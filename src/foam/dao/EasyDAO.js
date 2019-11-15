@@ -829,6 +829,57 @@ foam.CLASS({
       `
     },
     {
+      name: 'addDecoratorAfter',
+      documentation: 'Places a decorator chain ending in a null delegate at a specified point in the chain. Automatically insterts between given decorator and mdao. If isReverse flag is true, decorator chain placed before the dao instead of inbetween the supplied dao and mdao. Return true on success.',
+      type: 'Boolean',
+      args: [
+        {
+          documentation: 'Null ending decorator chain to insert',
+          name: 'decorator',
+          javaType: 'foam.dao.ProxyDAO'
+        },
+        {
+          documentation: 'Decorator in the EasyDAO chain to place in relation to',
+          name: 'location',
+          javaType: 'foam.core.ClassInfo'
+        },
+        {
+          documentation: 'If true, decorator chain placed before the dao instead of inbetween the supplied dao and mdao',
+          name: 'isReverse',
+          class: 'Boolean'
+        }
+      ],
+      javaCode: `
+        foam.dao.DAO daodecorator = getDelegate();
+
+        if ( ! ( daodecorator instanceof foam.dao.ProxyDAO ) ) 
+          return false;
+
+        ProxyDAO proxy = (ProxyDAO) daodecorator;
+        while ( true ) {
+          if ( isReverse && location.isInstance( proxy.getDelegate() ) )
+            break;
+          else if ( !isReverse && location.isInstance( proxy ) )
+            break;
+          else if ( !(proxy.getDelegate() instanceof foam.dao.ProxyDAO) ) 
+            return false;
+
+          proxy = (foam.dao.ProxyDAO) proxy.getDelegate();
+        }
+
+        if ( decorator == null || ! ( decorator.getDelegate() instanceof ProxyDAO ) ) 
+          return false;
+
+        foam.dao.ProxyDAO decoratorptr = decorator;
+        
+        while ( decorator.getDelegate() != null ) 
+          decorator = (ProxyDAO) decorator.getDelegate();
+        decorator.setDelegate(proxy.getDelegate());
+        proxy.setDelegate(decoratorptr);
+        return true;
+      `
+    },
+    {
       name: 'printDecorators',
       documentation: 'Useful for debugging and checking if EasyDAO is being used to correctly set up a decorator chain',
       javaCode: `
