@@ -48,13 +48,13 @@ foam.CLASS({
     },
     {
       name: 'crudMap',
-      class: 'Map',
-      javaType: 'java.util.Map<String, java.util.Map<String, java.util.List<String>>>'
+      class: 'Object',
+      type: 'foam.nanos.rope.CRUDMap'
     },
     {
       name: 'relationshipMap',
-      class: 'Map',
-      javaType: 'java.util.Map<String, java.util.List<String>>'
+      class: 'Object',
+      type: 'foam.nanos.rope.RelationshipMap',
     },
     {
       name: 'isInverse',
@@ -207,18 +207,9 @@ foam.CLASS({
         List<String> next = new ArrayList<String>();
     
         if ( crudKey != null && ! crudKey.equals("") ) {
-    
-          Map<String, List<String>> crudMap = getCrudMap() == null ? null : getCrudMap().get(crudKey);
-    
-          if ( propertyKey != null && ! propertyKey.equals("") && crudMap.containsKey(propertyKey) ) {
-            next = crudMap.get(propertyKey);
-          } else {
-            next = crudMap.get("__default__");
-          }
+          next = getCrudMap() == null ? null : getCrudMap().get(crudKey, propertyKey);
         } else if ( relationshipKey != null && ! relationshipKey.equals("") ) {
           next = getRelationshipMap() == null ? null : getRelationshipMap().get(relationshipKey);
-        } else {
-          return null;
         }
         return next;
       `
