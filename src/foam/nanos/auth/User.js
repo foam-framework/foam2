@@ -35,8 +35,6 @@ foam.CLASS({
     'foam.mlang.predicate.Predicate',
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.PriorPassword',
-    'foam.nanos.auth.UserNotificationSettingJunction',
-    'foam.nanos.auth.UserUserJunctionNotificationSettingJunction',
     'foam.nanos.notification.Notification',
     'foam.nanos.notification.NotificationSetting',
     'foam.util.SafetyUtil',
@@ -600,17 +598,12 @@ foam.CLASS({
     {
       name: 'notify',
       javaCode: `
-      DAO notificationSettingDAO = (DAO) x.get("notificationSettingDAO");
+        DAO notificationSettingDAO = (DAO) x.get("notificationSettingDAO");
 
-      List<UserNotificationSettingJunction> junctions = ((ArraySink) getNotificationSettings(x).getJunctionDAO().select(new ArraySink())).getArray();
-      for( UserNotificationSettingJunction junction : junctions ) {
-        NotificationSetting setting = (NotificationSetting) notificationSettingDAO.find(junction.getTargetId());
-        if ( setting == null ) {
-          throw new RuntimeException("A notification setting for the user cannot be found.");
+        List<NotificationSetting> settings = ((ArraySink) getNotificationSettings(x).select(new ArraySink())).getArray();
+        for( NotificationSetting setting : settings ) {
+          setting.sendNotification(x, this, notification);
         }
-  
-        setting.sendNotification(x, this, notification);
-      }
       `
     }
   ]
@@ -679,22 +672,22 @@ foam.RELATIONSHIP({
 });
 
 foam.RELATIONSHIP({
-  cardinality: '*:*',
+  cardinality: '1:*',
   sourceModel: 'foam.nanos.auth.UserUserJunction',
   targetModel: 'foam.nanos.notification.NotificationSetting',
   forwardName: 'notificationSettingsForBusinessUsers',
-  inverseName: 'businessUsers',
+  inverseName: 'businessUser',
   sourceProperty: {
     hidden: true
   }
 });
 
 foam.RELATIONSHIP({
-  cardinality: '*:*',
+  cardinality: '1:*',
   sourceModel: 'foam.nanos.auth.User',
   targetModel: 'foam.nanos.notification.NotificationSetting',
   forwardName: 'notificationSettings',
-  inverseName: 'owners',
+  inverseName: 'owner',
   sourceProperty: {
     hidden: true
   }

@@ -774,31 +774,3 @@ p({
     }
   """
 })
-
-p({
-  "class":"foam.nanos.boot.NSpec",
-  "name":"userNotificationSettingJunctionDAO",
-  "description":"The junction DAO for the many-to-many relationship between users and notification settings",
-  "serviceScript":"""
-    return new foam.dao.EasyDAO.Builder(x)
-      .setOf(foam.nanos.auth.UserNotificationSettingJunction.getOwnClassInfo())
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName("userNotificationSettingJunctions")
-      .setPm(true)
-      .build();
-  """
-})
-
-p({
-  "class":"foam.nanos.boot.NSpec",
-  "name":"userUserJunctionNotificationSettingJunctionDAO",
-  "description":"The junction DAO for the many-to-many relationship between business user pairs and notification settings",
-  "serviceScript":"""
-    return new foam.dao.EasyDAO.Builder(x)
-      .setOf(foam.nanos.auth.UserUserJunctionNotificationSettingJunction.getOwnClassInfo())
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName("userUserJunctionNotificationSettingJunctions")
-      .setPm(true)
-      .build();
-  """
-})
