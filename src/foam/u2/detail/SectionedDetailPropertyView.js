@@ -290,12 +290,12 @@ foam.CLASS({
                       .start({
                         class: 'foam.u2.tag.Image',
                         data: 'images/inline-error-icon.svg',
-                        displayHeight: 16,
-                        displayWidth: 16
                       })
                         .style({
                           'justify-content': 'flex-start',
-                          'margin': '0 8px 0 0'
+                          'margin': '0 8px 0 0',
+                          'width': '16px',
+                          'height': '16px'
                         })
                       .end()
                       .start()
