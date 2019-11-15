@@ -92,6 +92,12 @@ foam.CLASS({
       documentation: 'Uses largeLogo image on various views instead of logo.'
     },
     {
+      class: 'Color',
+      name: 'logoBackgroundColour',
+      documentation: 'The logo background colour to display in the application.',
+      section: 'colours'
+    },
+    {
       class: 'String',
       name: 'topNavigation',
       documentation: 'A custom top nav view to use.',
