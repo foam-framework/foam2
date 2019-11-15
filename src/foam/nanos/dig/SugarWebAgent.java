@@ -62,7 +62,7 @@ public class SugarWebAgent
       }
       
       PStream ps = new StringPStream(data);
-      ProxyParser jsonP =  new MapParser();
+      ProxyParser jsonP = new MapParser();
       jsonP.setX(x);
       PStream ps1 = jsonP.parse(ps , new ParserContextImpl());
       Map mapPostParam = (Map) ps1.value();
