@@ -30,6 +30,7 @@ import foam.lib.json.MapParser;
 import foam.lib.json.Outputter;
 import foam.lib.parse.PStream;
 import foam.lib.parse.ParserContextImpl;
+import foam.lib.parse.ProxyParser;
 import foam.lib.parse.StringPStream;
 import foam.nanos.boot.NSpec;
 import foam.nanos.dig.exception.DigErrorMessage;
@@ -61,8 +62,10 @@ public class SugarWebAgent
       }
       
       PStream ps = new StringPStream(data);
-      PStream jsonP = new MapParser().parse(ps , new ParserContextImpl());
-      Map mapPostParam = (Map) jsonP.value();
+      ProxyParser jsonP =  new MapParser();
+      jsonP.setX(x);
+      PStream ps1 = jsonP.parse(ps , new ParserContextImpl());
+      Map mapPostParam = (Map) ps1.value();
 
       String serviceName = (String) mapPostParam.get("service");
       if ( SafetyUtil.isEmpty(serviceName) ) {
