@@ -139,8 +139,7 @@ try {
         cls.extras.push(foam.java.Code.create({
           data:
 `protected class CustomFormatter extends Formatter {
-  long   prevTime;
-  String prevTimestamp;
+  foam.util.SyncFastTimestamper ts_ = new foam.util.SyncFastTimestamper();
 
   @Override
   public String format(LogRecord record) {
@@ -148,12 +147,7 @@ try {
     String        msg = record.getMessage();
     StringBuilder str = sb.get();
 
-    if ( prevTime / 1000 != System.currentTimeMillis() / 1000 ) {
-      prevTime = System.currentTimeMillis();
-      prevTimestamp = sdf.get().format(prevTime);
-    }
-
-    str.append(prevTimestamp);
+    str.append(ts_.createTimestamp());
     str.append(',');
 
     // debug special case, fine level == 500
