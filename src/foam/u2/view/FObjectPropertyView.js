@@ -23,7 +23,12 @@ foam.CLASS({
     },
     {
       name: 'writeView',
-      value: { class: 'foam.u2.detail.VerticalDetailView' }
+      factory: function() {
+        return {
+          class: 'foam.u2.view.FObjectView',
+          of: this.prop.of
+        }
+      }
     }
   ],
 });
