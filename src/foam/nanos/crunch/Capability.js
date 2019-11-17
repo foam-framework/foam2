@@ -36,6 +36,8 @@ foam.CLASS({
     'enabled',
     'visible',
     'expiry',
+    'price',
+    'featured',
     'daoKey'
   ],
 
@@ -53,7 +55,12 @@ foam.CLASS({
     {
       name: 'description',
       class: 'String',
-      documentation: `Description of capability`
+      documentation: `Brief description of capability`
+    },
+    {
+      name: 'longDescription',
+      class: 'String',
+      documentation: `Complete description of capability`
     },
     {
       name: 'notes',
@@ -100,6 +107,14 @@ foam.CLASS({
       name: 'permissionsGranted',
       class: 'StringArray',
       documentation: `List of permissions granted by this capability`
+    },
+    {
+      name: 'price',
+      class: 'Currency'
+    },
+    {
+      name: 'featured',
+      class: 'Boolean'
     },
     {
       name: 'daoKey',
