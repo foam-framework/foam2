@@ -806,28 +806,6 @@ foam.CLASS({
         return this;
       `
     },
-
-    /** Only relevant if cache is true or if daoType
-      was set to MDAO, but harmless otherwise. Adds an existing index
-      to the MDAO.
-      @param index The index to add.
-    */
-    {
-      name: 'addIndex',
-      type: 'foam.dao.EasyDAO',
-      documentation: 'Only relavent if the cache is true or if daoType was set to MDAO, but harmless otherwise. Adds an existing index to the MDAO',
-      // TODO: The java Index interface conflicts with the js CLASS Index
-      args: [ { javaType: 'foam.dao.index.Index', name: 'index' } ],
-      code: function addIndex(index) {
-        this.mdao && this.mdao.addIndex.apply(this.mdao, arguments);
-        return this;
-      },
-      javaCode: `
-        if ( getMdao() != null ) 
-          getMdao().addIndex(index);
-        return this;
-      `
-    },
     {
       name: 'printDecorators',
       documentation: 'Useful for debugging and checking if EasyDAO is being used to correctly set up a decorator chain',
