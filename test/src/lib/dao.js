@@ -1008,7 +1008,6 @@ describe('EasyDAO-permutations', function() {
       daoType: foam.dao.MDAO
     });
     // TODO: mock MDAO, check that these get called through
-    dao = dao.getMdao()
     dao.addPropertyIndex(test.CompA.A);
     dao.addIndex(test.CompA.A.toIndex(dao.mdao.idIndex));
   });
