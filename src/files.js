@@ -498,6 +498,7 @@ FOAM_FILES([
   { name: 'foam/u2/filter/FilterSearch', flags: ['web'] },
   { name: 'foam/u2/filter/FilterViewController', flags: ['web'] },
   { name: 'foam/u2/filter/StringFilterView', flags: ['web'] },
+  { name: 'foam/u2/filter/FObjectPropertyFilterView', flags: ['web'] },
   { name: 'foam/u2/filter/IntegerFilterView', flags: ['web'] },
   { name: 'foam/u2/filter/FloatFilterView', flags: ['web'] },
   { name: 'foam/u2/filter/BooleanFilterView', flags: ['web'] },

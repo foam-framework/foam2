@@ -486,6 +486,19 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2.search',
+  name: 'FObjectPropertyRefinement',
+  refines: 'foam.core.FObjectProperty',
+  properties: [
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'searchView',
+      value: { class: 'foam.u2.filter.FObjectPropertyFilterView' }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.u2.search',
   name: 'BooleanRefinement',
   refines: 'foam.core.Boolean',
 
