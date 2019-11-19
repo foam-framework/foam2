@@ -596,7 +596,7 @@ foam.CLASS({
       }
     },
     {
-      name: 'notify',
+      name: 'doNotify',
       javaCode: `
         DAO notificationSettingDAO = (DAO) x.get("notificationSettingDAO");
 

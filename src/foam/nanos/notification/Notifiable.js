@@ -8,7 +8,7 @@ foam.INTERFACE({
 
   methods: [
     {
-      name: 'notify',
+      name: 'doNotify',
       args: [
         { name: 'x', type: 'Context' },
         { name: 'notification', type: 'foam.nanos.notification.Notification' }
