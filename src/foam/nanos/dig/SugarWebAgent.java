@@ -141,7 +141,7 @@ public class SugarWebAgent
 
               if ( ! pArray[j].isNamePresent() ) {
                 DigErrorMessage error = new GeneralException.Builder(x)
-                  .setMessage("IllegalArgumentException : Add a compiler argument")
+                  .setMessage("IllegalArgumentException : Add a compiler argument (use javac -parameters)")
                   .build();
                 outputException(x, resp, "JSON", out, error);
                 return;

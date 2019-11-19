@@ -217,7 +217,7 @@ foam.CLASS({
         var query = false;
         var url   = '/service/sugar';
 
-        this.postData=this.data.toString();
+        this.postData = this.data.toString();
         return encodeURI(url);
       }
     },
@@ -242,12 +242,11 @@ foam.CLASS({
       name: 'postButton',
       label: 'Send POST Request',
       code: async function() {
-        if ( this.sugarURL !== '') {
+        if ( this.sugarURL !== '' ) {
           var req = this.HTTPRequest.create({
             url: window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + this.sugarURL + '?data=' + this.postData+ '&sessionId=' + localStorage.defaultSession,
             method: 'POST',
-            contentType: 'url',
-            payload: this.postData,
+            contentType: 'url'
           }).send();
 
           var resp = await req.then(async function(resp) {
