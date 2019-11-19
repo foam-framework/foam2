@@ -31,9 +31,6 @@ foam.RELATIONSHIP({
   unauthorizedSourceDAOKey: 'localTicketDAO',
   targetDAOKey: 'ticketCommentDAO',
   unauthorizedTargetDAOKey: 'localTicketCommentDAO',
-  // targetProperty: {
-  //   section: 'commentSection'
-  // },
 });
 
 foam.RELATIONSHIP({
