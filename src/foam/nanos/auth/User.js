@@ -241,13 +241,25 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'phoneNumber',
+      name: 'phoneNumberOld',
       transient: true,
       documentation: `Omits properties of the phone number object and returns
         the phone number.`,
       expression: function(phone) {
         return phone.number;
       },
+      section: 'personal'
+    },
+    {
+      class: 'PhoneNumber',
+      name: 'phoneNumber',
+      documentation: 'Personal phone number.',
+      section: 'personal'
+    },
+    {
+      class: 'Boolean',
+      name: 'phoneNumberVerified',
+      writePermissionRequired: true,
       section: 'personal'
     },
     {
@@ -259,6 +271,18 @@ foam.CLASS({
         return this.Phone.create();
       },
       view: { class: 'foam.u2.detail.VerticalDetailView' },
+      section: 'personal'
+    },
+    {
+      class: 'PhoneNumber',
+      name: 'mobile',
+      documentation: 'Returns the mobile phone number of the User from the Phone model.',
+      section: 'personal'
+    },
+    {
+      class: 'Boolean',
+      name: 'mobileVerified',
+      writePermissionRequired: true,
       section: 'personal'
     },
     {
