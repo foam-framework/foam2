@@ -3,348 +3,314 @@
 //  * Copyright 2019 The FOAM Authors. All Rights Reserved.
 //  * http://www.apache.org/licenses/LICENSE-2.0
 //  */
-// package foam.nanos.rope.test;
+package foam.nanos.rope.test;
 
-// import java.util.ArrayList;
-// import java.util.Arrays;
-// import java.util.HashMap;
-// import java.util.List;
-// import java.util.Map;
-// import foam.nanos.test.Test;
-// import foam.test.TestUtils;
-// import foam.core.*;
-// import foam.nanos.auth.*;
-// import foam.core.X;
-// import foam.dao.*;
-// import foam.dao.MDAO;
-// import foam.nanos.rope.*;
-// import foam.nanos.auth.User;
-// import net.nanopay.tx.model.Transaction;
-// import net.nanopay.account.Account;
-// // import net.nanopay.account.AccountUserJunction;
-// import net.nanopay.approval.ApprovalRequest;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import foam.nanos.test.Test;
+import foam.test.TestUtils;
+import foam.core.*;
+import foam.nanos.auth.*;
+import foam.core.X;
+import foam.dao.*;
+import foam.dao.MDAO;
+import foam.nanos.rope.*;
+import foam.nanos.auth.User;
+import net.nanopay.tx.model.Transaction;
+import net.nanopay.account.Account;
+// import net.nanopay.account.AccountUserJunction;
+import net.nanopay.approval.ApprovalRequest;
 
-// import static foam.mlang.MLang.*;
+import static foam.mlang.MLang.*;
 
-// public class ROPETest extends Test {
+public class ROPETest extends Test {
 
-//   DAO userDAO, accountDAO, transactionDAO, approvalRequestDAO, ropeDAO;
-//   // DAO accountViewerJunctionDAO, accountMakerJunctionDAO, accountApproverJunctionDAO, transactionViewerJunctionDAO, transactionMakerJunctionDAO, transactionApproverJunctionDAO, roleViewerJunctionDAO, roleMakerJunctionDAO, roleApproverJunctionDAO, ruleViewerJunctionDAO, ruleMakerJunctionDAO, ruleApproverJunctionDAO, userViewerJunctionDAO, userMakerJunctionDAO, userApproverJunctionDAO;
+  DAO userDAO, accountDAO, transactionDAO, approvalRequestDAO, ropeDAO;
+  // DAO accountViewerJunctionDAO, accountMakerJunctionDAO, accountApproverJunctionDAO, transactionViewerJunctionDAO, transactionMakerJunctionDAO, transactionApproverJunctionDAO, roleViewerJunctionDAO, roleMakerJunctionDAO, roleApproverJunctionDAO, ruleViewerJunctionDAO, ruleMakerJunctionDAO, ruleApproverJunctionDAO, userViewerJunctionDAO, userMakerJunctionDAO, userApproverJunctionDAO;
 
-//   // User accountViewer, accountMaker, accountApprover, transactionViewer, transactionMaker, transactionApprover, roleViewer, roleMaker, roleApprover, root;
-//   // Account rootAccount;
-//   // AccountUserJunction aujunction;
+  // User accountViewer, accountMaker, accountApprover, transactionViewer, transactionMaker, transactionApprover, roleViewer, roleMaker, roleApprover, root;
+  // Account rootAccount;
+  // AccountUserJunction aujunction;
 
-//   public void runTest(X x) {
-//     ropeDAO = (DAO) x.get("ropeDAO");
-//     List<ROPE> ropes = (List<ROPE>) ((ArraySink) ropeDAO.inX(x).select(new ArraySink())).getArray();
-//     System.out.println(ropes.size());
-//     for (ROPE rope : ropes) {
-//       System.out.println(rope.getCrudMap());
-//     }
-
-
-//     x = x.put("localUserDAO", new MDAO(User.getOwnClassInfo()));
-//     DAO easydao = new foam.dao.EasyDAO.Builder(x).setInnerDAO((DAO) x.get("localUserDAO")).setAuthorize(false).setOf(User.getOwnClassInfo()).build();
-//     x = x.put("userDAO", easydao);
-//     x = x.put("accountDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(Account.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("accountDAO").build()).build());
-//     x = x.put("transactionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(Transaction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("transactionDAO").build()).build());
-//     x = x.put("approvalRequestDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(ApprovalRequest.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("approvalRequestDAO").build()).build());
-//     // x = x.put("accountViewerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("accountViewerJunctionDAO").build()).build());
-//     // x = x.put("accountMakerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("accountMakerJunctionDAO").build()).build());
-//     // x = x.put("accountApproverJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("accountApproverJunctionDAO").build()).build());
-//     // x = x.put("transactionViewerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("transactionViewerJunctionDAO").build()).build());
-//     // x = x.put("transactionMakerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("transactionMakerJunctionDAO").build()).build());
-//     // x = x.put("transactionApproverJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("transactionApproverJunctionDAO").build()).build());
-//     // x = x.put("roleViewerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("roleViewerJunctionDAO").build()).build());
-//     // x = x.put("roleMakerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("roleMakerJunctionDAO").build()).build());
-//     // x = x.put("roleApproverJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("roleApproverJunctionDAO").build()).build());    
-//     // x = x.put("ruleViewerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("ruleViewerJunctionDAO").build()).build()); 
-//     // x = x.put("ruleMakerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("ruleMakerJunctionDAO").build()).build());
-//     // x = x.put("ruleApproverJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("ruleApproverJunctionDAO").build()).build());
-//     // x = x.put("userViewerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("userViewerJunctionDAO").build()).build()); 
-//     // x = x.put("userMakerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("userMakerJunctionDAO").build()).build());
-//     // x = x.put("userApproverJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("userApproverJunctionDAO").build()).build());
+  public void runTest(X x) {
+    x = x.put("localUserDAO", new MDAO(User.getOwnClassInfo()));
+    DAO easydao = new foam.dao.EasyDAO.Builder(x).setInnerDAO((DAO) x.get("localUserDAO")).setAuthorize(false).setOf(User.getOwnClassInfo()).build();
+    x = x.put("userDAO", easydao);
+    x = x.put("accountDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(Account.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("accountDAO").build()).build());
+    x = x.put("transactionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(Transaction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("transactionDAO").build()).build());
+    x = x.put("approvalRequestDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(ApprovalRequest.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("approvalRequestDAO").build()).build());
+    // x = x.put("accountViewerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("accountViewerJunctionDAO").build()).build());
+    // x = x.put("accountMakerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("accountMakerJunctionDAO").build()).build());
+    // x = x.put("accountApproverJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("accountApproverJunctionDAO").build()).build());
+    // x = x.put("transactionViewerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("transactionViewerJunctionDAO").build()).build());
+    // x = x.put("transactionMakerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("transactionMakerJunctionDAO").build()).build());
+    // x = x.put("transactionApproverJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("transactionApproverJunctionDAO").build()).build());
+    // x = x.put("roleViewerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("roleViewerJunctionDAO").build()).build());
+    // x = x.put("roleMakerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("roleMakerJunctionDAO").build()).build());
+    // x = x.put("roleApproverJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("roleApproverJunctionDAO").build()).build());    
+    // x = x.put("ruleViewerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("ruleViewerJunctionDAO").build()).build()); 
+    // x = x.put("ruleMakerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("ruleMakerJunctionDAO").build()).build());
+    // x = x.put("ruleApproverJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("ruleApproverJunctionDAO").build()).build());
+    // x = x.put("userViewerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("userViewerJunctionDAO").build()).build()); 
+    // x = x.put("userMakerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("userMakerJunctionDAO").build()).build());
+    // x = x.put("userApproverJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("userApproverJunctionDAO").build()).build());
     
-//     // ropeDAO = (DAO) x.get("ropeDAO");
-//     userDAO = (DAO) x.get("userDAO");
-//     accountDAO = (DAO) x.get("accountDAO");
-//     transactionDAO = (DAO) x.get("transactionDAO");
-//     approvalRequestDAO = (DAO) x.get("approvalRequestDAO");
-//     // accountViewerJunctionDAO = (DAO) x.get("accountViewerJunctionDAO");
-//     // accountMakerJunctionDAO = (DAO) x.get("accountMakerJunctionDAO");
-//     // accountApproverJunctionDAO = (DAO) x.get("accountApproverJunctionDAO");
-//     // transactionViewerJunctionDAO = (DAO) x.get("transactionViewerJunctionDAO");
-//     // transactionMakerJunctionDAO = (DAO) x.get("transactionMakerJunctionDAO");
-//     // transactionApproverJunctionDAO = (DAO) x.get("transactionApproverJunctionDAO");
-//     // roleViewerJunctionDAO = (DAO) x.get("roleViewerJunctionDAO");
-//     // roleMakerJunctionDAO = (DAO) x.get("roleMakerJunctionDAO");
-//     // roleApproverJunctionDAO = (DAO) x.get("roleApproverJunctionDAO");
-//     // ruleViewerJunctionDAO = (DAO) x.get("ruleViewerJunctionDAO");
-//     // ruleMakerJunctionDAO = (DAO) x.get("ruleMakerJunctionDAO");
-//     // ruleApproverJunctionDAO = (DAO) x.get("ruleApproverJunctionDAO");
-//     // userViewerJunctionDAO = (DAO) x.get("userViewerJunctionDAO");
-//     // userMakerJunctionDAO = (DAO) x.get("userMakerJunctionDAO");
-//     // userApproverJunctionDAO = (DAO) x.get("userApproverJunctionDAO");
+    ropeDAO = (DAO) x.get("ropeDAO");
+    userDAO = (DAO) x.get("userDAO");
+    accountDAO = (DAO) x.get("accountDAO");
+    transactionDAO = (DAO) x.get("transactionDAO");
+    approvalRequestDAO = (DAO) x.get("approvalRequestDAO");
+    // accountViewerJunctionDAO = (DAO) x.get("accountViewerJunctionDAO");
+    // accountMakerJunctionDAO = (DAO) x.get("accountMakerJunctionDAO");
+    // accountApproverJunctionDAO = (DAO) x.get("accountApproverJunctionDAO");
+    // transactionViewerJunctionDAO = (DAO) x.get("transactionViewerJunctionDAO");
+    // transactionMakerJunctionDAO = (DAO) x.get("transactionMakerJunctionDAO");
+    // transactionApproverJunctionDAO = (DAO) x.get("transactionApproverJunctionDAO");
+    // roleViewerJunctionDAO = (DAO) x.get("roleViewerJunctionDAO");
+    // roleMakerJunctionDAO = (DAO) x.get("roleMakerJunctionDAO");
+    // roleApproverJunctionDAO = (DAO) x.get("roleApproverJunctionDAO");
+    // ruleViewerJunctionDAO = (DAO) x.get("ruleViewerJunctionDAO");
+    // ruleMakerJunctionDAO = (DAO) x.get("ruleMakerJunctionDAO");
+    // ruleApproverJunctionDAO = (DAO) x.get("ruleApproverJunctionDAO");
+    // userViewerJunctionDAO = (DAO) x.get("userViewerJunctionDAO");
+    // userMakerJunctionDAO = (DAO) x.get("userMakerJunctionDAO");
+    // userApproverJunctionDAO = (DAO) x.get("userApproverJunctionDAO");
     
-//     // setupROPEs(x);
+    setupROPEs(x);
 
-//     // testHelperMethods(x);
-//     // testROPEs(x);
-//     // ropeDAO.inX(x).removeAll();
+    testHelperMethods(x);
+    testROPEs(x);
+    ropeDAO.inX(x).removeAll();
 
-//     // add back when liquid stuff merged into dev
-//     // setupLiquidROPEs(x);
-//     // testLiquid(x);
+    // add back when liquid stuff merged into dev
+    // setupLiquidROPEs(x);
+    // testLiquid(x);
 
-//   }
+  }
 
-//   public void setupROPEs(X x) {
-//     // set up a mock rope
-//     List<String> list = new ArrayList<String>();
-//     Map<String, List<String>> createMap = new HashMap<String, List<String>>();
-//     Map<String, List<String>> readMap = new HashMap<String, List<String>>();
-//     Map<String, List<String>> updateMap = new HashMap<String, List<String>>();
-//     Map<String, List<String>> deleteMap = new HashMap<String, List<String>>();
-//     Map<String, Map<String, List<String>>> crudMap = new HashMap<String, Map<String, List<String>>>();
-//     Map<String, List<String>> relationshipMap = new HashMap<String, List<String>>();
+  public void setupROPEs(X x) {
+    // set up a mock rope
+    List list;
+    Map<String, NextRelationshipsList> createMap = new HashMap<String, NextRelationshipsList>();
+    Map<String, NextRelationshipsList> readMap = new HashMap<String, NextRelationshipsList>();
+    Map<String, NextRelationshipsList> updateMap = new HashMap<String, NextRelationshipsList>();
+    Map<String, NextRelationshipsList> deleteMap = new HashMap<String, NextRelationshipsList>();
+    Map<String, NextRelationshipsList> relationshipMap = new HashMap<String, NextRelationshipsList>();
+    RelationshipMap relationshipMapObj;
+    CRUDMap crudMapObj;
 
-//     // transaction - transaction rope
+    // transaction - transaction rope
 
-//     list = new ArrayList<String>(Arrays.asList( "sourceAccount", "parent" )); 
-//     createMap.put("__default__", list);
-//     list = new ArrayList<String>(Arrays.asList( "sourceAccount", "destinationAccount", "parent" ));
-//     readMap.put("__default__", list);
-//     list = new ArrayList<String>(Arrays.asList( ));
-//     updateMap.put("__default__", list);
-//     list = new ArrayList<String>(Arrays.asList( ));
-//     deleteMap.put("__default__", list);
-//     crudMap.put("create", createMap);
-//     crudMap.put("read", readMap);
-//     crudMap.put("update", updateMap);
-//     crudMap.put("delete", deleteMap);
+    list = new ArrayList<String>(Arrays.asList( "sourceAccount", "parent" )); 
+    createMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    list.add("destinationAccount");
+    readMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    updateMap.put("__default__", null);
+    deleteMap.put("__default__", null);
+    crudMapObj = new CRUDMap.Builder(x).setCreate(createMap).setRead(readMap).setUpdate(updateMap).setDelete(deleteMap).build();
 
-//     ropeDAO.inX(x).put(new ROPE.Builder(x)
-//       .setSourceDAOKey("transactionDAO")
-//       .setTargetDAOKey("transactionDAO")
-//       .setCardinality("1:*")
-//       .setRelationshipKey("parent")
-//       .setCrudMap(crudMap)           
-//       .setRelationshipMap(relationshipMap)   
-//       .build());
-//     createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); crudMap.clear(); relationshipMap.clear();
+    ropeDAO.inX(x).put(new ROPE.Builder(x)
+      .setSourceDAOKey("transactionDAO")
+      .setTargetDAOKey("transactionDAO")
+      .setCardinality("1:*")
+      .setRelationshipKey("parent")
+      .setCrudMap(crudMapObj)          
+      .build());
+    createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); relationshipMap.clear();
 
-//     // transaction - sourceAccount rope 
+    // transaction - sourceAccount rope 
 
-//     list = new ArrayList<String>(Arrays.asList( "owner", "parent" )); 
-//     createMap.put("__default__", list);
-//     list = new ArrayList<String>(Arrays.asList( "owner", "parent" ));
-//     readMap.put("__default__", list);
-//     list = new ArrayList<String>(Arrays.asList( ));
-//     updateMap.put("__default__", list);
-//     list = new ArrayList<String>(Arrays.asList( ));
-//     deleteMap.put("__default__", list);
-//     crudMap.put("create", createMap);
-//     crudMap.put("read", readMap);
-//     crudMap.put("update", updateMap);
-//     crudMap.put("delete", deleteMap);
-//     relationshipMap.put("parent", new ArrayList<String>(Arrays.asList( "owner", "parent" )));
+    list = new ArrayList<String>(Arrays.asList( "owner", "parent" )); 
+    createMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    readMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    updateMap.put("__default__", null);
+    deleteMap.put("__default__", null);
+    crudMapObj = new CRUDMap.Builder(x).setCreate(createMap).setRead(readMap).setUpdate(updateMap).setDelete(deleteMap).build();
+    relationshipMap.put("parent", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    relationshipMapObj = new RelationshipMap.Builder(x).setMap(relationshipMap).build();
 
-//     ropeDAO.inX(x).put(new ROPE.Builder(x)
-//       .setSourceDAOKey("accountDAO")
-//       .setTargetDAOKey("transactionDAO")
-//       .setCardinality("1:*")
-//       .setRelationshipKey("sourceAccount")
-//       .setCrudMap(crudMap)           
-//       .setRelationshipMap(relationshipMap)   
-//       .build());
-//     createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); crudMap.clear(); relationshipMap.clear();
+    ropeDAO.inX(x).put(new ROPE.Builder(x)
+      .setSourceDAOKey("accountDAO")
+      .setTargetDAOKey("transactionDAO")
+      .setCardinality("1:*")
+      .setRelationshipKey("sourceAccount")
+      .setCrudMap(crudMapObj)           
+      .setRelationshipMap(relationshipMapObj)   
+      .build());
+    createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); relationshipMap.clear();
 
-//     // transaction - destinationAccount rope 
+    // transaction - destinationAccount rope 
 
-//     list = new ArrayList<String>(Arrays.asList( )); 
-//     createMap.put("__default__", list);
-//     list = new ArrayList<String>(Arrays.asList( "owner", "parent" ));
-//     readMap.put("__default__", list);
-//     list = new ArrayList<String>(Arrays.asList( ));
-//     updateMap.put("__default__", list);
-//     list = new ArrayList<String>(Arrays.asList( ));
-//     deleteMap.put("__default__", list);
-//     crudMap.put("create", createMap);
-//     crudMap.put("read", readMap);
-//     crudMap.put("update", updateMap);
-//     crudMap.put("delete", deleteMap);
-//     relationshipMap.put("parent", new ArrayList<String>(Arrays.asList( "owner", "parent" )));
+    createMap.put("__default__", null);
+    list = new ArrayList<String>(Arrays.asList( "owner", "parent" ));
+    readMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    updateMap.put("__default__", null);
+    deleteMap.put("__default__", null);
+    crudMapObj = new CRUDMap.Builder(x).setCreate(createMap).setRead(readMap).setUpdate(updateMap).setDelete(deleteMap).build();
+    relationshipMap.put("parent", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    relationshipMapObj = new RelationshipMap.Builder(x).setMap(relationshipMap).build();
 
-//     ropeDAO.inX(x).put(new ROPE.Builder(x)
-//       .setSourceDAOKey("accountDAO")
-//       .setTargetDAOKey("transactionDAO")
-//       .setCardinality("1:*")
-//       .setRelationshipKey("destinationAccount")
-//       .setCrudMap(crudMap)           
-//       .setRelationshipMap(relationshipMap)   
-//       .build());
-//     createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); crudMap.clear(); relationshipMap.clear();
+    ropeDAO.inX(x).put(new ROPE.Builder(x)
+      .setSourceDAOKey("accountDAO")
+      .setTargetDAOKey("transactionDAO")
+      .setCardinality("1:*")
+      .setRelationshipKey("destinationAccount")
+      .setCrudMap(crudMapObj)           
+      .setRelationshipMap(relationshipMapObj)   
+      .build());
+    createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); relationshipMap.clear();
 
-//     // parentAccount - childAccount rope 
+    // parentAccount - childAccount rope 
 
-//     list = new ArrayList<String>(Arrays.asList( "owner", "parent" )); 
-//     createMap.put("__default__", list);
-//     list = new ArrayList<String>(Arrays.asList( "owner", "parent" ));
-//     readMap.put("__default__", list);
-//     list = new ArrayList<String>(Arrays.asList( "owner", "parent" ));
-//     updateMap.put("__default__", list);
-//     list = new ArrayList<String>(Arrays.asList( "owner", "parent" ));
-//     deleteMap.put("__default__", list);
-//     crudMap.put("create", createMap);
-//     crudMap.put("read", readMap);
-//     crudMap.put("update", updateMap);
-//     crudMap.put("delete", deleteMap);
-//     relationshipMap.put("sourceAccount", new ArrayList<String>(Arrays.asList( "owner", "parent" )));
-//     relationshipMap.put("destinationAccount", new ArrayList<String>(Arrays.asList( "owner", "parent" )));
+    list = new ArrayList<String>(Arrays.asList( "owner", "parent" )); 
+    createMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    readMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    updateMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    deleteMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    crudMapObj = new CRUDMap.Builder(x).setCreate(createMap).setRead(readMap).setUpdate(updateMap).setDelete(deleteMap).build();
+    relationshipMap.put("sourceAccount", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    relationshipMap.put("destinationAccount", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    relationshipMapObj = new RelationshipMap.Builder(x).setMap(relationshipMap).build();
 
-//     ropeDAO.inX(x).put(new ROPE.Builder(x)
-//       .setSourceDAOKey("accountDAO")
-//       .setTargetDAOKey("accountDAO")
-//       .setCardinality("1:*")
-//       .setRelationshipKey("parent")
-//       .setCrudMap(crudMap)           
-//       .setRelationshipMap(relationshipMap)   
-//       .build());
-//     createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); crudMap.clear(); relationshipMap.clear();
+    ropeDAO.inX(x).put(new ROPE.Builder(x)
+      .setSourceDAOKey("accountDAO")
+      .setTargetDAOKey("accountDAO")
+      .setCardinality("1:*")
+      .setRelationshipKey("parent")
+      .setCrudMap(crudMapObj)           
+      .setRelationshipMap(relationshipMapObj)   
+      .build());
+    createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); relationshipMap.clear();
 
 
-//     // user - account rope 
+    // user - account rope 
 
-//     list = new ArrayList<String>(Arrays.asList( "__terminate__" )); 
-//     createMap.put("__default__", list);
-//     list = new ArrayList<String>(Arrays.asList( "__terminate__" ));
-//     readMap.put("__default__", list);
-//     list = new ArrayList<String>(Arrays.asList( "__terminate__" ));
-//     updateMap.put("__default__", list);
-//     list = new ArrayList<String>(Arrays.asList( "__terminate__" ));
-//     deleteMap.put("__default__", list);
-//     crudMap.put("create", createMap);
-//     crudMap.put("read", readMap);
-//     crudMap.put("update", updateMap);
-//     crudMap.put("delete", deleteMap);
-//     relationshipMap.put("parent", new ArrayList<String>(Arrays.asList( "__terminate__" )));
-//     relationshipMap.put("sourceAccount", new ArrayList<String>(Arrays.asList( "__terminate__" )));
-//     relationshipMap.put("destinationAccount", new ArrayList<String>(Arrays.asList( "__terminate__" )));
+    list = new ArrayList<String>(Arrays.asList( "__terminate__" )); 
+    createMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    readMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    updateMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    deleteMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    crudMapObj = new CRUDMap.Builder(x).setCreate(createMap).setRead(readMap).setUpdate(updateMap).setDelete(deleteMap).build();
+    relationshipMap.put("parent", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    relationshipMap.put("sourceAccount", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    relationshipMap.put("destinationAccount", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    relationshipMapObj = new RelationshipMap.Builder(x).setMap(relationshipMap).build();
 
-//     ropeDAO.inX(x).put(new ROPE.Builder(x)
-//       .setSourceDAOKey("userDAO")
-//       .setTargetDAOKey("accountDAO")
-//       .setCardinality("1:*")
-//       .setRelationshipKey("owner")
-//       .setCrudMap(crudMap)           
-//       .setRelationshipMap(relationshipMap)   
-//       .build());
-//     createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); crudMap.clear(); relationshipMap.clear();
+    ropeDAO.inX(x).put(new ROPE.Builder(x)
+      .setSourceDAOKey("userDAO")
+      .setTargetDAOKey("accountDAO")
+      .setCardinality("1:*")
+      .setRelationshipKey("owner")
+      .setCrudMap(crudMapObj)           
+      .setRelationshipMap(relationshipMapObj)   
+      .build());
+    createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); relationshipMap.clear();
 
-//   }
+  }
 
-//   public void testROPEs(X x) {
-//     User contact = new User.Builder(x).setId(2).setFirstName("contactuser").build();
-//     contact = (User) userDAO.put(contact);
-//     Account contactaccount = new Account.Builder(x).setId(1).setOwner(2).build();
-//     contactaccount = (Account) accountDAO.put(contactaccount);
+  public void testROPEs(X x) {
+    User contact = new User.Builder(x).setId(2).setFirstName("contactuser").build();
+    contact = (User) userDAO.put(contact);
+    Account contactaccount = new Account.Builder(x).setId(1).setOwner(2).build();
+    contactaccount = (Account) accountDAO.put(contactaccount);
 
-//     User user = new User.Builder(x).setId(7).setFirstName("testuser").build();
-//     user = (User) userDAO.put(user);
-//     x = x.put("user", user);
-//     test(((User) x.get("user")).getId() == 7, "context user is correct : " + ((User) x.get("user")).getId());
-//     Account account = new Account.Builder(x).setId(8).setOwner(7).build();
+    User user = new User.Builder(x).setId(7).setFirstName("testuser").build();
+    user = (User) userDAO.put(user);
+    x = x.put("user", user);
+    test(((User) x.get("user")).getId() == 7, "context user is correct : " + ((User) x.get("user")).getId());
+    Account account = new Account.Builder(x).setId(8).setOwner(7).build();
 
-//     // test user can put into accountDAO
-//     account = (Account) accountDAO.inX(x).put(account);
-//     test(account != null, "user can create account with itself as owner");
-//     test(accountDAO.inX(x).find(account.getId()) != null, "user can read account");
+    // test user can put into accountDAO
+    account = (Account) accountDAO.inX(x).put(account);
+    test(account != null, "user can create account with itself as owner");
+    test(accountDAO.inX(x).find(account.getId()) != null, "user can read account");
 
-//     Transaction transaction = new Transaction.Builder(x).setSourceAccount(8).setDestinationAccount(8).setId("t1").build();
-//     transaction = (Transaction) transactionDAO.put(transaction);
-//     test(transaction != null, "user can create transaction with sourceAccount as account user owns");
-//     Transaction t2 = new Transaction.Builder(x).setSourceAccount(contactaccount.getId()).setDestinationAccount(8).setId("t2").build();
-//     try {
-//       t2 = (Transaction) transactionDAO.inX(x).put(t2);
-//     } catch (java.lang.Exception e) {
-//       test(e instanceof AuthorizationException, "user cannot create transaction with sourceaccount as account they do not own");
-//     }
-//   }
+    Transaction transaction = new Transaction.Builder(x).setSourceAccount(8).setDestinationAccount(7).setId("t1").build();
+    transaction = (Transaction) transactionDAO.put(transaction);
+    test(transaction != null, "user can create transaction with sourceAccount as account user owns");
+    Transaction t2 = new Transaction.Builder(x).setSourceAccount(contactaccount.getId()).setDestinationAccount(8).setId("t2").build();
+    try {
+      t2 = (Transaction) transactionDAO.inX(x).put(t2);
+    } catch (java.lang.Exception e) {
+      test(e instanceof AuthorizationException, "user cannot create transaction with sourceaccount as account they do not own");
+    }
+  }
 
-//   public void testHelperMethods(X x) {
-//     // set up a mock rope
-//     List<String> list = new ArrayList<String>();
-//     Map<String, List<String>> createMap = new HashMap<String, List<String>>();
-//     Map<String, List<String>> readMap = new HashMap<String, List<String>>();
-//     Map<String, List<String>> updateMap = new HashMap<String, List<String>>();
-//     Map<String, List<String>> deleteMap = new HashMap<String, List<String>>();
-//     Map<String, Map<String, List<String>>> crudMap = new HashMap<String, Map<String, List<String>>>();
-//     Map<String, List<String>> relationshipMap = new HashMap<String, List<String>>();
+  public void testHelperMethods(X x) {
+    // set up a mock rope
+    List<String> list = new ArrayList<String>();
+    Map<String, NextRelationshipsList> createMap = new HashMap<String, NextRelationshipsList>();
+    Map<String, NextRelationshipsList> readMap = new HashMap<String, NextRelationshipsList>();
+    Map<String, NextRelationshipsList> updateMap = new HashMap<String, NextRelationshipsList>();
+    Map<String, NextRelationshipsList> deleteMap = new HashMap<String, NextRelationshipsList>();
+    Map<String, NextRelationshipsList> relationshipMap = new HashMap<String, NextRelationshipsList>();
 
-//     list = new ArrayList<String>(Arrays.asList( "a", "b" )); 
-//     createMap.put("__default__", list);
-//     list = new ArrayList<String>(Arrays.asList( "c", "d" )); 
-//     createMap.put("prop1", list);
-//     list = new ArrayList<String>(Arrays.asList( "e", "f" ));
-//     readMap.put("__default__", list);
-//     list = new ArrayList<String>(Arrays.asList( "g", "h" ));
-//     updateMap.put("__default__", list);
-//     list = new ArrayList<String>(Arrays.asList( "i", "j" ));
-//     updateMap.put("prop2", list);
-//     list = new ArrayList<String>(Arrays.asList( "k", "l" ));
-//     deleteMap.put("__default__", list);
-//     crudMap.put("create", createMap);
-//     crudMap.put("read", readMap);
-//     crudMap.put("update", updateMap);
-//     crudMap.put("delete", deleteMap);
+    list = new ArrayList<String>(Arrays.asList( "a", "b" )); 
+    createMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    list = new ArrayList<String>(Arrays.asList( "c", "d" )); 
+    createMap.put("prop1", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    list = new ArrayList<String>(Arrays.asList( "e", "f" ));
+    readMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    list = new ArrayList<String>(Arrays.asList( "g", "h" ));
+    updateMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    list = new ArrayList<String>(Arrays.asList( "i", "j" ));
+    updateMap.put("prop2", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    list = new ArrayList<String>(Arrays.asList( "k", "l" ));
+    deleteMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    CRUDMap crudMapObj = new CRUDMap.Builder(x).setCreate(createMap).setUpdate(updateMap).setRead(readMap).setDelete(deleteMap).build();
 
-//     relationshipMap.put("rel1", new ArrayList<String>(Arrays.asList( "m", "n" )));
-//     relationshipMap.put("rel2", new ArrayList<String>(Arrays.asList( "o", "p" )));
+    list = new ArrayList<String>(Arrays.asList( "m", "n" ));
+    relationshipMap.put("rel1", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    list = new ArrayList<String>(Arrays.asList( "o", "p" ));
+    relationshipMap.put("rel2", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    RelationshipMap relationshipMapObj = new RelationshipMap.Builder(x).setMap(relationshipMap).build();
 
-//     ROPE rope = (ROPE) ropeDAO.inX(x).put(new ROPE.Builder(x)
-//       .setSourceDAOKey("aDAO")
-//       .setTargetDAOKey("bDAO")
-//       .setCardinality("*:*")
-//       .setRelationshipKey("bs")
-//       .setCrudMap(crudMap)           
-//       .setRelationshipMap(relationshipMap)   
-//       .build());
-//     createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); crudMap.clear(); relationshipMap.clear();
+    ROPE rope = (ROPE) ropeDAO.inX(x).put(new ROPE.Builder(x)
+      .setSourceDAOKey("aDAO")
+      .setTargetDAOKey("bDAO")
+      .setCardinality("*:*")
+      .setRelationshipKey("bs")
+      .setCrudMap(crudMapObj)           
+      .setRelationshipMap(relationshipMapObj)   
+      .build());
+    createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); relationshipMap.clear();
 
-//     // test retrieveProperty(obj, objClass, prefix, propertyName. x);
-//     test(rope.retrieveProperty(rope, rope.getClass(), "get", "cardinality").equals("*:*"), "test retrieveProperty for property");
+    // test retrieveProperty(obj, objClass, prefix, propertyName. x);
+    test(rope.retrieveProperty(rope, rope.getClass(), "get", "cardinality").equals("*:*"), "test retrieveProperty for property");
     
-//     User user = (User) userDAO.put(new User.Builder(x).setId(123).setFirstName("testuser").build());
-//     test(rope.retrieveProperty(user, user.getClass(), "get", "accounts", x) instanceof DAO, "test retrieveProperty for relationship");
+    User user = (User) userDAO.put(new User.Builder(x).setId(123).setFirstName("testuser").build());
+    test(rope.retrieveProperty(user, user.getClass(), "get", "accounts", x) instanceof DAO, "test retrieveProperty for relationship");
 
-//     // test getNextRelationships(relationshipKey, crudKey, propertyKey);
-//     List<String> result = rope.getNextRelationships("rel1", "create", "prop1");
-//     test(result.contains("c"), "test getNextRelationships should return list for prop1 in createMap : " + result);
-//     result = rope.getNextRelationships("rel1", "create", "");
-//     test(result.contains("a"), "test getNextRelationships should return list for __default__ in createMap : " + result);
-//     result = rope.getNextRelationships("", "", "prop1");
-//     test(result == null, "test getNextRelationships should return null for wrong args : " + result);
+    // test getNextRelationships(relationshipKey, crudKey, propertyKey);
+    List<String> result = rope.getNextRelationships("rel1", "create", "prop1");
+    test(result.contains("c"), "test getNextRelationships should return list for prop1 in createMap : " + result);
+    result = rope.getNextRelationships("rel1", "create", "");
+    test(result.contains("a"), "test getNextRelationships should return list for __default__ in createMap : " + result);
+    result = rope.getNextRelationships("", "", "prop1");
+    test(result == null || result.size() == 0, "test getNextRelationships should return null for wrong args : " + result);
 
-//     // test getPropertiesUpdated(oldObj, obj);
-//     ROPE rope2 = ((ROPE) rope.fclone());
-//     rope2.setCardinality("1:1");
-//     ROPEAuthorizer ra = new ROPEAuthorizer.Builder(x).setTargetDAOKey("ropeDAO").build();
-//     List<String> propertiesUpdated = ra.getPropertiesUpdated(rope, rope2);
-//     test(propertiesUpdated.equals(new ArrayList<String>(Arrays.asList("cardinality"))), "test getPropertiesUpdated for property update returned list of size = "+ propertiesUpdated.size() +" : " + propertiesUpdated);
-//     propertiesUpdated = ra.getPropertiesUpdated(null, rope);
-//     test(propertiesUpdated.size() == 7, "test getPropertiesUpdated for createObject returned list of size = " + propertiesUpdated.size() + " : " + propertiesUpdated);
+    // test getPropertiesUpdated(oldObj, obj);
+    ROPE rope2 = ((ROPE) rope.fclone());
+    rope2.setCardinality("1:1");
+    ROPEAuthorizer ra = new ROPEAuthorizer.Builder(x).setTargetDAOKey("ropeDAO").build();
+    List<String> propertiesUpdated = ra.getPropertiesUpdated(rope, rope2);
+    test(propertiesUpdated.equals(new ArrayList<String>(Arrays.asList("cardinality"))), "test getPropertiesUpdated for property update returned list of size = "+ propertiesUpdated.size() +" : " + propertiesUpdated);
+    propertiesUpdated = ra.getPropertiesUpdated(null, rope);
+    test(propertiesUpdated.size() == 7, "test getPropertiesUpdated for createObject returned list of size = " + propertiesUpdated.size() + " : " + propertiesUpdated);
 
-//     // test rope.getSourceObjects(x, obj);
-//     Account account = (Account) accountDAO.put(new Account.Builder(x).setId(345).setOwner(user.getId()).build());
-//     ROPE accountOwnerRope = (ROPE) ropeDAO.find(AND(
-//       EQ(ROPE.SOURCE_DAOKEY, "userDAO"),
-//       EQ(ROPE.TARGET_DAOKEY, "accountDAO"),
-//       EQ(ROPE.RELATIONSHIP_KEY, "owner")
-//     ));
-//     List<FObject> objs= accountOwnerRope.getSourceObjects(x, account);
-//     test(objs.size() == 1 && ((User) objs.get(0)).getId() == 123, "test getSourceObjects");
-//   }
+    // test rope.getSourceObjects(x, obj);
+    Account account = (Account) accountDAO.put(new Account.Builder(x).setId(345).setOwner(user.getId()).build());
+    ROPE accountOwnerRope = (ROPE) ropeDAO.find(AND(
+      EQ(ROPE.SOURCE_DAOKEY, "userDAO"),
+      EQ(ROPE.TARGET_DAOKEY, "accountDAO"),
+      EQ(ROPE.RELATIONSHIP_KEY, "owner")
+    ));
+    List<FObject> objs= accountOwnerRope.getSourceObjects(x, account);
+    test(objs.size() == 1 && ((User) objs.get(0)).getId() == 123, "test getSourceObjects");
+  }
 
 //   // public void testLiquid(X x) {
 
@@ -1185,4 +1151,4 @@
 //   // }
 
 
-// }
+}
