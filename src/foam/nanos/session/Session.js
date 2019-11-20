@@ -21,7 +21,8 @@ foam.CLASS({
     'foam.nanos.logger.Logger',
     'foam.nanos.logger.PrefixLogger',
     'foam.util.SafetyUtil',
-    'java.util.Date'
+    'java.util.Date',
+    'static foam.mlang.MLang.*'
   ],
 
   tableColumns: [
@@ -242,6 +243,66 @@ foam.CLASS({
         return rtn
           .put("group", group)
           .put("appConfig", group.getAppConfig(rtn));
+      `
+    },
+    {
+      name: 'validate',
+      args: [
+        { name: 'x', type: 'Context' }
+      ],
+      javaCode: `
+        if ( getUserId() < 1 ) {
+          throw new IllegalStateException("User id is invalid.");
+        }
+
+        if ( getAgentId() < 0 ) {
+          throw new IllegalStateException("Agent id is invalid.");
+        }
+
+        if ( ! hasSPIDPermission(x, "create", getUserId() ) ) {
+          throw new AuthorizationException("You don't have permission to create a session for that user.");
+        }
+
+        if ( getAgentId() > 0 ) {
+          DAO localUserDAO = (DAO) x.get("localUserDAO");
+          User sessionAgent = (User) localUserDAO.inX(x).find(getAgentId());
+
+          if ( sessionAgent == null ) {
+            throw new RuntimeException(String.format("Agent with id '%d' not found.", getAgentId()));
+          }
+
+          DAO agentJunctionDAO = (DAO) x.get("agentJunctionDAO");
+          UserUserJunction junction = (UserUserJunction) agentJunctionDAO.find(
+            AND(
+              EQ(UserUserJunction.SOURCE_ID, getAgentId()),
+              EQ(UserUserJunction.TARGET_ID, getUserId())
+            )
+          );
+
+          if ( junction == null ) {
+            throw new RuntimeException("The junction between user and agent was not found.");
+          }
+        }
+      `
+    },
+    {
+      name: 'hasSPIDPermission',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'operation', type: 'String' },
+        { name: 'userId', type: 'Long' }
+      ],
+      type: 'Boolean',
+      javaCode: `
+        AuthService auth         = (AuthService) x.get("auth");
+        DAO         localUserDAO = (DAO) x.get("localUserDAO");
+        User        sessionUser  = (User) localUserDAO.inX(x).find(userId);
+
+        if ( sessionUser == null ) throw new RuntimeException(String.format("User with id '%d' not found.", userId));
+
+        String spid = sessionUser.getSpid();
+        if ( SafetyUtil.isEmpty(spid) ) spid = "*";
+        return auth.check(x, String.format("session.%s.%s", operation, spid));
       `
     }
   ]
