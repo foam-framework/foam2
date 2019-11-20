@@ -49,12 +49,12 @@ foam.CLASS({
     {
       name: 'crudMap',
       class: 'FObjectProperty',
-      type: 'foam.nanos.rope.CRUDMap'
+      of: 'foam.nanos.rope.CRUDMap'
     },
     {
       name: 'relationshipMap',
       class: 'FObjectProperty',
-      type: 'foam.nanos.rope.RelationshipMap',
+      of: 'foam.nanos.rope.RelationshipMap',
     },
     {
       name: 'isInverse',
