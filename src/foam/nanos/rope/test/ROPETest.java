@@ -285,11 +285,11 @@ public class ROPETest extends Test {
     test(rope.retrieveProperty(user, user.getClass(), "get", "accounts", x) instanceof DAO, "test retrieveProperty for relationship");
 
     // test getNextRelationships(relationshipKey, crudKey, propertyKey);
-    List<String> result = rope.getNextRelationships("rel1", "create", "prop1");
+    List<String> result = rope.getNextRelationships("rel1", CrudOperation.CREATE, "prop1");
     test(result.contains("c"), "test getNextRelationships should return list for prop1 in createMap : " + result);
-    result = rope.getNextRelationships("rel1", "create", "");
+    result = rope.getNextRelationships("rel1", CrudOperation.CREATE, "");
     test(result.contains("a"), "test getNextRelationships should return list for __default__ in createMap : " + result);
-    result = rope.getNextRelationships("", "", "prop1");
+    result = rope.getNextRelationships("", null, "prop1");
     test(result == null || result.size() == 0, "test getNextRelationships should return null for wrong args : " + result);
 
     // test getPropertiesUpdated(oldObj, obj);

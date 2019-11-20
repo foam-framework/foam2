@@ -88,20 +88,20 @@ foam.CLASS({
           /**
            * Returns the map for a crud operation.
            * */
-          public Map<String, NextRelationshipsList> get(String crudKey) {
+          public Map<String, NextRelationshipsList> get(CrudOperation crudKey) {
             switch ( crudKey ) {
-              case "create":
+              case CREATE:
                 return getCreate();
-              case "read":
+              case READ:
                 return getRead();
-              case "update":
+              case UPDATE:
                 return getUpdate();
-              case "delete":
+              case DELETE:
                 return getDelete();
               default:
             }
             return null;
-          }
+          }   
 
           /**
            * Returns the list of relationshipKeys of ropes that can authorize a crud operation, depending on the
@@ -109,7 +109,7 @@ foam.CLASS({
            * If the propertyKey is null, empty, or not found, return __default__ list.
            * Otherwise, return the list mapped to by the property name.
            * */
-          public List<String> get(String crudKey, String propertyKey) {
+          public List<String> get(CrudOperation crudKey, String propertyKey) {
             Map<String, NextRelationshipsList> map = this.get(crudKey);
             if ( map == null ) return null;
     
@@ -122,4 +122,27 @@ foam.CLASS({
       }
     }
   ],
-})
+});
+
+foam.ENUM({
+  package: 'foam.nanos.rope',
+  name: 'CrudOperation',
+  values: [
+    {
+      name: 'CREATE',
+      label: 'create'
+    },
+    {
+      name: 'READ',
+      label: 'read'
+    },
+    {
+      name: 'UPDATE',
+      label: 'update'
+    },
+    {
+      name: 'DELETE',
+      label: 'delete'
+    }
+  ]
+});
