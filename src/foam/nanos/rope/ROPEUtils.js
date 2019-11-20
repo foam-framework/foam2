@@ -54,6 +54,18 @@ foam.CLASS({
     'java.util.List'
   ],
 
+  constants: [
+    {
+      name: 'DEFAULT',
+      type: 'String',
+      value: '__default__',
+      documentation: `
+      This is the default key to be used for mapping to a list of next relationships in the sub-maps of this model.
+      To authorize using a different set of relationships for create/update operations, please use propertyname as key.
+      `
+    },
+  ],
+
   properties: [
     {
       name: 'create',
@@ -80,38 +92,41 @@ foam.CLASS({
   axioms: [
     {
       name: 'javaExtras',
+      documentation: `
+      The 'get' functions are added via javaExtras rather than methods because method overloading is not yet supported in foam.
+      `,
       buildJavaClass: function (cls) {
         cls.extras.push(`
           /**
-           * returns the map for a crud operation
+           * Returns the map for a crud operation.
            * */
-          public Map<String, NextRelationshipsList> get(String crudKey) {
+          public Map<String, NextRelationshipsList> get(CrudOperation crudKey) {
             switch ( crudKey ) {
-              case "create":
+              case CREATE:
                 return getCreate();
-              case "read":
+              case READ:
                 return getRead();
-              case "update":
+              case UPDATE:
                 return getUpdate();
-              case "delete":
+              case DELETE:
                 return getDelete();
               default:
             }
             return null;
-          }
+          }   
 
           /**
-           * returns the list of relationshipKeys of ropes that can authorize a crud operation, depending on the
+           * Returns the list of relationshipKeys of ropes that can authorize a crud operation, depending on the
            * crudKey and propertyKey.
            * If the propertyKey is null, empty, or not found, return __default__ list.
-           * Otherwise, return the list mapped to by the property name
+           * Otherwise, return the list mapped to by the property name.
            * */
-          public List<String> get(String crudKey, String propertyKey) {
+          public List<String> get(CrudOperation crudKey, String propertyKey) {
             Map<String, NextRelationshipsList> map = this.get(crudKey);
             if ( map == null ) return null;
     
             if ( propertyKey == null || propertyKey.equals("") || ! map.containsKey(propertyKey) ) {
-              return map.containsKey("__default__") && map.get("__default__") != null ? map.get("__default__").getNextRelationships() : null;
+              return map.containsKey(DEFAULT) && map.get(DEFAULT) != null ? map.get(DEFAULT).getNextRelationships() : null;
             }
             return map.get(propertyKey).getNextRelationships();
           }
@@ -119,4 +134,27 @@ foam.CLASS({
       }
     }
   ],
-})
+});
+
+foam.ENUM({
+  package: 'foam.nanos.rope',
+  name: 'CrudOperation',
+  values: [
+    {
+      name: 'CREATE',
+      label: 'create'
+    },
+    {
+      name: 'READ',
+      label: 'read'
+    },
+    {
+      name: 'UPDATE',
+      label: 'update'
+    },
+    {
+      name: 'DELETE',
+      label: 'delete'
+    }
+  ]
+});
