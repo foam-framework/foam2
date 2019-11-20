@@ -671,28 +671,6 @@ foam.RELATIONSHIP({
   }
 });
 
-foam.RELATIONSHIP({
-  cardinality: '1:*',
-  sourceModel: 'foam.nanos.auth.UserUserJunction',
-  targetModel: 'foam.nanos.notification.NotificationSetting',
-  forwardName: 'notificationSettingsForBusinessUsers',
-  inverseName: 'businessUser',
-  sourceProperty: {
-    hidden: true
-  }
-});
-
-foam.RELATIONSHIP({
-  cardinality: '1:*',
-  sourceModel: 'foam.nanos.auth.User',
-  targetModel: 'foam.nanos.notification.NotificationSetting',
-  forwardName: 'notificationSettings',
-  inverseName: 'owner',
-  sourceProperty: {
-    hidden: true
-  }
-});
-
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'UserUserJunctionRefinement',
