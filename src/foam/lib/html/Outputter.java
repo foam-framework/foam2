@@ -42,6 +42,7 @@ public class Outputter
   protected OutputterMode      mode_;
   protected boolean            outputHeaders_;
   protected boolean            isHeadersOutput_ = false;
+  protected String[]           fields_       = null;
 
   public Outputter() {
     this(OutputterMode.FULL);
@@ -137,34 +138,41 @@ public class Outputter
   public void outputHead(FObject obj) {
     writer_.append("<thead><tr>");
     List<PropertyInfo> prop = of_.getAxiomsByClass(PropertyInfo.class);
-    for ( PropertyInfo pi : prop ) {
-      if ( mode_ == OutputterMode.NETWORK && pi.getNetworkTransient() ) continue;
-      if ( mode_ == OutputterMode.STORAGE && pi.getStorageTransient() ) continue;
 
-      writer_.append("<th>");
-      writer_.append(pi.getName());
-      writer_.append("</th>");
+    for ( PropertyInfo pi : prop ) {
+      if (mode_ == OutputterMode.NETWORK && pi.getNetworkTransient()) continue;
+      if (mode_ == OutputterMode.STORAGE && pi.getStorageTransient()) continue;
+
+      if ( fields_ != null && checkFieldsProperty(pi) || fields_ == null ) {
+        writer_.append("<th>");
+        writer_.append(pi.getName());
+        writer_.append("</th>");
+      }
     }
+
     writer_.append("</tr></thead>");
   }
 
   protected void outputFObject(FObject obj) {
-    List     axioms = of_.getAxiomsByClass(PropertyInfo.class);
-    Iterator i      = axioms.iterator();
-int j = 0;
+    ClassInfo info = obj.getClassInfo();
+    List<PropertyInfo> axioms = of_.getAxiomsByClass(PropertyInfo.class);
+
+    int j = 0;
     writer_.append("<tr>");
-    while ( i.hasNext() ) {
-      PropertyInfo prop = (PropertyInfo) i.next();
+    for ( PropertyInfo prop : axioms ) {
       if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) continue;
       if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) continue;
 
-      writer_.append("<td col=" + (++j) + ">");
-      try {
-        output(prop.get(obj));
-      } catch (Throwable t) {
-        output("nbsp;<!-- error -->");
+      if ( fields_ != null && checkFieldsProperty(prop) || fields_ == null ) {
+
+        writer_.append("<td col=" + (++j) + ">");
+        try {
+          output(prop.get(obj));
+        } catch (Throwable t) {
+          output("nbsp;<!-- error -->");
+        }
+        writer_.append("</td>");
       }
-      writer_.append("</td>");
     }
     writer_.append("</tr>");
   }
@@ -204,5 +212,19 @@ int j = 0;
   public void flush() throws IOException {
     if ( stringWriter_ != null ) stringWriter_.flush();
     if ( writer_ != null ) writer_.flush();
+  }
+
+  public Outputter setFields(String[] fields) {
+    fields_ = fields;
+
+    return this;
+  }
+
+  public boolean checkFieldsProperty(PropertyInfo prop) {
+    for ( int i = 0; i < fields_.length; i++ ) {
+      if ( fields_[i].equals(prop.getName()) )
+        return true;
+    }
+    return false;
   }
 }

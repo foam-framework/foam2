@@ -25,7 +25,7 @@ import org.apache.commons.io.IOUtils;
 public class Outputter
   extends AbstractSink
   implements foam.lib.Outputter {
-  
+
   protected static ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
     @Override
     protected SimpleDateFormat initialValue() {
@@ -45,6 +45,7 @@ public class Outputter
   protected boolean       outputReadableDates_ = true;
   protected PropertyPredicate propertyPredicate_;
   protected Map<String, List<PropertyInfo>> propertyMap_ = new HashMap<>();
+  protected String[]      fields_ = null;
 
 
   public Outputter(foam.core.X x) {
@@ -320,7 +321,8 @@ public class Outputter
       while ( e.hasNext() ) {
         PropertyInfo prop = (PropertyInfo) e.next();
         if ( propertyPredicate_ == null || propertyPredicate_.propertyPredicateCheck(this.x_, of.toLowerCase(), prop) ) {
-          filteredAxioms.add(prop);
+          if ( fields_ != null && checkFieldsProperty(prop) || fields_ == null )
+            filteredAxioms.add(prop);
         }
       }
       propertyMap_.put(of, filteredAxioms);
@@ -340,7 +342,7 @@ public class Outputter
 
     if ( includeComma ) writer_.append(",");
     if ( multiLineOutput_ ) addInnerNewline();
-    outputProperty(fo, prop); 
+    outputProperty(fo, prop);
     return true;
   }
 
@@ -380,10 +382,10 @@ public class Outputter
           outputProperty(newFObject, prop);
         }
       }
-      
-      if ( isDiff ) { 
+
+      if ( isDiff ) {
         if ( multiLineOutput_ )  writer_.append("\n");
-        writer_.append("}"); 
+        writer_.append("}");
       }
     }
   }
@@ -515,5 +517,19 @@ public class Outputter
 
   public void setMultiLine(boolean ml) {
     multiLineOutput_ = ml;
+  }
+
+  public Outputter setFields(String[] fields) {
+    fields_ = fields;
+
+    return this;
+  }
+
+  public boolean checkFieldsProperty(foam.core.PropertyInfo prop) {
+    for ( int i = 0; i < fields_.length; i++ ) {
+      if ( fields_[i].equals(prop.getName()) )
+        return true;
+    }
+    return false;
   }
 }

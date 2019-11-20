@@ -29,6 +29,7 @@ import foam.nanos.http.*;
 import foam.nanos.logger.Logger;
 import foam.nanos.logger.PrefixLogger;
 import foam.nanos.notification.email.EmailMessage;
+import foam.parse.SinkParser;
 import foam.util.Emails.EmailsUtility;
 import foam.nanos.pm.PM;
 import foam.util.SafetyUtil;
@@ -65,6 +66,7 @@ public class DigWebAgent
     boolean             emailSet = email != null && email.length > 0 && ! SafetyUtil.isEmpty(email[0]);
     String              subject  = p.getParameter("subject");
     String              fileAddress = p.getParameter("fileaddress");
+    String              fields   = p.getParameter("fields");
 
     //
     // FIXME/TODO: ensuring XML and CSV flows return proper response objects and codes has not been completed since the switch to HttpParameters.
@@ -142,6 +144,7 @@ public class DigWebAgent
           Outputter outputterJson = new Outputter(x).setPropertyPredicate(new foam.lib.AndPropertyPredicate(x, new foam.lib.PropertyPredicate[] {new foam.lib.NetworkPropertyPredicate(), new foam.lib.PermissionedPropertyPredicate()}));;
           outputterJson.setOutputDefaultValues(true);
           outputterJson.setOutputClassNames(true);
+
           // let FObjectArray parse first
           if ( SafetyUtil.isEmpty(data) ) {
               DigErrorMessage error = new EmptyDataException.Builder(x).build();
@@ -339,10 +342,63 @@ public class DigWebAgent
         }
         out.println(returnMessage);
       } else if ( Command.select == command ) {
+        resp.setContentType("text/html");
+
         PropertyInfo idProp = (PropertyInfo) cInfo.getAxiomByName("id");
         ArraySink sink = (ArraySink) ( ! SafetyUtil.isEmpty(id) ?
           dao.where(MLang.EQ(idProp, id)).select(new ArraySink()) :
           dao.select(new ArraySink()));
+
+        SinkParser sinkParser = new SinkParser(cInfo);
+        StringPStream ps = new StringPStream(fields);
+        ParserContextImpl x_ = new ParserContextImpl();
+        ps = (StringPStream) sinkParser.parse(ps, x_);
+
+        Object[] psArray = (Object[]) ps.value();
+        logger.debug("ps.value.length: " + psArray.length);
+
+        for ( Object objPs : psArray ) {
+          logger.debug("ps.value() : " + objPs);
+
+          if ( objPs.toString().startsWith("groupBy") || objPs.toString().startsWith("min") || objPs.toString().startsWith("max") || objPs.toString().startsWith("avg") ) {
+            String pName = getPropertyName(objPs.toString());
+            PropertyInfo pInfo = (PropertyInfo) cInfo.getAxiomByName(pName);
+
+            if ( pInfo != null) {
+              if ( objPs.toString().startsWith("groupBy") ) {
+                foam.mlang.sink.GroupBy groupBy = (foam.mlang.sink.GroupBy) dao.select(MLang.GROUP_BY(pInfo, new foam.mlang.sink.Count()));
+
+                for ( Object key : groupBy.getGroups().keySet() ) {
+                  foam.mlang.sink.Count count = ((foam.mlang.sink.Count) groupBy.getGroups().get(key));
+                  out.println(key + " : " + count.getValue());
+                }
+              } else if ( objPs.toString().startsWith("min") || objPs.toString().startsWith("max") || objPs.toString().startsWith("avg") ) {
+                foam.dao.Sink[] seqSinkArray = {MLang.MIN(pInfo), MLang.MAX(pInfo), MLang.AVG(pInfo), MLang.SUM(pInfo)};
+                foam.mlang.sink.Sequence seq = (foam.mlang.sink.Sequence) dao.select(MLang.SEQ(seqSinkArray));
+
+                for ( Object o : seq.getArgs() ) {
+                  if ( o instanceof foam.mlang.sink.Min )
+                    out.println("MIN : " + ((foam.mlang.sink.Min) o).getValue());
+                  else if ( o instanceof foam.mlang.sink.Max )
+                    out.println("MAX : " + ((foam.mlang.sink.Max) o).getValue());
+                  else if ( o instanceof foam.mlang.sink.Average )
+                    out.println("AVG : " + ((foam.mlang.sink.Average) o).getValue());
+                  else if ( o instanceof foam.mlang.sink.Sum )
+                    out.println("SUM : " + ((foam.mlang.sink.Sum) o).getValue());
+                }
+              }
+
+              return;
+            } else if ( pInfo == null ) {
+              DigErrorMessage error = new GeneralException.Builder(x)
+                .setMessage("Invalid Filed Name : " + pName)
+                .build();
+              outputException(x, resp, format, out, error);
+
+              return;
+            }
+          }
+        }
 
         if ( sink != null ) {
           if ( sink.getArray().size() == 0 ) {
@@ -355,10 +411,14 @@ public class DigWebAgent
           }
           logger.debug(this.getClass().getSimpleName(), "objects selected: " + sink.getArray().size());
 
+          String[] fieldsArray = fields.split(",");
+          if ( fieldsArray[0].equals("*") ) fieldsArray = null;
+
           if ( Format.JSON == format ) {
             Outputter outputterJson = new Outputter(x).setPropertyPredicate(new AndPropertyPredicate(x, new PropertyPredicate[] {new NetworkPropertyPredicate(), new PermissionedPropertyPredicate()}));
             outputterJson.setOutputDefaultValues(true);
             outputterJson.setOutputClassNames(true);
+            outputterJson.setFields(fieldsArray);
             outputterJson.output(sink.getArray().toArray());
 
             //resp.setContentType("application/json");
@@ -369,6 +429,7 @@ public class DigWebAgent
             }
           } else if ( Format.XML == format ) {
             foam.lib.xml.Outputter outputterXml = new foam.lib.xml.Outputter(OutputterMode.NETWORK);
+            outputterXml.setFields(fieldsArray);
             outputterXml.output(sink.getArray().toArray());
 
             resp.setContentType("application/xml");
@@ -381,6 +442,7 @@ public class DigWebAgent
           } else if ( Format.CSV == format ) {
             CSVOutputter outputterCsv = new foam.lib.csv.CSVOutputterImpl.Builder(x)
              .setOf(cInfo)
+             .setFields(fieldsArray)
              .build();
 
             for ( Object o : sink.getArray() ) {
@@ -395,6 +457,7 @@ public class DigWebAgent
           } else if ( Format.HTML == format ) {
             foam.lib.html.Outputter outputterHtml = new foam.lib.html.Outputter(cInfo, OutputterMode.NETWORK);
 
+            outputterHtml.setFields(fieldsArray);
             outputterHtml.outputStartHtml();
             outputterHtml.outputStartTable();
             List a = sink.getArray();
@@ -415,6 +478,7 @@ public class DigWebAgent
             }
           } else if ( Format.JSONJ == format ) {
             Outputter outputterJson = new Outputter(x).setPropertyPredicate(new AndPropertyPredicate(new PropertyPredicate[] {new StoragePropertyPredicate(), new PermissionedPropertyPredicate()}));
+            outputterJson.setFields(fieldsArray);
             List a = sink.getArray();
             String dataToString = "";
 
@@ -429,10 +493,6 @@ public class DigWebAgent
             }
           }
         } else {
-          if ( Format.XML == format ) {
-            resp.setContentType("text/html");
-          }
-
           DigErrorMessage error = new ParsingErrorException.Builder(x)
             .setMessage("Unsupported DAO : " + daoName)
             .build();
@@ -596,5 +656,14 @@ public class DigWebAgent
     } else {
       // TODO
     }
+  }
+
+  public String getPropertyName(String field) {
+    int start = field.indexOf("(");
+    int end = field.indexOf(")");
+
+    String pName = field.substring(start+1, end);
+
+    return pName;
   }
 }
