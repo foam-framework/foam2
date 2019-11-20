@@ -45,7 +45,7 @@ foam.CLASS({
         { name: 'x', javaType: 'X' },
         { name: 'obj', javaType: 'FObject' },
         { name: 'targetDAOKey', javaType: 'String' },
-        { name: 'crudKey', javaType: 'String' },
+        { name: 'crudKey', javaType: 'CrudOperation' },
         { name: 'propertyKey', javaType: 'String' }
       ],
       javaCode: `    
@@ -92,7 +92,7 @@ foam.CLASS({
     
         List<String> propertiesUpdated = getPropertiesUpdated(null, obj);
         for ( String property : propertiesUpdated ) {
-          if ( ! authorizeByRope(x, obj, getTargetDAOKey(), "create", property ) ) {
+          if ( ! authorizeByRope(x, obj, getTargetDAOKey(), CrudOperation.CREATE, property ) ) {
             throw new AuthorizationException("You don't have permission to create this object");
           }
         }
@@ -103,7 +103,7 @@ foam.CLASS({
       javaCode: `
         // TODO remove after SystemAuthorizer is created
         if ( ((User) x.get("user")).getId() == User.SYSTEM_USER_ID ) return;
-        if ( ! authorizeByRope(x, obj, getTargetDAOKey(), "read", "") ) throw new AuthorizationException("You don't have permission to read this object");
+        if ( ! authorizeByRope(x, obj, getTargetDAOKey(), CrudOperation.READ, "") ) throw new AuthorizationException("You don't have permission to read this object");
       `
     },
     {
@@ -114,7 +114,7 @@ foam.CLASS({
     
         List<String> propertiesUpdated = getPropertiesUpdated(oldObj, newObj);
         for ( String property : propertiesUpdated ) {
-          if ( ! authorizeByRope(x, newObj, getTargetDAOKey(), "update", property ) ) {
+          if ( ! authorizeByRope(x, newObj, getTargetDAOKey(), CrudOperation.UPDATE, property ) ) {
             throw new AuthorizationException("You don't have permission to update this object");
           }
         }
@@ -125,7 +125,7 @@ foam.CLASS({
       javaCode: `
       // TODO remove after SystemAuthorizer is created
       if ( ((User) x.get("user")).getId() == User.SYSTEM_USER_ID ) return;
-      if ( ! authorizeByRope(x, obj, getTargetDAOKey(), "delete", "") ) throw new AuthorizationException("You don't have permission to delete this object");
+      if ( ! authorizeByRope(x, obj, getTargetDAOKey(), CrudOperation.DELETE, "") ) throw new AuthorizationException("You don't have permission to delete this object");
       `
     },
     {

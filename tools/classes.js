@@ -507,7 +507,11 @@ var classes = [
   'foam.nanos.rope.OrROPE',
   'foam.nanos.rope.AndROPE',
   'foam.nanos.rope.ROPEAuthorizer',
-  'foam.nanos.rope.CompositeROPE'
+  'foam.nanos.rope.CompositeROPE',
+  'foam.nanos.rope.RelationshipMap',
+  'foam.nanos.rope.CRUDMap',
+  'foam.nanos.rope.CrudOperation',
+  'foam.nanos.rope.NextRelationshipsList',
 ];
 
 var abstractClasses = [

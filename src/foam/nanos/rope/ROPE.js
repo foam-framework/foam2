@@ -48,13 +48,13 @@ foam.CLASS({
     },
     {
       name: 'crudMap',
-      class: 'Map',
-      javaType: 'java.util.Map<String, java.util.Map<String, java.util.List<String>>>'
+      class: 'FObjectProperty',
+      of: 'foam.nanos.rope.CRUDMap'
     },
     {
       name: 'relationshipMap',
-      class: 'Map',
-      javaType: 'java.util.Map<String, java.util.List<String>>'
+      class: 'FObjectProperty',
+      of: 'foam.nanos.rope.RelationshipMap',
     },
     {
       name: 'isInverse',
@@ -71,7 +71,7 @@ foam.CLASS({
         { name: 'x', javaType: 'X' },
         { name: 'obj', javaType: 'FObject' },
         { name: 'relationshipKey', javaType: 'String' },
-        { name: 'crudKey', javaType: 'String' },
+        { name: 'crudKey', javaType: 'CrudOperation' },
         { name: 'propertyKey', javaType: 'String' }
       ],
       javaCode: `
@@ -97,7 +97,7 @@ foam.CLASS({
               EQ(ROPE.RELATIONSHIP_KEY, nextRelationship)
             )).select(new ArraySink())).getArray();
             for ( ROPE nextRope : nextRopes ) {
-              if ( nextRope.check(x, sourceObj, getRelationshipKey(), "", "") ) return true;
+              if ( nextRope.check(x, sourceObj, getRelationshipKey(), null, "") ) return true;
             }
           }
         }
@@ -192,7 +192,7 @@ foam.CLASS({
       name: 'getNextRelationships',
       args: [
         { name: 'relationshipKey', javaType: 'String' },
-        { name: 'crudKey', javaType: 'String' },
+        { name: 'crudKey', javaType: 'CrudOperation' },
         { name: 'propertyKey', javaType: 'String' }
       ],
       javaType: 'List<String>',
@@ -206,19 +206,10 @@ foam.CLASS({
       javaCode: `
         List<String> next = new ArrayList<String>();
     
-        if ( crudKey != null && ! crudKey.equals("") ) {
-    
-          Map<String, List<String>> crudMap = getCrudMap() == null ? null : getCrudMap().get(crudKey);
-    
-          if ( propertyKey != null && ! propertyKey.equals("") && crudMap.containsKey(propertyKey) ) {
-            next = crudMap.get(propertyKey);
-          } else {
-            next = crudMap.get("__default__");
-          }
+        if ( crudKey != null ) {
+          next = getCrudMap() == null ? null : getCrudMap().get(crudKey, propertyKey);
         } else if ( relationshipKey != null && ! relationshipKey.equals("") ) {
           next = getRelationshipMap() == null ? null : getRelationshipMap().get(relationshipKey);
-        } else {
-          return null;
         }
         return next;
       `
