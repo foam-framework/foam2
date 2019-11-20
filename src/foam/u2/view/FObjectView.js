@@ -122,7 +122,7 @@ foam.CLASS({
           choices.sort((a, b) => a[1] > b[1] ? 1 : -1);
 
           this.choices = choices;
-        });
+        }).catch(err => console.warn(err));
       } else {
         this.choices = this.choicesFallback(this.of);
       }
