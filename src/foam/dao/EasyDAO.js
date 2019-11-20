@@ -830,7 +830,7 @@ foam.CLASS({
     },
     {
       name: 'addDecoratorAfter',
-      documentation: 'Places a decorator chain ending in a null delegate at a specified point in the chain. Automatically insterts between given decorator and mdao. If isReverse flag is true, decorator chain placed before the dao instead of inbetween the supplied dao and mdao. Return true on success.',
+      documentation: 'Places a decorator chain ending in a null delegate at a specified point in the chain. Automatically insterts between given decorator and mdao. If "before" flag is true, decorator chain placed before the dao instead of inbetween the supplied dao and mdao. Return true on success.',
       type: 'Boolean',
       args: [
         {
@@ -845,7 +845,7 @@ foam.CLASS({
         },
         {
           documentation: 'If true, decorator chain placed before the dao instead of inbetween the supplied dao and mdao',
-          name: 'isReverse',
+          name: 'before',
           class: 'Boolean'
         }
       ],
@@ -857,9 +857,9 @@ foam.CLASS({
 
         ProxyDAO proxy = (ProxyDAO) daodecorator;
         while ( true ) {
-          if ( isReverse && location.isInstance( proxy.getDelegate() ) )
+          if ( before && location.isInstance( proxy.getDelegate() ) )
             break;
-          else if ( !isReverse && location.isInstance( proxy ) )
+          else if ( !before && location.isInstance( proxy ) )
             break;
           else if ( !(proxy.getDelegate() instanceof foam.dao.ProxyDAO) ) 
             return false;
