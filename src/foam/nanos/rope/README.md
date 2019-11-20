@@ -158,3 +158,58 @@ Finally, we finish this examply by setting up the `userDAO` to `transactionDAO` 
       .build());
     createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); crudMap.clear(); relationshipMap.clear();
 ```
+
+##### Example of ROPE in Journals
+
+This is an example of what a ROPE set-up looks like as an entry in a journal. Here, we are using the userDAO - accountDAO ROPE in the above example.
+
+Account - User ROPE: 
+```json
+p({
+  "class": "foam.nanos.rope.ROPE",
+  "sourceDAOKey": "userDAO",
+  "targetDAOKey": "accountDAO",
+  "cardinality": "1:*",
+  "relationshipKey": "owner",
+  "isInverse": false,
+  "relationshipMap": {
+    "class": "foam.nanos.rope.RelationshipMap",
+    "map": {
+      "parent": {
+        "class": "foam.nanos.rope.NextRelationshipsList",
+        "nextRelationships": [ "__terminate__" ]
+      },
+      "sourceAccount": {
+        "class": "foam.nanos.rope.NextRelationshipsList",
+        "nextRelationships": [ "__terminate__" ]
+      }
+    }
+  },
+  "crudMap": {
+    "class": "foam.nanos.rope.CRUDMap",
+    "create": {
+      "__default__": {
+        "class": "foam.nanos.rope.NextRelationshipsList",
+        "nextRelationships": [ "__terminate__" ]
+      }
+    },
+    "read": {
+      "__default__": {
+        "class": "foam.nanos.rope.NextRelationshipsList",
+        "nextRelationships": [ "__terminate__" ]
+      }
+    },
+    "update": {
+      "__default__": {
+        "class": "foam.nanos.rope.NextRelationshipsList",
+        "nextRelationships": [ "__terminate__" ]
+      }
+    },
+    "delete": {
+      "__default__": {
+        "class": "foam.nanos.rope.NextRelationshipsList",
+        "nextRelationships": [ "__terminate__" ]
+      }
+    }
+  }
+})
