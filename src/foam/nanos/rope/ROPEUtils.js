@@ -80,10 +80,13 @@ foam.CLASS({
   axioms: [
     {
       name: 'javaExtras',
+      documentation: `
+      The 'get' functions are added via javaExtras rather than methods because method overloading is not yet supported in foam.
+      `,
       buildJavaClass: function (cls) {
         cls.extras.push(`
           /**
-           * returns the map for a crud operation
+           * Returns the map for a crud operation.
            * */
           public Map<String, NextRelationshipsList> get(String crudKey) {
             switch ( crudKey ) {
@@ -101,10 +104,10 @@ foam.CLASS({
           }
 
           /**
-           * returns the list of relationshipKeys of ropes that can authorize a crud operation, depending on the
+           * Returns the list of relationshipKeys of ropes that can authorize a crud operation, depending on the
            * crudKey and propertyKey.
            * If the propertyKey is null, empty, or not found, return __default__ list.
-           * Otherwise, return the list mapped to by the property name
+           * Otherwise, return the list mapped to by the property name.
            * */
           public List<String> get(String crudKey, String propertyKey) {
             Map<String, NextRelationshipsList> map = this.get(crudKey);
