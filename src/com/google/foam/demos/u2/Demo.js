@@ -25,7 +25,7 @@
 
        for ( let i = 0 ; i < this.numOfParts ; i++ ) {
          let v = this.TextField.create({size: 2});
-         v.data$.relateFrom(this.data$, _ => this.data.substring(0,i) + v.data.substring(0) + this.data.substring(i+1), _ => this.data.substring(i, i+1));
+         v.data$.relateFrom(this.data$, () => this.data.substring(0,i) + v.data.substring(0) + this.data.substring(i+1), () => this.data.substring(i, i+1));
          this.tag(v);
        }
 
