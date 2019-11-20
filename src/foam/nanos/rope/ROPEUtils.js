@@ -7,6 +7,13 @@
 foam.CLASS({
   package: 'foam.nanos.rope',
   name: 'NextRelationshipsList',
+  
+  documentation: `
+  This is the List of next relationships used in the sub-maps of CRUDMap and in relationshipMap.
+  The reason this model is needed is because when a ROPE with the maps as Map<String, List<String>> is read from the journal, 
+  the List is interpreted as an String[] instead of List<String> (probably), so we get <String, Ljava.lang.String>.
+  Modelling this list, and using this class as the value type in the maps is a quick fix to this problem.
+  `,
 
   properties: [
     {
