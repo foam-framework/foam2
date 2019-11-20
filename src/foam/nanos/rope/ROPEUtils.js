@@ -54,6 +54,18 @@ foam.CLASS({
     'java.util.List'
   ],
 
+  constants: [
+    {
+      name: 'DEFAULT',
+      type: 'String',
+      value: '__default__',
+      documentation: `
+      This is the default key to be used for mapping to a list of next relationships in the sub-maps of this model.
+      To authorize using a different set of relationships for create/update operations, please use propertyname as key.
+      `
+    },
+  ],
+
   properties: [
     {
       name: 'create',
@@ -114,7 +126,7 @@ foam.CLASS({
             if ( map == null ) return null;
     
             if ( propertyKey == null || propertyKey.equals("") || ! map.containsKey(propertyKey) ) {
-              return map.containsKey("__default__") && map.get("__default__") != null ? map.get("__default__").getNextRelationships() : null;
+              return map.containsKey(DEFAULT) && map.get(DEFAULT) != null ? map.get(DEFAULT).getNextRelationships() : null;
             }
             return map.get(propertyKey).getNextRelationships();
           }
