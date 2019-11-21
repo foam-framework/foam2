@@ -160,6 +160,14 @@ foam.CLASS({
           proxy.setDelegate(delegate);
           delegate = (ProxyDAO) getDecorator();
         }
+        
+        if ( getSeqNo() ) {
+          delegate = new foam.dao.SequenceNumberDAO.Builder(getX()).
+          setDelegate(delegate).
+          setProperty(getSeqPropertyName()).
+          setStartingValue(getSeqStartingValue()).
+          build();
+        }
 
         if ( getValidated() ) {
           if ( getValidator() != null )
@@ -201,14 +209,6 @@ foam.CLASS({
 
         if ( getGuid() ) 
           delegate = new foam.dao.GUIDDAO.Builder(getX()).setDelegate(delegate).build();
-
-        if ( getSeqNo() ) {
-          delegate = new foam.dao.SequenceNumberDAO.Builder(getX()).
-          setDelegate(delegate).
-          setProperty(getSeqPropertyName()).
-          setStartingValue(getSeqStartingValue()).
-          build();
-        }
 
         if ( getContextualize() ) {
           delegate = new foam.dao.ContextualizingDAO.Builder(getX()).
