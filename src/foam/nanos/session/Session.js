@@ -290,14 +290,14 @@ foam.CLASS({
         { name: 'userId', type: 'Long' }
       ],
       javaCode: `
-        User user = (User) ((DAO) x.get("localUserDAO")).inX(x).find(userId);
+        User user = (User) ((DAO) x.get("localUserDAO")).find(userId);
 
         if ( user == null || user.getDeleted() ) {
-          throw new RuntimeException(String.format("User with id '%d' is not found.", userId));
+          throw new RuntimeException(String.format("User with id '%d' not found.", userId));
         }
 
         if ( ! user.getEnabled() ) {
-          throw new RuntimeException(String.format("User with id '%d' is disabled.", userId));
+          throw new RuntimeException(String.format("The user with id '%d' has been disabled.", userId));
         }
       `
     }
