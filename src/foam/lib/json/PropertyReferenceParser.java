@@ -44,6 +44,7 @@ public class PropertyReferenceParser
       new KeyParser("name"),
       new Whitespace(),
       new Literal(":"),
+      new Whitespace(),
       new Parser() {
         private Parser delegate = new StringParser();
 
