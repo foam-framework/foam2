@@ -21,7 +21,8 @@ foam.CLASS({
     'foam.nanos.logger.Logger',
     'foam.nanos.logger.PrefixLogger',
     'foam.util.SafetyUtil',
-    'java.util.Date'
+    'java.util.Date',
+    'static foam.mlang.MLang.*'
   ],
 
   tableColumns: [
@@ -217,6 +218,9 @@ foam.CLASS({
 
         if ( getUserId() == 0 ) return rtn;
 
+        // Validate
+        validate(x);
+
         DAO localUserDAO  = (DAO) x.get("localUserDAO");
         DAO localGroupDAO = (DAO) x.get("localGroupDAO");
         AuthService auth  = (AuthService) x.get("auth");
@@ -242,6 +246,42 @@ foam.CLASS({
         return rtn
           .put("group", group)
           .put("appConfig", group.getAppConfig(rtn));
+      `
+    },
+    {
+      name: 'validate',
+      args: [
+        { name: 'x', type: 'Context' }
+      ],
+      javaCode: `
+        if ( getUserId() < 0 ) {
+          throw new IllegalStateException("User id is invalid.");
+        }
+
+        if ( getAgentId() < 0 ) {
+          throw new IllegalStateException("Agent id is invalid.");
+        }
+
+        if ( getAgentId() > 0 ) {
+          DAO localUserDAO = (DAO) x.get("localUserDAO");
+          User sessionAgent = (User) localUserDAO.inX(x).find(getAgentId());
+
+          if ( sessionAgent == null ) {
+            throw new RuntimeException(String.format("Agent with id '%d' not found.", getAgentId()));
+          }
+
+          DAO agentJunctionDAO = (DAO) x.get("agentJunctionDAO");
+          UserUserJunction junction = (UserUserJunction) agentJunctionDAO.find(
+            AND(
+              EQ(UserUserJunction.SOURCE_ID, getAgentId()),
+              EQ(UserUserJunction.TARGET_ID, getUserId())
+            )
+          );
+
+          if ( junction == null ) {
+            throw new RuntimeException("The junction between user and agent was not found.");
+          }
+        }
       `
     }
   ]

@@ -27,9 +27,7 @@ foam.CLASS({
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.AuthorizationException',
     'foam.nanos.auth.User',
-    'foam.nanos.auth.UserUserJunction',
-    'foam.util.SafetyUtil',
-    'static foam.mlang.MLang.*'
+    'foam.util.SafetyUtil'
   ],
 
   methods: [
@@ -47,33 +45,8 @@ foam.CLASS({
           throw new IllegalArgumentException("User id must be a positive integer.");
         }
 
-        if ( ! hasSPIDPermission(x, "create", userId ) ) {
+        if ( ! hasSPIDPermission(x, "create", userId) ) {
           throw new AuthorizationException("You don't have permission to create a session for that user.");
-        }
-
-        if ( agentId < 0 ) {
-          throw new IllegalArgumentException("Agent id is invalid.");
-        }
-
-        if ( agentId > 0 ) {
-          DAO localUserDAO = (DAO) x.get("localUserDAO");
-          User sessionAgent = (User) localUserDAO.inX(x).find(agentId);
-
-          if ( sessionAgent == null ) {
-            throw new RuntimeException(String.format("Agent with id '%d' not found.", agentId));
-          }
-
-          DAO agentJunctionDAO = (DAO) x.get("agentJunctionDAO");
-          UserUserJunction junction = (UserUserJunction) agentJunctionDAO.find(
-            AND(
-              EQ(UserUserJunction.SOURCE_ID, agentId),
-              EQ(UserUserJunction.TARGET_ID, userId)
-            )
-          );
-
-          if ( junction == null ) {
-            throw new RuntimeException("The junction between user and agent was not found.");
-          }
         }
 
         Session session = new Session.Builder(x)
@@ -100,8 +73,8 @@ foam.CLASS({
       ],
       type: 'Boolean',
       javaCode: `
-        AuthService auth         = (AuthService) x.get("auth");
-        DAO         localUserDAO = (DAO) x.get("localUserDAO");
+        AuthService auth         = (AuthService) getAuth();
+        DAO         localUserDAO = (DAO) getLocalUserDAO();
         User        sessionUser  = (User) localUserDAO.inX(x).find(userId);
 
         if ( sessionUser == null ) throw new RuntimeException(String.format("User with id '%d' not found.", userId));
