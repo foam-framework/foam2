@@ -146,18 +146,25 @@ foam.CLASS({
       name: 'tableCellFormatter',
       value: function(value, obj, axiom) {
         var unitProp = obj.cls_.getAxiomByName(axiom.unitPropName);
-        if ( unitProp ) {
-          var unitId = obj[unitProp.name];
-          // TODO: replace currencyDAO with unitDAO
-          obj.__context__.currencyDAO.find(unitId).then((unit) => {
-            var slot = obj.slot(axiom.name).map((propValue) => unit.format(propValue));
-            this.add(slot);
-            this.onDetach(this.tooltip$.follow(slot));
-          });
-        } else {
+        if ( ! unitProp ) {
           console.warn(obj.cls_.name, ' does not have the property: ', axiom.unitPropName);
           this.add(value);
-        }    
+          return;
+        }
+        var self = this;
+        this.add(foam.core.ExpressionSlot.create({
+          args: [obj.slot(unitProp.name), obj.slot(axiom.name)],
+          code: (unitId, propValue) => {
+            // TODO: Replace currencyDAO with unitDAO
+            return foam.core.PromiseSlot.create({
+              promise: obj.__context__.currencyDAO.find(unitId).then((unit) => {
+                var formatted = unit.format(propValue);
+                self.tooltip = formatted;
+                return formatted;
+              })
+            });
+          }
+        }));
       }
     }
   ]
