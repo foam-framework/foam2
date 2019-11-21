@@ -85,3 +85,4 @@ p({
   "output":""
 })
 p({"class":"foam.nanos.auth.DeletedAwareDAOTest","id":"DeletedAwareDAOTest"})
+p({"class":"net.nanopay.test.api.PostMethodTest","id":"PostMethodTest"})
