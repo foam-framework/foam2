@@ -160,6 +160,9 @@ foam.CLASS({
           proxy.setDelegate(delegate);
           delegate = (ProxyDAO) getDecorator();
         }
+
+        if ( getGuid() && getSeqNo() ) 
+          throw new RuntimeException("EasyDAO GUID and SeqNo are mutually exclusive");
         
         if ( getSeqNo() ) {
           delegate = new foam.dao.SequenceNumberDAO.Builder(getX()).
@@ -168,6 +171,9 @@ foam.CLASS({
           setStartingValue(getSeqStartingValue()).
           build();
         }
+
+        if ( getGuid() ) 
+          delegate = new foam.dao.GUIDDAO.Builder(getX()).setDelegate(delegate).build();
 
         if ( getValidated() ) {
           if ( getValidator() != null )
@@ -203,12 +209,6 @@ foam.CLASS({
 
         if ( getLastModifiedByAware() ) 
           delegate = new foam.nanos.auth.LastModifiedByAwareDAO.Builder(getX()).setDelegate(delegate).build();
-
-        if ( getGuid() && getSeqNo() ) 
-          throw new RuntimeException("EasyDAO GUID and SeqNo are mutually exclusive");
-
-        if ( getGuid() ) 
-          delegate = new foam.dao.GUIDDAO.Builder(getX()).setDelegate(delegate).build();
 
         if ( getContextualize() ) {
           delegate = new foam.dao.ContextualizingDAO.Builder(getX()).
