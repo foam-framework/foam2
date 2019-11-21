@@ -117,7 +117,7 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       name: 'service',
-      view: { class: 'foam.u2.view.FObjectView' },
+      view: { class: 'foam.u2.detail.SectionedDetailView' },
       readPermissionRequired: true,
       writePermissionRequired: true
     },
