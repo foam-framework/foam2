@@ -262,13 +262,12 @@ foam.CLASS({
           throw new IllegalStateException("Agent id is invalid.");
         }
 
-        if ( getAgentId() > 0 ) {
-          DAO localUserDAO = (DAO) x.get("localUserDAO");
-          User sessionAgent = (User) localUserDAO.inX(x).find(getAgentId());
+        if ( getUserId() > 0 ) {
+          checkUserEnabled(x, getUserId());
+        }
 
-          if ( sessionAgent == null ) {
-            throw new RuntimeException(String.format("Agent with id '%d' not found.", getAgentId()));
-          }
+        if ( getAgentId() > 0 ) {
+          checkUserEnabled(x, getAgentId());
 
           DAO agentJunctionDAO = (DAO) x.get("agentJunctionDAO");
           UserUserJunction junction = (UserUserJunction) agentJunctionDAO.find(
@@ -281,6 +280,24 @@ foam.CLASS({
           if ( junction == null ) {
             throw new RuntimeException("The junction between user and agent was not found.");
           }
+        }
+      `
+    },
+    {
+      name: 'checkUserEnabled',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'userId', type: 'Long' }
+      ],
+      javaCode: `
+        User user = (User) ((DAO) x.get("localUserDAO")).inX(x).find(userId);
+
+        if ( user == null || user.getDeleted() ) {
+          throw new RuntimeException(String.format("User with id '%d' is not found.", userId));
+        }
+
+        if ( ! user.getEnabled() ) {
+          throw new RuntimeException(String.format("User with id '%d' is disabled.", userId));
         }
       `
     }
