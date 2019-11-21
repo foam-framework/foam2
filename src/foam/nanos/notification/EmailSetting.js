@@ -37,7 +37,7 @@ foam.CLASS({
               }
             } catch(Throwable t) {
               Logger logger = (Logger) x.get("logger");
-              logger.error("Error sending notification email message: "+message+". Error: " + t);
+              logger.error("Error sending notification email message: " + message + ". Error: " + t);
             }
           }
         }
