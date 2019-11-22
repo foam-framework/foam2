@@ -23,6 +23,7 @@ import net.nanopay.tx.model.Transaction;
 import net.nanopay.account.Account;
 import net.nanopay.account.AccountUserJunction;
 import net.nanopay.approval.ApprovalRequest;
+import net.nanopay.liquidity.roles.*;
 
 import static foam.mlang.MLang.*;
 
@@ -33,6 +34,7 @@ public class LiquifiedRopeTest extends Test {
   User accountViewer, accountMaker, accountApprover, transactionViewer, transactionMaker, transactionApprover, root;
   Account rootAccount;
   AccountUserJunction aujunction;
+  Role transactionViewerRole, transactionMakerRole, transactionApproverRole, accountViewerRole, accountMakerRole, accountApproverRole, roleAssignmentApproverRole, roleAssignmentMakerRole;
 
   public void runTest(X x) {
     x = x.put("localUserDAO", new MDAO(User.getOwnClassInfo()));
@@ -40,7 +42,7 @@ public class LiquifiedRopeTest extends Test {
     x = x.put("userDAO", easydao);
     x = x.put("accountDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(Account.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("accountDAO").build()).build());
     x = x.put("transactionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(Transaction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("transactionDAO").build()).build());
-    x = x.put("approvalRequestDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(ApprovalRequest.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("approvalRequestDAO").build()).build());
+    x = x.put("approvalRequestDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(ApprovalRequest.getOwnClassInfo())).setAuthorizer(new foam.nanos.auth.AuthorizableAuthorizer("approvalRequestDAO")).build());
     x = x.put("accountViewerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("accountViewerJunctionDAO").build()).build());
     x = x.put("accountMakerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("accountMakerJunctionDAO").build()).build());
     x = x.put("accountApproverJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("accountApproverJunctionDAO").build()).build());
@@ -52,6 +54,7 @@ public class LiquifiedRopeTest extends Test {
     x = x.put("roleDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(net.nanopay.liquidity.roles.Role.getOwnClassInfo())).setAuthorizer(new foam.nanos.auth.StandardAuthorizer("roleDAO")).build());
     x = x.put("roleAssignmentTrunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(net.nanopay.liquidity.roles.RoleAssignmentTrunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("roleAssignmentTrunctionDAO").build()).build());
     x = x.put("roleAssignmentTemplateDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(net.nanopay.liquidity.roles.RoleAssignmentTemplate.getOwnClassInfo())).setAuthorizer(new foam.nanos.auth.StandardAuthorizer("roleAssignmentTemplateDAO")).build());
+    x = x.put("ropeDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(foam.nanos.rope.ROPE.getOwnClassInfo())).setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("ropeDAO")).build());
 
     ropeDAO = (DAO) x.get("ropeDAO");
     userDAO = (DAO) x.get("userDAO");
@@ -71,7 +74,8 @@ public class LiquifiedRopeTest extends Test {
     roleAssignmentTemplateDAO = (DAO) x.get("roleAssignmentTemplateDAO");
 
     setupLiquidROPEs(x);
-    // testLiquid(x);
+    setupBasicRoles(x);
+    testLiquid(x);
 
   }
 
@@ -614,5 +618,64 @@ public class LiquifiedRopeTest extends Test {
     transactionApproverJunctionDAO.put(aujunction);
   }
 
+  public void setupBasicRoles(X x) {
+    transactionViewerRole = (Role) roleDAO.inX(x).put(
+      new Role.Builder(x)
+        .setId(1)
+        .setName("transactionViewer")
+        .setJunctionDAOKey("transactionViewerJunctionDAO")
+        .build()
+    );
+    transactionMakerRole = (Role) roleDAO.inX(x).put(
+      new Role.Builder(x)
+        .setId(1)
+        .setName("transactionMaker")
+        .setJunctionDAOKey("transactionMakerJunctionDAO")
+        .build()
+    );
+    transactionApproverRole = (Role) roleDAO.inX(x).put(
+      new Role.Builder(x)
+        .setId(1)
+        .setName("transactionApprover")
+        .setJunctionDAOKey("transactionApproverJunctionDAO")
+        .build()
+    );
+    accountViewerRole = (Role) roleDAO.inX(x).put(
+      new Role.Builder(x)
+        .setId(1)
+        .setName("accountViewer")
+        .setJunctionDAOKey("accountViewerJunctionDAO")
+        .build()
+    );
+    accountMakerRole = (Role) roleDAO.inX(x).put(
+      new Role.Builder(x)
+        .setId(1)
+        .setName("accountMaker")
+        .setJunctionDAOKey("accountMakerJunctionDAO")
+        .build()
+    );
+    accountApproverRole = (Role) roleDAO.inX(x).put(
+      new Role.Builder(x)
+        .setId(1)
+        .setName("accountApprover")
+        .setJunctionDAOKey("accountApproverJunctionDAO")
+        .build()
+    );
+    roleAssignmentMakerRole = (Role) roleDAO.inX(x).put(
+      new Role.Builder(x)
+        .setId(1)
+        .setName("roleAssignmentMaker")
+        .setJunctionDAOKey("roleAssignmentMakerJunctionDAO")
+        .build()
+    );
+    roleAssignmentApproverRole = (Role) roleDAO.inX(x).put(
+      new Role.Builder(x)
+        .setId(1)
+        .setName("roleAssignmentApprover")
+        .setJunctionDAOKey("roleAssignmentApproverJunctionDAO")
+        .build()
+    );
+
+  }
 
 }
