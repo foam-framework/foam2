@@ -73,6 +73,9 @@ ${Object.keys(o).map(function(k) {
           var n = d.getTime();
           return `new java.util.Date(` + n +
             (n > Math.pow(2, 31) || n < -Math.pow(2,31) ? 'L' : '') + `)`
+        },
+        Function: function(f) {
+          return null;
         }
       })
     },
