@@ -85,4 +85,5 @@ p({
   "output":""
 })
 p({"class":"foam.nanos.rope.test.ROPETest","id":"ROPETest","description":"test rope"})
+p({"class":"foam.nanos.rope.test.LiquifiedRopeTest","id":"lrt","description":"test rope in liquid"})
 p({"class":"foam.nanos.auth.DeletedAwareDAOTest","id":"DeletedAwareDAOTest"})
