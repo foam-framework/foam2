@@ -126,9 +126,11 @@ foam.CLASS({
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(obj) {
-        this.start()
-          .add(obj.toSummary())
-        .end();
+        this.callIf(obj, function() {
+          this.start()
+            .add(obj.toSummary())
+          .end();
+        })
       }
     }
   ]
@@ -194,7 +196,9 @@ foam.CLASS({
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(value) {
-        this.add(value.map(o => o.toSummary()).join(', '));
+        this.callIf(value, function() {
+          this.add(value.map(o => o.toSummary()).join(', '));
+        });
       }
     }
   ]
