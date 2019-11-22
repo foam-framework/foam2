@@ -12,6 +12,7 @@ import foam.lib.Outputter;
 import foam.lib.json.OutputterMode;
 import foam.lib.NetworkPropertyPredicate;
 import foam.nanos.http.Format;
+import foam.util.SafetyUtil;
 import org.apache.commons.io.IOUtils;
 
 import javax.servlet.http.HttpServletResponse;
@@ -24,10 +25,16 @@ public class HTTPSink
     extends AbstractSink
 {
   protected String url_;
+  protected String bearerToken_;
   protected Format format_;
 
-  public HTTPSink(String url, Format format) throws IOException {
+  public HTTPSink(String url, Format format) {
+    this(url, "", format);
+  }
+
+  public HTTPSink(String url, String bearerToken, Format format) {
     url_ = url;
+    bearerToken_ = bearerToken;
     format_ = format;
   }
 
@@ -41,6 +48,9 @@ public class HTTPSink
       Outputter outputter = null;
       conn = (HttpURLConnection) new URL(url_).openConnection();
       conn.setRequestMethod("POST");
+      if ( ! SafetyUtil.isEmpty(bearerToken_) ) {
+        conn.setRequestProperty("Authorization", "Bearer " + bearerToken_);
+      }
       conn.setDoInput(true);
       conn.setDoOutput(true);
       if ( format_ == Format.JSON ) {

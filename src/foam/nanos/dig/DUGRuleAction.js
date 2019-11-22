@@ -21,6 +21,10 @@ foam.CLASS({
       name: 'url'
     },
     {
+      class: 'String',
+      name: 'bearerToken'
+    },
+    {
       class: 'foam.core.Enum',
       of: 'foam.nanos.http.Format',
       name: 'format',
@@ -34,12 +38,7 @@ foam.CLASS({
         agency.submit(x, new ContextAgent() {
           @Override
           public void execute(X x) {
-            HTTPSink sink = null;
-            try {
-              sink = new HTTPSink(getUrl(), getFormat());
-            } catch (Exception e) {
-            }
-            sink.put(obj, null);
+            new HTTPSink(getUrl(), getBearerToken(), getFormat()).put(obj, null);
           }
         }, "DUG Rule (url: " + getUrl() + " )");
       `
