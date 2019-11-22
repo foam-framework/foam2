@@ -1,6 +1,6 @@
 foam.CLASS({
   package: 'foam.u2.view',
-  name: 'AuthView',
+  name: 'TwoFactCodeView',
   extends: 'foam.u2.View',
   requires: ['foam.u2.TextField'],
 
