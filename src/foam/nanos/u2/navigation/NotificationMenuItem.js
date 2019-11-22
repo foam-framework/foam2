@@ -26,6 +26,10 @@ foam.CLASS({
     'user'
   ],
 
+  implements: [
+    'foam.mlang.Expressions'
+  ],
+
   css: `
     ^ {
       display: flex;
