@@ -16,7 +16,8 @@
     'foam.core.X',
     'foam.core.DirectAgency',
     'foam.nanos.logger.Logger',
-    'java.util.Collection'
+    'java.util.Collection',
+    'foam.nanos.ruler.RuleGroup'
   ],
 
   tableColumns: [
@@ -67,15 +68,6 @@
       readPermissionRequired: true,
       writePermissionRequired: true,
       tableWidth: 50,
-      section: 'basicInfo'
-    },
-    {
-      class: 'String',
-      name: 'ruleGroup',
-      documentation: 'ruleGroup defines sets of rules related to the same action.',
-      readPermissionRequired: true,
-      writePermissionRequired: true,
-      tableWidth: 100,
       section: 'basicInfo'
     },
     {
@@ -257,12 +249,16 @@
           type: 'foam.nanos.ruler.RuleEngine'
         },
         {
+          name: 'rule',
+          type: 'foam.nanos.ruler.Rule'
+        },
+        {
           name: 'agency',
           type: 'foam.core.Agency'
         }
       ],
       javaCode: `
-        getAction().applyAction(x, obj, oldObj, ruler, agency);
+        getAction().applyAction(x, obj, oldObj, ruler, rule, agency);
       `
     },
     {
@@ -283,10 +279,14 @@
         {
           name: 'ruler',
           type: 'foam.nanos.ruler.RuleEngine'
-        }
+        },
+        {
+          name: 'rule',
+          type: 'foam.nanos.ruler.Rule'
+        },
       ],
       javaCode: `
-        getAsyncAction().applyAction(x, obj, oldObj, ruler, new DirectAgency());
+        getAsyncAction().applyAction(x, obj, oldObj, ruler, rule, new DirectAgency());
         if ( ! getAfter() ) {
           ruler.getDelegate().cmd_(x.put("OBJ", obj), getCmd());
         }

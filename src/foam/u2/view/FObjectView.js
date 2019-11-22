@@ -25,11 +25,15 @@ foam.CLASS({
           foam.u2.Visibility.RW :
           foam.u2.Visibility.HIDDEN;
       },
-      view: function(_, x) {
-        return foam.u2.view.ChoiceView.create({
+      view: function(args, X) {
+        return {
+          class: 'foam.u2.view.ChoiceView',
           placeholder: '--',
-          choices$: x.data.choices$
-        }, x);
+          choices$: X.data.choices$,
+          defaultValue$: X.data.choices$.map((choices) => {
+            return Array.isArray(choices) && choices.length > 0 ? choices[0][0] : '';
+          })
+        };
       },
       postSet: function(oldValue, newValue) {
         if ( newValue !== oldValue ) {
@@ -52,7 +56,18 @@ foam.CLASS({
         } else if ( data.cls_.id != this.objectClass ) {
           this.objectClass = data.cls_.id;
         }
+      },
+      // We need to override the default view, otherwise we end up with a
+      // circular definition where FObjectView has an FObjectProperty which gets
+      // rendered as an FObjectView, which leads to infinite recursion.
+      view: function(args, X) {
+        return X.data.dataView || { class: 'foam.u2.detail.SectionedDetailView' }
       }
+    },
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'dataView',
+      documentation: 'Set this to change the view of the FObject being created.'
     },
     {
       class: 'Class',
@@ -71,7 +86,7 @@ foam.CLASS({
 
   methods: [
     function init() {
-      this.of$.sub(this.updateChoices);
+      this.onDetach(this.of$.sub(this.updateChoices));
       this.updateChoices();
     },
 
@@ -87,17 +102,27 @@ foam.CLASS({
       // implements and extends relations.
       if ( this.strategizer != null ) {
         this.strategizer.query(null, this.of.id).then((strategyReferences) => {
-          this.choices = strategyReferences
+          if ( ! Array.isArray(strategyReferences) || strategyReferences.length === 0 ) {
+            this.choices = [[this.of.id, this.of.model_.label]];
+            return;
+          }
+
+          var choices = strategyReferences
             .reduce((arr, sr) => {
               if ( ! sr.strategy ) {
                 console.warn('Invalid strategy reference: ' + sr.id);
                 return arr;
               }
 
-              return arr.concat([[sr.strategy.id, sr.strategy.name]]);
+              return arr.concat([[sr.strategy.id, sr.strategy.model_.label]]);
             }, [])
             .filter(x => x);
-        });
+
+          // Sort choices alphabetically by label.
+          choices.sort((a, b) => a[1] > b[1] ? 1 : -1);
+
+          this.choices = choices;
+        }).catch(err => console.warn(err));
       } else {
         this.choices = this.choicesFallback(this.of);
       }

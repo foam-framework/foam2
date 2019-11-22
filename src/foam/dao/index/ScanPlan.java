@@ -71,6 +71,7 @@ public class ScanPlan
     return null;
   }
 
+  @Override
   public void select(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     if ( state_ == null ) return;
     // Use the stale_, skip_, limit_, order_, predicate_... which we have already pre-processed.

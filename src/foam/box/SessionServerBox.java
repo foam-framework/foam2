@@ -79,7 +79,6 @@ public class SessionServerBox
           logger.warning("Remote host for session ", sessionID, " changed from ", session.getRemoteHost(), " to ", req.getRemoteHost(), ". Deleting session and forcing the user to sign in again.");
           sessionDAO.remove(session);
           msg.replyWithException(new AuthenticationException("IP address changed. Your session was deleted to keep your account secure. Please sign in again to verify your identity."));
-          return;
         }
       }
 
@@ -125,7 +124,7 @@ public class SessionServerBox
 
       msg.getLocalAttributes().put("x", effectiveContext);
     } catch (Throwable t) {
-      logger.error("Error throw in SessionServerBox: " + t, " ,service: " + spec.getName());
+      logger.error("Error throw in SessionServerBox: " + t, " ,service: " + spec.getName(), t);
       t.printStackTrace();
       msg.replyWithException(t);
       return;

@@ -18,7 +18,7 @@ import static foam.mlang.MLang.*;
 public class RulerDAOTest extends Test {
   Rule rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9, rule10;
   User user1, user2;
-  DAO ruleDAO, userDAO, ruleHistoryDAO;
+  DAO ruleDAO, userDAO, ruleHistoryDAO,rgDAO;
   int asyncWait = 1000;
 
   public void runTest(X x) {
@@ -29,6 +29,13 @@ public class RulerDAOTest extends Test {
     ruleDAO = (DAO) x.get("ruleDAO");
     userDAO = new RulerDAO(x, (DAO) x.get("localUserDAO"), "localUserDAO");
     ruleHistoryDAO = (DAO) x.get("ruleHistoryDAO");
+    RuleGroup rg = new RuleGroup();
+    rg.setId("users:email filter");
+    rgDAO = ((DAO) (x.get("ruleGroupDAO")));
+    rgDAO.put(rg);
+    RuleGroup rg2 = new RuleGroup();
+    rg2.setId("users:change lastName");
+    rgDAO.put(rg2);
     createRule(x);
     testUsers(x);
     testRuleHistory(x);
@@ -100,7 +107,7 @@ public class RulerDAOTest extends Test {
 
     // test array of 1 action
     RuleAction[] actions = new RuleAction[1];
-    RuleAction r1 = (x12, obj, oldObj, ruler, agent) -> {
+    RuleAction r1 = (x12, obj, oldObj, ruler, rule10, agent) -> {
       User user = (User) obj;
       user.setEmail("action1"+user.getEmail());
     };
@@ -115,7 +122,7 @@ public class RulerDAOTest extends Test {
     //test array of 2 actions
     actions = new RuleAction[2];
     actions[0] = r1;
-    actions[1] = (x12, obj, oldObj, ruler, agent) -> {
+    actions[1] = (x12, obj, oldObj, ruler, rule10, agent) -> {
       User user = (User) obj;
       user.setEmail("action2"+user.getEmail());
     };
@@ -137,7 +144,7 @@ public class RulerDAOTest extends Test {
     rule7.setOperation(Operations.CREATE);
     rule7.setAfter(false);
     rule7.setPriority(100);
-    RuleAction action7 = (x1, obj, oldObj, ruler, agent) -> ruler.stop();
+    RuleAction action7 = (x1, obj, oldObj, ruler, rule7, agent) -> ruler.stop();
     rule7.setAction(action7);
     rule7 = (Rule) ruleDAO.put_(x, rule7);
 
@@ -168,7 +175,7 @@ public class RulerDAOTest extends Test {
     rule1.setOperation(Operations.CREATE);
     rule1.setAfter(false);
     rule1.setPriority(60);
-    RuleAction action1 = (x1, obj, oldObj, ruler, agent) -> ruler.stop();
+    RuleAction action1 = (x1, obj, oldObj, ruler, rule1, agent) -> ruler.stop();
     rule1.setAction(action1);
     rule1 = (Rule) ruleDAO.put_(x, rule1);
 
@@ -185,12 +192,12 @@ public class RulerDAOTest extends Test {
       EQ(DOT(NEW_OBJ, INSTANCE_OF(foam.nanos.auth.User.class)), true)
     );
     rule2.setPredicate(predicate2);
-    RuleAction action2 = (x12, obj, oldObj, ruler, agent) -> {
+    RuleAction action2 = (x12, obj, oldObj, ruler, rule2, agent) -> {
       User user = (User) obj;
       user.setEmail("foam@nanos.net");
     };
     rule2.setAction(action2);
-    RuleAction asyncAction2 = (x13, obj, oldObj, ruler, agent) -> {
+    RuleAction asyncAction2 = (x13, obj, oldObj, ruler, rule2, agent) -> {
       throw new RuntimeException("this async action is not supposed to be executed.");
     };
     rule2.setAsyncAction(asyncAction2);
@@ -204,7 +211,7 @@ public class RulerDAOTest extends Test {
     rule3.setOperation(Operations.CREATE);
     rule3.setAfter(false);
     rule3.setPriority(20);
-    RuleAction action3 = (x14, obj, oldObj, ruler, agent) -> {
+    RuleAction action3 = (x14, obj, oldObj, ruler, rule3, agent) -> {
       throw new RuntimeException("this rule is not supposed to be executed");
     };
     rule3.setAction(action3);
@@ -220,12 +227,12 @@ public class RulerDAOTest extends Test {
     rule4.setPriority(10);
     Predicate predicate4 = EQ(DOT(NEW_OBJ, INSTANCE_OF(foam.nanos.auth.User.class)), true);
     rule4.setPredicate(predicate4);
-    RuleAction action4 = (x15, obj, oldObj, ruler, agent) -> {
+    RuleAction action4 = (x15, obj, oldObj, ruler, rule4, agent) -> {
       User user = (User) obj;
       user.setLastName("Smirnova");
     };
     rule4.setAction(action4);
-    RuleAction asyncAction4 = (x16, obj, oldObj, ruler, agent) -> ruler.stop();
+    RuleAction asyncAction4 = (x16, obj, oldObj, ruler, rule4, agent) -> ruler.stop();
     rule4.setAsyncAction(asyncAction4);
     rule4 = (Rule) ruleDAO.put_(x, rule4);
 
@@ -238,11 +245,14 @@ public class RulerDAOTest extends Test {
     rule5.setAfter(false);
     Predicate predicate5 = EQ(DOT(NEW_OBJ, INSTANCE_OF(foam.nanos.auth.User.class)), true);
     rule5.setPredicate(predicate5);
-    RuleAction action5 = (x17, obj, oldObj, ruler, agency) -> {
+    RuleAction action5 = (x17, obj, oldObj, ruler, rule5, agency) -> {
       User user = (User) obj;
       user.setLastName("Unknown");
       Rule executeRule = new Rule();
       executeRule.setId("executeRule");
+      RuleGroup rg = new RuleGroup();
+      rg.setId("fake test group");
+      rgDAO.put(rg);
       executeRule.setRuleGroup("fake test group");
       executeRule.setDaoKey("fakeDaoKey");
       agency.submit(x, new ContextAwareAgent() {
@@ -254,7 +264,7 @@ public class RulerDAOTest extends Test {
 
     };
     rule5.setAction(action5);
-    RuleAction asyncAction5 = (x18, obj, oldObj, ruler, agent) -> {
+    RuleAction asyncAction5 = (x18, obj, oldObj, ruler, rule5, agent) -> {
       // simulate async
       try {
         Thread.sleep(asyncWait);
@@ -268,15 +278,18 @@ public class RulerDAOTest extends Test {
 
     //the rule only applied to user2
     rule6 = new Rule();
+    RuleGroup rg = new RuleGroup();
+    rg.setId("user2 update");
+    rgDAO.put(rg);
     rule6.setId("rule6. user2 update");
     rule6.setRuleGroup("user2 update");
     rule6.setDaoKey("localUserDAO");
     rule6.setOperation(Operations.UPDATE);
     rule6.setSaveHistory(true);
     rule6.setPredicate(EQ(DOT(NEW_OBJ, foam.nanos.auth.User.EMAIL), "user2@nanos.net"));
-    RuleAction action6 = (x19, obj, oldObj, ruler, agent) -> ruler.putResult("Pending");
+    RuleAction action6 = (x19, obj, oldObj, ruler, rule6, agent) -> ruler.putResult("Pending");
     rule6.setAction(action6);
-    RuleAction asyncAction6 = (x110, obj, oldObj, ruler, agent) -> {
+    RuleAction asyncAction6 = (x110, obj, oldObj, ruler, rule6, agent) -> {
       // simulate async
       try {
         Thread.sleep(asyncWait);
@@ -290,24 +303,30 @@ public class RulerDAOTest extends Test {
     //the rule with erroneous predicate
     rule8 = new Rule();
     rule8.setId("rule8. Erroneous rule predicate");
+    RuleGroup rg2 = new RuleGroup();
+    rg2.setId("user created");
+    rgDAO.put(rg2);
     rule8.setRuleGroup("user created");
     rule8.setDaoKey("localUserDAO");
     rule8.setOperation(Operations.CREATE);
     rule8.setAfter(false);
     rule8.setPredicate(new DummyErroneousPredicate());
-    RuleAction action8 = (x111, obj, oldObj, ruler, agent) -> ruler.stop();
+    RuleAction action8 = (x111, obj, oldObj, ruler, rule8, agent) -> ruler.stop();
     rule8.setAction(action8);
     rule8 = (Rule) ruleDAO.put_(x, rule8);
 
     //the rule with FObject predicate
     rule9 = new Rule();
     rule9.setId("rule9. FObject rule predicate");
+    RuleGroup rg3 = new RuleGroup();
+    rg3.setId("user updated");
+    rgDAO.put(rg3);
     rule9.setRuleGroup("user updated");
     rule9.setDaoKey("localUserDAO");
     rule9.setOperation(Operations.UPDATE);
     rule9.setAfter(false);
     rule9.setPredicate(EQ(foam.nanos.auth.User.EMAIL, "nanos@nanos.net"));
-    RuleAction action9 = (x113, obj, oldObj, ruler, agent) -> {
+    RuleAction action9 = (x113, obj, oldObj, ruler, rule9, agent) -> {
       User user = (User) obj;
       user.setEmailVerified(true);
     };

@@ -137,18 +137,34 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2.view',
-  name: 'CurrencyTableCellFormatterRefinement',
-  refines: 'foam.core.Currency',
+  name: 'UnitValueTableCellFormatterRefinement',
+  refines: 'foam.core.UnitValue',
 
   properties: [
     {
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
-      value: function(value) {
-        this.start()
-          .style({'text-align': 'left', 'padding-right': '20px'})
-          .add('$' + (value/100).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,'))
-        .end();
+      value: function(value, obj, axiom) {
+        var unitProp = obj.cls_.getAxiomByName(axiom.unitPropName);
+        if ( ! unitProp ) {
+          console.warn(obj.cls_.name, ' does not have the property: ', axiom.unitPropName);
+          this.add(value);
+          return;
+        }
+        var self = this;
+        this.add(foam.core.ExpressionSlot.create({
+          args: [obj.slot(unitProp.name), obj.slot(axiom.name)],
+          code: (unitId, propValue) => {
+            // TODO: Replace currencyDAO with unitDAO
+            return foam.core.PromiseSlot.create({
+              promise: obj.__context__.currencyDAO.find(unitId).then((unit) => {
+                var formatted = unit.format(propValue);
+                self.tooltip = formatted;
+                return formatted;
+              })
+            });
+          }
+        }));
       }
     }
   ]
@@ -195,7 +211,11 @@ foam.CLASS({
       name: 'tableCellFormatter',
       value: function(date) {
         // allow the browser to deal with this since we are technically using the user's preference
-        if ( date ) this.add(date.toLocaleDateString());
+        if ( date ) {
+          var formattedDate = date.toLocaleDateString();
+          this.add(formattedDate);
+          this.tooltip = formattedDate;
+        }
       }
     }
   ]
@@ -213,7 +233,11 @@ foam.CLASS({
       name: 'tableCellFormatter',
       value: function(date) {
         // allow the browser to deal with this since we are technically using the user's preference
-        if ( date ) this.add(date.toLocaleString());
+        if ( date ) {
+          var formattedDate = date.toLocaleDateString();
+          this.add(formattedDate);
+          this.tooltip = formattedDate;
+        }
       }
     }
   ]
@@ -230,6 +254,7 @@ foam.CLASS({
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(value) {
+        value = Math.round(value);
         var hours = Math.floor(value / 3600000);
         value -= hours * 3600000;
         var minutes = Math.floor(value / 60000);

@@ -399,7 +399,6 @@ p({
   "serviceScript": "return new foam.nanos.dig.DigWebAgent()"
 })
 
-p({"class":"foam.nanos.boot.NSpec", "name":"dugDAO",                            "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setPm(true).setGuid(true).setOf(foam.nanos.dig.DUG.getOwnClassInfo()).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"dugs\").setDecorator(new foam.nanos.dig.DUGDAO(x)).build();","client":"{\"of\":\"foam.nanos.dig.DUG\"}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"digDAO",                            "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setPm(true).setGuid(true).setOf(foam.nanos.dig.DIG.getOwnClassInfo()).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"digs\").build();","client":"{\"of\":\"foam.nanos.dig.DIG\",\"decorators\": [{\"class\":\"foam.nanos.fs.FileDAODecorator\"},{\"class\":\"foam.nanos.fs.FileArrayDAODecorator\"}]}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"demoObjectDAO",                      "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"demoObjects\").setGuid(true).setOf(foam.nanos.demo.DemoObject.getOwnClassInfo()).build();", "client":"{\"of\":\"foam.nanos.demo.DemoObject\", \"remoteListenerSupport\": false}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"fileDAO",                            "serve":true,  "serviceScript":"return new foam.dao.PMDAO(x, new foam.dao.KeyValueDAO.Builder(x).setDelegate(new foam.dao.GUIDDAO(new foam.dao.java.JDAO(x, foam.nanos.fs.File.getOwnClassInfo(), \"files\"))).build());","client":"{\"of\":\"foam.nanos.fs.File\",\"cache\":false,\"decorators\": [{\"class\":\"foam.blob.BlobServiceDecorator\"}]}"})
@@ -440,9 +439,7 @@ p({
   }
   """
 })
-p({"class":"foam.nanos.boot.NSpec", "name":"ticketMessageDAO",                 "lazy":true, "serve":true, "serviceScript":"return new foam.dao.PMDAO(new foam.dao.SequenceNumberDAO(new foam.dao.java.JDAO(x, foam.support.model.TicketMessage.getOwnClassInfo(), \"ticketMessages\")))","client":"{\"of\":\"foam.support.model.TicketMessage\"}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"supportEmailDAO",                  "lazy":true, "serve":true, "serviceScript":"return new foam.dao.PMDAO(new foam.dao.SequenceNumberDAO(new foam.dao.java.JDAO(x, foam.support.model.SupportEmail.getOwnClassInfo(), \"supportEmails\")));","client":"{\"of\":\"foam.support.model.SupportEmail\"}"})
-p({"class":"foam.nanos.boot.NSpec", "name":"ticketDAO",                        "lazy":true, "serve":true, "serviceScript":"return new foam.dao.PMDAO(new foam.dao.SequenceNumberDAO(new foam.dao.java.JDAO(x, foam.support.model.Ticket.getOwnClassInfo(), \"tickets\")));","client":"{\"of\":\"foam.support.model.Ticket\"}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"pop3",                             "lazy":true, "serve":true, "boxClass":"foam.nanos.notification.email.POP3EmailSkeleton", "serviceClass":"foam.nanos.notification.email.POP3EmailService","client":"{ \"class\":\"foam.nanos.notification.email.ClientPOP3EmailService\", \"delegate\": { \"class\":\"foam.box.HTTPBox\", \"url\":\"service/pop3\" } }"})
 
 p({
@@ -482,12 +479,34 @@ p({
       .setOf(foam.nanos.ruler.Rule.getOwnClassInfo())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("rules")
+      .setRuler(false)
       .build();
     return new foam.dao.ValidatingDAO(x, ed);
   """,
   "client": """
     {
       "of": "foam.nanos.ruler.Rule"
+    }
+  """
+})
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "ruleGroupDAO",
+  "serve": true,
+  "serviceScript": """
+    ed = new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setGuid(true)
+      .setOf(foam.nanos.ruler.RuleGroup.getOwnClassInfo())
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("ruleGroups")
+      .setRuler(false)
+      .build();
+    return new foam.dao.ValidatingDAO(x, ed);
+  """,
+  "client": """
+    {
+      "of": "foam.nanos.ruler.RuleGroup"
     }
   """
 })
@@ -645,49 +664,6 @@ p({
 })
 
 p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "strategyDAO",
-  "description": "A DAO that knows which objects in the system implement the various interfaces present in the system. It is used on the server by the Strategizer service.",
-  "serve": true,
-  "serviceScript": """
-    return new foam.dao.EasyDAO.Builder(x)
-      .setGuid(true)
-      .setOf(foam.strategy.StrategyReference.getOwnClassInfo())
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName("strategyReferences")
-      .build();
-  """,
-  "client": """
-    {
-      "of": "foam.strategy.StrategyReference",
-      "remoteListenerSupport": false
-    }
-  """,
-  "documentation": "A DAO that knows which objects in the system implement the various interfaces present in the system. It is used on the server by the Strategizer service.",
-  "authNotes": "This DAO is decorated with a standard AuthenticatedDAO via EasyDAO."
-})
-p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "strategizer",
-  "description": "A service that can give you a list of all models in the system that implement a given interface.",
-  "serve": true,
-  "serviceClass": "foam.strategy.BasicStrategizer",
-  "boxClass": "foam.strategy.StrategizerServiceSkeleton",
-  "documentation": "A service that can give you a list of all models in the system that implement a given interface.",
-  "client": """
-    {
-      "class": "foam.strategy.ClientStrategizerService",
-      "delegate": {
-        "class": "foam.box.SessionClientBox",
-        "delegate": {
-          "class": "foam.box.HTTPBox",
-          "url": "service/strategizer"
-        }
-      }
-    }
-  """
-})
-p({
   "class":"foam.nanos.boot.NSpec",
   "name":"addressParser",
   "lazy":false,
@@ -711,4 +687,28 @@ p({
   "name": "sessionService",
   "serve": true,
   "serviceClass": "foam.nanos.session.SimpleSessionService"
+})
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "currencyDAO",
+  "serve": true,
+  "serviceScript":
+  """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("currencies")
+      .setPm(true)
+      .setPipelinePm(true)
+      .setOf(foam.core.Currency.getOwnClassInfo())
+      .setName("currency")
+      .setIndex(new foam.core.PropertyInfo[] {foam.core.Currency.COUNTRY})
+      .build();
+  """,
+  "client":
+  """
+    {
+      "of": "foam.core.Currency",
+      "cache": true
+    }
+  """
 })

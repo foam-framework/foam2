@@ -26,6 +26,7 @@ foam.CLASS({
     'foam.mlang.order.Desc',
     'foam.mlang.predicate.Predicate',
     'foam.mlang.sink.GroupBy',
+    'foam.util.SafetyUtil',
     'java.util.List',
     'java.util.Map',
     'static foam.mlang.MLang.*'
@@ -160,10 +161,16 @@ return ret;`
           type: 'foam.mlang.sink.GroupBy'
         }
       ],
-      javaCode: `for ( Object key : sink.getGroupKeys() ) {
-  List<Rule> group = ((ArraySink) sink.getGroups().get(key)).getArray();
-  if ( ! group.isEmpty() ) {
-    new RuleEngine(x, getX(), this).execute(group, obj, oldObj);
+      javaCode: `
+for ( Object key : sink.getGroupKeys() ) {
+  RuleGroup rg = (RuleGroup) ((DAO) x.get("ruleGroupDAO")).find(key);
+  if ( rg == null ) {
+    ((foam.nanos.logger.Logger) x.get("logger")).error("RuleGroup not found.", key);
+  } else if ( rg.f(x, obj, oldObj) ) {
+    List<Rule> group = ((ArraySink) sink.getGroups().get(key)).getArray();
+    if ( ! group.isEmpty() ) {
+      new RuleEngine(x, getX(), this).execute(group, obj, oldObj);
+    }
   }
 }`
     },

@@ -16,7 +16,7 @@ import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
 
 public class ThreadPoolAgency
-  extends AbstractFixedThreadPool
+  extends    AbstractFixedThreadPool
   implements Agency
 {
   protected ExecutorService pool_          = null;
@@ -44,7 +44,7 @@ public class ThreadPoolAgency
       try {
         agent_.execute(x_);
       } catch (Throwable t) {
-        logger.error(this.getClass(), t.getMessage());
+        logger.error(this.getClass(), t.getMessage(), t);
       } finally {
         incrExecuting(-1);
         incrExecuted();
@@ -81,6 +81,7 @@ public class ThreadPoolAgency
     return pool_;
   }
 
+  // TODO: reverse order or 2nd and 3rd args
   public void submit(X x, ContextAgent agent, String description) {
     incrQueued();
     getPool().submit(new ContextAgentRunnable(x, agent));

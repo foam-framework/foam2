@@ -12,29 +12,29 @@ foam.INTERFACE({
     {
       name: 'put',
       args: [
-        { name: 'x', type: 'Context' },
+        { name: 'x',  type: 'Context' },
         { name: 'nu', type: 'foam.core.FObject' }
       ]
     },
     {
       name: 'put_',
       args: [
-        { name: 'x', type: 'Context' },
+        { name: 'x',   type: 'Context' },
         { name: 'old', type: 'foam.core.FObject' },
-        { name: 'nu', type: 'foam.core.FObject' }
+        { name: 'nu',  type: 'foam.core.FObject' }
       ]
     },
     {
       name: 'remove',
       args: [
-        { name: 'x', type: 'Context' },
+        { name: 'x',   type: 'Context' },
         { name: 'obj', type: 'foam.core.FObject' }
       ]
     },
     {
       name: 'replay',
       args: [
-        { name: 'x', type: 'Context' },
+        { name: 'x',   type: 'Context' },
         { name: 'dao', type: 'foam.dao.DAO' }
       ]
     }

@@ -39,6 +39,7 @@ foam.CLASS({
     'foam.util.Password',
     'foam.util.SafetyUtil',
 
+    'java.security.Permission',
     'java.util.Calendar',
     'java.util.regex.Pattern',
     'javax.security.auth.AuthPermission',
@@ -150,7 +151,7 @@ foam.CLASS({
 
         Session session = x.get(Session.class);
         session.setUserId(user.getId());
-        ((DAO) getLocalSessionDAO()).put(session);
+        ((DAO) getLocalSessionDAO()).inX(x).put(session);
         session.setContext(session.applyTo(session.getContext()));
 
         return user;
@@ -185,7 +186,7 @@ foam.CLASS({
       `
     },
     {
-      name: 'checkUserPermission',
+      name: 'checkUser',
       documentation: `Checks if the user passed into the method has the passed
         in permission attributed to it by checking their group. No check on User
         and group enabled flags.`,
@@ -205,7 +206,7 @@ foam.CLASS({
             if ( group == null ) break;
 
             // check permission
-            if ( group.implies(x, permission) ) return true;
+            if ( group.implies(x, new AuthPermission(permission)) ) return true;
 
             // check parent group
             groupId = group.getParent();
@@ -223,7 +224,7 @@ foam.CLASS({
       javaCode: `
         if ( x == null || permission == null ) return false;
 
-        java.security.Permission p = new AuthPermission(permission);
+        Permission p = new AuthPermission(permission);
 
         try {
           Group group = getCurrentGroup(x);
@@ -256,19 +257,15 @@ foam.CLASS({
 
         // Retrieve the password policy from the user and group when available
         if ( user != null ) {
-          Group ancestor = user.findGroup(x);
-          if ( ancestor == null ) {
-            logger.error("No group for user", user);
-            throw new RuntimeException("Group not found");
-          }
-
-          // Check password policy
-          passwordPolicy = ancestor.getPasswordPolicy();
-          while ( passwordPolicy == null || ! passwordPolicy.getEnabled() ) {
-            ancestor = ancestor.getAncestor(x, ancestor);
-            if ( ancestor == null )
-              break;
+          Group ancestor = (Group) x.get("group");
+          if ( ancestor != null ) {
+            // Check password policy
             passwordPolicy = ancestor.getPasswordPolicy();
+            while ( passwordPolicy == null || ! passwordPolicy.getEnabled() ) {
+              ancestor = ancestor.getAncestor(x, ancestor);
+              if ( ancestor == null ) break;
+              passwordPolicy = ancestor.getPasswordPolicy();
+            }
           }
         }
 
@@ -280,12 +277,6 @@ foam.CLASS({
 
         // Validate the password against the password policy
         passwordPolicy.validate(user, potentialPassword);
-      `
-    },
-    {
-      name: 'checkUser',
-      javaCode: `
-        return checkUserPermission(x, user, new AuthPermission(permission));
       `
     },
     {

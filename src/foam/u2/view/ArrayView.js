@@ -10,6 +10,7 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   requires: [
+    'foam.core.FObject',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows'
   ],
@@ -24,6 +25,10 @@ foam.CLASS({
       class: 'foam.u2.ViewSpec',
       name: 'valueView',
       value: { class: 'foam.u2.view.AnyView' }
+    },
+    {
+      name: 'defaultNewItem',
+      value: ''
     }
   ],
 
@@ -35,7 +40,11 @@ foam.CLASS({
         return mode === foam.u2.DisplayMode.RW;
       },
       code: function() {
-        this.data[this.data.length] = '';
+        var newItem = this.defaultNewItem;
+        if ( this.FObject.isInstance(newItem) ) {
+          newItem = newItem.clone();
+        }
+        this.data[this.data.length] = newItem;
         this.updateData();
       }
     }
@@ -123,7 +132,7 @@ foam.CLASS({
         .add(this.slot(function(data, valueView) {
           return self.E()
             .start(self.Rows)
-              .forEach(data, function(e, i) {
+              .forEach(data || [], function(e, i) {
                 var row = self.Row.create({ index: i, value: e });
                 this
                   .startContext({ data: row })
