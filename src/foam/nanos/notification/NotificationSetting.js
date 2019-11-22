@@ -1,10 +1,23 @@
+
+/**
+ * @license
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.nanos.notification',
   name: 'NotificationSetting',
 
+  implements: [
+    'foam.nanos.auth.Authorizable'
+  ],
+
   javaImports: [
     'foam.dao.ArraySink',
     'foam.dao.DAO',
+    'foam.nanos.auth.AuthService',
+    'foam.nanos.auth.AuthorizationException',
     'foam.nanos.auth.User',
     'foam.nanos.auth.UserUserJunction',
     'foam.nanos.logger.Logger',
@@ -14,6 +27,25 @@ foam.CLASS({
     'java.util.List',
     'net.nanopay.model.Business',
     'static foam.mlang.MLang.EQ'
+  ],
+
+  messages: [
+    {
+      name: 'LACKS_CREATE_PERMISSION',
+      message: 'You don\'t have permission to create this notification setting.'
+    },
+    {
+      name: 'LACKS_UPDATE_PERMISSION',
+      message: 'You don\'t have permission to update notification settings you do not own.'
+    },
+    {
+      name: 'LACKS_DELETE_PERMISSION',
+      message: 'You don\'t have permission to delete notification settings you do not own.'
+    },
+    {
+      name: 'LACKS_READ_PERMISSION',
+      message: 'You don\'t have permission to read notification settings you do not own.'
+    }
   ],
 
   properties: [
@@ -44,6 +76,62 @@ foam.CLASS({
           Logger logger = (Logger) x.get("logger");
           logger.error("Failed to send notification: " + t, t);
         };
+      `
+    },
+    {
+      name: 'authorizeOnCreate',
+      javaCode: `
+      AuthService auth = (AuthService) x.get("auth");
+      if ( ! checkOwnership(x) && ! auth.check(x, createPermission("create")) ) throw new AuthorizationException(LACKS_CREATE_PERMISSION);
+      `
+    },
+    {
+      name: 'authorizeOnUpdate',
+      javaCode: `
+      AuthService auth = (AuthService) x.get("auth");
+      if ( ! checkOwnership(x) && ! auth.check(x, createPermission("update")) ) throw new AuthorizationException(LACKS_UPDATE_PERMISSION);
+      `
+    },
+    {
+      name: 'authorizeOnDelete',
+      javaCode: `
+      AuthService auth = (AuthService) x.get("auth");
+      if ( ! checkOwnership(x) && ! auth.check(x, createPermission("delete")) ) throw new AuthorizationException(LACKS_DELETE_PERMISSION);
+      `
+    },
+    {
+      name: 'authorizeOnRead',
+      javaCode: `
+      AuthService auth = (AuthService) x.get("auth");
+      if ( ! checkOwnership(x) && ! auth.check(x, createPermission("read")) ) throw new AuthorizationException(LACKS_READ_PERMISSION);
+      `
+    },
+    {
+      name: 'checkOwnership',
+      args: [
+        { name: 'x', type: 'Context' }
+      ],
+      type: 'Boolean',
+      javaCode: `
+      User user = (User) x.get("user");
+
+      if ( user == null ) return false;
+
+      if ( user instanceof Business ) {
+        return getBusinessUser() != null && ( getBusinessUser().getTargetId() == user.getId() );
+      } else {
+        return getOwner() == user.getId();
+      }
+      `
+    },
+    {
+      name: 'createPermission',
+      args: [
+        { name: 'operation', type: 'String' }
+      ],
+      type: 'String',
+      javaCode: `
+        return "notificationsetting." + operation + "." + getId();
       `
     }
   ]

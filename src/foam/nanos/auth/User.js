@@ -601,7 +601,7 @@ foam.CLASS({
         DAO notificationSettingDAO = (DAO) x.get("notificationSettingDAO");
 
         List<NotificationSetting> settings = ((ArraySink) getNotificationSettings(x).select(new ArraySink())).getArray();
-        for ( NotificationSetting setting : settings ) {
+        for( NotificationSetting setting : settings ) {
           setting.sendNotification(x, this, notification);
         }
       `
@@ -673,14 +673,10 @@ foam.RELATIONSHIP({
 
 foam.CLASS({
   package: 'foam.nanos.auth',
-  name: 'UserUserJunctionRefinement',
+  name: 'UserUserJunctionGroupRefinement',
   refines: 'foam.nanos.auth.UserUserJunction',
 
   properties: [
-    {
-      class: 'Long',
-      name: 'id'
-    },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.Group',
