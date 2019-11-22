@@ -12,12 +12,6 @@ p({
 })
 p({
   "class": "foam.strategy.StrategyReference",
-  "id": "28dda8d3-4b9c-49e0-8e27-8e02eb2adb39",
-  "desiredModelId": "foam.nanos.cron.Schedule",
-  "strategy": "foam.nanos.cron.NeverSchedule"
-})
-p({
-  "class": "foam.strategy.StrategyReference",
   "id": "5d9a7dea-4385-47f5-9689-9cba577b179e",
   "desiredModelId": "foam.nanos.cron.Schedule",
   "strategy": "foam.nanos.cron.IntervalSchedule"
