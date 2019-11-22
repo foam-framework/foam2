@@ -177,7 +177,6 @@ var classes = [
   'foam.nanos.app.Mode',
   'foam.nanos.bench.Benchmark',
   'foam.nanos.auth.Authorizer',
-  'foam.nanos.auth.OrAuthorizer',
   'foam.nanos.auth.AuthorizationDAO',
   'foam.nanos.auth.EnabledAware',
   'foam.nanos.auth.EnabledAwareDummy',
