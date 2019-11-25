@@ -25,10 +25,6 @@ foam.CLASS({
     'java.util.Map',
     'static foam.mlang.MLang.*'
   ],
-  
-  imports: [
-    'ropeDAO'
-  ],
 
   properties: [
     {
@@ -49,7 +45,7 @@ foam.CLASS({
         { name: 'propertyKey', javaType: 'String' }
       ],
       javaCode: `    
-      List<ROPE> ropes = (List<ROPE>) ((ArraySink) ((DAO) ((DAO) getRopeDAO()).inX(x).where(EQ(ROPE.TARGET_DAOKEY, targetDAOKey))).select(new ArraySink())).getArray();
+      List<ROPE> ropes = (List<ROPE>) ((ArraySink) ((DAO) ((DAO) x.get("ropeDAO")).inX(x).where(EQ(ROPE.TARGET_DAOKEY, targetDAOKey))).select(new ArraySink())).getArray();
 
         for ( ROPE rope : ropes ) {
           if ( rope.check(x, obj, "", crudKey, propertyKey) ) return true;
