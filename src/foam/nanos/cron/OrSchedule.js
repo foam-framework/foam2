@@ -24,7 +24,19 @@ foam.CLASS({
     {
       name: 'delegates',
       class: 'FObjectArray',
-      of: 'foam.nanos.cron.Schedule'
+      of: 'foam.nanos.cron.Schedule',
+      view: () => {
+        return {
+          class: 'foam.u2.view.FObjectArrayView',
+          of: 'foam.nanos.cron.Schedule',
+          defaultNewItem: foam.nanos.cron.IntervalSchedule.create({
+            start: "2019-10-14",
+            duration: foam.nanos.cron.TimeHMS.create({
+              hour: 0, minute: 0, second: 0
+            })
+          })
+        };
+      }
     }
   ],
 
