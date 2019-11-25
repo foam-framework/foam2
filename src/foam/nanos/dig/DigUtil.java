@@ -71,7 +71,8 @@ public class DigUtil {
       out.println(outputterJson.toString());
 
     } else {
-      // TODO
+      throw new UnsupportedOperationException(
+        String.format("Output DIG exception in %s format is not supported.", format.getName()));
     }
   }
 }
