@@ -57,6 +57,11 @@ foam.CLASS({
       section: 'basicInfo'
     },
     {
+      class: 'String',
+      name: 'bearerToken',
+      section: 'basicInfo'
+    },
+    {
       class: 'foam.core.Enum',
       of: 'foam.nanos.http.Format',
       name: 'format',
@@ -90,6 +95,7 @@ foam.CLASS({
       javaGetter: `
         DUGRuleAction action = new DUGRuleAction();
         action.setUrl(getUrl());
+        action.setBearerToken(getBearerToken());
         action.setFormat(getFormat());
         return action;
       `

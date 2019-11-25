@@ -18,10 +18,6 @@ public class AuthorizableAuthorizer implements Authorizer {
     permissionPrefix_ = permissionPrefix;
   }
 
-  public String getPermissionPrefix() {
-    return permissionPrefix_;
-  }
-
   public void authorizeOnCreate(X x, FObject obj) throws AuthorizationException {
     if ( obj instanceof Authorizable ) {
       ((Authorizable) obj).authorizeOnCreate(x);

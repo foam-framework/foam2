@@ -203,7 +203,7 @@ var classes = [
   'foam.nanos.auth.User',
   'foam.nanos.auth.PriorPassword',
   'foam.nanos.auth.ruler.AddPasswordHistoryAction',
-  'foam.nanos.auth.PasswordPolicyTest',
+  'foam.nanos.auth.test.PasswordPolicyTest',
   'foam.nanos.auth.Country',
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.UserUserJunction',
@@ -350,6 +350,7 @@ var classes = [
   'foam.lib.json.UnknownFObject',
   'foam.lib.json.UnknownFObjectArray',
   'foam.lib.json.ClassReferenceParserTest',
+  'foam.lib.json.PropertyReferenceParserTest',
   'foam.lib.xml.OutputXML',
   'foam.blob.Blob',
   'foam.blob.BlobService',
@@ -458,6 +459,14 @@ var classes = [
   'foam.nanos.analytics.FoldManagerDAODecorator',
   'foam.nanos.analytics.DAOFoldManager',
   'foam.nanos.analytics.DAOReduceManager',
+
+  // Ticket
+  'foam.nanos.ticket.TicketStatus',
+  'foam.nanos.ticket.TicketComment',
+  'foam.nanos.ticket.Ticket',
+  'foam.nanos.ticket.TicketAddCommentDAO',
+  'foam.nanos.ticket.TicketOwnerDAO',
+  'foam.nanos.ticket.TicketCommentOwnerDAO',
 
   // Testing support
   'foam.test.TestEnum',

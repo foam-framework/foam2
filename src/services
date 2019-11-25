@@ -455,9 +455,7 @@ p({
   }
   """
 })
-p({"class":"foam.nanos.boot.NSpec", "name":"ticketMessageDAO",                 "lazy":true, "serve":true, "serviceScript":"return new foam.dao.PMDAO(new foam.dao.SequenceNumberDAO(new foam.dao.java.JDAO(x, foam.support.model.TicketMessage.getOwnClassInfo(), \"ticketMessages\")))","client":"{\"of\":\"foam.support.model.TicketMessage\"}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"supportEmailDAO",                  "lazy":true, "serve":true, "serviceScript":"return new foam.dao.PMDAO(new foam.dao.SequenceNumberDAO(new foam.dao.java.JDAO(x, foam.support.model.SupportEmail.getOwnClassInfo(), \"supportEmails\")));","client":"{\"of\":\"foam.support.model.SupportEmail\"}"})
-p({"class":"foam.nanos.boot.NSpec", "name":"ticketDAO",                        "lazy":true, "serve":true, "serviceScript":"return new foam.dao.PMDAO(new foam.dao.SequenceNumberDAO(new foam.dao.java.JDAO(x, foam.support.model.Ticket.getOwnClassInfo(), \"tickets\")));","client":"{\"of\":\"foam.support.model.Ticket\"}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"pop3",                             "lazy":true, "serve":true, "boxClass":"foam.nanos.notification.email.POP3EmailSkeleton", "serviceClass":"foam.nanos.notification.email.POP3EmailService","client":"{ \"class\":\"foam.nanos.notification.email.ClientPOP3EmailService\", \"delegate\": { \"class\":\"foam.box.HTTPBox\", \"url\":\"service/pop3\" } }"})
 
 p({
@@ -681,49 +679,6 @@ p({
   "client":"{\"of\":\"foam.nanos.crunch.CapabilityCapabilityJunction\", \"remoteListenerSupport\": false}"
 })
 
-p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "strategyDAO",
-  "description": "A DAO that knows which objects in the system implement the various interfaces present in the system. It is used on the server by the Strategizer service.",
-  "serve": true,
-  "serviceScript": """
-    return new foam.dao.EasyDAO.Builder(x)
-      .setGuid(true)
-      .setOf(foam.strategy.StrategyReference.getOwnClassInfo())
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName("strategyReferences")
-      .build();
-  """,
-  "client": """
-    {
-      "of": "foam.strategy.StrategyReference",
-      "remoteListenerSupport": false
-    }
-  """,
-  "documentation": "A DAO that knows which objects in the system implement the various interfaces present in the system. It is used on the server by the Strategizer service.",
-  "authNotes": "This DAO is decorated with a standard AuthenticatedDAO via EasyDAO."
-})
-p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "strategizer",
-  "description": "A service that can give you a list of all models in the system that implement a given interface.",
-  "serve": true,
-  "serviceClass": "foam.strategy.BasicStrategizer",
-  "boxClass": "foam.strategy.StrategizerServiceSkeleton",
-  "documentation": "A service that can give you a list of all models in the system that implement a given interface.",
-  "client": """
-    {
-      "class": "foam.strategy.ClientStrategizerService",
-      "delegate": {
-        "class": "foam.box.SessionClientBox",
-        "delegate": {
-          "class": "foam.box.HTTPBox",
-          "url": "service/strategizer"
-        }
-      }
-    }
-  """
-})
 p({
   "class":"foam.nanos.boot.NSpec",
   "name":"addressParser",
