@@ -18,7 +18,18 @@ import foam.nanos.http.Format;
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
 
+/**
+ * DigUtil contains static utility methods for working with Dig and Sugar.
+ */
 public class DigUtil {
+  /**
+   * Output a DigErrorMessage object to HTTP response.
+   * @param x The context.
+   * @param resp The HTTP response object used for setting the response status and contentType.
+   * @param format The format to determine the content type of the output HTTP response.
+   * @param out The response writer/outputter write the error.
+   * @param error The error to output.
+   */
   public static void outputException(X x, HttpServletResponse resp, Format format, PrintWriter out, DigErrorMessage error) {
     if ( resp == null ) resp = x.get(HttpServletResponse.class);
     if ( out == null ) out = x.get(PrintWriter.class);
