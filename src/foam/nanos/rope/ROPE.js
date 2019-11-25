@@ -92,7 +92,7 @@ foam.CLASS({
           }
           for ( String nextRelationship : nextRelationships ) {
             if ( nextRelationship.equals("__terminate__") ) continue;
-            List<ROPE> nextRopes = (List<ROPE>) ((ArraySink) ropeDAO.where(AND(
+            List<ROPE> nextRopes = (List<ROPE>) ((ArraySink) ropeDAO.inX(x).where(AND(
               EQ(ROPE.TARGET_DAOKEY, getSourceDAOKey()),
               EQ(ROPE.RELATIONSHIP_KEY, nextRelationship)
             )).select(new ArraySink())).getArray();
@@ -129,14 +129,14 @@ foam.CLASS({
             ).select(new ArraySink())).getArray();
       
             for ( FObject junctionObj : junctionObjs ) {
-              FObject sourceObj = (FObject) (((DAO) x.get(getSourceDAOKey())).inX(x).find((retrieveProperty(junctionObj, junctionObj.getClass(), "get", sourcePropertyName))));
+              FObject sourceObj = (FObject) (((DAO) x.get(getSourceDAOKey())).find((retrieveProperty(junctionObj, junctionObj.getClass(), "get", sourcePropertyName))));
               sourceObjs.add(sourceObj);
             }
             break;
           case "1:*" :
             if ( getIsInverse() ) {
               DAO rDAO = retrieveProperty(obj, obj.getClass(), "get", getRelationshipKey(), x);
-              sourceObjs = ((ArraySink) rDAO.inX(x).select(new ArraySink())).getArray();
+              sourceObjs = ((ArraySink) rDAO.select(new ArraySink())).getArray();
             } else {
               FObject sourceObj = retrieveProperty(obj, obj.getClass(), "find", getRelationshipKey(), x);
               sourceObjs.add(sourceObj);
@@ -144,7 +144,7 @@ foam.CLASS({
             break;
           case "1:1" :
             DAO sourceDAO = (DAO) x.get(getSourceDAOKey());
-            sourceObjs.add(sourceDAO.inX(x).find(retrieveProperty(obj, obj.getClass(), "get", getRelationshipKey())));
+            sourceObjs.add(sourceDAO.find(retrieveProperty(obj, obj.getClass(), "get", getRelationshipKey())));
             break;
           default: 
         }
