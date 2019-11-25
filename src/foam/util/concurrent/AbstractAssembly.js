@@ -23,6 +23,7 @@ foam.CLASS({
     {
       name: 'isCompleted',
       class: 'Boolean',
+      synchronized: true,
       value: false,
       documentation: 'True once endJob() has executed.'
     },
