@@ -164,7 +164,9 @@ return ret;`
       javaCode: `
 for ( Object key : sink.getGroupKeys() ) {
   RuleGroup rg = (RuleGroup) ((DAO) x.get("ruleGroupDAO")).find(key);
-  if( rg.f(x,obj,oldObj) ) {
+  if ( rg == null ) {
+    ((foam.nanos.logger.Logger) x.get("logger")).error("RuleGroup not found.", key);
+  } else if ( rg.f(x, obj, oldObj) ) {
     List<Rule> group = ((ArraySink) sink.getGroups().get(key)).getArray();
     if ( ! group.isEmpty() ) {
       new RuleEngine(x, getX(), this).execute(group, obj, oldObj);

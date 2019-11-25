@@ -27,6 +27,9 @@ foam.CLASS({
       documentation: 'application of template args to emailTemplate and then onto the emailMessage',
       javaCode: `
       Logger logger = (Logger) x.get("logger");
+      if ( templateArgs == null ) {
+        return emailMessage;
+      }
       String templateName = (String)templateArgs.get("template");
       if ( SafetyUtil.isEmpty(templateName) ) return emailMessage;
 
