@@ -501,7 +501,10 @@ var classes = [
   'foam.strategy.StrategyReference',
   'foam.strategy.StrategizerService',
   'foam.strategy.BasicStrategizer',
-  'foam.strategy.ClientStrategizerService'
+  'foam.strategy.ClientStrategizerService',
+  //concurrent
+  'foam.util.concurrent.AbstractAssembly',
+  'foam.util.concurrent.Assembly',
 ];
 
 var abstractClasses = [
