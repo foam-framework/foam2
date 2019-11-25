@@ -21,14 +21,14 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'complete',
-      type: 'Boolean',
+      name: 'isCompleted',
+      class: 'Boolean',
       value: false,
       documentation: 'True once endJob() has executed.'
     },
     {
-      name: 'isLast',
-      type: 'Boolean',
+      name: 'last',
+      class: 'Boolean',
       value: true,
       documentation: 'True if no new Assembly is waiting for this task to complete.'
     },
@@ -36,30 +36,36 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'startJob'
-      // Template method, override in subclass if desired
+      name: 'startJob',
+      javaCode: `
+        // Template method, override in subclass if desired
+      `
     },
     {
-      name: 'executeJob'
-      // Template method, override in subclass if desired
+      name: 'executeJob',
+      javaCode: `
+        // Template method, override in subclass if desired
+      `
     },
     {
-      name: 'endJob'
-      // Template method, override in subclass if desired
+      name: 'endJob',
+      javaCode: `
+        // Template method, override in subclass if desired
+      `
     },
     {
       name: 'isLast',
       type: 'boolean',
       synchronized: true,
       javaCode: `
-        return getIsLast();
+        return getLast();
       `,
     },
     {
       name: 'complete',
       synchronized: true,
       javaCode: `
-         setComplete(true);
+         setIsCompleted(true);
          notify();
       `
     },
@@ -67,7 +73,7 @@ foam.CLASS({
       name: 'waitToComplete',
       synchronized: true,
       javaCode: `
-         while ( ! getComplete() ) {
+         while ( ! getIsCompleted() ) {
            try {
              wait();
            } catch (InterruptedException e) {
