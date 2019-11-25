@@ -44,56 +44,59 @@ public class TreeIndex
    * @return Return an Object[] which contains two elements, first one is update state and second one is update predicate.
    */
   protected Object[] simplifyPredicate(Object state, Predicate predicate) {
-    if ( predicate != null && prop_ != null ) {
-      if ( predicate instanceof Binary ) {
-        Binary expr = (Binary) predicate;
-        if ( predicate.getClass().equals(Eq.class) && expr.getArg1().toString().equals(prop_.toString()) ) {
-          state = ( (TreeNode) state ).get((TreeNode) state, expr.getArg2().f(expr), prop_);
-          return new Object[]{state, null};
-        }
+    if ( predicate == null || prop_ == null ) {
+      return new Object[]{state, predicate};
+    }
 
-//        if ( predicate.getClass().equals(Neq.class) && expr.getArg1().toString().equals(prop_.toString()) ) {
-//          state = ( (TreeNode) state ).neq((TreeNode) state, expr.getArg2().f(expr), prop_);
-//          return new Object[]{state, null};
-//        }
-
-        if ( predicate.getClass().equals(Gt.class) && expr.getArg1().toString().equals(prop_.toString()) ) {
-          state = ( (TreeNode) state ).gt((TreeNode) state, expr.getArg2().f(expr), prop_);
-          return new Object[]{state, null};
-        }
-
-        if ( predicate.getClass().equals(Gte.class) && expr.getArg1().toString().equals(prop_.toString()) ) {
-          state = ( (TreeNode) state ).gte((TreeNode) state, expr.getArg2().f(expr), prop_);
-          return new Object[]{state, null};
-        }
-
-        if ( predicate.getClass().equals(Lt.class) && expr.getArg1().toString().equals(prop_.toString()) ) {
-          state = ( (TreeNode) state ).lt((TreeNode) state, expr.getArg2().f(expr), prop_);
-          return new Object[]{state, null};
-        }
-
-        if ( predicate.getClass().equals(Lte.class) && expr.getArg1().toString().equals(prop_.toString()) ) {
-          state = ( (TreeNode) state ).lte((TreeNode) state, expr.getArg2().f(expr), prop_);
-          return new Object[]{state, null};
-        }
-      } else if ( predicate instanceof And ) {
-        int length = ((And) predicate).getArgs().length;
-        for ( int i = 0; i < length; i++ ) {
-          Predicate arg = ( (And) predicate ).getArgs()[i];
-          if ( arg != null && state != null ) {
-            // Each args deal with by 'simplifyPredicate()' function recursively.
-            Object[] statePredicate = simplifyPredicate(state, arg);
-            state = statePredicate[0];
-            arg   = (Predicate) statePredicate[1];
-          }
-          if ( arg == null ) {
-            ((And) predicate).getArgs()[i] = new True();
-          }
-        }
-        // use partialEval to simplify predicate themselves.
-        predicate = predicate.partialEval();
-        if ( predicate instanceof True ) return new Object[]{state, null};
+    if ( predicate instanceof Binary ) {
+      Binary expr = (Binary) predicate;
+      if ( predicate.getClass().equals(Eq.class) && expr.getArg1().toString().equals(prop_.toString()) ) {
+        state = ( (TreeNode) state ).get((TreeNode) state, expr.getArg2().f(expr), prop_);
+        return new Object[]{state, null};
       }
+
+      // TODO: Handle NEQ
+//      if ( predicate.getClass().equals(Neq.class) && expr.getArg1().toString().equals(prop_.toString()) ) {
+//        state = ( (TreeNode) state ).neq((TreeNode) state, expr.getArg2().f(expr), prop_);
+//        return new Object[]{state, null};
+//      }
+
+      if ( predicate.getClass().equals(Gt.class) && expr.getArg1().toString().equals(prop_.toString()) ) {
+        state = ( (TreeNode) state ).gt((TreeNode) state, expr.getArg2().f(expr), prop_);
+        return new Object[]{state, null};
+      }
+
+      if ( predicate.getClass().equals(Gte.class) && expr.getArg1().toString().equals(prop_.toString()) ) {
+        state = ( (TreeNode) state ).gte((TreeNode) state, expr.getArg2().f(expr), prop_);
+        return new Object[]{state, null};
+      }
+
+      if ( predicate.getClass().equals(Lt.class) && expr.getArg1().toString().equals(prop_.toString()) ) {
+        state = ( (TreeNode) state ).lt((TreeNode) state, expr.getArg2().f(expr), prop_);
+        return new Object[]{state, null};
+      }
+
+      if ( predicate.getClass().equals(Lte.class) && expr.getArg1().toString().equals(prop_.toString()) ) {
+        state = ( (TreeNode) state ).lte((TreeNode) state, expr.getArg2().f(expr), prop_);
+        return new Object[]{state, null};
+      }
+    } else if ( predicate instanceof And ) {
+      int length = ((And) predicate).getArgs().length;
+      for ( int i = 0; i < length; i++ ) {
+        Predicate arg = ( (And) predicate ).getArgs()[i];
+        if ( arg != null && state != null ) {
+          // Each args deal with by 'simplifyPredicate()' function recursively.
+          Object[] statePredicate = simplifyPredicate(state, arg);
+          state = statePredicate[0];
+          arg   = (Predicate) statePredicate[1];
+        }
+        if ( arg == null ) {
+          ((And) predicate).getArgs()[i] = new True();
+        }
+      }
+      // use partialEval to simplify predicate themselves.
+      predicate = predicate.partialEval();
+      if ( predicate instanceof True ) return new Object[]{state, null};
     }
 
     return new Object[]{state, predicate};
@@ -125,26 +128,25 @@ public class TreeIndex
   }
 
   //TODO
+  @Override
   public FindPlan planFind(Object state, Object key) {
     return new TreeLookupFindPlan(prop_, (state != null ? ((TreeNode) state).size : 0) );
   }
 
 
   /**
-   * This function retrun plan depend on index and sink.
-   * @return return is a selectPlan
+   * This function tries to return an optimal plan based on its arguments.
    */
+  @Override
   public SelectPlan planSelect(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    if ( state == null ) return NotFoundPlan.instance();
-
-    if ( predicate != null && predicate instanceof False ) return NotFoundPlan.instance();
+    if ( state == null || predicate instanceof False ) return NotFoundPlan.instance();
 
     Object[] statePredicate = simplifyPredicate(state, predicate);
     state     = statePredicate[0];
     predicate = (Predicate) statePredicate[1];
 
     if ( predicate == null ) {
-      // To see if there have some possible to do count or groubBy select efficiently
+      // See if it's possible to do Count or GroupBy select efficiently.
       if ( sink instanceof Count && state != null ) {
         return new CountPlan(((TreeNode) state).size);
       }

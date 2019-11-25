@@ -14,7 +14,7 @@ foam.CLASS({
   methods: [
     function initE() {
       this.SUPER();
-      return this.add(this.data);
+      return this.add(this.data$);
     }
   ],
 });

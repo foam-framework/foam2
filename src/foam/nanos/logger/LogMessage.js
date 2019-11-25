@@ -36,6 +36,13 @@ foam.CLASS({
     },
     'createdBy',
     {
+      name: 'threadName',
+      class: 'String',
+      label: 'Thread',
+      visibility: 'RO',
+      javaFactory: `return Thread.currentThread().getName();`,
+    },
+    {
       name: 'severity',
       class: 'Enum',
       of: 'foam.log.LogLevel',

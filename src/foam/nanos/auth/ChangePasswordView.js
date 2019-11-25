@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'ChangePasswordView',
-  extends: 'foam.u2.View',
+  extends: 'foam.u2.Controller',
 
   documentation: `Change Password View: managing two states.
   State one) ResetPassword:  redirect from email link, with a token to update forgotten password,
@@ -32,30 +32,32 @@ foam.CLASS({
   ],
 
   css: `
-    ^ .centerVerticle{
+    ^ .centerVertical {
       max-width: 30vw;
       margin: 0 auto;
     }
-    ^ .logoCenterVerticle {
-      margin-left: 64vh
-    }
 
-    ^ .horizontal{
+    ^ .logoCenterVertical {
+      margin: 0 auto;
+      text-align: center;
+      display: block;
+    }
+    ^ .horizontal {
       padding: 0 0 1vh 2vh;
       max-width: 98%;
     }
-    ^ .logoHorizontal{
+    ^ .logoHorizontal {
       padding-left: 2vh;
     }
-
     ^ .top-bar {
+      background: /*%PRIMARY1%*/ #202341;
       width: 100%;
       height: 8vh;
       border-bottom: solid 1px #e2e2e3
     }
     ^ .top-bar img {
       height: 4vh;
-      margin-top: 2vh;
+      padding-top: 1vh;
     }
   `,
 
@@ -88,7 +90,6 @@ foam.CLASS({
       documentation: `This property toggles the view from updating a user password to resetting a user password.`,
       factory: function() {
         var searchParams = new URLSearchParams(location.search);
-        window.history.replaceState(null, null, window.location.origin+'/#reset');
         return searchParams.get('token');
       },
       hidden: true
@@ -110,7 +111,7 @@ foam.CLASS({
       name: 'newPassword',
       section: 'resetPasswordSection',
       view: {
-        class: 'net.nanopay.ui.NewPasswordView',
+        class: 'foam.u2.view.PasswordView',
         passwordIcon: true
       },
       minLength: 6
@@ -157,6 +158,7 @@ foam.CLASS({
         this.clearProperty('originalPassword');
         this.clearProperty('newPassword');
         this.clearProperty('confirmationPassword');
+        if ( this.token ) window.history.replaceState(null, null, window.location.origin + '/#reset');
       }
     },
     function initE() {
@@ -164,31 +166,30 @@ foam.CLASS({
       this.SUPER();
       this
         .addClass(this.myClass())
-        .startContext({ data: this })
           .start().addClass('top-bar').show(this.topBarShow)
             .start('img')
               .attr('src', this.theme.logo)
               .callIfElse( this.horizontal, function() {
                 this.addClass('logoHorizontal');
               }, function() {
-                this.addClass('logoCenterVerticle');
+                this.addClass('logoCenterVertical');
               })
             .end()
           .end()
           .start()
-          .callIfElse( this.horizontal, function() {
-            this.addClass('horizontal');
-          }, function() {
-            this.addClass('centerVerticle');
-          })
+            .callIfElse( this.horizontal, function() {
+              this.addClass('horizontal');
+            }, function() {
+              this.addClass('centerVertical');
+            })
             .start(this.SectionView, {
               data: this,
               sectionName: 'resetPasswordSection'
             }).end()
-            .start(this.UPDATE_PASSWORD).end()
-            .start(this.RESET_PASSWORD).end()
-          .end()
-        .endContext();
+            .br().br()
+            .tag(this.UPDATE_PASSWORD)
+            .tag(this.RESET_PASSWORD)
+          .end();
       }
   ],
 
@@ -197,6 +198,9 @@ foam.CLASS({
       name: 'resetPassword',
       isAvailable: function() {
         return !! this.token;
+      },
+      isEnabled: function(errors_) {
+        return ! errors_;
       },
       code: function(X) {
         var user = this.User.create({
@@ -216,6 +220,9 @@ foam.CLASS({
       name: 'updatePassword',
       isAvailable: function() {
         return ! this.token;
+      },
+      isEnabled: function(errors_) {
+        return ! errors_;
       },
       code: function(X) {
         this.auth.updatePassword(null, this.originalPassword, this.newPassword)

@@ -30,10 +30,6 @@ public class StandardAuthorizer implements Authorizer {
     return permissionPrefix_ + "." + op + "." + id;
   }
 
-  public String getPermissionPrefix() {
-    return permissionPrefix_;
-  }
-
   public void authorizeOnCreate(X x, FObject obj) throws AuthorizationException {
 
     String permission = createPermission("create");

@@ -490,7 +490,17 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core',
   name: 'UnitValue',
-  extends: 'Long'
+  extends: 'Long',
+  properties: [
+    {
+      class: 'String',
+      name: 'unitPropName',
+      value: 'denomination',
+      documentation: `
+        The name of the property of a model that contains the denomination String.
+      `
+    }
+  ]
 });
 
 

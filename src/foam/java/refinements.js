@@ -225,12 +225,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'includeInDigest',
-      value: true
-    },
-    {
-      class: 'Boolean',
-      name: 'includeInSignature',
-      value: true
+      value: false
     },
     {
       class: 'String',

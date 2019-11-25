@@ -204,7 +204,7 @@ var classes = [
   'foam.nanos.auth.User',
   'foam.nanos.auth.PriorPassword',
   'foam.nanos.auth.ruler.AddPasswordHistoryAction',
-  'foam.nanos.auth.PasswordPolicyTest',
+  'foam.nanos.auth.test.PasswordPolicyTest',
   'foam.nanos.auth.Country',
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.UserUserJunction',
@@ -312,10 +312,12 @@ var classes = [
   'foam.nanos.notification.email.ClientPOP3EmailService',
   'foam.nanos.notification.push.PushService',
   'foam.nanos.notification.push.FirebasePushService',
+  'foam.nanos.notification.Notifiable',
   'foam.nanos.notification.Notification',
   'foam.nanos.notification.NotificationTemplateDAO',
   'foam.nanos.notification.notifications.ScriptRunNotification',
-  'foam.nanos.script.Language',
+  'foam.nanos.notification.EmailSetting',
+  'foam.nanos.notification.NotificationSetting',
   'foam.nanos.script.Script',
 //  'foam.nanos.script.ScriptCompiler',
 //  'foam.nanos.script.JavaShellScriptCompiler',
@@ -357,6 +359,7 @@ var classes = [
   'foam.lib.json.UnknownFObject',
   'foam.lib.json.UnknownFObjectArray',
   'foam.lib.json.ClassReferenceParserTest',
+  'foam.lib.json.PropertyReferenceParserTest',
   'foam.lib.xml.OutputXML',
   'foam.blob.Blob',
   'foam.blob.BlobService',
@@ -396,8 +399,9 @@ var classes = [
   'foam.nanos.http.DefaultHttpParameters',
   'foam.nanos.http.HttpParameters',
   'foam.nanos.dig.DIG',
-  'foam.nanos.dig.DUG',
   'foam.nanos.dig.SUGAR',
+  'foam.nanos.dig.DUGRule',
+  'foam.nanos.dig.DUGRuleAction',
 
   'foam.nanos.jetty.HttpServer',
   'foam.nanos.servlet.Servlet',
@@ -428,6 +432,7 @@ var classes = [
   'foam.flow.Document',
   'foam.flow.DocumentationFolderDAO',
 
+  'foam.nanos.ruler.RuleGroup',
   'foam.nanos.ruler.Rule',
   'foam.nanos.ruler.RulerDAO',
   'foam.nanos.ruler.Operations',
@@ -440,6 +445,13 @@ var classes = [
   'foam.nanos.ruler.RuleHistoryStatus',
   'foam.nanos.ruler.UpdateRulesListSink',
   'foam.nanos.ruler.predicate.PropertyChangePredicate',
+  'foam.nanos.ruler.action.SendNotification',
+  'foam.nanos.ruler.predicate.PropertyEQValue',
+  'foam.nanos.ruler.predicate.PropertyNEQValue',
+  'foam.nanos.ruler.predicate.PropertyEQProperty',
+  'foam.nanos.ruler.predicate.NewEqOld',
+  'foam.nanos.ruler.predicate.IsInstancePredicate',
+  'foam.nanos.ruler.action.ChangePropertyAction',
   'foam.comics.SearchMode',
 
   // Support Files
@@ -456,6 +468,14 @@ var classes = [
   'foam.nanos.analytics.FoldManagerDAODecorator',
   'foam.nanos.analytics.DAOFoldManager',
   'foam.nanos.analytics.DAOReduceManager',
+
+  // Ticket
+  'foam.nanos.ticket.TicketStatus',
+  'foam.nanos.ticket.TicketComment',
+  'foam.nanos.ticket.Ticket',
+  'foam.nanos.ticket.TicketAddCommentDAO',
+  'foam.nanos.ticket.TicketOwnerDAO',
+  'foam.nanos.ticket.TicketCommentOwnerDAO',
 
   // Testing support
   'foam.test.TestEnum',
