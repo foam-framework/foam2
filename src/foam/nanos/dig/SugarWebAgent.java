@@ -51,7 +51,7 @@ public class SugarWebAgent
         DigErrorMessage error = new GeneralException.Builder(x)
           .setMessage("Empty Service Key")
           .build();
-        DigUtil.outputException(x, resp, Format.JSON, out, error);
+        DigUtil.outputException(x, error, Format.JSON);
         return;
       }
 
@@ -59,7 +59,7 @@ public class SugarWebAgent
         DigErrorMessage error = new GeneralException.Builder(x)
           .setMessage("Empty Method Name")
           .build();
-        DigUtil.outputException(x, resp, Format.JSON, out, error);
+        DigUtil.outputException(x, error, Format.JSON);
         return;
       }
 
@@ -70,7 +70,7 @@ public class SugarWebAgent
           DigErrorMessage error = new GeneralException.Builder(x)
             .setMessage("Can not find out service interface")
             .build();
-          DigUtil.outputException(x, resp, Format.JSON, out, error);
+          DigUtil.outputException(x, error, Format.JSON);
           return;
       }
 
@@ -83,16 +83,18 @@ public class SugarWebAgent
         DigErrorMessage error = new GeneralException.Builder(x)
           .setMessage(String.format("Could not find service named '%s'", serviceName))
           .build();
-        DigUtil.outputException(x, resp, Format.JSON, out, error);
+        DigUtil.outputException(x, error, Format.JSON);
         return;
       }
 
       try {
         nspec.checkAuthorization(x);
       } catch (foam.nanos.auth.AuthorizationException e) {
-        DigUtil.outputException(x, resp, Format.JSON, out, new foam.nanos.dig.exception.AuthorizationException.Builder(x)
-          .setMessage(e.getMessage())
-          .build());
+        DigUtil.outputException(x,
+          new foam.nanos.dig.exception.AuthorizationException.Builder(x)
+            .setMessage(e.getMessage())
+            .build(),
+          Format.JSON);
         return;
       }
 
@@ -119,7 +121,7 @@ public class SugarWebAgent
                 DigErrorMessage error = new GeneralException.Builder(x)
                   .setMessage("IllegalArgumentException : Add a compiler argument")
                   .build();
-                DigUtil.outputException(x, resp, Format.JSON, out, error);
+                DigUtil.outputException(x, error, Format.JSON);
                 return;
               }
 
@@ -141,7 +143,7 @@ public class SugarWebAgent
                 DigErrorMessage error = new GeneralException.Builder(x)
                   .setMessage("Empty Parameter values : " + pArray[j].getName())
                   .build();
-                DigUtil.outputException(x, resp, Format.JSON, out, error);
+                DigUtil.outputException(x, error, Format.JSON);
                 return;
               }
             }
@@ -154,7 +156,7 @@ public class SugarWebAgent
       DigErrorMessage error = new GeneralException.Builder(x)
         .setMessage(e.toString())
         .build();
-      DigUtil.outputException(x, null, Format.JSON, null, error);
+      DigUtil.outputException(x, error, Format.JSON);
     }
   }
 
@@ -178,12 +180,12 @@ public class SugarWebAgent
       DigErrorMessage error = new GeneralException.Builder(x)
         .setMessage("InvocationTargetException: " + e.getTargetException().getMessage())
         .build();
-      DigUtil.outputException(x, resp, Format.JSON, out, error);
+      DigUtil.outputException(x, error, Format.JSON);
     } catch (Exception e) {
       DigErrorMessage error = new GeneralException.Builder(x)
         .setMessage("Exception: " + e.toString())
         .build();
-      DigUtil.outputException(x, resp, Format.JSON, out, error);
+      DigUtil.outputException(x, error, Format.JSON);
     }
   }
 
@@ -225,7 +227,7 @@ public class SugarWebAgent
       DigErrorMessage error = new GeneralException.Builder(x)
         .setMessage(e.toString())
         .build();
-      DigUtil.outputException(x, null, Format.JSON, null, error);
+      DigUtil.outputException(x, error, Format.JSON);
     }
 
     return clsObj;
@@ -276,7 +278,7 @@ public class SugarWebAgent
             DigErrorMessage error = new GeneralException.Builder(x)
               .setMessage(e.toString())
               .build();
-            DigUtil.outputException(x, null, Format.JSON, null, error);
+            DigUtil.outputException(x, error, Format.JSON);
           }
       }
     }

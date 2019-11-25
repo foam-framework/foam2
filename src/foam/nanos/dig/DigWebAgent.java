@@ -92,7 +92,7 @@ public class DigWebAgent
          DigErrorMessage error = new DAONotFoundException.Builder(x)
                                       .setMessage("DAO not found: " + daoName)
                                       .build();
-        DigUtil.outputException(x, resp, format, out, error);
+        DigUtil.outputException(x, error, format);
         return;
       }
 
@@ -100,9 +100,11 @@ public class DigWebAgent
       try {
         nspec.checkAuthorization(x);
       } catch (foam.nanos.auth.AuthorizationException e) {
-        DigUtil.outputException(x, resp, format, out, new foam.nanos.dig.exception.AuthorizationException.Builder(x)
-          .setMessage(e.getMessage())
-          .build());
+        DigUtil.outputException(x,
+          new foam.nanos.dig.exception.AuthorizationException.Builder(x)
+            .setMessage(e.getMessage())
+            .build(),
+          format);
         return;
       }
 
@@ -112,7 +114,7 @@ public class DigWebAgent
         DigErrorMessage error = new DAONotFoundException.Builder(x)
                                       .setMessage("DAO not found: " + daoName)
                                       .build();
-        DigUtil.outputException(x, resp, format, out, error);
+        DigUtil.outputException(x, error, format);
         return;
       }
 
@@ -145,7 +147,7 @@ public class DigWebAgent
           // let FObjectArray parse first
           if ( SafetyUtil.isEmpty(data) ) {
               DigErrorMessage error = new EmptyDataException.Builder(x).build();
-              DigUtil.outputException(x, resp, format, out, error);
+              DigUtil.outputException(x, error, format);
               return;
           }
           try {
@@ -155,7 +157,7 @@ public class DigWebAgent
               DigErrorMessage error = new ParsingErrorException.Builder(x)
                                             .setMessage("Invalid JSON Format")
                                             .build();
-              DigUtil.outputException(x, resp, format, out, error);
+              DigUtil.outputException(x, error, format);
               return;
             }
 
@@ -184,7 +186,7 @@ public class DigWebAgent
             DigErrorMessage error = new DAOPutException.Builder(x)
                                           .setMessage(e.getMessage())
                                           .build();
-            DigUtil.outputException(x, resp, format, out, error);
+            DigUtil.outputException(x, error, format);
             return;
           }
         } else if ( Format.XML == format ) {
@@ -194,7 +196,7 @@ public class DigWebAgent
           if ( SafetyUtil.isEmpty(data) ) {
             DigErrorMessage error = new EmptyDataException.Builder(x)
               .build();
-            DigUtil.outputException(x, resp, format, out, error);
+            DigUtil.outputException(x, error, format);
             return;
           }
 
@@ -211,7 +213,7 @@ public class DigWebAgent
             DigErrorMessage error = new ParsingErrorException.Builder(x)
                                       .setMessage("Invalid XML Format")
                                       .build();
-            DigUtil.outputException(x, resp, format, out, error);
+            DigUtil.outputException(x, error, format);
             return;
           }
 
@@ -225,7 +227,7 @@ public class DigWebAgent
           if ( SafetyUtil.isEmpty(data) && SafetyUtil.isEmpty(fileAddress) ) {
             DigErrorMessage error = new EmptyDataException.Builder(x)
               .build();
-            DigUtil.outputException(x, resp, format, out, error);
+            DigUtil.outputException(x, error, format);
             return;
           }
 
@@ -245,7 +247,7 @@ public class DigWebAgent
                 DigErrorMessage error = new GeneralException.Builder(x)
                   .setMessage("File Not Found Exception")
                   .build();
-                DigUtil.outputException(x, resp, format, out, error);
+                DigUtil.outputException(x, error, format);
                 return;
             }
           }
@@ -261,7 +263,7 @@ public class DigWebAgent
             DigErrorMessage error = new ParsingErrorException.Builder(x)
               .setMessage("Invalid CSV Format")
               .build();
-            DigUtil.outputException(x, resp, format, out, error);
+            DigUtil.outputException(x, error, format);
             return;
           }
 
@@ -272,7 +274,7 @@ public class DigWebAgent
           DigErrorMessage error = new UnsupportException.Builder(x)
                                         .setMessage("Unsupported Format: " + format)
                                         .build();
-          DigUtil.outputException(x, resp, format, out, error);
+          DigUtil.outputException(x, error, format);
 
           return;
         } else if (Format.JSONJ == format ) {
@@ -296,7 +298,7 @@ public class DigWebAgent
           if ( SafetyUtil.isEmpty(dataJson) ) {
               DigErrorMessage error = new EmptyDataException.Builder(x)
                                             .build();
-              DigUtil.outputException(x, resp, format, out, error);
+              DigUtil.outputException(x, error, format);
               return;
           }
           try {
@@ -306,7 +308,7 @@ public class DigWebAgent
               DigErrorMessage error = new ParsingErrorException.Builder(x)
                                             .setMessage("Invalid JSONJ Format")
                                             .build();
-              DigUtil.outputException(x, resp, format, out, error);
+              DigUtil.outputException(x, error, format);
               return;
             }
 
@@ -333,7 +335,7 @@ public class DigWebAgent
             DigErrorMessage error = new DAOPutException.Builder(x)
                                           .setMessage(e.getMessage())
                                           .build();
-            DigUtil.outputException(x, resp, format, out, error);
+            DigUtil.outputException(x, error, format);
             return;
           }
         }
@@ -436,7 +438,7 @@ public class DigWebAgent
           DigErrorMessage error = new ParsingErrorException.Builder(x)
             .setMessage("Unsupported DAO : " + daoName)
             .build();
-          DigUtil.outputException(x, resp, format, out, error);
+          DigUtil.outputException(x, error, format);
 
           return;
         }
@@ -448,7 +450,7 @@ public class DigWebAgent
         if ( targetFobj == null ) {
           DigErrorMessage error = new UnknownIdException.Builder(x)
             .build();
-          DigUtil.outputException(x, resp, format, out, error);
+          DigUtil.outputException(x, error, format);
 
           return;
         } else {
@@ -457,14 +459,14 @@ public class DigWebAgent
           DigErrorMessage error = new DigSuccessMessage.Builder(x)
             .setMessage("Success")
             .build();
-          DigUtil.outputException(x, resp, format, out, error);
+          DigUtil.outputException(x, error, format);
           return;
         }
       } else {
         DigErrorMessage error = new ParsingErrorException.Builder(x)
                                   .setMessage("Unsupported method: "+command)
                                   .build();
-        DigUtil.outputException(x, resp, format, out, error);
+        DigUtil.outputException(x, error, format);
         return;
       }
 
