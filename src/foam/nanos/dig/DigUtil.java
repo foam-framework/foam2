@@ -6,6 +6,7 @@
 
 package foam.nanos.dig;
 
+import foam.core.FObject;
 import foam.core.X;
 import foam.lib.*;
 import foam.lib.csv.CSVOutputter;
@@ -30,10 +31,16 @@ public class DigUtil {
    * @param format The format of the output.
    */
   public static void outputException(X x, DigErrorMessage error, Format format) {
+    HttpServletResponse resp = x.get(HttpServletResponse.class);
+
+    resp.setStatus(Integer.parseInt(error.getStatus()));
+    outputFObject(x, error, format);
+  }
+
+  public static void outputFObject(X x, FObject object, Format format) {
     HttpServletResponse resp  = x.get(HttpServletResponse.class);
     PrintWriter         out   = x.get(PrintWriter.class);
 
-    resp.setStatus(Integer.parseInt(error.getStatus()));
     if ( format == Format.JSON ) {
       //output error in json format
       resp.setContentType("application/json");
@@ -43,7 +50,7 @@ public class DigUtil {
       Outputter outputterJson = new Outputter(x).setPropertyPredicate(new AndPropertyPredicate(x, new PropertyPredicate[] {new NetworkPropertyPredicate(), new PermissionedPropertyPredicate()}));
       outputterJson.setOutputDefaultValues(true);
       outputterJson.setOutputClassNames(true);
-      outputterJson.output(error);
+      outputterJson.output(object);
       out.println(outputterJson.toString());
 
     } else if ( format == Format.XML )  {
@@ -51,7 +58,7 @@ public class DigUtil {
       resp.setContentType("application/xml");
 
       foam.lib.xml.Outputter outputterXml = new foam.lib.xml.Outputter(OutputterMode.NETWORK);
-      outputterXml.output(error);
+      outputterXml.output(object);
       out.println(outputterXml.toString());
 
     } else if ( format == Format.CSV )  {
@@ -59,7 +66,7 @@ public class DigUtil {
       resp.setContentType("text/csv");
 
       CSVOutputter outputterCsv = new foam.lib.csv.CSVOutputterImpl.Builder(x).build();
-      outputterCsv.outputFObject(x, error);
+      outputterCsv.outputFObject(x, object);
       out.println(outputterCsv.toString());
 
     } else if ( format == Format.HTML ) {
@@ -69,8 +76,8 @@ public class DigUtil {
       foam.lib.html.Outputter outputterHtml = new foam.lib.html.Outputter(OutputterMode.NETWORK);
       outputterHtml.outputStartHtml();
       outputterHtml.outputStartTable();
-      outputterHtml.outputHead(error);
-      outputterHtml.put(error, null);
+      outputterHtml.outputHead(object);
+      outputterHtml.put(object, null);
       outputterHtml.outputEndTable();
       outputterHtml.outputEndHtml();
       out.println(outputterHtml.toString());
@@ -83,12 +90,12 @@ public class DigUtil {
       Outputter outputterJson = new Outputter(x).setPropertyPredicate(new AndPropertyPredicate(new PropertyPredicate[] {new StoragePropertyPredicate(), new PermissionedPropertyPredicate()}));
       outputterJson.setOutputDefaultValues(true);
       outputterJson.setOutputClassNames(true);
-      outputterJson.outputJSONJFObject(error);
+      outputterJson.outputJSONJFObject(object);
       out.println(outputterJson.toString());
 
     } else {
       throw new UnsupportedOperationException(
-        String.format("Output DIG exception in %s format is not supported.", format.getName()));
+        String.format("Output FObject in %s format is not supported.", format.getName()));
     }
   }
 }
