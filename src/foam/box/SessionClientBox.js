@@ -15,6 +15,7 @@ foam.CLASS({
 
   imports: [
     'requestLogin',
+    'requestCapability',
     'sessionTimer',
     'group'
   ],
@@ -41,10 +42,16 @@ foam.CLASS({
       name: 'send',
       code: function send(msg) {
         var self = this;
-        if ( this.RPCErrorMessage.isInstance(msg.object) && msg.object.data.id === 'foam.nanos.auth.AuthenticationException' ) {
-          this.requestLogin().then(function() {
-            self.clientBox.send(self.msg);
-          });
+        if ( this.RPCErrorMessage.isInstance(msg.object) ) {
+          if ( msg.object.data.id === 'foam.nanos.auth.AuthenticationException' ) {
+            this.requestLogin().then(function() {
+              self.clientBox.send(self.msg);
+            });
+          } else if ( msg.object.data.id === 'foam.box.CapabilityRequiredRemoteException' ) {
+            this.requestCapability(msg.object.data).then(function() {
+              self.clientBox.send(self.msg);
+            });
+          }
         } else {
 
           // fetch the soft session limit from group, and then start the timer

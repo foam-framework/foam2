@@ -23,6 +23,19 @@ p({
   "notes":""
 })
 
+p({
+  "class": "foam.nanos.script.Script",
+  "id": "Invoke Capability Intercept",
+  "server":false,
+  "code": """
+    let result = x.crunchTestService.testAuthorizationException("test.crunch.a");
+    result.then(
+      function () { console.log("Capability AQUIRED"); },
+      function () { console.log("Capability CANCELLED"); }
+    );
+  """
+})
+
 p({"class": "foam.nanos.script.TestRunnerScript", "id":"testRunnerScript"})
 p({"class":"foam.nanos.script.Script","id":"Migrate permissions","code":"import foam.dao.ArraySink;\u000aimport foam.nanos.auth.*;\u000a\u000alocalGroupDAO = x.get(\"localGroupDAO\");\u000apermissionDAO = x.get(\"localPermissionDAO\");\u000agroupPermissionJunctionDAO = x.get(\"localGroupPermissionJunctionDAO\");\u000a\u000agroups = ((ArraySink) localGroupDAO.select(new ArraySink())).getArray();\u000a\u000afor ( Group group : groups ) {\u000a  Permission[] permissions = group.getPermissions();\u000a\u000a  for ( Permission permission : permissions ) {\u000a\u000a    // Add to permissionDAO if not already there.\u000a    Permission existing = permissionDAO.find(permission.getId());\u000a\u000a    if ( existing == null ) {\u000a      permissionDAO.put(permission);\u000a      print(\"Added permission \" + permission.getId() + \" to permissionDAO.\");\u000a    }\u000a\u000a    // Add to groupPermissionJunctionDAO if not already there.\u000a    GroupPermissionJunction junction = group.getPermissions2(x).createJunction(permission.getId());\u000a    GroupPermissionJunction existing2 = groupPermissionJunctionDAO.find(junction);\u000a\u000a    if ( existing2 == null ) {\u000a      group.getPermissions2(x).add(permission);\u000a      print(\"Added \" + permission.getId() + \" to group \" + group.getId() + \".\");\u000a    } else {\u000a      print(permission.getId() + \" is already in group \" + group.getId() + \".\");\u000a    }\u000a  }\u000a}\u000a"})
 p({"class":"foam.nanos.script.Script","id":"Sample Threads","description":"Perform statistical thread sampling to discover code hot spots.","lastRun":"2019-06-24T17:30:02.660Z","lastDuration":12626,"status":1,"code":"map     = new HashMap();\n\nfor ( j = 0 ; j < 1000 ; j++ ) {\n\nthreads = Thread.getAllStackTraces().values();\n\nfor ( i = threads.iterator() ; i.hasNext() ; ) {\n  t = i.next();\n  try {\n    l = t[0].toString().trim();\n    if ( l.equals(\"java.lang.Thread.dumpThreads(Native Method)\") ) continue;\n    if ( l.equals(\"sun.misc.Unsafe.park(Native Method)\") ) continue;\n    if ( l.equals(\"java.lang.Thread.sleep(Native Method)\") ) continue;\n    if ( l.equals(\"java.lang.Object.wait(Native Method)\") ) continue;\n    if ( l.equals(\"sun.nio.ch.KQueueArrayWrapper.kevent0(Native Method)\") ) continue;\n    if ( l.equals(\"sun.nio.ch.KQueueArrayWrapper.register0(Native Method)\") ) continue;\n    if ( l.equals(\"sun.nio.ch.ServerSocketChannelImpl.accept0(Native Method)\") ) continue;\n\n    if ( map.containsKey(l) ) {\n      map.put(l, map.get(l) + 1);\n    } else {\n      map.put(l, 1);\n    }\n  } catch (Throwable t) {\n  }\n}\n\nThread.sleep(10);\n}\n\nfor ( i = map.keySet().iterator() ; i.hasNext() ; ) {\n  key = i.next();\n  value = map.get(key);\n  if ( ! String.valueOf(value).equals(\"1\") ) \n    print(String.format(\"%-100s %s\", new Object[] {key, value}));\n}\n\nprint(\"done\");","output":"foam.core.AbstractFObject.compareTo(AbstractFObject.java:31)                                         2\ndone\n"})

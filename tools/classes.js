@@ -93,6 +93,9 @@ var classes = [
   'com.google.foam.demos.heroes.Hero',
   'com.google.auth.TokenVerifier',
   'foam.box.RemoteException',
+  'foam.box.CapabilityRequiredRemoteException',
+  'foam.box.CapabilityInterceptBox',
+  'foam.box.CapabilityInterceptReplyDecoratorBox',
   'foam.box.RPCMessage',
   'foam.box.RPCReturnBox',
   'foam.box.RPCReturnMessage',
@@ -489,6 +492,8 @@ var classes = [
 
   // Crunch
   'foam.nanos.crunch.crunchtest.FakeTestObject',
+  'foam.nanos.crunch.crunchtest.TestService',
+  'foam.nanos.crunch.crunchtest.TestServiceServer',
   //models
   'foam.nanos.crunch.Capability',
   'foam.nanos.crunch.CapabilityJunctionStatus',
@@ -527,6 +532,7 @@ var skeletons = [
   'foam.nanos.auth.email.EmailDocInterface',
   'foam.nanos.auth.twofactor.OTPAuthService',
   'foam.nanos.auth.token.TokenService',
+  'foam.nanos.crunch.crunchtest.TestService',
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.email.POP3Email',
   'foam.nanos.notification.push.PushService',

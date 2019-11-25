@@ -57,6 +57,7 @@ foam.CLASS({
         reply.setData(wrapper);
 
         Message replyMessage = new Message();
+        replyMessage.getLocalAttributes().put("serverThrowable", t);
         replyMessage.setObject(reply);
 
         replyBox.send(replyMessage);
