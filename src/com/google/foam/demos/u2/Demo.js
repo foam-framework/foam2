@@ -4,6 +4,52 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+
+ foam.CLASS({
+   name: 'MultiPartTextField',
+   extends: 'foam.u2.View',
+
+   requires: [ 'foam.u2.TextField' ],
+
+   properties: [
+     {
+       class: 'Int',
+       name: 'numOfParts',
+       value: 7
+     }
+   ],
+
+   methods: [
+     function initE() {
+       this.SUPER();
+
+       for ( let i = 0 ; i < this.numOfParts ; i++ ) {
+         let v = this.TextField.create({size: 2});
+         v.data$.relateFrom(this.data$, () => this.data.substring(0,i) + v.data.substring(0) + this.data.substring(i+1), () => this.data.substring(i, i+1));
+         this.tag(v);
+       }
+
+     }
+   ]
+ });
+
+ foam.CLASS({
+   name: 'MultiPartTextFieldTest',
+   properties: [
+     {
+       name: 'val',
+       view: 'MultiPartTextField'
+     }
+   ]
+ })
+
+ var mptft = MultiPartTextFieldTest.create({val:'1234567'});
+ foam.u2.DetailView.create({ data: mptft }).write();
+ foam.u2.DetailView.create({ data: mptft }).write();
+ mptft.val$.sub(function() { console.log('***** value: ', mptft.val)});
+
+
+
 foam.CLASS({
   name: 'Something',
 

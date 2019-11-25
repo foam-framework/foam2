@@ -132,7 +132,7 @@ foam.CLASS({
         .add(this.slot(function(data, valueView) {
           return self.E()
             .start(self.Rows)
-              .forEach(data, function(e, i) {
+              .forEach(data || [], function(e, i) {
                 var row = self.Row.create({ index: i, value: e });
                 this
                   .startContext({ data: row })

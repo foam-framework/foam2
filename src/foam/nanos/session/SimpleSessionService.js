@@ -35,7 +35,7 @@ foam.CLASS({
     {
       name: 'createSession',
       javaCode: `
-        return createSessionWithTTL(x, userId, 0);
+        return createSessionWithTTL(x, userId, agentId, 0);
       `
     },
     {
@@ -51,13 +51,14 @@ foam.CLASS({
 
         Session session = new Session.Builder(x)
           .setUserId(userId)
+          .setAgentId(agentId)
           .build();
-        
+
         if ( ttl > 0 ) {
           session.setTtl(ttl);
         }
 
-        session = (Session) ((DAO) getLocalSessionDAO()).put(session);
+        session = (Session) ((DAO) getLocalSessionDAO()).inX(x).put(session);
 
         // TODO: Change to access token property when we support that.
         return session.getId();
@@ -76,7 +77,7 @@ foam.CLASS({
         DAO         localUserDAO = (DAO) getLocalUserDAO();
         User        sessionUser  = (User) localUserDAO.inX(x).find(userId);
 
-        if ( sessionUser == null ) throw new RuntimeException(String.format("User with id '%d' not found.", Long.toString(userId)));
+        if ( sessionUser == null ) throw new RuntimeException(String.format("User with id '%d' not found.", userId));
 
         String spid = sessionUser.getSpid();
         if ( SafetyUtil.isEmpty(spid) ) spid = "*";
