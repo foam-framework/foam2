@@ -435,7 +435,7 @@ p({
       .setJournalName(\"agentJunctions\")
       .setOf(foam.nanos.auth.UserUserJunction.getOwnClassInfo())
       .build();
-  ",
+  """,
   "client": "{\"of\":\"foam.nanos.auth.UserUserJunction\", \"remoteListenerSupport\": false}"
 })
 
