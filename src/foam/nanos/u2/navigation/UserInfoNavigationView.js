@@ -71,7 +71,7 @@ foam.CLASS({
             .add(this.slot((agent, user) => {
               return this.E().addClass('name-container')
                   .start('span').addClass(this.myClass('userName'))
-                    .add( agent.firstName ? user.businessName : user.label())
+                    .add(user.label())
                   .end();
             }))
             .add(this.slot((agent) => {
