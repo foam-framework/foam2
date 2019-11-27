@@ -82,7 +82,10 @@ foam.CLASS({
         if ( nextRelationships == null || nextRelationships.size() == 0 ) return false;
     
         // get the list of sourceObjs that have a relationship with the targetObj
-        List<FObject> sourceObjs = getSourceObjects(x, obj);
+        
+        // switch user in context to a system user
+        User systemUser = new User.Builder(x).setId(1).build();
+        List<FObject> sourceObjs = getSourceObjects(x.put("user", systemUser), obj);
     
         DAO ropeDAO = (DAO) x.get("ropeDAO");
         for ( FObject sourceObj : sourceObjs ) {
