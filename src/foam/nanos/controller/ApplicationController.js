@@ -78,7 +78,7 @@ foam.CLASS({
 
   constants: {
     MACROS: [
-      'LOGO_BACKGROUND_COLOUR',
+      'logoBackgroundColour',
       'customCSS',
       'primary1',
       'primary2',
@@ -144,7 +144,8 @@ foam.CLASS({
         return {
           dao_: client$userDAO || null,
           imgPath: '',
-          group: 'system'
+          group: 'system',
+          countryChoices_: [] // empty defaults to entire countryDAO
         };
       }
     },

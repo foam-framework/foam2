@@ -54,7 +54,7 @@ foam.CLASS({
   ^ .topBar-logo-Back {
     text-align: center;
     height: 6vh;
-    background: /*%LOGO_BACKGROUND_COLOUR%*/ /*%PRIMARY1%*/ #202341;
+    background: /*%LOGO_BACKGROUND_COLOUR%*/ #202341;
   }
 
   /* SET ON LOGO IMG */
@@ -89,7 +89,7 @@ foam.CLASS({
 
   /* TOP-TOP BAR NAV to go with backLink_ */
   ^ .top-bar-nav {
-    background: /*%LOGO_BACKGROUND_COLOUR%*/ /*%PRIMARY1%*/ #202341;
+    background: /*%LOGO_BACKGROUND_COLOUR%*/ #202341;
     width: 100%;
     height: 4vh;
     border-bottom: solid 1px #e2e2e3
@@ -154,10 +154,7 @@ foam.CLASS({
       class: 'Boolean',
       name: 'topBarShow_',
       factory: function() {
-        if ( this.appConfig && this.appConfig.url ) {
-          return true;
-        }
-        return false;
+        return !! this.backLink_;
       },
       hidden: true
     },
@@ -168,7 +165,12 @@ foam.CLASS({
       },
       view: { class: 'foam.u2.detail.VerticalDetailView' }
     },
-    'param',
+    {
+      name: 'param',
+      factory: function() {
+        return {};
+      }
+    },
     {
       class: 'String',
       name: 'mode_',
@@ -197,7 +199,9 @@ foam.CLASS({
       class: 'String',
       name: 'backLink_',
       factory: function() {
-        return this.model.backLink_ ? this.model.backLink_ : this.appConfig.url;
+        return !! this.model.backLink_ ?
+          this.model.backLink_ :
+          !! this.appConfig.url ? this.appConfig.url : undefined;
       },
       hidden: true
     }
@@ -210,18 +214,18 @@ foam.CLASS({
 
   methods: [
     function init() {
-      if ( ! this.param ) {
-        this.param = {};
-      }
-      this.param.dao_ = (! this.param.dao_) ? this.loginVariables.dao_ : this.param.dao_;
+      // Use passed in values or default loginVariables defined on ApplicationControllers
+      this.param.dao_ = !! this.param.dao_ ? this.param.dao_ : this.loginVariables.dao_;
+      this.param.group_ = !! this.param.group_ ? this.param.group_ : this.loginVariables.group_;
+      this.param.countryChoices_ = !! this.param.countryChoices_ ? this.param.countryChoices_ : this.loginVariables.countryChoices_;
+      // Instantiating model based on mode_
       if ( this.mode_ === this.MODE1 ) {
-        this.param.group_ = ! this.param.group_ ? this.loginVariables.group_ : this.param.group_;
-        this.param.countryChoices_ = this.param.countryChoices_ ? this.param.countryChoices_ : ['CA', 'US'];
         this.model = this.SignUp.create(this.param, this);
       } else {
         this.model = this.SignIn.create(this.param, this);
       }
     },
+
     function initE() {
       this.SUPER();
       let logo = this.theme.largeLogo ? this.theme.largeLogo : this.theme.logo;
