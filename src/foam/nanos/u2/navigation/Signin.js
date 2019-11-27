@@ -13,11 +13,6 @@ foam.CLASS({
     'user'
   ],
 
-  implements: [
-    'foam.core.Validatable',
-    'foam.nanos.auth.Authorizable'
-  ],
-
   messages: [
     { name: 'TITLE', message: 'Welcome!' },
     { name: 'FOOTER_TXT', message: 'Not a user yet?' },

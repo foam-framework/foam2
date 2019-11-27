@@ -54,7 +54,7 @@ foam.CLASS({
   ^ .topBar-logo-Back {
     text-align: center;
     height: 6vh;
-    // background: /*%logoBackgrounColour%*/ #202341;
+    background: /*%LOGO_BACKGROUND_COLOUR%*/ /*%PRIMARY1%*/ #202341;
   }
 
   /* SET ON LOGO IMG */
@@ -89,7 +89,7 @@ foam.CLASS({
 
   /* TOP-TOP BAR NAV to go with backLink_ */
   ^ .top-bar-nav {
-    // background: /*%PRIMARY1%*/ #202341; // TODO create logo background theme colour
+    background: /*%LOGO_BACKGROUND_COLOUR%*/ /*%PRIMARY1%*/ #202341;
     width: 100%;
     height: 4vh;
     border-bottom: solid 1px #e2e2e3
@@ -213,7 +213,7 @@ foam.CLASS({
       if ( ! this.param ) {
         this.param = {};
       }
-      this.param.dao_ = ! this.param.dao_ ? this.loginVariables.dao_ : this.param.dao_;
+      this.param.dao_ = (! this.param.dao_) ? this.loginVariables.dao_ : this.param.dao_;
       if ( this.mode_ === this.MODE1 ) {
         this.param.group_ = ! this.param.group_ ? this.loginVariables.group_ : this.param.group_;
         this.param.countryChoices_ = this.param.countryChoices_ ? this.param.countryChoices_ : ['CA', 'US'];
@@ -224,12 +224,13 @@ foam.CLASS({
     },
     function initE() {
       this.SUPER();
+      let logo = this.theme.largeLogo ? this.theme.largeLogo : this.theme.logo;
       // CREATE MODEL VIEW
       var right = this.Element.create({}, this)
       // Header on-top of rendering model
         .start().show(this.topBarShow).addClass('topBar-logo-Back')
           .start('img')
-            .attr('src', this.theme.logo)
+            .attr('src', logo)
             .addClass('top-bar-img')
           .end()
       .end()

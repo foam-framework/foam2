@@ -13,11 +13,6 @@ foam.CLASS({
     'user'
   ],
 
-  implements: [
-    'foam.core.Validatable',
-    'foam.nanos.auth.Authorizable'
-  ],
-
   requires: [
     'foam.nanos.auth.Address',
     'foam.nanos.auth.Country',

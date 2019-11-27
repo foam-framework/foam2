@@ -78,6 +78,7 @@ foam.CLASS({
 
   constants: {
     MACROS: [
+      'LOGO_BACKGROUND_COLOUR',
       'customCSS',
       'primary1',
       'primary2',
