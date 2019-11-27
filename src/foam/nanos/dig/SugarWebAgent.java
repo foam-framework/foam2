@@ -29,11 +29,14 @@ import foam.lib.json.JSONParser;
 import foam.lib.json.MapParser;
 import foam.lib.json.Outputter;
 import foam.lib.parse.PStream;
+import foam.lib.parse.ParserContext;
 import foam.lib.parse.ParserContextImpl;
+import foam.lib.parse.ProxyParser;
 import foam.lib.parse.StringPStream;
 import foam.nanos.boot.NSpec;
 import foam.nanos.dig.exception.DigErrorMessage;
 import foam.nanos.dig.exception.GeneralException;
+import foam.nanos.http.Format;
 import foam.nanos.http.HttpParameters;
 import foam.nanos.http.WebAgent;
 import foam.nanos.logger.Logger;
@@ -56,18 +59,18 @@ public class SugarWebAgent
         DigErrorMessage error = new GeneralException.Builder(x)
           .setMessage("Empty data")
           .build();
-        outputException(x, resp, "JSON", out, error);
+        DigUtil.outputException(x, error, Format.JSON);
         return;
       }
       
       PStream ps = new StringPStream(data);
-      PStream jsonP = new MapParser().parse(ps , new ParserContextImpl());
-      Map mapPostParam = (Map) jsonP.value();
+      ParserContext psx = new ParserContextImpl();
+      psx.set("X", x);
 
-//      ProxyParser jsonP =  new MapParser();
-//      jsonP.setX(x);
-//      PStream ps1 = jsonP.parse(ps , new ParserContextImpl());
-//      Map mapPostParam = (Map) ps1.value();
+      ProxyParser jsonP =  new MapParser();
+      jsonP.setX(x);
+      PStream psParse = jsonP.parse(ps , psx);
+      Map mapPostParam = (Map) psParse.value();
 
       String serviceName = (String) mapPostParam.get("service");
       if ( SafetyUtil.isEmpty(serviceName) ) {
