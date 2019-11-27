@@ -44,6 +44,7 @@ foam.CLASS({
       this.SUPER(p);
       this.min = p.min;
       this.max = p.max;
+      this.mode = p.mode;
     }
   ]
 });
