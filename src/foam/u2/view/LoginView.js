@@ -54,7 +54,7 @@ foam.CLASS({
   ^ .topBar-logo-Back {
     text-align: center;
     height: 6vh;
-    background: /*%LOGO_BACKGROUND_COLOUR%*/ #202341;
+    background: /*%LOGOBACKGROUNDCOLOUR%*/  #202341;
   }
 
   /* SET ON LOGO IMG */
@@ -89,7 +89,7 @@ foam.CLASS({
 
   /* TOP-TOP BAR NAV to go with backLink_ */
   ^ .top-bar-nav {
-    background: /*%LOGO_BACKGROUND_COLOUR%*/ #202341;
+    background: /*%LOGOBACKGROUNDCOLOUR%*/ #202341;
     width: 100%;
     height: 4vh;
     border-bottom: solid 1px #e2e2e3
