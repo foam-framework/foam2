@@ -1,0 +1,15 @@
+p({
+  "class": "foam.nanos.dig.SUGAR",
+  "id": "checkUserTest",
+  "data": "{
+    "service": "auth",
+    "interfaceName": "foam.nanos.auth.AuthService",
+    "method": "checkUser",
+    "X": "X",
+    "user": {
+      "class":"foam.nanos.auth.User",
+      "group":"admin"
+     },
+    "permission":"menu.read.doc"
+  }"
+})
