@@ -1,0 +1,13 @@
+p({
+  "class":"foam.nanos.ticket.TicketStatus",
+  "id":"OPEN",
+  "label":"Open",
+  "ordinal":0
+})
+
+p({
+  "class":"foam.nanos.ticket.TicketStatus",
+  "id":"CLOSED",
+  "label":"Closed",
+  "ordinal":99
+})

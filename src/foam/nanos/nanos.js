@@ -189,6 +189,17 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/notifications/ScriptRunNotificationNotificationView'},
   { name: 'foam/nanos/dashboard/Demo' },
 
+  // Ticket
+  { name: 'foam/nanos/ticket/TicketStatus' },
+  { name: 'foam/nanos/ticket/TicketComment' },
+  { name: 'foam/nanos/ticket/Ticket' },
+  { name: 'foam/nanos/ticket/Relationships' },
+  { name: 'foam/nanos/ticket/TicketAddCommentDAO' },
+  { name: 'foam/nanos/ticket/TicketOwnerDAO' },
+  { name: 'foam/nanos/ticket/TicketCommentOwnerDAO' },
+  { name: 'foam/nanos/ticket/TicketSummaryView' },
+  { name: 'foam/nanos/ticket/SummaryCard' },
+
   // Dig
   { name: "foam/nanos/dig/exception/DigErrorMessage" },
   { name: 'foam/nanos/dig/Argument'},

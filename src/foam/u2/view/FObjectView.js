@@ -39,9 +39,7 @@ foam.CLASS({
         if ( newValue !== oldValue ) {
           var m = this.__context__.lookup(newValue, true);
           if ( m ) {
-            var n = m.create(null, this);
-            n.copyFrom(this.data);
-            this.data = n;
+            this.data = m.create(null, this);
           }
         }
       }
@@ -122,7 +120,7 @@ foam.CLASS({
           choices.sort((a, b) => a[1] > b[1] ? 1 : -1);
 
           this.choices = choices;
-        });
+        }).catch(err => console.warn(err));
       } else {
         this.choices = this.choicesFallback(this.of);
       }

@@ -18,8 +18,10 @@ public class AsyncAssemblyLine
  extends SyncAssemblyLine
 {
  protected Agency pool_;
+ protected X      x_;
 
  public AsyncAssemblyLine(X x) {
+   x_    = x;
    pool_ = (Agency) x.get("threadPool");
  }
 
@@ -32,7 +34,7 @@ public class AsyncAssemblyLine
      job.startJob();
    }
 
-   pool_.submit(null, new ContextAgent() { public void execute(X x) {
+   pool_.submit(x_, new ContextAgent() { public void execute(X x) {
      job.executeJob();
 
      if ( previous != null ) previous.waitToComplete();

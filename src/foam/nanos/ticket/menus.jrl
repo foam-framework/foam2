@@ -1,0 +1,26 @@
+p({
+  "class":"foam.nanos.menu.Menu",
+  "id":"admin.tickets",
+  "label":"Tickets",
+  "handler":{
+    "class":"foam.nanos.menu.DAOMenu",
+    "daoKey":"ticketDAO",
+    "title":"Tickets"
+  },
+  "parent":"admin"
+})
+
+p({
+  "class":"foam.nanos.menu.Menu",
+  "id":"tickets",
+  "label":"Tickets",
+  "handler":{
+    "class":"foam.nanos.menu.DAOMenu",
+    "daoKey":"ticketDAO",
+    "title":"Tickets",
+    "summaryView":{
+      "class":"foam.nanos.ticket.TicketSummaryView"
+    }
+  },
+  "parent":""
+})

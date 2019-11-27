@@ -145,7 +145,7 @@ public class RuleEngine extends ContextAwareSupport {
 
   private void applyRule(Rule rule, FObject obj, FObject oldObj, Agency agency) {
     ProxyX readOnlyX = new ReadOnlyDAOContext(userX_);
-    rule.apply(readOnlyX, obj, oldObj, this, agency);
+    rule.apply(readOnlyX, obj, oldObj, this, rule, agency);
   }
 
   private boolean isRuleApplicable(Rule rule, FObject obj, FObject oldObj) {
@@ -170,7 +170,7 @@ public class RuleEngine extends ContextAwareSupport {
           FObject nu = getDelegate().find_(x, obj).fclone();
           nu = reloadObject(obj, oldObj, nu, rule.getAfter());
           try {
-            rule.asyncApply(x, nu, oldObj, RuleEngine.this);
+            rule.asyncApply(x, nu, oldObj, RuleEngine.this, rule);
             saveHistory(rule, nu);
           } catch (Exception ex) {
             retryAsyncApply(x, rule, nu, oldObj);
@@ -182,7 +182,7 @@ public class RuleEngine extends ContextAwareSupport {
 
   private void retryAsyncApply(X x, Rule rule, FObject obj, FObject oldObj) {
     new RetryManager().submit(x, x1 -> {
-      rule.asyncApply(x, obj, oldObj, RuleEngine.this);
+      rule.asyncApply(x, obj, oldObj, RuleEngine.this, rule);
       saveHistory(rule, obj);
     });
   }
