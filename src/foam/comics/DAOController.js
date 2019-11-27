@@ -179,8 +179,16 @@ foam.CLASS({
       class: 'foam.u2.ViewSpec',
       name: 'detailView',
       factory: function() {
+        // Split the sections of the model into tabs if the model has more than
+        // one section, otherwise use the normal detail view. We do this because
+        // tabs are easier to navigate when there are multiple sections, but
+        // they don't make sense when there's only one tab.
+        var classId = this.data.of.model_.sections
+          ? 'foam.u2.detail.TabbedDetailView'
+          : 'foam.u2.detail.SectionedDetailView';
+
         return {
-          class: 'foam.u2.detail.SectionedDetailView',
+          class: classId,
           of: this.data.of
         };
       }
