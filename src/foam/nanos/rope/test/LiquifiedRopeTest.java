@@ -32,16 +32,17 @@ public class LiquifiedRopeTest extends Test {
 
   DAO userDAO, accountDAO, transactionDAO, approvalRequestDAO, ropeDAO;
   DAO accountViewerJunctionDAO, accountMakerJunctionDAO, accountApproverJunctionDAO, transactionViewerJunctionDAO, transactionMakerJunctionDAO, transactionApproverJunctionDAO, roleAssignmentApproverJunctionDAO, roleAssignmentMakerJunctionDAO, roleDAO, roleAssignmentTrunctionDAO, roleAssignmentTemplateDAO;
-  User accountViewer, accountMaker, accountApprover, transactionViewer, transactionMaker, transactionApprover, root;
-  Account rootAccount;
+  User root, contact;
+  Account rootAccount, contactAccount;
   AccountUserJunction aujunction;
   Role transactionViewerRole, transactionMakerRole, transactionApproverRole, accountViewerRole, accountMakerRole, accountApproverRole, roleAssignmentApproverRole, roleAssignmentMakerRole;
 
   public void runTest(X x) {
     x = x.put("localUserDAO", new MDAO(User.getOwnClassInfo()));
+    x = x.put("localAccountDAO", new MDAO(Account.getOwnClassInfo()));
     DAO easydao = new foam.dao.EasyDAO.Builder(x).setInnerDAO((DAO) x.get("localUserDAO")).setAuthorize(false).setOf(User.getOwnClassInfo()).build();
     x = x.put("userDAO", easydao);
-    x = x.put("accountDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(Account.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("accountDAO").build()).build());
+    x = x.put("accountDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate((DAO) x.get("localAccountDAO")).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("accountDAO").build()).build());
     x = x.put("transactionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(Transaction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("transactionDAO").build()).build());
     x = x.put("approvalRequestDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(ApprovalRequest.getOwnClassInfo())).setAuthorizer(new foam.nanos.auth.AuthorizableAuthorizer("approvalRequestDAO")).build());
     x = x.put("accountViewerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("accountViewerJunctionDAO").build()).build());
@@ -117,10 +118,10 @@ public class LiquifiedRopeTest extends Test {
     auj = (AccountUserJunction) accountViewerJunctionDAO.find(AND(EQ(AccountUserJunction.SOURCE_ID, account102.getId()), EQ(AccountUserJunction.TARGET_ID, accountViewer102.getId())));
     rat = (RoleAssignmentTrunction) roleAssignmentTrunctionDAO.find(AND(EQ(RoleAssignmentTrunction.ACCOUNT_ID, account102.getId()), EQ(RoleAssignmentTrunction.USER_ID, accountViewer102.getId()), EQ(RoleAssignmentTrunction.ROLE_ID, accountViewerRole.getId())));
     test(auj != null && rat != null, "3. root user able to put user into accountviewerjunctiondao via role.assign");
-
+    // accountviewer for account102 can view account102
     List<Account> accountsViewableByAccountViewer102 = (ArrayList<Account>) ((ArraySink) accountDAO.inX(x.put("user", accountViewer102)).select(new ArraySink())).getArray();
     test(accountsViewableByAccountViewer102.size() == 1 && accountsViewableByAccountViewer102.get(0).getId() == 102, "4. accountViewer102 can view account102, but not any other accounts");
-
+    // accountviewer for account102 cannot make accounts under account102
     Account account103 = new Account.Builder(x).setId(103).setParent(102).build();
     final DAO tempAccountDAO = (DAO) ((DAO) x.get("accountDAO")).inX(x.put("user", accountViewer102));
     test(
@@ -132,168 +133,45 @@ public class LiquifiedRopeTest extends Test {
       "5. accountViewer102 cannot create account103 under parent account102"
     );
 
-    // test user without transactionmaker junction cannot put into transactiondao
-    // final Transaction t = new Transaction();
-    // t.setId("1001");
-    // t.setSourceAccount(rootAccount.getId());
-    // t.setDestinationAccount(rootAccount.getId());
+    // root user add transactionmaker for rootAccount
+    User transactionMaker101 = new User.Builder(x).setId(14).build();
+    transactionMaker101 = (User) userDAO.put(transactionMaker101);
+    Role transactionMakerRole = (Role) roleDAO.find(EQ(Role.NAME, "transactionMaker"));
+    transactionMakerRole.assign(x, new ArrayList<Long>(Arrays.asList(transactionMaker101.getId())), new ArrayList<Long>(Arrays.asList(rootAccount.getId())));
+    auj = (AccountUserJunction) transactionMakerJunctionDAO.find(AND(EQ(AccountUserJunction.SOURCE_ID, rootAccount.getId()), EQ(AccountUserJunction.TARGET_ID, transactionMaker101.getId())));
+    rat = (RoleAssignmentTrunction) roleAssignmentTrunctionDAO.find(AND(EQ(RoleAssignmentTrunction.ACCOUNT_ID, rootAccount.getId()), EQ(RoleAssignmentTrunction.USER_ID, transactionMaker101.getId()), EQ(RoleAssignmentTrunction.ROLE_ID, transactionMakerRole.getId())));
+    test(auj != null && rat != null, "6. root user able to put user into transactionmaker via role.assign");
+    // check that transactionmaker 101 can't view rootAccount, or any accounts
+    List<Account> accountsViewableByTransactionMaker101 = (ArrayList<Account>) ((ArraySink) accountDAO.inX(x.put("user", transactionMaker101)).select(new ArraySink())).getArray();
+    test(accountsViewableByTransactionMaker101.size() == 0, "7. transactionmaker101 do not get more privilege to view account for which they are a transactionmaker since its not explicitly granted");
+    // test transactionmaker101 can create transaction with srcaccount = 101
+    Transaction t1000 = new Transaction.Builder(x).setId("t1000").setSourceAccount(rootAccount.getId()).setDestinationAccount(contactAccount.getId()).build();
+    System.out.println(t1000.findSourceAccount(x));
+    t1000 = (Transaction) transactionDAO.inX(x.put("user", transactionMaker101)).put(t1000);
+    test(t1000 != null, "8. transactionmaker101 can create transaction with srcaccount 101");
+    // transactionmaker101 cannot create transaction from other account with destaccount = 101
+    Transaction t1001 = new Transaction.Builder(x).setId("t1001").setSourceAccount(account102.getId()).setDestinationAccount(rootAccount.getId()).setAmount(100).build();
+    final DAO tempTransactionDAO = (DAO) ((DAO) x.get("transactionDAO")).inX(x.put("user", transactionMaker101));
+    test(
+      TestUtils.testThrows(
+        () -> tempTransactionDAO.put(t1001),
+        "You don't have permission to create this object",
+        foam.nanos.auth.AuthorizationException.class
+      ),
+      "9. transactionmaker101 cannot create transaction from other account with destaccount = 101"
+    );
 
-    // transactionMaker = new User();
-    // transactionMaker.setFirstName("transaction");
-    // transactionMaker.setLastName("maker");
-    // transactionMaker.setId(12);
-    // transactionMaker = (User) userDAO.put(transactionMaker);
-    // final DAO tempTransactionDAO = (DAO) ((DAO) x.get("transactionDAO")).inX(x.put("user", transactionMaker));
-    // test(
-    //   TestUtils.testThrows(
-    //     () -> tempTransactionDAO.put(t),
-    //     "You don't have permission to create this object",
-    //     foam.nanos.auth.AuthorizationException.class
-    //   ),
-    //   "user without transactionmaker junction cannot put into transactiondao"
-    // );
-
-    // test root user can put into transactiondao
-    // test((Transaction) transactionDAO.inX(x).put(t) != null, "root user can create Transaction" + t.getId());
-
-    // test root user can create transactionmakerjunction for root account
+    // root user add transactionviewer for rootAccount
+    User transactionViewer101 = new User.Builder(x).setId(15).build();
+    transactionViewer101 = (User) userDAO.put(transactionViewer101);
+    Role transactionViewerRole = (Role) roleDAO.find(EQ(Role.NAME, "transactionViewer"));
+    transactionViewerRole.assign(x, new ArrayList<Long>(Arrays.asList(transactionViewer101.getId())), new ArrayList<Long>(Arrays.asList(rootAccount.getId())));
+    auj = (AccountUserJunction) transactionViewerJunctionDAO.find(AND(EQ(AccountUserJunction.SOURCE_ID, rootAccount.getId()), EQ(AccountUserJunction.TARGET_ID, transactionViewer101.getId())));
+    rat = (RoleAssignmentTrunction) roleAssignmentTrunctionDAO.find(AND(EQ(RoleAssignmentTrunction.ACCOUNT_ID, rootAccount.getId()), EQ(RoleAssignmentTrunction.USER_ID, transactionViewer101.getId()), EQ(RoleAssignmentTrunction.ROLE_ID, transactionViewerRole.getId())));
+    test(auj != null && rat != null, "10. root user able to put user into transactionviewerdao via role.assign");
     
-    // AccountUserJunction accountTransactionMakerJunction = new AccountUserJunction();
-    // accountTransactionMakerJunction.setSourceId(rootAccount.getId());
-    // accountTransactionMakerJunction.setTargetId(transactionMaker.getId());
-    // accountTransactionMakerJunction = (AccountUserJunction) transactionMakerJunctionDAO.inX(x).put(accountTransactionMakerJunction);
-    
-    // test(accountTransactionMakerJunction != null, "root user can create transactionmaker" + accountTransactionMakerJunction.getId());
-
-    // // test root user can create transaction viewer junction for root account
-    // transactionViewer = new User();
-    // transactionViewer.setFirstName("transaction");
-    // transactionViewer.setLastName("viewer");
-    // transactionViewer.setId(333);
-    // transactionViewer = (User) userDAO.put(transactionViewer);
-
-    // AccountUserJunction accountTransactionViewerJunction = new AccountUserJunction();
-    // accountTransactionViewerJunction.setSourceId(rootAccount.getId());
-    // accountTransactionViewerJunction.setTargetId(transactionViewer.getId());
-    // accountTransactionViewerJunction = (AccountUserJunction) transactionViewerJunctionDAO.inX(x).put(accountTransactionViewerJunction);
-    
-    // test(accountTransactionViewerJunction != null, "root user can create transactionviewer" + accountTransactionViewerJunction.getId());
-
-    // // test root user can create role maker junction for root account    
-    // roleMaker = new User();
-    // roleMaker.setFirstName("role");
-    // roleMaker.setLastName("maker");
-    // roleMaker.setId(444);
-    // roleMaker = (User) userDAO.put(roleMaker);
-
-    // AccountUserJunction accountRoleMakerJunction = new AccountUserJunction();
-    // accountRoleMakerJunction.setSourceId(rootAccount.getId());
-    // accountRoleMakerJunction.setTargetId(roleMaker.getId());
-    // accountRoleMakerJunction = (AccountUserJunction) roleMakerJunctionDAO.inX(x).put(accountRoleMakerJunction);
-    // test(accountRoleMakerJunction != null, "root user can create roleMaker" + accountRoleMakerJunction.getId());
-
-    // // put role maker as context user, test rolemaker create accountuserjunctions
-    // x.put("user", roleMaker);
-    // transactionApprover = new User();
-    // transactionApprover.setFirstName("transaction");
-    // transactionApprover.setLastName("approver");
-    // transactionApprover.setId(555);
-    // transactionApprover = (User) userDAO.put(transactionApprover);
-
-    // AccountUserJunction accountTransactionApproverJunction = new AccountUserJunction();
-    // accountTransactionApproverJunction.setSourceId(rootAccount.getId());
-    // accountTransactionApproverJunction.setTargetId(transactionApprover.getId());
-    // accountTransactionApproverJunction = (AccountUserJunction) transactionApproverJunctionDAO.inX(x).put(accountTransactionApproverJunction);
-    // test(accountTransactionApproverJunction != null, "rolemaker user can create transactionapprover" + accountTransactionApproverJunction.getId());
-
-    // accountMaker = new User();
-    // accountMaker.setFirstName("account");
-    // accountMaker.setLastName("maker");
-    // accountMaker.setId(666);
-    // accountMaker = (User) userDAO.put(accountMaker);
-    // AccountUserJunction accountAccountMakerJunction = new AccountUserJunction();
-    // accountAccountMakerJunction.setSourceId(rootAccount.getId());
-    // accountAccountMakerJunction.setTargetId(accountMaker.getId());
-    // accountAccountMakerJunction = (AccountUserJunction) accountMakerJunctionDAO.inX(x).put(accountAccountMakerJunction);
-    // test(accountAccountMakerJunction != null, "rolemaker user can create accountmaker" + accountAccountMakerJunction.getId());
-
-    // accountViewer = new User();
-    // accountViewer.setFirstName("account");
-    // accountViewer.setLastName("viewer");
-    // accountViewer.setId(777);
-    // accountViewer = (User) userDAO.put(accountViewer);
-    // AccountUserJunction accountAccountViewerJunction = new AccountUserJunction();
-    // accountAccountViewerJunction.setSourceId(rootAccount.getId());
-    // accountAccountViewerJunction.setTargetId(accountViewer.getId());
-    // accountAccountViewerJunction = (AccountUserJunction) accountViewerJunctionDAO.inX(x).put(accountAccountViewerJunction);
-    // test(accountAccountViewerJunction != null, "rolemaker user can create accountViewer" + accountAccountViewerJunction.getId());
-
-    // accountApprover = new User();
-    // accountApprover.setFirstName("account");
-    // accountApprover.setLastName("approver");
-    // accountApprover.setId(888);
-    // accountApprover = (User) userDAO.put(accountApprover);
-    // AccountUserJunction accountAccountApproverJunction = new AccountUserJunction();
-    // accountAccountApproverJunction.setSourceId(rootAccount.getId());
-    // accountAccountApproverJunction.setTargetId(accountApprover.getId());
-    // accountAccountApproverJunction = (AccountUserJunction) accountApproverJunctionDAO.inX(x).put(accountAccountApproverJunction);
-    // test(accountAccountApproverJunction != null, "rolemaker user can create accountApprover" + accountAccountApproverJunction.getId());
-
-    // roleApprover = new User();
-    // roleApprover.setFirstName("role");
-    // roleApprover.setLastName("approver");
-    // roleApprover.setId(999);
-    // roleApprover = (User) userDAO.put(roleApprover);
-    // AccountUserJunction accountRoleApproverJunction = new AccountUserJunction();
-    // accountRoleApproverJunction.setSourceId(rootAccount.getId());
-    // accountRoleApproverJunction.setTargetId(roleApprover.getId());
-    // accountRoleApproverJunction = (AccountUserJunction) roleApproverJunctionDAO.inX(x).put(accountRoleApproverJunction);
-    // test(accountRoleApproverJunction != null, "rolemaker user can create roleApprover" + accountRoleApproverJunction.getId());
-
-
-    // roleViewer = new User();
-    // roleViewer.setFirstName("role");
-    // roleViewer.setLastName("viewer");
-    // roleViewer.setId(101010);
-    // roleViewer = (User) userDAO.put(roleViewer);
-    // AccountUserJunction accountRoleViewerJunction = new AccountUserJunction();
-    // accountRoleViewerJunction.setSourceId(rootAccount.getId());
-    // accountRoleViewerJunction.setTargetId(roleViewer.getId());
-    // accountRoleViewerJunction = (AccountUserJunction) roleViewerJunctionDAO.inX(x).put(accountRoleViewerJunction);
-    // test(accountRoleViewerJunction != null, "rolemaker user can create roleViewer" + accountRoleViewerJunction.getId());
-
-    // // test account maker create child account
-    // Account childAccount1 = new Account();
-    // childAccount1.setId(222);
-    // childAccount1.setParent(rootAccount.getId());
-    // childAccount1 = (Account) accountDAO.inX(x.put("user", accountMaker)).put(childAccount1);
-    // test(childAccount1 != null, "accountmaker user can create direct child account under account in which they are accountmaker of");
-
-
-    // // test transaction viewer cannot create transaction 
-    // final Transaction t1 = new Transaction();
-    // t1.setId("999");
-    // t1.setSourceAccount(rootAccount.getId());
-    // t1.setDestinationAccount(rootAccount.getId());
-    // final DAO tempTransactionDAO2 = tempTransactionDAO.inX(x.put("user", transactionViewer));
-    // test(
-    //   TestUtils.testThrows(
-    //     () -> tempTransactionDAO2.put(t1),
-    //     "You don't have permission to create this object",
-    //     foam.nanos.auth.AuthorizationException.class
-    //   ),
-    //   "transactionViewer cannot create transaction"
-    // );
-
-    // // test transaction maker can create transaction
-    // x = x.put("user", transactionMaker);
-    // Transaction returnedt1 = (Transaction) transactionDAO.inX(x).put(t1);
-    // test(returnedt1 != null, "transactionMaker user can create Transaction" + returnedt1.getId());
-
-    // // test transaction viewer can view transaction
-    // x = x.put("user", transactionViewer);
-    // Transaction viewedTransaction = (Transaction) transactionDAO.inX(x).find(returnedt1.getId());
-    // test(viewedTransaction != null, "transactionViewer user can view transaction");
+    List<Transaction> transactionsViewableByTransactionViewer101 = (ArrayList<Transaction>) ((ArraySink) transactionDAO.inX(x.put("user", transactionViewer101)).select(new ArraySink())).getArray();
+    test(transactionsViewableByTransactionViewer101.size() == 1 && transactionsViewableByTransactionViewer101.get(0).getId().equals("t1000"), "11. transactionsviewablevbytransactionviewr101 contains the one transaction made from rootAccount");
 
   }
 
@@ -309,16 +187,17 @@ public class LiquifiedRopeTest extends Test {
 
     // PARENT CHILD ACCOUNT ROPE
 
-    list = new ArrayList<String>(Arrays.asList( "accountMakers", "accountApprovers" ));
+    list = new ArrayList<String>(Arrays.asList( "accountMakers" ));
     createMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     updateMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     deleteMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    list.add("accountApprovers");
     readMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     crudMapObj = new CRUDMap.Builder(x).setCreate(createMap).setRead(readMap).setUpdate(updateMap).setDelete(deleteMap).build();
-    list = new ArrayList<String>(Arrays.asList( "transactionMakers", "transactionApprovers", "parent" ));
-    relationshipMap.put("sourceAccount", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
-    list = new ArrayList<String>(Arrays.asList( "transactionViewers", "parent" ));
-    relationshipMap.put("destinationAccount", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    // list = new ArrayList<String>(Arrays.asList( "transactionMakers", "transactionApprovers", "parent" ));
+    // relationshipMap.put("sourceAccount", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    // list = new ArrayList<String>(Arrays.asList( "transactionViewers", "parent" ));
+    // relationshipMap.put("destinationAccount", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     relationshipMapObj = new RelationshipMap.Builder(x).setMap(relationshipMap).build();
 
     ropeDAO.inX(x).put(new ROPE.Builder(x)
@@ -342,8 +221,8 @@ public class LiquifiedRopeTest extends Test {
     list = new ArrayList<String>(Arrays.asList("__terminate__"));
     readMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     crudMapObj = new CRUDMap.Builder(x).setCreate(createMap).setRead(readMap).setUpdate(updateMap).setDelete(deleteMap).build();
-    relationshipMap.put("parent", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
-    relationshipMapObj = new RelationshipMap.Builder(x).setMap(relationshipMap).build();
+    // relationshipMap.put("parent", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    // relationshipMapObj = new RelationshipMap.Builder(x).setMap(relationshipMap).build();
 
     ropeDAO.inX(x).put(new ROPE.Builder(x)
       .setSourceDAOKey("userDAO")
@@ -432,9 +311,10 @@ public class LiquifiedRopeTest extends Test {
 
     list = new ArrayList<String>(Arrays.asList( )); // users should never be able to modify/create top-level accounts
     createMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
-    readMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     updateMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     deleteMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    // list = new ArrayList<String>(Arrays.asList( "__terminate__" ));
+    readMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());    
     crudMapObj = new CRUDMap.Builder(x).setCreate(createMap).setRead(readMap).setUpdate(updateMap).setDelete(deleteMap).build();
     list = new ArrayList<String>(Arrays.asList( "__terminate__" )); 
     relationshipMap.put("sourceAccount", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
@@ -454,9 +334,10 @@ public class LiquifiedRopeTest extends Test {
 
     list = new ArrayList<String>(Arrays.asList( )); // users should never be able to modify/create top-level accounts
     createMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
-    readMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     updateMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     deleteMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    list = new ArrayList<String>(Arrays.asList( "__terminate__" ));
+    readMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build()); 
     crudMapObj = new CRUDMap.Builder(x).setCreate(createMap).setRead(readMap).setUpdate(updateMap).setDelete(deleteMap).build();
     list = new ArrayList<String>(Arrays.asList( "__terminate__" )); 
     relationshipMap.put("transactionApprovalRequest", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
@@ -499,9 +380,10 @@ public class LiquifiedRopeTest extends Test {
 
     list = new ArrayList<String>(Arrays.asList( )); // users should never be able to modify/create top-level accounts
     createMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
-    readMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     updateMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     deleteMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    list = new ArrayList<String>(Arrays.asList( "__terminate__" ));
+    readMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     crudMapObj = new CRUDMap.Builder(x).setCreate(createMap).setRead(readMap).setUpdate(updateMap).setDelete(deleteMap).build();
     list = new ArrayList<String>(Arrays.asList( "__terminate__" )); 
     relationshipMap.put("roleAssignmentApprovalRequest", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
@@ -541,9 +423,10 @@ public class LiquifiedRopeTest extends Test {
 
     list = new ArrayList<String>(Arrays.asList( "roleAssignmentMakers" )); 
     createMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
-    readMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     updateMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     deleteMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    list.add("roleAssignmentApprovers");
+    readMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     crudMapObj = new CRUDMap.Builder(x).setCreate(createMap).setRead(readMap).setUpdate(updateMap).setDelete(deleteMap).build();
     
     ropeDAO.inX(x).put(new ROPE.Builder(x)
@@ -561,9 +444,10 @@ public class LiquifiedRopeTest extends Test {
 
     list = new ArrayList<String>(Arrays.asList( "roleAssignmentMakers" )); 
     createMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
-    readMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     updateMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     deleteMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    list.add("roleAssignmentApprovers");
+    readMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     crudMapObj = new CRUDMap.Builder(x).setCreate(createMap).setRead(readMap).setUpdate(updateMap).setDelete(deleteMap).build();
     
     ropeDAO.inX(x).put(new ROPE.Builder(x)
@@ -581,9 +465,10 @@ public class LiquifiedRopeTest extends Test {
     
     list = new ArrayList<String>(Arrays.asList( "roleAssignmentMakers" )); 
     createMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
-    readMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     updateMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     deleteMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    list.add("roleAssignmentApprovers");
+    readMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     crudMapObj = new CRUDMap.Builder(x).setCreate(createMap).setRead(readMap).setUpdate(updateMap).setDelete(deleteMap).build();
     
     ropeDAO.inX(x).put(new ROPE.Builder(x)
@@ -600,9 +485,10 @@ public class LiquifiedRopeTest extends Test {
 
     list = new ArrayList<String>(Arrays.asList( "roleAssignmentMakers" )); 
     createMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
-    readMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     updateMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     deleteMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    list.add("roleAssignmentApprovers");
+    readMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     crudMapObj = new CRUDMap.Builder(x).setCreate(createMap).setRead(readMap).setUpdate(updateMap).setDelete(deleteMap).build();
     
     ropeDAO.inX(x).put(new ROPE.Builder(x)
@@ -619,9 +505,10 @@ public class LiquifiedRopeTest extends Test {
 
     list = new ArrayList<String>(Arrays.asList( "roleAssignmentMakers" )); 
     createMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
-    readMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     updateMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     deleteMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    list.add("roleAssignmentApprovers");
+    readMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     crudMapObj = new CRUDMap.Builder(x).setCreate(createMap).setRead(readMap).setUpdate(updateMap).setDelete(deleteMap).build();
     
     ropeDAO.inX(x).put(new ROPE.Builder(x)
@@ -638,9 +525,10 @@ public class LiquifiedRopeTest extends Test {
 
     list = new ArrayList<String>(Arrays.asList( "roleAssignmentMakers" )); 
     createMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
-    readMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     updateMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     deleteMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    list.add("roleAssignmentApprovers");
+    readMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     crudMapObj = new CRUDMap.Builder(x).setCreate(createMap).setRead(readMap).setUpdate(updateMap).setDelete(deleteMap).build();
     
     ropeDAO.inX(x).put(new ROPE.Builder(x)
@@ -655,12 +543,13 @@ public class LiquifiedRopeTest extends Test {
 
     // SOURCE ACCOUNT TRANSACTION ROPE
 
-
     list = new ArrayList<String>(Arrays.asList( "transactionMakers", "treasurers" )); 
     createMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
-    readMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     updateMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     deleteMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
+    list.add("transactionViewers");
+    list.add("transactionApprovers");
+    readMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     crudMapObj = new CRUDMap.Builder(x).setCreate(createMap).setRead(readMap).setUpdate(updateMap).setDelete(deleteMap).build();
 
     ropeDAO.inX(x).put(new ROPE.Builder(x)
@@ -730,6 +619,15 @@ public class LiquifiedRopeTest extends Test {
     transactionApproverJunctionDAO.put(aujunction);
     roleAssignmentApproverJunctionDAO.put(aujunction);
     roleAssignmentMakerJunctionDAO.put(aujunction);
+
+    contact = new User.Builder(x).setId(99).build();
+    contact = (User) userDAO.put(contact);
+
+    contactAccount = new Account();
+    contactAccount.setName("contactAccount");
+    contactAccount.setId(888);
+    contactAccount.setOwner(contact.getId());
+    contactAccount = (Account) accountDAO.put(contactAccount);
   }
 
   public void addAccountPrivilegesToRoot(X x, User root, Account account) {
