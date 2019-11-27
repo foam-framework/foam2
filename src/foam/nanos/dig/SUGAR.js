@@ -208,7 +208,7 @@ foam.CLASS({
       // TODO: appears not to work if named 'url', find out why.
       name: 'sugarURL',
       label: 'URL',
-      hidden: false,
+      hidden: true,
       displayWidth: 120,
       documentation: 'dynamic URL according to picking service, method, parameters against web agent',
       view: 'foam.nanos.dig.LinkView',
@@ -217,53 +217,16 @@ foam.CLASS({
         var query = false;
         var url   = '/service/sugar';
 
-        this.postData = null;
-
-       if ( serviceKey ) {
-          url += query ? '&' : '?';
-          query = true;
-          url += 'service=' + serviceKey;
-        }
-        if ( interfaceName ) {
-          url += query ? '&' : '?';
-          query = true;
-          url += 'interfaceName=' + interfaceName;
-        }
-        if ( currentMethod ) {
-          url += query ? '&' : '?';
-          query = true;
-          url += 'method=' + currentMethod;
-        }
-
-        for ( var k = 0; k < argumentInfo.length; k++ ) {
-          query = true;
-
-          if ( argumentInfo[k].value != '' ) {
-            this.postData += query ? '&' : '?';
-            this.postData += argumentInfo[k].name + '=' + argumentInfo[k].value;
-          }
-
-          if ( argumentInfo[k].objectType ) {
-            var javaType_ = argumentInfo[k].javaType;
-            var prop = foam.lookup(javaType_).getAxiomsByClass(foam.core.Property);
-            this.postData += '&' + argumentInfo[k].name + '=' + argumentInfo[k].name + '&';
-
-            for ( var i = 0 ; i < prop.length ; i++ ) {
-              if ( argumentInfo[k].objectType.instance_[prop[i].name] ) {
-                this.postData += query ? '&' : '?';
-                query = true;
-
-                this.postData += prop[i].name + '=' + argumentInfo[k].objectType.instance_[prop[i].name];
-              }
-            }
-          }
-        }
-        if ( (url.length + this.postData.length) >= this.MAX_URL_SIZE ) {
-          this.postURL = url;
-        }
-
-        return encodeURI(url + this.postData);
+        this.postData = this.data.toString();
+        return encodeURI(url);
       }
+    },
+    {
+      class: 'String',
+      name: 'data',
+      value: 'Add your data to send to the server.',
+      view: { class: 'foam.u2.tag.TextArea', rows: 5, cols: 137 },
+      visibility: 'RW'
     },
     {
       class: 'String',
@@ -279,12 +242,11 @@ foam.CLASS({
       name: 'postButton',
       label: 'Send POST Request',
       code: async function() {
-        if ( this.postURL !== '' ) {
+        if ( this.sugarURL !== '' ) {
           var req = this.HTTPRequest.create({
-            url: window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + this.postURL + this.postData+ "&sessionId=" + localStorage.defaultSession,
+            url: window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + this.sugarURL + '?data=' + this.postData+ '&sessionId=' + localStorage.defaultSession,
             method: 'POST',
-            contentType: 'url',
-            payload: this.postData.substring(1),
+            contentType: 'url'
           }).send();
 
           var resp = await req.then(async function(resp) {
