@@ -382,7 +382,7 @@ public class LiquifiedRopeTest extends Test {
     createMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     updateMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     deleteMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
-    list = new ArrayList<String>(Arrays.asList( "__terminate__" ));
+    // list = new ArrayList<String>(Arrays.asList( "__terminate__" ));
     readMap.put("__default__", new NextRelationshipsList.Builder(x).setNextRelationships(list).build());
     crudMapObj = new CRUDMap.Builder(x).setCreate(createMap).setRead(readMap).setUpdate(updateMap).setDelete(deleteMap).build();
     list = new ArrayList<String>(Arrays.asList( "__terminate__" )); 
