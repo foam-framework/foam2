@@ -396,8 +396,16 @@ foam.CLASS({
               default: return 'other';
             }
           })).
+          // Hide the DOM depending on the value of 'flip'
           start('div').show(this.flip$).add('flip').end().
           start('div').hide(this.flip$).add('flop').end().
+          // Create or destroy the DOM depending on the value of 'flip'
+          add(this.flip$.map(function(f) {
+            if ( f ) return E().start('div').add('flip').end();
+          })).
+          add(this.flip$.map(function(f) {
+            if ( ! f ) return E().start('div').add('flop').end();
+          })).
           start(this.FIELD1).attrs({onKey: true}).end().
           start(this.FIELD1).attrs({onKey: true}).end().
           start(this.FIELD2).attrs({onKey: true}).end().
