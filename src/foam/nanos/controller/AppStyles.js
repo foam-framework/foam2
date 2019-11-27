@@ -68,5 +68,17 @@ foam.CLASS({
     input:focus{
       outline: none;
     }
+    .horizontal-flip {
+    -moz-transform: scale(-1, 1);
+    -webkit-transform: scale(-1, 1);
+    -o-transform: scale(-1, 1);
+    -ms-transform: scale(-1, 1);
+    transform: scale(-1, 1);
+    margin-right: 10px;
+  }
+  .inline-block {
+    display: inline-block;
+  }
+
   `
 });
