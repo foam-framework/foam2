@@ -184,9 +184,9 @@ foam.CLASS({
           T ret = x.length > 0 ? (T) method.invoke((FObject) obj, x[0]) : (T) method.invoke((FObject) obj);
           return ret;
         } catch ( NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e ) {
-            if ( ((Class) objClass).getSuperclass() != null ) return retrieveProperty(obj, ((Class) objClass).getSuperclass(), prefix, propertyName, x);
-            System.err.println("ROPE ERROR: Attempted access on non-existant property ");
-            e.printStackTrace();
+          if ( e instanceof NoSuchMethodException && ((Class) objClass).getSuperclass() != null ) return retrieveProperty(obj, ((Class) objClass).getSuperclass(), prefix, propertyName, x);
+          System.err.println("ROPE ERROR: Attempted access on non-existant property ");
+          e.printStackTrace();
         } 
         return null;
       `
