@@ -14,7 +14,8 @@ foam.CLASS({
     'foam.nanos.auth.EnabledAware',
     'foam.nanos.auth.HumanNameTrait',
     'foam.nanos.auth.LastModifiedAware',
-    'foam.nanos.auth.ServiceProviderAware'
+    'foam.nanos.auth.ServiceProviderAware',
+    'foam.nanos.notification.Notifiable'
   ],
 
   requires: [
@@ -28,12 +29,16 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.DAO',
     'foam.dao.ProxyDAO',
+    'foam.dao.ArraySink',
     'foam.dao.Sink',
     'foam.mlang.order.Comparator',
     'foam.mlang.predicate.Predicate',
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.PriorPassword',
+    'foam.nanos.notification.Notification',
+    'foam.nanos.notification.NotificationSetting',
     'foam.util.SafetyUtil',
+    'java.util.List',
     'static foam.mlang.MLang.EQ'
   ],
 
@@ -589,6 +594,17 @@ foam.CLASS({
       code: function() {
         return this.label();
       }
+    },
+    {
+      name: 'doNotify',
+      javaCode: `
+        DAO notificationSettingDAO = (DAO) x.get("notificationSettingDAO");
+
+        List<NotificationSetting> settings = ((ArraySink) getNotificationSettings(x).select(new ArraySink())).getArray();
+        for( NotificationSetting setting : settings ) {
+          setting.sendNotification(x, this, notification);
+        }
+      `
     }
   ]
 });

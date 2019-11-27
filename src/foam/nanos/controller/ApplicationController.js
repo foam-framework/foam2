@@ -56,6 +56,7 @@ foam.CLASS({
 
   exports: [
     'displayWidth',
+    'agent',
     'appConfig',
     'as ctrl',
     'currentMenu',
@@ -170,6 +171,12 @@ foam.CLASS({
       class: 'foam.core.FObjectProperty',
       of: 'foam.nanos.auth.User',
       name: 'user',
+      factory: function() { return this.User.create(); }
+    },
+    {
+      class: 'foam.core.FObjectProperty',
+      of: 'foam.nanos.auth.User',
+      name: 'agent',
       factory: function() { return this.User.create(); }
     },
     {
