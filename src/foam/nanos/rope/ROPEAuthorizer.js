@@ -84,8 +84,9 @@ foam.CLASS({
       name: 'authorizeOnCreate',
       javaCode: `
         // TODO remove after SystemAuthorizer is created
-        if ( ((User) x.get("user")).getId() == User.SYSTEM_USER_ID ) return;
-    
+        User user = (User) x.get("user");
+        if ( user != null && ( user.getId() == User.SYSTEM_USER_ID || user.getGroup().equals("admin") || user.getGroup().equals("system") ) ) return;
+
         List<String> propertiesUpdated = getPropertiesUpdated(null, obj);
         for ( String property : propertiesUpdated ) {
           if ( ! authorizeByRope(x, obj, getTargetDAOKey(), CrudOperation.CREATE, property ) ) {
@@ -98,7 +99,9 @@ foam.CLASS({
       name: 'authorizeOnRead',
       javaCode: `
         // TODO remove after SystemAuthorizer is created
-        if ( ((User) x.get("user")).getId() == User.SYSTEM_USER_ID ) return;
+        User user = (User) x.get("user");
+        if ( user != null && ( user.getId() == User.SYSTEM_USER_ID || user.getGroup().equals("admin") || user.getGroup().equals("system") ) ) return;
+
         if ( ! authorizeByRope(x, obj, getTargetDAOKey(), CrudOperation.READ, "") ) throw new AuthorizationException("You don't have permission to read this object");
       `
     },
@@ -106,7 +109,8 @@ foam.CLASS({
       name: 'authorizeOnUpdate',
       javaCode: `
         // TODO remove after SystemAuthorizer is created
-        if ( ((User) x.get("user")).getId() == User.SYSTEM_USER_ID ) return;
+        User user = (User) x.get("user");
+        if ( user != null && ( user.getId() == User.SYSTEM_USER_ID || user.getGroup().equals("admin") || user.getGroup().equals("system") ) ) return;
     
         List<String> propertiesUpdated = getPropertiesUpdated(oldObj, newObj);
         for ( String property : propertiesUpdated ) {
@@ -120,19 +124,27 @@ foam.CLASS({
       name: 'authorizeOnDelete',
       javaCode: `
       // TODO remove after SystemAuthorizer is created
-      if ( ((User) x.get("user")).getId() == User.SYSTEM_USER_ID ) return;
+      User user = (User) x.get("user");
+      if ( user != null && ( user.getId() == User.SYSTEM_USER_ID || user.getGroup().equals("admin") || user.getGroup().equals("system") ) ) return;
+
       if ( ! authorizeByRope(x, obj, getTargetDAOKey(), CrudOperation.DELETE, "") ) throw new AuthorizationException("You don't have permission to delete this object");
       `
     },
     {
       name: 'checkGlobalRead',
       javaCode: `
+      User user = (User) x.get("user");
+      if ( user != null && ( user.getId() == User.SYSTEM_USER_ID || user.getGroup().equals("admin") || user.getGroup().equals("system") ) ) return true;
+
       return false;
       `
     },
     {
       name: 'checkGlobalRemove',
       javaCode: `
+      User user = (User) x.get("user");
+      if ( user != null && ( user.getId() == User.SYSTEM_USER_ID || user.getGroup().equals("admin") || user.getGroup().equals("system") ) ) return true;
+
       return false;
       `
     }
