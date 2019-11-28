@@ -53,10 +53,10 @@ foam.CLASS({
           return self.E()
             .start(self.Grid)
               .forEach(sections, function(s) {
-                this
-                  .start(self.GUnit, { columns: s.gridColumns })
+                this.add(s.createIsAvailableFor(self.data$).map(function(isAvailable) {
+                  if ( ! isAvailable ) return;
+                  return self.E().start(self.GUnit, { columns: s.gridColumns })
                     .addClass(self.myClass('card-container'))
-                    .show(s.createIsAvailableFor(self.data$))
                     .start('h2')
                       .add(s.title$)
                       .show(s.title$)
@@ -70,6 +70,7 @@ foam.CLASS({
                       })
                     .end()
                   .end();
+                }));
               })
             .end();
         }));

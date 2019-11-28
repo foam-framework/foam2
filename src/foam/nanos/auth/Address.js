@@ -210,6 +210,18 @@ foam.CLASS({
             );
           },
           errorString: 'Invalid zip code'
+        },
+        {
+          args: ['postalCode', 'countryId'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'IN'),
+              e.REG_EXP(
+                foam.nanos.auth.Address.POSTAL_CODE,
+                /^^\d{6}(?:[-\s]\d{4})?$/i)
+            );
+          },
+          errorString: 'Invalid zip code'
         }
       ],
       javaSetter:

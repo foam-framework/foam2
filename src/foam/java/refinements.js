@@ -228,6 +228,11 @@ foam.CLASS({
       value: false
     },
     {
+      class: 'Boolean',
+      name: 'synchronized',
+      value: false
+    },
+    {
       class: 'String',
       name: 'javaValidateObj',
       expression: function(validationPredicates) {
@@ -374,6 +379,7 @@ foam.CLASS({
           name: 'get' + capitalized,
           type: this.javaType,
           visibility: 'public',
+          synchronized: this.synchronized,
           body: this.javaGetter || ('if ( ! ' + isSet + ' ) {\n' +
             ( this.javaFactory ?
                 '  set' + capitalized + '(' + factoryName + '());\n' :
@@ -384,6 +390,7 @@ foam.CLASS({
         method({
           name: 'set' + capitalized,
           visibility: 'public',
+          synchronized: this.synchronized,
           args: [
             {
               type: this.javaType,
