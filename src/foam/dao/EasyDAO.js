@@ -829,7 +829,7 @@ foam.CLASS({
       `
     },
     {
-      name: 'addDecoratorAfter',
+      name: 'addDecorator',
       documentation: 'Places a decorator chain ending in a null delegate at a specified point in the chain. Automatically insterts between given decorator and mdao. If "before" flag is true, decorator chain placed before the dao instead of inbetween the supplied dao and mdao. Return true on success.',
       type: 'Boolean',
       args: [
