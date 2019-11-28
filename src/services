@@ -719,6 +719,7 @@ p({
       .build();
   """,
   "client": "{\"of\": \"foam.nanos.rope.ROPE\", \"remoteListenerSupport\": false}"
+})
 
 p({
   "class": "foam.nanos.boot.NSpec",
