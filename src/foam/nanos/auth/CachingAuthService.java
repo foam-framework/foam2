@@ -47,7 +47,13 @@ class SessionContextCacheFactory
 public class CachingAuthService
   extends ProxyAuthService
 {
-
+  /**
+   * A list of DAOs that will be listened to. When any of these DAOs update, the
+   * cache will be invalidated. Use this to listen to DAOs that are specific to
+   * your application.
+   * FUTURE: Support supplying predicates to pass to the listeners as well.
+   */
+  protected String[] extraDAOsToListenTo_;
   public static String CACHE_KEY = "CachingAuthService.PermissionCache";
 
   protected static Map<String,Boolean> getPermissionMap(final X x) {
@@ -81,6 +87,15 @@ public class CachingAuthService
       userDAO.listen(purgeSink, EQ(User.ID, user.getId()));
       groupPermissionJunctionDAO.listen(purgeSink, TRUE);
 
+      String[] extraDAOsToListenTo = (String[]) x.get("extraDAOsToListenTo");
+
+      if ( extraDAOsToListenTo != null ) {
+        for ( String daoName : extraDAOsToListenTo ) {
+          DAO dao = (DAO) x.get(daoName);
+          if ( dao != null ) dao.listen(purgeSink, TRUE);
+        }
+      }
+
       map = new ConcurrentHashMap<String,Boolean>();
       session.setContext(session.getContext().putFactory(
         CACHE_KEY,
@@ -96,7 +111,12 @@ public class CachingAuthService
   }
 
   public CachingAuthService(AuthService delegate) {
+    this(delegate, new String[0]);
+  }
+
+  public CachingAuthService(AuthService delegate, String[] extraDAOsToListenTo) {
     setDelegate(delegate);
+    extraDAOsToListenTo_ = extraDAOsToListenTo;
   }
 
   @Override
@@ -104,7 +124,7 @@ public class CachingAuthService
     if ( x == null || permission == null ) return false;
     Permission p = new AuthPermission(permission);
 
-    Map<String,Boolean> map = getPermissionMap(x);
+    Map<String,Boolean> map = getPermissionMap(x.put("extraDAOsToListenTo", extraDAOsToListenTo_));
 
     if ( map.containsKey(p.getName()) ) {
       return map.get(p.getName());
