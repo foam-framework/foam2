@@ -6,21 +6,25 @@
 
 package foam.core;
 
-public interface MethodInfo extends Axiom {
+/**
+ * Method information objects are generated inside classes as data members,
+ * to allow that class methods be called remotely through an ORBitalDAO.
+ */
+public abstract class MethodInfo implements Axiom, ClassInfoAware {
 
-  public ClassInfo getClassInfo();
-  public MethodInfo setClassInfo(ClassInfo p);
+  protected ClassInfo parent;
 
-  public String getName();
-  public void setName(String name);
+  @Override
+  public ClassInfo getClassInfo() {
+    return parent;
+  }
 
-  public Object get(Object obj);
-  public void set(Object obj, Object value);
+  @Override
+  public MethodInfo setClassInfo(ClassInfo p) {
+    parent = p;
+    return this;
+  }
 
-  public boolean getPermissionRequired();
-  public void authorize(foam.core.X x);
+  public abstract Object call(foam.core.X x, Object receiver, Object[] args);
 
-  public Object call(foam.core.X x, Object receiver, Object[] args);
-
-  public String toString();
 }

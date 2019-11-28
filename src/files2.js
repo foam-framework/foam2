@@ -65,8 +65,6 @@ FOAM_FILES([
   { name: "foam/core/Argument" },
   { name: "foam/core/MultiMethod" },
   { name: "foam/core/debug", flags: ['debug'] },
-  { name: "foam/core/MethodInfo", flags: ['java'] },
-  { name: "foam/core/SimpleMethodInfo", flags: ['java'] },
   { name: "foam/pattern/Singleton" },
   { name: "foam/pattern/Multiton" },
   { name: "foam/core/Enum" },
