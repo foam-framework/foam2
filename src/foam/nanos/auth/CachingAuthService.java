@@ -10,6 +10,7 @@ import foam.core.X;
 import foam.core.XFactory;
 import foam.dao.DAO;
 import foam.dao.Sink;
+import foam.mlang.predicate.Predicate;
 import foam.nanos.session.Session;
 import java.security.Permission;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,6 +18,7 @@ import java.util.Map;
 import javax.security.auth.AuthPermission;
 
 import static foam.mlang.MLang.EQ;
+import static foam.mlang.MLang.OR;
 import static foam.mlang.MLang.TRUE;
 
 /** Only return value if the session context hasn't changed. **/
@@ -82,9 +84,15 @@ public class CachingAuthService
       DAO groupDAO      = (DAO) x.get("localGroupDAO");
       DAO groupPermissionJunctionDAO = (DAO) x.get("groupPermissionJunctionDAO");
       User user         = (User) x.get("user");
+      User agent        = (User) x.get("agent");
+      Predicate predicate = EQ(User.ID, user.getId());
+
+      if ( agent != null ) {
+        predicate = OR(predicate, EQ(User.ID, agent.getId()));
+      }
 
       groupDAO.listen(purgeSink, TRUE);
-      userDAO.listen(purgeSink, EQ(User.ID, user.getId()));
+      userDAO.listen(purgeSink, predicate);
       groupPermissionJunctionDAO.listen(purgeSink, TRUE);
 
       String[] extraDAOsToListenTo = (String[]) x.get("extraDAOsToListenTo");
