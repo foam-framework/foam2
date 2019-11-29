@@ -680,7 +680,7 @@ foam.CLASS({
       initializerString = `new foam.core.MethodInfo(){
         @Override
         public String getName(){
-          return \"${this.name}\";
+          return "${this.name}";
         }
         @Override
         public Object call(foam.core.X x, Object receiver, Object[] args){
