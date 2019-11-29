@@ -712,6 +712,7 @@ FOAM_FILES([
   { name: "foam/u2/detail/SectionedDetailView" },
   { name: "foam/u2/detail/VerticalDetailView" },
   { name: "foam/u2/detail/WizardSectionsView" },
+  { name: "foam/u2/detail/TabbedDetailView" },
   { name: "foam/u2/detail/SectionedDetailPropertyView" },
 
   { name: "foam/graphics/ZoomMapView" },
