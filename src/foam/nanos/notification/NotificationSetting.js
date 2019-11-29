@@ -62,6 +62,7 @@ foam.CLASS({
         notification.setUserId(user.getId());
         notification.setBroadcasted(false);
         notification.setGroupId(null);
+        notification.setEmailIsEnabled(false);
         try {
           notificationDAO.put_(x, notification);
         } catch (Throwable t) {
