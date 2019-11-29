@@ -717,9 +717,9 @@ foam.CLASS({
 
       // Close try block
       if ( exceptions ) { initializerString += `          }
-         catch (Exception e) {
-           foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get(\"logger\");
-           logger.error(e.getMessage());
+         catch (Throwable t) {
+           foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
+           logger.error(t.getMessage());
            return null;
          }
         `
