@@ -19,10 +19,8 @@ import java.util.Map;
 
 // ???: Why is this interface mutable?
 public interface PropertyInfo
-    extends Axiom, Comparator, Expr, SQLStatement, Validator, Hasher, Signer, Comparable
+    extends Axiom, Comparator, Expr, SQLStatement, Validator, Hasher, Signer, Comparable, ClassInfoAware
 {
-  public PropertyInfo setClassInfo(ClassInfo p);
-  public ClassInfo getClassInfo();
 
   public boolean getNetworkTransient();
   public boolean getReadPermissionRequired();

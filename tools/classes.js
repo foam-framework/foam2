@@ -162,6 +162,8 @@ var classes = [
   'foam.dao.PMDAO',
   'foam.nanos.pm.PMInfo',
   'foam.dao.PutOnlyDAO',
+  'foam.dao.ORBRequest',
+  'foam.dao.ORBitalDAO',
   'foam.mlang.order.Comparator',
   'foam.mlang.order.Desc',
   'foam.mlang.sink.Count',
