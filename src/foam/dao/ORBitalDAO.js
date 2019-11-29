@@ -33,9 +33,9 @@ foam.CLASS({
       ],
 
       javaCode: `
-        ORBRequest request = null;
-        if ( obj instanceof ORBRequest ) request = (ORBRequest) obj;
-        else return getDelegate().cmd_(x, obj);
+
+        if ( ! ( obj instanceof ORBRequest ) ) return getDelegate().cmd_(x, obj);
+        request = (ORBRequest) obj;
 
         String receiverID = request.getReceiverObjectID();
 
@@ -43,13 +43,13 @@ foam.CLASS({
         FObject receiverFObj = request.getReceiverObject();
 
         receiverFObj =  ( receiverFObj == null && receiverID != null )? (FObject) x.get(receiverID) : receiverFObj;
-        if ( receiverFObj != null ) {
-          ClassInfo classInfo = receiverFObj.getClassInfo();
-          MethodInfo methodInfo = (MethodInfo) classInfo.getAxiomByName(request.getMethodName());
-          return methodInfo.call(x, receiverFObj, request.getArgs());
-        } else {
-          return null;
-        }
+
+        if ( receiverFObj == null ) return null;
+
+        ClassInfo classInfo = receiverFObj.getClassInfo();
+        MethodInfo methodInfo = (MethodInfo) classInfo.getAxiomByName(request.getMethodName());
+        return methodInfo.call(x, receiverFObj, request.getArgs());
+
       `
     }
   ]
