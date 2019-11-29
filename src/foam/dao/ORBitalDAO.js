@@ -35,7 +35,7 @@ foam.CLASS({
       javaCode: `
 
         if ( ! ( obj instanceof ORBRequest ) ) return getDelegate().cmd_(x, obj);
-        request = (ORBRequest) obj;
+        ORBRequest request = (ORBRequest) obj;
 
         String receiverID = request.getReceiverObjectID();
 
