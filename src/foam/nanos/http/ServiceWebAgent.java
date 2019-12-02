@@ -114,6 +114,7 @@ public class ServiceWebAgent
       }
 
       foam.box.Message msg = (foam.box.Message) result;
+      //      logger.debug("ServiceWebAgent", "execute", "skeleton", skeleton_.getClass().getSimpleName(), "authenticate", authenticate_);
       new SessionServerBox(x, skeleton_, authenticate_).send(msg);
     } catch (Throwable t) {
       throw new RuntimeException(t);

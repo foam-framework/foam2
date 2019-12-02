@@ -201,6 +201,13 @@ foam.CLASS({
         }
       ],
       javaCode: `
+        foam.nanos.mrac.ClusterConfigService service = (foam.nanos.mrac.ClusterConfigService) x.get("clusterConfigService");
+        if ( service != null &&
+            ! service.getIsPrimary() ) {
+          // nop when not primary
+          return;
+        }
+
         ByteArrayOutputStream baos  = new ByteArrayOutputStream();
         PrintStream           ps    = new PrintStream(baos);
         Interpreter           shell = createInterpreter(x);

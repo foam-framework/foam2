@@ -44,6 +44,12 @@ public class CronScheduler
   }
 
   public void start() {
+    foam.nanos.mrac.ClusterConfigService service = (foam.nanos.mrac.ClusterConfigService) getX().get("clusterConfigService");
+    if ( service != null &&
+         ! service.getIsPrimary() ) {
+      // nop when not primary
+      return;
+    }
     cronDAO_ = (DAO) getX().get("cronDAO");
 
     new Thread(this).start();
@@ -72,7 +78,7 @@ public class CronScheduler
               cron.runScript(CronScheduler.this.getX());
               cronDAO_.put((FObject) cron);
             } catch (Throwable t) {
-              logger.error(this.getClass(), "Error running Cron Job", cron.getId(), t.getMessage());
+              logger.error(this.getClass(), "Error running Cron Job", cron.getId(), t.getMessage(), t);
             } finally {
               pm.log(getX());
             }

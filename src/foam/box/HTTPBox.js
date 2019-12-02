@@ -87,6 +87,12 @@ foam.CLASS({
       value: 'POST'
     },
     {
+      class: 'Enum',
+      of: 'foam.box.HTTPAuthorizationType',
+      name: 'authorizationType',
+      value: foam.box.HTTPAuthorizationType.NONE
+    },
+    {
       class: 'FObjectProperty',
       of: 'foam.json.Parser',
       swiftType: 'foam_swift_parse_json_FObjectParser',
@@ -183,7 +189,7 @@ protected class ResponseThread implements Runnable {
           payload: payload,
           headers: {
             'Content-Type': 'application/json; charset=utf-8'
-          },
+          }
         }).send();
 
         req.then(function(resp) {
@@ -235,6 +241,9 @@ try {
   conn.setRequestMethod("POST");
   conn.setRequestProperty("Accept", "application/json");
   conn.setRequestProperty("Content-Type", "application/json");
+  if ( getAuthorizationType().equals(HTTPAuthorizationType.BEARER) ) {
+    conn.setRequestProperty("Authorization", "BEARER "+getSessionID());
+  }
 
   java.io.OutputStreamWriter output = new java.io.OutputStreamWriter(conn.getOutputStream(),
                                                                      java.nio.charset.StandardCharsets.UTF_8);

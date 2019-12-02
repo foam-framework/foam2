@@ -19,6 +19,7 @@ p({
         new foam.nanos.notification.SendSlackNotificationDAO(x)))).build())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("notifications")
+      .setCluster(false)
       .build();
   """
 })
@@ -110,69 +111,7 @@ p({
   "serviceClass": "foam.nanos.pool.ThreadPoolAgency"
 })
 
-p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "testDAO",
-  "serve": true,
-  "serviceScript": """
-    return new foam.dao.EasyDAO.Builder(x)
-      .setPm(true)
-      .setGuid(true)
-      .setOf(foam.nanos.test.Test.getOwnClassInfo())
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName(\"tests\")
-      .setDecorator(new foam.nanos.script.ScriptRunnerDAO(null))
-      .build();
-  """,
-  "client": "{\"of\":\"foam.nanos.test.Test\"}"
-})
-
 p({"class":"foam.nanos.boot.NSpec", "name":"pmInfoDAO",                          "serve":true,  "serviceScript":"return new foam.nanos.pm.PMInfoMDAO().orderBy(foam.mlang.MLang.DESC(foam.nanos.pm.PMInfo.TOTAL_TIME));","client":"{\"of\":\"foam.nanos.pm.PMInfo\", \"remoteListenerSupport\": false}" })
-
-p({
-  "class":"foam.nanos.boot.NSpec",
-  "name":"scriptDAO",
-  "serve":true,
-  "serviceScript":"""
-    return new foam.dao.EasyDAO.Builder(x)
-      .setPm(true)
-      .setGuid(true)
-      .setOf(foam.nanos.script.Script.getOwnClassInfo())
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName(\"scripts\")
-      .setDecorator(new foam.nanos.script.ScriptRunnerDAO(null))
-      .setOrder(new foam.core.PropertyInfo[] {foam.nanos.script.Script.ID})
-      .setIndex(new foam.core.PropertyInfo[] {foam.nanos.script.Script.ID})
-      .build();
-  """,
-  "client":"{\"of\":\"foam.nanos.script.Script\"}"
-})
-
-p({
-  "class":"foam.nanos.boot.NSpec",
-  "name":"cronDAO",
-  "serve":true,
-  "serviceScript":"""
-    return new foam.dao.EasyDAO.Builder(x)
-      .setPm(true)
-      .setGuid(true)
-      .setOf(foam.nanos.cron.Cron.getOwnClassInfo())
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName(\"cronjobs\")
-      .setDecorator(new foam.nanos.cron.CronScheduleDAO.Builder(x)
-        .setDelegate(new foam.nanos.script.ScriptRunnerDAO(null))
-        .build())
-      .build();
-  """,
-  "client":"{\"of\":\"foam.nanos.cron.Cron\"}"
-})
-
-p({
-  "class":"foam.nanos.boot.NSpec", 
-  "name":"cronScheduler",                    
-  "lazy":false, 
-  "serviceClass":"foam.nanos.cron.CronScheduler" 
-})
 
 p({
   "class": "foam.nanos.boot.NSpec", 
@@ -239,39 +178,6 @@ p({
       .build();
   """,
   "client":"{\"of\":\"foam.nanos.auth.Group\"}"
-})
-
-p({
-  "class":"foam.nanos.boot.NSpec",
-  "name":"localSessionDAO",
-  "serviceScript":"""
-    return new foam.dao.EasyDAO.Builder(x)
-      .setOf(foam.nanos.session.Session.getOwnClassInfo())
-      .setGuid(true)
-      .setCreatedAware(true)
-      .setCreatedByAware(true)
-      .setJournalName("sessions")
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setAuthorize(false)
-      .setDecorator(new foam.dao.ValidatingDAO(x, null))
-      .build();
-  """
-})
-
-p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "sessionDAO",
-  "serve": true,
-  "serviceScript": """
-    return new foam.dao.EasyDAO.Builder(x)
-      .setOf(foam.nanos.session.Session.getOwnClassInfo())
-      .setPm(true)
-      .setAuthorize(false)
-      .setInnerDAO(((foam.dao.DAO) x.get(\"localSessionDAO\")))
-      .build();
-  """,
-  "client": "{\"of\":\"foam.nanos.session.Session\"}",
-  "authNotes": "Users must have the 'service.sessionDAO' permission to access this service. Due to the highly sensitive nature of sessions, only superadmins should have permission to access this service."
 })
 
 p({

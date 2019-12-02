@@ -15,10 +15,12 @@ import foam.nanos.auth.Group;
 import foam.nanos.boot.Boot;
 import foam.nanos.boot.NSpec;
 import foam.nanos.logger.Logger;
+import foam.nanos.logger.PrefixLogger;
 import foam.nanos.session.Session;
 import foam.util.SafetyUtil;
 import org.eclipse.jetty.server.Request;
 
+import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -40,25 +42,53 @@ public class SessionServerBox
   }
 
   public void send(Message msg) {
-    String sessionID = (String) msg.getAttributes().get("sessionId");
-    Logger logger    = (Logger) getX().get("logger");
-
-    if ( sessionID == null && authenticate_ ) {
-      msg.replyWithException(new IllegalArgumentException("sessionid required for authenticated services"));
-      return;
-    }
-
+    Logger logger = (Logger) getX().get("logger");
     NSpec spec = getX().get(NSpec.class);
+    String sessionID = null;
 
     try {
-      HttpServletRequest req        = getX().get(HttpServletRequest.class);
-      DAO                sessionDAO = (DAO) getX().get("localSessionDAO");
-      Session            session    = sessionID == null ? null : (Session) sessionDAO.find(sessionID);
+      HttpServletRequest req = getX().get(HttpServletRequest.class);
+      if ( req != null ) {
+        String authorization = req.getHeader("Authorization");
+        if ( ! SafetyUtil.isEmpty(authorization) ) {
+          StringTokenizer st = new StringTokenizer(authorization);
+          if ( st.hasMoreTokens() ) {
+            String authType = st.nextToken();
+            if ( HTTPAuthorizationType.BEARER.getName().equalsIgnoreCase(authType) ) {
+              sessionID = st.nextToken();
+            } else {
+              logger.warning(this.getClass().getSimpleName(), "send", "Authorization: "+authType+" not supported.");
+              msg.replyWithException(new IllegalArgumentException("Authorization: "+authType+ " not supported."));
+              return;
+            }
+            if ( SafetyUtil.isEmpty(sessionID) ) {
+              logger.warning(this.getClass().getSimpleName(), "send", "Authorization: Bearer token not found.");
+              msg.replyWithException(new IllegalArgumentException("Authorization: Bearer token not found"));
+              return;
+            }
+          }
+        }
+      }
+
+      if ( sessionID == null ) {
+        sessionID = (String) msg.getAttributes().get("sessionId");
+
+      }
+
+      if ( sessionID == null && authenticate_ ) {
+        msg.replyWithException(new IllegalArgumentException("sessionid required for authenticated services"));
+        return;
+      }
+
+      DAO sessionDAO = (DAO) getX().get("localSessionDAO");
+      Session session = sessionID == null ? null : (Session) sessionDAO.find(sessionID);
 
       if ( session == null ) {
         session = new Session((X) getX().get(Boot.ROOT));
         session.setId(sessionID == null ? "anonymous" : sessionID);
-        if ( req != null ) session.setRemoteHost(req.getRemoteHost());
+        if ( req != null ) {
+          session.setRemoteHost(req.getRemoteHost());
+        }
 
         if ( sessionID != null ) {
           session = (Session) sessionDAO.put(session);
@@ -129,7 +159,6 @@ public class SessionServerBox
       msg.replyWithException(t);
       return;
     }
-
     getDelegate().send(msg);
   }
 }

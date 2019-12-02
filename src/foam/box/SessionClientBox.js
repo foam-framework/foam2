@@ -58,7 +58,11 @@ foam.CLASS({
       javaCode: `Object object = msg.getObject();
 if ( object instanceof RPCErrorMessage && ((RPCErrorMessage) object).getData() instanceof RemoteException &&
     "foam.nanos.auth.AuthenticationException".equals(((RemoteException) ((RPCErrorMessage) object).getData()).getId()) ) {
-  // TODO: should this be wrapped in new Thread() ?
+RemoteException e = (RemoteException) ((RPCErrorMessage) object).getData();
+foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
+logger.warning(this.getClass().getSimpleName(), "send", e.getMessage());
+// TODO/REVIEW: when remote exception is authentication exception 'not logged in',
+// the following results in a NullPointerException.
   ((Runnable) getX().get("requestLogin")).run();
   getClientBox().send(getMsg());
 } else {

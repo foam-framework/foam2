@@ -76,6 +76,12 @@ foam.CLASS({
     {
       class: 'String',
       name: 'defaultSpid'
+    },
+    {
+      class: 'Boolean',
+      name: 'cluster',
+      visibility: 'RO',
+      storageTransient: true
     }
   ]
 });

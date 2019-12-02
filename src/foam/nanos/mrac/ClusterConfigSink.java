@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -15,20 +15,20 @@ import foam.dao.Sink;
 public class ClusterConfigSink
   extends ProxySink
 {
-  protected ClusterDAO cluster_;
+  protected ClusterConfigService service_;
 
-  public ClusterConfigSink(X x, ClusterDAO cluster) {
+  public ClusterConfigSink(X x, ClusterConfigService service) {
     setX(x);
-    cluster_ = cluster;
+    service_ = service;
   }
 
   @Override
   public void put(Object obj, Detachable sub) {
-    cluster_.reconfigure(getX());
+    service_.onDAOUpdate(getX());
   }
 
   @Override
   public void remove(Object obj, Detachable sub) {
-    cluster_.reconfigure(getX());
+    service_.onDAOUpdate(getX());
   }
 }
