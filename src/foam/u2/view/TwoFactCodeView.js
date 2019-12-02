@@ -71,6 +71,7 @@ foam.CLASS({
         v.data$.relateFrom(this.data$, (_) => this.data.substring(0, this.currentIndex) + v.data.substring(0) + this.data.substring(this.currentIndex+1), (_) => v.data);
       }
     },
+
     function findIndexOfInput(id) {
       return this.tokenId.indexOf(id);
     }
