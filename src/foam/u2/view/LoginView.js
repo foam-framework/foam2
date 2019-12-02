@@ -213,6 +213,10 @@ foam.CLASS({
 
     function initE() {
       this.SUPER();
+      this.document.addEventListener('keyup', this.onKeyPressed);
+      this.onDetach(() => {
+        this.document.removeEventListener('keyup', this.onKeyPressed);
+      });
       let logo = this.theme.largeLogo ? this.theme.largeLogo : this.theme.logo;
       // CREATE MODEL VIEW
       var right = this.Element.create({}, this)
@@ -294,6 +298,16 @@ foam.CLASS({
         }, function() {
           this.add(right);
         });
+    }
+  ],
+
+  listeners: [
+    function onKeyPressed(e) {
+      e.preventDefault();
+      var key = e.key || e.keyCode;
+      if ( key === 'Enter' || key === 13 ) {
+          this.model.login();
+      }
     }
   ]
 });
