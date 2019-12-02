@@ -235,8 +235,7 @@ foam.CLASS({
             this.user.copyFrom(user);
             this.updateUser(x);
           }).catch((err) => {
-            console.warn(err.message);
-            this.notify('There was a problem creating your account.', 'error');
+            this.notify(err.message || 'There was a problem creating your account.', 'error');
           })
           .finally(() => {
             this.isLoading_ = false;
