@@ -211,7 +211,7 @@ foam.CLASS({
     
         if ( crudKey != null ) {
           next = getCrudMap() == null ? null : getCrudMap().get(crudKey, propertyKey);
-        } else if ( relationshipKey != null && ! relationshipKey.equals("") ) {
+        } else if ( relationshipKey != null && ! "".equals(relationshipKey) ) {
           next = getRelationshipMap() == null ? null : getRelationshipMap().get(relationshipKey);
         }
         return next;
