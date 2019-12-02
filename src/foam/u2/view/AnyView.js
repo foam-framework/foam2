@@ -8,6 +8,7 @@ foam.CLASS({
   package: 'foam.u2.view',
   name: 'AnyView',
   extends: 'foam.u2.View',
+
   requires: [
     'foam.u2.layout.Cols',
     'foam.u2.CheckBox',
@@ -17,6 +18,7 @@ foam.CLASS({
     'foam.u2.view.ChoiceView',
     'foam.u2.view.MapView'
   ],
+
   constants: [
     {
       name: 'DEFAULT_TYPES',
@@ -91,6 +93,7 @@ foam.CLASS({
       }
     }
   ],
+
   classes: [
     {
       name: 'Choice',
@@ -118,6 +121,7 @@ foam.CLASS({
       ]
     }
   ],
+
   properties: [
     {
       name: 'types',
@@ -138,18 +142,12 @@ foam.CLASS({
       }
     },
     {
-      name: 'view',
-      postSet: function(o, n) {
-        if ( o ) o.detach();
-        n.onDetach(n.data$.linkFrom(this.data$));
-      }
-    },
-    {
       class: 'Boolean',
       name: 'enableChoice',
       value: true
     }
   ],
+
   methods: [
     function initE() {
       var self = this;
@@ -158,10 +156,9 @@ foam.CLASS({
           .start()
             .style({flex: 1})
             .add(this.slot(function(selected) {
-              self.data = selected.toType(self.data);
               return self.E()
                 .startContext({data: null})
-                  .start(selected.view, null, this.view$).end()
+                  .start(selected.view, null).end()
                 .endContext();
             }))
           .end()
@@ -169,7 +166,7 @@ foam.CLASS({
             this.start(self.ChoiceView, {
               choices$: self.types$.map(types => types.map(t => [t, t.label])),
               data$: self.selected$
-              })
+            })
             .end()
           })
         .end();

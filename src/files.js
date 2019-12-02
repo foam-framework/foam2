@@ -191,6 +191,7 @@ FOAM_FILES([
   { name: 'foam/u2/view/StringArrayRowView', flags: ['web'] },
   { name: 'foam/u2/borders/NullBorder', flags: ['web'] },
   { name: 'foam/u2/borders/CardBorder', flags: ['web'] },
+  { name: 'foam/u2/borders/SplitScreenBorder', flags: ['web'] },
   { name: "foam/version/VersionTrait" },
   { name: "foam/version/VersionedClass" },
   { name: "foam/version/VersionedClassFactory" },
@@ -254,6 +255,8 @@ FOAM_FILES([
   { name: "foam/dao/VersionNoDAO" },
   { name: "foam/dao/sync/SyncRecord" },
   { name: "foam/dao/SyncDAO" },
+  { name: "foam/nanos/u2/navigation/SignUp" },
+  { name: "foam/nanos/u2/navigation/SignIn" },
   { name: "foam/nanos/boot/NSpec" },
   { name: "foam/nanos/boot/NSpecAware" },
   { name: "foam/nanos/auth/Authorizer" },
@@ -261,6 +264,9 @@ FOAM_FILES([
   { name: "foam/nanos/auth/ServiceProviderAware" },
   { name: "foam/nanos/logger/Logger" },
   { name: "foam/nanos/logger/LoggingDAO" },
+  { name: "foam/nanos/notification/Notifiable" },
+  { name: "foam/nanos/notification/EmailSetting" },
+  { name: "foam/nanos/notification/NotificationSetting" },
   { name: "foam/dao/EasyDAO" },
   { name: "foam/dao/NoSelectAllDAO" },
   { name: "foam/dao/NullDAO" },
@@ -430,6 +436,7 @@ FOAM_FILES([
   { name: "foam/u2/TimeView", flags: ['web'] },
   { name: "foam/u2/history/HistoryItemView", flags: ['web'] },
   { name: "foam/u2/history/HistoryView", flags: ['web'] },
+  { name: "foam/u2/view/LoginView", flags: ['web'] },
   { name: "foam/u2/view/ValueView", flags: ['web'] },
   { name: "foam/u2/view/PreView", flags: ['web'] },
   { name: "foam/u2/view/TableCellFormatterReadView", flags: ['web'] },
@@ -710,6 +717,7 @@ FOAM_FILES([
   { name: "foam/u2/detail/SectionedDetailView" },
   { name: "foam/u2/detail/VerticalDetailView" },
   { name: "foam/u2/detail/WizardSectionsView" },
+  { name: "foam/u2/detail/TabbedDetailView" },
   { name: "foam/u2/detail/SectionedDetailPropertyView" },
 
   { name: "foam/graphics/ZoomMapView" },
@@ -722,4 +730,7 @@ FOAM_FILES([
 
   { name: "foam/core/Unit" },
   { name: "foam/core/Currency" },
+
+  { name: "foam/util/concurrent/AbstractAssembly"},
+  { name: "foam/util/concurrent/Assembly"},
 ]);

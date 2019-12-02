@@ -162,6 +162,8 @@ var classes = [
   'foam.dao.PMDAO',
   'foam.nanos.pm.PMInfo',
   'foam.dao.PutOnlyDAO',
+  'foam.dao.ORBRequest',
+  'foam.dao.ORBitalDAO',
   'foam.mlang.order.Comparator',
   'foam.mlang.order.Desc',
   'foam.mlang.sink.Count',
@@ -303,9 +305,12 @@ var classes = [
   'foam.nanos.notification.email.ClientPOP3EmailService',
   'foam.nanos.notification.push.PushService',
   'foam.nanos.notification.push.FirebasePushService',
+  'foam.nanos.notification.Notifiable',
   'foam.nanos.notification.Notification',
   'foam.nanos.notification.NotificationTemplateDAO',
   'foam.nanos.notification.notifications.ScriptRunNotification',
+  'foam.nanos.notification.EmailSetting',
+  'foam.nanos.notification.NotificationSetting',
   'foam.nanos.script.Script',
 //  'foam.nanos.script.ScriptCompiler',
 //  'foam.nanos.script.JavaShellScriptCompiler',
@@ -509,7 +514,10 @@ var classes = [
   'foam.strategy.StrategyReference',
   'foam.strategy.StrategizerService',
   'foam.strategy.BasicStrategizer',
-  'foam.strategy.ClientStrategizerService'
+  'foam.strategy.ClientStrategizerService',
+  //concurrent
+  'foam.util.concurrent.AbstractAssembly',
+  'foam.util.concurrent.Assembly',
 ];
 
 var abstractClasses = [
