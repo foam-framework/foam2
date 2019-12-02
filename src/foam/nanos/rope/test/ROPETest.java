@@ -284,13 +284,13 @@ public class ROPETest extends Test {
     User user = (User) userDAO.put(new User.Builder(x).setId(123).setFirstName("testuser").build());
     test(rope.retrieveProperty(user, user.getClass(), "get", "accounts", x) instanceof DAO, "test retrieveProperty for relationship");
 
-    // test getNextRelationships(relationshipKey, crudKey, propertyKey);
-    List<String> result = rope.getNextRelationships("rel1", CrudOperation.CREATE, "prop1");
-    test(result.contains("c"), "test getNextRelationships should return list for prop1 in createMap : " + result);
-    result = rope.getNextRelationships("rel1", CrudOperation.CREATE, "");
-    test(result.contains("a"), "test getNextRelationships should return list for __default__ in createMap : " + result);
-    result = rope.getNextRelationships("", null, "prop1");
-    test(result == null || result.size() == 0, "test getNextRelationships should return null for wrong args : " + result);
+    // test findNextRelationships(relationshipKey, crudKey, propertyKey);
+    List<String> result = rope.findNextRelationships("rel1", CrudOperation.CREATE, "prop1");
+    test(result.contains("c"), "test findNextRelationships should return list for prop1 in createMap : " + result);
+    result = rope.findNextRelationships("rel1", CrudOperation.CREATE, "");
+    test(result.contains("a"), "test findNextRelationships should return list for __default__ in createMap : " + result);
+    result = rope.findNextRelationships("", null, "prop1");
+    test(result == null || result.size() == 0, "test findNextRelationships should return null for wrong args : " + result);
 
     // test getPropertiesUpdated(oldObj, obj);
     ROPE rope2 = ((ROPE) rope.fclone());

@@ -76,7 +76,7 @@ foam.CLASS({
       ],
       javaCode: `
         // get the list of next relationships to search to pass this rope
-        List<String> nextRelationships = getNextRelationships(relationshipKey, crudKey, propertyKey);
+        List<String> nextRelationships = findNextRelationships(relationshipKey, crudKey, propertyKey);
     
         // if a there are no results, return false
         if ( nextRelationships == null || nextRelationships.size() == 0 ) return false;
@@ -192,7 +192,7 @@ foam.CLASS({
       `
     },
     {
-      name: 'getNextRelationships',
+      name: 'findNextRelationships',
       args: [
         { name: 'relationshipKey', javaType: 'String' },
         { name: 'crudKey', javaType: 'CrudOperation' },
@@ -211,7 +211,7 @@ foam.CLASS({
     
         if ( crudKey != null ) {
           next = getCrudMap() == null ? null : getCrudMap().get(crudKey, propertyKey);
-        } else if ( relationshipKey != null && ! relationshipKey.equals("") ) {
+        } else if ( relationshipKey != null && ! "".equals(relationshipKey) ) {
           next = getRelationshipMap() == null ? null : getRelationshipMap().get(relationshipKey);
         }
         return next;
