@@ -162,6 +162,8 @@ var classes = [
   'foam.dao.PMDAO',
   'foam.nanos.pm.PMInfo',
   'foam.dao.PutOnlyDAO',
+  'foam.dao.ORBRequest',
+  'foam.dao.ORBitalDAO',
   'foam.mlang.order.Comparator',
   'foam.mlang.order.Desc',
   'foam.mlang.sink.Count',
@@ -512,7 +514,10 @@ var classes = [
   'foam.strategy.StrategyReference',
   'foam.strategy.StrategizerService',
   'foam.strategy.BasicStrategizer',
-  'foam.strategy.ClientStrategizerService'
+  'foam.strategy.ClientStrategizerService',
+  //concurrent
+  'foam.util.concurrent.AbstractAssembly',
+  'foam.util.concurrent.Assembly',
 ];
 
 var abstractClasses = [
