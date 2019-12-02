@@ -45,7 +45,7 @@ foam.CLASS({
         { name: 'relationshipKey', class: 'String' }
       ],
       javaCode: `
-        return getMap().containsKey(relationshipKey) && getMap().get(relationshipKey) != null ? getMap().get(relationshipKey).findNextRelationships() : null;
+        return getMap().containsKey(relationshipKey) && getMap().get(relationshipKey) != null ? getMap().get(relationshipKey).getNextRelationships() : null;
       `
     },
   ]
@@ -133,9 +133,9 @@ foam.CLASS({
             if ( map == null ) return null;
     
             if ( propertyKey == null || "".equals(propertyKey) || ! map.containsKey(propertyKey) ) {
-              return map.containsKey(DEFAULT) && map.get(DEFAULT) != null ? map.get(DEFAULT).findNextRelationships() : null;
+              return map.containsKey(DEFAULT) && map.get(DEFAULT) != null ? map.get(DEFAULT).getNextRelationships() : null;
             }
-            return map.get(propertyKey).findNextRelationships();
+            return map.get(propertyKey).getNextRelationships();
           }
         `);
       }
