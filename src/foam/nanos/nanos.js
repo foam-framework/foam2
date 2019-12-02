@@ -71,8 +71,6 @@ FOAM_FILES([
   { name: "foam/nanos/auth/CreatedByAwareDAO" },
   { name: "foam/nanos/auth/LastModifiedByAware" },
   { name: "foam/nanos/auth/LastModifiedByAwareDAO" },
-  { name: "foam/nanos/auth/SignInView", flags: ['web'] },
-  { name: "foam/nanos/auth/SignUpView", flags: ['web'] },
   { name: "foam/nanos/auth/PermissionedPropertyDAO" },
   { name: "foam/nanos/auth/ProfilePictureView", flags: ['web'] },
   { name: "foam/nanos/auth/twofactor/OTPAuthService" },

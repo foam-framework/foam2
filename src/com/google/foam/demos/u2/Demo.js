@@ -443,6 +443,31 @@ foam.CLASS({
 foam.lookup('CustomDetailView').create().write();
 
 
+foam.CLASS({
+  name: 'AnyViewDemo',
+
+  documentation: 'Show use of AnyView, which provides a suitable view for Object properties based on their current value.',
+
+  properties: [
+    {
+      class: 'Object',
+      name: 'anyValue',
+      view: 'foam.u2.view.AnyView',
+      value: true
+    }
+  ],
+
+  actions: [
+    function becomeString()  { this.anyValue = 'a String'; },
+    function becomeBoolean() { this.anyValue = true},
+    function becomeInt()     { this.anyValue = 42; },
+    function becomeDate()    { this.anyValue = new Date(); },
+  ]
+});
+
+foam.u2.DetailView.create({ data: AnyViewDemo.create() }).write();
+
+
 // Converted from Angular2 demo:
 // https://github.com/thelgevold/angular-2-samples/blob/master/components/bound-textbox/bound-textbox.js
 foam.CLASS({
