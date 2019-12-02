@@ -235,8 +235,6 @@ foam.CLASS({
           .put("agent", agent)
           .put("logger", new PrefixLogger(prefix, (Logger) x.get("logger")))
           .put("twoFactorSuccess", getContext().get("twoFactorSuccess"))
-
-          // TODO: I'm not sure if this is necessary.
           .put(CachingAuthService.CACHE_KEY, getContext().get(CachingAuthService.CACHE_KEY));
 
         // We need to do this after the user and agent have been put since

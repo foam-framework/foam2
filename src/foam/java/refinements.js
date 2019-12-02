@@ -228,6 +228,11 @@ foam.CLASS({
       value: false
     },
     {
+      class: 'Boolean',
+      name: 'synchronized',
+      value: false
+    },
+    {
       class: 'String',
       name: 'javaValidateObj',
       expression: function(validationPredicates) {
@@ -374,6 +379,7 @@ foam.CLASS({
           name: 'get' + capitalized,
           type: this.javaType,
           visibility: 'public',
+          synchronized: this.synchronized,
           body: this.javaGetter || ('if ( ! ' + isSet + ' ) {\n' +
             ( this.javaFactory ?
                 '  set' + capitalized + '(' + factoryName + '());\n' :
@@ -384,6 +390,7 @@ foam.CLASS({
         method({
           name: 'set' + capitalized,
           visibility: 'public',
+          synchronized: this.synchronized,
           args: [
             {
               type: this.javaType,
@@ -675,6 +682,56 @@ foam.CLASS({
   ],
 
   methods: [
+    function buildMethodInfoInitializer(cls) {
+      // Add MethodInfo field for each method
+      initializerString = `new foam.core.MethodInfo(){
+        @Override
+        public String getName(){
+          return "${this.name}";
+        }
+        @Override
+        public Object call(foam.core.X x, Object receiver, Object[] args){
+      `;
+      // See if call needs try catch block
+      var exceptions = this.javaThrows.length > 0;
+      if ( exceptions ) initializerString += `    try {
+        `;
+
+      if ( this.javaType != 'void' ) initializerString += '    return ';
+      // Use ((typeCast)receiver).methodName() to call method because of rare collisions between inner and outer class method names
+      initializerString += `    ((${cls.name})receiver).${this.name}(`;
+      argsString = '';
+      for ( var i = 0 ; this.args && i < this.args.length ; i++ ) {
+        if ( this.args[i].javaType )
+          argsString += '(' + this.args[i].javaType.replace('...', '[]').replace('final ', '') + `)(args[${ i }])`;
+        else if ( this.args[i].type )
+          argsString += '(' + this.args[i].type.replace('...', '[]').replace('final ', '') + `)(args[${ i }])`;
+        else if ( this.args[i].class )
+          argsString += '(' + this.args[i].class.replace('...', '[]').replace('final ', '') + `)(args[${ i }])`;
+        else
+          continue;
+        if ( i != this.args.length - 1 ) argsString += ', ';
+      }
+      initializerString += argsString + ');\n';
+      if ( this.javaType == 'void' ) initializerString += '            return null;\n';
+
+      // Close try block
+      if ( exceptions ) { initializerString += `          }
+         catch (Throwable t) {
+           foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
+           logger.error(t.getMessage());
+           return null;
+         }
+        `
+      }
+
+      initializerString += `}
+      }
+      `;
+      return initializerString;
+    },
+
+
     function buildJavaClass(cls) {
       if ( ! this.javaSupport ) return;
       if ( ! this.javaCode && ! this.abstract ) return;
@@ -698,6 +755,24 @@ foam.CLASS({
         }),
         body: this.javaCode ? this.javaCode : ''
       });
+
+
+      var initializerString = this.buildMethodInfoInitializer(cls);
+
+      // Create MethodInfo field
+      methodInfoName = this.name;
+      field = cls.field({
+        name: methodInfoName,
+        visibility: 'public',
+        static: true,
+        type: 'foam.core.MethodInfo',
+        initializer: initializerString,
+        order: 0,
+      });
+
+      var info = cls.getField('classInfo_');
+      if ( info ) info.addAxiom(cls.name + '.' + methodInfoName);
+
     },
     function isStatic() {
       return false;

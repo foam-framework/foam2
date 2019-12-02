@@ -435,7 +435,7 @@ p({
       .setJournalName(\"agentJunctions\")
       .setOf(foam.nanos.auth.UserUserJunction.getOwnClassInfo())
       .build();
-  ",
+  """,
   "client": "{\"of\":\"foam.nanos.auth.UserUserJunction\", \"remoteListenerSupport\": false}"
 })
 
@@ -544,6 +544,7 @@ p({
       .setOf(foam.nanos.theme.Theme.getOwnClassInfo())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("themes")
+      .setIndex(new foam.core.PropertyInfo[] {foam.nanos.auth.GroupPermissionJunction.TARGET_ID})
       .build()
       .orderBy(foam.mlang.MLang.DESC(foam.nanos.theme.Theme.PRIORITY));
   """,

@@ -396,8 +396,16 @@ foam.CLASS({
               default: return 'other';
             }
           })).
+          // Hide the DOM depending on the value of 'flip'
           start('div').show(this.flip$).add('flip').end().
           start('div').hide(this.flip$).add('flop').end().
+          // Create or destroy the DOM depending on the value of 'flip'
+          add(this.flip$.map(function(f) {
+            if ( f ) return E().start('div').add('flip').end();
+          })).
+          add(this.flip$.map(function(f) {
+            if ( ! f ) return E().start('div').add('flop').end();
+          })).
           start(this.FIELD1).attrs({onKey: true}).end().
           start(this.FIELD1).attrs({onKey: true}).end().
           start(this.FIELD2).attrs({onKey: true}).end().
@@ -433,6 +441,31 @@ foam.CLASS({
   ]
 });
 foam.lookup('CustomDetailView').create().write();
+
+
+foam.CLASS({
+  name: 'AnyViewDemo',
+
+  documentation: 'Show use of AnyView, which provides a suitable view for Object properties based on their current value.',
+
+  properties: [
+    {
+      class: 'Object',
+      name: 'anyValue',
+      view: 'foam.u2.view.AnyView',
+      value: true
+    }
+  ],
+
+  actions: [
+    function becomeString()  { this.anyValue = 'a String'; },
+    function becomeBoolean() { this.anyValue = true},
+    function becomeInt()     { this.anyValue = 42; },
+    function becomeDate()    { this.anyValue = new Date(); },
+  ]
+});
+
+foam.u2.DetailView.create({ data: AnyViewDemo.create() }).write();
 
 
 // Converted from Angular2 demo:

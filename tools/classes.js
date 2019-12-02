@@ -162,6 +162,8 @@ var classes = [
   'foam.dao.PMDAO',
   'foam.nanos.pm.PMInfo',
   'foam.dao.PutOnlyDAO',
+  'foam.dao.ORBRequest',
+  'foam.dao.ORBitalDAO',
   'foam.mlang.order.Comparator',
   'foam.mlang.order.Desc',
   'foam.mlang.sink.Count',
@@ -524,6 +526,9 @@ var classes = [
   'foam.nanos.rope.CRUDMap',
   'foam.nanos.rope.CrudOperation',
   'foam.nanos.rope.NextRelationshipsList',
+  //concurrent
+  'foam.util.concurrent.AbstractAssembly',
+  'foam.util.concurrent.Assembly',
 ];
 
 var abstractClasses = [
