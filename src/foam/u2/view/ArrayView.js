@@ -44,7 +44,11 @@ foam.CLASS({
         if ( this.FObject.isInstance(newItem) ) {
           newItem = newItem.clone();
         }
-        this.data[this.data.length] = newItem;
+        if (this.data) {
+          this.data[this.data.length] = newItem;
+        } else {
+          this.data = [newItem];
+        }
         this.updateData();
       }
     }
