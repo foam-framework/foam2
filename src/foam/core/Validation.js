@@ -345,6 +345,46 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.core',
+  name: 'PhoneNumberPropertyValidationRefinement',
+  refines: 'foam.core.PhoneNumber',
+  properties: [
+    {
+      class: 'FObjectArray',
+      of: 'foam.core.ValidationPredicate',
+      name: 'validationPredicates',
+      factory: function() {
+        var self = this;
+        var ret = [
+          {
+            args: [this.name],
+            predicateFactory: function(e) {
+                return e.REG_EXP(
+                  self,
+                  /^(?:\+?1[-.●]?)?\(?([0-9]{3})\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4})$/
+                 );
+              },
+              errorString: 'Please enter a valid phone number'
+            }
+        ];
+        if ( this.required ) {
+          ret.push(
+            {
+              args: [this.name],
+              predicateFactory: function(e) {
+                return e.NEQ(self, '');
+              },
+              errorString: 'Please enter a phone number'
+            }
+          );
+        }
+        return ret;
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.core',
   name: 'DatePropertyValidationRefinement',
   refines: 'foam.core.Date',
   properties: [
