@@ -658,7 +658,10 @@ foam.CLASS({
         this.mdao = dao;
         var cache = this.mdao;
         if ( this.dedup ) cache = this.DeDupDAO.create({delegate: cache});
-        if ( this.order ) cache = this.OrderedDAO.create({delegate: cache});
+        if ( this.order ) cache = this.OrderedDAO.create({
+          delegate: cache,
+          comparator: this.order
+        });
 
         if ( this.cache ) {
           this.mdao = this.MDAO.create({of: params.of});
