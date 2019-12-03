@@ -354,7 +354,8 @@ foam.CLASS({
       name: 'validationPredicates',
       factory: function() {
         var self = this;
-        var ret = [
+        if ( ! this.required ) return;
+        return [
           {
             args: [this.name],
             predicateFactory: function(e) {
@@ -364,10 +365,7 @@ foam.CLASS({
                  );
               },
               errorString: 'Please enter a valid phone number'
-            }
-        ];
-        if ( this.required ) {
-          ret.push(
+            },
             {
               args: [this.name],
               predicateFactory: function(e) {
@@ -375,9 +373,7 @@ foam.CLASS({
               },
               errorString: 'Please enter a phone number'
             }
-          );
-        }
-        return ret;
+        ];
       }
     }
   ]
