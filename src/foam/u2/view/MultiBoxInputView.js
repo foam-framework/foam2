@@ -5,10 +5,15 @@
  */
 
 foam.CLASS({
-  package: 'net.nanopay.sme.ui',
-  name: 'TwoFactorAuthenticationVerificationView',
+  package: 'foam.u2.view',
+  name: 'MultiBoxInputView',
   extends: 'foam.u2.View',
-  documentation: `numOfParts stand for length of verification code`,
+  documentation: `
+      Generate a six(default) 48 * 48 multi box input field.
+      Each input field is limited to 1 digital value. NumOfParts defines
+      the number of input boxes. The input field will switch to error style
+      when incorrectCode is set to true.
+      `,
   requires: [
     'foam.core.ArraySlot',
     'foam.u2.TextField'
@@ -43,7 +48,7 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'incorrectCode',
+      name: 'incorrectCode'
     },
     {
       class: 'Int',
@@ -58,7 +63,7 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'numOfParts',
-      value: 6,
+      value: 6
     },
     {
       class: 'FObjectArray',
@@ -70,7 +75,7 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       var self = this;
-      for ( let i = 0; i < this.numOfParts; i++ ) {
+      for ( let i = 0 ; i < this.numOfParts ; i++ ) {
         var isFirstElement = i === 0;
         let v = this.TextField.create({ onKey: true });
         v.setAttribute('maxlength', 1);
@@ -81,12 +86,15 @@ foam.CLASS({
         });
         v.on('keydown', (e) => {
           switch ( e.keyCode ) {
+            // keyCode 37: '⟵' this will focus the left input field from the current focused element.
             case 37:
                 this.currentIndex--;
             break;
+            // keyCode 39: '⟶' this will focus the right input field from the current focused element.
             case 39:
                 this.currentIndex++;
             break;
+            // keyCode 8: 'DELETE'
             case 8:
               if ( this.elements[this.currentIndex].data === ' ' || ! this.elements[this.currentIndex].data ) {
                 this.currentIndex--;
