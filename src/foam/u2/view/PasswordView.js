@@ -30,7 +30,7 @@ foam.CLASS({
     }
     ^ .input-image {
       position: absolute;
-      width: 4vh;
+      width: 30px;
       height: 30px;
       top: 5px;
       right: 10px;
