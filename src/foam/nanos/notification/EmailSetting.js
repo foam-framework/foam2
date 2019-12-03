@@ -11,17 +11,11 @@ foam.CLASS({
   extends: 'foam.nanos.notification.NotificationSetting',
 
   javaImports: [
-    'foam.dao.ArraySink',
-    'foam.dao.DAO',
-    'foam.nanos.auth.User',
-    'foam.nanos.auth.UserUserJunction',
     'foam.nanos.logger.Logger',
     'foam.nanos.notification.email.EmailMessage',
     'foam.util.Emails.EmailsUtility',
     'java.util.Arrays',
     'java.util.List',
-    'net.nanopay.model.Business',
-    'static foam.mlang.MLang.EQ'
   ],
 
   methods: [

@@ -48,8 +48,8 @@ foam.RELATIONSHIP({
   cardinality: '1:*',
   sourceModel: 'foam.nanos.auth.UserUserJunction',
   targetModel: 'foam.nanos.notification.NotificationSetting',
-  forwardName: 'notificationSettingsForBusinessUsers',
-  inverseName: 'businessUser',
+  forwardName: 'notificationSettingsForUserUsers',
+  inverseName: 'userJunction',
   sourceProperty: {
     hidden: true
   }
