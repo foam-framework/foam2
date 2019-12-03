@@ -20,6 +20,7 @@ public class SyncAssemblyLine
  protected Object   startLock_ = new Object();
  protected Object   endLock_   = new Object();
 
+  /*
  public void enqueue(Assembly job) {
    Object[] locks = job.requestLocks();
 
@@ -30,25 +31,23 @@ public class SyncAssemblyLine
      enqueue_(job);
    }
  }
+  */
 
- public void enqueue_(Assembly job) {
+ public void enqueue(Assembly job) {
   Assembly previous = null;
 
-   synchronized ( startLock_ ) {
+  synchronized ( startLock_ ) {
      previous = q_;
      q_ = job;
+     job.executeUnderLock();
      job.startJob();
    }
-
    job.executeJob();
-
    if ( previous != null ) previous.waitToComplete();
-
    synchronized ( endLock_ ) {
      job.endJob();
      job.complete();
    }
-
    // Isn't required, but helps GC last entry.
    synchronized ( startLock_ ) {
      // If I'm still the only job in the queue, then remove me
@@ -59,7 +58,7 @@ public class SyncAssemblyLine
  public void acquireLocksThenEnqueue(Object[] locks, Assembly job, int lockIndex) {
    if ( lockIndex >= locks.length ) {
      job.executeUnderLock();
-     enqueue_(job);
+     enqueue(job);
    } else {
      synchronized ( locks[lockIndex] ) {
        acquireLocksThenEnqueue(locks, job, lockIndex+1);
