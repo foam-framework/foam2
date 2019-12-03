@@ -46,6 +46,7 @@ foam.CLASS({
 
   methods: [
     function createIsAvailableFor(data$) {
+      var self = this;
       var slot = foam.core.ExpressionSlot.create({
         obj$: data$,
         code: this.isAvailable
@@ -56,7 +57,7 @@ foam.CLASS({
           var data = data$.get();
           if ( data && data.__subContext__.auth ) {
             data.__subContext__.auth.check(null,
-              `${data.cls_.id.toLowerCase()}.section.${this.name}`).then((hasAuth) => {
+              `${data.cls_.id.toLowerCase()}.section.${self.name}`).then((hasAuth) => {
                 permSlot.set(hasAuth);
               });
           }
