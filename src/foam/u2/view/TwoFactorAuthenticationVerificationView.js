@@ -8,6 +8,7 @@ foam.CLASS({
   package: 'net.nanopay.sme.ui',
   name: 'TwoFactorAuthenticationVerificationView',
   extends: 'foam.u2.View',
+  documentation: `numOfParts stand for length of verification code`,
   requires: [
     'foam.core.ArraySlot',
     'foam.u2.TextField'
@@ -82,19 +83,17 @@ foam.CLASS({
           switch ( e.keyCode ) {
             case 37:
                 this.currentIndex--;
-                this.elements[this.currentIndex].focus();
             break;
             case 39:
                 this.currentIndex++;
-                this.elements[this.currentIndex].focus();
             break;
             case 8:
               if ( this.elements[this.currentIndex].data === ' ' || ! this.elements[this.currentIndex].data ) {
                 this.currentIndex--;
-                this.elements[this.currentIndex].focus();
               };
             break;
           }
+          this.elements[this.currentIndex].focus();
         });
 
         this.tag(v).addClass(this.myClass());
