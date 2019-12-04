@@ -363,16 +363,9 @@ foam.CLASS({
                   self,
                   /^(?:\+?1[-.●]?)?\(?([0-9]{3})\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4})$/
                  );
-              },
-              errorString: 'Please enter a valid phone number'
             },
-            {
-              args: [this.name],
-              predicateFactory: function(e) {
-                return e.NEQ(self, '');
-              },
-              errorString: 'Please enter a phone number'
-            }
+            errorString: 'Please enter a valid phone number'
+          }
         ];
       }
     }
