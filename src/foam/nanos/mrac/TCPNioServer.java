@@ -28,15 +28,20 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import foam.core.AbstractFObject;
+import foam.core.FObject;
 import foam.core.FoamThread;
+import foam.core.X;
+import foam.lib.json.JSONParser;
 import foam.nanos.NanoService;
 import foam.nanos.box.NanoServiceRouter;
+import foam.nanos.logger.Logger;
 
 //Start a tcp service.
 public class TCPNioServer extends AbstractFObject implements NanoService {
 
 
-    protected NanoServiceRouter router_ = null;
+    protected TcpNioRouter router_ = null;
+    protected Logger logger   = (Logger) getX().get("logger");
     //TODO: Do not hard code this field.
     // protected int maxConnectionPerClient = 50;
 
@@ -52,7 +57,6 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
     //TODO: start selector
     public void start() throws Exception {
         System.out.println("<><><><><><><<><>");
-        System.out.println("qilai");
         //TODO: do not hard coding following parameter.
         InetSocketAddress serverAddress = new InetSocketAddress("127.0.0.1", 7070);
         int totalProcessors = totalCores * 2;
@@ -67,7 +71,6 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
         this.serverSocketChannel.configureBlocking(false);
 
         acceptor = new Acceptor(this.serverSocketChannel, serverAddress, this.processors);
-        System.out.println("processor size: " + totalProcessors);
 
         // Start TCP server.
         // Make sure that thread starts once.
@@ -157,7 +160,6 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
                         keys.remove();
 
                         if ( key.isAcceptable() ) {
-                            System.out.println("accept key");
                             SocketChannel socketChannel = acceptChannel(key);
                             
                             if ( socketChannel != null ) {
@@ -194,7 +196,7 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
                 return socketChannel;
             } catch ( IOException e ) {
                 //TODO: LOG 
-                // Hard close SocketChannel.
+                removeSelectionKey(key);
                 hardCloseSocketChannel(socketChannel);
             }
             return null;
@@ -275,7 +277,6 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
                     keys.remove(key);
 
                     if ( key.isValid() == false ) {
-                        System.out.println("isValid");
                         removeSelectionKey(key);
                         continue;
                     }
@@ -291,13 +292,14 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
 
         private void configureNewConnections() {
             SocketChannel socketChannel = acceptedSocketChannels.poll();
-            System.out.println("aaaa");
             while ( isRunning.get() && socketChannel != null ) {
                 SelectionKey key = null;
                 try {
                     key = socketChannel.register(this.selector, SelectionKey.OP_READ);
-                    //TODO: Use key.attach to hook on something.
-                    //TODO: Record the connection.
+                    // LenBuffer can be reused. Put into the context to make sure it is thread-safe.
+                    X x = getX().put("lenBuffer", ByteBuffer.allocate(4));
+                    key.attach(getX().put("lenBuffer", ByteBuffer.allocate(4)));
+
                 } catch ( IOException e ) {
                     removeSelectionKey(key);
                     hardCloseSocketChannel(socketChannel);
@@ -306,35 +308,100 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
             }
         }
 
+
         // Entry to all servers in System.
+        //TODO: change to multi-thread process.
         private void processRequest(SelectionKey key) throws IOException {
-            System.out.println("process key");
+            System.out.println("processRequest method:");
             SocketChannel socketChannel = null;
             try {
-                //drain out message first.
+                // Stop selecting.
+                key.interestOps(0);
+
                 socketChannel = (SocketChannel) key.channel();
-                ByteBuffer buffer = ByteBuffer.allocate(1024);
-                int len = socketChannel.read(buffer);
-                if ( len == -1 ) throw new IOException("connect refuse");
-                System.out.println(len);
-                System.out.println(new String(buffer.array(), 0, len, Charset.forName("UTF-8")));
-                // Check onMessage method.
-                // have a box
+                X x = (X) key.attachment();
+                ByteBuffer lenbuffer = (ByteBuffer) x.get("lenBuffer");
+                int rc = socketChannel.read(lenbuffer);
+
+                if ( rc < 0 ) {
+                    throw new IOException("End of Stream");
+                }
+
+                // Read message length.
+                int messageLen = -1;
+                if ( lenbuffer.remaining() == 0 ) {
+                    lenbuffer.flip();
+                    messageLen = lenbuffer.getInt();
+                    lenbuffer.clear();
+                    if ( messageLen < 0 ) throw new IOException("Len error " + messageLen);
+                }
+                
+                // Read message.
+                ByteBuffer message = ByteBuffer.allocate(messageLen);
+                if ( socketChannel.read(message) < 0 ) throw new IOException("End of Stream");
+
+                String requestString = null;
+
+                if ( message.remaining() == 0 ) {
+                    message.flip();
+                    requestString = new String(message.array(), 0, messageLen, Charset.forName("UTF-8"));
+                    message.clear();
+                }
+
+                //TODO: log
+                System.out.println(messageLen);
+                System.out.println(requestString);
+
+                // Deserialize json and assign to service.
+                // Inject SelectionKey and SocketChannel into X. 
+                // Then, the FObject that created by this X can obtain injected values.
+                x = x.put("selectionKey", key).put("socketChannel", socketChannel);
+                FObject request = x.create(JSONParser.class).parseString(requestString);
+
+                //TODO: Inject ReturnBox.
+                
+                if ( request == null ) {
+                    // logger.warning("Failed to parse request.", request);
+                    System.out.println("Failed to parse request.");
+                    return;
+                }
+
+                if ( ! ( request instanceof TcpMessage ) ) {
+                    System.out.println("Request was not a TcpMessage");
+                    logger.warning("Request was not a TcpMessage", request);
+                    return;
+                }
+
+                TcpMessage tcpMessage = (TcpMessage) request;
+                tcpMessage.getLocalAttributes().put("x", x);
+
+                System.out.println(tcpMessage.getServiceKey());
+                getRouter().service(tcpMessage.getServiceKey(), tcpMessage);
+
             } catch ( IOException e ) {
                 // When client reset. close Socket.
+                //TODO: log socket close.
+                System.out.println(e);
                 try {
                     key.cancel();
                 } catch ( Exception exception ) {
                     // Log error
                 }
                 TCPNioServer.closeSocketChannel(socketChannel);
+            } catch ( Exception e){
+                //TODO: log or ignore.
+            } finally {
+                // if ( key.isValid() ) {
+                //     // Resume READ selection.
+                //     key.interestOps(SelectionKey.OP_READ);
+                // }
             }
         }
     }
 
     public NanoServiceRouter getRouter() {
         if ( router_ == null ) 
-            router_ = new NanoServiceRouter();
+            router_ = getX().create(TcpNioRouter.class);
         return router_;
     }
 
