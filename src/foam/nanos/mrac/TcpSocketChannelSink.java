@@ -71,8 +71,8 @@ public class TcpSocketChannelSink extends AbstractSink {
   
   public synchronized void handleFailure() {
     if ( ! isClose ) return;
-    TCPNioServer.removeSelectionKey(key);
-    TCPNioServer.hardCloseSocketChannel(socketChannel);
+    TCPNioServer.removeSelectionKey(getSelectionKey());
+    TCPNioServer.hardCloseSocketChannel(getSocketChannel());
     isClose = true;
   }
   
