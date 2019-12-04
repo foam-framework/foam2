@@ -535,6 +535,7 @@ p({
       .setPm(true)
       .setSeqNo(true)
       .setOf(foam.nanos.ruler.RuleHistory.getOwnClassInfo())
+      .setNullify(true)
       //.setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       //.setJournalName(\"ruleHistory\")
       .build(); 
