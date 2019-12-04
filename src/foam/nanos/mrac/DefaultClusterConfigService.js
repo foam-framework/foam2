@@ -118,25 +118,13 @@ logger.debug(this.getClass().getSimpleName(), "buildURL", serviceName, uri.toURL
     },
     {
       name: 'getPrimaryDAO',
-      type: 'foam.dao.DAO',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          // REVIEW: potentially have route to different end-points based on service. not used at the moment.
-          name: 'serviceName',
-          type: 'String'
-        }
-      ],
       javaCode: `
-        DAO dao = (DAO) getPrimaryDAOs().get(getServiceName());
-        if ( dao == null ) {
+        DAO pDao = (DAO) getPrimaryDAOs().get(getServiceName());
+        if ( pDao == null ) {
           ClusterConfig primaryConfig = getPrimaryConfig();
           ClusterConfig config = getConfig();
-          dao = new ClientDAO.Builder(x)
-                  .setDelegate(new SessionClientBox.Builder(x)
+          pDao = new ClientDAO.Builder(x)
+                    .setDelegate(new SessionClientBox.Builder(x)
                      .setSessionID(config.getSessionId())
                      .setDelegate(new HTTPBox.Builder(x)
                         .setAuthorizationType(foam.box.HTTPAuthorizationType.BEARER)
@@ -145,9 +133,9 @@ logger.debug(this.getClass().getSimpleName(), "buildURL", serviceName, uri.toURL
                         .build())
                      .build())
                    .build();
-          getPrimaryDAOs().put(getServiceName(), dao);
+          getPrimaryDAOs().put(getServiceName(), pDao);
         }
-        return dao;
+        return pDao;
       `
     },
     {

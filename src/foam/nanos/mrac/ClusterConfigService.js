@@ -31,6 +31,10 @@ foam.INTERFACE({
         {
           name: 'serviceName',
           type: 'String'
+        },
+        {
+          name: 'dao',
+          type: 'foam.dao.DAO',
         }
       ],
     },

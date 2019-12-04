@@ -105,7 +105,6 @@ FOAM_FILES([
   { name: "foam/nanos/menu/TreeAltView", flags: ['web'] },
   { name: "foam/nanos/menu/TreeGraphAltView" },
   { name: "foam/nanos/mrac/AccessMode" },
-  { name: "foam/nanos/mrac/ClusterDAO" },
   { name: "foam/nanos/mrac/ClusterClientDAO" },
   { name: "foam/nanos/mrac/ClusterServerDAO" },
   { name: "foam/nanos/mrac/ClusterCommand" },

@@ -49,6 +49,10 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'clusterTransient'
+    },
+    {
+      class: 'Boolean',
       name: 'readPermissionRequired'
     },
     {
@@ -237,6 +241,12 @@ foam.CLASS({
             type: 'boolean',
             visibility: 'public',
             body: 'return ' + this.storageTransient + ';'
+          },
+          {
+            name: 'getClusterTransient',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.clusterTransient + ';'
           },
           {
             name: 'getXMLAttribute',

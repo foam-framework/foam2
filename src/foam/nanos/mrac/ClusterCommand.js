@@ -52,7 +52,8 @@ foam.CLASS({
     },
     {
       name: 'obj',
-      class: 'FObjectProperty'
+      //class: 'FObjectProperty'
+      class: 'String'
     },
     {
       name: 'sessionId',
@@ -71,7 +72,7 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-  public ClusterCommand(X x, String serviceName, String command, FObject obj) {
+  public ClusterCommand(X x, String serviceName, String command, String obj) {
     setServiceName(serviceName);
     setCommand(command);
     setObj(obj);

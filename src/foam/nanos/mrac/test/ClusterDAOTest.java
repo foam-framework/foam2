@@ -69,7 +69,7 @@ public class ClusterDAOTest
       .build();
     ((DAO) x.get("clusterConfigDAO")).put(config);
 
-    DAO client = new ClusterDAO.Builder(x)
+    DAO client = new ClusterClientDAO.Builder(x)
       .setServiceName(serviceName)
       .build();
 

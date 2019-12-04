@@ -28,77 +28,81 @@ foam.CLASS({
     {
       name: 'mdao',
       class: 'foam.dao.DAOProperty',
-      vibility: 'HIDDEN'
+      visibility: 'HIDDEN'
     }
   ],
 
   methods: [
     {
       name: 'put_',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'obj',
-          type: 'FObject'
-        }
-      ],
       javaCode: `
       Logger logger = new PrefixLogger(new Object[] {
         this.getClass().getSimpleName(),
+        getServiceName(),
         "put_",
-        getServiceName()
       }, (Logger) x.get("logger"));
 
       ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
       if ( service != null &&
            service.getConfig() != null &&
            ! service.getIsPrimary() ) {
-        ClusterCommand cmd = new ClusterCommand(x, getServiceName(), ClusterCommand.PUT, obj);
+        foam.core.FObject old = getMdao().find_(x, obj.getProperty("id"));
+        foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(x).setPropertyPredicate(new foam.lib.ClusterPropertyPredicate());
+        String record = ( old != null ) ?
+          outputter.stringifyDelta(old, obj) :
+          outputter.stringify(obj);
+        logger.debug("record", record);
+        if ( foam.util.SafetyUtil.isEmpty(record) ||
+            "{}".equals(record.trim()) ) {
+          logger.debug("no changes");
+          // temporarily store locally until Medusa
+          //return obj;
+          return getDelegate().put_(x, obj);
+        }
+
+        ClusterCommand cmd = new ClusterCommand(x, getServiceName(), ClusterCommand.PUT, record);
         logger.debug("to primary", cmd);
-        FObject result = (FObject) service.getPrimaryDAO(x, getServiceName()).cmd_(x, cmd);
-        logger.debug("from primary", result);
+        FObject result = (FObject) service.getPrimaryDAO(x, getServiceName(), (foam.dao.DAO) getMdao()).cmd_(x, cmd);
+        logger.debug("from primary", result.getClass().getSimpleName(), result);
+        obj = obj.copyFrom(result);
         // temporarily store locally until Medusa
-        //return getDelegate().put_(x, result);
-        //return getDelegate().put_(x, obj);
-        return getMdao().put_(x, result); // does not work for password updates.
+        // return obj;
+        logger.debug("obj after copyFrom", obj);
+        return getMdao().put_(x, obj); // does not work for password updates.
       } else {
-        //logger.debug(this.getClass().getSimpleName(), "put_", getServiceName(), "to self", obj);
         return getDelegate().put_(x, obj);
-     }
-     `
+      }
+      `
     },
     {
       name: 'remove_',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'obj',
-          type: 'FObject'
-        }
-      ],
       javaCode: `
-      Logger logger = (Logger) x.get("logger");
+      Logger logger = new PrefixLogger(new Object[] {
+        this.getClass().getSimpleName(),
+        getServiceName(),
+        "remove_",
+      }, (Logger) x.get("logger"));
 
       ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
       if ( service != null &&
            service.getConfig() != null &&
            ! service.getIsPrimary() ) {
-        ClusterCommand cmd = new ClusterCommand(x, getServiceName(), ClusterCommand.REMOVE, obj);
-        logger.debug(this.getClass().getSimpleName(), "remove_", getServiceName(), "to primary", cmd);
-        FObject result = (FObject) service.getPrimaryDAO(x, getServiceName()).cmd_(x, cmd);
+        foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(x).setPropertyPredicate(new foam.lib.ClusterPropertyPredicate());
+        String record = outputter.stringify(obj);
+
+        ClusterCommand cmd = new ClusterCommand(x, getServiceName(), ClusterCommand.REMOVE, record);
+        logger.debug("to primary", cmd);
+        FObject result = (FObject) service.getPrimaryDAO(x, getServiceName(), (foam.dao.DAO) getMdao()).cmd_(x, cmd);
+        logger.debug("from primary", result.getClass().getSimpleName(), result);
+        obj = obj.copyFrom(result);
         // temporarily store locally until Medusa
-        return getDelegate().remove_(x, obj);
+        // return obj;
+        logger.debug("obj after copyFrom", obj);
+        return getMdao().remove_(x, obj);
       } else {
-        //logger.debug(this.getClass().getSimpleName(), "remove_", getServiceName(), "to self", obj);
         return getDelegate().remove_(x, obj);
       }
-     `
+      `
     }
   ]
 });
