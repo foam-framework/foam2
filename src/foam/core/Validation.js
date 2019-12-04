@@ -354,7 +354,7 @@ foam.CLASS({
       name: 'validationPredicates',
       factory: function() {
         var self = this;
-        if ( ! this.required ) return;
+        if ( ! this.required ) return [];
         return [
           {
             args: [this.name],
