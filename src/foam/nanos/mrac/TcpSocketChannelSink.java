@@ -12,15 +12,11 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
 
+import foam.core.FObject;
 import foam.dao.AbstractSink;
 import foam.lib.NetworkPropertyPredicate;
 import foam.lib.json.Outputter;
 
-/**
-* Serialize object and write into a SocketChannel.
-* The class is not thread-safe.
-* Make sure that only one thread can write into SocketChannelSink at a moment.
-*/
 //TODO: model this class
 public class TcpSocketChannelSink extends AbstractSink {
     
@@ -31,49 +27,53 @@ public class TcpSocketChannelSink extends AbstractSink {
     // Once socket closed, this sink will still be picked while doing put and remove operation.
     boolean isClose = false;
     
-    protected int writeWithPrefix(String source, String prefix) throws IOException {
+    protected int writeWithPrefix(String source, String prefix) {
         return write(prefix + "(" + source + ")");
     }
 
-    protected int write(String source) throws IOException {
-        byte[] bytes = source.getBytes(Charset.forName("UTF-8"));
-        ByteBuffer byteBuffer = ByteBuffer.allocate(4 + bytes.length);
-        byteBuffer.putInt(bytes.length);
-        byteBuffer.put(bytes);
-        byteBuffer.flip();
-        int len = write(byteBuffer);
-        byteBuffer.clear();
-        return len;
+    protected int write(String source) {
+        // try {
+            byte[] bytes = source.getBytes(Charset.forName("UTF-8"));
+            ByteBuffer byteBuffer = ByteBuffer.allocate(4 + bytes.length);
+            byteBuffer.putInt(bytes.length);
+            byteBuffer.put(bytes);
+            byteBuffer.flip();
+            int len = write(byteBuffer);
+            byteBuffer.clear();
+            return len;
+        // } catch ( IOException e ) {
+        //     // This IOException is because of byteBuffer, so can be ignore.
+        //     // Log
+        //     return -1;
+        // }
     }
 
-    protected int write(ByteBuffer source) throws IOException {
-        return this.getSocketChannel().write(source);
+
+    protected synchronized int write(ByteBuffer source) {
+        try {
+            return this.getSocketChannel().write(source);
+        } catch ( IOException e ) {
+            // Close socket when IOException occurs.
+            // Client side should sense this. And re-send sink cmd.
+            System.out.println(e);
+            handleFailure();
+            return -1;
+        }
     }
     
     @Override
     public void put(Object obj, foam.core.Detachable sub) {
-        if ( ! isClose ) return;
-        try {
-            String out = new Outputter(getX()).setPropertyPredicate(new NetworkPropertyPredicate()).stringify(obj);
-            writeWithPrefix(out, "p");
-        } catch ( IOException e ) {
-            // Close socket when IOException occurs.
-            // Client side should sense this. And re-send sink cmd.
-            handleFailure();
-        }
+        if ( isClose ) return;
+        String out = new Outputter(getX()).setPropertyPredicate(new NetworkPropertyPredicate()).stringify((FObject) obj);
+        writeWithPrefix(out, "p");
+
     }
 
     @Override
     public void remove(Object obj, foam.core.Detachable sub) {
-        if ( ! isClose ) return;
-        try {
-            String out = new Outputter(getX()).setPropertyPredicate(new NetworkPropertyPredicate()).stringify(obj);
-            writeWithPrefix(out, "r");
-        } catch ( IOException e ) {
-            // Close socket when IOException occurs.
-            // Client side should sense this. And re-send sink cmd.
-            handleFailure();
-        } 
+        if ( isClose ) return;
+        String out = new Outputter(getX()).setPropertyPredicate(new NetworkPropertyPredicate()).stringify((FObject) obj);
+        writeWithPrefix(out, "r");
     }
 
     public synchronized void handleFailure() {
