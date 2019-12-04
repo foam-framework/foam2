@@ -30,11 +30,10 @@ foam.CLASS({
     }
     ^ .input-image {
       position: absolute;
-      width: 4vh;
-      height: 3vh;
-      bottom: 3vh;
-      right: 0.1vw;
-      top: 0.5vh;
+      width: 30px;
+      height: 30px;
+      top: 5px;
+      right: 10px;
     }
   `,
 
