@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.nanos.mrac',
   name: 'ClusterConfig',
 
-  documentation: 'Multi-role active clustering - used by high availability system and clustering.',
+  documentation: 'Cluster node meta data used to group nodes and describe features.',
 
   implements: [
     'foam.nanos.auth.CreatedAware',

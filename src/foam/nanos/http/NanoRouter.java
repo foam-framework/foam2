@@ -132,7 +132,7 @@ public class NanoRouter
 
   protected WebAgent createWebAgent(NSpec spec, Object service) {
     Logger logger = (Logger) getX().get("logger");
-    logger.debug(this.getClass().getSimpleName(), "createWebAgent", spec.getName(), Thread.currentThread().getName());
+    logger.debug(this.getClass().getSimpleName(), "createWebAgent", spec.getName());
     if ( spec.getServe() ) {
       try {
         Class cls = spec.getBoxClass() != null && spec.getBoxClass().length() > 0 ?
@@ -147,7 +147,7 @@ public class NanoRouter
 
         service = new ServiceWebAgent(skeleton, spec.getAuthenticate());
 
-        logger.debug(this.getClass().getSimpleName(), "createWebAgent.serve", spec.getName(), "service"/*, service*/);
+        logger.debug(this.getClass().getSimpleName(), "createWebAgent.serve", spec.getName(), "service");
       } catch (IllegalAccessException | InstantiationException | ClassNotFoundException ex) {
         ex.printStackTrace();
         ((Logger) getX().get("logger")).error("Unable to create NSPec servlet: " + spec.getName());

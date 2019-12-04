@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'ClusterClientDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  documentation: '',
+  documentation: 'Marshall put and remove operations to the ClusterServer.',
 
   javaImports: [
     'foam.core.FObject',

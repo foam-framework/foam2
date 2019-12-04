@@ -155,10 +155,8 @@ foam.CLASS({
           }
           // The decorator dao may be a proxy chain
           ProxyDAO proxy = (ProxyDAO) getDecorator();
-          while ( proxy.getDelegate() != null ) /* &&
-                  proxy.getDelegate() instanceof ProxyDAO ) */ {
+          while ( proxy.getDelegate() != null )
             proxy = (ProxyDAO) proxy.getDelegate();
-          }
           proxy.setDelegate(delegate);
           delegate = (ProxyDAO) getDecorator();
         }
@@ -242,6 +240,8 @@ foam.CLASS({
              getMdao() != null ) {
           // REVIEW: testing for mdao as a way to only cluster the
           // real local dao and not duplicate on the non local.
+          // also, ClusterClient uses the MDAO to find the old object
+          // to create a detla for marshalling. 
           logger.debug(this.getClass().getSimpleName(), "clustering", getOf().getId());
           delegate = new foam.nanos.mrac.ClusterClientDAO.Builder(getX())
             .setServiceName(getNSpec().getName())
@@ -268,6 +268,7 @@ foam.CLASS({
         if ( getPm() ) 
           delegate = new foam.dao.PMDAO.Builder(getX()).setNSpec(getNSpec()).setDelegate(delegate).build();
 
+        // see comments above regarding DAOs with init_
         ((ProxyDAO)delegate_).setDelegate(delegate);
         return delegate_;
       `
@@ -552,11 +553,6 @@ foam.CLASS({
       generateJava: false,
       name: 'decorators'
     },
-    // {
-    //   name: 'orderBy',
-    //   class: 'FObjectProperty',
-    //   type: 'Any'
-    // },
     {
       class: 'FObjectArray',
       of: 'foam.mlang.order.Comparator',
@@ -726,10 +722,6 @@ foam.CLASS({
         var args = {__proto__: params, delegate: dao, of: this.of};
         if ( this.seqProperty ) args.property = this.seqProperty;
         dao = this.GUIDDAO.create(args);
-      }
-
-      if ( this.orderBy ) {
-        //dao = dao.orderBy(this.orderBy);
       }
 
       var cls = this.of;

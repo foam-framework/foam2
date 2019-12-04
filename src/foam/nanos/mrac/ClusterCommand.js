@@ -52,7 +52,6 @@ foam.CLASS({
     },
     {
       name: 'obj',
-      //class: 'FObjectProperty'
       class: 'String'
     },
     {

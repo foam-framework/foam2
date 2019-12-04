@@ -704,7 +704,7 @@ foam.LIB({
     }),
 
     // Short, but exclude cluster-transient properties.
-    Storage: foam.json.Outputter.create({
+    Cluster: foam.json.Outputter.create({
       pretty: false,
       strict: false,
       formatDatesAsNumbers: true,

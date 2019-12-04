@@ -7,6 +7,11 @@
 foam.INTERFACE({
   package: 'foam.nanos.mrac',
   name: 'ClusterConfigService',
+
+  documentation: `Service from which an instance may inquire it\'s
+cluster type - such as primary. It also provides access to
+configuration for contacting the primary node.`,
+
   methods: [
     {
       name: 'getIsPrimary',
