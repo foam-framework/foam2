@@ -23,21 +23,20 @@ public class TcpSocketChannelReturnBox extends AbstractFObject implements Box {
   
   SelectionKey key;
   SocketChannel socketChannel;
+  protected int sizeBytes = 4;
   
   public void send(Message msg) {
     System.out.println("sendback");
-    
-    String out = new Outputter(getX()).setPropertyPredicate(new NetworkPropertyPredicate()).stringify(msg);
-    byte[] bytes = out.getBytes(Charset.forName("UTF-8"));
-    ByteBuffer byteBuffer = ByteBuffer.allocate(4 + bytes.length);
-    byteBuffer.putInt(bytes.length);
-    byteBuffer.put(bytes);
-    byteBuffer.flip();
-    send(byteBuffer);
-    byteBuffer.clear();
+    doSend(msg);
     // After sending back response, the SocketChannel should re-register READ in selector.
     // So that this SocketChannel can be re-use by client.
     resumeSelection();
+  }
+
+  public void doSend(Message msg) {
+    String out = new Outputter(getX()).setPropertyPredicate(new NetworkPropertyPredicate()).stringify(msg);
+    byte[] bytes = out.getBytes(Charset.forName("UTF-8"));
+    send(bytes);
   }
   
   //Do not filp ByteBuffer before pass into this method.
@@ -50,6 +49,15 @@ public class TcpSocketChannelReturnBox extends AbstractFObject implements Box {
       // Force socket close, and client should be able to handle this error.
       handleFailure();
     }
+  }
+
+  public void send(byte[] bytes) {
+    ByteBuffer byteBuffer = ByteBuffer.allocate(sizeBytes + bytes.length);
+    byteBuffer.putInt(bytes.length);
+    byteBuffer.put(bytes);
+    byteBuffer.flip();
+    send(byteBuffer);
+    byteBuffer.clear();
   }
   
   private void resumeSelection() {

@@ -28,15 +28,7 @@ public class TcpSocketChannelSinkBox extends TcpSocketChannelReturnBox {
   @Override
   public void send(Message msg) {
     System.out.println("sendback");
-    
-    String out = new Outputter(getX()).setPropertyPredicate(new NetworkPropertyPredicate()).stringify(msg);
-    byte[] bytes = out.getBytes(Charset.forName("UTF-8"));
-    ByteBuffer byteBuffer = ByteBuffer.allocate(4 + bytes.length);
-    byteBuffer.putInt(bytes.length);
-    byteBuffer.put(bytes);
-    byteBuffer.flip();
-    send(byteBuffer);
-    byteBuffer.clear();
+    doSend(msg);
   }
   
 }
