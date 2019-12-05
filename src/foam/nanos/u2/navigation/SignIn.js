@@ -108,8 +108,7 @@ foam.CLASS({
                   this.user.copyFrom(updatedUser);
                   this.nextStep();
                 }).catch((err) => {
-                  console.warn(err.message);
-                  this.notify('There was an issue with logging in.', 'error');
+                  this.notify(err.message || 'There was an issue with logging in.', 'error');
                 });
             } else {
               this.user.copyFrom(logedInUser);
@@ -118,8 +117,7 @@ foam.CLASS({
           }
         ).catch(
           (err) => {
-            console.warn(err.message);
-            this.notify('There was a problem logging in.', 'error');
+            this.notify(err.message || 'There was a problem logging in.', 'error');
         });
       }
     }

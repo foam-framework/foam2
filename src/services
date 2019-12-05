@@ -483,7 +483,6 @@ p({
   "client":"{\"of\":\"foam.nanos.dig.SUGAR\"}"
 })
 
-p({"class":"foam.nanos.boot.NSpec", "name":"argumentDAO",                        "serve":true,  "serviceScript":"return new foam.dao.PMDAO(x, new foam.dao.java.JDAO(x, foam.nanos.dig.Argument.getOwnClassInfo(), \"arguments\"));","client":"{\"of\":\"foam.nanos.dig.Argument\"}"})
 p({
   "class": "foam.nanos.boot.NSpec",
   "name": "ruleDAO",
