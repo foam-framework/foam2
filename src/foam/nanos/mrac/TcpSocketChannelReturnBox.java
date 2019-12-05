@@ -19,6 +19,7 @@ import foam.lib.json.Outputter;
 
 // Each Request generate its own box. So this class should be thread-safe in theory.
 //TODO: need common close method for all box using SocketChannel?
+// Do not catch IOException in this class. Let caller handle it.
 public class TcpSocketChannelReturnBox extends AbstractFObject implements Box {
   
   SelectionKey key;
@@ -26,32 +27,31 @@ public class TcpSocketChannelReturnBox extends AbstractFObject implements Box {
   protected int sizeBytes = 4;
   
   public void send(Message msg) {
-    System.out.println("sendback");
-    doSend(msg);
-    // After sending back response, the SocketChannel should re-register READ in selector.
-    // So that this SocketChannel can be re-use by client.
-    resumeSelection();
+    try {
+      System.out.println("sendback");
+      doSend(msg);
+      // After sending back response, the SocketChannel should re-register READ in selector.
+      // So that this SocketChannel can be re-use by client.
+      resumeSelection();
+    } catch ( IOException e ) {
+      //Re-throw IOException.
+      throw new RuntimeException(e);
+    }
+
   }
 
-  public void doSend(Message msg) {
+  public void doSend(Message msg) throws IOException {
     String out = new Outputter(getX()).setPropertyPredicate(new NetworkPropertyPredicate()).stringify(msg);
     byte[] bytes = out.getBytes(Charset.forName("UTF-8"));
     send(bytes);
   }
   
   //Do not filp ByteBuffer before pass into this method.
-  public void send(ByteBuffer byteBuffer) {
-    try {
-      getSocketChannel().write(byteBuffer);
-    } catch ( IOException e ) {
-      // If there is an IOException happen while writing into socket,
-      // Which means that socket has some connection issues.
-      // Force socket close, and client should be able to handle this error.
-      handleFailure();
-    }
+  public void send(ByteBuffer byteBuffer) throws IOException {
+    getSocketChannel().write(byteBuffer);
   }
 
-  public void send(byte[] bytes) {
+  public void send(byte[] bytes) throws IOException {
     ByteBuffer byteBuffer = ByteBuffer.allocate(sizeBytes + bytes.length);
     byteBuffer.putInt(bytes.length);
     byteBuffer.put(bytes);
@@ -87,11 +87,6 @@ public class TcpSocketChannelReturnBox extends AbstractFObject implements Box {
       socketChannel = (SocketChannel) getX().get("socketChannel");
     }
     return socketChannel;
-  }
-  
-  public void handleFailure() {
-    TCPNioServer.removeSelectionKey(getSelectionKey());
-    TCPNioServer.hardCloseSocketChannel(getSocketChannel());
   }
   
 }
