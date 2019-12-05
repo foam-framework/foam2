@@ -55,7 +55,34 @@ foam.CLASS({
 
     return super.put_(x, obj);
       `
+    },
+    {
+      name: 'find_',
+      javaCode: `
+    FObject found = super.find_(x, id);
+    if ( found != null ) {
+      ServiceProviderAware sp = (ServiceProviderAware) found;
+      String spid = ((User) x.get("user")).getSpid();
+      if ( ! spid.equals("*") &&
+           ! spid.equals(sp.getSpid()) ) {
+        return null;
+      }
+    }
+    return found;
+      `
+    },
+    {
+      name: 'select_',
+      javaCode: `
+    return super.select_(
+      x,
+      new ServiceProviderAwareSink(x, sink),
+      skip,
+      limit,
+      order,
+      predicate
+   );
+      `
     }
   ]
-
 });
