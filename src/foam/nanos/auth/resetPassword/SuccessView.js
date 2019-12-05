@@ -100,7 +100,7 @@ foam.CLASS({
               .add('Back to Sign In')
               .on('click', function() {
                 window.location.href = '#';
-                self.stack.push({ class: 'foam.nanos.auth.SignInView' });
+                self.stack.push({ class: 'foam.u2.view.LoginView', mode_: 'SignIn' }, self);
               })
             .end()
           .end()

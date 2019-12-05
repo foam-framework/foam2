@@ -14,19 +14,11 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.AuthorizationException',
     'foam.nanos.auth.User',
-    'foam.nanos.auth.UserUserJunction',
-    'foam.nanos.logger.Logger',
-    'foam.nanos.notification.email.EmailMessage',
-    'foam.util.Emails.EmailsUtility',
-    'java.util.Arrays',
-    'java.util.List',
-    'net.nanopay.model.Business',
-    'static foam.mlang.MLang.EQ'
+    'foam.nanos.logger.Logger'
   ],
 
   messages: [
@@ -70,6 +62,7 @@ foam.CLASS({
         notification.setUserId(user.getId());
         notification.setBroadcasted(false);
         notification.setGroupId(null);
+        notification.setEmailIsEnabled(false);
         try {
           notificationDAO.put_(x, notification);
         } catch (Throwable t) {
@@ -113,15 +106,11 @@ foam.CLASS({
       ],
       type: 'Boolean',
       javaCode: `
-      User user = (User) x.get("user");
+        User user = (User) x.get("user");
 
-      if ( user == null ) return false;
+        if ( user == null ) return false;
 
-      if ( user instanceof Business ) {
-        return getBusinessUser() != null && ( getBusinessUser().getTargetId() == user.getId() );
-      } else {
-        return getOwner() == user.getId();
-      }
+        return getUserJunction() != null && ( getUserJunction().getTargetId() == user.getId() ) || getOwner() == user.getId();
       `
     },
     {

@@ -176,7 +176,7 @@ try {
           FObject old;
           String  record_ = null;
 
-          public Object[] requireLocks() {
+          public Object[] requestLocks() {
             return new Object[] { id };
           }
 
@@ -264,7 +264,7 @@ try {
       getLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
         String record_ = null;
 
-        public Object[] requireLocks() {
+        public Object[] requestLocks() {
           return new Object[] { id };
         }
 
