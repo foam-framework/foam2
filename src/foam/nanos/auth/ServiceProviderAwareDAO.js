@@ -13,6 +13,8 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.FObject',
+    'foam.dao.ProxySink',
+    'foam.dao.Sink',
     'foam.nanos.app.AppConfig',
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.User',
@@ -74,7 +76,7 @@ foam.CLASS({
     {
       name: 'select_',
       javaCode: `
-    return super.select_(
+    ProxySink proxy = (ProxySink) super.select_(
       x,
       new ServiceProviderAwareSink(x, sink),
       skip,
@@ -82,6 +84,7 @@ foam.CLASS({
       order,
       predicate
    );
+    return proxy.getDelegate();
       `
     }
   ]
