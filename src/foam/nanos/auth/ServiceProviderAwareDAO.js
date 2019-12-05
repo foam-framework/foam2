@@ -64,9 +64,10 @@ foam.CLASS({
     FObject found = super.find_(x, id);
     if ( found != null ) {
       ServiceProviderAware sp = (ServiceProviderAware) found;
-      String spid = ((User) x.get("user")).getSpid();
-      if ( ! spid.equals("*") &&
-           ! spid.equals(sp.getSpid()) ) {
+      User user = (User) x.get("user");
+      if ( User.SYSTEM_USER_ID != user.getId() &&
+           ! user.getSpid().equals(sp.getSpid()) ) {
+System.out.println(this.getClass().getSimpleName() + " find_ " + user.getSpid() +" discard "+sp.getSpid()+" user "+user.getId());
         return null;
       }
     }

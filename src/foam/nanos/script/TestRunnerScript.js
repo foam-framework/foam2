@@ -12,6 +12,7 @@ foam.CLASS({
   javaImports: [
     'foam.dao.DAO',
     'foam.dao.ArraySink',
+    'foam.nanos.app.AppConfig',
     'foam.nanos.test.Test',
     'java.util.*',
     'foam.nanos.logger.LogLevelFilterLogger',
@@ -74,6 +75,10 @@ foam.CLASS({
         loggerFilter.setLogInfo(false);
         loggerFilter.setLogDebug(false);
         loggerFilter.setLogWarning(false);
+
+        AppConfig appConfig = (AppConfig) x.get("appConfig");
+        appConfig.setDefaultSpid("test");
+        x = x.put("appConfig", appConfig);
 
         DAO testDAO = (DAO) x.get("testDAO");
         ArraySink tests = (ArraySink) testDAO.select(new ArraySink());
