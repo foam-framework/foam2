@@ -59,6 +59,7 @@ foam.CLASS({
       flags: ['java'],
     },
     'foam.dao.MDAO',
+    'foam.dao.OrderedDAO',
     'foam.dao.PromisedDAO',
     'foam.dao.RequestResponseClientDAO',
     'foam.dao.SequenceNumberDAO',
@@ -660,12 +661,19 @@ foam.CLASS({
       } else {
         if ( this.cache ) {
           this.mdao = this.MDAO.create({of: params.of});
+
+          var cache = this.mdao;
+          if ( this.dedup ) cache = this.DeDupDAO.create({delegate: cache});
+          if ( Array.isArray(this.order) && this.order.length > 0 ) cache = this.OrderedDAO.create({
+            delegate: cache,
+            comparator: foam.compare.toCompare(this.order)
+          });
+
           dao = this.CachingDAO.create({
-            cache: this.dedup ?
-              this.mdao :
-              this.DeDupDAO.create({delegate: this.mdao}),
+            cache: cache,
             src: dao,
-            of: this.model});
+            of: this.model
+          });
         }
       }
 
