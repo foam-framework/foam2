@@ -27,8 +27,12 @@ public class TcpSocketChannelSinkBox extends TcpSocketChannelReturnBox {
   
   @Override
   public void send(Message msg) {
-    System.out.println("sendback");
-    doSend(msg);
+    try {
+      doSend(msg);
+    } catch ( IOException e ) {
+      //Re-throw IOException.
+      throw new RuntimeException(e);
+    }
   }
   
 }
