@@ -195,7 +195,6 @@ var classes = [
   'foam.nanos.auth.LastModifiedAwareDAO',
   'foam.nanos.auth.LastModifiedByAware',
   'foam.nanos.auth.LastModifiedByAwareDAO',
-  'foam.nanos.auth.LastModifiedByAwareDAO',
   'foam.nanos.auth.LifecycleState',
   'foam.nanos.auth.LifecycleAware',
   'foam.nanos.auth.LifecycleAwareDAO',
