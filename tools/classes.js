@@ -198,6 +198,7 @@ var classes = [
   'foam.nanos.auth.LastModifiedByAwareDAO',
   'foam.nanos.auth.lifecycleAware.LifecycleAware',
   'foam.nanos.auth.lifecycleAware.LifecycleAwareDAO',
+  'foam.nanos.auth.lifecycleAware.LifecycleState',
   'foam.nanos.auth.DeletedAwareDAO',
   'foam.nanos.auth.Permission',
   'foam.nanos.auth.DayOfWeek',
