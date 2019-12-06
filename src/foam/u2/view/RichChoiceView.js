@@ -61,7 +61,7 @@ foam.CLASS({
 
     ^container {
       position: absolute;
-      bottom: 0;
+      bottom: -4px;
       left: 0;
       transform: translateY(100%);
       background: white;
@@ -71,7 +71,8 @@ foam.CLASS({
       box-sizing: border-box;
       width: 100%;
       min-width: fit-content;
-      -webkit-appearance: textfield;
+      border-radius: 3px;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 2px 8px 0 rgba(0, 0, 0, 0.16);
     }
 
     ^heading {
@@ -82,16 +83,22 @@ foam.CLASS({
     }
 
     ^selection-view {
-      background-color: white;
       display: inline-flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 11px;
+      width: 100%;
+
+      height: /*%INPUTHEIGHT%*/ 32px;
+      font-size: 14px;
+      padding-left: %INPUTHORIZONTALPADDING%;
+      padding-right: %INPUTHORIZONTALPADDING%;
+      border: 1px solid;
+      border-radius: 3px;
+      color: /*%BLACK%*/ #1e1f21;
+      background-color: white;
+      border-color: /*%GREY3%*/ #cbcfd4;
       box-sizing: border-box;
-      -webkit-appearance: textfield;
-      padding: 1px 2px;
       cursor: default;
-      border: 1px solid /*%GREY3%*/ #cbcfd4;
       min-width: 94px;
     }
 
@@ -116,29 +123,26 @@ foam.CLASS({
       flex-grow: 1;
     }
 
+    ^ .search .property-filter_ {
+      width: 100%;
+    }
+
     ^ .search input {
       width: 100%;
       border: none;
-      border-bottom: 1px solid #f4f4f9;
-    }
-
-    ^ .search input:focus {
-      border: none;
+      padding-left: %INPUTHORIZONTALPADDING%;
+      padding-right: %INPUTHORIZONTALPADDING%;
+      height: /*%INPUTHEIGHT%*/ 32px;
     }
 
     ^ .search img {
       width: 15px;
-      position: absolute;
-      left: 10px;
-      top: 13px;
+      margin-left: 8px;
     }
 
     ^ .search {
       border-bottom: 1px solid #f4f4f9;
-    }
-
-    ^ .property-filter_ {
-      padding-left: 25px;
+      display: flex;
     }
 
     ^ .disabled {
