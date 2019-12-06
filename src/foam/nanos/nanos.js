@@ -41,6 +41,8 @@ FOAM_FILES([
   { name: "foam/nanos/auth/CreatedAwareDAO" },
   { name: "foam/nanos/auth/LastModifiedAware" },
   { name: "foam/nanos/auth/LastModifiedAwareDAO" },
+  { name: "foam/nanos/auth/lifecycleAware/LifecycleAware" },
+  { name: "foam/nanos/auth/lifecycleAware/LifecycleAwareDAO" },
   { name: "foam/nanos/auth/Login" },
   { name: "foam/nanos/auth/Permission" },
   { name: "foam/nanos/auth/Country" },
