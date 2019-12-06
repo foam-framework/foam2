@@ -16,8 +16,6 @@ foam.CLASS({
     'foam.mlang.MLang',
     'foam.mlang.order.Comparator',
     'foam.mlang.predicate.Predicate',
-    'foam.nanos.auth.LifecycleAware',
-    'foam.nanos.auth.LifecycleState',
     'foam.util.SafetyUtil'
   ],
 

@@ -2,10 +2,19 @@ foam.INTERFACE({
   package: 'foam.nanos.auth',
   name: 'LifecycleAware',
 
-  properties: [
+  methods: [
     {
-      name: 'lifecycleState',
-      type: 'foam.nanos.auth.LifecycleState'
+      name: 'getLifecycleState',
+      type: 'foam.nanos.auth.LifecycleState',
+    },
+    {
+      name: 'setLifecycleState',
+      args: [
+        {
+          name: 'value',
+          type: 'foam.nanos.auth.LifecycleState',
+        }
+      ]
     }
   ]
 });
