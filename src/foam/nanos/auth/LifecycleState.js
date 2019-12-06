@@ -1,5 +1,5 @@
 foam.ENUM({
-  package: 'foam.nanos.auth.lifecycleAware',
+  package: 'foam.nanos.auth',
   name: 'LifecycleState',
 
   values: [
