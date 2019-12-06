@@ -194,6 +194,13 @@ foam.CLASS({
             .build();
         }
 
+        if ( getLifecycleAware() ) {
+          delegate = new foam.nanos.auth.LifecycleAwareDAO.Builder(getX())
+            .setDelegate(delegate)
+            .setName(getPermissionPrefix())
+            .build();
+        }
+
         if ( getRuler() ) {
           String name = foam.util.SafetyUtil.isEmpty(getRulerDaoKey()) ? getName() : getRulerDaoKey();
           delegate = new foam.nanos.ruler.RulerDAO(getX(), delegate, name);
@@ -545,6 +552,11 @@ foam.CLASS({
       name: 'serviceProviderAware',
       class: 'Boolean',
       javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.auth.ServiceProviderAware.class.isAssignableFrom(getOf().getObjClass());'
+    },
+    {
+      name: 'lifecycleAware',
+      class: 'Boolean',
+      javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.auth.LifecycleAware.class.isAssignableFrom(getOf().getObjClass());'
     },
     {
       name: 'deletedAware',
