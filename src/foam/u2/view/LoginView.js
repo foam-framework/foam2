@@ -43,7 +43,7 @@ foam.CLASS({
   ],
 
   css: `
-  .foam-u2-ActionView {
+  ^.foam-u2-ActionView {
     width: 100%;
   }
 
