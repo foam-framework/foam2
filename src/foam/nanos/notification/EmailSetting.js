@@ -26,9 +26,12 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'mapNotificationArguments',
+      name: 'resolveNotificationArguments',
       type: 'Map',
-      documentation: `Iterate through arguments to replace propertyInfo values with the notified user' values.`,
+      documentation: `
+          Iterate through arguments to replace propertyInfo values with the notified user' values.
+          TODO: Handle nested FObjects passed in as propertyInfo.
+      `,
       args: [
         { name: 'x', type: 'Context' },
         { name: 'arguments', type: 'Map' },
@@ -41,12 +44,12 @@ foam.CLASS({
         while (entries.hasNext()) {
           Map.Entry entry = (Map.Entry) entries.next();
           if ( entry.getValue() instanceof PropertyInfo ) {
-            if ( ! ((PropertyInfo) entry.getValue()).getClassInfo().equals(User.getOwnClassInfo()) ) {
-              logger.error("Cannot set a none User PropertyInfo as an email argument value");
+            if ( ! ((PropertyInfo) entry.getValue()).getClassInfo().getObjClass().isAssignableFrom(user.getClass()) ) {
+              entry.setValue("");
+              logger.error("Cannot set an unrelated PropertyInfo to notified user as an argument value");
               continue;
             }
-            String newValue = (String) ((PropertyInfo) entry.getValue()).get(user);
-            arguments.replace(entry.getKey(), newValue);
+            entry.setValue(((PropertyInfo) entry.getValue()).get(user));
           }
         }
         return arguments;
@@ -62,7 +65,7 @@ foam.CLASS({
             message.setTo(new String[]{user.getEmail()});
 
             if ( notification.getEmailArgs() != null ) {
-              Map<String, Object> emailArgs = mapNotificationArguments(x, notification.getEmailArgs(), user);
+              Map<String, Object> emailArgs = resolveNotificationArguments(x, notification.getEmailArgs(), user);
               notification.setEmailArgs(emailArgs);
             }
 
