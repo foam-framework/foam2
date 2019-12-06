@@ -21,13 +21,13 @@ foam.CLASS({
   css: `
     ^ .sizeCenter {
       max-width: 30vw;
-      margin: 0 auto;
+      margin: 6% auto;
     }
     ^ .center {
       text-align: center;
     }
     ^ .top-bar {
-      background: /*%PRIMARY1%*/ #202341;
+      background: /*%LOGOBACKGROUNDCOLOUR%*/ #202341;
       width: 100%;
       height: 8vh;
       border-bottom: solid 1px #e2e2e3
@@ -39,6 +39,12 @@ foam.CLASS({
       display: block;
       margin: 0 auto;
     }
+
+    ^ .title-top {
+      font-size: 2.5em;
+      padding-top: 2vh;
+      font-weight: bold;
+    }
   `,
 
   requires: [
@@ -49,7 +55,7 @@ foam.CLASS({
   sections: [
     {
       name: 'emailPasswordSection',
-      title: 'Forgot your password',
+      title: '',
       help: `Enter your account email and we will send you an email with a link to create a new one.`
     }
   ],
@@ -66,31 +72,32 @@ foam.CLASS({
   messages: [
     { name: 'INSTRUC_ONE', message: 'Password reset instructions were sent to' },
     { name: 'INSTRUC_TWO', message: 'Please check your inbox to continue.' },
-    { name: 'REDIRECTION', message: 'Remember your password?' },
-    { name: 'REDIRECTION_TO', message: 'Sign in.' },
+    { name: 'REDIRECTION_TO', message: 'Back to Sign in' },
+    { name: 'TITLE', message: 'Forgot your password?' },
     { name: 'ACTION_PRESS', message: 'click' }
   ],
 
   methods: [
     function initE() {
       this.SUPER();
+      let logo = this.theme.largeLogo ? this.theme.largeLogo : this.theme.logo;
       this
         .addClass(this.myClass())
         .startContext({ data: this })
           .start().addClass('top-bar')
             .start('img')
-              .attr('src', this.theme.logo)
+              .attr('src', logo)
             .end()
           .end()
           .start().addClass('sizeCenter')
+            .start('h1').addClass('title-top').add(this.TITLE).end()
             .start(this.SectionView, {
               data: this,
               sectionName: 'emailPasswordSection'
             }).end()
-            .start().addClass('center').br()
+            .start().addClass('center').br().br()
               .start(this.SEND_EMAIL, { size: 'LARGE' }).end()
               .br().br()
-              .start().add(this.REDIRECTION).end()
               .start().addClass('link')
                 .add(this.REDIRECTION_TO)
                 .on(this.ACTION_PRESS, () => {
