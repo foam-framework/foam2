@@ -22,6 +22,14 @@ foam.CLASS({
     'foam.util.SafetyUtil'
   ],
 
+  properties: [
+    {
+      name: 'referencePropertyInfos',
+      class: 'FObjectArray',
+      of: 'foam.core.PropertyInfo',
+    }
+  ],
+
   methods: [
     {
       name: 'put_',
@@ -61,25 +69,34 @@ foam.CLASS({
     {
       name: 'find_',
       javaCode: `
-    FObject found = super.find_(x, id);
-    if ( found != null ) {
+    FObject result = super.find_(x, id);
+
+    if ( ((AuthService) x.get("auth")).check(x, "*") ) {
+      return result;
+    }
+    FObject found = ServiceProviderAwareSupport.findServiceProviderAware(x, getReferencePropertyInfos(), result);
+    if ( found != null &&
+         found instanceof ServiceProviderAware ) {
       ServiceProviderAware sp = (ServiceProviderAware) found;
       User user = (User) x.get("user");
-      if ( User.SYSTEM_USER_ID != user.getId() &&
-           ! user.getSpid().equals(sp.getSpid()) ) {
+      if ( ! user.getSpid().equals(sp.getSpid()) ) {
 System.out.println(this.getClass().getSimpleName() + " find_ " + user.getSpid() +" discard "+sp.getSpid()+" user "+user.getId());
         return null;
       }
     }
-    return found;
+    return result;
       `
     },
     {
       name: 'select_',
       javaCode: `
+    if ( ((AuthService) x.get("auth")).check(x, "*") ) {
+      return super.select_(x, sink, skip, limit, order, predicate);
+    }
+
     ProxySink proxy = (ProxySink) super.select_(
       x,
-      new ServiceProviderAwareSink(x, sink),
+      new ServiceProviderAwareSink(x, sink), // , getReferencePropertyInfo()),
       skip,
       limit,
       order,

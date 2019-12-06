@@ -38,11 +38,12 @@ foam.CLASS({
           .build();
         X y = Auth.sudo(x, user);
 
-        testAll(y);
+        testAware(y);
+        testReference(y);
       `
     },
     {
-      name: 'testAll',
+      name: 'testAware',
       args: [
         { type: 'Context', name: 'x' }
       ],
@@ -85,12 +86,30 @@ foam.CLASS({
         dao = dao.inX(y);
 
         user = (User) dao.find(user.getId());
-        test(user == null, "["+(idx++)+"] ServiceProviderAwareDAO find filters non-matching spid.");
+        test(user != null, "["+(idx++)+"] ServiceProviderAwareDAO find does not filters admin.");
 
         sink = new ArraySink();
         dao.select(sink);
         users = sink.getArray();
-        test (users.size() == 1, "["+(idx++)+"]  ServiceProvicerAwareDAO select filtered on spid. expected: 1, found: "+users.size());
+        test (users.size() == 4, "["+(idx++)+"] ServiceProvicerAwareDAO select does not filter admin. expected: 4, found: "+users.size());
+
+       ctxUser = new User.Builder(x)
+          .setId(99996)
+          .setEmail("test@example.com")
+          .setSpid("fail")
+          .setGroup("test")
+          .build();
+        ctxUser = (User) delegate.put_(y, ctxUser);
+        y = Auth.sudo(y, ctxUser);
+        dao = dao.inX(y);
+
+        user = (User) dao.find(user.getId());
+        test(user == null, "["+(idx++)+"] ServiceProviderAwareDAO find filters on spid.");
+
+        sink = new ArraySink();
+        dao.select(sink);
+        users = sink.getArray();
+        test (users.size() == 1, "["+(idx++)+"] ServiceProvicerAwareDAO select filtered on spid. expected: 1, found: "+users.size());
 
         User user3 = (User) new User.Builder(x)
           .setId(99997)
@@ -107,5 +126,18 @@ foam.CLASS({
 
       `
     },
+    {
+      name: 'testReference',
+      args: [
+        { type: 'Context', name: 'x' }
+      ],
+      javaCode: `
+        User ctxUser = (User) x.get("user");
+        DAO delegate = new MDAO(User.getOwnClassInfo());
+        DAO dao = (DAO) new ServiceProviderAwareDAO.Builder(x).setDelegate(delegate).build();
+//        ctxUser = (User) delegate.put_(x, ctxUser);
+        int idx = 0;
+     `
+    }
   ]
 });
