@@ -46,13 +46,17 @@ foam.CLASS({
         groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("test").setTargetId("spid.read.test").build());
         groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("fail").setTargetId("spid.read.fail").build());
 
-      User user = new User.Builder(x)
+        foam.nanos.app.AppConfig appConfig = (foam.nanos.app.AppConfig) x.get("appConfig");
+        appConfig.setDefaultSpid("test");
+        X y = x.put("appConfig", appConfig);
+
+        User user = new User.Builder(x)
           .setId(99995)
           .setEmail("test@example.com")
           .setSpid("test")
           .setGroup("admin")
           .build();
-        X y = Auth.sudo(x, user);
+        y = Auth.sudo(y, user);
 
         testAware(y);
         testReference(y);

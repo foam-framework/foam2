@@ -72,13 +72,9 @@ foam.CLASS({
       javaCode: `
         // turn off logging to get rid of clutter.
         LogLevelFilterLogger loggerFilter = (LogLevelFilterLogger) x.get("logger");
-        loggerFilter.setLogInfo(false);
         loggerFilter.setLogDebug(false);
+        loggerFilter.setLogInfo(false);
         loggerFilter.setLogWarning(false);
-
-        AppConfig appConfig = (AppConfig) x.get("appConfig");
-        appConfig.setDefaultSpid("test");
-        x = x.put("appConfig", appConfig);
 
         DAO testDAO = (DAO) x.get("testDAO");
         ArraySink tests = (ArraySink) testDAO.select(new ArraySink());
