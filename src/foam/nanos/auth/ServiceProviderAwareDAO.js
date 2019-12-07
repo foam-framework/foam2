@@ -27,6 +27,7 @@ foam.CLASS({
       name: 'referencePropertyInfos',
       class: 'FObjectArray',
       of: 'foam.core.PropertyInfo',
+      javaFactory: 'return new foam.core.PropertyInfo[0];'
     }
   ],
 
@@ -74,15 +75,15 @@ foam.CLASS({
     if ( ((AuthService) x.get("auth")).check(x, "*") ) {
       return result;
     }
-    FObject found = ServiceProviderAwareSupport.findServiceProviderAware(x, getReferencePropertyInfos(), result);
-    if ( found != null &&
-         found instanceof ServiceProviderAware ) {
-      ServiceProviderAware sp = (ServiceProviderAware) found;
-      User user = (User) x.get("user");
-      if ( ! user.getSpid().equals(sp.getSpid()) ) {
-System.out.println(this.getClass().getSimpleName() + " find_ " + user.getSpid() +" discard "+sp.getSpid()+" user "+user.getId());
+    try {
+      ServiceProviderAware sp = ServiceProviderAwareSupport.findServiceProviderAware(x, getReferencePropertyInfos(), result);
+      if ( sp == null ||
+        ! sp.getSpid().equals(((User) x.get("user")).getSpid()) ) {
         return null;
       }
+    } catch (foam.nanos.auth.AuthorizationException e) {
+     ((foam.nanos.logger.Logger) x.get("logger")).debug(this.getClass().getSimpleName(), "find discard on AuthorizationException", e.getMessage());
+      return null;
     }
     return result;
       `
@@ -96,7 +97,7 @@ System.out.println(this.getClass().getSimpleName() + " find_ " + user.getSpid() 
 
     ProxySink proxy = (ProxySink) super.select_(
       x,
-      new ServiceProviderAwareSink(x, sink), // , getReferencePropertyInfo()),
+      new ServiceProviderAwareSink(x, sink, getReferencePropertyInfos()),
       skip,
       limit,
       order,

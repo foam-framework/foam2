@@ -11,20 +11,13 @@ foam.CLASS({
 
   documentation: 'Sink which discard non-matching spids.',
 
-  constants: [
-    {
-      name: 'SYSTEM_SPID',
-      value: '*',
-      type: 'String'
-    }
-  ],
-
   properties: [
     {
-      name: 'spid',
-      class: 'String',
-      value: 'nanos'
-    },
+      name: 'referencePropertyInfos',
+      class: 'FObjectArray',
+      of: 'foam.core.PropertyInfo',
+      javaFactory: 'return new foam.core.PropertyInfo[0];'
+    }
   ],
 
   axioms: [
@@ -34,14 +27,13 @@ foam.CLASS({
         cls.extras.push(foam.java.Code.create({
           data: `
   public ServiceProviderAwareSink(foam.core.X x, foam.dao.Sink delegate) {
+    this(x, delegate, new foam.core.PropertyInfo[0]);
+  }
+
+  public ServiceProviderAwareSink(foam.core.X x, foam.dao.Sink delegate, foam.core.PropertyInfo[] propertyInfos) {
     setX(x);
     setDelegate(delegate);
-    User user = (User) x.get("user");
-    if ( user.getId() == User.SYSTEM_USER_ID ) {
-      setSpid(SYSTEM_SPID);
-    } else {
-      setSpid(user.getSpid());
-    }
+    setReferencePropertyInfos(propertyInfos);
   }
           `
         }));
@@ -49,18 +41,18 @@ foam.CLASS({
     }
   ],
 
-
   methods: [
     {
       name: 'put',
       javaCode: `
-    if ( obj instanceof ServiceProviderAware ) {
-      ServiceProviderAware sp = (ServiceProviderAware) obj;
-      if ( foam.util.SafetyUtil.isEmpty(sp.getSpid()) ||
-           ! sp.getSpid().equals(getSpid()) &&
-           ! SYSTEM_SPID.equals(getSpid()) ) {
+    try {
+      ServiceProviderAware sp = ServiceProviderAwareSupport.findServiceProviderAware(getX(), getReferencePropertyInfos(), obj);
+      if ( sp == null ||
+        ! sp.getSpid().equals(((User) getX().get("user")).getSpid()) ) {
         return;
       }
+    } catch (foam.nanos.auth.AuthorizationException e) {
+      return;
     }
     getDelegate().put(obj, sub);
       `
@@ -68,13 +60,14 @@ foam.CLASS({
     {
       name: 'remove',
       javaCode: `
-    if ( obj instanceof ServiceProviderAware ) {
-      ServiceProviderAware sp = (ServiceProviderAware) obj;
-      if ( foam.util.SafetyUtil.isEmpty(sp.getSpid()) ||
-           ! sp.getSpid().equals(getSpid()) &&
-           ! SYSTEM_SPID.equals(getSpid()) ) {
-       return;
+    try {
+      ServiceProviderAware sp = ServiceProviderAwareSupport.findServiceProviderAware(getX(), getReferencePropertyInfos(), obj);
+      if ( sp == null ||
+        ! sp.getSpid().equals(((User) getX().get("user")).getSpid()) ) {
+        return;
       }
+    } catch (foam.nanos.auth.AuthorizationException e) {
+      return;
     }
     getDelegate().remove(obj, sub);
       `
