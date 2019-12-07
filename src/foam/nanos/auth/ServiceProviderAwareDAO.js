@@ -75,16 +75,13 @@ foam.CLASS({
     if ( ((AuthService) x.get("auth")).check(x, "*") ) {
       return result;
     }
-    try {
-      ServiceProviderAware sp = ServiceProviderAwareSupport.findServiceProviderAware(x, getReferencePropertyInfos(), result);
-      if ( sp == null ||
-        ! sp.getSpid().equals(((User) x.get("user")).getSpid()) ) {
-        return null;
-      }
-    } catch (foam.nanos.auth.AuthorizationException e) {
-     ((foam.nanos.logger.Logger) x.get("logger")).debug(this.getClass().getSimpleName(), "find discard on AuthorizationException", e.getMessage());
+
+    ServiceProviderAware sp = ServiceProviderAwareSupport.findServiceProviderAware(x, getReferencePropertyInfos(), result);
+    if ( sp == null ||
+      ! sp.getSpid().equals(((User) x.get("user")).getSpid()) ) {
       return null;
     }
+
     return result;
       `
     },
@@ -103,6 +100,7 @@ foam.CLASS({
       order,
       predicate
    );
+
     return proxy.getDelegate();
       `
     }

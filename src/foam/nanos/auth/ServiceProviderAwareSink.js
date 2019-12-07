@@ -45,13 +45,9 @@ foam.CLASS({
     {
       name: 'put',
       javaCode: `
-    try {
-      ServiceProviderAware sp = ServiceProviderAwareSupport.findServiceProviderAware(getX(), getReferencePropertyInfos(), obj);
-      if ( sp == null ||
-        ! sp.getSpid().equals(((User) getX().get("user")).getSpid()) ) {
-        return;
-      }
-    } catch (foam.nanos.auth.AuthorizationException e) {
+    ServiceProviderAware sp = ServiceProviderAwareSupport.findServiceProviderAware(getX(), getReferencePropertyInfos(), obj);
+    if ( sp == null ||
+      ! sp.getSpid().equals(((User) getX().get("user")).getSpid()) ) {
       return;
     }
     getDelegate().put(obj, sub);
@@ -60,13 +56,9 @@ foam.CLASS({
     {
       name: 'remove',
       javaCode: `
-    try {
-      ServiceProviderAware sp = ServiceProviderAwareSupport.findServiceProviderAware(getX(), getReferencePropertyInfos(), obj);
-      if ( sp == null ||
-        ! sp.getSpid().equals(((User) getX().get("user")).getSpid()) ) {
-        return;
-      }
-    } catch (foam.nanos.auth.AuthorizationException e) {
+    ServiceProviderAware sp = ServiceProviderAwareSupport.findServiceProviderAware(getX(), getReferencePropertyInfos(), obj);
+    if ( sp == null ||
+      ! sp.getSpid().equals(((User) getX().get("user")).getSpid()) ) {
       return;
     }
     getDelegate().remove(obj, sub);

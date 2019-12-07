@@ -29,7 +29,6 @@ foam.CLASS({
         }
       ],
       type: 'foam.nanos.auth.ServiceProviderAware',
-      throws: ['foam.nanos.auth.AuthorizationException'],
       javaCode: `
       Object result = obj;
       if ( result == null ||
@@ -37,6 +36,7 @@ foam.CLASS({
            result instanceof ServiceProviderAware ) {
         return (ServiceProviderAware) result;
       }
+
       for ( int i = 0; i < properties.length; i++) {
         foam.core.PropertyInfo pInfo = properties[i];
         String methodName = "find" + pInfo.getName().substring(0,1).toUpperCase() + pInfo.getName().substring(1);
@@ -50,13 +50,15 @@ foam.CLASS({
           }
           if ( cause != null &&
                cause instanceof foam.nanos.auth.AuthorizationException ) {
-            throw (foam.nanos.auth.AuthorizationException) cause;
+            ((foam.nanos.logger.Logger) x.get("logger")).debug("ServiceProviderAwareSupport", "AuthorizationException", methodName, "on", result.getClass().getSimpleName(), e.getMessage(), e);
+            return null;
           } else {
             ((foam.nanos.logger.Logger) x.get("logger")).error("ServiceProviderAwareSupport", "Failed to reflect/invoke method", methodName, "on", result.getClass().getSimpleName(), e.getMessage(), e);
           }
           break;
         }
       }
+
       if ( result != null &&
            result instanceof ServiceProviderAware ) {
         return (ServiceProviderAware) result;
