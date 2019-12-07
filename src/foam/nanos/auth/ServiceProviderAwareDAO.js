@@ -76,7 +76,7 @@ foam.CLASS({
       return result;
     }
 
-    ServiceProviderAware sp = ServiceProviderAwareSupport.findServiceProviderAware(x, getReferencePropertyInfos(), result);
+    ServiceProviderAware sp = new ServiceProviderAwareSupport().find(x, getReferencePropertyInfos(), result);
     if ( sp == null ||
       ! sp.getSpid().equals(((User) x.get("user")).getSpid()) ) {
       return null;

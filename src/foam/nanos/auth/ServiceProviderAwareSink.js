@@ -17,6 +17,14 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'foam.core.PropertyInfo',
       javaFactory: 'return new foam.core.PropertyInfo[0];'
+    },
+    {
+      name: 'support',
+      class: 'Object',
+      of: 'foam.nanos.auth.ServiceProviderAwareSupport',
+      visibility: 'HIDDEN',
+      javaType: 'foam.nanos.auth.ServiceProviderAwareSupport',
+      javaFactory: 'return new ServiceProviderAwareSupport();'
     }
   ],
 
@@ -45,7 +53,7 @@ foam.CLASS({
     {
       name: 'put',
       javaCode: `
-    ServiceProviderAware sp = ServiceProviderAwareSupport.findServiceProviderAware(getX(), getReferencePropertyInfos(), obj);
+    ServiceProviderAware sp = getSupport().find(getX(), getReferencePropertyInfos(), obj);
     if ( sp == null ||
       ! sp.getSpid().equals(((User) getX().get("user")).getSpid()) ) {
       return;
@@ -56,7 +64,7 @@ foam.CLASS({
     {
       name: 'remove',
       javaCode: `
-    ServiceProviderAware sp = ServiceProviderAwareSupport.findServiceProviderAware(getX(), getReferencePropertyInfos(), obj);
+    ServiceProviderAware sp = getSupport().find(getX(), getReferencePropertyInfos(), obj);
     if ( sp == null ||
       ! sp.getSpid().equals(((User) getX().get("user")).getSpid()) ) {
       return;
