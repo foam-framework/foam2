@@ -74,6 +74,7 @@ foam.CLASS({
         loggerFilter.setLogInfo(false);
         loggerFilter.setLogDebug(false);
         loggerFilter.setLogWarning(false);
+        loggerFilter.setLogTest(true);
 
         DAO testDAO = (DAO) x.get("testDAO");
         ArraySink tests = (ArraySink) testDAO.select(new ArraySink());
