@@ -40,6 +40,12 @@ foam.INTERFACE({
       documentation: 'Log at debug log level.',
       type: 'Void',
       args: [ { name: 'args', javaType: 'Object...' } ]
+    },
+    {
+      name: 'test',
+      documentation: 'Log at test log level.',
+      type: 'Void',
+      args: [ { name: 'args', javaType: 'Object...' } ]
     }
   ]
 });

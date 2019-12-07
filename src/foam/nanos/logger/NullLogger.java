@@ -25,4 +25,6 @@ public class NullLogger
   public void error(Object... args) { }
 
   public void debug(Object...  args) { }
+
+  public void test(Object...  args) { }
 }

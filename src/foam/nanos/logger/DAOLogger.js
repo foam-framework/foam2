@@ -138,6 +138,17 @@ getDao().put_(getX().put("logger", (Logger) getLogger()), lm);
       javaCode: 'submit(LogLevel.DEBUG, combine(args));'
     },
     {
+      name: 'test',
+      type: 'Void',
+      args: [
+        {
+          name: 'args',
+          javaType: 'Object...'
+        }
+      ],
+      javaCode: 'submit(LogLevel.TEST, combine(args));'
+    },
+    {
       name: 'toString',
       type: 'String',
       javaCode: 'return this.getClass().getSimpleName();'

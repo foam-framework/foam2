@@ -42,6 +42,10 @@ public class PrefixLogger
     getDelegate().error(prefix(args));
   }
 
+  public void test(Object...  args) {
+    getDelegate().test(prefix(args));
+  }
+
   public void debug(Object...  args) {
     getDelegate().debug(prefix(args));
   }

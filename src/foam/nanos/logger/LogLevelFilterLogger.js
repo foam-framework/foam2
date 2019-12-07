@@ -29,6 +29,11 @@ foam.CLASS({
       name: 'logDebug',
       class: 'Boolean',
       value: true
+    },
+    {
+      name: 'logTest',
+      class: 'Boolean',
+      value: false
     }
   ],
 
@@ -76,6 +81,17 @@ foam.CLASS({
         }
       ],
       javaCode: "if ( getLogDebug() ) getDelegate().debug(args);"
+    },
+    {
+      name: 'test',
+      type: 'Void',
+      args: [
+        {
+          name: 'args',
+          javaType: 'Object...'
+        }
+      ],
+      javaCode: "if ( getLogTest() ) getDelegate().test(args);"
     }
   ]
 });

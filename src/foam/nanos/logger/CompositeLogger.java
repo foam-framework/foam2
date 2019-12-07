@@ -57,6 +57,12 @@ public class CompositeLogger
     }
   }
 
+  public void test(Object... args) {
+    for ( Logger logger : childLoggers ) {
+      logger.test(args);
+    }
+  }
+
   public void debug(Object...  args) {
     for ( Logger logger : childLoggers ) {
       logger.debug(args);

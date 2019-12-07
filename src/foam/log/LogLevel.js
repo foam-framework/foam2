@@ -62,6 +62,13 @@ foam.ENUM({
       label: 'Error',
       color: 'red',
       consoleMethodName: 'error'
+    },
+    {
+      name: 'TEST',
+      shortName: 'TEST',
+      label: 'Test',
+      color: 'blue',
+      consoleMethodName: 'test'
     }
   ]
 });

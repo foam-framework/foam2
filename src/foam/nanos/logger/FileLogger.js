@@ -115,6 +115,16 @@ try {
       javaCode: "getLogger().severe(combine(args));"
     },
     {
+      name: 'test',
+      args: [
+        {
+          name: 'args',
+          javaType: 'Object...'
+        }
+      ],
+      javaCode: "getLogger().finer(combine(args));"
+    },
+    {
       name: 'debug',
       documentation: "Can't normally do .debug() with custom formatter: use fine instead.",
       args: [
