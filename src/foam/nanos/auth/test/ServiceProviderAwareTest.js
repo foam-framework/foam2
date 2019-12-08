@@ -10,6 +10,7 @@ foam.CLASS({
   extends: 'foam.nanos.test.Test',
 
   javaImports: [
+    'foam.core.PropertyInfo',
     'foam.core.X',
     'foam.core.FObject',
     'foam.dao.ArraySink',
@@ -27,8 +28,10 @@ foam.CLASS({
     'foam.nanos.auth.ServiceProviderAwareSink',
     'foam.nanos.auth.GroupPermissionJunction',
     'foam.nanos.notification.NotificationSetting',
+    'java.util.HashMap',
     'java.util.List',
-    'javax.security.auth.AuthPermission',
+    'java.util.Map',
+    'javax.security.auth.AuthPermission'
   ],
 
   methods: [
@@ -181,13 +184,13 @@ foam.CLASS({
                            .build();
         DAO dao = (DAO) new ServiceProviderAwareDAO.Builder(x)
                             .setDelegate(delegate)
-                            .setReferencePropertyInfos(
-                              new foam.core.PropertyInfo[] {
-                                NotificationSetting.OWNER
-                              }
+                            .setPropertyInfos(
+                              new HashMap<String, PropertyInfo[]>() {{
+                                put(NotificationSetting.class.getName(), new PropertyInfo[] { NotificationSetting.OWNER });
+                              }}
                             )
                             .build();
-
+//Collections.singletonMap("username1", "password1")
         DAO userDAO = (DAO) x.get("localUserDAO");
         User user1 = new User.Builder(x)
           .setId(89996)

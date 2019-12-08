@@ -11,9 +11,10 @@ foam.CLASS({
   documentation: 'Support methods for ServiceProviderAware DAOs and Sinks.',
 
   // TODO: ServiceProviderAwareMLang(property) performs EQ on getSpid on both objs.
-  // or add to generation where 'findFoo' is available.  then can just add property list,
+  // and add to generation where 'findFoo' is available to avoid reflection.,
 
   javaImports: [
+    'foam.core.PropertyInfo',
     'foam.core.X',
     'foam.nanos.logger.Logger',
     'java.util.HashMap',
@@ -31,8 +32,9 @@ foam.CLASS({
 
   methods: [
     {
-      documentation: 'Using Relationship findFoo(x), traverse relationships for ServiceProviderAware entity.',
-      name: 'find',
+      documentation: `Using Relationship findFoo(x), traverse relationships,
+returning true if the context users spid matches the object owner.`,
+      name: 'match',
       args: [
         {
           name: 'x',
@@ -40,37 +42,41 @@ foam.CLASS({
         },
         {
           name: 'properties',
-          type: 'foam.core.PropertyInfo[]'
+          type: 'Map'
         },
         {
           name: 'obj',
           type: 'Object'
         }
       ],
-      type: 'foam.nanos.auth.ServiceProviderAware',
+      type: 'Boolean',
       javaCode: `
-      Object result = obj;
-      if ( result == null ||
-           result != null &&
-           result instanceof ServiceProviderAware ) {
-        return (ServiceProviderAware) result;
+      User user = (User) x.get("user");
+      if ( obj instanceof ServiceProviderAware ) {
+        return ((ServiceProviderAware) obj).getSpid().equals(user.getSpid());
       }
 
-      for ( int i = 0; i < properties.length; i++) {
-        foam.core.PropertyInfo pInfo = properties[i];
-        try {
-          java.lang.reflect.Method method = getFindMethod(x, pInfo.getName(), result);
-          result = invokeMethod(x, method, result);
-        } catch (Throwable e) {
-          break;
+      Object result = obj;
+      while ( result != null ) {
+        PropertyInfo pInfos[] = (PropertyInfo[]) properties.get(result.getClass().getName());
+        if ( pInfos == null ) {
+          return false;
+        }
+        for ( int i = 0; i < pInfos.length; i++) {
+          foam.core.PropertyInfo pInfo = pInfos[i];
+          try {
+            java.lang.reflect.Method method = getFindMethod(x, pInfo.getName(), result);
+            result = invokeMethod(x, method, result);
+            if ( result != null &&
+                 result instanceof ServiceProviderAware ) {
+              return ((ServiceProviderAware) result).getSpid().equals(user.getSpid());
+            }
+          } catch (Throwable e) {
+            return false;
+          }
         }
       }
-
-      if ( result != null &&
-           result instanceof ServiceProviderAware ) {
-        return (ServiceProviderAware) result;
-      }
-      return null;
+      return false;
       `
     },
     {

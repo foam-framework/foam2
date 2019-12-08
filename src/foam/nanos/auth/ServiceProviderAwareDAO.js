@@ -9,25 +9,29 @@ foam.CLASS({
   name: 'ServiceProviderAwareDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  documentation: 'Enforce Spid to that of context user or AppConfig default.',
+  documentation: `Enforce Spid to that of context user or AppConfig default on put,
+and filter by spid on find and select`,
 
   javaImports: [
     'foam.core.FObject',
+    'foam.core.PropertyInfo',
+    'foam.core.X',
     'foam.dao.ProxySink',
     'foam.dao.Sink',
     'foam.nanos.app.AppConfig',
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.User',
     'foam.nanos.logger.Logger',
-    'foam.util.SafetyUtil'
+    'foam.util.SafetyUtil',
+    'java.util.Map',
+    'java.util.HashMap'
   ],
 
   properties: [
     {
-      name: 'referencePropertyInfos',
-      class: 'FObjectArray',
-      of: 'foam.core.PropertyInfo',
-      javaFactory: 'return new foam.core.PropertyInfo[0];'
+      name: 'propertyInfos',
+      class: 'Map',
+      javaFactory: 'return new java.util.HashMap<String, PropertyInfo[]>();'
     }
   ],
 
@@ -76,13 +80,11 @@ foam.CLASS({
       return result;
     }
 
-    ServiceProviderAware sp = new ServiceProviderAwareSupport().find(x, getReferencePropertyInfos(), result);
-    if ( sp == null ||
-      ! sp.getSpid().equals(((User) x.get("user")).getSpid()) ) {
-      return null;
+    if ( new ServiceProviderAwareSupport().match(x, getPropertyInfos(), result) ) {
+      return result;
     }
 
-    return result;
+    return null;
       `
     },
     {
@@ -94,12 +96,12 @@ foam.CLASS({
 
     ProxySink proxy = (ProxySink) super.select_(
       x,
-      new ServiceProviderAwareSink(x, sink, getReferencePropertyInfos()),
+      new ServiceProviderAwareSink(x, sink, getPropertyInfos()),
       skip,
       limit,
       order,
       predicate
-   );
+    );
 
     return proxy.getDelegate();
       `

@@ -11,12 +11,19 @@ foam.CLASS({
 
   documentation: 'Sink which discard non-matching spids.',
 
+  javaImports: [
+    'foam.core.PropertyInfo',
+    'foam.core.X',
+    'foam.dao.Sink',
+    'java.util.Map',
+    'java.util.HashMap'
+  ],
+  
   properties: [
     {
-      name: 'referencePropertyInfos',
-      class: 'FObjectArray',
-      of: 'foam.core.PropertyInfo',
-      javaFactory: 'return new foam.core.PropertyInfo[0];'
+      name: 'propertyInfos',
+      class: 'Map',
+      javaFactory: 'return new java.util.HashMap<String, PropertyInfo[]>();'
     },
     {
       name: 'support',
@@ -34,14 +41,10 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-  public ServiceProviderAwareSink(foam.core.X x, foam.dao.Sink delegate) {
-    this(x, delegate, new foam.core.PropertyInfo[0]);
-  }
-
-  public ServiceProviderAwareSink(foam.core.X x, foam.dao.Sink delegate, foam.core.PropertyInfo[] propertyInfos) {
+  public ServiceProviderAwareSink(X x, Sink delegate, Map<String, PropertyInfo[]> propertyInfos) {
     setX(x);
     setDelegate(delegate);
-    setReferencePropertyInfos(propertyInfos);
+    setPropertyInfos(propertyInfos);
   }
           `
         }));
@@ -53,23 +56,17 @@ foam.CLASS({
     {
       name: 'put',
       javaCode: `
-    ServiceProviderAware sp = getSupport().find(getX(), getReferencePropertyInfos(), obj);
-    if ( sp == null ||
-      ! sp.getSpid().equals(((User) getX().get("user")).getSpid()) ) {
-      return;
+    if ( getSupport().match(getX(), getPropertyInfos(), obj) ) {
+      getDelegate().put(obj, sub);
     }
-    getDelegate().put(obj, sub);
       `
     },
     {
       name: 'remove',
       javaCode: `
-    ServiceProviderAware sp = getSupport().find(getX(), getReferencePropertyInfos(), obj);
-    if ( sp == null ||
-      ! sp.getSpid().equals(((User) getX().get("user")).getSpid()) ) {
-      return;
+    if ( getSupport().match(getX(), getPropertyInfos(), obj) ) {
+      getDelegate().remove(obj, sub);
     }
-    getDelegate().remove(obj, sub);
       `
     }
   ]
