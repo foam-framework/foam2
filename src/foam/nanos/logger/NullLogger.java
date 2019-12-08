@@ -16,6 +16,10 @@ public class NullLogger
 
   private NullLogger() {}
 
+  public void test(Object...  args) { }
+
+  public void debug(Object...  args) { }
+
   public void log(Object... args) { }
 
   public void info(Object... args) { }
@@ -23,8 +27,4 @@ public class NullLogger
   public void warning(Object... args) { }
 
   public void error(Object... args) { }
-
-  public void debug(Object...  args) { }
-
-  public void test(Object...  args) { }
 }

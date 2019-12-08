@@ -26,6 +26,14 @@ public class PrefixLogger
     return ret;
   }
 
+  public void test(Object...  args) {
+    getDelegate().test(prefix(args));
+  }
+
+  public void debug(Object...  args) {
+    getDelegate().debug(prefix(args));
+  }
+
   public void log(Object... args) {
     getDelegate().log(prefix(args));
   }
@@ -40,13 +48,5 @@ public class PrefixLogger
 
   public void error(Object... args) {
     getDelegate().error(prefix(args));
-  }
-
-  public void test(Object...  args) {
-    getDelegate().test(prefix(args));
-  }
-
-  public void debug(Object...  args) {
-    getDelegate().debug(prefix(args));
   }
 }

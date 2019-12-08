@@ -26,6 +26,7 @@ foam.CLASS({
   requires: [ 'foam.log.LogLevel' ],
 
   imports: [
+    'testing as testing_',
     'debug as debug_',
     'log as log_',
     'info as info_',
@@ -34,6 +35,7 @@ foam.CLASS({
   ],
 
   exports: [
+    'testing',
     'debug',
     'log',
     'info',
@@ -42,6 +44,11 @@ foam.CLASS({
   ],
 
   properties: [
+    {
+      class: 'Function',
+      name: 'test',
+      factory: function() { return this.put.bind(this, this.LogLevel.TEST); }
+    },
     {
       class: 'Function',
       name: 'debug',

@@ -11,12 +11,12 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'logError',
+      name: 'logTest',
       class: 'Boolean',
-      value: true
+      value: false
     },
     {
-      name: 'logWarning',
+      name: 'logDebug',
       class: 'Boolean',
       value: true
     },
@@ -26,14 +26,14 @@ foam.CLASS({
       value: true
     },
     {
-      name: 'logDebug',
+      name: 'logWarning',
       class: 'Boolean',
       value: true
     },
     {
-      name: 'logTest',
+      name: 'logError',
       class: 'Boolean',
-      value: false
+      value: true
     }
   ],
 

@@ -33,6 +33,18 @@ public class CompositeLogger
     childLoggers.remove(logger);
   }
 
+  public void test(Object... args) {
+    for ( Logger logger : childLoggers ) {
+      logger.test(args);
+    }
+  }
+
+  public void debug(Object...  args) {
+    for ( Logger logger : childLoggers ) {
+      logger.debug(args);
+    }
+  }
+
   public void log(Object... args) {
     for ( Logger logger : childLoggers ) {
       logger.log(args);
@@ -54,18 +66,6 @@ public class CompositeLogger
   public void error(Object... args) {
     for ( Logger logger : childLoggers ) {
       logger.error(args);
-    }
-  }
-
-  public void test(Object... args) {
-    for ( Logger logger : childLoggers ) {
-      logger.test(args);
-    }
-  }
-
-  public void debug(Object...  args) {
-    for ( Logger logger : childLoggers ) {
-      logger.debug(args);
     }
   }
 

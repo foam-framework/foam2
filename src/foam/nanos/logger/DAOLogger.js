@@ -83,6 +83,28 @@ getDao().put_(getX().put("logger", (Logger) getLogger()), lm);
 `
     },
     {
+      name: 'test',
+      type: 'Void',
+      args: [
+        {
+          name: 'args',
+          javaType: 'Object...'
+        }
+      ],
+      javaCode: 'submit(LogLevel.TEST, combine(args));'
+    },
+    {
+      name: 'debug',
+      type: 'Void',
+      args: [
+        {
+          name: 'args',
+          javaType: 'Object...'
+        }
+      ],
+      javaCode: 'submit(LogLevel.DEBUG, combine(args));'
+    },
+    {
       name: 'log',
       type: 'Void',
       args: [
@@ -125,28 +147,6 @@ getDao().put_(getX().put("logger", (Logger) getLogger()), lm);
         }
       ],
       javaCode: 'submit(LogLevel.ERROR, combine(args));'
-    },
-    {
-      name: 'debug',
-      type: 'Void',
-      args: [
-        {
-          name: 'args',
-          javaType: 'Object...'
-        }
-      ],
-      javaCode: 'submit(LogLevel.DEBUG, combine(args));'
-    },
-    {
-      name: 'test',
-      type: 'Void',
-      args: [
-        {
-          name: 'args',
-          javaType: 'Object...'
-        }
-      ],
-      javaCode: 'submit(LogLevel.TEST, combine(args));'
     },
     {
       name: 'toString',

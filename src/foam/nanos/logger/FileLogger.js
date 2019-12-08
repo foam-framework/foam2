@@ -75,6 +75,27 @@ try {
   return str.toString();`
     },
     {
+      name: 'test',
+      args: [
+        {
+          name: 'args',
+          javaType: 'Object...'
+        }
+      ],
+      javaCode: 'getLogger().finer(combine(args));'
+    },
+    {
+      name: 'debug',
+      documentation: 'Cannot normally do .debug() with custom formatter: use fine instead.',
+      args: [
+        {
+          name: 'args',
+          javaType: 'Object...'
+        }
+      ],
+      javaCode: 'getLogger().fine(combine(args));'
+    },
+    {
       name: 'log',
       args: [
         {
@@ -82,7 +103,7 @@ try {
           javaType: 'Object...'
         }
       ],
-      javaCode: "getLogger().info(combine(args));"
+      javaCode: 'getLogger().info(combine(args));'
     },
     {
       name: 'info',
@@ -92,7 +113,7 @@ try {
           javaType: 'Object...'
         }
       ],
-      javaCode: "getLogger().info(combine(args));"
+      javaCode: 'getLogger().info(combine(args));'
     },
     {
       name: 'warning',
@@ -102,7 +123,7 @@ try {
           javaType: 'Object...'
         }
       ],
-      javaCode: "getLogger().warning(combine(args));"
+      javaCode: 'getLogger().warning(combine(args));'
     },
     {
       name: 'error',
@@ -112,33 +133,12 @@ try {
           javaType: 'Object...'
         }
       ],
-      javaCode: "getLogger().severe(combine(args));"
-    },
-    {
-      name: 'test',
-      args: [
-        {
-          name: 'args',
-          javaType: 'Object...'
-        }
-      ],
-      javaCode: "getLogger().finer(combine(args));"
-    },
-    {
-      name: 'debug',
-      documentation: "Can't normally do .debug() with custom formatter: use fine instead.",
-      args: [
-        {
-          name: 'args',
-          javaType: 'Object...'
-        }
-      ],
-      javaCode: "getLogger().fine(combine(args));"
+      javaCode: 'getLogger().severe(combine(args));'
     },
     {
       name: 'toString',
       type: 'String',
-      javaCode: "return this.getClass().getSimpleName();"
+      javaCode: 'return this.getClass().getSimpleName();'
     }
   ],
 

@@ -56,6 +56,15 @@ public class StdoutLogger
     }
   }
 
+  public void test(Object... args) {
+    logger_.finer(combine(args));
+  }
+
+  // can't normally do .debug() with custom formatter: use fine instead
+  public void debug(Object...  args) {
+    logger_.fine(combine(args));
+  }
+
   public void log(Object... args) {
     logger_.info(combine(args));
   }
@@ -70,14 +79,5 @@ public class StdoutLogger
 
   public void error(Object... args) {
     logger_.severe(combine(args));
-  }
-
-  public void test(Object... args) {
-    logger_.finer(combine(args));
-  }
-
-  // can't normally do .debug() with custom formatter: use fine instead
-  public void debug(Object...  args) {
-    logger_.fine(combine(args));
   }
 }

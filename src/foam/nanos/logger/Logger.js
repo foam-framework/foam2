@@ -10,6 +10,18 @@ foam.INTERFACE({
 
   methods: [
     {
+      name: 'test',
+      documentation: 'Log at test log level.',
+      type: 'Void',
+      args: [ { name: 'args', javaType: 'Object...' } ]
+    },
+    {
+      name: 'debug',
+      documentation: 'Log at debug log level.',
+      type: 'Void',
+      args: [ { name: 'args', javaType: 'Object...' } ]
+    },
+    {
       name: 'log',
       documentation: 'Synonym for info.',
       type: 'Void',
@@ -32,18 +44,6 @@ foam.INTERFACE({
     {
       name: 'error',
       documentation: 'Log at error log level.',
-      type: 'Void',
-      args: [ { name: 'args', javaType: 'Object...' } ]
-    },
-    {
-      name: 'debug',
-      documentation: 'Log at debug log level.',
-      type: 'Void',
-      args: [ { name: 'args', javaType: 'Object...' } ]
-    },
-    {
-      name: 'test',
-      documentation: 'Log at test log level.',
       type: 'Void',
       args: [ { name: 'args', javaType: 'Object...' } ]
     }
