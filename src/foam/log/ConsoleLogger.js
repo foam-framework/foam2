@@ -26,7 +26,7 @@ foam.CLASS({
   requires: [ 'foam.log.LogLevel' ],
 
   imports: [
-    'testing as testing_',
+    'test as test_',
     'debug as debug_',
     'log as log_',
     'info as info_',
@@ -35,7 +35,7 @@ foam.CLASS({
   ],
 
   exports: [
-    'testing',
+    'test',
     'debug',
     'log',
     'info',
