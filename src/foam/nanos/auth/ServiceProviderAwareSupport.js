@@ -70,7 +70,6 @@ returning true if the context users spid matches the current object.`,
 
       if ( obj != null &&
            obj instanceof ServiceProviderAware ) {
-        System.out.println("ServiceProvicerAwareSupport.match obj.spid: "+ ((ServiceProviderAware) obj).getSpid()+" user.spid: "+user.getSpid());
         return ((ServiceProviderAware) obj).getSpid().equals(user.getSpid());
       }
 
