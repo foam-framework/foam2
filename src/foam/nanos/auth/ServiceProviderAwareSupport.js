@@ -44,7 +44,7 @@ Use: see ServiceProviderAwareTest
   methods: [
     {
       documentation: `Using Relationship findFoo(x), traverse relationships,
-returning true if the context users spid matches the object owner.`,
+returning true if the context users spid matches the current object.`,
       name: 'match',
       args: [
         {
@@ -64,7 +64,7 @@ returning true if the context users spid matches the object owner.`,
       javaCode: `
       User user = (User) x.get("user");
       if ( user == null ) {
-        // occurs during login.
+        // TODO/REVIEW: occurs during login. See AuthenticationApiTest
         return true;
       }
 
