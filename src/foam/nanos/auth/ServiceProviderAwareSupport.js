@@ -8,7 +8,18 @@ foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'ServiceProviderAwareSupport',
 
-  documentation: 'Support methods for ServiceProviderAware DAOs and Sinks.',
+  documentation: `Support methods for ServiceProviderAware DAOs and Sinks.
+Use: see ServiceProviderAwareTest
+        DAO dao = (DAO) new ServiceProviderAwareDAO.Builder(x)
+                            .setDelegate(delegate)
+                            .setPropertyInfos(
+                              new HashMap<String, PropertyInfo[]>() {{
+                                put(NotificationSetting.class.getName(), new PropertyInfo[] { NotificationSetting.OWNER });
+                              }}
+                            )
+                            .build();
+
+`,
 
   // TODO: ServiceProviderAwareMLang(property) performs EQ on getSpid on both objs.
   // and add to generation where 'findFoo' is available to avoid reflection.,
