@@ -63,7 +63,14 @@ returning true if the context users spid matches the object owner.`,
       type: 'Boolean',
       javaCode: `
       User user = (User) x.get("user");
-      if ( obj instanceof ServiceProviderAware ) {
+      if ( user == null ) {
+        // occurs during login.
+        return true;
+      }
+
+      if ( obj != null &&
+           obj instanceof ServiceProviderAware ) {
+        System.out.println("ServiceProvicerAwareSupport.match obj.spid: "+ ((ServiceProviderAware) obj).getSpid()+" user.spid: "+user.getSpid());
         return ((ServiceProviderAware) obj).getSpid().equals(user.getSpid());
       }
 
