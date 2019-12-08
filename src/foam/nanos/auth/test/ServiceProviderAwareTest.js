@@ -43,11 +43,11 @@ foam.CLASS({
         ((DAO) x.get("localGroupDAO")).put(new Group.Builder(x).setId("fail").build());
 
          // permission setup
-        DAO groupPermissionJunctionDAO = (DAO) x.get("localGroupPermissionJunctionDAO");
-        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("test").setTargetId("user.read.*").build());
-        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("fail").setTargetId("user.read.*").build());
-        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("test").setTargetId("spid.read.test").build());
-        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("fail").setTargetId("spid.read.fail").build());
+//        DAO groupPermissionJunctionDAO = (DAO) x.get("localGroupPermissionJunctionDAO");
+//        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("test").setTargetId("user.read.*").build());
+//        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("fail").setTargetId("user.read.*").build());
+//        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("test").setTargetId("spid.read.test").build());
+//        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("fail").setTargetId("spid.read.fail").build());
 
         foam.nanos.app.AppConfig appConfig = (foam.nanos.app.AppConfig) x.get("appConfig");
         appConfig.setDefaultSpid("test");
@@ -190,7 +190,6 @@ foam.CLASS({
                               }}
                             )
                             .build();
-//Collections.singletonMap("username1", "password1")
         DAO userDAO = (DAO) x.get("localUserDAO");
         User user1 = new User.Builder(x)
           .setId(89996)
@@ -235,15 +234,31 @@ foam.CLASS({
         NotificationSetting ns = (NotificationSetting) dao.inX(y).find(ns1.getId());
         test(ns != null, "ReferenceTest find same spid.");
 
-        // user 2 - spid fail
-        y = Auth.sudo(y, user2);
-        ns = (NotificationSetting) dao.inX(y).find(ns1.getId());
-        test(ns == null, "ReferenceTest find different spid.");
-
         ArraySink sink = new ArraySink();
         dao.inX(y).select(sink);
         List nss = sink.getArray();
         test (nss.size() == 1, "ReferenceTest DAO select filtered on spid. expected: 1, found: "+nss.size());
+
+       // user 2 - spid fail
+        y = Auth.sudo(y, user2);
+        ns = (NotificationSetting) dao.inX(y).find(ns1.getId());
+        test(ns == null, "ReferenceTest find different spid.");
+
+        sink = new ArraySink();
+        dao.inX(y).select(sink);
+        nss = sink.getArray();
+        test (nss.size() == 1, "ReferenceTest DAO select filtered on spid. expected: 1, found: "+nss.size());
+
+        // add read of other spid
+         // permission setup
+        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("user.read.89994").build());
+
+        y = Auth.sudo(x, user1);
+        sink = new ArraySink();
+        dao.inX(y).select(sink);
+        nss = sink.getArray();
+        test (nss.size() == 2, "ReferenceTest DAO select filtered on spid. expected: 2, found: "+nss.size());
+
      `
     }
   ]

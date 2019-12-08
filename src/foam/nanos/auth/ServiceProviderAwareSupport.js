@@ -27,6 +27,11 @@ Use: see ServiceProviderAwareTest
   javaImports: [
     'foam.core.PropertyInfo',
     'foam.core.X',
+    'foam.core.FObject',
+    'foam.nanos.auth.AuthService',
+    'foam.nanos.auth.Authorizer',
+    'foam.nanos.auth.AuthorizationException',
+    'foam.nanos.auth.User',
     'foam.nanos.logger.Logger',
     'java.util.HashMap',
     'java.util.Map'
@@ -155,7 +160,7 @@ returning true if the context users spid matches the current object.`,
             cause = cause.getCause();
           }
           if ( cause != null &&
-               cause instanceof foam.nanos.auth.AuthorizationException ) {
+               cause instanceof AuthorizationException ) {
             ((Logger) x.get("logger")).debug("ServiceProviderAwareSupport", "AuthorizationException", method.getName(), "on", obj.getClass().getSimpleName(), cause.getMessage(), cause);
             return null;
           } else {

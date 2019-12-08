@@ -12,7 +12,6 @@ foam.CLASS({
   javaImports: [
     'foam.dao.DAO',
     'foam.dao.ArraySink',
-    'foam.nanos.app.AppConfig',
     'foam.nanos.test.Test',
     'java.util.*',
     'foam.nanos.logger.LogLevelFilterLogger',
