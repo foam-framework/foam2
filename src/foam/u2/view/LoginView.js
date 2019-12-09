@@ -43,6 +43,10 @@ foam.CLASS({
   ],
 
   css: `
+  ^.foam-u2-ActionView {
+    width: 100%;
+  }
+
   /* ON RIGHT SIDE ALL **** */
   ^ .centerVertical {
     padding-top: 3vh; 
@@ -52,7 +56,6 @@ foam.CLASS({
 
   /* SET ABOVE MODEL */
   ^ .topBar-logo-Back {
-    text-align: center;
     height: 6vh;
     background: /*%LOGOBACKGROUNDCOLOUR%*/  #202341;
   }
@@ -64,13 +67,14 @@ foam.CLASS({
     display: block;
   }
   ^ .top-bar-img {
+    padding-left: 1vh;
     height: 4vh;
     padding-top: 1vh;
   }
 
   /* TITLE TXT ON MODEL */
   ^ .title-top {
-    font-size: 2em;
+    font-size: 2.5em;
     padding-top: 2vh;
     font-weight: bold;
   }
@@ -84,7 +88,10 @@ foam.CLASS({
   /* ON ALL FOOTER TEXT */
   ^ .bold-text-with-pad {
     font-weight: bold;
-    padding-right: 0.2em;
+    margin-right: 0.2em;
+  }
+  ^ .center-footer {
+    text-align: center;
   }
 
   /* TOP-TOP BAR NAV to go with backLink_ */
@@ -213,6 +220,10 @@ foam.CLASS({
 
     function initE() {
       this.SUPER();
+      this.document.addEventListener('keyup', this.onKeyPressed);
+      this.onDetach(() => {
+        this.document.removeEventListener('keyup', this.onKeyPressed);
+      });
       let logo = this.theme.largeLogo ? this.theme.largeLogo : this.theme.logo;
       // CREATE MODEL VIEW
       var right = this.Element.create({}, this)
@@ -229,7 +240,8 @@ foam.CLASS({
           .addClass('content-form').tag(this.MODEL).br()
         .endContext()
       // first footer
-        .start()
+      .br()
+      .start().addClass('center-footer')
           .start('span').addClass('bold-text-with-pad').add(this.model.FOOTER_TXT).end()
           .start('span').addClass('link')
             .add(this.model.FOOTER_LINK)
@@ -237,9 +249,8 @@ foam.CLASS({
               this.model.footerLink(this.topBarShow_, this.param);
             })
           .end()
-        .end()
       // second footer
-        .start().br()
+        .br().br()
           .start('span').addClass('bold-text-with-pad').add(this.model.SUB_FOOTER_TXT).end()
           .start('span').addClass('link')
             .add(this.model.SUB_FOOTER_LINK)
@@ -294,6 +305,16 @@ foam.CLASS({
         }, function() {
           this.add(right);
         });
+    }
+  ],
+
+  listeners: [
+    function onKeyPressed(e) {
+      e.preventDefault();
+      var key = e.key || e.keyCode;
+      if ( key === 'Enter' || key === 13 ) {
+          this.model.login();
+      }
     }
   ]
 });

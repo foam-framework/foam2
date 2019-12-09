@@ -11,20 +11,50 @@ foam.CLASS({
   extends: 'foam.nanos.notification.NotificationSetting',
 
   javaImports: [
-    'foam.dao.ArraySink',
+    'foam.core.PropertyInfo',
     'foam.dao.DAO',
     'foam.nanos.auth.User',
-    'foam.nanos.auth.UserUserJunction',
     'foam.nanos.logger.Logger',
     'foam.nanos.notification.email.EmailMessage',
     'foam.util.Emails.EmailsUtility',
     'java.util.Arrays',
+    'java.util.Iterator',
     'java.util.List',
-    'net.nanopay.model.Business',
+    'java.util.Map',
     'static foam.mlang.MLang.EQ'
   ],
 
   methods: [
+    {
+      name: 'resolveNotificationArguments',
+      type: 'Map',
+      documentation: `
+          Iterate through arguments to replace propertyInfo values with the notified user' values.
+          TODO: Handle nested FObjects passed in as propertyInfo.
+      `,
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'arguments', type: 'Map' },
+        { name: 'user', type: 'User' }
+      ],
+      javaCode: `
+        Logger logger = (Logger) x.get("logger");
+
+        Iterator entries = arguments.entrySet().iterator();
+        while (entries.hasNext()) {
+          Map.Entry entry = (Map.Entry) entries.next();
+          if ( entry.getValue() instanceof PropertyInfo ) {
+            if ( ! ((PropertyInfo) entry.getValue()).getClassInfo().getObjClass().isAssignableFrom(user.getClass()) ) {
+              entry.setValue("");
+              logger.error("Cannot set an unrelated PropertyInfo to notified user as an argument value");
+              continue;
+            }
+            entry.setValue(((PropertyInfo) entry.getValue()).get(user));
+          }
+        }
+        return arguments;
+      `
+    },
     {
       name: 'sendNotification',
       javaCode: `
@@ -33,6 +63,11 @@ foam.CLASS({
           if ( ! disabledTopics.contains(notification.getNotificationType()) ) {
             EmailMessage message = new EmailMessage();
             message.setTo(new String[]{user.getEmail()});
+
+            if ( notification.getEmailArgs() != null ) {
+              Map<String, Object> emailArgs = resolveNotificationArguments(x, notification.getEmailArgs(), user);
+              notification.setEmailArgs(emailArgs);
+            }
 
             try {
               if ( foam.util.SafetyUtil.isEmpty(notification.getEmailName()) ) {
@@ -52,4 +87,3 @@ foam.CLASS({
     }
   ]
 });
-  

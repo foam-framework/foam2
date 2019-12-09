@@ -10,6 +10,13 @@
 
   documentation: 'Rule model represents rules(actions) that need to be applied in case passed object satisfies provided predicate.',
 
+  implements: [
+    'foam.nanos.auth.CreatedAware',
+    'foam.nanos.auth.CreatedByAware',
+    'foam.nanos.auth.LastModifiedAware',
+    'foam.nanos.auth.LastModifiedByAware'
+  ],
+
   javaImports: [
     'foam.core.ContextAware',
     'foam.core.FObject',
@@ -26,7 +33,9 @@
     'enabled',
     'priority',
     'daoKey',
-    'documentation'
+    'documentation',
+    'createdBy',
+    'lastModifiedBy'
   ],
 
   searchColumns: [
@@ -191,6 +200,42 @@
         }
         return null;
       `
+    },
+    {
+      class: 'DateTime',
+      name: 'created',
+      visibility: 'RO'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdBy',
+      visibility: 'RO',
+      tableCellFormatter: function(value, obj) {
+        obj.userDAO.find(value).then(function(user) {
+          if ( user ) {
+            this.add(user.legalName);
+          }
+        }.bind(this));
+      }
+    },
+    {
+      class: 'DateTime',
+      name: 'lastModified',
+      visibility: 'RO'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'lastModifiedBy',
+      visibility: 'RO',
+      tableCellFormatter: function(value, obj) {
+        obj.userDAO.find(value).then(function(user) {
+          if ( user ) {
+            this.add(user.legalName);
+          }
+        }.bind(this));
+      }
     }
   ],
 

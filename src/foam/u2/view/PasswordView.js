@@ -25,16 +25,12 @@ foam.CLASS({
   ],
 
   css: `
-    ^ .input-field-container {
-      position: relative;
-    }
     ^ .input-image {
+      --fieldSize: /*%INPUTHEIGHT%*/ 32px;
       position: absolute;
-      width: 4vh;
-      height: 3vh;
-      bottom: 3vh;
-      right: 0.1vw;
-      top: 0.5vh;
+      height: calc( var(--fieldSize) / 1.2);
+      top: calc( var(--fieldSize) / 15);
+      right: 1vh;
     }
   `,
 
@@ -80,7 +76,6 @@ foam.CLASS({
       this.SUPER();
 
       this.addClass(this.myClass()).start().
-        addClass('input-field-container').
         start(this.TextField, {
           type: this.type,
           data$: this.data$,
@@ -88,7 +83,7 @@ foam.CLASS({
         }, this.inputElement$).
         addClass('full-width-input-password').end().
         start('img').show(this.passwordIcon$).addClass('input-image').
-        attr('src', this.visibilityIcon$).on('click', this.visible).
+          attr('src', this.visibilityIcon$).on('click', this.visible).
         end().
       end();
     },
