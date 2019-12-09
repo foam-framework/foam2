@@ -157,7 +157,7 @@ public abstract class AbstractPropertyInfo
       AuthService auth = (AuthService) x.get("auth");
       String simpleName = this.getClassInfo().getObjClass().getSimpleName();
 
-      if ( ! auth.check(x, String.format("%s.ro.%s", simpleName.toLowerCase(), this.getName().toLowerCase())) ) {
+      if ( ! auth.check(x, String.format("%s.ro.%s", simpleName.toLowerCase(), this.getName().toLowerCase())) && ! auth.check(x, String.format("%s.rw.%s", simpleName.toLowerCase(), this.getName().toLowerCase()))) {
         throw new AuthorizationException(String.format("Access denied. User lacks permission to access property '%s' on model '%s'.", this.getName(), simpleName));
       };
     }
