@@ -187,7 +187,20 @@ foam.CLASS({
           delegate = new foam.nanos.auth.ServiceProviderAwareDAO.Builder(getX()).setDelegate(delegate).build();
         }
 
+        if ( getLifecycleAware() && getDeletedAware() ){
+          throw new RuntimeException("Both DeletedAware and LifecycleAware cannot be used simultaneously");
+        }
+
+        if ( getLifecycleAware() ) {
+          delegate = new foam.nanos.auth.LifecycleAwareDAO.Builder(getX())
+            .setDelegate(delegate)
+            .setName(getPermissionPrefix())
+            .build();
+        }
+
         if ( getDeletedAware() ) {
+          logger.warning("EasyDAO", getNSpec().getName(), "DEPRECATED: DeletedAware. Use LifecycleAware instead");
+
           delegate = new foam.nanos.auth.DeletedAwareDAO.Builder(getX())
             .setDelegate(delegate)
             .setName(getPermissionPrefix())
@@ -545,6 +558,11 @@ foam.CLASS({
       name: 'serviceProviderAware',
       class: 'Boolean',
       javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.auth.ServiceProviderAware.class.isAssignableFrom(getOf().getObjClass());'
+    },
+    {
+      name: 'lifecycleAware',
+      class: 'Boolean',
+      javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.auth.LifecycleAware.class.isAssignableFrom(getOf().getObjClass());'
     },
     {
       name: 'deletedAware',
