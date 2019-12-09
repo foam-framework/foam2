@@ -61,10 +61,6 @@ foam.CLASS({
       javaCode: `return helperTwo((authorizer) -> authorizer.checkGlobalRemove(x));`
     },
     {
-      name: 'getPermissionPrefix',
-      javaCode: `return "";`
-    },
-    {
       name: 'helperOne',
       args: [
         { name: 'fn', type: 'Consumer<Authorizer>' }
