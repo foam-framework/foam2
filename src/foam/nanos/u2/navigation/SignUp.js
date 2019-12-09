@@ -101,7 +101,7 @@ foam.CLASS({
           predicateFactory: function(e) {
             return e.NEQ(foam.nanos.u2.navigation.SignUp.DEPARTMENT, '');
           },
-          errorString: 'Please select a Job Title'
+          errorString: 'Please enter a job title'
         }
       ],
       required: true
