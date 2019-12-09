@@ -52,7 +52,8 @@ foam.CLASS({
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
     'foam.u2.ControllerMode',
-    'foam.u2.dialog.NotificationMessage'
+    'foam.u2.dialog.NotificationMessage',
+    'foam.u2.dialog.Popup',
   ],
   imports: [
     'stack'
@@ -107,18 +108,13 @@ foam.CLASS({
     },
     {
       name: 'delete',
-      confirmationRequired: true,
       code: function() {
-        this.config.dao.remove(this.data).then(o => {
-          this.finished.pub();
-          this.stack.back();
-        }, e => {
-          this.throwError.pub(e);
-          this.add(this.NotificationMessage.create({
-            message: e.message,
-            type: 'error'
-          }));
-        });
+        this.add(this.Popup.create().tag({
+          class: 'foam.u2.DeleteModal',
+          dao_: this.config.dao,
+          data: this,
+          obj: this.data
+        }));
       }
     }
   ],
