@@ -95,6 +95,15 @@ foam.CLASS({
         class: 'foam.u2.TextField',
         placeholder: 'Staff accountant'
       },
+      validationPredicates: [
+        {
+          args: ['department'],
+          predicateFactory: function(e) {
+            return e.NEQ(foam.nanos.u2.navigation.SignUp.DEPARTMENT, '');
+          },
+          errorString: 'Please select a Job Title.'
+        }
+      ],
       required: true
     },
     {
