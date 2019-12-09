@@ -43,6 +43,15 @@ foam.CLASS({
       createMode: 'HIDDEN',
       updateMode: 'RO',
       section: 'administrative'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdByAgent',
+      documentation: 'Agent acting as User who created the entry',
+      createMode: 'HIDDEN',
+      updateMode: 'RO',
+      section: 'administrative'
     }
   ]
 });
