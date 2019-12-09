@@ -42,13 +42,6 @@ foam.CLASS({
         ((DAO) x.get("localGroupDAO")).put(new Group.Builder(x).setId("test").build());
         ((DAO) x.get("localGroupDAO")).put(new Group.Builder(x).setId("fail").build());
 
-         // permission setup
-//        DAO groupPermissionJunctionDAO = (DAO) x.get("localGroupPermissionJunctionDAO");
-//        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("test").setTargetId("user.read.*").build());
-//        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("fail").setTargetId("user.read.*").build());
-//        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("test").setTargetId("spid.read.test").build());
-//        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("fail").setTargetId("spid.read.fail").build());
-
         foam.nanos.app.AppConfig appConfig = (foam.nanos.app.AppConfig) x.get("appConfig");
         appConfig.setDefaultSpid("test");
         X y = x.put("appConfig", appConfig);
