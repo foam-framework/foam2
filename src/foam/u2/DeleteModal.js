@@ -51,7 +51,7 @@ foam.CLASS({
   ],
 
   properties: [
-    'dao', 'onDelete', 'obj'
+    'dao', 'onDelete', 'data'
   ],
 
   methods: [
@@ -62,10 +62,10 @@ foam.CLASS({
         .start()
           .addClass(this.myClass('main'))
           .start('h2')
-            .add(this.TITLE).add(this.obj.cls_.name).add('?')
+            .add(this.TITLE).add(this.data.cls_.name).add('?')
           .end()
           .start('p')
-            .add(`${this.CONFIRM_DELETE_1} '${this.obj.toSummary()}'?`)
+            .add(`${this.CONFIRM_DELETE_1} '${this.data.toSummary()}'?`)
           .end()
         .end()
         .start()
@@ -83,7 +83,7 @@ foam.CLASS({
       name: 'delete',
       label: 'Delete',
       code: function(X) {
-        this.dao.remove(this.obj).then((_) => {
+        this.dao.remove(this.data).then((_) => {
           this.onDelete();
           this.notify(this.SUCCESS_MSG);
         }).catch((err) => {

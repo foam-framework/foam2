@@ -116,7 +116,7 @@ foam.CLASS({
             this.finished.pub();
             this.stack.back();
           },
-          obj: this.data
+          data: this.data
         }));
       }
     }
