@@ -48,7 +48,7 @@
       //
     },
     {
-      name: 'testExceedsPrecision',
+      name: 'checkExceedsPrecision',
       type: 'Boolean',
       args: [
         { name: 'amount', type: 'Double' }
@@ -56,14 +56,14 @@
       javaCode: `
         long normal = (long) (Math.floor(amount * Math.pow(10, precision)));
         long higher = (long) (Math.floor(amount * Math.pow(10, precision+1)));
-        if ( normal*10 == higher ) return true;
-        return false;
+        if ( normal*10 == higher ) return false;
+        return true;
       `,
       code: function(amount) {
         var normal = Math.floor(amount * Math.pow(10, precision));
         var higher = Math.floor(amount * Math.pow(10, precision+1));
-        if ( normal*10 === higher ) return true;
-        return false;
+        if ( normal*10 === higher ) return false;
+        return true;
       }
     }
   ]
