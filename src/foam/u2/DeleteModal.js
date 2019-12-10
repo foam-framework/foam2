@@ -45,14 +45,13 @@ foam.CLASS({
 
   messages: [
     { name: 'TITLE', message: 'Delete ' },
-    { name: 'CONFIRM_DELETE_1', message: 'Are you sure you want to delete ' },
-    { name: 'CONFIRM_DELETE_2', message: ' from your list?' },
+    { name: 'CONFIRM_DELETE_1', message: 'Are you sure you want to delete' },
     { name: 'SUCCESS_MSG', message: 'Successfully deleted' },
     { name: 'FAIL_MSG', message: 'Failed to delete.' }
   ],
 
   properties: [
-    'dao_', 'data', 'obj'
+    'dao', 'onDelete', 'obj'
   ],
 
   methods: [
@@ -66,7 +65,7 @@ foam.CLASS({
             .add(this.TITLE).add(this.obj.cls_.name).add('?')
           .end()
           .start('p')
-            .add(`${this.CONFIRM_DELETE_1} '${this.obj.name}' ${this.CONFIRM_DELETE_2}`)
+            .add(`${this.CONFIRM_DELETE_1} '${this.obj.toSummary()}'?`)
           .end()
         .end()
         .start()
@@ -76,18 +75,6 @@ foam.CLASS({
             .add(this.DELETE)
           .endContext()
         .end();
-    },
-
-    function deleteObj() {
-      this.dao_.remove(this.obj).then((_) => {
-        if ( this.data ) {
-          if ( this.data.finished ) this.data.finished.pub();
-          if ( this.data.stack ) this.data.stack.back();
-        }
-        this.notify(this.SUCCESS_MSG);
-      }).catch((err) => {
-        this.notify(err.message || this.FAIL_MSG, 'error');
-      });
     }
   ],
 
@@ -96,7 +83,12 @@ foam.CLASS({
       name: 'delete',
       label: 'Delete',
       code: function(X) {
-        this.deleteObj();
+        this.dao.remove(this.obj).then((_) => {
+          this.onDelete();
+          this.notify(this.SUCCESS_MSG);
+        }).catch((err) => {
+          this.notify(err.message || this.FAIL_MSG, 'error');
+        });
         X.closeDialog();
       }
     },

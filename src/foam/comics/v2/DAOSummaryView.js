@@ -111,8 +111,11 @@ foam.CLASS({
       code: function() {
         this.add(this.Popup.create().tag({
           class: 'foam.u2.DeleteModal',
-          dao_: this.config.dao,
-          data: this,
+          dao: this.config.dao,
+          onDelete: () => {
+            this.finished.pub();
+            this.stack.back();
+          },
           obj: this.data
         }));
       }
