@@ -89,9 +89,9 @@ foam.CLASS({
       code: function() {
         var cData = this.data;
 
-        if ( this.LifecycleAware.isInstance(clonedData) ) {
+        if ( foam.nanos.auth.LifecycleAware.isInstance(clonedData) ) {
           cData = cData.clone();
-          cData.lifecycleState = this.LifecycleState.PENDING;
+          cData.lifecycleState = foam.nanos.auth.LifecycleState.PENDING;
         }
         
         this.config.dao.put(cData).then((o) => {
