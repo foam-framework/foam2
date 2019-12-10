@@ -183,7 +183,17 @@ foam.CLASS({
         // one section, otherwise use the normal detail view. We do this because
         // tabs are easier to navigate when there are multiple sections, but
         // they don't make sense when there's only one tab.
-        var classId = this.data.of.model_.sections
+        var sections = new Set();
+        var model = this.data.of.model_;
+        while ( model && model !== foam.core.FObject ) {
+          model.sections && model.sections.forEach(s => sections.add(s.name));
+          if ( sections.size > 1 ) {
+            break;
+          }
+          model = foam.lookup(model.extends).model_;
+        }
+
+        var classId = sections.size > 1
           ? 'foam.u2.detail.TabbedDetailView'
           : 'foam.u2.detail.SectionedDetailView';
 
