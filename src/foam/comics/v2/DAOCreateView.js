@@ -10,7 +10,8 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   requires: [
-    'foam.nanos.auth.LifecycleState'
+    'foam.nanos.auth.LifecycleState',
+    'foam.nanos.auth.LifecycleAware'
   ],
 
   topics: [
@@ -86,13 +87,14 @@ foam.CLASS({
     {
       name: 'save',
       code: function() {
-        var clonedData = this.data.clone();
+        var cData = this.data;
 
-        if ( foam.nanos.auth.LifecycleAware.isInstance(clonedData) ) {
-          clonedData.lifecycleState = foam.nanos.auth.LifecycleState.PENDING;
+        if ( this.LifecycleAware.isInstance(clonedData) ) {
+          cData = cData.clone();
+          cData.lifecycleState = this.LifecycleState.PENDING;
         }
         
-        this.config.dao.put(clonedData).then((o) => {
+        this.config.dao.put(cData).then((o) => {
           this.data = o;
           this.finished.pub();
           this.stack.back();
