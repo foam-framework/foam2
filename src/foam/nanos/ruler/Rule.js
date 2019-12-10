@@ -17,6 +17,10 @@
     'foam.nanos.auth.LastModifiedByAware'
   ],
 
+  imports: [
+    'userDAO?'
+  ],
+
   javaImports: [
     'foam.core.ContextAware',
     'foam.core.FObject',
