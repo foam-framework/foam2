@@ -51,7 +51,19 @@ foam.CLASS({
   ],
 
   properties: [
-    'dao', 'onDelete', 'data'
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'dao'
+    },
+    {
+      class: 'Function',
+      name: 'onDelete',
+      value: () => {}
+    },
+    {
+      class: 'FObject',
+      name: 'data'
+    }
   ],
 
   methods: [
@@ -84,8 +96,8 @@ foam.CLASS({
       label: 'Delete',
       code: function(X) {
         this.dao.remove(this.data).then((_) => {
-          this.onDelete();
           this.notify(this.SUCCESS_MSG);
+          this.onDelete();
         }).catch((err) => {
           this.notify(err.message || this.FAIL_MSG, 'error');
         });
