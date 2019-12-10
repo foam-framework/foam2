@@ -47,7 +47,7 @@ foam.CLASS({
     { name: 'TITLE', message: 'Delete ' },
     { name: 'CONFIRM_DELETE_1', message: 'Are you sure you want to delete' },
     { name: 'SUCCESS_MSG', message: 'Successfully deleted' },
-    { name: 'FAIL_MSG', message: 'Failed to delete.' }
+    { name: 'FAIL_MSG', message: 'Failed to delete' }
   ],
 
   properties: [
