@@ -65,7 +65,7 @@ foam.CLASS({
             .add(this.TITLE).add(this.data.cls_.name).add('?')
           .end()
           .start('p')
-            .add(`${this.CONFIRM_DELETE_1} '${this.data.toSummary()}'?`)
+            .add(`${this.CONFIRM_DELETE_1} ${this.data.toSummary()}?`)
           .end()
         .end()
         .start()
