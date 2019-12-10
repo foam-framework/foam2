@@ -8,12 +8,7 @@ foam.CLASS({
   package: 'foam.comics.v2',
   name: 'DAOCreateView',
   extends: 'foam.u2.View',
-
-  requires: [
-    'foam.nanos.auth.LifecycleState',
-    'foam.nanos.auth.LifecycleAware'
-  ],
-
+  
   topics: [
     'finished',
     'throwError'
