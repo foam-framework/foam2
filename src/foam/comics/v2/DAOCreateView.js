@@ -9,6 +9,11 @@ foam.CLASS({
   name: 'DAOCreateView',
   extends: 'foam.u2.View',
 
+  requires: [
+    'foam.nanos.auth.LifecycleState',
+    'foam.nanos.auth.LifecycleAware'
+  ],
+
   topics: [
     'finished',
     'throwError'
@@ -82,7 +87,14 @@ foam.CLASS({
     {
       name: 'save',
       code: function() {
-        this.config.dao.put(this.data).then((o) => {
+        var cData = this.data;
+
+        if ( this.LifecycleAware.isInstance(clonedData) ) {
+          cData = cData.clone();
+          cData.lifecycleState = this.LifecycleState.PENDING;
+        }
+        
+        this.config.dao.put(cData).then((o) => {
           this.data = o;
           this.finished.pub();
           this.stack.back();
