@@ -30,5 +30,22 @@
       documentation: 'Defines the number of digits that come after the decimal point. ',
       required: true
     }
+  ],
+  methods: [
+    {
+      name: 'asInteger',
+      type: 'Long',
+      args: [
+        { name: 'amount', type: 'Double' }
+      ],
+      // TODO: warn lossy conversion for decimals-to-precision mismatch
+      javaCode: `
+        return (long) (Math.floor(amount * Math.pow(10, precision)));
+      `,
+      code: function(amount) {
+        return Math.floor(amount * Math.pow(10, precision));
+      }
+      //
+    }
   ]
 });
