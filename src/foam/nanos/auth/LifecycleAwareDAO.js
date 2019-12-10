@@ -16,7 +16,7 @@ foam.CLASS({
     'foam.mlang.MLang',
     'foam.mlang.order.Comparator',
     'foam.mlang.predicate.Predicate',
-    'foam.util.SafetyUtil',
+    'foam.util.SafetyUtil'
   ],
 
   documentation: `
