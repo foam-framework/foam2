@@ -86,8 +86,8 @@ foam.CLASS({
             });
           } else {
             window.location.hash = '';
+            this.loginSuccess = !! this.user;
           }
-          this.loginSuccess = !! this.user;
         }
       }
     }

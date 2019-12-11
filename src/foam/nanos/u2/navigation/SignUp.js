@@ -207,8 +207,6 @@ foam.CLASS({
           window.history.replaceState(null, null, window.location.origin);
           location.reload();
         } else {
-          // logout once we have finished updating documents.
-          this.auth.logout();
           this.stack.push({
             class: 'foam.nanos.auth.ResendVerificationEmail'
           });
