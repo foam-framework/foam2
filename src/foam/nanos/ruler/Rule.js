@@ -17,6 +17,10 @@
     'foam.nanos.auth.LastModifiedByAware'
   ],
 
+  imports: [
+    'userDAO'
+  ],
+
   javaImports: [
     'foam.core.ContextAware',
     'foam.core.FObject',
@@ -212,7 +216,7 @@
       name: 'createdBy',
       visibility: 'RO',
       tableCellFormatter: function(value, obj) {
-        this.__subSubContext__.userDAO.find(value).then(function(user) {
+        obj.userDAO.find(value).then(function(user) {
           if ( user ) {
             this.add(user.legalName);
           }
@@ -230,7 +234,7 @@
       name: 'lastModifiedBy',
       visibility: 'RO',
       tableCellFormatter: function(value, obj) {
-        this.__subSubContext__.userDAO.find(value).then(function(user) {
+        obj.userDAO.find(value).then(function(user) {
           if ( user ) {
             this.add(user.legalName);
           }
