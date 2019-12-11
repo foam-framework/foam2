@@ -141,6 +141,15 @@ foam.CLASS({
             errorString: `Please enter a ${this.label} with at most ${this.maxLength} character${this.maxLength>1?'s':''}`
           });
         }
+        if ( this.required && ! foam.Number.isInstance(this.maxLength || this.minLength) ) {
+          a.push({
+            args: [this.name],
+            predicateFactory: function(e) {
+              return e.GTE(foam.mlang.StringLength.create({ arg1: self }), 1);
+            },
+            errorString: `Please enter ${this.label}`
+          });
+        }
         return a;
       }
     }
