@@ -57,8 +57,7 @@ foam.CLASS({
     },
     {
       class: 'Function',
-      name: 'onDelete',
-      value: () => {}
+      name: 'onDelete'
     },
     {
       class: 'FObject',
