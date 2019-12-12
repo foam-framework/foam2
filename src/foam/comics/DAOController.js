@@ -186,7 +186,7 @@ foam.CLASS({
         var sectionName = undefined;
         var hasManySections = false;
         var model = this.data.of.model_;
-        while ( model && model !== foam.core.FObject ) {
+        while ( model && model === foam.core.FObject ) {
           if ( model.sections ) {
             hasManySections = model.sections.length > 1;
             if ( ! hasManySections && model.sections.length === 1 ) {
