@@ -39,6 +39,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/ServiceProviderAwareSink" },
   { name: "foam/nanos/auth/ServiceProviderAwareSupport" },
   { name: "foam/nanos/auth/test/ServiceProviderAwareTest" },
+  { name: "foam/nanos/auth/test/UserAndGroupPermissionTest" },
   { name: "foam/nanos/auth/Language" },
   { name: "foam/nanos/auth/CreatedAware" },
   { name: "foam/nanos/auth/CreatedAwareDAO" },

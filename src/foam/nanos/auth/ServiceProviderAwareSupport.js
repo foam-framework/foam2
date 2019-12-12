@@ -75,7 +75,9 @@ returning true if the context users spid matches the current object.`,
 
       if ( obj != null &&
            obj instanceof ServiceProviderAware ) {
-        return ((ServiceProviderAware) obj).getSpid().equals(user.getSpid());
+        ServiceProviderAware sp = (ServiceProviderAware) obj;
+        return user.getSpid().equals(sp.getSpid()) ||
+          ((AuthService) x.get("auth")).check(x, "spid.read."+sp.getSpid());
       }
 
       Object result = obj;
@@ -91,7 +93,9 @@ returning true if the context users spid matches the current object.`,
             result = invokeMethod(x, method, result);
             if ( result != null &&
                  result instanceof ServiceProviderAware ) {
-              return ((ServiceProviderAware) result).getSpid().equals(user.getSpid());
+              ServiceProviderAware sp = (ServiceProviderAware) result;
+              return user.getSpid().equals(sp.getSpid()) ||
+                ((AuthService) x.get("auth")).check(x, "spid.read."+sp.getSpid());
             }
           } catch (Throwable e) {
             return false;
@@ -127,7 +131,7 @@ returning true if the context users spid matches the current object.`,
         method = obj.getClass().getMethod(methodName, foam.core.X.class);
         getFindMethods().put(name, method);
       } catch (Exception e) {
-       ((Logger) x.get("logger")).error("ServiceProviderAwareSupport", "Failed to find method", methodName, "on", obj.getClass().getSimpleName(), e.getMessage(), e);
+        ((Logger) x.get("logger")).error("ServiceProviderAwareSupport", "Failed to find method", methodName, "on", obj.getClass().getSimpleName(), e.getMessage(), e);
         throw e;
       }
     }

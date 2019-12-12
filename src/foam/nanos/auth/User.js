@@ -525,7 +525,6 @@ foam.CLASS({
         User user = (User) x.get("user");
         User agent = (User) x.get("agent");
         AuthService auth = (AuthService) x.get("auth");
-
         boolean findSelf = SafetyUtil.equals(this.getId(), user.getId()) ||
           (
             agent != null &&
@@ -533,7 +532,8 @@ foam.CLASS({
           );
 
         if ( ! findSelf &&
-             ! auth.check(x, "user.read." + this.getId()) ) {
+             ! auth.check(x, "user.read." + this.getId())
+        ) {
           throw new AuthorizationException();
         }
       `
@@ -559,7 +559,8 @@ foam.CLASS({
 
         if (
           ! updatingSelf &&
-          ! hasUserEditPermission
+          ! hasUserEditPermission &&
+          ! auth.check(x, "spid.update." + user.getSpid())
         ) {
           throw new AuthorizationException("You do not have permission to update this user.");
         }
@@ -591,8 +592,8 @@ foam.CLASS({
 
         if (
           ! SafetyUtil.equals(this.getId(), user.getId()) &&
-          ! auth.check(x, "user.delete." + this.getId())
-
+          ! auth.check(x, "user.delete." + this.getId()) &&
+          ! auth.check(x, "spid.delete." + this.getSpid())
         ) {
           throw new RuntimeException("You do not have permission to delete that user.");
         }

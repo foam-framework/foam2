@@ -234,6 +234,8 @@ var classes = [
   'foam.nanos.auth.ServiceProviderAwareSink',
   'foam.nanos.auth.ServiceProviderAwareSupport',
   'foam.nanos.auth.test.ServiceProviderAwareTest',
+  'foam.nanos.auth.test.DummySp',
+  'foam.nanos.auth.test.UserAndGroupPermissionTest',
   'foam.nanos.auth.twofactor.OTPKey',
   'foam.nanos.auth.twofactor.OTPAuthService',
   'foam.nanos.auth.twofactor.AbstractOTPAuthService',

@@ -184,7 +184,11 @@ foam.CLASS({
         }
 
         if ( getServiceProviderAware() ) {
-          delegate = new foam.nanos.auth.ServiceProviderAwareDAO.Builder(getX()).setDelegate(delegate).build();
+          foam.nanos.auth.ServiceProviderAwareDAO dao = new foam.nanos.auth.ServiceProviderAwareDAO.Builder(getX()).setDelegate(delegate).build();
+          if ( getServiceProviderAwarePropertyInfos() != null ) {
+            dao.setPropertyInfos(getServiceProviderAwarePropertyInfos());
+          }
+          delegate = dao;
         }
 
         if ( getDeletedAware() ) {
@@ -542,9 +546,16 @@ foam.CLASS({
       value: true
     },
     {
+      // note: want this decorator on the non-local/served stack. 
       name: 'serviceProviderAware',
       class: 'Boolean',
-      javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.auth.ServiceProviderAware.class.isAssignableFrom(getOf().getObjClass());'
+      javaFactory: `return getNSpec().getServe() &&
+                            ! getEnableInterfaceDecorators() &&
+                            foam.nanos.auth.ServiceProviderAware.class.isAssignableFrom(getOf().getObjClass());`
+    },
+    {
+      name: 'serviceProviderAwarePropertyInfos',
+      class: 'Map'
     },
     {
       name: 'deletedAware',

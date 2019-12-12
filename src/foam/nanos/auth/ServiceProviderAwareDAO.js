@@ -16,6 +16,8 @@ and filter by spid on find and select`,
     'foam.core.FObject',
     'foam.core.PropertyInfo',
     'foam.core.X',
+    'foam.dao.DAO',
+    'foam.dao.ProxyDAO',
     'foam.dao.ProxySink',
     'foam.dao.Sink',
     'foam.nanos.app.AppConfig',
@@ -54,7 +56,7 @@ and filter by spid on find and select`,
     if ( isCreate ) {
       if ( SafetyUtil.isEmpty(sp.getSpid()) ||
            ( ! SafetyUtil.isEmpty(sp.getSpid()) &&
-             ! ((AuthService) x.get("auth")).check(x, "spid.create.*") ) ) {
+             ! ((AuthService) x.get("auth")).check(x, "spid.create."+sp.getSpid()) ) ) {
         User user = (User) x.get("user");
         if ( user != null &&
              ! SafetyUtil.isEmpty(user.getSpid()) ) {
@@ -64,7 +66,8 @@ and filter by spid on find and select`,
         }
       }
     } else if ( ! sp.getSpid().equals(oldSp.getSpid()) &&
-                ! ((AuthService) x.get("auth")).check(x, "spid.update.*") ) {
+                ! (((AuthService) x.get("auth")).check(x, "spid.update."+oldSp.getSpid()) &&
+                   ((AuthService) x.get("auth")).check(x, "spid.update."+sp.getSpid())) ) {
       throw new AuthorizationException("You do not have permission to update ServiceProvider (spid) property.");
     }
 
@@ -74,9 +77,9 @@ and filter by spid on find and select`,
     {
       name: 'find_',
       javaCode: `
-    FObject result = super.find_(x, id);
-
-    if ( ((AuthService) x.get("auth")).check(x, "*") ) {
+    FObject result = getDelegate().find_(x, id);
+    if ( result == null ||
+         ((AuthService) x.get("auth")).check(x, "*") ) {
       return result;
     }
 
@@ -94,7 +97,7 @@ and filter by spid on find and select`,
       return super.select_(x, sink, skip, limit, order, predicate);
     }
 
-    ProxySink proxy = (ProxySink) super.select_(
+    ProxySink proxy = (ProxySink) getDelegate().select_(
       x,
       new ServiceProviderAwareSink(x, sink, getPropertyInfos()),
       skip,
