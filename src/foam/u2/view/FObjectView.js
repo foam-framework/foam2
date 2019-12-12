@@ -89,6 +89,12 @@ foam.CLASS({
     },
 
     function updateChoices() {
+      // If choices is hard-coded to something, just use that instead of pulling
+      // options from the strategizer.
+      if ( Array.isArray(this.choices) && this.choices.length > 0 ) {
+        return;
+      }
+
       if ( this.of == null ) {
         this.choices = [];
         return;
