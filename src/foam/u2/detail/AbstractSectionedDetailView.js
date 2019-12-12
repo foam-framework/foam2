@@ -126,10 +126,7 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'outstandingCalculations_',
-      documentation: 'Used alongside `loading` to hide the view while it is loading',
-      factory: function() {
-        return 0;
-      }
+      documentation: 'Used alongside `loading` to hide the view while it is loading'
     },
     {
       class: 'Long',
@@ -153,167 +150,170 @@ foam.CLASS({
   ],
 
   listeners: [
-    function updateSections() {
-      /**
-       * This function sets 'sections' to a filtered version of 'sections_'
-       * after checking a few different things. The goal is to do all of the
-       * work to determine which sections should be visible in one place, then
-       * set 'sections' to that set of sections once we know what it is. Then
-       * views that extend AbstractSectionedDetailView can simply use a slot of
-       * 'sections' and don't need to worry about doing all of this work
-       * themselves.
-       * 
-       * The things we need to check are:
-       *   1. That the user has permission to see the section if the section is
-       *      configured that way.
-       *   2. That the section is visible based on the data and the section's
-       *      'isAvailable' method if there is one.
-       *   3. That the section has at least one visible property or action,
-       *      which is based on:
-       *        (a) Whether or not the property or action requires permission to
-       *            be seen.
-       *        (b) Whether or not the action is visible based on the
-       *            'isAvailable' method of the action.
-       *        (c) Whether or not the property is visible based on the
-       *            controllerMode, visibility, or visibilityExpression.
-       */
+    {
+      name: 'updateSections',
+      documentation: `
+        This function sets 'sections' to a filtered version of 'sections_'
+        after checking a few different things. The goal is to do all of the
+        work to determine which sections should be visible in one place, then
+        set 'sections' to that set of sections once we know what it is. Then
+        views that extend AbstractSectionedDetailView can simply use a slot of
+        'sections' and don't need to worry about doing all of this work
+        themselves.
 
-      // Keep track of the number of outstanding calls to this function so we
-      // can hide the view while it's loading.
-      this.outstandingCalculations_++;
+        The things we need to check are:
+          1. That the user has permission to see the section if the section is
+            configured that way.
+          2. That the section is visible based on the data and the section's
+            'isAvailable' method if there is one.
+          3. That the section has at least one visible property or action,
+            which is based on:
+              (a) Whether or not the property or action requires permission to
+                  be seen.
+              (b) Whether or not the action is visible based on the
+                  'isAvailable' method of the action.
+              (c) Whether or not the property is visible based on the
+                  controllerMode, visibility, or visibilityExpression.
+      `,
+      code: function() {
+        // Keep track of the number of outstanding calls to this function so we
+        // can hide the view while it's loading.
+        this.outstandingCalculations_++;
 
-      // Record the order in which calls to this function happen so we can use
-      // it to avoid race conditions.
-      var queuePos = this.nextQueuePosition_++;
+        // Record the order in which calls to this function happen so we can use
+        // it to avoid race conditions.
+        var queuePos = this.nextQueuePosition_++;
 
-      // First filter out sections by calling their `isAvailable` method on
-      // `data`. We do this first because it's the cheapest way to filter out
-      // entire sections, which means we don't need to calculate the visibility
-      // of properties or actions in those sections.
-      var visibleSections = this.sections_.filter(s => s.createIsAvailableFor(this.data$).get());
+        // First filter out sections by calling their `isAvailable` method on
+        // `data`. We do this first because it's the cheapest way to filter out
+        // entire sections, which means we don't need to calculate the visibility
+        // of properties or actions in those sections.
+        var visibleSections = this.sections_.filter(s => s.createIsAvailableFor(this.data$).get());
 
-      if ( visibleSections.length === 0 ) {
-        if ( queuePos > this.queuePositionWhenLastUpdated_ ) {
-          this.sections = visibleSections;
-          this.queuePositionWhenLastUpdated_ = queuePos;
-        }
-        this.outstandingCalculations_--;
-        return;
-      }
-
-      // Next we filter out the sections that the user doesn't have permission
-      // to see.
-      Promise.all(visibleSections.map((s) => {
-        if ( ! s.permissionRequired ) return Promise.resolve(true);
-        return this.auth.check(null, this.data.cls_.id.toLowerCase() + '.section.' + s.name);
-      }))
-        .then((sectionPermissionCheckResults) => {
-          visibleSections = visibleSections.filter((_, i) => sectionPermissionCheckResults[i]);
-
-          if ( visibleSections.length === 0 ) {
-            if ( queuePos > this.queuePositionWhenLastUpdated_ ) {
-              this.sections = visibleSections;
-              this.queuePositionWhenLastUpdated_ = queuePos;
-            }
-            return;
+        if ( visibleSections.length === 0 ) {
+          if ( queuePos > this.queuePositionWhenLastUpdated_ ) {
+            this.sections = visibleSections;
+            this.queuePositionWhenLastUpdated_ = queuePos;
           }
+          this.outstandingCalculations_--;
+          return;
+        }
 
-          var final = [];
+        // Next we filter out the sections that the user doesn't have permission
+        // to see.
+        Promise.all(visibleSections.map((s) => {
+          if ( ! s.permissionRequired ) return Promise.resolve(true);
+          return this.auth.check(null, this.data.cls_.id.toLowerCase() + '.section.' + s.name);
+        }))
+          .then((sectionPermissionCheckResults) => {
+            visibleSections = visibleSections.filter((_, i) => sectionPermissionCheckResults[i]);
 
-          // Finally, we filter out any remaining sections that have no visible
-          // properties or actions in them below.
-
-          // As an optimization, we'll calculate the visible properties and
-          // actions here and replace each section with a clone of it where
-          // we only set properties to the ones that are visible and likewise
-          // for actions.
-          // WARNING: Maybe we can't do this. What if visibilityExpression
-          // depends on other properties' data changing but this only gets
-          // triggered when `data` changes?
-          Promise.all(visibleSections.map(s => {
-            var visibleProperties = s.properties
-              .map(prop => {
-                // First filter by visibility based on controllerMode since
-                // that's cheapest.
-                if ( this.controllerMode.getMode(prop) === foam.u2.DisplayMode.HIDDEN ) return null;
-
-                // Next filter by visibility or visibilityExpression since
-                // that's cheaper than the permission check.
-                var vis = prop.visibilityExpression
-                  ? this.data.slot(prop.visibilityExpression).get()
-                  : prop.visibility;
-                if ( vis === foam.u2.Visibility.HIDDEN ) return null;
-
-                return prop;
-              })
-              .filter(prop => prop);
-
-            // Filter out the actions that user can't see.
-            var visibleActions = s.actions
-              .map(action => {
-                // First check based on isAvailable, not including permission
-                // check.
-                if ( ! action.isAvailable ) return action;
-
-                return this.data.slot(action.isAvailable).get() // We assume isAvailable is synchronous.
-                  ? action
-                  : null;
-              })
-              .filter(action => action);
-            
-            if ( visibleProperties.length + visibleActions.length === 0 ) {
-              // No need to do the permission check stuff if we already know
-              // the section is empty.
+            if ( visibleSections.length === 0 ) {
+              if ( queuePos > this.queuePositionWhenLastUpdated_ ) {
+                this.sections = visibleSections;
+                this.queuePositionWhenLastUpdated_ = queuePos;
+              }
               return;
             }
 
-            // Now we almost have the list of properties that are visible. The
-            // last thing we need to do is filter out the ones that the user
-            // doesn't have permission to see.
-            var propertyPermissionPromises = visibleProperties.map((prop) => {
-              var propName = prop.name.toLowerCase();
-              var clsName  = prop.forClass_.substring(prop.forClass_.lastIndexOf('.') + 1).toLowerCase();
+            var final = [];
 
-              if ( ! (prop.readPermissionRequired || prop.writePermissionRequired) ) {
-                return Promise.resolve(true);
+            // Finally, we filter out any remaining sections that have no visible
+            // properties or actions in them below.
+
+            // As an optimization, we'll calculate the visible properties and
+            // actions here and replace each section with a clone of it where
+            // we only set properties to the ones that are visible and likewise
+            // for actions.
+            Promise.all(visibleSections.map(s => {
+              var visibleProperties = s.properties
+                .map(prop => {
+                  // First filter by visibility based on controllerMode since
+                  // that's cheapest.
+                  if ( this.controllerMode.getMode(prop) === foam.u2.DisplayMode.HIDDEN ) return null;
+
+                  // Next filter by visibility or visibilityExpression since
+                  // that's cheaper than the permission check.
+                  var vis = prop.visibilityExpression
+                    ? this.data.slot(prop.visibilityExpression).get()
+                    : prop.visibility;
+                  if ( vis === foam.u2.Visibility.HIDDEN ) return null;
+
+                  return prop;
+                })
+                .filter(prop => prop);
+
+              // Filter out the actions that user can't see.
+              var visibleActions = s.actions
+                .map(action => {
+                  // First check based on isAvailable, not including permission
+                  // check.
+                  if ( ! action.isAvailable ) return action;
+
+                  return this.data.slot(action.isAvailable).get() // We assume isAvailable is synchronous.
+                    ? action
+                    : null;
+                })
+                .filter(action => action);
+
+              if ( visibleProperties.length + visibleActions.length === 0 ) {
+                // No need to do the permission check stuff if we already know
+                // the section is empty.
+                return;
               }
 
-              return this.auth.check(null, `${clsName}.rw.${propName}`).then((rw) => {
-                if ( rw ) return foam.u2.Visibility.RW;
-                return this.auth.check(null, `${clsName}.ro.${propName}`).then((ro) => ro ? foam.u2.Visibility.RO : foam.u2.Visibility.HIDDEN);
+              // Now we almost have the list of properties that are visible. The
+              // last thing we need to do is filter out the ones that the user
+              // doesn't have permission to see.
+              var propertyPermissionPromises = visibleProperties.map((prop) => {
+                var propName = prop.name.toLowerCase();
+                var clsName  = prop.forClass_.substring(prop.forClass_.lastIndexOf('.') + 1).toLowerCase();
+
+                if ( ! (prop.readPermissionRequired || prop.writePermissionRequired) ) {
+                  return Promise.resolve(true);
+                }
+
+                return this.auth.check(null, `${clsName}.rw.${propName}`).then((rw) => {
+                  if ( rw ) return foam.u2.Visibility.RW;
+                  return this.auth.check(null, `${clsName}.ro.${propName}`).then((ro) => ro ? foam.u2.Visibility.RO : foam.u2.Visibility.HIDDEN);
+                });
               });
-            });
 
-            // Filter out actions that the user doesn't have permission to see.
-            var actionPermissionPromises = visibleActions.map(action => {
-              return Promise.all(action.availablePermissions.map(permission => {
-                return this.auth.check(null, permission);
-              }));
-            });
-
-            return Promise.all([
-              Promise.all(propertyPermissionPromises),
-              Promise.all(actionPermissionPromises)
-            ]).then((tuple) => {
-              let [propertyResults, actionResults] = tuple;
-              visibleProperties = visibleProperties.filter((_, i) => propertyResults[i]);
-              visibleActions = visibleActions.filter((_, i) => actionResults[i].every(b => b));
-              if ( visibleProperties.length + visibleActions.length > 0 ) {
-                final.push(s.clone().copyFrom({
-                  properties: visibleProperties,
-                  actions: visibleActions
+              // Filter out actions that the user doesn't have permission to see.
+              var actionPermissionPromises = visibleActions.map(action => {
+                return Promise.all(action.availablePermissions.map(permission => {
+                  return this.auth.check(null, permission);
                 }));
+              });
+
+              return Promise.all([
+                Promise.all(propertyPermissionPromises),
+                Promise.all(actionPermissionPromises)
+              ]).then((tuple) => {
+                let [propertyResults, actionResults] = tuple;
+                visibleProperties = visibleProperties.filter((_, i) => propertyResults[i]);
+                visibleActions = visibleActions.filter((_, i) => actionResults[i].every(b => b));
+                if ( visibleProperties.length + visibleActions.length > 0 ) {
+                  final.push(s.clone().copyFrom({
+                    properties: visibleProperties,
+                    actions: visibleActions
+                  }));
+                }
+              });
+            })).then(() => {
+              if ( queuePos > this.queuePositionWhenLastUpdated_ ) {
+                this.sections = final;
+                this.queuePositionWhenLastUpdated_ = queuePos;
               }
+            }).finally(() => {
+              this.outstandingCalculations_--;
             });
-          })).then(() => {
-            if ( queuePos > this.queuePositionWhenLastUpdated_ ) {
-              this.sections = final;
-              this.queuePositionWhenLastUpdated_ = queuePos;
-            }
-          }).finally(() => {
+          })
+          .catch((err) => {
+            console.error(err);
             this.outstandingCalculations_--;
           });
-        });
+      }
     }
   ]
 });
