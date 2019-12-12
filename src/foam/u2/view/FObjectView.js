@@ -131,7 +131,7 @@ foam.CLASS({
       this
         .tag(foam.u2.detail.VerticalDetailView, {
           data: this,
-          sections: [{
+          sections_: [{
             properties: [this.OBJECT_CLASS, this.DATA]
           }]
         });
