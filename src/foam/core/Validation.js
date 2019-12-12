@@ -141,7 +141,7 @@ foam.CLASS({
             errorString: `Please enter a ${this.label} with at most ${this.maxLength} character${this.maxLength>1?'s':''}`
           });
         }
-        if ( this.required && ! foam.Number.isInstance(this.maxLength) && ! foam.Number.isInstance(this.minLength) ) {
+        if ( this.required && ! foam.Number.isInstance(this.minLength) ) {
           a.push({
             args: [this.name],
             predicateFactory: function(e) {
