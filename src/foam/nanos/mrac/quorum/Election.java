@@ -62,9 +62,9 @@ public class Election extends AbstractFObject {
 		sendAndReceiver.start();
 	}
 	
-	public void shutdown() {
+	public void close() {
 		isRunning = false;
-		sendAndReceiver.shutdown();
+		sendAndReceiver.close();
 	}
 	
 	private void endOfElection(Vote vote) {
@@ -190,7 +190,7 @@ public class Election extends AbstractFObject {
 						if ( message == null ) {
 							continue;
 						}
-						networkManager.send(message.getDestinationInstance(), message);
+						networkManager.sendToInstance(message.getDestinationInstance(), message);
 						
 					} catch ( InterruptedException e ) {
 						// leave the loop.
@@ -214,15 +214,16 @@ public class Election extends AbstractFObject {
 			receiver.start();
 		}
 		
-		void shutdown() {
-			sender.isRunning = true;
-			receiver.isRunning = true;
+		void close() {
+			sender.isRunning = false;
+			receiver.isRunning = false;
 		}
 	}
 	
 	
 	// The method will hold til a primary is found.
 	public Vote electingPrimary() {
+		//TODO: Log start election
 		try {
 			Map<Long, Vote> curVoteSet = new HashMap<Long, Vote>();
 			
@@ -231,12 +232,14 @@ public class Election extends AbstractFObject {
 			
 			synchronized(this) {
 				electionEra.incrementAndGet();
+				// Update propose with initial values.
 				updateProposal(quorumName.getId(), electionEra.get(), quorumName.getId());
 			}
 			
-			//Initial a broadcast. Collaborating era with other instances in the clould.
+			// Propose myself as Leader.
 			broadcast();
 			
+			//TODO: have a class to record all received Votes.
 			QuorumVoteSet voteSet;
 			
 			while ( quorumName.getCurrentState() == InstanceState.ELECTING && isRunning ) {
