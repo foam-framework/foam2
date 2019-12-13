@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 if ( typeof RUNNING_IN_FOAMLINK !== 'undefined' )
   ABORT("this file is not a foamlink manifest");
 
