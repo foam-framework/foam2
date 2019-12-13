@@ -11,6 +11,7 @@ process.on('unhandledRejection', function(e) {
 
 // enable FOAM java support.
 global.FOAM_FLAGS = { 'java': true, 'debug': true, 'js': false, 'swift': true };
+global.FOAMLINK_DATA = __dirname + '/../../.foam/foamlinkoutput.json';
 
 require('../src/foam.js');
 require('../src/foam/nanos/nanos.js');
@@ -18,16 +19,26 @@ require('../src/foam/support/support.js');
 
 var srcPath = __dirname + "/../src/";
 
-if ( ! (process.argv.length == 4 || process.argv.length == 5) ) {
-  console.log("USAGE: genjava.js input-path output-path src-path(optional)");
+if ( ! (
+  process.argv.length == 4 ||
+  process.argv.length == 5 ||
+  process.argv.length == 6 ) ) {
+  console.log("USAGE: genjava.js input-path output-path src-path(optional) files-to-update (optional)");
   process.exit(1);
 }
 
-if ( process.argv.length == 5 ) {
+if ( process.argv.length > 4 && process.argv[4] !== '--' ) {
   srcPath = process.argv[4];
   if ( ! srcPath.endsWith('/') ) {
     srcPath = srcPath + '/';
   }
+}
+
+var incrementalMeta = null;
+if ( process.argv.length > 5  &&
+     process.argv[5] !== '--' &&
+     process.argv[5] != '' ) {
+  incrementalMeta = JSON.parse(process.argv[5]);
 }
 
 var path_ = require('path');
@@ -46,6 +57,16 @@ var blacklist = {}
 externalFile.blacklist.forEach(function(cls) {
   blacklist[cls] = true;
 });
+
+var fileWhitelist = null;
+var classesNotFound = {};
+var classesFound = {};
+if ( incrementalMeta !== null ) {
+  fileWhitelist = {}; // set
+  for ( var i=0; i < incrementalMeta.modified.length; i++ ) {
+    fileWhitelist[incrementalMeta.modified[i]] = true;
+  }
+}
 
 [
   'FObject',
@@ -120,8 +141,13 @@ function loadClass(c) {
     path = path + c[0];
     c = c[1];
   }
-  if ( ! foam.lookup(c, true) ) require(path + c.replace(/\./g, '/') + '.js');
-  return foam.lookup(c);
+  if ( ! foam.lookup(c, true) ) {
+    console.warn("Using fallback model loading; " +
+      "may cause errors for files with multiple definitions.");
+    require(path + c.replace(/\./g, '/') + '.js');
+  }
+  cls = foam.lookup(c);
+  return cls;
 }
 
 function generateClass(cls) {
@@ -130,6 +156,25 @@ function generateClass(cls) {
   }
   if ( typeof cls === 'string' )
     cls = foam.lookup(cls);
+
+  if ( fileWhitelist !== null ) {
+    let src = cls.model_.source;
+    if ( ! src ) {
+      classesNotFound[cls.id] = true;
+      // console.log('no src for: '+cls.id);
+    } else {
+      delete classesNotFound[cls.id];
+      classesFound[cls.id] = true;
+      if ( ! fileWhitelist[src] ) {
+        console.log(fileWhitelist);
+        console.log(src);
+        console.log('skipping...');
+        return;
+      }
+    }
+  }
+
+  console.log('Generating: ' + cls.id);
 
   var outfile = outdir + path_.sep +
     cls.id.replace(/\./g, path_.sep) + '.java';
@@ -195,6 +240,8 @@ function generateProxy(intf) {
       }
     ]
   });
+
+  proxy.source = intf.model_.source;
 
   generateClass(proxy.buildClass());
 }
@@ -279,6 +326,9 @@ function checkFlags(model) {
   return true;
 }
 
+console.log('READY TO DO THE THING');
+console.log(classes);
+
 addDepsToClasses().then(function() {
   classes.forEach(loadClass);
   abstractClasses.forEach(loadClass);
@@ -289,4 +339,20 @@ addDepsToClasses().then(function() {
   abstractClasses.forEach(generateAbstractClass);
   skeletons.forEach(generateSkeleton);
   proxies.forEach(generateProxy);
+}).then(function () {
+  var notFound = Object.keys(classesNotFound).length;
+  var found = Object.keys(classesFound).length;
+
+  if ( notFound > 0 ) {
+    var allKeys = {};
+    for ( k in classesNotFound ) allKeys[k] = true;
+    for ( k in classesFound ) allKeys[k] = true;
+    console.log(''+found+'/'+Object.keys(allKeys).length+' '+
+      'sources found ('+notFound+' missing)');
+    console.log(Object.keys(classesNotFound));
+    if ( notFound > 0 ) {
+      require('fs').writeFileSync('.foam/classesWithNoSources.json',
+        JSON.stringify(Object.keys(classesNotFound)));
+    }
+  }
 });

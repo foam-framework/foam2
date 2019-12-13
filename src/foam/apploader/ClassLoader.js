@@ -35,6 +35,10 @@ have multiple classloaders running alongside eachother`
       path: 'foam.apploader.NodeModelFileDAO',
       flags: ['node'],
     },
+    {
+      path: 'foam.foamlink.FoamlinkNodeModelFileDAO',
+      flags: ['node'],
+    },
   ],
   properties: [
     {
@@ -54,7 +58,11 @@ have multiple classloaders running alongside eachother`
     {
       name: 'addClassPath',
       code: function(path) {
-        var cls = this[foam.isServer ? 'NodeModelFileDAO' : 'WebModelFileDAO'];
+        var cls = this[
+          foam.isServer
+          ? (foam.hasFoamlink ? 'FoamlinkNodeModelFileDAO' : 'NodeModelFileDAO')
+          : 'WebModelFileDAO'
+        ];
         var modelDAO = cls.create({root: path}, this);
 
         if ( this.modelDAO ) {
@@ -72,7 +80,13 @@ have multiple classloaders running alongside eachother`
       async: true,
       args: [ { class: 'String', name: 'id' } ],
       code: function(id) {
-        return this.load_(id, []);
+        var o = this.load_(id, []);
+        o.then((cls) => {
+          if ( cls.id == 'foam.mop.ProxyMOP' ) {
+            console.log(cls.model_.source);
+          }
+        });
+        return o;
       }
     },
     {
@@ -171,8 +185,10 @@ have multiple classloaders running alongside eachother`
               new Error("Failed to load class " + id);
           });
         }
+        if (t) console.log('C');
 
         if ( foam.core.Model.isInstance(id) ) {
+          if (t) console.log('D');
           return this.pending[id.id] = this.buildClass_(id, path);
         }
 
