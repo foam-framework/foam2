@@ -21,6 +21,7 @@ foam.CLASS({
     'java.util.Iterator',
     'java.util.List',
     'java.util.Map',
+    'java.util.HashMap',
     'static foam.mlang.MLang.EQ'
   ],
 
@@ -40,7 +41,8 @@ foam.CLASS({
       javaCode: `
         Logger logger = (Logger) x.get("logger");
 
-        Iterator entries = arguments.entrySet().iterator();
+        Map<String, Object> args = new HashMap<String, Object>(arguments);
+        Iterator entries = args.entrySet().iterator();
         while (entries.hasNext()) {
           Map.Entry entry = (Map.Entry) entries.next();
           if ( entry.getValue() instanceof PropertyInfo ) {
@@ -52,7 +54,7 @@ foam.CLASS({
             entry.setValue(((PropertyInfo) entry.getValue()).get(user));
           }
         }
-        return arguments;
+        return args;
       `
     },
     {
@@ -63,19 +65,20 @@ foam.CLASS({
           if ( ! disabledTopics.contains(notification.getNotificationType()) ) {
             EmailMessage message = new EmailMessage();
             message.setTo(new String[]{user.getEmail()});
+            Notification clone = (Notification) notification.fclone();
 
-            if ( notification.getEmailArgs() != null ) {
-              Map<String, Object> emailArgs = resolveNotificationArguments(x, notification.getEmailArgs(), user);
-              notification.setEmailArgs(emailArgs);
+            if ( clone.getEmailArgs() != null ) {
+              Map<String, Object> emailArgs = resolveNotificationArguments(x, clone.getEmailArgs(), user);
+              clone.setEmailArgs(emailArgs);
             }
 
             try {
-              if ( foam.util.SafetyUtil.isEmpty(notification.getEmailName()) ) {
-                message.setSubject(notification.getTemplate());
-                message.setBody(notification.getBody());
+              if ( foam.util.SafetyUtil.isEmpty(clone.getEmailName()) ) {
+                message.setSubject(clone.getTemplate());
+                message.setBody(clone.getBody());
                 EmailsUtility.sendEmailFromTemplate(x, null, message, null, null);
               } else {
-                EmailsUtility.sendEmailFromTemplate(x, user, message, notification.getEmailName(), notification.getEmailArgs());
+                EmailsUtility.sendEmailFromTemplate(x, user, message, clone.getEmailName(), clone.getEmailArgs());
               }
             } catch(Throwable t) {
               Logger logger = (Logger) x.get("logger");
