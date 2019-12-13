@@ -38,6 +38,6 @@ foam.CLASS({
           ret(null);
         }
       });
-    },
+    }
   ]
 });

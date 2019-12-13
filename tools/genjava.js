@@ -63,7 +63,7 @@ var classesNotFound = {};
 var classesFound = {};
 if ( incrementalMeta !== null ) {
   fileWhitelist = {}; // set
-  for ( var i=0; i < incrementalMeta.modified.length; i++ ) {
+  for ( var i = 0; i < incrementalMeta.modified.length; i++ ) {
     fileWhitelist[incrementalMeta.modified[i]] = true;
   }
 }

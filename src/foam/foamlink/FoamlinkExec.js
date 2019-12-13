@@ -60,7 +60,7 @@ foam.CLASS({
       try {
         this.processFoamlinkFile(repoPath, false, true);
       } catch (e) {
-        reject(e)
+        reject(e);
       }
 
       var walker = foam.util.filesystem.FileWalker.create();
@@ -69,7 +69,7 @@ foam.CLASS({
           self.handleDirectory(repoPath, info);
         } catch (e) {
           console.error(e);
-          reject(e)
+          reject(e);
         }
       });
       return walker.walk(repoPath);
@@ -81,7 +81,7 @@ foam.CLASS({
       var w = "\033[33;1m[WARN]\033[0m ";
 
       for ( k in this.ignorePaths_ ) {
-        if ( info.directory === k || info.directory.startsWith(k+'/') )
+        if ( info.directory === k || info.directory.startsWith(k + '/') )
           return;
       }
 
@@ -110,7 +110,7 @@ foam.CLASS({
 
         // Add any code specified by 'INJECT' in a foamlink file
         if ( this.injectFiles_[fileInfo.fullPath] ) {
-          injectCode = this.injectFiles_[fileInfo.fullPath].join('\n')+'\n';
+          injectCode = this.injectFiles_[fileInfo.fullPath].join('\n') + '\n';
           text = injectCode + text;
         }
 
@@ -128,7 +128,7 @@ foam.CLASS({
           ) {
             console.warn(tag + w +
               'Package name does not match file path: ' +
-              '"'+id+'" is outside of "'+expectedPackage+'".'
+              '"' + id + '" is outside of "' + expectedPackage + '".'
             );
           }
         }
@@ -211,13 +211,13 @@ foam.CLASS({
         self.ignorePaths_[fullPath] = {}
       }
       __foamlink__.ROOTS = function() {
-        for ( var i=0; i < arguments.length; i++ ) {
+        for ( var i = 0; i < arguments.length; i++ ) {
           foam.foamlink.lib.addRoot(arguments[i]);
         }
       }
 
       // Process the foamlink.js file
       with ( __foamlink__ ) { eval(text); }
-    },
+    }
   ]
 });

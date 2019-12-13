@@ -50,7 +50,7 @@ foam.CLASS({
 
       var self = this;
       return new Promise(function(resolve, reject) {
-        self.nodejs_.fs.readdir(path, function (err, files) {
+        self.nodejs_.fs.readdir(path, function(err, files) {
           if ( err ) {
             reject(err);
             return;
@@ -62,7 +62,7 @@ foam.CLASS({
           };
           directoriesToWalk = [];
 
-          files.forEach(function (file) {
+          files.forEach(function(file) {
             let fullPath = self.nodejs_.path.join(path, file);
             let stats = null;
             try {
@@ -78,7 +78,7 @@ foam.CLASS({
               filesMessage.files[file] = {
                 name: file,
                 fullPath: fullPath,
-                stats: stats,
+                stats: stats
               };
             }
           });
@@ -90,7 +90,7 @@ foam.CLASS({
             self.files.pub(filesMessage);
             directoriesToWalk.forEach((fullPath) => {
               recursePromises.push(
-                self.walk(fullPath, depth+1)
+                self.walk(fullPath, depth + 1)
               );
             });
             Promise.all(recursePromises).then(() => {
@@ -102,7 +102,7 @@ foam.CLASS({
             self.directoryStart.pub(path);
             directoriesToWalk.forEach((fullPath) => {
               recursePromises.push(
-                self.walk(fullPath, depth+1)
+                self.walk(fullPath, depth + 1)
               );
             });
             Promise.all(recursePromises).then(() => {

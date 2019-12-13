@@ -5,7 +5,7 @@
  */
 
 if ( typeof RUNNING_IN_FOAMLINK !== 'undefined' )
-  ABORT("this file is not a foamlink manifest");
+  ABORT("This file is not a foamlink manifest");
 
 const util = require('util');
 var fs = require('fs');
