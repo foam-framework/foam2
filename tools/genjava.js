@@ -18,6 +18,12 @@ if ( foamlinkMode ) {
   global.FOAMLINK_DATA = process.env['FOAMLINK_DATA'];
 }
 
+// Store debug files but only if DEBUG_DATA_DIR is set in environment
+var debugDataDir = null;
+if ( process.env.hasOwnProperty('DEBUG_DATA_DIR') ) {
+  debugDataDir = process.env['DEBUG_DATA_DIR'];
+}
+
 require('../src/foam.js');
 require('../src/foam/nanos/nanos.js');
 require('../src/foam/support/support.js');
@@ -348,8 +354,8 @@ addDepsToClasses().then(function() {
     console.log(''+found+'/'+Object.keys(allKeys).length+' '+
       'sources found ('+notFound+' missing)');
     console.log(Object.keys(classesNotFound));
-    if ( notFound > 0 ) {
-      require('fs').writeFileSync('.foam/classesWithNoSources.json',
+    if ( debugDataDir !== null ) {
+      require('fs').writeFileSync('classesWithNoSources.json',
         JSON.stringify(Object.keys(classesNotFound)));
     }
   }
