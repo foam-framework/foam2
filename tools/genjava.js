@@ -11,7 +11,12 @@ process.on('unhandledRejection', function(e) {
 
 // enable FOAM java support.
 global.FOAM_FLAGS = { 'java': true, 'debug': true, 'js': false, 'swift': true };
-global.FOAMLINK_DATA = __dirname + '/../../.foam/foamlinkoutput.json';
+
+// Enable FOAMLink mode but only if FOAMLINK_DATA is set in environment
+var foamlinkMode = process.env.hasOwnProperty('FOAMLINK_DATA');
+if ( foamlinkMode ) {
+  global.FOAMLINK_DATA = process.env['FOAMLINK_DATA'];
+}
 
 require('../src/foam.js');
 require('../src/foam/nanos/nanos.js');
@@ -61,7 +66,9 @@ externalFile.blacklist.forEach(function(cls) {
 var fileWhitelist = null;
 var classesNotFound = {};
 var classesFound = {};
-if ( incrementalMeta !== null ) {
+
+// Set file whitelist from parsed argument, but only if foamlink is enabled
+if ( incrementalMeta !== null && foamlinkMode ) {
   fileWhitelist = {}; // set
   for ( var i = 0; i < incrementalMeta.modified.length; i++ ) {
     fileWhitelist[incrementalMeta.modified[i]] = true;
