@@ -95,6 +95,15 @@ foam.CLASS({
         class: 'foam.u2.TextField',
         placeholder: 'Staff accountant'
       },
+      validationPredicates: [
+        {
+          args: ['department'],
+          predicateFactory: function(e) {
+            return e.NEQ(foam.nanos.u2.navigation.SignUp.DEPARTMENT, '');
+          },
+          errorString: 'Please enter a job title'
+        }
+      ],
       required: true
     },
     {
@@ -198,8 +207,6 @@ foam.CLASS({
           window.history.replaceState(null, null, window.location.origin);
           location.reload();
         } else {
-          // logout once we have finished updating documents.
-          this.auth.logout();
           this.stack.push({
             class: 'foam.nanos.auth.ResendVerificationEmail'
           });
