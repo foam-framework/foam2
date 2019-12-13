@@ -27,8 +27,7 @@ foam.LIB({
 
         // This is the scope of the loaded file
         var context = {
-          // Create using the real foam object's prototype (thanks Mike)
-          foam_: Object.create({})
+          foam_: {}
         };
 
         // TODO: DRY list of FOAM declaration types if possible
@@ -63,7 +62,6 @@ foam.LIB({
 
         try {
           (function() {
-            // console.log(proxyHack + text);
             with ( context ) {
 
         // Unfortunately, without parsing the Javascript AST, it is currently
