@@ -34,7 +34,7 @@ foam.CLASS({
       if ( ! Array.isArray(idsPresent) ) {
         idsPresent = Object.keys(idsPresent);
       }
-      for ( var i=0; i < idsPresent.length; i++ ) {
+      for ( var i = 0; i < idsPresent.length; i++ ) {
         this.classesToFiles[idsPresent[i]] = fileName;
       }
     },
