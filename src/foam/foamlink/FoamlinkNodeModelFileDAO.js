@@ -18,9 +18,9 @@ foam.CLASS({
       name: 'delegate',
       factory: function() {
         return this.ModelFileDAO.create({
-          fetcher: this.FoamlinkNodeModelFileFetcher.create({root: this.root}), });
+          fetcher: this.FoamlinkNodeModelFileFetcher.create({ root: this.root })
+        });
       },
     },
   ],
 });
-
