@@ -46,12 +46,9 @@ foam.CLASS({
       return new Promise((resolve, reject) => {
         this.processFoamlinkFile(path, true);
 
-        var walkPromises = [];
-        for ( repoPath in this.repositories_ ) {
-          walkPromises.push(this.startWalking(repoPath, reject));
-        }
-
-        Promise.all(walkPromises).then(resolve);
+        Promise.all(Object.keys(this.repositories_).map(
+            repoPath => this.startWalking(repoPath, reject))
+          ).then(resolve);
       });
     },
     function startWalking(repoPath, reject) {
@@ -85,7 +82,6 @@ foam.CLASS({
           return;
       }
 
-      // console.log('--> ' + info.directory);
       var relPath = this.nodejs_.path.relative(repoPath, info.directory);
 
       // Compute expected package name for warnings
@@ -104,7 +100,6 @@ foam.CLASS({
           || this.ignorePaths_[fileInfo.fullPath]
         ) continue;
 
-        // console.log('   - >' + fileInfo.fullPath);
         let text = this.nodejs_.fs.readFileSync(fileInfo.fullPath)
         text = text.toString();
 

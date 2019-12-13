@@ -1,7 +1,9 @@
 foam.CLASS({
   package: 'foam.util.filesystem',
   name: 'FileWalker',
+
   topics: ['files', 'directoryStart', 'directoryEnd', 'error'],
+
   documentation: `
     This FileWalker goes through items in a directory recursively
     and reports the following to these 4 topics:
@@ -16,6 +18,7 @@ foam.CLASS({
         the source of the error as a string (ex: 'lstat') and the
         error object.
   `,
+
   properties: [
     // TODO: add regexes for ignored files (ex: dotfiles)
     {
@@ -31,6 +34,7 @@ foam.CLASS({
     },
     'nodejs_'
   ],
+
   methods: [
     function init() {
       this.nodejs_ = {};
@@ -62,50 +66,47 @@ foam.CLASS({
           };
           directoriesToWalk = [];
 
-          files.forEach(function(file) {
-            let fullPath = self.nodejs_.path.join(path, file);
-            let stats = null;
-            try {
-              stats = self.nodejs_.fs.lstatSync(fullPath);
-            } catch (e) {
-              console.warn('Failed to stat file: ' + fullPath);
-              self.error.pub('stat', e);
-              return;
-            }
-            if ( stats.isDirectory() ) {
-              directoriesToWalk.push(fullPath);
-            } else {
-              filesMessage.files[file] = {
-                name: file,
-                fullPath: fullPath,
-                stats: stats
-              };
-            }
-          });
+          let fileInfos = files
+            .map((file) => {
+              let fullPath = self.nodejs_.path.join(path, file);
+              try {
+                stats = self.nodejs_.fs.lstatSync(fullPath);
+                return {
+                  name: file,
+                  fullPath: fullPath,
+                  stats: stats,
+                }
+              } catch (e) {
+                console.warn('Failed to stat file: ' + fullPath);
+                self.error.pub('stat', e);
+              }
+              return null;
+            }).filter( (info) => info !== null );
+
+          directoriesToWalk = fileInfos
+            .filter( (info) => info.stats.isDirectory() )
+            .map( (info) => info.fullPath );
+
+          filesMessage.files = fileInfos
+            .filter( (info) => ! info.stats.isDirectory() );
 
           let recursePromises = [];
           switch ( self.order ) {
           case 'BFS':
             self.directoryStart.pub(path);
             self.files.pub(filesMessage);
-            directoriesToWalk.forEach((fullPath) => {
-              recursePromises.push(
-                self.walk(fullPath, depth + 1)
-              );
-            });
-            Promise.all(recursePromises).then(() => {
+            Promise.all(directoriesToWalk.map(
+              (fullPath) => self.walk(fullPath, depth + 1)
+            )).then(() => {
               self.directoryEnd.pub(path);
               resolve();
             });
             break;
           case 'DFS':
             self.directoryStart.pub(path);
-            directoriesToWalk.forEach((fullPath) => {
-              recursePromises.push(
-                self.walk(fullPath, depth + 1)
-              );
-            });
-            Promise.all(recursePromises).then(() => {
+            Promise.all(directoriesToWalk.map(
+              (fullPath) => self.walk(fullPath, depth + 1)
+            )).then(() => {
               self.files.pub(filesMessage);
               self.directoryEnd.pub(path);
               resolve();
