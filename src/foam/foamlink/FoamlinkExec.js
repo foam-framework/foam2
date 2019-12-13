@@ -40,9 +40,6 @@ foam.CLASS({
       return new Promise((resolve, reject) => {
         this.processFoamlinkFile(path, true);
 
-        console.log('FOAMLINK REPOSITORIES');
-        console.log(this.repositories_);
-
         var walkPromises = [];
         for ( repoPath in this.repositories_ ) {
           walkPromises.push(this.startWalking(repoPath, reject));
@@ -53,8 +50,6 @@ foam.CLASS({
     },
     function startWalking(repoPath, reject) {
       var self = this;
-
-      console.log('==> ' + repoPath);
 
       try {
         this.processFoamlinkFile(repoPath, false, true);

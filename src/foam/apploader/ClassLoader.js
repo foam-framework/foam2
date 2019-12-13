@@ -80,13 +80,7 @@ have multiple classloaders running alongside eachother`
       async: true,
       args: [ { class: 'String', name: 'id' } ],
       code: function(id) {
-        var o = this.load_(id, []);
-        o.then((cls) => {
-          if ( cls.id == 'foam.mop.ProxyMOP' ) {
-            console.log(cls.model_.source);
-          }
-        });
-        return o;
+        return this.load_(id, []);
       }
     },
     {
@@ -185,10 +179,8 @@ have multiple classloaders running alongside eachother`
               new Error("Failed to load class " + id);
           });
         }
-        if (t) console.log('C');
 
         if ( foam.core.Model.isInstance(id) ) {
-          if (t) console.log('D');
           return this.pending[id.id] = this.buildClass_(id, path);
         }
 

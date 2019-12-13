@@ -33,8 +33,7 @@ foam.CLASS({
           if ( ! text ) return null;
           var source = null;
 
-          // TODO: I don't like this but didn't want to change the
-          //       interface of fetcher prior to review
+          // TODO: Change the interface of fetcher to remove this hack
           if ( Array.isArray(text) && text[0] === 'withsource' ) {
             source = text[1].source;
             text = text[1].text;

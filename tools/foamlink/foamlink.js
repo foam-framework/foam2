@@ -34,28 +34,6 @@ function main () {
     console.log('\033[31;1mOh no! Foamlink aborted due to an error!\033[0m');
     process.exit(1);
   });
-
-  /*
-    var walker = foam.foamlink.FileWalker.create();
-    walker.files.sub((_1, _2, info) => {
-      var foamlink = null;
-      if ( info.files.hasOwnProperty('foamlink.js') ) {
-        foamlink = info.files['foamlink.js'];
-      }
-    });
-    walker.walk('./deployment').then(() => {
-      return;
-      let o = foam.json.Outputter.create();
-      let cls = foam.lookup('foam.foamlink.FileWalker');
-      let r = o.objectify(cls.model_);
-      let s = JSON.stringify(r);
-      let hurledUpModel = JSON.parse(s);
-      let realModel = foam.lookup(
-        hurledUpModel.class || 'Model').create(hurledUpModel);
-      let newCls = realModel.buildClass();
-      console.log(newCls.id)
-    });;
-  */
 }
 
 main();

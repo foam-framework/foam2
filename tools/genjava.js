@@ -161,20 +161,14 @@ function generateClass(cls) {
     let src = cls.model_.source;
     if ( ! src ) {
       classesNotFound[cls.id] = true;
-      // console.log('no src for: '+cls.id);
     } else {
       delete classesNotFound[cls.id];
       classesFound[cls.id] = true;
       if ( ! fileWhitelist[src] ) {
-        console.log(fileWhitelist);
-        console.log(src);
-        console.log('skipping...');
         return;
       }
     }
   }
-
-  console.log('Generating: ' + cls.id);
 
   var outfile = outdir + path_.sep +
     cls.id.replace(/\./g, path_.sep) + '.java';
@@ -325,9 +319,6 @@ function checkFlags(model) {
 
   return true;
 }
-
-console.log('READY TO DO THE THING');
-console.log(classes);
 
 addDepsToClasses().then(function() {
   classes.forEach(loadClass);
