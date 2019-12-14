@@ -86,7 +86,7 @@ returning true if the context users spid matches the current object.`,
         if ( pInfos == null ) {
           return false;
         }
-        for ( int i = 0; i < pInfos.length; i++) {
+        for ( int i = 0; i < pInfos.length; i++ ) {
           foam.core.PropertyInfo pInfo = pInfos[i];
           try {
             java.lang.reflect.Method method = getFindMethod(x, pInfo.getName(), result);
@@ -94,16 +94,18 @@ returning true if the context users spid matches the current object.`,
             if ( result != null &&
                  result instanceof ServiceProviderAware ) {
               ServiceProviderAware sp = (ServiceProviderAware) result;
-              return user.getSpid().equals(sp.getSpid()) ||
-                ((AuthService) x.get("auth")).check(x, "spid.read."+sp.getSpid());
-            }
-          } catch (Throwable e) {
-            return false;
-          }
-        }
-      }
-      return false;
-      `
+              if ( user.getSpid().equals(sp.getSpid()) ||
+                  ((AuthService) x.get("auth")).check(x, "spid.read." + sp.getSpid()) ) {
+                return true;
+             }
+           }
+         } catch (Throwable e) {
+           return false;
+         }
+       }
+     }
+     return false;
+     `
     },
     {
       name: 'getFindMethod',

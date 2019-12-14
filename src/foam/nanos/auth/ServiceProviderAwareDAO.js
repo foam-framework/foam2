@@ -9,8 +9,15 @@ foam.CLASS({
   name: 'ServiceProviderAwareDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  documentation: `Enforce Spid to that of context user or AppConfig default on put,
-and filter by spid on find and select`,
+  documentation: `A DAO decorator which:
+- filters find and select by the 'owning' ServiceProvider ID (spid),
+- enforces spid permissions on update and create,
+- restricts or filters by spid on remove.
+The DAO can act on models which explicitly implement ServiceProviderAware,
+or where a Reference/Relationship model implements ServiceProviderAware.
+Where the ServiceProviderAware is found through a Reference or Relationship,
+the DAO uses a Map of class and PropertyInfos to traverse the Reference,
+Relationship hierarchy.`,
 
   javaImports: [
     'foam.core.FObject',
@@ -31,6 +38,10 @@ and filter by spid on find and select`,
 
   properties: [
     {
+      documentation: `A Map propertyInfo[] key on class name.  For some class,
+the propertyInfos are the Reference or Relationship property from which to find
+the next step in the hierachy on route the instance which implements
+ServiceProviderAware`,
       name: 'propertyInfos',
       class: 'Map',
       javaFactory: 'return new java.util.HashMap<String, PropertyInfo[]>();'
