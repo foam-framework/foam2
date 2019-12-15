@@ -564,7 +564,6 @@ foam.CLASS({
       class: 'Boolean',
       // note: want this decorator on the non-local/served stack.
       javaFactory: `return getNSpec().getServe() &&
-                            ! getEnableInterfaceDecorators() &&
                             foam.nanos.auth.ServiceProviderAware.class.isAssignableFrom(getOf().getObjClass());`
     },
     {

@@ -233,6 +233,7 @@ foam.CLASS({
         rtn = rtn
           .put("user", user)
           .put("agent", agent)
+          .put("spid", user.getSpid())
           .put("logger", new PrefixLogger(prefix, (Logger) x.get("logger")))
           .put("twoFactorSuccess", getContext().get("twoFactorSuccess"))
           .put(CachingAuthService.CACHE_KEY, getContext().get(CachingAuthService.CACHE_KEY));
