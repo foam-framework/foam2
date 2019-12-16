@@ -201,7 +201,7 @@ foam.CLASS({
         if ( getDeletedAware() ) {
           logger.warning("EasyDAO", getName(), "DEPRECATED: DeletedAware. Use LifecycleAware instead");
 
-         delegate = new foam.nanos.auth.DeletedAwareDAO.Builder(getX())
+          delegate = new foam.nanos.auth.DeletedAwareDAO.Builder(getX())
             .setDelegate(delegate)
             .setName(getPermissionPrefix())
             .build();
