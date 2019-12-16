@@ -155,6 +155,7 @@ public class Election extends AbstractFObject {
                 // The cluster has picked a primary already. Send back Vote for leader.
                 if ( inMessage.getSourceStatus() == InstanceState.ELECTING ) {
 
+
                   //TODO: provide a way to allow all voter to have a change to vote at lease once.
 
                   //Vote should set both electionEra and primaryEra
@@ -314,7 +315,7 @@ public class Election extends AbstractFObject {
 
               if ( finalMessage == null ) {
                 Vote primaryVote = new Vote(proposedPrimary, electionEra.get(), proposedPrimaryEra, proposedCriteria);
-                finishElection(Vote);
+                finishElection(primaryVote);
                 return primaryVote;
               }
             }
@@ -330,7 +331,7 @@ public class Election extends AbstractFObject {
                   || vote.getPrimaryInstanceId() != proposedPrimary) {
               voteMap.clear();
               electionEra.set(vote.getElectionEra());
-              updateProposel(vote.getPrimaryInstanceId(), vote.getPrimaryEra(), vote.getCriteria());
+              updateProposal(vote.getPrimaryInstanceId(), vote.getPrimaryEra(), vote.getCriteria());
               receptedQueue.put(inMessage);
               continue;
             }
@@ -339,7 +340,7 @@ public class Election extends AbstractFObject {
 
             if ( voteMap.size() >= quorumSize || voteMap.get(proposedPrimary) != null ) {
                Vote primaryVote = new Vote(proposedPrimary, electionEra.get(), proposedPrimaryEra, proposedCriteria);
-              finishElection(Vote);
+              finishElection(primaryVote);
               return primaryVote;
             }
 

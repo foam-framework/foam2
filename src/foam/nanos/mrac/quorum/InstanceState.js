@@ -9,7 +9,7 @@ foam.ENUM({
   name: 'InstanceState',
 
   values: [
-    'PRIMAEY',
+    'PRIMARY',
     'SECONDARY',
     'ELECTING'
   ]
