@@ -58,8 +58,7 @@ foam.CLASS({
     },
     {
       name: 'isInverse',
-      class: 'Boolean',
-      value: false
+      class: 'Boolean'
     }
   ],
 
