@@ -6,29 +6,41 @@
 
 package foam.nanos.dig;
 
-import foam.dao.DAO;
+import java.io.PrintWriter;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
+
 import foam.core.PropertyInfo;
 import foam.core.X;
+import foam.dao.DAO;
 import foam.lib.AndPropertyPredicate;
 import foam.lib.NetworkPropertyPredicate;
 import foam.lib.PermissionedPropertyPredicate;
 import foam.lib.PropertyPredicate;
 import foam.lib.json.JSONParser;
+import foam.lib.json.MapParser;
 import foam.lib.json.Outputter;
+import foam.lib.parse.PStream;
+import foam.lib.parse.ParserContext;
+import foam.lib.parse.ParserContextImpl;
+import foam.lib.parse.ProxyParser;
+import foam.lib.parse.StringPStream;
 import foam.nanos.boot.NSpec;
-import foam.nanos.dig.exception.*;
+import foam.nanos.dig.exception.DigErrorMessage;
+import foam.nanos.dig.exception.GeneralException;
+import foam.nanos.http.Format;
 import foam.nanos.http.HttpParameters;
+import foam.nanos.http.WebAgent;
 import foam.nanos.logger.Logger;
 import foam.util.SafetyUtil;
-import foam.nanos.http.WebAgent;
-
-import java.io.*;
-import java.lang.Exception;
-import java.lang.reflect.*;
-import java.nio.CharBuffer;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Iterator;
-import java.util.List;
 
 public class SugarWebAgent
   implements WebAgent
@@ -40,28 +52,45 @@ public class SugarWebAgent
     PrintWriter         out            = x.get(PrintWriter.class);
     HttpServletResponse resp           = x.get(HttpServletResponse.class);
     HttpParameters      p              = x.get(HttpParameters.class);
-    CharBuffer          buffer_        = CharBuffer.allocate(65535);
-    String              serviceName    = p.getParameter("service");
-    String              methodName     = p.getParameter("method");
-    String              interfaceName  = p.getParameter("interfaceName");
+    String              data           = p.getParameter("data");
 
     try {
+      if ( SafetyUtil.isEmpty(data) ) {
+        DigErrorMessage error = new GeneralException.Builder(x)
+          .setMessage("Empty data")
+          .build();
+        DigUtil.outputException(x, error, Format.JSON);
+        return;
+      }
+      
+      PStream ps = new StringPStream(data);
+      ParserContext psx = new ParserContextImpl();
+      psx.set("X", x);
+
+      ProxyParser jsonP =  new MapParser();
+      jsonP.setX(x);
+      PStream psParse = jsonP.parse(ps , psx);
+      Map mapPostParam = (Map) psParse.value();
+
+      String serviceName = (String) mapPostParam.get("service");
       if ( SafetyUtil.isEmpty(serviceName) ) {
         DigErrorMessage error = new GeneralException.Builder(x)
           .setMessage("Empty Service Key")
           .build();
-        outputException(x, resp, "JSON", out, error);
+        DigUtil.outputException(x, error, Format.JSON);
         return;
       }
-
+      
+      String methodName = (String) mapPostParam.get("method");
       if ( SafetyUtil.isEmpty(methodName) ) {
         DigErrorMessage error = new GeneralException.Builder(x)
           .setMessage("Empty Method Name")
           .build();
-        outputException(x, resp, "JSON", out, error);
+        DigUtil.outputException(x, error, Format.JSON);
         return;
       }
 
+      String interfaceName = (String) mapPostParam.get("interfaceName");
       Class class_ = null;
       try {
         class_ = Class.forName(interfaceName);
@@ -69,7 +98,7 @@ public class SugarWebAgent
           DigErrorMessage error = new GeneralException.Builder(x)
             .setMessage("Can not find out service interface")
             .build();
-          outputException(x, resp, "JSON", out, error);
+          DigUtil.outputException(x, error, Format.JSON);
           return;
       }
 
@@ -82,21 +111,24 @@ public class SugarWebAgent
         DigErrorMessage error = new GeneralException.Builder(x)
           .setMessage(String.format("Could not find service named '%s'", serviceName))
           .build();
-        outputException(x, resp, "JSON", out, error);
+        DigUtil.outputException(x, error, Format.JSON);
         return;
       }
 
       try {
         nspec.checkAuthorization(x);
       } catch (foam.nanos.auth.AuthorizationException e) {
-        outputException(x, resp, "JSON", out, new foam.nanos.dig.exception.AuthorizationException.Builder(x)
-          .setMessage(e.getMessage())
-          .build());
+        DigUtil.outputException(x,
+          new foam.nanos.dig.exception.AuthorizationException.Builder(x)
+            .setMessage(e.getMessage())
+            .build(),
+          Format.JSON);
         return;
       }
 
       Class[] paramTypes = null; // for picked Method's parameters' types
-      Object arglist[] = null; // to store each parameters' values
+      Object  arglist[]  = null; // to store each parameters' values
+      String  paramName  = null;
 
       if ( class_ != null ) {
         Method method_[] = class_.getMethods();  // get Methods' List from the class
@@ -109,38 +141,35 @@ public class SugarWebAgent
 
             Parameter[] pArray = method_[k].getParameters();
             paramTypes = new Class[pArray.length];
-            arglist = new Object[pArray.length];
+            arglist    = new Object[pArray.length];
 
-            for ( int j = 0 ; j < pArray.length ; j++ ) {  // checking the method's each parameter
+            for ( int j = 0 ; j < pArray.length ; j++ ) { // checking the method's each parameter
               paramTypes[j] = pArray[j].getType();
 
               if ( ! pArray[j].isNamePresent() ) {
                 DigErrorMessage error = new GeneralException.Builder(x)
-                  .setMessage("IllegalArgumentException : Add a compiler argument")
+                  .setMessage("IllegalArgumentException : Add a compiler argument (use javac -parameters)")
                   .build();
-                outputException(x, resp, "JSON", out, error);
+                DigUtil.outputException(x, error, Format.JSON);
                 return;
               }
-
-              paramTypes[j] = pArray[j].getType();
-              arglist[j] = p.getParameter(pArray[j].getName());
-
-              logger.debug(pArray[j].getName() + " :   " + p.getParameter(pArray[j].getName()));
+              // the post method
+              paramName = pArray[j].getName();
+              logger.debug(pArray[j].getName() + " :   " + paramName);
 
               // casting and setting according to parameters type
               String typeName = pArray[j].getType().getCanonicalName();
-              Class paramObj_ = null;
-              Object obj_ = null;
 
               if ( typeName.equals("foam.core.X") ) {
                 arglist[j] = x;
-              } else if ( ! SafetyUtil.isEmpty(p.getParameter(pArray[j].getName())) ) {
-                arglist[j] = setParameterValue(x, resp, out, p, typeName, pArray[j]);
+              } else if ( paramName != null ) {
+                //post method
+                arglist[j] = mapPostParam.get(paramName);
               } else {
                 DigErrorMessage error = new GeneralException.Builder(x)
                   .setMessage("Empty Parameter values : " + pArray[j].getName())
                   .build();
-                outputException(x, resp, "JSON", out, error);
+                DigUtil.outputException(x, error, Format.JSON);
                 return;
               }
             }
@@ -153,7 +182,7 @@ public class SugarWebAgent
       DigErrorMessage error = new GeneralException.Builder(x)
         .setMessage(e.toString())
         .build();
-      outputException(x, null, "JSON", null, error);
+      DigUtil.outputException(x, error, Format.JSON);
     }
   }
 
@@ -177,36 +206,13 @@ public class SugarWebAgent
       DigErrorMessage error = new GeneralException.Builder(x)
         .setMessage("InvocationTargetException: " + e.getTargetException().getMessage())
         .build();
-      outputException(x, resp, "JSON", out, error);
+      DigUtil.outputException(x, error, Format.JSON);
     } catch (Exception e) {
       DigErrorMessage error = new GeneralException.Builder(x)
         .setMessage("Exception: " + e.toString())
         .build();
-      outputException(x, resp, "JSON", out, error);
+      DigUtil.outputException(x, error, Format.JSON);
     }
-  }
-
-  protected void outputException(X x, HttpServletResponse resp, String format, PrintWriter out, DigErrorMessage error) {
-    if ( resp == null ) resp = x.get(HttpServletResponse.class);
-
-    if ( out == null ) out = x.get(PrintWriter.class);
-
-    resp.setStatus(Integer.parseInt(error.getStatus()));
-    format = "JSON";  // Currently supporting only JSON
-
-    if ( format.equals("JSON") ) {
-      JSONParser jsonParser = new JSONParser();
-      jsonParser.setX(x);
-
-      Outputter outputterJson = new foam.lib.json.Outputter(x).setPropertyPredicate(new AndPropertyPredicate(x, new PropertyPredicate[] {new NetworkPropertyPredicate(), new PermissionedPropertyPredicate()}));
-      outputterJson.setOutputDefaultValues(true);
-      outputterJson.setOutputClassNames(true);
-      outputterJson.output(error);
-
-      out.println(outputterJson.toString());
-    }
-
-    return;
   }
 
   protected Object getFieldInfo(X x, String className, HttpParameters p) {  // For Obj Parameters
@@ -247,64 +253,9 @@ public class SugarWebAgent
       DigErrorMessage error = new GeneralException.Builder(x)
         .setMessage(e.toString())
         .build();
-      outputException(x, null, "JSON", null, error);
+      DigUtil.outputException(x, error, Format.JSON);
     }
 
     return clsObj;
-  }
-
-  protected Object setParameterValue(X x, HttpServletResponse resp, PrintWriter out, HttpParameters p, String typeName, Parameter pArray_) {
-    Object arg = null;
-
-    if ( ! SafetyUtil.isEmpty(typeName) ) {
-      switch ( typeName ) {
-        case "double":
-          arg = Double.parseDouble(p.getParameter(pArray_.getName()));
-          break;
-        case "boolean":
-          arg = Boolean.parseBoolean(p.getParameter(pArray_.getName()));
-          break;
-        case "int":
-          arg = Integer.parseInt(p.getParameter(pArray_.getName()));
-          break;
-        case "long":
-          arg = Long.parseLong(p.getParameter(pArray_.getName()));
-          break;
-        case "java.lang.String":
-          arg = p.getParameter(pArray_.getName());
-          break;
-        case "String[]":
-          arg = p.getParameterValues(pArray_.getName());
-          break;
-        case "foam.core.X":
-          arg = x;
-          break;
-        default:
-          Class objClass = null;
-
-          try {
-            objClass = Class.forName(typeName);
-
-            if ( objClass != null && objClass.isEnum() ) {  // For Enum Parameter
-              for ( int t = 0 ; t < objClass.getEnumConstants().length ; t++ ) {
-                if ( objClass.getEnumConstants()[t].toString().equals(p.getParameter(pArray_.getName())) ) {
-                  arg = objClass.getEnumConstants()[t];
-                }
-              }
-            } else {
-              arg = getFieldInfo(x, typeName, p);  // For Object Parameter
-            }
-          } catch (Exception e) {
-            DigErrorMessage error = new GeneralException.Builder(x)
-              .setMessage(e.toString())
-              .build();
-            outputException(x, null, "JSON", null, error);
-
-
-          }
-      }
-    }
-
-    return arg;
   }
 }

@@ -4,6 +4,52 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+
+ foam.CLASS({
+   name: 'MultiPartTextField',
+   extends: 'foam.u2.View',
+
+   requires: [ 'foam.u2.TextField' ],
+
+   properties: [
+     {
+       class: 'Int',
+       name: 'numOfParts',
+       value: 7
+     }
+   ],
+
+   methods: [
+     function initE() {
+       this.SUPER();
+
+       for ( let i = 0 ; i < this.numOfParts ; i++ ) {
+         let v = this.TextField.create({size: 2});
+         v.data$.relateFrom(this.data$, () => this.data.substring(0,i) + v.data.substring(0) + this.data.substring(i+1), () => this.data.substring(i, i+1));
+         this.tag(v);
+       }
+
+     }
+   ]
+ });
+
+ foam.CLASS({
+   name: 'MultiPartTextFieldTest',
+   properties: [
+     {
+       name: 'val',
+       view: 'MultiPartTextField'
+     }
+   ]
+ })
+
+ var mptft = MultiPartTextFieldTest.create({val:'1234567'});
+ foam.u2.DetailView.create({ data: mptft }).write();
+ foam.u2.DetailView.create({ data: mptft }).write();
+ mptft.val$.sub(function() { console.log('***** value: ', mptft.val)});
+
+
+
 foam.CLASS({
   name: 'Something',
 
@@ -350,8 +396,16 @@ foam.CLASS({
               default: return 'other';
             }
           })).
+          // Hide the DOM depending on the value of 'flip'
           start('div').show(this.flip$).add('flip').end().
           start('div').hide(this.flip$).add('flop').end().
+          // Create or destroy the DOM depending on the value of 'flip'
+          add(this.flip$.map(function(f) {
+            if ( f ) return E().start('div').add('flip').end();
+          })).
+          add(this.flip$.map(function(f) {
+            if ( ! f ) return E().start('div').add('flop').end();
+          })).
           start(this.FIELD1).attrs({onKey: true}).end().
           start(this.FIELD1).attrs({onKey: true}).end().
           start(this.FIELD2).attrs({onKey: true}).end().
@@ -387,6 +441,31 @@ foam.CLASS({
   ]
 });
 foam.lookup('CustomDetailView').create().write();
+
+
+foam.CLASS({
+  name: 'AnyViewDemo',
+
+  documentation: 'Show use of AnyView, which provides a suitable view for Object properties based on their current value.',
+
+  properties: [
+    {
+      class: 'Object',
+      name: 'anyValue',
+      view: 'foam.u2.view.AnyView',
+      value: true
+    }
+  ],
+
+  actions: [
+    function becomeString()  { this.anyValue = 'a String'; },
+    function becomeBoolean() { this.anyValue = true},
+    function becomeInt()     { this.anyValue = 42; },
+    function becomeDate()    { this.anyValue = new Date(); },
+  ]
+});
+
+foam.u2.DetailView.create({ data: AnyViewDemo.create() }).write();
 
 
 // Converted from Angular2 demo:

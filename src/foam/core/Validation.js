@@ -141,6 +141,15 @@ foam.CLASS({
             errorString: `Please enter a ${this.label} with at most ${this.maxLength} character${this.maxLength>1?'s':''}`
           });
         }
+        if ( this.required && ! foam.Number.isInstance(this.minLength) ) {
+          a.push({
+            args: [this.name],
+            predicateFactory: function(e) {
+              return e.GTE(foam.mlang.StringLength.create({ arg1: self }), 1);
+            },
+            errorString: `Please enter a ${this.label}`
+          });
+        }
         return a;
       }
     }
@@ -338,6 +347,35 @@ foam.CLASS({
           );
         }
         return ret;
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'PhoneNumberPropertyValidationRefinement',
+  refines: 'foam.core.PhoneNumber',
+  properties: [
+    {
+      class: 'FObjectArray',
+      of: 'foam.core.ValidationPredicate',
+      name: 'validationPredicates',
+      factory: function() {
+        var self = this;
+        if ( ! this.required ) return [];
+        return [
+          {
+            args: [this.name],
+            predicateFactory: function(e) {
+                return e.REG_EXP(
+                  self,
+                  /^(?:\+?1[-.●]?)?\(?([0-9]{3})\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4})$/
+                 );
+            },
+            errorString: 'Please enter a valid phone number'
+          }
+        ];
       }
     }
   ]

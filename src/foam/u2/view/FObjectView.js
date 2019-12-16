@@ -36,12 +36,10 @@ foam.CLASS({
         };
       },
       postSet: function(oldValue, newValue) {
-        if ( newValue !== oldValue ) {
+        if ( newValue !== oldValue && oldValue !== '' ) {
           var m = this.__context__.lookup(newValue, true);
           if ( m ) {
-            var n = m.create(null, this);
-            n.copyFrom(this.data);
-            this.data = n;
+            this.data = m.create(null, this);
           }
         }
       }
@@ -91,6 +89,12 @@ foam.CLASS({
     },
 
     function updateChoices() {
+      // If choices is hard-coded to something, just use that instead of pulling
+      // options from the strategizer.
+      if ( Array.isArray(this.choices) && this.choices.length > 0 ) {
+        return;
+      }
+
       if ( this.of == null ) {
         this.choices = [];
         return;
@@ -122,7 +126,7 @@ foam.CLASS({
           choices.sort((a, b) => a[1] > b[1] ? 1 : -1);
 
           this.choices = choices;
-        });
+        }).catch(err => console.warn(err));
       } else {
         this.choices = this.choicesFallback(this.of);
       }
@@ -133,7 +137,7 @@ foam.CLASS({
       this
         .tag(foam.u2.detail.VerticalDetailView, {
           data: this,
-          sections: [{
+          sections_: [{
             properties: [this.OBJECT_CLASS, this.DATA]
           }]
         });

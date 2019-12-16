@@ -47,31 +47,26 @@ foam.CLASS({
       this.SUPER();
       this
         .addClass(this.myClass())
-        .add(this.slot(function(sections, data) {
-          if ( ! data ) return;
-
-          return self.E()
-            .start(self.Grid)
-              .forEach(sections, function(s) {
-                this
-                  .start(self.GUnit, { columns: s.gridColumns })
-                    .addClass(self.myClass('card-container'))
-                    .show(s.createIsAvailableFor(self.data$))
-                    .start('h2')
-                      .add(s.title$)
-                      .show(s.title$)
-                    .end()
-                    .start(self.border)
-                      .addClass('inner-card')
-                      .tag(self.SectionView, {
-                        data$: self.data$,
-                        section: s,
-                        showTitle: false
-                      })
-                    .end()
-                  .end();
-              })
-            .end();
+        .hide(this.loading$)
+        .add(this.slot(function(sections) {
+          return this.E()
+            .forEach(sections, function(s) {
+              this.start(self.GUnit, { columns: s.gridColumns })
+                .addClass(self.myClass('card-container'))
+                .start('h2')
+                  .add(s.title$)
+                  .show(s.title$)
+                .end()
+                .start(self.border)
+                  .addClass('inner-card')
+                  .tag(self.SectionView, {
+                    data$: self.data$,
+                    section: s,
+                    showTitle: false
+                  })
+                .end()
+              .end();
+            });
         }));
     }
   ]

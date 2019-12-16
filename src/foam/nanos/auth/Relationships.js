@@ -43,3 +43,25 @@ foam.RELATIONSHIP({
     section: 'administrative'
   }
 });
+
+foam.RELATIONSHIP({
+  cardinality: '1:*',
+  sourceModel: 'foam.nanos.auth.UserUserJunction',
+  targetModel: 'foam.nanos.notification.NotificationSetting',
+  forwardName: 'notificationSettingsForUserUsers',
+  inverseName: 'userJunction',
+  sourceProperty: {
+    hidden: true
+  }
+});
+
+foam.RELATIONSHIP({
+  cardinality: '1:*',
+  sourceModel: 'foam.nanos.auth.User',
+  targetModel: 'foam.nanos.notification.NotificationSetting',
+  forwardName: 'notificationSettings',
+  inverseName: 'owner',
+  sourceProperty: {
+    hidden: true
+  }
+});

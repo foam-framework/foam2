@@ -109,7 +109,9 @@ public class Outputter
   }
 
   protected void outputFObject(FObject obj) {
-    writer_.append("<").append(obj.getClass().getSimpleName()).append(">");
+    writer_.append("<").append(obj.getClass().getSimpleName());
+    outputAttributes(obj);
+    writer_.append(">");
     outputProperties_(obj);
     writer_.append("</").append(obj.getClass().getSimpleName()).append(">");
   }

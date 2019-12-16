@@ -43,16 +43,20 @@ foam.CLASS({
             class: 'foam.u2.tag.Image',
             data$: this.theme$.dot('logo')
           })
-            .hide(this.theme$.dot('largeIconEnabled'))
+            .hide(this.theme$.dot('largeLogoEnabled'))
             .addClass('logo')
           .end()
-          .start('span').addClass('appName').add(this.theme$.dot('appName')).end()
+          .start('span')
+            .addClass('appName')
+            .hide(this.theme$.dot('largeLogoEnabled'))
+            .add(this.theme$.dot('appName'))
+          .end()
           .start({
             class: 'foam.u2.tag.Image',
             data$: this.theme$.dot('largeLogo')
           })
             .addClass('logo')
-            .show(this.theme$.dot('largeIconEnabled'))
+            .show(this.theme$.dot('largeLogoEnabled'))
           .end();
     }
   ],

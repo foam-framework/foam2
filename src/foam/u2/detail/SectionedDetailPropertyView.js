@@ -86,7 +86,9 @@ foam.CLASS({
     ^error .foam-u2-IntView,
     ^error .foam-u2-FloatView,
     ^error .foam-u2-DateView,
-    ^error .foam-u2-view-date-DateTimePicker .date-display-box
+    ^error .foam-u2-view-date-DateTimePicker .date-display-box,
+    ^error .foam-u2-view-RichChoiceView-selection-view
+
     {
       border-color: /*%DESTRUCTIVE3%*/ #d9170e !important;
     }
@@ -122,7 +124,6 @@ foam.CLASS({
     ^ .foam-u2-view-RichChoiceView-selection-view {
       width: 100%;
       border-radius: 3px;
-      border: solid 1px #8e9090;
       background-color: #ffffff;
       box-sizing: border-box;
       -webkit-appearance: none;

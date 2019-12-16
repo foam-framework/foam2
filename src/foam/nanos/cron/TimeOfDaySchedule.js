@@ -28,7 +28,10 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.cron.TimeHMS',
-      name: 'time'
+      name: 'time',
+      factory: () => {
+        return foam.nanos.cron.TimeHMS.create();
+      }
     }
   ],
 

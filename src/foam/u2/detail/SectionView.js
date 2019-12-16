@@ -62,7 +62,6 @@ foam.CLASS({
         .add(self.slot(function(section, showTitle, section$title) {
           if ( ! section ) return;
           return self.Rows.create()
-            .show(section.createIsAvailableFor(self.data$))
             .callIf(showTitle && section$title, function() {
               this.start('h2').add(section$title).end();
             })
@@ -82,7 +81,7 @@ foam.CLASS({
             .start(self.Cols)
               .style({
                 'justify-content': 'end',
-                'margin-top': section.actions.length ? '20px' : 'initial'
+                'margin-top': section.actions.length ? '4vh' : 'initial'
               })
               .forEach(section.actions, function(a) {
                 this.add(a);

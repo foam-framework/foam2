@@ -12,7 +12,7 @@ p({"class":"foam.nanos.menu.Menu","id":"admin.regions","label":"Regions","handle
 p({"class":"foam.nanos.menu.Menu","id":"logs","label":"Logs","handler":{"class":"foam.nanos.menu.DAOMenu","title":"Server Log","createEnabled":false,"daoKey":"logMessageDAO"},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"reset","label":"Reset Password","handler":{"class":"foam.nanos.menu.ViewMenu"},"order":1000,"parent":"hidden"})
 p({"class":"foam.nanos.menu.Menu","id":"admin.scripts","label":"Scripts","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"scriptDAO"},"order":1000,"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"sign-in","label":"Sign in","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.auth.SignInView"}},"order":1000,"parent":"hidden"})
+p({"class":"foam.nanos.menu.Menu","id":"sign-in","label":"Sign in","handler":{"class":"foam.nanos.menu.ViewMenu","view":{ "class": "foam.u2.view.LoginView", "mode_": "SignIn" },"order":1000,"parent":"hidden"})
 p({"class":"foam.nanos.menu.Menu","id":"admin.tests","label":"Tests","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"testDAO","summaryView":{"class":"foam.nanos.test.TestBorder"}},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"admin.rules","label":"Rules","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"ruleDAO"},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"set-password","label":"Change Password","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.auth.ChangePasswordView"}},"order":100,"parent":"settings"})
