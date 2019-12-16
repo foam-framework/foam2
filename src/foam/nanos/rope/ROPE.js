@@ -86,7 +86,8 @@ foam.CLASS({
         User systemUser = new User.Builder(x).setId(1).build();
         List<FObject> sourceObjs = getSourceObjects(x.put("user", systemUser), obj);
     
-        DAO ropeDAO = (DAO) x.get("ropeDAO");
+        DAO filteredRopeDAO = ((DAO) x.get("ropeDAO")).inX(x).where(EQ(ROPE.TARGET_DAOKEY, getSourceDAOKey()));
+        
         for ( FObject sourceObj : sourceObjs ) {
           if ( sourceObj == null ) continue;
           if ( nextRelationships.contains("__terminate__") ) {
@@ -94,10 +95,9 @@ foam.CLASS({
           }
           for ( String nextRelationship : nextRelationships ) {
             if ( nextRelationship.equals("__terminate__") ) continue;
-            List<ROPE> nextRopes = (List<ROPE>) ((ArraySink) ropeDAO.inX(x).where(AND(
-              EQ(ROPE.TARGET_DAOKEY, getSourceDAOKey()),
+            List<ROPE> nextRopes = (List<ROPE>) ((ArraySink) filteredRopeDAO.where(
               EQ(ROPE.RELATIONSHIP_KEY, nextRelationship)
-            )).select(new ArraySink())).getArray();
+            ).select(new ArraySink())).getArray();
             for ( ROPE nextRope : nextRopes ) {
               if ( nextRope.check(x, sourceObj, getRelationshipKey(), null, "") ) return true;
             }
