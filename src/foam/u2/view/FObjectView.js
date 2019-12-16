@@ -89,6 +89,12 @@ foam.CLASS({
     },
 
     function updateChoices() {
+      // If choices is hard-coded to something, just use that instead of pulling
+      // options from the strategizer.
+      if ( Array.isArray(this.choices) && this.choices.length > 0 ) {
+        return;
+      }
+
       if ( this.of == null ) {
         this.choices = [];
         return;
@@ -131,7 +137,7 @@ foam.CLASS({
       this
         .tag(foam.u2.detail.VerticalDetailView, {
           data: this,
-          sections: [{
+          sections_: [{
             properties: [this.OBJECT_CLASS, this.DATA]
           }]
         });

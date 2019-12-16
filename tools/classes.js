@@ -519,7 +519,6 @@ var classes = [
   'foam.strategy.StrategizerService',
   'foam.strategy.BasicStrategizer',
   'foam.strategy.ClientStrategizerService',
-
   //ROPE
   'foam.nanos.rope.ROPE',
   'foam.nanos.rope.OrROPE',

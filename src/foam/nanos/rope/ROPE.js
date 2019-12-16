@@ -49,17 +49,27 @@ foam.CLASS({
     {
       name: 'crudMap',
       class: 'FObjectProperty',
-      of: 'foam.nanos.rope.CRUDMap'
+      of: 'foam.nanos.rope.CRUDMap',
+      documentation: `
+      A map containing maps for each of the crud operations, where the keys are "create", "read", "update", and "delete".
+      - Each sub-map contains keys which are either "__default__" or some propertyName, in the case of update or create.
+      - The values of each sub-map contains relationshipKeys of ropes where the targetDAOKey is the sourceDAOKey of the current rope.
+      `
     },
     {
       name: 'relationshipMap',
       class: 'FObjectProperty',
       of: 'foam.nanos.rope.RelationshipMap',
+      documentation: `
+      A map containing keys which are the relationshipKey of the previous ROPE in the chain of ROPE lookups, 
+      and the values are the relationshipKeys of the ropes where the targetDAOKey is the sourceDAOKey of the 
+      current rope. 
+      Think of this as a mapping from "previousStep" to "nextSteps".
+      `
     },
     {
       name: 'isInverse',
-      class: 'Boolean',
-      value: false
+      class: 'Boolean'
     }
   ],
 
@@ -87,7 +97,8 @@ foam.CLASS({
         User systemUser = new User.Builder(x).setId(1).build();
         List<FObject> sourceObjs = getSourceObjects(x.put("user", systemUser), obj);
     
-        DAO ropeDAO = (DAO) x.get("ropeDAO");
+        DAO filteredRopeDAO = ((DAO) x.get("ropeDAO")).inX(x).where(EQ(ROPE.TARGET_DAOKEY, getSourceDAOKey()));
+        
         for ( FObject sourceObj : sourceObjs ) {
           if ( sourceObj == null ) continue;
           if ( nextRelationships.contains("__terminate__") ) {
@@ -95,10 +106,9 @@ foam.CLASS({
           }
           for ( String nextRelationship : nextRelationships ) {
             if ( nextRelationship.equals("__terminate__") ) continue;
-            List<ROPE> nextRopes = (List<ROPE>) ((ArraySink) ropeDAO.inX(x).where(AND(
-              EQ(ROPE.TARGET_DAOKEY, getSourceDAOKey()),
+            List<ROPE> nextRopes = (List<ROPE>) ((ArraySink) filteredRopeDAO.where(
               EQ(ROPE.RELATIONSHIP_KEY, nextRelationship)
-            )).select(new ArraySink())).getArray();
+            ).select(new ArraySink())).getArray();
             for ( ROPE nextRope : nextRopes ) {
               if ( nextRope.check(x, sourceObj, getRelationshipKey(), null, "") ) return true;
             }
