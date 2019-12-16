@@ -28,9 +28,10 @@ foam.CLASS({
       args: [ 
         { name: 'x', javaType: 'X' }
       ],
+      javaType: 'Boolean',
       javaCode: `
         User user = (User) x.get("user");
-        return ( user != null && ( user.getId() == User.SYSTEM_USER_ID || user.getGroup().equals("admin") || user.getGroup().equals("system") ) );
+        return ( user != null && ( user.getId() == User.SYSTEM_USER_ID || "admin".equals(user.getGroup()) || "system".equals(user.getGroup()) ) );
       `
     },
     {
