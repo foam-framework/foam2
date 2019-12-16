@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.nanos.auth.',
+  package: 'foam.nanos.auth',
   name: 'SystemAuthorizer',
   implements: [ 'foam.nanos.auth.Authorizer' ],
 
@@ -78,4 +78,4 @@ foam.CLASS({
       `
     }
   ]
-})
+});
