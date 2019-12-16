@@ -49,12 +49,23 @@ foam.CLASS({
     {
       name: 'crudMap',
       class: 'FObjectProperty',
-      of: 'foam.nanos.rope.CRUDMap'
+      of: 'foam.nanos.rope.CRUDMap',
+      documentation: `
+      A map containing maps for each of the crud operations, where the keys are "create", "read", "update", and "delete".
+      - Each sub-map contains keys which are either "__default__" or some propertyName, in the case of update or create.
+      - The values of each sub-map contains relationshipKeys of ropes where the targetDAOKey is the sourceDAOKey of the current rope.
+      `
     },
     {
       name: 'relationshipMap',
       class: 'FObjectProperty',
       of: 'foam.nanos.rope.RelationshipMap',
+      documentation: `
+      A map containing keys which are the relationshipKey of the previous ROPE in the chain of ROPE lookups, 
+      and the values are the relationshipKeys of the ropes where the targetDAOKey is the sourceDAOKey of the 
+      current rope. 
+      Think of this as a mapping from "previousStep" to "nextSteps".
+      `
     },
     {
       name: 'isInverse',
