@@ -155,6 +155,8 @@ public class Election extends AbstractFObject {
                 // The cluster has picked a primary already. Send back Vote for leader.
                 if ( inMessage.getSourceStatus() == InstanceState.ELECTING ) {
 
+                  //TODO: provide a way to allow all voter to have a change to vote at lease once.
+
                   //Vote should set both electionEra and primaryEra
                   Vote latestVote = quorumName.getLatestVote();
                   QuorumMessage response = new QuorumMessage();
@@ -383,6 +385,7 @@ public class Election extends AbstractFObject {
   }
 
   protected Vote finishElection(Vote vote) {
+    receptedQueue.clear();
     return vote;
   }
 
