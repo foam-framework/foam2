@@ -63,7 +63,7 @@ foam.CLASS({
           if ( ! disabledTopics.contains(notification.getNotificationType()) ) {
             EmailMessage message = new EmailMessage();
             message.setTo(new String[]{user.getEmail()});
-            notication = (Notification) notification.fclone();
+            notification = (Notification) notification.fclone();
 
             if ( notification.getEmailArgs() != null ) {
               Map<String, Object> emailArgs = resolveNotificationArguments(x, notification.getEmailArgs(), user);
