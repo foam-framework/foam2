@@ -2,9 +2,11 @@ package foam.nanos.mrac;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import foam.core.FObject;
 import foam.core.FoamThread;
+import foam.dao.Journal;
 
 // Make sure that this class sould only have one instance in single journal mode.
 // In multiple journal mode. each JDAO will have it's own instance.
@@ -17,6 +19,11 @@ public class MMjournal {
 
     private JournalSender journalSender;
 
+    // globalIndex should be unique in each storePath.
+    // One MMjournal instance can be shared by different DAO(Single Journal Mode).
+    // Method: Replay will update this index.
+    private AtomicLong globalIndex = new AtomicLong(1);
+
     public MMjournal(String storePath) {
         this.storePath = storePath;
         this.journalSender = new JournalSender();
@@ -27,12 +34,12 @@ public class MMjournal {
         //TODO: register journal info to MmManager. So that MmManager are able to find info
         //from MM gget outgoingQueue instance
 
-        
+
     }
 
     //TODO: think if this class acctually need?
     class JournalSender extends FoamThread {
-        
+
         volatile boolean stop;
         // TODO: Create Network Manager
 
@@ -59,7 +66,7 @@ public class MMjournal {
         }
 
         void process(FObject obj) {
-            //TODO: processing data in outgoingQueue and send to ready to 
+            //TODO: processing data in outgoingQueue and send to ready to
             System.out.println("sender process");
         }
     }
