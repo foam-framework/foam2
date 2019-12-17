@@ -40,6 +40,7 @@ import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
 import javax.servlet.http.HttpServletResponse;
+import foam.lib.json.JSONParser;
 
 // Make sure that this class sould only have one instance in single journal mode.
 // In multiple journal mode. each JDAO will have it's own instance.
@@ -49,7 +50,7 @@ import javax.servlet.http.HttpServletResponse;
 // TODO: refactor all clusterNode finding in the a DAO. provide better controller of MN.
 public class MMJournal extends AbstractJournal {
 
-  private String filename;
+  private String serviceName;
 
   private final Map<Long, ArrayList<ClusterNode>> groupToMN = new HashMap<Long, ArrayList<ClusterNode>>();
   private final List<ArrayList<ClusterNode>> groups  = new LinkedList<ArrayList<ClusterNode>>();
@@ -62,8 +63,8 @@ public class MMJournal extends AbstractJournal {
   // Method: Replay will update this index.
   private AtomicLong globalIndex = new AtomicLong(1);
 
-  private MMJournal(String filename) {
-    this.filename = filename;
+  private MMJournal(String serviceName) {
+    this.serviceName = serviceName;
     initial();
   }
 
@@ -120,9 +121,9 @@ public class MMJournal extends AbstractJournal {
 
   private static Map<String, MMJournal> journalMap = new HashMap<String, MMJournal>();
 
-  public synchronized static MMJournal getMMjournal(String filename) {
-    if ( journalMap.get(filename) != null ) return journalMap.get(filename);
-    return journalMap.put(filename, new MMJournal(filename));
+  public synchronized static MMJournal getMMjournal(String serviceName) {
+    if ( journalMap.get(serviceName) != null ) return journalMap.get(serviceName);
+    return journalMap.put(serviceName, new MMJournal(serviceName));
   }
 
   // We will remove synchronized key word in the DAO put.
@@ -160,6 +161,7 @@ public class MMJournal extends AbstractJournal {
     int index = nextRobin() % groups.size();
     int i = 0;
     int totalTry = groups.size();
+    boolean isPersist = false;
 
     while ( i < totalTry ) {
       ArrayList<ClusterNode> nodes = groups.get(index / totalTry);
@@ -180,17 +182,54 @@ public class MMJournal extends AbstractJournal {
       while ( System.currentTimeMillis() < endtime || check >=2 || check <= -2 ) {
         for ( int j = 0 ; j < tasks.length ; j++ ) {
           if ( checks[j] == false && ((FutureTask<String>) tasks[j]).isDone() ) {
+            FutureTask<String> task = (FutureTask<String>) tasks[j];
+            try {
+              String response = task.get();
+              FObject responseMessage = getX().create(JSONParser.class).parseString(response);
+              if ( responseMessage instanceof MedusaMessage ) {
 
+                check++;
+              }
+              check--;
+            } catch ( Exception e ) {
+              //TODO: log error
+              check--;
+            } finally {
+              checks[j] = true;
+            }
           }
         }
       }
 
+      if ( check >= 2 ) {
+        isPersist = false;
+        break;
+      }
 
       index++;
       i++;
     }
 
+    // Important
+    if ( isPersist == false ) {
+      //TODO: shutdown the put method.
+      throw new RuntimeException("MN do not work....");
+    }
+
   }
+
+  private MedusaMessage createMessage(
+    long globalIndex1,
+    int hash1,
+    long globalIndex2,
+    int hash2,
+    long globalIndex,
+    long myIndex,
+    FObject entry
+  ) {
+    return null;
+  }
+
 
   private class Sender implements Callable<String> {
     private String ip;
@@ -207,7 +246,7 @@ public class MMJournal extends AbstractJournal {
       InputStream input = null;
 
       try {
-        URL url = new URL("Http", ip, 8080, "service/mn");
+        URL url = new URL("Http", ip, 8080, "service/" + serviceName);
 
         conn = (HttpURLConnection) url.openConnection();
         conn.setDoOutput(true);
@@ -243,7 +282,6 @@ public class MMJournal extends AbstractJournal {
         }
 
         return  new String(buf, 0, off, StandardCharsets.UTF_8);
-        // foam.core.FObject responseMessage = getX().create(foam.lib.json.JSONParser.class).parseString(str);
       } catch ( Exception e ) {
         throw e;
       } finally {
@@ -256,9 +294,7 @@ public class MMJournal extends AbstractJournal {
     }
   }
 
-  // We will remove synchronized key word in the DAO put.
-  // This method has to be thread safe.
-  //TODO: add
+  //TODO: provide versioning for the remove.
   public void remove(X x, FObject obj) {
     if ( ! ( obj instanceof Identifiable ) ) throw new RuntimeException("MM only accept Identifiable");
 
