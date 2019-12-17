@@ -2,7 +2,7 @@
 
 # EasyDAO User Guide and Documentation
 
-&nbsp
+&nbsp;
 
 ## EasyDAO Description
 
@@ -10,12 +10,12 @@ Creating long decorator chains is a tedious and error prone process. EasyDAO wor
 
 EasyDAO works by using a builder pattern, allowing building of doas by the setting of intuitinve properties. Once the properties describing the requisite function of the DAO being built are set, EasyDAO takes care of the rest, making the messy calls to the required decorators of all the DOAs and placing them all in a chain that has been set up to specifically avoid any bugs that may be caused by any local interdependancies between proxies.
 
-&nbsp
-&nbsp
+&nbsp;
+&nbsp;
 
 ## Setting up EasyDAO
 
-&nbsp
+&nbsp;
 
 #### Basic Setup
 
