@@ -43,6 +43,46 @@ new foam.dao.EasyDAO.Builder(x)
 
 #### Journalling
 
+Many application may wish to make use of the journalling abilities of foam by adding a journal to their DAOs. To do so with EasyDAO is simple. We will add a JDAO by simply specifiyng the name of our journal and the type of journal we wish to use (of which there is currently only one that defaults to foam.dao.JDAO). The type of journal is specified by an enumeration at foam.dao.JournalType from which SINGLE_JOURNAL should be used.
+
+```java
+new foam.dao.EasyDAO.Builder(x)
+  .setOf(MODEL_PATH.getOwnClassInfo())
+  .setAuthorize(false)
+  .setRuler(false)
+  .setJournalName("docs")
+  .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+  .build();
+```
+
+Our new decorator chain now looks like the following,
+
+```
+EasyDAO -> JDAO -> MDAO
+```
+
+&nbsp;
+
+#### MiscProxies
+
+Any other proxy can be added to the EasyDAO generated chain. Feel free to look at the various properties available in the faom.dao.EasyDAO model to get a feel for what sort of proxies you can add to your decorator chain. But most commonly, if a DAO is defined in foam.dao.*, chances are there is an EasyDAO property for it. But what if you want a client-side defined dao, or a DAO which is not yet defined within EasyDAO? EasyDAO allows you to create a cahin of ProxyDAO decorators ending in null that it will inset into the chain for you,
+
+```java
+new foam.dao.EasyDAO.Builder(x)
+  .setOf(MODEL_PATH.getOwnClassInfo())
+  .setAuthorize(false)
+  .setRuler(false)
+  .setDecorator(new faom.dao.DAO1(new foam.dao.DAO2(null)))
+  .setJournalName("docs")
+  .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+  .build();
+```
+
+This will create the following decorator chain,
+
+```
+EasyDAO -> DAO1 -> DAO2 -> JDAO -> MDAO
+```
 
 &nbsp;
 &nbsp;
