@@ -22,3 +22,24 @@ new foam.dao.EasyDAO.Builder(x)
   .setOf(MODEL_PATH.getOwnClassInfo())
   .build();
 ```
+
+This creates the following decorator chain,
+
+```
+EasyDAO
+AuthorizationDAO
+RulerDAO
+MDAO
+```
+
+EassyDAO automatically taccks on itself as a decorator. As for authorization and ruler DAOs, these come automatically with every EasyDAO construction. To disable them, simply set their corresponding properties to false,
+
+```java
+new foam.dao.EasyDAO.Builder(x)
+  .setOf(MODEL_PATH.getOwnClassInfo())
+  .setAuthorize(false)
+  .setRuler(false)
+  .build();
+```
+
+&nbsp;
