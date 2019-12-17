@@ -89,11 +89,20 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'department',
-      label: 'Your Job Title',
-      view: {
-        class: 'foam.u2.TextField',
-        placeholder: 'Staff accountant'
+      name: 'jobTitle',
+      view: function(args, X) {
+        return {
+          class: 'foam.u2.view.ChoiceWithOtherView',
+          otherKey: 'Other',
+          choiceView: {
+            class: 'foam.u2.view.ChoiceView',
+            placeholder: 'Please select...',
+            dao: X.jobTitleDAO,
+            objToChoice: function(a) {
+              return [a.name, a.label];
+            }
+          }
+        };
       },
       required: true
     },
@@ -227,8 +236,8 @@ foam.CLASS({
             signUpToken: this.token_,
             address: this.Address.create({ countryId: this.countryId }),
             welcomeEmailSent: true,
-            department: this.department,
-            phone: this.Phone.create({ number: this.phone }),
+            jobTitle: this.jobTitle,
+            phone: this.phone,
             group: this.group_
           }))
           .then((user) => {

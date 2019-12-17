@@ -102,7 +102,7 @@ foam.CLASS({
         }
         return !required ? null : [[name],
           function() {
-            return !this.hasOwnProperty(name) && (`Please enter a ${label}`);
+            return !this.hasOwnProperty(name) && (`Please enter ${label.toLowerCase()}`);
           }]
       },
     },
@@ -129,7 +129,7 @@ foam.CLASS({
             predicateFactory: function(e) {
               return e.GTE(foam.mlang.StringLength.create({ arg1: self }), self.minLength);
             },
-            errorString: `Please enter a ${this.label} with least ${this.minLength} character${this.minLength>1?'s':''}`
+            errorString: `Please enter ${this.label.toLowerCase()} with least ${this.minLength} character${this.minLength>1?'s':''}`
           });
         }
         if ( foam.Number.isInstance(this.maxLength) ) {
@@ -138,7 +138,7 @@ foam.CLASS({
             predicateFactory: function(e) {
               return e.LTE(foam.mlang.StringLength.create({ arg1: self }), self.maxLength);
             },
-            errorString: `Please enter a ${this.label} with at most ${this.maxLength} character${this.maxLength>1?'s':''}`
+            errorString: `Please enter ${this.label.toLowerCase()} with at most ${this.maxLength} character${this.maxLength>1?'s':''}`
           });
         }
         return a;
@@ -163,7 +163,7 @@ foam.CLASS({
           return [
             [`${name}$errors_`],
             function(errs) {
-              return errs ? `Please enter a valid ${label}` : null;
+              return errs ? `Please enter valid ${label.toLowerCase()}` : null;
             }
           ];
         }
@@ -194,7 +194,7 @@ foam.CLASS({
             predicateFactory: function(e) {
               return e.GTE(self, self.min);
             },
-            errorString: `Please enter a ${self.label} greater than or equal to ${self.min}.`
+            errorString: `Please enter ${self.label.toLowerCase()} greater than or equal to ${self.min}.`
           });
         }
         if ( foam.Number.isInstance(self.max) ) {
@@ -203,7 +203,7 @@ foam.CLASS({
             predicateFactory: function(e) {
               return e.LTE(self, self.max);
             },
-            errorString: `Please enter a ${self.label} less than or equal to ${self.max}`
+            errorString: `Please enter ${self.label.toLowerCase()} less than or equal to ${self.max}`
           });
         }
         return a;
