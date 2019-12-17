@@ -149,7 +149,7 @@ foam.CLASS({
             return [a.id, a.name];
           },
           dao$: choices
-        });
+        }, X);
       },
       required: true,
     },
