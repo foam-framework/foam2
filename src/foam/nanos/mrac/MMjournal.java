@@ -42,6 +42,10 @@ import org.apache.commons.io.IOUtils;
 import javax.servlet.http.HttpServletResponse;
 import foam.lib.json.JSONParser;
 
+import foam.box.RPCMessage;
+import foam.box.HTTPReplyBox;
+import foam.box.Message;
+
 // Make sure that this class sould only have one instance in single journal mode.
 // In multiple journal mode. each JDAO will have it's own instance.
 // can simple get put to MedusaMediator
@@ -218,16 +222,24 @@ public class MMJournal extends AbstractJournal {
 
   }
 
-  private MedusaMessage createMessage(
+  private Message createMessage(
     long globalIndex1,
     int hash1,
     long globalIndex2,
     int hash2,
-    long globalIndex,
     long myIndex,
     FObject entry
   ) {
-    return null;
+    Message message = getX().create(Message.class);
+    RPCMessage rpc = getX().create(foam.box.RPCMessage.class);;
+    rpc.setName("put");
+    Object[] args = {globalIndex1, hash1, globalIndex2, hash2, myIndex, entry};
+    rpc.setArgs(args);
+
+    message.setObject(rpc);
+    HTTPReplyBox replyBox = getX().create(HTTPReplyBox.class);
+    message.getAttributes().put("replyBox", replyBox);
+    return message;
   }
 
 
