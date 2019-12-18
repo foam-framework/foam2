@@ -83,8 +83,28 @@ This will create the following decorator chain,
 ```
 EasyDAO -> DAO1 -> DAO2 -> JDAO -> MDAO
 ```
+&nbsp;
 
+#### Inner DAOs
+
+Sometimes you want the ability to choose which dao EasyDAO places at the end of your chain to perform the act of storing. For instance maybe you have another more modular dao you wish to attach it to; or simply have made your own version of MDAO. You can do so with setInnerDAO. Caution should be used here however as sometimes this will reduce the ability to upgrade the function of all DAOs and should be used sparingly as the Inner DAO property is a popular spot that is often used to modify functionality on a larger scale. The following example shows setInnerDAO at work,
+
+```java
+new foam.dao.EasyDAO.Builder(x)
+  .setOf(MODEL_PATH.getOwnClassInfo())
+  .setAuthorize(false)
+  .setRuler(false)
+  .setDecorator(new faom.dao.DAO1(new foam.dao.DAO2(null)))
+  .setInnerDAO(new INDAO())
+  .build();
+```
+
+This will create the following decorator chain,
+
+```
+EasyDAO -> DAO1 -> DAO2 -> INDAO
+```
 &nbsp;
 &nbsp;
 
-## Customizing EasyDAO for the CLient Side
+## Customizing EasyDAO for the Client Side
