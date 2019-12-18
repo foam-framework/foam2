@@ -104,6 +104,13 @@ This will create the following decorator chain,
 ```
 EasyDAO -> DAO1 -> DAO2 -> INDAO
 ```
+
+&nbsp;
+
+#### Debugging Tips and Tricks
+
+
+
 &nbsp;
 &nbsp;
 
@@ -118,3 +125,5 @@ Here you are provided the tail of the decorator chain already constructed somewh
 &nbsp;
 
 #### Precise Placement of EasyDAO Decorators
+
+
