@@ -36,14 +36,6 @@ foam.CLASS({
       name: 'gridColumns'
     },
     {
-      class: 'Boolean',
-      name: 'permissionRequired'
-    },
-    {
-      class: 'String',
-      name: 'name'
-    },
-    {
       class: 'Function',
       name: 'createIsAvailableFor',
       value: function(data$) {
