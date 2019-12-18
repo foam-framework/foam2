@@ -107,14 +107,8 @@ foam.CLASS({
       required: true
     },
     {
-      class: 'FObjectProperty',
-      of: 'foam.nanos.auth.Phone',
+      class: 'PhoneNumber',
       name: 'phone',
-      label: '',
-      factory: function() {
-        return this.Phone.create();
-      },
-      view: { class: 'foam.u2.detail.VerticalDetailView' },
       required: true
     },
     {
@@ -237,7 +231,7 @@ foam.CLASS({
             address: this.Address.create({ countryId: this.countryId }),
             welcomeEmailSent: true,
             jobTitle: this.jobTitle,
-            phone: this.phone,
+            phone: this.Phone.create({ number: this.phone }),
             group: this.group_
           }))
           .then((user) => {

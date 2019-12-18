@@ -323,7 +323,7 @@ foam.CLASS({
             predicateFactory: function(e) {
               return e.REG_EXP(self, /^$|.+@.+\..+/);
             },
-            errorString: 'Please enter an email address'
+            errorString: 'Please enter email address'
           }
         ];
         if ( this.required ) {
@@ -333,7 +333,7 @@ foam.CLASS({
               predicateFactory: function(e) {
                 return e.NEQ(self, '');
               },
-              errorString: 'Please enter an email address'
+              errorString: 'Please enter email address'
             }
           );
         }
@@ -364,7 +364,7 @@ foam.CLASS({
                   /^(?:\+?1[-.●]?)?\(?([0-9]{3})\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4})$/
                  );
             },
-            errorString: 'Please enter a valid phone number'
+            errorString: 'Please enter valid phone number'
           }
         ];
       }
