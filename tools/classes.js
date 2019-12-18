@@ -500,7 +500,19 @@ var classes = [
   'foam.strategy.StrategyReference',
   'foam.strategy.StrategizerService',
   'foam.strategy.BasicStrategizer',
-  'foam.strategy.ClientStrategizerService'
+  'foam.strategy.ClientStrategizerService',
+
+  // Clustering
+  'foam.nanos.mrac.MedusaMessage',
+  'foam.nanos.mrac.TcpMessage',
+  'foam.nanos.mrac.ClusterNode',
+  'foam.nanos.mrac.FileMeta',
+  'foam.nanos.mrac.ClusterNodeType',
+  'foam.nanos.mrac.MedusaEntry',
+  'foam.nanos.mrac.quorum.InstanceState',
+  'foam.nanos.mrac.quorum.QuorumMessage',
+  'foam.nanos.mrac.quorum.QuorumMessageType',
+  'foam.nanos.mrac.quorum.Vote'
 ];
 
 var abstractClasses = [
