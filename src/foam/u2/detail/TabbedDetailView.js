@@ -45,23 +45,32 @@ foam.CLASS({
       this.SUPER();
       this
         .addClass(this.myClass())
-        .hide(this.loading$)
-        .add(this.slot(function(sections) {
+        .add(this.slot(function(sections, data) {
+          if ( ! data ) return;
+
+          var arraySlot = foam.core.ArraySlot.create({
+            slots: sections.map((s) => s.createIsAvailableFor(self.data$))
+          });
+
           return self.E()
-            .start(self.Tabs)
-              .forEach(sections, function(s) {
-                this
-                  .start(self.Tab, { label: s.title || self.defaultSectionLabel })
-                    .call(function() {
-                      this.tag(self.SectionView, {
-                        data$: self.data$,
-                        section: s,
-                        showTitle: false
-                      })
-                    })
-                  .end();
-              })
-            .end();
+            .add(arraySlot.map((visibilities) => {
+              return this.E()
+                .start(self.Tabs)
+                  .forEach(sections, function(s, i) {
+                    if ( ! visibilities[i] ) return;
+                    this
+                      .start(self.Tab, { label: s.title || self.defaultSectionLabel })
+                        .call(function() {
+                          this.tag(self.SectionView, {
+                            data$: self.data$,
+                            section: s,
+                            showTitle: false
+                          })
+                        })
+                      .end();
+                  })
+                .end();
+            }))
         }));
     }
   ]
