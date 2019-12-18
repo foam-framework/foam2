@@ -6,15 +6,14 @@
 
 foam.CLASS({
   package: 'foam.nanos.mrac',
-  name: 'MedusaMessage',
+  name: 'TcpMessage',
   extends: 'foam.box.Message',
-
-  documentation: 'This model used for TCP request',
+  documentation: '',
 
   properties: [
     {
-      class: 'String',
-      name: 'serviceName'
+        class: "String",
+        name: 'serviceKey'
     }
   ]
 });

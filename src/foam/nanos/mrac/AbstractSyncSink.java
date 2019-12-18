@@ -20,11 +20,14 @@ import foam.dao.AbstractSink;
  * Broadcast all changes.
  */
 // TODO: model this method.
+// Do I need async method? cause socketchannel should async in nature.
+// I do not think that it will cut down the performance.
 public abstract class AbstractSyncSink extends AbstractSink {
 
     // Blocking or Non-Blocking sync.
     private final boolean asyn;
     // Using ThreadPool to eliminate the cost of create and destroy a thread.
+    //TODO: Put into context.
     private ThreadPoolExecutor threadPool;
     //TODO: Use ClassInfo to get class name.
     private final String clazzName = this.getClass().getCanonicalName();

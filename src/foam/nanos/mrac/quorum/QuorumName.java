@@ -17,13 +17,8 @@ public class QuorumName {
     private ClusterNode self;
 
     private InstanceState curState;
-    
-    private QuorumRecord quorumRecord;
 
     private volatile Vote latestVote;
-
-    public Primary primary;
-    public Secondary secondary;
 
     
     public ClusterNode getSelf() {
@@ -32,11 +27,6 @@ public class QuorumName {
 
     public long getGroup() {
         return group;
-    }
-
-    // Make this function thread safe
-    public QuorumRecord getQuorumRecord() {
-        return quorumRecord;
     }
 
     public InstanceState getCurrentState() {

@@ -28,9 +28,6 @@ public class Election extends AbstractFObject {
   // QuorumNetworkManager handles network communication for a Election.
   QuorumNetworkManager networkManager;
 
-  //TODO: DO not hard coding this field.
-  QuorumRecord quorumRecord;
-
   // Manage meta of current instance.
   private QuorumName quorumName;
 
