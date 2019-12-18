@@ -109,7 +109,30 @@ EasyDAO -> DAO1 -> DAO2 -> INDAO
 
 #### Debugging Tips and Tricks
 
+Unfortunately, settiing up a decorator chain can be a very buggy and frustrating experience. The best way to set up a chain is sequentially, testing its function at each step of the way. This is because any bug that might be caused by a single step of the process can be very difficult to pinpoint once the entire decorator chain is set up. A sequential approach will give you a strong indication to what is causing each bug as it pops up. The best way to use this approach is to disable any decorators that may be added by default at first, and slowly add them one by one, taking care to prioritize adding first decorators that may conflict with others such as those performing authorization checks.
 
+It may help to visualize what decorator chain the EasyDAO is creating at each step of the way to help identify possible culprits and mismatched orders of DAOs. This can be done using the following piece of logic to walk the chain of decorators and print them out one by one,
+
+```java
+  foam.dao.DAO delegate = EASYDAO;
+
+  while ( delegate instanceof foam.dao.ProxyDAO) {
+    System.out.println(delegate.getClass().getSimpleName());
+    delegate = ((foam.dao.ProxyDAO) delegate).getDelegate();
+  }
+
+  System.out.println(delegate.getClass().getSimpleName());
+```
+
+This in fact comes built in to each EasyDAO in a method called printDecorators which you may wish to use. One of the advantages of having an EasyDAO decorator at the tail of each chain is simply being able to call it using the built dao,
+
+```java
+EasyDAO dao = new foam.dao.EasyDAO.Builder(x)
+  ...
+  .build();
+
+  dao.printDecorators();
+```
 
 &nbsp;
 &nbsp;
