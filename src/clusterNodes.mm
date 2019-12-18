@@ -1,0 +1,11 @@
+//MM
+p({"class":"foam.nanos.mrac.ClusterNode","id":1,"group":1,"ip":"127.0.0.1","hostName":"1","servicePort":8001,"electionIP":"127.0.0.1","electionPort":9001,"isVoter":true,"type":0})
+p({"class":"foam.nanos.mrac.ClusterNode","id":2,"group":1,"ip":"127.0.0.1","hostName":"2","servicePort":8002,"electionIP":"127.0.0.1","electionPort":9002,"isVoter":true,"type":0})
+p({"class":"foam.nanos.mrac.ClusterNode","id":3,"group":1,"ip":"127.0.0.1","hostName":"3","servicePort":8003,"electionIP":"127.0.0.1","electionPort":9003,"isVoter":true,"type":0})
+//MN
+p({"class":"foam.nanos.mrac.ClusterNode","id":4,"group":2,"ip":"127.0.0.1","hostName":"1","servicePort":8004,"electionIP":"127.0.0.1","electionPort":9004,"isVoter":false,"type":1})
+p({"class":"foam.nanos.mrac.ClusterNode","id":5,"group":2,"ip":"127.0.0.1","hostName":"1","servicePort":8005,"electionIP":"127.0.0.1","electionPort":9005,"isVoter":false,"type":1})
+p({"class":"foam.nanos.mrac.ClusterNode","id":6,"group":2,"ip":"127.0.0.1","hostName":"1","servicePort":8006,"electionIP":"127.0.0.1","electionPort":9006,"isVoter":false,"type":1})
+p({"class":"foam.nanos.mrac.ClusterNode","id":7,"group":3,"ip":"127.0.0.1","hostName":"1","servicePort":8007,"electionIP":"127.0.0.1","electionPort":9007,"isVoter":false,"type":1})
+p({"class":"foam.nanos.mrac.ClusterNode","id":8,"group":3,"ip":"127.0.0.1","hostName":"1","servicePort":8008,"electionIP":"127.0.0.1","electionPort":9008,"isVoter":false,"type":1})
+p({"class":"foam.nanos.mrac.ClusterNode","id":9,"group":3,"ip":"127.0.0.1","hostName":"1","servicePort":8009,"electionIP":"127.0.0.1","electionPort":9009,"isVoter":false,"type":1})

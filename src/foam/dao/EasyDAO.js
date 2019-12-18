@@ -275,6 +275,16 @@ return delegate;
 `
     },
     {
+      class: 'Boolean',
+      name: 'medusa',
+      value: false
+    },
+    {
+      class: 'String',
+      name: 'mnPort',
+      value: 'singleJournal'
+    },
+    {
       class: 'Object',
       type: 'foam.dao.DAO',
       name: 'innerDAO',
@@ -283,6 +293,9 @@ return delegate;
         return new foam.dao.NullDAO.Builder(getX())
         .setOf(getOf())
         .build();
+      }
+      if ( getMedusa() ) {
+        return new foam.nanos.mrac.MMDAO(getX(), getOf(), getMnPort());
       }
       if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) )
         return new foam.dao.java.JDAO(getX(), getOf(), getJournalName());
