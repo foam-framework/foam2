@@ -41,7 +41,7 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'prevIndex',
-      expression: function(lastUpdate, currentIndex, sections, data) {
+      expression: function(lastUpdate, currentIndex, sections) {
         for ( var i = currentIndex - 1 ; i >= 0 ; i-- ) {
           if ( sections[i].createIsAvailableFor(this.data$).get() ) return i;
         }
@@ -51,7 +51,7 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'nextIndex',
-      expression: function(lastUpdate, currentIndex, sections, data) {
+      expression: function(lastUpdate, currentIndex, sections) {
         for ( var i = currentIndex + 1 ; i < sections.length ; i++ ) {
           if ( sections[i].createIsAvailableFor(this.data$).get() ) return i;
         }

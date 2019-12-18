@@ -104,6 +104,15 @@ foam.CLASS({
           }
         };
       },
+      validationPredicates: [
+        {
+          args: ['department'],
+          predicateFactory: function(e) {
+            return e.NEQ(foam.nanos.u2.navigation.SignUp.DEPARTMENT, '');
+          },
+          errorString: 'Please enter a job title'
+        }
+      ],
       required: true
     },
     {
@@ -143,7 +152,7 @@ foam.CLASS({
             return [a.id, a.name];
           },
           dao$: choices
-        });
+        }, X);
       },
       required: true,
     },
@@ -201,8 +210,6 @@ foam.CLASS({
           window.history.replaceState(null, null, window.location.origin);
           location.reload();
         } else {
-          // logout once we have finished updating documents.
-          this.auth.logout();
           this.stack.push({
             class: 'foam.nanos.auth.ResendVerificationEmail'
           });

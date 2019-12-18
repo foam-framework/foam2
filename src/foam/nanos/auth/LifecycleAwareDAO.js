@@ -56,15 +56,29 @@ foam.CLASS({
     {
       name: 'find_',
       javaCode: `
-        LifecycleAware obj = (LifecycleAware) getDelegate().find_(x, id);
+        FObject obj = getDelegate().find_(x, id);
+
+        LifecycleAware lifecycleAwareObj = (LifecycleAware) obj;
+
+        // ! we are also handling the deprecated DeletedAware until we fully remove it from the system
+        if ( obj instanceof DeletedAware ){
+          DeletedAware deletedAwareObj = (DeletedAware) obj;
+
+          if ( obj == null || 
+            ( ( lifecycleAwareObj.getLifecycleState() == LifecycleState.DELETED || deletedAwareObj.getDeleted() == true ) && ! canReadDeleted(x) ) ||  
+            ( lifecycleAwareObj.getLifecycleState() == LifecycleState.REJECTED && ! canReadRejected(x)) ) {
+            return null;
+          }
+          return obj;
+        }
 
         if ( obj == null || 
-          ( obj.getLifecycleState() == LifecycleState.DELETED  && ! canReadDeleted(x) ) ||  
-          ( obj.getLifecycleState() == LifecycleState.REJECTED && ! canReadRejected(x) )) {
+          ( lifecycleAwareObj.getLifecycleState() == LifecycleState.DELETED && ! canReadDeleted(x) ) ||  
+          ( lifecycleAwareObj.getLifecycleState() == LifecycleState.REJECTED && ! canReadRejected(x)) ) {
           return null;
         }
 
-        return (FObject) obj;
+        return obj;
       `
     },
     {
@@ -79,6 +93,34 @@ foam.CLASS({
             .where(
               MLang.NOT(
                 MLang.EQ(getOf().getAxiomByName("lifecycleState"), LifecycleState.REJECTED)
+              )
+            )
+            .select_(x, sink, skip, limit, order, predicate);
+        }
+
+        // ! we are also handling the deprecated DeletedAware until we fully remove it from the system
+        if ( getOf().getAxiomByName("deleted") != null ){
+          if ( ! canReadDeleted(x) && canReadRejected(x) ) {
+            return getDelegate()
+              .where(
+                MLang.NOT(
+                  MLang.OR(
+                    MLang.EQ(getOf().getAxiomByName("lifecycleState"), LifecycleState.DELETED),
+                    MLang.EQ(getOf().getAxiomByName("deleted"), true)
+                  )
+                )
+              )
+              .select_(x, sink, skip, limit, order, predicate);
+          }
+
+          return getDelegate()
+            .where(
+              MLang.NOT(
+                MLang.OR(
+                  MLang.EQ(getOf().getAxiomByName("lifecycleState"), LifecycleState.DELETED),
+                  MLang.EQ(getOf().getAxiomByName("lifecycleState"), LifecycleState.REJECTED),
+                  MLang.EQ(getOf().getAxiomByName("deleted"), true)
+                )
               )
             )
             .select_(x, sink, skip, limit, order, predicate);
@@ -137,7 +179,7 @@ foam.CLASS({
         return authService.check(x, getDeletePermission_());
       `
     },
-        {
+    {
       name: 'canReadRejected',
       type: 'Boolean',
       args: [

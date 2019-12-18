@@ -66,6 +66,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'createEnabled',
+      value: true,
       documentation: 'True to enable the create button.'
     },
     {
