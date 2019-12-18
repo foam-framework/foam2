@@ -59,6 +59,7 @@ foam.CLASS({
       flags: ['java'],
     },
     'foam.dao.MDAO',
+    'foam.dao.OrderedDAO',
     'foam.dao.PromisedDAO',
     'foam.dao.RequestResponseClientDAO',
     'foam.dao.SequenceNumberDAO',
@@ -161,6 +162,20 @@ foam.CLASS({
           delegate = (ProxyDAO) getDecorator();
         }
 
+        if ( getGuid() && getSeqNo() ) 
+          throw new RuntimeException("EasyDAO GUID and SeqNo are mutually exclusive");
+        
+        if ( getSeqNo() ) {
+          delegate = new foam.dao.SequenceNumberDAO.Builder(getX()).
+          setDelegate(delegate).
+          setProperty(getSeqPropertyName()).
+          setStartingValue(getSeqStartingValue()).
+          build();
+        }
+
+        if ( getGuid() ) 
+          delegate = new foam.dao.GUIDDAO.Builder(getX()).setDelegate(delegate).build();
+
         if ( getValidated() ) {
           if ( getValidator() != null )
             delegate = new foam.dao.ValidatingDAO(getX(), delegate, getValidator());
@@ -172,7 +187,20 @@ foam.CLASS({
           delegate = new foam.nanos.auth.ServiceProviderAwareDAO.Builder(getX()).setDelegate(delegate).build();
         }
 
+        if ( getLifecycleAware() && getDeletedAware() ){
+          throw new RuntimeException("Both DeletedAware and LifecycleAware cannot be used simultaneously");
+        }
+
+        if ( getLifecycleAware() ) {
+          delegate = new foam.nanos.auth.LifecycleAwareDAO.Builder(getX())
+            .setDelegate(delegate)
+            .setName(getPermissionPrefix())
+            .build();
+        }
+
         if ( getDeletedAware() ) {
+          logger.warning("EasyDAO", getName(), "DEPRECATED: DeletedAware. Use LifecycleAware instead");
+
           delegate = new foam.nanos.auth.DeletedAwareDAO.Builder(getX())
             .setDelegate(delegate)
             .setName(getPermissionPrefix())
@@ -195,20 +223,6 @@ foam.CLASS({
 
         if ( getLastModifiedByAware() ) 
           delegate = new foam.nanos.auth.LastModifiedByAwareDAO.Builder(getX()).setDelegate(delegate).build();
-
-        if ( getGuid() && getSeqNo() ) 
-          throw new RuntimeException("EasyDAO GUID and SeqNo are mutually exclusive");
-
-        if ( getGuid() ) 
-          delegate = new foam.dao.GUIDDAO.Builder(getX()).setDelegate(delegate).build();
-
-        if ( getSeqNo() ) {
-          delegate = new foam.dao.SequenceNumberDAO.Builder(getX()).
-          setDelegate(delegate).
-          setProperty(getSeqPropertyName()).
-          setStartingValue(getSeqStartingValue()).
-          build();
-        }
 
         if ( getContextualize() ) {
           delegate = new foam.dao.ContextualizingDAO.Builder(getX()).
@@ -546,6 +560,11 @@ foam.CLASS({
       javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.auth.ServiceProviderAware.class.isAssignableFrom(getOf().getObjClass());'
     },
     {
+      name: 'lifecycleAware',
+      class: 'Boolean',
+      javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.auth.LifecycleAware.class.isAssignableFrom(getOf().getObjClass());'
+    },
+    {
       name: 'deletedAware',
       class: 'Boolean',
       javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.auth.DeletedAware.class.isAssignableFrom(getOf().getObjClass());'
@@ -660,12 +679,19 @@ foam.CLASS({
       } else {
         if ( this.cache ) {
           this.mdao = this.MDAO.create({of: params.of});
+
+          var cache = this.mdao;
+          if ( this.dedup ) cache = this.DeDupDAO.create({delegate: cache});
+          if ( Array.isArray(this.order) && this.order.length > 0 ) cache = this.OrderedDAO.create({
+            delegate: cache,
+            comparator: foam.compare.toCompare(this.order)
+          });
+
           dao = this.CachingDAO.create({
-            cache: this.dedup ?
-              this.mdao :
-              this.DeDupDAO.create({delegate: this.mdao}),
+            cache: cache,
             src: dao,
-            of: this.model});
+            of: this.model
+          });
         }
       }
 
@@ -826,6 +852,57 @@ foam.CLASS({
         if ( getMdao() != null ) 
           getMdao().addIndex(index);
         return this;
+      `
+    },
+    {
+      name: 'addDecorator',
+      documentation: 'Places a decorator chain ending in a null delegate at a specified point in the chain. Automatically insterts between given decorator and mdao. If "before" flag is true, decorator chain placed before the dao instead of inbetween the supplied dao and mdao. Return true on success.',
+      type: 'Boolean',
+      args: [
+        {
+          documentation: 'Null ending decorator chain to insert',
+          name: 'decorator',
+          javaType: 'foam.dao.ProxyDAO'
+        },
+        {
+          documentation: 'Decorator in the EasyDAO chain to place in relation to',
+          name: 'location',
+          javaType: 'foam.core.ClassInfo'
+        },
+        {
+          documentation: 'If true, decorator chain placed before the dao instead of inbetween the supplied dao and mdao',
+          name: 'before',
+          class: 'Boolean'
+        }
+      ],
+      javaCode: `
+        foam.dao.DAO daodecorator = getDelegate();
+
+        if ( ! ( daodecorator instanceof foam.dao.ProxyDAO ) ) 
+          return false;
+
+        ProxyDAO proxy = (ProxyDAO) daodecorator;
+        while ( true ) {
+          if ( before && location.isInstance( proxy.getDelegate() ) )
+            break;
+          else if ( !before && location.isInstance( proxy ) )
+            break;
+          else if ( !(proxy.getDelegate() instanceof foam.dao.ProxyDAO) ) 
+            return false;
+
+          proxy = (foam.dao.ProxyDAO) proxy.getDelegate();
+        }
+
+        if ( decorator == null || ! ( decorator.getDelegate() instanceof ProxyDAO ) ) 
+          return false;
+
+        foam.dao.ProxyDAO decoratorptr = decorator;
+        
+        while ( decorator.getDelegate() != null ) 
+          decorator = (ProxyDAO) decorator.getDelegate();
+        decorator.setDelegate(proxy.getDelegate());
+        proxy.setDelegate(decoratorptr);
+        return true;
       `
     },
     {

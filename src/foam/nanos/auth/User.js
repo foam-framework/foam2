@@ -14,7 +14,8 @@ foam.CLASS({
     'foam.nanos.auth.EnabledAware',
     'foam.nanos.auth.HumanNameTrait',
     'foam.nanos.auth.LastModifiedAware',
-    'foam.nanos.auth.ServiceProviderAware'
+    'foam.nanos.auth.ServiceProviderAware',
+    'foam.nanos.notification.Notifiable'
   ],
 
   requires: [
@@ -28,12 +29,16 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.DAO',
     'foam.dao.ProxyDAO',
+    'foam.dao.ArraySink',
     'foam.dao.Sink',
     'foam.mlang.order.Comparator',
     'foam.mlang.predicate.Predicate',
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.PriorPassword',
+    'foam.nanos.notification.Notification',
+    'foam.nanos.notification.NotificationSetting',
     'foam.util.SafetyUtil',
+    'java.util.List',
     'static foam.mlang.MLang.EQ'
   ],
 
@@ -245,14 +250,15 @@ foam.CLASS({
       section: 'personal'
     },
     {
-      class: 'String',
+      class: 'PhoneNumber',
       name: 'phoneNumber',
-      transient: true,
-      documentation: `Omits properties of the phone number object and returns
-        the phone number.`,
-      expression: function(phone) {
-        return phone.number;
-      },
+      documentation: 'Personal phone number.',
+      section: 'personal'
+    },
+    {
+      class: 'Boolean',
+      name: 'phoneNumberVerified',
+      writePermissionRequired: true,
       section: 'personal'
     },
     {
@@ -266,6 +272,18 @@ foam.CLASS({
       view: { class: 'foam.u2.detail.VerticalDetailView' },
       section: 'personal',
       includeInDigest: true
+    },
+    {
+      class: 'PhoneNumber',
+      name: 'mobileNumber',
+      documentation: 'Returns the mobile phone number of the User from the Phone model.',
+      section: 'personal'
+    },
+    {
+      class: 'Boolean',
+      name: 'mobileNumberVerified',
+      writePermissionRequired: true,
+      section: 'personal'
     },
     {
       class: 'String',
@@ -589,6 +607,17 @@ foam.CLASS({
       code: function() {
         return this.label();
       }
+    },
+    {
+      name: 'doNotify',
+      javaCode: `
+        DAO notificationSettingDAO = (DAO) x.get("notificationSettingDAO");
+
+        List<NotificationSetting> settings = ((ArraySink) getNotificationSettings(x).select(new ArraySink())).getArray();
+        for( NotificationSetting setting : settings ) {
+          setting.sendNotification(x, this, notification);
+        }
+      `
     }
   ]
 });

@@ -36,12 +36,10 @@ foam.CLASS({
         };
       },
       postSet: function(oldValue, newValue) {
-        if ( newValue !== oldValue ) {
+        if ( newValue !== oldValue && oldValue !== '' ) {
           var m = this.__context__.lookup(newValue, true);
           if ( m ) {
-            var n = m.create(null, this);
-            n.copyFrom(this.data);
-            this.data = n;
+            this.data = m.create(null, this);
           }
         }
       }

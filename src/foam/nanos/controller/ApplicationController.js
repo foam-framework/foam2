@@ -36,7 +36,6 @@ foam.CLASS({
     'foam.nanos.client.ClientBuilder',
     'foam.nanos.auth.Group',
     'foam.nanos.auth.ResendVerificationEmail',
-    'foam.nanos.auth.SignInView',
     'foam.nanos.auth.User',
     'foam.nanos.theme.Theme',
     'foam.nanos.u2.navigation.TopNavigation',
@@ -56,6 +55,7 @@ foam.CLASS({
 
   exports: [
     'displayWidth',
+    'agent',
     'appConfig',
     'as ctrl',
     'currentMenu',
@@ -69,6 +69,7 @@ foam.CLASS({
     'pushMenu',
     'requestLogin',
     'signUpEnabled',
+    'loginVariables',
     'stack',
     'user',
     'webApp',
@@ -78,6 +79,7 @@ foam.CLASS({
 
   constants: {
     MACROS: [
+      'logoBackgroundColour',
       'customCSS',
       'primary1',
       'primary2',
@@ -138,6 +140,17 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'loginVariables',
+      expression: function(client$userDAO) {
+        return {
+          dao_: client$userDAO || null,
+          imgPath: '',
+          group: 'system',
+          countryChoices_: [] // empty defaults to entire countryDAO
+        };
+      }
+    },
+    {
       class: 'Enum',
       of: 'foam.u2.layout.DisplayWidth',
       name: 'displayWidth',
@@ -170,6 +183,12 @@ foam.CLASS({
       class: 'foam.core.FObjectProperty',
       of: 'foam.nanos.auth.User',
       name: 'user',
+      factory: function() { return this.User.create(); }
+    },
+    {
+      class: 'foam.core.FObjectProperty',
+      of: 'foam.nanos.auth.User',
+      name: 'agent',
       factory: function() { return this.User.create(); }
     },
     {
@@ -383,7 +402,7 @@ foam.CLASS({
       }
 
       return new Promise(function(resolve, reject) {
-        self.stack.push({ class: 'foam.nanos.auth.SignInView' });
+        self.stack.push({ class: 'foam.u2.view.LoginView', mode_: 'SignIn' }, self);
         self.loginSuccess$.sub(resolve);
       });
     },

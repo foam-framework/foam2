@@ -68,10 +68,10 @@ foam.CLASS({
             }));
           })
           .start()
-            .add(this.slot((agent, user) => {
+             .add(this.slot((user) => {
               return this.E().addClass('name-container')
                   .start('span').addClass(this.myClass('userName'))
-                    .add( agent ? user.businessName() : user.label())
+                    .add(user.label())
                   .end();
             }))
             .add(this.slot((agent) => {

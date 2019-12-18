@@ -86,7 +86,7 @@ public class HistoryDAO
       historyDAO_.put_(x, historyRecord);
     } catch (Throwable t) {
       Logger l = (Logger) x.get("logger");
-      l.error("Unexpected error creating history record.", t);
+      l.error("Unexpected error creating history record for", obj.getClassInfo().getId(), t);
     }
 
     return super.put_(x, obj);
