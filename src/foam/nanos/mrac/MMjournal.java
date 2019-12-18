@@ -26,6 +26,7 @@ import foam.mlang.sink.GroupBy;
 import foam.core.Identifiable;
 import foam.box.Message;
 import foam.box.RPCMessage;
+import foam.lib.json.Outputter;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -66,6 +67,26 @@ public class MMJournal extends AbstractJournal {
   // One MMJournal instance can be shared by different DAO(Single Journal Mode).
   // Method: Replay will update this index.
   private AtomicLong globalIndex = new AtomicLong(1);
+
+  //Only record two entry for now.
+  //TODO: need to initial parents.
+  MedusaEntry parent1;
+  MedusaEntry parent2;
+  int hashIndex = 1;
+  Object hashRecordLock = new Object();
+
+  //TODO: check if this method is really threadsafe.
+  private void updateHash(MedusaEntry parent) {
+    synchronized ( hashRecordLock ) {
+      if ( hashIndex == 1 ) {
+        parent1 = parent;
+        hashIndex = 2;
+      } else {
+        parent2 = parent;
+        hashIndex =1;
+      }
+    }
+  }
 
   private MMJournal(String serviceName) {
     this.serviceName = serviceName;
@@ -144,10 +165,11 @@ public class MMJournal extends AbstractJournal {
     String uniqueString = className + id.toString();
     String uniqueStringLock = String.valueOf(uniqueString).intern();
 
+    long globalIndex = -1;
     // Lock primarykey
     // Allow parallel network call
     synchronized ( uniqueStringLock ) {
-      long globalIndex = getGlobalIndex();
+      globalIndex = getGlobalIndex();
 
       if ( old != null ) {
         // update version.
@@ -159,8 +181,22 @@ public class MMJournal extends AbstractJournal {
       }
     }
 
-    //TODO: Construct journal.
-    String mn = "aaaaaaaa";
+    // Get whole entry first to make sure threadsafe.
+    MedusaEntry p1 = parent1;
+    MedusaEntry p2 = parent2;
+    Message msg =
+      createMessage(
+        p1.getMyIndex(),
+        p1.getMyHash(),
+        p2.getMyIndex(),
+        p2.getMyHash(),
+        globalIndex,
+        old,
+        nu
+      );
+    Outputter outputter = new Outputter(getX());
+
+    String mn = outputter.stringify(msg);;
 
     int index = nextRobin() % groups.size();
     int i = 0;
@@ -183,15 +219,19 @@ public class MMJournal extends AbstractJournal {
       boolean[] checks = new boolean[nodes.size()];
       Arrays.fill(checks, false);
 
-      while ( System.currentTimeMillis() < endtime || check >=2 || check <= -2 ) {
+      MedusaEntry p = null;
+
+      while ( System.currentTimeMillis() < endtime && check < 2 && check > -2 ) {
         for ( int j = 0 ; j < tasks.length ; j++ ) {
           if ( checks[j] == false && ((FutureTask<String>) tasks[j]).isDone() ) {
             FutureTask<String> task = (FutureTask<String>) tasks[j];
             try {
               String response = task.get();
+              System.out.println(response);
+              //TODO: a bug, return message format wrong.
               FObject responseMessage = getX().create(JSONParser.class).parseString(response);
+              p = (MedusaEntry) responseMessage;
               if ( responseMessage instanceof MedusaMessage ) {
-
                 check++;
               }
               check--;
@@ -206,7 +246,8 @@ public class MMJournal extends AbstractJournal {
       }
 
       if ( check >= 2 ) {
-        isPersist = false;
+        isPersist = true;
+        updateHash(p);
         break;
       }
 
@@ -214,26 +255,30 @@ public class MMJournal extends AbstractJournal {
       i++;
     }
 
+
+
     // Important
     if ( isPersist == false ) {
       //TODO: shutdown the put method.
       throw new RuntimeException("MN do not work....");
     }
 
+
   }
 
   private Message createMessage(
     long globalIndex1,
-    int hash1,
+    String hash1,
     long globalIndex2,
-    int hash2,
+    String hash2,
     long myIndex,
-    FObject entry
+    FObject old,
+    FObject nu
   ) {
     Message message = getX().create(Message.class);
     RPCMessage rpc = getX().create(foam.box.RPCMessage.class);;
     rpc.setName("put");
-    Object[] args = {globalIndex1, hash1, globalIndex2, hash2, myIndex, entry};
+    Object[] args = {globalIndex1, hash1, globalIndex2, hash2, myIndex, old, nu};
     rpc.setArgs(args);
 
     message.setObject(rpc);
