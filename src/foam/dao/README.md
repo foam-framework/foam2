@@ -115,4 +115,6 @@ Customizing EasyDAO on the client side is a bit dificult do to the nature of how
 
 Here you are provided the tail of the decorator chain already constructed somewhere between JDAO and the rest of the proprietry foam daos, and you need only add to this and return a pointer to the last decorator in your completed chain. This is a simple way to EasyDAO whichever DAOs you like, however it is not without its drawbacks. For instance if you would like a ProxyDAO to come exactly in between two specific ProxyDAOs in foam you will not be abke to make it purely EasyDAO. Fret not, however for the next section will explain the support that EasyDAO provides for strategic placement of all your DAO needs.
 
+&nbsp;
+
 #### Precise Placement of EasyDAO Decorators
