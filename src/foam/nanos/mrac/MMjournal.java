@@ -191,6 +191,8 @@ public class MMJournal extends AbstractJournal {
         p2.getMyIndex(),
         p2.getMyHash(),
         globalIndex,
+        "put",
+        "p",
         old,
         nu
       );
@@ -272,13 +274,26 @@ public class MMJournal extends AbstractJournal {
     long globalIndex2,
     String hash2,
     long myIndex,
+    String method,
+    String action,
     FObject old,
     FObject nu
   ) {
     Message message = getX().create(Message.class);
-    RPCMessage rpc = getX().create(foam.box.RPCMessage.class);;
-    rpc.setName("put");
-    Object[] args = {globalIndex1, hash1, globalIndex2, hash2, myIndex, old, nu};
+    RPCMessage rpc = getX().create(foam.box.RPCMessage.class);
+    //put or remove
+    rpc.setName(method);
+    MedusaEntry entry = getX().create(MedusaEntry.class);
+    entry.setServiceName(serviceName);
+    // p or r
+    entry.setAction(action);
+    entry.setGlobalIndex1(globalIndex1);
+    entry.setHash1(hash1);
+    entry.setGlobalIndex2(globalIndex2);
+    entry.setHash2(hash2);
+    entry.setOld(old);
+    entry.setNu(nu);
+    Object[] args = {entry};
     rpc.setArgs(args);
 
     message.setObject(rpc);
@@ -370,6 +385,7 @@ public class MMJournal extends AbstractJournal {
   // Get Data Stream from different MN.
   // Merge data base on the global index.
   // put data into DAO.
+  //TODO: implement tomorrow.
   public void replay(X x, DAO dao) {
 
   }

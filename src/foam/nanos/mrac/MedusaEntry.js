@@ -43,7 +43,11 @@ foam.CLASS({
     },
     {
       class: 'FObjectProperty',
-      name: 'entry'
+      name: 'old'
+    },
+    {
+      class: 'FObjectProperty',
+      name: 'nu'
     },
     {
       class: 'String',
