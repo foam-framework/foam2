@@ -24,11 +24,16 @@ public class MNDAO extends JDAO {
 
   @Override
   public FObject put_(X x, FObject obj) {
-    return null;
+    // MN does not have record on old obj;
+    //TODO: extra check code should add at here.
+    ((MNJournal) getJournal()).writeRaw(x, obj);
+    return obj;
   }
 
   @Override
   public FObject remove_(X x, FObject obj) {
-    throw new RuntimeException("Implement.........");
+    // MM should check if the object is exists.
+    ((MNJournal) getJournal()).writeRaw(x, obj);
+    return obj;
   }
 }

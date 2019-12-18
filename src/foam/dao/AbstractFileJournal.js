@@ -78,8 +78,8 @@ foam.CLASS({
       name: 'outputter',
       javaType: 'foam.lib.json.Outputter',
       javaFactory: `
-        foam.lib.json.Outputter outputter = new Outputter(getX()).setPropertyPredicate(new StoragePropertyPredicate()); 
-        outputter.setMultiLine(getMultiLineOutput()); 
+        foam.lib.json.Outputter outputter = new Outputter(getX()).setPropertyPredicate(new StoragePropertyPredicate());
+        outputter.setMultiLine(getMultiLineOutput());
         return outputter;
         `
     },
@@ -278,6 +278,23 @@ try {
           .append(record)
           .append(")")
           .toString());
+      `
+    },
+    {
+      name: 'writeRaw',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'obj', type: 'foam.core.FObject' },
+      ],
+      synchronized: true,
+      javaCode: `
+        try {
+            String record = getOutputter().stringify(obj);
+            write_(record);
+        } catch ( Throwable t ) {
+          getLogger().error("Failed to write remove entry to journal", t);
+          throw new RuntimeException(t);
+        }
       `
     },
     {
