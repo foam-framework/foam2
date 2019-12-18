@@ -129,6 +129,8 @@ This in fact comes built in to each EasyDAO in a method called printDecorators w
 ```java
 EasyDAO dao = new foam.dao.EasyDAO.Builder(x)
   ...
+  ...
+  ...
   .build();
 
   dao.printDecorators();
@@ -149,4 +151,24 @@ Here you are provided the tail of the decorator chain already constructed somewh
 
 #### Precise Placement of EasyDAO Decorators
 
+On some rare occations, iinterdependencies between the semantics of each DAO decorator do arrise. Here, precise placement of a decorator is required. This can be acheived using the addDecorator method which places a null ending chain (similar to the semantics of the more familiar setDecorator()) after a specified dao. The specific dao it places the decorator chain is in relation to the methods second argument, which is the class info of the dao to be placed in relation to. Set the last argument to true if you want to place it before the given dao, and false otherwise. Although complicated, this specialized function gives full controll over where to place decorators within the EasyDAO chain. The following is an example of its use,
+
+```java
+foam.dao.EasyDAO dao = new foam.dao.EasyDAO.Builder(x)
+  .setOf(MODEL_PATH.getOwnClassInfo())
+  .setAuthorize(false)
+  .setRuler(false)
+  .setDecorator(new faom.dao.DAO1(new foam.dao.DAO2(null)))
+  .setJournalName("docs")
+  .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+  .build();
+
+dao.addDecorator(new DAO3(new DAO4(null)), DAO1.getOwnClassInfo(), false);
+```
+
+This gives the following decorator chain,
+
+```
+EasyDAO -> DAO1 -> DAO3 -> DAO4 -> DAO2 -> JDAO -> MDAO
+```
 
