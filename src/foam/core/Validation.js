@@ -129,7 +129,7 @@ foam.CLASS({
             predicateFactory: function(e) {
               return e.GTE(foam.mlang.StringLength.create({ arg1: self }), self.minLength);
             },
-            errorString: `Please enter ${this.label.toLowerCase()} with least ${this.minLength} character${this.minLength>1?'s':''}`
+            errorString: `Please enter ${this.label.toLowerCase()} with at least ${this.minLength} character${this.minLength>1?'s':''}`
           });
         }
         if ( foam.Number.isInstance(this.maxLength) ) {
@@ -147,7 +147,7 @@ foam.CLASS({
             predicateFactory: function(e) {
               return e.GTE(foam.mlang.StringLength.create({ arg1: self }), 1);
             },
-            errorString: `Please enter a ${this.label}`
+            errorString: `Please enter ${this.label.toLowerCase()}`
           });
         }
         return a;
@@ -373,7 +373,7 @@ foam.CLASS({
                   /^(?:\+?1[-.●]?)?\(?([0-9]{3})\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4})$/
                  );
             },
-            errorString: 'Please enter valid phone number'
+            errorString: 'Please enter phone number'
           }
         ];
       }
