@@ -33,9 +33,9 @@ public class CompositeLogger
     childLoggers.remove(logger);
   }
 
-  public void test(Object... args) {
+  public void testing(Object... args) {
     for ( Logger logger : childLoggers ) {
-      logger.test(args);
+      logger.testing(args);
     }
   }
 

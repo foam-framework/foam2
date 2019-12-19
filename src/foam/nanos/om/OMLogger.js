@@ -44,7 +44,7 @@ foam.CLASS({
       `
     },
     {
-      name: 'test',
+      name: 'testing',
       javaCode: `
         log(args);
       `

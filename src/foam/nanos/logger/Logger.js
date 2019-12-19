@@ -10,8 +10,8 @@ foam.INTERFACE({
 
   methods: [
     {
-      name: 'test',
-      documentation: 'Log at test log level.',
+      name: 'testing',
+      documentation: 'Log at testing log level.',
       type: 'Void',
       args: [ { name: 'args', javaType: 'Object...' } ]
     },

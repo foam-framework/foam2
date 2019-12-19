@@ -36,11 +36,11 @@ foam.ENUM({
 
   values: [
     {
-      name: 'TEST',
-      shortName: 'TEST',
-      label: 'Test',
+      name: 'TESTING',
+      shortName: 'TESTING',
+      label: 'Testing',
       color: 'blue',
-      consoleMethodName: 'test'
+      consoleMethodName: 'testing'
     },
     {
       name: 'DEBUG',

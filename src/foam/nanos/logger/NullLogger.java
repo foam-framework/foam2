@@ -16,7 +16,7 @@ public class NullLogger
 
   private NullLogger() {}
 
-  public void test(Object...  args) { }
+  public void testing(Object...  args) { }
 
   public void debug(Object...  args) { }
 

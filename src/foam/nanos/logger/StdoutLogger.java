@@ -56,7 +56,7 @@ public class StdoutLogger
     }
   }
 
-  public void test(Object... args) {
+  public void testing(Object... args) {
     logger_.finer(combine(args));
   }
 

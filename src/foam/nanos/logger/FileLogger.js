@@ -75,7 +75,7 @@ try {
   return str.toString();`
     },
     {
-      name: 'test',
+      name: 'testing',
       args: [
         {
           name: 'args',

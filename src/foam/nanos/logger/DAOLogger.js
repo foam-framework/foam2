@@ -83,7 +83,7 @@ getDao().put_(getX().put("logger", (Logger) getLogger()), lm);
 `
     },
     {
-      name: 'test',
+      name: 'testing',
       type: 'Void',
       args: [
         {
@@ -91,7 +91,7 @@ getDao().put_(getX().put("logger", (Logger) getLogger()), lm);
           javaType: 'Object...'
         }
       ],
-      javaCode: 'submit(LogLevel.TEST, combine(args));'
+      javaCode: 'submit(LogLevel.TESTING, combine(args));'
     },
     {
       name: 'debug',

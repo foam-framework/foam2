@@ -26,8 +26,8 @@ public class PrefixLogger
     return ret;
   }
 
-  public void test(Object...  args) {
-    getDelegate().test(prefix(args));
+  public void testing(Object...  args) {
+    getDelegate().testing(prefix(args));
   }
 
   public void debug(Object...  args) {

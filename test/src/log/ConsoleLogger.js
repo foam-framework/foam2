@@ -19,7 +19,7 @@ describe('ConsoleLogger', function() {
   var captureLogger;
   var testCtx;
   var LogLevel;
-  var logLevels = [ 'test', 'debug', 'info', 'warn', 'error' ];
+  var logLevels = [ 'testing', 'debug', 'info', 'warn', 'error' ];
 
   beforeAll(function() {
     var path = require('path');
@@ -32,7 +32,7 @@ describe('ConsoleLogger', function() {
       implements: [ 'foam.log.Logger' ],
 
       exports: [
-        'test',
+        'testing',
         'debug',
         'log',
         'info',

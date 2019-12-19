@@ -11,7 +11,7 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'logTest',
+      name: 'logTesting',
       class: 'Boolean',
       value: false
     },
@@ -83,7 +83,7 @@ foam.CLASS({
       javaCode: "if ( getLogDebug() ) getDelegate().debug(args);"
     },
     {
-      name: 'test',
+      name: 'testing',
       type: 'Void',
       args: [
         {
@@ -91,7 +91,7 @@ foam.CLASS({
           javaType: 'Object...'
         }
       ],
-      javaCode: "if ( getLogTest() ) getDelegate().test(args);"
+      javaCode: "if ( getLogTesting() ) getDelegate().testing(args);"
     }
   ]
 });
