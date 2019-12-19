@@ -724,6 +724,7 @@ FOAM_FILES([
   { name: "foam/u2/detail/SectionedDetailPropertyView" },
 
   { name: "foam/graphics/ZoomMapView" },
+  { name: "foam/core/CoreTypesValidationTest" },
 
   // Strategy
   { name: "foam/strategy/StrategyReference" },

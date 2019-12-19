@@ -27,13 +27,17 @@ Relationship hierarchy.`,
     'foam.dao.ProxyDAO',
     'foam.dao.ProxySink',
     'foam.dao.Sink',
+    'foam.mlang.MLang',
+    'foam.mlang.predicate.Predicate',
     'foam.nanos.app.AppConfig',
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.User',
     'foam.nanos.logger.Logger',
     'foam.util.SafetyUtil',
     'java.util.Map',
-    'java.util.HashMap'
+    'java.util.Map.Entry',
+    'java.util.HashMap',
+    'java.util.stream.Collectors'
   ],
 
   properties: [
@@ -43,8 +47,7 @@ the propertyInfos are the Reference or Relationship property from which to find
 the next step in the hierachy on route the instance which implements
 ServiceProviderAware`,
       name: 'propertyInfos',
-      class: 'Map',
-      javaFactory: 'return new java.util.HashMap<String, PropertyInfo[]>();'
+      class: 'Map'
     }
   ],
 
@@ -108,16 +111,44 @@ ServiceProviderAware`,
       return super.select_(x, sink, skip, limit, order, predicate);
     }
 
-    ProxySink proxy = (ProxySink) getDelegate().select_(
+    Sink spidSink = sink;
+    Predicate spidPredicate = predicate;
+    if ( ServiceProviderAware.class.isAssignableFrom(getOf().getObjClass()) ) {
+      User user = (User) x.get("user");
+      PropertyInfo spidProperty = ((PropertyInfo) getOf().getAxiomByName("spid"));
+      spidPredicate = MLang.EQ(spidProperty, user.getSpid());
+
+      if ( predicate != null ) {
+        spidPredicate = MLang.AND(
+          spidPredicate,
+          predicate
+        );
+      }
+    } else if ( getPropertyInfos() != null &&
+                getPropertyInfos().size() > 0 ) {
+      if ( predicate != null ) {
+        spidPredicate = new ServiceProviderAwarePredicate(x, predicate, getPropertyInfos());
+      } else {
+        spidSink = new ServiceProviderAwareSink(x, sink, getPropertyInfos());
+      }
+    } else {
+      return super.select_(x, sink, skip, limit, order, predicate);
+    }
+
+    Sink responseSink = getDelegate().select_(
       x,
-      new ServiceProviderAwareSink(x, sink, getPropertyInfos()),
+      spidSink,
       skip,
       limit,
       order,
-      predicate
+      spidPredicate
     );
 
-    return proxy.getDelegate();
+    if ( responseSink instanceof ProxySink ) {
+      return ((ProxySink)responseSink).getDelegate();
+    } else {
+      return responseSink;
+    }
       `
     }
   ]

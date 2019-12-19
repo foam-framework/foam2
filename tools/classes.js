@@ -234,6 +234,7 @@ var classes = [
   'foam.nanos.auth.ServiceProvider',
   'foam.nanos.auth.ServiceProviderAware',
   'foam.nanos.auth.ServiceProviderAwareDAO',
+  'foam.nanos.auth.ServiceProviderAwarePredicate',
   'foam.nanos.auth.ServiceProviderAwareSink',
   'foam.nanos.auth.ServiceProviderAwareSupport',
   'foam.nanos.auth.test.ServiceProviderAwareTest',

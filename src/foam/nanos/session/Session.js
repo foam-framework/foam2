@@ -233,18 +233,24 @@ foam.CLASS({
         rtn = rtn
           .put("user", user)
           .put("agent", agent)
-          .put("spid", user.getSpid())
           .put("logger", new PrefixLogger(prefix, (Logger) x.get("logger")))
           .put("twoFactorSuccess", getContext().get("twoFactorSuccess"))
           .put(CachingAuthService.CACHE_KEY, getContext().get(CachingAuthService.CACHE_KEY));
+
+        if ( user != null ) {
+         rtn = rtn.put("spid", user.getSpid());
+        }
 
         // We need to do this after the user and agent have been put since
         // 'getCurrentGroup' depends on them being in the context.
         Group group = auth.getCurrentGroup(rtn);
 
-        return rtn
+        if ( group != null ) {
+          rtn = rtn
           .put("group", group)
           .put("appConfig", group.getAppConfig(rtn));
+        }
+        return rtn;
       `
     },
     {

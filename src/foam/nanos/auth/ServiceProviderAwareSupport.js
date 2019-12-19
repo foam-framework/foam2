@@ -81,7 +81,8 @@ returning true if the context users spid matches the current object.`,
       }
 
       Object result = obj;
-      while ( result != null ) {
+      while ( result != null &&
+              properties != null ) {
         PropertyInfo pInfos[] = (PropertyInfo[]) properties.get(result.getClass().getName());
         if ( pInfos == null ) {
           return false;

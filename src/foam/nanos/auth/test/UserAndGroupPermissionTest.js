@@ -393,6 +393,19 @@ foam.CLASS({
           test(false, "put with spid.update.target_spid should not throw AuthorizationException: "+e.getMessage());
         }
 
+        // predicate filter by ServiceProviderAwarePredicate
+        DAO where = dao.where(EQ(User.ID, user2.getId()));
+        sink = new ArraySink();
+        where.select(sink);
+        users = sink.getArray();
+        test (users.size() == 1, "ReferenceTest DAO select filtered on spid predicate and where. expected: 1, found: "+users.size());
+
+        where = dao.where(EQ(User.ID, user3.getId()));
+        sink = new ArraySink();
+        where.select(sink);
+        users = sink.getArray();
+        test (users.size() == 0, "ReferenceTest DAO select filtered on spid predicate and where. expected: 0, found: "+users.size());
+
       `
     }
   ]

@@ -61,7 +61,6 @@ foam.CLASS({
         AuthService auth = (AuthService) x.get("auth");
         DAO groupPermissionJunctionDAO = (DAO) x.get("localGroupPermissionJunctionDAO");
         groupPermissionJunctionDAO.where(EQ(GroupPermissionJunction.SOURCE_ID, "test")).removeAll();
-        //groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("test").setTargetId("spid.read.spid").build());
 
         DAO userDAODelegate = new MDAO(User.getOwnClassInfo());
         DAO userDAO = new foam.nanos.auth.AuthorizationDAO.Builder(x)
@@ -162,16 +161,67 @@ foam.CLASS({
         nss = sink.getArray();
         test (nss.size() == 1, "ReferenceTest DAO select filtered on spid. expected: 1, found: "+nss.size());
 
-        // groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("dummysp.read."+ns1.getId()).build());
-      groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("user.read."+user2.getId()).build());
+        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("user.read."+user2.getId()).build());
 
         y = Auth.sudo(y, user1);
         dao = dao.inX(y);
+
         sink = new ArraySink();
         dao.select(sink);
         nss = sink.getArray();
-        test (nss.size() == 2, "ReferenceTest DAO select filtered on spid. expected: 2, found: "+nss.size());
+        test (nss.size() == 2, "ReferenceTest DAO select filtered on permission. expected: 2, found: "+nss.size());
 
+        // select predicate tests.
+        DAO where = dao.where(EQ(DummySp.ID, ns2.getId()));
+        sink = new ArraySink();
+        where.select(sink);
+        nss = sink.getArray();
+        test (nss.size() == 1, "ReferenceTest DAO select filtered on predicate. expected: 1, found: "+nss.size());
+
+        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("user.read."+user3.getId()).build());
+
+        // select before changing spid
+        sink = new ArraySink();
+        dao.select(sink);
+        nss = sink.getArray();
+        test (nss.size() == 3, "ReferenceTest DAO select filtered on permission. expected: 3, found: "+nss.size());
+
+        // select before changing spid
+        where = dao.where(EQ(DummySp.ID, ns3.getId()));
+        sink = new ArraySink();
+        where.select(sink);
+        nss = sink.getArray();
+        test (nss.size() == 1, "ReferenceTest DAO select filtered on predicate. expected: 1, found: "+nss.size());
+
+        // change spid
+        user3 = (User) user3.fclone();
+        user3.setSpid("other");
+        y = Auth.sudo(y, ctxUser);
+        user3 = (User) userDAO.put_(y, user3);
+
+        y = Auth.sudo(y, user1);
+        dao = dao.inX(y);
+
+        sink = new ArraySink();
+        dao.select(sink);
+        nss = sink.getArray();
+        test (nss.size() == 2, "ReferenceTest DAO select filtered on permission. expected: 2, found: "+nss.size());
+
+        // select predicate that should filter by permission
+        where = dao.where(EQ(DummySp.ID, ns2.getId()));
+        sink = new ArraySink();
+        where.select(sink);
+        nss = sink.getArray();
+        test (nss.size() == 1, "ReferenceTest DAO select filtered on predicate. expected: 1, found: "+nss.size());
+
+        // select predicate that should filter by spid first.
+        where = dao.where(EQ(DummySp.ID, ns3.getId()));
+        sink = new ArraySink();
+        where.select(sink);
+        nss = sink.getArray();
+        test (nss.size() == 0, "ReferenceTest DAO select filtered on spid. expected: 0, found: "+nss.size());
+
+        // delete/remove
      `
     }
   ]

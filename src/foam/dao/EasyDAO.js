@@ -563,7 +563,8 @@ foam.CLASS({
       name: 'serviceProviderAware',
       class: 'Boolean',
       // note: want this decorator on the non-local/served stack.
-      javaFactory: `return getNSpec().getServe() &&
+      javaFactory: `return getNSpec() != null &&
+                            getNSpec().getServe() &&
                             foam.nanos.auth.ServiceProviderAware.class.isAssignableFrom(getOf().getObjClass());`
     },
     {
