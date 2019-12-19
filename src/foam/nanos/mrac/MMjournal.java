@@ -96,31 +96,43 @@ public class MMJournal extends AbstractJournal {
 
   private MMJournal(String serviceName) {
     this.serviceName = serviceName;
-    initial();
   }
 
-  private void initial() {
-    X x = getX();
-    if ( x == null ) throw new RuntimeException("Context miss.");
-    DAO clusterNodeDAO = (DAO) x.get("clusterNodeDAO");
-    if ( clusterNodeDAO == null ) throw new RuntimeException("clusterNodeDAO miss");
+  Object initialLock = new Object();
+  private void initial(X x) {
+    synchronized ( initialLock ) {
+      if ( isInitialized ) return;
 
-    GroupBy groupToInstance = (GroupBy) clusterNodeDAO
-      .where(EQ(ClusterNode.TYPE, ClusterNodeType.MM))
-      .select(GROUP_BY(ClusterNode.GROUP, new ArraySink.Builder(getX()).build()));
+      if ( x == null ) throw new RuntimeException("Context miss.");
+      DAO clusterNodeDAO = (DAO) x.get("clusterNodeDAO");
+      if ( clusterNodeDAO == null ) throw new RuntimeException("clusterNodeDAO miss");
 
-    for ( Object key : groupToInstance.getGroups().keySet() ) {
-      for ( Object value: ((ArraySink) groupToInstance.getGroups().get(key)).getArray() ) {
-        ClusterNode clusterNode = (ClusterNode) value;
-        if ( groupToMN.get(clusterNode.getGroup()) != null ) {
-          groupToMN.put(clusterNode.getGroup(), new ArrayList<ClusterNode>());
+      GroupBy groupToInstance = (GroupBy) clusterNodeDAO
+        .where(EQ(ClusterNode.TYPE, ClusterNodeType.MN))
+        .select(GROUP_BY(ClusterNode.GROUP, new ArraySink.Builder(getX()).build()));
+
+      for ( Object key : groupToInstance.getGroups().keySet() ) {
+        for ( Object value: ((ArraySink) groupToInstance.getGroups().get(key)).getArray() ) {
+          ClusterNode clusterNode = (ClusterNode) value;
+          if ( groupToMN.get(clusterNode.getGroup()) == null ) {
+            groupToMN.put(clusterNode.getGroup(), new ArrayList<ClusterNode>());
+          }
+          System.out.println(clusterNode);
+          groupToMN.get(clusterNode.getGroup()).add(clusterNode);
         }
-        groupToMN.get(clusterNode.getGroup()).add(clusterNode);
       }
-    }
 
-    for ( Long group : groupToMN.keySet() ) {
-      groups.add(groupToMN.get(group));
+      for ( Long group : groupToMN.keySet() ) {
+        groups.add(groupToMN.get(group));
+      }
+
+      //TODO: remove below code. it only use for test.
+      parent1 = new MedusaEntry();
+      parent1.setMyIndex(1);
+      parent1.setMyHash("aa");
+      parent2 = new MedusaEntry();
+      parent2.setMyIndex(2);
+      parent2.setMyHash("bb");
     }
   }
 
@@ -154,38 +166,21 @@ public class MMJournal extends AbstractJournal {
 
   public synchronized static MMJournal getMMjournal(String serviceName) {
     if ( journalMap.get(serviceName) != null ) return journalMap.get(serviceName);
-    return journalMap.put(serviceName, new MMJournal(serviceName));
+    journalMap.put(serviceName, new MMJournal(serviceName));
+    return journalMap.get(serviceName);
   }
 
+  public volatile boolean isVersion = true;
+  private volatile boolean isInitialized = false;
   // We will remove synchronized key word in the DAO put.
   // This method has to be thread safe.
   // The method only work if FObject implement Identifiable.Identifiable
   // Version is used to allow we can make parallel call.
   // TODO: can we do this versioning code at the begnning of DAO?
   public void put_(X x, FObject old, FObject nu) {
-    if ( ! ( nu instanceof Identifiable ) ) throw new RuntimeException("MM only accept Identifiable");
+    if ( ! isInitialized ) initial(x);
 
-    Object id = ((Identifiable) nu).getPrimaryKey();
-    if ( id == null ) throw new RuntimeException("Id should not be null");
-    String className = nu.getClass().getName();
-    String uniqueString = className + id.toString();
-    String uniqueStringLock = String.valueOf(uniqueString).intern();
-
-    long globalIndex = -1;
-    // Lock primarykey
-    // Allow parallel network call
-    synchronized ( uniqueStringLock ) {
-      globalIndex = getGlobalIndex();
-
-      if ( old != null ) {
-        // update version.
-        ((Identifiable) nu).setPersistVersion(1);
-      } else {
-        // Old version of journal.
-        if ( ((Identifiable) old).getPersistVersion() == -1 ) ((Identifiable) nu).setPersistVersion(1);
-        else ((Identifiable) nu).setPersistVersion(((Identifiable) old).getPersistVersion() + 1);
-      }
-    }
+    long myIndex = getGlobalIndex();
 
     // Get whole entry first to make sure threadsafe.
     MedusaEntry p1 = parent1;
@@ -196,7 +191,7 @@ public class MMJournal extends AbstractJournal {
         p1.getMyHash(),
         p2.getMyIndex(),
         p2.getMyHash(),
-        globalIndex,
+        myIndex,
         "put",
         "p",
         old,

@@ -11,6 +11,7 @@ import foam.core.ClassInfo;
 import foam.core.FObject;
 import foam.dao.java.JDAO;
 import foam.dao.MDAO;
+import foam.core.Identifiable;
 
 public class MMDAO extends JDAO {
 
@@ -20,12 +21,26 @@ public class MMDAO extends JDAO {
     setX(x);
     setOf(classInfo);
     setDelegate(new MDAO(classInfo));
+    setJournal(MMJournal.getMMjournal(mnPort));
     this.mnPort = mnPort;
   }
 
   //Remove synchronized key word.
+  //TODO: move lock to here
   @Override
   public FObject put_(X x, FObject obj) {
+    if ( obj == null ) throw new RuntimeException("obj is null");
+
+    Object id = ((Identifiable) obj).getPrimaryKey();
+    String className = obj.getClass().getName();
+    String uniqueString = className + id.toString();
+    String uniqueStringLock = String.valueOf(uniqueString).intern();
+
+    //TODO: Change to assembly version.
+    synchronized ( uniqueStringLock ) {
+      getJournal().put_(x, null, obj);
+      //TODO: put to MDAO.
+    }
     return null;
   }
 

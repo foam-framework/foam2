@@ -36,4 +36,5 @@ public class MNDAO extends JDAO {
     ((MNJournal) getJournal()).writeRaw(x, obj);
     return obj;
   }
+
 }
