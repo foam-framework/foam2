@@ -87,7 +87,7 @@ EasyDAO -> DAO1 -> DAO2 -> JDAO -> MDAO
 
 #### Inner DAOs
 
-Sometimes you want the ability to choose which dao EasyDAO places at the end of your chain to perform the act of storing. For instance maybe you have another more modular dao you wish to attach it to; or simply have made your own version of MDAO. You can do so with setInnerDAO. Caution should be used here however as sometimes this will reduce the ability to upgrade the function of all DAOs and should be used sparingly as the Inner DAO property is a popular spot that is often used to modify functionality on a larger scale. The following example shows setInnerDAO at work,
+Sometimes you want the ability to choose which DAO EasyDAO places at the end of your chain to perform the act of storing. For instance maybe you have another more modular DAO you wish to attach it to; or simply have made your own version of MDAO. You can do so with setInnerDAO. Caution should be used here however as sometimes this will reduce the ability to upgrade the function of all DAOs and should be used sparingly as the Inner DAO property is a popular spot that is often used to modify functionality on a larger scale. The following example shows setInnerDAO at work:
 
 ```java
 new foam.dao.EasyDAO.Builder(x)
@@ -111,7 +111,7 @@ EasyDAO -> DAO1 -> DAO2 -> INDAO
 
 Unfortunately, setting up a decorator chain can be a very buggy and frustrating experience. The best way to set up a chain is sequentially, testing its function at each step of the way. This is because any bug that might be caused by a single step of the process can be very difficult to pinpoint once the entire decorator chain is set up. A sequential approach will give you a strong indication to what is causing each bug as it pops up. The best way to use this approach is to disable any decorators that may be added by default at first, and slowly add them one by one, taking care to prioritize adding first decorators that may conflict with others such as those performing authorization checks.
 
-It will help to visualize what decorator chain the EasyDAO is creating at each step of the way to help identify possible culprits and mismatched orders of DAOs. This can be done using the following piece of logic to walk the chain of decorators and print them out one by one,
+It will help to visualize what decorator chain the EasyDAO is creating at each step of the way to help identify possible culprits and mismatched orders of DAOs. This can be done using the following piece of logic to walk the chain of decorators and print them out one by one:
 
 ```java
   foam.dao.DAO delegate = EASYDAO;
@@ -124,7 +124,7 @@ It will help to visualize what decorator chain the EasyDAO is creating at each s
   System.out.println(delegate.getClass().getSimpleName());
 ```
 
-This in fact comes built in to each EasyDAO in a method called printDecorators which you may wish to use. One of the advantages of having an EasyDAO decorator at the tail of each chain is simply being able to call it using the built dao,
+This in fact comes built in to each EasyDAO in a method called printDecorators which you may wish to use. One of the advantages of having an EasyDAO decorator at the EasyDAO side of each chain is simply being able to call it using the built DAO,
 
 ```java
 EasyDAO dao = new foam.dao.EasyDAO.Builder(x)
@@ -143,15 +143,15 @@ EasyDAO dao = new foam.dao.EasyDAO.Builder(x)
 
 #### Overwriting Properties
 
-Customizing EasyDAO on the client side is a bit dificult do to the nature of how it is implemented. It is however, not impossible. The first step to take would be to create a foam model extending the original EasyDAO. Here you can override properties and even add some of your own. Since all the logic of creating the decorator chain is placed within a single property it is a bit hard to modify. However, EasyDAO comes equipped with a method allowing the user to specify their own unique decorator chain using the properties that they have added. This is known as getOuterDAO. 
+Customizing EasyDAO on the client side is a bit difficult do to the nature of how it is implemented. It is however, not impossible. The first step to take would be to create a foam model extending the original EasyDAO. Here you can override properties and even add some of your own. Since all the logic of creating the decorator chain is placed within a single property it is a bit hard to modify. However, EasyDAO comes equipped with a method allowing the user to specify their own unique decorator chain using the properties that they have added. This is known as getOuterDAO. 
 
-Here you are provided the tail of the decorator chain already constructed somewhere between JDAO and the rest of the proprietry foam daos, and you need only add to this and return a pointer to the last decorator in your completed chain. This is a simple way to EasyDAO whichever DAOs you like, however it is not without its drawbacks. For instance if you would like a ProxyDAO to come exactly in between two specific ProxyDAOs in foam you will not be abke to make it purely EasyDAO. Fret not, however for the next section will explain the support that EasyDAO provides for strategic placement of all your DAO needs.
+Here you are provided the tail of the decorator chain already constructed somewhere between JDAO and the rest of the proprietry foam DAOs, and you need only add to this and return a pointer to the last decorator in your completed chain. This is a simple way to EasyDAO whichever DAO decorators you wish, however it is not without its drawbacks. For instance if you would like a ProxyDAO to come exactly in between two specific ProxyDAOs in foam you will not be abke to make it purely with EasyDAO. Fret not, however for the next section will explain the support that EasyDAO provides for strategic placement of all your DAO needs.
 
 &nbsp;
 
 #### Precise Placement of EasyDAO Decorators
 
-On some rare occations, interdependencies between the semantics of each DAO decorator do arrise. Here, precise placement of a decorator is required. This can be acheived using the addDecorator method which places a null ending chain (similar to the semantics of the more familiar setDecorator()) after a specified dao. The specific dao it places the decorator chain is in relation to the methods second argument, which is the class info of the dao to be placed in relation to. Set the last argument to true if you want to place it before the given dao, and false otherwise. Although complicated, this specialized function gives full controll over where to place decorators within the EasyDAO chain. The following is an example of its use,
+On some rare occations, interdependencies between the semantics of each DAO decorator do arise. Here, precise placement of a decorator is required. This can be acheived using the addDecorator method which places a null ending chain (similar to the semantics of the more familiar setDecorator()) after a specified DAO. The specific DAO it places the decorator chain is in relation to the methods second argument, which is the class info of the DAO to be placed in relation to. Set the last argument to true if you want to place it before the given DAO, and false otherwise. Although complicated, this specialized function gives full controll over where to place decorators within the EasyDAO chain. The following is an example of its use:
 
 ```java
 foam.dao.EasyDAO dao = new foam.dao.EasyDAO.Builder(x)
@@ -166,7 +166,7 @@ foam.dao.EasyDAO dao = new foam.dao.EasyDAO.Builder(x)
 dao.addDecorator(new DAO3(new DAO4(null)), DAO1.getOwnClassInfo(), false);
 ```
 
-This gives the following decorator chain,
+This gives the following decorator chain:
 
 ```
 EasyDAO -> DAO1 -> DAO3 -> DAO4 -> DAO2 -> JDAO -> MDAO
