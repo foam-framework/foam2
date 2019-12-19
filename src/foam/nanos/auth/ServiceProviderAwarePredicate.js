@@ -45,7 +45,10 @@ foam.CLASS({
       ],
       javaCode: `
     if ( new ServiceProviderAwareSupport(getX()).match(getX(), getPropertyInfos(), obj) ) {
-      return getDelegate().f(obj);
+      if ( getDelegate() != null ) {
+        return getDelegate().f(obj);
+      }
+      return true;
     }
     return false;
       `
@@ -57,8 +60,10 @@ foam.CLASS({
       javaCode: `
     ServiceProviderAwarePredicate copy = (ServiceProviderAwarePredicate) super.deepClone();
     copy.setX(getX());
-    java.util.Set<Map.Entry<String, PropertyInfo[]>> entries = propertyInfos_.entrySet();
-    copy.setPropertyInfos((Map<String, PropertyInfo[]>) entries.stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+    if ( propertyInfos_ != null ) {
+      java.util.Set<Map.Entry<String, PropertyInfo[]>> entries = propertyInfos_.entrySet();
+      copy.setPropertyInfos((Map<String, PropertyInfo[]>) entries.stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+    }
     return copy;
 `
     }

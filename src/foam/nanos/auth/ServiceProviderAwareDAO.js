@@ -66,11 +66,12 @@ ServiceProviderAware`,
 
     ServiceProviderAware sp = (ServiceProviderAware) obj;
     ServiceProviderAware oldSp = (ServiceProviderAware) oldObj;
+    AuthService auth = (AuthService) x.get("auth");
 
     if ( isCreate ) {
       if ( SafetyUtil.isEmpty(sp.getSpid()) ||
            ( ! SafetyUtil.isEmpty(sp.getSpid()) &&
-             ! ((AuthService) x.get("auth")).check(x, "spid.create."+sp.getSpid()) ) ) {
+             ! auth.check(x, "spid.create." + sp.getSpid()) ) ) {
         User user = (User) x.get("user");
         if ( user != null &&
              ! SafetyUtil.isEmpty(user.getSpid()) ) {
@@ -80,8 +81,8 @@ ServiceProviderAware`,
         }
       }
     } else if ( ! sp.getSpid().equals(oldSp.getSpid()) &&
-                ! (((AuthService) x.get("auth")).check(x, "spid.update."+oldSp.getSpid()) &&
-                   ((AuthService) x.get("auth")).check(x, "spid.update."+sp.getSpid())) ) {
+                ! (auth.check(x, "spid.update." + oldSp.getSpid()) &&
+                   auth.check(x, "spid.update." + sp.getSpid())) ) {
       throw new AuthorizationException("You do not have permission to update ServiceProvider (spid) property.");
     }
 
@@ -111,8 +112,8 @@ ServiceProviderAware`,
       return super.select_(x, sink, skip, limit, order, predicate);
     }
 
-    Sink spidSink = sink;
     Predicate spidPredicate = predicate;
+
     if ( ServiceProviderAware.class.isAssignableFrom(getOf().getObjClass()) ) {
       User user = (User) x.get("user");
       PropertyInfo spidProperty = ((PropertyInfo) getOf().getAxiomByName("spid"));
@@ -126,30 +127,18 @@ ServiceProviderAware`,
       }
     } else if ( getPropertyInfos() != null &&
                 getPropertyInfos().size() > 0 ) {
-      if ( predicate != null ) {
-        spidPredicate = new ServiceProviderAwarePredicate(x, predicate, getPropertyInfos());
-      } else {
-        spidSink = new ServiceProviderAwareSink(x, sink, getPropertyInfos());
-      }
-    } else {
-      return super.select_(x, sink, skip, limit, order, predicate);
+      spidPredicate = new ServiceProviderAwarePredicate(x, predicate, getPropertyInfos());
     }
 
-    Sink responseSink = getDelegate().select_(
+    return getDelegate().select_(
       x,
-      spidSink,
+      sink,
       skip,
       limit,
       order,
       spidPredicate
     );
-
-    if ( responseSink instanceof ProxySink ) {
-      return ((ProxySink)responseSink).getDelegate();
-    } else {
-      return responseSink;
-    }
-      `
+     `
     }
   ]
 });

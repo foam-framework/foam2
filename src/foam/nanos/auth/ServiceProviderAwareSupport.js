@@ -77,7 +77,7 @@ returning true if the context users spid matches the current object.`,
            obj instanceof ServiceProviderAware ) {
         ServiceProviderAware sp = (ServiceProviderAware) obj;
         return user.getSpid().equals(sp.getSpid()) ||
-          ((AuthService) x.get("auth")).check(x, "spid.read."+sp.getSpid());
+          ((AuthService) x.get("auth")).check(x, "spid.read." + sp.getSpid());
       }
 
       Object result = obj;
