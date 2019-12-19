@@ -39,7 +39,7 @@ public class MMDAO extends JDAO {
     //TODO: Change to assembly version.
     synchronized ( uniqueStringLock ) {
       getJournal().put_(x, null, obj);
-      //TODO: put to MDAO.
+      super.put_(x, obj);
     }
     return null;
   }
