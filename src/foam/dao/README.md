@@ -151,7 +151,7 @@ Here you are provided the tail of the decorator chain already constructed somewh
 
 #### Precise Placement of EasyDAO Decorators
 
-On some rare occations, iinterdependencies between the semantics of each DAO decorator do arrise. Here, precise placement of a decorator is required. This can be acheived using the addDecorator method which places a null ending chain (similar to the semantics of the more familiar setDecorator()) after a specified dao. The specific dao it places the decorator chain is in relation to the methods second argument, which is the class info of the dao to be placed in relation to. Set the last argument to true if you want to place it before the given dao, and false otherwise. Although complicated, this specialized function gives full controll over where to place decorators within the EasyDAO chain. The following is an example of its use,
+On some rare occations, interdependencies between the semantics of each DAO decorator do arrise. Here, precise placement of a decorator is required. This can be acheived using the addDecorator method which places a null ending chain (similar to the semantics of the more familiar setDecorator()) after a specified dao. The specific dao it places the decorator chain is in relation to the methods second argument, which is the class info of the dao to be placed in relation to. Set the last argument to true if you want to place it before the given dao, and false otherwise. Although complicated, this specialized function gives full controll over where to place decorators within the EasyDAO chain. The following is an example of its use,
 
 ```java
 foam.dao.EasyDAO dao = new foam.dao.EasyDAO.Builder(x)
@@ -171,4 +171,8 @@ This gives the following decorator chain,
 ```
 EasyDAO -> DAO1 -> DAO3 -> DAO4 -> DAO2 -> JDAO -> MDAO
 ```
+
+#### Dynamic Modification of DAOs
+
+The previous method can be used not only for the precise placement of decorators within the chain, but also to easily change decorator chains on the fly. Say you're doing some testing on your running server and you want to insert a decorator that checks the data flowing through the dao pipeline; simply add with the method as previously described and you'll be good to go! Light caution should be taken though, especially when dealing with DAOs that require synchronization as always.
 
