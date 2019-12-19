@@ -266,7 +266,7 @@ foam.CLASS({
           result = 'data:text/csv;charset=utf-8,' + result;
           var encodedUri = encodeURI(result);
           var link = document.createElement('a');
-          link.setAttribute('href', encodedUri);
+          link.setAttribute('href', encodedUri.replace(/#/g, '%23'));
           link.setAttribute('download', 'data.csv');
           document.body.appendChild(link);
           link.click();
