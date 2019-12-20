@@ -20,11 +20,11 @@ foam.INTERFACE({
   name: 'Logger',
 
   methods: [
-    { name: 'testing', documentation: 'Log at "testing" log level.' },
     { name: 'debug', documentation: 'Log at "debug" log level.' },
     { name: 'log',   documentation: 'Synonym for "info".'       },
     { name: 'info',  documentation: 'Log at "info" log level.'  },
-    { name: 'warn',  documentation: 'Log at "warn" log level.'  },
-    { name: 'error', documentation: 'Log at "error" log level.' }
+    { name: 'warn',  documentation: 'Log at "warn" log level.' },
+    { name: 'error', documentation: 'Log at "error" log level.' },
+    { name: 'testing', documentation: 'Log at "testing" log level.' }
   ],
 });

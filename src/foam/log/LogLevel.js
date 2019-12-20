@@ -36,39 +36,44 @@ foam.ENUM({
 
   values: [
     {
-      name: 'TESTING',
-      shortName: 'TESTING',
-      label: 'Testing',
-      color: 'blue',
-      consoleMethodName: 'testing'
-    },
-    {
       name: 'DEBUG',
       shortName: 'DEBG',
       label: 'Debug',
       color: 'blue',
-      consoleMethodName: 'debug'
+      consoleMethodName: 'debug',
+      ordinal: 0
     },
     {
       name: 'INFO',
       shortName: 'INFO',
       label: 'Info',
       color: '#0000cc',
-      consoleMethodName: 'info'
+      consoleMethodName: 'info',
+      ordinal: 1
     },
     {
       name: 'WARN',
       shortName: 'WARN',
       label: 'Warn',
       color: '#ffa500',
-      consoleMethodName: 'warn'
+      consoleMethodName: 'warn',
+      ordinal: 2
     },
     {
       name: 'ERROR',
       shortName: 'ERRR',
       label: 'Error',
       color: 'red',
-      consoleMethodName: 'error'
+      consoleMethodName: 'error',
+      ordinal: 3
+    },
+    {
+      name: 'TESTING',
+      shortName: 'TESTING',
+      label: 'Testing',
+      color: 'blue',
+      consoleMethodName: 'testing',
+      ordinal: 4
     }
   ]
 });
