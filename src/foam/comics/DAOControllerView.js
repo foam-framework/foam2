@@ -213,7 +213,7 @@ foam.CLASS({
           .end());
 
       this.add(this.data.border);
-      if (this.isIframe()) this.tag(this.IFrameTopNavigation);
+      if ( this.isIframe() ) this.tag(this.IFrameTopNavigation);
     },
 
     function isIframe () {
