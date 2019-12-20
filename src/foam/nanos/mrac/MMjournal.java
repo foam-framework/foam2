@@ -382,12 +382,8 @@ public class MMJournal extends AbstractJournal {
     }
   }
 
-  // The method will create a tcp connection.
-  // Get Data Stream from different MN.
-  // Merge data base on the global index.
-  // put data into DAO.
-  //TODO: implement tomorrow.
   public void replay(X x, DAO dao) {
+    //TODO: need a speciall dao.
 
   }
 }
