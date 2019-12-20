@@ -204,7 +204,6 @@ foam.CLASS({
       name: 'organization',
       documentation: 'The organization/business associated with the User.',
       tableWidth: 160,
-      required: true,
       section: 'business'
     },
     {
