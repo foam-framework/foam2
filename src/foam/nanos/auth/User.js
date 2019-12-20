@@ -145,7 +145,7 @@ foam.CLASS({
       // TODO: Use validatationPredicates instead.
       validateObj: function(firstName) {
         if ( ! firstName.trim() ) {
-          return 'First Name Required.';
+          return 'First name required.';
         }
       },
       gridColumns: 4,
@@ -167,7 +167,7 @@ foam.CLASS({
       // TODO: Use validatationPredicates instead.
       validateObj: function(lastName) {
         if ( ! lastName.trim() ) {
-          return 'Last Name Required.';
+          return 'Last name required.';
         }
       },
       gridColumns: 4,
@@ -184,6 +184,11 @@ foam.CLASS({
       class: 'String',
       name: 'jobTitle',
       section: 'personal',
+      validateObj: function(jobTitle) {
+        if ( ! jobTitle.trim() ) {
+          return 'Job title required.';
+        }
+      },
       view: function(args, X) {
         return {
           class: 'foam.u2.view.ChoiceWithOtherView',
@@ -203,6 +208,8 @@ foam.CLASS({
       class: 'String',
       name: 'organization',
       documentation: 'The organization/business associated with the User.',
+      displayWidth: 80,
+      width: 100,
       tableWidth: 160,
       section: 'business'
     },
@@ -234,7 +241,7 @@ foam.CLASS({
         var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
         if ( ! email.trim() ) {
-          return 'Email Required.';
+          return 'Email required.';
         }
 
         if ( ! emailRegex.test(email.trim()) ) {
@@ -375,6 +382,11 @@ foam.CLASS({
       storageTransient: true,
       // TODO: Validation that's consistent with the PasswordPolicy feature but
       // also only applies on create.
+      validateObj: function(desiredPassword, passwordLastModified) {
+        if ( passwordLastModified === undefined && desiredPassword.length < 6 ) {
+          return 'Password must be at least 6 characters long.';
+        }
+      },
       createMode: 'RW',
       updateMode: 'HIDDEN',
       readMode: 'HIDDEN',
