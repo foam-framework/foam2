@@ -916,6 +916,6 @@ foam.CLASS({
         }
         System.out.println(delegate.getClass().getSimpleName());
       `
-    },
+    }
   ]
 });
