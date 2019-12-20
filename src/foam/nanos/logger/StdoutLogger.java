@@ -61,7 +61,7 @@ public class StdoutLogger
   }
 
   // can't normally do .debug() with custom formatter: use fine instead
-  public void debug(Object...  args) {
+  public void debug(Object... args) {
     logger_.fine(combine(args));
   }
 

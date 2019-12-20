@@ -47,7 +47,7 @@ foam.CLASS({
           javaType: 'Object...'
         }
       ],
-      javaCode: "if ( getLogError() ) getDelegate().error(args);"
+      javaCode: 'if ( getLogError() ) getDelegate().error(args);'
     },
     {
       name: 'warning',
@@ -58,7 +58,7 @@ foam.CLASS({
           javaType: 'Object...'
         }
       ],
-      javaCode: "if ( getLogWarning() ) getDelegate().warning(args);"
+      javaCode: 'if ( getLogWarning() ) getDelegate().warning(args);'
     },
     {
       name: 'info',
@@ -69,7 +69,7 @@ foam.CLASS({
           javaType: 'Object...'
         }
       ],
-      javaCode: "if ( getLogInfo() ) getDelegate().info(args);"
+      javaCode: 'if ( getLogInfo() ) getDelegate().info(args);'
     },
     {
       name: 'debug',
@@ -80,7 +80,7 @@ foam.CLASS({
           javaType: 'Object...'
         }
       ],
-      javaCode: "if ( getLogDebug() ) getDelegate().debug(args);"
+      javaCode: 'if ( getLogDebug() ) getDelegate().debug(args);'
     },
     {
       name: 'testing',
@@ -91,7 +91,7 @@ foam.CLASS({
           javaType: 'Object...'
         }
       ],
-      javaCode: "if ( getLogTesting() ) getDelegate().testing(args);"
+      javaCode: 'if ( getLogTesting() ) getDelegate().testing(args);'
     }
   ]
 });

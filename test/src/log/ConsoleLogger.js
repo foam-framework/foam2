@@ -34,7 +34,6 @@ describe('ConsoleLogger', function() {
       exports: [
         'testing',
         'debug',
-        'log',
         'info',
         'warn',
         'error'

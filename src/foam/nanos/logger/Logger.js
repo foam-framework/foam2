@@ -30,14 +30,14 @@ foam.INTERFACE({
     },
     {
       name: 'info',
-      documentation: 'Log at info log level.' ,
+      documentation: 'Log at info log level.',
       type: 'Void',
       args: [ { name: 'args', javaType: 'Object...' } ]
     },
     // TODO: rename to warn
     {
       name: 'warning',
-      documentation: 'Log at warn log level.' ,
+      documentation: 'Log at warn log level.',
       type: 'Void',
       args: [ { name: 'args', javaType: 'Object...' } ]
     },
