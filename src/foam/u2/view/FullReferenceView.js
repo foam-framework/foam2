@@ -23,7 +23,7 @@ foam.CLASS({
       this.SUPER();
       this.add(this.slot(function(dao, data, detailView) {
         return dao.find(data).then(d => {
-          if ( ! d ) return;
+          if ( ! d ) return null; // NOTE: We have to return null here instead of undefined, otherwise we end up with an infinite loop.
           return self.E()
             .startContext({ controllerMode: foam.u2.ControllerMode.VIEW })
               .tag(detailView, { data: d })
