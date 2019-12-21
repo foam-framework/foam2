@@ -46,7 +46,6 @@ foam.CLASS({
           new NoSuchFieldException("@EmailTemplateApplyEmailPropertyService: emailTemplate.apply has failed. emailTemplate = {id:" + templateName + ", group:" + group + "}" + e).printStackTrace();
         }
       }
-
       return emailMessage;
       `
     }
