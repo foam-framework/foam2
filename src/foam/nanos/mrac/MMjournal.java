@@ -52,6 +52,7 @@ import foam.lib.json.JSONParser;
 import foam.box.RPCMessage;
 import foam.box.HTTPReplyBox;
 import foam.box.Message;
+import foam.box.RPCReturnMessage;
 
 import java.nio.channels.SocketChannel;
 import java.nio.channels.SelectionKey;
@@ -141,6 +142,8 @@ public class MMJournal extends AbstractJournal {
       parent2 = new MedusaEntry();
       parent2.setMyIndex(2);
       parent2.setMyHash("bb");
+
+      isInitialized = true;
     }
   }
 
@@ -187,7 +190,7 @@ public class MMJournal extends AbstractJournal {
   // TODO: can we do this versioning code at the begnning of DAO?
   public void put_(X x, FObject old, FObject nu) {
     if ( ! isInitialized ) initial(x);
-
+    System.out.println("putput_");
     long myIndex = getGlobalIndex();
 
     // Get whole entry first to make sure threadsafe.
@@ -200,7 +203,7 @@ public class MMJournal extends AbstractJournal {
         p2.getMyIndex(),
         p2.getMyHash(),
         myIndex,
-        "put",
+        "put_",
         "p",
         old,
         nu
@@ -208,21 +211,26 @@ public class MMJournal extends AbstractJournal {
     Outputter outputter = new Outputter(getX());
 
     String mn = outputter.stringify(msg);
+    System.out.println(mn);
 
     int index = nextRobin() % groups.size();
     int i = 0;
     int totalTry = groups.size();
     boolean isPersist = false;
+    System.out.println("totalTry");
+    System.out.println(totalTry);
 
     while ( i < totalTry ) {
+      System.out.println("try");
       ArrayList<ClusterNode> nodes = groups.get(index / totalTry);
       Object[] tasks = new Object[nodes.size()];
+      System.out.println(nodes.size());
 
       for ( int j = 0 ; j < nodes.size() ; j++ ) {
         ClusterNode node = nodes.get(j);
-        tasks[j] = new FutureTask<String>(new Sender(node.getIp(), mn));
+        tasks[j] = new FutureTask<String>(new Sender(node.getIp(), node.getServicePort(), mn));
         //TODO: use threadpool.
-        new Thread((FutureTask<String>) tasks[j]);
+        new Thread((FutureTask<String>) tasks[j]).start();
       }
 
       long endtime = System.currentTimeMillis() + TIME_OUT * (i + 1);
@@ -231,23 +239,26 @@ public class MMJournal extends AbstractJournal {
       Arrays.fill(checks, false);
 
       MedusaEntry p = null;
+      int threhold = 1;
 
-      while ( System.currentTimeMillis() < endtime && check < 2 && check > -2 ) {
+      while ( System.currentTimeMillis() < endtime && check < threhold && check > (0 - threhold) ) {
         for ( int j = 0 ; j < tasks.length ; j++ ) {
           if ( checks[j] == false && ((FutureTask<String>) tasks[j]).isDone() ) {
             FutureTask<String> task = (FutureTask<String>) tasks[j];
             try {
               String response = task.get();
-              System.out.println(response);
               //TODO: a bug, return message format wrong.
-              FObject responseMessage = getX().create(JSONParser.class).parseString(response);
-              p = (MedusaEntry) responseMessage;
-              if ( responseMessage instanceof MedusaMessage ) {
+              Message responseMessage = (Message) getX().create(JSONParser.class).parseString(response);
+              System.out.println(response);
+              p = (MedusaEntry) ((RPCReturnMessage) responseMessage.getObject()).getData();
+              if ( p instanceof MedusaEntry ) {
                 check++;
+              } else {
+                check--;
               }
-              check--;
             } catch ( Exception e ) {
               //TODO: log error
+              System.out.println(e);
               check--;
             } finally {
               checks[j] = true;
@@ -256,7 +267,7 @@ public class MMJournal extends AbstractJournal {
         }
       }
 
-      if ( check >= 2 ) {
+      if ( check >= threhold ) {
         isPersist = true;
         updateHash(p);
         break;
@@ -300,9 +311,10 @@ public class MMJournal extends AbstractJournal {
     entry.setHash1(hash1);
     entry.setGlobalIndex2(globalIndex2);
     entry.setHash2(hash2);
+    entry.setMyIndex(myIndex);
     entry.setOld(old);
     entry.setNu(nu);
-    Object[] args = {entry};
+    Object[] args = {null, entry};
     rpc.setArgs(args);
 
     message.setObject(rpc);
@@ -315,10 +327,12 @@ public class MMJournal extends AbstractJournal {
   private class Sender implements Callable<String> {
     private String ip;
     private String message;
+    private int port;
 
-    public Sender(String ip, String message) {
+    public Sender(String ip, int port, String message) {
       this.ip = ip;
       this.message = message;
+      this.port = port;
     }
 
     public String call() throws Exception {
@@ -327,7 +341,9 @@ public class MMJournal extends AbstractJournal {
       InputStream input = null;
 
       try {
-        URL url = new URL("Http", ip, 8080, "service/" + serviceName);
+        System.out.println("aaaaccccc");
+        URL url = new URL("Http", ip, port, "/service/" + serviceName);
+        System.out.println(url);
 
         conn = (HttpURLConnection) url.openConnection();
         conn.setDoOutput(true);
@@ -344,7 +360,7 @@ public class MMJournal extends AbstractJournal {
          // check response code
         int code = conn.getResponseCode();
         if ( code != HttpServletResponse.SC_OK ) {
-          throw new RuntimeException("Http server did not return 200.");
+          throw new RuntimeException("Http server return: " + code);
         }
 
         byte[] buf = new byte[8388608];
@@ -407,8 +423,12 @@ public class MMJournal extends AbstractJournal {
 
         // Send replay command to MN.
         TcpMessage replayInitialMessage = new TcpMessage();
-        replayInitialMessage.setServiceKey("ReplayService");
-        replayInitialMessage.setServiceName(serviceName);
+        replayInitialMessage.setServiceKey("MNService");
+        RPCMessage rpc = x.create(RPCMessage.class);
+        rpc.setName("replayAll");
+        Object[] args = { null, serviceName };
+        rpc.setArgs(args);
+        replayInitialMessage.setObject(rpc);
 
         Outputter outputter = new Outputter(x);
         String msg = outputter.stringify(replayInitialMessage);

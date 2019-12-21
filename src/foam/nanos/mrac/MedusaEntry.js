@@ -15,6 +15,10 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'nspecKey'
+    },
+    {
+      class: 'String',
       name: 'action'
     },
     {

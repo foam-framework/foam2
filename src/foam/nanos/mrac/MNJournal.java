@@ -41,7 +41,7 @@ public class MNJournal extends FileJournal {
   // Allocate 20KB.
   private ByteBuffer writeBuffer = ByteBuffer.allocate(20 * 1024);
 
-  public MNJournal(String filename) {
+  private MNJournal(String filename) {
     try {
       this.filename = filename;
       this.journalDir = System.getProperty("JOURNAL_HOME");
@@ -59,13 +59,14 @@ public class MNJournal extends FileJournal {
   public void put_(X x, FObject obj) {
     MedusaEntry entry = (MedusaEntry) obj;
     entry.setAction("p");
-    doWrite(x, new Outputter(x).stringify(obj));
+    String msg = new Outputter(x).stringify(obj);
+    doWrite(x, msg + "\n");
   }
 
-  public void remove(X x, FObject obj) {
+  public void remove_(X x, FObject obj) {
     MedusaEntry entry = (MedusaEntry) obj;
     entry.setAction("r");
-    doWrite(x, new Outputter(x).stringify(obj));
+    doWrite(x, new Outputter(x).stringify(obj) + "\n");
   }
 
   private void doWrite(X x, String record) {

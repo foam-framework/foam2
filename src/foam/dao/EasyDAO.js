@@ -276,13 +276,18 @@ return delegate;
     },
     {
       class: 'Boolean',
-      name: 'medusa',
+      name: 'medusaNode',
       value: false
     },
     {
       class: 'String',
-      name: 'mnPort',
+      name: 'mnPersistServiceName',
       value: 'singleJournal'
+    },
+    {
+      class: 'Boolean',
+      name: 'medusaMediator',
+      value: false
     },
     {
       class: 'Object',
@@ -294,8 +299,8 @@ return delegate;
         .setOf(getOf())
         .build();
       }
-      if ( getMedusa() ) {
-        return new foam.nanos.mrac.MMDAO(getX(), getOf(), getMnPort());
+      if ( getMedusaNode() ) {
+        return new foam.nanos.mrac.MNDAO(getX(), getOf(), getJournalName());
       }
       if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) )
         return new foam.dao.java.JDAO(getX(), getOf(), getJournalName());

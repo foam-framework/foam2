@@ -23,6 +23,7 @@ public class MMDAO extends JDAO {
     setDelegate(new MDAO(classInfo));
     setJournal(MMJournal.getMMjournal(mnPort));
     this.mnPort = mnPort;
+    // getJournal.replay(x, getDelegate());
   }
 
   //Remove synchronized key word.
@@ -39,7 +40,7 @@ public class MMDAO extends JDAO {
     //TODO: Change to assembly version.
     synchronized ( uniqueStringLock ) {
       getJournal().put_(x, null, obj);
-      super.put_(x, obj);
+      getDelegate().put_(x, obj);
     }
     return null;
   }

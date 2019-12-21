@@ -16,25 +16,29 @@ public class MNDAO extends JDAO {
   public MNDAO(X x, ClassInfo classInfo, String filename) {
     setX(x);
     setOf(classInfo);
-    setJournal(new MNJournal.Builder(x)
-      .setFilename(filename)
-      .setCreateFile(true)
-      .build());
+    setJournal(MNJournal.getMNjournal(filename));
+  }
+
+  @Override
+  public FObject put(FObject obj) {
+    System.out.println(obj);
+    return obj;
   }
 
   @Override
   public FObject put_(X x, FObject obj) {
+    System.out.println("enen");
+    System.out.println(obj);
     // MN does not have record on old obj;
     //TODO: extra check code should add at here.
-    ((MNJournal) getJournal()).writeRaw(x, obj);
+    ((MNJournal) getJournal()).put_(x, obj);
     return obj;
   }
 
   @Override
   public FObject remove_(X x, FObject obj) {
     // MM should check if the object is exists.
-    ((MNJournal) getJournal()).writeRaw(x, obj);
+    ((MNJournal) getJournal()).remove_(x, obj);
     return obj;
   }
-
 }
