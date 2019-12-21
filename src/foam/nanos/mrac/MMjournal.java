@@ -53,6 +53,13 @@ import foam.box.RPCMessage;
 import foam.box.HTTPReplyBox;
 import foam.box.Message;
 
+import java.nio.channels.SocketChannel;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.nio.ByteBuffer;
+import java.net.InetSocketAddress;
+import java.nio.charset.Charset;
+
 // Make sure that this class sould only have one instance in single journal mode.
 // In multiple journal mode. each JDAO will have it's own instance.
 // can simple get put to MedusaMediator
@@ -65,7 +72,7 @@ public class MMJournal extends AbstractJournal {
 
   private final Map<Long, ArrayList<ClusterNode>> groupToMN = new HashMap<Long, ArrayList<ClusterNode>>();
   private final List<ArrayList<ClusterNode>> groups  = new LinkedList<ArrayList<ClusterNode>>();
-
+  private final List<ClusterNode> availableNodes = new LinkedList<ClusterNode>();
   // Default TIME_OUT is 5 second
   private final long TIME_OUT = 5000;
 
@@ -119,6 +126,7 @@ public class MMJournal extends AbstractJournal {
           }
           System.out.println(clusterNode);
           groupToMN.get(clusterNode.getGroup()).add(clusterNode);
+          availableNodes.add(clusterNode);
         }
       }
 
@@ -199,7 +207,7 @@ public class MMJournal extends AbstractJournal {
       );
     Outputter outputter = new Outputter(getX());
 
-    String mn = outputter.stringify(msg);;
+    String mn = outputter.stringify(msg);
 
     int index = nextRobin() % groups.size();
     int i = 0;
@@ -369,21 +377,72 @@ public class MMJournal extends AbstractJournal {
 
   //TODO: provide versioning for the remove.
   public void remove(X x, FObject obj) {
-    if ( ! ( obj instanceof Identifiable ) ) throw new RuntimeException("MM only accept Identifiable");
+    //TODO;
+    // synchronized ( uniqueStringLock ) {
 
-    Object id = ((Identifiable) obj).getPrimaryKey();
-    if ( id == null ) throw new RuntimeException("Id should not be null");
-    String className = obj.getClass().getName();
-    String uniqueString = className + id.toString();
-    String uniqueStringLock = String.valueOf(uniqueString).intern();
-
-    synchronized ( uniqueStringLock ) {
-
-    }
+    // }
   }
+
+  //TODO: capture IOException.
+  //TODO: need to have a cache dao.
 
   public void replay(X x, DAO dao) {
     //TODO: need a speciall dao.
+    if ( ! isInitialized ) initial(x);
+    int fileBufferSize = 1024;
+    ByteBuffer byteBuffer = ByteBuffer.allocate(fileBufferSize);
+    ByteBuffer lengthBuffer = ByteBuffer.allocate(4);
+
+    try {
+      //TODO: code below could be multi-thread.
+      for ( ClusterNode node : availableNodes ) {
+        SocketChannel channel = SocketChannel.open();
+        channel.configureBlocking(true);
+        InetSocketAddress address = new InetSocketAddress(node.getIp(), node.getServicePort());
+        //The system should wait for connection at here.
+        boolean connectResult = channel.connect(address);
+
+        if ( connectResult == false )
+          throw new RuntimeException("Replay can not connect to: " + node.getId());
+
+        // Send replay command to MN.
+        TcpMessage replayInitialMessage = new TcpMessage();
+        replayInitialMessage.setServiceKey("ReplayService");
+        replayInitialMessage.setServiceName(serviceName);
+
+        Outputter outputter = new Outputter(x);
+        String msg = outputter.stringify(replayInitialMessage);
+        byte[] bytes = msg.getBytes(Charset.forName("UTF-8"));
+        ByteBuffer initialMessageBuffer = ByteBuffer.allocate(4 + bytes.length);
+        initialMessageBuffer.putInt(bytes.length);
+        initialMessageBuffer.put(bytes);
+        initialMessageBuffer.flip();
+        channel.write(initialMessageBuffer);
+
+        lengthBuffer.clear();
+        byteBuffer.clear();
+
+        channel.read(lengthBuffer);
+        lengthBuffer.flip();
+        int length = lengthBuffer.getInt();
+        ByteBuffer readBuffer;
+
+        if ( length == fileBufferSize ) {
+          readBuffer = byteBuffer;
+        } else {
+          readBuffer = ByteBuffer.allocate(length);
+        }
+
+        channel.read(readBuffer);
+        readBuffer.flip();
+        //TODO: get entry from readBuffer and but into dao.
+        //TODO: After replay If not primary add socket channel into a selector. and set blocking == false.
+
+      }
+    } catch ( IOException ioe ) {
+      //TODO: retry or stop system.
+      throw new RuntimeException(ioe);
+    }
 
   }
 }

@@ -12,8 +12,12 @@ foam.CLASS({
 
   properties: [
     {
-        class: "String",
-        name: 'serviceKey'
+      class: 'String',
+      name: 'serviceKey'
+    },
+    {
+      class: 'String',
+      name: 'serviceName'
     }
   ]
 });
