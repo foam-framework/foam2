@@ -69,7 +69,6 @@ foam.CLASS({
       name: 'line',
       javaType: 'foam.util.concurrent.AssemblyLine',
       javaFactory: 'return new foam.util.concurrent.SyncAssemblyLine();'
-//      javaFactory: 'return new foam.util.concurrent.AsyncAssemblyLine(getX());'
     },
     {
       class: 'Object',
