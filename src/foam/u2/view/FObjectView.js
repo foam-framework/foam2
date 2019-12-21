@@ -36,7 +36,7 @@ foam.CLASS({
         };
       },
       postSet: function(oldValue, newValue) {
-        if ( newValue !== oldValue ) {
+        if ( newValue !== oldValue && oldValue !== '' ) {
           var m = this.__context__.lookup(newValue, true);
           if ( m ) {
             this.data = m.create(null, this);

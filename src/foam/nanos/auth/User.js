@@ -180,6 +180,25 @@ foam.CLASS({
       updateMode: 'RO',
       section: 'personal'
     },
+   {
+      class: 'String',
+      name: 'jobTitle',
+      section: 'personal',
+      view: function(args, X) {
+        return {
+          class: 'foam.u2.view.ChoiceWithOtherView',
+          otherKey: 'Other',
+          choiceView: {
+            class: 'foam.u2.view.ChoiceView',
+            placeholder: 'Please select...',
+            dao: X.jobTitleDAO,
+            objToChoice: function(a) {
+              return [a.name, a.label];
+            }
+          }
+        };
+      }
+    },
     {
       class: 'String',
       name: 'organization',

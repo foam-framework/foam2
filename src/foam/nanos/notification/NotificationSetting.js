@@ -96,7 +96,7 @@ foam.CLASS({
       name: 'authorizeOnRead',
       javaCode: `
       AuthService auth = (AuthService) x.get("auth");
-      if ( ! checkOwnership(x) && ! auth.check(x, createPermission("read")) ) throw new AuthorizationException(LACKS_READ_PERMISSION);
+      if ( ! auth.check(x, createPermission("read")) ) throw new AuthorizationException(LACKS_READ_PERMISSION);
       `
     },
     {
