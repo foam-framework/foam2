@@ -115,34 +115,35 @@ public class MNJournal extends FileJournal {
       // but it is inefficient.
       // We can just sync and get file size. and build sink attach to the DAO.
       // This way we can do replay and write in parallel.
+      // TODO: sync below code for now.
       synchronized ( fileLock ) {
         position = inChannel.size();
+
+        // Allocate 500M.
+        // TODO: make sure memory assign to this instance is bigger enough.
+        // ByteBuffer byteBuffer = ByteBuffer.allocate(524288000);
+        ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
+        ByteBuffer lengthBuffer = ByteBuffer.allocate(4);
+        int length = -1;
+        //TODO: send ack to MM.
+
+        while ( inChannel.position() < position ) {
+          length = inChannel.read(byteBuffer);
+          lengthBuffer = lengthBuffer.putInt(length);
+
+          byteBuffer.flip();
+          lengthBuffer.flip();
+
+          while ( lengthBuffer.hasRemaining() ) { socketChannel.write(lengthBuffer); }
+          while ( byteBuffer.hasRemaining() ) { socketChannel.write(byteBuffer); }
+
+          lengthBuffer.clear();
+          byteBuffer.clear();
+        }
+
+        //TODO: send finish ack
+        //TODO: activate sink;
       }
-
-      // Allocate 500M.
-      // TODO: make sure memory assign to this instance is bigger enough.
-      // ByteBuffer byteBuffer = ByteBuffer.allocate(524288000);
-      ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
-      ByteBuffer lengthBuffer = ByteBuffer.allocate(4);
-      int length = -1;
-      //TODO: send ack to MM.
-
-      while ( inChannel.position() < position ) {
-        length = inChannel.read(byteBuffer);
-        lengthBuffer = lengthBuffer.putInt(length);
-
-        byteBuffer.flip();
-        lengthBuffer.flip();
-
-        while ( lengthBuffer.hasRemaining() ) { socketChannel.write(lengthBuffer); }
-        while ( byteBuffer.hasRemaining() ) { socketChannel.write(byteBuffer); }
-
-        lengthBuffer.clear();
-        byteBuffer.clear();
-      }
-
-      //TODO: send finish ack
-      //TODO: activate sink;
 
     } catch ( IOException e ) {
       try {

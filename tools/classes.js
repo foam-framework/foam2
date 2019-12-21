@@ -512,7 +512,8 @@ var classes = [
   'foam.nanos.mrac.quorum.InstanceState',
   'foam.nanos.mrac.quorum.QuorumMessage',
   'foam.nanos.mrac.quorum.QuorumMessageType',
-  'foam.nanos.mrac.quorum.Vote'
+  'foam.nanos.mrac.quorum.Vote',
+  'foam.nanos.mrac.MNService'
 ];
 
 var abstractClasses = [
@@ -535,7 +536,8 @@ var skeletons = [
   'foam.nanos.notification.push.PushService',
   'foam.nanos.session.SessionService',
   'foam.nanos.test.EchoService',
-  'foam.strategy.StrategizerService'
+  'foam.strategy.StrategizerService',
+  'foam.nanos.mrac.MNService'
 ];
 
 var proxies = [

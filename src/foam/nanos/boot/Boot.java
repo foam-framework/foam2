@@ -26,6 +26,8 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static foam.mlang.MLang.EQ;
+import foam.nanos.mrac.*;
+import foam.dao.DAO;
 
 public class Boot {
   // Context key used to store the top-level root context in the context.
@@ -52,7 +54,8 @@ public class Boot {
         new foam.nanos.fs.FileSystemStorage(datadir));
 
     // Used for all the services that will be required when Booting
-    serviceDAO_ = new foam.nanos.auth.PermissionedPropertyDAO(root_, new JDAO(((foam.core.ProxyX) root_).getX(), NSpec.getOwnClassInfo(), "services"));
+    // serviceDAO_ = new foam.nanos.auth.PermissionedPropertyDAO(root_, new JDAO(((foam.core.ProxyX) root_).getX(), NSpec.getOwnClassInfo(), "services"));
+    serviceDAO_ = new JDAO(((foam.core.ProxyX) root_).getX(), NSpec.getOwnClassInfo(), "services");
 
     installSystemUser();
 
@@ -102,8 +105,9 @@ public class Boot {
     root_ = ((ProxyX) root_).getX();
 
     // Export the ServiceDAO
-    ((ProxyDAO) root_.get("nSpecDAO")).setDelegate(
-        new foam.nanos.auth.AuthorizationDAO(getX(), serviceDAO_, new foam.nanos.auth.GlobalReadAuthorizer("service")));
+    ((ProxyDAO) root_.get("nSpecDAO")).setDelegate(serviceDAO_);
+    //((ProxyDAO) root_.get("nSpecDAO")).setDelegate(
+    //    new foam.nanos.auth.AuthorizationDAO(getX(), serviceDAO_, new foam.nanos.auth.GlobalReadAuthorizer("service")));
     // 'read' authenticated version - for dig and docs
     // ((ProxyDAO) root_.get("AuthenticatedNSpecDAO")).setDelegate(
     //     new foam.dao.PMDAO(root_, new foam.nanos.auth.AuthorizationDAO(getX(), (DAO) root_.get("nSpecDAO"), new foam.nanos.auth.StandardAuthorizer("service"))));
@@ -126,6 +130,12 @@ public class Boot {
     //     script.runScript(root_);
     //   }
     // }
+
+    DAO demoObjectDAO = (DAO) root_.get("demoObjectDAO");
+    foam.nanos.demo.DemoObject object = new foam.nanos.demo.DemoObject();
+    object.setId("11");
+    demoObjectDAO.put_(root_, object);
+
   }
 
   protected List perfectList(List src) {
@@ -170,7 +180,9 @@ public class Boot {
     throws java.lang.Exception
   {
     System.out.println("Starting Nanos Server");
-
+    System.out.println("ClusterNode: " + System.getProperty("CLUSTER"));
+    System.out.println(System.getProperty("LOG_HOME"));
+    System.out.println(System.getProperty("hostname"));
     boolean datadirFlag = false;
 
     String datadir = "";

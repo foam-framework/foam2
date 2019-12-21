@@ -43,7 +43,7 @@ public class TcpNioRouter
 
     foam.core.X x = getX().put(NSpec.class, spec);
 
-		//Ignore session right now.
+		//TODO: add session to protect the server.
     //result = new foam.box.SessionServerBox(x, result, spec.getAuthenticate());
 
     return result;

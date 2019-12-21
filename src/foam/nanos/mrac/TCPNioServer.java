@@ -59,8 +59,9 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
     System.out.println("<><><><><><><<><>");
     //TODO: do not hard coding following parameter.
     InetSocketAddress serverAddress = new InetSocketAddress("127.0.0.1", 7070);
-    int totalProcessors = totalCores * 2;
-
+    // int totalProcessors = totalCores * 1;
+    // Double size of MM.
+    int totalProcessors = 3 * 2;
     for ( int i = 0 ; i < totalProcessors ; i++ ) {
       this.processors.add(new Processor(String.valueOf(i)));
     }
@@ -187,11 +188,6 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
         socketChannel.configureBlocking(false);
         socketChannel.socket().setTcpNoDelay(true);
         socketChannel.socket().setKeepAlive(true);
-
-        // InetAddress ip = socketChannel.socket().getInetAddress();
-        // int currentConnection = getClientConnection(ip);
-        // if ( currentConnection >= maxConnectionPerClient )
-        //   throw new IOException("Connections from " + ip.toString() + " is greater than " + maxConnectionPerClient);
 
         return socketChannel;
       } catch ( IOException e ) {

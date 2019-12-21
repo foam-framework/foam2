@@ -67,6 +67,7 @@ public class NanoRouter
   protected void service(final HttpServletRequest req, final HttpServletResponse resp)
     throws ServletException, IOException
   {
+    System.out.println("********Http processing");
     String   path       = req.getRequestURI();
     String[] urlParams  = path.split("/");
     String   serviceKey = urlParams[2];
