@@ -40,7 +40,11 @@ foam.CLASS({
       try {
         emailMessage = emailTemplateObj.apply(x, group, emailMessage, templateArgs);
       } catch (Exception e) {
-        ((Logger) x.get("logger")).error(new NoSuchFieldException("@EmailTemplateApplyEmailPropertyService: emailTemplate.apply has failed. emailTemplate = {id:" + templateName + ", group:" + group + "}" + e));
+        if ( logger != null ) {
+          logger.error(new NoSuchFieldException("@EmailTemplateApplyEmailPropertyService: emailTemplate.apply has failed. emailTemplate = {id:" + templateName + ", group:" + group + "}" + e));
+        } else {
+          new NoSuchFieldException("@EmailTemplateApplyEmailPropertyService: emailTemplate.apply has failed. emailTemplate = {id:" + templateName + ", group:" + group + "}" + e).printStackTrace();
+        }
       }
 
       return emailMessage;
