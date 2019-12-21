@@ -40,413 +40,413 @@ import foam.nanos.logger.Logger;
 public class TCPNioServer extends AbstractFObject implements NanoService {
 
 
-    protected TcpNioRouter router_ = null;
-    protected Logger logger   = (Logger) getX().get("logger");
-    //TODO: Do not hard code this field.
-    // protected int maxConnectionPerClient = 50;
+  protected TcpNioRouter router_ = null;
+  protected Logger logger   = (Logger) getX().get("logger");
+  //TODO: Do not hard code this field.
+  // protected int maxConnectionPerClient = 50;
 
-    // Record all register SocketChannels for a client.
-    private final ConcurrentHashMap<InetAddress, Set<SocketChannel>> clientMap = new ConcurrentHashMap<InetAddress, Set<SocketChannel>>();
+  // Record all register SocketChannels for a client.
+  private final ConcurrentHashMap<InetAddress, Set<SocketChannel>> clientMap = new ConcurrentHashMap<InetAddress, Set<SocketChannel>>();
 
-    private Acceptor acceptor;
-    private Set<Processor> processors = new HashSet<Processor>();
-    private ServerSocketChannel serverSocketChannel;
-    private final int totalCores = Runtime.getRuntime().availableProcessors();
-    private volatile AtomicBoolean isRunning = new AtomicBoolean(true);
+  private Acceptor acceptor;
+  private Set<Processor> processors = new HashSet<Processor>();
+  private ServerSocketChannel serverSocketChannel;
+  private final int totalCores = Runtime.getRuntime().availableProcessors();
+  private volatile AtomicBoolean isRunning = new AtomicBoolean(true);
 
-    //TODO: start selector
-    public void start() throws Exception {
-        System.out.println("<><><><><><><<><>");
-        //TODO: do not hard coding following parameter.
-        InetSocketAddress serverAddress = new InetSocketAddress("127.0.0.1", 7070);
-        int totalProcessors = totalCores * 2;
+  //TODO: start selector
+  public void start() throws Exception {
+    System.out.println("<><><><><><><<><>");
+    //TODO: do not hard coding following parameter.
+    InetSocketAddress serverAddress = new InetSocketAddress("127.0.0.1", 7070);
+    int totalProcessors = totalCores * 2;
 
-        for ( int i = 0 ; i < totalProcessors ; i++ ) {
-            this.processors.add(new Processor(String.valueOf(i)));
-        }
+    for ( int i = 0 ; i < totalProcessors ; i++ ) {
+      this.processors.add(new Processor(String.valueOf(i)));
+    }
 
-        this.serverSocketChannel = ServerSocketChannel.open();
-        this.serverSocketChannel.socket().setReuseAddress(true);
-        this.serverSocketChannel.socket().bind(serverAddress);
-        this.serverSocketChannel.configureBlocking(false);
+    this.serverSocketChannel = ServerSocketChannel.open();
+    this.serverSocketChannel.socket().setReuseAddress(true);
+    this.serverSocketChannel.socket().bind(serverAddress);
+    this.serverSocketChannel.configureBlocking(false);
 
-        acceptor = new Acceptor(this.serverSocketChannel, serverAddress, this.processors);
+    acceptor = new Acceptor(this.serverSocketChannel, serverAddress, this.processors);
 
-        // Start TCP server.
-        // Make sure that thread starts once.
-        for ( Processor processor : this.processors ) {
-            if ( processor.getState() == Thread.State.NEW ) {
-                processor.start();
+    // Start TCP server.
+    // Make sure that thread starts once.
+    for ( Processor processor : this.processors ) {
+      if ( processor.getState() == Thread.State.NEW ) {
+        processor.start();
+      }
+    }
+
+    if ( acceptor.getState() == Thread.State.NEW ) {
+      acceptor.start();
+    }
+
+  }
+
+  private int getClientConnection(InetAddress ip) {
+    if ( clientMap.get(ip) == null ) return 0;
+    return clientMap.get(ip).size();
+  }
+
+  /**
+   * Abstract common java.nio.channels.Selector codes.
+   */
+  private abstract class AbstractSelector extends FoamThread {
+
+    protected final Selector selector;
+
+    public AbstractSelector(String name) throws IOException {
+      // Allows JVM to shutdown.
+      super(name, true);
+      this.selector = Selector.open();
+    }
+
+    public void wakeup() {
+      this.selector.wakeup();
+    }
+
+    protected void close() {
+      try {
+        this.selector.close();
+      } catch ( IOException e ) {
+        //TODO: LOG
+      }
+    }
+
+    protected boolean isRunning() {
+      return isRunning.get();
+    }
+
+    protected void shutdown() {
+      isRunning.set(false);
+    }
+
+  }
+
+  /**
+   * Listen on port and establish new connection.
+   * Each instance should only have one instance running.
+   * An Acceptor is a kinde of AbstractSelector
+   */
+  private class Acceptor extends AbstractSelector {
+
+    private final ServerSocketChannel acceptSocketCahnnel;
+    private final SelectionKey acceptSelectionKey;
+    private final List<Processor> processors;
+    private final Iterator<Processor> processorIterator;
+
+    public Acceptor(ServerSocketChannel serverSocketChannel, InetSocketAddress address, Set<Processor> processors) throws IOException {
+      super("TCPSocketService.Acceptor: " + address.toString());
+      this.acceptSocketCahnnel = serverSocketChannel;
+      // ServerSocketChannel should only hook on ACCEPT event.
+      this.acceptSelectionKey = serverSocketChannel.register(this.selector, SelectionKey.OP_ACCEPT);
+      this.processors = Collections.unmodifiableList(new ArrayList<Processor>(processors));
+      this.processorIterator = this.processors.iterator();
+    }
+
+    @Override
+    public void run() {
+      try {
+        int curIndex = 0;
+        while ( isRunning() ) {
+          this.selector.select();
+          Iterator<SelectionKey> keys = this.selector.selectedKeys().iterator();
+          while ( isRunning() && keys.hasNext() ) {
+            SelectionKey key = keys.next();
+            // Remove from collection. Register into Processor later.
+            keys.remove();
+
+            if ( key.isAcceptable() ) {
+              SocketChannel socketChannel = acceptChannel(key);
+
+              if ( socketChannel != null ) {
+                this.processors.get(curIndex % this.processors.size()).acceptSocketChannel(socketChannel);
+              } else {
+                //TODO: LOG error.
+              }
+            } else {
+              //TODO: LOG accept error.
             }
+          }
         }
+      } catch ( Exception e ) {
+        //TODO: LOG ignore exception.
+      }
+    }
 
-        if ( acceptor.getState() == Thread.State.NEW ) {
-            acceptor.start();
+    protected SocketChannel acceptChannel(SelectionKey key) {
+      ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
+      SocketChannel socketChannel = null;
+      try {
+        socketChannel = serverSocketChannel.accept();
+
+        // Configure SocketChannel.
+        socketChannel.configureBlocking(false);
+        socketChannel.socket().setTcpNoDelay(true);
+        socketChannel.socket().setKeepAlive(true);
+
+        // InetAddress ip = socketChannel.socket().getInetAddress();
+        // int currentConnection = getClientConnection(ip);
+        // if ( currentConnection >= maxConnectionPerClient )
+        //   throw new IOException("Connections from " + ip.toString() + " is greater than " + maxConnectionPerClient);
+
+        return socketChannel;
+      } catch ( IOException e ) {
+        //TODO: LOG
+        removeSelectionKey(key);
+        hardCloseSocketChannel(socketChannel);
+      }
+      return null;
+    }
+
+    protected void shutdown() {
+      super.shutdown();
+      // Close all processors.
+      synchronized( this ) {
+        for ( Processor p : processors ) {
+          p.shutdown();
         }
+      }
+    }
+
+  }
+
+  /**
+   * Processor
+   */
+  private class Processor extends AbstractSelector {
+
+    private final String threadName;
+    private final Queue<SocketChannel> acceptedSocketChannels;
+    protected volatile AtomicBoolean isRunning = new AtomicBoolean(true);
+
+    public Processor(String threadName) throws IOException {
+      super("TCPSocketService.Processor-" + threadName);
+      this.threadName = threadName;
+      this.acceptedSocketChannels = new LinkedBlockingQueue<SocketChannel>();
 
     }
 
-    private int getClientConnection(InetAddress ip) {
-        if ( clientMap.get(ip) == null ) return 0;
-        return clientMap.get(ip).size();
+    public boolean acceptSocketChannel(SocketChannel socketChannel) {
+      System.out.println("acceptSocketChannel");
+      if ( isRunning.get() && this.acceptedSocketChannels.offer(socketChannel) ) {
+        this.wakeup();
+        return true;
+      }
+      return false;
     }
 
-    /**
-     * Abstract common java.nio.channels.Selector codes.
-     */
-    private abstract class AbstractSelector extends FoamThread {
-
-        protected final Selector selector;
-
-        public AbstractSelector(String name) throws IOException {
-            // Allows JVM to shutdown.
-            super(name, true);
-            this.selector = Selector.open();
+    @Override
+    public void run() {
+      try {
+        while ( isRunning.get() ) {
+          //select
+          // System.out.println(threadName);
+          configureNewConnections();
+          select();
         }
 
-        public void wakeup() {
-            this.selector.wakeup();
+        // Close connections.
+        for ( SelectionKey key : selector.keys() ) {
+          removeSelectionKey(key);
         }
-
-        protected void close() {
-            try {
-                this.selector.close();
-            } catch ( IOException e ) {
-                //TODO: LOG
-            }
+        // Close accepted connections pending on the queue.
+        SocketChannel socketChannel = acceptedSocketChannels.poll();
+        while ( socketChannel != null ) {
+          hardCloseSocketChannel(socketChannel);
+          socketChannel = acceptedSocketChannels.poll();
         }
-
-        protected boolean isRunning() {
-            return isRunning.get();
-        }
-
-        protected void shutdown() {
-            isRunning.set(false);
-        }
-
+      } catch ( Exception e ) {
+        //TODO: log ignore exceptions.
+      }
     }
 
-    /**
-     * Listen on port and establish new connection.
-     * Each instance should only have one instance running. 
-     * An Acceptor is a kinde of AbstractSelector
-     */
-    private class Acceptor extends AbstractSelector {
+    private void select() {
+      try {
+        this.selector.select();
 
-        private final ServerSocketChannel acceptSocketCahnnel;
-        private final SelectionKey acceptSelectionKey;
-        private final List<Processor> processors;
-        private final Iterator<Processor> processorIterator;
+        Set<SelectionKey> keys = selector.selectedKeys();
+        Iterator<SelectionKey> iterator = new ArrayList<SelectionKey>(keys).iterator();
 
-        public Acceptor(ServerSocketChannel serverSocketChannel, InetSocketAddress address, Set<Processor> processors) throws IOException {
-            super("TCPSocketService.Acceptor: " + address.toString());
-            this.acceptSocketCahnnel = serverSocketChannel;
-            // ServerSocketChannel should only hook on ACCEPT event.
-            this.acceptSelectionKey = serverSocketChannel.register(this.selector, SelectionKey.OP_ACCEPT);
-            this.processors = Collections.unmodifiableList(new ArrayList<Processor>(processors));
-            this.processorIterator = this.processors.iterator();
+        while ( isRunning.get() && iterator.hasNext() ) {
+          SelectionKey key = iterator.next();
+          //Remove from selected Set.
+          keys.remove(key);
+
+          if ( key.isValid() == false ) {
+            removeSelectionKey(key);
+            continue;
+          }
+
+          if ( key.isReadable() ) {
+            processRequest(key);
+          }
         }
-
-        @Override
-        public void run() {
-            try {
-                int curIndex = 0;
-                while ( isRunning() ) {
-                    this.selector.select();
-                    Iterator<SelectionKey> keys = this.selector.selectedKeys().iterator();
-                    while ( isRunning() && keys.hasNext() ) {
-                        SelectionKey key = keys.next();
-                        // Remove from collection. Register into Processor later.
-                        keys.remove();
-
-                        if ( key.isAcceptable() ) {
-                            SocketChannel socketChannel = acceptChannel(key);
-                            
-                            if ( socketChannel != null ) {
-                                this.processors.get(curIndex % this.processors.size()).acceptSocketChannel(socketChannel);
-                            } else {
-                                //TODO: LOG error.
-                            }
-                        } else {
-                            //TODO: LOG accept error.
-                        }
-                    }
-                }
-            } catch ( Exception e ) {
-                //TODO: LOG ignore exception.
-            }
-        }
-
-        protected SocketChannel acceptChannel(SelectionKey key) {
-            ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
-            SocketChannel socketChannel = null;
-            try {
-                socketChannel = serverSocketChannel.accept();
-                
-                // Configure SocketChannel.
-                socketChannel.configureBlocking(false);
-                socketChannel.socket().setTcpNoDelay(true);
-                socketChannel.socket().setKeepAlive(true);
-
-                // InetAddress ip = socketChannel.socket().getInetAddress();
-                // int currentConnection = getClientConnection(ip);
-                // if ( currentConnection >= maxConnectionPerClient )
-                //     throw new IOException("Connections from " + ip.toString() + " is greater than " + maxConnectionPerClient);
-
-                return socketChannel;
-            } catch ( IOException e ) {
-                //TODO: LOG 
-                removeSelectionKey(key);
-                hardCloseSocketChannel(socketChannel);
-            }
-            return null;
-        }
-
-        protected void shutdown() {
-            super.shutdown();
-            // Close all processors.
-            synchronized( this ) {
-                for ( Processor p : processors ) {
-                    p.shutdown();
-                }
-            }
-        }
-
+      } catch ( IOException e ) {
+        //TODO: LOG ignore error.
+      }
     }
 
-    /** 
-     * Processor
-     */
-    private class Processor extends AbstractSelector {
-
-        private final String threadName;
-        private final Queue<SocketChannel> acceptedSocketChannels;
-        protected volatile AtomicBoolean isRunning = new AtomicBoolean(true);
-
-        public Processor(String threadName) throws IOException {
-            super("TCPSocketService.Processor-" + threadName);
-            this.threadName = threadName;
-            this.acceptedSocketChannels = new LinkedBlockingQueue<SocketChannel>();
-
-        }
-
-        public boolean acceptSocketChannel(SocketChannel socketChannel) {
-            System.out.println("acceptSocketChannel");
-            if ( isRunning.get() && this.acceptedSocketChannels.offer(socketChannel) ) {
-                this.wakeup();
-                return true;
-            }
-            return false;
-        }
-
-        @Override
-        public void run() {
-            try {
-                while ( isRunning.get() ) {
-                    //select
-                    // System.out.println(threadName);
-                    configureNewConnections();
-                    select();
-                }
-
-                // Close connections.
-                for ( SelectionKey key : selector.keys() ) {
-                    removeSelectionKey(key);
-                }
-                // Close accepted connections pending on the queue.
-                SocketChannel socketChannel = acceptedSocketChannels.poll();
-                while ( socketChannel != null ) {
-                    hardCloseSocketChannel(socketChannel);
-                    socketChannel = acceptedSocketChannels.poll();
-                }
-            } catch ( Exception e ) {
-                //TODO: log ignore exceptions.
-            }
-        }
-
-        private void select() {
-            try {
-                this.selector.select();
-
-                Set<SelectionKey> keys = selector.selectedKeys();
-                Iterator<SelectionKey> iterator = new ArrayList<SelectionKey>(keys).iterator();
-
-                while ( isRunning.get() && iterator.hasNext() ) {
-                    SelectionKey key = iterator.next();
-                    //Remove from selected Set.
-                    keys.remove(key);
-
-                    if ( key.isValid() == false ) {
-                        removeSelectionKey(key);
-                        continue;
-                    }
-
-                    if ( key.isReadable() ) {
-                        processRequest(key);
-                    }
-                }
-            } catch ( IOException e ) {
-                //TODO: LOG ignore error.
-            }
-        }
-
-        private void configureNewConnections() {
-            SocketChannel socketChannel = acceptedSocketChannels.poll();
-            while ( isRunning.get() && socketChannel != null ) {
-                SelectionKey key = null;
-                try {
-                    key = socketChannel.register(this.selector, SelectionKey.OP_READ);
-                    // LenBuffer can be reused. Put into the context to make sure it is thread-safe.
-                    X x = getX().put("lenBuffer", ByteBuffer.allocate(4));
-                    key.attach(getX().put("lenBuffer", ByteBuffer.allocate(4)));
-
-                } catch ( IOException e ) {
-                    removeSelectionKey(key);
-                    hardCloseSocketChannel(socketChannel);
-                }
-                socketChannel = acceptedSocketChannels.poll();
-            }
-        }
-
-
-        // Entry to all servers in System.
-        //TODO: change to multi-thread process.
-        private void processRequest(SelectionKey key) throws IOException {
-            System.out.println("processRequest method:");
-            SocketChannel socketChannel = null;
-            try {
-                // Stop selecting.
-                key.interestOps(0);
-
-                socketChannel = (SocketChannel) key.channel();
-                X x = (X) key.attachment();
-                ByteBuffer lenbuffer = (ByteBuffer) x.get("lenBuffer");
-                int rc = socketChannel.read(lenbuffer);
-
-                if ( rc < 0 ) {
-                    throw new IOException("End of Stream");
-                }
-
-                // Read message length.
-                int messageLen = -1;
-                if ( lenbuffer.remaining() == 0 ) {
-                    lenbuffer.flip();
-                    messageLen = lenbuffer.getInt();
-                    lenbuffer.clear();
-                    if ( messageLen < 0 ) throw new IOException("Len error " + messageLen);
-                }
-                
-                // Read message.
-                ByteBuffer message = ByteBuffer.allocate(messageLen);
-                if ( socketChannel.read(message) < 0 ) throw new IOException("End of Stream");
-
-                String requestString = null;
-
-                if ( message.remaining() == 0 ) {
-                    message.flip();
-                    requestString = new String(message.array(), 0, messageLen, Charset.forName("UTF-8"));
-                    message.clear();
-                }
-
-                //TODO: log
-                System.out.println(messageLen);
-                System.out.println(requestString);
-
-                // Deserialize json and assign to service.
-                // Inject SelectionKey and SocketChannel into X. 
-                // Then, the FObject that created by this X can obtain injected values.
-                x = x.put("selectionKey", key).put("socketChannel", socketChannel);
-                FObject request = x.create(JSONParser.class).parseString(requestString);
-
-                //TODO: Inject ReturnBox.
-                
-                if ( request == null ) {
-                    // logger.warning("Failed to parse request.", request);
-                    System.out.println("Failed to parse request.");
-                    return;
-                }
-
-                if ( ! ( request instanceof TcpMessage ) ) {
-                    System.out.println("Request was not a TcpMessage");
-                    logger.warning("Request was not a TcpMessage", request);
-                    return;
-                }
-
-                TcpMessage tcpMessage = (TcpMessage) request;
-                tcpMessage.getLocalAttributes().put("x", x);
-
-                System.out.println(tcpMessage.getServiceKey());
-                getRouter().service(tcpMessage.getServiceKey(), tcpMessage);
-
-            } catch ( IOException e ) {
-                // When client reset. close Socket.
-                //TODO: log socket close.
-                System.out.println(e);
-                try {
-                    key.cancel();
-                } catch ( Exception exception ) {
-                    // Log error
-                }
-                TCPNioServer.closeSocketChannel(socketChannel);
-            } catch ( Exception e){
-                //TODO: log or ignore.
-            } finally {
-                // if ( key.isValid() ) {
-                //     // Resume READ selection.
-                //     key.interestOps(SelectionKey.OP_READ);
-                // }
-            }
-        }
-    }
-
-    public NanoServiceRouter getRouter() {
-        if ( router_ == null ) 
-            router_ = getX().create(TcpNioRouter.class);
-        return router_;
-    }
-
-    // Waiting for Acceptor and all Processors finish work.
-    public void join() throws InterruptedException {
-        if ( this.acceptor != null ) this.acceptor.join();
-        for ( Processor processor : this.processors) {
-            processor.join();
-        }
-    }
-
-    public static void closeSocketChannel(SocketChannel socketChannel) {
-        if ( socketChannel == null ) return;
-
-        // Do not close a socketChannel twice.
-        if ( ! socketChannel.isOpen() ) return;
-
+    private void configureNewConnections() {
+      SocketChannel socketChannel = acceptedSocketChannels.poll();
+      while ( isRunning.get() && socketChannel != null ) {
+        SelectionKey key = null;
         try {
-            socketChannel.socket().shutdownOutput();
-            socketChannel.socket().shutdownInput();
-            socketChannel.socket().close();
-            socketChannel.close();
+          key = socketChannel.register(this.selector, SelectionKey.OP_READ);
+          // LenBuffer can be reused. Put into the context to make sure it is thread-safe.
+          X x = getX().put("lenBuffer", ByteBuffer.allocate(4));
+          key.attach(getX().put("lenBuffer", ByteBuffer.allocate(4)));
+
         } catch ( IOException e ) {
-            //TODO: LOG
+          removeSelectionKey(key);
+          hardCloseSocketChannel(socketChannel);
         }
+        socketChannel = acceptedSocketChannels.poll();
+      }
     }
 
-    public static void hardCloseSocketChannel(SocketChannel socketChannel) {
-        if ( socketChannel == null ) return;
 
+    // Entry to all servers in System.
+    //TODO: change to multi-thread process.
+    private void processRequest(SelectionKey key) throws IOException {
+      System.out.println("processRequest method:");
+      SocketChannel socketChannel = null;
+      try {
+        // Stop selecting.
+        key.interestOps(0);
+
+        socketChannel = (SocketChannel) key.channel();
+        X x = (X) key.attachment();
+        ByteBuffer lenbuffer = (ByteBuffer) x.get("lenBuffer");
+        int rc = socketChannel.read(lenbuffer);
+
+        if ( rc < 0 ) {
+          throw new IOException("End of Stream");
+        }
+
+        // Read message length.
+        int messageLen = -1;
+        if ( lenbuffer.remaining() == 0 ) {
+          lenbuffer.flip();
+          messageLen = lenbuffer.getInt();
+          lenbuffer.clear();
+          if ( messageLen < 0 ) throw new IOException("Len error " + messageLen);
+        }
+
+        // Read message.
+        ByteBuffer message = ByteBuffer.allocate(messageLen);
+        if ( socketChannel.read(message) < 0 ) throw new IOException("End of Stream");
+
+        String requestString = null;
+
+        if ( message.remaining() == 0 ) {
+          message.flip();
+          requestString = new String(message.array(), 0, messageLen, Charset.forName("UTF-8"));
+          message.clear();
+        }
+
+        //TODO: log
+        System.out.println(messageLen);
+        System.out.println(requestString);
+
+        // Deserialize json and assign to service.
+        // Inject SelectionKey and SocketChannel into X.
+        // Then, the FObject that created by this X can obtain injected values.
+        x = x.put("selectionKey", key).put("socketChannel", socketChannel);
+        FObject request = x.create(JSONParser.class).parseString(requestString);
+
+        //TODO: Inject ReturnBox.
+
+        if ( request == null ) {
+          // logger.warning("Failed to parse request.", request);
+          System.out.println("Failed to parse request.");
+          return;
+        }
+
+        if ( ! ( request instanceof TcpMessage ) ) {
+          System.out.println("Request was not a TcpMessage");
+          logger.warning("Request was not a TcpMessage", request);
+          return;
+        }
+
+        TcpMessage tcpMessage = (TcpMessage) request;
+        tcpMessage.getLocalAttributes().put("x", x);
+
+        System.out.println(tcpMessage.getServiceKey());
+        getRouter().service(tcpMessage.getServiceKey(), tcpMessage);
+
+      } catch ( IOException e ) {
+        // When client reset. close Socket.
+        //TODO: log socket close.
+        System.out.println(e);
         try {
-            socketChannel.socket().setSoLinger(true, 0);
-        } catch ( SocketException e ) {
-            //TODO: LOG
+          key.cancel();
+        } catch ( Exception exception ) {
+          // Log error
         }
-        closeSocketChannel(socketChannel);
+        TCPNioServer.closeSocketChannel(socketChannel);
+      } catch ( Exception e){
+        //TODO: log or ignore.
+      } finally {
+        // if ( key.isValid() ) {
+        //   // Resume READ selection.
+        //   key.interestOps(SelectionKey.OP_READ);
+        // }
+      }
     }
+  }
 
-    public static void removeSelectionKey(SelectionKey selectionKey) {
-        if ( selectionKey == null )  return;
-        try {
-            selectionKey.cancel();
-        } catch ( Exception e ) {
-            //TODO: log ignore exception
-        }
+  public NanoServiceRouter getRouter() {
+    if ( router_ == null )
+      router_ = getX().create(TcpNioRouter.class);
+    return router_;
+  }
+
+  // Waiting for Acceptor and all Processors finish work.
+  public void join() throws InterruptedException {
+    if ( this.acceptor != null ) this.acceptor.join();
+    for ( Processor processor : this.processors) {
+      processor.join();
     }
+  }
+
+  public static void closeSocketChannel(SocketChannel socketChannel) {
+    if ( socketChannel == null ) return;
+
+    // Do not close a socketChannel twice.
+    if ( ! socketChannel.isOpen() ) return;
+
+    try {
+      socketChannel.socket().shutdownOutput();
+      socketChannel.socket().shutdownInput();
+      socketChannel.socket().close();
+      socketChannel.close();
+    } catch ( IOException e ) {
+      //TODO: LOG
+    }
+  }
+
+  public static void hardCloseSocketChannel(SocketChannel socketChannel) {
+    if ( socketChannel == null ) return;
+
+    try {
+      socketChannel.socket().setSoLinger(true, 0);
+    } catch ( SocketException e ) {
+      //TODO: LOG
+    }
+    closeSocketChannel(socketChannel);
+  }
+
+  public static void removeSelectionKey(SelectionKey selectionKey) {
+    if ( selectionKey == null )  return;
+    try {
+      selectionKey.cancel();
+    } catch ( Exception e ) {
+      //TODO: log ignore exception
+    }
+  }
 
 }
