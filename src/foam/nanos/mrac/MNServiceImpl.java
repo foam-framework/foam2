@@ -19,6 +19,12 @@ public class MNServiceImpl implements MNService {
 
     MNJournal journal = MNJournal.getMNjournal(serviceName);
 
+    //TODO: add sink
     journal.replay(x, dao);
+    //TODO: activate sink.
+  }
+
+  public void sinkDAO(X x, String daoKey) {
+    //TODO: implement.
   }
 }

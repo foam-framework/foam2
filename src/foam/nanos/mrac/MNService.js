@@ -21,6 +21,19 @@ foam.INTERFACE({
           type: 'String'
         }
       ]
+    },
+    {
+      name: 'sinkDAO',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'daoKey',
+          type: 'String'
+        }
+      ]
     }
   ]
 })
