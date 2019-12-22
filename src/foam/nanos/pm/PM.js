@@ -60,10 +60,10 @@ foam.CLASS({
         }
       ],
       javaCode: `
-    setEndTime(new java.util.Date());
     if ( x == null ) return;
     PMLogger pmLogger = (PMLogger) x.get(DAOPMLogger.SERVICE_NAME);
     if ( pmLogger != null ) {
+      setEndTime(new java.util.Date());
       pmLogger.log(this);
     }
 `
