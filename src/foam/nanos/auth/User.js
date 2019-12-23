@@ -184,11 +184,6 @@ foam.CLASS({
       class: 'String',
       name: 'jobTitle',
       section: 'personal',
-      validateObj: function(jobTitle) {
-        if ( ! jobTitle.trim() ) {
-          return 'Job title required.';
-        }
-      },
       view: function(args, X) {
         return {
           class: 'foam.u2.view.ChoiceWithOtherView',
@@ -380,11 +375,11 @@ foam.CLASS({
       displayWidth: 30,
       width: 100,
       storageTransient: true,
-      // TODO: Validation that's consistent with the PasswordPolicy feature but
-      // also only applies on create.
-      validateObj: function(desiredPassword, passwordLastModified) {
-        if ( passwordLastModified === undefined && desiredPassword.length < 6 ) {
-          return 'Password must be at least 6 characters long.';
+      validateObj: function (password) {
+        var re = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{7,32}$/;
+
+        if ( password.length > 0 && ! re.test(password) ) {
+          return 'Password must contain one lowercase letter, one uppercase letter, one digit, and be between 7 and 32 characters in length.';
         }
       },
       createMode: 'RW',
