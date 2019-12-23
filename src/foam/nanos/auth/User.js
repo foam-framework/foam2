@@ -345,7 +345,6 @@ foam.CLASS({
       factory: function() {
         return this.Address.create();
       },
-      createMode: 'HIDDEN',
       section: 'personal'
     },
     {
