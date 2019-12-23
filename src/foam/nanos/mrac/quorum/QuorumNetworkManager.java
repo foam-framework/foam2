@@ -31,41 +31,41 @@ import foam.nanos.mrac.ClusterNode;
 
 
 public class QuorumNetworkManager extends AbstractFObject {
-  
+
   QuorumName quorumName = null;
-  
+
   //TODO: DO I need?
   int outputQueueSize = 10;
-  
+
   ConcurrentHashMap<Long, Sender> instanceToSenderMap;
   ConcurrentHashMap<Long, ArrayBlockingQueue<QuorumMessage>> instanceToQueueMap;
   public ArrayBlockingQueue<QuorumMessage> receiveQueue;
   Object receiveQueueLock = new Object();
-  
+
   volatile boolean isRunning = true;
-  
+
   public QuorumMessage pollResponseQueue(long timeout, TimeUnit unit) throws InterruptedException {
     return this.receiveQueue.poll(timeout, TimeUnit.MICROSECONDS);
   }
-  
+
   // Convert to Bytebuffer and put into send.
   public void send(long destinationId, QuorumMessage message) {
-    
+
   }
-  
-  
+
+
   public void connect(Long instanceId, Socket sock) throws IOException {
-    
+
   }
-  
+
   public class Sender extends FoamThread {
     Long instanceId;
     Socket socket;
     Receiver receiver = null;
     volatile boolean isRunning = true;
     DataOutputStream outputter;
-    
-    
+
+
     public Sender(Long instanceId, Socket socket) {
       super("QuoromNetworkManager.Sender");
       this.instanceId = instanceId;
@@ -80,11 +80,11 @@ public class QuorumNetworkManager extends AbstractFObject {
       }
       //TODO: log success
     }
-    
+
     synchronized void setReciever(Receiver receiver) {
       this.receiver = receiver;
     }
-    
+
     synchronized void send(QuorumMessage message) throws IOException {
       String out = new Outputter(getX()).setPropertyPredicate(new NetworkPropertyPredicate()).stringify(message);
       byte[] bytes = out.getBytes();
@@ -92,18 +92,18 @@ public class QuorumNetworkManager extends AbstractFObject {
       outputter.write(bytes);
       outputter.flush();
     }
-    
+
     synchronized void close() {
       if ( ! isRunning ) return;
       isRunning = false;
-      
+
       closeSocket(socket);
       // Interrupt queue poll waiting.
       this.interrupt();
       if ( receiver != null ) receiver.close();
       instanceToSenderMap.remove(instanceId, this);
     }
-    
+
     @Override
     public void run() {
       try {
@@ -116,7 +116,7 @@ public class QuorumNetworkManager extends AbstractFObject {
             }
             QuorumMessage message = messageQueue.poll(1000, TimeUnit.MICROSECONDS);
             send(message);
-            
+
           } catch ( InterruptedException e ) {
             //TODO: log warningd
           }
@@ -128,14 +128,14 @@ public class QuorumNetworkManager extends AbstractFObject {
       }
     }
   }
-  
+
   class Receiver extends FoamThread {
     Long instanceId;
     Socket socket;
     volatile boolean isRunning = true;
     DataInputStream in;
     Sender sender;
-    
+
     public Receiver(Long instanceId, Socket socket, Sender sender) {
       super("QuorumBetworkManager.Receiver");
       this.instanceId = instanceId;
@@ -151,20 +151,20 @@ public class QuorumNetworkManager extends AbstractFObject {
         this.isRunning = false;
       }
     }
-    
+
     synchronized void close() {
       if ( ! isRunning ) return;
       isRunning = false;
       this.interrupt();
     }
-    
+
     @Override
     public void run() {
       try {
         while ( isRunning ) {
           int messagelength = in.readInt();
           if ( messagelength <= 0 ) throw new IOException("Invalid packet length: " + messagelength);
-          
+
           byte[] bytes = new byte[messagelength];
           in.readFully(bytes, 0, messagelength);
           String message = new String(bytes, "UTF-8");
@@ -173,7 +173,7 @@ public class QuorumNetworkManager extends AbstractFObject {
             //TODO: log error.
             continue;
           }
-          
+
         }
       } catch ( Exception e ) {
         //TODO: log exits
@@ -184,13 +184,13 @@ public class QuorumNetworkManager extends AbstractFObject {
       }
     }
   }
-  
+
   public class Server extends FoamThread {
-    
+
     public Server() {
       super("QuoromNetworkManager.Server");
     }
-    
+
     @Override
     public void run() {
       InetSocketAddress addr;
@@ -198,7 +198,7 @@ public class QuorumNetworkManager extends AbstractFObject {
       Socket client = null;
       int retry = 0;
       int totalRetry = 3;
-      
+
       while ( isRunning && retry < totalRetry ) {
         try {
           serverSocket = new ServerSocket();
@@ -208,7 +208,7 @@ public class QuorumNetworkManager extends AbstractFObject {
           ClusterNode clusterNode = (ClusterNode) dao.find(quorumName.getId());
           addr = new InetSocketAddress(clusterNode.getElectionIP(), clusterNode.getElectionPort());
           serverSocket.bind(addr);
-          
+
           // Ideally thread should be keep inside this loop until isRunning == false;
           while ( isRunning ) {
             try {
@@ -220,7 +220,7 @@ public class QuorumNetworkManager extends AbstractFObject {
             } catch ( SocketTimeoutException e ) {
               //TODO: ignore socketTimeout.
             }
-            
+
           }
           retry = 0;
         } catch ( IOException e ) {
@@ -248,53 +248,53 @@ public class QuorumNetworkManager extends AbstractFObject {
       closeServerSocket(serverSocket);
       closeSocket(client);
     }
-    
+
   }
-  
+
   private void closeSocket(Socket socket) {
     if ( socket == null ) return;
-    
+
     try {
       socket.close();
     } catch ( IOException e ) {
       //TODO: log error
     }
   }
-  
+
   private void closeServerSocket(ServerSocket serverSocket) {
     if ( serverSocket == null ) return;
-    
+
     try {
       serverSocket.close();
     } catch ( IOException e ) {
       //TODO: log error
     }
   }
-  
+
   public void appendToReceiveQueue(QuorumMessage message) {
     // Only one thread can append message to queue at any giving time.
     synchronized ( receiveQueueLock ) {
-      // It is ok to remove first one. 
+      // It is ok to remove first one.
       // Because the algorithm will eventually elect a leader even if some machine have network packet loss.
       if ( receiveQueue.remainingCapacity() == 0 ) receiveQueue.remove();
       receiveQueue.add(message);
     }
-    
+
   }
-  
+
   public void appendToSendQueue(ArrayBlockingQueue<QuorumMessage> queue, QuorumMessage message) {
     synchronized ( queue ) {
       if ( queue.remainingCapacity() == 0 ) queue.remove();
       queue.add(message);
     }
   }
-  
+
   public void sendToInstance(Long instanceId, QuorumMessage message) {
     if ( quorumName.getId() == instanceId ) {
       appendToReceiveQueue(message);
       return;
     }
-    
+
     ArrayBlockingQueue<QuorumMessage> queue = instanceToQueueMap.get(instanceId);
     if ( queue == null ) {
       queue = instanceToQueueMap.put(instanceId, new ArrayBlockingQueue<QuorumMessage>(1));
@@ -308,28 +308,28 @@ public class QuorumNetworkManager extends AbstractFObject {
       maybeConnect(instanceId);
     }
   }
-  
+
   synchronized boolean maybeConnect(Long instanceId) {
     //TODO: Get InetAddress from dao.
     if ( instanceToSenderMap.get(instanceId) != null ) {
       //TODO: log Election connection exists.
       return true;
     }
-    
+
     Object obj = getX().get("clusterNodeDAO");
     if ( obj == null ) {
       //TODO: Log error.
       return false;
     }
-    
+
     DAO dao = (DAO) obj;
-    ClusterNode instance = (ClusterNode) dao.find(instanceId); 
-    
+    ClusterNode instance = (ClusterNode) dao.find(instanceId);
+
     if ( instance == null ) {
       //TODO: log error.
       return false;
     }
-    
+
     try {
       InetSocketAddress addr = new InetSocketAddress(instance.getElectionIP(), instance.getElectionPort());
       Socket socket = new Socket();
@@ -337,7 +337,7 @@ public class QuorumNetworkManager extends AbstractFObject {
       socket.setKeepAlive(true);
       socket.setSoTimeout(2000);
       socket.connect(addr, 5000);
-      
+
       return initialConnection(socket, instanceId, addr);
     } catch ( SocketException e ) {
       return false;
@@ -346,60 +346,60 @@ public class QuorumNetworkManager extends AbstractFObject {
       e.printStackTrace();
       return false;
     }
-    
+
   }
-  
+
   public synchronized boolean initialConnection(Socket socket, Long instanceId, InetSocketAddress addr) {
     DataInputStream in = null;
     DataOutputStream out = null;
-    
+
     try {
       out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
-      
+
       QuorumMessage initialMessage = new QuorumMessage();
       initialMessage.setMessageType(QuorumMessageType.INITIAL);
       initialMessage.setDestinationInstance(instanceId);
       initialMessage.setSourceInstance(quorumName.getId());
       initialMessage.setSourceElectionIP(addr.getHostString());
       initialMessage.setSourceElectionPort(addr.getPort());
-      
+
       String message = new Outputter(getX()).setPropertyPredicate(new NetworkPropertyPredicate()).stringify(initialMessage);
       byte[] bytes = message.getBytes();
       out.writeInt(bytes.length);
       out.write(bytes);
       out.flush();
-      
+
       in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
     } catch ( IOException e ) {
       closeSocket(socket);
       return false;
     }
-    
+
     if ( instanceId > quorumName.getId() ) {
       closeSocket(socket);
       return false;
     }
-    
+
     Sender sender = new Sender(instanceId, socket);
     Receiver receiver = new Receiver(instanceId, socket, sender);
-    
+
     Sender oldSender = instanceToSenderMap.get(instanceId);
     if ( oldSender != null ) oldSender.close();
-    
+
     instanceToSenderMap.put(instanceId, sender);
     instanceToQueueMap.putIfAbsent(instanceId, new ArrayBlockingQueue<QuorumMessage>(1));
-    
+
     sender.start();
     receiver.start();
     return true;
   }
-  
+
   public void addConnection(Socket socket) {
     QuorumMessage message = null;
     InetSocketAddress clientAddr;
     try {
       DataInputStream io = null;
-      
+
       io = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
       // Get message length.
       int messagelen = io.readInt();
@@ -407,49 +407,49 @@ public class QuorumNetworkManager extends AbstractFObject {
         //TODO: handle error.
         throw new IOException("can not find message len");
       }
-      
+
       byte[] bytes = new byte[messagelen];
       int rc = io.read(bytes);
       if ( rc != messagelen ) {
         throw new IOException("Illegal length");
       }
-      
+
       // Convert bytes to String.
       String input = new String(bytes, "UTF-8");
       FObject request = getX().create(JSONParser.class).parseString(input);
-      
+
       message = (QuorumMessage) request;
-      
+
       clientAddr = new InetSocketAddress(message.getSourceElectionIP(), message.getSourceElectionPort());
-      
+
     } catch ( IOException e ) {
-      //TODO: Log error 
+      //TODO: Log error
       closeSocket(socket);
       return;
     }
-    
+
     // Drop Connection.
     if ( message.getSourceInstance() < quorumName.getId() ) {
       Sender sender = instanceToSenderMap.get(message.getSourceInstance());
       if ( sender != null ) sender.close();
-      
+
       closeSocket(socket);
       maybeConnect(message.getSourceInstance());
     } else {
       Sender sender = new Sender(message.getSourceInstance(), socket);
       Receiver receiver = new Receiver(message.getSourceInstance(), socket, sender);
-      
+
       Sender oldSender = instanceToSenderMap.get(message.getSourceInstance());
       if ( oldSender != null ) oldSender.close();
-      
+
       instanceToSenderMap.put(message.getSourceInstance(), sender);
       instanceToQueueMap.putIfAbsent(message.getSourceInstance(), new ArrayBlockingQueue<QuorumMessage>(1));
-      
+
       sender.start();
       receiver.start();
     }
-    
+
   }
-  
-  
+
+
 }
