@@ -41,11 +41,12 @@ foam.CLASS({
     {
       class: 'FObjectArray',
       of: 'foam.core.Property',
-      name: 'propertyWhiteList',
+      name: 'propertyWhitelist',
       documentation: `
         If this array is not empty, only the properties listed in it will be
         included in the detail view.
       `,
+      factory: null,
       preSet: function(_, ps) {
         foam.assert(ps, 'Properties required.');
         for ( var i = 0; i < ps.length; i++ ) {
