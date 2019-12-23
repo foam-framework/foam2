@@ -15,7 +15,7 @@ import foam.core.X;
 * Uses the threadpool to avoid blocking the caller.
 **/
 public class AsyncAssemblyLine
- extends SyncAssemblyLine
+  extends SyncAssemblyLine
 {
  protected Agency pool_;
  protected X      x_;

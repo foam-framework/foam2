@@ -399,7 +399,7 @@ foam.CLASS({
         foam.nanos.auth.PriorPassword[] priorPasswords = new foam.nanos.auth.PriorPassword[1];
         priorPasswords[0] = new foam.nanos.auth.PriorPassword();
         priorPasswords[0].setPassword(this.getPassword());
-        priorPasswords[0].setTimeStamp(new Date());
+        priorPasswords[0].setTimeStamp(new java.util.Date());
         return priorPasswords;
       `,
       hidden: true,
