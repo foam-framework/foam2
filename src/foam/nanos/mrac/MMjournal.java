@@ -75,7 +75,7 @@ public class MMJournal extends AbstractJournal {
   private final List<ArrayList<ClusterNode>> groups  = new LinkedList<ArrayList<ClusterNode>>();
   private final List<ClusterNode> availableNodes = new LinkedList<ClusterNode>();
   // Default TIME_OUT is 5 second
-  private final long TIME_OUT = 5000;
+  private final long TIME_OUT = 10000;
 
   // globalIndex should be unique in each filename.
   // One MMJournal instance can be shared by different DAO(Single Journal Mode).
@@ -241,7 +241,7 @@ public class MMJournal extends AbstractJournal {
       MedusaEntry p = null;
       int threhold = 1;
 
-      while ( System.currentTimeMillis() < endtime && check < threhold && check > (0 - threhold) ) {
+      while ( System.currentTimeMillis() < endtime && Math.abs(check) < threhold ) {
         for ( int j = 0 ; j < tasks.length ; j++ ) {
           if ( checks[j] == false && ((FutureTask<String>) tasks[j]).isDone() ) {
             FutureTask<String> task = (FutureTask<String>) tasks[j];
@@ -249,6 +249,7 @@ public class MMJournal extends AbstractJournal {
               String response = task.get();
               //TODO: a bug, return message format wrong.
               Message responseMessage = (Message) getX().create(JSONParser.class).parseString(response);
+              System.out.println("response>>>>>>>>");
               System.out.println(response);
               p = (MedusaEntry) ((RPCReturnMessage) responseMessage.getObject()).getData();
               if ( p instanceof MedusaEntry ) {
@@ -266,6 +267,8 @@ public class MMJournal extends AbstractJournal {
           }
         }
       }
+
+      System.out.println(check);
 
       if ( check >= threhold ) {
         isPersist = true;
@@ -380,6 +383,7 @@ public class MMJournal extends AbstractJournal {
 
         return  new String(buf, 0, off, StandardCharsets.UTF_8);
       } catch ( Exception e ) {
+        System.out.println(e);
         throw e;
       } finally {
         IOUtils.closeQuietly(output);
@@ -401,68 +405,162 @@ public class MMJournal extends AbstractJournal {
 
   //TODO: capture IOException.
   //TODO: need to have a cache dao.
-
+  //TODO: can only execute by one thread at any giving time.
   public void replay(X x, DAO dao) {
     //TODO: need a speciall dao.
     if ( ! isInitialized ) initial(x);
     int fileBufferSize = 1024;
-    ByteBuffer byteBuffer = ByteBuffer.allocate(fileBufferSize);
     ByteBuffer lengthBuffer = ByteBuffer.allocate(4);
-
+    // MedusaNode id to Bytebuffer.
+    Map<Long, Map<Long, LinkedList<ByteBuffer>>> groupToJournal = new ConcurrentHashMap<Long, Map<Long, LinkedList<ByteBuffer>>>();
     try {
       //TODO: code below could be multi-thread.
-      for ( ClusterNode node : availableNodes ) {
-        SocketChannel channel = SocketChannel.open();
-        channel.configureBlocking(true);
-        InetSocketAddress address = new InetSocketAddress(node.getIp(), node.getServicePort());
-        //The system should wait for connection at here.
-        boolean connectResult = channel.connect(address);
+      for ( Map.Entry<Long, ArrayList<ClusterNode>> entry: groupToMN.entrySet() ) {
+        long groupId = entry.getKey();
+        Map<Long, LinkedList<ByteBuffer>> nodeToBuffers = new HashMap<Long, LinkedList<ByteBuffer>>();
+        groupToJournal.put(groupId, nodeToBuffers);
 
-        if ( connectResult == false )
-          throw new RuntimeException("Replay can not connect to: " + node.getId());
+        for ( ClusterNode node : entry.getValue() ) {
+          LinkedList<ByteBuffer> buffers = new LinkedList<ByteBuffer>();
+          nodeToBuffers.put(node.getId(), buffers);
 
-        // Send replay command to MN.
-        TcpMessage replayInitialMessage = new TcpMessage();
-        replayInitialMessage.setServiceKey("MNService");
-        RPCMessage rpc = x.create(RPCMessage.class);
-        rpc.setName("replayAll");
-        Object[] args = { null, serviceName };
-        rpc.setArgs(args);
-        replayInitialMessage.setObject(rpc);
+          SocketChannel channel = SocketChannel.open();
+          channel.configureBlocking(true);
+          InetSocketAddress address = new InetSocketAddress(node.getIp(), node.getSocketPort());
+          //The system should wait for connection at here.
+          boolean connectResult = channel.connect(address);
 
-        Outputter outputter = new Outputter(x);
-        String msg = outputter.stringify(replayInitialMessage);
-        byte[] bytes = msg.getBytes(Charset.forName("UTF-8"));
-        ByteBuffer initialMessageBuffer = ByteBuffer.allocate(4 + bytes.length);
-        initialMessageBuffer.putInt(bytes.length);
-        initialMessageBuffer.put(bytes);
-        initialMessageBuffer.flip();
-        channel.write(initialMessageBuffer);
+          if ( connectResult == false )
+            throw new RuntimeException("Replay can not connect to: " + node.getId());
 
-        lengthBuffer.clear();
-        byteBuffer.clear();
+          // Send replay command to MN.
+          TcpMessage replayInitialMessage = new TcpMessage();
+          replayInitialMessage.setServiceKey("MNService");
+          RPCMessage rpc = x.create(RPCMessage.class);
+          rpc.setName("replayAll");
+          Object[] args = { null, serviceName };
+          rpc.setArgs(args);
+          replayInitialMessage.setObject(rpc);
 
-        channel.read(lengthBuffer);
-        lengthBuffer.flip();
-        int length = lengthBuffer.getInt();
-        ByteBuffer readBuffer;
+          Outputter outputter = new Outputter(x);
+          String msg = outputter.stringify(replayInitialMessage);
+          byte[] bytes = msg.getBytes(Charset.forName("UTF-8"));
+          ByteBuffer ackBuffer = ByteBuffer.allocate(4 + bytes.length);
+          ackBuffer.putInt(bytes.length);
+          ackBuffer.put(bytes);
+          ackBuffer.flip();
+          channel.write(ackBuffer);
+          // Waiting for ACK from MN.
+          lengthBuffer.clear();
 
-        if ( length == fileBufferSize ) {
-          readBuffer = byteBuffer;
-        } else {
-          readBuffer = ByteBuffer.allocate(length);
+          if ( channel.read(lengthBuffer) < 0 ) throw new RuntimeException("End of Stream");
+          lengthBuffer.flip();
+
+          int ackLength = lengthBuffer.getInt();
+          if ( ackLength < 0 ) throw new RuntimeException("End of Stream");
+          ByteBuffer packet = ByteBuffer.allocate(ackLength);
+          if ( channel.read(packet) < 0 ) throw new RuntimeException("End of Stream");
+
+          packet.flip();
+          String ackString = new String(packet.array(), 0, ackLength, Charset.forName("UTF-8"));
+          FilePacket filePacket = (FilePacket) x.create(JSONParser.class).parseString(ackString);
+          int totalBlock = filePacket.getTotalBlock();
+
+          for ( int i = 0 ; i < totalBlock ; i++ ) {
+            lengthBuffer.clear();
+
+            channel.read(lengthBuffer);
+            lengthBuffer.flip();
+            int length = lengthBuffer.getInt();
+            ByteBuffer readBuffer = ByteBuffer.allocate(length);
+
+            channel.read(readBuffer);
+            readBuffer.flip();
+            buffers.add(readBuffer);
+          }
+          //TODO: get entry from readBuffer and but into dao.
+          //TODO: After replay If not primary add socket channel into a selector. and set blocking == false.
         }
-
-        channel.read(readBuffer);
-        readBuffer.flip();
-        //TODO: get entry from readBuffer and but into dao.
-        //TODO: After replay If not primary add socket channel into a selector. and set blocking == false.
-
       }
-    } catch ( IOException ioe ) {
+      System.out.println(">>>>>replay journal");
+      printAll(x, groupToJournal);
+      System.out.println("------replay journal end");
+   } catch ( IOException ioe ) {
       //TODO: retry or stop system.
       throw new RuntimeException(ioe);
     }
 
+  }
+
+  // This method only use for test.
+  // This method hold when the minimal ByteBuffer is greater than 4,
+  // and a entry should not be accross more than two ByteBuffer.
+  private final void printAll(X x, Map<Long, Map<Long, LinkedList<ByteBuffer>>> groupTojournal) {
+    for ( Map.Entry<Long, Map<Long, LinkedList<ByteBuffer>>> entry1 : groupTojournal.entrySet() ) {
+      long groupId = entry1.getKey();
+      for ( Map.Entry<Long, LinkedList<ByteBuffer>> entry2: entry1.getValue().entrySet() ) {
+        long clusterNodeId = entry2.getKey();
+        byte[] carryOverBytes = null;
+        int carryOverLength = -1;
+        byte[] carryOverLengthBytes = null;
+        byte[] lengthBytes = null;
+
+        for ( ByteBuffer buffer : entry2.getValue() ) {
+
+          if ( carryOverLengthBytes != null ) {
+            int remain = 4 - carryOverLengthBytes.length;
+            byte[] unreadLengthBytes = new byte[remain];
+            buffer.get(unreadLengthBytes);
+            lengthBytes = new byte[4];
+            System.arraycopy(carryOverLengthBytes, 0, lengthBytes, 0, carryOverLengthBytes.length);
+            System.arraycopy(unreadLengthBytes, 0, lengthBytes, carryOverLengthBytes.length, unreadLengthBytes.length);
+            int length = ByteBuffer.wrap(lengthBytes).getInt();
+          }
+
+          if ( carryOverBytes != null ) {
+            int remain = carryOverLength - carryOverBytes.length;
+            byte[] remainBytes = new byte[remain];
+            buffer.get(remainBytes);
+            byte[] entryBytes = new byte[carryOverBytes.length + remainBytes.length];
+            System.arraycopy(carryOverBytes, 0, entryBytes, 0, carryOverBytes.length);
+            System.arraycopy(remainBytes, 0, entryBytes, carryOverBytes.length, remainBytes.length);
+            String entry = new String(entryBytes, 0, carryOverLength, Charset.forName("UTF-8"));
+            carryOverBytes = null;
+            carryOverLength = -1;
+            System.out.println(entry);
+          }
+          while ( buffer.hasRemaining() ) {
+            int length;
+
+            if ( lengthBytes != null ) {
+              length = ByteBuffer.wrap(lengthBytes).getInt();
+              lengthBytes = null;
+            } else {
+              length = buffer.getInt();
+            }
+
+            if ( buffer.remaining() < 4 ) {
+              carryOverLengthBytes = new byte[buffer.remaining()];
+              buffer.get(carryOverLengthBytes);
+              carryOverBytes = null;
+              carryOverLength = -1;
+            } else if ( length > buffer.remaining() ) {
+              carryOverBytes = new byte[buffer.remaining()];
+              carryOverLength = length;
+              buffer.get(carryOverBytes);
+              carryOverLengthBytes = null;
+            } else {
+              byte[] bytes = new byte[length];
+              buffer.get(bytes);
+              String entry = new String(bytes, 0, length, Charset.forName("UTF-8"));
+              System.out.println(entry);
+              carryOverBytes = null;
+              carryOverLength = -1;
+              carryOverLengthBytes = null;
+            }
+          }
+        }
+      }
+    }
   }
 }

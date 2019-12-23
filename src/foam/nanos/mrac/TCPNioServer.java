@@ -31,6 +31,7 @@ import foam.core.AbstractFObject;
 import foam.core.FObject;
 import foam.core.FoamThread;
 import foam.core.X;
+import foam.dao.DAO;
 import foam.lib.json.JSONParser;
 import foam.nanos.NanoService;
 import foam.nanos.box.NanoServiceRouter;
@@ -42,6 +43,7 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
 
   protected TcpNioRouter router_ = null;
   protected Logger logger   = (Logger) getX().get("logger");
+  protected Long clusterId = Long.parseLong(System.getProperty("CLUSTER"));
   //TODO: Do not hard code this field.
   // protected int maxConnectionPerClient = 50;
 
@@ -57,11 +59,21 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
   //TODO: start selector
   public void start() throws Exception {
     System.out.println("<><><><><><><<><>");
+    X x = getX();
+    if ( x == null ) throw new RuntimeException("Context no found.");
+    DAO clusterDAO = (DAO) x.get("clusterNodeDAO");
+    if ( clusterDAO == null ) throw new RuntimeException("clusterDAO no found.");
+
+    ClusterNode myself = (ClusterNode) clusterDAO.find(clusterId);
+    if ( myself == null ) throw new RuntimeException("ClusterNode no found: " + clusterId);
+
+
     //TODO: do not hard coding following parameter.
-    InetSocketAddress serverAddress = new InetSocketAddress("127.0.0.1", 7070);
+    InetSocketAddress serverAddress = new InetSocketAddress(myself.getIp(), myself.getSocketPort());
+    System.out.println("Tcp server open at: " + serverAddress);
     // int totalProcessors = totalCores * 1;
     // Double size of MM.
-    int totalProcessors = 3 * 2;
+    int totalProcessors = totalCores * 2;
     for ( int i = 0 ; i < totalProcessors ; i++ ) {
       this.processors.add(new Processor(String.valueOf(i)));
     }
@@ -161,6 +173,7 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
             keys.remove();
 
             if ( key.isAcceptable() ) {
+              System.out.println("aaaaaa");
               SocketChannel socketChannel = acceptChannel(key);
 
               if ( socketChannel != null ) {

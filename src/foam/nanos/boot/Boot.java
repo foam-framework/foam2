@@ -135,6 +135,9 @@ public class Boot {
     foam.nanos.demo.DemoObject object = new foam.nanos.demo.DemoObject();
     object.setId("11");
     demoObjectDAO.put_(root_, object);
+    foam.nanos.demo.DemoObject object2 = new foam.nanos.demo.DemoObject();
+    object.setId("12");
+    demoObjectDAO.put_(root_, object2);
 
   }
 

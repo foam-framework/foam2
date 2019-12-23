@@ -32,6 +32,10 @@ foam.CLASS({
       name: 'servicePort'
     },
     {
+      class: 'Int',
+      name: 'socketPort'
+    },
+    {
       class: 'String',
       name: 'electionIP'
     },

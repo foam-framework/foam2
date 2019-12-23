@@ -23,7 +23,7 @@ public class MMDAO extends JDAO {
     setDelegate(new MDAO(classInfo));
     setJournal(MMJournal.getMMjournal(mnPort));
     this.mnPort = mnPort;
-    // getJournal.replay(x, getDelegate());
+    getJournal().replay(x, getDelegate());
   }
 
   //Remove synchronized key word.

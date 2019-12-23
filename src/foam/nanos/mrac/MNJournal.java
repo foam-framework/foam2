@@ -46,6 +46,7 @@ public class MNJournal extends FileJournal {
       this.filename = filename;
       this.journalDir = System.getProperty("JOURNAL_HOME");
       this.outChannel = FileChannel.open(getPath(filename), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+
     } catch ( IOException e ) {
       throw new RuntimeException(e);
     }
@@ -57,6 +58,7 @@ public class MNJournal extends FileJournal {
 
 
   public void put_(X x, FObject obj) {
+    System.out.println("MNPut");
     MedusaEntry entry = (MedusaEntry) obj;
     entry.setAction("p");
     String msg = new Outputter(x).stringify(obj);
@@ -123,12 +125,29 @@ public class MNJournal extends FileJournal {
         // Allocate 500M.
         // TODO: make sure memory assign to this instance is bigger enough.
         // ByteBuffer byteBuffer = ByteBuffer.allocate(524288000);
-        ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
+        int blockSize = 1024;
+        ByteBuffer byteBuffer = ByteBuffer.allocate(blockSize);
         ByteBuffer lengthBuffer = ByteBuffer.allocate(4);
         int length = -1;
-        //TODO: send ack to MM.
+
+        int totalBlock = (int) Math.ceil( (position/(double)blockSize));
+
+        // Send ACK to MM.
+        FilePacket filePacket = new FilePacket();
+        filePacket.setTotalBlock(totalBlock);
+        Outputter outputter = new Outputter(x);
+        String msg = outputter.stringify(filePacket);
+        System.out.println(msg);
+        byte[] bytes = msg.getBytes(Charset.forName("UTF-8"));
+        ByteBuffer ackBuffer = ByteBuffer.allocate(4 + bytes.length);
+        ackBuffer.putInt(bytes.length);
+        ackBuffer.put(bytes);
+        ackBuffer.flip();
+        socketChannel.write(ackBuffer);
 
         while ( inChannel.position() < position ) {
+          lengthBuffer.clear();
+          byteBuffer.clear();
           length = inChannel.read(byteBuffer);
           lengthBuffer = lengthBuffer.putInt(length);
 
@@ -138,8 +157,6 @@ public class MNJournal extends FileJournal {
           while ( lengthBuffer.hasRemaining() ) { socketChannel.write(lengthBuffer); }
           while ( byteBuffer.hasRemaining() ) { socketChannel.write(byteBuffer); }
 
-          lengthBuffer.clear();
-          byteBuffer.clear();
         }
 
         //TODO: send finish ack

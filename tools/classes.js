@@ -513,7 +513,7 @@ var classes = [
   'foam.nanos.mrac.quorum.QuorumMessage',
   'foam.nanos.mrac.quorum.QuorumMessageType',
   'foam.nanos.mrac.quorum.Vote',
-  'foam.nanos.mrac.FileSendingACk',
+  'foam.nanos.mrac.FilePacket',
   'foam.nanos.mrac.MNService'
 ];
 
