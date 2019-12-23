@@ -27,10 +27,7 @@ public class MNDAO extends JDAO {
 
   @Override
   public FObject put_(X x, FObject obj) {
-    System.out.println("enen");
-    System.out.println(obj);
     // MN does not have record on old obj;
-    //TODO: extra check code should add at here.
     ((MNJournal) getJournal()).put_(x, obj);
     return obj;
   }

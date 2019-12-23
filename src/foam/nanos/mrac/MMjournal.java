@@ -188,9 +188,9 @@ public class MMJournal extends AbstractJournal {
   // The method only work if FObject implement Identifiable.Identifiable
   // Version is used to allow we can make parallel call.
   // TODO: can we do this versioning code at the begnning of DAO?
+  @Override
   public void put_(X x, FObject old, FObject nu) {
     if ( ! isInitialized ) initial(x);
-    System.out.println("putput_");
     long myIndex = getGlobalIndex();
 
     // Get whole entry first to make sure threadsafe.
@@ -211,7 +211,37 @@ public class MMJournal extends AbstractJournal {
     Outputter outputter = new Outputter(getX());
 
     String mn = outputter.stringify(msg);
-    System.out.println(mn);
+    callMN(mn);
+  }
+
+  @Override
+  public void remove(X x, FObject obj) {
+    if ( ! isInitialized ) initial(x);
+
+    long myIndex = getGlobalIndex();
+    // Get whole entry first to make sure threadsafe.
+    MedusaEntry p1 = parent1;
+    MedusaEntry p2 = parent2;
+    Message msg =
+      createMessage(
+        p1.getMyIndex(),
+        p1.getMyHash(),
+        p2.getMyIndex(),
+        p2.getMyHash(),
+        myIndex,
+        "remove_",
+        "r",
+        null,
+        obj
+      );
+    Outputter outputter = new Outputter(getX());
+
+    String mn = outputter.stringify(msg);
+    callMN(mn);
+
+  }
+
+  private void callMN(String medusaEntry) {
 
     int index = nextRobin() % groups.size();
     int i = 0;
@@ -228,7 +258,7 @@ public class MMJournal extends AbstractJournal {
 
       for ( int j = 0 ; j < nodes.size() ; j++ ) {
         ClusterNode node = nodes.get(j);
-        tasks[j] = new FutureTask<String>(new Sender(node.getIp(), node.getServicePort(), mn));
+        tasks[j] = new FutureTask<String>(new Sender(node.getIp(), node.getServicePort(), medusaEntry));
         //TODO: use threadpool.
         new Thread((FutureTask<String>) tasks[j]).start();
       }
@@ -287,7 +317,6 @@ public class MMJournal extends AbstractJournal {
       //TODO: shutdown the put method.
       throw new RuntimeException("MN do not work....");
     }
-
 
   }
 
@@ -393,14 +422,6 @@ public class MMJournal extends AbstractJournal {
         }
       }
     }
-  }
-
-  //TODO: provide versioning for the remove.
-  public void remove(X x, FObject obj) {
-    //TODO;
-    // synchronized ( uniqueStringLock ) {
-
-    // }
   }
 
   //TODO: capture IOException.
