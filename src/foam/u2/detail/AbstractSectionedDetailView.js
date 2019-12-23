@@ -93,7 +93,11 @@ foam.CLASS({
         if ( this.propertyWhitelist ) {
           sections = sections
             .map((s) => {
-              s.properties = s.properties.filter((p) => this.propertyWhitelist.includes(p));
+              s.properties = s.properties.reduce((acc, sectionProp) => {
+                var prop = this.propertyWhitelist.find(whitelistProp => whitelistProp.name === sectionProp.name);
+                if ( prop ) acc.push(prop);
+                return acc;
+              }, []);
               return s;
             })
             .filter((s) => {
