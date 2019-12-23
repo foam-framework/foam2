@@ -13,6 +13,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import foam.core.X;
 import foam.core.AbstractFObject;
 import foam.core.Detachable;
 import foam.core.FoamThread;
@@ -26,7 +27,9 @@ import foam.nanos.mrac.ClusterNode;
 public class Election extends AbstractFObject {
 
   // QuorumNetworkManager handles network communication for a Election.
-  QuorumNetworkManager networkManager;
+  private final QuorumNetworkManager networkManager;
+  protected Long clusterId = Long.parseLong(System.getProperty("CLUSTER"));
+  ClusterNode mySelf;
 
   // Manage meta of current instance.
   private QuorumName quorumName;
@@ -36,6 +39,21 @@ public class Election extends AbstractFObject {
   // Receiver will sanitize and put reponse into the queue.
   LinkedBlockingQueue<QuorumMessage> receptedQueue;
 
+  public Election(X x, QuorumNetworkManager networkManager) {
+    System.out.println("Election");
+    setX(x);
+    if ( x == null ) throw new RuntimeException("Context no found.");
+    DAO clusterDAO = (DAO) x.get("clusterNodeDAO");
+    if ( clusterDAO == null ) throw new RuntimeException("clusterNodeDAO no found.");
+
+    mySelf = (ClusterNode) clusterDAO.find(clusterId);
+    if ( mySelf == null ) throw new RuntimeException("ClusterNode no found: " + clusterId);
+
+    this.networkManager = networkManager;
+    sendQueue = new LinkedBlockingQueue<QuorumMessage>();
+    receptedQueue = new LinkedBlockingQueue<QuorumMessage>();
+    sendAndReceiver.start();
+  }
 
   // Initial value will be 0. When this instance broadcast with initial value,
   // it will get current electionEra in the cluster.
@@ -75,7 +93,7 @@ public class Election extends AbstractFObject {
   private boolean verifyGroup(Long instanceId) {
     ClusterNode instance = findClusterNode(instanceId);
     if ( instance == null ) return false;
-    if ( instance.getGroup() == quorumName.getGroup() ) return true;
+    if ( instance.getGroup() == mySelf.getGroup() ) return true;
     return false;
   }
 
@@ -86,7 +104,7 @@ public class Election extends AbstractFObject {
   }
 
   private boolean isSelf(Long instanceId) {
-    return instanceId == quorumName.getId();
+    return instanceId == mySelf.getId();
   }
 
   class SenderAndReceiver {
@@ -96,7 +114,7 @@ public class Election extends AbstractFObject {
       volatile boolean isRunning = true;
 
       Receiver() {
-        super("Election.SenderAndReceiver.Receiver[id=" + quorumName.getId() + "]");
+        super("Election.SenderAndReceiver.Receiver[id=" + mySelf.getId() + "]");
       }
 
       public void run() {
@@ -121,7 +139,7 @@ public class Election extends AbstractFObject {
               QuorumMessage response = new QuorumMessage();
               response.setMessageType(QuorumMessageType.NOTIFICATION);
               response.setDestinationInstance(inMessage.getSourceInstance());
-              response.setSourceInstance(quorumName.getId());
+              response.setSourceInstance(mySelf.getId());
               response.setSourceStatus(quorumName.getCurrentState());
               // Very important!!
               vote.setElectionEra(electionEra.get());
@@ -142,7 +160,7 @@ public class Election extends AbstractFObject {
                   QuorumMessage response = new QuorumMessage();
                   response.setMessageType(QuorumMessageType.NOTIFICATION);
                   response.setDestinationInstance(inMessage.getSourceInstance());
-                  response.setSourceInstance(quorumName.getId());
+                  response.setSourceInstance(mySelf.getId());
                   response.setSourceStatus(quorumName.getCurrentState());
                   response.setVote(getVote());
                   sendQueue.offer(response);
@@ -160,7 +178,7 @@ public class Election extends AbstractFObject {
                   QuorumMessage response = new QuorumMessage();
                   response.setMessageType(QuorumMessageType.NOTIFICATION);
                   response.setDestinationInstance(inMessage.getSourceInstance());
-                  response.setSourceInstance(quorumName.getId());
+                  response.setSourceInstance(mySelf.getId());
                   response.setSourceStatus(quorumName.getCurrentState());
                   response.setVote(latestVote);
                   sendQueue.offer(response);
@@ -179,7 +197,7 @@ public class Election extends AbstractFObject {
       volatile boolean isRunning = true;
 
       Sender() {
-        super("Election.SenderAndReceiver.Sender[id=" + quorumName.getId() + "]");
+        super("Election.SenderAndReceiver.Sender[id=" + mySelf.getId() + "]");
       }
 
       public void run() {
@@ -231,18 +249,18 @@ public class Election extends AbstractFObject {
       Map<Long, Vote> outOfElection = new HashMap<Long, Vote>();
 
       //TODO: replace with IP address.
-      long initialCriteria   = quorumName.getId();
+      long initialCriteria   = mySelf.getId();
       long initialPrimaryEra = electionEra.get();
 
       synchronized(this) {
         electionEra.incrementAndGet();
-        // Initially propose myself as leader.
+        // Initially propose mySelf as leader.
         // We do not need to consensus data right now,
         // so set initial proposePrimaryEra equal to electionEra
-        updateProposal(quorumName.getId(), initialPrimaryEra, initialCriteria);
+        updateProposal(mySelf.getId(), initialPrimaryEra, initialCriteria);
       }
 
-      // Propose myself as Leader.
+      // Propose mySelf as Leader.
       broadcast();
 
       //TODO: have a class to record all received Votes.
@@ -274,7 +292,7 @@ public class Election extends AbstractFObject {
 
               if ( initialCriteria > vote.getCriteria() ) {
                 // Re-proposal SELF as PRIMARY.
-                updateProposal(quorumName.getId(), initialPrimaryEra, initialCriteria);
+                updateProposal(mySelf.getId(), initialPrimaryEra, initialCriteria);
               } else {
                 // Accept new vote.
                 updateProposal(vote.getPrimaryInstanceId(), vote.getPrimaryEra(), vote.getCriteria());
@@ -371,7 +389,7 @@ public class Election extends AbstractFObject {
           QuorumMessage message = new QuorumMessage();
           message.setMessageType(QuorumMessageType.NOTIFICATION);
           message.setDestinationInstance(clusterNode.getId());
-          message.setSourceInstance(quorumName.getId());
+          message.setSourceInstance(mySelf.getId());
           message.setSourceStatus(InstanceState.ELECTING);
           Vote vote = getVote();
           vote.setElectionEra(electionEra.get());
