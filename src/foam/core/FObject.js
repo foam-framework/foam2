@@ -844,7 +844,10 @@ foam.CLASS({
 
       // FUTURE: check 'id' first
       // FUTURE: order properties
-      var ps = this.cls_.getAxiomsByClass(foam.core.Property);
+      var ps = this.cls_.getAxiomsByClass(foam.core.Property).filter((p) => {
+        return ! foam.dao.DAOProperty.isInstance(p)
+          && ! foam.dao.ManyToManyRelationshipProperty.isInstance(p);
+      });
       for ( var i = 0 ; i < ps.length ; i++ ) {
         var r = ps[i].compare(this, other);
         if ( r ) return r;
