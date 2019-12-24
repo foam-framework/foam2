@@ -2626,6 +2626,24 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'PasswordPropertyRefinement',
+  refines: 'foam.core.Password',
+  requires: [
+    'foam.u2.view.PasswordView'
+  ],
+  properties: [
+    {
+      name: 'view',
+      value: {
+        class: 'foam.u2.view.PasswordView',
+        passwordIcon: true
+      }
+    }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.u2',

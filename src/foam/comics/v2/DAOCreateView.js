@@ -81,6 +81,9 @@ foam.CLASS({
   actions: [
     {
       name: 'save',
+      isEnabled: function(data$errors_) {
+        return ! data$errors_;
+      },
       code: function() {
         var cData = this.data;
 
