@@ -77,7 +77,7 @@ public class QuorumNetworkManager extends AbstractFObject {
       try {
         this.outputter = new DataOutputStream(socket.getOutputStream());
       } catch ( IOException e ) {
-        //TODO: log error.
+        e.printStackTrace();
         closeSocket(socket);
         // terminate this Sender
         this.isRunning = false;
@@ -98,6 +98,7 @@ public class QuorumNetworkManager extends AbstractFObject {
     }
 
     synchronized void close() {
+      System.out.println("sender close: " + instanceId);
       if ( ! isRunning ) return;
       isRunning = false;
 
@@ -119,13 +120,14 @@ public class QuorumNetworkManager extends AbstractFObject {
               break;
             }
             QuorumMessage message = messageQueue.poll(1000, TimeUnit.MICROSECONDS);
-            send(message);
+            if ( message != null ) send(message);
 
           } catch ( InterruptedException e ) {
-            //TODO: log warningd
+            e.printStackTrace();
           }
         }
       } catch ( Exception e ) {
+        e.printStackTrace();
         //TODO: log error
       } finally {
         close();
@@ -173,7 +175,7 @@ public class QuorumNetworkManager extends AbstractFObject {
           in.readFully(bytes, 0, messagelength);
           String message = new String(bytes, "UTF-8");
           FObject obj = getX().create(JSONParser.class).parseString(message);
-          System.out.println(message);
+          System.out.println("receive: " + message);
           if ( ! (obj instanceof QuorumMessage) ) {
             //TODO: log error.
             continue;
@@ -221,17 +223,19 @@ public class QuorumNetworkManager extends AbstractFObject {
           while ( isRunning ) {
             try {
               client = serverSocket.accept();
+              System.out.println(client);
               client.setTcpNoDelay(true);
               client.setKeepAlive(true);
               client.setSoTimeout(5000);
               addConnection(client);
             } catch ( SocketTimeoutException e ) {
-              //TODO: ignore socketTimeout.
+              e.printStackTrace();
             }
 
           }
           retry = 0;
         } catch ( IOException e ) {
+          e.printStackTrace();
           if ( ! isRunning ) {
             break;
           }
@@ -308,6 +312,7 @@ public class QuorumNetworkManager extends AbstractFObject {
       return;
     }
 
+    System.out.println("sendTO: " + instanceId + "\n ->" + message.toString() + "\n");
     ArrayBlockingQueue<QuorumMessage> queue = instanceToQueueMap.get(instanceId);
     if ( queue == null ) {
       instanceToQueueMap.putIfAbsent(instanceId, new ArrayBlockingQueue<QuorumMessage>(1));
@@ -327,7 +332,6 @@ public class QuorumNetworkManager extends AbstractFObject {
   synchronized boolean maybeConnect(Long instanceId) {
 
     if ( instanceToSenderMap.get(instanceId) != null ) {
-      System.out.println("Already connection to: " +instanceId);
       return true;
     }
 
@@ -339,6 +343,7 @@ public class QuorumNetworkManager extends AbstractFObject {
 
     try {
       InetSocketAddress addr = new InetSocketAddress(instance.getElectionIP(), instance.getElectionPort());
+      System.out.println("Connect to: " + addr);
       Socket socket = new Socket();
       socket.setTcpNoDelay(true);
       socket.setKeepAlive(true);
@@ -346,9 +351,10 @@ public class QuorumNetworkManager extends AbstractFObject {
       socket.setSoTimeout(5000);
       socket.connect(addr, 5000);
 
-      System.out.println("Connect to: " + addr);
       return initialConnection(socket, instance, addr);
     } catch ( SocketException e ) {
+      System.out.println(".............fail connect to " + instanceId);
+      System.out.println(e);
       return false;
     } catch (IOException e) {
       // TODO Auto-generated catch block
@@ -375,6 +381,7 @@ public class QuorumNetworkManager extends AbstractFObject {
       initialMessage.setSourceElectionPort(addr.getPort());
 
       String message = new Outputter(getX()).setPropertyPredicate(new NetworkPropertyPredicate()).stringify(initialMessage);
+      System.out.println("send........");
       System.out.println(message);
       byte[] bytes = message.getBytes();
       out.writeInt(bytes.length);
@@ -388,7 +395,15 @@ public class QuorumNetworkManager extends AbstractFObject {
     }
 
     //TODO: wait for two second.
+    //Thread.sleep(4000);
+    // try {
+    //   Thread.sleep(2000);
+    // } catch ( InterruptedException e ) {
+    //   System.out.println(e);
+    // }
+
     if ( instanceId > mySelf.getId() ) {
+      System.out.println("small id: " + mySelf.getId());
       closeSocket(socket);
       return false;
     }
@@ -407,7 +422,7 @@ public class QuorumNetworkManager extends AbstractFObject {
     return true;
   }
 
-  public void addConnection(Socket socket) {
+  public synchronized void addConnection(Socket socket) {
     QuorumMessage message = null;
     InetSocketAddress clientAddr;
     try {
@@ -432,24 +447,28 @@ public class QuorumNetworkManager extends AbstractFObject {
       FObject request = getX().create(JSONParser.class).parseString(input);
 
       message = (QuorumMessage) request;
-      System.out.println(message);
+      System.out.println("receive...........");
+      System.out.println(input);
 
       clientAddr = new InetSocketAddress(message.getSourceElectionIP(), message.getSourceElectionPort());
 
     } catch ( IOException e ) {
-      //TODO: Log error
+      System.out.println(e);
       closeSocket(socket);
       return;
     }
 
     // Drop Connection.
     if ( message.getSourceInstance() < mySelf.getId() ) {
+      System.out.println("drop connection");
       Sender sender = instanceToSenderMap.get(message.getSourceInstance());
       if ( sender != null ) sender.close();
 
       closeSocket(socket);
+      System.out.println("before maybeConnect");
       maybeConnect(message.getSourceInstance());
     } else {
+      System.out.println("register");
       Sender sender = new Sender(message.getSourceInstance(), socket);
       Receiver receiver = new Receiver(message.getSourceInstance(), socket, sender);
 
@@ -458,7 +477,6 @@ public class QuorumNetworkManager extends AbstractFObject {
 
       instanceToSenderMap.put(message.getSourceInstance(), sender);
       instanceToQueueMap.putIfAbsent(message.getSourceInstance(), new ArrayBlockingQueue<QuorumMessage>(1));
-
       sender.start();
       receiver.start();
     }

@@ -33,13 +33,14 @@ public class Election extends AbstractFObject {
 
   // Manage meta of current instance.
   private QuorumName quorumName;
+  private QuorumService quorumService;
 
   // Sender will send message in the queue.
   LinkedBlockingQueue<QuorumMessage> sendQueue;
   // Receiver will sanitize and put reponse into the queue.
   LinkedBlockingQueue<QuorumMessage> receptedQueue;
 
-  public Election(X x, QuorumNetworkManager networkManager) {
+  public Election(X x, QuorumNetworkManager networkManager, QuorumService quorumService) {
     System.out.println("Election");
     setX(x);
     if ( x == null ) throw new RuntimeException("Context no found.");
@@ -50,8 +51,10 @@ public class Election extends AbstractFObject {
     if ( mySelf == null ) throw new RuntimeException("ClusterNode no found: " + clusterId);
 
     this.networkManager = networkManager;
+    this.quorumService = quorumService;
     sendQueue = new LinkedBlockingQueue<QuorumMessage>();
     receptedQueue = new LinkedBlockingQueue<QuorumMessage>();
+    sendAndReceiver = new SenderAndReceiver();
     sendAndReceiver.start();
   }
 
@@ -135,12 +138,12 @@ public class Election extends AbstractFObject {
 
             // Return latest Vote from this instance.
             if ( ! isVoter(inMessage.getSourceInstance()) ) {
-              Vote vote = quorumName.getLatestVote();
+              Vote vote = quorumService.getPrimaryVote();
               QuorumMessage response = new QuorumMessage();
               response.setMessageType(QuorumMessageType.NOTIFICATION);
               response.setDestinationInstance(inMessage.getSourceInstance());
               response.setSourceInstance(mySelf.getId());
-              response.setSourceStatus(quorumName.getCurrentState());
+              response.setSourceStatus(quorumService.getMyState());
               // Very important!!
               vote.setElectionEra(electionEra.get());
               response.setVote(getVote());
@@ -148,7 +151,7 @@ public class Election extends AbstractFObject {
             } else {
 
               // If this instance is electing, then doing election and sending proposed Primary.
-              if ( quorumName.getCurrentState() == InstanceState.ELECTING ) {
+              if ( quorumService.getMyState() == InstanceState.ELECTING ) {
                 receptedQueue.offer(inMessage);
 
                 // If request instance lag this instance, send back message with current electionEra and CurrentVote.
@@ -161,7 +164,7 @@ public class Election extends AbstractFObject {
                   response.setMessageType(QuorumMessageType.NOTIFICATION);
                   response.setDestinationInstance(inMessage.getSourceInstance());
                   response.setSourceInstance(mySelf.getId());
-                  response.setSourceStatus(quorumName.getCurrentState());
+                  response.setSourceStatus(quorumService.getMyState());
                   response.setVote(getVote());
                   sendQueue.offer(response);
                 }
@@ -174,12 +177,12 @@ public class Election extends AbstractFObject {
                   //TODO: provide a way to allow all voter to have a change to vote at lease once.
 
                   //Vote should set both electionEra and primaryEra
-                  Vote latestVote = quorumName.getLatestVote();
+                  Vote latestVote = quorumService.getPrimaryVote();
                   QuorumMessage response = new QuorumMessage();
                   response.setMessageType(QuorumMessageType.NOTIFICATION);
                   response.setDestinationInstance(inMessage.getSourceInstance());
                   response.setSourceInstance(mySelf.getId());
-                  response.setSourceStatus(quorumName.getCurrentState());
+                  response.setSourceStatus(quorumService.getMyState());
                   response.setVote(latestVote);
                   sendQueue.offer(response);
                 }
@@ -201,7 +204,7 @@ public class Election extends AbstractFObject {
       }
 
       public void run() {
-        while ( ! isRunning ) {
+        while ( isRunning ) {
           try {
             QuorumMessage message = sendQueue.poll(pollInteval, TimeUnit.MICROSECONDS);
             if ( message == null ) {
@@ -266,9 +269,8 @@ public class Election extends AbstractFObject {
       //TODO: have a class to record all received Votes.
       //QuorumVoteSet voteSet;
 
-      while ( quorumName.getCurrentState() == InstanceState.ELECTING && isRunning ) {
+      while ( quorumService.getMyState() == InstanceState.ELECTING && isRunning ) {
         QuorumMessage inMessage = receptedQueue.poll(pollInteval, TimeUnit.MICROSECONDS);
-
         if ( inMessage == null ){
           broadcast();
         } else {
@@ -314,7 +316,9 @@ public class Election extends AbstractFObject {
               }
             }
             //TODO: Check if sourceInstance alread exists?
-            voteMap.put(inMessage.getSourceInstance(), new Vote(proposedPrimary, electionEra.get(), proposedPrimaryEra, proposedCriteria));
+            if ( proposedCriteria == vote.getCriteria() ) {
+              voteMap.put(inMessage.getSourceInstance(), new Vote(proposedPrimary, electionEra.get(), proposedPrimaryEra, proposedCriteria));
+            }
 
             if ( voteMap.size() >= quorumSize ) {
 
@@ -324,11 +328,13 @@ public class Election extends AbstractFObject {
                   // Proposed Primary in the cluster has changed.
                   // Send message back to the queue and re-process it.
                   receptedQueue.put(finalMessage);
+                  voteMap.clear();
                   break;
                 }
               }
 
               if ( finalMessage == null ) {
+                updateState(proposedPrimary);
                 Vote primaryVote = new Vote(proposedPrimary, electionEra.get(), proposedPrimaryEra, proposedCriteria);
                 finishElection(primaryVote);
                 return primaryVote;
@@ -351,16 +357,19 @@ public class Election extends AbstractFObject {
               continue;
             }
 
-            voteMap.put(inMessage.getSourceInstance(), new Vote(proposedPrimary, electionEra.get(), proposedPrimaryEra, proposedCriteria));
+            if ( proposedCriteria == vote.getCriteria() ) {
+              voteMap.put(inMessage.getSourceInstance(), new Vote(proposedPrimary, electionEra.get(), proposedPrimaryEra, proposedCriteria));
+            }
 
             if ( voteMap.size() >= quorumSize || voteMap.get(proposedPrimary) != null ) {
-               Vote primaryVote = new Vote(proposedPrimary, electionEra.get(), proposedPrimaryEra, proposedCriteria);
+              updateState(proposedPrimary);
+              Vote primaryVote = new Vote(proposedPrimary, electionEra.get(), proposedPrimaryEra, proposedCriteria);
               finishElection(primaryVote);
               return primaryVote;
             }
 
           } else {
-            //TODO: Log cannot process this type of message.
+            System.out.println("error state.");
           }
         }
       }
@@ -368,6 +377,11 @@ public class Election extends AbstractFObject {
       //TODO: log error.
     }
     return null;
+  }
+
+  private void updateState(long proposedLeader) {
+    if ( clusterId == proposedLeader ) quorumService.setMyState(InstanceState.PRIMARY);
+    else quorumService.setMyState(InstanceState.SECONDARY);
   }
 
   // Tell every other instance in the cluser: I changed vote.
@@ -385,6 +399,12 @@ public class Election extends AbstractFObject {
       new AbstractSink() {
         @Override
         public void put(Object obj, Detachable sub) {
+
+          try {
+            Thread.sleep(50);
+          } catch ( InterruptedException e ) {
+            System.out.println(e);
+          }
           ClusterNode clusterNode = (ClusterNode) obj;
           QuorumMessage message = new QuorumMessage();
           message.setMessageType(QuorumMessageType.NOTIFICATION);
