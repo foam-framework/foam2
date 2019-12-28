@@ -28,26 +28,38 @@ public class AsyncAssemblyLine
  public void enqueue(Assembly job) {
    final Assembly previous;
 
-   synchronized ( startLock_ ) {
-     previous = q_;
-     q_ = job;
-     job.startJob();
-   }
-
-   pool_.submit(x_, new ContextAgent() { public void execute(X x) {
-     job.executeJob();
-
-     if ( previous != null ) previous.waitToComplete();
-
-     synchronized ( endLock_ ) {
-       job.endJob();
-       job.complete();
+   try {
+     synchronized ( startLock_ ) {
+       previous = q_;
+       q_ = job;
+       job.executeUnderLock();
+       job.startJob();
      }
-
+   } catch (Throwable t) {
      // Isn't required, but helps GC last entry.
      synchronized ( startLock_ ) {
        // If I'm still the only job in the queue, then remove me
        if ( q_ == job ) q_ = null;
+     }
+     throw t;
+   }
+
+   pool_.submit(x_, new ContextAgent() { public void execute(X x) {
+     try {
+       job.executeJob();
+
+       if ( previous != null ) previous.waitToComplete();
+
+       synchronized ( endLock_ ) {
+         job.endJob();
+         job.complete();
+       }
+     } finally {
+       // Isn't required, but helps GC last entry.
+       synchronized ( startLock_ ) {
+         // If I'm still the only job in the queue, then remove me
+         if ( q_ == job ) q_ = null;
+       }
      }
    }}, "SyncAssemblyLine");
  }
