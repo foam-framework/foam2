@@ -43,7 +43,7 @@ foam.CLASS({
       name: 'prevIndex',
       expression: function(lastUpdate, currentIndex, sections) {
         for ( var i = currentIndex - 1 ; i >= 0 ; i-- ) {
-          if ( sections[i].createIsAvailableFor(this.data$).get() ) return i;
+          if ( sections[i].createIsAvailableFor(this.buildModel$).get() ) return i;
         }
         return -1;
       }
@@ -53,7 +53,7 @@ foam.CLASS({
       name: 'nextIndex',
       expression: function(lastUpdate, currentIndex, sections) {
         for ( var i = currentIndex + 1 ; i < sections.length ; i++ ) {
-          if ( sections[i].createIsAvailableFor(this.data$).get() ) return i;
+          if ( sections[i].createIsAvailableFor(this.buildModel$).get() ) return i;
         }
         return -1;
       }
@@ -66,8 +66,8 @@ foam.CLASS({
   ],
   reactions: [
     ['', 'propertyChange.sections', 'restartWizard'],
-    ['', 'propertyChange.data', 'restartWizard'],
-    ['data', 'propertyChange', 'onDataUpdate']
+    ['', 'propertyChange.buildModel', 'restartWizard'],
+    ['buildModel', 'propertyChange', 'onDataUpdate']
   ],
   listeners: [
     {
@@ -75,7 +75,7 @@ foam.CLASS({
       isFramed: true,
       code: function() {
         for ( var i = 0 ; i < this.sections.length ; i++ ) {
-          if ( this.sections[i].createIsAvailableFor(this.data$).get() ) {
+          if ( this.sections[i].createIsAvailableFor(this.buildModel$).get() ) {
             this.currentIndex = i;
             return;
           }
@@ -100,9 +100,9 @@ foam.CLASS({
       label: 'Continue',
       code: function() { this.currentIndex = this.nextIndex; },
       isAvailable: function(nextIndex) { return nextIndex != -1; },
-      isEnabled: function(lastUpdate, data$errors_, sections, currentIndex) {
+      isEnabled: function(lastUpdate, buildModel$errors_, sections, currentIndex) {
         return sections[currentIndex]
-          .createErrorSlotFor(this.data$).get()
+          .createErrorSlotFor(this.buildModel$).get()
           .filter(e => e).length == 0;
       }
     }
@@ -120,7 +120,7 @@ foam.CLASS({
             return self.E()
               .tag(self.sectionView, {
                 section: sections[currentIndex],
-                data$: self.data$
+                data$: self.buildModel$
               });
           })).addClass(this.myClass('wizard-body'))
           .startContext({ data: this })

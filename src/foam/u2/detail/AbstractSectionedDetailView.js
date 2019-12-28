@@ -26,8 +26,22 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'FObjectProperty',
       name: 'data',
+      documentation: `
+      * This prop(property) is now legacy.
+      There was an intersection where 'data' was not meant to be the same
+      as the wizard model to be used - which was with the faceted pattern which is also using prop 'data'.
+
+      However for current implementation, we redirect data property to buildModel,
+      given that buildModel is not defined.
+      `,
+      postSet: function(o, n) {
+        if ( n && ! this.buildModel ) this.buildModel = n;
+      }
+    },
+    {
+      class: 'FObjectProperty',
+      name: 'buildModel',
       factory: function() {
         return this.hasOwnProperty('of') ? this.of.create(null, this) : null;
       },
@@ -38,8 +52,8 @@ foam.CLASS({
     {
       class: 'Class',
       name: 'of',
-      expression: function(data) {
-        return data && data.cls_;
+      expression: function(buildModel) {
+        return buildModel && buildModel.cls_;
       }
     },
     {
@@ -144,7 +158,7 @@ foam.CLASS({
   methods: [
     function init() {
       this.onDetach(this.sections_$.sub(this.updateSections));
-      this.onDetach(this.data$.sub(this.updateSections));
+      this.onDetach(this.buildModel$.sub(this.updateSections));
       this.updateSections();
     }
   ],
@@ -164,7 +178,7 @@ foam.CLASS({
         The things we need to check are:
           1. That the user has permission to see the section if the section is
             configured that way.
-          2. That the section is visible based on the data and the section's
+          2. That the section is visible based on the buildModel and the section's
             'isAvailable' method if there is one.
           3. That the section has at least one visible property or action,
             which is based on:
@@ -185,10 +199,10 @@ foam.CLASS({
         var queuePos = this.nextQueuePosition_++;
 
         // First filter out sections by calling their `isAvailable` method on
-        // `data`. We do this first because it's the cheapest way to filter out
+        // `buildModel`. We do this first because it's the cheapest way to filter out
         // entire sections, which means we don't need to calculate the visibility
         // of properties or actions in those sections.
-        var visibleSections = this.sections_.filter(s => s.createIsAvailableFor(this.data$).get());
+        var visibleSections = this.sections_.filter((s) => s.createIsAvailableFor(this.buildModel$).get());
 
         if ( visibleSections.length === 0 ) {
           if ( queuePos > this.queuePositionWhenLastUpdated_ ) {
@@ -203,7 +217,7 @@ foam.CLASS({
         // to see.
         Promise.all(visibleSections.map((s) => {
           if ( ! s.permissionRequired ) return Promise.resolve(true);
-          return this.auth.check(null, this.data.cls_.id.toLowerCase() + '.section.' + s.name);
+          return this.auth.check(null, this.buildModel.cls_.id.toLowerCase() + '.section.' + s.name);
         }))
           .then((sectionPermissionCheckResults) => {
             visibleSections = visibleSections.filter((_, i) => sectionPermissionCheckResults[i]);
@@ -235,7 +249,7 @@ foam.CLASS({
                   // Next filter by visibility or visibilityExpression since
                   // that's cheaper than the permission check.
                   var vis = prop.visibilityExpression
-                    ? this.data.slot(prop.visibilityExpression).get()
+                    ? this.buildModel.slot(prop.visibilityExpression).get()
                     : prop.visibility;
                   if ( vis === foam.u2.Visibility.HIDDEN ) return null;
 
@@ -250,7 +264,7 @@ foam.CLASS({
                   // check.
                   if ( ! action.isAvailable ) return action;
 
-                  return this.data.slot(action.isAvailable).get() // We assume isAvailable is synchronous.
+                  return this.buildModel.slot(action.isAvailable).get() // We assume isAvailable is synchronous.
                     ? action
                     : null;
                 })
@@ -282,8 +296,8 @@ foam.CLASS({
               // Filter out actions that the user doesn't have permission to see.
               var actionPermissionPromises = visibleActions.map(action => {
                 return Promise.all(action.availablePermissions.map(permission => {
-                  return this.auth.check(null, permission);
-                }));
+                    return this.auth.check(null, permission);
+                  }));
               });
 
               return Promise.all([
