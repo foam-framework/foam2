@@ -28,20 +28,16 @@ public class AsyncAssemblyLine
  public void enqueue(Assembly job) {
    final Assembly previous;
 
-   try {
-     synchronized ( startLock_ ) {
+   synchronized ( startLock_ ) {
+     try {
        previous = q_;
        q_ = job;
        job.executeUnderLock();
        job.startJob();
+     } catch (Throwable t) {
+       q_ = null;
+       throw t;
      }
-   } catch (Throwable t) {
-     // Isn't required, but helps GC last entry.
-     synchronized ( startLock_ ) {
-       // If I'm still the only job in the queue, then remove me
-       if ( q_ == job ) q_ = null;
-     }
-     throw t;
    }
 
    pool_.submit(x_, new ContextAgent() { public void execute(X x) {
