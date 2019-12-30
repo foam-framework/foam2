@@ -75,6 +75,9 @@ foam.CLASS({
   actions: [
     {
       name: 'create',
+      isAvailable: function(config$createEnabled) {
+        return config$createEnabled;
+      },
       code: function() {
         if ( ! this.stack ) return;
         this.stack.push({
