@@ -35,7 +35,7 @@ public class AsyncAssemblyLine
        job.executeUnderLock();
        job.startJob();
      } catch (Throwable t) {
-       q_ = null;
+       q_ = previous;
        throw t;
      }
    }
