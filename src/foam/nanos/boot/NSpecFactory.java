@@ -6,6 +6,9 @@
 
 package foam.nanos.boot;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
 import foam.core.*;
 import foam.dao.ProxyDAO;
 import foam.nanos.*;
@@ -45,7 +48,14 @@ public class NSpecFactory
 
     try {
       if ( logger != null ) logger.info("Creating Service", spec_.getName());
-      ns_ = spec_.createService(x_.getX().put(NSpec.class, spec_));
+      if ( spec_.getLanguage() == foam.nanos.script.Language.BEANSHELL ) {
+        ns_ = spec_.createService(x_.getX().put(NSpec.class, spec_),null);
+      }
+      else if (spec_.getLanguage() == foam.nanos.script.Language.JSHELL) {
+        //PrintStream ps =null;
+        ns_ = spec_.createService(x_.getX().put(NSpec.class, spec_),null);
+      }
+
       Object ns = ns_;
       while ( ns != null ) {
         if (ns instanceof ContextAware) ((ContextAware) ns).setX(x_.getX());
