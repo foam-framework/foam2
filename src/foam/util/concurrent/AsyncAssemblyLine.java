@@ -29,9 +29,9 @@ public class AsyncAssemblyLine
    final Assembly previous;
 
    synchronized ( startLock_ ) {
+     previous = q_;
+     q_ = job;
      try {
-       previous = q_;
-       q_ = job;
        job.executeUnderLock();
        job.startJob();
      } catch (Throwable t) {
