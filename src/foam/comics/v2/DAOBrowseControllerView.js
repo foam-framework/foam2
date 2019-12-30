@@ -7,15 +7,17 @@
 foam.CLASS({
   package: 'foam.comics.v2',
   name: 'DAOBrowseControllerView',
+  extends: 'foam.u2.View',
+
   documentation: `
     The inline DAO controller for a collection of instances of a model that can 
     switch between multiple views
   `,
   
-  extends: 'foam.u2.View',
   imports: [
     'stack'
   ],
+
   requires: [
     'foam.comics.v2.DAOBrowserView',
     'foam.u2.borders.CardBorder',

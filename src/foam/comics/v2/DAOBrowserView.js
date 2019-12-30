@@ -86,10 +86,12 @@ foam.CLASS({
   imports: [
     'stack?'
   ],
+
   exports: [
     'dblclick',
     'filteredTableColumns'
   ],
+
   properties: [
     {
       class: 'StringArray',

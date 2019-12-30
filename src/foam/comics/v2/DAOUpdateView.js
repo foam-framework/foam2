@@ -50,12 +50,15 @@ foam.CLASS({
     'foam.u2.ControllerMode',
     'foam.u2.dialog.NotificationMessage'
   ],
+
   imports: [
     'stack'
   ],
+
   exports: [
     'controllerMode'
   ],
+
   properties: [
     {
       class: 'FObjectProperty',
@@ -87,6 +90,7 @@ foam.CLASS({
       }
     }
   ],
+
   actions: [
     {
       name: 'save',
