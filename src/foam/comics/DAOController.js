@@ -185,20 +185,22 @@ foam.CLASS({
         // they don't make sense when there's only one tab.
         var sectionName = undefined;
         var hasManySections = false;
-        var model = this.data.of.model_;
-        while ( model && model !== foam.core.FObject ) {
-          if ( model.sections ) {
-            hasManySections = model.sections.length > 1;
-            if ( ! hasManySections && model.sections.length === 1 ) {
-              sectionName = sectionName || model.sections[0].name;
+        var cls = this.data.of;
+        while ( foam.core.FObject.isSubClass(cls)
+          && foam.core.FObject !== cls
+        ) {
+          if ( cls.model_.sections ) {
+            hasManySections = cls.model_.sections.length > 1;
+            if ( ! hasManySections && cls.model_.sections.length === 1 ) {
+              sectionName = sectionName || cls.model_.sections[0].name;
               // When model has only one section and the same section already
               // exists on its ancestor, do not count as having many sections.
-              hasManySections = sectionName !== model.sections[0].name;
+              hasManySections = sectionName !== cls.model_.sections[0].name;
             }
           }
 
           if ( hasManySections ) break;
-          model = foam.lookup(model.extends).model_;
+          cls = cls.getSuperClass();
         }
 
         var classId = hasManySections
@@ -261,10 +263,10 @@ foam.CLASS({
     function downloadCSV(x, data) {
       this.csvDriver.exportDAO(x, data)
         .then(function(result) {
-          result = 'data:text/csv;charset=utf-8,' + result;
-          var encodedUri = encodeURI(result);
+          let encodedUri = encodeURIComponent(result);
+          let uri = 'data:text/csv;charset=utf-8,' + encodedUri;
           var link = document.createElement('a');
-          link.setAttribute('href', encodedUri);
+          link.setAttribute('href', uri);
           link.setAttribute('download', 'data.csv');
           document.body.appendChild(link);
           link.click();

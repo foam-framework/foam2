@@ -168,6 +168,12 @@ foam.CLASS({
     }
   ],
   methods: [
+    function init() {
+      // Reset the search filters when a different canned query is selected
+      this.onDetach(this.cannedPredicate$.sub(() => {
+        this.searchPredicate = foam.mlang.predicate.True.create();
+      }));
+    },
     function dblclick(obj) {
       if ( ! this.stack ) return;
       this.stack.push({

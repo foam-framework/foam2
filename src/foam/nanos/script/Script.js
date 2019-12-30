@@ -8,7 +8,10 @@ foam.CLASS({
   package: 'foam.nanos.script',
   name: 'Script',
 
-  implements: ['foam.nanos.auth.EnabledAware'],
+  implements: [
+    'foam.nanos.auth.EnabledAware',
+    'foam.nanos.auth.LastModifiedByAware'
+  ],
 
   requires: [
     'foam.nanos.script.ScriptStatus',
@@ -157,6 +160,12 @@ foam.CLASS({
       class: 'String',
       name: 'notes',
       view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 144 }
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'lastModifiedBy',
+      documentation: 'User who last modified script'
     }
   ],
 

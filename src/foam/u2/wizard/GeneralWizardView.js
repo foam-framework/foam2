@@ -4,6 +4,7 @@ foam.CLASS({
   extends: 'foam.u2.detail.WizardSectionsView',
 
   imports: [
+    'theme',
     'stack'
   ],
 
@@ -13,9 +14,9 @@ foam.CLASS({
   1) have property isSaveDraftAvailable
   2) have method saveDraft(x) // saves progress as user goes through buildModel
   3) have method submit(x) // saves the finished buildModel
-  4) have property isSaveAndExitAvailable
-  4) have method saveAndExit(x) // user saves progress and leaves.
-     // Should only be available for buildModels that are stored in there own daos.`,
+  4) have property isSaveAndExitAvailable // Should only be available for buildModels that are stored in there own daos.
+  5) have method saveAndExit(x) // user saves progress and leaves.
+  `,
 
   css: `
     ^ {
@@ -23,11 +24,10 @@ foam.CLASS({
       flex-direction: column;
       background-color: white;
       position: fixed;
-      top: 0;
-      left: 0;
-      height: 100vh;
-      width: 100vw;
-      z-index: 950;
+      top: 18vh;
+      left: 13vw;
+      height: 71vh;
+      width: 81vw;
       margin: 0;
       padding: 0;
       overflow: scroll;
@@ -38,12 +38,13 @@ foam.CLASS({
     }
 
     ^header {
-      height: 64px;
+      height: 4vh;
       border: solid 1px #edf0f5;
       justify-content: space-between;
       align-items: center;
       display: flex;
-      padding: 0 128px;
+      padding: 0 4vh;
+      background: /*%LOGOBACKGROUNDCOLOUR%*/ #202341;
     }
 
     ^ .foam-u2-ProgressView {
@@ -144,7 +145,7 @@ foam.CLASS({
       this
         .addClass(this.myClass())
         .start().addClass(this.myClass('header'))
-          .start({ class: 'foam.u2.tag.Image', data: 'images/ablii-wordmark.svg' }).addClass(this.myClass('logo')).end()
+          .start({ class: 'foam.u2.tag.Image', data: this.theme.logo }).addClass(this.myClass('logo')).end()
           .startContext({ data: this })
             .start()
               .tag(this.SAVE_AND_EXIT, {

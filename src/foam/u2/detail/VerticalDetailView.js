@@ -20,16 +20,18 @@ foam.CLASS({
       this.SUPER();
       this
         .addClass(this.myClass())
-        .hide(this.loading$)
-        .add(this.slot(function(sections) {
+        .add(this.slot(function(sections, data) {
+          if ( ! data ) return;
           return self.E()
             .start(self.Rows)
               .forEach(sections, function(s) {
                 this
-                  .tag(self.SectionView, {
+                  .start(self.SectionView, {
                     data$: self.data$,
                     section: s
                   })
+                    .show(s.createIsAvailableFor(self.data$))
+                  .end();
               })
             .end();
         }));
