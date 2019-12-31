@@ -43,8 +43,7 @@ public class NanoServiceRouter
         logger.warning("No service found for", serviceKey);
         return;
       }
-      System.out.println(box==null);
-      System.out.println(box.getClass().toGenericString());
+
       box.send(message);
     } catch (Throwable t) {
       logger.error(this.getClass(), "Error servicing request", t);
