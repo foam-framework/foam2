@@ -19,6 +19,7 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'EasyDAO',
   extends: 'foam.dao.ProxyDAO',
+
   implements: [
     'foam.mlang.Expressions',
     'foam.nanos.boot.NSpecAware'
@@ -120,7 +121,6 @@ foam.CLASS({
       name: 'delegate',
       javaFactory: `
         Logger logger = (Logger) getX().get("logger");
-
         foam.dao.DAO delegate = getInnerDAO();
         foam.dao.DAO head = delegate;
         foam.dao.ProxyDAO pxy = null;
@@ -156,11 +156,17 @@ foam.CLASS({
           }
           // The decorator dao may be a proxy chain
           ProxyDAO proxy = (ProxyDAO) getDecorator();
-          while ( proxy.getDelegate() != null ) 
+          while ( proxy.getDelegate() != null )
             proxy = (ProxyDAO) proxy.getDelegate();
           proxy.setDelegate(delegate);
           delegate = (ProxyDAO) getDecorator();
         }
+
+        // set inner delegate_ to handle reentrant
+        // DelegateFactory calls from subsequent DAOs which may
+        // have init_ methods which in turn call getDelegate().
+        delegateIsSet_ = true;
+        delegate_ = new ProxyDAO.Builder(getX()).setDelegate(delegate).build();
 
         if ( getGuid() && getSeqNo() ) 
           throw new RuntimeException("EasyDAO GUID and SeqNo are mutually exclusive");
@@ -212,6 +218,7 @@ foam.CLASS({
           delegate = new foam.nanos.ruler.RulerDAO(getX(), delegate, name);
         }
 
+
         if ( getCreatedAware() )
           delegate = new foam.nanos.auth.CreatedAwareDAO.Builder(getX()).setDelegate(delegate).build();
 
@@ -243,6 +250,20 @@ foam.CLASS({
             .build();
         }
 
+        if ( getCluster() &&
+             getMdao() != null ) {
+          // REVIEW: testing for mdao as a way to only cluster the
+          // real local dao and not duplicate on the non local.
+          // also, ClusterClient uses the MDAO to find the old object
+          // to create a detla for marshalling. 
+          logger.debug(this.getClass().getSimpleName(), "clustering", getOf().getId());
+          delegate = new foam.nanos.mrac.ClusterClientDAO.Builder(getX())
+            .setServiceName(getNSpec().getName())
+            .setDelegate(delegate)
+            .setMdao(getMdao())
+            .build();
+        }
+
         if ( getNSpec() != null && getNSpec().getServe() && ! getAuthorize() && ! getReadOnly() ) 
           logger.warning("EasyDAO", getNSpec().getName(), "Served DAO should be Authorized, or ReadOnly");
 
@@ -261,7 +282,9 @@ foam.CLASS({
         if ( getPm() ) 
           delegate = new foam.dao.PMDAO.Builder(getX()).setNSpec(getNSpec()).setDelegate(delegate).build();
 
-        return delegate;
+        // see comments above regarding DAOs with init_
+        ((ProxyDAO)delegate_).setDelegate(delegate);
+        return delegate_;
       `
     },
     {
@@ -519,6 +542,7 @@ foam.CLASS({
     },
     {
       name: 'retryBoxMaxAttempts',
+      class: 'Boolean',
       generateJava: false,
     },
     {
@@ -542,8 +566,17 @@ foam.CLASS({
       }
     },
     {
+      /** Cluster this DAO */
+      name: 'cluster',
+      class: 'Boolean',
+      javaFactory: `
+    return "true".equals(System.getProperty("CLUSTER"));
+      `
+    },
+    {
       /** Simpler alternative than providing serverBox. */
       name: 'serviceName',
+      class: 'String',
       generateJava: false
     },
     {

@@ -189,6 +189,9 @@ foam.boot.end();
 
   A storageTransient field is not stored to persistent storage.
   foam.json.Storage does not encode storageTransient fields.
+
+  A clusterTransient field is not marshalled over the network to the primary/master node.
+  foam.json.Cluster does not encode clusterTransient fields.
  */
 foam.CLASS({
   refines: 'foam.core.Property',
@@ -208,6 +211,13 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'storageTransient',
+      expression: function(transient) {
+        return transient;
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'clusterTransient',
       expression: function(transient) {
         return transient;
       }

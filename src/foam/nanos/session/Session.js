@@ -103,7 +103,8 @@ foam.CLASS({
       class: 'Long',
       name: 'uses',
       tableWidth: 70,
-      storageTransient: true
+      storageTransient: true,
+      clusterTransient: true
     },
     {
       class: 'String',

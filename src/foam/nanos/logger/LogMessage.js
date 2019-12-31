@@ -77,6 +77,12 @@ foam.CLASS({
     //   class: 'Map'
     // },
     {
+      name: 'thread',
+      class: 'String',
+      visibility: 'RO',
+      javaFactory: `return Thread.currentThread().getName();`
+    },
+    {
       name: 'exception',
       class: 'Object',
       view: { class: 'foam.u2.view.PreView' },
