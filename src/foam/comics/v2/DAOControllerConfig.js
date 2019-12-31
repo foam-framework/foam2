@@ -112,6 +112,12 @@ foam.CLASS({
         // for it which doesn't jive with the AbstractFObjectPropertyInfo.
         return { class: 'foam.u2.borders.NullBorder' };
       }
+    },
+    {
+      class: 'Boolean',
+      name: 'createEnabled',
+      documentation: 'If set to false, the "Create" button will not be visible.',
+      value: true
     }
   ]
 });
