@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.comics.v2',
   name: 'DAOCreateView',
   extends: 'foam.u2.View',
-
+  
   topics: [
     'finished',
     'throwError'
@@ -81,8 +81,18 @@ foam.CLASS({
   actions: [
     {
       name: 'save',
+      isEnabled: function(data$errors_) {
+        return ! data$errors_;
+      },
       code: function() {
-        this.config.dao.put(this.data).then((o) => {
+        var cData = this.data;
+
+        if ( foam.nanos.auth.LifecycleAware.isInstance(cData) ) {
+          cData = cData.clone();
+          cData.lifecycleState = foam.nanos.auth.LifecycleState.PENDING;
+        }
+        
+        this.config.dao.put(cData).then((o) => {
           this.data = o;
           this.finished.pub();
           this.stack.back();

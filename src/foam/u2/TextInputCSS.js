@@ -16,7 +16,7 @@ foam.CLASS({
       name: 'code',
       value: `
         ^ {
-          height: %INPUTHEIGHT%;
+          height: /*%INPUTHEIGHT%*/ 32px;
           font-size: 14px;
           padding-left: %INPUTHORIZONTALPADDING%;
           padding-right: %INPUTHORIZONTALPADDING%;

@@ -162,6 +162,8 @@ var classes = [
   'foam.dao.PMDAO',
   'foam.nanos.pm.PMInfo',
   'foam.dao.PutOnlyDAO',
+  'foam.dao.ORBRequest',
+  'foam.dao.ORBitalDAO',
   'foam.mlang.order.Comparator',
   'foam.mlang.order.Desc',
   'foam.mlang.sink.Count',
@@ -193,6 +195,9 @@ var classes = [
   'foam.nanos.auth.LastModifiedAwareDAO',
   'foam.nanos.auth.LastModifiedByAware',
   'foam.nanos.auth.LastModifiedByAwareDAO',
+  'foam.nanos.auth.LifecycleState',
+  'foam.nanos.auth.LifecycleAware',
+  'foam.nanos.auth.LifecycleAwareDAO',
   'foam.nanos.auth.DeletedAwareDAO',
   'foam.nanos.auth.Permission',
   'foam.nanos.auth.DayOfWeek',
@@ -203,7 +208,7 @@ var classes = [
   'foam.nanos.auth.User',
   'foam.nanos.auth.PriorPassword',
   'foam.nanos.auth.ruler.AddPasswordHistoryAction',
-  'foam.nanos.auth.PasswordPolicyTest',
+  'foam.nanos.auth.test.PasswordPolicyTest',
   'foam.nanos.auth.Country',
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.UserUserJunction',
@@ -303,9 +308,12 @@ var classes = [
   'foam.nanos.notification.email.ClientPOP3EmailService',
   'foam.nanos.notification.push.PushService',
   'foam.nanos.notification.push.FirebasePushService',
+  'foam.nanos.notification.Notifiable',
   'foam.nanos.notification.Notification',
   'foam.nanos.notification.NotificationTemplateDAO',
   'foam.nanos.notification.notifications.ScriptRunNotification',
+  'foam.nanos.notification.EmailSetting',
+  'foam.nanos.notification.NotificationSetting',
   'foam.nanos.script.Script',
 //  'foam.nanos.script.ScriptCompiler',
 //  'foam.nanos.script.JavaShellScriptCompiler',
@@ -347,6 +355,7 @@ var classes = [
   'foam.lib.json.UnknownFObject',
   'foam.lib.json.UnknownFObjectArray',
   'foam.lib.json.ClassReferenceParserTest',
+  'foam.lib.json.PropertyReferenceParserTest',
   'foam.lib.xml.OutputXML',
   'foam.blob.Blob',
   'foam.blob.BlobService',
@@ -456,6 +465,14 @@ var classes = [
   'foam.nanos.analytics.DAOFoldManager',
   'foam.nanos.analytics.DAOReduceManager',
 
+  // Ticket
+  'foam.nanos.ticket.TicketStatus',
+  'foam.nanos.ticket.TicketComment',
+  'foam.nanos.ticket.Ticket',
+  'foam.nanos.ticket.TicketAddCommentDAO',
+  'foam.nanos.ticket.TicketOwnerDAO',
+  'foam.nanos.ticket.TicketCommentOwnerDAO',
+
   // Testing support
   'foam.test.TestEnum',
   'foam.test.AllSerializableProperties',
@@ -515,6 +532,10 @@ var classes = [
   'foam.nanos.mrac.quorum.Vote',
   'foam.nanos.mrac.FilePacket',
   'foam.nanos.mrac.MNService'
+
+  //concurrent
+  'foam.util.concurrent.AbstractAssembly',
+  'foam.util.concurrent.Assembly',
 ];
 
 var abstractClasses = [

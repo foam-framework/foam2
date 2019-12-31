@@ -25,33 +25,15 @@ foam.CLASS({
     {
       class: 'foam.dao.DAOProperty',
       name: 'dao'
-    },
+    }
   ],
 
   methods: [
     {
-      name: 'put',
-      javaCode: `
-        this.put_(x, null, nu);
-      `
-    },
-    {
-      name: 'put_',
-      javaCode: `
-        putWithPrefix_(x, old, nu, "");
-      `
-    },
-    {
-      name: 'remove',
-      javaCode: `
-        removeWithPrefix_(x, obj, "");
-      `
-    },
-    {
       name: 'replay',
       documentation: 'Replays the journal file',
       args: [
-        { name: 'x', type: 'Context' },
+        { name: 'x',   type: 'Context' },
         { name: 'dao', type: 'foam.dao.DAO' }
       ],
       javaCode: `

@@ -518,11 +518,7 @@ return this.find_(this.getX(), id);
     {
       name: 'cmd_',
       code: function cmd_(x, obj) {
-        /** Force the DAO to publish a 'reset' notification. **/
-        if ( this.RESET_CMD == obj ) {
-          this.on.reset.pub();
-          return true;
-        }
+        console.warn('Unrecognized command');
         return undefined;
       },
       javaCode: `

@@ -3,6 +3,7 @@
  * Copyright 2019 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
+
 foam.CLASS({
   package: 'foam.nanos.crunch',
   name: 'Capability',
@@ -39,21 +40,35 @@ foam.CLASS({
     'daoKey'
   ],
 
+  sections: [
+    {
+      name: '_defaultSection',
+      title: 'Administrative'
+    },
+    {
+      name: 'uiSettings',
+      title: 'UI Settings',
+      help: 'These properties are used to control how this capability appears in the GUI.'
+    }
+  ],
+
   properties: [
-    
     {
       name: 'id',
-      class: 'String'
+      class: 'String',
+      updateMode: 'RO'
     }, 
     {
       name: 'icon',
       class: 'Image',
-      documentation: `Path to capability icon`
+      documentation: `Path to capability icon`,
+      section: 'uiSettings'
     },
     {
       name: 'description',
       class: 'String',
-      documentation: `Description of capability`
+      documentation: `Description of capability`,
+      section: 'uiSettings'
     },
     {
       name: 'notes',
@@ -78,7 +93,8 @@ foam.CLASS({
     {
       name: 'visible',
       class: 'Boolean',
-      documentation: `Hide sub-capabilities which aren't top-level and individually selectable. when true, capability is visible to the user`
+      documentation: `Hide sub-capabilities which aren't top-level and individually selectable. when true, capability is visible to the user`,
+      section: 'uiSettings'
     },
     {
       name: 'expiry',
@@ -103,8 +119,7 @@ foam.CLASS({
     },
     {
       name: 'daoKey',
-      class: 'String',
-      visibility: 'RO'
+      class: 'String'
     }
   ],
 

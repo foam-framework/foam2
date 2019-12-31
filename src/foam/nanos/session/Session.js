@@ -21,7 +21,8 @@ foam.CLASS({
     'foam.nanos.logger.Logger',
     'foam.nanos.logger.PrefixLogger',
     'foam.util.SafetyUtil',
-    'java.util.Date'
+    'java.util.Date',
+    'static foam.mlang.MLang.*'
   ],
 
   tableColumns: [
@@ -217,6 +218,9 @@ foam.CLASS({
 
         if ( getUserId() == 0 ) return rtn;
 
+        // Validate
+        validate(x);
+
         DAO localUserDAO  = (DAO) x.get("localUserDAO");
         DAO localGroupDAO = (DAO) x.get("localGroupDAO");
         AuthService auth  = (AuthService) x.get("auth");
@@ -231,8 +235,6 @@ foam.CLASS({
           .put("agent", agent)
           .put("logger", new PrefixLogger(prefix, (Logger) x.get("logger")))
           .put("twoFactorSuccess", getContext().get("twoFactorSuccess"))
-
-          // TODO: I'm not sure if this is necessary.
           .put(CachingAuthService.CACHE_KEY, getContext().get(CachingAuthService.CACHE_KEY));
 
         // We need to do this after the user and agent have been put since
@@ -242,6 +244,61 @@ foam.CLASS({
         return rtn
           .put("group", group)
           .put("appConfig", group.getAppConfig(rtn));
+      `
+    },
+    {
+      name: 'validate',
+      args: [
+        { name: 'x', type: 'Context' }
+      ],
+      javaCode: `
+        if ( getUserId() < 0 ) {
+          throw new IllegalStateException("User id is invalid.");
+        }
+
+        if ( getAgentId() < 0 ) {
+          throw new IllegalStateException("Agent id is invalid.");
+        }
+
+        if ( getUserId() > 0 ) {
+          checkUserEnabled(x, getUserId());
+        }
+
+        if ( getAgentId() > 0 ) {
+          checkUserEnabled(x, getAgentId());
+
+          DAO agentJunctionDAO = (DAO) x.get("agentJunctionDAO");
+          UserUserJunction junction = (UserUserJunction) agentJunctionDAO.find(
+            AND(
+              EQ(UserUserJunction.SOURCE_ID, getAgentId()),
+              EQ(UserUserJunction.TARGET_ID, getUserId())
+            )
+          );
+
+          if ( junction == null ) {
+            throw new RuntimeException("The junction between user and agent was not found.");
+          }
+        }
+      `
+    },
+    {
+      name: 'checkUserEnabled',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'userId', type: 'Long' }
+      ],
+      javaCode: `
+        User user = (User) ((DAO) x.get("localUserDAO")).find(userId);
+
+       if ( user == null
+         || (user instanceof DeletedAware && ((DeletedAware)user).getDeleted())
+       ) {
+          throw new RuntimeException(String.format("User with id '%d' not found.", userId));
+        }
+
+        if ( ! user.getEnabled() ) {
+          throw new RuntimeException(String.format("The user with id '%d' has been disabled.", userId));
+        }
       `
     }
   ]

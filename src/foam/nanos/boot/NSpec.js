@@ -6,6 +6,9 @@
 foam.CLASS({
   package: 'foam.nanos.boot',
   name: 'NSpec',
+  javaImplements: [
+    'foam.nanos.auth.EnabledAware'
+  ],
 
   requires: [
     {
@@ -114,7 +117,7 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       name: 'service',
-      view: { class: 'foam.u2.view.FObjectView' },
+      view: { class: 'foam.u2.detail.SectionedDetailView' },
       readPermissionRequired: true,
       writePermissionRequired: true
     },
@@ -158,6 +161,13 @@ foam.CLASS({
         writeView: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 140 },
         readView: { class: 'foam.u2.view.PreView' }
       },
+      readPermissionRequired: true,
+      writePermissionRequired: true
+    },
+    {
+      class: 'Boolean',
+      name: 'enabled',
+      value: true,
       readPermissionRequired: true,
       writePermissionRequired: true
     }

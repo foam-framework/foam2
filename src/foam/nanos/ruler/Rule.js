@@ -10,6 +10,17 @@
 
   documentation: 'Rule model represents rules(actions) that need to be applied in case passed object satisfies provided predicate.',
 
+  implements: [
+    'foam.nanos.auth.CreatedAware',
+    'foam.nanos.auth.CreatedByAware',
+    'foam.nanos.auth.LastModifiedAware',
+    'foam.nanos.auth.LastModifiedByAware'
+  ],
+
+  imports: [
+    'userDAO'
+  ],
+
   javaImports: [
     'foam.core.ContextAware',
     'foam.core.FObject',
@@ -26,7 +37,9 @@
     'enabled',
     'priority',
     'daoKey',
-    'documentation'
+    'documentation',
+    'createdBy',
+    'lastModifiedBy'
   ],
 
   searchColumns: [
@@ -191,6 +204,46 @@
         }
         return null;
       `
+    },
+    {
+      class: 'DateTime',
+      name: 'created',
+      createMode: 'HIDDEN',
+      updateMode: 'RO'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdBy',
+      createMode: 'HIDDEN',
+      updateMode: 'RO',
+      tableCellFormatter: function(value, obj) {
+        obj.userDAO.find(value).then(function(user) {
+          if ( user ) {
+            this.add(user.legalName);
+          }
+        }.bind(this));
+      }
+    },
+    {
+      class: 'DateTime',
+      name: 'lastModified',
+      createMode: 'HIDDEN',
+      updateMode: 'RO'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'lastModifiedBy',
+      createMode: 'HIDDEN',
+      updateMode: 'RO',
+      tableCellFormatter: function(value, obj) {
+        obj.userDAO.find(value).then(function(user) {
+          if ( user ) {
+            this.add(user.legalName);
+          }
+        }.bind(this));
+      }
     }
   ],
 
@@ -249,12 +302,16 @@
           type: 'foam.nanos.ruler.RuleEngine'
         },
         {
+          name: 'rule',
+          type: 'foam.nanos.ruler.Rule'
+        },
+        {
           name: 'agency',
           type: 'foam.core.Agency'
         }
       ],
       javaCode: `
-        getAction().applyAction(x, obj, oldObj, ruler, agency);
+        getAction().applyAction(x, obj, oldObj, ruler, rule, agency);
       `
     },
     {
@@ -275,10 +332,14 @@
         {
           name: 'ruler',
           type: 'foam.nanos.ruler.RuleEngine'
-        }
+        },
+        {
+          name: 'rule',
+          type: 'foam.nanos.ruler.Rule'
+        },
       ],
       javaCode: `
-        getAsyncAction().applyAction(x, obj, oldObj, ruler, new DirectAgency());
+        getAsyncAction().applyAction(x, obj, oldObj, ruler, rule, new DirectAgency());
         if ( ! getAfter() ) {
           ruler.getDelegate().cmd_(x.put("OBJ", obj), getCmd());
         }

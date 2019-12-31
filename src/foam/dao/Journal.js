@@ -11,30 +11,28 @@ foam.INTERFACE({
   methods: [
     {
       name: 'put',
+      type: 'FObject',
       args: [
-        { name: 'x', type: 'Context' },
-        { name: 'nu', type: 'foam.core.FObject' }
-      ]
-    },
-    {
-      name: 'put_',
-      args: [
-        { name: 'x', type: 'Context' },
-        { name: 'old', type: 'foam.core.FObject' },
-        { name: 'nu', type: 'foam.core.FObject' }
+        { name: 'x',      type: 'Context' },
+        { name: 'prefix', type: 'String' },
+        { name: 'dao',    type: 'DAO' },
+        { name: 'obj',    type: 'foam.core.FObject' }
       ]
     },
     {
       name: 'remove',
+      type: 'FObject',
       args: [
-        { name: 'x', type: 'Context' },
-        { name: 'obj', type: 'foam.core.FObject' }
+        { name: 'x',      type: 'Context' },
+        { name: 'prefix', type: 'String' },
+        { name: 'dao',    type: 'DAO' },
+        { name: 'obj',    type: 'foam.core.FObject' }
       ]
     },
     {
       name: 'replay',
       args: [
-        { name: 'x', type: 'Context' },
+        { name: 'x',   type: 'Context' },
         { name: 'dao', type: 'foam.dao.DAO' }
       ]
     }
@@ -49,18 +47,6 @@ foam.CLASS({
 
   implements: [
     'foam.dao.Journal'
-  ],
-
-  methods: [
-    {
-      name: 'put',
-      code: function (x, nu) {
-        this.put_(x, null, nu);
-      },
-      javaCode: `
-        this.put_(x, null, nu);
-      `
-    }
   ]
 });
 
@@ -78,7 +64,7 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.dao.Journal',
       name: 'delegate',
-      forwards: [ 'put_', 'remove', 'replay' ]
+      forwards: [ 'put', 'remove', 'replay' ]
     }
   ]
 });

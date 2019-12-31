@@ -14,6 +14,7 @@ foam.CLASS({
     'foam.comics.DAOController',
     'foam.comics.DAOUpdateControllerView',
     'foam.u2.view.ScrollTableView',
+    'foam.nanos.u2.navigation.IFrameTopNavigation',
     'foam.u2.dialog.Popup'
   ],
 
@@ -212,6 +213,15 @@ foam.CLASS({
           .end());
 
       this.add(this.data.border);
+      if ( this.isIframe() ) this.tag(this.IFrameTopNavigation);
+    },
+
+    function isIframe () {
+      try {
+        return window.self !== window.top;
+      } catch (e) {
+        return true;
+      }
     },
 
     function dblclick(obj) {

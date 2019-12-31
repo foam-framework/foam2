@@ -29,6 +29,7 @@ foam.CLASS({
   sections: [
     {
       name: 'scheduling',
+      isAvailable: function(id) { return !! id; },
       order: 2
     },
     {
@@ -39,10 +40,14 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'schedule',
       class: 'FObjectProperty',
       of: 'foam.nanos.cron.Schedule',
       name: 'schedule',
-      view: { class: 'foam.u2.DetailView' },
+      view: {
+        class: 'foam.u2.view.FObjectView',
+        of: 'foam.nanos.cron.Schedule'
+      },
       section: 'scheduling',
       javaFactory: `return new CronSchedule.Builder(getX()).build();`
     },

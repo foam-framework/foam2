@@ -41,6 +41,9 @@ FOAM_FILES([
   { name: "foam/nanos/auth/CreatedAwareDAO" },
   { name: "foam/nanos/auth/LastModifiedAware" },
   { name: "foam/nanos/auth/LastModifiedAwareDAO" },
+  { name: "foam/nanos/auth/LifecycleState" },
+  { name: "foam/nanos/auth/LifecycleAware" },
+  { name: "foam/nanos/auth/LifecycleAwareDAO" },
   { name: "foam/nanos/auth/Login" },
   { name: "foam/nanos/auth/Permission" },
   { name: "foam/nanos/auth/Country" },
@@ -70,8 +73,6 @@ FOAM_FILES([
   { name: "foam/nanos/auth/CreatedByAwareDAO" },
   { name: "foam/nanos/auth/LastModifiedByAware" },
   { name: "foam/nanos/auth/LastModifiedByAwareDAO" },
-  { name: "foam/nanos/auth/SignInView", flags: ['web'] },
-  { name: "foam/nanos/auth/SignUpView", flags: ['web'] },
   { name: "foam/nanos/auth/PermissionedPropertyDAO" },
   { name: "foam/nanos/auth/ProfilePictureView", flags: ['web'] },
   { name: "foam/nanos/auth/twofactor/OTPAuthService" },
@@ -190,6 +191,17 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/NotificationNotificationView'},
   { name: 'foam/nanos/notification/notifications/ScriptRunNotificationNotificationView'},
   { name: 'foam/nanos/dashboard/Demo' },
+
+  // Ticket
+  { name: 'foam/nanos/ticket/TicketStatus' },
+  { name: 'foam/nanos/ticket/TicketComment' },
+  { name: 'foam/nanos/ticket/Ticket' },
+  { name: 'foam/nanos/ticket/Relationships' },
+  { name: 'foam/nanos/ticket/TicketAddCommentDAO' },
+  { name: 'foam/nanos/ticket/TicketOwnerDAO' },
+  { name: 'foam/nanos/ticket/TicketCommentOwnerDAO' },
+  { name: 'foam/nanos/ticket/TicketSummaryView' },
+  { name: 'foam/nanos/ticket/SummaryCard' },
 
   // Dig
   { name: "foam/nanos/dig/exception/DigErrorMessage" },

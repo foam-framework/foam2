@@ -86,7 +86,9 @@ foam.CLASS({
     ^error .foam-u2-IntView,
     ^error .foam-u2-FloatView,
     ^error .foam-u2-DateView,
-    ^error .foam-u2-view-date-DateTimePicker .date-display-box
+    ^error .foam-u2-view-date-DateTimePicker .date-display-box,
+    ^error .foam-u2-view-RichChoiceView-selection-view
+
     {
       border-color: /*%DESTRUCTIVE3%*/ #d9170e !important;
     }
@@ -122,7 +124,6 @@ foam.CLASS({
     ^ .foam-u2-view-RichChoiceView-selection-view {
       width: 100%;
       border-radius: 3px;
-      border: solid 1px #8e9090;
       background-color: #ffffff;
       box-sizing: border-box;
       -webkit-appearance: none;
@@ -250,7 +251,7 @@ foam.CLASS({
                 .style({ 'position': 'relative', 'display': 'inline-flex', 'width': '100%' })
                 .start()
                   .style({ 'flex-grow': 1 })
-                  .tag(prop, { mode: this.mode })
+                  .tag(prop, { mode$: this.mode$ })
                   .callIf(prop.validationStyleEnabled, function() {
                     this.enableClass(self.myClass('error'), errorSlot);
                   })
