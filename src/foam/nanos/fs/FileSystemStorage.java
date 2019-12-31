@@ -30,8 +30,6 @@ public class FileSystemStorage extends AbstractStorage {
   protected Path getPath(String name) {
     FileSystem fs = getFS();
     if ( fs == null ) return null;
-    System.out.println("***************");
-    System.out.println(resourceDir_);
     return SafetyUtil.isEmpty(resourceDir_) ? fs.getPath(name) : fs.getPath(resourceDir_, name);
   }
 }
