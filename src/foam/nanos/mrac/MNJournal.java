@@ -57,18 +57,22 @@ public class MNJournal extends FileJournal {
   }
 
 
-  public void put_(X x, FObject obj) {
+  @Override
+  public FObject put(X x, String prefix, DAO dao, FObject obj) {
     System.out.println("MNPut");
     MedusaEntry entry = (MedusaEntry) obj;
     entry.setAction("p");
     String msg = new Outputter(x).stringify(obj);
     doWrite(x, msg + "\n");
+    return obj;
   }
 
-  public void remove_(X x, FObject obj) {
+  @Override
+  public FObject remove(X x, String prefix, DAO dao, FObject obj) {
     MedusaEntry entry = (MedusaEntry) obj;
     entry.setAction("r");
     doWrite(x, new Outputter(x).stringify(obj) + "\n");
+    return obj;
   }
 
   private void doWrite(X x, String record) {

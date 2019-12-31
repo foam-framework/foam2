@@ -20,6 +20,7 @@ public class MMDAO extends JDAO {
   //TODO: inject NSpec to record where the entry come from.
   //nSpec.getName();
   NSpec nspec;
+  String nspecKey;
 
   public MMDAO(X x, ClassInfo classInfo, String mnPort) {
     setX(x);
@@ -45,7 +46,7 @@ public class MMDAO extends JDAO {
     FObject result = null;
     //TODO: Change to assembly version.
     synchronized ( uniqueStringLock ) {
-      getJournal().put_(x, null, obj);
+      getJournal().put(x, nspecKey, getDelegate(), obj);
       result = getDelegate().put_(x, obj);
     }
     return result;

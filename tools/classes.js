@@ -531,7 +531,7 @@ var classes = [
   'foam.nanos.mrac.quorum.QuorumMessageType',
   'foam.nanos.mrac.quorum.Vote',
   'foam.nanos.mrac.FilePacket',
-  'foam.nanos.mrac.MNService'
+  'foam.nanos.mrac.MNService',
 
   //concurrent
   'foam.util.concurrent.AbstractAssembly',

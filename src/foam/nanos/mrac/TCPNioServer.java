@@ -277,13 +277,12 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
       try {
         this.selector.select();
 
-        Set<SelectionKey> keys = selector.selectedKeys();
-        Iterator<SelectionKey> iterator = new ArrayList<SelectionKey>(keys).iterator();
+        Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
 
         while ( isRunning.get() && iterator.hasNext() ) {
           SelectionKey key = iterator.next();
           //Remove from selected Set.
-          keys.remove(key);
+          iterator.remove();
 
           if ( key.isValid() == false ) {
             removeSelectionKey(key);
@@ -342,8 +341,9 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
           lenbuffer.flip();
           messageLen = lenbuffer.getInt();
           lenbuffer.clear();
-          if ( messageLen < 0 ) throw new IOException("Len error " + messageLen);
         }
+        if ( messageLen < 0 ) throw new IOException("Len error " + messageLen);
+
 
         // Read message.
         ByteBuffer message = ByteBuffer.allocate(messageLen);

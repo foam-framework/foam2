@@ -57,5 +57,22 @@ foam.CLASS({
       class: 'String',
       name: 'signature'
     }
+  ],
+
+  methods: [
+    {
+      name: 'compareTo',
+      type: 'Integer',
+      args: [ { name: 'o', type: 'Any' } ],
+      javaCode: `
+        if ( o == this ) return 0;
+        if ( o == null ) return 1;
+        if ( ! ( o instanceof MedusaEntry ) ) return 1;
+
+        MedusaEntry entry = (MedusaEntry) o;
+        return Long.compare(this.getMyIndex(), entry.getMyIndex());
+
+      `
+    }
   ]
 });
