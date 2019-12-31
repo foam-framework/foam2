@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
@@ -124,7 +124,7 @@ public class SessionServerBox
 
       msg.getLocalAttributes().put("x", effectiveContext);
     } catch (Throwable t) {
-      logger.error("Error throw in SessionServerBox: " + t, " ,service: " + spec.getName(), t);
+      logger.error("Error throw in SessionServerBox: " + t, " ,service: " + spec.getName());
       t.printStackTrace();
       msg.replyWithException(t);
       return;
