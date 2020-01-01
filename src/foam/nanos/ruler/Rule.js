@@ -275,9 +275,8 @@
           try {
             return getPredicate().f(obj);
           } catch ( Throwable th ) { }
-
-          ((Logger) x.get("logger")).error(
-            "Failed to evaluate predicate of rule: " + getId(), t);
+          // ((Logger) x.get("logger")).debug(this.getClass().getSimpleName(), "id", getId(), "\\nrule", this, "\\nobj", obj, "\\nold", oldObj, "\\n", t);
+          ((Logger) x.get("logger")).error("Failed to evaluate predicate of rule: " + getId(), t);
           return false;
         }
       `

@@ -57,21 +57,27 @@ public class RuleEngine extends ContextAwareSupport {
   public void execute(List<Rule> rules, FObject obj, FObject oldObj) {
     CompoundContextAgency compoundAgency = new CompoundContextAgency();
     ContextualizingAgency agency = new ContextualizingAgency(compoundAgency, userX_, getX());
+    Logger logger = (Logger) getX().get("logger");
     for (Rule rule : rules) {
-      if ( stops_.get() ) break;
-      if ( ! isRuleApplicable(rule, obj, oldObj)) continue;
-      PM pm = (PM) x_.get("PM");
-      pm.setClassType(RulerDAO.getOwnClassInfo());
-      pm.setName(rule.getDaoKey() + ": " + rule.getId());
-      pm.init_();
-      applyRule(rule, obj, oldObj, agency);
-      pm.log(x_);
-      agency.submit(x_, x -> saveHistory(rule, obj), "Save history. Rule id:" + rule.getId());
+      try {
+        if ( stops_.get() ) break;
+        if ( ! isRuleApplicable(rule, obj, oldObj)) continue;
+        PM pm = (PM) x_.get("PM");
+        pm.setClassType(RulerDAO.getOwnClassInfo());
+        pm.setName(rule.getDaoKey() + ": " + rule.getId());
+        pm.init_();
+        applyRule(rule, obj, oldObj, agency);
+        pm.log(x_);
+        agency.submit(x_, x -> saveHistory(rule, obj), "Save history. Rule id:" + rule.getId());
+      } catch ( Exception e ) {
+        // logger.debug(this.getClass().getSimpleName(), "id", rule.getId(), "\\nrule", rule, "\\nobj", obj, "\\nold", oldObj, "\\n", e);
+        logger.error(this.getClass().getSimpleName(), "id", rule.getId(), e);
+        throw e;
+      }
     }
     try {
       compoundAgency.execute(x_);
     } catch (Exception e) {
-      Logger logger = (Logger) x_.get("logger");
       logger.error(e.getMessage(), e);
     }
 
