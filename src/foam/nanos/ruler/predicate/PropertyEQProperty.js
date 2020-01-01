@@ -42,11 +42,12 @@ foam.CLASS({
     {
       name: 'f',
       javaCode: `
-        if ( getIsNew() ) {
+        FObject old = (FObject) OLD_OBJ.f(obj);
+        if ( getIsNew() ||
+             old == null ) {
           FObject nu  = (FObject) NEW_OBJ.f(obj);
           return EQ(nu.getClassInfo().getAxiomByName(getProp1()), nu.getClassInfo().getAxiomByName(getProp2())).f(nu);
         }
-        FObject old = (FObject) OLD_OBJ.f(obj);
         return EQ(old.getClassInfo().getAxiomByName(getProp1()), old.getClassInfo().getAxiomByName(getProp2())).f(old);
       `
     }
