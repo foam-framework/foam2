@@ -323,7 +323,6 @@ foam.CLASS({
       class: 'Date',
       name: 'birthday',
       documentation: 'The date of birth of the individual person, or real user.',
-      createMode: 'HIDDEN',
       section: 'personal'
     },
     {
