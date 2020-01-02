@@ -40,13 +40,15 @@ foam.CLASS({
     {
       name: 'f',
       javaCode: `
-        FObject old = (FObject) OLD_OBJ.f(obj);
-        if ( getIsNew() ||
-             old == null ) {
+        if ( getIsNew() ) {
           FObject nu  = (FObject) NEW_OBJ.f(obj);
           return EQ(nu.getClassInfo().getAxiomByName(getPropName()), getPropValue()).f(nu);
         }
-        return EQ(old.getClassInfo().getAxiomByName(getPropName()), getPropValue()).f(old);
+        FObject old = (FObject) OLD_OBJ.f(obj);
+        if ( old != null ) {
+          return EQ(old.getClassInfo().getAxiomByName(getPropName()), getPropValue()).f(old);
+        }
+        return false;
       `
     }
   ]
