@@ -45,7 +45,10 @@ foam.CLASS({
           return NEQ(nu.getClassInfo().getAxiomByName(getPropName()), getPropValue()).f(nu);
         }
         FObject old = (FObject) OLD_OBJ.f(obj);
-        return NEQ(old.getClassInfo().getAxiomByName(getPropName()), getPropValue()).f(old);
+        if ( old != null ) {
+          return NEQ(old.getClassInfo().getAxiomByName(getPropName()), getPropValue()).f(old);
+        }
+        return false;
       `
     }
   ]
