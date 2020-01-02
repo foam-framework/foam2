@@ -17,6 +17,10 @@
     'foam.nanos.auth.LastModifiedByAware'
   ],
 
+  imports: [
+    'userDAO'
+  ],
+
   javaImports: [
     'foam.core.ContextAware',
     'foam.core.FObject',
@@ -204,13 +208,15 @@
     {
       class: 'DateTime',
       name: 'created',
-      visibility: 'RO'
+      createMode: 'HIDDEN',
+      updateMode: 'RO'
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdBy',
-      visibility: 'RO',
+      createMode: 'HIDDEN',
+      updateMode: 'RO',
       tableCellFormatter: function(value, obj) {
         obj.userDAO.find(value).then(function(user) {
           if ( user ) {
@@ -222,13 +228,15 @@
     {
       class: 'DateTime',
       name: 'lastModified',
-      visibility: 'RO'
+      createMode: 'HIDDEN',
+      updateMode: 'RO'
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'lastModifiedBy',
-      visibility: 'RO',
+      createMode: 'HIDDEN',
+      updateMode: 'RO',
       tableCellFormatter: function(value, obj) {
         obj.userDAO.find(value).then(function(user) {
           if ( user ) {

@@ -29,7 +29,7 @@ foam.CLASS({
           type: 'X'
         }
       ],
-      javaCode: ``
+      javaCode: '/*nop*/'
     }
   ]
 });
