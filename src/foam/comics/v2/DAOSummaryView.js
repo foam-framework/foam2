@@ -55,12 +55,15 @@ foam.CLASS({
     'foam.u2.dialog.NotificationMessage',
     'foam.u2.dialog.Popup',
   ],
+
   imports: [
     'stack'
   ],
+
   exports: [
     'controllerMode'
   ],
+
   properties: [
     {
       class: 'FObjectProperty',
@@ -93,6 +96,7 @@ foam.CLASS({
       }
     }
   ],
+
   actions: [
     {
       name: 'edit',
@@ -121,6 +125,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function initE() {
       var self = this;
