@@ -56,6 +56,7 @@ foam.CLASS({
   ],
 
   imports: [
+    'ctrl',
     'stack'
   ],
 
@@ -104,6 +105,9 @@ foam.CLASS({
           this.data = o;
           this.finished.pub();
           this.stack.back();
+          this.ctrl.add(this.NotificationMessage.create({
+            message: `${this.data.model_.label} updated.`
+          }));
         }, e => {
           this.throwError.pub(e);
           this.add(this.NotificationMessage.create({
