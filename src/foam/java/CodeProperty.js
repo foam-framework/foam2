@@ -23,6 +23,7 @@ foam.CLASS({
     {
       name: 'adapt',
       value: function(o, v) {
+        if ( v == 'false' || v == 'true') return v;
         if ( typeof v === 'string' ) return foam.java.Code.create({ data: v });
         return v;
       }

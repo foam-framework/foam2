@@ -41,9 +41,7 @@ foam.CLASS({
         this.final ? 'final ' : '',
         this.type, ' ', this.name);
       if ( this.initializer ) {
-        o.increaseIndent();
         o.out(' = ', this.initializer);
-        o.decreaseIndent();
       }
       o.out(';\n');
     }
