@@ -125,11 +125,11 @@ foam.CLASS({
               .start(self.Rows)
                 // we will handle this in the StackView instead
                 .startContext({ data: self.stack })
-                    .tag(self.stack.BACK, {
-                      buttonStyle: foam.u2.ButtonStyle.TERTIARY,
-                      icon: 'images/back-icon.svg',
-                      label: originalName
-                    })
+                  .tag(self.stack.BACK, {
+                    buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                    icon: 'images/back-icon.svg',
+                    label: originalName
+                  })
                 .endContext()
                 .start(self.Cols).style({ 'align-items': 'center' })
                   .start()
