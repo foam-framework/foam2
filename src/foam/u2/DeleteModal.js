@@ -28,7 +28,7 @@ foam.CLASS({
   messages: [
     { name: 'TITLE', message: 'Delete ' },
     { name: 'CONFIRM_DELETE_1', message: 'Are you sure you want to delete' },
-    { name: 'SUCCESS_MSG', message: 'Successfully deleted' },
+    { name: 'SUCCESS_MSG', message: ' deleted.' },
     { name: 'FAIL_MSG', message: 'Failed to delete' }
   ],
 
@@ -77,7 +77,7 @@ foam.CLASS({
       label: 'Delete',
       code: function(X) {
         this.dao.remove(this.data).then((_) => {
-          this.notify(this.SUCCESS_MSG);
+          this.notify(this.data.model_.label + this.SUCCESS_MSG);
           this.onDelete();
         }).catch((err) => {
           this.notify(err.message || this.FAIL_MSG, 'error');

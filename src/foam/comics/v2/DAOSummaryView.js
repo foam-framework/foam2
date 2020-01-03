@@ -139,16 +139,16 @@ foam.CLASS({
               .start(self.Rows)
                 // we will handle this in the StackView instead
                 .startContext({ data: self.stack })
-                    .tag(self.stack.BACK, {
-                      buttonStyle: foam.u2.ButtonStyle.TERTIARY,
-                      icon: 'images/back-icon.svg',
-                      label: `All ${config$browseTitle}`
-                    })
+                  .tag(self.stack.BACK, {
+                    buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                    icon: 'images/back-icon.svg',
+                    label: `All ${config$browseTitle}`
+                  })
                 .endContext()
                 .start(self.Cols).style({ 'align-items': 'center' })
                   .start()
                     .add(data.toSummary())
-                      .addClass(this.myClass('account-name'))
+                    .addClass(this.myClass('account-name'))
                   .end()
                   .startContext({ data }).add(self.primary).endContext()
                 .end()
@@ -156,14 +156,16 @@ foam.CLASS({
 
               .start(self.Cols)
                 .start(self.Cols).addClass(this.myClass('actions-header'))
-                  .startContext({data: self}).tag(self.EDIT, {
-                    buttonStyle: foam.u2.ButtonStyle.TERTIARY,
-                    icon: 'images/edit-icon.svg'
-                  }).endContext()
-                  .startContext({data: self}).tag(self.DELETE, {
-                    buttonStyle: foam.u2.ButtonStyle.TERTIARY,
-                    icon: 'images/delete-icon.svg'
-                  }).endContext()
+                  .startContext({ data: self })
+                    .tag(self.EDIT, {
+                      buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                      icon: 'images/edit-icon.svg'
+                    })
+                    .tag(self.DELETE, {
+                      buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                      icon: 'images/delete-icon.svg'
+                    })
+                  .endContext()
                 .end()
               .end()
 
