@@ -2888,3 +2888,24 @@ foam.CLASS({
     }
   ]
 });
+
+
+foam.SCRIPT({
+  package: 'foam.u2',
+  name: 'UpdateModelTableColumnsScript',
+  code: function() {
+    // debugger;
+    console.log('Running this script...');
+    foam.core.Model.axiomMap_['tableColumns__axiom_'] =
+      foam.u2.TableColumns.create({columns: ['id']});
+  }
+});
+/*
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'ModelU2Refinements2',
+  refines: 'foam.core.Model',
+
+  tableColumns: ['id'],
+});
+*/

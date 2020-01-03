@@ -91,7 +91,7 @@ foam.CLASS({
       name: 'columns',
       expression: function(of, allColumns) {
         if ( ! of ) return [];
-        var tc = of.getAxiomByName('tableColumns');
+        var tc = of.getAxiomsByClass(foam.u2.TableColumns)[0];
         return tc ? tc.columns.map(c => of.getAxiomByName(c)) : allColumns;
       },
     },
