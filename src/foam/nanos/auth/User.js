@@ -145,7 +145,7 @@ foam.CLASS({
       // TODO: Use validatationPredicates instead.
       validateObj: function(firstName) {
         if ( ! firstName.trim() ) {
-          return 'First Name Required.';
+          return 'First name required.';
         }
       },
       gridColumns: 4,
@@ -167,7 +167,7 @@ foam.CLASS({
       // TODO: Use validatationPredicates instead.
       validateObj: function(lastName) {
         if ( ! lastName.trim() ) {
-          return 'Last Name Required.';
+          return 'Last name required.';
         }
       },
       gridColumns: 4,
@@ -180,6 +180,25 @@ foam.CLASS({
       updateMode: 'RO',
       section: 'personal'
     },
+   {
+      class: 'String',
+      name: 'jobTitle',
+      section: 'personal',
+      view: function(args, X) {
+        return {
+          class: 'foam.u2.view.ChoiceWithOtherView',
+          otherKey: 'Other',
+          choiceView: {
+            class: 'foam.u2.view.ChoiceView',
+            placeholder: 'Please select...',
+            dao: X.jobTitleDAO,
+            objToChoice: function(a) {
+              return [a.name, a.label];
+            }
+          }
+        };
+      }
+    },
     {
       class: 'String',
       name: 'organization',
@@ -187,12 +206,6 @@ foam.CLASS({
       displayWidth: 80,
       width: 100,
       tableWidth: 160,
-      // TODO: Use validatationPredicates instead.
-      validateObj: function(organization) {
-        if ( ! organization.trim() ) {
-          return 'Organization Required.';
-        }
-      },
       section: 'business'
     },
     {
@@ -201,6 +214,7 @@ foam.CLASS({
       documentation: `The department associated with the organization/business
         of the User.`,
       width: 50,
+      createMode: 'HIDDEN',
       section: 'business'
     },
     {
@@ -222,7 +236,7 @@ foam.CLASS({
         var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
         if ( ! email.trim() ) {
-          return 'Email Required.';
+          return 'Email required.';
         }
 
         if ( ! emailRegex.test(email.trim()) ) {
@@ -247,6 +261,7 @@ foam.CLASS({
         return this.Phone.create();
       },
       view: { class: 'foam.u2.detail.VerticalDetailView' },
+      createMode: 'HIDDEN',
       section: 'personal'
     },
     {
@@ -271,12 +286,14 @@ foam.CLASS({
       },
       view: { class: 'foam.u2.detail.VerticalDetailView' },
       section: 'personal',
+      createMode: 'HIDDEN',
       includeInDigest: true
     },
     {
       class: 'PhoneNumber',
       name: 'mobileNumber',
       documentation: 'Returns the mobile phone number of the User from the Phone model.',
+      createMode: 'HIDDEN',
       section: 'personal'
     },
     {
@@ -335,6 +352,7 @@ foam.CLASS({
       documentation: 'The default language preferred by the User.',
       of: 'foam.nanos.auth.Language',
       value: 'en',
+      createMode: 'HIDDEN',
       section: 'personal'
     },
     {
@@ -342,6 +360,7 @@ foam.CLASS({
       name: 'timeZone',
       documentation: 'The preferred time zone of the User.',
       width: 5,
+      createMode: 'HIDDEN',
       section: 'personal'
       // TODO: create custom view or DAO
     },
@@ -361,7 +380,10 @@ foam.CLASS({
           return 'Password must contain one lowercase letter, one uppercase letter, one digit, and be between 7 and 32 characters in length.';
         }
       },
-      section: 'administrative'
+      createMode: 'RW',
+      updateMode: 'HIDDEN',
+      readMode: 'HIDDEN',
+      section: 'personal'
     },
     {
       class: 'Password',
@@ -380,7 +402,7 @@ foam.CLASS({
         foam.nanos.auth.PriorPassword[] priorPasswords = new foam.nanos.auth.PriorPassword[1];
         priorPasswords[0] = new foam.nanos.auth.PriorPassword();
         priorPasswords[0].setPassword(this.getPassword());
-        priorPasswords[0].setTimeStamp(new Date());
+        priorPasswords[0].setTimeStamp(new java.util.Date());
         return priorPasswords;
       `,
       hidden: true,
@@ -458,6 +480,7 @@ foam.CLASS({
           return 'Invalid website';
         }
       },
+      createMode: 'HIDDEN',
       section: 'personal'
     },
     {

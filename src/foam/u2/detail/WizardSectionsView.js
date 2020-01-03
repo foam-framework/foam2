@@ -8,6 +8,7 @@ foam.CLASS({
   package: 'foam.u2.detail',
   name: 'WizardSectionsView',
   extends: 'foam.u2.detail.AbstractSectionedDetailView',
+
   requires: [
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows'
@@ -41,7 +42,7 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'prevIndex',
-      expression: function(lastUpdate, currentIndex, sections) {
+      expression: function(lastUpdate, currentIndex, sections, data) {
         for ( var i = currentIndex - 1 ; i >= 0 ; i-- ) {
           if ( sections[i].createIsAvailableFor(this.data$).get() ) return i;
         }
@@ -51,7 +52,7 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'nextIndex',
-      expression: function(lastUpdate, currentIndex, sections) {
+      expression: function(lastUpdate, currentIndex, sections, data) {
         for ( var i = currentIndex + 1 ; i < sections.length ; i++ ) {
           if ( sections[i].createIsAvailableFor(this.data$).get() ) return i;
         }
@@ -64,11 +65,13 @@ foam.CLASS({
       value: { class: 'foam.u2.detail.SectionView' }
     }
   ],
+
   reactions: [
     ['', 'propertyChange.sections', 'restartWizard'],
     ['', 'propertyChange.data', 'restartWizard'],
     ['data', 'propertyChange', 'onDataUpdate']
   ],
+
   listeners: [
     {
       name: 'restartWizard',
@@ -88,6 +91,7 @@ foam.CLASS({
       code: function() { this.lastUpdate = new Date(); }
     }
   ],
+
   actions: [
     {
       name: 'prev',
@@ -107,6 +111,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function initE() {
       var self = this;

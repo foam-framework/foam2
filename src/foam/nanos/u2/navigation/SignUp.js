@@ -89,32 +89,35 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'department',
-      label: 'Your Job Title',
-      view: {
-        class: 'foam.u2.TextField',
-        placeholder: 'Staff accountant'
+      name: 'jobTitle',
+      view: function(args, X) {
+        return {
+          class: 'foam.u2.view.ChoiceWithOtherView',
+          otherKey: 'Other',
+          choiceView: {
+            class: 'foam.u2.view.ChoiceView',
+            placeholder: 'Please select...',
+            dao: X.jobTitleDAO,
+            objToChoice: function(a) {
+              return [a.name, a.label];
+            }
+          }
+        };
       },
       validationPredicates: [
         {
-          args: ['department'],
+          args: ['jobTitle'],
           predicateFactory: function(e) {
-            return e.NEQ(foam.nanos.u2.navigation.SignUp.DEPARTMENT, '');
+            return e.NEQ(foam.nanos.u2.navigation.SignUp.JOB_TITLE, '');
           },
-          errorString: 'Please enter a job title'
+          errorString: 'Please enter job title'
         }
       ],
       required: true
     },
     {
-      class: 'FObjectProperty',
-      of: 'foam.nanos.auth.Phone',
+      class: 'PhoneNumber',
       name: 'phone',
-      label: '',
-      factory: function() {
-        return this.Phone.create();
-      },
-      view: { class: 'foam.u2.detail.VerticalDetailView' },
       required: true
     },
     {
@@ -149,7 +152,7 @@ foam.CLASS({
             return [a.id, a.name];
           },
           dao$: choices
-        });
+        }, X);
       },
       required: true,
     },
@@ -234,7 +237,7 @@ foam.CLASS({
             signUpToken: this.token_,
             address: this.Address.create({ countryId: this.countryId }),
             welcomeEmailSent: true,
-            department: this.department,
+            jobTitle: this.jobTitle,
             phone: this.Phone.create({ number: this.phone }),
             group: this.group_
           }))

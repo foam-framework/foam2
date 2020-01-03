@@ -208,13 +208,15 @@
     {
       class: 'DateTime',
       name: 'created',
-      visibility: 'RO'
+      createMode: 'HIDDEN',
+      updateMode: 'RO'
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdBy',
-      visibility: 'RO',
+      createMode: 'HIDDEN',
+      updateMode: 'RO',
       tableCellFormatter: function(value, obj) {
         obj.userDAO.find(value).then(function(user) {
           if ( user ) {
@@ -226,13 +228,15 @@
     {
       class: 'DateTime',
       name: 'lastModified',
-      visibility: 'RO'
+      createMode: 'HIDDEN',
+      updateMode: 'RO'
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'lastModifiedBy',
-      visibility: 'RO',
+      createMode: 'HIDDEN',
+      updateMode: 'RO',
       tableCellFormatter: function(value, obj) {
         obj.userDAO.find(value).then(function(user) {
           if ( user ) {
@@ -271,9 +275,8 @@
           try {
             return getPredicate().f(obj);
           } catch ( Throwable th ) { }
-
-          ((Logger) x.get("logger")).error(
-            "Failed to evaluate predicate of rule: " + getId(), t);
+          // ((Logger) x.get("logger")).debug(this.getClass().getSimpleName(), "id", getId(), "\\nrule", this, "\\nobj", obj, "\\nold", oldObj, "\\n", t);
+          ((Logger) x.get("logger")).error("Failed to evaluate predicate of rule: " + getId(), t);
           return false;
         }
       `

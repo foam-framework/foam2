@@ -263,10 +263,10 @@ foam.CLASS({
     function downloadCSV(x, data) {
       this.csvDriver.exportDAO(x, data)
         .then(function(result) {
-          result = 'data:text/csv;charset=utf-8,' + result;
-          var encodedUri = encodeURI(result);
+          let encodedUri = encodeURIComponent(result);
+          let uri = 'data:text/csv;charset=utf-8,' + encodedUri;
           var link = document.createElement('a');
-          link.setAttribute('href', encodedUri);
+          link.setAttribute('href', uri);
           link.setAttribute('download', 'data.csv');
           document.body.appendChild(link);
           link.click();
