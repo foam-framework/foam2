@@ -339,6 +339,7 @@ var classes = [
   'foam.u2.DefaultValidator',
   'foam.u2.DisplayMode',
   'foam.u2.Visibility',
+  'foam.u2.filter.AccumulatorFilter',
   'foam.nanos.export.ExportDriverRegistry',
   'foam.dao.jdbc.ConnectionPool',
   'foam.lib.Outputter',

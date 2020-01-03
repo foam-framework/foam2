@@ -759,3 +759,11 @@ p({
     }
   """
 })
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "accumulatorFilter",
+  "serve": true,
+  "lazy": true,
+  "serviceScript": "return new foam.u2.filter.AccumulatorFilterService();"
+})
