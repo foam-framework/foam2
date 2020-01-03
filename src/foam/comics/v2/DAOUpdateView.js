@@ -99,6 +99,9 @@ foam.CLASS({
   actions: [
     {
       name: 'save',
+      isEnabled: function(workingData$errors_) {
+        return ! workingData$errors_;
+      },
       code: function() {
         this.data.copyFrom(this.workingData);
         this.config.dao.put(this.data).then(o => {
