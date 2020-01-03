@@ -34,9 +34,8 @@ public class StandardAuthorizer implements Authorizer {
 
     String permission = createPermission("create");
     AuthService authService = (AuthService) x.get("auth");
-
     if ( ! authService.check(x, permission) ) {
-      throw new AuthorizationException(permission);
+      throw new AuthorizationException();
     }
   }
 
@@ -46,7 +45,7 @@ public class StandardAuthorizer implements Authorizer {
     AuthService authService = (AuthService) x.get("auth");
     
     if ( ! authService.check(x, permission) ) {
-      throw new AuthorizationException(permission);
+      throw new AuthorizationException();
     }
   }
 
@@ -56,7 +55,7 @@ public class StandardAuthorizer implements Authorizer {
     AuthService authService = (AuthService) x.get("auth");
     
     if ( ! authService.check(x, permission) ) {
-      throw new AuthorizationException(permission);
+      throw new AuthorizationException();
     }
   }
 
@@ -66,7 +65,7 @@ public class StandardAuthorizer implements Authorizer {
     AuthService authService = (AuthService) x.get("auth");
     
     if ( ! authService.check(x, permission) ) {
-      throw new AuthorizationException(permission);
+      throw new AuthorizationException();
     }
   }
 
