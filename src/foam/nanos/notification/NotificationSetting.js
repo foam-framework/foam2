@@ -120,7 +120,7 @@ foam.CLASS({
       ],
       type: 'String',
       javaCode: `
-        return "notificationsetting." + operation + getId();
+        return "notificationsetting." + operation + "." + getId();
       `
     }
   ]
