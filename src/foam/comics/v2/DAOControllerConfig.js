@@ -123,6 +123,18 @@ foam.CLASS({
       name: 'createEnabled',
       documentation: 'If set to false, the "Create" button will not be visible.',
       value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'editEnabled',
+      documentation: 'True to enable the edit button.',
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'deleteEnabled',
+      documentation: 'True to enable the edit button.',
+      value: true
     }
   ]
 });
