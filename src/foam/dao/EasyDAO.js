@@ -670,6 +670,10 @@ foam.CLASS({
 
       var dao = daoModel.create(params, this.__subContext__);
 
+      if ( daoType == 'foam.dao.ClientDAO' && this.requestResponseCaching ) {
+        dao = this.RequestResponseCachingDAO.create({delegate: dao});
+      }
+
       // Not used by decorators.
       delete params['name'];
 
