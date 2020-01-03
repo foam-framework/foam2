@@ -96,6 +96,17 @@ Suitable for usage against backends that don't support listen(), such as plain H
     function listen_(x, sink, predicate) {
       return this.__context__.lookup('foam.dao.AbstractDAO').
         prototype.listen_.call(this, x, sink, predicate);
+    },
+    {
+      name: 'cmd_',
+      code: function cmd_(x, obj) {
+        /** Force the DAO to publish a 'reset' notification. **/
+        if ( this.RESET_CMD == obj ) {
+          this.on.reset.pub();
+          return true;
+        }
+        return this.SUPER(x, obj);
+      }
     }
   ]
 });

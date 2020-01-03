@@ -8,17 +8,21 @@ package foam.nanos.bench.benchmarks;
 
 import foam.core.X;
 import foam.dao.FileJournal;
-import foam.nanos.bench.Benchmark;
+import foam.dao.DAO;
 import foam.dao.MDAO;
+import foam.dao.NullDAO;
 import foam.nanos.auth.User;
+import foam.nanos.bench.Benchmark;
 
 public class FileJournalBenchmark
   implements Benchmark
 {
   protected FileJournal journal_;
+  protected DAO         dao_;
 
   @Override
   public void setup(X x) {
+    dao_ = new NullDAO();
     journal_ = new FileJournal.Builder(x)
       .setDao(new MDAO(User.getOwnClassInfo()))
       .setFilename("journalbenchmark")
@@ -36,7 +40,7 @@ public class FileJournalBenchmark
     u.setId(System.currentTimeMillis());
     u.setFirstName("test");
     u.setLastName("testing");
-    journal_.put_(x, null, u);
+    journal_.put(x, "", dao_, u);
   }
 }
 

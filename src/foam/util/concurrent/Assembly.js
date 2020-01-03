@@ -9,6 +9,21 @@ foam.INTERFACE({
 
   methods: [
     {
+      name: 'requestLocks',
+      type: 'Object[]',
+      documentation: `
+        Request locks to be held before this Assembly can be entered into
+        the AssemblinLine.
+      `
+    },
+    {
+      name: 'executeUnderLock',
+      documentation: `
+        Execute in parallel amongst all Assemblies which do not rely on any of
+        the same requested locks. Is executed before startJob.
+      `
+    },
+    {
       name: 'startJob',
       documentation: `
         Execute serially before start of job.

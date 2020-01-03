@@ -72,23 +72,14 @@ foam.CLASS({
   methods: [
     {
       name: 'put_',
-      synchronized: true,
       javaCode: `
-        foam.core.FObject old = super.find_(x, obj.getProperty("id"));
-        foam.core.FObject result = super.put_(x, obj);
-        getJournal().put_(x, old, result);
-        return result;
+        return getJournal().put(x, "", getDelegate(), obj);
       `
     },
     {
       name: 'remove_',
-      synchronized: true,
       javaCode: `
-        foam.core.FObject result = super.remove_(x, obj);
-        if ( result != null ) {
-          getJournal().remove(x, result);
-        }
-        return result;
+        return getJournal().remove(x, "", getDelegate(), obj);
       `
     },
     {

@@ -37,6 +37,19 @@ foam.CLASS({
 
   methods: [
     {
+      name: 'requestLocks',
+      javaCode: `
+        // Template method, override in subclass if desired
+        return null;
+      `
+    },
+    {
+      name: 'executeUnderLock',
+      javaCode: `
+        // Template method, override in subclass if desired
+      `
+    },
+    {
       name: 'startJob',
       javaCode: `
         // Template method, override in subclass if desired
@@ -60,7 +73,7 @@ foam.CLASS({
       synchronized: true,
       javaCode: `
         return getLast();
-      `,
+      `
     },
     {
       name: 'complete',
