@@ -133,7 +133,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'deleteEnabled',
-      documentation: 'True to enable the edit button.',
+      documentation: 'True to enable the delete button.',
       value: true
     }
   ]
