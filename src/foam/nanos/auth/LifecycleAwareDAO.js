@@ -43,12 +43,12 @@ foam.CLASS({
     {
       class: 'String',
       name: 'deletePermission_',
-      javaFactory: 'return getName() + ".read.lifecyclestate.deleted";'
+      javaFactory: 'return "lifecyclestate.deleted.read." + getName();'
     },
     {
       class: 'String',
       name: 'rejectPermission_',
-      javaFactory: 'return getName() + ".read.lifecyclestate.rejected";'
+      javaFactory: 'return "lifecyclestate.rejected.read." + getName();'
     }
   ],
 
