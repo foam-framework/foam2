@@ -100,6 +100,9 @@ foam.CLASS({
   actions: [
     {
       name: 'edit',
+      isAvailable: function(config$editEnabled) {
+        return config$editEnabled;
+      },
       code: function() {
         if ( ! this.stack ) return;
         this.stack.push({
@@ -112,6 +115,9 @@ foam.CLASS({
     },
     {
       name: 'delete',
+      isAvailable: function(config$deleteEnabled) {
+        return config$deleteEnabled;
+      },
       code: function() {
         this.add(this.Popup.create().tag({
           class: 'foam.u2.DeleteModal',
