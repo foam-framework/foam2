@@ -49,7 +49,8 @@ foam.CLASS({
     'foam.u2.dialog.NotificationMessage'
   ],
   imports: [
-    'stack'
+    'stack',
+    'ctrl'
   ],
   exports: [
     'controllerMode'
@@ -78,6 +79,12 @@ foam.CLASS({
       }
     }
   ],
+  messages: [
+    {
+      name: 'SUCCESS_MESSAGE',
+      message: 'An approval request has been created.'
+    }
+  ],
   actions: [
     {
       name: 'save',
@@ -95,6 +102,9 @@ foam.CLASS({
         this.config.dao.put(cData).then((o) => {
           this.data = o;
           this.finished.pub();
+          this.ctrl.add(this.NotificationMessage.create({
+            message: this.SUCCESS_MESSAGE
+          }));
           this.stack.back();
         }, (e) => {
           this.throwError.pub(e);
