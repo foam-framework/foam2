@@ -167,16 +167,21 @@ foam.CLASS({
     ^tertiary {
       border-color: transparent;
       background-color: transparent;
-      color: /*%BLACK%*/ #1e1f21;
+      color: /*%GREY1%*/ #5e6061;
+      border-radius: 0;
     }
 
     ^tertiary:hover:not(:disabled) {
       border-color: transparent;
       background-color: transparent;
+      color: /*%BLACK%*/ #1e1f21;
     }
 
-    ^tertiary:focus:not(:hover) {
+    ^tertiary:focus {
       border-bottom-color: /*%PRIMARY3%*/ #406dea;
+      border-left-width: 0;
+      border-right-width: 0;
+      color: /*%BLACK%*/ #1e1f21;
     }
 
     ^tertiary:disabled {
@@ -217,11 +222,6 @@ foam.CLASS({
       padding: 7px 15px;
     }
 
-    ^tertiary^small {
-      font-size: 12px;
-      padding: 8px 0px;
-    }
-
     ^medium {
       font-size: 14px;
       padding: 9px 16px;
@@ -229,10 +229,6 @@ foam.CLASS({
 
     ^medium:focus {
       padding: 8px 15px;
-    }
-
-    ^tertiary^medium {
-      padding: 8px 0px;
     }
 
     ^large {
@@ -244,8 +240,18 @@ foam.CLASS({
       padding: 9px 15px;
     }
 
+    ^tertiary^small,
+    ^tertiary^medium,
     ^tertiary^large {
-      padding: 10px 0px;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    ^tertiary^small:focus,
+    ^tertiary^medium:focus,
+    ^tertiary^large:focus {
+      padding-left: 1px;
+      padding-right: 1px;
     }
   `,
 

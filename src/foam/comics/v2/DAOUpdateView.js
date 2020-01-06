@@ -18,6 +18,10 @@ foam.CLASS({
     A configurable summary view for a specific instance
   `,
 
+  axioms: [
+    foam.pattern.Faceted.create()
+  ],
+
   css:`
     ^ {
       padding: 32px
@@ -50,12 +54,16 @@ foam.CLASS({
     'foam.u2.ControllerMode',
     'foam.u2.dialog.NotificationMessage'
   ],
+
   imports: [
+    'ctrl',
     'stack'
   ],
+
   exports: [
     'controllerMode'
   ],
+
   properties: [
     {
       class: 'FObjectProperty',
@@ -87,15 +95,22 @@ foam.CLASS({
       }
     }
   ],
+
   actions: [
     {
       name: 'save',
+      isEnabled: function(workingData$errors_) {
+        return ! workingData$errors_;
+      },
       code: function() {
         this.data.copyFrom(this.workingData);
         this.config.dao.put(this.data).then(o => {
           this.data = o;
           this.finished.pub();
           this.stack.back();
+          this.ctrl.add(this.NotificationMessage.create({
+            message: `${this.data.model_.label} updated.`
+          }));
         }, e => {
           this.throwError.pub(e);
           this.add(this.NotificationMessage.create({
@@ -121,11 +136,11 @@ foam.CLASS({
               .start(self.Rows)
                 // we will handle this in the StackView instead
                 .startContext({ data: self.stack })
-                    .tag(self.stack.BACK, {
-                      buttonStyle: foam.u2.ButtonStyle.TERTIARY,
-                      icon: 'images/back-icon.svg',
-                      label: originalName
-                    })
+                  .tag(self.stack.BACK, {
+                    buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                    icon: 'images/back-icon.svg',
+                    label: originalName
+                  })
                 .endContext()
                 .start(self.Cols).style({ 'align-items': 'center' })
                   .start()

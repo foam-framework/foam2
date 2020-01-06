@@ -23,30 +23,12 @@ foam.CLASS({
       display: flex;
       justify-content: flex-end;
     }
-    ^ .foam-u2-ActionView-delete,
-    ^ .foam-u2-ActionView-delete:hover {
-      border-radius: 4px;
-      box-shadow: 0 1px 0 0 /*%GREY4%*/ rgba(22, 29, 37, 0.05);
-      background: /*%DESTRUCTIVE2%*/ #f91c1c;
-      color: white;
-      vertical-align: middle;
-    }
-    ^ .foam-u2-ActionView-delete:hover {
-      opacity: 0.9;
-    }
-    ^ .foam-u2-ActionView-cancel,
-    ^ .foam-u2-ActionView-cancel:hover {
-      background: none;
-      color: /*%GREY1%*/ #525455;
-      border: none;
-      box-shadow: none;
-    }
   `,
 
   messages: [
     { name: 'TITLE', message: 'Delete ' },
     { name: 'CONFIRM_DELETE_1', message: 'Are you sure you want to delete' },
-    { name: 'SUCCESS_MSG', message: 'Successfully deleted' },
+    { name: 'SUCCESS_MSG', message: ' deleted.' },
     { name: 'FAIL_MSG', message: 'Failed to delete' }
   ],
 
@@ -82,8 +64,8 @@ foam.CLASS({
         .start()
           .addClass('buttons')
           .startContext({ data: this })
-            .add(this.CANCEL)
-            .add(this.DELETE)
+            .tag(this.CANCEL, { buttonStyle: 'SECONDARY' })
+            .tag(this.DELETE, { isDestructive: true })
           .endContext()
         .end();
     }
@@ -95,7 +77,7 @@ foam.CLASS({
       label: 'Delete',
       code: function(X) {
         this.dao.remove(this.data).then((_) => {
-          this.notify(this.SUCCESS_MSG);
+          this.notify(this.data.model_.label + this.SUCCESS_MSG);
           this.onDelete();
         }).catch((err) => {
           this.notify(err.message || this.FAIL_MSG, 'error');

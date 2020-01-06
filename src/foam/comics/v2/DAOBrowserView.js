@@ -86,10 +86,12 @@ foam.CLASS({
   imports: [
     'stack?'
   ],
+
   exports: [
     'dblclick',
     'filteredTableColumns'
   ],
+
   properties: [
     {
       class: 'StringArray',
@@ -152,6 +154,13 @@ foam.CLASS({
       expression: function(config, cannedPredicate, searchPredicate) {
         return config.dao$proxy.where(this.AND(cannedPredicate, searchPredicate));
       }
+    },
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'searchFilterDAO',
+      expression: function(config, cannedPredicate) {
+        return config.dao$proxy.where(cannedPredicate);
+      }
     }
   ],
   actions: [
@@ -188,7 +197,7 @@ foam.CLASS({
       this.addClass(this.myClass());
       this.SUPER();
       this
-        .add(this.slot(function(data, config$cannedQueries, config$defaultColumns) {
+        .add(this.slot(function(data, config$cannedQueries, config$defaultColumns, searchFilterDAO) {
           return self.E()
             .start(self.Rows)
               .callIf(config$cannedQueries.length >= 1, function() {
@@ -199,7 +208,7 @@ foam.CLASS({
                       .callIf(config$cannedQueries.length > 1, function() {
                         this
                           .start(self.cannedQueriesView, {
-                            choices: config$cannedQueries.map(o => [o.predicate, o.label]),
+                            choices: config$cannedQueries.map((o) => [o.predicate, o.label]),
                             data$: self.cannedPredicate$
                           })
                             .addClass(self.myClass('canned-queries'))
@@ -210,7 +219,7 @@ foam.CLASS({
               })
               .start(self.Cols).addClass(self.myClass('query-bar'))
                 .startContext({
-                  dao: self.config.dao,
+                  dao: searchFilterDAO,
                   controllerMode: foam.u2.ControllerMode.EDIT
                 })
                   .callIf(self.config.searchMode === self.SearchMode.SIMPLE, function() {
@@ -225,7 +234,7 @@ foam.CLASS({
                     });
                   })
                 .endContext()
-                .startContext({data: self})
+                .startContext({ data: self })
                   .start(self.EXPORT, {
                     buttonStyle: foam.u2.ButtonStyle.SECONDARY
                   })

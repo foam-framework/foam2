@@ -23,7 +23,6 @@ foam.CLASS({
       display: flex;
       flex-direction: column;
       background-color: white;
-      position: fixed;
       top: 18vh;
       left: 13vw;
       height: 71vh;
