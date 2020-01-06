@@ -16,6 +16,10 @@ foam.CLASS({
       name: 'id'
     },
     {
+      class: 'String',
+      name: 'sessionId'
+    },
+    {
       class: 'Long',
       name: 'group'
     },

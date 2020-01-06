@@ -19,7 +19,7 @@ import java.io.IOException;
 public class QuorumService extends AbstractFObject implements NanoService {
 
   protected Long clusterId = Long.parseLong(System.getProperty("CLUSTER"));
-  private ClusterNode mySelf;
+  public final ClusterNode mySelf;
   private QuorumNetworkManager networkManager;
   private Election election;
   // Initial myState.
