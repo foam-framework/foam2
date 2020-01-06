@@ -56,7 +56,6 @@ foam.CLASS({
     ^ {
       display: inline-block;
       position: relative;
-      z-index: 1;
     }
 
     ^container {
@@ -158,7 +157,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'name',
-      factory: function() { return "select"; }
+      value: 'select'
     },
     {
       class: 'foam.u2.ViewSpec',
@@ -342,7 +341,7 @@ foam.CLASS({
                   return Promise.all(promiseArray).then((resp) => {
                     var index = 0;
                     return this.E().forEach(sections, function(section) {
-                      this
+                      this // .style({ 'z-index': 1 })
                         .start().hide(!! section.hideIfEmpty && resp[index].value <= 0 || ! section.heading)
                           .addClass(self.myClass('heading'))
                           .add(section.heading)
@@ -361,8 +360,8 @@ foam.CLASS({
                                 })
                               .end();
                           })
-                        .end();
-                        index++;
+                      .end();
+                      index++;
                     });
                   });
                 }))
@@ -378,7 +377,7 @@ foam.CLASS({
           } else {
             return self.E().add(fullObject_ ? fullObject_.toSummary() : '');
           }
-        }))
+        }));
     },
 
     function updateMode_(mode) {
@@ -493,7 +492,7 @@ foam.CLASS({
 
       methods: [
         function initE() {
-          return this.add(this.fullObject$.map(o => {
+          return this.add(this.fullObject$.map((o) => {
             return o ? o.toSummary() : this.defaultSelectionPrompt;
           }));
         }
