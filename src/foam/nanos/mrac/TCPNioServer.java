@@ -240,8 +240,8 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
     }
 
     public boolean acceptSocketChannel(SocketChannel socketChannel) {
-      System.out.println("acceptSocketChannel");
       if ( isRunning.get() && this.acceptedSocketChannels.offer(socketChannel) ) {
+        System.out.println("acceptSocketChannel");
         this.wakeup();
         return true;
       }
@@ -328,7 +328,7 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
 
         socketChannel = (SocketChannel) key.channel();
         X x = (X) key.attachment();
-        ByteBuffer lenbuffer = (ByteBuffer) x.get("lenBuffer");
+        ByteBuffer lenbuffer = ByteBuffer.allocate(4);
         int rc = socketChannel.read(lenbuffer);
 
         if ( rc < 0 ) {
@@ -344,7 +344,7 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
         }
         if ( messageLen < 0 ) throw new IOException("Len error " + messageLen);
 
-
+        System.out.println(messageLen);
         // Read message.
         ByteBuffer message = ByteBuffer.allocate(messageLen);
         if ( socketChannel.read(message) < 0 ) throw new IOException("End of Stream");
@@ -390,7 +390,7 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
       } catch ( IOException e ) {
         // When client reset. close Socket.
         //TODO: log socket close.
-        System.out.println(e);
+        e.printStackTrace();
         try {
           key.cancel();
         } catch ( Exception exception ) {

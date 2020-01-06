@@ -21,11 +21,11 @@ import foam.lib.json.Outputter;
 //TODO: need common close method for all box using SocketChannel?
 // Do not catch IOException in this class. Let caller handle it.
 public class TcpSocketChannelReturnBox extends AbstractFObject implements Box {
-  
+
   SelectionKey key;
   SocketChannel socketChannel;
   protected int sizeBytes = 4;
-  
+
   public void send(Message msg) {
     try {
       System.out.println("sendback");
@@ -45,7 +45,7 @@ public class TcpSocketChannelReturnBox extends AbstractFObject implements Box {
     byte[] bytes = out.getBytes(Charset.forName("UTF-8"));
     send(bytes);
   }
-  
+
   //Do not filp ByteBuffer before pass into this method.
   public void send(ByteBuffer byteBuffer) throws IOException {
     getSocketChannel().write(byteBuffer);
@@ -59,17 +59,17 @@ public class TcpSocketChannelReturnBox extends AbstractFObject implements Box {
     send(byteBuffer);
     byteBuffer.clear();
   }
-  
+
   private void resumeSelection() {
     if ( getSelectionKey().isValid() ) {
       getSelectionKey().interestOps(SelectionKey.OP_READ);
     }
   }
-  
+
   public void setKey(SelectionKey key) {
     this.key = key;
   }
-  
+
   public SelectionKey getSelectionKey() {
     if ( key == null ) {
       key = (SelectionKey) getX().get("selectionKey");
@@ -77,16 +77,16 @@ public class TcpSocketChannelReturnBox extends AbstractFObject implements Box {
     //TODO: handle key == null exception.
     return key;
   }
-  
+
   public void setSocketChannel(SocketChannel socketChannel) {
     this.socketChannel = socketChannel;
   }
-  
-  public SocketChannel getSocketChannel() {  
+
+  public SocketChannel getSocketChannel() {
     if ( socketChannel == null ) {
       socketChannel = (SocketChannel) getX().get("socketChannel");
     }
     return socketChannel;
   }
-  
+
 }

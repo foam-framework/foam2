@@ -16,6 +16,7 @@ public class MNDAO extends JDAO {
   public MNDAO(X x, ClassInfo classInfo, String filename) {
     setX(x);
     setOf(classInfo);
+    setDelegate(new ObservableDAO(classInfo));
     setJournal(MNJournal.getMNjournal(filename));
   }
 
@@ -27,15 +28,19 @@ public class MNDAO extends JDAO {
 
   @Override
   public FObject put_(X x, FObject obj) {
-    // MN does not have record on old obj;
+    MedusaEntry entry = (MedusaEntry) obj;
+    entry.setAction("p");
     ((MNJournal) getJournal()).put(x, "", null, obj);
+    getDelegate().put_(x, obj);
     return obj;
   }
 
   @Override
   public FObject remove_(X x, FObject obj) {
-    // MM should check if the object is exists.
+    MedusaEntry entry = (MedusaEntry) obj;
+    entry.setAction("r");
     ((MNJournal) getJournal()).remove(x, "", null, obj);
+    getDelegate().remove_(x, obj);
     return obj;
   }
 }

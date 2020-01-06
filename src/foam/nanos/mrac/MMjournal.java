@@ -208,17 +208,17 @@ public class MMJournal extends AbstractJournal {
     MedusaEntry p2 = parent2;
     Message msg =
       createMessage(
-        p1.getMyIndex(),
-        p1.getMyHash(),
-        p2.getMyIndex(),
-        p2.getMyHash(),
-        myIndex,
-        "put_",
-        "p",
-        null,
-        prefix,
-        obj
-      );
+          p1.getMyIndex(),
+          p1.getMyHash(),
+          p2.getMyIndex(),
+          p2.getMyHash(),
+          myIndex,
+          "put_",
+          "p",
+          null,
+          prefix,
+          obj
+          );
     Outputter outputter = new Outputter(getX());
 
     String mn = outputter.stringify(msg);
@@ -237,17 +237,17 @@ public class MMJournal extends AbstractJournal {
     MedusaEntry p2 = parent2;
     Message msg =
       createMessage(
-        p1.getMyIndex(),
-        p1.getMyHash(),
-        p2.getMyIndex(),
-        p2.getMyHash(),
-        myIndex,
-        "remove_",
-        "r",
-        null,
-        prefix,
-        obj
-      );
+          p1.getMyIndex(),
+          p1.getMyHash(),
+          p2.getMyIndex(),
+          p2.getMyHash(),
+          myIndex,
+          "remove_",
+          "r",
+          null,
+          prefix,
+          obj
+          );
     Outputter outputter = new Outputter(getX());
 
     String mn = outputter.stringify(msg);
@@ -284,9 +284,8 @@ public class MMJournal extends AbstractJournal {
       Arrays.fill(checks, false);
 
       MedusaEntry p = null;
-      int threhold = 1;
 
-      while ( System.currentTimeMillis() < endtime && Math.abs(check) < threhold ) {
+      while ( System.currentTimeMillis() < endtime && Math.abs(check) < quorumSize ) {
         for ( int j = 0 ; j < tasks.length ; j++ ) {
           if ( checks[j] == false && ((FutureTask<String>) tasks[j]).isDone() ) {
             FutureTask<String> task = (FutureTask<String>) tasks[j];
@@ -313,7 +312,7 @@ public class MMJournal extends AbstractJournal {
         }
       }
 
-      if ( check >= threhold ) {
+      if ( check >= quorumSize ) {
         isPersist = true;
         updateHash(p);
         break;
@@ -334,17 +333,17 @@ public class MMJournal extends AbstractJournal {
   }
 
   private Message createMessage(
-    long globalIndex1,
-    String hash1,
-    long globalIndex2,
-    String hash2,
-    long myIndex,
-    String method,
-    String action,
-    FObject old,
-    String prefix,
-    FObject nu
-  ) {
+      long globalIndex1,
+      String hash1,
+      long globalIndex2,
+      String hash2,
+      long myIndex,
+      String method,
+      String action,
+      FObject old,
+      String prefix,
+      FObject nu
+      ) {
     Message message = getX().create(Message.class);
     RPCMessage rpc = getX().create(foam.box.RPCMessage.class);
     //put or remove
@@ -368,20 +367,28 @@ public class MMJournal extends AbstractJournal {
     HTTPReplyBox replyBox = getX().create(HTTPReplyBox.class);
     message.getAttributes().put("replyBox", replyBox);
     return message;
-  }
+      }
 
   private TcpMessage createListenMessage() {
     TcpMessage tcpMessage = new TcpMessage();
     tcpMessage.setServiceKey(serviceName);
-    TcpSocketChannelSinkBox replyBox = new TcpSocketChannelSinkBox();
-    tcpMessage.getAttributes().put("replyBox", replyBox);
+    // TcpSocketChannelSinkBox replyBox = new TcpSocketChannelSinkBox();
+    String replayBox = "{\"class\":\"foam.nanos.mrac.TcpSocketChannelSinkBox\"}";
+    tcpMessage.getAttributes().put("replyBox", replayBox);
     tcpMessage.getAttributes().put("sessionId", "aaaa");
     RPCMessage rpc = new RPCMessage();
     rpc.setName("listen_");
-    Object[] args = {null, new TcpSocketChannelSink(), null};
+    Object[] args = {null, "{\"class\":\"foam.nanos.mrac.TcpSocketChannelSink\"}", null};
     rpc.setArgs(args);
     tcpMessage.setObject(rpc);
     return tcpMessage;
+  }
+
+  //TODO: Modelling TcpSocketChannelSinkBox and remove this method.
+  private String createListenMessageString(String serviceName, String sessionId) {
+    // String ret = "{\"class\":\"foam.nanos.mrac.TcpMessage\",\"serviceKey\":\"" + serviceName + "\",\"attributes\":{\"replyBox\":{\"class\":\"foam.nanos.mrac.TcpSocketChannelSinkBox\"},\"sessionId\":\"" + sessionId + "\"},\"object\":{\"class\":\"foam.box.RPCMessage\",\"name\":\"listen_\",\"args\":[null,{\"class\":\"foam.nanos.mrac.TcpSocketChannelSink\"},null]}}";
+    String ret = "{\"class\":\"foam.nanos.mrac.TcpMessage\",\"serviceKey\":\"" + serviceName + "\",\"attributes\":{\"replyBox\":{\"class\":\"foam.nanos.mrac.TcpSocketChannelSinkBox\"},\"sessionId\":\"" + sessionId + "\"},\"object\":{\"class\":\"foam.box.RPCMessage\",\"name\":\"listen_\",\"args\":[null,{\"class\":\"foam.nanos.mrac.TcpSocketChannelSink\"},null]}}";
+    return ret;
   }
 
 
@@ -418,7 +425,7 @@ public class MMJournal extends AbstractJournal {
         output.write(message);
         output.close();
 
-         // check response code
+        // check response code
         int code = conn.getResponseCode();
         if ( code != HttpServletResponse.SC_OK ) {
           throw new RuntimeException("Http server return: " + code);
@@ -480,15 +487,25 @@ public class MMJournal extends AbstractJournal {
 
     // Only replay once.
     if ( ! isReplayed ) {
-      initialReplay(x);
+      System.out.println(">>>>>>>>>>>>>>>>start replay<<<<<<<<<<<<<<<");
       try {
-        List<MedusaEntry> entries = retrieveData(x, groupToMN);
-        cacheOrMDAO(entries);
+        initialListener(x);
+        initialReplay(x);
+        // List<MedusaEntry> entries = retrieveData(x, groupToMN);
+        // System.out.println(">>>>>>>entry start");
+        // System.out.println(entries.size());
+        // for ( MedusaEntry entry : entries ) {
+        //   Outputter outputter = new Outputter(getX());
+        //   String mn = outputter.stringify(entry);
+        //   System.out.println(mn);
+        // }
+        // System.out.println("--------entry end");
+        // cacheOrMDAO(entries);
       } catch ( Exception e ) {
         //TODO: retry or stop system.
         throw new RuntimeException(e);
       }
-      isReplayed = false;
+      isReplayed = true;
     }
 
     if ( dao == null ) return;
@@ -513,6 +530,8 @@ public class MMJournal extends AbstractJournal {
   //Only one thread can access this function at any give time. When instance is secondary.
   private void cacheOrMDAO(MedusaEntry entry) {
     synchronized ( cacheOrMDAOLock ) {
+      if ( entry.getMyIndex() != recordIndex ) throw new RuntimeException("Wrong order");
+
       if ( registerDAOs.get(entry.getNspecKey()) != null ) {
         DAO dao = registerDAOs.get(entry.getNspecKey());
         dao.put(entry.getNu());
@@ -525,10 +544,12 @@ public class MMJournal extends AbstractJournal {
       }
 
       //TODO: update globalIndex and parent, varify hash.
-
+      globalIndex.set(entry.getMyIndex() + 1L);
+      recordIndex = recordIndex + 1L;
     }
   }
 
+  volatile long recordIndex = 1;
   private void cacheOrMDAO(List<MedusaEntry> entries) {
     synchronized ( cacheOrMDAOLock ) {
       for ( MedusaEntry entry :  entries ) {
@@ -571,9 +592,9 @@ public class MMJournal extends AbstractJournal {
         groupToEntry.put(groupId, concatEntries(parseEntries(x, nodeToBuffers)));
       }
 
-      System.out.println(">>>>>replay journal");
-      printAll(x, groupToJournal);
-      System.out.println("------replay journal end");
+      // System.out.println(">>>>>replay journal");
+      // printAll(x, groupToJournal);
+      // System.out.println("------replay journal end");
       return sortEntries(mergeEntries(groupToEntry));
 
     } catch ( IOException ioe ) {
@@ -584,54 +605,54 @@ public class MMJournal extends AbstractJournal {
   }
 
   private final LinkedList<ByteBuffer> retrieveDataFromNode(X x, SocketChannel channel) throws IOException {
-      LinkedList<ByteBuffer> buffers = new LinkedList<ByteBuffer>();
-      ByteBuffer lengthBuffer = ByteBuffer.allocate(4);
-      TcpMessage replayInitialMessage = new TcpMessage();
-      replayInitialMessage.setServiceKey("MNService");
-      RPCMessage rpc = x.create(RPCMessage.class);
-      rpc.setName("replayAll");
-      Object[] args = { null, serviceName };
-      rpc.setArgs(args);
-      replayInitialMessage.setObject(rpc);
+    LinkedList<ByteBuffer> buffers = new LinkedList<ByteBuffer>();
+    ByteBuffer lengthBuffer = ByteBuffer.allocate(4);
+    TcpMessage replayInitialMessage = new TcpMessage();
+    replayInitialMessage.setServiceKey("MNService");
+    RPCMessage rpc = x.create(RPCMessage.class);
+    rpc.setName("replayAll");
+    Object[] args = { null, serviceName };
+    rpc.setArgs(args);
+    replayInitialMessage.setObject(rpc);
 
-      Outputter outputter = new Outputter(x);
-      String msg = outputter.stringify(replayInitialMessage);
-      byte[] bytes = msg.getBytes(Charset.forName("UTF-8"));
-      ByteBuffer ackBuffer = ByteBuffer.allocate(4 + bytes.length);
-      ackBuffer.putInt(bytes.length);
-      ackBuffer.put(bytes);
-      ackBuffer.flip();
-      channel.write(ackBuffer);
-      // Waiting for ACK from MN.
+    Outputter outputter = new Outputter(x);
+    String msg = outputter.stringify(replayInitialMessage);
+    byte[] bytes = msg.getBytes(Charset.forName("UTF-8"));
+    ByteBuffer ackBuffer = ByteBuffer.allocate(4 + bytes.length);
+    ackBuffer.putInt(bytes.length);
+    ackBuffer.put(bytes);
+    ackBuffer.flip();
+    channel.write(ackBuffer);
+    // Waiting for ACK from MN.
+    lengthBuffer.clear();
+
+    if ( channel.read(lengthBuffer) < 0 ) throw new RuntimeException("End of Stream");
+    lengthBuffer.flip();
+
+    int ackLength = lengthBuffer.getInt();
+    if ( ackLength < 0 ) throw new RuntimeException("End of Stream");
+    ByteBuffer packet = ByteBuffer.allocate(ackLength);
+    if ( channel.read(packet) < 0 ) throw new RuntimeException("End of Stream");
+
+    packet.flip();
+    String ackString = new String(packet.array(), 0, ackLength, Charset.forName("UTF-8"));
+    FilePacket filePacket = (FilePacket) x.create(JSONParser.class).parseString(ackString);
+    int totalBlock = filePacket.getTotalBlock();
+
+    for ( int i = 0 ; i < totalBlock ; i++ ) {
       lengthBuffer.clear();
 
-      if ( channel.read(lengthBuffer) < 0 ) throw new RuntimeException("End of Stream");
+      channel.read(lengthBuffer);
       lengthBuffer.flip();
+      int length = lengthBuffer.getInt();
+      ByteBuffer readBuffer = ByteBuffer.allocate(length);
 
-      int ackLength = lengthBuffer.getInt();
-      if ( ackLength < 0 ) throw new RuntimeException("End of Stream");
-      ByteBuffer packet = ByteBuffer.allocate(ackLength);
-      if ( channel.read(packet) < 0 ) throw new RuntimeException("End of Stream");
+      channel.read(readBuffer);
+      readBuffer.flip();
+      buffers.add(readBuffer);
+    }
 
-      packet.flip();
-      String ackString = new String(packet.array(), 0, ackLength, Charset.forName("UTF-8"));
-      FilePacket filePacket = (FilePacket) x.create(JSONParser.class).parseString(ackString);
-      int totalBlock = filePacket.getTotalBlock();
-
-      for ( int i = 0 ; i < totalBlock ; i++ ) {
-        lengthBuffer.clear();
-
-        channel.read(lengthBuffer);
-        lengthBuffer.flip();
-        int length = lengthBuffer.getInt();
-        ByteBuffer readBuffer = ByteBuffer.allocate(length);
-
-        channel.read(readBuffer);
-        readBuffer.flip();
-        buffers.add(readBuffer);
-      }
-
-      return buffers;
+    return buffers;
   }
 
   private final Map<Long, List<MedusaEntry>> parseEntries(X x, Map<Long, LinkedList<ByteBuffer>> nodeTojournal) {
@@ -656,7 +677,6 @@ public class MMJournal extends AbstractJournal {
           lengthBytes = new byte[4];
           System.arraycopy(carryOverLengthBytes, 0, lengthBytes, 0, carryOverLengthBytes.length);
           System.arraycopy(unreadLengthBytes, 0, lengthBytes, carryOverLengthBytes.length, unreadLengthBytes.length);
-          int length = ByteBuffer.wrap(lengthBytes).getInt();
           carryOverLengthBytes = null;
         }
 
@@ -675,8 +695,16 @@ public class MMJournal extends AbstractJournal {
           medusaEntrys.add(medusaEntry);
         }
         while ( buffer.hasRemaining() ) {
-          int length;
 
+          if ( buffer.remaining() < 4 ) {
+            carryOverLengthBytes = new byte[buffer.remaining()];
+            buffer.get(carryOverLengthBytes);
+            carryOverBytes = null;
+            carryOverLength = -1;
+            break;
+          }
+
+          int length;
           if ( lengthBytes != null ) {
             length = ByteBuffer.wrap(lengthBytes).getInt();
             lengthBytes = null;
@@ -684,12 +712,7 @@ public class MMJournal extends AbstractJournal {
             length = buffer.getInt();
           }
 
-          if ( buffer.remaining() < 4 ) {
-            carryOverLengthBytes = new byte[buffer.remaining()];
-            buffer.get(carryOverLengthBytes);
-            carryOverBytes = null;
-            carryOverLength = -1;
-          } else if ( length > buffer.remaining() ) {
+          if ( length > buffer.remaining() ) {
             carryOverBytes = new byte[buffer.remaining()];
             carryOverLength = length;
             buffer.get(carryOverBytes);
@@ -698,7 +721,6 @@ public class MMJournal extends AbstractJournal {
             byte[] bytes = new byte[length];
             buffer.get(bytes);
             String entry = new String(bytes, 0, length, Charset.forName("UTF-8"));
-            System.out.println(entry);
 
             MedusaEntry medusaEntry = (MedusaEntry) x.create(JSONParser.class).parseString(entry);
             medusaEntrys.add(medusaEntry);
@@ -716,6 +738,7 @@ public class MMJournal extends AbstractJournal {
     return ret;
   }
 
+  int quorumSize = 1;
   // Verify entries from same group. And concat them into list.
   private final List<MedusaEntry> concatEntries(Map<Long, List<MedusaEntry>> nodeToEntry) {
     Map<MedusaEntry, Integer> entryCount = new HashMap<MedusaEntry, Integer>();
@@ -729,10 +752,11 @@ public class MMJournal extends AbstractJournal {
     }
 
     List<MedusaEntry> entryList = new LinkedList<MedusaEntry>();
+    System.out.println("entryCount size: " + entryCount.size());
     for ( Map.Entry<MedusaEntry, Integer> entry : entryCount.entrySet() ) {
-      if ( entry.getValue().intValue() >= 2 ) entryList.add(entry.getKey());
+      if ( entry.getValue().intValue() >= quorumSize ) entryList.add(entry.getKey());
     }
-
+    System.out.println("entryList size: " + entryList.size());
     return entryList;
   }
 
@@ -743,8 +767,10 @@ public class MMJournal extends AbstractJournal {
 
   private final List<MedusaEntry> mergeEntries(Map<Long, List<MedusaEntry>> groupToEntry) {
 
-    ArrayList<List<MedusaEntry>> keyList = new ArrayList<List<MedusaEntry>>();
-    List<MedusaEntry> ret = keyList.stream().flatMap(list -> list.stream()).collect(Collectors.toList());
+    List<MedusaEntry> ret = new LinkedList<MedusaEntry>();
+    for ( Map.Entry<Long, List<MedusaEntry>> entry : groupToEntry.entrySet() ) {
+      ret.addAll(entry.getValue());
+    }
     return ret;
   }
 
@@ -766,6 +792,7 @@ public class MMJournal extends AbstractJournal {
     private volatile boolean isRunning;
     private final Long groupId;
     private final Queue<SocketChannel> acceptedSocketChannels;
+    private final List<SocketChannel> registerChannels;
     private X x;
 
 
@@ -776,9 +803,11 @@ public class MMJournal extends AbstractJournal {
       this.selector = Selector.open();
       isRunning = true;
       acceptedSocketChannels = new LinkedBlockingQueue<SocketChannel>();
+      registerChannels = new LinkedList<SocketChannel>();
     }
 
     public boolean acceptSocketChannel(SocketChannel channel) {
+      System.out.println(isRunning);
       if ( isRunning && acceptedSocketChannels.offer(channel) ) {
         wakeup();
         return true;
@@ -793,6 +822,8 @@ public class MMJournal extends AbstractJournal {
     public void close() {
       try {
         isRunning = false;
+        selector.wakeup();
+        //TODO: check if a bug when close.
         selector.close();
       } catch ( IOException e ) {
         System.out.println(e);
@@ -804,12 +835,14 @@ public class MMJournal extends AbstractJournal {
 
       while ( isRunning && socketChannel != null ) {
         SelectionKey key = null;
+        System.out.println("new connection");
         try {
           socketChannel.configureBlocking(false);
           socketChannel.socket().setSoLinger(false, -1);
           socketChannel.socket().setTcpNoDelay(true);
 
-          key = socketChannel.register(selector, SelectionKey.OP_READ);
+          key = socketChannel.register(selector, SelectionKey.OP_CONNECT);
+          registerChannels.add(socketChannel); 
 
         } catch ( IOException e ) {
           System.out.println(e);
@@ -829,9 +862,23 @@ public class MMJournal extends AbstractJournal {
           SelectionKey key = iterator.next();
           iterator.remove();
 
-          if ( key.isValid() == false ) {
-            TCPNioServer.removeSelectionKey(key);
-            continue;
+          if ( key.isConnectable() ) {
+              System.out.println("client connect success");
+              SocketChannel channel=(SocketChannel)key.channel();
+              if(channel.isConnectionPending()){
+                  channel.finishConnect();
+              }
+              channel.configureBlocking(false);
+              channel.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
+          }
+
+          // if ( key.isValid() == false ) {
+          //   TCPNioServer.removeSelectionKey(key);
+          //   continue;
+          // }
+
+          if ( key.isWritable() ) {
+            initialRequest(key);
           }
 
           if ( key.isReadable() ) {
@@ -870,6 +917,8 @@ public class MMJournal extends AbstractJournal {
           msgBuf.clear();
         }
 
+        System.out.println("broadcast: " + msgStr);
+
         FObject msg = x.create(JSONParser.class).parseString(msgStr);
 
         if ( msg == null ) {
@@ -878,7 +927,8 @@ public class MMJournal extends AbstractJournal {
         }
 
         if ( ! ( msg instanceof MedusaEntry ) ) {
-          System.out.println("Request should be MedusaEntry");
+          System.out.println(msgStr);
+          return;
         }
 
         MedusaEntry entry = (MedusaEntry) msg;
@@ -886,6 +936,29 @@ public class MMJournal extends AbstractJournal {
         processEntry(groupId, entry);
       } catch ( IOException e ) {
         System.out.println(e);
+        TCPNioServer.removeSelectionKey(key);
+        TCPNioServer.hardCloseSocketChannel(socketChannel);
+      }
+    }
+
+    private void initialRequest(SelectionKey key) {
+      System.out.println("write");
+      SocketChannel socketChannel = null;
+      try {
+        socketChannel = (SocketChannel) key.channel();
+        String tcpMsgStr = createListenMessageString(serviceName, "");
+        // Outputter outputter = new Outputter(x);
+        // String tcpMsgStr = outputter.stringify(tcpMsg);
+        System.out.println(tcpMsgStr);
+        byte[] bytes = tcpMsgStr.getBytes(Charset.forName("UTF-8"));
+        ByteBuffer tcpMsgBuf = ByteBuffer.allocate(4 + bytes.length);
+        tcpMsgBuf.putInt(bytes.length);
+        tcpMsgBuf.put(bytes);
+        tcpMsgBuf.flip();
+        socketChannel.write(tcpMsgBuf);
+        key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
+      } catch ( IOException e ) {
+        e.printStackTrace();
         TCPNioServer.removeSelectionKey(key);
         TCPNioServer.hardCloseSocketChannel(socketChannel);
       }
@@ -899,6 +972,13 @@ public class MMJournal extends AbstractJournal {
           select();
         }
 
+      } catch ( Exception e ) {
+        e.printStackTrace();
+      } finally {
+
+        for ( SocketChannel channel : registerChannels ) {
+          TCPNioServer.hardCloseSocketChannel(channel);
+        }
         for ( SelectionKey key : selector.keys() ) {
           TCPNioServer.removeSelectionKey(key);
         }
@@ -908,14 +988,13 @@ public class MMJournal extends AbstractJournal {
           TCPNioServer.hardCloseSocketChannel(socketChannel);
           socketChannel = acceptedSocketChannels.poll();
         }
-      } catch ( Exception e ) {
-        System.out.println(e);
       }
     }
   }
 
 
   private void initialListener(X x) throws IOException {
+    System.out.println("initialListerner");
     if ( processorsMap != null ) {
       for ( Map.Entry<Long, Processor> entry : processorsMap.entrySet() ) {
         entry.getValue().close();
@@ -929,17 +1008,23 @@ public class MMJournal extends AbstractJournal {
     cachedEntryMap = new HashMap<Long, MedusaEntry>();
 
     processorsMap = new HashMap<Long, Processor>();
-    //TODO: Initial processor.
+
     for ( Map.Entry<Long, ArrayList<ClusterNode>> group : groupToMN.entrySet() ) {
       Long groupId = group.getKey();
       Processor processor = new Processor(x, groupId);
+      processor.start();
       for ( ClusterNode node : group.getValue() ) {
-        //TODO: create socketChannel.
-        SocketChannel channel = null;
-        //TODO: need to wait until connection success.
+        //TODO: create socketChannel;
+        InetSocketAddress address = new InetSocketAddress(node.getIp(), node.getSocketPort());
+        SocketChannel channel = SocketChannel.open();
+        channel.configureBlocking(false);
+        channel.connect(address);
+        // if ( processor.acceptSocketChannel(channel) ) throw new RuntimeException("Socket connection error");
         processor.acceptSocketChannel(channel);
       }
     }
+    // EntryLoader loader = new EntryLoader(x);
+    // loader.start();
   }
 
   // The method is called when Secondary become primary.
@@ -1016,7 +1101,13 @@ public class MMJournal extends AbstractJournal {
 
     @Override
     public void run() {
-      processEntryFromCachedMap(globalIndex.get() + 1L);
+      while ( isRunning ) {
+        try {
+          processEntryFromCachedMap(globalIndex.get() + 1L);
+        } catch ( Exception e ) {
+          e.printStackTrace();
+        }
+      }
     }
   }
 

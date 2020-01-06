@@ -401,7 +401,8 @@ public class Election extends AbstractFObject {
         public void put(Object obj, Detachable sub) {
 
           try {
-            Thread.sleep(50);
+            // Give system enough time to handle inflight request.
+            Thread.sleep(1000);
           } catch ( InterruptedException e ) {
             System.out.println(e);
           }

@@ -25,11 +25,12 @@ public class MMDAO extends JDAO {
   public MMDAO(X x, ClassInfo classInfo, String mnPort) {
     setX(x);
     setOf(classInfo);
+    nspecKey = classInfo.getId();
     setDelegate(new MDAO(classInfo));
     setJournal(MMJournal.getMMjournal(mnPort));
     this.mnPort = mnPort;
     //TODO: command replay for testing election.
-    //getJournal().replay(x, getDelegate());
+    getJournal().replay(x, getDelegate());
   }
 
   //Remove synchronized key word.

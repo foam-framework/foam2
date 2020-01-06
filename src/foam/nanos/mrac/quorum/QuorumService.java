@@ -27,6 +27,7 @@ public class QuorumService extends AbstractFObject implements NanoService {
   public volatile Vote primaryVote;
   private RunElection runElection;
   DAO clusterDAO;
+  private volatile ClusterNode primaryClusterNode;
 
   public QuorumService(X x) {
     System.out.println("QuorumServer");
@@ -81,6 +82,21 @@ public class QuorumService extends AbstractFObject implements NanoService {
     }
   }
 
+  //TODO: apply this function.
+  // This function only executes in one thread.
+  private void setPrimaryClusterNode(Long id) {
+    ClusterNode primaryNode = (ClusterNode) clusterDAO.find(id);
+    if ( primaryNode == null ) throw new RuntimeException("Can not find ClusterNode with id: " + id.toString());
+    primaryClusterNode = primaryNode;
+  }
+
+  private void setPrimaryClusterNode(ClusterNode clusterNode) {
+    primaryClusterNode = clusterNode;
+  }
+
+  public ClusterNode getPrimaryClusterNode() {
+    return primaryClusterNode;
+  }
 
   public synchronized void reset() {
     isReset = true;
