@@ -112,7 +112,7 @@ foam.CLASS({
       this.SUPER();
       this
         .addClass(this.myClass())
-        .add(self.slot(function(config$viewBorder, config$browseTitle) {
+        .add(self.slot(function(config$viewBorder) {
           return self.E()
             .start(self.Rows)
               .start(self.Rows)
@@ -125,8 +125,8 @@ foam.CLASS({
                 .endContext()
                 .start(self.Cols).style({ 'align-items': 'center' })
                   .start()
-                    .add(`Create your ${config$browseTitle}`)
-                      .addClass(this.myClass('account-name'))
+                    .add(self.slot('config$createTitle'))
+                    .addClass(this.myClass('account-name'))
                   .end()
                   .startContext({ data: self }).add(self.SAVE).endContext()
                 .end()

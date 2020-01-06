@@ -43,12 +43,12 @@ foam.CLASS({
     {
       class: 'String',
       name: 'deletePermission_',
-      javaFactory: 'return getName() + ".read.lifecyclestate.deleted";'
+      javaFactory: 'return "lifecyclestate.deleted.read." + getName();'
     },
     {
       class: 'String',
       name: 'rejectPermission_',
-      javaFactory: 'return getName() + ".read.lifecyclestate.rejected";'
+      javaFactory: 'return "lifecyclestate.rejected.read." + getName();'
     }
   ],
 
@@ -84,11 +84,14 @@ foam.CLASS({
     {
       name: 'select_',
       javaCode: `
-        if ( canReadDeleted(x) && canReadRejected(x) ) {
+        boolean userCanReadDeleted = canReadDeleted(x);
+        boolean userCanReadRejected = canReadRejected(x);
+
+        if ( userCanReadDeleted && userCanReadRejected ) {
           return getDelegate().select_(x, sink, skip, limit, order, predicate);
         }
 
-        if ( canReadDeleted(x) && ! canReadRejected(x) ) {
+        if ( userCanReadDeleted && ! userCanReadRejected ) {
           return getDelegate()
             .where(
               MLang.NOT(
@@ -100,7 +103,7 @@ foam.CLASS({
 
         // ! we are also handling the deprecated DeletedAware until we fully remove it from the system
         if ( getOf().getAxiomByName("deleted") != null ){
-          if ( ! canReadDeleted(x) && canReadRejected(x) ) {
+          if ( ! userCanReadDeleted && userCanReadRejected ) {
             return getDelegate()
               .where(
                 MLang.NOT(
@@ -126,7 +129,7 @@ foam.CLASS({
             .select_(x, sink, skip, limit, order, predicate);
         }
 
-        if ( ! canReadDeleted(x) && canReadRejected(x) ) {
+        if ( ! userCanReadDeleted && userCanReadRejected ) {
           return getDelegate()
             .where(
               MLang.NOT(

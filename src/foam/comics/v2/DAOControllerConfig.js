@@ -57,6 +57,11 @@ foam.CLASS({
       expression: function(of) { return foam.String.pluralize(of.model_.label); }
     },
     {
+      class: 'String',
+      name: 'createTitle',
+      expression: function(of) { return 'Create a New ' + of.model_.label; }
+    },
+    {
       class: 'StringArray',
       name: 'defaultColumns',
       factory: null,
@@ -117,6 +122,18 @@ foam.CLASS({
       class: 'Boolean',
       name: 'createEnabled',
       documentation: 'If set to false, the "Create" button will not be visible.',
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'editEnabled',
+      documentation: 'True to enable the edit button.',
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'deleteEnabled',
+      documentation: 'True to enable the delete button.',
       value: true
     }
   ]
