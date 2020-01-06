@@ -21,7 +21,8 @@ foam.CLASS({
   requires: [
     'foam.nanos.auth.Address',
     'foam.nanos.auth.PriorPassword',
-    'foam.nanos.auth.Phone'
+    'foam.nanos.auth.Phone',
+    'net.nanopay.sme.onboarding.model.SuggestedUserTransactionInfo'
   ],
 
   javaImports: [
