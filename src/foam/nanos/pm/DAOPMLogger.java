@@ -33,7 +33,7 @@ public class DAOPMLogger
 
   @Override
   public void log(PM pm) {
-    if ( ! pm.getClassType().getId().equals("foam.dao.PMDAO") ) {
+    if ( ! pm.getClassType().getId().equals("foam.dao.PMDAO") && ! pm.getClassType().getId().equals("foam.dao.PipelinePMDAO") ) {
       if ( pm.getClassType().getId().indexOf("PM") != -1 ) return;
       if ( pm.getName().indexOf("PM")              != -1 ) return;
       if ( pm.getClassType().getId().indexOf("pm") != -1 ) return;
