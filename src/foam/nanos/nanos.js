@@ -264,5 +264,11 @@ FOAM_FILES([
   //authservice
   { name: "foam/nanos/auth/CapabilityAuthService" },
   // google
-  { name: "foam/nanos/geocode/GoogleMapsCredentials" }
+  { name: "foam/nanos/geocode/GoogleMapsCredentials" },
+
+  // foam/nanos/rope
+  { name: "foam/nanos/rope/ROPE" },
+  { name: "foam/nanos/rope/CompositeROPE" },
+  { name: "foam/nanos/rope/ROPEAuthorizer" },
+  { name: "foam/nanos/rope/ROPEUtils" }
 ]);

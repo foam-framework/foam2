@@ -518,6 +518,16 @@ var classes = [
   'foam.strategy.StrategizerService',
   'foam.strategy.BasicStrategizer',
   'foam.strategy.ClientStrategizerService',
+  //ROPE
+  'foam.nanos.rope.ROPE',
+  'foam.nanos.rope.OrROPE',
+  'foam.nanos.rope.AndROPE',
+  'foam.nanos.rope.ROPEAuthorizer',
+  'foam.nanos.rope.CompositeROPE',
+  'foam.nanos.rope.RelationshipMap',
+  'foam.nanos.rope.CRUDMap',
+  'foam.nanos.rope.CrudOperation',
+  'foam.nanos.rope.NextRelationshipsList',
   //concurrent
   'foam.util.concurrent.AbstractAssembly',
   'foam.util.concurrent.Assembly',
