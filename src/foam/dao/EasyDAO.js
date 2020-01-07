@@ -156,8 +156,11 @@ foam.CLASS({
           }
           // The decorator dao may be a proxy chain
           ProxyDAO proxy = (ProxyDAO) getDecorator();
-          while ( proxy.getDelegate() != null )
+          while ( proxy.getDelegate() != null &&
+                  ! (proxy.getDelegate() instanceof foam.dao.NullDAO) ) {
+
             proxy = (ProxyDAO) proxy.getDelegate();
+          }
           proxy.setDelegate(delegate);
           delegate = (ProxyDAO) getDecorator();
         }
@@ -562,7 +565,7 @@ foam.CLASS({
       documentation: 'Decorate with a ServiceProviderAwareDAO',
       name: 'serviceProviderAware',
       class: 'Boolean',
-      // note: want this decorator on the non-local/served stack.
+      // REVIEW: want this decorator on the non-local/served stack.
       javaFactory: `return getNSpec() != null &&
                             getNSpec().getServe() &&
                             foam.nanos.auth.ServiceProviderAware.class.isAssignableFrom(getOf().getObjClass());`
@@ -914,8 +917,10 @@ model from which to test ServiceProvider ID (spid)`,
 
         foam.dao.ProxyDAO decoratorptr = decorator;
 
-        while ( decorator.getDelegate() != null )
+        while ( decorator.getDelegate() != null &&
+                ! ( decorator.getDelegate() instanceof foam.dao.NullDAO ) ) {
           decorator = (ProxyDAO) decorator.getDelegate();
+        }
         decorator.setDelegate(proxy.getDelegate());
         proxy.setDelegate(decoratorptr);
         return true;
