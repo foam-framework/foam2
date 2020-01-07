@@ -67,7 +67,7 @@ public class CronScheduler
           public void put(Object obj, Detachable sub) {
             Cron cron = (Cron) ((FObject) obj).fclone();
 
-            PM pm = new PM(CronScheduler.this.getClass(), "cronScheduler");
+            PM pm = new PM(CronScheduler.class, "cronScheduler");
             try {
               cron.runScript(CronScheduler.this.getX());
               cronDAO_.put((FObject) cron);
