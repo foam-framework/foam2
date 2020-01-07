@@ -114,20 +114,23 @@ ServiceProviderAware`,
 
     Predicate spidPredicate = predicate;
 
-    if ( ServiceProviderAware.class.isAssignableFrom(getOf().getObjClass()) ) {
-      User user = (User) x.get("user");
-      PropertyInfo spidProperty = ((PropertyInfo) getOf().getAxiomByName("spid"));
-      spidPredicate = MLang.EQ(spidProperty, user.getSpid());
+    String spid = (String) x.get("spid");
+    if ( spid != null ) { // spid may be null during account creation.
+      if ( ServiceProviderAware.class.isAssignableFrom(getOf().getObjClass()) ) {
 
-      if ( predicate != null ) {
-        spidPredicate = MLang.AND(
-          spidPredicate,
-          predicate
-        );
+        PropertyInfo spidProperty = ((PropertyInfo) getOf().getAxiomByName("spid"));
+        spidPredicate = MLang.EQ(spidProperty, spid);
+
+        if ( predicate != null ) {
+          spidPredicate = MLang.AND(
+            spidPredicate,
+            predicate
+          );
+        }
+      } else if ( getPropertyInfos() != null &&
+                  getPropertyInfos().size() > 0 ) {
+        spidPredicate = new ServiceProviderAwarePredicate(x, predicate, getPropertyInfos());
       }
-    } else if ( getPropertyInfos() != null &&
-                getPropertyInfos().size() > 0 ) {
-      spidPredicate = new ServiceProviderAwarePredicate(x, predicate, getPropertyInfos());
     }
 
     return getDelegate().select_(
