@@ -95,7 +95,7 @@ return listener
         cls.extras.push(`
 public ProxyDAO(foam.core.X x, foam.dao.DAO delegate) {
   foam.nanos.logger.Logger log = (foam.nanos.logger.Logger)x.get("logger");
-  log.warning("Direct constructor use is deprecated. Use Builder instead.");
+  log.warning("Direct constructor use is deprecated. Use Builder instead.", (delegate != null ? delegate.getOf().getId() : ""));
   setX(x);
   setDelegate(delegate);
 }
