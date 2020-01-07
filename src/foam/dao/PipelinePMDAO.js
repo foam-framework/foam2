@@ -104,6 +104,13 @@ foam.CLASS({
       setDelegate(delegate);
       init_();
      }
+
+     // TODO: Remove when all DAO nspecs converted to EasyDAO
+     public PipelinePMDAO(X x, DAO delegate) {
+      setX(x);
+      setDelegate(delegate);
+      init_();
+     }
           `
         }));
       }
