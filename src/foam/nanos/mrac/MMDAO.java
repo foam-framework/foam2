@@ -33,6 +33,15 @@ public class MMDAO extends JDAO {
     getJournal().replay(x, getDelegate());
   }
 
+  public MMDAO(X x, String nspecKey, MDAO dao, String mnPort) {
+    setX(x);
+    setOf(dao.getOf());
+    this.nspecKey = nspecKey;
+    setDelegate(dao);
+    this.mnPort = mnPort;
+    setJournal(MMJournal.getMMjournal(mnPort));
+    ((MMJournal) getJournal()).replay(x, nspecKey, getDelegate());
+  }
   //Remove synchronized key word.
   //TODO: move lock to here
   @Override
@@ -67,7 +76,7 @@ public class MMDAO extends JDAO {
     synchronized ( uniqueStringLock ) {
       result = getDelegate().find_(x, obj.getProperty("id"));
       if ( result == null ) throw new RuntimeException("Record do not find. Id: " + obj.getProperty("id"));
-      //TODO: call MMJournal.
+      getJournal().remove(x, nspecKey, getDelegate(), obj);
       result = getDelegate().remove_(x, obj);
     }
     return result;

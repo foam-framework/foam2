@@ -25,14 +25,13 @@ import java.net.URI;
 public class VotingDAO extends ProxyDAO {
 
   QuorumService quorumService;
-  String serviceName;
-  //Must be the same instance as the one being put in JDAO
-  DAO mdao;
 
-  public VotingDAO(X x, String serviceName, DAO mdao) {
+  public VotingDAO(X x, DAO delegate) {
     setX(x);
-    this.serviceName = serviceName;
-    this.mdao = mdao;
+    QuorumService quorumService = (QuorumService) x.get("quorumService");
+    if ( quorumService == null ) throw new RuntimeException("Can not find quorumService");
+    this.quorumService = quorumService;
+    setDelegate(delegate);
   }
 
   public FObject put_(X x, FObject obj) {

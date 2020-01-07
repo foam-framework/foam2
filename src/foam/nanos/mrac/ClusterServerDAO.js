@@ -15,7 +15,8 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.DAO',
     'foam.nanos.logger.Logger',
-    'foam.nanos.logger.PrefixLogger'
+    'foam.nanos.logger.PrefixLogger',
+    'foam.nanos.mrac.quorum.*'
   ],
 
   methods: [
@@ -23,11 +24,19 @@ foam.CLASS({
       name: 'cmd_',
       javaCode: `
       if ( obj instanceof ClusterCommand ) {
-        ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
-        if ( service == null ||
-            ! service.getIsPrimary() ) {
+        // ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
+        // if ( service == null ||
+        //     ! service.getIsPrimary() ) {
+        //   throw new UnsupportedOperationException("Cluster command not supported on non-primary instance");
+        // }
+
+        QuorumService quorumService = (QuorumService) x.get("quorumService");
+        if ( quorumService == null || quorumService.exposeState != InstanceState.PRIMARY ) {
           throw new UnsupportedOperationException("Cluster command not supported on non-primary instance");
         }
+
+        System.out.println("lallalalalalal");
+        System.out.println(obj);
 
         ClusterCommand request = (ClusterCommand) obj;
         X y = request.applyTo(x);

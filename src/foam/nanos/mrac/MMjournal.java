@@ -143,14 +143,6 @@ public class MMJournal extends AbstractJournal {
         groups.add(groupToMN.get(group));
       }
 
-      //TODO: remove below code. it only use for test.
-      parent1 = new MedusaEntry();
-      parent1.setMyIndex(1);
-      parent1.setMyHash("aa");
-      parent2 = new MedusaEntry();
-      parent2.setMyIndex(2);
-      parent2.setMyHash("bb");
-
       isInitialized = true;
 
     }
@@ -226,6 +218,24 @@ public class MMJournal extends AbstractJournal {
     return obj;
   }
 
+  //TODO: remove after finish two very first parents.
+  private FObject putParentHash(long myIndex, String hash, FObject randomFObject) {
+    Message msg =
+      createMessage(
+        -1,
+        null,
+        -1,
+        null,
+        myIndex,
+        "put_",
+        "p",
+        null,
+        "TOP",
+        randomFObject 
+      );
+    return null;
+  }
+
   @Override
   public FObject remove(X x, String prefix, DAO dao, FObject obj) {
     if ( ! isInitialized ) initial(x);
@@ -267,7 +277,7 @@ public class MMJournal extends AbstractJournal {
 
     while ( i < totalTry ) {
       System.out.println("try");
-      ArrayList<ClusterNode> nodes = groups.get(index / totalTry);
+      ArrayList<ClusterNode> nodes = groups.get(index);
       Object[] tasks = new Object[nodes.size()];
       System.out.println(nodes.size());
 
@@ -462,7 +472,7 @@ public class MMJournal extends AbstractJournal {
 
   // Record SocketChannel for each node.
   private Map<Long, SocketChannel> nodeToSocketChannel;
-  private Map<String, List<FObject>> readyToUseEntry;
+  private Map<String, List<MedusaEntry>> readyToUseEntry;
   private Map<String, DAO> registerDAOs;
 
   private final void initialReplay(X x) {
@@ -474,14 +484,25 @@ public class MMJournal extends AbstractJournal {
 
     }
     nodeToSocketChannel = new HashMap<Long, SocketChannel>();
-    readyToUseEntry = new HashMap<String, List<FObject>>();
+    readyToUseEntry = new HashMap<String, List<MedusaEntry>>();
     registerDAOs = new HashMap<String, DAO>();
+
+    parent1 = new MedusaEntry();
+    parent1.setMyHash("aaaaaa");
+    parent1.setMyIndex(-1L);
+
+    parent2 = new MedusaEntry();
+    parent2.setMyHash("bbbbbb");
+    parent2.setMyIndex(0L);
   }
 
+  @Override
+  public void replay(X x, DAO dao) {
+    throw new RuntimeException("MMJournal do not support replay(x,DAO)");
+  }
   // Make sure only replay once.
   private volatile boolean isReplayed = false;
-  //TODO: add npsec into function.
-  public synchronized void replay(X x, DAO dao) {
+  public synchronized void replay(X x, String nspecKey, DAO dao) {
     //TODO: need a speciall dao.
     if ( ! isInitialized ) initial(x);
 
@@ -491,19 +512,22 @@ public class MMJournal extends AbstractJournal {
       try {
         initialListener(x);
         initialReplay(x);
-        // List<MedusaEntry> entries = retrieveData(x, groupToMN);
-        // System.out.println(">>>>>>>entry start");
-        // System.out.println(entries.size());
-        // for ( MedusaEntry entry : entries ) {
-        //   Outputter outputter = new Outputter(getX());
-        //   String mn = outputter.stringify(entry);
-        //   System.out.println(mn);
-        // }
-        // System.out.println("--------entry end");
-        // cacheOrMDAO(entries);
+        List<MedusaEntry> entries = retrieveData(x, groupToMN);
+        System.out.println(">>>>>>>entry start");
+        System.out.println("total entry receive in replay: " + entries.size());
+        for ( MedusaEntry entry : entries ) {
+          Outputter outputter = new Outputter(getX());
+          String mn = outputter.stringify(entry);
+          System.out.println(mn);
+        }
+        System.out.println("--------entry end");
+        cacheOrMDAO(entries);
       } catch ( Exception e ) {
-        //TODO: retry or stop system.
+        e.printStackTrace();
         throw new RuntimeException(e);
+      }
+      if ( globalIndex.get() < 3 ) {
+        //TODO: very first two parents.
       }
       isReplayed = true;
     }
@@ -512,16 +536,35 @@ public class MMJournal extends AbstractJournal {
 
     // Disable put when doing replay to a dao.
     synchronized ( cacheOrMDAOLock ) {
-      String nspecKey = null;
       if ( readyToUseEntry.get(nspecKey) == null ) {
         System.out.println("No cached entry associated with: " + nspecKey);
         return;
       }
-      for ( FObject obj : readyToUseEntry.get(nspecKey) ) {
-        dao.put(obj);
+      // Load cached entries into DAO.
+      for ( MedusaEntry obj : readyToUseEntry.get(nspecKey) ) {
+        if ( "p".equals(obj.getAction()) ) {
+          //TODO: investigating on TransactionDAO.
+          dao.put(obj.getNu());
+        } else if ( "r".equals(obj.getAction()) ) {
+          dao.remove(obj.getNu());
+        } else {
+          throw new RuntimeException("Do not have action inMedusaEntry");
+        }
       }
       readyToUseEntry.remove(nspecKey);
       registerDAOs.put(nspecKey, dao);
+    }
+  }
+
+  // Help method for text only
+  public void printReadyTOUseEntry() {
+    for ( Map.Entry<String, List<MedusaEntry>> entry : readyToUseEntry.entrySet() ) {
+      System.out.println(entry.getKey() + ":");
+      for ( MedusaEntry obj : entry.getValue() ) {
+        Outputter outputter = new Outputter(getX());
+        String mn = outputter.stringify(obj);
+        System.out.println(mn);
+      }
     }
   }
 
@@ -534,13 +577,20 @@ public class MMJournal extends AbstractJournal {
 
       if ( registerDAOs.get(entry.getNspecKey()) != null ) {
         DAO dao = registerDAOs.get(entry.getNspecKey());
-        dao.put(entry.getNu());
+        if ( "p".equals(entry.getAction()) ) {
+          //TODO: investigating on TransactionDAO.
+          dao.put(entry.getNu());
+        } else if ( "r".equals(entry.getAction()) ) {
+          dao.remove(entry.getNu());
+        } else {
+          throw new RuntimeException("Do not have action inMedusaEntry");
+        }
       } else {
         if ( readyToUseEntry.get(entry.getNspecKey()) == null ) {
-          readyToUseEntry.put(entry.getNspecKey(), new LinkedList() );
+          readyToUseEntry.put(entry.getNspecKey(), new LinkedList<MedusaEntry>() );
         }
-        List<FObject> entryList = readyToUseEntry.get(entry.getNspecKey());
-        entryList.add(entry.getNu());
+        List<MedusaEntry> entryList = readyToUseEntry.get(entry.getNspecKey());
+        entryList.add(entry);
       }
 
       //TODO: update globalIndex and parent, varify hash.
@@ -1101,6 +1151,8 @@ public class MMJournal extends AbstractJournal {
 
     @Override
     public void run() {
+      while ( isReplayed ) {}
+      System.out.println("replay finish. entryloader start");
       while ( isRunning ) {
         try {
           processEntryFromCachedMap(globalIndex.get() + 1L);

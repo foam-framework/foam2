@@ -126,13 +126,13 @@ foam.CLASS({
         foam.dao.ProxyDAO pxy = null;
         while( head instanceof foam.dao.ProxyDAO ) {
           pxy = (foam.dao.ProxyDAO) head;
-          if ( head instanceof foam.dao.MDAO ) 
+          if ( head instanceof foam.dao.MDAO )
             break;
           head = ( (ProxyDAO) head).getDelegate();
         }
         if ( head instanceof foam.dao.MDAO ) {
           setMdao((foam.dao.MDAO)head);
-          if ( getIndex() != null && getIndex().length > 0 ) 
+          if ( getIndex() != null && getIndex().length > 0 )
             getMdao().addIndex(getIndex());
         }
         if ( getFixedSize() != null ) {
@@ -140,7 +140,7 @@ foam.CLASS({
             foam.dao.ProxyDAO fixedSizeDAO = (foam.dao.ProxyDAO) getFixedSize();
             fixedSizeDAO.setDelegate(head);
             pxy.setDelegate(fixedSizeDAO);
-          } 
+          }
           else {
             logger.error(this.getClass().getSimpleName(), "NSpec.name", (getNSpec() != null ) ? getNSpec().getName() : null, "of_", of_, "FixedSizeDAO did not find instanceof MDAO");
             System.exit(1);
@@ -168,9 +168,9 @@ foam.CLASS({
         delegateIsSet_ = true;
         delegate_ = new ProxyDAO.Builder(getX()).setDelegate(delegate).build();
 
-        if ( getGuid() && getSeqNo() ) 
+        if ( getGuid() && getSeqNo() )
           throw new RuntimeException("EasyDAO GUID and SeqNo are mutually exclusive");
-        
+
         if ( getSeqNo() ) {
           delegate = new foam.dao.SequenceNumberDAO.Builder(getX()).
           setDelegate(delegate).
@@ -179,7 +179,7 @@ foam.CLASS({
           build();
         }
 
-        if ( getGuid() ) 
+        if ( getGuid() )
           delegate = new foam.dao.GUIDDAO.Builder(getX()).setDelegate(delegate).build();
 
         if ( getValidated() ) {
@@ -222,13 +222,13 @@ foam.CLASS({
         if ( getCreatedAware() )
           delegate = new foam.nanos.auth.CreatedAwareDAO.Builder(getX()).setDelegate(delegate).build();
 
-        if ( getCreatedByAware() ) 
+        if ( getCreatedByAware() )
           delegate = new foam.nanos.auth.CreatedByAwareDAO.Builder(getX()).setDelegate(delegate).build();
 
-        if ( getLastModifiedAware() ) 
+        if ( getLastModifiedAware() )
           delegate = new foam.nanos.auth.LastModifiedAwareDAO.Builder(getX()).setDelegate(delegate).build();
 
-        if ( getLastModifiedByAware() ) 
+        if ( getLastModifiedByAware() )
           delegate = new foam.nanos.auth.LastModifiedByAwareDAO.Builder(getX()).setDelegate(delegate).build();
 
         if ( getContextualize() ) {
@@ -239,7 +239,7 @@ foam.CLASS({
 
         if ( getOrder() != null && getOrder().length > 0 ) {
           // TODO: CompositeDAO or thenBy
-          for ( foam.mlang.order.Comparator comp : getOrder() ) 
+          for ( foam.mlang.order.Comparator comp : getOrder() )
             delegate = delegate.orderBy(comp);
         }
 
@@ -255,7 +255,7 @@ foam.CLASS({
           // REVIEW: testing for mdao as a way to only cluster the
           // real local dao and not duplicate on the non local.
           // also, ClusterClient uses the MDAO to find the old object
-          // to create a detla for marshalling. 
+          // to create a detla for marshalling.
           logger.debug(this.getClass().getSimpleName(), "clustering", getOf().getId());
           delegate = new foam.nanos.mrac.ClusterClientDAO.Builder(getX())
             .setServiceName(getNSpec().getName())
@@ -264,22 +264,22 @@ foam.CLASS({
             .build();
         }
 
-        if ( getNSpec() != null && getNSpec().getServe() && ! getAuthorize() && ! getReadOnly() ) 
+        if ( getNSpec() != null && getNSpec().getServe() && ! getAuthorize() && ! getReadOnly() )
           logger.warning("EasyDAO", getNSpec().getName(), "Served DAO should be Authorized, or ReadOnly");
 
-        if ( getPermissioned() && ( getNSpec() != null && getNSpec().getServe() ) ) 
+        if ( getPermissioned() && ( getNSpec() != null && getNSpec().getServe() ) )
           delegate = new foam.nanos.auth.PermissionedPropertyDAO.Builder(getX()).setDelegate(delegate).build();
 
-        if ( getReadOnly() ) 
+        if ( getReadOnly() )
           delegate = new foam.dao.ReadOnlyDAO.Builder(getX()).setDelegate(delegate).build();
 
-        if ( getLogging() ) 
+        if ( getLogging() )
           delegate = new foam.nanos.logger.LoggingDAO.Builder(getX()).setNSpec(getNSpec()).setDelegate(delegate).build();
 
-        if ( getPipelinePm() && ( delegate instanceof ProxyDAO ) ) 
+        if ( getPipelinePm() && ( delegate instanceof ProxyDAO ) )
           delegate = new foam.dao.PipelinePMDAO.Builder(getX()).setNSpec(getNSpec()).setDelegate(delegate).build();;
 
-        if ( getPm() ) 
+        if ( getPm() )
           delegate = new foam.dao.PMDAO.Builder(getX()).setNSpec(getNSpec()).setDelegate(delegate).build();
 
         // see comments above regarding DAOs with init_
@@ -876,7 +876,7 @@ foam.CLASS({
         this.mdao && this.mdao.addPropertyIndex.apply(this.mdao, arguments);
         return this;
       },
-      javaCode: ` 
+      javaCode: `
         if ( getMdao() != null ) {
           getMdao().addIndex(props);
         }
@@ -900,7 +900,7 @@ foam.CLASS({
         return this;
       },
       javaCode: `
-        if ( getMdao() != null ) 
+        if ( getMdao() != null )
           getMdao().addIndex(index);
         return this;
       `
@@ -929,7 +929,7 @@ foam.CLASS({
       javaCode: `
         foam.dao.DAO daodecorator = getDelegate();
 
-        if ( ! ( daodecorator instanceof foam.dao.ProxyDAO ) ) 
+        if ( ! ( daodecorator instanceof foam.dao.ProxyDAO ) )
           return false;
 
         ProxyDAO proxy = (ProxyDAO) daodecorator;
@@ -938,18 +938,18 @@ foam.CLASS({
             break;
           else if ( !before && location.isInstance( proxy ) )
             break;
-          else if ( !(proxy.getDelegate() instanceof foam.dao.ProxyDAO) ) 
+          else if ( !(proxy.getDelegate() instanceof foam.dao.ProxyDAO) )
             return false;
 
           proxy = (foam.dao.ProxyDAO) proxy.getDelegate();
         }
 
-        if ( decorator == null || ! ( decorator.getDelegate() instanceof ProxyDAO ) ) 
+        if ( decorator == null || ! ( decorator.getDelegate() instanceof ProxyDAO ) )
           return false;
 
         foam.dao.ProxyDAO decoratorptr = decorator;
-        
-        while ( decorator.getDelegate() != null ) 
+
+        while ( decorator.getDelegate() != null )
           decorator = (ProxyDAO) decorator.getDelegate();
         decorator.setDelegate(proxy.getDelegate());
         proxy.setDelegate(decoratorptr);

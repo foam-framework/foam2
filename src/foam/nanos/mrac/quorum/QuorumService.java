@@ -19,7 +19,7 @@ import java.io.IOException;
 public class QuorumService extends AbstractFObject implements NanoService {
 
   protected Long clusterId = Long.parseLong(System.getProperty("CLUSTER"));
-  public final ClusterNode mySelf;
+  public ClusterNode mySelf;
   private QuorumNetworkManager networkManager;
   private Election election;
   // Initial myState.
@@ -27,11 +27,16 @@ public class QuorumService extends AbstractFObject implements NanoService {
   public volatile Vote primaryVote;
   private RunElection runElection;
   DAO clusterDAO;
-  private volatile ClusterNode primaryClusterNode;
+  private volatile ClusterNode primaryClusterNode = null;
 
-  public QuorumService(X x) {
+
+  public boolean electing() {
+    return false;
+  }
+
+  public void start() throws Exception {
     System.out.println("QuorumServer");
-    setX(x);
+    X x = getX();
     if ( x == null ) throw new RuntimeException("Context no found.");
     clusterDAO = (DAO) x.get("clusterNodeDAO");
     if ( clusterDAO == null ) throw new RuntimeException("clusterNodeDAO no found.");
@@ -42,15 +47,7 @@ public class QuorumService extends AbstractFObject implements NanoService {
     networkManager = new QuorumNetworkManager(x);
     election = new Election(x, networkManager, this);
     runElection = new RunElection();
-  }
 
-
-
-  public boolean electing() {
-    return false;
-  }
-
-  public void start() throws Exception {
     initialElection();
     runElection.start();
   }
@@ -84,9 +81,9 @@ public class QuorumService extends AbstractFObject implements NanoService {
 
   //TODO: apply this function.
   // This function only executes in one thread.
-  private void setPrimaryClusterNode(Long id) {
+  private void setPrimaryClusterNode(long id) {
     ClusterNode primaryNode = (ClusterNode) clusterDAO.find(id);
-    if ( primaryNode == null ) throw new RuntimeException("Can not find ClusterNode with id: " + id.toString());
+    if ( primaryNode == null ) throw new RuntimeException("Can not find ClusterNode with id: " + id);
     primaryClusterNode = primaryNode;
   }
 
@@ -119,17 +116,19 @@ public class QuorumService extends AbstractFObject implements NanoService {
           try {
             System.out.println("ELECTING");
             setPrimaryVote(election.electingPrimary());
+            setPrimaryClusterNode(getPrimaryVote().getPrimaryInstanceId());
             System.out.println(">>>>>>>>>>>>>>>");
             System.out.println("!!!!!!!!!!!!!end election");
             System.out.println("*********Primary: " + getPrimaryVote().getPrimaryInstanceId());
           } catch ( Exception e ) {
+            e.printStackTrace();
             setMyState(InstanceState.ELECTING);
           }
         } else if ( getMyState() == InstanceState.PRIMARY ) {
           System.out.println("Primary");
           try {
-            //TODO: adjust MMjournal.
             exposeState = InstanceState.PRIMARY;
+            setPrimaryClusterNode(getPrimaryVote().getPrimaryInstanceId());
             while ( true ) {
               //once become primary. It will stay primary forever.
             }
@@ -146,6 +145,7 @@ public class QuorumService extends AbstractFObject implements NanoService {
             if ( primaryNode == null ) throw new RuntimeException("Can not find primary node");
             String urlString = "http://" + primaryNode.getIp() + ":" + primaryNode.getServicePort() + "/service" + "/ping";
             exposeState = InstanceState.SECONDARY;
+            setPrimaryClusterNode(primaryNode);
             while ( true ) {
               try {
                 Thread.sleep(200);
@@ -159,6 +159,7 @@ public class QuorumService extends AbstractFObject implements NanoService {
             e.printStackTrace();
           } finally {
             exposeState = InstanceState.ELECTING;
+            setPrimaryClusterNode(null);
             setMyState(InstanceState.ELECTING);
           }
         } else {
