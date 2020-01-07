@@ -109,7 +109,17 @@ foam.CLASS({
           .createErrorSlotFor(this.buildModel$).get()
           .filter(e => e).length == 0;
       }
-    }
+    },
+    {
+      name: 'submit',
+      label: 'Finish',
+      isAvailable: function(buildModel$errors_, nextIndex) {
+        return ! buildModel$errors_ && nextIndex === -1 && this.buildModel.submit;
+      },
+      code: function(x) {
+        this.buildModel.submit(x);
+      }
+    },
   ],
 
   methods: [
@@ -132,6 +142,7 @@ foam.CLASS({
             .start(self.Cols).addClass(this.myClass('footer'))
               .add(this.PREV)
               .add(this.NEXT)
+              .add(this.SUBMIT)
             .end()
           .endContext()
         .end();
