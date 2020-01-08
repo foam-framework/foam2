@@ -79,15 +79,12 @@ public class Boot {
       }
     }, null);
 
-    // PM factory
+    // PM factory, only return a real PM 1% of the time
     root_ = root_.putFactory("PM", new XFactory() {
       public Object create(X x) {
-        int rand = ThreadLocalRandom.current().nextInt(0, 100);
-        if ( rand == 0 ) {
-          return new PM();
-        } else {
-          return nullPM_;
-        }
+        return ThreadLocalRandom.current().nextInt(0, 100) == 0 ?
+          new PM() :
+          nullPM_  ;
       }
     });
 
