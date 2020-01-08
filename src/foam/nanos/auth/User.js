@@ -631,8 +631,6 @@ foam.CLASS({
     {
       name: 'doNotify',
       javaCode: `
-        DAO notificationSettingDAO = (DAO) x.get("notificationSettingDAO");
-
         List<NotificationSetting> settings = ((ArraySink) getNotificationSettings(x).select(new ArraySink())).getArray();
         for( NotificationSetting setting : settings ) {
           setting.sendNotification(x, this, notification);

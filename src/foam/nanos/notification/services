@@ -69,7 +69,7 @@ p({
 p({
   "class": "foam.nanos.boot.NSpec",
   "name": "notificationSettingDAO",
-  "serve": true
+  "serve": true,
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.notification.NotificationSetting.getOwnClassInfo())
