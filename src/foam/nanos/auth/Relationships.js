@@ -52,7 +52,8 @@ foam.RELATIONSHIP({
   inverseName: 'userJunction',
   sourceProperty: {
     hidden: true
-  }
+  },
+  unauthorizedTargetDAOKey: 'localNotificationSettingDAO'
 });
 
 foam.RELATIONSHIP({
@@ -63,5 +64,6 @@ foam.RELATIONSHIP({
   inverseName: 'owner',
   sourceProperty: {
     hidden: true
-  }
+  },
+  unauthorizedTargetDAOKey: 'localNotificationSettingDAO'
 });
