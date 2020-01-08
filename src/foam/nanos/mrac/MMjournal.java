@@ -1176,6 +1176,7 @@ public class MMJournal extends AbstractJournal {
       System.out.println("replay finish. entryloader start");
       while ( isRunning ) {
         try {
+          if ( quorumService.exposeState == InstanceState.PRIMARY ) continue;
           processEntryFromCachedMap(globalIndex.get());
         } catch ( Exception e ) {
           e.printStackTrace();
