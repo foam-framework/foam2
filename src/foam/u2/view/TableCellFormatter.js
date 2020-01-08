@@ -267,6 +267,12 @@ foam.CLASS({
         value -= seconds * 1000;
         var milliseconds = value % 1000;
 
+        // For long durations, don't show milliseconds
+        if ( hours ) seconds = 0;
+
+        // For longer durations, don't show seconds
+        if ( minutes || hours ) milliseconds = 0;
+
         var formatted = [[hours, 'h'], [minutes, 'm'], [seconds, 's'], [milliseconds, 'ms']].reduce((acc, cur) => {
           return cur[0] > 0 ? acc.concat([cur[0] + cur[1]]) : acc;
         }, []).join(' ');
