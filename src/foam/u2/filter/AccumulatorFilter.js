@@ -4,6 +4,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'fetchDAOContents',
+      async: true,
       type: 'java.util.List',
       args: [
         {
@@ -11,8 +12,8 @@ foam.INTERFACE({
           type: 'Context'
         },
         {
-          name: 'dao',
-          type: 'foam.dao.DAO'
+          name: 'serviceName',
+          type: 'String'
         },
         {
           name: 'property',

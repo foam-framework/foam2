@@ -15,6 +15,10 @@ foam.CLASS({
     'foam.mlang.Expressions'
   ],
 
+  imports: [
+    'accumulatorFilter'
+  ],
+
   css: `
     ^ {
       position: relative;
@@ -113,26 +117,7 @@ foam.CLASS({
       required: true
     },
     {
-      name: 'daoContents',
-      preSet: function(_, n) {
-        // remove objects with the same strings for specified property
-        var self = this;
-        return n.reduce(function(accumulator, obj) {
-
-          // create an identifying id
-          var id = obj[self.property];
-
-          // if the id is not found in the temp array
-          // add the object to the output array
-          // and add the key to the temp array
-          if ( accumulator.temp.indexOf(id) === -1 ) {
-            accumulator.out.push(obj);
-            accumulator.temp.push(id);
-          }
-          return accumulator;
-        // return the zero duplicate array
-        }, { temp: [], out: [] }).out;
-      }
+      name: 'daoContents'
     },
     {
       class: 'String',
@@ -198,9 +183,10 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.dao.select().then((results) => {
-        this.daoContents = results.array;
+      this.accumulatorFilter.fetchDAOContents(null, this.dao.serviceName, this.property).then((results) => {
+        this.daoContents = results;
       });
+      
       var self = this;
       this
         .addClass(this.myClass())

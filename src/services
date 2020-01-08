@@ -764,6 +764,18 @@ p({
   "class": "foam.nanos.boot.NSpec",
   "name": "accumulatorFilter",
   "serve": true,
-  "lazy": true,
-  "serviceScript": "return new foam.u2.filter.AccumulatorFilterService();"
+  "serviceClass": "foam.u2.filter.AccumulatorFilterService",
+  "boxClass": "foam.u2.filter.AccumulatorFilterSkeleton",
+  "client": """
+    {
+      "class": "foam.u2.filter.ClientAccumulatorFilterService",
+      "delegate": {
+        "class": "foam.box.SessionClientBox",
+        "delegate": {
+          "class": "foam.box.HTTPBox",
+          "url": "service/accumulatorFilter"
+        }
+      }
+    }
+  """
 })
