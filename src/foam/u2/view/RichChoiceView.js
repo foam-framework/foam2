@@ -269,12 +269,10 @@ foam.CLASS({
       name: 'filter_',
       documentation: 'The text that the user typed in to search by.',
       postSet: function(oldValue, newValue) {
-        this.sections = this.sections.map((section) => {
-          return Object.assign({}, section, {
-            filtered: newValue
-              ? section.dao.where(this.KEYWORD(newValue))
-              : section.dao
-          });
+        this.sections.forEach((section) => {
+          section.filteredDAO = newValue
+            ? section.dao.where(this.KEYWORD(newValue))
+            : section.dao;
         });
       }
     },
@@ -382,7 +380,7 @@ foam.CLASS({
                           .add(section.heading)
                         .end()
                         .start()
-                          .select(section.filtered || section.dao, (obj) => {
+                          .select(section.filteredDAO$proxy, (obj) => {
                             return this.E()
                               .start(self.rowView, { data: obj })
                                 .enableClass('disabled', section.disabled)
