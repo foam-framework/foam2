@@ -2187,7 +2187,7 @@ foam.CLASS({
       name: 'readMode',
       documentation: 'The display mode for this property when the controller mode is VIEW.',
       assertValue: function(newValue) {
-        foam.assert(newValue === foam.u2.DisplayMode.RO || newValue === foam.u2.DisplayMode.HIDDEN, `Read mode must be RO or HIDDEN. Property '${this.of ? this.of.id + '.' : ''}${this.name}' was '${newValue.label}' and must be fixed.`);
+        // no restrictions on DisplayMode
       },
       value: 'RO'
     },
