@@ -34,7 +34,7 @@ foam.CLASS({
       },
     },
     {
-      name: 'setNameHere',
+      name: 'chosenOption',
       //visibility: 'hidden',
       view: function(_, X) {
         return X.data.slot(function(names) {
@@ -49,7 +49,7 @@ foam.CLASS({
     function initE() {
       this.start('div').add('switch :').end().
         start('div').add(this.NAMES).end().
-        start('div').add(this.SET_NAME_HERE).end();
+        start('div').add('The chosen option is ').add(this.CHOSEN_OPTION).end();
     }
   ],
 });
