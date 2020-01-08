@@ -112,6 +112,7 @@ foam.CLASS({
       code: function() {
         var message = `${this.data.model_.label} updated.`;
 
+        // TODO: Make this check foam.nanos.auth.ApprovableAware.isInstance(cData) once ApprovableAware moves to foam
         if ( foam.nanos.auth.LifecycleAware.isInstance(this.data) ){
           message = this.SUCCESS_REQUEST_MESSAGE;
         }
