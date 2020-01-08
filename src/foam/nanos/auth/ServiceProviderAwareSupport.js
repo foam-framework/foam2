@@ -34,12 +34,19 @@ Use: see ServiceProviderAwareTest
     'foam.nanos.auth.User',
     'foam.nanos.logger.Logger',
     'java.util.HashMap',
-    'java.util.Map'
+    'java.util.Map',
+    'java.util.Map.Entry',
   ],
 
   properties: [
     {
       name: 'findMethods',
+      class: 'Map',
+      visibility: 'HIDDEN',
+      javaFactory: 'return new HashMap();'
+    },
+    {
+      name: 'propertyInfos',
       class: 'Map',
       visibility: 'HIDDEN',
       javaFactory: 'return new HashMap();'
@@ -83,7 +90,8 @@ returning true if the context users spid matches the current object.`,
       Object result = obj;
       while ( result != null &&
               properties != null ) {
-        PropertyInfo pInfos[] = (PropertyInfo[]) properties.get(result.getClass().getName());
+//        PropertyInfo pInfos[] = (PropertyInfo[]) properties.get(result.getClass().getName());
+        PropertyInfo pInfos[] = (PropertyInfo[]) getProperties(x, properties, result);
         if ( pInfos == null ) {
           return false;
         }
@@ -106,6 +114,50 @@ returning true if the context users spid matches the current object.`,
        }
      }
      return false;
+     `
+    },
+    {
+      documentation: `Search for obj class name in property info map.
+If not found, test if argument obj is assignable from map class, and
+store the result for subsequent lookups. `,
+      name: 'getProperties',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'properties',
+          type: 'Map'
+        },
+        {
+          name: 'obj',
+          type: 'Object'
+        }
+      ],
+      type: 'foam.core.PropertyInfo[]',
+      javaCode: `
+      String name = obj.getClass().getName();
+      PropertyInfo[] pInfos = (PropertyInfo[]) getPropertyInfos().get(name);
+      if ( pInfos != null ) {
+        return pInfos;
+      }
+
+      for ( Object o : properties.entrySet() ) {
+        Map.Entry entry = (Map.Entry) o;
+        String key = entry.getKey().toString();
+        try {
+          Class cls = Class.forName(key);
+          if ( cls.isAssignableFrom(obj.getClass()) ) {
+            getPropertyInfos().put(name, entry.getValue());
+            return (PropertyInfo[]) entry.getValue();
+          }
+        } catch ( ClassNotFoundException e ) {
+          getPropertyInfos().put(name, null);
+          break;
+        }
+      }
+      return null;
      `
     },
     {
