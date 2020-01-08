@@ -69,6 +69,8 @@ import java.nio.ByteBuffer;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 
+import foam.nanos.mrac.quorum.*;
+
 // Make sure that this class sould only have one instance in single journal mode.
 // In multiple journal mode. each JDAO will have it's own instance.
 // can simple get put to MedusaMediator
@@ -78,7 +80,7 @@ import java.nio.charset.Charset;
 public class MMJournal extends AbstractJournal {
 
   private String serviceName;
-
+  private QuorumService quorumService;
   private final Map<Long, ArrayList<ClusterNode>> groupToMN = new HashMap<Long, ArrayList<ClusterNode>>();
   private final List<ArrayList<ClusterNode>> groups  = new LinkedList<ArrayList<ClusterNode>>();
   private final List<ClusterNode> availableNodes = new LinkedList<ClusterNode>();
@@ -120,6 +122,11 @@ public class MMJournal extends AbstractJournal {
       if ( isInitialized ) return;
 
       if ( x == null ) throw new RuntimeException("Context miss.");
+
+      quorumService = (QuorumService) x.get("quorumService");
+
+      if ( quorumService == null ) throw new RuntimeException("quorumService miss");
+
       DAO clusterNodeDAO = (DAO) x.get("clusterNodeDAO");
       if ( clusterNodeDAO == null ) throw new RuntimeException("clusterNodeDAO miss");
 
@@ -596,6 +603,8 @@ public class MMJournal extends AbstractJournal {
       //TODO: update globalIndex and parent, varify hash.
       globalIndex.set(entry.getMyIndex() + 1L);
       recordIndex = recordIndex + 1L;
+      System.out.println("aaaaaaaaccccc");
+      updateHash(entry);
     }
   }
 
@@ -1073,8 +1082,8 @@ public class MMJournal extends AbstractJournal {
         processor.acceptSocketChannel(channel);
       }
     }
-    // EntryLoader loader = new EntryLoader(x);
-    // loader.start();
+    EntryLoader loader = new EntryLoader(x);
+    loader.start();
   }
 
   // The method is called when Secondary become primary.
@@ -1093,12 +1102,20 @@ public class MMJournal extends AbstractJournal {
   private Map<Long, MedusaEntry> cachedEntryMap;
   private Object cachedEntryMapLock = new Object();
 
+  //TODO: add consensus
   private void processEntry(Long groupId, MedusaEntry entry) {
+    if ( quorumService.exposeState == InstanceState.PRIMARY ) return; 
     Map<MedusaEntry, Integer> entryCount = cachedEntry.get(groupId);
     //TODO: provide a way to clear cache.
     synchronized ( entryCount ) {
+      //TODO: rewrite this method.
       if ( entry.getMyIndex() < globalIndex.get() ) return;
-
+      if ( entryCount.get(entry) == null ) {
+        addEntryIntoCachedMap(entry);
+        return;
+      } else if ( entryCount.get(entry) != null ) {
+        return;
+      }
       if ( entryCount.get(entry) == null ) {
         entryCount.put(entry, new Integer(1));
       } else if ( entryCount.get(entry) == 1 ) {
@@ -1112,15 +1129,19 @@ public class MMJournal extends AbstractJournal {
 
   private void addEntryIntoCachedMap(MedusaEntry entry) {
     synchronized ( cachedEntryMapLock ) {
+      System.out.println("cache");
+      System.out.println("entry");
+      System.out.println(globalIndex.get());
       cachedEntryMap.put(entry.getMyIndex(), entry);
     }
   }
 
-  private void processEntryFromCachedMap(Long globalInex) {
-    if ( cachedEntryMap.get(globalIndex) != null ) {
+  //TODO: create a queue.
+  private void processEntryFromCachedMap(Long index) {
+    if ( cachedEntryMap.get(index) != null ) {
       synchronized ( cachedEntryMapLock ) {
-        cacheOrMDAO(cachedEntryMap.get(globalIndex));
-        cachedEntryMap.remove(globalIndex);
+        cacheOrMDAO(cachedEntryMap.get(index));
+        cachedEntryMap.remove(index);
       }
     }
   }
@@ -1137,7 +1158,7 @@ public class MMJournal extends AbstractJournal {
 
   private class EntryLoader extends FoamThread {
 
-    private volatile boolean isRunning;
+    private volatile boolean isRunning = true;
     private X x;
 
     public EntryLoader(X x) {
@@ -1151,11 +1172,11 @@ public class MMJournal extends AbstractJournal {
 
     @Override
     public void run() {
-      while ( isReplayed ) {}
+      while ( ! isReplayed && isRunning ) {}
       System.out.println("replay finish. entryloader start");
       while ( isRunning ) {
         try {
-          processEntryFromCachedMap(globalIndex.get() + 1L);
+          processEntryFromCachedMap(globalIndex.get());
         } catch ( Exception e ) {
           e.printStackTrace();
         }

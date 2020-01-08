@@ -11,6 +11,7 @@ foam.ENUM({
   values: [
     'PRIMARY',
     'SECONDARY',
-    'ELECTING'
+    'ELECTING',
+    'NONE'
   ]
 })
