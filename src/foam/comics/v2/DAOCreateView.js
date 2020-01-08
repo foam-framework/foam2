@@ -49,7 +49,8 @@ foam.CLASS({
     'foam.u2.dialog.NotificationMessage'
   ],
   imports: [
-    'stack'
+    'stack',
+    'ctrl'
   ],
   exports: [
     'controllerMode'
@@ -78,6 +79,16 @@ foam.CLASS({
       }
     }
   ],
+  messages: [
+    {
+      name: 'SUCCESS_REQUEST_MESSAGE',
+      message: 'An approval request has been created.'
+    },
+    {
+      name: 'SUCCESS_CREATED_MESSAGE',
+      message: 'Successfully created.'
+    }
+  ],
   actions: [
     {
       name: 'save',
@@ -86,15 +97,22 @@ foam.CLASS({
       },
       code: function() {
         var cData = this.data;
+        var message = this.SUCCESS_CREATED_MESSAGE;
 
         if ( foam.nanos.auth.LifecycleAware.isInstance(cData) ) {
           cData = cData.clone();
           cData.lifecycleState = foam.nanos.auth.LifecycleState.PENDING;
+
+          // TODO: Make this check foam.nanos.auth.ApprovableAware.isInstance(cData) once ApprovableAware moves to foam
+          message = this.SUCCESS_REQUEST_MESSAGE;
         }
         
         this.config.dao.put(cData).then((o) => {
           this.data = o;
           this.finished.pub();
+          this.ctrl.add(this.NotificationMessage.create({
+            message: message
+          }));
           this.stack.back();
         }, (e) => {
           this.throwError.pub(e);

@@ -29,6 +29,7 @@ foam.CLASS({
     { name: 'TITLE', message: 'Delete ' },
     { name: 'CONFIRM_DELETE_1', message: 'Are you sure you want to delete' },
     { name: 'SUCCESS_MSG', message: ' deleted.' },
+    { name: 'SUCCESS_MSG_REQUEST', message: 'An approval request has been created.' },
     { name: 'FAIL_MSG', message: 'Failed to delete' }
   ],
 
@@ -77,7 +78,12 @@ foam.CLASS({
       label: 'Delete',
       code: function(X) {
         this.dao.remove(this.data).then((_) => {
-          this.notify(this.data.model_.label + this.SUCCESS_MSG);
+          // TODO: Make this check foam.nanos.auth.ApprovableAware.isInstance(cData) once ApprovableAware moves to foam
+          if ( foam.nanos.auth.LifecycleAware.isInstance(this.data) ){
+            this.notify(this.SUCCESS_MSG_REQUEST);
+          } else {
+            this.notify(this.data.model_.label + this.SUCCESS_MSG);
+          }
           this.onDelete();
         }).catch((err) => {
           this.notify(err.message || this.FAIL_MSG, 'error');
@@ -94,3 +100,4 @@ foam.CLASS({
     }
   ]
 });
+

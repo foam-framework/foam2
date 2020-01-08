@@ -96,6 +96,13 @@ foam.CLASS({
     }
   ],
 
+  messages: [
+    {
+      name: 'SUCCESS_REQUEST_MESSAGE',
+      message: 'An approval request has been created.'
+    }
+  ],
+
   actions: [
     {
       name: 'save',
@@ -103,13 +110,19 @@ foam.CLASS({
         return ! workingData$errors_;
       },
       code: function() {
+        var message = `${this.data.model_.label} updated.`;
+
+        if ( foam.nanos.auth.LifecycleAware.isInstance(this.data) ){
+          message = this.SUCCESS_REQUEST_MESSAGE;
+        }
+
         this.data.copyFrom(this.workingData);
         this.config.dao.put(this.data).then(o => {
           this.data = o;
           this.finished.pub();
           this.stack.back();
           this.ctrl.add(this.NotificationMessage.create({
-            message: `${this.data.model_.label} updated.`
+            message: message
           }));
         }, e => {
           this.throwError.pub(e);
