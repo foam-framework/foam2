@@ -49,10 +49,6 @@ foam.CLASS({
       name: 'uiSettings',
       title: 'UI Settings',
       help: 'These properties are used to control how this capability appears in the GUI.'
-    },
-    {
-      name: 'capabilityRelationships',
-      title: 'Capability Relationships'
     }
   ],
 
@@ -201,6 +197,9 @@ foam.RELATIONSHIP({
   cardinality: '*:*',
   forwardName: 'capabilities',
   inverseName: 'users',
+  sourceProperty: {
+    section: 'administrative'
+  }
 });
 
 foam.RELATIONSHIP({
@@ -209,13 +208,7 @@ foam.RELATIONSHIP({
   cardinality: '*:*',
   forwardName: 'deprecated',
   inverseName: 'deprecating',
-  junctionDAOKey: 'deprecatedCapabilityJunctionDAO',
-  sourceProperty: {
-    section: 'capabilityRelationships'
-  },
-  targetProperty: {
-    section: 'capabilityRelationships'
-  }
+  junctionDAOKey: 'deprecatedCapabilityJunctionDAO'
 });
 
 foam.RELATIONSHIP({
@@ -224,11 +217,5 @@ foam.RELATIONSHIP({
   cardinality: '*:*',
   forwardName: 'prerequisites',
   inverseName: 'dependents',
-  junctionDAOKey: 'prerequisiteCapabilityJunctionDAO',
-  sourceProperty: {
-    section: 'capabilityRelationships'
-  },
-  targetProperty: {
-    section: 'capabilityRelationships'
-  }
+  junctionDAOKey: 'prerequisiteCapabilityJunctionDAO'
 });
