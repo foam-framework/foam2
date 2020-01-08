@@ -734,6 +734,10 @@ FOAM_FILES([
 
   { name: "foam/core/Unit" },
   { name: "foam/core/Currency" },
+  { name: "foam/nanos/mrac/NodeStatus" },
+  { name: "foam/nanos/mrac/ClusterNode" },
+  { name: "foam/nanos/mrac/ClusterNodeType" },
+  { name: "foam/nanos/mrac/quorum/InstanceState" },
 
   { name: "foam/util/concurrent/AbstractAssembly"},
   { name: "foam/util/concurrent/Assembly"},

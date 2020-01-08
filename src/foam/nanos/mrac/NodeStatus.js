@@ -9,8 +9,12 @@ foam.CLASS({
   name: 'NodeStatus',
   properties: [
     {
-      class: 'String',
+      class: 'Long',
       name: 'id'
+    },
+    {
+      class: 'String',
+      name: 'hostName'
     },
     {
       class: 'Long',

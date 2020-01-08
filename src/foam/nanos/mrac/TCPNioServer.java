@@ -62,7 +62,7 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
     X x = getX();
     if ( x == null ) throw new RuntimeException("Context no found.");
     DAO clusterDAO = (DAO) x.get("clusterNodeDAO");
-    if ( clusterDAO == null ) throw new RuntimeException("clusterDAO no found.");
+    if ( clusterDAO == null ) throw new RuntimeException("clusterNodeDAO no found.");
 
     ClusterNode myself = (ClusterNode) clusterDAO.find(clusterId);
     if ( myself == null ) throw new RuntimeException("ClusterNode no found: " + clusterId);

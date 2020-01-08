@@ -27,13 +27,16 @@ public class PingService
     DAO clusterDAO = (DAO) x.get("clusterNodeDAO");
     String clusterId = System.getProperty("CLUSTER");
 
+    //TODO: refactor this if statement.
     if ( clusterDAO != null && (! "".equals(clusterId)) ) {
       Long id = Long.parseLong(clusterId);
       ClusterNode mySelf = (ClusterNode) clusterDAO.find_(x, id);
       NodeStatus status = null;
       if ( mySelf != null ) {
         status = new NodeStatus();
-        status.setId(mySelf.getIp() + ":" + mySelf.getServicePort());
+        status.setId(id);
+        status.setGroup(mySelf.getGroup());
+        status.setHostName(mySelf.getIp() + ":" + mySelf.getServicePort());
         status.setInstanceType(mySelf.getType());
         status.setOnline(true);
 
@@ -50,6 +53,9 @@ public class PingService
             status.setQuorumStatus(InstanceState.NONE);
           }
         }
+      } else {
+        status = new NodeStatus();
+        status.setId(-1);
       }
       if ( status != null ) {
         Outputter outputter = new Outputter(x);
@@ -59,7 +65,15 @@ public class PingService
         return;
       }
     }
+
+    NodeStatus nStatus = new NodeStatus();
+    nStatus.setId(-1);
+    Outputter outputter = new Outputter(x);
+    String msg = outputter.stringify(nStatus);
     PrintWriter out = x.get(PrintWriter.class);
-    out.println("Pong: " + new Date());
+    out.println(msg);
+
+    // PrintWriter out = x.get(PrintWriter.class);
+    // out.println("Pong: " + new Date());
   }
 }
