@@ -10,7 +10,6 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
 
   implements: [
-    'foam.nanos.auth.EnabledAware',
     'foam.nanos.boot.NSpecAware'
   ],
 
@@ -23,6 +22,7 @@ foam.CLASS({
     'foam.mlang.order.Comparator',
     'foam.mlang.predicate.Predicate',
     'foam.nanos.auth.EnabledAware',
+    'foam.nanos.boot.NSpec',
     'foam.nanos.pm.PM'
   ],
 
@@ -31,46 +31,11 @@ foam.CLASS({
       name: 'PIPE_PM_START',
       documentation: '',
       type: 'String',
-      value: 'pipePmStart'
+      value: '__pipePMStart__'
     }
   ],
 
   properties: [
-    {
-      documentation: `true when createPipeline has been called.
-both enabled.postSet and Builder.init_() can call createPipeline.`,
-      name: 'initialized',
-      class: 'Boolean',
-      value: false
-    },
-    {
-      name: 'enabled',
-      class: 'Boolean',
-      value: true,
-      javaPostSet: `
-      if ( enabled_ != val ) {
-        boolean toggled = false;
-        DAO d = getDelegate();
-        while ( d != null ) {
-          if ( d instanceof PipelinePMDAO ) {
-            ((EnabledAware) d).setEnabled(val);
-            toggled = true;
-            break;
-          }
-          if ( d instanceof ProxyDAO ) {
-            d = ((ProxyDAO) d).getDelegate();
-          } else {
-            break;
-          }
-        }
-        if ( val &&
-             ! toggled ) {
-          // createPipeline has yet to be called.
-          createPipeline();
-        }
-      }
-      `
-    },
     {
       name: 'nSpec',
       class: 'FObjectProperty',
@@ -80,6 +45,14 @@ both enabled.postSet and Builder.init_() can call createPipeline.`,
       documentation: 'Enable PMs on DAO.find operations',
       name: 'pmFind',
       class: 'Boolean'
+    },
+    {
+      name: 'classType',
+      class: 'Class',
+      javaFactory: `
+        return PipelinePMDAO.getOwnClassInfo();
+      `,
+      hidden: true
     },
     {
       name: 'putName',
@@ -125,8 +98,18 @@ both enabled.postSet and Builder.init_() can call createPipeline.`,
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data:
-    `public PipelinePMDAO(X x, DAO delegate) {
-       super(x, delegate);
+    `public PipelinePMDAO(X x, NSpec nspec, DAO delegate) {
+      setX(x);
+      setNSpec(nspec);
+      setDelegate(delegate);
+      init_();
+     }
+
+     // TODO: Remove when all DAO nspecs converted to EasyDAO
+     public PipelinePMDAO(X x, DAO delegate) {
+      setX(x);
+      setDelegate(delegate);
+      init_();
      }
           `
         }));
@@ -138,9 +121,11 @@ both enabled.postSet and Builder.init_() can call createPipeline.`,
     {
       name: 'init_',
       javaCode: `
-    if ( getEnabled() ) {
-      createPipeline();
-    }
+        ProxyDAO delegate = (ProxyDAO) getDelegate();
+        if ( delegate.getDelegate() instanceof ProxyDAO && ! ( delegate.getDelegate() instanceof PipelinePMDAO ) ) {
+          delegate.setDelegate(new PipelinePMDAO(getX(), getNSpec(), delegate.getDelegate()));
+        }
+        delegate.setDelegate(new EndPipelinePMDAO(getX(), delegate.getDelegate()));
     `
     },
     {
@@ -170,56 +155,23 @@ Creates the PM that will measure the performance of each operation and creates a
       ],
       javaType: 'X',
       javaCode: `
-    if ( getEnabled() ) {
       PM pm = (PM) x.get("PM");
-      pm.setClassType(this.getOwnClassInfo());
+      pm.setClassType(getClassType());
       pm.setName(op);
       pm.init_();
       return x.put(PIPE_PM_START, pm);
-    }
-    return x;
       `
     },
     {
       documentation: `
 Creates the PM pipeline by adding an EndPipelinePMDAO after of this class only if it is a ProxyDAO.
-If the delegate of that is also a ProxyDAO, creates a new PipelinedPMDAO in the chain beofre it which repeats this procedure recursively.
+If the delegate of that is also a ProxyDAO, creates a new PipelinePMDAO in the chain beofre it which repeats this procedure recursively.
 `,
       name: 'createPipeline',
       javaCode: `
-    synchronized (this) {
-      if ( getInitialized() ) {
-        return;
-      } else {
-        setInitialized(true);
-      }
-    }
-((foam.nanos.logger.Logger) getX().get("logger")).debug("PipelinePMDAO createPipeline INITIALIZED");
-    DAO delegate = getDelegate();
-    DAO secondaryDelegate;
-    secondaryDelegate = ((ProxyDAO) delegate).getDelegate();
-    ((ProxyDAO) delegate).setDelegate(new EndPipelinePMDAO(getX(), secondaryDelegate));
-    delegate = ((ProxyDAO) delegate).getDelegate();
-    if ( ( secondaryDelegate instanceof ProxyDAO ) && ! ( secondaryDelegate instanceof PipelinePMDAO ) ) {
-      PipelinePMDAO pmd = new PipelinePMDAO(getX(), secondaryDelegate);
-      pmd.setNSpec(getNSpec());
-      ((ProxyDAO) delegate).setDelegate(pmd);
-    }
       `
     },
-    {
-      name: 'isPipelinePMDAO',
-      args: [
-        {
-          name: 'dao',
-          type: 'DAO'
-        }
-      ],
-      javaType: 'Boolean',
-      javaCode: `
-    return dao instanceof PipelinePMDAO || dao instanceof EndPipelinePMDAO;
-`
-    },
+    /*
     {
       name: 'log',
       args: [
@@ -238,10 +190,11 @@ If the delegate of that is also a ProxyDAO, creates a new PipelinedPMDAO in the 
     }
       `
     },
+    */
     {
       name: 'put_',
       javaCode: `
-    return super.put_(createPMX(x, getPutName()), obj);
+    return getDelegate().put_(createPMX(x, getPutName()), obj);
      `
     },
     {
@@ -254,25 +207,25 @@ If the delegate of that is also a ProxyDAO, creates a new PipelinedPMDAO in the 
     {
       name: 'select_',
       javaCode: `
-      return super.select_(createPMX(x, getSelectName()), sink, skip, limit, order, predicate);
+      return getDelegate().select_(createPMX(x, getSelectName()), sink, skip, limit, order, predicate);
      `
     },
     {
       name: 'remove_',
       javaCode: `
-    return super.remove_(createPMX(x, getRemoveName()), obj);
+    return getDelegate().remove_(createPMX(x, getRemoveName()), obj);
      `
     },
     {
       name: 'removeAll_',
       javaCode: `
-    super.removeAll_(createPMX(x, getRemoveAllName()), skip, limit, order, predicate);
+    getDelegate().removeAll_(createPMX(x, getRemoveAllName()), skip, limit, order, predicate);
       `
     },
     {
       name: 'cmd_',
       javaCode: `
-    return super.cmd_(createPMX(x, getCmdName()), obj);
+    return getDelegate().cmd_(createPMX(x, getCmdName()), obj);
      `
     }
   ],
@@ -320,9 +273,7 @@ If the delegate of that is also a ProxyDAO, creates a new PipelinedPMDAO in the 
           ],
           javaCode: `
       PM pm = (PM) x.get(PIPE_PM_START);
-      if ( pm != null ) {
-        pm.log(x);
-      }
+      if ( pm != null ) pm.log(x);
       `
         },
         {
