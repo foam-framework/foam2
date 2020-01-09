@@ -193,7 +193,7 @@ foam.CLASS({
       factory: function() {
         return !! this.model.backLink_ ?
           this.model.backLink_ :
-          !! this.appConfig.url ? this.appConfig.url : undefined;
+          !! this.appConfig.externalUrl ? this.appConfig.externalUrl : undefined;
       },
       hidden: true
     }
