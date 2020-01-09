@@ -156,7 +156,8 @@ foam.CLASS({
           }
           // The decorator dao may be a proxy chain
           ProxyDAO proxy = (ProxyDAO) getDecorator();
-          while ( proxy.getDelegate() != null )
+          while ( proxy.getDelegate() != null &&
+                  proxy.getDelegate() instanceof ProxyDAO )
             proxy = (ProxyDAO) proxy.getDelegate();
           proxy.setDelegate(delegate);
           delegate = (ProxyDAO) getDecorator();
@@ -277,7 +278,7 @@ foam.CLASS({
           delegate = new foam.nanos.logger.LoggingDAO.Builder(getX()).setNSpec(getNSpec()).setDelegate(delegate).build();
 
         if ( getPipelinePm() && ( delegate instanceof ProxyDAO ) )
-          delegate = new foam.dao.PipelinePMDAO.Builder(getX()).setNSpec(getNSpec()).setDelegate(delegate).build();;
+          delegate = new foam.dao.PipelinePMDAO(getX(), getNSpec(), delegate);
 
         if ( getPm() )
           delegate = new foam.dao.PMDAO.Builder(getX()).setNSpec(getNSpec()).setDelegate(delegate).build();
@@ -949,7 +950,8 @@ foam.CLASS({
 
         foam.dao.ProxyDAO decoratorptr = decorator;
 
-        while ( decorator.getDelegate() != null )
+        while ( decorator.getDelegate() != null &&
+                decorator.getDelegate() instanceof ProxyDAO )
           decorator = (ProxyDAO) decorator.getDelegate();
         decorator.setDelegate(proxy.getDelegate());
         proxy.setDelegate(decoratorptr);
