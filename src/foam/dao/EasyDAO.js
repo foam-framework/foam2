@@ -157,10 +157,8 @@ foam.CLASS({
           // The decorator dao may be a proxy chain
           ProxyDAO proxy = (ProxyDAO) getDecorator();
           while ( proxy.getDelegate() != null &&
-                  ! (proxy.getDelegate() instanceof foam.dao.NullDAO) ) {
-
+                  proxy.getDelegate() instanceof ProxyDAO )
             proxy = (ProxyDAO) proxy.getDelegate();
-          }
           proxy.setDelegate(delegate);
           delegate = (ProxyDAO) getDecorator();
         }
@@ -915,9 +913,8 @@ model from which to test ServiceProvider ID (spid)`,
         foam.dao.ProxyDAO decoratorptr = decorator;
 
         while ( decorator.getDelegate() != null &&
-                ! ( decorator.getDelegate() instanceof foam.dao.NullDAO ) ) {
+                decorator.getDelegate() instanceof ProxyDAO )
           decorator = (ProxyDAO) decorator.getDelegate();
-        }
         decorator.setDelegate(proxy.getDelegate());
         proxy.setDelegate(decoratorptr);
         return true;
