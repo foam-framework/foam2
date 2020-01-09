@@ -135,6 +135,11 @@ foam.CLASS({
       name: 'deleteEnabled',
       documentation: 'True to enable the delete button.',
       value: true
-    }
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.comics.v2.CRUDActionsAuth',
+      name: 'CRUDActionsAuth'
+    },
   ]
 });
