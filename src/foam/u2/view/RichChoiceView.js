@@ -6,6 +6,42 @@
 
 foam.CLASS({
   package: 'foam.u2.view',
+  name: 'RichChoiceViewSection',
+
+  documentation: 'Models one section of the dropdown for a RichChoiceView.',
+
+  properties: [
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'dao',
+      documentation: 'The DAO that will be used to populate the options in this section.'
+    },
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'filteredDAO',
+      documentation: 'A filtered version of the underlying DAO, depending on the search term the user has typed in.',
+      factory: function() { return this.dao; }
+    },
+    {
+      class: 'Boolean',
+      name: 'hideIfEmpty',
+      documentation: 'This section will be hidden if there are no items in it if this is set to true.'
+    },
+    {
+      class: 'Boolean',
+      name: 'disabled',
+      documentation: 'Rows in this section will not be selectable if this is set to true.'
+    },
+    {
+      class: 'String',
+      name: 'heading',
+      documentation: 'The heading text for this section.'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.u2.view',
   name: 'RichChoiceView',
   extends: 'foam.u2.View',
 
@@ -198,15 +234,13 @@ foam.CLASS({
       }
     },
     {
-      class: 'Array',
+      class: 'FObjectArray',
+      of: 'foam.u2.view.RichChoiceViewSection',
       name: 'sections',
       documentation: `
         This lets you pass different predicated versions of a dao in different
         sections, which can be used to do things like grouping by some property
         for each section.
-        Each object in the array must have a 'label' property of type string
-        which will be used for the section heading, and a 'dao' property of type
-        DAO that will be used to populate the list in that section.
       `,
     },
     {
@@ -235,12 +269,10 @@ foam.CLASS({
       name: 'filter_',
       documentation: 'The text that the user typed in to search by.',
       postSet: function(oldValue, newValue) {
-        this.sections = this.sections.map((section) => {
-          return Object.assign({}, section, {
-            filtered: newValue
-              ? section.dao.where(this.KEYWORD(newValue))
-              : section.dao
-          });
+        this.sections.forEach((section) => {
+          section.filteredDAO = newValue
+            ? section.dao.where(this.KEYWORD(newValue))
+            : section.dao;
         });
       }
     },
@@ -348,7 +380,7 @@ foam.CLASS({
                           .add(section.heading)
                         .end()
                         .start()
-                          .select(section.filtered || section.dao, (obj) => {
+                          .select(section.filteredDAO$proxy, (obj) => {
                             return this.E()
                               .start(self.rowView, { data: obj })
                                 .enableClass('disabled', section.disabled)
