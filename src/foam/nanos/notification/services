@@ -77,7 +77,7 @@ p({
       .setPipelinePm(true)
       .setAuthorize(true)
       .setInnerDAO((foam.dao.DAO) x.get("localNotificationSettingDAO"))
-      .setEnableInterfaceDecators(false)
+      .setEnableInterfaceDecorators(false)
       .build();
     """,
   "client": "{\"of\":\"foam.nanos.notification.NotificationSetting\"}"
