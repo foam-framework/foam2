@@ -565,10 +565,7 @@ foam.CLASS({
       documentation: 'Decorate with a ServiceProviderAwareDAO',
       name: 'serviceProviderAware',
       class: 'Boolean',
-      // REVIEW: want this decorator on the non-local/served stack.
-      javaFactory: `return getNSpec() != null &&
-                            getNSpec().getServe() &&
-                            foam.nanos.auth.ServiceProviderAware.class.isAssignableFrom(getOf().getObjClass());`
+      javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.auth.ServiceProviderAware.class.isAssignableFrom(getOf().getObjClass());'
     },
     {
       documentation: `More documentation in ServiceProviderAwareDAO.
