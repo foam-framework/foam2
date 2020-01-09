@@ -46,6 +46,11 @@ foam.CLASS({
       name: 'myHash'
     },
     {
+      //TODO: make it networkTransist.
+      class: 'String',
+      name: 'localHash'
+    },
+    {
       class: 'FObjectProperty',
       name: 'old'
     },

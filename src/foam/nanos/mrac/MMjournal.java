@@ -71,6 +71,9 @@ import java.nio.charset.Charset;
 
 import foam.nanos.mrac.quorum.*;
 
+import java.security.MessageDigest;
+import java.nio.charset.StandardCharsets;
+
 // Make sure that this class sould only have one instance in single journal mode.
 // In multiple journal mode. each JDAO will have it's own instance.
 // can simple get put to MedusaMediator
@@ -238,7 +241,7 @@ public class MMJournal extends AbstractJournal {
         "p",
         null,
         "TOP",
-        randomFObject 
+        randomFObject
       );
     return null;
   }
@@ -482,6 +485,9 @@ public class MMJournal extends AbstractJournal {
   private Map<String, List<MedusaEntry>> readyToUseEntry;
   private Map<String, DAO> registerDAOs;
 
+  //TODO: prvide a way to clear this map
+  private Map<Long, String> indexHashMap;
+
   private final void initialReplay(X x) {
     //TODO: close all socketchannel.
     if ( nodeToSocketChannel != null ) {
@@ -494,6 +500,7 @@ public class MMJournal extends AbstractJournal {
     readyToUseEntry = new HashMap<String, List<MedusaEntry>>();
     registerDAOs = new HashMap<String, DAO>();
 
+    //TODO: Configure Very first two Index; Very Important
     parent1 = new MedusaEntry();
     parent1.setMyHash("aaaaaa");
     parent1.setMyIndex(-1L);
@@ -501,6 +508,10 @@ public class MMJournal extends AbstractJournal {
     parent2 = new MedusaEntry();
     parent2.setMyHash("bbbbbb");
     parent2.setMyIndex(0L);
+
+    indexHashMap = new HashMap<Long, String>();
+    indexHashMap.put(parent1.getMyIndex(), parent1.getMyHash());
+    indexHashMap.put(parent2.getMyIndex(), parent2.getMyHash());
   }
 
   @Override
@@ -603,8 +614,23 @@ public class MMJournal extends AbstractJournal {
       //TODO: update globalIndex and parent, varify hash.
       globalIndex.set(entry.getMyIndex() + 1L);
       recordIndex = recordIndex + 1L;
-      System.out.println("aaaaaaaaccccc");
       updateHash(entry);
+      try {
+        //TODO: turn hash on.
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        md.update(indexHashMap.get(entry.getGlobalIndex1()).getBytes(StandardCharsets.UTF_8));
+        md.update(indexHashMap.get(entry.getGlobalIndex2()).getBytes(StandardCharsets.UTF_8));
+        String myHash = MNJournal.byte2Hex(entry.getNu().hash(md));
+        System.out.println(myHash);
+        System.out.println(entry.getMyHash());
+        if ( ! myHash.equals(entry.getMyHash()) ) {
+          throw new RuntimeException("hash invalid");
+        }
+        indexHashMap.put(entry.getMyIndex(), entry.getMyHash());
+      } catch ( Exception e ) {
+        e.printStackTrace();
+        throw new RuntimeException(e);
+      }
     }
   }
 
@@ -901,7 +927,7 @@ public class MMJournal extends AbstractJournal {
           socketChannel.socket().setTcpNoDelay(true);
 
           key = socketChannel.register(selector, SelectionKey.OP_CONNECT);
-          registerChannels.add(socketChannel); 
+          registerChannels.add(socketChannel);
 
         } catch ( IOException e ) {
           System.out.println(e);
@@ -1104,7 +1130,7 @@ public class MMJournal extends AbstractJournal {
 
   //TODO: add consensus
   private void processEntry(Long groupId, MedusaEntry entry) {
-    if ( quorumService.exposeState == InstanceState.PRIMARY ) return; 
+    if ( quorumService.exposeState == InstanceState.PRIMARY ) return;
     Map<MedusaEntry, Integer> entryCount = cachedEntry.get(groupId);
     //TODO: provide a way to clear cache.
     synchronized ( entryCount ) {
