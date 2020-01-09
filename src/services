@@ -1,43 +1,6 @@
 p({"class":"foam.nanos.boot.NSpec", "name":"nSpecDAO",                           "serve":true,  "authenticate": false, "serviceClass":"foam.dao.ProxyDAO", "client":"{\"of\":\"foam.nanos.boot.NSpec\",\"cache\":true}"})
 
-p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "localNotificationDAO",
-  "lazy": false,
-  "serve": false,
-  "serviceScript": """
-    return new foam.dao.EasyDAO.Builder(x)
-      .setOf(foam.nanos.notification.Notification.getOwnClassInfo())
-      .setIndex(new foam.core.PropertyInfo[] {foam.nanos.notification.Notification.GROUP_ID})
-      .setAuthorize(false)
-      .setPm(true)
-      .setSeqNo(true)
-      .setDecorator(
-        new foam.nanos.notification.NotificationTemplateDAO.Builder(x).setDelegate(
-        new foam.nanos.notification.SendNotificationDAO(x,
-        new foam.nanos.notification.SendEmailNotificationDAO(
-        new foam.nanos.notification.SendSlackNotificationDAO(x)))).build())
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName("notifications")
-      .build();
-  """
-})
-p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "notificationDAO",
-  "lazy": false,
-  "serve": true,
-  "serviceScript": """
-    return new foam.dao.EasyDAO.Builder(x)
-      .setOf(foam.nanos.notification.Notification.getOwnClassInfo())
-      .setAuthorize(true)
-      .setInnerDAO((foam.dao.DAO) x.get("localNotificationDAO"))
-      .build();
-  """,
-  "client": "{\"of\":\"foam.nanos.notification.Notification\"}"
-})
 
-p({"class":"foam.nanos.boot.NSpec", "name":"notificationTemplateDAO",          "lazy":false,  "serve":true,  "serviceScript":"return new foam.dao.PMDAO(x, new foam.dao.SequenceNumberDAO(new foam.dao.java.JDAO(x, foam.nanos.notification.Notification.getOwnClassInfo(), \"notificationTemplates\")));", "client":"{\"of\":\"foam.nanos.notification.Notification\"}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"AuthenticatedNSpecDAO",              "serve":true,  "serviceClass":"foam.dao.ProxyDAO", "client":"{\"of\":\"foam.nanos.boot.NSpec\",\"cache\":true}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"http",                             "lazy":false, "service":{"class":"foam.nanos.jetty.HttpServer","port":8080,"forwardedForProxyWhitelist":[],"welcomeFiles":["/src/foam/nanos/controller/index.html"],"servletMappings":[{"class":"foam.nanos.servlet.ServletMapping","className":"foam.nanos.http.NanoRouter","pathSpec":"/service/*"},{"class":"foam.nanos.servlet.ServletMapping","className":"org.eclipse.jetty.servlet.DefaultServlet","pathSpec":"/*","initParameters":{"dirAllowed":"true","redirectWelcome":"true"}}]}})
 p({"class":"foam.nanos.boot.NSpec", "name":"httprouter",                         "serviceClass":"foam.nanos.http.NanoRouter"})
@@ -441,22 +404,33 @@ p({
 
 p({
   "class":"foam.nanos.boot.NSpec",
-  "name":"documentDAO",
-  "lazy": true,
+  "name":"localDocumentDAO",
+
+  "serviceScript":
+  """
+  return new foam.dao.EasyDAO.Builder(x)
+    .setOf(foam.flow.Document.getOwnClassInfo())
+    .setInnerDAO(new foam.flow.DocumentationFolderDAO.Builder(x).build())
+    .build();
+  """
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "documentDAO",
   "serve": true,
   "serviceScript":
   """
-  return new foam.dao.ReadOnlyDAO.Builder(x).setDelegate(new foam.flow.DocumentationFolderDAO.Builder(x).build()).build();
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.flow.Document.getOwnClassInfo())
+      .setPermissionPrefix("flow")
+      .setInnerDAO(x.get("localDocumentDAO"))
+      .build();
   """,
-  "client":
-  """
-  {
-    "of":"foam.flow.Document"
-  }
-  """
+  "client": "{\"of\":\"foam.flow.Document\"\}"
 })
+
 p({"class":"foam.nanos.boot.NSpec", "name":"supportEmailDAO",                  "lazy":true, "serve":true, "serviceScript":"return new foam.dao.PMDAO(new foam.dao.SequenceNumberDAO(new foam.dao.java.JDAO(x, foam.support.model.SupportEmail.getOwnClassInfo(), \"supportEmails\")));","client":"{\"of\":\"foam.support.model.SupportEmail\"}"})
-p({"class":"foam.nanos.boot.NSpec", "name":"pop3",                             "lazy":true, "serve":true, "boxClass":"foam.nanos.notification.email.POP3EmailSkeleton", "serviceClass":"foam.nanos.notification.email.POP3EmailService","client":"{ \"class\":\"foam.nanos.notification.email.ClientPOP3EmailService\", \"delegate\": { \"class\":\"foam.box.HTTPBox\", \"url\":\"service/pop3\" } }"})
 
 p({
   "class": "foam.nanos.boot.NSpec",
@@ -718,21 +692,6 @@ p({
   "name": "sessionService",
   "serve": true,
   "serviceClass": "foam.nanos.session.SimpleSessionService"
-})
-
-p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "notificationSettingDAO",
-  "serviceScript": """
-    return new foam.dao.EasyDAO.Builder(x)
-      .setSeqNo(true)
-      .setPm(true)
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName("notificationSettings")
-      .setOf(foam.nanos.notification.NotificationSetting.getOwnClassInfo())
-      .build();
-  """,
-  "client": "{\"of\":\"foam.nanos.notification.NotificationSetting\"}"
 })
 
 p({

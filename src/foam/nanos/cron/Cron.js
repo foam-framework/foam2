@@ -21,7 +21,7 @@ foam.CLASS({
   documentation: 'FOAM class that models a Cron script',
 
   tableColumns: [
-    'id', 'enabled', 'server', 'description', 'lastDuration', 'status', 'run'
+    'id', 'enabled', 'description', 'lastDuration', 'status', 'scheduledTime', 'run'
   ],
 
   searchColumns: ['id', 'description'],
@@ -40,6 +40,11 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'server',
+      hidden: true,
+      value: true
+    },
+    {
       name: 'schedule',
       class: 'FObjectProperty',
       of: 'foam.nanos.cron.Schedule',
@@ -55,7 +60,8 @@ foam.CLASS({
       class: 'DateTime',
       name: 'scheduledTime',
       documentation: `Scheduled time to run Cron script.`,
-      hidden: true,
+      section: 'scheduling',
+      visibility: 'RO',
       javaFactory: 'return getNextScheduledTime();'
     },
     {
