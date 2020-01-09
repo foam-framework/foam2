@@ -53,6 +53,7 @@ foam.RELATIONSHIP({
   sourceProperty: {
     hidden: true
   },
+  targetDAOKey: 'localNotificationSettingDAO',
   unauthorizedTargetDAOKey: 'localNotificationSettingDAO'
 });
 
@@ -65,5 +66,6 @@ foam.RELATIONSHIP({
   sourceProperty: {
     hidden: true
   },
+  targetDAOKey: 'localNotificationSettingDAO',
   unauthorizedTargetDAOKey: 'localNotificationSettingDAO'
 });

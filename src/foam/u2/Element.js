@@ -2176,9 +2176,6 @@ foam.CLASS({
       of: 'foam.u2.DisplayMode',
       name: 'createMode',
       documentation: 'The display mode for this property when the controller mode is CREATE.',
-      assertValue: function(newValue) {
-        foam.assert(newValue === foam.u2.DisplayMode.RW || newValue === foam.u2.DisplayMode.HIDDEN, `Create mode must be RW or HIDDEN. Property '${this.of ? this.of.id + '.' : ''}${this.name}' was '${newValue.label}' and must be fixed.`);
-      },
       value: 'RW'
     },
     {
