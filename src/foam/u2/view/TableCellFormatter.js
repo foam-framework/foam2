@@ -238,7 +238,8 @@ foam.CLASS({
       value: function(date) {
         // allow the browser to deal with this since we are technically using the user's preference
         if ( date ) {
-          var formattedDate = date.toLocaleDateString();
+          // toLocaleString includes date and time
+          var formattedDate = date.toLocaleString();
           this.add(formattedDate);
           this.tooltip = formattedDate;
         }
