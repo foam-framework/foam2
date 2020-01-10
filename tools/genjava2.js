@@ -85,6 +85,7 @@ externalFile.blacklist.forEach(function(cls) {
   'foam.box.TimeoutBox',
   'foam.box.RetryBox',
   'foam.dao.CachingDAO',
+  'foam.dao.TTLCachingDAO',
   'foam.dao.CompoundDAODecorator',
   'foam.dao.DecoratedDAO',
   'foam.dao.DeDupDAO',
