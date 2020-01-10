@@ -9,9 +9,6 @@ foam.CLASS({
   name: 'WriteOnlyFileJournal',
   extends: 'foam.dao.FileJournal',
 
-  javaImports: [
-    'foam.core.FObject',
-  ],
   properties: [
     {
       name: 'outputClassNames',
@@ -32,23 +29,12 @@ foam.CLASS({
     {
       name: 'put',
       javaCode: `
-        final Object id = obj.getProperty("id");
-
         getLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
-          FObject old;
           String record_ = null;
-
-          public Object[] requestLocks() {
-            return new Object[] { id };
-          }
-
-          public void executeUnderLock() {
-            old = dao.find_(x, id);
-            dao.put_(x, obj);
-          }
 
           public void executeJob() {
             try {
+              dao.put_(x, obj);
               record_ = getOutputter().stringify(obj);
             } catch (Throwable t) {
               getLogger().error("Failed to write put entry to journal", t);
