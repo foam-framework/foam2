@@ -335,7 +335,7 @@ p({
   "serviceScript":
   """
     return new foam.dao.EasyDAO.Builder(x)
-      .setName(\"menu\")
+      .setName("menu")
       .setPm(true)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName(\"menus\")
