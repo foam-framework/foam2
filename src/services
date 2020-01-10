@@ -718,23 +718,3 @@ p({
     }
   """
 })
-
-p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "accumulatorFilter",
-  "serve": true,
-  "serviceClass": "foam.u2.filter.AccumulatorFilterService",
-  "boxClass": "foam.u2.filter.AccumulatorFilterSkeleton",
-  "client": """
-    {
-      "class": "foam.u2.filter.ClientAccumulatorFilterService",
-      "delegate": {
-        "class": "foam.box.SessionClientBox",
-        "delegate": {
-          "class": "foam.box.HTTPBox",
-          "url": "service/accumulatorFilter"
-        }
-      }
-    }
-  """
-})

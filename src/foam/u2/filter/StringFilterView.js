@@ -15,8 +15,9 @@ foam.CLASS({
     'foam.mlang.Expressions'
   ],
 
-  imports: [
-    'accumulatorFilter'
+  requires: [
+    'foam.dao.ArraySink',
+    'foam.mlang.sink.GroupBy'
   ],
 
   css: `
@@ -121,7 +122,15 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'search'
+      name: 'search',
+      postSet: function(_, n) {
+        this.dao.where(this.CONTAINS_IC(this.property, n)).limit(100).select(this.GroupBy.create({
+          arg1: this.property,
+          arg2: this.ArraySink.create()
+        })).then((results) => {
+          this.daoContents = results.groupKeys;
+        });
+      }
     },
     {
       name: 'selectedOptions',
@@ -131,18 +140,10 @@ foam.CLASS({
     },
     {
       name: 'filteredOptions',
-      expression: function(property, daoContents, search, selectedOptions) {
+      expression: function(daoContents, selectedOptions) {
         if ( ! daoContents || daoContents.length === 0 ) return [];
 
-        var options = daoContents.map((obj) => obj[this.property].trim());
-
-        // Filter out search
-        if ( search ) {
-          var lowerCaseSearch = search.toLowerCase();
-          options = options.filter(function(option) {
-            return option.toLowerCase().includes(lowerCaseSearch);
-          });
-        }
+        var options = daoContents.map((obj) => obj.trim());
 
         // Filter out selectedOptions
         selectedOptions.forEach(function(selection) {
@@ -183,10 +184,13 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.accumulatorFilter.fetchDAOContents(null, this.dao.serviceName, this.property).then((results) => {
-        this.daoContents = results;
+      this.dao.limit(100).select(this.GroupBy.create({
+        arg1: this.property,
+        arg2: this.ArraySink.create()
+      })).then((results) => {
+        this.daoContents = results.groupKeys;
       });
-      
+
       var self = this;
       this
         .addClass(this.myClass())

@@ -505,8 +505,6 @@ FOAM_FILES([
   { name: "foam/u2/dialog/NotificationMessage", flags: ['web'] },
   { name: "foam/u2/dialog/InlineNotificationMessage", flags: ['web'] },
   { name: "foam/u2/Autocompleter", flags: ['web'] },
-  { name: 'foam/u2/filter/AccumulatorFilter' },
-  { name: 'foam/u2/filter/ClientAccumulatorFilterService' },
   { name: 'foam/u2/filter/FilterSearch', flags: ['web'] },
   { name: 'foam/u2/filter/FilterViewController', flags: ['web'] },
   { name: 'foam/u2/filter/StringFilterView', flags: ['web'] },

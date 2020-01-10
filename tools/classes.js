@@ -518,9 +518,7 @@ var classes = [
   'foam.strategy.StrategizerService',
   'foam.strategy.BasicStrategizer',
   'foam.strategy.ClientStrategizerService',
-
-  'foam.u2.filter.AccumulatorFilter',
-  'foam.u2.filter.ClientAccumulatorFilterService',
+  
   //concurrent
   'foam.util.concurrent.AbstractAssembly',
   'foam.util.concurrent.Assembly',
@@ -546,8 +544,7 @@ var skeletons = [
   'foam.nanos.notification.push.PushService',
   'foam.nanos.session.SessionService',
   'foam.nanos.test.EchoService',
-  'foam.strategy.StrategizerService',
-  'foam.u2.filter.AccumulatorFilter'
+  'foam.strategy.StrategizerService'
 ];
 
 var proxies = [
