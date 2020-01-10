@@ -191,9 +191,7 @@ foam.CLASS({
       class: 'String',
       name: 'backLink_',
       factory: function() {
-        return !! this.model.backLink_ ?
-          this.model.backLink_ :
-          !! this.appConfig.url ? this.appConfig.url : undefined;
+        return this.model.backLink_ || this.appConfig.externalUrl || undefined;
       },
       hidden: true
     }
