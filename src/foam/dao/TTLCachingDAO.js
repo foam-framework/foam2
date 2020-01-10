@@ -27,6 +27,7 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'purgeTime'
+      value: 15000
     },
   ],
 
