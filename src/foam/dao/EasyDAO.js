@@ -304,6 +304,11 @@ foam.CLASS({
       value: 1
     },
     {
+      class: 'Long',
+      name: 'purgeTime',
+      value: 15000
+    },
+    {
       documentation: 'Have EasyDAO generate guids to index items. Note that .seqNo and .guid features are mutually exclusive',
       class: 'Boolean',
       name: 'guid',
@@ -695,10 +700,10 @@ foam.CLASS({
             src: dao,
             of: this.model
           });
-        }
-        if ( this.cacheType == foam.dao.CacheType.TTL ) {
+        } else if ( this.cacheType == foam.dao.CacheType.TTL ) {
           dao = this.TTLCachingDAO.create({
-            delegate: dao
+            delegate: dao,
+            purgeTime: this.purgeTime
           });
         }
       }
