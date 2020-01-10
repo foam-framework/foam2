@@ -328,7 +328,24 @@ p({
 })
 
 p({"class":"foam.nanos.boot.NSpec", "name":"historyDAO",                         "serve":true,  "serviceScript":"return new foam.dao.PMDAO(x, new foam.dao.java.JDAO(x, foam.dao.history.HistoryRecord.getOwnClassInfo(), \"historyRecords\"));","client":"{\"of\":\"foam.dao.history.HistoryRecord\"}"})
-p({"class":"foam.nanos.boot.NSpec", "name":"menuDAO",                            "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setName(\"menu\").setPm(true).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"menus\").setOf(foam.nanos.menu.Menu.getOwnClassInfo()).setOrder(new foam.core.PropertyInfo[] {foam.nanos.menu.Menu.ORDER, foam.nanos.menu.Menu.LABEL}).build().orderBy(foam.nanos.menu.Menu.ORDER);", "client":"{\"of\":\"foam.nanos.menu.Menu\",\"cacheType\":\"FULL\"}"})
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name" :"menuDAO",
+  "serve" :true,
+  "serviceScript":
+  """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setName(\"menu\")
+      .setPm(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName(\"menus\")
+      .setOf(foam.nanos.menu.Menu.getOwnClassInfo())
+      .setOrder(new foam.core.PropertyInfo[] {foam.nanos.menu.Menu.ORDER, foam.nanos.menu.Menu.LABEL})
+      .build()
+      .orderBy(foam.nanos.menu.Menu.ORDER);
+  """,
+  "client": "{\"of\":\"foam.nanos.menu.Menu\",\"cacheType\":\"FULL\"}"
+})
 
 p({"class":"foam.nanos.boot.NSpec", "name":"blobStore",                          "serviceClass":"foam.blob.BlobStore"})
 
