@@ -341,8 +341,7 @@ p({
       .setJournalName("menus")
       .setOf(foam.nanos.menu.Menu.getOwnClassInfo())
       .setOrder(new foam.core.PropertyInfo[] {foam.nanos.menu.Menu.ORDER, foam.nanos.menu.Menu.LABEL})
-      .build()
-      .orderBy(foam.nanos.menu.Menu.ORDER);
+      .build();
   """,
   "client": "{\"of\":\"foam.nanos.menu.Menu\",\"cacheType\":\"FULL\"}"
 })
