@@ -16,7 +16,7 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.dao.ArraySink',
+    'foam.mlang.sink.Count',
     'foam.mlang.sink.GroupBy'
   ],
 
@@ -126,7 +126,7 @@ foam.CLASS({
       postSet: function(_, n) {
         this.dao.where(this.CONTAINS_IC(this.property, n)).limit(100).select(this.GroupBy.create({
           arg1: this.property,
-          arg2: this.ArraySink.create()
+          arg2: this.Count.create()
         })).then((results) => {
           this.daoContents = results.groupKeys;
         });
@@ -186,7 +186,7 @@ foam.CLASS({
     function initE() {
       this.dao.limit(100).select(this.GroupBy.create({
         arg1: this.property,
-        arg2: this.ArraySink.create()
+        arg2: this.Count.create()
       })).then((results) => {
         this.daoContents = results.groupKeys;
       });
