@@ -91,6 +91,15 @@ foam.CLASS({
     }
   ],
 
+  properties: [
+    {
+      name: 'userFeedback',
+      class: 'FObjectProperty',
+      of: 'foam.comics.v2.userFeedback.UserFeedback',
+      storageTransient: true
+    }
+  ],
+
   methods: [
     {
       name: 'compareTo',
