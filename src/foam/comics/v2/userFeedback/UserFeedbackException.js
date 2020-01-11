@@ -12,7 +12,7 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'foam.comics.v2.userFeedback.UserFeedback',
-      name: 'feedback'
+      name: 'userFeedback'
     }
   ]
 });
