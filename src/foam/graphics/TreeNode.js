@@ -20,7 +20,9 @@ foam.CLASS({
     'formatNode',
     'graph',
     'parentNode?',
-    'relationship'
+    'relationship',
+    'isAutoExpandedByDefault',
+    'childNodesForAutoExpansion'
   ],
   exports: ['as parentNode'],
 
@@ -104,8 +106,11 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'expanded',
-      expression: function(childNodes) {
-        return childNodes.length < 5;
+      expression: function(isAutoExpandedByDefault, childNodesForAutoExpansion, childNodes) {
+        if ( isAutoExpandedByDefault ) {
+          return childNodes < childNodesForAutoExpansion;
+        }
+        return false;
       },
       postSet: function() {
         this.graph.doLayout();
