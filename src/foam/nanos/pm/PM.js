@@ -15,6 +15,8 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.core.ClassInfo',
+    'foam.core.FObject',
     'foam.core.X'
   ],
 
@@ -88,14 +90,63 @@ foam.CLASS({
       buildJavaClass: function (cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-  public PM(Class cls, String name) {
+          public static PM create(X x, FObject fo, String name) {
+            PM pm = (PM) x.get("PM");
+
+            if ( pm == null ) return new PM(fo, name);
+
+            pm.setClassType(fo.getClassInfo());
+            pm.setName(name);
+            pm.init_();
+
+            return pm;
+          }
+
+          public static PM create(X x, ClassInfo clsInfo, String name) {
+            PM pm = (PM) x.get("PM");
+
+            if ( pm == null ) return new PM(clsInfo, name);
+
+            pm.setClassType(clsInfo);
+            pm.setName(name);
+            pm.init_();
+
+            return pm;
+          }
+
+/*
+  public static PM create(X x, Class cls, String name) {
+    PM pm = (PM) x.get("PM");
+
+    if ( pm == null ) return new PM(cls, name);
+
+    pm.setClassType(cls);
+    pm.setName(name);
+    pm.init_();
+
+    return pm;
+  }
+  */
+
+  public PM(ClassInfo clsInfo, String name) {
     setName(name);
-    foam.core.ClassInfoImpl classInfo = new foam.core.ClassInfoImpl();
-    classInfo.setObjClass(cls);
-    classInfo.setId(cls.getName());
-    setClassType(classInfo);
+    setClassType(clsInfo);
     init_();
   }
+
+  public PM(Class cls, String name) {
+    setName(name);
+    foam.core.ClassInfoImpl clsInfo = new foam.core.ClassInfoImpl();
+    clsInfo.setObjClass(cls);
+    clsInfo.setId(cls.getName());
+    setClassType(clsInfo);
+    init_();
+  }
+
+  public PM(FObject fo, String name) {
+    this(fo.getClassInfo(), name);
+  }
+
 `
         }));
       }

@@ -42,6 +42,7 @@ foam.CLASS({
     'foam.box.TimeoutBox',
     'foam.box.WebSocketBox',
     'foam.dao.CachingDAO',
+    'foam.dao.CacheType',
     'foam.dao.ClientDAO',
     'foam.dao.CompoundDAODecorator',
     'foam.dao.ContextualizingDAO',
@@ -61,6 +62,7 @@ foam.CLASS({
     'foam.dao.MDAO',
     'foam.dao.OrderedDAO',
     'foam.dao.PromisedDAO',
+    'foam.dao.TTLCachingDAO',
     'foam.dao.RequestResponseClientDAO',
     'foam.dao.SequenceNumberDAO',
     'foam.dao.SyncDAO',
@@ -306,6 +308,11 @@ foam.CLASS({
       value: 1
     },
     {
+      class: 'Long',
+      name: 'purgeTime',
+      value: 15000
+    },
+    {
       documentation: 'Have EasyDAO generate guids to index items. Note that .seqNo and .guid features are mutually exclusive',
       class: 'Boolean',
       name: 'guid',
@@ -325,10 +332,10 @@ foam.CLASS({
     },
     {
       documentation: 'Enable local in-memory caching of the DAO',
-      class: 'Boolean',
-      name: 'cache',
-      generateJava: false,
-      value: false
+      class: 'foam.core.Enum',
+      of: 'foam.dao.CacheType',
+      name: 'cacheType',
+      value: 'NONE' /* 'None' */
     },
     {
       documentation: 'Enable authorization',
@@ -691,7 +698,7 @@ model from which to test ServiceProvider ID (spid)`,
         this.mdao = dao;
         if ( this.dedup ) dao = this.DeDupDAO.create({delegate: dao});
       } else {
-        if ( this.cache ) {
+        if ( this.cacheType == foam.dao.CacheType.FULL ) {
           this.mdao = this.MDAO.create({of: params.of});
 
           var cache = this.mdao;
@@ -705,6 +712,11 @@ model from which to test ServiceProvider ID (spid)`,
             cache: cache,
             src: dao,
             of: this.model
+          });
+        } else if ( this.cacheType == foam.dao.CacheType.TTL ) {
+          dao = this.TTLCachingDAO.create({
+            delegate: dao,
+            purgeTime: this.purgeTime
           });
         }
       }
@@ -758,7 +770,7 @@ model from which to test ServiceProvider ID (spid)`,
         });
         dao.syncRecordDAO = foam.dao.EasyDAO.create({
           of: dao.SyncRecord,
-          cache: true,
+          cacheType: foam.dao.CacheType.FULL,
           daoType: this.daoType,
           name: this.name + '_SyncRecords'
         });

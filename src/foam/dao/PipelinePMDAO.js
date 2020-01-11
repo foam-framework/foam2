@@ -155,10 +155,7 @@ Creates the PM that will measure the performance of each operation and creates a
       ],
       javaType: 'X',
       javaCode: `
-      PM pm = (PM) x.get("PM");
-      pm.setClassType(getClassType());
-      pm.setName(op);
-      pm.init_();
+      PM pm = PM.create(x, getClassType(), op);
       return x.put(PIPE_PM_START, pm);
       `
     },

@@ -23,7 +23,12 @@ foam.CLASS({
     {
       /** The cache to read items quickly. */
       name: 'cache'
-    }
+    },
+    {
+      class: 'Long',
+      name: 'purgeTime',
+      value: 15000
+    },
   ],
 
   methods: [
@@ -97,7 +102,7 @@ foam.CLASS({
     {
       name: 'purgeCache',
       isMerged: true,
-      mergeDelay: 15000,
+      mergeDelay: this.purgeTime,
       code: function() {
         this.cache = {};
         this.purgeCache();
