@@ -79,6 +79,7 @@ externalFile.blacklist.forEach(function(cls) {
   'foam.box.WebSocketBox',
   'foam.box.TimeoutBox',
   'foam.box.RetryBox',
+  'foam.dao.TTLCachingDAO',
   'foam.dao.CachingDAO',
   'foam.dao.CompoundDAODecorator',
   'foam.dao.DecoratedDAO',
