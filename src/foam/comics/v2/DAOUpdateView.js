@@ -103,8 +103,7 @@ foam.CLASS({
         return ! workingData$errors_;
       },
       code: function() {
-        this.data.copyFrom(this.workingData);
-        this.config.dao.put(this.data).then(o => {
+        this.config.dao.put(this.workingData).then(o => {
           this.data = o;
           this.finished.pub();
           this.stack.back();
