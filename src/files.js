@@ -712,6 +712,9 @@ FOAM_FILES([
   { name: "foam/comics/v2/DAOUpdateView" },
   { name: "foam/comics/v2/NamedViews" },
   { name: "foam/comics/v2/ViewSpecWithJava" },
+  { name: "foam/comics/v2/userFeedback/UserFeedbackStatus" },
+  { name: "foam/comics/v2/userFeedback/UserFeedback" },
+  { name: "foam/comics/v2/userFeedback/UserFeedbackException" },
 
   { name: "foam/layout/Section" },
   { name: "foam/layout/SectionAxiom" },
