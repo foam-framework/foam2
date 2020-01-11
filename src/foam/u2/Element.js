@@ -2532,6 +2532,17 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2',
+  name: 'ReferenceSpecViewRefinement',
+  refines: 'foam.core.ReferenceSpec',
+  requires: [ 'foam.u2.view.ReferenceSpecPropertyView' ],
+  properties: [
+    [ 'view', { class: 'foam.u2.view.ReferenceSpecPropertyView' } ]
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
   name: 'EnumViewRefinement',
   refines: 'foam.core.Enum',
   requires: [ 'foam.u2.view.EnumView' ],

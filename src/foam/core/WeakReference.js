@@ -23,7 +23,8 @@ foam.CLASS({
       }
     },
     {
-      name: 'value',
+      name: 'target',
+      value: null,
       preSet: function(ol, nu) {
         return this.of.isInstance(nu) ?
           nu.id : nu;
@@ -33,17 +34,4 @@ foam.CLASS({
       }
     }
   ],
-
-  methods: [
-    function installInProto(proto) {
-      this.SUPER(proto);
-      var self = this;
-      Object.defineProperty(proto, self.name + '$find', {
-        get: function classGetter() {
-          return this.__subContext__[self.targetDAOKey].find(this[self.name]);
-        },
-        configurable: true
-      });
-    }
-  ]
 });

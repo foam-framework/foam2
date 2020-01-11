@@ -713,7 +713,8 @@ foam.CLASS({
           if ( typeof this[self.name] !== 'object' ) {
             return null;
           }
-          return this[self.name].find();
+          return this.__subContext__[this[self.name].targetDAOKey]
+            .find(this[self.name].target);
         },
         configurable: true
       });
