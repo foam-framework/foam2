@@ -55,7 +55,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'pendingPermission_',
-      javaFactory: 'return "lifecyclestate.pending" + getName();'
+      javaFactory: 'return "lifecyclestate.pending." + getName();'
     }
   ],
 
