@@ -16,7 +16,9 @@ foam.CLASS({
     'foam.mlang.MLang',
     'foam.mlang.order.Comparator',
     'foam.mlang.predicate.Predicate',
-    'foam.util.SafetyUtil'
+    'foam.util.SafetyUtil',
+    'java.util.ArrayList',
+    'java.util.List'
   ],
 
   documentation: `
@@ -29,7 +31,7 @@ foam.CLASS({
     decorators that also override "remove_" and "removeAll_".
 
     For filtering, objects with a lifecycle state of DELETED or REJECTED
-    will be filtered out unless the user group has {name}.read.lifecyclestate.deleted 
+    will be filtered out unless the user group has lifecyclestate.deleted.{name}
     and/or {name}.read.lifecyclestate.rejected respectively permission where {name} is 
     either the lowercase name of the model of the objects by default or the {name} provided by the user.
   `,
@@ -43,12 +45,17 @@ foam.CLASS({
     {
       class: 'String',
       name: 'deletePermission_',
-      javaFactory: 'return "lifecyclestate.deleted.read." + getName();'
+      javaFactory: 'return "lifecyclestate.deleted." + getName();'
     },
     {
       class: 'String',
       name: 'rejectPermission_',
-      javaFactory: 'return "lifecyclestate.rejected.read." + getName();'
+      javaFactory: 'return "lifecyclestate.rejected." + getName();'
+    },
+    {
+      class: 'String',
+      name: 'pendingPermission_',
+      javaFactory: 'return "lifecyclestate.pending" + getName();'
     }
   ],
 
@@ -60,21 +67,28 @@ foam.CLASS({
 
         LifecycleAware lifecycleAwareObj = (LifecycleAware) obj;
 
+
+
         // ! we are also handling the deprecated DeletedAware until we fully remove it from the system
         if ( obj instanceof DeletedAware ){
           DeletedAware deletedAwareObj = (DeletedAware) obj;
 
-          if ( obj == null || 
-            ( ( lifecycleAwareObj.getLifecycleState() == LifecycleState.DELETED || deletedAwareObj.getDeleted() == true ) && ! canReadDeleted(x) ) ||  
-            ( lifecycleAwareObj.getLifecycleState() == LifecycleState.REJECTED && ! canReadRejected(x)) ) {
+          if ( 
+              obj == null || 
+              ( ( lifecycleAwareObj.getLifecycleState() == LifecycleState.DELETED || deletedAwareObj.getDeleted() == true ) && ! canReadDeleted(x) ) || 
+              ( lifecycleAwareObj.getLifecycleState() == LifecycleState.REJECTED && ! canReadRejected(x) ) || ( lifecycleAwareObj.getLifecycleState() == LifecycleState.PENDING && ! canReadPending(x) ) 
+            ) {
             return null;
           }
           return obj;
         }
 
-        if ( obj == null || 
-          ( lifecycleAwareObj.getLifecycleState() == LifecycleState.DELETED && ! canReadDeleted(x) ) ||  
-          ( lifecycleAwareObj.getLifecycleState() == LifecycleState.REJECTED && ! canReadRejected(x)) ) {
+        if ( 
+            obj == null || 
+            ( lifecycleAwareObj.getLifecycleState() == LifecycleState.DELETED && ! canReadDeleted(x) ) ||  
+            ( lifecycleAwareObj.getLifecycleState() == LifecycleState.REJECTED && ! canReadRejected(x) ) || 
+            ( lifecycleAwareObj.getLifecycleState() == LifecycleState.PENDING && ! canReadPending(x) ) 
+          ) {
           return null;
         }
 
@@ -86,65 +100,35 @@ foam.CLASS({
       javaCode: `
         boolean userCanReadDeleted = canReadDeleted(x);
         boolean userCanReadRejected = canReadRejected(x);
+        boolean userCanReadPending = canReadPending(x);
 
-        if ( userCanReadDeleted && userCanReadRejected ) {
-          return getDelegate().select_(x, sink, skip, limit, order, predicate);
+        List<Predicate> predicateList = new ArrayList<>();
+
+        if (  ! userCanReadPending ) {
+          Predicate pendingPredicate = MLang.EQ(getOf().getAxiomByName("lifecycleState"), LifecycleState.PENDING);
+          predicateList.add(pendingPredicate);
         }
+        if ( ! userCanReadDeleted ) {
+          Predicate deletedPredicate = MLang.EQ(getOf().getAxiomByName("lifecycleState"), LifecycleState.DELETED);
+          // ! we are also handling the deprecated DeletedAware until we fully remove it from the system
+          Predicate deprecatedDeletedPredicate = MLang.EQ(getOf().getAxiomByName("deleted"), true);
 
-        if ( userCanReadDeleted && ! userCanReadRejected ) {
-          return getDelegate()
-            .where(
-              MLang.NOT(
-                MLang.EQ(getOf().getAxiomByName("lifecycleState"), LifecycleState.REJECTED)
-              )
-            )
-            .select_(x, sink, skip, limit, order, predicate);
+          predicateList.add(deletedPredicate);
+          predicateList.add(deprecatedDeletedPredicate);
         }
+        if ( ! userCanReadRejected ) {
+          Predicate rejectedPredicate = MLang.EQ(getOf().getAxiomByName("lifecycleState"), LifecycleState.REJECTED);
 
-        // ! we are also handling the deprecated DeletedAware until we fully remove it from the system
-        if ( getOf().getAxiomByName("deleted") != null ){
-          if ( ! userCanReadDeleted && userCanReadRejected ) {
-            return getDelegate()
-              .where(
-                MLang.NOT(
-                  MLang.OR(
-                    MLang.EQ(getOf().getAxiomByName("lifecycleState"), LifecycleState.DELETED),
-                    MLang.EQ(getOf().getAxiomByName("deleted"), true)
-                  )
-                )
-              )
-              .select_(x, sink, skip, limit, order, predicate);
-          }
-
-          return getDelegate()
-            .where(
-              MLang.NOT(
-                MLang.OR(
-                  MLang.EQ(getOf().getAxiomByName("lifecycleState"), LifecycleState.DELETED),
-                  MLang.EQ(getOf().getAxiomByName("lifecycleState"), LifecycleState.REJECTED),
-                  MLang.EQ(getOf().getAxiomByName("deleted"), true)
-                )
-              )
-            )
-            .select_(x, sink, skip, limit, order, predicate);
+          predicateList.add(rejectedPredicate);
         }
-
-        if ( ! userCanReadDeleted && userCanReadRejected ) {
-          return getDelegate()
-            .where(
-              MLang.NOT(
-                MLang.EQ(getOf().getAxiomByName("lifecycleState"), LifecycleState.DELETED)
-              )
-            )
-            .select_(x, sink, skip, limit, order, predicate);
-        }
+        
+        Predicate[] predicateArray = predicateList.toArray(new Predicate[predicateList.size()]);
 
         return getDelegate()
           .where(
             MLang.NOT(
               MLang.OR(
-                MLang.EQ(getOf().getAxiomByName("lifecycleState"), LifecycleState.DELETED),
-                MLang.EQ(getOf().getAxiomByName("lifecycleState"), LifecycleState.REJECTED)
+                predicateArray
               )
             )
           )
@@ -180,6 +164,17 @@ foam.CLASS({
       javaCode: `
         AuthService authService = (AuthService) getX().get("auth");
         return authService.check(x, getDeletePermission_());
+      `
+    },
+    {
+      name: 'canReadPending',
+      type: 'Boolean',
+      args: [
+        { type: 'Context', name: 'x' }
+      ],
+      javaCode: `
+        AuthService authService = (AuthService) getX().get("auth");
+        return authService.check(x, getPendingPermission_());
       `
     },
     {
