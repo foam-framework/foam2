@@ -7,6 +7,10 @@
 foam.ENUM({
   package: 'foam.comics.v2.userfeedback',
   name: 'UserFeedbackStatus',
+  documentation: `
+    Functional statuses which highlight different types of feedback
+    the client user is interested in
+  `,
 
   values: [
     { name: 'SUCCESS',   label: 'Success' },
