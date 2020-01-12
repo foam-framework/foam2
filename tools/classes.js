@@ -546,6 +546,9 @@ var classes = [
   'foam.nanos.mrac.FilePacket',
   'foam.nanos.mrac.MNService',
   'foam.nanos.mrac.NodeStatus',
+  'foam.nanos.mrac.BlockInfo',
+  'foam.nanos.mrac.EntryRecord',
+  'foam.nanos.mrac.MNServiceMate',
 
   //concurrent
   'foam.util.concurrent.AbstractAssembly',

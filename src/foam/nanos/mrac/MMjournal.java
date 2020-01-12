@@ -80,7 +80,7 @@ import java.nio.charset.StandardCharsets;
 // Make sure MM initial before initial of this class.
 // TODO: refactor this class as DAO.
 // TODO: refactor all clusterNode finding in the a DAO. provide better controller of MN.
-public class MMJournal extends AbstractJournal {
+public class MMJournal extends AbstractJournal implements Electable {
 
   private String serviceName;
   private QuorumService quorumService;
@@ -115,8 +115,9 @@ public class MMJournal extends AbstractJournal {
     }
   }
 
-  private MMJournal(String serviceName) {
+  private MMJournal(X x, String serviceName) {
     this.serviceName = serviceName;
+    initial(x);
   }
 
   Object initialLock = new Object();
@@ -153,6 +154,23 @@ public class MMJournal extends AbstractJournal {
         groups.add(groupToMN.get(group));
       }
 
+      nodeToSocketChannel = new HashMap<Long, SocketChannel>();
+      readyToUseEntry = new HashMap<String, List<MedusaEntry>>();
+      registerDAOs = new HashMap<String, DAO>();
+
+      //TODO: Configure Very first two Index; Very Important
+      parent1 = new MedusaEntry();
+      parent1.setMyHash("aaaaaa");
+      parent1.setMyIndex(-1L);
+
+      parent2 = new MedusaEntry();
+      parent2.setMyHash("bbbbbb");
+      parent2.setMyIndex(0L);
+
+      indexHashMap = new HashMap<Long, String>();
+      indexHashMap.put(parent1.getMyIndex(), parent1.getMyHash());
+      indexHashMap.put(parent2.getMyIndex(), parent2.getMyHash());
+
       isInitialized = true;
 
     }
@@ -186,9 +204,9 @@ public class MMJournal extends AbstractJournal {
 
   private static Map<String, MMJournal> journalMap = new HashMap<String, MMJournal>();
 
-  public synchronized static MMJournal getMMjournal(String serviceName) {
+  public synchronized static MMJournal getMMjournal(X x, String serviceName) {
     if ( journalMap.get(serviceName) != null ) return journalMap.get(serviceName);
-    journalMap.put(serviceName, new MMJournal(serviceName));
+    journalMap.put(serviceName, new MMJournal(x, serviceName));
     return journalMap.get(serviceName);
   }
 
@@ -201,8 +219,8 @@ public class MMJournal extends AbstractJournal {
   // TODO: can we do this versioning code at the begnning of DAO?
   @Override
   public FObject put(X x, String prefix, DAO dao, FObject obj) {
-    if ( ! isInitialized ) initial(x);
-    if ( isReplayed == false ) throw new RuntimeException("Can not do put without replay.");
+    if (  quorumService.exposeState != InstanceState.PRIMARY 
+        && isPrimary() ) throw new RuntimeException("Electing/Secondary");
     long myIndex = getGlobalIndex();
 
     // Get whole entry first to make sure threadsafe.
@@ -232,24 +250,24 @@ public class MMJournal extends AbstractJournal {
   private FObject putParentHash(long myIndex, String hash, FObject randomFObject) {
     Message msg =
       createMessage(
-        -1,
-        null,
-        -1,
-        null,
-        myIndex,
-        "put_",
-        "p",
-        null,
-        "TOP",
-        randomFObject
-      );
+          -1,
+          null,
+          -1,
+          null,
+          myIndex,
+          "put_",
+          "p",
+          null,
+          "TOP",
+          randomFObject
+          );
     return null;
   }
 
   @Override
   public FObject remove(X x, String prefix, DAO dao, FObject obj) {
-    if ( ! isInitialized ) initial(x);
-    if ( isReplayed == false ) throw new RuntimeException("Can not do put without replay.");
+    if (  quorumService.exposeState != InstanceState.PRIMARY 
+        && isPrimary() ) throw new RuntimeException("Electing/Secondary");
 
     long myIndex = getGlobalIndex();
     // Get whole entry first to make sure threadsafe.
@@ -497,63 +515,73 @@ public class MMJournal extends AbstractJournal {
 
     }
     nodeToSocketChannel = new HashMap<Long, SocketChannel>();
-    readyToUseEntry = new HashMap<String, List<MedusaEntry>>();
-    registerDAOs = new HashMap<String, DAO>();
-
-    //TODO: Configure Very first two Index; Very Important
-    parent1 = new MedusaEntry();
-    parent1.setMyHash("aaaaaa");
-    parent1.setMyIndex(-1L);
-
-    parent2 = new MedusaEntry();
-    parent2.setMyHash("bbbbbb");
-    parent2.setMyIndex(0L);
-
-    indexHashMap = new HashMap<Long, String>();
-    indexHashMap.put(parent1.getMyIndex(), parent1.getMyHash());
-    indexHashMap.put(parent2.getMyIndex(), parent2.getMyHash());
   }
+
+  public final void cleanConnection() {
+    if ( nodeToSocketChannel != null ) {
+      for ( Map.Entry<Long, SocketChannel> entry: nodeToSocketChannel.entrySet() ) {
+        TCPNioServer.closeSocketChannel(entry.getValue());
+      }
+    }
+  }
+
+  public volatile boolean needReplay = true;
+  public volatile boolean isReplaying = false;
 
   @Override
   public void replay(X x, DAO dao) {
     throw new RuntimeException("MMJournal do not support replay(x,DAO)");
   }
+
   // Make sure only replay once.
   private volatile boolean isReplayed = false;
-  public synchronized void replay(X x, String nspecKey, DAO dao) {
-    //TODO: need a speciall dao.
-    if ( ! isInitialized ) initial(x);
 
-    // Only replay once.
-    if ( ! isReplayed ) {
-      System.out.println(">>>>>>>>>>>>>>>>start replay<<<<<<<<<<<<<<<");
-      try {
+  public synchronized void pullData(X x, long fromIndex, boolean isListen) {
+    System.out.println(">>>>>>>>>>>>>>>>pull<<<<<<<<<<<<<<<");
+    try {
+      if ( isListen ) {
         initialListener(x);
-        initialReplay(x);
-        List<MedusaEntry> entries = retrieveData(x, groupToMN);
-        System.out.println(">>>>>>>entry start");
-        System.out.println("total entry receive in replay: " + entries.size());
-        for ( MedusaEntry entry : entries ) {
-          Outputter outputter = new Outputter(getX());
-          String mn = outputter.stringify(entry);
-          System.out.println(mn);
-        }
-        System.out.println("--------entry end");
-        cacheOrMDAO(entries);
-      } catch ( Exception e ) {
-        e.printStackTrace();
-        throw new RuntimeException(e);
       }
-      if ( globalIndex.get() < 3 ) {
-        //TODO: very first two parents.
+      initialReplay(x);
+      List<MedusaEntry> entries = retrieveData(x, groupToMN, fromIndex);
+      System.out.println(">>>>>>>entry start");
+      for ( MedusaEntry entry : entries ) {
+        Outputter outputter = new Outputter(getX());
+        String mn = outputter.stringify(entry);
+        System.out.println(mn);
       }
-      isReplayed = true;
+      System.out.println("total entry receive in replay: " + entries.size());
+      System.out.println("--------entry end");
+      cacheOrMDAO(entries);
+    } catch ( Exception e ) {
+      throw new RuntimeException(e);
     }
+  }
 
-    if ( dao == null ) return;
+  // Get data start from global Index.
+  public synchronized void updateData(X x, boolean isListen) {
+    if ( needReplay == false ) return;
+
+    try {
+      isReplaying = true;
+      pullData(x , globalIndex.get(), isListen);
+      isReplaying = false;
+      needReplay = false;
+    } catch ( Exception e ) {
+      e.printStackTrace();
+      throw new RuntimeException(e);
+    }
+  }
+
+  public synchronized void replay(X x, String nspecKey, DAO dao) {
 
     // Disable put when doing replay to a dao.
     synchronized ( cacheOrMDAOLock ) {
+      if ( registerDAOs.get(nspecKey) != null ) {
+        throw new RuntimeException("can not replay duplicate dao: " + nspecKey);
+      }
+
+      registerDAOs.put(nspecKey, dao);
       if ( readyToUseEntry.get(nspecKey) == null ) {
         System.out.println("No cached entry associated with: " + nspecKey);
         return;
@@ -570,7 +598,6 @@ public class MMJournal extends AbstractJournal {
         }
       }
       readyToUseEntry.remove(nspecKey);
-      registerDAOs.put(nspecKey, dao);
     }
   }
 
@@ -588,10 +615,13 @@ public class MMJournal extends AbstractJournal {
 
 
   private Object cacheOrMDAOLock = new Object();
-  //Only one thread can access this function at any give time. When instance is secondary.
+  // This method only apply on secondary.
+  // Only one thread can access this function at any give time. When instance is secondary.
   private void cacheOrMDAO(MedusaEntry entry) {
     synchronized ( cacheOrMDAOLock ) {
-      if ( entry.getMyIndex() != recordIndex ) throw new RuntimeException("Wrong order");
+      // Data already in the MDAO.
+      if ( entry.getMyIndex() <= globalIndex.get() ) return;
+      if ( entry.getMyIndex() != globalIndex.get() + 1 ) throw new RuntimeException("Wrong order");
 
       if ( registerDAOs.get(entry.getNspecKey()) != null ) {
         DAO dao = registerDAOs.get(entry.getNspecKey());
@@ -610,31 +640,33 @@ public class MMJournal extends AbstractJournal {
         List<MedusaEntry> entryList = readyToUseEntry.get(entry.getNspecKey());
         entryList.add(entry);
       }
+      globalIndex.set(entry.getMyIndex() + 1L);
+      updateHash(entry);
 
       //TODO: update globalIndex and parent, varify hash.
-      globalIndex.set(entry.getMyIndex() + 1L);
-      recordIndex = recordIndex + 1L;
-      updateHash(entry);
-      try {
-        //TODO: turn hash on.
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        md.update(indexHashMap.get(entry.getGlobalIndex1()).getBytes(StandardCharsets.UTF_8));
-        md.update(indexHashMap.get(entry.getGlobalIndex2()).getBytes(StandardCharsets.UTF_8));
-        String myHash = MNJournal.byte2Hex(entry.getNu().hash(md));
-        System.out.println(myHash);
-        System.out.println(entry.getMyHash());
-        if ( ! myHash.equals(entry.getMyHash()) ) {
-          throw new RuntimeException("hash invalid");
-        }
-        indexHashMap.put(entry.getMyIndex(), entry.getMyHash());
-      } catch ( Exception e ) {
-        e.printStackTrace();
-        throw new RuntimeException(e);
-      }
+      ////close hash for now to see the performance difference.
+      //globalIndex.set(entry.getMyIndex() + 1L);
+      //recordIndex = recordIndex + 1L;
+      //updateHash(entry);
+      //try {
+      //  //TODO: turn hash on.
+      //  MessageDigest md = MessageDigest.getInstance("SHA-256");
+      //  md.update(indexHashMap.get(entry.getGlobalIndex1()).getBytes(StandardCharsets.UTF_8));
+      //  md.update(indexHashMap.get(entry.getGlobalIndex2()).getBytes(StandardCharsets.UTF_8));
+      //  String myHash = MNJournal.byte2Hex(entry.getNu().hash(md));
+      //  System.out.println(myHash);
+      //  System.out.println(entry.getMyHash());
+      //  if ( ! myHash.equals(entry.getMyHash()) ) {
+      //    throw new RuntimeException("hash invalid");
+      //  }
+      //  indexHashMap.put(entry.getMyIndex(), entry.getMyHash());
+      //} catch ( Exception e ) {
+      //  e.printStackTrace();
+      //  throw new RuntimeException(e);
+      //}
     }
   }
 
-  volatile long recordIndex = 1;
   private void cacheOrMDAO(List<MedusaEntry> entries) {
     synchronized ( cacheOrMDAOLock ) {
       for ( MedusaEntry entry :  entries ) {
@@ -644,19 +676,20 @@ public class MMJournal extends AbstractJournal {
   }
 
 
-  private final List<MedusaEntry> retrieveData(X x, Map<Long, ArrayList<ClusterNode>> groupToMN) {
+  private final List<MedusaEntry> retrieveData(X x, Map<Long, ArrayList<ClusterNode>> groupToMN, long fromIndex) {
 
     // MedusaNode id to Bytebuffer.
     Map<Long, Map<Long, LinkedList<ByteBuffer>>> groupToJournal = new HashMap<Long, Map<Long, LinkedList<ByteBuffer>>>();
     Map<Long, List<MedusaEntry>> groupToEntry = new HashMap<Long, List<MedusaEntry>>();
     SocketChannel channel = null;
-    try {
-      for ( Map.Entry<Long, ArrayList<ClusterNode>> entry : groupToMN.entrySet() ) {
-        long groupId = entry.getKey();
-        Map<Long, LinkedList<ByteBuffer>> nodeToBuffers = new HashMap<Long, LinkedList<ByteBuffer>>();
-        groupToJournal.put(groupId, nodeToBuffers);
+    for ( Map.Entry<Long, ArrayList<ClusterNode>> entry : groupToMN.entrySet() ) {
+      long groupId = entry.getKey();
+      Map<Long, LinkedList<ByteBuffer>> nodeToBuffers = new HashMap<Long, LinkedList<ByteBuffer>>();
+      groupToJournal.put(groupId, nodeToBuffers);
 
-        for ( ClusterNode node : entry.getValue() ) {
+      int count = 0;
+      for ( ClusterNode node : entry.getValue() ) {
+        try {
           channel = SocketChannel.open();
           channel.configureBlocking(true);
           InetSocketAddress address = new InetSocketAddress(node.getIp(), node.getSocketPort());
@@ -668,35 +701,36 @@ public class MMJournal extends AbstractJournal {
 
           nodeToSocketChannel.put(node.getId(), channel);
 
-          nodeToBuffers.put(node.getId(), retrieveDataFromNode(x, channel));
-          //TODO: record last entry from ench node.
-          //TODO: get entry from readBuffer and but into dao.
-          //TODO: After replay If not primary add socket channel into a selector. and set blocking == false.
+          nodeToBuffers.put(node.getId(), retrieveDataFromNode(x, channel, fromIndex));
+          count++;
+        } catch ( Exception e ) {
+          TCPNioServer.closeSocketChannel(channel);
+          e.printStackTrace();
         }
-
-        groupToEntry.put(groupId, concatEntries(parseEntries(x, nodeToBuffers)));
       }
 
-      // System.out.println(">>>>>replay journal");
-      // printAll(x, groupToJournal);
-      // System.out.println("------replay journal end");
-      return sortEntries(mergeEntries(groupToEntry));
+      if ( count < 1 ) {
+        throw new RuntimeException("Do not get data from enough MN");
+      }
 
-    } catch ( IOException ioe ) {
-      TCPNioServer.closeSocketChannel(channel);
-      throw new RuntimeException(ioe);
+      groupToEntry.put(groupId, concatEntries(parseEntries(x, nodeToBuffers)));
     }
+
+    // System.out.println(">>>>>replay journal");
+    // printAll(x, groupToJournal);
+    // System.out.println("------replay journal end");
+    return sortEntries(mergeEntries(groupToEntry));
 
   }
 
-  private final LinkedList<ByteBuffer> retrieveDataFromNode(X x, SocketChannel channel) throws IOException {
+  private final LinkedList<ByteBuffer> retrieveDataFromNode(X x, SocketChannel channel, long fromIndex) throws IOException {
     LinkedList<ByteBuffer> buffers = new LinkedList<ByteBuffer>();
     ByteBuffer lengthBuffer = ByteBuffer.allocate(4);
     TcpMessage replayInitialMessage = new TcpMessage();
     replayInitialMessage.setServiceKey("MNService");
     RPCMessage rpc = x.create(RPCMessage.class);
-    rpc.setName("replayAll");
-    Object[] args = { null, serviceName };
+    rpc.setName("replayFrom");
+    Object[] args = { null, serviceName, fromIndex };
     rpc.setArgs(args);
     replayInitialMessage.setObject(rpc);
 
@@ -711,31 +745,72 @@ public class MMJournal extends AbstractJournal {
     // Waiting for ACK from MN.
     lengthBuffer.clear();
 
+    // Start receiving.
     if ( channel.read(lengthBuffer) < 0 ) throw new RuntimeException("End of Stream");
     lengthBuffer.flip();
 
-    int ackLength = lengthBuffer.getInt();
-    if ( ackLength < 0 ) throw new RuntimeException("End of Stream");
-    ByteBuffer packet = ByteBuffer.allocate(ackLength);
-    if ( channel.read(packet) < 0 ) throw new RuntimeException("End of Stream");
+    int length = lengthBuffer.getInt();
+    if ( length < 0 ) throw new RuntimeException("End of Stream");
+    ByteBuffer firstBlockInfo = ByteBuffer.allocate(length);
+    if ( channel.read(firstBlockInfo) < 0 ) throw new RuntimeException("End of Stream");
 
-    packet.flip();
-    String ackString = new String(packet.array(), 0, ackLength, Charset.forName("UTF-8"));
-    FilePacket filePacket = (FilePacket) x.create(JSONParser.class).parseString(ackString);
-    int totalBlock = filePacket.getTotalBlock();
+    firstBlockInfo.flip();
+    String blockInfoString = new String(firstBlockInfo.array(), 0, length, Charset.forName("UTF-8"));
+    BlockInfo blockInfo = (BlockInfo) x.create(JSONParser.class).parseString(blockInfoString);
+    System.out.println(blockInfoString);
+    while ( blockInfo.getEof() == false ) {
+      if ( blockInfo.getAnyFailure() == true )
+        throw new RuntimeException(blockInfo.getFailReason() + "\n" + blockInfo.getFailLine());
 
-    for ( int i = 0 ; i < totalBlock ; i++ ) {
       lengthBuffer.clear();
-
       channel.read(lengthBuffer);
       lengthBuffer.flip();
-      int length = lengthBuffer.getInt();
+      length = lengthBuffer.getInt();
       ByteBuffer readBuffer = ByteBuffer.allocate(length);
+      channel.read(readBuffer);
+      readBuffer.flip();
+      buffers.add(readBuffer);
 
+      lengthBuffer.clear();
+      channel.read(lengthBuffer);
+      lengthBuffer.flip();
+      length = lengthBuffer.getInt();
+      ByteBuffer nextBlockInfo = ByteBuffer.allocate(length);
+      if ( channel.read(nextBlockInfo) < 0 ) throw new RuntimeException("End of Stream");
+      nextBlockInfo.flip();
+      blockInfoString = new String(nextBlockInfo.array(), 0, length, Charset.forName("UTF-8"));
+      blockInfo = (BlockInfo) x.create(JSONParser.class).parseString(blockInfoString);
+    }
+
+
+    if ( blockInfo.getAnyFailure() == true )
+      throw new RuntimeException(blockInfo.getFailReason() + "\n" + blockInfo.getFailLine());
+
+    if ( blockInfo.getTotalEntries() > 0 ) {
+      lengthBuffer.clear();
+      channel.read(lengthBuffer);
+      lengthBuffer.flip();
+      length = lengthBuffer.getInt();
+      ByteBuffer readBuffer = ByteBuffer.allocate(length);
       channel.read(readBuffer);
       readBuffer.flip();
       buffers.add(readBuffer);
     }
+    // int totalBlock = filePacket.getTotalBlock();
+
+    // for ( int i = 0 ; i < totalBlock ; i++ ) {
+    //   lengthBuffer.clear();
+
+    //   channel.read(lengthBuffer);
+    //   lengthBuffer.flip();
+    //   int length = lengthBuffer.getInt();
+    //   ByteBuffer readBuffer = ByteBuffer.allocate(length);
+
+    //   channel.read(readBuffer);
+    //   readBuffer.flip();
+    //   buffers.add(readBuffer);
+    // }
+
 
     return buffers;
   }
@@ -948,13 +1023,13 @@ public class MMJournal extends AbstractJournal {
           iterator.remove();
 
           if ( key.isConnectable() ) {
-              System.out.println("client connect success");
-              SocketChannel channel=(SocketChannel)key.channel();
-              if(channel.isConnectionPending()){
-                  channel.finishConnect();
-              }
-              channel.configureBlocking(false);
-              channel.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
+            System.out.println("client connect success");
+            SocketChannel channel=(SocketChannel)key.channel();
+            if(channel.isConnectionPending()){
+              channel.finishConnect();
+            }
+            channel.configureBlocking(false);
+            channel.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
           }
 
           // if ( key.isValid() == false ) {
@@ -1077,7 +1152,7 @@ public class MMJournal extends AbstractJournal {
     }
   }
 
-
+  private volatile EntryLoader loader;
   private void initialListener(X x) throws IOException {
     System.out.println("initialListerner");
     if ( processorsMap != null ) {
@@ -1108,8 +1183,24 @@ public class MMJournal extends AbstractJournal {
         processor.acceptSocketChannel(channel);
       }
     }
+    if ( loader != null ) loader.close();
     EntryLoader loader = new EntryLoader(x);
     loader.start();
+  }
+
+  public boolean stopListener(X x) {
+    if ( processorsMap != null ) {
+      for ( Map.Entry<Long, Processor> entry : processorsMap.entrySet() ) {
+        entry.getValue().close();
+      }
+    }
+    cachedEntry = null;
+    cachedEntryMap = null;
+    processorsMap = null;
+    if ( loader != null ) loader.close();
+    EntryLoader loader = null;
+
+    return true;
   }
 
   // The method is called when Secondary become primary.
@@ -1283,4 +1374,48 @@ public class MMJournal extends AbstractJournal {
     }
   }
 
+  private volatile InstanceState currentState = InstanceState.ELECTING;
+  public synchronized void primary() {
+    this.updateData(null, false);
+    currentState = InstanceState.PRIMARY;
+  }
+
+  public boolean isPrimary() {
+    return currentState == InstanceState.PRIMARY;
+  }
+
+  public synchronized void secondary() {
+    updateData(null, true);
+    currentState = InstanceState.SECONDARY;
+  }
+
+  public boolean isSecondary() {
+    return currentState == InstanceState.SECONDARY;
+  }
+
+  public synchronized void leaveSecondary() {
+    currentState = InstanceState.ELECTING;
+    cleanConnection();
+    stopListener(null);
+  }
+
+  public synchronized void leavePrimary() {
+    currentState = InstanceState.ELECTING;
+    cleanConnection();
+  }
+
+  //TODO: remove this method after model this class.
+  public int hashCode() {
+    return java.util.Objects.hash(serviceName);
+  }
+
+  //TODO: remove this method after model this class.
+  public boolean equals(Object o) {
+    if ( o == null ) return false;
+    if ( this == o ) return false;
+    if ( this.getClass() != o.getClass() ) return false;
+
+    MMJournal other = (MMJournal) o;
+    return other.serviceName == this.serviceName;
+  }
 }

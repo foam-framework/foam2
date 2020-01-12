@@ -9,17 +9,19 @@ package foam.nanos.mrac;
 import foam.core.X;
 import foam.dao.DAO;
 
+import foam.lib.json.Outputter;
+import java.io.PrintWriter;
+
 public class MNServiceImpl implements MNService {
 
+  //TODO: close socketChannel;
   public void replayAll(X x, String serviceName) {
-    //TODO: catch IOException close socket.
     System.out.println("replayreplayreplay");
     DAO dao = (DAO) x.get(serviceName);
 
     if ( dao == null ) throw new RuntimeException("DAO miss: " + serviceName);
 
-    //TODO: Do not hard code journal name.
-    MNJournal journal = MNJournal.getMNjournal(serviceName + "s");
+    MNJournal journal = MNJournal.getMNjournal(x, serviceName + "s");
 
     //TODO: add sink
     journal.replay(x, dao);
@@ -27,6 +29,32 @@ public class MNServiceImpl implements MNService {
   }
 
   public void sinkDAO(X x, String daoKey) {
+
+  }
+
+  public void serviceMate(X x, String serviceName) {
+    DAO dao = (DAO) x.get("serviceName");
+    if (dao == null ) throw new RuntimeException("DAO miss: " + serviceName);
+
+    MNJournal journal = MNJournal.getMNjournal(x, serviceName + "s");
+
+    MNServiceMate mate = new MNServiceMate();
+    mate.setServiceName(serviceName);
+    mate.setMaxIndex(journal.getCurrentMaxIndex());
+
+    Outputter outputter = new Outputter(x);
+    String msg = outputter.stringify(mate);
+    PrintWriter out = x.get(PrintWriter.class);
+    out.println(msg);
+    return;
+
+  }
+  public void replayFrom(X x, String serviceName, long indexFrom) {
+    System.out.println("replayFrom");
+    DAO dao = (DAO) x.get(serviceName);
+  }
+
+  public void serviceMeta(X x, String serviceName) {
 
   }
 }

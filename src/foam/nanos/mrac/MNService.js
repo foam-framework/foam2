@@ -34,6 +34,36 @@ foam.INTERFACE({
           type: 'String'
         }
       ]
+    },
+    {
+      name: 'serviceMate',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'serviceName',
+          type: 'String'
+        }
+      ]
+    },
+    {
+      name: 'replayFrom',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'serviceName',
+          type: 'String'
+        },
+        {
+          name: 'indexFrom',
+          type: 'Long'
+        }
+      ]
     }
   ]
 })

@@ -25,7 +25,7 @@ import java.net.URI;
 public class VotingDAO extends ProxyDAO {
 
   QuorumService quorumService;
-
+  volatile boolean isReady;
   public VotingDAO(X x, DAO delegate) {
     setX(x);
     QuorumService quorumService = (QuorumService) x.get("quorumService");
@@ -71,7 +71,7 @@ public class VotingDAO extends ProxyDAO {
                                                   quorumService.mySelf
                                                 );
       X x1 = x.put("clusterConfigService", service);
-      return getDelegate().put_(x1, obj);
+      return getDelegate().remove_(x1, obj);
     } else if ( quorumService.exposeState == InstanceState.SECONDARY ) {
       ClusterNode primaryClusterNode = quorumService.getPrimaryClusterNode();
       if ( primaryClusterNode == null ) throw new RuntimeException("No Primary");
@@ -82,7 +82,7 @@ public class VotingDAO extends ProxyDAO {
                                                   primaryClusterNode
                                                 );
       X x1 = x.put("clusterConfigService", service);
-      return getDelegate().put_(x1, obj);
+      return getDelegate().remove_(x1, obj);
     } else if ( quorumService.exposeState == InstanceState.ELECTING ) {
       throw new RuntimeException("Server re-election");
     } else {
@@ -94,17 +94,17 @@ public class VotingDAO extends ProxyDAO {
     throw new RuntimeException("Implements");
   }
 
-  public Object cmd_(X x, Object obj) {
-    //TODO: create clusterConfigServer into x;
-    if ( ! ( obj instanceof ClusterCommand ) ) {
-      throw new RuntimeException("obj should be an instance of ClusterCommand");
-    }
+  //public Object cmd_(X x, Object obj) {
+  //  //TODO: create clusterConfigServer into x;
+  //  if ( ! ( obj instanceof ClusterCommand ) ) {
+  //    throw new RuntimeException("obj should be an instance of ClusterCommand");
+  //  }
 
-    if ( quorumService.exposeState != InstanceState.PRIMARY ) {
-      throw new RuntimeException("Instance");
-    }
-    return null;
-  }
+  //  if ( quorumService.exposeState != InstanceState.PRIMARY ) {
+  //    throw new RuntimeException("Instance");
+  //  }
+  //  return null;
+  //}
 
   //TODO: this class should be generate from election.java
   private class VotingClusterConfigService

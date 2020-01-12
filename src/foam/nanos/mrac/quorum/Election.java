@@ -146,10 +146,9 @@ public class Election extends AbstractFObject {
               response.setSourceStatus(quorumService.getMyState());
               // Very important!!
               vote.setElectionEra(electionEra.get());
-              response.setVote(getVote());
+              response.setVote(vote);
               sendQueue.offer(response);
             } else {
-
               // If this instance is electing, then doing election and sending proposed Primary.
               if ( quorumService.getMyState() == InstanceState.ELECTING ) {
                 receptedQueue.offer(inMessage);
@@ -157,6 +156,7 @@ public class Election extends AbstractFObject {
                 // If request instance lag this instance, send back message with current electionEra and CurrentVote.
                 if ( inMessage.getSourceStatus() == InstanceState.ELECTING
                 && inMessage.getVote().getElectionEra() < electionEra.get() ) {
+                  System.out.println("aa**ss");
                   Vote vote = getVote();
                   // Set electionEra of this instance into vote.
                   vote.setElectionEra(electionEra.get());
@@ -165,7 +165,7 @@ public class Election extends AbstractFObject {
                   response.setDestinationInstance(inMessage.getSourceInstance());
                   response.setSourceInstance(mySelf.getId());
                   response.setSourceStatus(quorumService.getMyState());
-                  response.setVote(getVote());
+                  response.setVote(vote);
                   sendQueue.offer(response);
                 }
 

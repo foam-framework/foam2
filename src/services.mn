@@ -25,6 +25,29 @@ p({
     }
   """
 })
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "entryRecordDAO",
+  "lazy": false,
+  "serve": true,
+  "serviceScript":
+  """
+    return new foam.dao.EasyDAO
+      .Builder(x)
+      .setRuler(false)
+      .setAuthorize(false)
+      .setSeqNo(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("entryRecords")
+      .setOf(foam.nanos.mrac.EntryRecord.getOwnClassInfo())
+      .build();
+  """,
+  "client": """
+    {
+      "of": "foam.nanos.mrac.EntryRecord"
+    }
+  """
+})
 p({"class":"foam.nanos.boot.NSpec","name":"appConfig",                         "lazy":false, "service":{"class":"foam.nanos.app.AppConfig"}})
 p({
   "class": "foam.nanos.boot.NSpec",
@@ -32,4 +55,23 @@ p({
   "lazy": "false",
   "authenticate": false,
   "serviceClass": "foam.nanos.http.PingService"
+})
+p({"class":"foam.nanos.boot.NSpec", "name":"AuthenticatedNSpecDAO",              "serve":true,  "serviceClass":"foam.dao.ProxyDAO", "client":"{\"of\":\"foam.nanos.boot.NSpec\",\"cache\":true}"})
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"scriptDAO",
+  "serve":true,
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setGuid(true)
+      .setOf(foam.nanos.script.Script.getOwnClassInfo())
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("scripts")
+      .setDecorator(new foam.nanos.script.ScriptRunnerDAO(null))
+      .setOrder(new foam.core.PropertyInfo[] {foam.nanos.script.Script.ID})
+      .setIndex(new foam.core.PropertyInfo[] {foam.nanos.script.Script.ID})
+      .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.script.Script\"}"
 })

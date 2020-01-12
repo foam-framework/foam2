@@ -24,13 +24,26 @@ import java.nio.channels.SelectionKey;
 import java.nio.charset.Charset;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.ByteArrayInputStream;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
+import java.util.LinkedList;
 
 import java.security.MessageDigest;
 import java.nio.charset.StandardCharsets;
+import static foam.mlang.MLang.*;
+import foam.dao.ArraySink;
+import foam.lib.json.JSONParser;
+import foam.mlang.order.Desc;
 
+//TODO: is it a good ideal to keep a very big file?
+//TODO: use new file to replace block.
 public class MNJournal extends FileJournal {
 
   private static FileSystem fileSystem = FileSystems.getDefault();
@@ -40,25 +53,56 @@ public class MNJournal extends FileJournal {
   private FileChannel outChannel;
   private Object fileLock = new Object();
   private long lateIndex;
+  private DAO entryRecordDAO;
+  private volatile boolean isReady;
+
   // To avoid we need to create ByteBuffer everyTime when we write.
   // Allocate 20KB.
-  private ByteBuffer writeBuffer = ByteBuffer.allocate(20 * 1024);
+  private ByteBuffer writeBuffer = ByteBuffer.allocate(40 * 1024);
+  private long maxGlobalIndex = Long.MIN_VALUE;
+  private long minGlobalIndex = Long.MAX_VALUE;
 
-  private MNJournal(String filename) {
+  private MNJournal(X x, String filename) {
     try {
+      setX(x);
+      entryRecordDAO = (DAO) x.get("entryRecordDAO");
+      if ( entryRecordDAO == null ) throw new RuntimeException("entryRecordDAO miss");
       this.filename = filename;
       this.journalDir = System.getProperty("JOURNAL_HOME");
       this.outChannel = FileChannel.open(getPath(filename), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-
+      blocking();
+      //load min and max index;
+      ArraySink sink = (ArraySink) entryRecordDAO
+                                    .where(EQ(EntryRecord.FILE_NAME, filename))
+                                    .select(new ArraySink());
+      List list = sink.getArray();
+      for ( Object obj : list ) {
+        BlockInfo blockInfo = (BlockInfo) obj;
+        if ( blockInfo.getMaxIndex() > maxGlobalIndex ) {
+          maxGlobalIndex = blockInfo.getMaxIndex();
+        }
+        if ( blockInfo.getMinIndex() < minGlobalIndex ) {
+          minGlobalIndex = blockInfo.getMinIndex();
+        }
+      }
+      System.out.println(maxGlobalIndex);
     } catch ( IOException e ) {
       throw new RuntimeException(e);
     }
+  }
+
+  public long getCurrentMaxIndex() {
+    return maxGlobalIndex;
   }
 
   private Path getPath(String name) {
     return SafetyUtil.isEmpty(journalDir) ? fileSystem.getPath(name) : fileSystem.getPath(journalDir, name);
   }
 
+
+  public boolean isReady() {
+    return isReady;
+  }
 
   @Override
   public FObject put(X x, String prefix, DAO dao, FObject obj) {
@@ -68,18 +112,18 @@ public class MNJournal extends FileJournal {
     String hash1 = entry.getHash1();
     String hash2 = entry.getHash2();
     //TODO: Do not hard code SHA-256.
-    try {
-      MessageDigest md = MessageDigest.getInstance("SHA-256");
-      md.update(hash1.getBytes(StandardCharsets.UTF_8));
-      md.update(hash2.getBytes(StandardCharsets.UTF_8));
-      String myHash = byte2Hex(entry.getNu().hash(md));
-      entry.setMyHash(myHash);
-    } catch ( Exception e ) {
-      System.out.println(e);
-      throw new RuntimeException(e);
-    }
+    // try {
+    //   MessageDigest md = MessageDigest.getInstance("SHA-256");
+    //   md.update(hash1.getBytes(StandardCharsets.UTF_8));
+    //   md.update(hash2.getBytes(StandardCharsets.UTF_8));
+    //   String myHash = byte2Hex(entry.getNu().hash(md));
+    //   entry.setMyHash(myHash);
+    // } catch ( Exception e ) {
+    //   System.out.println(e);
+    //   throw new RuntimeException(e);
+    // }
     String msg = new Outputter(x).stringify(obj);
-    doWrite(x, msg + "\n");
+    doWrite(x, msg + "\n", entry.getMyIndex());
     return obj;
   }
 
@@ -100,17 +144,32 @@ public class MNJournal extends FileJournal {
       System.out.println(e);
       throw new RuntimeException(e);
     }
-    doWrite(x, new Outputter(x).stringify(obj) + "\n");
+    doWrite(x, new Outputter(x).stringify(obj) + "\n", entry.getMyIndex());
     return obj;
   }
 
-  private void doWrite(X x, String record) {
+  private volatile int blockIndex = 0;
+  private void doWrite(X x, String record, long globalIndex) {
+
     try {
       synchronized ( fileLock ) {
+        if ( blockIndex != 10 ) {
+          blockIndex++;
+        } else {
+          if ( ! blocking() ) throw new RuntimeException("can not blccking");
+          blockIndex = 0;
+        }
+
+        if ( globalIndex > maxGlobalIndex ) {
+          maxGlobalIndex = globalIndex;
+        }
+        if ( globalIndex < minGlobalIndex ) {
+          minGlobalIndex = globalIndex;
+        }
+
         writeBuffer.clear();
         byte[] bytes = record.getBytes(Charset.forName("UTF-8"));
-        writeBuffer.putInt(bytes.length);
-        writeBuffer.put(bytes);
+    writeBuffer.put(bytes);
         writeBuffer.flip();
         while ( writeBuffer.hasRemaining() ) {
           outChannel.write(writeBuffer);
@@ -123,78 +182,444 @@ public class MNJournal extends FileJournal {
 
   private static Map<String, MNJournal> journalMap = new HashMap<String, MNJournal>();
 
-  public synchronized static MNJournal getMNjournal(String serviceName) {
+  public synchronized static MNJournal getMNjournal(X x, String serviceName) {
     if ( journalMap.get(serviceName) != null ) return journalMap.get(serviceName);
-    journalMap.put(serviceName, new MNJournal(serviceName));
+    journalMap.put(serviceName, new MNJournal(x, serviceName));
     return journalMap.get(serviceName);
   }
 
-  // Send back all data now.
-  // I can get outside of this call.
-  public void replay(X x, DAO dao) {
-    //TODO: create a SocketChannelDAO. And use it to send File.
-    //TODO: SocketChannel should put into X.
-    //TODO: create special sink and add to the dao. Use to deal with inflight request.
+  private boolean blocking() {
+    try {
+      ArraySink sink = (ArraySink) entryRecordDAO
+                                    .where(EQ(EntryRecord.FILE_NAME, filename))
+                                    .orderBy(new Desc(EntryRecord.ID))
+                                    .select(new ArraySink());
+      List list = sink.getArray();
+
+      FileChannel inChannel = FileChannel.open(getPath(filename), StandardOpenOption.CREATE, StandardOpenOption.READ);
+      long fileSize = inChannel.size();
+      long offset = -1;
+      int bufferSize;
+      if ( list.size() == 0 ) {
+        // Load from 0 to file size.
+        bufferSize = (int) (fileSize - 0L);
+        offset = 0L;
+      } else {
+        EntryRecord lastRecord = (EntryRecord) list.get(0);
+        offset = (lastRecord.getOffset() + (long) lastRecord.getLength());
+        bufferSize = (int) (fileSize - (offset));
+      }
+      ByteBuffer byteBuffer = ByteBuffer.allocate(bufferSize);
+      inChannel.position(offset);
+      inChannel.read(byteBuffer);
+      byteBuffer.flip();
+      BufferedReader reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(byteBuffer.array())));
+
+      String line;
+      int count = 0;
+      long minIndex = Long.MAX_VALUE;
+      long maxIndex = Long.MIN_VALUE;
+
+      while ( ( line = reader.readLine() ) != null ) {
+        if ( "".equals(line.trim()) ) continue;
+        MedusaEntry entry = (MedusaEntry) getX().create(JSONParser.class).parseString(line);
+        if ( entry.getMyIndex() < minIndex ) minIndex = entry.getMyIndex();
+        if ( entry.getMyIndex() > maxIndex ) maxIndex = entry.getMyIndex();
+        count++;
+      }
+      if ( count > 0 ) {
+        EntryRecord newRecord = new EntryRecord();
+        newRecord.setFileName(filename);
+        newRecord.setOffset(offset);
+        newRecord.setLength(bufferSize);
+        newRecord.setTotalEntry(count);
+        newRecord.setMaxIndex(maxIndex);
+        newRecord.setMinIndex(minIndex);
+        entryRecordDAO.put(newRecord);
+      }
+      return true;
+    } catch ( Exception e ) {
+      //TODO: report error.
+      e.printStackTrace();
+      return false;
+    }
+
+  }
+
+  public void loadBlock(X x, long id) {
 
     SelectionKey key = (SelectionKey) x.get("selectionKey");
     SocketChannel socketChannel = (SocketChannel) key.channel();
 
     if ( key == null ) throw new RuntimeException("SelectionKey do not find.");
     if ( socketChannel == null ) throw new RuntimeException("SocketChannel do not find");
-    //TODO: create a special sink and add this socketChannel in.
 
     try {
-      long position = -1;
+      EntryRecord record = (EntryRecord) entryRecordDAO.find_(x, id);
+      FileChannel inChannel = FileChannel.open(getPath(filename), StandardOpenOption.CREATE, StandardOpenOption.READ);
+      long offset = record.getOffset();
+      int length = record.getLength();
+
+      ByteBuffer byteBuffer = ByteBuffer.allocate(length);
+      inChannel.position(offset);
+      inChannel.read(byteBuffer);
+      byteBuffer.flip();
+      BufferedReader reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(byteBuffer.array())));
+
+      String line;
+      int count = 0;
+      int totalSendingSize = 0;
+      List<String> entries = new LinkedList<String>();
+
+      // Do not support multi-line journal and comment.
+      while ( ( line = reader.readLine() ) != null ) {
+        if ( "".equals(line.trim()) ) continue;
+        MedusaEntry entry = null;
+        try {
+          entry = (MedusaEntry) x.create(JSONParser.class).parseString(line);
+          //TODO: hash check.
+          Outputter outputter = new Outputter(x);
+          String entryString = outputter.stringify(entry);
+          //TODO: find a better way to implement this.
+          byte[] bytes = entryString.getBytes(Charset.forName("UTF-8"));
+          totalSendingSize = totalSendingSize + 4 + bytes.length;
+          entries.add(entryString);
+          count++;
+        } catch ( Exception ioe ) {
+          //TODO: terminal reply, and send error message to mediator, and
+          //stop this mmJournal until problem fix.
+          BlockInfo blockInfo = new BlockInfo();
+          blockInfo.setFileName(filename);
+          blockInfo.setAnyFailure(true);
+          blockInfo.setFailLine(line);
+          blockInfo.setFailReason(ioe.toString());
+          blockInfo.setEof(true);
+          Outputter outputter = new Outputter(x);
+          String blockInfoStr = outputter.stringify(blockInfo);
+          byte[] blockInfoBytes = blockInfoStr.getBytes(Charset.forName("UTF-8"));
+          int sendingSize = 4 + blockInfoBytes.length;
+          ByteBuffer sendBuffer = ByteBuffer.allocate(sendingSize);
+          // sendBuffer.putInt(sendingSize);
+          sendBuffer.putInt(blockInfoBytes.length);
+          sendBuffer.put(blockInfoBytes);
+          sendBuffer.flip();
+          while( sendBuffer.hasRemaining() ) { socketChannel.write(sendBuffer); }
+
+          try {
+            socketChannel.close();
+            key.cancel();
+          } catch ( IOException ie ) {
+            //TODO: log
+          }
+          return;
+        }
+      }
+
+      BlockInfo blockInfo = new BlockInfo();
+      blockInfo.setIsSort(false);
+      blockInfo.setFileName(filename);
+      blockInfo.setEof(true);
+      blockInfo.setMaxIndex(record.getMaxIndex());
+      blockInfo.setMinIndex(record.getMinIndex());
+      blockInfo.setAnyFailure(false);
+      blockInfo.setTotalEntries(count);
+      Outputter outputter = new Outputter(x);
+      String blockInfoStr = outputter.stringify(blockInfo);
+      byte[] blockInfoBytes = blockInfoStr.getBytes(Charset.forName("UTF-8"));
+      ByteBuffer sendBuffer = ByteBuffer.allocate(4 + blockInfoBytes.length + 4 + totalSendingSize);
+
+      sendBuffer.putInt(blockInfoBytes.length);
+      sendBuffer.put(blockInfoBytes);
+      sendBuffer.putInt(blockInfoBytes.length);
+      for ( String entry : entries ) {
+        byte[] bytes = entry.getBytes(Charset.forName("UTF-8"));
+        sendBuffer.putInt(bytes.length);
+        sendBuffer.put(bytes);
+      }
+      sendBuffer.flip();
+
+      while ( sendBuffer.hasRemaining() ) { socketChannel.write(sendBuffer); }
+
+    } catch ( IOException ioe ) {
+        //TODO: send error to mediator. Mediator should fail this node.
+        //Terminator replay.
+        try {
+          socketChannel.close();
+          key.cancel();
+        } catch ( IOException ie ) {
+          //TODO: log
+        }
+        return;
+      }
+  }
+
+  // Mediator should subscribe dao first before apply this method.
+  public void replayFrom(X x, DAO dao, long indexFrom) {
+    SelectionKey key = (SelectionKey) x.get("selectionKey");
+    SocketChannel socketChannel = (SocketChannel) key.channel();
+
+    if ( key == null ) throw new RuntimeException("SelectionKey do not find.");
+    if ( socketChannel == null ) throw new RuntimeException("SocketChannel do not find");
+
+    try {
+      long fileSize = -1;
       FileChannel inChannel = FileChannel.open(getPath(filename), StandardOpenOption.CREATE, StandardOpenOption.READ);
 
       // We can synchronize whole below code using fileLock,
       // but it is inefficient.
       // We can just sync and get file size. and build sink attach to the DAO.
       // This way we can do replay and write in parallel.
-      // TODO: sync below code for now.
+      ArraySink sink;
       synchronized ( fileLock ) {
-        position = inChannel.size();
+        //All entry record.
+        sink = (ArraySink) entryRecordDAO
+          .where(EQ(EntryRecord.FILE_NAME, filename))
+          .orderBy(EntryRecord.ID)
+          .select(new ArraySink());
+        fileSize = inChannel.size();
+      }
 
-        // Allocate 500M.
-        // TODO: make sure memory assign to this instance is bigger enough.
-        // ByteBuffer byteBuffer = ByteBuffer.allocate(524288000);
-        int blockSize = 1024;
-        ByteBuffer byteBuffer = ByteBuffer.allocate(blockSize);
-        ByteBuffer lengthBuffer = ByteBuffer.allocate(4);
-        int length = -1;
-
-        int totalBlock = (int) Math.ceil( (position/(double)blockSize));
-
-        // Send ACK to MM.
-        FilePacket filePacket = new FilePacket();
-        filePacket.setTotalBlock(totalBlock);
-        Outputter outputter = new Outputter(x);
-        String msg = outputter.stringify(filePacket);
-        System.out.println(msg);
-        byte[] bytes = msg.getBytes(Charset.forName("UTF-8"));
-        ByteBuffer ackBuffer = ByteBuffer.allocate(4 + bytes.length);
-        ackBuffer.putInt(bytes.length);
-        ackBuffer.put(bytes);
-        ackBuffer.flip();
-        socketChannel.write(ackBuffer);
-
-        while ( inChannel.position() < position ) {
-          lengthBuffer.clear();
-          byteBuffer.clear();
-          length = inChannel.read(byteBuffer);
-          lengthBuffer = lengthBuffer.putInt(length);
-
+      List list = sink.getArray();
+      EntryRecord lastRecord = null;
+      // Journal will be send block by block to mediator.
+      try {
+        for ( Object obj : list ) {
+          EntryRecord record = (EntryRecord) obj;
+          lastRecord = record;
+          if ( record.getMinIndex() < indexFrom && record.getMaxIndex() < indexFrom ) continue;
+          int bufferSize = record.getLength();
+          ByteBuffer byteBuffer = ByteBuffer.allocate(bufferSize);
+          inChannel.read(byteBuffer);
           byteBuffer.flip();
-          lengthBuffer.flip();
+          BufferedReader reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(byteBuffer.array())));
+          //TODO: support multiline parse.
+          String line;
+          int count = 0;
+          int totalSendingSize = 0;
+          List<String> entries = new LinkedList<String>();
 
-          while ( lengthBuffer.hasRemaining() ) { socketChannel.write(lengthBuffer); }
-          while ( byteBuffer.hasRemaining() ) { socketChannel.write(byteBuffer); }
+          // Do not support multi-line journal and comment.
+          while ( ( line = reader.readLine() ) != null ) {
+            if ( "".equals(line.trim()) ) continue;
+            MedusaEntry entry = null;
+            try {
+              entry = (MedusaEntry) x.create(JSONParser.class).parseString(line);
+              //TODO: hash check.
+              Outputter outputter = new Outputter(x);
+              String entryString = outputter.stringify(entry);
+              //TODO: find a better way to implement this.
+              byte[] bytes = entryString.getBytes(Charset.forName("UTF-8"));
+              totalSendingSize = totalSendingSize + 4 + bytes.length;
+              entries.add(entryString);
+              count++;
+            } catch ( Exception ioe ) {
+              //TODO: terminal reply, and send error message to mediator, and
+              //stop this mmJournal until problem fix.
+              BlockInfo blockInfo = new BlockInfo();
+              blockInfo.setFileName(filename);
+              blockInfo.setAnyFailure(true);
+              blockInfo.setFailLine(line);
+              blockInfo.setEof(true);
+              blockInfo.setFailReason(ioe.toString());
+              Outputter outputter = new Outputter(x);
+              String blockInfoStr = outputter.stringify(blockInfo);
+              byte[] blockInfoBytes = blockInfoStr.getBytes(Charset.forName("UTF-8"));
+              int sendingSize = 4 + blockInfoBytes.length;
+              ByteBuffer sendBuffer = ByteBuffer.allocate(sendingSize);
+              // sendBuffer.putInt(sendingSize);
+              sendBuffer.putInt(blockInfoBytes.length);
+              sendBuffer.put(blockInfoBytes);
+              sendBuffer.flip();
+              while( sendBuffer.hasRemaining() ) { socketChannel.write(sendBuffer); }
 
+              try {
+                socketChannel.close();
+                key.cancel();
+              } catch ( IOException ie ) {
+                //TODO: log
+              }
+              return;
+            }
+          }
+
+          // Start to send block to mediator.
+          BlockInfo blockInfo = new BlockInfo();
+          blockInfo.setIsSort(false);
+          blockInfo.setFileName(filename);
+          blockInfo.setEof(false);
+          blockInfo.setMaxIndex(record.getMaxIndex());
+          blockInfo.setMinIndex(record.getMinIndex());
+          blockInfo.setOffset(record.getOffset());
+          blockInfo.setAnyFailure(false);
+          blockInfo.setTotalEntries(count);
+          Outputter outputter = new Outputter(x);
+          String blockInfoStr = outputter.stringify(blockInfo);
+          byte[] blockInfoBytes = blockInfoStr.getBytes(Charset.forName("UTF-8"));
+          ByteBuffer sendBuffer = ByteBuffer.allocate(4 + blockInfoBytes.length + 4 + totalSendingSize);
+
+          // sendBuffer.putInt(totalSendingSize);
+          sendBuffer.putInt(blockInfoBytes.length);
+          sendBuffer.put(blockInfoBytes);
+          sendBuffer.putInt(totalSendingSize);
+          for ( String entry : entries ) {
+            byte[] bytes = entry.getBytes(Charset.forName("UTF-8"));
+            sendBuffer.putInt(bytes.length);
+            sendBuffer.put(bytes);
+          }
+          sendBuffer.flip();
+
+          while ( sendBuffer.hasRemaining() ) { socketChannel.write(sendBuffer); }
         }
 
-        //TODO: send finish ack
-        //TODO: activate sink;
+        // We need special for the last block of data.
+        int bufferSize;
+        if ( lastRecord == null ) {
+          bufferSize = (int) (fileSize - 0L) ;
+        } else {
+          bufferSize = (int) (fileSize - (lastRecord.getOffset() + (long) lastRecord.getLength()));
+        }
+
+        ByteBuffer byteBuffer = ByteBuffer.allocate(bufferSize);
+        inChannel.read(byteBuffer);
+        byteBuffer.flip();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(byteBuffer.array())));
+
+        String line;
+        int count = 0;
+        int totalSendingSize = 0;
+        List<String> entries = new LinkedList<String>();
+        long minIndex = Long.MAX_VALUE;
+        long maxIndex = Long.MIN_VALUE;
+
+        // Do not support multi-line journal and comment.
+        while ( ( line = reader.readLine() ) != null ) {
+          if ( "".equals(line.trim()) ) continue;
+          MedusaEntry entry = null;
+          try {
+            entry = (MedusaEntry) x.create(JSONParser.class).parseString(line);
+            if ( entry.getMyIndex() < minIndex ) minIndex = entry.getMyIndex();
+            if ( entry.getMyIndex() > maxIndex ) maxIndex = entry.getMyIndex();
+            //TODO: hash check.
+            Outputter outputter = new Outputter(x);
+            String entryString = outputter.stringify(entry);
+            //TODO: find a better way to implement this.
+            byte[] bytes = entryString.getBytes(Charset.forName("UTF-8"));
+            totalSendingSize = totalSendingSize + 4 + bytes.length;
+            entries.add(entryString);
+            count++;
+          } catch ( Exception ioe ) {
+
+            //TODO: terminal reply, and send error message to mediator, and
+            //stop this mmJournal until problem fix.
+            BlockInfo blockInfo = new BlockInfo();
+            blockInfo.setFileName(filename);
+            blockInfo.setAnyFailure(true);
+            blockInfo.setFailLine(line);
+            blockInfo.setEof(true);
+            blockInfo.setFailReason(ioe.toString());
+            Outputter outputter = new Outputter(x);
+            String blockInfoStr = outputter.stringify(blockInfo);
+            byte[] blockInfoBytes = blockInfoStr.getBytes(Charset.forName("UTF-8"));
+            int sendingSize = 4 + blockInfoBytes.length;
+            ByteBuffer sendBuffer = ByteBuffer.allocate(sendingSize);
+            // sendBuffer.putInt(sendingSize);
+            sendBuffer.putInt(blockInfoBytes.length);
+            sendBuffer.put(blockInfoBytes);
+            sendBuffer.flip();
+            while( sendBuffer.hasRemaining() ) { socketChannel.write(sendBuffer); }
+
+            try {
+              socketChannel.close();
+              key.cancel();
+            } catch ( IOException ie ) {
+              //TODO: log
+            }
+            return;
+
+          }
+        }
+
+        // Send last block to mediator.
+        BlockInfo blockInfo = new BlockInfo();
+        blockInfo.setIsSort(false);
+        blockInfo.setFileName(filename);
+        blockInfo.setEof(true);
+        blockInfo.setMaxIndex(maxIndex);
+        blockInfo.setMinIndex(minIndex);
+        blockInfo.setAnyFailure(false);
+        blockInfo.setTotalEntries(count);
+        Outputter outputter = new Outputter(x);
+        String blockInfoStr = outputter.stringify(blockInfo);
+        byte[] blockInfoBytes = blockInfoStr.getBytes(Charset.forName("UTF-8"));
+        ByteBuffer sendBuffer = ByteBuffer.allocate(4 + blockInfoBytes.length + 4 +totalSendingSize);
+
+        sendBuffer.putInt(blockInfoBytes.length);
+        sendBuffer.put(blockInfoBytes);
+        sendBuffer.putInt(totalSendingSize);
+        for ( String entry : entries ) {
+          byte[] bytes = entry.getBytes(Charset.forName("UTF-8"));
+          sendBuffer.putInt(bytes.length);
+          sendBuffer.put(bytes);
+        }
+        sendBuffer.flip();
+
+        while ( sendBuffer.hasRemaining() ) { socketChannel.write(sendBuffer); }
+
+      } catch ( IOException ioe ) {
+        //TODO: send error to mediator. Mediator should fail this node.
+        //Terminator replay.
+        try {
+          socketChannel.close();
+          key.cancel();
+        } catch ( IOException ie ) {
+          //TODO: log
+        }
+        return;
       }
+
+      //synchronized ( fileLock ) {
+      //  position = inChannel.size();
+
+      //  // Allocate 500M.
+      //  // TODO: make sure memory assign to this instance is bigger enough.
+      //  // ByteBuffer byteBuffer = ByteBuffer.allocate(524288000);
+      //  int blockSize = 1024;
+      //  ByteBuffer byteBuffer = ByteBuffer.allocate(blockSize);
+      //  ByteBuffer lengthBuffer = ByteBuffer.allocate(4);
+      //  int length = -1;
+
+      //  int totalBlock = (int) Math.ceil( (position/(double)blockSize));
+
+      //  // Send ACK to MM.
+      //  FilePacket filePacket = new FilePacket();
+      //  filePacket.setTotalBlock(totalBlock);
+      //  Outputter outputter = new Outputter(x);
+      //  String msg = outputter.stringify(filePacket);
+      //  System.out.println(msg);
+      //  byte[] bytes = msg.getBytes(Charset.forName("UTF-8"));
+      //  ByteBuffer ackBuffer = ByteBuffer.allocate(4 + bytes.length);
+      //  ackBuffer.putInt(bytes.length);
+      //  ackBuffer.put(bytes);
+      //  ackBuffer.flip();
+      //  socketChannel.write(ackBuffer);
+
+      //  while ( inChannel.position() < position ) {
+      //    lengthBuffer.clear();
+      //    byteBuffer.clear();
+      //    length = inChannel.read(byteBuffer);
+      //    lengthBuffer = lengthBuffer.putInt(length);
+
+      //    byteBuffer.flip();
+      //    lengthBuffer.flip();
+
+      //    while ( lengthBuffer.hasRemaining() ) { socketChannel.write(lengthBuffer); }
+      //    while ( byteBuffer.hasRemaining() ) { socketChannel.write(byteBuffer); }
+
+      //  }
+
+      //  //TODO: send finish ack
+      //  //TODO: activate sink;
+      //}
 
     } catch ( IOException e ) {
       try {
@@ -204,6 +629,13 @@ public class MNJournal extends FileJournal {
         //TODO: log error.
       }
     }
+
+  }
+
+  // Send back all data now.
+  // I can get outside of this call.
+  public void replay(X x, DAO dao) {
+    replayFrom(x, dao, 1L);
   }
 
   public static String byte2Hex(byte[] bytes){

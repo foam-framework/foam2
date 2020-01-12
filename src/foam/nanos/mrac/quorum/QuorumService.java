@@ -14,6 +14,16 @@ import foam.core.FoamThread;
 
 import java.io.IOException;
 
+import java.util.List;
+import java.util.LinkedList;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
 // Initial QuorumNetworkManager and Election.
 // Start voting.
 public class QuorumService extends AbstractFObject implements NanoService {
@@ -29,6 +39,9 @@ public class QuorumService extends AbstractFObject implements NanoService {
   DAO clusterDAO;
   private volatile ClusterNode primaryClusterNode = null;
 
+  LinkedBlockingQueue<Electable> primaryElectables;
+  LinkedBlockingQueue<Electable> secondaryElectables;
+  LinkedBlockingQueue<Electable> unReadyElectables;
 
   public boolean electing() {
     return false;
@@ -48,8 +61,16 @@ public class QuorumService extends AbstractFObject implements NanoService {
     election = new Election(x, networkManager, this);
     runElection = new RunElection();
 
+    primaryElectables = new LinkedBlockingQueue<Electable>();
+    secondaryElectables = new LinkedBlockingQueue<Electable>();
+    unReadyElectables = new LinkedBlockingQueue<Electable>();
+
     initialElection();
     runElection.start();
+  }
+
+  public void registerEletable(Electable electable) {
+    unReadyElectables.offer(electable);
   }
 
   public synchronized void setMyState(InstanceState state) {
@@ -127,6 +148,9 @@ public class QuorumService extends AbstractFObject implements NanoService {
         } else if ( getMyState() == InstanceState.PRIMARY ) {
           System.out.println("Primary");
           try {
+            // for ( Electable electable : registedElectables ) {
+
+            // }
             exposeState = InstanceState.PRIMARY;
             setPrimaryClusterNode(getPrimaryVote().getPrimaryInstanceId());
             while ( true ) {
@@ -174,6 +198,59 @@ public class QuorumService extends AbstractFObject implements NanoService {
 
     public void close() {
       isRunning = false;
+    }
+  }
+
+  // This thread allow we seperator shutdown primary service as soon as
+  // possible.
+  public class QuorumInitial extends FoamThread {
+
+    private boolean isPrimary = false;
+    private CountDownLatch countDownLatch;
+    private volatile boolean isRunning;
+
+    public QuorumInitial(boolean isPrimary, CountDownLatch countDownLatch) {
+      super("quorumInitial");
+      this.isPrimary = isPrimary;
+      this.isRunning = true;
+      this.countDownLatch = countDownLatch;
+    }
+
+    public void close() {
+      this.isRunning = false;
+    }
+    @Override
+    public void run() {
+      try {
+        while ( isRunning ) {
+          Electable electable = null;
+          try {
+            electable = unReadyElectables.poll(200, TimeUnit.MILLISECONDS);
+            if ( electable == null ) continue;
+            if ( getMyState() == InstanceState.PRIMARY ) {
+              electable.primary();
+              primaryElectables.put(electable);
+            }
+            if ( getMyState() == InstanceState.SECONDARY ) {
+              secondaryElectables.put(electable);
+            }
+          } catch ( Exception e ) {
+            //TODO: provide retry;
+            if ( electable != null ) unReadyElectables.add(electable);
+          }
+        }
+      } finally {
+        Electable electable;
+        while ( ( electable = primaryElectables.poll() ) != null ) {
+          electable.leavePrimary();
+          unReadyElectables.add(electable);
+        }
+        while ( ( electable = secondaryElectables.poll() ) != null ) {
+          electable.leaveSecondary();
+          unReadyElectables.add(electable);
+        }
+        countDownLatch.countDown();
+      }
     }
   }
 

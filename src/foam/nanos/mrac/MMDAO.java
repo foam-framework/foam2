@@ -25,9 +25,10 @@ public class MMDAO extends JDAO {
   public MMDAO(X x, ClassInfo classInfo, String mnPort) {
     setX(x);
     setOf(classInfo);
+
     nspecKey = classInfo.getId();
     setDelegate(new MDAO(classInfo));
-    setJournal(MMJournal.getMMjournal(mnPort));
+    setJournal(MMJournal.getMMjournal(x, mnPort));
     this.mnPort = mnPort;
     //TODO: command replay for testing election.
     getJournal().replay(x, getDelegate());
@@ -39,13 +40,14 @@ public class MMDAO extends JDAO {
     this.nspecKey = nspecKey;
     setDelegate(dao);
     this.mnPort = mnPort;
-    setJournal(MMJournal.getMMjournal(mnPort));
+    setJournal(MMJournal.getMMjournal(x, mnPort));
     ((MMJournal) getJournal()).replay(x, nspecKey, getDelegate());
   }
   //Remove synchronized key word.
   //TODO: move lock to here
   @Override
   public FObject put_(X x, FObject obj) {
+    System.out.println("put>>>>>>>>>><<<<<<<<");
     if ( obj == null ) throw new RuntimeException("obj is null");
 
     Object id = ((Identifiable) obj).getPrimaryKey();
@@ -65,6 +67,7 @@ public class MMDAO extends JDAO {
   //Remove synchronized key word.
   @Override
   public FObject remove_(X x, FObject obj) {
+    System.out.println("remove>>>>>>>>>>><<<<<<<");
     if ( obj == null ) throw new RuntimeException("obj is null");
 
     Object id = ((Identifiable) obj).getPrimaryKey();
@@ -81,4 +84,5 @@ public class MMDAO extends JDAO {
     }
     return result;
   }
+
 }

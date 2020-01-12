@@ -17,7 +17,7 @@ public class MNDAO extends JDAO {
     setX(x);
     setOf(classInfo);
     setDelegate(new ObservableDAO(classInfo));
-    setJournal(MNJournal.getMNjournal(filename));
+    setJournal(MNJournal.getMNjournal(x, filename));
   }
 
   @Override
