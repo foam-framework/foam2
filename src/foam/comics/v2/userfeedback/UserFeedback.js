@@ -10,7 +10,7 @@ foam.CLASS({
   documentation: `
     A model track of feedback messages as an object travels 
     through multiple decorators on the back-end and 
-    inevitably making its way back to the client who view the feedback
+    inevitably making its way back to the client who views the feedback
   `,
 
   properties: [
