@@ -5,14 +5,14 @@
  */
 
 foam.CLASS({
-  package: 'foam.comics.v2.userFeedback',
+  package: 'foam.comics.v2.userfeedback',
   name: 'UserFeedback',
 
   properties: [
     {
       class: 'Enum',
       name: 'status',
-      of: 'foam.comics.v2.userFeedback.UserFeedbackStatus'
+      of: 'foam.comics.v2.userfeedback.UserFeedbackStatus'
     },
     {
       class: 'String',
@@ -20,7 +20,7 @@ foam.CLASS({
     },
     {
       class: 'FObjectProperty',
-      of: 'foam.comics.v2.userFeedback.UserFeedback',
+      of: 'foam.comics.v2.userfeedback.UserFeedback',
       name: 'delegate'
     }
   ],

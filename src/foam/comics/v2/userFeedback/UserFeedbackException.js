@@ -5,13 +5,13 @@
  */
 
 foam.CLASS({
-  package: 'foam.comics.v2.userFeedback',
+  package: 'foam.comics.v2.userfeedback',
   name: 'UserFeedbackException',
   implements: ['foam.core.Exception'],
   properties: [
     {
       class: 'FObjectProperty',
-      of: 'foam.comics.v2.userFeedback.UserFeedback',
+      of: 'foam.comics.v2.userfeedback.UserFeedback',
       name: 'userFeedback'
     }
   ]

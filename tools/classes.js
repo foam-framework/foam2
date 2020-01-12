@@ -285,9 +285,9 @@ var classes = [
   'foam.comics.v2.CannedQuery',
   'foam.comics.v2.namedViews.NamedViewCollection',
   'foam.comics.v2.namedViews.NamedViewInstance',
-  'foam.comics.v2.userFeedback.UserFeedbackStatus',
-  'foam.comics.v2.userFeedback.UserFeedback',
-  'foam.comics.v2.userFeedback.UserFeedbackException',
+  'foam.comics.v2.userfeedback.UserFeedbackStatus',
+  'foam.comics.v2.userfeedback.UserFeedback',
+  'foam.comics.v2.userfeedback.UserFeedbackException',
   'foam.nanos.menu.ScriptMenu',
   // Email base model or interface
   'foam.nanos.notification.email.EmailMessage',

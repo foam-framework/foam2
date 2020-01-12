@@ -5,7 +5,7 @@
  */
 
 foam.ENUM({
-  package: 'foam.comics.v2.userFeedback',
+  package: 'foam.comics.v2.userfeedback',
   name: 'UserFeedbackStatus',
 
   values: [
