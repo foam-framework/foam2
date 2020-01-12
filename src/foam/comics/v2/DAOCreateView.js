@@ -49,7 +49,8 @@ foam.CLASS({
     'foam.u2.dialog.NotificationMessage'
   ],
   imports: [
-    'stack'
+    'stack',
+    'ctrl'
   ],
   exports: [
     'controllerMode'
@@ -86,22 +87,47 @@ foam.CLASS({
       },
       code: function() {
         var cData = this.data;
-
-        if ( foam.nanos.auth.LifecycleAware.isInstance(cData) ) {
-          cData = cData.clone();
-          cData.lifecycleState = foam.nanos.auth.LifecycleState.PENDING;
-        }
         
         this.config.dao.put(cData).then((o) => {
           this.data = o;
           this.finished.pub();
+
+          if ( o.userFeedback ){
+            var currentFeedback = o.userFeedback;
+            while ( currentFeedback ){
+              this.ctrl.add(this.NotificationMessage.create({
+                message: currentFeedback.message,
+                type: currentFeedback.status.name.toLowerCase()
+              }));
+
+              currentFeedback = currentFeedback.next;
+            }
+          } else {
+            this.ctrl.add(this.NotificationMessage.create({
+              message: `${this.data.model_.label} created.`
+            }));
+          }
+
           this.stack.back();
         }, (e) => {
           this.throwError.pub(e);
-          this.add(this.NotificationMessage.create({
-            message: e.message,
-            type: 'error'
-          }));
+          
+          if ( foam.comics.v2.userfeedback.UserFeedbackException.isInstance(e) && e.userFeedback  ){
+            var currentFeedback = e.userFeedback;
+            while ( currentFeedback ){
+              this.ctrl.add(this.NotificationMessage.create({
+                message: currentFeedback.message,
+                type: currentFeedback.status.name.toLowerCase()
+              }));
+
+              currentFeedback = currentFeedback.next;
+            }
+          } else {
+            this.ctrl.add(this.NotificationMessage.create({
+              message: e.message,
+              type: 'error'
+            }));
+          }
         });
       }
     },

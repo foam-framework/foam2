@@ -106,16 +106,43 @@ foam.CLASS({
         this.config.dao.put(this.workingData).then(o => {
           this.data = o;
           this.finished.pub();
+
+          if ( o.userFeedback ){
+            var currentFeedback = o.userFeedback;
+            while ( currentFeedback ){
+              this.ctrl.add(this.NotificationMessage.create({
+                message: currentFeedback.message,
+                type: currentFeedback.status.name.toLowerCase()
+              }));
+
+              currentFeedback = currentFeedback.next;
+            }
+          } else {
+            this.ctrl.add(this.NotificationMessage.create({
+              message: `${this.data.model_.label} updated.`
+            }));
+          }
+
           this.stack.back();
-          this.ctrl.add(this.NotificationMessage.create({
-            message: `${this.data.model_.label} updated.`
-          }));
         }, e => {
           this.throwError.pub(e);
-          this.add(this.NotificationMessage.create({
-            message: e.message,
-            type: 'error'
-          }));
+
+          if ( foam.comics.v2.userfeedback.UserFeedbackException.isInstance(e) && e.userFeedback  ){
+            var currentFeedback = e.userFeedback;
+            while ( currentFeedback ){
+              this.ctrl.add(this.NotificationMessage.create({
+                message: currentFeedback.message,
+                type: currentFeedback.status.name.toLowerCase()
+              }));
+
+              currentFeedback = currentFeedback.next;
+            }
+          } else {
+            this.ctrl.add(this.NotificationMessage.create({
+              message: e.message,
+              type: 'error'
+            }));
+          }
         });
       }
     },
