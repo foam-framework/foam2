@@ -505,6 +505,7 @@ public class MNJournal extends FileJournal {
             entry = (MedusaEntry) x.create(JSONParser.class).parseString(line);
             System.out.println(line);
             System.out.println(entry);
+            if ( entry.getMyIndex() < indexFrom ) continue;
             if ( entry.getMyIndex() < minIndex ) minIndex = entry.getMyIndex();
             if ( entry.getMyIndex() > maxIndex ) maxIndex = entry.getMyIndex();
             //TODO: hash check.
