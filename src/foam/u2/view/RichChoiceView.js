@@ -377,7 +377,7 @@ foam.CLASS({
                   return Promise.all(promiseArray).then((resp) => {
                     var index = 0;
                     return this.E().forEach(sections, function(section) {
-                      this.addClass('setAbove')
+                      this.addClass(this.myClass('setAbove'))
                         .start().hide(!! section.hideIfEmpty && resp[index].value <= 0 || ! section.heading)
                           .addClass(self.myClass('heading'))
                           .add(section.heading)
