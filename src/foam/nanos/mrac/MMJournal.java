@@ -344,13 +344,10 @@ public class MMJournal extends AbstractJournal implements Electable {
               p = (MedusaEntry) ((RPCReturnMessage) responseMessage.getObject()).getData();
               if ( p instanceof MedusaEntry ) {
                 check++;
-              } else {
-                check--;
               }
             } catch ( Exception e ) {
               //TODO: log error
               System.out.println(e);
-              check--;
             } finally {
               checks[j] = true;
             }
