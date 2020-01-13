@@ -162,7 +162,7 @@ foam.CLASS({
         { type: 'Context', name: 'x' }
       ],
       javaCode: `
-        AuthService authService = (AuthService) getX().get("auth");
+        AuthService authService = (AuthService) x.get("auth");
         return authService.check(x, getDeletePermission_());
       `
     },
@@ -173,8 +173,9 @@ foam.CLASS({
         { type: 'Context', name: 'x' }
       ],
       javaCode: `
-        AuthService authService = (AuthService) getX().get("auth");
-        return authService.check(x, getPendingPermission_());
+        AuthService authService = (AuthService) x.get("auth");
+
+        return authService.check(x, getPendingPermission_()) || x.get("requestViewPending");
       `
     },
     {
@@ -184,7 +185,7 @@ foam.CLASS({
         { type: 'Context', name: 'x' }
       ],
       javaCode: `
-        AuthService authService = (AuthService) getX().get("auth");
+        AuthService authService = (AuthService) x.get("auth");
         return authService.check(x, getRejectPermission_());
       `
     }
