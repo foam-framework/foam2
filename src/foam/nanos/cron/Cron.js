@@ -84,15 +84,24 @@ foam.CLASS({
       javaCode:
 `DAO notification = (DAO) x.get("notificationDAO");
 
+/*
+  I don't know why we're doing this because we aren't specifying a user or
+  group to be notified and we aren't including the script output either.
+  Also, if we were to notify, we should use a ScriptRunNotification rather
+  than a generic notification. Maybe there should be properties to say which
+  users or groups to notify, or if notifications should be sent or not (and
+  their expiry).
 Notification cronStartNotify = new Notification();
 cronStartNotify.setBody("Cron STARTED - " + this.getId() + " " + this.getDescription());
 notification.put(cronStartNotify);
-
+*/
 super.runScript(x);
 
+/*
 Notification cronEndNotify = new Notification();
 cronEndNotify.setBody("Cron ENDED - " + this.getId() + " " + this.getDescription());
 notification.put(cronEndNotify);
+*/
 
 setScheduledTime(getNextScheduledTime());`
     },

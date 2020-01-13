@@ -62,7 +62,8 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'id'
+      name: 'id',
+      tableWidth: 280
     },
     {
       class: 'Boolean',
@@ -80,7 +81,8 @@ foam.CLASS({
     {
       class: 'String',
       name: 'description',
-      documentation: 'Description of the script.'
+      documentation: 'Description of the script.',
+      tableWidth: 200
     },
     {
       class: 'DateTime',

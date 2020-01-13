@@ -82,6 +82,10 @@ foam.CLASS({
       name: 'cluster',
       visibility: 'RO',
       storageTransient: true
+    },
+    {
+      class: 'String',
+      name: 'externalUrl'
     }
   ]
 });
