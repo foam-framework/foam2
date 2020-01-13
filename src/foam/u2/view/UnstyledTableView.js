@@ -256,7 +256,7 @@ foam.CLASS({
                     if ( column.tableWidth ) {
                       this.style({ flex: `0 0 ${column.tableWidth}px` });
                     } else {
-                      this.style({ flex: '1 0 auto' });
+                      this.style({ flex: '1 0 0' });
                     }
                   }).
                   on('click', function(e) {
@@ -443,7 +443,7 @@ foam.CLASS({
                         if ( column.tableWidth ) {
                           this.style({ flex: `0 0 ${column.tableWidth}px` });
                         } else {
-                          this.style({ flex: '1 0 auto' });
+                          this.style({ flex: '1 0 0' });
                         }
                       }).
                     end();
