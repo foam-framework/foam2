@@ -51,7 +51,7 @@
    ],
 
    topics: [
-    'onSizeChange'
+    'onSizeChangeComplete'
    ],
 
    methods: [
@@ -115,7 +115,8 @@
            this.invalidate();
            this.doLayout();
 
-           this.onSizeChange.pub();
+         } else {
+          this.onSizeChangeComplete.pub();
          }
       }
      }
