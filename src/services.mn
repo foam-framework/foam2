@@ -10,6 +10,25 @@ p({"class":"foam.nanos.boot.NSpec", "name":"tcpServer",                        "
 
 p({"class":"foam.nanos.boot.NSpec", "name":"demoObjectDAO",                    "lazy":false,  "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setRuler(false).setAuthorize(false).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"demoObjects\").setGuid(true).setOf(foam.nanos.demo.DemoObject.getOwnClassInfo()).build();", "client":"{\"of\":\"foam.nanos.demo.DemoObject\", \"remoteListenerSupport\": false}"})
 
+p({"class":"foam.nanos.boot.NSpec", "name":"AuthenticatedNSpecDAO",              "serve":true,  "serviceClass":"foam.dao.ProxyDAO", "client":"{\"of\":\"foam.nanos.boot.NSpec\",\"cache\":true}"})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "auth",
+  "serve": true,
+  "authenticate": false,
+  "boxClass": "foam.nanos.auth.AuthServiceSkeleton",
+  "serviceScript": """
+    return new foam.nanos.auth.SystemAuthService.Builder(x)
+      .setDelegate(new foam.nanos.auth.twofactor.TwoFactorAuthService.Builder(x)
+      .setDelegate(new foam.nanos.auth.PasswordExpiryAuthService.Builder(x)
+      .setDelegate(new foam.nanos.auth.EnabledCheckAuthService.Builder(x)
+      .setDelegate(new foam.nanos.auth.CachingAuthService(new foam.nanos.auth.UserAndGroupAuthService(x)))
+      .build()).build()).build()).build();
+  """,
+  "client": "{\"class\":\"foam.nanos.auth.CachedAuthServiceProxy\",\"delegate\":{\"class\":\"foam.nanos.auth.ClientLoginAuthService\"}}"
+})
+
 //Medusa Node Port
 p({"class":"foam.nanos.boot.NSpec", "name":"singleJournal", "authenticate":false, "boxClass": "foam.dao.DAOSkeleton",          "lazy":false,  "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setRuler(false).setPermissioned(false).setGuid(false).setAuthorize(false).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"singleJournals\").setMedusaNode(true).setOf(foam.nanos.mrac.MedusaEntry.getOwnClassInfo()).build();", "client":"{\"of\":\"foam.nanos.mrac.MedusaEntry\", \"remoteListenerSupport\": false}"})
 
