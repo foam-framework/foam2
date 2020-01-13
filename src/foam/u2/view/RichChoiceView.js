@@ -92,6 +92,9 @@ foam.CLASS({
     ^ {
       display: inline-block;
       position: relative;
+    }
+
+    ^setAbove {
       z-index: 1;
     }
 
@@ -374,7 +377,7 @@ foam.CLASS({
                   return Promise.all(promiseArray).then((resp) => {
                     var index = 0;
                     return this.E().forEach(sections, function(section) {
-                      this
+                      this.addClass(self.myClass('setAbove'))
                         .start().hide(!! section.hideIfEmpty && resp[index].value <= 0 || ! section.heading)
                           .addClass(self.myClass('heading'))
                           .add(section.heading)
