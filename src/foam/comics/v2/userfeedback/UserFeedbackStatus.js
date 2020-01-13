@@ -9,7 +9,7 @@ foam.ENUM({
   name: 'UserFeedbackStatus',
   documentation: `
     Functional statuses which highlight different types of feedback
-    the client user is interested in
+    the client user is interested in.
   `,
 
   values: [
