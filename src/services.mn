@@ -1,15 +1,18 @@
 //Medusa Node
 p({"class":"foam.nanos.boot.NSpec", "name":"nSpecDAO",                           "serve":true,  "authenticate": false, "serviceClass":"foam.dao.ProxyDAO", "client":"{\"of\":\"foam.nanos.boot.NSpec\",\"cache\":true}"})
+
 p({"class":"foam.nanos.boot.NSpec", "name":"clusterNodeDAO",                  "lazy":false,  "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setRuler(false).setAuthorize(false).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"clusterNodes\").setGuid(true).setOf(foam.nanos.mrac.ClusterNode.getOwnClassInfo()).build();", "client":"{\"of\":\"foam.nanos.demo.DemoObject\", \"remoteListenerSupport\": false}"})
+
 p({"class":"foam.nanos.boot.NSpec", "name":"http",                             "lazy":false, "service":{"class":"foam.nanos.jetty.HttpServer","port":8004,"forwardedForProxyWhitelist":[],"welcomeFiles":["/src/foam/nanos/controller/index.html"],"servletMappings":[{"class":"foam.nanos.servlet.ServletMapping","className":"foam.nanos.http.NanoRouter","pathSpec":"/service/*"},{"class":"foam.nanos.servlet.ServletMapping","className":"org.eclipse.jetty.servlet.DefaultServlet","pathSpec":"/*","initParameters":{"dirAllowed":"true","redirectWelcome":"true"}}]}})
+
 p({"class":"foam.nanos.boot.NSpec", "name":"tcpServer",                        "lazy":false, "serve":true, "serviceClass":"foam.nanos.mrac.TCPNioServer"})
-//p({"class":"foam.nanos.boot.NSpec", "name":"demoObjectDAO",                    "lazy":false,  "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setRuler(false).setAuthorize(false).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"demoObjects\").setGuid(true).setOf(foam.nanos.demo.DemoObject.getOwnClassInfo()).build();", "client":"{\"of\":\"foam.nanos.demo.DemoObject\", \"remoteListenerSupport\": false}"})
-// Create a dao for FileMeta. Do not need to persist it, just put into memory.
-p({"class":"foam.nanos.boot.NSpec", "name":"fileMetaDAO",                      "lazy":false,  "serve":true,  "serviceScript":"return new foam.dao.MDAO(foam.nanos.mrac.FileMeta.getOwnClassInfo());"})
-//p({"class":"foam.nanos.boot.NSpec", "name":"clusterNodeDAO",                  "lazy":false,  "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setRuler(false).setAuthorize(false).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"clusterNodes\").setGuid(true).setOf(foam.nanos.mrac.ClusterNode.getOwnClassInfo()).build();", "client":"{\"of\":\"foam.nanos.demo.DemoObject\", \"remoteListenerSupport\": false}"})
+
+
 p({"class":"foam.nanos.boot.NSpec", "name":"demoObjectDAO",                    "lazy":false,  "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setRuler(false).setAuthorize(false).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"demoObjects\").setGuid(true).setOf(foam.nanos.demo.DemoObject.getOwnClassInfo()).build();", "client":"{\"of\":\"foam.nanos.demo.DemoObject\", \"remoteListenerSupport\": false}"})
+
 //Medusa Node Port
 p({"class":"foam.nanos.boot.NSpec", "name":"singleJournal", "authenticate":false, "boxClass": "foam.dao.DAOSkeleton",          "lazy":false,  "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setRuler(false).setPermissioned(false).setGuid(false).setAuthorize(false).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"singleJournals\").setMedusaNode(true).setOf(foam.nanos.mrac.MedusaEntry.getOwnClassInfo()).build();", "client":"{\"of\":\"foam.nanos.mrac.MedusaEntry\", \"remoteListenerSupport\": false}"})
+
 p({
   "class": "foam.nanos.boot.NSpec",
   "name": "MNService",
@@ -25,6 +28,7 @@ p({
     }
   """
 })
+
 p({
   "class": "foam.nanos.boot.NSpec",
   "name": "entryRecordDAO",
@@ -48,7 +52,9 @@ p({
     }
   """
 })
+
 p({"class":"foam.nanos.boot.NSpec","name":"appConfig",                         "lazy":false, "service":{"class":"foam.nanos.app.AppConfig"}})
+
 p({
   "class": "foam.nanos.boot.NSpec",
   "name": "ping",
@@ -56,7 +62,7 @@ p({
   "authenticate": false,
   "serviceClass": "foam.nanos.http.PingService"
 })
-p({"class":"foam.nanos.boot.NSpec", "name":"AuthenticatedNSpecDAO",              "serve":true,  "serviceClass":"foam.dao.ProxyDAO", "client":"{\"of\":\"foam.nanos.boot.NSpec\",\"cache\":true}"})
+
 p({
   "class":"foam.nanos.boot.NSpec",
   "name":"scriptDAO",
