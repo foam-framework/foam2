@@ -96,6 +96,16 @@ foam.CLASS({
       name: 'userFeedback',
       class: 'FObjectProperty',
       of: 'foam.comics.v2.userfeedback.UserFeedback',
+      documentation: `
+        DAO decorators can attach messages to objects being being created,
+        updated or removed. These messages will be available on the client where
+        they can be displayed for the end user to read.
+        
+        Such feedback messages should be added to the FObject in question by
+        setting this property to an instance of the UserFeedback model. Note
+        that UserFeedback instances can be chained by setting the property named
+        'next'.
+      `
       storageTransient: true
     }
   ],
