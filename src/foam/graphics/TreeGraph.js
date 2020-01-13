@@ -16,7 +16,9 @@
    exports: [
      'as graph',
      'formatNode',
-     'relationship'
+     'relationship',
+     'isAutoExpandedByDefault',
+     'childNodesForAutoExpansion'
    ],
 
    properties: [
@@ -35,11 +37,21 @@
      {
        name: 'formatNode',
        value: function() {}
+     },
+     {
+       class: 'Boolean',
+       name: 'isAutoExpandedByDefault',
+       value: true     
+     },
+     {
+       class: 'Int',
+       name: 'childNodesForAutoExpansion',
+       value: 5
      }
    ],
 
    topics: [
-    'onSizeChange'
+    'onSizeChangeComplete'
    ],
 
    methods: [
@@ -97,7 +109,14 @@
 
            this.root.centerX = 0;
            this.root.centerX = - Math.min.apply(Math, this.root.outline.map(o => o.left));
-           this.onSizeChange.pub();
+
+           // IMPORTANT: Have to add the extra invalidate and doLayout to avoid a bug with
+           // the tree freezing upon render sometimes during search 
+           this.invalidate();
+           this.doLayout();
+
+         } else {
+          this.onSizeChangeComplete.pub();
          }
       }
      }
