@@ -51,7 +51,7 @@ return obj
       `,
       javaCode: `
 onRemove(obj);
-return null;
+return obj;
       `,
     },
 
