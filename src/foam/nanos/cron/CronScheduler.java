@@ -70,12 +70,12 @@ public class CronScheduler
             PM pm = new PM(CronScheduler.class, "cron:" + cron.getId());
             try {
               cron.runScript(CronScheduler.this.getX());
-              cronDAO_.put((FObject) cron);
             } catch (Throwable t) {
-              logger.error(this.getClass(), "Error running Cron Job", cron.getId(), t.getMessage());
+              logger.error(this.getClass(), "Error running Cron Job", cron.getId(), t.getMessage(), t);
             } finally {
               pm.log(getX());
             }
+            cronDAO_.put((FObject) cron);
           }
         });
 
@@ -86,8 +86,13 @@ public class CronScheduler
           Thread.sleep(5000);
         } else {
           long delay = minScheduledTime.getTime() - System.currentTimeMillis();
-          if ( delay > 5000 ) delay = 5000;
-          else if ( delay < 0 ) delay = 0;
+          if ( delay > 5000 ) {
+            delay = 5000;
+          } else if ( delay < 0 ) {
+            // Delay at least a little bit to avoid blocking in case of a
+            // script error.
+            delay = 500;
+          }
           Thread.sleep(delay);
         }
       }
