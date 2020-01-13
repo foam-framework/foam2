@@ -24,8 +24,9 @@ foam.CLASS({
         return mode === foam.u2.DisplayMode.RW;
       },
       code: function() {
-        this.data = this.data || {};
-        this.data[Date.now()] = '';
+        var d2 = foam.Object.clone(this.data);
+        d2[Date.now()] = '';
+        this.data = d2;
         this.updateData();
       }
     }
@@ -62,7 +63,9 @@ foam.CLASS({
             return mode === foam.u2.DisplayMode.RW;
           },
           code: function() {
-            delete this.data[this.key];
+            var d2 = foam.Object.clone(this.data);
+            delete d2[this.key];
+            this.data = d2;
             this.updateData();
           }
         }
