@@ -174,8 +174,7 @@ foam.CLASS({
       ],
       javaCode: `
         AuthService authService = (AuthService) x.get("auth");
-
-        return authService.check(x, getPendingPermission_()) || x.get("requestViewPending");
+        return authService.check(x, getPendingPermission_());
       `
     },
     {
