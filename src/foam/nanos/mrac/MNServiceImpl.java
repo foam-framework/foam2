@@ -50,8 +50,13 @@ public class MNServiceImpl implements MNService {
 
   }
   public void replayFrom(X x, String serviceName, long indexFrom) {
-    System.out.println("replayFrom");
+    System.out.println("replayFromIndex: " + indexFrom);
     DAO dao = (DAO) x.get(serviceName);
+
+    if ( dao == null ) throw new RuntimeException("DAO miss: " + serviceName);
+
+    MNJournal journal = MNJournal.getMNjournal(x, serviceName + "s");
+    journal.replayFrom(x, dao, indexFrom);
   }
 
   public void serviceMeta(X x, String serviceName) {

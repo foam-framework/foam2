@@ -69,7 +69,7 @@ public class QuorumService extends AbstractFObject implements NanoService {
     runElection.start();
   }
 
-  public void registerEletable(Electable electable) {
+  public void registerElectable(Electable electable) {
     unReadyElectables.offer(electable);
   }
 
@@ -147,12 +147,14 @@ public class QuorumService extends AbstractFObject implements NanoService {
           }
         } else if ( getMyState() == InstanceState.PRIMARY ) {
           System.out.println("Primary");
+          CountDownLatch countDownLatch = new CountDownLatch(1);
+          QuorumInitial quorumInitial = null;
           try {
-            // for ( Electable electable : registedElectables ) {
 
-            // }
             exposeState = InstanceState.PRIMARY;
             setPrimaryClusterNode(getPrimaryVote().getPrimaryInstanceId());
+            quorumInitial = new QuorumInitial(countDownLatch);
+            quorumInitial.start();
             while ( true ) {
               //once become primary. It will stay primary forever.
             }
@@ -161,15 +163,28 @@ public class QuorumService extends AbstractFObject implements NanoService {
           } finally {
             exposeState = InstanceState.ELECTING;
             setMyState(InstanceState.ELECTING);
+            if ( quorumInitial != null ) {
+              quorumInitial.close();
+              try {
+                countDownLatch.await();
+              } catch ( Exception e ) {
+                e.printStackTrace();
+              }
+            }
+            System.out.println("leave primary");
           }
         } else if ( getMyState() == InstanceState.SECONDARY ) {
           System.out.println("Secondary");
+          CountDownLatch countDownLatch = new CountDownLatch(1);
+          QuorumInitial quorumInitial = null;
           try {
             ClusterNode primaryNode = (ClusterNode) clusterDAO.find(getPrimaryVote().getPrimaryInstanceId());
             if ( primaryNode == null ) throw new RuntimeException("Can not find primary node");
             String urlString = "http://" + primaryNode.getIp() + ":" + primaryNode.getServicePort() + "/service" + "/ping";
             exposeState = InstanceState.SECONDARY;
             setPrimaryClusterNode(primaryNode);
+            quorumInitial = new QuorumInitial(countDownLatch);
+            quorumInitial.start();
             while ( true ) {
               try {
                 Thread.sleep(200);
@@ -185,6 +200,16 @@ public class QuorumService extends AbstractFObject implements NanoService {
             exposeState = InstanceState.ELECTING;
             setPrimaryClusterNode(null);
             setMyState(InstanceState.ELECTING);
+
+            if ( quorumInitial != null ) {
+              quorumInitial.close();
+              try {
+                countDownLatch.await();
+              } catch ( Exception e ) {
+                e.printStackTrace();
+              }
+            }
+            System.out.println("leave Secondary");
           }
         } else {
           System.out.println("Wrong state");
@@ -205,13 +230,11 @@ public class QuorumService extends AbstractFObject implements NanoService {
   // possible.
   public class QuorumInitial extends FoamThread {
 
-    private boolean isPrimary = false;
     private CountDownLatch countDownLatch;
     private volatile boolean isRunning;
 
-    public QuorumInitial(boolean isPrimary, CountDownLatch countDownLatch) {
+    public QuorumInitial(CountDownLatch countDownLatch) {
       super("quorumInitial");
-      this.isPrimary = isPrimary;
       this.isRunning = true;
       this.countDownLatch = countDownLatch;
     }
@@ -227,15 +250,18 @@ public class QuorumService extends AbstractFObject implements NanoService {
           try {
             electable = unReadyElectables.poll(200, TimeUnit.MILLISECONDS);
             if ( electable == null ) continue;
+            System.out.println("aaaaaaaaaaaa");
             if ( getMyState() == InstanceState.PRIMARY ) {
               electable.primary();
               primaryElectables.put(electable);
             }
             if ( getMyState() == InstanceState.SECONDARY ) {
+              electable.secondary();
               secondaryElectables.put(electable);
             }
           } catch ( Exception e ) {
             //TODO: provide retry;
+            e.printStackTrace();
             if ( electable != null ) unReadyElectables.add(electable);
           }
         }

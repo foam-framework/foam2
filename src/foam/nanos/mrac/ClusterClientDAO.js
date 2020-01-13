@@ -68,7 +68,8 @@ foam.CLASS({
         // temporarily store locally until Medusa
         // return obj;
         logger.debug("obj after copyFrom", obj);
-        return getMdao().put_(x, obj); // does not work for password updates.
+        //return getMdao().put_(x, obj); // does not work for password updates.
+        return obj;
       } else {
         return getDelegate().put_(x, obj);
       }

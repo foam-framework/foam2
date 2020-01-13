@@ -77,12 +77,12 @@ public class MNJournal extends FileJournal {
                                     .select(new ArraySink());
       List list = sink.getArray();
       for ( Object obj : list ) {
-        BlockInfo blockInfo = (BlockInfo) obj;
-        if ( blockInfo.getMaxIndex() > maxGlobalIndex ) {
-          maxGlobalIndex = blockInfo.getMaxIndex();
+        EntryRecord entryRecord = (EntryRecord) obj;
+        if ( entryRecord.getMaxIndex() > maxGlobalIndex ) {
+          maxGlobalIndex = entryRecord.getMaxIndex();
         }
-        if ( blockInfo.getMinIndex() < minGlobalIndex ) {
-          minGlobalIndex = blockInfo.getMinIndex();
+        if ( entryRecord.getMinIndex() < minGlobalIndex ) {
+          minGlobalIndex = entryRecord.getMinIndex();
         }
       }
       System.out.println(maxGlobalIndex);
@@ -386,7 +386,10 @@ public class MNJournal extends FileJournal {
         for ( Object obj : list ) {
           EntryRecord record = (EntryRecord) obj;
           lastRecord = record;
-          if ( record.getMinIndex() < indexFrom && record.getMaxIndex() < indexFrom ) continue;
+          if ( record.getMinIndex() < indexFrom && record.getMaxIndex() < indexFrom ) {
+            inChannel.position((long)(record.getOffset() + (long)record.getLength()));
+            continue;
+          }
           int bufferSize = record.getLength();
           ByteBuffer byteBuffer = ByteBuffer.allocate(bufferSize);
           inChannel.read(byteBuffer);
@@ -413,6 +416,7 @@ public class MNJournal extends FileJournal {
               entries.add(entryString);
               count++;
             } catch ( Exception ioe ) {
+              ioe.printStackTrace();
               //TODO: terminal reply, and send error message to mediator, and
               //stop this mmJournal until problem fix.
               BlockInfo blockInfo = new BlockInfo();
@@ -436,7 +440,7 @@ public class MNJournal extends FileJournal {
                 socketChannel.close();
                 key.cancel();
               } catch ( IOException ie ) {
-                //TODO: log
+                ie.printStackTrace();
               }
               return;
             }
@@ -474,9 +478,11 @@ public class MNJournal extends FileJournal {
         // We need special for the last block of data.
         int bufferSize;
         if ( lastRecord == null ) {
-          bufferSize = (int) (fileSize - 0L) ;
+          bufferSize = (int) (fileSize - 0L);
         } else {
+          System.out.println("1111111");
           bufferSize = (int) (fileSize - (lastRecord.getOffset() + (long) lastRecord.getLength()));
+          System.out.println(bufferSize);
         }
 
         ByteBuffer byteBuffer = ByteBuffer.allocate(bufferSize);
@@ -497,6 +503,8 @@ public class MNJournal extends FileJournal {
           MedusaEntry entry = null;
           try {
             entry = (MedusaEntry) x.create(JSONParser.class).parseString(line);
+            System.out.println(line);
+            System.out.println(entry);
             if ( entry.getMyIndex() < minIndex ) minIndex = entry.getMyIndex();
             if ( entry.getMyIndex() > maxIndex ) maxIndex = entry.getMyIndex();
             //TODO: hash check.
@@ -508,7 +516,7 @@ public class MNJournal extends FileJournal {
             entries.add(entryString);
             count++;
           } catch ( Exception ioe ) {
-
+            ioe.printStackTrace();
             //TODO: terminal reply, and send error message to mediator, and
             //stop this mmJournal until problem fix.
             BlockInfo blockInfo = new BlockInfo();
@@ -529,6 +537,7 @@ public class MNJournal extends FileJournal {
             while( sendBuffer.hasRemaining() ) { socketChannel.write(sendBuffer); }
 
             try {
+              ioe.printStackTrace();
               socketChannel.close();
               key.cancel();
             } catch ( IOException ie ) {

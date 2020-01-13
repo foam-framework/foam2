@@ -31,7 +31,7 @@ public class MMDAO extends JDAO {
     setJournal(MMJournal.getMMjournal(x, mnPort));
     this.mnPort = mnPort;
     //TODO: command replay for testing election.
-    getJournal().replay(x, getDelegate());
+    // getJournal().replay(x, getDelegate());
   }
 
   public MMDAO(X x, String nspecKey, MDAO dao, String mnPort) {

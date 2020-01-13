@@ -185,6 +185,7 @@ public class QuorumNetworkManager extends AbstractFObject {
         }
       } catch ( Exception e ) {
         //TODO: log exits
+        e.printStackTrace();
       } finally {
         //TODO: log finish.
         sender.close();
