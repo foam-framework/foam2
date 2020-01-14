@@ -769,6 +769,7 @@ foam.CLASS({
         name: methodInfoName,
         visibility: 'public',
         static: true,
+        final: true,
         type: 'foam.core.MethodInfo',
         initializer: initializerString,
         order: 0,
