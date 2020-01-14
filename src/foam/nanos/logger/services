@@ -1,6 +1,12 @@
 p({
-  "class":
-  "foam.nanos.boot.NSpec",
+  "class":"foam.nanos.boot.NSpec",
+  "name":"logLevelFilterLogger",
+  "lazy":false,
+  "service":{"class":"foam.nanos.logger.LogLevelFilterLogger"}
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
   "name":"localLogMessageDAO",
   "lazy":false,
   "serviceScript":"""
@@ -19,7 +25,7 @@ p({
       .setDecorator(new foam.nanos.logger.RepeatLogMessageDAO.Builder(x)
         .setDelegate(new foam.nanos.logger.NotificationLogMessageDAO.Builder(x).build())
         .build())
-      .setInnerDAO(new foam.dao.WriteOnlyJDAO(x, new foam.dao.MDAO(foam.nanos.logger.LogMessage.getOwnClassInfo()), foam.nanos.logger.LogMessage.getOwnClassInfo(), \"../logs/logs\" /*TODO System.getProperty(\"LOG_HOME\")+\"/logs\"*/))
+      .setInnerDAO(new foam.dao.WriteOnlyJDAO(x, new foam.dao.MDAO(foam.nanos.logger.LogMessage.getOwnClassInfo()), foam.nanos.logger.LogMessage.getOwnClassInfo(), "../logs/logs"))
       .build();
   """
 })
@@ -61,7 +67,7 @@ p({
     import foam.nanos.logger.DAOLogger;
     CompositeLogger log = new CompositeLogger();
     StdoutLogger stdOut = new StdoutLogger();
-    ProxyLogger logLevelFilterLogger = (ProxyLogger) x.get(\"logLevelFilterLogger\");
+    ProxyLogger logLevelFilterLogger = (ProxyLogger) x.get("logLevelFilterLogger");
     logLevelFilterLogger.setX(x);
     logLevelFilterLogger.setDelegate(log);
     DAOLogger daoLogger = new DAOLogger(x);
