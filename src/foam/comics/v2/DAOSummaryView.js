@@ -156,7 +156,7 @@ foam.CLASS({
             });
           }
 
-          if ( config$CRUDActionsAuth$delete ){
+          if ( config$CRUDActionsAuth$delete ) {
             var deleteArray = config$CRUDActionsAuth$delete;
 
 
