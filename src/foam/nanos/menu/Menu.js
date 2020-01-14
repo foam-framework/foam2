@@ -91,7 +91,7 @@ foam.CLASS({
         class: 'foam.u2.view.JSONTextView'
       },
       javaFactory: `
-      return foam.mlang.MLang.TRUE;
+        return foam.mlang.MLang.TRUE;
       `,
     }
   ],
@@ -112,46 +112,46 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      return getReadPredicate().f(
-        x.put("MENU", this)
-      );
+        return getReadPredicate().f(
+          x.put("MENU", this)
+        );
       `
     },
     {
       name: 'authorizeOnCreate',
       javaCode: `
-      AuthService auth = (AuthService) x.get("auth");
-      if ( ! auth.check(x, "menu.create") ) {
-        throw new AuthorizationException("You do not have permission to create menus.");
-      }
+        AuthService auth = (AuthService) x.get("auth");
+        if ( ! auth.check(x, "menu.create") ) {
+          throw new AuthorizationException("You do not have permission to create menus.");
+        }
       `
     },
     {
       name: 'authorizeOnUpdate',
       javaCode: `
-      AuthService auth = (AuthService) x.get("auth");
-      if ( ! auth.check(x, "menu.update." + getId()) ) {
-        throw new AuthorizationException("You do not have permission to update this menu.");
-      }
+        AuthService auth = (AuthService) x.get("auth");
+        if ( ! auth.check(x, "menu.update." + getId()) ) {
+          throw new AuthorizationException("You do not have permission to update this menu.");
+        }
       `
     },
     {
       name: 'authorizeOnDelete',
       javaCode: `
-      AuthService auth = (AuthService) x.get("auth");
-      if ( ! auth.check(x, "menu.remove." + getId()) ) {
-        throw new AuthorizationException("You do not have permission to delete menus.");
-      }
+        AuthService auth = (AuthService) x.get("auth");
+        if ( ! auth.check(x, "menu.remove." + getId()) ) {
+          throw new AuthorizationException("You do not have permission to delete menus.");
+        }
       `
     },
     {
       name: 'authorizeOnRead',
       javaCode: `
-      AuthService auth = (AuthService) x.get("auth");
-      if ( ! ( auth.check(x, "menu.read." + getId()) &&
-               f(x) ) ) {
-        throw new AuthorizationException("You do not have permission to read this menu.");
-      }
+        AuthService auth = (AuthService) x.get("auth");
+        if ( ! ( auth.check(x, "menu.read." + getId()) &&
+                 f(x) ) ) {
+          throw new AuthorizationException("You do not have permission to read this menu.");
+        }
       `
     }
   ],
