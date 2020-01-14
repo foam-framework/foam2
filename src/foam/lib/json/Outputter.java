@@ -25,7 +25,7 @@ import org.apache.commons.io.IOUtils;
 public class Outputter
   extends AbstractSink
   implements foam.lib.Outputter {
-  
+
   protected static ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
     @Override
     protected SimpleDateFormat initialValue() {
@@ -340,12 +340,13 @@ public class Outputter
 
     if ( includeComma ) writer_.append(",");
     if ( multiLineOutput_ ) addInnerNewline();
-    outputProperty(fo, prop); 
+    outputProperty(fo, prop);
     return true;
   }
 
   protected void outputFObjectDelta(FObject oldFObject, FObject newFObject) {
     ClassInfo info           = oldFObject.getClassInfo();
+    ClassInfo newInfo        = newFObject.getClassInfo();
     boolean   outputComma    = true;
     boolean   isDiff         = false;
     boolean   isPropertyDiff = false;
@@ -367,11 +368,11 @@ public class Outputter
               writer_.append("class");
               writer_.append(afterKey_());
               writer_.append(":");
-              outputString(info.getId());
+              outputString(newInfo.getId());
             }
             if ( outputClassNames_ ) writer_.append(",");
             addInnerNewline();
-            PropertyInfo id = (PropertyInfo) info.getAxiomByName("id");
+            PropertyInfo id = (PropertyInfo) newInfo.getAxiomByName("id");
             outputProperty(newFObject, id);
             writer_.append(",");
 
@@ -382,8 +383,10 @@ public class Outputter
           outputProperty(newFObject, prop);
         }
       }
-      addInnerNewline();
-      writer_.append("}");
+      if ( isDiff ) {
+        if ( multiLineOutput_ )  writer_.append("\n");
+        writer_.append("}");
+      }
     }
   }
 

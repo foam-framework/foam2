@@ -270,7 +270,6 @@ foam.CLASS({
       'For internal use only. Is used to implement the Slot.dot() method.',
 
   properties: [
-    'of',
     'parent', // parent slot, not parent object
     'name',
     'value',
@@ -329,12 +328,9 @@ foam.CLASS({
       this.prevSub && this.prevSub.detach();
       var o = this.parent.get();
 
-      // Record the 'of' of the parent so we can tell when it changes.
-      if ( ! this.of && o ) this.of = o.cls_.id;
-
-      // If the parent object changes class, then don't update
-      // because a new class will have different sub-slots.
-      if ( o && ( this.of !== o.cls_.id || o.cls_.getAxiomByName(this.name) == null ) ) {
+      // If the new class has the same axiom as the old class, then we keep this
+      // SubSlot attached instead of detaching it.
+      if ( o && o.cls_.getAxiomByName(this.name) == null ) {
         this.prevSub = null;
         this.detach();
         return;

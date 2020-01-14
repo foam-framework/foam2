@@ -336,7 +336,10 @@ foam.CLASS({
 
       // set value
       setter += `boolean oldIsSet = ${this.name}IsSet_;\n`;
-      setter += `${this.javaType} oldVal = ${this.name}_;\n`;
+      // Don't include oldVal if not used
+      if ( this.javaPostSet && this.javaPostSet.indexOf('oldVal') != -1 ) {
+        setter += `${this.javaType} oldVal = ${this.name}_;\n`;
+      }
       setter += `${this.name}_ = val;\n`;
       setter += `${this.name}IsSet_ = true;\n`;
 
@@ -424,6 +427,7 @@ ${isSet} = false;
         name: constantize,
         visibility: 'public',
         static: true,
+        final: true,
         type: 'foam.core.PropertyInfo',
         initializer: this.createJavaPropertyInfo_(cls)
       });
@@ -491,10 +495,10 @@ foam.LIB({
     function buildJavaClass(cls) {
       cls = cls || foam.java.Class.create();
 
-      cls.name = this.model_.name;
-      cls.package = this.model_.package;
-      cls.source = this.model_.source;
-      cls.abstract = this.model_.abstract;
+      cls.name          = this.model_.name;
+      cls.package       = this.model_.package;
+      cls.source        = this.model_.source;
+      cls.abstract      = this.model_.abstract;
       cls.documentation = this.model_.documentation;
 
       if ( this.model_.name !== 'AbstractFObject' ) {

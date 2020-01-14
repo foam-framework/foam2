@@ -471,7 +471,7 @@ try {
           PropertyInfo prop = (PropertyInfo) e.next();
           mergeProperty(oldFObject, diffFObject, prop);
         }
-        return oldFObject;
+        return diffFObject.copyFrom(oldFObject);
       `
     },
     {
