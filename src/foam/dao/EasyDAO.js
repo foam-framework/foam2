@@ -270,6 +270,11 @@ foam.CLASS({
     {
       class: 'Object',
       type: 'foam.dao.DAO',
+      name: 'mDAO'
+    },
+    {
+      class: 'Object',
+      type: 'foam.dao.DAO',
       name: 'innerDAO',
       javaFactory: `
       if ( getNullify() ) {
@@ -277,8 +282,12 @@ foam.CLASS({
         .setOf(getOf())
         .build();
       }
-      if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) )
+      if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
+        if ( getMDAO() != null )
+          return new foam.dao.java.JDAO(getX(), getMDAO(), getJournalName());
+        else
         return new foam.dao.java.JDAO(getX(), getOf(), getJournalName());
+      }
       return new foam.dao.MDAO(getOf());
       `
     },
