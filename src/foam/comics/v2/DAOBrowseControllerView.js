@@ -100,7 +100,7 @@ foam.CLASS({
       this.addClass(this.myClass())
       .add(this.slot(function(data, config, config$CRUDActionsAuth$create, config$browseBorder, config$browseViews, config$browseTitle) {
         var createAction = config$CRUDActionsAuth$create 
-            ? self.CREATE.copyFrom({
+            ? self.CREATE.clone().copyFrom({
               availablePermissions: config$CRUDActionsAuth$create
             })
             : self.CREATE;
