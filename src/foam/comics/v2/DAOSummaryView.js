@@ -144,7 +144,7 @@ foam.CLASS({
           var editAction = self.EDIT;
           var deleteAction = self.DELETE;
 
-          if ( config$CRUDActionsAuth$update ){
+          if ( config$CRUDActionsAuth$update ) {
             var editArray = config$CRUDActionsAuth$update;
 
             editArray = editArray.map(permission => {
