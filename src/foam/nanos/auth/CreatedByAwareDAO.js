@@ -21,6 +21,7 @@ foam.CLASS({
         return this.delegate.find_(x, obj).then(function(result) {
           if ( result == null ) {
             obj.createdBy = x.user.id;
+            obj.createdByAgent = x.agent != null ? x.agent.id : x.user.id;
           }
           return this.delegate.put_(x, obj);
         }.bind(this));
@@ -30,7 +31,8 @@ foam.CLASS({
         if ( obj instanceof CreatedByAware && getDelegate().find_(x, obj) == null ) {
           User user = (User) x.get("user");
           User agent = (User) x.get("agent");
-          ((CreatedByAware) obj).setCreatedBy(agent != null ? agent.getId() : user.getId());
+          ((CreatedByAware) obj).setCreatedBy(user.getId());
+          ((CreatedByAware) obj).setCreatedByAgent(agent != null ? agent.getId() : user.getId());
         }
         return super.put_(x, obj);
       `

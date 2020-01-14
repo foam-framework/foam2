@@ -23,6 +23,8 @@ foam.CLASS({
     ^ .foam-u2-Tabs-content > div {
       background: white;
       padding: 14px 16px
+      overflow-x: scroll;
+      white-space: nowrap;
     }
 
     ^ .foam-u2-view-ScrollTableView table {
