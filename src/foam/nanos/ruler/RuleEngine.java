@@ -10,6 +10,8 @@ import foam.core.*;
 import foam.dao.DAO;
 import foam.nanos.auth.LastModifiedAware;
 import foam.nanos.auth.LastModifiedByAware;
+import foam.nanos.auth.LifecycleAware;
+import foam.nanos.auth.LifecycleState;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
 import foam.util.SafetyUtil;
@@ -156,7 +158,16 @@ public class RuleEngine extends ContextAwareSupport {
 
   private boolean isRuleApplicable(Rule rule, FObject obj, FObject oldObj) {
     currentRule_ = rule;
-    return rule.getAction() != null
+
+    // Check if the rule is in an ACTIVE state
+    Boolean isActive = true;
+    if (rule instanceof LifecycleAware) {
+      isActive = ((LifecycleAware) rule).getLifecycleState() == LifecycleState.ACTIVE;
+    }
+
+    return 
+         isActive
+      && rule.getAction() != null
       && rule.f(userX_, obj, oldObj);
   }
 

@@ -12,7 +12,7 @@ foam.CLASS({
 
   ids: [ 'clsName', 'name' ],
 
-  tableColumns: [ 'clsName', 'name', 'count', 'minTime', 'maxTime', 'average', 'totalTime' ],
+  tableColumns: [ 'clsName', 'name', 'count', 'minTime', 'average', 'maxTime', 'totalTime' ],
 
   searchColumns: [ 'clsName', 'name' ],
 
@@ -30,7 +30,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'name',
-      tableWidth: 300
+      tableWidth: 320
     },
     {
       class: 'Int',

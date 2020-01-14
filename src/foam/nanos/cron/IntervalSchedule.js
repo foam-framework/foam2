@@ -36,7 +36,9 @@ foam.CLASS({
     },
     {
       class: 'DateTime',
-      name: 'start'
+      name: 'start',
+      factory: function() { return new Date(); },
+      javaFactory: 'return new Date();'
     }
   ],
 
@@ -74,4 +76,3 @@ return next.getTime();
     }
   ]
 });
-

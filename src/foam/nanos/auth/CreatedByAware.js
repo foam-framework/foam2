@@ -16,6 +16,15 @@ foam.INTERFACE({
       createMode: 'HIDDEN',
       updateMode: 'RO',
       documentation: 'User who created the entry'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdByAgent',
+      documentation: 'Agent acting as User who created the entry',
+      createMode: 'HIDDEN',
+      updateMode: 'RO',
+      section: 'administrative'
     }
   ]
 });
@@ -40,6 +49,15 @@ foam.CLASS({
       of: 'foam.nanos.auth.User',
       name: 'createdBy',
       documentation: 'User who created the entry',
+      createMode: 'HIDDEN',
+      updateMode: 'RO',
+      section: 'administrative'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdByAgent',
+      documentation: 'Agent acting as User who created the entry',
       createMode: 'HIDDEN',
       updateMode: 'RO',
       section: 'administrative'
