@@ -334,10 +334,14 @@ foam.CLASS({
 
       // If the parent object changes class, then don't update
       // because a new class will have different sub-slots.
-      if ( o && ( this.of !== o.cls_.id || o.cls_.getAxiomByName(this.name) == null ) ) {
+      // If the new class has the same axiom as the old class, then we keep this
+      // SubSlot attached instead of detaching it.
+      if ( o && ( this.of !== o.cls_.id && o.cls_.getAxiomByName(this.name) == null ) ) {
         this.prevSub = null;
         this.detach();
         return;
+      } else if ( o ) {
+        this.of = o.cls_.id;
       }
 
       this.prevSub = o && o.slot && o.slot(this.name).sub(this.valueChange);
