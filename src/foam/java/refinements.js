@@ -423,6 +423,7 @@ ${isSet} = false;
         name: constantize,
         visibility: 'public',
         static: true,
+        final: true,
         type: 'foam.core.PropertyInfo',
         initializer: this.createJavaPropertyInfo_(cls)
       });
@@ -490,10 +491,10 @@ foam.LIB({
     function buildJavaClass(cls) {
       cls = cls || foam.java.Class.create();
 
-      cls.name = this.model_.name;
-      cls.package = this.model_.package;
-      cls.source = this.model_.source;
-      cls.abstract = this.model_.abstract;
+      cls.name          = this.model_.name;
+      cls.package       = this.model_.package;
+      cls.source        = this.model_.source;
+      cls.abstract      = this.model_.abstract;
       cls.documentation = this.model_.documentation;
 
       if ( this.model_.name !== 'AbstractFObject' ) {
