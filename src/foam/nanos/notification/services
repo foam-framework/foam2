@@ -21,7 +21,7 @@ p({
         new foam.nanos.notification.SendSlackNotificationDAO(x)))).build())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("notifications")
-      .setInnerDAO(dao)
+      .serMDAO(dao)
       .build();
   """
 })
