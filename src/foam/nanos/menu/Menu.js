@@ -139,7 +139,7 @@ foam.CLASS({
       name: 'authorizeOnDelete',
       javaCode: `
       AuthService auth = (AuthService) x.get("auth");
-      if ( ! auth.check(x, "menu.delete") ) {
+      if ( ! auth.check(x, "menu.remove." + getId()) ) {
         throw new AuthorizationException("You do not have permission to delete menus.");
       }
       `
