@@ -321,7 +321,7 @@ foam.CLASS({
       }
 
       var capitalized = foam.String.capitalize(this.name);
-      var setter = `if ( this.__frozen__ ) throw new UnsupportedOperationException("Object is frozen.");\n`;
+      var setter = `assertNotFrozen();\n`;
 
       // add value assertion
       if ( this.javaAssertValue ) {

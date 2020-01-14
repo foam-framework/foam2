@@ -86,6 +86,10 @@ foam.CLASS({
             verifier.initVerify(key);
             return this.verify(signature, verifier);
           }
+
+          public void assertNotFrozen() {
+            if ( __frozen__ ) throw new UnsupportedOperationException("Object is frozen.");
+          }
         `);
       }
     }
