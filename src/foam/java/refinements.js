@@ -577,6 +577,14 @@ foam.LIB({
         }).join(',')});`
       });
 
+      cls.method({
+        name: 'equals',
+        type: 'Boolean',
+        args: [ { name: 'o', type: 'Any' } ],
+        visibility: 'public',
+        body: `return super.equals(o);`
+      });
+
       if ( cls.name ) {
         var props = cls.allProperties;
 
