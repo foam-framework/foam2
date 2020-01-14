@@ -27,7 +27,7 @@ foam.CLASS({
         return mode === foam.u2.DisplayMode.RW;
       },
       code: function() {
-        var d2 = foam.Object.clone(this.data);
+        var d2 = foam.Object.shallowClone(this.data);
         d2[Date.now()] = '';
         this.data = d2;
       }
@@ -58,7 +58,7 @@ foam.CLASS({
             return mode === foam.u2.DisplayMode.RW;
           },
           code: function() {
-            var d2 = foam.Object.clone(this.view.data);
+            var d2 = foam.Object.shallowClone(this.view.data);
             delete d2[this.key];
             this.view.data = d2;
           }
