@@ -58,7 +58,6 @@ foam.CLASS({
             return mode === foam.u2.DisplayMode.RW;
           },
           code: function() {
-            debugger;
             var d2 = foam.Object.clone(this.view.data);
             delete d2[this.key];
             this.view.data = d2;
@@ -75,11 +74,11 @@ foam.CLASS({
         .add(this.slot(function(data) {
           return self.Rows.create()
             .forEach(Object.entries(data || {}), function(e) {
-              var oldKey = e[0];
-              var row    = self.KeyValueRow.create({key: e[0], value: e[1]});
-              row.onDetach(row.sub(function() {
-                delete view.data[oldKey];
-                view.data[row.key] = row.value;
+              let oldKey = e[0];
+              let row    = self.KeyValueRow.create({key: e[0], value: e[1]});
+              row.onDetach(row.sub('propertyChange', function() {
+                delete self.data[oldKey];
+                self.data[row.key] = row.value;
                 oldKey = row.key;
               }));
               this
