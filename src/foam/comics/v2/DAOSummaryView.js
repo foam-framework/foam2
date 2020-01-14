@@ -151,7 +151,7 @@ foam.CLASS({
               return permission.replace("%", data$id);
             });
 
-            editAction = self.EDIT.copyFrom({
+            editAction = self.EDIT.clone().copyFrom({
               availablePermissions: editArray
             });
           }
