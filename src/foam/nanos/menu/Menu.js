@@ -87,7 +87,7 @@ foam.CLASS({
       documentation: 'Predicate providing arbitrary checks, in addition to the regular menu auth checks.',
       class: 'FObjectProperty',
       of: 'foam.mlang.predicate.Predicate',
-      name: 'predicate',
+      name: 'readPredicate',
       view: {
         class: 'foam.u2.view.JSONTextView'
       },
@@ -103,6 +103,7 @@ foam.CLASS({
       this.handler && this.handler.launch(X, this, e);
     },
     {
+      documentation: 'Desire to call read predicate with calling context but predicate may also need access to this menu; add the current menu as context key MENU',
       name: 'f',
       type: 'Boolean',
       args: [
@@ -112,7 +113,7 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      return getPredicate().f(
+      return getReadPredicate().f(
         x.put("MENU", this)
       );
       `
@@ -121,9 +122,7 @@ foam.CLASS({
       name: 'authorizeOnCreate',
       javaCode: `
       AuthService auth = (AuthService) x.get("auth");
-      if ( ! ( auth.check(x, "menu.create") &&
-               f(x) ) ) {
-//               getPredicate().f(this) ) ) {
+      if ( ! auth.check(x, "menu.create") ) {
         throw new AuthorizationException("You do not have permission to create menus.");
       }
       `
@@ -132,9 +131,7 @@ foam.CLASS({
       name: 'authorizeOnUpdate',
       javaCode: `
       AuthService auth = (AuthService) x.get("auth");
-      if ( ! ( auth.check(x, "menu.update."+getId()) &&
-               f(x) ) ) {
-//               getPredicate().f(this) ) ) {
+      if ( ! auth.check(x, "menu.update."+getId()) ) {
         throw new AuthorizationException("You do not have permission to update this menu.");
       }
       `
@@ -143,9 +140,7 @@ foam.CLASS({
       name: 'authorizeOnDelete',
       javaCode: `
       AuthService auth = (AuthService) x.get("auth");
-      if ( ! ( auth.check(x, "menu.delete") &&
-               f(x) ) ) {
-//               getPredicate().f(this) ) ) {
+      if ( ! auth.check(x, "menu.delete") ) {
         throw new AuthorizationException("You do not have permission to delete menus.");
       }
       `
@@ -156,8 +151,7 @@ foam.CLASS({
       AuthService auth = (AuthService) x.get("auth");
       if ( ! ( auth.check(x, "menu.read."+getId()) &&
                f(x) ) ) {
-//               getPredicate().f(this) ) ) {
-        throw new AuthorizationException("You don't have permission to read this menu.");
+        throw new AuthorizationException("You do not have permission to read this menu.");
       }
       `
     }
