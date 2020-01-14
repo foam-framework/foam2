@@ -164,7 +164,7 @@ foam.CLASS({
               return permission.replace("%", data$id);
             });
 
-            deleteAction = self.DELETE.copyFrom({
+            deleteAction = self.DELETE.clone().copyFrom({
               availablePermissions: self.DELETE.availablePermissions.concat(deleteArray)
             });
           }
