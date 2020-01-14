@@ -148,7 +148,7 @@ foam.CLASS({
       name: 'authorizeOnRead',
       javaCode: `
       AuthService auth = (AuthService) x.get("auth");
-      if ( ! ( auth.check(x, "menu.read."+getId()) &&
+      if ( ! ( auth.check(x, "menu.read." + getId()) &&
                f(x) ) ) {
         throw new AuthorizationException("You do not have permission to read this menu.");
       }
