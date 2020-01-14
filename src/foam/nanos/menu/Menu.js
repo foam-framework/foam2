@@ -85,8 +85,7 @@ foam.CLASS({
     },
     {
       documentation: 'Predicate providing arbitrary checks, in addition to the regular menu auth checks.',
-      class: 'FObjectProperty',
-      of: 'foam.mlang.predicate.Predicate',
+      class: 'foam.mlang.predicate.PredicateProperty',
       name: 'readPredicate',
       view: {
         class: 'foam.u2.view.JSONTextView'
