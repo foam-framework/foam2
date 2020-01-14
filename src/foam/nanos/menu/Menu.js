@@ -130,7 +130,7 @@ foam.CLASS({
       name: 'authorizeOnUpdate',
       javaCode: `
       AuthService auth = (AuthService) x.get("auth");
-      if ( ! auth.check(x, "menu.update."+getId()) ) {
+      if ( ! auth.check(x, "menu.update." + getId()) ) {
         throw new AuthorizationException("You do not have permission to update this menu.");
       }
       `
