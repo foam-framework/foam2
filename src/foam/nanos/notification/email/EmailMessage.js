@@ -41,6 +41,12 @@ foam.CLASS({
       documentation: 'User who created the entry',
     },
     {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdByAgent',
+      documentation: 'User who created the entry',
+    },
+    {
       class: 'StringArray',
       name: 'to'
     },

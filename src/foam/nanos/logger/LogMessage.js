@@ -35,6 +35,7 @@ foam.CLASS({
       tableWidth: 180
     },
     'createdBy',
+    'createdByAgent',
     {
       name: 'threadName',
       class: 'String',
