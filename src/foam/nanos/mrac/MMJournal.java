@@ -326,6 +326,7 @@ public class MMJournal extends AbstractJournal implements Electable {
 
       long endtime = System.currentTimeMillis() + TIME_OUT * (i + 1);
       int check = 0;
+      int falseCheck = 0;
       boolean[] checks = new boolean[nodes.size()];
       Arrays.fill(checks, false);
 
@@ -344,9 +345,12 @@ public class MMJournal extends AbstractJournal implements Electable {
               p = (MedusaEntry) ((RPCReturnMessage) responseMessage.getObject()).getData();
               if ( p instanceof MedusaEntry ) {
                 check++;
+              } else {
+                falseCheck++;
               }
             } catch ( Exception e ) {
               //TODO: log error
+              falseCheck++;
               System.out.println(e);
             } finally {
               checks[j] = true;
@@ -708,7 +712,7 @@ public class MMJournal extends AbstractJournal implements Electable {
             throw new RuntimeException("Replay can not connect to: " + node.getId());
 
           nodeToSocketChannel.put(node.getId(), channel);
-
+          System.out.println(node.getId());
           nodeToBuffers.put(node.getId(), retrieveDataFromNode(x, channel, fromIndex));
           count++;
         } catch ( Exception e ) {
@@ -788,6 +792,7 @@ public class MMJournal extends AbstractJournal implements Electable {
       nextBlockInfo.flip();
       blockInfoString = new String(nextBlockInfo.array(), 0, length, Charset.forName("UTF-8"));
       blockInfo = (BlockInfo) getX().create(JSONParser.class).parseString(blockInfoString);
+      System.out.println(blockInfoString);
     }
 
 

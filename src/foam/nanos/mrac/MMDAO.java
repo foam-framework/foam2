@@ -13,6 +13,8 @@ import foam.dao.java.JDAO;
 import foam.dao.MDAO;
 import foam.nanos.boot.NSpec;
 import foam.core.Identifiable;
+import foam.nanos.fs.ResourceStorage;
+import foam.nanos.fs.Storage;
 
 public class MMDAO extends JDAO {
 
@@ -22,21 +24,31 @@ public class MMDAO extends JDAO {
   NSpec nspec;
   String nspecKey;
 
-  public MMDAO(X x, ClassInfo classInfo, String mnPort) {
-    setX(x);
-    setOf(classInfo);
+  //public MMDAO(X x, ClassInfo classInfo, String mnPort) {
+  //  setX(x);
+  //  setOf(classInfo);
 
-    nspecKey = classInfo.getId();
-    setDelegate(new MDAO(classInfo));
-    setJournal(MMJournal.getMMjournal(x, mnPort));
-    this.mnPort = mnPort;
-    //TODO: command replay for testing election.
-    // getJournal().replay(x, getDelegate());
-  }
+  //  nspecKey = classInfo.getId();
+  //  setDelegate(new MDAO(classInfo));
+  //  setJournal(MMJournal.getMMjournal(x, mnPort));
+  //  this.mnPort = mnPort;
+  //  //TODO: command replay for testing election.
+  //  // getJournal().replay(x, getDelegate());
+  //}
 
-  public MMDAO(X x, String nspecKey, MDAO dao, String mnPort) {
+  public MMDAO(X x, String nspecKey, MDAO dao, String mnPort, String fileName) {
     setX(x);
     setOf(dao.getOf());
+
+    // Load journal from resource.journals first.
+    X resourceStorageX = x;
+    if ( System.getProperty("resource.journals.dir") != null ) {
+      resourceStorageX = x.put(Storage.class,
+          new ResourceStorage(System.getProperty("resource.journals.dir")));
+    }
+    new foam.dao.FileJournal.Builder(resourceStorageX)
+      .setFilename(fileName).build().replay(x, dao);
+
     this.nspecKey = nspecKey;
     setDelegate(dao);
     this.mnPort = mnPort;
