@@ -152,7 +152,7 @@ foam.CLASS({
             });
 
             editAction = self.EDIT.clone().copyFrom({
-              availablePermissions: editArray
+              availablePermissions: self.EDIT.availablePermissions.concat(editArray)
             });
           }
 
