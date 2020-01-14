@@ -556,6 +556,14 @@ foam.LIB({
               return `get${foam.String.capitalize(p.name)}();`
             }).join('\n')
         });
+
+        cls.method({
+          name: 'equals',
+          type: 'boolean',
+          args: [ { name: 'o', type: 'Object' } ],
+          visibility: 'public',
+          body: `return super.equals(o);`
+        });
       }
 
       if ( this.hasOwnAxiom('id') ) {
