@@ -48,7 +48,7 @@ foam.CLASS({
         },
         {
           name: 'value',
-          xxxview: { class: 'foam.u2.view.AnyView' }
+          view: { class: 'foam.u2.view.AnyView' }
         }
       ],
       actions: [
