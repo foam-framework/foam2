@@ -580,7 +580,7 @@ foam.LIB({
       cls.method({
         name: 'equals',
         type: 'Boolean',
-        args: [ { name: 'o', type: 'Any' } ],
+        args: [ { name: 'o', type: 'Object' } ],
         visibility: 'public',
         body: `return super.equals(o);`
       });
