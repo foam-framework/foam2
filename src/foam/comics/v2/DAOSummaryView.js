@@ -165,7 +165,7 @@ foam.CLASS({
             });
 
             deleteAction = self.DELETE.copyFrom({
-              availablePermissions: deleteArray
+              availablePermissions: self.DELETE.availablePermissions.concat(deleteArray)
             });
           }
 
