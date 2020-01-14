@@ -334,7 +334,8 @@ foam.CLASS({
       };
 
       // set value
-      setter += `boolean oldIsSet = ${this.name}IsSet_;\n`;
+      // Remove the useless assignment to local variable
+      //setter += `boolean oldIsSet = ${this.name}IsSet_;\n`;
       setter += `${this.javaType} oldVal = ${this.name}_;\n`;
       setter += `${this.name}_ = val;\n`;
       setter += `${this.name}IsSet_ = true;\n`;
