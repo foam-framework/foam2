@@ -11,14 +11,17 @@ foam.CLASS({
 
   css: `
     ^ {
-      width: 25vw;
+      border-radius: 3px;
+      background-color: #fff;
     }
     ^main {
-      padding: 1vh 2vw 1.5vh 2vw;
+      padding: 24px;
+    }
+    ^main > h2:first-child {
+      margin-top: 0;
     }
     ^ .buttons {
-      background: /*%GREY5%*/ #fafafa;
-      padding: 2vh;
+      padding: 24px;
       box-sizing: border-box;
       display: flex;
       justify-content: flex-end;
