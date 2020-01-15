@@ -36,7 +36,8 @@ public class QuorumNetworkManager extends AbstractFObject {
   ConcurrentHashMap<Long, Sender> instanceToSenderMap;
   ConcurrentHashMap<Long, ArrayBlockingQueue<QuorumMessage>> instanceToQueueMap;
   public ArrayBlockingQueue<QuorumMessage> receiveQueue;
-  protected Long clusterId = Long.parseLong(System.getProperty("CLUSTER"));
+  protected String clusterIdString = System.getProperty("CLUSTER");
+  protected Long clusterId;
   ClusterNode mySelf;
   public volatile boolean isRunning = true;
   private final Server server;
@@ -44,6 +45,7 @@ public class QuorumNetworkManager extends AbstractFObject {
   public QuorumNetworkManager(X x) {
     System.out.println("QuorumNetworkManager");
     setX(x);
+    clusterId = Long.parseLong(clusterIdString);
     if ( x == null ) throw new RuntimeException("Context no found.");
     DAO clusterDAO = (DAO) x.get("clusterNodeDAO");
     if ( clusterDAO == null ) throw new RuntimeException("clusterNodeDAO no found.");

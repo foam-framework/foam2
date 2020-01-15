@@ -28,7 +28,8 @@ public class Election extends AbstractFObject {
 
   // QuorumNetworkManager handles network communication for a Election.
   private final QuorumNetworkManager networkManager;
-  protected Long clusterId = Long.parseLong(System.getProperty("CLUSTER"));
+  protected String clusterIdString = System.getProperty("CLUSTER");
+  protected Long clusterId;
   ClusterNode mySelf;
 
   // Manage meta of current instance.
@@ -43,6 +44,7 @@ public class Election extends AbstractFObject {
   public Election(X x, QuorumNetworkManager networkManager, QuorumService quorumService) {
     System.out.println("Election");
     setX(x);
+    clusterId = Long.parseLong(clusterIdString);
     if ( x == null ) throw new RuntimeException("Context no found.");
     DAO clusterDAO = (DAO) x.get("clusterNodeDAO");
     if ( clusterDAO == null ) throw new RuntimeException("clusterNodeDAO no found.");

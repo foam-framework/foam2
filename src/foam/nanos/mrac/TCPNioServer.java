@@ -43,7 +43,8 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
 
   protected TcpNioRouter router_ = null;
   protected Logger logger   = (Logger) getX().get("logger");
-  protected Long clusterId = Long.parseLong(System.getProperty("CLUSTER"));
+  protected String clusterIdString = System.getProperty("CLUSTER");
+  protected Long clusterId;
   //TODO: Do not hard code this field.
   // protected int maxConnectionPerClient = 50;
 
@@ -60,6 +61,7 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
   public void start() throws Exception {
     System.out.println("<><><><><><><<><>");
     X x = getX();
+    clusterId = Long.parseLong(clusterIdString);
     if ( x == null ) throw new RuntimeException("Context no found.");
     DAO clusterDAO = (DAO) x.get("clusterNodeDAO");
     if ( clusterDAO == null ) throw new RuntimeException("clusterNodeDAO no found.");

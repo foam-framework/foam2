@@ -28,7 +28,8 @@ import java.util.concurrent.TimeUnit;
 // Start voting.
 public class QuorumService extends AbstractFObject implements NanoService {
 
-  protected Long clusterId = Long.parseLong(System.getProperty("CLUSTER"));
+  protected String clusterIdString = System.getProperty("CLUSTER");
+  protected Long clusterId;
   public ClusterNode mySelf;
   private QuorumNetworkManager networkManager;
   private Election election;
@@ -50,6 +51,7 @@ public class QuorumService extends AbstractFObject implements NanoService {
   public void start() throws Exception {
     System.out.println("QuorumServer");
     X x = getX();
+    clusterId = Long.parseLong(clusterIdString);
     if ( x == null ) throw new RuntimeException("Context no found.");
     clusterDAO = (DAO) x.get("clusterNodeDAO");
     if ( clusterDAO == null ) throw new RuntimeException("clusterNodeDAO no found.");
