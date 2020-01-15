@@ -408,8 +408,8 @@ foam.CLASS({
           visibility: 'public',
           type: 'void',
           body: `
-if ( this.__frozen__ ) throw new UnsupportedOperationException("Object is frozen.");
-${isSet} = false;
+          assertNotFrozen();
+          ${isSet} = false;
           `
         });
 
@@ -1274,17 +1274,21 @@ foam.CLASS({
         cls.buildJavaClass = function(cls) {
           cls = cls || foam.java.Enum.create();
 
-          cls.name = this.name;
+          cls.name    = this.name;
           cls.package = this.package;
           cls.extends = this.extends;
-          cls.values = this.VALUES;
+          cls.values  = this.VALUES;
 
-          cls.field({
-            name: '__frozen__',
-            visibility: 'protected',
-            type: 'boolean',
-            initializer: 'false;'
+          // TODO: needed for now because Enums don't extend FObject
+          // but a better solution would be to remove setters from
+          // Enums and not call asserNotFrozen in first place. KGR
+          cls.method({
+            name: 'assertNotFrozen',
+            visibility: 'public',
+            type: 'void',
+            body: `/* nop */`
           });
+
 
           var flagFilter = foam.util.flagFilter(['java']);
           var axioms = this.getAxioms().filter(flagFilter);
