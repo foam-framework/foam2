@@ -168,10 +168,9 @@ foam.CLASS({
           }
         } catch ( Throwable t ) {
           throw new RuntimeException(t);
-        } finally {
-          if ( isDiff ) return ret;
-          return null;
         }
+        if ( isDiff ) return ret;
+        return null;
       `
     },
     {
