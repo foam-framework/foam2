@@ -277,12 +277,8 @@ foam.CLASS({
         .setOf(getOf())
         .build();
       }
-      if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
-        if ( getMDAO() != null )
-          return new foam.dao.java.JDAO(getX(), getMDAO(), getJournalName());
-        else
+      if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) )
         return new foam.dao.java.JDAO(getX(), getOf(), getJournalName());
-      }
       return new foam.dao.MDAO(getOf());
       `
     },
