@@ -14,6 +14,7 @@ public class RetryManager {
   protected final int      retryDelay_;
   protected final String   description_;
   protected CountDownLatch latch_;
+  protected Exception      exception_;
 
   class Retry {
     final X            x_;
@@ -29,8 +30,10 @@ public class RetryManager {
       if ( retryCount_.getAndIncrement() < maxRetry_ ) {
         retry();
       } else {
-        ((Logger) x_.get("logger")).error(String.format(
-          "RetryManager(%s) max retry reached.", description_));
+        ((Logger) x_.get("logger")).error(
+          String.format("RetryManager(%s) max retry reached.", description_)
+          , exception_
+        );
       }
     }
 
@@ -44,6 +47,7 @@ public class RetryManager {
               latch_.countDown();
             }
           } catch (Exception ex) {
+            exception_ = ex;
             start();
             latch_.countDown();
           }
