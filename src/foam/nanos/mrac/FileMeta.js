@@ -12,13 +12,28 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'String',
+      class: 'Long',
       name: 'id'
     },
     {
-      class: 'Object',
-      name: 'fileLock',
-      documentation: 'Use ReadWriteLock, because there may be more machine replaying concurrently.'
+      class: 'String',
+      name: 'filename'
+    },
+    {
+      class: 'Int',
+      name: 'postFix'
+    },
+    {
+      class: 'Int',
+      name: 'totalEntry'
+    },
+    {
+      class: 'Long',
+      name: 'maxIndex'
+    },
+    {
+      class: 'Long',
+      name: 'minIndex'
     }
   ]
 });

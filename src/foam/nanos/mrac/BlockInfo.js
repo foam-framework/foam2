@@ -22,6 +22,10 @@ foam.CLASS({
       name: 'offset'
     },
     {
+      class: 'Long',
+      name: 'filePostfix'
+    },
+    {
       class: 'Int',
       name: 'length'
     },

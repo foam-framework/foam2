@@ -72,6 +72,29 @@ p({
   """
 })
 
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "fileMetaDAO",
+  "lazy": false,
+  "serve": true,
+  "serviceScript":
+  """
+    return new foam.dao.EasyDAO
+      .Builder(x)
+      .setRuler(false)
+      .setAuthorize(false)
+      .setSeqNo(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("fileMetas")
+      .setOf(foam.nanos.mrac.FileMeta.getOwnClassInfo())
+      .build();
+  """,
+  "client": """
+    {
+      "of": "foam.nanos.mrac.FileMeta"
+    }
+  """
+})
 p({"class":"foam.nanos.boot.NSpec","name":"appConfig",                         "lazy":false, "service":{"class":"foam.nanos.app.AppConfig"}})
 
 p({
