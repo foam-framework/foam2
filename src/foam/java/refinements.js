@@ -1337,9 +1337,8 @@ return new String[] {
             body: `
 switch (ordinal) {
 ${this.VALUES.map(v => `\tcase ${v.ordinal}: return ${cls.name}.${v.name};`).join('\n')}
-}
-return null;
-            `
+    default: return null;
+}`
           });
 
           cls.method({
@@ -1351,9 +1350,8 @@ return null;
             body: `
 switch (label) {
 ${this.VALUES.map(v => `\tcase "${v.label}": return ${cls.name}.${v.name};`).join('\n')}
-}
-return null;
-            `
+    default: return null;
+}`
           });
 
           return cls;
