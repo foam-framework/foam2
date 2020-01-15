@@ -270,11 +270,6 @@ foam.CLASS({
     {
       class: 'Object',
       type: 'foam.dao.DAO',
-      name: 'mDAO'
-    },
-    {
-      class: 'Object',
-      type: 'foam.dao.DAO',
       name: 'innerDAO',
       javaFactory: `
       if ( getNullify() ) {
