@@ -57,8 +57,8 @@ public class Election extends AbstractFObject {
                                   .select(new ArraySink());
     List list = sink.getArray();
     if ( list.size() != 1 ) throw new RuntimeException("error on clusterNode journal");
-    ClusterNode myself = (ClusterNode) list.get(0);
-    clusterId = myself.getId();
+    mySelf = (ClusterNode) list.get(0);
+    clusterId = mySelf.getId();
     //mySelf = (ClusterNode) clusterDAO.find(clusterId);
     if ( mySelf == null ) throw new RuntimeException("ClusterNode no found: " + hostname);
 

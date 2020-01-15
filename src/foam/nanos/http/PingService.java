@@ -37,8 +37,7 @@ public class PingService
                           .select(new ArraySink());
       List list = sink.getArray();
       NodeStatus status = null;
-      if ( list.size() != 1 ) mySelf = (ClusterNode) list.get(0);
-
+      if ( list.size() == 1 ) mySelf = (ClusterNode) list.get(0);
       if ( mySelf != null ) {
         status = new NodeStatus();
         status.setId(mySelf.getId());
