@@ -764,7 +764,7 @@ foam.CLASS({
       var initializerString = this.buildMethodInfoInitializer(cls);
 
       // Create MethodInfo field
-      methodInfoName = this.name;
+      methodInfoName = foam.String.constantize(this.name);
       field = cls.field({
         name: methodInfoName,
         visibility: 'public',
