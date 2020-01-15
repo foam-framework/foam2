@@ -321,7 +321,7 @@ foam.CLASS({
       }
 
       var capitalized = foam.String.capitalize(this.name);
-      var setter = `if ( this.__frozen__ ) throw new UnsupportedOperationException("Object is frozen.");\n`;
+      var setter = `assertNotFrozen();\n`;
 
       // add value assertion
       if ( this.javaAssertValue ) {
@@ -408,8 +408,8 @@ foam.CLASS({
           visibility: 'public',
           type: 'void',
           body: `
-if ( this.__frozen__ ) throw new UnsupportedOperationException("Object is frozen.");
-${isSet} = false;
+          assertNotFrozen();
+          ${isSet} = false;
           `
         });
 
@@ -717,16 +717,18 @@ foam.CLASS({
         if ( i != this.args.length - 1 ) argsString += ', ';
       }
       initializerString += argsString + ');\n';
-      if ( this.javaType == 'void' ) initializerString += '            return null;\n';
 
       // Close try block
       if ( exceptions ) { initializerString += `          }
          catch (Throwable t) {
            foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
            logger.error(t.getMessage());
-           return null;
-         }
+         }\n
         `
+      }
+
+      if ( exceptions || this.javaType == 'void' ) {
+        initializerString += "return null;"
       }
 
       initializerString += `}
@@ -764,11 +766,12 @@ foam.CLASS({
       var initializerString = this.buildMethodInfoInitializer(cls);
 
       // Create MethodInfo field
-      methodInfoName = this.name;
+      methodInfoName = foam.String.constantize(this.name);
       field = cls.field({
         name: methodInfoName,
         visibility: 'public',
         static: true,
+        final: true,
         type: 'foam.core.MethodInfo',
         initializer: initializerString,
         order: 0,
@@ -1274,17 +1277,21 @@ foam.CLASS({
         cls.buildJavaClass = function(cls) {
           cls = cls || foam.java.Enum.create();
 
-          cls.name = this.name;
+          cls.name    = this.name;
           cls.package = this.package;
           cls.extends = this.extends;
-          cls.values = this.VALUES;
+          cls.values  = this.VALUES;
 
-          cls.field({
-            name: '__frozen__',
-            visibility: 'protected',
-            type: 'boolean',
-            initializer: 'false;'
+          // TODO: needed for now because Enums don't extend FObject
+          // but a better solution would be to remove setters from
+          // Enums and not call asserNotFrozen in first place. KGR
+          cls.method({
+            name: 'assertNotFrozen',
+            visibility: 'public',
+            type: 'void',
+            body: `/* nop */`
           });
+
 
           var flagFilter = foam.util.flagFilter(['java']);
           var axioms = this.getAxioms().filter(flagFilter);
@@ -1986,6 +1993,7 @@ foam.CLASS({
         name: this.javaInfoName,
         visibility: 'public',
         static: true,
+        final: true,
         type: 'foam.core.MultitonInfo',
         initializer: `
 new foam.core.MultitonInfo("${this.javaName}", ${cls.name}.${foam.String.constantize(this.property)});
