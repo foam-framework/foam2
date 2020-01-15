@@ -2257,10 +2257,12 @@ foam.CLASS({
 
           var propName = this.name.toLowerCase();
           var clsName  = this.forClass_.substring(this.forClass_.lastIndexOf('.') + 1).toLowerCase();
+          var canRead  = this.readPermissionRequired === false;
 
           return auth.check(null, `${clsName}.rw.${propName}`)
               .then(function(rw) {
                 if ( rw ) return Visibility.RW;
+                if ( canRead ) return Visibility.RO;
                 return auth.check(null, `${clsName}.ro.${propName}`)
                   .then((ro) => ro ? Visibility.RO : Visibility.HIDDEN);
               });
