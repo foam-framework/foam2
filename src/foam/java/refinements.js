@@ -717,17 +717,17 @@ foam.CLASS({
         if ( i != this.args.length - 1 ) argsString += ', ';
       }
       initializerString += argsString + ');\n';
-      if ( this.javaType == 'void' ) initializerString += '            return null;\n';
 
       // Close try block
       if ( exceptions ) { initializerString += `          }
          catch (Throwable t) {
            foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
            logger.error(t.getMessage());
-           return null;
          }
         `
       }
+
+      if ( this.javaType == 'void' ) initializerString += '            return null;\n';
 
       initializerString += `}
       }
