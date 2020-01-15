@@ -379,7 +379,7 @@ foam.CLASS({
       factory: function() {
         return this.EasyDAO.create({
           of: com.google.flow.FLOW,
-          cache: false,
+          cacheType: 'NONE',
           daoType: 'IDB'
         });
       }

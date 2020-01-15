@@ -321,7 +321,7 @@ foam.CLASS({
       }
 
       var capitalized = foam.String.capitalize(this.name);
-      var setter = `if ( this.__frozen__ ) throw new UnsupportedOperationException("Object is frozen.");\n`;
+      var setter = `assertNotFrozen();\n`;
 
       // add value assertion
       if ( this.javaAssertValue ) {
@@ -335,7 +335,10 @@ foam.CLASS({
 
       // set value
       setter += `boolean oldIsSet = ${this.name}IsSet_;\n`;
-      setter += `${this.javaType} oldVal = ${this.name}_;\n`;
+      // Don't include oldVal if not used
+      if ( this.javaPostSet && this.javaPostSet.indexOf('oldVal') != -1 ) {
+        setter += `${this.javaType} oldVal = ${this.name}_;\n`;
+      }
       setter += `${this.name}_ = val;\n`;
       setter += `${this.name}IsSet_ = true;\n`;
 
@@ -405,8 +408,8 @@ foam.CLASS({
           visibility: 'public',
           type: 'void',
           body: `
-if ( this.__frozen__ ) throw new UnsupportedOperationException("Object is frozen.");
-${isSet} = false;
+          assertNotFrozen();
+          ${isSet} = false;
           `
         });
 
@@ -423,6 +426,7 @@ ${isSet} = false;
         name: constantize,
         visibility: 'public',
         static: true,
+        final: true,
         type: 'foam.core.PropertyInfo',
         initializer: this.createJavaPropertyInfo_(cls)
       });
@@ -490,10 +494,10 @@ foam.LIB({
     function buildJavaClass(cls) {
       cls = cls || foam.java.Class.create();
 
-      cls.name = this.model_.name;
-      cls.package = this.model_.package;
-      cls.source = this.model_.source;
-      cls.abstract = this.model_.abstract;
+      cls.name          = this.model_.name;
+      cls.package       = this.model_.package;
+      cls.source        = this.model_.source;
+      cls.abstract      = this.model_.abstract;
       cls.documentation = this.model_.documentation;
 
       if ( this.model_.name !== 'AbstractFObject' ) {
@@ -765,6 +769,7 @@ foam.CLASS({
         name: methodInfoName,
         visibility: 'public',
         static: true,
+        final: true,
         type: 'foam.core.MethodInfo',
         initializer: initializerString,
         order: 0,
@@ -1270,17 +1275,21 @@ foam.CLASS({
         cls.buildJavaClass = function(cls) {
           cls = cls || foam.java.Enum.create();
 
-          cls.name = this.name;
+          cls.name    = this.name;
           cls.package = this.package;
           cls.extends = this.extends;
-          cls.values = this.VALUES;
+          cls.values  = this.VALUES;
 
-          cls.field({
-            name: '__frozen__',
-            visibility: 'protected',
-            type: 'boolean',
-            initializer: 'false;'
+          // TODO: needed for now because Enums don't extend FObject
+          // but a better solution would be to remove setters from
+          // Enums and not call asserNotFrozen in first place. KGR
+          cls.method({
+            name: 'assertNotFrozen',
+            visibility: 'public',
+            type: 'void',
+            body: `/* nop */`
           });
+
 
           var flagFilter = foam.util.flagFilter(['java']);
           var axioms = this.getAxioms().filter(flagFilter);
