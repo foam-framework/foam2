@@ -98,7 +98,7 @@ foam.CLASS({
       name: 'login',
       label: 'Sign in',
       code: async function(X) {
-        this.auth.loginByEmail(X, this.email, this.password).then(
+        this.auth.login(X, this.email, this.password).then(
           (logedInUser) => {
             if ( ! logedInUser ) return;
             if ( this.token_ ) {

@@ -217,7 +217,7 @@ public class AuthWebAgent
       }
 
       try {
-        User user = auth.loginByEmail(session.getContext()
+        User user = auth.login(session.getContext()
           .put(HttpServletRequest.class,  req)
           .put(HttpServletResponse.class, resp), email, password);
 
@@ -237,7 +237,7 @@ public class AuthWebAgent
         }
 
         // user should not be null, any login failure should throw an Exception
-        logger.error("AuthService.loginByEmail returned null user and did not throw AuthenticationException.");
+        logger.error("AuthService.login returned null user and did not throw AuthenticationException.");
         // TODO: generate stack trace.
         if ( ! SafetyUtil.isEmpty(authHeader) ) {
           resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

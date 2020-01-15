@@ -159,18 +159,6 @@ foam.CLASS({
     },
     {
       name: 'login',
-      documentation: `Login a user by the id provided, validate the password and
-        return the user in the context`,
-      javaCode: `
-        if ( userId < 1 || SafetyUtil.isEmpty(password) ) {
-          throw new AuthenticationException("Invalid Parameters");
-        }
-
-        return loginHelper(x, (User) ((DAO) getLocalUserDAO()).find(userId), password);
-      `
-    },
-    {
-      name: 'loginByEmail',
       javaCode: `
         User user = (User) ((DAO) getLocalUserDAO()).find(
           AND(
