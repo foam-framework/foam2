@@ -373,7 +373,7 @@ foam.CLASS({
           name: isSet,
           type: 'boolean',
           visibility: 'private',
-          initializer: 'false;'
+          initializer: 'false'
         }).
         method({
           name: 'get' + capitalized,
