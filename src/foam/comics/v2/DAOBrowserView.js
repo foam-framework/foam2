@@ -171,7 +171,8 @@ foam.CLASS({
       code: function() {
         this.add(this.Popup.create().tag({
           class: 'foam.u2.ExportModal',
-          exportData: this.predicatedDAO$proxy
+          exportData: this.predicatedDAO$proxy,
+          predicate: this.config.filterExportPredicate
         }));
       }
     }

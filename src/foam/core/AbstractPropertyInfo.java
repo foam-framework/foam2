@@ -23,6 +23,7 @@ public abstract class AbstractPropertyInfo
   implements PropertyInfo
 {
   protected ClassInfo parent;
+  protected byte[]    nameAsByteArray_ = null;
 
   @Override
   public PropertyInfo setClassInfo(ClassInfo p) {
@@ -51,7 +52,9 @@ public abstract class AbstractPropertyInfo
   }
 
   @Override
-  public void prepareStatement(IndexedPreparedStatement stmt) throws SQLException {}
+  public void prepareStatement(IndexedPreparedStatement stmt) throws SQLException {
+    /* Template Method: override in subclasses if required. */
+  }
 
   @Override
   public Object f(Object o) {
@@ -81,10 +84,10 @@ public abstract class AbstractPropertyInfo
       //set o2 prop into diff
       this.set(diff, this.get(o2));
       return true;
-    } else {
-      //return null if o1 and o2 are same
-      return false;
     }
+
+    // return false if o1 and o2 are same
+    return false;
   }
 
   public void setFromString(Object obj, String value) {
@@ -100,6 +103,7 @@ public abstract class AbstractPropertyInfo
       Logger logger = (Logger) x.get("logger");
       logger.error("Premature end of XML file");
     }
+
     return "";
   }
 
@@ -124,7 +128,11 @@ public abstract class AbstractPropertyInfo
   }
 
   @Override
-  public void validate(X x, FObject obj) throws IllegalStateException {}
+  public void validate(X x, FObject obj)
+    throws IllegalStateException
+  {
+    /* Template Method: override in subclasses if required. */
+  }
 
   @Override
   public boolean includeInDigest() {
@@ -154,28 +162,30 @@ public abstract class AbstractPropertyInfo
     // Since MLangs don't write values, we only need to check if the property
     // requires a read permission here.
     if ( this.getReadPermissionRequired() ) {
-      AuthService auth = (AuthService) x.get("auth");
-      String simpleName = this.getClassInfo().getObjClass().getSimpleName();
-
+      AuthService auth       = (AuthService) x.get("auth");
+      String simpleName      = this.getClassInfo().getObjClass().getSimpleName();
       String simpleNameLower = simpleName.toLowerCase();
-      String nameLower = this.getName().toLowerCase();
-      
+      String nameLower       = this.getName().toLowerCase();
+
       if ( ! auth.check(x, simpleNameLower + ".ro." + nameLower) && ! auth.check(x, simpleNameLower + ".rw." + nameLower)) {
         throw new AuthorizationException(String.format("Access denied. User lacks permission to access property '%s' on model '%s'.", this.getName(), simpleName));
-      };
+      }
     }
   }
 
   @Override
-  public void updateSignature(FObject obj, Signature sig) throws SignatureException {}
-
-  protected byte[] nameAsByteArray_ = null;
+  public void updateSignature(FObject obj, Signature sig)
+    throws SignatureException
+  {
+    /* Template Method: override in subclasses if required. */
+  }
 
   @Override
   public byte[] getNameAsByteArray() {
     if ( nameAsByteArray_ == null ) {
       nameAsByteArray_ = getName().getBytes(StandardCharsets.UTF_8);
     }
+
     return nameAsByteArray_;
   }
 }

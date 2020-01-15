@@ -25,7 +25,7 @@ foam.CLASS({
       name: 'dataType',
       view: function(_, X) {
         return foam.u2.view.ChoiceView.create({
-          dao: X.exportDriverRegistryDAO,
+          dao: X.exportDriverRegistryDAO.where(X.data.predicate),
           objToChoice: function(a) {
             return [a.id, a.id];
           }
@@ -36,6 +36,11 @@ foam.CLASS({
       name: 'note',
       view: 'foam.u2.tag.TextArea',
       value: ''
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.predicate.Predicate',
+      name: 'predicate'
     },
     'exportData',
     'exportObj'
