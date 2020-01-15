@@ -1993,6 +1993,7 @@ foam.CLASS({
         name: this.javaInfoName,
         visibility: 'public',
         static: true,
+        final: true,
         type: 'foam.core.MultitonInfo',
         initializer: `
 new foam.core.MultitonInfo("${this.javaName}", ${cls.name}.${foam.String.constantize(this.property)});
