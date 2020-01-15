@@ -105,6 +105,13 @@ foam.CLASS({
             });
         }
 
+        // Filter out any sections where we know that there are no actions and
+        // no visible properties.
+        sections = sections.filter(s => {
+          return s.actions.length > 0 ||
+                 s.properties.some(p => this.controllerMode.getMode(p) !== foam.u2.DisplayMode.HIDDEN);
+        });
+
         return sections;
       }
     }
