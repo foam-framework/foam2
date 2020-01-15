@@ -14,27 +14,34 @@ import foam.dao.DAO;
 import foam.nanos.mrac.quorum.*;
 import foam.nanos.mrac.*;
 import foam.lib.json.Outputter;
+import static foam.mlang.MLang.*;
+import foam.dao.ArraySink;
+import java.util.List;
 
 public class PingService
   implements WebAgent
 {
-
-
   public PingService() {}
 
   @Override
   public void execute(X x) {
     DAO clusterDAO = (DAO) x.get("clusterNodeDAO");
-    String clusterId = System.getProperty("CLUSTER");
+    String hostname = System.getProperty("hostname");
 
     //TODO: refactor this if statement.
-    if ( clusterDAO != null && (! "".equals(clusterId)) ) {
-      Long id = Long.parseLong(clusterId);
-      ClusterNode mySelf = (ClusterNode) clusterDAO.find_(x, id);
+    if ( clusterDAO != null && (! "".equals(hostname)) ) {
+      ClusterNode mySelf = null;
+
+      ArraySink sink = (ArraySink) clusterDAO
+                          .where(EQ(ClusterNode.HOST_NAME, hostname))
+                          .select(new ArraySink());
+      List list = sink.getArray();
       NodeStatus status = null;
+      if ( list.size() != 1 ) mySelf = (ClusterNode) list.get(0);
+
       if ( mySelf != null ) {
         status = new NodeStatus();
-        status.setId(id);
+        status.setId(mySelf.getId());
         status.setGroup(mySelf.getGroup());
         status.setHostName(mySelf.getIp() + ":" + mySelf.getServicePort());
         status.setInstanceType(mySelf.getType());

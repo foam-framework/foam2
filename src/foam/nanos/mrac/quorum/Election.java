@@ -7,6 +7,7 @@ package foam.nanos.mrac.quorum;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -22,14 +23,17 @@ import foam.dao.DAO;
 import foam.dao.Sink;
 import foam.mlang.MLang;
 import foam.nanos.mrac.ClusterNode;
+import static foam.mlang.MLang.*;
+import foam.dao.ArraySink;
+
 
 // This class should be singlton.
 public class Election extends AbstractFObject {
 
   // QuorumNetworkManager handles network communication for a Election.
   private final QuorumNetworkManager networkManager;
-  protected String clusterIdString = System.getProperty("CLUSTER");
-  protected Long clusterId;
+  protected String hostname = System.getProperty("hostname");
+  private long clusterId;
   ClusterNode mySelf;
 
   // Manage meta of current instance.
@@ -44,13 +48,19 @@ public class Election extends AbstractFObject {
   public Election(X x, QuorumNetworkManager networkManager, QuorumService quorumService) {
     System.out.println("Election");
     setX(x);
-    clusterId = Long.parseLong(clusterIdString);
     if ( x == null ) throw new RuntimeException("Context no found.");
     DAO clusterDAO = (DAO) x.get("clusterNodeDAO");
     if ( clusterDAO == null ) throw new RuntimeException("clusterNodeDAO no found.");
 
-    mySelf = (ClusterNode) clusterDAO.find(clusterId);
-    if ( mySelf == null ) throw new RuntimeException("ClusterNode no found: " + clusterId);
+    ArraySink sink = (ArraySink) clusterDAO
+                                  .where(EQ(ClusterNode.HOST_NAME, hostname))
+                                  .select(new ArraySink());
+    List list = sink.getArray();
+    if ( list.size() != 1 ) throw new RuntimeException("error on clusterNode journal");
+    ClusterNode myself = (ClusterNode) list.get(0);
+    clusterId = myself.getId();
+    //mySelf = (ClusterNode) clusterDAO.find(clusterId);
+    if ( mySelf == null ) throw new RuntimeException("ClusterNode no found: " + hostname);
 
     this.networkManager = networkManager;
     this.quorumService = quorumService;

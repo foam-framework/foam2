@@ -37,13 +37,16 @@ import foam.nanos.NanoService;
 import foam.nanos.box.NanoServiceRouter;
 import foam.nanos.logger.Logger;
 
+import static foam.mlang.MLang.*;
+import foam.dao.ArraySink;
+
 //Start a tcp service.
 public class TCPNioServer extends AbstractFObject implements NanoService {
 
 
   protected TcpNioRouter router_ = null;
   protected Logger logger   = (Logger) getX().get("logger");
-  protected String clusterIdString = System.getProperty("CLUSTER");
+  protected String hostname = System.getProperty("hostname");
   protected Long clusterId;
   //TODO: Do not hard code this field.
   // protected int maxConnectionPerClient = 50;
@@ -61,12 +64,17 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
   public void start() throws Exception {
     System.out.println("<><><><><><><<><>");
     X x = getX();
-    clusterId = Long.parseLong(clusterIdString);
     if ( x == null ) throw new RuntimeException("Context no found.");
     DAO clusterDAO = (DAO) x.get("clusterNodeDAO");
     if ( clusterDAO == null ) throw new RuntimeException("clusterNodeDAO no found.");
 
-    ClusterNode myself = (ClusterNode) clusterDAO.find(clusterId);
+    ArraySink sink = (ArraySink) clusterDAO
+                                  .where(EQ(ClusterNode.HOST_NAME, hostname))
+                                  .select(new ArraySink());
+    List list = sink.getArray();
+    if ( list.size() != 1 ) throw new RuntimeException("error on clusterNode journal");
+    ClusterNode myself = (ClusterNode) list.get(0);
+    //ClusterNode myself = (ClusterNode) clusterDAO.find(clusterId);
     if ( myself == null ) throw new RuntimeException("ClusterNode no found: " + clusterId);
 
 

@@ -24,12 +24,14 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static foam.mlang.MLang.*;
+import foam.dao.ArraySink;
+
 // Initial QuorumNetworkManager and Election.
 // Start voting.
 public class QuorumService extends AbstractFObject implements NanoService {
 
-  protected String clusterIdString = System.getProperty("CLUSTER");
-  protected Long clusterId;
+  protected String hostname = System.getProperty("hostname");
   public ClusterNode mySelf;
   private QuorumNetworkManager networkManager;
   private Election election;
@@ -51,13 +53,19 @@ public class QuorumService extends AbstractFObject implements NanoService {
   public void start() throws Exception {
     System.out.println("QuorumServer");
     X x = getX();
-    clusterId = Long.parseLong(clusterIdString);
     if ( x == null ) throw new RuntimeException("Context no found.");
     clusterDAO = (DAO) x.get("clusterNodeDAO");
     if ( clusterDAO == null ) throw new RuntimeException("clusterNodeDAO no found.");
 
-    mySelf = (ClusterNode) clusterDAO.find(clusterId);
-    if ( mySelf == null ) throw new RuntimeException("ClusterNode no found: " + clusterId);
+    ArraySink sink = (ArraySink) clusterDAO
+                                  .where(EQ(ClusterNode.HOST_NAME, hostname))
+                                  .select(new ArraySink());
+    List list = sink.getArray();
+    if ( list.size() != 1 ) throw new RuntimeException("error on clusterNode journal");
+    ClusterNode myself = (ClusterNode) list.get(0);
+
+    //mySelf = (ClusterNode) clusterDAO.find(clusterId);
+    if ( mySelf == null ) throw new RuntimeException("ClusterNode no found: " + hostname);
 
     networkManager = new QuorumNetworkManager(x);
     election = new Election(x, networkManager, this);

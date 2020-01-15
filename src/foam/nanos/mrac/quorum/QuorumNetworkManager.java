@@ -19,6 +19,7 @@ import java.net.SocketTimeoutException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.List;
 
 import foam.core.AbstractFObject;
 import foam.core.FObject;
@@ -29,6 +30,8 @@ import foam.lib.json.JSONParser;
 import foam.lib.json.Outputter;
 import foam.nanos.mrac.ClusterNode;
 import foam.core.X;
+import static foam.mlang.MLang.*;
+import foam.dao.ArraySink;
 
 
 public class QuorumNetworkManager extends AbstractFObject {
@@ -36,8 +39,7 @@ public class QuorumNetworkManager extends AbstractFObject {
   ConcurrentHashMap<Long, Sender> instanceToSenderMap;
   ConcurrentHashMap<Long, ArrayBlockingQueue<QuorumMessage>> instanceToQueueMap;
   public ArrayBlockingQueue<QuorumMessage> receiveQueue;
-  protected String clusterIdString = System.getProperty("CLUSTER");
-  protected Long clusterId;
+  protected String hostname = System.getProperty("hostname");
   ClusterNode mySelf;
   public volatile boolean isRunning = true;
   private final Server server;
@@ -45,13 +47,18 @@ public class QuorumNetworkManager extends AbstractFObject {
   public QuorumNetworkManager(X x) {
     System.out.println("QuorumNetworkManager");
     setX(x);
-    clusterId = Long.parseLong(clusterIdString);
     if ( x == null ) throw new RuntimeException("Context no found.");
     DAO clusterDAO = (DAO) x.get("clusterNodeDAO");
     if ( clusterDAO == null ) throw new RuntimeException("clusterNodeDAO no found.");
 
-    mySelf = (ClusterNode) clusterDAO.find(clusterId);
-    if ( mySelf == null ) throw new RuntimeException("ClusterNode no found: " + clusterId);
+    ArraySink sink = (ArraySink) clusterDAO
+                                  .where(EQ(ClusterNode.HOST_NAME, hostname))
+                                  .select(new ArraySink());
+    List list = sink.getArray();
+    if ( list.size() != 1 ) throw new RuntimeException("error on clusterNode journal");
+    ClusterNode myself = (ClusterNode) list.get(0);
+    //ClusterNode myself = (ClusterNode) clusterDAO.find(clusterId);
+    if ( myself == null ) throw new RuntimeException("ClusterNode no found: " + hostname);
 
     receiveQueue = new ArrayBlockingQueue<QuorumMessage>(200);
     instanceToQueueMap = new ConcurrentHashMap<Long, ArrayBlockingQueue<QuorumMessage>>();
