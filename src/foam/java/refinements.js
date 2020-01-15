@@ -723,11 +723,13 @@ foam.CLASS({
          catch (Throwable t) {
            foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
            logger.error(t.getMessage());
-         }
+         }\n
         `
       }
 
-      if ( this.javaType == 'void' ) initializerString += '            return null;\n';
+      if ( exceptions || this.javaType == 'void' ) {
+        initializerString += "return null;"
+      }
 
       initializerString += `}
       }
