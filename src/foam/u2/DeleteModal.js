@@ -58,7 +58,7 @@ foam.CLASS({
         .start()
           .addClass(this.myClass('main'))
           .start('h2')
-            .add(this.TITLE).add(this.data.cls_.name).add('?')
+            .add(this.TITLE).add(this.data.model_.label).add('?')
           .end()
           .start('p')
             .add(`${this.CONFIRM_DELETE_1} ${this.data.toSummary()}?`)
