@@ -12,10 +12,10 @@ import java.util.regex.Pattern;
 public class SafetyUtil {
 
   // TODO: reuse Patterns and thread-local matchers
-  public static void assertPattern(String val, String pattern, String argumentName)
+  public static void assertPattern(String val, String patternStr, String argumentName)
     throws IllegalArgumentException
   {
-    Pattern pattern = Pattern.compile(pattern);
+    Pattern pattern = Pattern.compile(patternStr);
     if ( ! pattern.matcher(val).matches() )
       throw new IllegalArgumentException(argumentName);
   }
