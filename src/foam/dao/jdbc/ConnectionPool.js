@@ -83,9 +83,7 @@ foam.CLASS({
   pool.setUrl(getConnectionString());
   pool.setInitialSize(getPoolSize());
   setPool(pool);
-} catch (Exception e) {
-  e.printStackTrace();
-}`
+} catch (Exception e) {}`
     },
     {
       name: 'getConnection',
