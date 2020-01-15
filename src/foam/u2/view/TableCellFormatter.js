@@ -160,7 +160,7 @@ foam.CLASS({
             // TODO: Replace currencyDAO with unitDAO
             return foam.core.PromiseSlot.create({
               promise: obj.__context__.currencyDAO.find(unitId).then((unit) => {
-                var formatted = unit.format(propValue);
+                var formatted = unit ? unit.format(propValue) : propValue;
                 self.tooltip = formatted;
                 return formatted;
               })
