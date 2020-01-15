@@ -165,7 +165,7 @@ public class RuleEngine extends ContextAwareSupport {
       isActive = ((LifecycleAware) rule).getLifecycleState() == LifecycleState.ACTIVE;
     }
 
-    return 
+    return
          isActive
       && rule.getAction() != null
       && rule.f(userX_, obj, oldObj);
@@ -192,7 +192,7 @@ public class RuleEngine extends ContextAwareSupport {
             rule.asyncApply(x, nu, oldObj, RuleEngine.this, rule);
             saveHistory(rule, nu);
           } catch (Exception ex) {
-            logger.warning("Retry asyncApply rule: " + rule.getId(), ex);
+            logger.warning("Retry asyncApply rule(" + rule.getId() + ").", ex);
             retryAsyncApply(x, rule, nu, oldObj);
           }
         }

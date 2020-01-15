@@ -31,9 +31,7 @@ public class RetryManager {
         retry();
       } else {
         ((Logger) x_.get("logger")).error(
-          String.format("RetryManager(%s) max retry reached.", description_)
-          , exception_
-        );
+          "RetryManager(" + description_ + ") max retry reached.", exception_);
       }
     }
 
