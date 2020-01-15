@@ -2,6 +2,7 @@ package foam.nanos.ruler;
 
 import foam.core.ContextAgent;
 import foam.core.X;
+import foam.nanos.logger.Logger;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -11,6 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class RetryManager {
   protected final int      maxRetry_;
   protected final int      retryDelay_;
+  protected final String   description_;
   protected CountDownLatch latch_;
 
   class Retry {
@@ -26,6 +28,9 @@ public class RetryManager {
     public void start() {
       if ( retryCount_.getAndIncrement() < maxRetry_ ) {
         retry();
+      } else {
+        ((Logger) x_.get("logger")).error(String.format(
+          "RetryManager(%s) max retry reached.", description_));
       }
     }
 
@@ -47,13 +52,14 @@ public class RetryManager {
     }
   }
 
-  public RetryManager() {
-    this(5, 10000);
+  public RetryManager(String description) {
+    this(5, 10000, description);
   }
 
-  public RetryManager(int maxRetry, int retryDelay) {
+  public RetryManager(int maxRetry, int retryDelay, String description) {
     maxRetry_ = maxRetry;
     retryDelay_ = retryDelay;
+    description_ = description;
     latch_ = new CountDownLatch(maxRetry);
   }
 
