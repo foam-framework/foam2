@@ -88,7 +88,7 @@ foam.CLASS({
 
     foam.box.RPCMessage rpc      = (foam.box.RPCMessage) message.getObject();
     foam.box.Box        replyBox = (foam.box.Box) message.getAttributes().get("replyBox");
-    Object              result   = null;
+    <% if ( hasReturn ) { %>Object              result   = null;<% } %>
 
     try {
       switch ( rpc.getName() ) {<%
@@ -130,9 +130,9 @@ foam.CLASS({
 
     if ( replyBox != null ) {
       foam.box.RPCReturnMessage reply = (foam.box.RPCReturnMessage)getX().create(foam.box.RPCReturnMessage.class);
-      if ( result != null ) {
+      <% if ( hasReturn ) { %>if ( result != null ) {
         reply.setData(result);
-      }
+      }<% } %>
 
       foam.box.Message message1 = getX().create(foam.box.Message.class);
       message1.setObject(reply);
