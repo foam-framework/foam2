@@ -12,11 +12,7 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.dao.DAO',
-    'foam.nanos.notification.Notification',
-    'foam.util.SafetyUtil',
-    'java.util.Calendar',
-    'java.util.Date'
+    'java.util.Calendar'
   ],
 
   documentation: `
