@@ -30,6 +30,7 @@ foam.CLASS({
     {
       name: 'last',
       class: 'Boolean',
+      synchronized: true,
       value: true,
       documentation: 'True if no new Assembly is waiting for this task to complete.'
     },
