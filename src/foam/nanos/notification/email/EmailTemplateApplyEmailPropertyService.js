@@ -15,7 +15,6 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.nanos.notification.email.DAOResourceLoader',
     'foam.nanos.logger.Logger',
     'foam.util.SafetyUtil'
   ],

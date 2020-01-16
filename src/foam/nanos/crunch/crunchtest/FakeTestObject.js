@@ -16,8 +16,6 @@ foam.CLASS({
     ],
   
     javaImports: [
-      'foam.nanos.auth.AuthorizationException',
-      'foam.nanos.auth.AuthService',
       'foam.util.SafetyUtil'
     ],
   
