@@ -601,7 +601,7 @@ foam.LIB({
           body: 'setX(x);'
         });
 
-        if ( props.length ) {
+        if ( props.length && props.length < 7 ) {
           // All-property constructor
           cls.method({
             visibility: 'public',
