@@ -285,6 +285,7 @@ var classes = [
   'foam.comics.v2.CannedQuery',
   'foam.comics.v2.namedViews.NamedViewCollection',
   'foam.comics.v2.namedViews.NamedViewInstance',
+  'foam.comics.v2.userfeedback.UserFeedbackAware',
   'foam.comics.v2.userfeedback.UserFeedbackStatus',
   'foam.comics.v2.userfeedback.UserFeedback',
   'foam.comics.v2.userfeedback.UserFeedbackException',
