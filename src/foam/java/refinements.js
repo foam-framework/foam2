@@ -569,7 +569,7 @@ foam.LIB({
           visibility: 'public',
           type: 'Object',
           name: 'getPrimaryKey',
-          body: 'return (Object)getId();'
+          body: 'return getId();'
         });
       }
 
