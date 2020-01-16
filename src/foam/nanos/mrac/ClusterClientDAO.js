@@ -48,9 +48,11 @@ foam.CLASS({
            ! service.getIsPrimary() ) {
         foam.core.FObject old = getMdao().find_(x, obj.getProperty("id"));
         foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(x).setPropertyPredicate(new foam.lib.ClusterPropertyPredicate());
-        String record = ( old != null ) ?
-          outputter.stringifyDelta(old, obj) :
-          outputter.stringify(obj);
+        //TODO: outputDelta has problem when output array. Fix bugs then use output delta.
+        // String record = ( old != null ) ?
+        //   outputter.stringifyDelta(old, obj) :
+        //   outputter.stringify(obj);
+        String record = outputter.stringify(obj);
         logger.debug("record", record);
         if ( foam.util.SafetyUtil.isEmpty(record) ||
             "{}".equals(record.trim()) ) {
