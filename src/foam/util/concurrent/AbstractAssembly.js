@@ -92,6 +92,7 @@ foam.CLASS({
              wait();
            } catch (InterruptedException e) {
              // NOP
+             Thread.currentThread().interrupt();
            }
          }
       `
