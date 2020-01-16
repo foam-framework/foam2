@@ -51,12 +51,6 @@ public class MMDAO extends JDAO {
     new foam.dao.FileJournal.Builder(resourceStorageX)
       .setFilename(fileName+".0").build().replay(x, dao);
 
-    System.out.println(">>>>>>>>nspecKey: " + nspecKey);
-    dao.select(new AbstractSink() {
-              public void put(Object obj, Detachable sub) {
-                System.out.println(obj);
-              }});
-
     this.nspecKey = nspecKey;
     setDelegate(dao);
     this.mnPort = mnPort;
@@ -67,7 +61,6 @@ public class MMDAO extends JDAO {
   //TODO: move lock to here
   @Override
   public FObject put_(X x, FObject obj) {
-    System.out.println("put>>>>>>>>>><<<<<<<<");
     if ( obj == null ) throw new RuntimeException("obj is null");
 
     Object id = ((Identifiable) obj).getPrimaryKey();
@@ -87,7 +80,6 @@ public class MMDAO extends JDAO {
   //Remove synchronized key word.
   @Override
   public FObject remove_(X x, FObject obj) {
-    System.out.println("remove>>>>>>>>>>><<<<<<<");
     if ( obj == null ) throw new RuntimeException("obj is null");
 
     Object id = ((Identifiable) obj).getPrimaryKey();
