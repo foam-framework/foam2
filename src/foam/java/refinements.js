@@ -1023,12 +1023,8 @@ foam.CLASS({
       var info = this.SUPER(cls);
 
       var m = info.getMethod('cast');
-      m.body = `return ( o instanceof Number ) ?
-        ((Number)o).intValue() :
-        ( o instanceof String ) ?
-        Integer.valueOf((String) o) :
-        (int)o;`;
-
+      m.body = `int i = ( o instanceof String ) ? Integer.valueOf((String) o) : (int) o;
+        return ( o instanceof Number ) ? ((Number) o).intValue() : i;`;
       return info;
     }
   ]
@@ -1053,12 +1049,8 @@ foam.CLASS({
       var info = this.SUPER(cls);
 
       var m = info.getMethod('cast');
-      m.body = `return ( o instanceof Number ) ?
-        ((Number)o).byteValue() :
-        ( o instanceof String ) ?
-        Byte.valueOf((String) o) :
-        (byte)o;`;
-
+      m.body = `byte b = ( o instanceof String ) ? Byte.valueOf((String) o) : (byte)o;
+        return ( o instanceof Number ) ? ((Number)o).byteValue() : b;`;
       return info;
     }
   ]
@@ -1083,12 +1075,8 @@ foam.CLASS({
       var info = this.SUPER(cls);
 
       var m = info.getMethod('cast');
-      m.body = `return ( o instanceof Number ) ?
-        ((Number)o).shortValue() :
-        ( o instanceof String ) ?
-        Short.valueOf((String) o) :
-        (short)o;`;
-
+      m.body = `short s = ( o instanceof String ) ? Short.valueOf((String) o) : (short)o;
+        return ( o instanceof Number ) ? ((Number)o).shortValue() : s;`;
       return info;
     }
   ]
@@ -1116,12 +1104,8 @@ foam.CLASS({
       var info = this.SUPER(cls);
 
       var m = info.getMethod('cast');
-      m.body = `return ( o instanceof Number ) ?
-        ((Number) o).longValue() :
-        ( o instanceof String ) ?
-        Long.valueOf((String) o) :
-        (long) o;`;
-
+      m.body = `long l = ( o instanceof String ) ? Long.valueOf((String) o) : (long) o;
+        return ( o instanceof Number ) ? ((Number) o).longValue() : l;`;
       return info;
     }
   ]
@@ -1145,12 +1129,8 @@ foam.CLASS({
       var info = this.SUPER(cls);
 
       var m = info.getMethod('cast');
-      m.body = `return ( o instanceof Number ) ?
-        ((Number)o).doubleValue() :
-        ( o instanceof String ) ?
-        Double.parseDouble((String) o) :
-        (double)o;`;
-
+      m.body = `double d = ( o instanceof String ) ? Double.parseDouble((String) o) : (double)o;
+        return ( o instanceof Number ) ? ((Number)o).doubleValue() : d;`;
       return info;
     }
   ]
@@ -1175,12 +1155,8 @@ foam.CLASS({
       var info = this.SUPER(cls);
 
       var m = info.getMethod('cast');
-      m.body = `return ( o instanceof Number ) ?
-        ((Number)o).floatValue() :
-        ( o instanceof String ) ?
-        Float.parseFloat((String) o) :
-        (float)o;`;
-
+      m.body = `float f = ( o instanceof String ) ? Float.parseFloat((String) o) : (float)o;
+        return ( o instanceof Number ) ? ((Number)o).floatValue() : f;`;
       return info;
     }
   ]
