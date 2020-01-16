@@ -97,14 +97,14 @@ foam.CLASS({
     }
   ],
 
-  properties: [
-    {
-      name: 'userFeedback',
-      class: 'FObjectProperty',
-      of: 'foam.comics.v2.userfeedback.UserFeedback',
-      storageTransient: true
-    }
-  ],
+  // properties: [
+  //   {
+  //     name: 'userFeedback',
+  //     class: 'FObjectProperty',
+  //     of: 'foam.comics.v2.userfeedback.UserFeedback',
+  //     storageTransient: true
+  //   }
+  // ],
 
   methods: [
     {
