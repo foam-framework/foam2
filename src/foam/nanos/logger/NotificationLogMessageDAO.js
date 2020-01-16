@@ -20,8 +20,7 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.dao.DAO',
-    'foam.core.X',
+    'foam.dao.DAO'
   ],
 
   requires: [
