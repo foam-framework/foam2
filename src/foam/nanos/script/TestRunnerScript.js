@@ -167,7 +167,7 @@ foam.CLASS({
           printOutput(test);
         }
         catch ( Exception e ) {
-          Logger logger = (Logger) getX().get("logger");
+          Logger logger = (Logger) x.get("logger");
           logger.error(e);
           setFailedTests(getFailedTests() + 1);
           addToFailedTestsList(test);
