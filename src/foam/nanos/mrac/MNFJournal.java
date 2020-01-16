@@ -64,10 +64,11 @@ public class MNFJournal extends FileJournal {
   private int fileSize;
   private FileMeta lastFileMeta;
   private int entryCount = 0;
-
+  private Logger logger;
   private MNFJournal(X x, String filename) {
     try {
       setX(x);
+      logger = (Logger) x.get("logger");
       fileMetaDAO = (DAO) x.get("fileMetaDAO");
       if ( fileMetaDAO == null ) throw new RuntimeException("fileMetaDAO miss");
       this.filename = filename;
@@ -129,7 +130,7 @@ public class MNFJournal extends FileJournal {
         this.outChannel = FileChannel.open(getPath(filename + "_" + String.valueOf(fileIndex)), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
       }
 
-      System.out.println(maxGlobalIndex);
+      logger.info(maxGlobalIndex);
     } catch ( IOException e ) {
       throw new RuntimeException(e);
     }
@@ -145,7 +146,6 @@ public class MNFJournal extends FileJournal {
 
   @Override
   public FObject put(X x, String prefix, DAO dao, FObject obj) {
-    System.out.println("MNPut");
     MedusaEntry entry = (MedusaEntry) obj;
     entry.setAction("p");
     String hash1 = entry.getHash1();
@@ -158,7 +158,7 @@ public class MNFJournal extends FileJournal {
        String myHash = byte2Hex(entry.getNu().hash(md));
        entry.setMyHash(myHash);
      } catch ( Exception e ) {
-       System.out.println(e);
+       logger.info(e);
        throw new RuntimeException(e);
      }
     String msg = new Outputter(x).stringify(obj);
@@ -180,7 +180,7 @@ public class MNFJournal extends FileJournal {
       String myHash = byte2Hex(entry.getNu().hash(md));
       entry.setMyHash(myHash);
     } catch ( Exception e ) {
-      System.out.println(e);
+      logger.info(e);
       throw new RuntimeException(e);
     }
     doWrite(x, new Outputter(x).stringify(obj) + "\n", entry.getMyIndex());
@@ -480,50 +480,6 @@ public class MNFJournal extends FileJournal {
         }
         return;
       }
-
-      //synchronized ( fileLock ) {
-      //  position = inChannel.size();
-
-      //  // Allocate 500M.
-      //  // TODO: make sure memory assign to this instance is bigger enough.
-      //  // ByteBuffer byteBuffer = ByteBuffer.allocate(524288000);
-      //  int blockSize = 1024;
-      //  ByteBuffer byteBuffer = ByteBuffer.allocate(blockSize);
-      //  ByteBuffer lengthBuffer = ByteBuffer.allocate(4);
-      //  int length = -1;
-
-      //  int totalBlock = (int) Math.ceil( (position/(double)blockSize));
-
-      //  // Send ACK to MM.
-      //  FilePacket filePacket = new FilePacket();
-      //  filePacket.setTotalBlock(totalBlock);
-      //  Outputter outputter = new Outputter(x);
-      //  String msg = outputter.stringify(filePacket);
-      //  System.out.println(msg);
-      //  byte[] bytes = msg.getBytes(Charset.forName("UTF-8"));
-      //  ByteBuffer ackBuffer = ByteBuffer.allocate(4 + bytes.length);
-      //  ackBuffer.putInt(bytes.length);
-      //  ackBuffer.put(bytes);
-      //  ackBuffer.flip();
-      //  socketChannel.write(ackBuffer);
-
-      //  while ( inChannel.position() < position ) {
-      //    lengthBuffer.clear();
-      //    byteBuffer.clear();
-      //    length = inChannel.read(byteBuffer);
-      //    lengthBuffer = lengthBuffer.putInt(length);
-
-      //    byteBuffer.flip();
-      //    lengthBuffer.flip();
-
-      //    while ( lengthBuffer.hasRemaining() ) { socketChannel.write(lengthBuffer); }
-      //    while ( byteBuffer.hasRemaining() ) { socketChannel.write(byteBuffer); }
-
-      //  }
-
-      //  //TODO: send finish ack
-      //  //TODO: activate sink;
-      //}
 
     } catch ( IOException e ) {
       try {
