@@ -13,6 +13,7 @@ foam.CLASS({
 
   javaImports: [
     'bsh.Interpreter',
+    'foam.nanos.logger.Logger',
     'foam.nanos.app.AppConfig',
     'foam.nanos.app.Mode',
     'foam.nanos.pm.PM',
@@ -175,6 +176,8 @@ foam.CLASS({
           setFailed(getFailed()+1);
           ps.println("FAILURE: "+e.getMessage());
           e.printStackTrace(ps);
+          Logger logger = (Logger) getX().get("logger");
+          logger.error(e);
         } finally {
           pm.log(x);
         }
