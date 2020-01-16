@@ -25,7 +25,7 @@ import foam.mlang.MLang;
 import foam.nanos.mrac.ClusterNode;
 import static foam.mlang.MLang.*;
 import foam.dao.ArraySink;
-
+import foam.nanos.logger.Logger;
 
 // This class should be singlton.
 public class Election extends AbstractFObject {
@@ -44,10 +44,11 @@ public class Election extends AbstractFObject {
   LinkedBlockingQueue<QuorumMessage> sendQueue;
   // Receiver will sanitize and put reponse into the queue.
   LinkedBlockingQueue<QuorumMessage> receptedQueue;
+  private Logger logger;
 
   public Election(X x, QuorumNetworkManager networkManager, QuorumService quorumService) {
-    System.out.println("Election");
     setX(x);
+    logger = (Logger) x.get("logger");
     if ( x == null ) throw new RuntimeException("Context no found.");
     DAO clusterDAO = (DAO) x.get("clusterNodeDAO");
     if ( clusterDAO == null ) throw new RuntimeException("clusterNodeDAO no found.");
@@ -168,7 +169,6 @@ public class Election extends AbstractFObject {
                 // If request instance lag this instance, send back message with current electionEra and CurrentVote.
                 if ( inMessage.getSourceStatus() == InstanceState.ELECTING
                 && inMessage.getVote().getElectionEra() < electionEra.get() ) {
-                  System.out.println("aa**ss");
                   Vote vote = getVote();
                   // Set electionEra of this instance into vote.
                   vote.setElectionEra(electionEra.get());
@@ -381,7 +381,7 @@ public class Election extends AbstractFObject {
             }
 
           } else {
-            System.out.println("error state.");
+            logger.info("error state.");
           }
         }
       }
@@ -416,7 +416,7 @@ public class Election extends AbstractFObject {
             // Give system enough time to handle inflight request.
             Thread.sleep(1000);
           } catch ( InterruptedException e ) {
-            System.out.println(e);
+            logger.info(e);
           }
           ClusterNode clusterNode = (ClusterNode) obj;
           QuorumMessage message = new QuorumMessage();

@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 import static foam.mlang.MLang.*;
 import foam.dao.ArraySink;
+import foam.nanos.logger.Logger;
 
 // Initial QuorumNetworkManager and Election.
 // Start voting.
@@ -45,14 +46,15 @@ public class QuorumService extends AbstractFObject implements NanoService {
   LinkedBlockingQueue<Electable> primaryElectables;
   LinkedBlockingQueue<Electable> secondaryElectables;
   LinkedBlockingQueue<Electable> unReadyElectables;
+  Logger logger;
 
   public boolean electing() {
     return false;
   }
 
   public void start() throws Exception {
-    System.out.println("QuorumServer");
     X x = getX();
+    logger = (Logger) getX().get("logger");
     if ( x == null ) throw new RuntimeException("Context no found.");
     clusterDAO = (DAO) x.get("clusterNodeDAO");
     if ( clusterDAO == null ) throw new RuntimeException("clusterNodeDAO no found.");
@@ -145,18 +147,16 @@ public class QuorumService extends AbstractFObject implements NanoService {
       while ( isRunning ) {
         if ( getMyState() == InstanceState.ELECTING ) {
           try {
-            System.out.println("ELECTING");
             setPrimaryVote(election.electingPrimary());
             setPrimaryClusterNode(getPrimaryVote().getPrimaryInstanceId());
-            System.out.println(">>>>>>>>>>>>>>>");
-            System.out.println("!!!!!!!!!!!!!end election");
-            System.out.println("*********Primary: " + getPrimaryVote().getPrimaryInstanceId());
+            logger.info("!!!!!!!!!!!!!end election");
+            logger.info("*********Primary: " + getPrimaryVote().getPrimaryInstanceId());
           } catch ( Exception e ) {
             e.printStackTrace();
             setMyState(InstanceState.ELECTING);
           }
         } else if ( getMyState() == InstanceState.PRIMARY ) {
-          System.out.println("Primary");
+          logger.info("Primary");
           CountDownLatch countDownLatch = new CountDownLatch(1);
           QuorumInitial quorumInitial = null;
           try {
@@ -169,7 +169,7 @@ public class QuorumService extends AbstractFObject implements NanoService {
               //once become primary. It will stay primary forever.
             }
           } catch ( Exception e ) {
-            System.out.println(e);
+            logger.info(e);
           } finally {
             exposeState = InstanceState.ELECTING;
             setMyState(InstanceState.ELECTING);
@@ -181,10 +181,10 @@ public class QuorumService extends AbstractFObject implements NanoService {
                 e.printStackTrace();
               }
             }
-            System.out.println("leave primary");
+            logger.info("leave primary");
           }
         } else if ( getMyState() == InstanceState.SECONDARY ) {
-          System.out.println("Secondary");
+          logger.info("Secondary");
           CountDownLatch countDownLatch = new CountDownLatch(1);
           QuorumInitial quorumInitial = null;
           try {
@@ -199,7 +199,7 @@ public class QuorumService extends AbstractFObject implements NanoService {
               try {
                 Thread.sleep(200);
               } catch ( InterruptedException e ) {
-                System.out.println(e);
+                logger.info(e);
               }
               // Heartbeat.
               ping(urlString,"");
@@ -219,15 +219,15 @@ public class QuorumService extends AbstractFObject implements NanoService {
                 e.printStackTrace();
               }
             }
-            System.out.println("leave Secondary");
+            logger.info("leave Secondary");
           }
         } else {
-          System.out.println("Wrong state");
+          logger.info("Wrong state");
           setMyState(InstanceState.ELECTING);
           exposeState = InstanceState.ELECTING;
         }
       }
-      System.out.println("end of election service");
+      logger.info("end of election service");
 
     }
 
@@ -260,7 +260,6 @@ public class QuorumService extends AbstractFObject implements NanoService {
           try {
             electable = unReadyElectables.poll(200, TimeUnit.MILLISECONDS);
             if ( electable == null ) continue;
-            System.out.println("aaaaaaaaaaaa");
             if ( getMyState() == InstanceState.PRIMARY ) {
               electable.primary();
               primaryElectables.put(electable);

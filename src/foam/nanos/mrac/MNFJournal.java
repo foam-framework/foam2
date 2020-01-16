@@ -41,6 +41,7 @@ import static foam.mlang.MLang.*;
 import foam.dao.ArraySink;
 import foam.lib.json.JSONParser;
 import foam.mlang.order.Desc;
+import foam.nanos.logger.Logger;
 
 
 // This class is different implementation of MNJournal.

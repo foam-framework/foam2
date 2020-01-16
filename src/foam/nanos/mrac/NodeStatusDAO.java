@@ -93,8 +93,6 @@ public class NodeStatusDAO
         sink.put(status, null);
         continue;
       }
-      System.out.println("response");
-      System.out.println(ret);
       NodeStatus response = (NodeStatus) x.create(JSONParser.class).parseString(ret);
 
       if ( response != null && response.getId() != -1 ) {

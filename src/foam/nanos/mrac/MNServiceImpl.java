@@ -16,7 +16,6 @@ public class MNServiceImpl implements MNService {
 
   //TODO: close socketChannel;
   public void replayAll(X x, String serviceName) {
-    System.out.println("replayreplayreplay");
     DAO dao = (DAO) x.get(serviceName);
 
     if ( dao == null ) throw new RuntimeException("DAO miss: " + serviceName);
@@ -50,7 +49,6 @@ public class MNServiceImpl implements MNService {
 
   }
   public void replayFrom(X x, String serviceName, long indexFrom) {
-    System.out.println("replayFromIndex: " + indexFrom);
     DAO dao = (DAO) x.get(serviceName);
 
     if ( dao == null ) throw new RuntimeException("DAO miss: " + serviceName);
