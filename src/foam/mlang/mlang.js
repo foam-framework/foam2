@@ -376,9 +376,6 @@ foam.CLASS({
   name: 'AbstractPredicate',
   abstract: true,
   implements: [ 'foam.mlang.predicate.Predicate' ],
-  javaImports: [
-    'foam.nanos.auth.AuthService',
-  ],
 
   documentation: 'Abstract Predicate base-class.',
 
