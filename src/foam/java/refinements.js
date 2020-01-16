@@ -392,6 +392,8 @@ foam.CLASS({
         }).
         method({
           name: 'set' + capitalized,
+          setter: true,
+          // Enum setters shouldn't be public.
           visibility: 'public',
           synchronized: this.synchronized,
           args: [
