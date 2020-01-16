@@ -282,7 +282,7 @@ foam.CLASS({
             name: 'createStatement',
             visibility: 'public',
             type: 'String',
-            body: 'return "' + this.propName.toLowerCase() + '";'
+            body: 'return getName();'
           },
           {
             name: 'isSet',
@@ -307,7 +307,7 @@ foam.CLASS({
               { name: 'x', type: 'foam.core.X' },
               { name: 'obj', type: 'foam.core.FObject' }
             ],
-            body: this.validateObj
+            body: this.validateObj || '/* Template Method: override in subclass if required. */'
           },
           {
             name: 'toCSV',

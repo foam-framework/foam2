@@ -124,6 +124,22 @@ foam.CLASS({
       `
     },
     {
+      name: 'hashCode',
+      type: 'Integer',
+      javaCode: `
+        int hashCode = 1;
+        List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
+        Iterator i = props.iterator();
+
+        while ( i.hasNext() ) {
+          PropertyInfo pi = (PropertyInfo) i.next();
+          hashCode = 31 * hashCode + java.util.Objects.hash(pi.get(this));
+        }
+
+        return hashCode;
+      `
+    },
+    {
       name: 'equals',
       type: 'Boolean',
       args: [ { name: 'o', type: 'Any' } ],
@@ -366,7 +382,6 @@ foam.CLASS({
           PropertyInfo prop = (PropertyInfo) i.next();
           if ( ! prop.includeInDigest() ) continue;
           if ( ! prop.isSet(this) ) continue;
-          //if ( prop.isDefaultValue(this) ) continue;
           md.update(prop.getNameAsByteArray());
           prop.updateDigest(this, md);
         }
@@ -390,7 +405,6 @@ foam.CLASS({
           PropertyInfo prop = (PropertyInfo) i.next();
           if ( ! prop.includeInDigest() ) continue;
           if ( ! prop.isSet(this) ) continue;
-          //if ( prop.isDefaultValue(this) ) continue;
           signer.update(prop.getNameAsByteArray());
           prop.updateSignature(this, signer);
         }
@@ -412,7 +426,6 @@ foam.CLASS({
           PropertyInfo prop = (PropertyInfo) i.next();
           if ( ! prop.includeInDigest() ) continue;
           if ( ! prop.isSet(this) ) continue;
-          //if ( prop.isDefaultValue(this) ) continue;
           verifier.update(prop.getNameAsByteArray());
           prop.updateSignature(this, verifier);
         }

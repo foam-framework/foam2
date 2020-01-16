@@ -2,9 +2,7 @@ foam.CLASS({
   package: 'foam.lib',
   name: 'AndPropertyPredicate',
   implements: [ 'foam.lib.PropertyPredicate'],
-  javaImports: [
-    'foam.nanos.auth.AuthService'
-  ],
+
   properties: [
     {
       class: 'Array',

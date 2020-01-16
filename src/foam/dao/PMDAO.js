@@ -20,8 +20,6 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.X',
-    'foam.mlang.order.Comparator',
-    'foam.mlang.predicate.Predicate',
     'foam.nanos.pm.PM'
   ],
 

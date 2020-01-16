@@ -16,12 +16,6 @@ foam.CLASS({
     'foam.dao.*',
     'foam.mlang.predicate.Predicate',
     'foam.nanos.auth.*',
-    'foam.nanos.pm.PM',
-    'foam.nanos.session.Session',
-    'java.io.ByteArrayOutputStream',
-    'java.io.PrintStream',
-    'java.util.Date',
-    'java.util.List',
     'static foam.mlang.MLang.*',
   ],
 
@@ -52,9 +46,7 @@ foam.CLASS({
 
       try {
         return (boolean) shell.eval(getCode());
-      } catch (Throwable e) {
-        e.printStackTrace();
-      }
+      } catch (Throwable e) {}
       return false;
       `
     },

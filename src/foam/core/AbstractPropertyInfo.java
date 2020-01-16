@@ -140,7 +140,9 @@ public abstract class AbstractPropertyInfo
   }
 
   @Override
-  public void updateDigest(FObject obj, MessageDigest md) {}
+  public void updateDigest(FObject obj, MessageDigest md) {
+    /* Template Method: override in subclasses if required. */
+  }
 
   @Override
   public boolean includeInSignature() {

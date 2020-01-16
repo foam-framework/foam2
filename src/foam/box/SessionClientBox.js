@@ -19,10 +19,6 @@ foam.CLASS({
     'group'
   ],
 
-  javaImports: [
-    'foam.nanos.auth.AuthenticationException'
-  ],
-
   properties: [
     {
       class: 'FObjectProperty',
