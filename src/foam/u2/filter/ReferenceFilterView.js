@@ -135,7 +135,6 @@ foam.CLASS({
       name: 'setOfReferenceIds',
       documentation: 'an array of unique reference ids',
       expression: function(daoContents) {
-        debugger;
         if ( ! daoContents ) return;
         return new Set(daoContents);
       }
@@ -314,7 +313,6 @@ foam.CLASS({
     {
       name: 'updateReferenceObjectsArray',
       code: function() {
-        debugger;
         if ( ! this.daoContents || this.daoContents.length === 0 ) return;
         var self = this;
         this.__subContext__[this.targetDAOName].where(this.IN(this.property.of.ID, this.daoContents)).select().then(function(result) {
