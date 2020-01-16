@@ -78,6 +78,7 @@ import java.security.MessageDigest;
 import java.nio.charset.StandardCharsets;
 
 import foam.lib.ClusterPropertyPredicate;
+import foam.nanos.logger.Logger;
 
 // Make sure that this class sould only have one instance in single journal mode.
 // In multiple journal mode. each JDAO will have it's own instance.
@@ -120,7 +121,9 @@ public class MMJournal extends AbstractJournal implements Electable {
     }
   }
 
+  Logger logger;
   private MMJournal(X x, String serviceName) {
+    logger = (Logger) x.get("logger");
     if ( x == null ) throw new RuntimeException("Miss Context");
     this.serviceName = serviceName;
     initial(x);
@@ -152,7 +155,6 @@ public class MMJournal extends AbstractJournal implements Electable {
           if ( groupToMN.get(clusterNode.getGroup()) == null ) {
             groupToMN.put(clusterNode.getGroup(), new ArrayList<ClusterNode>());
           }
-          System.out.println(clusterNode);
           groupToMN.get(clusterNode.getGroup()).add(clusterNode);
           availableNodes.add(clusterNode);
         }
@@ -308,14 +310,10 @@ public class MMJournal extends AbstractJournal implements Electable {
     int i = 0;
     int totalTry = groups.size();
     boolean isPersist = false;
-    System.out.println("totalTry");
-    System.out.println(totalTry);
 
     while ( i < totalTry ) {
-      System.out.println("try");
       ArrayList<ClusterNode> nodes = groups.get(index);
       Object[] tasks = new Object[nodes.size()];
-      System.out.println(nodes.size());
 
       for ( int j = 0 ; j < nodes.size() ; j++ ) {
         ClusterNode node = nodes.get(j);
@@ -340,8 +338,6 @@ public class MMJournal extends AbstractJournal implements Electable {
               String response = task.get();
               //TODO: a bug, return message format wrong.
               Message responseMessage = (Message) getX().create(JSONParser.class).parseString(response);
-              System.out.println("response>>>>>>>>");
-              System.out.println(response);
               p = (MedusaEntry) ((RPCReturnMessage) responseMessage.getObject()).getData();
               if ( p instanceof MedusaEntry ) {
                 check++;
@@ -351,7 +347,6 @@ public class MMJournal extends AbstractJournal implements Electable {
             } catch ( Exception e ) {
               //TODO: log error
               falseCheck++;
-              System.out.println(e);
             } finally {
               checks[j] = true;
             }
@@ -456,9 +451,8 @@ public class MMJournal extends AbstractJournal implements Electable {
       InputStream input = null;
 
       try {
-        System.out.println("aaaaccccc");
         URL url = new URL("Http", ip, port, "/service/" + serviceName);
-        System.out.println(url);
+        logger.info(url);
 
         conn = (HttpURLConnection) url.openConnection();
         conn.setDoOutput(true);
@@ -495,7 +489,7 @@ public class MMJournal extends AbstractJournal implements Electable {
 
         return  new String(buf, 0, off, StandardCharsets.UTF_8);
       } catch ( Exception e ) {
-        System.out.println(e);
+        logger.info(e);
         throw e;
       } finally {
         IOUtils.closeQuietly(output);
@@ -546,21 +540,17 @@ public class MMJournal extends AbstractJournal implements Electable {
   private volatile boolean isReplayed = false;
 
   public synchronized void pullData(X x, long fromIndex, boolean isListen) {
-    System.out.println(">>>>>>>>>>>>>>>>pull<<<<<<<<<<<<<<<");
     try {
       if ( isListen ) {
         initialListener(x);
       }
       initialReplay(x);
       List<MedusaEntry> entries = retrieveData(x, groupToMN, fromIndex);
-      System.out.println(">>>>>>>entry start");
       for ( MedusaEntry entry : entries ) {
         Outputter outputter = new Outputter(getX());
         String mn = outputter.stringify(entry);
-        System.out.println(mn);
       }
-      System.out.println("total entry receive in replay: " + entries.size());
-      System.out.println("--------entry end");
+      logger.info("total entry receive in replay: " + entries.size());
       cacheOrMDAO(entries);
     } catch ( Exception e ) {
       throw new RuntimeException(e);
@@ -573,7 +563,7 @@ public class MMJournal extends AbstractJournal implements Electable {
 
     try {
       isReplaying = true;
-      System.out.println("update with globalIndex: " + globalIndex.get());
+      logger.info("update with globalIndex: " + globalIndex.get());
       pullData(x , globalIndex.get(), isListen);
       isReplaying = false;
       needReplay = false;
@@ -593,7 +583,7 @@ public class MMJournal extends AbstractJournal implements Electable {
 
       registerDAOs.put(nspecKey, dao);
       if ( readyToUseEntry.get(nspecKey) == null ) {
-        System.out.println("No cached entry associated with: " + nspecKey);
+        logger.info("No cached entry associated with: " + nspecKey);
         return;
       }
       // Load cached entries into DAO.
@@ -614,11 +604,9 @@ public class MMJournal extends AbstractJournal implements Electable {
   // Help method for text only
   public void printReadyTOUseEntry() {
     for ( Map.Entry<String, List<MedusaEntry>> entry : readyToUseEntry.entrySet() ) {
-      System.out.println(entry.getKey() + ":");
       for ( MedusaEntry obj : entry.getValue() ) {
         Outputter outputter = new Outputter(getX());
         String mn = outputter.stringify(obj);
-        System.out.println(mn);
       }
     }
   }
@@ -664,8 +652,8 @@ public class MMJournal extends AbstractJournal implements Electable {
       //  md.update(indexHashMap.get(entry.getGlobalIndex1()).getBytes(StandardCharsets.UTF_8));
       //  md.update(indexHashMap.get(entry.getGlobalIndex2()).getBytes(StandardCharsets.UTF_8));
       //  String myHash = MNJournal.byte2Hex(entry.getNu().hash(md));
-      //  System.out.println(myHash);
-      //  System.out.println(entry.getMyHash());
+      //  logger.info(myHash);
+      //  logger.info(entry.getMyHash());
       //  if ( ! myHash.equals(entry.getMyHash()) ) {
       //    throw new RuntimeException("hash invalid");
       //  }
@@ -682,8 +670,7 @@ public class MMJournal extends AbstractJournal implements Electable {
       for ( MedusaEntry entry :  entries ) {
         cacheOrMDAO(entry);
       }
-      System.out.println("replay finish:");
-      System.out.println(globalIndex.get());
+      logger.info("replay finish: " + globalIndex.get());
     }
   }
 
@@ -712,7 +699,7 @@ public class MMJournal extends AbstractJournal implements Electable {
             throw new RuntimeException("Replay can not connect to: " + node.getId());
 
           nodeToSocketChannel.put(node.getId(), channel);
-          System.out.println(node.getId());
+          logger.info(node.getId());
           nodeToBuffers.put(node.getId(), retrieveDataFromNode(x, channel, fromIndex));
           count++;
         } catch ( Exception e ) {
@@ -728,9 +715,6 @@ public class MMJournal extends AbstractJournal implements Electable {
       groupToEntry.put(groupId, concatEntries(parseEntries(x, nodeToBuffers)));
     }
 
-    // System.out.println(">>>>>replay journal");
-    // printAll(x, groupToJournal);
-    // System.out.println("------replay journal end");
     return sortEntries(mergeEntries(groupToEntry));
 
   }
@@ -769,7 +753,7 @@ public class MMJournal extends AbstractJournal implements Electable {
     firstBlockInfo.flip();
     String blockInfoString = new String(firstBlockInfo.array(), 0, length, Charset.forName("UTF-8"));
     BlockInfo blockInfo = (BlockInfo) getX().create(JSONParser.class).parseString(blockInfoString);
-    System.out.println(blockInfoString);
+    logger.info(blockInfoString);
     while ( blockInfo.getEof() == false ) {
       if ( blockInfo.getAnyFailure() == true )
         throw new RuntimeException(blockInfo.getFailReason() + "\n" + blockInfo.getFailLine());
@@ -792,7 +776,7 @@ public class MMJournal extends AbstractJournal implements Electable {
       nextBlockInfo.flip();
       blockInfoString = new String(nextBlockInfo.array(), 0, length, Charset.forName("UTF-8"));
       blockInfo = (BlockInfo) getX().create(JSONParser.class).parseString(blockInfoString);
-      System.out.println(blockInfoString);
+      logger.info(blockInfoString);
     }
 
 
@@ -925,11 +909,11 @@ public class MMJournal extends AbstractJournal implements Electable {
     }
 
     List<MedusaEntry> entryList = new LinkedList<MedusaEntry>();
-    System.out.println("entryCount size: " + entryCount.size());
+    logger.info("entryCount size: " + entryCount.size());
     for ( Map.Entry<MedusaEntry, Integer> entry : entryCount.entrySet() ) {
       if ( entry.getValue().intValue() >= quorumSize ) entryList.add(entry.getKey());
     }
-    System.out.println("entryList size: " + entryList.size());
+    logger.info("entryList size: " + entryList.size());
     return entryList;
   }
 
@@ -980,7 +964,6 @@ public class MMJournal extends AbstractJournal implements Electable {
     }
 
     public boolean acceptSocketChannel(SocketChannel channel) {
-      System.out.println(isRunning);
       if ( isRunning && acceptedSocketChannels.offer(channel) ) {
         wakeup();
         return true;
@@ -999,7 +982,7 @@ public class MMJournal extends AbstractJournal implements Electable {
         //TODO: check if a bug when close.
         selector.close();
       } catch ( IOException e ) {
-        System.out.println(e);
+        logger.info(e);
       }
     }
 
@@ -1008,7 +991,6 @@ public class MMJournal extends AbstractJournal implements Electable {
 
       while ( isRunning && socketChannel != null ) {
         SelectionKey key = null;
-        System.out.println("new connection");
         try {
           socketChannel.configureBlocking(false);
           socketChannel.socket().setSoLinger(false, -1);
@@ -1018,7 +1000,7 @@ public class MMJournal extends AbstractJournal implements Electable {
           registerChannels.add(socketChannel);
 
         } catch ( IOException e ) {
-          System.out.println(e);
+          logger.info(e);
           TCPNioServer.removeSelectionKey(key);
           TCPNioServer.hardCloseSocketChannel(socketChannel);
         }
@@ -1036,7 +1018,7 @@ public class MMJournal extends AbstractJournal implements Electable {
           iterator.remove();
 
           if ( key.isConnectable() ) {
-            System.out.println("client connect success");
+            logger.info("client connect success");
             SocketChannel channel=(SocketChannel)key.channel();
             if(channel.isConnectionPending()){
               channel.finishConnect();
@@ -1059,7 +1041,7 @@ public class MMJournal extends AbstractJournal implements Electable {
           }
         }
       } catch ( IOException e ) {
-        System.out.println(e);
+        logger.info(e);
       }
     }
 
@@ -1090,17 +1072,17 @@ public class MMJournal extends AbstractJournal implements Electable {
           msgBuf.clear();
         }
 
-        System.out.println("broadcast: " + msgStr);
+        logger.info("broadcast: " + msgStr);
 
         FObject msg = getX().create(JSONParser.class).parseString(msgStr);
 
         if ( msg == null ) {
-          System.out.println("Failed to parse request: " + msg);
+          logger.info("Failed to parse request: " + msg);
           return;
         }
 
         if ( ! ( msg instanceof MedusaEntry ) ) {
-          System.out.println(msgStr);
+          logger.info(msgStr);
           return;
         }
 
@@ -1108,21 +1090,19 @@ public class MMJournal extends AbstractJournal implements Electable {
 
         processEntry(groupId, entry);
       } catch ( IOException e ) {
-        System.out.println(e);
+        logger.info(e);
         TCPNioServer.removeSelectionKey(key);
         TCPNioServer.hardCloseSocketChannel(socketChannel);
       }
     }
 
     private void initialRequest(SelectionKey key) {
-      System.out.println("write");
       SocketChannel socketChannel = null;
       try {
         socketChannel = (SocketChannel) key.channel();
         String tcpMsgStr = createListenMessageString(serviceName, "");
         // Outputter outputter = new Outputter(x);
         // String tcpMsgStr = outputter.stringify(tcpMsg);
-        System.out.println(tcpMsgStr);
         byte[] bytes = tcpMsgStr.getBytes(Charset.forName("UTF-8"));
         ByteBuffer tcpMsgBuf = ByteBuffer.allocate(4 + bytes.length);
         tcpMsgBuf.putInt(bytes.length);
@@ -1168,7 +1148,7 @@ public class MMJournal extends AbstractJournal implements Electable {
   private volatile EntryLoader loader;
 
   private void initialListener(X x) throws IOException {
-    System.out.println("initialListerner");
+    logger.info("initialListerner");
     if ( processorsMap != null ) {
       for ( Map.Entry<Long, Processor> entry : processorsMap.entrySet() ) {
         entry.getValue().close();
@@ -1269,9 +1249,6 @@ public class MMJournal extends AbstractJournal implements Electable {
 
   private void addEntryIntoCachedMap(MedusaEntry entry) {
     synchronized ( cachedEntryMapLock ) {
-      System.out.println("cache");
-      System.out.println("entry");
-      System.out.println(globalIndex.get());
       cachedEntryMap.put(entry.getMyIndex(), entry);
     }
   }
@@ -1279,7 +1256,7 @@ public class MMJournal extends AbstractJournal implements Electable {
   //TODO: create a queue.
   private void processEntryFromCachedMap(Long index) {
     if ( cachedEntryMap.get(index) != null ) {
-      System.out.println("queeueque");
+      logger.info("queeueque");
       synchronized ( cachedEntryMapLock ) {
         cacheOrMDAO(cachedEntryMap.get(index));
         cachedEntryMap.remove(index);
@@ -1316,7 +1293,7 @@ public class MMJournal extends AbstractJournal implements Electable {
     @Override
     public void run() {
       while ( needReplay = false && isRunning ) {}
-      System.out.println("replay finish. entryloader start");
+      logger.info("replay finish. entryloader start");
       while ( isRunning ) {
         try {
           if ( quorumService.exposeState == InstanceState.PRIMARY ) continue;
@@ -1364,7 +1341,6 @@ public class MMJournal extends AbstractJournal implements Electable {
             String entry = new String(entryBytes, 0, carryOverLength, Charset.forName("UTF-8"));
             carryOverBytes = null;
             carryOverLength = -1;
-            System.out.println(entry);
           }
           while ( buffer.hasRemaining() ) {
             int length;
@@ -1390,7 +1366,7 @@ public class MMJournal extends AbstractJournal implements Electable {
               byte[] bytes = new byte[length];
               buffer.get(bytes);
               String entry = new String(bytes, 0, length, Charset.forName("UTF-8"));
-              System.out.println(entry);
+              logger.info(entry);
               carryOverBytes = null;
               carryOverLength = -1;
               carryOverLengthBytes = null;
@@ -1405,7 +1381,7 @@ public class MMJournal extends AbstractJournal implements Electable {
   public synchronized void primary() {
     this.updateData(null, false);
     currentState = InstanceState.PRIMARY;
-    System.out.println("start primary: " + serviceName);
+    logger.info("start primary: " + serviceName);
   }
 
   public boolean isPrimary() {
@@ -1415,7 +1391,7 @@ public class MMJournal extends AbstractJournal implements Electable {
   public synchronized void secondary() {
     updateData(null, true);
     currentState = InstanceState.SECONDARY;
-    System.out.println("start secondary: " + serviceName);
+    logger.info("start secondary: " + serviceName);
   }
 
   public boolean isSecondary() {
@@ -1424,7 +1400,7 @@ public class MMJournal extends AbstractJournal implements Electable {
 
   public synchronized void leaveSecondary() {
     currentState = InstanceState.ELECTING;
-    System.out.println("leaveSecondary");
+    logger.info("leaveSecondary");
     cleanConnection();
     stopListener(null);
     needReplay = true;
