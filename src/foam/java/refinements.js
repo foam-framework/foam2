@@ -53,15 +53,11 @@ foam.LIB({
         },
         Null: function(n) { return "null"; },
         Object: function(o) {
-          return `
-new java.util.HashMap() {
-  {
-${Object.keys(o).map(function(k) {
-  return `  put(${foam.java.asJavaValue(k)}, ${foam.java.asJavaValue(o[k])});`
+          return `foam.util.Arrays.asHashMap(new Object[] {
+${Object.keys(o).map(function(k, i, a) {
+  return `  ${foam.java.asJavaValue(k)}, ${foam.java.asJavaValue(o[k])}` + ((i == a.length-1) ? '' : ',')
 }).join('\n')}
-  }
-}
-          `;
+})`;
         },
         RegExp: function(o) {
           o = o.toString();
@@ -334,7 +330,6 @@ foam.CLASS({
       };
 
       // set value
-      setter += `boolean oldIsSet = ${this.name}IsSet_;\n`;
       // Don't include oldVal if not used
       if ( this.javaPostSet && this.javaPostSet.indexOf('oldVal') != -1 ) {
         setter += `${this.javaType} oldVal = ${this.name}_;\n`;
@@ -376,7 +371,7 @@ foam.CLASS({
           name: isSet,
           type: 'boolean',
           visibility: 'private',
-          initializer: 'false;'
+          initializer: 'false'
         }).
         method({
           name: 'get' + capitalized,
@@ -392,6 +387,8 @@ foam.CLASS({
         }).
         method({
           name: 'set' + capitalized,
+          setter: true,
+          // Enum setters shouldn't be public.
           visibility: 'public',
           synchronized: this.synchronized,
           args: [
@@ -568,18 +565,9 @@ foam.LIB({
           visibility: 'public',
           type: 'Object',
           name: 'getPrimaryKey',
-          body: 'return (Object)getId();'
+          body: 'return getId();'
         });
       }
-
-      cls.method({
-        name: 'hashCode',
-        type: 'int',
-        visibility: 'public',
-        body: `return java.util.Objects.hash(${cls.allProperties.map(function(p) {
-          return '(Object) ' + p.name + '_';
-        }).join(',')});`
-      });
 
       if ( cls.name ) {
         var props = cls.allProperties;
@@ -601,7 +589,7 @@ foam.LIB({
           body: 'setX(x);'
         });
 
-        if ( props.length ) {
+        if ( props.length && props.length < 7 ) {
           // All-property constructor
           cls.method({
             visibility: 'public',
@@ -1029,12 +1017,8 @@ foam.CLASS({
       var info = this.SUPER(cls);
 
       var m = info.getMethod('cast');
-      m.body = `return ( o instanceof Number ) ?
-        ((Number)o).intValue() :
-        ( o instanceof String ) ?
-        Integer.valueOf((String) o) :
-        (int)o;`;
-
+      m.body = `int i = ( o instanceof String ) ? Integer.valueOf((String) o) : (int) o;
+        return ( o instanceof Number ) ? ((Number) o).intValue() : i;`;
       return info;
     }
   ]
@@ -1059,12 +1043,8 @@ foam.CLASS({
       var info = this.SUPER(cls);
 
       var m = info.getMethod('cast');
-      m.body = `return ( o instanceof Number ) ?
-        ((Number)o).byteValue() :
-        ( o instanceof String ) ?
-        Byte.valueOf((String) o) :
-        (byte)o;`;
-
+      m.body = `byte b = ( o instanceof String ) ? Byte.valueOf((String) o) : (byte)o;
+        return ( o instanceof Number ) ? ((Number)o).byteValue() : b;`;
       return info;
     }
   ]
@@ -1089,12 +1069,8 @@ foam.CLASS({
       var info = this.SUPER(cls);
 
       var m = info.getMethod('cast');
-      m.body = `return ( o instanceof Number ) ?
-        ((Number)o).shortValue() :
-        ( o instanceof String ) ?
-        Short.valueOf((String) o) :
-        (short)o;`;
-
+      m.body = `short s = ( o instanceof String ) ? Short.valueOf((String) o) : (short)o;
+        return ( o instanceof Number ) ? ((Number)o).shortValue() : s;`;
       return info;
     }
   ]
@@ -1122,12 +1098,8 @@ foam.CLASS({
       var info = this.SUPER(cls);
 
       var m = info.getMethod('cast');
-      m.body = `return ( o instanceof Number ) ?
-        ((Number) o).longValue() :
-        ( o instanceof String ) ?
-        Long.valueOf((String) o) :
-        (long) o;`;
-
+      m.body = `long l = ( o instanceof String ) ? Long.valueOf((String) o) : (long) o;
+        return ( o instanceof Number ) ? ((Number) o).longValue() : l;`;
       return info;
     }
   ]
@@ -1151,12 +1123,8 @@ foam.CLASS({
       var info = this.SUPER(cls);
 
       var m = info.getMethod('cast');
-      m.body = `return ( o instanceof Number ) ?
-        ((Number)o).doubleValue() :
-        ( o instanceof String ) ?
-        Double.parseDouble((String) o) :
-        (double)o;`;
-
+      m.body = `double d = ( o instanceof String ) ? Double.parseDouble((String) o) : (double)o;
+        return ( o instanceof Number ) ? ((Number)o).doubleValue() : d;`;
       return info;
     }
   ]
@@ -1181,12 +1149,8 @@ foam.CLASS({
       var info = this.SUPER(cls);
 
       var m = info.getMethod('cast');
-      m.body = `return ( o instanceof Number ) ?
-        ((Number)o).floatValue() :
-        ( o instanceof String ) ?
-        Float.parseFloat((String) o) :
-        (float)o;`;
-
+      m.body = `float f = ( o instanceof String ) ? Float.parseFloat((String) o) : (float)o;
+        return ( o instanceof Number ) ? ((Number)o).floatValue() : f;`;
       return info;
     }
   ]
@@ -1347,9 +1311,8 @@ return new String[] {
             body: `
 switch (ordinal) {
 ${this.VALUES.map(v => `\tcase ${v.ordinal}: return ${cls.name}.${v.name};`).join('\n')}
-}
-return null;
-            `
+    default: return null;
+}`
           });
 
           cls.method({
@@ -1361,9 +1324,8 @@ return null;
             body: `
 switch (label) {
 ${this.VALUES.map(v => `\tcase "${v.label}": return ${cls.name}.${v.name};`).join('\n')}
-}
-return null;
-            `
+    default: return null;
+}`
           });
 
           return cls;

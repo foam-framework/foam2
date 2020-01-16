@@ -1,10 +1,12 @@
 package foam.util;
 
 import java.lang.reflect.Array;
+import java.util.HashMap;
 
 public class Arrays {
 
-  /* Append an existing array to one or more Items of the same Type
+  /**
+    Append an existing array to one or more Items of the same Type
     Example:
       String[] s1 = new String[]{"a", "b", "c"};
       String[] s2 = new String[]{"d", "e", "f"};
@@ -16,7 +18,7 @@ public class Arrays {
   * @param array  the initial array
   * @param items  new items to be added to original array
   * @return The new array
-  */
+  **/
   public static <T> T[] append(T[] array, T... items) {
 
     if( array == null ) {
@@ -48,9 +50,28 @@ public class Arrays {
     // in every "<primitive>PropertyInfo"
     for ( int i = 0 ; i < length ; i++ ) {
       java.lang.reflect.Array.set(result, i,
-                                   foam.util.SafetyUtil.deepClone(java.lang.reflect.Array.get(value, i)));
+        foam.util.SafetyUtil.deepClone(java.lang.reflect.Array.get(value, i)));
     }
 
     return result;
+  }
+
+  /**
+    Convert an array of keys and values into a HashMap.
+    Example:
+    HashMap map = foam.util.Arrays.asHashMap({
+      "key1", "value1",
+      "key2", "value2"
+      ...
+    });
+  **/
+  public static HashMap asHashMap(Object[] arr) {
+    HashMap m = new HashMap();
+    if ( arr != null ) {
+      for ( int i = 0 ; i < arr.length ; i += 2 ) {
+        m.put(arr[i], arr[i+1]);
+      }
+    }
+    return m;
   }
 }

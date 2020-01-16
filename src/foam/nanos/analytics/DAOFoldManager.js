@@ -17,8 +17,7 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.core.X',
-    'java.util.Date'
+    'foam.core.X'
   ],
 
   properties: [

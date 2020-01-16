@@ -17,8 +17,7 @@ foam.CLASS({
   javaImports: [
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.AuthorizationException',
-    'foam.nanos.auth.User',
-    'java.util.Date'
+    'foam.nanos.auth.User'
   ],
 
   tableColumns: ['id', 'body', 'notificationType', 'broadcasted', 'userId', 'groupId' ],

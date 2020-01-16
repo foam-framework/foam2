@@ -77,8 +77,7 @@ foam.CLASS({
   imports: [ 'document' ],
 
   javaImports: [
-    'foam.nanos.logger.Logger',
-    'foam.dao.ValidatingDAO'
+    'foam.nanos.logger.Logger'
   ],
 
   constants: [
