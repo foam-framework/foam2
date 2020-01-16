@@ -223,7 +223,7 @@ foam.CLASS({
         } catch (Throwable e) {
           ps.println();
           e.printStackTrace(ps);
-          Logger logger = (Logger) getX().get("logger");
+          Logger logger = (Logger) x.get("logger");
           logger.error(e);
         } finally {
           pm.log(x);
