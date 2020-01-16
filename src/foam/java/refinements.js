@@ -574,15 +574,6 @@ foam.LIB({
         });
       }
 
-      cls.method({
-        name: 'hashCode',
-        type: 'int',
-        visibility: 'public',
-        body: `return java.util.Objects.hash(${cls.allProperties.map(function(p) {
-          return '(Object) ' + p.name + '_';
-        }).join(',')});`
-      });
-
       if ( cls.name ) {
         var props = cls.allProperties;
 
