@@ -13,9 +13,7 @@ foam.CLASS({
   ],
   javaImports: [
     'foam.core.PropertyInfo',
-    'java.util.ArrayList',
-    'java.util.List',
-    'java.util.stream.Collectors'
+    'java.util.List'
   ],
 
   documentation: 'Sink runs the csv outputter, and contains the resulting string in this.csv',

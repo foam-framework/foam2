@@ -22,13 +22,9 @@
   ],
 
   javaImports: [
-    'foam.core.ContextAware',
-    'foam.core.FObject',
-    'foam.core.X',
     'foam.core.DirectAgency',
     'foam.nanos.logger.Logger',
-    'java.util.Collection',
-    'foam.nanos.ruler.RuleGroup'
+    'java.util.Collection'
   ],
 
   tableColumns: [

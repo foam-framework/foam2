@@ -10,10 +10,6 @@ foam.CLASS({
   documentation : 'ORBRequest objects are used to pass method call arguments to ORBitalDAOs request brokers.',
   flags: ['java'],
 
-  javaImports: [
-    'foam.core.FObject'
-  ],
-
   properties: [
     {
       name: 'receiverObject',

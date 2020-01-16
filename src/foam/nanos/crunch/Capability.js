@@ -14,14 +14,11 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.core.FObject',
-    'foam.core.X',
+
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.dao.Sink',
     'foam.mlang.sink.Count',
-    'foam.nanos.crunch.Capability',
-    'foam.nanos.crunch.CapabilityCapabilityJunction',
     'java.util.List',
     'static foam.mlang.MLang.*'
   ],

@@ -19,9 +19,6 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.X',
-    'foam.mlang.order.Comparator',
-    'foam.mlang.predicate.Predicate',
-    'foam.nanos.auth.EnabledAware',
     'foam.nanos.boot.NSpec',
     'foam.nanos.pm.PM'
   ],
