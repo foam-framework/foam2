@@ -61,10 +61,11 @@ public class MNJournal extends FileJournal {
   private ByteBuffer writeBuffer = ByteBuffer.allocate(40 * 1024);
   private long maxGlobalIndex = Long.MIN_VALUE;
   private long minGlobalIndex = Long.MAX_VALUE;
-
+  private Logger logger;
   private MNJournal(X x, String filename) {
     try {
       setX(x);
+      logger = (Logger) x.get("logger");
       entryRecordDAO = (DAO) x.get("entryRecordDAO");
       if ( entryRecordDAO == null ) throw new RuntimeException("entryRecordDAO miss");
       this.filename = filename;
@@ -85,7 +86,6 @@ public class MNJournal extends FileJournal {
           minGlobalIndex = entryRecord.getMinIndex();
         }
       }
-      System.out.println(maxGlobalIndex);
     } catch ( IOException e ) {
       throw new RuntimeException(e);
     }
@@ -106,7 +106,6 @@ public class MNJournal extends FileJournal {
 
   @Override
   public FObject put(X x, String prefix, DAO dao, FObject obj) {
-    System.out.println("MNPut");
     MedusaEntry entry = (MedusaEntry) obj;
     entry.setAction("p");
     String hash1 = entry.getHash1();
@@ -141,7 +140,7 @@ public class MNJournal extends FileJournal {
       String myHash = byte2Hex(entry.getNu().hash(md));
       entry.setMyHash(myHash);
     } catch ( Exception e ) {
-      System.out.println(e);
+      logger.info(e);
       throw new RuntimeException(e);
     }
     doWrite(x, new Outputter(x).stringify(obj) + "\n", entry.getMyIndex());
@@ -480,9 +479,8 @@ public class MNJournal extends FileJournal {
         if ( lastRecord == null ) {
           bufferSize = (int) (fileSize - 0L);
         } else {
-          System.out.println("1111111");
           bufferSize = (int) (fileSize - (lastRecord.getOffset() + (long) lastRecord.getLength()));
-          System.out.println(bufferSize);
+          logger.info(bufferSize);
         }
 
         ByteBuffer byteBuffer = ByteBuffer.allocate(bufferSize);
@@ -503,8 +501,6 @@ public class MNJournal extends FileJournal {
           MedusaEntry entry = null;
           try {
             entry = (MedusaEntry) x.create(JSONParser.class).parseString(line);
-            System.out.println(line);
-            System.out.println(entry);
             if ( entry.getMyIndex() < indexFrom ) continue;
             if ( entry.getMyIndex() < minIndex ) minIndex = entry.getMyIndex();
             if ( entry.getMyIndex() > maxIndex ) maxIndex = entry.getMyIndex();
@@ -542,7 +538,7 @@ public class MNJournal extends FileJournal {
               socketChannel.close();
               key.cancel();
             } catch ( IOException ie ) {
-              //TODO: log
+              logger.info(ie.toString());
             }
             return;
 
@@ -576,67 +572,23 @@ public class MNJournal extends FileJournal {
         while ( sendBuffer.hasRemaining() ) { socketChannel.write(sendBuffer); }
 
       } catch ( IOException ioe ) {
-        //TODO: send error to mediator. Mediator should fail this node.
-        //Terminator replay.
+        logger.info(ioe);
         try {
           socketChannel.close();
           key.cancel();
         } catch ( IOException ie ) {
-          //TODO: log
+          logger.info(ie);
         }
         return;
       }
 
-      //synchronized ( fileLock ) {
-      //  position = inChannel.size();
-
-      //  // Allocate 500M.
-      //  // TODO: make sure memory assign to this instance is bigger enough.
-      //  // ByteBuffer byteBuffer = ByteBuffer.allocate(524288000);
-      //  int blockSize = 1024;
-      //  ByteBuffer byteBuffer = ByteBuffer.allocate(blockSize);
-      //  ByteBuffer lengthBuffer = ByteBuffer.allocate(4);
-      //  int length = -1;
-
-      //  int totalBlock = (int) Math.ceil( (position/(double)blockSize));
-
-      //  // Send ACK to MM.
-      //  FilePacket filePacket = new FilePacket();
-      //  filePacket.setTotalBlock(totalBlock);
-      //  Outputter outputter = new Outputter(x);
-      //  String msg = outputter.stringify(filePacket);
-      //  System.out.println(msg);
-      //  byte[] bytes = msg.getBytes(Charset.forName("UTF-8"));
-      //  ByteBuffer ackBuffer = ByteBuffer.allocate(4 + bytes.length);
-      //  ackBuffer.putInt(bytes.length);
-      //  ackBuffer.put(bytes);
-      //  ackBuffer.flip();
-      //  socketChannel.write(ackBuffer);
-
-      //  while ( inChannel.position() < position ) {
-      //    lengthBuffer.clear();
-      //    byteBuffer.clear();
-      //    length = inChannel.read(byteBuffer);
-      //    lengthBuffer = lengthBuffer.putInt(length);
-
-      //    byteBuffer.flip();
-      //    lengthBuffer.flip();
-
-      //    while ( lengthBuffer.hasRemaining() ) { socketChannel.write(lengthBuffer); }
-      //    while ( byteBuffer.hasRemaining() ) { socketChannel.write(byteBuffer); }
-
-      //  }
-
-      //  //TODO: send finish ack
-      //  //TODO: activate sink;
-      //}
-
     } catch ( IOException e ) {
+      logger.info(e);
       try {
         socketChannel.close();
         key.cancel();
       } catch ( IOException ie ) {
-        //TODO: log error.
+        logger.info(ie);
       }
     }
 
