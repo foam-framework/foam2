@@ -212,7 +212,7 @@ foam.CLASS({
         server.start();
       } catch(Exception e) {
         Logger logger = (Logger) getX().get("logger");
-        if(logger != null)
+        if ( logger != null )
           logger.error(e);
       }
       `
@@ -237,7 +237,8 @@ foam.CLASS({
             } catch (Exception e) {
               System.err.println("Exception during Jetty server stop in the shutdown hook");
               Logger logger = (Logger) getX().get("logger");
-              logger.error(e);
+              if ( logger != null )
+                logger.error(e);
             }
           }
         });
