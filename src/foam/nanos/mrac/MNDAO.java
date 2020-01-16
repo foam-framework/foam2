@@ -22,7 +22,6 @@ public class MNDAO extends JDAO {
 
   @Override
   public FObject put(FObject obj) {
-    System.out.println(obj);
     return obj;
   }
 
