@@ -107,7 +107,7 @@ foam.CLASS({
           this.data = o;
           this.finished.pub();
 
-          if ( o.userFeedback ){
+          if ( foam.comics.v2.userfeedback.UserFeedbackAware.isInstance(o) ){
             var currentFeedback = o.userFeedback;
             while ( currentFeedback ){
               this.ctrl.add(this.NotificationMessage.create({

@@ -86,10 +86,30 @@ foam.CLASS({
       label: 'Delete',
       code: function(X) {
         this.dao.remove(this.data).then((_) => {
-          this.notify(this.data.model_.label + this.SUCCESS_MSG);
+          if ( foam.comics.v2.userfeedback.UserFeedbackAware.isInstance(o) ){
+            var currentFeedback = o.userFeedback;
+            while ( currentFeedback ){
+
+              this.notify(currentFeedback.message);
+
+              currentFeedback = currentFeedback.next;
+            }
+          } else {
+            this.notify(this.data.model_.label + this.SUCCESS_MSG);
+          }
+
           this.onDelete();
         }).catch((err) => {
-          this.notify(err.message || this.FAIL_MSG, 'error');
+          if ( foam.comics.v2.userfeedback.UserFeedbackException.isInstance(err) && err.userFeedback  ){
+            var currentFeedback = err.userFeedback;
+            while ( currentFeedback ){
+              this.notify(currentFeedback.message || this.FAIL_MSG, 'error');
+
+              currentFeedback = currentFeedback.next;
+            }
+          } else {
+            this.notify(err.message || this.FAIL_MSG, 'error');
+          }
         });
         X.closeDialog();
       }
