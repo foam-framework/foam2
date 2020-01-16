@@ -226,7 +226,7 @@ public class QuorumNetworkManager extends AbstractFObject {
           //TODO: get from addr.
           DAO dao = (DAO) getX().get("clusterNodeDAO");
           ClusterNode clusterNode = (ClusterNode) dao.find(mySelf.getId());
-          addr = new InetSocketAddress(clusterNode.getElectionIP(), clusterNode.getElectionPort());
+          addr = new InetSocketAddress(clusterNode.getIp(), clusterNode.getElectionPort());
           serverSocket.bind(addr);
 
           // Ideally thread should be keep inside this loop until isRunning == false;
@@ -350,7 +350,7 @@ public class QuorumNetworkManager extends AbstractFObject {
     if ( instance == null ) throw new RuntimeException("clusterNode no found: " + instanceId);
 
     try {
-      InetSocketAddress addr = new InetSocketAddress(instance.getElectionIP(), instance.getElectionPort());
+      InetSocketAddress addr = new InetSocketAddress(instance.getIp(), instance.getElectionPort());
       logger.info("Connect to: " + addr);
       Socket socket = new Socket();
       socket.setTcpNoDelay(true);
