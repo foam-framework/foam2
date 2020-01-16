@@ -12,7 +12,10 @@ foam.CLASS({
 
   implements: [ 'foam.nanos.NanoService' ],
 
-  javaImports: [ 'org.apache.commons.dbcp2.BasicDataSource' ],
+  javaImports: [ 
+    'org.apache.commons.dbcp2.BasicDataSource',
+    'foam.nanos.logger.Logger'
+   ],
 
   properties: [
     {
@@ -83,7 +86,10 @@ foam.CLASS({
   pool.setUrl(getConnectionString());
   pool.setInitialSize(getPoolSize());
   setPool(pool);
-} catch (Exception e) {}`
+} catch (Exception e) {
+  Logger logger = (Logger) x.get("logger");
+  logger.error(e);
+}`
     },
     {
       name: 'getConnection',
