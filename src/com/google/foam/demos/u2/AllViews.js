@@ -262,6 +262,10 @@ foam.CLASS({
           [ 'foam.nanos.menu.TabsMenu', 'Tabs'    ]
         ]
       }
+    },
+    {
+      class: 'Map',
+      name: 'map'
     }
   ]
 })

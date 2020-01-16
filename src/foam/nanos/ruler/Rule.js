@@ -226,6 +226,20 @@
       }
     },
     {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdByAgent',
+      createMode: 'HIDDEN',
+      updateMode: 'RO',
+      tableCellFormatter: function(value, obj) {
+        obj.userDAO.find(value).then(function(user) {
+          if ( user ) {
+            this.add(user.legalName);
+          }
+        }.bind(this));
+      }
+    },
+    {
       class: 'DateTime',
       name: 'lastModified',
       createMode: 'HIDDEN',

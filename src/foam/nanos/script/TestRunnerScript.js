@@ -166,7 +166,6 @@ foam.CLASS({
           printOutput(test);
         }
         catch ( Exception e ) {
-          e.printStackTrace();
           setFailedTests(getFailedTests() + 1);
           addToFailedTestsList(test);
         }

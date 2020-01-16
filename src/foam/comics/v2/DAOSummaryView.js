@@ -119,7 +119,7 @@ foam.CLASS({
         return config$deleteEnabled;
       },
       code: function() {
-        this.add(this.Popup.create().tag({
+        this.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
           class: 'foam.u2.DeleteModal',
           dao: this.config.dao,
           onDelete: () => {

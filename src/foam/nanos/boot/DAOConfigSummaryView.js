@@ -9,6 +9,8 @@
    name: 'DAOConfigSummaryView',
    extends: 'foam.u2.Controller',
 
+   documentation: 'Data Management UI for browsing all DAOs.',
+
    classes: [
      {
         name: 'BackBorder',
@@ -73,7 +75,7 @@
        font-size: smaller;
        margin: 2px;
        padding: 2px;
-       width: 190px;
+       width: 220px;
      }
      ^dao {
        color: #555;
@@ -114,8 +116,7 @@
            this.AND(
              this.ENDS_WITH(foam.nanos.boot.NSpec.ID, 'DAO'),
              this.EQ(foam.nanos.boot.NSpec.SERVE,     true)
-           ))
-           .orderBy(this.NSpec.ID);
+           ));
        }
      }
    ],
@@ -142,27 +143,29 @@
          }, this);
        });
 
-       this.filteredDAO.select(function(spec) {
-         var label = foam.String.capitalize(spec.id.substring(0, spec.id.length-3));
-         var l     = label.charAt(0);
+       this.filteredDAO.select().then(function(specs) {
+         specs.array.sort(function(o1, o2) { return foam.String.compare(o1.id.toUpperCase(), o2.id.toUpperCase())}).forEach(function(spec) {
+           var label = foam.String.capitalize(spec.id.substring(0, spec.id.length-3));
+           var l     = label.charAt(0);
 
-         if ( l != currentLetter ) {
-           currentLetter = l;
-           section = self.start('span')
-             .addClass(self.myClass('section'))
-             .start('span')
-               .addClass(self.myClass('header'))
-               .add(l)
-             .end();
-         }
+           if ( l != currentLetter ) {
+             currentLetter = l;
+             section = self.start('span')
+               .addClass(self.myClass('section'))
+               .start('span')
+                 .addClass(self.myClass('header'))
+                 .add(l)
+               .end();
+           }
 
-         section.start('span')
-           .addClass(self.myClass('dao'))
-           .add(label)
-           .attrs({title: spec.description})
-           .on('click', function() {
-             self.memento = spec.id;
-           });
+           section.start('span')
+             .addClass(self.myClass('dao'))
+             .add(label)
+             .attrs({title: spec.description})
+             .on('click', function() {
+               self.memento = spec.id;
+             });
+         });
        });
      }
    ]

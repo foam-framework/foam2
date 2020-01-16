@@ -53,9 +53,7 @@ try {
 
   handler.setFormatter(new CustomFormatter());
   getLogger().addHandler(handler);
-} catch (IOException e) {
-  e.printStackTrace();
-}`
+} catch (IOException e) {}`
     },
     {
       name: 'combine',

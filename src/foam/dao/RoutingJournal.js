@@ -29,11 +29,10 @@ waitForReplay();
       name: 'waitForReplay',
       synchronized: true,
       javaCode: `
-try {
-  if ( ! getReplayed() ) wait();
-  else notifyAll();
-} catch (InterruptedException e) {
-  throw new RuntimeException(e);
+while ( ! getReplayed() ) {
+  try {
+    wait();
+  } catch (InterruptedException e) {}
 }
       `
     },
