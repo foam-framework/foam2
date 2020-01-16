@@ -212,7 +212,8 @@ foam.CLASS({
         server.start();
       } catch(Exception e) {
         Logger logger = (Logger) getX().get("logger");
-        logger.error(e);
+        if(logger != null)
+          logger.error(e);
       }
       `
     },

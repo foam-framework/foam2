@@ -54,8 +54,7 @@ try {
   handler.setFormatter(new CustomFormatter());
   getLogger().addHandler(handler);
 } catch (IOException e) {
-  foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
-  logger.error(e);
+  System.err.println(e);
 }`
     },
     {
