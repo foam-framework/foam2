@@ -52,9 +52,7 @@ foam.CLASS({
 
       try {
         return (boolean) shell.eval(getCode());
-      } catch (Throwable e) {
-        e.printStackTrace();
-      }
+      } catch (Throwable e) {}
       return false;
       `
     },

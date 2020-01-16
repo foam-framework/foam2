@@ -213,9 +213,7 @@ foam.CLASS({
         this.configHttps(server);
                 
         server.start();
-      } catch(Exception e) {
-        e.printStackTrace();
-      }
+      } catch(Exception e) {}
       `
     },
     {
@@ -237,7 +235,6 @@ foam.CLASS({
               server.stop();
             } catch (Exception e) {
               System.err.println("Exception during Jetty server stop in the shutdown hook");
-              e.printStackTrace();
             }
           }
         });
