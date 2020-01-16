@@ -102,9 +102,7 @@ foam.CLASS({
 
     if (x.get("notificationDAO") != null) ((DAO) x.get("notificationDAO")).put_(x, notif) ;
   }
-  catch (Throwable t) {
-    t.printStackTrace();
-  }
+  catch (Throwable t) {}
   currentlyLogging.set(false);
   `
     },

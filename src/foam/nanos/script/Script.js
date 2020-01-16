@@ -225,7 +225,6 @@ foam.CLASS({
         } catch (Throwable e) {
           ps.println();
           e.printStackTrace(ps);
-          e.printStackTrace();
         } finally {
           pm.log(x);
         }

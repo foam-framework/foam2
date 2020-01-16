@@ -88,16 +88,19 @@ foam.CLASS({
 
     foam.box.RPCMessage rpc      = (foam.box.RPCMessage) message.getObject();
     foam.box.Box        replyBox = (foam.box.Box) message.getAttributes().get("replyBox");
-    Object              result   = null;
+    <%
+    var methods = this.of.getOwnAxiomsByClass(foam.core.Method);
+    var anyHasReturn = methods.find(function(m) { return m.javaType && m.javaType !== 'void'; });
+    if ( anyHasReturn ) { %>Object result = null;<% }%>
 
     try {
       switch ( rpc.getName() ) {<%
-  var methods = this.of.getOwnAxiomsByClass(foam.core.Method);
+
   for ( var i = 0 ; i < methods.length ; i++ ) {
     var m = methods[i];
     var hasReturn = m.javaType && m.javaType !== 'void';%>
         case "<%= m.name %>":
-          <% if ( hasReturn ) { %>result = <% } %>getDelegate().<%= m.name %>(
+          <% if ( hasReturn ) { %>result =<% } %> getDelegate().<%= m.name %>(
           <%
     for ( var j = 0 ; j < m.args.length ; j++ ) {
       if ( m.args[j].type == 'Context' ) {
@@ -130,9 +133,9 @@ foam.CLASS({
 
     if ( replyBox != null ) {
       foam.box.RPCReturnMessage reply = (foam.box.RPCReturnMessage)getX().create(foam.box.RPCReturnMessage.class);
-      if ( result != null ) {
+      <% if ( anyHasReturn ) { %>if ( result != null ) {
         reply.setData(result);
-      }
+      }<% } %>
 
       foam.box.Message message1 = getX().create(foam.box.Message.class);
       message1.setObject(reply);
