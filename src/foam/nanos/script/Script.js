@@ -224,7 +224,8 @@ foam.CLASS({
           ps.println();
           e.printStackTrace(ps);
           Logger logger = (Logger) getX().get("logger");
-          logger.error(e);
+          if(logger != null)
+            logger.error(e);
         } finally {
           pm.log(x);
         }
