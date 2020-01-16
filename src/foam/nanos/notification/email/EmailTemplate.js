@@ -12,9 +12,7 @@ foam.CLASS({
   mimics the EmailMessage which is the end obj that is processed into email.`,
 
   javaImports: [
-    'foam.core.X',
     'foam.nanos.logger.Logger',
-    'foam.nanos.notification.email.EmailMessage',
     'foam.util.SafetyUtil',
     'java.nio.charset.StandardCharsets',
     'org.jtwig.environment.EnvironmentConfiguration',

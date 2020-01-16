@@ -17,7 +17,6 @@ foam.CLASS({
   javaImports: [
     'foam.dao.DAO',
     'foam.nanos.auth.Group',
-    'foam.nanos.logger.Logger',
     'foam.util.SafetyUtil',
   ],
 

@@ -15,7 +15,6 @@ foam.CLASS({
   documentation: 'A Password Policy for a Group.',
 
   javaImports: [
-    'foam.nanos.auth.User',
     'foam.util.Password',
     'foam.util.SafetyUtil'
   ],

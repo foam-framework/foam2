@@ -12,10 +12,6 @@ foam.CLASS({
 
   implements: ['foam.nanos.ruler.RuleAction'],
 
-  javaImports: [
-    'foam.nanos.ruler.RuleAction',
-  ],
-
   properties: [
     {
       class: 'FObjectArray',

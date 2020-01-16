@@ -16,7 +16,6 @@ foam.CLASS({
     'foam.core.X',
     'foam.nanos.auth.PriorPassword',
     'foam.nanos.auth.User',
-    'foam.nanos.logger.Logger',
     'java.util.Date'
   ],
 

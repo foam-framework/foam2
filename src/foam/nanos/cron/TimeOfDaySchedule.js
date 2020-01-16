@@ -20,8 +20,7 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'java.util.Calendar',
-    'java.util.Date'
+    'java.util.Calendar'
   ],
 
   properties: [
