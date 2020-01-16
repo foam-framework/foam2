@@ -87,7 +87,7 @@ foam.CLASS({
   pool.setInitialSize(getPoolSize());
   setPool(pool);
 } catch (Exception e) {
-  Logger logger = (Logger) x.get("logger");
+  Logger logger = (Logger) getX().get("logger");
   logger.error(e);
 }`
     },
