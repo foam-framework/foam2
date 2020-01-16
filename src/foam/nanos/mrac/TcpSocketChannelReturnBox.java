@@ -28,7 +28,6 @@ public class TcpSocketChannelReturnBox extends AbstractFObject implements Box {
 
   public void send(Message msg) {
     try {
-      System.out.println("sendback");
       doSend(msg);
       // After sending back response, the SocketChannel should re-register READ in selector.
       // So that this SocketChannel can be re-use by client.

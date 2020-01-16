@@ -35,9 +35,6 @@ foam.CLASS({
           throw new UnsupportedOperationException("Cluster command not supported on non-primary instance");
         }
 
-        System.out.println("lallalalalalal");
-        System.out.println(obj);
-
         ClusterCommand request = (ClusterCommand) obj;
         X y = request.applyTo(x);
 

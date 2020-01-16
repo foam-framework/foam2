@@ -40,12 +40,14 @@ import foam.nanos.logger.Logger;
 import static foam.mlang.MLang.*;
 import foam.dao.ArraySink;
 
+import foam.nanos.logger.Logger;
+
 //Start a tcp service.
 public class TCPNioServer extends AbstractFObject implements NanoService {
 
 
   protected TcpNioRouter router_ = null;
-  protected Logger logger   = (Logger) getX().get("logger");
+  protected Logger logger;
   protected String hostname = System.getProperty("hostname");
   protected Long clusterId;
   //TODO: Do not hard code this field.
@@ -59,11 +61,10 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
   private ServerSocketChannel serverSocketChannel;
   private final int totalCores = Runtime.getRuntime().availableProcessors();
   private volatile AtomicBoolean isRunning = new AtomicBoolean(true);
-
   //TODO: start selector
   public void start() throws Exception {
-    System.out.println("<><><><><><><<><>");
     X x = getX();
+    logger = (Logger) getX().get("logger");
     if ( x == null ) throw new RuntimeException("Context no found.");
     DAO clusterDAO = (DAO) x.get("clusterNodeDAO");
     if ( clusterDAO == null ) throw new RuntimeException("clusterNodeDAO no found.");
@@ -80,7 +81,7 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
 
     //TODO: do not hard coding following parameter.
     InetSocketAddress serverAddress = new InetSocketAddress(myself.getIp(), myself.getSocketPort());
-    System.out.println("Tcp server open at: " + serverAddress);
+    logger.info("Tcp server open at: " + serverAddress);
     // int totalProcessors = totalCores * 1;
     // Double size of MM.
     int totalProcessors = totalCores * 2;
@@ -183,7 +184,6 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
             keys.remove();
 
             if ( key.isAcceptable() ) {
-              System.out.println("aaaaaa");
               SocketChannel socketChannel = acceptChannel(key);
 
               if ( socketChannel != null ) {
@@ -251,7 +251,6 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
 
     public boolean acceptSocketChannel(SocketChannel socketChannel) {
       if ( isRunning.get() && this.acceptedSocketChannels.offer(socketChannel) ) {
-        System.out.println("acceptSocketChannel");
         this.wakeup();
         return true;
       }
@@ -263,7 +262,6 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
       try {
         while ( isRunning.get() ) {
           //select
-          // System.out.println(threadName);
           configureNewConnections();
           select();
         }
@@ -330,7 +328,6 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
     // Entry to all servers in System.
     //TODO: change to multi-thread process.
     private void processRequest(SelectionKey key) throws IOException {
-      System.out.println("processRequest method:");
       SocketChannel socketChannel = null;
       try {
         // Stop selecting.
@@ -354,7 +351,6 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
         }
         if ( messageLen < 0 ) throw new IOException("Len error " + messageLen);
 
-        System.out.println(messageLen);
         // Read message.
         ByteBuffer message = ByteBuffer.allocate(messageLen);
         if ( socketChannel.read(message) < 0 ) throw new IOException("End of Stream");
@@ -368,8 +364,8 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
         }
 
         //TODO: log
-        System.out.println(messageLen);
-        System.out.println(requestString);
+        logger.info(messageLen);
+        logger.info(requestString);
 
         // Deserialize json and assign to service.
         // Inject SelectionKey and SocketChannel into X.
@@ -381,12 +377,12 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
 
         if ( request == null ) {
           // logger.warning("Failed to parse request.", request);
-          System.out.println("Failed to parse request.");
+          logger.info("Failed to parse request.");
           return;
         }
 
         if ( ! ( request instanceof TcpMessage ) ) {
-          System.out.println("Request was not a TcpMessage");
+          logger.info("Request was not a TcpMessage");
           logger.warning("Request was not a TcpMessage", request);
           return;
         }
@@ -394,7 +390,6 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
         TcpMessage tcpMessage = (TcpMessage) request;
         tcpMessage.getLocalAttributes().put("x", x);
 
-        System.out.println(tcpMessage.getServiceKey());
         getRouter().service(tcpMessage.getServiceKey(), tcpMessage);
 
       } catch ( IOException e ) {
