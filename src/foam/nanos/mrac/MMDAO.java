@@ -15,6 +15,8 @@ import foam.nanos.boot.NSpec;
 import foam.core.Identifiable;
 import foam.nanos.fs.ResourceStorage;
 import foam.nanos.fs.Storage;
+import foam.dao.AbstractSink;
+import foam.core.Detachable;
 
 public class MMDAO extends JDAO {
 
@@ -47,7 +49,13 @@ public class MMDAO extends JDAO {
           new ResourceStorage(System.getProperty("resource.journals.dir")));
     }
     new foam.dao.FileJournal.Builder(resourceStorageX)
-      .setFilename(fileName).build().replay(x, dao);
+      .setFilename(fileName+".0").build().replay(x, dao);
+
+    System.out.println(">>>>>>>>nspecKey: " + nspecKey);
+    dao.select(new AbstractSink() {
+              public void put(Object obj, Detachable sub) {
+                System.out.println(obj);
+              }});
 
     this.nspecKey = nspecKey;
     setDelegate(dao);

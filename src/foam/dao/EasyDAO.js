@@ -253,18 +253,30 @@ foam.CLASS({
             .build();
         }
 
-        if ( getCluster() &&
-             getMdao() != null ) {
-          // REVIEW: testing for mdao as a way to only cluster the
-          // real local dao and not duplicate on the non local.
-          // also, ClusterClient uses the MDAO to find the old object
-          // to create a detla for marshalling.
-          logger.debug(this.getClass().getSimpleName(), "clustering", getOf().getId());
+        // if ( getCluster() &&
+        //      getMdao() != null ) {
+        //   // REVIEW: testing for mdao as a way to only cluster the
+        //   // real local dao and not duplicate on the non local.
+        //   // also, ClusterClient uses the MDAO to find the old object
+        //   // to create a detla for marshalling.
+        //   logger.debug(this.getClass().getSimpleName(), "clustering", getOf().getId());
+        //   delegate = new foam.nanos.mrac.ClusterClientDAO.Builder(getX())
+        //     .setServiceName(getNSpec().getName())
+        //     .setDelegate(delegate)
+        //     .setMdao(getMdao())
+        //     .build();
+        // }
+
+        if ( getCluster() && getMdao() != null ) {
+          System.out.println("getCluster>>>>>>>");
           delegate = new foam.nanos.mrac.ClusterClientDAO.Builder(getX())
-            .setServiceName(getNSpec().getName())
-            .setDelegate(delegate)
-            .setMdao(getMdao())
-            .build();
+                          .setServiceName(getNSpec().getName())
+                          .setDelegate(delegate)
+                          .setMdao(getMdao())
+                          .build();
+
+          delegate = new foam.nanos.mrac.VotingDAO(getX(), delegate);
+
         }
 
         if ( getNSpec() != null && getNSpec().getServe() && ! getAuthorize() && ! getReadOnly() )
@@ -317,6 +329,10 @@ foam.CLASS({
       }
       if ( getMedusaNode() ) {
         return new foam.nanos.mrac.MNDAO(getX(), getOf(), getJournalName());
+      }
+      if ( getCluster() == true ) {
+        foam.dao.MDAO mdao = new foam.dao.MDAO(getOf());       
+        return new foam.nanos.mrac.MMDAO(getX(), getNSpec().getName(), mdao, "singleJournal", getJournalName());
       }
       if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) )
         return new foam.dao.java.JDAO(getX(), getOf(), getJournalName());
