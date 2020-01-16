@@ -1,4 +1,4 @@
-//p({
+p({
   "class": "foam.nanos.boot.NSpec",
   "name": "localClusterConfigDAO",
   "lazy": true,
@@ -15,7 +15,7 @@
    """
 })
 
-//p({
+p({
   "class": "foam.nanos.boot.NSpec",
   "name": "clusterConfigDAO",
   "lazy": true,
@@ -30,7 +30,7 @@
   "client": "{\"of\":\"foam.nanos.mrac.ClusterConfig\"}"
 })
 
-//p({
+p({
   "class": "foam.nanos.boot.NSpec",
   "name": "clusterConfigService",
   "lazy": true,
@@ -40,7 +40,7 @@
   """
 })
 
-//p({
+p({
   "class": "foam.nanos.boot.NSpec",
   "name": "cluster",
   "lazy": false,
@@ -58,7 +58,7 @@
   """
 })
 
-//p({
+p({
   "class":"foam.nanos.boot.NSpec",
   "name":"clusterNodeDAO",
   "lazy":false,
@@ -82,21 +82,21 @@
   """
 })
 
-//p({
+p({
   "class":"foam.nanos.boot.NSpec",
   "name":"tcpServer",
   "lazy":false,
   "serviceClass":"foam.nanos.mrac.TCPNioServer"
 })
 
-//p({
+p({
   "class":"foam.nanos.boot.NSpec",
   "name":"quorumService",
   "lazy":false,
   "serviceClass":"foam.nanos.mrac.quorum.QuorumService"
 })
 
-//p({
+p({
   "class": "foam.nanos.boot.NSpec",
   "name": "nodeStatusDAO",
   "lazy": false,
@@ -112,7 +112,7 @@
   """
 })
 
-//p({
+p({
   "class": "foam.nanos.boot.NSpec",
   "name": "demoObjectDAO",
   "lazy": false,
