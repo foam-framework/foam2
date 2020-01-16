@@ -34,8 +34,8 @@ foam.CLASS({
 
     ^ label {
       cursor: pointer;
-      line-height: 48px;
-      padding: 0 32px;
+      line-height: 1.4;
+      padding: 16px 32px;
       text-align:center;
       font-size: 14px;
     }

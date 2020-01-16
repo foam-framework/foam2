@@ -1472,8 +1472,7 @@ foam.CLASS({
   javaImports: [
     'java.util.List',
     'foam.mlang.ArrayConstant',
-    'foam.mlang.Constant',
-    'foam.mlang.predicate.False'
+    'foam.mlang.Constant'
   ],
 
   properties: [

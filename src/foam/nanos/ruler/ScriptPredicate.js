@@ -17,12 +17,6 @@ foam.CLASS({
     'foam.nanos.logger.Logger',
     'foam.mlang.predicate.Predicate',
     'foam.nanos.auth.*',
-    'foam.nanos.pm.PM',
-    'foam.nanos.session.Session',
-    'java.io.ByteArrayOutputStream',
-    'java.io.PrintStream',
-    'java.util.Date',
-    'java.util.List',
     'static foam.mlang.MLang.*',
   ],
 

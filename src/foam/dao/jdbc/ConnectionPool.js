@@ -12,7 +12,7 @@ foam.CLASS({
 
   implements: [ 'foam.nanos.NanoService' ],
 
-  javaImports: [ 
+  javaImports: [
     'org.apache.commons.dbcp2.BasicDataSource',
     'foam.nanos.logger.Logger'
    ],
