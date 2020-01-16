@@ -86,7 +86,7 @@ foam.CLASS({
       label: 'Delete',
       code: function(X) {
         this.dao.remove(this.data).then((_) => {
-          if ( foam.comics.v2.userfeedback.UserFeedbackAware.isInstance(o) ){
+          if ( foam.comics.v2.userfeedback.UserFeedbackAware.isInstance(o) && o.userFeedback ){
             var currentFeedback = o.userFeedback;
             while ( currentFeedback ){
 
@@ -103,7 +103,7 @@ foam.CLASS({
           if ( foam.comics.v2.userfeedback.UserFeedbackException.isInstance(err) && err.userFeedback  ){
             var currentFeedback = err.userFeedback;
             while ( currentFeedback ){
-              this.notify(currentFeedback.message || this.FAIL_MSG, 'error');
+              this.notify(currentFeedback.message);
 
               currentFeedback = currentFeedback.next;
             }
