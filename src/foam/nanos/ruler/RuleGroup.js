@@ -11,10 +11,7 @@
   documentation: 'A rule group groups some rules together, the rules within only run if the ruleGroup predicate evaluates to true.',
 
   javaImports: [
-    'foam.core.ContextAware',
-    'foam.core.FObject',
-    'foam.core.X',
-    'foam.nanos.logger.Logger',
+    'foam.nanos.logger.Logger'
   ],
 
   properties: [
