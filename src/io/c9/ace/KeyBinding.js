@@ -13,19 +13,19 @@ foam.ENUM({
   values: [
     {
       path: null,
-      name: 'ACE'
+      name: 'Ace'
     },
     {
       path: 'ace/keyboard/vim',
-      name: 'VIN'
+      name: 'Vim'
     },
     {
       path: 'ace/keyboard/emacs',
-      name: 'EMACS'
+      name: 'Emacs'
     },
     {
       path: 'ace/keyboard/sublime',
-      name: 'SUBLIME'
+      name: 'Sublime'
     },
   ]
 });

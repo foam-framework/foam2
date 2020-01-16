@@ -24,7 +24,7 @@ foam.ENUM({
     {
       path: 'ace/mode/actionscript',
       label: 'ActionScript',
-      name: 'ACTION_SRCRIPT'
+      name: 'ActionScript'
     },
     {
       path: 'ace/mode/ada',
@@ -34,12 +34,12 @@ foam.ENUM({
     {
       path: 'ace/mode/apache_conf',
       label: 'Apache Conf',
-      name: 'APACHE_CONF'
+      name: 'ApacheConf'
     },
     {
       path: 'ace/mode/asciidoc',
       label: 'AsciiDoc',
-      name: 'ASCII_DOC'
+      name: 'AsciiDoc'
     },
     {
       path: 'ace/mode/asl',
@@ -49,62 +49,62 @@ foam.ENUM({
     {
       path: 'ace/mode/assembly_x86',
       label: 'Assembly x86',
-      name: 'ASSEMLBY_X86'
+      name: 'Assemblyx86'
     },
     {
       path: 'ace/mode/autohotkey',
       label: 'AutoHotkey / AutoIt',
-      name: 'AUTOHOTKEY_AUTOIT'
+      name: 'AutoHotkeyAutoIt'
     },
     {
       path: 'ace/mode/apex',
       label: 'Apex',
-      name: 'APEX'
+      name: 'Apex'
     },
     {
       path: 'ace/mode/batchfile',
       label: 'BatchFile',
-      name: 'BATACH_FILE'
+      name: 'BatchFile'
     },
     {
       path: 'ace/mode/bro',
       label: 'Bro',
-      name: 'BRO'
+      name: 'Bro'
     },
     {
       path: 'ace/mode/c_cpp',
       label: 'C and C++',
-      name: 'C_AND_CPP'
+      name: 'CandCpp'
     },
     {
       path: 'ace/mode/c9search',
       label: 'C9Search',
-      name: 'C9_SEARCH'
+      name: 'C9Search'
     },
     {
       path: 'ace/mode/cirru',
       label: 'Cirru',
-      name: 'CIRRU'
+      name: 'Cirru'
     },
     {
       path: 'ace/mode/clojure',
       label: 'Clojure',
-      name: 'CLOJURE'
+      name: 'Clojure'
     },
     {
       path: 'ace/mode/cobol',
       label: 'Cobol',
-      name: 'COBOL'
+      name: 'Cobol'
     },
     {
       path: 'ace/mode/coffee',
       label: 'CoffeeScript',
-      name: 'COFFE_SCRIPT'
+      name: 'CoffeeScript'
     },
     {
       path: 'ace/mode/coldfusion',
       label: 'ColdFusion',
-      name: 'COLD_FUSION'
+      name: 'ColdFusion'
     },
     {
       path: 'ace/mode/csharp',
@@ -114,17 +114,17 @@ foam.ENUM({
     {
       path: 'ace/mode/csound_document',
       label: 'Csound Document',
-      name: 'C_SOUND_DOCUMENT'
+      name: 'CsoundDocument'
     },
     {
       path: 'ace/mode/csound_orchestra',
       label: 'Csound',
-      name: 'C_SOUND'
+      name: 'Csound'
     },
     {
       path: 'ace/mode/csound_score',
       label: 'Csound Score',
-      name: 'C_SOUND_CORE'
+      name: 'CsoundScore'
     },
     {
       path: 'ace/mode/css',
@@ -134,7 +134,7 @@ foam.ENUM({
     {
       path: 'ace/mode/curly',
       label: 'Curly',
-      name: 'CURLY'
+      name: 'Curly'
     },
     {
       path: 'ace/mode/d',
@@ -144,37 +144,37 @@ foam.ENUM({
     {
       path: 'ace/mode/dart',
       label: 'Dart',
-      name: 'DART'
+      name: 'Dart'
     },
     {
       path: 'ace/mode/diff',
       label: 'Diff',
-      name: 'DIFF'
+      name: 'Diff'
     },
     {
       path: 'ace/mode/dockerfile',
       label: 'Dockerfile',
-      name: 'DOCKER_FILE'
+      name: 'Dockerfile'
     },
     {
       path: 'ace/mode/dot',
       label: 'Dot',
-      name: 'DOT'
+      name: 'Dot'
     },
     {
       path: 'ace/mode/drools',
       label: 'Drools',
-      name: 'DROOLS'
+      name: 'Drools'
     },
     {
       path: 'ace/mode/edifact',
       label: 'Edifact',
-      name: 'EDIFACT'
+      name: 'Edifact'
     },
     {
       path: 'ace/mode/eiffel',
       label: 'Eiffel',
-      name: 'EIFFEL'
+      name: 'Eiffel'
     },
     {
       path: 'ace/mode/ejs',
@@ -184,32 +184,32 @@ foam.ENUM({
     {
       path: 'ace/mode/elixir',
       label: 'Elixir',
-      name: 'ELIXIR'
+      name: 'Elixir'
     },
     {
       path: 'ace/mode/elm',
       label: 'Elm',
-      name: 'ELM'
+      name: 'Elm'
     },
     {
       path: 'ace/mode/erlang',
       label: 'Erlang',
-      name: 'ERLAND'
+      name: 'Erlang'
     },
     {
       path: 'ace/mode/forth',
       label: 'Forth',
-      name: 'FORTH'
+      name: 'Forth'
     },
     {
       path: 'ace/mode/fortran',
       label: 'Fortran',
-      name: 'FORTRAN'
+      name: 'Fortran'
     },
     {
       path: 'ace/mode/fsharp',
       label: 'FSharp',
-      name: 'FSHARP'
+      name: 'FSharp'
     },
     {
       path: 'ace/mode/fsl',
@@ -219,47 +219,47 @@ foam.ENUM({
     {
       path: 'ace/mode/ftl',
       label: 'FreeMarker',
-      name: 'FREE_MARKER'
+      name: 'FreeMarker'
     },
     {
       path: 'ace/mode/gcode',
       label: 'Gcode',
-      name: 'GCODE'
+      name: 'Gcode'
     },
     {
       path: 'ace/mode/gherkin',
       label: 'Gherkin',
-      name: 'GHERKIN'
+      name: 'Gherkin'
     },
     {
       path: 'ace/mode/gitignore',
       label: 'Gitignore',
-      name: 'GIT_IGNORE'
+      name: 'Gitignore'
     },
     {
       path: 'ace/mode/glsl',
       label: 'Glsl',
-      name: 'GLSL'
+      name: 'Glsl'
     },
     {
       path: 'ace/mode/gobstones',
       label: 'Gobstones',
-      name: 'GOBSTONES'
+      name: 'Gobstones'
     },
     {
       path: 'ace/mode/golang',
       label: 'Go',
-      name: 'GO'
+      name: 'Go'
     },
     {
       path: 'ace/mode/graphqlschema',
       label: 'GraphQLSchema',
-      name: 'GRAPH_QLS_SCHEMA'
+      name: 'GraphQLSchema'
     },
     {
       path: 'ace/mode/groovy',
       label: 'Groovy',
-      name: 'GROOVY'
+      name: 'Groovy'
     },
     {
       path: 'ace/mode/haml',
@@ -269,27 +269,27 @@ foam.ENUM({
     {
       path: 'ace/mode/handlebars',
       label: 'Handlebars',
-      name: 'HANDLE_BARS'
+      name: 'Handlebars'
     },
     {
       path: 'ace/mode/haskell',
       label: 'Haskell',
-      name: 'HASKELL'
+      name: 'Haskell'
     },
     {
       path: 'ace/mode/haskell_cabal',
       label: 'Haskell Cabal',
-      name: 'HASKELL_CABAL'
+      name: 'HaskellCabal'
     },
     {
       path: 'ace/mode/haxe',
       label: 'haXe',
-      name: 'HAXE'
+      name: 'haXe'
     },
     {
       path: 'ace/mode/hjson',
       label: 'Hjson',
-      name: 'HJSON'
+      name: 'Hjson'
     },
     {
       path: 'ace/mode/html',
@@ -299,12 +299,12 @@ foam.ENUM({
     {
       path: 'ace/mode/html_elixir',
       label: 'HTML (Elixir)',
-      name: 'HTML_ELIXIR'
+      name: 'HTMLElixir'
     },
     {
       path: 'ace/mode/html_ruby',
       label: 'HTML (Ruby)',
-      name: 'HTML_RUBY'
+      name: 'HTMLRuby'
     },
     {
       path: 'ace/mode/ini',
@@ -314,27 +314,27 @@ foam.ENUM({
     {
       path: 'ace/mode/io',
       label: 'Io',
-      name: 'IO'
+      name: 'Io'
     },
     {
       path: 'ace/mode/jack',
       label: 'Jack',
-      name: 'JACK'
+      name: 'Jack'
     },
     {
       path: 'ace/mode/jade',
       label: 'Jade',
-      name: 'JADE'
+      name: 'Jade'
     },
     {
       path: 'ace/mode/java',
       label: 'Java',
-      name: 'JAVA'
+      name: 'Java'
     },
     {
       path: 'ace/mode/javascript',
       label: 'JavaScript',
-      name: 'JAVASCRIPT'
+      name: 'JavaScript'
     },
     {
       path: 'ace/mode/json',
@@ -344,7 +344,7 @@ foam.ENUM({
     {
       path: 'ace/mode/jsoniq',
       label: 'JSONiq',
-      name: 'JSON_IQ'
+      name: 'JSONiq'
     },
     {
       path: 'ace/mode/jsp',
@@ -364,17 +364,17 @@ foam.ENUM({
     {
       path: 'ace/mode/julia',
       label: 'Julia',
-      name: 'JULIA'
+      name: 'Julia'
     },
     {
       path: 'ace/mode/kotlin',
       label: 'Kotlin',
-      name: 'KOTLIN'
+      name: 'Kotlin'
     },
     {
       path: 'ace/mode/latex',
       label: 'LaTeX',
-      name: 'LATEX'
+      name: 'LaTeX'
     },
     {
       path: 'ace/mode/less',
@@ -384,22 +384,22 @@ foam.ENUM({
     {
       path: 'ace/mode/liquid',
       label: 'Liquid',
-      name: 'LIQUID'
+      name: 'Liquid'
     },
     {
       path: 'ace/mode/lisp',
       label: 'Lisp',
-      name: 'LISP'
+      name: 'Lisp'
     },
     {
       path: 'ace/mode/livescript',
       label: 'LiveScript',
-      name: 'LIVE_SCRIPT'
+      name: 'LiveScript'
     },
     {
       path: 'ace/mode/logiql',
       label: 'LogiQL',
-      name: 'LOGIQL'
+      name: 'LogiQL'
     },
     {
       path: 'ace/mode/lsl',
@@ -409,32 +409,32 @@ foam.ENUM({
     {
       path: 'ace/mode/lua',
       label: 'Lua',
-      name: 'LUA'
+      name: 'Lua'
     },
     {
       path: 'ace/mode/luapage',
       label: 'LuaPage',
-      name: 'LUA_PAGE'
+      name: 'LuaPage'
     },
     {
       path: 'ace/mode/lucene',
       label: 'Lucene',
-      name: 'LUCENE'
+      name: 'Lucene'
     },
     {
       path: 'ace/mode/makefile',
       label: 'Makefile',
-      name: 'MAKE_FILE'
+      name: 'Makefile'
     },
     {
       path: 'ace/mode/markdown',
       label: 'Markdown',
-      name: 'MARK_DOWN'
+      name: 'Markdown'
     },
     {
       path: 'ace/mode/mask',
       label: 'Mask',
-      name: 'MASK'
+      name: 'Mask'
     },
     {
       path: 'ace/mode/matlab',
@@ -444,7 +444,7 @@ foam.ENUM({
     {
       path: 'ace/mode/maze',
       label: 'Maze',
-      name: 'MAZE'
+      name: 'Maze'
     },
     {
       path: 'ace/mode/mel',
@@ -464,12 +464,12 @@ foam.ENUM({
     {
       path: 'ace/mode/mysql',
       label: 'MySQL',
-      name: 'MYSQL'
+      name: 'MySQL'
     },
     {
       path: 'ace/mode/nix',
       label: 'Nix',
-      name: 'NIX'
+      name: 'Nix'
     },
     {
       path: 'ace/mode/nsis',
@@ -479,37 +479,37 @@ foam.ENUM({
     {
       path: 'ace/mode/objectivec',
       label: 'Objective-C',
-      name: 'OBJECTIVE_C'
+      name: 'ObjectiveC'
     },
     {
       path: 'ace/mode/ocaml',
       label: 'OCaml',
-      name: 'OCAML'
+      name: 'OCaml'
     },
     {
       path: 'ace/mode/pascal',
       label: 'Pascal',
-      name: 'PASCAL'
+      name: 'Pascal'
     },
     {
       path: 'ace/mode/perl',
       label: 'Perl',
-      name: 'PERL'
+      name: 'Perl'
     },
     {
       path: 'ace/mode/perl6',
       label: 'Perl 6',
-      name: 'PERL6'
+      name: 'Perl6'
     },
     {
       path: 'ace/mode/pgsql',
       label: 'pgSQL',
-      name: 'PGSQL'
+      name: 'pgSQL'
     },
     {
       path: 'ace/mode/php_laravel_blade',
       label: 'PHP (Blade Template)',
-      name: 'PHP_BLADE_TEMPLATE'
+      name: 'PHPBladeTemplate'
     },
     {
       path: 'ace/mode/php',
@@ -519,42 +519,42 @@ foam.ENUM({
     {
       path: 'ace/mode/puppet',
       label: 'Puppet',
-      name: 'PUPPET'
+      name: 'Puppet'
     },
     {
       path: 'ace/mode/pig',
       label: 'Pig',
-      name: 'PIG'
+      name: 'Pig'
     },
     {
       path: 'ace/mode/powershell',
       label: 'Powershell',
-      name: 'POWERSHELL'
+      name: 'Powershell'
     },
     {
       path: 'ace/mode/praat',
       label: 'Praat',
-      name: 'PRAAT'
+      name: 'Praat'
     },
     {
       path: 'ace/mode/prolog',
       label: 'Prolog',
-      name: 'PROLOG'
+      name: 'Prolog'
     },
     {
       path: 'ace/mode/properties',
       label: 'Properties',
-      name: 'PROPERTIES'
+      name: 'Properties'
     },
     {
       path: 'ace/mode/protobuf',
       label: 'Protobuf',
-      name: 'PROTOBUFF'
+      name: 'Protobuf'
     },
     {
       path: 'ace/mode/python',
       label: 'Python',
-      name: 'PYTHON'
+      name: 'Python'
     },
     {
       path: 'ace/mode/r',
@@ -564,17 +564,17 @@ foam.ENUM({
     {
       path: 'ace/mode/razor',
       label: 'Razor',
-      name: 'RAZOR'
+      name: 'Razor'
     },
     {
       path: 'ace/mode/rdoc',
       label: 'RDoc',
-      name: 'R_DOC'
+      name: 'RDoc'
     },
     {
       path: 'ace/mode/red',
       label: 'Red',
-      name: 'RED'
+      name: 'Red'
     },
     {
       path: 'ace/mode/rhtml',
@@ -589,12 +589,12 @@ foam.ENUM({
     {
       path: 'ace/mode/ruby',
       label: 'Ruby',
-      name: 'RUBY'
+      name: 'Ruby'
     },
     {
       path: 'ace/mode/rust',
       label: 'Rust',
-      name: 'RUST'
+      name: 'Rust'
     },
     {
       path: 'ace/mode/sass',
@@ -609,12 +609,12 @@ foam.ENUM({
     {
       path: 'ace/mode/scala',
       label: 'Scala',
-      name: 'SCALA'
+      name: 'Scala'
     },
     {
       path: 'ace/mode/scheme',
       label: 'Scheme',
-      name: 'SCHEME'
+      name: 'Scheme'
     },
     {
       path: 'ace/mode/scss',
@@ -634,27 +634,27 @@ foam.ENUM({
     {
       path: 'ace/mode/slim',
       label: 'Slim',
-      name: 'SLIM'
+      name: 'Slim'
     },
     {
       path: 'ace/mode/smarty',
       label: 'Smarty',
-      name: 'SMARTY'
+      name: 'Smarty'
     },
     {
       path: 'ace/mode/snippets',
       label: 'snippets',
-      name: 'SNIPPETS'
+      name: 'snippets'
     },
     {
       path: 'ace/mode/soy_template',
       label: 'Soy Template',
-      name: 'SOY_TEMPLATE'
+      name: 'SoyTemplate'
     },
     {
       path: 'ace/mode/space',
       label: 'Space',
-      name: 'SPACE'
+      name: 'Space'
     },
     {
       path: 'ace/mode/sql',
@@ -669,7 +669,7 @@ foam.ENUM({
     {
       path: 'ace/mode/stylus',
       label: 'Stylus',
-      name: 'STYLUS'
+      name: 'Stylus'
     },
     {
       path: 'ace/mode/svg',
@@ -679,37 +679,37 @@ foam.ENUM({
     {
       path: 'ace/mode/swift',
       label: 'Swift',
-      name: 'SWIFT'
+      name: 'Swift'
     },
     {
       path: 'ace/mode/tcl',
       label: 'Tcl',
-      name: 'TCL'
+      name: 'Tcl'
     },
     {
       path: 'ace/mode/terraform',
       label: 'Terraform',
-      name: 'TERRAFORM'
+      name: 'Terraform'
     },
     {
       path: 'ace/mode/tex',
       label: 'Tex',
-      name: 'TEX'
+      name: 'Tex'
     },
     {
       path: 'ace/mode/text',
       label: 'Text',
-      name: 'TEXT'
+      name: 'Text'
     },
     {
       path: 'ace/mode/textile',
       label: 'Textile',
-      name: 'TEXTILE'
+      name: 'Textile'
     },
     {
       path: 'ace/mode/toml',
       label: 'Toml',
-      name: 'TOML'
+      name: 'Toml'
     },
     {
       path: 'ace/mode/tsx',
@@ -719,32 +719,32 @@ foam.ENUM({
     {
       path: 'ace/mode/twig',
       label: 'Twig',
-      name: 'TWIG'
+      name: 'Twig'
     },
     {
       path: 'ace/mode/typescript',
       label: 'Typescript',
-      name: 'TYPESCRIPT'
+      name: 'Typescript'
     },
     {
       path: 'ace/mode/vala',
       label: 'Vala',
-      name: 'VALA'
+      name: 'Vala'
     },
     {
       path: 'ace/mode/vbscript',
       label: 'VBScript',
-      name: 'VBSCIPT'
+      name: 'VBScript'
     },
     {
       path: 'ace/mode/velocity',
       label: 'Velocity',
-      name: 'VELOCITY'
+      name: 'Velocity'
     },
     {
       path: 'ace/mode/verilog',
       label: 'Verilog',
-      name: 'VERILOG'
+      name: 'Verilog'
     },
     {
       path: 'ace/mode/vhdl',
@@ -754,12 +754,12 @@ foam.ENUM({
     {
       path: 'ace/mode/visualforce',
       label: 'Visualforce',
-      name: 'VISUAL_FORCE'
+      name: 'Visualforce'
     },
     {
       path: 'ace/mode/wollok',
       label: 'Wollok',
-      name: 'WOLLOK'
+      name: 'Wollok'
     },
     {
       path: 'ace/mode/xml',
@@ -769,7 +769,7 @@ foam.ENUM({
     {
       path: 'ace/mode/xquery',
       label: 'XQuery',
-      name: 'XQUERY'
+      name: 'XQuery'
     },
     {
       path: 'ace/mode/yaml',
@@ -779,7 +779,7 @@ foam.ENUM({
     {
       path: 'ace/mode/django',
       label: 'Django',
-      name: 'DJANGO'
+      name: 'Django'
     }
   ]
 });
