@@ -53,15 +53,11 @@ foam.LIB({
         },
         Null: function(n) { return "null"; },
         Object: function(o) {
-          return `
-new java.util.HashMap() {
-  {
-${Object.keys(o).map(function(k) {
-  return `  put(${foam.java.asJavaValue(k)}, ${foam.java.asJavaValue(o[k])});`
+          return `foam.util.Arrays.asHashMap(new Object[] {
+${Object.keys(o).map(function(k, i, a) {
+  return `  ${foam.java.asJavaValue(k)}, ${foam.java.asJavaValue(o[k])}` + ((i == a.length-1) ? '' : ',')
 }).join('\n')}
-  }
-}
-          `;
+})`;
         },
         RegExp: function(o) {
           o = o.toString();
@@ -593,7 +589,7 @@ foam.LIB({
           body: 'setX(x);'
         });
 
-        if ( props.length ) {
+        if ( props.length && props.length < 7 ) {
           // All-property constructor
           cls.method({
             visibility: 'public',

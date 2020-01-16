@@ -14,6 +14,7 @@ foam.CLASS({
     'bsh.Interpreter',
     'foam.core.*',
     'foam.dao.*',
+    'foam.nanos.logger.Logger',
     'foam.mlang.predicate.Predicate',
     'foam.nanos.auth.*',
     'static foam.mlang.MLang.*',
@@ -46,7 +47,10 @@ foam.CLASS({
 
       try {
         return (boolean) shell.eval(getCode());
-      } catch (Throwable e) {}
+      } catch (Throwable e) {
+        Logger logger = (Logger) getX().get("logger");
+        logger.error(e);
+      }
       return false;
       `
     },

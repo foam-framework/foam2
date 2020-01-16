@@ -52,7 +52,9 @@ try {
 
   handler.setFormatter(new CustomFormatter());
   getLogger().addHandler(handler);
-} catch (IOException e) {}`
+} catch (IOException e) {
+  System.err.println(e);
+}`
     },
     {
       name: 'combine',
