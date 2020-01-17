@@ -19,11 +19,27 @@ foam.CLASS({
     'foam.dao.QuickSink'
   ],
 
+  imports: [ 'merged' ],
+
   properties: [
     {
       /** The cache to read items quickly. */
       name: 'cache'
-    }
+    },
+    {
+       class: 'Long',
+       name: 'purgeTime',
+       documentation: 'Time to wait before purging cache.',
+       units: 'ms',
+       value: 15000
+     },
+     {
+       name: 'purgeCache',
+       transient: true,
+       expression: function(purgeTime) {
+         return this.merged(=> this.cache = {}, purgeTime);
+       }
+     }
   ],
 
   methods: [
@@ -92,17 +108,6 @@ foam.CLASS({
         self.cache = {};
         return;
       });
-    }
-  ],
-
-  listeners: [
-    {
-      name: 'purgeCache',
-      isMerged: true,
-      mergeDelay: 15000,
-      code: function() {
-        this.cache = {};
-      }
     }
   ]
 });
