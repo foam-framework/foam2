@@ -37,7 +37,7 @@ foam.CLASS({
        name: 'purgeCache',
        transient: true,
        expression: function(purgeTime) {
-         return this.merged(=> this.cache = {}, purgeTime);
+         return this.merged(() => this.cache = {}, purgeTime);
        }
      }
   ],
