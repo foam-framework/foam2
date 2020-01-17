@@ -25,7 +25,7 @@ foam.CLASS({
     {
       /** The cache to read items quickly. */
       name: 'cache',
-      value: {}
+      factory: function() { return {}; }
     },
     {
        class: 'Long',
