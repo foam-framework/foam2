@@ -47,6 +47,15 @@ foam.CLASS({
         included in the detail view.
       `,
       factory: null,
+      adapt: function(_, newValue) {
+        if ( Array.isArray(newValue) ) return newValue;
+        if ( typeof newValue !== 'object' ) throw new Error('You must set propertyWhitelist to an array of properties or a map from names to overrides encoded as an object.');
+        return Object.entries(newValue).reduce((acc, [propertyName, overrides]) => {
+          var axiom = this.of.getAxiomByName(propertyName);
+          if ( axiom ) acc.push(axiom.clone().copyFrom(overrides));
+          return acc;
+        }, []);
+      },
       preSet: function(_, ps) {
         foam.assert(ps, 'Properties required.');
         for ( var i = 0; i < ps.length; i++ ) {
@@ -104,6 +113,13 @@ foam.CLASS({
               return s.properties.length > 0 || s.actions.length > 0;
             });
         }
+
+        // Filter out any sections where we know that there are no actions and
+        // no visible properties.
+        sections = sections.filter(s => {
+          return s.actions.length > 0 ||
+                 s.properties.some(p => this.controllerMode.getMode(p) !== foam.u2.DisplayMode.HIDDEN);
+        });
 
         return sections;
       }

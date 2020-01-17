@@ -25,17 +25,10 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.core.FObject',
     'foam.core.X',
     'foam.dao.DAO',
-    'foam.dao.ProxyDAO',
     'foam.dao.ArraySink',
-    'foam.dao.Sink',
-    'foam.mlang.order.Comparator',
-    'foam.mlang.predicate.Predicate',
-    'foam.nanos.auth.AuthService',
-    'foam.nanos.auth.PriorPassword',
-    'foam.nanos.notification.Notification',
+
     'foam.nanos.notification.NotificationSetting',
     'foam.util.SafetyUtil',
     'java.util.List',

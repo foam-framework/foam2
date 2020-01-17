@@ -376,9 +376,6 @@ foam.CLASS({
   name: 'AbstractPredicate',
   abstract: true,
   implements: [ 'foam.mlang.predicate.Predicate' ],
-  javaImports: [
-    'foam.nanos.auth.AuthService',
-  ],
 
   documentation: 'Abstract Predicate base-class.',
 
@@ -1472,8 +1469,7 @@ foam.CLASS({
   javaImports: [
     'java.util.List',
     'foam.mlang.ArrayConstant',
-    'foam.mlang.Constant',
-    'foam.mlang.predicate.False'
+    'foam.mlang.Constant'
   ],
 
   properties: [

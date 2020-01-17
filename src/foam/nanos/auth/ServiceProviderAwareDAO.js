@@ -30,14 +30,7 @@ Relationship hierarchy.`,
     'foam.mlang.MLang',
     'foam.mlang.predicate.Predicate',
     'foam.nanos.app.AppConfig',
-    'foam.nanos.auth.AuthService',
-    'foam.nanos.auth.User',
-    'foam.nanos.logger.Logger',
-    'foam.util.SafetyUtil',
-    'java.util.Map',
-    'java.util.Map.Entry',
-    'java.util.HashMap',
-    'java.util.stream.Collectors'
+    'foam.util.SafetyUtil'
   ],
 
   properties: [

@@ -165,7 +165,7 @@ public class RuleEngine extends ContextAwareSupport {
       isActive = ((LifecycleAware) rule).getLifecycleState() == LifecycleState.ACTIVE;
     }
 
-    return 
+    return
          isActive
       && rule.getAction() != null
       && rule.f(userX_, obj, oldObj);
@@ -174,6 +174,7 @@ public class RuleEngine extends ContextAwareSupport {
   private void asyncApplyRules(List<Rule> rules, FObject obj, FObject oldObj) {
     if (rules.isEmpty()) return;
     ((Agency) getX().get("threadPool")).submit(userX_, x -> {
+      Logger logger = (Logger) x.get("logger");
       for (Rule rule : rules) {
         if ( stops_.get() ) return;
 
@@ -191,6 +192,7 @@ public class RuleEngine extends ContextAwareSupport {
             rule.asyncApply(x, nu, oldObj, RuleEngine.this, rule);
             saveHistory(rule, nu);
           } catch (Exception ex) {
+            logger.warning("Retry asyncApply rule(" + rule.getId() + ").", ex);
             retryAsyncApply(x, rule, nu, oldObj);
           }
         }
@@ -199,7 +201,7 @@ public class RuleEngine extends ContextAwareSupport {
   }
 
   private void retryAsyncApply(X x, Rule rule, FObject obj, FObject oldObj) {
-    new RetryManager().submit(x, x1 -> {
+    new RetryManager(rule.getId()).submit(x, x1 -> {
       rule.asyncApply(x, obj, oldObj, RuleEngine.this, rule);
       saveHistory(rule, obj);
     });

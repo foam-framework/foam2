@@ -86,10 +86,25 @@ foam.CLASS({
             verifier.initVerify(key);
             return this.verify(signature, verifier);
           }
+
+          public void assertNotFrozen()
+            throws UnsupportedOperationException
+          {
+            if ( __frozen__ ) throw new UnsupportedOperationException("Object is frozen.");
+          }
         `);
       }
     }
   ],
+
+  // properties: [
+  //   {
+  //     name: 'userFeedback',
+  //     class: 'FObjectProperty',
+  //     of: 'foam.comics.v2.userfeedback.UserFeedback',
+  //     storageTransient: true
+  //   }
+  // ],
 
   methods: [
     {
@@ -115,6 +130,22 @@ foam.CLASS({
         }
 
         return 0;
+      `
+    },
+    {
+      name: 'hashCode',
+      type: 'Integer',
+      javaCode: `
+        int hashCode = 1;
+        List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
+        Iterator i = props.iterator();
+
+        while ( i.hasNext() ) {
+          PropertyInfo pi = (PropertyInfo) i.next();
+          hashCode = 31 * hashCode + java.util.Objects.hash(pi.get(this));
+        }
+
+        return hashCode;
       `
     },
     {
@@ -162,10 +193,9 @@ foam.CLASS({
           }
         } catch ( Throwable t ) {
           throw new RuntimeException(t);
-        } finally {
-          if ( isDiff ) return ret;
-          return null;
         }
+        if ( isDiff ) return ret;
+        return null;
       `
     },
     {
@@ -361,7 +391,6 @@ foam.CLASS({
           PropertyInfo prop = (PropertyInfo) i.next();
           if ( ! prop.includeInDigest() ) continue;
           if ( ! prop.isSet(this) ) continue;
-          //if ( prop.isDefaultValue(this) ) continue;
           md.update(prop.getNameAsByteArray());
           prop.updateDigest(this, md);
         }
@@ -385,7 +414,6 @@ foam.CLASS({
           PropertyInfo prop = (PropertyInfo) i.next();
           if ( ! prop.includeInDigest() ) continue;
           if ( ! prop.isSet(this) ) continue;
-          //if ( prop.isDefaultValue(this) ) continue;
           signer.update(prop.getNameAsByteArray());
           prop.updateSignature(this, signer);
         }
@@ -407,7 +435,6 @@ foam.CLASS({
           PropertyInfo prop = (PropertyInfo) i.next();
           if ( ! prop.includeInDigest() ) continue;
           if ( ! prop.isSet(this) ) continue;
-          //if ( prop.isDefaultValue(this) ) continue;
           verifier.update(prop.getNameAsByteArray());
           prop.updateSignature(this, verifier);
         }
