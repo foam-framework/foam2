@@ -60,7 +60,7 @@ foam.CLASS({
 
         try {
           if ( ! n && this.placeholder ) {
-            this.data  = undefined;
+            this.data  = this.defaultValue !== undefined ? this.defaultValue : undefined;
             this.text  = this.placeholder;
             this.index = -1;
           } else {
