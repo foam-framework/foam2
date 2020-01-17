@@ -489,7 +489,7 @@ public class MMJournal extends AbstractJournal implements Electable {
 
         return  new String(buf, 0, off, StandardCharsets.UTF_8);
       } catch ( Exception e ) {
-        logger.info(ip + ":" +  port + " error message: " + e);
+        logger.info("fail persist entry into "ip + ":" +  port + " error message: " + e);
         throw e;
       } finally {
         IOUtils.closeQuietly(output);
