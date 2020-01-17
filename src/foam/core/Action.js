@@ -123,13 +123,15 @@ If empty than no permissions are required.`
 If empty than no permissions are required.`,
     },
     {
+      // TODO: Use WeakMap instead. Doing so causes issues when cloning Actions
+      // though, since FOAM doesn't handle cloning WeakMaps right now. Instead,
+      // it converts them to normal objects, which breaks downstream code that
+      // expects a WeakMap.
+      class: 'Map',
       name: 'runningMap',
-      factory: function() {
-        return new WeakMap();
-      },
       hidden: true,
       transient: true,
-      documentation: 'A weak Map to track the running state of action on a per object basis.'
+      documentation: 'A map to track the running state of action on a per object basis.'
     }
   ],
 
@@ -193,10 +195,10 @@ If empty than no permissions are required.`,
     },
 
     function getRunning$(data) {
-      var running = this.runningMap.get(data);
+      var running = this.runningMap[data];
       if ( ! running ) {
         running = foam.core.SimpleSlot.create({ value: false });
-        if ( data ) this.runningMap.set(data, running);
+        if ( data ) this.runningMap[data] = running;
       }
       return running;
     },
