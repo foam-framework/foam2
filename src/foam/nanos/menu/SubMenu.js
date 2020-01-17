@@ -17,8 +17,7 @@ foam.CLASS({
     },
 
     function launch(X, menu, parent) {
-      var view = this.createView(X, menu, parent);
-      view.open();
+      // noop
     }
   ]
 });
