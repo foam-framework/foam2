@@ -2,6 +2,9 @@ package foam.util;
 
 import java.lang.reflect.Array;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class Arrays {
 
@@ -57,7 +60,7 @@ public class Arrays {
   }
 
   /**
-    Convert an array of keys and values into a HashMap.
+    Convert an array of keys and values into a Map.
     Example:
     HashMap map = foam.util.Arrays.asHashMap({
       "key1", "value1",
@@ -65,7 +68,7 @@ public class Arrays {
       ...
     });
   **/
-  public static HashMap asHashMap(Object[] arr) {
+  public static Map asMap(Object[] arr) {
     HashMap m = new HashMap();
     if ( arr != null ) {
       for ( int i = 0 ; i < arr.length ; i += 2 ) {
@@ -73,5 +76,24 @@ public class Arrays {
       }
     }
     return m;
+  }
+
+  /**
+    Convert an array of values into a Set.
+    Example:
+    HashMap map = foam.util.Arrays.asHashMap({
+      "key1", "value1",
+      "key2", "value2"
+      ...
+    });
+  **/
+  public static Set asSet(Object[] arr) {
+    HashSet s = new HashSet();
+    if ( arr != null ) {
+      for ( int i = 0 ; i < arr.length ; i++ ) {
+        s.add(arr[i]);
+      }
+    }
+    return s;
   }
 }
