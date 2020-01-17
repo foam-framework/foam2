@@ -65,9 +65,13 @@ public class QuorumService extends AbstractFObject implements NanoService {
     List list = sink.getArray();
     if ( list.size() != 1 ) throw new RuntimeException("error on clusterNode journal");
     mySelf = (ClusterNode) list.get(0);
-
+    unReadyElectables = new LinkedBlockingQueue<Electable>();
     //mySelf = (ClusterNode) clusterDAO.find(clusterId);
     if ( mySelf == null ) throw new RuntimeException("ClusterNode no found: " + hostname);
+    if ( mySelf.getGroup() != 1 || mySelf.getType() != ClusterNodeType.MM) {
+      logger.info("not in group 1");
+      return;
+    }
 
     networkManager = new QuorumNetworkManager(x);
     election = new Election(x, networkManager, this);
@@ -75,7 +79,6 @@ public class QuorumService extends AbstractFObject implements NanoService {
 
     primaryElectables = new LinkedBlockingQueue<Electable>();
     secondaryElectables = new LinkedBlockingQueue<Electable>();
-    unReadyElectables = new LinkedBlockingQueue<Electable>();
 
     initialElection();
     runElection.start();

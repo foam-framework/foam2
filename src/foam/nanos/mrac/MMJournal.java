@@ -619,7 +619,7 @@ public class MMJournal extends AbstractJournal implements Electable {
     synchronized ( cacheOrMDAOLock ) {
       // Data already in the MDAO.
       if ( entry.getMyIndex() < globalIndex.get() ) return;
-      if ( entry.getMyIndex() != globalIndex.get() ) throw new RuntimeException("Wrong order");
+      if ( entry.getMyIndex() != globalIndex.get() ) throw new RuntimeException("Wrong globalIndex [ expect=" + globalIndex + ", receive=" + entry.getMyIndex() + " ]");
 
       if ( registerDAOs.get(entry.getNspecKey()) != null ) {
         DAO dao = registerDAOs.get(entry.getNspecKey());
@@ -703,17 +703,18 @@ public class MMJournal extends AbstractJournal implements Electable {
           nodeToBuffers.put(node.getId(), retrieveDataFromNode(x, channel, fromIndex));
           count++;
         } catch ( Exception e ) {
-          logger.info("Can not replay from : " + node.getId() + "-" + node.getHostName());
+          logger.info("!!fail replay from : " + node.getId() + "-" + node.getHostName() + e);
           TCPNioServer.closeSocketChannel(channel);
-          e.printStackTrace();
         }
       }
+
+      logger.info("replay from " + count + "medusa node");
 
       if ( count < 1 ) {
         throw new RuntimeException("Do not get data from enough MN");
       }
 
-      groupToEntry.put(groupId, concatEntries(parseEntries(x, nodeToBuffers)));
+      groupToEntry.put(groupId, concatEntries(groupId, parseEntries(x, nodeToBuffers)));
     }
 
     return sortEntries(mergeEntries(groupToEntry));
@@ -898,7 +899,7 @@ public class MMJournal extends AbstractJournal implements Electable {
 
   int quorumSize = 1;
   // Verify entries from same group. And concat them into list.
-  private final List<MedusaEntry> concatEntries(Map<Long, List<MedusaEntry>> nodeToEntry) {
+  private final List<MedusaEntry> concatEntries(long groupId, Map<Long, List<MedusaEntry>> nodeToEntry) {
     Map<MedusaEntry, Integer> entryCount = new HashMap<MedusaEntry, Integer>();
 
     for ( Map.Entry<Long, List<MedusaEntry>> entry2: nodeToEntry.entrySet() ) {
@@ -914,7 +915,7 @@ public class MMJournal extends AbstractJournal implements Electable {
     for ( Map.Entry<MedusaEntry, Integer> entry : entryCount.entrySet() ) {
       if ( entry.getValue().intValue() >= quorumSize ) entryList.add(entry.getKey());
     }
-    logger.info("entryList size: " + entryList.size());
+    logger.info("From groupId: " + groupId + " [ receive:" + entryCount.size() + ", accept:" + entryList.size() + " ]");
     return entryList;
   }
 
@@ -1001,7 +1002,7 @@ public class MMJournal extends AbstractJournal implements Electable {
           registerChannels.add(socketChannel);
 
         } catch ( IOException e ) {
-          logger.info(e);
+          logger.info("Fail to listen from: " + socketChannel.socket().getInetAddress());
           TCPNioServer.removeSelectionKey(key);
           TCPNioServer.hardCloseSocketChannel(socketChannel);
         }
@@ -1019,8 +1020,8 @@ public class MMJournal extends AbstractJournal implements Electable {
           iterator.remove();
 
           if ( key.isConnectable() ) {
-            logger.info("client connect success");
             SocketChannel channel=(SocketChannel)key.channel();
+            logger.info("success to lisetn from: " + channel.socket().getInetAddress());
             if(channel.isConnectionPending()){
               channel.finishConnect();
             }
