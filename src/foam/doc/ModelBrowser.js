@@ -90,7 +90,7 @@ foam.CLASS({
           var cls = foam.lookup(model.id);
           return this.E().
               start().style({ 'font-size': '20px', 'margin-top': '20px' }).
-                add('Model ' + model).
+                add('Model ' + cls.name).//model
               end().
               start(self.UMLDiagram, { data: cls }).end().
               start(self.SimpleClassView, { data: cls }).end()
