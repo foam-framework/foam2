@@ -356,7 +356,7 @@ public class Outputter
       Iterator i      = axioms.iterator();
 
       writer_.append("{");
-      addInnerNewline();
+      if ( multiLineOutput_ ) addInnerNewline();
       while ( i.hasNext() ) {
         PropertyInfo prop = (PropertyInfo) i.next();
         isPropertyDiff = maybeOutputPropertyDelta(oldFObject, newFObject, prop);
@@ -374,15 +374,14 @@ public class Outputter
             addInnerNewline();
             PropertyInfo id = (PropertyInfo) newInfo.getAxiomByName("id");
             outputProperty(newFObject, id);
-            writer_.append(",");
-
             isDiff = true;
           }
-
+          writer_.append(",");
           addInnerNewline();
           outputProperty(newFObject, prop);
         }
       }
+
       if ( isDiff ) {
         if ( multiLineOutput_ )  writer_.append("\n");
         writer_.append("}");
