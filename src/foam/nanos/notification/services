@@ -17,10 +17,10 @@ p({
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("notifications")
       .build();
-    dao.addPropertyIndex(foam.nanos.notification.Notification.GROUP_ID,foam.nanos.notification.Notification.READ);
-    dao.addPropertyIndex(foam.nanos.notification.Notification.BROADCASTED,foam.nanos.notification.Notification.READ);
-    dao.addPropertyIndex(foam.nanos.notification.Notification.USER_ID,foam.nanos.notification.Notification.READ);
-    dao.addPropertyIndex(foam.nanos.notification.Notification.EXPIRY_DATE);
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.notification.Notification.GROUP_ID,foam.nanos.notification.Notification.READ });
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.notification.Notification.BROADCASTED,foam.nanos.notification.Notification.READ });
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.notification.Notification.USER_ID,foam.nanos.notification.Notification.READ });
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.notification.Notification.EXPIRY_DATE });
     return dao;
   """
 })
