@@ -73,10 +73,10 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
                                   .where(EQ(ClusterNode.HOST_NAME, hostname))
                                   .select(new ArraySink());
     List list = sink.getArray();
-    if ( list.size() != 1 ) throw new RuntimeException("error on clusterNode journal");
+    if ( list.size() != 1 ) throw new RuntimeException("hostname: " +  hostname + " duplicate on journal");
     ClusterNode myself = (ClusterNode) list.get(0);
     //ClusterNode myself = (ClusterNode) clusterDAO.find(clusterId);
-    if ( myself == null ) throw new RuntimeException("ClusterNode no found: " + clusterId);
+    if ( myself == null ) throw new RuntimeException("can not find clusterNode with hostname: " + hostname);
 
 
     //TODO: do not hard coding following parameter.
