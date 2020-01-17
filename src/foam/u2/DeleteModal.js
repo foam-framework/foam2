@@ -51,7 +51,7 @@ foam.CLASS({
       name: 'onDelete'
     },
     {
-      class: 'FObject',
+      class: 'FObjectProperty',
       name: 'data'
     }
   ],
