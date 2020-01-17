@@ -489,7 +489,7 @@ public class MMJournal extends AbstractJournal implements Electable {
 
         return  new String(buf, 0, off, StandardCharsets.UTF_8);
       } catch ( Exception e ) {
-        logger.info(e);
+        logger.info(ip + ":" +  port + " error message: " + e);
         throw e;
       } finally {
         IOUtils.closeQuietly(output);
@@ -703,6 +703,7 @@ public class MMJournal extends AbstractJournal implements Electable {
           nodeToBuffers.put(node.getId(), retrieveDataFromNode(x, channel, fromIndex));
           count++;
         } catch ( Exception e ) {
+          logger.info("Can not replay from : " + node.getId() + "-" + node.getHostName());
           TCPNioServer.closeSocketChannel(channel);
           e.printStackTrace();
         }

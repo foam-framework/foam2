@@ -72,7 +72,7 @@ public class MNJournal extends FileJournal {
       this.filename = filename;
       this.journalDir = System.getProperty("JOURNAL_HOME");
       this.outChannel = FileChannel.open(getPath(filename), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-      blocking();
+      //blocking();
       //load min and max index;
       ArraySink sink = (ArraySink) entryRecordDAO
                                     .where(EQ(EntryRecord.FILE_NAME, filename))
@@ -153,12 +153,6 @@ public class MNJournal extends FileJournal {
 
     try {
       synchronized ( fileLock ) {
-        if ( blockIndex != 10 ) {
-          blockIndex++;
-        } else {
-          if ( ! blocking() ) throw new RuntimeException("can not blccking");
-          blockIndex = 0;
-        }
 
         if ( globalIndex > maxGlobalIndex ) {
           maxGlobalIndex = globalIndex;
