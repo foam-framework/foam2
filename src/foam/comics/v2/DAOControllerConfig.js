@@ -138,6 +138,10 @@ foam.CLASS({
     },
     {
       class: 'FObjectProperty',
+      of: 'foam.comics.v2.CRUDActionsAuth',
+      name: 'CRUDActionsAuth'
+    },
+    {
       of: 'foam.mlang.predicate.Predicate',
       name: 'filterExportPredicate',
       documentation: 'Filtering the types of formats user is able to export from TableView'

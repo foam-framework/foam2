@@ -706,6 +706,7 @@ FOAM_FILES([
   { name: "foam/comics/v2/CannedQuery" },
   { name: "foam/comics/v2/DAOBrowseControllerView" },
   { name: "foam/comics/v2/DAOBrowserView" },
+  { name: "foam/comics/v2/CRUDActionsAuth" },
   { name: "foam/comics/v2/DAOControllerConfig" },
   { name: "foam/comics/v2/DAOCreateView" },
   { name: "foam/comics/v2/DAOSummaryView" },

@@ -18,6 +18,7 @@ foam.CLASS({
     'org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest',
     'org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse',
     'org.eclipse.jetty.websocket.servlet.WebSocketCreator',
+    'foam.nanos.logger.Logger',
     'java.util.Set',
     'java.util.HashSet',
     'java.util.Arrays',
@@ -209,7 +210,11 @@ foam.CLASS({
         this.configHttps(server);
                 
         server.start();
-      } catch(Exception e) {}
+      } catch(Exception e) {
+        Logger logger = (Logger) getX().get("logger");
+        if ( logger != null )
+          logger.error(e);
+      }
       `
     },
     {
@@ -231,6 +236,9 @@ foam.CLASS({
               server.stop();
             } catch (Exception e) {
               System.err.println("Exception during Jetty server stop in the shutdown hook");
+              Logger logger = (Logger) getX().get("logger");
+              if ( logger != null )
+                logger.error(e);
             }
           }
         });
