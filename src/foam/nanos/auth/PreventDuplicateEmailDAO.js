@@ -11,10 +11,7 @@ foam.CLASS({
   documentation: 'DAO decorator that prevents putting a user with the same email',
 
   javaImports: [
-    'foam.core.FObject',
-    'foam.core.X',
     'foam.dao.DAO',
-    'foam.dao.ProxyDAO',
     'foam.mlang.MLang',
     'foam.mlang.sink.Count',
     'foam.util.Email',

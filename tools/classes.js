@@ -283,6 +283,7 @@ var classes = [
   'foam.nanos.menu.TabsMenu',
   'foam.nanos.menu.ViewMenu',
   'foam.comics.v2.CannedQuery',
+  'foam.comics.v2.CRUDActionsAuth',
   'foam.comics.v2.namedViews.NamedViewCollection',
   'foam.comics.v2.namedViews.NamedViewInstance',
   'foam.comics.v2.userfeedback.UserFeedbackAware',
