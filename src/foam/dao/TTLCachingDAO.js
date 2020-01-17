@@ -23,12 +23,7 @@ foam.CLASS({
     {
       /** The cache to read items quickly. */
       name: 'cache'
-    },
-    {
-      class: 'Long',
-      name: 'purgeTime',
-      value: 15000
-    },
+    }
   ],
 
   methods: [
@@ -40,6 +35,7 @@ foam.CLASS({
       if ( foam.Undefined.isInstance(cachedValue) ) {
         this.delegate.find_(x, key).then(function(o) {
           self.cache[id] = o;
+          self.purgeCache();
           return o;
         });
       } else {
@@ -70,6 +66,7 @@ foam.CLASS({
               var o = a[i];
               console.log('***** caching ', o.id);
               self.cache[o.id] = o;
+              self.purgeCache();
             }
           }
           promise.resolve(s);
@@ -102,10 +99,9 @@ foam.CLASS({
     {
       name: 'purgeCache',
       isMerged: true,
-      mergeDelay: this.purgeTime,
+      mergeDelay: 15000,
       code: function() {
         this.cache = {};
-        this.purgeCache();
       }
     }
   ]
