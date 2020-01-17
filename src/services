@@ -343,7 +343,7 @@ p({
       .setOrder(new foam.core.PropertyInfo[] {foam.nanos.menu.Menu.ORDER, foam.nanos.menu.Menu.LABEL})
       .build();
   """,
-  "client": "{\"of\":\"foam.nanos.menu.Menu\",,\"cacheType\":\"FULL\"}"
+  "client": "{\"of\":\"foam.nanos.menu.Menu\",\"cacheType\":\"FULL\"}"
 })
 
 p({"class":"foam.nanos.boot.NSpec", "name":"blobStore",                          "serviceClass":"foam.blob.BlobStore"})
