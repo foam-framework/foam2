@@ -15,10 +15,7 @@ foam.CLASS({
     'foam.core.FObject',
     'foam.core.X',
     'foam.dao.*',
-    'foam.mlang.order.Comparator',
     'foam.mlang.predicate.Predicate',
-    'foam.nanos.auth.AuthorizationException',
-    'foam.nanos.auth.User',
 
     'static foam.mlang.MLang.AND',
     'static foam.mlang.MLang.IS_AUTHORIZED_TO_READ',

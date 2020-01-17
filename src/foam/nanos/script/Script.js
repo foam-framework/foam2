@@ -29,14 +29,12 @@ foam.CLASS({
     'bsh.Interpreter',
     'foam.core.*',
     'foam.dao.*',
-    'foam.mlang.predicate.Predicate',
+    'foam.nanos.logger.Logger',
     'foam.nanos.auth.*',
     'foam.nanos.pm.PM',
-    'foam.nanos.session.Session',
     'java.io.ByteArrayOutputStream',
     'java.io.PrintStream',
     'java.util.Date',
-    'java.util.List',
     'static foam.mlang.MLang.*',
   ],
 
@@ -225,6 +223,8 @@ foam.CLASS({
         } catch (Throwable e) {
           ps.println();
           e.printStackTrace(ps);
+          Logger logger = (Logger) x.get("logger");
+          logger.error(e);
         } finally {
           pm.log(x);
         }

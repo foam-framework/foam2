@@ -11,12 +11,8 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.FObject',
-    'foam.core.X',
     'foam.dao.*',
-    'foam.mlang.MLang',
-    'foam.mlang.order.Comparator',
-    'foam.mlang.predicate.Predicate',
-    'foam.util.SafetyUtil'
+    'foam.mlang.MLang'
   ],
 
   documentation: `

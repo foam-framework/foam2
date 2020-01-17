@@ -135,7 +135,7 @@ public class DigWebAgent
         }
       }
 
-      if ( Command.put == command ) {
+      if ( Command.PUT == command ) {
         String returnMessage = "success";
 
         if ( Format.JSON == format ) {
@@ -340,7 +340,7 @@ public class DigWebAgent
           }
         }
         out.println(returnMessage);
-      } else if ( Command.select == command ) {
+      } else if ( Command.SELECT == command ) {
         PropertyInfo idProp = (PropertyInfo) cInfo.getAxiomByName("id");
         ArraySink sink = (ArraySink) ( ! SafetyUtil.isEmpty(id) ?
           dao.where(MLang.EQ(idProp, id)).select(new ArraySink()) :
@@ -442,7 +442,7 @@ public class DigWebAgent
 
           return;
         }
-      } else if ( Command.remove == command ) {
+      } else if ( Command.REMOVE == command ) {
         PropertyInfo idProp     = (PropertyInfo) cInfo.getAxiomByName("id");
         Object       idObj      = idProp.fromString(id);
         FObject      targetFobj = dao.find(idObj);
