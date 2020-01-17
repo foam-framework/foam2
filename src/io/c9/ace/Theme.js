@@ -10,151 +10,151 @@ foam.ENUM({
   values: [
     {
       path: 'ace/theme/chrome',
-      name: 'Chrome'
+      name: 'CHROME'
     },
     {
       path: 'ace/theme/clouds',
-      name: 'Clouds'
+      name: 'CLOUDS'
     },
     {
       path: 'ace/theme/crimson_editor',
-      name: 'CrimsonEditor'
+      name: 'CRIMSON_EDITOR'
     },
     {
       path: 'ace/theme/dawn',
-      name: 'Dawn'
+      name: 'DAWN'
     },
     {
       path: 'ace/theme/dreamweaver',
-      name: 'Dreamweaver'
+      name: 'DREAMWEAVER'
     },
     {
       path: 'ace/theme/eclipse',
-      name: 'Eclipse'
+      name: 'ECLIPSE'
     },
     {
       path: 'ace/theme/github',
-      name: 'GitHub'
+      name: 'GITHUB'
     },
     {
       path: 'ace/theme/iplastic',
-      name: 'IPlastic'
+      name: 'IPLASTIC'
     },
     {
       path: 'ace/theme/solarized_light',
-      name: 'SolarizedLight'
+      name: 'SOLARIZED_LIGHT'
     },
     {
       path: 'ace/theme/textmate',
-      name: 'TextMate'
+      name: 'TEXTMATE'
     },
     {
       path: 'ace/theme/tomorrow',
-      name: 'Tomorrow'
+      name: 'TOMORROW'
     },
     {
       path: 'ace/theme/xcode',
-      name: 'XCode'
+      name: 'XCODE'
     },
     {
       path: 'ace/theme/kuroir',
-      name: 'Kuroir'
+      name: 'KUROIR'
     },
     {
       path: 'ace/theme/katzenmilch',
-      name: 'KatzenMilch'
+      name: 'KATZEN_MILCH'
     },
     {
       path: 'ace/theme/sqlserver',
-      name: 'SQLServer'
+      name: 'SQL_SERVER'
     },
     {
       path: 'ace/theme/ambiance',
-      name: 'Ambiance'
+      name: 'AMBIANCE'
     },
     {
       path: 'ace/theme/chaos',
-      name: 'Chaos'
+      name: 'CHAOS'
     },
     {
       path: 'ace/theme/clouds_midnight',
-      name: 'CloudsMidnight'
+      name: 'CLOUDS_MIDNIGHT'
     },
     {
       path: 'ace/theme/dracula',
-      name: 'Dracula'
+      name: 'DRACULA'
     },
     {
       path: 'ace/theme/cobalt',
-      name: 'Cobalt'
+      name: 'COBALT'
     },
     {
       path: 'ace/theme/gruvbox',
-      name: 'Gruvbox'
+      name: 'GRUVBOX'
     },
     {
       path: 'ace/theme/gob',
-      name: 'GreenOnBlack'
+      name: 'GREEN_ON_BLACK'
     },
     {
       path: 'ace/theme/idle_fingers',
-      name: 'idleFingers'
+      name: 'IDLE_FINGERS'
     },
     {
       path: 'ace/theme/kr_theme',
-      name: 'krTheme'
+      name: 'KR_THEME'
     },
     {
       path: 'ace/theme/merbivore',
-      name: 'Merbivore'
+      name: 'MERBIVORE'
     },
     {
       path: 'ace/theme/merbivore_soft',
-      name: 'MerbivoreSoft'
+      name: 'MERBIVORE_SOFT'
     },
     {
       path: 'ace/theme/mono_industrial',
-      name: 'MonoIndustrial'
+      name: 'MONO_INDUSTRIAL'
     },
     {
       path: 'ace/theme/monokai',
-      name: 'Monokai'
+      name: 'MONOKAI'
     },
     {
       path: 'ace/theme/pastel_on_dark',
-      name: 'PastelOnDark'
+      name: 'PASTEL_ON_DARK'
     },
     {
       path: 'ace/theme/solarized_dark',
-      name: 'SolarizedDark'
+      name: 'SOLOARIZED_DARK'
     },
     {
       path: 'ace/theme/terminal',
-      name: 'Terminal'
+      name: 'TERMINAL'
     },
     {
       path: 'ace/theme/tomorrow_night',
-      name: 'TomorrowNight'
+      name: 'TOMORROW_NIGHT'
     },
     {
       path: 'ace/theme/tomorrow_night_blue',
-      name: 'TomorrowNightBlue'
+      name: 'TOMORROW_NIGHT_BLUE'
     },
     {
       path: 'ace/theme/tomorrow_night_bright',
-      name: 'TomorrowNightBright'
+      name: 'TOMORROW_NIGHT_BRIGHT'
     },
     {
       path: 'ace/theme/tomorrow_night_eighties',
-      name: 'TomorrowNight80s'
+      name: 'TOMORROW_NIGHT_EIGHTIES'
     },
     {
       path: 'ace/theme/twilight',
-      name: 'Twilight'
+      name: 'TWILIGHT'
     },
     {
       path: 'ace/theme/vibrant_ink',
-      name: 'VibrantInk'
+      name: 'VIBRANT_INK'
     }
   ],
   properties: [
