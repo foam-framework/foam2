@@ -545,18 +545,21 @@ foam.LIB({
 
       if ( this.model_.name !== 'AbstractFObject' ) {
         // if not AbstractFObject add beforeFreeze method
-        cls.method({
-          visibility: 'public',
-          type: 'void',
-          name: 'beforeFreeze',
-          body: 'super.beforeFreeze();\n' + this.getAxiomsByClass(foam.core.Property).
-            filter(flagFilter).
-            filter(function(p) { return !! p.javaType && p.javaInfoType && p.generateJava; }).
-            filter(function(p) { return p.javaFactory; }).
-            map(function(p) {
-              return `get${foam.String.capitalize(p.name)}();`
-            }).join('\n')
-        });
+        var properties = this.getAxiomsByClass(foam.core.Property).
+        filter(flagFilter).
+        filter(function(p) { return !! p.javaType && p.javaInfoType && p.generateJava; }).
+        filter(function(p) { return p.javaFactory; });
+        if ( properties.length > 0 ) {
+          cls.method({
+            visibility: 'public',
+            type: 'void',
+            name: 'beforeFreeze',
+            body: 'super.beforeFreeze();\n' + properties.
+              map(function(p) {
+                return `get${foam.String.capitalize(p.name)}();`
+              }).join('\n')
+          });
+        }
       }
 
       if ( this.hasOwnAxiom('id') ) {
