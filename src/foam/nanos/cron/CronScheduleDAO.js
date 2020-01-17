@@ -12,7 +12,6 @@ foam.CLASS({
   documentation: 'Update cron scheduledTime on schedule changed',
 
   javaImports: [
-    'foam.nanos.cron.Cron',
     'foam.util.SafetyUtil'
   ],
 

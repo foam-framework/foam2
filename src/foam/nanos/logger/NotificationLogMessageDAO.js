@@ -20,8 +20,7 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.dao.DAO',
-    'foam.core.X',
+    'foam.dao.DAO'
   ],
 
   requires: [
@@ -102,7 +101,10 @@ foam.CLASS({
 
     if (x.get("notificationDAO") != null) ((DAO) x.get("notificationDAO")).put_(x, notif) ;
   }
-  catch (Throwable t) {}
+  catch (Throwable t) {
+    Logger logger = (Logger) x.get("logger");
+    logger.error(t);
+  }
   currentlyLogging.set(false);
   `
     },

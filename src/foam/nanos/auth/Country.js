@@ -37,14 +37,19 @@ foam.CLASS({
       documentation: `A list of known alternative country names.`,
     }
   ],
-  methods: [{
-    name: 'toString',
-    type: 'String',
-    code: function() {
-      return 'Country: ' + this.code + ', ' + this.name;
+  methods: [
+    {
+      name: 'toString',
+      type: 'String',
+      code: function() {
+        return 'Country: ' + this.code + ', ' + this.name;
+      },
+      javaCode: `
+        return "{ code:" + this.getCode() + ", name:" + this.getName() + " }";
+      `
     },
-    javaCode: `
-      return "{ code:" + this.getCode() + ", name:" + this.getName() + " }";
-    `
-  }]
+    function toSummary() {
+      return this.name;
+    }
+  ]
 });

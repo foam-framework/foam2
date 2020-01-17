@@ -12,7 +12,6 @@ foam.CLASS({
   documentation: `Logger which builds a modelled LogMessage from the free form Logger calls and puts it into the LogMessageDAO`,
 
   javaImports: [
-    'foam.core.X',
     'foam.dao.DAO',
     'foam.dao.NullDAO',
     'foam.log.LogLevel'

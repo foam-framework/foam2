@@ -17,7 +17,6 @@ foam.CLASS({
   javaImports: [
     'foam.core.ContextAgent',
     'foam.core.X',
-    'foam.dao.DAO',
     'foam.nanos.auth.User',
     'static foam.mlang.MLang.*'
   ],

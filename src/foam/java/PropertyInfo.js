@@ -177,7 +177,7 @@ foam.CLASS({
             type: this.propType,
             visibility: 'public',
             args: [{ name: 'o', type: 'Object' }],
-            body: 'return (' + this.propType + ') o;'
+            body: 'return ' + ( this.propType == "Object" ? 'o;' : '( ' + this.propType + ') o;')
           },
           {
             name: 'compare',
