@@ -53,7 +53,7 @@ foam.LIB({
         },
         Null: function(n) { return "null"; },
         Object: function(o) {
-          return `foam.util.Arrays.asHashMap(new Object[] {
+          return `foam.util.Arrays.asMap(new Object[] {
 ${Object.keys(o).map(function(k, i, a) {
   return `  ${foam.java.asJavaValue(k)}, ${foam.java.asJavaValue(o[k])}` + ((i == a.length-1) ? '' : ',')
 }).join('\n')}
