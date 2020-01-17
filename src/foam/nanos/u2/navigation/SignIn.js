@@ -86,7 +86,7 @@ foam.CLASS({
               class: 'foam.nanos.auth.ResendVerificationEmail'
             });
           } else {
-            this.menuDAO.cmd_(X, foam.dao.CachingDAO);
+            this.menuDAO.cmd_(X, foam.dao.CachingDAO.PURGE);
             window.location.hash = '';
             this.loginSuccess = !! this.user;
           }
