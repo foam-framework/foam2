@@ -24,7 +24,8 @@ foam.CLASS({
   properties: [
     {
       /** The cache to read items quickly. */
-      name: 'cache'
+      name: 'cache',
+      value: {}
     },
     {
        class: 'Long',
@@ -75,7 +76,7 @@ foam.CLASS({
       var self = this;
 
       return new Promise(function (resolve, reject) {
-        this.delegate.sink(x, sink).then(function(s) {
+        self.delegate.select_(x, sink).then(function(s) {
           if ( foam.dao.ArraySink.isInstance(s) ) {
             var a = s.array;
             for ( var i = 0 ; i < a.length ; i++ ) {
@@ -85,7 +86,7 @@ foam.CLASS({
               self.purgeCache();
             }
           }
-          promise.resolve(s);
+          resolve(s);
         });
       });
     },
