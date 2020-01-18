@@ -708,7 +708,7 @@ public class MMJournal extends AbstractJournal implements Electable {
         }
       }
 
-      logger.info("replay from " + count + "medusa node");
+      logger.info("replay from " + count + " medusa node");
 
       if ( count < 1 ) {
         throw new RuntimeException("Do not get data from enough MN");
