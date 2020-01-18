@@ -44,7 +44,7 @@ public class Boot {
     Logger logger = new ProxyLogger(new StdoutLogger());
     root_.put("logger", logger);
 
-    if ( datadir == null || datadir == "" ) {
+    if ( datadir == null || datadir.equals("") ) {
       datadir = System.getProperty("JOURNAL_HOME");
     }
 
