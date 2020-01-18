@@ -19,16 +19,28 @@ foam.CLASS({
     'foam.dao.QuickSink'
   ],
 
+  imports: [ 'merged' ],
+
   properties: [
     {
       /** The cache to read items quickly. */
-      name: 'cache'
+      name: 'cache',
+      factory: function() { return {}; }
     },
     {
-      class: 'Long',
-      name: 'purgeTime',
-      value: 15000
-    },
+       class: 'Long',
+       name: 'purgeTime',
+       documentation: 'Time to wait before purging cache.',
+       units: 'ms',
+       value: 15000
+     },
+     {
+       name: 'purgeCache',
+       transient: true,
+       expression: function(purgeTime) {
+         return this.merged(() => this.cache = {}, purgeTime);
+       }
+     }
   ],
 
   methods: [
@@ -40,6 +52,7 @@ foam.CLASS({
       if ( foam.Undefined.isInstance(cachedValue) ) {
         this.delegate.find_(x, key).then(function(o) {
           self.cache[id] = o;
+          self.purgeCache();
           return o;
         });
       } else {
@@ -63,16 +76,17 @@ foam.CLASS({
       var self = this;
 
       return new Promise(function (resolve, reject) {
-        this.delegate.sink(x, sink).then(function(s) {
+        self.delegate.select_(x, sink).then(function(s) {
           if ( foam.dao.ArraySink.isInstance(s) ) {
             var a = s.array;
             for ( var i = 0 ; i < a.length ; i++ ) {
               var o = a[i];
               console.log('***** caching ', o.id);
               self.cache[o.id] = o;
+              self.purgeCache();
             }
           }
-          promise.resolve(s);
+          resolve(s);
         });
       });
     },
@@ -95,18 +109,6 @@ foam.CLASS({
         self.cache = {};
         return;
       });
-    }
-  ],
-
-  listeners: [
-    {
-      name: 'purgeCache',
-      isMerged: true,
-      mergeDelay: this.purgeTime,
-      code: function() {
-        this.cache = {};
-        this.purgeCache();
-      }
     }
   ]
 });

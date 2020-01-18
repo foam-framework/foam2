@@ -14,9 +14,6 @@ foam.CLASS({
   javaImports: [
     'foam.core.FObject',
     'foam.nanos.app.AppConfig',
-    'foam.nanos.auth.AuthService',
-    'foam.nanos.auth.User',
-    'foam.nanos.logger.Logger',
     'foam.util.SafetyUtil'
   ],
 

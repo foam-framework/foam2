@@ -17,7 +17,7 @@ public class UnknownReferenceParser
 
       public PStream parse(PStream ps, ParserContext x) {
         ps = ps.apply(delegate, x);
-        if ( ps == null ) {
+        if ( ps == null || ! ps.valid() ) {
           return null;
         }
         
