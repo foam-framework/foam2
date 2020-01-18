@@ -252,7 +252,7 @@ foam.CLASS({
             .build();
         }
 
-        if ( getCluster() && getMdao() != null ) {
+        if ( getCluster() && getMdao() != null && innerDAOIsSet_ != true ) {
           delegate = new foam.nanos.mrac.ClusterClientDAO.Builder(getX())
                           .setServiceName(getNSpec().getName())
                           .setDelegate(delegate)
