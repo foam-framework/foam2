@@ -1184,6 +1184,16 @@ public class MMJournal extends AbstractJournal implements Electable {
     loader.start();
   }
 
+  public boolean stopReplay() {
+    if ( processorsMap != null ) {
+      for ( Map.Entry<Long, Processor> entry : processorsMap.entrySet() ) {
+        entry.getValue().close();
+      }
+    }
+    processorsMap = null;
+    return true;
+  }
+
   public boolean stopListener(X x) {
     if ( loader != null ) {
       loader.close();
@@ -1403,6 +1413,7 @@ public class MMJournal extends AbstractJournal implements Electable {
   public synchronized void leaveSecondary() {
     currentState = InstanceState.ELECTING;
     logger.info("leaveSecondary");
+    stopReplay();
     cleanConnection();
     stopListener(null);
     needReplay = true;
