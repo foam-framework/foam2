@@ -99,7 +99,7 @@ public class MMJournal extends AbstractJournal implements Electable {
   // globalIndex should be unique in each filename.
   // One MMJournal instance can be shared by different DAO(Single Journal Mode).
   // Method: Replay will update this index.
-  private AtomicLong globalIndex = new AtomicLong(1);
+  private volatile AtomicLong globalIndex = new AtomicLong(1);
 
   //Only record two entry for now.
   //TODO: need to initial parents.
@@ -206,9 +206,11 @@ public class MMJournal extends AbstractJournal implements Electable {
     }
   }
 
-  // The method is thread-safe.
+  Object indexLock = new Object();
   public Long getGlobalIndex() {
-    return globalIndex.getAndIncrement();
+    synchronized(indexLock) {
+      return globalIndex.getAndIncrement();
+    }
   }
 
 
@@ -920,7 +922,9 @@ public class MMJournal extends AbstractJournal implements Electable {
   }
 
   private final List<MedusaEntry> sortEntries(List<MedusaEntry> entries) {
+    logger.info("before sort: " + entryCount.size());
     Collections.sort(entries, new SortbyIndex());
+    logger.info("after sort: " entries.size());
     return entries;
   }
 
