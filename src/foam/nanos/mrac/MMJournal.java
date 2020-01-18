@@ -922,9 +922,9 @@ public class MMJournal extends AbstractJournal implements Electable {
   }
 
   private final List<MedusaEntry> sortEntries(List<MedusaEntry> entries) {
-    logger.info("before sort: " + entryCount.size());
+    logger.info("before sort: " + entries.size());
     Collections.sort(entries, new SortbyIndex());
-    logger.info("after sort: " entries.size());
+    logger.info("after sort: " + entries.size());
     return entries;
   }
 

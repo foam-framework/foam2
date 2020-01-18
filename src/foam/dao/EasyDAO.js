@@ -252,7 +252,7 @@ foam.CLASS({
             .build();
         }
 
-        if ( getCluster() && getMdao() != null && innerDAOIsSet_ != true ) {
+        if ( getCluster() && getMdao() != null && getMedusaMediator() ) {
           delegate = new foam.nanos.mrac.ClusterClientDAO.Builder(getX())
                           .setServiceName(getNSpec().getName())
                           .setDelegate(delegate)
@@ -315,6 +315,7 @@ foam.CLASS({
         return new foam.nanos.mrac.MNDAO(getX(), getOf(), getJournalName());
       }
       if ( getCluster() == true ) {
+        setMedusaMediator(true);
         foam.dao.MDAO mdao = new foam.dao.MDAO(getOf());       
         return new foam.nanos.mrac.MMDAO(getX(), getNSpec().getName(), mdao, "singleJournal", getJournalName());
       }
