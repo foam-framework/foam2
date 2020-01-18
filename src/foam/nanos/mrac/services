@@ -124,7 +124,7 @@ p({
     import foam.nanos.mrac.*;
 
     MDAO mdao = new MDAO(DemoObject.getOwnClassInfo());
-    MMDAO mmdao = new MMDAO(x, "demoObjectDAO", mdao, "singleJournal");
+    MMDAO mmdao = new MMDAO(x, "demoObjectDAO", mdao, "singleJournal", "demoObjects");
     ClusterClientDAO clusterClientDAO = new ClusterClientDAO.Builder(x)
                                               .setServiceName("demoObjectDAO")
                                               .setDelegate(mmdao)
