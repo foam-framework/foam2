@@ -150,6 +150,7 @@ protected class ResponseThread implements Runnable {
   }
 
   public void run() {
+    /* Template method. */
   }
 }
 `}));

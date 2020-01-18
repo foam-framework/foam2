@@ -127,6 +127,9 @@ If empty than no permissions are required.`,
       factory: function() {
         return new WeakMap();
       },
+      cloneProperty: function() {
+        return new WeakMap();
+      },
       hidden: true,
       transient: true,
       documentation: 'A weak Map to track the running state of action on a per object basis.'

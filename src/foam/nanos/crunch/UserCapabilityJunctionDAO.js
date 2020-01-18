@@ -146,7 +146,7 @@ foam.CLASS({
       DAO dao = (DAO) x.get(daoKey);
       if ( dao == null ) return;
 
-      if ( dao.getOf().getId() == (obj.getData()).getClassInfo().getId() ) {
+      if ( dao.getOf().getId().equals((obj.getData()).getClassInfo().getId()) ) {
         try {
           dao.put(obj.getData());
         } catch (Exception e) {
