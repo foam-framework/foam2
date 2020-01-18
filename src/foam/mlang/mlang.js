@@ -896,7 +896,6 @@ return stmt.toString();`
         `java.util.List<Predicate> args = new java.util.ArrayList<>();
 boolean update = false;
 True TRUE = new True();
-False FALSE = new False();
 for ( int i = 0; i < this.args_.length; i++ ) {
   Predicate arg = this.args_[i];
   Predicate newArg = this.args_[i].partialEval();
