@@ -517,7 +517,7 @@ public final class QrCode {
           case 7:  invert = ((x + y) % 2 + x * y % 3) % 2 == 0;  break;
           default:  throw new AssertionError();
         }
-        modules[y][x] ^= invert & !isFunction[y][x];
+        modules[y][x] ^= invert && !isFunction[y][x];
       }
     }
   }

@@ -131,20 +131,6 @@ foam.CLASS({
             body: 'return "' + this.propName + '";'
           },
           {
-            name: 'getShortName',
-            visibility: 'public',
-            type: 'String',
-            body: this.propShortName ?
-              'return "' + this.propShortName + '";' :
-              'return null;'
-          },
-          {
-            name: 'getAliases',
-            visibility: 'public',
-            type: 'String[]',
-            body: 'return ' + this.getAliasesBody
-          },
-          {
             name: 'get',
             visibility: 'public',
             type: 'Object',
@@ -340,6 +326,26 @@ foam.CLASS({
             body: this.fromCSVLabelMapping
           }
         ];
+
+        if ( this.propShortName ) {
+          m.push({
+            name: 'getShortName',
+            visibility: 'public',
+            type: 'String',
+            body: this.propShortName ?
+              'return "' + this.propShortName + '";' :
+              'return null;'
+          });
+        }
+
+        if ( this.propAliases.length ) {
+          m.push({
+            name: 'getAliases',
+            visibility: 'public',
+            type: 'String[]',
+            body: 'return ' + this.getAliasesBody
+          });
+        }
 
         if ( this.cloneProperty != null ) {
           m.push({

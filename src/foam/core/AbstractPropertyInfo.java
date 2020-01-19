@@ -37,6 +37,15 @@ public abstract class AbstractPropertyInfo
   }
 
   @Override
+  public String getShortName() {
+    return null;
+  }
+
+  public String[] getAliases() {
+    return new String[] {};
+  }
+
+  @Override
   public void toJSON(foam.lib.json.Outputter outputter, Object value) {
     outputter.output(value);
   }
