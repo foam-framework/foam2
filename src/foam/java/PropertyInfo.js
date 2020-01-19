@@ -281,7 +281,7 @@ foam.CLASS({
           });
         }
 
-        if ( this.storageTransient ) {
+        if ( this.clusterTransient ) {
           m.push({
             name: 'getClusterTransient',
             type: 'boolean',
