@@ -226,7 +226,7 @@ public class LiveScriptBundler
     HttpServletResponse r  = x.get(HttpServletResponse.class);
     r.setHeader("Content-Type", "application/javascript");
 
-    synchronized (this) {} // Wait for build to finish before serving
+    synchronized (this) { /* Wait for build to finish before serving */ } 
     pw.println(javascriptBuffer_);
   }
 
