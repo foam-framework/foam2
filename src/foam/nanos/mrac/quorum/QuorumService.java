@@ -155,7 +155,7 @@ public class QuorumService extends AbstractFObject implements NanoService {
             logger.info("!!!!!!!!!!!!!end election");
             logger.info("*********Primary: " + getPrimaryVote().getPrimaryInstanceId());
           } catch ( Exception e ) {
-            e.printStackTrace();
+            logger.error("ELECTNG: ",e);
             setMyState(InstanceState.ELECTING);
           }
         } else if ( getMyState() == InstanceState.PRIMARY ) {
@@ -172,7 +172,7 @@ public class QuorumService extends AbstractFObject implements NanoService {
               //once become primary. It will stay primary forever.
             }
           } catch ( Exception e ) {
-            logger.info(e);
+            logger.info("PRIMARY: ", e);
           } finally {
             exposeState = InstanceState.ELECTING;
             setMyState(InstanceState.ELECTING);
@@ -181,7 +181,7 @@ public class QuorumService extends AbstractFObject implements NanoService {
               try {
                 countDownLatch.await();
               } catch ( Exception e ) {
-                e.printStackTrace();
+                logger.error(e);
               }
             }
             logger.info("leave primary");
@@ -202,13 +202,13 @@ public class QuorumService extends AbstractFObject implements NanoService {
               try {
                 Thread.sleep(200);
               } catch ( InterruptedException e ) {
-                logger.info(e);
+                logger.info("SECONDARY: ",e);
               }
               // Heartbeat.
               ping(urlString,"");
             }
           } catch ( Exception e ) {
-            e.printStackTrace();
+            logger.error("SECONDARY: ", e);
           } finally {
             exposeState = InstanceState.ELECTING;
             setPrimaryClusterNode(null);
@@ -219,7 +219,7 @@ public class QuorumService extends AbstractFObject implements NanoService {
               try {
                 countDownLatch.await();
               } catch ( Exception e ) {
-                e.printStackTrace();
+                logger.error(e);
               }
             }
             logger.info("leave Secondary");
@@ -273,7 +273,7 @@ public class QuorumService extends AbstractFObject implements NanoService {
             }
           } catch ( Exception e ) {
             //TODO: provide retry;
-            e.printStackTrace();
+            logger.error("run:",e);
             if ( electable != null ) unReadyElectables.add(electable);
           }
         }
