@@ -49,7 +49,7 @@ public class SafetyUtil {
 
       if ( d1 == d2 ) return  0;
       if ( d1  > d2 ) return  1;
-      if ( d1  < d2 ) return -1;
+        return -1;
     }
 
     if ( ! (o1 instanceof Comparable && o2 instanceof Comparable) ) return 0;

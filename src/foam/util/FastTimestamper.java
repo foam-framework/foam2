@@ -40,7 +40,7 @@ public class FastTimestamper {
       // repair
       lastTime_ = now;
       lastTimestamp_ = lastTimestamp_.substring(0, lastTimestamp_.length()-3) + String.format("%03d", now%1000);
-    } else if ( now != lastTime_ ) {
+    } else {
       // replace
       lastTime_ = now;
       lastTimestamp_ = format_.format(now);
