@@ -201,12 +201,6 @@ foam.CLASS({
             body: 'return ' + ( this.csvParser ? this.csvParser : null ) + ';'
           },
           {
-            name: 'getNetworkTransient',
-            type: 'boolean',
-            visibility: 'public',
-            body: 'return ' + this.networkTransient + ';'
-          },
-          {
             name: 'getReadPermissionRequired',
             type: 'boolean',
             visibility: 'public',
@@ -217,12 +211,6 @@ foam.CLASS({
             type: 'boolean',
             visibility: 'public',
             body: 'return ' + this.writePermissionRequired + ';'
-          },
-          {
-            name: 'getStorageTransient',
-            type: 'boolean',
-            visibility: 'public',
-            body: 'return ' + this.storageTransient + ';'
           },
           {
             name: 'getXMLAttribute',
@@ -316,6 +304,25 @@ foam.CLASS({
             body: this.fromCSVLabelMapping
           }
         ];
+
+        if ( this.networkTransient ) {
+          m.push({
+            name: 'getNetworkTransient',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.networkTransient + ';'
+          });
+        }
+
+        if ( this.storageTransient ) {
+          m.push({
+            name: 'getStorageTransient',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.storageTransient + ';'
+          });
+        }
+
 
         if ( this.propShortName ) {
           m.push({

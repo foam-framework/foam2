@@ -41,6 +41,14 @@ public abstract class AbstractPropertyInfo
     return null;
   }
 
+  public boolean getNetworkTransient() {
+    return false;
+  }
+
+  public boolean getStorageTransient() {
+    return false;
+  }
+
   public String[] getAliases() {
     return new String[] {};
   }
