@@ -37,6 +37,47 @@ public abstract class AbstractPropertyInfo
   }
 
   @Override
+  public String getShortName() {
+    return null;
+  }
+
+  public boolean getNetworkTransient() {
+    return false;
+  }
+
+  public boolean getStorageTransient() {
+    return false;
+  }
+
+  public boolean getReadPermissionRequired() {
+    return false;
+  }
+
+  public boolean getWritePermissionRequired() {
+    return false;
+  }
+
+  public boolean getXMLAttribute() {
+    return false;
+  }
+
+  public boolean getXMLTextNode() {
+    return false;
+  }
+
+  public boolean getRequired() {
+    return false;
+  }
+
+  public void validateObj(foam.core.X x, foam.core.FObject obj) {
+    /* Template Method: override in subclass if required. */
+  }
+
+  public String[] getAliases() {
+    return new String[] {};
+  }
+
+  @Override
   public void toJSON(foam.lib.json.Outputter outputter, Object value) {
     outputter.output(value);
   }
@@ -105,6 +146,10 @@ public abstract class AbstractPropertyInfo
     }
 
     return "";
+  }
+
+  public String createStatement() {
+    return getName();
   }
 
   @Override
