@@ -207,12 +207,6 @@ foam.CLASS({
             body: 'return ' + this.readPermissionRequired + ';'
           },
           {
-            name: 'getWritePermissionRequired',
-            type: 'boolean',
-            visibility: 'public',
-            body: 'return ' + this.writePermissionRequired + ';'
-          },
-          {
             name: 'getXMLAttribute',
             type: 'boolean',
             visibility: 'public',
@@ -323,6 +317,14 @@ foam.CLASS({
           });
         }
 
+        if ( this.writePermissionRequired ) {
+          m.push({
+            name: 'getWritePermissionRequired',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.writePermissionRequired + ';'
+          });
+        }
 
         if ( this.propShortName ) {
           m.push({

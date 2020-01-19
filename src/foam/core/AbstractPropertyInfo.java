@@ -49,6 +49,10 @@ public abstract class AbstractPropertyInfo
     return false;
   }
 
+  public boolean getWritePermissionRequired() {
+    return false;
+  }
+
   public String[] getAliases() {
     return new String[] {};
   }
