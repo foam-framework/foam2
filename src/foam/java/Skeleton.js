@@ -51,7 +51,7 @@ foam.CLASS({
 
       cls.package = this.package;
       cls.name    = this.name;
-      cls.extends = 'foam.box.AbstractSkeleton',
+      cls.extends = 'foam.box.AbstractSkeleton';
 
       foam.core.FObjectProperty.create({
         name: 'delegate',

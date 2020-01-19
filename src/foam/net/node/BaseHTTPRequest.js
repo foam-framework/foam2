@@ -22,7 +22,7 @@ foam.SCRIPT({
   requires: [
     'foam.net.node.HTTPRequest',
   ],
-  flags: ['node'],
+
   code: function() {
 // Registering BaseHTTPRequest facilitates decoration when HTTPRequest has been
 // re-overridden.
