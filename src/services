@@ -631,18 +631,32 @@ p({
 
 p({
   "class": "foam.nanos.boot.NSpec",
+  "name": "localCurrencyDAO",
+  "serve": false,
+  "serviceScript":
+  """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.core.Currency.getOwnClassInfo())
+      .setName("currency")
+      .setPm(true)
+      .setPipelinePm(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("currencies")
+      .setIndex(new foam.core.PropertyInfo[] {foam.core.Currency.COUNTRY})
+      .build();
+  """
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
   "name": "currencyDAO",
   "serve": true,
   "serviceScript":
   """
     return new foam.dao.EasyDAO.Builder(x)
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName("currencies")
-      .setPm(true)
-      .setPipelinePm(true)
       .setOf(foam.core.Currency.getOwnClassInfo())
       .setName("currency")
-      .setIndex(new foam.core.PropertyInfo[] {foam.core.Currency.COUNTRY})
+      .setInnerDAO(x.get("localCurrencyDAO"))
       .build();
   """,
   "client":
