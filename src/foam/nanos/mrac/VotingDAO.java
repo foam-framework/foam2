@@ -91,7 +91,7 @@ public class VotingDAO extends ProxyDAO {
   }
 
   public void removeAll_(foam.core.X x, long skip, long limit, foam.mlang.order.Comparator order, foam.mlang.predicate.Predicate predicate) {
-    throw new RuntimeException("Implements");
+    throw new RuntimeException("!!!!!!removeAll_ do not implement");
   }
 
   //public Object cmd_(X x, Object obj) {

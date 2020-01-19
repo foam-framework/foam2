@@ -58,7 +58,7 @@ public class TcpSocketChannelSink extends AbstractSink {
   @Override
   public void put(Object obj, foam.core.Detachable sub) {
     if ( isClose ) return;
-    String out = new Outputter(getX()).setPropertyPredicate(new NetworkPropertyPredicate()).stringify((FObject) obj);
+    String out = new Outputter(getX()).stringify((FObject) obj);
     writeWithPrefix(out, "p");
 
   }
@@ -66,7 +66,7 @@ public class TcpSocketChannelSink extends AbstractSink {
   @Override
   public void remove(Object obj, foam.core.Detachable sub) {
     if ( isClose ) return;
-    String out = new Outputter(getX()).setPropertyPredicate(new NetworkPropertyPredicate()).stringify((FObject) obj);
+    String out = new Outputter(getX()).stringify((FObject) obj);
     writeWithPrefix(out, "r");
   }
 
