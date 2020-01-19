@@ -264,11 +264,11 @@ public class QuorumService extends AbstractFObject implements NanoService {
             electable = unReadyElectables.poll(200, TimeUnit.MILLISECONDS);
             if ( electable == null ) continue;
             if ( getMyState() == InstanceState.PRIMARY ) {
-              electable.primary();
+              electable.primary(getX());
               primaryElectables.put(electable);
             }
             if ( getMyState() == InstanceState.SECONDARY ) {
-              electable.secondary();
+              electable.secondary(getX());
               secondaryElectables.put(electable);
             }
           } catch ( Exception e ) {

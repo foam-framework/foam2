@@ -4,10 +4,11 @@
 * http://www.apache.org/licenses/LICENSE-2.0
 */
 package foam.nanos.mrac;
+import foam.core.X;
 
 public interface Electable {
-  public void primary();
-  public void secondary();
+  public void primary(X x);
+  public void secondary(X x);
   public void leaveSecondary();
   public void leavePrimary();
   public boolean isPrimary();

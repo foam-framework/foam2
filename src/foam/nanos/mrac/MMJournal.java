@@ -1422,8 +1422,8 @@ public class MMJournal extends AbstractJournal implements Electable {
   }
 
   private volatile InstanceState currentState = InstanceState.ELECTING;
-  public synchronized void primary() {
-    this.updateData(null, false);
+  public synchronized void primary(X x) {
+    this.updateData(x, false);
     currentState = InstanceState.PRIMARY;
     logger.info("start primary: " + serviceName);
   }
@@ -1432,8 +1432,8 @@ public class MMJournal extends AbstractJournal implements Electable {
     return currentState == InstanceState.PRIMARY;
   }
 
-  public synchronized void secondary() {
-    updateData(null, true);
+  public synchronized void secondary(X x) {
+    updateData(x, true);
     currentState = InstanceState.SECONDARY;
     logger.info("start secondary: " + serviceName);
   }
