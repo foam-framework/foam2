@@ -49,6 +49,10 @@ public abstract class AbstractPropertyInfo
     return false;
   }
 
+  public boolean getClusterTransient() {
+    return false;
+  }
+
   public boolean getReadPermissionRequired() {
     return false;
   }
