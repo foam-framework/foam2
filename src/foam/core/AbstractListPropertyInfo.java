@@ -17,7 +17,7 @@ public abstract class AbstractListPropertyInfo
     Object v1 = this.get(o1);
     Object v2 = this.get(o2);
 
-    if ( v1 == null & v2 == null ) return 0;
+    if ( v1 == null && v2 == null ) return 0;
     if ( v2 == null ) return 1;
     if ( v1 == null ) return -1;
 
