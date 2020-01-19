@@ -232,12 +232,14 @@ public class MMJournal extends AbstractJournal implements Electable {
   @Override
   public FObject put(X x, String prefix, DAO dao, FObject obj) {
     if (  quorumService.exposeState != InstanceState.PRIMARY 
-        && isPrimary() ) throw new RuntimeException("Electing/Secondary");
+        || isPrimary() == false ) throw new RuntimeException("Electing/Secondary");
     long myIndex = getGlobalIndex();
 
     // Get whole entry first to make sure threadsafe.
     MedusaEntry p1 = parent1;
+    while ( ( p1 = parent1 ) == null ) {}
     MedusaEntry p2 = parent2;
+    while ( ( p2 = parent2) == null ) {}
     Message msg =
       createMessage(
           p1.getMyIndex(),
@@ -279,12 +281,14 @@ public class MMJournal extends AbstractJournal implements Electable {
   @Override
   public FObject remove(X x, String prefix, DAO dao, FObject obj) {
     if (  quorumService.exposeState != InstanceState.PRIMARY 
-        && isPrimary() ) throw new RuntimeException("Electing/Secondary");
+        || isPrimary() == false ) throw new RuntimeException("Electing/Secondary");
 
     long myIndex = getGlobalIndex();
     // Get whole entry first to make sure threadsafe.
     MedusaEntry p1 = parent1;
+    while ( ( p1 = parent1 ) == null ) {}
     MedusaEntry p2 = parent2;
+    while ( ( p2 = parent2) == null ) {}
     Message msg =
       createMessage(
           p1.getMyIndex(),
@@ -618,6 +622,10 @@ public class MMJournal extends AbstractJournal implements Electable {
   // This method only apply on secondary.
   // Only one thread can access this function at any give time. When instance is secondary.
   private void cacheOrMDAO(MedusaEntry entry) {
+    cacheOrMDAO(entry, false);
+  }
+
+  private void cacheOrMDAO(MedusaEntry entry, boolean verifyhash) {
     synchronized ( cacheOrMDAOLock ) {
       // Data already in the MDAO.
       if ( entry.getMyIndex() < globalIndex.get() ) return;
@@ -640,8 +648,28 @@ public class MMJournal extends AbstractJournal implements Electable {
         List<MedusaEntry> entryList = readyToUseEntry.get(entry.getNspecKey());
         entryList.add(entry);
       }
+
+      if ( verifyhash ) {
+        try {
+          //TODO: turn hash on.
+          MessageDigest md = MessageDigest.getInstance("SHA-256");
+          md.update(indexHashMap.get(entry.getGlobalIndex1()).getBytes(StandardCharsets.UTF_8));
+          md.update(indexHashMap.get(entry.getGlobalIndex2()).getBytes(StandardCharsets.UTF_8));
+          String myHash = MNJournal.byte2Hex(entry.getNu().hash(md));
+          if ( ! myHash.equals(entry.getMyHash()) ) {
+            logger.info("Invalid Hash: [ \n" + "expect Hash value: " + myHash + "\n" + "receive Hash value: " + entry.getMyHash() + "\n]");
+            throw new RuntimeException("Invalid hash");
+          }
+        } catch ( Exception e ) {
+          e.printStackTrace();
+          throw new RuntimeException(e);
+        }
+      } 
+
       globalIndex.set(entry.getMyIndex() + 1L);
       updateHash(entry);
+      //TODO: important clear this map
+      indexHashMap.put(entry.getMyIndex(), entry.getMyHash());
 
       //TODO: update globalIndex and parent, varify hash.
       ////close hash for now to see the performance difference.
