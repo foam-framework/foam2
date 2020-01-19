@@ -194,6 +194,7 @@ public class QuorumService extends AbstractFObject implements NanoService {
             ClusterNode primaryNode = (ClusterNode) clusterDAO.find(getPrimaryVote().getPrimaryInstanceId());
             if ( primaryNode == null ) throw new RuntimeException("Can not find primary node");
             String urlString = "http://" + primaryNode.getIp() + ":" + primaryNode.getServicePort() + "/service" + "/ping";
+            logger.info("ping primary: " + urlString);
             exposeState = InstanceState.SECONDARY;
             setPrimaryClusterNode(primaryNode);
             quorumInitial = new QuorumInitial(countDownLatch);

@@ -364,8 +364,7 @@ public class QuorumNetworkManager extends AbstractFObject {
       logger.info(".............fail connect to " + instanceId);
       return false;
     } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      logger.error(e);
       return false;
     }
 

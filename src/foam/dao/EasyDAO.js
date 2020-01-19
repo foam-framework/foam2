@@ -275,8 +275,7 @@ foam.CLASS({
             .build();
         }
 
-        if ( getCluster() &&
-             ! getNSpec().getServe() ) {
+        if ( getCluster() ) {
           // test if chain already has CluterConfigDAO
           boolean found = false;
           foam.dao.DAO next = delegate;

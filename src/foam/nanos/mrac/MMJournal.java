@@ -583,6 +583,7 @@ public class MMJournal extends AbstractJournal implements Electable {
 
     // Disable put when doing replay to a dao.
     synchronized ( cacheOrMDAOLock ) {
+      int count = 0;
       if ( registerDAOs.get(nspecKey) != null ) {
         throw new RuntimeException("can not replay duplicate dao: " + nspecKey);
       }
@@ -594,6 +595,7 @@ public class MMJournal extends AbstractJournal implements Electable {
       }
       // Load cached entries into DAO.
       for ( MedusaEntry obj : readyToUseEntry.get(nspecKey) ) {
+        count++;
         if ( "p".equals(obj.getAction()) ) {
           //TODO: investigating on TransactionDAO.
           dao.put(obj.getNu());
@@ -603,6 +605,7 @@ public class MMJournal extends AbstractJournal implements Electable {
           throw new RuntimeException("Do not have action inMedusaEntry");
         }
       }
+      logger.info("Service: " + nspecKey + " replay " + count + " entries from Mediator");
       readyToUseEntry.remove(nspecKey);
     }
   }
@@ -993,6 +996,7 @@ public class MMJournal extends AbstractJournal implements Electable {
     private final Queue<SocketChannel> acceptedSocketChannels;
     private final List<SocketChannel> registerChannels;
     private X x;
+    public CountDownLatch countDownLatch;
 
 
     public Processor(X x, Long groupId) throws IOException {
@@ -1003,6 +1007,7 @@ public class MMJournal extends AbstractJournal implements Electable {
       isRunning = true;
       acceptedSocketChannels = new LinkedBlockingQueue<SocketChannel>();
       registerChannels = new LinkedList<SocketChannel>();
+      countDownLatch = new CountDownLatch(1);
     }
 
     public boolean acceptSocketChannel(SocketChannel channel) {
@@ -1018,14 +1023,15 @@ public class MMJournal extends AbstractJournal implements Electable {
     }
 
     public void close() {
-      try {
+      // try {
+        System.out.println("close close");
         isRunning = false;
         selector.wakeup();
         //TODO: check if a bug when close.
-        selector.close();
-      } catch ( IOException e ) {
-        logger.info(e);
-      }
+        // selector.close();
+      // } catch ( IOException e ) {
+      //   logger.info(e);
+      // }
     }
 
     private void configureNewConnections() {
@@ -1183,6 +1189,8 @@ public class MMJournal extends AbstractJournal implements Electable {
           TCPNioServer.hardCloseSocketChannel(socketChannel);
           socketChannel = acceptedSocketChannels.poll();
         }
+        System.out.println("finally");
+        countDownLatch.countDown();
       }
     }
   }
@@ -1228,6 +1236,7 @@ public class MMJournal extends AbstractJournal implements Electable {
         // if ( processor.acceptSocketChannel(channel) ) throw new RuntimeException("Socket connection error");
         processor.acceptSocketChannel(channel);
       }
+      processorsMap.put(groupId, processor);
     }
     if ( loader != null ) loader.close();
     loader = new EntryLoader(x, new CountDownLatch(1));
@@ -1238,6 +1247,11 @@ public class MMJournal extends AbstractJournal implements Electable {
     if ( processorsMap != null ) {
       for ( Map.Entry<Long, Processor> entry : processorsMap.entrySet() ) {
         entry.getValue().close();
+        try {
+          entry.getValue().countDownLatch.await();
+        } catch ( Exception e ) {
+          logger.error(e);
+        }
       }
     }
     processorsMap = null;
@@ -1250,7 +1264,7 @@ public class MMJournal extends AbstractJournal implements Electable {
       try {
         loader.countDownLatch.await();
       } catch ( Exception e ) {
-        e.printStackTrace();
+        logger.error(e);
       }
     }
     loader = null;
@@ -1479,6 +1493,7 @@ public class MMJournal extends AbstractJournal implements Electable {
     cleanConnection();
     stopListener(null);
     needReplay = true;
+    System.out.println("clear connection finish");
   }
 
   public synchronized void leavePrimary() {
