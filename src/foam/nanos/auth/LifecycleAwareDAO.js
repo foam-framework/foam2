@@ -72,8 +72,7 @@ foam.CLASS({
         if ( obj instanceof DeletedAware ){
           DeletedAware deletedAwareObj = (DeletedAware) obj;
 
-          if ( 
-              obj == null || (
+          if ( (
               ( lifecycleAwareObj.getLifecycleState() == LifecycleState.DELETED || deletedAwareObj.getDeleted() == true ) && ! canReadDeleted(x) ) || 
               ( lifecycleAwareObj.getLifecycleState() == LifecycleState.REJECTED && ! canReadRejected(x) ) || 
               ( lifecycleAwareObj.getLifecycleState() == LifecycleState.PENDING && ! canReadPending(x) ) 
@@ -84,7 +83,6 @@ foam.CLASS({
         }
 
         if ( 
-            obj == null || 
             ( lifecycleAwareObj.getLifecycleState() == LifecycleState.DELETED && ! canReadDeleted(x) ) ||  
             ( lifecycleAwareObj.getLifecycleState() == LifecycleState.REJECTED && ! canReadRejected(x) ) || 
             ( lifecycleAwareObj.getLifecycleState() == LifecycleState.PENDING && ! canReadPending(x) ) 
