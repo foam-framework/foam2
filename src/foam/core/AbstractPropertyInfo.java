@@ -49,7 +49,23 @@ public abstract class AbstractPropertyInfo
     return false;
   }
 
+  public boolean getReadPermissionRequired() {
+    return false;
+  }
+
   public boolean getWritePermissionRequired() {
+    return false;
+  }
+
+  public boolean getXMLAttribute() {
+    return false;
+  }
+
+  public boolean getXMLTextNode() {
+    return false;
+  }
+
+  public boolean getRequired() {
     return false;
   }
 

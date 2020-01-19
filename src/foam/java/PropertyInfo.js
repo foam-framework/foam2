@@ -201,24 +201,6 @@ foam.CLASS({
             body: 'return ' + ( this.csvParser ? this.csvParser : null ) + ';'
           },
           {
-            name: 'getXMLAttribute',
-            type: 'boolean',
-            visibility: 'public',
-            body: 'return ' + this.xmlAttribute + ';'
-          },
-          {
-            name: 'getXMLTextNode',
-            type: 'boolean',
-            visibility: 'public',
-            body: 'return ' + this.xmlTextNode + ';'
-          },
-          {
-            name: 'getRequired',
-            visibility: 'public',
-            type: 'boolean',
-            body: 'return ' + Boolean(this.propRequired) + ';'
-          },
-          {
             name: 'getValueClass',
             visibility: 'public',
             type: 'Class',
@@ -326,6 +308,33 @@ foam.CLASS({
             type: 'boolean',
             visibility: 'public',
             body: 'return ' + this.writePermissionRequired + ';'
+          });
+        }
+
+        if ( this.xmlAttribute ) {
+          m.push({
+            name: 'getXMLAttribute',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.xmlAttribute + ';'
+          });
+        }
+
+        if ( this.xmlTextNode ) {
+          m.push({
+            name: 'getXMLTextNode',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.xmlTextNode + ';'
+          });
+        }
+
+        if ( this.propRequired ) {
+          m.push({
+            name: 'getRequired',
+            visibility: 'public',
+            type: 'boolean',
+            body: 'return ' + Boolean(this.propRequired) + ';'
           });
         }
 
