@@ -148,6 +148,10 @@ public abstract class AbstractPropertyInfo
     return "";
   }
 
+  public String createStatement() {
+    return getName();
+  }
+
   @Override
   public void setStatementValue(IndexedPreparedStatement stmt, FObject o) throws java.sql.SQLException {
     stmt.setObject(this.get(o));

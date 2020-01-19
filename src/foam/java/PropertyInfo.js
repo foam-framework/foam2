@@ -213,12 +213,6 @@ foam.CLASS({
             body: 'return "' + this.sqlType + '";'
           },
           {
-            name: 'createStatement',
-            visibility: 'public',
-            type: 'String',
-            body: 'return getName();'
-          },
-          {
             name: 'isSet',
             visibility: 'public',
             type: 'boolean',
