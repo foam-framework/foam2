@@ -123,23 +123,46 @@ foam.CLASS({
       javaFactory: `
         Logger logger = (Logger) getX().get("logger");
         foam.dao.DAO delegate = getInnerDAO();
-        foam.dao.DAO head = delegate;
+        if ( delegate == null ) {
+          if ( getNullify() ) {
+            delegate = new foam.dao.NullDAO.Builder(getX())
+            .setOf(getOf())
+            .build();
+          } else if ( getMedusaNode() ) {
+            delegate = new foam.nanos.mrac.MNDAO(getX(), getOf(), getJournalName());
+          } else if ( getCluster() == true ) {
+            setMdao(new foam.dao.MDAO(getOf()));
+            delegate = new foam.nanos.mrac.MMDAO(getX(), getNSpec().getName(), getMdao(), "singleJournal", getJournalName());
+          } else if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
+            delegate = new foam.dao.java.JDAO(getX(), getOf(), getJournalName());
+          } else {
+            setMdao(new foam.dao.MDAO(getOf()));
+            delegate = getMdao();
+          }
+        }
+
         foam.dao.ProxyDAO pxy = null;
-        while( head instanceof foam.dao.ProxyDAO ) {
-          pxy = (foam.dao.ProxyDAO) head;
-          if ( head instanceof foam.dao.MDAO )
-            break;
-          head = ( (ProxyDAO) head).getDelegate();
+
+        if ( getMdao() == null ) {
+          foam.dao.DAO head = delegate;
+          while( head instanceof foam.dao.ProxyDAO ) {
+            pxy = (foam.dao.ProxyDAO) head;
+            head = ((ProxyDAO) head).getDelegate();
+          }
+          if ( head instanceof foam.dao.MDAO ) {
+            setMdao((foam.dao.MDAO)head);
+          }
         }
-        if ( head instanceof foam.dao.MDAO ) {
-          setMdao((foam.dao.MDAO)head);
-          if ( getIndex() != null && getIndex().length > 0 )
-            getMdao().addIndex(getIndex());
+
+        if ( getMdao() != null &&
+             getIndex() != null && getIndex().length > 0 ) {
+          getMdao().addIndex(getIndex());
         }
+
         if ( getFixedSize() != null ) {
-          if ( head instanceof foam.dao.MDAO && pxy != null ) {
+          if ( getMdao() != null && pxy != null ) {
             foam.dao.ProxyDAO fixedSizeDAO = (foam.dao.ProxyDAO) getFixedSize();
-            fixedSizeDAO.setDelegate(head);
+            fixedSizeDAO.setDelegate(getMdao());
             pxy.setDelegate(fixedSizeDAO);
           }
           else {
@@ -252,15 +275,24 @@ foam.CLASS({
             .build();
         }
 
-        if ( getCluster() && getMdao() != null ) {
-          delegate = new foam.nanos.mrac.ClusterClientDAO.Builder(getX())
+        if ( getCluster() &&
+             ! getNSpec().getServe() ) {
+          // test if chain already has CluterConfigDAO
+          boolean found = false;
+          foam.dao.DAO next = delegate;
+          while ( next instanceof foam.dao.ProxyDAO &&
+            ! ( next instanceof foam.nanos.mrac.ClusterClientDAO ) ) {
+            next = ((foam.dao.ProxyDAO) next).getDelegate();
+          }
+          if ( ! ( next instanceof foam.nanos.mrac.ClusterClientDAO ) ) {
+            delegate = new foam.nanos.mrac.ClusterClientDAO.Builder(getX())
                           .setServiceName(getNSpec().getName())
                           .setDelegate(delegate)
                           .setMdao(getMdao())
                           .build();
 
-          delegate = new foam.nanos.mrac.VotingDAO(getX(), delegate);
-
+            delegate = new foam.nanos.mrac.VotingDAO(getX(), delegate);
+          }
         }
 
         if ( getNSpec() != null && getNSpec().getServe() && ! getAuthorize() && ! getReadOnly() )
@@ -305,23 +337,25 @@ foam.CLASS({
       class: 'Object',
       type: 'foam.dao.DAO',
       name: 'innerDAO',
-      javaFactory: `
-      if ( getNullify() ) {
-        return new foam.dao.NullDAO.Builder(getX())
-        .setOf(getOf())
-        .build();
-      }
-      if ( getMedusaNode() ) {
-        return new foam.nanos.mrac.MNDAO(getX(), getOf(), getJournalName());
-      }
-      if ( getCluster() == true ) {
-        foam.dao.MDAO mdao = new foam.dao.MDAO(getOf());       
-        return new foam.nanos.mrac.MMDAO(getX(), getNSpec().getName(), mdao, "singleJournal", getJournalName());
-      }
-      if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) )
-        return new foam.dao.java.JDAO(getX(), getOf(), getJournalName());
-      return new foam.dao.MDAO(getOf());
-      `
+      // javaFactory: `
+      // if ( getNullify() ) {
+      //   return new foam.dao.NullDAO.Builder(getX())
+      //   .setOf(getOf())
+      //   .build();
+      // }
+      // if ( getMedusaNode() ) {
+      //   return new foam.nanos.mrac.MNDAO(getX(), getOf(), getJournalName());
+      // }
+      // if ( getCluster() == true ) {
+      //   foam.dao.MDAO mdao = new foam.dao.MDAO(getOf());
+      //   return new foam.nanos.mrac.MMDAO(getX(), getNSpec().getName(), mdao, "singleJournal", getJournalName());
+      // }
+      // if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
+      //   return new foam.dao.java.JDAO(getX(), getOf(), getJournalName());
+      // }
+
+      // return new foam.dao.MDAO(getOf());
+      // `
     },
     {
       class: 'Object',
