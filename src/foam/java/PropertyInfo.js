@@ -127,12 +127,6 @@ foam.CLASS({
             body: 'return "' + this.propName + '";'
           },
           {
-            name: 'getAliases',
-            visibility: 'public',
-            type: 'String[]',
-            body: 'return ' + this.getAliasesBody
-          },
-          {
             name: 'get',
             visibility: 'public',
             type: 'Object',
@@ -331,6 +325,15 @@ foam.CLASS({
             body: this.propShortName ?
               'return "' + this.propShortName + '";' :
               'return null;'
+          });
+        }
+
+        if ( this.propAliases.length ) {
+          m.push({
+            name: 'getAliases',
+            visibility: 'public',
+            type: 'String[]',
+            body: 'return ' + this.getAliasesBody
           });
         }
 
