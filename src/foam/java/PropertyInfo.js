@@ -201,12 +201,6 @@ foam.CLASS({
             body: 'return ' + ( this.csvParser ? this.csvParser : null ) + ';'
           },
           {
-            name: 'getReadPermissionRequired',
-            type: 'boolean',
-            visibility: 'public',
-            body: 'return ' + this.readPermissionRequired + ';'
-          },
-          {
             name: 'getXMLAttribute',
             type: 'boolean',
             visibility: 'public',
@@ -314,6 +308,15 @@ foam.CLASS({
             type: 'boolean',
             visibility: 'public',
             body: 'return ' + this.storageTransient + ';'
+          });
+        }
+
+        if ( this.readPermissionRequired ) {
+          m.push({
+            name: 'getReadPermissionRequired',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.readPermissionRequired + ';'
           });
         }
 
