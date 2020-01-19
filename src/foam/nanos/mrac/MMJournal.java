@@ -930,20 +930,28 @@ public class MMJournal extends AbstractJournal implements Electable {
   int quorumSize = 1;
   // Verify entries from same group. And concat them into list.
   private final List<MedusaEntry> concatEntries(long groupId, Map<Long, List<MedusaEntry>> nodeToEntry) {
-    Map<MedusaEntry, Integer> entryCount = new HashMap<MedusaEntry, Integer>();
+    Map<Long, Integer> entryCount = new HashMap<Long, Integer>();
+    Map<Long, ArrayList<MedusaEntry>> entryRecord = new HashMap<Long, ArrayList<MedusaEntry>>();
 
     for ( Map.Entry<Long, List<MedusaEntry>> entry2: nodeToEntry.entrySet() ) {
       for ( MedusaEntry entry : entry2.getValue() ) {
-        Integer i = entryCount.get(entry);
-        if ( i == null ) entryCount.put(entry, 1);
-        else entryCount.put(entry, i.intValue() + 1);
+        if ( entryCount.get(entry.getMyIndex()) == null ) {
+          entryCount.put(entry.getMyIndex(), 1);
+          ArrayList<MedusaEntry> list = new ArrayList<MedusaEntry>();
+          list.add(entry);
+          entryRecord.put(entry.getMyIndex(), list);
+        } else {
+          //TODO: check if hash equal.
+          entryCount.put(entry.getMyIndex(), entryCount.get(entry.getMyIndex()) + 1);
+          entryRecord.get(entry.getMyIndex()).add(entry);
+        }
       }
     }
 
     List<MedusaEntry> entryList = new LinkedList<MedusaEntry>();
     logger.info("entryCount size: " + entryCount.size());
-    for ( Map.Entry<MedusaEntry, Integer> entry : entryCount.entrySet() ) {
-      if ( entry.getValue().intValue() >= quorumSize ) entryList.add(entry.getKey());
+    for ( Map.Entry<Long, Integer> entry : entryCount.entrySet() ) {
+      if ( entry.getValue().intValue() >= quorumSize ) entryList.add(entryRecord.get(entry.getKey()).get(0));
     }
     logger.info("From groupId: " + groupId + " [ receive:" + entryCount.size() + ", accept:" + entryList.size() + " ]");
     return entryList;
@@ -1193,6 +1201,16 @@ public class MMJournal extends AbstractJournal implements Electable {
       cachedEntry.put(group, new HashMap<MedusaEntry, Integer>());
     }
 
+    entryCounts = new HashMap<Long, Map<Long, Integer>>();
+    for ( Long group : groupToMN.keySet() ) {
+      entryCounts.put(group, new HashMap<Long, Integer>());
+    }
+
+    entryRecords = new HashMap<Long, Map<Long, ArrayList<MedusaEntry>>>();
+    for ( Long group : groupToMN.keySet() ) {
+      entryRecords.put(group, new HashMap<Long, ArrayList<MedusaEntry>>());
+    }
+
     cachedEntryMap = new HashMap<Long, MedusaEntry>();
 
     processorsMap = new HashMap<Long, Processor>();
@@ -1250,16 +1268,12 @@ public class MMJournal extends AbstractJournal implements Electable {
     return true;
   }
 
-  // The method is called when Secondary become primary.
-  public void enableMNWrite(X x) {
-    shutdwonProcessors();
-    //TODO: verify MN.
-    cachedEntryMap = null;
-    cachedEntry = null;
-  }
-
   // Map<groupId, Map<MedusaEntry, count>>
   private Map<Long, Map<MedusaEntry, Integer>> cachedEntry;
+
+  private Map<Long, Map<Long, Integer>> entryCounts;
+  private Map<Long, Map<Long, ArrayList<MedusaEntry>>> entryRecords;
+
   // GroupId to Processor map.
   private Map<Long, Processor> processorsMap;
   // Map<myIndex, MedusaEntry>.
@@ -1290,9 +1304,25 @@ public class MMJournal extends AbstractJournal implements Electable {
     }
   }
 
+  // private void processEntry1(Long groupId, MedusaEntry entry) {
+  //   if ( quorumService.exposeState == InstanceState.PRIMARY ) return;
+  //   Map<Long, Integer> entryCount = entryCounts.get(groupId);
+  //   synchronized ( entryCount ) {
+  //     if ( entry.getMyIndex() < globalIndex.get() ) return;
+  //     if ( entryCount.get(entry.getMyIndex()) == null ) {
+  //       entryCount.set(entry.getMyIndex(), new Integer(1));
+  //       entryRecords.put(entry.getMyIndex(), (new ArrayList<MedusaEntry>()).add(entry));
+  //       addEntryIntoCachedMap(entry);
+  //     } else {
+
+  //     }
+  //   }
+  // }
+
 
   private void addEntryIntoCachedMap(MedusaEntry entry) {
     synchronized ( cachedEntryMapLock ) {
+      if ( entry.getMyIndex() < globalIndex.get() ) return;
       cachedEntryMap.put(entry.getMyIndex(), entry);
     }
   }

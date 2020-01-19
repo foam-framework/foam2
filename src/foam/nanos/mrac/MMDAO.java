@@ -17,6 +17,7 @@ import foam.nanos.fs.ResourceStorage;
 import foam.nanos.fs.Storage;
 import foam.dao.AbstractSink;
 import foam.core.Detachable;
+import foam.dao.DAO;
 
 public class MMDAO extends JDAO {
 
@@ -38,7 +39,7 @@ public class MMDAO extends JDAO {
   //  // getJournal().replay(x, getDelegate());
   //}
 
-  public MMDAO(X x, String nspecKey, MDAO dao, String mnPort, String fileName) {
+  public MMDAO(X x, String nspecKey, DAO dao, String mnPort, String fileName) {
     setX(x);
     setOf(dao.getOf());
 
