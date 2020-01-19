@@ -134,16 +134,16 @@ public class MNJournal extends FileJournal {
     String hash1 = entry.getHash1();
     String hash2 = entry.getHash2();
     //TODO: Do not hard code SHA-256.
-    try {
-      MessageDigest md = MessageDigest.getInstance("SHA-256");
-      md.update(hash1.getBytes(StandardCharsets.UTF_8));
-      md.update(hash2.getBytes(StandardCharsets.UTF_8));
-      String myHash = byte2Hex(entry.getNu().hash(md));
-      entry.setMyHash(myHash);
-    } catch ( Exception e ) {
-      logger.info(e);
-      throw new RuntimeException(e);
-    }
+    // try {
+    //   MessageDigest md = MessageDigest.getInstance("SHA-256");
+    //   md.update(hash1.getBytes(StandardCharsets.UTF_8));
+    //   md.update(hash2.getBytes(StandardCharsets.UTF_8));
+    //   String myHash = byte2Hex(entry.getNu().hash(md));
+    //   entry.setMyHash(myHash);
+    // } catch ( Exception e ) {
+    //   logger.info(e);
+    //   throw new RuntimeException(e);
+    // }
     doWrite(x, new Outputter(x).stringify(obj) + "\n", entry.getMyIndex());
     return obj;
   }
