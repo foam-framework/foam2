@@ -69,6 +69,10 @@ public abstract class AbstractPropertyInfo
     return false;
   }
 
+  public void validateObj(foam.core.X x, foam.core.FObject obj) {
+    /* Template Method: override in subclass if required. */
+  }
+
   public String[] getAliases() {
     return new String[] {};
   }

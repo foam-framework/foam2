@@ -234,16 +234,6 @@ foam.CLASS({
             body: `return foam.util.SafetyUtil.compare(get_(o), ${this.propValue}) == 0;`
           },
           {
-            name: 'validateObj',
-            visibility: 'public',
-            type: 'void',
-            args: [
-              { name: 'x', type: 'foam.core.X' },
-              { name: 'obj', type: 'foam.core.FObject' }
-            ],
-            body: this.validateObj || '/* Template Method: override in subclass if required. */'
-          },
-          {
             name: 'toCSV',
             visibility: 'public',
             type: 'void',
@@ -335,6 +325,19 @@ foam.CLASS({
             visibility: 'public',
             type: 'boolean',
             body: 'return ' + Boolean(this.propRequired) + ';'
+          });
+        }
+
+        if ( this.validateObj ) {
+          m.push({
+            name: 'validateObj',
+            visibility: 'public',
+            type: 'void',
+            args: [
+              { name: 'x', type: 'foam.core.X' },
+              { name: 'obj', type: 'foam.core.FObject' }
+            ],
+            body: this.validateObj
           });
         }
 
