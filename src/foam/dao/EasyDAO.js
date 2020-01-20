@@ -292,6 +292,10 @@ foam.CLASS({
                           .build();
 
             delegate = new foam.nanos.mrac.VotingDAO(getX(), delegate);
+
+            delegate = new foam.dao.RetryDAO.Builder(getX())
+              .setDelegate(delegate)
+              .build();
           }
         }
 

@@ -15,7 +15,6 @@ foam.CLASS({
   javaImports: [
     'foam.box.Box',
     'foam.box.HTTPBox',
-    'foam.box.RetryBox',
     'foam.box.SessionClientBox',
     'foam.core.FObject',
     'foam.core.X',
@@ -127,17 +126,12 @@ logger.debug(this.getClass().getSimpleName(), "buildURL", serviceName, uri.toURL
           pDao = new ClientDAO.Builder(x)
                    .setDelegate(new SessionClientBox.Builder(x)
                      .setSessionID(config.getSessionId())
-                     .setDelegate(new RetryBox.Builder(x)
-                       .setDelegate(new HTTPBox.Builder(x)
-                         .setAuthorizationType(foam.box.HTTPAuthorizationType.BEARER)
-                         .setSessionID(config.getSessionId())
-                         .setUrl(buildURL(x, getServiceName(), primaryConfig))
-                         .build()
-                       )
-                       .build()
-                     )
-                     .build()
-                  )
+                     .setDelegate(new HTTPBox.Builder(x)
+                       .setAuthorizationType(foam.box.HTTPAuthorizationType.BEARER)
+                       .setSessionID(config.getSessionId())
+                       .setUrl(buildURL(x, getServiceName(), primaryConfig))
+                       .build())
+                     .build())
                   .build();
           getPrimaryDAOs().put(getServiceName(), pDao);
         }
