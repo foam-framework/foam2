@@ -46,11 +46,11 @@ foam.CLASS({
       name: 'send',
       args: [
         {
-          name: 'm',
+          name: 'msg',
           type: 'foam.box.Message'
         }
       ],
-      code: function (m) {
+      code: function (msg) {
         var self = this;
         this.setTimeout(function() {
           self.delegate.send(m);
@@ -73,21 +73,27 @@ foam.CLASS({
   name: 'RetryReplyBox',
   extends: 'foam.box.ProxyBox',
   requires: [
-    'foam.core.Exception'
+    'foam.core.Exception',
+    'foam.box.Message'
   ],
   properties: [
     {
       name: 'attempt',
-      value: 0
+      class: 'Int'
     },
     {
-      name: 'maxAttempts'
+      name: 'maxAttempts',
+      class: 'Int',
+      value: -1
     },
     {
-      name: 'message'
+      name: 'message',
+      class: 'foam.box.Message'
     },
     {
-      name: 'destination'
+      name: 'destination',
+      class: 'Proxy',
+      of: 'foam.box.Box'
     }
   ],
   methods: [
@@ -110,13 +116,12 @@ foam.CLASS({
         this.delegate && this.delegate.send(msg);
       },
       javaCode: `
-        if (
-          m instanceof foam.core.Exception &&
-          (
-            getMaxAttempts() == -1 ||
-            getAttempt() < getMaxAttempts()
-          )
-        ) {
+        if ( msg instanceof foam.core.Exception &&
+             (
+               getMaxAttempts() == -1 ||
+               getAttempt() < getMaxAttempts()
+             )
+           ) {
           setAttempt(getAttempt() + 1);
           getDestination().send(getMessage());
           return;
@@ -143,6 +148,7 @@ foam.CLASS({
     'attempts',
     {
       name: 'maxAttempts',
+      class: 'Int',
       documentation: 'Set to -1 to infinitely retry.',
       value: 3
     }

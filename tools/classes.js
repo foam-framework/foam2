@@ -86,6 +86,8 @@ var classes = [
   'foam.box.HTTPAuthorizationType',
   'foam.box.HTTPBox',
   'foam.box.HTTPReplyBox',
+  'foam.box.RetryBox',
+  'foam.box.RetryReplyBox',
   'foam.box.AuthServiceClientBox',
   'foam.box.ExportBox',
   'foam.nanos.app.AppConfig',
