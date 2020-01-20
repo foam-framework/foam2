@@ -5,6 +5,7 @@ import foam.core.FObject;
 import foam.core.XMLSupport;
 import org.w3c.dom.Document;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -75,6 +76,7 @@ public class XMLDAO
 
     try {
       DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+      dbFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
       DocumentBuilder        dBuilder  = dbFactory.newDocumentBuilder();
       Document               doc       = dBuilder.newDocument();
 
