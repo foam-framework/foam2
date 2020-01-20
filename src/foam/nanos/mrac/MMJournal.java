@@ -833,7 +833,14 @@ public class MMJournal extends AbstractJournal implements Electable {
       lengthBuffer.flip();
       length = lengthBuffer.getInt();
       ByteBuffer readBuffer = ByteBuffer.allocate(length);
-      channel.read(readBuffer);
+      // int l = 0;
+      // while ( l < length ) {
+      //   int i = channel.read(readBuffer)
+      //   l = l + i;
+      // }
+      while ( readBuffer.hasRemaining() ) {
+        channel.read(readBuffer);
+      }
       readBuffer.flip();
       buffers.add(readBuffer);
     }
@@ -893,6 +900,7 @@ public class MMJournal extends AbstractJournal implements Electable {
           carryOverLength = -1;
 
           MedusaEntry medusaEntry = (MedusaEntry) getX().create(JSONParser.class).parseString(entry);
+          if ( medusaEntry == null ) throw new RuntimeException("parse error: " + entry);
           medusaEntrys.add(medusaEntry);
         }
         while ( buffer.hasRemaining() ) {
@@ -1033,7 +1041,6 @@ public class MMJournal extends AbstractJournal implements Electable {
 
     public void close() {
       // try {
-        System.out.println("close close");
         isRunning = false;
         selector.wakeup();
         //TODO: check if a bug when close.
@@ -1198,7 +1205,7 @@ public class MMJournal extends AbstractJournal implements Electable {
           TCPNioServer.hardCloseSocketChannel(socketChannel);
           socketChannel = acceptedSocketChannels.poll();
         }
-        System.out.println("finally");
+        logger.info("finally");
         countDownLatch.countDown();
       }
     }
@@ -1502,7 +1509,7 @@ public class MMJournal extends AbstractJournal implements Electable {
     cleanConnection();
     stopListener(null);
     needReplay = true;
-    System.out.println("clear connection finish");
+    logger.info("clear connection finish");
   }
 
   public synchronized void leavePrimary() {

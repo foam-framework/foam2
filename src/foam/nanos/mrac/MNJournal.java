@@ -371,6 +371,7 @@ public class MNJournal extends FileJournal {
           .orderBy(EntryRecord.ID)
           .select(new ArraySink());
         fileSize = inChannel.size();
+        logger.info("readfileSize: " + fileSize);
       }
 
       List list = sink.getArray();
@@ -496,6 +497,7 @@ public class MNJournal extends FileJournal {
           MedusaEntry entry = null;
           try {
             entry = (MedusaEntry) x.create(JSONParser.class).parseString(line);
+            if ( entry == null ) throw new RuntimeException("parse error: " + line);
             if ( entry.getMyIndex() < indexFrom ) continue;
             if ( entry.getMyIndex() < minIndex ) minIndex = entry.getMyIndex();
             if ( entry.getMyIndex() > maxIndex ) maxIndex = entry.getMyIndex();
