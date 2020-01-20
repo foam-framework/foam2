@@ -18,8 +18,35 @@ configuration for contacting the primary node.`,
       type: 'Boolean'
     },
     {
+      name: 'setIsPrimary',
+      args: [
+        {
+          name: 'primary',
+          type: 'Boolean'
+        },
+      ]
+    },
+    {
+      name: 'setConfig',
+      args: [
+        {
+          name: 'config',
+          type: 'foam.nanos.mrac.ClusterConfig',
+        }
+      ]
+    },
+    {
       name: 'getConfig',
       type: 'foam.nanos.mrac.ClusterConfig',
+    },
+    {
+      name: 'setPrimaryConfig',
+      args: [
+        {
+          name: 'config',
+          type: 'foam.nanos.mrac.ClusterConfig',
+        }
+      ]
     },
     {
       name: 'getPrimaryConfig',
@@ -36,11 +63,7 @@ configuration for contacting the primary node.`,
         {
           name: 'serviceName',
           type: 'String'
-        },
-        // {
-        //   name: 'dao',
-        //   type: 'foam.dao.DAO',
-        // }
+        }
       ],
     },
     {

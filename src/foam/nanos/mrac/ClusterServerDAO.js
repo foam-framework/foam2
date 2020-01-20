@@ -24,14 +24,9 @@ foam.CLASS({
       name: 'cmd_',
       javaCode: `
       if ( obj instanceof ClusterCommand ) {
-        // ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
-        // if ( service == null ||
-        //     ! service.getIsPrimary() ) {
-        //   throw new UnsupportedOperationException("Cluster command not supported on non-primary instance");
-        // }
-
-        QuorumService quorumService = (QuorumService) x.get("quorumService");
-        if ( quorumService == null || quorumService.exposeState != InstanceState.PRIMARY ) {
+        ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
+        if ( service == null ||
+            ! service.getIsPrimary() ) {
           throw new UnsupportedOperationException("Cluster command not supported on non-primary instance");
         }
 

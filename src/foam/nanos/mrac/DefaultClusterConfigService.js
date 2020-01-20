@@ -25,6 +25,7 @@ foam.CLASS({
     'static foam.mlang.MLang.*',
     'foam.mlang.predicate.Predicate',
     'foam.nanos.logger.Logger',
+    'foam.nanos.mrac.quorum.QuorumService',
     'java.net.HttpURLConnection',
     'java.net.URL',
     'java.util.List',
@@ -82,6 +83,27 @@ foam.CLASS({
         onDAOUpdate(getX());
       `
     },
+    // {
+    //   name: 'getIsPrimary',
+    //   args: [
+    //     {
+    //       name: 'x',
+    //       type: 'Context'
+    //     },
+    //     {
+    //       name: 'serviceName',
+    //       type: 'String'
+    //     }
+    //   ],
+    //   type: 'Boolean',
+    //   javaCode: `
+    //   QuorumService quorumService = (QuorumService) x.get("quorumService");
+    //   if ( quorumService != null ) {
+    //     return quorumService.isPrimary();
+    //   }
+    //   return false;
+    //  `
+    // },
     {
       name: 'buildURL',
       type: 'String',
@@ -120,7 +142,7 @@ logger.debug(this.getClass().getSimpleName(), "buildURL", serviceName, uri.toURL
       name: 'getPrimaryDAO',
       javaCode: `
         DAO pDao = (DAO) getPrimaryDAOs().get(getServiceName());
-        if ( pDao == null ) {
+//        if ( pDao == null ) {
           ClusterConfig primaryConfig = getPrimaryConfig();
           ClusterConfig config = getConfig();
           pDao = new ClientDAO.Builder(x)
@@ -129,12 +151,12 @@ logger.debug(this.getClass().getSimpleName(), "buildURL", serviceName, uri.toURL
                      .setDelegate(new HTTPBox.Builder(x)
                        .setAuthorizationType(foam.box.HTTPAuthorizationType.BEARER)
                        .setSessionID(config.getSessionId())
-                       .setUrl(buildURL(x, getServiceName(), primaryConfig))
+                       .setUrl(buildURL(x, "cluster"/*getServiceName()*/, primaryConfig))
                        .build())
                      .build())
                   .build();
           getPrimaryDAOs().put(getServiceName(), pDao);
-        }
+//        }
         return pDao;
       `
     },
@@ -148,45 +170,46 @@ logger.debug(this.getClass().getSimpleName(), "buildURL", serviceName, uri.toURL
         }
       ],
       javaCode: `
-      Logger logger = (Logger) x.get("logger");
-      logger.debug(this.getClass().getSimpleName(), "onDAOUpdate");
-      String hostname = System.getProperty("hostname", "localhost");
-      DAO dao = getClusterConfigDAO();
-      ClusterConfig config = (ClusterConfig) dao.find(hostname);
-      if ( config == null ) {
-        logger.error(this.getClass().getSimpleName(), "onDAOUpdate", "cluster configuration not found for", hostname);
-        return;
-      }
-      setConfig(config);
+//nop
+      // Logger logger = (Logger) x.get("logger");
+      // logger.debug(this.getClass().getSimpleName(), "onDAOUpdate");
+      // String hostname = System.getProperty("hostname", "localhost");
+      // DAO dao = getClusterConfigDAO();
+      // ClusterConfig config = (ClusterConfig) dao.find(hostname);
+      // if ( config == null ) {
+      //   logger.error(this.getClass().getSimpleName(), "onDAOUpdate", "cluster configuration not found for", hostname);
+      //   return;
+      // }
+      // setConfig(config);
 
-      List andPredicates = new ArrayList();
-      if ( ! SafetyUtil.isEmpty(config.getRealm()) ) {
-        andPredicates.add(EQ(ClusterConfig.REALM, config.getRealm()));
-      }
-      if ( ! SafetyUtil.isEmpty(config.getRegion()) ) {
-        andPredicates.add(EQ(ClusterConfig.REGION, config.getRegion()));
-      }
-      andPredicates.add(EQ(ClusterConfig.ENABLED, true));
-      andPredicates.add(EQ(ClusterConfig.STATUS, Status.ONLINE));
-      List configs = (ArrayList) ((ArraySink) getClusterConfigDAO()
-        .where(AND((Predicate[]) andPredicates.toArray(new Predicate[andPredicates.size()])))
-        .select(new ArraySink())).getArray();
+      // List andPredicates = new ArrayList();
+      // if ( ! SafetyUtil.isEmpty(config.getRealm()) ) {
+      //   andPredicates.add(EQ(ClusterConfig.REALM, config.getRealm()));
+      // }
+      // if ( ! SafetyUtil.isEmpty(config.getRegion()) ) {
+      //   andPredicates.add(EQ(ClusterConfig.REGION, config.getRegion()));
+      // }
+      // andPredicates.add(EQ(ClusterConfig.ENABLED, true));
+      // andPredicates.add(EQ(ClusterConfig.STATUS, Status.ONLINE));
+      // List configs = (ArrayList) ((ArraySink) getClusterConfigDAO()
+      //   .where(AND((Predicate[]) andPredicates.toArray(new Predicate[andPredicates.size()])))
+      //   .select(new ArraySink())).getArray();
 
-      List<DAO> newClients = new ArrayList<DAO>();
-      for ( Object c : configs ) {
-        ClusterConfig clientConfig = (ClusterConfig) c;
-        if ( clientConfig.getNodeType() == NodeType.PRIMARY ) {
-          setPrimaryConfig(clientConfig);
-        }
-      }
+      // List<DAO> newClients = new ArrayList<DAO>();
+      // for ( Object c : configs ) {
+      //   ClusterConfig clientConfig = (ClusterConfig) c;
+      //   if ( clientConfig.getNodeType() == NodeType.PRIMARY ) {
+      //     setPrimaryConfig(clientConfig);
+      //   }
+      // }
 
-      if ( config.getNodeType().equals(NodeType.PRIMARY) &&
-        getPrimaryConfig() == null ) {
-        logger.error(this.getClass().getSimpleName(), "onDAOUpdate", "cluster configuration for PRIMARY not found.");
-      }
-      setIsPrimary(config.equals(getPrimaryConfig()));
+      // if ( config.getNodeType().equals(NodeType.PRIMARY) &&
+      //   getPrimaryConfig() == null ) {
+      //   logger.error(this.getClass().getSimpleName(), "onDAOUpdate", "cluster configuration for PRIMARY not found.");
+      // }
+      // setIsPrimary(config.equals(getPrimaryConfig()));
 
-      getPrimaryDAOs().clear();
+      // getPrimaryDAOs().clear();
       `
     }
   ]

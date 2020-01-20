@@ -235,24 +235,52 @@ p({
 
 p({
   "class": "foam.nanos.boot.NSpec",
-  "name": "countryDAO",
+  "name": "localCountryDAO",
   "description": "A DAO which contains information about countries.",
-  "serve": true,
+  "serve": false,
   "authenticate": false,
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
       .setPm(true)
-      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer(\"countryDAO\"))
+      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("countryDAO"))
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName(\"countries\")
+      .setJournalName("countries")
       .setOf(foam.nanos.auth.Country.getOwnClassInfo())
       .setOrder(new foam.core.PropertyInfo[] {foam.nanos.auth.Country.NAME})
       .build();
+  """
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "countryDAO",
+  "serve": true,
+  "authenticate": false,
+  "serviceScript":
+  """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.auth.Country.getOwnClassInfo())
+      .setName("countries")
+      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("countryDAO"))
+      .setInnerDAO(x.get("localCountryDAO"))
+      .build();
   """,
-  "client": "{\"of\":\"foam.nanos.auth.Country\"}",
+  "client":
+  """
+    {
+      "of": "foam.nanos.auth.Country",
+      "cache": true
+    }
+  """,
   "authNotes": "The \"authenticate\" flag is explicitly set to false because we want to be able to use the countryDAO to populate a dropdown in the sign up form. The DAO is decorated with an AuthenticatedDAO decorator with \"authenticateRead\" set to false so that anyone can read from countryDAO but only those with permission can write to or remove from it."
 })
-p({"class":"foam.nanos.boot.NSpec", "name":"countryService",                     "serve":true, "serviceClass":"foam.nanos.auth.CountryService"})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"countryService",
+  "serve":true,
+  "serviceClass":"foam.nanos.auth.CountryService"
+})
 
 p({"class":"foam.nanos.boot.NSpec", "name":"languageDAO",                        "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setPm(true).setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer(\"languageDAO\")).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"languages\").setOf(foam.nanos.auth.Language.getOwnClassInfo()).build();", "client":"{\"of\":\"foam.nanos.auth.Language\"}"})
 

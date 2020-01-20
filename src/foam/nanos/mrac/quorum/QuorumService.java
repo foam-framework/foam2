@@ -5,34 +5,31 @@
  */
 package foam.nanos.mrac.quorum;
 
+import foam.core.AbstractFObject;
+import foam.core.FoamThread;
+import foam.core.X;
+import foam.dao.ArraySink;
+import foam.dao.DAO;
+import static foam.mlang.MLang.*;
+import foam.nanos.logger.PrefixLogger;
+import foam.nanos.logger.Logger;
 import foam.nanos.NanoService;
 import foam.nanos.mrac.*;
-import foam.core.AbstractFObject;
-import foam.core.X;
-import foam.dao.DAO;
-import foam.core.FoamThread;
 
 import java.io.IOException;
-
 import java.util.List;
 import java.util.LinkedList;
-
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.Map;
-import java.util.concurrent.LinkedBlockingQueue;
-
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-
-import static foam.mlang.MLang.*;
-import foam.dao.ArraySink;
-import foam.nanos.logger.Logger;
+import java.util.Map;
 
 // Initial QuorumNetworkManager and Election.
 // Start voting.
 public class QuorumService extends AbstractFObject implements NanoService {
 
-  protected String hostname = System.getProperty("hostname");
+  protected String hostname = System.getProperty("hostname", "localhost");
   public ClusterNode mySelf;
   private QuorumNetworkManager networkManager;
   private Election election;
@@ -47,6 +44,10 @@ public class QuorumService extends AbstractFObject implements NanoService {
   LinkedBlockingQueue<Electable> secondaryElectables;
   LinkedBlockingQueue<Electable> unReadyElectables;
   Logger logger;
+
+  public  boolean isPrimary() {
+    return getMyState() == InstanceState.PRIMARY;
+  }
 
   public boolean electing() {
     return false;
@@ -117,14 +118,80 @@ public class QuorumService extends AbstractFObject implements NanoService {
 
   //TODO: apply this function.
   // This function only executes in one thread.
-  private void setPrimaryClusterNode(long id) {
+  // This instance has just become primary
+  private void setPrimaryClusterNode(X x, long id) {
+    Logger logger = new PrefixLogger(new Object[] {
+        this.getClass().getSimpleName(),
+        "setPrimaryClusterNode(id)"
+      }, (Logger) x.get("logger"));
+
+    logger.debug("enter");
     ClusterNode primaryNode = (ClusterNode) clusterDAO.find(id);
     if ( primaryNode == null ) throw new RuntimeException("Can not find ClusterNode with id: " + id);
     primaryClusterNode = primaryNode;
+
+    DAO configDAO = (DAO) x.get("localClusterConfigDAO");
+    ClusterConfig config = (ClusterConfig) configDAO.find(hostname);
+    if ( config == null ) {
+      logger.warning("cluster configuration not found for", hostname);
+      config = new ClusterConfig();
+      config.setId(hostname);
+      config.setPort(primaryNode.getServicePort());
+    } else {
+      config = (ClusterConfig) config.fclone();
+    }
+    config.setNodeType(NodeType.PRIMARY);
+    config.setSessionId(mySelf.getSessionId());
+    config.setPort(primaryClusterNode.getServicePort());
+    config = (ClusterConfig) configDAO.put(config);
+
+    ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
+    service.setConfig(config);
+    service.setPrimaryConfig(config);
+    service.setIsPrimary(true);
   }
 
+  // This instance has just become a secondary
   private void setPrimaryClusterNode(ClusterNode clusterNode) {
     primaryClusterNode = clusterNode;
+
+    X x = getX();
+    Logger logger = new PrefixLogger(new Object[] {
+        this.getClass().getSimpleName(),
+        "setPrimaryClusterNode(clusterNode)"
+      }, (Logger) x.get("logger"));
+
+    logger.debug("enter");
+
+    DAO configDAO = (DAO) x.get("localClusterConfigDAO");
+    ClusterConfig config = (ClusterConfig) configDAO.find(hostname);
+    if ( config == null ) {
+      logger.warning("cluster configuration not found for", hostname);
+      config = new ClusterConfig();
+      config.setId(hostname);
+    } else {
+      config = (ClusterConfig) config.fclone();
+    }
+    config.setNodeType(NodeType.SECONDARY);
+    config.setSessionId(mySelf.getSessionId());
+    config = (ClusterConfig) configDAO.put(config);
+
+    ClusterConfig primaryConfig = (ClusterConfig) configDAO.find(clusterNode.getHostName());
+    if ( primaryConfig == null ) {
+      primaryConfig = new ClusterConfig();
+      primaryConfig.setId(clusterNode.getHostName());
+      primaryConfig.setPort(clusterNode.getServicePort());
+    } else {
+      primaryConfig = (ClusterConfig) primaryConfig.fclone();
+    }
+    primaryConfig.setNodeType(NodeType.PRIMARY);
+    primaryConfig.setPort(primaryClusterNode.getServicePort());
+    primaryConfig = (ClusterConfig) configDAO.put(primaryConfig);
+
+    ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
+    service.setConfig(config);
+    service.setPrimaryConfig(primaryConfig);
+    service.setIsPrimary(false);
   }
 
   public ClusterNode getPrimaryClusterNode() {
@@ -151,7 +218,7 @@ public class QuorumService extends AbstractFObject implements NanoService {
         if ( getMyState() == InstanceState.ELECTING ) {
           try {
             setPrimaryVote(election.electingPrimary());
-            setPrimaryClusterNode(getPrimaryVote().getPrimaryInstanceId());
+            setPrimaryClusterNode(getX(), getPrimaryVote().getPrimaryInstanceId());
             logger.info("!!!!!!!!!!!!!end election");
             logger.info("*********Primary: " + getPrimaryVote().getPrimaryInstanceId());
           } catch ( Exception e ) {
@@ -165,10 +232,11 @@ public class QuorumService extends AbstractFObject implements NanoService {
           try {
 
             exposeState = InstanceState.PRIMARY;
-            setPrimaryClusterNode(getPrimaryVote().getPrimaryInstanceId());
+            setPrimaryClusterNode(getX(), getPrimaryVote().getPrimaryInstanceId());
             quorumInitial = new QuorumInitial(countDownLatch);
             quorumInitial.start();
             while ( true ) {
+              // Thread.sleep(500);
               //once become primary. It will stay primary forever.
             }
           } catch ( Exception e ) {
@@ -201,7 +269,7 @@ public class QuorumService extends AbstractFObject implements NanoService {
             quorumInitial.start();
             while ( true ) {
               try {
-                Thread.sleep(200);
+                Thread.sleep(1000);
               } catch ( InterruptedException e ) {
                 logger.info("SECONDARY: ",e);
               }

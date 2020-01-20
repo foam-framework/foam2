@@ -287,14 +287,7 @@ foam.CLASS({
             delegate = new foam.nanos.mrac.ClusterClientDAO.Builder(getX())
                           .setServiceName(getNSpec().getName())
                           .setDelegate(delegate)
-                          .setMdao(getMdao())
                           .build();
-
-            delegate = new foam.nanos.mrac.VotingDAO(getX(), delegate);
-
-            delegate = new foam.dao.RetryDAO.Builder(getX())
-              .setDelegate(delegate)
-              .build();
           }
         }
 

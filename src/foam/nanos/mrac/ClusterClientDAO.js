@@ -26,9 +26,21 @@ foam.CLASS({
       class: 'String'
     },
     {
+      // deprecated - temporary.
       name: 'mdao',
       class: 'foam.dao.DAOProperty',
       visibility: 'HIDDEN'
+    },
+    {
+      name: 'maxRetryAttempts',
+      class: 'Int',
+      documentation: 'Set to -1 to infinitely retry.',
+      value: 3
+    },
+    {
+      class: 'Int',
+      name: 'maxRetryDelay',
+      value: 20000
     }
   ],
 
@@ -46,7 +58,8 @@ foam.CLASS({
       if ( service != null &&
            service.getConfig() != null &&
            ! service.getIsPrimary() ) {
-        foam.core.FObject old = getMdao().find_(x, obj.getProperty("id"));
+
+        foam.core.FObject old = getDelegate().find_(x, obj.getProperty("id"));
         foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(x).setPropertyPredicate(new foam.lib.ClusterPropertyPredicate());
         //TODO: outputDelta has problem when output array. Fix bugs then use output delta.
         // String record = ( old != null ) ?
@@ -57,26 +70,57 @@ foam.CLASS({
         if ( foam.util.SafetyUtil.isEmpty(record) ||
             "{}".equals(record.trim()) ) {
           logger.debug("no changes");
-          // temporarily store locally until Medusa
-          //return getDelegate().put_(x, obj);
           return obj;
         }
 
         ClusterCommand cmd = new ClusterCommand(x, getServiceName(), ClusterCommand.PUT, record);
         logger.debug("to primary", cmd);
-        FObject result = (FObject) service.getPrimaryDAO(x, getServiceName()/*, (foam.dao.DAO) getMdao()*/).cmd_(x, cmd);
-        logger.debug("from primary", result.getClass().getSimpleName(), result);
-        obj = obj.copyFrom(result);
-        logger.debug("obj after copyFrom", obj);
-        // temporarily store locally until Medusa
-        //return getMdao().put_(x, obj); // does not work for password updates.
-        return obj;
+
+        int retryAttempt = 1;
+        int retryDelay = 1;
+
+        while ( ! service.getIsPrimary() ) {
+          try {
+            logger.debug("retryAttempt", retryAttempt);
+            FObject result = (FObject) service.getPrimaryDAO(x, getServiceName()).cmd_(x, cmd);
+            logger.debug("from primary", result.getClass().getSimpleName(), result);
+            obj = obj.copyFrom(result);
+            logger.debug("obj after copyFrom", obj);
+            return obj;
+          } catch ( Throwable t ) {
+            if ( getMaxRetryAttempts() > -1 &&
+                 retryAttempt >= getMaxRetryAttempts() ) {
+              logger.debug("retryAttempt >= maxRetryAttempts", retryAttempt, getMaxRetryAttempts());
+              throw t;
+            }
+            retryAttempt += 1;
+
+            // delay
+            try {
+              logger.debug("retryDelay", retryDelay);
+              Thread.sleep(retryDelay);
+              retryDelay *= 2;
+              if ( retryDelay > getMaxRetryDelay() ) {
+                retryDelay = 1;
+              }
+            } catch(InterruptedException e) {
+              Thread.currentThread().interrupt();
+              logger.debug("InterruptedException");
+              throw t;
+            }
+          }
+        }
+        // we've become primary
+        logger.debug("secondary -> primary delegating");
+        return getDelegate().put_(x, obj);
       } else {
+        logger.debug("primary delegating");
         return getDelegate().put_(x, obj);
       }
       `
     },
     {
+      // TODO: refactor  like put.
       name: 'remove_',
       javaCode: `
       Logger logger = new PrefixLogger(new Object[] {
@@ -89,17 +133,16 @@ foam.CLASS({
       if ( service != null &&
            service.getConfig() != null &&
            ! service.getIsPrimary() ) {
-        foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(x).setPropertyPredicate(new foam.lib.ClusterPropertyPredicate());
+
+       foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(x).setPropertyPredicate(new foam.lib.ClusterPropertyPredicate());
         String record = outputter.stringify(obj);
 
         ClusterCommand cmd = new ClusterCommand(x, getServiceName(), ClusterCommand.REMOVE, record);
         logger.debug("to primary", cmd);
-        FObject result = (FObject) service.getPrimaryDAO(x, getServiceName()/*, (foam.dao.DAO) getMdao()*/).cmd_(x, cmd);
+        FObject result = (FObject) service.getPrimaryDAO(x, getServiceName()).cmd_(x, cmd);
         logger.debug("from primary", result.getClass().getSimpleName(), result);
         obj = obj.copyFrom(result);
         logger.debug("obj after copyFrom", obj);
-        // temporarily store locally until Medusa
-        // return getMdao().remove_(x, obj);
         return obj;
       } else {
         return getDelegate().remove_(x, obj);
