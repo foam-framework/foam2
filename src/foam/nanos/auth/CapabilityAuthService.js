@@ -64,7 +64,6 @@ foam.CLASS({
           Capability cap = (Capability) capabilityDAO.find(permission);
           if ( cap != null && cap.isDeprecated(x) ) return getDelegate().checkUser(x, user, permission);
 
-          Date now = new Date();
           Predicate capabilityScope = AND(
             EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
             OR(
