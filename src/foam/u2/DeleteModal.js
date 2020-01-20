@@ -85,7 +85,7 @@ foam.CLASS({
       name: 'delete',
       label: 'Delete',
       code: function(X) {
-        this.dao.remove(this.data).then((_) => {
+        this.dao.remove(this.data).then((o) => {
           if ( foam.comics.v2.userfeedback.UserFeedbackAware.isInstance(o) && o.userFeedback ){
             var currentFeedback = o.userFeedback;
             while ( currentFeedback ){
