@@ -131,20 +131,6 @@ foam.CLASS({
             body: 'return "' + this.propName + '";'
           },
           {
-            name: 'getShortName',
-            visibility: 'public',
-            type: 'String',
-            body: this.propShortName ?
-              'return "' + this.propShortName + '";' :
-              'return null;'
-          },
-          {
-            name: 'getAliases',
-            visibility: 'public',
-            type: 'String[]',
-            body: 'return ' + this.getAliasesBody
-          },
-          {
             name: 'get',
             visibility: 'public',
             type: 'Object',
@@ -219,54 +205,6 @@ foam.CLASS({
             body: 'return ' + ( this.csvParser ? this.csvParser : null ) + ';'
           },
           {
-            name: 'getNetworkTransient',
-            type: 'boolean',
-            visibility: 'public',
-            body: 'return ' + this.networkTransient + ';'
-          },
-          {
-            name: 'getReadPermissionRequired',
-            type: 'boolean',
-            visibility: 'public',
-            body: 'return ' + this.readPermissionRequired + ';'
-          },
-          {
-            name: 'getWritePermissionRequired',
-            type: 'boolean',
-            visibility: 'public',
-            body: 'return ' + this.writePermissionRequired + ';'
-          },
-          {
-            name: 'getStorageTransient',
-            type: 'boolean',
-            visibility: 'public',
-            body: 'return ' + this.storageTransient + ';'
-          },
-          {
-            name: 'getClusterTransient',
-            type: 'boolean',
-            visibility: 'public',
-            body: 'return ' + this.clusterTransient + ';'
-          },
-          {
-            name: 'getXMLAttribute',
-            type: 'boolean',
-            visibility: 'public',
-            body: 'return ' + this.xmlAttribute + ';'
-          },
-          {
-            name: 'getXMLTextNode',
-            type: 'boolean',
-            visibility: 'public',
-            body: 'return ' + this.xmlTextNode + ';'
-          },
-          {
-            name: 'getRequired',
-            visibility: 'public',
-            type: 'boolean',
-            body: 'return ' + Boolean(this.propRequired) + ';'
-          },
-          {
             name: 'getValueClass',
             visibility: 'public',
             type: 'Class',
@@ -277,12 +215,6 @@ foam.CLASS({
             visibility: 'public',
             type: 'String',
             body: 'return "' + this.sqlType + '";'
-          },
-          {
-            name: 'createStatement',
-            visibility: 'public',
-            type: 'String',
-            body: 'return getName();'
           },
           {
             name: 'isSet',
@@ -298,16 +230,6 @@ foam.CLASS({
             args: [{ name: 'o', type: 'Object' }],
             /* TODO: revise when/if expression support is added to Java */
             body: `return foam.util.SafetyUtil.compare(get_(o), ${this.propValue}) == 0;`
-          },
-          {
-            name: 'validateObj',
-            visibility: 'public',
-            type: 'void',
-            args: [
-              { name: 'x', type: 'foam.core.X' },
-              { name: 'obj', type: 'foam.core.FObject' }
-            ],
-            body: this.validateObj || '/* Template Method: override in subclass if required. */'
           },
           {
             name: 'toCSV',
@@ -340,6 +262,111 @@ foam.CLASS({
             body: this.fromCSVLabelMapping
           }
         ];
+
+        if ( this.networkTransient ) {
+          m.push({
+            name: 'getNetworkTransient',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.networkTransient + ';'
+          });
+        }
+
+        if ( this.storageTransient ) {
+          m.push({
+            name: 'getStorageTransient',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.storageTransient + ';'
+          });
+        }
+
+        if ( this.clusterTransient ) {
+          m.push({
+            name: 'getClusterTransient',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.clusterTransient + ';'
+          });
+        }
+
+        if ( this.readPermissionRequired ) {
+          m.push({
+            name: 'getReadPermissionRequired',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.readPermissionRequired + ';'
+          });
+        }
+
+        if ( this.writePermissionRequired ) {
+          m.push({
+            name: 'getWritePermissionRequired',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.writePermissionRequired + ';'
+          });
+        }
+
+        if ( this.xmlAttribute ) {
+          m.push({
+            name: 'getXMLAttribute',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.xmlAttribute + ';'
+          });
+        }
+
+        if ( this.xmlTextNode ) {
+          m.push({
+            name: 'getXMLTextNode',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.xmlTextNode + ';'
+          });
+        }
+
+        if ( this.propRequired ) {
+          m.push({
+            name: 'getRequired',
+            visibility: 'public',
+            type: 'boolean',
+            body: 'return ' + Boolean(this.propRequired) + ';'
+          });
+        }
+
+        if ( this.validateObj ) {
+          m.push({
+            name: 'validateObj',
+            visibility: 'public',
+            type: 'void',
+            args: [
+              { name: 'x', type: 'foam.core.X' },
+              { name: 'obj', type: 'foam.core.FObject' }
+            ],
+            body: this.validateObj
+          });
+        }
+
+        if ( this.propShortName ) {
+          m.push({
+            name: 'getShortName',
+            visibility: 'public',
+            type: 'String',
+            body: this.propShortName ?
+              'return "' + this.propShortName + '";' :
+              'return null;'
+          });
+        }
+
+        if ( this.propAliases.length ) {
+          m.push({
+            name: 'getAliases',
+            visibility: 'public',
+            type: 'String[]',
+            body: 'return ' + this.getAliasesBody
+          });
+        }
 
         if ( this.cloneProperty != null ) {
           m.push({
