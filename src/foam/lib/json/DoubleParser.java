@@ -13,7 +13,7 @@ public class DoubleParser implements Parser {
     StringBuilder n = new StringBuilder();
     boolean decimalFound = false;
     boolean exponentFound = false;
-    boolean negateAfterExponend = false;
+    boolean negativeExponent = false;
     char previousChar;
 
     if ( ! ps.valid() ) return null;
@@ -51,10 +51,10 @@ public class DoubleParser implements Parser {
         if ( exponentFound ) return null;
         exponentFound = true;
         n.append(c);
-      } else if ( c == '-') {
-        if ( negateAfterExponend ) return null;
+      } else if ( c == '-' ) {
+        if ( negativeExponent ) return null;
         if ( previousChar == 'E' || previousChar == 'e' ) {
-          negateAfterExponend = true;
+          negativeExponent = true;
           n.append(c);
         }
       } else {
