@@ -383,7 +383,7 @@ try {
         if ( obj instanceof LastModifiedByAware && ((LastModifiedByAware) obj).getLastModifiedBy() != 0L ) return;
 
         User user = (User) x.get("user");
-        Calendar now = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+
         write_(sb.get()
           .append("// Modified by ")
           .append(user.label())

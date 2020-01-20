@@ -14,6 +14,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -136,6 +137,7 @@ public class XMLSupport {
     Document doc = null;
     try {
       DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+      dbFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
       DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
       doc = dBuilder.newDocument();
     } catch (ParserConfigurationException ex) {
@@ -147,6 +149,7 @@ public class XMLSupport {
     Transformer transformer = null;
     try {
       TransformerFactory tf = TransformerFactory.newInstance();
+      tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
       transformer = tf.newTransformer();
       transformer.setOutputProperty(OutputKeys.INDENT, "yes");
       transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
