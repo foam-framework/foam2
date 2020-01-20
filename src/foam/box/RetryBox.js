@@ -22,16 +22,12 @@ foam.CLASS({
   imports: [
     'setTimeout'
   ],
-  javaImports: [
-    'java.lang.InterruptedException'
-  ],
   properties: [
     {
       class: 'Int',
-      javaType: 'long',
       name: 'delay',
       preSet: function(_, a) {
-        return a < this.maxDelay ? a : 1; // reset
+        return a < this.maxDelay ? a : this.maxDelay;
       },
       value: 1
     },
@@ -42,28 +38,13 @@ foam.CLASS({
     }
   ],
   methods: [
-    {
-      name: 'send',
-      args: [
-        {
-          name: 'msg',
-          type: 'foam.box.Message'
-        }
-      ],
-      code: function (msg) {
-        var self = this;
-        this.setTimeout(function() {
-          self.delegate.send(m);
-        }, this.delay);
+    function send(m) {
+      var self = this;
+      this.setTimeout(function() {
+        self.delegate.send(m);
+      }, this.delay);
 
-        this.delay *= 2;
-      },
-      javaCode: `
-        try {
-          Thread.sleep(getDelay());
-        } catch (InterruptedException e) {}
-        setDelay(getDelay() * 2);
-      `
+      this.delay *= 2;
     }
   ]
 });
@@ -73,39 +54,26 @@ foam.CLASS({
   name: 'RetryReplyBox',
   extends: 'foam.box.ProxyBox',
   requires: [
-    'foam.core.Exception',
-    'foam.box.Message'
+    'foam.core.Exception'
   ],
   properties: [
     {
       name: 'attempt',
-      class: 'Int'
+      value: 0
     },
     {
-      name: 'maxAttempts',
-      class: 'Int',
-      value: -1
+      name: 'maxAttempts'
     },
     {
-      name: 'message',
-      class: 'FObjectProperty',
-      of: 'foam.box.Message'
+      name: 'message'
     },
     {
-      name: 'destination',
-      class: 'Proxy',
-      of: 'foam.box.Box'
+      name: 'destination'
     }
   ],
   methods: [
     {
       name: 'send',
-      args: [
-        {
-          name: 'msg',
-          type: 'foam.box.Message'
-        }
-      ],
       code: function send(msg) {
         if ( this.Exception.isInstance(msg.object) &&
              ( this.maxAttempts == -1 || this.attempt < this.maxAttempts ) ) {
@@ -115,22 +83,7 @@ foam.CLASS({
         }
 
         this.delegate && this.delegate.send(msg);
-      },
-      javaCode: `
-        if ( msg instanceof foam.core.Exception &&
-             (
-               getMaxAttempts() == -1 ||
-               getAttempt() < getMaxAttempts()
-             )
-           ) {
-          setAttempt(getAttempt() + 1);
-          getDestination().send(getMessage());
-          return;
-        }
-        if ( getDelegate() != null ) {
-          getDelegate().send(msg);
-        }
-      `
+      }
     }
   ]
 });
@@ -149,65 +102,34 @@ foam.CLASS({
     'attempts',
     {
       name: 'maxAttempts',
-      class: 'Int',
       documentation: 'Set to -1 to infinitely retry.',
       value: 3
     }
   ],
 
   methods: [
-    {
-      name: 'send',
-      args: [
-        {
-          name: 'msg',
-          type: 'foam.box.Message'
+    function send(msg) {
+      var replyBox = msg.attributes.replyBox;
+
+      if ( replyBox ) {
+        var clone = msg.cls_.create(msg);
+
+        replyBox.localBox = this.RetryReplyBox.create({
+          delegate: replyBox.localBox,
+          maxAttempts: this.maxAttempts,
+          message: clone,
+          destination: this.BackoffBox.create({
+            delegate: this.delegate
+          })
+        });
+
+        clone.attributes = {};
+        for ( var key in msg.attributes ) {
+          clone.attributes[key] = msg.attributes[key];
         }
-      ],
-      code: function (msg) {
-        var replyBox = msg.attributes.replyBox;
+      }
 
-        if ( replyBox ) {
-          var clone = msg.cls_.create(msg);
-
-          replyBox.localBox = this.RetryReplyBox.create({
-            delegate: replyBox.localBox,
-            maxAttempts: this.maxAttempts,
-            message: clone,
-            destination: this.BackoffBox.create({
-              delegate: this.delegate
-            })
-          });
-
-          clone.attributes = {};
-          for ( var key in msg.attributes ) {
-            clone.attributes[key] = msg.attributes[key];
-          }
-        }
-
-        this.delegate.send(msg);
-      },
-      javaCode: `
-        Box replyBox = (Box) msg.getAttributes().get("replyBox");
-
-        if ( replyBox == null ) {
-          getDelegate().send(msg);
-          return;
-        }
-
-        // TODO: determine if cloning delegate replyBox is necessary
-
-        replyBox.setLocalBox(new RetryReplyBox.Builder(getX())
-          .setDelegate(replyBox.getLocalBox())
-          .setMaxAttempts(getMaxAttempts())
-          .setMessage(msg) // TODO: cloned?
-          .setDestination(new BackoffBox.Builder(getX())
-            .setDelegate(getDelegate())
-            .build());
-          .build());
-
-        getDelegate().send(msg);
-      `
+      this.delegate.send(msg);
     }
   ]
 });
