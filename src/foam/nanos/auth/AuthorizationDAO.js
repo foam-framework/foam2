@@ -91,8 +91,14 @@ foam.CLASS({
     if ( getAuthorizer().checkGlobalRead(x) ) return super.find_(x, id);
 
     FObject obj = super.find_(x, id);
-    if ( obj != null ) getAuthorizer().authorizeOnRead(x, obj);
-    return obj;
+    try 
+    {
+      if ( obj != null ) 
+        getAuthorizer().authorizeOnRead(x, obj);
+      return obj;
+    } catch (Exception e) {
+      return null;
+    }
  `
     },
     {
