@@ -88,7 +88,8 @@ foam.CLASS({
     },
     {
       name: 'message',
-      class: 'foam.box.Message'
+      class: 'FObjectProperty',
+      of: 'foam.box.Message'
     },
     {
       name: 'destination',
