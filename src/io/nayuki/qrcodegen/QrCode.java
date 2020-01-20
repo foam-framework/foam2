@@ -123,13 +123,13 @@ public final class QrCode {
     for (version = minVersion; ; version++) {
       int dataCapacityBits = getNumDataCodewords(version, ecl) * 8;  // Number of data bits available
       dataUsedBits = QrSegment.getTotalBits(segs, version);
-      if (dataUsedBits != -1 && dataUsedBits <= dataCapacityBits)
+      if (dataUsedBits != 0 && dataUsedBits <= dataCapacityBits)
         break;  // This version number is found to be suitable
       if (version >= maxVersion)  // All versions in the range could not fit the given data
         throw new IllegalArgumentException("Data too long");
     }
-    if (dataUsedBits == -1)
-      throw new AssertionError();
+    if (dataUsedBits == 0)
+      throw new IllegalArgumentException("No data provided");
 
     // Increase the error correction level while the data still fits in the current version number
     for (Ecc newEcl : Ecc.values()) {
