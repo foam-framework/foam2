@@ -680,7 +680,6 @@ describe('MLang', function() {
       },
       function(err) {
         throw err;
-        done();
       });
     });
 
@@ -698,7 +697,6 @@ describe('MLang', function() {
       },
       function(err) {
         throw err;
-        done();
       });
     });
 
@@ -714,7 +712,6 @@ describe('MLang', function() {
       },
       function(err) {
         throw err;
-        done();
       });
     });
 

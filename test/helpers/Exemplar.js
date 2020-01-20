@@ -45,7 +45,6 @@ foam.CLASS({
         // NOTE: this will also cause not-yet-declared dependencies to fail
         if ( this.dependsOn(nu, this.name) ) {
           throw "Cannot have self as a dependency!" + name;
-          return old;
         }
         return nu;
       }

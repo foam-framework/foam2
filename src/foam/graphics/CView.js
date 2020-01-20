@@ -948,8 +948,6 @@ foam.CLASS({
       var pos = scalarProj;
 
       return distance < 5 && pos > -5 && pos < (blen + 5)
-
-      return false;
     }
   ]
 });

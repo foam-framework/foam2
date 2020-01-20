@@ -215,7 +215,6 @@ foam.LIB({
           'memoize0(' + f.name + ')');
       ret.toString = function() {
         return f.toString();
-        return `foam.Function.memoize0(${f.toString()})`
       };
       ret.args = []
       return ret;
@@ -245,7 +244,6 @@ foam.LIB({
           'memoize1(' + f.name + ')');
       ret.toString = function() {
         return f.toString();
-        return `foam.Function.memoize1(${f.toString()})`
       };
       ret.args = [];
       return ret;

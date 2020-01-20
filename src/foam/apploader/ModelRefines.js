@@ -28,7 +28,6 @@ foam.CLASS({
           if ( d.indexOf('.') == -1 ) return 'foam.core.' + d;
           return d;
         });
-        return deps;
       }
     },
   ],

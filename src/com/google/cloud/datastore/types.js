@@ -308,7 +308,6 @@ foam.CLASS({
         "name" property for Datastore API usage details.`,
       code: function(o) {
         return this.f(o).toString();
-        return this.toDatastoreKeyNamePart(o);
       }
     }
   ]

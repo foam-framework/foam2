@@ -20,7 +20,6 @@ foam.CLASS({
       name: 'tail',
       getter: function() {
         throw "trap";
-        return foam.parse.InvalidPStream.create();
       },
       setter: function(){}
     },

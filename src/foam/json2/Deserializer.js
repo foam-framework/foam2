@@ -68,7 +68,6 @@ foam.CLASS({
         if ( ! foam.Undefined.isInstance(v["$CLS$"]) ) {
           // Defines a class referenced by $CLS$ key
           return this.aref(v["$CLS$"]);
-          return foam.lookup(v["$CLS$"]);
         }
         if ( ! foam.Undefined.isInstance(v["$INST$"]) ) {
           // Is an instance of the class defined by $INST$ key

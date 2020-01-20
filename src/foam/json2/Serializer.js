@@ -78,7 +78,6 @@ foam.CLASS({
             if ( foam.core.FObject.isSubClass(v) ) { // Is an actual class
               if ( v.id.indexOf('AnonymousClass') == 0 ) {
                 throw new Error("Anonymous Class support dropped.");
-                this.output(x, v.model_);
               } else {
                 out.obj();
                 out.key("$CLS$");
