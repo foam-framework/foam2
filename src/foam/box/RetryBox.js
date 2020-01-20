@@ -31,7 +31,7 @@ foam.CLASS({
       javaType: 'long',
       name: 'delay',
       preSet: function(_, a) {
-        return a < this.maxDelay ? a : this.maxDelay;
+        return a < this.maxDelay ? a : 1; // reset
       },
       value: 1
     },
