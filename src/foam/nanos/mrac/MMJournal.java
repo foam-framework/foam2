@@ -1344,7 +1344,7 @@ public class MMJournal extends AbstractJournal implements Electable {
   //TODO: create a queue.
   private void processEntryFromCachedMap(Long index) {
     if ( cachedEntryMap.get(index) != null ) {
-      logger.info("queeueque");
+      logger.info("queeueque Index: " + index);
       synchronized ( cachedEntryMapLock ) {
         cacheOrMDAO(cachedEntryMap.get(index));
         cachedEntryMap.remove(index);
