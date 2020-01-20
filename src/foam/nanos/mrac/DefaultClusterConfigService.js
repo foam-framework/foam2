@@ -124,15 +124,15 @@ logger.debug(this.getClass().getSimpleName(), "buildURL", serviceName, uri.toURL
           ClusterConfig primaryConfig = getPrimaryConfig();
           ClusterConfig config = getConfig();
           pDao = new ClientDAO.Builder(x)
-                    .setDelegate(new SessionClientBox.Builder(x)
+                   .setDelegate(new SessionClientBox.Builder(x)
                      .setSessionID(config.getSessionId())
                      .setDelegate(new HTTPBox.Builder(x)
-                        .setAuthorizationType(foam.box.HTTPAuthorizationType.BEARER)
-                        .setSessionID(config.getSessionId())
-                        .setUrl(buildURL(x, getServiceName(), primaryConfig))
-                        .build())
+                       .setAuthorizationType(foam.box.HTTPAuthorizationType.BEARER)
+                       .setSessionID(config.getSessionId())
+                       .setUrl(buildURL(x, getServiceName(), primaryConfig))
+                       .build())
                      .build())
-                   .build();
+                  .build();
           getPrimaryDAOs().put(getServiceName(), pDao);
         }
         return pDao;

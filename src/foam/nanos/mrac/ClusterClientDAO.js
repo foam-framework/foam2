@@ -58,18 +58,17 @@ foam.CLASS({
             "{}".equals(record.trim()) ) {
           logger.debug("no changes");
           // temporarily store locally until Medusa
-          //return obj;
-          return getDelegate().put_(x, obj);
+          //return getDelegate().put_(x, obj);
+          return obj;
         }
 
         ClusterCommand cmd = new ClusterCommand(x, getServiceName(), ClusterCommand.PUT, record);
         logger.debug("to primary", cmd);
-        FObject result = (FObject) service.getPrimaryDAO(x, getServiceName(), (foam.dao.DAO) getMdao()).cmd_(x, cmd);
+        FObject result = (FObject) service.getPrimaryDAO(x, getServiceName()/*, (foam.dao.DAO) getMdao()*/).cmd_(x, cmd);
         logger.debug("from primary", result.getClass().getSimpleName(), result);
         obj = obj.copyFrom(result);
-        // temporarily store locally until Medusa
-        // return obj;
         logger.debug("obj after copyFrom", obj);
+        // temporarily store locally until Medusa
         //return getMdao().put_(x, obj); // does not work for password updates.
         return obj;
       } else {
@@ -95,13 +94,13 @@ foam.CLASS({
 
         ClusterCommand cmd = new ClusterCommand(x, getServiceName(), ClusterCommand.REMOVE, record);
         logger.debug("to primary", cmd);
-        FObject result = (FObject) service.getPrimaryDAO(x, getServiceName(), (foam.dao.DAO) getMdao()).cmd_(x, cmd);
+        FObject result = (FObject) service.getPrimaryDAO(x, getServiceName()/*, (foam.dao.DAO) getMdao()*/).cmd_(x, cmd);
         logger.debug("from primary", result.getClass().getSimpleName(), result);
         obj = obj.copyFrom(result);
-        // temporarily store locally until Medusa
-        // return obj;
         logger.debug("obj after copyFrom", obj);
-        return getMdao().remove_(x, obj);
+        // temporarily store locally until Medusa
+        // return getMdao().remove_(x, obj);
+        return obj;
       } else {
         return getDelegate().remove_(x, obj);
       }

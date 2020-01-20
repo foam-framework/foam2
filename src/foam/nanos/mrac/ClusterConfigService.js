@@ -37,10 +37,10 @@ configuration for contacting the primary node.`,
           name: 'serviceName',
           type: 'String'
         },
-        {
-          name: 'dao',
-          type: 'foam.dao.DAO',
-        }
+        // {
+        //   name: 'dao',
+        //   type: 'foam.dao.DAO',
+        // }
       ],
     },
     {
