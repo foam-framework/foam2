@@ -1,7 +1,26 @@
 p({"class":"foam.nanos.boot.NSpec", "name":"nSpecDAO",                           "serve":true,  "authenticate": false, "serviceClass":"foam.dao.ProxyDAO", "client":"{\"of\":\"foam.nanos.boot.NSpec\",\"cache\":true}"})
 
 
-p({"class":"foam.nanos.boot.NSpec", "name":"AuthenticatedNSpecDAO",              "serve":true,  "serviceClass":"foam.dao.ProxyDAO", "client":"{\"of\":\"foam.nanos.boot.NSpec\",\"cache\":true}"})
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"AuthenticatedNSpecDAO",
+  "serve":true,
+  "serviceScript":"""
+    return new foam.dao.PMDAO(x,
+      new foam.nanos.auth.AuthorizationDAO(x,
+        x.get("nSpecDAO"),
+        new foam.nanos.auth.StandardAuthorizer("service")
+      )
+    );
+  """,
+  "client":"""
+    {
+      "of":"foam.nanos.boot.NSpec",
+      "cache":true
+    }
+  """,
+  documentation:"The authenticated version of nSpecDAO - for dig and docs."
+})
 p({"class":"foam.nanos.boot.NSpec", "name":"http",                             "lazy":false, "service":{"class":"foam.nanos.jetty.HttpServer","port":8080,"forwardedForProxyWhitelist":[],"welcomeFiles":["/src/foam/nanos/controller/index.html"],"servletMappings":[{"class":"foam.nanos.servlet.ServletMapping","className":"foam.nanos.http.NanoRouter","pathSpec":"/service/*"},{"class":"foam.nanos.servlet.ServletMapping","className":"org.eclipse.jetty.servlet.DefaultServlet","pathSpec":"/*","initParameters":{"dirAllowed":"true","redirectWelcome":"true"}}]}})
 p({"class":"foam.nanos.boot.NSpec", "name":"httprouter",                         "serviceClass":"foam.nanos.http.NanoRouter"})
 p({"class":"foam.nanos.boot.NSpec", "name":"websockets",                       "lazy":false, "serviceClass":"foam.nanos.ws.NanoWebSocketServer"})

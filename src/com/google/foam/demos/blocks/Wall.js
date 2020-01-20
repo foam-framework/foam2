@@ -87,11 +87,11 @@ foam.CLASS({
     function balance() {
       return;
       for ( var i = 0 ; i < 1 ; i++ )
-      for ( var x = 0 ; x < this.width ; x++ ) {
-        for ( var y = 0 ; y < this.height ; y++ ) {
-          this.balanceBrick(this.bricks[x][y]);
+        for ( var x = 0 ; x < this.width ; x++ ) {
+          for ( var y = 0 ; y < this.height ; y++ ) {
+            this.balanceBrick(this.bricks[x][y]);
+          }
         }
-      }
     }
   ],
 

@@ -21,10 +21,8 @@ public class PersistedIndex
 
   public PersistedIndex(String filename, Index index) throws IOException {
     this.file_ = new File(filename).getAbsoluteFile();
-    if ( ! file_.exists() ) {
-      if ( ! this.file_.createNewFile() ) {
+    if ( ! file_.exists() && ! this.file_.createNewFile() ) {
         throw new IOException("Unable to create file: " + filename);
-      }
     }
     this.fis_ = new FileInputStream(this.file_);
     this.fos_ = new FileOutputStream(this.file_);
