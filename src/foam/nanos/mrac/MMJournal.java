@@ -80,6 +80,9 @@ import java.nio.charset.StandardCharsets;
 import foam.lib.ClusterPropertyPredicate;
 import foam.nanos.logger.Logger;
 
+import java.util.concurrent.ExecutorService; 
+import java.util.concurrent.Executors;
+
 // Make sure that this class sould only have one instance in single journal mode.
 // In multiple journal mode. each JDAO will have it's own instance.
 // can simple get put to MedusaMediator
@@ -107,6 +110,7 @@ public class MMJournal extends AbstractJournal implements Electable {
   MedusaEntry parent2;
   int hashIndex = 1;
   Object hashRecordLock = new Object();
+  private ExecutorService pool = Executors.newFixedThreadPool(3);
 
   //TODO: check if this method is really threadsafe.
   private void updateHash(MedusaEntry parent) {
@@ -325,7 +329,8 @@ public class MMJournal extends AbstractJournal implements Electable {
         ClusterNode node = nodes.get(j);
         tasks[j] = new FutureTask<String>(new Sender(node.getIp(), node.getServicePort(), medusaEntry));
         //TODO: use threadpool.
-        new Thread((FutureTask<String>) tasks[j]).start();
+        //new Thread((FutureTask<String>) tasks[j]).start();
+        pool.execute(new Thread((FutureTask<String>) tasks[j]));
       }
 
       long endtime = System.currentTimeMillis() + TIME_OUT * (i + 1);
@@ -492,10 +497,10 @@ public class MMJournal extends AbstractJournal implements Electable {
         if ( len == 0 && read != -1 ) {
           throw new RuntimeException("Message too large.");
         }
-
+        logger.info("success persist [ " + message + " ] entry into " + ip + ":" +  port);
         return  new String(buf, 0, off, StandardCharsets.UTF_8);
       } catch ( Exception e ) {
-        logger.info("fail persist entry into " + ip + ":" +  port + " error message: " + e);
+        logger.info("fail persist [ " + message + " ] entry into " + ip + ":" +  port + " error message: " + e);
         throw e;
       } finally {
         IOUtils.closeQuietly(output);
@@ -636,13 +641,17 @@ public class MMJournal extends AbstractJournal implements Electable {
 
       if ( registerDAOs.get(entry.getNspecKey()) != null ) {
         DAO dao = registerDAOs.get(entry.getNspecKey());
-        if ( "p".equals(entry.getAction()) ) {
-          //TODO: investigating on TransactionDAO.
-          dao.put(entry.getNu());
-        } else if ( "r".equals(entry.getAction()) ) {
-          dao.remove(entry.getNu());
-        } else {
-          throw new RuntimeException("Do not have action inMedusaEntry");
+        try {
+          if ( "p".equals(entry.getAction()) ) {
+            //TODO: investigating on TransactionDAO.
+            dao.put(entry.getNu());
+          } else if ( "r".equals(entry.getAction()) ) {
+            dao.remove(entry.getNu());
+          } else {
+            throw new RuntimeException("Do not have action inMedusaEntry");
+          }
+        } catch ( Exception e ) {
+          logger.error("cacheOrMDAO error: " + e);
         }
       } else {
         if ( readyToUseEntry.get(entry.getNspecKey()) == null ) {
