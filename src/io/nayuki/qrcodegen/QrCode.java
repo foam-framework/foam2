@@ -517,7 +517,7 @@ public final class QrCode {
           case 7:  invert = ((x + y) % 2 + x * y % 3) % 2 == 0;  break;
           default:  throw new AssertionError();
         }
-        modules[y][x] ^= invert & !isFunction[y][x];
+        modules[y][x] ^= invert && !isFunction[y][x];
       }
     }
   }
@@ -648,7 +648,7 @@ public final class QrCode {
         // ceil((size - 13) / (2*numAlign - 2)) * 2
         step = (ver * 4 + numAlign * 2 + 1) / (2 * numAlign - 2) * 2;
       } else  // C-C-C-Combo breaker!
-        step = 26;
+          step = 26;
 
       int[] result = new int[numAlign];
       result[0] = 6;

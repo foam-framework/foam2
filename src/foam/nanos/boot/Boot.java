@@ -21,7 +21,7 @@ import foam.nanos.pm.NullPM;
 import foam.nanos.pm.PM;
 import foam.nanos.script.Script;
 import foam.nanos.session.Session;
-
+import foam.util.SafetyUtil;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -44,7 +44,7 @@ public class Boot {
     Logger logger = new ProxyLogger(new StdoutLogger());
     root_.put("logger", logger);
 
-    if ( datadir == null || datadir == "" ) {
+    if ( SafetyUtil.isEmpty(datadir) ) {
       datadir = System.getProperty("JOURNAL_HOME");
     }
 

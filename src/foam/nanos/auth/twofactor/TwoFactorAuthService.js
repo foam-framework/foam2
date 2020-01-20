@@ -8,7 +8,6 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.dao.DAO',
     'foam.nanos.auth.User',
     'foam.nanos.NanoService',
     'foam.nanos.session.Session'

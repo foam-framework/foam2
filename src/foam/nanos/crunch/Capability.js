@@ -14,14 +14,11 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.core.FObject',
-    'foam.core.X',
+
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.dao.Sink',
     'foam.mlang.sink.Count',
-    'foam.nanos.crunch.Capability',
-    'foam.nanos.crunch.CapabilityCapabilityJunction',
     'java.util.List',
     'static foam.mlang.MLang.*'
   ],
@@ -202,8 +199,16 @@ foam.RELATIONSHIP({
   forwardName: 'capabilities',
   inverseName: 'users',
   sourceProperty: {
-    section: 'administrative'
+    section: 'capabilities',
+    updateMode: 'HIDDEN'
   }
+});
+
+foam.CLASS({
+  package: 'foam.nanos.crunch',
+  name: 'CRUNCHUserRefinement',
+  refines: 'foam.nanos.auth.User',
+  sections: [{ name: 'capabilities' }]
 });
 
 foam.RELATIONSHIP({

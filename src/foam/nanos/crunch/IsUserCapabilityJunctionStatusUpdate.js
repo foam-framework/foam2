@@ -14,8 +14,6 @@ foam.CLASS({
   documentation: `Returns true if the status of the usercapabilityjunction has been updated`,
 
   javaImports: [
-    'foam.nanos.crunch.UserCapabilityJunction',
-    'foam.nanos.crunch.CapabilityJunctionStatus',
     'static foam.mlang.MLang.*'
   ],
 

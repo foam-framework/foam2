@@ -12,7 +12,6 @@ foam.CLASS({
 
   javaImports: [
     'java.io.IOException',
-    'java.text.SimpleDateFormat',
     'java.util.logging.FileHandler',
     'java.util.logging.Formatter',
     'java.util.logging.Handler',
@@ -54,7 +53,7 @@ try {
   handler.setFormatter(new CustomFormatter());
   getLogger().addHandler(handler);
 } catch (IOException e) {
-  e.printStackTrace();
+  System.err.println(e);
 }`
     },
     {

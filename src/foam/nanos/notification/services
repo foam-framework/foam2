@@ -4,12 +4,7 @@ p({
   "lazy": false,
   "serve": false,
   "serviceScript": """
-  foam.dao.DAO dao = new foam.dao.MDAO(foam.nanos.notification.Notification.getOwnClassInfo());
-    dao.addIndex(new foam.core.PropertyInfo[] { foam.nanos.notification.Notification.GROUP_ID,foam.nanos.notification.Notification.READ });
-    dao.addIndex(new foam.core.PropertyInfo[] { foam.nanos.notification.Notification.BROADCASTED,foam.nanos.notification.Notification.READ });
-    dao.addIndex(new foam.core.PropertyInfo[] { foam.nanos.notification.Notification.USER_ID,foam.nanos.notification.Notification.READ });
-    dao.addIndex(new foam.core.PropertyInfo[] { foam.nanos.notification.Notification.EXPIRY_DATE });
-    return new foam.dao.EasyDAO.Builder(x)
+    dao = new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.notification.Notification.getOwnClassInfo())
       .setAuthorize(false)
       .setPm(true)
@@ -21,10 +16,15 @@ p({
         new foam.nanos.notification.SendSlackNotificationDAO(x)))).build())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("notifications")
-      .setInnerDAO(dao)
       .build();
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.notification.Notification.GROUP_ID,foam.nanos.notification.Notification.READ });
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.notification.Notification.BROADCASTED,foam.nanos.notification.Notification.READ });
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.notification.Notification.USER_ID,foam.nanos.notification.Notification.READ });
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.notification.Notification.EXPIRY_DATE });
+    return dao;
   """
 })
+
 p({
   "class": "foam.nanos.boot.NSpec",
   "name": "notificationDAO",

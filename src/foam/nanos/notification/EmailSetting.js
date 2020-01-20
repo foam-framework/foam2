@@ -12,7 +12,6 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.PropertyInfo',
-    'foam.dao.DAO',
     'foam.nanos.auth.User',
     'foam.nanos.logger.Logger',
     'foam.nanos.notification.email.EmailMessage',

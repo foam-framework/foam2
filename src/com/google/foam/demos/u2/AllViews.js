@@ -6,9 +6,42 @@
 
 foam.CLASS({
   package: 'com.google.foam.demos.u2',
+  name: 'SampleData',
+  properties: [
+    {
+      name: 'id',
+    },
+    {
+      name: 'value'
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.google.foam.demos.u2',
   name: 'AllViews',
 
+  requires: [
+    'com.google.foam.demos.u2.SampleData',
+    'foam.dao.EasyDAO'
+  ],
+
   properties: [
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'sampleDAO',
+      factory: function() {
+        return this.EasyDAO.create({
+          of: this.SampleData,
+          testData: [
+            { id: 'key1', value: 'value1' },
+            { id: 'key2', value: 'value2' },
+            { id: 'key3', value: 'value3' }
+          ]
+        });
+      }
+    },
     {
       class: 'Int',
       name: 'defaultInt'

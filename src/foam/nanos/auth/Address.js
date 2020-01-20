@@ -83,6 +83,18 @@ foam.CLASS({
         if ( oldValue !== newValue ) {
           this.regionId = undefined;
         }
+      },
+      view: function(_, X) {
+        return {
+          class: 'foam.u2.view.RichChoiceView',
+          search: true,
+          sections: [
+            {
+              heading: 'Countries',
+              dao: X.countryDAO
+            }
+          ]
+        };
       }
     },
     {

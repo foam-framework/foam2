@@ -14,7 +14,6 @@ foam.CLASS({
   javaImports: [
     'foam.dao.DAO',
     'foam.nanos.notification.Notification',
-    'foam.util.SafetyUtil',
     'java.util.Date'
   ],
 
@@ -48,7 +47,6 @@ foam.CLASS({
       name: 'schedule',
       class: 'FObjectProperty',
       of: 'foam.nanos.cron.Schedule',
-      name: 'schedule',
       view: {
         class: 'foam.u2.view.FObjectView',
         of: 'foam.nanos.cron.Schedule'

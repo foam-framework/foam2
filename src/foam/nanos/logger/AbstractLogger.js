@@ -14,8 +14,7 @@ foam.CLASS({
   javaImports: [
     'java.io.PrintWriter',
     'java.io.StringWriter',
-    'java.io.Writer',
-    'java.text.SimpleDateFormat'
+    'java.io.Writer'
   ],
 
   axioms: [

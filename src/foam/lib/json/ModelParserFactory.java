@@ -26,7 +26,7 @@ public class ModelParserFactory {
     try {
       info = (ClassInfo) c.getMethod("getOwnClassInfo").invoke(null);
     } catch(NoSuchMethodException|IllegalAccessException|InvocationTargetException e) {
-      throw new RuntimeException("Failed to build parser for " + info.getId(), e);
+      throw new RuntimeException("Failed to build parser ", e);
     }
 
     Parser parser = buildInstance_(info);

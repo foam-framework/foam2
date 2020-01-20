@@ -405,7 +405,7 @@ foam.CLASS({
 
                     if ( checked ) {
                       var modification = {};
-                      modification[obj.id] = checked ? obj : null;
+                      modification[obj.id] = obj;
                       view.selectedObjects = Object.assign({}, view.selectedObjects, modification);
                     } else {
                       var temp = Object.assign({}, view.selectedObjects);
