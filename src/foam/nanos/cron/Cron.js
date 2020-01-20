@@ -80,8 +80,7 @@ foam.CLASS({
       ],
       type: 'Void',
       javaCode:
-`DAO notification = (DAO) x.get("notificationDAO");
-
+`
 /*
   I don't know why we're doing this because we aren't specifying a user or
   group to be notified and we aren't including the script output either.

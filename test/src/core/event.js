@@ -353,7 +353,6 @@ describe('PropertyChangePublisher.propertyChange()', function() {
   it('triggers listeners when old/nu value differs', function() {
     pcp.propertyChange.sub(listener);
 
-    pcp.propA = 1;
     pcp.propA = 3;
     expect(listener.last_old).toEqual(1);
     expect(listener.last_nu).toEqual(3);
@@ -366,7 +365,6 @@ describe('PropertyChangePublisher.propertyChange()', function() {
     expect(listener.last_old).toEqual(3);
     expect(listener.last_nu).toEqual(7);
 
-    pcp.propA = NaN;
     pcp.propA = NaN;
     expect(listener.last_old).toEqual(7);
     expect(listener.last_nu).toEqual(NaN);
