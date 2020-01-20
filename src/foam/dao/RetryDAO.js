@@ -37,6 +37,7 @@ foam.CLASS({
       Object id = obj.getProperty("id");
       Logger logger = new PrefixLogger(new Object[] {
         this.getClass().getSimpleName(),
+        getDelegate().getOf().getId(),
         "put_",
         id
       }, (Logger) x.get("logger"));
@@ -54,11 +55,13 @@ foam.CLASS({
             logger.debug("attempt >= maxAttempts", attempt, getMaxAttempts());
             throw t;
         }
+        attempt += 1;
+
         // delay
         try {
           logger.debug("delay", delay);
           Thread.sleep(delay);
-          delay = delay * 2;
+          delay *= 2;
           if ( delay > getMaxDelay() ) {
             delay = 1;
           }
