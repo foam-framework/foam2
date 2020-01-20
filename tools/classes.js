@@ -554,6 +554,7 @@ var classes = [
   'foam.nanos.mrac.BlockInfo',
   'foam.nanos.mrac.EntryRecord',
   'foam.nanos.mrac.MNServiceMate',
+  'foam.box.BackoffBox',
 
   //concurrent
   'foam.util.concurrent.AbstractAssembly',
