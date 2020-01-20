@@ -36,7 +36,7 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'sampleDAO',
+      name: 'sampleDataDAO',
       factory: function() {
         return this.EasyDAO.create({
           of: this.SampleData,
