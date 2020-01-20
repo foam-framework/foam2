@@ -222,7 +222,7 @@ foam.CLASS({
         var a = this.args[i];
         s += a.toSQL();
         if ( i < this.args.length - 1 )
-        s += ' AND ';
+          s += ' AND ';
       }
       return s;
     }
@@ -241,7 +241,7 @@ foam.CLASS({
         var a = this.args[i];
         s += a.toSQL();
         if ( i < this.args.length - 1 )
-        s += ' OR ';
+          s += ' OR ';
       }
       s += ' ) ';
       return s;

@@ -29,7 +29,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'DAO',
+      class: 'foam.dao.DAOProperty',
       name: 'sampleDAO',
       factory: function() {
         return this.EasyDAO.create({
