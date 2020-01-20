@@ -54,9 +54,4 @@ public class InputStreamBlob
   public long getSize() {
     return size_;
   }
-
-  @Override
-  protected void finalize() throws Throwable {
-    in_.close();
-  }
 }
