@@ -192,6 +192,7 @@ public class DigWebAgent
         } else if ( Format.XML == format ) {
           XMLSupport      xmlSupport = new XMLSupport();
           XMLInputFactory factory    = XMLInputFactory.newInstance();
+          factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
 
           if ( SafetyUtil.isEmpty(data) ) {
             DigErrorMessage error = new EmptyDataException.Builder(x)

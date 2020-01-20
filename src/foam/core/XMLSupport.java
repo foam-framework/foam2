@@ -90,6 +90,7 @@ public class XMLSupport {
 
   public static List<FObject> fromXML(X x, String fileName) throws IOException {
     XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+    xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
     XMLStreamReader xmlr = null;
     try {
       xmlr = xmlInputFactory.createXMLStreamReader(new FileReader(fileName));
