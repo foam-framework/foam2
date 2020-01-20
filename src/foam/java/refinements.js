@@ -2191,7 +2191,7 @@ foam.CLASS({
         return `
 try {
   synchronized ( getDelegate() ) {
-    if ( ! getDelegate().isPropertySet("${this.property}") ) getDelegate().wait();
+    while ( ! getDelegate().isPropertySet("${this.property}") ) getDelegate().wait();
   }
 } catch (Exception e) {
   throw new RuntimeException(e);
