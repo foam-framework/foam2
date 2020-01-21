@@ -700,7 +700,25 @@ foam.CLASS({
           value.value = this.arg1.adapt.call(null, old, value.value, arg1);
 
         return value;
-      }
+      },
+      javaPreSet: `
+        // Temporary Fix
+        if ( val instanceof foam.mlang.Constant ) {
+
+          foam.mlang.Constant c = (foam.mlang.Constant) val;
+          Object value = c.getValue();
+
+          // TODO: add castObject() method to PropertyInfo and use instead
+          if ( getArg1() instanceof foam.core.AbstractLongPropertyInfo ) {
+            foam.core.PropertyInfo prop1 = (foam.core.PropertyInfo) getArg1();
+            if ( value instanceof String ) {
+              c.setValue(Long.valueOf((String) value));
+            } else if ( value instanceof Number ) {
+              c.setValue(((Number) value).longValue());
+            }
+          }
+        }
+      `
     }
   ],
 
@@ -3400,7 +3418,8 @@ foam.CLASS({
     },
     function THEN_BY(a, b) { return this.ThenBy.create({head: a, tail: b}); },
 
-    function INSTANCE_OF(cls) { return this.IsInstanceOf.create({ targetClass: cls }); }
+    function INSTANCE_OF(cls) { return this.IsInstanceOf.create({ targetClass: cls }); },
+    function CLASS_OF(cls) { return this.IsClassOf.create({ targetClass: cls }); }
   ]
 });
 

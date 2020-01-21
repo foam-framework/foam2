@@ -336,22 +336,25 @@ foam.CLASS({
         while ( i.hasNext() ) {
           PropertyInfo prop = (PropertyInfo) i.next();
 
-          sb.append(prop.getName());
-          sb.append(": ");
+          // Don't output Personally Identifiable Information (PII)
+          if ( ! prop.containsPII() ) {
+            sb.append(prop.getName());
+            sb.append(": ");
 
-          try {
-            Object value = prop.get(this);
+            try {
+              Object value = prop.get(this);
 
-            if ( value instanceof Appendable ) {
-              ((Appendable) value).append(sb);
-            } else {
-              sb.append(value);
+              if ( value instanceof Appendable ) {
+                ((Appendable) value).append(sb);
+              } else {
+                sb.append(value);
+              }
+            } catch (Throwable t) {
+              sb.append("-");
             }
-          } catch (Throwable t) {
-            sb.append("-");
-          }
 
-          if ( i.hasNext() ) sb.append(", ");
+            if ( i.hasNext() ) sb.append(", ");
+          }
         }
       `
     },

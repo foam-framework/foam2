@@ -47,7 +47,7 @@ public abstract class AbstractEnumPropertyInfo
         switch ( reader.getEventType() ) {
           case XMLStreamConstants.START_ELEMENT:
             // Enum Specific Case
-            if ( reader.getLocalName() == this.getName() ) {
+            if ( reader.getLocalName().equals(this.getName()) ) {
               // Move to characters within tags to extract ordinal value
               reader.next();
               Integer ordinalVal = Integer.parseInt(reader.getText());

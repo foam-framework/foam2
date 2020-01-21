@@ -99,7 +99,7 @@ foam.CLASS({
 
       this.addClass(this.myClass())
       .add(this.slot(function(data, config, config$CRUDActionsAuth$create, config$browseBorder, config$browseViews, config$browseTitle) {
-        var createAction = config$CRUDActionsAuth$create 
+        var createAction = config$CRUDActionsAuth$create
             ? self.CREATE.clone().copyFrom({
               availablePermissions: self.CREATE.availablePermissions.concat(config$CRUDActionsAuth$create)
             })
@@ -114,7 +114,7 @@ foam.CLASS({
                 .addClass(self.myClass('browse-title'))
                 .add(config$browseTitle)
               .end()
-              .startContext({data: self}).tag(createAction).endContext()
+              .startContext({ data: self }).tag(createAction).endContext()
             .end()
             .start(self.CardBorder)
               .style({ position: 'relative' })

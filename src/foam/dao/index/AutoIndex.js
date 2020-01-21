@@ -31,7 +31,7 @@ foam.CLASS({
     'foam.dao.index.AltIndex',
     'foam.dao.index.ValueIndex',
     'foam.mlang.predicate.True',
-    'foam.mlang.predicate.False',
+    'foam.mlang.predicate.False'
   ],
 
   constants: {
@@ -207,4 +207,3 @@ console.log(self.$UID, "BUILDING INDEX", existingPlanCost, estimateRatio, this.c
 
   ]
 });
-

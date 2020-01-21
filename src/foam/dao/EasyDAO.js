@@ -127,8 +127,6 @@ foam.CLASS({
         foam.dao.ProxyDAO pxy = null;
         while( head instanceof foam.dao.ProxyDAO ) {
           pxy = (foam.dao.ProxyDAO) head;
-          if ( head instanceof foam.dao.MDAO )
-            break;
           head = ( (ProxyDAO) head).getDelegate();
         }
         if ( head instanceof foam.dao.MDAO ) {

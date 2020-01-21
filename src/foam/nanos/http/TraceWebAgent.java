@@ -20,20 +20,21 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/** WebAgent for debugging which shows request data. **/
 public class TraceWebAgent
   implements WebAgent
 {
   public TraceWebAgent() {}
 
   public void execute(X x) {
-    Logger              logger = (Logger) x.get("logger");
+    Logger               logger  = (Logger) x.get("logger");
 
     try {
-      PrintWriter         out = x.get(PrintWriter.class);
-      HttpServletRequest  req = x.get(HttpServletRequest.class);
-      HttpServletResponse resp = x.get(HttpServletResponse.class);
+      PrintWriter         out    = x.get(PrintWriter.class);
+      HttpServletRequest  req    = x.get(HttpServletRequest.class);
+      HttpServletResponse resp   = x.get(HttpServletResponse.class);
       HttpParameters      params = x.get(HttpParameters.class);
-      Map                 kv  = new HashMap();
+      Map                 kv     = new HashMap();
 
       resp.setContentType("text/html");
       out.println("<HTML>\n" +
