@@ -39,6 +39,10 @@ foam.CLASS({
       margin-right: 0;
     }
 
+    .foam-u2-ActionView-refreshTable > img {
+      margin-right: 0;
+    }
+
     ^top-bar {
       border-bottom: solid 1px #e7eaec;
       align-items: center;
@@ -82,6 +86,10 @@ foam.CLASS({
       width: 100%;
     }
   `,
+
+  messages: [
+    { name: 'REFRESH_MSG', message: 'Table Refreshed' }
+  ],
 
   imports: [
     'stack?'
@@ -175,6 +183,17 @@ foam.CLASS({
           predicate: this.config.filterExportPredicate
         }));
       }
+    },
+    {
+      name: 'refreshTable',
+      label: '',
+      icon: 'images/refresh-icon-black.svg',
+      code: function(X) {
+        this.data.cmd_(X, foam.dao.CachingDAO.PURGE);
+        this.add(foam.u2.dialog.NotificationMessage.create({
+          message: this.REFRESH_MSG
+        }));
+      }
     }
   ],
   methods: [
@@ -236,11 +255,10 @@ foam.CLASS({
                   })
                 .endContext()
                 .startContext({ data: self })
-                  .start(self.EXPORT, {
-                    buttonStyle: foam.u2.ButtonStyle.SECONDARY
-                  })
+                  .start(self.EXPORT, { buttonStyle: 'SECONDARY' })
                     .addClass(self.myClass('export'))
                   .end()
+                  .tag(this.REFRESH_TABLE, { buttonStyle: 'SECONDARY' })
                 .endContext()
               .end()
               .start(self.summaryView, {
