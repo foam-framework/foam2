@@ -208,6 +208,8 @@ FOAM_FILES([
   { name: "foam/dao/DAOProperty" },
   { name: "foam/dao/SQLStatement" },
   { name: "foam/dao/CSVSink" },
+  { name: "foam/dao/RetryStrategy" },
+  { name: "foam/dao/DefaultRetryStrategy" },
   { name: "foam/mlang/order/Comparator" },
 //  { name: "foam/mlang/order/ComparatorJava", flags: ['java'] },
   { name: "foam/mlang/mlang" },
