@@ -122,7 +122,7 @@ public class GoogleMapsGeocodingDAO
           conn.connect();
 
           builder.setLength(0);
-          try(BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+          try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
         	  while ( (line = reader.readLine()) != null ) {
               builder.append(line);
             } 
