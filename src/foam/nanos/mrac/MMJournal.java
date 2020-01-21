@@ -1040,14 +1040,8 @@ public class MMJournal extends AbstractJournal implements Electable {
     }
 
     public void close() {
-      // try {
-        isRunning = false;
-        selector.wakeup();
-        //TODO: check if a bug when close.
-        // selector.close();
-      // } catch ( IOException e ) {
-      //   logger.info(e);
-      // }
+      isRunning = false;
+      selector.wakeup();
     }
 
     private void configureNewConnections() {
@@ -1205,7 +1199,7 @@ public class MMJournal extends AbstractJournal implements Electable {
           TCPNioServer.hardCloseSocketChannel(socketChannel);
           socketChannel = acceptedSocketChannels.poll();
         }
-        logger.info("finally");
+        logger.info("All processor close.");
         countDownLatch.countDown();
       }
     }
@@ -1532,4 +1526,4 @@ public class MMJournal extends AbstractJournal implements Electable {
     MMJournal other = (MMJournal) o;
     return other.serviceName == this.serviceName;
   }
- }
+}

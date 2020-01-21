@@ -119,10 +119,10 @@ public class QuorumService extends AbstractFObject implements NanoService {
   //TODO: apply this function.
   // This function only executes in one thread.
   // This instance has just become primary
-  private void setPrimaryClusterNode(X x, long id) {
+  private void setPrimaryClusterNode(X x, long id, boolean amIprimary) {
     Logger logger = new PrefixLogger(new Object[] {
         this.getClass().getSimpleName(),
-        "setPrimaryClusterNode(id)"
+        "setPrimaryClusterNode( " + id + ")"
       }, (Logger) x.get("logger"));
 
     logger.debug("enter");
@@ -148,17 +148,16 @@ public class QuorumService extends AbstractFObject implements NanoService {
     ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
     service.setConfig(config);
     service.setPrimaryConfig(config);
-    service.setIsPrimary(true);
+    service.setIsPrimary(amIprimary);
   }
 
   // This instance has just become a secondary
   private void setPrimaryClusterNode(ClusterNode clusterNode) {
     primaryClusterNode = clusterNode;
-
     X x = getX();
     Logger logger = new PrefixLogger(new Object[] {
         this.getClass().getSimpleName(),
-        "setPrimaryClusterNode(clusterNode)"
+        "setPrimaryClusterNode(" + clusterNode + ")"
       }, (Logger) x.get("logger"));
 
     logger.debug("enter");
@@ -194,6 +193,11 @@ public class QuorumService extends AbstractFObject implements NanoService {
     service.setIsPrimary(false);
   }
 
+  private void resetPrimaryClusterNode() {
+    ClusterConfigService service = (ClusterConfigService) getX().get("clusterConfigService");
+    service.setIsPrimary(false);
+  }
+
   public ClusterNode getPrimaryClusterNode() {
     return primaryClusterNode;
   }
@@ -218,12 +222,12 @@ public class QuorumService extends AbstractFObject implements NanoService {
         if ( getMyState() == InstanceState.ELECTING ) {
           try {
             setPrimaryVote(election.electingPrimary());
-            setPrimaryClusterNode(getX(), getPrimaryVote().getPrimaryInstanceId());
             logger.info("!!!!!!!!!!!!!end election");
             logger.info("*********Primary: " + getPrimaryVote().getPrimaryInstanceId());
           } catch ( Exception e ) {
             logger.error("ELECTNG: ",e);
             setMyState(InstanceState.ELECTING);
+            resetPrimaryClusterNode();
           }
         } else if ( getMyState() == InstanceState.PRIMARY ) {
           logger.info("Primary");
@@ -232,9 +236,11 @@ public class QuorumService extends AbstractFObject implements NanoService {
           try {
 
             exposeState = InstanceState.PRIMARY;
-            setPrimaryClusterNode(getX(), getPrimaryVote().getPrimaryInstanceId());
+            setPrimaryClusterNode(getX(), getPrimaryVote().getPrimaryInstanceId(), true);
             quorumInitial = new QuorumInitial(countDownLatch);
             quorumInitial.start();
+            //If you want to remove this while loop.
+            //You need to comment out all code in the following finally block.
             while ( true ) {
               // Thread.sleep(500);
               //once become primary. It will stay primary forever.
@@ -264,7 +270,7 @@ public class QuorumService extends AbstractFObject implements NanoService {
             String urlString = "http://" + primaryNode.getIp() + ":" + primaryNode.getServicePort() + "/service" + "/ping";
             logger.info("ping primary: " + urlString);
             exposeState = InstanceState.SECONDARY;
-            setPrimaryClusterNode(primaryNode);
+            setPrimaryClusterNode(getX(), getPrimaryVote().getPrimaryInstanceId(), false);
             quorumInitial = new QuorumInitial(countDownLatch);
             quorumInitial.start();
             while ( true ) {
@@ -280,9 +286,8 @@ public class QuorumService extends AbstractFObject implements NanoService {
             logger.error("SECONDARY: ", e);
           } finally {
             exposeState = InstanceState.ELECTING;
-            setPrimaryClusterNode(null);
+            resetPrimaryClusterNode();
             setMyState(InstanceState.ELECTING);
-
             if ( quorumInitial != null ) {
               quorumInitial.close();
               try {
