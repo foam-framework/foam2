@@ -112,16 +112,16 @@ public class MNJournal extends FileJournal {
     String hash1 = entry.getHash1();
     String hash2 = entry.getHash2();
     //TODO: Do not hard code SHA-256.
-    // try {
-    //   MessageDigest md = MessageDigest.getInstance("SHA-256");
-    //   md.update(hash1.getBytes(StandardCharsets.UTF_8));
-    //   md.update(hash2.getBytes(StandardCharsets.UTF_8));
-    //   String myHash = byte2Hex(entry.getNu().hash(md));
-    //   entry.setMyHash(myHash);
-    // } catch ( Exception e ) {
-    //   System.out.println(e);
-    //   throw new RuntimeException(e);
-    // }
+    try {
+      MessageDigest md = MessageDigest.getInstance("SHA-256");
+      md.update(hash1.getBytes(StandardCharsets.UTF_8));
+      md.update(hash2.getBytes(StandardCharsets.UTF_8));
+      String myHash = byte2Hex(entry.getNu().hash(md));
+      entry.setMyHash(myHash);
+    } catch ( Exception e ) {
+      System.out.println(e);
+      throw new RuntimeException(e);
+    }
     String msg = new Outputter(x).stringify(obj);
     doWrite(x, msg + "\n", entry.getMyIndex());
     return obj;
@@ -134,16 +134,16 @@ public class MNJournal extends FileJournal {
     String hash1 = entry.getHash1();
     String hash2 = entry.getHash2();
     //TODO: Do not hard code SHA-256.
-    // try {
-    //   MessageDigest md = MessageDigest.getInstance("SHA-256");
-    //   md.update(hash1.getBytes(StandardCharsets.UTF_8));
-    //   md.update(hash2.getBytes(StandardCharsets.UTF_8));
-    //   String myHash = byte2Hex(entry.getNu().hash(md));
-    //   entry.setMyHash(myHash);
-    // } catch ( Exception e ) {
-    //   logger.info(e);
-    //   throw new RuntimeException(e);
-    // }
+    try {
+      MessageDigest md = MessageDigest.getInstance("SHA-256");
+      md.update(hash1.getBytes(StandardCharsets.UTF_8));
+      md.update(hash2.getBytes(StandardCharsets.UTF_8));
+      String myHash = byte2Hex(entry.getNu().hash(md));
+      entry.setMyHash(myHash);
+    } catch ( Exception e ) {
+      logger.info(e);
+      throw new RuntimeException(e);
+    }
     doWrite(x, new Outputter(x).stringify(obj) + "\n", entry.getMyIndex());
     return obj;
   }
@@ -162,6 +162,8 @@ public class MNJournal extends FileJournal {
         }
 
         writeBuffer.clear();
+        //TODO: remove it latter.
+        this.outChannel = FileChannel.open(getPath(filename), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
         byte[] bytes = record.getBytes(Charset.forName("UTF-8"));
     writeBuffer.put(bytes);
         writeBuffer.flip();
