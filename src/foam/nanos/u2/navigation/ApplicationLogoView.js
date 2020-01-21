@@ -64,7 +64,7 @@ foam.CLASS({
   listeners: [
     function goToDefault() {
       if ( this.theme ) {
-        this.pushMenu(this.theme.defaultMenu);
+        this.pushMenu(this.group.defaultMenu);
       }
     }
   ]
