@@ -48,17 +48,7 @@ foam.CLASS({
       right: 0;
       padding: 12px 16px 0 0;
     }
-
-    ^header-align-right {
-      display: inline-block;
-      vertical-align: middle;
-      float: right;
-    }
   `,
-
-  messages: [
-    { name: 'REFRESH_MSG', message: 'Table Refreshed' }
-  ],
 
   properties: [
     {
@@ -99,15 +89,6 @@ foam.CLASS({
           of: this.data.of
         });
       }
-    },
-    {
-      name: 'refreshTable',
-      code: function(X) {
-        this.data.cmd_(X, foam.dao.CachingDAO.PURGE);
-        this.add(foam.u2.dialog.NotificationMessage.create({
-          message: this.REFRESH_MSG
-        }));
-      }
     }
   ],
   methods: [
@@ -133,13 +114,7 @@ foam.CLASS({
                 .addClass(self.myClass('browse-title'))
                 .add(config$browseTitle)
               .end()
-              .startContext({ data: self })
-              .start()
-                .addClass(this.myClass('header-align-right'))
-                .tag(this.REFRESH_TABLE, { buttonStyle: 'SECONDARY', isDestructive: true })
-                .tag(createAction)
-              .end()
-              .endContext()
+              .startContext({ data: self }).tag(createAction).endContext()
             .end()
             .start(self.CardBorder)
               .style({ position: 'relative' })
