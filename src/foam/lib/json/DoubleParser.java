@@ -13,6 +13,8 @@ public class DoubleParser implements Parser {
     StringBuilder n = new StringBuilder();
     boolean decimalFound = false;
     boolean exponentFound = false;
+    boolean negativeExponent = false;
+    char previousChar;
 
     if ( ! ps.valid() ) return null;
 
@@ -32,6 +34,7 @@ public class DoubleParser implements Parser {
     ps = ps.tail();
 
     while ( ps.valid() ) {
+      previousChar = c;
       c = ps.head();
       if ( Character.isDigit(c) ) {
         n.append(c);
@@ -48,6 +51,12 @@ public class DoubleParser implements Parser {
         if ( exponentFound ) return null;
         exponentFound = true;
         n.append(c);
+      } else if ( c == '-' ) {
+        if ( negativeExponent ) return null;
+        if ( previousChar == 'E' || previousChar == 'e' ) {
+          negativeExponent = true;
+          n.append(c);
+        }
       } else {
         break;
       }

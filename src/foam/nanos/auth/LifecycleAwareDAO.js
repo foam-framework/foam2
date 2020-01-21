@@ -48,11 +48,6 @@ foam.CLASS({
       class: 'String',
       name: 'rejectPermission_',
       javaFactory: 'return "lifecyclestate.rejected." + getName();'
-    },
-    {
-      class: 'String',
-      name: 'pendingPermission_',
-      javaFactory: 'return "lifecyclestate.pending." + getName();'
     }
   ],
 
@@ -74,8 +69,7 @@ foam.CLASS({
 
           if ( (
               ( lifecycleAwareObj.getLifecycleState() == LifecycleState.DELETED || deletedAwareObj.getDeleted() == true ) && ! canReadDeleted(x) ) || 
-              ( lifecycleAwareObj.getLifecycleState() == LifecycleState.REJECTED && ! canReadRejected(x) ) || 
-              ( lifecycleAwareObj.getLifecycleState() == LifecycleState.PENDING && ! canReadPending(x) ) 
+              ( lifecycleAwareObj.getLifecycleState() == LifecycleState.REJECTED && ! canReadRejected(x) )
             ) {
             return null;
           }
@@ -84,8 +78,7 @@ foam.CLASS({
 
         if ( 
             ( lifecycleAwareObj.getLifecycleState() == LifecycleState.DELETED && ! canReadDeleted(x) ) ||  
-            ( lifecycleAwareObj.getLifecycleState() == LifecycleState.REJECTED && ! canReadRejected(x) ) || 
-            ( lifecycleAwareObj.getLifecycleState() == LifecycleState.PENDING && ! canReadPending(x) ) 
+            ( lifecycleAwareObj.getLifecycleState() == LifecycleState.REJECTED && ! canReadRejected(x) )
           ) {
           return null;
         }
@@ -98,14 +91,8 @@ foam.CLASS({
       javaCode: `
         boolean userCanReadDeleted = canReadDeleted(x);
         boolean userCanReadRejected = canReadRejected(x);
-        boolean userCanReadPending = canReadPending(x);
 
         List<Predicate> predicateList = new ArrayList<>();
-
-        if ( ! userCanReadPending ) {
-          Predicate pendingPredicate = MLang.EQ(getOf().getAxiomByName("lifecycleState"), LifecycleState.PENDING);
-          predicateList.add(pendingPredicate);
-        }
 
         if ( ! userCanReadDeleted ) {
           if ( foam.nanos.auth.LifecycleAware.class.isAssignableFrom(getOf().getObjClass()) )
@@ -171,17 +158,6 @@ foam.CLASS({
       javaCode: `
         AuthService authService = (AuthService) x.get("auth");
         return authService.check(x, getDeletePermission_());
-      `
-    },
-    {
-      name: 'canReadPending',
-      type: 'Boolean',
-      args: [
-        { type: 'Context', name: 'x' }
-      ],
-      javaCode: `
-        AuthService authService = (AuthService) x.get("auth");
-        return authService.check(x, getPendingPermission_());
       `
     },
     {
