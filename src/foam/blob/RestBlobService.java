@@ -138,7 +138,7 @@ public class RestBlobService
 
       try (
         InputStream is = new BufferedInputStream(connection.getInputStream());
-		    ByteArrayOutputStream os = new ByteArrayOutputStream()
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
       ) {
     	  int read = 0;
         byte[] buffer = new byte[BUFFER_SIZE];

@@ -63,11 +63,11 @@ public class HTTPSink
       conn.connect();
 
       try(OutputStream os = conn.getOutputStream()) {
-    	  try(BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));) {
+        try(BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8))) {
           writer.write(outputter.stringify((FObject)obj));
           writer.flush();
-    	  }
-      }   
+        }
+      }
 
       // check response code
       int code = conn.getResponseCode();
