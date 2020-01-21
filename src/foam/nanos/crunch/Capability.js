@@ -200,7 +200,7 @@ foam.RELATIONSHIP({
   inverseName: 'users',
   sourceProperty: {
     section: 'capabilities',
-    updateMode: 'HIDDEN'
+    updateMode: 'RO'
   }
 });
 
