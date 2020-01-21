@@ -116,8 +116,6 @@ public class RestBlobService
 
   @Override
   public Blob find_(X x, Object id) {
-    InputStream is = null;
-    ByteArrayOutputStream os = null;
     HttpURLConnection connection = null;
 
     try {
@@ -138,21 +136,21 @@ public class RestBlobService
         throw new RuntimeException("Failed to find blob");
       }
 
-      is = new BufferedInputStream(connection.getInputStream());
-      os = new ByteArrayOutputStream();
+      try (
+        InputStream is = new BufferedInputStream(connection.getInputStream());
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+      ) {
+    	  int read = 0;
+        byte[] buffer = new byte[BUFFER_SIZE];
+        while ( (read = is.read(buffer, 0, BUFFER_SIZE)) != -1 ) {
+          os.write(buffer, 0, read);
+        }
 
-      int read = 0;
-      byte[] buffer = new byte[BUFFER_SIZE];
-      while ( (read = is.read(buffer, 0, BUFFER_SIZE)) != -1 ) {
-        os.write(buffer, 0, read);
-      }
-
-      return new ByteArrayBlob(os.toByteArray());
+        return new ByteArrayBlob(os.toByteArray());
+      }      
     } catch ( Throwable t ) {
       throw new RuntimeException(t);
     } finally {
-      IOUtils.closeQuietly(os);
-      IOUtils.closeQuietly(is);
       IOUtils.close(connection);
     }
   }
