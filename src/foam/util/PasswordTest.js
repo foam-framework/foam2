@@ -55,7 +55,6 @@ foam.CLASS({
           test(false, "Password hashing with null should throw an IllegalArgumentException");
         } catch (IllegalArgumentException e) {
           test(true, message);
-        } catch ( Throwable t ) {
         }
       `
     },
