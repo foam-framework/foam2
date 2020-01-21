@@ -95,9 +95,12 @@ public class RestBlobService
       }
 
       is = connection.getInputStream();
-      BufferedReader  reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
       CharBuffer cb = CharBuffer.allocate(65535);
-      reader.read(cb);
+      
+      try(BufferedReader  reader = new BufferedReader(new InputStreamReader(is, "UTF-8"))) {
+    	  reader.read(cb);
+      }
+      
       cb.rewind();
 
       return (Blob) getX().create(JSONParser.class).parseString(cb.toString(), IdentifiedBlob.class);
