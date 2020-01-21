@@ -715,7 +715,7 @@ this.setup(x);
 long size = blob.getSize();
 File tmp = allocateTmp(x, 1);
 
-try(HashingOutputStream os = new HashingOutputStream(new FileOutputStream(tmp))) {
+try( HashingOutputStream os = new HashingOutputStream(new FileOutputStream(tmp)) ) {
   blob.read(os, 0, size);
   os.close();
 
