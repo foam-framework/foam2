@@ -64,6 +64,7 @@ public class FileWebAgent
       path = req.getRequestURI().replaceFirst("/?service/" + nspec_.getName() + "/?", "") + path_;
       File src = new File(SafetyUtil.isEmpty(path) ? "./" : path);
 
+      // Checking that it starts with the CanonicalPath prevents path escaping
       boolean pathStartsWithCwd = src.getAbsolutePath().startsWith(cwd_);
       if ( ! pathStartsWithCwd ) {
         throw new FileNotFoundException("File not found: " + path);
