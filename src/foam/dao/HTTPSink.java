@@ -41,8 +41,6 @@ public class HTTPSink
   @Override
   public void put(Object obj, Detachable sub) {
     HttpURLConnection conn = null;
-    OutputStream os = null;
-    BufferedWriter writer = null;
 
     try {
       Outputter outputter = null;
@@ -64,12 +62,12 @@ public class HTTPSink
       }
       conn.connect();
 
-      os = conn.getOutputStream();
-      writer = new BufferedWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
-      writer.write(outputter.stringify((FObject)obj));
-      writer.flush();
-      writer.close();
-      os.close();
+      try(OutputStream os = conn.getOutputStream()) {
+    	  try(BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));) {
+          writer.write(outputter.stringify((FObject)obj));
+          writer.flush();
+    	  }
+      }   
 
       // check response code
       int code = conn.getResponseCode();
@@ -79,8 +77,6 @@ public class HTTPSink
     } catch (Throwable t) {
       throw new RuntimeException(t);
     } finally {
-      IOUtils.closeQuietly(writer);
-      IOUtils.closeQuietly(os);
       if ( conn != null ) {
         conn.disconnect();
       }
