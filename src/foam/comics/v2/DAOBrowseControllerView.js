@@ -57,7 +57,7 @@ foam.CLASS({
   `,
 
   messages: [
-    { name: 'REFRESH_MSG', message: 'Table Refreshed' }
+    { name: 'REFRESH_MSG', message: 'Table Refreshing. Please be patient, as some networks might take longer.' }
   ],
 
   properties: [
