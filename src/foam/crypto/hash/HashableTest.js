@@ -93,10 +93,9 @@ foam.CLASS({
           input.hash("asldkfjaksdjhf");
           test(false, "Hash with invalid algorithm should throw a NoSuchAlgorithmException");
         } catch (Exception e) {
-        	test(true, "Hash with invalid algorithm throws NoSuchAlgorithmException");
-		} catch ( Throwable t ) {
-          
-        } 
+        test(true, "Hash with invalid algorithm throws NoSuchAlgorithmException");
+        } catch (Throwable t) {
+        }
       `
     }
   ]
