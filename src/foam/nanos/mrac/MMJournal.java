@@ -111,9 +111,9 @@ public class MMJournal extends AbstractJournal implements Electable {
   int hashIndex = 1;
   Object hashRecordLock = new Object();
 
-  int hashQuorumSize = 1;
+  int hashQuorumSize = 2;
   boolean isHash = true;
-  int quorumSize = 1;
+  int quorumSize = 2;
 
   private ExecutorService pool = Executors.newFixedThreadPool(3);
 
