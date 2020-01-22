@@ -35,10 +35,6 @@ foam.CLASS({
         public void execute(X x) {
           if ( ((LifecycleAware) obj).getLifecycleState() == foam.nanos.auth.LifecycleState.DELETED ) {
             DAO dao = (DAO) x.get("userCapabilityJunctionDAO");
-            List<UserCapabilityJunction> list= ((ArraySink) dao
-              .where(EQ(UserCapabilityJunction.SOURCE_ID, ((User) obj).getId()))
-              .select(new ArraySink()))
-              .getArray();
             dao.where(EQ(UserCapabilityJunction.SOURCE_ID, ((User) obj).getId())).removeAll();
           }
         }
