@@ -4,8 +4,7 @@ foam.CLASS({
   extends: 'foam.nanos.auth.ProxyAuthService',
 
   implements: [
-    'foam.nanos.auth.EnabledAware',
-    'foam.nanos.boot.NSpecAware'
+    'foam.nanos.auth.EnabledAware'
   ],
 
   requires: [
@@ -24,11 +23,6 @@ foam.CLASS({
       name: 'enabled',
       class: 'Boolean',
       value: true
-    },
-    {
-      name: 'nSpec',
-      class: 'FObjectProperty',
-      type: 'foam.nanos.boot.NSpec'
     },
     {
       name: 'classType',
@@ -58,7 +52,7 @@ foam.CLASS({
       javaCode: `
     PM pm = null;
     if ( getEnabled() ) {
-      pm =  (PM) x.get("PM");
+      pm = (PM) x.get("PM");
       pm.setClassType(this.getClassType());
       pm.setName(op);
       pm.init_();
@@ -94,33 +88,11 @@ foam.CLASS({
       ],
       type: 'String',
       javaCode: `
-        return getNSpec().getName() + ":" + name;
+        return "auth:" + name;
       `
     },
 
     // Proxy methods, to be monitored
-    {
-      name: 'getCurrentUser',
-      javaCode: `
-      PM pm = createPM(x, getNameFor("getCurrentUser"));
-      try {
-        return super.getCurrentUser(x);
-      } finally {
-        log(x, pm);
-      }
-     `
-    },
-    {
-      name: 'getCurrentGroup',
-      javaCode: `
-      PM pm = createPM(x, getNameFor("getCurrentGroup"));
-      try {
-        return super.getCurrentGroup(x);
-      } finally {
-        log(x, pm);
-      }
-     `
-    },
     {
       name: 'login',
       javaCode: `
