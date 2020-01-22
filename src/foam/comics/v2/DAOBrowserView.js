@@ -175,6 +175,7 @@ foam.CLASS({
     {
       name: 'export',
       label: '',
+      toolTip: 'Export Table Data',
       icon: 'images/export-arrow-icon.svg',
       code: function() {
         this.add(this.Popup.create().tag({
@@ -187,6 +188,7 @@ foam.CLASS({
     {
       name: 'refreshTable',
       label: '',
+      toolTip: 'Refresh Table',
       icon: 'images/refresh-icon-black.svg',
       code: function(X) {
         this.data.cmd_(X, foam.dao.CachingDAO.PURGE);
