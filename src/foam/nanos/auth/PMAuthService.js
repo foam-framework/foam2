@@ -37,6 +37,10 @@ foam.CLASS({
         return PMAuthService.getOwnClassInfo();
       `,
       hidden: true
+    },
+    {
+      name: 'label',
+      class: 'String'
     }
   ],
 
@@ -94,7 +98,10 @@ foam.CLASS({
       ],
       type: 'String',
       javaCode: `
-        return "auth:" + name;
+        String label = getLabel();
+        return "auth" +
+          ("".equals(label) ? "" : "/" + label) +
+          ":" + name;
       `
     },
 
