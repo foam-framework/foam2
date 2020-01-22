@@ -129,13 +129,14 @@ public class QuorumService extends AbstractFObject implements NanoService {
     ClusterNode primaryNode = (ClusterNode) clusterDAO.find(id);
     if ( primaryNode == null ) throw new RuntimeException("Can not find ClusterNode with id: " + id);
     primaryClusterNode = primaryNode;
-
+    logger.info("primaryNode: ", primaryNode);
     DAO configDAO = (DAO) x.get("localClusterConfigDAO");
-    ClusterConfig config = (ClusterConfig) configDAO.find(hostname);
+    String primaryHostName = primaryNode.getIp();
+    ClusterConfig config = (ClusterConfig) configDAO.find(primaryHostName);
     if ( config == null ) {
-      logger.warning("cluster configuration not found for", hostname);
+      logger.warning("cluster configuration not found for", primaryHostName);
       config = new ClusterConfig();
-      config.setId(hostname);
+      config.setId(primaryHostName);
       config.setPort(primaryNode.getServicePort());
     } else {
       config = (ClusterConfig) config.fclone();
