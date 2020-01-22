@@ -211,6 +211,7 @@ var classes = [
   'foam.nanos.auth.test.PasswordPolicyTest',
   'foam.nanos.auth.Country',
   'foam.nanos.auth.AuthService',
+  'foam.nanos.auth.PMAuthService',
   'foam.nanos.auth.UserUserJunction',
   'foam.nanos.auth.ClientAuthService',
   'foam.nanos.auth.ClientLoginAuthService',
