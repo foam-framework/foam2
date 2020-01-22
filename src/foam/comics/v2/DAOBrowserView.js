@@ -88,7 +88,7 @@ foam.CLASS({
   `,
 
   messages: [
-    { name: 'REFRESH_MSG', message: 'Table Refreshed' }
+    { name: 'REFRESH_MSG', message: 'Refresh Requested. Please be patient, refresh may take up to a minute.' }
   ],
 
   imports: [
