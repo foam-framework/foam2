@@ -61,6 +61,11 @@ foam.CLASS({
     {
       class: 'String',
       name: 'signature'
+    },
+    {
+      class: 'String',
+      name: 'internalHash',
+      includeInDigest: false,
     }
   ],
 

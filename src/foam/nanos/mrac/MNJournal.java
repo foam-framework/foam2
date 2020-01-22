@@ -56,7 +56,7 @@ public class MNJournal extends FileJournal {
   private long lateIndex;
   private DAO entryRecordDAO;
   private volatile boolean isReady;
-
+  private boolean isHash = true;
   // To avoid we need to create ByteBuffer everyTime when we write.
   // Allocate 20KB.
   private ByteBuffer writeBuffer = ByteBuffer.allocate(40 * 1024);
@@ -111,16 +111,25 @@ public class MNJournal extends FileJournal {
     entry.setAction("p");
     String hash1 = entry.getHash1();
     String hash2 = entry.getHash2();
-    //TODO: Do not hard code SHA-256.
-    try {
-      MessageDigest md = MessageDigest.getInstance("SHA-256");
-      md.update(hash1.getBytes(StandardCharsets.UTF_8));
-      md.update(hash2.getBytes(StandardCharsets.UTF_8));
-      String myHash = byte2Hex(entry.getNu().hash(md));
-      entry.setMyHash(myHash);
-    } catch ( Exception e ) {
-      System.out.println(e);
-      throw new RuntimeException(e);
+    //TODO: Do not hard code SHA-256,
+    //TODO: use hashingJDAO.
+    if ( isHash ) {
+      try {
+        //global hash.
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        md.update(hash1.getBytes(StandardCharsets.UTF_8));
+        md.update(hash2.getBytes(StandardCharsets.UTF_8));
+        String myHash = byte2Hex(entry.getNu().hash(md));
+        entry.setMyHash(myHash);
+
+        //internal hash.
+        md = MessageDigest.getInstance("SHA-256");
+        String internalHash = byte2Hex(entry.hash(md));
+        entry.setInternalHash(internalHash);
+      } catch ( Exception e ) {
+        System.out.println(e);
+        throw new RuntimeException(e);
+      }
     }
     String msg = new Outputter(x).stringify(obj);
     doWrite(x, msg + "\n", entry.getMyIndex());
@@ -133,16 +142,25 @@ public class MNJournal extends FileJournal {
     entry.setAction("r");
     String hash1 = entry.getHash1();
     String hash2 = entry.getHash2();
-    //TODO: Do not hard code SHA-256.
-    try {
-      MessageDigest md = MessageDigest.getInstance("SHA-256");
-      md.update(hash1.getBytes(StandardCharsets.UTF_8));
-      md.update(hash2.getBytes(StandardCharsets.UTF_8));
-      String myHash = byte2Hex(entry.getNu().hash(md));
-      entry.setMyHash(myHash);
-    } catch ( Exception e ) {
-      logger.info(e);
-      throw new RuntimeException(e);
+    //TODO: Do not hard code SHA-256,
+    //TODO: use hashingJDAO.
+    if ( isHash ) {
+      try {
+        //global hash.
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        md.update(hash1.getBytes(StandardCharsets.UTF_8));
+        md.update(hash2.getBytes(StandardCharsets.UTF_8));
+        String myHash = byte2Hex(entry.getNu().hash(md));
+        entry.setMyHash(myHash);
+
+        //internal hash.
+        md = MessageDigest.getInstance("SHA-256");
+        String internalHash = byte2Hex(entry.hash(md));
+        entry.setInternalHash(internalHash);
+      } catch ( Exception e ) {
+        System.out.println(e);
+        throw new RuntimeException(e);
+      }
     }
     doWrite(x, new Outputter(x).stringify(obj) + "\n", entry.getMyIndex());
     return obj;
@@ -503,7 +521,23 @@ public class MNJournal extends FileJournal {
             if ( entry.getMyIndex() < indexFrom ) continue;
             if ( entry.getMyIndex() < minIndex ) minIndex = entry.getMyIndex();
             if ( entry.getMyIndex() > maxIndex ) maxIndex = entry.getMyIndex();
-            //TODO: hash check.
+            //TODO: Use HashingJDAO to replay following code + 
+            //Support rollingHash for internal.
+            //only verify internalHash.
+            if ( isHash ) {
+              try {
+                MessageDigest md = MessageDigest.getInstance("SHA-256");
+                String internalHash = MNJournal.byte2Hex(entry.hash(md));
+                if ( ! internalHash.equals(entry.getInternalHash()) ) {
+                  //logger.info("Internal Hash verify FAIL: [ \n" + "expect Hash value: " + myHash + "\n" + "caculate Hash value: " + entry.getMyHash() + "\n]");
+                  throw new RuntimeException("internal hash fail -> line: " + line);
+                }
+              } catch ( Exception e ) {
+                logger.error(e);
+                throw new RuntimeException(e);
+              }
+            }
+
             Outputter outputter = new Outputter(x);
             String entryString = outputter.stringify(entry);
             //TODO: find a better way to implement this.

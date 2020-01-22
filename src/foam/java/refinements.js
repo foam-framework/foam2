@@ -221,7 +221,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'includeInDigest',
-      value: false
+      value: true
     },
     {
       class: 'Boolean',

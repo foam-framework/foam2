@@ -110,6 +110,11 @@ public class MMJournal extends AbstractJournal implements Electable {
   MedusaEntry parent2;
   int hashIndex = 1;
   Object hashRecordLock = new Object();
+
+  int hashQuorumSize = 2;
+  boolean isHash = true;
+  int quorumSize = 1;
+
   private ExecutorService pool = Executors.newFixedThreadPool(3);
 
   //TODO: check if this method is really threadsafe.
@@ -752,7 +757,7 @@ public class MMJournal extends AbstractJournal implements Electable {
 
       logger.info("replay from " + count + " medusa node");
 
-      if ( count < 1 ) {
+      if ( count < quorumSize ) {
         throw new RuntimeException("Do not get data from enough MN");
       }
 
@@ -947,7 +952,6 @@ public class MMJournal extends AbstractJournal implements Electable {
     return ret;
   }
 
-  int quorumSize = 1;
   // Verify entries from same group. And concat them into list.
   private final List<MedusaEntry> concatEntries(long groupId, Map<Long, List<MedusaEntry>> nodeToEntry) {
     Map<Long, Integer> entryCount = new HashMap<Long, Integer>();
@@ -970,8 +974,34 @@ public class MMJournal extends AbstractJournal implements Electable {
 
     List<MedusaEntry> entryList = new LinkedList<MedusaEntry>();
     logger.info("entryCount size: " + entryCount.size());
+
     for ( Map.Entry<Long, Integer> entry : entryCount.entrySet() ) {
-      if ( entry.getValue().intValue() >= quorumSize ) entryList.add(entryRecord.get(entry.getKey()).get(0));
+      if ( isHash ) {
+        //TODO: re-implementation.
+        ArrayList<MedusaEntry> collectEntries = entryRecord.get(entry.getKey());
+        Map<String, Integer> quorumHashRecord = new HashMap<String, Integer>();
+        String errorMessage = "";
+        boolean hashSuccess = false;
+        for ( MedusaEntry e : collectEntries ) {
+          errorMessage = "\n" + e.toString(); 
+          if ( quorumHashRecord.get(e.getMyHash()) != null ) {
+            quorumHashRecord.put(e.getMyHash(), quorumHashRecord.get(e.getMyHash()).intValue() + 1);
+          } else {
+            quorumHashRecord.put(e.getMyHash(), 1);
+          }
+
+          if ( quorumHashRecord.get(e.getMyHash()).intValue() >= hashQuorumSize ) {
+            entryList.add(e);
+            hashSuccess = true;
+            break;
+          }
+        }
+        if ( hashSuccess == false ) {
+          logger.debug("start>>> \nCan not find enough number of HashValue from: " + errorMessage + "\n>>>>end");
+        }
+      } else {
+        if ( entry.getValue().intValue() >= quorumSize ) entryList.add(entryRecord.get(entry.getKey()).get(0));
+      }
     }
     logger.info("From groupId: " + groupId + " [ receive:" + entryCount.size() + ", accept:" + entryList.size() + " ]");
     return entryList;
