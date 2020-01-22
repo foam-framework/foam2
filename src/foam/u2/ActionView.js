@@ -99,7 +99,6 @@ foam.CLASS({
       border-color: /*%DESTRUCTIVE3%*/ #d9170e;
       background-color: /*%DESTRUCTIVE3%*/ #d9170e;
       color: white;
-      margin-top: 12px;
     }
 
     ^primary-destructive:hover:not(:disabled) {

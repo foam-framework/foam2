@@ -23,12 +23,6 @@ foam.CLASS({
     'foam.u2.Visibility'
   ],
 
-  css: `
-    ^ {
-      padding: 12px 0 0 0;
-    }
-  `,
-
   properties: [
     {
       class: 'String',

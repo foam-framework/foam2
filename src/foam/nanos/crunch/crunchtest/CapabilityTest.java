@@ -359,7 +359,7 @@ public class CapabilityTest extends Test {
     CapabilityCapabilityJunction prereqJunction = new CapabilityCapabilityJunction();
     prereqJunction.setSourceId(outer.getId());
     prereqJunction.setTargetId(inner.getId());
-    prereqJunction = (CapabilityCapabilityJunction) prerequisiteCapabilityJunctionDAO.put_(x, prereqJunction);
+    prerequisiteCapabilityJunctionDAO.put_(x, prereqJunction);
 
     FakeTestObject data = new FakeTestObject();
     data.setUsername("RUBY");

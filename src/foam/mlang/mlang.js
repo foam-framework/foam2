@@ -700,7 +700,25 @@ foam.CLASS({
           value.value = this.arg1.adapt.call(null, old, value.value, arg1);
 
         return value;
-      }
+      },
+      javaPreSet: `
+        // Temporary Fix
+        if ( val instanceof foam.mlang.Constant ) {
+
+          foam.mlang.Constant c = (foam.mlang.Constant) val;
+          Object value = c.getValue();
+
+          // TODO: add castObject() method to PropertyInfo and use instead
+          if ( getArg1() instanceof foam.core.AbstractLongPropertyInfo ) {
+            foam.core.PropertyInfo prop1 = (foam.core.PropertyInfo) getArg1();
+            if ( value instanceof String ) {
+              c.setValue(Long.valueOf((String) value));
+            } else if ( value instanceof Number ) {
+              c.setValue(((Number) value).longValue());
+            }
+          }
+        }
+      `
     }
   ],
 
@@ -2353,7 +2371,7 @@ return false;`
 
         try {
           var props = obj.cls_.getAxiomsByClass(this.String);
-          for ( var i = 0; i < props.length; i++ ) {
+          for ( let i = 0; i < props.length; i++ ) {
             s = props[i].f(obj);
             if ( ! s || typeof s !== 'string' ) continue;
             if ( s.toLowerCase().includes(arg) ) return true;
@@ -2361,7 +2379,7 @@ return false;`
 
           if ( checkSubObjects ) {
             var objectProps = obj.cls_.getAxiomsByClass(this.FObjectProperty);
-            for ( var i = 0; i < objectProps.length; i++ ) {
+            for ( let i = 0; i < objectProps.length; i++ ) {
               var prop = objectProps[i];
               var subObject = prop.f(obj);
               if ( this.fInner_(subObject, false) ) return true;
@@ -2369,19 +2387,19 @@ return false;`
           }
 
           var longProps = obj.cls_.getAxiomsByClass(this.Long);
-          for ( var i = 0; i < longProps.length; i++ ) {
+          for ( let i = 0; i < longProps.length; i++ ) {
             var s = (longProps[i]).toString();
             if ( s.toLowerCase().includes(arg) ) return true;
           }
 
           var enumProps = obj.cls_.getAxiomsByClass(this.Enum);
-          for ( var i = 0; i < enumProps.length; i++ ) {
+          for ( let i = 0; i < enumProps.length; i++ ) {
             var s = (enumProps[i]).label;
             if ( s.toLowerCase().includes(arg) ) return true;
           }
 
           var dateProps = obj.cls_.getAxiomsByClass(this.Date);
-          for ( var i = 0; i < dateProps.length; i++ ) {
+          for ( let i = 0; i < dateProps.length; i++ ) {
             var s = (dateProps[i]).toISOString();
             if ( s.toLowerCase().includes(arg) ) return true;
           }
