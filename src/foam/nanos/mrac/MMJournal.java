@@ -346,7 +346,8 @@ public class MMJournal extends AbstractJournal implements Electable {
 
       MedusaEntry p = null;
 
-      while ( System.currentTimeMillis() < endtime && Math.abs(check) < quorumSize ) {
+      //while ( System.currentTimeMillis() < endtime && Math.abs(check) < quorumSize ) {
+      while ( Math.abs(check) < quorumSize ) {
         for ( int j = 0 ; j < tasks.length ; j++ ) {
           if ( checks[j] == false && ((FutureTask<String>) tasks[j]).isDone() ) {
             FutureTask<String> task = (FutureTask<String>) tasks[j];
@@ -752,6 +753,15 @@ public class MMJournal extends AbstractJournal implements Electable {
         } catch ( Exception e ) {
           logger.info("!!fail replay from : " + node.getId() + "-" + node.getHostName() + " exception message: " + e);
           TCPNioServer.closeSocketChannel(channel);
+        } finally {
+          try {
+            if ( channel != null ) {
+              channel.close();
+              channel = null;
+            }
+          } catch ( IOException ie ) {
+            logger.info(ie);
+          }
         }
       }
 

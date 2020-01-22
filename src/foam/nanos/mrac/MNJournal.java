@@ -64,31 +64,42 @@ public class MNJournal extends FileJournal {
   private long minGlobalIndex = Long.MAX_VALUE;
   private Logger logger;
   private MNJournal(X x, String filename) {
+    setX(x);
+    logger = (Logger) x.get("logger");
+    entryRecordDAO = (DAO) x.get("entryRecordDAO");
+    if ( entryRecordDAO == null ) throw new RuntimeException("entryRecordDAO miss");
+    this.filename = filename;
+    this.journalDir = System.getProperty("JOURNAL_HOME");
+    this.outChannel = null;
     try {
-      setX(x);
-      logger = (Logger) x.get("logger");
-      entryRecordDAO = (DAO) x.get("entryRecordDAO");
-      if ( entryRecordDAO == null ) throw new RuntimeException("entryRecordDAO miss");
-      this.filename = filename;
-      this.journalDir = System.getProperty("JOURNAL_HOME");
       this.outChannel = FileChannel.open(getPath(filename), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-      //blocking();
-      //load min and max index;
-      ArraySink sink = (ArraySink) entryRecordDAO
+    } catch ( IOException e) {
+      logger.info(e);
+      throw new RuntimeException(e);
+    } finally {
+      try {
+        if ( this.outChannel != null ) {
+          this.outChannel.close();
+          this.outChannel = null;
+        }
+      } catch ( IOException ioe ) {
+        throw new RuntimeException(ioe);
+      }
+    }
+    //blocking();
+    //load min and max index;
+    ArraySink sink = (ArraySink) entryRecordDAO
                                     .where(EQ(EntryRecord.FILE_NAME, filename))
                                     .select(new ArraySink());
-      List list = sink.getArray();
-      for ( Object obj : list ) {
-        EntryRecord entryRecord = (EntryRecord) obj;
-        if ( entryRecord.getMaxIndex() > maxGlobalIndex ) {
-          maxGlobalIndex = entryRecord.getMaxIndex();
-        }
-        if ( entryRecord.getMinIndex() < minGlobalIndex ) {
-          minGlobalIndex = entryRecord.getMinIndex();
-        }
+    List list = sink.getArray();
+    for ( Object obj : list ) {
+      EntryRecord entryRecord = (EntryRecord) obj;
+      if ( entryRecord.getMaxIndex() > maxGlobalIndex ) {
+        maxGlobalIndex = entryRecord.getMaxIndex();
       }
-    } catch ( IOException e ) {
-      throw new RuntimeException(e);
+      if ( entryRecord.getMinIndex() < minGlobalIndex ) {
+        minGlobalIndex = entryRecord.getMinIndex();
+      }
     }
   }
 
@@ -168,10 +179,9 @@ public class MNJournal extends FileJournal {
 
   private volatile int blockIndex = 0;
   private void doWrite(X x, String record, long globalIndex) {
-
     try {
       synchronized ( fileLock ) {
-
+        this.outChannel = FileChannel.open(getPath(filename), StandardOpenOption.APPEND);
         if ( globalIndex > maxGlobalIndex ) {
           maxGlobalIndex = globalIndex;
         }
@@ -181,9 +191,8 @@ public class MNJournal extends FileJournal {
 
         writeBuffer.clear();
         //TODO: remove it latter.
-        this.outChannel = FileChannel.open(getPath(filename), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
         byte[] bytes = record.getBytes(Charset.forName("UTF-8"));
-    writeBuffer.put(bytes);
+        writeBuffer.put(bytes);
         writeBuffer.flip();
         while ( writeBuffer.hasRemaining() ) {
           outChannel.write(writeBuffer);
@@ -191,6 +200,15 @@ public class MNJournal extends FileJournal {
       }
     } catch ( IOException ioe ) {
       throw new RuntimeException(ioe);
+    } finally {
+      try {
+        if ( this.outChannel != null ) {
+          this.outChannel.close();
+          this.outChannel = null;
+        }
+      } catch ( IOException ioe ) {
+        throw new RuntimeException(ioe);
+      }
     }
   }
 
@@ -374,10 +392,10 @@ public class MNJournal extends FileJournal {
 
     if ( key == null ) throw new RuntimeException("SelectionKey do not find.");
     if ( socketChannel == null ) throw new RuntimeException("SocketChannel do not find");
-
+    FileChannel inChannel = null;
     try {
       long fileSize = -1;
-      FileChannel inChannel = FileChannel.open(getPath(filename), StandardOpenOption.CREATE, StandardOpenOption.READ);
+      inChannel = FileChannel.open(getPath(filename), StandardOpenOption.CREATE, StandardOpenOption.READ);
 
       // We can synchronize whole below code using fileLock,
       // but it is inefficient.
@@ -392,7 +410,6 @@ public class MNJournal extends FileJournal {
           .select(new ArraySink());
         fileSize = inChannel.size();
         logger.info("readfileSize: " + fileSize);
-      }
 
       List list = sink.getArray();
       EntryRecord lastRecord = null;
@@ -614,10 +631,22 @@ public class MNJournal extends FileJournal {
         }
         return;
       }
+      }
 
     } catch ( IOException e ) {
       logger.info(e);
       try {
+        socketChannel.close();
+        key.cancel();
+      } catch ( IOException ie ) {
+        logger.info(ie);
+      }
+    } finally {
+      try {
+        if ( inChannel != null ) {
+          inChannel.close();
+          inChannel = null;
+        }
         socketChannel.close();
         key.cancel();
       } catch ( IOException ie ) {
