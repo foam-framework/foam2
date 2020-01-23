@@ -21,7 +21,6 @@ foam.CLASS({
     'foam.nanos.auth.User',
     'static foam.mlang.MLang.*',
     'foam.nanos.auth.LifecycleAware',
-    'foam.dao.ArraySink'
   ],
 
   methods: [
