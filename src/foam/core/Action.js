@@ -27,6 +27,8 @@ foam.CLASS({
     'foam.core.PromiseSlot'
   ],
 
+  imports: [ 'auth' ],
+
   documentation: 'An Action is a method with extra GUI support.',
 
   properties: [
@@ -123,6 +125,31 @@ If empty than no permissions are required.`
 If empty than no permissions are required.`,
     },
     {
+      name: 'enabledPermissionsSlot_',
+      transient: true,
+      xxxfactory: function() {
+        return foam.core.PromiseSlot.create({
+          promise: Promise.all(this.enabledPermissions.map(p => x.auth.check(null, p))).
+            then(function(perms) {
+              return perms.every(p => p);
+            })
+        });
+      }
+    },
+    {
+      name: 'availablePermissionsSlot_',
+      transient: true,
+      xxxfactory: function() {
+        debugger;
+        return foam.core.PromiseSlot.create({
+          promise: Promise.all(this.availablePermissions.map(p => this.auth.check(null, p))).
+            then(function(perms) {
+              return perms.every(p => p);
+            })
+        });
+      }
+    },
+    {
       name: 'runningMap',
       factory: function() {
         return new WeakMap();
@@ -137,22 +164,29 @@ If empty than no permissions are required.`,
   ],
 
   methods: [
-    function addPermissionsCheck_(x, slot, data, permissions) {
+    function addPermissionsCheck_(x, slot, data, permissionsName) {
       // Decorates an isEnabled/isAvailable slot with a permission
       // check if appropriate.
+      var permissions = this[permissionsName + 'Permissions'];
 
       // If no auth service, or no permissions to check then nothing to do.
       if ( ! x.auth || ! permissions.length )
         return slot;
 
+      var pName = permissionsName + 'PermissionsSlot_';
+
+      if ( ! this[pName] ) {
+        this[pName] = foam.core.PromiseSlot.create({
+          promise: Promise.all(permissions.map(p => x.auth.check(null, p))).
+            then(function(perms) {
+              return perms.every(p => p);
+            })
+        });
+      }
+
       return foam.core.ExpressionSlot.create({
         args: [
-          foam.core.PromiseSlot.create({
-            promise: Promise.all(permissions.map(p => x.auth.check(null, p))).
-              then(function(perms) {
-                return perms.every(p => p);
-              })
-          }),
+          this[pName],
           slot
         ],
         code: function(a, b) {
@@ -161,7 +195,7 @@ If empty than no permissions are required.`,
       });
     },
 
-    function createSlotFor_(x, data, expression, permissions) {
+    function createSlotFor_(x, data, expression, permissionsName) {
       // Handle old code that might try to pass data as a slot
       if ( foam.core.Slot.isInstance(data) ) {
         console.warn("Action createIsEnabled$ and createIsAvailable$ does not support data as a slot.");
@@ -174,12 +208,12 @@ If empty than no permissions are required.`,
           data.slot(expression) :
           foam.core.ConstantSlot.create({ value: true });
 
-      return this.addPermissionsCheck_(x, slot, data, permissions);
+      return this.addPermissionsCheck_(x, slot, data, permissionsName);
     },
 
     function createIsEnabled$(x, data) {
       var running = this.getRunning$(data);
-      var slot = this.createSlotFor_(x, data, this.isEnabled, this.enabledPermissions);
+      var slot    = this.createSlotFor_(x, data, this.isEnabled, 'enabled');
       return foam.core.ExpressionSlot.create({
         args: [
           running,
@@ -192,7 +226,7 @@ If empty than no permissions are required.`,
     },
 
     function createIsAvailable$(x, data) {
-      return this.createSlotFor_(x, data, this.isAvailable, this.availablePermissions);
+      return this.createSlotFor_(x, data, this.isAvailable, 'available');
     },
 
     function getRunning$(data) {
@@ -229,7 +263,6 @@ If empty than no permissions are required.`,
       if ( ( this.isAvailable && ! foam.Function.withArgs(this.isAvailable, data) ) ||
            ( this.isEnabled   && ! foam.Function.withArgs(this.isEnabled, data) ) )
         return;
-
 
       // No permission check if no auth service or no permissions to check.
       if ( ! x.auth ||
