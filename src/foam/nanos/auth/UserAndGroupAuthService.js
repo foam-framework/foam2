@@ -288,7 +288,6 @@ foam.CLASS({
     {
       name: 'assertUserIsActive',
       documenation: `Given a user, we check whether the user is ACTIVE.`,
-      type: 'Boolean',
       args: [
         {
           name: 'user',
