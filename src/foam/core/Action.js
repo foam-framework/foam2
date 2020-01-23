@@ -126,28 +126,11 @@ If empty than no permissions are required.`,
     },
     {
       name: 'enabledPermissionsSlot_',
-      transient: true,
-      xxxfactory: function() {
-        return foam.core.PromiseSlot.create({
-          promise: Promise.all(this.enabledPermissions.map(p => x.auth.check(null, p))).
-            then(function(perms) {
-              return perms.every(p => p);
-            })
-        });
-      }
+      transient: true
     },
     {
       name: 'availablePermissionsSlot_',
-      transient: true,
-      xxxfactory: function() {
-        debugger;
-        return foam.core.PromiseSlot.create({
-          promise: Promise.all(this.availablePermissions.map(p => this.auth.check(null, p))).
-            then(function(perms) {
-              return perms.every(p => p);
-            })
-        });
-      }
+      transient: true
     },
     {
       name: 'runningMap',
