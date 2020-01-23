@@ -24,6 +24,10 @@ foam.ENUM({
     {
       name: 'TTL',
       documentation: "Using a TTL (Time to Live) cache"
+    },
+    {
+      name: 'TTL_SELECT',
+      documentation: "Using a TTL (Time to Live) cache on dao.select()"
     }
   ]
 });

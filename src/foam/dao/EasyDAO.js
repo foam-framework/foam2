@@ -63,6 +63,7 @@ foam.CLASS({
     'foam.dao.OrderedDAO',
     'foam.dao.PromisedDAO',
     'foam.dao.TTLCachingDAO',
+    'foam.dao.TTLSelectCachingDAO',
     'foam.dao.RequestResponseClientDAO',
     'foam.dao.SequenceNumberDAO',
     'foam.dao.SyncDAO',
@@ -712,6 +713,11 @@ foam.CLASS({
           });
         } else if ( this.cacheType == foam.dao.CacheType.TTL ) {
           dao = this.TTLCachingDAO.create({
+            delegate: dao,
+            purgeTime: this.purgeTime
+          });
+        } else if ( this.cacheType == foam.dao.CacheType.TTL_SELECT ) {
+          dao = this.TTLSelectCachingDAO.create({
             delegate: dao,
             purgeTime: this.purgeTime
           });
