@@ -16,7 +16,6 @@ foam.CLASS({
 
   javaImports: [
     'foam.dao.DAO',
-    'foam.nanos.crunch.UserCapabilityJunction',
     'foam.core.ContextAgent',
     'foam.core.X',
     'foam.nanos.auth.User',
