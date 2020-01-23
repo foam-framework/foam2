@@ -172,19 +172,19 @@ foam.CLASS({
     }
   ],
   actions: [
-    {
-      name: 'export',
-      label: '',
-      toolTip: 'Export Table Data',
-      icon: 'images/export-arrow-icon.svg',
-      code: function() {
-        this.add(this.Popup.create().tag({
-          class: 'foam.u2.ExportModal',
-          exportData: this.predicatedDAO$proxy,
-          predicate: this.config.filterExportPredicate
-        }));
-      }
-    },
+    // { // Put back once fully tested https://nanopay.atlassian.net/browse/CPF-4315
+    //   name: 'export',
+    //   label: '',
+    //   toolTip: 'Export Table Data',
+    //   icon: 'images/export-arrow-icon.svg',
+    //   code: function() {
+    //     this.add(this.Popup.create().tag({
+    //       class: 'foam.u2.ExportModal',
+    //       exportData: this.predicatedDAO$proxy,
+    //       predicate: this.config.filterExportPredicate
+    //     }));
+    //   }
+    // },
     {
       name: 'refreshTable',
       label: '',
