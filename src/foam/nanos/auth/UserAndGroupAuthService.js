@@ -33,6 +33,7 @@ foam.CLASS({
 
   javaImports: [
     'foam.dao.DAO',
+    'foam.nanos.auth.LifecycleState',
     'foam.nanos.logger.Logger',
     'foam.nanos.session.Session',
     'foam.util.Email',
@@ -75,6 +76,11 @@ foam.CLASS({
         User user = (User) ((DAO) getLocalUserDAO()).find(session.getUserId());
         if ( user == null ) {
           throw new AuthenticationException("User not found: " + session.getUserId());
+        }
+
+        // check that the user is active
+        if (user instanceof LifecycleAware && ((LifecycleAware)user).getLifecycleState() != LifecycleState.ACTIVE) {
+          throw new AuthenticationException("User is not active");
         }
 
         // check if user enabled
@@ -123,6 +129,11 @@ foam.CLASS({
       javaCode: `
         if ( user == null ) {
           throw new AuthenticationException("User not found");
+        }
+
+        // check that the user is active
+        if (user instanceof LifecycleAware && ((LifecycleAware)user).getLifecycleState() != LifecycleState.ACTIVE) {
+          throw new AuthenticationException("User is not active");
         }
 
         // check if user enabled
@@ -296,6 +307,11 @@ foam.CLASS({
         User user = (User) ((DAO) getLocalUserDAO()).find(session.getUserId());
         if ( user == null ) {
           throw new AuthenticationException("User not found");
+        }
+
+        // check that the user is active
+        if (user instanceof LifecycleAware && ((LifecycleAware)user).getLifecycleState() != LifecycleState.ACTIVE) {
+          throw new AuthenticationException("User is not active");
         }
 
         // check if user enabled
