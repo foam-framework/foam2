@@ -27,8 +27,6 @@ foam.CLASS({
     'foam.core.PromiseSlot'
   ],
 
-  imports: [ 'auth' ],
-
   documentation: 'An Action is a method with extra GUI support.',
 
   properties: [
