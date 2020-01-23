@@ -79,9 +79,7 @@ foam.CLASS({
         }
 
         // check that the user is active
-        if (user instanceof LifecycleAware && ((LifecycleAware)user).getLifecycleState() != LifecycleState.ACTIVE) {
-          throw new AuthenticationException("User is not active");
-        }
+        assertUserIsActive(user);
 
         // check if user enabled
         if ( ! user.getEnabled() ) {
@@ -132,9 +130,7 @@ foam.CLASS({
         }
 
         // check that the user is active
-        if (user instanceof LifecycleAware && ((LifecycleAware)user).getLifecycleState() != LifecycleState.ACTIVE) {
-          throw new AuthenticationException("User is not active");
-        }
+        assertUserIsActive(user);
 
         // check if user enabled
         if ( ! user.getEnabled() ) {
@@ -291,6 +287,23 @@ foam.CLASS({
       `
     },
     {
+      name: 'assertUserIsActive',
+      documenation: `Given a user, we check whether the user is ACTIVE.`,
+      type: 'Boolean',
+      args: [
+        {
+          name: 'user',
+          type: 'foam.nanos.auth.User'
+        }
+      ],
+      javaCode: `
+      // check that the user is active
+      if ( user instanceof LifecycleAware && ((LifecycleAware)user).getLifecycleState() != LifecycleState.ACTIVE ) {
+        throw new AuthenticationException("User is not active");
+      }
+      `
+    },
+    {
       name: 'updatePassword',
       documentation: `Given a context with a user, validate the password to be
         updated and return a context with the updated user information.`,
@@ -310,9 +323,7 @@ foam.CLASS({
         }
 
         // check that the user is active
-        if (user instanceof LifecycleAware && ((LifecycleAware)user).getLifecycleState() != LifecycleState.ACTIVE) {
-          throw new AuthenticationException("User is not active");
-        }
+        assertUserIsActive(user);
 
         // check if user enabled
         if ( ! user.getEnabled() ) {
