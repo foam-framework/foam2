@@ -31,22 +31,22 @@ foam.CLASS({
       name: 'obj'
     },
     {
-      class: 'URL',
+      class: 'Image',
       name: 'activeImageURL',
       value: 'images/Icon_More_Active.svg'
     },
     {
-      class: 'URL',
+      class: 'Image',
       name: 'restingImageURL',
       value: 'images/Icon_More_Resting.svg'
     },
     {
-      class: 'URL',
+      class: 'Image',
       name: 'hoverImageURL',
       value: 'images/Icon_More_Hover.svg'
     },
     {
-      class: 'URL',
+      class: 'Image',
       name: 'disabledImageURL',
       value: 'images/Icon_More_Disabled.svg'
     },
@@ -54,10 +54,16 @@ foam.CLASS({
       class: 'URL',
       name: 'imageURL_',
       expression: function(restingImageURL, hoverImageURL, disabledImageURL, activeImageURL, hovered_, disabled_, active_) {
-        if ( disabled_ ) return `url(${disabledImageURL})`;
-        if ( active_ ) return `url(${activeImageURL})`;
-        if ( hovered_ ) return `url(${hoverImageURL})`;
-        return `url(${restingImageURL})`;
+        var url = null;
+
+        if ( disabled_ ) url = disabledImageURL;
+        else if ( active_ ) url = activeImageURL;
+        else if ( hovered_ ) url = hoverImageURL;
+        else url = restingImageURL;
+
+        var ccache = foam.u2.ClientResourceCache.create();
+        url = ccache.saveImageFromURL(url);
+        return `url('${url}')`;
       }
     },
     {

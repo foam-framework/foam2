@@ -183,6 +183,7 @@ FOAM_FILES([
   { name: "foam/u2/Visibility"},
   { name: "foam/u2/RowFormatter" },
   { name: "foam/u2/WeakMap", flags: ['web'] },
+  { name: "foam/u2/ClientResourceCache", flags: ['js'] },
   { name: "foam/u2/Element", flags: ['js'] },
   { name: "foam/u2/Tooltip", flags: ['web'] },
   { name: "foam/u2/MNRowFormatter", flags: ['web'] },
