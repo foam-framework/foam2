@@ -14,9 +14,7 @@ foam.CLASS({
   javaImports: [
     'foam.core.FObject',
     'foam.core.ClassInfo',
-    'foam.core.MethodInfo',
-    'foam.core.X',
-    'foam.nanos.logger.Logger'
+    'foam.core.MethodInfo'
   ],
 
   properties: [

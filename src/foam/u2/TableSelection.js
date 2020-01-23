@@ -77,7 +77,7 @@ foam.CLASS({
       name: 'selectionText_',
       expression: function(filteredCount_, totalCount_) {
         if ( ! totalCount_ ) return '';
-        var s = (totalCount_ || '0') + ' selected';
+        var s = totalCount_ + ' selected';
         if ( totalCount_ !== filteredCount_ ) {
           s += ' (' + (filteredCount_ || '0') + ' shown)';
         }

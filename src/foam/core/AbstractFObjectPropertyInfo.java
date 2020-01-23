@@ -40,7 +40,7 @@ public abstract class AbstractFObjectPropertyInfo
         eventType = reader.next();
         switch ( eventType ) {
           case XMLStreamConstants.START_ELEMENT:
-            if (reader.getLocalName() == "object") {
+            if (reader.getLocalName().equals("object")) {
               obj = XMLSupport.createObj(x, reader);
               return obj;
             }

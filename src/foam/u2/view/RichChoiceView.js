@@ -88,6 +88,13 @@ foam.CLASS({
     'of'
   ],
 
+  messages: [
+    {
+      name: 'CHOOSE_FROM',
+      message: 'Choose from '
+    }
+  ],
+
   css: `
     ^ {
       display: inline-block;
@@ -288,7 +295,11 @@ foam.CLASS({
     {
       class: 'String',
       name: 'choosePlaceholder',
-      documentation: 'Replaces choose from placeholder with passed in string.'
+      documentation: 'Replaces choose from placeholder with passed in string.',
+      expression: function(of) {
+        var plural = of.model_.plural.toLowerCase();
+        return this.CHOOSE_FROM + plural + '...';
+      }
     },
     {
       type: 'Action',
@@ -496,24 +507,14 @@ foam.CLASS({
         'of'
       ],
 
-      messages: [
-        {
-          name: 'CHOOSE_FROM',
-          message: 'Choose from '
-        }
-      ],
-
       properties: [
         {
           name: 'data',
           documentation: 'The id of the selected object.',
         },
         {
-          name: 'defaultSelectionPrompt',
-          expression: function(of) {
-            var plural = of.model_.plural.toLowerCase();
-            return this.CHOOSE_FROM + plural;
-          }
+          class: 'String',
+          name: 'defaultSelectionPrompt'
         },
         {
           name: 'fullObject',

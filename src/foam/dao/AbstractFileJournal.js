@@ -24,14 +24,12 @@ foam.CLASS({
     'foam.nanos.logger.Logger',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.StdoutLogger',
-    'foam.util.SafetyUtil',
     'java.io.BufferedReader',
     'java.io.BufferedWriter',
     'java.io.InputStreamReader',
     'java.io.InputStream',
     'java.io.OutputStream',
     'java.io.OutputStreamWriter',
-    'java.text.SimpleDateFormat',
     'java.util.Calendar',
     'java.util.Iterator',
     'java.util.List',
@@ -368,7 +366,7 @@ try {
         if ( obj instanceof LastModifiedByAware && ((LastModifiedByAware) obj).getLastModifiedBy() != 0L ) return;
 
         User user = (User) x.get("user");
-        Calendar now = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+
         write_(sb.get()
           .append("// Modified by ")
           .append(user.label())

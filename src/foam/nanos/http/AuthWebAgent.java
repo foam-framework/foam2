@@ -80,7 +80,6 @@ public class AuthWebAgent
     HttpServletResponse resp         = x.get(HttpServletResponse.class);
     AuthService         auth         = (AuthService) x.get("auth");
     DAO                 sessionDAO   = (DAO) x.get("localSessionDAO");
-    DAO                 userDAO      = (DAO) x.get("localUserDAO");
 
     // query parameters
     String              email        = req.getParameter("user");

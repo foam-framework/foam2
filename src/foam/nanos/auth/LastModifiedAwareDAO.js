@@ -12,7 +12,6 @@ foam.CLASS({
   documentation: 'Sets lastModified timestamp on put() of LastModifiedAware objects.',
 
   javaImports: [
-    'foam.nanos.auth.LastModifiedAware',
     'java.util.Calendar',
     'java.util.TimeZone'
   ],

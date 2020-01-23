@@ -97,6 +97,15 @@ foam.CLASS({
     }
   ],
 
+  // properties: [
+  //   {
+  //     name: 'userFeedback',
+  //     class: 'FObjectProperty',
+  //     of: 'foam.comics.v2.userfeedback.UserFeedback',
+  //     storageTransient: true
+  //   }
+  // ],
+
   methods: [
     {
       name: 'compareTo',
@@ -121,6 +130,22 @@ foam.CLASS({
         }
 
         return 0;
+      `
+    },
+    {
+      name: 'hashCode',
+      type: 'Integer',
+      javaCode: `
+        int hashCode = 1;
+        List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
+        Iterator i = props.iterator();
+
+        while ( i.hasNext() ) {
+          PropertyInfo pi = (PropertyInfo) i.next();
+          hashCode = 31 * hashCode + java.util.Objects.hash(pi.get(this));
+        }
+
+        return hashCode;
       `
     },
     {
@@ -311,22 +336,25 @@ foam.CLASS({
         while ( i.hasNext() ) {
           PropertyInfo prop = (PropertyInfo) i.next();
 
-          sb.append(prop.getName());
-          sb.append(": ");
+          // Don't output Personally Identifiable Information (PII)
+          if ( ! prop.containsPII() ) {
+            sb.append(prop.getName());
+            sb.append(": ");
 
-          try {
-            Object value = prop.get(this);
+            try {
+              Object value = prop.get(this);
 
-            if ( value instanceof Appendable ) {
-              ((Appendable) value).append(sb);
-            } else {
-              sb.append(value);
+              if ( value instanceof Appendable ) {
+                ((Appendable) value).append(sb);
+              } else {
+                sb.append(value);
+              }
+            } catch (Throwable t) {
+              sb.append("-");
             }
-          } catch (Throwable t) {
-            sb.append("-");
-          }
 
-          if ( i.hasNext() ) sb.append(", ");
+            if ( i.hasNext() ) sb.append(", ");
+          }
         }
       `
     },
@@ -366,7 +394,6 @@ foam.CLASS({
           PropertyInfo prop = (PropertyInfo) i.next();
           if ( ! prop.includeInDigest() ) continue;
           if ( ! prop.isSet(this) ) continue;
-          //if ( prop.isDefaultValue(this) ) continue;
           md.update(prop.getNameAsByteArray());
           prop.updateDigest(this, md);
         }
@@ -390,7 +417,6 @@ foam.CLASS({
           PropertyInfo prop = (PropertyInfo) i.next();
           if ( ! prop.includeInDigest() ) continue;
           if ( ! prop.isSet(this) ) continue;
-          //if ( prop.isDefaultValue(this) ) continue;
           signer.update(prop.getNameAsByteArray());
           prop.updateSignature(this, signer);
         }
@@ -412,7 +438,6 @@ foam.CLASS({
           PropertyInfo prop = (PropertyInfo) i.next();
           if ( ! prop.includeInDigest() ) continue;
           if ( ! prop.isSet(this) ) continue;
-          //if ( prop.isDefaultValue(this) ) continue;
           verifier.update(prop.getNameAsByteArray());
           prop.updateSignature(this, verifier);
         }

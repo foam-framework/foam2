@@ -17,9 +17,6 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.nanos.auth.*',
     'foam.nanos.auth.User',
-    'foam.nanos.crunch.Capability',
-    'foam.nanos.crunch.CapabilityJunctionStatus',
-    'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.logger.Logger',
     'java.util.Calendar',
     'java.util.Date',
@@ -149,7 +146,7 @@ foam.CLASS({
       DAO dao = (DAO) x.get(daoKey);
       if ( dao == null ) return;
 
-      if ( dao.getOf().getId() == (obj.getData()).getClassInfo().getId() ) {
+      if ( dao.getOf().getId().equals((obj.getData()).getClassInfo().getId()) ) {
         try {
           dao.put(obj.getData());
         } catch (Exception e) {

@@ -35,7 +35,7 @@ foam.CLASS({
 
 var vt = ValidateTest.create({gt10: 11, lt10: 9});
 console.log('error: ', vt.errors_);
-vt.errors_$.sub(function(_,_,_,errs) { console.log('Error_$.sub::', errs.get());});
+vt.errors_$.sub(function(_,__,___,errs) { console.log('Error_$.sub::', errs.get());});
 vt.gt10 = 9;
 vt.lt10 = 11;
 console.log('error: ', vt.errors_);

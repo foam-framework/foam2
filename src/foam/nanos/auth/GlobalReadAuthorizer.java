@@ -8,6 +8,7 @@ package foam.nanos.auth;
 
 import foam.core.FObject;
 import foam.core.X;
+import foam.mlang.predicate.Predicate;
 
 public class GlobalReadAuthorizer extends StandardAuthorizer {
 
@@ -20,7 +21,7 @@ public class GlobalReadAuthorizer extends StandardAuthorizer {
   }
 
   @Override
-  public boolean checkGlobalRead(X x) {
+  public boolean checkGlobalRead(X x, Predicate predicate) {
     // return true in checkGlobalRead to save time checking each object
     return true;
   }

@@ -74,11 +74,10 @@ foam.CLASS({
     'foam.nanos.logger.LoggingDAO'
   ],
 
-  imports: [ 'document' ],
+  imports: [ 'document', 'log' ],
 
   javaImports: [
-    'foam.nanos.logger.Logger',
-    'foam.dao.ValidatingDAO'
+    'foam.nanos.logger.Logger'
   ],
 
   constants: [
@@ -128,8 +127,6 @@ foam.CLASS({
         foam.dao.ProxyDAO pxy = null;
         while( head instanceof foam.dao.ProxyDAO ) {
           pxy = (foam.dao.ProxyDAO) head;
-          if ( head instanceof foam.dao.MDAO )
-            break;
           head = ( (ProxyDAO) head).getDelegate();
         }
         if ( head instanceof foam.dao.MDAO ) {
@@ -304,11 +301,6 @@ foam.CLASS({
       value: 1
     },
     {
-      class: 'Long',
-      name: 'purgeTime',
-      value: 15000
-    },
-    {
       documentation: 'Have EasyDAO generate guids to index items. Note that .seqNo and .guid features are mutually exclusive',
       class: 'Boolean',
       name: 'guid',
@@ -327,12 +319,29 @@ foam.CLASS({
       class: 'Property'
     },
     {
+      /* deprecated: see cacheType */
+      documentation: 'Enable local in-memory caching of the DAO',
+      class: 'Boolean',
+      name: 'cache',
+      value: false,
+       generateJava: false
+   },
+    {
       documentation: 'Enable local in-memory caching of the DAO',
       class: 'foam.core.Enum',
       of: 'foam.dao.CacheType',
       name: 'cacheType',
-      value: 'NONE' /* 'None' */
+      value: 'NONE',
+      generateJava: false
     },
+    {
+      documentation: 'Time to wait before purging cache.',
+      class: 'Long',
+      name: 'purgeTime',
+      units: 'ms',
+      value: 15000,
+      generateJava: false
+     },
     {
       documentation: 'Enable authorization',
       class: 'Boolean',
@@ -685,7 +694,8 @@ foam.CLASS({
         this.mdao = dao;
         if ( this.dedup ) dao = this.DeDupDAO.create({delegate: dao});
       } else {
-        if ( this.cacheType == foam.dao.CacheType.FULL ) {
+        if ( this.cache ||
+             this.cacheType == foam.dao.CacheType.FULL ) {
           this.mdao = this.MDAO.create({of: params.of});
 
           var cache = this.mdao;

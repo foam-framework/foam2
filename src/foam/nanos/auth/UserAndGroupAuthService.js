@@ -42,7 +42,6 @@ foam.CLASS({
 
     'java.security.Permission',
     'java.util.Calendar',
-    'java.util.regex.Pattern',
     'javax.security.auth.AuthPermission',
 
     'static foam.mlang.MLang.AND',

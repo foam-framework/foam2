@@ -28,7 +28,6 @@ foam.CLASS({
       view: function(args, X) {
         return {
           class: 'foam.u2.view.ChoiceView',
-          placeholder: '--',
           choices$: X.data.choices$,
           defaultValue$: X.data.choices$.map((choices) => {
             return Array.isArray(choices) && choices.length > 0 ? choices[0][0] : '';

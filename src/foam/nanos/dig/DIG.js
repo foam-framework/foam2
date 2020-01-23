@@ -109,7 +109,7 @@ foam.CLASS({
         var url = "/service/dig";
 
         if ( daoKey ) {
-          url += query ? "&" : "?";
+          url += "?";
           query = true;
           url += "dao=" + daoKey;
         }
@@ -134,8 +134,7 @@ foam.CLASS({
           url += "email=" + email;
 
           if ( subject ) {
-            url += query ? "&" : "?";
-            query = true;
+            url += "&";
             url += "subject=" + encodeURIComponent(subject);
           }
         }

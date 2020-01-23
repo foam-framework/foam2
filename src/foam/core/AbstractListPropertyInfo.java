@@ -17,7 +17,7 @@ public abstract class AbstractListPropertyInfo
     Object v1 = this.get(o1);
     Object v2 = this.get(o2);
 
-    if ( v1 == null & v2 == null ) return 0;
+    if ( v1 == null && v2 == null ) return 0;
     if ( v2 == null ) return 1;
     if ( v1 == null ) return -1;
 
@@ -29,7 +29,7 @@ public abstract class AbstractListPropertyInfo
     if ( l1.size() < l2.size() ) return -1;
 
     // check if lists are equal, if not return -1 suggesting the 2nd list is newer
-    if ( l1.containsAll(l2) && l2.containsAll(l2) ) return 0;
+    if ( l1.containsAll(l2) && l2.containsAll(l1) ) return 0;
     return Integer.compare(l1.hashCode(), l2.hashCode());
   }
 }

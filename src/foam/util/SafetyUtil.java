@@ -6,8 +6,19 @@
 
 package foam.util;
 
+import java.util.regex.Pattern;
+
 /** Convenience methods for performing standard operations with null checks. **/
 public class SafetyUtil {
+
+  // TODO: reuse Patterns and thread-local matchers
+  public static void assertPattern(String val, String patternStr, String argumentName)
+    throws IllegalArgumentException
+  {
+    Pattern pattern = Pattern.compile(patternStr);
+    if ( ! pattern.matcher(val).matches() )
+      throw new IllegalArgumentException(argumentName);
+  }
 
   public static boolean equals(Object o1, Object o2) {
     return compare(o1, o2) == 0;
@@ -38,7 +49,7 @@ public class SafetyUtil {
 
       if ( d1 == d2 ) return  0;
       if ( d1  > d2 ) return  1;
-      if ( d1  < d2 ) return -1;
+        return -1;
     }
 
     if ( ! (o1 instanceof Comparable && o2 instanceof Comparable) ) return 0;
@@ -63,7 +74,7 @@ public class SafetyUtil {
 
   public static java.util.Map deepCloneMap(java.util.Map o) {
     try {
-      java.util.Map result = (java.util.Map)o.getClass().newInstance();
+      java.util.Map result = (java.util.Map) o.getClass().newInstance();
 
       java.util.Iterator<java.util.Map.Entry> entries = o.entrySet().iterator();
 

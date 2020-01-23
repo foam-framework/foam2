@@ -48,7 +48,7 @@ foam.CLASS({
       name: 'average',
       label: 'Avg',
       getter: function() { return (this.totalTime / this.count).toFixed(2); },
-      javaGetter: `return (long) Math.round( ( getTotalTime() / getCount() ) * 100 ) / 100;`,
+      javaGetter: `return (long) (Math.round( ( (float)getTotalTime() / (float)getCount() ) * 100.0 ) / 100.0);`,
       transient: true
     },
     {

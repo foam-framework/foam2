@@ -67,7 +67,7 @@ foam.CLASS({
     },
 
     function open() {
-     if ( this.parent ) {
+     if ( this.parent && this.parent.add ) {
         this.parent.add(this);
       } else {
         this.document.body.insertAdjacentHTML('beforeend', this.outerHTML);

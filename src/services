@@ -1,7 +1,26 @@
 p({"class":"foam.nanos.boot.NSpec", "name":"nSpecDAO",                           "serve":true,  "authenticate": false, "serviceClass":"foam.dao.ProxyDAO", "client":"{\"of\":\"foam.nanos.boot.NSpec\",\"cache\":true}"})
 
 
-p({"class":"foam.nanos.boot.NSpec", "name":"AuthenticatedNSpecDAO",              "serve":true,  "serviceClass":"foam.dao.ProxyDAO", "client":"{\"of\":\"foam.nanos.boot.NSpec\",\"cache\":true}"})
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"AuthenticatedNSpecDAO",
+  "serve":true,
+  "serviceScript":"""
+    return new foam.dao.PMDAO(x,
+      new foam.nanos.auth.AuthorizationDAO(x,
+        x.get("nSpecDAO"),
+        new foam.nanos.auth.StandardAuthorizer("service")
+      )
+    );
+  """,
+  "client":"""
+    {
+      "of":"foam.nanos.boot.NSpec",
+      "cache":true
+    }
+  """,
+  documentation:"The authenticated version of nSpecDAO - for dig and docs."
+})
 p({"class":"foam.nanos.boot.NSpec", "name":"http",                             "lazy":false, "service":{"class":"foam.nanos.jetty.HttpServer","port":8080,"forwardedForProxyWhitelist":[],"welcomeFiles":["/src/foam/nanos/controller/index.html"],"servletMappings":[{"class":"foam.nanos.servlet.ServletMapping","className":"foam.nanos.http.NanoRouter","pathSpec":"/service/*"},{"class":"foam.nanos.servlet.ServletMapping","className":"org.eclipse.jetty.servlet.DefaultServlet","pathSpec":"/*","initParameters":{"dirAllowed":"true","redirectWelcome":"true"}}]}})
 p({"class":"foam.nanos.boot.NSpec", "name":"httprouter",                         "serviceClass":"foam.nanos.http.NanoRouter"})
 p({"class":"foam.nanos.boot.NSpec", "name":"websockets",                       "lazy":false, "serviceClass":"foam.nanos.ws.NanoWebSocketServer"})
@@ -56,6 +75,7 @@ p({
   "name": "trace",
   "authenticate": false,
   "parameters": true,
+  "enabled": false,
   "serviceClass": "foam.nanos.http.TraceWebAgent"
 })
 
@@ -263,27 +283,54 @@ p({
     return new foam.nanos.http.RefreshWebAgent(memoryWebAgent);
   """
 })
-
 p({
   "class": "foam.nanos.boot.NSpec",
-  "name": "countryDAO",
+  "name": "localCountryDAO",
   "description": "A DAO which contains information about countries.",
-  "serve": true,
+  "serve": false,
   "authenticate": false,
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
       .setPm(true)
-      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer(\"countryDAO\"))
+      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("countryDAO"))
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName(\"countries\")
+      .setJournalName("countries")
       .setOf(foam.nanos.auth.Country.getOwnClassInfo())
       .setOrder(new foam.core.PropertyInfo[] {foam.nanos.auth.Country.NAME})
       .build();
+  """
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "countryDAO",
+  "serve": true,
+  "authenticate": false,
+  "serviceScript":
+  """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.auth.Country.getOwnClassInfo())
+      .setName("countries")
+      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("countryDAO"))
+      .setInnerDAO(x.get("localCountryDAO"))
+      .build();
   """,
-  "client": "{\"of\":\"foam.nanos.auth.Country\"}",
+  "client":
+  """
+    {
+      "of": "foam.nanos.auth.Country",
+      "cache": true
+    }
+  """,
   "authNotes": "The \"authenticate\" flag is explicitly set to false because we want to be able to use the countryDAO to populate a dropdown in the sign up form. The DAO is decorated with an AuthenticatedDAO decorator with \"authenticateRead\" set to false so that anyone can read from countryDAO but only those with permission can write to or remove from it."
 })
-p({"class":"foam.nanos.boot.NSpec", "name":"countryService",                     "serve":true, "serviceClass":"foam.nanos.auth.CountryService"})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"countryService",
+  "serve":true,
+  "serviceClass":"foam.nanos.auth.CountryService"
+})
 
 p({"class":"foam.nanos.boot.NSpec", "name":"languageDAO",                        "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setPm(true).setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer(\"languageDAO\")).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"languages\").setOf(foam.nanos.auth.Language.getOwnClassInfo()).build();", "client":"{\"of\":\"foam.nanos.auth.Language\"}"})
 
@@ -712,18 +759,32 @@ p({
 
 p({
   "class": "foam.nanos.boot.NSpec",
+  "name": "localCurrencyDAO",
+  "serve": false,
+  "serviceScript":
+  """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.core.Currency.getOwnClassInfo())
+      .setName("currency")
+      .setPm(true)
+      .setPipelinePm(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("currencies")
+      .setIndex(new foam.core.PropertyInfo[] {foam.core.Currency.COUNTRY})
+      .build();
+  """
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
   "name": "currencyDAO",
   "serve": true,
   "serviceScript":
   """
     return new foam.dao.EasyDAO.Builder(x)
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName("currencies")
-      .setPm(true)
-      .setPipelinePm(true)
       .setOf(foam.core.Currency.getOwnClassInfo())
       .setName("currency")
-      .setIndex(new foam.core.PropertyInfo[] {foam.core.Currency.COUNTRY})
+      .setInnerDAO(x.get("localCurrencyDAO"))
       .build();
   """,
   "client":

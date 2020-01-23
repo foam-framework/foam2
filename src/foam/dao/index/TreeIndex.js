@@ -199,7 +199,8 @@ foam.CLASS({
       if ( ! order ) return true;
 
       // if this index can sort, it's up to our tail to sub-sort
-      if ( foam.util.equals(order.orderPrimaryProperty(), this.prop) ) {
+      // TODO: the following code breaks things, fix. KGR
+      if ( false /*foam.util.equals(order.orderPrimaryProperty, this.prop)*/ ) {
         // If the subestimate is less than sort cost (N*lg(N) for a dummy size of 1000)
         return 9965 >
           this.tail.estimate(1000, this.NullSink.create(), 0, 0, order.orderTail())
