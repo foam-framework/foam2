@@ -112,7 +112,7 @@ foam.CLASS({
                       defaults.daoType            = 'CLIENT';
                     }
                     for ( var k in defaults ) {
-                      if ( cls.getAxiomByName(k) && ! json[k] )
+                      if ( cls.getAxiomByName(k) && json[k] == undefined )
                         json[k] = defaults[k];
                     }
                     return foam.json.parse(json, null, this.__subContext__);
