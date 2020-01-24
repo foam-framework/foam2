@@ -6,6 +6,42 @@
 
 foam.CLASS({
   package: 'foam.u2.view',
+  name: 'RichChoiceViewSection',
+
+  documentation: 'Models one section of the dropdown for a RichChoiceView.',
+
+  properties: [
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'dao',
+      documentation: 'The DAO that will be used to populate the options in this section.'
+    },
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'filteredDAO',
+      documentation: 'A filtered version of the underlying DAO, depending on the search term the user has typed in.',
+      factory: function() { return this.dao; }
+    },
+    {
+      class: 'Boolean',
+      name: 'hideIfEmpty',
+      documentation: 'This section will be hidden if there are no items in it if this is set to true.'
+    },
+    {
+      class: 'Boolean',
+      name: 'disabled',
+      documentation: 'Rows in this section will not be selectable if this is set to true.'
+    },
+    {
+      class: 'String',
+      name: 'heading',
+      documentation: 'The heading text for this section.'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.u2.view',
   name: 'RichChoiceView',
   extends: 'foam.u2.View',
 
@@ -48,14 +84,32 @@ foam.CLASS({
     'foam.mlang.Expressions'
   ],
 
+  imports: [
+    'window'
+  ],
+
   exports: [
     'of'
+  ],
+
+  messages: [
+    {
+      name: 'CHOOSE_FROM',
+      message: 'Choose from '
+    },
+    {
+      name: 'CLEAR_SELECTION',
+      message: 'Clear Selection'
+    }
   ],
 
   css: `
     ^ {
       display: inline-block;
       position: relative;
+    }
+
+    ^setAbove {
       z-index: 1;
     }
 
@@ -127,7 +181,8 @@ foam.CLASS({
       width: 100%;
     }
 
-    ^ .search input {
+    ^ .search input,
+    ^clear-btn {
       width: 100%;
       border: none;
       padding-left: %INPUTHORIZONTALPADDING%;
@@ -151,6 +206,15 @@ foam.CLASS({
 
     ^ .disabled:hover {
       cursor: default;
+    }
+
+    ^clear-btn {
+      background-color: /*%GREY4%*/ #e7eaec;
+    }
+
+    ^clear-btn:hover {
+      color: /*%DESTRUCTIVE3%*/ #d9170e;
+      cursor: pointer;
     }
   `,
 
@@ -183,6 +247,18 @@ foam.CLASS({
       documentation: `
         An internal property used to determine whether the options list is
         visible or not.
+      `,
+      postSet: function(_, nv) {
+        if ( nv && ! this.hasBeenOpenedYet_ ) this.hasBeenOpenedYet_ = true;
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'hasBeenOpenedYet_',
+      documentation: `
+        Used internally to keep track of whether the dropdown has been opened
+        yet or not. We don't want to waste resources pulling from the DAO until
+        we know the user is going to interact with this dropdown.
       `
     },
     {
@@ -198,15 +274,13 @@ foam.CLASS({
       }
     },
     {
-      class: 'Array',
+      class: 'FObjectArray',
+      of: 'foam.u2.view.RichChoiceViewSection',
       name: 'sections',
       documentation: `
         This lets you pass different predicated versions of a dao in different
         sections, which can be used to do things like grouping by some property
         for each section.
-        Each object in the array must have a 'label' property of type string
-        which will be used for the section heading, and a 'dao' property of type
-        DAO that will be used to populate the list in that section.
       `,
     },
     {
@@ -235,12 +309,10 @@ foam.CLASS({
       name: 'filter_',
       documentation: 'The text that the user typed in to search by.',
       postSet: function(oldValue, newValue) {
-        this.sections = this.sections.map((section) => {
-          return Object.assign({}, section, {
-            filtered: newValue
-              ? section.dao.where(this.KEYWORD(newValue))
-              : section.dao
-          });
+        this.sections.forEach((section) => {
+          section.filteredDAO = newValue
+            ? section.dao.where(this.KEYWORD(newValue))
+            : section.dao;
         });
       }
     },
@@ -253,7 +325,11 @@ foam.CLASS({
     {
       class: 'String',
       name: 'choosePlaceholder',
-      documentation: 'Replaces choose from placeholder with passed in string.'
+      documentation: 'Replaces choose from placeholder with passed in string.',
+      expression: function(of) {
+        var plural = of.model_.plural.toLowerCase();
+        return this.CHOOSE_FROM + plural + '...';
+      }
     },
     {
       type: 'Action',
@@ -261,6 +337,13 @@ foam.CLASS({
       documentation: `
         Optional. If this is provided, an action will be included at the bottom
         of the dropdown.
+      `
+    },
+    {
+      class: 'Boolean',
+      name: 'allowClearingSelection',
+      documentation: `
+        Set to true if you want the user to be able to clear their selection.
       `
     }
   ],
@@ -281,6 +364,42 @@ foam.CLASS({
       // passed to the selectionView to use it if it wants to.
       this.onDetach(this.data$.sub(this.onDataUpdate));
       this.onDataUpdate();
+
+      // Set up an event listener on the window so we can close the dropdown
+      // when the user clicks somewhere else.
+      var containerU2Element;
+      const fn = function(evt) {
+        // This prevents a console error when opening the dropdown.
+        if ( containerU2Element === undefined ) return;
+
+        var selfDOMElement = self.el();
+        var containerDOMElement = containerU2Element.el();
+
+        // If an ancestor U2 Element was removed but didn't properly detach us,
+        // then the DOM elements will be removed but the listener will still be
+        // in place. Here we detect such a situation and remove the listener if
+        // it arises, preventing a memory leak.
+        if ( selfDOMElement == null || containerDOMElement == null ) {
+          self.window.removeEventListener('click', fn);
+          return;
+        }
+
+        var selfRect = selfDOMElement.getClientRects()[0];
+        var containerRect = containerDOMElement.getClientRects()[0];
+
+        if (
+          ! (
+              evt.clientX >= selfRect.x &&
+              evt.clientX <= selfRect.x + selfRect.width &&
+              evt.clientY >= selfRect.y &&
+              evt.clientY <= containerRect.y + containerRect.height
+            )
+        ) {
+          self.isOpen_ = false;
+        }
+      };
+      this.window.addEventListener('click', fn);
+      this.onDetach(() => this.window.removeEventListener('click', fn));
 
       this
         .add(this.slot(function(mode, fullObject_) {
@@ -313,68 +432,78 @@ foam.CLASS({
                   .addClass(this.myClass('chevron'))
                 .end()
               .end()
-              .start()
-                .addClass(this.myClass('container'))
-                .show(self.isOpen_$)
-                .add(self.search$.map((searchEnabled) => {
-                  if ( ! searchEnabled ) return null;
-                  return this.E()
-                    .start()
-                      .start('img')
-                        .attrs({ src: 'images/ic-search.svg' })
-                      .end()
-                      .startContext({ data: self })
-                        .addClass('search')
-                        .add(self.FILTER_.clone().copyFrom({ view: {
-                          class: 'foam.u2.view.TextField',
-                          placeholder: this.searchPlaceholder,
-                          onKey: true
-                        } }))
-                      .endContext()
-                    .end();
-                }))
-                .add(this.slot(function(sections) {
-                  var promiseArray = [];
-                  sections.forEach(function(section) {
-                    promiseArray.push(section.dao.select(self.COUNT()));
-                  });
-      
-                  return Promise.all(promiseArray).then((resp) => {
-                    var index = 0;
-                    return this.E().forEach(sections, function(section) {
-                      this
-                        .start().hide(!! section.hideIfEmpty && resp[index].value <= 0 || ! section.heading)
-                          .addClass(self.myClass('heading'))
-                          .add(section.heading)
-                        .end()
-                        .start()
-                          .select(section.filtered || section.dao, (obj) => {
-                            return this.E()
-                              .start(self.rowView, { data: obj })
-                                .enableClass('disabled', section.disabled)
-                                .callIf(! section.disabled, function() {
-                                  this.on('click', () => {
-                                    self.fullObject_ = obj;
-                                    self.data = obj.id;
-                                    self.isOpen_ = false;
-                                  });
-                                })
-                              .end();
-                          })
-                        .end();
-                        index++;
-                    });
-                  });
-                }))
-                .add(this.slot(function(action) {
-                  if ( action ) {
+              .add(this.slot(function(hasBeenOpenedYet_) {
+                if ( ! hasBeenOpenedYet_ ) return this.E();
+                return this.E()
+                  .addClass(self.myClass('container'))
+                  .call(function() { containerU2Element = this; })
+                  .show(self.isOpen_$)
+                  .add(self.search$.map((searchEnabled) => {
+                    if ( ! searchEnabled ) return null;
                     return this.E()
-                      .start(self.DefaultActionView, { action: action })
-                        .addClass(self.myClass('action'))
+                      .start()
+                        .start('img')
+                          .attrs({ src: 'images/ic-search.svg' })
+                        .end()
+                        .startContext({ data: self })
+                          .addClass('search')
+                          .add(self.FILTER_.clone().copyFrom({ view: {
+                            class: 'foam.u2.view.TextField',
+                            placeholder: this.searchPlaceholder,
+                            onKey: true
+                          } }))
+                        .endContext()
                       .end();
-                  }
-                }))
-              .end();
+                  }))
+                  .add(self.slot(function(allowClearingSelection) {
+                    if ( ! allowClearingSelection ) return null;
+                    return this.E('button')
+                      .addClass(self.myClass('clear-btn'))
+                      .on('click', self.clearSelection)
+                      .add(self.CLEAR_SELECTION)
+                  }))
+                  .add(self.slot(function(sections) {
+                    var promiseArray = [];
+                    sections.forEach(function(section) {
+                      promiseArray.push(section.dao.select(self.COUNT()));
+                    });
+
+                    return Promise.all(promiseArray).then((resp) => {
+                      var index = 0;
+                      return this.E().forEach(sections, function(section) {
+                        this.addClass(self.myClass('setAbove'))
+                          .start().hide(!! section.hideIfEmpty && resp[index].value <= 0 || ! section.heading)
+                            .addClass(self.myClass('heading'))
+                            .add(section.heading)
+                          .end()
+                          .start()
+                            .select(section.filteredDAO$proxy, (obj) => {
+                              return this.E()
+                                .start(self.rowView, { data: obj })
+                                  .enableClass('disabled', section.disabled)
+                                  .callIf(! section.disabled, function() {
+                                    this.on('click', () => {
+                                      self.fullObject_ = obj;
+                                      self.data = obj.id;
+                                      self.isOpen_ = false;
+                                    });
+                                  })
+                                .end();
+                            })
+                          .end();
+                          index++;
+                      });
+                    });
+                  }))
+                  .add(this.slot(function(action) {
+                    if ( action ) {
+                      return this.E()
+                        .start(self.DefaultActionView, { action: action })
+                          .addClass(self.myClass('action'))
+                        .end();
+                    }
+                  }));
+              }))
           } else {
             return self.E().add(fullObject_ ? fullObject_.toSummary() : '');
           }
@@ -398,6 +527,11 @@ foam.CLASS({
           });
         }
       }
+    },
+    function clearSelection() {
+      this.data = undefined;
+      this.fullObject_ = undefined;
+      this.isOpen_ = false;
     }
   ],
 
@@ -461,24 +595,14 @@ foam.CLASS({
         'of'
       ],
 
-      messages: [
-        {
-          name: 'CHOOSE_FROM',
-          message: 'Choose from '
-        }
-      ],
-
       properties: [
         {
           name: 'data',
           documentation: 'The id of the selected object.',
         },
         {
-          name: 'defaultSelectionPrompt',
-          expression: function(of) {
-            var plural = of.model_.plural.toLowerCase();
-            return this.CHOOSE_FROM + plural;
-          }
+          class: 'String',
+          name: 'defaultSelectionPrompt'
         },
         {
           name: 'fullObject',

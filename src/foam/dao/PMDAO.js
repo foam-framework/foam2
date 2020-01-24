@@ -20,8 +20,6 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.X',
-    'foam.mlang.order.Comparator',
-    'foam.mlang.predicate.Predicate',
     'foam.nanos.pm.PM'
   ],
 
@@ -43,11 +41,6 @@ foam.CLASS({
         return PMDAO.getOwnClassInfo();
       `,
       hidden: true
-    },
-    {
-      documentation: 'Enable PMs on DAO.find operations',
-      name: 'pmFind',
-      class: 'Boolean'
     },
     {
       name: 'putName',
@@ -117,14 +110,7 @@ foam.CLASS({
       ],
       javaType: 'PM',
       javaCode: `
-    PM pm = null;
-    if ( getEnabled() ) {
-      pm =  (PM) x.get("PM");
-      pm.setClassType(this.getClassType());
-      pm.setName(op);
-      pm.init_();
-    }
-    return pm;
+    return getEnabled() ? PM.create(x, this.getClassType(), op) : null;
       `
     },
     {
@@ -159,8 +145,7 @@ foam.CLASS({
     {
       name: 'find_',
       javaCode: `
-    PM pm = null;
-    if ( getPmFind() ) pm = createPM(x, getFindName());
+    PM pm = createPM(x, getFindName());
     try {
       return super.find_(x, id);
     } finally {

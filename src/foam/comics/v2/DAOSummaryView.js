@@ -100,6 +100,9 @@ foam.CLASS({
   actions: [
     {
       name: 'edit',
+      isAvailable: function(config$editEnabled) {
+        return config$editEnabled;
+      },
       code: function() {
         if ( ! this.stack ) return;
         this.stack.push({
@@ -112,8 +115,11 @@ foam.CLASS({
     },
     {
       name: 'delete',
+      isAvailable: function(config$deleteEnabled) {
+        return config$deleteEnabled;
+      },
       code: function() {
-        this.add(this.Popup.create().tag({
+        this.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
           class: 'foam.u2.DeleteModal',
           dao: this.config.dao,
           onDelete: () => {
@@ -132,23 +138,52 @@ foam.CLASS({
       this.SUPER();
       this
         .addClass(this.myClass())
-        .add(self.slot(function(data, config, config$browseTitle, config$viewBorder, viewView) {
+        .add(self.slot(function(data, data$id, config$CRUDActionsAuth$update, config$CRUDActionsAuth$delete,config$browseTitle, config$viewBorder, viewView) {
+
+          // iterate through permissions and replace % with data$id
+          var editAction = self.EDIT;
+          var deleteAction = self.DELETE;
+
+          if ( config$CRUDActionsAuth$update ) {
+            var editArray = config$CRUDActionsAuth$update;
+
+            editArray = editArray.map(permission => {
+              return permission.replace("%", data$id);
+            });
+
+            editAction = self.EDIT.clone().copyFrom({
+              availablePermissions: self.EDIT.availablePermissions.concat(editArray)
+            });
+          }
+
+          if ( config$CRUDActionsAuth$delete ) {
+            var deleteArray = config$CRUDActionsAuth$delete;
+
+
+            deleteArray = deleteArray.map(permission => {
+              return permission.replace("%", data$id);
+            });
+
+            deleteAction = self.DELETE.clone().copyFrom({
+              availablePermissions: self.DELETE.availablePermissions.concat(deleteArray)
+            });
+          }
 
           return self.E()
             .start(self.Rows)
               .start(self.Rows)
                 // we will handle this in the StackView instead
                 .startContext({ data: self.stack })
-                    .tag(self.stack.BACK, {
-                      buttonStyle: foam.u2.ButtonStyle.TERTIARY,
-                      icon: 'images/back-icon.svg',
-                      label: `All ${config$browseTitle}`
-                    })
+                  .tag(self.stack.BACK, {
+                    buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                    icon: 'images/back-icon.svg',
+                    label: `All ${config$browseTitle}`
+                  })
                 .endContext()
                 .start(self.Cols).style({ 'align-items': 'center' })
                   .start()
                     .add(data.toSummary())
-                      .addClass(this.myClass('account-name'))
+                    .addClass(this.myClass('account-name'))
                   .end()
                   .startContext({ data }).add(self.primary).endContext()
                 .end()
@@ -156,14 +191,16 @@ foam.CLASS({
 
               .start(self.Cols)
                 .start(self.Cols).addClass(this.myClass('actions-header'))
-                  .startContext({data: self}).tag(self.EDIT, {
-                    buttonStyle: foam.u2.ButtonStyle.TERTIARY,
-                    icon: 'images/edit-icon.svg'
-                  }).endContext()
-                  .startContext({data: self}).tag(self.DELETE, {
-                    buttonStyle: foam.u2.ButtonStyle.TERTIARY,
-                    icon: 'images/delete-icon.svg'
-                  }).endContext()
+                  .startContext({ data: self })
+                    .tag(editAction, {
+                      buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                      icon: 'images/edit-icon.svg'
+                    })
+                    .tag(deleteAction, {
+                      buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                      icon: 'images/delete-icon.svg'
+                    })
+                  .endContext()
                 .end()
               .end()
 

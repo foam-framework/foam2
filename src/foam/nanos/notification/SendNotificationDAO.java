@@ -64,6 +64,6 @@ public class SendNotificationDAO
     notification.setUserId(user.getId());
     notification.setBroadcasted(false);
     notification.setGroupId(null);
-    ((DAO) x.get("notificationDAO")).put_(x, notification);
+    ((DAO) x.get("localNotificationDAO")).put_(x, notification);
   }
 }

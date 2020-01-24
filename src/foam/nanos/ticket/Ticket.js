@@ -124,7 +124,7 @@ foam.CLASS({
         if ( 'CLOSED' == this.status ) {
           s.push(['CLOSED', 'CLOSED']);
         } else {
-          s.push(this.status),
+          s.push(this.status);
           s.push(['CLOSED', 'CLOSED']);
         }
         return s;
@@ -204,6 +204,21 @@ foam.CLASS({
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdBy',
+      visibility: 'RO',
+      includeInDigest: true,
+      tableCellFormatter: function(value, obj) {
+        obj.userDAO.find(value).then(function(user) {
+          if ( user ) {
+            this.add(user.legalName);
+          }
+        }.bind(this));
+      },
+      section: 'metaSection',
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdByAgent',
       visibility: 'RO',
       includeInDigest: true,
       tableCellFormatter: function(value, obj) {

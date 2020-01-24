@@ -21,7 +21,7 @@ import foam.nanos.pm.NullPM;
 import foam.nanos.pm.PM;
 import foam.nanos.script.Script;
 import foam.nanos.session.Session;
-
+import foam.util.SafetyUtil;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -44,7 +44,7 @@ public class Boot {
     Logger logger = new ProxyLogger(new StdoutLogger());
     root_.put("logger", logger);
 
-    if ( datadir == null || datadir == "" ) {
+    if ( SafetyUtil.isEmpty(datadir) ) {
       datadir = System.getProperty("JOURNAL_HOME");
     }
 
@@ -79,15 +79,12 @@ public class Boot {
       }
     }, null);
 
-    // PM factory
+    // PM factory, only return a real PM 1% of the time
     root_ = root_.putFactory("PM", new XFactory() {
       public Object create(X x) {
-        int rand = ThreadLocalRandom.current().nextInt(0, 100);
-        if ( rand == 0 ) {
-          return new PM();
-        } else {
-          return nullPM_;
-        }
+        return ThreadLocalRandom.current().nextInt(0, 100) == 0 ?
+          new PM() :
+          nullPM_  ;
       }
     });
 
@@ -104,9 +101,6 @@ public class Boot {
     // Export the ServiceDAO
     ((ProxyDAO) root_.get("nSpecDAO")).setDelegate(
         new foam.nanos.auth.AuthorizationDAO(getX(), serviceDAO_, new foam.nanos.auth.GlobalReadAuthorizer("service")));
-    // 'read' authenticated version - for dig and docs
-    ((ProxyDAO) root_.get("AuthenticatedNSpecDAO")).setDelegate(
-        new foam.dao.PMDAO(root_, new foam.nanos.auth.AuthorizationDAO(getX(), (DAO) root_.get("nSpecDAO"), new foam.nanos.auth.StandardAuthorizer("service"))));
 
     serviceDAO_.where(EQ(NSpec.LAZY, false)).select(new AbstractSink() {
       @Override

@@ -39,6 +39,10 @@ foam.CLASS({
       margin-right: 0;
     }
 
+    .foam-u2-ActionView-refreshTable > img {
+      margin-right: 0;
+    }
+
     ^top-bar {
       border-bottom: solid 1px #e7eaec;
       align-items: center;
@@ -82,6 +86,10 @@ foam.CLASS({
       width: 100%;
     }
   `,
+
+  messages: [
+    { name: 'REFRESH_MSG', message: 'Refresh Requested ... ' }
+  ],
 
   imports: [
     'stack?'
@@ -154,17 +162,38 @@ foam.CLASS({
       expression: function(config, cannedPredicate, searchPredicate) {
         return config.dao$proxy.where(this.AND(cannedPredicate, searchPredicate));
       }
+    },
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'searchFilterDAO',
+      expression: function(config, cannedPredicate) {
+        return config.dao$proxy.where(cannedPredicate);
+      }
     }
   ],
   actions: [
     {
       name: 'export',
       label: '',
+      toolTip: 'Export Table Data',
       icon: 'images/export-arrow-icon.svg',
       code: function() {
         this.add(this.Popup.create().tag({
           class: 'foam.u2.ExportModal',
-          exportData: this.predicatedDAO$proxy
+          exportData: this.predicatedDAO$proxy,
+          predicate: this.config.filterExportPredicate
+        }));
+      }
+    },
+    {
+      name: 'refreshTable',
+      label: '',
+      toolTip: 'Refresh Table',
+      icon: 'images/refresh-icon-black.svg',
+      code: function(X) {
+        this.config.dao.cmd_(X, foam.dao.CachingDAO.PURGE);
+        this.add(foam.u2.dialog.NotificationMessage.create({
+          message: this.REFRESH_MSG
         }));
       }
     }
@@ -190,7 +219,7 @@ foam.CLASS({
       this.addClass(this.myClass());
       this.SUPER();
       this
-        .add(this.slot(function(data, config$cannedQueries, config$defaultColumns) {
+        .add(this.slot(function(data, config$cannedQueries, config$defaultColumns, searchFilterDAO) {
           return self.E()
             .start(self.Rows)
               .callIf(config$cannedQueries.length >= 1, function() {
@@ -201,7 +230,7 @@ foam.CLASS({
                       .callIf(config$cannedQueries.length > 1, function() {
                         this
                           .start(self.cannedQueriesView, {
-                            choices: config$cannedQueries.map(o => [o.predicate, o.label]),
+                            choices: config$cannedQueries.map((o) => [o.predicate, o.label]),
                             data$: self.cannedPredicate$
                           })
                             .addClass(self.myClass('canned-queries'))
@@ -212,7 +241,7 @@ foam.CLASS({
               })
               .start(self.Cols).addClass(self.myClass('query-bar'))
                 .startContext({
-                  dao: self.config.dao,
+                  dao: searchFilterDAO,
                   controllerMode: foam.u2.ControllerMode.EDIT
                 })
                   .callIf(self.config.searchMode === self.SearchMode.SIMPLE, function() {
@@ -227,12 +256,11 @@ foam.CLASS({
                     });
                   })
                 .endContext()
-                .startContext({data: self})
-                  .start(self.EXPORT, {
-                    buttonStyle: foam.u2.ButtonStyle.SECONDARY
-                  })
+                .startContext({ data: self })
+                  .start(self.EXPORT, { buttonStyle: 'SECONDARY' })
                     .addClass(self.myClass('export'))
                   .end()
+                  .tag(this.REFRESH_TABLE, { buttonStyle: 'SECONDARY' })
                 .endContext()
               .end()
               .start(self.summaryView, {

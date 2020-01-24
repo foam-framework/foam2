@@ -84,7 +84,7 @@ foam.CLASS({
         if ( ! this.stack ) return;
         this.stack.push({
           class: 'foam.comics.v2.DAOCreateView',
-          data: this.data.of.create({}, this),
+          data: this.data.of.create({ mode: 'create' }, this),
           config$: this.config$,
           of: this.data.of
         });
@@ -98,7 +98,13 @@ foam.CLASS({
     var self = this;
 
       this.addClass(this.myClass())
-      .add(this.slot(function(data, config, config$browseBorder, config$browseViews, config$browseTitle) {
+      .add(this.slot(function(data, config, config$CRUDActionsAuth$create, config$browseBorder, config$browseViews, config$browseTitle) {
+        var createAction = config$CRUDActionsAuth$create
+            ? self.CREATE.clone().copyFrom({
+              availablePermissions: self.CREATE.availablePermissions.concat(config$CRUDActionsAuth$create)
+            })
+            : self.CREATE;
+
         return self.E()
           .start(self.Rows)
             .addClass(self.myClass('container'))
@@ -108,7 +114,7 @@ foam.CLASS({
                 .addClass(self.myClass('browse-title'))
                 .add(config$browseTitle)
               .end()
-              .startContext({data: self}).add(self.CREATE).endContext()
+              .startContext({ data: self }).tag(createAction).endContext()
             .end()
             .start(self.CardBorder)
               .style({ position: 'relative' })

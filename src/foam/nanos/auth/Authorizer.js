@@ -87,6 +87,10 @@ access to an FObject under different circumstances.`,
           name: 'x',
           type: 'foam.core.X'
         },
+        {
+          name: 'predicate',
+          type: 'foam.mlang.predicate.Predicate'
+        }
       ],
       javaType: 'boolean'
     },

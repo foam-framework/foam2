@@ -100,7 +100,7 @@
         property. In this case, we are using the id.
       `,
       code: function(x) {
-        return this.id;
+        return this.id + " - " + this.name;
       }
     },
     {
@@ -110,11 +110,11 @@
          * Given a number, display it as a currency using the appropriate
          * precision, decimal character, delimiter, symbol, and placement
          * thereof.
-         * 
-         * With the new home denomination feature, we will append (if left) or 
+         *
+         * With the new home denomination feature, we will append (if left) or
          * prepend (if right) the alphabetic code if the currency's alphabetic code
-         * is not equal to the homeDenomination 
-         * 
+         * is not equal to the homeDenomination
+         *
          */
         amount = Math.floor(amount);
         var isNegative = amount < 0;

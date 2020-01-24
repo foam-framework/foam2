@@ -65,7 +65,7 @@ foam.CLASS({
           };
 
           context.foam.INTERFACE = function(json) {
-            json.class = json.class || 'foam.core.InterfaceModel',
+            json.class = json.class || 'foam.core.InterfaceModel';
             context.foam.CLASS(json);
           };
 

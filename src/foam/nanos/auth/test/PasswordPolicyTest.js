@@ -11,7 +11,6 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.DirectAgency',
-    'foam.core.X',
     'foam.nanos.auth.PasswordPolicy',
     'foam.nanos.auth.User',
     'foam.util.Password'

@@ -32,9 +32,9 @@ public class CronScheduler
    * @return Date of the minimum scheduled cron job
    */
   private Date getMinScheduledTime() {
-    Min min = (Min) cronDAO_.select(
-      MLang.MIN(Cron.SCHEDULED_TIME)
-    );
+    Min min = (Min) cronDAO_
+      .where(MLang.EQ(Cron.ENABLED, true))
+      .select(MLang.MIN(Cron.SCHEDULED_TIME));
 
     if ( min.getValue().equals(0) ) {
       return null;
@@ -67,23 +67,33 @@ public class CronScheduler
           public void put(Object obj, Detachable sub) {
             Cron cron = (Cron) ((FObject) obj).fclone();
 
-            PM pm = new PM(CronScheduler.this.getClass(), "cronScheduler");
+            PM pm = new PM(CronScheduler.class, "cron:" + cron.getId());
             try {
               cron.runScript(CronScheduler.this.getX());
-              cronDAO_.put((FObject) cron);
             } catch (Throwable t) {
-              logger.error(this.getClass(), "Error running Cron Job", cron.getId(), t.getMessage());
+              logger.error(this.getClass(), "Error running Cron Job", cron.getId(), t.getMessage(), t);
             } finally {
               pm.log(getX());
             }
+            cronDAO_.put((FObject) cron);
           }
         });
 
         Date minScheduledTime = getMinScheduledTime();
-
-        if ( minScheduledTime != null ) {
-          // Check for new cronjobs every second
-          Thread.sleep(1000);
+        // Check for new cronjobs every 5 seconds if no current jobs
+        // or if their next scheduled execution time is > 5s away
+        if( minScheduledTime == null ) {
+          Thread.sleep(5000);
+        } else {
+          long delay = minScheduledTime.getTime() - System.currentTimeMillis();
+          if ( delay > 5000 ) {
+            delay = 5000;
+          } else if ( delay < 0 ) {
+            // Delay at least a little bit to avoid blocking in case of a
+            // script error.
+            delay = 500;
+          }
+          Thread.sleep(delay);
         }
       }
     } catch (Throwable t) {

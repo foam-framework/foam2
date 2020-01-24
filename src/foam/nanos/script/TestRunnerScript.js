@@ -15,6 +15,7 @@ foam.CLASS({
     'foam.nanos.test.Test',
     'java.util.*',
     'foam.nanos.logger.LogLevelFilterLogger',
+    'foam.nanos.logger.Logger',
     'foam.util.SafetyUtil'
   ],
   constants: [
@@ -166,7 +167,8 @@ foam.CLASS({
           printOutput(test);
         }
         catch ( Exception e ) {
-          e.printStackTrace();
+          Logger logger = (Logger) x.get("logger");
+          logger.error(e);
           setFailedTests(getFailedTests() + 1);
           addToFailedTestsList(test);
         }

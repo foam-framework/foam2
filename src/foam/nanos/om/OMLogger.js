@@ -11,10 +11,7 @@ foam.CLASS({
   extends: 'foam.nanos.logger.AbstractLogger',
 
   javaImports: [
-    'foam.core.X',
-    'foam.dao.DAO',
     'foam.nanos.analytics.FoldManager',
-    'foam.nanos.analytics.Candlestick',
     'java.util.Date'
   ],
 

@@ -15,7 +15,6 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.nanos.notification.email.DAOResourceLoader',
     'foam.nanos.logger.Logger',
     'foam.util.SafetyUtil'
   ],
@@ -42,8 +41,6 @@ foam.CLASS({
       } catch (Exception e) {
         if ( logger != null ) {
           logger.error(new NoSuchFieldException("@EmailTemplateApplyEmailPropertyService: emailTemplate.apply has failed. emailTemplate = {id:" + templateName + ", group:" + group + "}" + e));
-        } else {
-          new NoSuchFieldException("@EmailTemplateApplyEmailPropertyService: emailTemplate.apply has failed. emailTemplate = {id:" + templateName + ", group:" + group + "}" + e).printStackTrace();
         }
       }
       return emailMessage;

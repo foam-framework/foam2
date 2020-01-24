@@ -2176,9 +2176,6 @@ foam.CLASS({
       of: 'foam.u2.DisplayMode',
       name: 'createMode',
       documentation: 'The display mode for this property when the controller mode is CREATE.',
-      assertValue: function(newValue) {
-        foam.assert(newValue === foam.u2.DisplayMode.RW || newValue === foam.u2.DisplayMode.HIDDEN, `Create mode must be RW or HIDDEN. Property '${this.of ? this.of.id + '.' : ''}${this.name}' was '${newValue.label}' and must be fixed.`);
-      },
       value: 'RW'
     },
     {
@@ -2260,10 +2257,12 @@ foam.CLASS({
 
           var propName = this.name.toLowerCase();
           var clsName  = this.forClass_.substring(this.forClass_.lastIndexOf('.') + 1).toLowerCase();
+          var canRead  = this.readPermissionRequired === false;
 
           return auth.check(null, `${clsName}.rw.${propName}`)
               .then(function(rw) {
                 if ( rw ) return Visibility.RW;
+                if ( canRead ) return Visibility.RO;
                 return auth.check(null, `${clsName}.ro.${propName}`)
                   .then((ro) => ro ? Visibility.RO : Visibility.HIDDEN);
               });

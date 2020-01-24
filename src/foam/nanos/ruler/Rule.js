@@ -22,13 +22,9 @@
   ],
 
   javaImports: [
-    'foam.core.ContextAware',
-    'foam.core.FObject',
-    'foam.core.X',
     'foam.core.DirectAgency',
     'foam.nanos.logger.Logger',
-    'java.util.Collection',
-    'foam.nanos.ruler.RuleGroup'
+    'java.util.Collection'
   ],
 
   tableColumns: [
@@ -226,6 +222,20 @@
       }
     },
     {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdByAgent',
+      createMode: 'HIDDEN',
+      updateMode: 'RO',
+      tableCellFormatter: function(value, obj) {
+        obj.userDAO.find(value).then(function(user) {
+          if ( user ) {
+            this.add(user.legalName);
+          }
+        }.bind(this));
+      }
+    },
+    {
       class: 'DateTime',
       name: 'lastModified',
       createMode: 'HIDDEN',
@@ -275,9 +285,8 @@
           try {
             return getPredicate().f(obj);
           } catch ( Throwable th ) { }
-
-          ((Logger) x.get("logger")).error(
-            "Failed to evaluate predicate of rule: " + getId(), t);
+          // ((Logger) x.get("logger")).debug(this.getClass().getSimpleName(), "id", getId(), "\\nrule", this, "\\nobj", obj, "\\nold", oldObj, "\\n", t);
+          ((Logger) x.get("logger")).error("Failed to evaluate predicate of rule: " + getId(), t);
           return false;
         }
       `

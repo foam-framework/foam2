@@ -12,12 +12,7 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.dao.DAO',
-    'foam.nanos.notification.Notification',
-    'foam.util.SafetyUtil',
-    'java.util.Calendar',
-    'java.util.Date',
-    'java.util.concurrent.atomic.AtomicBoolean'
+    'java.util.Calendar'
   ],
 
   documentation: `
@@ -122,11 +117,10 @@ while ( next.get(Calendar.YEAR) < 3000 ) {
   dateFound = true;
   break;
 }
-if ( !dateFound ) {
+if ( ! dateFound ) {
   throw new IllegalArgumentException("Unable to get next scheduled time");
 }
 return next.getTime();`
     }
   ]
 });
-

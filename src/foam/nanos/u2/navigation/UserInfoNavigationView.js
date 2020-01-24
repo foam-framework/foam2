@@ -78,7 +78,7 @@ foam.CLASS({
               if ( ! agent ) return;
               return this.E().addClass('name-container')
                   .start('span').addClass(this.myClass('agentName'))
-                    .add( agent ? agent.label() : '')
+                    .add( agent.label() )
                   .end();
             }))
           .end()

@@ -31,7 +31,7 @@ foam.CLASS({
     }
 
     .foam-comics-DAOControllerView {
-      margin: 0;
+      margin: 96 auto;
     }
   `,
 

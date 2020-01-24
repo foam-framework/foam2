@@ -160,7 +160,7 @@ foam.CLASS({
             // TODO: Replace currencyDAO with unitDAO
             return foam.core.PromiseSlot.create({
               promise: obj.__context__.currencyDAO.find(unitId).then((unit) => {
-                var formatted = unit.format(propValue);
+                var formatted = unit ? unit.format(propValue) : propValue;
                 self.tooltip = formatted;
                 return formatted;
               })
@@ -238,7 +238,8 @@ foam.CLASS({
       value: function(date) {
         // allow the browser to deal with this since we are technically using the user's preference
         if ( date ) {
-          var formattedDate = date.toLocaleDateString();
+          // toLocaleString includes date and time
+          var formattedDate = date.toLocaleString();
           this.add(formattedDate);
           this.tooltip = formattedDate;
         }
@@ -266,6 +267,12 @@ foam.CLASS({
         var seconds = Math.floor(value / 1000);
         value -= seconds * 1000;
         var milliseconds = value % 1000;
+
+        // For long durations, don't show milliseconds
+        if ( hours ) seconds = 0;
+
+        // For longer durations, don't show seconds
+        if ( minutes || hours ) milliseconds = 0;
 
         var formatted = [[hours, 'h'], [minutes, 'm'], [seconds, 's'], [milliseconds, 'ms']].reduce((acc, cur) => {
           return cur[0] > 0 ? acc.concat([cur[0] + cur[1]]) : acc;

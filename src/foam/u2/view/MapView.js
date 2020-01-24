@@ -8,14 +8,17 @@ foam.CLASS({
   package: 'foam.u2.view',
   name: 'MapView',
   extends: 'foam.u2.View',
+
   requires: [
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows'
   ],
+
   exports: [
-    'mode',
-    'updateData'
+    'as view',
+    'mode'
   ],
+
   actions: [
     {
       name: 'addRow',
@@ -24,35 +27,28 @@ foam.CLASS({
         return mode === foam.u2.DisplayMode.RW;
       },
       code: function() {
-        this.data = this.data || {};
-        this.data[Date.now()] = '';
-        this.updateData();
+        var d2 = foam.Object.shallowClone(this.data);
+        d2[Date.now()] = '';
+        this.data = d2;
       }
     }
   ],
+
   classes: [
     {
       name: 'KeyValueRow',
       imports: [
-        'data',
         'mode',
-        'updateData'
+        'view'
       ],
       properties: [
         {
           class: 'String',
-          name: 'key',
-          postSet: function(o, n) {
-            delete this.data[o];
-            this.data[n] = this.value;
-          }
+          name: 'key'
         },
         {
           name: 'value',
-          view: { class: 'foam.u2.view.AnyView' },
-          postSet: function(o, n) {
-            this.data[this.key] = n;
-          }
+          view: { class: 'foam.u2.view.AnyView' }
         }
       ],
       actions: [
@@ -62,24 +58,15 @@ foam.CLASS({
             return mode === foam.u2.DisplayMode.RW;
           },
           code: function() {
-            delete this.data[this.key];
-            this.updateData();
+            var d2 = foam.Object.shallowClone(this.view.data);
+            delete d2[this.key];
+            this.view.data = d2;
           }
         }
       ]
     }
   ],
-  listeners: [
-    {
-      name: 'updateData',
-      isFramed: true,
-      code: function() {
-        var d = this.data;
-        this.data = null;
-        this.data = d;
-      }
-    }
-  ],
+
   methods: [
     function initE() {
       var self = this;
@@ -87,7 +74,13 @@ foam.CLASS({
         .add(this.slot(function(data) {
           return self.Rows.create()
             .forEach(Object.entries(data || {}), function(e) {
-              var row = self.KeyValueRow.create({ key: e[0], value: e[1] });
+              let oldKey = e[0];
+              let row    = self.KeyValueRow.create({key: e[0], value: e[1]});
+              row.onDetach(row.sub('propertyChange', function() {
+                delete self.data[oldKey];
+                self.data[row.key] = row.value;
+                oldKey = row.key;
+              }));
               this
                 .startContext({ data: row })
                   .start(self.Cols)
@@ -104,10 +97,9 @@ foam.CLASS({
                     })
                   .end()
                 .endContext();
-              row.onDetach(row.sub(self.updateData));
             });
         }))
-        .startContext({ data: this }).add(this.ADD_ROW).endContext();
+        .startContext({data: this}).add(this.ADD_ROW).endContext();
     }
   ]
 });

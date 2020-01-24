@@ -1,44 +1,28 @@
 p({"class":"foam.nanos.boot.NSpec", "name":"nSpecDAO",                           "serve":true,  "authenticate": false, "serviceClass":"foam.dao.ProxyDAO", "client":"{\"of\":\"foam.nanos.boot.NSpec\",\"cache\":true}"})
 
-p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "localNotificationDAO",
-  "lazy": false,
-  "serve": false,
-  "serviceScript": """
-    return new foam.dao.EasyDAO.Builder(x)
-      .setOf(foam.nanos.notification.Notification.getOwnClassInfo())
-      .setIndex(new foam.core.PropertyInfo[] {foam.nanos.notification.Notification.GROUP_ID})
-      .setAuthorize(false)
-      .setPm(true)
-      .setSeqNo(true)
-      .setDecorator(
-        new foam.nanos.notification.NotificationTemplateDAO.Builder(x).setDelegate(
-        new foam.nanos.notification.SendNotificationDAO(x,
-        new foam.nanos.notification.SendEmailNotificationDAO(
-        new foam.nanos.notification.SendSlackNotificationDAO(x)))).build())
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName("notifications")
-      .build();
-  """
-})
-p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "notificationDAO",
-  "lazy": false,
-  "serve": true,
-  "serviceScript": """
-    return new foam.dao.EasyDAO.Builder(x)
-      .setOf(foam.nanos.notification.Notification.getOwnClassInfo())
-      .setAuthorize(true)
-      .setInnerDAO((foam.dao.DAO) x.get("localNotificationDAO"))
-      .build();
-  """,
-  "client": "{\"of\":\"foam.nanos.notification.Notification\"}"
-})
 
-p({"class":"foam.nanos.boot.NSpec", "name":"notificationTemplateDAO",          "lazy":false,  "serve":true,  "serviceScript":"return new foam.dao.PMDAO(x, new foam.dao.SequenceNumberDAO(new foam.dao.java.JDAO(x, foam.nanos.notification.Notification.getOwnClassInfo(), \"notificationTemplates\")));", "client":"{\"of\":\"foam.nanos.notification.Notification\"}"})
-p({"class":"foam.nanos.boot.NSpec", "name":"AuthenticatedNSpecDAO",              "serve":true,  "serviceClass":"foam.dao.ProxyDAO", "client":"{\"of\":\"foam.nanos.boot.NSpec\",\"cache\":true}"})
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"AuthenticatedNSpecDAO",
+  "serve":true,
+  "serviceScript":"""
+    return new foam.dao.PMDAO(x,
+      new foam.nanos.auth.AuthorizationDAO(x,
+        x.get("nSpecDAO"),
+        new foam.nanos.auth.StandardAuthorizer("service")
+      )
+    );
+  """,
+  "client":"""
+    {
+      "of":"foam.nanos.boot.NSpec",
+      "cache":true,
+      "ttlSelectPurgeTime": 0,
+      "ttlPurgeTime": 0
+    }
+  """,
+  documentation:"The authenticated version of nSpecDAO - for dig and docs."
+})
 p({"class":"foam.nanos.boot.NSpec", "name":"http",                             "lazy":false, "service":{"class":"foam.nanos.jetty.HttpServer","port":8080,"forwardedForProxyWhitelist":[],"welcomeFiles":["/src/foam/nanos/controller/index.html"],"servletMappings":[{"class":"foam.nanos.servlet.ServletMapping","className":"foam.nanos.http.NanoRouter","pathSpec":"/service/*"},{"class":"foam.nanos.servlet.ServletMapping","className":"org.eclipse.jetty.servlet.DefaultServlet","pathSpec":"/*","initParameters":{"dirAllowed":"true","redirectWelcome":"true"}}]}})
 p({"class":"foam.nanos.boot.NSpec", "name":"httprouter",                         "serviceClass":"foam.nanos.http.NanoRouter"})
 p({"class":"foam.nanos.boot.NSpec", "name":"websockets",                       "lazy":false, "serviceClass":"foam.nanos.ws.NanoWebSocketServer"})
@@ -93,6 +77,7 @@ p({
   "name": "trace",
   "authenticate": false,
   "parameters": true,
+  "enabled": false,
   "serviceClass": "foam.nanos.http.TraceWebAgent"
 })
 
@@ -168,19 +153,19 @@ p({
 })
 
 p({
-  "class":"foam.nanos.boot.NSpec", 
-  "name":"cronScheduler",                    
-  "lazy":false, 
-  "serviceClass":"foam.nanos.cron.CronScheduler" 
+  "class":"foam.nanos.boot.NSpec",
+  "name":"cronScheduler",
+  "lazy":false,
+  "serviceClass":"foam.nanos.cron.CronScheduler"
 })
 
 p({
-  "class": "foam.nanos.boot.NSpec", 
+  "class": "foam.nanos.boot.NSpec",
   "name": "localUserDAO",
   "serviceScript": """
-    return 
-      new foam.dao.PMDAO(x, 
-      new foam.dao.SequenceNumberDAO(1000, 
+    return
+      new foam.dao.PMDAO(x,
+      new foam.dao.SequenceNumberDAO(1000,
       new foam.nanos.auth.PreventDuplicateEmailDAO.Builder(x).setDelegate(
         new foam.dao.java.JDAO(x, foam.nanos.auth.User.getOwnClassInfo(), \"users\")
       ).build()));
@@ -207,7 +192,8 @@ p({
   "client":"""
     {
       "of":"foam.nanos.auth.User",
-      "cache":false,
+      "ttlSelectPurgeTime": 15000,
+      "ttlPurgeTime": 0,
       "decorators": [{"class":"foam.nanos.fs.FileDAODecorator"}]
     }
   """
@@ -300,27 +286,56 @@ p({
     return new foam.nanos.http.RefreshWebAgent(memoryWebAgent);
   """
 })
-
 p({
   "class": "foam.nanos.boot.NSpec",
-  "name": "countryDAO",
+  "name": "localCountryDAO",
   "description": "A DAO which contains information about countries.",
-  "serve": true,
+  "serve": false,
   "authenticate": false,
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
       .setPm(true)
-      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer(\"countryDAO\"))
+      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("countryDAO"))
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName(\"countries\")
+      .setJournalName("countries")
       .setOf(foam.nanos.auth.Country.getOwnClassInfo())
       .setOrder(new foam.core.PropertyInfo[] {foam.nanos.auth.Country.NAME})
       .build();
+  """
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "countryDAO",
+  "serve": true,
+  "authenticate": false,
+  "serviceScript":
+  """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.auth.Country.getOwnClassInfo())
+      .setName("countries")
+      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("countryDAO"))
+      .setInnerDAO(x.get("localCountryDAO"))
+      .build();
   """,
-  "client": "{\"of\":\"foam.nanos.auth.Country\"}",
+  "client":
+  """
+    {
+      "of": "foam.nanos.auth.Country",
+      "cache": true,
+      "ttlSelectPurgeTime": 0,
+      "ttlPurgeTime": 0
+    }
+  """,
   "authNotes": "The \"authenticate\" flag is explicitly set to false because we want to be able to use the countryDAO to populate a dropdown in the sign up form. The DAO is decorated with an AuthenticatedDAO decorator with \"authenticateRead\" set to false so that anyone can read from countryDAO but only those with permission can write to or remove from it."
 })
-p({"class":"foam.nanos.boot.NSpec", "name":"countryService",                     "serve":true, "serviceClass":"foam.nanos.auth.CountryService"})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"countryService",
+  "serve":true,
+  "serviceClass":"foam.nanos.auth.CountryService"
+})
 
 p({"class":"foam.nanos.boot.NSpec", "name":"languageDAO",                        "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setPm(true).setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer(\"languageDAO\")).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"languages\").setOf(foam.nanos.auth.Language.getOwnClassInfo()).build();", "client":"{\"of\":\"foam.nanos.auth.Language\"}"})
 
@@ -365,7 +380,27 @@ p({
 })
 
 p({"class":"foam.nanos.boot.NSpec", "name":"historyDAO",                         "serve":true,  "serviceScript":"return new foam.dao.PMDAO(x, new foam.dao.java.JDAO(x, foam.dao.history.HistoryRecord.getOwnClassInfo(), \"historyRecords\"));","client":"{\"of\":\"foam.dao.history.HistoryRecord\"}"})
-p({"class":"foam.nanos.boot.NSpec", "name":"menuDAO",                            "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setName(\"menu\").setPm(true).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"menus\").setOf(foam.nanos.menu.Menu.getOwnClassInfo()).setOrder(new foam.core.PropertyInfo[] {foam.nanos.menu.Menu.ORDER, foam.nanos.menu.Menu.LABEL}).build().orderBy(foam.nanos.menu.Menu.ORDER);", "client":"{\"of\":\"foam.nanos.menu.Menu\",\"cache\":true}"})
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name" :"menuDAO",
+  "serve" :true,
+  "serviceScript":
+  """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setName("menu")
+      .setPm(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("menus")
+      .setOf(foam.nanos.menu.Menu.getOwnClassInfo())
+      .setOrder(new foam.core.PropertyInfo[] {foam.nanos.menu.Menu.ORDER, foam.nanos.menu.Menu.LABEL})
+      .build();
+  """,
+  "client": "{
+    \"of\":\"foam.nanos.menu.Menu\",
+    \"ttlSelectPurgeTime\": 0,
+    \"ttlPurgeTime\": 0,
+    \"cache\":true}"
+})
 
 p({"class":"foam.nanos.boot.NSpec", "name":"blobStore",                          "serviceClass":"foam.blob.BlobStore"})
 
@@ -441,22 +476,33 @@ p({
 
 p({
   "class":"foam.nanos.boot.NSpec",
-  "name":"documentDAO",
-  "lazy": true,
+  "name":"localDocumentDAO",
+
+  "serviceScript":
+  """
+  return new foam.dao.EasyDAO.Builder(x)
+    .setOf(foam.flow.Document.getOwnClassInfo())
+    .setInnerDAO(new foam.flow.DocumentationFolderDAO.Builder(x).build())
+    .build();
+  """
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "documentDAO",
   "serve": true,
   "serviceScript":
   """
-  return new foam.dao.ReadOnlyDAO.Builder(x).setDelegate(new foam.flow.DocumentationFolderDAO.Builder(x).build()).build();
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.flow.Document.getOwnClassInfo())
+      .setPermissionPrefix("flow")
+      .setInnerDAO(x.get("localDocumentDAO"))
+      .build();
   """,
-  "client":
-  """
-  {
-    "of":"foam.flow.Document"
-  }
-  """
+  "client": "{\"of\":\"foam.flow.Document\"\}"
 })
+
 p({"class":"foam.nanos.boot.NSpec", "name":"supportEmailDAO",                  "lazy":true, "serve":true, "serviceScript":"return new foam.dao.PMDAO(new foam.dao.SequenceNumberDAO(new foam.dao.java.JDAO(x, foam.support.model.SupportEmail.getOwnClassInfo(), \"supportEmails\")));","client":"{\"of\":\"foam.support.model.SupportEmail\"}"})
-p({"class":"foam.nanos.boot.NSpec", "name":"pop3",                             "lazy":true, "serve":true, "boxClass":"foam.nanos.notification.email.POP3EmailSkeleton", "serviceClass":"foam.nanos.notification.email.POP3EmailService","client":"{ \"class\":\"foam.nanos.notification.email.ClientPOP3EmailService\", \"delegate\": { \"class\":\"foam.box.HTTPBox\", \"url\":\"service/pop3\" } }"})
 
 p({
   "class": "foam.nanos.boot.NSpec",
@@ -526,9 +572,9 @@ p({
   """
 })
 p({
-  "class":"foam.nanos.boot.NSpec", 
+  "class":"foam.nanos.boot.NSpec",
   "name":"ruleHistoryDAO",
-  "serve":true,  
+  "serve":true,
   "serviceScript":"""
     return new foam.dao.EasyDAO.Builder(x)
       .setPm(true)
@@ -536,8 +582,8 @@ p({
       .setOf(foam.nanos.ruler.RuleHistory.getOwnClassInfo())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("ruleHistory")
-      .build(); 
-    """, 
+      .build();
+    """,
     "client":"{\"of\":\"foam.nanos.ruler.RuleHistory\"}"
 })
 //p({"class":"foam.nanos.boot.NSpec", "name":"ruleHistoryDAO",                     "serve":true,  "serviceScript":"dao = new foam.dao.EasyDAO.Builder(x).setPm(true).setSeqNo(true).setOf(foam.nanos.ruler.RuleHistory.getOwnClassInfo()).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"ruleHistory\").build(); ca = new foam.nanos.auth.CreatedAwareDAO.Builder(x).setDelegate(dao).build(); lma = new foam.nanos.auth.LastModifiedAwareDAO.Builder(x).setDelegate(ca).build(); return lma;", "client":"{\"of\":\"foam.nanos.ruler.RuleHistory\"}"})
@@ -722,17 +768,20 @@ p({
 
 p({
   "class": "foam.nanos.boot.NSpec",
-  "name": "notificationSettingDAO",
-  "serviceScript": """
+  "name": "localCurrencyDAO",
+  "serve": false,
+  "serviceScript":
+  """
     return new foam.dao.EasyDAO.Builder(x)
-      .setSeqNo(true)
+      .setOf(foam.core.Currency.getOwnClassInfo())
+      .setName("currency")
       .setPm(true)
+      .setPipelinePm(true)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName("notificationSettings")
-      .setOf(foam.nanos.notification.NotificationSetting.getOwnClassInfo())
+      .setJournalName("currencies")
+      .setIndex(new foam.core.PropertyInfo[] {foam.core.Currency.COUNTRY})
       .build();
-  """,
-  "client": "{\"of\":\"foam.nanos.notification.NotificationSetting\"}"
+  """
 })
 
 p({
@@ -742,20 +791,18 @@ p({
   "serviceScript":
   """
     return new foam.dao.EasyDAO.Builder(x)
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName("currencies")
-      .setPm(true)
-      .setPipelinePm(true)
       .setOf(foam.core.Currency.getOwnClassInfo())
       .setName("currency")
-      .setIndex(new foam.core.PropertyInfo[] {foam.core.Currency.COUNTRY})
+      .setInnerDAO(x.get("localCurrencyDAO"))
       .build();
   """,
   "client":
   """
     {
       "of": "foam.core.Currency",
-      "cache": true
+      "cache": true,
+      "ttlSelectPurgeTime": 0,
+      "ttlPurgeTime": 0
     }
   """
 })
