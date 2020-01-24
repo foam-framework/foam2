@@ -133,7 +133,7 @@ foam.CLASS({
         this.cache.removeAll();
         delete this.private_['delegate'];
       } else {
-        SUPER.cmd_(x, obj);
+        this.SUPER(x, obj);
       }
     }
   ],

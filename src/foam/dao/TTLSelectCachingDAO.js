@@ -94,7 +94,7 @@ foam.CLASS({
       if ( obj == this.PURGE ) {
         this.cache = {};
       } else {
-        SUPER.cmd_(x, obj);
+        this.SUPER(x, obj);
       }
     }
   ]
