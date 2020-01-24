@@ -191,7 +191,7 @@ foam.CLASS({
       toolTip: 'Refresh Table',
       icon: 'images/refresh-icon-black.svg',
       code: function(X) {
-        this.data.cmd_(X, foam.dao.CachingDAO.PURGE);
+        this.config.dao.cmd_(X, foam.dao.CachingDAO.PURGE);
         this.add(foam.u2.dialog.NotificationMessage.create({
           message: this.REFRESH_MSG
         }));
