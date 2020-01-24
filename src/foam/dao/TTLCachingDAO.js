@@ -21,6 +21,13 @@ foam.CLASS({
 
   imports: [ 'merged' ],
 
+  constants: [
+    {
+      name: 'PURGE',
+      value: 'PURGE'
+    }
+  ],
+
   properties: [
     {
       /** The cache to read items quickly. */
@@ -111,6 +118,14 @@ foam.CLASS({
       return self.src.removeAll_(x, skip, limit, order, predicate).then(function() {
         self.cache = {};
       });
+    },
+
+    function cmd_(x, obj) {
+      if ( obj == this.PURGE ) {
+        this.cache = {};
+      } else {
+        SUPER.cmd_(x, obj);
+      }
     }
   ]
 });

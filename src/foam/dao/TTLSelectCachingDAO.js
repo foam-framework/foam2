@@ -61,7 +61,7 @@ foam.CLASS({
       var key  = [sink, skip, limit, order, predicate].toString();
 
       if ( this.cache[key] ) {
-//        console.log('************************ CACHED: ', key);
+        // console.log('************************ CACHED: ', key);
         return Promise.resolve(this.cache[key]);
       }
 
@@ -88,8 +88,14 @@ foam.CLASS({
     function removeAll_(x, skip, limit, order, predicate) {
       this.cache = {};
       self.delegate.removeAll_(x, skip, limit, order, predicate);
-    }
+    },
 
-    // TODO: add cmd()
+    function cmd_(x, obj) {
+      if ( obj == this.PURGE ) {
+        this.cache = {};
+      } else {
+        SUPER.cmd_(x, obj);
+      }
+    }
   ]
 });
