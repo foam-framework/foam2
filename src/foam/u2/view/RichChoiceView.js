@@ -328,6 +328,26 @@ foam.CLASS({
       this.onDetach(this.data$.sub(this.onDataUpdate));
       this.onDataUpdate();
 
+      // Set up an event listener on the window so we can close the dropdown
+      // when the user clicks somewhere else.
+      var containerElement;
+      const fn = function(evt) {
+        var selfRect = (document.getElementById(self.id)).getClientRects()[0];
+        var containerRect = (document.getElementById(containerElement.id)).getClientRects()[0];
+        if (
+          ! (
+              evt.clientX >= selfRect.x &&
+              evt.clientX <= selfRect.x + selfRect.width &&
+              evt.clientY >= selfRect.y &&
+              evt.clientY <= containerRect.y + containerRect.height
+            )
+        ) {
+          self.isOpen_ = false;
+        }
+      };
+      window.addEventListener('click', fn);
+      this.onDetach(() => window.removeEventListener('click', fn));
+
       this
         .add(this.slot(function(mode, fullObject_) {
           if ( mode !== foam.u2.DisplayMode.RO ) {
@@ -361,6 +381,7 @@ foam.CLASS({
               .end()
               .start()
                 .addClass(this.myClass('container'))
+                .call(function() { containerElement = this; })
                 .show(self.isOpen_$)
                 .add(self.search$.map((searchEnabled) => {
                   if ( ! searchEnabled ) return null;
