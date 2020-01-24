@@ -298,7 +298,7 @@ foam.CLASS({
       documentation: 'Replaces choose from placeholder with passed in string.',
       expression: function(of) {
         var plural = of.model_.plural.toLowerCase();
-        return this.CHOOSE_FROM + plural + '...';
+        return this.CHOOSE_FROM + plural + ' ...';
       }
     },
     {
@@ -308,6 +308,12 @@ foam.CLASS({
         Optional. If this is provided, an action will be included at the bottom
         of the dropdown.
       `
+    },
+    {
+      class: 'String',
+      name: 'placeholder',
+      factory: function() { return this.choosePlaceholder; },
+      documentation: 'When provided the placeholder will be prepended to the selection list, and selected if the choices array is empty or no choice in the choices array is selected.'
     }
   ],
 
@@ -343,13 +349,15 @@ foam.CLASS({
                 .on('click', function() {
                   if ( self.mode === foam.u2.DisplayMode.RW ) {
                     self.isOpen_ = ! self.isOpen_;
+                    this.placeholder = self.placeholder;
                   }
                 })
                 .start()
                   .addClass(this.myClass('custom-selection-view'))
-                  .add(this.slot((data) => {
-                    return this.E().tag(self.selectionView, {
+                  .add(this.slot((data, isOpen_) => {
+                   return this.E().tag(self.selectionView, {
                       data: data,
+                      defaultSelectionPrompt: self.placeholder,
                       fullObject$: this.fullObject_$,
                       defaultSelectionPrompt$: this.choosePlaceholder$
                     });
@@ -392,7 +400,19 @@ foam.CLASS({
                         .start().hide(!! section.hideIfEmpty && resp[index].value <= 0 || ! section.heading)
                           .addClass(self.myClass('heading'))
                           .add(section.heading)
-                        .end()
+                          .end()
+                          .start()
+                            .addClass(self.myClass('selection-view'))
+                            .add('--------------------------')
+                                .callIf(! section.disabled, function() {
+                                  this.on('click', () => {
+                                    self.fullObject_ = undefined;
+                                    self.data = 0;
+                                    self.isOpen_ = false;
+                                    self.cross=true;
+                                  });
+                                })
+                          .end()
                         .start()
                           .select(section.filteredDAO$proxy, (obj) => {
                             return this.E()
