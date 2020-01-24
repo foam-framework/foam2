@@ -103,12 +103,14 @@ foam.CLASS({
                     var cls = foam.lookup(json.class);
                     var defaults = {
                       serviceName: 'service/' + spec.name,
-                      daoType: 'CLIENT',
-                      cache: true,
-                      ttlSelectPurgeTime: 15000, // for select()
-                      ttlPurgeTime: 15000,       // for find()
                       retryBoxMaxAttempts: 0
                     };
+                    if ( cls == foam.dao.EasyDAO ) {
+                      defaults.cache              = true,
+                      defaults.ttlSelectPurgeTime = 15000;    // for select()
+                      defaults.ttlPurgeTime       = 15000;    // for find()
+                      defaults.daoType            = 'CLIENT';
+                    }
                     for ( var k in defaults ) {
                       if ( cls.getAxiomByName(k) && ! json[k] )
                         json[k] = defaults[k];
