@@ -16,7 +16,9 @@ p({
   "client":"""
     {
       "of":"foam.nanos.boot.NSpec",
-      "cache":true
+      "cache":true,
+      "ttlSelectPurgeTime": 0,
+      "ttlPurgeTime": 0
     }
   """,
   documentation:"The authenticated version of nSpecDAO - for dig and docs."
@@ -190,7 +192,8 @@ p({
   "client":"""
     {
       "of":"foam.nanos.auth.User",
-      "cache":false,
+      "ttlSelectPurgeTime": 15000,
+      "ttlPurgeTime": 0,
       "decorators": [{"class":"foam.nanos.fs.FileDAODecorator"}]
     }
   """
@@ -319,7 +322,9 @@ p({
   """
     {
       "of": "foam.nanos.auth.Country",
-      "cache": true
+      "cache": true,
+      "ttlSelectPurgeTime": 0,
+      "ttlPurgeTime": 0
     }
   """,
   "authNotes": "The \"authenticate\" flag is explicitly set to false because we want to be able to use the countryDAO to populate a dropdown in the sign up form. The DAO is decorated with an AuthenticatedDAO decorator with \"authenticateRead\" set to false so that anyone can read from countryDAO but only those with permission can write to or remove from it."
@@ -390,7 +395,11 @@ p({
       .setOrder(new foam.core.PropertyInfo[] {foam.nanos.menu.Menu.ORDER, foam.nanos.menu.Menu.LABEL})
       .build();
   """,
-  "client": "{\"of\":\"foam.nanos.menu.Menu\",\"cache\":true}"
+  "client": "{
+    \"of\":\"foam.nanos.menu.Menu\",
+    \"ttlSelectPurgeTime\": 0,
+    \"ttlPurgeTime\": 0,
+    \"cache\":true}"
 })
 
 p({"class":"foam.nanos.boot.NSpec", "name":"blobStore",                          "serviceClass":"foam.blob.BlobStore"})
@@ -791,7 +800,9 @@ p({
   """
     {
       "of": "foam.core.Currency",
-      "cache": true
+      "cache": true,
+      "ttlSelectPurgeTime": 0,
+      "ttlPurgeTime": 0
     }
   """
 })
