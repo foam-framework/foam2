@@ -84,6 +84,10 @@ foam.CLASS({
     'foam.mlang.Expressions'
   ],
 
+  imports: [
+    'window'
+  ],
+
   exports: [
     'of'
   ],
@@ -330,10 +334,26 @@ foam.CLASS({
 
       // Set up an event listener on the window so we can close the dropdown
       // when the user clicks somewhere else.
-      var containerElement;
+      var containerU2Element;
       const fn = function(evt) {
-        var selfRect = (document.getElementById(self.id)).getClientRects()[0];
-        var containerRect = (document.getElementById(containerElement.id)).getClientRects()[0];
+        var selfDOMElement = self.el();
+        var containerDOMElement = containerU2Element.el();
+
+        // If an ancestor U2 Element was removed but didn't properly detach us,
+        // then the DOM elements will be removed but the listener will still be
+        // in place. Here we detect such a situation and remove the listener if
+        // it arises, preventing a memory leak.
+        if ( selfDOMElement == null || containerDOMElement == null ) {
+          self.window.removeEventListener('click', fn);
+          return;
+        }
+
+        var selfRect = selfDOMElement.getClientRects()[0];
+        var containerRect = containerDOMElement.getClientRects()[0];
+
+        // This prevents a console error when opening the dropdown.
+        if ( containerRect === undefined ) return;
+
         if (
           ! (
               evt.clientX >= selfRect.x &&
@@ -345,8 +365,8 @@ foam.CLASS({
           self.isOpen_ = false;
         }
       };
-      window.addEventListener('click', fn);
-      this.onDetach(() => window.removeEventListener('click', fn));
+      this.window.addEventListener('click', fn);
+      this.onDetach(() => this.window.removeEventListener('click', fn));
 
       this
         .add(this.slot(function(mode, fullObject_) {
@@ -381,7 +401,7 @@ foam.CLASS({
               .end()
               .start()
                 .addClass(this.myClass('container'))
-                .call(function() { containerElement = this; })
+                .call(function() { containerU2Element = this; })
                 .show(self.isOpen_$)
                 .add(self.search$.map((searchEnabled) => {
                   if ( ! searchEnabled ) return null;
