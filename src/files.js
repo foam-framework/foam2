@@ -251,7 +251,6 @@ FOAM_FILES([
   { name: "foam/dao/TTLCachingDAO"},
   { name: "foam/dao/TTLSelectCachingDAO"},
   { name: "foam/dao/CachingDAO" },
-  { name: "foam/dao/CacheType" },
   { name: "foam/dao/DeDupDAO" },
   { name: "foam/dao/LRUDAOManager" },
   { name: "foam/dao/SequenceNumberDAO" },

@@ -42,7 +42,6 @@ foam.CLASS({
     'foam.box.TimeoutBox',
     'foam.box.WebSocketBox',
     'foam.dao.CachingDAO',
-    'foam.dao.CacheType',
     'foam.dao.ClientDAO',
     'foam.dao.CompoundDAODecorator',
     'foam.dao.ContextualizingDAO',
@@ -63,6 +62,7 @@ foam.CLASS({
     'foam.dao.OrderedDAO',
     'foam.dao.PromisedDAO',
     'foam.dao.TTLCachingDAO',
+    'foam.dao.TTLSelectCachingDAO',
     'foam.dao.RequestResponseClientDAO',
     'foam.dao.SequenceNumberDAO',
     'foam.dao.SyncDAO',
@@ -319,29 +319,26 @@ foam.CLASS({
       class: 'Property'
     },
     {
-      /* deprecated: see cacheType */
       documentation: 'Enable local in-memory caching of the DAO',
       class: 'Boolean',
       name: 'cache',
       value: false,
-       generateJava: false
-   },
-    {
-      documentation: 'Enable local in-memory caching of the DAO',
-      class: 'foam.core.Enum',
-      of: 'foam.dao.CacheType',
-      name: 'cacheType',
-      value: 'NONE',
       generateJava: false
     },
     {
-      documentation: 'Time to wait before purging cache.',
+      documentation: 'Time to wait before purging cache on find().',
       class: 'Long',
-      name: 'purgeTime',
+      name: 'ttlPurgeTime',
       units: 'ms',
-      value: 15000,
       generateJava: false
-     },
+    },
+    {
+      documentation: 'Time to wait before purging cache on select().',
+      class: 'Long',
+      name: 'ttlSelectPurgeTime',
+      units: 'ms',
+      generateJava: false
+    },
     {
       documentation: 'Enable authorization',
       class: 'Boolean',
@@ -694,27 +691,40 @@ foam.CLASS({
         this.mdao = dao;
         if ( this.dedup ) dao = this.DeDupDAO.create({delegate: dao});
       } else {
-        if ( this.cache ||
-             this.cacheType == foam.dao.CacheType.FULL ) {
-          this.mdao = this.MDAO.create({of: params.of});
+        if ( this.cache ) {
+          if ( this.ttlPurgeTime <= 0 &&  this.ttlSelectPurgeTime <= 0 ) {
+            this.mdao = this.MDAO.create({of: params.of});
 
-          var cache = this.mdao;
-          if ( this.dedup ) cache = this.DeDupDAO.create({delegate: cache});
-          if ( Array.isArray(this.order) && this.order.length > 0 ) cache = this.OrderedDAO.create({
-            delegate: cache,
-            comparator: foam.compare.toCompare(this.order)
-          });
+            var cache = this.mdao;
+            if ( this.dedup ) cache = this.DeDupDAO.create({delegate: cache});
+            if ( Array.isArray(this.order) && this.order.length > 0 ) cache = this.OrderedDAO.create({
+              delegate: cache,
+              comparator: foam.compare.toCompare(this.order)
+            });
 
-          dao = this.CachingDAO.create({
-            cache: cache,
-            src: dao,
-            of: this.model
-          });
-        } else if ( this.cacheType == foam.dao.CacheType.TTL ) {
-          dao = this.TTLCachingDAO.create({
-            delegate: dao,
-            purgeTime: this.purgeTime
-          });
+            // Full cache
+            dao = this.CachingDAO.create({
+              cache: cache,
+              src: dao,
+              of: this.model
+            });
+          }
+
+          // TTL find cache
+          if ( this.ttlPurgeTime > 0 )  {
+            dao = this.TTLCachingDAO.create({
+              delegate: dao,
+              purgeTime: this.ttlPurgeTime
+            });
+          }
+
+          // TTL select cache
+          if ( this.ttlSelectPurgeTime > 0 ) {
+            dao = this.TTLSelectCachingDAO.create({
+              delegate: dao,
+              purgeTime: this.ttlSelectPurgeTime
+            });
+          }
         }
       }
 
@@ -767,7 +777,7 @@ foam.CLASS({
         });
         dao.syncRecordDAO = foam.dao.EasyDAO.create({
           of: dao.SyncRecord,
-          cacheType: foam.dao.CacheType.FULL,
+          cache: true,
           daoType: this.daoType,
           name: this.name + '_SyncRecords'
         });
