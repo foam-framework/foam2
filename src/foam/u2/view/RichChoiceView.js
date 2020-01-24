@@ -233,6 +233,18 @@ foam.CLASS({
       documentation: `
         An internal property used to determine whether the options list is
         visible or not.
+      `,
+      postSet: function(_, nv) {
+        if ( nv && ! this.hasBeenOpenedYet_ ) this.hasBeenOpenedYet_ = true;
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'hasBeenOpenedYet_',
+      documentation: `
+        Used internally to keep track of whether the dropdown has been opened
+        yet or not. We don't want to waste resources pulling from the DAO until
+        we know the user is going to interact with this dropdown.
       `
     },
     {
@@ -399,69 +411,71 @@ foam.CLASS({
                   .addClass(this.myClass('chevron'))
                 .end()
               .end()
-              .start()
-                .addClass(this.myClass('container'))
-                .call(function() { containerU2Element = this; })
-                .show(self.isOpen_$)
-                .add(self.search$.map((searchEnabled) => {
-                  if ( ! searchEnabled ) return null;
-                  return this.E()
-                    .start()
-                      .start('img')
-                        .attrs({ src: 'images/ic-search.svg' })
-                      .end()
-                      .startContext({ data: self })
-                        .addClass('search')
-                        .add(self.FILTER_.clone().copyFrom({ view: {
-                          class: 'foam.u2.view.TextField',
-                          placeholder: this.searchPlaceholder,
-                          onKey: true
-                        } }))
-                      .endContext()
-                    .end();
-                }))
-                .add(this.slot(function(sections) {
-                  var promiseArray = [];
-                  sections.forEach(function(section) {
-                    promiseArray.push(section.dao.select(self.COUNT()));
-                  });
-      
-                  return Promise.all(promiseArray).then((resp) => {
-                    var index = 0;
-                    return this.E().forEach(sections, function(section) {
-                      this.addClass(self.myClass('setAbove'))
-                        .start().hide(!! section.hideIfEmpty && resp[index].value <= 0 || ! section.heading)
-                          .addClass(self.myClass('heading'))
-                          .add(section.heading)
-                        .end()
-                        .start()
-                          .select(section.filteredDAO$proxy, (obj) => {
-                            return this.E()
-                              .start(self.rowView, { data: obj })
-                                .enableClass('disabled', section.disabled)
-                                .callIf(! section.disabled, function() {
-                                  this.on('click', () => {
-                                    self.fullObject_ = obj;
-                                    self.data = obj.id;
-                                    self.isOpen_ = false;
-                                  });
-                                })
-                              .end();
-                          })
-                        .end();
-                        index++;
-                    });
-                  });
-                }))
-                .add(this.slot(function(action) {
-                  if ( action ) {
+              .add(this.slot(function(hasBeenOpenedYet_) {
+                if ( ! hasBeenOpenedYet_ ) return this.E();
+                return this.E()
+                  .addClass(self.myClass('container'))
+                  .call(function() { containerU2Element = this; })
+                  .show(self.isOpen_$)
+                  .add(self.search$.map((searchEnabled) => {
+                    if ( ! searchEnabled ) return null;
                     return this.E()
-                      .start(self.DefaultActionView, { action: action })
-                        .addClass(self.myClass('action'))
+                      .start()
+                        .start('img')
+                          .attrs({ src: 'images/ic-search.svg' })
+                        .end()
+                        .startContext({ data: self })
+                          .addClass('search')
+                          .add(self.FILTER_.clone().copyFrom({ view: {
+                            class: 'foam.u2.view.TextField',
+                            placeholder: this.searchPlaceholder,
+                            onKey: true
+                          } }))
+                        .endContext()
                       .end();
-                  }
-                }))
-              .end();
+                  }))
+                  .add(self.slot(function(sections) {
+                    var promiseArray = [];
+                    sections.forEach(function(section) {
+                      promiseArray.push(section.dao.select(self.COUNT()));
+                    });
+
+                    return Promise.all(promiseArray).then((resp) => {
+                      var index = 0;
+                      return this.E().forEach(sections, function(section) {
+                        this.addClass(self.myClass('setAbove'))
+                          .start().hide(!! section.hideIfEmpty && resp[index].value <= 0 || ! section.heading)
+                            .addClass(self.myClass('heading'))
+                            .add(section.heading)
+                          .end()
+                          .start()
+                            .select(section.filteredDAO$proxy, (obj) => {
+                              return this.E()
+                                .start(self.rowView, { data: obj })
+                                  .enableClass('disabled', section.disabled)
+                                  .callIf(! section.disabled, function() {
+                                    this.on('click', () => {
+                                      self.fullObject_ = obj;
+                                      self.data = obj.id;
+                                      self.isOpen_ = false;
+                                    });
+                                  })
+                                .end();
+                            })
+                          .end();
+                          index++;
+                      });
+                    });
+                  }))
+                  .add(this.slot(function(action) {
+                    if ( action ) {
+                      return this.E()
+                        .start(self.DefaultActionView, { action: action })
+                          .addClass(self.myClass('action'))
+                        .end();
+                    }
+                  }));
+              }))
           } else {
             return self.E().add(fullObject_ ? fullObject_.toSummary() : '');
           }
