@@ -692,7 +692,7 @@ foam.CLASS({
         if ( this.dedup ) dao = this.DeDupDAO.create({delegate: dao});
       } else {
         if ( this.cache ) {
-          if ( this.ttlPurgeTime <= 0 &&  this.ttlSelectPurgeTime <= 0 ) {
+          if ( this.ttlPurgeTime <= 0 && this.ttlSelectPurgeTime <= 0 ) {
             this.mdao = this.MDAO.create({of: params.of});
 
             var cache = this.mdao;
@@ -768,8 +768,8 @@ foam.CLASS({
 
         dao = this.SyncDAO.create({
           remoteDAO: this.RequestResponseClientDAO.create({
-              name: this.name,
-              delegate: this.serverBox
+            name: this.name,
+            delegate: this.serverBox
           }, boxContext),
           syncProperty: this.syncProperty,
           delegate: dao,
