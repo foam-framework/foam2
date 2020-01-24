@@ -96,6 +96,10 @@ foam.CLASS({
     {
       name: 'CHOOSE_FROM',
       message: 'Choose from '
+    },
+    {
+      name: 'CLEAR_SELECTION',
+      message: 'Clear Selection'
     }
   ],
 
@@ -177,7 +181,8 @@ foam.CLASS({
       width: 100%;
     }
 
-    ^ .search input {
+    ^ .search input,
+    ^clear-btn {
       width: 100%;
       border: none;
       padding-left: %INPUTHORIZONTALPADDING%;
@@ -201,6 +206,15 @@ foam.CLASS({
 
     ^ .disabled:hover {
       cursor: default;
+    }
+
+    ^clear-btn {
+      background-color: /*%GREY4%*/ #e7eaec;
+    }
+
+    ^clear-btn:hover {
+      color: /*%DESTRUCTIVE3%*/ #d9170e;
+      cursor: pointer;
     }
   `,
 
@@ -324,6 +338,13 @@ foam.CLASS({
         Optional. If this is provided, an action will be included at the bottom
         of the dropdown.
       `
+    },
+    {
+      class: 'Boolean',
+      name: 'allowClearingSelection',
+      documentation: `
+        Set to true if you want the user to be able to clear their selection.
+      `
     }
   ],
 
@@ -348,6 +369,9 @@ foam.CLASS({
       // when the user clicks somewhere else.
       var containerU2Element;
       const fn = function(evt) {
+        // This prevents a console error when opening the dropdown.
+        if ( containerU2Element === undefined ) return;
+
         var selfDOMElement = self.el();
         var containerDOMElement = containerU2Element.el();
 
@@ -362,9 +386,6 @@ foam.CLASS({
 
         var selfRect = selfDOMElement.getClientRects()[0];
         var containerRect = containerDOMElement.getClientRects()[0];
-
-        // This prevents a console error when opening the dropdown.
-        if ( containerRect === undefined ) return;
 
         if (
           ! (
@@ -434,6 +455,13 @@ foam.CLASS({
                         .endContext()
                       .end();
                   }))
+                  .add(self.slot(function(allowClearingSelection) {
+                    if ( ! allowClearingSelection ) return null;
+                    return this.E('button')
+                      .addClass(self.myClass('clear-btn'))
+                      .on('click', self.clearSelection)
+                      .add(self.CLEAR_SELECTION)
+                  }))
                   .add(self.slot(function(sections) {
                     var promiseArray = [];
                     sections.forEach(function(section) {
@@ -499,6 +527,11 @@ foam.CLASS({
           });
         }
       }
+    },
+    function clearSelection() {
+      this.data = undefined;
+      this.fullObject_ = undefined;
+      this.isOpen_ = false;
     }
   ],
 
