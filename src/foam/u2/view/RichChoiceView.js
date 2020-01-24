@@ -349,15 +349,13 @@ foam.CLASS({
                 .on('click', function() {
                   if ( self.mode === foam.u2.DisplayMode.RW ) {
                     self.isOpen_ = ! self.isOpen_;
-                    this.placeholder = self.placeholder;
                   }
                 })
                 .start()
                   .addClass(this.myClass('custom-selection-view'))
                   .add(this.slot((data, isOpen_) => {
-                   return this.E().tag(self.selectionView, {
+                    return this.E().tag(self.selectionView, {
                       data: data,
-                      defaultSelectionPrompt: self.placeholder,
                       fullObject$: this.fullObject_$,
                       defaultSelectionPrompt$: this.choosePlaceholder$
                     });
@@ -400,19 +398,18 @@ foam.CLASS({
                         .start().hide(!! section.hideIfEmpty && resp[index].value <= 0 || ! section.heading)
                           .addClass(self.myClass('heading'))
                           .add(section.heading)
-                          .end()
-                          .start()
-                            .addClass(self.myClass('selection-view'))
-                            .add('--------------------------')
-                                .callIf(! section.disabled, function() {
-                                  this.on('click', () => {
-                                    self.fullObject_ = undefined;
-                                    self.data = 0;
-                                    self.isOpen_ = false;
-                                    self.cross=true;
-                                  });
-                                })
-                          .end()
+                        .end()
+                        .start()
+                          .addClass(self.myClass('selection-view'))
+                          .add(self.placeholder)
+                            .callIf(! section.disabled, function() {
+                              this.on('click', () => {
+                                self.fullObject_ = undefined;
+                                self.data = 0;
+                                self.isOpen_ = false;
+                              });
+                            })
+                        .end()
                         .start()
                           .select(section.filteredDAO$proxy, (obj) => {
                             return this.E()
