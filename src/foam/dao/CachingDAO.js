@@ -129,9 +129,11 @@ foam.CLASS({
     },
 
     function cmd_(x, obj) {
-      if ( obj == 'PURGE' ) {
+      if ( obj == this.PURGE ) {
         this.cache.removeAll();
         delete this.private_['delegate'];
+      } else {
+        SUPER.cmd_(x, obj);
       }
     }
   ],
