@@ -348,6 +348,9 @@ foam.CLASS({
       // when the user clicks somewhere else.
       var containerU2Element;
       const fn = function(evt) {
+        // This prevents a console error when opening the dropdown.
+        if ( containerU2Element === undefined ) return;
+
         var selfDOMElement = self.el();
         var containerDOMElement = containerU2Element.el();
 
@@ -362,9 +365,6 @@ foam.CLASS({
 
         var selfRect = selfDOMElement.getClientRects()[0];
         var containerRect = containerDOMElement.getClientRects()[0];
-
-        // This prevents a console error when opening the dropdown.
-        if ( containerRect === undefined ) return;
 
         if (
           ! (
