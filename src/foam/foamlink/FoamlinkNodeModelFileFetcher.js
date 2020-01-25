@@ -31,7 +31,7 @@ foam.CLASS({
           // TODO: anything but this terrible array thing
           ret(['withsource', {
             text: js,
-            source: path
+            source: require('path').relative(process.cwd(), path)
           }]);
         } catch(e) {
           console.error(e);
