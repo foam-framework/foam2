@@ -397,6 +397,9 @@ foam.CLASS({
         var selfRect = selfDOMElement.getClientRects()[0];
         var containerRect = containerDOMElement.getClientRects()[0];
 
+        // This prevents a console error when making a selection.
+        if ( containerRect === undefined ) return;
+
         if (
           ! (
               evt.clientX >= selfRect.x &&
