@@ -10,7 +10,7 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
 
   documentation: 'A DAO decorator to run authorization checks.',
-  
+
   javaImports: [
     'foam.core.FObject',
     'foam.core.X',
@@ -21,7 +21,7 @@ foam.CLASS({
     'static foam.mlang.MLang.IS_AUTHORIZED_TO_READ',
     'static foam.mlang.MLang.IS_AUTHORIZED_TO_DELETE'
   ],
-  
+
   axioms: [
     {
       name: 'javaExtras',
@@ -85,7 +85,7 @@ foam.CLASS({
       name: 'find_',
       javaCode: `
     if ( id == null ) return null;
-    if ( getAuthorizer().checkGlobalRead(x) ) return super.find_(x, id);
+    if ( getAuthorizer().checkGlobalRead(x, null) ) return super.find_(x, id);
 
     FObject obj = super.find_(x, id);
     if ( obj != null ) getAuthorizer().authorizeOnRead(x, obj);
@@ -95,7 +95,7 @@ foam.CLASS({
     {
       name: 'select_',
       javaCode: `
-    if ( ! getAuthorizer().checkGlobalRead(x) ) predicate = augmentPredicate(x, false, predicate);
+    if ( ! getAuthorizer().checkGlobalRead(x, predicate) ) predicate = augmentPredicate(x, false, predicate);
     return super.select_(x, sink, skip, limit, order, predicate);
  `
     },

@@ -108,7 +108,7 @@ foam.CLASS({
       name: 'expanded',
       expression: function(isAutoExpandedByDefault, childNodesForAutoExpansion, childNodes) {
         if ( isAutoExpandedByDefault ) {
-          return childNodes < childNodesForAutoExpansion;
+          return childNodes.length < childNodesForAutoExpansion;
         }
         return false;
       },

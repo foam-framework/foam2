@@ -54,7 +54,7 @@ describe('MDAO with TreeIndex', function() {
       package: 'test',
       name: 'Album',
       properties: [
-        { name: 'id', name: 'id' },
+        { name: 'id' },
         { class: 'Boolean', name: 'isLocal' },
         { class: 'Boolean', name: 'byAction' },
         { class: 'Date', name: 'timestamp' },

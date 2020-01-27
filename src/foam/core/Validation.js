@@ -102,7 +102,8 @@ foam.CLASS({
         }
         return !required ? null : [[name],
           function() {
-            return !this.hasOwnProperty(name) && (`Please enter ${label.toLowerCase()}`);
+            const axiom = this.cls_.getAxiomByName(name);
+            return axiom.isDefaultValue(this[name]) && (`Please enter ${label.toLowerCase()}`);
           }]
       },
     },

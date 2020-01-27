@@ -700,7 +700,25 @@ foam.CLASS({
           value.value = this.arg1.adapt.call(null, old, value.value, arg1);
 
         return value;
-      }
+      },
+      javaPreSet: `
+        // Temporary Fix
+        if ( val instanceof foam.mlang.Constant ) {
+
+          foam.mlang.Constant c = (foam.mlang.Constant) val;
+          Object value = c.getValue();
+
+          // TODO: add castObject() method to PropertyInfo and use instead
+          if ( getArg1() instanceof foam.core.AbstractLongPropertyInfo ) {
+            foam.core.PropertyInfo prop1 = (foam.core.PropertyInfo) getArg1();
+            if ( value instanceof String ) {
+              c.setValue(Long.valueOf((String) value));
+            } else if ( value instanceof Number ) {
+              c.setValue(((Number) value).longValue());
+            }
+          }
+        }
+      `
     }
   ],
 
@@ -892,19 +910,17 @@ return stmt.toString();`
       javaCode:
         `java.util.List<Predicate> args = new java.util.ArrayList<>();
 boolean update = false;
-True TRUE = new True();
-False FALSE = new False();
 for ( int i = 0; i < this.args_.length; i++ ) {
   Predicate arg = this.args_[i];
   Predicate newArg = this.args_[i].partialEval();
-  if ( newArg instanceof True ) return TRUE;
+  if ( newArg == foam.mlang.MLang.TRUE ) return foam.mlang.MLang.TRUE;
   if ( newArg instanceof Or ) {
     for ( int j = 0; j < ( ( (Or) newArg ).args_.length ); j++ ) {
       args.add(( (Or) newArg ).args_[j]);
     }
     update = true;
   } else {
-    if ( newArg instanceof False || arg == null ) {
+    if ( newArg == foam.mlang.MLang.FALSE || arg == null ) {
       update = true;
     } else {
       args.add(newArg);
@@ -912,7 +928,7 @@ for ( int i = 0; i < this.args_.length; i++ ) {
     }
   }
 }
-if ( args.size() == 0 ) return TRUE;
+if ( args.size() == 0 ) return foam.mlang.MLang.TRUE;
 if ( args.size() == 1 ) return args.get(0);
 if ( update ) {
   Predicate newArgs[] = new Predicate[args.size()];
@@ -1010,7 +1026,7 @@ return stmt.toString();`
         var updated = false;
 
         var FALSE = foam.mlang.predicate.False.create();
-        var TRUE = foam.mlang.predicate.True.create();
+        var TRUE  = foam.mlang.predicate.True.create();
 
         for ( var i = 0; i < this.args.length; i++ ) {
           var a    = this.args[i];
@@ -1045,19 +1061,17 @@ return stmt.toString();`
       javaCode:
         `java.util.List<Predicate> args = new java.util.ArrayList<>();
 boolean update = false;
-True TRUE = new True();
-False FALSE = new False();
 for ( int i = 0; i < this.args_.length; i++ ) {
   Predicate arg = this.args_[i];
   Predicate newArg = this.args_[i].partialEval();
-  if ( newArg instanceof False ) return FALSE;
+  if ( newArg == foam.mlang.MLang.FALSE ) return foam.mlang.MLang.FALSE;
   if ( newArg instanceof And ) {
     for ( int j = 0; j < ( ( (And) newArg ).args_.length ); j++ ) {
       args.add(( (And) newArg ).args_[j]);
     }
     update = true;
   } else {
-    if ( newArg instanceof True || newArg == null ) {
+    if ( newArg == foam.mlang.MLang.TRUE || newArg == null ) {
       update = true;
     } else {
       args.add(newArg);
@@ -1065,7 +1079,7 @@ for ( int i = 0; i < this.args_.length; i++ ) {
     }
   }
 }
-if ( args.size() == 0 ) return TRUE;
+if ( args.size() == 0 ) return foam.mlang.MLang.TRUE;
 if ( args.size() == 1 ) return args.get(0);
 if ( update ) {
   Predicate newArgs[] = new Predicate[args.size()];
@@ -2357,7 +2371,7 @@ return false;`
 
         try {
           var props = obj.cls_.getAxiomsByClass(this.String);
-          for ( var i = 0; i < props.length; i++ ) {
+          for ( let i = 0; i < props.length; i++ ) {
             s = props[i].f(obj);
             if ( ! s || typeof s !== 'string' ) continue;
             if ( s.toLowerCase().includes(arg) ) return true;
@@ -2365,7 +2379,7 @@ return false;`
 
           if ( checkSubObjects ) {
             var objectProps = obj.cls_.getAxiomsByClass(this.FObjectProperty);
-            for ( var i = 0; i < objectProps.length; i++ ) {
+            for ( let i = 0; i < objectProps.length; i++ ) {
               var prop = objectProps[i];
               var subObject = prop.f(obj);
               if ( this.fInner_(subObject, false) ) return true;
@@ -2373,19 +2387,19 @@ return false;`
           }
 
           var longProps = obj.cls_.getAxiomsByClass(this.Long);
-          for ( var i = 0; i < longProps.length; i++ ) {
+          for ( let i = 0; i < longProps.length; i++ ) {
             var s = (longProps[i]).toString();
             if ( s.toLowerCase().includes(arg) ) return true;
           }
 
           var enumProps = obj.cls_.getAxiomsByClass(this.Enum);
-          for ( var i = 0; i < enumProps.length; i++ ) {
+          for ( let i = 0; i < enumProps.length; i++ ) {
             var s = (enumProps[i]).label;
             if ( s.toLowerCase().includes(arg) ) return true;
           }
 
           var dateProps = obj.cls_.getAxiomsByClass(this.Date);
-          for ( var i = 0; i < dateProps.length; i++ ) {
+          for ( let i = 0; i < dateProps.length; i++ ) {
             var s = (dateProps[i]).toISOString();
             if ( s.toLowerCase().includes(arg) ) return true;
           }
@@ -3404,7 +3418,8 @@ foam.CLASS({
     },
     function THEN_BY(a, b) { return this.ThenBy.create({head: a, tail: b}); },
 
-    function INSTANCE_OF(cls) { return this.IsInstanceOf.create({ targetClass: cls }); }
+    function INSTANCE_OF(cls) { return this.IsInstanceOf.create({ targetClass: cls }); },
+    function CLASS_OF(cls) { return this.IsClassOf.create({ targetClass: cls }); }
   ]
 });
 

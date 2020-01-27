@@ -5,12 +5,12 @@
  */
 
 /**
- * Time To Live (TTL) Caching DAO only caches find() operations
+ * Time To Live (TTL) Select Caching DAO only caches select() operations
  * for a limited amount of time.
 */
 foam.CLASS({
   package: 'foam.dao',
-  name: 'TTLCachingDAO',
+  name: 'TTLSelectCachingDAO',
   extends: 'foam.dao.ProxyDAO',
 
   requires: [
@@ -20,13 +20,6 @@ foam.CLASS({
   ],
 
   imports: [ 'merged' ],
-
-  constants: [
-    {
-      name: 'PURGE',
-      value: 'PURGE'
-    }
-  ],
 
   properties: [
     {
@@ -42,6 +35,11 @@ foam.CLASS({
        value: 25000
      },
      {
+       class: 'Long',
+       name: 'maxCacheSize',
+       value: 100
+     },
+     {
        name: 'purgeCache',
        transient: true,
        expression: function(purgeTime) {
@@ -51,51 +49,28 @@ foam.CLASS({
   ],
 
   methods: [
-    function find_(x, key) {
-      var id          = this.of.isInstance(key) ? key.id : key;
-      var cachedValue = this.cache[id];
-      var self        = this;
-
-      if ( foam.Undefined.isInstance(cachedValue) ) {
-        return new Promise(function (resolve, reject) {
-          self.delegate.find_(x, key).then(function(o) {
-            self.cache[id] = o || null;
-            // console.log('*************** CACHING ', id, self.cache[id]);
-            self.purgeCache();
-            resolve(o);
-          });
-        });
-      }
-
-      // console.log('*************** CACHED VALUE', id);
-      return Promise.resolve(cachedValue ? cachedValue.clone(x) : null);
-    },
-
     /** Puts are sent to the cache and to the source, ensuring both
       are up to date. */
     function put_(x, o) {
-      var self = this;
-      // ensure the returned object from src is cached.
-      return self.delegate.put(o).then(function(srcObj) {
-        self.cache[o.id] = srcObj;
-        return srcObj;
-      });
+      this.cache = {};
+      return this.delegate.put_(x, o);
     },
 
     function select_(x, sink, skip, limit, order, predicate) {
       var self = this;
+      var key  = [sink, skip, limit, order, predicate].toString();
+
+      if ( this.cache[key] ) {
+        // console.log('************************ CACHED: ', key);
+        return Promise.resolve(this.cache[key]);
+      }
 
       return new Promise(function (resolve, reject) {
         self.delegate.select_(x, sink, skip, limit, order, predicate).then(function(s) {
-          if ( foam.dao.ArraySink.isInstance(s) ) {
-            var a = s.array;
-            for ( var i = 0 ; i < a.length ; i++ ) {
-              var o = a[i];
-              // console.log('***** caching from select ', o.id);
-              self.cache[o.id] = o;
-            }
-            self.purgeCache();
-          }
+          self.cache[key] = s;
+//          console.log('************************ CACHING: ', key);
+          // TODO: check if cache is > maxCacheSize and remove oldest entry if it is
+          self.purgeCache();
           resolve(s);
         });
       });
@@ -104,20 +79,15 @@ foam.CLASS({
     /** Removes are sent to the cache and to the source, ensuring both
       are up to date. */
     function remove_(x, o) {
-      var self = this;
-      return self.delegate.remove(o).then(function() {
-        self.cache.remove(o);
-        return o;
-      });
+      this.cache = {};
+      return self.delegate.remove_(x, o);
     },
 
     /** removeAll is executed on the cache and the source, ensuring both
       are up to date. */
     function removeAll_(x, skip, limit, order, predicate) {
-      var self = this;
-      return self.src.removeAll_(x, skip, limit, order, predicate).then(function() {
-        self.cache = {};
-      });
+      this.cache = {};
+      self.delegate.removeAll_(x, skip, limit, order, predicate);
     },
 
     function cmd_(x, obj) {

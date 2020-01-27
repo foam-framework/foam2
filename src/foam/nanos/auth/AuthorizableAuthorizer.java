@@ -8,13 +8,14 @@ package foam.nanos.auth;
 
 import foam.core.FObject;
 import foam.core.X;
+import foam.mlang.predicate.Predicate;
 import foam.nanos.auth.AuthorizationException;
 
 public class AuthorizableAuthorizer implements Authorizer {
 
   protected String permissionPrefix_;
 
-  public AuthorizableAuthorizer(String permissionPrefix) {  
+  public AuthorizableAuthorizer(String permissionPrefix) {
     permissionPrefix_ = permissionPrefix;
   }
 
@@ -50,7 +51,7 @@ public class AuthorizableAuthorizer implements Authorizer {
     return permissionPrefix_ + "." + op + "." + id;
   }
 
-  public boolean checkGlobalRead(X x) {
+  public boolean checkGlobalRead(X x, Predicate predicate) {
     String permission = createPermission("read", "*");
     AuthService authService = (AuthService) x.get("auth");
     try {

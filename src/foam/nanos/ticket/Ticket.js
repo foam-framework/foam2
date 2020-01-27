@@ -124,7 +124,7 @@ foam.CLASS({
         if ( 'CLOSED' == this.status ) {
           s.push(['CLOSED', 'CLOSED']);
         } else {
-          s.push(this.status),
+          s.push(this.status);
           s.push(['CLOSED', 'CLOSED']);
         }
         return s;
