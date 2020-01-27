@@ -11,32 +11,14 @@ foam.CLASS({
 
   requires: [
     'foam.core.ArraySlot',
-    'foam.u2.borders.CardBorder',
     'foam.u2.detail.SectionView',
-    'foam.u2.layout.Grid',
-    'foam.u2.layout.GUnit',
-    'foam.u2.Tab',
-    'foam.u2.Tabs',
     'foam.u2.view.ChoiceView'
   ],
 
   css: `
-    ^ .foam-u2-Tabs-content > div {
-      background: white;
-      padding: 14px 16px
-      overflow-x: scroll;
-      white-space: nowrap;
-    }
-
     ^ .foam-u2-view-ScrollTableView table {
       width: 100%;
     }
-
-    ^ .foam-u2-Tabs-tabRow {
-      overflow-x: scroll;
-      white-space: nowrap;
-    }
-
     ^ .foam-u2-tag-Select {
         text-align-last:center;
       }
@@ -63,14 +45,8 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'String',
-      name: 'defaultSectionLabel',
-      value: 'Uncategorized'
-    },
-    {
       name: 'currentIndex',
       preSet: function(o,n) {
-        debugger;
         if ( n < 1 ) return 0;
         if ( n >= this.newSections.length ) return this.newSections.length - 1;
         return n;
@@ -78,7 +54,7 @@ foam.CLASS({
       value: 0
     },
     {
-      name: 'newSections',
+      name: 'newSections'
     }
   ],
 
@@ -109,9 +85,9 @@ foam.CLASS({
                     }).end()
                     .tag(this.ChoiceView, {
                       choices: sections.filter( (s,i) => {
-                        return visibilities[i]
+                        return visibilities[i];
                       }).map( (s,i) => [i,s.title] ),
-                      data$: self.currentIndex$,
+                      data$: self.currentIndex$
                     })
                     .start('button').addClass('action-button').add('>').on('click', () => {
                       this.currentIndex += 1;
