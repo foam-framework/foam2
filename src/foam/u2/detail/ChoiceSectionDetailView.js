@@ -26,21 +26,21 @@ foam.CLASS({
         text-align-last:center;
       }
 
-    .choicePosition {
-      text-align: center;
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .action-button {
-      width: 100px;
-      font-size: 20px;
-      font-weight: bold;
-      padding: 5px;
-      border-radius: 10px;
-    }
+      .choicePosition {
+        align-items: center;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        text-align: center;
+      }
+  
+      .action-button {
+        border-radius: 10px;
+        font-size: 20px;
+        font-weight: bold;
+        padding: 5px;
+        width: 100px;
+      }
   `,
 
   properties: [
