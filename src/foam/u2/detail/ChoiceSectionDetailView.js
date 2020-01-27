@@ -84,6 +84,11 @@ foam.CLASS({
                   .start().addClass('choicePosition')
                     .start('button').addClass('action-button').add('<').on('click', () => {
                       this.currentIndex -= 1;
+                    })
+                    .attrs({
+                      disabled: self.slot(function (currentIndex) {
+                        return currentIndex === 0
+                      })
                     }).end()
                     .tag(this.ChoiceView, {
                       choices: self.visibleSections.map((s, i) => [i, s.title]),
@@ -91,6 +96,11 @@ foam.CLASS({
                     })
                     .start('button').addClass('action-button').add('>').on('click', () => {
                       this.currentIndex += 1;
+                    })
+                    .attrs({
+                      disabled: self.slot(function (currentIndex) {
+                        return currentIndex === self.visibleSections.length - 1
+                      })
                     }).end()
                   .end()
                 .endContext()
