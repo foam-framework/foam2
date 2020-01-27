@@ -87,8 +87,8 @@ foam.CLASS({
     ^error .foam-u2-FloatView,
     ^error .foam-u2-DateView,
     ^error .foam-u2-view-date-DateTimePicker .date-display-box,
-    ^error .foam-u2-view-RichChoiceView-selection-view
-
+    ^error .foam-u2-view-RichChoiceView-selection-view,
+    ^error .foam-u2-view-RichChoiceView-clear-btn
     {
       border-color: /*%DESTRUCTIVE3%*/ #d9170e !important;
     }
