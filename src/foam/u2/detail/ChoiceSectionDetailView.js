@@ -86,8 +86,8 @@ foam.CLASS({
                       this.currentIndex -= 1;
                     })
                     .attrs({
-                      disabled: self.slot(function (currentIndex) {
-                        return currentIndex === 0
+                      disabled: self.slot(function(currentIndex) {
+                        return currentIndex === 0;
                       })
                     }).end()
                     .tag(this.ChoiceView, {
@@ -98,8 +98,8 @@ foam.CLASS({
                       this.currentIndex += 1;
                     })
                     .attrs({
-                      disabled: self.slot(function (currentIndex) {
-                        return currentIndex === self.visibleSections.length - 1
+                      disabled: self.slot(function(currentIndex) {
+                        return currentIndex === self.visibleSections.length - 1;
                       })
                     }).end()
                   .end()
