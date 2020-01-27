@@ -64,7 +64,8 @@ foam.INTERFACE({
     {
       name: 'login',
       documentation: `
-        Log the user in using their email and password to authenticate them.
+        Log the user in using their id (email or username) and password to
+        authenticate them.
       `,
       async: true,
       type: 'foam.nanos.auth.User',
@@ -76,7 +77,7 @@ foam.INTERFACE({
           type: 'Context'
         },
         {
-          name: 'email',
+          name: 'id',
           type: 'String'
         },
         {

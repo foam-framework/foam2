@@ -218,6 +218,13 @@ foam.CLASS({
       section: 'business'
     },
     {
+      class: 'String',
+      name: 'userName',
+      label: 'Username',
+      documentation: 'The username of the User.',
+      section: 'personal'
+    },
+    {
       class: 'EMail',
       name: 'email',
       label: 'Email Address',

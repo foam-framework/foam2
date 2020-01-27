@@ -45,7 +45,8 @@ foam.CLASS({
     'javax.security.auth.AuthPermission',
 
     'static foam.mlang.MLang.AND',
-    'static foam.mlang.MLang.EQ'
+    'static foam.mlang.MLang.EQ',
+    'static foam.mlang.MLang.OR'
   ],
 
   constants: [
@@ -159,13 +160,20 @@ foam.CLASS({
     },
     {
       name: 'login',
+      documentation: `Login a user by the id (email or username) provided, validate the password and
+        return the user in the context`,
       javaCode: `
-        User user = (User) ((DAO) getLocalUserDAO()).find(
-          AND(
-            EQ(User.EMAIL, email.toLowerCase()),
-            EQ(User.LOGIN_ENABLED, true)
-          )
-        );
+        User user = (User) ((DAO) getLocalUserDAO())
+          .inX(x)
+          .find(
+            AND(
+              OR(
+                EQ(foam.nanos.auth.User.EMAIL, id.toLowerCase()),
+                EQ(foam.nanos.auth.User.USER_NAME, id)
+              ),
+              EQ(foam.nanos.auth.User.LOGIN_ENABLED, true)
+            )
+          );
 
         if ( user == null ) {
           throw new AuthenticationException("User not found");
