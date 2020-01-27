@@ -9,6 +9,12 @@ foam.CLASS({
   name: 'ChoiceSectionDetailView',
   extends: 'foam.u2.detail.AbstractSectionedDetailView',
 
+  documentation: `
+    A section-aware detail view that lets the user navigate between sections by
+    using arrow buttons to move forward and back, or a ChoiceView to navigate to
+    a specific section directly.
+  `,
+
   requires: [
     'foam.core.ArraySlot',
     'foam.u2.detail.SectionView',
@@ -21,24 +27,24 @@ foam.CLASS({
     }
 
     ^ .foam-u2-tag-Select {
-        text-align-last: center;
-      }
-  
-      .choicePosition {
-        align-items: center;
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        text-align: center;
-      }
-  
-      .action-button {
-        border-radius: 10px;
-        font-size: 20px;
-        font-weight: bold;
-        padding: 5px;
-        width: 100px;
-      }
+      text-align-last: center;
+    }
+
+    ^ .choicePosition {
+      align-items: center;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      text-align: center;
+    }
+
+    ^ .action-button {
+      border-radius: 10px;
+      font-size: 20px;
+      font-weight: bold;
+      padding: 5px;
+      width: 100px;
+    }
   `,
 
   properties: [
@@ -66,12 +72,13 @@ foam.CLASS({
         .add(this.slot(function(sections, data) {
           if ( ! data ) return;
 
-          var arraySlot = foam.core.ArraySlot.create({
+          var arraySlot = self.ArraySlot.create({
             slots: sections.map((s) => s.createIsAvailableFor(self.data$))
           });
+
           return self.E()
             .add(arraySlot.map((visibilities) => {
-              self.visibleSections = sections.filter((s, i) => visibilities[i])
+              self.visibleSections = sections.filter((s, i) => visibilities[i]);
               return this.E()
                 .startContext({ controllerMode: 'EDIT' })
                   .start().addClass('choicePosition')
@@ -87,15 +94,15 @@ foam.CLASS({
                     }).end()
                   .end()
                 .endContext()
-                  .add(this.slot(function (currentIndex) {
-                    return this.E()
+                .add(this.slot(function(currentIndex) {
+                  return this.E()
                     .tag(self.SectionView, {
                       data$: self.data$,
                       section: this.visibleSections[this.currentIndex],
                       showTitle: true
-                    })
-                }))
-            }))
+                    });
+                }));
+            }));
         }));
     }
   ]
