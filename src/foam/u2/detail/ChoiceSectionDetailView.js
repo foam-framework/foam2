@@ -79,7 +79,7 @@ foam.CLASS({
                       this.currentIndex -= 1;
                     }).end()
                     .tag(this.ChoiceView, {
-                      choices: sections.filter((s, i) => visibilities[i]).map((s, i) => [i, s.title]),
+                      choices: self.visibleSections.map((s, i) => [i, s.title]),
                       data$: self.currentIndex$
                     })
                     .start('button').addClass('action-button').add('>').on('click', () => {
