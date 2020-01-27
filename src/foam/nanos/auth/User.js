@@ -224,18 +224,6 @@ foam.CLASS({
       javaSetter:
       `email_ = val.toLowerCase();
        emailIsSet_ = true;`,
-      // TODO: Use validatationPredicates instead.
-      validateObj: function(email) {
-        var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-        if ( ! email.trim() ) {
-          return 'Email required.';
-        }
-
-        if ( ! emailRegex.test(email.trim()) ) {
-          return 'Invalid email address.';
-        }
-      },
       section: 'personal'
     },
     {
