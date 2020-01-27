@@ -19,9 +19,11 @@ foam.CLASS({
     ^ .foam-u2-view-ScrollTableView table {
       width: 100%;
     }
+
     ^ .foam-u2-tag-Select {
         text-align-last:center;
       }
+
     ^ .foam-u2-tag-Select:after {
         text-align-last:center;
       }
