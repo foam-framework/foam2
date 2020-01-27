@@ -21,13 +21,9 @@ foam.CLASS({
     }
 
     ^ .foam-u2-tag-Select {
-        text-align-last:center;
+        text-align-last: center;
       }
-
-    ^ .foam-u2-tag-Select:after {
-        text-align-last:center;
-      }
-
+  
       .choicePosition {
         align-items: center;
         display: flex;
@@ -50,13 +46,13 @@ foam.CLASS({
       name: 'currentIndex',
       preSet: function(o,n) {
         if ( n < 1 ) return 0;
-        if ( n >= this.newSections.length ) return this.newSections.length - 1;
+        if ( n >= this.visibleSections.length ) return this.visibleSections.length - 1;
         return n;
       },
       value: 0
     },
     {
-      name: 'newSections'
+      name: 'visibleSections'
     }
   ],
 
@@ -73,12 +69,9 @@ foam.CLASS({
           var arraySlot = foam.core.ArraySlot.create({
             slots: sections.map((s) => s.createIsAvailableFor(self.data$))
           });
-
           return self.E()
             .add(arraySlot.map((visibilities) => {
-              self.newSections = sections.filter((s, i) => {
-                return visibilities[i]
-              })
+              self.visibleSections = sections.filter((s, i) => visibilities[i])
               return this.E()
                 .startContext({ controllerMode: 'EDIT' })
                   .start().addClass('choicePosition')
@@ -86,9 +79,7 @@ foam.CLASS({
                       this.currentIndex -= 1;
                     }).end()
                     .tag(this.ChoiceView, {
-                      choices: sections.filter( (s,i) => {
-                        return visibilities[i];
-                      }).map( (s,i) => [i,s.title] ),
+                      choices: sections.filter((s, i) => visibilities[i]).map((s, i) => [i, s.title]),
                       data$: self.currentIndex$
                     })
                     .start('button').addClass('action-button').add('>').on('click', () => {
@@ -97,11 +88,13 @@ foam.CLASS({
                   .end()
                 .endContext()
                   .add(this.slot(function (currentIndex) {
-                    return this.E().tag(self.SectionView, {
-                            data$: self.data$,
-                            section: this.newSections[this.currentIndex],
-                            showTitle: true})
-                  }))
+                    return this.E()
+                    .tag(self.SectionView, {
+                      data$: self.data$,
+                      section: this.visibleSections[this.currentIndex],
+                      showTitle: true
+                    })
+                }))
             }))
         }));
     }
