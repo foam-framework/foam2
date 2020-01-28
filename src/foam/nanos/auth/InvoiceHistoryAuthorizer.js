@@ -3,7 +3,7 @@ foam.CLASS({
   name: 'InvoiceHistoryAuthorizer',
   implements: ['foam.nanos.auth.Authorizer'],
 
-  documentation: `AuthorizableAuthorizer which checks if user has access to the invoice history record`,
+  documentation: `Authorizer which checks if user has access to the invoice history record`,
 
   javaImports: [
     'foam.dao.DAO',
