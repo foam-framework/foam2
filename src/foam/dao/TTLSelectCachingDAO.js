@@ -80,14 +80,14 @@ foam.CLASS({
       are up to date. */
     function remove_(x, o) {
       this.cache = {};
-      return self.delegate.remove_(x, o);
+      return this.delegate.remove_(x, o);
     },
 
     /** removeAll is executed on the cache and the source, ensuring both
       are up to date. */
     function removeAll_(x, skip, limit, order, predicate) {
       this.cache = {};
-      self.delegate.removeAll_(x, skip, limit, order, predicate);
+      this.delegate.removeAll_(x, skip, limit, order, predicate);
     },
 
     function cmd_(x, obj) {

@@ -99,7 +99,7 @@ foam.CLASS({
     },
     {
       name: 'CLEAR_SELECTION',
-      message: 'Clear Selection'
+      message: 'Clear'
     }
   ],
 
@@ -144,8 +144,8 @@ foam.CLASS({
 
       height: /*%INPUTHEIGHT%*/ 32px;
       font-size: 14px;
-      padding-left: %INPUTHORIZONTALPADDING%;
-      padding-right: %INPUTHORIZONTALPADDING%;
+      padding-left: /*%INPUTHORIZONTALPADDING%*/ 8px;
+      padding-right: /*%INPUTHORIZONTALPADDING%*/ 8px;
       border: 1px solid;
       border-radius: 3px;
       color: /*%BLACK%*/ #1e1f21;
@@ -156,7 +156,8 @@ foam.CLASS({
       min-width: 94px;
     }
 
-    ^selection-view:hover {
+    ^selection-view:hover,
+    ^selection-view:hover ^clear-btn {
       border-color: /*%GREY2%*/ #9ba1a6;
     }
 
@@ -164,7 +165,8 @@ foam.CLASS({
       outline: none;
     }
 
-    ^:focus ^selection-view {
+    ^:focus ^selection-view,
+    ^:focus ^selection-view ^clear-btn {
       border-color: /*%PRIMARY3%*/ #406dea;
     }
 
@@ -181,12 +183,11 @@ foam.CLASS({
       width: 100%;
     }
 
-    ^ .search input,
-    ^clear-btn {
+    ^ .search input {
       width: 100%;
       border: none;
-      padding-left: %INPUTHORIZONTALPADDING%;
-      padding-right: %INPUTHORIZONTALPADDING%;
+      padding-left: /*%INPUTHORIZONTALPADDING%*/ 8px;
+      padding-right: /*%INPUTHORIZONTALPADDING%*/ 8px;
       height: /*%INPUTHEIGHT%*/ 32px;
     }
 
@@ -209,7 +210,16 @@ foam.CLASS({
     }
 
     ^clear-btn {
-      background-color: /*%GREY4%*/ #e7eaec;
+      display: flex;
+      align-items: center;
+      border-left: 1px;
+      padding-left: /*%INPUTHORIZONTALPADDING%*/ 8px;
+      padding-right: /*%INPUTHORIZONTALPADDING%*/ 8px;
+      height: /*%INPUTHEIGHT%*/ 32px;
+      border-left: 1px solid;
+      border-color: /*%GREY3%*/ #cbcfd4;
+      margin-left: 12px;
+      padding-left: 16px;
     }
 
     ^clear-btn:hover {
@@ -387,6 +397,9 @@ foam.CLASS({
         var selfRect = selfDOMElement.getClientRects()[0];
         var containerRect = containerDOMElement.getClientRects()[0];
 
+        // This prevents a console error when making a selection.
+        if ( containerRect === undefined ) return;
+
         if (
           ! (
               evt.clientX >= selfRect.x &&
@@ -431,6 +444,13 @@ foam.CLASS({
                 .start()
                   .addClass(this.myClass('chevron'))
                 .end()
+                .add(this.slot(function(allowClearingSelection) {
+                  if ( ! allowClearingSelection ) return null;
+                  return this.E()
+                    .addClass(self.myClass('clear-btn'))
+                    .on('click', self.clearSelection)
+                    .add(self.CLEAR_SELECTION)
+                }))
               .end()
               .add(this.slot(function(hasBeenOpenedYet_) {
                 if ( ! hasBeenOpenedYet_ ) return this.E();
@@ -454,13 +474,6 @@ foam.CLASS({
                           } }))
                         .endContext()
                       .end();
-                  }))
-                  .add(self.slot(function(allowClearingSelection) {
-                    if ( ! allowClearingSelection ) return null;
-                    return this.E('button')
-                      .addClass(self.myClass('clear-btn'))
-                      .on('click', self.clearSelection)
-                      .add(self.CLEAR_SELECTION)
                   }))
                   .add(self.slot(function(sections) {
                     var promiseArray = [];
@@ -528,10 +541,10 @@ foam.CLASS({
         }
       }
     },
-    function clearSelection() {
+    function clearSelection(evt) {
+      evt.stopImmediatePropagation();
       this.data = undefined;
       this.fullObject_ = undefined;
-      this.isOpen_ = false;
     }
   ],
 
