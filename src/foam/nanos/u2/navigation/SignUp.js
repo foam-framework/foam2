@@ -164,7 +164,7 @@ foam.CLASS({
         class: 'foam.u2.TextField',
         placeholder: 'example123'
       },
-      //TODO: uncomment when integratting
+      //TODO: uncomment when integrating
       // validationPredicates: [
       //   {
       //     args: ['userName'],
@@ -176,9 +176,9 @@ foam.CLASS({
       //     errorString: 'Please enter username'
       //   }
       // ],
-      //TODO: set to true when integratting
+      //TODO: set to true when integrating
       required: false,
-      //TODO: set to false when integratting
+      //TODO: set to false when integrating
       hidden: true
     },
     {

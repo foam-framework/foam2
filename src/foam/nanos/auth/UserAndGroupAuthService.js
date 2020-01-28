@@ -38,15 +38,16 @@ foam.CLASS({
     'foam.util.Email',
     'foam.util.Password',
     'foam.util.SafetyUtil',
+    'foam.nanos.auth.User',
 
     'java.security.Permission',
     'java.util.Calendar',
-    'java.util.regex.Pattern',
     'javax.security.auth.AuthPermission',
 
     'static foam.mlang.MLang.AND',
+    'static foam.mlang.MLang.OR',
     'static foam.mlang.MLang.EQ',
-    'static foam.mlang.MLang.OR'
+    'static foam.mlang.MLang.CLASS_OF'
   ],
 
   constants: [
@@ -105,7 +106,7 @@ foam.CLASS({
     {
       name: 'loginHelper',
       documentation: `Helper function to reduce duplicated code.`,
-      type: 'foam.nanos.auth.User',
+      type: 'User',
       args: [
         {
           name: 'x',
@@ -113,7 +114,7 @@ foam.CLASS({
         },
         {
           name: 'user',
-          type: 'foam.nanos.auth.User'
+          type: 'User'
         },
         {
           name: 'password',
@@ -168,10 +169,10 @@ foam.CLASS({
           .find(
             AND(
               OR(
-                EQ(foam.nanos.auth.User.EMAIL, id.toLowerCase()),
-                EQ(foam.nanos.auth.User.USER_NAME, id)
+                EQ(User.EMAIL, id.toLowerCase()),
+                EQ(User.USER_NAME, id)
               ),
-              EQ(foam.nanos.auth.User.LOGIN_ENABLED, true)
+              CLASS_OF(User.class)
             )
           );
 

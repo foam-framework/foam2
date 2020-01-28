@@ -22,10 +22,12 @@ foam.CLASS({
   javaImports: [
     'foam.dao.DAO',
     'foam.nanos.NanoService',
+    'foam.nanos.auth.User',
 
     'static foam.mlang.MLang.AND',
+    'static foam.mlang.MLang.OR',
     'static foam.mlang.MLang.EQ',
-    'static foam.mlang.MLang.OR'
+    'static foam.mlang.MLang.CLASS_OF'
   ],
 
   methods: [
@@ -44,10 +46,10 @@ foam.CLASS({
           .find(
             AND(
               OR(
-                EQ(foam.nanos.auth.User.EMAIL, id.toLowerCase()),
-                EQ(foam.nanos.auth.User.USER_NAME, id)
+                EQ(User.EMAIL, id.toLowerCase()),
+                EQ(User.USER_NAME, id)
               ),
-              EQ(foam.nanos.auth.User.LOGIN_ENABLED, true)
+              CLASS_OF(User.class)
             )
           );
 
@@ -64,7 +66,7 @@ foam.CLASS({
       args: [
         {
           name: 'user',
-          type: 'foam.nanos.auth.User'
+          type: 'User'
         }
       ],
       javaCode:

@@ -28,7 +28,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'id',
-      //TODO: rename label to 'Email or Username' when integratting
+      //TODO: rename label to 'Email or Username' when integrating
       label: 'Email',
       view: {
         class: 'foam.u2.TextField',
@@ -123,7 +123,7 @@ foam.CLASS({
               this.notify(err.message || 'There was a problem logging in.', 'error');
           });
         } else {
-          //TODO: change to 'Please enter email or username' when integratting
+          //TODO: change to 'Please enter email or username' when integrating
           this.notify('Please enter email', 'error')
         }
       }
