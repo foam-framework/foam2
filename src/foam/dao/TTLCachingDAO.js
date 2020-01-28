@@ -105,8 +105,8 @@ foam.CLASS({
       are up to date. */
     function remove_(x, o) {
       var self = this;
-      return self.delegate.remove(o).then(function() {
-        self.cache.remove(o);
+      return self.delegate.remove_(x, o).then(function() {
+        delete self.cache[o.id];
         return o;
       });
     },
@@ -115,7 +115,7 @@ foam.CLASS({
       are up to date. */
     function removeAll_(x, skip, limit, order, predicate) {
       var self = this;
-      return self.src.removeAll_(x, skip, limit, order, predicate).then(function() {
+      return self.delegate.removeAll_(x, skip, limit, order, predicate).then(function() {
         self.cache = {};
       });
     },
