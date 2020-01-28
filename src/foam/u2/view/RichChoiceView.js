@@ -527,6 +527,11 @@ foam.CLASS({
       if ( mode !== foam.u2.DisplayMode.RW ) {
         this.isOpen_ = false;
       }
+    },
+
+    function fromProperty(property) {
+      this.SUPER(property);
+      this.prop = property;
     }
   ],
 
@@ -543,8 +548,17 @@ foam.CLASS({
     },
     function clearSelection(evt) {
       evt.stopImmediatePropagation();
-      this.data = undefined;
       this.fullObject_ = undefined;
+
+      // If this view is being used for a property, then when the user clears
+      // their selection we set the value back to the default value for that
+      // property type. We can't simply set it to undefined because that
+      // introduces a bug where it's impossible to update an object to set a
+      // Reference property back to a default value, since a value of undefined
+      // will cause the JSON outputter to ignore that property when performing
+      // the put. Instead, we need to explicitly set the value to the default
+      // value.
+      this.data = this.prop ? this.prop.value : undefined;
     }
   ],
 
