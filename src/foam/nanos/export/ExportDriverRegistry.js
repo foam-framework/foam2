@@ -13,6 +13,16 @@ foam.CLASS({
   properties: [
     { class: 'String', name: 'id' },
     { class: 'String', name: 'driverName' },
-    { class: 'String', name: 'targetModel' }
+    { class: 'String', name: 'targetModel' },
+    {
+      class: 'String',
+      name: 'extension',
+      value: 'csv'
+    },
+    {
+      class: 'String',
+      name: 'mimeType',
+      value: 'data:text/csv;charset=utf-8'
+    }
   ]
 });
