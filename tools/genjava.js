@@ -72,6 +72,7 @@ externalFile.blacklist.forEach(function(cls) {
 var fileWhitelist = null;
 var classesNotFound = {};
 var classesFound = {};
+var debugFilesWritten = [];
 
 // Set file whitelist from parsed argument, but only if foamlink is enabled
 if ( incrementalMeta !== null && foamlinkMode ) {
@@ -256,6 +257,7 @@ function generateProxy(intf) {
 
 function writeFileIfUpdated(outfile, buildJavaSource, opt_result) {
   if (! ( fs_.existsSync(outfile) && (fs_.readFileSync(outfile).toString() == buildJavaSource))) {
+    debugFilesWritten.push(outfile);
     fs_.writeFileSync(outfile, buildJavaSource);
     if ( opt_result !== undefined) opt_result.push(outfile);
   }
@@ -356,8 +358,17 @@ addDepsToClasses().then(function() {
       'sources found ('+notFound+' missing)');
     console.log(Object.keys(classesNotFound));
     if ( debugDataDir !== null ) {
-      require('fs').writeFileSync('classesWithNoSources.json',
+      require('fs').writeFileSync(
+        path_.join(debugDataDir, 'classesWithNoSources.json'),
         JSON.stringify(Object.keys(classesNotFound)));
     }
+  }
+
+  if ( debugDataDir !== null ) {
+    if ( debugFilesWritten.length != 0 ) {
+      require('fs').writeFileSync(
+        path_.join(debugDataDir, 'filesWritten.json'),
+        JSON.stringify(debugFilesWritten));
+      }
   }
 });
