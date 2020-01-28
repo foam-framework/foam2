@@ -26,7 +26,7 @@ foam.CLASS({
       width: 100%;
     }
 
-    ^ .foam-u2-tag-Select {
+    ^ .tag-Select {
       text-align-last: center;
     }
 
@@ -93,7 +93,7 @@ foam.CLASS({
                     .tag(this.ChoiceView, {
                       choices: self.visibleSections.map((s, i) => [i, s.title]),
                       data$: self.currentIndex$
-                    })
+                    }).addClass('tag-Select')
                     .start('button').addClass('action-button').add('>').on('click', () => {
                       this.currentIndex += 1;
                     })
