@@ -129,18 +129,18 @@ foam.CLASS({
         return;
       }
 
-      var exportDriver = await this.exportDriverRegistryDAO.find(this.dataType);
-      exportDriver = foam.lookup(exportDriver.driverName).create();
+      var exportDriverReg = await this.exportDriverRegistryDAO.find(this.dataType);
+      var exportDriver    = foam.lookup(exportDriverReg.driverName).create();
 
       var p = this.exportData ?
         exportDriver.exportDAO(this.__context__, this.exportData) :
         Promise.resolve(exportDriver.exportFObject(this.__context__, this.exportObj));
 
       p.then(result => {
-        result = 'data:text/csv;charset=utf-8,' + result;
+        result = 'data:' + exportDriverReg.mimeType + ',' + result;
         var link = document.createElement('a');
         link.setAttribute('href', encodeURI(result));
-        link.setAttribute('download', 'data.csv');
+        link.setAttribute('download', 'data.' + exportDriverReg.extension);
         document.body.appendChild(link);
         link.click();
       })
