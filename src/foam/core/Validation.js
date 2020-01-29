@@ -331,9 +331,9 @@ foam.CLASS({
           {
             args: [this.name],
             predicateFactory: function(e) {
-              return e.REG_EXP(self, /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
+              return e.REG_EXP(self, /^[A-Za-z0-9._%+-]+@[a-zA-Z0-9]+\.[a-zA-Z]{2,6}$/);
             },
-            errorString: 'Please enter email address'
+            errorString: 'Please enter valid email address'
           }
         ];
         if ( this.required ) {
