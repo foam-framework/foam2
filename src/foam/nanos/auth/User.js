@@ -218,7 +218,7 @@ foam.CLASS({
       displayWidth: 80,
       width: 100,
       preSet: function(_, val) {
-        return val.toLowerCase();
+        return val.toLowerCase().trim();
       },
       includeInDigest: true,
       javaSetter:
