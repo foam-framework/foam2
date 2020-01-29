@@ -27,19 +27,17 @@ foam.CLASS({
       hidden: true
     },
     {
-      class: 'String',
+      class: 'EMail',
       name: 'email',
       view: {
         class: 'foam.u2.TextField',
         focused: true
       },
-      preSet: function(o, n) {
-        return n.trim();
-      },
       visibilityExpression: function(disableEmail_) {
         return disableEmail_ ?
           foam.u2.Visibility.DISABLED : foam.u2.Visibility.RW;
-      }
+      },
+      validationTextVisible: false
     },
     {
       class: 'Password',
