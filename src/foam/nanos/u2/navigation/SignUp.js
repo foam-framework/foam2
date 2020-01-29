@@ -163,9 +163,6 @@ foam.CLASS({
         class: 'foam.u2.TextField',
         placeholder: 'example@example.com'
       },
-      preSet: function(o, n) {
-        return n.trim();
-      },
       visibilityExpression: function(disableEmail_) {
         return disableEmail_ ?
           foam.u2.Visibility.DISABLED : foam.u2.Visibility.RW;
