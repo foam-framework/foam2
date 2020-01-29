@@ -97,7 +97,10 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'backLabel'
+      name: 'backLabel',
+      expression: function(config$browseTitle) {
+        return 'All ' + config$browseTitle;
+      }
     }
   ],
 
@@ -173,8 +176,6 @@ foam.CLASS({
             });
           }
 
-          var label = self.backLabel || `All ${config$browseTitle}`;
-
           return self.E()
             .start(self.Rows)
               .start(self.Rows)
@@ -183,7 +184,7 @@ foam.CLASS({
                   .tag(self.stack.BACK, {
                     buttonStyle: foam.u2.ButtonStyle.TERTIARY,
                     icon: 'images/back-icon.svg',
-                    label: label
+                    label: self.backLabel
                   })
                 .endContext()
                 .start(self.Cols).style({ 'align-items': 'center' })
