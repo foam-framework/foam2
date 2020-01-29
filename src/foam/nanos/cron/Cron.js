@@ -14,7 +14,6 @@ foam.CLASS({
   javaImports: [
     'foam.dao.DAO',
     'foam.nanos.notification.Notification',
-    'foam.util.SafetyUtil',
     'java.util.Date'
   ],
 
@@ -48,7 +47,6 @@ foam.CLASS({
       name: 'schedule',
       class: 'FObjectProperty',
       of: 'foam.nanos.cron.Schedule',
-      name: 'schedule',
       view: {
         class: 'foam.u2.view.FObjectView',
         of: 'foam.nanos.cron.Schedule'
@@ -82,9 +80,7 @@ foam.CLASS({
       ],
       type: 'Void',
       javaCode:
-`DAO notification = (DAO) x.get("notificationDAO");
-
-/*
+`/*
   I don't know why we're doing this because we aren't specifying a user or
   group to be notified and we aren't including the script output either.
   Also, if we were to notify, we should use a ScriptRunNotification rather

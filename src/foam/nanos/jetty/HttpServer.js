@@ -18,15 +18,12 @@ foam.CLASS({
     'org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest',
     'org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse',
     'org.eclipse.jetty.websocket.servlet.WebSocketCreator',
-    'foam.nanos.jetty.WhitelistedForwardedRequestCustomizer',
+    'foam.nanos.logger.Logger',
     'java.util.Set',
     'java.util.HashSet',
     'java.util.Arrays',
     'org.eclipse.jetty.server.*',
     'org.eclipse.jetty.util.ssl.SslContextFactory',
-    'javax.net.ssl.KeyManager',
-    'javax.net.ssl.KeyManagerFactory',
-    'javax.net.ssl.SSLContext',
     'java.io.FileInputStream',
     'java.security.KeyStore',
     'org.apache.commons.io.IOUtils'
@@ -214,7 +211,9 @@ foam.CLASS({
                 
         server.start();
       } catch(Exception e) {
-        e.printStackTrace();
+        Logger logger = (Logger) getX().get("logger");
+        if ( logger != null )
+          logger.error(e);
       }
       `
     },
@@ -237,7 +236,9 @@ foam.CLASS({
               server.stop();
             } catch (Exception e) {
               System.err.println("Exception during Jetty server stop in the shutdown hook");
-              e.printStackTrace();
+              Logger logger = (Logger) getX().get("logger");
+              if ( logger != null )
+                logger.error(e);
             }
           }
         });

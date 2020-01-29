@@ -37,6 +37,13 @@ foam.CLASS({
     'foam.dao.QuickSink'
   ],
 
+  constants: [
+    {
+      name: 'PURGE',
+      value: 'PURGE'
+    }
+  ],
+
   properties: [
     {
       /** The source DAO on which to add caching. Writes go straight
@@ -119,6 +126,15 @@ foam.CLASS({
       return self.src.removeAll_(x, skip, limit, order, predicate).then(function() {
         return self.delegate.removeAll_(x, skip, limit, order, predicate);
       });
+    },
+
+    function cmd_(x, obj) {
+      if ( obj == this.PURGE ) {
+        this.cache.removeAll();
+        delete this.private_['delegate'];
+      } else {
+        this.SUPER(x, obj);
+      }
     }
   ],
 

@@ -102,7 +102,8 @@ foam.CLASS({
         }
         return !required ? null : [[name],
           function() {
-            return !this.hasOwnProperty(name) && (`Please enter ${label.toLowerCase()}`);
+            const axiom = this.cls_.getAxiomByName(name);
+            return axiom.isDefaultValue(this[name]) && (`Please enter ${label.toLowerCase()}`);
           }]
       },
     },
@@ -356,6 +357,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'PhoneNumberPropertyValidationRefinement',
   refines: 'foam.core.PhoneNumber',
+
   properties: [
     {
       class: 'FObjectArray',
@@ -363,19 +365,36 @@ foam.CLASS({
       name: 'validationPredicates',
       factory: function() {
         var self = this;
-        if ( ! this.required ) return [];
-        return [
-          {
-            args: [this.name],
-            predicateFactory: function(e) {
-                return e.REG_EXP(
-                  self,
-                  /^(?:\+?1[-.●]?)?\(?([0-9]{3})\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4})$/
-                 );
-            },
-            errorString: 'Please enter phone number'
-          }
-        ];
+        const PHONE_NUMBER_REGEX = /^(?:\+?1[-.●]?)?\(?([0-9]{3})\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4})$/;
+        return this.required
+          ? [
+              {
+                args: [this.name],
+                predicateFactory: function(e) {
+                  return e.HAS(self);
+                },
+                errorString: 'Phone number required.'
+              },
+              {
+                args: [this.name],
+                predicateFactory: function(e) {
+                  return e.REG_EXP(self, PHONE_NUMBER_REGEX);
+                },
+                errorString: 'Invalid phone number.'
+              }
+            ]
+          : [
+              {
+                args: [this.name],
+                predicateFactory: function(e) {
+                    return e.OR(
+                      e.EQ(foam.mlang.StringLength.create({ arg1: self }), 0),
+                      e.REG_EXP(self, PHONE_NUMBER_REGEX)
+                    );
+                },
+                errorString: 'Invalid phone number.'
+              }
+            ];
       }
     }
   ]

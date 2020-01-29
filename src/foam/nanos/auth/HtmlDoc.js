@@ -10,11 +10,6 @@ foam.CLASS({
 
   documentation: 'Model to store html documents',
 
-  javaImports: [
-    'java.nio.charset.StandardCharsets',
-    'java.util.Date',
-  ],
-
   tableColumns: [ 'id', 'name', 'issuedDate' ],
 
   properties: [

@@ -100,7 +100,7 @@ foam.CLASS({
           .start().addClass('label').add('Response').end()
           .start(this.NOTE).addClass('input-box').addClass('note').end()
           .start(this.Cols).style({ 'justify-content': 'flex-start' }).addClass(this.myClass('buttons'))
-            .start(this.DOWNLOAD_CSV).end()
+            .start(this.DOWNLOAD).end()
             .start(this.CONVERT).end()
           .end()
         .end()
@@ -118,29 +118,29 @@ foam.CLASS({
       var exportDriver = await this.exportDriverRegistryDAO.find(this.dataType);
       exportDriver = foam.lookup(exportDriver.driverName).create();
 
-      this.note = this.exportData 
-                    ? await exportDriver.exportDAO(this.__context__, this.exportData)
-                    : await exportDriver.exportFObject(this.__context__, this.exportObj);
+      this.note = this.exportData ?
+        await exportDriver.exportDAO(this.__context__, this.exportData) :
+        await exportDriver.exportFObject(this.__context__, this.exportObj);
     },
 
-    async function downloadCSV() {
+    async function download() {
       if ( ! this.exportData && ! this.exportObj ) {
         console.log('Neither exportData nor exportObj exist');
         return;
       }
 
-      var exportDriver = await this.exportDriverRegistryDAO.find(this.dataType);
-      exportDriver = foam.lookup(exportDriver.driverName).create();
+      var exportDriverReg = await this.exportDriverRegistryDAO.find(this.dataType);
+      var exportDriver    = foam.lookup(exportDriverReg.driverName).create();
 
-      var p = this.exportData 
-                ? exportDriver.exportDAO(this.__context__, this.exportData)
-                : Promise.resolve(exportDriver.exportFObject(this.__context__, this.exportObj));
+      var p = this.exportData ?
+        exportDriver.exportDAO(this.__context__, this.exportData) :
+        Promise.resolve(exportDriver.exportFObject(this.__context__, this.exportObj));
 
       p.then(result => {
-        result = 'data:text/csv;charset=utf-8,' + result;
+        result = 'data:' + exportDriverReg.mimeType + ',' + result;
         var link = document.createElement('a');
         link.setAttribute('href', encodeURI(result));
-        link.setAttribute('download', 'data.csv');
+        link.setAttribute('download', 'data.' + exportDriverReg.extension);
         document.body.appendChild(link);
         link.click();
       })

@@ -489,10 +489,11 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'org.apache.commons.io.IOUtils',
-    'org.apache.commons.codec.binary.Hex',
     'java.io.File',
     'java.io.FileOutputStream',
+    'java.io.IOException',
+    'org.apache.commons.codec.binary.Hex',
+    'org.apache.commons.io.IOUtils',
     'foam.nanos.fs.Storage'
   ],
 
@@ -711,18 +712,18 @@ return file;`
 }
 
 this.setup(x);
-HashingOutputStream os = null;
+long size = blob.getSize();
+File tmp = allocateTmp(x, 1);
 
-try {
-  long size = blob.getSize();
-  File tmp = allocateTmp(x, 1);
-  os = new HashingOutputStream(new FileOutputStream(tmp));
+try ( HashingOutputStream os = new HashingOutputStream(new FileOutputStream(tmp)) ) {
   blob.read(os, 0, size);
   os.close();
 
   String digest = new String(Hex.encodeHexString(os.digest()));
   File dest = x.get(Storage.class).get(getSha256() + File.separator + digest);
-  tmp.renameTo(dest);
+  if ( !tmp.renameTo(dest) ) {
+    throw new IOException("Rename failed!");
+  }
 
   IdentifiedBlob result = new IdentifiedBlob();
   result.setId(digest);
@@ -730,9 +731,8 @@ try {
   return result;
 } catch (Throwable t) {
   return null;
-} finally {
-  IOUtils.closeQuietly(os);
-}`
+}
+`
     },
     function filename(blob) {
       if ( ! foam.blob.IdentifiedBlob.isInstance(blob) ) return null;

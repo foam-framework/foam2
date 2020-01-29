@@ -59,21 +59,20 @@ foam.CLASS({
       name: 'columns_',
       expression: function(columns, of, allColumns, editColumnsEnabled) {
         if ( ! of ) return [];
-        columns = columns.map(c => foam.String.isInstance(c) ? this.of.getAxiomByName(c) : c);
         if ( ! editColumnsEnabled ) return columns;
 
         // Reorder allColumns to respect the order of columns first followed by
         // the order of allColumns.
         allColumns = columns.concat(allColumns);
         allColumns = allColumns.filter((c, i) => {
-          return allColumns.findIndex(a => a.name == c.name) == i;
+          return allColumns.findIndex(a => a[0] == c[0]) == i;
         });
 
         return allColumns.filter(c => {
-          var v = this.ColumnConfig.create({ of: of, axiom : c }).visibility;
+          var v = this.ColumnConfig.create({ of: of, axiom : (typeof c[0] === 'string' ? of.getAxiomByName(c[0]) : c[0]) }).visibility;
           return v == this.ColumnVisibility.ALWAYS_HIDE ? false :
                  v == this.ColumnVisibility.ALWAYS_SHOW ? true :
-                 columns.find(c2 => c.name == c2.name)  ? true : false;
+                 columns.find(c2 => c[0] == c2[0])  ? true : false;
         });
       },
     },
@@ -82,17 +81,22 @@ foam.CLASS({
       expression: function(of) {
         return ! of ? [] : [].concat(
           of.getAxiomsByClass(foam.core.Property)
-            .filter(p => p.tableCellFormatter && ! p.hidden),
+            .filter(p => p.tableCellFormatter && ! p.hidden)
+            .map(a => [a.name, null]),
           of.getAxiomsByClass(foam.core.Action)
+            .map(a => [a.name, null])
         );
       }
     },
     {
       name: 'columns',
+      adapt: function(_, cols) {
+        return cols.map(c => Array.isArray(c) ? c : [c, null]);
+      },
       expression: function(of, allColumns) {
         if ( ! of ) return [];
         var tc = of.getAxiomByName('tableColumns');
-        return tc ? tc.columns.map(c => of.getAxiomByName(c)) : allColumns;
+        return tc ? tc.columns.map(c => [c, null]) : allColumns;
       },
     },
     {
@@ -199,6 +203,7 @@ foam.CLASS({
       var columnSelectionE;
 
       if ( this.filteredTableColumns$ ) {
+        // TODO
         this.onDetach(this.filteredTableColumns$.follow(
           this.columns_$.map((cols) => cols.map((a) => a.name))));
       }
@@ -248,7 +253,11 @@ foam.CLASS({
               }).
 
               // Render the table headers for the property columns.
-              forEach(columns_, function(column) {
+              forEach(columns_, function([axiomOrColumnName, overrides]) {
+                var column = typeof axiomOrColumnName === 'string'
+                  ? view.of.getAxiomByName(axiomOrColumnName)
+                  : axiomOrColumnName;
+                if ( overrides ) column = column.clone().copyFrom(overrides);
                 this.start().
                   addClass(view.myClass('th')).
                   addClass(view.myClass('th-' + column.name)).
@@ -405,7 +414,7 @@ foam.CLASS({
 
                     if ( checked ) {
                       var modification = {};
-                      modification[obj.id] = checked ? obj : null;
+                      modification[obj.id] = obj;
                       view.selectedObjects = Object.assign({}, view.selectedObjects, modification);
                     } else {
                       var temp = Object.assign({}, view.selectedObjects);
@@ -424,7 +433,11 @@ foam.CLASS({
                   });
                 }).
 
-                forEach(columns_, function(column) {
+                forEach(columns_, function([axiomOrColumnName, overrides]) {
+                  var column = typeof axiomOrColumnName === 'string'
+                    ? obj.cls_.getAxiomByName(axiomOrColumnName)
+                    : axiomOrColumnName;
+                  if ( overrides ) column = column.clone().copyFrom(overrides);
                   this.
                     start().
                       addClass(view.myClass('td')).

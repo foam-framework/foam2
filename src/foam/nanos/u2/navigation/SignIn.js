@@ -10,7 +10,8 @@ foam.CLASS({
     'loginSuccess',
     'notify',
     'stack',
-    'user'
+    'user',
+    'menuDAO'
   ],
 
   messages: [
@@ -74,7 +75,7 @@ foam.CLASS({
     },
     {
       name: 'nextStep',
-      code: function() {
+      code: function(X) {
         if ( this.user.twoFactorEnabled ) {
           this.loginSuccess = false;
           window.history.replaceState({}, document.title, '/');
@@ -87,6 +88,7 @@ foam.CLASS({
               class: 'foam.nanos.auth.ResendVerificationEmail'
             });
           } else {
+            this.menuDAO.cmd_(X, foam.dao.CachingDAO.PURGE);
             window.location.hash = '';
             this.loginSuccess = !! this.user;
           }

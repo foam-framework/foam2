@@ -33,6 +33,11 @@ foam.CLASS({
       name: 'remote'
     },
     {
+      class: 'Boolean',
+      name: 'setter',
+      documentation: 'true iff this method is a setter'
+    },
+    {
       class: 'FObjectArray',
       of: 'foam.java.Argument',
       name: 'args'

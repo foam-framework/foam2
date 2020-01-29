@@ -115,8 +115,8 @@ foam.CLASS({
 
   methods: [
     function fromModel(model) {
-      this.name = model.name;
-      this.package = model.package;
+      this.name     = model.name;
+      this.package  = model.package;
       this.abstract = model.abstract;
 
       if ( model.name != 'AbstractFObject' ) {
@@ -235,7 +235,7 @@ foam.CLASS({
           break;
         }
       }
-      if( isORBitalDAOed ){
+      if ( isORBitalDAOed ) {
         //TODO: add necessary constructs to generated java class that needs to be an ORBitalDAO'able
 
       }

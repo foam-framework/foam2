@@ -11,14 +11,23 @@ foam.CLASS({
 
   css: `
     ^ {
-      width: 25vw;
+      border-radius: 3px;
+      background-color: #fff;
+      /* Don't let the modal exceed the screen size, minus some margin. */
+      max-width: calc(100vw - 48px);
+      max-height: calc(100vh - 116px);
+      overflow-y: scroll;
+      /* The line below accounts for the top nav bar. */
+      margin-top: 60px;
     }
     ^main {
-      padding: 1vh 2vw 1.5vh 2vw;
+      padding: 24px;
+    }
+    ^main > h2:first-child {
+      margin-top: 0;
     }
     ^ .buttons {
-      background: /*%GREY5%*/ #fafafa;
-      padding: 2vh;
+      padding: 24px;
       box-sizing: border-box;
       display: flex;
       justify-content: flex-end;
@@ -42,7 +51,7 @@ foam.CLASS({
       name: 'onDelete'
     },
     {
-      class: 'FObject',
+      class: 'FObjectProperty',
       name: 'data'
     }
   ],
@@ -55,7 +64,7 @@ foam.CLASS({
         .start()
           .addClass(this.myClass('main'))
           .start('h2')
-            .add(this.TITLE).add(this.data.cls_.name).add('?')
+            .add(this.TITLE).add(this.data.model_.label).add('?')
           .end()
           .start('p')
             .add(`${this.CONFIRM_DELETE_1} ${this.data.toSummary()}?`)
@@ -76,11 +85,42 @@ foam.CLASS({
       name: 'delete',
       label: 'Delete',
       code: function(X) {
-        this.dao.remove(this.data).then((_) => {
-          this.notify(this.data.model_.label + this.SUCCESS_MSG);
+        this.dao.remove(this.data).then((o) => {
+          if ( foam.comics.v2.userfeedback.UserFeedbackAware.isInstance(o) && o.userFeedback ){
+            var currentFeedback = o.userFeedback;
+            while ( currentFeedback ){
+
+              this.notify(currentFeedback.message);
+
+              currentFeedback = currentFeedback.next;
+            }
+          } else {
+            this.notify(this.data.model_.label + this.SUCCESS_MSG);
+          }
+
           this.onDelete();
         }).catch((err) => {
-          this.notify(err.message || this.FAIL_MSG, 'error');
+
+          // TODO: Uncomment once we turn UserFeedbackException in to a throwable
+          // if ( foam.comics.v2.userfeedback.UserFeedbackException.isInstance(err) && err.userFeedback  ){
+          //   var currentFeedback = err.userFeedback;
+          //   while ( currentFeedback ){
+          //     this.notify(currentFeedback.message);
+
+          //     currentFeedback = currentFeedback.next;
+          //   }
+          // } else {
+          //   this.notify(err.message || this.FAIL_MSG, 'error');
+          // }
+
+          if ( err.message === "An approval request has been sent out."  ){
+            this.notify(err.message);
+
+          } else {
+            this.notify(err.message || this.FAIL_MSG, 'error');
+          }
+
+          
         });
         X.closeDialog();
       }
