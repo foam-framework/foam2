@@ -94,6 +94,10 @@ foam.CLASS({
       expression: function() {
         return foam.u2.detail.SectionedDetailView;
       }
+    },
+    {
+      class: 'String',
+      name: 'backLabel'
     }
   ],
 
@@ -169,6 +173,8 @@ foam.CLASS({
             });
           }
 
+          var label = self.backLabel || `All ${config$browseTitle}`;
+
           return self.E()
             .start(self.Rows)
               .start(self.Rows)
@@ -177,7 +183,7 @@ foam.CLASS({
                   .tag(self.stack.BACK, {
                     buttonStyle: foam.u2.ButtonStyle.TERTIARY,
                     icon: 'images/back-icon.svg',
-                    label: `All ${config$browseTitle}`
+                    label: label
                   })
                 .endContext()
                 .start(self.Cols).style({ 'align-items': 'center' })
