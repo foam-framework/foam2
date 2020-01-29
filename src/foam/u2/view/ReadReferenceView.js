@@ -44,7 +44,8 @@ foam.CLASS({
                 of: self.obj.cls_,
                 config: self.DAOControllerConfig.create({
                   daoKey: self.prop.targetDAOKey
-                })
+                }),
+                backLabel: 'Back'
               }, self);
             })
             .tag(this.CitationView, { data$: this.obj$ })
