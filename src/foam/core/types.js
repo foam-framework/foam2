@@ -431,7 +431,15 @@ foam.CLASS({
   name: 'EMail',
   extends: 'String',
   // FUTURE: verify
-  label: 'Email address'
+  label: 'Email address',
+  properties: [
+    [
+      'adapt',
+      function(_, v) {
+        return v.toLowerCase().trim();
+      }
+    ]
+  ]
 });
 
 
