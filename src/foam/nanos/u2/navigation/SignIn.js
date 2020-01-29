@@ -27,7 +27,7 @@ foam.CLASS({
       hidden: true
     },
     {
-      class: 'String',
+      class: 'EMail',
       name: 'email',
       view: {
         class: 'foam.u2.TextField',

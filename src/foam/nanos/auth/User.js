@@ -217,9 +217,6 @@ foam.CLASS({
       documentation: 'The email address of the User.',
       displayWidth: 80,
       width: 100,
-      preSet: function(_, val) {
-        return val.toLowerCase().trim();
-      },
       includeInDigest: true,
       javaSetter:
       `email_ = val.toLowerCase();
