@@ -104,25 +104,25 @@ foam.CLASS({
       },
       code: function() {
         this.config.dao.put(this.workingData).then(o => {
-          this.data = o;
-          this.finished.pub();
+          if ( ! this.data.equals(o) ) {
+            this.data = o;
+            this.finished.pub();
+            if ( foam.comics.v2.userfeedback.UserFeedbackAware.isInstance(o) && o.userFeedback ){
+              var currentFeedback = o.userFeedback;
+              while ( currentFeedback ){
+                this.ctrl.add(this.NotificationMessage.create({
+                  message: currentFeedback.message,
+                  type: currentFeedback.status.name.toLowerCase()
+                }));
 
-          if ( foam.comics.v2.userfeedback.UserFeedbackAware.isInstance(o) && o.userFeedback ){
-            var currentFeedback = o.userFeedback;
-            while ( currentFeedback ){
+                currentFeedback = currentFeedback.next;
+              }
+            } else {
               this.ctrl.add(this.NotificationMessage.create({
-                message: currentFeedback.message,
-                type: currentFeedback.status.name.toLowerCase()
+                message: `${this.data.model_.label} updated.`
               }));
-
-              currentFeedback = currentFeedback.next;
             }
-          } else {
-            this.ctrl.add(this.NotificationMessage.create({
-              message: `${this.data.model_.label} updated.`
-            }));
-          }
-
+          } 
           this.stack.back();
         }, e => {
           this.throwError.pub(e);
