@@ -200,12 +200,12 @@ foam.CLASS({
 
     function initE() {
       var view = this;
-      var columnSelectionE;
 
       if ( this.filteredTableColumns$ ) {
-        // TODO
         this.onDetach(this.filteredTableColumns$.follow(
-          this.columns_$.map((cols) => cols.map((a) => a.name))));
+          this.columns_$.map((cols) => cols.map(([axiomOrColumnName, overrides]) => {
+            return (typeof axiomOrColumnName) === 'string' ? axiomOrColumnName : axiomOrColumnName.name;
+          }))));
       }
 
       this.

@@ -107,8 +107,10 @@ foam.CLASS({
         mode: 'RO'
       },
       factory: function() {
-        return this.allColumns.map(c => {
-          return this.ColumnConfig.create({ of: this.of, axiom: c });
+        return this.allColumns.map(([axiomName, overridesMap]) => {
+          const axiom = this.of.getAxiomByName(axiomName);
+          if ( overridesMap ) axiom = axiom.clone().copyFrom(overridesMap);
+          return this.ColumnConfig.create({ of: this.of, axiom: axiom });
         });
       }
     },
