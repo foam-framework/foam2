@@ -173,6 +173,11 @@
       }
     },
     {
+      class: 'Boolean',
+      name: 'debug',
+      documentation: 'Determines if logger uses debug'
+    },
+    {
       class: 'Int',
       name: 'validity',
       documentation: 'Validity of the rule (in days) for automatic rescheduling.',
