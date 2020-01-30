@@ -175,7 +175,7 @@
     {
       class: 'Boolean',
       name: 'debug',
-      documentation: 'Determines if logger uses debug'
+      documentation: 'Test this boolean before generating expensive logger.debug calls, to speed rule execution.'
     },
     {
       class: 'Int',
