@@ -173,6 +173,11 @@
       }
     },
     {
+      class: 'Boolean',
+      name: 'debug',
+      documentation: 'Test this boolean before generating expensive logger.debug calls, to speed rule execution.'
+    },
+    {
       class: 'Int',
       name: 'validity',
       documentation: 'Validity of the rule (in days) for automatic rescheduling.',
