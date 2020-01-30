@@ -52,6 +52,9 @@ public class RuleEngine extends ContextAwareSupport {
    *
    * Each rule would check object applicability before applying action.
    *
+   * Before generating any logger.debug(...) calls rule.debug property should be tested:
+   *  if ( rule.getDebug() ) { logger.debug(…) };
+   *
    * @param rules - Rules to be considered applying
    * @param obj - FObject supplied to rules for execution
    * @param oldObj - Old FObject supplied to rules for execution
