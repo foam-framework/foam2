@@ -27,6 +27,7 @@ foam.CLASS({
   ],
 
   searchColumns: [
+    'hostname',
     'created',
     'severity',
     'exception'
@@ -36,7 +37,7 @@ foam.CLASS({
     {
       name: 'hostname',
       class: 'String',
-      visibility: 'HIDDEN'
+      visibility: 'RO'
     },
     {
       class: 'DateTime',
