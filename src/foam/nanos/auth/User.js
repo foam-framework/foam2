@@ -322,6 +322,9 @@ foam.CLASS({
       factory: function() {
         return this.Address.create();
       },
+      tableCellFormatter: function(value, obj, axiom) {
+        this.add(value.countryId);
+      },
       section: 'personal'
     },
     {
