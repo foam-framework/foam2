@@ -72,7 +72,7 @@ foam.CLASS({
           var v = this.ColumnConfig.create({ of: of, axiom : (typeof c[0] === 'string' ? of.getAxiomByName(c[0]) : c[0]) }).visibility;
           return v == this.ColumnVisibility.ALWAYS_HIDE ? false :
                  v == this.ColumnVisibility.ALWAYS_SHOW ? true :
-                 columns.find(c2 => c[0] == c2[0])  ? true : false;
+                 columns.some(c2 => c[0] == c2[0]);
         });
       },
     },
