@@ -16,7 +16,7 @@ foam.CLASS({
 
   css: `
     ^wizard-body {
-      height: 90%;
+      height: 100%;
       background-color: white;
     }
 
