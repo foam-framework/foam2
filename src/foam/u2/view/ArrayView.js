@@ -16,6 +16,7 @@ foam.CLASS({
   ],
 
   exports: [
+    'enableRemoving',
     'mode',
     'updateData'
   ],
@@ -29,6 +30,16 @@ foam.CLASS({
     {
       name: 'defaultNewItem',
       value: ''
+    },
+    {
+      class: 'Boolean',
+      name: 'enableAdding',
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'enableRemoving',
+      value: true
     }
   ],
 
@@ -36,8 +47,8 @@ foam.CLASS({
     {
       name: 'addRow',
       label: 'Add',
-      isAvailable: function(mode) {
-        return mode === foam.u2.DisplayMode.RW;
+      isAvailable: function(mode, enableAdding) {
+        return enableAdding && mode === foam.u2.DisplayMode.RW;
       },
       code: function() {
         var newItem = this.defaultNewItem;
@@ -55,6 +66,7 @@ foam.CLASS({
       name: 'Row',
       imports: [ 
         'data',
+        'enableRemoving',
         'mode',
         'updateData'
       ],
@@ -75,8 +87,8 @@ foam.CLASS({
         {
           name: 'remove',
           label: '',
-          isAvailable: function(mode) {
-            return mode === foam.u2.DisplayMode.RW;
+          isAvailable: function(enableRemoving, mode) {
+            return enableRemoving && mode === foam.u2.DisplayMode.RW;
           },
           code: function() {
             this.data.splice(this.index, 1);

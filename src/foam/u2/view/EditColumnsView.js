@@ -100,8 +100,10 @@ foam.CLASS({
       name: 'columns',
       view: {
         class: 'foam.u2.view.FObjectArrayView',
-        mode: 'RO'
         valueView: { class: 'foam.u2.view.ColumnConfigView' },
+        mode: 'RO',
+        enableAdding: false,
+        enableRemoving: false
       },
       factory: function() {
         var rtn = this.allColumns.map(([axiomName, overridesMap]) => {
