@@ -326,8 +326,8 @@ foam.CLASS({
       tableCellFormatter: function(value, obj, axiom) {
         let addressString = '';
         for ( prop in value.instance_ ) if ( prop ) addressString += ` ${value[prop]}`;
+        if ( addressString ) this.setAttribute('title', addressString.trim());
         return this.__subContext__.countryDAO.find(value.countryId).then((cobj) => {
-          if ( addressString ) this.setAttribute('title', addressString);
           return cobj ? this.add(cobj.name) : this.add(value.countryId);
         });
       },
