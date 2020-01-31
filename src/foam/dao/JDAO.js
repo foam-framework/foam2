@@ -27,8 +27,13 @@ foam.CLASS({
       name: 'promise',
       factory: function() {
         var self = this;
-        return this.journal.replay(this.delegate).then(function(dao) {
-          dao.listen(self.journal);
+        return this.journal.replay(null, this.delegate).then(function(dao) {
+          // TODO: can't use `requires` for class used inside factory
+          sink = foam.dao.JournalSink.create({
+            journal: self.journal,
+            dao: self.delegate,
+          });
+          dao.listen(sink);
           return dao;
         });
       }
