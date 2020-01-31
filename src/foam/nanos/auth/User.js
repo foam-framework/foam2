@@ -323,7 +323,9 @@ foam.CLASS({
         return this.Address.create();
       },
       tableCellFormatter: function(value, obj, axiom) {
-        this.add(value.countryId);
+        return this.__subContext__.countryDAO.find(value.countryId).then((cobj) => {
+          return cobj ? this.add(cobj.name) : this.add(value.countryId);
+        });
       },
       section: 'personal'
     },
