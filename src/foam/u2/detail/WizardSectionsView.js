@@ -15,12 +15,17 @@ foam.CLASS({
   ],
 
   css: `
+    ^ .foam-u2-layout-Cols {
+      align-items: center;
+    }
     ^wizard-body {
-      height: 90%;
+      height: 100%;
       background-color: white;
     }
 
     ^footer {
+      height: 75px;
+      border-top: solid 1px /*%GREY5%*/ #edf0f5;
       padding: 0px 128px;
     }
 

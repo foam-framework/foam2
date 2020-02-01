@@ -40,6 +40,19 @@ foam.CLASS({
     'stack?'
   ],
 
+  constants: [
+    {
+      type: 'Int',
+      name: 'MIN_COLUMN_WIDTH_FALLBACK',
+      value: 100
+    },
+    {
+      type: 'Int',
+      name: 'EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH',
+      value: 60
+    }
+  ],
+
   properties: [
     {
       class: 'Class',
@@ -72,7 +85,7 @@ foam.CLASS({
           var v = this.ColumnConfig.create({ of: of, axiom : (typeof c[0] === 'string' ? of.getAxiomByName(c[0]) : c[0]) }).visibility;
           return v == this.ColumnVisibility.ALWAYS_HIDE ? false :
                  v == this.ColumnVisibility.ALWAYS_SHOW ? true :
-                 columns.find(c2 => c[0] == c2[0])  ? true : false;
+                 columns.some(c2 => c[0] == c2[0]);
         });
       },
     },
@@ -188,6 +201,17 @@ foam.CLASS({
       class: 'Boolean',
       name: 'allCheckBoxesEnabled_',
       documentation: 'Used internally to denote when the user has pressed the checkbox in the header to enable all checkboxes.'
+    },
+    {
+      class: 'Int',
+      name: 'tableWidth_',
+      documentation: 'Width of the whole table. Used to get proper scrolling on narrow screens.',
+      expression: function(of, columns_) {
+        return columns_.reduce((acc, col) => {
+          const axiom = typeof col[0] === 'string' ? of.getAxiomByName(col[0]) : col[0];
+          return acc + (axiom.tableWidth || this.MIN_COLUMN_WIDTH_FALLBACK);
+        }, this.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH) + 'px';
+      }
     }
   ],
 
@@ -213,6 +237,7 @@ foam.CLASS({
         addClass(this.myClass(this.of.id.replace(/\./g, '-'))).
         start().
           addClass(this.myClass('thead')).
+          style({ 'min-width': this.tableWidth_$ }).
           show(this.showHeader$).
           add(this.slot(function(columns_) {
             return this.E().
@@ -288,7 +313,7 @@ foam.CLASS({
               call(function() {
                 this.start().
                   addClass(view.myClass('th')).
-                  style({ flex: '0 0 60px' }).
+                  style({ flex: `0 0 ${this.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH}px` }).
                   callIf(view.editColumnsEnabled, function() {
                     this.addClass(view.myClass('th-editColumns')).
                     on('click', function(e) {
@@ -370,6 +395,7 @@ foam.CLASS({
                       view.myClass('selected') : '';
                 })).
                 addClass(view.myClass('row')).
+                style({ 'min-width': view.tableWidth_$ }).
 
                 // If the multi-select feature is enabled, then we render a
                 // Checkbox in the first cell of each row.
@@ -464,7 +490,7 @@ foam.CLASS({
                 start().
                   addClass(view.myClass('td')).
                   attrs({ name: 'contextMenuCell' }).
-                  style({ flex: '0 0 60px' }).
+                  style({ flex: `0 0 ${this.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH}px` }).
                   tag(view.OverlayActionListView, {
                     data: actions,
                     obj: obj

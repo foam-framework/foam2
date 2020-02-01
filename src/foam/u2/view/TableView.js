@@ -17,6 +17,7 @@ foam.CLASS({
       border-bottom: 1px solid /*%GREY4%*/ #e7eaec;
       display: flex;
       height: 48px;
+      box-sizing: border-box;
     }
 
     ^tbody > ^tr:hover {
