@@ -416,6 +416,8 @@ foam.CLASS({
   documentation: 'FOAM documentation browser.',
 
   requires: [
+    'foam.dao.ArrayDAO',
+    'foam.dao.PromisedDAO',
     'foam.doc.ClassDocView',
     'foam.doc.ClassDocViewEnumValue',
     'foam.doc.ClassList',
@@ -423,7 +425,10 @@ foam.CLASS({
     'foam.doc.UMLDiagram'
   ],
 
-  imports: [ 'document' ],
+  imports: [
+    'document',
+    'nSpecDAO'
+  ],
 
   exports: [
     'as data',
@@ -451,7 +456,8 @@ foam.CLASS({
     {
       name: 'MODEL_COMPARATOR',
       factory: function() {
-        return foam.compare.compound([foam.core.Model.PACKAGE, foam.core.Model.NAME]).compare;
+        return foam.compare.toCompare(
+          [foam.core.Model.PACKAGE, foam.core.Model.NAME]).compare;
       },
     },
   ],
@@ -530,14 +536,72 @@ foam.CLASS({
       class: 'Boolean',
       name: 'showOnlyProperties',
       value: true
-    }
+    },
+    {
+      name: 'modelDAO',
+      expression: function(nSpecDAO) {
+        var self = this;
+        var dao = self.ArrayDAO.create({ of: self.Model })
+        return self.PromisedDAO.create({
+          promise: nSpecDAO.select().then(function(a) {
+            return Promise.all(
+              a.array.map(function(nspec) {
+                var cls = JSON.parse(nspec.client);
+                var clsName = cls.of ? cls.of : cls.class;
+                return foam.lookup(clsName, true);
+              }).filter(function(cls) {
+                return !!cls;
+              }).map(function(cls) {
+                return dao.put(cls.model_);
+              })
+            )
+          }).then(function() {
+            dao.select(foam.mlang.sink.Count.create()).then((c) => console.log("COUNT>>>"+c.value));
+            return dao;
+          })
+        })
+      }
+    },
+    {
+      name: 'fakeFoamDotUsed',
+      documentation: `
+        A map of class objects derived from modelDAO, corresponding to the
+        format of the foam.USED global.
+      `
+    },
   ],
 
   methods: [
+    function init() {
+      this.onDetach(this.fakeFoamDotUsed$.follow(this.PromiseSlot.create({
+        promise: this.modelDAO.select().then((arraySink) => {
+          var asMap = {};
+          for ( var i = 0; i < arraySink.array.length; i++ ) {
+            let model = arraySink.array[i];
+            // We must not build a class if it's already in the context
+            let cls = foam.__context__.__cache__[model.id];
+            if (cls === undefined) {
+              cls = model.buildClass();
+            }
+            asMap[model.id] = cls;
+          }
+          return asMap;
+        })
+      })));
+    },
     function initE() {
-      for ( var key in foam.UNUSED ) foam.lookup(key);
+      for ( var key in foam.UNUSED ) {
+        foam.lookup(key);
+      }
       this.SUPER();
-
+      this.add(this.slot(function (fakeFoamDotUsed) {
+        if ( fakeFoamDotUsed == undefined )
+          return 'Loading...';
+        this.displayMain(fakeFoamDotUsed);
+      }));
+    },
+    function displayMain(fakeFoamDotUsed) {
+      var self = this;
       this.
         addClass(this.myClass()).
         tag(this.PATH, {displayWidth: 80}).
@@ -568,7 +632,7 @@ foam.CLASS({
             end().
             start('td').
               style({'vertical-align': 'top'}).
-              tag(this.ClassList, {title: 'Class List', showPackages: false, showSummary: true, data: Object.values(foam.USED).sort(this.MODEL_COMPARATOR)}).
+              tag(this.ClassList, {title: 'Class List', showPackages: false, showSummary: true, data: Object.values(self.fakeFoamDotUsed).sort(this.MODEL_COMPARATOR)}).
             end().
             start('td').
               style({'vertical-align': 'top'}).
