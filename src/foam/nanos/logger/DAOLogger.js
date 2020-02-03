@@ -37,6 +37,11 @@ return dao;
       name: 'logger',
       class: 'Object',
       javaFactory: `return new foam.nanos.logger.StdoutLogger();`
+    },
+    {
+      name: 'hostname',
+      class: 'String',
+      javaFactory: 'return System.getProperty("hostname", "localhost");'
     }
   ],
   axioms: [
@@ -75,9 +80,11 @@ if ( initializing.get() ) {
   System.out.println("DAOLogger initializing");
   return;
 }
-LogMessage lm = new LogMessage.Builder(getX())
-                    .setSeverity(severity)
-                    .setMessage(message).build();
+LogMessage lm = new LogMessage(
+                    getX(),
+                    getHostname(),
+                    severity,
+                    message);
 getDao().put_(getX().put("logger", (Logger) getLogger()), lm);
 `
     },
