@@ -46,10 +46,9 @@ foam.CLASS({
     'exportData',
     'exportObj',
     {
-      name: 'useFiltered',
+      name: 'exportAllColumns',
       view: { class: 'foam.u2.CheckBox' },
-      class: 'Boolean',
-      value: true
+      class: 'Boolean'
     }
   ],
 
@@ -110,7 +109,7 @@ foam.CLASS({
           .add(
             self.slot(function(dataType) {
               if( dataType == 'CSV' ) {
-                return self.E().start().addClass('label').add('Export filtered columns only ').startContext({ data: self }).add(self.USE_FILTERED).endContext().end();
+                return self.E().start().addClass('label').add('Export all columns ').startContext({ data: self }).add(self.EXPORT_ALL_COLUMNS).endContext().end();
               }
             })
           )
@@ -131,7 +130,7 @@ foam.CLASS({
       }
 
       var filteredColumnsCopy = this.filteredTableColumns;
-      if( ! this.useFiltered )
+      if( this.exportAllColumns )
         this.filteredTableColumns$.set(null);
 
       var exportDriver = await this.exportDriverRegistryDAO.find(this.dataType);
@@ -141,7 +140,7 @@ foam.CLASS({
         await exportDriver.exportDAO(this.__context__, this.exportData) :
         await exportDriver.exportFObject(this.__context__, this.exportObj);
 
-        if( ! this.useFiltered )
+        if( this.exportAllColumns )
           this.filteredTableColumns$.set(filteredColumnsCopy);
     },
 
@@ -152,7 +151,7 @@ foam.CLASS({
       }
 
       var filteredColumnsCopy = this.filteredTableColumns;
-      if( ! this.useFiltered )
+      if( this.exportAllColumns )
         this.filteredTableColumns$.set(null);
 
       var exportDriverReg = await this.exportDriverRegistryDAO.find(this.dataType);
@@ -171,7 +170,7 @@ foam.CLASS({
         link.click();
       })
 
-      if( ! this.useFiltered )
+      if( this.exportAllColumns )
         this.filteredTableColumns$.set(filteredColumnsCopy);
     }
   ]
