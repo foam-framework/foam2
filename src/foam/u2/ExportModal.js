@@ -108,7 +108,7 @@ foam.CLASS({
           .start(this.NOTE).addClass('input-box').addClass('note').end()
           .add(
             self.slot(function(dataType) {
-              if( dataType == 'CSV' ) {
+              if ( dataType == 'CSV' ) {
                 return self.E().start().addClass('label').add('Export all columns ').startContext({ data: self }).add(self.EXPORT_ALL_COLUMNS).endContext().end();
               }
             })
@@ -130,7 +130,7 @@ foam.CLASS({
       }
 
       var filteredColumnsCopy = this.filteredTableColumns;
-      if( this.exportAllColumns )
+      if ( this.exportAllColumns )
         this.filteredTableColumns$.set(null);
 
       var exportDriver = await this.exportDriverRegistryDAO.find(this.dataType);
@@ -140,7 +140,7 @@ foam.CLASS({
         await exportDriver.exportDAO(this.__context__, this.exportData) :
         await exportDriver.exportFObject(this.__context__, this.exportObj);
 
-        if( this.exportAllColumns )
+        if ( this.exportAllColumns )
           this.filteredTableColumns$.set(filteredColumnsCopy);
     },
 
@@ -151,7 +151,7 @@ foam.CLASS({
       }
 
       var filteredColumnsCopy = this.filteredTableColumns;
-      if( this.exportAllColumns )
+      if ( this.exportAllColumns )
         this.filteredTableColumns$.set(null);
 
       var exportDriverReg = await this.exportDriverRegistryDAO.find(this.dataType);
@@ -170,7 +170,7 @@ foam.CLASS({
         link.click();
       })
 
-      if( this.exportAllColumns )
+      if ( this.exportAllColumns )
         this.filteredTableColumns$.set(filteredColumnsCopy);
     }
   ]
