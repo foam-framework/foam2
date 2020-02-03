@@ -164,7 +164,7 @@ foam.CLASS({
           if ( config$CRUDActionsAuth$delete ) {
             var deleteArray = config$CRUDActionsAuth$delete;
 
-            deleteArray = deleteArray.map((permission) => permission.replace('%', data$id) );
+            deleteArray = deleteArray.map((permission) => permission.replace('%', data$id));
 
             deleteAction = self.DELETE.clone().copyFrom({
               availablePermissions: self.DELETE.availablePermissions.concat(deleteArray)
