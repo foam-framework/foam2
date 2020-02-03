@@ -46,12 +46,6 @@ foam.CLASS({
     ^view-container {
       margin: auto;
     }
-
-    ^truncate {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
   `,
 
   requires: [
