@@ -22,10 +22,10 @@ foam.CLASS({
       outputter.outputFObject(X, obj);
       return outputter.toString();
     },
-    function exportDAO(X, dao) {
+    function exportDAO(X, dao, useFilteredColumns) {
       return dao.select(this.CSVSink.create({
           of: dao.of,
-          props: X.filteredTableColumns || undefined
+          props: useFilteredColumns ? X.filteredTableColumns : undefined
         })).then( (s) => s.csv );
     }
   ]
