@@ -17,7 +17,7 @@ foam.CLASS({
 
   requires: [
     'foam.u2.ModalHeader',
-    'foam.u2.layout.Cols',
+    'foam.u2.layout.Cols'
   ],
 
   properties: [

@@ -11,6 +11,7 @@ foam.CLASS({
   documentation: 'Export driver registry model',
 
   tableColumns: [ 'id', 'driverName', 'targetModel', 'extension' ],
+
   properties: [
     { class: 'String', name: 'id', tableWidth: 80 },
     { class: 'String', name: 'driverName', tableWidth: 300 },

@@ -62,7 +62,7 @@ foam.CLASS({
       expression: function(of) { return 'Create a New ' + of.model_.label; }
     },
     {
-      class: 'StringArray',
+      class: 'Array',
       name: 'defaultColumns',
       factory: null,
       expression: function(of) {
