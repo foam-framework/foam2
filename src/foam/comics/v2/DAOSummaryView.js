@@ -154,7 +154,7 @@ foam.CLASS({
           if ( config$CRUDActionsAuth$update ) {
             var editArray = config$CRUDActionsAuth$update;
 
-            editArray = editArray.map((permission) => permission.replace('%', data$id) );
+            editArray = editArray.map((permission) => permission.replace('%', data$id));
 
             editAction = self.EDIT.clone().copyFrom({
               availablePermissions: self.EDIT.availablePermissions.concat(editArray)
