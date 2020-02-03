@@ -131,7 +131,7 @@ foam.CLASS({
       }
 
       var filteredColumnsCopy = this.filteredTableColumns;
-      if(!this.useFiltered) {
+      if( ! this.useFiltered ) {
         this.filteredTableColumns$.set(null);
       }
 
@@ -142,7 +142,7 @@ foam.CLASS({
         await exportDriver.exportDAO(this.__context__, this.exportData) :
         await exportDriver.exportFObject(this.__context__, this.exportObj);
 
-        if(!this.useFiltered) {
+        if( ! this.useFiltered ) {
           this.filteredTableColumns$.set(filteredColumnsCopy);
         }
     },
@@ -154,7 +154,7 @@ foam.CLASS({
       }
 
       var filteredColumnsCopy = this.filteredTableColumns;
-      if(!this.useFiltered) {
+      if( ! this.useFiltered ) {
         this.filteredTableColumns$.set(null);
       }
 
@@ -174,7 +174,7 @@ foam.CLASS({
         link.click();
       })
 
-      if(!this.useFiltered) {
+      if( ! this.useFiltered ) {
         this.filteredTableColumns$.set(filteredColumnsCopy);
       }
     }
