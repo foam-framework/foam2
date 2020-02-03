@@ -192,7 +192,7 @@ foam.CLASS({
                   .start()
                     .add(data.toSummary())
                     .addClass(this.myClass('account-name'))
-                    .addClass(this.myClass('truncate'))
+                    .addClass('truncate-ellipsis')
                   .end()
                   .startContext({ data }).add(self.primary).endContext()
                 .end()
