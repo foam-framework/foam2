@@ -136,6 +136,12 @@ foam.CLASS({
       content: "";
       display: block;
     }
+
+    .truncate-ellipsis {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   `,
 
   properties: [
