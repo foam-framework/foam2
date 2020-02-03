@@ -131,9 +131,8 @@ foam.CLASS({
       }
 
       var filteredColumnsCopy = this.filteredTableColumns;
-      if( ! this.useFiltered ) {
+      if( ! this.useFiltered )
         this.filteredTableColumns$.set(null);
-      }
 
       var exportDriver = await this.exportDriverRegistryDAO.find(this.dataType);
       exportDriver = foam.lookup(exportDriver.driverName).create();
@@ -142,9 +141,8 @@ foam.CLASS({
         await exportDriver.exportDAO(this.__context__, this.exportData) :
         await exportDriver.exportFObject(this.__context__, this.exportObj);
 
-        if( ! this.useFiltered ) {
+        if( ! this.useFiltered )
           this.filteredTableColumns$.set(filteredColumnsCopy);
-        }
     },
 
     async function download() {
@@ -154,9 +152,8 @@ foam.CLASS({
       }
 
       var filteredColumnsCopy = this.filteredTableColumns;
-      if( ! this.useFiltered ) {
+      if( ! this.useFiltered )
         this.filteredTableColumns$.set(null);
-      }
 
       var exportDriverReg = await this.exportDriverRegistryDAO.find(this.dataType);
       var exportDriver    = foam.lookup(exportDriverReg.driverName).create();
@@ -174,9 +171,8 @@ foam.CLASS({
         link.click();
       })
 
-      if( ! this.useFiltered ) {
+      if( ! this.useFiltered )
         this.filteredTableColumns$.set(filteredColumnsCopy);
-      }
     }
   ]
 
