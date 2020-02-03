@@ -753,6 +753,7 @@ public class MMJournal extends AbstractJournal implements Electable {
         } catch ( Exception e ) {
           logger.info("!!fail replay from : " + node.getId() + "-" + node.getHostName() + " exception message: " + e);
           TCPNioServer.closeSocketChannel(channel);
+          throw new RuntimeException(e);
         } finally {
           try {
             if ( channel != null ) {
