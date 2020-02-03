@@ -23,7 +23,7 @@ foam.CLASS({
       name: 'ignores',
       class: 'String',
       documentation: 'Ignored properties separated by comma.',
-      value: 'lastModified, lastModifiedBy'
+      value: 'lastModified, lastModifiedBy, userFeedback'
     }
   ],
 
