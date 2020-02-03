@@ -12,7 +12,8 @@ foam.CLASS({
   documentation: 'Export Modal',
 
   imports: [
-    'exportDriverRegistryDAO'
+    'exportDriverRegistryDAO',
+    'filteredTableColumns'
   ],
 
   requires: [
@@ -47,7 +48,8 @@ foam.CLASS({
     {
       name: 'useFiltered',
       view: { class: 'foam.u2.CheckBox' },
-      class: 'Boolean'
+      class: 'Boolean',
+      value: true
     }
   ],
 
@@ -107,7 +109,7 @@ foam.CLASS({
           .start(this.NOTE).addClass('input-box').addClass('note').end()
           .add(
             self.slot(function(dataType) {
-              if(dataType == 'CSV') {
+              if( dataType == 'CSV' ) {
                 return self.E().start().addClass('label').add('Export filtered columns only ').startContext({ data: self }).add(self.USE_FILTERED).endContext().end();
               }
             })
@@ -128,12 +130,21 @@ foam.CLASS({
         return;
       }
 
+      var filteredColumnsCopy = this.filteredTableColumns;
+      if(!this.useFiltered) {
+        this.filteredTableColumns$.set(null);
+      }
+
       var exportDriver = await this.exportDriverRegistryDAO.find(this.dataType);
       exportDriver = foam.lookup(exportDriver.driverName).create();
 
       this.note = this.exportData ?
-        await exportDriver.exportDAO(this.__context__, this.exportData, this.useFiltered) :
-        await exportDriver.exportFObject(this.__context__, this.exportObj, this.useFiltered);
+        await exportDriver.exportDAO(this.__context__, this.exportData) :
+        await exportDriver.exportFObject(this.__context__, this.exportObj);
+
+        if(!this.useFiltered) {
+          this.filteredTableColumns$.set(filteredColumnsCopy);
+        }
     },
 
     async function download() {
@@ -142,12 +153,17 @@ foam.CLASS({
         return;
       }
 
+      var filteredColumnsCopy = this.filteredTableColumns;
+      if(!this.useFiltered) {
+        this.filteredTableColumns$.set(null);
+      }
+
       var exportDriverReg = await this.exportDriverRegistryDAO.find(this.dataType);
       var exportDriver    = foam.lookup(exportDriverReg.driverName).create();
 
       var p = this.exportData ?
         exportDriver.exportDAO(this.__context__, this.exportData) :
-        Promise.resolve(exportDriver.exportFObject(this.__context__, this.exportObj, this.useFiltered));
+        Promise.resolve(exportDriver.exportFObject(this.__context__, this.exportObj));
 
       p.then(result => {
         result = 'data:' + exportDriverReg.mimeType + ',' + result;
@@ -157,6 +173,10 @@ foam.CLASS({
         document.body.appendChild(link);
         link.click();
       })
+
+      if(!this.useFiltered) {
+        this.filteredTableColumns$.set(filteredColumnsCopy);
+      }
     }
   ]
 

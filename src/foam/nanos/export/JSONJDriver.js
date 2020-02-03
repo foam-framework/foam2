@@ -25,7 +25,7 @@ foam.CLASS({
       return 'p(' + this.outputter.stringify(obj) + ')\r\n';
     },
 
-    function exportDAO(X, dao, useFilteredColumns) {
+    function exportDAO(X, dao) {
       var output = '';
       return dao.select(function(o) {
         output += this.exportFObject(X, o);

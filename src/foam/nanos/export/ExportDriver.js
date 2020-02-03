@@ -20,7 +20,7 @@ foam.INTERFACE({
     {
       name: 'exportDAO',
       type: 'Promise',
-      args: ['X', 'dao', 'useFilteredColumns'],
+      args: ['X', 'dao'],
       documentation: 'Exports data in a DAO'
     }
   ]
