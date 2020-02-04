@@ -39,7 +39,7 @@ foam.CLASS({
       this.TableView.create();
 
       this.add(this.CLEAR_ALL);
-      this.columns_.push(this.CLEAR);
+      this.columns_.push([this.CLEAR, null]);
 
       this.SUPER();
 
