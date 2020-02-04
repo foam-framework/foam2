@@ -6,14 +6,12 @@
 
 package foam.nanos.pool;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ExecutorService;
-
 import foam.core.Agency;
 import foam.core.ContextAgent;
 import foam.core.X;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
+import java.util.concurrent.*;
 
 public class ThreadPoolAgency
   extends    AbstractFixedThreadPool
@@ -39,7 +37,7 @@ public class ThreadPoolAgency
       incrExecuting(1);
 
       Logger logger = (Logger) x_.get("logger");
-      PM pm = new PM(this.getClass(), agent_.getClass().getName());
+      PM     pm     = new PM(this.getClass(), agent_.getClass().getName());
 
       try {
         agent_.execute(x_);
@@ -74,14 +72,22 @@ public class ThreadPoolAgency
     }
   }
 
-  public synchronized ExecutorService getPool() {
-    if ( pool_ == null ) {
-      pool_ = Executors.newFixedThreadPool(getNumberOfThreads());
-    }
+  public void init_() {
+    /* GC threads that haven't been used for 10 seconds. */
+    pool_ = new ThreadPoolExecutor(
+      getNumberOfThreads(),
+      getNumberOfThreads(),
+      10,
+      TimeUnit.SECONDS,
+      new LinkedBlockingQueue()
+    );
+  }
+
+  public ExecutorService getPool() {
     return pool_;
   }
 
-  // TODO: reverse order or 2nd and 3rd args
+  // TODO: reverse order of 2nd and 3rd args
   public void submit(X x, ContextAgent agent, String description) {
     incrQueued();
     getPool().submit(new ContextAgentRunnable(x, agent));
