@@ -394,8 +394,10 @@ public class TreeNode {
    * In-order traversal with efficient skip and limit.
    * Each node contains a 'size' will show the amount of node under itself. When first reach the one node, check the the number of nodes under it leftchild.
    * If amount <= skip number just skip it. If amount > skip number, go into this branch and check the size again.
-   * When skip number achieve 0, it will reach each node as regular in-order traversal.
+   * When skip number is 0, it will then perform a regular in-order traversal.
    * When the limit node is 0, stop the whole traversal.
+   * Skip and limit are provided in a long[] so that they can be updated.
+   *
    * @return a long[] which contains update skip and limit number.
    */
   protected void skipLimitTreeNode(TreeNode currentNode, Sink sink, long[] skipLimit, Index tail, boolean reverse) {
