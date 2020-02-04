@@ -47,19 +47,6 @@ foam.CLASS({
     padding-right: 10px;
     vertical-align: top;
   }
-  ^ .up-arrow {
-    margin-bottom: 6px;
-    border: 1px solid /*%PRIMARY3%*/ #406dea;
-    display: inline-block;
-    padding: 3px;
-    float: right;
-    position: relative;
-    right: 40px;
-    top: 7px;
-    transform: rotate(45deg);
-    border-width: 1px 0px 0px 1px;
-    -webkit-transform: rotate(45deg);
-  }
   ^ .menu-label {
     width: calc(100% - 24px);
     padding-top: 15px;
@@ -74,7 +61,6 @@ foam.CLASS({
     display: inline-block;
   }
   ^ .selected-root {
-    width: 100%;
     border-left: 4px solid /*%PRIMARY3%*/ #406dea !important;
     background: /*%PRIMARY5%*/ #e5f1fc;
     color: /*%BLACK%*/ black;
@@ -186,7 +172,21 @@ foam.CLASS({
               .start('span')
                 .add(menu.label)
               .end()
-              .start().enableClass('up-arrow', viewChildren).end()
+              .start()
+                .style({
+                    visibility: hasChildren.map(function(c) { return c ? 'visible' : 'hidden'; }),
+                    'margin-bottom': '6px',
+                    'border': '1px solid /*%PRIMARY3%*/ #406dea',
+                    'display': 'inline-block',
+                    'padding': '3px',
+                    'float': 'right',
+                    'position': 'relative',
+                    'right': '40px',
+                    'top': '7px',
+                    'transform': viewChildren.map(function(c) { return c ? 'rotate(225deg)' : 'rotate(45deg)' } ),
+                    'border-width': '1px 0px 0px 1px'                    
+                })
+              .end()
             .end()
 
             .start()
