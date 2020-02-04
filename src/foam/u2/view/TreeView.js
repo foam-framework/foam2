@@ -113,7 +113,6 @@ foam.CLASS({
             'vertical-align': 'middle',
             'font-weight': 'bold',
             'display': 'inline-block',
-            'visibility': 'visible',
             'font-size': '16px',
             'transform': this.expanded$.map(function(c) { return c ? 'rotate(180deg)' : 'rotate(90deg)' })
           }).

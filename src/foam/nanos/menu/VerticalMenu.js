@@ -20,7 +20,7 @@ foam.CLASS({
   ^ .side-nav-view {
     display: inline-block;
     position: absolute;
-    height: 95vh;
+    height: 107vh;
     width: 240px;
     overflow-y: scroll;
     overflow-x: hidden;
@@ -131,24 +131,6 @@ foam.CLASS({
     {
       name: 'menuSearch',
       value: ''
-      // view: function(_, X) {
-      //   return {
-      //   class: 'foam.u2.view.RichChoiceView',
-      //     sections: [
-      //       {
-      //         heading: '',
-      //         dao: X.menuDAO
-      //       },
-      //     ],
-      //     search: true,
-      //     searchPlaceholder: 'Search...',
-      //     selectionView: { class: 'net.nanopay.ui.MenuChoiceSelection' },
-      //     rowView: { class: 'net.nanopay.ui.MenuRowView' }
-      //   };
-      // },
-      // factory: function() {
-      //   return this.currentMenu;
-      // }
     }
   ],
   methods: [
@@ -174,19 +156,20 @@ foam.CLASS({
             .start()
             .show(searchVisibily)
             .attrs({ name: menu.label })
-            .on('click', function() {
-              if ( self.currentMenu != null && self.currentMenu.parent == menu.id ) {
-                return;
-              }
-
-              if ( ! hasChildren.get() ) {
-                self.menuListener(menu.id);
-                self.pushMenu(menu.id);
-              }
-              //self.menuSearch = menu.id;
-            })
             .addClass('sidenav-item-wrapper')
               .start().addClass('menu-label')
+              .on('click', function() {
+                viewChildren.set(!viewChildren.get());
+                if ( self.currentMenu != null && self.currentMenu.parent == menu.id ) {
+                  return;
+                }
+  
+                if ( ! hasChildren.get() ) {
+                  self.menuListener(menu.id);
+                  self.pushMenu(menu.id);
+                }
+                //self.menuSearch = menu.id;
+              })
               .enableClass('selected-root', slot)
               .enableClass('selected-root', self.currentMenu$.map((currentMenu) => {
                 var selectedRoot = window.location.hash.replace('#', '') == menu.id ||
@@ -203,7 +186,7 @@ foam.CLASS({
               .start('span')
                 .add(menu.label)
               .end()
-              .start().enableClass('up-arrow', visibilitySlot).end()
+              .start().enableClass('up-arrow', viewChildren).end()
             .end()
 
             .start()
