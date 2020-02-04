@@ -488,6 +488,7 @@ FOAM_FILES([
   { name: "foam/u2/view/UnstyledTableView", flags: ['web'] },
   { name: "foam/u2/view/TableView", flags: ['web'] },
   { name: "foam/u2/view/EditColumnsView", flags: ['web'] },
+  { name: "foam/u2/view/ColumnConfigView", flags: ['web'] },
   { name: "foam/u2/md/OverlayDropdown", flags: ['web'] },
   { name: "foam/u2/view/ScrollTableView", flags: ['web'] },
   { name: "foam/u2/view/ScrollDAOView", flags: ['web'] },
