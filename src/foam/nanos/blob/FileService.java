@@ -66,7 +66,7 @@ public class FileService
       // permission check is really necessary.
       User owner = (User) userDAO_.find_(x, file.getOwner());
       User user = (User) x.get("user");
-      if ( user == null || owner == null || (user.getId()!= owner.getId() && ! auth.check(x,"file.read.*")) ) {
+      if ( user == null || owner == null || (user.getId() != owner.getId() && ! auth.check(x,"file.read." + file.getId())) ) {
         resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         return;
       }
