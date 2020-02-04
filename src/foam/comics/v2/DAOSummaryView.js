@@ -22,7 +22,7 @@ foam.CLASS({
     foam.pattern.Faceted.create()
   ],
 
-  css:`
+  css: `
     ^ {
       padding: 32px
     }
@@ -145,7 +145,7 @@ foam.CLASS({
       this.SUPER();
       this
         .addClass(this.myClass())
-        .add(self.slot(function(data, data$id, config$CRUDActionsAuth$update, config$CRUDActionsAuth$delete,config$browseTitle, config$viewBorder, viewView) {
+        .add(self.slot(function(data, data$id, config$CRUDActionsAuth$update, config$CRUDActionsAuth$delete, config$browseTitle, config$viewBorder, viewView) {
 
           // iterate through permissions and replace % with data$id
           var editAction = self.EDIT;
@@ -154,9 +154,7 @@ foam.CLASS({
           if ( config$CRUDActionsAuth$update ) {
             var editArray = config$CRUDActionsAuth$update;
 
-            editArray = editArray.map(permission => {
-              return permission.replace("%", data$id);
-            });
+            editArray = editArray.map((permission) => permission.replace('%', data$id));
 
             editAction = self.EDIT.clone().copyFrom({
               availablePermissions: self.EDIT.availablePermissions.concat(editArray)
@@ -166,10 +164,7 @@ foam.CLASS({
           if ( config$CRUDActionsAuth$delete ) {
             var deleteArray = config$CRUDActionsAuth$delete;
 
-
-            deleteArray = deleteArray.map(permission => {
-              return permission.replace("%", data$id);
-            });
+            deleteArray = deleteArray.map((permission) => permission.replace('%', data$id));
 
             deleteAction = self.DELETE.clone().copyFrom({
               availablePermissions: self.DELETE.availablePermissions.concat(deleteArray)
@@ -191,6 +186,7 @@ foam.CLASS({
                   .start()
                     .add(data.toSummary())
                     .addClass(this.myClass('account-name'))
+                    .addClass('truncate-ellipsis')
                   .end()
                   .startContext({ data }).add(self.primary).endContext()
                 .end()

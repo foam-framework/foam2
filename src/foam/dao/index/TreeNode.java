@@ -100,14 +100,15 @@ public class TreeNode {
   }
 
   public TreeNode skew(TreeNode node, Index tail) {
+    /** 'node' should be a new (cloned) TreeNode, not a reused one. **/
     if ( node != null && node.left != null && node.left.level == node.level ) {
       // Swap the pointers of horizontal left links.
       TreeNode l = maybeClone(node.left);
 
       node.left = l.right;
       l.right   = node;
-      node      = updateSize(node, tail);
-      l         = updateSize(l, tail);
+      updateSize(node, tail);
+      updateSize(l, tail);
 
       return l;
     }
@@ -227,8 +228,9 @@ public class TreeNode {
   }
 
   private TreeNode decreaseLevel(TreeNode node) {
+    /** 'node' should be a new (cloned) TreeNode, not a reused one. **/
     long expectedLevel = 1 + Math.min(
-      node.left  != null ? node.left.level : 0 ,
+      node.left  != null ? node.left.level  : 0 ,
       node.right != null ? node.right.level : 0);
 
     if ( expectedLevel < node.level ) {

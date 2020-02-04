@@ -12,7 +12,8 @@ foam.CLASS({
   documentation: 'Export Modal',
 
   imports: [
-    'exportDriverRegistryDAO'
+    'exportDriverRegistryDAO',
+    'filteredTableColumns'
   ],
 
   requires: [
@@ -43,7 +44,12 @@ foam.CLASS({
       name: 'predicate'
     },
     'exportData',
-    'exportObj'
+    'exportObj',
+    {
+      name: 'exportAllColumns',
+      view: { class: 'foam.u2.CheckBox' },
+      class: 'Boolean'
+    }
   ],
 
   css: `
@@ -86,6 +92,7 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      var self = this;
       this.SUPER();
 
       this
@@ -99,6 +106,13 @@ foam.CLASS({
           .start(this.DATA_TYPE).end()
           .start().addClass('label').add('Response').end()
           .start(this.NOTE).addClass('input-box').addClass('note').end()
+          .add(
+            self.slot(function(dataType) {
+              if ( dataType == 'CSV' ) {
+                return self.E().start().addClass('label').add('Export all columns ').startContext({ data: self }).add(self.EXPORT_ALL_COLUMNS).endContext().end();
+              }
+            })
+          )
           .start(this.Cols).style({ 'justify-content': 'flex-start' }).addClass(this.myClass('buttons'))
             .start(this.DOWNLOAD).end()
             .start(this.CONVERT).end()
@@ -115,12 +129,19 @@ foam.CLASS({
         return;
       }
 
+      var filteredColumnsCopy = this.filteredTableColumns;
+      if ( this.exportAllColumns )
+        this.filteredTableColumns = null;
+
       var exportDriver = await this.exportDriverRegistryDAO.find(this.dataType);
       exportDriver = foam.lookup(exportDriver.driverName).create();
 
       this.note = this.exportData ?
         await exportDriver.exportDAO(this.__context__, this.exportData) :
         await exportDriver.exportFObject(this.__context__, this.exportObj);
+
+        if ( this.exportAllColumns )
+          this.filteredTableColumns = filteredColumnsCopy;
     },
 
     async function download() {
@@ -128,6 +149,10 @@ foam.CLASS({
         console.log('Neither exportData nor exportObj exist');
         return;
       }
+
+      var filteredColumnsCopy = this.filteredTableColumns;
+      if ( this.exportAllColumns )
+        this.filteredTableColumns = null;
 
       var exportDriverReg = await this.exportDriverRegistryDAO.find(this.dataType);
       var exportDriver    = foam.lookup(exportDriverReg.driverName).create();
@@ -144,6 +169,9 @@ foam.CLASS({
         document.body.appendChild(link);
         link.click();
       })
+
+      if ( this.exportAllColumns )
+        this.filteredTableColumns = filteredColumnsCopy;
     }
   ]
 

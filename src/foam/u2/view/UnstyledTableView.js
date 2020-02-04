@@ -313,7 +313,7 @@ foam.CLASS({
               call(function() {
                 this.start().
                   addClass(view.myClass('th')).
-                  style({ flex: `0 0 ${this.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH}px` }).
+                  style({ flex: `0 0 ${view.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH}px` }).
                   callIf(view.editColumnsEnabled, function() {
                     this.addClass(view.myClass('th-editColumns')).
                     on('click', function(e) {
@@ -490,7 +490,7 @@ foam.CLASS({
                 start().
                   addClass(view.myClass('td')).
                   attrs({ name: 'contextMenuCell' }).
-                  style({ flex: `0 0 ${this.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH}px` }).
+                  style({ flex: `0 0 ${view.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH}px` }).
                   tag(view.OverlayActionListView, {
                     data: actions,
                     obj: obj
