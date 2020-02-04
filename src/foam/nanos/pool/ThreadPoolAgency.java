@@ -72,18 +72,18 @@ public class ThreadPoolAgency
     }
   }
 
-  public void init_() {
-    /* GC threads that haven't been used for 10 seconds. */
-    pool_ = new ThreadPoolExecutor(
-      getNumberOfThreads(),
-      getNumberOfThreads(),
-      10,
-      TimeUnit.SECONDS,
-      new LinkedBlockingQueue()
-    );
-  }
+  public synchronized ExecutorService getPool() {
+    if ( pool_ == null ) {
+      /* GC threads that haven't been used for 10 seconds. */
+      pool_ = new ThreadPoolExecutor(
+        getNumberOfThreads(),
+        getNumberOfThreads(),
+        10,
+        TimeUnit.SECONDS,
+        new LinkedBlockingQueue<Runnable>()
+      );
+    }
 
-  public ExecutorService getPool() {
     return pool_;
   }
 
