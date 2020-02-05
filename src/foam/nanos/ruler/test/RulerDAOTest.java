@@ -88,7 +88,7 @@ public class RulerDAOTest extends Test {
 
     // wait for async
     try {
-      Thread.sleep(asyncWait + 100);
+      Thread.sleep(asyncWait + 2000);
     } catch (InterruptedException e) { }
     ruleHistory = (RuleHistory) ruleHistoryDAO.find(ruleHistory.getId());
     test(ruleHistory.getResult().equals("Done"),
