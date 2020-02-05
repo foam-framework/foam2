@@ -124,12 +124,16 @@ foam.CLASS({
     {
       class: 'String',
       name: 'serviceClass',
-      displayWidth: 80
+      displayWidth: 80,
+      readPermissionRequired: true,
+      writePermissionRequired: true
     },
     {
       class: 'String',
       name: 'boxClass',
-      displayWidth: 80
+      displayWidth: 80,
+      readPermissionRequired: true,
+      writePermissionRequired: true
     },
     {
       class: 'Code',
