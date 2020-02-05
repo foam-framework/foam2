@@ -121,23 +121,44 @@ foam.CLASS({
   ],
   methods: [
     function initE() {
+
+      var firstSearchMatch = foam.core.SimpleSlot.create({value: ''});
+      firstSearchMatch.sub(function() {
+        if(firstSearchMatch.get() && firstSearchMatch.get().length != 0) {
+          self.menuListener(firstSearchMatch.get());
+          self.pushMenu(firstSearchMatch.get());
+        }
+      });
+
       self = this;
+
       this
       .addClass(this.myClass())
       .start()
       .addClass('side-nav-view')
       .start()
+      .startContext({ data: this })
       .add(self.MENU_SEARCH.clone().copyFrom({ view: {
         class: 'foam.u2.view.TextField',
         onKey: true
       } }))
+      .endContext()
       .add(this.slot(function(menuSearch) {
         return self.E().select(this.dao_.where(this.EQ(this.Menu.PARENT, this.menuName)), function(menu) {
           var slot = foam.core.SimpleSlot.create({ value: false });
-          var viewChildren = foam.core.SimpleSlot.create({ value: false});
+          var viewChildren = foam.core.SimpleSlot.create({ value: menuSearch.length != 0 });
           var hasChildren = foam.core.SimpleSlot.create({ value: false });
-          var visibilitySlot = foam.core.ArraySlot.create({ slots: [slot, hasChildren] }).map((results) => results.every(x => x));
-          var searchVisibily = menu.label.includes(menuSearch);
+          var searchVisibily = menuSearch.length == 0 || (menu.label.includes(menuSearch) && !hasChildren.get());
+
+          hasChildren.sub(function() {
+            if (hasChildren.get())
+              firstSearchMatch.set('');
+          });
+          if ( menuSearch.length === 0 && firstSearchMatch.get().length !== 0)
+            firstSearchMatch.set('');
+          else if ( menuSearch.length !== 0 && searchVisibily && firstSearchMatch.get().length === 0)
+            firstSearchMatch.set(menu.id);
+
           return self.E()
             .start()
             .show(searchVisibily)
@@ -154,7 +175,6 @@ foam.CLASS({
                   self.menuListener(menu.id);
                   self.pushMenu(menu.id);
                 }
-                //self.menuSearch = menu.id;
               })
               .enableClass('selected-root', slot)
               .enableClass('selected-root', self.currentMenu$.map((currentMenu) => {
@@ -183,18 +203,20 @@ foam.CLASS({
                     'position': 'relative',
                     'right': '40px',
                     'top': '7px',
-                    'transform': viewChildren.map(function(c) { return c ? 'rotate(225deg)' : 'rotate(45deg)' } ),
+                    'transform': viewChildren.map(function(c) { return c ? 'rotate(225deg)' : 'rotate(45deg)'; } ),
                     'border-width': '1px 0px 0px 1px'                    
                 })
               .end()
             .end()
-
             .start()
               .addClass('submenu')
               .show(viewChildren)
               .select(self.dao_.where(self.EQ(self.Menu.PARENT, menu.id)), function(subMenu) {
                 var subMenuSearchVisibility = subMenu.label.includes(menuSearch);                      
-                searchVisibily = searchVisibily || subMenuSearchVisibility;
+                searchVisibily = menuSearch.length !== 0 && ( searchVisibily || subMenuSearchVisibility );
+                if ( searchVisibily && firstSearchMatch.get().length === 0 )
+                  firstSearchMatch.set(subMenu.id);
+
                 hasChildren.set(true);
                 var e = this.E()
                 .show(subMenuSearchVisibility)
@@ -218,80 +240,8 @@ foam.CLASS({
               })
             .end()
           .end();
-          //return self.E().start().add(menu.label).end();
-        });//.start().add(menuSearch).end();
+        });
       }))
-      // .select(this.dao_.where(this.EQ(this.Menu.PARENT, this.menuName)), function(menu) {
-      //   var slot = foam.core.SimpleSlot.create({ value: false });
-      //   var hasChildren = foam.core.SimpleSlot.create({ value: false });
-      //   var visibilitySlot = foam.core.ArraySlot.create({ slots: [slot, hasChildren] }).map((results) => results.every(x => x));
-      //   return this.E()
-      //     .start()
-      //     //.show(searchVisibilySlot)
-      //       .attrs({ name: menu.label })
-      //       .on('click', function() {
-      //         if ( self.currentMenu != null && self.currentMenu.parent == menu.id ) {
-      //           return;
-      //         }
-      //         if ( ! hasChildren.get() ) {
-      //           self.menuListener(menu.id);
-      //           self.pushMenu(menu.id);
-      //         }
-      //         self.menuSearch = menu.id;
-      //       })
-      //       .addClass('sidenav-item-wrapper')
-      //         .start().addClass('menu-label')
-      //         .enableClass('selected-root', slot)
-      //         .enableClass('selected-root', self.currentMenu$.map((currentMenu) => {
-      //           var selectedRoot = window.location.hash.replace('#', '') == menu.id ||
-      //             currentMenu != null && (
-      //               currentMenu.id == menu.id ||
-      //               currentMenu.parent == menu.id
-      //             );
-      //           slot.set(selectedRoot);
-      //           return selectedRoot;
-      //         }))
-      //         .start('img').addClass('icon')
-      //           .attr('src', menu.icon)
-      //         .end()
-      //         .start('span')
-      //           .add(menu.label)
-      //         .end()
-      //         .start().enableClass('up-arrow', visibilitySlot).end()
-      //       .end()
-
-      //       .start()
-      //         .addClass('submenu')
-      //         .show(visibilitySlot)
-      //         .select(self.dao_.where(self.EQ(self.Menu.PARENT, menu.id)), function(subMenu) {
-
-      //           self.searchVisibilySlot = self.searchVisibilySlot || subMenu.label.includes(self.menuSearch);
-                
-
-      //           hasChildren.set(true);
-      //           var e = this.E()
-      //           .show()
-      //             .addClass(self.myClass('submenu-item'))
-      //             .start().addClass(self.myClass('selected-dot')).end()
-      //             .attrs({ name: subMenu.id })
-      //             .on('click', function() {
-      //               if ( self.currentMenu != null && self.currentMenu.id != subMenu.id ) {
-      //                 self.pushMenu(subMenu.id);
-      //                 self.menuSearch = menu.id;
-      //               }
-      //             })
-      //             .start('span').add(subMenu.label).end()
-      //             .enableClass('selected-sub', self.currentMenu$.map((currentMenu) => {
-      //               return currentMenu != null && currentMenu.id === subMenu.id;
-      //             }));
-
-      //           if ( self.currentMenu == subMenu ) self.subMenu = e;
-
-      //           return e;
-      //         })
-      //       .end()
-      //     .end();
-      // })
     .end();
 
     this.subMenu$.dot('state').sub(this.scrollToCurrentSub);
