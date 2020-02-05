@@ -17,10 +17,10 @@ public class ThreadPoolAgency
   extends    AbstractFixedThreadPool
   implements Agency
 {
-  protected ExecutorService pool_          = null;
-  protected Object          queuedLock_    = new Object();
-  protected Object          executingLock_ = new Object();
-  protected Object          executedLock_  = new Object();
+  protected ThreadPoolExecutor pool_          = null;
+  protected Object             queuedLock_    = new Object();
+  protected Object             executingLock_ = new Object();
+  protected Object             executedLock_  = new Object();
 
   class ContextAgentRunnable
     implements Runnable
@@ -52,6 +52,15 @@ public class ThreadPoolAgency
   }
 
   public ThreadPoolAgency() {
+    /* GC threads that haven't been used for 10 seconds. */
+    pool_ = new ThreadPoolExecutor(
+      0,
+      getNumberOfThreads(),
+      10,
+      TimeUnit.SECONDS,
+      new LinkedBlockingQueue<Runnable>()
+    );
+    pool_.allowCoreThreadTimeOut(true);
   }
 
   public void incrExecuting(int d) {
@@ -72,18 +81,7 @@ public class ThreadPoolAgency
     }
   }
 
-  public synchronized ExecutorService getPool() {
-    if ( pool_ == null ) {
-      /* GC threads that haven't been used for 10 seconds. */
-      pool_ = new ThreadPoolExecutor(
-        getNumberOfThreads(),
-        getNumberOfThreads(),
-        10,
-        TimeUnit.SECONDS,
-        new LinkedBlockingQueue<Runnable>()
-      );
-    }
-
+  public ExecutorService getPool() {
     return pool_;
   }
 
