@@ -17,8 +17,12 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.dao.ProxySink',
+    'foam.dao.LimitedSink',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
+    'foam.core.Detachable',
+    'foam.core.X',
     'foam.mlang.predicate.Predicate',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityJunctionStatus',
@@ -27,6 +31,7 @@ foam.CLASS({
     'foam.nanos.session.Session',
     'java.util.Date',
     'java.util.List',
+    'java.util.Map',
     'static foam.mlang.MLang.*'
   ],
 
@@ -55,14 +60,11 @@ foam.CLASS({
         if ( x.get(Session.class) == null ) return false;
         if ( user == null || ! user.getEnabled() ) return false;
 
-        // Check whether user has permission to check user permissions.
-        if ( ! getDelegate().check(x, "service.auth.checkUser") ) return false;
-
         try {
-          DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+          DAO capabilityDAO = ( x.get("localCapabilityDAO") == null ) ? (DAO) x.get("capabilityDAO") : (DAO) x.get("localCapabilityDAO");
 
           Capability cap = (Capability) capabilityDAO.find(permission);
-          if ( cap != null && cap.isDeprecated(x) ) return getDelegate().checkUser(x, user, permission);
+          if ( cap != null && ( cap.isDeprecated(x) || cap.getEnabled() ) ) return getDelegate().checkUser(x, user, permission);
 
           Predicate capabilityScope = AND(
             EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
@@ -81,15 +83,29 @@ foam.CLASS({
               EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
             )) != null ) return true;
 
-          List<UserCapabilityJunction> userCapabilityJunctions = ((ArraySink) user.getCapabilities(x).getJunctionDAO()
-            .where(capabilityScope)
-            .select(new ArraySink())).getArray();
+          ProxySink proxy = new ProxySink(x, new LimitedSink(x, 1, 0, new ArraySink())) {
+            int count = 0;
+            @Override
+            public void put(Object o, Detachable sub) {
+              UserCapabilityJunction ucj = (UserCapabilityJunction) ((UserCapabilityJunction) o).deepClone();
+              Capability c = (Capability) capabilityDAO.find(ucj.getTargetId());
+              if ( c != null && ! c.isDeprecated(x) && c.implies(x, permission) ) {
+                getDelegate().put(o, sub);
+              }
+            }
+          };
 
-          for ( UserCapabilityJunction ucJunction : userCapabilityJunctions ) {
-            Capability capability = (Capability) capabilityDAO.find(ucJunction.getTargetId());
-            if ( capability.isDeprecated(x) ) continue;
-            if ( capability.implies(x, permission) ) return true;
-          }
+          List<UserCapabilityJunction> ucjs = ((ArraySink) ((ProxySink) ((ProxySink) userCapabilityJunctionDAO
+            .where(AND(
+              EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
+              EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
+            ))
+            .select(proxy))
+            .getDelegate())
+            .getDelegate())
+            .getArray();
+          if ( ucjs.size() > 0 ) return true;
+
         } catch (Exception e) {
           Logger logger = (Logger) x.get("logger");
           logger.error("check", permission, e);
