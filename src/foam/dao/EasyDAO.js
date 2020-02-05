@@ -291,7 +291,8 @@ foam.CLASS({
     {
       class: 'Boolean',
       documentation: 'Creates pipelinePMDAOs around each decorator to measure their performance',
-      name: 'pipelinePm'
+      name: 'pipelinePm',
+      value: false
     },
     {
       documentation: 'Have EasyDAO use a sequence number to index items. Note that .seqNo and .guid features are mutuallyexclusive.',
