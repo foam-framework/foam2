@@ -88,9 +88,16 @@ public class RulerDAOTest extends Test {
 
     // wait for async
     try {
-      Thread.sleep(asyncWait + 2000);
+      for (int i = 0; i < 2000; i++) {
+        Thread.sleep(asyncWait + 100);
+        ruleHistory = (RuleHistory) ruleHistoryDAO.find(ruleHistory.getId());
+        if ( ruleHistory.getResult().equals("Pending") )
+          continue;
+        else
+          break;
+      }
     } catch (InterruptedException e) { }
-    ruleHistory = (RuleHistory) ruleHistoryDAO.find(ruleHistory.getId());
+//    ruleHistory = (RuleHistory) ruleHistoryDAO.find(ruleHistory.getId());
     test(ruleHistory.getResult().equals("Done"),
       "Expected: Update rule history result = Done in rule 6 async action. Actual: " + ruleHistory.getResult()
     );
