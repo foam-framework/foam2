@@ -91,9 +91,7 @@ public class RulerDAOTest extends Test {
       for (int i = 0; i < 2000; i++) {
         Thread.sleep(asyncWait + 100);
         ruleHistory = (RuleHistory) ruleHistoryDAO.find(ruleHistory.getId());
-        if ( ruleHistory.getResult().equals("Pending") )
-          continue;
-        else
+        if ( ! ruleHistory.getResult().equals("Pending") )
           break;
       }
     } catch (InterruptedException e) { }
