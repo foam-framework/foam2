@@ -126,6 +126,7 @@ foam.CLASS({
   ],
   methods: [
     function initE() {
+      self = this;
 
       var firstSearchMatch = foam.core.SimpleSlot.create({value: ''});
       firstSearchMatch.sub(function() {
@@ -134,9 +135,6 @@ foam.CLASS({
           self.pushMenu(firstSearchMatch.get());
         }
       });
-
-      self = this;
-
       this
       .addClass(this.myClass())
       .start()
@@ -157,15 +155,18 @@ foam.CLASS({
           var slot = foam.core.SimpleSlot.create({ value: false });
           var viewChildren = foam.core.SimpleSlot.create({ value: menuSearch.length != 0 });
           var hasChildren = foam.core.SimpleSlot.create({ value: false });
-          var searchVisibily = menuSearch.length == 0 || (menu.label.includes(menuSearch) && !hasChildren.get());
+          var searchVisibily = foam.core.SimpleSlot.create({ value: menuSearch.length == 0 || (menu.label.includes(menuSearch) && !hasChildren.get()) });
 
+          searchVisibily.sub(function() {
+            console.log(menu.label + '  ' + searchVisibily.get());
+          });
           hasChildren.sub(function() {
             if (hasChildren.get())
               firstSearchMatch.set('');
           });
           if ( menuSearch.length === 0 && firstSearchMatch.get().length !== 0)
             firstSearchMatch.set('');
-          else if ( menuSearch.length !== 0 && searchVisibily && firstSearchMatch.get().length === 0)
+          else if ( menuSearch.length !== 0 && !hasChildren.get() && searchVisibily.get() && firstSearchMatch.get().length === 0)
             firstSearchMatch.set(menu.id);
 
           return self.E()
@@ -211,7 +212,8 @@ foam.CLASS({
                     'float': 'right',
                     'position': 'relative',
                     'right': '40px',
-                    'transform': viewChildren.map(function(c) { return c ? 'rotate(45deg)' : 'rotate(225deg)'; } ),
+                    'top': '2px',
+                    'transform': viewChildren.map(function(c) { return c ? 'rotate(225deg)' : 'rotate(135deg)'; } ),
                     'border-width': '1px 0px 0px 1px'                    
                 })
               .end()
@@ -221,9 +223,9 @@ foam.CLASS({
               .show(viewChildren)
               .select(self.dao_.where(self.EQ(self.Menu.PARENT, menu.id)), function(subMenu) {
                 var subMenuSearchVisibility = subMenu.label.includes(menuSearch);                      
-                searchVisibily = menuSearch.length !== 0 && ( searchVisibily || subMenuSearchVisibility );
+                searchVisibily.set(searchVisibily.get() || menuSearch.length === 0 || subMenuSearchVisibility);
                 
-                if ( searchVisibily && firstSearchMatch.get().length === 0 ) {
+                if ( searchVisibily.get() && menuSearch.length !== 0 && firstSearchMatch.get().length === 0 ) {
                   firstSearchMatch.set(subMenu.id);
                   console.log(subMenu.id);
                 }
