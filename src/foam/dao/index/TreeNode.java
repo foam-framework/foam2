@@ -394,38 +394,40 @@ public class TreeNode {
    * In-order traversal with efficient skip and limit.
    * Each node contains a 'size' will show the amount of node under itself. When first reach the one node, check the the number of nodes under it leftchild.
    * If amount <= skip number just skip it. If amount > skip number, go into this branch and check the size again.
-   * When skip number achieve 0, it will reach each node as regular in-order traversal.
+   * When skip number is 0, it will then perform a regular in-order traversal.
    * When the limit node is 0, stop the whole traversal.
+   * Skip and limit are provided in a long[] so that they can be updated.
+   *
    * @return a long[] which contains update skip and limit number.
    */
-  protected long[] skipLimitTreeNode(TreeNode currentNode, Sink sink, long skip, long limit, Index tail, boolean reverse) {
-    if ( limit <= 0 || currentNode == null ) return new long[] {skip, limit};
+  protected void skipLimitTreeNode(TreeNode currentNode, Sink sink, long[] skipLimit, Index tail, boolean reverse) {
+    if ( skipLimit[1] <= 0 || currentNode == null ) return;
 
     long size = currentNode.size;
-    if ( size <= skip ) return new long[] {skip-size, limit};
+    if ( size <= skipLimit[0] ) {
+      skipLimit[0] -= size;
+      return;
+    }
 
-    TreeNode left       = reverse ? currentNode.getRight() : currentNode.getLeft();
-    TreeNode right      = reverse ? currentNode.getLeft()  : currentNode.getRight();
-    long[]   skip_limit = new long[] {skip, limit}; //skip_limit[0]: skip, skip_limit[1]: limit
+    TreeNode left  = reverse ? currentNode.getRight() : currentNode.getLeft();
+    TreeNode right = reverse ? currentNode.getLeft()  : currentNode.getRight();
 
     if ( left != null ) {
-      skip_limit = skipLimitTreeNode(left, sink, skip_limit[0], skip_limit[1], tail, reverse);
+      skipLimitTreeNode(left, sink, skipLimit, tail, reverse);
     }
 
     Object value = currentNode.getValue();
-    tail.planSelect(value, sink, skip_limit[0], skip_limit[1], null, null).select(value, sink, skip_limit[0], skip_limit[1], null, null);
+    tail.planSelect(value, sink, skipLimit[0], skipLimit[1], null, null).select(value, sink, skipLimit[0], skipLimit[1], null, null);
     long tailSize = tail.size(value);
-    skip_limit[0] -= tailSize;
-    if ( skip_limit[0] < 0 ) {
-      skip_limit[1] += skip_limit[0];
-      skip_limit[0] = 0;
+    skipLimit[0] -= tailSize;
+    if ( skipLimit[0] < 0 ) {
+      skipLimit[1] += skipLimit[0];
+      skipLimit[0] = 0;
     }
 
     if ( right != null ) {
-      skip_limit = skipLimitTreeNode(right, sink, skip_limit[0], skip_limit[1], tail, reverse);
+      skipLimitTreeNode(right, sink, skipLimit, tail, reverse);
     }
-
-    return skip_limit;
   }
 
   /**
@@ -439,7 +441,7 @@ public class TreeNode {
       select_(currentNode, sink, tail);
       if ( order != null ) sink.eof();
     } else {
-      skipLimitTreeNode(currentNode, sink, skip, limit, tail, reverse);
+      skipLimitTreeNode(currentNode, sink, new long[] {skip, limit}, tail, reverse);
     }
   }
 
