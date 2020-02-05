@@ -184,7 +184,11 @@ foam.CLASS({
         }
 
         if ( getServiceProviderAware() ) {
-          delegate = new foam.nanos.auth.ServiceProviderAwareDAO.Builder(getX()).setDelegate(delegate).build();
+          foam.nanos.auth.ServiceProviderAwareDAO dao = new foam.nanos.auth.ServiceProviderAwareDAO.Builder(getX()).setDelegate(delegate).build();
+          if ( getServiceProviderAwarePropertyInfos() != null ) {
+            dao.setPropertyInfos(getServiceProviderAwarePropertyInfos());
+          }
+          delegate = dao;
         }
 
         if ( getLifecycleAware() && getDeletedAware() ){
@@ -569,9 +573,18 @@ foam.CLASS({
       value: true
     },
     {
+      documentation: 'Decorate with a ServiceProviderAwareDAO',
       name: 'serviceProviderAware',
       class: 'Boolean',
       javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.auth.ServiceProviderAware.class.isAssignableFrom(getOf().getObjClass());'
+    },
+    {
+      documentation: `More documentation in ServiceProviderAwareDAO.
+A map of class and PropertyInfos used by the ServiceProviderAwareDAO
+to traverse a hierarchy of models in search of a ServiceProviderAware
+model from which to test ServiceProvider ID (spid)`,
+      name: 'serviceProviderAwarePropertyInfos',
+      class: 'Map'
     },
     {
       name: 'lifecycleAware',
