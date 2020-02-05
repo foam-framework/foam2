@@ -41,6 +41,7 @@ foam.CLASS({
       margin: 6px 20px;
       inset: none;
       cursor: pointer;
+      margin-right: 0;
     }
 
     ^label:hover {
@@ -109,18 +110,18 @@ foam.CLASS({
         start('span').
           style({
             visibility: this.hasChildren$.map(function(c) { return c ? 'visible' : 'hidden'; }),
-            'margin-right': '5px',
             'vertical-align': 'middle',
             'font-weight': 'bold',
             'display': 'inline-block',
+            'float': 'right',
             'font-size': '16px',
-            'transform': this.expanded$.map(function(c) { return c ? 'rotate(180deg)' : 'rotate(90deg)' })
+            'transform': this.expanded$.map(function(c) { return c ? 'rotate(180deg)' : 'rotate(0deg)' })
           }).
           on('click', this.toggleExpanded).
           add('\u2303').
-          entity('nbsp').
+          //entity('nbsp').
         end().
-        on('click', this.selected).
+        on('click', this.toggleExpanded).
         on('dblclick', function() { self.dblclick && self.dblclick(self.data); }).
         callIf(this.draggable, function() {
           this.

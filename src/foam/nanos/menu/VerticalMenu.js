@@ -95,7 +95,12 @@ foam.CLASS({
   }
   ^ .selected-sub ^selected-dot {
     background-color: /*%PRIMARY3%*/ #406dea;
-  }`,
+  }
+  .foam-u2-search-TextSearchView {
+    text-align: center;
+    margin: 4px 0;
+  }
+  `,
   properties: [
     {
       name: 'menuName',
@@ -138,12 +143,16 @@ foam.CLASS({
       .addClass('side-nav-view')
       .start()
       .startContext({ data: this })
-      .add(self.MENU_SEARCH.clone().copyFrom({ view: {
-        class: 'foam.u2.view.TextField',
-        onKey: true
-      } }))
+      .start()
+        .add(self.MENU_SEARCH.clone().copyFrom({ view: {
+          class: 'foam.u2.view.TextField',
+          onKey: true
+        } }))
+        .addClass('foam-u2-search-TextSearchView')
+      .end()
       .endContext()
       .add(this.slot(function(menuSearch) {
+        var currentMenuCopy = this.currentMenu;
         return self.E().select(this.dao_.where(this.EQ(this.Menu.PARENT, this.menuName)), function(menu) {
           var slot = foam.core.SimpleSlot.create({ value: false });
           var viewChildren = foam.core.SimpleSlot.create({ value: menuSearch.length != 0 });
@@ -202,8 +211,7 @@ foam.CLASS({
                     'float': 'right',
                     'position': 'relative',
                     'right': '40px',
-                    'top': '7px',
-                    'transform': viewChildren.map(function(c) { return c ? 'rotate(225deg)' : 'rotate(45deg)'; } ),
+                    'transform': viewChildren.map(function(c) { return c ? 'rotate(45deg)' : 'rotate(225deg)'; } ),
                     'border-width': '1px 0px 0px 1px'                    
                 })
               .end()
@@ -214,8 +222,12 @@ foam.CLASS({
               .select(self.dao_.where(self.EQ(self.Menu.PARENT, menu.id)), function(subMenu) {
                 var subMenuSearchVisibility = subMenu.label.includes(menuSearch);                      
                 searchVisibily = menuSearch.length !== 0 && ( searchVisibily || subMenuSearchVisibility );
-                if ( searchVisibily && firstSearchMatch.get().length === 0 )
+                
+                if ( searchVisibily && firstSearchMatch.get().length === 0 ) {
                   firstSearchMatch.set(subMenu.id);
+                  console.log(subMenu.id);
+                }
+                  
 
                 hasChildren.set(true);
                 var e = this.E()
