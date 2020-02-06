@@ -54,7 +54,7 @@ public class ThreadPoolAgency
   public ThreadPoolAgency() {
     /* GC threads that haven't been used for 10 seconds. */
     pool_ = new ThreadPoolExecutor(
-      0,
+      getNumberOfThreads(),
       getNumberOfThreads(),
       10,
       TimeUnit.SECONDS,
