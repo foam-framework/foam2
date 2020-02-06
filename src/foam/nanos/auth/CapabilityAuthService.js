@@ -129,6 +129,7 @@ foam.CLASS({
 
         try {
           DAO capabilityDAO = ( x.get("localCapabilityDAO") == null ) ? (DAO) x.get("capabilityDAO") : (DAO) x.get("localCapabilityDAO");
+          DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
 
           // 1. check if there is a capability matching the name of the permission 
           // that is enabled and not deprecated, and granted to the user 
@@ -143,8 +144,6 @@ foam.CLASS({
               )
             );
 
-            DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
-
             if ( userCapabilityJunctionDAO.find(
               AND(
                 capabilityScope,
@@ -154,7 +153,7 @@ foam.CLASS({
             // if the user has the permission, store this in the cache and return the result
             // otherwise, move on to the 2nd part of the check
             if ( result ) {
-              (Map<String, Boolean> getCache()).put(key, result);
+              ((Map<String, Boolean>) getCache()).put(key, result);
               return result;
             }
           }
