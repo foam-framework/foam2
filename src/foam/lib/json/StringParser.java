@@ -17,6 +17,19 @@ import foam.lib.parse.Seq1;
 public class StringParser
   implements Parser
 {
+  protected ThreadLocal<StringBuilder> builder__ = new ThreadLocal<StringBuilder>() {
+    @Override
+    protected StringBuilder initialValue() {
+      return new StringBuilder();
+    }
+    @Override
+    public StringBuilder get() {
+      StringBuilder sb = super.get();
+      sb.setLength(0);
+      return sb;
+    }
+  };
+
   final Parser delimiterParser = new Alt(
     new Literal("\"\"\""),
     new Literal("\""),
@@ -41,13 +54,10 @@ public class StringParser
     ps = ps.apply(delimiterParser, x);
     if ( ps == null ) return null;
 
-    Parser delimiter = new Literal((String) ps.value());
-
-    // TODO: Use thread-local StringBuilder
-    StringBuilder sb = new StringBuilder();
-
-    PStream result;
-    boolean escaping = false;
+    Parser        delimiter = new Literal((String) ps.value());
+    StringBuilder sb        = builder__.get();
+    PStream       result;
+    boolean       escaping  = false;
 
     while ( ps.valid() ) {
       char c;
