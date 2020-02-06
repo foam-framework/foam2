@@ -130,26 +130,36 @@ foam.CLASS({
         try {
           DAO capabilityDAO = ( x.get("localCapabilityDAO") == null ) ? (DAO) x.get("capabilityDAO") : (DAO) x.get("localCapabilityDAO");
 
+          // 1. check if there is a capability matching the name of the permission 
+          // that is enabled and not deprecated, and granted to the user 
           Capability cap = (Capability) capabilityDAO.find(permission);
-          if ( cap != null && ( cap.isDeprecated(x) || cap.getEnabled() ) ) return getDelegate().checkUser(x, user, permission);
+          if ( cap != null && ! cap.isDeprecated(x) && cap.getEnabled() ) {
 
-          Predicate capabilityScope = AND(
-            EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
-            OR(
-              NOT(HAS(UserCapabilityJunction.EXPIRY)),
-              NOT(EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.EXPIRED))
-            )
-          );
+            Predicate capabilityScope = AND(
+              EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
+              OR(
+                NOT(HAS(UserCapabilityJunction.EXPIRY)),
+                NOT(EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.EXPIRED))
+              )
+            );
 
-          DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
+            DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
 
-          if ( userCapabilityJunctionDAO.find(
-            AND(
-              capabilityScope,
-              EQ(UserCapabilityJunction.TARGET_ID, permission),
-              EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
-            )) != null ) return true;
+            if ( userCapabilityJunctionDAO.find(
+              AND(
+                capabilityScope,
+                EQ(UserCapabilityJunction.TARGET_ID, permission),
+                EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
+              )) != null ) result = true;
+            // if the user has the permission, store this in the cache and return the result
+            // otherwise, move on to the 2nd part of the check
+            if ( result ) {
+              (Map<String, Boolean> getCache()).put(key, result);
+              return result;
+            }
+          }
 
+          // 2. check if the user has a capability that grants the permission
           ProxySink proxy = new ProxySink(x, new LimitedSink(x, 1, 0, new ArraySink())) {
             int count = 0;
             @Override
