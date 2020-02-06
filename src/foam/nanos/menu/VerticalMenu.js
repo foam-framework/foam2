@@ -18,6 +18,8 @@ foam.CLASS({
   ],
   css: `
   ^ .side-nav-view {
+    font-size: medium!important;
+    font-weight: normal;
     display: inline-block;
     position: absolute;
     height: 107vh;
@@ -122,11 +124,20 @@ foam.CLASS({
     {
       name: 'menuSearch',
       value: ''
-    }
+    },
+    // {
+    //   name: 'filteredDAO',
+    //   expression: function(dao_, menuSearch) {
+    //     //the only way: to do selection map to new menu object then this new menu object to TreeViewRow with the same relationship
+    //     //+ need to add onclick function to TreeViewRow
+    //     return dao_.where(this.CONTAINS_IC(this.Menu.LABEL, menuSearch));
+    //   }
+    // }
   ],
   methods: [
     function initE() {
       self = this;
+      self.menuSearch = 'a';
 
       var firstSearchMatch = foam.core.SimpleSlot.create({value: ''});
       firstSearchMatch.sub(function() {
@@ -149,113 +160,17 @@ foam.CLASS({
         .addClass('foam-u2-search-TextSearchView')
       .end()
       .endContext()
-      .add(this.slot(function(menuSearch) {
-        var currentMenuCopy = this.currentMenu;
-        return self.E().select(this.dao_.where(this.EQ(this.Menu.PARENT, this.menuName)), function(menu) {
-          var slot = foam.core.SimpleSlot.create({ value: false });
-          var viewChildren = foam.core.SimpleSlot.create({ value: menuSearch.length != 0 });
-          var hasChildren = foam.core.SimpleSlot.create({ value: false });
-          var searchVisibily = foam.core.SimpleSlot.create({ value: menuSearch.length == 0 || (menu.label.includes(menuSearch) && !hasChildren.get()) });
-
-          searchVisibily.sub(function() {
-            console.log(menu.label + '  ' + searchVisibily.get());
-          });
-          hasChildren.sub(function() {
-            if (hasChildren.get())
-              firstSearchMatch.set('');
-          });
-          if ( menuSearch.length === 0 && firstSearchMatch.get().length !== 0)
-            firstSearchMatch.set('');
-          else if ( menuSearch.length !== 0 && !hasChildren.get() && searchVisibily.get() && firstSearchMatch.get().length === 0)
-            firstSearchMatch.set(menu.id);
-
-          return self.E()
-            .start()
-            .show(searchVisibily)
-            .attrs({ name: menu.label })
-            .addClass('sidenav-item-wrapper')
-              .start().addClass('menu-label')
-              .on('click', function() {
-                viewChildren.set(!viewChildren.get());
-                if ( self.currentMenu != null && self.currentMenu.parent == menu.id ) {
-                  return;
-                }
-  
-                if ( ! hasChildren.get() ) {
-                  self.menuListener(menu.id);
-                  self.pushMenu(menu.id);
-                }
-              })
-              .enableClass('selected-root', slot)
-              .enableClass('selected-root', self.currentMenu$.map((currentMenu) => {
-                var selectedRoot = window.location.hash.replace('#', '') == menu.id ||
-                  currentMenu != null && (
-                    currentMenu.id == menu.id ||
-                    currentMenu.parent == menu.id
-                  );
-                slot.set(selectedRoot);
-                return selectedRoot;
-              }))
-              .start('img').addClass('icon')
-                .attr('src', menu.icon)
-              .end()
-              .start('span')
-                .add(menu.label)
-              .end()
-              .start()
-                .style({
-                    visibility: hasChildren.map(function(c) { return c ? 'visible' : 'hidden'; }),
-                    'margin-bottom': '6px',
-                    'border': '1px solid /*%PRIMARY3%*/ #406dea',
-                    'display': 'inline-block',
-                    'padding': '3px',
-                    'float': 'right',
-                    'position': 'relative',
-                    'right': '40px',
-                    'top': '2px',
-                    'transform': viewChildren.map(function(c) { return c ? 'rotate(225deg)' : 'rotate(135deg)'; } ),
-                    'border-width': '1px 0px 0px 1px'                    
-                })
-              .end()
-            .end()
-            .start()
-              .addClass('submenu')
-              .show(viewChildren)
-              .select(self.dao_.where(self.EQ(self.Menu.PARENT, menu.id)), function(subMenu) {
-                var subMenuSearchVisibility = subMenu.label.includes(menuSearch);                      
-                searchVisibily.set(searchVisibily.get() || menuSearch.length === 0 || subMenuSearchVisibility);
-                
-                if ( searchVisibily.get() && menuSearch.length !== 0 && firstSearchMatch.get().length === 0 ) {
-                  firstSearchMatch.set(subMenu.id);
-                  console.log(subMenu.id);
-                }
-                  
-
-                hasChildren.set(true);
-                var e = this.E()
-                .show(subMenuSearchVisibility)
-                  .addClass(self.myClass('submenu-item'))
-                  .start().addClass(self.myClass('selected-dot')).end()
-                  .attrs({ name: subMenu.id })
-                  .on('click', function() {
-                    if ( self.currentMenu != null && self.currentMenu.id != subMenu.id ) {
-                      self.pushMenu(subMenu.id);
-                      //self.menuSearch = menu.id;
-                    }
-                  })
-                  .start('span').add(subMenu.label).end()
-                  .enableClass('selected-sub', self.currentMenu$.map((currentMenu) => {
-                    return currentMenu != null && currentMenu.id === subMenu.id;
-                  }));
-
-                if ( self.currentMenu == subMenu ) self.subMenu = e;
-
-                return e;
-              })
-            .end()
-          .end();
+      .add(self.slot(function(menuSearch) {
+        return self.E()
+        .tag({ 
+          class: 'foam.u2.view.TreeView',
+          data: self.filteredDAO,
+          relationship: foam.nanos.menu.MenuMenuChildrenRelationship,
+          startExpanded: true,
+          formatter: function(data) { this.add(data.label); }
         });
       }))
+      
     .end();
 
     this.subMenu$.dot('state').sub(this.scrollToCurrentSub);
