@@ -17,6 +17,7 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.dao.Sink',
     'foam.dao.ProxySink',
     'foam.dao.LimitedSink',
     'foam.dao.ArraySink',
@@ -29,13 +30,70 @@ foam.CLASS({
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.logger.Logger',
     'foam.nanos.session.Session',
+    'java.util.concurrent.ConcurrentHashMap',
     'java.util.Date',
     'java.util.List',
     'java.util.Map',
     'static foam.mlang.MLang.*'
   ],
 
+  properties: [
+    {
+      class: 'Map',
+      name: 'cache',
+      javaFactory: `
+        return new ConcurrentHashMap<String, Boolean>();
+      `
+    },
+    {
+      name: 'initialized',
+      class: 'Boolean',
+      value: false
+    }
+  ],
+
   methods: [
+    {
+      name: 'initialize',
+      synchronized: true,
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+      ],
+      javaCode: `
+        if ( getInitialized() )
+          return;
+
+        DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
+        DAO capabilityDAO = (x.get("capabilityDAO") == null ) ? (DAO) x.get("capabilityDAO") : (DAO) x.get("localCapabilityDAO");
+        if ( capabilityDAO == null || userCapabilityJunctionDAO == null )
+          return;
+
+        Map<String, Boolean> cache = ( Map<String, Boolean> ) getCache();
+        Sink purgeSink = new Sink() {
+          public void put(Object obj, Detachable sub) {
+            cache.clear();
+          }
+          public void remove(Object obj, Detachable sub) {
+            cache.clear();
+          }
+          public void eof() {
+          }
+          public void reset(Detachable sub) {
+            cache.clear();
+          }
+        };
+
+        // Add the purge listener
+        userCapabilityJunctionDAO.listen(purgeSink, TRUE);
+        capabilityDAO.listen(purgeSink, TRUE);
+        
+        // Initialization done
+        setInitialized(true);
+      `
+    },
     {
       name: 'check',
       documentation: `
@@ -59,6 +117,15 @@ foam.CLASS({
         if ( x == null || permission == null ) return false;
         if ( x.get(Session.class) == null ) return false;
         if ( user == null || ! user.getEnabled() ) return false;
+
+        this.initialize(x);
+
+        String key = user.getId() + permission;
+        if ( (( Map<String, Boolean> )getCache()).containsKey(key) ) {
+          return (( Map<String, Boolean> )getCache()).get(key);
+        }
+
+        boolean result = false;
 
         try {
           DAO capabilityDAO = ( x.get("localCapabilityDAO") == null ) ? (DAO) x.get("capabilityDAO") : (DAO) x.get("localCapabilityDAO");
@@ -104,14 +171,20 @@ foam.CLASS({
             .getDelegate())
             .getDelegate())
             .getArray();
-          if ( ucjs.size() > 0 ) return true;
+
+          if ( ucjs.size() > 0) {
+            result = true;
+          }
+
+          // Add the result to the cache
+          (( Map<String, Boolean> ) getCache()).put(key, result);
 
         } catch (Exception e) {
           Logger logger = (Logger) x.get("logger");
           logger.error("check", permission, e);
         }
 
-        return getDelegate().checkUser(x, user, permission);
+        return result ? true : getDelegate().checkUser(x, user, permission);
       `
     }
   ]
