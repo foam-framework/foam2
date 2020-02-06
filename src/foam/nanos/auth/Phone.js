@@ -30,7 +30,7 @@ foam.CLASS({
       class: 'Boolean',
       name: 'verified',
       writePermissionRequired: true,
-      createMode: 'HIDDEN',
+      createVisibility: 'HIDDEN',
     }
   ]
 });

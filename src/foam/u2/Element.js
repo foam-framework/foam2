@@ -30,17 +30,17 @@ foam.ENUM({
 
   methods: [
     {
-      name: 'getMode',
+      name: 'getVisibilityValue',
       code: function(prop) {
-        return prop[this.modePropertyName];
+        return prop.visibility || prop[this.modePropertyName];
       }
     }
   ],
 
   values: [
-    { name: 'CREATE', label: 'Create', modePropertyName: 'createMode' },
-    { name: 'VIEW',   label: 'View',   modePropertyName: 'readMode'   },
-    { name: 'EDIT',   label: 'Edit',   modePropertyName: 'updateMode' }
+    { name: 'CREATE', label: 'Create', modePropertyName: 'createVisibility' },
+    { name: 'VIEW',   label: 'View',   modePropertyName: 'readVisibility'   },
+    { name: 'EDIT',   label: 'Edit',   modePropertyName: 'updateVisibility' }
   ]
 });
 
@@ -2165,40 +2165,23 @@ foam.CLASS({
       value: { class: 'foam.u2.TextField' }
     },
     {
-      // DEPRECATED: Use 'createMode', 'readMode', and 'updateMode' instead.
-      class: 'Enum',
-      of: 'foam.u2.Visibility',
       name: 'visibility',
-      value: 'RW'
+      documentation: 'Exists for backwards compatability. You should set createVisibility, updateVisibility, or readVisibility instead. If this property is set, it will override the other three.'
     },
     {
-      class: 'Enum',
-      of: 'foam.u2.DisplayMode',
-      name: 'createMode',
+      name: 'createVisibility',
       documentation: 'The display mode for this property when the controller mode is CREATE.',
       value: 'RW'
     },
     {
-      class: 'Enum',
-      of: 'foam.u2.DisplayMode',
-      name: 'readMode',
+      name: 'readVisibility',
       documentation: 'The display mode for this property when the controller mode is VIEW.',
-      assertValue: function(newValue) {
-        foam.assert(newValue === foam.u2.DisplayMode.RO || newValue === foam.u2.DisplayMode.HIDDEN, `Read mode must be RO or HIDDEN. Property '${this.of ? this.of.id + '.' : ''}${this.name}' was '${newValue.label}' and must be fixed.`);
-      },
       value: 'RO'
     },
     {
-      class: 'Enum',
-      of: 'foam.u2.DisplayMode',
-      name: 'updateMode',
+      name: 'updateVisibility',
       documentation: 'The display mode for this property when the controller mode is EDIT.',
       value: 'RW'
-    },
-    {
-      class: 'Function',
-      name: 'visibilityExpression',
-      value: null
     },
     {
       class: 'Boolean',
@@ -2238,21 +2221,51 @@ foam.CLASS({
       return e;
     },
 
-    function createVisibilityFor(data$) {
-      var Visibility = foam.u2.Visibility;
+    function createVisibilityFor(data$, controllerMode$) {
+      /**
+       * Return a slot of DisplayMode based on:
+       *   * visibility
+       *   * createVisibility
+       *   * updateVisibility
+       *   * readVisibility
+       *   * readPermissionRequired
+       *   * writePermissionRequired
+       */
+      const DisplayMode = foam.u2.DisplayMode;
 
-      var slot = this.visibilityExpression ?
-        foam.core.ExpressionSlot.create({
-          obj$: data$,
-          code: this.visibilityExpression
-        }) :
-        foam.core.ConstantSlot.create({ value: this.visibility });
+      var slot = foam.core.ProxySlot.create({
+        delegate$: controllerMode$.map((controllerMode) => {
+          var value = controllerMode.getVisibilityValue(this);
 
-      // TODO: Do something smarter than this.
+          if ( foam.String.isInstance(value) ) {
+            return foam.core.ConstantSlot.create({
+              value: foam.u2.DisplayMode[foam.String.constantize(value)]
+            });
+          }
+
+          if ( foam.u2.DisplayMode.isInstance(value) ) {
+            return foam.core.ConstantSlot.create({ value: value });
+          }
+
+          if ( foam.Function.isInstance(value) ) {
+            return foam.core.ExpressionSlot.create({
+              obj$: data$,
+              code: value
+            });
+          }
+
+          if ( foam.core.Slot.isInstance(value) ) {
+            return value;
+          }
+
+          throw new Error('Property.visibility must be set to one of the following: (1) a value of DisplayMode, (2) a function that returns a value of DisplayMode, or (3) a slot whose value is a value of DisplayMode. Property ' + this.name + ' was set to ' + value + ' instead.');
+        })
+      });
+
       if ( this.readPermissionRequired || this.writePermissionRequired ) {
         var visSlot  = slot;
         var permSlot = data$.map((data) => {
-          if ( ! data || ! data.__subContext__.auth ) return Visibility.HIDDEN;
+          if ( ! data || ! data.__subContext__.auth ) return DisplayMode.HIDDEN;
           var auth = data.__subContext__.auth;
 
           var propName = this.name.toLowerCase();
@@ -2261,20 +2274,20 @@ foam.CLASS({
 
           return auth.check(null, `${clsName}.rw.${propName}`)
               .then(function(rw) {
-                if ( rw ) return Visibility.RW;
-                if ( canRead ) return Visibility.RO;
+                if ( rw ) return DisplayMode.RW;
+                if ( canRead ) return DisplayMode.RO;
                 return auth.check(null, `${clsName}.ro.${propName}`)
-                  .then((ro) => ro ? Visibility.RO : Visibility.HIDDEN);
+                  .then((ro) => ro ? DisplayMode.RO : DisplayMode.HIDDEN);
               });
         });
 
         slot = foam.core.ArraySlot.create({ slots: [visSlot, permSlot] }).map((arr) => {
           var vis  = arr[0];
-          var perm = arr[1] || Visibility.HIDDEN;
+          var perm = arr[1] || DisplayMode.HIDDEN;
 
-          return perm === Visibility.HIDDEN ? perm :
-            vis  === Visibility.HIDDEN ? vis :
-            perm === Visibility.RO ? perm :
+          return perm === DisplayMode.HIDDEN ? perm :
+            vis  === DisplayMode.HIDDEN ? vis :
+            perm === DisplayMode.RO ? perm :
             vis;
         });
       }
@@ -2706,40 +2719,15 @@ foam.CLASS({
     // },
     {
       class: 'Enum',
-      of: 'foam.u2.Visibility',
-      name: 'visibility',
-      postSet: function() { this.updateMode_(this.mode); },
-      attribute: true,
-      value: 'RW'
-    },
-    {
-      class: 'Enum',
       of: 'foam.u2.DisplayMode',
       name: 'mode',
       attribute: true,
       postSet: function(_, mode) { this.updateMode_(mode); },
-      expression: function(visibility, controllerMode) {
-        if ( visibility === foam.u2.Visibility.HIDDEN ) {
-          return foam.u2.DisplayMode.HIDDEN;
-        }
-
-        if ( visibility === foam.u2.Visibility.RO ) {
-          return foam.u2.DisplayMode.RO;
-        }
-
-        if ( visibility === foam.u2.Visibility.DISABLED ) {
-          return foam.u2.DisplayMode.DISABLED;
-        }
-
-        if ( visibility === foam.u2.Visibility.FINAL && controllerMode !== foam.u2.ControllerMode.CREATE ) {
-          return foam.u2.DisplayMode.RO;
-        }
-
+      expression: function(controllerMode) {
         return controllerMode === foam.u2.ControllerMode.VIEW ?
           foam.u2.DisplayMode.RO :
           foam.u2.DisplayMode.RW ;
-      },
-      attribute: true
+      }
     }
   ],
 
@@ -2756,20 +2744,7 @@ foam.CLASS({
     },
 
     function fromProperty(p) {
-      this.visibility = p.visibility;
-
       this.attr('name', p.name);
-
-      if ( p.validateObj ) {
-        /*
-        var s = foam.core.ExpressionSlot.create({
-          obj$: this.__context__.data$,
-          code: p.validateObj
-        });
-        this.error_$.follow(s);
-        */
-//        this.error_$.follow(this.__context__.data.slot(p.validateObj));
-      }
     }
   ]
 });
