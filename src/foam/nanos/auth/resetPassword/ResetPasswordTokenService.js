@@ -155,6 +155,7 @@ EmailMessage message = new EmailMessage();
 message.setTo(new String[] { userResult.getEmail() });
 HashMap<String, Object> args = new HashMap<>();
 args.put("name", userResult.getFirstName());
+args.put("sendTo", userResult.getEmail());
 EmailsUtility.sendEmailFromTemplate(x, userResult, message, "password-changed", args);
 return true;`
     }
