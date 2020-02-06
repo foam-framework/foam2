@@ -9,7 +9,7 @@ foam.CLASS({
     name: 'UserRefines',
     refines: 'foam.nanos.auth.User',
     imports: [
-      'complianceHistoryDAO'
+      'complianceHistoryDAO?'
     ],
     actions: [
       {
