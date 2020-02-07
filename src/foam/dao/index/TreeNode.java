@@ -41,12 +41,12 @@ public class TreeNode {
 
   public TreeNode cloneNode() {
     return new TreeNode(
-      this.key,
-      this.value,
-      this.size,
-      this.level,
-      this.left,
-      this.right);
+      key,
+      value,
+      size,
+      level,
+      left,
+      right);
   }
 
   TreeNode maybeClone(TreeNode s) {
