@@ -41,7 +41,8 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'foam.mlang.predicate.Predicate',
-      name: 'predicate'
+      name: 'predicate',
+      factory: function() { return foam.mlang.predicate.True.create(); }
     },
     'exportData',
     'exportObj',
