@@ -221,7 +221,7 @@ foam.CLASS({
   actions: [
     {
       name: 'login',
-      label: 'Get Started',
+      label: 'Create Account',
       isEnabled: function(errors_, isLoading_) {
         return ! errors_ && ! isLoading_;
       },
