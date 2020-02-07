@@ -2097,7 +2097,7 @@ var examples = [
   },
   {
     name: 'Expression Slots',
-    description: 'ExpressionSlot creates a Slot from a list of Slots and a function to comine them',
+    description: 'ExpressionSlot creates a Slot from a list of Slots and a function to combine them',
     dependencies: [  ],
     code: function() {
       foam.CLASS({ name: 'Person', properties: ['fname', 'lname'] });
