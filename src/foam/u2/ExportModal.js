@@ -165,11 +165,16 @@ foam.CLASS({
       p.then(result => {
         result = 'data:' + exportDriverReg.mimeType + ',' + result;
         var link = document.createElement('a');
-        link.setAttribute('href', encodeURI(result));
-        link.setAttribute('download', 'data.' + exportDriverReg.extension);
-        document.body.appendChild(link);
-        link.click();
-      })
+        var href = encodeURI(result);
+        if ( href.length > 524288 ) {
+          alert('Results exceed maximum download size.');
+        } else {
+          link.setAttribute('href', href);
+          link.setAttribute('download', 'data.' + exportDriverReg.extension);
+          document.body.appendChild(link);
+          link.click();
+        }
+      });
 
       if ( this.exportAllColumns )
         this.filteredTableColumns = filteredColumnsCopy;
