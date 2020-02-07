@@ -31,6 +31,7 @@ foam.CLASS({
   imports: [
     'dblclick?',
     'onObjDrop',
+    'query',
     'selection',
     'startExpanded'
   ],
@@ -96,20 +97,39 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'draggable',
-      documentation: 'Enable to allow drag&drop editing.',
-      value: true
+      documentation: 'Enable to allow drag&drop editing.'
     },
     {
       class: 'Boolean',
       name: 'hasChildren'
+    },
+    {
+      class: 'Boolean',
+      name: 'showRootOnSearch',
+      value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'showThisOnSearch',
+      value: true
     }
   ],
 
   methods: [
     function initE() {
       var self = this;
+      self.showThisOnSearch = self.query ? ( self.data.label.includes(this.query) || self.hasChildren ) : true;
+        self.showRootOnSearch = this.showRootOnSearch || this.showThisOnSearch;
+
+      this.hasChildren$.sub(function() {
+        self.showThisOnSearch = self.query ? ( self.data.label.includes(this.query) || self.hasChildren ) : true;
+        self.showRootOnSearch = this.showRootOnSearch || this.showThisOnSearch;
+      });
+
+      this.data[self.relationship.forwardName].select().then(function(c) {console.log(c);});
       this.
         addClass(this.myClass()).
+        show(this.showRootOnSearch$ &&  this.showThisOnSearch$).
         addClass(this.slot(function(selected, id) {
           if ( selected && foam.util.equals(selected.id, id) ) {
             return this.myClass('selected');
@@ -134,7 +154,7 @@ foam.CLASS({
             call(this.formatter, [self.data]).
           end().
           start('span').
-            show(this.hasChildren$).
+            show(this.hasChildren$ && this.showRootOnSearch$).
             style({
               'margin-right': '5px',
               'vertical-align': 'middle',
@@ -157,7 +177,8 @@ foam.CLASS({
               data: obj,
               formatter: self.formatter,
               relationship: self.relationship,
-              expanded: self.startExpanded
+              expanded: self.startExpanded,
+              showRootOnSearch: self.showRootOnSearch$
             }, self);
           }).
         end();
@@ -238,11 +259,16 @@ foam.CLASS({
 
   exports: [
     'onObjDrop',
+    'query',
     'selection',
     'startExpanded'
   ],
 
   properties: [
+    {
+      class: 'String',
+      name: 'query'
+    },
     {
       class: 'foam.dao.DAOProperty',
       name: 'data'
@@ -266,12 +292,21 @@ foam.CLASS({
 
   methods: [
     function initE() {
-this.startExpanded = false;
+    this.startExpanded = false;
 
       var M   = this.ExpressionsSingleton.create();
       var of  = this.__context__.lookup(this.relationship.sourceModel);
+
+      this.data.select().then(function(x) {
+        console.log(x);
+      });
+
       var dao = this.data$proxy.where(
         M.NOT(M.HAS(of.getAxiomByName(this.relationship.inverseName))));
+
+        dao.select().then(function(x) {
+          console.log(x);
+        });
 
       var self = this;
       var isFirstSet = false;

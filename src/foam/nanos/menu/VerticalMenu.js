@@ -14,7 +14,8 @@ foam.CLASS({
   ],
   requires: [
     'foam.nanos.menu.Menu',
-    'foam.nanos.menu.VerticalMenu'
+    'foam.nanos.menu.VerticalMenu',
+    'foam.dao.ArraySink'
   ],
   css: `
   ^ .side-nav-view {
@@ -125,19 +126,37 @@ foam.CLASS({
       name: 'menuSearch',
       value: ''
     },
-    // {
-    //   name: 'filteredDAO',
-    //   expression: function(dao_, menuSearch) {
-    //     //the only way: to do selection map to new menu object then this new menu object to TreeViewRow with the same relationship
-    //     //+ need to add onclick function to TreeViewRow
-    //     return dao_.where(this.CONTAINS_IC(this.Menu.LABEL, menuSearch));
-    //   }
-    // }
+    {
+      name: 'filteredDAO',
+      // expression: function(dao_, menuSearch) {
+      //   self.dao_.where(this.CONTAINS_IC(this.Menu.LABEL, self.menuSearch)).select(this.Map.create({
+      //     arg1: self.Menu.PARENT, 
+      //     delegate: this.ArraySink.create()
+      //   })).then(function (val) {
+      //     var parentIds = val.array;
+      //     self.filteredDAO = self.dao_.where(this.OR(this.CONTAINS_IC(this.Menu.LABEL, self.menuSearch), this.IN(this.Menu.ID, parentIds)));
+      //   })
+      //   //the only way: to do selection map to new menu object then this new menu object to TreeViewRow with the same relationship
+      //   //+ need to add onclick function to TreeViewRow
+      //   return dao_.where(this.CONTAINS_IC(this.Menu.LABEL, menuSearch));
+      // }
+    }
   ],
   methods: [
     function initE() {
       self = this;
-      self.menuSearch = 'a';
+      //self.menuSearch = 'a';
+      self.filteredDAO = self.dao_;
+
+      this.menuSearch$.sub(function() {
+        self.dao_.where(self.CONTAINS_IC(self.Menu.LABEL, self.menuSearch)).select(self.Map.create({
+          arg1: self.Menu.PARENT, 
+          delegate: self.ArraySink.create()
+        })).then(function (val) {
+          var parentIds = val.delegate.array;
+          self.filteredDAO = self.dao_.where(self.OR(self.CONTAINS_IC(self.Menu.LABEL, self.menuSearch), self.IN(self.Menu.ID, parentIds)));
+        })
+      });
 
       var firstSearchMatch = foam.core.SimpleSlot.create({value: ''});
       firstSearchMatch.sub(function() {
@@ -160,13 +179,14 @@ foam.CLASS({
         .addClass('foam-u2-search-TextSearchView')
       .end()
       .endContext()
-      .add(self.slot(function(menuSearch) {
+      .add(self.slot(function(filteredDAO) {
         return self.E()
         .tag({ 
           class: 'foam.u2.view.TreeView',
-          data: self.filteredDAO,
+          data: self.dao_,
           relationship: foam.nanos.menu.MenuMenuChildrenRelationship,
           startExpanded: true,
+          query: self.menuSearch$.get(),
           formatter: function(data) { this.add(data.label); }
         });
       }))
