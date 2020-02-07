@@ -354,8 +354,7 @@ addDepsToClasses().then(function() {
     var allKeys = {};
     for ( k in classesNotFound ) allKeys[k] = true;
     for ( k in classesFound ) allKeys[k] = true;
-    console.log(''+found+'/'+Object.keys(allKeys).length+' '+
-      'sources found ('+notFound+' missing)');
+    console.log('${found}/${Object.keys(allKeys).length} sources found (${notFound} missing)');
     console.log(Object.keys(classesNotFound));
     if ( debugDataDir !== null ) {
       require('fs').writeFileSync(
