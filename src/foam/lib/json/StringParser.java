@@ -19,6 +19,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class StringParser
   implements Parser
 {
+  private final static Parser instance__ = new StringParser();
+
+  public static Parser instance() { return instance__; }
+
   protected static ThreadLocal<StringBuilder> builder__ = new ThreadLocal<StringBuilder>() {
     @Override
     protected StringBuilder initialValue() {
