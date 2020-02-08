@@ -13,9 +13,9 @@ public class CSVNewlineParser
 {
 
   static Parser delegate__ = new Alt(
-    new Seq0(Literal.create("\\"), Literal.create("r"), Literal.create("\\"), Literal.create("n")),
-    new Seq0(Literal.create("\\"), Literal.create("r")),
-    new Seq0(Literal.create("\\"), Literal.create("n"))
+    Literal.create("\\r\\n"),
+    Literal.create("\\r"),
+    Literal.create("\\n")
   );
 
   public PStream parse(PStream ps, ParserContext x) {
