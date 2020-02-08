@@ -34,21 +34,21 @@ public class StringParser
 
   protected final static Map cache_ = new ConcurrentHashMap();
 
-  final Parser delimiterParser = new Alt(
+  final static Parser delimiterParser = new Alt(
     Literal.create("\"\"\""),
     Literal.create("\""),
     Literal.create("'")
   );
 
-  final char ESCAPE = '\\';
+  final static char ESCAPE = '\\';
 
   // An escape is either a Unicode code like \u001a, an ASCII escape like \n or
   // just a literal escape next character.
 
-  final Parser escapeParser = new Alt(
+  final static Parser escapeParser = new Alt(
     new UnicodeParser(),
     new ASCIIEscapeParser(),
-    new Seq1(1, Literal.create(Character.toString(ESCAPE)), new AnyChar())
+    new Seq1(1, Literal.create(Character.toString(ESCAPE)), AnyChar.instance())
   );
 
   public StringParser() {
