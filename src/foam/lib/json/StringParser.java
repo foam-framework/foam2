@@ -98,6 +98,8 @@ public class StringParser
     return ps.setValue(cache(sb));
   }
 
+  // static long count__ = 0;
+
   public String cache(StringBuilder sb) {
     if ( sb.length() > 40 ) return sb.toString();
 
@@ -110,7 +112,7 @@ public class StringParser
       return s;
     }
 
-//    System.err.println("************************************** " + s + " " + cache_.size());
+    // System.err.println("************************************** " + s + " " + count__++);
 
     return s2;
   }
