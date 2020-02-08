@@ -25,12 +25,12 @@ public class RelativeDateParser extends ProxyParser {
         new Alt(
         //today-7
           new Seq(
-            new Literal("today"),
-            new Literal("-"),
+            Literal.create("today"),
+            Literal.create("-"),
             new IntParser()),
 
         //today
-          new Literal("today")));
+          Literal.create("today")));
   }
 
   @Override

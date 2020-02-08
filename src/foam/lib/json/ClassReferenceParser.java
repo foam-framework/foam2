@@ -16,24 +16,24 @@ public class ClassReferenceParser
     super(new Alt(
       new NullParser(),
       new Seq1(15,
-        new Whitespace(),
-        new Literal("{"),
-        new Whitespace(),
+        Whitespace.instance(),
+        Literal.create("{"),
+        Whitespace.instance(),
         new KeyParser("class"),
-        new Whitespace(),
-        new Literal(":"),
-        new Whitespace(),
-        new Literal("\"__Class__\""),
-        new Whitespace(),
-        new Literal(","),
-        new Whitespace(),
+        Whitespace.instance(),
+        Literal.create(":"),
+        Whitespace.instance(),
+        Literal.create("\"__Class__\""),
+        Whitespace.instance(),
+        Literal.create(","),
+        Whitespace.instance(),
         new KeyParser("forClass_"),
-        new Whitespace(),
-        new Literal(":"),
-        new Whitespace(),
+        Whitespace.instance(),
+        Literal.create(":"),
+        Whitespace.instance(),
         new StringParser(),
-        new Whitespace(),
-        new Literal("}")),
+        Whitespace.instance(),
+        Literal.create("}")),
       new StringParser()
     ));
   }
@@ -45,7 +45,7 @@ public class ClassReferenceParser
 
     String classId = (String) ps.value();
     // Expects classId be a fully qualified name of a modelled class
-    // with Java code generation for class lookup and returns 
+    // with Java code generation for class lookup and returns
     // ClassInfo of the modelled class if found, otherwise return null.
     //
     // Eg.,

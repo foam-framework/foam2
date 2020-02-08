@@ -23,7 +23,7 @@ public class AnyParser
           // parse long but fail if decimal is found
           new Seq1(0,
             new LongParser(),
-            new Not(new Literal("."))),
+            new Not(Literal.create("."))),
           new DoubleParser(),
           new ObjectDateParser(),
           new StringArrayParser(),

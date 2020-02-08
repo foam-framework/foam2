@@ -15,17 +15,17 @@ public class FObjectParser
 
   public FObjectParser(final Class defaultClass) {
     super(new Seq1(3,
-      new Whitespace(),
-      new Literal("{"),
-      new Whitespace(),
+      Whitespace.instance(),
+      Literal.create("{"),
+      Whitespace.instance(),
       new Parser() {
         private Parser delegate = new Seq1(4,
             new KeyParser("class"),
-            new Whitespace(),
-            new Literal(":"),
-            new Whitespace(),
+            Whitespace.instance(),
+            Literal.create(":"),
+            Whitespace.instance(),
             new StringParser(),
-            new Optional(new Literal(",")));
+            new Optional(Literal.create(",")));
 
         public PStream parse(PStream ps, ParserContext x) {
           try {
@@ -63,8 +63,8 @@ public class FObjectParser
           }
         }
       },
-      new Whitespace(),
-      new Literal("}")));
+      Whitespace.instance(),
+      Literal.create("}")));
   }
 
   public FObjectParser() {

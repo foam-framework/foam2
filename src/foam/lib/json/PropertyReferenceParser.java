@@ -13,21 +13,21 @@ public class PropertyReferenceParser
 {
   public PropertyReferenceParser() {
     super(new Seq0(
-      new Whitespace(),
-      new Literal("{"),
-      new Whitespace(),
+      Whitespace.instance(),
+      Literal.create("{"),
+      Whitespace.instance(),
       new KeyParser("class"),
-      new Whitespace(),
-      new Literal(":"),
-      new Whitespace(),
-      new Literal("\"__Property__\""),
-      new Whitespace(),
-      new Literal(","),
-      new Whitespace(),
+      Whitespace.instance(),
+      Literal.create(":"),
+      Whitespace.instance(),
+      Literal.create("\"__Property__\""),
+      Whitespace.instance(),
+      Literal.create(","),
+      Whitespace.instance(),
       new KeyParser("forClass_"),
-      new Whitespace(),
-      new Literal(":"),
-      new Whitespace(),
+      Whitespace.instance(),
+      Literal.create(":"),
+      Whitespace.instance(),
       new Parser() {
         private Parser delegate = new StringParser();
 
@@ -39,12 +39,12 @@ public class PropertyReferenceParser
           return ps;
         }
       },
-      new Literal(","),
-      new Whitespace(),
+      Literal.create(","),
+      Whitespace.instance(),
       new KeyParser("name"),
-      new Whitespace(),
-      new Literal(":"),
-      new Whitespace(),
+      Whitespace.instance(),
+      Literal.create(":"),
+      Whitespace.instance(),
       new Parser() {
         private Parser delegate = new StringParser();
 
@@ -56,8 +56,8 @@ public class PropertyReferenceParser
           return ps;
         }
       },
-      new Whitespace(),
-      new Literal("}")));
+      Whitespace.instance(),
+      Literal.create("}")));
   }
 
   public PStream parse(PStream ps, ParserContext x) {

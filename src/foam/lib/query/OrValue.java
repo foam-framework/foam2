@@ -14,15 +14,17 @@ import foam.lib.parse.ParserContext;
 import foam.lib.parse.Repeat;
 import foam.lib.parse.Seq;
 
-public class OrValue extends foam.lib.parse.ProxyParser {
+public class OrValue
+  extends foam.lib.parse.ProxyParser
+{
 
   public OrValue() {
     setDelegate(
-        new Seq(
-            new Literal("("),
-            new Repeat(new ValueParser(), new Alt(new Literal("|"), new LiteralIC(" or "), new Literal(" | ")), 1),
-            new Literal(")")
-        ));
+      new Seq(
+        Literal.create("("),
+        new Repeat(new ValueParser(), new Alt(Literal.create("|"), new LiteralIC(" or "), Literal.create(" | ")), 1),
+        Literal.create(")")
+      ));
   }
 
   @Override

@@ -16,15 +16,15 @@ public class PropertyParser
   public PropertyParser(PropertyInfo p) {
     super(
       new Seq1(5,
-        new Whitespace(),
+        Whitespace.instance(),
         new Alt(
           new KeyParser(p.getName()),
           new KeyParser(p.getShortName())),
-        new Whitespace(),
-        new Literal(":"),
-        new Whitespace(),
+        Whitespace.instance(),
+        Literal.create(":"),
+        Whitespace.instance(),
         p.jsonParser(),
-        new Whitespace()));
+        Whitespace.instance()));
     property = p;
   }
 

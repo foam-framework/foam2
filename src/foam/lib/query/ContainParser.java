@@ -16,13 +16,14 @@ public class ContainParser extends foam.lib.parse.ProxyParser {
 
   public ContainParser(Parser valueParser) {
     setDelegate(new Seq1(1,
-                         new Literal(":"),
-                         valueParser ));
+      Literal.create(":"),
+      valueParser ));
   }
 
   @Override
   public PStream parse(PStream ps, ParserContext x) {
     ps = super.parse(ps, x);
+
     if ( ps == null ) return ps;
 
     foam.mlang.predicate.Binary expr = new foam.mlang.predicate.Contains();

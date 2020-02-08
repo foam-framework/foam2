@@ -35,22 +35,22 @@ public class DateParser
       new NullParser(),
       new LongParser(),
       new Seq(
-        new Literal("\""),
+        Literal.create("\""),
         new IntParser(),
-        new Literal("-"),
+        Literal.create("-"),
         new IntParser(),
-        new Literal("-"),
+        Literal.create("-"),
         new IntParser(),
-        new Literal("T"),
+        Literal.create("T"),
         new IntParser(),
-        new Literal(":"),
+        Literal.create(":"),
         new IntParser(),
-        new Literal(":"),
+        Literal.create(":"),
         new IntParser(),
-        new Literal("."),
+        Literal.create("."),
         new Repeat(new Chars("0123456789")),
-        new Literal("Z"),
-        new Literal("\""))));
+        Literal.create("Z"),
+        Literal.create("\""))));
   }
 
   public PStream parse(PStream ps, ParserContext x) {

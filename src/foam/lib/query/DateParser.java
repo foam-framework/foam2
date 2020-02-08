@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.lib.query;
 
 import foam.lib.json.IntParser;
@@ -12,11 +18,11 @@ public class DateParser
 
   public DateParser() {
     setDelegate(new Seq(// YYYY/MM/DD
-                        new IntParser(),
-                        new Literal("/"),
-                        new IntParser(),
-                        new Literal("/"),
-                        new IntParser()));
+      new IntParser(),
+      Literal.create("/"),
+      new IntParser(),
+      Literal.create("/"),
+      new IntParser()));
   }
 
   @Override

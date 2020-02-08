@@ -32,54 +32,54 @@ public class LiteralDateParser
             new Seq(
               new IntParser(),
               new Alt(
-                new Literal("-"),
-                new Literal("/")),
+                Literal.create("-"),
+                Literal.create("/")),
               new IntParser(),
               new Alt(
-                new Literal("-"),
-                new Literal("/")),
+                Literal.create("-"),
+                Literal.create("/")),
               new IntParser(),
-              new Literal("T"),
+              Literal.create("T"),
               new IntParser(),
-              new Literal(":"),
+              Literal.create(":"),
               new IntParser()),
 
             //YYYY-MM-DDTHH
             new Seq(
               new IntParser(),
               new Alt(
-                new Literal("-"),
-                new Literal("/")),
+                Literal.create("-"),
+                Literal.create("/")),
               new IntParser(),
               new Alt(
-                new Literal("-"),
-                new Literal("/")),
+                Literal.create("-"),
+                Literal.create("/")),
               new IntParser(),
-              new Literal("T"),
+              Literal.create("T"),
               new IntParser()),
 
         //YYYY-MM-DD
           new Seq(
-            //new Literal("\""),
+            //Literal.create("\""),
             new IntParser(),
             new Alt(
-                new Literal("-"),
-                new Literal("/")),
+                Literal.create("-"),
+                Literal.create("/")),
             new IntParser(),
             new Alt(
-                new Literal("-"),
-                new Literal("/")),
+                Literal.create("-"),
+                Literal.create("/")),
             new IntParser(),
-            new Whitespace()),
+            Whitespace.instance()),
 
         //YYYY-MM
           new Seq(
               new IntParser(),
               new Alt(
-                  new Literal("-"),
-                  new Literal("/")),
+                  Literal.create("-"),
+                  Literal.create("/")),
               new IntParser(),
-              new Whitespace()),
+              Whitespace.instance()),
 
         //YYYY
           new Seq(

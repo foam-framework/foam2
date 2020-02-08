@@ -16,8 +16,8 @@ public class CharParser extends foam.lib.parse.ProxyParser {
 
   public CharParser() {
     setDelegate(
-        new Alt(new Range('A', 'z'), new Range('0', '9'), new Literal("-"), new Literal("^"),
-            new Literal("_"), new Literal("@"), new Literal("%"), new Literal("."))
+        new Alt(new Range('A', 'z'), new Range('0', '9'), Literal.create("-"), Literal.create("^"),
+            Literal.create("_"), Literal.create("@"), Literal.create("%"), Literal.create("."))
         );
   }
 

@@ -17,15 +17,29 @@
 
 package foam.lib.parse;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class Literal
   implements Parser
 {
+  protected final static Map map_ = new ConcurrentHashMap();
+
+  public static Parser create(String s) {
+    if ( s == null ) return new Literal(s, s);
+
+    Parser p = (Parser) map_.get(s);
+
+    if ( p == null ) {
+      p = new Literal(s, s);
+      map_.put(s, p);
+    }
+
+    return p;
+  }
+
   protected String string_;
   protected Object value_;
-
-  public Literal(String s) {
-    this(s, s);
-  }
 
   public Literal(String s, Object v) {
     string_ = s;
