@@ -146,6 +146,7 @@ foam.CLASS({
     },
 
     async function download() {
+      var self = this;
       if ( ! this.exportData && ! this.exportObj ) {
         console.log('Neither exportData nor exportObj exist');
         return;
@@ -163,13 +164,19 @@ foam.CLASS({
         Promise.resolve(exportDriver.exportFObject(this.__context__, this.exportObj));
 
       p.then(result => {
-        result = 'data:' + exportDriverReg.mimeType + ',' + result;
+        var prefix = 'data:' + exportDriverReg.mimeType + ',';
         var link = document.createElement('a');
-        link.setAttribute('href', encodeURI(result));
-        link.setAttribute('download', 'data.' + exportDriverReg.extension);
-        document.body.appendChild(link);
-        link.click();
-      })
+        var href = encodeURI(prefix + result);
+        if ( href.length > 524288 ) {
+          self.note = result;
+          alert('Results exceed maximum download size.\nPlease cut and paste response data.');
+        } else {
+          link.setAttribute('href', href);
+          link.setAttribute('download', 'data.' + exportDriverReg.extension);
+          document.body.appendChild(link);
+          link.click();
+        }
+      });
 
       if ( this.exportAllColumns )
         this.filteredTableColumns = filteredColumnsCopy;
