@@ -31,10 +31,10 @@ public class ClassReferenceParser
         Whitespace.instance(),
         Literal.create(":"),
         Whitespace.instance(),
-        new StringParser(),
+        StringParser.instance(),
         Whitespace.instance(),
         Literal.create("}")),
-      new StringParser()
+      StringParser.instance()
     ));
   }
 

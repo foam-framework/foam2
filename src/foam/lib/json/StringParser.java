@@ -36,6 +36,12 @@ public class StringParser
     }
   };
 
+  /**
+   * Cache of already parsed Strings. Used to avoid wasting memory by
+   * generating multiple versions of the same String.
+   *
+   * TODO: move to own helper class.
+   **/
   protected final static Map cache_ = new ConcurrentHashMap();
 
   final static Parser delimiterParser = new Alt(
@@ -102,9 +108,7 @@ public class StringParser
     return ps.setValue(cache(sb));
   }
 
-  // static long count__ = 0;
-
-  public String cache(StringBuilder sb) {
+  public static String cache(StringBuilder sb) {
     if ( sb.length() > 40 ) return sb.toString();
 
     String s = sb.toString();
@@ -116,10 +120,9 @@ public class StringParser
       return s;
     }
 
-    // System.err.println("************************************** " + s + " " + count__++);
-
     return s2;
   }
+
   /**
    This would be better, but doesn't work because StringBuilder doesn't
    implement equals() and hashcode() properly.

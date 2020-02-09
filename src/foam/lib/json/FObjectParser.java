@@ -24,7 +24,7 @@ public class FObjectParser
             Whitespace.instance(),
             Literal.create(":"),
             Whitespace.instance(),
-            new StringParser(),
+            StringParser.instance(),
             new Optional(Literal.create(",")));
 
         public PStream parse(PStream ps, ParserContext x) {

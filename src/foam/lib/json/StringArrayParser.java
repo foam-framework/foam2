@@ -20,7 +20,7 @@ public class StringArrayParser
           Literal.create("["),
           Whitespace.instance(),
           new Repeat(
-            new StringParser(),
+            StringParser.instance(),
             new Seq0(Whitespace.instance(), Literal.create(","), Whitespace.instance())),
           Whitespace.instance(),
           Literal.create("]"))

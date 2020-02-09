@@ -8,7 +8,6 @@ package foam.lib.json;
 
 import foam.lib.parse.*;
 import foam.util.SafetyUtil;
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -16,6 +15,10 @@ import java.util.TimeZone;
 public class DateParser
   extends ProxyParser
 {
+  private final static Parser instance__ = new DateParser();
+
+  public static Parser instance() { return instance__; }
+
   protected static ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
     @Override
     protected StringBuilder initialValue() {
@@ -103,6 +106,7 @@ public class DateParser
     // try to parse milliseconds, default to 0
     c.add(Calendar.MILLISECOND, ! SafetyUtil.isEmpty(milliseconds.toString()) ?
       Integer.parseInt(milliseconds.toString(), 10) : 0);
+
     return ps.setValue(c.getTime());
   }
 }

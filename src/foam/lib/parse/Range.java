@@ -6,17 +6,20 @@
 
 package foam.lib.parse;
 
-public class Range implements Parser {
-  private char from;
-  private char to;
+// TODO: make into a Multiton
+public class Range
+  implements Parser
+{
+  private char from_;
+  private char to_;
 
   public Range(char from, char to) {
-    this.from = from;
-    this.to   = to;
+    from_ = from;
+    to_   = to;
   }
 
   public PStream parse(PStream ps, ParserContext x) {
-    if ( ps.valid() && ( ps.head() >= from ) && ( ps.head() <= to ) ) {
+    if ( ps.valid() && ( ps.head() >= from_ ) && ( ps.head() <= to_ ) ) {
       return ps.tail().setValue(ps.head());
     }
 
@@ -24,6 +27,6 @@ public class Range implements Parser {
   }
 
   public String toString() {
-    return "Range(" + from + "-" + to + ")";
+    return "Range(" + from_ + "-" + to_ + ")";
   }
 }
