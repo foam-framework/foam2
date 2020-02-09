@@ -1347,9 +1347,9 @@ foam.CLASS({
 
   properties: [
     ['javaInfoType', 'foam.core.AbstractDatePropertyInfo'],
-    ['javaJSONParser', 'new foam.lib.json.DateParser()'],
+    ['javaJSONParser', 'foam.lib.json.DateParser.instance()'],
     ['javaQueryParser', 'new foam.lib.query.DuringExpressionParser()'],
-    ['javaCSVParser', 'new foam.lib.json.DateParser()'],
+    ['javaCSVParser', 'foam.lib.json.DateParser.instance()'],
     ['sqlType', 'TIMESTAMP WITHOUT TIME ZONE']
   ],
 
@@ -1384,9 +1384,9 @@ foam.CLASS({
 
    properties: [
        ['javaInfoType', 'foam.core.AbstractDatePropertyInfo'],
-       ['javaJSONParser', 'new foam.lib.json.DateParser()'],
+       ['javaJSONParser', 'foam.lib.json.DateParser.instance()'],
        ['javaQueryParser', 'new foam.lib.query.DuringExpressionParser()'],
-       ['javaCSVParser', 'new foam.lib.json.DateParser()'],
+       ['javaCSVParser', 'foam.lib.json.DateParser.instance()'],
        ['sqlType', 'DATE']
    ],
 
@@ -1480,10 +1480,10 @@ foam.CLASS({
   flags: ['java'],
 
   properties: [
-    ['javaInfoType', 'foam.core.AbstractStringPropertyInfo'],
-    ['javaJSONParser', 'new foam.lib.json.StringParser()'],
-    ['javaQueryParser', 'new foam.lib.query.StringParser()'],
-    ['javaCSVParser', 'new foam.lib.csv.CSVStringParser()'],
+    ['javaInfoType',    'foam.core.AbstractStringPropertyInfo'],
+    ['javaJSONParser',  'foam.lib.json.StringParser.instance()'],
+    ['javaQueryParser', 'foam.lib.query.StringParser.instance()'],
+    ['javaCSVParser',   'foam.lib.csv.CSVStringParser.instance()'],
     {
       name: 'sqlType',
       expression: function(width) {
@@ -1852,10 +1852,10 @@ foam.CLASS({
   refines: 'foam.core.Object',
   flags: ['java'],
   properties: [
-    ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.AnyParser.instance()'],
+    ['javaInfoType',    'foam.core.AbstractObjectPropertyInfo'],
+    ['javaJSONParser',  'foam.lib.json.AnyParser.instance()'],
     ['javaQueryParser', 'foam.lib.query.AnyParser.instance()'],
-    ['javaCSVParser', 'new foam.lib.csv.CSVStringParser()']
+    ['javaCSVParser',   'foam.lib.csv.CSVStringParser.instance()']
   ]
 });
 
