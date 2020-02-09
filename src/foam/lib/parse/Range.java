@@ -6,14 +6,36 @@
 
 package foam.lib.parse;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
+
 // TODO: make into a Multiton
 public class Range
   implements Parser
 {
-  private char from_;
-  private char to_;
+  protected final static Map map__ = new ConcurrentHashMap();
 
-  public Range(char from, char to) {
+  /**
+   * Implement the multiton pattern so we don't create the same Range
+   * parser more than once.
+   **/
+  public static Parser create(char from, char to) {
+    String key = from + "" + to;
+    Parser p   = (Parser) map__.get(key);
+
+    if ( p == null ) {
+      p = new Range(from, to);
+      map__.put(key, p);
+    }
+
+    return p;
+  }
+
+
+  protected char from_;
+  protected char to_;
+
+  private Range(char from, char to) {
     from_ = from;
     to_   = to;
   }

@@ -18,7 +18,7 @@ public class CharParser
 
   public CharParser() {
     setDelegate(
-      new Alt(new Range('A', 'z'), new Range('0', '9'), Literal.create("-"), Literal.create("^"),
+      new Alt(Range.create('A', 'z'), Range.create('0', '9'), Literal.create("-"), Literal.create("^"),
           Literal.create("_"), Literal.create("@"), Literal.create("%"), Literal.create("."))
       );
   }

@@ -18,7 +18,7 @@ public class AnyKeyParser
           // TODO: Implement Java Grammar support (so separate files aren't needed)
           new IdentifierStartParser(),
           new Repeat0(new Alt(
-            new Range('0', '9'),
+            Range.create('0', '9'),
             new IdentifierStartParser()))))));
   }
 }
