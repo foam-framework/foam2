@@ -295,6 +295,40 @@ foam.CLASS({
       function(v) { return ! v || ! v.length; }
     ],
     [ 'type', 'Any[]' ]
+  ],
+
+  methods: [
+    function installInProto(proto) {
+      this.SUPER(proto);
+      var self = this;
+      Object.defineProperty(proto, self.name + '$push', {
+        get: function classGetter() {
+          return function (v) {
+            // Push value
+            this[self.name].push(v);
+            // Force property update
+            this[self.name] = this[self.name];
+          }
+        },
+        configurable: true
+      });
+      Object.defineProperty(proto, self.name + '$remove', {
+        get: function classGetter() {
+          return function (predicate) {
+            // Faster than splice or filter as of the time this was added
+            let oldArry = this[self.name];
+            let newArry = [];
+            for ( let i=0; i < oldArry.length; i++ ) {
+              if ( ! predicate.f(oldArry[i]) ) {
+                newArry.push(oldArry[i]);
+              }
+            }
+            this[self.name] = newArry;
+          }
+        },
+        configurable: true
+      });
+    },
   ]
 });
 
