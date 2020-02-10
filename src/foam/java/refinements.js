@@ -1355,11 +1355,11 @@ foam.CLASS({
   flags: ['java'],
 
   properties: [
-    ['javaInfoType', 'foam.core.AbstractDatePropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.DateParser.instance()'],
-    ['javaQueryParser', 'new foam.lib.query.DuringExpressionParser()'],
-    ['javaCSVParser', 'foam.lib.json.DateParser.instance()'],
-    ['sqlType', 'TIMESTAMP WITHOUT TIME ZONE']
+    ['javaInfoType',    'foam.core.AbstractDatePropertyInfo'],
+    ['javaJSONParser',  'foam.lib.json.DateParser.instance()'],
+    ['javaQueryParser', 'foam.lib.query.DuringExpressionParser.instance()'],
+    ['javaCSVParser',   'foam.lib.json.DateParser.instance()'],
+    ['sqlType',         'TIMESTAMP WITHOUT TIME ZONE']
   ],
 
   methods: [
@@ -1394,7 +1394,7 @@ foam.CLASS({
    properties: [
        ['javaInfoType',    'foam.core.AbstractDatePropertyInfo'],
        ['javaJSONParser',  'foam.lib.json.DateParser.instance()'],
-       ['javaQueryParser', 'new foam.lib.query.DuringExpressionParser()'],
+       ['javaQueryParser', 'foam.lib.query.DuringExpressionParser.instance()'],
        ['javaCSVParser',   'foam.lib.json.DateParser.instance()'],
        ['sqlType',         'DATE']
    ],

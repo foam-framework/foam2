@@ -22,11 +22,12 @@ public class PropertyExpressionParser
     for ( String aliase : prop.getAliases() ) {
       parsers.add(Literal.create(aliase));
     }
+
     if ( prop.getShortName() != null ) parsers.add(Literal.create(prop.getShortName()));
 
     parsers.add(Literal.create(prop.getName()));
 
-    Alt names = new Alt( parsers.toArray(new Parser[parsers.size()]) );
+    Alt names = new Alt(parsers.toArray(new Parser[parsers.size()]));
 
     setDelegate(new Seq1(2,
       foam.lib.json.Whitespace.instance(),
@@ -34,7 +35,7 @@ public class PropertyExpressionParser
       // TODO: There should probably be a better way to detect Date
       // properties, but this works for now.
       prop.getValueClass().equals(java.util.Date.class) ?
-      new Alt(new EqualsParser(new DuringExpressionParser()),
+      new Alt(new EqualsParser(DuringExpressionParser.instance()),
         new BeforeLteParser(new LiteralDateParser()),
         new BeforeLtParser(new LiteralDateParser()),
         new AfterGteParser(new LiteralDateParser()),
