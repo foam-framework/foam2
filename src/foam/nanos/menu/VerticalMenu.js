@@ -141,17 +141,14 @@ foam.CLASS({
         .addClass('foam-u2-search-TextSearchView')
       .end()
       .endContext()
-      .add(self.slot(function(menuSearch) {
-        return self.E()
-        .tag({ 
-          class: 'foam.u2.view.TreeView',
-          data: self.dao_,
-          relationship: foam.nanos.menu.MenuMenuChildrenRelationship,
-          startExpanded: true,
-          query: menuSearch,
-          formatter: function(data) { this.add(data.label); }
-        });
-      }))
+      .tag({ 
+        class: 'foam.u2.view.TreeView',
+        data: self.dao_,
+        relationship: foam.nanos.menu.MenuMenuChildrenRelationship,
+        startExpanded: true,
+        query: self.menuSearch$,
+        formatter: function(data) { this.add(data.label); }
+      })
     .end();
 
     this.subMenu$.dot('state').sub(this.scrollToCurrentSub);
