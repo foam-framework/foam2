@@ -11,6 +11,15 @@ import foam.lib.parse.*;
 public class Whitespace
   implements Parser
 {
+  protected static final Parser instance__ = new Whitespace();
+
+  public static Parser instance() {
+    return instance__;
+  }
+
+  private Whitespace() {
+  }
+
   // From RFC4627
   // Insignificant whitespace is allowed before or after any of the six
   // structural characters.

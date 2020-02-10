@@ -33,7 +33,6 @@
     'enabled',
     'priority',
     'daoKey',
-    'documentation',
     'createdBy',
     'lastModifiedBy'
   ],
@@ -65,7 +64,7 @@
       class: 'String',
       name: 'id',
       updateMode: 'RO',
-      tableWidth: 200,
+      tableWidth: 300,
       section: 'basicInfo'
     },
     {
@@ -76,7 +75,7 @@
       'The convention for values is ints that are multiple of 10.',
       readPermissionRequired: true,
       writePermissionRequired: true,
-      tableWidth: 50,
+      tableWidth: 66,
       section: 'basicInfo'
     },
     {
@@ -93,6 +92,7 @@
     {
       class: 'String',
       name: 'daoKey',
+      label: 'DAO Key',
       documentation: 'dao name that the rule is applied on.',
       readPermissionRequired: true,
       writePermissionRequired: true,
@@ -171,6 +171,11 @@
       adapt: function(_, nu) {
         return nu || this.validity > 0;
       }
+    },
+    {
+      class: 'Boolean',
+      name: 'debug',
+      documentation: 'Test this boolean before generating expensive logger.debug calls, to speed rule execution.'
     },
     {
       class: 'Int',

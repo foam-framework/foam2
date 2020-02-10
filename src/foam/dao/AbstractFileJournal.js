@@ -182,7 +182,10 @@ try {
             dao.put_(x, obj);
           }
 
-          public void executeJob() {
+          public void executeJob() { }
+
+          public void endJob() {
+
             try {
               record_ = ( old != null ) ?
                 getOutputter().stringifyDelta(old, obj) :
@@ -190,9 +193,7 @@ try {
             } catch (Throwable t) {
               getLogger().error("Failed to write put entry to journal", t);
             }
-          }
 
-          public void endJob() {
             if ( foam.util.SafetyUtil.isEmpty(record_) ) return;
 
             try {

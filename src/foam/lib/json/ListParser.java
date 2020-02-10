@@ -13,16 +13,16 @@ public class ListParser
 {
   public ListParser() {
     super(new Alt(
-                  new NullParser(),
-                  new Seq1(3,
-                           new Whitespace(),
-                           new Literal("["),
-                           new Whitespace(),
-                           new Repeat(
-                                      AnyParser.instance(),
-                                      new Seq0(new Whitespace(), new Literal(","), new Whitespace())),
-                           new Whitespace(),
-                           new Literal("]"))));
+      NullParser.instance(),
+      new Seq1(3,
+               Whitespace.instance(),
+               Literal.create("["),
+               Whitespace.instance(),
+               new Repeat(
+                          AnyParser.instance(),
+                          new Seq0(Whitespace.instance(), Literal.create(","), Whitespace.instance())),
+               Whitespace.instance(),
+               Literal.create("]"))));
   }
 
   public PStream parse(PStream ps, ParserContext x) {

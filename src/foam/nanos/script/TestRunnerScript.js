@@ -72,8 +72,8 @@ foam.CLASS({
       javaCode: `
         // turn off logging to get rid of clutter.
         LogLevelFilterLogger loggerFilter = (LogLevelFilterLogger) x.get("logger");
-        loggerFilter.setLogInfo(false);
         loggerFilter.setLogDebug(false);
+        loggerFilter.setLogInfo(false);
         loggerFilter.setLogWarning(false);
 
         DAO testDAO = (DAO) x.get("testDAO");

@@ -789,3 +789,54 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'JournalSink',
+
+  implements: [ 'foam.dao.Sink' ],
+
+  properties: [
+    {
+      name: 'journal',
+      class: 'FObjectProperty',
+      of: 'foam.dao.Journal'
+    },
+    {
+      name: 'dao',
+      class: 'foam.dao.DAOProperty'
+    },
+    {
+      name: 'prefix',
+      class: 'String',
+      value: ''
+    }
+  ],
+
+  methods: [
+    {
+      name: 'put',
+      code: function(o) {
+        var x = this.__context__; // TODO: is this always correct?
+        this.journal.put(x, '', this.dao, o);
+      },
+    },
+    {
+      name: 'remove',
+      code: function(o) {
+        var x = this.__context__; // TODO: is this always correct?
+        this.journal.remove(x, '', this.dao, o);
+      },
+    },
+    {
+      name: 'eof',
+      code: function() {},
+    },
+    {
+      name: 'reset',
+      code: function() {
+        console.warn('use of unimplemented JournalSink.reset()');
+      },
+    }
+  ]
+});

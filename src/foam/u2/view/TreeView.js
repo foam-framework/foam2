@@ -43,28 +43,37 @@ foam.CLASS({
       cursor: pointer;
     }
 
-    ^label:hover {
-      border-radius: 2px;
-      background-color: rgba(0, 48, 249, 0.1);
-      color: #0098db;
+    ^:hover > ^heading {
+      xxxborder-radius: 2px;
+      background-color: #e7eaec;
+      color: #406dea;
     }
 
     ^label {
       min-width: 120px;
       padding: 4px;
       font-weight: 500;
+      display: inline-block;
+      width: 250px;
       color: /*%BLACK%*/ #1e1f21;
     }
 
-    ^selected > ^label {
-      border-radius: 2px;
-      background-color: rgba(0, 48, 249, 0.1);
-      color: #0098db;
+    ^heading {
+      border-left: 4px solid rgba(0,0,0,0);
     }
 
-    ^expanded {
-      transform: rotate(180deg);
+    ^selected > ^label {
+      xxxborder-radius: 2px;
+      xxxbackground-color: rgba(0, 48, 249, 0.1);
+      xxxcolor: #0098db;
     }
+
+    ^selected > ^heading {
+      xxxborder-radius: 2px;
+      background-color: #e5f1fc !important;
+      color: #406dea;
+      border-left: 4px solid /*%PRIMARY3%*/ #406dea;
+      }
   `,
 
   properties: [
@@ -106,22 +115,8 @@ foam.CLASS({
           }
           return '';
         }, this.selection$, this.data$.dot('id'))).
-        start('span').
-          style({
-            visibility: this.hasChildren$.map(function(c) { return c ? 'visible' : 'hidden'; }),
-            'margin-right': '5px',
-            'vertical-align': 'middle',
-            'font-weight': 'bold',
-            'display': 'inline-block',
-            'visibility': 'visible',
-            'font-size': '16px',
-            'transform': this.expanded$.map(function(c) { return c ? 'rotate(180deg)' : 'rotate(90deg)' })
-          }).
-          on('click', this.toggleExpanded).
-          add('\u2303').
-          entity('nbsp').
-        end().
-        on('click', this.selected).
+        on('click', this.toggleExpanded).
+//        on('click', this.selected).
         on('dblclick', function() { self.dblclick && self.dblclick(self.data); }).
         callIf(this.draggable, function() {
           this.
@@ -131,21 +126,40 @@ foam.CLASS({
           on('dragover',  this.onDragOver).
           on('drop',      this.onDrop);
         }).
-        start('span').addClass(self.myClass('label')).call(this.formatter, [self.data]).end().
-        add(this.slot(function(e) {
-          var e2 = this.E('div');
-          if ( ! e ) return e2;
-          e2.select(this.data[self.relationship.forwardName]/*.dao*/, function(obj) {
+        start().
+          addClass(self.myClass('heading')).
+          start('span').
+            addClass(self.myClass('label')).
+            call(this.formatter, [self.data]).
+          end().
+          start('span').
+            show(this.hasChildren$).
+            style({
+              'margin-right': '5px',
+              'vertical-align': 'middle',
+              'font-weight': 'bold',
+              'display': 'inline-block',
+              'visibility': 'visible',
+              'font-size': '16px',
+              'transform': this.expanded$.map(function(c) { return c ? 'rotate(180deg)' : 'rotate(90deg)' })
+            }).
+            on('click', this.toggleExpanded).
+            add('\u2303').
+            entity('nbsp').
+          end().
+        end().
+        start().
+          show(this.expanded$).
+          select(this.data[self.relationship.forwardName]/*.dao*/, function(obj) {
             self.hasChildren = true;
             return self.cls_.create({
               data: obj,
               formatter: self.formatter,
               relationship: self.relationship,
               expanded: self.startExpanded
-            }, this);
-          });
-          return e2;
-        }, this.expanded$));
+            }, self);
+          }).
+        end();
     }
   ],
 
@@ -251,6 +265,8 @@ foam.CLASS({
 
   methods: [
     function initE() {
+this.startExpanded = false;
+
       var M   = this.ExpressionsSingleton.create();
       var of  = this.__context__.lookup(this.relationship.sourceModel);
       var dao = this.data$proxy.where(

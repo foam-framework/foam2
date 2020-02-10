@@ -13,13 +13,13 @@ public class ArrayParser
 {
   public ArrayParser() {
     super(new Seq1(3,
-      new Whitespace(),
-      new Literal("["),
-      new Whitespace(),
+      Whitespace.instance(),
+      Literal.create("["),
+      Whitespace.instance(),
       new Repeat(
         AnyParser.instance(),
-        new Seq0(new Whitespace(), new Literal(","), new Whitespace())),
-      new Whitespace(),
-      new Literal("]")));
+        new Seq0(Whitespace.instance(), Literal.create(","), Whitespace.instance())),
+      Whitespace.instance(),
+      Literal.create("]")));
   }
 }

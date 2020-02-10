@@ -57,6 +57,9 @@ foam.CLASS({
     },
 
     function select_(x, sink, skip, limit, order, predicate) {
+      if ( foam.dao.AnonymousSink.isInstance(sink) )
+        return this.SUPER(x, sink, skip, limit, order, predicate);
+
       var self = this;
       var key  = [sink, skip, limit, order, predicate].toString();
 
@@ -80,14 +83,14 @@ foam.CLASS({
       are up to date. */
     function remove_(x, o) {
       this.cache = {};
-      return self.delegate.remove_(x, o);
+      return this.delegate.remove_(x, o);
     },
 
     /** removeAll is executed on the cache and the source, ensuring both
       are up to date. */
     function removeAll_(x, skip, limit, order, predicate) {
       this.cache = {};
-      self.delegate.removeAll_(x, skip, limit, order, predicate);
+      this.delegate.removeAll_(x, skip, limit, order, predicate);
     },
 
     function cmd_(x, obj) {

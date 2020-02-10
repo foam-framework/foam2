@@ -12,12 +12,13 @@ foam.CLASS({
   documentation: 'Export Modal',
 
   imports: [
-    'exportDriverRegistryDAO'
+    'exportDriverRegistryDAO',
+    'filteredTableColumns'
   ],
 
   requires: [
     'foam.u2.ModalHeader',
-    'foam.u2.layout.Cols',
+    'foam.u2.layout.Cols'
   ],
 
   properties: [
@@ -40,10 +41,16 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'foam.mlang.predicate.Predicate',
-      name: 'predicate'
+      name: 'predicate',
+      factory: function() { return foam.mlang.predicate.True.create(); }
     },
     'exportData',
-    'exportObj'
+    'exportObj',
+    {
+      name: 'exportAllColumns',
+      view: { class: 'foam.u2.CheckBox' },
+      class: 'Boolean'
+    }
   ],
 
   css: `
@@ -86,6 +93,7 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      var self = this;
       this.SUPER();
 
       this
@@ -99,8 +107,15 @@ foam.CLASS({
           .start(this.DATA_TYPE).end()
           .start().addClass('label').add('Response').end()
           .start(this.NOTE).addClass('input-box').addClass('note').end()
+          .add(
+            self.slot(function(dataType) {
+              if ( dataType == 'CSV' ) {
+                return self.E().start().addClass('label').add('Export all columns ').startContext({ data: self }).add(self.EXPORT_ALL_COLUMNS).endContext().end();
+              }
+            })
+          )
           .start(this.Cols).style({ 'justify-content': 'flex-start' }).addClass(this.myClass('buttons'))
-            .start(this.DOWNLOAD_CSV).end()
+            .start(this.DOWNLOAD).end()
             .start(this.CONVERT).end()
           .end()
         .end()
@@ -115,35 +130,56 @@ foam.CLASS({
         return;
       }
 
+      var filteredColumnsCopy = this.filteredTableColumns;
+      if ( this.exportAllColumns )
+        this.filteredTableColumns = null;
+
       var exportDriver = await this.exportDriverRegistryDAO.find(this.dataType);
       exportDriver = foam.lookup(exportDriver.driverName).create();
 
-      this.note = this.exportData 
-                    ? await exportDriver.exportDAO(this.__context__, this.exportData)
-                    : await exportDriver.exportFObject(this.__context__, this.exportObj);
+      this.note = this.exportData ?
+        await exportDriver.exportDAO(this.__context__, this.exportData) :
+        await exportDriver.exportFObject(this.__context__, this.exportObj);
+
+        if ( this.exportAllColumns )
+          this.filteredTableColumns = filteredColumnsCopy;
     },
 
-    async function downloadCSV() {
+    async function download() {
+      var self = this;
       if ( ! this.exportData && ! this.exportObj ) {
         console.log('Neither exportData nor exportObj exist');
         return;
       }
 
-      var exportDriver = await this.exportDriverRegistryDAO.find(this.dataType);
-      exportDriver = foam.lookup(exportDriver.driverName).create();
+      var filteredColumnsCopy = this.filteredTableColumns;
+      if ( this.exportAllColumns )
+        this.filteredTableColumns = null;
 
-      var p = this.exportData 
-                ? exportDriver.exportDAO(this.__context__, this.exportData)
-                : Promise.resolve(exportDriver.exportFObject(this.__context__, this.exportObj));
+      var exportDriverReg = await this.exportDriverRegistryDAO.find(this.dataType);
+      var exportDriver    = foam.lookup(exportDriverReg.driverName).create();
+
+      var p = this.exportData ?
+        exportDriver.exportDAO(this.__context__, this.exportData) :
+        Promise.resolve(exportDriver.exportFObject(this.__context__, this.exportObj));
 
       p.then(result => {
-        result = 'data:text/csv;charset=utf-8,' + result;
+        var prefix = 'data:' + exportDriverReg.mimeType + ',';
         var link = document.createElement('a');
-        link.setAttribute('href', encodeURI(result));
-        link.setAttribute('download', 'data.csv');
-        document.body.appendChild(link);
-        link.click();
-      })
+        var href = encodeURI(prefix + result);
+        if ( href.length > 524288 ) {
+          self.note = result;
+          alert('Results exceed maximum download size.\nPlease cut and paste response data.');
+        } else {
+          link.setAttribute('href', href);
+          link.setAttribute('download', 'data.' + exportDriverReg.extension);
+          document.body.appendChild(link);
+          link.click();
+        }
+      });
+
+      if ( this.exportAllColumns )
+        this.filteredTableColumns = filteredColumnsCopy;
     }
   ]
 
