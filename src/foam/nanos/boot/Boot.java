@@ -83,7 +83,7 @@ public class Boot {
       public Object create(X x) {
         return ThreadLocalRandom.current().nextInt(0, 100) == 0 ?
           new PM() :
-          NULLPM_  ;
+          NULLPM__ ;
       }
     });
 
