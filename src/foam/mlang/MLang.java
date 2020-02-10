@@ -41,65 +41,65 @@ public class MLang
   }
 
   public static Predicate LT(Object o1, Object o2) {
-    return new Lt.Builder(null)
-      .setArg1(MLang.prepare(o1))
-      .setArg2(MLang.prepare(o2))
-      .build();
+    Lt lt = new Lt();
+    lt.setArg1(MLang.prepare(o1));
+    lt.setArg2(MLang.prepare(o2));
+    return lt;
   }
 
   public static Predicate LTE(Object o1, Object o2) {
-    return new Lte.Builder(null)
-      .setArg1(MLang.prepare(o1))
-      .setArg2(MLang.prepare(o2))
-      .build();
+    Lte lte = new Lte();
+    lte.setArg1(MLang.prepare(o1));
+    lte.setArg2(MLang.prepare(o2));
+    return lte;
   }
 
   public static Predicate EQ(Object o1, Object o2) {
-    return new Eq.Builder(null)
-      .setArg1(MLang.prepare(o1))
-      .setArg2(MLang.prepare(o2))
-      .build();
+    Eq eq = new Eq();
+    eq.setArg1(MLang.prepare(o1));
+    eq.setArg2(MLang.prepare(o2));
+    return eq;
   }
 
   public static Predicate NEQ(Object o1, Object o2) {
-    return new Neq.Builder(null)
-      .setArg1(MLang.prepare(o1))
-      .setArg2(MLang.prepare(o2))
-      .build();
+    Neq neq = new Neq();
+    neq.setArg1(MLang.prepare(o1));
+    neq.setArg2(MLang.prepare(o2));
+    return neq;
   }
 
   public static Predicate GTE(Object o1, Object o2) {
-    return new Gte.Builder(null)
-      .setArg1(MLang.prepare(o1))
-      .setArg2(MLang.prepare(o2))
-      .build();
+    Gte gte = new Gte();
+    gte.setArg1(MLang.prepare(o1));
+    gte.setArg2(MLang.prepare(o2));
+    return gte;
   }
 
   public static Predicate GT(Object o1, Object o2) {
-    return new Gt.Builder(null)
-      .setArg1(MLang.prepare(o1))
-      .setArg2(MLang.prepare(o2))
-      .build();
+    Gt gt = new Gt();
+    gt.setArg1(MLang.prepare(o1));
+    gt.setArg2(MLang.prepare(o2));
+    return gt;
   }
 
   public static Predicate IN(Object o1, Object o2) {
-    return new In.Builder(null)
-      .setArg1(MLang.prepare(o1))
-      .setArg2(MLang.prepare(o2))
-      .build();
+    In in = new In();
+    in.setArg1(MLang.prepare(o1));
+    in.setArg2(MLang.prepare(o2));
+    return in;
   }
 
   public static Predicate AND(Predicate... args) {
-    return new And.Builder(null)
-      .setArgs(args)
-      .build();
+    And and = new And();
+    and.setArgs(args);
+    return and;
   }
 
   public static Sink GROUP_BY(Expr o1, Sink o2) {
-    return new GroupBy.Builder(null)
-      .setArg1(o1)
-      .setArg2(o2)
-      .build();
+    GroupBy groupBy = new GroupBy();
+    groupBy.setArg1(o1);
+    groupBy.setArg2(o2);
+    return groupBy;
   }
 
   public static Sink COUNT() {
@@ -107,41 +107,41 @@ public class MLang
   }
 
   public static Predicate OR(Predicate... args) {
-    return new Or.Builder(null)
-      .setArgs(args)
-      .build();
+    Or or = new Or();
+    or.setArgs(args);
+    return or;
   }
 
   public static Predicate NOT(Predicate predicate) {
-    return new Not.Builder(null)
-      .setArg1(predicate)
-      .build();
+    Not not = new Not();
+    not.setArg1(predicate);
+    return not;
   }
 
   public static Sink MAX(Object o1) {
-    return new Max.Builder(null)
-      .setArg1(MLang.prepare(o1))
-      .build();
+    Max max = new Max();
+    max.setArg1(MLang.prepare(o1));
+    return max;
   }
 
   public static Sink MIN(Object o1) {
-    return new Min.Builder(null)
-      .setArg1(MLang.prepare(o1))
-      .build();
+    Min min = new Min();
+    min.setArg1(MLang.prepare(o1));
+    return min;
   }
 
   public static Sink SUM(Object o1) {
-    return new Sum.Builder(null)
-      .setArg1(MLang.prepare(o1))
-      .setValue(0.0)
-      .build();
+    Sum sum = new Sum();
+    sum.setArg1(MLang.prepare(o1));
+    sum.setValue(0.0);
+    return sum;
   }
 
   public static Sink MAP(Object o1, foam.dao.Sink delegate) {
-    return new Map.Builder(null)
-      .setArg1(MLang.prepare(o1))
-      .setDelegate(delegate)
-      .build();
+    Map map = new Map();
+    map.setArg1(MLang.prepare(o1));
+    map.setDelegate(delegate);
+    return map;
   }
 
   public static Predicate INSTANCE_OF(ClassInfo info) {
@@ -157,17 +157,17 @@ public class MLang
   }
 
   public static Expr DOT(Expr o1, Expr o2) {
-    return new Dot.Builder(null)
-      .setArg1(o1)
-      .setArg2(o2)
-      .build();
+    Dot dot = new Dot();
+    dot.setArg1(o1);
+    dot.setArg2(o2);
+    return dot;
   }
 
   public static Expr DOT(Expr o1, Predicate o2) {
-    return new Dot.Builder(null)
-      .setArg1(o1)
-      .setArg2(new PredicatedExpr(o2))
-      .build();
+    Dot dot = new Dot();
+    dot.setArg1(o1);
+    dot.setArg2(new PredicatedExpr(o2));
+    return dot;
   }
 
   public static Predicate CLASS_OF(ClassInfo info) {
@@ -183,16 +183,16 @@ public class MLang
   }
 
   public static Predicate CONTAINS_IC(Object o1, Object o2) {
-    return new ContainsIC.Builder(null)
-    .setArg1(MLang.prepare(o1))
-    .setArg2(MLang.prepare(o2))
-      .build();
+    ContainsIC containsIC = new ContainsIC();
+    containsIC.setArg1(MLang.prepare(o1));
+    containsIC.setArg2(MLang.prepare(o2));
+    return containsIC;
   }
 
   public static Predicate HAS(Object o) {
-    return new Has.Builder(null)
-      .setArg1(MLang.prepare(o))
-      .build();
+    Has has = new Has();
+    has.setArg1(MLang.prepare(o));
+    return has;
   }
 
   // used by AuthenticatedDAO
@@ -203,22 +203,22 @@ public class MLang
 
   // used by AuthorizationDAO
   public static Predicate IS_AUTHORIZED_TO_READ(X userContext, Authorizer authorizer) {
-    return new isAuthorizedToRead.Builder(null)
-      .setUserContext(userContext)
-      .setAuthorizer(authorizer)
-      .build();
+    isAuthorizedToRead isAuthorizedToRead =new isAuthorizedToRead();
+    isAuthorizedToRead.setUserContext(userContext);
+    isAuthorizedToRead.setAuthorizer(authorizer);
+    return isAuthorizedToRead;
   }
   public static Predicate IS_AUTHORIZED_TO_DELETE(X userContext, Authorizer authorizer) {
-    return new isAuthorizedToDelete.Builder(null)
-      .setUserContext(userContext)
-      .setAuthorizer(authorizer)
-      .build();
+    isAuthorizedToDelete isAuthorizedToDelete = new isAuthorizedToDelete();
+    isAuthorizedToDelete.setUserContext(userContext);
+    isAuthorizedToDelete.setAuthorizer(authorizer);
+    return isAuthorizedToDelete;
   }
 
   public static Predicate DOT_F(Object o1, Object o2) {
-    return new DotF.Builder(null)
-      .setArg1(MLang.prepare(o1))
-      .setArg2(MLang.prepare(o2))
-      .build();
+    DotF dotF = new DotF();
+    dotF.setArg1(MLang.prepare(o1));
+    dotF.setArg2(MLang.prepare(o2));
+    return dotF;
   }
 }
