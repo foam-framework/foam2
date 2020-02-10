@@ -120,6 +120,7 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
+
       self.subMenus = [];
       self.showThisOnSearch = self.query ? ( self.data.label.includes(self.query) || self.hasChildren ) : true;
       if(self.showRootOnSearch)
@@ -135,8 +136,12 @@ foam.CLASS({
 
       this.
         addClass(this.myClass()).
-        show(this.slot(function(query, hasChildren, showThisRootOnSearch){
+        show(this.slot(function(query, hasChildren, showThisRootOnSearch) {
           self.showThisOnSearch = query ? (self.data.label.includes(query) && !hasChildren) || (hasChildren && showThisRootOnSearch) : true;//( self.data.label.includes(self.query) || self.hasChildren )
+
+          if(query && self.showThisOnSearch)
+            self.expanded = true;
+
           if(self.showRootOnSearch)
             self.showRootOnSearch.set(self.showRootOnSearch.get() || self.showThisOnSearch);
           return self.showThisOnSearch;
@@ -165,7 +170,7 @@ foam.CLASS({
             call(this.formatter, [self.data]).
           end().
           start('span').
-            show(this.hasChildren$ && this.showRootOnSearch$).
+            show(this.hasChildren$).
             style({
               'margin-right': '5px',
               'vertical-align': 'middle',
@@ -190,7 +195,6 @@ foam.CLASS({
                 relationship: self.relationship,
                 expanded: self.startExpanded,
                 showRootOnSearch: self.showThisRootOnSearch$,
-                //query: self.query,
               }, self));
             });
           })).
