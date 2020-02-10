@@ -112,14 +112,22 @@ foam.CLASS({
       class: 'Boolean',
       name: 'showThisOnSearch',
       value: true
-    }
+    },
+    'subMenus'
   ],
 
   methods: [
     function initE() {
       var self = this;
+      self.subMenus = [];
       self.showThisOnSearch = self.query ? ( self.data.label.includes(this.query) || self.hasChildren ) : true;
-        self.showRootOnSearch = this.showRootOnSearch || this.showThisOnSearch;
+      self.showRootOnSearch = this.showRootOnSearch || this.showThisOnSearch;
+
+      this.data[self.relationship.forwardName].select().then(function(val){
+        if(val.array.length > 0)
+          self.hasChildren = true;
+        self.subMenus = val.array;
+      });
 
       this.hasChildren$.sub(function() {
         self.showThisOnSearch = self.query ? ( self.data.label.includes(this.query) || self.hasChildren ) : true;
@@ -171,16 +179,18 @@ foam.CLASS({
         end().
         start().
           show(this.expanded$).
-          select(this.data[self.relationship.forwardName]/*.dao*/, function(obj) {
-            self.hasChildren = true;
-            return self.cls_.create({
-              data: obj,
-              formatter: self.formatter,
-              relationship: self.relationship,
-              expanded: self.startExpanded,
-              showRootOnSearch: self.showRootOnSearch$
-            }, self);
-          }).
+          add(this.slot(function(subMenus) {
+            return this.E().forEach(subMenus/*.dao*/, function(obj) {
+              this.add(self.cls_.create({
+                data: obj,
+                formatter: self.formatter,
+                relationship: self.relationship,
+                expanded: self.startExpanded,
+                showRootOnSearch: self.showThisRootOnSearch$,
+                query: self.query,
+              }, self));
+            });
+          })).
         end();
     }
   ],
