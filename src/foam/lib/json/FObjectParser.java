@@ -37,7 +37,7 @@ public class FObjectParser
     return p;
   }
 
-  private FObjectParser(final Class defaultClass) {
+  public FObjectParser(final Class defaultClass) {
     super(new Seq1(3,
       Whitespace.instance(),
       Literal.create("{"),
@@ -91,7 +91,7 @@ public class FObjectParser
       Literal.create("}")));
   }
 
-  private FObjectParser() {
+  public FObjectParser() {
     this(null);
   }
 }
