@@ -16,7 +16,7 @@ public class UnknownParser
 
       private Parser delegate = new Alt(
         new NullParser(),
-        new BooleanParser(),
+        BooleanParser.instance(),
         //double parser should be before LongParser()
         new DoubleParser(),
         new LongParser(),

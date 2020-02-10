@@ -12,7 +12,8 @@ import foam.core.*;
 public class FObjectParser
   extends ObjectNullParser
 {
-
+  static int count__;
+  // TODO: make a multiton
   public FObjectParser(final Class defaultClass) {
     super(new Seq1(3,
       Whitespace.instance(),
@@ -65,6 +66,7 @@ public class FObjectParser
       },
       Whitespace.instance(),
       Literal.create("}")));
+      System.err.println("************************* " + defaultClass + " " + count__++);
   }
 
   public FObjectParser() {

@@ -1096,8 +1096,8 @@ foam.CLASS({
 
   properties: [
     ['javaInfoType',                 'foam.core.AbstractLongPropertyInfo'],
-    ['javaJSONParser',               'new foam.lib.json.LongParser()'],
-    ['javaCSVParser',                'new foam.lib.json.LongParser()'],
+    ['javaJSONParser',               'foam.lib.json.LongParser.instance()'],
+    ['javaCSVParser',                'foam.lib.json.LongParser.instance()'],
     ['sqlType',                      'BIGINT'],
     ['javaCompare',                  'return Long.compare(get_(o1), get_(o2));'],
     [ 'javaComparePropertyToValue',  'return Long.compare(cast(key), cast(value));' ],
@@ -1125,8 +1125,8 @@ foam.CLASS({
 
   properties: [
     ['javaInfoType',   'foam.core.AbstractDoublePropertyInfo'],
-    ['javaJSONParser', 'new foam.lib.json.DoubleParser()'],
-    ['javaCSVParser',  'new foam.lib.json.DoubleParser()'],
+    ['javaJSONParser', 'foam.lib.json.DoubleParser.instance()'],
+    ['javaCSVParser',  'foam.lib.json.DoubleParser.instance()'],
     ['sqlType',        'DOUBLE PRECISION']
   ],
 
@@ -1839,8 +1839,8 @@ foam.CLASS({
   properties: [
     ['javaType',       'boolean'],
     ['javaInfoType',   'foam.core.AbstractBooleanPropertyInfo'],
-    ['javaJSONParser', 'new foam.lib.json.BooleanParser()'],
-    ['javaCSVParser',  'new foam.lib.json.BooleanParser()'],
+    ['javaJSONParser', 'foam.lib.json.BooleanParser.instance()'],
+    ['javaCSVParser',  'foam.lib.json.BooleanParser.instance()'],
     ['sqlType',        'BOOLEAN']
   ],
   methods: [
