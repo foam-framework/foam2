@@ -1018,8 +1018,8 @@ foam.CLASS({
 
   properties: [
     ['javaInfoType',   'foam.core.AbstractIntPropertyInfo'],
-    ['javaJSONParser', 'new foam.lib.json.IntParser()'],
-    ['javaCSVParser',  'new foam.lib.json.IntParser()'],
+    ['javaJSONParser', 'foam.lib.json.IntParser.instance()'],
+    ['javaCSVParser',  'foam.lib.json.IntParser.instance()'],
     ['sqlType',        'INT']
   ],
 
@@ -1178,8 +1178,8 @@ foam.CLASS({
   properties: [
     { class:           'foam.java.JavaType' },
     ['javaInfoType',   'foam.core.AbstractEnumPropertyInfo'],
-    ['javaJSONParser', 'new foam.lib.json.IntParser()'],
-    ['javaCSVParser',  'new foam.lib.json.IntParser()']
+    ['javaJSONParser', 'foam.lib.json.IntParser.instance()'],
+    ['javaCSVParser',  'foam.lib.json.IntParser.instance()']
   ],
 
   methods: [

@@ -33,7 +33,7 @@ public class EnumParserFactory {
                                 Whitespace.instance(),
                                 new Alt(
                                         new Parser() {
-                                          Parser delegate = new KeyValueParser("ordinal", new IntParser());
+                                          Parser delegate = new KeyValueParser("ordinal", IntParser.instance());
 
                                           public PStream parse(PStream ps, ParserContext x) {
                                             ps = ps.apply(delegate, x);

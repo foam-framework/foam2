@@ -25,11 +25,11 @@ public class DateParser
   // TODO: make private
   public DateParser() {
     setDelegate(new Seq(// YYYY/MM/DD
-      new IntParser(),
+      IntParser.instance(),
       Literal.create("/"),
-      new IntParser(),
+      IntParser.instance(),
       Literal.create("/"),
-      new IntParser()));
+      IntParser.instance()));
   }
 
   @Override

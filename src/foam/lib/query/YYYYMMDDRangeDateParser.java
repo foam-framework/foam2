@@ -20,25 +20,25 @@ public class YYYYMMDDRangeDateParser extends ProxyParser  {
 
   public YYYYMMDDRangeDateParser() {
     super(new Seq(
-      new IntParser(),
+      IntParser.instance(),
       new Alt(
           Literal.create("-"),
           Literal.create("/")),
-      new IntParser(),
+      IntParser.instance(),
       new Alt(
           Literal.create("-"),
           Literal.create("/")),
-      new IntParser(),
+      IntParser.instance(),
       Literal.create(".."),
-      new IntParser(),
+      IntParser.instance(),
       new Alt(
           Literal.create("-"),
           Literal.create("/")),
-      new IntParser(),
+      IntParser.instance(),
       new Alt(
           Literal.create("-"),
           Literal.create("/")),
-      new IntParser()));
+      IntParser.instance()));
   }
 
   public PStream parse(PStream ps, ParserContext x) {
