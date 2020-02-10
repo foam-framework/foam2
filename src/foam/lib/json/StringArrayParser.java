@@ -14,7 +14,7 @@ public class StringArrayParser
   public StringArrayParser() {
     super(
       new Alt(
-        new NullParser(),
+        NullParser.instance(),
         new Seq1(3,
           Whitespace.instance(),
           Literal.create("["),

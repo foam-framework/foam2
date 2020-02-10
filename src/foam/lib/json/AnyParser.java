@@ -18,7 +18,7 @@ public class AnyParser
 
   private AnyParser() {
     setDelegate(new Alt(
-      new NullParser(),
+      NullParser.instance(),
       StringParser.instance(),
       BooleanParser.instance(),
       // parse long but fail if decimal is found

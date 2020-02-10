@@ -35,7 +35,7 @@ public class DateParser
 
   public DateParser() {
     super(new Alt(
-      new NullParser(),
+      NullParser.instance(),
       new LongParser(),
       new Seq(
         Literal.create("\""),

@@ -14,7 +14,7 @@ public class ClassReferenceParser
 {
   public ClassReferenceParser() {
     super(new Alt(
-      new NullParser(),
+      NullParser.instance(),
       new Seq1(15,
         Whitespace.instance(),
         Literal.create("{"),
