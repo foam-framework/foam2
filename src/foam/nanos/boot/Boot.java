@@ -10,8 +10,8 @@ import foam.core.*;
 import foam.dao.AbstractSink;
 import foam.dao.ArraySink;
 import foam.dao.DAO;
-import foam.dao.ProxyDAO;
 import foam.dao.java.JDAO;
+import foam.dao.ProxyDAO;
 import foam.nanos.auth.Group;
 import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
@@ -24,13 +24,12 @@ import foam.nanos.session.Session;
 import foam.util.SafetyUtil;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
-
 import static foam.mlang.MLang.EQ;
 
 public class Boot {
   // Context key used to store the top-level root context in the context.
-  public final static String ROOT = "_ROOT_";
-  public static PM nullPM_ = new NullPM();
+  public final static String ROOT     = "_ROOT_";
+  public final static PM     NULLPM__ = new NullPM();
 
   protected DAO serviceDAO_;
   protected X   root_ = new ProxyX();
@@ -84,7 +83,7 @@ public class Boot {
       public Object create(X x) {
         return ThreadLocalRandom.current().nextInt(0, 100) == 0 ?
           new PM() :
-          nullPM_  ;
+          NULLPM_  ;
       }
     });
 
