@@ -105,39 +105,42 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'showRootOnSearch',
+      name: 'showThisOnSearch',
       value: false
     },
     {
       class: 'Boolean',
-      name: 'showThisOnSearch',
-      value: true
+      name: 'showThisRootOnSearch',
+      value: false
     },
-    'subMenus'
+    'subMenus',
+    'showRootOnSearch'
   ],
 
   methods: [
     function initE() {
       var self = this;
       self.subMenus = [];
-      self.showThisOnSearch = self.query ? ( self.data.label.includes(this.query) || self.hasChildren ) : true;
-      self.showRootOnSearch = this.showRootOnSearch || this.showThisOnSearch;
+      self.showThisOnSearch = self.query ? ( self.data.label.includes(self.query) || self.hasChildren ) : true;
+      if(self.showRootOnSearch)
+        self.showRootOnSearch.set(self.showRootOnSearch.get() || self.showThisOnSearch);
 
       this.data[self.relationship.forwardName].select().then(function(val){
         if(val.array.length > 0)
           self.hasChildren = true;
+        else
+          self.hasChildren = false;
         self.subMenus = val.array;
       });
 
-      this.hasChildren$.sub(function() {
-        self.showThisOnSearch = self.query ? ( self.data.label.includes(this.query) || self.hasChildren ) : true;
-        self.showRootOnSearch = this.showRootOnSearch || this.showThisOnSearch;
-      });
-
-      this.data[self.relationship.forwardName].select().then(function(c) {console.log(c);});
       this.
         addClass(this.myClass()).
-        show(this.showRootOnSearch$ &&  this.showThisOnSearch$).
+        show(this.slot(function(query, hasChildren, showThisRootOnSearch){
+          self.showThisOnSearch = query ? (self.data.label.includes(query) && !hasChildren) || (hasChildren && showThisRootOnSearch) : true;//( self.data.label.includes(self.query) || self.hasChildren )
+          if(self.showRootOnSearch)
+            self.showRootOnSearch.set(self.showRootOnSearch.get() || self.showThisOnSearch);
+          return self.showThisOnSearch;
+        })).
         addClass(this.slot(function(selected, id) {
           if ( selected && foam.util.equals(selected.id, id) ) {
             return this.myClass('selected');
@@ -170,7 +173,7 @@ foam.CLASS({
               'display': 'inline-block',
               'visibility': 'visible',
               'font-size': '16px',
-              'transform': this.expanded$.map(function(c) { return c ? 'rotate(180deg)' : 'rotate(90deg)' })
+              'transform': this.expanded$.map(function(c) { return c ? 'rotate(180deg)' : 'rotate(90deg)'; })
             }).
             on('click', this.toggleExpanded).
             add('\u2303').
@@ -187,7 +190,7 @@ foam.CLASS({
                 relationship: self.relationship,
                 expanded: self.startExpanded,
                 showRootOnSearch: self.showThisRootOnSearch$,
-                query: self.query,
+                //query: self.query,
               }, self));
             });
           })).
@@ -307,16 +310,8 @@ foam.CLASS({
       var M   = this.ExpressionsSingleton.create();
       var of  = this.__context__.lookup(this.relationship.sourceModel);
 
-      this.data.select().then(function(x) {
-        console.log(x);
-      });
-
       var dao = this.data$proxy.where(
         M.NOT(M.HAS(of.getAxiomByName(this.relationship.inverseName))));
-
-        dao.select().then(function(x) {
-          console.log(x);
-        });
 
       var self = this;
       var isFirstSet = false;
