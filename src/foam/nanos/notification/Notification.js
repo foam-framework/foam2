@@ -51,7 +51,8 @@ foam.CLASS({
       factory: function() { return new Date(); },
       label: 'Notification Date',
       documentation: 'Date notification was created.',
-      visibility: foam.u2.Visibility.RO
+      visibility: foam.u2.Visibility.RO,
+      javaFactory: `return new java.util.Date();`
     },
     {
       class: 'Date',
