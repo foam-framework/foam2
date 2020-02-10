@@ -29,6 +29,7 @@ foam.CLASS({
     {
       class: 'EMail',
       name: 'email',
+      required: true,
       view: {
         class: 'foam.u2.TextField',
         focused: true
@@ -42,6 +43,7 @@ foam.CLASS({
     {
       class: 'Password',
       name: 'password',
+      required: true,
       view: { class: 'foam.u2.view.PasswordView', passwordIcon: true }
     },
     {
@@ -100,6 +102,9 @@ foam.CLASS({
     {
       name: 'login',
       label: 'Sign in',
+      isEnabled: function(errors_) {
+        return ! errors_;
+      },
       code: async function(X) {
         this.auth.loginByEmail(X, this.email, this.password).then(
           (logedInUser) => {

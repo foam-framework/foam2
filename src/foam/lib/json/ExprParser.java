@@ -9,7 +9,7 @@ package foam.lib.json;
 import foam.lib.parse.Alt;
 
 public class ExprParser
-    extends foam.lib.parse.ProxyParser
+  extends foam.lib.parse.ProxyParser
 {
   public ExprParser() {
     this(null);
@@ -19,6 +19,6 @@ public class ExprParser
     super(new Alt(
       new PropertyReferenceParser(),
       new ClassReferenceParser(),
-      new FObjectParser(defaultClass)));
+      FObjectParser.create(defaultClass)));
   }
 }

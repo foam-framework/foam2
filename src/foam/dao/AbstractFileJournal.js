@@ -194,7 +194,6 @@ try {
               getLogger().error("Failed to write put entry to journal", t);
             }
 
-
             if ( foam.util.SafetyUtil.isEmpty(record_) ) return;
 
             try {

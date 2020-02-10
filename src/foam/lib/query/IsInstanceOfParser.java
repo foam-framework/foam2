@@ -16,9 +16,9 @@ import foam.mlang.predicate.IsInstanceOf;
 public class IsInstanceOfParser extends foam.lib.parse.ProxyParser {
 
   public IsInstanceOfParser() {
-      setDelegate(new Seq(new Literal("instance"),
-                          new Literal(":"),
-                          new StringParser()));
+      setDelegate(new Seq(Literal.create("instance"),
+                          Literal.create(":"),
+                          StringParser.instance()));
   }
 
   @Override

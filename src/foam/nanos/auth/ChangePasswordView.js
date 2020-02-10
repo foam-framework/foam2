@@ -119,6 +119,7 @@ foam.CLASS({
     {
       class: 'Password',
       name: 'confirmationPassword',
+      label: 'Confirm Password',
       section: 'resetPasswordSection',
       view: {
         class: 'foam.u2.view.PasswordView',

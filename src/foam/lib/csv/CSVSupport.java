@@ -9,7 +9,6 @@ package foam.lib.csv;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
 import foam.core.ClassInfo;
 import foam.core.PropertyInfo;
 import foam.core.FObject;
@@ -20,7 +19,7 @@ import foam.dao.Sink;
 public class CSVSupport
   extends foam.core.ContextAwareSupport
 {
-  protected Parser headParser = new Repeat(new CSVStringParser(), new Literal(","));
+  protected Parser headParser = new Repeat(new CSVStringParser(), Literal.create(","));
 
   public void inputCSV(InputStream is, Sink sink, ClassInfo classInfo) {
 
@@ -46,7 +45,7 @@ public class CSVSupport
         Parser p = propertyInfos[i].csvParser();
 
         if ( i < column - 1) {
-          propertyParsers[i] = new Seq1(0, p, new Literal(","));
+          propertyParsers[i] = new Seq1(0, p, Literal.create(","));
         } else {
           propertyParsers[i] = p;
         }

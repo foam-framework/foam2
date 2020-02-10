@@ -18,10 +18,10 @@ public class NegateValue extends foam.lib.parse.ProxyParser {
   public NegateValue() {
     setDelegate(
         new Seq(
-            new Literal("("),
-            new Alt(new Literal("-"), new LiteralIC("not ")),
+            Literal.create("("),
+            new Alt(Literal.create("-"), new LiteralIC("not ")),
             new ValueParser(),
-            new Literal(")")
+            Literal.create(")")
         ));
   }
 

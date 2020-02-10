@@ -166,10 +166,8 @@ foam.CLASS({
             if ( group != null && group.implies(x, permission) ) {
               return true;
             }
-          } else {
-            if ( new AuthPermission(j.getTargetId()).implies(permission) ) {
-              return true;
-            }
+          } else if ( new AuthPermission(j.getTargetId()).implies(permission) ) {
+            return true;
           }
         }
 

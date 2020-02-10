@@ -251,7 +251,7 @@ foam.CLASS({
       name: 'type',
       value: 'foam.dao.Sink'
     },
-    ['javaJSONParser', 'new foam.lib.json.FObjectParser()'],
+    ['javaJSONParser', 'foam.lib.json.FObjectParser.instance()'],
     {
       name: 'view',
       value: { class: 'foam.u2.view.FObjectView' }
