@@ -6,15 +6,38 @@
 
 package foam.lib.json;
 
-import foam.lib.parse.*;
 import foam.core.*;
+import foam.lib.parse.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
 
 public class FObjectParser
   extends ObjectNullParser
 {
-  static int count__;
-  // TODO: make a multiton
-  public FObjectParser(final Class defaultClass) {
+  protected final static Map map__ = new ConcurrentHashMap();
+
+  private final static Parser instance__ = new FObjectParser();
+
+  public static Parser instance() { return instance__; }
+
+  /**
+   * Implement the multiton pattern so we don't create the same
+   * parser more than once.
+   **/
+  public static Parser create(Class cls) {
+    if ( cls == null ) return instance();
+
+    Parser p = (Parser) map__.get(cls.getName());
+
+    if ( p == null ) {
+      p = new FObjectParser(cls);
+      map__.put(cls.getName(), p);
+    }
+
+    return p;
+  }
+
+  private FObjectParser(final Class defaultClass) {
     super(new Seq1(3,
       Whitespace.instance(),
       Literal.create("{"),
@@ -66,10 +89,9 @@ public class FObjectParser
       },
       Whitespace.instance(),
       Literal.create("}")));
-      System.err.println("************************* " + defaultClass + " " + count__++);
   }
 
-  public FObjectParser() {
+  private FObjectParser() {
     this(null);
   }
 }

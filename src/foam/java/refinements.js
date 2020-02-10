@@ -1524,7 +1524,7 @@ foam.CLASS({
     {
       name: 'javaJSONParser',
       expression: function(of) {
-        return 'new foam.lib.json.FObjectParser('
+        return 'foam.lib.json.FObjectParser.create('
           + (of ? of.id + '.class' : '') + ')';
       }
     },
@@ -1896,7 +1896,7 @@ foam.CLASS({
       }
     },
     ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
-    ['javaJSONParser', 'new foam.lib.json.FObjectParser()']
+    ['javaJSONParser', 'foam.lib.json.FObjectParser.instance()']
   ]
 });
 
@@ -2007,7 +2007,7 @@ foam.CLASS({
   flags: ['java'],
 
   properties: [
-    ['javaJSONParser', 'new foam.lib.json.FObjectParser()'],
+    ['javaJSONParser', 'foam.lib.json.FObjectParser.instance()'],
     {
       name: 'javaGetter',
       factory: function() {

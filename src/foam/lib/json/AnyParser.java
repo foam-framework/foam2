@@ -32,7 +32,7 @@ public class AnyParser
       new PropertyReferenceParser(),
       new ClassReferenceParser(),
       new ArrayParser(),
-      new FObjectParser(),
+      FObjectParser.instance(),
       new MapParser()));
   }
 }
