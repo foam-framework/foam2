@@ -2140,6 +2140,62 @@ foam.CLASS({
 });
 
 
+foam.ENUM({
+  package: 'foam.u2',
+  name: 'PermissionedPropertyVisibilityConstraints',
+
+  properties: [
+    {
+      class: 'Array',
+      name: 'allowedValues',
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.DisplayMode',
+      name: 'fallbackValue'
+    }
+  ],
+
+  methods: [
+    function applyConstraints(displayMode) {
+      return this.allowedValues.some(x => displayMode === x)
+        ? displayMode
+        : this.fallbackValue;
+    }
+  ],
+
+  values: [
+    {
+      name: 'HIDDEN',
+      documentation: 'The visibility must be HIDDEN because the user lacks the requisite permission.',
+      allowedValues: [
+        foam.u2.DisplayMode.HIDDEN
+      ],
+      fallbackValue: foam.u2.DisplayMode.HIDDEN
+    },
+    {
+      name: 'RO_OR_HIDDEN',
+      documentation: 'The visibility must be read-only or hidden because the user has permission to read but not to write.',
+      allowedValues: [
+        foam.u2.DisplayMode.RO,
+        foam.u2.DisplayMode.HIDDEN
+      ],
+      fallbackValue: foam.u2.DisplayMode.RO
+    },
+    {
+      name: 'ANYTHING',
+      documentation: 'The user has all requisite permissions so the visibility is unconstrained.',
+      allowedValues: [
+        foam.u2.DisplayMode.RO,
+        foam.u2.DisplayMode.RW,
+        foam.u2.DisplayMode.HIDDEN,
+        foam.u2.DisplayMode.DISABLED
+      ],
+      fallbackValue: foam.u2.DisplayMode.RW
+    }
+  ]
+});
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'PropertyViewRefinements',
@@ -2239,11 +2295,11 @@ foam.CLASS({
 
           if ( foam.String.isInstance(value) ) {
             return foam.core.ConstantSlot.create({
-              value: foam.u2.DisplayMode[foam.String.constantize(value)]
+              value: DisplayMode[foam.String.constantize(value)]
             });
           }
 
-          if ( foam.u2.DisplayMode.isInstance(value) ) {
+          if ( DisplayMode.isInstance(value) ) {
             return foam.core.ConstantSlot.create({ value: value });
           }
 
@@ -2263,9 +2319,10 @@ foam.CLASS({
       });
 
       if ( this.readPermissionRequired || this.writePermissionRequired ) {
+        const PPVC = foam.u2.PermissionedPropertyVisibilityConstraints;
         var visSlot  = slot;
         var permSlot = data$.map((data) => {
-          if ( ! data || ! data.__subContext__.auth ) return DisplayMode.HIDDEN;
+          if ( ! data || ! data.__subContext__.auth ) return PPVC.HIDDEN;
           var auth = data.__subContext__.auth;
 
           var propName = this.name.toLowerCase();
@@ -2274,21 +2331,18 @@ foam.CLASS({
 
           return auth.check(null, `${clsName}.rw.${propName}`)
               .then(function(rw) {
-                if ( rw ) return DisplayMode.RW;
-                if ( canRead ) return DisplayMode.RO;
+                if ( rw ) return PPVC.ANYTHING;
+                if ( canRead ) return PPVC.RO_OR_HIDDEN;
                 return auth.check(null, `${clsName}.ro.${propName}`)
-                  .then((ro) => ro ? DisplayMode.RO : DisplayMode.HIDDEN);
+                  .then((ro) => ro ? PPVC.RO_OR_HIDDEN : PPVC.HIDDEN);
               });
         });
 
         slot = foam.core.ArraySlot.create({ slots: [visSlot, permSlot] }).map((arr) => {
           var vis  = arr[0];
-          var perm = arr[1] || DisplayMode.HIDDEN;
+          var perm = arr[1] || PPVC.HIDDEN;
 
-          return perm === DisplayMode.HIDDEN ? perm :
-            vis  === DisplayMode.HIDDEN ? vis :
-            perm === DisplayMode.RO ? perm :
-            vis;
+          return perm.applyConstraints(vis);
         });
       }
 
