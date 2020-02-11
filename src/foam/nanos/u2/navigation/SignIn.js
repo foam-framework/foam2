@@ -18,7 +18,9 @@ foam.CLASS({
     { name: 'TITLE', message: 'Welcome!' },
     { name: 'FOOTER_TXT', message: 'Not a user yet?' },
     { name: 'FOOTER_LINK', message: 'Create an account' },
-    { name: 'SUB_FOOTER_LINK', message: 'Forgot password?' }
+    { name: 'SUB_FOOTER_LINK', message: 'Forgot password?' },
+    { name: 'ERROR_MSG1', message: 'There was an issue with logging in.' },
+    { name: 'ERROR_MSG2', message: 'Please check email and password, and try again.' }
   ],
 
   properties: [
@@ -44,7 +46,8 @@ foam.CLASS({
       class: 'Password',
       name: 'password',
       required: true,
-      view: { class: 'foam.u2.view.PasswordView', passwordIcon: true }
+      view: { class: 'foam.u2.view.PasswordView', passwordIcon: true },
+      validationTextVisible: false
     },
     {
       class: 'Boolean',
@@ -102,10 +105,19 @@ foam.CLASS({
     {
       name: 'login',
       label: 'Sign in',
-      isEnabled: function(errors_) {
-        return ! errors_;
-      },
       code: async function(X) {
+        if ( this.errors_ ) {
+          // Format an error msg for users
+          let errMsg = '';
+          for ( i = 0; i < this.errors_.length; i++ ) {
+            if ( ! this.errors_[i] ) continue;
+            errMsg += this.errors_[i].length == 2 ?
+              `${i+1}) ${this.errors_[i][0].name} input is not correct: ${this.errors_[i][1]} ` :
+              `${i+1}) Input error: ${this.errors_[i]} `;
+          }
+          this.notify(errMsg || this.ERROR_MSG2, 'error');
+          return;
+        }
         this.auth.loginByEmail(X, this.email, this.password).then(
           (logedInUser) => {
             if ( ! logedInUser ) return;
@@ -116,7 +128,7 @@ foam.CLASS({
                   this.user.copyFrom(updatedUser);
                   this.nextStep();
                 }).catch((err) => {
-                  this.notify(err.message || 'There was an issue with logging in.', 'error');
+                  this.notify(err.message || this.ERROR_MSG1, 'error');
                 });
             } else {
               this.user.copyFrom(logedInUser);
@@ -125,7 +137,7 @@ foam.CLASS({
           }
         ).catch(
           (err) => {
-            this.notify(err.message || 'There was a problem logging in.', 'error');
+            this.notify(err.message || this.ERROR_MSG1, 'error');
         });
       }
     }
