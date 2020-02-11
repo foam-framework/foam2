@@ -153,10 +153,8 @@ foam.CLASS({
     {
       name: 'filteredOptions',
       expression: function(property, daoContents, idToStringDisplayMap, search, selectedOptions) {
-        if ( ! daoContents || daoContents.length === 0 || ! idToStringDisplayMap ) {
-          this.isLoading = false;
-          return [];
-        }
+        if ( ! daoContents || daoContents.length === 0 || ! idToStringDisplayMap ) return [];
+
         var options = Object.values(idToStringDisplayMap);
         // Filter out search
         if ( search ) {
@@ -227,6 +225,7 @@ foam.CLASS({
       this.onDetach(this.setOfReferenceIds$.sub(this.updateReferenceObjectsArray));
       this.dao.select(this.GROUP_BY(this.property, this.COUNT())).then(function(result) {
         self.daoContents = result.groupKeys; //  gets contents from the source dao
+        self.isLoading = false;
       });
       this
         .addClass(this.myClass())
@@ -269,7 +268,8 @@ foam.CLASS({
               .start('p').addClass(self.myClass('label-loading'))
                 .add(self.LABEL_LOADING)
               .end();
-          } else if ( filteredOptions.length == 0 ) {
+          }
+          if ( filteredOptions.length == 0 ) {
             return element
               .start('p').addClass(self.myClass('label-loading'))
                 .add(self.LABEL_NO_OPTIONS)

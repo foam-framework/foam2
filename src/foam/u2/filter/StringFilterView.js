@@ -142,10 +142,7 @@ foam.CLASS({
     {
       name: 'filteredOptions',
       expression: function(daoContents, selectedOptions) {
-        if ( ! daoContents || daoContents.length === 0 ) {
-          this.isLoading = false;
-          return [];
-        }
+        if ( ! daoContents || daoContents.length === 0 ) return [];
 
         var options = daoContents.map((obj) => obj.trim());
 
@@ -156,7 +153,6 @@ foam.CLASS({
           });
         });
 
-        this.isLoading = false;
         return options;
       }
     },
@@ -193,6 +189,7 @@ foam.CLASS({
         arg2: this.Count.create()
       })).then((results) => {
         this.daoContents = results.groupKeys;
+        this.isLoading = false;
       });
 
       var self = this;
@@ -237,7 +234,8 @@ foam.CLASS({
                 .start('p').addClass(self.myClass('label-loading'))
                   .add(self.LABEL_LOADING)
                 .end();
-            } else if ( filteredOptions.length == 0 ) {
+            }
+            if ( filteredOptions.length == 0 ) {
               return element
                 .start('p').addClass(self.myClass('label-loading'))
                   .add(self.LABEL_NO_OPTIONS)
