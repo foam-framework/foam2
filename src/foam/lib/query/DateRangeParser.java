@@ -9,8 +9,8 @@ public class DateRangeParser
 
   public DateRangeParser() {
     setDelegate(new Seq2(0, 2,
-                         new DateParser(),
+                         DateParser.instance(),
                          Literal.create(".."),
-                         new DateParser()));
+                         DateParser.instance()));
   }
 }

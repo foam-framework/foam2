@@ -14,7 +14,7 @@ foam.CLASS({
   requires: [
     {
       path: 'foam.comics.BrowserView',
-      flags: ['web'],
+      flags: ['web']
     }
   ],
 

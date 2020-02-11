@@ -13,7 +13,7 @@ public class ListParser
 {
   public ListParser() {
     super(new Alt(
-      new NullParser(),
+      NullParser.instance(),
       new Seq1(3,
                Whitespace.instance(),
                Literal.create("["),

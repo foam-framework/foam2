@@ -30,60 +30,60 @@ public class LiteralDateParser
 
             //YYYY-MM-DDTHH:MM
             new Seq(
-              new IntParser(),
+              IntParser.instance(),
               new Alt(
                 Literal.create("-"),
                 Literal.create("/")),
-              new IntParser(),
+              IntParser.instance(),
               new Alt(
                 Literal.create("-"),
                 Literal.create("/")),
-              new IntParser(),
+              IntParser.instance(),
               Literal.create("T"),
-              new IntParser(),
+              IntParser.instance(),
               Literal.create(":"),
-              new IntParser()),
+              IntParser.instance()),
 
             //YYYY-MM-DDTHH
             new Seq(
-              new IntParser(),
+              IntParser.instance(),
               new Alt(
                 Literal.create("-"),
                 Literal.create("/")),
-              new IntParser(),
+              IntParser.instance(),
               new Alt(
                 Literal.create("-"),
                 Literal.create("/")),
-              new IntParser(),
+              IntParser.instance(),
               Literal.create("T"),
-              new IntParser()),
+              IntParser.instance()),
 
         //YYYY-MM-DD
           new Seq(
             //Literal.create("\""),
-            new IntParser(),
+            IntParser.instance(),
             new Alt(
                 Literal.create("-"),
                 Literal.create("/")),
-            new IntParser(),
+            IntParser.instance(),
             new Alt(
                 Literal.create("-"),
                 Literal.create("/")),
-            new IntParser(),
+            IntParser.instance(),
             Whitespace.instance()),
 
         //YYYY-MM
           new Seq(
-              new IntParser(),
+              IntParser.instance(),
               new Alt(
                   Literal.create("-"),
                   Literal.create("/")),
-              new IntParser(),
+              IntParser.instance(),
               Whitespace.instance()),
 
         //YYYY
           new Seq(
-              new IntParser())
+              IntParser.instance())
           ));
 
   }

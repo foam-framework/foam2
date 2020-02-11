@@ -8,21 +8,28 @@ package foam.lib.query;
 
 import foam.lib.json.IntParser;
 import foam.lib.parse.Literal;
-import foam.lib.parse.PStream;
+import foam.lib.parse.Parser;
 import foam.lib.parse.ParserContext;
 import foam.lib.parse.ProxyParser;
+import foam.lib.parse.PStream;
 import foam.lib.parse.Seq;
 
 public class DateParser
-  extends ProxyParser {
+  extends ProxyParser
+{
 
+  private final static Parser instance__ = new DateParser();
+
+  public static Parser instance() { return instance__; }
+
+  // TODO: make private
   public DateParser() {
     setDelegate(new Seq(// YYYY/MM/DD
-      new IntParser(),
+      IntParser.instance(),
       Literal.create("/"),
-      new IntParser(),
+      IntParser.instance(),
       Literal.create("/"),
-      new IntParser()));
+      IntParser.instance()));
   }
 
   @Override

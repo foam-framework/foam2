@@ -13,6 +13,6 @@ import foam.lib.parse.Range;
 
 public class IdentifierStartParser extends ProxyParser {
   public IdentifierStartParser() {
-    super(new Alt(new Range('A', 'z'), Literal.create("_"), Literal.create("$")));
+    super(new Alt(Range.create('A', 'z'), Literal.create("_"), Literal.create("$")));
   }
 }

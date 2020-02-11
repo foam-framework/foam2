@@ -45,6 +45,7 @@ import java.util.Date;
 public class ObjectDateParser
   extends ProxyParser
 {
+  static long count__;
   public ObjectDateParser() {
     super(new Seq0(
       Whitespace.instance(),
@@ -72,6 +73,7 @@ public class ObjectDateParser
       },
       Whitespace.instance(),
       Literal.create("}")));
+      System.err.println("******************************* " + count__++);
   }
 
   public PStream parse(PStream ps, ParserContext x) {
