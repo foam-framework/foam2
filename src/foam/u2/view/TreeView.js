@@ -117,22 +117,64 @@ foam.CLASS({
     'showThisRootOnSearch',
     'subMenus',
     'showRootOnSearch',
-    'searchStringValue'
+    'searchStringValue',
+    'updateThisRoot',
+    'childRootUpdateSlot',
+    'searchRelated'
   ],
 
   methods: [
     function initE() {
       var self = this;
+      var controlledSearchSlot = foam.core.SimpleSlot.create();
+      // self.childRootUpdateSlot = foam.core.SimpleSlot.create({value: false});
+      self.updateThisRoot = false;//foam.core.SimpleSlot.create({value: false});
 
       self.subMenus = [];
-      //self.searchStringValue = self.query.get();
-      //self.doesThisIncludeSearch = self.query.get() ? self.data.label.includes(self.query.get()) : true;
+
+      // this.updateThisRoot.sub(function() {
+      //   if(self.updateThisRoot.get()) {
+      //     self.showThisRootOnSearch = false;
+          // if(self.hasChildren)
+          //   self.showThisRootOnSearch = false;
+          // else {
+          //     self.doesThisIncludeSearch = self.query.get() ? self.data.label.includes(self.query.get()) : true;
+          //     self.searchRelated = self.query.get() ? (self.doesThisIncludeSearch && !self.hasChildren) || (self.hasChildren && self.showThisRootOnSearch) : true;
+          //     if(self.showRootOnSearch) 
+          //       self.showRootOnSearch.set(self.showRootOnSearch.get() || self.doesThisIncludeSearch);
+          //     //self.showRootOnSearch.set(self.showRootOnSearch.get() || self.doesThisIncludeSearch);
+          //   }
+        //} else {
+        //   self.searchRelated = self.query.get() ? (self.doesThisIncludeSearch && !self.hasChildren) || (self.hasChildren && self.showThisRootOnSearch) : true;
+        //   self.showRootOnSearch.set(self.showRootOnSearch.get() || self.doesThisIncludeSearch);
+        // }    
+      // });
+
+      // this.showThisRootOnSearch$.sub(function() {
+      //   if(this.updateThisRoot)
+      //     self.searchRelated = self.query.get() ? (self.doesThisIncludeSearch && !self.hasChildren) || (self.hasChildren && self.showThisRootOnSearch) : true;
+      // });
+
+      this.query.sub(function() {
+          if(self.query.get()) {
+            self.updateThisRoot = true;
+            self.showThisRootOnSearch = false;
+            // self.childRootUpdateSlot.set(true);
+          } 
+          controlledSearchSlot.set(self.query.get());
+          self.updateThisRoot = false;
+      });
+      
       if(self.showRootOnSearch)
         self.showRootOnSearch.set(self.showRootOnSearch.get() || self.doesThisIncludeSearch);
 
-      this.query.sub(function() {
-        self.searchStringValue = self.query.get();
-      });
+      //   controlledSearchSlot.sub(function() {
+      //     self.doesThisIncludeSearch = self.query.get() ? self.data.label.includes(self.query.get()) : true;
+      //     if(!self.hasChildren) {
+      //       self.searchRelated = self.query.get() ? (self.doesThisIncludeSearch && !self.hasChildren) || (self.hasChildren && self.showThisRootOnSearch) : true;
+      //       self.showRootOnSearch.set(self.showRootOnSearch.get() || self.doesThisIncludeSearch);
+      //     }
+      // });
 
       this.data[self.relationship.forwardName].select().then(function(val){
         if(val.array.length > 0)
@@ -144,22 +186,16 @@ foam.CLASS({
 
       this.
         addClass(this.myClass()).
-        show(this.slot(function(hasChildren, showThisRootOnSearch, searchStringValue) {
-          // if(self.data.label == 'Ablii')
-          //   console.log();
-          
-          // if(self.data.parent == 'sme')
-          //   console.log();
-            
-          self.doesThisIncludeSearch = self.query.get() ? self.data.label.includes(self.query.get()) : true;
-          var shouldThisBeShown = self.query.get() ? (self.doesThisIncludeSearch && !hasChildren) || (hasChildren && showThisRootOnSearch) : true;//( self.data.label.includes(self.query) || self.hasChildren )
-
-          if(self.query.get() && shouldThisBeShown)
-            self.expanded = true;
-
-          if(self.showRootOnSearch && self.query.get())
-            self.showRootOnSearch.set(self.showRootOnSearch.get() || shouldThisBeShown);
-          return shouldThisBeShown;
+        show(this.slot(function(hasChildren, showThisRootOnSearch, updateThisRoot) {
+          if(!updateThisRoot) {
+            self.doesThisIncludeSearch = self.query.get() ? self.data.label.includes(self.query.get()) : true;
+            self.searchRelated = self.query.get() ? (self.doesThisIncludeSearch && !hasChildren) || (self.hasChildren && self.showThisRootOnSearch) : true;
+            if(self.showRootOnSearch)
+              self.showRootOnSearch.set(self.showRootOnSearch.get() || self.doesThisIncludeSearch);
+          }
+          else
+            return true;
+          return self.searchRelated;
         })).
         addClass(this.slot(function(selected, id) {
           if ( selected && foam.util.equals(selected.id, id) ) {
@@ -210,7 +246,8 @@ foam.CLASS({
                 relationship: self.relationship,
                 expanded: self.startExpanded,
                 showRootOnSearch: self.showThisRootOnSearch$,
-                query: self.query
+                query: controlledSearchSlot,
+                // updateThisRoot: self.childRootUpdateSlot
               }, self));
             });
           })).
@@ -319,13 +356,14 @@ foam.CLASS({
     },
     'query',
     'updatedQuery',
-    'showRootsOnSearch'
+    'showRootsOnSearch',
+    'updateChildRoots'
   ],
 
   methods: [
     function initE() {
       this.startExpanded = this.startExpanded;
-      this.updatedQuery = foam.core.SimpleSlot.create();
+      var controlledSearchSlot = foam.core.SimpleSlot.create();
 
       var M   = this.ExpressionsSingleton.create();
       var of  = this.__context__.lookup(this.relationship.sourceModel);
@@ -339,11 +377,19 @@ foam.CLASS({
       var treeViewRows = [];
 
       //updates children roots
-      this.query.sub(function() {
-        this.showRootOnSearch = false;
-        treeViewRows.forEach((i) => i.showThisRootOnSearch = false);
-        self.updatedQuery.set(self.query.get());
-      });
+    //  self.updateChildRoots = foam.core.SimpleSlot.create({value: false});
+
+    // this.query.sub(() => {
+    //       if(self.query.get())
+    //         self.updateChildRoots.set(true);
+    //       controlledSearchSlot.set(self.query.get());
+    //       self.updateChildRoots.set(false);
+    //   });
+      // this.query.sub(function() {
+      //   this.showRootOnSearch = false;
+      //   //treeViewRows.forEach((i) => i.showThisRootOnSearch = false);
+      //   controlledSearchSlot.set(self.query.get());
+      // });
 
       this.addClass(this.myClass()).
         select(dao, function(obj) {
@@ -356,7 +402,10 @@ foam.CLASS({
             relationship: self.relationship,
             expanded: self.startExpanded,
             formatter: self.formatter,
-            query: this.updatedQuery,
+            //query: this.updatedQuery,
+            query: self.query,
+            //showThisRootOnSearch: childRoots,
+            //updateThisRoot: self.updateChildRoots
            // showThisRootOnSearch: this.showRootsOnSearch
           }, this);
           treeViewRows.push(item);
