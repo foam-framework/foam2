@@ -71,6 +71,11 @@ foam.CLASS({
 
     function link() {
       this.data$.linkTo(this.attrSlot('checked'));
+    },
+
+    function fromProperty(property) {
+      this.SUPER(property);
+      this.label = property.label;
     }
   ],
 
