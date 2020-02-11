@@ -129,13 +129,56 @@ foam.CLASS({
     }
 
     kbd {
-      font-family: 'IBM Plex Mono', monospace;
       background: #eee;
       border-radius: 3px;
       padding: 0 4px;
     }
   `,
 
+  messages: [
+    {
+      name: 'CODE_EXAMPLE_1',
+      message: `
+        {
+          class: 'String',
+          name: 'foo',
+          visibility: 'RW'
+        },
+        {
+          class: 'String',
+          name: 'bar',
+          visibility: foam.u2.DisplayMode.RW
+        }
+      `,
+    },
+    {
+      name: 'CODE_EXAMPLE_2',
+      message: `
+        {
+          class: 'Boolean',
+          name: 'bar'
+        },
+        {
+          class: 'String',
+          name: 'foo',
+          visibility: function(bar) {
+            const DisplayMode = foam.u2.DisplayMode;
+            return bar ? DisplayMode.RW : DisplayMode.HIDDEN;
+          }
+        }
+      `,
+    },
+    {
+      name: 'CODE_EXAMPLE_3',
+      message: `
+        {
+          class: 'String',
+          name: 'foo',
+          visibility: foam.core.ConstantSlot.create({ value: foam.u2.DisplayMode.RW })
+        }
+      `,
+    }
+  ],
   properties: [
     {
       class: 'Enum',
@@ -153,7 +196,7 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this
-        .start('h1').add('Visibility Demo').end()
+        .start('h1').add('Property Visibility Demo').end()
         .start('p')
           .add('Every property has a view, which can be specified by setting the ')
           .start('kbd').add('view').end()
@@ -169,6 +212,8 @@ foam.CLASS({
             .start('kbd').add('controllerMode').end()
             .add(' is ')
             .start('kbd').add('CREATE').end()
+            .add('. Defaults to ')
+            .start('kbd').add('RW').end()
             .add('.')
           .end()
           .start('li')
@@ -177,6 +222,8 @@ foam.CLASS({
             .start('kbd').add('controllerMode').end()
             .add(' is ')
             .start('kbd').add('VIEW').end()
+            .add('. Defaults to ')
+            .start('kbd').add('RO').end()
             .add('.')
           .end()
           .start('li')
@@ -185,11 +232,15 @@ foam.CLASS({
             .start('kbd').add('controllerMode').end()
             .add(' is ')
             .start('kbd').add('EDIT').end()
+            .add('. Defaults to ')
+            .start('kbd').add('RW').end()
             .add('.')
           .end()
           .start('li')
             .start('kbd').add('visibility').end()
-            .add(': Overrides all three of the properties listed above.')
+            .add(': Overrides all three of the properties listed above. Defaults to ')
+            .start('kbd').add('null').end()
+            .add('.')
           .end()
         .end()
         .start('p')
@@ -198,14 +249,23 @@ foam.CLASS({
             .start('li')
               .add('A ')
               .start('kbd').add('foam.u2.DisplayMode').end()
-            .end()
-            .start('li')
-              .add('A slot of ')
-              .start('kbd').add('foam.u2.DisplayMode').end()
+              .add('. Examples:')
+              .start('pre').add(this.CODE_EXAMPLE_1).end()
             .end()
             .start('li')
               .add('An expression function that returns a ')
               .start('kbd').add('foam.u2.DisplayMode').end()
+              .add('. Example:')
+              .start('pre').add(this.CODE_EXAMPLE_2).end()
+            .end()
+            .start('li')
+              .add('A slot of ')
+              .start('kbd').add('foam.u2.DisplayMode').end()
+              .add('. Example:')
+              .start('pre').add(this.CODE_EXAMPLE_3).end()
+              .add(`It's not likely that you'll need to use this option under normal conditions. It might be useful if you're modifying the `)
+              .start('kbd').add('visibility').end()
+              .add(' of properties programmatically, such as in some lower-level framework code though, for example.')
             .end()
           .end()
         .end()
