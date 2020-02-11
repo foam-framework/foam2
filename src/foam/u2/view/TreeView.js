@@ -156,11 +156,11 @@ foam.CLASS({
       // });
 
       this.query.sub(function() {
-          if(self.query.get()) {
+          //if(self.query.get()) {
             self.updateThisRoot = true;
             self.showThisRootOnSearch = false;
             // self.childRootUpdateSlot.set(true);
-          } 
+          //} 
           controlledSearchSlot.set(self.query.get());
           self.updateThisRoot = false;
       });
