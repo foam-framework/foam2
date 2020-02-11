@@ -8,8 +8,8 @@ package foam.lib.json;
 
 import foam.lib.parse.*;
 
-public class NullParser {
-  private final static Parser instance__ = new Literal("null", null);
+public class NullParser extends ProxyParser {
+private final static Parser instance__ = new Literal("null", null);
 
   public static Parser instance() { return instance__; }
 }
