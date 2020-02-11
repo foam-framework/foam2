@@ -124,10 +124,10 @@ foam.CLASS({
       self.subMenus = [];
 
       this.query.sub(function() {
-          self.updateThisRoot = true;
-          self.showThisRootOnSearch = false;
-          controlledSearchSlot.set(self.query.get());
-          self.updateThisRoot = false;
+        self.updateThisRoot = true;
+        self.showThisRootOnSearch = false;
+        controlledSearchSlot.set(self.query.get());
+        self.updateThisRoot = false;
       });
       
       if( self.showRootOnSearch )
@@ -147,12 +147,13 @@ foam.CLASS({
           var isThisItemRelatedToSearch = false;
           if ( !updateThisRoot ) {
             self.doesThisIncludeSearch = self.query.get() ? self.data.label.includes(self.query.get()) : true;
-            isThisItemRelatedToSearch = self.query.get() ? (self.doesThisIncludeSearch && !hasChildren) || (self.hasChildren && self.showThisRootOnSearch) : true;
+            isThisItemRelatedToSearch = self.query.get() ? (self.doesThisIncludeSearch && (!hasChildren || self.data.parent !== "")) || (hasChildren && showThisRootOnSearch) : true;
             if ( self.showRootOnSearch )
-              self.showRootOnSearch.set(self.showRootOnSearch.get() || self.doesThisIncludeSearch);
+              self.showRootOnSearch.set(self.showRootOnSearch.get() || isThisItemRelatedToSearch);
           }
-          else
+          else {
             isThisItemRelatedToSearch = true;
+          }
           return isThisItemRelatedToSearch;
         })).
         addClass(this.slot(function(selected, id) {
@@ -317,7 +318,6 @@ foam.CLASS({
   methods: [
     function initE() {
       this.startExpanded = this.startExpanded;
-      var controlledSearchSlot = foam.core.SimpleSlot.create();
 
       var M   = this.ExpressionsSingleton.create();
       var of  = this.__context__.lookup(this.relationship.sourceModel);
