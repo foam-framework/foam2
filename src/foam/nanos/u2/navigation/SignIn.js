@@ -27,15 +27,17 @@ foam.CLASS({
       hidden: true
     },
     {
-      class: 'EMail',
-      name: 'email',
+      class: 'String',
+      name: 'id',
       required: true,
+      //TODO: rename label to 'Email or Username' when integrating
+      label: 'Email',
       view: {
         class: 'foam.u2.TextField',
         focused: true
       },
-      visibilityExpression: function(disableEmail_) {
-        return disableEmail_ ?
+      visibilityExpression: function(disableIdentifier_) {
+        return disableIdentifier_ ?
           foam.u2.Visibility.DISABLED : foam.u2.Visibility.RW;
       },
       validationTextVisible: false
@@ -48,7 +50,7 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'disableEmail_',
+      name: 'disableIdentifier_',
       hidden: true
     },
     {
@@ -106,27 +108,32 @@ foam.CLASS({
         return ! errors_;
       },
       code: async function(X) {
-        this.auth.loginByEmail(X, this.email, this.password).then(
-          (logedInUser) => {
-            if ( ! logedInUser ) return;
-            if ( this.token_ ) {
-              logedInUser.signUpToken = this.token_;
-              this.dao_.put(logedInUser)
-                .then((updatedUser) => {
-                  this.user.copyFrom(updatedUser);
-                  this.nextStep();
-                }).catch((err) => {
-                  this.notify(err.message || 'There was an issue with logging in.', 'error');
-                });
-            } else {
-              this.user.copyFrom(logedInUser);
-              this.nextStep();
+        if ( this.id.length > 0 ) {
+          this.auth.login(X, this.id, this.password).then(
+            (logedInUser) => {
+              if ( ! logedInUser ) return;
+              if ( this.token_ ) {
+                logedInUser.signUpToken = this.token_;
+                this.dao_.put(logedInUser)
+                  .then((updatedUser) => {
+                    this.user.copyFrom(updatedUser);
+                    this.nextStep();
+                  }).catch((err) => {
+                    this.notify(err.message || 'There was an issue with logging in.', 'error');
+                  });
+              } else {
+                this.user.copyFrom(logedInUser);
+                this.nextStep();
+              }
             }
-          }
-        ).catch(
-          (err) => {
-            this.notify(err.message || 'There was a problem logging in.', 'error');
-        });
+          ).catch(
+            (err) => {
+              this.notify(err.message || 'There was a problem logging in.', 'error');
+          });
+        } else {
+          //TODO: change to 'Please enter email or username' when integrating
+          this.notify('Please enter email', 'error')
+        }
       }
     }
   ]
