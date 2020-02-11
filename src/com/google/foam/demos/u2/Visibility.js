@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 foam.CLASS({
+  package: 'com.google.foam.demos.u2',
   name: 'VisibilityTest',
 
   properties: [
@@ -22,31 +23,31 @@ foam.CLASS({
       class: 'String',
       name: 'readWrite',
       value: 'testing...',
-      visibility: foam.u2.Visibility.RW
+      visibility: 'RW'
     },
     {
       class: 'String',
       name: 'final',
       value: 'testing...',
-      visibility: foam.u2.Visibility.FINAL
+      updateVisibility: 'RO'
     },
     {
       class: 'String',
       name: 'disabled',
       value: 'testing...',
-      visibility: foam.u2.Visibility.DISABLED
+      visibility: 'DISABLED'
     },
     {
       class: 'String',
       name: 'readOnly',
       value: 'testing...',
-      visibility: foam.u2.Visibility.RO
+      visibility: 'RO'
     },
     {
       class: 'String',
       name: 'hidden',
       value: 'testing...',
-      visibility: foam.u2.Visibility.HIDDEN
+      visibility: 'HIDDEN'
     },
     {
       class: 'Boolean',
@@ -56,91 +57,184 @@ foam.CLASS({
     {
       class: 'String',
       name: 'disabledExpression',
-      visibilityExpression: function(flag) {
-        return foam.u2.Visibility[flag ? 'RW' : 'DISABLED'];
+      visibility: function(flag) {
+        return foam.u2.DisplayMode[flag ? 'RW' : 'DISABLED'];
       }
     },
     {
       class: 'Boolean',
       name: 'disabledBooleanExpression',
-      visibilityExpression: function(flag) {
-        return foam.u2.Visibility[flag ? 'RW' : 'DISABLED'];
+      visibility: function(flag) {
+        return foam.u2.DisplayMode[flag ? 'RW' : 'DISABLED'];
       }
     },
     {
       class: 'Date',
       name: 'disabledDateExpression',
-      visibilityExpression: function(flag) {
-        return foam.u2.Visibility[flag ? 'RW' : 'DISABLED'];
+      visibility: function(flag) {
+        return foam.u2.DisplayMode[flag ? 'RW' : 'DISABLED'];
       }
     },
     {
       class: 'String',
       name: 'readOnlyExpression',
-      visibilityExpression: function(flag) {
-        return foam.u2.Visibility[flag ? 'RW' : 'RO'];
+      visibility: function(flag) {
+        return foam.u2.DisplayMode[flag ? 'RW' : 'RO'];
       }
     },
     {
       class: 'Boolean',
       name: 'readOnlyBooleanExpression',
-      visibilityExpression: function(flag) {
-        return foam.u2.Visibility[flag ? 'RW' : 'RO'];
+      visibility: function(flag) {
+        return foam.u2.DisplayMode[flag ? 'RW' : 'RO'];
       }
     },
     {
       class: 'Date',
       name: 'readOnlyDateExpression',
-      visibilityExpression: function(flag) {
-        return foam.u2.Visibility[flag ? 'RW' : 'RO'];
+      visibility: function(flag) {
+        return foam.u2.DisplayMode[flag ? 'RW' : 'RO'];
       }
     },
     {
       class: 'String',
       name: 'hiddenExpression',
-      visibilityExpression: function(flag) {
-        return foam.u2.Visibility[flag ? 'RW' : 'HIDDEN'];
+      visibility: function(flag) {
+        return foam.u2.DisplayMode[flag ? 'RW' : 'HIDDEN'];
       }
     }
   ]
 });
 
-var ctx = foam.__context__;
+foam.CLASS({
+  package: 'com.google.foam.demos.u2',
+  name: 'VisibilityDemo',
+  extends: 'foam.u2.Element',
 
-document.write('Default');
+  requires: [
+    'com.google.foam.demos.u2.VisibilityTest',
+    'foam.u2.ControllerMode',
+    'foam.u2.detail.SectionedDetailView',
+    'foam.u2.layout.DisplayWidth',
+    'foam.u2.layout.Grid',
+    'foam.u2.layout.GUnit'
+  ],
 
-foam.u2.DetailView.create(
-  {
-    data: VisibilityTest.create()
-  }
-).write();
+  exports: ['displayWidth'],
 
+  css: `
+    body {
+      font-family: 'IBM Plex Sans', Helvetica, sans-serif;
+      line-height: 1.5;
+    }
 
-document.write('<br>Create');
+    kbd {
+      font-family: 'IBM Plex Mono', monospace;
+      background: #eee;
+      border-radius: 3px;
+      padding: 0 4px;
+    }
+  `,
 
-foam.u2.DetailView.create(
-  {
-    data: VisibilityTest.create(),
-    controllerMode: foam.u2.ControllerMode.CREATE
-  }
-).write();
+  properties: [
+    {
+      class: 'Enum',
+      of: 'foam.u2.layout.DisplayWidth',
+      name: 'displayWidth',
+      factory: function() {
+        return this.DisplayWidth.VALUES
+          .sort((a, b) => b.minWidth - a.minWidth)
+          .find(o => o.minWidth <= window.innerWidth);
+      }
+    }
+  ],
 
+  methods: [
+    function initE() {
+      this.SUPER();
+      this
+        .start('h1').add('Visibility Demo').end()
+        .start('p')
+          .add('Every property has a view, which can be specified by setting the ')
+          .start('kbd').add('view').end()
+          .add(' property property. If not set explicitly, a suitable default view will be used based on the type of the property.')
+        .end()
+        .start('p')
+          .add('There are several property properties that can be used to control the visibility of the view of a property:')
+        .end()
+        .start('ul')
+          .start('li')
+            .start('kbd').add('createVisibility').end()
+            .add(': Controls the visibility of the view when ')
+            .start('kbd').add('controllerMode').end()
+            .add(' is ')
+            .start('kbd').add('CREATE').end()
+            .add('.')
+          .end()
+          .start('li')
+            .start('kbd').add('readVisibility').end()
+            .add(': Controls the visibility of the view when ')
+            .start('kbd').add('controllerMode').end()
+            .add(' is ')
+            .start('kbd').add('VIEW').end()
+            .add('.')
+          .end()
+          .start('li')
+            .start('kbd').add('updateVisibility').end()
+            .add(': Controls the visibility of the view when ')
+            .start('kbd').add('controllerMode').end()
+            .add(' is ')
+            .start('kbd').add('EDIT').end()
+            .add('.')
+          .end()
+          .start('li')
+            .start('kbd').add('visibility').end()
+            .add(': Overrides all three of the properties listed above.')
+          .end()
+        .end()
+        .start('p')
+          .add('Each of the properties above can be set to any of the following values:')
+          .start('ol')
+            .start('li')
+              .add('A ')
+              .start('kbd').add('foam.u2.DisplayMode').end()
+            .end()
+            .start('li')
+              .add('A slot of ')
+              .start('kbd').add('foam.u2.DisplayMode').end()
+            .end()
+            .start('li')
+              .add('An expression function that returns a ')
+              .start('kbd').add('foam.u2.DisplayMode').end()
+            .end()
+          .end()
+        .end()
+        .start('p')
+          .add('Below we show three detail views, one for each of the possible values of ')
+          .start('kbd').add('controllerMode').end()
+          .add('.')
+        .end()
 
-document.write('<br>View');
-
-foam.u2.DetailView.create(
-  {
-    data: VisibilityTest.create(),
-    controllerMode: foam.u2.ControllerMode.VIEW
-  }
-).write();
-
-
-document.write('<br>Edit');
-
-foam.u2.DetailView.create(
-  {
-    data: VisibilityTest.create(),
-    controllerMode: foam.u2.ControllerMode.EDIT
-  }
-).write();
+        .start(this.Grid)
+          .start(this.GUnit, { columns: 4 })
+            .startContext({ controllerMode: this.ControllerMode.CREATE })
+              .start('h2').add('Create').end()
+              .tag(this.SectionedDetailView, { data: this.VisibilityTest.create() })
+            .endContext()
+          .end()
+          .start(this.GUnit, { columns: 4 })
+            .startContext({ controllerMode: this.ControllerMode.VIEW })
+              .start('h2').add('View').end()
+              .tag(this.SectionedDetailView, { data: this.VisibilityTest.create() })
+            .endContext()
+          .end()
+          .start(this.GUnit, { columns: 4 })
+            .startContext({ controllerMode: this.ControllerMode.EDIT })
+              .start('h2').add('Edit').end()
+              .tag(this.SectionedDetailView, { data: this.VisibilityTest.create() })
+            .endContext()
+          .end()
+        .end();
+    }
+  ],
+});
