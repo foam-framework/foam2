@@ -94,7 +94,8 @@ public class SessionServerBox
       session.touch();
 
       // TODO: Shouldn't this go somewhere else?
-      if ( req != null && ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
+      if ( effectiveContext.get("group") == null &&
+           req != null && ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
         AppConfig appConfig = (AppConfig) effectiveContext.get("appConfig");
         appConfig = (AppConfig) appConfig.fclone();
         String configUrl = ((Request) req).getRootURL().toString();
