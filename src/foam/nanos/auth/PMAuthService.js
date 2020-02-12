@@ -111,7 +111,7 @@ foam.CLASS({
       javaCode: `
       PM pm = createPM(x, getNameFor("login"));
       try {
-        return super.login(x, id, password);
+        return super.login(x, identifier, password);
       } finally {
         log(x, pm);
       }

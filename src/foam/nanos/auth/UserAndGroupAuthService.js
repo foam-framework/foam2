@@ -168,7 +168,7 @@ foam.CLASS({
     },
     {
       name: 'login',
-      documentation: `Login a user by the id (email or username) provided, validate the password and
+      documentation: `Login a user by the identifier (email or username) provided, validate the password and
         return the user in the context`,
       javaCode: `
         User user = (User) ((DAO) getLocalUserDAO())
@@ -176,8 +176,8 @@ foam.CLASS({
           .find(
             AND(
               OR(
-                EQ(User.EMAIL, id.toLowerCase()),
-                EQ(User.USER_NAME, id)
+                EQ(User.EMAIL, identifier.toLowerCase()),
+                EQ(User.USER_NAME, identifier)
               ),
               CLASS_OF(User.class)
             )

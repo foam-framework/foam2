@@ -46,8 +46,8 @@ foam.CLASS({
           .find(
             AND(
               OR(
-                EQ(User.EMAIL, id.toLowerCase()),
-                EQ(User.USER_NAME, id)
+                EQ(User.EMAIL, identifier.toLowerCase()),
+                EQ(User.USER_NAME, identifier)
               ),
               CLASS_OF(User.class)
             )
@@ -56,7 +56,7 @@ foam.CLASS({
         if ( isPasswordExpired(user) ) {
           throw new AuthenticationException("Password expired");
         }
-        return getDelegate().login(x, id, password);`
+        return getDelegate().login(x, identifier, password);`
     },
     {
       name: 'isPasswordExpired',

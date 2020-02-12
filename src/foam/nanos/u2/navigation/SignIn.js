@@ -28,7 +28,7 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'id',
+      name: 'identifier',
       required: true,
       //TODO: rename label to 'Email or Username' when integrating
       label: 'Email',
@@ -108,8 +108,8 @@ foam.CLASS({
         return ! errors_;
       },
       code: async function(X) {
-        if ( this.id.length > 0 ) {
-          this.auth.login(X, this.id, this.password).then(
+        if ( this.identifier.length > 0 ) {
+          this.auth.login(X, this.identifier, this.password).then(
             (logedInUser) => {
               if ( ! logedInUser ) return;
               if ( this.token_ ) {

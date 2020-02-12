@@ -64,7 +64,7 @@ foam.INTERFACE({
     {
       name: 'login',
       documentation: `
-        Log the user in using their id (email or username) and password to
+        Log the user in using their identifier (email or username) and password to
         authenticate them.
       `,
       async: true,
@@ -77,7 +77,7 @@ foam.INTERFACE({
           type: 'Context'
         },
         {
-          name: 'id',
+          name: 'identifier',
           type: 'String'
         },
         {
