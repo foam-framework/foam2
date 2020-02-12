@@ -134,7 +134,7 @@ foam.CLASS({
   ],
   methods: [
     function initE() {
-      self = this;
+      var self = this;
 
       this
       .addClass(this.myClass())

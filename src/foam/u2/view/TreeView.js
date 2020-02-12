@@ -110,20 +110,31 @@ foam.CLASS({
       value: false
     },
     'query',
-    'showThisRootOnSearch',
-    'subMenus',
+    {
+      class: 'Boolean',
+      name: 'showThisRootOnSearch'
+    },
+    {
+      class: 'Array',
+      name: 'subMenus',
+      value: []
+    },
     'showRootOnSearch',
-    'updateThisRoot',
-    'onClickAddOn'
+    {
+      class: 'Boolean',
+      name: 'updateThisRoot',
+      value: false
+    },
+    {
+      class: 'Function',
+      name: 'onClickAddOn'
+    }
   ],
 
   methods: [
     function initE() {
       var self = this;
       var controlledSearchSlot = foam.core.SimpleSlot.create();
-      self.updateThisRoot = false;
-
-      self.subMenus = [];
 
       if ( this.query ) {
         this.query.sub(function() {
@@ -153,7 +164,7 @@ foam.CLASS({
           var isThisItemRelatedToSearch = false;
           if ( ! updateThisRoot ) {
             self.doesThisIncludeSearch = self.query.get() ? self.data.label.toLowerCase().includes(self.query.get().toLowerCase()) : true;
-            isThisItemRelatedToSearch = self.query.get() ? (self.doesThisIncludeSearch && (!hasChildren || self.data.parent !== "")) || (hasChildren && showThisRootOnSearch) : true;
+            isThisItemRelatedToSearch = self.query.get() ? ( self.doesThisIncludeSearch && !hasChildren ) || ( hasChildren && showThisRootOnSearch ) : true;
             if ( self.showRootOnSearch )
               self.showRootOnSearch.set(self.showRootOnSearch.get() || isThisItemRelatedToSearch);
           }
