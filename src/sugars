@@ -10,6 +10,6 @@ p({
       "class":"foam.nanos.auth.User",
       "group":"admin"
      },
-    "permission":"menu.read.doc"
+    "permission":"menu.read.integration"
   }"
 })
