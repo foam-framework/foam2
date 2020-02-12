@@ -1,5 +1,5 @@
 // admin
-p({"class":"foam.nanos.menu.Menu","id":"admin","label":"Admin","handler":{"class":"foam.nanos.menu.SubMenu"},"order":100,"parent":""})
+p({"class":"foam.nanos.menu.Menu","id":"admin","label":"Admin","handler":{"class":"foam.nanos.menu.SubMenu"},"parent":""})
 p({"class":"foam.nanos.menu.Menu","id":"admin.all-views","label":"All Views","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"com.google.foam.demos.u2.AllViews"}},"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"admin.countries","label":"Countries","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"countryDAO","browseViews":[{"class":"foam.comics.v2.BrowseView","name":"Table","view":{"class":"foam.u2.view.ScrollTableView"}}]}},"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"admin.cron","label":"Cron Jobs","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"cronDAO"},"parent":"admin"})
