@@ -269,7 +269,7 @@ foam.CLASS({
                 .add(self.LABEL_LOADING)
               .end();
           }
-          if ( filteredOptions.length == 0 ) {
+          if ( filteredOptions.length === 0 ) {
             return element
               .start('p').addClass(self.myClass('label-loading'))
                 .add(self.LABEL_NO_OPTIONS)
