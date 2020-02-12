@@ -244,13 +244,20 @@ foam.CLASS({
           .put("twoFactorSuccess", getContext().get("twoFactorSuccess"))
           .put(CachingAuthService.CACHE_KEY, getContext().get(CachingAuthService.CACHE_KEY));
 
+        if ( user != null ) {
+         rtn = rtn.put("spid", user.getSpid());
+        }
+
         // We need to do this after the user and agent have been put since
         // 'getCurrentGroup' depends on them being in the context.
         Group group = auth.getCurrentGroup(rtn);
 
-        return rtn
+        if ( group != null ) {
+          rtn = rtn
           .put("group", group)
           .put("appConfig", group.getAppConfig(rtn));
+        }
+        return rtn;
       `
     },
     {
@@ -298,7 +305,8 @@ foam.CLASS({
         User user = (User) ((DAO) x.get("localUserDAO")).find(userId);
 
        if ( user == null
-         || (user instanceof DeletedAware && ((DeletedAware)user).getDeleted())
+         || (user instanceof DeletedAware && ((DeletedAware)user).getDeleted()
+         || (user instanceof LifecycleAware && ((LifecycleAware)user).getLifecycleState() != LifecycleState.ACTIVE) )
        ) {
           throw new RuntimeException(String.format("User with id '%d' not found.", userId));
         }

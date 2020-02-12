@@ -189,6 +189,7 @@ try {
                 getOutputter().stringify(obj);
             } catch (Throwable t) {
               getLogger().error("Failed to write put entry to journal", t);
+              record_ = null;
             }
           }
 

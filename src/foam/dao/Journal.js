@@ -110,7 +110,12 @@ if ( foam.isServer ) {
               "));\n"));
       },
 
-      function remove(x, obj) {
+      function put(x, prefix, dao, obj) {
+        var old = dao.find_(x, obj.id);
+        this.put_(x, old, obj);
+      },
+
+      function remove(x, prefix, dao, obj) {
         return this.write_(Buffer.from(
             "remove(foam.json.parse(" +
               foam.json.Storage.stringify(obj, this.of) +

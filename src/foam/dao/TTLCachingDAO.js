@@ -21,6 +21,13 @@ foam.CLASS({
 
   imports: [ 'merged' ],
 
+  constants: [
+    {
+      name: 'PURGE',
+      value: 'PURGE'
+    }
+  ],
+
   properties: [
     {
       /** The cache to read items quickly. */
@@ -75,19 +82,19 @@ foam.CLASS({
       });
     },
 
-    function select_(x, sink) {
+    function select_(x, sink, skip, limit, order, predicate) {
       var self = this;
 
       return new Promise(function (resolve, reject) {
-        self.delegate.select_(x, sink).then(function(s) {
+        self.delegate.select_(x, sink, skip, limit, order, predicate).then(function(s) {
           if ( foam.dao.ArraySink.isInstance(s) ) {
             var a = s.array;
             for ( var i = 0 ; i < a.length ; i++ ) {
               var o = a[i];
               // console.log('***** caching from select ', o.id);
               self.cache[o.id] = o;
-              self.purgeCache();
             }
+            self.purgeCache();
           }
           resolve(s);
         });
@@ -98,8 +105,8 @@ foam.CLASS({
       are up to date. */
     function remove_(x, o) {
       var self = this;
-      return self.delegate.remove(o).then(function() {
-        self.cache.remove(o);
+      return self.delegate.remove_(x, o).then(function() {
+        delete self.cache[o.id];
         return o;
       });
     },
@@ -108,9 +115,17 @@ foam.CLASS({
       are up to date. */
     function removeAll_(x, skip, limit, order, predicate) {
       var self = this;
-      return self.src.removeAll_(x, skip, limit, order, predicate).then(function() {
+      return self.delegate.removeAll_(x, skip, limit, order, predicate).then(function() {
         self.cache = {};
       });
+    },
+
+    function cmd_(x, obj) {
+      if ( obj == this.PURGE ) {
+        this.cache = {};
+      } else {
+        this.SUPER(x, obj);
+      }
     }
   ]
 });

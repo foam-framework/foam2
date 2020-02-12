@@ -18,7 +18,7 @@ public class ValueList extends foam.lib.parse.ProxyParser {
   public ValueList(Parser valueParser) {
     setDelegate(new Alt(new CompoundValue(),
                         new Repeat(valueParser,
-                                   new Literal(","),
+                                   Literal.create(","),
                                    1)));
   }
 

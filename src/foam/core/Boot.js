@@ -151,6 +151,7 @@ foam.LIB({
           context.lookup(this.extends) :
           foam.core.FObject            ;
 
+        foam.assert(parent, "Missing parent.", this.name);
         cls                  = parent.createSubClass_();
         cls.prototype.cls_   = cls;
         cls.prototype.model_ = this;

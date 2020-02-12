@@ -14,7 +14,7 @@ public class AndParser
   extends foam.lib.parse.ProxyParser {
   public AndParser(Parser exprParser) {
     setDelegate(new Repeat(exprParser,
-                           new Seq0(new foam.lib.json.Whitespace(),
+                           new Seq0(foam.lib.json.Whitespace.instance(),
                                     new Alt(new LiteralIC("AND "),
                                             new Not(new LiteralIC("OR"))))));
   }

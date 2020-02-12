@@ -217,25 +217,10 @@ foam.CLASS({
       documentation: 'The email address of the User.',
       displayWidth: 80,
       width: 100,
-      preSet: function(_, val) {
-        return val.toLowerCase();
-      },
       includeInDigest: true,
       javaSetter:
       `email_ = val.toLowerCase();
        emailIsSet_ = true;`,
-      // TODO: Use validatationPredicates instead.
-      validateObj: function(email) {
-        var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-        if ( ! email.trim() ) {
-          return 'Email required.';
-        }
-
-        if ( ! emailRegex.test(email.trim()) ) {
-          return 'Invalid email address.';
-        }
-      },
       section: 'personal'
     },
     {
@@ -336,6 +321,15 @@ foam.CLASS({
       documentation: 'Returns the postal address from the Address model.',
       factory: function() {
         return this.Address.create();
+      },
+      label: 'Country',
+      tableCellFormatter: function(value, obj, axiom) {
+        let addressString = '';
+        for ( prop in value.instance_ ) if ( prop ) addressString += ` ${value[prop]}`;
+        if ( addressString ) this.setAttribute('title', addressString.trim());
+        return this.__subContext__.countryDAO.find(value.countryId).then((cobj) => {
+          return cobj ? this.add(cobj.name) : this.add(value.countryId);
+        });
       },
       section: 'personal'
     },
@@ -541,17 +535,14 @@ foam.CLASS({
         User user = (User) x.get("user");
         User agent = (User) x.get("agent");
         AuthService auth = (AuthService) x.get("auth");
-
         boolean findSelf = SafetyUtil.equals(this.getId(), user.getId()) ||
           (
             agent != null &&
             SafetyUtil.equals(agent.getId(), this.getId())
           );
 
-        if (
-          ! findSelf &&
-          ! auth.check(x, "user.read." + this.getId()) &&
-          ! auth.check(x, "spid.read." + this.getSpid())
+        if ( ! findSelf &&
+             ! auth.check(x, "user.read." + this.getId())
         ) {
           throw new AuthorizationException();
         }

@@ -15,6 +15,11 @@ foam.CLASS({
     'foam.nanos.auth.CreatedByAware'
   ],
 
+  javaImports: [
+    'foam.core.X',
+    'foam.log.LogLevel'
+  ],
+
   tableColumns: [
     'created',
     'severity',
@@ -22,12 +27,18 @@ foam.CLASS({
   ],
 
   searchColumns: [
+    'hostname',
     'created',
     'severity',
     'exception'
   ],
 
   properties: [
+    {
+      name: 'hostname',
+      class: 'String',
+      visibility: 'RO'
+    },
     {
       class: 'DateTime',
       name: 'created',
@@ -88,6 +99,30 @@ foam.CLASS({
       class: 'Object',
       view: { class: 'foam.u2.view.PreView' },
       updateMode: 'RO'
+    }
+  ],
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(foam.java.Code.create({
+          data:`
+     // explicit constructors to avoid unneccessary object creation via Builders.
+     public LogMessage(X x, LogLevel severity, String message) {
+      setX(x);
+      setSeverity(severity);
+      setMessage(message);
+    }
+
+    public LogMessage(X x, String hostname, LogLevel severity, String message) {
+      setX(x);
+      setHostname(hostname);
+      setSeverity(severity);
+      setMessage(message);
+    }
+          `
+        }));
+      }
     }
   ]
 });

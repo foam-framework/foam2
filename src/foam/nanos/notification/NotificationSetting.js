@@ -56,7 +56,7 @@ foam.CLASS({
         { name: 'notification', type: 'foam.nanos.notification.Notification' }
       ],
       javaCode: `
-        DAO notificationDAO  = (DAO) x.get("localNotificationDAO");
+        DAO notificationDAO = (DAO) x.get("localNotificationDAO");
         notification = (Notification) notification.fclone();
         notification.setId(0L);
         notification.setUserId(user.getId());

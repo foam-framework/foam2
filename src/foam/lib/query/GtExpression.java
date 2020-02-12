@@ -11,7 +11,7 @@ public class GtExpression
   extends ProxyParser {
   public GtExpression(Parser valueParser) {
     setDelegate(new Seq1(1,
-                         new Literal(">"),
+                         Literal.create(">"),
                          valueParser));
   }
 

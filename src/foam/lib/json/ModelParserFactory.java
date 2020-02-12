@@ -49,7 +49,7 @@ public class ModelParserFactory {
     propertyParsers[i] = new UnknownPropertyParser();
 
     return new Repeat0(
-        new Seq0(new Whitespace(), new Alt(propertyParsers)),
-        new Literal(","));
+      new Seq0(Whitespace.instance(), new Alt(propertyParsers)),
+      Literal.create(","));
   }
 }

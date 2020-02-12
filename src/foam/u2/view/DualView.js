@@ -45,7 +45,10 @@ foam.CLASS({
         b.fromProperty && b.fromProperty(this.prop);
       }
 
-      this.add(a).nbsp().add(b);
+      this
+        .start(a).addClass( this.myClass('viewa') ).end()
+        .nbsp()
+        .start(b).addClass( this.myClass('viewb') ).end();
     },
 
     function fromProperty(prop) {
