@@ -14,8 +14,7 @@ import java.util.Map;
 public class FObjectParser
   extends ObjectNullParser
 {
-  protected final static Map map__ = new ConcurrentHashMap();
-
+  private final static Map    map__      = new ConcurrentHashMap();
   private final static Parser instance__ = new FObjectParser();
 
   public static Parser instance() { return instance__; }
