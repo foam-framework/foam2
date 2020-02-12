@@ -17,7 +17,7 @@ public class ArrayParser
       Literal.create("["),
       Whitespace.instance(),
       new Repeat(
-        AnyParser.instance(),
+        new ProxyParser() { public Parser getDelegate() { return AnyParser.instance(); }},
         new Seq0(Whitespace.instance(), Literal.create(","), Whitespace.instance())),
       Whitespace.instance(),
       Literal.create("]")));
