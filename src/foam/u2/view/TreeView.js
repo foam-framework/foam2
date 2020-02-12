@@ -147,7 +147,7 @@ foam.CLASS({
         show(this.slot(function(hasChildren, showThisRootOnSearch, updateThisRoot) {
           var isThisItemRelatedToSearch = false;
           if ( !updateThisRoot ) {
-            self.doesThisIncludeSearch = self.query.get() ? self.data.label.includes(self.query.get()) : true;
+            self.doesThisIncludeSearch = self.query.get() ? self.data.label.toLowerCase().includes(self.query.get().toLowerCase()) : true;
             isThisItemRelatedToSearch = self.query.get() ? (self.doesThisIncludeSearch && (!hasChildren || self.data.parent !== "")) || (hasChildren && showThisRootOnSearch) : true;
             if ( self.showRootOnSearch )
               self.showRootOnSearch.set(self.showRootOnSearch.get() || isThisItemRelatedToSearch);
