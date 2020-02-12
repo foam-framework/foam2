@@ -112,7 +112,8 @@ foam.CLASS({
     'showThisRootOnSearch',
     'subMenus',
     'showRootOnSearch',
-    'updateThisRoot'
+    'updateThisRoot',
+    'onClickAddOn'
   ],
 
   methods: [
@@ -154,6 +155,10 @@ foam.CLASS({
           else {
             isThisItemRelatedToSearch = true;
           }
+          if(!self.query.get())
+            self.expanded = false;
+          else if(self.query.get() && isThisItemRelatedToSearch)
+            self.expanded = true;
           return isThisItemRelatedToSearch;
         })).
         addClass(this.slot(function(selected, id) {
@@ -206,6 +211,7 @@ foam.CLASS({
                 expanded: self.startExpanded,
                 showRootOnSearch: self.showThisRootOnSearch$,
                 query: controlledSearchSlot,
+                onClickAddOn: self.onClickAddOn
               }, self));
             });
           })).
@@ -266,6 +272,8 @@ foam.CLASS({
     },
 
     function toggleExpanded(e) {
+      if(this.onClickAddOn)
+        this.onClickAddOn(this.data);
       this.expanded = ! this.expanded;
       this.selection = this.data;
       e.preventDefault();
@@ -312,7 +320,8 @@ foam.CLASS({
       name: 'startExpanded',
       value: false
     },
-    'query'
+    'query',
+    'onClickAddOn'
   ],
 
   methods: [
@@ -340,6 +349,7 @@ foam.CLASS({
             expanded: self.startExpanded,
             formatter: self.formatter,
             query: self.query,
+            onClickAddOn: self.onClickAddOn
           }, this);
         });
     },

@@ -147,11 +147,19 @@ foam.CLASS({
         relationship: foam.nanos.menu.MenuMenuChildrenRelationship,
         startExpanded: true,
         query: self.menuSearch$,
+        onClickAddOn: function(data) { self.openMenu(data); },
         formatter: function(data) { this.add(data.label); }
       })
     .end();
 
     this.subMenu$.dot('state').sub(this.scrollToCurrentSub);
+    },
+
+    function openMenu(menu) {
+      if(Object.keys(menu.handler.instance_).length > 0) {
+        this.pushMenu(menu.id);
+        this.menuListener(menu);
+      }
     }
   ],
 
