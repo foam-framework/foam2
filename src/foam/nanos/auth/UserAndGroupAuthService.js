@@ -168,7 +168,7 @@ foam.CLASS({
     },
     {
       name: 'login',
-      documentation: `Login a user by the identifier (email or username) provided, validate the password and
+      documentation: `Login a user by their identifier (email or username) provided, validate the password and
         return the user in the context`,
       javaCode: `
         User user = (User) ((DAO) getLocalUserDAO())
