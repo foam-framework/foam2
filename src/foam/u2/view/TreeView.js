@@ -54,10 +54,8 @@ foam.CLASS({
       min-width: 120px;
       padding: 4px;
       font-weight: 500;
-      //font-weight: 300;
       display: inline-block;
       font-size: 14px;
-      //width: 250px;
       color: /*%BLACK%*/ #1e1f21;
     }
 
