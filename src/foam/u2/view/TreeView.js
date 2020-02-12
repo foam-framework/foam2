@@ -31,7 +31,6 @@ foam.CLASS({
   imports: [
     'dblclick?',
     'onObjDrop',
-    //'query',
     'selection',
     'startExpanded'
   ],
@@ -126,7 +125,7 @@ foam.CLASS({
 
       self.subMenus = [];
 
-      if(this.query) {
+      if ( this.query ) {
         this.query.sub(function() {
           self.updateThisRoot = true;
           self.showThisRootOnSearch = false;
@@ -135,7 +134,7 @@ foam.CLASS({
         });
       }
       
-      if( self.showRootOnSearch )
+      if ( self.showRootOnSearch )
         self.showRootOnSearch.set(self.showRootOnSearch.get() || self.doesThisIncludeSearch);
 
       this.data[self.relationship.forwardName].select().then(function(val){
@@ -149,10 +148,10 @@ foam.CLASS({
       this.
         addClass(this.myClass()).
         show(this.slot(function(hasChildren, showThisRootOnSearch, updateThisRoot) {
-          if(!self.query)
+          if ( ! self.query )
             return true;
           var isThisItemRelatedToSearch = false;
-          if ( !updateThisRoot ) {
+          if ( ! updateThisRoot ) {
             self.doesThisIncludeSearch = self.query.get() ? self.data.label.toLowerCase().includes(self.query.get().toLowerCase()) : true;
             isThisItemRelatedToSearch = self.query.get() ? (self.doesThisIncludeSearch && (!hasChildren || self.data.parent !== "")) || (hasChildren && showThisRootOnSearch) : true;
             if ( self.showRootOnSearch )
@@ -161,9 +160,9 @@ foam.CLASS({
           else {
             isThisItemRelatedToSearch = true;
           }
-          if(!self.query.get())
+          if( ! self.query.get() )
             self.expanded = false;
-          else if(self.query.get() && isThisItemRelatedToSearch)
+          else if ( self.query.get() && isThisItemRelatedToSearch )
             self.expanded = true;
           return isThisItemRelatedToSearch;
         })).
@@ -173,7 +172,7 @@ foam.CLASS({
           }
           return '';
         }, this.selection$, this.data$.dot('id'))).
-        on('click', this.toggleExpanded).
+        on('click', this.onClickFunctions).
 //        on('click', this.selected).
         on('dblclick', function() { self.dblclick && self.dblclick(self.data); }).
         callIf(this.draggable, function() {
@@ -279,9 +278,13 @@ foam.CLASS({
       e.stopPropagation();
     },
 
-    function toggleExpanded(e) {
-      if(this.onClickAddOn)
+    function onClickFunctions(e) {
+      if ( this.onClickAddOn )
         this.onClickAddOn(this.data);
+      this.toggleExpanded(e);
+    },
+
+    function toggleExpanded(e) {
       this.expanded = ! this.expanded;
       this.selection = this.data;
       e.preventDefault();
@@ -303,7 +306,6 @@ foam.CLASS({
 
   exports: [
     'onObjDrop',
-    //'query',
     'selection',
     'startExpanded'
   ],

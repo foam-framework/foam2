@@ -21,12 +21,6 @@ foam.CLASS({
   input {
     width: 220px;
   }
-  ^ {
-    font-weight: normal; 
-  }
-  ^ .my-new-normal-class {
-    font-weight: normal; 
-  }
   ^ .side-nav-view {
     font-size: medium!important;
     font-weight: normal;
@@ -42,72 +36,72 @@ foam.CLASS({
     border-right: 1px solid /*%GREY4%*/ #e7eaec;
     background: /*%GREY5%*/ #f5f7fas;
   }
-  ^ .selected-sub {
-    color: /*%BLACK%*/ #1e1f21;
-    font-weight: 800;
-  }
-  ^ .submenu {
-    max-height: 204px;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    font-size: 14px;
-    border-bottom: 1px solid /*%GREY4%*/ #e7eaec;
-  }
-  ^ .icon {
-    width: 16px;
-    height: 16px;
-    padding-right: 10px;
-    vertical-align: top;
-  }
-  ^ .menu-label {
-    width: calc(100% - 24px);
-    padding-top: 15px;
-    padding-left: 20px;
-    height: 30px;
-    font-size: 14px;
-    vertical-align: top;
-    display: inline-block;
-    border-left: 4px solid /*%GREY5%*/ #f5f7fa;
-  }
-  ^ .menu-label span {
-    display: inline-block;
-  }
-  ^ .selected-root {
-    border-left: 4px solid /*%PRIMARY3%*/ #406dea !important;
-    background: /*%PRIMARY5%*/ #e5f1fc;
-    color: /*%BLACK%*/ black;
-  }
-  ^ .menu-label:hover {
-    color: /*%BLACK%*/ black;
-    cursor: pointer;
-  }
-  ^ .menu-label:not(.selected-root):hover {
-    border-left: 4px solid transparent;
-    background: /*%GREY4%*/ #e7eaec;
-  }
-  ^submenu-item {
-    display: flex;
-    padding: 12px 12px 12px 51px;
-  }
-  ^submenu-item:hover {
-    cursor: pointer;
-  }
-  ^ .foam-u2-view-RichChoiceView {
-    width: calc(240px - 16px - 16px);
-    margin: 16px;
-  }
-  ^submenu-item ^selected-dot {
-    border-radius: 999px;
-    min-width: 8px;
-    height: 8px;
-    background-color: transparent;
-    display: inline-block;
-    margin-right: 8px;
-    margin-top: 4px;
-  }
-  ^ .selected-sub ^selected-dot {
-    background-color: /*%PRIMARY3%*/ #406dea;
-  }
+  // ^ .selected-sub {
+  //   color: /*%BLACK%*/ #1e1f21;
+  //   font-weight: 800;
+  // }
+  // ^ .submenu {
+  //   max-height: 204px;
+  //   overflow-y: scroll;
+  //   overflow-x: hidden;
+  //   font-size: 14px;
+  //   border-bottom: 1px solid /*%GREY4%*/ #e7eaec;
+  // }
+  // ^ .icon {
+  //   width: 16px;
+  //   height: 16px;
+  //   padding-right: 10px;
+  //   vertical-align: top;
+  // }
+  // ^ .menu-label {
+  //   width: calc(100% - 24px);
+  //   padding-top: 15px;
+  //   padding-left: 20px;
+  //   height: 30px;
+  //   font-size: 14px;
+  //   vertical-align: top;
+  //   display: inline-block;
+  //   border-left: 4px solid /*%GREY5%*/ #f5f7fa;
+  // }
+  // ^ .menu-label span {
+  //   display: inline-block;
+  // }
+  // ^ .selected-root {
+  //   border-left: 4px solid /*%PRIMARY3%*/ #406dea !important;
+  //   background: /*%PRIMARY5%*/ #e5f1fc;
+  //   color: /*%BLACK%*/ black;
+  // }
+  // ^ .menu-label:hover {
+  //   color: /*%BLACK%*/ black;
+  //   cursor: pointer;
+  // }
+  // ^ .menu-label:not(.selected-root):hover {
+  //   border-left: 4px solid transparent;
+  //   background: /*%GREY4%*/ #e7eaec;
+  // }
+  // ^submenu-item {
+  //   display: flex;
+  //   padding: 12px 12px 12px 51px;
+  // }
+  // ^submenu-item:hover {
+  //   cursor: pointer;
+  // }
+  // ^ .foam-u2-view-RichChoiceView {
+  //   width: calc(240px - 16px - 16px);
+  //   margin: 16px;
+  // }
+  // ^submenu-item ^selected-dot {
+  //   border-radius: 999px;
+  //   min-width: 8px;
+  //   height: 8px;
+  //   background-color: transparent;
+  //   display: inline-block;
+  //   margin-right: 8px;
+  //   margin-top: 4px;
+  // }
+  // ^ .selected-sub ^selected-dot {
+  //   background-color: /*%PRIMARY3%*/ #406dea;
+  // }
   .foam-u2-search-TextSearchView {
     text-align: center;
     margin: 4px 0;
@@ -157,7 +151,6 @@ foam.CLASS({
       .end()
       .endContext()
       .start()
-        .addClass('my-new-normal-class')
         .tag({ 
           class: 'foam.u2.view.TreeView',
           data: self.dao_,
@@ -174,7 +167,7 @@ foam.CLASS({
     },
 
     function openMenu(menu) {
-      if(Object.keys(menu.handler.instance_).length > 0) {
+      if ( Object.keys(menu.handler.instance_).length > 0 ) {
         this.pushMenu(menu.id);
         this.menuListener(menu);
       }
