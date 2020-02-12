@@ -102,8 +102,8 @@ foam.CLASS({
         class: 'foam.u2.view.PasswordView',
         passwordIcon: true
       },
-      visibilityExpression: function(token) {
-        return ! token ? foam.u2.Visibility.RW : foam.u2.Visibility.HIDDEN;
+      visibility: function(token) {
+        return ! token ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
       }
     },
     {

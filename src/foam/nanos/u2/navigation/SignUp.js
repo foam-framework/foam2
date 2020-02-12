@@ -128,8 +128,8 @@ foam.CLASS({
         class: 'foam.u2.TextField',
         placeholder: 'ABC Company'
       },
-      visibilityExpression: function(disableCompanyName_) {
-        return disableCompanyName_ ? foam.u2.Visibility.DISABLED : foam.u2.Visibility.RW;
+      visibility: function(disableCompanyName_) {
+        return disableCompanyName_ ? foam.u2.DisplayMode.DISABLED : foam.u2.DisplayMode.RW;
       },
       required: true
     },
@@ -188,9 +188,9 @@ foam.CLASS({
         class: 'foam.u2.TextField',
         placeholder: 'example@example.com'
       },
-      visibilityExpression: function(disableEmail_) {
+      visibility: function(disableEmail_) {
         return disableEmail_ ?
-          foam.u2.Visibility.DISABLED : foam.u2.Visibility.RW;
+          foam.u2.DisplayMode.DISABLED : foam.u2.DisplayMode.RW;
       },
       required: true
     },

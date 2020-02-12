@@ -418,7 +418,7 @@ try {
         }
       ],
       javaCode: `
-        Parser        parser = new ExprParser();
+        Parser        parser = ExprParser.instance();
         PStream       ps     = new StringPStream();
         ParserContext x      = new ParserContextImpl();
 

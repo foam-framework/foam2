@@ -703,9 +703,9 @@ foam.CLASS({
   extends: 'foam.dao.DAOProperty',
   properties: [
     {
-      name: 'visibilityExpression',
+      name: 'visibility',
       value: function(id) {
-        return !! id ? foam.u2.Visibility.RW : foam.u2.Visibility.HIDDEN;
+        return !! id ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
       }
     },
     {
@@ -1039,8 +1039,8 @@ foam.CLASS({
       value: '// NOOP',
     },
     {
-      name: 'createMode',
-      value: foam.u2.DisplayMode.HIDDEN // NOTE: value: 'HIDDEN' doesn't work.
+      name: 'createVisibility',
+      value: 'HIDDEN'
     },
     {
       name: 'view',
