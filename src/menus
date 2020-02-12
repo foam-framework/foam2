@@ -26,7 +26,7 @@ p({"class":"foam.nanos.menu.Menu","id":"admin.tests","label":"Tests","handler":{
 p({"class":"foam.nanos.menu.Menu","id":"admin.users","label":"Users","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"userDAO"},"parent":"admin"})
 
 // integration
-p({"class":"foam.nanos.menu.Menu","id":"integration","label":"Integration","handler":{"class":"foam.nanos.menu.SubMenu"},"order":110,"parent":""})
+p({"class":"foam.nanos.menu.Menu","id":"integration","label":"Integration","handler":{"class":"foam.nanos.menu.SubMenu"},"parent":""})
 p({"class":"foam.nanos.menu.Menu","id":"integration.api-dig","label":"API - DIG","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"digDAO"},"parent":"integration"})
 p({
   "class": "foam.nanos.menu.Menu",
