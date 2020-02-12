@@ -1,7 +1,7 @@
 // admin
 p({"class":"foam.nanos.menu.Menu","id":"admin","label":"Admin","handler":{"class":"foam.nanos.menu.SubMenu"},"order":100,"parent":""})
 p({"class":"foam.nanos.menu.Menu","id":"admin.all-views","label":"All Views","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"com.google.foam.demos.u2.AllViews"}},"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.countries","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"countryDAO","browseViews":[{"class":"foam.comics.v2.BrowseView","name":"Table","view":{"class":"foam.u2.view.ScrollTableView"}}]}},"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.countries","label":"Countries","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"countryDAO","browseViews":[{"class":"foam.comics.v2.BrowseView","name":"Table","view":{"class":"foam.u2.view.ScrollTableView"}}]}},"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"admin.cron","label":"Cron Jobs","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"cronDAO"},"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"admin.data","label":"Data Management","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.boot.DAOConfigSummaryView"}},"parent":"admin"})
 p({"class": "foam.nanos.menu.Menu","id":"admin.emailmessage","label": "Email Messages","handler": {"class": "foam.nanos.menu.DAOMenu","daoKey": "emailMessageDAO"},"parent": "admin"})
@@ -27,10 +27,10 @@ p({"class":"foam.nanos.menu.Menu","id":"admin.users","label":"Users","handler":{
 
 // integration
 p({"class":"foam.nanos.menu.Menu","id":"integration","label":"Integration","handler":{"class":"foam.nanos.menu.SubMenu"},"order":110,"parent":""})
-p({"class":"foam.nanos.menu.Menu","id":"integration.dig","label":"API - DIG","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"digDAO"},"parent":"integration"})
+p({"class":"foam.nanos.menu.Menu","id":"integration.api-dig","label":"API - DIG","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"digDAO"},"parent":"integration"})
 p({
   "class": "foam.nanos.menu.Menu",
-  "id": "integration.dug",
+  "id": "integration.api-dug",
   "label": "API - DUG",
   "handler": {
     "class": "foam.nanos.menu.DAOMenu2",
@@ -44,12 +44,10 @@ p({
       "of": "foam.nanos.dig.DUGRule"
     }
   },
-  "order": 21,
   "parent": "integration"
 })
-p({"class":"foam.nanos.menu.Menu","id":"integration.model-doc","label":"UML API Documentation","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.doc.ModelBrowser"}},"parent":"integration"})
-p({"class":"foam.nanos.menu.Menu","id":"integration.sugar","label":"API - SUGAR","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"sugarDAO"},"parent":"integration"})
-
+p({"class":"foam.nanos.menu.Menu","id":"integration.api-sugar","label":"API - SUGAR","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"sugarDAO"},"parent":"integration"})
+p({"class":"foam.nanos.menu.Menu","id":"integration.model-doc","label":"UML API Models","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.doc.ModelBrowser"}},"parent":"integration"})
 
 // settings
 p({"class":"foam.nanos.menu.Menu","id":"set-password","label":"Change Password","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.auth.ChangePasswordView"}},"order":100,"parent":"settings"})
