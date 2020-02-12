@@ -348,7 +348,10 @@ foam.CLASS({
       value: false
     },
     'query',
-    'onClickAddOn'
+    {
+      class: 'Function',
+      name: 'onClickAddOn'
+    }
   ],
 
   methods: [
