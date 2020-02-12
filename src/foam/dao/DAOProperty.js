@@ -37,7 +37,7 @@ foam.CLASS({
       }
     },
     {
-      name: 'createMode',
+      name: 'createVisibility',
       value: 'HIDDEN'
     },
     ['transient', true],
