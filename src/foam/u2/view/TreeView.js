@@ -39,7 +39,7 @@ foam.CLASS({
   css: `
     ^ {
       white-space: nowrap;
-      margin: 6px 20px;
+      margin: 0px 15px;
       inset: none;
       cursor: pointer;
       margin-right: 0;
@@ -55,8 +55,10 @@ foam.CLASS({
       min-width: 120px;
       padding: 4px;
       font-weight: 500;
+      //font-weight: 300;
       display: inline-block;
-      width: 250px;
+      font-size: 14px;
+      //width: 250px;
       color: /*%BLACK%*/ #1e1f21;
     }
 
@@ -124,12 +126,14 @@ foam.CLASS({
 
       self.subMenus = [];
 
-      this.query.sub(function() {
-        self.updateThisRoot = true;
-        self.showThisRootOnSearch = false;
-        controlledSearchSlot.set(self.query.get());
-        self.updateThisRoot = false;
-      });
+      if(this.query) {
+        this.query.sub(function() {
+          self.updateThisRoot = true;
+          self.showThisRootOnSearch = false;
+          controlledSearchSlot.set(self.query.get());
+          self.updateThisRoot = false;
+        });
+      }
       
       if( self.showRootOnSearch )
         self.showRootOnSearch.set(self.showRootOnSearch.get() || self.doesThisIncludeSearch);
@@ -145,6 +149,8 @@ foam.CLASS({
       this.
         addClass(this.myClass()).
         show(this.slot(function(hasChildren, showThisRootOnSearch, updateThisRoot) {
+          if(!self.query)
+            return true;
           var isThisItemRelatedToSearch = false;
           if ( !updateThisRoot ) {
             self.doesThisIncludeSearch = self.query.get() ? self.data.label.toLowerCase().includes(self.query.get().toLowerCase()) : true;
@@ -188,16 +194,18 @@ foam.CLASS({
             show(this.hasChildren$).
             style({
               'margin-right': '5px',
+              'margin-top': '2px',
               'vertical-align': 'middle',
               'font-weight': 'bold',
               'display': 'inline-block',
               'visibility': 'visible',
               'font-size': '16px',
+              'float': 'right',
               'transform': this.expanded$.map(function(c) { return c ? 'rotate(180deg)' : 'rotate(90deg)'; })
             }).
             on('click', this.toggleExpanded).
             add('\u2303').
-            entity('nbsp').
+            // entity('nbsp').
           end().
         end().
         start().
@@ -299,6 +307,12 @@ foam.CLASS({
     'selection',
     'startExpanded'
   ],
+
+  css: `
+    ^ {
+      padding-top: 10px;
+    }
+  `,
 
   properties: [
     {

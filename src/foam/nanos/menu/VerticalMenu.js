@@ -18,6 +18,15 @@ foam.CLASS({
     'foam.dao.ArraySink'
   ],
   css: `
+  input {
+    width: 220px;
+  }
+  ^ {
+    font-weight: normal; 
+  }
+  ^ .my-new-normal-class {
+    font-weight: normal; 
+  }
   ^ .side-nav-view {
     font-size: medium!important;
     font-weight: normal;
@@ -103,6 +112,12 @@ foam.CLASS({
     text-align: center;
     margin: 4px 0;
   }
+  ^ .foam-u2-view-TreeView {
+    margin-right: 10px;
+  }
+  ^ .foam-u2-view-TreeViewRow-label {
+    font-weight: 300;
+  }
   `,
   properties: [
     {
@@ -141,15 +156,18 @@ foam.CLASS({
         .addClass('foam-u2-search-TextSearchView')
       .end()
       .endContext()
-      .tag({ 
-        class: 'foam.u2.view.TreeView',
-        data: self.dao_,
-        relationship: foam.nanos.menu.MenuMenuChildrenRelationship,
-        startExpanded: true,
-        query: self.menuSearch$,
-        onClickAddOn: function(data) { self.openMenu(data); },
-        formatter: function(data) { this.add(data.label); }
-      })
+      .start()
+        .addClass('my-new-normal-class')
+        .tag({ 
+          class: 'foam.u2.view.TreeView',
+          data: self.dao_,
+          relationship: foam.nanos.menu.MenuMenuChildrenRelationship,
+          startExpanded: true,
+          query: self.menuSearch$,
+          onClickAddOn: function(data) { self.openMenu(data); },
+          formatter: function(data) { this.add(data.label); }
+        })
+      .end()
     .end();
 
     this.subMenu$.dot('state').sub(this.scrollToCurrentSub);
@@ -163,19 +181,19 @@ foam.CLASS({
     }
   ],
 
-  listeners: [
-    async function menuSearchSelect() {
-      var menu = await this.menuDAO.find(this.menuSearch);
-      this.pushMenu(this.menuSearch);
-      this.menuListener(menu);
-      // Scroll to submenu selected from search.
-      document.getElementsByName(this.menuSearch)[0].scrollIntoView({ block: 'end' });
-    },
-    function scrollToCurrentSub() {
-      // When submenu element is loaded, scroll element into parent view TODO: Fix to align to middle of parent div.
-      if ( this.subMenu.state === this.subMenu.LOADED ) {
-        this.subMenu.el().scrollIntoView({ block: 'end' });
-      }
-    }
-  ]
+  // listeners: [
+  //   async function menuSearchSelect() {
+  //     var menu = await this.menuDAO.find(this.menuSearch);
+  //     this.pushMenu(this.menuSearch);
+  //     this.menuListener(menu);
+  //     // Scroll to submenu selected from search.
+  //     document.getElementsByName(this.menuSearch)[0].scrollIntoView({ block: 'end' });
+  //   },
+  //   function scrollToCurrentSub() {
+  //     // When submenu element is loaded, scroll element into parent view TODO: Fix to align to middle of parent div.
+  //     if ( this.subMenu.state === this.subMenu.LOADED ) {
+  //       this.subMenu.el().scrollIntoView({ block: 'end' });
+  //     }
+  //   }
+  // ]
 });
