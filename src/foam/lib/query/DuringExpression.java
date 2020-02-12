@@ -11,8 +11,8 @@ public class DuringExpression
   extends ProxyParser {
   public DuringExpression() {
     setDelegate(new Seq1(1,
-                         new Alt(new Literal(":"),
-                                 new Literal("=")),
+                         new Alt(Literal.create(":"),
+                                 Literal.create("=")),
                          new DateRangeParser()));
   }
 

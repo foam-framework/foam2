@@ -12,13 +12,12 @@ import foam.lib.parse.Parser;
 import foam.lib.parse.ParserContext;
 import foam.lib.parse.Seq1;
 
-public class AfterGtParser extends foam.lib.parse.ProxyParser {
+public class AfterGtParser
+  extends foam.lib.parse.ProxyParser
+{
 
   public AfterGtParser(Parser valueParser) {
-    setDelegate(new Seq1(1,
-                         new Literal(">"),
-                         valueParser
-                        ));
+    setDelegate(new Seq1(1, Literal.create(">"), valueParser));
   }
 
   @Override

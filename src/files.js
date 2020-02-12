@@ -180,7 +180,6 @@ FOAM_FILES([
   { name: "foam/u2/AttrSlot" },
   { name: "foam/u2/ViewSpec" },
   { name: "foam/u2/Tooltip", flags: ['web'] },
-  { name: "foam/u2/Visibility"},
   { name: "foam/u2/RowFormatter" },
   { name: "foam/u2/WeakMap", flags: ['web'] },
   { name: "foam/u2/Element", flags: ['js'] },
@@ -266,6 +265,8 @@ FOAM_FILES([
   { name: "foam/nanos/auth/Authorizer" },
   { name: "foam/nanos/auth/EnabledAware" },
   { name: "foam/nanos/auth/ServiceProviderAware" },
+  { name: "foam/nanos/auth/ServiceProviderAwareSink" },
+  { name: "foam/nanos/auth/test/ServiceProviderAwareTest" },
   { name: "foam/nanos/logger/Logger" },
   { name: "foam/nanos/logger/LoggingDAO" },
   { name: "foam/nanos/notification/Notifiable" },
@@ -732,6 +733,7 @@ FOAM_FILES([
   { name: "foam/u2/detail/SectionedDetailPropertyView" },
 
   { name: "foam/graphics/ZoomMapView" },
+  { name: "foam/core/CoreTypesValidationTest" },
 
   // Strategy
   { name: "foam/strategy/StrategyReference" },

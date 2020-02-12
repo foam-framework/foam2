@@ -45,7 +45,7 @@ foam.RELATIONSHIP({
   unauthorizedTargetDAOKey: 'localTicketCommentDAO',
   sourceProperty: {
     section: 'metaSection',
-    visibility: 'RO'
+    updateVisibility: 'RO'
   },
   targetProperty: {
     hidden: true

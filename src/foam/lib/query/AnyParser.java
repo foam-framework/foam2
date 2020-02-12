@@ -7,24 +7,21 @@
 package foam.lib.query;
 
 import foam.lib.json.NullParser;
-import foam.lib.parse.Alt;
-import foam.lib.parse.ProxyParser;
+import foam.lib.parse.*;
 
 public class AnyParser
   extends ProxyParser
 {
 
-  private static AnyParser instance_ = null;
-  public static AnyParser instance() {
-    if ( instance_ == null ) {
-      instance_ = new AnyParser();
-      Alt delegate = new Alt(
-          new LongParser(),
-          new StringParser(),
-          new NullParser());
-      instance_.setDelegate(delegate);
-    }
-    return instance_;
+  private static Parser instance__ = new AnyParser();
+
+  public static Parser instance() { return instance__; }
+
+  private AnyParser() {
+    setDelegate(new Alt(
+        LongParser.instance(),
+        StringParser.instance(),
+        NullParser.instance()));
   }
-  private AnyParser() {}
+
 }

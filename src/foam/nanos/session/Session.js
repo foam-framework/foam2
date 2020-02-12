@@ -51,7 +51,7 @@ foam.CLASS({
         }.bind(this));
       },
       required: true,
-      visibility: 'FINAL',
+      updateVisibility: 'RO',
     },
     {
       class: 'Long',
@@ -243,13 +243,20 @@ foam.CLASS({
           .put("twoFactorSuccess", getContext().get("twoFactorSuccess"))
           .put(CachingAuthService.CACHE_KEY, getContext().get(CachingAuthService.CACHE_KEY));
 
+        if ( user != null ) {
+         rtn = rtn.put("spid", user.getSpid());
+        }
+
         // We need to do this after the user and agent have been put since
         // 'getCurrentGroup' depends on them being in the context.
         Group group = auth.getCurrentGroup(rtn);
 
-        return rtn
+        if ( group != null ) {
+          rtn = rtn
           .put("group", group)
           .put("appConfig", group.getAppConfig(rtn));
+        }
+        return rtn;
       `
     },
     {

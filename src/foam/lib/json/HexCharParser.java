@@ -10,6 +10,6 @@ import foam.lib.parse.*;
 
 public class HexCharParser extends ProxyParser {
   public HexCharParser() {
-    super(new Alt(new Range('0', '9'), new Range('A', 'F'), new Range('a', 'f')));
+    super(new Alt(Range.create('0', '9'), Range.create('A', 'F'), Range.create('a', 'f')));
   }
 }

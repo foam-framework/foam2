@@ -15,16 +15,16 @@ public class FObjectArrayParser extends ObjectNullParser {
 
   public FObjectArrayParser(final Class defaultClass) {
     super(new Seq1(3,
-        new Whitespace(),
-        new Literal("["),
-        new Whitespace(),
-        new Repeat(
-            // Parses Alt(__Property__, FObject)
-            new ExprParser(defaultClass),
-            new Seq0(new Whitespace(),
-                new Literal(","),
-                new Whitespace())),
-        new Whitespace(),
-        new Literal("]")));
+      Whitespace.instance(),
+      Literal.create("["),
+      Whitespace.instance(),
+      new Repeat(
+          // Parses Alt(__Property__, FObject)
+          ExprParser.create(defaultClass),
+          new Seq0(Whitespace.instance(),
+              Literal.create(","),
+              Whitespace.instance())),
+      Whitespace.instance(),
+      Literal.create("]")));
   }
 }

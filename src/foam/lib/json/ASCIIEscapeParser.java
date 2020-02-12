@@ -14,15 +14,15 @@ public class ASCIIEscapeParser
 
   public ASCIIEscapeParser() {
     super(new Seq(
-      new Whitespace(),
-      new Literal("\\"),
+      Whitespace.instance(),
+      Literal.create("\\"),
       new Alt(
-        new Literal("\\"),
-        new Literal("n"),
-        new Literal("t"),
-        new Literal("r"),
-        new Literal("f"),
-        new Literal("b"))));
+        Literal.create("\\"),
+        Literal.create("n"),
+        Literal.create("t"),
+        Literal.create("r"),
+        Literal.create("f"),
+        Literal.create("b"))));
   }
 
   public PStream parse(PStream ps, ParserContext x) {

@@ -10,9 +10,9 @@ import foam.lib.parse.*;
 
 public class UnicodeParser extends ProxyParser {
   public UnicodeParser() {
-    super(new Seq(new Whitespace(),
-                  new Literal("\\"),
-                  new Literal("u"),
+    super(new Seq(Whitespace.instance(),
+                  Literal.create("\\"),
+                  Literal.create("u"),
                   new Repeat(new HexCharParser(), null, 4, 4)));
   }
 

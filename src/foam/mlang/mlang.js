@@ -180,7 +180,7 @@ foam.CLASS({
       name: 'type',
       value: 'foam.mlang.Expr'
     },
-    ['javaJSONParser', 'new foam.lib.json.ExprParser()'],
+    ['javaJSONParser', 'foam.lib.json.ExprParser.instance()'],
     {
       name: 'view',
       value: {
@@ -251,7 +251,7 @@ foam.CLASS({
       name: 'type',
       value: 'foam.dao.Sink'
     },
-    ['javaJSONParser', 'new foam.lib.json.FObjectParser()'],
+    ['javaJSONParser', 'foam.lib.json.FObjectParser.instance()'],
     {
       name: 'view',
       value: { class: 'foam.u2.view.FObjectView' }
@@ -2803,7 +2803,7 @@ foam.CLASS({
       name: 'arg1',
       type: 'foam.mlang.order.Comparator',
       adapt: function(_, c) { return foam.compare.toCompare(c); },
-      javaJSONParser: 'new foam.lib.json.ExprParser()'
+      javaJSONParser: 'foam.lib.json.ExprParser.instance()'
     }
   ],
 
