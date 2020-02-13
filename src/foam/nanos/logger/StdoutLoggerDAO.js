@@ -43,7 +43,8 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       LogMessage lm = (LogMessage) getDelegate().put_(x, obj);
-      if ( getEnabled() ) {
+      if ( getEnabled() &&
+           lm != null ) {
         System.out.println(lm.getCreated() + ","+lm.getThreadName()+","+lm.getSeverity()+","+lm.getMessage());
       } 
       return lm;
