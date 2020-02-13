@@ -40,7 +40,7 @@ public class JSONParser
     ParserContext x = new ParserContextImpl();
     x.set("X", getX());
 
-    ps = (StringPStream) ps.apply( FObjectArrayParser.create(defaultClass), x);
+    ps = (StringPStream) ps.apply(FObjectArrayParser.create(defaultClass), x);
     return ps == null ? null : (Object[]) ps.value();
   }
 
