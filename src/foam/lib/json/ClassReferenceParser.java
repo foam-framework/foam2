@@ -16,7 +16,7 @@ public class ClassReferenceParser
 
   public static Parser instance() { return instance__; }
 
-  public ClassReferenceParser() {
+  private ClassReferenceParser() {
     super(new Alt(
       NullParser.instance(),
       new Seq1(15,
