@@ -24,10 +24,8 @@ foam.CLASS({
 
   css: `
     .login-wrapper {
-      margin: 0;
-      width : 100%;
-      height: 100%;
-      padding: 0;
+      padding-top: 60px;
+      margin-left: 250px;
     }
 
     .foam-comics-DAOControllerView {
