@@ -1,39 +1,33 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
+
 
 foam.CLASS({
   package: 'foam.nanos.menu',
   name: 'VerticalMenu',
   extends: 'foam.u2.View',
+
   implements: [
     'foam.mlang.Expressions'
   ],
+
   imports: [
     'currentMenu',
     'menuListener',
     'loginSuccess',
     'menuDAO',
-    'pushMenu',
+    'pushMenu'
   ],
+
   requires: [
     'foam.nanos.menu.Menu',
     'foam.nanos.menu.VerticalMenu',
     'foam.dao.ArraySink'
   ],
+
   css: `
   input {
     width: 220px;
@@ -68,6 +62,7 @@ foam.CLASS({
     font-weight: 300;
   }
   `,
+
   properties: [
     {
       class: 'FObjectProperty',
@@ -88,6 +83,7 @@ foam.CLASS({
       value: ''
     }
   ],
+
   methods: [
     function initE() {
       var self = this;
@@ -95,31 +91,32 @@ foam.CLASS({
       this
       .addClass(this.myClass())
       .start()
-      .addClass('side-nav-view')
-      .start()
-      .startContext({ data: this })
-      .start()
-        .add(self.MENU_SEARCH.clone().copyFrom({ view: {
-          class: 'foam.u2.view.TextField',
-          onKey: true
-        } }))
-        .addClass('foam-u2-search-TextSearchView')
-      .end()
-      .endContext()
-      .start()
-        .tag({ 
-          class: 'foam.u2.view.TreeView',
-          data: self.dao_,
-          relationship: foam.nanos.menu.MenuMenuChildrenRelationship,
-          startExpanded: true,
-          query: self.menuSearch$,
-          onClickAddOn: function(data) { self.openMenu(data); },
-          formatter: function(data) { this.add(data.label); }
-        })
-      .end()
-    .end();
+        .addClass('side-nav-view')
+        .start()
+          .startContext({ data: this })
+            .start()
+              .add(self.MENU_SEARCH.clone().copyFrom({ view: {
+                class: 'foam.u2.view.TextField',
+                onKey: true
+              } }))
+              .addClass('foam-u2-search-TextSearchView')
+            .end()
+          .endContext()
+          .start()
+            .tag({
+              class: 'foam.u2.view.TreeView',
+              data: self.dao_,
+              relationship: foam.nanos.menu.MenuMenuChildrenRelationship,
+              startExpanded: true,
+              query: self.menuSearch$,
+              onClickAddOn: function(data) { self.openMenu(data); },
+              formatter: function(data) { this.add(data.label); }
+            })
+          .end()
+        .end()
+      .end();
 
-    this.subMenu$.dot('state').sub(this.scrollToCurrentSub);
+      this.subMenu$.dot('state').sub(this.scrollToCurrentSub);
     },
 
     function openMenu(menu) {
