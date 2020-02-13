@@ -29,7 +29,7 @@ foam.CLASS({
           [{ class: 'foam.u2.detail.TabbedDetailView' }, 'Tabs'],
           [{ class: 'foam.u2.detail.VerticalDetailView' }, 'Basic'],
           [{ class: 'foam.u2.detail.ChoiceSectionDetailView' }, 'Navigable'],
-          [{ class: 'foam.u2.detail.WizardSectionsView' }, 'Yer a wizard, \'arry']
+          [{ class: 'foam.u2.detail.WizardSectionsView' }, 'Wizard']
         ],
       }
     }
