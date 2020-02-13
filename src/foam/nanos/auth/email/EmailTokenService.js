@@ -35,7 +35,6 @@ foam.CLASS({
 DAO tokenDAO = (DAO) getX().get("localTokenDAO");
 DAO userDAO  = (DAO) getX().get("localUserDAO");
 AppConfig appConfig = user.findGroup(x).getAppConfig(x);
-String url = appConfig.getUrl().replaceAll("/$", "");
 
 Token token = new Token();
 token.setUserId(user.getId());
@@ -48,7 +47,7 @@ message.setTo(new String[]{user.getEmail()});
 
 HashMap<String, Object> args = new HashMap<>();
 args.put("name", user.getFirstName());
-args.put("link", url + "/service/verifyEmail?userId=" + user.getId() + "&token=" + token.getData() + "&redirect=/" );
+args.put("link", appConfig.getUrl() + "/service/verifyEmail?userId=" + user.getId() + "&token=" + token.getData() + "&redirect=/" );
 
 EmailsUtility.sendEmailFromTemplate(getX(), user, message, "verifyEmail", args);
 return true;
