@@ -14,7 +14,7 @@ public class StringArrayParser
   private final static Parser instance__ = new StringArrayParser();
 
   public static Parser instance() { return instance__; }
-  public StringArrayParser() {
+  private StringArrayParser() {
     super(
       new Alt(
         NullParser.instance(),

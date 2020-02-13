@@ -14,7 +14,7 @@ public class MapParser
   private final static Parser instance__ = new MapParser();
 
   public static Parser instance() { return instance__; }
-  public MapParser() {
+  private MapParser() {
     super(new Seq1(3,
       Whitespace.instance(),
       Literal.create("{"),

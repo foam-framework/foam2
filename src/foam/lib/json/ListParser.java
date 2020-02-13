@@ -14,7 +14,7 @@ public class ListParser
   private final static Parser instance__ = new ListParser();
 
   public static Parser instance() { return instance__; }
-  public ListParser() {
+  private ListParser() {
     super(new Alt(
       NullParser.instance(),
       new Seq1(3,
