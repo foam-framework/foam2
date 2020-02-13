@@ -747,4 +747,17 @@ FOAM_FILES([
 
   { name: "foam/util/concurrent/AbstractAssembly"},
   { name: "foam/util/concurrent/Assembly"},
+
+  // Approval
+  { name: 'foam/approval/ApprovalRequest' },
+  { name: 'foam/approval/ApprovalStatus' },
+  { name: 'foam/approval/ApprovableAware'},
+  { name: 'foam/approval/PropertiesToUpdateView', flags: ['web'] },
+  { name: 'foam/approval/Approvable' },
+  { name: 'foam/approval/ApprovableAwareDAO' },
+  { name: 'foam/approval/ApprovableApprovalRequestsPredicate' },
+  { name: 'foam/approval/ApprovableApprovalRequestsRule' },
+  { name: 'foam/approval/RoleApprovalRequest' },
+  { name: 'foam/approval/FulfilledApprovablePredicate' },
+  { name: 'foam/approval/FulfilledApprovableRule' },
 ]);

@@ -270,6 +270,8 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/SendNotificationOnTopLevelCapabilityStatusUpdate" },
   { name: "foam/nanos/crunch/IsUserCapabilityJunctionStatusUpdate" },
   { name: "foam/nanos/crunch/RemoveJunctionsOnUserRemoval" },
+  { name: "foam/nanos/crunch/UCJQueryService" },
+
   //authservice
   { name: "foam/nanos/auth/CapabilityAuthService" },
   // google

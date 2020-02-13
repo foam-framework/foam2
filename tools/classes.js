@@ -523,6 +523,8 @@ var classes = [
   'foam.nanos.crunch.RemoveJunctionsOnUserRemoval',
   //authservice
   'foam.nanos.auth.CapabilityAuthService',
+  // ucjQueryService
+  'foam.nanos.crunch.UCJQueryService',
   //Unit
   'foam.core.Unit',
   'foam.core.Currency',
@@ -535,6 +537,18 @@ var classes = [
   //concurrent
   'foam.util.concurrent.AbstractAssembly',
   'foam.util.concurrent.Assembly',
+
+  // approval
+  'foam.approval.ApprovalRequest',
+  'foam.approval.ApprovalStatus',
+  'foam.approval.Approvable',
+  'foam.approval.ApprovableAwareDAO',
+  'foam.approval.ApprovableAware',
+  'foam.approval.ApprovableApprovalRequestsPredicate',
+  'foam.approval.ApprovableApprovalRequestsRule',
+  'foam.approval.FulfilledApprovablePredicate',
+  'foam.approval.FulfilledApprovableRule',
+  'foam.approval.RoleApprovalRequest',
 ];
 
 var abstractClasses = [
@@ -557,7 +571,8 @@ var skeletons = [
   'foam.nanos.notification.push.PushService',
   'foam.nanos.session.SessionService',
   'foam.nanos.test.EchoService',
-  'foam.strategy.StrategizerService'
+  'foam.strategy.StrategizerService',
+  'foam.nanos.crunch.UCJQueryService',
 ];
 
 var proxies = [
