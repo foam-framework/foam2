@@ -1070,8 +1070,8 @@ foam.CLASS({
 
   properties: [
     ['javaInfoType',   'foam.core.AbstractShortPropertyInfo'],
-    ['javaJSONParser', 'new foam.lib.json.ShortParser()'],
-    ['javaCSVParser',  'new foam.lib.json.ShortParser()'],
+    ['javaJSONParser', 'foam.lib.json.ShortParser.instance()'],
+    ['javaCSVParser',  'foam.lib.json.ShortParser.instance()'],
     ['sqlType',        'SMALLINT']
   ],
 
@@ -1151,8 +1151,8 @@ foam.CLASS({
 
   properties: [
     ['javaInfoType',   'foam.core.AbstractFloatPropertyInfo'],
-    ['javaJSONParser', 'new foam.lib.json.FloatParser()'],
-    ['javaCSVParser',  'new foam.lib.json.FloatParser()'],
+    ['javaJSONParser', 'foam.lib.json.FloatParser.instance()'],
+    ['javaCSVParser',  'foam.lib.json.FloatParser.instance()'],
     ['sqlType',        'FLOAT']
   ],
 

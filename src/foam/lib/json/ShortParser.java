@@ -9,6 +9,12 @@ package foam.lib.json;
 import foam.lib.parse.*;
 
 public class ShortParser implements Parser {
+  private final static Parser instance__ = new ShortParser();
+
+  public static Parser instance() { return instance__; }
+
+  private ShortParser() {}
+
   public PStream parse(PStream ps, ParserContext x) {
     long n = 0;
 
