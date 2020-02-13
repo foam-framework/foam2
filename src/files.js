@@ -268,6 +268,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/ServiceProviderAwareSink" },
   { name: "foam/nanos/auth/test/ServiceProviderAwareTest" },
   { name: "foam/nanos/logger/Logger" },
+  { name: "foam/nanos/logger/DAOLogger" },
   { name: "foam/nanos/logger/LoggingDAO" },
   { name: "foam/nanos/notification/Notifiable" },
   { name: "foam/nanos/notification/EmailSetting" },
