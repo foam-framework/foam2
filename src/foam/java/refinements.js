@@ -1731,7 +1731,7 @@ foam.CLASS({
       name: 'javaJSONParser',
       expression: function(of) {
         var id = of ? of.id ? of.id : of : null;
-        return 'new foam.lib.json.FObjectArrayParser('
+        return 'foam.lib.json.FObjectArrayParser.create('
           + ( id ? id + '.class' : '') + ')';
       }
     },
