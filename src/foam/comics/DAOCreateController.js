@@ -38,7 +38,7 @@ foam.CLASS({
     },
     {
       name: 'view',
-      value: 'foam.u2.DetailView'
+      value: 'foam.u2.detail.AltDetailView'
     },
     {
       name: 'data',

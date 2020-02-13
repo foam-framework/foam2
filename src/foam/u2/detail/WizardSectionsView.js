@@ -135,7 +135,7 @@ foam.CLASS({
           })).addClass(this.myClass('wizard-body'))
           .startContext({ data: this })
             .start(self.Cols).addClass(this.myClass('footer'))
-              .add(this.PREV)
+              .tag(this.PREV, { buttonStyle: 'SECONDARY' })
               .add(this.NEXT)
             .end()
           .endContext()
