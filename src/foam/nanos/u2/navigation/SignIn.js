@@ -34,9 +34,9 @@ foam.CLASS({
         class: 'foam.u2.TextField',
         focused: true
       },
-      visibilityExpression: function(disableEmail_) {
+      visibility: function(disableEmail_) {
         return disableEmail_ ?
-          foam.u2.Visibility.DISABLED : foam.u2.Visibility.RW;
+          foam.u2.DisplayMode.DISABLED : foam.u2.DisplayMode.RW;
       },
       validationTextVisible: false
     },

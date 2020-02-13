@@ -27,12 +27,12 @@ foam.CLASS({
       class: 'Boolean',
       name: 'read',
       documentation: 'Determines if notification has been read.',
-      visibility: foam.u2.Visibility.RO
+      visibility: foam.u2.DisplayMode.RO
     },
     {
       class: 'Long',
       name: 'id',
-      visibility: foam.u2.Visibility.RO
+      visibility: foam.u2.DisplayMode.RO
     },
     {
       class: 'String',
@@ -51,7 +51,7 @@ foam.CLASS({
       factory: function() { return new Date(); },
       label: 'Notification Date',
       documentation: 'Date notification was created.',
-      visibility: foam.u2.Visibility.RO,
+      visibility: foam.u2.DisplayMode.RO,
       javaFactory: `return new java.util.Date();`
     },
     {
@@ -90,7 +90,7 @@ foam.CLASS({
     {
       class: 'Map',
       name: 'emailArgs',
-      visibility: foam.u2.Visibility.HIDDEN,
+      visibility: foam.u2.DisplayMode.HIDDEN,
       documentation: 'Arguments for email template.',
       javaFactory: 'return new java.util.HashMap<String, Object>();'
     },

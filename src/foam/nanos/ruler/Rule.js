@@ -63,7 +63,7 @@
     {
       class: 'String',
       name: 'id',
-      updateMode: 'RO',
+      updateVisibility: 'RO',
       tableWidth: 300,
       section: 'basicInfo'
     },
@@ -209,15 +209,15 @@
     {
       class: 'DateTime',
       name: 'created',
-      createMode: 'HIDDEN',
-      updateMode: 'RO'
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO'
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdBy',
-      createMode: 'HIDDEN',
-      updateMode: 'RO',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
       tableCellFormatter: function(value, obj) {
         obj.userDAO.find(value).then(function(user) {
           if ( user ) {
@@ -230,8 +230,8 @@
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdByAgent',
-      createMode: 'HIDDEN',
-      updateMode: 'RO',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
       tableCellFormatter: function(value, obj) {
         obj.userDAO.find(value).then(function(user) {
           if ( user ) {
@@ -243,15 +243,15 @@
     {
       class: 'DateTime',
       name: 'lastModified',
-      createMode: 'HIDDEN',
-      updateMode: 'RO'
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO'
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'lastModifiedBy',
-      createMode: 'HIDDEN',
-      updateMode: 'RO',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
       tableCellFormatter: function(value, obj) {
         obj.userDAO.find(value).then(function(user) {
           if ( user ) {

@@ -20,7 +20,7 @@ public class FObjectArrayParser extends ObjectNullParser {
       Whitespace.instance(),
       new Repeat(
           // Parses Alt(__Property__, FObject)
-          new ExprParser(defaultClass),
+          ExprParser.create(defaultClass),
           new Seq0(Whitespace.instance(),
               Literal.create(","),
               Whitespace.instance())),

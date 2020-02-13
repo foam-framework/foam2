@@ -11,6 +11,10 @@ import foam.lib.parse.*;
 public class ArrayParser
   extends ProxyParser
 {
+  private final static Parser instance__ = new ArrayParser();
+
+  public static Parser instance() { return instance__ == null  ? new ProxyParser() { public Parser getDelegate() { return instance__; } } : instance__; }
+
   public ArrayParser() {
     super(new Seq1(3,
       Whitespace.instance(),
