@@ -44,7 +44,7 @@ foam.CLASS({
     font-weight: normal;
     display: inline-block;
     position: absolute;
-    height: calc(100% - 80px);
+    height: calc(100vh - 80px);
     width: 240px;
     overflow-y: scroll;
     overflow-x: hidden;
