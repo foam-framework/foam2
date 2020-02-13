@@ -240,7 +240,6 @@ FOAM_FILES([
   { name: "foam/nanos/ruler/UpdateRulesListSink" },
   { name: "foam/nanos/ruler/TestedRule" },
   { name: "foam/nanos/ruler/RulerProbe" },
-  { name: "foam/nanos/ruler/UserRefines" },
   { name: "foam/nanos/ruler/predicate/PropertyChangePredicate" },
   { name: "foam/nanos/ruler/predicate/PropertyEQProperty" },
   { name: "foam/nanos/ruler/Relationships" },
