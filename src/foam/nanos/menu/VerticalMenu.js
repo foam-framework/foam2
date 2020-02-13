@@ -91,27 +91,28 @@ foam.CLASS({
       this
       .addClass(this.myClass())
       .start()
-      .addClass('side-nav-view')
-      .start()
-        .startContext({ data: this })
-          .start()
-            .add(self.MENU_SEARCH.clone().copyFrom({ view: {
-              class: 'foam.u2.view.TextField',
-              onKey: true
-            } }))
-            .addClass('foam-u2-search-TextSearchView')
-          .end()
-        .endContext()
+        .addClass('side-nav-view')
         .start()
-          .tag({
-            class: 'foam.u2.view.TreeView',
-            data: self.dao_,
-            relationship: foam.nanos.menu.MenuMenuChildrenRelationship,
-            startExpanded: true,
-            query: self.menuSearch$,
-            onClickAddOn: function(data) { self.openMenu(data); },
-            formatter: function(data) { this.add(data.label); }
-          })
+          .startContext({ data: this })
+            .start()
+              .add(self.MENU_SEARCH.clone().copyFrom({ view: {
+                class: 'foam.u2.view.TextField',
+                onKey: true
+              } }))
+              .addClass('foam-u2-search-TextSearchView')
+            .end()
+          .endContext()
+          .start()
+            .tag({
+              class: 'foam.u2.view.TreeView',
+              data: self.dao_,
+              relationship: foam.nanos.menu.MenuMenuChildrenRelationship,
+              startExpanded: true,
+              query: self.menuSearch$,
+              onClickAddOn: function(data) { self.openMenu(data); },
+              formatter: function(data) { this.add(data.label); }
+            })
+          .end()
         .end()
       .end();
 
