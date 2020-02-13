@@ -1044,8 +1044,8 @@ foam.CLASS({
 
   properties: [
     ['javaInfoType',   'foam.core.AbstractBytePropertyInfo'],
-    ['javaJSONParser', 'new foam.lib.json.ByteParser()'],
-    ['javaCSVParser',  'new foam.lib.json.ByteParser()'],
+    ['javaJSONParser', 'foam.lib.json.ByteParser.instance()'],
+    ['javaCSVParser',  'foam.lib.json.ByteParser.instance()'],
     ['sqlType',        'SMALLINT']
   ],
 
@@ -1581,7 +1581,7 @@ foam.CLASS({
   properties: [
     ['javaType',       'String[]'],
     ['javaInfoType',   'foam.core.AbstractArrayPropertyInfo'],
-    ['javaJSONParser', 'new foam.lib.json.StringArrayParser()'],
+    ['javaJSONParser', 'foam.lib.json.StringArrayParser.instance()'],
     ['javaFactory',    'return new String[0];'],
     {
       name: 'javaValue',

@@ -27,7 +27,7 @@ public class AnyParser
         new Not(Literal.create("."))),
       DoubleParser.instance(),
       new ObjectDateParser(),
-      new StringArrayParser(),
+      StringArrayParser.instance(),
       new StringDoubleArrayParser(),
       new PropertyReferenceParser(),
       new ClassReferenceParser(),

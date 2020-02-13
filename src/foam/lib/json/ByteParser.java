@@ -9,6 +9,11 @@ package foam.lib.json;
 import foam.lib.parse.*;
 
 public class ByteParser implements Parser {
+  
+  private final static Parser instance__ = new ByteParser();
+
+  public static Parser instance() { return instance__; }
+  
   public PStream parse(PStream ps, ParserContext x) {
     long n = 0;
 
