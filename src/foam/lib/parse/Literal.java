@@ -17,15 +17,34 @@
 
 package foam.lib.parse;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class Literal
   implements Parser
 {
+  protected final static Map map__ = new ConcurrentHashMap();
+
+  /**
+   * Implement the multiton pattern so we don't create the same Literal
+   * parser more than once.
+   **/
+  public static Parser create(String s) {
+    if ( s == null ) return new Literal(s, s);
+
+    Parser p = (Parser) map__.get(s);
+
+    if ( p == null ) {
+      p = new Literal(s, s);
+      map__.put(s, p);
+    }
+
+    return p;
+  }
+
+
   protected String string_;
   protected Object value_;
-
-  public Literal(String s) {
-    this(s, s);
-  }
 
   public Literal(String s, Object v) {
     string_ = s;

@@ -19,18 +19,18 @@ public class TreeNode {
   protected Object   key;
   protected Object   value;
   protected long     size;
-  protected long     level;
+  protected byte     level;
   protected TreeNode left;
   protected TreeNode right;
 
-  protected final static TreeNode NULL_NODE = new TreeNode(null, null, 0, 0, null, null);
+  protected final static TreeNode NULL_NODE = new TreeNode(null, null, 0, (byte) 0, null, null);
 
   public TreeNode(Object key, Object value) {
     this.key   = key;
     this.value = value;
   }
 
-  public TreeNode(Object key, Object value, long size, long level, TreeNode left, TreeNode right) {
+  public TreeNode(Object key, Object value, long size, byte level, TreeNode left, TreeNode right) {
     this.key   = key;
     this.value = value;
     this.size  = size;
@@ -41,12 +41,12 @@ public class TreeNode {
 
   public TreeNode cloneNode() {
     return new TreeNode(
-      this.key,
-      this.value,
-      this.size,
-      this.level,
-      this.left,
-      this.right);
+      key,
+      value,
+      size,
+      level,
+      left,
+      right);
   }
 
   TreeNode maybeClone(TreeNode s) {
@@ -71,7 +71,7 @@ public class TreeNode {
 
   public TreeNode putKeyValue(TreeNode state, PropertyInfo prop, Object key, FObject value, Index tail) {
     if ( state == null || state.equals(TreeNode.getNullNode()) ) {
-      return new TreeNode(key, tail.put(null, value), 1, 1, null, null);
+      return new TreeNode(key, tail.put(null, value), 1, (byte) 1, null, null);
     }
     state = maybeClone(state);
     int r = prop.comparePropertyToValue(key, state.key);
@@ -229,9 +229,9 @@ public class TreeNode {
 
   private TreeNode decreaseLevel(TreeNode node) {
     /** 'node' should be a new (cloned) TreeNode, not a reused one. **/
-    long expectedLevel = 1 + Math.min(
+    byte expectedLevel = (byte) (1 + Math.min(
       node.left  != null ? node.left.level  : 0 ,
-      node.right != null ? node.right.level : 0);
+      node.right != null ? node.right.level : 0));
 
     if ( expectedLevel < node.level ) {
       node.level = expectedLevel;
@@ -260,7 +260,7 @@ public class TreeNode {
     int r = prop.comparePropertyToValue(key, s.key);
     if ( r == 0 ) {
       long size = s.value instanceof TreeNode ? ( (TreeNode) s.value ).size : 1;
-      return new TreeNode(s.key, s.value, size, 0, null, null);
+      return new TreeNode(s.key, s.value, size, (byte) 0, null, null);
     }
     return r > 0 ? get(s.right, key, prop) : get(s.left, key, prop);
   }

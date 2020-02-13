@@ -6,6 +6,7 @@
 foam.CLASS({
   package: 'foam.nanos.boot',
   name: 'NSpec',
+
   javaImplements: [
     'foam.nanos.auth.EnabledAware'
   ],
@@ -13,8 +14,8 @@ foam.CLASS({
   requires: [
     {
       path: 'foam.comics.BrowserView',
-      flags: ['web'],
-    },
+      flags: ['web']
+    }
   ],
 
   javaImports: [
@@ -55,7 +56,7 @@ foam.CLASS({
             })
             .add(value ? ' Y' : '-')
           .end();
-      },
+      }
     },
     {
       class: 'Boolean',

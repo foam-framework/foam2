@@ -259,9 +259,10 @@ foam.CLASS({
         if ( getLogging() )
           delegate = new foam.nanos.logger.LoggingDAO.Builder(getX()).setNSpec(getNSpec()).setDelegate(delegate).build();
 
+        /*
         if ( getPipelinePm() && ( delegate instanceof ProxyDAO ) )
           delegate = new foam.dao.PipelinePMDAO(getX(), getNSpec(), delegate);
-
+          */
         if ( getPm() )
           delegate = new foam.dao.PMDAO.Builder(getX()).setNSpec(getNSpec()).setDelegate(delegate).build();
 
@@ -291,7 +292,8 @@ foam.CLASS({
     {
       class: 'Boolean',
       documentation: 'Creates pipelinePMDAOs around each decorator to measure their performance',
-      name: 'pipelinePm'
+      name: 'pipelinePm',
+      value: false
     },
     {
       documentation: 'Have EasyDAO use a sequence number to index items. Note that .seqNo and .guid features are mutuallyexclusive.',

@@ -12,10 +12,10 @@ public class KeyValueParser0
   extends ProxyParser
 {
   public KeyValueParser0() {
-    super(new Seq0(new Whitespace(),
+    super(new Seq0(Whitespace.instance(),
                    new AnyKeyParser(),
-                   new Whitespace(),
-                   new Literal(":"),
+                   Whitespace.instance(),
+                   Literal.create(":"),
                    AnyParser.instance()));
   }
 }

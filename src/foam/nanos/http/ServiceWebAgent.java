@@ -126,7 +126,7 @@ public class ServiceWebAgent
    * @return the error message
    */
   protected String getParsingError(X x, String buffer) {
-    Parser        parser = new ExprParser();
+    Parser        parser = ExprParser.instance();
     PStream       ps     = new StringPStream();
     ParserContext psx    = new ParserContextImpl();
 

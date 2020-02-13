@@ -35,7 +35,6 @@ foam.CLASS({
     function initE() {
       this
         .addClass(this.myClass())
-        .on('click', this.goToDefault)
         .start(this.Image, {
           data$: this.slot(function(theme$largeLogoEnabled, theme$logo, theme$largeLogo) {
             return theme$largeLogoEnabled ? theme$largeLogo : theme$logo;
@@ -43,14 +42,6 @@ foam.CLASS({
         })
           .addClass('logo')
         .end();
-    }
-  ],
-
-  listeners: [
-    function goToDefault() {
-      if ( this.theme ) {
-        this.pushMenu(this.group.defaultMenu);
-      }
     }
   ]
 });

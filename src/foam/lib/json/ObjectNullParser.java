@@ -15,7 +15,7 @@ public abstract class ObjectNullParser
   public ObjectNullParser(Parser objectParser) {
     super(
       new Alt(
-        new NullParser(),
+        NullParser.instance(),
         objectParser
       )
     );

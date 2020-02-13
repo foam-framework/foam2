@@ -1,22 +1,35 @@
+/**
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.lib.query;
 
 import foam.lib.json.IntParser;
 import foam.lib.parse.Literal;
-import foam.lib.parse.PStream;
+import foam.lib.parse.Parser;
 import foam.lib.parse.ParserContext;
 import foam.lib.parse.ProxyParser;
+import foam.lib.parse.PStream;
 import foam.lib.parse.Seq;
 
 public class DateParser
-  extends ProxyParser {
+  extends ProxyParser
+{
 
+  private final static Parser instance__ = new DateParser();
+
+  public static Parser instance() { return instance__; }
+
+  // TODO: make private
   public DateParser() {
     setDelegate(new Seq(// YYYY/MM/DD
-                        new IntParser(),
-                        new Literal("/"),
-                        new IntParser(),
-                        new Literal("/"),
-                        new IntParser()));
+      IntParser.instance(),
+      Literal.create("/"),
+      IntParser.instance(),
+      Literal.create("/"),
+      IntParser.instance()));
   }
 
   @Override

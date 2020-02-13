@@ -30,58 +30,58 @@ public class YYYYMMDDLiteralDateParser extends ProxyParser {
 
           //YYYY-MM-DDTHH:MM
           new Seq(
-            new IntParser(),
+            IntParser.instance(),
             new Alt(
-              new Literal("-"),
-              new Literal("/")),
-            new IntParser(),
+              Literal.create("-"),
+              Literal.create("/")),
+            IntParser.instance(),
             new Alt(
-              new Literal("-"),
-              new Literal("/")),
-            new IntParser(),
-            new Literal("T"),
-            new IntParser(),
-            new Literal(":"),
-            new IntParser()),
+              Literal.create("-"),
+              Literal.create("/")),
+            IntParser.instance(),
+            Literal.create("T"),
+            IntParser.instance(),
+            Literal.create(":"),
+            IntParser.instance()),
 
           //YYYY-MM-DDTHH
           new Seq(
-            new IntParser(),
+            IntParser.instance(),
             new Alt(
-              new Literal("-"),
-              new Literal("/")),
-            new IntParser(),
+              Literal.create("-"),
+              Literal.create("/")),
+            IntParser.instance(),
             new Alt(
-              new Literal("-"),
-              new Literal("/")),
-            new IntParser(),
-            new Literal("T"),
-            new IntParser()),
+              Literal.create("-"),
+              Literal.create("/")),
+            IntParser.instance(),
+            Literal.create("T"),
+            IntParser.instance()),
 
           //YYYY-MM-DD
           new Seq(
-            //new Literal("\""),
-            new IntParser(),
+            //Literal.create("\""),
+            IntParser.instance(),
             new Alt(
-                new Literal("-"),
-                new Literal("/")),
-            new IntParser(),
+                Literal.create("-"),
+                Literal.create("/")),
+            IntParser.instance(),
             new Alt(
-                new Literal("-"),
-                new Literal("/")),
-            new IntParser()),
+                Literal.create("-"),
+                Literal.create("/")),
+            IntParser.instance()),
 
           //YYYY-MM
           new Seq(
-            new IntParser(),
+            IntParser.instance(),
             new Alt(
-              new Literal("-"),
-              new Literal("/")),
-            new IntParser()),//,new Whitespace()
+              Literal.create("-"),
+              Literal.create("/")),
+            IntParser.instance()),//,Whitespace.instance()
 
           //YYYY
           new Seq(
-            new IntParser())//,new Whitespace()
+            IntParser.instance())//,Whitespace.instance()
           ));
 
   }
@@ -107,16 +107,16 @@ public class YYYYMMDDLiteralDateParser extends ProxyParser {
         result.length >= 11 ? (Integer) result[10] : 0);
 
     date1 = c.getTime();
-    
-    if ( result.length < 3 ) 
+
+    if ( result.length < 3 )
       c.add(java.util.Calendar.YEAR, 1);
-    else if ( result.length < 5 ) 
+    else if ( result.length < 5 )
       c.add(java.util.Calendar.MONTH, 1);
-    else if ( result.length < 7 ) 
+    else if ( result.length < 7 )
       c.add(java.util.Calendar.DAY_OF_MONTH, 1);
-    else if ( result.length < 9 ) 
+    else if ( result.length < 9 )
       c.add(java.util.Calendar.HOUR_OF_DAY, 1);
-    else if ( result.length < 11 ) 
+    else if ( result.length < 11 )
       c.add(java.util.Calendar.MINUTE, 1);
 
     date2 = c.getTime();
