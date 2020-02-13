@@ -227,6 +227,10 @@ foam.CLASS({
 
         if ( getUserId() == 0 ) {
           HttpServletRequest req = x.get(HttpServletRequest.class);
+          if ( req == null ) {
+            // null during test runs
+            return rtn;
+          }
           AppConfig appConfig = (AppConfig) x.get("appConfig");
           appConfig = (AppConfig) appConfig.fclone();
           String configUrl = ((Request) req).getRootURL().toString();
