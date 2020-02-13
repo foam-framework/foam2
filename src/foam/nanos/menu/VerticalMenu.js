@@ -60,12 +60,13 @@ foam.CLASS({
     margin: 4px 0;
   }
 
-  ^ .foam-u2-view-TreeView {
-    margin-right: 10px;
-  }
-
   ^ .foam-u2-view-TreeViewRow-label {
     font-weight: 300;
+  }
+
+  ^ .foam-u2-view-TreeViewRow {
+    width: 100%;
+    mergin: 0;
   }
   `,
   properties: [
@@ -101,6 +102,7 @@ foam.CLASS({
       .start()
         .add(self.MENU_SEARCH.clone().copyFrom({ view: {
           class: 'foam.u2.view.TextField',
+          type: 'search',
           onKey: true
         } }))
         .addClass('foam-u2-search-TextSearchView')
@@ -119,7 +121,7 @@ foam.CLASS({
       .end()
     .end();
 
-    this.subMenu$.dot('state').sub(this.scrollToCurrentSub);
+   // this.subMenu$.dot('state').sub(this.scrollToCurrentSub);
     },
 
     function openMenu(menu) {
