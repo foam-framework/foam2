@@ -30,7 +30,7 @@ public class AnyParser
       new StringArrayParser(),
       new StringDoubleArrayParser(),
       new PropertyReferenceParser(),
-      new ClassReferenceParser(),
+      ClassReferenceParser.instance(),
       ArrayParser.instance(),
       FObjectParser.instance(),
       new MapParser()));
