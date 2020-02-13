@@ -295,13 +295,13 @@ foam.CLASS({
           {
             class: 'Reference',
             name: 'sourceId',
-            // shortName: 's',
+            shortName: 's',
             of: this.sourceModel,
           },
           {
             class: 'Reference',
             name: 'targetId',
-            // shortName: 't',
+            shortName: 't',
             of: this.targetModel
           }
         ]
