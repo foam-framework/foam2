@@ -14,6 +14,8 @@ public class ByteParser implements Parser {
 
   public static Parser instance() { return instance__; }
   
+  private ByteParser() {}
+  
   public PStream parse(PStream ps, ParserContext x) {
     long n = 0;
 
