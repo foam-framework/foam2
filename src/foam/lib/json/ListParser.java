@@ -11,6 +11,9 @@ import foam.lib.parse.*;
 public class ListParser
   extends ProxyParser
 {
+  private final static Parser instance__ = new ListParser();
+
+  public static Parser instance() { return instance__; }
   public ListParser() {
     super(new Alt(
       NullParser.instance(),

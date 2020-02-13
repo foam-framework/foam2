@@ -11,6 +11,9 @@ import foam.lib.parse.*;
 public class MapParser
   extends ObjectNullParser
 {
+  private final static Parser instance__ = new MapParser();
+
+  public static Parser instance() { return instance__; }
   public MapParser() {
     super(new Seq1(3,
       Whitespace.instance(),

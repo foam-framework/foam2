@@ -1431,7 +1431,7 @@ foam.CLASS({
   properties: [
     ['javaType',       'java.util.Map'],
     ['javaInfoType',   'foam.core.AbstractMapPropertyInfo'],
-    ['javaJSONParser', 'new foam.lib.json.MapParser()'],
+    ['javaJSONParser', 'foam.lib.json.MapParser.instance()'],
     ['javaFactory',    'return new java.util.HashMap();']
   ],
 
@@ -1461,7 +1461,7 @@ foam.CLASS({
   properties: [
     ['javaType',       'java.util.List'],
     ['javaInfoType',   'foam.core.AbstractListPropertyInfo'],
-    ['javaJSONParser', 'new foam.lib.json.ListParser()'],
+    ['javaJSONParser', 'foam.lib.json.ListParser.instance()'],
     ['javaFactory',    'return new java.util.ArrayList();'],
   ],
 
@@ -1581,7 +1581,7 @@ foam.CLASS({
   properties: [
     ['javaType',       'String[]'],
     ['javaInfoType',   'foam.core.AbstractArrayPropertyInfo'],
-    ['javaJSONParser', 'new foam.lib.json.StringArrayParser()'],
+    ['javaJSONParser', 'foam.lib.json.StringArrayParser.instance()'],
     ['javaFactory',    'return new String[0];'],
     {
       name: 'javaValue',

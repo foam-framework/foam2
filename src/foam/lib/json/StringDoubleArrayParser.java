@@ -17,7 +17,7 @@ public class StringDoubleArrayParser
     Literal.create("["),
     Whitespace.instance(),
     new Repeat(
-      new StringArrayParser(),
+      StringArrayParser.instance(),
       new Seq0(Whitespace.instance(), Literal.create(","), Whitespace.instance())),
     Whitespace.instance(),
     Literal.create("]")));
