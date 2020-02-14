@@ -12,8 +12,8 @@ public class StringArrayParser
   extends ProxyParser
 {
   private final static Parser instance__ = new StringArrayParser();
-
   public static Parser instance() { return instance__; }
+  
   private StringArrayParser() {
     super(
       new Alt(
