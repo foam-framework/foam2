@@ -20,21 +20,6 @@ foam.CLASS({
       name: 'enabled',
       class: 'Boolean',
       value: true
-    },
-    {
-      name: 'multiline',
-      class: 'Boolean',
-      value: false
-    },
-    {
-      name: 'outputter',
-      class: 'Object',
-      javaFactory: `
-      foam.lib.json.Outputter out = new foam.lib.json.Outputter(getX());
-      out.setOutputDefaultValues(true);
-      out.setMultiLine(getMultiline());
-      return out;
-      `
     }
   ],
 

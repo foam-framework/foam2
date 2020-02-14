@@ -31,6 +31,14 @@ foam.CLASS({
 
         return promise.then(function(text) {
           if ( ! text ) return null;
+          var source = null;
+
+          // TODO: Change the interface of fetcher to remove this hack
+          if ( Array.isArray(text) && text[0] === 'withsource' ) {
+            source = text[1].source;
+            text = text[1].text;
+          }
+
           var json;
           var jsonId;
 
@@ -44,7 +52,12 @@ foam.CLASS({
                 m.name;
 
             if ( jsonId !== id ) {
-              self.cache[jsonId] = m;
+              self.cache[jsonId] = source === null
+                ? m
+                : ['withsource', {
+                    source: source,
+                    text: m
+                  }];
               return;
             }
 
@@ -103,7 +116,11 @@ foam.CLASS({
           }
 
           return Promise.all(foam.json.references(x, json)).then(function() {
-            return foam.lookup(json.class || 'Model').create(json, x);
+            var realModel = foam.lookup(json.class || 'Model').create(json, x);
+            if ( source ) {
+              realModel.source = source;
+            }
+            return realModel;
           });
         }, function() {
           return null;
