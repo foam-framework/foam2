@@ -1538,7 +1538,7 @@ foam.CLASS({
                 if ( prop.get(obj) == null ) prop.set(obj, prop.of().newInstance());
                 entry.getValue().set((foam.core.FObject) prop.get(obj), str);
               } catch ( Throwable t ) {
-                // ???
+                t.printStackTrace() // cannot use logging from logging. 
               }
             }
           });
