@@ -11,7 +11,6 @@ foam.CLASS({
     'foam.core.FObject',
     'foam.nanos.ruler.Operations',
     'java.util.List',
-    'net.nanopay.account.Account',
     'foam.nanos.logger.Logger',
     'static foam.mlang.MLang.*'
   ],
