@@ -20,16 +20,6 @@ foam.CLASS({
       name: 'enabled',
       class: 'Boolean',
       value: true
-    },
-    {
-      name: 'outputter',
-      class: 'Object',
-      javaFactory: `
-      foam.lib.json.Outputter out = new foam.lib.json.Outputter(getX());
-      out.setOutputDefaultValues(true);
-      out.setMultiLine(true);
-      return out;
-      `
     }
   ],
 
@@ -38,8 +28,9 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       LogMessage lm = (LogMessage) getDelegate().put_(x, obj);
-      if ( getEnabled() ) {
-        System.out.println(((foam.lib.json.Outputter)getOutputter()).stringify(lm));
+      if ( getEnabled() &&
+           lm != null ) {
+        System.out.println(lm.getCreated() + ","+lm.getThreadName()+","+lm.getSeverity()+","+lm.getMessage());
       } 
       return lm;
       `

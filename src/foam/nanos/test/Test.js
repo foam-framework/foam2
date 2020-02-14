@@ -176,7 +176,7 @@ foam.CLASS({
           setFailed(getFailed()+1);
           ps.println("FAILURE: "+e.getMessage());
           e.printStackTrace(ps);
-          Logger logger = (Logger) getX().get("logger");
+          Logger logger = (Logger) x.get("logger");
           logger.error(e);
         } finally {
           pm.log(x);

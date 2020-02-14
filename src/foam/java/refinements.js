@@ -1070,8 +1070,8 @@ foam.CLASS({
 
   properties: [
     ['javaInfoType',   'foam.core.AbstractShortPropertyInfo'],
-    ['javaJSONParser', 'new foam.lib.json.ShortParser()'],
-    ['javaCSVParser',  'new foam.lib.json.ShortParser()'],
+    ['javaJSONParser', 'foam.lib.json.ShortParser.instance()'],
+    ['javaCSVParser',  'foam.lib.json.ShortParser.instance()'],
     ['sqlType',        'SMALLINT']
   ],
 
@@ -1151,8 +1151,8 @@ foam.CLASS({
 
   properties: [
     ['javaInfoType',   'foam.core.AbstractFloatPropertyInfo'],
-    ['javaJSONParser', 'new foam.lib.json.FloatParser()'],
-    ['javaCSVParser',  'new foam.lib.json.FloatParser()'],
+    ['javaJSONParser', 'foam.lib.json.FloatParser.instance()'],
+    ['javaCSVParser',  'foam.lib.json.FloatParser.instance()'],
     ['sqlType',        'FLOAT']
   ],
 
@@ -1431,7 +1431,7 @@ foam.CLASS({
   properties: [
     ['javaType',       'java.util.Map'],
     ['javaInfoType',   'foam.core.AbstractMapPropertyInfo'],
-    ['javaJSONParser', 'new foam.lib.json.MapParser()'],
+    ['javaJSONParser', 'foam.lib.json.MapParser.instance()'],
     ['javaFactory',    'return new java.util.HashMap();']
   ],
 
@@ -1461,7 +1461,7 @@ foam.CLASS({
   properties: [
     ['javaType',       'java.util.List'],
     ['javaInfoType',   'foam.core.AbstractListPropertyInfo'],
-    ['javaJSONParser', 'new foam.lib.json.ListParser()'],
+    ['javaJSONParser', 'foam.lib.json.ListParser.instance()'],
     ['javaFactory',    'return new java.util.ArrayList();'],
   ],
 
@@ -1539,14 +1539,14 @@ foam.CLASS({
           p.fromCSVLabelMapping(map2);
         });
 
-        for ( String key : map2.keySet() ) {
-          map.put(getName() + "." + key, new foam.lib.csv.FromCSVSetter() {
+        for ( java.util.Map.Entry<String, foam.lib.csv.FromCSVSetter> entry : map2.entrySet() ) {
+          map.put(getName() + "." + entry.getKey(), new foam.lib.csv.FromCSVSetter() {
             public void set(foam.core.FObject obj, String str) {
               try {
                 if ( prop.get(obj) == null ) prop.set(obj, prop.of().newInstance());
-                map2.get(key).set((foam.core.FObject) prop.get(obj), str);
+                entry.getValue().set((foam.core.FObject) prop.get(obj), str);
               } catch ( Throwable t ) {
-                // ???
+                t.printStackTrace(); // cannot use logging from logging. 
               }
             }
           });
@@ -1878,7 +1878,7 @@ foam.CLASS({
   properties: [
     ['javaType',       'foam.core.ClassInfo'],
     ['javaInfoType',   'foam.core.AbstractClassPropertyInfo'],
-    ['javaJSONParser', 'new foam.lib.json.ClassReferenceParser()']
+    ['javaJSONParser', 'foam.lib.json.ClassReferenceParser.instance()']
   ]
 });
 
