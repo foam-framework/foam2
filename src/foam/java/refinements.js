@@ -1539,14 +1539,14 @@ foam.CLASS({
           p.fromCSVLabelMapping(map2);
         });
 
-        for ( String key : map2.keySet() ) {
-          map.put(getName() + "." + key, new foam.lib.csv.FromCSVSetter() {
+        for ( java.util.Map.Entry<String, foam.lib.csv.FromCSVSetter> entry : map2.entrySet() ) {
+          map.put(getName() + "." + entry.getKey(), new foam.lib.csv.FromCSVSetter() {
             public void set(foam.core.FObject obj, String str) {
               try {
                 if ( prop.get(obj) == null ) prop.set(obj, prop.of().newInstance());
-                map2.get(key).set((foam.core.FObject) prop.get(obj), str);
+                entry.getValue().set((foam.core.FObject) prop.get(obj), str);
               } catch ( Throwable t ) {
-                // ???
+                t.printStackTrace() // cannot use logging from logging. 
               }
             }
           });
