@@ -27,7 +27,7 @@ public class FObjectArrayParser extends ObjectNullParser {
     Parser p = (Parser) map__.get(cls.getName());
 
     if ( p == null ) {
-      p = new FObjectParser(cls);
+      p = new FObjectArrayParser(cls);
       map__.put(cls.getName(), p);
     }
 
