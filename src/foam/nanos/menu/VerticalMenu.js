@@ -40,6 +40,7 @@ foam.CLASS({
   }
 
   ^ .side-nav-view {
+    scroll-snap-stop: always;
     font-size: medium!important;
     font-weight: normal;
     display: inline-block;
