@@ -14,7 +14,9 @@ import foam.core.X;
 import foam.lib.json.ExprParser;
 import foam.lib.json.JSONParser;
 import foam.lib.parse.*;
+import foam.nanos.jetty.HttpServer;
 import foam.nanos.logger.Logger;
+import foam.nanos.servlet.VirtualHostRoutingServlet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,6 +28,7 @@ public class ServiceWebAgent
     implements WebAgent
 {
   public static final int BUFFER_SIZE = 4096;
+
 
   protected static ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
     @Override
@@ -75,8 +78,12 @@ public class ServiceWebAgent
       BufferedReader      reader         = req.getReader();
       X                   requestContext = x.put("httpRequest", req).put("httpResponse", resp);
       Logger              logger         = (Logger) x.get("logger");
+      HttpServer          http           = (HttpServer) x.get("http");
 
-      resp.setHeader("Access-Control-Allow-Origin", "*");
+      ((VirtualHostRoutingServlet) http.getServletMappings()[0].getServletObject()).getHostMapping().forEach((k,v) -> {
+        if ( req.getHeader("Origin").equals(String.format("http://%s:%d", k, http.getPort())) )
+          resp.setHeader("Access-Control-Allow-Origin", req.getHeader("Origin"));
+      });
 
       int read = 0;
       int count = 0;
@@ -148,4 +155,8 @@ public class ServiceWebAgent
     super.doOptions(req, resp);
   }
   */
+
+  public static String createOriginName(String host, int port) {
+    return "http://" + host + ":" + port;
+  }
 }
