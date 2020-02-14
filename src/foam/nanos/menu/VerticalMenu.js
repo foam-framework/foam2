@@ -40,14 +40,12 @@ foam.CLASS({
   }
 
   ^ .side-nav-view {
-    scroll-snap-stop: always;
     font-size: medium!important;
     font-weight: normal;
     display: inline-block;
     position: absolute;
     height: calc(100vh - 80px);
     width: 240px;
-    overflow-y: scroll;
     overflow-x: hidden;
     z-index: 100;
     font-size: 26px;
@@ -67,7 +65,9 @@ foam.CLASS({
 
   ^ .foam-u2-view-TreeViewRow {
     width: 100%;
-    mergin: 0;
+  }
+  ^ .tree-view-height-manager {
+    margin-bottom: 40px;
   }
   `,
   properties: [
@@ -97,32 +97,32 @@ foam.CLASS({
       this
       .addClass(this.myClass())
       .start()
-      .addClass('side-nav-view')
-      .start()
-      .startContext({ data: this })
-      .start()
-        .add(self.MENU_SEARCH.clone().copyFrom({ view: {
-          class: 'foam.u2.view.TextField',
-          type: 'search',
-          onKey: true
-        } }))
-        .addClass('foam-u2-search-TextSearchView')
-      .end()
-      .endContext()
-      .start()
-        .tag({ 
-          class: 'foam.u2.view.TreeView',
-          data: self.dao_,
-          relationship: foam.nanos.menu.MenuMenuChildrenRelationship,
-          startExpanded: true,
-          query: self.menuSearch$,
-          onClickAddOn: function(data) { self.openMenu(data); },
-          formatter: function(data) { this.add(data.label); }
-        })
-      .end()
-    .end();
-
-   // this.subMenu$.dot('state').sub(this.scrollToCurrentSub);
+        .addClass('side-nav-view')
+        .start()
+          .startContext({ data: this })
+          .start()
+            .add(self.MENU_SEARCH.clone().copyFrom({ view: {
+              class: 'foam.u2.view.TextField',
+              type: 'search',
+              onKey: true
+            } }))
+            .addClass('foam-u2-search-TextSearchView')
+          .end()
+          .endContext()
+          .start()
+            .addClass('tree-view-height-manager')
+            .tag({
+              class: 'foam.u2.view.TreeView',
+              data: self.dao_,
+              relationship: foam.nanos.menu.MenuMenuChildrenRelationship,
+              startExpanded: true,
+              query: self.menuSearch$,
+              onClickAddOn: function(data) { self.openMenu(data); },
+              formatter: function(data) { this.add(data.label); }
+            })
+          .end()
+        .end()
+      .end();
     },
 
     function openMenu(menu) {

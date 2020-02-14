@@ -40,7 +40,6 @@ foam.CLASS({
       white-space: nowrap;
       inset: none;
       cursor: pointer;
-      margin-right: 0;
     }
 
     ^:hover > ^heading {
