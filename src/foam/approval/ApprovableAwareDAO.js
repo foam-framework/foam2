@@ -1,5 +1,5 @@
 foam.CLASS({
-  package: 'foam.approval',
+  package: 'net.nanopay.liquidity.approvalRequest',
   name: 'ApprovableAwareDAO',
   extends: 'foam.dao.ProxyDAO',
 
@@ -32,7 +32,7 @@ foam.CLASS({
     'foam.comics.v2.userfeedback.UserFeedback',
     'foam.comics.v2.userfeedback.UserFeedbackStatus',
     'foam.comics.v2.userfeedback.UserFeedbackException',
-    'foam.nanos.crunch.UCJQueryService',
+    'foam.approval.UCJQueryService',
     'foam.approval.Approvable',
     'foam.approval.ApprovableAware',
     'foam.approval.RoleApprovalRequest'
@@ -46,6 +46,11 @@ foam.CLASS({
     {
       class: 'Class',
       name: 'of'
+    },
+    {
+      class: 'Boolean',
+      name: 'isEnabled',
+      value: true
     }
   ],
 
@@ -115,84 +120,19 @@ foam.CLASS({
       `
     },
     {
-      name: 'remove_',
-      javaCode: `
-        User user = (User) x.get("user");
-        Logger logger = (Logger) x.get("logger");
-
-        // system and admins override the approval process
-        if ( user != null && ( user.getId() == User.SYSTEM_USER_ID || user.getGroup().equals("admin") || user.getGroup().equals("system") ) ) return super.remove_(x,obj);
-
-        ApprovableAware approvableAwareObj = (ApprovableAware) obj;
-        DAO approvalRequestDAO = ((DAO) getX().get("approvalRequestDAO"));
-
-        List approvedObjRemoveRequests = ((ArraySink) approvalRequestDAO
-          .where(
-            foam.mlang.MLang.AND(
-              foam.mlang.MLang.EQ(ApprovalRequest.DAO_KEY, getDaoKey()),
-              foam.mlang.MLang.EQ(ApprovalRequest.OBJ_ID, approvableAwareObj.getApprovableKey()),
-              foam.mlang.MLang.EQ(RoleApprovalRequest.OPERATION, Operations.REMOVE),
-              foam.mlang.MLang.EQ(RoleApprovalRequest.IS_FULFILLED, false),
-              foam.mlang.MLang.OR(
-                foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.APPROVED),
-                foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.REJECTED)
-              )
-            )
-          ).select(new ArraySink())).getArray();
-
-        if ( approvedObjRemoveRequests.size() == 1 ) {
-          RoleApprovalRequest fulfilledRequest = (RoleApprovalRequest) approvedObjRemoveRequests.get(0);
-          fulfilledRequest.setIsFulfilled(true);
-
-          approvalRequestDAO.put_(getX(), fulfilledRequest);
-
-          if ( fulfilledRequest.getStatus() == ApprovalStatus.APPROVED ) {
-            return super.put_(x,obj);
-          } 
-          
-          return null;  // as request has been REJECTED
-        } 
-        
-        if ( approvedObjRemoveRequests.size() > 1 ) {
-          logger.error("Something went wrong cannot have multiple approved/rejected requests for the same request!");
-          throw new RuntimeException("Something went wrong cannot have multiple approved/rejected requests for the same request!");
-        } 
-
-        RoleApprovalRequest approvalRequest = new RoleApprovalRequest.Builder(getX())
-          .setDaoKey(getDaoKey())
-          .setObjId(approvableAwareObj.getApprovableKey())
-          .setClassification(getOf().getObjClass().getSimpleName())
-          .setOperation(Operations.REMOVE)
-          .setInitiatingUser(((User) x.get("user")).getId())
-          .setStatus(ApprovalStatus.REQUESTED).build(); 
-
-        fullSend(getX(), approvalRequest, obj);
-
-        // we need to prevent the remove_ call from being passed all the way down to actual deletion since
-        // we are just creating the approval requests for deleting the object as of now
-        // TODO: the following is a temporary fix will need to create an actual exception and pass feedback as a property
-        // in the skeleton back to the client
-
-        // UserFeedbackAware feedbackAwareObj = (UserFeedbackAware) obj;
-        
-        // UserFeedback newUserFeedback = new UserFeedback.Builder(getX())
-        //     .setStatus(UserFeedbackStatus.SUCCESS)
-        //     .setMessage("An approval request has been sent out.")
-        //     .setNext(feedbackAwareObj.getUserFeedback()).build();
-
-        // UserFeedbackException successException = new UserFeedbackException(getX())
-        //     .setUserFeedback(newUserFeedback);
-
-        throw new RuntimeException("An approval request has been sent out."); // we aren't updating to deleted
-      `
-    },
-    {
       name: 'put_',
       javaCode: `
       User user = (User) x.get("user");
       Logger logger = (Logger) x.get("logger");
 
       LifecycleAware lifecycleObj = (LifecycleAware) obj;
+      
+      if ( ! getIsEnabled() ){
+        if ( lifecycleObj.getLifecycleState() == LifecycleState.PENDING ){
+          lifecycleObj.setLifecycleState(LifecycleState.ACTIVE);
+        }
+        return super.put_(x,obj);
+      }
 
       // system and admins override the approval process
       if ( user != null && ( user.getId() == User.SYSTEM_USER_ID || user.getGroup().equals("admin") || user.getGroup().equals("system") ) ) {
@@ -426,8 +366,6 @@ foam.CLASS({
           .setStatus(ApprovalStatus.REQUESTED).build();
 
         fullSend(getX(), approvalRequest, obj);
-
-        
 
         UserFeedbackAware feedbackAwareObj = (UserFeedbackAware) obj;
 
