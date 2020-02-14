@@ -11,13 +11,31 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PropertyParser
   extends ProxyParser
 {
   protected PropertyInfo prop_;
+  private final static Map map__ = new ConcurrentHashMap();
+  
+  /**
+   * Implement the multiton pattern so we don't create the same
+   * parser more than once.
+   **/
+  public static Parser create(PropertyInfo p) {
+    Parser prs = (Parser) map__.get(p.toString());
 
-  public PropertyParser(PropertyInfo p) {
+    if ( prs == null ) {
+      prs = new PropertyParser(p);
+      map__.put(p.toString(), prs);
+    }
+
+    return prs;
+  }
+
+  private PropertyParser(PropertyInfo p) {
     prop_ = p;
 
     setDelegate(
