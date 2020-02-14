@@ -699,6 +699,39 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.core',
+  name: 'ReferenceSpec',
+  extends: 'Property',
+
+  properties: [
+    [ 'type', 'foam.core.WeakReference' ],
+    [
+      'factory',
+      function () {
+        return foam.core.WeakReference.create()
+      }
+    ]
+  ],
+
+  methods: [
+    function installInProto(proto) {
+      this.SUPER(proto);
+      var self = this;
+      Object.defineProperty(proto, self.name + '$find', {
+        get: function classGetter() {
+          if ( typeof this[self.name] !== 'object' ) {
+            return null;
+          }
+          return this.__subContext__[this[self.name].targetDAOKey]
+            .find(this[self.name].target);
+        },
+        configurable: true
+      });
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.core',
   name: 'ModelUpgradeTypesRefinement',
   refines: 'foam.core.Model',
 
