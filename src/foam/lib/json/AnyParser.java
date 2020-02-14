@@ -27,12 +27,12 @@ public class AnyParser
         new Not(Literal.create("."))),
       DoubleParser.instance(),
       new ObjectDateParser(),
-      new StringArrayParser(),
+      StringArrayParser.instance(),
       new StringDoubleArrayParser(),
       new PropertyReferenceParser(),
-      new ClassReferenceParser(),
+      ClassReferenceParser.instance(),
       ArrayParser.instance(),
       FObjectParser.instance(),
-      new MapParser()));
+      MapParser.instance()));
   }
 }

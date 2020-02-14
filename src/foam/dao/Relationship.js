@@ -686,7 +686,7 @@ foam.CLASS({
         targetPropertyName: this.targetPropertyName,
         targetDAOKey: this.targetDAOKey,
         unauthorizedTargetDAOKey: this.unauthorizedTargetDAOKey
-        
+
       }).copyFrom(this.methodOverrides));
 
       cls.installAxiom(this.OneToManyRelationshipProperty.create({
