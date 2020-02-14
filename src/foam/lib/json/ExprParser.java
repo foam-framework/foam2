@@ -43,7 +43,7 @@ public class ExprParser
   private ExprParser(final Class defaultClass) {
     super(new Alt(
       new PropertyReferenceParser(),
-      new ClassReferenceParser(),
+      ClassReferenceParser.instance(),
       FObjectParser.create(defaultClass)));
   }
 }
