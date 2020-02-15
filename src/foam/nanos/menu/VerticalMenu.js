@@ -82,7 +82,11 @@ foam.CLASS({
     {
       name: 'menuSearch',
       class: 'String',
-      value: ''
+      value: '',
+      view: {
+        class: 'foam.u2.view.TextField',
+        onKey: true
+      }
     }
   ],
 

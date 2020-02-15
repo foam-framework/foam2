@@ -64,7 +64,6 @@ foam.CLASS({
     ^select-level {
       padding: 8px;
     }
-
     ^selected > ^label {
       xxxborder-radius: 2px;
       xxxbackground-color: rgba(0, 48, 249, 0.1);
@@ -188,7 +187,6 @@ foam.CLASS({
           return '';
         }, this.selection$, this.data$.dot('id'))).
         on('click', this.onClickFunctions).
-//        on('click', this.selected).
         on('dblclick', function() { self.dblclick && self.dblclick(self.data); }).
         callIf(this.draggable, function() {
           this.
@@ -226,7 +224,6 @@ foam.CLASS({
               }).
               on('click', this.toggleExpanded).
               add('\u2303').
-              // entity('nbsp').
             end().
             end().
           end().
