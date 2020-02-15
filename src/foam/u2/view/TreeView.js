@@ -162,6 +162,16 @@ foam.CLASS({
           var isThisItemRelatedToSearch = false;
           if ( ! updateThisRoot ) {
             self.doesThisIncludeSearch = self.query.get() ? self.data.label.toLowerCase().includes(self.query.get().toLowerCase()) : true;
+
+            if ( self.query.get() && self.data.keywords ) {
+              for ( var i = 0; i < self.data.keywords.length; i++ ) {
+                if ( self.data.keywords[i].toLowerCase().includes(self.query.get().toLowerCase()) ) {
+                  self.doesThisIncludeSearch = true;
+                  break;
+                }
+              }
+            }
+
             isThisItemRelatedToSearch = self.query.get() ? ( self.doesThisIncludeSearch && ( ! hasChildren || self.data.parent !== '' ) ) || ( hasChildren && showThisRootOnSearch ) : true;
             if ( self.showRootOnSearch )
               self.showRootOnSearch.set(self.showRootOnSearch.get() || isThisItemRelatedToSearch);
