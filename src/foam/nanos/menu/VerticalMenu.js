@@ -101,11 +101,7 @@ foam.CLASS({
         .start()
           .startContext({ data: this })
           .start()
-            .add(self.MENU_SEARCH.clone().copyFrom({ view: {
-              class: 'foam.u2.view.TextField',
-              type: 'search',
-              onKey: true
-            } }))
+            .add(this.MENU_SEARCH)
             .addClass('foam-u2-search-TextSearchView')
           .end()
           .endContext()
