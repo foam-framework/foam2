@@ -318,7 +318,7 @@ foam.CLASS({
             // Faster than splice or filter as of the time this was added
             let oldArry = this[self.name];
             let newArry = [];
-            for ( let i=0; i < oldArry.length; i++ ) {
+            for ( let i=0 ; i < oldArry.length ; i++ ) {
               if ( ! predicate.f(oldArry[i]) ) {
                 newArry.push(oldArry[i]);
               }
