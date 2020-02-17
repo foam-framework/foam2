@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.core',
   name: 'FObjectArray',
-  extends: 'Property',
+  extends: 'foam.core.Array',
 
   documentation: "A Property which contains an array of 'of' FObjects.",
 
@@ -30,10 +30,6 @@ foam.CLASS({
         return this.of + '[]';
       }
     },
-    [
-      'factory',
-      function() { return []; }
-    ],
     [ 'adapt', function(_, /* array? */ a, prop) {
         if ( ! a ) return [];
         // If not an array, allow assertValue to assert the type-check.
@@ -63,40 +59,6 @@ foam.CLASS({
       value: function(value, ctx, prop) {
         return foam.json.parse(value, prop.of, ctx);
       }
-    }
-  ],
-
-  methods: [
-    function installInProto(proto) {
-      this.SUPER(proto);
-      var self = this;
-      Object.defineProperty(proto, self.name + '$push', {
-        get: function classGetter() {
-          return function (v) {
-            // Push value
-            this[self.name].push(v);
-            // Force property update
-            this[self.name] = this[self.name];
-          }
-        },
-        configurable: true
-      });
-      Object.defineProperty(proto, self.name + '$remove', {
-        get: function classGetter() {
-          return function (predicate) {
-            // Faster than splice or filter as of the time this was added
-            let oldArry = this[self.name];
-            let newArry = [];
-            for ( let i=0; i < oldArry.length; i++ ) {
-              if ( ! predicate.f(oldArry[i]) ) {
-                newArry.push(oldArry[i]);
-              }
-            }
-            this[self.name] = newArry;
-          }
-        },
-        configurable: true
-      });
     }
   ]
 });
