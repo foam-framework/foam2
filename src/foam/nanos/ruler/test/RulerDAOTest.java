@@ -102,7 +102,8 @@ public class RulerDAOTest extends Test {
 
   public void testCompositeRuleAction(X x){
     rule10 = (Rule) rule2.fclone();
-    rule10.setId("rule10. composite rule action");
+    rule10.setId(10);
+    rule10.setName("rule10. composite rule action");
     //test null array of rule actions
     CompositeRuleAction compositeAction = new CompositeRuleAction();
     Predicate pred10 = EQ(DOT(NEW_OBJ, foam.nanos.auth.User.EMAIL), "nanos@nanos.net");
@@ -142,7 +143,8 @@ public class RulerDAOTest extends Test {
 
     //the rule with the highest priority in "users:email filter" group and stops execution of the rest.
     rule7 = new Rule();
-    rule7.setId("rule7. userDAO email filter");
+    rule7.setId(7);
+    rule7.setName("rule7. userDAO email filter");
     rule7.setRuleGroup("users:email filter");
     rule7.setDaoKey("localUserDAO");
     rule7.setOperation(Operations.CREATE);
@@ -173,7 +175,8 @@ public class RulerDAOTest extends Test {
   public void createRule(X x) {
     // first rule stops execution of rules with a lower priority within the same group
     rule1 = new Rule();
-    rule1.setId("rule1. userDAO email filter");
+    rule1.setId(1);
+    rule1.setName("rule1. userDAO email filter");
     rule1.setRuleGroup("users:email filter");
     rule1.setDaoKey("localUserDAO");
     rule1.setOperation(Operations.CREATE);
@@ -185,7 +188,8 @@ public class RulerDAOTest extends Test {
 
     //the rule has a higher priority than the first rule, changes user's email from nanos@nanos.net to foam@nanos.net
     rule2 = new Rule();
-    rule2.setId("rule2. userDAO email filter");
+    rule2.setId(2);
+    rule2.setName("rule2. userDAO email filter");
     rule2.setRuleGroup("users:email filter");
     rule2.setDaoKey("localUserDAO");
     rule2.setOperation(Operations.CREATE);
@@ -209,7 +213,8 @@ public class RulerDAOTest extends Test {
 
     //the rule has lower priority than the first one => should never be executed
     rule3 = new Rule();
-    rule3.setId("rule3. userDAO email filter");
+    rule3.setId(3);
+    rule3.setName("rule3. userDAO email filter");
     rule3.setRuleGroup("users:email filter");
     rule3.setDaoKey("localUserDAO");
     rule3.setOperation(Operations.CREATE);
@@ -223,7 +228,8 @@ public class RulerDAOTest extends Test {
 
     //the rule has lower priority than the first one but has different group so should be executed
     rule4 = new Rule();
-    rule4.setId("rule4. userDAO lastName filter");
+    rule4.setId(4);
+    rule4.setName("rule4. userDAO lastName filter");
     rule4.setRuleGroup("users:change lastName");
     rule4.setDaoKey("localUserDAO");
     rule4.setOperation(Operations.CREATE);
@@ -242,7 +248,8 @@ public class RulerDAOTest extends Test {
 
     //the rule has lower priority than the first one but has different group so should be executed
     rule5 = new Rule();
-    rule5.setId("rule5. userDAO lastName filter");
+    rule5.setId(5);
+    rule5.setName("rule5. userDAO lastName filter");
     rule5.setRuleGroup("users:change lastName");
     rule5.setDaoKey("localUserDAO");
     rule5.setOperation(Operations.UPDATE);
@@ -253,7 +260,8 @@ public class RulerDAOTest extends Test {
       User user = (User) obj;
       user.setLastName("Unknown");
       Rule executeRule = new Rule();
-      executeRule.setId("executeRule");
+      executeRule.setId(100);
+      executeRule.setName("executeRule");
       RuleGroup rg = new RuleGroup();
       rg.setId("fake test group");
       rgDAO.put(rg);
@@ -285,7 +293,8 @@ public class RulerDAOTest extends Test {
     RuleGroup rg = new RuleGroup();
     rg.setId("user2 update");
     rgDAO.put(rg);
-    rule6.setId("rule6. user2 update");
+    rule6.setId(6);
+    rule6.setName("rule6. user2 update");
     rule6.setRuleGroup("user2 update");
     rule6.setDaoKey("localUserDAO");
     rule6.setOperation(Operations.UPDATE);
@@ -306,7 +315,8 @@ public class RulerDAOTest extends Test {
 
     //the rule with erroneous predicate
     rule8 = new Rule();
-    rule8.setId("rule8. Erroneous rule predicate");
+    rule8.setId(8);
+    rule8.setName("rule8. Erroneous rule predicate");
     RuleGroup rg2 = new RuleGroup();
     rg2.setId("user created");
     rgDAO.put(rg2);
@@ -321,7 +331,8 @@ public class RulerDAOTest extends Test {
 
     //the rule with FObject predicate
     rule9 = new Rule();
-    rule9.setId("rule9. FObject rule predicate");
+    rule9.setId(9);
+    rule9.setName("rule9. FObject rule predicate");
     RuleGroup rg3 = new RuleGroup();
     rg3.setId("user updated");
     rgDAO.put(rg3);
