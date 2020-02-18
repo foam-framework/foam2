@@ -19,10 +19,6 @@ foam.CLASS({
   package: 'foam.android.tools',
   name: 'GenResources',
 
-  imports: [
-    'arequire',
-  ],
-
   properties: [
     {
       class: 'StringArray',
@@ -47,7 +43,7 @@ foam.CLASS({
       }
       var promises = [];
       for (var i = 0; i < this.models.length; i++) {
-        promises.push(this.arequire(this.models[i]));
+        promises.push(foam.__context__.classloader.load(this.models[i]));
       }
       return Promise.all(promises).then(function() {
         var resources = [];
