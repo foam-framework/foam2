@@ -80,14 +80,14 @@ foam.CLASS({
       }
     },
     {
-      name: 'menuSearch',
       class: 'String',
-      value: '',
+      name: 'menuSearch',
       view: {
-        class: 'foam.u2.view.TextField',
-        onKey: true,
-        type: 'Search'
-      }
+        class: 'foam.u2.TextField',
+        type: 'search',
+        onKey: true
+      },
+      value: ''
     }
   ],
 
