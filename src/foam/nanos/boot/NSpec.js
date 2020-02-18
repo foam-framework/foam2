@@ -301,7 +301,7 @@ foam.CLASS({
           List<String> instructionList = new InstructionPresentation(jShell).parseToInstruction(l1);
           EvalInstruction console = new EvalInstruction(jShell, instructionList, x);
           String print = null;
-          print = console.runEvalInstruction();
+          String print = console.runEvalInstruction();
 //        saveService(x, service)//TODO delete this method.
           jShell.eval("foam.nanos.boot.NSpec.OBJECT_HOLDER[0] = service;");
           return  OBJECT_HOLDER[0];
