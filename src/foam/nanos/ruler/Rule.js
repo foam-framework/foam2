@@ -29,6 +29,7 @@
 
   tableColumns: [
     'id',
+    'name',
     'ruleGroup',
     'enabled',
     'priority',
@@ -39,6 +40,7 @@
 
   searchColumns: [
     'id',
+    'name',
     'ruleGroup',
     'enabled',
     'priority',
@@ -61,9 +63,13 @@
 
   properties: [
     {
-      class: 'String',
+      class: 'Long',
       name: 'id',
-      updateVisibility: 'RO',
+      hidden: true
+    },
+    {
+      class: 'String',
+      name: 'name',
       tableWidth: 300,
       section: 'basicInfo'
     },
@@ -380,8 +386,8 @@
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(`
-        public static Rule findById(Collection<Rule> listRule, String passedId) {
-          return listRule.stream().filter(rule -> passedId.equals(rule.getId())).findFirst().orElse(null);
+        public static Rule findById(Collection<Rule> listRule, Long id) {
+          return listRule.stream().filter(rule -> id.equals(rule.getId())).findFirst().orElse(null);
         }
         `);
       }
