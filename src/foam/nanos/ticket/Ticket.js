@@ -56,8 +56,7 @@ foam.CLASS({
     },
     {
       name: '_defaultSection',
-      permissionRequired: true,
-      hidden: true
+      permissionRequired: true
     },
   ],
 
@@ -149,7 +148,7 @@ foam.CLASS({
       // required: true,
       tableWidth: 250,
       section: 'infoSection',
-      validationPredicate: [
+      validationPredicates: [
         {
           args: ['title', 'type'],
           predicateFactory: function(e) {
@@ -170,7 +169,7 @@ foam.CLASS({
     // required: true,
       storageTransient: true,
       section: 'infoSection',
-      validationPredicate: [
+      validationPredicates: [
         {
           args: ['id', 'title', 'comment'],
           predicateFactory: function(e) {
