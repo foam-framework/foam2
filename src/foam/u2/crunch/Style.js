@@ -138,7 +138,7 @@ foam.CLASS({
     ^mode-circle {
       display: inline-block;
       height: 80px;
-      width: 332px;
+      width: 100%;
     }
     ^mode-circle::not(:first-of-type) {
       margin-left: 14px;

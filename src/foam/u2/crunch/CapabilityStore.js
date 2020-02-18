@@ -4,6 +4,7 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   requires: [
+    'foam.u2.UnstyledTabs',
     'foam.u2.crunch.CapabilityCardView',
     'foam.u2.crunch.CapabilityFeatureView',
     'foam.u2.layout.Grid',
@@ -26,11 +27,11 @@ foam.CLASS({
       margin: 24px 0 0 0;
       width: 97%;
     }
-    /* ^ {
+    ^ {
       max-width: 1024px;
       margin: auto;
       padding: 12px 24px 24px 24px;
-    } */
+    }
     ^four-column-grid {
       margin-top: 32px;
       justify-content: space-between;
@@ -72,6 +73,11 @@ foam.CLASS({
         return this.capabilityDAO;
       }
     },
+    {
+      name: 'capabilitySections',
+      class: 'FObjectArray',
+      of: 'foam.u2.crunch.CapabilityStoreSection',
+    }
   ],
 
   methods: [
@@ -82,35 +88,58 @@ foam.CLASS({
 
       self
         .addClass(self.myClass())
-          .addClass(self.myClass('fix-alignment-to-tab-bar'))
-          .addClass(self.myClass('four-column-grid'))
-          // .add('things are not working and this is bad')
-          .add(self.slot(function (featuredCapabilities) {
-            var spot = this.E();
-            featuredCapabilities.select().then((result) => {
-              let arr = result.array;
-              let grid = self.Grid.create();
-              console.log(['grid',grid]);
-              for ( let i=0 ; i < arr.length ; i++ ) {
-                let cap = arr[i];
-                grid = grid
-                  .start(self.GUnit, { columns: 3 })
-                    .tag(self.CapabilityFeatureView, { data: cap })
-                  .end()
+        // Featured Capabilities
+        .add(self.slot(function (featuredCapabilities) {
+          var spot = this.E('span');
+          featuredCapabilities.select().then((result) => {
+            let arr = result.array;
+            let grid = self.Grid.create();
+            grid
+              .addClass(self.myClass('fix-alignment-to-tab-bar'))
+              .addClass(self.myClass('four-column-grid'))
+              ;
+            for ( let i=0 ; i < arr.length ; i++ ) {
+              let cap = arr[i];
+              grid = grid
+                .start(self.GUnit, { columns: 3 })
+                  .tag(self.CapabilityFeatureView, { data: cap })
+                .end()
+                ;
+            }
+            spot.add(grid);
+          });
+          return spot;
+        }))
+        // Capability Store Sections
+        .add(self.slot(function (capabilitySections) {
+          return this.E('span')
+            .forEach(capabilitySections, function(section) {
+              var sectionElement = this.E('span');
+              this
+                .start('h3')
+                  .add(section.label)
+                .end()
+                .add(sectionElement)
+                ;
+              section.previewDAO.select().then((result) => {
+                let arr = result.array;
+                let grid = self.Grid.create();
+                grid
+                  .addClass('fix-alignment-to-tab-bar')
                   ;
-              }
-              spot.add(grid);
-            });
-            return spot;
-          }))
-          // .select(self.featuredCapabilities, function (cap) {
-          //   console.log([this, cap]);
-          //   this.__context__.registerElement(self.GUnit);
-          //   return this.E('GUNIT', { nodeName: 'div', columns: 3 })
-          //     .add('test words')
-          //     // .tag(self.CapabilityFeatureView, { data: cap })
-          // })
-        .end()
+                for ( let i=0 ; i < arr.length ; i++ ) {
+                  let cap = arr[i];
+                  grid = grid
+                    .start(self.GUnit, { columns: 4 })
+                      .tag(self.CapabilityCardView, { data: cap })
+                    .end()
+                    ;
+                }
+                sectionElement.add(grid);
+              })
+            })
+            ;
+        }))
         ;
     }
   ]
