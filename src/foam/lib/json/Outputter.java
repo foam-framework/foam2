@@ -13,6 +13,7 @@ import foam.core.PropertyInfo;
 import foam.dao.AbstractSink;
 import foam.lib.PermissionedPropertyPredicate;
 import foam.lib.PropertyPredicate;
+import foam.nanos.logger.Logger;
 import foam.util.SafetyUtil;
 import java.io.*;
 import java.lang.reflect.Array;
@@ -100,56 +101,67 @@ public class Outputter
     if ( multiLineOutput_ && s.indexOf('\n') >= 0 ) {
       writer_.append("\n");
       writer_.append("\"\"\"");
-      writer_.append(escapeMultiline(s));
+      escape(s, writer_);
       writer_.append("\"\"\"");
     }
     else {
       writer_.append("\"");
-      writer_.append(escape(s));
+      escape(s, writer_);
       writer_.append("\"");
     }
   }
 
-  public String escape(String s) {
-    s = s.replace("\\", "\\\\")
-            .replace("\"", "\\\"")
-            .replace("\t", "\\t")
-            .replace("\r","\\r")
-            .replace("\n","\\n");
-    s = escapeControlCharacters(s);
-    return s;
-  }
+  public void escape(String s, Writer writer) {
+    try {
+      char c;
+      for ( int i = 0; i < s.length(); i++ ) {
+        c = s.charAt(i);
 
-  public String escapeMultiline(String s) {
-    s = s.replace("\\", "\\\\");
-    s = escapeControlCharacters(s);
-    return s;
-  }
-
-  public String escapeControlCharacters(String s) {
-    int lastStart = 0;
-    String escapedString = "";
-    char c;
-    for ( int i = 0; i < s.length(); i++ ) {
-      c = s.charAt(i);
-      if ( c >= ' ' ) continue;
-      // Character to hex
-      char right = (char) (c & 0x0F);
-      char left = (char) ((c & 0xF0) >> 4);
-      right += '0';
-      if ( right > '9' ) right += 'A' - '9' - 1;
-      left += '0';
-      if ( left > '9' ) left += 'A' - '9' - 1;
-      char[] escape = new char[] {'\\','u','0','0',left,right};
-      // Add previous string segment
-      escapedString += s.substring(lastStart, i);
-      // Add escape sequence
-      escapedString += new String(escape);
-      lastStart = i + 1;
+        switch(c) {
+          case '\t':
+            writer.append("\\t");
+            break;
+          case '\r':
+            writer.append("\\r");
+            break;
+          case '\n':
+            writer.append("\\n");
+            break;
+          case '\\':
+            writer.append("\\\\");
+            break;
+          case '\"':
+            writer.append("\\\"");
+            break;
+          default:
+            if(c >= ' ')
+              writer.append(c);
+            else {
+              char right = (char) (c & 0x0F);
+              char left = (char) ((c & 0xF0) >> 4);
+              right += '0';
+              if ( right > '9' ) right += 'A' - '9' - 1;
+              left += '0';
+              if ( left > '9' ) left += 'A' - '9' - 1;
+              writer.append('\\');
+              writer.append('u');
+              writer.append('0');
+              writer.append('0');
+              writer.append(left);
+              writer.append(right);
+            }
+            break;
+        }
+      }
+    } catch(IOException e) {
+      Logger logger = (Logger) getX().get("logger");
+      logger.error(e);
+      try {
+        flush();
+      } catch (IOException e1) {
+        logger.error(e1);
+      }
     }
-    if ( lastStart != s.length() ) escapedString +=
-      s.substring(lastStart, s.length());
-    return escapedString;
   }
 
   protected void outputNumber(Number value) {
