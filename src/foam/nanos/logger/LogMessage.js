@@ -26,7 +26,7 @@ foam.CLASS({
     'hostname',
     'created',
     'severity',
-    'exception'
+    'message'
   ],
 
   properties: [
@@ -120,11 +120,11 @@ foam.CLASS({
     //   name: 'flags',
     //   class: 'Map'
     // },
-    {
-      name: 'exception',
-      class: 'Object',
-      view: { class: 'foam.u2.view.PreView' },
-      updateVisibility: 'RO'
-    }
+    // {
+    //   name: 'exception',
+    //   class: 'Object',
+    //   view: { class: 'foam.u2.view.PreView' },
+    //   updateVisibility: 'RO'
+    // }
   ]
 });

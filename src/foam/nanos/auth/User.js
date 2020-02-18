@@ -368,9 +368,9 @@ foam.CLASS({
         }
       },
       createVisibility: 'RW',
-      updateVisibility: 'HIDDEN',
+      updateVisibility: 'RW',
       readVisibility: 'HIDDEN',
-      section: 'personal'
+      section: 'administrative'
     },
     {
       class: 'Password',

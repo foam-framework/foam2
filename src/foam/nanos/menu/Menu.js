@@ -95,6 +95,10 @@ foam.CLASS({
       javaFactory: `
         return foam.mlang.MLang.TRUE;
       `,
+    },
+    {
+          class: 'StringArray',
+          name: 'keywords'
     }
   ],
 

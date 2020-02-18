@@ -38,10 +38,8 @@ foam.CLASS({
   css: `
     ^ {
       white-space: nowrap;
-      margin: 0px 15px;
       inset: none;
       cursor: pointer;
-      margin-right: 0;
     }
 
     ^:hover > ^heading {
@@ -63,6 +61,9 @@ foam.CLASS({
       border-left: 4px solid rgba(0,0,0,0);
     }
 
+    ^select-level {
+      padding: 8px;
+    }
     ^selected > ^label {
       xxxborder-radius: 2px;
       xxxbackground-color: rgba(0, 48, 249, 0.1);
@@ -126,6 +127,10 @@ foam.CLASS({
     {
       class: 'Function',
       name: 'onClickAddOn'
+    },
+    {
+      class: 'Int',
+      name: 'level'
     }
   ],
 
@@ -162,6 +167,16 @@ foam.CLASS({
           var isThisItemRelatedToSearch = false;
           if ( ! updateThisRoot ) {
             self.doesThisIncludeSearch = self.query.get() ? self.data.label.toLowerCase().includes(self.query.get().toLowerCase()) : true;
+
+            if ( self.query.get() && !self.doesThisIncludeSearch && self.data.keywords ) {
+              for ( var i = 0; i < self.data.keywords.length; i++ ) {
+                if ( self.data.keywords[i].toLowerCase().includes(self.query.get().toLowerCase()) ) {
+                  self.doesThisIncludeSearch = true;
+                  break;
+                }
+              }
+            }
+
             isThisItemRelatedToSearch = self.query.get() ? ( self.doesThisIncludeSearch && ( ! hasChildren || self.data.parent !== '' ) ) || ( hasChildren && showThisRootOnSearch ) : true;
             if ( self.showRootOnSearch )
               self.showRootOnSearch.set(self.showRootOnSearch.get() || isThisItemRelatedToSearch);
@@ -182,7 +197,6 @@ foam.CLASS({
           return '';
         }, this.selection$, this.data$.dot('id'))).
         on('click', this.onClickFunctions).
-//        on('click', this.selected).
         on('dblclick', function() { self.dblclick && self.dblclick(self.data); }).
         callIf(this.draggable, function() {
           this.
@@ -195,25 +209,33 @@ foam.CLASS({
         start().
           addClass(self.myClass('heading')).
           start('span').
-            addClass(self.myClass('label')).
-            call(this.formatter, [self.data]).
-          end().
-          start('span').
-            show(this.hasChildren$).
             style({
-              'margin-right': '5px',
-              'margin-top': '2px',
-              'vertical-align': 'middle',
-              'font-weight': 'bold',
-              'display': 'inline-block',
-              'visibility': 'visible',
-              'font-size': '16px',
-              'float': 'right',
-              'transform': this.expanded$.map(function(c) { return c ? 'rotate(180deg)' : 'rotate(90deg)'; })
+              'padding-left': (( self.level * 16 ) + 'px')
             }).
-            on('click', this.toggleExpanded).
-            add('\u2303').
-            // entity('nbsp').
+            start().
+              addClass(self.myClass('select-level')).
+              style({
+                'font-weight': self.hasChildren$.map(function(c) { return c ? 'bold' : 'normal'; }),
+                'width': '100%'
+              }).
+              addClass(self.myClass('label')).
+              call(this.formatter, [self.data]).
+              start('span').
+              show(this.hasChildren$).
+              style({
+                'margin-right': '36px',
+                'vertical-align': 'middle',
+                'font-weight': 'bold',
+                'display': 'inline-block',
+                'visibility': 'visible',
+                'font-size': '16px',
+                'float': 'right',
+                'transform': this.expanded$.map(function(c) { return c ? 'rotate(180deg)' : 'rotate(90deg)'; })
+              }).
+              on('click', this.toggleExpanded).
+              add('\u2303').
+            end().
+            end().
           end().
         end().
         start().
@@ -227,7 +249,8 @@ foam.CLASS({
                 expanded: self.startExpanded,
                 showRootOnSearch: self.showThisRootOnSearch$,
                 query: controlledSearchSlot,
-                onClickAddOn: self.onClickAddOn
+                onClickAddOn: self.onClickAddOn,
+                level: self.level + 1
               }, self));
             });
           })).
@@ -377,7 +400,8 @@ foam.CLASS({
             expanded: self.startExpanded,
             formatter: self.formatter,
             query: self.query,
-            onClickAddOn: self.onClickAddOn
+            onClickAddOn: self.onClickAddOn,
+            level: 1
           }, this);
         });
     },

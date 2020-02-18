@@ -221,7 +221,11 @@ foam.CLASS({
       readPermissionRequired: true,
       writePermissionRequired: true
     },
-    // TODO: permissions, keywords, lazy, parent
+    {
+          class: 'StringArray',
+          name: 'keywords'
+    },
+    // TODO: permissions, lazy, parent
     {
       class: 'Object',
       name: 'objectJshell',

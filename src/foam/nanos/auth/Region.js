@@ -12,7 +12,10 @@ foam.CLASS({
 
   ids: ['code'],
 
-  searchColumns: [],
+  searchColumns: [
+    'code',
+    'name'
+  ],
 
   properties: [
     {
