@@ -15,13 +15,13 @@
 
   javaImports: [
     'foam.core.ContextAwareAgent',
+    'foam.core.FObject',
     'foam.core.X',
     'foam.dao.DAO',
-    'foam.core.FObject',
-    'foam.nanos.ruler.Operations',
+    'foam.nanos.approval.Approvable',
     'foam.nanos.approval.ApprovalRequest',
     'foam.nanos.approval.ApprovalStatus',
-    'foam.nanos.approval.Approvable'
+    'foam.nanos.ruler.Operations',
   ],
 
   implements: ['foam.nanos.ruler.RuleAction'],

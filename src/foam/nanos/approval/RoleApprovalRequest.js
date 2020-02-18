@@ -10,14 +10,14 @@
   extends: 'foam.nanos.approval.ApprovalRequest',
 
   javaImports : [
+    'foam.core.FObject',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.nanos.auth.*',
-    'java.util.ArrayList',
-    'foam.core.FObject',
-    'foam.nanos.ruler.Operations',
-    'java.util.List',
     'foam.nanos.logger.Logger',
+    'foam.nanos.ruler.Operations',
+    'java.util.ArrayList',
+    'java.util.List',
     'static foam.mlang.MLang.*'
   ],
 

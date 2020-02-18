@@ -8,9 +8,9 @@
   package: 'foam.nanos.approval',
   name: 'ApprovableAware',
   implements: [
+    'foam.comics.v2.userfeedback.UserFeedbackAware',
     'foam.core.ContextAware',
     'foam.nanos.auth.LifecycleAware',
-    'foam.comics.v2.userfeedback.UserFeedbackAware'
   ],
 
   methods: [

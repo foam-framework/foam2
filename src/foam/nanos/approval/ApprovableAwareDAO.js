@@ -10,38 +10,38 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
 
   javaImports: [
-    'foam.core.X',
+    'foam.comics.v2.userfeedback.UserFeedback',
+    'foam.comics.v2.userfeedback.UserFeedbackAware',
+    'foam.comics.v2.userfeedback.UserFeedbackException',
+    'foam.comics.v2.userfeedback.UserFeedbackStatus',
+    'foam.core.Detachable',
+    'foam.core.FObject',
     'foam.core.PropertyInfo',
-    'java.util.Iterator',
+    'foam.core.X',
+    'foam.dao.AbstractSink',
+    'foam.dao.ArraySink',
     'foam.dao.DAO',
-    'java.util.Map',
-    'java.util.List',
-    'java.util.Set',
+    'foam.lib.PropertyPredicate',
     'foam.mlang.MLang',
     'foam.mlang.MLang.*',
-    'foam.core.FObject',
-    'foam.dao.ArraySink',
-    'java.util.ArrayList',
-    'foam.util.SafetyUtil',
-    'foam.nanos.auth.User',
-    'foam.core.Detachable',
-    'foam.dao.AbstractSink',
-    'foam.nanos.logger.Logger',
-    'foam.lib.PropertyPredicate',
-    'foam.nanos.ruler.Operations',
-    'foam.nanos.auth.LifecycleState',
-    'foam.nanos.auth.LifecycleAware',
     'foam.mlang.predicate.Predicate',
-    'foam.nanos.approval.ApprovalStatus',
-    'foam.nanos.approval.ApprovalRequest',
-    'foam.comics.v2.userfeedback.UserFeedbackAware',
-    'foam.comics.v2.userfeedback.UserFeedback',
-    'foam.comics.v2.userfeedback.UserFeedbackStatus',
-    'foam.comics.v2.userfeedback.UserFeedbackException',
-    'foam.nanos.crunch.UCJQueryService',
     'foam.nanos.approval.Approvable',
     'foam.nanos.approval.ApprovableAware',
-    'foam.nanos.approval.RoleApprovalRequest'
+    'foam.nanos.approval.ApprovalRequest',
+    'foam.nanos.approval.ApprovalStatus',
+    'foam.nanos.approval.RoleApprovalRequest',
+    'foam.nanos.auth.LifecycleAware',
+    'foam.nanos.auth.LifecycleState',
+    'foam.nanos.auth.User',
+    'foam.nanos.crunch.UCJQueryService',
+    'foam.nanos.logger.Logger',
+    'foam.nanos.ruler.Operations',
+    'foam.util.SafetyUtil',
+    'java.util.ArrayList',
+    'java.util.Iterator',
+    'java.util.List',
+    'java.util.Map',
+    'java.util.Set',
   ],
 
   properties: [
@@ -204,19 +204,7 @@ foam.CLASS({
 
         fullSend(getX(), approvalRequest, obj);
 
-        // UserFeedbackAware feedbackAwareObj = (UserFeedbackAware) obj;
-
         // TODO: the following is a temporary fix will need to create an actual exception and pass feedback as a property
-        // in the skeleton back to the client
-
-        // UserFeedback newUserFeedback = new UserFeedback.Builder(getX())
-        //     .setStatus(UserFeedbackStatus.SUCCESS)
-        //     .setMessage("An approval request has been sent out.")
-        //     .setNext(feedbackAwareObj.getUserFeedback()).build();
-
-        // UserFeedbackException successException = new UserFeedbackException(getX())
-        //     .setUserFeedback(newUserFeedback);
-
         throw new RuntimeException("An approval request has been sent out."); // we aren't updating to deleted
       }
 
@@ -269,7 +257,6 @@ foam.CLASS({
           fullSend(getX(), approvalRequest, obj);
 
           // we are storing the object in it's related dao with a lifecycle state of PENDING
-          // TODO: Add UserFeedback to obj here
           UserFeedbackAware feedbackAwareObj = (UserFeedbackAware) obj;
 
           UserFeedback newUserFeedback = new UserFeedback.Builder(getX())

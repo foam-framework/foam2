@@ -18,10 +18,10 @@
   ],
 
   javaImports: [
-    'foam.nanos.logger.Logger',
-    'foam.core.X',
     'foam.core.FObject',
-    'foam.dao.DAO'
+    'foam.core.X',
+    'foam.dao.DAO',
+    'foam.nanos.logger.Logger'
   ],
 
   requires: [
@@ -310,7 +310,7 @@
       factory: function(o, n) {
         var key = this.daoKey;
         var X = this.ctrl.__subContext__;
-        // FIXME: This is hacky
+        // FIXME: change to a better implementation
         if ( ! X[key] ) {
           // if DAO doesn't exist in context, change daoKey from localMyDAO
           // (server-side) to myDAO (accessible on front-end)
