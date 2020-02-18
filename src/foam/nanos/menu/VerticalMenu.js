@@ -85,7 +85,8 @@ foam.CLASS({
       value: '',
       view: {
         class: 'foam.u2.view.TextField',
-        onKey: true
+        onKey: true,
+        type: 'Search'
       }
     }
   ],
