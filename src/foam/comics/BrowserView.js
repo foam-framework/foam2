@@ -72,17 +72,20 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'editEnabled',
-      documentation: 'True to enable the edit button.'
+      documentation: 'True to enable the edit button.',
+      value: true
     },
     {
       class: 'Boolean',
       name: 'selectEnabled',
+      value: true,
       documentation: 'True to enable the select button.'
     },
     {
       class: 'Boolean',
       name: 'exportEnabled',
-      documentation: 'True to enable the export button.'
+      documentation: 'True to enable the export button.',
+      value: true
     },
     {
       class: 'Boolean',
@@ -118,12 +121,13 @@ foam.CLASS({
         if ( subtitle )    config.subtitle    = subtitle;
         if ( title )       config.title       = title;
         if ( detailView )  config.detailView  = detailView;
-        config.createEnabled = createEnabled;
-        config.editEnabled   = editEnabled;
-        config.exportEnabled = exportEnabled;
+
+        config.createEnabled    = createEnabled;
+        config.editEnabled      = editEnabled;
+        config.exportEnabled    = exportEnabled;
         config.exportCSVEnabled = exportCSVEnabled;
-        config.selectEnabled = selectEnabled;
-        config.toggleEnabled = toggleEnabled;
+        config.selectEnabled    = selectEnabled;
+        config.toggleEnabled    = toggleEnabled;
 
         if ( customDAOController ) {
           var controller = this.__context__.lookup(customDAOController).create(config, this);

@@ -13,11 +13,17 @@ import foam.lib.parse.Alt;
 import foam.lib.parse.Literal;
 import foam.lib.parse.AnyChar;
 import foam.lib.parse.Seq1;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class StringParser
   implements Parser
 {
-  protected ThreadLocal<StringBuilder> builder__ = new ThreadLocal<StringBuilder>() {
+  private final static Parser instance__ = new StringParser();
+
+  public static Parser instance() { return instance__; }
+
+  protected static ThreadLocal<StringBuilder> builder__ = new ThreadLocal<StringBuilder>() {
     @Override
     protected StringBuilder initialValue() {
       return new StringBuilder();
@@ -30,21 +36,29 @@ public class StringParser
     }
   };
 
-  final Parser delimiterParser = new Alt(
-    new Literal("\"\"\""),
-    new Literal("\""),
-    new Literal("'")
+  /**
+   * Cache of already parsed Strings. Used to avoid wasting memory by
+   * generating multiple versions of the same String.
+   *
+   * TODO: move to own helper class.
+   **/
+  protected final static Map cache_ = new ConcurrentHashMap();
+
+  final static Parser delimiterParser = new Alt(
+    Literal.create("\"\"\""),
+    Literal.create("\""),
+    Literal.create("'")
   );
 
-  final char ESCAPE = '\\';
+  final static char ESCAPE = '\\';
 
   // An escape is either a Unicode code like \u001a, an ASCII escape like \n or
   // just a literal escape next character.
 
-  final Parser escapeParser = new Alt(
+  final static Parser escapeParser = new Alt(
     new UnicodeParser(),
     new ASCIIEscapeParser(),
-    new Seq1(1, new Literal(Character.toString(ESCAPE)), new AnyChar())
+    new Seq1(1, Literal.create(Character.toString(ESCAPE)), AnyChar.instance())
   );
 
   public StringParser() {
@@ -54,7 +68,7 @@ public class StringParser
     ps = ps.apply(delimiterParser, x);
     if ( ps == null ) return null;
 
-    Parser        delimiter = new Literal((String) ps.value());
+    Parser        delimiter = Literal.create((String) ps.value());
     StringBuilder sb        = builder__.get();
     PStream       result;
     boolean       escaping  = false;
@@ -91,6 +105,42 @@ public class StringParser
 
     // Internalize small strings so we don't end up with millions of distinct
     // but equivalent strings, especially the empty string.
-    return ps.setValue(sb.length() < 6 ? sb.toString().intern() : sb.toString());
+    return ps.setValue(cache(sb));
   }
+
+  public static String cache(StringBuilder sb) {
+    if ( sb.length() > 40 ) return sb.toString();
+
+    String s = sb.toString();
+    if ( s.length() < 5 ) return s.intern();
+
+    String s2 = (String) cache_.get(s);
+    if ( s2 == null ) {
+      cache_.put(s, s);
+      return s;
+    }
+
+    return s2;
+  }
+
+  /**
+   This would be better, but doesn't work because StringBuilder doesn't
+   implement equals() and hashcode() properly.
+  public String cache(StringBuilder sb) {
+//    if ( s.length() < 6 ) return s.toString().intern();
+
+    if ( sb.length() > 20 ) return sb.toString();
+
+    String s = (String) cache_.get(sb);
+
+    if ( s == null ) {
+      s = sb.toString();
+      if ( s.length < 5 ) s = s.intern();
+
+      cache_.put(new StringBuilder(sb), s);
+    }
+
+    return s;
+  }
+  */
 }

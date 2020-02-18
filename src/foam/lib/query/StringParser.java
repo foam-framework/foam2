@@ -12,7 +12,13 @@ import foam.lib.parse.PStream;
 import foam.lib.parse.Parser;
 import foam.lib.parse.ParserContext;
 
-public class StringParser implements Parser {
+public class StringParser
+  implements Parser
+{
+  private final static Parser instance__ = new StringParser();
+
+  public static Parser instance() { return instance__; }
+
   public final static char ESCAPE = '\\';
 
   public StringParser() {
@@ -36,9 +42,9 @@ public class StringParser implements Parser {
         ps=lastPs;
         break;
       }
-      
+
       if ( c == delim && lastc != ESCAPE ) break;
-      
+
       lastPs=ps;
       PStream tail = ps.tail();
 

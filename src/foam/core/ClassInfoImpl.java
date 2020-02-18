@@ -165,4 +165,8 @@ public class ClassInfoImpl
     axiomMap_.put(cls, ret);
     return ret;
   }
+
+  public String toString() {
+    return "ClassInfoImpl(" + getId() + ")";
+  }
 }

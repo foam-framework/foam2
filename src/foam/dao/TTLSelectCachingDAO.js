@@ -57,6 +57,9 @@ foam.CLASS({
     },
 
     function select_(x, sink, skip, limit, order, predicate) {
+      if ( foam.dao.AnonymousSink.isInstance(sink) )
+        return this.SUPER(x, sink, skip, limit, order, predicate);
+
       var self = this;
       var key  = [sink, skip, limit, order, predicate].toString();
 

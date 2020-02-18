@@ -38,7 +38,6 @@ foam.CLASS({
   css: `
     ^ {
       white-space: nowrap;
-      margin: 6px 20px;
       inset: none;
       cursor: pointer;
     }
@@ -54,7 +53,7 @@ foam.CLASS({
       padding: 4px;
       font-weight: 500;
       display: inline-block;
-      width: 250px;
+      font-size: 14px;
       color: /*%BLACK%*/ #1e1f21;
     }
 
@@ -62,6 +61,9 @@ foam.CLASS({
       border-left: 4px solid rgba(0,0,0,0);
     }
 
+    ^select-level {
+      padding: 8px;
+    }
     ^selected > ^label {
       xxxborder-radius: 2px;
       xxxbackground-color: rgba(0, 48, 249, 0.1);
@@ -95,28 +97,106 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'draggable',
-      documentation: 'Enable to allow drag&drop editing.',
-      value: true
+      documentation: 'Enable to allow drag&drop editing.'
     },
     {
       class: 'Boolean',
       name: 'hasChildren'
+    },
+    {
+      class: 'Boolean',
+      name: 'doesThisIncludeSearch',
+      value: false
+    },
+    'query',
+    {
+      class: 'Boolean',
+      name: 'showThisRootOnSearch'
+    },
+    {
+      class: 'Array',
+      name: 'subMenus',
+      value: []
+    },
+    'showRootOnSearch',
+    {
+      class: 'Boolean',
+      name: 'updateThisRoot',
+      value: false
+    },
+    {
+      class: 'Function',
+      name: 'onClickAddOn'
+    },
+    {
+      class: 'Int',
+      name: 'level'
     }
   ],
 
   methods: [
     function initE() {
       var self = this;
+      var controlledSearchSlot = foam.core.SimpleSlot.create();
+
+      if ( this.query ) {
+        this.query.sub(function() {
+          self.updateThisRoot = true;
+          self.showThisRootOnSearch = false;
+          controlledSearchSlot.set(self.query.get());
+          self.updateThisRoot = false;
+        });
+      }
+      
+      if ( self.showRootOnSearch )
+        self.showRootOnSearch.set(self.showRootOnSearch.get() || self.doesThisIncludeSearch);
+
+      this.data[self.relationship.forwardName].select().then(function(val){
+        if ( val.array.length > 0 )
+          self.hasChildren = true;
+        else
+          self.hasChildren = false;
+        self.subMenus = val.array;
+      });
+
       this.
         addClass(this.myClass()).
+        show(this.slot(function(hasChildren, showThisRootOnSearch, updateThisRoot) {
+          if ( ! self.query )
+            return true;
+          var isThisItemRelatedToSearch = false;
+          if ( ! updateThisRoot ) {
+            self.doesThisIncludeSearch = self.query.get() ? self.data.label.toLowerCase().includes(self.query.get().toLowerCase()) : true;
+
+            if ( self.query.get() && !self.doesThisIncludeSearch && self.data.keywords ) {
+              for ( var i = 0; i < self.data.keywords.length; i++ ) {
+                if ( self.data.keywords[i].toLowerCase().includes(self.query.get().toLowerCase()) ) {
+                  self.doesThisIncludeSearch = true;
+                  break;
+                }
+              }
+            }
+
+            isThisItemRelatedToSearch = self.query.get() ? ( self.doesThisIncludeSearch && ( ! hasChildren || self.data.parent !== '' ) ) || ( hasChildren && showThisRootOnSearch ) : true;
+            if ( self.showRootOnSearch )
+              self.showRootOnSearch.set(self.showRootOnSearch.get() || isThisItemRelatedToSearch);
+          }
+          else {
+            isThisItemRelatedToSearch = true;
+          }
+          if( ! self.query.get() )
+            self.expanded = false;
+          else if ( self.query.get() && isThisItemRelatedToSearch )
+            self.expanded = true;
+          return isThisItemRelatedToSearch;
+        })).
         addClass(this.slot(function(selected, id) {
           if ( selected && foam.util.equals(selected.id, id) ) {
             return this.myClass('selected');
           }
           return '';
         }, this.selection$, this.data$.dot('id'))).
-        on('click', this.toggleExpanded).
-//        on('click', this.selected).
+        on('click', this.onClickFunctions).
         on('dblclick', function() { self.dblclick && self.dblclick(self.data); }).
         callIf(this.draggable, function() {
           this.
@@ -129,36 +209,51 @@ foam.CLASS({
         start().
           addClass(self.myClass('heading')).
           start('span').
-            addClass(self.myClass('label')).
-            call(this.formatter, [self.data]).
-          end().
-          start('span').
-            show(this.hasChildren$).
             style({
-              'margin-right': '5px',
-              'vertical-align': 'middle',
-              'font-weight': 'bold',
-              'display': 'inline-block',
-              'visibility': 'visible',
-              'font-size': '16px',
-              'transform': this.expanded$.map(function(c) { return c ? 'rotate(180deg)' : 'rotate(90deg)' })
+              'padding-left': (( self.level * 16 ) + 'px')
             }).
-            on('click', this.toggleExpanded).
-            add('\u2303').
-            entity('nbsp').
+            start().
+              addClass(self.myClass('select-level')).
+              style({
+                'font-weight': self.hasChildren$.map(function(c) { return c ? 'bold' : 'normal'; }),
+                'width': '100%'
+              }).
+              addClass(self.myClass('label')).
+              call(this.formatter, [self.data]).
+              start('span').
+              show(this.hasChildren$).
+              style({
+                'margin-right': '36px',
+                'vertical-align': 'middle',
+                'font-weight': 'bold',
+                'display': 'inline-block',
+                'visibility': 'visible',
+                'font-size': '16px',
+                'float': 'right',
+                'transform': this.expanded$.map(function(c) { return c ? 'rotate(180deg)' : 'rotate(90deg)'; })
+              }).
+              on('click', this.toggleExpanded).
+              add('\u2303').
+            end().
+            end().
           end().
         end().
         start().
           show(this.expanded$).
-          select(this.data[self.relationship.forwardName]/*.dao*/, function(obj) {
-            self.hasChildren = true;
-            return self.cls_.create({
-              data: obj,
-              formatter: self.formatter,
-              relationship: self.relationship,
-              expanded: self.startExpanded
-            }, self);
-          }).
+          add(this.slot(function(subMenus) {
+            return this.E().forEach(subMenus/*.dao*/, function(obj) {
+              this.add(self.cls_.create({
+                data: obj,
+                formatter: self.formatter,
+                relationship: self.relationship,
+                expanded: self.startExpanded,
+                showRootOnSearch: self.showThisRootOnSearch$,
+                query: controlledSearchSlot,
+                onClickAddOn: self.onClickAddOn,
+                level: self.level + 1
+              }, self));
+            });
+          })).
         end();
     }
   ],
@@ -215,6 +310,12 @@ foam.CLASS({
       e.stopPropagation();
     },
 
+    function onClickFunctions(e) {
+      if ( this.onClickAddOn )
+        this.onClickAddOn(this.data);
+      this.toggleExpanded(e);
+    },
+
     function toggleExpanded(e) {
       this.expanded = ! this.expanded;
       this.selection = this.data;
@@ -241,6 +342,12 @@ foam.CLASS({
     'startExpanded'
   ],
 
+  css: `
+    ^ {
+      padding-top: 10px;
+    }
+  `,
+
   properties: [
     {
       class: 'foam.dao.DAOProperty',
@@ -260,20 +367,27 @@ foam.CLASS({
       class: 'Boolean',
       name: 'startExpanded',
       value: false
+    },
+    'query',
+    {
+      class: 'Function',
+      name: 'onClickAddOn'
     }
   ],
 
   methods: [
     function initE() {
-this.startExpanded = false;
+      this.startExpanded = this.startExpanded;
 
       var M   = this.ExpressionsSingleton.create();
       var of  = this.__context__.lookup(this.relationship.sourceModel);
+
       var dao = this.data$proxy.where(
         M.NOT(M.HAS(of.getAxiomByName(this.relationship.inverseName))));
 
       var self = this;
       var isFirstSet = false;
+
       this.addClass(this.myClass()).
         select(dao, function(obj) {
           if ( ! isFirstSet && ! self.selection ) {
@@ -284,7 +398,10 @@ this.startExpanded = false;
             data: obj,
             relationship: self.relationship,
             expanded: self.startExpanded,
-            formatter: self.formatter
+            formatter: self.formatter,
+            query: self.query,
+            onClickAddOn: self.onClickAddOn,
+            level: 1
           }, this);
         });
     },

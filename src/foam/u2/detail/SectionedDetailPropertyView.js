@@ -200,8 +200,7 @@ foam.CLASS({
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
     'foam.u2.ControllerMode',
-    'foam.u2.DisplayMode',
-    'foam.u2.Visibility'
+    'foam.u2.DisplayMode'
   ],
 
   properties: [
@@ -210,16 +209,8 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.core.Slot',
       name: 'visibilitySlot',
-      expression: function(prop, mode) {
-        return mode === this.DisplayMode.HIDDEN
-          ? this.ConstantSlot.create({ value: false })
-          : prop.createVisibilityFor(this.data$).map((m) => m !== this.Visibility.HIDDEN);
-      }
-    },
-    {
-      name: 'mode',
       expression: function(prop) {
-        return this.controllerMode.getMode(prop);
+        return prop.createVisibilityFor(this.data$, this.controllerMode$);
       }
     }
   ],
@@ -229,12 +220,14 @@ foam.CLASS({
       var self = this;
       this.SUPER();
 
-      if ( this.mode === this.DisplayMode.HIDDEN ) return;
+      const vis$ = this.ProxySlot.create({ delegate$: this.visibilitySlot$ });
+      this.onDetach(this.mode$.follow(vis$));
 
       this
-        .show(this.ProxySlot.create({ delegate$: this.visibilitySlot$ }))
         .addClass(this.myClass())
-        .add(this.slot(function(prop, prop$label) {
+        .add(this.slot(function(mode, prop, prop$label) {
+          if ( mode === self.DisplayMode.HIDDEN ) return null;
+
           var errorSlot = prop.validateObj && prop.validationTextVisible ?
             this.data.slot(prop.validateObj) :
             foam.core.ConstantSlot.create({ value: null });
@@ -250,8 +243,8 @@ foam.CLASS({
               .start()
                 .style({ 'position': 'relative', 'display': 'inline-flex', 'width': '100%' })
                 .start()
-                  .style({ 'flex-grow': 1 })
-                  .tag(prop, { mode$: this.mode$ })
+                  .style({ 'flex-grow': 1, 'max-width': '100%' })
+                  .tag(prop, { mode$: vis$ })
                   .callIf(prop.validationStyleEnabled, function() {
                     this.enableClass(self.myClass('error'), errorSlot);
                   })
@@ -281,7 +274,7 @@ foam.CLASS({
                   .end();
                 })
               .end()
-              .callIf(prop.validationTextVisible && self.mode === self.DisplayMode.RW, function() {
+              .callIf(prop.validationTextVisible && mode === self.DisplayMode.RW, function() {
                 this
                   .start()
                     .style({ 'align-items': 'center' })
