@@ -536,6 +536,7 @@ FOAM_FILES([
   { name: "foam/u2/crunch/CapabilityView", flags: ['web'] },
   { name: "foam/u2/crunch/CapabilityCardView", flags: ['web'] },
   { name: "foam/u2/crunch/CapabilityFeatureView", flags: ['web'] },
+  { name: "foam/u2/crunch/CapabilityStore", flags: ['web'] },
   { name: "foam/apploader/ModelRefines" },
   { name: "foam/apploader/ClassLoader" },
   { name: "foam/apploader/SubClassLoader" },
