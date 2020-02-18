@@ -23,16 +23,6 @@ foam.CLASS({
   ],
 
   css: `
-    ^ .subTitle {
-      color: #8e9090;
-      font-size: 16px;
-    }
-    ^ .divider {
-      background-color: #e2e2e3;
-      height: 2px;
-      margin: 24px 0 0 0;
-      width: 97%;
-    }
     ^ {
       max-width: 1024px;
       margin: auto;
@@ -40,30 +30,6 @@ foam.CLASS({
     }
     ^four-column-grid {
       justify-content: space-between;
-    }
-
-    .fix-alignment-to-page-title {
-      margin-left: -9px;
-      margin-right: -9px;
-    }
-
-    .fix-alignment-to-tab-bar {
-      margin-left: -9px;
-      margin-right: -15px;
-    }
-
-    h3 {
-      margin-top: 30px;
-      width: 272px;
-      height: 20px;
-      font-family: IBMPlexSans;
-      font-size: 14px;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.43;
-      letter-spacing: normal;
-      color: #5e6061;
     }
   `,
   
@@ -120,7 +86,6 @@ foam.CLASS({
             let arr = result.array;
             let grid = self.Grid.create();
             grid
-              .addClass(self.myClass('fix-alignment-to-tab-bar'))
               .addClass(self.myClass('four-column-grid'))
               ;
             for ( let i=0 ; i < arr.length ; i++ ) {
@@ -149,9 +114,6 @@ foam.CLASS({
               section.previewDAO.select().then((result) => {
                 let arr = result.array;
                 let grid = self.Grid.create();
-                grid
-                  .addClass('fix-alignment-to-tab-bar')
-                  ;
                 for ( let i=0 ; i < arr.length ; i++ ) {
                   let cap = arr[i];
                   grid = grid
@@ -173,9 +135,6 @@ foam.CLASS({
       section.fullDAO.select().then((result) => {
         let arr = result.array;
         let grid = self.Grid.create();
-        grid
-          .addClass('fix-alignment-to-tab-bar')
-          ;
         for ( let i=0 ; i < arr.length ; i++ ) {
           let cap = arr[i];
           grid = grid
