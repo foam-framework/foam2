@@ -31,11 +31,11 @@ foam.CLASS({
         // TODO: how to represent badges?
         .start()
           .addClass(self.s.myClass('card-title'))
-          .add(self.data.label)
+          .add("Label (TODO)")
         .end()
         .start()
           .addClass(self.s.myClass('card-subtitle'))
-          .add("TODO")
+          .add("Category (TODO)")
         .end()
         .start()
           .addClass(self.s.myClass('card-description'))

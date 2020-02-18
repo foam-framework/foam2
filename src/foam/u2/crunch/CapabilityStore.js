@@ -4,6 +4,8 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   requires: [
+    'foam.u2.Tab',
+    'foam.u2.Tabs',
     'foam.u2.UnstyledTabs',
     'foam.u2.crunch.CapabilityCardView',
     'foam.u2.crunch.CapabilityFeatureView',
@@ -14,6 +16,10 @@ foam.CLASS({
   imports: [
     'capabilityDAO',
     'registerElement'
+  ],
+
+  messages: [
+    { name: 'TAB_ALL', message: 'All' }
   ],
 
   css: `
@@ -33,7 +39,6 @@ foam.CLASS({
       padding: 12px 24px 24px 24px;
     }
     ^four-column-grid {
-      margin-top: 32px;
       justify-content: space-between;
     }
 
@@ -88,6 +93,26 @@ foam.CLASS({
 
       self
         .addClass(self.myClass())
+        .add(self.slot(function (capabilitySections) {
+          // TODO: When possible, reduce slot scope to exclude "All" tab
+          return this.E()
+            .start(self.Tabs)
+              .start(self.Tab, { label: this.TAB_ALL, selected: true })
+                .add(self.renderFeatured())
+              .end()
+              .forEach(capabilitySections, function (section) {
+                this
+                  .start(self.Tab, { label: section.label })
+                    .add(self.renderSection(section))
+                  .end()
+              })
+            .end()
+        }))
+        ;
+    },
+    function renderFeatured() {
+      var self = this;
+      return self.E()
         // Featured Capabilities
         .add(self.slot(function (featuredCapabilities) {
           var spot = this.E('span');
@@ -141,6 +166,27 @@ foam.CLASS({
             ;
         }))
         ;
+    },
+    function renderSection(section) {
+      var self = this;
+      var sectionElement = this.E();
+      section.fullDAO.select().then((result) => {
+        let arr = result.array;
+        let grid = self.Grid.create();
+        grid
+          .addClass('fix-alignment-to-tab-bar')
+          ;
+        for ( let i=0 ; i < arr.length ; i++ ) {
+          let cap = arr[i];
+          grid = grid
+            .start(self.GUnit, { columns: 4 })
+              .tag(self.CapabilityCardView, { data: cap })
+            .end()
+            ;
+        }
+        sectionElement.add(grid);
+      })
+      return sectionElement;
     }
   ]
 });
