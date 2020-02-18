@@ -120,13 +120,21 @@ p({
       .setOf(foam.nanos.test.Test.getOwnClassInfo())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName(\"tests\")
-      .setDecorator(new foam.nanos.script.ScriptRunnerDAO(new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.test.Test.getOwnClassInfo()).build()))
+      .setDecorator(new foam.nanos.script.ScriptRunnerDAO(new foam.dao.NullDAO(x, foam.nanos.test.Test.getOwnClassInfo())))
       .build();
   """,
   "client": "{\"of\":\"foam.nanos.test.Test\"}"
 })
 
-p({"class":"foam.nanos.boot.NSpec", "name":"pmInfoDAO",                          "serve":true,  "serviceScript":"return new foam.nanos.pm.PMInfoMDAO().orderBy(foam.mlang.MLang.DESC(foam.nanos.pm.PMInfo.TOTAL_TIME));","client":"{\"of\":\"foam.nanos.pm.PMInfo\", \"remoteListenerSupport\": false}" })
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"pmInfoDAO",
+  "serve":true,
+  "serviceScript":"""
+    return new foam.nanos.pm.PMInfoMDAO().orderBy(foam.mlang.MLang.DESC(foam.nanos.pm.PMInfo.TOTAL_TIME));
+  """,
+  "client":"{\"of\":\"foam.nanos.pm.PMInfo\", \"remoteListenerSupport\": false}"
+})
 
 p({
   "class":"foam.nanos.boot.NSpec",
