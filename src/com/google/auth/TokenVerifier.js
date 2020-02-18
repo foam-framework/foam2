@@ -18,6 +18,7 @@
 foam.INTERFACE({
   package: 'com.google.auth',
   name: 'TokenVerifier',
+
   methods: [
     {
       name: 'verify',
