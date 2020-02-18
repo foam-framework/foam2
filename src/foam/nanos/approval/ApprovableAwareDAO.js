@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'net.nanopay.liquidity.approvalRequest',
+  package: 'foam.nanos.approval',
   name: 'ApprovableAwareDAO',
   extends: 'foam.dao.ProxyDAO',
 
@@ -32,16 +32,16 @@ foam.CLASS({
     'foam.nanos.auth.LifecycleState',
     'foam.nanos.auth.LifecycleAware',
     'foam.mlang.predicate.Predicate',
-    'foam.approval.ApprovalStatus',
-    'foam.approval.ApprovalRequest',
+    'foam.nanos.approval.ApprovalStatus',
+    'foam.nanos.approval.ApprovalRequest',
     'foam.comics.v2.userfeedback.UserFeedbackAware',
     'foam.comics.v2.userfeedback.UserFeedback',
     'foam.comics.v2.userfeedback.UserFeedbackStatus',
     'foam.comics.v2.userfeedback.UserFeedbackException',
-    'foam.approval.UCJQueryService',
-    'foam.approval.Approvable',
-    'foam.approval.ApprovableAware',
-    'foam.approval.RoleApprovalRequest'
+    'foam.nanos.crunch.UCJQueryService',
+    'foam.nanos.approval.Approvable',
+    'foam.nanos.approval.ApprovableAware',
+    'foam.nanos.approval.RoleApprovalRequest'
   ],
 
   properties: [

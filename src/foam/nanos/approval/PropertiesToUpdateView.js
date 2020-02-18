@@ -5,7 +5,7 @@
  */
 
  foam.CLASS({
-  package: 'foam.approval',
+  package: 'foam.nanos.approval',
   name: 'PropertiesToUpdateView',
   extends: 'foam.u2.View',
 

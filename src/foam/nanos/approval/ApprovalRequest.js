@@ -5,7 +5,7 @@
  */
 
  foam.CLASS({
-  package: 'foam.approval',
+  package: 'foam.nanos.approval',
   name: 'ApprovalRequest',
   documentation: 'Approval requests are stored in approvalRequestDAO and' +
   'represent a single approval request for a single user.',
@@ -26,7 +26,7 @@
 
   requires: [
     'foam.dao.AbstractDAO',
-    'foam.approval.ApprovalStatus'
+    'foam.nanos.approval.ApprovalStatus'
   ],
 
   imports: [
@@ -206,11 +206,11 @@
     },
     {
       class: 'Enum',
-      of: 'foam.approval.ApprovalStatus',
+      of: 'foam.nanos.approval.ApprovalStatus',
       name: 'status',
       value: 'REQUESTED',
       section: 'requestDetails',
-      javaFactory: 'return foam.approval.ApprovalStatus.REQUESTED;',
+      javaFactory: 'return foam.nanos.approval.ApprovalStatus.REQUESTED;',
       visibility: function(status) {
         return status ?
           foam.u2.DisplayMode.RO :
@@ -331,10 +331,10 @@
           .then((obj) => {
             if (
               // if approvalRequest is rejected don't show ViewReference
-              this.status === foam.approval.ApprovalStatus.REJECTED
+              this.status === foam.nanos.approval.ApprovalStatus.REJECTED
               ||
               // if approvalRequest is for remove and has been either approved/rejected
-              (this.status === foam.approval.ApprovalStatus.APPROVED
+              (this.status === foam.nanos.approval.ApprovalStatus.APPROVED
                 &&
               this.operation === foam.nanos.ruler.Operations.REMOVE)
             ) {
@@ -411,7 +411,7 @@ if ( obj == null ) {
         if ( obj.propertiesToUpdate ) {
           // then here we created custom view to display these properties
           X.stack.push({
-            class: 'foam.approval.PropertiesToUpdateView',
+            class: 'foam.nanos.approval.PropertiesToUpdateView',
             propObject: obj.propertiesToUpdate,
             objId: obj.objId,
             daoKey: obj.daoKey,

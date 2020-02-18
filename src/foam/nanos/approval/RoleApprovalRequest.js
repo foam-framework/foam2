@@ -5,9 +5,9 @@
  */
 
  foam.CLASS({
-  package: 'foam.approval',
+  package: 'foam.nanos.approval',
   name: 'RoleApprovalRequest',
-  extends: 'foam.approval.ApprovalRequest',
+  extends: 'foam.nanos.approval.ApprovalRequest',
 
   javaImports : [
     'foam.dao.ArraySink',
@@ -51,8 +51,8 @@
       label: 'Pending',
       predicateFactory: function(e) {
         return e.EQ(
-          foam.approval.ApprovalRequest.STATUS,
-          foam.approval.ApprovalStatus.REQUESTED
+          foam.nanos.approval.ApprovalRequest.STATUS,
+          foam.nanos.approval.ApprovalStatus.REQUESTED
         );
       }
     },
@@ -61,8 +61,8 @@
       label: 'Approved',
       predicateFactory: function(e) {
         return  e.EQ(
-          foam.approval.ApprovalRequest.STATUS,
-          foam.approval.ApprovalStatus.APPROVED
+          foam.nanos.approval.ApprovalRequest.STATUS,
+          foam.nanos.approval.ApprovalStatus.APPROVED
         );
       }
     },
@@ -71,8 +71,8 @@
       label: 'Rejected',
       predicateFactory: function(e) {
         return  e.EQ(
-          foam.approval.ApprovalRequest.STATUS,
-          foam.approval.ApprovalStatus.REJECTED
+          foam.nanos.approval.ApprovalRequest.STATUS,
+          foam.nanos.approval.ApprovalStatus.REJECTED
         );
       }
     },
@@ -99,7 +99,7 @@
       section: 'requestDetails',
       documentation: `The user that is requested for approval. When set, "group" property is ignored.`,
       view: function(_, X) {
-        if ( X.data.status === foam.approval.ApprovalStatus.REQUESTED ) {
+        if ( X.data.status === foam.nanos.approval.ApprovalStatus.REQUESTED ) {
           return {
             class: 'foam.u2.view.ValueView',
             data$: X.data$.map((data) => data.APPROVER_PENDING)
@@ -112,7 +112,7 @@
         let self = this;
         // If request is REQUESTED, show as Pending
         // Otherwise, show approver's name
-        if ( data.status === foam.approval.ApprovalStatus.REQUESTED ) {
+        if ( data.status === foam.nanos.approval.ApprovalStatus.REQUESTED ) {
           this.add(data.APPROVER_PENDING);
         } else {
           this.__subSubContext__.userDAO.find(approver).then(user => {
@@ -121,7 +121,7 @@
         }
       },
       visibility: function(status) {
-        if ( status === foam.approval.ApprovalStatus.REQUESTED ) {
+        if ( status === foam.nanos.approval.ApprovalStatus.REQUESTED ) {
           return foam.u2.DisplayMode.HIDDEN;
         }
 
@@ -136,7 +136,7 @@
       transient: true,
       value: 'Pending',
       visibility: function(status) {
-        if ( status === foam.approval.ApprovalStatus.REQUESTED ) {
+        if ( status === foam.nanos.approval.ApprovalStatus.REQUESTED ) {
           return foam.u2.DisplayMode.RO;
         }
         return foam.u2.DisplayMode.HIDDEN;
@@ -238,8 +238,8 @@
       section: 'requestDetails',
       isAvailable: (initiatingUser, user, status) => {
         if (
-          status === foam.approval.ApprovalStatus.REJECTED ||
-          status === foam.approval.ApprovalStatus.APPROVED
+          status === foam.nanos.approval.ApprovalStatus.REJECTED ||
+          status === foam.nanos.approval.ApprovalStatus.APPROVED
         ) {
           return false;
         }
@@ -273,8 +273,8 @@
       section: 'requestDetails',
       isAvailable: (initiatingUser, user, status) => {
         if (
-            status === foam.approval.ApprovalStatus.REJECTED ||
-            status === foam.approval.ApprovalStatus.APPROVED
+            status === foam.nanos.approval.ApprovalStatus.REJECTED ||
+            status === foam.nanos.approval.ApprovalStatus.APPROVED
           ) {
          return false;
         }

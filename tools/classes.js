@@ -539,16 +539,16 @@ var classes = [
   'foam.util.concurrent.Assembly',
 
   // approval
-  'foam.approval.ApprovalRequest',
-  'foam.approval.ApprovalStatus',
-  'foam.approval.Approvable',
-  'foam.approval.ApprovableAwareDAO',
-  'foam.approval.ApprovableAware',
-  'foam.approval.ApprovableApprovalRequestsPredicate',
-  'foam.approval.ApprovableApprovalRequestsRule',
-  'foam.approval.FulfilledApprovablePredicate',
-  'foam.approval.FulfilledApprovableRule',
-  'foam.approval.RoleApprovalRequest',
+  'foam.nanos.approval.ApprovalRequest',
+  'foam.nanos.approval.ApprovalStatus',
+  'foam.nanos.approval.Approvable',
+  'foam.nanos.approval.ApprovableAwareDAO',
+  'foam.nanos.approval.ApprovableAware',
+  'foam.nanos.approval.ApprovableApprovalRequestsPredicate',
+  'foam.nanos.approval.ApprovableApprovalRequestsRule',
+  'foam.nanos.approval.FulfilledApprovablePredicate',
+  'foam.nanos.approval.FulfilledApprovableRule',
+  'foam.nanos.approval.RoleApprovalRequest',
 ];
 
 var abstractClasses = [

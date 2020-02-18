@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.approval',
+  package: 'foam.nanos.approval',
   name: 'Approvable',
 
   properties: [
@@ -36,7 +36,7 @@ foam.CLASS({
     },
     {
       class: 'Enum',
-      of: 'foam.approval.ApprovalStatus',
+      of: 'foam.nanos.approval.ApprovalStatus',
       name: 'status'
     }
   ],

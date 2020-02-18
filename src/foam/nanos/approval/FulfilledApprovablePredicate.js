@@ -5,7 +5,7 @@
  */
 
  foam.CLASS({
-  package: 'foam.approval',
+  package: 'foam.nanos.approval',
   name: 'FulfilledApprovablePredicate',
 
   documentation: 'Returns true if from the approvableDAO and the Approvable is APPROVED',
@@ -14,8 +14,8 @@
   implements: ['foam.core.Serializable'],
 
   javaImports: [
-    'foam.approval.ApprovalStatus',
-    'foam.approval.Approvable',
+    'foam.nanos.approval.ApprovalStatus',
+    'foam.nanos.approval.Approvable',
     'static foam.mlang.MLang.*',
   ],
 

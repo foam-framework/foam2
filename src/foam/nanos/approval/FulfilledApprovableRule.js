@@ -5,7 +5,7 @@
  */
 
  foam.CLASS({
-  package: 'foam.approval',
+  package: 'foam.nanos.approval',
   name: 'FulfilledApprovableRule',
 
   documentation: `
@@ -20,10 +20,10 @@
     'foam.core.FObject',
     'java.util.Map',
     'foam.nanos.ruler.Operations',
-    'foam.approval.ApprovalRequest',
-    'foam.approval.ApprovalStatus',
-    'foam.approval.Approvable',
-    'foam.approval.RoleApprovalRequest'
+    'foam.nanos.approval.ApprovalRequest',
+    'foam.nanos.approval.ApprovalStatus',
+    'foam.nanos.approval.Approvable',
+    'foam.nanos.approval.RoleApprovalRequest'
   ],
 
   implements: ['foam.nanos.ruler.RuleAction'],

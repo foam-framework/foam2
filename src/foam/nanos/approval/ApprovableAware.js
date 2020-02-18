@@ -5,7 +5,7 @@
  */
 
  foam.INTERFACE({
-  package: 'foam.approval',
+  package: 'foam.nanos.approval',
   name: 'ApprovableAware',
   implements: [
     'foam.core.ContextAware',

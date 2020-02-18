@@ -5,7 +5,7 @@
  */
 
  foam.ENUM({
-  package: 'foam.approval',
+  package: 'foam.nanos.approval',
   name: 'ApprovalStatus',
 
   values: [

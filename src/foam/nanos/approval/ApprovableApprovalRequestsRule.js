@@ -5,7 +5,7 @@
  */
 
  foam.CLASS({
-  package: 'foam.approval',
+  package: 'foam.nanos.approval',
   name: 'ApprovableApprovalRequestsRule',
 
   documentation: `
@@ -19,9 +19,9 @@
     'foam.dao.DAO',
     'foam.core.FObject',
     'foam.nanos.ruler.Operations',
-    'foam.approval.ApprovalRequest',
-    'foam.approval.ApprovalStatus',
-    'foam.approval.Approvable'
+    'foam.nanos.approval.ApprovalRequest',
+    'foam.nanos.approval.ApprovalStatus',
+    'foam.nanos.approval.Approvable'
   ],
 
   implements: ['foam.nanos.ruler.RuleAction'],

@@ -5,7 +5,7 @@
  */
 
  foam.CLASS({
-  package: 'foam.approval',
+  package: 'foam.nanos.approval',
   name: 'ApprovableApprovalRequestsPredicate',
 
   documentation: `
@@ -17,8 +17,8 @@
   implements: ['foam.core.Serializable'],
 
   javaImports: [
-    'foam.approval.ApprovalRequest',
-    'foam.approval.ApprovalStatus',
+    'foam.nanos.approval.ApprovalRequest',
+    'foam.nanos.approval.ApprovalStatus',
     'static foam.mlang.MLang.*',
   ],
 
