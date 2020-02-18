@@ -878,3 +878,26 @@ p({
   """,
   "client": "{\"of\":\"foam.nanos.approval.ApprovalRequest\"}"
 })
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "userQueryService",
+  "serve": true,
+  "serviceClass": "net.nanopay.liquidity.ucjQuery.SimpleUserQueryService",
+  "boxClass": "net.nanopay.liquidity.ucjQuery.UserQueryServiceSkeleton",
+  "client":
+  """
+    {
+      "class":"net.nanopay.liquidity.ucjQuery.ClientUserQueryService",
+      "delegate": { 
+        "class":"foam.box.SessionClientBox",
+        "delegate": {
+          "class":"foam.box.HTTPBox",
+          "url":
+          "service/userQueryService"
+        }
+      }
+    }
+  """
+})
+

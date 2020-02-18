@@ -11,6 +11,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'getAllApprovers',
+      async: true,
       type: 'List',
       args: [
         {
@@ -20,6 +21,10 @@ foam.INTERFACE({
         {
           name: 'modelToApprove',
           type: 'String'
+        },
+        {
+          name: 'requestingUser',
+          type: 'foam.nanos.auth.User'
         }
       ]
     },

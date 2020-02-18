@@ -33,7 +33,7 @@ foam.CLASS({
     'foam.nanos.auth.LifecycleAware',
     'foam.nanos.auth.LifecycleState',
     'foam.nanos.auth.User',
-    'foam.nanos.crunch.UCJQueryService',
+    'foam.nanos.auth.UserQueryService',
     'foam.nanos.logger.Logger',
     'foam.nanos.ruler.Operations',
     'foam.util.SafetyUtil',
@@ -100,9 +100,11 @@ foam.CLASS({
 
       String modelName = requestingDAO.getOf().getObjClass().getSimpleName();
 
-      UCJQueryService ucjQueryService = (UCJQueryService) x.get("ucjQueryService");
+      UserQueryService userQueryService = (UserQueryService) x.get("userQueryService");
 
-      List<Long> approverIds = ucjQueryService.getAllApprovers(getX(), modelName);
+      User currentUser = (User) x.get("user");
+
+      List<Long> approverIds = userQueryService.getAllApprovers(getX(), modelName, currentUser);
 
       if ( approverIds.size() <= 0 ) {
         logger.error("No Approvers exist for the model: " + modelName);

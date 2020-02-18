@@ -523,8 +523,9 @@ var classes = [
   'foam.nanos.crunch.RemoveJunctionsOnUserRemoval',
   //authservice
   'foam.nanos.auth.CapabilityAuthService',
-  // ucjQueryService
-  'foam.nanos.crunch.UCJQueryService',
+  // userQueryService
+  'foam.nanos.auth.UserQueryService',
+  'foam.nanos.auth.SimpleUserQueryService',
   //Unit
   'foam.core.Unit',
   'foam.core.Currency',
@@ -572,7 +573,7 @@ var skeletons = [
   'foam.nanos.session.SessionService',
   'foam.nanos.test.EchoService',
   'foam.strategy.StrategizerService',
-  'foam.nanos.crunch.UCJQueryService',
+  'foam.nanos.auth.UserQueryService',
 ];
 
 var proxies = [
