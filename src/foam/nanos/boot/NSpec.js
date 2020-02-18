@@ -15,16 +15,50 @@ foam.CLASS({
     {
       path: 'foam.comics.BrowserView',
       flags: ['web']
-    }
+    },
+    'foam.nanos.script.Language'
+    ],
+
+    constants: [
+      {
+        javaType: 'Object[]',
+        name: 'X_HOLDER',
+        javaValue: 'new X[1]'
+      },
+      {
+        javaType: 'Object[]',
+        name: 'OBJECT_HOLDER',
+        javaValue: 'new Object[1]',
+        final: true
+      }
   ],
 
   javaImports: [
+    'java.io.BufferedReader',
+    'java.io.IOException',
+    'java.io.PrintStream',
+    'java.io.StringReader',
+    'java.util.ArrayList',
+    'java.util.List',
+    'java.util.Map',
+
     'bsh.EvalError',
     'bsh.Interpreter',
+    'foam.core.X',
+    'foam.nanos.auth.AuthService',
+    'foam.nanos.auth.AuthorizationException',
+    'foam.nanos.script.Language',
+    'jdk.jshell.JShell',
+    'jdk.jshell.SnippetEvent',
+    'jdk.jshell.execution.DirectExecutionControl',
+    'jdk.jshell.spi.ExecutionControl',
+    'jdk.jshell.spi.ExecutionControlProvider',
+    'jdk.jshell.spi.ExecutionEnv',
+
     'foam.dao.DAO',
     'foam.core.FObject',
-    'foam.nanos.auth.AuthorizationException',
-    'foam.nanos.auth.AuthService'
+    'foam.nanos.script.jShell.EvalInstruction',
+    'foam.nanos.script.jShell.InstructionPresentation',
   ],
 
   ids: [ 'name' ],
@@ -137,6 +171,17 @@ foam.CLASS({
       writePermissionRequired: true
     },
     {
+      class: 'Enum',
+      of: 'foam.nanos.script.Language',
+      name: 'language',
+      factory: function() {
+        return this.Language.BEANSHELL;
+      },
+      javaValue: 'foam.nanos.script.Language.BEANSHELL',
+      readPermissionRequired: true,
+      writePermissionRequired: true
+    },
+    {
       class: 'Code',
       name: 'serviceScript',
       readPermissionRequired: true,
@@ -175,8 +220,15 @@ foam.CLASS({
       value: true,
       readPermissionRequired: true,
       writePermissionRequired: true
-    }
+    },
     // TODO: permissions, keywords, lazy, parent
+    {
+      class: 'Object',
+      name: 'objectJshell',
+      static: true,
+      readPermissionRequired: true,
+      writePermissionRequired: true
+    }
   ],
 
   methods: [
@@ -200,7 +252,8 @@ foam.CLASS({
     {
       name: 'createService',
       args: [
-        { name: 'x', type: 'Context' }
+        { name: 'x', type: 'Context' },
+        { name: 'ps', type: 'PrintStream' }
       ],
       javaType: 'java.lang.Object',
       javaCode: `
@@ -213,28 +266,69 @@ foam.CLASS({
           return service;
         }
 
-        Interpreter shell = new Interpreter();
-        try {
-          shell.set("x", x);
-          Object service = shell.eval(getServiceScript());
-          saveService(x, service);
-          return service;
-        } catch (EvalError e) {
-          foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
-          if ( logger != null ) {
-            logger.error("NSpec serviceScript error", getServiceScript(), e);
-          } else {
-            System.err.println("NSpec serviceScript error: " + getServiceScript());
-            e.printStackTrace();
+        Language l = getLanguage();
+        if ( l == foam.nanos.script.Language.JSHELL ) {
+          JShell jShell = JShell
+            .builder()
+            .out(ps)
+            .executionEngine(new ExecutionControlProvider() {
+              @Override
+              public String name() {
+                return "direct";
+              }
+
+              @Override
+              public ExecutionControl generate(ExecutionEnv ee, Map<String, String> map) throws Throwable {
+                return new DirectExecutionControl();
+              }
+            }, null)
+            .build();
+
+          foam.nanos.script.Script.X_HOLDER[0] = x;
+          String init = "import foam.core.X; import foam.nanos.boot.NSpec; X x = foam.nanos.script.Script.X_HOLDER[0]; ";
+
+          BufferedReader rdr = new BufferedReader(new StringReader(init+getServiceScript()));
+          List<String> l1 = new ArrayList<String>();
+
+          for ( String line = rdr.readLine(); line != null; line = rdr.readLine() ) {
+            l1.add(line);
           }
-        }
+
+          List<String> instructionList = new InstructionPresentation(jShell).parseToInstruction(l1);
+          EvalInstruction console = new EvalInstruction(jShell, instructionList, x);
+          String print = null;
+          print = console.runEvalInstruction();
+//        saveService(x, service)//TODO delete this method.
+          jShell.eval("foam.nanos.boot.NSpec.OBJECT_HOLDER[0] = service;");
+          return  OBJECT_HOLDER[0];
+        } else { //if ( l == foam.nanos.script.Language.BEANSHELL ) {
+            Interpreter shell = new Interpreter();
+            try {
+              shell.set("x", x);
+              Object service = shell.eval(getServiceScript());
+              saveService(x, service);
+              return service;
+            } catch (EvalError e) {
+              foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
+              if ( logger != null ) {
+                logger.error("NSpec serviceScript error", getServiceScript(), e);
+              } else {
+                System.err.println("NSpec serviceScript error: " + getServiceScript());
+                e.printStackTrace();
+              }
+            }
+          }
 
         return null;
       `,
       javaThrows: [
         'java.lang.ClassNotFoundException',
         'java.lang.InstantiationException',
-        'java.lang.IllegalAccessException'
+        'java.lang.IllegalAccessException',
+        'SecurityException',
+        'NoSuchFieldException',
+        'IOException',
+        'Exception'
       ],
     },
     {
