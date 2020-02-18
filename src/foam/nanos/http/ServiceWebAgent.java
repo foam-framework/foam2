@@ -6,6 +6,7 @@
 
 package foam.nanos.http;
 
+import foam.nanos.app.Mode;
 import foam.box.Box;
 import foam.box.SessionServerBox;
 import foam.core.FObject;
@@ -14,6 +15,8 @@ import foam.core.X;
 import foam.lib.json.ExprParser;
 import foam.lib.json.JSONParser;
 import foam.lib.parse.*;
+import foam.nanos.app.AppConfig;
+import foam.nanos.jetty.HttpServer;
 import foam.nanos.jetty.HttpServer;
 import foam.nanos.logger.Logger;
 import foam.nanos.servlet.VirtualHostRoutingServlet;
@@ -22,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
+import java.net.URL;
 
 @SuppressWarnings("serial")
 public class ServiceWebAgent
@@ -79,10 +83,13 @@ public class ServiceWebAgent
       Logger              logger         = (Logger) x.get("logger");
       HttpServer          http           = (HttpServer) x.get("http");
 
-      ((VirtualHostRoutingServlet) http.getServletMappings()[0].getServletObject()).getHostMapping().forEach((k,v) -> {
-        if ( req.getHeader("Origin").equals(String.format("http://%s:%d", k, http.getPort())) )
+      if ( ((AppConfig) x.get("appConfig")).getMode() != Mode.PRODUCTION ) {
+        resp.setHeader("Access-Control-Allow-Origin", "*");
+      } else if ( ! req.getHeader("Origin").equals("null") ){
+        URL url = new URL(req.getHeader("Origin"));
+        if ( ((VirtualHostRoutingServlet) http.getServletMappings()[0].getServletObject()).getHostMapping().containsKey(url.getHost()) )
           resp.setHeader("Access-Control-Allow-Origin", req.getHeader("Origin"));
-      });
+      }
 
       int read = 0;
       int count = 0;
