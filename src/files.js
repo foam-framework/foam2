@@ -750,18 +750,6 @@ FOAM_FILES([
   { name: "foam/util/concurrent/AbstractAssembly"},
   { name: "foam/util/concurrent/Assembly"},
 
-  // Approval
-  { name: 'foam/nanos/approval/ApprovalRequest' },
-  { name: 'foam/nanos/approval/ApprovalStatus' },
-  { name: 'foam/nanos/approval/ApprovableAware'},
-  { name: 'foam/nanos/approval/PropertiesToUpdateView', flags: ['web'] },
-  { name: 'foam/nanos/approval/Approvable' },
-  { name: 'foam/nanos/approval/ApprovableAwareDAO' },
-  { name: 'foam/nanos/approval/ApprovableApprovalRequestsPredicate' },
-  { name: 'foam/nanos/approval/ApprovableApprovalRequestsRule' },
-  { name: 'foam/nanos/approval/RoleApprovalRequest' },
-  { name: 'foam/nanos/approval/FulfilledApprovablePredicate' },
-  { name: 'foam/nanos/approval/FulfilledApprovableRule' },
   // Foamlink
   { name: "foam/foamlink/FoamlinkData" },
   { name: "foam/foamlink/FoamlinkExec" },
