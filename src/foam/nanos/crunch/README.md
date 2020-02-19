@@ -66,9 +66,9 @@ Overrides the `checkUser` method: Given a permission `p`, and User `u`,
 3. Find the non-EXPIRED UserCapabilityJunctions where `User == u`, for each UCJ, check if the Capability is non-DEPRECATED and implies `p`
     - `implies` is a method on the Capability model. A Capability `c` implies a String `p` if :
         - `c` has a prerequisite Capability which implies `p`
-        - `p` is in the set of `permissionsGranted` by `c`, or implied by the set of `permissionsGranted` by `c`^*.
-        - the name of `c` implies `p`^* 
-        - ^*e.g., `obj.*` implies `obj.read`
+        - `p` is in the set of `permissionsGranted` by `c`, or implied by the set of `permissionsGranted` by `c`*.
+        - the name of `c` implies `p`* 
+        - *e.g., `obj.*` implies `obj.read`
 
 A notable difference between this decorator and other AuthService decorators is that if at any point, the result of the check is found to be true, `true` is returned instead of moving on to the next decorators in the AuthService chain. And if at any point, the result of the check is found to be false, the check moves on to return the result of its delegate
 
