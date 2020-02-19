@@ -13,7 +13,6 @@ import foam.core.PropertyInfo;
 import foam.dao.AbstractSink;
 import foam.lib.PermissionedPropertyPredicate;
 import foam.lib.PropertyPredicate;
-import foam.nanos.logger.Logger;
 import foam.util.SafetyUtil;
 import java.io.*;
 import java.lang.reflect.Array;
