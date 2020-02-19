@@ -138,9 +138,17 @@ foam.CLASS({
     },
     {
       class: 'FObjectProperty',
-      of: 'foam.comics.v2.CRUDActionsAuth',
-      name: 'CRUDActionsAuth'
+      of: 'foam.comics.v2.CRUDActionsPredicate',
+      name: 'CRUDPermission',
+      factory: function() {
+        return foam.comics.v2.CRUDActionsPredicate.create();
+      }
     },
+    // {
+    //   class: 'FObjectProperty',
+    //   of: 'foam.comics.v2.CRUDActionsAuth',
+    //   name: 'CRUDActionsAuth'
+    // },
     {
       of: 'foam.mlang.predicate.Predicate',
       name: 'filterExportPredicate',
