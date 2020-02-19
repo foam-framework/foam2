@@ -55,9 +55,9 @@ The UserCapabilityJunctionDAO decorator :
 
 #### CapabilityJunctionStatus
 Includes : 
-    - PENDING
-    - GRANTED
-    - EXPIRED
+- PENDING
+- GRANTED
+- EXPIRED
 
 #### CapabilityAuthService
 Overrides the `checkUser` method: Given a permission `p`, and User `u`,
