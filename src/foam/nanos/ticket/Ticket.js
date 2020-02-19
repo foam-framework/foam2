@@ -55,15 +55,11 @@ foam.CLASS({
       title: 'Audit',
     },
     {
-      name: 'commentSection',
-      isAvailable: function(id) {
-        return id != 0;
-      },
-      title: 'Comments',
-    },
-    {
+      // NOTE: if a section is name: commentSection
+      // then navigating to a comment detail view
+      // does not work.
       name: '_defaultSection',
-      permissionRequired: true
+      title: 'Comments'
     },
   ],
 
