@@ -11,7 +11,6 @@ For more information on CRUNCH as a solution to the onboarding problem, and some
 
 #### Capability
 Capability is the core model of CRUNCH, and describes a task that the user can perform, or a permission they are granted. 
-In the liquid use case, they denote a set of actions that a user may or may not perform on an object. For more detail, please visit the README under `liquid/crunch/`
 
 Some important properties on the Capability model are: 
 - `id` - A descriptive String id, which will soon be migrated to a Long id (TODO ruby) 
@@ -33,7 +32,7 @@ Below are some properties that may be useful in the onboarding use case of crunc
 
 ##### Capability - (Deprecated) Capability
 - stored in the `deprecatedCapabilityJunctionDAO`
-- If a Capability has been deprecated by another Capability, it is essentially no longer enabled, and ignored by the system
+- If a Capability has been deprecated by another Capability, the existing UCJs with the Capability are still valid, but the Capability is no longer a valid selection for new UCJs.
 
 ##### User - Capability 
 - stored in the `userCapabilityJunctionDAO`
@@ -61,9 +60,9 @@ Includes :
 
 #### CapabilityAuthService
 Overrides the `checkUser` method: Given a permission `p`, and User `u`,
-1. Check whether `p` is the name of an enabled and non-deprecated Capability
+1. Check whether `p` is the name of an enabled Capability
 2. Try to find a GRANTED and non-EXPIRED UserCapabilityJunction such that `User == u && Capability == p`. If found, return true
-3. Find the non-EXPIRED UserCapabilityJunctions where `User == u`, for each UCJ, check if the Capability is non-DEPRECATED and implies `p`
+3. Find the non-EXPIRED UserCapabilityJunctions where `User == u`, for each UCJ, check if the Capability implies `p`
     - `implies` is a method on the Capability model. A Capability `c` implies a String `p` if :
         - `c` has a prerequisite Capability which implies `p`
         - `p` is in the set of `permissionsGranted` by `c`, or implied by the set of `permissionsGranted` by `c`*.
