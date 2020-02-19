@@ -378,6 +378,11 @@
       ],
       javaCode: `
       return rule;`
+    },
+    {
+      name: 'toSummary',
+      type: 'String',
+      code: () => { return this.name || this.id; }
     }
   ],
 
