@@ -192,6 +192,10 @@ foam.CLASS({
     ^ .foam-u2-view-RadioView label {
       margin-left: 12px;
     }
+
+    ^ input {
+      margin-right: 6px;
+    }
   `,
 
   requires: [
@@ -225,7 +229,7 @@ foam.CLASS({
 
       this
         .addClass(this.myClass())
-        .add(this.slot(function(mode, prop, prop$label) {
+        .add(this.slot(function(mode, prop, prop$label, prop$label2) {
           if ( mode === self.DisplayMode.HIDDEN ) return null;
 
           var errorSlot = prop.validateObj && prop.validationTextVisible ?
@@ -245,6 +249,9 @@ foam.CLASS({
                 .start()
                   .style({ 'flex-grow': 1, 'max-width': '100%' })
                   .tag(prop, { mode$: vis$ })
+                  .callIf(prop$label2, function() {
+                    this.add(prop$label2)
+                  })
                   .callIf(prop.validationStyleEnabled, function() {
                     this.enableClass(self.myClass('error'), errorSlot);
                   })
@@ -274,7 +281,7 @@ foam.CLASS({
                   .end();
                 })
               .end()
-              .callIf(prop.validationTextVisible && mode === self.DisplayMode.RW, function() {
+              .callIf(prop.validationTextVisible && ( mode === self.DisplayMode.RW || mode === self.DisplayMode.RO ) , function() {
                 this
                   .start()
                     .style({ 'align-items': 'center' })
