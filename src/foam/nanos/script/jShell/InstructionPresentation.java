@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 package foam.nanos.script.jShell;
@@ -11,6 +11,10 @@ import java.util.List;
 import jdk.jshell.JShell;
 import jdk.jshell.SourceCodeAnalysis;
 
+/**
+ * Parse the code and return a list of instruction
+ *
+ */
 public class InstructionPresentation {
   public JShell jShell;
   List<String>  listInstruction = new LinkedList<String>();

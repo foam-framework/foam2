@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 package foam.nanos.script.jShell;
@@ -15,6 +15,10 @@ import foam.util.SafetyUtil;
 import foam.nanos.logger.Logger;
 import jdk.jshell.JShell;
 
+/**
+ * Parse the code from a file and return a list of instruction
+ *
+ */
 public class ReadLineByLine {
   protected List<String> lineScripts;
   public JShell          jShell;
@@ -25,11 +29,11 @@ public class ReadLineByLine {
     this.lineScripts = new LinkedList<>();
     this.jShell = jShell;
   }
-  
+
   public List<String> ReadByLine(String initialScript, X x) {
     try {
       BufferedReader br = new BufferedReader(new FileReader(initialScript));
-      for ( String scriptLine; ( scriptLine = br.readLine() ) != null; ) {
+      for ( String scriptLine ; ( scriptLine = br.readLine() ) != null ; ) {
         if ( SafetyUtil.isEmpty(scriptLine.trim()) ) continue;
         this.lineScripts.add(scriptLine);
       }
