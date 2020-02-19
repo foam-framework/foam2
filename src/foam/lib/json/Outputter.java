@@ -101,67 +101,20 @@ public class Outputter
     if ( multiLineOutput_ && s.indexOf('\n') >= 0 ) {
       writer_.append("\n");
       writer_.append("\"\"\"");
-      escape(s, writer_);
+      writer_.append(escape(s));
       writer_.append("\"\"\"");
     }
     else {
       writer_.append("\"");
-      escape(s, writer_);
+      writer_.append(escape(s));
       writer_.append("\"");
     }
   }
 
-  public void escape(String s, Writer writer) {
-    try {
-      char c;
-      for ( int i = 0; i < s.length(); i++ ) {
-        c = s.charAt(i);
-
-        switch(c) {
-          case '\t':
-            writer.append("\\t");
-            break;
-          case '\r':
-            writer.append("\\r");
-            break;
-          case '\n':
-            writer.append("\\n");
-            break;
-          case '\\':
-            writer.append("\\\\");
-            break;
-          case '\"':
-            writer.append("\\\"");
-            break;
-          default:
-            if(c >= ' ')
-              writer.append(c);
-            else {
-              char right = (char) (c & 0x0F);
-              char left = (char) ((c & 0xF0) >> 4);
-              right += '0';
-              if ( right > '9' ) right += 'A' - '9' - 1;
-              left += '0';
-              if ( left > '9' ) left += 'A' - '9' - 1;
-              writer.append('\\');
-              writer.append('u');
-              writer.append('0');
-              writer.append('0');
-              writer.append(left);
-              writer.append(right);
-            }
-            break;
-        }
-      }
-    } catch(IOException e) {
-      Logger logger = (Logger) getX().get("logger");
-      logger.error(e);
-      try {
-        flush();
-      } catch (IOException e1) {
-        logger.error(e1);
-      }
-    }
+  public String escape(String s) {
+    StringBuilder sb = new StringBuilder();
+    Util.escape(s, sb);
+    return sb.toString();
   }
 
   protected void outputNumber(Number value) {
