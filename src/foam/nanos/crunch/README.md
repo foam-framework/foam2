@@ -2,14 +2,14 @@
 
 &nbsp;
 
-## CRUNCH - Continuous Reactive User Nano-Capability Hierarchy
+### CRUNCH - Continuous Reactive User Nano-Capability Hierarchy
 
 CRUNCH is a [Knowledge-Based Configuration System](https://en.wikipedia.org/wiki/Knowledge-based_configuration) that configures a user's account with various capabilities based upon the features and functionalities.
 Using CRUNCH we model all the potential capabilities of a user along with various compliance, onboarding, security, and approval requirements of those capabilities. Those models form a knowledge-graph which allows CRUNCH to query for set of capabilities and receive sets of onboarding requirements.
 CRUNCH uses this knowledge graph to dynamically generate onboarding wizards for the particular configuration or set of capabilities that a user has requested, as well as dynamically add capabilities to a user's account at run-time and provide a gradual onboarding experience.
 For more information on CRUNCH as a solution to the onboarding problem, and some concrete use cases of CRUNCH, please visit the [CRUNCH wiki](https://github.com/nanoPayinc/NANOPAY/wiki/CRUNCH)
 
-## Capability
+#### Capability
 Capability is the core model of CRUNCH, and describes a task that the user can perform, or a permission they are granted. 
 In the liquid use case, they denote a set of actions that a user may or may not perform on an object. For more detail, please visit the README under `liquid/crunch/`
 
@@ -25,6 +25,43 @@ Below are some properties that may be useful in the onboarding use case of crunc
 - `expiry` - A DateTime denoting when this Capability will expire, this property is mutually exclusive with `duration`.
 - `duration`- An int value representing the number of days for which this Capability will the valid, once GRANTED to a user.
 
+#### Relationships Between Capabilities and Other Entities
+
+##### Capability - (Prerequisite) Capability
+- Stored in the `prerequisiteCapabilityJunctionDAO`
+- If a Capability has a prerequisite Capability, the user must be GRANTED the prerequisite Capability before being eligible to apply for the Capability
+
+##### Capability - (Deprecated) Capability
+- stored in the `deprecatedCapabilityJunctionDAO`
+- If a Capability has been deprecated by another Capability, it is essentially no longer enabled, and ignored by the system
+
+##### User - Capability 
+- stored in the `userCapabilityJunctionDAO`
+- refined by `UserCapabilityJunctionRefine`
+    ###### UserCapabilityJunctionRefined
+    ###### UserCapabilityJunctionDAO
+
+#### CapabilityAuthService
+
+
+#### CapabilityJunctionStatus
+Includes : 
+    - PENDING
+    - GRANTED
+    - EXPIRED
+
+#### Rules 
+
+##### IsUserCapabilityJunctionStatusUpdate (Predicate)
+
+##### SendNotificationOnTopLevelCapabilityStatusUpdate
+
+##### RemoveJunctionsOnUserRemoval
+
+
+#### Crons
+
+##### ExpireUserCapabilityJunctionsCron
 
 
 
