@@ -81,7 +81,3 @@ A notable difference between this decorator and other AuthService decorators is 
 
 #### Crons
 - ExpireUserCapabilityJunctionsCron
-
-
-
-
