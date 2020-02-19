@@ -138,6 +138,7 @@ foam.CLASS({
       // and not baked into the model.
       class: 'String',
       name: 'streetNumber',
+      label: 'Street No.',
       width: 16,
       documentation: 'The structured field for the street number of the postal address.',
       gridColumns: 2,

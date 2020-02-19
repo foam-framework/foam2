@@ -903,7 +903,7 @@ foam.CLASS({
     { class: 'Float',  name: 'endX' },
     { class: 'Float',  name: 'endY' },
     { class: 'Float',  name: 'lineWidth', value: 1 },
-    { class: 'String', name: 'color',     value: '#000000' },
+    { class: 'foam.core.Color', name: 'color',     value: '#000000' },
     { name: 'lineDash', documentation: 'An Array of numbers which specify distances to alternately draw lines and gaps. Full line if not set.' },
   ],
 
@@ -965,7 +965,7 @@ foam.CLASS({
   properties: [
     { class: 'Array', of: 'Float', name: 'xCoordinates' },
     { class: 'Array', of: 'Float', name: 'yCoordinates' },
-    { class: 'String', name: 'color', value: '#000' },
+    { class: 'foam.core.Color', name: 'color', value: '#000' },
     { class: 'Float', name: 'lineWidth', value: 1 }
   ],
 
