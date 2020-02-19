@@ -273,6 +273,7 @@ FOAM_FILES([
   { name: "foam/nanos/notification/Notifiable" },
   { name: "foam/nanos/notification/EmailSetting" },
   { name: "foam/nanos/notification/NotificationSetting" },
+  { name: "foam/nanos/script/Language", flags: ['java', 'web'] },
   { name: "foam/dao/EasyDAO" },
   { name: "foam/dao/NoSelectAllDAO" },
   { name: "foam/dao/NullDAO" },
