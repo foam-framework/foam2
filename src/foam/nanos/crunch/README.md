@@ -53,27 +53,25 @@ The UserCapabilityJunctionDAO decorator :
     - the `data` is saved to the `daoKey` of the Capability, if `daoKey` is provided
     - if the prerequistes are fulfilled and the data is validated, the `status` of the UCJ is set to `GRANTED`, and the `expiry` is calculated. Otherwise, the `status` is set to `PENDING`
 
-#### CapabilityAuthService
-
-
 #### CapabilityJunctionStatus
 Includes : 
     - PENDING
     - GRANTED
     - EXPIRED
 
+#### CapabilityAuthService
+
+
+
+
 #### Rules 
-
-##### IsUserCapabilityJunctionStatusUpdate (Predicate)
-
-##### SendNotificationOnTopLevelCapabilityStatusUpdate
-
-##### RemoveJunctionsOnUserRemoval
-
+- IsUserCapabilityJunctionStatusUpdate (Predicate)
+- SendNotificationOnTopLevelCapabilityStatusUpdate
+- RemoveJunctionsOnUserRemoval
 
 #### Crons
+- ExpireUserCapabilityJunctionsCron
 
-##### ExpireUserCapabilityJunctionsCron
 
 
 
