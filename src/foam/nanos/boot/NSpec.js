@@ -19,20 +19,6 @@ foam.CLASS({
     'foam.nanos.script.Language'
   ],
 
-    constants: [
-      {
-        javaType: 'Object[]',
-        name: 'X_HOLDER',
-        javaValue: 'new X[1]'
-      },
-      {
-        javaType: 'Object[]',
-        name: 'OBJECT_HOLDER',
-        javaValue: 'new Object[1]',
-        final: true
-      }
-  ],
-
   javaImports: [
     'java.io.IOException',
     'java.io.PrintStream',
@@ -256,9 +242,9 @@ foam.CLASS({
 
         Language l = getLanguage();
         if ( l == foam.nanos.script.Language.JSHELL ) 
-          return new JShellExecutor().runExecutor(x,ps,getServiceScript(),OBJECT_HOLDER);
+          return new JShellExecutor().runExecutor(x,ps,getServiceScript());
         //if ( l == foam.nanos.script.Language.BEANSHELL ) {
-        return new BeanShellExecutor(this).execute(x, ps, getServiceScript(), OBJECT_HOLDER);
+        return new BeanShellExecutor(this).execute(x, ps, getServiceScript());
       `,
       javaThrows: [
         'java.lang.ClassNotFoundException',

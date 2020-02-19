@@ -11,11 +11,13 @@ import foam.nanos.logger.Logger;
 
 public class BeanShellExecutor {
   private NSpec nSpec;
+  public static final Object[] OBJECT_HOLDER = new Object[1];
+  
   public BeanShellExecutor(NSpec nSpec) {
     this.nSpec = nSpec; 
   }
 
-  public Object execute(X x, PrintStream ps, String serviceScript, Object[] OBJECT_HOLDER ) throws IOException  {
+  public Object execute(X x, PrintStream ps, String serviceScript ) throws IOException  {
     Interpreter shell = new Interpreter();
     try {
       shell.set("x", x);
@@ -23,7 +25,7 @@ public class BeanShellExecutor {
       nSpec.saveService(x, service);
       return service;
     } catch (EvalError e) {
-      foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
+      Logger logger = (Logger) x.get("logger");
       if ( logger != null ) {
         logger.error("NSpec serviceScript error", serviceScript, e);
       } else {

@@ -19,8 +19,10 @@ import jdk.jshell.spi.ExecutionControlProvider;
 import jdk.jshell.spi.ExecutionEnv;
 
 public class JShellExecutor {
+  public static final Object[] X_HOLDER = new X[1];
+  public static final Object[] OBJECT_HOLDER = new Object[1];
   
-  public Object runExecutor(X x, PrintStream ps, String serviceScript, Object[] OBJECT_HOLDER ) throws IOException  {
+  public Object runExecutor(X x, PrintStream ps, String serviceScript ) throws IOException  {
 
     JShell jShell = createJShell(ps);
 
