@@ -60,7 +60,7 @@ public class RulerDAOTest extends Test {
     test(user1.getEmail().equals("nanos@nanos.net"), "user's email is nanos@nanos.net: on object update 'create' rules are not executed");
     test(user1.getLastName().equals("Unknown"), "user's lastName is 'Unknown': update rule was executed");
     test(user1.getEmailVerified(), "Set emailVerified to true in rule 9");
-    Rule executeRule = (Rule) ruleDAO.find("executeRule");
+    Rule executeRule = (Rule) ruleDAO.find(EQ(foam.nanos.ruler.Rule.NAME, "executeRule"));
     test(executeRule != null, "Test rule from executor was added successfully");
     test(executeRule.getRuleGroup().equals("fake test group"), "Test rule's group name is fake test group.");
 
