@@ -52,7 +52,14 @@ foam.CLASS({
       isAvailable: function(id) {
         return id != 0;
       },
-      title: '',
+      title: 'Audit',
+    },
+    {
+      name: 'commentSection',
+      isAvailable: function(id) {
+        return id != 0;
+      },
+      title: 'Comments',
     },
     {
       name: '_defaultSection',
@@ -169,6 +176,7 @@ foam.CLASS({
     // required: true,
       storageTransient: true,
       section: 'infoSection',
+      readVisibility: 'HIDDEN',
       validationPredicates: [
         {
           args: ['id', 'title', 'comment'],
