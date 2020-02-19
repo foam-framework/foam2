@@ -40,6 +40,7 @@ public interface PropertyInfo
   public Parser queryParser();
   public Parser csvParser();
   public void toJSON(foam.lib.json.Outputter outputter, Object value);
+  public void format(foam.lib.formatter.FObjectFormatter outputter, FObject obj);
   public void toCSV(X x, Object obj, foam.lib.csv.CSVOutputter outputter);
   public void toCSVLabel(X x, foam.lib.csv.CSVOutputter outputter);
   public void toXML(foam.lib.xml.Outputter outputter, Object value);

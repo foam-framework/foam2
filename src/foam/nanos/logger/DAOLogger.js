@@ -21,7 +21,7 @@ foam.CLASS({
     {
       name: 'delegate',
       class: 'foam.dao.DAOProperty',
-      visbiilty: 'HIDDEN'
+      visibility: 'HIDDEN'
     },
     {
       name: 'logger',
