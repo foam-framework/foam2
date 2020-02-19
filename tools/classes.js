@@ -460,6 +460,7 @@ var classes = [
   'foam.nanos.ruler.predicate.PropertyEQProperty',
   'foam.nanos.ruler.predicate.NewEqOld',
   'foam.nanos.ruler.predicate.IsInstancePredicate',
+  'foam.nanos.ruler.predicate.PropertyIsInstance',
   'foam.nanos.ruler.action.ChangePropertyAction',
   'foam.comics.SearchMode',
 
