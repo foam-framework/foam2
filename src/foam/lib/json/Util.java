@@ -32,7 +32,7 @@ public class Util {
             dst.append("\\\"");
             break;
           default:
-            if(c >= ' ')
+            if ( c >= ' ' )
               dst.append(c);
             else {
               char right = (char) (c & 0x0F);
