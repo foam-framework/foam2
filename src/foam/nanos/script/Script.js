@@ -192,20 +192,7 @@ foam.CLASS({
       javaCode: `
         Language l = getLanguage();
         if ( l == foam.nanos.script.Language.JSHELL ) {
-          JShell jShell = JShell
-            .builder()
-            .out(ps)
-            .executionEngine(new ExecutionControlProvider() {
-              @Override
-              public String name() {
-                return "direct";
-              }
-              @Override
-              public ExecutionControl generate(ExecutionEnv ee, Map<String, String> map) throws Throwable {
-                return new DirectExecutionControl();
-              }
-            }, null)
-            .build();
+          JShell jShell = new JShellExecutor().createJShell(ps);
           Script.X_HOLDER[0] = x.put("out",  ps);
           jShell.eval("import foam.core.X;");
           jShell.eval("X x = foam.nanos.script.Script.X_HOLDER[0];");
@@ -257,14 +244,7 @@ foam.CLASS({
           String print = null;
           try {
             JShell jShell = (JShell) createInterpreter(x,ps);
-            BufferedReader rdr = new BufferedReader(new StringReader(getCode()));
-            List<String> l1 = new ArrayList<String>();
-            for ( String line = rdr.readLine(); line != null; line = rdr.readLine() ) {
-              l1.add(line);
-            }
-            List<String> instructionList = new InstructionPresentation(jShell).parseToInstruction(l1);
-            EvalInstruction console = new EvalInstruction(jShell, instructionList, x);
-            print = console.runEvalInstruction();
+            print = new JShellExecutor().execute(x, jShell, getCode());
             ps.print(print);
           } catch (Throwable e) {
             e.printStackTrace();

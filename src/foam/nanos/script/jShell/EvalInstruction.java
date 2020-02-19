@@ -58,7 +58,7 @@ public class EvalInstruction {
                                        // wrapped in a temporary variable
                                        // (reserved).
         case UNKNOWN_SUBKIND:
-          String message = "Unknown subkind instruction" + source;
+          String message = "Unknown subkind instruction " + source;
           throw new Exception(message);
         default:
           break;

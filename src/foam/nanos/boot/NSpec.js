@@ -34,31 +34,15 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'java.io.BufferedReader',
     'java.io.IOException',
     'java.io.PrintStream',
-    'java.io.StringReader',
-    'java.util.ArrayList',
-    'java.util.List',
-    'java.util.Map',
 
-    'bsh.EvalError',
-    'bsh.Interpreter',
     'foam.core.X',
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.AuthorizationException',
-    'foam.nanos.script.Language',
-    'jdk.jshell.JShell',
-    'jdk.jshell.SnippetEvent',
-    'jdk.jshell.execution.DirectExecutionControl',
-    'jdk.jshell.spi.ExecutionControl',
-    'jdk.jshell.spi.ExecutionControlProvider',
-    'jdk.jshell.spi.ExecutionEnv',
-
-    'foam.dao.DAO',
-    'foam.core.FObject',
-    'foam.nanos.script.jShell.EvalInstruction',
-    'foam.nanos.script.jShell.InstructionPresentation',
+    'foam.nanos.script.BeanShellExecutor',
+    'foam.nanos.script.JShellExecutor',
+    'foam.nanos.script.Language'
   ],
 
   ids: [ 'name' ],
@@ -271,58 +255,10 @@ foam.CLASS({
         }
 
         Language l = getLanguage();
-        if ( l == foam.nanos.script.Language.JSHELL ) {
-          JShell jShell = JShell
-            .builder()
-            .out(ps)
-            .executionEngine(new ExecutionControlProvider() {
-              @Override
-              public String name() {
-                return "direct";
-              }
-
-              @Override
-              public ExecutionControl generate(ExecutionEnv ee, Map<String, String> map) throws Throwable {
-                return new DirectExecutionControl();
-              }
-            }, null)
-            .build();
-
-          foam.nanos.script.Script.X_HOLDER[0] = x;
-          String init = "import foam.core.X; import foam.nanos.boot.NSpec; X x = foam.nanos.script.Script.X_HOLDER[0]; ";
-
-          BufferedReader rdr = new BufferedReader(new StringReader(init+getServiceScript()));
-          List<String> l1 = new ArrayList<String>();
-
-          for ( String line = rdr.readLine(); line != null; line = rdr.readLine() ) {
-            l1.add(line);
-          }
-
-          List<String> instructionList = new InstructionPresentation(jShell).parseToInstruction(l1);
-          EvalInstruction console = new EvalInstruction(jShell, instructionList, x);
-          String print = console.runEvalInstruction();
-//        saveService(x, service)//TODO delete this method.
-          jShell.eval("foam.nanos.boot.NSpec.OBJECT_HOLDER[0] = service;");
-          return  OBJECT_HOLDER[0];
-        } else { //if ( l == foam.nanos.script.Language.BEANSHELL ) {
-            Interpreter shell = new Interpreter();
-            try {
-              shell.set("x", x);
-              Object service = shell.eval(getServiceScript());
-              saveService(x, service);
-              return service;
-            } catch (EvalError e) {
-              foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
-              if ( logger != null ) {
-                logger.error("NSpec serviceScript error", getServiceScript(), e);
-              } else {
-                System.err.println("NSpec serviceScript error: " + getServiceScript());
-                e.printStackTrace();
-              }
-            }
-          }
-
-        return null;
+        if ( l == foam.nanos.script.Language.JSHELL ) 
+          return new JShellExecutor().runExecutor(x,ps,getServiceScript(),OBJECT_HOLDER);
+        //if ( l == foam.nanos.script.Language.BEANSHELL ) {
+        return new BeanShellExecutor(this).execute(x, ps, getServiceScript(), OBJECT_HOLDER);
       `,
       javaThrows: [
         'java.lang.ClassNotFoundException',
