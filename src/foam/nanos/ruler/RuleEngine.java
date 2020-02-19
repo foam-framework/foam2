@@ -150,7 +150,7 @@ public class RuleEngine extends ContextAwareSupport {
     results_.put(currentRule_.getId(), result);
   }
 
-  public Object getResult(Long ruleId) {
+  public Object getResult(long ruleId) {
     return results_.get(ruleId);
   }
 

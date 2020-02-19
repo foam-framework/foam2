@@ -386,7 +386,7 @@
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(`
-        public static Rule findById(Collection<Rule> listRule, Long id) {
+        public static Rule findById(Collection<Rule> listRule, long id) {
           return listRule.stream().filter(rule -> id.equals(rule.getId())).findFirst().orElse(null);
         }
         `);
