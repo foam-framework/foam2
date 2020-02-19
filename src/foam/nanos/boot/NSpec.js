@@ -17,7 +17,7 @@ foam.CLASS({
       flags: ['web']
     },
     'foam.nanos.script.Language'
-    ],
+  ],
 
     constants: [
       {
@@ -177,9 +177,9 @@ foam.CLASS({
       factory: function() {
         return this.Language.BEANSHELL;
       },
-      javaValue: 'foam.nanos.script.Language.BEANSHELL',
-      readPermissionRequired: true,
-      writePermissionRequired: true
+      //javaValue: 'foam.nanos.script.Language.BEANSHELL',
+//      readPermissionRequired: true,
+//      writePermissionRequired: true
     },
     {
       class: 'Code',
