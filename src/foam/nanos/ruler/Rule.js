@@ -63,7 +63,7 @@
 
   properties: [
     {
-      class: 'Long',
+      class: 'String',
       name: 'id',
       hidden: true
     },
@@ -386,8 +386,8 @@
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(`
-        public static Rule findById(Collection<Rule> listRule, long id) {
-          return listRule.stream().filter(rule -> id == rule.getId()).findFirst().orElse(null);
+        public static Rule findById(Collection<Rule> listRule, String passedId) {
+          return listRule.stream().filter(rule -> passedId.equals(rule.getId())).findFirst().orElse(null);
         }
         `);
       }
