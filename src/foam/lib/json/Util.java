@@ -12,10 +12,10 @@ public class Util {
   /** Append src string to dst StringBuilder as an escaped JSON string. **/
   public static void escape(String src, StringBuilder dst) {
     char c;
-      for ( int i = 0; i < src.length(); i++ ) {
+      for ( int i = 0; i < src.length() ; i++ ) {
         c = src.charAt(i);
 
-        switch(c) {
+        switch ( c ) {
           case '\t':
             dst.append("\\t");
             break;
@@ -41,14 +41,10 @@ public class Util {
               if ( right > '9' ) right += 'A' - '9' - 1;
               left += '0';
               if ( left > '9' ) left += 'A' - '9' - 1;
-              dst.append('\\');
-              dst.append('u');
-              dst.append('0');
-              dst.append('0');
+              dst.append("\\u00");
               dst.append(left);
               dst.append(right);
             }
-            break;
         }
       }
   }
