@@ -6,39 +6,39 @@
 
 package foam.lib.query;
 
-import java.util.Date;
-
 import foam.lib.json.IntParser;
 import foam.lib.parse.Alt;
 import foam.lib.parse.Literal;
-import foam.lib.parse.PStream;
 import foam.lib.parse.ParserContext;
 import foam.lib.parse.ProxyParser;
+import foam.lib.parse.PStream;
 import foam.lib.parse.Seq;
+import java.util.Date;
+
 //YYYY-MM-DD..YYYY-MM-DD
 public class YYYYMMDDRangeDateParser extends ProxyParser  {
 
   public YYYYMMDDRangeDateParser() {
     super(new Seq(
-        new IntParser(),
-        new Alt(
-            new Literal("-"),
-            new Literal("/")),
-        new IntParser(),
-        new Alt(
-            new Literal("-"),
-            new Literal("/")),
-        new IntParser(),
-        new Literal(".."),
-        new IntParser(),
-        new Alt(
-            new Literal("-"),
-            new Literal("/")),
-        new IntParser(),
-        new Alt(
-            new Literal("-"),
-            new Literal("/")),
-        new IntParser()));
+      IntParser.instance(),
+      new Alt(
+          Literal.create("-"),
+          Literal.create("/")),
+      IntParser.instance(),
+      new Alt(
+          Literal.create("-"),
+          Literal.create("/")),
+      IntParser.instance(),
+      Literal.create(".."),
+      IntParser.instance(),
+      new Alt(
+          Literal.create("-"),
+          Literal.create("/")),
+      IntParser.instance(),
+      new Alt(
+          Literal.create("-"),
+          Literal.create("/")),
+      IntParser.instance()));
   }
 
   public PStream parse(PStream ps, ParserContext x) {
@@ -61,6 +61,7 @@ public class YYYYMMDDRangeDateParser extends ProxyParser  {
       Date[] dates = new Date[] { date1, date2 };
       return ps.setValue(dates);
     }
+
     return null;
   }
 }

@@ -9,13 +9,25 @@ foam.CLASS({
   name: 'Menu',
 
   implements: [
+    'foam.nanos.auth.Authorizable',
     'foam.nanos.auth.EnabledAware'
   ],
 
-  tableColumns: [ 'enabled', 'id', 'parent', 'label', 'order' ],
+  tableColumns: [
+    'enabled',
+    'id',
+    'parent',
+    'label',
+    'order'
+  ],
 
   imports: [
     'lastMenuLaunchedListener?'
+  ],
+
+  javaImports: [
+    'foam.nanos.auth.AuthService',
+    'foam.nanos.auth.AuthorizationException'
   ],
 
   properties: [
@@ -32,7 +44,8 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'enabled',
-      value: true
+      value: true,
+      tableWidth: 80
     },
     {
       class: 'FObjectProperty',
@@ -57,6 +70,7 @@ foam.CLASS({
       class: 'Int',
       name: 'order',
       documentation: 'Used to order the menu list.',
+      tableWidth: 80,
       value: 1000
     },
     {
@@ -70,6 +84,21 @@ foam.CLASS({
       name: 'icon',
       documentation: 'Icon associated to the menu item.',
       displayWidth: 80
+    },
+    {
+      documentation: 'Predicate providing arbitrary checks, in addition to the regular menu auth checks.',
+      class: 'foam.mlang.predicate.PredicateProperty',
+      name: 'readPredicate',
+      view: {
+        class: 'foam.u2.view.JSONTextView'
+      },
+      javaFactory: `
+        return foam.mlang.MLang.TRUE;
+      `,
+    },
+    {
+          class: 'StringArray',
+          name: 'keywords'
     }
   ],
 
@@ -77,6 +106,59 @@ foam.CLASS({
     function launch_(X, e) {
       this.lastMenuLaunchedListener && this.lastMenuLaunchedListener(this);
       this.handler && this.handler.launch(X, this, e);
+    },
+    {
+      documentation: 'Desire to call read predicate with calling context but predicate may also need access to this menu; add the current menu as context key MENU',
+      name: 'f',
+      type: 'Boolean',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      javaCode: `
+        return getReadPredicate().f(
+          x.put("MENU", this)
+        );
+      `
+    },
+    {
+      name: 'authorizeOnCreate',
+      javaCode: `
+        AuthService auth = (AuthService) x.get("auth");
+        if ( ! auth.check(x, "menu.create") ) {
+          throw new AuthorizationException("You do not have permission to create menus.");
+        }
+      `
+    },
+    {
+      name: 'authorizeOnUpdate',
+      javaCode: `
+        AuthService auth = (AuthService) x.get("auth");
+        if ( ! auth.check(x, "menu.update." + getId()) ) {
+          throw new AuthorizationException("You do not have permission to update this menu.");
+        }
+      `
+    },
+    {
+      name: 'authorizeOnDelete',
+      javaCode: `
+        AuthService auth = (AuthService) x.get("auth");
+        if ( ! auth.check(x, "menu.remove." + getId()) ) {
+          throw new AuthorizationException("You do not have permission to delete menus.");
+        }
+      `
+    },
+    {
+      name: 'authorizeOnRead',
+      javaCode: `
+        AuthService auth = (AuthService) x.get("auth");
+        if ( ! ( f(x) &&
+                 auth.check(x, "menu.read." + getId()) ) ) {
+          throw new AuthorizationException("You do not have permission to read this menu.");
+        }
+      `
     }
   ],
 

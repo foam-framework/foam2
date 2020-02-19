@@ -33,6 +33,7 @@ foam.CLASS({
 
   javaImports: [
     'foam.dao.DAO',
+    'foam.nanos.auth.LifecycleState',
     'foam.nanos.logger.Logger',
     'foam.nanos.session.Session',
     'foam.util.Email',
@@ -41,7 +42,6 @@ foam.CLASS({
 
     'java.security.Permission',
     'java.util.Calendar',
-    'java.util.regex.Pattern',
     'javax.security.auth.AuthPermission',
 
     'static foam.mlang.MLang.AND',
@@ -76,6 +76,9 @@ foam.CLASS({
         if ( user == null ) {
           throw new AuthenticationException("User not found: " + session.getUserId());
         }
+
+        // check that the user is active
+        assertUserIsActive(user);
 
         // check if user enabled
         if ( ! user.getEnabled() ) {
@@ -125,6 +128,9 @@ foam.CLASS({
           throw new AuthenticationException("User not found");
         }
 
+        // check that the user is active
+        assertUserIsActive(user);
+
         // check if user enabled
         if ( ! user.getEnabled() ) {
           throw new AuthenticationException("User disabled");
@@ -151,7 +157,7 @@ foam.CLASS({
 
         Session session = x.get(Session.class);
         session.setUserId(user.getId());
-        ((DAO) getLocalSessionDAO()).put(session);
+        ((DAO) getLocalSessionDAO()).inX(x).put(session);
         session.setContext(session.applyTo(session.getContext()));
 
         return user;
@@ -280,6 +286,22 @@ foam.CLASS({
       `
     },
     {
+      name: 'assertUserIsActive',
+      documentation: `Given a user, we check whether the user is ACTIVE.`,
+      args: [
+        {
+          name: 'user',
+          type: 'foam.nanos.auth.User'
+        }
+      ],
+      javaCode: `
+      // check that the user is active
+      if ( user instanceof LifecycleAware && ((LifecycleAware)user).getLifecycleState() != LifecycleState.ACTIVE ) {
+        throw new AuthenticationException("User is not active");
+      }
+      `
+    },
+    {
       name: 'updatePassword',
       documentation: `Given a context with a user, validate the password to be
         updated and return a context with the updated user information.`,
@@ -297,6 +319,9 @@ foam.CLASS({
         if ( user == null ) {
           throw new AuthenticationException("User not found");
         }
+
+        // check that the user is active
+        assertUserIsActive(user);
 
         // check if user enabled
         if ( ! user.getEnabled() ) {

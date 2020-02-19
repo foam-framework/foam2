@@ -22,7 +22,7 @@ foam.CLASS({
     foam.pattern.Faceted.create()
   ],
 
-  css:`
+  css: `
     ^ {
       padding: 32px
     }
@@ -52,14 +52,18 @@ foam.CLASS({
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
     'foam.u2.ControllerMode',
-    'foam.u2.dialog.NotificationMessage'
+    'foam.u2.dialog.NotificationMessage',
+    'foam.u2.dialog.Popup',
   ],
+
   imports: [
     'stack'
   ],
+
   exports: [
     'controllerMode'
   ],
+
   properties: [
     {
       class: 'FObjectProperty',
@@ -90,11 +94,22 @@ foam.CLASS({
       expression: function() {
         return foam.u2.detail.SectionedDetailView;
       }
+    },
+    {
+      class: 'String',
+      name: 'backLabel',
+      expression: function(config$browseTitle) {
+        return 'All ' + config$browseTitle;
+      }
     }
   ],
+
   actions: [
     {
       name: 'edit',
+      isAvailable: function(config$editEnabled) {
+        return config$editEnabled;
+      },
       code: function() {
         if ( ! this.stack ) return;
         this.stack.push({
@@ -107,44 +122,71 @@ foam.CLASS({
     },
     {
       name: 'delete',
-      confirmationRequired: true,
+      isAvailable: function(config$deleteEnabled) {
+        return config$deleteEnabled;
+      },
       code: function() {
-        this.config.dao.remove(this.data).then(o => {
-          this.finished.pub();
-          this.stack.back();
-        }, e => {
-          this.throwError.pub(e);
-          this.add(this.NotificationMessage.create({
-            message: e.message,
-            type: 'error'
-          }));
-        });
+        this.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
+          class: 'foam.u2.DeleteModal',
+          dao: this.config.dao,
+          onDelete: () => {
+            this.finished.pub();
+            this.stack.back();
+          },
+          data: this.data
+        }));
       }
     }
   ],
+
   methods: [
     function initE() {
       var self = this;
       this.SUPER();
       this
         .addClass(this.myClass())
-        .add(self.slot(function(data, config, config$browseTitle, config$viewBorder, viewView) {
+        .add(self.slot(function(data, data$id, config$CRUDActionsAuth$update, config$CRUDActionsAuth$delete, config$browseTitle, config$viewBorder, viewView) {
+
+          // iterate through permissions and replace % with data$id
+          var editAction = self.EDIT;
+          var deleteAction = self.DELETE;
+
+          if ( config$CRUDActionsAuth$update ) {
+            var editArray = config$CRUDActionsAuth$update;
+
+            editArray = editArray.map((permission) => permission.replace('%', data$id));
+
+            editAction = self.EDIT.clone().copyFrom({
+              availablePermissions: self.EDIT.availablePermissions.concat(editArray)
+            });
+          }
+
+          if ( config$CRUDActionsAuth$delete ) {
+            var deleteArray = config$CRUDActionsAuth$delete;
+
+            deleteArray = deleteArray.map((permission) => permission.replace('%', data$id));
+
+            deleteAction = self.DELETE.clone().copyFrom({
+              availablePermissions: self.DELETE.availablePermissions.concat(deleteArray)
+            });
+          }
 
           return self.E()
             .start(self.Rows)
               .start(self.Rows)
                 // we will handle this in the StackView instead
                 .startContext({ data: self.stack })
-                    .tag(self.stack.BACK, {
-                      buttonStyle: foam.u2.ButtonStyle.TERTIARY,
-                      icon: 'images/back-icon.svg',
-                      label: `All ${config$browseTitle}`
-                    })
+                  .tag(self.stack.BACK, {
+                    buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                    icon: 'images/back-icon.svg',
+                    label: self.backLabel
+                  })
                 .endContext()
                 .start(self.Cols).style({ 'align-items': 'center' })
                   .start()
                     .add(data.toSummary())
-                      .addClass(this.myClass('account-name'))
+                    .addClass(this.myClass('account-name'))
+                    .addClass('truncate-ellipsis')
                   .end()
                   .startContext({ data }).add(self.primary).endContext()
                 .end()
@@ -152,14 +194,16 @@ foam.CLASS({
 
               .start(self.Cols)
                 .start(self.Cols).addClass(this.myClass('actions-header'))
-                  .startContext({data: self}).tag(self.EDIT, {
-                    buttonStyle: foam.u2.ButtonStyle.TERTIARY,
-                    icon: 'images/edit-icon.svg'
-                  }).endContext()
-                  .startContext({data: self}).tag(self.DELETE, {
-                    buttonStyle: foam.u2.ButtonStyle.TERTIARY,
-                    icon: 'images/delete-icon.svg'
-                  }).endContext()
+                  .startContext({ data: self })
+                    .tag(editAction, {
+                      buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                      icon: 'images/edit-icon.svg'
+                    })
+                    .tag(deleteAction, {
+                      buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                      icon: 'images/delete-icon.svg'
+                    })
+                  .endContext()
                 .end()
               .end()
 

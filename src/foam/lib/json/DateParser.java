@@ -8,7 +8,6 @@ package foam.lib.json;
 
 import foam.lib.parse.*;
 import foam.util.SafetyUtil;
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -16,6 +15,10 @@ import java.util.TimeZone;
 public class DateParser
   extends ProxyParser
 {
+  private final static Parser instance__ = new DateParser();
+
+  public static Parser instance() { return instance__; }
+
   protected static ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
     @Override
     protected StringBuilder initialValue() {
@@ -32,25 +35,25 @@ public class DateParser
 
   public DateParser() {
     super(new Alt(
-      new NullParser(),
+      NullParser.instance(),
       new LongParser(),
       new Seq(
-        new Literal("\""),
-        new IntParser(),
-        new Literal("-"),
-        new IntParser(),
-        new Literal("-"),
-        new IntParser(),
-        new Literal("T"),
-        new IntParser(),
-        new Literal(":"),
-        new IntParser(),
-        new Literal(":"),
-        new IntParser(),
-        new Literal("."),
+        Literal.create("\""),
+        IntParser.instance(),
+        Literal.create("-"),
+        IntParser.instance(),
+        Literal.create("-"),
+        IntParser.instance(),
+        Literal.create("T"),
+        IntParser.instance(),
+        Literal.create(":"),
+        IntParser.instance(),
+        Literal.create(":"),
+        IntParser.instance(),
+        Literal.create("."),
         new Repeat(new Chars("0123456789")),
-        new Literal("Z"),
-        new Literal("\""))));
+        Literal.create("Z"),
+        Literal.create("\""))));
   }
 
   public PStream parse(PStream ps, ParserContext x) {
@@ -103,6 +106,7 @@ public class DateParser
     // try to parse milliseconds, default to 0
     c.add(Calendar.MILLISECOND, ! SafetyUtil.isEmpty(milliseconds.toString()) ?
       Integer.parseInt(milliseconds.toString(), 10) : 0);
+
     return ps.setValue(c.getTime());
   }
 }

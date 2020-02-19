@@ -18,7 +18,7 @@ public class AfterGteParser extends foam.lib.parse.ProxyParser {
 
   public AfterGteParser(Parser valueParser) {
     setDelegate(new Seq1(1,
-                        new Alt(new Literal(">="),
+                        new Alt(Literal.create(">="),
                                 new LiteralIC("-after:")),
                         valueParser
                         ));

@@ -41,11 +41,21 @@ foam.CLASS({
     {
       class: 'FObjectArray',
       of: 'foam.core.Property',
-      name: 'propertyWhiteList',
+      name: 'propertyWhitelist',
       documentation: `
         If this array is not empty, only the properties listed in it will be
         included in the detail view.
       `,
+      factory: null,
+      adapt: function(_, newValue) {
+        if ( Array.isArray(newValue) ) return newValue;
+        if ( typeof newValue !== 'object' ) throw new Error('You must set propertyWhitelist to an array of properties or a map from names to overrides encoded as an object.');
+        return Object.entries(newValue).reduce((acc, [propertyName, overrides]) => {
+          var axiom = this.of.getAxiomByName(propertyName);
+          if ( axiom ) acc.push(axiom.clone().copyFrom(overrides));
+          return acc;
+        }, []);
+      },
       preSet: function(_, ps) {
         foam.assert(ps, 'Properties required.');
         for ( var i = 0; i < ps.length; i++ ) {
@@ -92,13 +102,29 @@ foam.CLASS({
         if ( this.propertyWhitelist ) {
           sections = sections
             .map((s) => {
-              s.properties = s.properties.filter((p) => this.propertyWhitelist.includes(p));
+              s.properties = s.properties.reduce((acc, sectionProp) => {
+                var prop = this.propertyWhitelist.find(whitelistProp => whitelistProp.name === sectionProp.name);
+                if ( prop ) acc.push(prop);
+                return acc;
+              }, []);
               return s;
             })
             .filter((s) => {
               return s.properties.length > 0 || s.actions.length > 0;
             });
         }
+
+        // Filter out any sections where we know that there are no actions and
+        // no visible properties. Note that this isn't a comprehensive check.
+        // For example, the visibility value could be a function, which means
+        // it could be hidden under certain conditions and visible otherwise.
+        sections = sections.filter(s => {
+          return s.actions.length > 0 ||
+                 s.properties.some(p => {
+                   var visVal = this.controllerMode.getVisibilityValue(p);
+                   return visVal !== foam.u2.DisplayMode.HIDDEN && visVal !== 'HIDDEN';
+                 });
+        });
 
         return sections;
       }

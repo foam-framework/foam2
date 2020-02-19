@@ -12,10 +12,6 @@ foam.CLASS({
 
   implements: ['foam.nanos.ruler.RuleAction'],
 
-  javaImports: [
-    'foam.nanos.ruler.RuleAction',
-  ],
-
   properties: [
     {
       class: 'FObjectArray',
@@ -29,7 +25,7 @@ foam.CLASS({
       name: 'applyAction',
       javaCode: `
         for ( RuleAction action : getRuleActions() ) {
-          action.applyAction(x, obj, oldObj, ruler, agency);
+          action.applyAction(x, obj, oldObj, ruler, rule, agency);
         }
       `
     }

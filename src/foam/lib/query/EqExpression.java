@@ -12,8 +12,8 @@ public class EqExpression
   extends ProxyParser {
   public EqExpression(Parser valueParser) {
     setDelegate(new Seq1(1,
-                         new Alt(new Literal("="),
-                                 new Literal(":")),
+                         new Alt(Literal.create("="),
+                                 Literal.create(":")),
                          valueParser));
   }
 

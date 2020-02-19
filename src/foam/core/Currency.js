@@ -100,7 +100,7 @@
         property. In this case, we are using the id.
       `,
       code: function(x) {
-        return this.id;
+        return this.id + " - " + this.name;
       }
     },
     {
@@ -110,11 +110,11 @@
          * Given a number, display it as a currency using the appropriate
          * precision, decimal character, delimiter, symbol, and placement
          * thereof.
-         * 
-         * With the new home denomination feature, we will append (if left) or 
+         *
+         * With the new home denomination feature, we will append (if left) or
          * prepend (if right) the alphabetic code if the currency's alphabetic code
-         * is not equal to the homeDenomination 
-         * 
+         * is not equal to the homeDenomination
+         *
          */
         amount = Math.floor(amount);
         var isNegative = amount < 0;
@@ -193,6 +193,28 @@
 
 
         return formatted;
+      `
+    },
+    {
+      name: 'formatPrecision',
+      documentation: `
+        Given a number, display it as a currency using the appropriate
+        precision. Use a period '.' for the decimal place and do not
+        include commas or currency symbols.
+        Suitable for use when exporting to CSV.
+      `,
+      code: function(amount) {
+        return (amount/Math.pow(2, this.precision)).toFixed(this.precision);
+      },
+      args: [
+        {
+          class: 'foam.core.UnitValue',
+          name: 'amount'
+        }
+      ],
+      type: 'String',
+      javaCode: `
+        return String.format("%." + getPrecision() + "f", amount/Math.pow(10, getPrecision()));
       `
     }
   ]

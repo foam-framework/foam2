@@ -27,22 +27,39 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'put_',
-      synchronized: true,
+      name: 'put',
       javaCode: `
-        try {
-          // Since only writing, dispense with id lookup and delta
-          String record = getOutputter().stringify(nu);
-          if ( ! foam.util.SafetyUtil.isEmpty(record) ) {
-            write_(sb.get()
-              .append("p(")
-              .append(record)
-              .append(")")
-              .toString());
+        getLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
+          String record_ = null;
+
+          public void executeJob() {
+            try {
+              dao.put_(x, obj);
+              record_ = getOutputter().stringify(obj);
+            } catch (Throwable t) {
+              getLogger().error("Failed to write put entry to journal", t);
+            }
           }
-        } catch ( Throwable t ) {
-          throw new RuntimeException(t);
-        }
+
+          public void endJob() {
+            if ( foam.util.SafetyUtil.isEmpty(record_) ) return;
+
+            try {
+              writeComment_(x, obj);
+              writePut_(
+                x,
+                record_,
+                getMultiLineOutput() ? "\\n" : "",
+                "");
+
+                if ( isLast() ) getWriter().flush();
+            } catch (Throwable t) {
+              getLogger().error("Failed to write put entry to journal", t);
+            }
+          }
+        });
+
+        return obj;
       `
     },
     {

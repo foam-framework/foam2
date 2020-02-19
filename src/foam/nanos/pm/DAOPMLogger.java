@@ -27,13 +27,19 @@ public class DAOPMLogger
 
   protected Object getLock(PMInfo pmi) {
     int hash = pmi.getClsName().hashCode() * 31 + pmi.getName().hashCode();
-    return locks_[(int) (Math.abs(hash) % locks_.length)];
+    return locks_[(int) Math.abs(hash % locks_.length)];
   }
 
 
   @Override
   public void log(PM pm) {
-    if ( ! pm.getClassType().getId().equals("foam.dao.PMDAO") ) {
+    if (
+      // TODO: maybe an exclusion list for names in this package instead
+      //       of an inclusion list for names in outside packages
+      ! pm.getClassType().getId().equals("foam.dao.PMDAO") &&
+      ! pm.getClassType().getId().equals("foam.dao.PipelinePMDAO") &&
+      ! pm.getClassType().getId().equals("foam.nanos.auth.PMAuthService")
+    ) {
       if ( pm.getClassType().getId().indexOf("PM") != -1 ) return;
       if ( pm.getName().indexOf("PM")              != -1 ) return;
       if ( pm.getClassType().getId().indexOf("pm") != -1 ) return;

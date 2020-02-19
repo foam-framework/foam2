@@ -8,7 +8,10 @@ foam.CLASS({
   package: 'foam.nanos.script',
   name: 'Script',
 
-  implements: ['foam.nanos.auth.EnabledAware'],
+  implements: [
+    'foam.nanos.auth.EnabledAware',
+    'foam.nanos.auth.LastModifiedByAware'
+  ],
 
   requires: [
     'foam.nanos.script.ScriptStatus',
@@ -26,14 +29,12 @@ foam.CLASS({
     'bsh.Interpreter',
     'foam.core.*',
     'foam.dao.*',
-    'foam.mlang.predicate.Predicate',
+    'foam.nanos.logger.Logger',
     'foam.nanos.auth.*',
     'foam.nanos.pm.PM',
-    'foam.nanos.session.Session',
     'java.io.ByteArrayOutputStream',
     'java.io.PrintStream',
     'java.util.Date',
-    'java.util.List',
     'static foam.mlang.MLang.*',
   ],
 
@@ -59,7 +60,8 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'id'
+      name: 'id',
+      tableWidth: 280
     },
     {
       class: 'Boolean',
@@ -77,22 +79,23 @@ foam.CLASS({
     {
       class: 'String',
       name: 'description',
-      documentation: 'Description of the script.'
+      documentation: 'Description of the script.',
+      tableWidth: 200
     },
     {
       class: 'DateTime',
       name: 'lastRun',
       documentation: 'Date and time the script ran last.',
-      createMode: 'HIDDEN',
-      updateMode: 'RO',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
       tableWidth: 140
     },
     {
       class: 'Duration',
       name: 'lastDuration',
       documentation: 'Date and time the script took to complete.',
-      createMode: 'HIDDEN',
-      updateMode: 'RO',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
       tableWidth: 125
     },
     /*
@@ -117,8 +120,8 @@ foam.CLASS({
       of: 'foam.nanos.script.ScriptStatus',
       name: 'status',
       documentation: 'Status of script.',
-      createMode: 'HIDDEN',
-      updateMode: 'RO',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
       value: 'UNSCHEDULED',
       javaValue: 'ScriptStatus.UNSCHEDULED',
       tableWidth: 100,
@@ -131,8 +134,8 @@ foam.CLASS({
     {
       class: 'String',
       name: 'output',
-      createMode: 'HIDDEN',
-      updateMode: 'RO',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
       view: {
         class: 'foam.u2.view.ModeAltView',
         readView: { class: 'foam.u2.view.PreView' }
@@ -157,6 +160,12 @@ foam.CLASS({
       class: 'String',
       name: 'notes',
       view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 144 }
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'lastModifiedBy',
+      documentation: 'User who last modified script'
     }
   ],
 
@@ -214,7 +223,8 @@ foam.CLASS({
         } catch (Throwable e) {
           ps.println();
           e.printStackTrace(ps);
-          e.printStackTrace();
+          Logger logger = (Logger) x.get("logger");
+          logger.error(e);
         } finally {
           pm.log(x);
         }

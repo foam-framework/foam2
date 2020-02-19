@@ -8,21 +8,18 @@ package foam.core;
 
 import foam.crypto.hash.Hasher;
 import foam.crypto.sign.Signer;
-import foam.dao.SQLStatement;
 import foam.dao.jdbc.IndexedPreparedStatement;
+import foam.dao.SQLStatement;
 import foam.lib.parse.Parser;
 import foam.mlang.Expr;
 import foam.mlang.order.Comparator;
-
-import javax.xml.stream.XMLStreamReader;
 import java.util.Map;
+import javax.xml.stream.XMLStreamReader;
 
 // ???: Why is this interface mutable?
 public interface PropertyInfo
-    extends Axiom, Comparator, Expr, SQLStatement, Validator, Hasher, Signer, Comparable
+    extends Axiom, Comparator, Expr, SQLStatement, Validator, Hasher, Signer, Comparable, ClassInfoAware
 {
-  public PropertyInfo setClassInfo(ClassInfo p);
-  public ClassInfo getClassInfo();
 
   public boolean getNetworkTransient();
   public boolean getReadPermissionRequired();

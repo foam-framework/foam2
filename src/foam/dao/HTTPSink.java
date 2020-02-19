@@ -12,6 +12,7 @@ import foam.lib.Outputter;
 import foam.lib.json.OutputterMode;
 import foam.lib.NetworkPropertyPredicate;
 import foam.nanos.http.Format;
+import foam.util.SafetyUtil;
 import org.apache.commons.io.IOUtils;
 
 import javax.servlet.http.HttpServletResponse;
@@ -24,23 +25,30 @@ public class HTTPSink
     extends AbstractSink
 {
   protected String url_;
+  protected String bearerToken_;
   protected Format format_;
 
-  public HTTPSink(String url, Format format) throws IOException {
+  public HTTPSink(String url, Format format) {
+    this(url, "", format);
+  }
+
+  public HTTPSink(String url, String bearerToken, Format format) {
     url_ = url;
+    bearerToken_ = bearerToken;
     format_ = format;
   }
 
   @Override
   public void put(Object obj, Detachable sub) {
     HttpURLConnection conn = null;
-    OutputStream os = null;
-    BufferedWriter writer = null;
 
     try {
       Outputter outputter = null;
       conn = (HttpURLConnection) new URL(url_).openConnection();
       conn.setRequestMethod("POST");
+      if ( ! SafetyUtil.isEmpty(bearerToken_) ) {
+        conn.setRequestProperty("Authorization", "Bearer " + bearerToken_);
+      }
       conn.setDoInput(true);
       conn.setDoOutput(true);
       if ( format_ == Format.JSON ) {
@@ -54,12 +62,12 @@ public class HTTPSink
       }
       conn.connect();
 
-      os = conn.getOutputStream();
-      writer = new BufferedWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
-      writer.write(outputter.stringify((FObject)obj));
-      writer.flush();
-      writer.close();
-      os.close();
+      try (OutputStream os = conn.getOutputStream()) {
+        try(BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8))) {
+          writer.write(outputter.stringify((FObject)obj));
+          writer.flush();
+        }
+      }
 
       // check response code
       int code = conn.getResponseCode();
@@ -69,8 +77,6 @@ public class HTTPSink
     } catch (Throwable t) {
       throw new RuntimeException(t);
     } finally {
-      IOUtils.closeQuietly(writer);
-      IOUtils.closeQuietly(os);
       if ( conn != null ) {
         conn.disconnect();
       }

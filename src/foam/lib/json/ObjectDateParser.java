@@ -7,7 +7,6 @@
 package foam.lib.json;
 
 import foam.lib.parse.*;
-
 import java.util.Date;
 
 /**
@@ -46,23 +45,24 @@ import java.util.Date;
 public class ObjectDateParser
   extends ProxyParser
 {
+
   public ObjectDateParser() {
     super(new Seq0(
-      new Whitespace(),
-      new Literal("{"),
-      new Whitespace(),
+      Whitespace.instance(),
+      Literal.create("{"),
+      Whitespace.instance(),
       new KeyParser("class"),
-      new Whitespace(),
-      new Literal(":"),
-      new Whitespace(),
-      new Literal("\"__Timestamp__\""),
-      new Whitespace(),
-      new Literal(","),
-      new Whitespace(),
+      Whitespace.instance(),
+      Literal.create(":"),
+      Whitespace.instance(),
+      Literal.create("\"__Timestamp__\""),
+      Whitespace.instance(),
+      Literal.create(","),
+      Whitespace.instance(),
       new KeyParser("value"),
-      new Whitespace(),
-      new Literal(":"),
-      new Whitespace(),
+      Whitespace.instance(),
+      Literal.create(":"),
+      Whitespace.instance(),
       new Parser() {
        private Parser delegate = new LongParser();
        public PStream parse(PStream ps, ParserContext x) {
@@ -71,8 +71,8 @@ public class ObjectDateParser
          return ps;
        }
       },
-      new Whitespace(),
-      new Literal("}")));
+      Whitespace.instance(),
+      Literal.create("}")));
   }
 
   public PStream parse(PStream ps, ParserContext x) {

@@ -3,6 +3,7 @@
  * Copyright 2019 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
+
 foam.CLASS({
   package: 'foam.nanos.crunch',
   name: 'SendNotificationOnTopLevelCapabilityStatusUpdate',
@@ -17,10 +18,7 @@ foam.CLASS({
     'foam.core.ContextAgent',
     'foam.core.X',
     'foam.dao.DAO',
-    'foam.nanos.crunch.CapabilityJunctionStatus',
-    'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.notification.Notification',
-    'java.lang.StringBuilder',
     'java.util.Date'
   ],
 

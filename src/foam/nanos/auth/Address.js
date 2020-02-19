@@ -83,6 +83,18 @@ foam.CLASS({
         if ( oldValue !== newValue ) {
           this.regionId = undefined;
         }
+      },
+      view: function(_, X) {
+        return {
+          class: 'foam.u2.view.RichChoiceView',
+          search: true,
+          sections: [
+            {
+              heading: 'Countries',
+              dao: X.countryDAO
+            }
+          ]
+        };
       }
     },
     {
@@ -126,6 +138,7 @@ foam.CLASS({
       // and not baked into the model.
       class: 'String',
       name: 'streetNumber',
+      label: 'Street No.',
       width: 16,
       documentation: 'The structured field for the street number of the postal address.',
       gridColumns: 2,
@@ -207,6 +220,18 @@ foam.CLASS({
               e.REG_EXP(
                 foam.nanos.auth.Address.POSTAL_CODE,
                 /^^\d{5}(?:[-\s]\d{4})?$/i)
+            );
+          },
+          errorString: 'Invalid zip code'
+        },
+        {
+          args: ['postalCode', 'countryId'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'IN'),
+              e.REG_EXP(
+                foam.nanos.auth.Address.POSTAL_CODE,
+                /^^\d{6}(?:[-\s]\d{4})?$/i)
             );
           },
           errorString: 'Invalid zip code'

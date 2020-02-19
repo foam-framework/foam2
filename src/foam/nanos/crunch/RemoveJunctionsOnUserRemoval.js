@@ -3,6 +3,7 @@
  * Copyright 2019 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
+
 foam.CLASS({
   package: 'foam.nanos.crunch',
   name: 'RemoveJunctionsOnUserRemoval',
@@ -14,11 +15,12 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.dao.DAO',
     'foam.core.ContextAgent',
     'foam.core.X',
-    'foam.dao.DAO',
     'foam.nanos.auth.User',
-    'static foam.mlang.MLang.*'
+    'static foam.mlang.MLang.*',
+    'foam.nanos.auth.LifecycleAware',
   ],
 
   methods: [
@@ -28,7 +30,10 @@ foam.CLASS({
       agency.submit(x, new ContextAgent() {
         @Override
         public void execute(X x) {
-          ((User) obj).getCapabilities(x).getJunctionDAO().removeAll();
+          if ( ((LifecycleAware) obj).getLifecycleState() == foam.nanos.auth.LifecycleState.DELETED ) {
+            DAO dao = (DAO) x.get("userCapabilityJunctionDAO");
+            dao.where(EQ(UserCapabilityJunction.SOURCE_ID, ((User) obj).getId())).removeAll();
+          }
         }
       }, "Remove Junctions On User Removal");
       `

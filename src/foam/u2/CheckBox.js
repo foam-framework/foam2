@@ -56,6 +56,7 @@ foam.CLASS({
                       this.labelFormatter,
                       function() { this.add(self.label$); })
           .on('click', function() {
+            if ( self.getAttribute('disabled') ) return;
             this.data = ! this.data;
           }.bind(this))
         .end();
@@ -70,6 +71,11 @@ foam.CLASS({
 
     function link() {
       this.data$.linkTo(this.attrSlot('checked'));
+    },
+
+    function fromProperty(property) {
+      this.SUPER(property);
+      this.label = property.label;
     }
   ],
 

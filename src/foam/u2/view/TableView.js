@@ -12,9 +12,14 @@ foam.CLASS({
   css: `
     ^tr {
       background: white;
-      border-bottom: 1px solid /*%GREY4%*/ #e7eaec;
       display: flex;
       height: 48px;
+    }
+
+    ^tbody > ^tr {
+      border-left: 1px solid /*%GREY4%*/ #e7eaec;
+      border-right: 1px solid /*%GREY4%*/ #e7eaec;
+      border-bottom: 1px solid /*%GREY4%*/ #e7eaec;
     }
 
     ^tbody > ^tr:hover {

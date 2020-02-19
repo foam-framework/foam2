@@ -123,13 +123,13 @@ public final class QrCode {
     for (version = minVersion; ; version++) {
       int dataCapacityBits = getNumDataCodewords(version, ecl) * 8;  // Number of data bits available
       dataUsedBits = QrSegment.getTotalBits(segs, version);
-      if (dataUsedBits != -1 && dataUsedBits <= dataCapacityBits)
+      if (dataUsedBits != 0 && dataUsedBits <= dataCapacityBits)
         break;  // This version number is found to be suitable
       if (version >= maxVersion)  // All versions in the range could not fit the given data
         throw new IllegalArgumentException("Data too long");
     }
-    if (dataUsedBits == -1)
-      throw new AssertionError();
+    if (dataUsedBits == 0)
+      throw new IllegalArgumentException("No data provided");
 
     // Increase the error correction level while the data still fits in the current version number
     for (Ecc newEcl : Ecc.values()) {
@@ -517,7 +517,7 @@ public final class QrCode {
           case 7:  invert = ((x + y) % 2 + x * y % 3) % 2 == 0;  break;
           default:  throw new AssertionError();
         }
-        modules[y][x] ^= invert & !isFunction[y][x];
+        modules[y][x] ^= invert && !isFunction[y][x];
       }
     }
   }
@@ -648,7 +648,7 @@ public final class QrCode {
         // ceil((size - 13) / (2*numAlign - 2)) * 2
         step = (ver * 4 + numAlign * 2 + 1) / (2 * numAlign - 2) * 2;
       } else  // C-C-C-Combo breaker!
-        step = 26;
+          step = 26;
 
       int[] result = new int[numAlign];
       result[0] = 6;

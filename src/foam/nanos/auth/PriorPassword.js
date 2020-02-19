@@ -10,15 +10,11 @@ foam.CLASS({
 
   documentation: 'Prior hashed password value for a user.',
 
-  javaImports: [
-    'java.util.Date'
-  ],
-
   properties: [
     {
       class: 'DateTime',
       name: 'timeStamp',
-      updateMode: 'RO',
+      updateVisibility: 'RO',
       documentation: 'Time at which password entry was created'
     },
     {

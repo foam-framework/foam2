@@ -57,7 +57,12 @@ foam.CLASS({
       expression: function(of) { return foam.String.pluralize(of.model_.label); }
     },
     {
-      class: 'StringArray',
+      class: 'String',
+      name: 'createTitle',
+      expression: function(of) { return 'Create a New ' + of.model_.label; }
+    },
+    {
+      class: 'Array',
       name: 'defaultColumns',
       factory: null,
       expression: function(of) {
@@ -112,6 +117,34 @@ foam.CLASS({
         // for it which doesn't jive with the AbstractFObjectPropertyInfo.
         return { class: 'foam.u2.borders.NullBorder' };
       }
+    },
+    {
+      class: 'Boolean',
+      name: 'createEnabled',
+      documentation: 'If set to false, the "Create" button will not be visible.',
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'editEnabled',
+      documentation: 'True to enable the edit button.',
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'deleteEnabled',
+      documentation: 'True to enable the delete button.',
+      value: true
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.comics.v2.CRUDActionsAuth',
+      name: 'CRUDActionsAuth'
+    },
+    {
+      of: 'foam.mlang.predicate.Predicate',
+      name: 'filterExportPredicate',
+      documentation: 'Filtering the types of formats user is able to export from TableView'
     }
   ]
 });

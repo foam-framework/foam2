@@ -19,23 +19,12 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.core.ContextAgent',
-    'foam.core.X',
-    'foam.util.SafetyUtil',
-    'java.nio.charset.StandardCharsets',
     'java.util.Date',
     'java.util.Properties',
-    'java.util.List',
     'javax.mail.*',
     'javax.mail.internet.InternetAddress',
     'javax.mail.internet.MimeMessage',
     'org.apache.commons.lang3.StringUtils',
-    'org.jtwig.JtwigTemplate',
-    'org.jtwig.resource.loader.TypedResourceLoader',
-    'foam.dao.ArraySink',
-    'foam.dao.DAO',
-    'foam.nanos.auth.User',
-    'foam.nanos.auth.Group',
     'foam.nanos.logger.Logger',
     'foam.nanos.om.OMLogger',
     'static foam.mlang.MLang.EQ'
@@ -219,6 +208,12 @@ foam.CLASS({
         OMLogger omLogger = (OMLogger) getX().get("OMLogger");
 
         emailMessage = (EmailMessage) emailMessage.fclone();
+        if ( emailMessage.getStatus() == Status.FAILED ) {
+          // ignore
+          logger.debug("Email not sent, already FAILED.", emailMessage.getId());
+          return emailMessage;
+        }
+
         MimeMessage message = createMimeMessage(emailMessage);
         if ( message == null ) {
           return emailMessage;

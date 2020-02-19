@@ -11,6 +11,12 @@ import foam.lib.parse.*;
 public class IntParser
   implements Parser
 {
+  private final static Parser instance__ = new IntParser();
+
+  public static Parser instance() { return instance__; }
+
+  public IntParser() {
+  }
 
   public PStream parse(PStream ps, ParserContext x) {
     long    n      = 0;

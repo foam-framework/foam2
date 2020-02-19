@@ -3,6 +3,7 @@
  * Copyright 2019 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
+
 foam.CLASS({
   package: 'foam.nanos.crunch',
   name: 'Capability',
@@ -13,14 +14,11 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.core.FObject',
-    'foam.core.X',
+
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.dao.Sink',
     'foam.mlang.sink.Count',
-    'foam.nanos.crunch.Capability',
-    'foam.nanos.crunch.CapabilityCapabilityJunction',
     'java.util.List',
     'static foam.mlang.MLang.*'
   ],
@@ -39,21 +37,39 @@ foam.CLASS({
     'daoKey'
   ],
 
+  sections: [
+    {
+      name: '_defaultSection',
+      title: 'Administrative'
+    },
+    {
+      name: 'uiSettings',
+      title: 'UI Settings',
+      help: 'These properties are used to control how this capability appears in the GUI.'
+    },
+    {
+      name: 'capabilityRelationships',
+      title: 'Capability Relationships'
+    }
+  ],
+
   properties: [
-    
     {
       name: 'id',
-      class: 'String'
+      class: 'String',
+      updateVisibility: 'RO'
     }, 
     {
       name: 'icon',
       class: 'Image',
-      documentation: `Path to capability icon`
+      documentation: `Path to capability icon`,
+      section: 'uiSettings'
     },
     {
       name: 'description',
       class: 'String',
-      documentation: `Description of capability`
+      documentation: `Description of capability`,
+      section: 'uiSettings'
     },
     {
       name: 'notes',
@@ -78,7 +94,8 @@ foam.CLASS({
     {
       name: 'visible',
       class: 'Boolean',
-      documentation: `Hide sub-capabilities which aren't top-level and individually selectable. when true, capability is visible to the user`
+      documentation: `Hide sub-capabilities which aren't top-level and individually selectable. when true, capability is visible to the user`,
+      section: 'uiSettings'
     },
     {
       name: 'expiry',
@@ -103,8 +120,7 @@ foam.CLASS({
     },
     {
       name: 'daoKey',
-      class: 'String',
-      visibility: 'RO'
+      class: 'String'
     }
   ],
 
@@ -183,8 +199,16 @@ foam.RELATIONSHIP({
   forwardName: 'capabilities',
   inverseName: 'users',
   sourceProperty: {
-    section: 'administrative'
+    section: 'capabilities',
+    updateVisibility: 'RO'
   }
+});
+
+foam.CLASS({
+  package: 'foam.nanos.crunch',
+  name: 'CRUNCHUserRefinement',
+  refines: 'foam.nanos.auth.User',
+  sections: [{ name: 'capabilities' }]
 });
 
 foam.RELATIONSHIP({
@@ -193,7 +217,13 @@ foam.RELATIONSHIP({
   cardinality: '*:*',
   forwardName: 'deprecated',
   inverseName: 'deprecating',
-  junctionDAOKey: 'deprecatedCapabilityJunctionDAO'
+  junctionDAOKey: 'deprecatedCapabilityJunctionDAO',
+  sourceProperty: {
+    section: 'capabilityRelationships'
+  },
+  targetProperty: {
+    section: 'capabilityRelationships'
+  }
 });
 
 foam.RELATIONSHIP({
@@ -202,5 +232,11 @@ foam.RELATIONSHIP({
   cardinality: '*:*',
   forwardName: 'prerequisites',
   inverseName: 'dependents',
-  junctionDAOKey: 'prerequisiteCapabilityJunctionDAO'
+  junctionDAOKey: 'prerequisiteCapabilityJunctionDAO',
+  sourceProperty: {
+    section: 'capabilityRelationships'
+  },
+  targetProperty: {
+    section: 'capabilityRelationships'
+  }
 });

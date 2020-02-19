@@ -8,18 +8,24 @@ foam.CLASS({
   package: 'foam.u2.detail',
   name: 'WizardSectionsView',
   extends: 'foam.u2.detail.AbstractSectionedDetailView',
+
   requires: [
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows'
   ],
 
   css: `
+    ^ .foam-u2-layout-Cols {
+      align-items: center;
+    }
     ^wizard-body {
-      height: 90%;
+      height: 100%;
       background-color: white;
     }
 
     ^footer {
+      min-height: 75px;
+      border-top: solid 1px /*%GREY5%*/ #edf0f5;
       padding: 0px 128px;
     }
 
@@ -64,11 +70,13 @@ foam.CLASS({
       value: { class: 'foam.u2.detail.SectionView' }
     }
   ],
+
   reactions: [
     ['', 'propertyChange.sections', 'restartWizard'],
     ['', 'propertyChange.data', 'restartWizard'],
     ['data', 'propertyChange', 'onDataUpdate']
   ],
+
   listeners: [
     {
       name: 'restartWizard',
@@ -88,6 +96,7 @@ foam.CLASS({
       code: function() { this.lastUpdate = new Date(); }
     }
   ],
+
   actions: [
     {
       name: 'prev',
@@ -107,6 +116,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function initE() {
       var self = this;

@@ -427,9 +427,9 @@ foam.LIB({
      * Outputs:
      * Name is adam
      * Hello adam
-     * 
+     *
      * This also supports nested properties for FObjects using the $ syntax.
-     * 
+     *
      * Ex.
      * foam.CLASS({
      *   name: 'Foo',
@@ -445,7 +445,7 @@ foam.LIB({
      *     }
      *   ]
      * });
-     * 
+     *
      * var bar = Bar.create({
      *   foo: Foo.create({str: 'Hello!'})
      * });
@@ -861,6 +861,17 @@ foam.LIB({
     function isInstance(o) {
       return typeof o === 'object' && ! Array.isArray(o) &&
           ! foam.core.FObject.isInstance(o) && ! foam.Null.isInstance(o);
+    },
+    function shallowClone(o) {
+      const newObj = {};
+
+      for ( var key in o ) {
+        if ( o.hasOwnProperty(key) ) {
+          newObj[key] = o[key];
+        }
+      }
+
+      return newObj;
     },
     function clone(o) {
       const newObj = {};

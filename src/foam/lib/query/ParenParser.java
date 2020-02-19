@@ -17,9 +17,9 @@ public class ParenParser extends foam.lib.parse.ProxyParser {
 
   public ParenParser(Parser valueParser) {
     setDelegate(new Seq1(1,
-                         new Literal("("),
+                         Literal.create("("),
                          valueParser,
-                         new Literal(")")));
+                         Literal.create(")")));
   }
 
   @Override

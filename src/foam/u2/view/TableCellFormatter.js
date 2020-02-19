@@ -126,9 +126,11 @@ foam.CLASS({
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(obj) {
-        this.start()
-          .add(obj.toSummary())
-        .end();
+        this.callIf(obj, function() {
+          this.start()
+            .add(obj.toSummary())
+          .end();
+        })
       }
     }
   ]
@@ -146,18 +148,25 @@ foam.CLASS({
       name: 'tableCellFormatter',
       value: function(value, obj, axiom) {
         var unitProp = obj.cls_.getAxiomByName(axiom.unitPropName);
-        if ( unitProp ) {
-          var unitId = obj[unitProp.name];
-          // TODO: replace currencyDAO with unitDAO
-          obj.__context__.currencyDAO.find(unitId).then((unit) => {
-            var slot = obj.slot(axiom.name).map((propValue) => unit.format(propValue));
-            this.add(slot);
-            this.onDetach(this.tooltip$.follow(slot));
-          });
-        } else {
+        if ( ! unitProp ) {
           console.warn(obj.cls_.name, ' does not have the property: ', axiom.unitPropName);
           this.add(value);
-        }    
+          return;
+        }
+        var self = this;
+        this.add(foam.core.ExpressionSlot.create({
+          args: [obj.slot(unitProp.name), obj.slot(axiom.name)],
+          code: (unitId, propValue) => {
+            // TODO: Replace currencyDAO with unitDAO
+            return foam.core.PromiseSlot.create({
+              promise: obj.__context__.currencyDAO.find(unitId).then((unit) => {
+                var formatted = unit ? unit.format(propValue) : propValue;
+                self.tooltip = formatted;
+                return formatted;
+              })
+            });
+          }
+        }));
       }
     }
   ]
@@ -187,7 +196,9 @@ foam.CLASS({
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(value) {
-        this.add(value.map(o => o.toSummary()).join(', '));
+        this.callIf(value, function() {
+          this.add(value.map(o => o.toSummary()).join(', '));
+        });
       }
     }
   ]
@@ -227,7 +238,8 @@ foam.CLASS({
       value: function(date) {
         // allow the browser to deal with this since we are technically using the user's preference
         if ( date ) {
-          var formattedDate = date.toLocaleDateString();
+          // toLocaleString includes date and time
+          var formattedDate = date.toLocaleString();
           this.add(formattedDate);
           this.tooltip = formattedDate;
         }
@@ -255,6 +267,12 @@ foam.CLASS({
         var seconds = Math.floor(value / 1000);
         value -= seconds * 1000;
         var milliseconds = value % 1000;
+
+        // For long durations, don't show milliseconds
+        if ( hours ) seconds = 0;
+
+        // For longer durations, don't show seconds
+        if ( minutes || hours ) milliseconds = 0;
 
         var formatted = [[hours, 'h'], [minutes, 'm'], [seconds, 's'], [milliseconds, 'ms']].reduce((acc, cur) => {
           return cur[0] > 0 ? acc.concat([cur[0] + cur[1]]) : acc;

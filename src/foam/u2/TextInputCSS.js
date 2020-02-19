@@ -16,10 +16,10 @@ foam.CLASS({
       name: 'code',
       value: `
         ^ {
-          height: %INPUTHEIGHT%;
+          height: /*%INPUTHEIGHT%*/ 32px;
           font-size: 14px;
-          padding-left: %INPUTHORIZONTALPADDING%;
-          padding-right: %INPUTHORIZONTALPADDING%;
+          padding-left: /*%INPUTHORIZONTALPADDING%*/ 8px;
+          padding-right: /*%INPUTHORIZONTALPADDING%*/ 8px;
           border: 1px solid;
           border-radius: 3px;
           color: /*%BLACK%*/ #1e1f21;

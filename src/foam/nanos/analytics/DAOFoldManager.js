@@ -17,8 +17,7 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.core.X',
-    'java.util.Date'
+    'foam.core.X'
   ],
 
   properties: [
@@ -65,7 +64,7 @@ setCloseTimeExpr(new foam.glang.EndOfTimeSpan.Builder(getX())
       javaCode: `
         int hash = key.hashCode();
         Object[] locks = getLocks();
-        return locks[(int) (Math.abs(hash) % locks.length)];
+        return locks[(int) (Math.abs(hash % locks.length))];
       `
     },
     {

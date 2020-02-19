@@ -7,11 +7,15 @@ foam.CLASS({
   package: 'foam.nanos.boot',
   name: 'NSpec',
 
+  javaImplements: [
+    'foam.nanos.auth.EnabledAware'
+  ],
+
   requires: [
     {
       path: 'foam.comics.BrowserView',
-      flags: ['web'],
-    },
+      flags: ['web']
+    }
   ],
 
   javaImports: [
@@ -52,7 +56,7 @@ foam.CLASS({
             })
             .add(value ? ' Y' : '-')
           .end();
-      },
+      }
     },
     {
       class: 'Boolean',
@@ -114,19 +118,23 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       name: 'service',
-      view: { class: 'foam.u2.view.FObjectView' },
+      view: { class: 'foam.u2.detail.SectionedDetailView' },
       readPermissionRequired: true,
       writePermissionRequired: true
     },
     {
       class: 'String',
       name: 'serviceClass',
-      displayWidth: 80
+      displayWidth: 80,
+      readPermissionRequired: true,
+      writePermissionRequired: true
     },
     {
       class: 'String',
       name: 'boxClass',
-      displayWidth: 80
+      displayWidth: 80,
+      readPermissionRequired: true,
+      writePermissionRequired: true
     },
     {
       class: 'Code',
@@ -160,8 +168,19 @@ foam.CLASS({
       },
       readPermissionRequired: true,
       writePermissionRequired: true
+    },
+    {
+      class: 'Boolean',
+      name: 'enabled',
+      value: true,
+      readPermissionRequired: true,
+      writePermissionRequired: true
+    },
+    {
+          class: 'StringArray',
+          name: 'keywords'
     }
-    // TODO: permissions, keywords, lazy, parent
+    // TODO: permissions, lazy, parent
   ],
 
   methods: [

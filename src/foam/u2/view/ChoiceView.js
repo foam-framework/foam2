@@ -60,7 +60,7 @@ foam.CLASS({
 
         try {
           if ( ! n && this.placeholder ) {
-            this.data  = undefined;
+            this.data  = this.defaultValue;
             this.text  = this.placeholder;
             this.index = -1;
           } else {
@@ -269,7 +269,8 @@ foam.CLASS({
       code: function() {
         var d = this.data;
         if ( this.choices.length ) {
-          this.choice = ( d != null && this.findChoiceByData(d) ) || this.defaultValue;
+          var choice = this.findChoiceByData(d);
+          this.choice = choice === null ? this.findChoiceByData(this.defaultValue) : choice;
         }
       }
     },

@@ -18,17 +18,15 @@ foam.CLASS({
     'org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest',
     'org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse',
     'org.eclipse.jetty.websocket.servlet.WebSocketCreator',
-    'foam.nanos.jetty.WhitelistedForwardedRequestCustomizer',
+    'foam.nanos.logger.Logger',
     'java.util.Set',
     'java.util.HashSet',
     'java.util.Arrays',
     'org.eclipse.jetty.server.*',
     'org.eclipse.jetty.util.ssl.SslContextFactory',
-    'javax.net.ssl.KeyManager',
-    'javax.net.ssl.KeyManagerFactory',
-    'javax.net.ssl.SSLContext',
     'java.io.FileInputStream',
-    'java.security.KeyStore'
+    'java.security.KeyStore',
+    'org.apache.commons.io.IOUtils'
   ],
 
   properties: [
@@ -213,7 +211,9 @@ foam.CLASS({
                 
         server.start();
       } catch(Exception e) {
-        e.printStackTrace();
+        Logger logger = (Logger) getX().get("logger");
+        if ( logger != null )
+          logger.error(e);
       }
       `
     },
@@ -236,7 +236,9 @@ foam.CLASS({
               server.stop();
             } catch (Exception e) {
               System.err.println("Exception during Jetty server stop in the shutdown hook");
-              e.printStackTrace();
+              Logger logger = (Logger) getX().get("logger");
+              if ( logger != null )
+                logger.error(e);
             }
           }
         });
@@ -256,10 +258,12 @@ foam.CLASS({
 
       if ( this.getEnableHttps() ) {
   
+        FileInputStream is = null;
         try {
           // 1. load the keystore to verify the keystore path and password.
           KeyStore keyStore = KeyStore.getInstance("JKS");
-          keyStore.load(new FileInputStream(this.getKeystorePath()), this.getKeystorePassword().toCharArray());
+          is = new FileInputStream(this.getKeystorePath());
+          keyStore.load(is, this.getKeystorePassword().toCharArray());
   
           // 2. enable https
           HttpConfiguration https = new HttpConfiguration();
@@ -283,6 +287,8 @@ foam.CLASS({
                        "Please see: https://docs.google.com/document/d/1hXVdHjL8eASG2AG2F7lPwpO1VmcW2PHnAW7LuDC5xgA/edit?usp=sharing", e);
         } catch ( Exception e ) {
           logger.error("Error when enable the https.");
+        } finally {
+          IOUtils.closeQuietly(is);
         }
   
       }

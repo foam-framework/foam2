@@ -10,14 +10,21 @@
 
   documentation: 'Rule model represents rules(actions) that need to be applied in case passed object satisfies provided predicate.',
 
+  implements: [
+    'foam.nanos.auth.CreatedAware',
+    'foam.nanos.auth.CreatedByAware',
+    'foam.nanos.auth.LastModifiedAware',
+    'foam.nanos.auth.LastModifiedByAware'
+  ],
+
+  imports: [
+    'userDAO'
+  ],
+
   javaImports: [
-    'foam.core.ContextAware',
-    'foam.core.FObject',
-    'foam.core.X',
     'foam.core.DirectAgency',
     'foam.nanos.logger.Logger',
-    'java.util.Collection',
-    'foam.nanos.ruler.RuleGroup'
+    'java.util.Collection'
   ],
 
   tableColumns: [
@@ -26,7 +33,8 @@
     'enabled',
     'priority',
     'daoKey',
-    'documentation'
+    'createdBy',
+    'lastModifiedBy'
   ],
 
   searchColumns: [
@@ -55,8 +63,8 @@
     {
       class: 'String',
       name: 'id',
-      updateMode: 'RO',
-      tableWidth: 200,
+      updateVisibility: 'RO',
+      tableWidth: 300,
       section: 'basicInfo'
     },
     {
@@ -67,7 +75,7 @@
       'The convention for values is ints that are multiple of 10.',
       readPermissionRequired: true,
       writePermissionRequired: true,
-      tableWidth: 50,
+      tableWidth: 66,
       section: 'basicInfo'
     },
     {
@@ -84,6 +92,7 @@
     {
       class: 'String',
       name: 'daoKey',
+      label: 'DAO Key',
       documentation: 'dao name that the rule is applied on.',
       readPermissionRequired: true,
       writePermissionRequired: true,
@@ -164,6 +173,11 @@
       }
     },
     {
+      class: 'Boolean',
+      name: 'debug',
+      documentation: 'Test this boolean before generating expensive logger.debug calls, to speed rule execution.'
+    },
+    {
       class: 'Int',
       name: 'validity',
       documentation: 'Validity of the rule (in days) for automatic rescheduling.',
@@ -191,6 +205,60 @@
         }
         return null;
       `
+    },
+    {
+      class: 'DateTime',
+      name: 'created',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdBy',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      tableCellFormatter: function(value, obj) {
+        obj.userDAO.find(value).then(function(user) {
+          if ( user ) {
+            this.add(user.legalName);
+          }
+        }.bind(this));
+      }
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdByAgent',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      tableCellFormatter: function(value, obj) {
+        obj.userDAO.find(value).then(function(user) {
+          if ( user ) {
+            this.add(user.legalName);
+          }
+        }.bind(this));
+      }
+    },
+    {
+      class: 'DateTime',
+      name: 'lastModified',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'lastModifiedBy',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      tableCellFormatter: function(value, obj) {
+        obj.userDAO.find(value).then(function(user) {
+          if ( user ) {
+            this.add(user.legalName);
+          }
+        }.bind(this));
+      }
     }
   ],
 
@@ -222,9 +290,8 @@
           try {
             return getPredicate().f(obj);
           } catch ( Throwable th ) { }
-
-          ((Logger) x.get("logger")).error(
-            "Failed to evaluate predicate of rule: " + getId(), t);
+          // ((Logger) x.get("logger")).debug(this.getClass().getSimpleName(), "id", getId(), "\\nrule", this, "\\nobj", obj, "\\nold", oldObj, "\\n", t);
+          ((Logger) x.get("logger")).error("Failed to evaluate predicate of rule: " + getId(), t);
           return false;
         }
       `
@@ -249,12 +316,16 @@
           type: 'foam.nanos.ruler.RuleEngine'
         },
         {
+          name: 'rule',
+          type: 'foam.nanos.ruler.Rule'
+        },
+        {
           name: 'agency',
           type: 'foam.core.Agency'
         }
       ],
       javaCode: `
-        getAction().applyAction(x, obj, oldObj, ruler, agency);
+        getAction().applyAction(x, obj, oldObj, ruler, rule, agency);
       `
     },
     {
@@ -275,10 +346,14 @@
         {
           name: 'ruler',
           type: 'foam.nanos.ruler.RuleEngine'
-        }
+        },
+        {
+          name: 'rule',
+          type: 'foam.nanos.ruler.Rule'
+        },
       ],
       javaCode: `
-        getAsyncAction().applyAction(x, obj, oldObj, ruler, new DirectAgency());
+        getAsyncAction().applyAction(x, obj, oldObj, ruler, rule, new DirectAgency());
         if ( ! getAfter() ) {
           ruler.getDelegate().cmd_(x.put("OBJ", obj), getCmd());
         }

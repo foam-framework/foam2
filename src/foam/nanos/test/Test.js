@@ -13,6 +13,7 @@ foam.CLASS({
 
   javaImports: [
     'bsh.Interpreter',
+    'foam.nanos.logger.Logger',
     'foam.nanos.app.AppConfig',
     'foam.nanos.app.Mode',
     'foam.nanos.pm.PM',
@@ -40,7 +41,7 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'passed',
-      visibility: foam.u2.Visibility.RO,
+      visibility: foam.u2.DisplayMode.RO,
       tableCellFormatter: function(value) {
         if ( value ) this.start().style({ color: '#0f0' }).add(value).end();
       },
@@ -49,7 +50,7 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'failed',
-      visibility: foam.u2.Visibility.RO,
+      visibility: foam.u2.DisplayMode.RO,
       tableCellFormatter: function(value) {
         if ( value ) this.start().style({ color: '#f00' }).add(value).end();
       },
@@ -175,7 +176,8 @@ foam.CLASS({
           setFailed(getFailed()+1);
           ps.println("FAILURE: "+e.getMessage());
           e.printStackTrace(ps);
-          e.printStackTrace();
+          Logger logger = (Logger) x.get("logger");
+          logger.error(e);
         } finally {
           pm.log(x);
         }

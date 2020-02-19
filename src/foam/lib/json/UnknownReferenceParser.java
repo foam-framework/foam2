@@ -13,11 +13,11 @@ public class UnknownReferenceParser
 {
   public UnknownReferenceParser() {
     super(new Parser(){
-      private Parser delegate = new Whitespace();
+      private Parser delegate = Whitespace.instance();
 
       public PStream parse(PStream ps, ParserContext x) {
         ps = ps.apply(delegate, x);
-        if ( ps == null && ! ps.valid() ) {
+        if ( ps == null || ! ps.valid() ) {
           return null;
         }
         

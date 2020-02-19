@@ -11,30 +11,28 @@ foam.INTERFACE({
   methods: [
     {
       name: 'put',
+      type: 'FObject',
       args: [
-        { name: 'x', type: 'Context' },
-        { name: 'nu', type: 'foam.core.FObject' }
-      ]
-    },
-    {
-      name: 'put_',
-      args: [
-        { name: 'x', type: 'Context' },
-        { name: 'old', type: 'foam.core.FObject' },
-        { name: 'nu', type: 'foam.core.FObject' }
+        { name: 'x',      type: 'Context' },
+        { name: 'prefix', type: 'String' },
+        { name: 'dao',    type: 'DAO' },
+        { name: 'obj',    type: 'foam.core.FObject' }
       ]
     },
     {
       name: 'remove',
+      type: 'FObject',
       args: [
-        { name: 'x', type: 'Context' },
-        { name: 'obj', type: 'foam.core.FObject' }
+        { name: 'x',      type: 'Context' },
+        { name: 'prefix', type: 'String' },
+        { name: 'dao',    type: 'DAO' },
+        { name: 'obj',    type: 'foam.core.FObject' }
       ]
     },
     {
       name: 'replay',
       args: [
-        { name: 'x', type: 'Context' },
+        { name: 'x',   type: 'Context' },
         { name: 'dao', type: 'foam.dao.DAO' }
       ]
     }
@@ -49,18 +47,6 @@ foam.CLASS({
 
   implements: [
     'foam.dao.Journal'
-  ],
-
-  methods: [
-    {
-      name: 'put',
-      code: function (x, nu) {
-        this.put_(x, null, nu);
-      },
-      javaCode: `
-        this.put_(x, null, nu);
-      `
-    }
   ]
 });
 
@@ -78,7 +64,7 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.dao.Journal',
       name: 'delegate',
-      forwards: [ 'put_', 'remove', 'replay' ]
+      forwards: [ 'put', 'remove', 'replay' ]
     }
   ]
 });
@@ -124,7 +110,12 @@ if ( foam.isServer ) {
               "));\n"));
       },
 
-      function remove(x, obj) {
+      function put(x, prefix, dao, obj) {
+        var old = dao.find_(x, obj.id);
+        this.put_(x, old, obj);
+      },
+
+      function remove(x, prefix, dao, obj) {
         return this.write_(Buffer.from(
             "remove(foam.json.parse(" +
               foam.json.Storage.stringify(obj, this.of) +

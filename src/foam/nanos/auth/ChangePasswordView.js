@@ -102,8 +102,8 @@ foam.CLASS({
         class: 'foam.u2.view.PasswordView',
         passwordIcon: true
       },
-      visibilityExpression: function(token) {
-        return ! token ? foam.u2.Visibility.RW : foam.u2.Visibility.HIDDEN;
+      visibility: function(token) {
+        return ! token ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
       }
     },
     {
@@ -119,6 +119,7 @@ foam.CLASS({
     {
       class: 'Password',
       name: 'confirmationPassword',
+      label: 'Confirm Password',
       section: 'resetPasswordSection',
       view: {
         class: 'foam.u2.view.PasswordView',
@@ -209,7 +210,7 @@ foam.CLASS({
         this.resetPasswordToken.processToken(null, user, this.token)
         .then((_) => {
           this.reset_();
-          this.stack.push({ class: 'foam.nanos.auth.SignInView' });
+          this.stack.push({ class: 'foam.u2.view.LoginView', mode_: 'SignIn' }, this);
           this.notify(this.SUCCESS_MSG);
         }).catch((err) => {
           this.notify(err.message, 'error');

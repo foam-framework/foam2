@@ -16,11 +16,6 @@ foam.CLASS({
   `Model that stores the array of decorators that fills the emailMessage
    with service level precedence on properties.`,
 
-  javaImports: [
-    'foam.nanos.notification.email.EmailMessage',
-    'foam.nanos.notification.email.EmailPropertyService'
-  ],
-
   properties: [
     {
       name: 'data',

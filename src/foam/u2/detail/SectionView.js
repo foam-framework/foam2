@@ -16,18 +16,12 @@ foam.CLASS({
     'foam.core.SimpleSlot',
     'foam.layout.Section',
     'foam.u2.detail.SectionedDetailPropertyView',
+    'foam.u2.DisplayMode',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Grid',
     'foam.u2.layout.GUnit',
-    'foam.u2.layout.Rows',
-    'foam.u2.Visibility'
+    'foam.u2.layout.Rows'
   ],
-
-  css: `
-    ^ {
-      padding: 12px 0 0 0;
-    }
-  `,
 
   properties: [
     {
@@ -76,13 +70,13 @@ foam.CLASS({
                     data$: self.data$
                   }, s2)
                 .end();
-                s1.get().show(self.ProxySlot.create({ delegate$: s2.get().visibilitySlot$ }));
+                s1.get().show(self.ProxySlot.create({ delegate$: s2.get().visibilitySlot$ }).map((mode) => mode !== self.DisplayMode.HIDDEN));
               })
             .end()
             .start(self.Cols)
               .style({
                 'justify-content': 'end',
-                'margin-top': section.actions.length ? '20px' : 'initial'
+                'margin-top': section.actions.length ? '4vh' : 'initial'
               })
               .forEach(section.actions, function(a) {
                 this.add(a);

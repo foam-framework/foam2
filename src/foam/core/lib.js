@@ -73,6 +73,18 @@ Object.defineProperty(
 
 
 /**
+ * Check for the FOAMLINK_DATA global. If it is set, FOAMLink will be
+ * enabled in the server-side classloader
+ */
+if ( typeof global.FOAMLINK_DATA !== 'undefined' ) {
+  foam.hasFoamlink = true;
+  foam.foamlink = {
+    dataFile: global.FOAMLINK_DATA
+  };
+}
+
+
+/**
  * Define an assertion function that is significantly faster and more
  * compatible than console.assert.  Also allows us to turn off assertions
  * in a production scenario.
@@ -84,6 +96,7 @@ Object.defineProperty(
 foam.assert = function assert(cond) {
   if ( ! cond ) {
     console.assert(false, Array.from(arguments).slice(1).join(' '));
+    console.trace();
   }
 
   return cond;

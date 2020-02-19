@@ -16,6 +16,10 @@ foam.CLASS({
     'theme'
   ],
 
+  requires: [
+    'foam.u2.tag.Image'
+  ],
+
   css: `
     ^ {
       display: flex;
@@ -25,43 +29,19 @@ foam.CLASS({
     ^ .logo {
       max-height: 40px;
     }
-    ^ .appName {
-      color: white;
-      font-size: 20px;
-      display: flex;
-      align-items: center;
-      margin-left: 10px;
-    }
   `,
 
   methods: [
     function initE() {
       this
         .addClass(this.myClass())
-        .on('click', this.goToDefault)
-          .start({
-            class: 'foam.u2.tag.Image',
-            data$: this.theme$.dot('logo')
+        .start(this.Image, {
+          data$: this.slot(function(theme$largeLogoEnabled, theme$logo, theme$largeLogo) {
+            return theme$largeLogoEnabled ? theme$largeLogo : theme$logo;
           })
-            .hide(this.theme$.dot('largeIconEnabled'))
-            .addClass('logo')
-          .end()
-          .start('span').addClass('appName').add(this.theme$.dot('appName')).end()
-          .start({
-            class: 'foam.u2.tag.Image',
-            data$: this.theme$.dot('largeLogo')
-          })
-            .addClass('logo')
-            .show(this.theme$.dot('largeIconEnabled'))
-          .end();
-    }
-  ],
-
-  listeners: [
-    function goToDefault() {
-      if ( this.theme ) {
-        this.pushMenu(this.theme.defaultMenu);
-      }
+        })
+          .addClass('logo')
+        .end();
     }
   ]
 });

@@ -1,15 +1,17 @@
-
 /**
  * @license
  * Copyright 2019 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
+
 foam.CLASS({
   package: 'foam.nanos.crunch',
   name: 'UserCapabilityJunctionRefine',
   refines: 'foam.nanos.crunch.UserCapabilityJunction',
+
   documentation: `
-  Model for UserCapabilityJunction, contains the data needed to grant the capability to user.
+    Model for UserCapabilityJunction, contains the data needed to grant the
+    capability to user.
   `,
 
   properties: [

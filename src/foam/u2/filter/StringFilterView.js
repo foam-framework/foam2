@@ -15,6 +15,11 @@ foam.CLASS({
     'foam.mlang.Expressions'
   ],
 
+  requires: [
+    'foam.mlang.sink.Count',
+    'foam.mlang.sink.GroupBy'
+  ],
+
   css: `
     ^ {
       position: relative;
@@ -95,6 +100,7 @@ foam.CLASS({
   messages: [
     { name: 'LABEL_PLACEHOLDER', message: 'Search' },
     { name: 'LABEL_LOADING', message: '- LOADING OPTIONS -' },
+    { name: 'LABEL_NO_OPTIONS', message: '- NO OPTIONS AVAILABLE -' },
     { name: 'LABEL_SELECTED', message: 'SELECTED OPTIONS' },
     { name: 'LABEL_FILTERED', message: 'OPTIONS' },
     { name: 'LABEL_EMPTY', message: '- Not Defined -' }
@@ -113,30 +119,19 @@ foam.CLASS({
       required: true
     },
     {
-      name: 'daoContents',
-      preSet: function(_, n) {
-        // remove objects with the same strings for specified property
-        var self = this;
-        return n.reduce(function(accumulator, obj) {
-
-          // create an identifying id
-          var id = obj[self.property];
-
-          // if the id is not found in the temp array
-          // add the object to the output array
-          // and add the key to the temp array
-          if ( accumulator.temp.indexOf(id) === -1 ) {
-            accumulator.out.push(obj);
-            accumulator.temp.push(id);
-          }
-          return accumulator;
-        // return the zero duplicate array
-        }, { temp: [], out: [] }).out;
-      }
+      name: 'daoContents'
     },
     {
       class: 'String',
-      name: 'search'
+      name: 'search',
+      postSet: function(_, n) {
+        this.dao.where(this.CONTAINS_IC(this.property, n)).limit(100).select(this.GroupBy.create({
+          arg1: this.property,
+          arg2: this.Count.create()
+        })).then((results) => {
+          this.daoContents = results.groupKeys;
+        });
+      }
     },
     {
       name: 'selectedOptions',
@@ -146,18 +141,10 @@ foam.CLASS({
     },
     {
       name: 'filteredOptions',
-      expression: function(property, daoContents, search, selectedOptions) {
+      expression: function(daoContents, selectedOptions) {
         if ( ! daoContents || daoContents.length === 0 ) return [];
 
-        var options = daoContents.map((obj) => obj[this.property].trim());
-
-        // Filter out search
-        if ( search ) {
-          var lowerCaseSearch = search.toLowerCase();
-          options = options.filter(function(option) {
-            return option.toLowerCase().includes(lowerCaseSearch);
-          });
-        }
+        var options = daoContents.map((obj) => obj.trim());
 
         // Filter out selectedOptions
         selectedOptions.forEach(function(selection) {
@@ -166,7 +153,6 @@ foam.CLASS({
           });
         });
 
-        this.isLoading = false;
         return options;
       }
     },
@@ -198,9 +184,14 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.dao.select().then((results) => {
-        this.daoContents = results.array;
+      this.dao.limit(100).select(this.GroupBy.create({
+        arg1: this.property,
+        arg2: this.Count.create()
+      })).then((results) => {
+        this.daoContents = results.groupKeys;
+        this.isLoading = false;
       });
+
       var self = this;
       this
         .addClass(this.myClass())
@@ -242,6 +233,12 @@ foam.CLASS({
               return element
                 .start('p').addClass(self.myClass('label-loading'))
                   .add(self.LABEL_LOADING)
+                .end();
+            }
+            if ( filteredOptions.length === 0 ) {
+              return element
+                .start('p').addClass(self.myClass('label-loading'))
+                  .add(self.LABEL_NO_OPTIONS)
                 .end();
             }
             return element
