@@ -38,8 +38,20 @@ Below are some properties that may be useful in the onboarding use case of crunc
 ##### User - Capability 
 - stored in the `userCapabilityJunctionDAO`
 - refined by `UserCapabilityJunctionRefine`
-    ###### UserCapabilityJunctionRefined
-    ###### UserCapabilityJunctionDAO
+Notable properties on the UCJ model :
+- `status` - an Enum of CapabilityJunctionStatus, `PENDING` unless `GRANTED` or `EXPIRED`
+- `expiry` - A DateTime calculated at the time the UCJ becomes GRANTED
+- `data` - Information relating to the user and the capability. 
+    - In the liquid use case, this field was used to add information about the extend of the Capability granted to the user. 
+    - In the onboarding use case, this could be information that need be collected from the user in order to grant a Capability
+The UserCapabilityJunctionDAO decorator :
+- This decorator was created with the onboarding use case in mind and can be excluded depending on need
+- Behavior on put :
+    - ownership of the UCJ is checked
+    - UCJs with prerequisite Capabilities are checked
+    - the `data` of the UCJ must be a validatable, and its `validate` method is checked 
+    - the `data` is saved to the `daoKey` of the Capability, if `daoKey` is provided
+    - if the prerequistes are fulfilled and the data is validated, the `status` of the UCJ is set to `GRANTED`, and the `expiry` is calculated. Otherwise, the `status` is set to `PENDING`
 
 #### CapabilityAuthService
 
