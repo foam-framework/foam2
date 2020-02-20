@@ -122,7 +122,10 @@ foam.CLASS({
       class: 'Boolean',
       name: 'createEnabled',
       documentation: 'If set to false, the "Create" button will not be visible.',
-      value: true
+      //value: true,
+      expression: function() {
+        return ( this.CRUDPermission$ &&  this.CRUDPermission.create$ ) ? this.CRUDPermission.create.f() : true;
+      }
     },
     {
       class: 'Boolean',

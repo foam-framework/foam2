@@ -9,33 +9,33 @@ foam.CLASS({
     {
       class: 'foam.mlang.predicate.PredicateProperty',
       name: 'create',
-      view: {
-        class: 'foam.u2.view.JSONTextView'
-      },
       javaFactory: `
         return foam.mlang.MLang.TRUE;
       `,
+      factory: function() {
+        foam.mlang.predicate.True.create();
+      }
       //javaFactory: `return foam.mlang.MLang.TRUE;`
     },
     {
       class: 'foam.mlang.predicate.PredicateProperty',
       name: 'update',
-      view: {
-        class: 'foam.u2.view.JSONTextView'
-      },
       javaFactory: `
         return foam.mlang.MLang.TRUE;
       `,
+      factory: function() {
+        foam.mlang.predicate.True.create();
+      }
     },
     {
       class: 'foam.mlang.predicate.PredicateProperty',
       name: 'delete',
-      view: {
-        class: 'foam.u2.view.JSONTextView'
-      },
       javaFactory: `
         return foam.mlang.MLang.TRUE;
       `,
+      factory: function() {
+        foam.mlang.predicate.True.create();
+      }
     }
   ] 
 });

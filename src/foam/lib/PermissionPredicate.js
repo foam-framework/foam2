@@ -16,17 +16,15 @@ foam.CLASS({
     {
       name: 'f',
       javaCode: `
-        AuthService auth = (AuthService) x.get("auth");
-        if ( ! ( args != null && args.length >= 0 ) ) {
+        AuthService auth = (AuthService) getX().get("auth");
+        if ( ! ( args_ != null && args_.length >= 0 ) ) {
           return true;
         }
 
-        for (String permission : args) {
-          if ( auth.check(x, permission) )
+        for (String permission : args_) {
+          if ( auth.check(getX(), permission) )
             return true;
         }
-        
-
         return false;
       `
     }
