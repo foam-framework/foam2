@@ -25,6 +25,8 @@ public class JSONOutputterEscapeBenchmark
 
   @Override
   public synchronized void execute(X x) {
-    out_.escape("abcdefg\n\t\\\u2605\\u0007xjxjxjxjxjxjxjxjxjxj");
+    for ( int i = 0 ; i < 1000 ; i++ ) {
+      out_.escape("abcdefg\n\t\\\u2605\\u0007xjxjxjxjxjxjxjxjxjxj");
+    }
   }
 }
