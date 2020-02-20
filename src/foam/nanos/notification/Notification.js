@@ -160,7 +160,7 @@ foam.CLASS({
       name: 'authorizeOnRead',
       javaCode: `
       AuthService auth = (AuthService) x.get("auth");
-      if ( ! checkOwnership(x) ) throw new AuthorizationException("You don't have permission to read notifications you do not own.");
+      if ( ! checkOwnership(x) && ! auth.check(x, createPermission("read")) ) throw new AuthorizationException("You don't have permission to read notifications you do not own.");
       `
     },
     {
