@@ -65,7 +65,7 @@
     {
       class: 'String',
       name: 'id',
-      hidden: true
+      visibility: 'HIDDEN'
     },
     {
       class: 'String',
