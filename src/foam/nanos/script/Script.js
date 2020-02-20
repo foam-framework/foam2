@@ -129,7 +129,8 @@ foam.CLASS({
     },
     {
       class: 'Code',
-      name: 'code'
+      name: 'code',
+      writePermissionRequired: true
     },
     {
       class: 'String',
@@ -166,6 +167,12 @@ foam.CLASS({
       of: 'foam.nanos.auth.User',
       name: 'lastModifiedBy',
       documentation: 'User who last modified script'
+    },
+    {
+      class: 'String',
+      name: 'daoKey',
+      value: 'scriptDAO',
+      visibility: 'HIDDEN'
     }
   ],
 
@@ -276,7 +283,7 @@ foam.CLASS({
         this.output = '';
         this.status = this.ScriptStatus.SCHEDULED;
         if ( this.server ) {
-          this.scriptDAO.put(this).then(function(script) {
+          this.__context__[this.daoKey].put(this).then(function(script) {
               self.copyFrom(script);
               if ( script.status === self.ScriptStatus.RUNNING ) {
                 self.poll();
@@ -286,11 +293,11 @@ foam.CLASS({
           this.status = this.ScriptStatus.RUNNING;
           this.runScript().then(() => {
             this.status = this.ScriptStatus.UNSCHEDULED;
-            this.scriptDAO.put(this);
+            this.__context__[this.daoKey].put(this);
           }).catch((err) => {
             console.log(err);
             this.status = this.ScriptStatus.ERROR;
-            this.scriptDAO.put(this);
+            this.__context__[this.daoKey].put(this);
           });
         }
       }
