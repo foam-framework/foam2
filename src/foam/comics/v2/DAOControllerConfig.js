@@ -124,7 +124,7 @@ foam.CLASS({
       documentation: 'If set to false, the "Create" button will not be visible.',
       //value: true,
       expression: function() {
-        return ( this.CRUDPermission$ &&  this.CRUDPermission.create$ ) ? this.CRUDPermission.create.f() : true;
+        return ( this.CRUDPermission &&  this.CRUDPermission.create ) ? this.CRUDPermission.create.f() : true;
       }
     },
     {

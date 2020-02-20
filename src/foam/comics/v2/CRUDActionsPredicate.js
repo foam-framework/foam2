@@ -3,10 +3,6 @@ foam.CLASS({
   name: 'CRUDActionsPredicate',
   properties: [
     {
-      class: 'String',
-      name: 'id'
-    },
-    {
       class: 'foam.mlang.predicate.PredicateProperty',
       name: 'create',
       javaFactory: `
