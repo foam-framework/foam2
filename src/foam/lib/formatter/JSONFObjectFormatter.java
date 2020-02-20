@@ -51,7 +51,7 @@ public class JSONFObjectFormatter
   };
 
   protected boolean quoteKeys_           = false;
-  protected boolean outputShortNames_    = false;
+  protected boolean outputShortNames_    = true;
   protected boolean outputDefaultValues_ = false;
   protected boolean multiLineOutput_     = false;
   protected boolean outputClassNames_    = true;
@@ -70,60 +70,19 @@ public class JSONFObjectFormatter
 
   public void output(String s) {
     if ( multiLineOutput_ && s.indexOf('\n') >= 0 ) {
-      b_.append("\n");
+      b_.append("\n\"\"\"");
+      escapeAppend(s);
       b_.append("\"\"\"");
-      b_.append(escapeMultiline(s));
-      b_.append("\"\"\"");
-    }
-    else {
-      b_.append("\"");
-      b_.append(escape(s));
-      b_.append("\"");
+    } else {
+      b_.append('\"');
+      escapeAppend(s);
+      b_.append('\"');
     }
   }
 
-  public String escape(String s) {
-    s = s.replace("\\", "\\\\")
-      .replace("\"", "\\\"")
-      .replace("\t", "\\t")
-      .replace("\r","\\r")
-      .replace("\n","\\n");
-    s = escapeControlCharacters(s);
-    return s;
+  public void escapeAppend(String s) {
+    foam.lib.json.Util.escape(s, b_);
   }
-
-  public String escapeMultiline(String s) {
-    s = s.replace("\\", "\\\\");
-    s = escapeControlCharacters(s);
-    return s;
-  }
-
-  public String escapeControlCharacters(String s) {
-    int lastStart = 0;
-    String escapedString = "";
-    char c;
-    for ( int i = 0 ; i < s.length() ; i++ ) {
-      c = s.charAt(i);
-      if ( c >= ' ' ) continue;
-      // Character to hex
-      char right = (char) (c & 0x0F);
-      char left  = (char) ((c & 0xF0) >> 4);
-      right += '0';
-      if ( right > '9' ) right += 'A' - '9' - 1;
-      left += '0';
-      if ( left > '9' ) left += 'A' - '9' - 1;
-      char[] escape = new char[] {'\\','u','0','0',left,right};
-      // Add previous string segment
-      escapedString += s.substring(lastStart, i);
-      // Add escape sequence
-      escapedString += new String(escape);
-      lastStart = i + 1;
-    }
-    if ( lastStart != s.length() )
-      escapedString += s.substring(lastStart, s.length());
-    return escapedString;
-  }
-
 
   public void output(short val) { b_.append(val); }
 
@@ -156,21 +115,21 @@ public class JSONFObjectFormatter
   }
 
   public void output(Object[] array) {
-    b_.append("[");
+    b_.append('[');
     for ( int i = 0 ; i < array.length ; i++ ) {
       output(array[i]);
-      if ( i < array.length - 1 ) b_.append(",");
+      if ( i < array.length - 1 ) b_.append(',');
     }
-    b_.append("]");
+    b_.append(']');
   }
 
   public void output(byte[][] array) {
-    b_.append("[");
+    b_.append('[');
     for ( int i = 0 ; i < array.length ; i++ ) {
       output(array[i]);
-      if ( i < array.length - 1 ) b_.append(",");
+      if ( i < array.length - 1 ) b_.append(',');
     }
-    b_.append("]");
+    b_.append(']');
   }
 
   public void output(byte[] array) {
@@ -178,34 +137,34 @@ public class JSONFObjectFormatter
   }
 
   public void output(Map map) {
-    b_.append("{");
+    b_.append('{');
     java.util.Iterator keys = map.keySet().iterator();
     while ( keys.hasNext() ) {
       Object key   = keys.next();
       Object value = map.get(key);
       output(key == null ? "" : key.toString());
-      b_.append(":");
+      b_.append(':');
       output(value);
-      if ( keys.hasNext() ) b_.append(",");
+      if ( keys.hasNext() ) b_.append(',');
     }
-    b_.append("}");
+    b_.append('}');
   }
 
   public void output(List list) {
-    b_.append("[");
+    b_.append('[');
     java.util.Iterator iter = list.iterator();
     while ( iter.hasNext() ) {
       output(iter.next());
       if ( iter.hasNext() ) b_.append(",");
     }
-    b_.append("]");
+    b_.append(']');
   }
 
   protected void outputProperty(FObject o, PropertyInfo p) {
     if ( quoteKeys_ ) b_.append(beforeKey_());
     b_.append(getPropertyName(p));
     if ( quoteKeys_ ) b_.append(afterKey_());
-    b_.append(":");
+    b_.append(':');
     p.format(this, o);
   }
 /*
@@ -229,21 +188,24 @@ public class JSONFObjectFormatter
   */
 
   public void output(Enum<?> value) {
-//    outputNumber(value.ordinal());
+    output(value.ordinal());
 
-    b_.append("{");
+//    outputNumber(value.ordinal());
+/*
+    b_.append('{');
       b_.append(beforeKey_());
       b_.append("class");
       b_.append(afterKey_());
-      b_.append(":");
+      b_.append(':');
       output(value.getClass().getName());
       b_.append(",");
       b_.append(beforeKey_());
       b_.append("ordinal");
       b_.append(afterKey_());
-      b_.append(":");
+      b_.append(':');
       outputNumber(value.ordinal());
-    b_.append("}");
+    b_.append('}');
+    */
   }
 
   public void output(Object value) {
@@ -296,9 +258,12 @@ public class JSONFObjectFormatter
   }
 
   public void output(Date date) {
+    output(date.getTime());
+    /*
     b_.append("{\"class\":\"__Timestamp__\",\"value\":");
     outputDateValue(date);
-    b_.append("}");
+    b_.append('}');
+    */
   }
 
   protected Boolean maybeOutputProperty(FObject fo, PropertyInfo prop, boolean includeComma) {
@@ -310,7 +275,7 @@ public class JSONFObjectFormatter
       return false;
     }
 
-    if ( includeComma ) b_.append(",");
+    if ( includeComma ) b_.append(',');
     if ( multiLineOutput_ ) addInnerNewline();
     outputProperty(fo, prop);
     return true;
@@ -327,7 +292,7 @@ public class JSONFObjectFormatter
       List     axioms = getProperties(info);
       Iterator i      = axioms.iterator();
 
-      b_.append("{");
+      b_.append('{');
       if ( multiLineOutput_ ) addInnerNewline();
       while ( i.hasNext() ) {
         PropertyInfo prop = (PropertyInfo) i.next();
@@ -356,14 +321,14 @@ public class JSONFObjectFormatter
 
       if ( isDiff ) {
         if ( multiLineOutput_ )  b_.append("\n");
-        b_.append("}");
+        b_.append('}');
       }
     }
   }
 
   protected void addInnerNewline() {
     if ( multiLineOutput_ ) {
-      b_.append("\n");
+      b_.append('\n');
     }
   }
 
@@ -393,12 +358,12 @@ public class JSONFObjectFormatter
   public void output(FObject o) {
     ClassInfo info = o.getClassInfo();
 
-    b_.append("{");
+    b_.append('{');
     if ( multiLineOutput_ ) addInnerNewline();
     if ( outputClassNames_ ) {
-      b_.append(beforeKey_());
+      // b_.append(beforeKey_());
       b_.append("class");
-      b_.append(afterKey_());
+      // b_.append(afterKey_());
       b_.append(':');
       output(info.getId());
     }
@@ -411,23 +376,23 @@ public class JSONFObjectFormatter
       outputComma = maybeOutputProperty(o, prop, outputComma) || outputComma;
     }
     if ( multiLineOutput_ ) b_.append("\n");
-    b_.append("}");
+    b_.append('}');
   }
 
   public void output(PropertyInfo prop) {
-    b_.append("{");
+    b_.append('{');
     if ( quoteKeys_ ) {
-      output("class");
+      b_.append("class");
     } else {
       outputRawString("class");
     }
-    b_.append(":");
+    b_.append(':');
     output("__Property__");
     b_.append(",");
     output("forClass_");
     b_.append(':');
     output(prop.getClassInfo().getId());
-    b_.append(",");
+    b_.append(',');
     output("name");
     b_.append(':');
     if ( quoteKeys_ ) {
@@ -435,13 +400,13 @@ public class JSONFObjectFormatter
     } else {
       outputRawString(getPropertyName(prop));
     }
-    b_.append("}");
+    b_.append('}');
   }
 
   public void output(ClassInfo info) {
     b_.append("{\"class\":\"__Class__\",\"forClass_\":");
     output(info.getId());
-    b_.append("}");
+    b_.append('}');
   }
 
   protected String beforeKey_() {
