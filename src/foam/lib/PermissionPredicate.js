@@ -3,6 +3,9 @@ foam.CLASS({
   name: 'PermissionPredicate',
   extends: 'foam.mlang.predicate.AbstractPredicate',
   implements: ['foam.core.Serializable'],
+  imports: [
+    'auth',
+  ],
   properties: [
     {
       name: 'args',
@@ -33,7 +36,8 @@ foam.CLASS({
           return true;
         
         for ( var  i = 0 ; i < this.args.length ; i++) {
-          if ( await this.__subContext__.auth.check(this.__subContext__, this.args[i]) )
+          var r = await this.auth.check(null, this.args[i]);
+          if ( r )
            return true;
         }
         return false;
