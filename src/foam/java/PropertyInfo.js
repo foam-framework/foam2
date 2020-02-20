@@ -260,6 +260,24 @@ foam.CLASS({
               { name: 'map', type: 'java.util.Map<String, foam.lib.csv.FromCSVSetter>' }
             ],
             body: this.fromCSVLabelMapping
+          },
+          // TODO: move to AbstractPropertyInfo class for each type to avoid
+          // generating for each PropertyInfo.
+          {
+            name: 'format',
+            visibility: 'public',
+            type: 'void',
+            args: [
+              {
+                name: 'formatter',
+                type: 'foam.lib.formatter.FObjectFormatter'
+              },
+              {
+                name: 'obj',
+                type: 'foam.core.FObject'
+              }
+            ],
+            body: 'formatter.output(get_(obj));'
           }
         ];
 

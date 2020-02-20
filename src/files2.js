@@ -167,7 +167,6 @@ FOAM_FILES([
   { name: 'foam/u2/ExportModal', flags: ['web'] },
   { name: "foam/u2/AttrSlot" },
   { name: "foam/u2/ViewSpec" },
-  { name: "foam/u2/Visibility"},
   { name: "foam/u2/RowFormatter" },
   { name: "foam/u2/WeakMap", flags: ['web'] },
   { name: "foam/u2/Element", flags: ['js'] },

@@ -86,16 +86,16 @@ foam.CLASS({
       class: 'DateTime',
       name: 'lastRun',
       documentation: 'Date and time the script ran last.',
-      createMode: 'HIDDEN',
-      updateMode: 'RO',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
       tableWidth: 140
     },
     {
       class: 'Duration',
       name: 'lastDuration',
       documentation: 'Date and time the script took to complete.',
-      createMode: 'HIDDEN',
-      updateMode: 'RO',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
       tableWidth: 125
     },
     /*
@@ -120,8 +120,8 @@ foam.CLASS({
       of: 'foam.nanos.script.ScriptStatus',
       name: 'status',
       documentation: 'Status of script.',
-      createMode: 'HIDDEN',
-      updateMode: 'RO',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
       value: 'UNSCHEDULED',
       javaValue: 'ScriptStatus.UNSCHEDULED',
       tableWidth: 100,
@@ -134,8 +134,8 @@ foam.CLASS({
     {
       class: 'String',
       name: 'output',
-      createMode: 'HIDDEN',
-      updateMode: 'RO',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
       view: {
         class: 'foam.u2.view.ModeAltView',
         readView: { class: 'foam.u2.view.PreView' }

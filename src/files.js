@@ -181,7 +181,6 @@ FOAM_FILES([
   { name: "foam/u2/AttrSlot" },
   { name: "foam/u2/ViewSpec" },
   { name: "foam/u2/Tooltip", flags: ['web'] },
-  { name: "foam/u2/Visibility"},
   { name: "foam/u2/RowFormatter" },
   { name: "foam/u2/WeakMap", flags: ['web'] },
   { name: "foam/u2/Element", flags: ['js'] },
@@ -270,6 +269,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/ServiceProviderAwareSink" },
   { name: "foam/nanos/auth/test/ServiceProviderAwareTest" },
   { name: "foam/nanos/logger/Logger" },
+  { name: "foam/nanos/logger/DAOLogger" },
   { name: "foam/nanos/logger/LoggingDAO" },
   { name: "foam/nanos/notification/Notifiable" },
   { name: "foam/nanos/notification/EmailSetting" },
@@ -535,6 +535,8 @@ FOAM_FILES([
   { name: "foam/u2/stack/Stack", flags: ['web'] },
   { name: "foam/u2/stack/StackView", flags: ['web'] },
   { name: "foam/apploader/ModelRefines" },
+  { name: "foam/foamlink/FoamlinkNodeModelFileDAO" },
+  { name: "foam/foamlink/FoamlinkNodeModelFileFetcher" },
   { name: "foam/apploader/ClassLoader" },
   { name: "foam/apploader/SubClassLoader" },
   { name: "foam/classloader/OrDAO", flags: ['debug'] },
@@ -753,4 +755,10 @@ FOAM_FILES([
 
   { name: "foam/util/concurrent/AbstractAssembly"},
   { name: "foam/util/concurrent/Assembly"},
+
+  // Foamlink
+  { name: "foam/foamlink/FoamlinkData" },
+  { name: "foam/foamlink/FoamlinkExec" },
+  { name: "foam/foamlink/lib" },
+  { name: "foam/util/filesystem/FileWalker" },
 ]);
