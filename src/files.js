@@ -533,7 +533,6 @@ FOAM_FILES([
   { name: "foam/u2/stack/Stack", flags: ['web'] },
   { name: "foam/u2/stack/StackView", flags: ['web'] },
   { name: "foam/u2/crunch/Style", flags: ['web'] },
-  { name: "foam/u2/crunch/CapabilityView", flags: ['web'] },
   { name: "foam/u2/crunch/CapabilityCardView", flags: ['web'] },
   { name: "foam/u2/crunch/CapabilityFeatureView", flags: ['web'] },
   { name: "foam/u2/crunch/CapabilityStoreSection", flags: ['web'] },
