@@ -712,6 +712,7 @@ p({
   "serviceScript":"""
     dao = new foam.dao.EasyDAO.Builder(x)
       .setAuthorize(true)
+      .setGuid(true)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("capabilities")
       .setOf(foam.nanos.crunch.Capability.getOwnClassInfo())
