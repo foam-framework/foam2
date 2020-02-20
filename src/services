@@ -711,11 +711,14 @@ p({
   "serve":true,
   "serviceScript":"""
     return new foam.dao.EasyDAO.Builder(x)
-    .setAuthorize(true)
-    .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-    .setJournalName("capabilities")
-    .setOf(foam.nanos.crunch.Capability.getOwnClassInfo())
-    .build();
+      .setAuthorize(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("capabilities")
+      .setOf(foam.nanos.crunch.Capability.getOwnClassInfo())
+      .build();
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.crunch.Capability.NAME });
+
+    return dao;
   """,
   "client":"{\"of\":\"foam.nanos.crunch.Capability\"}"
 })
