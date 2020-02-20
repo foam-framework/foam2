@@ -52,11 +52,14 @@ foam.CLASS({
       isAvailable: function(id) {
         return id != 0;
       },
-      title: '',
+      title: 'Audit',
     },
     {
+      // NOTE: if a section is name: commentSection
+      // then navigating to a comment detail view
+      // does not work.
       name: '_defaultSection',
-      permissionRequired: true
+      title: 'Comments'
     },
   ],
 
@@ -169,6 +172,7 @@ foam.CLASS({
     // required: true,
       storageTransient: true,
       section: 'infoSection',
+      readVisibility: 'HIDDEN',
       validationPredicates: [
         {
           args: ['id', 'title', 'comment'],
