@@ -172,7 +172,9 @@ foam.CLASS({
       class: 'String',
       name: 'daoKey',
       value: 'scriptDAO',
-      visibility: 'HIDDEN'
+      visibility: 'HIDDEN',
+      documentation: `Name of dao which journal will be used to store script run logs. To set from inheritor
+      just change property value`
     }
   ],
 
