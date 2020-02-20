@@ -333,6 +333,7 @@ var classes = [
 //  'foam.nanos.script.JavaShellScriptCompiler',
   'foam.nanos.script.TestRunnerScript',
   'foam.nanos.test.Test',
+  'foam.nanos.test.TestConfig',
   'foam.nanos.cron.Cron',
   'foam.nanos.cron.TimeHMS',
   'foam.nanos.cron.Schedule',

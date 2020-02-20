@@ -13,6 +13,7 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.dao.ArraySink',
     'foam.nanos.test.Test',
+    'foam.nanos.test.TestConfig',
     'java.util.*',
     'foam.nanos.logger.LogLevelFilterLogger',
     'foam.nanos.logger.Logger',
@@ -76,8 +77,13 @@ foam.CLASS({
         loggerFilter.setLogInfo(false);
         loggerFilter.setLogWarning(false);
 
+        TestConfig testConfig = (TestConfig) x.get("testConfig");
+        String testSuite = testConfig != null ? testConfig.getTestSuite() : null;
+
         DAO testDAO = (DAO) x.get("testDAO");
-        ArraySink tests = (ArraySink) testDAO.select(new ArraySink());
+        ArraySink tests = testSuite == null ?
+          (ArraySink) testDAO.select(new ArraySink()) :
+          (ArraySink) testDAO.where(foam.mlang.MLang.EQ(Test.TEST_SUITE, testSuite)).select(new ArraySink());
         List testArray = tests.getArray();
 
         List<String> selectedTests = null;
@@ -104,7 +110,8 @@ foam.CLASS({
           }
         }
 
-        System.out.println("DONE RUNNING TESTS");
+        System.out.println("DONE RUNNING " + testArray.size() + " TESTS")
+        System.out.println("TEST SUITE: " + (testSuite == null ? "main" : testSuite));
 
         printBold(GREEN_COLOR + " " +  "PASSED: " + Integer.toString(getPassedTests()) + " " + RESET_COLOR);
         printBold(RED_COLOR + " " + "FAILED: " + Integer.toString(getFailedTests()) + " " + RESET_COLOR);

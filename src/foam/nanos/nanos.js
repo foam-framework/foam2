@@ -137,6 +137,7 @@ FOAM_FILES([
   { name: "foam/nanos/servlet/VirtualHostRoutingServlet" },
   { name: "foam/nanos/test/Test" },
   { name: "foam/nanos/test/TestBorder" },
+  { name: "foam/nanos/test/TestConfig" },
   { name: "foam/nanos/cron/Cron" },
   { name: "foam/nanos/cron/CronSchedule" },
   { name: "foam/nanos/cron/CronScheduleDAO" },
