@@ -55,8 +55,6 @@ x = x.put("user", systemUser);
 
 DAO userDAO = (DAO) getLocalUserDAO();
 DAO tokenDAO = (DAO) getTokenDAO();
-String url = appConfig.getUrl()
-    .replaceAll("/$", "");
 
 // check if email invalid
 if ( user == null || ! Email.isValid(user.getEmail()) ) {
@@ -88,7 +86,7 @@ message.setTo(new String[] { user.getEmail() });
 
 HashMap<String, Object> args = new HashMap<>();
 args.put("name", String.format("%s %s", user.getFirstName(), user.getLastName()));
-args.put("link", url +"?token=" + token.getData() + "#reset");
+args.put("link", appConfig.getUrl() +"?token=" + token.getData() + "#reset");
 
 EmailsUtility.sendEmailFromTemplate(x, user, message, "reset-password", args);
 

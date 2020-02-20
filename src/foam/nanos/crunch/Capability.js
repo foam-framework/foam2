@@ -57,7 +57,7 @@ foam.CLASS({
     {
       name: 'id',
       class: 'String',
-      updateMode: 'RO'
+      updateVisibility: 'RO'
     }, 
     {
       name: 'icon',
@@ -200,7 +200,7 @@ foam.RELATIONSHIP({
   inverseName: 'users',
   sourceProperty: {
     section: 'capabilities',
-    updateMode: 'RO'
+    updateVisibility: 'RO'
   }
 });
 

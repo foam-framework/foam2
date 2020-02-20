@@ -136,7 +136,6 @@ foam.CLASS({
     function fromProperty(p) {
       this.SUPER(p);
 
-      this.visibility$.follow(p.createVisibilityFor(this.__context__.data$));
       if ( ! this.hasOwnProperty('onKey') && p.validateObj ) this.onKey = true;
     },
 

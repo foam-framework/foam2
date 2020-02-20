@@ -15,7 +15,6 @@ foam.CLASS({
     'org.bouncycastle.jce.provider.BouncyCastleProvider',
     'org.bouncycastle.util.encoders.Base64',
     'org.bouncycastle.util.encoders.Hex',
-
     'java.security.*',
     'java.security.spec.PKCS8EncodedKeySpec',
     'java.security.spec.X509EncodedKeySpec'
@@ -101,7 +100,7 @@ foam.CLASS({
           // verify using RSA public key
           System.out.println(SHA1withRSA);
           Signable_VerifyWithValidAlgorithmSignatureAndKey(input, "SHA1withRSA", publicKey, SHA1withRSA);
-          Signable_VerifyWithValidAlgorithmSignatureAndKey(input, "SHA256withRSA", publicKey, SHA256withRSA);              
+          Signable_VerifyWithValidAlgorithmSignatureAndKey(input, "SHA256withRSA", publicKey, SHA256withRSA);
           Signable_VerifyWithValidAlgorithmSignatureAndKey(input, "SHA384withRSA", publicKey, SHA384withRSA);
           Signable_VerifyWithValidAlgorithmSignatureAndKey(input, "SHA512withRSA", publicKey, SHA512withRSA);
 
@@ -152,7 +151,7 @@ foam.CLASS({
           signature = Hex.toHexString(input.sign(algorithm, (PrivateKey) key));
           test(! SafetyUtil.isEmpty(signature),
               "Input signed using " + algorithm + " produces correct signature");
-          
+
         } catch ( Throwable t ) {
           test(false, "Input signed using " + algorithm + " should not throw an exception");
         }
