@@ -29,6 +29,7 @@ foam.CLASS({
 
   tableColumns: [
     'id',
+    'name',
     'description',
     'version',
     'enabled',
@@ -57,8 +58,12 @@ foam.CLASS({
     {
       name: 'id',
       class: 'String',
-      updateVisibility: 'RO'
+      visibility: 'HIDDEN'
     }, 
+    {
+      name: 'name',
+      class: 'String'
+    },
     {
       name: 'icon',
       class: 'Image',
@@ -138,7 +143,7 @@ foam.CLASS({
         if ( ! this.getEnabled() ) return false;
 
         // check if permission is a capability string implied by this permission
-        if ( this.stringImplies(this.getId(), permission) ) return true;
+        if ( this.stringImplies(this.getName(), permission) ) return true;
 
         String[] permissionsGranted = this.getPermissionsGranted();
         for ( String permissionName : permissionsGranted ) {
