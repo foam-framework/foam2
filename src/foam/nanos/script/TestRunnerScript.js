@@ -110,7 +110,7 @@ foam.CLASS({
           }
         }
 
-        System.out.println("DONE RUNNING " + testArray.size() + " TESTS")
+        System.out.println("DONE RUNNING " + testArray.size() + " TESTS");
         System.out.println("TEST SUITE: " + (testSuite == null ? "main" : testSuite));
 
         printBold(GREEN_COLOR + " " +  "PASSED: " + Integer.toString(getPassedTests()) + " " + RESET_COLOR);
