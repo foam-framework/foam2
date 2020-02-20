@@ -180,7 +180,7 @@ public class BenchmarkRunner
           Thread thread = new Thread(group, new Runnable() {
               @Override
               public void run() {
-                for (int j = 0; j < invocationCount_; j++) {
+                for ( int j = 0 ; j < invocationCount_ ; j++ ) {
                   test_.execute(x);
                 }
                 // count down the latch when finished
@@ -223,17 +223,20 @@ public class BenchmarkRunner
           } else {
             threadCount_++;
           }
-          if ( threadCount_ <= 0 ||
-               threadCount_ > availableThreads ) {
+
+          if ( threadCount_ <= 0 || threadCount_ > availableThreads ) {
             break;
           }
+
           run++;
         } else {
           String results = formatResults();
           System.out.println(results);
+
           if ( logger != null ) {
             logger.info(results);
           }
+
           break;
         }
       }
@@ -275,7 +278,8 @@ public class BenchmarkRunner
       index = 0;
       for ( Map.Entry<String, Object> entry : result.entrySet() ) {
         index++;
-        csv.append(entry.getValue());
+        Object val = entry.getValue();
+        csv.append(val);
         if ( index < result.entrySet().size() ) csv.append(",");
       }
       csv.append("\n");
