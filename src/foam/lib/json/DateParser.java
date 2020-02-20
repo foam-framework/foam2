@@ -35,21 +35,21 @@ public class DateParser
 
   public DateParser() {
     super(new Alt(
-      new NullParser(),
+      NullParser.instance(),
       new LongParser(),
       new Seq(
         Literal.create("\""),
-        new IntParser(),
+        IntParser.instance(),
         Literal.create("-"),
-        new IntParser(),
+        IntParser.instance(),
         Literal.create("-"),
-        new IntParser(),
+        IntParser.instance(),
         Literal.create("T"),
-        new IntParser(),
+        IntParser.instance(),
         Literal.create(":"),
-        new IntParser(),
+        IntParser.instance(),
         Literal.create(":"),
-        new IntParser(),
+        IntParser.instance(),
         Literal.create("."),
         new Repeat(new Chars("0123456789")),
         Literal.create("Z"),

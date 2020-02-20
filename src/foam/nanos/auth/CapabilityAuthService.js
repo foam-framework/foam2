@@ -134,15 +134,16 @@ foam.CLASS({
           // 1. check if there is a capability matching the name of the permission 
           // that is enabled and not deprecated, and granted to the user 
           Capability cap = (Capability) capabilityDAO.find(permission);
-          if ( cap != null && ! cap.isDeprecated(x) && cap.getEnabled() ) {
 
-            Predicate capabilityScope = AND(
-              EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
-              OR(
-                NOT(HAS(UserCapabilityJunction.EXPIRY)),
-                NOT(EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.EXPIRED))
-              )
-            );
+          Predicate capabilityScope = AND(
+            EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
+            OR(
+              NOT(HAS(UserCapabilityJunction.EXPIRY)),
+              NOT(EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.EXPIRED))
+            )
+          );
+
+          if ( cap != null && cap.getEnabled() ) {
 
             if ( userCapabilityJunctionDAO.find(
               AND(
@@ -173,6 +174,7 @@ foam.CLASS({
 
           List<UserCapabilityJunction> ucjs = ((ArraySink) ((ProxySink) ((ProxySink) userCapabilityJunctionDAO
             .where(AND(
+              capabilityScope,
               EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
               EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
             ))

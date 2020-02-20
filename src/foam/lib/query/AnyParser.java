@@ -21,7 +21,7 @@ public class AnyParser
     setDelegate(new Alt(
         LongParser.instance(),
         StringParser.instance(),
-        new NullParser()));
+        NullParser.instance()));
   }
 
 }

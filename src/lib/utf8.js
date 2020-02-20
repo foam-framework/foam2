@@ -36,9 +36,9 @@ foam.CLASS({
 
   methods: [
     function reset() {
-      this.string = '';
+      this.string    = '';
       this.remaining = 0;
-      this.charcode = null;
+      this.charcode  = null;
     },
 
     function put(byte) {
@@ -55,7 +55,7 @@ foam.CLASS({
         return;
       }
 
-      if (this.charcode == null) {
+      if ( this.charcode == null)  {
         this.charcode = byte;
         if (!(this.charcode & 0x80)) {
           this.remaining = 0;

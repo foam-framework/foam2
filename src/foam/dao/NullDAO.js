@@ -22,6 +22,19 @@ foam.CLASS({
 
   documentation: 'A Null pattern (do-nothing) DAO implementation.',
 
+  axioms: [
+    {
+      buildJavaClass: function(cls) {
+        cls.extras.push(`
+          public NullDAO(foam.core.X x, foam.core.ClassInfo of) {
+            setX(x);
+            setOf(of);
+          }
+        `);
+      }
+    }
+  ],
+
   methods: [
     {
       name: 'put_',

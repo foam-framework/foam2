@@ -27,7 +27,7 @@ public class RelativeDateParser extends ProxyParser {
           new Seq(
             Literal.create("today"),
             Literal.create("-"),
-            new IntParser()),
+            IntParser.instance()),
 
         //today
           Literal.create("today")));

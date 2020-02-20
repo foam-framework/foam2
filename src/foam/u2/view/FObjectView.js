@@ -20,10 +20,10 @@ foam.CLASS({
       class: 'String',
       name: 'objectClass',
       label: '',
-      visibilityExpression: function(choices) {
+      visibility: function(choices) {
         return choices.length > 1 ?
-          foam.u2.Visibility.RW :
-          foam.u2.Visibility.HIDDEN;
+          foam.u2.DisplayMode.RW :
+          foam.u2.DisplayMode.HIDDEN;
       },
       view: function(args, X) {
         return {

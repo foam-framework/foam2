@@ -19,31 +19,18 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'dao',
+      name: 'delegate',
       class: 'foam.dao.DAOProperty',
-      javaFactory: `
-initializing.set(true);
-String daoName = "localLogMessageDAO";
-DAO dao = (DAO) getX().put("logger", new foam.nanos.logger.StdoutLogger()).get(daoName);
-if ( dao == null ) {
-  System.err.println("DAOLogger DAO not found: "+daoName);
-  dao = new NullDAO();
-}
-initializing.set(false);
-return dao;
-`
+      visibility: 'HIDDEN'
     },
     {
       name: 'logger',
       class: 'Object',
-      javaFactory: `return new foam.nanos.logger.StdoutLogger();`
-    },
-    {
-      name: 'hostname',
-      class: 'String',
-      javaFactory: 'return System.getProperty("hostname", "localhost");'
+      javaFactory: `return new foam.nanos.logger.StdoutLogger();`,
+      visibility: 'HIDDEN'
     }
   ],
+
   axioms: [
     {
       name: 'javaExtras',
@@ -76,17 +63,17 @@ return dao;
         }
       ],
       javaCode: `
-if ( initializing.get() ) {
-  System.out.println("DAOLogger initializing");
-  return;
-}
-LogMessage lm = new LogMessage(
-                    getX(),
-                    getHostname(),
-                    severity,
-                    message);
-getDao().put_(getX().put("logger", (Logger) getLogger()), lm);
-`
+      if ( initializing.get() ) {
+        System.out.println("DAOLogger initializing");
+        return;
+      }
+
+      LogMessage lm = new LogMessage(getX());
+      lm.setSeverity(severity);
+      lm.setMessage(message);
+
+      getDelegate().put(lm);
+     `
     },
     {
       name: 'log',

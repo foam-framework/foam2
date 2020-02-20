@@ -10,7 +10,7 @@ import foam.lib.parse.*;
 public class KeyParser
   implements Parser
 {
-  private Parser delegate;
+  protected Parser delegate;
 
   public KeyParser(String key) {
     delegate = new Alt(
