@@ -2,7 +2,7 @@ p({
 	"class": "foam.nanos.script.Script",
 	"id": "benchmarkDateFormat",
 	"description": "Benchmark Date Formatting",
-	"code": """import foam.nanos.bench.*;
+	"code": `import foam.nanos.bench.*;
 import foam.nanos.bench.benchmarks.*;
 import net.nanopay.bench.*;
 
@@ -10,7 +10,7 @@ x = x.put("pmLogger", null);
 b = new DateFormatBenchmark();
 builder = new BenchmarkRunner.Builder(x).setInvocationCount(10000).setBenchmark(b);
 runner = builder.build();
-runner.execute(x);""",
+runner.execute(x);`,
 	"lastModifiedBy": 1348
 })
 
