@@ -705,6 +705,11 @@ foam.CLASS({
 
   properties: [
     { class: 'String',  name: 'name' },
+    {
+      class: 'String',
+      name: 'label',
+      expression: function(name) { return foam.String.labelize(name); }
+    },
     { class: 'Boolean', name: 'abstract' }
   ]
 });
@@ -746,8 +751,12 @@ foam.CLASS({
       ]
     </pre>
     */
-    { class: 'String',  name: 'name' },
-    { class: 'String',  name: 'label' },
+    { class: 'String',  name: 'name', required: true },
+    {
+      class: 'String',
+      name: 'label',
+      expression: function(name) { return foam.String.labelize(name); }
+    },
     { class: 'String', name: 'shortName' }
   ]
 });
