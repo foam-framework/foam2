@@ -58,6 +58,7 @@ foam.CLASS({
     'framed',
     'info',
     'installCSS',
+    'language',
     'log',
     'merged',
     'requestAnimationFrame',
@@ -70,6 +71,10 @@ foam.CLASS({
   properties: [
     [ 'name', 'window' ],
     'window',
+    {
+      name: 'language',
+      factory: function() { return navigator.language; }
+    },
     {
       name: 'document',
       factory: function() { return this.window.document; }
