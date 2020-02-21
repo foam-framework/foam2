@@ -17,11 +17,6 @@
 
 // Polyfill
 
-// Required for Node
-if ( typeof navigator == "undefined" ) {
-  navigator.language = "en";
-}
-
 // Required on IE 11, Android Browser before 5.1.
 if ( ! Math.trunc ) {
   Math.trunc = function trunc(v) {
