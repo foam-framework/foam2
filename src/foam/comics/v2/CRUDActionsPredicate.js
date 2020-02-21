@@ -4,34 +4,15 @@ foam.CLASS({
   properties: [
     {
       class: 'foam.mlang.predicate.PredicateProperty',
-      name: 'create',
-      javaFactory: `
-        return foam.mlang.MLang.TRUE;
-      `,
-      factory: function() {
-        foam.mlang.predicate.True.create();
-      }
-      //javaFactory: `return foam.mlang.MLang.TRUE;`
+      name: 'create'
     },
     {
       class: 'foam.mlang.predicate.PredicateProperty',
-      name: 'update',
-      javaFactory: `
-        return foam.mlang.MLang.TRUE;
-      `,
-      factory: function() {
-        foam.mlang.predicate.True.create();
-      }
+      name: 'update'
     },
     {
       class: 'foam.mlang.predicate.PredicateProperty',
-      name: 'delete',
-      javaFactory: `
-        return foam.mlang.MLang.TRUE;
-      `,
-      factory: function() {
-        foam.mlang.predicate.True.create();
-      }
+      name: 'delete'
     }
   ] 
 });
