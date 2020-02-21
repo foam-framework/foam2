@@ -18,7 +18,7 @@
 // Polyfill
 
 // Required for Node
-if ( ! navigator ) {
+if ( typeof navigator == "undefined" ) {
   navigator.language = "en";
 }
 
