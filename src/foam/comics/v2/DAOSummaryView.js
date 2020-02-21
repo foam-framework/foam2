@@ -145,30 +145,31 @@ foam.CLASS({
       this.SUPER();
       this
         .addClass(this.myClass())
-        .add(self.slot(function(data, data$id, config$CRUDActionsAuth$update, config$CRUDActionsAuth$delete, config$browseTitle, config$viewBorder, viewView) {
+        .add(self.slot(function(data, data$id, config$viewBorder, viewView) {
 
-          // iterate through permissions and replace % with data$id
-          var editAction = self.EDIT;
-          var deleteAction = self.DELETE;
+          if ( ! self.config.CRUDPermission) {
+            self.config.editEnabled = true;
+            self.config.deleteEnabled = true;
+          } else {
+            if ( ! self.config.CRUDPermission.update || ! self.config.CRUDPermission.update.f ) {
+              self.config.editEnabled = true;
+            } else {
+              try {
+                self.config.editEnabled = self.config.CRUDPermission.update.f();
+              } catch(e) {
+                self.config.editEnabled = false;
+              }
+            }
 
-          if ( config$CRUDActionsAuth$update ) {
-            var editArray = config$CRUDActionsAuth$update;
-
-            editArray = editArray.map((permission) => permission.replace('%', data$id));
-
-            editAction = self.EDIT.clone().copyFrom({
-              availablePermissions: self.EDIT.availablePermissions.concat(editArray)
-            });
-          }
-
-          if ( config$CRUDActionsAuth$delete ) {
-            var deleteArray = config$CRUDActionsAuth$delete;
-
-            deleteArray = deleteArray.map((permission) => permission.replace('%', data$id));
-
-            deleteAction = self.DELETE.clone().copyFrom({
-              availablePermissions: self.DELETE.availablePermissions.concat(deleteArray)
-            });
+            if ( ! self.config.CRUDPermission.delete || ! self.config.CRUDPermission.delete.f ) {
+              self.config.deleteEnabled = true;
+            } else {
+              try {
+                self.config.deleteEnabled = self.config.CRUDPermission.delete.f();
+              } catch(e) {
+                self.config.deleteEnabled = false;
+              }
+            }
           }
 
           return self.E()
@@ -195,11 +196,11 @@ foam.CLASS({
               .start(self.Cols)
                 .start(self.Cols).addClass(this.myClass('actions-header'))
                   .startContext({ data: self })
-                    .tag(editAction, {
+                    .tag(self.EDIT, {
                       buttonStyle: foam.u2.ButtonStyle.TERTIARY,
                       icon: 'images/edit-icon.svg'
                     })
-                    .tag(deleteAction, {
+                    .tag(self.DELETE, {
                       buttonStyle: foam.u2.ButtonStyle.TERTIARY,
                       icon: 'images/delete-icon.svg'
                     })

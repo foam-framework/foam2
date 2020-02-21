@@ -98,12 +98,16 @@ foam.CLASS({
     var self = this;
 
       this.addClass(this.myClass())
-      .add(this.slot(function(data, config, config$CRUDPermission$create, config$browseBorder, config$browseViews, config$browseTitle) {
-        // var createAction = config$CRUDPermission$create.f()
-        //     ? self.CREATE.clone().copyFrom({
-        //       availablePermissions: self.CREATE.availablePermissions.concat(config$CRUDPermission$create)
-        //     })
-        //     : self.CREATE;
+      .add(this.slot(function(data, config, config$browseBorder, config$browseViews, config$browseTitle) {
+        if ( ! config.CRUDPermission || ! config.CRUDPermission.create || ! config.CRUDPermission.create.f ) {
+          config.createEnabled = true;
+        } else {
+          try {
+            config.createEnabled = config.CRUDPermission.create.f();
+          } catch(e) {
+            config.createEnabled = false;
+          }
+        }
 
         return self.E()
           .start(self.Rows)
