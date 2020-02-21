@@ -17,6 +17,11 @@
 
 // Polyfill
 
+// Required for Node
+if ( ! navigator ) {
+  navigator.language = "en";
+}
+
 // Required on IE 11, Android Browser before 5.1.
 if ( ! Math.trunc ) {
   Math.trunc = function trunc(v) {
@@ -56,7 +61,7 @@ if ( ! Array.prototype.find ) {
   };
 }
 
-if ( !Array.prototype.flat ) {
+if ( ! Array.prototype.flat ) {
   Array.prototype.flat = function () {
     var depth = arguments[0];
     depth = depth === undefined ? 1 : Math.floor(depth);
