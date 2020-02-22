@@ -19,7 +19,7 @@ public class EqualsParser extends foam.lib.parse.ProxyParser {
 
   public EqualsParser(Parser valueParser) {
     setDelegate(new Seq1(1,
-                        new Literal("="),
+                        Literal.create("="),
                         new Alt(new ValueList(valueParser),
                         valueParser)));
   }

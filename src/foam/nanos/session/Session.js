@@ -16,13 +16,16 @@ foam.CLASS({
   javaImports: [
     'foam.core.X',
     'foam.dao.DAO',
+    'foam.nanos.app.AppConfig',
     'foam.nanos.auth.*',
     'foam.nanos.boot.NSpec',
     'foam.nanos.logger.Logger',
     'foam.nanos.logger.PrefixLogger',
     'foam.util.SafetyUtil',
     'java.util.Date',
-    'static foam.mlang.MLang.*'
+    'static foam.mlang.MLang.*',
+    'javax.servlet.http.HttpServletRequest',
+    'org.eclipse.jetty.server.Request'
   ],
 
   tableColumns: [
@@ -51,7 +54,7 @@ foam.CLASS({
         }.bind(this));
       },
       required: true,
-      visibility: 'FINAL',
+      updateVisibility: 'RO',
     },
     {
       class: 'Long',
@@ -222,7 +225,33 @@ foam.CLASS({
         // used as the argument to this method.
         X rtn = reset(x);
 
-        if ( getUserId() == 0 ) return rtn;
+        if ( getUserId() == 0 ) {
+          HttpServletRequest req = x.get(HttpServletRequest.class);
+          if ( req == null ) {
+            // null during test runs
+            return rtn;
+          }
+          AppConfig appConfig = (AppConfig) x.get("appConfig");
+          appConfig = (AppConfig) appConfig.fclone();
+          String configUrl = ((Request) req).getRootURL().toString();
+
+          if ( appConfig.getForceHttps() ) {
+            if ( configUrl.startsWith("https://") ) {
+               // Don't need to do anything.
+            } else if ( configUrl.startsWith("http://") ) {
+              configUrl = "https" + configUrl.substring(4);
+            } else {
+              configUrl = "https://" + configUrl;
+            }
+          }
+          if ( configUrl.endsWith("/") ) {
+            configUrl = configUrl.substring(0, configUrl.length()-1);
+          }
+          appConfig.setUrl(configUrl);
+          rtn = rtn.put("appConfig", appConfig);
+
+          return rtn;
+        }
 
         // Validate
         validate(x);
@@ -243,13 +272,21 @@ foam.CLASS({
           .put("twoFactorSuccess", getContext().get("twoFactorSuccess"))
           .put(CachingAuthService.CACHE_KEY, getContext().get(CachingAuthService.CACHE_KEY));
 
+        if ( user != null ) {
+          rtn = rtn.put("spid", user.getSpid());
+        }
+
         // We need to do this after the user and agent have been put since
         // 'getCurrentGroup' depends on them being in the context.
         Group group = auth.getCurrentGroup(rtn);
 
-        return rtn
-          .put("group", group)
-          .put("appConfig", group.getAppConfig(rtn));
+        if ( group != null ) {
+          rtn = rtn
+            .put("group", group)
+            .put("appConfig", group.getAppConfig(rtn));
+        }
+
+        return rtn;
       `
     },
     {
@@ -297,7 +334,8 @@ foam.CLASS({
         User user = (User) ((DAO) x.get("localUserDAO")).find(userId);
 
        if ( user == null
-         || (user instanceof DeletedAware && ((DeletedAware)user).getDeleted())
+         || (user instanceof DeletedAware && ((DeletedAware)user).getDeleted()
+         || (user instanceof LifecycleAware && ((LifecycleAware)user).getLifecycleState() != LifecycleState.ACTIVE) )
        ) {
           throw new RuntimeException(String.format("User with id '%d' not found.", userId));
         }

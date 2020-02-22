@@ -29,17 +29,18 @@
 
   tableColumns: [
     'id',
+    'name',
     'ruleGroup',
     'enabled',
     'priority',
     'daoKey',
-    'documentation',
     'createdBy',
     'lastModifiedBy'
   ],
 
   searchColumns: [
     'id',
+    'name',
     'ruleGroup',
     'enabled',
     'priority',
@@ -64,8 +65,12 @@
     {
       class: 'String',
       name: 'id',
-      updateMode: 'RO',
-      tableWidth: 200,
+      visibility: 'HIDDEN'
+    },
+    {
+      class: 'String',
+      name: 'name',
+      tableWidth: 300,
       section: 'basicInfo'
     },
     {
@@ -76,7 +81,7 @@
       'The convention for values is ints that are multiple of 10.',
       readPermissionRequired: true,
       writePermissionRequired: true,
-      tableWidth: 50,
+      tableWidth: 66,
       section: 'basicInfo'
     },
     {
@@ -93,6 +98,7 @@
     {
       class: 'String',
       name: 'daoKey',
+      label: 'DAO Key',
       documentation: 'dao name that the rule is applied on.',
       readPermissionRequired: true,
       writePermissionRequired: true,
@@ -173,6 +179,11 @@
       }
     },
     {
+      class: 'Boolean',
+      name: 'debug',
+      documentation: 'Test this boolean before generating expensive logger.debug calls, to speed rule execution.'
+    },
+    {
       class: 'Int',
       name: 'validity',
       documentation: 'Validity of the rule (in days) for automatic rescheduling.',
@@ -204,15 +215,15 @@
     {
       class: 'DateTime',
       name: 'created',
-      createMode: 'HIDDEN',
-      updateMode: 'RO'
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO'
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdBy',
-      createMode: 'HIDDEN',
-      updateMode: 'RO',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
       tableCellFormatter: function(value, obj) {
         obj.userDAO.find(value).then(function(user) {
           if ( user ) {
@@ -225,8 +236,8 @@
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdByAgent',
-      createMode: 'HIDDEN',
-      updateMode: 'RO',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
       tableCellFormatter: function(value, obj) {
         obj.userDAO.find(value).then(function(user) {
           if ( user ) {
@@ -238,15 +249,15 @@
     {
       class: 'DateTime',
       name: 'lastModified',
-      createMode: 'HIDDEN',
-      updateMode: 'RO'
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO'
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'lastModifiedBy',
-      createMode: 'HIDDEN',
-      updateMode: 'RO',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
       tableCellFormatter: function(value, obj) {
         obj.userDAO.find(value).then(function(user) {
           if ( user ) {
@@ -367,6 +378,11 @@
       ],
       javaCode: `
       return rule;`
+    },
+    {
+      name: 'toSummary',
+      type: 'String',
+      code: () => { return this.name || this.id; }
     }
   ],
 

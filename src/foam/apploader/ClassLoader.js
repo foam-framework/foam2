@@ -6,13 +6,10 @@
 
 /*
 TODO:
-
  - Remove foam.classloader classes
  - Remove arequire, or change it to use classloader.load
  - Make GENMODEL work when running without a classloader
  - Fix WebSocketBox port autodetection to work when running with tomcat and also without
-
-
 */
 
 foam.CLASS({
@@ -29,12 +26,16 @@ have multiple classloaders running alongside eachother`
     'foam.apploader.SubClassLoader',
     {
       path: 'foam.apploader.WebModelFileDAO',
-      flags: ['web'],
+      flags: ['web']
     },
     {
       path: 'foam.apploader.NodeModelFileDAO',
-      flags: ['node'],
+      flags: ['node']
     },
+    {
+      path: 'foam.foamlink.FoamlinkNodeModelFileDAO',
+      flags: ['node']
+    }
   ],
   properties: [
     {
@@ -54,7 +55,11 @@ have multiple classloaders running alongside eachother`
     {
       name: 'addClassPath',
       code: function(path) {
-        var cls = this[foam.isServer ? 'NodeModelFileDAO' : 'WebModelFileDAO'];
+        var cls = this[
+          foam.isServer
+          ? (foam.hasFoamlink ? 'FoamlinkNodeModelFileDAO' : 'NodeModelFileDAO')
+          : 'WebModelFileDAO'
+        ];
         var modelDAO = cls.create({root: path}, this);
 
         if ( this.modelDAO ) {
@@ -150,13 +155,16 @@ have multiple classloaders running alongside eachother`
             });
           }
 
-          if ( foam.lookup(id, true) ) return Promise.resolve(foam.lookup(id));
+          if ( foam.lookup(id, true) )
+            return Promise.resolve(foam.lookup(id));
 
           return this.pending[id] = this.modelDAO.inX(subClassLoader).find(id).then(function(m) {
-            if ( ! m ) return Promise.reject(new Error('Model Not Found: ' + id));
-            if ( self.Relationship.isInstance(m) ) {
+            if ( ! m )
+              return Promise.reject(new Error('Model Not Found: ' + id));
+
+            if ( self.Relationship.isInstance(m) )
               return m.initRelationship();
-            }
+
             if ( self.Script.isInstance(m) ) {
               return Promise.all(m.requires.map(function(r) {
                 return self.load(r)
@@ -165,6 +173,7 @@ have multiple classloaders running alongside eachother`
                 return m;
               });
             }
+
             return this.buildClass_(m, path);
           }.bind(this), function(e) {
             throw e ? new Error("Failed to load class " + id + ".  Caused by: " + e.message) :
@@ -172,9 +181,8 @@ have multiple classloaders running alongside eachother`
           });
         }
 
-        if ( foam.core.Model.isInstance(id) ) {
+        if ( foam.core.Model.isInstance(id) )
           return this.pending[id.id] = this.buildClass_(id, path);
-        }
 
         throw new Error("Invalid parameter to ClassLoader.load_");
       }

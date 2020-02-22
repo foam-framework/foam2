@@ -27,20 +27,23 @@ foam.CLASS({
       hidden: true
     },
     {
-      class: 'String',
+      class: 'EMail',
       name: 'email',
+      required: true,
       view: {
         class: 'foam.u2.TextField',
         focused: true
       },
-      visibilityExpression: function(disableEmail_) {
+      visibility: function(disableEmail_) {
         return disableEmail_ ?
-          foam.u2.Visibility.DISABLED : foam.u2.Visibility.RW;
-      }
+          foam.u2.DisplayMode.DISABLED : foam.u2.DisplayMode.RW;
+      },
+      validationTextVisible: false
     },
     {
       class: 'Password',
       name: 'password',
+      required: true,
       view: { class: 'foam.u2.view.PasswordView', passwordIcon: true }
     },
     {
@@ -99,6 +102,9 @@ foam.CLASS({
     {
       name: 'login',
       label: 'Sign in',
+      isEnabled: function(errors_) {
+        return ! errors_;
+      },
       code: async function(X) {
         this.auth.loginByEmail(X, this.email, this.password).then(
           (logedInUser) => {

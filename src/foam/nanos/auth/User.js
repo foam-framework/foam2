@@ -103,8 +103,8 @@ foam.CLASS({
       documentation: 'The ID for the User.',
       final: true,
       tableWidth: 100,
-      createMode: 'HIDDEN',
-      updateMode: 'RO',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
       section: 'administrative',
       includeInDigest: true
    },
@@ -128,8 +128,8 @@ foam.CLASS({
       name: 'lastLogin',
       documentation: 'The date and time of last login by User.',
       section: 'administrative',
-      createMode: 'HIDDEN',
-      updateMode: 'RO'
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO'
     },
     {
       class: 'String',
@@ -169,8 +169,8 @@ foam.CLASS({
     },
     {
       name: 'legalName',
-      createMode: 'HIDDEN',
-      updateMode: 'RO',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
       section: 'personal'
     },
    {
@@ -207,7 +207,7 @@ foam.CLASS({
       documentation: `The department associated with the organization/business
         of the User.`,
       width: 50,
-      createMode: 'HIDDEN',
+      createVisibility: 'HIDDEN',
       section: 'business'
     },
     {
@@ -217,25 +217,10 @@ foam.CLASS({
       documentation: 'The email address of the User.',
       displayWidth: 80,
       width: 100,
-      preSet: function(_, val) {
-        return val.toLowerCase();
-      },
       includeInDigest: true,
       javaSetter:
       `email_ = val.toLowerCase();
        emailIsSet_ = true;`,
-      // TODO: Use validatationPredicates instead.
-      validateObj: function(email) {
-        var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-        if ( ! email.trim() ) {
-          return 'Email required.';
-        }
-
-        if ( ! emailRegex.test(email.trim()) ) {
-          return 'Invalid email address.';
-        }
-      },
       section: 'personal'
     },
     {
@@ -254,7 +239,7 @@ foam.CLASS({
         return this.Phone.create();
       },
       view: { class: 'foam.u2.detail.VerticalDetailView' },
-      createMode: 'HIDDEN',
+      createVisibility: 'HIDDEN',
       section: 'personal'
     },
     {
@@ -279,14 +264,14 @@ foam.CLASS({
       },
       view: { class: 'foam.u2.detail.VerticalDetailView' },
       section: 'personal',
-      createMode: 'HIDDEN',
+      createVisibility: 'HIDDEN',
       includeInDigest: true
     },
     {
       class: 'PhoneNumber',
       name: 'mobileNumber',
       documentation: 'Returns the mobile phone number of the User from the Phone model.',
-      createMode: 'HIDDEN',
+      createVisibility: 'HIDDEN',
       section: 'personal'
     },
     {
@@ -308,8 +293,8 @@ foam.CLASS({
       javaGetter: `
         return getClass().getSimpleName();
       `,
-      createMode: 'HIDDEN',
-      updateMode: 'RO',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
       section: 'administrative'
     },
     {
@@ -337,6 +322,15 @@ foam.CLASS({
       factory: function() {
         return this.Address.create();
       },
+      label: 'Country',
+      tableCellFormatter: function(value, obj, axiom) {
+        let addressString = '';
+        for ( prop in value.instance_ ) if ( prop ) addressString += ` ${value[prop]}`;
+        if ( addressString ) this.setAttribute('title', addressString.trim());
+        return this.__subContext__.countryDAO.find(value.countryId).then((cobj) => {
+          return cobj ? this.add(cobj.name) : this.add(value.countryId);
+        });
+      },
       section: 'personal'
     },
     {
@@ -345,7 +339,7 @@ foam.CLASS({
       documentation: 'The default language preferred by the User.',
       of: 'foam.nanos.auth.Language',
       value: 'en',
-      createMode: 'HIDDEN',
+      createVisibility: 'HIDDEN',
       section: 'personal'
     },
     {
@@ -353,7 +347,7 @@ foam.CLASS({
       name: 'timeZone',
       documentation: 'The preferred time zone of the User.',
       width: 5,
-      createMode: 'HIDDEN',
+      createVisibility: 'HIDDEN',
       section: 'personal'
       // TODO: create custom view or DAO
     },
@@ -373,10 +367,10 @@ foam.CLASS({
           return 'Password must contain one lowercase letter, one uppercase letter, one digit, and be between 7 and 32 characters in length.';
         }
       },
-      createMode: 'RW',
-      updateMode: 'HIDDEN',
-      readMode: 'HIDDEN',
-      section: 'personal'
+      createVisibility: 'RW',
+      updateVisibility: 'RW',
+      readVisibility: 'HIDDEN',
+      section: 'administrative'
     },
     {
       class: 'Password',
@@ -401,8 +395,8 @@ foam.CLASS({
       hidden: true,
       networkTransient: true,
       section: 'administrative',
-      createMode: 'HIDDEN',
-      updateMode: 'RO'
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO'
     },
     {
       class: 'Password',
@@ -416,8 +410,8 @@ foam.CLASS({
       class: 'DateTime',
       name: 'passwordLastModified',
       documentation: 'The date and time that the password was last modified.',
-      createMode: 'HIDDEN',
-      updateMode: 'RO',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
       section: 'administrative'
     },
     {
@@ -450,14 +444,14 @@ foam.CLASS({
       class: 'StringArray',
       name: 'disabledTopics',
       documentation: 'Disables types for notifications.',
-      createMode: 'HIDDEN',
+      createVisibility: 'HIDDEN',
       section: 'administrative'
     },
     {
       class: 'StringArray',
       name: 'disabledTopicsEmail',
       documentation: 'Disables types for email notifications.',
-      createMode: 'HIDDEN',
+      createVisibility: 'HIDDEN',
       section: 'administrative'
     },
     {
@@ -473,15 +467,15 @@ foam.CLASS({
           return 'Invalid website';
         }
       },
-      createMode: 'HIDDEN',
+      createVisibility: 'HIDDEN',
       section: 'personal'
     },
     {
       class: 'DateTime',
       name: 'created',
       documentation: 'The date and time of when the User was created in the system.',
-      createMode: 'HIDDEN',
-      updateMode: 'RO',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
       section: 'administrative',
       includeInDigest: true
     },
@@ -489,8 +483,8 @@ foam.CLASS({
       class: 'DateTime',
       name: 'lastModified',
       documentation: 'The date and time the User was last modified.',
-      createMode: 'HIDDEN',
-      updateMode: 'RO',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
       section: 'administrative'
     }
   ],
@@ -541,17 +535,14 @@ foam.CLASS({
         User user = (User) x.get("user");
         User agent = (User) x.get("agent");
         AuthService auth = (AuthService) x.get("auth");
-
         boolean findSelf = SafetyUtil.equals(this.getId(), user.getId()) ||
           (
             agent != null &&
             SafetyUtil.equals(agent.getId(), this.getId())
           );
 
-        if (
-          ! findSelf &&
-          ! auth.check(x, "user.read." + this.getId()) &&
-          ! auth.check(x, "spid.read." + this.getSpid())
+        if ( ! findSelf &&
+             ! auth.check(x, "user.read." + this.getId())
         ) {
           throw new AuthorizationException();
         }
@@ -689,11 +680,11 @@ foam.RELATIONSHIP({
   inverseName: 'agents',
   junctionDAOKey: 'agentJunctionDAO',
   sourceProperty: {
-    createMode: 'HIDDEN',
+    createVisibility: 'HIDDEN',
     section: 'business'
   },
   targetProperty: {
-    createMode: 'HIDDEN',
+    createVisibility: 'HIDDEN',
     section: 'business'
   }
 });

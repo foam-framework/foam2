@@ -182,17 +182,18 @@ try {
             dao.put_(x, obj);
           }
 
-          public void executeJob() {
+          public void executeJob() {}
+
+          public void endJob() {
             try {
               record_ = ( old != null ) ?
                 getOutputter().stringifyDelta(old, obj) :
                 getOutputter().stringify(obj);
             } catch (Throwable t) {
               getLogger().error("Failed to write put entry to journal", t);
+              record_ = null;
             }
-          }
 
-          public void endJob() {
             if ( foam.util.SafetyUtil.isEmpty(record_) ) return;
 
             try {
@@ -366,7 +367,7 @@ try {
         if ( obj instanceof LastModifiedByAware && ((LastModifiedByAware) obj).getLastModifiedBy() != 0L ) return;
 
         User user = (User) x.get("user");
-        Calendar now = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+
         write_(sb.get()
           .append("// Modified by ")
           .append(user.label())
@@ -417,7 +418,7 @@ try {
         }
       ],
       javaCode: `
-        Parser        parser = new ExprParser();
+        Parser        parser = ExprParser.instance();
         PStream       ps     = new StringPStream();
         ParserContext x      = new ParserContextImpl();
 

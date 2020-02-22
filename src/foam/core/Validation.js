@@ -102,7 +102,8 @@ foam.CLASS({
         }
         return !required ? null : [[name],
           function() {
-            return !this.hasOwnProperty(name) && (`Please enter ${label.toLowerCase()}`);
+            const axiom = this.cls_.getAxiomByName(name);
+            return axiom.isDefaultValue(this[name]) && (`Please enter ${label.toLowerCase()}`);
           }]
       },
     },
@@ -330,9 +331,12 @@ foam.CLASS({
           {
             args: [this.name],
             predicateFactory: function(e) {
-              return e.REG_EXP(self, /^$|.+@.+\..+/);
+              return e.OR(
+                e.EQ(self, ''),
+                e.REG_EXP(self, /^[A-Za-z0-9._%+-]+@[a-zA-Z0-9]+\.[a-zA-Z]{2,6}$/)
+              );
             },
-            errorString: 'Please enter email address'
+            errorString: 'Please enter valid email address'
           }
         ];
         if ( this.required ) {

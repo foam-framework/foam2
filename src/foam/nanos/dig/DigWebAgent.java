@@ -192,6 +192,7 @@ public class DigWebAgent
         } else if ( Format.XML == format ) {
           XMLSupport      xmlSupport = new XMLSupport();
           XMLInputFactory factory    = XMLInputFactory.newInstance();
+          factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
 
           if ( SafetyUtil.isEmpty(data) ) {
             DigErrorMessage error = new EmptyDataException.Builder(x)
@@ -536,7 +537,7 @@ public class DigWebAgent
    * @return the error message
    */
   protected String getParsingError(X x, String buffer) {
-    Parser        parser = new foam.lib.json.ExprParser();
+    Parser        parser = foam.lib.json.ExprParser.instance();
     PStream       ps     = new StringPStream();
     ParserContext psx    = new ParserContextImpl();
 

@@ -166,10 +166,8 @@ foam.CLASS({
             if ( group != null && group.implies(x, permission) ) {
               return true;
             }
-          } else {
-            if ( new AuthPermission(j.getTargetId()).implies(permission) ) {
-              return true;
-            }
+          } else if ( new AuthPermission(j.getTargetId()).implies(permission) ) {
+            return true;
           }
         }
 
@@ -242,6 +240,11 @@ foam.CLASS({
             }
           }
         }
+
+        // Strip trailing / to simplify other url building components, such as email templates. 
+        if ( configUrl.endsWith("/") ) {
+          configUrl = configUrl.substring(0, configUrl.length()-1);
+        } 
 
         // SET URL
         config.setUrl(configUrl);

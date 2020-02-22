@@ -13,10 +13,10 @@ public class OrParser
   extends foam.lib.parse.ProxyParser {
   public OrParser(Parser andParser) {
     setDelegate(new Repeat(andParser,
-                           new Seq0(new foam.lib.json.Whitespace(),
-                               new Alt(new LiteralIC("OR "),
-                                   new Literal("| "))
-                               )));
+      new Seq0(foam.lib.json.Whitespace.instance(),
+         new Alt(new LiteralIC("OR "),
+             Literal.create("| "))
+         )));
   }
 
   public PStream parse(PStream ps, ParserContext x) {

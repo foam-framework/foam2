@@ -44,7 +44,8 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'enabled',
-      value: true
+      value: true,
+      tableWidth: 80
     },
     {
       class: 'FObjectProperty',
@@ -69,6 +70,7 @@ foam.CLASS({
       class: 'Int',
       name: 'order',
       documentation: 'Used to order the menu list.',
+      tableWidth: 80,
       value: 1000
     },
     {
@@ -93,6 +95,10 @@ foam.CLASS({
       javaFactory: `
         return foam.mlang.MLang.TRUE;
       `,
+    },
+    {
+          class: 'StringArray',
+          name: 'keywords'
     }
   ],
 

@@ -75,7 +75,7 @@ foam.CLASS({
               }
             });
 
-            var version   = appConfig.version;
+            var version = appConfig.version;
             if ( 'CLIENT_VERSION' in localStorage ) {
               var oldVersion = localStorage.CLIENT_VERSION;
               if ( version != oldVersion ) {
@@ -99,15 +99,20 @@ foam.CLASS({
                 client.properties.push({
                   name: spec.name,
                   factory: function() {
-                    if ( ! json.class       ) json.class       = 'foam.dao.EasyDAO';
+                    if ( ! json.class ) json.class = 'foam.dao.EasyDAO';
                     var cls = foam.lookup(json.class);
                     var defaults = {
                       serviceName: 'service/' + spec.name,
-                      daoType: 'CLIENT',
                       retryBoxMaxAttempts: 0
                     };
+                    if ( cls == foam.dao.EasyDAO ) {
+                      defaults.cache              = true;
+                      defaults.ttlSelectPurgeTime = 15000;    // for select()
+                      defaults.ttlPurgeTime       = 15000;    // for find()
+                      defaults.daoType            = 'CLIENT';
+                    }
                     for ( var k in defaults ) {
-                      if ( cls.getAxiomByName(k) && ! json[k] )
+                      if ( cls.getAxiomByName(k) && json[k] == undefined )
                         json[k] = defaults[k];
                     }
                     return foam.json.parse(json, null, this.__subContext__);

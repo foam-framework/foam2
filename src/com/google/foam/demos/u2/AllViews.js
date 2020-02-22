@@ -14,6 +14,9 @@ foam.CLASS({
     {
       name: 'value'
     }
+  ],
+  methods: [
+    function toSummary() { return this.id + ' ' + this.value; }
   ]
 });
 
@@ -24,23 +27,53 @@ foam.CLASS({
 
   requires: [
     'com.google.foam.demos.u2.SampleData',
+    'foam.u2.view.ReferenceView',
+    'foam.dao.MDAO',
     'foam.dao.EasyDAO'
   ],
 
+  exports: [ 'sampleDataDAO' ],
+
   properties: [
     {
-      class: 'foam.dao.DAOProperty',
-      name: 'sampleDAO',
+      name: 'sampleDataDAO',
       factory: function() {
         return this.EasyDAO.create({
           of: this.SampleData,
+          daoType: 'MDAO',
           testData: [
             { id: 'key1', value: 'value1' },
             { id: 'key2', value: 'value2' },
-            { id: 'key3', value: 'value3' }
+            { id: 'key3', value: 'value3' },
+            { id: 'key4', value: 'value4' },
+            { id: 'key5', value: 'value5' },
+            { id: 'key6', value: 'value6' }
           ]
         });
+      },
+      view: {
+        class: 'foam.u2.DAOList',
+        rowView: { class: 'com.google.foam.demos.heroes.CitationView' }
       }
+    },
+    {
+      class: 'Reference',
+      of: 'com.google.foam.demos.u2.SampleData',
+      name: 'reference',
+      view: function(_, X) {
+        var v1 = X.data.ReferenceView.create({dao: X.data.sampleDataDAO, of: X.data.SampleData});
+        var v2 = X.data.ReferenceView.create({dao: X.data.sampleDataDAO, of: X.data.SampleData});
+        return foam.u2.view.DualView.create({
+          viewa: foam.u2.view.DualView.create({viewa: v1, viewb: v2}),
+          viewb: foam.u2.TextField.create()
+        });
+      }
+    },
+    {
+      class: 'Reference',
+      of: 'com.google.foam.demos.u2.SampleData',
+      name: 'reference2',
+      targetDAOKey: 'sampleDataDAO'
     },
     {
       class: 'Int',

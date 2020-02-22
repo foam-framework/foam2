@@ -16,16 +16,16 @@ public class CSVParser
   }
 
   public CSVParser(foam.core.ClassInfo info, foam.dao.Sink sink) {
-    Parser escapedQuote = new Literal("\"\"");
+    Parser escapedQuote = Literal.create("\"\"");
     Parser quotedText = new Seq1(1,
-      new Literal("\""),
+      Literal.create("\""),
       new Repeat(
         new Alt(new Parser[] {
           escapedQuote,
           new NotChar('"')
         })
       ),
-      new Literal("\"")
+      Literal.create("\"")
     );
     Parser unquotedText = new Repeat(new NotChars(",\n\r"));
     Parser field = new Join(

@@ -712,12 +712,10 @@ return file;`
 }
 
 this.setup(x);
-HashingOutputStream os = null;
+long size = blob.getSize();
+File tmp = allocateTmp(x, 1);
 
-try {
-  long size = blob.getSize();
-  File tmp = allocateTmp(x, 1);
-  os = new HashingOutputStream(new FileOutputStream(tmp));
+try ( HashingOutputStream os = new HashingOutputStream(new FileOutputStream(tmp)) ) {
   blob.read(os, 0, size);
   os.close();
 
@@ -733,9 +731,8 @@ try {
   return result;
 } catch (Throwable t) {
   return null;
-} finally {
-  IOUtils.closeQuietly(os);
-}`
+}
+`
     },
     function filename(blob) {
       if ( ! foam.blob.IdentifiedBlob.isInstance(blob) ) return null;

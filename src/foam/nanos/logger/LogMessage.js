@@ -10,9 +10,10 @@ foam.CLASS({
 
   documentation: 'Modelled log output.',
 
-  implements: [
-    'foam.nanos.auth.CreatedAware',
-    'foam.nanos.auth.CreatedByAware'
+  javaImports: [
+    'foam.core.X',
+    'foam.log.LogLevel',
+    'foam.nanos.auth.User'
   ],
 
   tableColumns: [
@@ -22,20 +23,62 @@ foam.CLASS({
   ],
 
   searchColumns: [
+    'hostname',
     'created',
     'severity',
-    'exception'
+    'message'
   ],
 
   properties: [
     {
-      class: 'DateTime',
+      name: 'hostname',
+      class: 'String',
+      visibility: 'RO'
+    },
+    {
+      class: 'String',
       name: 'created',
       visibility: 'RO',
       tableWidth: 180
     },
-    'createdBy',
-    'createdByAgent',
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdBy',
+      documentation: `The unique identifier of the user.`,
+      visibility: 'RO',
+      tableCellFormatter: function(value, obj, axiom) {
+        this.__subSubContext__.userDAO
+          .find(value)
+          .then((user) => {
+            if ( user ) {
+              this.add(user.legalName);
+            }
+          })
+          .catch((error) => {
+            this.add(value);
+          });
+      }
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdByAgent',
+      documentation: `The unique identifier of the agent`,
+      visibility: 'RO',
+      tableCellFormatter: function(value, obj, axiom) {
+        this.__subSubContext__.userDAO
+          .find(value)
+          .then((user) => {
+            if ( user ) {
+              this.add(user.legalName);
+            }
+          })
+          .catch((error) => {
+            this.add(value);
+          });
+      }
+    },
     {
       name: 'threadName',
       class: 'String',
@@ -48,7 +91,7 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.log.LogLevel',
       toJSON: function(value) { return value && value.label; },
-      updateMode: 'RO',
+      updateVisibility: 'RO',
       tableCellFormatter: function(severity, obj, axiom) {
          this
           .start()
@@ -70,18 +113,18 @@ foam.CLASS({
       class: 'String',
       label: 'Log Message',
       view: { class: 'foam.u2.view.PreView' },
-      updateMode: 'RO'
+      updateVisibility: 'RO'
     },
     // TODO: implement via an additional method on Logger logger.flag(x, y).log(message)
     // {
     //   name: 'flags',
     //   class: 'Map'
     // },
-    {
-      name: 'exception',
-      class: 'Object',
-      view: { class: 'foam.u2.view.PreView' },
-      updateMode: 'RO'
-    }
+    // {
+    //   name: 'exception',
+    //   class: 'Object',
+    //   view: { class: 'foam.u2.view.PreView' },
+    //   updateVisibility: 'RO'
+    // }
   ]
 });

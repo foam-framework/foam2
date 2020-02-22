@@ -72,7 +72,7 @@ foam.CLASS({
         var l = this.left.maybeClone(locked);
 
         this.left = l.right;
-        l.right = this;
+        l.right   = this;
 
         this.updateSize();
         l.updateSize();

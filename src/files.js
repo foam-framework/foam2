@@ -180,7 +180,6 @@ FOAM_FILES([
   { name: "foam/u2/AttrSlot" },
   { name: "foam/u2/ViewSpec" },
   { name: "foam/u2/Tooltip", flags: ['web'] },
-  { name: "foam/u2/Visibility"},
   { name: "foam/u2/RowFormatter" },
   { name: "foam/u2/WeakMap", flags: ['web'] },
   { name: "foam/u2/Element", flags: ['js'] },
@@ -249,8 +248,8 @@ FOAM_FILES([
   { name: "foam/dao/grid/ManyToManyGridDAO" },
   { name: "foam/dao/LazyCacheDAO" },
   { name: "foam/dao/TTLCachingDAO"},
+  { name: "foam/dao/TTLSelectCachingDAO"},
   { name: "foam/dao/CachingDAO" },
-  { name: "foam/dao/CacheType" },
   { name: "foam/dao/DeDupDAO" },
   { name: "foam/dao/LRUDAOManager" },
   { name: "foam/dao/SequenceNumberDAO" },
@@ -266,7 +265,10 @@ FOAM_FILES([
   { name: "foam/nanos/auth/Authorizer" },
   { name: "foam/nanos/auth/EnabledAware" },
   { name: "foam/nanos/auth/ServiceProviderAware" },
+  { name: "foam/nanos/auth/ServiceProviderAwareSink" },
+  { name: "foam/nanos/auth/test/ServiceProviderAwareTest" },
   { name: "foam/nanos/logger/Logger" },
+  { name: "foam/nanos/logger/DAOLogger" },
   { name: "foam/nanos/logger/LoggingDAO" },
   { name: "foam/nanos/notification/Notifiable" },
   { name: "foam/nanos/notification/EmailSetting" },
@@ -488,6 +490,7 @@ FOAM_FILES([
   { name: "foam/u2/view/UnstyledTableView", flags: ['web'] },
   { name: "foam/u2/view/TableView", flags: ['web'] },
   { name: "foam/u2/view/EditColumnsView", flags: ['web'] },
+  { name: "foam/u2/view/ColumnConfigView", flags: ['web'] },
   { name: "foam/u2/md/OverlayDropdown", flags: ['web'] },
   { name: "foam/u2/view/ScrollTableView", flags: ['web'] },
   { name: "foam/u2/view/ScrollDAOView", flags: ['web'] },
@@ -530,6 +533,8 @@ FOAM_FILES([
   { name: "foam/u2/stack/Stack", flags: ['web'] },
   { name: "foam/u2/stack/StackView", flags: ['web'] },
   { name: "foam/apploader/ModelRefines" },
+  { name: "foam/foamlink/FoamlinkNodeModelFileDAO" },
+  { name: "foam/foamlink/FoamlinkNodeModelFileFetcher" },
   { name: "foam/apploader/ClassLoader" },
   { name: "foam/apploader/SubClassLoader" },
   { name: "foam/classloader/OrDAO", flags: ['debug'] },
@@ -722,6 +727,7 @@ FOAM_FILES([
   { name: "foam/layout/SectionAxiom" },
 
   { name: "foam/u2/detail/AbstractSectionedDetailView" },
+  { name: "foam/u2/detail/ChoiceSectionDetailView" },
   { name: "foam/u2/detail/SectionView" },
   { name: "foam/u2/detail/SectionedDetailView" },
   { name: "foam/u2/detail/VerticalDetailView" },
@@ -730,6 +736,7 @@ FOAM_FILES([
   { name: "foam/u2/detail/SectionedDetailPropertyView" },
 
   { name: "foam/graphics/ZoomMapView" },
+  { name: "foam/core/CoreTypesValidationTest" },
 
   // Strategy
   { name: "foam/strategy/StrategyReference" },
@@ -742,4 +749,10 @@ FOAM_FILES([
 
   { name: "foam/util/concurrent/AbstractAssembly"},
   { name: "foam/util/concurrent/Assembly"},
+
+  // Foamlink
+  { name: "foam/foamlink/FoamlinkData" },
+  { name: "foam/foamlink/FoamlinkExec" },
+  { name: "foam/foamlink/lib" },
+  { name: "foam/util/filesystem/FileWalker" },
 ]);

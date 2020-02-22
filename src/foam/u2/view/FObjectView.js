@@ -20,15 +20,14 @@ foam.CLASS({
       class: 'String',
       name: 'objectClass',
       label: '',
-      visibilityExpression: function(choices) {
+      visibility: function(choices) {
         return choices.length > 1 ?
-          foam.u2.Visibility.RW :
-          foam.u2.Visibility.HIDDEN;
+          foam.u2.DisplayMode.RW :
+          foam.u2.DisplayMode.HIDDEN;
       },
       view: function(args, X) {
         return {
           class: 'foam.u2.view.ChoiceView',
-          placeholder: '--',
           choices$: X.data.choices$,
           defaultValue$: X.data.choices$.map((choices) => {
             return Array.isArray(choices) && choices.length > 0 ? choices[0][0] : '';
