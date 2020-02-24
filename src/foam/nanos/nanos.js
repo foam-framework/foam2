@@ -128,6 +128,7 @@ FOAM_FILES([
   { name: "foam/nanos/script/Language" },
   { name: "foam/nanos/script/ScriptStatus" },
   { name: "foam/nanos/script/Script" },
+  { name: "foam/nanos/script/TestRunnerConfig" },
   { name: "foam/nanos/script/TestRunnerScript" },
   { name: "foam/nanos/jetty/HttpServer" },
   { name: "foam/nanos/servlet/Servlet" },
