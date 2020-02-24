@@ -118,6 +118,16 @@
              this.EQ(foam.nanos.boot.NSpec.SERVE,     true)
            ));
        }
+     },
+     {
+       class: 'String',
+       name: 'search',
+       view: {
+         class: 'foam.u2.TextField',
+         type: 'search',
+         onKey: true
+       },
+       value: ''
      }
    ],
 
@@ -131,42 +141,71 @@
 
        this.addClass(this.myClass());
 
+       this.start()
+        .style({ 'display': 'inline-block', 'width': '100%' })
+        .add(this.SEARCH)
+        .addClass('foam-u2-search-TextSearchView')
+       .end();
+
        this.memento$.sub(function() {
-         self.stack.push({
-           class: self.BackBorder,
-           title: self.memento,
-           inner: {
-             class: self.BrowserView,
-             data: self.__context__[self.memento],
-             stack: self.stack
-           }
-         }, this);
-       });
+        self.stack.push({
+          class: self.BackBorder,
+          title: self.memento,
+          inner: {
+            class: self.BrowserView,
+            data: self.__context__[self.memento],
+            stack: self.stack
+          }
+        }, this);
+      });
 
-       this.filteredDAO.select().then(function(specs) {
-         specs.array.sort(function(o1, o2) { return foam.String.compare(o1.id.toUpperCase(), o2.id.toUpperCase())}).forEach(function(spec) {
-           var label = foam.String.capitalize(spec.id.substring(0, spec.id.length-3));
-           var l     = label.charAt(0);
+      this.filteredDAO.select().then(function(specs) {
+        specs.array.sort(function(o1, o2) { return foam.String.compare(o1.id.toUpperCase(), o2.id.toUpperCase())}).forEach(function(spec) {
+          var label = foam.String.capitalize(spec.id.substring(0, spec.id.length-3));
+          var l     = label.charAt(0);
+          var childrenThatContainsSearchCounter = 0;
 
-           if ( l != currentLetter ) {
-             currentLetter = l;
-             section = self.start('span')
-               .addClass(self.myClass('section'))
-               .start('span')
-                 .addClass(self.myClass('header'))
-                 .add(l)
-               .end();
-           }
+          if ( l != currentLetter ) {
+            currentLetter = l;
+            section = self.start('span')
+              .show(self.slot(function(search) {
+                childrenThatContainsSearchCounter = 0;
+                return section ? section.children.length > 0 : true;
+              }))
+              .addClass(self.myClass('section'))
+              .start('span')
+                .addClass(self.myClass('header'))
+                .add(l)
+              .end();
+          }
 
-           section.start('span')
-             .addClass(self.myClass('dao'))
-             .add(label)
-             .attrs({title: spec.description})
-             .on('click', function() {
-               self.memento = spec.id;
-             });
-         });
-       });
-     }
-   ]
+          section.start('span')
+            .show(self.slot(function(search) {
+              var contains = false;
+              if ( ! search )
+                contains = true;
+              if ( spec.description.toLowerCase().includes(search.toLowerCase()) )
+                contains =  true;
+              if ( !contains && spec.keywords && spec.keywords.length > 0 ) {
+                for(var k in spec.keywords) {
+                  if(k.toLowerCase().includes(search.toLowerCase())) {
+                    contains  = true;
+                    break;
+                  }
+                }
+              }
+              if(contains)
+                childrenThatContainsSearchCounter++;
+              return contains;
+            }))
+            .addClass(self.myClass('dao'))
+            .add(label)
+            .attrs({title: spec.description})
+            .on('click', function() {
+              self.memento = spec.id;
+            });
+        });
+      });
+    }
+  ]
  });
