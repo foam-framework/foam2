@@ -52,7 +52,7 @@ foam.CLASS({
             return a[foam.language];
           if ( a[foam.language.substring(0, foam.language.indexOf('-'))] !== undefined )
             return a[foam.language];
-          return a['en'];
+          return a['en'];// default language.
         }
         var s = typeof a === 'function' ? foam.String.multiline(a) :
                 typeof a === 'number'   ? String(a)                :
