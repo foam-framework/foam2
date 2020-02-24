@@ -44,6 +44,10 @@ foam.CLASS({
       title: 'Administrative'
     },
     {
+      name: 'basicInfo',
+      title: 'Basic Info'
+    },
+    {
       name: 'uiSettings',
       title: 'UI Settings',
       help: 'These properties are used to control how this capability appears in the GUI.'
@@ -58,11 +62,14 @@ foam.CLASS({
     {
       name: 'id',
       class: 'String',
-      visibility: 'HIDDEN'
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      section: 'basicInfo'
     }, 
     {
       name: 'name',
-      class: 'String'
+      class: 'String',
+      section: 'basicInfo'
     },
     {
       name: 'icon',
