@@ -39,10 +39,10 @@ public class QueryParser
     for ( Object prop : properties ) {
       PropertyInfo info = (PropertyInfo) prop;
 
-      expressions.add(new PropertyExpressionParser(info));
-      expressions.add(new NegateParser(new PropertyExpressionParser(info)));
+      expressions.add(PropertyExpressionParser.create(info));
+      expressions.add(new NegateParser(PropertyExpressionParser.create(info)));
       expressions.add(new HasParser(info));
-      expressions.add(new ParenParser(new PropertyExpressionParser(info)));
+      expressions.add(new ParenParser(PropertyExpressionParser.create(info)));
 
       if ( info.getSQLType().equalsIgnoreCase("BOOLEAN") ) expressions.add(new IsParser(info));
     }

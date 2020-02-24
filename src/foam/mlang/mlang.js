@@ -3294,6 +3294,10 @@ foam.CLASS({
       javaCode: `
         return getTargetClass().getObjClass() == obj.getClass();
       `
+    },
+    function toString() {
+      return foam.String.constantize(this.cls_.name) +
+          '(' + this.targetClass.id + ')';
     }
   ]
 });

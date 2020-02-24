@@ -20,13 +20,31 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PropertyExpressionParser
   extends ProxyParser
 {
   PropertyInfo prop_;
+  private final static Map map__ = new ConcurrentHashMap();
 
-  public PropertyExpressionParser(PropertyInfo prop) {
+  /**
+   * Implement the multiton pattern so we don't create the same
+   * parser more than once.
+   **/
+  public static Parser create(PropertyInfo p) {
+    Parser prs = (Parser) map__.get(p.toString());
+
+    if ( prs == null ) {
+      prs = new PropertyExpressionParser(p);
+      map__.put(p.toString(), prs);
+    }
+
+    return prs;
+  }
+
+  private PropertyExpressionParser(PropertyInfo prop) {
     prop_ = prop;
 
     setDelegate(new Seq1(2,
