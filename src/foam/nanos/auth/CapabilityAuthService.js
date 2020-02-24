@@ -62,7 +62,6 @@ foam.CLASS({
           DAO capabilityDAO = (DAO) x.get("capabilityDAO");
 
           Capability cap = (Capability) capabilityDAO.find(permission);
-          if ( cap != null && cap.isDeprecated(x) ) return getDelegate().checkUser(x, user, permission);
 
           Predicate capabilityScope = AND(
             EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
@@ -87,7 +86,6 @@ foam.CLASS({
 
           for ( UserCapabilityJunction ucJunction : userCapabilityJunctions ) {
             Capability capability = (Capability) capabilityDAO.find(ucJunction.getTargetId());
-            if ( capability.isDeprecated(x) ) continue;
             if ( capability.implies(x, permission) ) return true;
           }
         } catch (Exception e) {

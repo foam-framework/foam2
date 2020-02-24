@@ -487,7 +487,24 @@ p({
 p({"class":"foam.nanos.boot.NSpec", "name":"twofactor",                          "serve":true,  "authenticate": false, "boxClass":"foam.nanos.auth.twofactor.OTPAuthServiceSkeleton", "serviceClass":"foam.nanos.auth.twofactor.GoogleTOTPAuthService", "client":"{\"class\":\"foam.nanos.auth.twofactor.ClientOTPAuthService\"}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"htmlDocDAO",                         "serve":true,  "serviceScript":"return new foam.dao.PMDAO(x, new foam.dao.SequenceNumberDAO (new foam.dao.java.JDAO(x, foam.nanos.auth.HtmlDoc.getOwnClassInfo(), \"htmlDoc\")));", "client":"{\"of\":\"foam.nanos.auth.HtmlDoc\"}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"emailDocService",                  "lazy":false, "serve":true,  "boxClass":"foam.nanos.auth.email.EmailDocInterfaceSkeleton", "serviceClass":"foam.nanos.auth.email.EmailDocService","client":"{\"class\":\"foam.nanos.auth.email.ClientEmailDocService\", \"delegate\": { \"class\":\"foam.box.HTTPBox\", \"url\":\"service/emailDocService\" } }"})
-p({"class":"foam.nanos.boot.NSpec","name":"appConfig",                         "lazy":false, "service":{"class":"foam.nanos.app.AppConfig"}})
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"testRunnerConfig",
+  "lazy":false,
+  "service": {
+    "class":"foam.nanos.script.TestRunnerConfig"
+  }
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"appConfig",
+  "lazy":false,
+  "service": {
+    "class":"foam.nanos.app.AppConfig"
+  }
+})
+
 p({"class":"foam.nanos.boot.NSpec","name":"appConfigService",                   "serve":true, "authenticate": false, "boxClass":"foam.nanos.app.AppConfigServiceSkeleton", "service":{"class":"foam.nanos.app.ContextLookupAppConfigService"}, "client":"{\"class\":\"foam.nanos.app.ClientAppConfigService\",\"delegate\":{\"class\":\"foam.box.HTTPBox\",\"url\":\"service/appConfigService\"}}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"agentAuth",                        "lazy":false, "serve":true, "authenticate": false, "description":"Permits users to act as others if permitted. Places user as an agent of the system.", "boxClass":"foam.nanos.auth.AgentAuthServiceSkeleton", "serviceScript":"return new foam.nanos.auth.AgentUserAuthService(x);","client":"{\"class\":\"foam.nanos.auth.ClientAgentAuthService\"}"})
 
@@ -567,7 +584,7 @@ p({
   "name": "ruleDAO",
   "serve": true,
   "serviceScript": """
-    ed = new foam.dao.EasyDAO.Builder(x)
+    dao = new foam.dao.EasyDAO.Builder(x)
       .setPm(true)
       .setGuid(true)
       .setOf(foam.nanos.ruler.Rule.getOwnClassInfo())
@@ -575,7 +592,11 @@ p({
       .setJournalName("rules")
       .setRuler(false)
       .build();
-    return new foam.dao.ValidatingDAO(x, ed);
+
+    dao = new foam.dao.ValidatingDAO(x, dao);
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.ruler.Rule.NAME });
+
+    return dao;
   """,
   "client": """
     {

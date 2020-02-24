@@ -143,6 +143,11 @@ foam.CLASS({
     function initE() {
       var self = this;
       this.SUPER();
+
+      // Get a fresh copy of the data, especially when we've been returned
+      // to this view from the edit view on the stack.
+      this.config.dao.find(this.data).then(function(d) { self.data = d; });
+
       this
         .addClass(this.myClass())
         .add(self.slot(function(data, data$id, config$viewBorder, viewView) {
