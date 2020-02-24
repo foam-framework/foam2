@@ -24,9 +24,6 @@ public class FileService
     extends HttpBlobService
 {
   protected DAO fileDAO_;
-  protected DAO userDAO_;
-  protected DAO sessionDAO_;
-
 
   public FileService(X x, BlobService delegate) {
     this(x, "httpFileService", delegate);
@@ -35,10 +32,6 @@ public class FileService
   public FileService(X x, String name, BlobService delegate) {
     super(x, name, delegate);
     fileDAO_ = (DAO) x.get("fileDAO");
-    // use the user dao instead of local user dao
-    // so that we get the authentication decoration
-    userDAO_ = (DAO) x.get("userDAO");
-    sessionDAO_ = (DAO) x.get("localSessionDAO");
   }
 
   @Override
@@ -64,12 +57,7 @@ public class FileService
       // fileDAO has been decorated to disallow enumeration and File
       // IDs are unguessable cryptographically strong UUIDs, so no
       // permission check is really necessary.
-      User owner = (User) userDAO_.find_(x, file.getOwner());
-      User user = (User) x.get("user");
-      if ( user == null || owner == null || (user.getId() != owner.getId() && ! auth.check(x,"file.read." + file.getId())) ) {
-        resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        return;
-      }
+      // NOTE: 'user' is validated in SessionWebAgent
 
       // get blob and blob size
       // TODO: figure out why delegate is not being set for IdentifiedBlob
