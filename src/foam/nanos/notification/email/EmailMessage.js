@@ -21,7 +21,8 @@ foam.CLASS({
     'subject',
     'to',
     'from',
-    'status'
+    'status',
+    
   ],
 
   properties: [
@@ -105,9 +106,9 @@ foam.CLASS({
       tableWidth: 100
     },
     {
-      class: 'String',
-      name: 'templateName',
-      value: null
+      class: 'Map',
+      name: 'templateArguments',
+      view: { class: 'foam.u2.view.MapView' }
     }
   ]
 });
