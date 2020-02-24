@@ -435,7 +435,7 @@ foam.CLASS({
     [
       'adapt',
       function(_, v) {
-        return v.toLowerCase().trim();
+        return v || v === '' ? v : v.toLowerCase().trim();
       }
     ]
   ]
