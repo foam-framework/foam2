@@ -912,12 +912,12 @@ p({
   "class": "foam.nanos.boot.NSpec",
   "name": "userQueryService",
   "serve": true,
-  "serviceClass": "net.nanopay.liquidity.ucjQuery.SimpleUserQueryService",
-  "boxClass": "net.nanopay.liquidity.ucjQuery.UserQueryServiceSkeleton",
+  "serviceClass": "foam.nanos.auth.SimpleUserQueryService",
+  "boxClass": "foam.nanos.auth.UserQueryServiceSkeleton",
   "client":
   """
     {
-      "class":"net.nanopay.liquidity.ucjQuery.ClientUserQueryService",
+      "class":"foam.nanos.auth.ClientUserQueryService",
       "delegate": { 
         "class":"foam.box.SessionClientBox",
         "delegate": {
