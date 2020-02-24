@@ -55,6 +55,10 @@ foam.CLASS({
         if ( value ) this.start().style({ color: '#f00' }).add(value).end();
       },
       tableWidth: 85
+    },
+    {
+      class: 'String',
+      name: 'testSuite'
     }
   ],
 
