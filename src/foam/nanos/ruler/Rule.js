@@ -65,7 +65,8 @@
     {
       class: 'String',
       name: 'id',
-      visibility: 'HIDDEN'
+      visibility: 'RO'
+      // will display in '_defaultSection'
     },
     {
       class: 'String',
