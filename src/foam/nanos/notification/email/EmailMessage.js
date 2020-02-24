@@ -21,8 +21,7 @@ foam.CLASS({
     'subject',
     'to',
     'from',
-    'status',
-    
+    'status'
   ],
 
   properties: [
