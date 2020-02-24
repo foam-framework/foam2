@@ -47,6 +47,7 @@ public class EmailsUtility {
     // Add template name to templateArgs, to avoid extra parameter passing
     if ( ! SafetyUtil.isEmpty(templateName) ) {
       if ( templateArgs != null ) {
+        emailMessage.setTemplateName(templateName);
         templateArgs.put("template", templateName);
       } else {
         templateArgs = new HashMap<>();

@@ -104,5 +104,10 @@ foam.CLASS({
       name: 'status',
       tableWidth: 100
     },
+    {
+      class: 'String',
+      name: 'templateName',
+      value: null
+    }
   ]
 });
