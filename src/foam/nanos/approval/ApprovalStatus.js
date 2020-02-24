@@ -12,7 +12,7 @@
     {
       name: 'REQUESTED',
       label: 'Pending',
-      documentation: 'Requent pending.'
+      documentation: 'Request pending.'
     },
     {
       name: 'APPROVED',

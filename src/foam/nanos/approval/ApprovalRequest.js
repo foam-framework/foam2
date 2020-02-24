@@ -211,22 +211,22 @@
       value: 'REQUESTED',
       section: 'requestDetails',
       javaFactory: 'return foam.nanos.approval.ApprovalStatus.REQUESTED;',
-      visibility: function(status) {
-        return status ?
-          foam.u2.DisplayMode.RO :
-          foam.u2.DisplayMode.HIDDEN;
-      }
+      visibility: 'RO'
     },
     {
       class: 'String',
       name: 'memo',
       view: { class: 'foam.u2.tag.TextArea', rows: 5, cols: 80 },
       documentation: 'Meant to be used for explanation on why request was approved/rejected',
-      section: 'basicInformation',
-      visibility: function(memo) {
-        return memo ?
-          foam.u2.DisplayMode.RO :
-          foam.u2.DisplayMode.HIDDEN;
+      section: 'supportDetails',
+      visibility: function(memo, status) {
+        if ( status == net.nanopay.approval.ApprovalStatus.REQUESTED ) {
+          return foam.u2.DisplayMode.RW;
+        } else if ( memo ) {
+          return foam.u2.DisplayMode.R0;
+        } else {
+          return foam.u2.DisplayMode.HIDDEN;
+        }
       }
     },
     {
@@ -234,7 +234,7 @@
       name: 'description',
       documentation: `Approval request description.`,
       tableWidth: 200,
-      section: 'basicInformation',
+      section: 'requestDetails',
       visibility: function(description) {
         return description ?
           foam.u2.DisplayMode.RO :
