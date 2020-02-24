@@ -29,7 +29,7 @@ foam.CLASS({
   ],
 
   css: `
-  input {
+  ^ input {
     width: 220px;
   }
 
@@ -38,9 +38,8 @@ foam.CLASS({
     font-weight: normal;
     display: inline-block;
     position: absolute;
-    height: calc(100% - 80px);
+    height: calc(100vh - 80px);
     width: 240px;
-    overflow-y: scroll;
     overflow-x: hidden;
     z-index: 100;
     font-size: 26px;
@@ -54,12 +53,15 @@ foam.CLASS({
     margin: 4px 0;
   }
 
-  ^ .foam-u2-view-TreeView {
-    margin-right: 10px;
-  }
-
   ^ .foam-u2-view-TreeViewRow-label {
     font-weight: 300;
+  }
+
+  ^ .foam-u2-view-TreeViewRow {
+    width: 100%;
+  }
+  ^ .tree-view-height-manager {
+    margin-bottom: 40px;
   }
   `,
 
@@ -78,8 +80,13 @@ foam.CLASS({
       }
     },
     {
-      name: 'menuSearch',
       class: 'String',
+      name: 'menuSearch',
+      view: {
+        class: 'foam.u2.TextField',
+        type: 'search',
+        onKey: true
+      },
       value: ''
     }
   ],
@@ -94,15 +101,13 @@ foam.CLASS({
         .addClass('side-nav-view')
         .start()
           .startContext({ data: this })
-            .start()
-              .add(self.MENU_SEARCH.clone().copyFrom({ view: {
-                class: 'foam.u2.view.TextField',
-                onKey: true
-              } }))
-              .addClass('foam-u2-search-TextSearchView')
-            .end()
+          .start()
+            .add(this.MENU_SEARCH)
+            .addClass('foam-u2-search-TextSearchView')
+          .end()
           .endContext()
           .start()
+            .addClass('tree-view-height-manager')
             .tag({
               class: 'foam.u2.view.TreeView',
               data: self.dao_,
@@ -115,8 +120,6 @@ foam.CLASS({
           .end()
         .end()
       .end();
-
-      this.subMenu$.dot('state').sub(this.scrollToCurrentSub);
     },
 
     function openMenu(menu) {

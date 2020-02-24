@@ -329,8 +329,7 @@ var classes = [
   'foam.nanos.notification.EmailSetting',
   'foam.nanos.notification.NotificationSetting',
   'foam.nanos.script.Script',
-//  'foam.nanos.script.ScriptCompiler',
-//  'foam.nanos.script.JavaShellScriptCompiler',
+  'foam.nanos.script.TestRunnerConfig',
   'foam.nanos.script.TestRunnerScript',
   'foam.nanos.test.Test',
   'foam.nanos.cron.Cron',
@@ -460,6 +459,8 @@ var classes = [
   'foam.nanos.ruler.predicate.PropertyEQProperty',
   'foam.nanos.ruler.predicate.NewEqOld',
   'foam.nanos.ruler.predicate.IsInstancePredicate',
+  'foam.nanos.ruler.predicate.PropertyIsInstance',
+  'foam.nanos.ruler.predicate.PropertyIsClass',
   'foam.nanos.ruler.action.ChangePropertyAction',
   'foam.comics.SearchMode',
 

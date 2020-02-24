@@ -24,7 +24,7 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'id',
-      visibility: foam.u2.DisplayMode.RO,
+      visibility: 'RO',
       label:'Ticket ID'
     }, 
     {
@@ -43,7 +43,7 @@ foam.CLASS({
     {
       class: 'Date',
       name: 'createdAt',
-      visibility: foam.u2.DisplayMode.RO,
+      visibility: 'RO',
       label: 'Time',
       factory: function() {
           return new Date();
