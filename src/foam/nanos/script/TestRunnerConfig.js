@@ -5,8 +5,8 @@
  */
 
 foam.CLASS({
-  package: 'foam.nanos.test',
-  name: 'TestConfig',
+  package: 'foam.nanos.script',
+  name: 'TestRunnerConfig',
 
   properties: [
     {

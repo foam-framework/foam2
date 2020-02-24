@@ -489,10 +489,10 @@ p({"class":"foam.nanos.boot.NSpec", "name":"htmlDocDAO",                        
 p({"class":"foam.nanos.boot.NSpec", "name":"emailDocService",                  "lazy":false, "serve":true,  "boxClass":"foam.nanos.auth.email.EmailDocInterfaceSkeleton", "serviceClass":"foam.nanos.auth.email.EmailDocService","client":"{\"class\":\"foam.nanos.auth.email.ClientEmailDocService\", \"delegate\": { \"class\":\"foam.box.HTTPBox\", \"url\":\"service/emailDocService\" } }"})
 p({
   "class":"foam.nanos.boot.NSpec",
-  "name":"testConfig",
+  "name":"testRunnerConfig",
   "lazy":false,
   "service": {
-    "class":"foam.nanos.test.TestConfig"
+    "class":"foam.nanos.script.TestRunnerConfig"
   }
 })
 
