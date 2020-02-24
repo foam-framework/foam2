@@ -182,7 +182,9 @@ foam.SCRIPT({
     var superInstallModel = foam.core.FObject.installModel;
 
     return function(m) {
-      var names = {};
+      var names      = {};
+      var shortNames = {};
+      var aliases    = {};
 
       for ( var i = 0 ; i < m.axioms_.length ; i++ ) {
         var a = m.axioms_[i];
@@ -190,6 +192,28 @@ foam.SCRIPT({
         foam.assert(
           ! names.hasOwnProperty(a.name),
           'Axiom name conflict in', m.id || m.refines, ':', a.name);
+
+        if ( a.shortName ) {
+          foam.assert(
+            ! shortNames.hasOwnProperty(a.shortName),
+            'Axiom shortName conflict in', m.id || m.refines, ':', a.shortName);
+          foam.assert(
+            ! aliases.hasOwnProperty(a.shortName),
+            'Axiom shortName conflict with aliases in', m.id || m.refines, ':', a.shortName);
+          shortNames[a.shortName] = a;
+        }
+
+        if ( a.aliases && a.aliases.length > 0 ) {
+          a.aliases.map(x => {
+            foam.assert(
+              ! aliases.hasOwnProperty(x),
+              'Axiom aliases conflict in', m.id || m.refines, ':', x);
+            foam.assert(
+              ! shortNames.hasOwnProperty(x),
+              'Axiom aliases conflict with shortName in', m.id || m.refines, ':', x);
+            aliases[x] = a;
+          });
+        }
 
         var prevA    = this.getAxiomByName(a.name);
         var Property = foam.core.Property;
