@@ -138,6 +138,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'com.google.foam.demos.u2',
   name: 'VisibilityDemo',
@@ -393,5 +394,5 @@ foam.CLASS({
           .start().add(this.USER_HAS_READ_WRITE_PERMISSION).end()
         .end();
     }
-  ],
+  ]
 });
