@@ -74,7 +74,8 @@ foam.CLASS({
     {
       name: 'sendSingleRequest',
       documentation: `
-      
+        A helper method which sets the approver id of an approval request you want sent to
+        one to many approvers and submits it to the approvalRequestDAO
       `,
       type: 'void',
       args: [
@@ -92,7 +93,8 @@ foam.CLASS({
     {
       name: 'fullSend',
       documentation: `
-      
+        A method which can be overidden to define how to send an approval request to
+        multiple approvers and how those approvers are collected in the first place
       `,
       type: 'void',
       args: [
