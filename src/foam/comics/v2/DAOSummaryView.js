@@ -107,8 +107,16 @@ foam.CLASS({
   actions: [
     {
       name: 'edit',
-      isAvailable: function(config$editEnabled) {
-        return config$editEnabled;
+      isAvailable: function(config) {
+        if ( ! config.update || ! config.update.f ) {
+          return true;
+        } else {
+          try {
+            return config.update.f();
+          } catch(e) {
+            return false;
+          }
+        }
       },
       code: function() {
         if ( ! this.stack ) return;
@@ -122,8 +130,16 @@ foam.CLASS({
     },
     {
       name: 'delete',
-      isAvailable: function(config$deleteEnabled) {
-        return config$deleteEnabled;
+      isAvailable: function(config) {
+        if ( ! config.delete || ! config.delete.f ) {
+          return true;
+        } else {
+          try {
+            return config.delete.f();
+          } catch(e) {
+            return false;
+          }
+        }
       },
       code: function() {
         this.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
@@ -151,31 +167,6 @@ foam.CLASS({
       this
         .addClass(this.myClass())
         .add(self.slot(function(data, data$id, config$viewBorder, viewView) {
-
-          if ( ! self.config.CRUDPermission) {
-            self.config.editEnabled = true;
-            self.config.deleteEnabled = true;
-          } else {
-            if ( ! self.config.CRUDPermission.update || ! self.config.CRUDPermission.update.f ) {
-              self.config.editEnabled = true;
-            } else {
-              try {
-                self.config.editEnabled = self.config.CRUDPermission.update.f();
-              } catch(e) {
-                self.config.editEnabled = false;
-              }
-            }
-
-            if ( ! self.config.CRUDPermission.delete || ! self.config.CRUDPermission.delete.f ) {
-              self.config.deleteEnabled = true;
-            } else {
-              try {
-                self.config.deleteEnabled = self.config.CRUDPermission.delete.f();
-              } catch(e) {
-                self.config.deleteEnabled = false;
-              }
-            }
-          }
 
           return self.E()
             .start(self.Rows)

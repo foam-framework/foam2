@@ -77,8 +77,16 @@ foam.CLASS({
   actions: [
     {
       name: 'create',
-      isAvailable: function(config$createEnabled) {
-        return config$createEnabled;
+      isAvailable: function(config) {
+        if ( ! config.create || ! config.create.f ) {
+          return true;
+        } else {
+          try {
+            return config.create.f();
+          } catch(e) {
+            return false;
+          }
+        }
       },
       code: function() {
         if ( ! this.stack ) return;
@@ -99,15 +107,6 @@ foam.CLASS({
 
       this.addClass(this.myClass())
       .add(this.slot(function(data, config, config$browseBorder, config$browseViews, config$browseTitle) {
-        if ( ! config.CRUDPermission || ! config.CRUDPermission.create || ! config.CRUDPermission.create.f ) {
-          config.createEnabled = true;
-        } else {
-          try {
-            config.createEnabled = config.CRUDPermission.create.f();
-          } catch(e) {
-            config.createEnabled = false;
-          }
-        }
 
         return self.E()
           .start(self.Rows)
