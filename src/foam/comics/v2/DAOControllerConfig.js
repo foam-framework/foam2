@@ -119,30 +119,16 @@ foam.CLASS({
       }
     },
     {
-      class: 'Boolean',
-      name: 'createEnabled',
-      documentation: 'If set to false, the "Create" button will not be visible.',
-      value: true
+      class: 'foam.mlang.predicate.PredicateProperty',
+      name: 'create'
     },
     {
-      class: 'Boolean',
-      name: 'editEnabled',
-      documentation: 'True to enable the edit button.',
-      value: true
+      class: 'foam.mlang.predicate.PredicateProperty',
+      name: 'update'
     },
     {
-      class: 'Boolean',
-      name: 'deleteEnabled',
-      documentation: 'True to enable the delete button.',
-      value: true
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.comics.v2.CRUDActionsPredicate',
-      name: 'CRUDPermission',
-      factory: function() {
-        return foam.comics.v2.CRUDActionsPredicate.create();
-      }
+      class: 'foam.mlang.predicate.PredicateProperty',
+      name: 'delete'
     },
     {
       of: 'foam.mlang.predicate.Predicate',
