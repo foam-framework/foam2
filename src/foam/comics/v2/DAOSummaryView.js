@@ -108,14 +108,10 @@ foam.CLASS({
     {
       name: 'edit',
       isAvailable: function(config) {
-        if ( ! config.update || ! config.update.f ) {
-          return true;
-        } else {
-          try {
-            return config.update.f();
-          } catch(e) {
-            return false;
-          }
+        try {
+          return ! config.update || ! config.update.f  ? true : config.update.f();
+        } catch(e) {
+          return false;
         }
       },
       code: function() {
@@ -131,14 +127,10 @@ foam.CLASS({
     {
       name: 'delete',
       isAvailable: function(config) {
-        if ( ! config.delete || ! config.delete.f ) {
-          return true;
-        } else {
-          try {
-            return config.delete.f();
-          } catch(e) {
-            return false;
-          }
+        try {
+          return ! config.delete || ! config.delete.f ? true : config.delete.f();
+        } catch(e) {
+          return false;
         }
       },
       code: function() {

@@ -78,14 +78,10 @@ foam.CLASS({
     {
       name: 'create',
       isAvailable: function(config) {
-        if ( ! config.create || ! config.create.f ) {
-          return true;
-        } else {
-          try {
-            return config.create.f();
-          } catch(e) {
-            return false;
-          }
+        try {
+          return ! config.create || ! config.create.f ? true : config.create.f();
+        } catch(e) {
+          return false;
         }
       },
       code: function() {
