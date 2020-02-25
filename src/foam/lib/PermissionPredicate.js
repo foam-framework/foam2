@@ -19,6 +19,7 @@ foam.CLASS({
     }
   ],
   javaImports: [
+    'foam.core.X',
     'foam.nanos.auth.AuthService'
   ],
 
@@ -26,13 +27,14 @@ foam.CLASS({
     {
       name: 'f',
       javaCode: `
-        AuthService auth = (AuthService) getX().get("auth");
+        X x = (X) obj;
+        AuthService auth = (AuthService) x.get("auth");
         if ( args_ == null || args_.length <= 0 ) {
           return true;
         }
 
         for ( String permission : args_ ) {
-          if ( auth.check(getX(), permission) )
+          if ( auth.check(x, permission) )
             return true;
         }
         return false;
