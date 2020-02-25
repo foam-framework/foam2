@@ -81,8 +81,12 @@
       tableCellFormatter: function(approver) {
         let self = this;
         this.__subSubContext__.userDAO.find(approver).then((user)=> {
-          if ( user && user.group ) {
-            self.add(user.group);
+          if ( user ) {
+            if ( self.__subSubContext__.user.id == user.id ) {
+              self.add(user.legalName);
+            } else {
+              self.add(user.group);
+            }
           } else {
             self.add(approver);
           }
