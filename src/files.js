@@ -755,4 +755,6 @@ FOAM_FILES([
   { name: "foam/foamlink/FoamlinkExec" },
   { name: "foam/foamlink/lib" },
   { name: "foam/util/filesystem/FileWalker" },
+
+  { name: "foam/nanos/crunch/AppStore" },
 ]);

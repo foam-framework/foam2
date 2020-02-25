@@ -195,3 +195,26 @@ p({"class":"foam.nanos.menu.Menu","id":"intro-to-flow","label":"Intro to FLOW","
 p({"class":"foam.nanos.menu.Menu","id":"notifications","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.notification.NotificationListView"}},"parent":"hidden"})
 p({"class":"foam.nanos.menu.Menu","id":"reset","label":"Reset Password","handler":{"class":"foam.nanos.menu.ViewMenu"},"parent":"hidden"})
 p({"class":"foam.nanos.menu.Menu","id":"sign-in","label":"Sign in","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.u2.view.LoginView","mode_":"SignIn"}},"parent":"hidden"})
+
+//crunch
+p({
+  "class": "foam.nanos.menu.Menu",
+  "id": "appStore",
+  "label":"App Store",
+  "handler": {
+    "class": "foam.nanos.menu.DAOMenu2",
+    "config": {
+      "class": "foam.comics.v2.DAOControllerConfig",
+      "daoKey": "capabilityDAO",
+      "browseTitle": "App Store",
+      "browseViews": [
+        {
+          "class": 'foam.comics.v2.namedViews.NamedViewCollection',
+          "name": "Crunch",
+          "view": { "class": "foam.nanos.crunch.AppStore" }
+        }
+      ]
+    }
+  },
+  "parent":""
+})
