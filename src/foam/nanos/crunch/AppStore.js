@@ -102,9 +102,7 @@ foam.CLASS({
       class: 'foam.comics.v2.CannedQuery',
       label: 'Liquid Cap',
       predicateFactory: function(e) {
-        return e.AND(
-          e.INSTANCE_OF(net.nanopay.liquidity.crunch.LiquidCapability),
-        );
+        return e.INSTANCE_OF(net.nanopay.liquidity.crunch.LiquidCapability);
       }
     }
   ],
