@@ -220,7 +220,7 @@
       documentation: 'Meant to be used for explanation on why request was approved/rejected',
       section: 'supportDetails',
       visibility: function(memo, status) {
-        if ( status == net.nanopay.approval.ApprovalStatus.REQUESTED ) {
+        if ( status == foam.nanos.approval.ApprovalStatus.REQUESTED ) {
           return foam.u2.DisplayMode.RW;
         } else if ( memo ) {
           return foam.u2.DisplayMode.R0;
