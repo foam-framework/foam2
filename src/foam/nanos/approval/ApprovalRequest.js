@@ -98,7 +98,8 @@
       class: 'Object',
       javaType: 'Object',
       name: 'objId',
-      permissionRequired: true,
+      readPermissionRequired: true,
+      writePermissionRequired: true,
       documentation: 'id of the object that needs approval.',
       tableWidth: 150,
       tableCellFormatter: function(objId) {
@@ -121,7 +122,8 @@
     {
       class: 'String',
       name: 'daoKey',
-      permissionRequired: true,
+      readPermissionRequired: true,
+      writePermissionRequired: true,
       documentation: `Used internally in approvalDAO to point where requested object can be found.
       Should not be used to retrieve approval requests for a given objects
       since an object can have multiple requests of different nature.`
@@ -246,7 +248,8 @@
       name: 'token',
       documentation: 'token in email for ‘click to approve’.',
       section: 'basicInformation',
-      permissionRequired: true
+      readPermissionRequired: true,
+      writePermissionRequired: true
     },
     {
       class: 'DateTime',
@@ -275,21 +278,24 @@
       of: 'foam.nanos.auth.User',
       name: 'createdBy',
       section: 'supportDetails',
-      permissionRequired: true
+      readPermissionRequired: true,
+      writePermissionRequired: true
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdByAgent',
       section: 'supportDetails',
-      permissionRequired: true
+      readPermissionRequired: true,
+      writePermissionRequired: true
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'lastModifiedBy',
       section: 'supportDetails',
-      permissionRequired: true
+      readPermissionRequired: true,
+      writePermissionRequired: true
     },
     {
       class: 'String',
@@ -301,12 +307,14 @@
       javaGetter: `
         return getDaoKey() + ": " + getObjId();
       `,
-      permissionRequired: true
+      readPermissionRequired: true,
+      writePermissionRequired: true
     },
     {
       class: 'String',
       name: 'daoKey_',
-      permissionRequired: true,
+      readPermissionRequired: true,
+      writePermissionRequired: true,
       factory: function(o, n) {
         var key = this.daoKey;
         var X = this.ctrl.__subContext__;
@@ -321,7 +329,8 @@
     },
     {
       name: 'referenceObj_',
-      permissionRequired: true,
+      readPermissionRequired: true,
+      writePermissionRequired: true,
       expression: function() {
         var X = this.ctrl.__subContext__;
         var objId = X[this.daoKey_].of.ID.type === 'Long' ? parseInt(this.objId) : this.objId;
