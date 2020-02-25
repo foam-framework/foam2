@@ -57,12 +57,25 @@ foam.CLASS({
       class: 'Boolean',
       name: 'isEnabled',
       value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'canMakerApproveOwnRequest',
+      value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'isTrackingRequestSent',
+      value: true
     }
   ],
 
   methods: [
     {
       name: 'sendSingleRequest',
+      documentation: `
+      
+      `,
       type: 'void',
       args: [
         { name: 'x', type: 'Context' },
@@ -78,6 +91,9 @@ foam.CLASS({
     },
     {
       name: 'fullSend',
+      documentation: `
+      
+      `,
       type: 'void',
       args: [
         { name: 'x', type: 'Context' },
@@ -111,16 +127,15 @@ foam.CLASS({
         throw new RuntimeException("No Approvers exist for the model: " + modelName);
       }
 
-      if ( approverIds.size() == 1 && approverIds.get(0) == request.getInitiatingUser() ) {
+      if ( ! getCanMakerApproveOwnRequest() && approverIds.size() == 1 && approverIds.get(0) == request.getInitiatingUser() ) {
         logger.log("The only approver of " + modelName + " is the maker of this request!");
         throw new RuntimeException("The only approver of " + modelName + " is the maker of this request!");
       }
 
-      // makers cannot approve their own requests even if they are an approver for the model
-      // however they will receive an approvalRequest which they can only view and not approve or reject
-      // so that they can keep track of the status of their requests
-      sendSingleRequest(x, request, request.getInitiatingUser());
-      approverIds.remove(request.getInitiatingUser());
+      if ( getIsTrackingRequestSent() ){
+        sendSingleRequest(x, request, request.getInitiatingUser());
+        approverIds.remove(request.getInitiatingUser());
+      }
 
       for ( int i = 0; i < approverIds.size(); i++ ) {
         sendSingleRequest(getX(), request, approverIds.get(i));
