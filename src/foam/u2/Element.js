@@ -2474,20 +2474,16 @@ foam.CLASS({
   properties: [
     {
       name: 'view',
-      expression: function(label2, label2Formatter) {
+      expression: function(label, labelFormatter) {
         return {
           class: 'foam.u2.CheckBox',
-          label: label2,
-          labelFormatter: label2Formatter
+          label: label,
+          labelFormatter: labelFormatter
         };
       }
     },
     {
-      class: 'String',
-      name: 'label2'
-    },
-    {
-      name: 'label2Formatter'
+      name: 'labelFormatter'
     }
   ]
 });

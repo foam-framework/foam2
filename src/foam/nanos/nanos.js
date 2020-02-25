@@ -90,6 +90,8 @@ FOAM_FILES([
   { name: "foam/nanos/auth/twofactor/TwoFactorSignInView" },
   { name: "foam/nanos/auth/twofactor/refinements" },
   { name: "foam/nanos/auth/UserAndGroupAuthService" },
+  { name: "foam/nanos/auth/UserQueryService" },
+  { name: "foam/nanos/auth/SimpleUserQueryService" },
   { name: "foam/nanos/bench/Benchmark" },
   { name: "foam/nanos/boot/DAOConfigSummaryView", flags: ['web'] },
   { name: "foam/nanos/session/Session" },
@@ -273,6 +275,20 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/SendNotificationOnTopLevelCapabilityStatusUpdate" },
   { name: "foam/nanos/crunch/IsUserCapabilityJunctionStatusUpdate" },
   { name: "foam/nanos/crunch/RemoveJunctionsOnUserRemoval" },
+
+  // approval
+  { name: 'foam/nanos/approval/ApprovalRequest' },
+  { name: 'foam/nanos/approval/ApprovalStatus' },
+  { name: 'foam/nanos/approval/ApprovableAware'},
+  { name: 'foam/nanos/approval/PropertiesToUpdateView', flags: ['web'] },
+  { name: 'foam/nanos/approval/Approvable' },
+  { name: 'foam/nanos/approval/ApprovableAwareDAO' },
+  { name: 'foam/nanos/approval/ApprovableApprovalRequestsPredicate' },
+  { name: 'foam/nanos/approval/ApprovableApprovalRequestsRule' },
+  { name: 'foam/nanos/approval/RoleApprovalRequest' },
+  { name: 'foam/nanos/approval/FulfilledApprovablePredicate' },
+  { name: 'foam/nanos/approval/FulfilledApprovableRule' },
+
   //authservice
   { name: "foam/nanos/auth/CapabilityAuthService" },
   // google
