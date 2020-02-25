@@ -102,7 +102,7 @@
         if ( X.data.status === foam.nanos.approval.ApprovalStatus.REQUESTED ) {
           return {
             class: 'foam.u2.view.ValueView',
-            data$: X.data$.map((data) => data.APPROVER_PENDING)
+            data$: X.data$.map((data) => data.REQUESTED)
           };
         } else {
           return { class: 'foam.u2.view.ReferencePropertyView' };
@@ -113,7 +113,7 @@
         // If request is REQUESTED, show as Pending
         // Otherwise, show approver's name
         if ( data.status === foam.nanos.approval.ApprovalStatus.REQUESTED ) {
-          this.add(data.APPROVER_PENDING);
+          this.add(data.REQUESTED);
         } else {
           this.__subSubContext__.userDAO.find(approver).then(user => {
             self.add(user ? user.toSummary() : `User #${approver}`);
@@ -227,7 +227,7 @@
       message: 'You have successfully rejected this request.'
     },
     {
-      name: 'APPROVER_PENDING',
+      name: 'REQUESTED',
       message: 'Pending'
     }
   ],
