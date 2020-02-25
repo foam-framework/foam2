@@ -8,6 +8,13 @@ foam.CLASS({
   package: 'foam.nanos.approval',
   name: 'Approvable',
 
+  sections: [
+    {
+      name: 'admin',
+      permissionRequired: true
+    },
+  ],
+
   properties: [
     {
       class: 'String',
@@ -17,18 +24,21 @@ foam.CLASS({
         to distinguish update requests on the same object
       `,
       required: true,
-      visibility: 'HIDDEN'
+      section: 'admin',
+      visibility: 'RO'
     },
     {
       class: 'String',
       name: 'daoKey',
-      visibility: 'HIDDEN'
+      section: 'admin',
+      visibility: 'RO'
     },
     {
       class: 'Object',
       javaType: 'Object',
       name: 'objId',
-      visibility: 'HIDDEN'
+      section: 'admin',
+      visibility: 'RO'
     },
     {
       class: 'Map',
