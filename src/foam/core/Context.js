@@ -45,6 +45,8 @@ foam.SCRIPT({
 
 (function() {
   var __context__ = {
+    isContext: true,
+
     /**
      * Lookup a class in the context.  Throws an exception if the value
      * couldn't be found, unless opt_suppress is true.
@@ -176,7 +178,7 @@ foam.SCRIPT({
 
       for ( var key in opt_args ) {
         if ( opt_args.hasOwnProperty(key) ) {
-          var v = opt_args[key];
+          let v = opt_args[key];
 
           if ( ! foam.core.Slot.isInstance(v) ) {
             Object.defineProperty(sub, this.toSlotName_(key), {
@@ -194,12 +196,10 @@ foam.SCRIPT({
               enumerable: true
             });
 
-            (function(v) {
-              Object.defineProperty(sub, key, {
-                get: function() { return v.get(); },
-                enumerable: true
-              });
-            })(v);
+            Object.defineProperty(sub, key, {
+              get: function() { return v.get(); },
+              enumerable: true
+            });
           }
         }
       }
