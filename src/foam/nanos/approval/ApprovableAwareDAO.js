@@ -134,7 +134,7 @@ foam.CLASS({
         throw new RuntimeException("The only approver of " + modelName + " is the maker of this request!");
       }
 
-      if ( getIsTrackingRequestSent() ){
+      if ( getIsTrackingRequestSent() ) {
         RoleApprovalRequest trackingRequest = (RoleApprovalRequest) request.fclone();
         trackingRequest.setIsTrackingRequest(true);
 
