@@ -73,7 +73,11 @@ public class SafetyUtil {
   }
 
   public static int compare(String o1, String o2) {
-    return o1.equals(o2) ? 0 : o1 == null ? -1 : o2 == null ? 1 : o1.compareTo(o2);
+    if ( o1 == null && o2 == null ) return 0;
+    if ( o1 == null ) return -1;
+    if ( o2 == null ) return  1;
+    
+    return o1.compareTo(o2);
   }
 
   public static int compare(short o1, short o2) {
