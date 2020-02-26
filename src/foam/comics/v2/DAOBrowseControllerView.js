@@ -77,12 +77,8 @@ foam.CLASS({
   actions: [
     {
       name: 'create',
-      isAvailable: function(config) {
-        try {
-          return ! config.create || ! config.create.f ? true : config.create.f();
-        } catch(e) {
-          return false;
-        }
+      isAvailable: function(config$createEnabled) {
+        return config$createEnabled;
       },
       code: function() {
         if ( ! this.stack ) return;
@@ -102,7 +98,12 @@ foam.CLASS({
     var self = this;
 
       this.addClass(this.myClass())
-      .add(this.slot(function(data, config, config$browseBorder, config$browseViews, config$browseTitle) {
+      .add(this.slot(function(data, config, config$CRUDActionsAuth$create, config$browseBorder, config$browseViews, config$browseTitle) {
+        var createAction = config$CRUDActionsAuth$create
+            ? self.CREATE.clone().copyFrom({
+              availablePermissions: self.CREATE.availablePermissions.concat(config$CRUDActionsAuth$create)
+            })
+            : self.CREATE;
 
         return self.E()
           .start(self.Rows)
@@ -113,7 +114,7 @@ foam.CLASS({
                 .addClass(self.myClass('browse-title'))
                 .add(config$browseTitle)
               .end()
-              .startContext({ data: self }).tag(self.CREATE).endContext()
+              .startContext({ data: self }).tag(createAction).endContext()
             .end()
             .start(self.CardBorder)
               .style({ position: 'relative' })
