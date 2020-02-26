@@ -239,6 +239,7 @@ var classes = [
   'foam.nanos.auth.ServiceProviderAwareSink',
   'foam.nanos.auth.ServiceProviderAwareSupport',
   'foam.nanos.auth.test.ServiceProviderAwareTest',
+  'foam.nanos.auth.test.ServiceProviderAuthorizerTest',
   'foam.nanos.auth.test.DummySp',
   'foam.nanos.auth.test.UserAndGroupPermissionTest',
   'foam.nanos.auth.twofactor.OTPKey',
@@ -532,7 +533,7 @@ var classes = [
   'foam.strategy.StrategizerService',
   'foam.strategy.BasicStrategizer',
   'foam.strategy.ClientStrategizerService',
-  
+
   //concurrent
   'foam.util.concurrent.AbstractAssembly',
   'foam.util.concurrent.Assembly',
