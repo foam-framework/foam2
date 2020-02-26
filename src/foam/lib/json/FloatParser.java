@@ -9,6 +9,12 @@ package foam.lib.json;
 import foam.lib.parse.*;
 
 public class FloatParser implements Parser {
+  private final static Parser instance__ = new FloatParser();
+
+  public static Parser instance() { return instance__; }
+
+  private FloatParser() {}
+
   public PStream parse(PStream ps, ParserContext x) {
     StringBuilder n = new StringBuilder();
     boolean decimalFound = false;

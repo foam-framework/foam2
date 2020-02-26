@@ -21,6 +21,7 @@
 foam = {
   isServer: typeof window === 'undefined',
   core:     {},
+  language: typeof navigator === 'undefined' ? 'en' : navigator.language,
   next$UID: (function() {
     /* Return a unique id. */
     var id = 1;
@@ -53,6 +54,7 @@ foam = {
 /** Setup nodejs-like 'global' on web */
 if ( ! foam.isServer ) global = window;
 
+
 Object.defineProperty(
   Object.prototype,
   '$UID',
@@ -70,6 +72,18 @@ Object.defineProperty(
     enumerable: false
   }
 );
+
+
+/**
+ * Check for the FOAMLINK_DATA global. If it is set, FOAMLink will be
+ * enabled in the server-side classloader
+ */
+if ( typeof global.FOAMLINK_DATA !== 'undefined' ) {
+  foam.hasFoamlink = true;
+  foam.foamlink = {
+    dataFile: global.FOAMLINK_DATA
+  };
+}
 
 
 /**

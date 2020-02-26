@@ -6,19 +6,44 @@
 
 package foam.lib.json;
 
-import foam.lib.parse.Alt;
+import foam.lib.parse.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
 
 public class ExprParser
-    extends foam.lib.parse.ProxyParser
+  extends foam.lib.parse.ProxyParser
 {
-  public ExprParser() {
+
+  private final static Map    map__      = new ConcurrentHashMap();
+  private final static Parser instance__ = new ExprParser();
+
+  public static Parser instance() { return instance__; }
+
+  /**
+   * Implement the multiton pattern so we don't create the same
+   * parser more than once.
+   **/
+  public static Parser create(Class cls) {
+    if ( cls == null ) return instance();
+
+    Parser p = (Parser) map__.get(cls.getName());
+
+    if ( p == null ) {
+      p = new ExprParser(cls);
+      map__.put(cls.getName(), p);
+    }
+
+    return p;
+  }
+
+  private ExprParser() {
     this(null);
   }
 
-  public ExprParser(final Class defaultClass) {
+  private ExprParser(final Class defaultClass) {
     super(new Alt(
       new PropertyReferenceParser(),
-      new ClassReferenceParser(),
-      new FObjectParser(defaultClass)));
+      ClassReferenceParser.instance(),
+      FObjectParser.create(defaultClass)));
   }
 }

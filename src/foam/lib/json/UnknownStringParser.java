@@ -14,7 +14,7 @@ public class UnknownStringParser
   public UnknownStringParser() {
     super(new Parser() {
 
-      private Parser delegate = new StringParser();
+      private Parser delegate = StringParser.instance();
       
       public PStream parse(PStream ps, ParserContext x) {
         PStream ps1 = ps.apply(delegate, x);

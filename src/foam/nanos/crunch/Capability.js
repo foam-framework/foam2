@@ -57,7 +57,7 @@ foam.CLASS({
     {
       name: 'id',
       class: 'String',
-      updateMode: 'RO'
+      updateVisibility: 'RO'
     }, 
     {
       name: 'icon',
@@ -79,6 +79,14 @@ foam.CLASS({
         rows: 12, 
         cols: 120
       }
+    },
+    {
+      name: 'price',
+      class: 'Long'
+    },
+    {
+      name: 'keywords',
+      class: 'StringArray'
     },
     {
       name: 'version',
@@ -200,7 +208,7 @@ foam.RELATIONSHIP({
   inverseName: 'users',
   sourceProperty: {
     section: 'capabilities',
-    updateMode: 'RO'
+    updateVisibility: 'RO'
   }
 });
 

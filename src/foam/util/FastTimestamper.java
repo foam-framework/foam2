@@ -22,8 +22,9 @@ import java.text.SimpleDateFormat;
  **/
 public class FastTimestamper {
 
-  protected SimpleDateFormat format_        = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss.SSS");
-  protected long             lastTime_      = 0;
+  protected SimpleDateFormat format_        = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ"); // ISO 8601 format
+
+  protected long             lastTime_       = 0;
   protected String           lastTimestamp_ = null;
 
   public FastTimestamper() {
@@ -39,7 +40,7 @@ public class FastTimestamper {
     } else if ( now / 1000 == lastTime_ / 1000 ) {
       // repair
       lastTime_ = now;
-      lastTimestamp_ = lastTimestamp_.substring(0, lastTimestamp_.length()-3) + String.format("%03d", now%1000);
+      lastTimestamp_ = lastTimestamp_.substring(0, lastTimestamp_.length()-8) + String.format("%03d", now%1000) + lastTimestamp_.substring(lastTimestamp_.length()-5);
     } else {
       // replace
       lastTime_ = now;

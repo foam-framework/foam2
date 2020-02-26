@@ -45,6 +45,7 @@ import java.util.Date;
 public class ObjectDateParser
   extends ProxyParser
 {
+
   public ObjectDateParser() {
     super(new Seq0(
       Whitespace.instance(),

@@ -331,10 +331,7 @@ foam.CLASS({
           {
             args: [this.name],
             predicateFactory: function(e) {
-              return e.OR(
-                e.EQ(self, ''),
                 e.REG_EXP(self, /\S+@\S+\.\S+/)
-              );
             },
             errorString: 'Please enter valid email address'
           }

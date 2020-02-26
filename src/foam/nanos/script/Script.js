@@ -86,16 +86,16 @@ foam.CLASS({
       class: 'DateTime',
       name: 'lastRun',
       documentation: 'Date and time the script ran last.',
-      createMode: 'HIDDEN',
-      updateMode: 'RO',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
       tableWidth: 140
     },
     {
       class: 'Duration',
       name: 'lastDuration',
       documentation: 'Date and time the script took to complete.',
-      createMode: 'HIDDEN',
-      updateMode: 'RO',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
       tableWidth: 125
     },
     /*
@@ -120,8 +120,8 @@ foam.CLASS({
       of: 'foam.nanos.script.ScriptStatus',
       name: 'status',
       documentation: 'Status of script.',
-      createMode: 'HIDDEN',
-      updateMode: 'RO',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
       value: 'UNSCHEDULED',
       javaValue: 'ScriptStatus.UNSCHEDULED',
       tableWidth: 100,
@@ -129,13 +129,14 @@ foam.CLASS({
     },
     {
       class: 'Code',
-      name: 'code'
+      name: 'code',
+      writePermissionRequired: true
     },
     {
       class: 'String',
       name: 'output',
-      createMode: 'HIDDEN',
-      updateMode: 'RO',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
       view: {
         class: 'foam.u2.view.ModeAltView',
         readView: { class: 'foam.u2.view.PreView' }
@@ -166,6 +167,14 @@ foam.CLASS({
       of: 'foam.nanos.auth.User',
       name: 'lastModifiedBy',
       documentation: 'User who last modified script'
+    },
+    {
+      class: 'String',
+      name: 'daoKey',
+      value: 'scriptDAO',
+      visibility: 'HIDDEN',
+      documentation: `Name of dao which journal will be used to store script run logs. To set from inheritor
+      just change property value`
     }
   ],
 
@@ -276,7 +285,7 @@ foam.CLASS({
         this.output = '';
         this.status = this.ScriptStatus.SCHEDULED;
         if ( this.server ) {
-          this.scriptDAO.put(this).then(function(script) {
+          this.__context__[this.daoKey].put(this).then(function(script) {
               self.copyFrom(script);
               if ( script.status === self.ScriptStatus.RUNNING ) {
                 self.poll();
@@ -286,11 +295,11 @@ foam.CLASS({
           this.status = this.ScriptStatus.RUNNING;
           this.runScript().then(() => {
             this.status = this.ScriptStatus.UNSCHEDULED;
-            this.scriptDAO.put(this);
+            this.__context__[this.daoKey].put(this);
           }).catch((err) => {
             console.log(err);
             this.status = this.ScriptStatus.ERROR;
-            this.scriptDAO.put(this);
+            this.__context__[this.daoKey].put(this);
           });
         }
       }

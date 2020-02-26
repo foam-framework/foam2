@@ -12,9 +12,13 @@ import foam.lib.parse.*;
 public class ClassReferenceParser
   extends ProxyParser
 {
-  public ClassReferenceParser() {
+  private final static Parser instance__ = new ClassReferenceParser();
+
+  public static Parser instance() { return instance__; }
+
+  private ClassReferenceParser() {
     super(new Alt(
-      new NullParser(),
+      NullParser.instance(),
       new Seq1(15,
         Whitespace.instance(),
         Literal.create("{"),
@@ -31,10 +35,10 @@ public class ClassReferenceParser
         Whitespace.instance(),
         Literal.create(":"),
         Whitespace.instance(),
-        new StringParser(),
+        StringParser.instance(),
         Whitespace.instance(),
         Literal.create("}")),
-      new StringParser()
+      StringParser.instance()
     ));
   }
 

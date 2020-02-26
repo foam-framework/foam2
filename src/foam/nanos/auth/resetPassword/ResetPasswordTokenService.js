@@ -55,8 +55,6 @@ x = x.put("user", systemUser);
 
 DAO userDAO = (DAO) getLocalUserDAO();
 DAO tokenDAO = (DAO) getTokenDAO();
-String url = appConfig.getUrl()
-    .replaceAll("/$", "");
 
 // check if email invalid
 if ( user == null || ! Email.isValid(user.getEmail()) ) {
@@ -88,7 +86,7 @@ message.setTo(new String[] { user.getEmail() });
 
 HashMap<String, Object> args = new HashMap<>();
 args.put("name", String.format("%s %s", user.getFirstName(), user.getLastName()));
-args.put("link", url +"?token=" + token.getData() + "#reset");
+args.put("link", appConfig.getUrl() +"?token=" + token.getData() + "#reset");
 
 EmailsUtility.sendEmailFromTemplate(x, user, message, "reset-password", args);
 
@@ -107,10 +105,13 @@ return true;`
 // context. Therefore we put the system user in the context here so that
 // decorators down the line won't throw NPEs when trying to access the user in
 // the context.
+AppConfig appConfig = (AppConfig) x.get("appConfig");
 User systemUser = (User) getX().get("user");
 x = x.put("user", systemUser);
 
+
 String newPassword = user.getDesiredPassword();
+String url = appConfig.getUrl().replaceAll("/$", "");
 
 DAO userDAO = (DAO) getLocalUserDAO();
 DAO tokenDAO = (DAO) getTokenDAO();
@@ -156,6 +157,7 @@ message.setTo(new String[] { userResult.getEmail() });
 HashMap<String, Object> args = new HashMap<>();
 args.put("name", userResult.getFirstName());
 args.put("sendTo", userResult.getEmail());
+args.put("link", url);
 EmailsUtility.sendEmailFromTemplate(x, userResult, message, "password-changed", args);
 return true;`
     }

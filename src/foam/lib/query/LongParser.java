@@ -10,10 +10,18 @@ import foam.lib.parse.PStream;
 import foam.lib.parse.Parser;
 import foam.lib.parse.ParserContext;
 
-public class LongParser implements Parser {
-  public PStream parse(PStream ps, ParserContext x) {
-    long n = 0;
+public class LongParser
+  implements Parser
+{
+  private final static Parser instance__ = LongParser.instance();
 
+  public static Parser instance() { return instance__; }
+
+  private LongParser() {
+  }
+
+  public PStream parse(PStream ps, ParserContext x) {
+    long    n      = 0;
     boolean negate = false;
 
     if ( ! ps.valid() ) return null;

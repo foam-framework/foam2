@@ -14,7 +14,7 @@ foam.CLASS({
   requires: [
     {
       path: 'foam.comics.BrowserView',
-      flags: ['web'],
+      flags: ['web']
     }
   ],
 
@@ -175,8 +175,12 @@ foam.CLASS({
       value: true,
       readPermissionRequired: true,
       writePermissionRequired: true
+    },
+    {
+          class: 'StringArray',
+          name: 'keywords'
     }
-    // TODO: permissions, keywords, lazy, parent
+    // TODO: permissions, lazy, parent
   ],
 
   methods: [

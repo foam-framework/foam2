@@ -16,7 +16,17 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.json.Outputter',
       name: 'outputter',
-      factory: function() { return foam.json.StorageStrict; }
+      factory: function() {
+        return {
+          pretty: true,
+          strict: true,
+          formatDatesAsNumbers: true,
+          outputDefaultValues: false,
+          useShortNames: false,
+          useTemplateLiterals: true,
+          propertyPredicate: function(o, p) { return ! p.storageTransient; }
+        };
+       }
     }
   ],
 

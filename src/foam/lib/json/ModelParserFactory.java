@@ -41,7 +41,7 @@ public class ModelParserFactory {
     int      i               = 0;
 
     while ( iter.hasNext() ) {
-      propertyParsers[i] = new PropertyParser((PropertyInfo) iter.next());
+      propertyParsers[i] = PropertyParser.create((PropertyInfo) iter.next());
       i++;
     }
 

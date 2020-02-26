@@ -11,16 +11,19 @@ import foam.lib.parse.*;
 public class StringArrayParser
   extends ProxyParser
 {
-  public StringArrayParser() {
+  private final static Parser instance__ = new StringArrayParser();
+  public static Parser instance() { return instance__; }
+  
+  private StringArrayParser() {
     super(
       new Alt(
-        new NullParser(),
+        NullParser.instance(),
         new Seq1(3,
           Whitespace.instance(),
           Literal.create("["),
           Whitespace.instance(),
           new Repeat(
-            new StringParser(),
+            StringParser.instance(),
             new Seq0(Whitespace.instance(), Literal.create(","), Whitespace.instance())),
           Whitespace.instance(),
           Literal.create("]"))

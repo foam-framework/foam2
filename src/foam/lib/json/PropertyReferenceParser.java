@@ -29,7 +29,7 @@ public class PropertyReferenceParser
       Literal.create(":"),
       Whitespace.instance(),
       new Parser() {
-        private Parser delegate = new StringParser();
+        private Parser delegate = StringParser.instance();
 
         public PStream parse(PStream ps, ParserContext x) {
           ps = ps.apply(delegate, x);
@@ -46,7 +46,7 @@ public class PropertyReferenceParser
       Literal.create(":"),
       Whitespace.instance(),
       new Parser() {
-        private Parser delegate = new StringParser();
+        private Parser delegate = StringParser.instance();
 
         public PStream parse(PStream ps, ParserContext x) {
           ps = ps.apply(delegate, x);

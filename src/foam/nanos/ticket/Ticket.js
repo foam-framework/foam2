@@ -37,6 +37,7 @@ foam.CLASS({
     'type',
     // REVIEW: view fails to display when owner in tableColumn, the 2nd entry in allColumns is undefined.
     // 'owner',
+    'createdBy',
     'lastModified',
     'status',
     'title'
@@ -52,12 +53,14 @@ foam.CLASS({
       isAvailable: function(id) {
         return id != 0;
       },
-      title: '',
+      title: 'Audit',
     },
     {
+      // NOTE: if a section is name: commentSection
+      // then navigating to a comment detail view
+      // does not work.
       name: '_defaultSection',
-      permissionRequired: true,
-      hidden: true
+      title: 'Comments'
     },
   ],
 
@@ -149,7 +152,7 @@ foam.CLASS({
       // required: true,
       tableWidth: 250,
       section: 'infoSection',
-      validationPredicate: [
+      validationPredicates: [
         {
           args: ['title', 'type'],
           predicateFactory: function(e) {
@@ -170,7 +173,8 @@ foam.CLASS({
     // required: true,
       storageTransient: true,
       section: 'infoSection',
-      validationPredicate: [
+      readVisibility: 'HIDDEN',
+      validationPredicates: [
         {
           args: ['id', 'title', 'comment'],
           predicateFactory: function(e) {
@@ -213,7 +217,7 @@ foam.CLASS({
           }
         }.bind(this));
       },
-      section: 'metaSection',
+      section: 'infoSection', // until 'owner' showing
     },
     {
       class: 'Reference',

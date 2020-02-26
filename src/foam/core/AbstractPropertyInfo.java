@@ -109,9 +109,17 @@ public abstract class AbstractPropertyInfo
     }
   }
 
+  public boolean equals(Object obj) {
+    try {
+      return compareTo(obj) == 0;
+    } catch (ClassCastException e) {
+      return false;
+    }
+  }
+
   public int compareTo(Object obj) {
-    int result = getName().compareTo(((PropertyInfo)obj).getName());
-    return result != 0 ? result : getClassInfo().compareTo(((PropertyInfo)obj).getClassInfo());
+    int result = getName().compareTo(((PropertyInfo) obj).getName());
+    return result != 0 ? result : getClassInfo().compareTo(((PropertyInfo) obj).getClassInfo());
   }
 
   @Override
