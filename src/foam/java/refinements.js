@@ -595,6 +595,19 @@ foam.LIB({
           args: [{ type: 'foam.core.X', name: 'x' }],
           body: 'setX(x);'
         });
+        
+        cls.method({
+          visibility: 'public',
+          name: 'compareTo',
+          type: 'int',
+          args:[{ name: 'o', type: 'Object' }], 
+          body: [cls.name+' o2 = ('+ cls.name + ') o;\n'
+          +'if ( o2 == null ) return 1;'
+          +'int cmp;\n'].concat(props.map(function(f) {
+            return 'cmp = foam.util.SafetyUtil.compare(get'+foam.String.capitalize(f.name)+'(), o2.get'+foam.String.capitalize(f.name)+'());\n'
+          +'if ( cmp != 0 ) return cmp;';
+          })).join('\n')+'\n  return 0;\n'
+        });
 
         if ( props.length && props.length < 7 ) {
           // All-property constructor
