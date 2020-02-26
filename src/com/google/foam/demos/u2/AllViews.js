@@ -168,6 +168,14 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'choiceViewWithValues',
+      view: {
+        class: 'foam.u2.view.ChoiceView',
+        choices: [ [1, 'Yes'], [0, 'No'], [0.5, 'Maybe']]
+      }
+    },
+    {
+      class: 'String',
       name: 'radioView',
       view: {
         class: 'foam.u2.view.RadioView',
@@ -305,6 +313,10 @@ foam.CLASS({
       view: 'foam.u2.HTMLView'
     },
     {
+      class: 'Map',
+      name: 'map'
+    },
+    {
       class: 'FObjectProperty',
       name: 'defaultFObjectProperty',
       value: foam.util.Timer.create()
@@ -328,10 +340,6 @@ foam.CLASS({
           [ 'foam.nanos.menu.TabsMenu', 'Tabs'    ]
         ]
       }
-    },
-    {
-      class: 'Map',
-      name: 'map'
     }
   ]
 })
