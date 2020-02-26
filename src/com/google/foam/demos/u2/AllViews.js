@@ -121,6 +121,15 @@ foam.CLASS({
       }
     },
     {
+      class: 'Int',
+      name: 'intWithDualView2',
+      view: {
+        class: 'foam.u2.view.DualView',
+        viewa: 'foam.u2.RangeView',
+        viewb: 'foam.u2.ProgressView'
+      }
+    },
+    {
       class: 'String',
       name: 'defaultString'
     },
