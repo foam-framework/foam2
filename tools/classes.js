@@ -278,6 +278,7 @@ var classes = [
   'foam.nanos.logger.ProxyLogger',
   'foam.nanos.logger.LoggingDAO',
   'foam.nanos.logger.StdoutLoggerDAO',
+  'foam.nanos.menu.XRegistration',
   'foam.nanos.menu.Menu',
   'foam.nanos.menu.DAOMenu',
   'foam.nanos.menu.DAOMenu2',
@@ -535,7 +536,7 @@ var classes = [
   'foam.strategy.StrategizerService',
   'foam.strategy.BasicStrategizer',
   'foam.strategy.ClientStrategizerService',
-  
+
   //concurrent
   'foam.util.concurrent.AbstractAssembly',
   'foam.util.concurrent.Assembly',
