@@ -135,8 +135,12 @@ foam.CLASS({
       }
 
       if ( getIsTrackingRequestSent() ){
-        sendSingleRequest(x, request, request.getInitiatingUser());
-        approverIds.remove(request.getInitiatingUser());
+        RoleApprovalRequest trackingRequest = (RoleApprovalRequest) request.fclone();
+        trackingRequest.setIsTrackingRequest(true);
+
+        sendSingleRequest(x, trackingRequest, trackingRequest.getInitiatingUser());
+
+        approverIds.remove(trackingRequest.getInitiatingUser());
       }
 
       for ( int i = 0; i < approverIds.size(); i++ ) {
