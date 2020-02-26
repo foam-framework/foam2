@@ -257,6 +257,12 @@ foam.CLASS({
       value: 'someone@somewhere.com'
     },
     {
+      class: 'EMail',
+      name: 'requiredEMail',
+      required: true,
+      value: ''
+    },
+    {
       class: 'Image',
       name: 'defaultImage',
       value: 'Dragon.png'
