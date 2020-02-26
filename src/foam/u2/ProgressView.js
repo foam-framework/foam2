@@ -22,7 +22,6 @@ foam.CLASS({
 
   css: `
     ^ {
-      height: 23px;
       width: 183px;
     }
   `,
