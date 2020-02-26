@@ -60,7 +60,7 @@ foam.CLASS({
 
         var X;
         // If parent is a Context (should be a better way to test this)
-        if ( parent.isContext ) {
+        if ( parent && parent.isContext ) {
           X = parent;
         } else if ( parent ) {
           // I'm not sure how this is a good idea, KGR
