@@ -120,21 +120,36 @@ foam.CLASS({
     },
     {
       class: 'foam.mlang.predicate.PredicateProperty',
-      name: 'createEnabled',
+      name: 'createPredicate',
       documentation: 'If set to false, the "Create" button will not be visible.',
-      value: true
+      factory: function() {
+        return foam.mlang.predicate.True.create();
+      },
+      javaFactory: `
+        return foam.mlang.MLang.TRUE;
+      `
     },
     {
       class: 'foam.mlang.predicate.PredicateProperty',
-      name: 'editEnabled',
+      name: 'editPredicate',
       documentation: 'True to enable the edit button.',
-      value: true
+      factory: function() {
+        return foam.mlang.predicate.True.create();
+      },
+      javaFactory: `
+        return foam.mlang.MLang.TRUE;
+      `
     },
     {
       class: 'foam.mlang.predicate.PredicateProperty',
-      name: 'deleteEnabled',
+      name: 'deletePredicate',
       documentation: 'True to enable the delete button.',
-      value: true
+      factory: function() {
+        return foam.mlang.predicate.True.create();
+      },
+      javaFactory: `
+        return foam.mlang.MLang.TRUE;
+      `
     },
     {
       of: 'foam.mlang.predicate.Predicate',
