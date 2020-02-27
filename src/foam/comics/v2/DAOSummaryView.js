@@ -126,17 +126,12 @@ foam.CLASS({
     },
     {
       name: 'delete',
-<<<<<<< HEAD
       isAvailable: function(config) {
         try {
           return config.deletePredicate.f();
         } catch(e) {
           return false;
         }
-=======
-      isAvailable: function(config$deleteEnabled) {
-        return config$deleteEnabled;
->>>>>>> master
       },
       code: function() {
         this.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
