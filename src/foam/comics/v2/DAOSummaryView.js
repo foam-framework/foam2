@@ -117,7 +117,7 @@ foam.CLASS({
           data: this.data,
           config: this.config,
           of: this.config.of
-        });
+        }, this.__subContext__);
       }
     },
     {
