@@ -26,6 +26,7 @@ foam.CLASS({
   `,
 
   properties: [
+    ['showAction', true],
     'trueLabel',
     'falseLabel',
     'trueActionLabel',
@@ -60,13 +61,19 @@ foam.CLASS({
           .add(this.dynamicLabel$)
         .end()
         .startContext({ data: this })
-          .start().addClass(this.myClass('btn-box'))
+          .start().show(this.showAction$).addClass(this.myClass('btn-box'))
             .tag(this.UPDATE_OBJECT, {
               label$: this.dynamicActionLabel$,
               buttonStyle: 'SECONDARY'
             })
           .end()
         .endContext()
+        .start('input').hide(this.showAction$).setAttribute('type', 'checkbox')
+            .on('click', (e) => {
+              if ( this.mode === foam.u2.DisplayMode.RO ) return e.preventDefault();
+              this.data = ! this.data;
+            })
+        .end()
       .end();
     },
     function fromProperty(property) {
@@ -79,7 +86,7 @@ foam.CLASS({
     {
       name: 'updateObject',
       isEnabled: function(mode) {
-        return mode ? mode.name === 'RW' : null;
+        return mode === foam.u2.DisplayMode.RW;
       },
       code: async function(X) {
         var dao = X[this.targetDAOKey];
