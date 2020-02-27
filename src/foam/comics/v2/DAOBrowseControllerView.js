@@ -77,8 +77,12 @@ foam.CLASS({
   actions: [
     {
       name: 'create',
-      isAvailable: function(config$createEnabled) {
-        return config$createEnabled;
+      isAvailable: function(config) {
+        try {
+          return config.createPredicate.f();
+        } catch(e) {
+          return false;
+        }
       },
       code: function() {
         if ( ! this.stack ) return;
