@@ -30,6 +30,11 @@ foam.CLASS({
         .s.addClassTo(self, 'mode-circle')
         .start()
           .addClass(self.s.myClass('icon-circle'))
+          .style({
+            'background-image': "url('" + self.data.icon + "')",
+            'background-size': 'cover',
+            'background-position': '50% 50%',
+          })
         .end()
         .start()
           .addClass(self.s.myClass('badge'))
