@@ -26,8 +26,4 @@ public class PMBenchmark implements Benchmark {
     PM pm = new PM(Object.class,"def");
     pm.log(x);
   }
-
 }
-//PM pm = new PM("abc","def");
-//pm.log(x);
-//}
