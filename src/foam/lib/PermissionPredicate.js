@@ -29,16 +29,10 @@ foam.CLASS({
       javaCode: `
         X x = (X) obj;
         AuthService auth = (AuthService) x.get("auth");
-        if ( auth.check(x, permission_) )
-            return true;
-        return false;
+        return auth.check(x, permission_);
       `,
       code: async function() {
-        var r = await this.auth.check(null, this.permission);
-        if ( r )
-          return true;
-
-        return false;
+        return await this.auth.check(null, this.permission);
       }
     }
   ]
