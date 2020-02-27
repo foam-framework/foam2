@@ -95,6 +95,8 @@ foam.CLASS({
           threw = true;
         }
         test(threw, "Non admin user can't remove serviceProvider");
+
+        serviceProviderDAO.inX(x).remove(serviceProvider);
       `
     }
   ]
