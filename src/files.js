@@ -735,6 +735,9 @@ FOAM_FILES([
   { name: "foam/u2/detail/TabbedDetailView" },
   { name: "foam/u2/detail/SectionedDetailPropertyView" },
 
+  { name: "foam/u2/detail/MultipleModelAbstractSectionedDetailView" },
+  { name: "foam/nanos/crunch/ui/ModelBuilderWizard" },
+
   { name: "foam/graphics/ZoomMapView" },
   { name: "foam/core/CoreTypesValidationTest" },
 
