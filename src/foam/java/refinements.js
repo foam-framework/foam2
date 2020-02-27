@@ -595,6 +595,19 @@ foam.LIB({
           args: [{ type: 'foam.core.X', name: 'x' }],
           body: 'setX(x);'
         });
+        
+        if ( cls.name != 'AbstractFObject' ) {
+          cls.method({
+            visibility: 'public',
+            name: 'hashCode',
+            type: 'int',
+            body: 
+              ['int hash = 1'].concat(props.map(function(f) {
+                return 'hash += hash * 31 + java.util.Objects.hash('+foam.String.constantize(f.name)+'.get(this))';
+              })).join(';\n') + ';\n'
+              +'return hash;\n'
+          });
+        }
 
         if ( props.length && props.length < 7 ) {
           // All-property constructor
