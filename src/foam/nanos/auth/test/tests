@@ -2,3 +2,4 @@ p({"class":"foam.nanos.auth.PasswordPolicyTest","id":"passwordPolicyTest","descr
 p({"class":"foam.nanos.auth.test.ServiceProviderAwareTest","id":"ServiceProviderAwareTest","description":""})
 p({"class":"foam.nanos.auth.test.UserAndGroupPermissionTest","id":"UserAndGroupPermissionTest","description":""})
 p({"class":"foam.nanos.auth.test.PreventPrevilegeEscalationTest","id":"PreventPrivilegeEscalationTest"})
+p({"class":"foam.nanos.auth.test.ServiceProviderAuthorizerTest","id":"ServiceProviderAuthorizerTest"})
