@@ -485,7 +485,7 @@ p({
   """
     return new foam.nanos.auth.AuthorizationDAO(x, (foam.dao.DAO) x.get("localServiceProviderDAO"), new foam.nanos.auth.StandardAuthorizer("serviceprovider"));
   """,
-  "client":"{\"of\":\"foam.nanos.auth.serviceProvider\"}"
+  "client":"{\"of\":\"foam.nanos.auth.ServiceProvider\"}"
 })
 
 p({"class":"foam.nanos.boot.NSpec", "name":"liveScriptBundler",                      "lazy":false,  "serve":false, "authenticate": false, "serviceClass":"foam.nanos.http.LiveScriptBundler"})
