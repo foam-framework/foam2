@@ -14,8 +14,8 @@ foam.CLASS({
   ],
   properties: [
     {
-      name: 'args',
-      class: 'StringArray'
+      name: 'permission',
+      class: 'String'
     }
   ],
   javaImports: [
@@ -29,25 +29,15 @@ foam.CLASS({
       javaCode: `
         X x = (X) obj;
         AuthService auth = (AuthService) x.get("auth");
-        if ( args_ == null || args_.length <= 0 ) {
-          return true;
-        }
-
-        for ( String permission : args_ ) {
-          if ( auth.check(x, permission) )
+        if ( auth.check(x, permission_) )
             return true;
-        }
         return false;
       `,
       code: async function() {
-        if ( ! this.args || this.args.length <= 0 )
+        var r = await this.auth.check(null, this.permission);
+        if ( r )
           return true;
-        
-        for ( var i = 0; i < this.args.length; i++) {
-          var r = await this.auth.check(null, this.args[i]);
-          if ( r )
-           return true;
-        }
+
         return false;
       }
     }
