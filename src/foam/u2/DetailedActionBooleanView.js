@@ -79,9 +79,7 @@ foam.CLASS({
     {
       name: 'updateObject',
       isEnabled: function(mode) {
-        if ( mode ) {
-          return mode.name === 'RW';
-        }
+        return mode ? mode.name === 'RW' : null;
       },
       code: async function(X) {
         var dao = X[this.targetDAOKey];
