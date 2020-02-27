@@ -278,6 +278,7 @@ var classes = [
   'foam.nanos.logger.ProxyLogger',
   'foam.nanos.logger.LoggingDAO',
   'foam.nanos.logger.StdoutLoggerDAO',
+  'foam.nanos.menu.XRegistration',
   'foam.nanos.menu.Menu',
   'foam.nanos.menu.DAOMenu',
   'foam.nanos.menu.DAOMenu2',
@@ -524,6 +525,9 @@ var classes = [
   'foam.nanos.crunch.RemoveJunctionsOnUserRemoval',
   //authservice
   'foam.nanos.auth.CapabilityAuthService',
+  // userQueryService
+  'foam.nanos.auth.UserQueryService',
+  'foam.nanos.auth.SimpleUserQueryService',
   //Unit
   'foam.core.Unit',
   'foam.core.Currency',
@@ -532,10 +536,22 @@ var classes = [
   'foam.strategy.StrategizerService',
   'foam.strategy.BasicStrategizer',
   'foam.strategy.ClientStrategizerService',
-  
+
   //concurrent
   'foam.util.concurrent.AbstractAssembly',
   'foam.util.concurrent.Assembly',
+
+  // approval
+  'foam.nanos.approval.ApprovalRequest',
+  'foam.nanos.approval.ApprovalStatus',
+  'foam.nanos.approval.Approvable',
+  'foam.nanos.approval.ApprovableAwareDAO',
+  'foam.nanos.approval.ApprovableAware',
+  'foam.nanos.approval.ApprovableApprovalRequestsPredicate',
+  'foam.nanos.approval.ApprovableApprovalRequestsRule',
+  'foam.nanos.approval.FulfilledApprovablePredicate',
+  'foam.nanos.approval.FulfilledApprovableRule',
+  'foam.nanos.approval.RoleApprovalRequest',
 ];
 
 var abstractClasses = [
@@ -558,7 +574,8 @@ var skeletons = [
   'foam.nanos.notification.push.PushService',
   'foam.nanos.session.SessionService',
   'foam.nanos.test.EchoService',
-  'foam.strategy.StrategizerService'
+  'foam.strategy.StrategizerService',
+  'foam.nanos.auth.UserQueryService',
 ];
 
 var proxies = [

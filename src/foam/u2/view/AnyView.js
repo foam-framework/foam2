@@ -157,9 +157,7 @@ foam.CLASS({
             .style({flex: 1})
             .add(this.slot(function(selected) {
               return self.E()
-                .startContext({data: null})
-                  .start(selected.view, null).end()
-                .endContext();
+              .tag(selected.view, {data: self.data});
             }))
           .end()
           .callIf(this.enableChoice, function() {

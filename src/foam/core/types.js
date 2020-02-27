@@ -433,7 +433,7 @@ foam.CLASS({
   label: 'Email address',
   properties: [
     [
-      'adapt',
+      'preSet',
       function(_, v) {
         return v.toLowerCase().trim();
       }
