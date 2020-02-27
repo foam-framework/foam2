@@ -109,7 +109,7 @@ foam.CLASS({
       name: 'edit',
       isAvailable: function(config) {
         try {
-          return ! config.update || ! config.update.f  ? true : config.update.f();
+          return config.editPredicate.f();
         } catch(e) {
           return false;
         }
@@ -128,7 +128,7 @@ foam.CLASS({
       name: 'delete',
       isAvailable: function(config) {
         try {
-          return ! config.delete || ! config.delete.f ? true : config.delete.f();
+          return config.deletePredicate.f();
         } catch(e) {
           return false;
         }
