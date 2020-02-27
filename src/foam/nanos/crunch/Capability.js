@@ -89,6 +89,10 @@ foam.CLASS({
       class: 'StringArray'
     },
     {
+      name: 'category',
+      class: 'String'
+    },
+    {
       name: 'version',
       class: 'String'
     },
