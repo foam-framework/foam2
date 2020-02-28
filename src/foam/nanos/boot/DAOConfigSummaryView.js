@@ -178,44 +178,83 @@
          }, x);
        });
 
+       var updateSections = [];
+
+       var i = 0;
+
        this.filteredDAO.select().then(function(specs) {
          specs.array.sort(function(o1, o2) { return foam.String.compare(o1.id.toUpperCase(), o2.id.toUpperCase())}).forEach(function(spec) {
            var label = foam.String.capitalize(spec.id.substring(0, spec.id.length-3));
            var l     = label.charAt(0);
 
            if ( l != currentLetter ) {
+            var lSection;
+             var showSection = foam.core.SimpleSlot.create({value: true});
+             i = updateSections.length;
+
+             var updateSlot = foam.core.SimpleSlot.create({value: false});
+             updateSections.push(updateSlot);
+
+             updateSections[i].sub(function() {
+               console.log(lSection.instance_.id);
+               var doNeedToShow = false;
+               //first child is a header
+               for (var j = 1; j <  lSection.instance_.childNodes.length; j++) {
+                if(lSection.instance_.childNodes[j].shown) {
+                  doNeedToShow = true;
+                  break;
+                }
+               }
+                showSection.set(doNeedToShow);
+             });
              currentLetter = l;
+
              section = self.start('span')
-               .addClass(self.myClass('section'))
-               .start('span')
-                 .addClass(self.myClass('header'))
-                 .add(l)
-               .end();
+              .show(showSection.map(function(s) {
+                return s;
+              }))
+              .addClass(self.myClass('section'))
+              .start('span')
+                .addClass(self.myClass('header'))
+                .add(l)
+              .end();
+
+              lSection = Object.assign({}, section);
            }
 
+           var localI = i.valueOf();
+
+           var localUpdate = foam.core.SimpleSlot.create({value: true});
+           var localShow = foam.core.SimpleSlot.create({value: true});
            section
             .start('span')
-              .show(self.slot(function(search) {
-                var contains = false;
-                if ( ! search )
-                  contains = true;
-                if ( label.toLowerCase().includes(search.toLowerCase()) )
-                  contains =  true;
-                if ( !contains && spec.keywords && spec.keywords.length > 0 ) {
-                  for(var k in spec.keywords) {
-                    if(k.toLowerCase().includes(search.toLowerCase())) {
-                      contains  = true;
-                      break;
-                    }
-                  }
-                }
-                return contains;
+              .show(localShow.map(function(s) {
+                return s;
               }))
               .addClass(self.myClass('dao'))
               .add(label)
               .attrs({title: spec.description})
               .on('click', function() {
                 self.memento = spec.id;
+              });
+
+              self.search$.sub(function() {
+                var contains = false;
+                if ( ! self.search )
+                  contains = true;
+                if ( label.toLowerCase().includes(self.search.toLowerCase()) )
+                  contains =  true;
+                if ( !contains && spec.keywords && spec.keywords.length > 0 ) {
+                  for(var k in spec.keywords) {
+                    if(k.toLowerCase().includes(self.search.toLowerCase())) {
+                      contains  = true;
+                      break;
+                    }
+                  }
+                }
+
+                localShow.set( contains);
+                updateSections[localI].set(! updateSections[localI].get());
               });
          });
        });
