@@ -143,7 +143,6 @@
          type: 'search',
          onKey: true
        },
-       value: ''
      }
    ],
 
@@ -205,7 +204,7 @@
              updateSections[i].sub(function() {
                var doNeedToShow = false;
                //first child is a header
-               for (var j = 1; j <  lSection.instance_.childNodes.length; j++) {
+               for (var j = 1 ; j <  lSection.instance_.childNodes.length ; j++) {
                 if ( lSection.instance_.childNodes[j].shown ) {
                   doNeedToShow = true;
                   break;
@@ -216,9 +215,7 @@
              currentLetter = l;
 
              section = self.start('span')
-              .show(showSection.map(function(s) {
-                return s;
-              }))
+              .show(showSection)
               .addClass(self.myClass('section'))
               .start('span')
                 .addClass(self.myClass('header'))
@@ -233,9 +230,7 @@
            var localShow = foam.core.SimpleSlot.create({value: true});
            section
             .start('span')
-              .show(localShow.map(function(s) {
-                return s;
-              }))
+              .show(localShow)
               .addClass(self.myClass('dao'))
               .add(label)
               .attrs({title: spec.description})
@@ -250,7 +245,7 @@
                 if ( label.toLowerCase().includes(self.search.toLowerCase()) )
                   contains =  true;
                 if ( ! contains && spec.keywords && spec.keywords.length > 0 ) {
-                  for(var k in spec.keywords) {
+                  for ( var k in spec.keywords ) {
                     if ( k.toLowerCase().includes(self.search.toLowerCase()) ) {
                       contains  = true;
                       break;
