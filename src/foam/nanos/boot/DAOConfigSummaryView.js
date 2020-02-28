@@ -204,7 +204,7 @@
              updateSections[i].sub(function() {
                var doNeedToShow = false;
                //first child is a header
-               for (var j = 1 ; j <  lSection.instance_.childNodes.length ; j++) {
+               for (var j = 1 ; j < lSection.instance_.childNodes.length ; j++) {
                 if ( lSection.instance_.childNodes[j].shown ) {
                   doNeedToShow = true;
                   break;
