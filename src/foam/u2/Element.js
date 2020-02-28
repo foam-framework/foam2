@@ -44,6 +44,7 @@ foam.ENUM({
   ]
 });
 
+
 foam.ENUM({
   package: 'foam.u2',
   name: 'DisplayMode',
@@ -836,6 +837,12 @@ foam.CLASS({
       name: 'id',
       transient: true,
       factory: function() { return this.NEXT_ID(); }
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.ControllerMode',
+      name: 'controllerMode',
+      factory: function() { return this.__context__.controllerMode || foam.u2.ControllerMode.CREATE; }
     },
     {
       name: 'state',
@@ -2467,20 +2474,16 @@ foam.CLASS({
   properties: [
     {
       name: 'view',
-      expression: function(label2, label2Formatter) {
+      expression: function(label, labelFormatter) {
         return {
           class: 'foam.u2.CheckBox',
-          label: label2,
-          labelFormatter: label2Formatter
+          label: label,
+          labelFormatter: labelFormatter
         };
       }
     },
     {
-      class: 'String',
-      name: 'label2'
-    },
-    {
-      name: 'label2Formatter'
+      name: 'labelFormatter'
     }
   ]
 });
@@ -2713,24 +2716,6 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2',
-  name: 'ControllerViewTrait',
-
-  documentation: 'Trait for adding a ControllerMode controllerMode Property.',
-
-  exports: [ 'controllerMode' ],
-
-  properties: [
-    {
-      class: 'Enum',
-      of: 'foam.u2.ControllerMode',
-      name: 'controllerMode'
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.u2',
   name: 'View',
   extends: 'foam.u2.Element',
 
@@ -2757,12 +2742,6 @@ foam.CLASS({
   exports: [ 'data' ],
 
   properties: [
-    {
-      class: 'Enum',
-      of: 'foam.u2.ControllerMode',
-      name: 'controllerMode',
-      factory: function() { return this.__context__.controllerMode || foam.u2.ControllerMode.CREATE; }
-    },
     {
       name: 'data',
       attribute: true

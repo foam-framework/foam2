@@ -104,5 +104,10 @@ foam.CLASS({
       name: 'status',
       tableWidth: 100
     },
+    {
+      class: 'Map',
+      name: 'templateArguments',
+      view: { class: 'foam.u2.view.MapView' }
+    }
   ]
 });

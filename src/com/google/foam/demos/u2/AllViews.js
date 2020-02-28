@@ -121,6 +121,15 @@ foam.CLASS({
       }
     },
     {
+      class: 'Int',
+      name: 'intWithDualView2',
+      view: {
+        class: 'foam.u2.view.DualView',
+        viewa: 'foam.u2.RangeView',
+        viewb: 'foam.u2.ProgressView'
+      }
+    },
+    {
       class: 'String',
       name: 'defaultString'
     },
@@ -164,6 +173,14 @@ foam.CLASS({
       view: {
         class: 'foam.u2.view.ChoiceView',
         choices: ['Yes', 'No', 'Maybe']
+      }
+    },
+    {
+      class: 'String',
+      name: 'choiceViewWithValues',
+      view: {
+        class: 'foam.u2.view.ChoiceView',
+        choices: [ [1, 'Yes'], [0, 'No'], [0.5, 'Maybe']]
       }
     },
     {
@@ -249,6 +266,12 @@ foam.CLASS({
       value: 'someone@somewhere.com'
     },
     {
+      class: 'EMail',
+      name: 'requiredEMail',
+      required: true,
+      value: ''
+    },
+    {
       class: 'Image',
       name: 'defaultImage',
       value: 'Dragon.png'
@@ -305,6 +328,10 @@ foam.CLASS({
       view: 'foam.u2.HTMLView'
     },
     {
+      class: 'Map',
+      name: 'map'
+    },
+    {
       class: 'FObjectProperty',
       name: 'defaultFObjectProperty',
       value: foam.util.Timer.create()
@@ -328,10 +355,6 @@ foam.CLASS({
           [ 'foam.nanos.menu.TabsMenu', 'Tabs'    ]
         ]
       }
-    },
-    {
-      class: 'Map',
-      name: 'map'
     }
   ]
 })

@@ -13,6 +13,22 @@
 
    classes: [
      {
+       name: 'DAOUpdateControllerView',
+       extends: 'foam.comics.DAOUpdateControllerView',
+
+       documentation: 'Same as regular UpdateController except it starts in EDIT mode',
+
+       properties: [
+         {
+           name: 'controllerMode',
+           factory: function() {
+             return this.ControllerMode.EDIT;
+           }
+         }
+       ]
+     },
+
+     {
         name: 'BackBorder',
         extends: 'foam.u2.Element',
 
@@ -141,6 +157,9 @@
 
        this.addClass(this.myClass());
 
+       var x = this.__subContext__.createSubContext();
+       x.register(this.DAOUpdateControllerView, 'foam.comics.DAOUpdateControllerView');
+
        this.start()
         .style({ 'display': 'inline-block', 'width': '100%' })
         .add(this.SEARCH)
@@ -148,64 +167,58 @@
        .end();
 
        this.memento$.sub(function() {
-        self.stack.push({
-          class: self.BackBorder,
-          title: self.memento,
-          inner: {
-            class: self.BrowserView,
-            data: self.__context__[self.memento],
-            stack: self.stack
-          }
-        }, this);
-      });
+         self.stack.push({
+           class: self.BackBorder,
+           title: self.memento,
+           inner: {
+             class: self.BrowserView,
+             data: self.__context__[self.memento],
+             stack: self.stack
+           }
+         }, x);
+       });
 
-      this.filteredDAO.select().then(function(specs) {
-        specs.array.sort(function(o1, o2) { return foam.String.compare(o1.id.toUpperCase(), o2.id.toUpperCase())}).forEach(function(spec) {
-          var label = foam.String.capitalize(spec.id.substring(0, spec.id.length-3));
-          var l     = label.charAt(0);
-          var childrenThatContainsSearchCounter = 0;
+       this.filteredDAO.select().then(function(specs) {
+         specs.array.sort(function(o1, o2) { return foam.String.compare(o1.id.toUpperCase(), o2.id.toUpperCase())}).forEach(function(spec) {
+           var label = foam.String.capitalize(spec.id.substring(0, spec.id.length-3));
+           var l     = label.charAt(0);
 
-          if ( l != currentLetter ) {
-            currentLetter = l;
-            section = self.start('span')
+           if ( l != currentLetter ) {
+             currentLetter = l;
+             section = self.start('span')
+               .addClass(self.myClass('section'))
+               .start('span')
+                 .addClass(self.myClass('header'))
+                 .add(l)
+               .end();
+           }
+
+           section
+            .start('span')
               .show(self.slot(function(search) {
-                childrenThatContainsSearchCounter = 0;
-                return section ? section.children.length > 0 : true;
-              }))
-              .addClass(self.myClass('section'))
-              .start('span')
-                .addClass(self.myClass('header'))
-                .add(l)
-              .end();
-          }
-
-          section.start('span')
-            .show(self.slot(function(search) {
-              var contains = false;
-              if ( ! search )
-                contains = true;
-              if ( spec.description.toLowerCase().includes(search.toLowerCase()) )
-                contains =  true;
-              if ( !contains && spec.keywords && spec.keywords.length > 0 ) {
-                for(var k in spec.keywords) {
-                  if(k.toLowerCase().includes(search.toLowerCase())) {
-                    contains  = true;
-                    break;
+                var contains = false;
+                if ( ! search )
+                  contains = true;
+                if ( label.toLowerCase().includes(search.toLowerCase()) )
+                  contains =  true;
+                if ( !contains && spec.keywords && spec.keywords.length > 0 ) {
+                  for(var k in spec.keywords) {
+                    if(k.toLowerCase().includes(search.toLowerCase())) {
+                      contains  = true;
+                      break;
+                    }
                   }
                 }
-              }
-              if(contains)
-                childrenThatContainsSearchCounter++;
-              return contains;
-            }))
-            .addClass(self.myClass('dao'))
-            .add(label)
-            .attrs({title: spec.description})
-            .on('click', function() {
-              self.memento = spec.id;
-            });
-        });
-      });
-    }
-  ]
+                return contains;
+              }))
+              .addClass(self.myClass('dao'))
+              .add(label)
+              .attrs({title: spec.description})
+              .on('click', function() {
+                self.memento = spec.id;
+              });
+         });
+       });
+     }
+   ]
  });
