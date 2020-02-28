@@ -134,9 +134,13 @@ foam.CLASS({
         throw new RuntimeException("The only approver of " + modelName + " is the maker of this request!");
       }
 
-      if ( getIsTrackingRequestSent() ){
-        sendSingleRequest(x, request, request.getInitiatingUser());
-        approverIds.remove(request.getInitiatingUser());
+      if ( getIsTrackingRequestSent() ) {
+        RoleApprovalRequest trackingRequest = (RoleApprovalRequest) request.fclone();
+        trackingRequest.setIsTrackingRequest(true);
+
+        sendSingleRequest(x, trackingRequest, trackingRequest.getInitiatingUser());
+
+        approverIds.remove(trackingRequest.getInitiatingUser());
       }
 
       for ( int i = 0; i < approverIds.size(); i++ ) {
