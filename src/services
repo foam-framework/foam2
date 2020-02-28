@@ -735,10 +735,10 @@ p({
       .setAuthorize(true)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("capabilityCategories")
-      .setOf(foam.nanos.crunch.Capability.getOwnClassInfo())
+      .setOf(foam.nanos.crunch.CapabilityCategory.getOwnClassInfo())
       .build();
   """,
-  "client":"{\"of\":\"foam.nanos.crunch.Capability\"}"
+  "client":"{\"of\":\"foam.nanos.crunch.CapabilityCategory\"}"
 })
 
 p({
@@ -766,7 +766,7 @@ p({
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName(\"capabilityCategoryCapabilityJunction\")
+      .setJournalName("capabilityCategoryCapabilityJunction")
       .setOf(foam.nanos.crunch.CapabilityCategoryCapabilityJunction.getOwnClassInfo())
       .build();
   """,
