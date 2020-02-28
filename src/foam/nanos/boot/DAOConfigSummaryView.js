@@ -242,9 +242,9 @@
                 var contains = false;
                 if ( ! self.search )
                   contains = true;
-                if ( label.toLowerCase().includes(self.search.toLowerCase()) )
+                else if ( label.toLowerCase().includes(self.search.toLowerCase()) )
                   contains =  true;
-                if ( ! contains && spec.keywords && spec.keywords.length > 0 ) {
+                else if ( ! contains && spec.keywords && spec.keywords.length > 0 ) {
                   for ( var k in spec.keywords ) {
                     if ( k.toLowerCase().includes(self.search.toLowerCase()) ) {
                       contains  = true;
