@@ -21,20 +21,16 @@ foam.CLASS({
   ],
 
   properties: [
-    'capabilityName',
+    'capabilityName', // TODO use as title(??) and set CapabilityName
     'argsList',
     {
       class: 'FObjectArray',
       of: 'foam.core.Class',
       name: 'ofList',
-      preSet: function(_, n) {
-        return [net.nanopay.sme.onboarding.BusinessOnboarding, foam.nanos.u2.navigation.SignIn];
+      documentation: 'Currently taking in a string of class paths',
+      adapt: function(_, n) {
+        return n.map((of) => typeof of === 'string' ? foam.lookup(of) : of);
       }
-    },
-    {
-      name: 'createdModels',
-      class: 'FObjectArray',
-      of: 'foam.core.FObject',
     },
     {
       name: 'sections',
@@ -43,11 +39,14 @@ foam.CLASS({
         if ( ! ofList ) return [];
 
         sections = ofList.map((of) => {
-          let b = of.getAxiomsByClass(this.SectionAxiom);
-          if ( b.length > 0 ) {
-            // todo consider properties that are not in sections
-            var t = b.sort((a, b) => a.order - b.order).map((a) => this.Section.create().fromSectionAxiom(a, of) );
-            return { 'data': of.create(this.argsList, this), 'sections': t };
+          let listOfSectionAxiomsFromClass = of.getAxiomsByClass(this.SectionAxiom);
+          if ( listOfSectionAxiomsFromClass.length > 0 ) {
+            var listOfSectionsFromClass = listOfSectionAxiomsFromClass
+              .sort((a, b) => a.order - b.order)
+              .map((a) => this.Section.create().fromSectionAxiom(a, of) );
+            let unSectionedPropertiesSection = this.checkForUnusedProperties(listOfSectionsFromClass, of);
+            if ( unSectionedPropertiesSection ) listOfSectionsFromClass.push(unSectionedPropertiesSection);
+            return { 'data': of.create(this.argsList, this), 'sections': listOfSectionsFromClass };
           } else {
             var c = foam.layout.SectionAxiom.create({ name: of.name, title: of.name });
             let p = of.getAxiomsByClass(this.Property);
@@ -59,6 +58,33 @@ foam.CLASS({
         return sections;
       }
     }
+  ],
+
+  methods: [
+    {
+      name: 'checkForUnusedProperties',
+      code: function(sections, of) {
+        var usedAxioms = sections
+          .map((s) => s.properties.concat(s.actions))
+          .flat()
+          .reduce((map, a) => {
+            map[a.name] = true;
+            return map;
+          }, {});
+        var unusedProperties = of.getAxiomsByClass(this.Property)
+          .filter((p) => ! usedAxioms[p.name])
+          .filter((p) => ! p.hidden);
+        var unusedActions = of.getAxiomsByClass(this.Action)
+          .filter((a) => ! usedAxioms[a.name]);
+
+        if ( unusedProperties.length || unusedActions.length ) {
+          return this.Section.create({
+            properties: unusedProperties,
+            actions: unusedActions
+          });
+        }
+        return undefined;
+      }
+    }
   ]
 });
-

@@ -11,11 +11,6 @@ foam.CLASS({
   name: 'ModelBuilderWizard',
   extends: 'foam.u2.detail.MultipleModelAbstractSectionedDetailView',
 
-  requires: [
-    'foam.u2.layout.Cols',
-    'foam.u2.layout.Rows'
-  ],
-
   css: `
     ^ .foam-u2-layout-Cols {
       align-items: center;
