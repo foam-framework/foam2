@@ -179,9 +179,8 @@
        });
 
        var updateSections = [];
-
        var i = 0;
-
+       
        this.filteredDAO.select().then(function(specs) {
          specs.array.sort(function(o1, o2) { return foam.String.compare(o1.id.toUpperCase(), o2.id.toUpperCase())}).forEach(function(spec) {
            var label = foam.String.capitalize(spec.id.substring(0, spec.id.length-3));
@@ -196,11 +195,10 @@
              updateSections.push(updateSlot);
 
              updateSections[i].sub(function() {
-               console.log(lSection.instance_.id);
                var doNeedToShow = false;
                //first child is a header
                for (var j = 1; j <  lSection.instance_.childNodes.length; j++) {
-                if(lSection.instance_.childNodes[j].shown) {
+                if ( lSection.instance_.childNodes[j].shown ) {
                   doNeedToShow = true;
                   break;
                 }
@@ -224,7 +222,6 @@
 
            var localI = i.valueOf();
 
-           var localUpdate = foam.core.SimpleSlot.create({value: true});
            var localShow = foam.core.SimpleSlot.create({value: true});
            section
             .start('span')
@@ -244,16 +241,16 @@
                   contains = true;
                 if ( label.toLowerCase().includes(self.search.toLowerCase()) )
                   contains =  true;
-                if ( !contains && spec.keywords && spec.keywords.length > 0 ) {
+                if ( ! contains && spec.keywords && spec.keywords.length > 0 ) {
                   for(var k in spec.keywords) {
-                    if(k.toLowerCase().includes(self.search.toLowerCase())) {
+                    if ( k.toLowerCase().includes(self.search.toLowerCase()) ) {
                       contains  = true;
                       break;
                     }
                   }
                 }
 
-                localShow.set( contains);
+                localShow.set(contains);
                 updateSections[localI].set(! updateSections[localI].get());
               });
          });
