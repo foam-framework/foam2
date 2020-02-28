@@ -276,6 +276,7 @@ p({
       .setPm(true)
       .setAuthorize(false)
       .setInnerDAO(((foam.dao.DAO) x.get("localSessionDAO")))
+      .setOrder(new foam.mlang.order.Comparator[] { new foam.mlang.order.Desc.Builder(x).setArg1(foam.nanos.session.Session.LAST_USED).build() })
       .build();
   """,
   "client": "{\"of\":\"foam.nanos.session.Session\"}",
@@ -876,9 +877,9 @@ p({
 })
 
 p({
-  "class":"foam.nanos.boot.NSpec", 
+  "class":"foam.nanos.boot.NSpec",
   "name":"approvableDAO",
-  "serve":true,  
+  "serve":true,
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
       .setAuthorize(false)
@@ -932,7 +933,7 @@ p({
   """
     {
       "class":"foam.nanos.auth.ClientUserQueryService",
-      "delegate": { 
+      "delegate": {
         "class":"foam.box.SessionClientBox",
         "delegate": {
           "class":"foam.box.HTTPBox",
@@ -943,4 +944,3 @@ p({
     }
   """
 })
-
