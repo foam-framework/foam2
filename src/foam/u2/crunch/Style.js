@@ -176,6 +176,14 @@ foam.CLASS({
     ^badge.info {
       background-color: #604aff;
     }
+
+    ^category {
+      display: inline-block;
+      padding: 0;
+    }
+    ^category:not(:last-child) {
+      margin-right: 8px;
+    }
   `,
 
   methods: [
