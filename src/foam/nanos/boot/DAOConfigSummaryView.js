@@ -155,16 +155,24 @@
        var currentLetter = '';
        var section;
 
-       this.addClass(this.myClass());
+       this.addClass(this.myClass()).
+        start().
+          style({ 'height': '56px', 'padding-left': '16px', 'padding-top': '8px'}).
+          start().
+            style({ 'font-size': '26px', 'width': 'fit-content', 'float': 'left', 'padding-top': '10px' }).
+            add('Data Management').
+          end()
+          .start()
+            .style({ 'width': 'fit-content', 'float': 'right', 'margin-right': '4%' })
+              .add(this.SEARCH)
+              .addClass('foam-u2-search-TextSearchView')
+              .addClass(this.myClass('foam-u2-search-TextSearchView'))
+            .end()
+          .end()
+        .end();
 
        var x = this.__subContext__.createSubContext();
        x.register(this.DAOUpdateControllerView, 'foam.comics.DAOUpdateControllerView');
-
-       this.start()
-        .style({ 'display': 'inline-block', 'width': '100%' })
-        .add(this.SEARCH)
-        .addClass('foam-u2-search-TextSearchView')
-       .end();
 
        this.memento$.sub(function() {
          self.stack.push({
@@ -180,7 +188,7 @@
 
        var updateSections = [];
        var i = 0;
-       
+
        this.filteredDAO.select().then(function(specs) {
          specs.array.sort(function(o1, o2) { return foam.String.compare(o1.id.toUpperCase(), o2.id.toUpperCase())}).forEach(function(spec) {
            var label = foam.String.capitalize(spec.id.substring(0, spec.id.length-3));
