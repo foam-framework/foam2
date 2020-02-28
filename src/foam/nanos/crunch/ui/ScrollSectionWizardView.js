@@ -1,5 +1,3 @@
-
-
 /**
  * @license
  * Copyright 2020 The FOAM Authors. All Rights Reserved.
@@ -8,28 +6,13 @@
 
 foam.CLASS({
   package: 'foam.nanos.crunch.ui',
-  name: 'ModelBuilderWizard',
-  extends: 'foam.u2.detail.MultipleModelAbstractSectionedDetailView',
+  name: 'ScrollSectionWizardView',
+  extends: 'foam.u2.detail.MultipleModelSectionedDetailView',
+
+  documentation: `Takes in a list of class paths in "ofList" representing the MultipleModels
+  and creates a section list in "sections" for editing properties.`,
 
   css: `
-    ^ .foam-u2-layout-Cols {
-      align-items: center;
-    }
-    ^wizard-body {
-      height: 100%;
-      background-color: white;
-    }
-
-    ^footer {
-      min-height: 75px;
-      border-top: solid 1px /*%GREY5%*/ #edf0f5;
-      padding: 0px 128px;
-    }
-
-    ^next-button {
-      width: 156px;
-      height: 48px;
-    }
   `,
 
   properties: [
@@ -63,12 +46,11 @@ foam.CLASS({
          return this.E().forEach(sections, (dataEntry) => {
           let y = dataEntry.data;
           let u = dataEntry.sections;
-          let v = [];
-          u.forEach((section) => {
-            v.push(this.tag(this.sectionView, {
+          u.fmap((section) => {
+            return this.tag(this.sectionView, {
               section: section,
               data: y
-            }));
+            });
           });
           return v;
         });

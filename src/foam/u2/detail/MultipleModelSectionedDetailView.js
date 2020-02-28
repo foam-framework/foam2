@@ -6,12 +6,11 @@
 
 foam.CLASS({
   package: 'foam.u2.detail',
-  name: 'MultipleModelAbstractSectionedDetailView',
+  name: 'MultipleModelSectionedDetailView',
   extends: 'foam.u2.View',
 
-  documentation: `
-    The abstract for property-sheet style Views with sections for editing an FObject. Takes in an array 'of' of Classes for 'of' prop
-  `,
+  documentation: `Takes in a list of class paths in "ofList" representing the MultipleModels
+  and creates a section list in "sections" for editing properties.`,
 
   requires: [
     'foam.core.Action',
@@ -21,8 +20,11 @@ foam.CLASS({
   ],
 
   properties: [
-    'capabilityName', // TODO use as title(??) and set CapabilityName
-    'argsList',
+    {
+      class: 'Array',
+      name: 'argsList',
+      documentation: 'this potentially contains any'
+    },
     {
       class: 'FObjectArray',
       of: 'foam.core.Class',
@@ -38,20 +40,22 @@ foam.CLASS({
       expression: function(ofList) {
         if ( ! ofList ) return [];
 
-        sections = ofList.map((of) => {
+        sections = ofList.map((of, index) => {
           let listOfSectionAxiomsFromClass = of.getAxiomsByClass(this.SectionAxiom);
           if ( listOfSectionAxiomsFromClass.length > 0 ) {
+            // Model(of-class) has section(s)
             var listOfSectionsFromClass = listOfSectionAxiomsFromClass
               .sort((a, b) => a.order - b.order)
               .map((a) => this.Section.create().fromSectionAxiom(a, of) );
             let unSectionedPropertiesSection = this.checkForUnusedProperties(listOfSectionsFromClass, of);
             if ( unSectionedPropertiesSection ) listOfSectionsFromClass.push(unSectionedPropertiesSection);
-            return { 'data': of.create(this.argsList, this), 'sections': listOfSectionsFromClass };
+            return { 'data': of.create(this.argsList[index], this), 'sections': listOfSectionsFromClass };
           } else {
+            // Model(of-class) is a section
             var c = foam.layout.SectionAxiom.create({ name: of.name, title: of.name });
             let p = of.getAxiomsByClass(this.Property);
             let a = of.getAxiomsByClass(this.Action);
-            return { 'data': of.create(this.argsList, this), 'sections': [this.Section.create({ properties: p, actions: a }).copyFrom(c)] };
+            return { 'data': of.create(this.argsList[index], this), 'sections': [this.Section.create({ properties: p, actions: a }).copyFrom(c)] };
           }
         });
 
