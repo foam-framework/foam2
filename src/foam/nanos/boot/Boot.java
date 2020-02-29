@@ -17,10 +17,8 @@ import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
 import foam.nanos.logger.ProxyLogger;
 import foam.nanos.logger.StdoutLogger;
-import foam.nanos.pm.DAOPMLogger;
 import foam.nanos.pm.NullPM;
 import foam.nanos.pm.PM;
-import foam.nanos.pm.PMLogger;
 import foam.nanos.script.Script;
 import foam.nanos.session.Session;
 import foam.util.SafetyUtil;
@@ -44,8 +42,6 @@ public class Boot {
   public Boot(String datadir) {
     Logger logger = new ProxyLogger(new StdoutLogger());
     root_.put("logger", logger);
-    root_.put("pmInfoDAO", new foam.nanos.pm.PMInfoMDAO());
-    root_.put("pmLogger", new foam.nanos.pm.DAOPMLogger(root_));
 
     if ( SafetyUtil.isEmpty(datadir) ) {
       datadir = System.getProperty("JOURNAL_HOME");

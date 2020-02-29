@@ -130,12 +130,7 @@ p({
   "name":"pmInfoDAO",
   "serve":true,
   "serviceScript":`
-    // see Boot.java for default PMInfoMDAO setup
-    foam.dao.DAO dao = (foam.dao.DAO) x.get("pmInfoDAO");
-    if ( dao == null ) {
-      dao = new foam.nanos.pm.PMInfoMDAO();
-    }
-    return dao.orderBy(foam.mlang.MLang.DESC(foam.nanos.pm.PMInfo.TOTAL_TIME));
+    return new foam.nanos.pm.PMInfoMDAO().orderBy(foam.mlang.MLang.DESC(foam.nanos.pm.PMInfo.TOTAL_TIME));
   `,
   "client":"{\"of\":\"foam.nanos.pm.PMInfo\", \"remoteListenerSupport\": false}"
 })
@@ -717,14 +712,7 @@ p({
   "name":"pmLogger",
   "serve":false,
   "lazy":false,
-  "serviceScript":`
-    /* see Boot.java for default pmLogger */
-    foam.nanos.pm.PMLogger pmLogger = (foam.nanos.pm.PMLogger) x.get("pmLogger");
-    if ( pmLogger == null ) {
-      pmLogger = new foam.nanos.pm.DAOPMLogger(x);
-    }
-    return pmLogger;
-  `
+  "serviceClass": "foam.nanos.pm.DAOPMLogger"
 })
 
 p({"class":"foam.nanos.boot.NSpec", "name":"pm1MinuteDAO","serve":true,"serviceScript":"return new foam.dao.MDAO(foam.nanos.analytics.Candlestick.getOwnClassInfo());","client":"{\"of\":\"foam.nanos.analytics.Candlestick\"}" })
