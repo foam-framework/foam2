@@ -23,7 +23,10 @@ public class DAOPMLogger
   public DAOPMLogger() {
     for ( int i = 0 ; i < locks_.length ; i++ ) locks_[i] = new Object();
   }
-
+  public DAOPMLogger(X x) {
+    this();
+    setX(x);
+  }
 
   protected Object getLock(PMInfo pmi) {
     int hash = pmi.getClsName().hashCode() * 31 + pmi.getName().hashCode();
