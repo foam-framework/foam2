@@ -127,7 +127,7 @@ foam.CLASS({
 try {
   InputStream is = getX().get(foam.nanos.fs.Storage.class).getInputStream(getFilename());
   if ( is == null ) {
-    getLogger().error("Failed to read from resource journal: " + getFilename());
+    getLogger().error("File not found - journal: " + getFilename());
   }
   return (is == null) ? null : new BufferedReader(new InputStreamReader(is));
 } catch ( Throwable t ) {
@@ -145,7 +145,7 @@ try {
 try {
   OutputStream os = getX().get(foam.nanos.fs.Storage.class).getOutputStream(getFilename());
   if ( os == null ) {
-    getLogger().error("Failed to read from resource journal: " + getFilename());
+    getLogger().error("File not found - journal: " + getFilename());
   }
   return (os == null) ? null : new BufferedWriter(new OutputStreamWriter(os));
 } catch ( Throwable t ) {
@@ -182,7 +182,9 @@ try {
             dao.put_(x, obj);
           }
 
-          public void executeJob() {
+          public void executeJob() {}
+
+          public void endJob() {
             try {
               record_ = ( old != null ) ?
                 getOutputter().stringifyDelta(old, obj) :
@@ -191,9 +193,7 @@ try {
               getLogger().error("Failed to write put entry to journal", t);
               record_ = null;
             }
-          }
 
-          public void endJob() {
             if ( foam.util.SafetyUtil.isEmpty(record_) ) return;
 
             try {

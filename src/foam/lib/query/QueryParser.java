@@ -20,7 +20,7 @@ public class QueryParser
     for ( Object prop : properties ) {
       foam.core.PropertyInfo info = (foam.core.PropertyInfo)prop;
 
-      expressions[i++] = new PropertyExpressionParser(info);
+      expressions[i++] = PropertyExpressionParser.create(info);
     }
 
     setDelegate(new OrParser(new AndParser(new Alt(expressions))));

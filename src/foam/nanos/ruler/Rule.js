@@ -29,6 +29,7 @@
 
   tableColumns: [
     'id',
+    'name',
     'ruleGroup',
     'enabled',
     'priority',
@@ -39,6 +40,7 @@
 
   searchColumns: [
     'id',
+    'name',
     'ruleGroup',
     'enabled',
     'priority',
@@ -63,7 +65,12 @@
     {
       class: 'String',
       name: 'id',
-      updateVisibility: 'RO',
+      visibility: 'RO'
+      // will display in '_defaultSection'
+    },
+    {
+      class: 'String',
+      name: 'name',
       tableWidth: 300,
       section: 'basicInfo'
     },
@@ -372,6 +379,11 @@
       ],
       javaCode: `
       return rule;`
+    },
+    {
+      name: 'toSummary',
+      type: 'String',
+      code: () => { return this.name || this.id; }
     }
   ],
 

@@ -412,7 +412,6 @@ foam.CLASS({
 
       Object.defineProperty(proto, name, desc);
 
-
       Object.defineProperty(proto, name + '$cls', {
         get: function classGetter() {
           console.warn("Deprecated use of 'cls.$cls'. Just use 'cls' instead.");
@@ -434,7 +433,7 @@ foam.CLASS({
   label: 'Email address',
   properties: [
     [
-      'adapt',
+      'preSet',
       function(_, v) {
         return v.toLowerCase().trim();
       }
@@ -706,6 +705,11 @@ foam.CLASS({
 
   properties: [
     { class: 'String',  name: 'name' },
+    {
+      class: 'String',
+      name: 'label',
+      expression: function(name) { return foam.String.labelize(name); }
+    },
     { class: 'Boolean', name: 'abstract' }
   ]
 });
@@ -747,6 +751,12 @@ foam.CLASS({
       ]
     </pre>
     */
+    { class: 'String',  name: 'name', required: true },
+    {
+      class: 'String',
+      name: 'label',
+      expression: function(name) { return foam.String.labelize(name); }
+    },
     { class: 'String', name: 'shortName' }
   ]
 });

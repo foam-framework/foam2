@@ -239,6 +239,7 @@ var classes = [
   'foam.nanos.auth.ServiceProviderAwareSink',
   'foam.nanos.auth.ServiceProviderAwareSupport',
   'foam.nanos.auth.test.ServiceProviderAwareTest',
+  'foam.nanos.auth.test.ServiceProviderAuthorizerTest',
   'foam.nanos.auth.test.DummySp',
   'foam.nanos.auth.test.UserAndGroupPermissionTest',
   'foam.nanos.auth.twofactor.OTPKey',
@@ -267,6 +268,7 @@ var classes = [
   'foam.nanos.auth.Language',
   'foam.nanos.auth.Region',
   'foam.nanos.logger.LogMessage',
+  'foam.nanos.logger.LogMessageDAO',
   'foam.nanos.logger.LogLevelFilterLogger',
   'foam.nanos.logger.AbstractLogger',
   'foam.nanos.logger.DAOLogger',
@@ -276,6 +278,8 @@ var classes = [
   'foam.nanos.logger.RepeatLogMessageDAO',
   'foam.nanos.logger.ProxyLogger',
   'foam.nanos.logger.LoggingDAO',
+  'foam.nanos.logger.StdoutLoggerDAO',
+  'foam.nanos.menu.XRegistration',
   'foam.nanos.menu.Menu',
   'foam.nanos.menu.DAOMenu',
   'foam.nanos.menu.DAOMenu2',
@@ -327,8 +331,7 @@ var classes = [
   'foam.nanos.notification.EmailSetting',
   'foam.nanos.notification.NotificationSetting',
   'foam.nanos.script.Script',
-//  'foam.nanos.script.ScriptCompiler',
-//  'foam.nanos.script.JavaShellScriptCompiler',
+  'foam.nanos.script.TestRunnerConfig',
   'foam.nanos.script.TestRunnerScript',
   'foam.nanos.test.Test',
   'foam.nanos.cron.Cron',
@@ -458,6 +461,8 @@ var classes = [
   'foam.nanos.ruler.predicate.PropertyEQProperty',
   'foam.nanos.ruler.predicate.NewEqOld',
   'foam.nanos.ruler.predicate.IsInstancePredicate',
+  'foam.nanos.ruler.predicate.PropertyIsInstance',
+  'foam.nanos.ruler.predicate.PropertyIsClass',
   'foam.nanos.ruler.action.ChangePropertyAction',
   'foam.comics.SearchMode',
 
@@ -521,6 +526,9 @@ var classes = [
   'foam.nanos.crunch.RemoveJunctionsOnUserRemoval',
   //authservice
   'foam.nanos.auth.CapabilityAuthService',
+  // userQueryService
+  'foam.nanos.auth.UserQueryService',
+  'foam.nanos.auth.SimpleUserQueryService',
   //Unit
   'foam.core.Unit',
   'foam.core.Currency',
@@ -529,10 +537,22 @@ var classes = [
   'foam.strategy.StrategizerService',
   'foam.strategy.BasicStrategizer',
   'foam.strategy.ClientStrategizerService',
-  
+
   //concurrent
   'foam.util.concurrent.AbstractAssembly',
   'foam.util.concurrent.Assembly',
+
+  // approval
+  'foam.nanos.approval.ApprovalRequest',
+  'foam.nanos.approval.ApprovalStatus',
+  'foam.nanos.approval.Approvable',
+  'foam.nanos.approval.ApprovableAwareDAO',
+  'foam.nanos.approval.ApprovableAware',
+  'foam.nanos.approval.ApprovableApprovalRequestsPredicate',
+  'foam.nanos.approval.ApprovableApprovalRequestsRule',
+  'foam.nanos.approval.FulfilledApprovablePredicate',
+  'foam.nanos.approval.FulfilledApprovableRule',
+  'foam.nanos.approval.RoleApprovalRequest',
 ];
 
 var abstractClasses = [
@@ -555,7 +575,8 @@ var skeletons = [
   'foam.nanos.notification.push.PushService',
   'foam.nanos.session.SessionService',
   'foam.nanos.test.EchoService',
-  'foam.strategy.StrategizerService'
+  'foam.strategy.StrategizerService',
+  'foam.nanos.auth.UserQueryService',
 ];
 
 var proxies = [

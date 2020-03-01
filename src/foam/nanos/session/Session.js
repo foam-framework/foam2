@@ -16,13 +16,16 @@ foam.CLASS({
   javaImports: [
     'foam.core.X',
     'foam.dao.DAO',
+    'foam.nanos.app.AppConfig',
     'foam.nanos.auth.*',
     'foam.nanos.boot.NSpec',
     'foam.nanos.logger.Logger',
     'foam.nanos.logger.PrefixLogger',
     'foam.util.SafetyUtil',
     'java.util.Date',
-    'static foam.mlang.MLang.*'
+    'static foam.mlang.MLang.*',
+    'javax.servlet.http.HttpServletRequest',
+    'org.eclipse.jetty.server.Request'
   ],
 
   tableColumns: [
@@ -222,7 +225,33 @@ foam.CLASS({
         // used as the argument to this method.
         X rtn = reset(x);
 
-        if ( getUserId() == 0 ) return rtn;
+        if ( getUserId() == 0 ) {
+          HttpServletRequest req = x.get(HttpServletRequest.class);
+          if ( req == null ) {
+            // null during test runs
+            return rtn;
+          }
+          AppConfig appConfig = (AppConfig) x.get("appConfig");
+          appConfig = (AppConfig) appConfig.fclone();
+          String configUrl = ((Request) req).getRootURL().toString();
+
+          if ( appConfig.getForceHttps() ) {
+            if ( configUrl.startsWith("https://") ) {
+               // Don't need to do anything.
+            } else if ( configUrl.startsWith("http://") ) {
+              configUrl = "https" + configUrl.substring(4);
+            } else {
+              configUrl = "https://" + configUrl;
+            }
+          }
+          if ( configUrl.endsWith("/") ) {
+            configUrl = configUrl.substring(0, configUrl.length()-1);
+          }
+          appConfig.setUrl(configUrl);
+          rtn = rtn.put("appConfig", appConfig);
+
+          return rtn;
+        }
 
         // Validate
         validate(x);
@@ -244,7 +273,7 @@ foam.CLASS({
           .put(CachingAuthService.CACHE_KEY, getContext().get(CachingAuthService.CACHE_KEY));
 
         if ( user != null ) {
-         rtn = rtn.put("spid", user.getSpid());
+          rtn = rtn.put("spid", user.getSpid());
         }
 
         // We need to do this after the user and agent have been put since
@@ -253,9 +282,10 @@ foam.CLASS({
 
         if ( group != null ) {
           rtn = rtn
-          .put("group", group)
-          .put("appConfig", group.getAppConfig(rtn));
+            .put("group", group)
+            .put("appConfig", group.getAppConfig(rtn));
         }
+
         return rtn;
       `
     },
@@ -279,18 +309,6 @@ foam.CLASS({
 
         if ( getAgentId() > 0 ) {
           checkUserEnabled(x, getAgentId());
-
-          DAO agentJunctionDAO = (DAO) x.get("agentJunctionDAO");
-          UserUserJunction junction = (UserUserJunction) agentJunctionDAO.find(
-            AND(
-              EQ(UserUserJunction.SOURCE_ID, getAgentId()),
-              EQ(UserUserJunction.TARGET_ID, getUserId())
-            )
-          );
-
-          if ( junction == null ) {
-            throw new RuntimeException("The junction between user and agent was not found.");
-          }
         }
       `
     },

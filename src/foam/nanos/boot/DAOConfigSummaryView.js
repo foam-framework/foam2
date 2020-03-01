@@ -13,6 +13,22 @@
 
    classes: [
      {
+       name: 'DAOUpdateControllerView',
+       extends: 'foam.comics.DAOUpdateControllerView',
+
+       documentation: 'Same as regular UpdateController except it starts in EDIT mode',
+
+       properties: [
+         {
+           name: 'controllerMode',
+           factory: function() {
+             return this.ControllerMode.EDIT;
+           }
+         }
+       ]
+     },
+
+     {
         name: 'BackBorder',
         extends: 'foam.u2.Element',
 
@@ -131,6 +147,9 @@
 
        this.addClass(this.myClass());
 
+       var x = this.__subContext__.createSubContext();
+       x.register(this.DAOUpdateControllerView, 'foam.comics.DAOUpdateControllerView');
+
        this.memento$.sub(function() {
          self.stack.push({
            class: self.BackBorder,
@@ -140,7 +159,7 @@
              data: self.__context__[self.memento],
              stack: self.stack
            }
-         }, this);
+         }, x);
        });
 
        this.filteredDAO.select().then(function(specs) {

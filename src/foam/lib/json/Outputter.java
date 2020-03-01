@@ -111,6 +111,12 @@ public class Outputter
   }
 
   public String escape(String s) {
+    // I tested with a ThreadLocal StringBuilder, but
+    // not faster in Java 11. KGR
+    StringBuilder sb = new StringBuilder();
+    foam.lib.json.Util.escape(s, sb);
+    return sb.toString();
+    /*
     s = s.replace("\\", "\\\\")
             .replace("\"", "\\\"")
             .replace("\t", "\\t")
@@ -118,6 +124,7 @@ public class Outputter
             .replace("\n","\\n");
     s = escapeControlCharacters(s);
     return s;
+    */
   }
 
   public String escapeMultiline(String s) {

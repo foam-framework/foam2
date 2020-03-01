@@ -234,7 +234,7 @@ foam.CLASS({
 
           return self.E()
             .start(self.Rows)
-              .callIf(prop$label, function() {
+              .callIf(prop$label && prop.view.class != 'foam.u2.CheckBox', function() {
                 this.start('m3')
                   .add(prop$label)
                   .style({ 'line-height': '2' })
