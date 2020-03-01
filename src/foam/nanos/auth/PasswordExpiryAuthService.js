@@ -44,13 +44,15 @@ foam.CLASS({
         `User user = (User) ((DAO) getLocalUserDAO())
           .inX(x)
           .find(
-            AND(
-              OR(
-                EQ(User.EMAIL, identifier.toLowerCase()),
-                EQ(User.USER_NAME, identifier)
-              ),
-              CLASS_OF(User.class)
-            )
+            EQ(User.EMAIL, identifier.toLowerCase())
+            // future - when UserName support complete.
+            // AND(
+            //   OR(
+            //     EQ(User.EMAIL, identifier.toLowerCase()),
+            //     EQ(User.USER_NAME, identifier)
+            //   ),
+            //   CLASS_OF(User.class)
+            // )
           );
 
         if ( isPasswordExpired(user) ) {

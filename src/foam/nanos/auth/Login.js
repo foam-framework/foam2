@@ -13,7 +13,7 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'id',
+      name: 'identifier',
       displayWidth: 30,
       width: 100
     },
