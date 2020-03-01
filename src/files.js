@@ -268,6 +268,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/ServiceProviderAware" },
   { name: "foam/nanos/auth/ServiceProviderAwareSink" },
   { name: "foam/nanos/auth/test/ServiceProviderAwareTest" },
+  { name: "foam/nanos/auth/test/ServiceProviderAuthorizerTest" },
   { name: "foam/nanos/logger/Logger" },
   { name: "foam/nanos/logger/DAOLogger" },
   { name: "foam/nanos/logger/LoggingDAO" },
@@ -648,8 +649,6 @@ FOAM_FILES([
   { name: "foam/test/TestEnum" },
   { name: "foam/test/TestObj" },
   { name: "foam/core/FObjectTest" },
-  { name: "com/google/foam/demos/bubbles/Bubbles" },
-  { name: "com/google/foam/demos/u2/AllViews" },
 
   { name: "foam/flow/Document" },
   { name: "foam/flow/MarkupEditor" },

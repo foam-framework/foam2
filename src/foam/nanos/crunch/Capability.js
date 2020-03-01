@@ -81,6 +81,14 @@ foam.CLASS({
       }
     },
     {
+      name: 'price',
+      class: 'Long'
+    },
+    {
+      name: 'keywords',
+      class: 'StringArray'
+    },
+    {
       name: 'version',
       class: 'String'
     },
