@@ -211,6 +211,13 @@ foam.CLASS({
       section: 'business'
     },
     {
+      class: 'String',
+      name: 'userName',
+      label: 'Username',
+      documentation: 'The username of the User.',
+      section: 'personal'
+    },
+    {
       class: 'EMail',
       name: 'email',
       label: 'Email Address',
@@ -438,7 +445,7 @@ foam.CLASS({
       documentation: 'The name of the business associated with the User.',
       width: 50,
       section: 'business',
-      hidden: true
+      visibility: 'HIDDEN'
     },
     {
       class: 'StringArray',

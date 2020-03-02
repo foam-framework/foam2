@@ -309,18 +309,6 @@ foam.CLASS({
 
         if ( getAgentId() > 0 ) {
           checkUserEnabled(x, getAgentId());
-
-          DAO agentJunctionDAO = (DAO) x.get("agentJunctionDAO");
-          UserUserJunction junction = (UserUserJunction) agentJunctionDAO.find(
-            AND(
-              EQ(UserUserJunction.SOURCE_ID, getAgentId()),
-              EQ(UserUserJunction.TARGET_ID, getUserId())
-            )
-          );
-
-          if ( junction == null ) {
-            throw new RuntimeException("The junction between user and agent was not found.");
-          }
         }
       `
     },

@@ -213,7 +213,7 @@ foam.CLASS({
         data: obj,
         config: this.config,
         of: this.config.of
-      });
+      }, this.__subContext__);
     },
     function initE() {
       var self = this;
