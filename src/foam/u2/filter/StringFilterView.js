@@ -184,14 +184,8 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.dao.limit(100).select(this.GroupBy.create({
-        arg1: this.property,
-        arg2: this.Count.create()
-      })).then((results) => {
-        this.daoContents = results.groupKeys;
-        this.isLoading = false;
-      });
-
+      this.onDetach(this.dao$.sub(this.daoUpdate));
+      this.daoUpdate();
       var self = this;
       this
         .addClass(this.myClass())
@@ -273,6 +267,18 @@ foam.CLASS({
   ],
 
   listeners: [
+    {
+      name: 'daoUpdate',
+      code: function() {
+        this.dao.limit(100).select(this.GroupBy.create({
+          arg1: this.property,
+          arg2: this.Count.create()
+        })).then((results) => {
+          this.daoContents = results.groupKeys;
+          this.isLoading = false;
+        });
+      }
+    },
     {
       name: 'selectOption',
       code: function(index) {
