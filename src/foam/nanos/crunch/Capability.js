@@ -58,7 +58,7 @@ foam.CLASS({
       name: 'id',
       class: 'String',
       updateVisibility: 'RO'
-    }, 
+    },
     {
       name: 'icon',
       class: 'Image',
@@ -76,7 +76,7 @@ foam.CLASS({
       class: 'String',
       view: {
         class: 'foam.u2.tag.TextArea',
-        rows: 12, 
+        rows: 12,
         cols: 120
       }
     },
@@ -167,8 +167,8 @@ foam.CLASS({
       name: 'stringImplies',
       type: 'Boolean',
       args: [
-        {name: 's1', type: 'String'},
-        {name: 's2', type: 'String'}
+        { name: 's1', type: 'String' },
+        { name: 's2', type: 'String' }
       ],
       documentation: `check if s1 implies s2 where s1 and s2 are permission or capability strings`,
       javaCode: `
@@ -183,7 +183,7 @@ foam.CLASS({
       name: 'isDeprecated',
       type: 'Boolean',
       args: [
-        {name: 'x', type: 'Context'}
+        { name: 'x', type: 'Context' }
       ],
       documentation: 'check if a given capability is deprecated',
       javaCode: `
@@ -220,7 +220,7 @@ foam.CLASS({
 });
 
 foam.RELATIONSHIP({
-  sourceModel: 'foam.nanos.crunch.Capability',  
+  sourceModel: 'foam.nanos.crunch.Capability',
   targetModel: 'foam.nanos.crunch.Capability',
   cardinality: '*:*',
   forwardName: 'deprecated',
@@ -235,7 +235,7 @@ foam.RELATIONSHIP({
 });
 
 foam.RELATIONSHIP({
-  sourceModel: 'foam.nanos.crunch.Capability',  
+  sourceModel: 'foam.nanos.crunch.Capability',
   targetModel: 'foam.nanos.crunch.Capability',
   cardinality: '*:*',
   forwardName: 'prerequisites',
