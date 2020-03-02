@@ -61,7 +61,7 @@ foam.CLASS({
         try {
           DAO capabilityDAO = (DAO) x.get("capabilityDAO");
 
-          Capability cap = (Capability) capabilityDAO.find(permission);
+          Capability cap = (Capability) capabilityDAO.find(EQ(foam.nanos.crunch.Capability.NAME, permission));
 
           Predicate capabilityScope = AND(
             EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
@@ -73,12 +73,14 @@ foam.CLASS({
 
           DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
 
-          if ( userCapabilityJunctionDAO.find(
-            AND(
-              capabilityScope,
-              EQ(UserCapabilityJunction.TARGET_ID, permission),
-              EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
-            )) != null ) return true;
+          if ( cap != null && 
+               userCapabilityJunctionDAO.find(
+                AND(
+                  capabilityScope,
+                  EQ(UserCapabilityJunction.TARGET_ID, cap.getId()),
+                  EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
+             )) != null ) 
+            return true;
 
           List<UserCapabilityJunction> userCapabilityJunctions = ((ArraySink) user.getCapabilities(x).getJunctionDAO()
             .where(capabilityScope)
