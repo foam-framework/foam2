@@ -22,12 +22,9 @@ foam.CLASS({
 
   css: `
     ^ {
-      margin: 8px 0;
-      margin-left: 32px;
-    }
-
-    ^:first-child {
-      margin-left: 0;
+      margin: 8px;
+      margin-bottom: 0;
+      flex: 1 1 250px;
     }
 
     ^container-property {
@@ -53,6 +50,8 @@ foam.CLASS({
       font-size: 14px;
       line-height: 1.43;
       color: #5e6061;
+      flex: 1;
+      overflow: hidden;
     }
 
     ^overlay-dismiss {
