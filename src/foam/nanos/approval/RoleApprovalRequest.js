@@ -236,14 +236,14 @@
     {
       name: 'approve',
       section: 'requestDetails',
-      isAvailable: (initiatingUser, user, status) => {
+      isAvailable: (isTrackingRequest, status) => {
         if (
           status === foam.nanos.approval.ApprovalStatus.REJECTED ||
           status === foam.nanos.approval.ApprovalStatus.APPROVED
         ) {
           return false;
         }
-        return initiatingUser !== user.id;
+        return ! isTrackingRequest;
       },
       code: function() {
         var approvedApprovalRequest = this.clone();
@@ -271,14 +271,14 @@
     {
       name: 'reject',
       section: 'requestDetails',
-      isAvailable: (initiatingUser, user, status) => {
+      isAvailable: (isTrackingRequest, status) => {
         if (
-            status === foam.nanos.approval.ApprovalStatus.REJECTED ||
-            status === foam.nanos.approval.ApprovalStatus.APPROVED
-          ) {
-         return false;
+          status === foam.nanos.approval.ApprovalStatus.REJECTED ||
+          status === foam.nanos.approval.ApprovalStatus.APPROVED
+        ) {
+          return false;
         }
-        return initiatingUser !== user.id;
+        return ! isTrackingRequest;
       },
       code: function() {
         var rejectedApprovalRequest = this.clone();

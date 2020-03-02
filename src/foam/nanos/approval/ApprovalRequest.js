@@ -246,7 +246,7 @@
           foam.u2.DisplayMode.RO :
           foam.u2.DisplayMode.HIDDEN;
       }
-   },
+    },
     {
       class: 'String',
       name: 'token',
@@ -360,8 +360,13 @@
             console.warn(err.message || err);
           });
         return '';
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'isTrackingRequest',
+      value: false
     }
-  }
   ],
 
   methods: [
@@ -393,6 +398,15 @@ if ( obj == null ) {
       name: 'approve',
       label: 'Approve',
       section: 'requestDetails',
+      isAvailable: (isTrackingRequest, status) => {
+        if (
+          status === foam.nanos.approval.ApprovalStatus.REJECTED ||
+          status === foam.nanos.approval.ApprovalStatus.APPROVED
+        ) {
+          return false;
+        }
+        return ! isTrackingRequest;
+      },
       code: function() {
         this.status = this.ApprovalStatus.APPROVED;
         this.approvalRequestDAO.put(this);
@@ -404,6 +418,15 @@ if ( obj == null ) {
       name: 'reject',
       label: 'Reject',
       section: 'requestDetails',
+      isAvailable: (isTrackingRequest, status) => {
+        if (
+          status === foam.nanos.approval.ApprovalStatus.REJECTED ||
+          status === foam.nanos.approval.ApprovalStatus.APPROVED
+        ) {
+          return false;
+        }
+        return ! isTrackingRequest;
+      },
       code: function() {
         this.status = this.ApprovalStatus.REJECTED;
         this.approvalRequestDAO.put(this);

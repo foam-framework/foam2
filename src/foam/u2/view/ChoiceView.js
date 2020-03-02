@@ -207,13 +207,13 @@ foam.CLASS({
         if ( mode !== foam.u2.DisplayMode.RO ) {
           return self.E()
             .start(self.selectSpec, {
-              data$: self.index$,
-              label$: self.label$,
+              data$:            self.index$,
+              label$:           self.label$,
               alwaysFloatLabel: self.alwaysFloatLabel,
-              choices$: self.choices$,
-              placeholder$: self.placeholder$,
-              mode$: self.mode$,
-              size$: self.size$
+              choices$:         self.choices$,
+              placeholder$:     self.placeholder$,
+              mode$:            self.mode$,
+              size$:            self.size$
             })
               .attrs({ name: self.name })
               .enableClass('selection-made', self.index$.map((index) => index !== -1))

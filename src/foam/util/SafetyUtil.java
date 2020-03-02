@@ -7,6 +7,7 @@
 package foam.util;
 
 import java.util.regex.Pattern;
+import foam.core.FObject;
 
 /** Convenience methods for performing standard operations with null checks. **/
 public class SafetyUtil {
@@ -25,7 +26,7 @@ public class SafetyUtil {
   }
 
   public static int compare(Object o1, Object o2) {
-    if ( o1 == null && o2 == null ) return 0;
+    if ( o1 == o2   ) return  0;
     if ( o2 == null ) return  1;
     if ( o1 == null ) return -1;
 
@@ -57,6 +58,46 @@ public class SafetyUtil {
     if ( ! (o1 instanceof Comparable) ) return -1;
 
     return ((Comparable) o1).compareTo(o2);
+  }
+
+  public static int compare(FObject o1, FObject o2) {
+    if ( o1 == o2   ) return  0;
+    if ( o2 == null ) return  1;
+    if ( o1 == null ) return -1;
+
+    return o1.compareTo(o2);
+  }
+
+  public static int compare(boolean o1, boolean o2) {
+    return o1 == o2 ? 0 : o1 ? 1 : 0;
+  }
+
+  public static int compare(String o1, String o2) {
+    if ( o1 == null && o2 == null ) return 0;
+    if ( o1 == null ) return -1;
+    if ( o2 == null ) return  1;
+
+    return o1.compareTo(o2);
+  }
+
+  public static int compare(short o1, short o2) {
+    return o1 == o2 ? 0 : o1 < o2 ? -1 : 1;
+  }
+
+  public static int compare(int o1, int o2) {
+    return o1 == o2 ? 0 : o1 < o2 ? -1 : 1;
+  }
+
+  public static int compare(long o1, long o2) {
+    return o1 == o2 ? 0 : o1 < o2 ? -1 : 1;
+  }
+
+  public static int compare(float o1, float o2) {
+    return o1 == o2 ? 0 : o1 < o2 ? -1 : 1;
+  }
+
+  public static int compare(double o1, double o2) {
+    return o1 == o2 ? 0 : o1 < o2 ? -1 : 1;
   }
 
   public static Object deepClone(Object o) {
