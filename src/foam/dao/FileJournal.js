@@ -42,7 +42,9 @@ foam.CLASS({
         int successReading = 0;
         JSONParser parser = getParser();
 
-        PM pm = PM.create(x, ((foam.dao.AbstractDAO)dao).getOf(), "replay."+getFilename());
+        // NOTE: explicitly calling PM constructor as create only creates
+        // a percentage of PMs, but we want all replay statistics
+        PM pm = new PM(((foam.dao.AbstractDAO)dao).getOf(), "replay."+getFilename());
 
         try ( BufferedReader reader = getReader() ) {
           if ( reader == null ) {
@@ -82,8 +84,6 @@ foam.CLASS({
         } catch ( Throwable t) {
           getLogger().error("Failed to read from journal", t);
         } finally {
-          // NOTE: PM logging is not setup yet for most of replay so these logs are lost. So explicitly set endtime and log with normal logging.
-          pm.setEndTime(new java.util.Date());
           pm.log(x);
           getLogger().log("Successfully read " + successReading + " entries from file: " + getFilename() +" in: "+pm.getTime()+"(ms)");
         }
