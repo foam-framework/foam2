@@ -9,10 +9,10 @@ foam.CLASS({
   name: 'ScrollSectionWizardView',
   extends: 'foam.u2.detail.MultipleModelSectionedDetailView',
 
-  documentation: `Takes in a list of class paths in "ofList" representing the MultipleModels
-  and creates a section list in "sections" for editing properties.`,
+  documentation: `Simply displays "sections" consecutively.`,
 
   css: `
+  // TODO
   `,
 
   properties: [
@@ -42,20 +42,39 @@ foam.CLASS({
       this.SUPER();
       this.addClass(this.myClass());
       this.start()
-        .add(this.slot((sections) => {
-         return this.E().forEach(sections, (dataEntry) => {
-          let y = dataEntry.data;
-          let u = dataEntry.sections;
-          u.fmap((section) => {
-            return this.tag(this.sectionView, {
-              section: section,
-              data: y
-            });
-          });
-          return v;
-        });
-      }))
-      .end();
+        .add(this.slot(
+          (sectionsList) => {
+            return this.E().forEach(sectionsList,
+              (dataEntry) => (dataEntry.sections).map(
+                (section) =>
+                  this.tag(this.sectionView, {
+                    section: section,
+                    data: dataEntry.data
+                  })
+              )
+            );
+          }
+        ))
+      .end()
+      .startContext({ data: this })
+        .tag(this.SUBMIT, { size: 'LARGE' })
+        .tag(this.SAVE, { size: 'LARGE' })
+      .endContext();
+    }
+  ],
+
+  actions: [
+    {
+      name: 'submit',
+      code: function(x) {
+        console.log('submit');
+      }
+    },
+    {
+      name: 'save',
+      code: function(x) {
+        console.log('saving');
+      }
     }
   ]
 });
