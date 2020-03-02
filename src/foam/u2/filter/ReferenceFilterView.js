@@ -223,10 +223,8 @@ foam.CLASS({
         return;
       }
       this.onDetach(this.setOfReferenceIds$.sub(this.updateReferenceObjectsArray));
-      this.dao.select(this.GROUP_BY(this.property, this.COUNT())).then(function(result) {
-        self.daoContents = result.groupKeys; //  gets contents from the source dao
-        self.isLoading = false;
-      });
+      this.onDetach(this.dao$.sub(this.daoUpdate));
+      this.daoUpdate();
       this
         .addClass(this.myClass())
           .start().addClass(this.myClass('container-search'))
@@ -305,6 +303,16 @@ foam.CLASS({
     }
   ],
   listeners: [
+    {
+      name: 'daoUpdate',
+      code: function() {
+        this.isLoading = true;
+        this.dao.select(this.GROUP_BY(this.property, this.COUNT())).then(function(result) {
+          self.daoContents = result.groupKeys; //  gets contents from the source dao
+          self.isLoading = false;
+        });
+      }
+    },
     {
       name: 'selectOption',
       code: function(index) {
