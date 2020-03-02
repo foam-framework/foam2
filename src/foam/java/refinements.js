@@ -603,7 +603,7 @@ foam.LIB({
             type: 'int',
             body: 
               ['int hash = 1'].concat(props.map(function(f) {
-                return 'hash += hash * 31 + java.util.Objects.hash('+foam.String.constantize(f.name)+'.get(this))';
+                return 'hash += hash * 31 + foam.util.SafetyUtil.hash('+f.name+ '_' +')';
               })).join(';\n') + ';\n'
               +'return hash;\n'
           });
