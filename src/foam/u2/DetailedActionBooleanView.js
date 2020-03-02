@@ -23,16 +23,22 @@ foam.CLASS({
     ^ {
       display: flex;
       align-items: center;
-      justify-content: space-between;
     }
     ^ .foam-u2-DetailedActionBooleanView-text{
       width: 50%;
       white-space: pre-wrap;
     }
+    ^show-action {
+      justify-content: space-between;
+    }
+    ^ input {
+      margin-right: 15px;
+    }
   `,
 
   properties: [
     ['showAction', true],
+    ['autoSave', true],
     'trueLabel',
     'falseLabel',
     'trueActionLabel',
@@ -62,7 +68,14 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.start().addClass(this.myClass())
+      this.start().addClass(this.myClass()).enableClass(this.myClass('show-action'), this.showAction$)
+        .start('input').hide(this.showAction$).setAttribute('type', 'checkbox')
+          .attrs({ 'checked': this.data$, 'disabled': this.mode !== foam.u2.DisplayMode.RW })
+          .on('click', (e) => {
+            if ( this.mode === foam.u2.DisplayMode.RO ) return e.preventDefault();
+            this.data = ! this.data;
+          })
+        .end()
         .start().addClass(this.myClass('text'))
           .add(this.dynamicLabel$)
         .end()
@@ -74,12 +87,6 @@ foam.CLASS({
             })
           .end()
         .endContext()
-        .start('input').hide(this.showAction$).setAttribute('type', 'checkbox')
-            .on('click', (e) => {
-              if ( this.mode === foam.u2.DisplayMode.RO ) return e.preventDefault();
-              this.data = ! this.data;
-            })
-        .end()
       .end();
     },
     function fromProperty(property) {
@@ -97,6 +104,7 @@ foam.CLASS({
       code: async function(X) {
         var dao = X[this.targetDAOKey];
         this.data = ! this.data;
+        if ( ! this.autoSave ) return;
         try {
           dao.put(this.__context__.data);
         } catch (e) {
