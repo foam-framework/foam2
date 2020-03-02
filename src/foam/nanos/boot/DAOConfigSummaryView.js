@@ -84,28 +84,30 @@ foam.CLASS({
 
   css: `
     ^ {
-     padding: 6px;
+      padding: 6px;
     }
     ^dao, ^header {
-     display: inline-block;
-     font-size: smaller;
-     margin: 2px;
-     padding: 2px;
-     width: 220px;
+      display: inline-block;
+      font-size: smaller;
+      margin: 2px;
+      padding: 2px;
+      width: 220px;
     }
     ^dao {
-     color: #555;
+      color: #555;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     ^dao:hover {
-     background: lightgray;
+      background: lightgray;
     }
     ^section {
-     display: inline-grid;
+      display: inline-grid;
     }
     ^header {
-     background: /*%BLACK%*/ #1e1f21;
-     color: white;
-     font-weight: 800;
+      background: /*%BLACK%*/ #1e1f21;
+      color: white;
+      font-weight: 800;
     }
   `,
 
@@ -194,7 +196,7 @@ foam.CLASS({
           var l     = label.charAt(0);
 
           if ( l != currentLetter ) {
-            var lSection;
+            let lSection;
             let showSection = foam.core.SimpleSlot.create({value: true});
             i = updateSections.length;
 
@@ -206,7 +208,7 @@ foam.CLASS({
               for ( var j = 1 ; j < lSection.childNodes.length ; j++ ) {
                 if ( lSection.childNodes[j].shown ) {
                   showSection.set(true);
-                  break;
+                  return;
                 }
               }
               showSection.set(false);
@@ -215,14 +217,14 @@ foam.CLASS({
             currentLetter = l;
 
             section = self.start('span')
-             .show(showSection)
-             .addClass(self.myClass('section'))
-             .start('span')
-               .addClass(self.myClass('header'))
-               .add(l)
-             .end();
+              .show(showSection)
+              .addClass(self.myClass('section'))
+              .start('span')
+                .addClass(self.myClass('header'))
+                .add(l)
+              .end();
 
-             lSection = Object.assign({}, section);
+            lSection = section;
           }
 
           var localI    = i.valueOf();
