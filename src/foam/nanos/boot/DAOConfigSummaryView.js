@@ -142,7 +142,7 @@
          class: 'foam.u2.TextField',
          type: 'search',
          onKey: true
-       },
+       }
      }
    ],
 
@@ -204,7 +204,7 @@
              updateSections[i].sub(function() {
                var doNeedToShow = false;
                //first child is a header
-               for (var j = 1 ; j < lSection.instance_.childNodes.length ; j++) {
+               for ( var j = 1 ; j < lSection.instance_.childNodes.length ; j++ ) {
                 if ( lSection.instance_.childNodes[j].shown ) {
                   doNeedToShow = true;
                   break;
@@ -225,9 +225,9 @@
               lSection = Object.assign({}, section);
            }
 
-           var localI = i.valueOf();
-
+           var localI    = i.valueOf();
            var localShow = foam.core.SimpleSlot.create({value: true});
+
            section
             .start('span')
               .show(localShow)
@@ -240,11 +240,11 @@
 
               self.search$.sub(function() {
                 var contains = false;
-                if ( ! self.search )
+                if ( ! self.search ) {
                   contains = true;
-                else if ( label.toLowerCase().includes(self.search.toLowerCase()) )
+                } else if ( label.toLowerCase().includes(self.search.toLowerCase()) ) {
                   contains =  true;
-                else if ( ! contains && spec.keywords && spec.keywords.length > 0 ) {
+                } else if ( ! contains && spec.keywords && spec.keywords.length > 0 ) {
                   for ( var k in spec.keywords ) {
                     if ( k.toLowerCase().includes(self.search.toLowerCase()) ) {
                       contains  = true;
