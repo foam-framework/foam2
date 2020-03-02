@@ -63,7 +63,6 @@ foam.CLASS({
     },
 
     function fromSectionAxiom(a, cls) {
-      if ( ! a ) return this;
       this.copyFrom(a);
       this.copyFrom({
         createIsAvailableFor: a.createIsAvailableFor.bind(a),

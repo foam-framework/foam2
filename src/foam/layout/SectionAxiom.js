@@ -52,7 +52,7 @@ foam.CLASS({
         code: this.isAvailable
       });
       if ( this.permissionRequired ) {
-        var permSlot = foam.core.SimpleSlot.create({ value: false });
+        var permSlot = foam.core.SimpleSlot.create({value: false});
         var update = function() {
           var data = data$.get();
           if ( data && data.__subContext__.auth ) {
@@ -64,7 +64,7 @@ foam.CLASS({
         };
         update();
         data$.sub(update);
-        slot = foam.core.ArraySlot.create({ slots: [slot, permSlot] }).map(arr => {
+        slot = foam.core.ArraySlot.create({slots: [slot, permSlot]}).map(arr => {
           return arr.every(b => b);
         });
       }
