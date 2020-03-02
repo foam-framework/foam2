@@ -134,6 +134,15 @@
              this.EQ(foam.nanos.boot.NSpec.SERVE,     true)
            ));
        }
+     },
+     {
+       class: 'String',
+       name: 'search',
+       view: {
+         class: 'foam.u2.TextField',
+         type: 'search',
+         onKey: true
+       },
      }
    ],
 
@@ -145,7 +154,21 @@
        var currentLetter = '';
        var section;
 
-       this.addClass(this.myClass());
+       this.addClass(this.myClass()).
+        start().
+          style({ 'height': '56px', 'padding-left': '16px', 'padding-top': '8px'}).
+          start().
+            style({ 'font-size': '26px', 'width': 'fit-content', 'float': 'left', 'padding-top': '10px' }).
+            add('Data Management').
+          end()
+          .start()
+            .style({ 'width': 'fit-content', 'float': 'right', 'margin-right': '4%' })
+              .add(this.SEARCH)
+              .addClass('foam-u2-search-TextSearchView')
+              .addClass(this.myClass('foam-u2-search-TextSearchView'))
+            .end()
+          .end()
+        .end();
 
        var x = this.__subContext__.createSubContext();
        x.register(this.DAOUpdateControllerView, 'foam.comics.DAOUpdateControllerView');
@@ -162,28 +185,77 @@
          }, x);
        });
 
+       var updateSections = [];
+       var i = 0;
+
        this.filteredDAO.select().then(function(specs) {
          specs.array.sort(function(o1, o2) { return foam.String.compare(o1.id.toUpperCase(), o2.id.toUpperCase())}).forEach(function(spec) {
            var label = foam.String.capitalize(spec.id.substring(0, spec.id.length-3));
            var l     = label.charAt(0);
 
            if ( l != currentLetter ) {
+            var lSection;
+             var showSection = foam.core.SimpleSlot.create({value: true});
+             i = updateSections.length;
+
+             var updateSlot = foam.core.SimpleSlot.create({value: false});
+             updateSections.push(updateSlot);
+
+             updateSections[i].sub(function() {
+               var doNeedToShow = false;
+               //first child is a header
+               for (var j = 1 ; j < lSection.instance_.childNodes.length ; j++) {
+                if ( lSection.instance_.childNodes[j].shown ) {
+                  doNeedToShow = true;
+                  break;
+                }
+               }
+                showSection.set(doNeedToShow);
+             });
              currentLetter = l;
+
              section = self.start('span')
-               .addClass(self.myClass('section'))
-               .start('span')
-                 .addClass(self.myClass('header'))
-                 .add(l)
-               .end();
+              .show(showSection)
+              .addClass(self.myClass('section'))
+              .start('span')
+                .addClass(self.myClass('header'))
+                .add(l)
+              .end();
+
+              lSection = Object.assign({}, section);
            }
 
-           section.start('span')
-             .addClass(self.myClass('dao'))
-             .add(label)
-             .attrs({title: spec.description})
-             .on('click', function() {
-               self.memento = spec.id;
-             });
+           var localI = i.valueOf();
+
+           var localShow = foam.core.SimpleSlot.create({value: true});
+           section
+            .start('span')
+              .show(localShow)
+              .addClass(self.myClass('dao'))
+              .add(label)
+              .attrs({title: spec.description})
+              .on('click', function() {
+                self.memento = spec.id;
+              });
+
+              self.search$.sub(function() {
+                var contains = false;
+                if ( ! self.search )
+                  contains = true;
+                else if ( label.toLowerCase().includes(self.search.toLowerCase()) )
+                  contains =  true;
+                else if ( ! contains && spec.keywords && spec.keywords.length > 0 ) {
+                  for ( var k in spec.keywords ) {
+                    if ( k.toLowerCase().includes(self.search.toLowerCase()) ) {
+                      contains  = true;
+                      break;
+                    }
+                  }
+                }
+
+                localShow.set(contains);
+                updateSections[localI].set(! updateSections[localI].get());
+              });
          });
        });
      }
