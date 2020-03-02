@@ -107,8 +107,12 @@ foam.CLASS({
   actions: [
     {
       name: 'edit',
-      isAvailable: function(config$editEnabled) {
-        return config$editEnabled;
+      isAvailable: function(config) {
+        try {
+          return config.editPredicate.f();
+        } catch(e) {
+          return false;
+        }
       },
       code: function() {
         if ( ! this.stack ) return;
@@ -117,13 +121,17 @@ foam.CLASS({
           data: this.data,
           config: this.config,
           of: this.config.of
-        });
+        }, this.__subContext__);
       }
     },
     {
       name: 'delete',
-      isAvailable: function(config$deleteEnabled) {
-        return config$deleteEnabled;
+      isAvailable: function(config) {
+        try {
+          return config.deletePredicate.f();
+        } catch(e) {
+          return false;
+        }
       },
       code: function() {
         this.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
@@ -146,7 +154,9 @@ foam.CLASS({
 
       // Get a fresh copy of the data, especially when we've been returned
       // to this view from the edit view on the stack.
-      this.config.dao.find(this.data).then(function(d) { self.data = d; });
+      this.config.dao.find(this.data).then(function(d) { 
+        if ( d ) self.data = d; 
+      });
 
       this
         .addClass(this.myClass())

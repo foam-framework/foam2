@@ -238,7 +238,7 @@ foam.CLASS({
       this.stack.push({
         class: this.createControllerView.class,
         detailView: this.data.detailView
-      }, this);
+      }, this.__subContext__);
     },
 
     function onEdit(s, edit, id) {
@@ -247,7 +247,7 @@ foam.CLASS({
         detailView: this.data.detailView,
         editEnabled: this.data.editEnabled,
         key: id
-      }, this);
+      }, this.__subContext__);
     },
 
     function onFinished() {

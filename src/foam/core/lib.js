@@ -21,6 +21,7 @@
 foam = {
   isServer: typeof window === 'undefined',
   core:     {},
+  language: typeof navigator === 'undefined' ? 'en' : navigator.language,
   next$UID: (function() {
     /* Return a unique id. */
     var id = 1;
@@ -52,6 +53,7 @@ foam = {
 
 /** Setup nodejs-like 'global' on web */
 if ( ! foam.isServer ) global = window;
+
 
 Object.defineProperty(
   Object.prototype,

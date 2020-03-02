@@ -1,18 +1,7 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2016 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
@@ -43,7 +32,6 @@ foam.CLASS({
     }
 
     ^:hover > ^heading {
-      xxxborder-radius: 2px;
       background-color: #e7eaec;
       color: #406dea;
     }
@@ -64,14 +52,8 @@ foam.CLASS({
     ^select-level {
       padding: 8px;
     }
-    ^selected > ^label {
-      xxxborder-radius: 2px;
-      xxxbackground-color: rgba(0, 48, 249, 0.1);
-      xxxcolor: #0098db;
-    }
 
     ^selected > ^heading {
-      xxxborder-radius: 2px;
       background-color: #e5f1fc !important;
       color: #406dea;
       border-left: 4px solid /*%PRIMARY3%*/ #406dea;
@@ -147,23 +129,19 @@ foam.CLASS({
           self.updateThisRoot = false;
         });
       }
-      
+
       if ( self.showRootOnSearch )
         self.showRootOnSearch.set(self.showRootOnSearch.get() || self.doesThisIncludeSearch);
 
       this.data[self.relationship.forwardName].select().then(function(val){
-        if ( val.array.length > 0 )
-          self.hasChildren = true;
-        else
-          self.hasChildren = false;
-        self.subMenus = val.array;
+        self.hasChildren = val.array.length > 0;
+        self.subMenus    = val.array;
       });
 
       this.
         addClass(this.myClass()).
         show(this.slot(function(hasChildren, showThisRootOnSearch, updateThisRoot) {
-          if ( ! self.query )
-            return true;
+          if ( ! self.query ) return true;
           var isThisItemRelatedToSearch = false;
           if ( ! updateThisRoot ) {
             self.doesThisIncludeSearch = self.query.get() ? self.data.label.toLowerCase().includes(self.query.get().toLowerCase()) : true;
@@ -223,14 +201,14 @@ foam.CLASS({
               start('span').
               show(this.hasChildren$).
               style({
-                'margin-right': '36px',
+                'margin-right':   '36px',
                 'vertical-align': 'middle',
-                'font-weight': 'bold',
-                'display': 'inline-block',
-                'visibility': 'visible',
-                'font-size': '16px',
-                'float': 'right',
-                'transform': this.expanded$.map(function(c) { return c ? 'rotate(180deg)' : 'rotate(90deg)'; })
+                'font-weight':    'bold',
+                'display':        'inline-block',
+                'visibility':     'visible',
+                'font-size':      '16px',
+                'float':          'right',
+                'transform':      this.expanded$.map(function(c) { return c ? 'rotate(180deg)' : 'rotate(90deg)'; })
               }).
               on('click', this.toggleExpanded).
               add('\u2303').
@@ -243,14 +221,14 @@ foam.CLASS({
           add(this.slot(function(subMenus) {
             return this.E().forEach(subMenus/*.dao*/, function(obj) {
               this.add(self.cls_.create({
-                data: obj,
-                formatter: self.formatter,
-                relationship: self.relationship,
-                expanded: self.startExpanded,
+                data:             obj,
+                formatter:        self.formatter,
+                relationship:     self.relationship,
+                expanded:         self.startExpanded,
                 showRootOnSearch: self.showThisRootOnSearch$,
-                query: controlledSearchSlot,
-                onClickAddOn: self.onClickAddOn,
-                level: self.level + 1
+                query:            controlledSearchSlot,
+                onClickAddOn:     self.onClickAddOn,
+                level:            self.level + 1
               }, self));
             });
           })).
@@ -381,7 +359,6 @@ foam.CLASS({
 
       var M   = this.ExpressionsSingleton.create();
       var of  = this.__context__.lookup(this.relationship.sourceModel);
-
       var dao = this.data$proxy.where(
         M.NOT(M.HAS(of.getAxiomByName(this.relationship.inverseName))));
 

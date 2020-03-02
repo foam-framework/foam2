@@ -597,6 +597,24 @@ foam.LIB({
           body: 'setX(x);'
         });
 
+        if ( cls.name != 'AbstractFObject' &&
+             ! this.hasOwnAxiom('compareTo') ) {
+          cls.method({
+            visibility: 'public',
+            name: 'compareTo',
+            type: 'int',
+            args:[{ name: 'o', type: 'Object' }],
+            body: [cls.name+' o2 = ('+ cls.name + ') o;\n'
+              +'if ( o2 == null ) return 1;'
+              +'if ( o2 == this ) return 0;'
+              +'int cmp;\n'].concat(props.map(function(f) {
+                return 'cmp = foam.util.SafetyUtil.compare(get'+foam.String.capitalize(f.name)+'(), o2.get'+foam.String.capitalize(f.name)+'());\n'
+                  +'if ( cmp != 0 ) return cmp;';
+              })).join('\n')+'\n'
+              +'  return 0;\n'
+          });
+        }
+
         if ( props.length && props.length < 7 ) {
           // All-property constructor
           cls.method({
@@ -1018,6 +1036,7 @@ foam.CLASS({
   flags: ['java'],
 
   properties: [
+    ['javaType',       'int'],
     ['javaInfoType',   'foam.core.AbstractIntPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.IntParser.instance()'],
     ['javaCSVParser',  'foam.lib.json.IntParser.instance()'],
@@ -1044,6 +1063,7 @@ foam.CLASS({
   flags: ['java'],
 
   properties: [
+    ['javaType',       'byte'],
     ['javaInfoType',   'foam.core.AbstractBytePropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.ByteParser.instance()'],
     ['javaCSVParser',  'foam.lib.json.ByteParser.instance()'],
@@ -1070,6 +1090,7 @@ foam.CLASS({
   flags: ['java'],
 
   properties: [
+    ['javaType',       'short'],
     ['javaInfoType',   'foam.core.AbstractShortPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.ShortParser.instance()'],
     ['javaCSVParser',  'foam.lib.json.ShortParser.instance()'],
@@ -1096,6 +1117,7 @@ foam.CLASS({
   flags: ['java'],
 
   properties: [
+    ['javaType',                     'long'],
     ['javaInfoType',                 'foam.core.AbstractLongPropertyInfo'],
     ['javaJSONParser',               'foam.lib.json.LongParser.instance()'],
     ['javaCSVParser',                'foam.lib.json.LongParser.instance()'],
@@ -1125,6 +1147,7 @@ foam.CLASS({
   flags: ['java'],
 
   properties: [
+    ['javaType',       'double'],
     ['javaInfoType',   'foam.core.AbstractDoublePropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.DoubleParser.instance()'],
     ['javaCSVParser',  'foam.lib.json.DoubleParser.instance()'],
@@ -1151,6 +1174,7 @@ foam.CLASS({
   flags: ['java'],
 
   properties: [
+    ['javaType',       'float'],
     ['javaInfoType',   'foam.core.AbstractFloatPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.FloatParser.instance()'],
     ['javaCSVParser',  'foam.lib.json.FloatParser.instance()'],
