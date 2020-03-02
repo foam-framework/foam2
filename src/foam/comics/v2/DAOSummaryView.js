@@ -85,7 +85,11 @@ foam.CLASS({
       expression: function(config$of) {
         var allActions = config$of.getAxiomsByClass(foam.core.Action);
         var defaultAction = allActions.filter((a) => a.isDefault);
-        return defaultAction.length >= 1 ? defaultAction[0] : allActions[0];
+        return defaultAction.length >= 1 
+                ? defaultAction[0] 
+                : allActions.length >= 1 
+                  ? allActions[0]
+                  : null;
       }
     },
     {
@@ -154,55 +158,55 @@ foam.CLASS({
 
       // Get a fresh copy of the data, especially when we've been returned
       // to this view from the edit view on the stack.
-      this.config.dao.find(this.data).then(function(d) { 
+      this.config.dao.find(this.data).then(d => { 
         if ( d ) self.data = d; 
-      });
 
-      this
-        .addClass(this.myClass())
-        .add(self.slot(function(data, data$id, config$browseTitle, config$viewBorder, viewView) {
+        this
+          .addClass(this.myClass())
+          .add(self.slot(function(data, data$id, config$viewBorder, viewView) {
 
-          return self.E()
-            .start(self.Rows)
+            return self.E()
               .start(self.Rows)
-                // we will handle this in the StackView instead
-                .startContext({ data: self.stack })
-                  .tag(self.stack.BACK, {
-                    buttonStyle: foam.u2.ButtonStyle.TERTIARY,
-                    icon: 'images/back-icon.svg',
-                    label: self.backLabel
-                  })
-                .endContext()
-                .start(self.Cols).style({ 'align-items': 'center' })
-                  .start()
-                    .add(data.toSummary())
-                    .addClass(this.myClass('account-name'))
-                    .addClass('truncate-ellipsis')
-                  .end()
-                  .startContext({ data }).add(self.primary).endContext()
-                .end()
-              .end()
-
-              .start(self.Cols)
-                .start(self.Cols).addClass(this.myClass('actions-header'))
-                  .startContext({ data: self })
-                    .tag(self.EDIT, {
+                .start(self.Rows)
+                  // we will handle this in the StackView instead
+                  .startContext({ data: self.stack })
+                    .tag(self.stack.BACK, {
                       buttonStyle: foam.u2.ButtonStyle.TERTIARY,
-                      icon: 'images/edit-icon.svg'
-                    })
-                    .tag(self.DELETE, {
-                      buttonStyle: foam.u2.ButtonStyle.TERTIARY,
-                      icon: 'images/delete-icon.svg'
+                      icon: 'images/back-icon.svg',
+                      label: self.backLabel
                     })
                   .endContext()
+                  .start(self.Cols).style({ 'align-items': 'center' })
+                    .start()
+                      .add(data.toSummary())
+                      .addClass(this.myClass('account-name'))
+                      .addClass('truncate-ellipsis')
+                    .end()
+                    .startContext({ data }).add(self.primary).endContext()
+                  .end()
                 .end()
-              .end()
 
-              .start(config$viewBorder)
-                .start(viewView, { data }).addClass(this.myClass('view-container')).end()
-              .end()
-            .end();
-        }));
+                .start(self.Cols)
+                  .start(self.Cols).addClass(this.myClass('actions-header'))
+                    .startContext({ data: self })
+                      .tag(self.EDIT, {
+                        buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                        icon: 'images/edit-icon.svg'
+                      })
+                      .tag(self.DELETE, {
+                        buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                        icon: 'images/delete-icon.svg'
+                      })
+                    .endContext()
+                  .end()
+                .end()
+
+                .start(config$viewBorder)
+                  .start(viewView, { data }).addClass(this.myClass('view-container')).end()
+                .end()
+              .end();
+          }));
+      });
     }
   ]
 });
