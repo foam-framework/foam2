@@ -160,31 +160,7 @@ foam.CLASS({
 
       this
         .addClass(this.myClass())
-        .add(self.slot(function(data, data$id, config$CRUDActionsAuth$update, config$CRUDActionsAuth$delete, config$browseTitle, config$viewBorder, viewView) {
-
-          // iterate through permissions and replace % with data$id
-          var editAction = self.EDIT;
-          var deleteAction = self.DELETE;
-
-          if ( config$CRUDActionsAuth$update ) {
-            var editArray = config$CRUDActionsAuth$update;
-
-            editArray = editArray.map((permission) => permission.replace('%', data$id));
-
-            editAction = self.EDIT.clone().copyFrom({
-              availablePermissions: self.EDIT.availablePermissions.concat(editArray)
-            });
-          }
-
-          if ( config$CRUDActionsAuth$delete ) {
-            var deleteArray = config$CRUDActionsAuth$delete;
-
-            deleteArray = deleteArray.map((permission) => permission.replace('%', data$id));
-
-            deleteAction = self.DELETE.clone().copyFrom({
-              availablePermissions: self.DELETE.availablePermissions.concat(deleteArray)
-            });
-          }
+        .add(self.slot(function(data, data$id, config$browseTitle, config$viewBorder, viewView) {
 
           return self.E()
             .start(self.Rows)
@@ -210,11 +186,11 @@ foam.CLASS({
               .start(self.Cols)
                 .start(self.Cols).addClass(this.myClass('actions-header'))
                   .startContext({ data: self })
-                    .tag(editAction, {
+                    .tag(self.EDIT, {
                       buttonStyle: foam.u2.ButtonStyle.TERTIARY,
                       icon: 'images/edit-icon.svg'
                     })
-                    .tag(deleteAction, {
+                    .tag(self.DELETE, {
                       buttonStyle: foam.u2.ButtonStyle.TERTIARY,
                       icon: 'images/delete-icon.svg'
                     })
