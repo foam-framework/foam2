@@ -158,7 +158,7 @@ foam.CLASS({
 
       this.addClass(this.myClass()).
       start().
-        style({ 'height': '56px', 'padding-left': '16px', 'padding-top': '8px'}).
+        style({ 'height': '56px', 'padding-top': '8px'}).
         start().
           style({ 'font-size': '26px', 'width': 'fit-content', 'float': 'left', 'padding-top': '10px' }).
           add('Data Management').
