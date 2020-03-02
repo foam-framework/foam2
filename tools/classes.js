@@ -356,6 +356,7 @@ var classes = [
   'foam.nanos.export.ExportDriverRegistry',
   'foam.dao.jdbc.ConnectionPool',
   'foam.lib.Outputter',
+  'foam.lib.PermissionPredicate',
   'foam.lib.PropertyPredicate',
   'foam.lib.PermissionedPropertyPredicate',
   'foam.lib.NetworkPropertyPredicate',

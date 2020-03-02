@@ -625,6 +625,7 @@ FOAM_FILES([
   { name: "foam/mop/MOP" },
   { name: "foam/dao/jdbc/ConnectionPool" },
   { name: "foam/lib/Outputter" },
+  { name: "foam/lib/PermissionPredicate" },
   { name: "foam/lib/PropertyPredicate" },
   { name: "foam/lib/PermissionedPropertyPredicate" },
   { name: "foam/lib/NetworkPropertyPredicate" },
