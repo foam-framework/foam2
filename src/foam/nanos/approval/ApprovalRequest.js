@@ -337,9 +337,14 @@
       writePermissionRequired: true,
       expression: function() {
         var X = this.ctrl.__subContext__;
-        var objId = X[this.daoKey_].of.ID.type === 'Long' ? parseInt(this.objId) : this.objId;
+        var key = this.daoKey_;
+        if (key && key.startsWith('local')) {
+          key = key.replace('local', '');
+          key = key.charAt(0).toLowerCase() + key.substring(1);
+        }
+        var objId = X[key].of.ID.type === 'Long' ? parseInt(this.objId) : this.objId;
 
-        X[this.daoKey_]
+        X[key]
           .find(objId)
           .then((obj) => {
             if (
