@@ -25,12 +25,34 @@ foam.CLASS({
     {
       name: 'delegate',
       class: 'foam.mlang.predicate.PredicateProperty',
+      visibility: 'HIDDEN'
     },
     {
       documentation: 'See ServiceProviderAwareDAO',
       name: 'propertyInfos',
-      class: 'Map'
+      class: 'Map',
+      visibility: 'HIDDEN'
+    },
+    {
+      name: 'support',
+      class: 'Object',
+      visibility: 'HIDDEN',
+      javaFactory: 'return new ServiceProviderAwareSupport(getX());'
     }
+  ],
+
+  axioms: [
+    {
+      buildJavaClass: function(cls) {
+        cls.extras.push(`
+  public ServiceProviderAwarePredicate(foam.core.X x, foam.mlang.predicate.Predicate predicate, Map propertyInfos) {
+    setX(x);
+    setDelegate(predicate);
+    setPropertyInfos(propertyInfos);
+  }
+        `);
+      },
+    },
   ],
 
   methods: [
@@ -44,7 +66,7 @@ foam.CLASS({
         }
       ],
       javaCode: `
-    if ( new ServiceProviderAwareSupport(getX()).match(getX(), getPropertyInfos(), obj) ) {
+    if ( ((ServiceProviderAwareSupport)getSupport()).match(getX(), getPropertyInfos(), obj) ) {
       if ( getDelegate() != null ) {
         return getDelegate().f(obj);
       }

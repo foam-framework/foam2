@@ -237,7 +237,7 @@ foam.CLASS({
           .end();
 
           return e;
-        }, this.filters$))
+        }, this.filters$));
     },
 
     function addFilter(key) {

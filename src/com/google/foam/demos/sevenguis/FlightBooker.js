@@ -53,7 +53,8 @@ foam.CLASS({
     {
       class: 'Date',
       name: 'departDate',
-      permissionRequired: true,
+      readPermissionRequired: true,
+      writePermissionRequired: true,
       factory: function() { return new Date(Date.now()+3600000*24); },
       validateObj: function(departDate) {
         var today = new Date();

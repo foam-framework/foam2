@@ -30,8 +30,8 @@ public class UserGroupAndSpidValidator implements Validator
     // Not doing the assignment here cause this is just a validator.
     // see ServiceProviderAwareDAO
     if ( ! SafetyUtil.isEmpty(user.getSpid()) ) {
-      DAO serviceProviderDAO = (DAO) x.get("serviceProviderDAO");
-      ServiceProvider serviceProvider = (ServiceProvider) serviceProviderDAO.find(user.getSpid());
+      DAO localServiceProviderDAO = (DAO) x.get("localServiceProviderDAO");
+      ServiceProvider serviceProvider = (ServiceProvider) localServiceProviderDAO.find(user.getSpid());
       if ( serviceProvider == null ) {
         throw new IllegalArgumentException("User needs to be assigned to a valid service provider");
       }
