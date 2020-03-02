@@ -116,6 +116,42 @@ public class SafetyUtil {
     return o1 == o2 ? 0 : o1 < o2 ? -1 : 1;
   }
 
+  public static int hash(Object o1) {
+    return java.util.Objects.hash(o1);
+  }
+
+  public static int hash(FObject o1) {
+    return java.util.Objects.hash(o1);
+  }
+
+  public static int hash(boolean o1) {
+    return java.util.Objects.hash(o1);
+  }
+
+  public static int hash(String o1) {
+    return java.util.Objects.hash(o1);
+  }
+
+  public static int hash(short o1) {
+    return java.util.Objects.hash(o1);
+  }
+
+  public static int hash(int o1) {
+    return java.util.Objects.hash(o1);
+  }
+
+  public static int hash(long o1) {
+    return java.util.Objects.hash(o1);
+  }
+
+  public static int hash(float o1) {
+    return java.util.Objects.hash(o1);
+  }
+
+  public static int hash(double o1) {
+    return java.util.Objects.hash(o1);
+  }
+  
   public static Object deepClone(Object o) {
     if ( o == null ) return null;
     if ( o instanceof foam.core.FObject ) return ((foam.core.FObject)o).deepClone();
