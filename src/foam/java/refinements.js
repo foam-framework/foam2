@@ -596,7 +596,8 @@ foam.LIB({
           body: 'setX(x);'
         });
 
-        if ( cls.name != 'AbstractFObject' ) {
+        if ( cls.name != 'AbstractFObject' &&
+             ! this.hasOwnAxiom('compareTo') ) {
           cls.method({
             visibility: 'public',
             name: 'compareTo',
