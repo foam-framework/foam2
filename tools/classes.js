@@ -551,7 +551,7 @@ var classes = [
   'foam.strategy.StrategizerService',
   'foam.strategy.BasicStrategizer',
   'foam.strategy.ClientStrategizerService',
-  
+
   // Clustering
   'foam.nanos.mrac.MedusaMessage',
   'foam.nanos.mrac.TcpMessage',
