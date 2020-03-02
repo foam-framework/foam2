@@ -72,7 +72,7 @@ foam.CLASS({
   methods: [
     {
       name: 'compareTo',
-      type: 'Integer',
+      type: 'int',
       args: [ { name: 'o', type: 'Any' } ],
       javaCode: `
         if ( o == this ) return 0;
@@ -81,7 +81,6 @@ foam.CLASS({
 
         MedusaEntry entry = (MedusaEntry) o;
         return Long.compare(this.getMyIndex(), entry.getMyIndex());
-
       `
     }
   ]
