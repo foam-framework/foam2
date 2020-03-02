@@ -17,6 +17,7 @@ foam.CLASS({
   javaImports: [
     'foam.core.FObject',
     'foam.lib.json.JSONParser',
+    'foam.nanos.pm.PM',
     'foam.util.SafetyUtil',
     'java.io.BufferedReader'
   ],
@@ -40,6 +41,10 @@ foam.CLASS({
         // count number of entries successfully read
         int successReading = 0;
         JSONParser parser = getParser();
+
+        // NOTE: explicitly calling PM constructor as create only creates
+        // a percentage of PMs, but we want all replay statistics
+        PM pm = new PM(((foam.dao.AbstractDAO)dao).getOf(), "replay."+getFilename());
 
         try ( BufferedReader reader = getReader() ) {
           if ( reader == null ) {
@@ -79,7 +84,8 @@ foam.CLASS({
         } catch ( Throwable t) {
           getLogger().error("Failed to read from journal", t);
         } finally {
-          getLogger().log("Successfully read " + successReading + " entries from file: " + getFilename());
+          pm.log(x);
+          getLogger().log("Successfully read " + successReading + " entries from file: " + getFilename() +" in: "+pm.getTime()+"(ms)");
         }
       `
     }
