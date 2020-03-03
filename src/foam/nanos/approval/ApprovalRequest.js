@@ -126,7 +126,6 @@
     {
       class: 'String',
       name: 'daoKey',
-      readPermissionRequired: true,
       writePermissionRequired: true,
       documentation: `Used internally in approvalDAO to point where requested object can be found.
       Should not be used to retrieve approval requests for a given objects
