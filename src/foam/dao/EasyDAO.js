@@ -279,6 +279,9 @@ foam.CLASS({
         .setOf(getOf())
         .build();
       }
+      if ( getWriteOnly() ) {
+        return new foam.dao.WriteOnlyJDAO(getX(), new foam.dao.MDAO(getOf()), getOf(), getJournalName());
+      }
       if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) )
         return new foam.dao.java.JDAO(getX(), getOf(), getJournalName());
       return new foam.dao.MDAO(getOf());
@@ -376,6 +379,11 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'readOnly',
+      value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'writeOnly',
       value: false
     },
     {
