@@ -111,9 +111,9 @@ foam.CLASS({
   actions: [
     {
       name: 'edit',
-      isAvailable: function(config) {
+      isAvailable: function(config, data$id) {
         try {
-          return config.editPredicate.f();
+          return config.editPredicate.f(data$id);
         } catch(e) {
           return false;
         }
@@ -130,9 +130,9 @@ foam.CLASS({
     },
     {
       name: 'delete',
-      isAvailable: function(config) {
+      isAvailable: function(config, data$id) {
         try {
-          return config.deletePredicate.f();
+          return config.deletePredicate.f(data$id);
         } catch(e) {
           return false;
         }
