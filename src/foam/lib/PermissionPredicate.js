@@ -27,9 +27,8 @@ foam.CLASS({
     {
       name: 'f',
       javaCode: `
-        X x = (X) obj;
-        AuthService auth = (AuthService) x.get("auth");
-        return auth.check(x, permission_);
+        // java side is only needed for rules which is handled in the RulePermissionPredicate
+        throw new RuntimeException( new UnsupportedOperationException() );
       `,
       code: async function(objId) {    
         /**
