@@ -10,10 +10,10 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   documentation: `
-    The inline DAO controller for a collection of instances of a model that can 
+    The inline DAO controller for a collection of instances of a model that can
     switch between multiple views
   `,
-  
+
   imports: [
     'stack'
   ],
@@ -77,8 +77,12 @@ foam.CLASS({
   actions: [
     {
       name: 'create',
-      isAvailable: function(config$createEnabled) {
-        return config$createEnabled;
+      isAvailable: function(config) {
+        try {
+          return config.createPredicate.f();
+        } catch(e) {
+          return false;
+        }
       },
       code: function() {
         if ( ! this.stack ) return;
@@ -87,7 +91,7 @@ foam.CLASS({
           data: this.data.of.create({ mode: 'create' }, this),
           config$: this.config$,
           of: this.data.of
-        });
+        }, this.__subContext__);
       }
     }
   ],
@@ -98,13 +102,7 @@ foam.CLASS({
     var self = this;
 
       this.addClass(this.myClass())
-      .add(this.slot(function(data, config, config$CRUDActionsAuth$create, config$browseBorder, config$browseViews, config$browseTitle) {
-        var createAction = config$CRUDActionsAuth$create
-            ? self.CREATE.clone().copyFrom({
-              availablePermissions: self.CREATE.availablePermissions.concat(config$CRUDActionsAuth$create)
-            })
-            : self.CREATE;
-
+      .add(this.slot(function(data, config, config$browseBorder, config$browseViews, config$browseTitle) {
         return self.E()
           .start(self.Rows)
             .addClass(self.myClass('container'))
@@ -114,14 +112,14 @@ foam.CLASS({
                 .addClass(self.myClass('browse-title'))
                 .add(config$browseTitle)
               .end()
-              .startContext({ data: self }).tag(createAction).endContext()
+              .startContext({ data: self }).tag(self.CREATE).endContext()
             .end()
             .start(self.CardBorder)
               .style({ position: 'relative' })
               .start(config$browseBorder)
                 .callIf(config$browseViews.length > 1, function() {
                   this
-                    .start(self.IconChoiceView, { 
+                    .start(self.IconChoiceView, {
                       choices:config$browseViews.map(o => [o.view, o.icon]),
                       data$: self.browseView$
                     })
