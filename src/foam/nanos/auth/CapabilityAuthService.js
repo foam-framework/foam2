@@ -66,8 +66,8 @@ foam.CLASS({
         if ( getInitialized() )
           return;
 
-        DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
-        DAO capabilityDAO = (x.get("capabilityDAO") == null ) ? (DAO) x.get("capabilityDAO") : (DAO) x.get("localCapabilityDAO");
+        DAO userCapabilityJunctionDAO = (DAO) getX().get("userCapabilityJunctionDAO");
+        DAO capabilityDAO = (getX().get("capabilityDAO") == null ) ? (DAO) getX().get("capabilityDAO") : (DAO) getX().get("localCapabilityDAO");
         if ( capabilityDAO == null || userCapabilityJunctionDAO == null )
           return;
 
@@ -121,11 +121,10 @@ foam.CLASS({
         this.initialize(x);
 
         String key = user.getId() + permission;
-        if ( (( Map<String, Boolean> )getCache()).containsKey(key) ) {
-          return (( Map<String, Boolean> )getCache()).get(key);
-        }
+        Boolean result = ( (Map<String, Boolean>) getCache() ).get(key);
+        if ( result != null ) return result;
 
-        boolean result = false;
+        result = false;
 
         try {
           DAO capabilityDAO = ( x.get("localCapabilityDAO") == null ) ? (DAO) x.get("capabilityDAO") : (DAO) x.get("localCapabilityDAO");
@@ -195,7 +194,7 @@ foam.CLASS({
           logger.error("check", permission, e);
         }
 
-        return result ? true : getDelegate().checkUser(x, user, permission);
+        return result || getDelegate().checkUser(x, user, permission);
       `
     }
   ]
