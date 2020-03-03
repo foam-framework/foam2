@@ -31,7 +31,15 @@ foam.CLASS({
         AuthService auth = (AuthService) x.get("auth");
         return auth.check(x, permission_);
       `,
-      code: async function() {
+      code: async function(objId) {    
+        /**
+         * % is a character gets replaced in the permission string with 
+         * the object id of the object you are trying to view    
+         */
+        if ( this.permission.includes('.%') && objId ){
+          var permissionForObject = this.permission.replace('.%', '.' + objId);
+          return await this.auth.check(null, permissionForObject);
+        }
         return await this.auth.check(null, this.permission);
       }
     }
