@@ -102,7 +102,6 @@
       class: 'Object',
       javaType: 'Object',
       name: 'objId',
-      readPermissionRequired: true,
       writePermissionRequired: true,
       documentation: 'id of the object that needs approval.',
       tableWidth: 150,
