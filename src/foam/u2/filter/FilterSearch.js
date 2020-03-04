@@ -184,7 +184,9 @@ foam.CLASS({
     {
       class: 'String',
       name: 'iconPath',
-      value: 'images/expand-less.svg'
+      expression: function(isOpen) {
+        return isOpen ? 'images/expand-less.svg' : 'images/expand-more.svg';
+      }
     }
   ],
 
@@ -288,7 +290,6 @@ foam.CLASS({
       name: 'toggleDrawer',
       code: function() {
         this.isOpen = ! this.isOpen;
-        this.iconPath = this.isOpen ? 'images/expand-less.svg' : 'images/expand-more.svg';
       }
     }
   ]
