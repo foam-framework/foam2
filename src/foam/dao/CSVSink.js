@@ -22,7 +22,8 @@ foam.CLASS({
     {
       class: 'String',
       name: 'csv',
-      view: 'foam.u2.tag.TextArea'
+      view: 'foam.u2.tag.TextArea',
+      factory: function() { return this.outputter.toString(); }
     },
     {
       class: 'Class',
