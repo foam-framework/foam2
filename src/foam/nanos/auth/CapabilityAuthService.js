@@ -24,6 +24,7 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.core.Detachable',
     'foam.core.X',
+    'foam.mlang.predicate.AbstractPredicate',
     'foam.mlang.predicate.Predicate',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityJunctionStatus',
@@ -159,29 +160,19 @@ foam.CLASS({
           }
 
           // 2. check if the user has a capability that grants the permission
-          ProxySink proxy = new ProxySink(x, new LimitedSink(x, 1, 0, new ArraySink())) {
+          AbstractPredicate predicate = new AbstractPredicate(x) {
             @Override
-            public void put(Object o, Detachable sub) {
-              UserCapabilityJunction ucj = (UserCapabilityJunction) (UserCapabilityJunction) o;
+            public boolean f(Object obj) {
+              UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
               Capability c = (Capability) capabilityDAO.find(ucj.getTargetId());
               if ( c != null && ! c.isDeprecated(x) && c.implies(x, permission) ) {
-                getDelegate().put(o, sub);
+                return true;
               }
+              return false;
             }
           };
 
-          List<UserCapabilityJunction> ucjs = ((ArraySink) ((ProxySink) ((ProxySink) userCapabilityJunctionDAO
-            .where(AND(
-              capabilityScope,
-              EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
-              EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
-            ))
-            .select(proxy))
-            .getDelegate())
-            .getDelegate())
-            .getArray();
-
-          if ( ucjs.size() > 0) {
+          if ( userCapabilityJunctionDAO.find(AND(capabilityScope, predicate)) != null ) {
             result = true;
           }
 
