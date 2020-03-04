@@ -22,8 +22,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'csv',
-      view: 'foam.u2.tag.TextArea',
-      factory: function() { return this.outputter.toString(); }
+      view: 'foam.u2.tag.TextArea'
     },
     {
       class: 'Class',
@@ -37,8 +36,8 @@ foam.CLASS({
         if ( ! this.of ) return [];
         if ( tc = this.of.getAxiomByName('tableColumns') ) return tc.columns;
         return this.of.getAxiomsByClass(foam.core.Property)
-          .filter(p => ! p.networkTransient)
-          .map(p => p.name);
+          .filter((p) => ! p.networkTransient)
+          .map((p) => p.name);
       },
       javaFactory: `
         if ( getOf() == null ) return new String[]{};
@@ -75,9 +74,11 @@ foam.CLASS({
       name: 'put',
       code: function(obj) {
         this.outputter.outputFObject(this.__context__, obj);
+        this.csv = this.outputter.toString();
       },
       javaCode: `
         getOutputter().outputFObject(getX(), (foam.core.FObject)obj);
+        setCsv(getOutputter().toString());
       `
     },
 
@@ -178,7 +179,7 @@ foam.CLASS({
           delegate: outputter
         });
         this.of.getAxiomsByClass(foam.core.Property)
-          .forEach(p => {
+          .forEach((p) => {
             p.toCSVLabel.call(p, x, outputter);
           });
       },
