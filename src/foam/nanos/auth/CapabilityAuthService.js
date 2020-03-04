@@ -160,10 +160,9 @@ foam.CLASS({
 
           // 2. check if the user has a capability that grants the permission
           ProxySink proxy = new ProxySink(x, new LimitedSink(x, 1, 0, new ArraySink())) {
-            int count = 0;
             @Override
             public void put(Object o, Detachable sub) {
-              UserCapabilityJunction ucj = (UserCapabilityJunction) ((UserCapabilityJunction) o).deepClone();
+              UserCapabilityJunction ucj = (UserCapabilityJunction) (UserCapabilityJunction) o;
               Capability c = (Capability) capabilityDAO.find(ucj.getTargetId());
               if ( c != null && ! c.isDeprecated(x) && c.implies(x, permission) ) {
                 getDelegate().put(o, sub);
