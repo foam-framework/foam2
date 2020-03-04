@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'PropertyHasValue',
 
   documentation: `A predicate that returns true when a specific property has a value.
-  user can choose the new or old object for evaluation.`,
+      user can choose the new or old object for evaluation.`,
 
   extends: 'foam.mlang.predicate.AbstractPredicate',
   implements: ['foam.core.Serializable'],
