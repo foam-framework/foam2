@@ -40,6 +40,7 @@ foam.CLASS({
     'foam.nanos.theme.Theme',
     'foam.nanos.u2.navigation.TopNavigation',
     'foam.nanos.u2.navigation.FooterView',
+    'foam.u2.crunch.CrunchController',
     'foam.u2.stack.Stack',
     'foam.u2.stack.StackView',
     'foam.u2.dialog.NotificationMessage',
@@ -74,7 +75,8 @@ foam.CLASS({
     'user',
     'webApp',
     'wrapCSS as installCSS',
-    'sessionTimer'
+    'sessionTimer',
+    'crunchController'
   ],
 
   constants: {
@@ -220,6 +222,15 @@ foam.CLASS({
       factory: function() {
         return this.SessionTimer.create();
       }
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.u2.crunch.CrunchController',
+      name: 'crunchController',
+      factory: function() {
+        return this.CrunchController.create();
+      }
+
     },
     {
       class: 'FObjectProperty',

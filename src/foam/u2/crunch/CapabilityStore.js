@@ -30,7 +30,8 @@ foam.CLASS({
     'capabilityCategoryDAO',
     'capabilityDAO',
     'capabilityCategoryCapabilityJunctionDAO',
-    'registerElement'
+    'registerElement',
+    'crunchController'
   ],
 
   messages: [
@@ -75,7 +76,7 @@ foam.CLASS({
           .end()
           .select(self.capabilityCategoryDAO, function(category) {
             return self.Tab.create({ label: category.name })
-              // .add(self.renderSection(category))
+              .add(self.renderSection(category))
               ;
           }, false, true)
         .end()
@@ -158,6 +159,9 @@ foam.CLASS({
             grid = grid
               .start(self.GUnit, { columns: 4 })
                 .tag(self.CapabilityCardView, { data: cap })
+                .on('click', () => {
+                  self.crunchController.launchWizard(cap.id);
+                })
               .end()
               ;
           }
