@@ -222,12 +222,14 @@ foam.CLASS({
             .forEach(filters, function(f) {
               var axiom = self.dao.of.getAxiomByName(f);
 
-              this.start(self.FilterViewController, {
-                searchView: axiom.searchView,
-                property: axiom,
-                dao$: self.dao$
-              })
-              .end();
+              if ( axiom ){
+                this.start(self.FilterViewController, {
+                  searchView: axiom.searchView,
+                  property: axiom,
+                  dao$: self.dao$
+                })
+                .end();
+              }
             })
           .end()
           .start('p')
