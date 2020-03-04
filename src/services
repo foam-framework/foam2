@@ -582,7 +582,23 @@ p({
   "client": "{\"of\":\"foam.flow.Document\"\}"
 })
 
-p({"class":"foam.nanos.boot.NSpec", "name":"supportEmailDAO",                  "lazy":true, "serve":true, "serviceScript":"return new foam.dao.PMDAO(new foam.dao.SequenceNumberDAO(new foam.dao.java.JDAO(x, foam.support.model.SupportEmail.getOwnClassInfo(), \"supportEmails\")));","client":"{\"of\":\"foam.support.model.SupportEmail\"}"})
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"supportEmailDAO",
+  "lazy":true,
+  "serve":true,
+  "serviceScript":
+  """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setSeqProperty(true)
+      .setOf(foam.support.model.SupportEmail.getOwnClassInfo())
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("supportEmails")
+      .build();
+  """,
+  "client":"{\"of\":\"foam.support.model.SupportEmail\"}"
+})
 
 p({
   "class": "foam.nanos.boot.NSpec",
