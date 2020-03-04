@@ -159,7 +159,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'isOpen',
-      value: true
+      value: false
     },
     {
       class: 'Boolean',
