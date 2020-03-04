@@ -37,11 +37,16 @@ foam.CLASS({
         // TODO: how to represent badges?
         .start()
           .addClass(self.s.myClass('card-title'))
-          .add("Label (TODO)")
+          .add(( self.data.name != '') ? self.data.name : self.data.id)
         .end()
         .start()
           .addClass(self.s.myClass('card-subtitle'))
-          .add("Category (TODO)")
+          .select(self.data.categories.dao, function (category) {
+            return this.E('span')
+              .addClass(self.s.myClass('category'))
+              .add(category.name)
+              ;
+          })
         .end()
         .start()
           .addClass(self.s.myClass('card-description'))
