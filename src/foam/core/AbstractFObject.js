@@ -211,7 +211,7 @@ foam.CLASS({
           }
           return ret;
         } catch (IllegalAccessException | InstantiationException e) {
-          return null;
+          return this;
         }
       `
     },

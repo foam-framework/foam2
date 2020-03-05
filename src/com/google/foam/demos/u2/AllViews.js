@@ -162,6 +162,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'textFieldWithChoices',
+      documentation: 'Like a Combo-Box.',
       view: {
         class: 'foam.u2.TextField',
         choices: ['Yes', 'No', 'Maybe']
@@ -350,6 +351,24 @@ foam.CLASS({
       view: {
         class: 'foam.u2.view.FObjectView',
         choices: [
+          [ 'foam.util.Timer', 'Timer' ],
+          [ 'foam.core.Property', 'Property' ],
+          [ 'foam.nanos.menu.DAOMenu',  'DAO'     ],
+          [ 'foam.nanos.menu.SubMenu',  'SubMenu' ],
+          [ 'foam.nanos.menu.TabsMenu', 'Tabs'    ]
+        ]
+      }
+    },
+    {
+      class: 'FObjectProperty',
+      name: 'fObjectViewWithChoicesAndCustomClasses',
+      label: 'FObjectView With Choices and Custom Classes',
+      view: {
+        class: 'foam.u2.view.FObjectView',
+        allowCustom: true,
+        choices: [
+          [ 'foam.util.Timer', 'Timer' ],
+          [ 'foam.core.Property', 'Property' ],
           [ 'foam.nanos.menu.DAOMenu',  'DAO'     ],
           [ 'foam.nanos.menu.SubMenu',  'SubMenu' ],
           [ 'foam.nanos.menu.TabsMenu', 'Tabs'    ]

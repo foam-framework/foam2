@@ -38,12 +38,12 @@ foam.CLASS({
     {
       type: 'String',
       name: 'VISIBILITY',
-      value: 'images/visibility.svg'
+      value: '/images/visibility.svg'
     },
     {
       type: 'String',
       name: 'VISIBILITY_OFF',
-      value: 'images/visibility-off.svg'
+      value: '/images/visibility-off.svg'
     }
   ],
 

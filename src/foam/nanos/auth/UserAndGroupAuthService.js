@@ -39,13 +39,16 @@ foam.CLASS({
     'foam.util.Email',
     'foam.util.Password',
     'foam.util.SafetyUtil',
+    'foam.nanos.auth.User',
 
     'java.security.Permission',
     'java.util.Calendar',
     'javax.security.auth.AuthPermission',
 
     'static foam.mlang.MLang.AND',
-    'static foam.mlang.MLang.EQ'
+    'static foam.mlang.MLang.OR',
+    'static foam.mlang.MLang.EQ',
+    'static foam.mlang.MLang.CLASS_OF'
   ],
 
   constants: [
@@ -107,7 +110,7 @@ foam.CLASS({
     {
       name: 'loginHelper',
       documentation: `Helper function to reduce duplicated code.`,
-      type: 'foam.nanos.auth.User',
+      type: 'User',
       args: [
         {
           name: 'x',
@@ -115,7 +118,7 @@ foam.CLASS({
         },
         {
           name: 'user',
-          type: 'foam.nanos.auth.User'
+          type: 'User'
         },
         {
           name: 'password',
@@ -165,25 +168,20 @@ foam.CLASS({
     },
     {
       name: 'login',
-      documentation: `Login a user by the id provided, validate the password and
+      documentation: `Login a user by their identifier (email or username) provided, validate the password and
         return the user in the context`,
       javaCode: `
-        if ( userId < 1 || SafetyUtil.isEmpty(password) ) {
-          throw new AuthenticationException("Invalid Parameters");
-        }
-
-        return loginHelper(x, (User) ((DAO) getLocalUserDAO()).find(userId), password);
-      `
-    },
-    {
-      name: 'loginByEmail',
-      javaCode: `
-        User user = (User) ((DAO) getLocalUserDAO()).find(
-          AND(
-            EQ(User.EMAIL, email.toLowerCase()),
-            EQ(User.LOGIN_ENABLED, true)
-          )
-        );
+        User user = (User) ((DAO) getLocalUserDAO())
+          .inX(x)
+          .find(
+            AND(
+              OR(
+                EQ(User.EMAIL, identifier.toLowerCase()),
+                EQ(User.USER_NAME, identifier)
+              ),
+              CLASS_OF(User.class)
+            )
+          );
 
         if ( user == null ) {
           throw new AuthenticationException("User not found");

@@ -10,7 +10,7 @@ The documentation here is meant to provide a high-level view of the code in this
 
 The mechanisms by which we enforce access control checks vary, and the `foam.nanos.auth` package provides a number of different ways to enforce access control, which are documented in more detail below.
 
-**Access Control**: When we say "access", we mean any of the following: 
+**Access Control**: When we say "access", we mean any of the following:
 
 * service level
   * being able to interface with/access services

@@ -16,7 +16,6 @@ foam.INTERFACE({
       * getCurrentUser
       * getCurrentGroup
       * login
-      * loginByEmail
       * logout
       * validatePassword
       * updatePassword
@@ -65,7 +64,8 @@ foam.INTERFACE({
     {
       name: 'login',
       documentation: `
-        Log the user in using their system id and password to authenticate them.
+        Log the user in using their identifier (email or username) and password to
+        authenticate them.
       `,
       async: true,
       type: 'foam.nanos.auth.User',
@@ -77,31 +77,7 @@ foam.INTERFACE({
           type: 'Context'
         },
         {
-          name: 'userId',
-          type: 'Long'
-        },
-        {
-          name: 'password',
-          type: 'String'
-        }
-      ]
-    },
-    {
-      name: 'loginByEmail',
-      documentation: `
-        Log the user in using their email and password to authenticate them.
-      `,
-      async: true,
-      type: 'foam.nanos.auth.User',
-      javaThrows: ['foam.nanos.auth.AuthenticationException'],
-      swiftThrows: true,
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'email',
+          name: 'identifier',
           type: 'String'
         },
         {
