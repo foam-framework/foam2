@@ -40,6 +40,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'RichChoiceView',
