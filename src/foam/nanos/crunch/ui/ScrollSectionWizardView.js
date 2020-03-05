@@ -11,6 +11,10 @@ foam.CLASS({
 
   documentation: `Simply displays "sections" consecutively.`,
 
+  imports: [
+    'stack'
+  ],
+
   css: `
   // TODO
   `,
@@ -74,6 +78,7 @@ foam.CLASS({
       name: 'save',
       code: function(x) {
         console.log('saving');
+        this.stack.back();
       }
     }
   ]
