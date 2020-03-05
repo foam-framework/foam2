@@ -154,6 +154,11 @@ foam.CLASS({
       User user = (User) x.get("user");
       Logger logger = (Logger) x.get("logger");
 
+      if ( ! ( obj instanceof LifecycleAware ) )
+      {
+        return super.put_(x, obj);
+      }
+
       LifecycleAware lifecycleObj = (LifecycleAware) obj;
       
       if ( ! getIsEnabled() ){
