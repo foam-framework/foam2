@@ -72,7 +72,13 @@ foam.CLASS({
         }
         test(threw, "Non admin user can't add serviceProvider");
 
-        test(serviceProviderDAO.inX(nonAdminUserContext).find(serviceProvider) == null, "Non admin user can't view serviceProvider");
+        threw = false;
+        try {
+          serviceProviderDAO.inX(nonAdminUserContext).find(serviceProvider);
+        } catch ( AuthorizationException e ) {
+          threw = true;
+        }
+        test(threw, "Non admin user can't view serviceProvider");
 
         threw = false;
         try {
