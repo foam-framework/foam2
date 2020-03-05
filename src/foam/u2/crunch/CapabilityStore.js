@@ -111,6 +111,9 @@ foam.CLASS({
               grid = grid
                 .start(self.GUnit, { columns: 3 })
                   .tag(self.CapabilityFeatureView, { data: cap })
+                  .on('click', () => {
+                    self.crunchController.launchWizard(cap.id);
+                  })
                 .end()
                 ;
             }
@@ -141,6 +144,9 @@ foam.CLASS({
                 grid = grid
                   .start(self.GUnit, { columns: 4 })
                     .tag(self.CapabilityCardView, { data: cap })
+                    .on('click', () => {
+                      self.crunchController.launchWizard(cap.id);
+                    })
                   .end()
                   ;
               }
