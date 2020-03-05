@@ -76,7 +76,7 @@ foam.CLASS({
       class: 'Boolean',
       name: 'editEnabled',
       documentation: 'True to enable the edit button',
-      value: true
+      value: false
     },
     {
       class: 'Boolean',
@@ -225,14 +225,18 @@ foam.CLASS({
     {
       name: 'edit',
       isEnabled: function(selection) { return !! selection; },
-      isAvailable: function(editEnabled) { return editEnabled; },
+      isAvailable: function(editEnabled) {
+         return this.relationship ? false : editEnabled;
+      },
       code: function() {
         this.pub('edit', this.selection.id);
       }
     },
     {
       name: 'select',
-      isAvailable: function(selectEnabled) { return selectEnabled; },
+      isAvailable: function(selectEnabled) {
+        return this.relationship ? false : selectEnabled;
+      },
       isEnabled: function(selection, selectedObjects) {
         return this.relationship ? !! selectedObjects : !! selection;
       },
