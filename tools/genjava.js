@@ -294,7 +294,7 @@ var addDepsToClasses = function() {
       while ( classQueue.length ) {
         var cls = classQueue.pop();
         if ( ! classMap[cls] && ! blacklist[cls] ) {
-          console.log('generating ', cls);
+          console.log('generating', cls);
           cls = foam.lookup(cls);
           if ( ! checkFlags(cls.model_) ) continue;
           classMap[cls.id] = true;

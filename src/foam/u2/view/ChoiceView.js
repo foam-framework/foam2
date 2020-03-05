@@ -229,7 +229,7 @@ foam.CLASS({
     function findIndexOfChoice(choice) {
       if ( ! choice ) return -1;
       var choices = this.choices;
-      var data = choice[0];
+      var data    = choice[0];
       for ( var i = 0 ; i < choices.length ; i++ ) {
         if ( foam.util.equals(choices[i][0], data) ) return i;
       }
