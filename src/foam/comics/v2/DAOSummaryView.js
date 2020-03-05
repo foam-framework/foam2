@@ -119,7 +119,8 @@ foam.CLASS({
         if ( config.CRUDEnabledActionsAuth && config.CRUDEnabledActionsAuth.isEnabled ) {
           try {
             let permissionString = config.CRUDEnabledActionsAuth.enabledActionsAuth.permissionFactory(foam.nanos.ruler.Operations.UPDATE, data);
-            debugger;
+            
+            // TODO: change to this.auth once import extension bug is fixed
             return this.__subContext__.auth.check(null, permissionString).then(isAuthorized => isAuthorized);
           } catch(e) {
             return false;
@@ -151,6 +152,7 @@ foam.CLASS({
           try {
             let permissionString = config.CRUDEnabledActionsAuth.enabledActionsAuth.permissionFactory(foam.nanos.ruler.Operations.REMOVE, data);
   
+            // TODO: change to this.auth once import extension bug is fixed
             return this.__subContext__.auth.check(null, permissionString).then(isAuthorized => isAuthorized);
           } catch(e) {
             return false;
