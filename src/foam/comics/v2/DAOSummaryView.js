@@ -9,6 +9,10 @@ foam.CLASS({
   name: 'DAOSummaryView',
   extends: 'foam.u2.View',
 
+  imports: [
+    'auth',
+  ],
+
   documentation: `
     A configurable summary view for a specific instance
   `,
@@ -111,6 +115,18 @@ foam.CLASS({
   actions: [
     {
       name: 'edit',
+      isEnabled: function(config, data) {
+        if ( config.CRUDEnabledActionsAuth && config.CRUDEnabledActionsAuth.isEnabled ) {
+          try {
+            let permissionString = config.CRUDEnabledActionsAuth.enabledActionsAuth.permissionFactory(foam.nanos.ruler.Operations.UPDATE, data);
+            debugger;
+            return this.__subContext__.auth.check(null, permissionString).then(isAuthorized => isAuthorized);
+          } catch(e) {
+            return false;
+          }
+        }
+        return true;
+      },
       isAvailable: function(config) {
         try {
           return config.editPredicate.f();
@@ -130,6 +146,18 @@ foam.CLASS({
     },
     {
       name: 'delete',
+      isEnabled: function(config, data) {
+        if ( config.CRUDEnabledActionsAuth && config.CRUDEnabledActionsAuth.isEnabled ) {
+          try {
+            let permissionString = config.CRUDEnabledActionsAuth.enabledActionsAuth.permissionFactory(foam.nanos.ruler.Operations.REMOVE, data);
+  
+            return this.__subContext__.auth.check(null, permissionString).then(isAuthorized => isAuthorized);
+          } catch(e) {
+            return false;
+          }
+        }
+        return true;
+      },
       isAvailable: function(config) {
         try {
           return config.deletePredicate.f();
@@ -154,6 +182,7 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
+
       this.SUPER();
 
       // Get a fresh copy of the data, especially when we've been returned
@@ -163,8 +192,8 @@ foam.CLASS({
 
         this
           .addClass(this.myClass())
-          .add(self.slot(function(data, data$id, config$viewBorder, viewView) {
-
+          .add(self.slot(function(data, config$viewBorder, viewView) {
+            
             return self.E()
               .start(self.Rows)
                 .start(self.Rows)
