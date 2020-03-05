@@ -123,7 +123,7 @@ foam.CLASS({
 
         String key = user.getId() + permission;
         Boolean result = ( (Map<String, Boolean>) getCache() ).get(key);
-        if ( result != null ) return result;
+        if ( result != null ) return result || getDelegate().checkUser(x, user, permission);
 
         result = false;
 
