@@ -559,69 +559,6 @@ return junction`
       swiftCode: 'return dao!',
       code: function getDAO() { return this.dao; }
     }
-  ],
-  actions: [
-    {
-      name: 'addItem',
-      label: 'Add',
-      code: function(x) {
-        var self = this;
-        var dao = x[self.targetDAOKey];
-
-        var controller = foam.comics.DAOController.create({
-          createEnabled: false,
-          editEnabled: false,
-          selectEnabled: true,
-          exportEnabled: false,
-          relationship: this,
-          data: dao,
-          createLabel: 'Add',
-          title: `Add ${dao.of.model_.plural}`,
-          subtitle: `Select ${dao.of.model_.plural} from the table and click "Add" to add them.`
-        }, x);
-
-        controller.sub('select', function(s, _, selectedObjects) {
-          Object.values(selectedObjects).forEach((obj) => {
-            self.add(obj);
-          });
-        });
-
-        x.stack.push({
-          class: 'foam.comics.DAOControllerView',
-          data: controller
-        });
-      }
-    },
-    {
-      name: 'removeItem',
-      label: 'Remove',
-      code: function(x) {
-        var self = this;
-        var dao = self.dao;
-
-        var controller = foam.comics.DAOController.create({
-          createEnabled: false,
-          editEnabled: false,
-          selectEnabled: true,
-          relationship: this,
-          data: dao,
-          createLabel: 'Remove',
-          title: `Remove ${dao.of.model_.plural}`,
-          subtitle: `Select ${dao.of.model_.plural} from the table and click "Remove" to remove them.`
-        }, x);
-
-        controller.sub('select', function(s, _, selectedObjects) {
-          Object.values(selectedObjects).forEach((obj) => {
-            self.remove(obj);
-          });
-        });
-
-        x.stack.push({
-          class: 'foam.comics.DAOControllerView',
-          data: controller
-        });
-      }
-    }
   ]
 });
 
