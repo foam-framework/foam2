@@ -155,7 +155,7 @@ public class MMJournal extends AbstractJournal implements Electable {
       if ( clusterNodeDAO == null ) throw new RuntimeException("clusterNodeDAO miss");
 
       GroupBy groupToInstance = (GroupBy) clusterNodeDAO
-        .where(EQ(ClusterNode.TYPE, ClusterNodeType.MN))
+        .where(EQ(ClusterNode.TYPE, MedusaType.NODE))
         .select(GROUP_BY(ClusterNode.GROUP, new ArraySink.Builder(getX()).build()));
 
       for ( Object key : groupToInstance.getGroups().keySet() ) {

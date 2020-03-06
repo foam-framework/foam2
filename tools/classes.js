@@ -558,7 +558,7 @@ var classes = [
   'foam.nanos.medusa.TcpMessage',
   'foam.nanos.medusa.ClusterNode',
   'foam.nanos.medusa.FileMeta',
-  'foam.nanos.medusa.ClusterNodeType',
+  'foam.nanos.medusa.MedusaType',
   'foam.nanos.medusa.MedusaEntry',
   'foam.nanos.medusa.quorum.InstanceState',
   'foam.nanos.medusa.quorum.QuorumMessage',

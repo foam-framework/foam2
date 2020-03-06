@@ -26,7 +26,7 @@ foam.CLASS({
     },
     {
       class: 'Enum',
-      of: 'foam.nanos.medusa.ClusterNodeType',
+      of: 'foam.nanos.medusa.MedusaType',
       name: 'InstanceType'
     },
     {

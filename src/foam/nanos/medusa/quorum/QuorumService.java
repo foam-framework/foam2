@@ -69,7 +69,7 @@ public class QuorumService extends AbstractFObject implements NanoService {
     unReadyElectables = new LinkedBlockingQueue<Electable>();
     //mySelf = (ClusterNode) clusterDAO.find(clusterId);
     if ( mySelf == null ) throw new RuntimeException("ClusterNode no found: " + hostname);
-    if ( mySelf.getGroup() != 1 || mySelf.getType() != ClusterNodeType.MM) {
+    if ( mySelf.getGroup() != 1 || mySelf.getType() != MedusaType.MEDIATOR) {
       logger.info("not in group 1");
       return;
     }
