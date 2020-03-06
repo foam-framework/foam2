@@ -129,10 +129,10 @@ foam.CLASS({
               .setOf(getOf())
               .build();
           } else if ( getMedusaNode() ) {
-            delegate = new foam.nanos.mrac.MNDAO(getX(), getOf(), getJournalName());
+            delegate = new foam.nanos.medusa.MNDAO(getX(), getOf(), getJournalName());
           } else if ( getCluster() == true ) {
             setMdao(new foam.dao.MDAO(getOf()));
-            delegate = new foam.nanos.mrac.MMDAO(getX(), getNSpec().getName(), getMdao(), "singleJournal", getJournalName());
+            delegate = new foam.nanos.medusa.MMDAO(getX(), getNSpec().getName(), getMdao(), "singleJournal", getJournalName());
           } else if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
             setMdao(new foam.dao.MDAO(getOf()));
             if ( getWriteOnly() ) {
@@ -293,11 +293,11 @@ foam.CLASS({
           boolean found = false;
           foam.dao.DAO next = delegate;
           while ( next instanceof foam.dao.ProxyDAO &&
-            ! ( next instanceof foam.nanos.mrac.ClusterClientDAO ) ) {
+            ! ( next instanceof foam.nanos.medusa.ClusterClientDAO ) ) {
             next = ((foam.dao.ProxyDAO) next).getDelegate();
           }
-          if ( ! ( next instanceof foam.nanos.mrac.ClusterClientDAO ) ) {
-            delegate = new foam.nanos.mrac.ClusterClientDAO.Builder(getX())
+          if ( ! ( next instanceof foam.nanos.medusa.ClusterClientDAO ) ) {
+            delegate = new foam.nanos.medusa.ClusterClientDAO.Builder(getX())
                           .setServiceName(getNSpec().getName())
                           .setDelegate(delegate)
                           .build();

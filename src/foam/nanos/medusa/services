@@ -1,0 +1,141 @@
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "localClusterConfigDAO",
+  "lazy": true,
+  "serve": false,
+  "serviceScript": """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.medusa.ClusterConfig.getOwnClassInfo())
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("clusterConfig")
+      .setAuthorize(false)
+      .setCluster(false)
+      .setPm(true)
+      .build();
+   """
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "clusterConfigDAO",
+  "lazy": true,
+  "serve": true,
+  "serviceScript": """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.medusa.ClusterConfig.getOwnClassInfo())
+      .setInnerDAO((foam.dao.DAO) x.get("localClusterConfigDAO"))
+      .setEnableInterfaceDecorators(false)
+      .build();
+  """,
+  "client": "{\"of\":\"foam.nanos.medusa.ClusterConfig\"}"
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "clusterConfigService",
+  "lazy": true,
+  "serve": false,
+  "serviceScript": """
+    return new foam.nanos.medusa.DefaultClusterConfigService.Builder(x).build();
+  """
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "cluster",
+  "lazy": false,
+  "serve": true,
+  "authenticate":true,
+  "serviceScript": """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.medusa.ClusterServerDAO.getOwnClassInfo())
+      .setInnerDAO(new foam.nanos.medusa.ClusterServerDAO.Builder(x).build())
+      .setNullify(true)
+      .setEnableInterfaceDecorators(false)
+      .setRuler(false)
+      .setAuthorize(false)
+      .build();
+  """
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"clusterNodeDAO",
+  "lazy":false,
+  "serve":true,
+  "serviceScript": """
+    return new foam.dao.EasyDAO
+      .Builder(x)
+      .setOf(foam.nanos.medusa.ClusterNode.getOwnClassInfo())
+      .setGuid(true)
+      .setRuler(false)
+      .setAuthorize(false)
+      .setCluster(false)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("clusternodes")
+      .build();
+  """,
+  "client": """
+    {
+     "of": "foam.nanos.medusa.ClusterNode"
+    }
+  """
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"tcpServer",
+  "lazy":false,
+  "serviceClass":"foam.nanos.medusa.TCPNioServer"
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"quorumService",
+  "lazy":false,
+  "serviceClass":"foam.nanos.medusa.quorum.QuorumService"
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "nodeStatusDAO",
+  "lazy": false,
+  "serve": true,
+  "authenticate": true,
+  "serviceScript": """
+    return new foam.nanos.medusa.NodeStatusDAO();
+  """,
+  "client": """
+    {
+    "of": "foam.nanos.medusa.NodeStatus"
+    }
+  """
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "demoObjectDAO",
+  "lazy": false,
+  "serve": true,
+  "serviceScript":
+  """
+    import foam.dao.*;
+    import foam.nanos.demo.DemoObject;
+    import foam.nanos.medusa.*;
+
+    MDAO mdao = new MDAO(DemoObject.getOwnClassInfo());
+    MMDAO mmdao = new MMDAO(x, "demoObjectDAO", mdao, "singleJournal", "demoObjects");
+    ClusterClientDAO clusterClientDAO = new ClusterClientDAO.Builder(x)
+                                              .setServiceName("demoObjectDAO")
+                                              .setDelegate(mmdao)
+                                              .setMdao(mdao)
+                                              .build();
+    VotingDAO votingDAO = new VotingDAO(x, clusterClientDAO);
+    return votingDAO;
+  """,
+  "client": """
+    {
+      "of": "foam.nanos.demo.DemoObject"
+    }
+  """
+})

@@ -44,7 +44,7 @@ public class CronScheduler
   }
 
   public void start() {
-    foam.nanos.mrac.ClusterConfigService service = (foam.nanos.mrac.ClusterConfigService) getX().get("clusterConfigService");
+    foam.nanos.medusa.ClusterConfigService service = (foam.nanos.medusa.ClusterConfigService) getX().get("clusterConfigService");
     if ( service != null &&
          ! service.getIsPrimary() ) {
       // nop when not primary

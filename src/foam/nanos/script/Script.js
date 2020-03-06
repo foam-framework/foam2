@@ -220,7 +220,7 @@ foam.CLASS({
       ],
       javaCode: `
         //Command it out for GS demo.
-        // foam.nanos.mrac.ClusterConfigService service = (foam.nanos.mrac.ClusterConfigService) x.get("clusterConfigService");
+        // foam.nanos.medusa.ClusterConfigService service = (foam.nanos.medusa.ClusterConfigService) x.get("clusterConfigService");
         // if ( service != null &&
         //     ! service.getIsPrimary() ) {
         //   // nop when not primary

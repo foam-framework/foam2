@@ -11,8 +11,8 @@ import java.io.PrintWriter;
 import java.util.Date;
 import foam.dao.DAO;
 
-import foam.nanos.mrac.quorum.*;
-import foam.nanos.mrac.*;
+import foam.nanos.medusa.quorum.*;
+import foam.nanos.medusa.*;
 import foam.lib.json.Outputter;
 import static foam.mlang.MLang.*;
 import foam.dao.ArraySink;

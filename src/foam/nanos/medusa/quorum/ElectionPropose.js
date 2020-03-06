@@ -1,0 +1,33 @@
+/**
+* @license
+* Copyright 2020 The FOAM Authors. All Rights Reserved.
+* http://www.apache.org/licenses/LICENSE-2.0
+*/
+
+foam.CLASS({
+  package: 'foam.nanos.medusa.quorum',
+  name: 'ElectionPropose',
+  extends: 'foam.nanos.medusa.quorum.QuorumMessage',
+  documentation: 'This model used to propose a new Primary in a cloud.',
+  
+  properties: [
+    {
+      class: 'Long',
+      name: 'proposedPrimary'
+    },
+    {
+      class: 'Long',
+      name: 'electionEra'
+    },
+    {
+      class: 'Long',
+      name: 'targetId'
+    },
+    {
+      class: 'Enum',
+      of: 'foam.nanos.medusa.quorum.InstanceState',
+      name: 'sourceStatus'
+    }
+  ]
+  
+});
