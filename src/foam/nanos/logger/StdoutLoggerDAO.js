@@ -17,7 +17,6 @@ foam.CLASS({
   
   javaImports: [
     'foam.log.LogLevel',
-    'foam.nanos.app.AppConfig',
     'foam.nanos.app.Mode'
   ],
 
@@ -26,9 +25,15 @@ foam.CLASS({
       name: 'enabled',
       class: 'Boolean',
       value: true
+    },
+    {
+      name: 'mode',
+      class: 'Enum',
+      of: 'foam.nanos.app.Mode',
+      value: 'DEVELOPMENT'
     }
   ],
-
+  
   methods: [
     {
       name: 'put_',
@@ -39,10 +44,8 @@ foam.CLASS({
         // Only write WARN, ERROR to SYSLOG in production to reduce
         // burden on syslogd, journald. With our own journal logs we are
         // effectively writing out logs twice. 
-       AppConfig appConfig = (AppConfig) x.get("appConfig");
-       if ( lm.getSeverity().getOrdinal() > LogLevel.INFO.getOrdinal() ||
-            appConfig == null ||
-            appConfig.getMode() != Mode.PRODUCTION ) {
+        if ( lm.getSeverity().getOrdinal() > LogLevel.INFO.getOrdinal() ||
+            getMode() != Mode.PRODUCTION ) {
           System.out.println(lm.getCreated() + ","+lm.getThread()+","+lm.getSeverity()+","+lm.getMessage());
         }
       }
