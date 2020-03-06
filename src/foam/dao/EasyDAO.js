@@ -228,22 +228,15 @@ foam.CLASS({
         if ( getLastModifiedByAware() )
           delegate = new foam.nanos.auth.LastModifiedByAwareDAO.Builder(getX()).setDelegate(delegate).build();
 
-        if ( getApprovableAware() && getApprovableAwareEnabled() )
+        if ( getApprovableAware() ) {
           delegate = new foam.nanos.approval.ApprovableAwareDAO
           .Builder(getX())
           .setDaoKey(getName())
           .setOf(getOf())
           .setDelegate(delegate)
+          .setIsEnabled(getApprovableAwareEnabled())
           .build();
-
-        if ( getApprovableAware() && ! getApprovableAwareEnabled() )
-          delegate = new foam.nanos.approval.ApprovableAwareDAO
-          .Builder(getX())
-          .setDaoKey(getName())
-          .setOf(getOf())
-          .setDelegate(delegate)
-          .setIsEnabled(false)
-          .build();
+        }
 
         if ( getContextualize() ) {
           delegate = new foam.dao.ContextualizingDAO.Builder(getX()).
