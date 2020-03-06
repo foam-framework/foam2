@@ -16,10 +16,16 @@ foam.CLASS({
   ],
 
   css: `
-  // TODO
+    ^ {
+      margin: 30px;
+    }
   `,
 
   properties: [
+    {
+      class: 'String',
+      name: 'title'
+    },
     {
       class: 'DateTime',
       name: 'lastUpdate'
@@ -45,7 +51,8 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this.addClass(this.myClass());
-      this.start()
+      this.start('h1').add(this.title).end()
+        .start()
         .add(this.slot(
           (sectionsList) => {
             return this.E().forEach(sectionsList,
