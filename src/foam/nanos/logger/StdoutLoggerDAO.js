@@ -14,6 +14,12 @@ foam.CLASS({
   implements: [
     'foam.nanos.auth.EnabledAware'
   ],
+  
+  javaImports: [
+    'foam.log.LogLevel',
+    'foam.nanos.app.AppConfig',
+    'foam.nanos.app.Mode'
+  ],
 
   properties: [
     {
@@ -30,8 +36,16 @@ foam.CLASS({
       LogMessage lm = (LogMessage) getDelegate().put_(x, obj);
       if ( getEnabled() &&
            lm != null ) {
-        System.out.println(lm.getCreated() + ","+lm.getThread()+","+lm.getSeverity()+","+lm.getMessage());
-      } 
+        // Only write WARN, ERROR to SYSLOG in production to reduce
+        // burden on syslogd, journald. With our own journal logs we are
+        // effectively writing out logs twice. 
+       AppConfig appConfig = (AppConfig) x.get("appConfig");
+       if ( lm.getSeverity().getOrdinal() > LogLevel.INFO.getOrdinal() ||
+            appConfig == null ||
+            appConfig.getMode() != Mode.PRODUCTION ) {
+          System.out.println(lm.getCreated() + ","+lm.getThread()+","+lm.getSeverity()+","+lm.getMessage());
+        }
+      }
       return lm;
       `
     }
