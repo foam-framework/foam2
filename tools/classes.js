@@ -580,6 +580,7 @@ var skeletons = [
   'foam.nanos.test.EchoService',
   'foam.strategy.StrategizerService',
   'foam.nanos.auth.UserQueryService',
+  'foam.nanos.export.GoogleSheetsExport'
 ];
 
 var proxies = [

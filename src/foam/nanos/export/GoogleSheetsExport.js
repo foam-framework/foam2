@@ -17,6 +17,7 @@ foam.INTERFACE({
     {
       name: 'createSheet',
       type: 'String',
+      async: true
     }
   ]
 });

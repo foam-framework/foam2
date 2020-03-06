@@ -62,7 +62,7 @@ foam.CLASS({
                   .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(System.getProperty("NANOPAY_HOME"))))
                   .setAccessType("offline")
                   .build();
-        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8080).build();
+        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8080).setCallbackPath("").build();
         return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
       `
     },

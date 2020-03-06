@@ -3,19 +3,25 @@ foam.CLASS({
   name: 'GoogleSheetsExportDriver',
   implements: [ 'foam.nanos.export.ExportDriver' ],
 
-  imports: [
-    'googleSheetsDataExport'
+  requires: [
+    'foam.nanos.export.GoogleSheetsExport',
+    'foam.nanos.export.GoogleSheetsExportService',
+    'foam.nanos.export.ClientGoogleSheetsExportService',
+    'foam.box.HTTPBox'
   ],
 
   methods: [
     function exportFObject(X, obj) {
       return '';
     },
-    function exportDAO(X, obj) {
-      var url  =  this.googleSheetsDataExport.createSheet();
+    {
+      name: 'exportDAO',
+      code: async function(X, obj) {
+      var url  =  await X.googleSheetsDataExport.createSheet();
       if(url) {
         window.location.assign(url);
       }
+    }
     }
   ]
 });
