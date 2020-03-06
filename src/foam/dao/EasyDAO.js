@@ -126,15 +126,21 @@ foam.CLASS({
         if ( delegate == null ) {
           if ( getNullify() ) {
             delegate = new foam.dao.NullDAO.Builder(getX())
-            .setOf(getOf())
-            .build();
+              .setOf(getOf())
+              .build();
           } else if ( getMedusaNode() ) {
             delegate = new foam.nanos.mrac.MNDAO(getX(), getOf(), getJournalName());
           } else if ( getCluster() == true ) {
             setMdao(new foam.dao.MDAO(getOf()));
             delegate = new foam.nanos.mrac.MMDAO(getX(), getNSpec().getName(), getMdao(), "singleJournal", getJournalName());
           } else if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
-            delegate = new foam.dao.java.JDAO(getX(), getOf(), getJournalName());
+            setMdao(new foam.dao.MDAO(getOf()));
+            if ( getWriteOnly() ) {
+              delegate = new foam.dao.WriteOnlyJDAO(getX(), getMdao(), getOf(), getJournalName());
+            } else {
+              setMdao(new foam.dao.MDAO(getOf()));
+              delegate = new foam.dao.java.JDAO(getX(), getMdao(), getJournalName());
+            }
           } else {
             setMdao(new foam.dao.MDAO(getOf()));
             delegate = getMdao();
@@ -160,12 +166,15 @@ foam.CLASS({
         }
 
         if ( getFixedSize() != null ) {
-          if ( getMdao() != null && pxy != null ) {
+          if ( getMdao() != null ) {
             foam.dao.ProxyDAO fixedSizeDAO = (foam.dao.ProxyDAO) getFixedSize();
             fixedSizeDAO.setDelegate(getMdao());
-            pxy.setDelegate(fixedSizeDAO);
-          }
-          else {
+            if ( pxy == null ) {
+              delegate = fixedSizeDAO;
+            } else {
+              pxy.setDelegate(fixedSizeDAO);
+            }
+          } else {
             logger.error(this.getClass().getSimpleName(), "NSpec.name", (getNSpec() != null ) ? getNSpec().getName() : null, "of_", of_, "FixedSizeDAO did not find instanceof MDAO");
             System.exit(1);
           }
@@ -337,28 +346,7 @@ foam.CLASS({
     {
       class: 'Object',
       type: 'foam.dao.DAO',
-      name: 'innerDAO',
-      javaFactory: `
-      if ( getNullify() ) {
-        return new foam.dao.NullDAO.Builder(getX())
-        .setOf(getOf())
-        .build();
-      }
-      if ( getMedusaNode() ) {
-        return new foam.nanos.mrac.MNDAO(getX(), getOf(), getJournalName());
-      }
-      if ( getCluster() == true ) {
-        foam.dao.MDAO mdao = new foam.dao.MDAO(getOf());
-        return new foam.nanos.mrac.MMDAO(getX(), getNSpec().getName(), mdao, "singleJournal", getJournalName());
-      }
-      if ( getWriteOnly() ) {
-        return new foam.dao.WriteOnlyJDAO(getX(), new foam.dao.MDAO(getOf()), getOf(), getJournalName());
-      }
-      if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
-        return new foam.dao.java.JDAO(getX(), getOf(), getJournalName());
-      }
-      return new foam.dao.MDAO(getOf());
-      `
+      name: 'innerDAO'
     },
     {
       class: 'Object',
