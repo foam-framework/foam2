@@ -64,7 +64,7 @@ foam.CLASS({
   classes: [
     {
       name: 'Row',
-      imports: [ 
+      imports: [
         'data',
         'enableRemoving',
         'mode',
@@ -155,7 +155,7 @@ foam.CLASS({
                       .end()
                       .tag(self.Row.REMOVE, {
                         isDestructive: true,
-                        icon: 'images/remove-circle.svg',
+                        icon: '/images/remove-circle.svg',
                         buttonStyle: 'UNSTYLED'
                       })
                     .end()
