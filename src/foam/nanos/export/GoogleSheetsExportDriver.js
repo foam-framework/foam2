@@ -18,8 +18,8 @@ foam.CLASS({
       name: 'exportDAO',
       code: async function(X, obj) {
       var url  =  await X.googleSheetsDataExport.createSheet();
-      if(url) {
-        window.location.assign(url);
+      if ( url && url.length > 0 ) {
+        window.location.replace(url);
       }
     }
     }
