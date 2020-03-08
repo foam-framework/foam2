@@ -160,7 +160,9 @@ foam.CLASS({
   label: 'Round byte numbers',
 
   properties: [
-    [ 'type', 'Byte' ]
+    [ 'type', 'Byte' ],
+    [ 'min', -128 ],
+    [ 'max', 127 ]
   ]
 });
 
@@ -174,7 +176,9 @@ foam.CLASS({
   label: 'Round short numbers',
 
   properties: [
-    [ 'type', 'Short' ]
+    [ 'type', 'Short' ],
+    [ 'min', -32768 ],
+    [ 'max', 32767 ]
   ]
 });
 
