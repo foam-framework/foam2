@@ -23,6 +23,8 @@ foam.CLASS({
     'contextData as data'
   ],
 
+  css: '^ { display: inline-block; }',
+
   properties: [
     {
       class: 'foam.u2.ViewSpec',
