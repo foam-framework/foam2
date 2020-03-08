@@ -25,13 +25,9 @@ foam.CLASS({
   ],
 
   css: `
-    ^ label {
-      position: relative;
-    }
-
-    ^horizontal-radio {
-      display: flex;
-    }
+    ^ { padding: 4px 0; }
+    ^ label { position: relative; }
+    ^horizontal-radio { display: flex; }
   `,
 
   properties: [
