@@ -112,10 +112,6 @@ foam.CLASS({
   ],
 
   css: `
-    ^value-view-container {
-      border-top: 1px solid /*%GREY4%*/ #e7eaec;
-    }
-
     ^ .foam-u2-ActionView-addRow {
       margin: 8px 0;
     }
@@ -124,9 +120,9 @@ foam.CLASS({
       align-self: flex-start;
     }
 
-    ^value-view-container:last-child {
-      border-bottom: 1px solid /*%GREY4%*/ #e7eaec;
-    }
+   ^ .foam-u2-ActionView-remove {
+     padding: 2 0 10px 8px;
+   }
 
     ^value-view {
       flex: 1;
