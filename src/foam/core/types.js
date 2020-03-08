@@ -436,6 +436,7 @@ foam.CLASS({
   // FUTURE: verify
   label: 'Email address',
   properties: [
+    [ 'displayWidth', 50 ],
     [
       'preSet',
       function(_, v) {
@@ -487,7 +488,8 @@ foam.CLASS({
   package: 'foam.core',
   name: 'PhoneNumber',
   extends: 'String',
-  label: 'Phone number'
+  label: 'Phone number',
+  properties: [ [ 'displayWidth', 20 ] ]
 });
 
 
