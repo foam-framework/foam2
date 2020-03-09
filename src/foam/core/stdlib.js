@@ -1089,6 +1089,9 @@ foam.LIB({
           typeof value === 'number' ||
           typeof value === 'boolean' ||
           foam.Date.isInstance(value);
+      },
+      function Y(f)          {
+        return ((x) => x(x))((x) => f((y) => (x(x))(y)));
       }
     ]
   });
