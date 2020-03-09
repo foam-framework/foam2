@@ -313,8 +313,8 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'defaultBooleanWithoutLabel',
-      view: { class: 'foam.u2.CheckBox', showLabel: false }// default
+      name: 'defaultBooleanWithLabel',
+      view: { class: 'foam.u2.CheckBox', label: "Label goes here"}
     },
     {
       class: 'Boolean',
