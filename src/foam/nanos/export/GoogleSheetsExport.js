@@ -17,7 +17,13 @@ foam.INTERFACE({
     {
       name: 'createSheet',
       type: 'String',
-      async: true
+      async: true,
+      args: [
+        {
+          name: 'obj',
+          type: 'Object'
+        }
+      ]
     }
   ]
 });

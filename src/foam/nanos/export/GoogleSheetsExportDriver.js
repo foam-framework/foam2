@@ -4,10 +4,16 @@ foam.CLASS({
   implements: [ 'foam.nanos.export.ExportDriver' ],
 
   requires: [
-    'foam.nanos.export.GoogleSheetsExport',
-    'foam.nanos.export.GoogleSheetsExportService',
-    'foam.nanos.export.ClientGoogleSheetsExportService',
-    'foam.box.HTTPBox'
+    'foam.nanos.export.GoogleSheetsOutputter'
+  ],
+
+  properties: [
+    {
+      name: 'outputter',
+      factory: function() {
+        return this.GoogleSheetsOutputter.create();
+      }
+    }
   ],
 
   methods: [
@@ -16,12 +22,25 @@ foam.CLASS({
     },
     {
       name: 'exportDAO',
-      code: async function(X, obj) {
-      var url  =  await X.googleSheetsDataExport.createSheet();
-      if ( url && url.length > 0 ) {
-        window.location.replace(url);
+      code: async function(X, dao) {
+        self = this;
+        
+        dao.select().then(function(sink) {
+          var url  = '';
+          var stringArray = [];
+          var columnNames = self.outputter.getAllPropertyNames(dao.of);
+          stringArray.push(columnNames);
+          var values = self.outputter.outputArray(sink.array, columnNames);
+          stringArray = stringArray.concat(values);
+
+           X.googleSheetsDataExport.createSheet(stringArray).then((val) => {
+            url = val;
+            if ( url && url.length > 0 ) {
+              window.location.replace(url);
+            }
+          });
+        });
       }
-    }
     }
   ]
 });

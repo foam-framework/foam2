@@ -69,9 +69,24 @@ foam.CLASS({
     {
       name: 'createSheet',
       type: 'String',
+      args: [
+        {
+          name: 'obj',
+          type: 'Object'
+        }
+      ],
       javaCode: `
+        if( !obj.getClass().isArray())
+          return "";
+
         try {
-          System.out.println(Paths.get("").toAbsolutePath().toString());
+          List<List<Object>> listOfValues = new ArrayList<>();
+
+          Object[] arr = (Object[]) obj;
+          for ( Object v : arr ) {
+            listOfValues.add(Arrays.asList((Object[])v));
+          }
+
           final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
           Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
             .setApplicationName(APPLICATION_NAME)
@@ -84,12 +99,7 @@ foam.CLASS({
           List<ValueRange> data = new ArrayList<>();
           data.add(new ValueRange()
             .setRange("A1")
-            .setValues(Arrays.asList(
-              Arrays.asList("Hello"))));
-          data.add(new ValueRange()
-            .setRange("A4")
-            .setValues(Arrays.asList(
-              Arrays.asList("World"))));
+            .setValues(listOfValues));
     
           BatchUpdateValuesRequest batchBody = new BatchUpdateValuesRequest()
             .setValueInputOption("USER_ENTERED")
