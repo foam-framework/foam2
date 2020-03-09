@@ -28,7 +28,7 @@ foam.CLASS({
         dao.select().then(function(sink) {
           var url  = '';
           var stringArray = [];
-          var columnNames = self.outputter.getAllPropertyNames(dao.of);
+          var columnNames = X.filteredTableColumns ? X.filteredTableColumns : self.outputter.getAllPropertyNames(dao.of);
           stringArray.push(columnNames);
           var values = self.outputter.outputArray(sink.array, columnNames);
           stringArray = stringArray.concat(values);

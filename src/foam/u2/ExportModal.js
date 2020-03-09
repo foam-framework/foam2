@@ -109,8 +109,8 @@ foam.CLASS({
           .start(this.NOTE).addClass('input-box').addClass('note').end()
           .add(
             self.slot(function(dataType) {
-              if ( dataType == 'CSV' ) {
-                return self.E().start().addClass('label').add('Export all columns ').startContext({ data: self }).add(self.EXPORT_ALL_COLUMNS).endContext().end();
+              if ( dataType == 'CSV' || dataType == 'GoogleSheets' ) {
+                return self.E().start().addClass('label').startContext({ data: self }).tag(self.EXPORT_ALL_COLUMNS).endContext().end();
               }
             })
           )
