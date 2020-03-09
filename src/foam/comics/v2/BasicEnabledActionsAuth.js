@@ -43,7 +43,7 @@ foam.CLASS({
       javaCode: `
         String outputString = getModelName();
 
-        if ( SafetyUtil.equals(operation, foam.nanos.ruler.Operations.CREATE ) ){
+        if ( SafetyUtil.equals(operation, foam.nanos.ruler.Operations.CREATE ) ) {
           outputString += ".create";
         } else if ( SafetyUtil.equals(operation, foam.nanos.ruler.Operations.UPDATE) ) {
           outputString += ".update." + obj.getProperty("id");
