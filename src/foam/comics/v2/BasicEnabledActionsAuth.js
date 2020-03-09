@@ -50,7 +50,7 @@ foam.CLASS({
         } else if ( SafetyUtil.equals(operation, foam.nanos.ruler.Operations.REMOVE) ) {
           outputString += ".remove." + obj.getProperty("id");
         } else {
-          throw new RuntimeException(new UnsupportedOperationException(operation.getLabel());
+          throw new RuntimeException(new UnsupportedOperationException(operation.getLabel()));
         }
 
         return outputString;
