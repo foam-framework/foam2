@@ -329,6 +329,7 @@ var classes = [
   'foam.nanos.notification.notifications.ScriptRunNotification',
   'foam.nanos.notification.EmailSetting',
   'foam.nanos.notification.NotificationSetting',
+  'foam.nanos.notification.NotificationHostnameRuleAction',
   'foam.nanos.script.Script',
   'foam.nanos.script.TestRunnerConfig',
   'foam.nanos.script.TestRunnerScript',
