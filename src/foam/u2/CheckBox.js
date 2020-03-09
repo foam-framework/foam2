@@ -55,7 +55,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'showLabel',
-      factory: function() { return !! this.label || this.labelFormatter },
+      factory: function() { return this.label || this.labelFormatter },
     },
     {
       class: 'String',
@@ -96,11 +96,6 @@ foam.CLASS({
 
     function link() {
       this.data$.linkTo(this.attrSlot('checked'));
-    },
-
-    function fromProperty(property) {
-      this.SUPER(property);
-      this.label = property.label;
     }
   ]
 });
