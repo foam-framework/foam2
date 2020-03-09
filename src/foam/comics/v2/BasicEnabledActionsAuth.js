@@ -23,7 +23,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'modelName'
-    },
+    }
   ],
 
   methods: [
@@ -50,7 +50,7 @@ foam.CLASS({
         } else if ( SafetyUtil.equals(operation, foam.nanos.ruler.Operations.REMOVE) ) {
           outputString += ".remove." + obj.getProperty("id");
         } else {
-          throw new RuntimeException("Submitted an invalid operation");
+          throw new RuntimeException(new UnsupportedOperationException(operation.getLabel());
         }
 
         return outputString;
