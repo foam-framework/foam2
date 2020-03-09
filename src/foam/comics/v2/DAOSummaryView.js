@@ -190,7 +190,6 @@ foam.CLASS({
         this
           .addClass(this.myClass())
           .add(self.slot(function(data, config$viewBorder, viewView) {
-            
             return self.E()
               .start(self.Rows)
                 .start(self.Rows)
