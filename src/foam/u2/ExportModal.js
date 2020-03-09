@@ -53,13 +53,7 @@ foam.CLASS({
       view: { class: 'foam.u2.CheckBox' },
       class: 'Boolean'
     },
-    {
-      name: 'exportDriverReg',
-      expression: async function(dataType) {
-        var exportDriverReg = this.exportDriverRegistryDAO.find(this.dataType);
-        return exportDriverReg;
-      }
-    },
+    'exportDriverReg',
     {
       class: 'Boolean',
       name: 'isConvertAvailable' 
@@ -126,6 +120,7 @@ foam.CLASS({
           self.exportDriverReg = val;
         });
       });
+      
       self.exportDriverReg$.sub(function() {
         self.isConvertAvailable =  self.exportDriverReg.canBeConverted;
         self.isDownloadAvailable = self.exportDriverReg.canBeDownloaded;
