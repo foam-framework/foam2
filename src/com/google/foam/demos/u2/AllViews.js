@@ -76,6 +76,11 @@ foam.CLASS({
     },
     {
       class: 'Int',
+      name: 'int2',
+      view: 'foam.u2.view.IntView'
+    },
+    {
+      class: 'Int',
       name: 'intWithMinAndMax',
       min: 1,
       max: 5,
@@ -285,6 +290,12 @@ foam.CLASS({
     {
       class: 'Color',
       name: 'defaultColor'
+    },
+    {
+      class: 'Color',
+      name: 'readOnlyColor',
+      value: 'orange',
+      view: 'foam.u2.view.ReadColorView'
     },
     {
       class: 'Password',
