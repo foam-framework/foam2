@@ -23,6 +23,7 @@ p({"class":"foam.strategy.StrategyReference","id":"e5eac520-5516-4879-afce-5cb39
 p({"class":"foam.strategy.StrategyReference","id":"50e1aea1-6c37-4dfe-ab47-572aeac712f3","desiredModelId":"foam.mlang.predicate.Predicate","strategy":"foam.mlang.predicate.IsClassOf"})
 p({"class":"foam.strategy.StrategyReference","id":"54a6686e-00cc-410a-88cf-97aa7d70ed27","desiredModelId":"foam.mlang.predicate.Predicate","strategy":"foam.mlang.predicate.RegExp"})
 p({"class":"foam.strategy.StrategyReference","id":"90a921a8-4002-40a2-a487-4679d84a6b8f","desiredModelId":"foam.mlang.predicate.Predicate","strategy":"foam.mlang.predicate.OlderThan"})
+p({"class":"foam.strategy.StrategyReference","id":"98ee0780-53fc-11ea-8d77-2e728ce88125","desiredModelId":"foam.mlang.predicate.Predicate","strategy":"foam.lib.PermissionPredicate"})
 
 // foam.mlang.Expr
 p({"class":"foam.strategy.StrategyReference","id":"904ae35f-5c4a-4361-8f0c-7b54a71d5b79","desiredModelId":"foam.mlang.Expr","strategy":"foam.mlang.expr.PropertyExpr"})

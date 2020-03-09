@@ -20,6 +20,11 @@ foam.CLASS({
   name: 'DualView',
   extends: 'foam.u2.Element',
 
+  css: `
+    ^viewa, ^viewb { padding: 2px 0; }
+    ^viewa { margin-right: 8px; }
+  `,
+
   properties: [
     {
       class: 'foam.u2.ViewSpec',
@@ -46,9 +51,8 @@ foam.CLASS({
       }
 
       this
-        .start(a).addClass( this.myClass('viewa') ).end()
-        .nbsp()
-        .start(b).addClass( this.myClass('viewb') ).end();
+        .start(a).addClass(this.myClass('viewa')).end()
+        .start(b).addClass(this.myClass('viewb')).end();
     },
 
     function fromProperty(prop) {

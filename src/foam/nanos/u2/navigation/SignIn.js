@@ -104,9 +104,8 @@ foam.CLASS({
     {
       name: 'login',
       label: 'Sign in',
-      isEnabled: function(errors_) {
-        return ! errors_;
-      },
+      // if you use isAvailable or isEnabled - with model error_, then note that auto validate will not
+      // work correctly. Chorme for example will not read a field auto populated without a user action
       code: async function(X) {
         if ( this.identifier.length > 0 ) {
           this.auth.login(X, this.identifier, this.password).then(
@@ -131,8 +130,8 @@ foam.CLASS({
               this.notify(err.message || 'There was a problem logging in.', 'error');
           });
         } else {
-          //TODO: change to 'Please enter email or username' when integrating
-          this.notify('Please enter email', 'error')
+          // TODO: change to 'Please enter email or username' when integrating
+          this.notify('Please enter email', 'error');
         }
       }
     }
