@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.comics.v2',
   name: 'CRUDEnabledActionsAuth',
   documentation: `
-    String arrays of permissions that will be checked on each CRUD action through availablePermissions
+    A config which can take in customized permission checks for the isEnabled method on CRUD actions
   `,
 
   properties: [

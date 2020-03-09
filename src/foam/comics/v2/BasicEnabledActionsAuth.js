@@ -15,7 +15,8 @@ foam.CLASS({
   ],
 
   documentation: `
-    String arrays of permissions that will be checked on each CRUD action through availablePermissions
+    Defines baseline CRUD permissions to be checked in conjuction with the DAOControllerConfig
+    (model.create, model.update.i, model.remove.i)
   `,
 
   properties: [
