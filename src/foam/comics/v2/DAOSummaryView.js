@@ -179,7 +179,6 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
-
       this.SUPER();
 
       // Get a fresh copy of the data, especially when we've been returned
