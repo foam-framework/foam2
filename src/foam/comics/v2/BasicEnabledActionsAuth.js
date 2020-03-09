@@ -64,7 +64,7 @@ foam.CLASS({
         } else if ( operation === foam.nanos.ruler.Operations.REMOVE ) {
           outputString += '.remove.' + obj.id;
         } else {
-          throw new Error("Submitted an invalid operation");
+          throw new Error("Unsupported operation: "+operation.label);
         }
 
         return outputString;
