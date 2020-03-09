@@ -8,7 +8,9 @@ foam.CLASS({
   package: 'foam.comics.v2',
   name: 'CRUDEnabledActionsAuth',
   documentation: `
-    A config which can take in customized permission checks for the isEnabled method on CRUD actions
+    A config which can take in customized front-end permission checks for actions 
+    using the isEnabled method on action. Is wired up through DAOMenu2 by using the
+    DAOControllerConfig. 
   `,
 
   properties: [
