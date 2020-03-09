@@ -48,8 +48,8 @@ foam.CLASS({
     'exportObj',
     {
       name: 'exportAllColumns',
-      view: { class: 'foam.u2.CheckBox' },
-      class: 'Boolean'
+      view: { class: 'foam.u2.CheckBox',  label: 'Export all columns '},
+      class: 'Boolean',
     }
   ],
 
@@ -110,7 +110,7 @@ foam.CLASS({
           .add(
             self.slot(function(dataType) {
               if ( dataType == 'CSV' ) {
-                return self.E().start().addClass('label').add('Export all columns ').startContext({ data: self }).add(self.EXPORT_ALL_COLUMNS).endContext().end();
+                return self.E().start().addClass('label').startContext({ data: self }).add(self.EXPORT_ALL_COLUMNS).endContext().end();
               }
             })
           )
@@ -176,10 +176,10 @@ foam.CLASS({
           document.body.appendChild(link);
           link.click();
         }
-      });
 
-      if ( this.exportAllColumns )
-        this.filteredTableColumns = filteredColumnsCopy;
+        if ( this.exportAllColumns )
+          this.filteredTableColumns = filteredColumnsCopy;
+      }); 
     }
   ]
 
