@@ -15,8 +15,8 @@ foam.CLASS({
   ],
 
   documentation: `
-    Defines baseline CRUD permissions to be checked in conjuction with the DAOControllerConfig
-    (model.create, model.update.i, model.remove.i)
+    Defines baseline CRUD permissions to be checked on front-end actions
+    in conjuction with the DAOControllerConfig (model.create, model.update.i, model.remove.i)
   `,
 
   properties: [

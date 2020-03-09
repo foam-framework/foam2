@@ -8,8 +8,8 @@ foam.INTERFACE({
   package: 'foam.comics.v2',
   name: 'EnabledActionsAuth',
   documentation: `
-    An interface where you can define how CRUD permissions can be generated, to be used
-    in conjuction with the isEnabled method of CRUD actions for the DAOController
+    An interface where you can define how front-end CRUD permissions for actions can be generated,
+    to be used in conjuction with the isEnabled method of CRUD actions for the DAOController
   `,
 
   methods: [
