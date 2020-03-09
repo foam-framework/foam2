@@ -83,7 +83,7 @@ foam.CLASS({
           try {
             let permissionString = config.CRUDEnabledActionsAuth.enabledActionsAuth.permissionFactory(foam.nanos.ruler.Operations.CREATE, data);
   
-            return this.auth.check(null, permissionString).then(isAuthorized => isAuthorized);
+            return this.auth.check(null, permissionString);
           } catch(e) {
             return false;
           }
