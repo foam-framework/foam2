@@ -29,7 +29,6 @@ foam.CLASS({
     'foam.nanos.approval.ApprovableAware',
     'foam.nanos.approval.ApprovalRequest',
     'foam.nanos.approval.ApprovalStatus',
-    'foam.nanos.approval.RoleApprovalRequest',
     'foam.nanos.auth.LifecycleAware',
     'foam.nanos.auth.LifecycleState',
     'foam.nanos.auth.User',
@@ -80,11 +79,11 @@ foam.CLASS({
       type: 'void',
       args: [
         { name: 'x', type: 'Context' },
-        { name: 'req', type: 'RoleApprovalRequest' },
+        { name: 'req', type: 'ApprovalRequest' },
         { name: 'userId', type: 'long' }
       ],
       javaCode: `
-        RoleApprovalRequest request = (RoleApprovalRequest) req.fclone();
+        ApprovalRequest request = (ApprovalRequest) req.fclone();
         request.clearId();
         request.setApprover(userId);
         ((DAO) x.get("approvalRequestDAO")).put_(x, request);
@@ -99,7 +98,7 @@ foam.CLASS({
       type: 'void',
       args: [
         { name: 'x', type: 'Context' },
-        { name: 'request', type: 'RoleApprovalRequest' },
+        { name: 'request', type: 'ApprovalRequest' },
         { name: 'obj', type: 'FObject' }
       ],
       javaCode:`
@@ -135,7 +134,7 @@ foam.CLASS({
       }
 
       if ( getIsTrackingRequestSent() ) {
-        RoleApprovalRequest trackingRequest = (RoleApprovalRequest) request.fclone();
+        ApprovalRequest trackingRequest = (ApprovalRequest) request.fclone();
         trackingRequest.setIsTrackingRequest(true);
 
         sendSingleRequest(x, trackingRequest, trackingRequest.getInitiatingUser());
@@ -195,8 +194,8 @@ foam.CLASS({
             foam.mlang.MLang.AND(
               foam.mlang.MLang.EQ(ApprovalRequest.DAO_KEY, getDaoKey()),
               foam.mlang.MLang.EQ(ApprovalRequest.OBJ_ID, approvableAwareObj.getApprovableKey()),
-              foam.mlang.MLang.EQ(RoleApprovalRequest.OPERATION, Operations.REMOVE),
-              foam.mlang.MLang.EQ(RoleApprovalRequest.IS_FULFILLED, false),
+              foam.mlang.MLang.EQ(ApprovalRequest.OPERATION, Operations.REMOVE),
+              foam.mlang.MLang.EQ(ApprovalRequest.IS_FULFILLED, false),
               foam.mlang.MLang.OR(
                 foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.APPROVED),
                 foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.REJECTED)
@@ -205,7 +204,7 @@ foam.CLASS({
           ).select(new ArraySink())).getArray();
 
         if ( approvedObjRemoveRequests.size() == 1 ) {
-          RoleApprovalRequest fulfilledRequest = (RoleApprovalRequest) approvedObjRemoveRequests.get(0);
+          ApprovalRequest fulfilledRequest = (ApprovalRequest) approvedObjRemoveRequests.get(0);
           fulfilledRequest.setIsFulfilled(true);
 
           approvalRequestDAO.put_(getX(), fulfilledRequest);
@@ -222,7 +221,7 @@ foam.CLASS({
           throw new RuntimeException("Something went wrong cannot have multiple approved/rejected requests for the same request!");
         } 
 
-        RoleApprovalRequest approvalRequest = new RoleApprovalRequest.Builder(getX())
+        ApprovalRequest approvalRequest = new ApprovalRequest.Builder(getX())
           .setDaoKey(getDaoKey())
           .setObjId(approvableAwareObj.getApprovableKey())
           .setClassification(getOf().getObjClass().getSimpleName())
@@ -245,8 +244,8 @@ foam.CLASS({
               foam.mlang.MLang.AND(
                 foam.mlang.MLang.EQ(ApprovalRequest.DAO_KEY, getDaoKey()),
                 foam.mlang.MLang.EQ(ApprovalRequest.OBJ_ID, approvableAwareObj.getApprovableKey()),
-                foam.mlang.MLang.EQ(RoleApprovalRequest.OPERATION, Operations.CREATE),
-                foam.mlang.MLang.EQ(RoleApprovalRequest.IS_FULFILLED, false),
+                foam.mlang.MLang.EQ(ApprovalRequest.OPERATION, Operations.CREATE),
+                foam.mlang.MLang.EQ(ApprovalRequest.IS_FULFILLED, false),
                 foam.mlang.MLang.OR(
                   foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.APPROVED),
                   foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.REJECTED)
@@ -255,7 +254,7 @@ foam.CLASS({
             ).select(new ArraySink())).getArray();
 
           if ( approvedObjCreateRequests.size() == 1 ) {
-            RoleApprovalRequest fulfilledRequest = (RoleApprovalRequest) approvedObjCreateRequests.get(0);
+            ApprovalRequest fulfilledRequest = (ApprovalRequest) approvedObjCreateRequests.get(0);
             fulfilledRequest.setIsFulfilled(true);
 
             approvalRequestDAO.put_(getX(), fulfilledRequest);
@@ -274,7 +273,7 @@ foam.CLASS({
             throw new RuntimeException("Something went wrong cannot have multiple approved/rejected requests for the same request!");
           } 
 
-          RoleApprovalRequest approvalRequest = new RoleApprovalRequest.Builder(getX())
+          ApprovalRequest approvalRequest = new ApprovalRequest.Builder(getX())
             .setDaoKey(getDaoKey())
             .setObjId(approvableAwareObj.getApprovableKey())
             .setClassification(getOf().getObjClass().getSimpleName())
@@ -344,8 +343,8 @@ foam.CLASS({
             foam.mlang.MLang.AND(
               foam.mlang.MLang.EQ(ApprovalRequest.DAO_KEY, "approvableDAO"),
               foam.mlang.MLang.EQ(ApprovalRequest.OBJ_ID, hashedId),
-              foam.mlang.MLang.EQ(RoleApprovalRequest.OPERATION, Operations.UPDATE),
-              foam.mlang.MLang.EQ(RoleApprovalRequest.IS_FULFILLED, false),
+              foam.mlang.MLang.EQ(ApprovalRequest.OPERATION, Operations.UPDATE),
+              foam.mlang.MLang.EQ(ApprovalRequest.IS_FULFILLED, false),
               foam.mlang.MLang.OR(
                 foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.APPROVED),
                 foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.REJECTED)
@@ -354,7 +353,7 @@ foam.CLASS({
           ).select(new ArraySink())).getArray();
 
         if ( approvedObjUpdateRequests.size() == 1 ) {
-          RoleApprovalRequest fulfilledRequest = (RoleApprovalRequest) approvedObjUpdateRequests.get(0);
+          ApprovalRequest fulfilledRequest = (ApprovalRequest) approvedObjUpdateRequests.get(0);
           fulfilledRequest.setIsFulfilled(true);
 
           approvalRequestDAO.put_(getX(), fulfilledRequest);
@@ -378,7 +377,7 @@ foam.CLASS({
           .setObjId(approvableAwareObj.getApprovableKey())
           .setPropertiesToUpdate(updatedProperties).build());
 
-        RoleApprovalRequest approvalRequest = new RoleApprovalRequest.Builder(getX())
+        ApprovalRequest approvalRequest = new ApprovalRequest.Builder(getX())
           .setDaoKey("approvableDAO")
           .setObjId(approvable.getId())
           .setClassification(getOf().getObjClass().getSimpleName())
