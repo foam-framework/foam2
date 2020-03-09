@@ -49,7 +49,7 @@ foam.CLASS({
     {
       name: 'exportAllColumns',
       view: { class: 'foam.u2.CheckBox',  label: 'Export all columns '},
-      class: 'Boolean',
+      class: 'Boolean'
     }
   ],
 
