@@ -89,6 +89,10 @@ foam.CLASS({
     {
       name: 'select_',
       javaCode: `
+        // TODO: See CPF-4875 for more info
+        // Will need to figure out if the DAO OF is not lifecycleAware, 
+        // but a subclass entry may be lifecycleAware
+
         boolean userCanReadDeleted = canReadDeleted(x);
         boolean userCanReadRejected = canReadRejected(x);
 
@@ -120,12 +124,17 @@ foam.CLASS({
         getDelegate().select_(x, sink, skip, limit, order, predicate) :
         getDelegate()
           .where(
-            MLang.NOT(
               MLang.OR(
-                predicateArray
+                MLang.NOT(
+                  MLang.INSTANCE_OF(LifecycleAware.class)
+                ),
+                MLang.NOT(
+                  MLang.OR(
+                    predicateArray
+                  )
+                )
               )
             )
-          )
           .select_(x, sink, skip, limit, order, predicate);
       `
     },
