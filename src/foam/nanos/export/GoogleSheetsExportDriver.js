@@ -25,21 +25,16 @@ foam.CLASS({
       code: async function(X, dao) {
         self = this;
         
-        dao.select().then(function(sink) {
-          var url  = '';
-          var stringArray = [];
-          var columnNames = X.filteredTableColumns ? X.filteredTableColumns : self.outputter.getAllPropertyNames(dao.of);
-          stringArray.push(columnNames);
-          var values = self.outputter.outputArray(sink.array, columnNames);
-          stringArray = stringArray.concat(values);
+        var sink = await dao.select();
+        var url  = '';
+        var stringArray = [];
+        var columnNames = X.filteredTableColumns ? X.filteredTableColumns : self.outputter.getAllPropertyNames(dao.of);
+        stringArray.push(columnNames);
+        var values = self.outputter.outputArray(sink.array, columnNames);
+        stringArray = stringArray.concat(values);
 
-           X.googleSheetsDataExport.createSheet(stringArray).then((val) => {
-            url = val;
-            if ( url && url.length > 0 ) {
-              window.location.replace(url);
-            }
-          });
-        });
+        var url = await X.googleSheetsDataExport.createSheet(stringArray);
+        return url;
       }
     }
   ]
