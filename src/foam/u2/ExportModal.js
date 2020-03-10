@@ -33,7 +33,6 @@ foam.CLASS({
           }
         });
       },
-      value: 'CSV'
     },
     {
       name: 'note',
@@ -111,11 +110,11 @@ foam.CLASS({
       var self = this;
       this.SUPER();
 
-      self.exportDriverRegistryDAO.find(self.dataType).then(function(val) {
-        self.exportDriverReg = val;
+      self.exportDriverRegistryDAO.where(this.predicate).select().then(function(val) {
+        self.dataType = val.array[0].id;
       });
 
-      this.dataType$.sub(function() {
+      self.dataType$.sub(function() {
         self.exportDriverRegistryDAO.find(self.dataType).then(function(val) {
           self.exportDriverReg = val;
         });
