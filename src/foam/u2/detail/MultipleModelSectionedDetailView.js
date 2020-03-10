@@ -30,16 +30,6 @@ foam.CLASS({
       of: 'foam.core.Class',
       name: 'ofList',
       documentation: 'Currently taking in a string of class paths',
-      factory: function() {
-        return [
-          // 'net.nanopay.crunch.onboardingModels.SigningOfficerInformationData',
-          // 'net.nanopay.crunch.onboardingModels.PersonalInformationData',
-          // 'net.nanopay.crunch.onboardingModels.BusinessInformationData',
-          // 'net.nanopay.crunch.onboardingModels.TransactionDetailsData',
-          'net.nanopay.crunch.onboardingModels.BusinessOwnershipData'
-          // if us, add 'net.nanopay.crunch.onboardingModels.InternationalBusinessAgreementDocuments'
-        ]
-      },
       adapt: function(_, n) {
         return n.map((of) => typeof of === 'string' ? foam.lookup(of) : of);
       }
