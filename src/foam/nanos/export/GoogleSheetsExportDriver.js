@@ -36,9 +36,9 @@ foam.CLASS({
       var sink = await dao.select();
       var url  = '';
       var stringArray = [];
-      var columnNames = X.filteredTableColumns ? X.filteredTableColumns : self.outputter.getAllPropertyNames(dao.of);
-      stringArray.push(columnNames);
-      var values = self.outputter.outputArray(sink.array, columnNames);
+      var props = X.filteredTableColumns ? X.filteredTableColumns : self.outputter.getAllPropertyNames(dao.of);
+      stringArray.push(X.filteredTableColumns ? self.outputter.getSpecifiedPropertyLabels(dao.of, X.filteredTableColumns) : self.outputter.getAllPropertyLabels(dao.of));
+      var values = self.outputter.outputArray(sink.array, props);
       stringArray = stringArray.concat(values);
 
       var url = await X.googleSheetsDataExport.createSheet(stringArray);

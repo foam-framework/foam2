@@ -16,6 +16,32 @@ foam.CLASS({
       }
     },
     {
+      name: 'getAllPropertyLabels',
+      type: 'StringArray',
+      code: function(cls) {
+        var props = cls.getAxiomsByClass(foam.core.Property);
+        var propNames = [];
+        for ( var i = 0 ; i < props.length ; i++ ) {
+          if ( ! props[i].networkTransient )
+            propNames.push(props[i].label);
+        }
+        return propNames;
+      }
+    },
+    {
+      name: 'getSpecifiedPropertyLabels',
+      type: 'StringArray',
+      code: function(cls, propIds) {
+        var propNames = [];
+        for ( var i = 0 ; i < propIds.length ; i++ ) {
+          var p = cls.getAxiomByName(propIds[i]);
+          if ( ! p.networkTransient )
+            propNames.push(p.label);
+        }
+        return propNames;
+      }
+    },
+    {
       name: 'outputObjectForProperties',
       type: 'StringArray',
       code: function(obj, props) {
