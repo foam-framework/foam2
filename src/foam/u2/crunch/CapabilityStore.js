@@ -51,13 +51,25 @@ foam.CLASS({
   
   properties: [
     {
+      name: 'visibleCapabilityDAO',
+      class: 'foam.dao.DAOProperty',
+      documentation: `
+        DAO with only visible capabilities.
+      `,
+      factory: function () {
+        return this.capabilityDAO.where(this.EQ(
+          this.Capability.VISIBLE, true));
+      }
+    },
+    {
       name: 'featuredCapabilities',
       class: 'foam.dao.DAOProperty',
       documentation: `
         DAO Property to find four capabilities to feature.
       `,
       factory: function () {
-        return this.capabilityDAO.where(this.IN("featured", this.Capability.KEYWORDS));
+        return this.visibleCapabilityDAO.where(this.IN(
+          "featured", this.Capability.KEYWORDS));
       }
     }
   ],
@@ -99,6 +111,9 @@ foam.CLASS({
               grid = grid
                 .start(self.GUnit, { columns: 3 })
                   .tag(self.CapabilityFeatureView, { data: cap })
+                  .on('click', () => {
+                    self.crunchController.launchWizard(cap.id);
+                  })
                 .end()
                 ;
             }
@@ -119,7 +134,7 @@ foam.CLASS({
             .select().then(arraySink => arraySink.array.map(x => x.targetId) );
 
           previewIdsPromise.then(capabilityIds => {
-            self.capabilityDAO.where(
+            self.visibleCapabilityDAO.where(
               self.IN(self.Capability.ID, capabilityIds)
             ).select().then((result) => {
               let arr = result.array;
@@ -129,6 +144,9 @@ foam.CLASS({
                 grid = grid
                   .start(self.GUnit, { columns: 4 })
                     .tag(self.CapabilityCardView, { data: cap })
+                    .on('click', () => {
+                      self.crunchController.launchWizard(cap.id);
+                    })
                   .end()
                   ;
               }
@@ -149,7 +167,7 @@ foam.CLASS({
 
       // When 'p' resolves, query all matching capabilities
       p.then(capabilityIds => {
-        self.capabilityDAO.where(
+        self.visibleCapabilityDAO.where(
           self.IN(self.Capability.ID, capabilityIds)
         ).select().then((result) => {
           let arr = result.array;

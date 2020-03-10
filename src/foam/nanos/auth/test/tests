@@ -1,4 +1,4 @@
-p({"class":"foam.nanos.auth.PasswordPolicyTest","id":"passwordPolicyTest","description":"password policy tests"})
+p({"class":"foam.nanos.auth.test.PasswordPolicyTest","id":"passwordPolicyTest","description":"password policy tests"})
 p({"class":"foam.nanos.auth.test.ServiceProviderAwareTest","id":"ServiceProviderAwareTest","description":""})
 p({"class":"foam.nanos.auth.test.UserAndGroupPermissionTest","id":"UserAndGroupPermissionTest","description":""})
 p({"class":"foam.nanos.auth.test.PreventPrevilegeEscalationTest","id":"PreventPrivilegeEscalationTest"})

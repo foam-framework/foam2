@@ -14,6 +14,7 @@ p({
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("OMMinutely")
       .setOf(foam.nanos.analytics.Candlestick.getOwnClassInfo())
+      .setWriteOnly(true)
       .build();
   """,
   "client": "{\"of\":\"foam.nanos.analytics.Candlestick\"}"
@@ -29,6 +30,7 @@ p({
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("OMHourly")
       .setOf(foam.nanos.analytics.Candlestick.getOwnClassInfo())
+      .setWriteOnly(true)
       .build();
   """,
   "client": "{\"of\":\"foam.nanos.analytics.Candlestick\"}"
@@ -44,6 +46,7 @@ p({
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("OMDAILY")
       .setOf(foam.nanos.analytics.Candlestick.getOwnClassInfo())
+      .setWriteOnly(true)
       .build();
   """,
   "client": "{\"of\":\"foam.nanos.analytics.Candlestick\"}"

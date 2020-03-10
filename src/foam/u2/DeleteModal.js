@@ -18,7 +18,6 @@ foam.CLASS({
       max-height: calc(100vh - 116px);
       overflow-y: scroll;
       /* The line below accounts for the top nav bar. */
-      margin-top: 60px;
     }
     ^main {
       padding: 24px;

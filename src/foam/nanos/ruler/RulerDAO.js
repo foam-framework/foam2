@@ -243,7 +243,7 @@ if ( ! ( obj instanceof RulerProbe ) ) return getDelegate().cmd_(x, obj);
 RuleEngine engine = new RuleEngine(x, getX(), this);
 Map rulesList = getRulesList();
 FObject oldObj = getDelegate().find_(x, probe.getObject());
-groups = (GroupBy)rulesList.get(predicate);
+groups = (GroupBy) rulesList.get(predicate);
 for ( Object key : groups.getGroupKeys() ) {
   List<Rule> rules = ((ArraySink)(groups.getGroups().get(key))).getArray();
   engine.probe(rules, probe, (FObject)probe.getObject(), oldObj);

@@ -65,14 +65,16 @@ foam.CLASS({
             .map((capID) => capabilityMap[capID].of);
         });
       });
-
-      // Summon the wizard; accio!
-      p.then(() => {
-        let argsList = ofList.map(() => { return {}; });
-        self.stack.push({
-          class: 'foam.nanos.crunch.ui.ScrollSectionWizardView',
-          ofList: ofList,
-          argsList: argsList
+      this.capabilityDAO.find(capabilityId).then((cap) => {
+        // Summon the wizard; accio!
+        p.then(() => {
+          let argsList = ofList.map(() => { return {}; });
+          self.stack.push({
+            class: 'foam.nanos.crunch.ui.ScrollSectionWizardView',
+            title: cap.name,
+            ofList: ofList,
+            argsList: argsList
+          });
         });
       });
     }
