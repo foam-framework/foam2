@@ -25,11 +25,6 @@ foam.CLASS({
     }
   `,
 
-  imports: [
-    'capabilityDAO',
-    'userCapabilityJunctionDAO'
-  ],
-
   requires: [
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.UserCapabilityJunction'
