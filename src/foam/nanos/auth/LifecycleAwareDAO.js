@@ -13,6 +13,7 @@ foam.CLASS({
     'foam.core.FObject',
     'foam.dao.*',
     'foam.mlang.MLang',
+    'foam.mlang.predicate.AbstractPredicate',
     'foam.mlang.predicate.Predicate',
     'java.util.ArrayList',
     'java.util.List'
@@ -120,13 +121,20 @@ foam.CLASS({
         
         Predicate[] predicateArray = predicateList.toArray(new Predicate[predicateList.size()]);
 
+        AbstractPredicate isLifecycleAwarePredicate = new AbstractPredicate(x) {
+          @Override
+          public boolean f(Object obj) {
+            return obj instanceof LifecycleAware;
+          }
+        };
+
         return ( predicateArray.length == 0 ) ?
         getDelegate().select_(x, sink, skip, limit, order, predicate) :
         getDelegate()
           .where(
               MLang.OR(
                 MLang.NOT(
-                  MLang.INSTANCE_OF(LifecycleAware.class)
+                  isLifecycleAwarePredicate
                 ),
                 MLang.NOT(
                   MLang.OR(
