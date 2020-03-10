@@ -18,7 +18,7 @@ foam.CLASS({
       display: flex;
       height: /*%INPUTHEIGHT%*/ 32px;
       justify-content: center;
-      margin: 4px 0;
+      padding: 0 32px;
     }
 
     ^black {
