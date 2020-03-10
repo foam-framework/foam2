@@ -14,12 +14,26 @@ foam.CLASS({
   imports: [
     'stack'
   ],
+  
+  implements: [
+    'foam.mlang.Expressions'
+  ],
 
   css: `
     ^ {
       margin: 30px;
     }
   `,
+
+  imports: [
+    'capabilityDAO',
+    'userCapabilityJunctionDAO'
+  ],
+
+  requires: [
+    'foam.nanos.crunch.Capability',
+    'foam.nanos.crunch.UserCapabilityJunction'
+  ],
 
   properties: [
     {
@@ -83,9 +97,26 @@ foam.CLASS({
     },
     {
       name: 'save',
-      code: function(x) {
-        console.log('saving');
-        this.stack.back();
+      code: async function(x) {
+
+        var capabilityDAO = x.capabilityDAO;
+        var userCapabilityJunctionDAO = x.userCapabilityJunctionDAO;
+
+        this.sectionsList.forEach((m) => {
+          capabilityDAO
+            .find(this.EQ(foam.nanos.crunch.Capability.OF, m.data.cls_))
+            .then((cap) => {
+              var ucj = foam.nanos.crunch.UserCapabilityJunction.create({
+                sourceId: this.data.businessId,
+                targetId: cap.id,
+                data: m.data
+              });
+              userCapabilityJunctionDAO.put_(x, ucj);
+            });
+        });
+        
+        x.ctrl.notify('Your progress has been saved.');
+        x.stack.back();
       }
     }
   ]
