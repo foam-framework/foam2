@@ -33,6 +33,7 @@ foam.CLASS({
           }
         });
       },
+      value: 'CSV'
     },
     {
       name: 'note',
@@ -55,15 +56,15 @@ foam.CLASS({
     'exportDriverReg',
     {
       class: 'Boolean',
-      name: 'isConvertAvailable' 
+      name: 'isConvertAvailable'
     },
     {
       class: 'Boolean',
-      name: 'isDownloadAvailable' 
+      name: 'isDownloadAvailable'
     },
     {
       class: 'Boolean',
-      name: 'isOpenAvailable' 
+      name: 'isOpenAvailable'
     }
   ],
 
@@ -110,8 +111,10 @@ foam.CLASS({
       var self = this;
       this.SUPER();
 
-      self.exportDriverRegistryDAO.where(this.predicate).select().then(function(val) {
-        self.dataType = val.array[0].id;
+      self.exportDriverRegistryDAO.where(self.predicate).select().then(function(val) {
+        self.exportDriverRegistryDAO.find(val.array[0].id).then(function(val) {
+          self.exportDriverReg = val;
+        });
       });
 
       self.dataType$.sub(function() {
