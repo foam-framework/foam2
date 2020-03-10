@@ -69,7 +69,7 @@ public class SafetyUtil {
   }
 
   public static int compare(boolean o1, boolean o2) {
-    return o1 == o2 ? 0 : o1 ? 1 : 0;
+    return o1 == o2 ? 0 : o1 ? 1 : -1;
   }
 
   public static int compare(String o1, String o2) {
