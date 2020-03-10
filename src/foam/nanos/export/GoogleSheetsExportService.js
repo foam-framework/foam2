@@ -112,6 +112,39 @@ foam.CLASS({
           BatchUpdateValuesResponse batchResult = service.spreadsheets().values()
             .batchUpdate(response.getSpreadsheetId(), batchBody)
             .execute();
+
+          Request fontSizeRequest = new Request().setRepeatCell(new RepeatCellRequest()
+            .setCell(new CellData().setUserEnteredFormat(new CellFormat().setTextFormat(new TextFormat().setFontSize(10))))
+            .setRange(new GridRange().setEndRowIndex(listOfValues.size() + 1))
+            .setFields("userEnteredFormat.textFormat.fontSize"));
+
+          Request fontFamilyRequest = new Request().setRepeatCell(new RepeatCellRequest()
+            .setCell(new CellData().setUserEnteredFormat(new CellFormat().setTextFormat(new TextFormat().setFontFamily("Roboto"))))
+            .setRange(new GridRange().setEndRowIndex(listOfValues.size() + 1))
+            .setFields("userEnteredFormat.textFormat.fontFamily"));
+
+          Request titleBoldRequest = new Request().setRepeatCell(new RepeatCellRequest()
+            .setCell(new CellData().setUserEnteredFormat(new CellFormat().setTextFormat(new TextFormat().setBold(true))))
+            .setRange(new GridRange().setEndRowIndex(1))
+            .setFields("userEnteredFormat.textFormat.bold"));
+          
+          Request alternatingColors = new Request().setAddBanding(new AddBandingRequest()
+            .setBandedRange(new BandedRange().setRange(new GridRange().setEndRowIndex(listOfValues.size()).setEndColumnIndex(listOfValues.get(0).size())).setRowProperties(
+              new BandingProperties()
+                .setHeaderColor(new Color().setRed(0.643f).setGreen(0.761f).setBlue(0.957f))
+                .setFirstBandColor(new Color().setRed(1f).setGreen(1f).setBlue(1f))
+                .setSecondBandColor(new Color().setRed(0.91f).setGreen(0.941f).setBlue(0.996f))//232,240,254
+            )));
+
+          BatchUpdateSpreadsheetRequest r = new BatchUpdateSpreadsheetRequest().setRequests(new ArrayList(){{
+            add(titleBoldRequest);
+            add(fontSizeRequest);
+            add(fontFamilyRequest);
+            add(alternatingColors);
+          }});
+          BatchUpdateSpreadsheetResponse resp = service.spreadsheets()
+            .batchUpdate(response.getSpreadsheetId(), r)
+            .execute();
     
           System.out.print(url);
           return url;
