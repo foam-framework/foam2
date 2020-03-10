@@ -22,9 +22,10 @@ foam.CLASS({
 
   requires: [
     'com.google.foam.demos.u2.SampleData',
-    'foam.u2.view.ReferenceView',
+    'foam.dao.EasyDAO',
     'foam.dao.MDAO',
-    'foam.dao.EasyDAO'
+    'foam.u2.MultiView',
+    'foam.u2.view.ReferenceView'
   ],
 
   exports: [ 'sampleDataDAO' ],
@@ -56,10 +57,8 @@ foam.CLASS({
       of: 'com.google.foam.demos.u2.SampleData',
       name: 'reference',
       view: function(_, X) {
-        var v1 = X.data.ReferenceView.create({dao: X.data.sampleDataDAO, of: X.data.SampleData});
-        var v2 = X.data.ReferenceView.create({dao: X.data.sampleDataDAO, of: X.data.SampleData});
         return foam.u2.view.DualView.create({
-          viewa: foam.u2.view.DualView.create({viewa: v1, viewb: v2}),
+          viewa: X.data.ReferenceView.create({dao: X.data.sampleDataDAO, of: X.data.SampleData}),
           viewb: foam.u2.TextField.create()
         });
       }
@@ -67,7 +66,8 @@ foam.CLASS({
     {
       class: 'Reference',
       of: 'com.google.foam.demos.u2.SampleData',
-      name: 'reference2',
+      name: 'referenceWithCustomObjToChoice',
+      view: { class: 'foam.u2.view.ReferenceView', objToChoice: function(obj) { return [obj.id, obj.name]; } },
       targetDAOKey: 'sampleDataDAO'
     },
     {
@@ -113,11 +113,19 @@ foam.CLASS({
     },
     {
       class: 'Int',
-      name: 'intWithDualView',
+      name: 'intWithMultiView',
       view: {
-        class: 'foam.u2.view.DualView',
-        viewa: 'foam.u2.RangeView',
-        viewb: 'foam.u2.IntView'
+        class: 'foam.u2.MultiView',
+        views: [ 'foam.u2.RangeView', 'foam.u2.IntView' ]
+      }
+    },
+    {
+      class: 'Int',
+      name: 'intWithMultiViewVertical',
+      view: {
+        class: 'foam.u2.MultiView',
+        horizontal: false,
+        views: [ 'foam.u2.RangeView', 'foam.u2.IntView' ]
       }
     },
     {
