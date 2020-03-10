@@ -40,11 +40,11 @@ foam.CLASS({
 
       if ( getIsNew() ) {
         FObject nu  = (FObject) NEW_OBJ.f(obj);
-        return INSTANCE_OF(getOf().getObjClass()).f(nu.getClassInfo().getAxiomByName(getPropName()));
+        return getOf().isInstance(nu.getProperty(getPropName()));
       }
       FObject old = (FObject) OLD_OBJ.f(obj);
       if ( old != null )
-        return INSTANCE_OF(getOf().getObjClass()).f(old.getClassInfo().getAxiomByName(getPropName()));
+        return getOf().isInstance(old.getProperty(getPropName()));
       return false;
       `
     }
