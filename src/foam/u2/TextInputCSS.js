@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'TextInputCSS',
@@ -16,6 +22,7 @@ foam.CLASS({
       name: 'code',
       value: `
         ^ {
+          min-width: 64px;
           height: /*%INPUTHEIGHT%*/ 32px;
           font-size: 14px;
           padding-left: /*%INPUTHORIZONTALPADDING%*/ 8px;
@@ -57,4 +64,3 @@ foam.CLASS({
     },
   ],
 });
-

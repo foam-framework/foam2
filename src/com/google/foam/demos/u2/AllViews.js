@@ -8,12 +8,7 @@ foam.CLASS({
   package: 'com.google.foam.demos.u2',
   name: 'SampleData',
   properties: [
-    {
-      name: 'id',
-    },
-    {
-      name: 'value'
-    }
+    'id', 'name', 'value'
   ],
   methods: [
     function toSummary() { return this.id + ' ' + this.value; }
@@ -27,9 +22,10 @@ foam.CLASS({
 
   requires: [
     'com.google.foam.demos.u2.SampleData',
-    'foam.u2.view.ReferenceView',
+    'foam.dao.EasyDAO',
     'foam.dao.MDAO',
-    'foam.dao.EasyDAO'
+    'foam.u2.MultiView',
+    'foam.u2.view.ReferenceView'
   ],
 
   exports: [ 'sampleDataDAO' ],
@@ -42,12 +38,12 @@ foam.CLASS({
           of: this.SampleData,
           daoType: 'MDAO',
           testData: [
-            { id: 'key1', value: 'value1' },
-            { id: 'key2', value: 'value2' },
-            { id: 'key3', value: 'value3' },
-            { id: 'key4', value: 'value4' },
-            { id: 'key5', value: 'value5' },
-            { id: 'key6', value: 'value6' }
+            { id: 'key1', name: 'John',  value: 'value1' },
+            { id: 'key2', name: 'Jane',  value: 'value2' },
+            { id: 'key3', name: 'Kevin', value: 'value3' },
+            { id: 'key4', name: 'Kim',   value: 'value4' },
+            { id: 'key5', name: 'Larry', value: 'value5' },
+            { id: 'key6', name: 'Linda', value: 'value6' }
           ]
         });
       },
@@ -61,10 +57,8 @@ foam.CLASS({
       of: 'com.google.foam.demos.u2.SampleData',
       name: 'reference',
       view: function(_, X) {
-        var v1 = X.data.ReferenceView.create({dao: X.data.sampleDataDAO, of: X.data.SampleData});
-        var v2 = X.data.ReferenceView.create({dao: X.data.sampleDataDAO, of: X.data.SampleData});
         return foam.u2.view.DualView.create({
-          viewa: foam.u2.view.DualView.create({viewa: v1, viewb: v2}),
+          viewa: X.data.ReferenceView.create({dao: X.data.sampleDataDAO, of: X.data.SampleData}),
           viewb: foam.u2.TextField.create()
         });
       }
@@ -72,12 +66,18 @@ foam.CLASS({
     {
       class: 'Reference',
       of: 'com.google.foam.demos.u2.SampleData',
-      name: 'reference2',
+      name: 'referenceWithCustomObjToChoice',
+      view: { class: 'foam.u2.view.ReferenceView', objToChoice: function(obj) { return [obj.id, obj.name]; } },
       targetDAOKey: 'sampleDataDAO'
     },
     {
       class: 'Int',
       name: 'defaultInt'
+    },
+    {
+      class: 'Int',
+      name: 'int2',
+      view: 'foam.u2.view.IntView'
     },
     {
       class: 'Int',
@@ -113,11 +113,19 @@ foam.CLASS({
     },
     {
       class: 'Int',
-      name: 'intWithDualView',
+      name: 'intWithMultiView',
       view: {
-        class: 'foam.u2.view.DualView',
-        viewa: 'foam.u2.RangeView',
-        viewb: 'foam.u2.IntView'
+        class: 'foam.u2.MultiView',
+        views: [ 'foam.u2.RangeView', 'foam.u2.IntView' ]
+      }
+    },
+    {
+      class: 'Int',
+      name: 'intWithMultiViewVertical',
+      view: {
+        class: 'foam.u2.MultiView',
+        horizontal: false,
+        views: [ 'foam.u2.RangeView', 'foam.u2.IntView' ]
       }
     },
     {
@@ -292,6 +300,12 @@ foam.CLASS({
       name: 'defaultColor'
     },
     {
+      class: 'Color',
+      name: 'readOnlyColor',
+      value: 'orange',
+      view: 'foam.u2.view.ReadColorView'
+    },
+    {
       class: 'Password',
       name: 'defaultPassword',
       value: 'secret'
@@ -318,8 +332,13 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'defaultBooleanWithLabel',
+      view: { class: 'foam.u2.CheckBox', label: "Label goes here"}
+    },
+    {
+      class: 'Boolean',
       name: 'mdCheckboxBoolean',
-      label: 'md.CheckBox',
+      label: 'MD CheckBox',
       view: { class: 'foam.u2.md.CheckBox' }
     },
     {
@@ -348,6 +367,22 @@ foam.CLASS({
       class: 'FObjectProperty',
       name: 'fObjectViewWithChoices',
       label: 'FObjectView With Choices',
+      view: {
+        class: 'foam.u2.view.FObjectView',
+        choices: [
+          [ 'foam.util.Timer', 'Timer' ],
+          [ 'foam.core.Property', 'Property' ],
+          [ 'foam.nanos.menu.DAOMenu',  'DAO'     ],
+          [ 'foam.nanos.menu.SubMenu',  'SubMenu' ],
+          [ 'foam.nanos.menu.TabsMenu', 'Tabs'    ]
+        ]
+      }
+    },
+    {
+      class: 'FObjectProperty',
+      name: 'fObjectViewWithChoicesValueSet',
+      label: 'FObjectView With Choices (Value Set)',
+      value: foam.core.Property.create(),
       view: {
         class: 'foam.u2.view.FObjectView',
         choices: [

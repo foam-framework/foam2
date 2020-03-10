@@ -269,6 +269,16 @@ foam.CLASS({
         if ( getLastModifiedByAware() )
           delegate = new foam.nanos.auth.LastModifiedByAwareDAO.Builder(getX()).setDelegate(delegate).build();
 
+        if ( getApprovableAware() ) {
+          delegate = new foam.nanos.approval.ApprovableAwareDAO
+          .Builder(getX())
+          .setDaoKey(getName())
+          .setOf(getOf())
+          .setDelegate(delegate)
+          .setIsEnabled(getApprovableAwareEnabled())
+          .build();
+        }
+
         if ( getContextualize() ) {
           delegate = new foam.dao.ContextualizingDAO.Builder(getX()).
           setDelegate(delegate).
@@ -701,6 +711,27 @@ model from which to test ServiceProvider ID (spid)`,
       name: 'fixedSize',
       class: 'FObjectProperty',
       of: 'foam.dao.FixedSizeDAO'
+    },
+    {
+      name: 'approvableAware',
+      class: 'Boolean',
+      documentation: `
+        Denotes if a model is approvable aware, and if so it should ALWAYS have this decorator on,
+        if an object is approvableAware but the user does not want the approval requests turned on,
+        they should set the approvableAwareEnabled property to false instead of setting the 
+        approvableAware property to false
+      `,
+      javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.approval.ApprovableAware.class.isAssignableFrom(getOf().getObjClass());'
+    },
+    {
+      name: 'approvableAwareEnabled',
+      class: 'Boolean',
+      documentation: `
+        Handles the approval process set to true, otherwise if set to false it will automatically
+        bypass the approval system
+
+      `,
+      javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.approval.ApprovableAware.class.isAssignableFrom(getOf().getObjClass());'
     },
  ],
 

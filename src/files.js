@@ -627,7 +627,6 @@ FOAM_FILES([
   { name: "foam/mop/MOP" },
   { name: "foam/dao/jdbc/ConnectionPool" },
   { name: "foam/lib/Outputter" },
-  { name: "foam/lib/PermissionPredicate" },
   { name: "foam/lib/PropertyPredicate" },
   { name: "foam/lib/PermissionedPropertyPredicate" },
   { name: "foam/lib/NetworkPropertyPredicate" },
@@ -711,6 +710,10 @@ FOAM_FILES([
   { name: "foam/u2/layout/GridColumns" },
 
   { name: "foam/comics/v2/CannedQuery" },
+  { name: "foam/comics/v2/CannedQuery" },
+  { name: "foam/comics/v2/EnabledActionsAuth" },
+  { name: "foam/comics/v2/BasicEnabledActionsAuth" },
+  { name: "foam/comics/v2/CRUDEnabledActionsAuth" },
   { name: "foam/comics/v2/DAOBrowseControllerView" },
   { name: "foam/comics/v2/DAOBrowserView" },
   { name: "foam/comics/v2/DAOControllerConfig" },

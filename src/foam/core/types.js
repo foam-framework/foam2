@@ -160,7 +160,9 @@ foam.CLASS({
   label: 'Round byte numbers',
 
   properties: [
-    [ 'type', 'Byte' ]
+    [ 'type', 'Byte' ],
+    [ 'min', -128 ],
+    [ 'max', 127 ]
   ]
 });
 
@@ -174,7 +176,9 @@ foam.CLASS({
   label: 'Round short numbers',
 
   properties: [
-    [ 'type', 'Short' ]
+    [ 'type', 'Short' ],
+    [ 'min', -32768 ],
+    [ 'max', 32767 ]
   ]
 });
 
@@ -432,6 +436,7 @@ foam.CLASS({
   // FUTURE: verify
   label: 'Email address',
   properties: [
+    [ 'displayWidth', 50 ],
     [
       'preSet',
       function(_, v) {
@@ -483,7 +488,8 @@ foam.CLASS({
   package: 'foam.core',
   name: 'PhoneNumber',
   extends: 'String',
-  label: 'Phone number'
+  label: 'Phone number',
+  properties: [ [ 'displayWidth', 20 ] ]
 });
 
 

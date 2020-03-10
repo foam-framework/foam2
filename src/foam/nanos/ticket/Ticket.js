@@ -23,7 +23,7 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'java.util.Date',
+    'java.util.Date'
   ],
 
   imports: [
@@ -271,8 +271,9 @@ foam.CLASS({
       name: 'close',
       tableWidth: 70,
       confirmationRequired: true,
-      isAvailable: function(status) {
-        return status != 'CLOSED';
+      isAvailable: function(status, id) {
+        return status != 'CLOSED' &&
+               id > 0;
       },
       code: function() {
         this.status = 'CLOSED';
