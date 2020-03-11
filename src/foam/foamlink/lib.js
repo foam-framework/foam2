@@ -51,6 +51,9 @@ foam.LIB({
           idsPresent[m.name] = {type: 'LIB'}
         };
 
+        // Allow access to real FOAM variable (used for injections only)
+        context.foam_.realfoam = foam;
+
         var srcMeta = `
           //@ sourceURL=filename_unknown.js
         `

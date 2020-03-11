@@ -203,6 +203,7 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/NotificationSettingsView'},
   { name: 'foam/nanos/notification/NotificationView'},
   { name: 'foam/nanos/notification/NotificationNotificationView'},
+  { name: 'foam/nanos/notification/NotificationHostnameRuleAction'},
   { name: 'foam/nanos/notification/notifications/ScriptRunNotificationNotificationView'},
   { name: 'foam/nanos/dashboard/Demo' },
 
