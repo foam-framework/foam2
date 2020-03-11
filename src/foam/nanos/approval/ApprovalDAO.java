@@ -13,7 +13,6 @@ import foam.dao.ProxyDAO;
 import foam.mlang.sink.Sum;
 import foam.nanos.auth.User;
 import foam.nanos.ruler.Operations;
-import foam.nanos.approval.RoleApprovalRequest;
 import foam.nanos.approval.ApprovalStatus;
 import foam.nanos.approval.ApprovalRequest;
 
@@ -52,9 +51,7 @@ public class ApprovalDAO
         if ( 
           request.getStatus() == ApprovalStatus.APPROVED ||
           ( 
-            request.getStatus() == ApprovalStatus.REJECTED &&
-            request instanceof RoleApprovalRequest && 
-            ((RoleApprovalRequest) request).getOperation() == Operations.CREATE 
+            request.getStatus() == ApprovalStatus.REJECTED && ((ApprovalRequest) request).getOperation() == Operations.CREATE 
           )
         ){
           //puts object to its original dao
@@ -75,12 +72,12 @@ public class ApprovalDAO
     DAO dao = (DAO) x.get(request.getDaoKey());
     FObject found = dao.inX(x).find(request.getObjId()).fclone();
 
-    if ( request instanceof RoleApprovalRequest ) {
+    if ( request instanceof ApprovalRequest ) {
       DAO userDAO = (DAO) x.get("localUserDAO");
-      User initiatingUser = (User) userDAO.find(((RoleApprovalRequest) request).getInitiatingUser());
+      User initiatingUser = (User) userDAO.find(((ApprovalRequest) request).getCreatedBy());
       X initiatingUserX = x.put("user", initiatingUser);
 
-      if ( ((RoleApprovalRequest) request).getOperation() == Operations.REMOVE ) {
+      if ( ((ApprovalRequest) request).getOperation() == Operations.REMOVE ) {
         dao.inX(initiatingUserX).remove(found);
       } else {
         dao.inX(initiatingUserX).put(found);
