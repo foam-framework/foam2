@@ -287,7 +287,6 @@ FOAM_FILES([
   { name: 'foam/nanos/approval/ApprovableAwareDAO' },
   { name: 'foam/nanos/approval/ApprovableApprovalRequestsPredicate' },
   { name: 'foam/nanos/approval/ApprovableApprovalRequestsRule' },
-  { name: 'foam/nanos/approval/RoleApprovalRequest' },
   { name: 'foam/nanos/approval/FulfilledApprovablePredicate' },
   { name: 'foam/nanos/approval/FulfilledApprovableRule' },
 

@@ -18,20 +18,35 @@
   ],
 
   javaImports: [
-    'foam.core.FObject',
     'foam.core.X',
+    'foam.core.FObject',
+    'foam.dao.ArraySink',
     'foam.dao.DAO',
-    'foam.nanos.logger.Logger'
+    'foam.nanos.auth.*',
+    'foam.nanos.logger.Logger',
+    'foam.nanos.ruler.Operations',
+    'java.util.ArrayList',
+    'java.util.List',
+    'static foam.mlang.MLang.*'
+  ],
+
+  topics: [
+    'finished',
+    'throwError'
   ],
 
   requires: [
     'foam.dao.AbstractDAO',
-    'foam.nanos.approval.ApprovalStatus'
+    'foam.nanos.approval.ApprovalStatus',
+    'foam.u2.dialog.NotificationMessage'
   ],
 
   imports: [
     'approvalRequestDAO',
-    'ctrl'
+    'ctrl',
+    'currentMenu',
+    'stack',
+    'user'
   ],
 
   tableColumns: [
@@ -64,6 +79,52 @@
     }
   ],
 
+  axioms: [
+    {
+      class: 'foam.comics.v2.CannedQuery',
+      label: 'Pending',
+      predicateFactory: function(e) {
+        return e.EQ(
+          foam.nanos.approval.ApprovalRequest.STATUS,
+          foam.nanos.approval.ApprovalStatus.REQUESTED
+        );
+      }
+    },
+    {
+      class: 'foam.comics.v2.CannedQuery',
+      label: 'Approved',
+      predicateFactory: function(e) {
+        return  e.EQ(
+          foam.nanos.approval.ApprovalRequest.STATUS,
+          foam.nanos.approval.ApprovalStatus.APPROVED
+        );
+      }
+    },
+    {
+      class: 'foam.comics.v2.CannedQuery',
+      label: 'Rejected',
+      predicateFactory: function(e) {
+        return  e.EQ(
+          foam.nanos.approval.ApprovalRequest.STATUS,
+          foam.nanos.approval.ApprovalStatus.REJECTED
+        );
+      }
+    },
+    {
+      class: 'foam.comics.v2.CannedQuery',
+      label: 'All',
+      predicateFactory: function(e) {
+        return e.TRUE;
+      }
+    },
+    {
+      class: 'foam.comics.v2.namedViews.NamedViewCollection',
+      name: 'Table',
+      view: { class: 'foam.comics.v2.DAOBrowserView' },
+      icon: 'images/list-view.svg',
+    }
+  ],
+
   properties: [
     {
       class: 'Long',
@@ -78,31 +139,38 @@
       name: 'approver',
       section: 'requestDetails',
       documentation: `The user that is requested for approval. When set, "group" property is ignored.`,
-      tableCellFormatter: function(approver) {
+      view: function(_, X) {
+        if ( X.data.status === foam.nanos.approval.ApprovalStatus.REQUESTED ) {
+          return {
+            class: 'foam.u2.view.ValueView',
+            data$: X.data$.map((data) => data.REQUESTED)
+          };
+        } else {
+          return { class: 'foam.u2.view.ReferencePropertyView' };
+        }
+      },
+      tableCellFormatter: function(approver, data) {
         let self = this;
-        this.__subSubContext__.userDAO.find(approver).then((user)=> {
-          if ( user ) {
+        this.__subSubContext__.userDAO.find(approver).then(user => {
+          if ( data.status != foam.nanos.approval.ApprovalStatus.REQUESTED ) {
+            self.add(user ? user.toSummary() : `User #${approver}`);
+          } else if ( user ) {
             if ( self.__subSubContext__.user.id == user.id ) {
-              self.add(user.legalName);
+              self.add(user.toSummary());
             } else {
               self.add(user.group);
             }
           } else {
-            self.add(approver);
+            self.add(data.REQUESTED);
           }
         });
       },
-      visibility: function(approver) {
-        return approver ?
-          foam.u2.DisplayMode.RO :
-          foam.u2.DisplayMode.HIDDEN;
-      },
+      visibility: 'RO'
     },
     {
       class: 'Object',
       javaType: 'Object',
       name: 'objId',
-      writePermissionRequired: true,
       documentation: 'id of the object that needs approval.',
       tableWidth: 150,
       tableCellFormatter: function(objId) {
@@ -125,7 +193,6 @@
     {
       class: 'String',
       name: 'daoKey',
-      writePermissionRequired: true,
       documentation: `Used internally in approvalDAO to point where requested object can be found.
       Should not be used to retrieve approval requests for a given objects
       since an object can have multiple requests of different nature.`
@@ -146,8 +213,8 @@
       gridColumns: 4,
       visibility: function(classification) {
         return classification ?
-          foam.u2.DisplayMode.RO :
-          foam.u2.DisplayMode.HIDDEN;
+          'RO' :
+          'HIDDEN';
       }
     },
     {
@@ -280,8 +347,12 @@
       of: 'foam.nanos.auth.User',
       name: 'createdBy',
       section: 'supportDetails',
-      readPermissionRequired: true,
-      writePermissionRequired: true
+      tableCellFormatter: function(initiatingUser) {
+        let self = this;
+        this.__subSubContext__.userDAO.find(initiatingUser).then(user => {
+          self.add(user ? user.toSummary() : `User #${initiatingUser}`);
+        });
+      }
     },
     {
       class: 'Reference',
@@ -364,6 +435,38 @@
       class: 'Boolean',
       name: 'isTrackingRequest',
       value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'isFulfilled',
+      visibility: 'HIDDEN'
+    },
+    {
+      class: 'Enum',
+      of: 'foam.nanos.ruler.Operations',
+      name: 'operation',
+      label: 'Action',
+      section: 'requestDetails',
+      visibility: function(operation) {
+        return operation ?
+          foam.u2.DisplayMode.RO :
+          foam.u2.DisplayMode.HIDDEN;
+      }
+    }
+  ],
+
+  messages: [
+    {
+      name: 'SUCCESS_APPROVED',
+      message: 'You have successfully approved this request.'
+    },
+    {
+      name: 'SUCCESS_REJECTED',
+      message: 'You have successfully rejected this request.'
+    },
+    {
+      name: 'REQUESTED',
+      message: 'Pending'
     }
   ],
 
@@ -376,25 +479,34 @@
           type: 'Context'
         }
       ],
-      javaCode: `Logger logger = (Logger) x.get("logger");
-DAO dao = (DAO) x.get(getDaoKey());
-if ( dao == null ) {
-  logger.error(this.getClass().getSimpleName(), "DaoKey not found", getDaoKey());
-  throw new RuntimeException("Invalid dao key for the approval request object.");
-}
-FObject obj = dao.inX(x).find(getObjId());
-if ( obj == null ) {
-  logger.error(this.getClass().getSimpleName(), "ObjId not found", getObjId());
-  throw new RuntimeException("Invalid object id.");
-}
+      javaCode: `
+      Logger logger = (Logger) x.get("logger");
+      DAO dao = (DAO) x.get(getDaoKey());
+      if ( dao == null ) {
+        logger.error(this.getClass().getSimpleName(), "DaoKey not found", getDaoKey());
+        throw new RuntimeException("Invalid dao key for the approval request object.");
+      }
+
+      if ( getOperation() != Operations.CREATE ){
+        FObject obj = dao.inX(x).find(getObjId());
+        if ( obj == null ) {
+          logger.error(this.getClass().getSimpleName(), "ObjId not found", getObjId());
+          throw new RuntimeException("Invalid object id.");
+        }
+      }
       `
+    },
+    {
+      name: 'toSummary',
+      code: function() {
+        return `(${this.classification}) ${this.operation}`;
+      }
     }
   ],
 
   actions: [
     {
       name: 'approve',
-      label: 'Approve',
       section: 'requestDetails',
       isAvailable: (isTrackingRequest, status) => {
         if (
@@ -406,15 +518,30 @@ if ( obj == null ) {
         return ! isTrackingRequest;
       },
       code: function() {
-        this.status = this.ApprovalStatus.APPROVED;
-        this.approvalRequestDAO.put(this);
-        this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
-      },
-      tableWidth: 100
+        var approvedApprovalRequest = this.clone();
+        approvedApprovalRequest.status = this.ApprovalStatus.APPROVED;
+
+        this.approvalRequestDAO.put(approvedApprovalRequest).then(o => {
+          this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
+          this.finished.pub();
+          this.ctrl.add(this.NotificationMessage.create({
+            message: this.SUCCESS_APPROVED
+          }));
+
+          if ( this.currentMenu.id !== this.stack.top[2] ) {
+            this.stack.back();
+          }
+        }, e => {
+          this.throwError.pub(e);
+          this.ctrl.add(this.NotificationMessage.create({
+            message: e.message,
+            type: 'error'
+          }));
+        });
+      }
     },
     {
       name: 'reject',
-      label: 'Reject',
       section: 'requestDetails',
       isAvailable: (isTrackingRequest, status) => {
         if (
@@ -426,11 +553,27 @@ if ( obj == null ) {
         return ! isTrackingRequest;
       },
       code: function() {
-        this.status = this.ApprovalStatus.REJECTED;
-        this.approvalRequestDAO.put(this);
-        this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
-      },
-      tableWidth: 100
+        var rejectedApprovalRequest = this.clone();
+        rejectedApprovalRequest.status = this.ApprovalStatus.REJECTED;
+
+        this.approvalRequestDAO.put(rejectedApprovalRequest).then(o => {
+          this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
+          this.finished.pub();
+          this.ctrl.add(this.NotificationMessage.create({
+            message: this.SUCCESS_REJECTED
+          }));
+
+          if ( this.currentMenu.id !== this.stack.top[2] ) {
+            this.stack.back();
+          }
+        }, e => {
+          this.throwError.pub(e);
+          this.ctrl.add(this.NotificationMessage.create({
+            message: e.message,
+            type: 'error'
+          }));
+        });
+      }
     },
     {
       name: 'viewReference',
