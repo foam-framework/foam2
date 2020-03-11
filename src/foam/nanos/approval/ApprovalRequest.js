@@ -151,8 +151,6 @@
       },
       tableCellFormatter: function(approver, data) {
         let self = this;
-        // If request is REQUESTED, show as Pending
-        // Otherwise, show approver's name
         this.__subSubContext__.userDAO.find(approver).then(user => {
           if ( data.status != foam.nanos.approval.ApprovalStatus.REQUESTED ) {
             self.add(user ? user.toSummary() : `User #${approver}`);
