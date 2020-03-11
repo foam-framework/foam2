@@ -386,7 +386,9 @@ foam.CLASS({
         this.cssClass(this.iconFontClass); // required by font package
         this.style({ 'font-family': this.iconFontFamily });
         this.add(this.iconFontName);
-      } else if ( this.label ) {
+      }
+
+      if ( this.label ) {
         this.add(this.label$);
       }
     }
