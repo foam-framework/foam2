@@ -153,21 +153,21 @@
         let self = this;
         // If request is REQUESTED, show as Pending
         // Otherwise, show approver's name
-        if ( data.status === foam.nanos.approval.ApprovalStatus.REQUESTED ) {
-          this.add(data.REQUESTED);
-        } else {
-          this.__subSubContext__.userDAO.find(approver).then(user => {
+        this.__subSubContext__.userDAO.find(approver).then(user => {
+          if ( data.status != foam.nanos.approval.ApprovalStatus.REQUESTED ) {
             self.add(user ? user.toSummary() : `User #${approver}`);
-          });
-        }
+          } else if ( user ) {
+            if ( self.__subSubContext__.user.id == user.id ) {
+              self.add(user.toSummary());
+            } else {
+              self.add(user.group);
+            }
+          } else {
+            self.add(data.REQUESTED);
+          }
+        });
       },
-      visibility: function(status, approver) {
-        if ( status === foam.nanos.approval.ApprovalStatus.REQUESTED || ! approver ) {
-          return foam.u2.DisplayMode.HIDDEN;
-        }
-
-        return foam.u2.DisplayMode.RO;
-      }
+      visibility: 'RO'
     },
     {
       class: 'Object',
