@@ -25,7 +25,7 @@ foam.CLASS({
           var pattern = '';
           if ( props[i].cls_.id === "foam.core.UnitValue" ) {
             cellType = 'CURRENCY';
-            pattern = '\"' + props[i].cls_.unitPropName + '\"#,##.##';
+            pattern = '\"' + props[i].cls_.unitPropName + '\"#,###.##';
           } else if ( props[i].cls_.id === 'foam.core.Date' ) {
             cellType = 'DATE';
             pattern = '';
