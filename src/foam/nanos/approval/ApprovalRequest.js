@@ -173,7 +173,6 @@
       class: 'Object',
       javaType: 'Object',
       name: 'objId',
-      writePermissionRequired: true,
       documentation: 'id of the object that needs approval.',
       tableWidth: 150,
       tableCellFormatter: function(objId) {
