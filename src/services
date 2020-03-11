@@ -500,7 +500,6 @@ p({
       .setJournalName("spids")
       .build()
   """
-  "serviceScript":"return new foam.dao.PMDAO(x, new foam.dao.java.JDAO(x, foam.nanos.auth.ServiceProvider.getOwnClassInfo(), \"spids\"));"
 })
 
 p({
