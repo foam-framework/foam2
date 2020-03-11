@@ -96,6 +96,8 @@ foam.CLASS({
         if ( // These are the conditions in which a file is skipped
           fileInfo.name === 'foamlink.js'
           || ! fileInfo.name.endsWith('.js')
+          || fileInfo.name.startsWith('.')
+          || fileInfo.name.startsWith('#')
           || this.reservedNames_.includes(fileInfo.name)
           || this.ignorePaths_[fileInfo.fullPath]
         ) continue;
