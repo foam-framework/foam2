@@ -154,7 +154,11 @@ foam.CLASS({
             add(alternatingColors);
           }};
 
+          requests.add(new Request().setAutoResizeDimensions(new AutoResizeDimensionsRequest().setDimensions(new DimensionRange().setSheetId(0).setDimension("COLUMNS").setEndIndex(methadata.length))));
+    
           for(int i = 0; i < methadata.length; i++) {
+            if(methadata[i].getColumnWidth() > 0)
+              requests.add(new Request().setUpdateDimensionProperties(new UpdateDimensionPropertiesRequest().setRange(new DimensionRange().setSheetId(0).setDimension("COLUMNS").setStartIndex(i).setEndIndex(i+1)).setProperties(new DimensionProperties().setPixelSize(methadata[i].getColumnWidth())).setFields("pixelSize")));
             if(methadata[i].getCellType().equals("String"))
               continue;
             requests.add(new Request().setRepeatCell(
