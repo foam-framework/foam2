@@ -15,8 +15,7 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.DAO',
     'foam.nanos.logger.Logger',
-    'foam.nanos.logger.PrefixLogger',
-    'foam.nanos.medusa.quorum.*'
+    'foam.nanos.logger.PrefixLogger'
   ],
 
   methods: [

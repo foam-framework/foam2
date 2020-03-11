@@ -33,11 +33,9 @@ p({
 p({
   "class": "foam.nanos.boot.NSpec",
   "name": "clusterConfigService",
-  "lazy": true,
+  "lazy": false,
   "serve": false,
-  "serviceScript": """
-    return new foam.nanos.medusa.DefaultClusterConfigService.Builder(x).build();
-  """
+  "serviceClass": "foam.nanos.medusa.DefaultClusterConfigService"
 })
 
 p({
@@ -60,30 +58,6 @@ p({
 
 p({
   "class":"foam.nanos.boot.NSpec",
-  "name":"clusterNodeDAO",
-  "lazy":false,
-  "serve":true,
-  "serviceScript": """
-    return new foam.dao.EasyDAO
-      .Builder(x)
-      .setOf(foam.nanos.medusa.ClusterNode.getOwnClassInfo())
-      .setGuid(true)
-      .setRuler(false)
-      .setAuthorize(false)
-      .setCluster(false)
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName("clusternodes")
-      .build();
-  """,
-  "client": """
-    {
-     "of": "foam.nanos.medusa.ClusterNode"
-    }
-  """
-})
-
-p({
-  "class":"foam.nanos.boot.NSpec",
   "name":"tcpServer",
   "lazy":false,
   "serviceClass":"foam.nanos.medusa.TCPNioServer"
@@ -94,22 +68,6 @@ p({
   "name":"quorumService",
   "lazy":false,
   "serviceClass":"foam.nanos.medusa.quorum.QuorumService"
-})
-
-p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "nodeStatusDAO",
-  "lazy": false,
-  "serve": true,
-  "authenticate": true,
-  "serviceScript": """
-    return new foam.nanos.medusa.NodeStatusDAO();
-  """,
-  "client": """
-    {
-    "of": "foam.nanos.medusa.NodeStatus"
-    }
-  """
 })
 
 p({
@@ -138,4 +96,15 @@ p({
       "of": "foam.nanos.demo.DemoObject"
     }
   """
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"electoralService",
+  "lazy":false,
+  "serve":true,
+  "boxClass":"foam.nanos.medusa.ElectoralServiceSkeleton",
+  "authenticate": true,
+  "serviceClass":"foam.nanos.medusa.ElectoralServiceServer",
+  "client":"{ \"class\":\"foam.nanos.medusa.ClientElectoralService\" }"
 })

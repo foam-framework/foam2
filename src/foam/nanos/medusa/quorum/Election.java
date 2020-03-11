@@ -22,9 +22,11 @@ import foam.dao.AbstractSink;
 import foam.dao.DAO;
 import foam.dao.Sink;
 import foam.mlang.MLang;
-import foam.nanos.medusa.ClusterNode;
+import foam.nanos.medusa.ClusterConfig;
+import foam.nanos.medusa.ClusterConfigService;
 import static foam.mlang.MLang.*;
 import foam.dao.ArraySink;
+import foam.nanos.logger.PrefixLogger;
 import foam.nanos.logger.Logger;
 
 // This class should be singlton.
@@ -33,8 +35,8 @@ public class Election extends AbstractFObject {
   // QuorumNetworkManager handles network communication for a Election.
   private final QuorumNetworkManager networkManager;
   protected String hostname = System.getProperty("hostname");
-  private long clusterId;
-  ClusterNode mySelf;
+  private String clusterId;
+  ClusterConfig mySelf;
 
   // Manage meta of current instance.
   private QuorumName quorumName;
@@ -48,20 +50,24 @@ public class Election extends AbstractFObject {
 
   public Election(X x, QuorumNetworkManager networkManager, QuorumService quorumService) {
     setX(x);
-    logger = (Logger) x.get("logger");
     if ( x == null ) throw new RuntimeException("Context no found.");
-    DAO clusterDAO = (DAO) x.get("clusterNodeDAO");
-    if ( clusterDAO == null ) throw new RuntimeException("clusterNodeDAO no found.");
+
+    logger = new PrefixLogger(new Object[] {
+        this.getClass().getSimpleName() },
+      (Logger) x.get("logger"));
+
+    DAO clusterDAO = (DAO) x.get("clusterConfigDAO");
+    if ( clusterDAO == null ) throw new RuntimeException("clusterConfigDAO not found.");
 
     ArraySink sink = (ArraySink) clusterDAO
-                                  .where(EQ(ClusterNode.HOST_NAME, hostname))
+                                  .where(EQ(ClusterConfig.ID, hostname))
                                   .select(new ArraySink());
     List list = sink.getArray();
-    if ( list.size() != 1 ) throw new RuntimeException("error on clusterNode journal");
-    mySelf = (ClusterNode) list.get(0);
+    if ( list.size() != 1 ) throw new RuntimeException("error on clusterConfig journal");
+    mySelf = (ClusterConfig) list.get(0);
     clusterId = mySelf.getId();
-    //mySelf = (ClusterNode) clusterDAO.find(clusterId);
-    if ( mySelf == null ) throw new RuntimeException("ClusterNode no found: " + hostname);
+    //mySelf = (ClusterConfig) clusterDAO.find(clusterId);
+    if ( mySelf == null ) throw new RuntimeException("ClusterConfig no found: " + hostname);
 
     this.networkManager = networkManager;
     this.quorumService = quorumService;
@@ -75,8 +81,8 @@ public class Election extends AbstractFObject {
   // it will get current electionEra in the cluster.
   AtomicLong electionEra = new AtomicLong(1);
 
-  Long proposedPrimary;
-  Long proposedCriteria;
+  String proposedPrimary;
+  String proposedCriteria;
   Long proposedPrimaryEra;
 
   SenderAndReceiver sendAndReceiver;
@@ -86,7 +92,7 @@ public class Election extends AbstractFObject {
   private int pollInteval = 200;
 
   // Quorum size.
-  private long quorumSize = 2L;
+  private long quorumSize = 1L; //2L;
 
   public Election(QuorumNetworkManager networkManager, QuorumName quorumName) {
     this.networkManager = networkManager;
@@ -101,25 +107,27 @@ public class Election extends AbstractFObject {
     receptedQueue.clear();
   }
 
-  private ClusterNode findClusterNode(Long instanceId) {
-    DAO dao = (DAO) getX().get("clusterNodeDAO");
-    return (ClusterNode) dao.find(instanceId);
+  private ClusterConfig findClusterConfig(String instanceId) {
+    DAO dao = (DAO) getX().get("clusterConfigDAO");
+    return (ClusterConfig) dao.find(instanceId);
   }
 
-  private boolean verifyGroup(Long instanceId) {
-    ClusterNode instance = findClusterNode(instanceId);
+  private boolean verifyGroup(String instanceId) {
+    ClusterConfig instance = findClusterConfig(instanceId);
     if ( instance == null ) return false;
-    if ( instance.getGroup() == mySelf.getGroup() ) return true;
+    if ( instance.getZone() == mySelf.getZone() &&
+         instance.getType() == foam.nanos.medusa.MedusaType.MEDIATOR ) return true;
     return false;
   }
 
-  private boolean isVoter(Long instanceId) {
-    ClusterNode instance = findClusterNode(instanceId);
+  private boolean isVoter(String instanceId) {
+    ClusterConfig instance = findClusterConfig(instanceId);
     if ( instance == null ) return false;
-    return instance.getIsVoter() ? true : false;
+    logger.debug("isVoter", instanceId, instance.getZone());
+    return instance.getZone() == 0;
   }
 
-  private boolean isSelf(Long instanceId) {
+  private boolean isSelf(String instanceId) {
     return instanceId == mySelf.getId();
   }
 
@@ -136,21 +144,26 @@ public class Election extends AbstractFObject {
       public void run() {
 
         while ( isRunning ) {
+          // logger.debug("Receiver", "run");
           try {
+            Thread.sleep(1000L);
             // Get response from NetworkManager in every two second.
             QuorumMessage inMessage = networkManager.pollResponseQueue(pollInteval, TimeUnit.MILLISECONDS);
             if ( inMessage == null ) {
+              logger.debug("Receiver", "run", "inMessage null");
               continue;
             }
 
             // If voter is not belong to the same group, ignore packet
             if ( ! verifyGroup(inMessage.getSourceInstance()) ) {
-              //TODO: log debug
+              //TODO: exit until configuration updated.
+              logger.debug("Receiver", "run", "verifyGroup false");
               continue;
             }
 
             // Return latest Vote from this instance.
             if ( ! isVoter(inMessage.getSourceInstance()) ) {
+              logger.debug("Receiver", "run", "! isVoter");
               Vote vote = quorumService.getPrimaryVote();
               QuorumMessage response = new QuorumMessage();
               response.setMessageType(QuorumMessageType.NOTIFICATION);
@@ -164,11 +177,14 @@ public class Election extends AbstractFObject {
             } else {
               // If this instance is electing, then doing election and sending proposed Primary.
               if ( quorumService.getMyState() == InstanceState.ELECTING ) {
+                logger.debug("Receiver", "run", "accepting offer", inMessage);
                 receptedQueue.offer(inMessage);
 
                 // If request instance lag this instance, send back message with current electionEra and CurrentVote.
                 if ( inMessage.getSourceStatus() == InstanceState.ELECTING
-                && inMessage.getVote().getElectionEra() < electionEra.get() ) {
+                     && inMessage.getVote().getElectionEra() < electionEra.get() ) {
+                  logger.debug("Receiver", "run", "BOTH ELECTING", "sending offer");
+
                   Vote vote = getVote();
                   // Set electionEra of this instance into vote.
                   vote.setElectionEra(electionEra.get());
@@ -184,6 +200,7 @@ public class Election extends AbstractFObject {
               } else {
                 // The cluster has picked a primary already. Send back Vote for leader.
                 if ( inMessage.getSourceStatus() == InstanceState.ELECTING ) {
+                  logger.debug("Receiver", "run", "OTHER ELECTING", "sending offer");
 
 
                   //TODO: provide a way to allow all voter to have a change to vote at lease once.
@@ -217,7 +234,9 @@ public class Election extends AbstractFObject {
 
       public void run() {
         while ( isRunning ) {
+          //          logger.debug("Sender", "run");
           try {
+            Thread.sleep(1000L);
             QuorumMessage message = sendQueue.poll(pollInteval, TimeUnit.MICROSECONDS);
             if ( message == null ) {
               continue;
@@ -257,15 +276,16 @@ public class Election extends AbstractFObject {
   // The PRIMARY will be one who has biggest criteria value in the cloud.
   public Vote electingPrimary() {
     //TODO: Log start election
+    logger.debug("electingPrimary");
     try {
       // Store vote for current election era.
-      Map<Long, Vote> voteMap = new HashMap<Long, Vote>();
+      Map<String, Vote> voteMap = new HashMap<String, Vote>();
 
       Map<Long, Vote> outOfElection = new HashMap<Long, Vote>();
 
       //TODO: replace with IP address.
-      long initialCriteria   = mySelf.getId();
-      long initialPrimaryEra = electionEra.get();
+      String initialCriteria   = mySelf.getId();
+      Long initialPrimaryEra = electionEra.get();
 
       synchronized(this) {
         electionEra.incrementAndGet();
@@ -282,6 +302,7 @@ public class Election extends AbstractFObject {
       //QuorumVoteSet voteSet;
 
       while ( quorumService.getMyState() == InstanceState.ELECTING && isRunning ) {
+        logger.debug("electingPrimary", "ELECTING");
         QuorumMessage inMessage = receptedQueue.poll(pollInteval, TimeUnit.MICROSECONDS);
         if ( inMessage == null ){
           broadcast();
@@ -292,7 +313,7 @@ public class Election extends AbstractFObject {
 
           if ( inMessage.getSourceStatus() == InstanceState.ELECTING ) {
             // criteria == -1 means that sending instance is close.
-            if ( inMessage.getVote().getCriteria() == -1 ) break;
+            if ( inMessage.getVote().getCriteria() == "-1" ) break;
             // If current instance electionEra lags sending instance,
             // current instance needs to update its electionEra and
             // clean votes that current instance already stores.
@@ -304,7 +325,7 @@ public class Election extends AbstractFObject {
               voteMap.clear();
               electionEra.set(vote.getElectionEra());
 
-              if ( initialCriteria > vote.getCriteria() ) {
+              if ( initialCriteria.compareTo(vote.getCriteria()) > 0 ) {
                 // Re-proposal SELF as PRIMARY.
                 updateProposal(mySelf.getId(), initialPrimaryEra, initialCriteria);
               } else {
@@ -318,7 +339,7 @@ public class Election extends AbstractFObject {
               // The type of Vote is already handled by SenderAndReceiver.
               //TODO: Log
             } else {
-              if ( proposedCriteria < vote.getCriteria() ) {
+              if ( proposedCriteria.compareTo(vote.getCriteria() ) < 0 ) {
                 //Reset voteMap.
                 voteMap.clear();
                 // Accept new vote.
@@ -328,7 +349,7 @@ public class Election extends AbstractFObject {
               }
             }
             //TODO: Check if sourceInstance alread exists?
-            if ( proposedCriteria == vote.getCriteria() ) {
+            if ( proposedCriteria.equals(vote.getCriteria()) ) {
               voteMap.put(inMessage.getSourceInstance(), new Vote(proposedPrimary, electionEra.get(), proposedPrimaryEra, proposedCriteria));
             }
 
@@ -336,7 +357,7 @@ public class Election extends AbstractFObject {
 
               QuorumMessage finalMessage;
               while ( (finalMessage =  receptedQueue.poll(pollInteval, TimeUnit.MICROSECONDS)) != null ) {
-                if ( finalMessage.getVote().getPrimaryInstanceId() != proposedPrimary ) {
+                if ( ! finalMessage.getVote().getPrimaryInstanceId().equals(proposedPrimary) ) {
                   // Proposed Primary in the cluster has changed.
                   // Send message back to the queue and re-process it.
                   receptedQueue.put(finalMessage);
@@ -361,7 +382,7 @@ public class Election extends AbstractFObject {
 
             Vote vote = inMessage.getVote();
             if ( vote.getElectionEra() != electionEra.get()
-                  || vote.getPrimaryInstanceId() != proposedPrimary) {
+                 || ! vote.getPrimaryInstanceId().equals(proposedPrimary) ) {
               voteMap.clear();
               electionEra.set(vote.getElectionEra());
               updateProposal(vote.getPrimaryInstanceId(), vote.getPrimaryEra(), vote.getCriteria());
@@ -369,11 +390,12 @@ public class Election extends AbstractFObject {
               continue;
             }
 
-            if ( proposedCriteria == vote.getCriteria() ) {
+            if ( proposedCriteria.equals(vote.getCriteria()) ) {
               voteMap.put(inMessage.getSourceInstance(), new Vote(proposedPrimary, electionEra.get(), proposedPrimaryEra, proposedCriteria));
             }
 
-            if ( voteMap.size() >= quorumSize || voteMap.get(proposedPrimary) != null ) {
+            if ( voteMap.size() >= quorumSize ||
+                 voteMap.get(proposedPrimary) != null ) {
               updateState(proposedPrimary);
               Vote primaryVote = new Vote(proposedPrimary, electionEra.get(), proposedPrimaryEra, proposedCriteria);
               finishElection(primaryVote);
@@ -391,42 +413,40 @@ public class Election extends AbstractFObject {
     return null;
   }
 
-  private void updateState(long proposedLeader) {
-    if ( clusterId == proposedLeader ) quorumService.setMyState(InstanceState.PRIMARY);
-    else quorumService.setMyState(InstanceState.SECONDARY);
+  private void updateState(String proposedLeader) {
+    if ( clusterId.equals(proposedLeader) ) quorumService.setMyState(proposedLeader, InstanceState.PRIMARY);
+    else quorumService.setMyState(proposedLeader, InstanceState.SECONDARY);
   }
 
   // Tell every other instance in the cluser: I changed vote.
   // The function only invoke when this instance is in ELECTING status.
   protected void broadcast() {
-    //TODO: get from DAO.
-    DAO clusterNodeDAO = (DAO) getX().get("clusterNodeDAO");
-
-    if ( clusterNodeDAO == null ) {
-      //TODO: log error
-      throw new RuntimeException("clusterNodeDAO miss");
-    }
-    //TODO: Do not hard code group id.
-    clusterNodeDAO.where(MLang.EQ(ClusterNode.GROUP, 1)).select(
+    DAO clusterConfigDAO = (DAO) getX().get("clusterConfigDAO");
+    ClusterConfigService service = (ClusterConfigService) getX().get("clusterConfigService");
+    clusterConfigDAO.where(service.getVoterPredicate(getX()))
+       .select(
       new AbstractSink() {
         @Override
         public void put(Object obj, Detachable sub) {
-
           try {
             // Give system enough time to handle inflight request.
             Thread.sleep(1000);
           } catch ( InterruptedException e ) {
             logger.info(e);
           }
-          ClusterNode clusterNode = (ClusterNode) obj;
+          ClusterConfig clusterConfig = (ClusterConfig) obj;
+          if ( clusterConfig.getId() == mySelf.getId() ) {
+            return;
+          }
           QuorumMessage message = new QuorumMessage();
           message.setMessageType(QuorumMessageType.NOTIFICATION);
-          message.setDestinationInstance(clusterNode.getId());
+          message.setDestinationInstance(clusterConfig.getId());
           message.setSourceInstance(mySelf.getId());
           message.setSourceStatus(InstanceState.ELECTING);
           Vote vote = getVote();
           vote.setElectionEra(electionEra.get());
           message.setVote(vote);
+          logger.debug("broadcast offer");
           sendQueue.offer(message);
         }
       }
@@ -443,8 +463,8 @@ public class Election extends AbstractFObject {
   }
 
   public void close() {
-    proposedCriteria = -1L;
-    proposedPrimary = -1L;
+    proposedCriteria = "-1";
+    proposedPrimary = "-1";
   }
 
 
@@ -457,7 +477,7 @@ public class Election extends AbstractFObject {
     return vote;
   }
 
-  synchronized void updateProposal(long primary, long era, long criteria) {
+  synchronized void updateProposal(String primary, long era, String criteria) {
     this.proposedPrimary = primary;
     this.proposedPrimaryEra = era;
     this.proposedCriteria = criteria;

@@ -22,20 +22,34 @@ foam.CLASS({
     'userDAO',
   ],
 
+  tableColumns: [
+    'id',
+    'enabled',
+    'realm',
+    'region',
+    'zone',
+    'type',
+    'isPrimary',
+    'status',
+    'quorumStatus',
+    'pingLatency',
+    'lastModified'
+  ],
+  
   properties: [
+    {
+      documentation: 'Node local network or DNS name',
+      name: 'id',
+      class: 'String',
+      label: 'Hostname',
+      aliases: ['hostname', 'name'],
+      required: true
+    },
     {
       class: 'Boolean',
       name: 'enabled',
       documentation: 'Allows for prepatory configuration changes.',
       value: true
-    },
-    {
-      documentation: 'Node local network or DNS name',
-      name: 'id',
-      class: 'String',
-      label: 'hostname',
-      aliases: ['name', 'hostname'],
-      required: true
     },
     {
       documentation: 'Group of nodes. Encompases all nodes in all Regions for the same application.',
@@ -44,21 +58,37 @@ foam.CLASS({
       required: 'true',
     },
     {
-      documentation: 'Geographic region of group nodes. A sub group in the Realm.',
+      documentation: 'Geographic region, like a Data Center, of group nodes. A sub group in the Realm.',
       name: 'region',
       class: 'String',
     },
     {
-      documentation: 'Type of a node',
-      name: 'nodeType',
+      documentation: 'A sub-group of nodes in a region. An inner core of nodes in a Data Center.  0 (zero) has special meaning for Medusa Mediator clusters.',
+      name: 'zone',
+      class: 'Long',
+      value: 0
+    },
+    {
+      documentation: 'Type of a Medusa instance.',
+      name: 'type',
       class: 'Enum',
-      of: 'foam.nanos.medusa.NodeType',
+      of: 'foam.nanos.medusa.MedusaType',
+      value: 'MEDIATOR'
+    },
+    {
+      documentation: 'True when this instance is the Primary.',
+      name: 'isPrimary',
+      class: 'Boolean',
+      value: false,
+      visibility: 'RO',
+      storageTransient: true
     },
     {
       documentation: 'Status of a node',
       name: 'status',
       class: 'Enum',
       of: 'foam.nanos.medusa.Status',
+      value: 'OFFLINE'
     },
     {
       name: 'accessMode',
@@ -67,9 +97,49 @@ foam.CLASS({
       documentation: 'Mode of a node (read-only, read-write or write-only)'
     },
     {
-      name: 'port',
+      class: 'Enum',
+      of: 'foam.nanos.medusa.quorum.InstanceState',
+      name: 'quorumStatus',
+      value: 'NONE',
+      storageTransient: true
+    },
+    {
+      name: 'servicePort',
       class: 'Int',
       value: 8080
+    },
+    {
+      name: 'socketPort',
+      class: 'Int',
+      value: 8082
+    },
+    {
+      name: 'electionPort',
+      class: 'Int',
+      value: 8083
+    },
+    {
+      documentation: 'Ping delay greater than this value will trigger alarms.',
+      name: 'pingLatency',
+      class: 'Long',
+      visibility: 'RO',
+      tableCellFormatter: function(value, obj, axiom) {
+        this.add(obj.pingLatency).add('(ms)');
+      },
+      storageTransient: true
+    },
+    {
+      documentation: 'Ping message on error',
+      name: 'pingInfo',
+      class: 'String',
+      visibility: 'RO',
+      storageTransient: true
+    },
+    {
+      documentation: 'Ping delay greater than this value will trigger alarms.',
+      name: 'maxPingLatency',
+      class: 'Long',
+      value: 500
     },
     {
       name: 'sessionId',
@@ -134,7 +204,6 @@ foam.CLASS({
           }
         }.bind(this));
       }
-    },
- ]
+    }
+  ]
 });
-

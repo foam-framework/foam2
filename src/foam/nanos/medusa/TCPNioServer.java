@@ -66,22 +66,27 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
     X x = getX();
     logger = (Logger) getX().get("logger");
     if ( x == null ) throw new RuntimeException("Context no found.");
-    DAO clusterDAO = (DAO) x.get("clusterNodeDAO");
-    if ( clusterDAO == null ) throw new RuntimeException("clusterNodeDAO no found.");
+    DAO clusterDAO = (DAO) x.get("localClusterConfigDAO");
+    if ( clusterDAO == null ) throw new RuntimeException("localClusterConfigDAO no found.");
 
     ArraySink sink = (ArraySink) clusterDAO
-                                  .where(EQ(ClusterNode.HOST_NAME, hostname))
-                                  .select(new ArraySink());
+      .where(
+             AND(
+                 EQ(ClusterConfig.ENABLED, true),
+                 EQ(ClusterConfig.ID, hostname)
+                 )
+             )
+      .select(new ArraySink());
     List list = sink.getArray();
-    if ( list.size() == 0 ) throw new RuntimeException("Unknown hostname: " + hostname);
+    if ( list.size() == 0 ) throw new RuntimeException("ClusterConfig not found: " + hostname);
     if ( list.size() > 1 ) throw new RuntimeException("hostname: " +  hostname + " duplicate on journal");
-    ClusterNode myself = (ClusterNode) list.get(0);
-    //ClusterNode myself = (ClusterNode) clusterDAO.find(clusterId);
-    if ( myself == null ) throw new RuntimeException("can not find clusterNode with hostname: " + hostname);
+    ClusterConfig myself = (ClusterConfig) list.get(0);
+    //ClusterConfig myself = (ClusterConfig) clusterDAO.find(clusterId);
+    if ( myself == null ) throw new RuntimeException("ClusterConfig not found: " + hostname);
 
 
     //TODO: do not hard coding following parameter.
-    InetSocketAddress serverAddress = new InetSocketAddress(myself.getIp(), myself.getSocketPort());
+    InetSocketAddress serverAddress = new InetSocketAddress(myself.getId(), myself.getSocketPort());
     logger.info("Tcp server open at: " + serverAddress);
     // int totalProcessors = totalCores * 1;
     // Double size of MM.

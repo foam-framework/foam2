@@ -44,12 +44,12 @@ public class CronScheduler
   }
 
   public void start() {
-    foam.nanos.medusa.ClusterConfigService service = (foam.nanos.medusa.ClusterConfigService) getX().get("clusterConfigService");
-    if ( service != null &&
-         ! service.getIsPrimary() ) {
-      // nop when not primary
-      return;
-    }
+    // foam.nanos.medusa.ClusterConfigService service = (foam.nanos.medusa.ClusterConfigService) getX().get("clusterConfigService");
+    // if ( service != null &&
+    //      ! service.getIsPrimary() ) {
+    //   // nop when not primary
+    //   return;
+    // }
     cronDAO_ = (DAO) getX().get("cronDAO");
 
     new Thread(this).start();

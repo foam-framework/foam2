@@ -54,17 +54,17 @@ public class ClusterDAOTest
 
     ClusterConfig config = new ClusterConfig.Builder(x)
       .setId("primary")
-      .setNodeType(NodeType.PRIMARY)
+      .setIsPrimary(true)
       .setAccessMode(AccessMode.RW)
-      .setPort(8080)
+      .setServicePort(8080)
       .setSessionId("primary")
       .build();
     ((DAO) x.get("clusterConfigDAO")).put(config);
 
     config = new ClusterConfig.Builder(x)
       .setId("secondary")
-      .setNodeType(NodeType.SECONDARY)
-      .setPort(8090)
+      .setIsPrimary(false)
+      .setServicePort(8090)
       .setSessionId("secondary")
       .build();
     ((DAO) x.get("clusterConfigDAO")).put(config);
@@ -95,7 +95,7 @@ public class ClusterDAOTest
     config = (ClusterConfig) dao.find_(x, hostname);
     test ( config != null, "ClusterConfig found");
     if ( config != null &&
-         config.getNodeType().equals(NodeType.PRIMARY) ) {
+         config.getIsPrimary() ) {
       test ( countries.size() == numCountries, "countryDAO1 equal to countryDAO");
     } else {
       test ( countries.size() == 0, "countryDAO1 size 0 - all puts to primary");

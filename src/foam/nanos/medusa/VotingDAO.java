@@ -29,7 +29,7 @@ public class VotingDAO extends ProxyDAO {
   public VotingDAO(X x, DAO delegate) {
     setX(x);
     QuorumService quorumService = (QuorumService) x.get("quorumService");
-    if ( quorumService == null ) throw new RuntimeException("Can not find quorumService");
+    if ( quorumService == null ) throw new RuntimeException("quorumService not found.");
     this.quorumService = quorumService;
     setDelegate(delegate);
   }
@@ -45,13 +45,13 @@ public class VotingDAO extends ProxyDAO {
       X x1 = x.put("clusterConfigService", service);
       return getDelegate().put_(x1, obj);
     } else if ( quorumService.exposeState == InstanceState.SECONDARY ) {
-      ClusterNode primaryClusterNode = quorumService.getPrimaryClusterNode();
-      if ( primaryClusterNode == null ) throw new RuntimeException("No Primary");
+      ClusterConfig primaryClusterConfig = quorumService.getPrimaryClusterConfig();
+      if ( primaryClusterConfig == null ) throw new RuntimeException("No Primary");
       DefaultClusterConfigService service = new VotingClusterConfigService(
                                                   x,
                                                   false,
                                                   quorumService.mySelf,
-                                                  primaryClusterNode
+                                                  primaryClusterConfig
                                                 );
       X x1 = x.put("clusterConfigService", service);
       return getDelegate().put_(x1, obj);
@@ -73,13 +73,13 @@ public class VotingDAO extends ProxyDAO {
       X x1 = x.put("clusterConfigService", service);
       return getDelegate().remove_(x1, obj);
     } else if ( quorumService.exposeState == InstanceState.SECONDARY ) {
-      ClusterNode primaryClusterNode = quorumService.getPrimaryClusterNode();
-      if ( primaryClusterNode == null ) throw new RuntimeException("No Primary");
+      ClusterConfig primaryClusterConfig = quorumService.getPrimaryClusterConfig();
+      if ( primaryClusterConfig == null ) throw new RuntimeException("No Primary");
       DefaultClusterConfigService service = new VotingClusterConfigService(
                                                   x,
                                                   false,
                                                   quorumService.mySelf,
-                                                  primaryClusterNode
+                                                  primaryClusterConfig
                                                 );
       X x1 = x.put("clusterConfigService", service);
       return getDelegate().remove_(x1, obj);
@@ -110,14 +110,14 @@ public class VotingDAO extends ProxyDAO {
   private class VotingClusterConfigService
     extends DefaultClusterConfigService
   {
-    public VotingClusterConfigService(X x, boolean isPrimary, ClusterNode mySelf, ClusterNode primaryClusterNode) {
+    public VotingClusterConfigService(X x, boolean isPrimary, ClusterConfig mySelf, ClusterConfig primaryClusterConfig) {
       setX(x);
       this.setIsPrimary(isPrimary);
       ClusterConfig config = new ClusterConfig();
       config.setSessionId(mySelf.getSessionId());
       ClusterConfig primary = new ClusterConfig();
-      primary.setId(primaryClusterNode.getIp());
-      primary.setPort(primaryClusterNode.getServicePort());
+      primary.setId(primaryClusterConfig.getId());
+      primary.setServicePort(primaryClusterConfig.getServicePort());
       this.setConfig(config);
       this.setPrimaryConfig(primary);
     }

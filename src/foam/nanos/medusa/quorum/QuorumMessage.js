@@ -16,21 +16,17 @@ foam.CLASS({
       name: 'messageType'
     },
     {
-      class: 'Long',
+      class: 'String',
       name: 'destinationInstance'
     },
     {
-      class: 'Long',
+      class: 'String',
       name: 'sourceInstance'
     },
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.medusa.quorum.Vote',
       name: 'vote'
-    },
-    {
-      class: 'String',
-      name: 'sourceElectionIP'
     },
     {
       class: 'Int',
@@ -42,5 +38,4 @@ foam.CLASS({
       name: 'sourceStatus'
     }
   ]
-  
 });

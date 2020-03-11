@@ -9,7 +9,8 @@ foam.CLASS({
   name: 'DefaultClusterConfigService',
 
   implements: [
-    'foam.nanos.medusa.ClusterConfigService'
+    'foam.nanos.medusa.ClusterConfigService',
+    'foam.nanos.NanoService'
   ],
 
   javaImports: [
@@ -75,35 +76,24 @@ foam.CLASS({
   methods: [
     {
       documentation: `Upon initialization create the ClusterServer configuration and register nSpec.`,
-      name: 'init_',
+//      name: 'init_',
+      name: 'start',
       javaCode: `
-        /* register ClusterConfig Listener */
-        DAO clusterConfigDAO = getClusterConfigDAO();
-        clusterConfigDAO.listen(new ClusterConfigSink(getX(), this), TRUE);
-        onDAOUpdate(getX());
+        DAO dao = (DAO) getX().get("localClusterConfigDAO"); //getClusterConfigDAO();
+        ClusterConfig config = (ClusterConfig) dao.find(System.getProperty("hostname", "localhost"));
+        if ( config != null ) {
+          config = (ClusterConfig) config.fclone();
+          config.setStatus(Status.ONLINE);
+          config = (ClusterConfig) dao.put(config);
+          ((ElectoralService) getX().get("electoralService")).dissolve();
+        } else {
+          ((Logger) getX().get("logger")).warning("ClusterConfig not found. hostname:", System.getProperty("hostname"));
+        }
+        // //register ClusterConfig Listener
+        // clusterConfigDAO.listen(new ClusterConfigSink(getX(), this), TRUE);
+        // onDAOUpdate(getX());
       `
     },
-    // {
-    //   name: 'getIsPrimary',
-    //   args: [
-    //     {
-    //       name: 'x',
-    //       type: 'Context'
-    //     },
-    //     {
-    //       name: 'serviceName',
-    //       type: 'String'
-    //     }
-    //   ],
-    //   type: 'Boolean',
-    //   javaCode: `
-    //   QuorumService quorumService = (QuorumService) x.get("quorumService");
-    //   if ( quorumService != null ) {
-    //     return quorumService.isPrimary();
-    //   }
-    //   return false;
-    //  `
-    // },
     {
       name: 'buildURL',
       type: 'String',
@@ -129,7 +119,7 @@ foam.CLASS({
         if ( ! SafetyUtil.isEmpty(path) ) {
           path = "/" + path;
         }
-        java.net.URI uri = new java.net.URI("http", null, config.getId(), config.getPort(), path+"/"+serviceName, null, null);
+        java.net.URI uri = new java.net.URI("http", null, config.getId(), config.getServicePort(), path+"/"+serviceName, null, null);
 logger.debug(this.getClass().getSimpleName(), "buildURL", serviceName, uri.toURL().toString());
         return uri.toURL().toString();
       } catch (java.net.MalformedURLException | java.net.URISyntaxException e) {
@@ -210,6 +200,43 @@ logger.debug(this.getClass().getSimpleName(), "buildURL", serviceName, uri.toURL
       // setIsPrimary(config.equals(getPrimaryConfig()));
 
       // getPrimaryDAOs().clear();
+      `
+    },
+    {
+      name: 'getVoterPredicate',
+      type: 'foam.mlang.predicate.Predicate',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      javaCode: `
+    return AND(
+              EQ(ClusterConfig.ENABLED, true),
+              EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
+              EQ(ClusterConfig.ZONE, 0L)
+           );
+     `
+    },
+    {
+      name: 'canVote',
+      type: 'Boolean',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'config',
+          type: 'foam.nanos.medusa.ClusterConfig'
+        }
+      ],
+      javaCode: `
+    return
+      config.getEnabled() &&
+      config.getType() == MedusaType.MEDIATOR &&
+      config.getZone() == 0L;
       `
     }
   ]

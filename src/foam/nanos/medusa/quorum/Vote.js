@@ -11,7 +11,7 @@ foam.CLASS({
   
   properties: [
     {
-      class: 'Long',
+      class: 'String',
       name: 'primaryInstanceId'
     },
     {
@@ -23,7 +23,7 @@ foam.CLASS({
       name: 'primaryEra'
     },
     {
-      class: 'Long',
+      class: 'String',
       name: 'criteria',
       documentation: 'Primary electing criteria.'
     }

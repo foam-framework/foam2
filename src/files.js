@@ -750,8 +750,6 @@ FOAM_FILES([
 
   { name: "foam/core/Unit" },
   { name: "foam/core/Currency" },
-  { name: "foam/nanos/medusa/NodeStatus" },
-  { name: "foam/nanos/medusa/ClusterNode" },
   { name: "foam/nanos/medusa/MedusaType" },
   { name: "foam/nanos/medusa/quorum/InstanceState" },
 

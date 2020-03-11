@@ -74,6 +74,30 @@ configuration for contacting the primary node.`,
           type: 'Context'
         }
       ]
+    },
+    {
+      name: 'getVoterPredicate',
+      type: 'foam.mlang.predicate.Predicate',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ]
+    },
+    {
+      name: 'canVote',
+      type: 'Boolean',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'config',
+          type: 'foam.nanos.medusa.ClusterConfig'
+        }
+      ]
     }
   ]
 });

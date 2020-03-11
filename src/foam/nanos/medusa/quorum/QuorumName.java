@@ -6,7 +6,7 @@
 
 package foam.nanos.medusa.quorum;
 
-import foam.nanos.medusa.ClusterNode;
+import foam.nanos.medusa.ClusterConfig;
 
 // This class manages meta info for a node in a cluster.
 // Other service may use this class to varify if the service can be run or not.
@@ -14,14 +14,14 @@ public class QuorumName {
     
     private long id;
     private long group;
-    private ClusterNode self;
+    private ClusterConfig self;
 
     private InstanceState curState;
 
     private volatile Vote latestVote;
 
     
-    public ClusterNode getSelf() {
+    public ClusterConfig getSelf() {
         return self;
     }
 

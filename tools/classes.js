@@ -300,12 +300,18 @@ var classes = [
   'foam.nanos.medusa.AccessMode',
   'foam.nanos.medusa.ClusterCommand',
   'foam.nanos.medusa.ClusterConfig',
+  'foam.nanos.medusa.ClusterConfigPingSink',
+  'foam.nanos.medusa.ClusterConfigMonitor',
   'foam.nanos.medusa.ClusterConfigService',
   'foam.nanos.medusa.DefaultClusterConfigService',
   'foam.nanos.medusa.ClusterClientDAO',
   'foam.nanos.medusa.ClusterServerDAO',
   'foam.nanos.medusa.NodeType',
   'foam.nanos.medusa.Status',
+  'foam.nanos.medusa.ClientElectoralService',
+  'foam.nanos.medusa.ElectoralService',
+  'foam.nanos.medusa.ElectoralServiceState',
+  'foam.nanos.medusa.ElectoralServiceServer',
   'foam.comics.v2.EnabledActionsAuth',
   'foam.comics.v2.BasicEnabledActionsAuth',
   'foam.comics.v2.CRUDEnabledActionsAuth',
@@ -558,7 +564,7 @@ var classes = [
   // Clustering
   'foam.nanos.medusa.MedusaMessage',
   'foam.nanos.medusa.TcpMessage',
-  'foam.nanos.medusa.ClusterNode',
+  'foam.nanos.medusa.Electable',
   'foam.nanos.medusa.FileMeta',
   'foam.nanos.medusa.MedusaType',
   'foam.nanos.medusa.MedusaEntry',
@@ -568,7 +574,6 @@ var classes = [
   'foam.nanos.medusa.quorum.Vote',
   'foam.nanos.medusa.FilePacket',
   'foam.nanos.medusa.MNService',
-  'foam.nanos.medusa.NodeStatus',
   'foam.nanos.medusa.BlockInfo',
   'foam.nanos.medusa.EntryRecord',
   'foam.nanos.medusa.MNServiceMate',
@@ -613,7 +618,8 @@ var skeletons = [
   'foam.nanos.test.EchoService',
   'foam.strategy.StrategizerService',
   'foam.nanos.auth.UserQueryService',
-  'foam.nanos.medusa.MNService'
+  'foam.nanos.medusa.MNService',
+  'foam.nanos.medusa.ElectoralService'
 ];
 
 var proxies = [

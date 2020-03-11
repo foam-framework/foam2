@@ -120,7 +120,7 @@ p({
       .setGuid(true)
       .setOf(foam.nanos.test.Test.getOwnClassInfo())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName(\"tests\")
+      .setJournalName("tests")
       .setDecorator(new foam.nanos.script.ScriptRunnerDAO(new foam.dao.NullDAO(x, foam.nanos.test.Test.getOwnClassInfo())))
       .build();
   """,
@@ -147,7 +147,7 @@ p({
       .setGuid(true)
       .setOf(foam.nanos.script.Script.getOwnClassInfo())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName(\"scripts\")
+      .setJournalName("scripts")
       .setDecorator(new foam.nanos.script.ScriptRunnerDAO(new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.script.Script.getOwnClassInfo()).build()))
       .setOrder(new foam.core.PropertyInfo[] {foam.nanos.script.Script.ID})
       .setIndex(new foam.core.PropertyInfo[] {foam.nanos.script.Script.ID})
@@ -166,10 +166,11 @@ p({
       .setGuid(true)
       .setOf(foam.nanos.cron.Cron.getOwnClassInfo())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName(\"cronjobs\")
+      .setJournalName("cronjobs")
       .setDecorator(new foam.nanos.cron.CronScheduleDAO.Builder(x)
         .setDelegate(new foam.nanos.script.ScriptRunnerDAO(new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.cron.Cron.getOwnClassInfo()).build()))
         .build())
+      .setCluster(false)
       .build();
   """,
   "client":"{\"of\":\"foam.nanos.cron.Cron\"}"
@@ -262,6 +263,7 @@ p({
       .setJournalName("sessions")
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setAuthorize(false)
+      .setCluster(false)
       .setDecorator(new foam.dao.ValidatingDAO(x, new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.session.Session.getOwnClassInfo()).build()))
       .build();
   """

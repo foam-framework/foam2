@@ -54,8 +54,11 @@ foam.CLASS({
         "put_",
       }, (Logger) x.get("logger"));
 
+      ElectoralService electoralService = (ElectoralService) x.get("electoralService");
       ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
-      if ( service != null &&
+      if ( electoralService != null &&
+           electoralService.getState() == ElectoralServiceState.IN_SESSION &&
+           service != null &&
            service.getConfig() != null &&
            ! service.getIsPrimary() ) {
 
@@ -72,7 +75,6 @@ foam.CLASS({
           logger.debug("no changes");
           return obj;
         }
-
         ClusterCommand cmd = new ClusterCommand(x, getServiceName(), ClusterCommand.PUT, record);
         logger.debug("to primary", cmd);
 
@@ -91,6 +93,8 @@ foam.CLASS({
             if ( getMaxRetryAttempts() > -1 &&
                  retryAttempt >= getMaxRetryAttempts() ) {
               logger.debug("retryAttempt >= maxRetryAttempts", retryAttempt, getMaxRetryAttempts());
+              electoralService.dissolve();
+
               throw t;
             }
             retryAttempt += 1;
