@@ -14,7 +14,11 @@ foam.CLASS({
     'com.google.api.client.http.javanet.NetHttpTransport',
     'com.google.api.client.json.JsonFactory',
     'com.google.api.client.json.jackson2.JacksonFactory',
-    
+    'com.google.api.client.util.store.FileDataStoreFactory',
+    'com.google.api.services.sheets.v4.Sheets',
+    'com.google.api.services.sheets.v4.SheetsScopes',
+    'com.google.api.services.sheets.v4.model.*',
+    'foam.nanos.export.GoogleSheetsPropertyMetadata',
     'java.io.File',
     'java.io.FileInputStream',
     'java.io.InputStreamReader',
@@ -24,10 +28,6 @@ foam.CLASS({
     'java.util.Collections',
     'java.util.List',
     
-    'com.google.api.client.util.store.FileDataStoreFactory',
-    'com.google.api.services.sheets.v4.Sheets',
-    'com.google.api.services.sheets.v4.SheetsScopes',
-    'com.google.api.services.sheets.v4.model.*',
     'static com.itextpdf.html2pdf.html.AttributeConstants.APPLICATION_NAME'
   ],
   axioms: [
@@ -73,6 +73,11 @@ foam.CLASS({
         {
           name: 'obj',
           type: 'Object'
+        },
+        {
+          name: 'metadataObj',
+          type: 'foam.nanos.export.GoogleSheetsPropertyMetadata[]',
+          javaType: 'Object'
         }
       ],
       javaCode: `
@@ -81,6 +86,12 @@ foam.CLASS({
 
         try {
           List<List<Object>> listOfValues = new ArrayList<>();
+          Object[] methadataArr = (Object[])metadataObj;
+          GoogleSheetsPropertyMetadata[] methadata = new GoogleSheetsPropertyMetadata[methadataArr.length];
+
+          for(int i = 0; i < methadata.length; i++) {
+            methadata[i] = (GoogleSheetsPropertyMetadata)methadataArr[i];
+          }
 
           Object[] arr = (Object[]) obj;
           for ( Object v : arr ) {
@@ -136,12 +147,26 @@ foam.CLASS({
                 .setSecondBandColor(new Color().setRed(0.91f).setGreen(0.941f).setBlue(0.996f))//232,240,254
             )));
 
-          BatchUpdateSpreadsheetRequest r = new BatchUpdateSpreadsheetRequest().setRequests(new ArrayList(){{
+          List<Request> requests = new ArrayList<Request>(){{
             add(titleBoldRequest);
             add(fontSizeRequest);
             add(fontFamilyRequest);
             add(alternatingColors);
-          }});
+          }};
+
+          for(int i = 0; i < methadata.length; i++) {
+            if(methadata[i].getCellType().equals("String"))
+              continue;
+            requests.add(new Request().setRepeatCell(
+              new RepeatCellRequest()
+                .setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(methadata[i].getCellType()))))
+                .setRange(new GridRange().setStartRowIndex(1).setStartColumnIndex(i).setEndColumnIndex(i+1))
+                .setFields("userEnteredFormat.numberFormat")
+            ));
+          }
+
+          BatchUpdateSpreadsheetRequest r = new BatchUpdateSpreadsheetRequest().setRequests(requests);
+
           BatchUpdateSpreadsheetResponse resp = service.spreadsheets()
             .batchUpdate(response.getSpreadsheetId(), r)
             .execute();
