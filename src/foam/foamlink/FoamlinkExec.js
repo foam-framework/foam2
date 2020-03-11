@@ -121,10 +121,14 @@ foam.CLASS({
           if (
             !(id === expectedPackage || id.startsWith(expectedPackage+'.'))
           ) {
+            /*
+             This warning can be made useful with some amount of effort,
+             but presently it is incorrect most of the time.
             console.warn(tag + w +
               'Package name does not match file path: ' +
               '"' + id + '" is outside of "' + expectedPackage + '".'
             );
+            */
           }
         }
 
