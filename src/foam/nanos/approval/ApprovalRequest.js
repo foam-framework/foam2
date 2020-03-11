@@ -196,7 +196,6 @@
     {
       class: 'String',
       name: 'daoKey',
-      writePermissionRequired: true,
       documentation: `Used internally in approvalDAO to point where requested object can be found.
       Should not be used to retrieve approval requests for a given objects
       since an object can have multiple requests of different nature.`
@@ -217,8 +216,8 @@
       gridColumns: 4,
       visibility: function(classification) {
         return classification ?
-          foam.u2.DisplayMode.RO :
-          foam.u2.DisplayMode.HIDDEN;
+          'RO' :
+          'HIDDEN';
       }
     },
     {
@@ -351,8 +350,12 @@
       of: 'foam.nanos.auth.User',
       name: 'createdBy',
       section: 'supportDetails',
-      readPermissionRequired: true,
-      writePermissionRequired: true
+      tableCellFormatter: function(initiatingUser) {
+        let self = this;
+        this.__subSubContext__.userDAO.find(initiatingUser).then(user => {
+          self.add(user ? user.toSummary() : `User #${initiatingUser}`);
+        });
+      }
     },
     {
       class: 'Reference',
@@ -449,24 +452,6 @@
       section: 'requestDetails',
       visibility: function(operation) {
         return operation ?
-          foam.u2.DisplayMode.RO :
-          foam.u2.DisplayMode.HIDDEN;
-      }
-    },
-    {
-      class: 'Reference',
-      of: 'foam.nanos.auth.User',
-      name: 'initiatingUser',
-      label: 'Requestor',
-      tableCellFormatter: function(initiatingUser) {
-        let self = this;
-        this.__subSubContext__.userDAO.find(initiatingUser).then(user => {
-          self.add(user ? user.toSummary() : `User #${initiatingUser}`);
-        });
-      },
-      section: 'requestDetails',
-      visibility: function(initiatingUser) {
-        return initiatingUser ?
           foam.u2.DisplayMode.RO :
           foam.u2.DisplayMode.HIDDEN;
       }

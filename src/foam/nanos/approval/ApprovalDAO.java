@@ -74,7 +74,7 @@ public class ApprovalDAO
 
     if ( request instanceof ApprovalRequest ) {
       DAO userDAO = (DAO) x.get("localUserDAO");
-      User initiatingUser = (User) userDAO.find(((ApprovalRequest) request).getInitiatingUser());
+      User initiatingUser = (User) userDAO.find(((ApprovalRequest) request).getCreatedBy());
       X initiatingUserX = x.put("user", initiatingUser);
 
       if ( ((ApprovalRequest) request).getOperation() == Operations.REMOVE ) {
