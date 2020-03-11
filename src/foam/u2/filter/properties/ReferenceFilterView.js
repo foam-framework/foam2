@@ -4,7 +4,7 @@
 * http://www.apache.org/licenses/LICENSE-2.0
 */
 foam.CLASS({
-  package: 'foam.u2.filter',
+  package: 'foam.u2.filter.properties',
   name: 'ReferenceFilterView',
   extends: 'foam.u2.Controller',
   documentation: `

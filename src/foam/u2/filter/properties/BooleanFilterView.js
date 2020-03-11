@@ -5,7 +5,7 @@
 */
 
 foam.CLASS({
-  package: 'foam.u2.filter',
+  package: 'foam.u2.filter.properties',
   name: 'BooleanFilterView',
   extends: 'foam.u2.Controller',
 

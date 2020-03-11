@@ -5,17 +5,26 @@
  */
 
 foam.CLASS({
-  package: 'foam.u2.filter',
-  name: 'EnumFilterView',
+  package: 'foam.u2.filter.properties',
+  name: 'StringFilterView',
   extends: 'foam.u2.Controller',
 
-  documentation: `A SearchView for properties of type ENUM.`,
+  documentation: `A SearchView for properties of type String.`,
 
   implements: [
     'foam.mlang.Expressions'
   ],
 
+  requires: [
+    'foam.mlang.sink.Count',
+    'foam.mlang.sink.GroupBy'
+  ],
+
   css: `
+    ^ {
+      position: relative;
+    }
+
     ^container-search {
       padding: 24px 16px;
       border-bottom: solid 1px #cbcfd4;
@@ -52,6 +61,16 @@ foam.CLASS({
       color: #1e1f21;
     }
 
+    ^label-loading {
+      padding: 0 16px;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.33;
+      letter-spacing: normal;
+      color: #1e1f21;
+      text-align: center;
+    }
+
     ^container-option {
       display: flex;
       align-items: center;
@@ -80,20 +99,39 @@ foam.CLASS({
 
   messages: [
     { name: 'LABEL_PLACEHOLDER', message: 'Search' },
+    { name: 'LABEL_LOADING', message: '- LOADING OPTIONS -' },
+    { name: 'LABEL_NO_OPTIONS', message: '- NO OPTIONS AVAILABLE -' },
     { name: 'LABEL_SELECTED', message: 'SELECTED OPTIONS' },
-    { name: 'LABEL_FILTERED', message: 'OPTIONS' }
+    { name: 'LABEL_FILTERED', message: 'OPTIONS' },
+    { name: 'LABEL_EMPTY', message: '- Not Defined -' }
   ],
 
   properties: [
     {
       name: 'property',
       documentation: `The property that this view is filtering by. Should be of
-          type Enum.`,
+          type String.`,
       required: true
     },
     {
+      class: 'foam.dao.DAOProperty',
+      name: 'dao',
+      required: true
+    },
+    {
+      name: 'daoContents'
+    },
+    {
       class: 'String',
-      name: 'search'
+      name: 'search',
+      postSet: function(_, n) {
+        this.dao.where(this.CONTAINS_IC(this.property, n)).limit(100).select(this.GroupBy.create({
+          arg1: this.property,
+          arg2: this.Count.create()
+        })).then((results) => {
+          this.daoContents = results.groupKeys;
+        });
+      }
     },
     {
       name: 'selectedOptions',
@@ -103,22 +141,15 @@ foam.CLASS({
     },
     {
       name: 'filteredOptions',
-      expression: function(property, search, selectedOptions) {
-        var options = property.of.VALUES;
-        // Filter out search
-        if ( search ) {
-          var lowerCaseSearch = search.toLowerCase();
-          options = options.filter(function(option) {
-            return option.label ?
-              option.label.toLowerCase().includes(lowerCaseSearch) :
-              option.name.toLowerCase().includes(lowerCaseSearch);
-          });
-        }
+      expression: function(daoContents, selectedOptions) {
+        if ( ! daoContents || daoContents.length === 0 ) return [];
+
+        var options = daoContents.map((obj) => obj.trim());
 
         // Filter out selectedOptions
         selectedOptions.forEach(function(selection) {
           options = options.filter(function(option) {
-            return option.name !== selection.name;
+            return option !== selection;
           });
         });
 
@@ -130,24 +161,31 @@ foam.CLASS({
       documentation: ``,
       expression: function(selectedOptions) {
         if ( selectedOptions.length <= 0 ) return this.TRUE;
-        var ordinals = selectedOptions.map(option => option.ordinal);
 
-        if ( ordinals.length === 1) {
-          return this.EQ(this.property, ordinals[0]);
+        if ( selectedOptions.length === 1 ) {
+          return this.EQ(this.property, selectedOptions[0]);
         }
 
-        return this.IN(this.property, ordinals);
+        return this.IN(this.property, selectedOptions);
       }
     },
     {
       name: 'name',
       documentation: `Required by SearchManager.`,
-      value: 'ENUM search view'
+      value: 'String search view'
+    },
+    {
+      class: 'Boolean',
+      name: 'isLoading',
+      documentation: 'boolean tracking we are still loading info from DAO',
+      value: true
     }
   ],
 
   methods: [
     function initE() {
+      this.onDetach(this.dao$.sub(this.daoUpdate));
+      this.daoUpdate();
       var self = this;
       this
         .addClass(this.myClass())
@@ -160,17 +198,16 @@ foam.CLASS({
           })
           .end()
         .end()
-        .start().addClass(this.myClass('container-filter'))
-          .add(this.slot(function(selectedOptions) {
+        .start().addClass(self.myClass('container-filter'))
+          .add(this.slot(function(property, selectedOptions, isLoading) {
             var element = this.E();
-            if ( selectedOptions.length <= 0 ) return element;
+            if ( isLoading || selectedOptions.length <= 0 ) return element;
             return element
               .start('p').addClass(self.myClass('label-section'))
                 .add(self.LABEL_SELECTED)
               .end()
               .call(function() {
                 self.selectedOptions.forEach(function(option, index) {
-                  const label = option.label ? option.label : option.name;
                   return element
                     .start().addClass(self.myClass('container-option'))
                       .on('click', () => self.deselectOption(index))
@@ -178,21 +215,32 @@ foam.CLASS({
                         class: 'foam.u2.md.CheckBox',
                         data: true,
                         showLabel: true,
-                        label: label
+                        label: option ? option : self.LABEL_EMPTY
                       }).end()
                     .end();
                 });
               });
           }))
-          .add(this.slot(function(selectedOptions, filteredOptions) {
+          .add(this.slot(function(property, selectedOptions, filteredOptions, isLoading) {
             var element = this.E();
+            if ( isLoading ) {
+              return element
+                .start('p').addClass(self.myClass('label-loading'))
+                  .add(self.LABEL_LOADING)
+                .end();
+            }
+            if ( filteredOptions.length === 0 ) {
+              return element
+                .start('p').addClass(self.myClass('label-loading'))
+                  .add(self.LABEL_NO_OPTIONS)
+                .end();
+            }
             return element
               .start('p').addClass(self.myClass('label-section'))
                 .add(self.LABEL_FILTERED)
               .end()
               .call(function() {
                 self.filteredOptions.forEach(function(option, index) {
-                  const label = option.label || option.name;
                   return element
                     .start().addClass(self.myClass('container-option'))
                       .on('click', () => self.selectOption(index))
@@ -200,7 +248,7 @@ foam.CLASS({
                         class: 'foam.u2.md.CheckBox',
                         data: false,
                         showLabel: true,
-                        label: label
+                        label: option ? option : self.LABEL_EMPTY
                       }).end()
                     .end();
                 });
@@ -219,6 +267,18 @@ foam.CLASS({
   ],
 
   listeners: [
+    {
+      name: 'daoUpdate',
+      code: function() {
+        this.dao.limit(100).select(this.GroupBy.create({
+          arg1: this.property,
+          arg2: this.Count.create()
+        })).then((results) => {
+          this.daoContents = results.groupKeys;
+          this.isLoading = false;
+        });
+      }
+    },
     {
       name: 'selectOption',
       code: function(index) {

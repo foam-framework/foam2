@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.u2.filter',
-  name: 'FilterSearch',
+  name: 'FilterView',
   extends: 'foam.u2.View',
 
   documentation: `
@@ -20,8 +20,8 @@ foam.CLASS({
 
   requires: [
     'foam.core.SimpleSlot',
-    'foam.u2.search.SearchManager',
-    'foam.u2.filter.FilterViewController',
+    'foam.u2.filter.FilterController',
+    'foam.u2.filter.property.PropertyFilterView',
     'foam.u2.search.TextSearchView'
   ],
 
@@ -31,14 +31,14 @@ foam.CLASS({
   ],
 
   exports: [
-    'as filterController',
     'as data',
-    'searchManager'
+    'filterController'
   ],
 
   css: `
     ^ {
       flex: 1;
+      position: relative;
     }
 
     ^container-search {
@@ -144,13 +144,13 @@ foam.CLASS({
     {
       name: 'generalSearchField',
       postSet: function(o, n) {
-        this.searchManager.add(n);
+        this.filterController.add(n);
       }
     },
     {
-      name: 'searchManager',
+      name: 'filterController',
       factory: function() {
-        return this.SearchManager.create({
+        return this.FilterController.create({
           dao$: this.dao$,
           predicate$: this.data$
         });
@@ -199,7 +199,7 @@ foam.CLASS({
           self.show(filters.length);
 
           var e = this.E();
-          e.onDetach(self.searchManager);
+          e.onDetach(self.filterController);
           e.start().addClass(self.myClass('container-search'))
             .start(self.TextSearchView, {
               richSearch: true,
@@ -224,7 +224,7 @@ foam.CLASS({
               var axiom = self.dao.of.getAxiomByName(f);
 
               if ( axiom ){
-                this.start(self.FilterViewController, {
+                this.start(self.PropertyFilterView, {
                   searchView: axiom.searchView,
                   property: axiom,
                   dao$: self.dao$
@@ -280,7 +280,9 @@ foam.CLASS({
     {
       name: 'getResultCount',
       code: function() {
-        this.searchManager.filteredDAO.select(this.COUNT()).then((count) => {
+        debugger;
+        this.filterController.filteredDAO.select(this.COUNT()).then((count) => {
+          console.log('WHATT THE HELL?');
           this.resultsCount = count.value;
         });
       }
