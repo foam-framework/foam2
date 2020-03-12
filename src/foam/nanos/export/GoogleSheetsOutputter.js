@@ -116,10 +116,10 @@ foam.CLASS({
           if(obj[columnMethadata[i].columnName]) {
             if ( columnMethadata[i].cellType === 'CURRENCY' )
               propValues.push(( obj[columnMethadata[i].columnName] / 100 ).toString());
-              if ( columnMethadata[i].cellType === 'DATE' )
+            else if ( columnMethadata[i].cellType === 'DATE' )
                 propValues.push(obj[columnMethadata[i].columnName].toISOString().substring(0, 10));
-              else
-                propValues.push(obj[columnMethadata[i].columnName].toString());
+            else
+              propValues.push(obj[columnMethadata[i].columnName].toString());
           }
           else
             propValues.push('');
