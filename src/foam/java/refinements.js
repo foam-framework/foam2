@@ -1945,7 +1945,6 @@ foam.CLASS({
     },
     { name: 'type',            factory: function() { return this.referencedProperty.type; } },
     { name: 'javaType',        factory: function() { return this.referencedProperty.javaType; } },
-    { name: 'javaValue',       factory: function() { return this.referencedProperty.javaValue; } },
     { name: 'javaJSONParser',  factory: function() { return this.referencedProperty.javaJSONParser; } },
     { name: 'javaQueryParser', factory: function() { return this.referencedProperty.javaQueryParser; } },
     { name: 'javaInfoType',    factory: function() { return this.referencedProperty.javaInfoType; } }
@@ -1953,6 +1952,8 @@ foam.CLASS({
 
   methods: [
     function buildJavaClass(cls) {
+      if ( this.referencedProperty.hasOwnProperty('javaValue') ) this.javaValue = this.referencedProperty.javaValue;
+
       this.SUPER(cls);
       cls.method({
         name: `find${foam.String.capitalize(this.name)}`,
