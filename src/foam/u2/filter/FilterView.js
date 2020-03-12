@@ -95,17 +95,42 @@ foam.CLASS({
       background-image: linear-gradient(to bottom, #ffffff, #d3d6d8);
     }
 
+    ^container-footer {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+
     ^label-results {
       margin: 0;
-      margin-top: 8px;
       font-size: 12px;
       padding: 0 8px;
+      flex: 1;
+    }
+
+    ^link-mode {
+      margin: 0;
+      font-size: 12px;
+      padding: 0 8px;
+      color: #4D7AF7;
+      text-decoration: underline;
+    }
+
+    ^link-mode:hover {
+      cursor: pointer;
+      color: #233E8B;
     }
   `,
 
   messages: [
     { name: 'LABEL_FILTER', message: 'Filter'},
-    { name: 'LABEL_RESULTS', message: 'Filter Results: '}
+    { name: 'LABEL_RESULTS', message: 'Filter Results: '},
+    { name: 'LABEL_CLEAR', message: 'Clear'},
+    { name: 'LINK_ADVANCED', message: 'Advanced'},
+    { name: 'LINK_SIMPLE', message: 'Simple'},
+    { name: 'MESSAGE_ADVANCEDMODE', message: 'Advanced filters are currently being used.'},
+    { name: 'MESSAGE_VIEWADVANCED', message: 'View filters.'},
   ],
 
   properties: [
@@ -176,7 +201,7 @@ foam.CLASS({
       class: 'String',
       name: 'resultLabel',
       expression: function(isFiltering, resultsCount) {
-        if ( ! isFiltering ) return 'Showing all results';
+        if ( ! isFiltering ) return '';
         return `${this.LABEL_RESULTS}${resultsCount}`;
       }
     },
@@ -185,6 +210,13 @@ foam.CLASS({
       name: 'iconPath',
       expression: function(isOpen) {
         return isOpen ? 'images/expand-less.svg' : 'images/expand-more.svg';
+      }
+    },
+    {
+      class: 'String',
+      name: 'modeLabel',
+      expression: function(filterController$isAdvanced) {
+        return filterController$isAdvanced ? this.LINK_SIMPLE : this.LINK_ADVANCED;
       }
     }
   ],
@@ -220,23 +252,68 @@ foam.CLASS({
           .end()
           .start().addClass(self.myClass('container-drawer'))
             .enableClass(self.myClass('container-drawer-open'), self.isOpen$)
-            .forEach(filters, function(f) {
-              var axiom = self.dao.of.getAxiomByName(f);
-
-              if ( axiom ){
-                this.start(self.PropertyFilterView, {
-                  searchView: axiom.searchView,
-                  property: axiom,
-                  dao$: self.dao$
-                })
-                .end();
-              }
-            })
+              .forEach(filters, function(f) {
+                var axiom = self.dao.of.getAxiomByName(f);
+                if ( axiom ){
+                  this.start(self.PropertyFilterView, {
+                    searchView: axiom.searchView,
+                    property: axiom,
+                    dao$: self.dao$
+                  })
+                  .hide(self.filterController$.dot('isAdvanced'))
+                  .end();
+                }
+              })
+              .start('p')
+                .addClass(self.myClass(''))
+                .show(self.filterController$.dot('isAdvanced'))
+                .add(self.MESSAGE_ADVANCEDMODE)
+              .end()
+              .start('p')
+                .addClass(self.myClass(''))
+                .show(self.filterController$.dot('isAdvanced'))
+                .add(self.MESSAGE_VIEWADVANCED)
+              .end()
+            // .add(this.slot(function(isAdvanced){
+            //   if ( ! isAdvanced ) {
+            //     return this.E().forEach(filters, function(f) {
+            //       var axiom = self.dao.of.getAxiomByName(f);
+            //
+            //       if ( axiom ){
+            //         this.start(self.PropertyFilterView, {
+            //           searchView: axiom.searchView,
+            //           property: axiom,
+            //           dao$: self.dao$
+            //         })
+            //         .end();
+            //       }
+            //     });
+            //   }
+            //   return this.E().start('p')
+            //       .addClass(self.myClass(''))
+            //       .add(self.MESSAGE_ADVANCEDMODE)
+            //     .end()
+            //     .start('p')
+            //       .addClass(self.myClass(''))
+            //       .add(self.MESSAGE_VIEWADVANCED)
+            //     .end();
+            // }))
           .end()
-          .start('p')
-            .addClass(self.myClass('label-results'))
-            .show(self.isFiltering$)
-            .add(self.resultLabel$)
+          .start().addClass(self.myClass('container-footer'))
+            .start('p')
+              .addClass(self.myClass('label-results'))
+              .add(self.resultLabel$)
+            .end()
+            .start('p')
+              .addClass(self.myClass('link-mode'))
+              .on('click', self.clearAll)
+              .add(self.LABEL_CLEAR)
+            .end()
+            .start('p')
+              .addClass(self.myClass('link-mode'))
+              .on('click', self.toggleMode)
+              .add(self.modeLabel$)
+            .end()
           .end();
 
           return e;
@@ -256,15 +333,17 @@ foam.CLASS({
     //TODO: Move this to a tool? Would be useful for any large number
     function formatLargeValue(num) {
       var symbols = ['K', 'M', 'B', 'T'];
-
+      var range = '';
+      if ( num < 1000 ) return num;
       symbols.forEach((symbol, index) => {
-        var upperBound = (index + 1) * 3 * 10;
-        if ( num < upperBound ) {
-          return index > 0 ? `> ${Math.round(num/(upperBound/100))}${symbol}` : `${num}`;
+        var lowerBound = Math.pow(10, (index + 1) * 3);
+        var upperBound = lowerBound * 1000;
+        if ( num >= lowerBound && num < upperBound ) {
+          range = `~ ${Math.round(num/lowerBound)}${symbol}`;
         }
       });
 
-      return 'Value too large';
+      return range? range : 'Value too large';
 
       // if ( num < 1000 ) return `${num}`; // Less than K
       // if ( num < 1000000) return `> ${Math.round(num/1000)}K`; // Less than M
@@ -280,9 +359,7 @@ foam.CLASS({
     {
       name: 'getResultCount',
       code: function() {
-        debugger;
         this.filterController.filteredDAO.select(this.COUNT()).then((count) => {
-          console.log('WHATT THE HELL?');
           this.resultsCount = count.value;
         });
       }
@@ -291,6 +368,30 @@ foam.CLASS({
       name: 'toggleDrawer',
       code: function() {
         this.isOpen = ! this.isOpen;
+      }
+    },
+    {
+      name: 'clearAll',
+      code: function() {
+        // clear all filters
+        console.log('TODO: Clear filters');
+      }
+    },
+    {
+      name: 'toggleMode',
+      code: function() {
+        if ( this.filterController.isAdvanced ) {
+          // Switch back to simple mode
+          // Clear out all active filters
+          this.filterController.isAdvanced = !this.filterController.isAdvanced;
+          return;
+        }
+
+        // Make modal appear, switch to advance mode once user has selected
+        // filter criteria
+        // Clear out all active filters
+
+        this.filterController.isAdvanced = !this.filterController.isAdvanced;
       }
     }
   ]

@@ -6,7 +6,11 @@
 foam.CLASS({
   package: 'foam.u2.filter',
   name: 'FilterController',
-  documentation: 'This file will be deprecating the SearchManager.',
+  documentation: `
+    This file will be deprecating the SearchManager.
+    The FilterController controls the final predicate the DAO will use. This
+    predicate is constructed from the various PropertyFilterViews.
+  `,
 
   requires: [
     'foam.mlang.predicate.And',
@@ -41,6 +45,10 @@ foam.CLASS({
         this.updateViews();
         return d;
       }
+    },
+    {
+      class: 'Boolean',
+      name: 'isAdvanced'
     }
   ],
 
