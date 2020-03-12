@@ -26,19 +26,14 @@ foam.CLASS({
           var pattern = '';
           if ( props[i].cls_.id === "foam.core.UnitValue" ) {
             cellType = 'CURRENCY';
-            pattern = '\"$\"###\" CAD\"';// + props[i].cls_.unitPropName;
+            pattern = '\"$\"#0.0#\" CAD\"';
           } else if ( props[i].cls_.id === 'foam.core.Date' ) {
             cellType = 'DATE';
-            //m/d/yyy, h:m:s am/pm
-            //3/11/2020, 8:27:41 AM
-            //Fri Mar 27 2020"
             pattern = 'yyyy-mm-dd';
           } else if ( props[i].cls_.id === 'foam.core.DateTime' ) {
             cellType = 'DATE_TIME';
-            pattern = 'm/d/yyyy, h:m:s am/pm';
           } else if ( props[i].cls_.id === 'foam.core.Time' ) {
             cellType = 'TIME';
-            pattern = 'm/d/yyy, h:m:s am/pm';
           }
 
           var m = this.GoogleSheetsPropertyMetadata.create({
@@ -119,7 +114,15 @@ foam.CLASS({
               columnMethadata[i].perValuePatternSpecificValues.push(obj.destinationCurrency);
             }
             else if ( columnMethadata[i].cellType === 'DATE' )
-                propValues.push(obj[columnMethadata[i].columnName].toISOString().substring(0, 10));
+              propValues.push(obj[columnMethadata[i].columnName].toISOString().substring(0, 10));
+            else if ( columnMethadata[i].cellType === 'DATE_TIME' ) {
+              propValues.push(obj[columnMethadata[i].columnName].toString().substring(0, 24));
+              columnMethadata[i].perValuePatternSpecificValues.push(obj[columnMethadata[i].columnName].toString().substring(24));
+            }
+            else if ( columnMethadata[i].cellType === 'TIME' ) {
+              propValues.push(obj[columnMethadata[i].columnName].toString().substring(0, 8));
+              columnMethadata[i].perValuePatternSpecificValues.push(obj[columnMethadata[i].columnName].toString().substring(8));
+            }
             else
               propValues.push(obj[columnMethadata[i].columnName].toString());
           }

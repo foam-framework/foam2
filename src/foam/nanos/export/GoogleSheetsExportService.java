@@ -143,8 +143,28 @@ public class GoogleSheetsExportService extends foam.core.AbstractFObject impleme
               continue;
             requests.add(new Request().setRepeatCell(
               new RepeatCellRequest()
-                .setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(metadata[i].getCellType()).setPattern("\"$\"#####\"" + metadata[i].getPerValuePatternSpecificValues()[j] + "\""))))
-                .setRange(new GridRange().setStartRowIndex(1).setEndColumnIndex(i+1).setStartColumnIndex(i).setStartColumnIndex(j).setEndColumnIndex(j+1))
+                .setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(metadata[i].getCellType()).setPattern("\"$\"###,###,##\"" + metadata[i].getPerValuePatternSpecificValues()[j] + "\""))))
+                .setRange(new GridRange().setStartColumnIndex(i).setEndColumnIndex(i+1).setStartRowIndex(j+1).setEndRowIndex(j+2))
+                .setFields("userEnteredFormat.numberFormat")
+            ));
+          }
+        }
+        if(metadata[i].getCellType().equals("DATE_TIME")) {
+          for(int j = 0; j < metadata[i].getPerValuePatternSpecificValues().length; j++) {
+            requests.add(new Request().setRepeatCell(
+              new RepeatCellRequest()
+                .setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(metadata[i].getCellType()).setPattern("ddd mmm d yyyy hh/mm/ss\" " + metadata[i].getPerValuePatternSpecificValues()[j] + "\""))))
+                .setRange(new GridRange().setStartColumnIndex(i).setEndColumnIndex(i+1).setStartRowIndex(j+1).setEndRowIndex(j+2))
+                .setFields("userEnteredFormat.numberFormat")
+            ));
+          }
+        }
+        if(metadata[i].getCellType().equals("DATE_TIME")) {
+          for(int j = 0; j < metadata[i].getPerValuePatternSpecificValues().length; j++) {
+            requests.add(new Request().setRepeatCell(
+              new RepeatCellRequest()
+                .setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(metadata[i].getCellType()).setPattern("hh/mm/ss\" " + metadata[i].getPerValuePatternSpecificValues()[j] + "\""))))
+                .setRange(new GridRange().setStartColumnIndex(i).setEndColumnIndex(i+1).setStartRowIndex(j+1).setEndRowIndex(j+2))
                 .setFields("userEnteredFormat.numberFormat")
             ));
           }
