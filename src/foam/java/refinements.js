@@ -1945,6 +1945,7 @@ foam.CLASS({
     },
     { name: 'type',            factory: function() { return this.referencedProperty.type; } },
     { name: 'javaType',        factory: function() { return this.referencedProperty.javaType; } },
+    { name: 'javaValue',       factory: function() { return this.referencedProperty.javaValue; } },
     { name: 'javaJSONParser',  factory: function() { return this.referencedProperty.javaJSONParser; } },
     { name: 'javaQueryParser', factory: function() { return this.referencedProperty.javaQueryParser; } },
     { name: 'javaInfoType',    factory: function() { return this.referencedProperty.javaInfoType; } }
