@@ -159,7 +159,7 @@ public class GoogleSheetsExportService extends foam.core.AbstractFObject impleme
             ));
           }
         }
-        if(metadata[i].getCellType().equals("DATE_TIME")) {
+        if(metadata[i].getCellType().equals("TIME")) {
           for(int j = 0; j < metadata[i].getPerValuePatternSpecificValues().length; j++) {
             requests.add(new Request().setRepeatCell(
               new RepeatCellRequest()
