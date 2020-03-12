@@ -517,23 +517,23 @@
         }
         return ! isTrackingRequest;
       },
-      code: function() {
+      code: function(X) {
         var approvedApprovalRequest = this.clone();
         approvedApprovalRequest.status = this.ApprovalStatus.APPROVED;
 
-        this.approvalRequestDAO.put(approvedApprovalRequest).then(o => {
-          this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
+        X.approvalRequestDAO.put(approvedApprovalRequest).then(o => {
+          X.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
           this.finished.pub();
-          this.ctrl.add(this.NotificationMessage.create({
+          X.ctrl.add(this.NotificationMessage.create({
             message: this.SUCCESS_APPROVED
           }));
 
-          if ( this.currentMenu.id !== this.stack.top[2] ) {
-            this.stack.back();
+          if ( X.currentMenu.id !== X.stack.top[2] ) {
+            X.stack.back();
           }
         }, e => {
           this.throwError.pub(e);
-          this.ctrl.add(this.NotificationMessage.create({
+          X.ctrl.add(this.NotificationMessage.create({
             message: e.message,
             type: 'error'
           }));
@@ -552,23 +552,23 @@
         }
         return ! isTrackingRequest;
       },
-      code: function() {
+      code: function(X) {
         var rejectedApprovalRequest = this.clone();
         rejectedApprovalRequest.status = this.ApprovalStatus.REJECTED;
 
-        this.approvalRequestDAO.put(rejectedApprovalRequest).then(o => {
-          this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
+        X.approvalRequestDAO.put(rejectedApprovalRequest).then(o => {
+          X.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
           this.finished.pub();
-          this.ctrl.add(this.NotificationMessage.create({
+          X.ctrl.add(this.NotificationMessage.create({
             message: this.SUCCESS_REJECTED
           }));
 
-          if ( this.currentMenu.id !== this.stack.top[2] ) {
-            this.stack.back();
+          if ( X.currentMenu.id !== X.stack.top[2] ) {
+            X.stack.back();
           }
         }, e => {
           this.throwError.pub(e);
-          this.ctrl.add(this.NotificationMessage.create({
+          X.ctrl.add(this.NotificationMessage.create({
             message: e.message,
             type: 'error'
           }));
