@@ -119,9 +119,16 @@ foam.CLASS({
       align-self: flex-start;
     }
 
-   ^ .foam-u2-ActionView-remove {
-     padding: 2 0 10px 8px;
-   }
+    ^ .foam-u2-ActionView-remove {
+      margin-left: 4px;
+      padding: 0;
+    }
+
+    ^ .foam-u2-ActionView-remove:focus {
+      border-width: 1px;
+      margin-left: 4px;
+      padding: 0;
+    }
 
     ^value-view {
       flex: 1;
