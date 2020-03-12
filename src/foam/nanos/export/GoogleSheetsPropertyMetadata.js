@@ -21,6 +21,11 @@ foam.CLASS({
     {
       name: 'pattern',
       class: 'String'
+    },
+    {
+      name: 'perValuePatternSpecificValues',
+      class: 'StringArray',
+      value: []
     }
   ]
 });

@@ -114,8 +114,10 @@ foam.CLASS({
         var propValues = [];
         for (var i = 0 ; i < columnMethadata.length ; i++ ) {
           if(obj[columnMethadata[i].columnName]) {
-            if ( columnMethadata[i].cellType === 'CURRENCY' )
+            if ( columnMethadata[i].cellType === 'CURRENCY' ) {
               propValues.push(( obj[columnMethadata[i].columnName] / 100 ).toString());
+              columnMethadata[i].perValuePatternSpecificValues.push(obj.destinationCurrency);
+            }
             else if ( columnMethadata[i].cellType === 'DATE' )
                 propValues.push(obj[columnMethadata[i].columnName].toISOString().substring(0, 10));
             else

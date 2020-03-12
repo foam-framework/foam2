@@ -136,6 +136,19 @@ public class GoogleSheetsExportService extends foam.core.AbstractFObject impleme
               .setRange(new GridRange().setStartRowIndex(1).setStartColumnIndex(i).setEndColumnIndex(i+1))
               .setFields("userEnteredFormat.numberFormat")
           ));
+
+        if(metadata[i].getCellType().equals("CURRENCY")) {
+          for(int j = 0; j < metadata[i].getPerValuePatternSpecificValues().length; j++) {
+            if(metadata[i].getPerValuePatternSpecificValues()[j].equals("CAD"))
+              continue;
+            requests.add(new Request().setRepeatCell(
+              new RepeatCellRequest()
+                .setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(metadata[i].getCellType()).setPattern("\"$\"#####\"" + metadata[i].getPerValuePatternSpecificValues()[j] + "\""))))
+                .setRange(new GridRange().setStartRowIndex(1).setEndColumnIndex(i+1).setStartColumnIndex(i).setStartColumnIndex(j).setEndColumnIndex(j+1))
+                .setFields("userEnteredFormat.numberFormat")
+            ));
+          }
+        }
       }
 
       BatchUpdateSpreadsheetRequest r = new BatchUpdateSpreadsheetRequest().setRequests(requests);
