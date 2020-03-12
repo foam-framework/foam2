@@ -519,7 +519,7 @@
       },
       code: function(X) {
         var approvedApprovalRequest = this.clone();
-        approvedApprovalRequest.status = foam.nanos.approval.ApprovalStatus.APPROVED;
+        approvedApprovalRequest.status = this.ApprovalStatus.APPROVED;
 
         X.approvalRequestDAO.put(approvedApprovalRequest).then(o => {
           X.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
