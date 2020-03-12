@@ -20,6 +20,7 @@ foam.CLASS({
 
   requires: [
     'foam.core.SimpleSlot',
+    'foam.u2.dialog.Popup',
     'foam.u2.filter.FilterController',
     'foam.u2.filter.property.PropertyFilterView',
     'foam.u2.search.TextSearchView'
@@ -121,6 +122,31 @@ foam.CLASS({
       cursor: pointer;
       color: #233E8B;
     }
+
+    ^container-message {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      flex: 1;
+      padding: 16px;
+    }
+
+    ^message-advanced {
+      margin: 0;
+    }
+
+    ^message-view {
+      margin: 0;
+      margin-top: 8px;
+      color: #4D7AF7;
+      text-decoration: underline;
+    }
+
+    ^message-view:hover {
+      cursor: pointer;
+      color: #233E8B;
+    }
   `,
 
   messages: [
@@ -130,7 +156,7 @@ foam.CLASS({
     { name: 'LINK_ADVANCED', message: 'Advanced'},
     { name: 'LINK_SIMPLE', message: 'Simple'},
     { name: 'MESSAGE_ADVANCEDMODE', message: 'Advanced filters are currently being used.'},
-    { name: 'MESSAGE_VIEWADVANCED', message: 'View filters.'},
+    { name: 'MESSAGE_VIEWADVANCED', message: 'View filters'},
   ],
 
   properties: [
@@ -264,15 +290,17 @@ foam.CLASS({
                   .end();
                 }
               })
-              .start('p')
-                .addClass(self.myClass(''))
+              .start().addClass(self.myClass('container-message'))
                 .show(self.filterController$.dot('isAdvanced'))
-                .add(self.MESSAGE_ADVANCEDMODE)
-              .end()
-              .start('p')
-                .addClass(self.myClass(''))
-                .show(self.filterController$.dot('isAdvanced'))
-                .add(self.MESSAGE_VIEWADVANCED)
+                .start('p')
+                  .addClass(self.myClass('message-advanced'))
+                  .add(self.MESSAGE_ADVANCEDMODE)
+                .end()
+                .start('p')
+                  .addClass(self.myClass('message-view'))
+                  .on('click', self.openAdvanced)
+                  .add(self.MESSAGE_VIEWADVANCED)
+                .end()
               .end()
             // .add(this.slot(function(isAdvanced){
             //   if ( ! isAdvanced ) {
@@ -383,6 +411,7 @@ foam.CLASS({
         if ( this.filterController.isAdvanced ) {
           // Switch back to simple mode
           // Clear out all active filters
+          this.clearAll();
           this.filterController.isAdvanced = !this.filterController.isAdvanced;
           return;
         }
@@ -391,7 +420,18 @@ foam.CLASS({
         // filter criteria
         // Clear out all active filters
 
+        // TODO: Remove this once advanced filter is in charge of changing the
+        //       flag. This was only meant for testing purposes
         this.filterController.isAdvanced = !this.filterController.isAdvanced;
+
+        this.openAdvanced();
+      }
+    },
+    {
+      name: 'openAdvanced',
+      code: function() {
+        console.log('Create modal for advanced filter');
+        // this.add(this.Popup.create().tag({ class: 'net.nanopay.retail.ui.devices.ManageDeviceModal' }));
       }
     }
   ]
