@@ -20,10 +20,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+
 import static com.itextpdf.html2pdf.html.AttributeConstants.APPLICATION_NAME;
 
 public class GoogleSheetsExportService extends foam.core.AbstractFObject implements foam.nanos.export.GoogleSheetsExport {
@@ -49,11 +47,11 @@ public class GoogleSheetsExportService extends foam.core.AbstractFObject impleme
 
     try {
       List<List<Object>> listOfValues = new ArrayList<>();
-      Object[] methadataArr = (Object[])metadataObj;
-      GoogleSheetsPropertyMetadata[] methadata = new GoogleSheetsPropertyMetadata[methadataArr.length];
+      Object[] metadataArr = (Object[])metadataObj;
+      GoogleSheetsPropertyMetadata[] metadata = new GoogleSheetsPropertyMetadata[metadataArr.length];
 
-      for(int i = 0; i < methadata.length; i++) {
-        methadata[i] = (GoogleSheetsPropertyMetadata)methadataArr[i];
+      for(int i = 0; i < metadata.length; i++) {
+        metadata[i] = (GoogleSheetsPropertyMetadata)metadataArr[i];
       }
 
       Object[] arr = (Object[]) obj;
@@ -117,19 +115,27 @@ public class GoogleSheetsExportService extends foam.core.AbstractFObject impleme
         add(alternatingColors);
       }};
 
-      requests.add(new Request().setAutoResizeDimensions(new AutoResizeDimensionsRequest().setDimensions(new DimensionRange().setSheetId(0).setDimension("COLUMNS").setEndIndex(methadata.length))));
+      requests.add(new Request().setAutoResizeDimensions(new AutoResizeDimensionsRequest().setDimensions(new DimensionRange().setSheetId(0).setDimension("COLUMNS").setEndIndex(metadata.length))));
 
-      for(int i = 0; i < methadata.length; i++) {
-        if(methadata[i].getColumnWidth() > 0)
-          requests.add(new Request().setUpdateDimensionProperties(new UpdateDimensionPropertiesRequest().setRange(new DimensionRange().setSheetId(0).setDimension("COLUMNS").setStartIndex(i).setEndIndex(i+1)).setProperties(new DimensionProperties().setPixelSize(methadata[i].getColumnWidth())).setFields("pixelSize")));
-        if(methadata[i].getCellType().equals("String"))
+      for(int i = 0; i < metadata.length; i++) {
+        if(metadata[i].getColumnWidth() > 0)
+          requests.add(new Request().setUpdateDimensionProperties(new UpdateDimensionPropertiesRequest().setRange(new DimensionRange().setSheetId(0).setDimension("COLUMNS").setStartIndex(i).setEndIndex(i+1)).setProperties(new DimensionProperties().setPixelSize(metadata[i].getColumnWidth())).setFields("pixelSize")));
+        if(metadata[i].getCellType().equals("String"))
           continue;
-        requests.add(new Request().setRepeatCell(
-          new RepeatCellRequest()
-            .setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(methadata[i].getCellType()))))
-            .setRange(new GridRange().setStartRowIndex(1).setStartColumnIndex(i).setEndColumnIndex(i+1))
-            .setFields("userEnteredFormat.numberFormat")
-        ));
+        if( metadata[i].getPattern().isEmpty())
+          requests.add(new Request().setRepeatCell(
+            new RepeatCellRequest()
+          .setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(metadata[i].getCellType()))))
+          .setRange(new GridRange().setStartRowIndex(1).setStartColumnIndex(i).setEndColumnIndex(i+1))
+          .setFields("userEnteredFormat.numberFormat")
+          ));
+        else
+          requests.add(new Request().setRepeatCell(
+            new RepeatCellRequest()
+              .setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(metadata[i].getCellType()).setPattern(metadata[i].getPattern()))))
+              .setRange(new GridRange().setStartRowIndex(1).setStartColumnIndex(i).setEndColumnIndex(i+1))
+              .setFields("userEnteredFormat.numberFormat")
+          ));
       }
 
       BatchUpdateSpreadsheetRequest r = new BatchUpdateSpreadsheetRequest().setRequests(requests);

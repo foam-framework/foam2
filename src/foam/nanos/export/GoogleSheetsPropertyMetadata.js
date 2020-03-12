@@ -7,6 +7,10 @@ foam.CLASS({
       class: 'String'
     },
     {
+      name: 'columnLabel',
+      class: 'String'
+    },
+    {
       name: 'columnWidth',
       class: 'Int'//0 if no width found
     },

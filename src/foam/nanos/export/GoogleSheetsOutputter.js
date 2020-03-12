@@ -18,6 +18,7 @@ foam.CLASS({
             props.push(cls.getAxiomByName(propsName[i]));
           }
         }
+        
         for ( var i = 0 ; i < props.length ; i++ ) {
           if ( props[i].networkTransient )
             continue;
@@ -25,20 +26,24 @@ foam.CLASS({
           var pattern = '';
           if ( props[i].cls_.id === "foam.core.UnitValue" ) {
             cellType = 'CURRENCY';
-            pattern = '\"' + props[i].cls_.unitPropName + '\"#,###.##';
+            pattern = '\"$\"###\" CAD\"';// + props[i].cls_.unitPropName;
           } else if ( props[i].cls_.id === 'foam.core.Date' ) {
             cellType = 'DATE';
-            pattern = '';
+            //m/d/yyy, h:m:s am/pm
+            //3/11/2020, 8:27:41 AM
+            //Fri Mar 27 2020"
+            pattern = 'yyyy-mm-dd';
           } else if ( props[i].cls_.id === 'foam.core.DateTime' ) {
             cellType = 'DATE_TIME';
-            pattern = '';
+            pattern = 'm/d/yyyy, h:m:s am/pm';
           } else if ( props[i].cls_.id === 'foam.core.Time' ) {
             cellType = 'TIME';
-            pattern = '';
+            pattern = 'm/d/yyy, h:m:s am/pm';
           }
 
           var m = this.GoogleSheetsPropertyMetadata.create({
-            columnName: props[i].label,
+            columnName: props[i].name,
+            columnLabel: props[i].label,
             columnWidth: props[i].tableWidth ? props[i].tableWidth : 0,
             cellType: cellType,
             pattern: pattern
@@ -104,15 +109,17 @@ foam.CLASS({
     {
       name: 'outputObjectForProperties',
       type: 'StringArray',
-      code: function(obj, props) {
+      code: function(obj, columnMethadata) {
         //var props = this.getPropertyNames(obj.cls_);
         var propValues = [];
-        for (var i = 0 ; i < props.length ; i++ ) {
-          if(obj[props[i]]) {
-            if ( obj[props[i]].toSummary )
-              propValues.push(obj[props[i]].toSummary());
-            else
-              propValues.push(obj[props[i]].toString());
+        for (var i = 0 ; i < columnMethadata.length ; i++ ) {
+          if(obj[columnMethadata[i].columnName]) {
+            if ( columnMethadata[i].cellType === 'CURRENCY' )
+              propValues.push(( obj[columnMethadata[i].columnName] / 100 ).toString());
+              if ( columnMethadata[i].cellType === 'DATE' )
+                propValues.push(obj[columnMethadata[i].columnName].toISOString().substring(0, 10));
+              else
+                propValues.push(obj[columnMethadata[i].columnName].toString());
           }
           else
             propValues.push('');
