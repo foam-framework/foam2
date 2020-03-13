@@ -28,12 +28,13 @@ foam.CLASS({
         
         var url  = '';
         var stringArray = [];
-        var columnNames = X.filteredTableColumns ? X.filteredTableColumns : self.outputter.getAllPropertyNames(obj.cls_);
-        stringArray.push(columnNames);
-        var values = self.outputter.outputArray([ obj ], columnNames);
+        var props = X.filteredTableColumns ? X.filteredTableColumns : self.outputter.getAllPropertyNames(dao.of);
+        var metadata = self.outputter.getColumnMethadata(dao.of, props);
+        stringArray.push(metadata.map(m => m.columnLabel));
+        var values = self.outputter.outputArray([ obj ], metadata);
         stringArray = stringArray.concat(values);
 
-        var url = await X.googleSheetsDataExport.createSheet(stringArray);
+        url = await X.googleSheetsDataExport.createSheet(stringArray, metadata);
         return url;
     },
     async function exportDAO(X, dao) {
