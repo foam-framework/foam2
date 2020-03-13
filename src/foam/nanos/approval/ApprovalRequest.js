@@ -553,7 +553,7 @@
              return false;
         }
         
-        var objId = X[self.daoKey_].of.ID.type === 'Long' ? parseInt(this.objId) : this.objId;
+        var objId = self.ctrl.__subContext__[self.daoKey_].of.ID.type === 'Long' ? parseInt(this.objId) : this.objId;
 
         return self.ctrl.__subContext__[this.daoKey_]
           .find(objId)
