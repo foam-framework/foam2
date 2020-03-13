@@ -1,5 +1,9 @@
-// WARNING: GENERATED CODE, DO NOT MODIFY BY HAND!
-// SOURCE: foam2/src/foam/nanos/export/GoogleSheetsExportService.js
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+ 
 package foam.nanos.export;
 
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
