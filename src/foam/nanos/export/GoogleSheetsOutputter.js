@@ -68,7 +68,7 @@ foam.CLASS({
       code: function(obj, columnMethadata) {
         var propValues = [];
         for (var i = 0 ; i < columnMethadata.length ; i++ ) {
-          if(obj[columnMethadata[i].columnName]) {
+          if ( obj[columnMethadata[i].columnName] ) {
             if ( columnMethadata[i].cellType === 'CURRENCY' ) {
               propValues.push(( obj[columnMethadata[i].columnName] / 100 ).toString());
               columnMethadata[i].perValuePatternSpecificValues.push(obj.destinationCurrency);
