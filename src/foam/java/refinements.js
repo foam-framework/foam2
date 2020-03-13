@@ -1952,8 +1952,6 @@ foam.CLASS({
 
   methods: [
     function buildJavaClass(cls) {
-      if ( this.referencedProperty.hasOwnProperty('javaValue') ) this.javaValue = this.referencedProperty.javaValue;
-
       this.SUPER(cls);
       cls.method({
         name: `find${foam.String.capitalize(this.name)}`,
