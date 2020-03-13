@@ -72,19 +72,19 @@
             <version>2.0b6</version>
         </dependency>
         <dependency>
-          <groupId>com.google.oauth-client</groupId>
-          <artifactId>google-oauth-client-jetty</artifactId>
-          <version>1.22.0</version>
-        </dependency>
-        <dependency>
           <groupId>com.google.api-client</groupId>
           <artifactId>google-api-client</artifactId>
           <version>1.22.0</version>
         </dependency>
         <dependency>
-            <groupId>com.google.oauth-client</groupId>
-            <artifactId>google-oauth-client-jetty</artifactId>
-            <version>1.22.0</version>
+            <groupId>com.google.apis</groupId>
+            <artifactId>google-api-services-sheets</artifactId>
+            <version>v4-rev567-1.22.0</version>
+        </dependency>
+        <dependency>
+          <groupId>com.google.oauth-client</groupId>
+          <artifactId>google-oauth-client-jetty</artifactId>
+          <version>1.22.0</version>
         </dependency>
         <dependency>
             <groupId>org.jtwig</groupId>
