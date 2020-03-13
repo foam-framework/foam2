@@ -124,33 +124,7 @@ public class GoogleSheetsExportService extends foam.core.AbstractFObject impleme
           requests.add(new Request().setUpdateDimensionProperties(new UpdateDimensionPropertiesRequest().setRange(new DimensionRange().setSheetId(0).setDimension("COLUMNS").setStartIndex(i).setEndIndex(i+1)).setProperties(new DimensionProperties().setPixelSize(metadata[i].getColumnWidth())).setFields("pixelSize")));
         if(metadata[i].getCellType().equals("STRING"))
           continue;
-        if( metadata[i].getPattern().isEmpty())
-          requests.add(new Request().setRepeatCell(
-            new RepeatCellRequest()
-          .setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(metadata[i].getCellType()))))
-          .setRange(new GridRange().setStartRowIndex(COLUMN_TITLES_ROW_INDEX).setStartColumnIndex(i).setEndColumnIndex(i+1))
-          .setFields(NUMBER_FORMAT)
-          ));
-        else
-          requests.add(new Request().setRepeatCell(
-            new RepeatCellRequest()
-              .setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(metadata[i].getCellType()).setPattern(metadata[i].getPattern()))))
-              .setRange(new GridRange().setStartRowIndex(COLUMN_TITLES_ROW_INDEX).setStartColumnIndex(i).setEndColumnIndex(i+1))
-              .setFields(NUMBER_FORMAT)
-          ));
 
-        if(metadata[i].getCellType().equals("CURRENCY")) {
-          for(int j = 0; j < metadata[i].getPerValuePatternSpecificValues().length; j++) {
-            if(metadata[i].getPerValuePatternSpecificValues()[j].equals(DEFAULT_CURRENCY))
-              continue;
-            requests.add(new Request().setRepeatCell(
-              new RepeatCellRequest()
-                .setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(metadata[i].getCellType()).setPattern("\"$\"#0.0#\"" + metadata[i].getPerValuePatternSpecificValues()[j] + "\""))))
-                .setRange(new GridRange().setStartColumnIndex(i).setEndColumnIndex(i+1).setStartRowIndex(j+1).setEndRowIndex(j+2))
-                .setFields(NUMBER_FORMAT)
-            ));
-          }
-        }
         if(metadata[i].getCellType().equals("DATE_TIME")) {
           for(int j = 0; j < metadata[i].getPerValuePatternSpecificValues().length; j++) {
             requests.add(new Request().setRepeatCell(
@@ -160,8 +134,7 @@ public class GoogleSheetsExportService extends foam.core.AbstractFObject impleme
                 .setFields(NUMBER_FORMAT)
             ));
           }
-        }
-        if(metadata[i].getCellType().equals("TIME")) {
+        } else if(metadata[i].getCellType().equals("TIME")) {
           for(int j = 0; j < metadata[i].getPerValuePatternSpecificValues().length; j++) {
             requests.add(new Request().setRepeatCell(
               new RepeatCellRequest()
@@ -169,6 +142,34 @@ public class GoogleSheetsExportService extends foam.core.AbstractFObject impleme
                 .setRange(new GridRange().setStartColumnIndex(i).setEndColumnIndex(i+1).setStartRowIndex(j+1).setEndRowIndex(j+2))
                 .setFields(NUMBER_FORMAT)
             ));
+          }
+        } else {
+          if( metadata[i].getPattern().isEmpty())
+            requests.add(new Request().setRepeatCell(
+              new RepeatCellRequest()
+                .setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(metadata[i].getCellType()))))
+                .setRange(new GridRange().setStartRowIndex(COLUMN_TITLES_ROW_INDEX).setStartColumnIndex(i).setEndColumnIndex(i+1))
+                .setFields(NUMBER_FORMAT)
+            ));
+          else
+            requests.add(new Request().setRepeatCell(
+              new RepeatCellRequest()
+                .setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(metadata[i].getCellType()).setPattern(metadata[i].getPattern()))))
+                .setRange(new GridRange().setStartRowIndex(COLUMN_TITLES_ROW_INDEX).setStartColumnIndex(i).setEndColumnIndex(i+1))
+                .setFields(NUMBER_FORMAT)
+            ));
+
+          if(metadata[i].getCellType().equals("CURRENCY")) {
+            for(int j = 0; j < metadata[i].getPerValuePatternSpecificValues().length; j++) {
+              if(metadata[i].getPerValuePatternSpecificValues()[j].equals(DEFAULT_CURRENCY))
+                continue;
+              requests.add(new Request().setRepeatCell(
+                new RepeatCellRequest()
+                  .setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(metadata[i].getCellType()).setPattern("\"$\"#0.0#\"" + metadata[i].getPerValuePatternSpecificValues()[j] + "\""))))
+                  .setRange(new GridRange().setStartColumnIndex(i).setEndColumnIndex(i+1).setStartRowIndex(j+1).setEndRowIndex(j+2))
+                  .setFields(NUMBER_FORMAT)
+              ));
+            }
           }
         }
       }
