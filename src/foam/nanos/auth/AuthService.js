@@ -151,6 +151,8 @@ foam.INTERFACE({
       name: 'check',
       documentation: `
         Check if a user in the given context has the given permission.
+        The require method should be used instead if the intent is to throw an
+        exception.
       `,
       async: true,
       type: 'Boolean',
@@ -163,6 +165,42 @@ foam.INTERFACE({
         {
           name: 'permission',
           type: 'String',
+        }
+      ]
+    },
+    {
+      name: 'require',
+      documentation: `
+        Requires that a user in the given context has the given permission.
+        Throws AuthorizationException is the permission is not granted.
+      `,
+      /*
+        Note: there is no requireUser method; a new context should be created
+          if it's necessary to throw an exception on a permission for a
+          different user.
+      */
+      async: true,
+      type: 'Void',
+      javaThrows: ['foam.nanos.auth.AuthorizationException'],
+      swiftThrows: true,
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'permission',
+          type: 'String',
+        },
+        {
+          name: 'exception',
+          type: 'foam.nanos.auth.AuthorizationException',
+          documentation: `
+            A custom AuthorizationException to throw, or null. Default
+            behaviour is to create an exception with the message
+            "Permission Denied"; this argument is useful if a different
+            exception message is desired.
+          `
         }
       ]
     },
