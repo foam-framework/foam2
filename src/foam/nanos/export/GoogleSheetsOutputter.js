@@ -9,7 +9,7 @@ foam.CLASS({
       name: 'getColumnMethadata',
       type: 'foam.nanos.export.GoogleSheetsPropertyMetadata[]',
       code: function(cls, propsName) {
-        var methadata = [];
+        var metadata = [];
         var props = [];
         if ( ! propsName ) {
           props = cls.getAxiomsByClass(foam.core.Property);
@@ -22,7 +22,7 @@ foam.CLASS({
         for ( var i = 0 ; i < props.length ; i++ ) {
           if ( props[i].networkTransient )
             continue;
-          var cellType = 'String';
+          var cellType = 'STRING';
           var pattern = '';
           if ( props[i].cls_.id === "foam.core.UnitValue" ) {
             cellType = 'CURRENCY';
@@ -44,9 +44,9 @@ foam.CLASS({
             pattern: pattern
           });
           
-          methadata.push(m);
+          metadata.push(m);
         }
-        return methadata;
+        return metadata;
       }
     },
     {
@@ -63,49 +63,9 @@ foam.CLASS({
       }
     },
     {
-      name: 'getAllPropertyLabels',
-      type: 'StringArray',
-      code: function(cls) {
-        var props = cls.getAxiomsByClass(foam.core.Property);
-        var propNames = [];
-        for ( var i = 0 ; i < props.length ; i++ ) {
-          if ( ! props[i].networkTransient )
-            propNames.push(props[i].label);
-        }
-        return propNames;
-      }
-    },
-    {
-      name: 'getSpecifiedPropertyWidth',
-      type: 'StringArray',
-      code: function(cls, propIds) {
-        var propNames = [];
-        for ( var i = 0 ; i < propIds.length ; i++ ) {
-          var p = cls.getAxiomByName(propIds[i]);
-          if ( ! p.networkTransient )
-            propNames.push(p.tableWidth);
-        }
-        return propNames;
-      }
-    },
-    {
-      name: 'getSpecifiedPropertyLabels',
-      type: 'StringArray',
-      code: function(cls, propIds) {
-        var propNames = [];
-        for ( var i = 0 ; i < propIds.length ; i++ ) {
-          var p = cls.getAxiomByName(propIds[i]);
-          if ( ! p.networkTransient )
-            propNames.push(p.label);
-        }
-        return propNames;
-      }
-    },
-    {
       name: 'outputObjectForProperties',
       type: 'StringArray',
       code: function(obj, columnMethadata) {
-        //var props = this.getPropertyNames(obj.cls_);
         var propValues = [];
         for (var i = 0 ; i < columnMethadata.length ; i++ ) {
           if(obj[columnMethadata[i].columnName]) {
