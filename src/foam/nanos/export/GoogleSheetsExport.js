@@ -11,6 +11,7 @@ foam.INTERFACE({
     {
       name: 'getCredentials',
       type: 'com.google.api.client.auth.oauth2.Credential',
+      visibility: 'private',
       javaThrows: [ 'java.io.IOException' ],
       async: true,
       args: [
@@ -22,6 +23,40 @@ foam.INTERFACE({
     },
     {
       name: 'createSheet',
+      type: 'com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetResponse',
+      visibility: 'private',
+      javaThrows: [ 'java.lang.Exception' ],
+      async: true,
+      args: [
+        {
+          name: 'obj',
+          type: 'Object'
+        },
+        {
+          name: 'metadataObj',
+          type: 'foam.nanos.export.GoogleSheetsPropertyMetadata[]',
+          javaType: 'Object'
+        }
+      ]
+    },
+    {
+      name: 'export',
+      type: 'String',
+      async: true,
+      args: [
+        {
+          name: 'obj',
+          type: 'Object'
+        },
+        {
+          name: 'metadataObj',
+          type: 'foam.nanos.export.GoogleSheetsPropertyMetadata[]',
+          javaType: 'Object'
+        }
+      ]
+    },
+    {
+      name: 'exportPdf',
       type: 'String',
       async: true,
       args: [

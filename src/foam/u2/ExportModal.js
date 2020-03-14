@@ -207,9 +207,15 @@ foam.CLASS({
           Promise.resolve(exportDriver.exportFObject(this.__context__, this.exportObj));
   
         p.then(result => {
-          var prefix = 'data:' + self.exportDriverReg.mimeType + ',';
           var link = document.createElement('a');
-          var href = encodeURI(prefix + result);
+          var href = '';
+          if ( self.exportDriverReg.mimeType && self.exportDriverReg.mimeType.length != 0 ) {
+            var prefix = 'data:' + self.exportDriverReg.mimeType + ',';
+            href = encodeURI(prefix + result);
+          } else {
+            href = result;
+          }
+          
           if ( href.length > 524288 ) {
             self.note = result;
             alert('Results exceed maximum download size.\nPlease cut and paste response data.');

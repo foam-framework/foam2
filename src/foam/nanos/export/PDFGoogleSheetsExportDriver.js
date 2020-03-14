@@ -6,7 +6,8 @@
 
 foam.CLASS({
   package: 'foam.nanos.export',
-  name: 'GoogleSheetsExportDriver',
+  name: 'PDFGoogleSheetsExportDriver',
+
   implements: [ 'foam.nanos.export.ExportDriver' ],
 
   requires: [
@@ -21,7 +22,6 @@ foam.CLASS({
       }
     }
   ],
-
   methods: [
     async function exportFObject(X, obj) {
         var self = this;
@@ -34,7 +34,7 @@ foam.CLASS({
         var values = self.outputter.outputArray([ obj ], metadata);
         stringArray = stringArray.concat(values);
 
-        url = await X.googleSheetsDataExport.export(stringArray, metadata);
+        url = await X.googleSheetsDataExport.exportPdf(stringArray, metadata);
         return url;
     },
     async function exportDAO(X, dao) {
@@ -49,7 +49,7 @@ foam.CLASS({
       var values = self.outputter.outputArray(sink.array, metadata);
       stringArray = stringArray.concat(values);
 
-      url = await X.googleSheetsDataExport.export(stringArray, metadata);
+      url = await X.googleSheetsDataExport.exportPdf(stringArray, metadata);
       return url;
     }
   ]

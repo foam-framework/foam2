@@ -3,3 +3,4 @@ p({"class":"foam.nanos.export.ExportDriverRegistry", "id":"JSON/J", "driverName"
 p({"class":"foam.nanos.export.ExportDriverRegistry", "id":"XML",  "driverName":"foam.nanos.export.XMLDriver",  "targetModel":"", "canBeConverted":true, "canBeDownloaded":true})
 p({"class":"foam.nanos.export.ExportDriverRegistry", "id":"CSV",  "driverName":"foam.nanos.export.CSVDriver",  "targetModel":"", "canBeConverted":true, "canBeDownloaded":true})
 p({"class":"foam.nanos.export.ExportDriverRegistry", "id":"GoogleSheets", "driverName":"foam.nanos.export.GoogleSheetsExportDriver",  "targetModel":"", "canBeOpened":true})
+p({"class":"foam.nanos.export.ExportDriverRegistry", "id":"PDFGoogleSheets", "driverName":"foam.nanos.export.PDFGoogleSheetsExportDriver", "extension":"pdf", "canBeDownloaded":true})
