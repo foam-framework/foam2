@@ -12,7 +12,7 @@ foam.CLASS({
   ],
   methods: [
     {
-      name: 'getColumnMethadata',
+      name: 'getColumnMetadata',
       type: 'foam.nanos.export.GoogleSheetsPropertyMetadata[]',
       code: function(cls, propsName) {
         var metadata = [];

@@ -29,7 +29,7 @@ foam.CLASS({
         var url  = '';
         var stringArray = [];
         var props = X.filteredTableColumns ? X.filteredTableColumns : self.outputter.getAllPropertyNames(dao.of);
-        var metadata = self.outputter.getColumnMethadata(dao.of, props);
+        var metadata = self.outputter.getColumnMetadata(dao.of, props);
         stringArray.push(metadata.map(m => m.columnLabel));
         var values = self.outputter.outputArray([ obj ], metadata);
         stringArray = stringArray.concat(values);
@@ -44,7 +44,7 @@ foam.CLASS({
       var url  = '';
       var stringArray = [];
       var props = X.filteredTableColumns ? X.filteredTableColumns : self.outputter.getAllPropertyNames(dao.of);
-      var metadata = self.outputter.getColumnMethadata(dao.of, props);
+      var metadata = self.outputter.getColumnMetadata(dao.of, props);
       stringArray.push(metadata.map(m => m.columnLabel));
       var values = self.outputter.outputArray(sink.array, metadata);
       stringArray = stringArray.concat(values);
