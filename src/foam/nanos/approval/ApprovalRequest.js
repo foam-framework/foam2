@@ -54,12 +54,9 @@
     'description',
     'classification',
     'objId',
-    'viewReference',
     'approver',
     'status',
-    'memo',
-    'approve',
-    'reject'
+    'memo'
   ],
 
   sections: [
@@ -401,37 +398,6 @@
       }
     },
     {
-      name: 'referenceObj_',
-      readPermissionRequired: true,
-      writePermissionRequired: true,
-      expression: function() {
-        var X = this.ctrl.__subContext__;
-        var objId = X[this.daoKey_].of.ID.type === 'Long' ? parseInt(this.objId) : this.objId;
-
-        X[this.daoKey_]
-          .find(objId)
-          .then((obj) => {
-            if (
-              // if approvalRequest is rejected don't show ViewReference
-              this.status === foam.nanos.approval.ApprovalStatus.REJECTED
-              ||
-              // if approvalRequest is for remove and has been either approved/rejected
-              (this.status === foam.nanos.approval.ApprovalStatus.APPROVED
-                &&
-              this.operation === foam.nanos.ruler.Operations.REMOVE)
-            ) {
-              this.referenceObj_ = '';
-              return;
-            }
-            this.referenceObj_ = obj;
-          })
-          .catch((err) => {
-            console.warn(err.message || err);
-          });
-        return '';
-      }
-    },
-    {
       class: 'Boolean',
       name: 'isTrackingRequest',
       value: false
@@ -578,38 +544,74 @@
     {
       name: 'viewReference',
       isDefault: true,
-      isAvailable: function(referenceObj_) {
-        return !! referenceObj_;
+      isAvailable: function() {
+        var self = this;
+
+        // Do not show the action if the request was reject or approved and removed
+        if (self.status == foam.nanos.approval.ApprovalStatus.REJECTED ||
+           (self.status == foam.nanos.approval.ApprovalStatus.APPROVED && self.operation == foam.nanos.ruler.Operations.REMOVE)) {
+             return false;
+        }
+        
+        var objId = self.ctrl.__subContext__[self.daoKey_].of.ID.type === 'Long' ? parseInt(this.objId) : this.objId;
+
+        return self.ctrl.__subContext__[this.daoKey_]
+          .find(objId)
+          .then((obj) => {
+            return !! obj;
+          })
+          .catch((err) => {
+            console.warn(err.message || err);
+            return false;
+          });
       },
       code: function(X) {
-        var obj = this.referenceObj_;
-        // If the dif of objects is calculated and stored in Map(obj.propertiesToUpdate),
-        // this is for updating object approvals
-        if ( obj.propertiesToUpdate ) {
-          // then here we created custom view to display these properties
-          X.stack.push({
-            class: 'foam.nanos.approval.PropertiesToUpdateView',
-            propObject: obj.propertiesToUpdate,
-            objId: obj.objId,
-            daoKey: obj.daoKey,
-            title: 'Updated Properties and Changes'
-          });
-          return;
+        var self = this;
+
+        // This should already be filtered out by the isAvailable, but adding here as duplicate protection
+        if (self.status == foam.nanos.approval.ApprovalStatus.REJECTED ||
+           (self.status == foam.nanos.approval.ApprovalStatus.APPROVED && self.operation == foam.nanos.ruler.Operations.REMOVE)) {
+             console.warn('Object is inaccessible')
+             return;
         }
-        // else pass general view with modeled data for display
-        // this is for create, deleting object approvals
-        X.stack.push({
-          class: 'foam.comics.v2.DAOSummaryView',
-          data: obj,
-          of: obj.cls_,
-          config: foam.comics.v2.DAOControllerConfig.create({
-            daoKey: this.daoKey_,
-            of: obj.cls_,
-            editEnabled: false,
-            createEnabled: false,
-            deleteEnabled: false
+
+        var objId = X[self.daoKey_].of.ID.type === 'Long' ? parseInt(this.objId) : this.objId;
+
+        return X[this.daoKey_]
+          .find(objId)
+          .then((obj) => {
+            // If the dif of objects is calculated and stored in Map(obj.propertiesToUpdate),
+            // this is for updating object approvals
+            if ( obj.propertiesToUpdate ) {
+              // then here we created custom view to display these properties
+              X.stack.push({
+                class: 'foam.nanos.approval.PropertiesToUpdateView',
+                propObject: obj.propertiesToUpdate,
+                objId: obj.objId,
+                daoKey: obj.daoKey,
+                title: 'Updated Properties and Changes'
+              });
+              return;
+            }
+
+            // else pass general view with modeled data for display
+            // this is for create, deleting object approvals
+            X.stack.push({
+              class: 'foam.comics.v2.DAOSummaryView',
+              data: obj,
+              of: obj.cls_,
+              config: foam.comics.v2.DAOControllerConfig.create({
+                daoKey: this.daoKey_,
+                of: obj.cls_,
+                editEnabled: false,
+                createEnabled: false,
+                deleteEnabled: false
+              })
+            });
           })
-        });
+          .catch((err) => {
+            console.warn(err.message || err);
+          });
       },
       tableWidth: 100
     }
