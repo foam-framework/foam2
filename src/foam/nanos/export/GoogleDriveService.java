@@ -30,6 +30,5 @@ public class GoogleDriveService extends foam.core.AbstractFObject {
       .build();
 
     service.files().delete(fileId).execute();
-
   }
 }
