@@ -23,29 +23,17 @@ import foam.nanos.logger.Logger;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.security.GeneralSecurityException;
 import java.util.*;
 
 
 public class GoogleSheetsExportService extends foam.core.AbstractFObject implements foam.nanos.export.GoogleSheetsExport {
-  private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
   private static final List<String> SCOPES = Collections.singletonList(SheetsScopes.DRIVE_FILE);
   private static final int COLUMN_TITLES_ROW_INDEX = 1;
-  private static final int RANDOM_PORT = 64342;
-  private static final String CREDENTIALS_FOLDER = "NANOPAY_HOME";
-  private static final String CREDENTIALS_FILE = "credentials.json";
+  private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
   private static final String NUMBER_FORMAT = "userEnteredFormat.numberFormat";
   private static final String DEFAULT_CURRENCY = "CAD";
 
-  public com.google.api.client.auth.oauth2.Credential getCredentials(com.google.api.client.http.javanet.NetHttpTransport HTTP_TRANSPORT) throws java.io.IOException {
-    GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(new FileInputStream(System.getProperty(CREDENTIALS_FOLDER) + "/" + CREDENTIALS_FILE)));
-    GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-              HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
-              .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(System.getProperty(CREDENTIALS_FOLDER))))
-              .build();
-    
-    LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(RANDOM_PORT).build();
-    return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
-  }
 
   public String createSheet(Object obj, Object metadataObj) throws Exception {
 
@@ -63,7 +51,7 @@ public class GoogleSheetsExportService extends foam.core.AbstractFObject impleme
     }
 
     final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-    Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+    Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, GoogleApiAuthService.getCredentials(HTTP_TRANSPORT, SCOPES))
       .setApplicationName("nanopay")
       .build();
 
@@ -181,5 +169,9 @@ public class GoogleSheetsExportService extends foam.core.AbstractFObject impleme
       .execute();
 
     return updateResponse.getSpreadsheetId();
+  }
+
+  public void deleteSheet(String sheetId) throws IOException, GeneralSecurityException {
+    GoogleDriveService.deleteFile(sheetId);
   }
 }

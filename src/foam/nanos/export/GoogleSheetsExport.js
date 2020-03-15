@@ -9,19 +9,6 @@ foam.INTERFACE({
   name: 'GoogleSheetsExport',
   methods: [
     {
-      name: 'getCredentials',
-      type: 'com.google.api.client.auth.oauth2.Credential',
-      visibility: 'private',
-      javaThrows: [ 'java.io.IOException' ],
-      async: true,
-      args: [
-        {
-          name: 'HTTP_TRANSPORT',
-          type: 'com.google.api.client.http.javanet.NetHttpTransport'
-        }
-      ]
-    },
-    {
       name: 'createSheet',
       type: 'String',
       javaThrows: [ 'java.lang.Exception' ],
@@ -37,6 +24,16 @@ foam.INTERFACE({
           javaType: 'Object'
         }
       ]
+    },
+    {
+      name: 'deleteSheet',
+      args: [
+        {
+          name: 'sheetId',
+          type: 'String'
+        }
+      ],
+      javaThrows: [ 'java.io.IOException', 'java.security.GeneralSecurityException' ]
     }
   ]
 });

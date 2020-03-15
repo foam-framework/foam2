@@ -38,6 +38,7 @@ foam.CLASS({
         if ( ! sheetId || sheetId.length == 0)
           return '';
         var url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?exportFormat=pdf&format=pdf&scale=3`;
+        X.googleSheetsDataExport.deleteSheet(sheetId);
         return url;
     },
     async function exportDAO(X, dao) {
@@ -56,6 +57,7 @@ foam.CLASS({
       if ( ! sheetId || sheetId.length == 0)
         return '';
       var url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?exportFormat=pdf&format=pdf&scale=3`;
+      X.googleSheetsDataExport.deleteSheet(sheetId);
       return url;
     }
   ]
