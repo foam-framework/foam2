@@ -143,7 +143,7 @@ foam.CLASS({
           .start(this.NOTE).addClass('input-box').addClass('note').end()
           .add(
             self.slot(function(dataType) {
-              if ( dataType == 'CSV' || dataType == 'GoogleSheets' ) {
+              if ( dataType == 'CSV' || dataType == 'GoogleSheets' || dataType == 'PDFGoogleSheets' ) {
                 return self.E().start().addClass('label').startContext({ data: self }).tag(self.EXPORT_ALL_COLUMNS).endContext().end();
               }
             })
@@ -225,10 +225,10 @@ foam.CLASS({
             document.body.appendChild(link);
             link.click();
           }
-        });
-  
-        if ( this.exportAllColumns )
+
+          if ( this.exportAllColumns )
           this.filteredTableColumns = filteredColumnsCopy;
+        });
       }
     },
     {

@@ -197,7 +197,7 @@ public class GoogleSheetsExportService extends foam.core.AbstractFObject impleme
   @Override
   public String exportPdf(Object obj, Object metadataObj) {
     try {
-      return String.format("https://docs.google.com/spreadsheets/d/%s/export?exportFormat=pdf&format=pdf", createSheet(obj, metadataObj));
+      return String.format("https://docs.google.com/spreadsheets/d/%s/export?exportFormat=pdf&format=pdf&scale=3", createSheet(obj, metadataObj));
     } catch(Exception e) {
       Logger l = (Logger) getX().get("logger");
       l.error(e);
