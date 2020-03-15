@@ -47,7 +47,7 @@ public class GoogleSheetsExportService extends foam.core.AbstractFObject impleme
     return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
   }
 
-  public BatchUpdateSpreadsheetResponse createSheet(Object obj, Object metadataObj) throws Exception {
+  public String createSheet(Object obj, Object metadataObj) throws Exception {
 
     List<List<Object>> listOfValues = new ArrayList<>();
     Object[] metadataArr = (Object[])metadataObj;
@@ -83,7 +83,6 @@ public class GoogleSheetsExportService extends foam.core.AbstractFObject impleme
     Spreadsheet response = service.spreadsheets().create(st)
       .execute();
 
-    String url = response.getSpreadsheetUrl();
     BatchUpdateValuesResponse batchResult = service.spreadsheets().values()
       .batchUpdate(response.getSpreadsheetId(), batchBody)
       .execute();
@@ -181,14 +180,13 @@ public class GoogleSheetsExportService extends foam.core.AbstractFObject impleme
       .batchUpdate(response.getSpreadsheetId(), r)
       .execute();
 
-    return updateResponse;
+    return updateResponse.getSpreadsheetId();
   }
 
   @Override
   public String export(Object obj, Object metadataObj) {
     try {
-      BatchUpdateSpreadsheetResponse resp = createSheet(obj, metadataObj);
-      return String.format("https://docs.google.com/spreadsheets/d/%s/edit#gid=0", resp.getSpreadsheetId());
+      return String.format("https://docs.google.com/spreadsheets/d/%s/edit#gid=0", createSheet(obj, metadataObj));
     } catch(Exception e) {
       Logger l = (Logger) getX().get("logger");
       l.error(e);
@@ -199,8 +197,7 @@ public class GoogleSheetsExportService extends foam.core.AbstractFObject impleme
   @Override
   public String exportPdf(Object obj, Object metadataObj) {
     try {
-      BatchUpdateSpreadsheetResponse resp = createSheet(obj, metadataObj);
-      return String.format("https://docs.google.com/spreadsheets/d/%s/export?exportFormat=pdf&format=pdf", resp.getSpreadsheetId());
+      return String.format("https://docs.google.com/spreadsheets/d/%s/export?exportFormat=pdf&format=pdf", createSheet(obj, metadataObj));
     } catch(Exception e) {
       Logger l = (Logger) getX().get("logger");
       l.error(e);

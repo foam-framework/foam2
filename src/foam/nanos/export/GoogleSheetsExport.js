@@ -23,7 +23,7 @@ foam.INTERFACE({
     },
     {
       name: 'createSheet',
-      type: 'com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetResponse',
+      type: 'String',
       visibility: 'private',
       javaThrows: [ 'java.lang.Exception' ],
       async: true,
