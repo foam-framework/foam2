@@ -17,6 +17,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class GoogleApiAuthService {
   private static final int RANDOM_PORT = 64342;
 
 
-  public static Credential getCredentials(NetHttpTransport HTTP_TRANSPORT, List<String> scopes) {
+  public static Credential getCredentials(NetHttpTransport HTTP_TRANSPORT, List<String> scopes) throws IOException {
     GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(new FileInputStream(System.getProperty(CREDENTIALS_FOLDER) + "/" + CREDENTIALS_FILE)));
     GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
               HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, scopes)
