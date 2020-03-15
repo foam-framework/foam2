@@ -182,26 +182,4 @@ public class GoogleSheetsExportService extends foam.core.AbstractFObject impleme
 
     return updateResponse.getSpreadsheetId();
   }
-
-  @Override
-  public String export(Object obj, Object metadataObj) {
-    try {
-      return String.format("https://docs.google.com/spreadsheets/d/%s/edit#gid=0", createSheet(obj, metadataObj));
-    } catch(Exception e) {
-      Logger l = (Logger) getX().get("logger");
-      l.error(e);
-      return "";
-    }
-  }
-
-  @Override
-  public String exportPdf(Object obj, Object metadataObj) {
-    try {
-      return String.format("https://docs.google.com/spreadsheets/d/%s/export?exportFormat=pdf&format=pdf&scale=3", createSheet(obj, metadataObj));
-    } catch(Exception e) {
-      Logger l = (Logger) getX().get("logger");
-      l.error(e);
-      return "";
-    }
-  }
 }

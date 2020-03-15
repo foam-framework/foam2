@@ -26,7 +26,7 @@ foam.CLASS({
     async function exportFObject(X, obj) {
         var self = this;
         
-        var url  = '';
+        var sheetId  = '';
         var stringArray = [];
         var props = X.filteredTableColumns ? X.filteredTableColumns : self.outputter.getAllPropertyNames(dao.of);
         var metadata = self.outputter.getColumnMethadata(dao.of, props);
@@ -34,14 +34,17 @@ foam.CLASS({
         var values = self.outputter.outputArray([ obj ], metadata);
         stringArray = stringArray.concat(values);
 
-        url = await X.googleSheetsDataExport.exportPdf(stringArray, metadata);
+        sheetId = await X.googleSheetsDataExport.createSheet(stringArray, metadata);
+        if ( ! sheetId || sheetId.length == 0)
+          return '';
+        var url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?exportFormat=pdf&format=pdf&scale=3`;
         return url;
     },
     async function exportDAO(X, dao) {
       var self = this;
       
       var sink = await dao.select();
-      var url  = '';
+      var sheetId  = '';
       var stringArray = [];
       var props = X.filteredTableColumns ? X.filteredTableColumns : self.outputter.getAllPropertyNames(dao.of);
       var metadata = self.outputter.getColumnMethadata(dao.of, props);
@@ -49,7 +52,10 @@ foam.CLASS({
       var values = self.outputter.outputArray(sink.array, metadata);
       stringArray = stringArray.concat(values);
 
-      url = await X.googleSheetsDataExport.exportPdf(stringArray, metadata);
+      sheetId = await X.googleSheetsDataExport.createSheet(stringArray, metadata);
+      if ( ! sheetId || sheetId.length == 0)
+        return '';
+      var url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?exportFormat=pdf&format=pdf&scale=3`;
       return url;
     }
   ]

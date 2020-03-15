@@ -24,40 +24,7 @@ foam.INTERFACE({
     {
       name: 'createSheet',
       type: 'String',
-      visibility: 'private',
       javaThrows: [ 'java.lang.Exception' ],
-      async: true,
-      args: [
-        {
-          name: 'obj',
-          type: 'Object'
-        },
-        {
-          name: 'metadataObj',
-          type: 'foam.nanos.export.GoogleSheetsPropertyMetadata[]',
-          javaType: 'Object'
-        }
-      ]
-    },
-    {
-      name: 'export',
-      type: 'String',
-      async: true,
-      args: [
-        {
-          name: 'obj',
-          type: 'Object'
-        },
-        {
-          name: 'metadataObj',
-          type: 'foam.nanos.export.GoogleSheetsPropertyMetadata[]',
-          javaType: 'Object'
-        }
-      ]
-    },
-    {
-      name: 'exportPdf',
-      type: 'String',
       async: true,
       args: [
         {
