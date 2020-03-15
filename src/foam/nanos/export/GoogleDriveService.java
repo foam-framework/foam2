@@ -3,7 +3,7 @@
  * Copyright 2020 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
- 
+
 package foam.nanos.export;
 
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
@@ -28,7 +28,6 @@ import java.util.List;
 public class GoogleDriveService extends foam.core.AbstractFObject {
   private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
   private static final List<String> SCOPES = Collections.singletonList(DriveScopes.DRIVE);
-  private static final String CREDENTIALS_FILE = "credentials.json";
 
 
   public static void deleteFile(String fileId) throws IOException, GeneralSecurityException {
