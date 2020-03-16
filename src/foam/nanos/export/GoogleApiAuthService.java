@@ -22,17 +22,17 @@ import java.io.InputStreamReader;
 import java.util.List;
 
 public class GoogleApiAuthService {
-  private static final String CREDENTIALS_FOLDER = "NANOPAY_HOME";
+  private static final String CREDENTIALS_FOLDER = "/tmp";
   private static final String CREDENTIALS_FILE = "credentials.json";
   private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
   private static final int RANDOM_PORT = 64342;
 
 
   public static Credential getCredentials(NetHttpTransport HTTP_TRANSPORT, List<String> scopes) throws IOException {
-    GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(new FileInputStream(System.getProperty(CREDENTIALS_FOLDER) + "/" + CREDENTIALS_FILE)));
+    GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(new FileInputStream(CREDENTIALS_FOLDER + "/" + CREDENTIALS_FILE)));
     GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
               HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, scopes)
-              .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(System.getProperty(CREDENTIALS_FOLDER))))
+              .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(CREDENTIALS_FOLDER + "/tokens/")))
               .build();
     
     LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(RANDOM_PORT).build();
