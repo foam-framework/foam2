@@ -23,7 +23,12 @@ foam.CLASS({
     {
       class: 'Array',
       name: 'argsList',
-      documentation: 'this potentially contains any'
+      documentation: 'Contains key for submitting data. It is the id of the data we want to update.'
+    },
+    {
+      class: 'Array',
+      name: 'daoList',
+      documentation: 'Contains the daoKey for source model, specifying where data should be submitted too.'
     },
     {
       class: 'FObjectArray',
@@ -47,7 +52,7 @@ foam.CLASS({
             .map((a) => this.Section.create().fromSectionAxiom(a, of));
           let unSectionedPropertiesSection = this.checkForUnusedProperties(listOfSectionsFromClass, of); // this also will handle models with no sections
           if ( unSectionedPropertiesSection ) listOfSectionsFromClass.push(unSectionedPropertiesSection);
-          return { 'data': of.create(this.argsList[index], this), 'sections': listOfSectionsFromClass };
+          return { 'data': of.create({}, this), 'sections': listOfSectionsFromClass, 'dao': daoList[index], 'daoKey': this.argsList[index] };
         });
 
         return sections;
