@@ -87,4 +87,16 @@ public abstract class AbstractLongPropertyInfo
   public int comparePropertyToValue(Object key, Object value) {
     return foam.util.SafetyUtil.compare(cast(key), cast(value));
   }
+  
+  public foam.lib.parse.Parser jsonParser() {
+    return foam.lib.json.LongParser.instance();
+  }
+
+  public foam.lib.parse.Parser queryParser() {
+    return foam.lib.json.LongParser.instance();
+  }
+
+  public foam.lib.parse.Parser csvParser() {
+    return null;
+  }
 }

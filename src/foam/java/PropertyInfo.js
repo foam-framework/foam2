@@ -148,24 +148,6 @@ foam.CLASS({
             body: '((' + this.sourceCls.name + ') o).' + this.clearName + '();'
           },
           {
-            name: 'jsonParser',
-            type: 'foam.lib.parse.Parser',
-            visibility: 'public',
-            body: 'return ' + ( this.jsonParser ? this.jsonParser : null ) + ';'
-          },
-          {
-            name: 'queryParser',
-            type: 'foam.lib.parse.Parser',
-            visibility: 'public',
-            body: 'return ' + ( this.queryParser ? this.queryParser : null ) + ';'
-          },
-          {
-            name: 'csvParser',
-            type: 'foam.lib.parse.Parser',
-            visibility: 'public',
-            body: 'return ' + ( this.csvParser ? this.csvParser : null ) + ';'
-          },
-          {
             name: 'isSet',
             visibility: 'public',
             type: 'boolean',
@@ -254,6 +236,24 @@ foam.CLASS({
             visibility: 'public',
             args: [{ name: 'key', type: 'Object' }, { name: 'value', type: 'Object' }],
             body: this.comparePropertyToValue,
+          });
+          m.push({
+            name: 'jsonParser',
+            type: 'foam.lib.parse.Parser',
+            visibility: 'public',
+            body: 'return ' + ( this.jsonParser ? this.jsonParser : null ) + ';'
+          });
+          m.push({
+            name: 'queryParser',
+            type: 'foam.lib.parse.Parser',
+            visibility: 'public',
+            body: 'return ' + ( this.queryParser ? this.queryParser : null ) + ';'
+          });
+          m.push({
+            name: 'csvParser',
+            type: 'foam.lib.parse.Parser',
+            visibility: 'public',
+            body: 'return ' + ( this.csvParser ? this.csvParser : null ) + ';'
           });
         }
 

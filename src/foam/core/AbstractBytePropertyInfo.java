@@ -70,4 +70,16 @@ public abstract class AbstractBytePropertyInfo
   public int comparePropertyToValue(Object key, Object value) {
     return foam.util.SafetyUtil.compare(cast(key), cast(value));
   }
+  
+  public foam.lib.parse.Parser jsonParser() {
+    return foam.lib.json.ByteParser.instance();
+  }
+
+  public foam.lib.parse.Parser queryParser() {
+    return foam.lib.json.ByteParser.instance();
+  }
+
+  public foam.lib.parse.Parser csvParser() {
+    return foam.lib.json.ByteParser.instance();
+  }
 }

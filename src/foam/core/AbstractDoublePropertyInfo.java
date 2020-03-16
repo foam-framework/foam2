@@ -87,4 +87,16 @@ public abstract class AbstractDoublePropertyInfo
   public int comparePropertyToValue(Object key, Object value) {
     return foam.util.SafetyUtil.compare(cast(key), cast(value));
   }
+  
+  public foam.lib.parse.Parser jsonParser() {
+    return foam.lib.json.DoubleParser.instance();
+  }
+
+  public foam.lib.parse.Parser queryParser() {
+    return foam.lib.json.DoubleParser.instance();
+  }
+
+  public foam.lib.parse.Parser csvParser() {
+    return foam.lib.json.DoubleParser.instance();
+  }
 }
