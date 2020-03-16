@@ -41,4 +41,8 @@ public abstract class AbstractBooleanPropertyInfo
     boolean val = (boolean) get(obj);
     sig.update((byte) (val ? 1 : 0));
   }
+  
+  public String getSQLType() {
+    return "BOOLEAN";
+  }
 }

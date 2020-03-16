@@ -60,4 +60,8 @@ public abstract class AbstractShortPropertyInfo
     short val = (short) get(obj);
     sig.update((ByteBuffer) bb.get().putShort(val).flip());
   }
+  
+  public String getSQLType() {
+    return "SMALLINT";
+  }
 }

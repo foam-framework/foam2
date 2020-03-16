@@ -39,4 +39,8 @@ public abstract class AbstractBytePropertyInfo
     if ( ! includeInSignature() ) return;
     sig.update((byte) get(obj));
   }
+  
+  public String getSQLType() {
+    return "SMALLINT";
+  }
 }

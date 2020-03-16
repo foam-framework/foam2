@@ -56,4 +56,8 @@ public abstract class AbstractFloatPropertyInfo
     float val = (float) get(obj);
     sig.update((ByteBuffer) bb.get().putFloat(val).flip());
   }
+  
+  public String getSQLType() {
+    return "FLOAT";
+  }
 }

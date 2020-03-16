@@ -1066,7 +1066,6 @@ foam.CLASS({
     ['javaInfoType',   'foam.core.AbstractBytePropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.ByteParser.instance()'],
     ['javaCSVParser',  'foam.lib.json.ByteParser.instance()'],
-    ['sqlType',        'SMALLINT']
   ],
 
   methods: [
@@ -1093,7 +1092,6 @@ foam.CLASS({
     ['javaInfoType',   'foam.core.AbstractShortPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.ShortParser.instance()'],
     ['javaCSVParser',  'foam.lib.json.ShortParser.instance()'],
-    ['sqlType',        'SMALLINT']
   ],
 
   methods: [
@@ -1120,7 +1118,6 @@ foam.CLASS({
     ['javaInfoType',                 'foam.core.AbstractLongPropertyInfo'],
     ['javaJSONParser',               'foam.lib.json.LongParser.instance()'],
     ['javaCSVParser',                'foam.lib.json.LongParser.instance()'],
-    ['sqlType',                      'BIGINT'],
     ['javaCompare',                  'return Long.compare(get_(o1), get_(o2));'],
     [ 'javaComparePropertyToValue',  'return Long.compare(cast(key), cast(value));' ],
     [ 'javaComparePropertyToObject', 'return Long.compare(cast(key), get_(o));' ]
@@ -1150,7 +1147,6 @@ foam.CLASS({
     ['javaInfoType',   'foam.core.AbstractDoublePropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.DoubleParser.instance()'],
     ['javaCSVParser',  'foam.lib.json.DoubleParser.instance()'],
-    ['sqlType',        'DOUBLE PRECISION']
   ],
 
   methods: [
@@ -1177,7 +1173,6 @@ foam.CLASS({
     ['javaInfoType',   'foam.core.AbstractFloatPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.FloatParser.instance()'],
     ['javaCSVParser',  'foam.lib.json.FloatParser.instance()'],
-    ['sqlType',        'FLOAT']
   ],
 
   methods: [
@@ -1865,7 +1860,6 @@ foam.CLASS({
     ['javaInfoType',   'foam.core.AbstractBooleanPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.BooleanParser.instance()'],
     ['javaCSVParser',  'foam.lib.json.BooleanParser.instance()'],
-    ['sqlType',        'BOOLEAN']
   ],
   methods: [
     function createJavaPropertyInfo_(cls) {

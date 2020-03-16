@@ -56,4 +56,8 @@ public abstract class AbstractDoublePropertyInfo
     double val = (double) get(obj);
     sig.update((ByteBuffer) bb.get().putDouble(val).flip());
   }
+  
+  public String getSQLType() {
+    return "DOUBLE PRECISION";
+  }
 }

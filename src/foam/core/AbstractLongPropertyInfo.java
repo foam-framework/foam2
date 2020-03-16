@@ -56,4 +56,8 @@ public abstract class AbstractLongPropertyInfo
     long val = (long) get(obj);
     sig.update((ByteBuffer) bb.get().putLong(val).flip());
   }
+  
+  public String getSQLType() {
+    return "BIGINT";
+  }
 }

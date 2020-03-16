@@ -207,12 +207,6 @@ foam.CLASS({
             body: `return ${this.propType}.class;`
           },
           {
-            name: 'getSQLType',
-            visibility: 'public',
-            type: 'String',
-            body: 'return "' + this.sqlType + '";'
-          },
-          {
             name: 'isSet',
             visibility: 'public',
             type: 'boolean',
@@ -246,6 +240,16 @@ foam.CLASS({
             body: 'formatter.output(get_(obj));'
           }
         ];
+        
+        if ( ! (this.propType  == 'boolean'|| this.propType == 'long' || this.propType == 'byte' || this.propType == 'double' || 
+            this.propType == 'float' || this.propType == 'short')) {
+          m.push({
+              name: 'getSQLType',
+              visibility: 'public',
+              type: 'String',
+              body: 'return "' + this.sqlType + '";'
+          });
+        }
 
         if ( this.networkTransient ) {
           m.push({
