@@ -68,4 +68,9 @@ public abstract class AbstractShortPropertyInfo
   public Class getValueClass() {
     return short.class;
   }
+  
+  public short cast(Object o) {
+    short s = ( o instanceof String ) ? Short.valueOf((String) o) : (short)o;
+    return ( o instanceof Number ) ? ((Number)o).shortValue() : s;
+  }
 }

@@ -64,4 +64,9 @@ public abstract class AbstractIntPropertyInfo
   public Class getValueClass() {
     return int.class;
   }
+  
+  public int cast(Object o) {
+    int i = ( o instanceof String ) ? Integer.valueOf((String) o) : (int) o;
+    return ( o instanceof Number ) ? ((Number) o).intValue() : i;
+  }
 }

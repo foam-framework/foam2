@@ -64,4 +64,9 @@ public abstract class AbstractFloatPropertyInfo
   public Class getValueClass() {
     return float.class;
   }
+  
+  public float cast(Object o) {
+    float f = ( o instanceof String ) ? Float.parseFloat((String) o) : (float)o;
+    return ( o instanceof Number ) ? ((Number)o).floatValue() : f;
+  }
 }

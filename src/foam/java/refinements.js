@@ -1039,17 +1039,6 @@ foam.CLASS({
     ['javaInfoType',   'foam.core.AbstractIntPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.IntParser.instance()'],
     ['javaCSVParser',  'foam.lib.json.IntParser.instance()'],
-  ],
-
-  methods: [
-    function createJavaPropertyInfo_(cls) {
-      var info = this.SUPER(cls);
-
-      var m = info.getMethod('cast');
-      m.body = `int i = ( o instanceof String ) ? Integer.valueOf((String) o) : (int) o;
-        return ( o instanceof Number ) ? ((Number) o).intValue() : i;`;
-      return info;
-    }
   ]
 });
 
@@ -1065,17 +1054,6 @@ foam.CLASS({
     ['javaInfoType',   'foam.core.AbstractBytePropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.ByteParser.instance()'],
     ['javaCSVParser',  'foam.lib.json.ByteParser.instance()'],
-  ],
-
-  methods: [
-    function createJavaPropertyInfo_(cls) {
-      var info = this.SUPER(cls);
-
-      var m = info.getMethod('cast');
-      m.body = `byte b = ( o instanceof String ) ? Byte.valueOf((String) o) : (byte)o;
-        return ( o instanceof Number ) ? ((Number)o).byteValue() : b;`;
-      return info;
-    }
   ]
 });
 
@@ -1091,17 +1069,6 @@ foam.CLASS({
     ['javaInfoType',   'foam.core.AbstractShortPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.ShortParser.instance()'],
     ['javaCSVParser',  'foam.lib.json.ShortParser.instance()'],
-  ],
-
-  methods: [
-    function createJavaPropertyInfo_(cls) {
-      var info = this.SUPER(cls);
-
-      var m = info.getMethod('cast');
-      m.body = `short s = ( o instanceof String ) ? Short.valueOf((String) o) : (short)o;
-        return ( o instanceof Number ) ? ((Number)o).shortValue() : s;`;
-      return info;
-    }
   ]
 });
 
@@ -1120,17 +1087,6 @@ foam.CLASS({
     ['javaCompare',                  'return Long.compare(get_(o1), get_(o2));'],
     [ 'javaComparePropertyToValue',  'return Long.compare(cast(key), cast(value));' ],
     [ 'javaComparePropertyToObject', 'return Long.compare(cast(key), get_(o));' ]
-  ],
-
-  methods: [
-    function createJavaPropertyInfo_(cls) {
-      var info = this.SUPER(cls);
-
-      var m = info.getMethod('cast');
-      m.body = `long l = ( o instanceof String ) ? Long.valueOf((String) o) : (long) o;
-        return ( o instanceof Number ) ? ((Number) o).longValue() : l;`;
-      return info;
-    }
   ]
 });
 
@@ -1146,17 +1102,6 @@ foam.CLASS({
     ['javaInfoType',   'foam.core.AbstractDoublePropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.DoubleParser.instance()'],
     ['javaCSVParser',  'foam.lib.json.DoubleParser.instance()'],
-  ],
-
-  methods: [
-    function createJavaPropertyInfo_(cls) {
-      var info = this.SUPER(cls);
-
-      var m = info.getMethod('cast');
-      m.body = `double d = ( o instanceof String ) ? Double.parseDouble((String) o) : (double)o;
-        return ( o instanceof Number ) ? ((Number)o).doubleValue() : d;`;
-      return info;
-    }
   ]
 });
 
@@ -1172,17 +1117,6 @@ foam.CLASS({
     ['javaInfoType',   'foam.core.AbstractFloatPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.FloatParser.instance()'],
     ['javaCSVParser',  'foam.lib.json.FloatParser.instance()'],
-  ],
-
-  methods: [
-    function createJavaPropertyInfo_(cls) {
-      var info = this.SUPER(cls);
-
-      var m = info.getMethod('cast');
-      m.body = `float f = ( o instanceof String ) ? Float.parseFloat((String) o) : (float)o;
-        return ( o instanceof Number ) ? ((Number)o).floatValue() : f;`;
-      return info;
-    }
   ]
 });
 
@@ -1858,16 +1792,6 @@ foam.CLASS({
     ['javaInfoType',   'foam.core.AbstractBooleanPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.BooleanParser.instance()'],
     ['javaCSVParser',  'foam.lib.json.BooleanParser.instance()'],
-  ],
-  methods: [
-    function createJavaPropertyInfo_(cls) {
-      var info = this.SUPER(cls);
-
-      var m = info.getMethod('cast');
-      m.body = 'return ((Boolean) o).booleanValue();';
-
-      return info;
-    }
   ]
 });
 

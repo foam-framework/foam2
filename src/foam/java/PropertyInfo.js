@@ -155,13 +155,6 @@ foam.CLASS({
             body: '((' + this.sourceCls.name + ') o).' + this.clearName + '();'
           },
           {
-            name: 'cast',
-            type: this.propType,
-            visibility: 'public',
-            args: [{ name: 'o', type: 'Object' }],
-            body: 'return ' + ( this.propType == "Object" ? 'o;' : '( ' + this.propType + ') o;')
-          },
-          {
             name: 'compare',
             type: 'int',
             visibility: 'public',
@@ -254,6 +247,13 @@ foam.CLASS({
             visibility: 'public',
             type: 'Class',
             body: `return ${this.propType}.class;`
+          });
+          m.push({
+            name: 'cast',
+            type: this.propType,
+            visibility: 'public',
+            args: [{ name: 'o', type: 'Object' }],
+            body: 'return ' + ( this.propType == "Object" ? 'o;' : '( ' + this.propType + ') o;')
           });
         }
 

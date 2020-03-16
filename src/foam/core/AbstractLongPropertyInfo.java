@@ -64,4 +64,9 @@ public abstract class AbstractLongPropertyInfo
   public Class getValueClass() {
     return long.class;
   }
+  
+  public long cast(Object o) {
+    long l = ( o instanceof String ) ? Long.valueOf((String) o) : (long) o;
+    return ( o instanceof Number ) ? ((Number) o).longValue() : l;
+  }
 }

@@ -47,4 +47,9 @@ public abstract class AbstractBytePropertyInfo
   public Class getValueClass() {
     return byte.class;
   }
+  
+  public byte cast(Object o) {
+    byte b = ( o instanceof String ) ? Byte.valueOf((String) o) : (byte)o;
+            return ( o instanceof Number ) ? ((Number)o).byteValue() : b;
+  }
 }
