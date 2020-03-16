@@ -60,16 +60,17 @@ foam.CLASS({
           results.array.forEach((cap) => capabilityMap[cap.id] = cap);
             // Collect lists for fullfilling the requirements for any given capability.
             ofList = tcList
-              .filter((capID) => capabilityMap[capID].of != null)
+              .filter((capID) => !! capabilityMap[capID].of)
               .map((capID) => capabilityMap[capID].of);
 
             daoList = tcList
-              .filter((capID) => capabilityMap[capID].of != null)
+              .filter((capID) => !! capabilityMap[capID].of && !! capabilityMap[capID].daoKey)
               .map((capID) => capabilityMap[capID].daoKey);
 
             argsList = tcList
-              .filter((capID) => capabilityMap[capID].of != null)
-              .map((capID) => this.ctrl[capabilityMap[capID].daoFindKey].id);
+              .filter((capID) => !! capabilityMap[capID].of && !! capabilityMap[capID].daoKey)
+              .map((capID) =>
+                this.ctrl[capabilityMap[capID].daoFindKey].id);
           });
         });
         this.capabilityDAO.find(capabilityId).then((cap) => {
