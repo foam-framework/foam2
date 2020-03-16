@@ -227,36 +227,6 @@ foam.CLASS({
             /* TODO: revise when/if expression support is added to Java */
             body: `return foam.util.SafetyUtil.compare(get_(o), ${this.propValue}) == 0;`
           },
-          {
-            name: 'toCSV',
-            visibility: 'public',
-            type: 'void',
-            args: [
-              { name: 'x',          type: 'foam.core.X' },
-              { name: 'obj',        type: 'Object' },
-              { name: 'outputter',  type: 'foam.lib.csv.CSVOutputter' }
-            ],
-            body: this.toCSV
-          },
-          {
-            name: 'toCSVLabel',
-            visibility: 'public',
-            type: 'void',
-            args: [
-              { name: 'x',          type: 'foam.core.X' },
-              { name: 'outputter',  type: 'foam.lib.csv.CSVOutputter' }
-            ],
-            body: this.toCSVLabel
-          },
-          {
-            name: 'fromCSVLabelMapping',
-            visibility: 'public',
-            type: 'void',
-            args: [
-              { name: 'map', type: 'java.util.Map<String, foam.lib.csv.FromCSVSetter>' }
-            ],
-            body: this.fromCSVLabelMapping
-          },
           // TODO: move to AbstractPropertyInfo class for each type to avoid
           // generating for each PropertyInfo.
           {
