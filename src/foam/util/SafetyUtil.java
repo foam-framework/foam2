@@ -49,8 +49,8 @@ public class SafetyUtil {
       double d2 = ((Number) o2).doubleValue();
 
       if ( d1 == d2 ) return  0;
-      if ( d1  > d2 ) return  1;
-        return -1;
+      if ( d1 > d2  ) return  1;
+      return -1;
     }
 
     if ( ! (o1 instanceof Comparable && o2 instanceof Comparable) ) return 0;
@@ -69,7 +69,7 @@ public class SafetyUtil {
   }
 
   public static int compare(boolean o1, boolean o2) {
-    return o1 == o2 ? 0 : o1 ? 1 : 0;
+    return o1 == o2 ? 0 : o1 ? 1 : -1;
   }
 
   public static int compare(String o1, String o2) {

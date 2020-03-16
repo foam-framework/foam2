@@ -13,6 +13,7 @@ foam.CLASS({
     'foam.core.FObject',
     'foam.dao.*',
     'foam.mlang.MLang',
+    'foam.mlang.predicate.AbstractPredicate',
     'foam.mlang.predicate.Predicate',
     'java.util.ArrayList',
     'java.util.List'
@@ -89,6 +90,10 @@ foam.CLASS({
     {
       name: 'select_',
       javaCode: `
+        // TODO: See CPF-4875 for more info
+        // Will need to figure out if the DAO OF is not lifecycleAware, 
+        // but a subclass entry may be lifecycleAware
+
         boolean userCanReadDeleted = canReadDeleted(x);
         boolean userCanReadRejected = canReadRejected(x);
 
@@ -116,16 +121,28 @@ foam.CLASS({
         
         Predicate[] predicateArray = predicateList.toArray(new Predicate[predicateList.size()]);
 
+        AbstractPredicate isLifecycleAwarePredicate = new AbstractPredicate(x) {
+          @Override
+          public boolean f(Object obj) {
+            return obj instanceof LifecycleAware;
+          }
+        };
+
         return ( predicateArray.length == 0 ) ?
         getDelegate().select_(x, sink, skip, limit, order, predicate) :
         getDelegate()
           .where(
-            MLang.NOT(
               MLang.OR(
-                predicateArray
+                MLang.NOT(
+                  isLifecycleAwarePredicate
+                ),
+                MLang.NOT(
+                  MLang.OR(
+                    predicateArray
+                  )
+                )
               )
             )
-          )
           .select_(x, sink, skip, limit, order, predicate);
       `
     },

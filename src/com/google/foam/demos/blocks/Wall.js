@@ -72,21 +72,22 @@ foam.CLASS({
 
     function forEachNeighbour(cell, f) {
       this.forNeighbour(cell, f,  0,  1);
-      //this.forNeighbour(cell, f, -1,  0);
-      //this.forNeighbour(cell, f,  1, -1);
+      this.forNeighbour(cell, f,  0, -1);
+      this.forNeighbour(cell, f, -1,  0);
+      this.forNeighbour(cell, f,  1, -1);
     },
 
     function balanceBrick(brick) {
       this.forEachNeighbour(brick, function(n) {
-        var w = Math.floor(brick. weight/10);
-        //brick.force -= w;
-        n.force   += w;
+        if ( n.force > brick.force ) {
+          n.upForce++;
+          brick.downForce++;
+        }
       });
     },
 
     function balance() {
-      return;
-      for ( var i = 0 ; i < 1 ; i++ )
+      for ( var i = 0 ; i < 20 ; i++ )
         for ( var x = 0 ; x < this.width ; x++ ) {
           for ( var y = 0 ; y < this.height ; y++ ) {
             this.balanceBrick(this.bricks[x][y]);
