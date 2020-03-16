@@ -12,6 +12,7 @@ foam.CLASS({
   documentation: `Simply displays "sections" consecutively.`,
 
   imports: [
+    'notify',
     'stack'
   ],
   
@@ -44,6 +45,11 @@ foam.CLASS({
       name: 'sectionView',
       value: { class: 'foam.u2.detail.SectionView' }
     }
+  ],
+
+  messages: [
+    { name: 'SUCCESS_MSG', message: 'Information successfully submitted.' },
+    { name: 'ERROR_MSG', message: 'Information was not successfully submitted, please try again later' }
   ],
 
   listeners: [
@@ -88,6 +94,25 @@ foam.CLASS({
       name: 'submit',
       code: function(x) {
         console.log('submit');
+        this.sectionsList.forEach((model, i) => {
+          let dao = this.__subSubContext__[model.dao];
+          dao.find(model.daoKey)
+          .then((result) => {
+            let objToSubmit;
+            if ( result ) objToSubmit = result.copyFrom(model.data);
+            else objToSubmit = dao.of.create(model.data, this);
+            dao.put(objToSubmit).then(
+              () => {
+                this.notify(this.SUCCESS_MSG);
+                this.stack.back();
+              }
+            ).catch(
+              (e) => this.notify(this.ERROR_MSG + `${e && e.message ? ': ' + e.message : (e ? ': ' + e : '')}`, 'error')
+            );
+          }).catch(
+            (e) => this.notify(this.ERROR_MSG + `${e && e.message ? ': ' + e.message : (e ? ': ' + e : '')}`, 'error')
+          );
+        });
       }
     },
     {

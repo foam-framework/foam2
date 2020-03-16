@@ -11,6 +11,7 @@ foam.CLASS({
 
   imports: [
     'capabilityDAO',
+    'ctrl',
     'prerequisiteCapabilityJunctionDAO',
     'stack'
   ],
@@ -45,9 +46,9 @@ foam.CLASS({
           return arry.reduce(
             (p, pcj) => p.then(() => tcRecurse(pcj.targetId)),
             Promise.resolve()
-          ).then(() => { tcList.push(sourceId); });
-        })
-      }
+          ).then(() => tcList.push(sourceId));
+        });
+      };
 
       // Create "ofList" for the wizard
       let p = tcRecurse(capabilityId).then(() => {
@@ -56,25 +57,31 @@ foam.CLASS({
         ).select().then((results) => {
           // Get the Capability objects in a map because it's faster than sorting
           var capabilityMap = {};
-          results.array.forEach((cap) => { capabilityMap[cap.id] = cap; });
+          results.array.forEach((cap) => capabilityMap[cap.id] = cap);
+            // Collect lists for fullfilling the requirements for any given capability.
+            ofList = tcList
+              .filter((capID) => capabilityMap[capID].of != null)
+              .map((capID) => capabilityMap[capID].of);
 
-          // Construct a list of 'of' values from the list of Capability objects
-          // in the order of capability IDs resulting from the pre-order traversial.
-          ofList = tcList
-            .filter((capID) => capabilityMap[capID].of != null)
-            .map((capID) => capabilityMap[capID].of);
-        });
-      });
-      this.capabilityDAO.find(capabilityId).then((cap) => {
-        // Summon the wizard; accio!
-        p.then(() => {
-          let argsList = ofList.map(() => { return {}; });
-          self.stack.push({
-            class: 'foam.nanos.crunch.ui.ScrollSectionWizardView',
-            title: cap.name,
-            ofList: ofList,
-            argsList: argsList
+            daoList = tcList
+              .filter((capID) => capabilityMap[capID].of != null)
+              .map((capID) => capabilityMap[capID].daoKey);
+
+            argsList = tcList
+              .filter((capID) => capabilityMap[capID].of != null)
+              .map((capID) => this.ctrl[capabilityMap[capID].daoFindKey].id);
           });
+        });
+        this.capabilityDAO.find(capabilityId).then((cap) => {
+          // Summon the wizard; accio!
+          p.then(() => {
+            self.stack.push({
+              class: 'foam.nanos.crunch.ui.ScrollSectionWizardView',
+              title: cap.name,
+              daoList: daoList,
+              ofList: ofList,
+              argsList: argsList
+            });
         });
       });
     }
