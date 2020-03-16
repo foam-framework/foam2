@@ -4,39 +4,43 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'client_id',
+      name: 'clientId',
     },
     {
       class: 'String',
-      name: 'project_id',
+      name: 'projectId',
     },
     {
       class: 'String',
-      name: 'auth_uri',
+      name: 'authUri',
     },
     {
       class: 'String',
-      name: 'token_uri',
+      name: 'tokenUri',
     },
     {
       class: 'String',
-      name: 'auth_provider_x509_cert_url',
+      name: 'authProviderCertUrl',
     },
     {
       class: 'String',
-      name: 'client_secret',
+      name: 'clientSecret',
     },
     {
       class: 'StringArray',
-      name: 'redirect_uris',
+      name: 'redirectUris',
     },
     {
       class: 'String',
-      name: 'javascript_origins',
+      name: 'javascriptOrigins',
     },
     {
       class: 'Int',
       name: 'port'
+    },
+    {
+      class: 'String',
+      name: 'tokensFolderPath'
     }
   ]
 });

@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class GoogleApiAuthService extends foam.core.AbstractFObject {
-  private static final String CREDENTIALS_FOLDER = "/tmp";
   private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
 
 
@@ -31,16 +30,16 @@ public class GoogleApiAuthService extends foam.core.AbstractFObject {
 
     GoogleApiCredentials credentialsConfig = (GoogleApiCredentials)getX().get("googleApiCredentialsConfig");
     GoogleClientSecrets.Details details = new GoogleClientSecrets.Details()
-            .setClientId(credentialsConfig.getClient_id())
-            .setClientSecret(credentialsConfig.getClient_secret())
-            .setAuthUri(credentialsConfig.getAuth_uri())
-            .setTokenUri(credentialsConfig.getToken_uri())
-            .setRedirectUris(Arrays.asList(credentialsConfig.getRedirect_uris()));
+            .setClientId(credentialsConfig.getClientId())
+            .setClientSecret(credentialsConfig.getClientSecret())
+            .setAuthUri(credentialsConfig.getAuthUri())
+            .setTokenUri(credentialsConfig.getTokenUri())
+            .setRedirectUris(Arrays.asList(credentialsConfig.getRedirectUris()));
 
     GoogleClientSecrets clientSecrets = new GoogleClientSecrets().setInstalled(details);
     GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
               HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, scopes)
-              .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(CREDENTIALS_FOLDER + "/tokens/")))
+              .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(credentialsConfig.getTokensFolderPath() + "/tokens/")))
               .build();
     
     LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(credentialsConfig.getPort()).build();
