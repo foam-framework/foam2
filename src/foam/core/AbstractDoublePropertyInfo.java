@@ -75,4 +75,16 @@ public abstract class AbstractDoublePropertyInfo
   }
 
   protected abstract double get_(Object o);
+  
+  public int compare(Object o1, Object o2) {
+    return foam.util.SafetyUtil.compare(get_(o1), get_(o2));
+  }
+
+  public int comparePropertyToObject(Object key, Object o) {
+    return foam.util.SafetyUtil.compare(cast(key), get_(o));
+  }
+
+  public int comparePropertyToValue(Object key, Object value) {
+    return foam.util.SafetyUtil.compare(cast(key), cast(value));
+  }
 }

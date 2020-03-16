@@ -148,27 +148,6 @@ foam.CLASS({
             body: '((' + this.sourceCls.name + ') o).' + this.clearName + '();'
           },
           {
-            name: 'compare',
-            type: 'int',
-            visibility: 'public',
-            args: [{ name: 'o1', type: 'Object' }, { name: 'o2', type: 'Object' }],
-            body: this.compare,
-          },
-          {
-            name: 'comparePropertyToObject',
-            type: 'int',
-            visibility: 'public',
-            args: [{ name: 'key', type: 'Object' }, { name: 'o', type: 'Object' }],
-            body: this.comparePropertyToObject,
-          },
-          {
-            name: 'comparePropertyToValue',
-            type: 'int',
-            visibility: 'public',
-            args: [{ name: 'key', type: 'Object' }, { name: 'value', type: 'Object' }],
-            body: this.comparePropertyToValue,
-          },
-          {
             name: 'jsonParser',
             type: 'foam.lib.parse.Parser',
             visibility: 'public',
@@ -254,6 +233,27 @@ foam.CLASS({
             type: 'Object',
             args: [{ name: 'o', type: 'Object' }],
             body: 'return get_(o);'
+          });
+          m.push({
+            name: 'compare',
+            type: 'int',
+            visibility: 'public',
+            args: [{ name: 'o1', type: 'Object' }, { name: 'o2', type: 'Object' }],
+            body: this.compare,
+          });
+          m.push({
+            name: 'comparePropertyToObject',
+            type: 'int',
+            visibility: 'public',
+            args: [{ name: 'key', type: 'Object' }, { name: 'o', type: 'Object' }],
+            body: this.comparePropertyToObject,
+          });
+          m.push({
+            name: 'comparePropertyToValue',
+            type: 'int',
+            visibility: 'public',
+            args: [{ name: 'key', type: 'Object' }, { name: 'value', type: 'Object' }],
+            body: this.comparePropertyToValue,
           });
         }
 

@@ -1083,10 +1083,7 @@ foam.CLASS({
     ['javaType',                     'long'],
     ['javaInfoType',                 'foam.core.AbstractLongPropertyInfo'],
     ['javaJSONParser',               'foam.lib.json.LongParser.instance()'],
-    ['javaCSVParser',                'foam.lib.json.LongParser.instance()'],
-    ['javaCompare',                  'return Long.compare(get_(o1), get_(o2));'],
-    [ 'javaComparePropertyToValue',  'return Long.compare(cast(key), cast(value));' ],
-    [ 'javaComparePropertyToObject', 'return Long.compare(cast(key), get_(o));' ]
+    ['javaCSVParser',                'foam.lib.json.LongParser.instance()']
   ]
 });
 
