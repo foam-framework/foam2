@@ -60,4 +60,8 @@ public abstract class AbstractFloatPropertyInfo
   public String getSQLType() {
     return "FLOAT";
   }
+  
+  public Class getValueClass() {
+    return float.class;
+  }
 }

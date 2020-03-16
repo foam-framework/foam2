@@ -60,4 +60,8 @@ public abstract class AbstractDoublePropertyInfo
   public String getSQLType() {
     return "DOUBLE PRECISION";
   }
+  
+  public Class getValueClass() {
+    return double.class;
+  }
 }

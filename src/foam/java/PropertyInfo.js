@@ -201,12 +201,6 @@ foam.CLASS({
             body: 'return ' + ( this.csvParser ? this.csvParser : null ) + ';'
           },
           {
-            name: 'getValueClass',
-            visibility: 'public',
-            type: 'Class',
-            body: `return ${this.propType}.class;`
-          },
-          {
             name: 'isSet',
             visibility: 'public',
             type: 'boolean',
@@ -242,7 +236,9 @@ foam.CLASS({
         ];
         
         if ( ! (this.propType  == 'boolean'|| this.propType == 'long' || this.propType == 'byte' || this.propType == 'double' || 
-            this.propType == 'float' || this.propType == 'short' || this.propType == 'int' || this.propType == 'java.util.Map' )
+            this.propType == 'float' || this.propType == 'short' || this.propType == 'int' )
+            //TODO add support for special type.
+//              || this.propType == 'java.util.Map' || this.propType == 'java.util.List'
             //TODO add support for subtype.
 //            this.propType == 'foam.core.AbstractFObjectPropertyInfo' || this.propType == 'foam.core.AbstractClassPropertyInfo') ||
 //            this.propType == 'foam.core.AbstractObjectPropertyInfo'
@@ -252,6 +248,12 @@ foam.CLASS({
               visibility: 'public',
               type: 'String',
               body: 'return "' + this.sqlType + '";'
+          });
+          m.push({
+            name: 'getValueClass',
+            visibility: 'public',
+            type: 'Class',
+            body: `return ${this.propType}.class;`
           });
         }
 

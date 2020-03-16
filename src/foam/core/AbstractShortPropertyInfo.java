@@ -64,4 +64,8 @@ public abstract class AbstractShortPropertyInfo
   public String getSQLType() {
     return "SMALLINT";
   }
+  
+  public Class getValueClass() {
+    return short.class;
+  }
 }

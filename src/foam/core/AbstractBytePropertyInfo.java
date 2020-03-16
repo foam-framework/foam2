@@ -43,4 +43,8 @@ public abstract class AbstractBytePropertyInfo
   public String getSQLType() {
     return "SMALLINT";
   }
+  
+  public Class getValueClass() {
+    return byte.class;
+  }
 }

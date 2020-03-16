@@ -60,4 +60,8 @@ public abstract class AbstractIntPropertyInfo
   public String getSQLType() {
     return "INT";
   }
+  
+  public Class getValueClass() {
+    return int.class;
+  }
 }

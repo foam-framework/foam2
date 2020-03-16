@@ -45,4 +45,8 @@ public abstract class AbstractBooleanPropertyInfo
   public String getSQLType() {
     return "BOOLEAN";
   }
+  
+  public Class getValueClass() {
+    return boolean.class;
+  }
 }

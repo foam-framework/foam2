@@ -60,4 +60,8 @@ public abstract class AbstractLongPropertyInfo
   public String getSQLType() {
     return "BIGINT";
   }
+  
+  public Class getValueClass() {
+    return long.class;
+  }
 }
