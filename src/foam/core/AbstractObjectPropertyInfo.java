@@ -51,4 +51,8 @@ public abstract class AbstractObjectPropertyInfo
     this.set(diff, this.get(o2));
     return true;
   }
+  
+  public String getSQLType() {
+    return "";
+  }
 }

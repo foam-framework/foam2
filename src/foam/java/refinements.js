@@ -1039,7 +1039,6 @@ foam.CLASS({
     ['javaInfoType',   'foam.core.AbstractIntPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.IntParser.instance()'],
     ['javaCSVParser',  'foam.lib.json.IntParser.instance()'],
-    ['sqlType',        'INT']
   ],
 
   methods: [
@@ -1612,7 +1611,6 @@ foam.CLASS({
         return 'new String[] {\"' + value.join('\",\"') + '\"}';
       }
     },
-    ['sqlType', 'TEXT']
   ],
 
   methods: [

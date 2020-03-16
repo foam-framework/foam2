@@ -56,4 +56,8 @@ public abstract class AbstractIntPropertyInfo
     int val = (int) get(obj);
     sig.update((ByteBuffer) bb.get().putInt(val).flip());
   }
+  
+  public String getSQLType() {
+    return "INT";
+  }
 }

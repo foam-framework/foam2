@@ -117,4 +117,8 @@ public abstract class AbstractFObjectPropertyInfo
     this.set(diff, d);
     return d != null;
   }
+  
+  public String getSQLType() {
+    return "";
+  }
 }

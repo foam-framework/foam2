@@ -7,4 +7,8 @@ public abstract class AbstractClassPropertyInfo extends AbstractObjectPropertyIn
   public void toJSON(Outputter outputter, Object value) {
     outputter.outputString(((ClassInfo) value).getId());
   }
+  
+  public String getSQLType() {
+    return "";
+  }
 }
