@@ -29,7 +29,7 @@ foam.CLASS({
   ],
 
   css: `
-  input {
+  ^ input {
     width: 220px;
   }
 

@@ -23,6 +23,7 @@ foam.CLASS({
     'contextData as data'
   ],
 
+
   properties: [
     {
       class: 'foam.u2.ViewSpec',

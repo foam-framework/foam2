@@ -31,12 +31,12 @@ foam.CLASS({
         public void execute(X x) {
           UserCapabilityJunction junction = (UserCapabilityJunction) obj;
           Capability cap = (Capability) ((DAO) x.get("capabilityDAO")).find(((String)junction.getTargetId()));
-          if ( ! cap.getVisible() ) return;
+          if ( cap == null || ! cap.getVisible() ) return;
 
           DAO notificationDAO = (DAO) x.get("notificationDAO");
 
           StringBuilder sb = new StringBuilder("The Capability '")
-          .append(((String)junction.getTargetId()))
+          .append(cap.getName())
           .append("' has been set to ")
           .append(junction.getStatus())
           .append(".");

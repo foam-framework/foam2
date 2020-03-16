@@ -10,14 +10,19 @@ import foam.core.ContextAgent;
 import foam.core.ContextAwareSupport;
 import foam.core.X;
 import foam.nanos.logger.Logger;
-
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
 public class BenchmarkRunner
-  extends ContextAwareSupport
+  extends    ContextAwareSupport
   implements ContextAgent
 {
+  public static String RUN         = "Run";
+  public static String THREADCOUNT = "Threads";
+  public static String OPS         = "Operations/s";
+  public static String OPSPT       = "Operations/s/t";
+  public static String MEMORY      = "Memory MB";
+
   protected String    name_;
   protected int       threadCount_;
   protected Boolean   runPerThread_;
@@ -25,12 +30,6 @@ public class BenchmarkRunner
   protected int       invocationCount_;
   protected Benchmark test_;
   protected List<Map<String, Object>> results_ = new ArrayList<Map<String, Object>>();
-
-  public static String RUN = "Run";
-  public static String THREADCOUNT = "Threads";
-  public static String OPS = "Operations/s";
-  public static String OPSPT = "Operations/s/t";
-  public static String MEMORY = "Memory MB";
 
   // Builder pattern to avoid large constructor in the case
   // we want to add more variables to this test runner later.
@@ -83,7 +82,7 @@ public class BenchmarkRunner
     }
 
     public BenchmarkRunner build() {
-      return new BenchmarkRunner(getX(),this);
+      return new BenchmarkRunner(getX(), this);
     }
   }
 
@@ -153,7 +152,6 @@ public class BenchmarkRunner
 
     int availableThreads = Runtime.getRuntime().availableProcessors();
     int run = 1;
-    threadCount_ = availableThreads;
     if ( runPerThread_ ) {
       threadCount_ = 1;
       if ( reverseThreads_ ) {
@@ -177,12 +175,12 @@ public class BenchmarkRunner
         long startTime = System.currentTimeMillis();
 
         // execute all the threads
-        for (int i = 0; i < threadCount_; i++) {
+        for ( int i = 0 ; i < threadCount_ ; i++ ) {
           final int tno = i;
           Thread thread = new Thread(group, new Runnable() {
               @Override
               public void run() {
-                for (int j = 0; j < invocationCount_; j++) {
+                for ( int j = 0 ; j < invocationCount_ ; j++ ) {
                   test_.execute(x);
                 }
                 // count down the latch when finished
@@ -225,17 +223,20 @@ public class BenchmarkRunner
           } else {
             threadCount_++;
           }
-          if ( threadCount_ <= 0 ||
-               threadCount_ > availableThreads ) {
+
+          if ( threadCount_ <= 0 || threadCount_ > availableThreads ) {
             break;
           }
+
           run++;
         } else {
           String results = formatResults();
           System.out.println(results);
+
           if ( logger != null ) {
             logger.info(results);
           }
+
           break;
         }
       }
@@ -277,7 +278,8 @@ public class BenchmarkRunner
       index = 0;
       for ( Map.Entry<String, Object> entry : result.entrySet() ) {
         index++;
-        csv.append(entry.getValue());
+        Object val = entry.getValue();
+        csv.append(val);
         if ( index < result.entrySet().size() ) csv.append(",");
       }
       csv.append("\n");

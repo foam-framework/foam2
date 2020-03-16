@@ -4,13 +4,16 @@ p({
   "name":"localLogMessageDAO",
   "lazy":false,
   "serviceScript":"""
+    foam.nanos.app.AppConfig app = (foam.nanos.app.AppConfig) x.get("appConfig");
     new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.logger.LogMessage.getOwnClassInfo())
       .setAuthorize(false)
       .setSeqNo(true)
       .setPm(true)
       .setRuler(false)
-      .setInnerDAO(new foam.dao.WriteOnlyJDAO(x, new foam.dao.MDAO(foam.nanos.logger.LogMessage.getOwnClassInfo()), foam.nanos.logger.LogMessage.getOwnClassInfo(), "../logs/logs"))
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("../logs/logs")
+      .setWriteOnly(true)
       .setFixedSize(new foam.dao.FixedSizeDAO.Builder(x)
         .setComparator(foam.mlang.MLang.DESC(foam.nanos.logger.LogMessage.CREATED))
         .setSize(5000)
@@ -18,6 +21,7 @@ p({
       .setIndex(new foam.core.PropertyInfo[] {foam.nanos.logger.LogMessage.CREATED})
       .setOrder(new foam.mlang.order.Comparator[] {foam.mlang.MLang.DESC(foam.nanos.logger.LogMessage.CREATED)})
       .setDecorator(new foam.nanos.logger.StdoutLoggerDAO.Builder(x)
+        .setMode(app.getMode())
         .setDelegate(new foam.nanos.logger.LogMessageDAO.Builder(x)
           .setDelegate(new foam.nanos.logger.RepeatLogMessageDAO.Builder(x)
             .setDelegate(new foam.nanos.logger.NotificationLogMessageDAO.Builder(x)
@@ -58,11 +62,17 @@ p({
   "name":"logger",
   "lazy":false,
   "serviceScript":"""
+    import foam.nanos.app.AppConfig;
+    import foam.nanos.app.Mode;
     import foam.nanos.logger.ProxyLogger;
     import foam.nanos.logger.LogLevelFilterLogger;
     import foam.nanos.logger.DAOLogger;
     ProxyLogger logLevelFilterLogger = (ProxyLogger) x.get("logLevelFilterLogger");
     logLevelFilterLogger.setX(x);
+    AppConfig app = (AppConfig) x.get("appConfig");
+    if ( app.getMode() == Mode.PRODUCTION ) {
+      logLevelFilterLogger.setLogDebug(false);
+    }
     DAOLogger daoLogger = new DAOLogger(x);
     daoLogger.setDelegate((foam.dao.DAO) x.get("localLogMessageDAO"));
     logLevelFilterLogger.setDelegate(daoLogger);

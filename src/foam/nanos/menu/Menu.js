@@ -4,7 +4,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-foam.CLASS({
+ foam.CLASS({
   package: 'foam.nanos.menu',
   name: 'Menu',
 
@@ -53,9 +53,25 @@ foam.CLASS({
       documentation: 'View initialized when menu is launched.',
       view: {
         class: 'foam.u2.view.FObjectView',
+        allowCustom: true,
+        choices: [
+          [ 'foam.nanos.menu.DAOMenu',          'DAO' ],
+          [ 'foam.nanos.menu.DAOMenu2',         'DAO2' ],
+          [ 'foam.nanos.menu.DocumentMenu',     'Document' ],
+          [ 'foam.nanos.menu.DocumentFileMenu', 'External Document' ],
+          [ 'foam.nanos.menu.LinkMenu',         'Link' ],
+          [ 'foam.nanos.menu.ListMenu',         'List' ],
+          [ 'foam.nanos.menu.SubMenu',          'Submenu' ],
+          [ 'foam.nanos.menu.TabsMenu',         'Tabs' ],
+          [ 'foam.nanos.menu.ViewMenu',         'View' ]
+        ]
+      }
+/*
+      view: {
+        class: 'foam.u2.view.FObjectView',
         choices: [
           [ 'foam.nanos.menu.DAOMenu',      'DAO' ],
-          [ 'foam.nanos.menu.DAOMenu2',      'DAO2' ],
+          [ 'foam.nanos.menu.DAOMenu2',     'DAO2' ],
           [ 'foam.nanos.menu.DocumentMenu', 'Document' ],
           [ 'foam.nanos.menu.DocumentFileMenu', 'External Document' ],
           [ 'foam.nanos.menu.LinkMenu',     'Link' ],
@@ -65,6 +81,7 @@ foam.CLASS({
           [ 'foam.nanos.menu.ViewMenu',     'View' ]
         ]
       }
+      */
     },
     {
       class: 'Int',
@@ -86,6 +103,11 @@ foam.CLASS({
       displayWidth: 80
     },
     {
+      class: 'FObjectArray',
+      of: 'foam.nanos.menu.XRegistration',
+      name: 'registrations'
+    },
+    {
       documentation: 'Predicate providing arbitrary checks, in addition to the regular menu auth checks.',
       class: 'foam.mlang.predicate.PredicateProperty',
       name: 'readPredicate',
@@ -97,15 +119,22 @@ foam.CLASS({
       `,
     },
     {
-          class: 'StringArray',
-          name: 'keywords'
+      class: 'StringArray',
+      name: 'keywords'
     }
   ],
 
   methods: [
     function launch_(X, e) {
+      // Create a sub-context with per-menu X.register()-ations.
+      var subX = X.createSubContext({});
+      for ( var i = 0 ; i < this.registrations.length ; i++ ) {
+        var r = this.registrations[i];
+        subX.register(X.lookup(r.className), r.targetName);
+      }
+
       this.lastMenuLaunchedListener && this.lastMenuLaunchedListener(this);
-      this.handler && this.handler.launch(X, this, e);
+      this.handler && this.handler.launch(subX, this, e);
     },
     {
       documentation: 'Desire to call read predicate with calling context but predicate may also need access to this menu; add the current menu as context key MENU',
