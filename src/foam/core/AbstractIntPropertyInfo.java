@@ -69,4 +69,10 @@ public abstract class AbstractIntPropertyInfo
     int i = ( o instanceof String ) ? Integer.valueOf((String) o) : (int) o;
     return ( o instanceof Number ) ? ((Number) o).intValue() : i;
   }
+  
+  public Object get(Object o) {
+    return get_(o);
+  }
+
+  protected abstract int get_(Object o);
 }

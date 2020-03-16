@@ -127,13 +127,6 @@ foam.CLASS({
             body: 'return "' + this.propName + '";'
           },
           {
-            name: 'get',
-            visibility: 'public',
-            type: 'Object',
-            args: [{ name: 'o', type: 'Object' }],
-            body: 'return get_(o);'
-          },
-          {
             name: 'get_',
             type: this.propType,
             visibility: 'public',
@@ -254,6 +247,13 @@ foam.CLASS({
             visibility: 'public',
             args: [{ name: 'o', type: 'Object' }],
             body: 'return ' + ( this.propType == "Object" ? 'o;' : '( ' + this.propType + ') o;')
+          });
+          m.push({
+            name: 'get',
+            visibility: 'public',
+            type: 'Object',
+            args: [{ name: 'o', type: 'Object' }],
+            body: 'return get_(o);'
           });
         }
 

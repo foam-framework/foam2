@@ -52,4 +52,10 @@ public abstract class AbstractBytePropertyInfo
     byte b = ( o instanceof String ) ? Byte.valueOf((String) o) : (byte)o;
             return ( o instanceof Number ) ? ((Number)o).byteValue() : b;
   }
+  
+  public Object get(Object o) {
+    return get_(o);
+  }
+
+  protected abstract byte get_(Object o);
 }

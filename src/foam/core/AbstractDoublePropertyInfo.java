@@ -69,4 +69,10 @@ public abstract class AbstractDoublePropertyInfo
     double d = ( o instanceof String ) ? Double.parseDouble((String) o) : (double)o;
     return ( o instanceof Number ) ? ((Number)o).doubleValue() : d;
   }
+  
+  public Object get(Object o) {
+    return get_(o);
+  }
+
+  protected abstract double get_(Object o);
 }

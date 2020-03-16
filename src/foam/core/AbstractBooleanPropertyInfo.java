@@ -53,4 +53,10 @@ public abstract class AbstractBooleanPropertyInfo
   public boolean cast(Object o) {
     return ((Boolean) o).booleanValue();
   }
+  
+  public Object get(Object o) {
+    return get_(o);
+  }
+  
+  protected abstract boolean get_(Object o);
 }

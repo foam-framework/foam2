@@ -69,4 +69,10 @@ public abstract class AbstractFloatPropertyInfo
     float f = ( o instanceof String ) ? Float.parseFloat((String) o) : (float)o;
     return ( o instanceof Number ) ? ((Number)o).floatValue() : f;
   }
+  
+  public Object get(Object o) {
+    return get_(o);
+  }
+
+  protected abstract float get_(Object o);
 }
