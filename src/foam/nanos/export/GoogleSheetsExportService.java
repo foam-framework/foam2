@@ -48,7 +48,7 @@ public class GoogleSheetsExportService extends foam.core.AbstractFObject impleme
         .build();
 
       Spreadsheet st = new Spreadsheet().setProperties(
-        new SpreadsheetProperties().setTitle("My Spreadsheet"));
+        new SpreadsheetProperties().setTitle("NanopayExport" + new Date()));
 
 
       List<ValueRange> data = new ArrayList<>();
