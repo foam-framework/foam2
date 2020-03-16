@@ -31,7 +31,7 @@ foam.CLASS({
       name: 'redirectUris',
     },
     {
-      class: 'String',
+      class: 'StringArray',
       name: 'javascriptOrigins',
     },
     {
