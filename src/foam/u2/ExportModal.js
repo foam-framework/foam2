@@ -124,9 +124,9 @@ foam.CLASS({
       });
       
       self.exportDriverReg$.sub(function() {
-        self.isConvertAvailable =  self.exportDriverReg.canBeConverted;
-        self.isDownloadAvailable = self.exportDriverReg.canBeDownloaded;
-        self.isOpenAvailable = self.exportDriverReg.canBeOpened;
+        self.isConvertAvailable =  self.exportDriverReg.isConvertible;
+        self.isDownloadAvailable = self.exportDriverReg.isDownloadable;
+        self.isOpenAvailable = self.exportDriverReg.isOpenable;
       });
       
 

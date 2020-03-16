@@ -29,15 +29,15 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'canBeConverted'
+      name: 'isConvertible'
     },
     {
       class: 'Boolean',
-      name: 'canBeDownloaded'
+      name: 'isDownloadable'
     },
     {
       class: 'Boolean',
-      name: 'canBeOpened'
+      name: 'isOpenable'
     }
   ]
 });
