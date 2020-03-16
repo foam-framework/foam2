@@ -242,9 +242,11 @@ foam.CLASS({
         ];
         
         if ( ! (this.propType  == 'boolean'|| this.propType == 'long' || this.propType == 'byte' || this.propType == 'double' || 
-            this.propType == 'float' || this.propType == 'short' || this.propType == 'int' || this.propType == 'java.util.Map' ||
-            this.propType == 'foam.core.AbstractFObjectPropertyInfo' || this.propType == 'foam.core.AbstractClassPropertyInfo') ||
-            this.propType == 'foam.core.AbstractObjectPropertyInfo') {
+            this.propType == 'float' || this.propType == 'short' || this.propType == 'int' || this.propType == 'java.util.Map' )
+            //TODO add support for subtype.
+//            this.propType == 'foam.core.AbstractFObjectPropertyInfo' || this.propType == 'foam.core.AbstractClassPropertyInfo') ||
+//            this.propType == 'foam.core.AbstractObjectPropertyInfo'
+              ) {
           m.push({
               name: 'getSQLType',
               visibility: 'public',
