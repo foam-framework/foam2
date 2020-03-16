@@ -43,7 +43,8 @@ public class GoogleSheetsExportService extends foam.core.AbstractFObject impleme
       }
 
       final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-      Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, GoogleApiAuthService.getCredentials(HTTP_TRANSPORT, SCOPES))
+      GoogleApiAuthService googleApiAuthService = (GoogleApiAuthService)getX().get("googleApiAuthService");
+      Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleApiAuthService.getCredentials(HTTP_TRANSPORT, SCOPES))
         .setApplicationName("nanopay")
         .build();
 
@@ -170,7 +171,8 @@ public class GoogleSheetsExportService extends foam.core.AbstractFObject impleme
 
   public void deleteSheet(String sheetId) {
     try {
-      GoogleDriveService.deleteFile(sheetId);
+      GoogleDriveService googleDriveService = (GoogleDriveService) getX().get("googleDriveService");
+      googleDriveService.deleteFile(sheetId);
     } catch(Exception e) {
       Logger l = (Logger) getX().get("logger");
       l.error(e);

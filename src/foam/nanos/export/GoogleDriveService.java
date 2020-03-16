@@ -23,9 +23,10 @@ public class GoogleDriveService extends foam.core.AbstractFObject {
   private static final List<String> SCOPES = Collections.singletonList(DriveScopes.DRIVE);
 
 
-  public static void deleteFile(String fileId) throws IOException, GeneralSecurityException {
+  public void deleteFile(String fileId) throws IOException, GeneralSecurityException {
     final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-    Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY,  GoogleApiAuthService.getCredentials(HTTP_TRANSPORT, SCOPES))
+    GoogleApiAuthService googleApiAuthService = (GoogleApiAuthService)getX().get("googleApiAuthService");
+    Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY,  googleApiAuthService.getCredentials(HTTP_TRANSPORT, SCOPES))
       .setApplicationName("nanopay")
       .build();
 

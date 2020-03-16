@@ -943,3 +943,30 @@ p({
     }
   """
 })
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"googleDriveService",
+  "lazy":false,
+  "service": {
+    "class":"foam.nanos.export.GoogleDriveService"
+  }
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"googleApiAuthService",
+  "lazy":false,
+  "service": {
+    "class":"foam.nanos.export.GoogleApiAuthService"
+  }
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"googleApiCredentialsConfig",
+  "lazy":false,
+  "service": {
+    "class":"foam.nanos.export.GoogleApiCredentials"
+  }
+})

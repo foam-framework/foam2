@@ -19,23 +19,31 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.List;
 
-public class GoogleApiAuthService {
+public class GoogleApiAuthService extends foam.core.AbstractFObject {
   private static final String CREDENTIALS_FOLDER = "/tmp";
-  private static final String CREDENTIALS_FILE = "credentials.json";
   private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-  private static final int RANDOM_PORT = 64342;
 
 
-  public static Credential getCredentials(NetHttpTransport HTTP_TRANSPORT, List<String> scopes) throws IOException {
-    GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(new FileInputStream(CREDENTIALS_FOLDER + "/" + CREDENTIALS_FILE)));
+  public Credential getCredentials(NetHttpTransport HTTP_TRANSPORT, List<String> scopes) throws IOException {
+
+    GoogleApiCredentials credentialsConfig = (GoogleApiCredentials)getX().get("googleApiCredentialsConfig");
+    GoogleClientSecrets.Details details = new GoogleClientSecrets.Details()
+            .setClientId(credentialsConfig.getClient_id())
+            .setClientSecret(credentialsConfig.getClient_secret())
+            .setAuthUri(credentialsConfig.getAuth_uri())
+            .setTokenUri(credentialsConfig.getToken_uri())
+            .setRedirectUris(Arrays.asList(credentialsConfig.getRedirect_uris()));
+
+    GoogleClientSecrets clientSecrets = new GoogleClientSecrets().setInstalled(details);
     GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
               HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, scopes)
               .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(CREDENTIALS_FOLDER + "/tokens/")))
               .build();
     
-    LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(RANDOM_PORT).build();
+    LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(credentialsConfig.getPort()).build();
     return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
   }
 }

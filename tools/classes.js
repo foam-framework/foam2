@@ -355,6 +355,7 @@ var classes = [
   'foam.u2.DisplayMode',
   'foam.nanos.export.ClientGoogleSheetsExportService',
   'foam.nanos.export.ExportDriverRegistry',
+  'foam.nanos.export.GoogleApiCredentials',
   'foam.nanos.export.GoogleSheetsExport',
   'foam.nanos.export.GoogleSheetsPropertyMetadata',
   'foam.dao.jdbc.ConnectionPool',
