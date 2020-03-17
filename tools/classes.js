@@ -293,8 +293,10 @@ var classes = [
   'foam.nanos.menu.SubMenuView',
   'foam.nanos.menu.TabsMenu',
   'foam.nanos.menu.ViewMenu',
+  'foam.comics.v2.EnabledActionsAuth',
+  'foam.comics.v2.BasicEnabledActionsAuth',
+  'foam.comics.v2.CRUDEnabledActionsAuth',
   'foam.comics.v2.CannedQuery',
-  'foam.comics.v2.CRUDActionsAuth',
   'foam.comics.v2.namedViews.NamedViewCollection',
   'foam.comics.v2.namedViews.NamedViewInstance',
   'foam.comics.v2.userfeedback.UserFeedbackAware',
@@ -330,6 +332,7 @@ var classes = [
   'foam.nanos.notification.notifications.ScriptRunNotification',
   'foam.nanos.notification.EmailSetting',
   'foam.nanos.notification.NotificationSetting',
+  'foam.nanos.notification.NotificationHostnameRuleAction',
   'foam.nanos.script.Script',
   'foam.nanos.script.TestRunnerConfig',
   'foam.nanos.script.TestRunnerScript',
@@ -460,6 +463,7 @@ var classes = [
   'foam.nanos.ruler.UpdateRulesListSink',
   'foam.nanos.ruler.predicate.PropertyChangePredicate',
   'foam.nanos.ruler.action.SendNotification',
+  'foam.nanos.ruler.predicate.PropertyHasValue',
   'foam.nanos.ruler.predicate.PropertyEQValue',
   'foam.nanos.ruler.predicate.PropertyNEQValue',
   'foam.nanos.ruler.predicate.PropertyEQProperty',
@@ -555,8 +559,7 @@ var classes = [
   'foam.nanos.approval.ApprovableApprovalRequestsPredicate',
   'foam.nanos.approval.ApprovableApprovalRequestsRule',
   'foam.nanos.approval.FulfilledApprovablePredicate',
-  'foam.nanos.approval.FulfilledApprovableRule',
-  'foam.nanos.approval.RoleApprovalRequest',
+  'foam.nanos.approval.FulfilledApprovableRule'
 ];
 
 var abstractClasses = [

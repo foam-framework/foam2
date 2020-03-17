@@ -210,6 +210,7 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/NotificationSettingsView'},
   { name: 'foam/nanos/notification/NotificationView'},
   { name: 'foam/nanos/notification/NotificationNotificationView'},
+  { name: 'foam/nanos/notification/NotificationHostnameRuleAction'},
   { name: 'foam/nanos/notification/notifications/ScriptRunNotificationNotificationView'},
   { name: 'foam/nanos/dashboard/Demo' },
 
@@ -256,6 +257,7 @@ FOAM_FILES([
   { name: "foam/nanos/ruler/predicate/PropertyEQProperty" },
   { name: "foam/nanos/ruler/Relationships" },
   { name: "foam/nanos/ruler/action/SendNotification" },
+  { name: "foam/nanos/ruler/predicate/PropertyHasValue" },
   { name: "foam/nanos/ruler/predicate/PropertyEQValue" },
   { name: "foam/nanos/ruler/predicate/PropertyNEQValue" },
   { name: "foam/nanos/ruler/predicate/NewEqOld" },
@@ -293,7 +295,6 @@ FOAM_FILES([
   { name: 'foam/nanos/approval/ApprovableAwareDAO' },
   { name: 'foam/nanos/approval/ApprovableApprovalRequestsPredicate' },
   { name: 'foam/nanos/approval/ApprovableApprovalRequestsRule' },
-  { name: 'foam/nanos/approval/RoleApprovalRequest' },
   { name: 'foam/nanos/approval/FulfilledApprovablePredicate' },
   { name: 'foam/nanos/approval/FulfilledApprovableRule' },
 

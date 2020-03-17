@@ -349,11 +349,10 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      
       this.tooltip = this.action.toolTip;
 
       this.SUPER();
-      
+
       this.initCls();
 
       this.on('click', this.click);
@@ -397,19 +396,21 @@ foam.CLASS({
 
   listeners: [
     function click(e) {
-      if ( this.buttonState == this.ButtonState.NO_CONFIRM ) {
-        this.action && this.action.maybeCall(this.__subContext__, this.data);
-      } else if ( this.buttonState == this.ButtonState.CONFIRM ) {
-        this.buttonState = this.ButtonState.DEBOUNCE;
-        this.removeAllChildren();
-        this.add(this.confirm);
-        this.debounce();
-      } else if ( this.buttonState == this.ButtonState.ARMED ) {
-        this.buttonState = this.ButtonState.CONFIRM;
-        this.removeAllChildren();
-        this.addContent();
-        this.action && this.action.maybeCall(this.__subContext__, this.data);
-      }
+      try {
+        if ( this.buttonState == this.ButtonState.NO_CONFIRM ) {
+          this.action && this.action.maybeCall(this.__subContext__, this.data);
+        } else if ( this.buttonState == this.ButtonState.CONFIRM ) {
+          this.buttonState = this.ButtonState.DEBOUNCE;
+          this.removeAllChildren();
+          this.add(this.confirm);
+          this.debounce();
+        } else if ( this.buttonState == this.ButtonState.ARMED ) {
+          this.buttonState = this.ButtonState.CONFIRM;
+          this.removeAllChildren();
+          this.addContent();
+          this.action && this.action.maybeCall(this.__subContext__, this.data);
+        }
+      } catch (x) {}
 
       e.preventDefault();
       e.stopPropagation();

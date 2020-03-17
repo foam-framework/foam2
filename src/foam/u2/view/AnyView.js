@@ -153,20 +153,21 @@ foam.CLASS({
       var self = this;
       this
         .start(self.Cols)
-          .start()
-            .style({flex: 1})
-            .add(this.slot(function(selected) {
-              return self.E()
-              .tag(selected.view, {data: self.data});
-            }))
-          .end()
           .callIf(this.enableChoice, function() {
             this.start(self.ChoiceView, {
               choices$: self.types$.map(types => types.map(t => [t, t.label])),
               data$: self.selected$
             })
+            .style({'margin-right': '8px'})
             .end()
           })
+          .start()
+            .style({flex: 1})
+            .add(this.slot(function(selected) {
+              return self.E()
+              .tag(selected.view, {data$: self.data$});
+            }))
+          .end()
         .end();
     }
   ]

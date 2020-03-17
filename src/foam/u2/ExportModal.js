@@ -50,7 +50,7 @@ foam.CLASS({
     'exportObj',
     {
       name: 'exportAllColumns',
-      view: { class: 'foam.u2.CheckBox' },
+      view: { class: 'foam.u2.CheckBox',  label: 'Export all columns '},
       class: 'Boolean'
     },
     'exportDriverReg',

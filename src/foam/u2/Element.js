@@ -810,7 +810,7 @@ foam.CLASS({
         '39': 'right',
         '40': 'down'
       }
-    },
+    }
   ],
 
   css: `
@@ -875,7 +875,7 @@ foam.CLASS({
       class: 'String',
       name: 'tooltip',
       postSet: function(o, n) {
-        if ( ! o && n ) this.initTooltip();
+        if ( n && ! o && this.state == this.LOADED ) this.initTooltip();
         return n;
       }
     },

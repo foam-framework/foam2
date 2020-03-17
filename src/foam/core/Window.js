@@ -125,7 +125,7 @@ foam.CLASS({
 
     function merged(l, opt_delay) {
       var delay = opt_delay || 16;
-      var ctx     = this;
+      var ctx   = this;
 
       return foam.Function.setName(function() {
         var triggered = false;
