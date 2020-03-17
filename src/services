@@ -996,7 +996,8 @@ p({
   "lazy":false,
   "service": {
     "class":"foam.nanos.export.GoogleDriveService"
-  }
+  },
+  "documentation": "googleDriveService is used for making calls to Google Drive API"
 })
 
 p({
@@ -1005,7 +1006,8 @@ p({
   "lazy":false,
   "service": {
     "class":"foam.nanos.export.GoogleApiAuthService"
-  }
+  },
+  "documentation": "googleApiAuthService configures authoriziation (sets scope of permissions which are needed to be granted by user, sets port which will be listening to response and sets folder in which tokens will be stored) and authorize Google API calls"
 })
 
 p({
@@ -1014,5 +1016,6 @@ p({
   "lazy":false,
   "service": {
     "class":"foam.nanos.export.GoogleApiCredentials"
-  }
+  },
+  "documentation": "Service for setting authorization request parameters which are required in order to retrieve access token. To download credentials visit Google Developers Console"
 })
