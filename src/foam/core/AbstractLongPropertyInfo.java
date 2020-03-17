@@ -99,4 +99,12 @@ public abstract class AbstractLongPropertyInfo
   public foam.lib.parse.Parser csvParser() {
     return null;
   }
+  
+  public boolean isDefaultValue(Object o) {
+    return foam.util.SafetyUtil.compare(get_(o), 0) == 0;
+  }
+
+  public void format(foam.lib.formatter.FObjectFormatter formatter, foam.core.FObject obj) {
+    formatter.output(get_(obj));
+  }
 }

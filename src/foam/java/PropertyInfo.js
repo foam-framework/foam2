@@ -153,32 +153,6 @@ foam.CLASS({
             type: 'boolean',
             args: [{ name: 'o', type: 'Object' }],
             body: `return ((${this.sourceCls.name}) o).${this.propName}IsSet_;`
-          },
-          {
-            name: 'isDefaultValue',
-            visibility: 'public',
-            type: 'boolean',
-            args: [{ name: 'o', type: 'Object' }],
-            /* TODO: revise when/if expression support is added to Java */
-            body: `return foam.util.SafetyUtil.compare(get_(o), ${this.propValue}) == 0;`
-          },
-          // TODO: move to AbstractPropertyInfo class for each type to avoid
-          // generating for each PropertyInfo.
-          {
-            name: 'format',
-            visibility: 'public',
-            type: 'void',
-            args: [
-              {
-                name: 'formatter',
-                type: 'foam.lib.formatter.FObjectFormatter'
-              },
-              {
-                name: 'obj',
-                type: 'foam.core.FObject'
-              }
-            ],
-            body: 'formatter.output(get_(obj));'
           }
         ];
         
@@ -254,6 +228,30 @@ foam.CLASS({
             type: 'foam.lib.parse.Parser',
             visibility: 'public',
             body: 'return ' + ( this.csvParser ? this.csvParser : null ) + ';'
+          });
+          m.push({
+            name: 'isDefaultValue',
+            visibility: 'public',
+            type: 'boolean',
+            args: [{ name: 'o', type: 'Object' }],
+            /* TODO: revise when/if expression support is added to Java */
+            body: `return foam.util.SafetyUtil.compare(get_(o), ${this.propValue}) == 0;`
+          });
+          m.push({
+            name: 'format',
+            visibility: 'public',
+            type: 'void',
+            args: [
+              {
+                name: 'formatter',
+                type: 'foam.lib.formatter.FObjectFormatter'
+              },
+              {
+                name: 'obj',
+                type: 'foam.core.FObject'
+              }
+            ],
+            body: 'formatter.output(get_(obj));'
           });
         }
 
