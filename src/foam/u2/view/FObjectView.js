@@ -111,6 +111,18 @@ foam.CLASS({
                 return arr;
               }
 
+              switch ( sr.strategy.model_.name  ) {
+                case 'CABankAccount':
+                    sr.strategy.model_.label = 'Canada';
+                    break;
+                case 'USBankAccount':
+                    sr.strategy.model_.label = 'USA';
+                    break;
+                case 'INBankAccount':
+                    sr.strategy.model_.label = 'India';
+                    break;
+              }
+
               return arr.concat([[sr.strategy.id, sr.strategy.model_.label]]);
             }, [])
             .filter(x => x);
