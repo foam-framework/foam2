@@ -26,6 +26,18 @@ foam.CLASS({
       class: 'String',
       name: 'mimeType',
       value: 'text/csv;charset=utf-8'
+    },
+    {
+      class: 'Boolean',
+      name: 'isConvertible'
+    },
+    {
+      class: 'Boolean',
+      name: 'isDownloadable'
+    },
+    {
+      class: 'Boolean',
+      name: 'isOpenable'
     }
   ]
 });

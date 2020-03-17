@@ -24,6 +24,9 @@ foam2_MAVEN_DEPS = \
 	commons-io:commons-io:2.6 \
 	org.apache-extras.beanshell:bsh:2.0b6 \
 	com.google.api-client:google-api-client:1.22.0 \
+	com.google.oauth-client:google-oauth-client-jetty:1.22.0 \
+	com.google.apis:google-api-services-sheets:v4-rev578-1.22.0 \
+	com.google.apis:google-api-services-drive:v3-rev72-1.22.0 \
 	org.jtwig:jtwig-core:5.86.1.RELEASE \
 	org.mongodb:mongodb-driver:3.4.2 \
 	org.mongodb:mongodb-driver-core:3.4.2 \
