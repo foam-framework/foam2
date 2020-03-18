@@ -53,12 +53,20 @@ foam.CLASS({
 
       self
         .addClass(self.myClass())
-        .add(self.slot(function(section, showTitle, section$title) {
+        .add(self.slot(function(section, showTitle, section$title, section$subTitle) {
           if ( ! section ) return;
           return self.Rows.create()
             .show(section.createIsAvailableFor(self.data$))
             .callIf(showTitle && section$title, function() {
               this.start('h2').add(section$title).end();
+            })
+            .callIf(section$subTitle, function() {
+              this.start().style({
+                'color': '#8e9090',
+                'font-size': '14px',
+                'line-height': '1.5',
+                'margin-bottom': '15px'
+              }).add(section$subTitle).end();
             })
             .start(self.Grid)
               .forEach(section.properties, function(p, index) {
