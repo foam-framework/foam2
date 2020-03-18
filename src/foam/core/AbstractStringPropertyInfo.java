@@ -7,7 +7,6 @@
 package foam.core;
 
 import foam.util.SafetyUtil;
-import net.nanopay.cico.model.EFTReturnRecord;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.Signature;
