@@ -207,7 +207,7 @@ foam.CLASS({
           ApprovalRequest fulfilledRequest = (ApprovalRequest) approvedObjRemoveRequests.get(0);
           fulfilledRequest.setIsFulfilled(true);
 
-          approvalRequestDAO.put_(x, fulfilledRequest);
+          approvalRequestDAO.put_(getX(), fulfilledRequest);
 
           if ( fulfilledRequest.getStatus() == ApprovalStatus.APPROVED ) {
             return super.put_(x,obj);
