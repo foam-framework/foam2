@@ -12,22 +12,44 @@ process.on('unhandledRejection', function(e) {
 // enable FOAM java support.
 global.FOAM_FLAGS = { 'java': true, 'debug': true, 'js': false, 'swift': true };
 
+// Enable FOAMLink mode but only if FOAMLINK_DATA is set in environment
+var foamlinkMode = process.env.hasOwnProperty('FOAMLINK_DATA');
+if ( foamlinkMode ) {
+  global.FOAMLINK_DATA = process.env['FOAMLINK_DATA'];
+}
+
+// Store debug files but only if DEBUG_DATA_DIR is set in environment
+var debugDataDir = null;
+if ( process.env.hasOwnProperty('DEBUG_DATA_DIR') ) {
+  debugDataDir = process.env['DEBUG_DATA_DIR'];
+}
+
 require('../src/foam.js');
 require('../src/foam/nanos/nanos.js');
 require('../src/foam/support/support.js');
 
 var srcPath = __dirname + "/../src/";
 
-if ( ! (process.argv.length == 4 || process.argv.length == 5) ) {
-  console.log("USAGE: genjava.js input-path output-path src-path(optional)");
+if ( ! (
+  process.argv.length == 4 ||
+  process.argv.length == 5 ||
+  process.argv.length == 6 ) ) {
+  console.log("USAGE: genjava.js input-path output-path src-path(optional) files-to-update (optional)");
   process.exit(1);
 }
 
-if ( process.argv.length == 5 ) {
+if ( process.argv.length > 4 && process.argv[4] !== '--' ) {
   srcPath = process.argv[4];
   if ( ! srcPath.endsWith('/') ) {
     srcPath = srcPath + '/';
   }
+}
+
+var incrementalMeta = null;
+if ( process.argv.length > 5  &&
+     process.argv[5] !== '--' &&
+     process.argv[5] != '' ) {
+  incrementalMeta = JSON.parse(process.argv[5]);
 }
 
 var path_ = require('path');
@@ -46,6 +68,19 @@ var blacklist = {}
 externalFile.blacklist.forEach(function(cls) {
   blacklist[cls] = true;
 });
+
+var fileWhitelist = null;
+var classesNotFound = {};
+var classesFound = {};
+var debugFilesWritten = [];
+
+// Set file whitelist from parsed argument, but only if foamlink is enabled
+if ( incrementalMeta !== null && foamlinkMode ) {
+  fileWhitelist = {}; // set
+  for ( var i = 0; i < incrementalMeta.modified.length; i++ ) {
+    fileWhitelist[incrementalMeta.modified[i]] = true;
+  }
+}
 
 [
   'FObject',
@@ -121,8 +156,13 @@ function loadClass(c) {
     path = path + c[0];
     c = c[1];
   }
-  if ( ! foam.lookup(c, true) ) require(path + c.replace(/\./g, '/') + '.js');
-  return foam.lookup(c);
+  if ( ! foam.lookup(c, true) ) {
+    console.warn("Using fallback model loading; " +
+      "may cause errors for files with multiple definitions.");
+    require(path + c.replace(/\./g, '/') + '.js');
+  }
+  cls = foam.lookup(c);
+  return cls;
 }
 
 function generateClass(cls) {
@@ -131,6 +171,19 @@ function generateClass(cls) {
   }
   if ( typeof cls === 'string' )
     cls = foam.lookup(cls);
+
+  if ( fileWhitelist !== null ) {
+    let src = cls.model_.source;
+    if ( ! src ) {
+      classesNotFound[cls.id] = true;
+    } else {
+      delete classesNotFound[cls.id];
+      classesFound[cls.id] = true;
+      if ( ! fileWhitelist[src] ) {
+        return;
+      }
+    }
+  }
 
   var outfile = outdir + path_.sep +
     cls.id.replace(/\./g, path_.sep) + '.java';
@@ -197,11 +250,14 @@ function generateProxy(intf) {
     ]
   });
 
+  proxy.source = intf.model_.source;
+
   generateClass(proxy.buildClass());
 }
 
 function writeFileIfUpdated(outfile, buildJavaSource, opt_result) {
   if (! ( fs_.existsSync(outfile) && (fs_.readFileSync(outfile).toString() == buildJavaSource))) {
+    debugFilesWritten.push(outfile);
     fs_.writeFileSync(outfile, buildJavaSource);
     if ( opt_result !== undefined) opt_result.push(outfile);
   }
@@ -238,6 +294,7 @@ var addDepsToClasses = function() {
       while ( classQueue.length ) {
         var cls = classQueue.pop();
         if ( ! classMap[cls] && ! blacklist[cls] ) {
+          console.log('generating', cls);
           cls = foam.lookup(cls);
           if ( ! checkFlags(cls.model_) ) continue;
           classMap[cls.id] = true;
@@ -290,4 +347,28 @@ addDepsToClasses().then(function() {
   abstractClasses.forEach(generateAbstractClass);
   skeletons.forEach(generateSkeleton);
   proxies.forEach(generateProxy);
+}).then(function () {
+  var notFound = Object.keys(classesNotFound).length;
+  var found = Object.keys(classesFound).length;
+
+  if ( notFound > 0 ) {
+    var allKeys = {};
+    for ( k in classesNotFound ) allKeys[k] = true;
+    for ( k in classesFound ) allKeys[k] = true;
+    console.log('${found}/${Object.keys(allKeys).length} sources found (${notFound} missing)');
+    console.log(Object.keys(classesNotFound));
+    if ( debugDataDir !== null ) {
+      require('fs').writeFileSync(
+        path_.join(debugDataDir, 'classesWithNoSources.json'),
+        JSON.stringify(Object.keys(classesNotFound)));
+    }
+  }
+
+  if ( debugDataDir !== null ) {
+    if ( debugFilesWritten.length != 0 ) {
+      require('fs').writeFileSync(
+        path_.join(debugDataDir, 'filesWritten.json'),
+        JSON.stringify(debugFilesWritten));
+      }
+  }
 });

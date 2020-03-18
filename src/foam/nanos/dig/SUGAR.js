@@ -171,7 +171,7 @@ foam.CLASS({
       name: 'interfaceName',
       documentation: 'service class name',
       displayWidth: 60,
-      visibility: foam.u2.Visibility.RO
+      visibility: 'RO'
     },
     {
       class: 'Boolean',

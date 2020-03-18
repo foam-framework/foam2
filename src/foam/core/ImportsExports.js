@@ -175,18 +175,24 @@ foam.CLASS({
 
   methods: [
     function getExportMap() {
-      var m = {};
+      var m  = {};
       var bs = this.cls_.getAxiomsByClass(foam.core.Export);
       for ( var i = 0 ; i < bs.length ; i++ ) {
         var b = bs[i];
 
         if ( b.key ) {
           var path = b.key.split('.');
+          var a    = this.cls_.getAxiomByName(path[0]);
 
-          var a = this.cls_.getAxiomByName(path[0]);
-
-          foam.assert(!!a, 'Unknown axiom: "', path[0], '" in model: ',
-                      this.cls_.id, ", trying to export: '", b.key, "'");
+          foam.assert(
+            a,
+            'Unknown axiom: "',
+            path[0],
+            '" in model: ',
+            this.cls_.id,
+            ", trying to export: '",
+            b.key,
+            "'");
 
           // Axioms have an option of wrapping a value for export.
           // This could be used to bind a method to 'this', for example.
@@ -269,19 +275,19 @@ foam.CLASS({
             case 2:
               // Export 'this'
               foam.assert(
-                  a[0] === 'as',
-                  'Invalid export syntax: key [as value] | as value');
+                a[0] === 'as',
+                'Invalid export syntax: key [as value] | as value');
               return foam.core.Export.create({exportName: a[1], key: null});
 
             case 3:
               foam.assert(
-                  a[1] === 'as',
-                  'Invalid export syntax: key [as value] | as value');
+                a[1] === 'as',
+                'Invalid export syntax: key [as value] | as value');
               return foam.core.Export.create({exportName: a[2], key: a[0]});
 
             default:
               foam.assert(false,
-                  'Invalid export syntax: key [as value] | as value');
+                'Invalid export syntax: key [as value] | as value');
           }
         }
 

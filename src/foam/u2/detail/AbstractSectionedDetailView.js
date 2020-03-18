@@ -76,6 +76,7 @@ foam.CLASS({
         if ( ! of ) return [];
 
         sections = of.getAxiomsByClass(this.SectionAxiom)
+          // Why not Section.AXIOM.ORDER on next line?
           .sort((a, b) => a.order - b.order)
           .map((a) => this.Section.create().fromSectionAxiom(a, of));
 
@@ -115,10 +116,15 @@ foam.CLASS({
         }
 
         // Filter out any sections where we know that there are no actions and
-        // no visible properties.
+        // no visible properties. Note that this isn't a comprehensive check.
+        // For example, the visibility value could be a function, which means
+        // it could be hidden under certain conditions and visible otherwise.
         sections = sections.filter(s => {
           return s.actions.length > 0 ||
-                 s.properties.some(p => this.controllerMode.getMode(p) !== foam.u2.DisplayMode.HIDDEN);
+                 s.properties.some(p => {
+                   var visVal = this.controllerMode.getVisibilityValue(p);
+                   return visVal !== foam.u2.DisplayMode.HIDDEN && visVal !== 'HIDDEN';
+                 });
         });
 
         return sections;

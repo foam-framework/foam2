@@ -14,7 +14,7 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'timeStamp',
-      updateMode: 'RO',
+      updateVisibility: 'RO',
       documentation: 'Time at which password entry was created'
     },
     {

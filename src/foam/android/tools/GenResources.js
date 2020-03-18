@@ -20,7 +20,7 @@ foam.CLASS({
   name: 'GenResources',
 
   imports: [
-    'arequire',
+    'classloader',
   ],
 
   properties: [
@@ -47,7 +47,7 @@ foam.CLASS({
       }
       var promises = [];
       for (var i = 0; i < this.models.length; i++) {
-        promises.push(this.arequire(this.models[i]));
+        promises.push(this.classloader.load(this.models[i]));
       }
       return Promise.all(promises).then(function() {
         var resources = [];

@@ -27,15 +27,17 @@ foam.CLASS({
       hidden: true
     },
     {
-      class: 'EMail',
-      name: 'email',
+      class: 'String',
+      name: 'identifier',
       required: true,
+      //TODO: rename label to 'Email or Username' when integrating
+      label: 'Email',
       view: {
         class: 'foam.u2.TextField',
         focused: true
       },
-      visibilityExpression: function(disableEmail_) {
-        return disableEmail_ ?
+      visibilityExpression: function(disableIdentifier_) {
+        return disableIdentifier_ ?
           foam.u2.Visibility.DISABLED : foam.u2.Visibility.RW;
       },
       validationTextVisible: false
@@ -43,12 +45,11 @@ foam.CLASS({
     {
       class: 'Password',
       name: 'password',
-      required: true,
       view: { class: 'foam.u2.view.PasswordView', passwordIcon: true }
     },
     {
       class: 'Boolean',
-      name: 'disableEmail_',
+      name: 'disableIdentifier_',
       hidden: true
     },
     {
@@ -102,31 +103,35 @@ foam.CLASS({
     {
       name: 'login',
       label: 'Sign in',
-      isEnabled: function(errors_) {
-        return ! errors_;
-      },
+      // if you use isAvailable or isEnabled - with model error_, then note that auto validate will not
+      // work correctly. Chorme for example will not read a field auto populated without a user action
       code: async function(X) {
-        this.auth.loginByEmail(X, this.email, this.password).then(
-          (logedInUser) => {
-            if ( ! logedInUser ) return;
-            if ( this.token_ ) {
-              logedInUser.signUpToken = this.token_;
-              this.dao_.put(logedInUser)
-                .then((updatedUser) => {
-                  this.user.copyFrom(updatedUser);
-                  this.nextStep();
-                }).catch((err) => {
-                  this.notify(err.message || 'There was an issue with logging in.', 'error');
-                });
-            } else {
-              this.user.copyFrom(logedInUser);
-              this.nextStep();
+        if ( this.identifier.length > 0 ) {
+          this.auth.login(X, this.identifier, this.password).then(
+            (logedInUser) => {
+              if ( ! logedInUser ) return;
+              if ( this.token_ ) {
+                logedInUser.signUpToken = this.token_;
+                this.dao_.put(logedInUser)
+                  .then((updatedUser) => {
+                    this.user.copyFrom(updatedUser);
+                    this.nextStep();
+                  }).catch((err) => {
+                    this.notify(err.message || 'There was an issue with logging in.', 'error');
+                  });
+              } else {
+                this.user.copyFrom(logedInUser);
+                this.nextStep();
+              }
             }
-          }
-        ).catch(
-          (err) => {
-            this.notify(err.message || 'There was a problem logging in.', 'error');
-        });
+          ).catch(
+            (err) => {
+              this.notify(err.message || 'There was a problem logging in.', 'error');
+          });
+        } else {
+          // TODO: change to 'Please enter email or username' when integrating
+          this.notify('Please enter email', 'error');
+        }
       }
     }
   ]

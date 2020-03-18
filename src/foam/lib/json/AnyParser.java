@@ -14,7 +14,7 @@ public class AnyParser
 
   private static Parser instance__ = new AnyParser();
 
-  public static Parser instance() { return instance__; }
+  public static Parser instance() { return instance__ == null ? new ProxyParser() { public Parser getDelegate() { return instance__; } } : instance__; }
 
   private AnyParser() {
     setDelegate(new Alt(
@@ -27,12 +27,12 @@ public class AnyParser
         new Not(Literal.create("."))),
       DoubleParser.instance(),
       new ObjectDateParser(),
-      new StringArrayParser(),
+      StringArrayParser.instance(),
       new StringDoubleArrayParser(),
       new PropertyReferenceParser(),
-      new ClassReferenceParser(),
-      new ArrayParser(),
+      ClassReferenceParser.instance(),
+      ArrayParser.instance(),
       FObjectParser.instance(),
-      new MapParser()));
+      MapParser.instance()));
   }
 }

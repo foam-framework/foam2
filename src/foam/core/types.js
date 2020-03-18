@@ -160,7 +160,9 @@ foam.CLASS({
   label: 'Round byte numbers',
 
   properties: [
-    [ 'type', 'Byte' ]
+    [ 'type', 'Byte' ],
+    [ 'min', -128 ],
+    [ 'max', 127 ]
   ]
 });
 
@@ -174,7 +176,9 @@ foam.CLASS({
   label: 'Round short numbers',
 
   properties: [
-    [ 'type', 'Short' ]
+    [ 'type', 'Short' ],
+    [ 'min', -32768 ],
+    [ 'max', 32767 ]
   ]
 });
 
@@ -412,7 +416,6 @@ foam.CLASS({
 
       Object.defineProperty(proto, name, desc);
 
-
       Object.defineProperty(proto, name + '$cls', {
         get: function classGetter() {
           console.warn("Deprecated use of 'cls.$cls'. Just use 'cls' instead.");
@@ -433,8 +436,9 @@ foam.CLASS({
   // FUTURE: verify
   label: 'Email address',
   properties: [
+    [ 'displayWidth', 50 ],
     [
-      'adapt',
+      'preSet',
       function(_, v) {
         return v.toLowerCase().trim();
       }
@@ -484,7 +488,8 @@ foam.CLASS({
   package: 'foam.core',
   name: 'PhoneNumber',
   extends: 'String',
-  label: 'Phone number'
+  label: 'Phone number',
+  properties: [ [ 'displayWidth', 20 ] ]
 });
 
 
@@ -706,6 +711,11 @@ foam.CLASS({
 
   properties: [
     { class: 'String',  name: 'name' },
+    {
+      class: 'String',
+      name: 'label',
+      expression: function(name) { return foam.String.labelize(name); }
+    },
     { class: 'Boolean', name: 'abstract' }
   ]
 });
@@ -747,6 +757,12 @@ foam.CLASS({
       ]
     </pre>
     */
+    { class: 'String',  name: 'name', required: true },
+    {
+      class: 'String',
+      name: 'label',
+      expression: function(name) { return foam.String.labelize(name); }
+    },
     { class: 'String', name: 'shortName' }
   ]
 });

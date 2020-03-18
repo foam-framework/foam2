@@ -35,11 +35,11 @@ foam.CLASS({
   sections: [
     {
       name: 'infoSection',
-      title: ''
+      title: 'Comment'
     },
     {
       name: 'metaSection',
-      title: ''
+      title: 'Audit'
     }
   ],
 

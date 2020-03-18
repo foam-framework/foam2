@@ -180,7 +180,6 @@ FOAM_FILES([
   { name: "foam/u2/AttrSlot" },
   { name: "foam/u2/ViewSpec" },
   { name: "foam/u2/Tooltip", flags: ['web'] },
-  { name: "foam/u2/Visibility"},
   { name: "foam/u2/RowFormatter" },
   { name: "foam/u2/WeakMap", flags: ['web'] },
   { name: "foam/u2/Element", flags: ['js'] },
@@ -268,7 +267,9 @@ FOAM_FILES([
   { name: "foam/nanos/auth/ServiceProviderAware" },
   { name: "foam/nanos/auth/ServiceProviderAwareSink" },
   { name: "foam/nanos/auth/test/ServiceProviderAwareTest" },
+  { name: "foam/nanos/auth/test/ServiceProviderAuthorizerTest" },
   { name: "foam/nanos/logger/Logger" },
+  { name: "foam/nanos/logger/DAOLogger" },
   { name: "foam/nanos/logger/LoggingDAO" },
   { name: "foam/nanos/notification/Notifiable" },
   { name: "foam/nanos/notification/EmailSetting" },
@@ -533,6 +534,8 @@ FOAM_FILES([
   { name: "foam/u2/stack/Stack", flags: ['web'] },
   { name: "foam/u2/stack/StackView", flags: ['web'] },
   { name: "foam/apploader/ModelRefines" },
+  { name: "foam/foamlink/FoamlinkNodeModelFileDAO" },
+  { name: "foam/foamlink/FoamlinkNodeModelFileFetcher" },
   { name: "foam/apploader/ClassLoader" },
   { name: "foam/apploader/SubClassLoader" },
   { name: "foam/classloader/OrDAO", flags: ['debug'] },
@@ -644,8 +647,6 @@ FOAM_FILES([
   { name: "foam/test/TestEnum" },
   { name: "foam/test/TestObj" },
   { name: "foam/core/FObjectTest" },
-  { name: "com/google/foam/demos/bubbles/Bubbles" },
-  { name: "com/google/foam/demos/u2/AllViews" },
 
   { name: "foam/flow/Document" },
   { name: "foam/flow/MarkupEditor" },
@@ -707,9 +708,12 @@ FOAM_FILES([
   { name: "foam/u2/layout/GridColumns" },
 
   { name: "foam/comics/v2/CannedQuery" },
+  { name: "foam/comics/v2/CannedQuery" },
+  { name: "foam/comics/v2/EnabledActionsAuth" },
+  { name: "foam/comics/v2/BasicEnabledActionsAuth" },
+  { name: "foam/comics/v2/CRUDEnabledActionsAuth" },
   { name: "foam/comics/v2/DAOBrowseControllerView" },
   { name: "foam/comics/v2/DAOBrowserView" },
-  { name: "foam/comics/v2/CRUDActionsAuth" },
   { name: "foam/comics/v2/DAOControllerConfig" },
   { name: "foam/comics/v2/DAOCreateView" },
   { name: "foam/comics/v2/DAOSummaryView" },
@@ -747,4 +751,10 @@ FOAM_FILES([
 
   { name: "foam/util/concurrent/AbstractAssembly"},
   { name: "foam/util/concurrent/Assembly"},
+
+  // Foamlink
+  { name: "foam/foamlink/FoamlinkData" },
+  { name: "foam/foamlink/FoamlinkExec" },
+  { name: "foam/foamlink/lib" },
+  { name: "foam/util/filesystem/FileWalker" },
 ]);

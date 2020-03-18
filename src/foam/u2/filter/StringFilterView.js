@@ -100,6 +100,7 @@ foam.CLASS({
   messages: [
     { name: 'LABEL_PLACEHOLDER', message: 'Search' },
     { name: 'LABEL_LOADING', message: '- LOADING OPTIONS -' },
+    { name: 'LABEL_NO_OPTIONS', message: '- NO OPTIONS AVAILABLE -' },
     { name: 'LABEL_SELECTED', message: 'SELECTED OPTIONS' },
     { name: 'LABEL_FILTERED', message: 'OPTIONS' },
     { name: 'LABEL_EMPTY', message: '- Not Defined -' }
@@ -152,7 +153,6 @@ foam.CLASS({
           });
         });
 
-        this.isLoading = false;
         return options;
       }
     },
@@ -184,13 +184,8 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.dao.limit(100).select(this.GroupBy.create({
-        arg1: this.property,
-        arg2: this.Count.create()
-      })).then((results) => {
-        this.daoContents = results.groupKeys;
-      });
-
+      this.onDetach(this.dao$.sub(this.daoUpdate));
+      this.daoUpdate();
       var self = this;
       this
         .addClass(this.myClass())
@@ -234,6 +229,12 @@ foam.CLASS({
                   .add(self.LABEL_LOADING)
                 .end();
             }
+            if ( filteredOptions.length === 0 ) {
+              return element
+                .start('p').addClass(self.myClass('label-loading'))
+                  .add(self.LABEL_NO_OPTIONS)
+                .end();
+            }
             return element
               .start('p').addClass(self.myClass('label-section'))
                 .add(self.LABEL_FILTERED)
@@ -266,6 +267,18 @@ foam.CLASS({
   ],
 
   listeners: [
+    {
+      name: 'daoUpdate',
+      code: function() {
+        this.dao.limit(100).select(this.GroupBy.create({
+          arg1: this.property,
+          arg2: this.Count.create()
+        })).then((results) => {
+          this.daoContents = results.groupKeys;
+          this.isLoading = false;
+        });
+      }
+    },
     {
       name: 'selectOption',
       code: function(index) {

@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 foam.CLASS({
+  package: 'com.google.foam.demos.u2',
   name: 'VisibilityTest',
 
   properties: [
@@ -22,31 +23,31 @@ foam.CLASS({
       class: 'String',
       name: 'readWrite',
       value: 'testing...',
-      visibility: foam.u2.Visibility.RW
+      visibility: 'RW'
     },
     {
       class: 'String',
       name: 'final',
       value: 'testing...',
-      visibility: foam.u2.Visibility.FINAL
+      updateVisibility: 'RO'
     },
     {
       class: 'String',
       name: 'disabled',
       value: 'testing...',
-      visibility: foam.u2.Visibility.DISABLED
+      visibility: 'DISABLED'
     },
     {
       class: 'String',
       name: 'readOnly',
       value: 'testing...',
-      visibility: foam.u2.Visibility.RO
+      visibility: 'RO'
     },
     {
       class: 'String',
       name: 'hidden',
       value: 'testing...',
-      visibility: foam.u2.Visibility.HIDDEN
+      visibility: 'HIDDEN'
     },
     {
       class: 'Boolean',
@@ -56,91 +57,342 @@ foam.CLASS({
     {
       class: 'String',
       name: 'disabledExpression',
-      visibilityExpression: function(flag) {
-        return foam.u2.Visibility[flag ? 'RW' : 'DISABLED'];
+      visibility: function(flag) {
+        return foam.u2.DisplayMode[flag ? 'RW' : 'DISABLED'];
       }
     },
     {
       class: 'Boolean',
       name: 'disabledBooleanExpression',
-      visibilityExpression: function(flag) {
-        return foam.u2.Visibility[flag ? 'RW' : 'DISABLED'];
+      visibility: function(flag) {
+        return foam.u2.DisplayMode[flag ? 'RW' : 'DISABLED'];
       }
     },
     {
       class: 'Date',
       name: 'disabledDateExpression',
-      visibilityExpression: function(flag) {
-        return foam.u2.Visibility[flag ? 'RW' : 'DISABLED'];
+      visibility: function(flag) {
+        return foam.u2.DisplayMode[flag ? 'RW' : 'DISABLED'];
       }
     },
     {
       class: 'String',
       name: 'readOnlyExpression',
-      visibilityExpression: function(flag) {
-        return foam.u2.Visibility[flag ? 'RW' : 'RO'];
+      visibility: function(flag) {
+        return foam.u2.DisplayMode[flag ? 'RW' : 'RO'];
       }
     },
     {
       class: 'Boolean',
       name: 'readOnlyBooleanExpression',
-      visibilityExpression: function(flag) {
-        return foam.u2.Visibility[flag ? 'RW' : 'RO'];
+      visibility: function(flag) {
+        return foam.u2.DisplayMode[flag ? 'RW' : 'RO'];
       }
     },
     {
       class: 'Date',
       name: 'readOnlyDateExpression',
-      visibilityExpression: function(flag) {
-        return foam.u2.Visibility[flag ? 'RW' : 'RO'];
+      visibility: function(flag) {
+        return foam.u2.DisplayMode[flag ? 'RW' : 'RO'];
       }
     },
     {
       class: 'String',
       name: 'hiddenExpression',
-      visibilityExpression: function(flag) {
-        return foam.u2.Visibility[flag ? 'RW' : 'HIDDEN'];
+      visibility: function(flag) {
+        return foam.u2.DisplayMode[flag ? 'RW' : 'HIDDEN'];
       }
+    },
+    {
+      class: 'String',
+      name: 'gridColumnsDemoOne',
+      gridColumns: 6
+    },
+    {
+      class: 'String',
+      name: 'gridColumnsDemoTwo',
+      gridColumns: 6
+    },
+    {
+      class: 'String',
+      name: 'readPermissionRequiredDemoProperty',
+      readPermissionRequired: true,
+      value: 'testing...'
+    },
+    {
+      class: 'String',
+      name: 'writePermissionRequiredDemoProperty',
+      writePermissionRequired: true,
+      value: 'testing...',
+      createVisibility: function(flag) {
+        return foam.u2.DisplayMode[flag ? 'RW' : 'HIDDEN'];
+      }
+    },
+    {
+      class: 'String',
+      name: 'readAndWritePermissionRequiredDemoProperty',
+      readPermissionRequired: true,
+      writePermissionRequired: true,
+      value: 'testing...'
     }
   ]
 });
 
-var ctx = foam.__context__;
 
-document.write('Default');
+foam.CLASS({
+  package: 'com.google.foam.demos.u2',
+  name: 'VisibilityDemo',
+  extends: 'foam.u2.Element',
 
-foam.u2.DetailView.create(
-  {
-    data: VisibilityTest.create()
-  }
-).write();
+  requires: [
+    'com.google.foam.demos.u2.VisibilityTest',
+    'foam.u2.ControllerMode',
+    'foam.u2.detail.SectionedDetailView',
+    'foam.u2.layout.DisplayWidth',
+    'foam.u2.layout.Grid',
+    'foam.u2.layout.GUnit'
+  ],
 
+  exports: [
+    'displayWidth',
+    'mockAuthService as auth'
+  ],
 
-document.write('<br>Create');
+  css: `
+    body {
+      font-family: 'IBM Plex Sans', Helvetica, sans-serif;
+      line-height: 1.5;
+    }
 
-foam.u2.DetailView.create(
-  {
-    data: VisibilityTest.create(),
-    controllerMode: foam.u2.ControllerMode.CREATE
-  }
-).write();
+    kbd {
+      background: #eee;
+      border-radius: 3px;
+      padding: 0 4px;
+    }
+  `,
 
+  messages: [
+    {
+      name: 'CODE_EXAMPLE_1',
+      message: `
+        {
+          class: 'String',
+          name: 'foo',
+          visibility: 'RW'
+        },
+        {
+          class: 'String',
+          name: 'bar',
+          visibility: foam.u2.DisplayMode.RW
+        }
+      `,
+    },
+    {
+      name: 'CODE_EXAMPLE_2',
+      message: `
+        {
+          class: 'Boolean',
+          name: 'bar'
+        },
+        {
+          class: 'String',
+          name: 'foo',
+          visibility: function(bar) {
+            const DisplayMode = foam.u2.DisplayMode;
+            return bar ? DisplayMode.RW : DisplayMode.HIDDEN;
+          }
+        }
+      `,
+    },
+    {
+      name: 'CODE_EXAMPLE_3',
+      message: `
+        {
+          class: 'String',
+          name: 'foo',
+          visibility: foam.core.ConstantSlot.create({ value: foam.u2.DisplayMode.RW })
+        }
+      `,
+    }
+  ],
 
-document.write('<br>View');
+  properties: [
+    {
+      class: 'Enum',
+      of: 'foam.u2.layout.DisplayWidth',
+      name: 'displayWidth',
+      factory: function() {
+        return this.DisplayWidth.VALUES
+          .sort((a, b) => b.minWidth - a.minWidth)
+          .find(o => o.minWidth <= window.innerWidth);
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'userHasReadPermission',
+      label: 'User Has Read Permission?',
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'userHasReadWritePermission',
+      label: 'User Has Read/Write Permission?',
+      value: true
+    },
+    {
+      name: 'mockAuthService',
+      factory: function() {
+        return {
+          check: async (_, permission) => {
+            if ( permission.includes('.ro.') ) {
+              return this.userHasReadPermission;
+            }
+            return this.userHasReadWritePermission;
+          }
+        }
+      }
+    }
+  ],
 
-foam.u2.DetailView.create(
-  {
-    data: VisibilityTest.create(),
-    controllerMode: foam.u2.ControllerMode.VIEW
-  }
-).write();
+  methods: [
+    function initE() {
+      this.SUPER();
+      this
+        .start('h1').add('Property Visibility Demo').end()
+        .start('p')
+          .add('Every property has a view, which can be specified by setting the ')
+          .start('kbd').add('view').end()
+          .add(' property property. If not set explicitly, a suitable default view will be used based on the type of the property.')
+        .end()
+        .start('p')
+          .add('There are several property properties that can be used to control the visibility of the view of a property:')
+        .end()
+        .start('ul')
+          .start('li')
+            .start('kbd').add('readPermissionRequired').end()
+            .add(': True if a permission is required to read this property.')
+            .add(' Defaults to ')
+            .start('kbd').add('false').end()
+            .add('.')
+          .end()
+          .start('li')
+            .start('kbd').add('writePermissionRequired').end()
+            .add(': True if a permission is required to write this property.')
+            .add(' Defaults to ')
+            .start('kbd').add('false').end()
+            .add('.')
+          .end()
+          .start('li')
+            .start('kbd').add('gridColumns').end()
+            .add(`: Set to a number from 1 to 12, inclusive. Determines the width of the property's view based on a grid system. Properties take up the full width of the grid by default.`)
+          .end()
+          .start('li')
+            .start('kbd').add('createVisibility').end()
+            .add(': Controls the visibility of the view when ')
+            .start('kbd').add('controllerMode').end()
+            .add(' is ')
+            .start('kbd').add('CREATE').end()
+            .add('. Defaults to ')
+            .start('kbd').add('RW').end()
+            .add('.')
+          .end()
+          .start('li')
+            .start('kbd').add('readVisibility').end()
+            .add(': Controls the visibility of the view when ')
+            .start('kbd').add('controllerMode').end()
+            .add(' is ')
+            .start('kbd').add('VIEW').end()
+            .add('. Defaults to ')
+            .start('kbd').add('RO').end()
+            .add('.')
+          .end()
+          .start('li')
+            .start('kbd').add('updateVisibility').end()
+            .add(': Controls the visibility of the view when ')
+            .start('kbd').add('controllerMode').end()
+            .add(' is ')
+            .start('kbd').add('EDIT').end()
+            .add('. Defaults to ')
+            .start('kbd').add('RW').end()
+            .add('.')
+          .end()
+          .start('li')
+            .start('kbd').add('visibility').end()
+            .add(': Overrides all three of the properties listed above. Defaults to ')
+            .start('kbd').add('null').end()
+            .add('.')
+          .end()
+        .end()
+        .start('p')
+          .add(`If either of the permission-related properties are set to true, the set of allowed visibilities is constrained if the user doesn't have the corresponding permission. For example, if the property has `)
+          .start('kbd').add('writePermissionRequired: true').end()
+          .add(', then the visibility is never allowed to be ')
+          .start('kbd').add('RW').end()
+          .add(` since the user shouldn't be allowed to think they can edit the property.`)
+        .end()
+        .start('p')
+          .add('The last four properties in the list above can be set to any of the following values:')
+          .start('ol')
+            .start('li')
+              .add('A ')
+              .start('kbd').add('foam.u2.DisplayMode').end()
+              .add('. Examples:')
+              .start('pre').add(this.CODE_EXAMPLE_1).end()
+            .end()
+            .start('li')
+              .add('An expression function that returns a ')
+              .start('kbd').add('foam.u2.DisplayMode').end()
+              .add('. Example:')
+              .start('pre').add(this.CODE_EXAMPLE_2).end()
+            .end()
+            .start('li')
+              .add('A slot of ')
+              .start('kbd').add('foam.u2.DisplayMode').end()
+              .add('. Example:')
+              .start('pre').add(this.CODE_EXAMPLE_3).end()
+              .add(`It's not likely that you'll need to use this option under normal conditions. It might be useful if you're modifying the `)
+              .start('kbd').add('visibility').end()
+              .add(' of properties programmatically, such as in some lower-level framework code though, for example.')
+            .end()
+          .end()
+        .end()
+        .start('p')
+          .add('Below we show three detail views, one for each of the possible values of ')
+          .start('kbd').add('controllerMode').end()
+          .add('.')
+        .end()
 
+        .add(this.slot(function(userHasReadPermission, userHasReadWritePermission) {
+          return this.E()
+            .start(this.Grid)
+              .start(this.GUnit, { columns: 4 })
+                .startContext({ controllerMode: this.ControllerMode.CREATE })
+                  .start('h2').add('Create').end()
+                  .tag(this.SectionedDetailView, { data: this.VisibilityTest.create() })
+                .endContext()
+              .end()
+              .start(this.GUnit, { columns: 4 })
+                .startContext({ controllerMode: this.ControllerMode.VIEW })
+                  .start('h2').add('View').end()
+                  .tag(this.SectionedDetailView, { data: this.VisibilityTest.create() })
+                .endContext()
+              .end()
+              .start(this.GUnit, { columns: 4 })
+                .startContext({ controllerMode: this.ControllerMode.EDIT })
+                  .start('h2').add('Edit').end()
+                  .tag(this.SectionedDetailView, { data: this.VisibilityTest.create() })
+                .endContext()
+              .end()
+            .end()
+        }))
 
-document.write('<br>Edit');
-
-foam.u2.DetailView.create(
-  {
-    data: VisibilityTest.create(),
-    controllerMode: foam.u2.ControllerMode.EDIT
-  }
-).write();
+        .start('h2')
+          .add('Control Permissions')
+        .end()
+        .startContext({ data: this })
+          .start().add(this.USER_HAS_READ_PERMISSION).end()
+          .start().add(this.USER_HAS_READ_WRITE_PERMISSION).end()
+        .end();
+    }
+  ]
+});

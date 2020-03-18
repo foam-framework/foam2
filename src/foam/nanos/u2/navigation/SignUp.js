@@ -128,8 +128,8 @@ foam.CLASS({
         class: 'foam.u2.TextField',
         placeholder: 'ABC Company'
       },
-      visibilityExpression: function(disableCompanyName_) {
-        return disableCompanyName_ ? foam.u2.Visibility.DISABLED : foam.u2.Visibility.RW;
+      visibility: function(disableCompanyName_) {
+        return disableCompanyName_ ? foam.u2.DisplayMode.DISABLED : foam.u2.DisplayMode.RW;
       },
       required: true
     },
@@ -157,15 +157,40 @@ foam.CLASS({
       required: true,
     },
     {
+      class: 'String',
+      name: 'userName',
+      label: 'Username',
+      view: {
+        class: 'foam.u2.TextField',
+        placeholder: 'example123'
+      },
+      //TODO: uncomment when integrating
+      // validationPredicates: [
+      //   {
+      //     args: ['userName'],
+      //     predicateFactory: function(e) {
+      //       return e.REG_EXP(
+      //         foam.nanos.u2.navigation.SignUp.USER_NAME,
+      //         /^[^\s\/]+$/);
+      //     },
+      //     errorString: 'Please enter username'
+      //   }
+      // ],
+      //TODO: set to true when integrating
+      required: false,
+      //TODO: set to false when integrating
+      hidden: true
+    },
+    {
       class: 'EMail',
       name: 'email',
       view: {
         class: 'foam.u2.TextField',
         placeholder: 'example@example.com'
       },
-      visibilityExpression: function(disableEmail_) {
+      visibility: function(disableEmail_) {
         return disableEmail_ ?
-          foam.u2.Visibility.DISABLED : foam.u2.Visibility.RW;
+          foam.u2.DisplayMode.DISABLED : foam.u2.DisplayMode.RW;
       },
       required: true
     },
@@ -232,6 +257,7 @@ foam.CLASS({
             firstName: this.firstName,
             lastName: this.lastName,
             organization: this.organization,
+            userName: this.userName,
             email: this.email,
             desiredPassword: this.desiredPassword,
             signUpToken: this.token_,
