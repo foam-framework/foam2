@@ -422,7 +422,7 @@ foam.CLASS({
 
         // TODO: Remove this once advanced filter is in charge of changing the
         //       flag. This was only meant for testing purposes
-        this.filterController.isAdvanced = !this.filterController.isAdvanced;
+        // this.filterController.isAdvanced = !this.filterController.isAdvanced;
 
         this.openAdvanced();
       }
@@ -430,8 +430,12 @@ foam.CLASS({
     {
       name: 'openAdvanced',
       code: function() {
-        console.log('Create modal for advanced filter');
-        // this.add(this.Popup.create().tag({ class: 'net.nanopay.retail.ui.devices.ManageDeviceModal' }));
+        console.log('TODO: Create modal for advanced filter');
+        this.add(this.Popup.create().tag({
+          class: 'foam.u2.filter.advanced.AdvancedFilterView',
+          filterController$: this.filterController$,
+          dao$: this.dao$
+        }));
       }
     }
   ]
