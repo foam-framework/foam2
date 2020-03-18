@@ -46,7 +46,7 @@ p({
       .setOf(foam.nanos.crunch.Capability.getOwnClassInfo())
       .build();
   """,
-  "client":"{\"of\":\"net.nanopay.liquidity.crunch.LiquidCapability\"}"
+  "client":"{\"of\":\"foam.nanos.crunch.Capability\"}"
 })
 
 p({
