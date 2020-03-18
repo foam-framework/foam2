@@ -85,4 +85,43 @@ public abstract class AbstractDatePropertyInfo
     long val = date.getTime();
     sig.update((ByteBuffer) bb.get().putLong(val).flip());
   }
+
+  protected abstract java.util.Date get_(Object o);
+  protected abstract java.util.Date cast(Object key);
+    
+//  public foam.lib.parse.Parser jsonParser() {
+//    return foam.lib.json.DateParser.instance() == null ? foam.lib.json.DateParser.instance(): null;
+//  }
+  
+  public int compare(Object o1, Object o2) {
+    return foam.util.SafetyUtil.compare(get_(o1), get_(o2));
+  }
+
+  public int comparePropertyToObject(Object key, Object o) {
+    return foam.util.SafetyUtil.compare(cast(key), get_(o));
+  }
+
+  public int comparePropertyToValue(Object key, Object value) {
+    return foam.util.SafetyUtil.compare(cast(key), cast(value));
+  }
+
+  public foam.lib.parse.Parser queryParser() {
+    return foam.lib.query.DuringExpressionParser.instance() == null ? foam.lib.query.DuringExpressionParser.instance(): null;
+  }
+
+  public foam.lib.parse.Parser csvParser() {
+    return foam.lib.json.DateParser.instance() == null ? foam.lib.json.DateParser.instance() : null;
+  }
+
+  public Class getValueClass() {
+    return java.util.Date.class;
+  }
+  
+  public boolean isDefaultValue(Object o) {
+    return foam.util.SafetyUtil.compare(get_(o), null) == 0;
+  }
+
+  public void format(foam.lib.formatter.FObjectFormatter formatter, foam.core.FObject obj) {
+    formatter.output(get_(obj));
+  }
 }
