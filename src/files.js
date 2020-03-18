@@ -748,6 +748,7 @@ FOAM_FILES([
 
   { name: "foam/core/Unit" },
   { name: "foam/core/Currency" },
+  { name: 'foam/core/ValidationPropertyExport' },
 
   { name: "foam/util/concurrent/AbstractAssembly"},
   { name: "foam/util/concurrent/Assembly"},
