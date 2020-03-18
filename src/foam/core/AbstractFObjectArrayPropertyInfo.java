@@ -101,4 +101,31 @@ public abstract class AbstractFObjectArrayPropertyInfo
       }
     }
   }
+  
+  public String getSQLType() {
+    return "";
+  }
+  
+  public Object get(Object o) {
+    return get_(o);
+  }
+  
+  public int comparePropertyToObject(Object key, Object o) {
+    return foam.util.SafetyUtil.compare(cast(key), get_(o));
+  }
+
+  protected abstract Object cast(Object key);
+  protected abstract Object[] get_(Object o);
+
+  public int comparePropertyToValue(Object key, Object value) {
+    return foam.util.SafetyUtil.compare(cast(key), cast(value));
+  }
+
+  public boolean isDefaultValue(Object o) {
+    return java.util.Arrays.equals(get_(o), null);
+  }
+
+  public void format(foam.lib.formatter.FObjectFormatter formatter, foam.core.FObject obj) {
+    formatter.output(get_(obj));
+  }
 }

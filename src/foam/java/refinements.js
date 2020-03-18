@@ -1427,26 +1427,11 @@ foam.CLASS({
 
   properties: [
     ['javaInfoType',    'foam.core.AbstractStringPropertyInfo'],
-    ['javaJSONParser',  'foam.lib.json.StringParser.instance()'],
-    ['javaQueryParser', 'foam.lib.query.StringParser.instance()'],
-    ['javaCSVParser',   'foam.lib.csv.CSVStringParser.instance()'],
     {
       name: 'sqlType',
       expression: function(width) {
         return 'VARCHAR(' + width + ')';
       }
-    }
-  ],
-
-  methods: [
-    function createJavaPropertyInfo_(cls) {
-      var info = this.SUPER(cls);
-      // cast numbers to strings
-      var cast = info.getMethod('cast');
-      cast.body = `return ( o instanceof Number ) ?
-        ((Number) o).toString() : (String) o;`;
-
-      return info;
     }
   ]
 });
@@ -1694,9 +1679,6 @@ foam.CLASS({
         body: 'return "' + (this.of ? this.of.id ? this.of.id : this.of : null) + '";'
       });
 
-      var isDefaultValue = info.getMethod('isDefaultValue');
-      isDefaultValue.body = 'return java.util.Arrays.equals(get_(o), null);';
-
       return info;
     }
   ],
@@ -1785,10 +1767,7 @@ foam.CLASS({
   refines: 'foam.core.Object',
   flags: ['java'],
   properties: [
-    ['javaInfoType',    'foam.core.AbstractObjectPropertyInfo'],
-    ['javaJSONParser',  'foam.lib.json.AnyParser.instance()'],
-    ['javaQueryParser', 'foam.lib.query.AnyParser.instance()'],
-    ['javaCSVParser',   'foam.lib.csv.CSVStringParser.instance()']
+    ['javaInfoType',    'foam.core.AbstractObjectPropertyInfo']
   ]
 });
 
