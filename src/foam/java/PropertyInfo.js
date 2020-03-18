@@ -176,7 +176,7 @@ foam.CLASS({
           });
         }
         
-        if ( this.propType  == 'java.util.Date' || this.propType == 'String' || this.propType == 'Object' || ! ( primitiveType.includes(this.propType) ) ){
+        if ( this.propType  == 'java.util.Date' || this.propType == 'String' || this.propType == 'Object' || ! ( primitiveType.includes(this.propType) ) ) {
           m.push({
             name: 'get',
             visibility: 'public',
