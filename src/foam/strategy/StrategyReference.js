@@ -66,6 +66,11 @@ foam.CLASS({
         'Outputter' and target = 'Transaction', then the special outputter would
         be included in the results.
       `
+    },
+    {
+      class: 'String',
+      name: 'label',
+      documentation: 'allow we set the StrategyReference display'
     }
   ]
 });

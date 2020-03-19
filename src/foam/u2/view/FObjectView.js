@@ -78,10 +78,6 @@ foam.CLASS({
         model in the 'of' property. The user can choose to create an instance
         of one of the models in this list.
       `
-    },
-    {
-      class: 'Array',
-      name: 'presetLabel'
     }
   ],
 
@@ -115,11 +111,7 @@ foam.CLASS({
                 return arr;
               }
 
-              if ( this.presetLabel !== [] ) {
-                return arr.concat([[sr.strategy.id, this.presetLabel[arr.length]]])
-              }
-
-              return arr.concat([[sr.strategy.id, sr.strategy.model_.label]]);
+              return arr.concat([[sr.strategy.id, sr.label || sr.strategy.model_.label]]);
             }, [])
             .filter(x => x);
 
