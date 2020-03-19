@@ -101,7 +101,6 @@ foam.INTERFACE({
 
       this.csvDriver.exportDAO(this.__context__, this.dao)
       .then(function(result) {
-        console.log(result);
         let encodedUri = encodeURIComponent(result);
         let uri = 'data:text/csv;charset=utf-8,' + encodedUri;
         var link = document.createElement('a');
