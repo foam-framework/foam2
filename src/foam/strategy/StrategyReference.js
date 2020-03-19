@@ -70,7 +70,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'label',
-      documentation: 'allow we set the StrategyReference display'
+      documentation: 'Override the default model label for Strategizer Choice selections.'
     }
   ]
 });
