@@ -157,8 +157,12 @@ foam.CLASS({
         ];
         var primitiveType = ['boolean', 'long', 'byte', 'double','float','short','int'];
         
+<<<<<<< HEAD
         if ( this.propType == 'java.util.Date' || 
              ! ( primitiveType.includes(this.propType) || this.propType == 'Object' || this.propType == 'String') ){
+=======
+        if ( this.propType  == 'java.util.Date' || ! ( primitiveType.includes(this.propType) || this.propType == 'Object' || this.propType == 'String') ) {
+>>>>>>> branch 'lessCode' of git@github.com:foam-framework/foam2.git
           m.push({
             name: 'cast',
             type: this.propType,
@@ -179,10 +183,14 @@ foam.CLASS({
           });
         }
         
+<<<<<<< HEAD
         if ( this.propType == 'java.util.Date' || 
              this.propType == 'String' || 
              this.propType == 'Object' || 
              ! ( primitiveType.includes(this.propType) ) ){
+=======
+        if ( this.propType  == 'java.util.Date' || this.propType == 'String' || this.propType == 'Object' || ! ( primitiveType.includes(this.propType) ) ) {
+>>>>>>> branch 'lessCode' of git@github.com:foam-framework/foam2.git
           m.push({
             name: 'get',
             visibility: 'public',
