@@ -57,9 +57,11 @@ foam.CLASS({
       of: 'com.google.foam.demos.u2.SampleData',
       name: 'reference',
       view: function(_, X) {
-        return foam.u2.view.DualView.create({
-          viewa: X.data.ReferenceView.create({dao: X.data.sampleDataDAO, of: X.data.SampleData}),
-          viewb: foam.u2.TextField.create()
+        return foam.u2.MultiView.create({
+          views: [
+            X.data.ReferenceView.create({dao: X.data.sampleDataDAO, of: X.data.SampleData}),
+            foam.u2.TextField.create()
+          ]
         });
       }
     },
@@ -76,16 +78,11 @@ foam.CLASS({
     },
     {
       class: 'Int',
-      name: 'int2',
-      view: 'foam.u2.view.IntView'
-    },
-    {
-      class: 'Int',
       name: 'intWithMinAndMax',
       min: 1,
       max: 5,
       value: 3,
-      units: ' rating (1-5)'
+      units: 'rating (1-5)'
     },
     {
       class: 'Int',
@@ -253,7 +250,8 @@ foam.CLASS({
     {
       class: 'Float',
       name: 'floatWithPrecision',
-      precision: 2
+      precision: 2,
+      value: 3.1415926
     },
     {
       class: 'Double',
@@ -266,8 +264,14 @@ foam.CLASS({
     {
       class: 'StringArray',
       name: 'stringArrayRowView',
-      view: 'foam.u2.view.StringArrayRowView',
+      view: { class: 'foam.u2.MultiView', views: [ 'foam.u2.view.StringArrayRowView', 'foam.u2.view.StringArrayRowView' ] },
+      xxview: 'foam.u2.view.StringArrayRowView',
       factory: function() { return ['row1', 'row2', 'row3']; }
+    },
+    {
+      class: 'FObjectArray',
+      name: 'fobjectArray',
+      of: 'com.google.foam.demos.u2.SampleData'
     },
     {
       class: 'EMail',

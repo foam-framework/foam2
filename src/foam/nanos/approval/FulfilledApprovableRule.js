@@ -21,7 +21,6 @@
     'foam.nanos.approval.Approvable',
     'foam.nanos.approval.ApprovalRequest',
     'foam.nanos.approval.ApprovalStatus',
-    'foam.nanos.approval.RoleApprovalRequest',
     'foam.nanos.ruler.Operations',
     'java.util.Map'
   ],

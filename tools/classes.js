@@ -351,6 +351,7 @@ var classes = [
   'foam.nanos.notification.notifications.ScriptRunNotification',
   'foam.nanos.notification.EmailSetting',
   'foam.nanos.notification.NotificationSetting',
+  'foam.nanos.notification.NotificationHostnameRuleAction',
   'foam.nanos.script.Script',
   'foam.nanos.script.TestRunnerConfig',
   'foam.nanos.script.TestRunnerScript',
@@ -374,7 +375,11 @@ var classes = [
   'foam.u2.ElementState',
   'foam.u2.DefaultValidator',
   'foam.u2.DisplayMode',
+  'foam.nanos.export.ClientGoogleSheetsExportService',
   'foam.nanos.export.ExportDriverRegistry',
+  'foam.nanos.export.GoogleApiCredentials',
+  'foam.nanos.export.GoogleSheetsExport',
+  'foam.nanos.export.GoogleSheetsPropertyMetadata',
   'foam.dao.jdbc.ConnectionPool',
   'foam.lib.Outputter',
   'foam.lib.PropertyPredicate',
@@ -592,8 +597,7 @@ var classes = [
   'foam.nanos.approval.ApprovableApprovalRequestsPredicate',
   'foam.nanos.approval.ApprovableApprovalRequestsRule',
   'foam.nanos.approval.FulfilledApprovablePredicate',
-  'foam.nanos.approval.FulfilledApprovableRule',
-  'foam.nanos.approval.RoleApprovalRequest',
+  'foam.nanos.approval.FulfilledApprovableRule'
 ];
 
 var abstractClasses = [
@@ -619,7 +623,8 @@ var skeletons = [
   'foam.strategy.StrategizerService',
   'foam.nanos.auth.UserQueryService',
   'foam.nanos.medusa.MNService',
-  'foam.nanos.medusa.ElectoralService'
+  'foam.nanos.medusa.ElectoralService',
+  'foam.nanos.export.GoogleSheetsExport'
 ];
 
 var proxies = [
