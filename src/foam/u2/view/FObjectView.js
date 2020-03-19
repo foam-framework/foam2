@@ -78,6 +78,10 @@ foam.CLASS({
         model in the 'of' property. The user can choose to create an instance
         of one of the models in this list.
       `
+    },
+    {
+      class: 'Array',
+      name: 'presetLabel'
     }
   ],
 
@@ -111,16 +115,8 @@ foam.CLASS({
                 return arr;
               }
 
-              switch ( sr.strategy.model_.name  ) {
-                case 'CABankAccount':
-                    sr.strategy.model_.label = 'Canada';
-                    break;
-                case 'USBankAccount':
-                    sr.strategy.model_.label = 'USA';
-                    break;
-                case 'INBankAccount':
-                    sr.strategy.model_.label = 'India';
-                    break;
+              if ( this.presetLabel !== [] ) {
+                return arr.concat([[sr.strategy.id, this.presetLabel[arr.length]]])
               }
 
               return arr.concat([[sr.strategy.id, sr.strategy.model_.label]]);
