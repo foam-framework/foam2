@@ -76,6 +76,7 @@ foam.CLASS({
         if ( ! of ) return [];
 
         sections = of.getAxiomsByClass(this.SectionAxiom)
+          // Why not Section.AXIOM.ORDER on next line?
           .sort((a, b) => a.order - b.order)
           .map((a) => this.Section.create().fromSectionAxiom(a, of));
 

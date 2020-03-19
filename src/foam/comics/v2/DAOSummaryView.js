@@ -57,6 +57,7 @@ foam.CLASS({
   ],
 
   imports: [
+    'auth',
     'stack'
   ],
 
@@ -111,6 +112,18 @@ foam.CLASS({
   actions: [
     {
       name: 'edit',
+      isEnabled: function(config, data) {
+        if ( config.CRUDEnabledActionsAuth && config.CRUDEnabledActionsAuth.isEnabled ) {
+          try {
+            let permissionString = config.CRUDEnabledActionsAuth.enabledActionsAuth.permissionFactory(foam.nanos.ruler.Operations.UPDATE, data);
+            
+            return this.auth.check(null, permissionString);
+          } catch(e) {
+            return false;
+          }
+        }
+        return true;
+      },
       isAvailable: function(config) {
         try {
           return config.editPredicate.f();
@@ -130,6 +143,18 @@ foam.CLASS({
     },
     {
       name: 'delete',
+      isEnabled: function(config, data) {
+        if ( config.CRUDEnabledActionsAuth && config.CRUDEnabledActionsAuth.isEnabled ) {
+          try {
+            let permissionString = config.CRUDEnabledActionsAuth.enabledActionsAuth.permissionFactory(foam.nanos.ruler.Operations.REMOVE, data);
+  
+            return this.auth.check(null, permissionString);
+          } catch(e) {
+            return false;
+          }
+        }
+        return true;
+      },
       isAvailable: function(config) {
         try {
           return config.deletePredicate.f();
@@ -163,8 +188,7 @@ foam.CLASS({
 
         this
           .addClass(this.myClass())
-          .add(self.slot(function(data, data$id, config$viewBorder, viewView) {
-
+          .add(self.slot(function(data, config$viewBorder, viewView) {
             return self.E()
               .start(self.Rows)
                 .start(self.Rows)

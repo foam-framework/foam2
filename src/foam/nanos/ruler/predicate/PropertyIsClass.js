@@ -15,7 +15,8 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.FObject',
-    'static foam.mlang.MLang.*'
+    'static foam.mlang.MLang.*',
+    'foam.mlang.predicate.IsClassOf'
   ],
   properties: [
     {
@@ -40,11 +41,11 @@ foam.CLASS({
 
       if ( getIsNew() ) {
         FObject nu  = (FObject) NEW_OBJ.f(obj);
-        return CLASS_OF(getOf().getObjClass()).f(nu.getClassInfo().getAxiomByName(getPropName()));
+         return (new IsClassOf(getOf())).f(nu.getProperty(getPropName()));
       }
       FObject old = (FObject) OLD_OBJ.f(obj);
       if ( old != null )
-        return CLASS_OF(getOf().getObjClass()).f(old.getClassInfo().getAxiomByName(getPropName()));
+         return (new IsClassOf(getOf())).f(old.getProperty(getPropName()));
       return false;
       `
     }

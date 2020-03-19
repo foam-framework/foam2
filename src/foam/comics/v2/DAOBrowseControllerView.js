@@ -15,6 +15,7 @@ foam.CLASS({
   `,
 
   imports: [
+    'auth',
     'stack'
   ],
 
@@ -77,6 +78,18 @@ foam.CLASS({
   actions: [
     {
       name: 'create',
+      isEnabled: function(config, data) {
+        if ( config.CRUDEnabledActionsAuth && config.CRUDEnabledActionsAuth.isEnabled ) {
+          try {
+            let permissionString = config.CRUDEnabledActionsAuth.enabledActionsAuth.permissionFactory(foam.nanos.ruler.Operations.CREATE, data);
+  
+            return this.auth.check(null, permissionString);
+          } catch(e) {
+            return false;
+          }
+        }
+        return true;
+      },
       isAvailable: function(config) {
         try {
           return config.createPredicate.f();

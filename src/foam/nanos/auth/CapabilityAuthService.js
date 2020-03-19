@@ -103,13 +103,34 @@ foam.CLASS({
       javaCode: `
         User user = (User) x.get("user");
 
-        if ( user != null && checkUser(x, user, permission) ) return true;
-
-        return getDelegate().check(x, permission);
+        boolean hasViaCrunch = capabilityCheck(x, user, permission);
+        return ( user != null && hasViaCrunch ) || getDelegate().check(x, permission);
       `
     },
     {
       name: 'checkUser',
+      javaCode: `
+        boolean hasViaCrunch = capabilityCheck(x, user, permission);
+        return hasViaCrunch || getDelegate().checkUser(x, user, permission);
+      `
+    },
+    {
+      name: 'capabilityCheck',
+      type: 'Boolean',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'user',
+          type: 'foam.nanos.auth.User'
+        },
+        {
+          name: 'permission',
+          type: 'String'
+        }
+      ],
       documentation: `
         Check if the given input string is in the userCapabilityJunctions or
         implied by a capability in userCapabilityJunctions for a given user.
@@ -184,7 +205,7 @@ foam.CLASS({
           logger.error("check", permission, e);
         }
 
-        return result || getDelegate().checkUser(x, user, permission);
+        return result;
       `
     }
   ]
