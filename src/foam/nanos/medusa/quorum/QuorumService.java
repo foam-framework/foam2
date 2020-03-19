@@ -138,8 +138,8 @@ public class QuorumService
       primary = (ClusterConfig) clusterDAO_.put(primary);
       config = primary;
 
-      service.setConfig(config);
-      service.setPrimaryConfig(primary);
+      service.setConfigId(config.getId());
+      service.setPrimaryConfigId(primary.getId());
       service.setIsPrimary(isPrimary);
     } else if ( ! service.getIsPrimary() &&
                 primaryId.equals(hostname_) ) {
@@ -155,8 +155,8 @@ public class QuorumService
       primary.setIsPrimary(true);
       primary = (ClusterConfig) clusterDAO_.put(primary);
 
-      service.setConfig(config);
-      service.setPrimaryConfig(primary);
+      service.setConfigId(config.getId());
+      service.setPrimaryConfigId(primary.getId());
       service.setIsPrimary(isPrimary);
     }
   }
@@ -171,8 +171,8 @@ public class QuorumService
       config = (ClusterConfig) clusterDAO_.put(config);
 
       service.setIsPrimary(false);
-      service.setPrimaryConfig(null);
-      service.setConfig(config);
+      service.setPrimaryConfigId(null);
+      service.setConfigId(config.getId());
     }
   }
 

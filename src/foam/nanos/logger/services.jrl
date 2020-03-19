@@ -8,7 +8,6 @@ p({
       .setOf(foam.nanos.logger.LogMessage.getOwnClassInfo())
       .setAuthorize(false)
       .setSeqNo(true)
-      .setPm(true)
       .setRuler(false)
       .setCluster(false)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
@@ -41,6 +40,7 @@ p({
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.logger.LogMessage.getOwnClassInfo())
       .setInnerDAO(((foam.dao.DAO) x.get("localLogMessageDAO")))
+      .setCluster(false)
       .build();
   """,
   "client": """

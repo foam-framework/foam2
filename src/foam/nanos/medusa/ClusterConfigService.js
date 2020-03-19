@@ -27,29 +27,43 @@ configuration for contacting the primary node.`,
       ]
     },
     {
-      name: 'setConfig',
+      name: 'setConfigId',
       args: [
         {
-          name: 'config',
-          type: 'foam.nanos.medusa.ClusterConfig',
+          name: 'id',
+          type: 'String'
         }
       ]
+    },
+    {
+      name: 'getConfigId',
+      type: 'String'
+    },
+    {
+      name: 'setPrimaryConfigId',
+      args: [
+        {
+          name: 'id',
+          type: 'String'
+        }
+      ]
+    },
+    {
+      name: 'getPrimaryConfigId',
+      type: 'String'
     },
     {
       name: 'getConfig',
-      type: 'foam.nanos.medusa.ClusterConfig',
-    },
-    {
-      name: 'setPrimaryConfig',
       args: [
         {
-          name: 'config',
-          type: 'foam.nanos.medusa.ClusterConfig',
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'id',
+          type: 'String'
         }
-      ]
-    },
-    {
-      name: 'getPrimaryConfig',
+      ],
       type: 'foam.nanos.medusa.ClusterConfig',
     },
     {
@@ -96,6 +110,32 @@ configuration for contacting the primary node.`,
         {
           name: 'config',
           type: 'foam.nanos.medusa.ClusterConfig'
+        }
+      ]
+    },
+    {
+      name: 'addConnection',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'name',
+          type: 'String'
+        }
+      ]
+    },
+    {
+      name: 'removeConnection',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'name',
+          type: 'String'
         }
       ]
     }

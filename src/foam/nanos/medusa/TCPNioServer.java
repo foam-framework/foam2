@@ -31,20 +31,17 @@ import foam.core.AbstractFObject;
 import foam.core.FObject;
 import foam.core.FoamThread;
 import foam.core.X;
+import foam.dao.ArraySink;
 import foam.dao.DAO;
 import foam.lib.json.JSONParser;
-import foam.nanos.NanoService;
-import foam.nanos.box.NanoServiceRouter;
-import foam.nanos.logger.Logger;
-
 import static foam.mlang.MLang.*;
-import foam.dao.ArraySink;
-
+import foam.nanos.box.NanoServiceRouter;
+import foam.nanos.NanoService;
+import foam.nanos.logger.PrefixLogger;
 import foam.nanos.logger.Logger;
 
 //Start a tcp service.
 public class TCPNioServer extends AbstractFObject implements NanoService {
-
 
   protected TcpNioRouter router_ = null;
   protected Logger logger;
@@ -59,12 +56,16 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
   private Acceptor acceptor;
   private Set<Processor> processors = new HashSet<Processor>();
   private ServerSocketChannel serverSocketChannel;
-  private final int totalCores = Runtime.getRuntime().availableProcessors();
+  private final int totalCores = 1; //Runtime.getRuntime().availableProcessors();
   private volatile AtomicBoolean isRunning = new AtomicBoolean(true);
   //TODO: start selector
   public void start() throws Exception {
     X x = getX();
-    logger = (Logger) getX().get("logger");
+    logger = new PrefixLogger(new Object[] {
+        this.getClass().getSimpleName(),
+        hostname
+      },
+      (Logger) getX().get("logger"));
     if ( x == null ) throw new RuntimeException("Context no found.");
     DAO clusterDAO = (DAO) x.get("localClusterConfigDAO");
     if ( clusterDAO == null ) throw new RuntimeException("localClusterConfigDAO no found.");
@@ -84,10 +85,8 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
     //ClusterConfig myself = (ClusterConfig) clusterDAO.find(clusterId);
     if ( myself == null ) throw new RuntimeException("ClusterConfig not found: " + hostname);
 
-
-    //TODO: do not hard coding following parameter.
     InetSocketAddress serverAddress = new InetSocketAddress(myself.getId(), myself.getSocketPort());
-    logger.info("Tcp server open at: " + serverAddress);
+    logger.info("socket open at:", serverAddress);
     // int totalProcessors = totalCores * 1;
     // Double size of MM.
     int totalProcessors = totalCores * 2;
@@ -186,6 +185,7 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
           Iterator<SelectionKey> keys = this.selector.selectedKeys().iterator();
           while ( isRunning() && keys.hasNext() ) {
             SelectionKey key = keys.next();
+            logger.debug("Acceptor", "select", key);
             // Remove from collection. Register into Processor later.
             keys.remove();
 
@@ -195,15 +195,18 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
               if ( socketChannel != null ) {
                 this.processors.get(curIndex % this.processors.size()).acceptSocketChannel(socketChannel);
               } else {
+                logger.error("socketChannel null");
                 //TODO: LOG error.
               }
             } else {
               //TODO: LOG accept error.
+              logger.error("key.isAcceptable not");
             }
           }
         }
       } catch ( Exception e ) {
         //TODO: LOG ignore exception.
+        logger.error(e);
       }
     }
 
@@ -221,6 +224,7 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
         return socketChannel;
       } catch ( IOException e ) {
         //TODO: LOG
+        logger.error(e);
         removeSelectionKey(key);
         hardCloseSocketChannel(socketChannel);
       }
@@ -284,6 +288,7 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
         }
       } catch ( Exception e ) {
         //TODO: log ignore exceptions.
+        logger.error(e);
       }
     }
 
@@ -295,6 +300,7 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
 
         while ( isRunning.get() && iterator.hasNext() ) {
           SelectionKey key = iterator.next();
+          logger.debug("Processor", "select", key);
           //Remove from selected Set.
           iterator.remove();
 
@@ -309,6 +315,7 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
         }
       } catch ( IOException e ) {
         //TODO: LOG ignore error.
+        logger.error(e);
       }
     }
 
@@ -369,9 +376,7 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
           message.clear();
         }
 
-        //TODO: log
-        logger.info(messageLen);
-        logger.info(requestString);
+        logger.debug("Processor", "processRequest", "messageLen", messageLen, "requestString", requestString);
 
         // Deserialize json and assign to service.
         // Inject SelectionKey and SocketChannel into X.
@@ -382,13 +387,11 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
         //TODO: Inject ReturnBox.
 
         if ( request == null ) {
-          // logger.warning("Failed to parse request.", request);
-          logger.info("Failed to parse request.");
+          logger.warning("Failed to parse request. null");
           return;
         }
 
         if ( ! ( request instanceof TcpMessage ) ) {
-          logger.info("Request was not a TcpMessage");
           logger.warning("Request was not a TcpMessage", request);
           return;
         }
@@ -401,15 +404,17 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
       } catch ( IOException e ) {
         // When client reset. close Socket.
         //TODO: log socket close.
-        e.printStackTrace();
+        logger.error(e);
         try {
           key.cancel();
         } catch ( Exception exception ) {
           // Log error
+          logger.error(exception);
         }
         TCPNioServer.closeSocketChannel(socketChannel);
       } catch ( Exception e){
         //TODO: log or ignore.
+        logger.error(e);
       } finally {
         // if ( key.isValid() ) {
         //   // Resume READ selection.

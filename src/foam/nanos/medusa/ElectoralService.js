@@ -5,14 +5,17 @@ foam.INTERFACE({
   methods: [
     {
       name: 'getState',
-      type: 'foam.nanos.medusa.ElectoralServiceState'
+      type: 'foam.nanos.medusa.ElectoralServiceState',
+      async: true,
     },
     {
-      name: 'dissolve'
+      name: 'dissolve',
+      async: true,
     },
     {
       name: 'vote',
       type: 'Long',
+      async: true,
       args: [
         {
           name: 'id',
@@ -26,10 +29,11 @@ foam.INTERFACE({
     },
     {
       name: 'report',
+      async: true,
       args: [
         {
           name: 'winner',
-          type: 'foam.nanos.medusa.ClusterConfig'
+          type: 'String'
         }
       ]
     }

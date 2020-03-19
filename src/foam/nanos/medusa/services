@@ -6,10 +6,11 @@ p({
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.medusa.ClusterConfig.getOwnClassInfo())
+      .setCluster(false)
+      .setRuler(false)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("clusterConfig")
       .setAuthorize(false)
-      .setCluster(false)
       .setPm(true)
       .build();
    """
@@ -24,6 +25,8 @@ p({
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.medusa.ClusterConfig.getOwnClassInfo())
       .setInnerDAO((foam.dao.DAO) x.get("localClusterConfigDAO"))
+      .setCluster(false)
+      .setRuler(false)
       .setEnableInterfaceDecorators(false)
       .build();
   """,
@@ -48,6 +51,7 @@ p({
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.medusa.ClusterServerDAO.getOwnClassInfo())
       .setInnerDAO(new foam.nanos.medusa.ClusterServerDAO.Builder(x).build())
+      .setCluster(false)
       .setNullify(true)
       .setEnableInterfaceDecorators(false)
       .setRuler(false)
@@ -68,34 +72,6 @@ p({
   "name":"quorumService",
   "lazy":false,
   "serviceClass":"foam.nanos.medusa.quorum.QuorumService"
-})
-
-p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "demoObjectDAO",
-  "lazy": false,
-  "serve": true,
-  "serviceScript":
-  """
-    import foam.dao.*;
-    import foam.nanos.demo.DemoObject;
-    import foam.nanos.medusa.*;
-
-    MDAO mdao = new MDAO(DemoObject.getOwnClassInfo());
-    MMDAO mmdao = new MMDAO(x, "demoObjectDAO", mdao, "singleJournal", "demoObjects");
-    ClusterClientDAO clusterClientDAO = new ClusterClientDAO.Builder(x)
-                                              .setServiceName("demoObjectDAO")
-                                              .setDelegate(mmdao)
-                                              .setMdao(mdao)
-                                              .build();
-    VotingDAO votingDAO = new VotingDAO(x, clusterClientDAO);
-    return votingDAO;
-  """,
-  "client": """
-    {
-      "of": "foam.nanos.demo.DemoObject"
-    }
-  """
 })
 
 p({

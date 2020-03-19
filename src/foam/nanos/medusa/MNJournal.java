@@ -41,6 +41,7 @@ import static foam.mlang.MLang.*;
 import foam.dao.ArraySink;
 import foam.lib.json.JSONParser;
 import foam.mlang.order.Desc;
+import foam.nanos.logger.PrefixLogger;
 import foam.nanos.logger.Logger;
 
 //TODO: is it a good ideal to keep a very big file?
@@ -65,7 +66,9 @@ public class MNJournal extends FileJournal {
   private Logger logger;
   private MNJournal(X x, String filename) {
     setX(x);
-    logger = (Logger) x.get("logger");
+    logger = new PrefixLogger(new Object[] {
+        this.getClass().getSimpleName() },
+      (Logger) x.get("logger"));
     entryRecordDAO = (DAO) x.get("entryRecordDAO");
     if ( entryRecordDAO == null ) throw new RuntimeException("entryRecordDAO miss");
     this.filename = filename;
@@ -74,7 +77,7 @@ public class MNJournal extends FileJournal {
     try {
       this.outChannel = FileChannel.open(getPath(filename), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
     } catch ( IOException e) {
-      logger.info(e);
+      logger.error(e);
       throw new RuntimeException(e);
     } finally {
       try {
@@ -118,6 +121,7 @@ public class MNJournal extends FileJournal {
 
   @Override
   public FObject put(X x, String prefix, DAO dao, FObject obj) {
+    logger.debug("put", "prefix:", prefix, obj);
     MedusaEntry entry = (MedusaEntry) obj;
     entry.setAction("p");
     String hash1 = entry.getHash1();
@@ -138,7 +142,7 @@ public class MNJournal extends FileJournal {
         String internalHash = byte2Hex(entry.hash(md));
         entry.setInternalHash(internalHash);
       } catch ( Exception e ) {
-        System.out.println(e);
+        logger.error(e);
         throw new RuntimeException(e);
       }
     }
@@ -149,6 +153,7 @@ public class MNJournal extends FileJournal {
 
   @Override
   public FObject remove(X x, String prefix, DAO dao, FObject obj) {
+    logger.debug("remove", "prefix:", prefix, obj);
     MedusaEntry entry = (MedusaEntry) obj;
     entry.setAction("r");
     String hash1 = entry.getHash1();
@@ -169,7 +174,7 @@ public class MNJournal extends FileJournal {
         String internalHash = byte2Hex(entry.hash(md));
         entry.setInternalHash(internalHash);
       } catch ( Exception e ) {
-        System.out.println(e);
+        logger.error(e);
         throw new RuntimeException(e);
       }
     }
@@ -181,6 +186,7 @@ public class MNJournal extends FileJournal {
   private void doWrite(X x, String record, long globalIndex) {
     try {
       synchronized ( fileLock ) {
+        // TODO: why opening on each write operation?
         this.outChannel = FileChannel.open(getPath(filename), StandardOpenOption.APPEND);
         if ( globalIndex > maxGlobalIndex ) {
           maxGlobalIndex = globalIndex;
@@ -272,7 +278,7 @@ public class MNJournal extends FileJournal {
       return true;
     } catch ( Exception e ) {
       //TODO: report error.
-      e.printStackTrace();
+      logger.error(e);
       return false;
     }
 
@@ -318,6 +324,7 @@ public class MNJournal extends FileJournal {
           entries.add(entryString);
           count++;
         } catch ( Exception ioe ) {
+          logger.error(ioe);
           //TODO: terminal reply, and send error message to mediator, and
           //stop this mmJournal until problem fix.
           BlockInfo blockInfo = new BlockInfo();
@@ -342,6 +349,7 @@ public class MNJournal extends FileJournal {
             key.cancel();
           } catch ( IOException ie ) {
             //TODO: log
+            logger.error(ie);
           }
           return;
         }
@@ -373,6 +381,7 @@ public class MNJournal extends FileJournal {
       while ( sendBuffer.hasRemaining() ) { socketChannel.write(sendBuffer); }
 
     } catch ( IOException ioe ) {
+      logger.error(ioe);
         //TODO: send error to mediator. Mediator should fail this node.
         //Terminator replay.
         try {
@@ -380,6 +389,7 @@ public class MNJournal extends FileJournal {
           key.cancel();
         } catch ( IOException ie ) {
           //TODO: log
+          logger.error(ie);
         }
         return;
       }
@@ -448,7 +458,7 @@ public class MNJournal extends FileJournal {
               entries.add(entryString);
               count++;
             } catch ( Exception ioe ) {
-              ioe.printStackTrace();
+              logger.error(ioe);
               //TODO: terminal reply, and send error message to mediator, and
               //stop this mmJournal until problem fix.
               BlockInfo blockInfo = new BlockInfo();
@@ -472,7 +482,7 @@ public class MNJournal extends FileJournal {
                 socketChannel.close();
                 key.cancel();
               } catch ( IOException ie ) {
-                ie.printStackTrace();
+                logger.error(ie);
               }
               return;
             }
@@ -513,7 +523,7 @@ public class MNJournal extends FileJournal {
           bufferSize = (int) (fileSize - 0L);
         } else {
           bufferSize = (int) (fileSize - (lastRecord.getOffset() + (long) lastRecord.getLength()));
-          logger.info(bufferSize);
+          logger.debug(bufferSize);
         }
 
         ByteBuffer byteBuffer = ByteBuffer.allocate(bufferSize);
@@ -563,7 +573,7 @@ public class MNJournal extends FileJournal {
             entries.add(entryString);
             count++;
           } catch ( Exception ioe ) {
-            ioe.printStackTrace();
+            logger.error(ioe);
             //TODO: terminal reply, and send error message to mediator, and
             //stop this mmJournal until problem fix.
             BlockInfo blockInfo = new BlockInfo();
@@ -584,7 +594,7 @@ public class MNJournal extends FileJournal {
             while( sendBuffer.hasRemaining() ) { socketChannel.write(sendBuffer); }
 
             try {
-              ioe.printStackTrace();
+              logger.warning(ioe);
               socketChannel.close();
               key.cancel();
             } catch ( IOException ie ) {

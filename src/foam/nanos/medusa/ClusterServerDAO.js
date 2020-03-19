@@ -23,12 +23,6 @@ foam.CLASS({
       name: 'cmd_',
       javaCode: `
       if ( obj instanceof ClusterCommand ) {
-        ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
-        if ( service == null ||
-            ! service.getIsPrimary() ) {
-          throw new UnsupportedOperationException("Cluster command not supported on non-primary instance");
-        }
-
         ClusterCommand request = (ClusterCommand) obj;
         X y = request.applyTo(x);
 
@@ -39,7 +33,20 @@ foam.CLASS({
            request.getCommand()
         }, (Logger) y.get("logger"));
 
+        ClusterConfigService service = (ClusterConfigService) y.get("clusterConfigService");
+        ElectoralServiceServer electoralService = (ElectoralServiceServer) y.get("electoralService");
+
+        logger.debug("isPrimary", service.getIsPrimary(), "electoral state", electoralService.getState().getLabel());
+
+        if ( ! service.getIsPrimary() ) {
+          throw new UnsupportedOperationException("Cluster command not supported on non-primary instance");
+        }
+        if ( electoralService.getState() != ElectoralServiceState.IN_SESSION ) {
+          throw new RuntimeException("Election in progress");
+        }
+
         logger.debug(request);
+
         DAO dao = (DAO) y.get(request.getServiceName());
         if ( dao == null ) {
           logger.error("DAO not found");

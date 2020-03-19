@@ -9,26 +9,35 @@ package foam.nanos.medusa;
 import foam.core.Detachable;
 import foam.core.FObject;
 import foam.core.X;
+import foam.dao.DAO;
 import foam.dao.ProxySink;
 import foam.dao.Sink;
+import foam.nanos.logger.Logger;
 
 public class ClusterConfigSink
   extends ProxySink
 {
-  protected ClusterConfigService service_;
+  protected MMJournal mm_;
 
-  public ClusterConfigSink(X x, ClusterConfigService service) {
+  public ClusterConfigSink(X x, MMJournal mm) {
     setX(x);
-    service_ = service;
+    mm_ = mm;
   }
 
   @Override
   public void put(Object obj, Detachable sub) {
-    service_.onDAOUpdate(getX());
+    ClusterConfigService service = (ClusterConfigService) getX().get("clusterConfigService");
+    ClusterConfig nu = (ClusterConfig) obj;
+    ((Logger) getX().get("logger")).debug(this.getClass().getSimpleName(), "put", nu.getId(), nu.getIsPrimary(), "service", service.getConfigId(), service.getIsPrimary());
+    if ( service.getIsPrimary() ) {
+      mm_.primary(getX());
+    } else {
+      mm_.secondary(getX());
+    }
   }
 
   @Override
   public void remove(Object obj, Detachable sub) {
-    service_.onDAOUpdate(getX());
+    // nop
   }
 }

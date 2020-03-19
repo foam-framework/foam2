@@ -72,12 +72,11 @@ import java.nio.ByteBuffer;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 
-import foam.nanos.medusa.quorum.*;
-
 import java.security.MessageDigest;
 import java.nio.charset.StandardCharsets;
 
 import foam.lib.ClusterPropertyPredicate;
+import foam.nanos.logger.PrefixLogger;
 import foam.nanos.logger.Logger;
 
 import java.util.concurrent.ExecutorService; 
@@ -89,14 +88,14 @@ import java.util.concurrent.Executors;
 // Make sure MM initial before initial of this class.
 // TODO: refactor this class as DAO.
 // TODO: refactor all clusterNode finding in the a DAO. provide better controller of MN.
-public class MMJournal extends AbstractJournal implements Electable {
-
-  private String serviceName;
-  private QuorumService quorumService;
+public class MMJournal
+  extends AbstractJournal /*implements Electable*/
+{
+  //  protected X x_;
+  private String journalKey;
   private final Map<Long, ArrayList<ClusterConfig>> groupToMN = new HashMap<Long, ArrayList<ClusterConfig>>();
   private final List<ArrayList<ClusterConfig>> groups  = new LinkedList<ArrayList<ClusterConfig>>();
   private final List<ClusterConfig> availableNodes = new LinkedList<ClusterConfig>();
-  protected GroupBy zoneGroups_;
   
   // Default TIME_OUT is 5 second
   private final long TIME_OUT = 10000;
@@ -115,7 +114,7 @@ public class MMJournal extends AbstractJournal implements Electable {
 
   int hashQuorumSize = 2;
   boolean isHash = true;
-  int quorumSize = 2;
+ int quorumSize = 2;
 
   private ExecutorService pool = Executors.newFixedThreadPool(3);
 
@@ -133,36 +132,37 @@ public class MMJournal extends AbstractJournal implements Electable {
   }
 
   Logger logger;
-  private MMJournal(X x, String serviceName) {
-    logger = (Logger) x.get("logger");
-    if ( x == null ) throw new RuntimeException("Context not found.");
-    this.serviceName = serviceName;
+  private MMJournal(X x, String journalKey) {
+    setX(x);
+    logger = new PrefixLogger(new Object[] {
+        this.getClass().getSimpleName()
+      },
+      (Logger) x.get("logger"));
+    this.journalKey = journalKey;
     initialize(x);
   }
 
   Object initialLock = new Object();
   private void initialize(X x) {
+    ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
     synchronized ( initialLock ) {
       if ( isInitialized ) return;
-      // ElectoralService electoralService = (ElectoralService) x.get("electoralService");
-      // electoralService.dissolve();
-      
-      //      quorumService = (QuorumService) x.get("quorumService");
-
-      //     quorumService.registerElectable(this);
-
+      logger.debug("initialize", "journalKey", this.journalKey);
       DAO clusterConfigDAO = (DAO) x.get("localClusterConfigDAO");
-
+      ClusterConfig config = (ClusterConfig) clusterConfigDAO.find(service.getConfigId());
       GroupBy groupToInstance = (GroupBy) clusterConfigDAO
         .where(
                AND(
                    EQ(ClusterConfig.ENABLED, true),
                    //                   EQ(ClusterConfig.STATUS, Status.ONLINE),
-                   EQ(ClusterConfig.TYPE, MedusaType.NODE)
-                   )
+                   EQ(ClusterConfig.TYPE, MedusaType.NODE),
+                   EQ(ClusterConfig.REALM, config.getRealm()),
+                   EQ(ClusterConfig.REGION, config.getRegion())
+                 )
                )
         .select(GROUP_BY(ClusterConfig.ZONE, new ArraySink.Builder(getX()).build()));
 
+      int nodes = 0;
       for ( Object key : groupToInstance.getGroups().keySet() ) {
         for ( Object value: ((ArraySink) groupToInstance.getGroups().get(key)).getArray() ) {
           ClusterConfig clusterNode = (ClusterConfig) value;
@@ -171,8 +171,14 @@ public class MMJournal extends AbstractJournal implements Electable {
           }
           groupToMN.get(clusterNode.getZone()).add(clusterNode);
           availableNodes.add(clusterNode);
+          if ( clusterNode.getZone() == 0L ) {
+            nodes++;
+          }
         }
       }
+      quorumSize = nodes / 2 + 1;  
+      hashQuorumSize = quorumSize;
+      logger.debug("initialize", "nodes", nodes, "quorumSize", quorumSize);
 
       for ( Long group : groupToMN.keySet() ) {
         groups.add(groupToMN.get(group));
@@ -195,6 +201,22 @@ public class MMJournal extends AbstractJournal implements Electable {
       indexHashMap.put(parent1.getMyIndex(), parent1.getMyHash());
       indexHashMap.put(parent2.getMyIndex(), parent2.getMyHash());
 
+      logger.debug("initialize", "isPrimary", service.getIsPrimary());
+
+      if ( service.getIsPrimary() ) {
+        primary(x);
+      } else {
+        secondary(x);
+      }
+
+      // TODO: replace with Listener implementation on ElectoralService
+      clusterConfigDAO.listen(
+                              new ClusterConfigSink(x, this),
+                              AND(
+                                  EQ(ClusterConfig.ID, service.getConfigId()),
+                                  EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR)
+                                  )
+                              );
       isInitialized = true;
     }
   }
@@ -229,10 +251,10 @@ public class MMJournal extends AbstractJournal implements Electable {
 
   private static Map<String, MMJournal> journalMap = new HashMap<String, MMJournal>();
 
-  public synchronized static MMJournal getMMjournal(X x, String serviceName) {
-    if ( journalMap.get(serviceName) != null ) return journalMap.get(serviceName);
-    journalMap.put(serviceName, new MMJournal(x, serviceName));
-    return journalMap.get(serviceName);
+  public synchronized static MMJournal getMMjournal(X x, String journalKey) {
+    if ( journalMap.get(journalKey) != null ) return journalMap.get(journalKey);
+    journalMap.put(journalKey, new MMJournal(x, journalKey));
+    return journalMap.get(journalKey);
   }
 
   public volatile boolean isVersion = true;
@@ -244,15 +266,14 @@ public class MMJournal extends AbstractJournal implements Electable {
   // TODO: can we do this versioning code at the begnning of DAO?
   @Override
   public FObject put(X x, String prefix, DAO dao, FObject obj) {
-      ElectoralService electoralService = (ElectoralService) x.get("electoralService");
-      ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
-      if ( electoralService.getState() != ElectoralServiceState.IN_SESSION ||
-           ! service.getIsPrimary()) {
-        logger.warning("Reject put(). primary:", service.getIsPrimary(), ", state:", electoralService.getState().getLabel());
-        throw new RuntimeException("Reject put() on non-primary or during election. (primary: " + service.getIsPrimary() + ", state: " + electoralService.getState().getLabel());
-      }
-      //    if (  quorumService.exposeState != InstanceState.PRIMARY 
-      //  || isPrimary(x) == false ) throw new RuntimeException("Electing/Secondary");
+    ElectoralService electoralService = (ElectoralService) x.get("electoralService");
+    ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
+    logger.debug("put", "prefix:", prefix, "journalKey:", this.journalKey, "state: ", electoralService.getState().getLabel());
+    if ( electoralService.getState() != ElectoralServiceState.IN_SESSION ||
+         ! service.getIsPrimary()) {
+      logger.warning("Reject put(). primary:", service.getIsPrimary(), ", state:", electoralService.getState().getLabel());
+      throw new RuntimeException("Reject put() on non-primary or during election. (primary: " + service.getIsPrimary() + ", state: " + electoralService.getState().getLabel());
+    }
     long myIndex = getGlobalIndex();
 
     // Get whole entry first to make sure threadsafe.
@@ -277,26 +298,27 @@ public class MMJournal extends AbstractJournal implements Electable {
 
     String mn = outputter.stringify(msg);
     callMN(mn);
-    return obj;
+    logger.debug("put", prefix, "dao.put", obj);
+    return dao.put_(x, obj);
   }
 
   //TODO: remove after finish two very first parents.
-  private FObject putParentHash(long myIndex, String hash, FObject randomFObject) {
-    Message msg =
-      createMessage(
-          -1,
-          null,
-          -1,
-          null,
-          myIndex,
-          "put_",
-          "p",
-          null,
-          "TOP",
-          randomFObject
-          );
-    return null;
-  }
+  // private FObject putParentHash(long myIndex, String hash, FObject randomFObject) {
+  //   Message msg =
+  //     createMessage(
+  //         -1,
+  //         null,
+  //         -1,
+  //         null,
+  //         myIndex,
+  //         "put_",
+  //         "p",
+  //         null,
+  //         "TOP",
+  //         randomFObject
+  //         );
+  //   return null;
+  // }
 
   @Override
   public FObject remove(X x, String prefix, DAO dao, FObject obj) {
@@ -307,8 +329,6 @@ public class MMJournal extends AbstractJournal implements Electable {
       logger.warning("Reject remove(). primary:", service.getIsPrimary(), ", state:", electoralService.getState().getLabel());
       throw new RuntimeException("Reject remove() on non-primary or during election. primary: " + service.getIsPrimary() + ", state: " + electoralService.getState().getLabel());
     }
-    //if (  quorumService.exposeState != InstanceState.PRIMARY 
-    //    || isPrimary(x) == false ) throw new RuntimeException("Electing/Secondary");
 
     long myIndex = getGlobalIndex();
     // Get whole entry first to make sure threadsafe.
@@ -426,7 +446,7 @@ public class MMJournal extends AbstractJournal implements Electable {
     //put or remove
     rpc.setName(method);
     MedusaEntry entry = getX().create(MedusaEntry.class);
-    entry.setServiceName(serviceName);
+    entry.setServiceName(this.journalKey);
     // p or r
     entry.setAction(action);
     entry.setGlobalIndex1(globalIndex1);
@@ -448,7 +468,7 @@ public class MMJournal extends AbstractJournal implements Electable {
 
   private TcpMessage createListenMessage() {
     TcpMessage tcpMessage = new TcpMessage();
-    tcpMessage.setServiceKey(serviceName);
+    tcpMessage.setServiceKey(journalKey);
     // TcpSocketChannelSinkBox replyBox = new TcpSocketChannelSinkBox();
     String replayBox = "{\"class\":\"foam.nanos.medusa.TcpSocketChannelSinkBox\"}";
     tcpMessage.getAttributes().put("replyBox", replayBox);
@@ -462,9 +482,9 @@ public class MMJournal extends AbstractJournal implements Electable {
   }
 
   //TODO: Modelling TcpSocketChannelSinkBox and remove this method.
-  private String createListenMessageString(String serviceName, String sessionId) {
-    // String ret = "{\"class\":\"foam.nanos.medusa.TcpMessage\",\"serviceKey\":\"" + serviceName + "\",\"attributes\":{\"replyBox\":{\"class\":\"foam.nanos.medusa.TcpSocketChannelSinkBox\"},\"sessionId\":\"" + sessionId + "\"},\"object\":{\"class\":\"foam.box.RPCMessage\",\"name\":\"listen_\",\"args\":[null,{\"class\":\"foam.nanos.medusa.TcpSocketChannelSink\"},null]}}";
-    String ret = "{\"class\":\"foam.nanos.medusa.TcpMessage\",\"serviceKey\":\"" + serviceName + "\",\"attributes\":{\"replyBox\":{\"class\":\"foam.nanos.medusa.TcpSocketChannelSinkBox\"},\"sessionId\":\"" + sessionId + "\"},\"object\":{\"class\":\"foam.box.RPCMessage\",\"name\":\"listen_\",\"args\":[null,{\"class\":\"foam.nanos.medusa.TcpSocketChannelSink\"},null]}}";
+  private String createListenMessageString(String journalKey, String sessionId) {
+    // String ret = "{\"class\":\"foam.nanos.medusa.TcpMessage\",\"serviceKey\":\"" + journalKey + "\",\"attributes\":{\"replyBox\":{\"class\":\"foam.nanos.medusa.TcpSocketChannelSinkBox\"},\"sessionId\":\"" + sessionId + "\"},\"object\":{\"class\":\"foam.box.RPCMessage\",\"name\":\"listen_\",\"args\":[null,{\"class\":\"foam.nanos.medusa.TcpSocketChannelSink\"},null]}}";
+    String ret = "{\"class\":\"foam.nanos.medusa.TcpMessage\",\"serviceKey\":\"" + journalKey + "\",\"attributes\":{\"replyBox\":{\"class\":\"foam.nanos.medusa.TcpSocketChannelSinkBox\"},\"sessionId\":\"" + sessionId + "\"},\"object\":{\"class\":\"foam.box.RPCMessage\",\"name\":\"listen_\",\"args\":[null,{\"class\":\"foam.nanos.medusa.TcpSocketChannelSink\"},null]}}";
     return ret;
   }
 
@@ -480,14 +500,15 @@ public class MMJournal extends AbstractJournal implements Electable {
       this.port = port;
     }
 
+    // send to MNs
     public String call() throws Exception {
       HttpURLConnection conn = null;
       OutputStreamWriter output = null;
       InputStream input = null;
 
       try {
-        URL url = new URL("Http", ip, port, "/service/" + serviceName);
-        logger.info(url);
+        URL url = new URL("Http", ip, port, "/service/" + journalKey);
+        logger.debug("call", url);
 
         conn = (HttpURLConnection) url.openConnection();
         conn.setDoOutput(true);
@@ -536,7 +557,7 @@ public class MMJournal extends AbstractJournal implements Electable {
     }
   }
 
-  // Record SocketChannel for each node.
+  // // Record SocketChannel for each node.
   private Map<String, SocketChannel> nodeToSocketChannel;
   private Map<String, List<MedusaEntry>> readyToUseEntry;
   private Map<String, DAO> registerDAOs;
@@ -546,16 +567,19 @@ public class MMJournal extends AbstractJournal implements Electable {
 
   private final void initialReplay(X x) {
     //TODO: close all socketchannel.
+    ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
+    ClusterConfig config = service.getConfig(x, service.getConfigId());
     if ( nodeToSocketChannel != null ) {
       for ( Map.Entry<String, SocketChannel> entry: nodeToSocketChannel.entrySet() ) {
         TCPNioServer.closeSocketChannel(entry.getValue());
       }
-
     }
     nodeToSocketChannel = new HashMap<String, SocketChannel>();
   }
 
-  public final void cleanConnection() {
+  public final void cleanConnection(X x) {
+    ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
+    ClusterConfig config = service.getConfig(x, service.getConfigId());
     if ( nodeToSocketChannel != null ) {
       for ( Map.Entry<String, SocketChannel> entry: nodeToSocketChannel.entrySet() ) {
         TCPNioServer.closeSocketChannel(entry.getValue());
@@ -588,23 +612,26 @@ public class MMJournal extends AbstractJournal implements Electable {
       logger.info("total entry receive in replay: " + entries.size());
       cacheOrMDAO(entries);
     } catch ( Exception e ) {
-      throw new RuntimeException(e);
+      logger.error(e);
+      //throw new RuntimeException(e);
     }
   }
 
   // Get data start from global Index.
   public synchronized void updateData(X x, boolean isListen) {
-    if ( needReplay == false ) return;
+    if ( ! needReplay ||
+         isReplaying ) return;
 
     try {
       isReplaying = true;
       logger.info("update with globalIndex: " + globalIndex.get());
       pullData(x , globalIndex.get(), isListen);
-      isReplaying = false;
       needReplay = false;
     } catch ( Exception e ) {
-      e.printStackTrace();
-      throw new RuntimeException(e);
+      logger.error(e);
+      //throw new RuntimeException(e);
+    } finally {
+      isReplaying = false;
     }
   }
 
@@ -616,17 +643,18 @@ public class MMJournal extends AbstractJournal implements Electable {
       if ( registerDAOs.get(nspecKey) != null ) {
         throw new RuntimeException("can not replay duplicate dao: " + nspecKey);
       }
-
+      logger.debug("MMJournal", "replay", nspecKey);
       registerDAOs.put(nspecKey, dao);
       if ( readyToUseEntry.get(nspecKey) == null ) {
         logger.info("No cached entry associated with: " + nspecKey);
         return;
       }
       // Load cached entries into DAO.
-      for ( MedusaEntry obj : readyToUseEntry.get(nspecKey) ) {
         count++;
+      for ( MedusaEntry obj : readyToUseEntry.get(nspecKey) ) {
         if ( "p".equals(obj.getAction()) ) {
           //TODO: investigating on TransactionDAO.
+          logger.debug("replay", "put", obj.getNu());
           dao.put(obj.getNu());
         } else if ( "r".equals(obj.getAction()) ) {
           dao.remove(obj.getNu());
@@ -659,6 +687,7 @@ public class MMJournal extends AbstractJournal implements Electable {
 
   private void cacheOrMDAO(MedusaEntry entry, boolean verifyhash) {
     synchronized ( cacheOrMDAOLock ) {
+      logger.debug("MMJournal", "cacheOrMDAO", entry.getNspecKey());
       // Data already in the MDAO.
       if ( entry.getMyIndex() < globalIndex.get() ) return;
       if ( entry.getMyIndex() != globalIndex.get() ) throw new RuntimeException("Wrong globalIndex [ expect=" + globalIndex + ", receive=" + entry.getMyIndex() + " ]");
@@ -742,7 +771,10 @@ public class MMJournal extends AbstractJournal implements Electable {
 
 
   private final List<MedusaEntry> retrieveData(X x, Map<Long, ArrayList<ClusterConfig>> groupToMN, long fromIndex) {
-
+    logger.debug("MMJournal", "retrieveData");
+    ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
+    ClusterConfig config = service.getConfig(x, service.getConfigId());
+    
     // MedusaNode id to Bytebuffer.
     Map<Long, Map<String, LinkedList<ByteBuffer>>> groupToJournal = new HashMap<Long, Map<String, LinkedList<ByteBuffer>>>();
     Map<Long, List<MedusaEntry>> groupToEntry = new HashMap<Long, List<MedusaEntry>>();
@@ -763,14 +795,20 @@ public class MMJournal extends AbstractJournal implements Electable {
 
           if ( connectResult == false )
             throw new RuntimeException("Replay can not connect to: " + node.getId());
-
+          //          service.addConnection(x, node.getId());
           nodeToSocketChannel.put(node.getId(), channel);
+          // if ( config != null ) {
+          //   config = service.addConnection(x, config, node.getId());
+          // } else {
+          //   logger.warning("ClusterConfigService.getConfig null");
+          // }
           logger.info(node.getId());
           nodeToBuffers.put(node.getId(), retrieveDataFromNode(x, channel, fromIndex));
           count++;
         } catch ( Exception e ) {
-          logger.info("!!fail replay from : " + node.getId() + " exception message: " + e);
+          logger.error("Failed replay from:", node.getId(), e);
           TCPNioServer.closeSocketChannel(channel);
+          //          service.removeConnection(x, node.getId());
           throw new RuntimeException(e);
         } finally {
           try {
@@ -804,7 +842,7 @@ public class MMJournal extends AbstractJournal implements Electable {
     replayInitialMessage.setServiceKey("MNService");
     RPCMessage rpc = getX().create(RPCMessage.class);
     rpc.setName("replayFrom");
-    Object[] args = { null, serviceName, fromIndex };
+    Object[] args = { null, journalKey, fromIndex };
     rpc.setArgs(args);
     replayInitialMessage.setObject(rpc);
 
@@ -831,7 +869,7 @@ public class MMJournal extends AbstractJournal implements Electable {
     firstBlockInfo.flip();
     String blockInfoString = new String(firstBlockInfo.array(), 0, length, Charset.forName("UTF-8"));
     BlockInfo blockInfo = (BlockInfo) getX().create(JSONParser.class).parseString(blockInfoString);
-    logger.info(blockInfoString);
+    //    logger.info(blockInfoString);
     while ( blockInfo.getEof() == false ) {
       if ( blockInfo.getAnyFailure() == true )
         throw new RuntimeException(blockInfo.getFailReason() + "\n" + blockInfo.getFailLine());
@@ -981,7 +1019,7 @@ public class MMJournal extends AbstractJournal implements Electable {
     return ret;
   }
 
-  // Verify entries from same group. And concat them into list.
+  //  Verify entries from same group. And concat them into list.
   private final List<MedusaEntry> concatEntries(long groupId, Map<String, List<MedusaEntry>> nodeToEntry) {
     Map<Long, Integer> entryCount = new HashMap<Long, Integer>();
     Map<Long, ArrayList<MedusaEntry>> entryRecord = new HashMap<Long, ArrayList<MedusaEntry>>();
@@ -1133,10 +1171,10 @@ public class MMJournal extends AbstractJournal implements Electable {
         while ( isRunning  && iterator.hasNext() ) {
           SelectionKey key = iterator.next();
           iterator.remove();
-
+          logger.debug("Processor", "select", key);
           if ( key.isConnectable() ) {
             SocketChannel channel=(SocketChannel)key.channel();
-            logger.info("success to lisetn from: " + channel.socket().getInetAddress());
+            logger.info("success to listen from: " + channel.socket().getInetAddress());
             if(channel.isConnectionPending()){
               channel.finishConnect();
             }
@@ -1163,6 +1201,7 @@ public class MMJournal extends AbstractJournal implements Electable {
     }
 
     private void processRequest(SelectionKey key) {
+      logger.debug("MMJournal","processRequest",key);
       SocketChannel socketChannel = null;
       try {
         socketChannel = (SocketChannel) key.channel();
@@ -1217,7 +1256,7 @@ public class MMJournal extends AbstractJournal implements Electable {
       SocketChannel socketChannel = null;
       try {
         socketChannel = (SocketChannel) key.channel();
-        String tcpMsgStr = createListenMessageString(serviceName, "");
+        String tcpMsgStr = createListenMessageString(journalKey, "");
         // Outputter outputter = new Outputter(x);
         // String tcpMsgStr = outputter.stringify(tcpMsg);
         byte[] bytes = tcpMsgStr.getBytes(Charset.forName("UTF-8"));
@@ -1228,7 +1267,7 @@ public class MMJournal extends AbstractJournal implements Electable {
         socketChannel.write(tcpMsgBuf);
         key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
       } catch ( IOException e ) {
-        e.printStackTrace();
+        logger.error(e);
         TCPNioServer.removeSelectionKey(key);
         TCPNioServer.hardCloseSocketChannel(socketChannel);
       }
@@ -1243,7 +1282,7 @@ public class MMJournal extends AbstractJournal implements Electable {
         }
 
       } catch ( Exception e ) {
-        e.printStackTrace();
+        logger.error(e);
       } finally {
 
         for ( SocketChannel channel : registerChannels ) {
@@ -1268,6 +1307,9 @@ public class MMJournal extends AbstractJournal implements Electable {
 
   private void initialListener(X x) throws IOException {
     logger.info("initialListerner");
+    ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
+    ClusterConfig myConfig = service.getConfig(x, service.getConfigId());
+   
     if ( processorsMap != null ) {
       for ( Map.Entry<Long, Processor> entry : processorsMap.entrySet() ) {
         entry.getValue().close();
@@ -1296,15 +1338,17 @@ public class MMJournal extends AbstractJournal implements Electable {
       Long groupId = group.getKey();
       Processor processor = new Processor(x, groupId);
       processor.start();
-      for ( ClusterConfig node : group.getValue() ) {
+      for ( ClusterConfig config : group.getValue() ) {
         //TODO: create socketChannel;
-        InetSocketAddress address = new InetSocketAddress(node.getId(), node.getSocketPort());
+        InetSocketAddress address = new InetSocketAddress(config.getId(), config.getSocketPort());
         SocketChannel channel = SocketChannel.open();
         channel.configureBlocking(false);
         channel.connect(address);
+        //        service.addConnection(x, config.getId());
         // if ( processor.acceptSocketChannel(channel) ) throw new RuntimeException("Socket connection error");
         processor.acceptSocketChannel(channel);
       }
+      logger.debug("initialListener", "processorsMap.put", groupId);
       processorsMap.put(groupId, processor);
     }
     if ( loader != null ) loader.close();
@@ -1312,7 +1356,7 @@ public class MMJournal extends AbstractJournal implements Electable {
     loader.start();
   }
 
-  public boolean stopReplay() {
+  public boolean stopReplay(X x) {
     if ( processorsMap != null ) {
       for ( Map.Entry<Long, Processor> entry : processorsMap.entrySet() ) {
         entry.getValue().close();
@@ -1424,14 +1468,14 @@ public class MMJournal extends AbstractJournal implements Electable {
   }
 
 
-  private void shutdwonProcessors() {
-    if ( this.processorsMap != null ) {
-      for ( Map.Entry<Long, Processor> entry : this.processorsMap.entrySet() ) {
-        entry.getValue().close();
-      }
-    }
-    this.processorsMap = null;
-  }
+  // private void shutdwonProcessors() {
+  //   if ( this.processorsMap != null ) {
+  //     for ( Map.Entry<Long, Processor> entry : this.processorsMap.entrySet() ) {
+  //       entry.getValue().close();
+  //     }
+  //   }
+  //   this.processorsMap = null;
+  // }
 
   private class EntryLoader extends FoamThread {
 
@@ -1455,14 +1499,15 @@ public class MMJournal extends AbstractJournal implements Electable {
       logger.info("replay finish. entryloader start");
       while ( isRunning ) {
         try {
-          ClusterConfigService service = (ClusterConfigService) getX().get("clusterConfigService");
+          ClusterConfigService service = (ClusterConfigService) this.x.get("clusterConfigService");
           if ( service.getIsPrimary() ) {
+            Thread.sleep(1000L);
             continue;
           }
           //          if ( quorumService.exposeState == InstanceState.PRIMARY ) continue;
           processEntryFromCachedMap(globalIndex.get());
         } catch ( Exception e ) {
-          e.printStackTrace();
+          logger.error(e);
         }
       }
       countDownLatch.countDown();
@@ -1540,11 +1585,12 @@ public class MMJournal extends AbstractJournal implements Electable {
     }
   }
 
-  private volatile InstanceState currentState = InstanceState.ELECTING;
+  // private volatile InstanceState currentState = InstanceState.ELECTING;
   public synchronized void primary(X x) {
-    this.updateData(x, false);
-    currentState = InstanceState.PRIMARY;
-    logger.info("start primary: " + serviceName);
+    logger.info("start primary: " + journalKey);
+    this.leaveSecondary(getX());
+    this.updateData(getX(), false);
+    //   currentState = InstanceState.PRIMARY;
   }
 
   public boolean isPrimary(X x) {
@@ -1554,9 +1600,10 @@ public class MMJournal extends AbstractJournal implements Electable {
   }
 
   public synchronized void secondary(X x) {
-    updateData(x, true);
-    currentState = InstanceState.SECONDARY;
-    logger.info("start secondary: " + serviceName);
+     logger.info("start secondary: " + journalKey);
+     leavePrimary(getX());
+     updateData(getX(), true);
+    //    currentState = InstanceState.SECONDARY;
   }
 
   public boolean isSecondary(X x) {
@@ -1566,24 +1613,24 @@ public class MMJournal extends AbstractJournal implements Electable {
  }
 
   public synchronized void leaveSecondary(X x) {
-    currentState = InstanceState.ELECTING;
+    //    currentState = InstanceState.ELECTING;
     logger.info("leaveSecondary");
-    stopReplay();
-    cleanConnection();
+    stopReplay(x);
+    cleanConnection(x);
     stopListener(null);
     needReplay = true;
     logger.info("clear connection finish");
   }
 
   public synchronized void leavePrimary(X x) {
-    currentState = InstanceState.ELECTING;
-    cleanConnection();
+    //    currentState = InstanceState.ELECTING;
+    cleanConnection(x);
     needReplay = true;
   }
 
   //TODO: remove this method after model this class.
   public int hashCode() {
-    return java.util.Objects.hash(serviceName);
+    return java.util.Objects.hash(journalKey);
   }
 
   //TODO: remove this method after model this class.
@@ -1593,6 +1640,6 @@ public class MMJournal extends AbstractJournal implements Electable {
     if ( this.getClass() != o.getClass() ) return false;
 
     MMJournal other = (MMJournal) o;
-    return other.serviceName == this.serviceName;
+    return other.journalKey == this.journalKey;
   }
 }

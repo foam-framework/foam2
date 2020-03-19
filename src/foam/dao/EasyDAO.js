@@ -180,6 +180,27 @@ foam.CLASS({
           }
         }
 
+        // if ( getCluster() &&
+        //      getMdao() != null ) {
+        //     delegate = new foam.nanos.medusa.ClusterClientDAO.Builder(getX())
+        //                   .setServiceName(getNSpec().getName())
+        //                   .setDelegate(delegate)
+        //                   .build();
+        //   // // test if chain already has ClusterConfigDAO
+        //   // boolean found = false;
+        //   // foam.dao.DAO next = delegate;
+        //   // while ( next instanceof foam.dao.ProxyDAO &&
+        //   //   ! ( next instanceof foam.nanos.medusa.ClusterClientDAO ) ) {
+        //   //   next = ((foam.dao.ProxyDAO) next).getDelegate();
+        //   // }
+        //   // if ( ! ( next instanceof foam.nanos.medusa.ClusterClientDAO ) ) {
+        //   //   delegate = new foam.nanos.medusa.ClusterClientDAO.Builder(getX())
+        //   //                 .setServiceName(getNSpec().getName())
+        //   //                 .setDelegate(delegate)
+        //   //                 .build();
+        //   // }
+        // }
+
         delegate = getOuterDAO(delegate);
 
         if ( getDecorator() != null ) {
@@ -291,27 +312,32 @@ foam.CLASS({
             delegate = delegate.orderBy(comp);
         }
 
+        if ( getCluster() &&
+             getMdao() != null ) {
+            delegate = new foam.nanos.medusa.ClusterClientDAO.Builder(getX())
+                          .setServiceName(getNSpec().getName())
+                          .setDelegate(delegate)
+                          .build();
+          // // test if chain already has ClusterConfigDAO
+          // boolean found = false;
+          // foam.dao.DAO next = delegate;
+          // while ( next instanceof foam.dao.ProxyDAO &&
+          //   ! ( next instanceof foam.nanos.medusa.ClusterClientDAO ) ) {
+          //   next = ((foam.dao.ProxyDAO) next).getDelegate();
+          // }
+          // if ( ! ( next instanceof foam.nanos.medusa.ClusterClientDAO ) ) {
+          //   delegate = new foam.nanos.medusa.ClusterClientDAO.Builder(getX())
+          //                 .setServiceName(getNSpec().getName())
+          //                 .setDelegate(delegate)
+          //                 .build();
+          // }
+        }
+
         if ( getAuthorize() ) {
           delegate = new foam.nanos.auth.AuthorizationDAO.Builder(getX())
             .setDelegate(delegate)
             .setAuthorizer(getAuthorizer())
             .build();
-        }
-
-        if ( getCluster() ) {
-          // test if chain already has CluterConfigDAO
-          boolean found = false;
-          foam.dao.DAO next = delegate;
-          while ( next instanceof foam.dao.ProxyDAO &&
-            ! ( next instanceof foam.nanos.medusa.ClusterClientDAO ) ) {
-            next = ((foam.dao.ProxyDAO) next).getDelegate();
-          }
-          if ( ! ( next instanceof foam.nanos.medusa.ClusterClientDAO ) ) {
-            delegate = new foam.nanos.medusa.ClusterClientDAO.Builder(getX())
-                          .setServiceName(getNSpec().getName())
-                          .setDelegate(delegate)
-                          .build();
-          }
         }
 
         if ( getNSpec() != null && getNSpec().getServe() && ! getAuthorize() && ! getReadOnly() )

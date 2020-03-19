@@ -29,7 +29,7 @@ foam.CLASS({
       name: 'state',
       class: 'Enum',
       of: 'foam.nanos.medusa.ElectoralServiceState',
-      value: 'foam.nanos.medusa.ElectoralServiceState.NONE' //'IN_SESSION'
+      value: 'foam.nanos.medusa.ElectoralServiceState.NONE'
     },
     {
       name: 'electionTime',
@@ -48,8 +48,7 @@ foam.CLASS({
     },
     {
       name: 'winner',
-      class: 'FObjectProperty',
-      of: 'foam.nanos.medusa.ClusterConfig'
+      class: 'String'
     }
   ],
 
@@ -82,10 +81,12 @@ foam.CLASS({
       ],
       javaCode: `
       if ( result >= 0 ) {
+        ((Logger) getX().get("logger")).debug(this.getClass().getSimpleName(), "recordResult", config.getId(), result);
         setVotes(getVotes() + 1);
         if ( result > getCurrentSeq() ) {
+          ((Logger) getX().get("logger")).debug(this.getClass().getSimpleName(), "recordResult", config.getId(), result, "winner");
           setCurrentSeq(result);
-          setWinner(config);
+          setWinner(config.getId());
         }
       }
     `
@@ -121,34 +122,39 @@ foam.CLASS({
         }
       ],
       javaCode: `
+      ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
       DAO dao = (DAO) x.get("localClusterConfigDAO");
-      return (ClusterConfig) dao.find_(x, System.getProperty("hostname", "localhost"));
+      return (ClusterConfig) dao.find_(x, service.getConfigId());
       `
     },
     {
       name: 'dissolve',
       javaCode: `
-    ClusterConfig config = findConfig(getX());
-    Logger logger = new PrefixLogger(new Object[] {
-      this.getClass().getSimpleName(),
-      "dissolve"
-    }, (Logger) getX().get("logger"));
-    logger.debug(getState().getLabel());
-    // if ( getState().equals(ElectoralServiceState.ELECTION) ) {
-    //  logger.debug("election in progress since", getElectionTime());
-    //   return;
-    // }
+      ClusterConfig config = findConfig(getX());
+      Logger logger = new PrefixLogger(new Object[] {
+        this.getClass().getSimpleName(),
+        "dissolve"
+      }, (Logger) getX().get("logger"));
+      logger.debug(getState().getLabel());
+
+      if ( getState() == ElectoralServiceState.ELECTION &&
+          getElectionTime() > 0L ) {
+        logger.debug("election in progress since", getElectionTime());
+        return;
+      }
+
       setElectionTime(System.currentTimeMillis());
       setState(ElectoralServiceState.ELECTION);
+      setVotes(0);
       recordResult(vote(config.getId(), getElectionTime()), config);
 
       List arr = getVoters(getX());
 
-        if ( arr.size() <= 1 ) {
-          // nothing to do.
-          logger.warning("election, but no members", arr.size());
-          return;
-        }
+      if ( arr.size() <= 1 ) {
+        // nothing to do.
+        logger.warning("election, but no members", arr.size());
+        return;
+      }
 
         ExecutorService pool = Executors.newFixedThreadPool(arr.size());
         List<Callable<Long>> voteCallables = new ArrayList<>();
@@ -168,8 +174,9 @@ foam.CLASS({
              .build();
           
           voteCallables.add(() -> {
-            logger.debug("vote", clientConfig.getId());
+            logger.debug("call", "vote", clientConfig.getId());
             long result = electoralService.vote(clientConfig.getId(), getElectionTime());
+            logger.debug("call", "vote", clientConfig.getId(), "response", result);
             recordResult(result, clientConfig);
             return result;
           });
@@ -179,7 +186,6 @@ foam.CLASS({
           List<Future<Long>> voteResults =  pool.invokeAll(voteCallables);
           for( Future<Long> voteResult : voteResults ) {
             try {
-              logger.debug("voteResult");
               long vote = voteResult.get(5, TimeUnit.SECONDS);
             } catch(Exception e) {
               logger.error(e);
@@ -189,13 +195,15 @@ foam.CLASS({
             }
             if (getState().equals(ElectoralServiceState.ELECTION) &&
                 hasQuorum(arr.size())) {
-              ClusterConfig winner = getWinner();
-              report(winner);
+              report(getWinner());
               List<Callable<String>> reportCallables = new ArrayList<>();
               for (int j = 0; j < arr.size(); j++) {
                 ClusterConfig clientConfig2 = (ClusterConfig) arr.get(j);
-                if ( ! clientConfig2.getId().equals(config.getId())) {
-          ClientElectoralService electoralService2 =
+                if ( clientConfig2.getId().equals(config.getId())) {
+                  continue;
+                }
+
+                ClientElectoralService electoralService2 =
             new ClientElectoralService.Builder(getX())
              .setDelegate(new HTTPBox.Builder(getX())
                .setUrl(buildURL(clientConfig2))
@@ -203,12 +211,12 @@ foam.CLASS({
                .setSessionID(clientConfig2.getSessionId())
                .build())
              .build();
-                  reportCallables.add(() -> {
-                    logger.debug("report(winner)", winner.getId());
-                    electoralService2.report(winner);
-                    return clientConfig2.getId();
-                  });
-                }
+
+                reportCallables.add(() -> {
+                  logger.debug("call", "report(winner)", getWinner());
+                  electoralService2.report(getWinner());
+                  return clientConfig2.getId();
+                });
               }
               try {
                 List<Future<String>> reportResults =  pool.invokeAll(reportCallables);
@@ -233,7 +241,6 @@ foam.CLASS({
           pool.shutdown();
           logger.debug("finally", "votes", getVotes(), "arr.size", arr.size(), getState().getLabel());
         }
-      // }
      `
     },
     {
@@ -255,29 +262,33 @@ foam.CLASS({
     {
       name: 'report',
       javaCode: `
-      ((Logger) getX().get("logger")).debug(this.getClass().getSimpleName(), "report", winner.getId(), getState().getLabel());
       ClusterConfigService service = (ClusterConfigService) getX().get("clusterConfigService");
+      ((Logger) getX().get("logger")).debug(this.getClass().getSimpleName(), "report", winner, getState().getLabel(), "service", service.getConfigId(), "before", "primary", service.getPrimaryConfigId(), service.getIsPrimary());
+
+      if ( winner != service.getPrimaryConfigId() ) {
+
+      service.setPrimaryConfigId(winner);
+      service.setIsPrimary(service.getConfigId().equals(winner));
+
       DAO dao = (DAO) getX().get("localClusterConfigDAO");
       List arr = getVoters(getX());
       for (int i = 0; i < arr.size(); i++) {
-        ClusterConfig clientConfig = (ClusterConfig) arr.get(i);
-        if ( winner.getId().equals(clientConfig.getId()) ) {
-          ClusterConfig newConfig = (ClusterConfig) (clientConfig.fclone());
-          newConfig.setIsPrimary(true);
-          newConfig = (ClusterConfig) dao.put_(getX(), newConfig);
-          service.setPrimaryConfig(newConfig);
-        } else if ( clientConfig.getIsPrimary() ) {
-          ClusterConfig newConfig = (ClusterConfig) (clientConfig.fclone());
-          newConfig.setIsPrimary(false);
-          dao.put_(getX(), newConfig);
+        ClusterConfig config = (ClusterConfig) ((ClusterConfig) arr.get(i)).fclone();
+        if ( winner.equals(config.getId()) &&
+             ! config.getIsPrimary() ) {
+          // found the winner, and it is the 'new' primary, may or may not be us.
+          config.setIsPrimary(true);
+          dao.put_(getX(), config);
+        } else if ( config.getIsPrimary() ) {
+          // no longer primary
+          config.setIsPrimary(false);
+          dao.put_(getX(), config);
         }
       }
-      ClusterConfig config = findConfig(getX());
-      service.setConfig(config);
-      if ( config.getId() == service.getPrimaryConfig().getId() ) {
-        service.setIsPrimary(true);
-      }
+      } 
       setState(ElectoralServiceState.IN_SESSION);
+
+      ((Logger) getX().get("logger")).debug(this.getClass().getSimpleName(), "report", winner, getState().getLabel(), "service", service.getConfigId(), "after", "primary", service.getPrimaryConfigId(), service.getIsPrimary());
      `
     },
     {
@@ -296,14 +307,13 @@ foam.CLASS({
         .where(
           AND(
             service.getVoterPredicate(x),
-//            NEQ(ClusterConfig.ID, config.getId()),
             EQ(ClusterConfig.REALM, config.getRealm()),
             EQ(ClusterConfig.REGION, config.getRegion())
           )
         )
         .select(new ArraySink())).getArray();
      return arr;
-      `
+     `
     }
   ]
 });

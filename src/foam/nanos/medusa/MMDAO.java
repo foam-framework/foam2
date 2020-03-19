@@ -8,16 +8,17 @@ package foam.nanos.medusa;
 
 import foam.core.X;
 import foam.core.ClassInfo;
+import foam.core.Detachable;
 import foam.core.FObject;
+import foam.core.Identifiable;
+import foam.dao.AbstractSink;
+import foam.dao.DAO;
 import foam.dao.java.JDAO;
 import foam.dao.MDAO;
 import foam.nanos.boot.NSpec;
-import foam.core.Identifiable;
+import foam.nanos.logger.Logger;
 import foam.nanos.fs.ResourceStorage;
 import foam.nanos.fs.Storage;
-import foam.dao.AbstractSink;
-import foam.core.Detachable;
-import foam.dao.DAO;
 
 public class MMDAO extends JDAO {
 
@@ -39,7 +40,7 @@ public class MMDAO extends JDAO {
   //  // getJournal().replay(x, getDelegate());
   //}
 
-  public MMDAO(X x, String nspecKey, DAO dao, String mnPort, String fileName) {
+  public MMDAO(X x, String nspecKey, DAO dao, String journalKey, String fileName) {
     setX(x);
     setOf(dao.getOf());
 
@@ -54,8 +55,8 @@ public class MMDAO extends JDAO {
 
     this.nspecKey = nspecKey;
     setDelegate(dao);
-    this.mnPort = mnPort;
-    setJournal(MMJournal.getMMjournal(x, mnPort));
+    this.mnPort = journalKey;
+    setJournal(MMJournal.getMMjournal(x, journalKey));
     ((MMJournal) getJournal()).replay(x, nspecKey, getDelegate());
   }
   //Remove synchronized key word.
@@ -72,8 +73,10 @@ public class MMDAO extends JDAO {
     FObject result = null;
     //TODO: Change to assembly version.
     synchronized ( uniqueStringLock ) {
-      getJournal().put(x, nspecKey, getDelegate(), obj);
-      result = getDelegate().put_(x, obj);
+      ((Logger)x.get("logger")).debug("MMDAO", this.nspecKey, "journal.put", obj);
+      result = getJournal().put(x, nspecKey, getDelegate(), obj);
+      //      ((Logger)x.get("logger")).debug("MMDAO", this.nspecKey, "delegate mdao.put", result);
+      //      result = getDelegate().put_(x, result);
     }
     return result;
   }

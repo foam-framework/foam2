@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.nanos.medusa',
   name: 'ClusterConfigPingSink',
-  extends: 'foam.dao.ProxySink',
+  extends: 'foam.dao.AbstractSink',
 
   javaImports: [
     'foam.nanos.http.PingService',
@@ -35,7 +35,7 @@ foam.CLASS({
       args: [
         {
           name: 'obj',
-          type: 'foam.core.FObject'
+          type: 'Object'
         },
         {
           name: 'sub',
@@ -43,9 +43,8 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      ClusterConfig old = (ClusterConfig) obj;
-      ((Logger) getX().get("logger")).debug(this.getClass().getSimpleName(), old.getId(), old.getStatus().getLabel());
-      ClusterConfig config = (ClusterConfig) obj.fclone();
+      ClusterConfig config = (ClusterConfig) ((ClusterConfig) obj).fclone();
+      ((Logger) getX().get("logger")).debug(this.getClass().getSimpleName(), config.getId(), config.getStatus().getLabel());
       Long startTime = System.currentTimeMillis();
       PingService ping = (PingService) getX().get("ping");
       try {
@@ -53,7 +52,7 @@ foam.CLASS({
         config.setPingLatency(latency);
         config.setStatus(Status.ONLINE);
         ClusterConfig.PING_INFO.clear(config);
-        // if ( old.getStatus() == Status.OFFLINE ) {
+        // if ( config.getStatus() == Status.OFFLINE ) {
         //   ClusterConfigService clusterService = (ClusterConfigService) getX().get("clusterConfigService");
         //   if ( clusterService.canVote(getX(), config) ) {
         //     ElectoralService electoralService = (ElectoralService) getX().get("electoralService");

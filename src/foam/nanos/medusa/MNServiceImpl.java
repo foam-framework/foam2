@@ -18,7 +18,7 @@ public class MNServiceImpl implements MNService {
   public void replayAll(X x, String serviceName) {
     DAO dao = (DAO) x.get(serviceName);
 
-    if ( dao == null ) throw new RuntimeException("DAO miss: " + serviceName);
+    if ( dao == null ) throw new RuntimeException("DAO not found: " + serviceName);
 
     MNJournal journal = MNJournal.getMNjournal(x, serviceName + "s");
 
@@ -33,7 +33,7 @@ public class MNServiceImpl implements MNService {
 
   public void serviceMate(X x, String serviceName) {
     DAO dao = (DAO) x.get("serviceName");
-    if (dao == null ) throw new RuntimeException("DAO miss: " + serviceName);
+    if (dao == null ) throw new RuntimeException("DAO not found: " + serviceName);
 
     MNJournal journal = MNJournal.getMNjournal(x, serviceName + "s");
 

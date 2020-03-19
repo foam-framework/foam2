@@ -56,71 +56,74 @@ foam.CLASS({
 
       ElectoralService electoralService = (ElectoralService) x.get("electoralService");
       ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
-      if ( electoralService != null &&
-           electoralService.getState() == ElectoralServiceState.IN_SESSION &&
-           service != null &&
-           service.getConfig() != null &&
-           ! service.getIsPrimary() ) {
 
-        foam.core.FObject old = getDelegate().find_(x, obj.getProperty("id"));
-        foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(x).setPropertyPredicate(new foam.lib.ClusterPropertyPredicate());
+      foam.core.FObject old = getDelegate().find_(x, obj.getProperty("id"));
+      foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(x).setPropertyPredicate(new foam.lib.ClusterPropertyPredicate());
+
         //TODO: outputDelta has problem when output array. Fix bugs then use output delta.
         // String record = ( old != null ) ?
         //   outputter.stringifyDelta(old, obj) :
         //   outputter.stringify(obj);
         String record = outputter.stringify(obj);
-        logger.debug("record", record);
         if ( foam.util.SafetyUtil.isEmpty(record) ||
             "{}".equals(record.trim()) ) {
-          logger.debug("no changes");
+          logger.debug("no changes", record);
           return obj;
         }
-        ClusterCommand cmd = new ClusterCommand(x, getServiceName(), ClusterCommand.PUT, record);
-        logger.debug("to primary", cmd);
 
-        int retryAttempt = 1;
-        int retryDelay = 1;
+        int retryAttempt = 0;
+        int retryDelay = 10;
+
+        ClusterCommand cmd = new ClusterCommand(x, getServiceName(), ClusterCommand.PUT, record);
 
         while ( ! service.getIsPrimary() ) {
-          try {
-            logger.debug("retryAttempt", retryAttempt);
-            FObject result = (FObject) service.getPrimaryDAO(x, getServiceName()).cmd_(x, cmd);
-            logger.debug("from primary", result.getClass().getSimpleName(), result);
-            obj = obj.copyFrom(result);
-            logger.debug("obj after copyFrom", obj);
-            return obj;
+         try {
+           if ( electoralService.getState() == ElectoralServiceState.IN_SESSION ) {
+              logger.debug("to primary", service.getPrimaryConfigId(), cmd);
+              FObject result = (FObject) service.getPrimaryDAO(x, getServiceName()).cmd_(x, cmd);
+              logger.debug("from primary", result);
+              obj = obj.copyFrom(result);
+              logger.debug("obj after copyFrom", obj);
+              return obj;
+            } else {
+              logger.debug("Election in progress.", electoralService.getState().getLabel());
+              throw new RuntimeException("Election in progress.");
+            }
           } catch ( Throwable t ) {
+            logger.debug("from primary, error", t.getMessage());
+
             if ( getMaxRetryAttempts() > -1 &&
                  retryAttempt >= getMaxRetryAttempts() ) {
               logger.debug("retryAttempt >= maxRetryAttempts", retryAttempt, getMaxRetryAttempts());
-              electoralService.dissolve();
 
+              if ( electoralService.getState() == ElectoralServiceState.IN_SESSION ) {
+                electoralService.dissolve();
+              }
               throw t;
             }
             retryAttempt += 1;
 
             // delay
             try {
-              logger.debug("retryDelay", retryDelay);
-              Thread.sleep(retryDelay);
-              retryDelay *= 2;
-              if ( retryDelay > getMaxRetryDelay() ) {
-                retryDelay = 1;
+              if ( electoralService.getState() == ElectoralServiceState.IN_SESSION ) {
+                retryDelay *= 2;
+              } else {
+                retryDelay = 1000;
               }
-            } catch(InterruptedException e) {
+              if ( retryDelay > getMaxRetryDelay() ) {
+                retryDelay = 10;
+              }
+              logger.debug("retry attempt", retryAttempt, "delay", retryDelay);
+              Thread.sleep(retryDelay);
+           } catch(InterruptedException e) {
               Thread.currentThread().interrupt();
               logger.debug("InterruptedException");
               throw t;
             }
           }
         }
-        // we've become primary
-        logger.debug("secondary -> primary delegating");
-        return getDelegate().put_(x, obj);
-      } else {
         logger.debug("primary delegating");
         return getDelegate().put_(x, obj);
-      }
       `
     },
     {
@@ -133,12 +136,14 @@ foam.CLASS({
         "remove_",
       }, (Logger) x.get("logger"));
 
+      // TODO: Add Retry
+
       ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
       if ( service != null &&
-           service.getConfig() != null &&
+           service.getConfigId() != null &&
            ! service.getIsPrimary() ) {
 
-       foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(x).setPropertyPredicate(new foam.lib.ClusterPropertyPredicate());
+        foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(x).setPropertyPredicate(new foam.lib.ClusterPropertyPredicate());
         String record = outputter.stringify(obj);
 
         ClusterCommand cmd = new ClusterCommand(x, getServiceName(), ClusterCommand.REMOVE, record);

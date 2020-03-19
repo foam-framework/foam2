@@ -118,8 +118,8 @@ public class VotingDAO extends ProxyDAO {
       ClusterConfig primary = new ClusterConfig();
       primary.setId(primaryClusterConfig.getId());
       primary.setServicePort(primaryClusterConfig.getServicePort());
-      this.setConfig(config);
-      this.setPrimaryConfig(primary);
+      this.setConfigId(config.getId());
+      this.setPrimaryConfigId(primary.getId());
     }
 
   }

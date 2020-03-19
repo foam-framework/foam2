@@ -136,7 +136,7 @@ foam.CLASS({
       javaCode: `
     PM pm = createPM(x, getPutName());
     try {
-      return super.put_(x, obj);
+       return super.put_(x, obj);
     } finally {
       log(x, pm);
     }

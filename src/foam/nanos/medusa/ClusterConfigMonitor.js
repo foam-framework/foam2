@@ -15,11 +15,11 @@ foam.CLASS({
   javaImports: [
     'foam.core.X',
     'foam.dao.DAO',
-    'foam.dao.Sink',
     'foam.nanos.logger.Logger',
     'static foam.mlang.MLang.AND',
     'static foam.mlang.MLang.EQ',
-    'static foam.mlang.MLang.NEQ'
+    'static foam.mlang.MLang.NEQ',
+    'static foam.mlang.MLang.NOT'
   ],
 
   methods: [
@@ -33,19 +33,15 @@ foam.CLASS({
       ],
       javaCode: `
       ((Logger) x.get("logger")).debug(this.getClass().getSimpleName(), "execute");
-      DAO dao = (DAO) x.get("clusterConfigDAO");
-      dao.select_(
-       x,
-       new ClusterConfigPingSink(x, dao),
-       0,
-       0,
-       null,
+      DAO dao = (DAO) x.get("localClusterConfigDAO");
+      dao = dao.where(
        AND(
           EQ(ClusterConfig.ENABLED, true),
-          NEQ(ClusterConfig.ID, System.getProperty("hostname", "localhost"))
+          NOT(EQ(ClusterConfig.ID, System.getProperty("hostname", "localhost")))
         )
       );
-      `
+      dao.select(new ClusterConfigPingSink(x, dao));
+   `
     }
   ]
 });

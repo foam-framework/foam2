@@ -1,5 +1,11 @@
-p({"class":"foam.nanos.boot.NSpec", "name":"nSpecDAO",                           "serve":true,  "authenticate": false, "serviceClass":"foam.dao.ProxyDAO", "client":"{\"of\":\"foam.nanos.boot.NSpec\",\"cache\":true}"})
-
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"nSpecDAO",
+  "serve":true,
+  "authenticate": false,
+  "serviceClass":"foam.dao.ProxyDAO",
+  "client":"{\"of\":\"foam.nanos.boot.NSpec\",\"cache\":true}"
+})
 
 p({
   "class":"foam.nanos.boot.NSpec",
@@ -363,7 +369,22 @@ p({
   "serviceClass":"foam.nanos.auth.CountryService"
 })
 
-p({"class":"foam.nanos.boot.NSpec", "name":"languageDAO",                        "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setPm(true).setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer(\"languageDAO\")).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"languages\").setOf(foam.nanos.auth.Language.getOwnClassInfo()).build();", "client":"{\"of\":\"foam.nanos.auth.Language\"}"})
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"languageDAO",
+  "lazy":false,
+  "serve":true,
+  "serviceScript":`
+    return new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("languageDAO"))
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("languages")
+      .setOf(foam.nanos.auth.Language.getOwnClassInfo())
+      .build();
+    `,
+  "client":"{\"of\":\"foam.nanos.auth.Language\"}"
+})
 
 p({
   "class": "foam.nanos.boot.NSpec",
@@ -686,6 +707,7 @@ p({
       .setOf(foam.nanos.ruler.RuleHistory.getOwnClassInfo())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("ruleHistory")
+      .setCluster(false)
       .build();
     """,
     "client":"{\"of\":\"foam.nanos.ruler.RuleHistory\"}"
