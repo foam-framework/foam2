@@ -23,7 +23,7 @@ foam.INTERFACE({
       name: 'exportModel',
 
       tableColumns: [
-        'propName',
+        'fieldName',
         'errorStrings',
         'maxStrLength',
         'minStrLength',
@@ -61,7 +61,6 @@ foam.INTERFACE({
   properties: [
     {
       name: 'dao',
-      hidden: true,
       factory: function() {
         return this.EasyDAO.create({
           seqNo: true,
@@ -83,7 +82,8 @@ foam.INTERFACE({
   actions: [
     async function exportValidation(X) {
       var properties = this.cls_.getAxiomsByClass(foam.core.Property);
-      properties.forEach((p) => {
+      for ( i = 0; i < properties.length; i++ ) {
+        var p = properties[i];
         var export_ = this.exportModel.create({
           fieldName: p.label,
           minStrLength: p.minLength,
@@ -92,12 +92,12 @@ foam.INTERFACE({
           maxNumLength: p.max
         });
         if ( p.validationPredicates.length > 0 ) {
-          p.validationPredicates.forEach((pred) => {
-            export_.criteria.push(pred.errorString);
-          });
+          for ( i = 0; i < p.validationPredicates.length; i++ ) {
+            // export_.criteria.push(p.validationPredicates[i].errorString);
+          }
         }
-        this.dao.put(export_);
-      });
+        await this.dao.put(export_);
+      }
 
       this.csvDriver.exportDAO(this.__context__, this.dao)
       .then(function(result) {

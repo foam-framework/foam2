@@ -291,6 +291,7 @@ foam.CLASS({
       }
     }
   ],
+
   reactions: [
     ['', 'propertyChange.mode', 'onDAOUpdate']
   ]
