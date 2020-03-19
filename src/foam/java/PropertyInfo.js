@@ -157,7 +157,8 @@ foam.CLASS({
         ];
         var primitiveType = ['boolean', 'long', 'byte', 'double','float','short','int'];
         
-        if ( this.propType  == 'java.util.Date' || ! ( primitiveType.includes(this.propType) || this.propType == 'Object' || this.propType == 'String') ){
+        if ( this.propType == 'java.util.Date' || 
+             ! ( primitiveType.includes(this.propType) || this.propType == 'Object' || this.propType == 'String') ){
           m.push({
             name: 'cast',
             type: this.propType,
@@ -167,7 +168,9 @@ foam.CLASS({
           });
         }
         
-        if ( this.propType  == 'java.util.Date' || this.propType == 'String' ||  ! ( primitiveType.includes(this.propType)|| this.propType == 'Object' || this.extends == 'foam.core.AbstractFObjectPropertyInfo' || this.extends == 'foam.core.AbstractFObjectArrayPropertyInfo') ){
+        if ( this.propType == 'java.util.Date' ||
+             this.propType == 'String' ||  
+             ! ( primitiveType.includes(this.propType)|| this.propType == 'Object' || this.extends == 'foam.core.AbstractFObjectPropertyInfo' || this.extends == 'foam.core.AbstractFObjectArrayPropertyInfo') ){
           m.push({
             name: 'getSQLType',
             visibility: 'public',
@@ -176,7 +179,10 @@ foam.CLASS({
           });
         }
         
-        if ( this.propType  == 'java.util.Date' || this.propType == 'String' || this.propType == 'Object' || ! ( primitiveType.includes(this.propType) ) ){
+        if ( this.propType == 'java.util.Date' || 
+             this.propType == 'String' || 
+             this.propType == 'Object' || 
+             ! ( primitiveType.includes(this.propType) ) ){
           m.push({
             name: 'get',
             visibility: 'public',
@@ -193,13 +199,12 @@ foam.CLASS({
           });
         }
 
-        if ( ! ( primitiveType.includes(this.propType) || this.propType  == 'java.util.Date' || this.propType == 'String' || this.propType == 'Object' )      
+        if ( ! ( primitiveType.includes(this.propType) || this.propType  == 'java.util.Date' || this.propType == 'String' || this.propType == 'Object' ) ) {
             //TODO add support for special type.
 //              || this.propType == 'java.util.Map' || this.propType == 'java.util.List'
             //TODO add support for subtype.
 //            this.propType == 'foam.core.AbstractFObjectPropertyInfo' || this.propType == 'foam.core.AbstractClassPropertyInfo') ||
 //            this.propType == 'foam.core.AbstractObjectPropertyInfo'
-              ) {
 
           m.push({
             name: 'getValueClass',
