@@ -62,7 +62,7 @@ foam.CLASS({
             })
             .callIf(section$subTitle, function() {
               this.start().style({
-                'color': '#8e9090',
+                'color': '/*%GREY4%*/ #8e9090',
                 'font-size': '14px',
                 'line-height': '1.5',
                 'margin-bottom': '15px'
