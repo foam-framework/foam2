@@ -92,7 +92,7 @@ foam.CLASS({
             else {
               if( typeof obj[columnMethadata[i].columnName] === "function" )
                 propValues.push('');
-              else if (obj[columnMethadata[i].columnName].toSummary)
+              else if ( obj[columnMethadata[i].columnName].toSummary )
                 propValues.push(obj[columnMethadata[i].columnName].toSummary());
               else
                 propValues.push(obj[columnMethadata[i].columnName].toString());
