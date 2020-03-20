@@ -25,6 +25,7 @@ foam.CLASS({
     'foam.nanos.auth.GroupPermissionJunction',
     'foam.nanos.auth.User',
     'foam.nanos.auth.ServiceProviderAwareDAO',
+    'foam.nanos.auth.LifecycleState',
     'foam.util.Auth',
     'java.util.HashMap',
     'java.util.List',
@@ -80,6 +81,7 @@ foam.CLASS({
           .setId(99995)
           .setEmail("test@example.com")
           .setGroup("admin")
+          .setLifecycleState(LifecycleState.ACTIVE)
           .build();
         ctxUser = (User) delegate.put(ctxUser);
         y = Auth.sudo(y, ctxUser);
@@ -90,6 +92,7 @@ foam.CLASS({
           .setFirstName("first")
           .setLastName("last")
           .setEmail("99999@test.com")
+          .setLifecycleState(LifecycleState.ACTIVE)
           .setGroup("test")
           .build();
 
@@ -102,6 +105,7 @@ foam.CLASS({
           .setFirstName("first_two")
           .setLastName("last_two")
           .setEmail("99998@test.com")
+          .setLifecycleState(LifecycleState.ACTIVE)
           .setGroup("test")
           .build();
         user2 = (User) dao.put(user2);
@@ -159,6 +163,7 @@ foam.CLASS({
           .setFirstName("three")
           .setLastName("last")
           .setEmail("three@test.com")
+          .setLifecycleState(LifecycleState.ACTIVE)
           .setGroup("test")
           .build();
 
@@ -224,6 +229,7 @@ foam.CLASS({
           .setId(99995)
           .setEmail("test@example.com")
           .setGroup("admin")
+          .setLifecycleState(LifecycleState.ACTIVE)
           .build();
         ctxUser = (User) delegate.put(ctxUser);
         y = Auth.sudo(y, ctxUser);
@@ -235,6 +241,7 @@ foam.CLASS({
           .setLastName("last")
           .setEmail("99999@test.com")
           .setGroup("test")
+          .setLifecycleState(LifecycleState.ACTIVE)
           .build();
 
         user1 = (User) dao.put(user1);
@@ -247,6 +254,7 @@ foam.CLASS({
           .setLastName("last_two")
           .setEmail("99998@test.com")
           .setGroup("test")
+          .setLifecycleState(LifecycleState.ACTIVE)
           .build();
         user2 = (User) dao.put(user2);
 
@@ -257,6 +265,7 @@ foam.CLASS({
           .setEmail("99998@test.com")
           .setGroup("test")
           .setSpid("other")
+          .setLifecycleState(LifecycleState.ACTIVE)
           .build();
         user3 = (User) dao.put(user3);
 
@@ -315,6 +324,7 @@ foam.CLASS({
           .setEmail("four@test.com")
           .setGroup("test")
           .setSpid("other")
+          .setLifecycleState(LifecycleState.ACTIVE)
           .build();
 
         try {
