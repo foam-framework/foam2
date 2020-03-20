@@ -89,8 +89,14 @@ foam.CLASS({
               propValues.push(obj[columnMethadata[i].columnName].toString().substring(0, 8));
               columnMethadata[i].perValuePatternSpecificValues.push(obj[columnMethadata[i].columnName].toString().substring(8));
             }
-            else
-              propValues.push(obj[columnMethadata[i].columnName].toString());
+            else {
+              if( typeof obj[columnMethadata[i].columnName] === "function" )
+                propValues.push('');
+              else if (obj[columnMethadata[i].columnName].toSummary)
+                propValues.push(obj[columnMethadata[i].columnName].toSummary());
+              else
+                propValues.push(obj[columnMethadata[i].columnName].toString());
+            }
           }
           else
             propValues.push('');
