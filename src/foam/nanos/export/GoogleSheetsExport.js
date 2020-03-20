@@ -26,6 +26,7 @@ foam.INTERFACE({
         {
           name: 'config',
           type: 'foam.nanos.export.ExportConfig[]',
+          javaType: 'Object'
         }
       ]
     },

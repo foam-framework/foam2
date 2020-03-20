@@ -152,7 +152,7 @@ foam.CLASS({
               return self.E().forEach(this.exportDriverReg.exportConfig, function(a) {
                 var obj = self.ExportConfig.create({ exportMetadata: a, configValue: '' });
                 self.exportConfigArray.push(obj);
-                self.add(self.TextField.create({data: obj.configValue}));
+                return this.start().addClass('label').add(a.labelOfProperty).add(self.TextField.create({data$: obj.configValue$})).end();
               });
             }
           }))
@@ -194,8 +194,8 @@ foam.CLASS({
         var exportDriver = foam.lookup(this.exportDriverReg.driverName).create();
   
         this.note = this.exportData ?
-          await exportDriver.exportDAO(this.__context__, this.exportData) :
-          await exportDriver.exportFObject(this.__context__, this.exportObj);
+          await exportDriver.exportDAO(this.__context__, this.exportData, this.exportConfigArray) :
+          await exportDriver.exportFObject(this.__context__, this.exportObj, this.exportConfigArray);
   
         if ( this.exportAllColumns )
           this.filteredTableColumns = filteredColumnsCopy;
@@ -220,8 +220,8 @@ foam.CLASS({
         var exportDriver    = foam.lookup(this.exportDriverReg.driverName).create();
   
         var p = this.exportData ?
-          exportDriver.exportDAO(this.__context__, this.exportData) :
-          Promise.resolve(exportDriver.exportFObject(this.__context__, this.exportObj));
+          exportDriver.exportDAO(this.__context__, this.exportData, this.exportConfigArray) :
+          Promise.resolve(exportDriver.exportFObject(this.__context__, this.exportObj, this.exportConfigArray));
   
         p.then(result => {
           var link = document.createElement('a');
@@ -261,8 +261,8 @@ foam.CLASS({
 
         var exportDriver    = foam.lookup(this.exportDriverReg.driverName).create();
         var url = this.exportData ?
-          await exportDriver.exportDAO(this.__context__, this.exportData) :
-          await exportDriver.exportFObject(this.__context__, this.exportObj);
+          await exportDriver.exportDAO(this.__context__, this.exportData, this.exportConfigArray) :
+          await exportDriver.exportFObject(this.__context__, this.exportObj, this.exportConfigArray);
         
         if ( this.exportAllColumns )
           this.filteredTableColumns = filteredColumnsCopy;

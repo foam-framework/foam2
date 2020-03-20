@@ -26,14 +26,15 @@ public class GoogleSheetsExportService extends foam.core.AbstractFObject impleme
   private static final String DEFAULT_CURRENCY = "CAD";
 
 
-  public String createSheet(Object obj, Object metadataObj, ExportConfig[] config) {
+  public String createSheet(Object obj, Object metadataObj, Object config) {
 
     try {
       Map<String, ExportConfig> map = new HashMap<>();
 
 
-      for(int i = 0; i < config.length; i++) {
-        map.put(config[i].getExportMetadata().getNameOfProperty(), config[i]);
+      Object[] configObjArray = (Object[])config;
+      for(int i = 0; i < configObjArray.length; i++) {
+        map.put(((ExportConfig)configObjArray[i]).getExportMetadata().getNameOfProperty(), (ExportConfig)configObjArray[i]);
       }
 
       List<List<Object>> listOfValues = new ArrayList<>();
@@ -56,7 +57,7 @@ public class GoogleSheetsExportService extends foam.core.AbstractFObject impleme
         .build();
 
       Spreadsheet st = new Spreadsheet().setProperties(
-        new SpreadsheetProperties().setTitle("NanopayExport" + new Date()));
+        new SpreadsheetProperties().setTitle(map.get("title") == null ? ("NanopayExport" + new Date()) : map.get("title").getConfigValue()));
 
 
       List<ValueRange> data = new ArrayList<>();

@@ -23,7 +23,7 @@ foam.CLASS({
   ],
 
   methods: [
-    async function exportFObject(X, obj) {
+    async function exportFObject(X, obj, config) {
         var self = this;
         
         var sheetId  = '';
@@ -40,7 +40,7 @@ foam.CLASS({
         var url = `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`;
         return url;
     },
-    async function exportDAO(X, dao) {
+    async function exportDAO(X, dao, config) {
       var self = this;
       
       var sink = await dao.select();
