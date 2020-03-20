@@ -22,8 +22,8 @@ foam.CLASS({
   `,
 
   properties: [
-    [ 'width',  5 ],
-    [ 'height', 5 ],
+    [ 'width',  4 ],
+    [ 'height', 4 ],
     {
       name: 'bricks',
       factory: function() {
@@ -67,8 +67,8 @@ foam.CLASS({
 
     function forEachNeighbour(cell, f) {
       this.forNeighbour(cell, f,  0,  1);
-      this.forNeighbour(cell, f, -1,  0);
-      this.forNeighbour(cell, f,  1, -1);
+   //   this.forNeighbour(cell, f, -1,  0);
+   //   this.forNeighbour(cell, f,  1, -1);
     },
 
     function balanceBrick(brick) {
