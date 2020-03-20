@@ -50,3 +50,13 @@ foam.CLASS({
     }
   ]
 });
+
+
+foam.RELATIONSHIP({
+  sourceModel: 'foam.nanos.export.ExportDriverRegistry',
+  targetModel: 'foam.nanos.export.ExportDriverAddOn',
+  forwardName: 'exportConfig',
+  inverseName: 'exportDrivers',
+  cardinality: '*:*'
+  // sourceProperty: {}
+});

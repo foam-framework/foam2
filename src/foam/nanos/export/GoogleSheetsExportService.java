@@ -34,7 +34,7 @@ public class GoogleSheetsExportService extends foam.core.AbstractFObject impleme
 
       Object[] configObjArray = (Object[])config;
       for(int i = 0; i < configObjArray.length; i++) {
-        map.put(((ExportConfig)configObjArray[i]).getExportMetadata().getNameOfProperty(), (ExportConfig)configObjArray[i]);
+        map.put(((ExportConfig)configObjArray[i]).getExportMetadata().getId(), (ExportConfig)configObjArray[i]);
       }
 
       List<List<Object>> listOfValues = new ArrayList<>();

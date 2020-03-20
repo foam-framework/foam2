@@ -150,9 +150,9 @@ foam.CLASS({
           .add(this.slot(function(exportDriverReg) {
             if ( exportDriverReg && exportDriverReg.exportConfig) {
               return self.E().forEach(this.exportDriverReg.exportConfig, function(a) {
-                var obj = self.ExportConfig.create({ exportMetadata: a, configValue: '' });
+                var obj = self.ExportConfig.create({ exportMetadata: a, configValue: false });
                 self.exportConfigArray.push(obj);
-                return this.start().addClass('label').add(a.labelOfProperty).add(self.TextField.create({data$: obj.configValue$})).end();
+                return this.start().addClass('label').add(a.labelOfProperty).add(obj.CONFIG_VALUE).end();
               });
             }
           }))
