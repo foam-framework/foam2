@@ -357,6 +357,8 @@ var classes = [
   'foam.u2.DefaultValidator',
   'foam.u2.DisplayMode',
   'foam.nanos.export.ClientGoogleSheetsExportService',
+  'foam.nanos.export.ExportConfig',
+  'foam.nanos.export.ExportDriverAddOn',
   'foam.nanos.export.ExportDriverRegistry',
   'foam.nanos.export.GoogleApiCredentials',
   'foam.nanos.export.GoogleSheetsExport',

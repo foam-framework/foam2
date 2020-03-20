@@ -42,6 +42,11 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'isOpenable'
+    },
+    {
+      class: 'FObjectArray',
+      of: 'foam.nanos.export.ExportDriverAddOn',
+      name: 'exportConfig'
     }
   ]
 });

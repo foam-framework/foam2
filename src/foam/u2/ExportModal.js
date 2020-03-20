@@ -18,7 +18,10 @@ foam.CLASS({
 
   requires: [
     'foam.u2.ModalHeader',
-    'foam.u2.layout.Cols'
+    'foam.u2.layout.Cols',
+    'foam.u2.TextField',
+    'foam.nanos.export.ExportConfig',
+    'foam.core.type.Map'
   ],
 
   properties: [
@@ -65,7 +68,12 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'isOpenAvailable'
+    },
+    {
+      name: 'exportConfigArray',
+      value: []
     }
+    
   ],
 
   css: `
@@ -139,6 +147,15 @@ foam.CLASS({
         .start()
           .start().addClass('label').add('Data Type').end()
           .start(this.DATA_TYPE).end()
+          .add(this.slot(function(exportDriverReg) {
+            if ( exportDriverReg && exportDriverReg.exportConfig) {
+              return self.E().forEach(this.exportDriverReg.exportConfig, function(a) {
+                var obj = self.ExportConfig.create({ exportMetadata: a, configValue: '' });
+                self.exportConfigArray.push(obj);
+                self.add(self.TextField.create({data: obj.configValue}));
+              });
+            }
+          }))
           .start().addClass('label').add('Response').end()
           .start(this.NOTE).addClass('input-box').addClass('note').end()
           .add(
@@ -255,5 +272,4 @@ foam.CLASS({
       }
     }
   ]
-
 });

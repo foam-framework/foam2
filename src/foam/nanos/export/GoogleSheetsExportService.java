@@ -26,9 +26,16 @@ public class GoogleSheetsExportService extends foam.core.AbstractFObject impleme
   private static final String DEFAULT_CURRENCY = "CAD";
 
 
-  public String createSheet(Object obj, Object metadataObj) {
+  public String createSheet(Object obj, Object metadataObj, ExportConfig[] config) {
 
     try {
+      Map<String, ExportConfig> map = new HashMap<>();
+
+
+      for(int i = 0; i < config.length; i++) {
+        map.put(config[i].getExportMetadata().getNameOfProperty(), config[i]);
+      }
+
       List<List<Object>> listOfValues = new ArrayList<>();
       Object[] metadataArr = (Object[])metadataObj;
       GoogleSheetsPropertyMetadata[] metadata = new GoogleSheetsPropertyMetadata[metadataArr.length];

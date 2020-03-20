@@ -22,6 +22,10 @@ foam.INTERFACE({
           name: 'metadataObj',
           type: 'foam.nanos.export.GoogleSheetsPropertyMetadata[]',
           javaType: 'Object'
+        },
+        {
+          name: 'config',
+          type: 'foam.nanos.export.ExportConfig[]',
         }
       ]
     },

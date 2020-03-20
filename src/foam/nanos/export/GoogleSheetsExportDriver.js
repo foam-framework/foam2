@@ -34,7 +34,7 @@ foam.CLASS({
         var values = self.outputter.outputArray([ obj ], metadata);
         stringArray = stringArray.concat(values);
 
-        sheetId = await X.googleSheetsDataExport.createSheet(stringArray, metadata);
+        sheetId = await X.googleSheetsDataExport.createSheet(stringArray, metadata, config);
         if ( ! sheetId || sheetId.length == 0)
           return '';
         var url = `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`;
@@ -52,7 +52,7 @@ foam.CLASS({
       var values = self.outputter.outputArray(sink.array, metadata);
       stringArray = stringArray.concat(values);
 
-      sheetId = await X.googleSheetsDataExport.createSheet(stringArray, metadata);
+      sheetId = await X.googleSheetsDataExport.createSheet(stringArray, metadata, config);
       if ( ! sheetId || sheetId.length == 0)
         return '';
       var url = `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`;
