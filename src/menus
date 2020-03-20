@@ -136,6 +136,10 @@ p({
   },
   "parent":"admin"
 })
+p({"class":"foam.nanos.menu.Menu","id":"admin.exportDriversConfigType","label":"Export Drivers Config Types","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"exportDriverViewConfigDAO"},"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.exportDriversConfig","label":"Export Drivers Config","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"exportDriverAddOnJunctionDAO"},"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.exportDriversConfigAddOns","label":"Export Drivers Config Add Ons","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"exportDriverAddOnDAO"},"parent":"admin"})
+
 
 // integration
 p({"class":"foam.nanos.menu.Menu","id":"integration","label":"Integration","handler":{"class":"foam.nanos.menu.SubMenu"},"parent":""})

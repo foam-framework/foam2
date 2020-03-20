@@ -360,6 +360,7 @@ var classes = [
   'foam.nanos.export.ExportConfig',
   'foam.nanos.export.ExportDriverAddOn',
   'foam.nanos.export.ExportDriverRegistry',
+  'foam.nanos.export.ExportDriverRegistryExportDriverAddOnJunction',
   'foam.nanos.export.ExportDriverViewConfig',
   'foam.nanos.export.GoogleApiCredentials',
   'foam.nanos.export.GoogleSheetsExport',

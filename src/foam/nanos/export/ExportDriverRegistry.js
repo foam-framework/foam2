@@ -43,20 +43,14 @@ foam.CLASS({
       class: 'Boolean',
       name: 'isOpenable'
     },
-    {
-      class: 'FObjectArray',
-      of: 'foam.nanos.export.ExportDriverAddOn',
-      name: 'exportConfig'
-    }
   ]
 });
-
 
 foam.RELATIONSHIP({
   sourceModel: 'foam.nanos.export.ExportDriverRegistry',
   targetModel: 'foam.nanos.export.ExportDriverAddOn',
+  cardinality: '*:*',
   forwardName: 'exportConfig',
   inverseName: 'exportDrivers',
-  cardinality: '*:*'
-  // sourceProperty: {}
+  junctionDAOKey: 'exportDriverAddOnJunctionDAO'
 });
