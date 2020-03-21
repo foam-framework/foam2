@@ -128,7 +128,6 @@ FOAM_FILES([
   { name: "foam/nanos/medusa/ClusterConfigService" },
   { name: "foam/nanos/medusa/ClusterServerDAO" },
   { name: "foam/nanos/medusa/DefaultClusterConfigService" },
-  { name: "foam/nanos/medusa/Electable" },
   { name: "foam/nanos/medusa/ElectoralService" },
   { name: "foam/nanos/medusa/ElectoralServiceState" },
   { name: "foam/nanos/medusa/ElectoralServiceServer" },

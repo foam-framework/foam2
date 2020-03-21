@@ -89,7 +89,7 @@ import java.util.concurrent.Executors;
 // TODO: refactor this class as DAO.
 // TODO: refactor all clusterNode finding in the a DAO. provide better controller of MN.
 public class MMJournal
-  extends AbstractJournal /*implements Electable*/
+  extends AbstractJournal 
 {
   //  protected X x_;
   private String journalKey;

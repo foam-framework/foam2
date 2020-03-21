@@ -312,7 +312,19 @@ var classes = [
   'foam.nanos.medusa.ElectoralService',
   'foam.nanos.medusa.ElectoralServiceState',
   'foam.nanos.medusa.ElectoralServiceServer',
+  'foam.nanos.medusa.MedusaType',
   'foam.nanos.medusa.Status',
+  'foam.nanos.medusa.MedusaMessage',
+  'foam.nanos.medusa.TcpMessage',
+  'foam.nanos.medusa.FileMeta',
+  'foam.nanos.medusa.MedusaEntry',
+  'foam.nanos.medusa.FilePacket',
+  'foam.nanos.medusa.MNService',
+  'foam.nanos.medusa.BlockInfo',
+  'foam.nanos.medusa.EntryRecord',
+  'foam.nanos.medusa.MNServiceMate',
+  'foam.box.BackoffBox',
+
   'foam.comics.v2.EnabledActionsAuth',
   'foam.comics.v2.BasicEnabledActionsAuth',
   'foam.comics.v2.CRUDEnabledActionsAuth',
@@ -568,20 +580,6 @@ var classes = [
   'foam.strategy.BasicStrategizer',
   'foam.strategy.ClientStrategizerService',
 
-  // Clustering
-  'foam.nanos.medusa.MedusaMessage',
-  'foam.nanos.medusa.TcpMessage',
-  'foam.nanos.medusa.Electable',
-  'foam.nanos.medusa.FileMeta',
-  'foam.nanos.medusa.MedusaType',
-  'foam.nanos.medusa.MedusaEntry',
-  'foam.nanos.medusa.FilePacket',
-  'foam.nanos.medusa.MNService',
-  'foam.nanos.medusa.BlockInfo',
-  'foam.nanos.medusa.EntryRecord',
-  'foam.nanos.medusa.MNServiceMate',
-  'foam.box.BackoffBox',
-
   //concurrent
   'foam.util.concurrent.AbstractAssembly',
   'foam.util.concurrent.Assembly',
@@ -607,7 +605,6 @@ var abstractClasses = [
 var skeletons = [
   'foam.dao.DAO',
   'foam.mop.MOP',
-//  'foam.core.ContextAgent',
   'foam.nanos.app.AppConfigService',
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.AgentAuthService',
