@@ -9,6 +9,7 @@ foam.CLASS({
   name: 'DefaultClusterConfigService',
 
   implements: [
+    'foam.core.ContextAgent',
     'foam.nanos.medusa.ClusterConfigService',
     'foam.nanos.NanoService'
   ],
@@ -17,6 +18,7 @@ foam.CLASS({
     'foam.box.Box',
     'foam.box.HTTPBox',
     'foam.box.SessionClientBox',
+    'foam.core.Agency',
     'foam.core.FObject',
     'foam.core.X',
     'foam.dao.ClientDAO',
@@ -64,22 +66,28 @@ foam.CLASS({
       class: 'Map',
       visibility: 'HIDDEN',
       javaFactory: 'return new java.util.HashMap();'
-    },
-    // {
-    //   name: 'clusterConfigDAO',
-    //   class: 'foam.dao.DAOProperty',
-    //   javaFactory: 'return (foam.dao.DAO) getX().get("localClusterConfigDAO");'
-    // }
+    }
   ],
 
   methods: [
     {
       documentation: `Upon initialization create the ClusterServer configuration and register nSpec.`,
-//      name: 'init_',
       name: 'start',
       javaCode: `
-        Logger logger = (Logger) getX().get("logger");
-        logger.debug(this.getClass().getSimpleName(), "start");
+      ((Agency) getX().get("threadPool")).submit(getX(), this, getClass().getSimpleName());
+      `
+    },
+    {
+      name: 'execute',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      javaCode: `
+        Logger logger = (Logger) x.get("logger");
+        logger.debug(this.getClass().getSimpleName(), "execute");
 
         DAO dao = (DAO) getX().get("localClusterConfigDAO");
         ClusterConfig config = (ClusterConfig) dao.find(getConfigId());
@@ -87,13 +95,14 @@ foam.CLASS({
           config = (ClusterConfig) config.fclone();
           config.setStatus(Status.ONLINE);
           config = (ClusterConfig) dao.put(config);
-          ((ElectoralService) getX().get("electoralService")).dissolve();
+
+          // NOTE: Initial dissolve will be triggered by ClusterConfigMonitor
+          //((ElectoralService) getX().get("electoralService")).dissolve(x);
         } else {
           ((Logger) getX().get("logger")).warning("ClusterConfig not found", getConfigId());
         }
-        // //register ClusterConfig Listener
-        // clusterConfigDAO.listen(new ClusterConfigSink(getX(), this), TRUE);
-        // onDAOUpdate(getX());
+        // TODO/REVIEW: Optionally run as cronjob or timertask if cronjobs are not available on secondaries
+        //getX().get("clusterConfigMonitor");
       `
     },
     {
@@ -147,61 +156,8 @@ foam.CLASS({
                      .build())
                   .build();
           getPrimaryDAOs().put(serviceName, pDao);
-          // ((Logger) x.get("logger")).debug("getPrimaryDAO", getPrimaryConfigId(), serviceName);
         }
         return pDao;
-      `
-    },
-    {
-      documentation: `Rebuild the client list.`,
-      name: 'onDAOUpdate',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        }
-      ],
-      javaCode: `
-//nop
-      // Logger logger = (Logger) x.get("logger");
-      // logger.debug(this.getClass().getSimpleName(), "onDAOUpdate");
-      // String hostname = System.getProperty("hostname", "localhost");
-      // DAO dao = getClusterConfigDAO();
-      // ClusterConfig config = (ClusterConfig) dao.find(hostname);
-      // if ( config == null ) {
-      //   logger.error(this.getClass().getSimpleName(), "onDAOUpdate", "cluster configuration not found for", hostname);
-      //   return;
-      // }
-      // setConfig(config);
-
-      // List andPredicates = new ArrayList();
-      // if ( ! SafetyUtil.isEmpty(config.getRealm()) ) {
-      //   andPredicates.add(EQ(ClusterConfig.REALM, config.getRealm()));
-      // }
-      // if ( ! SafetyUtil.isEmpty(config.getRegion()) ) {
-      //   andPredicates.add(EQ(ClusterConfig.REGION, config.getRegion()));
-      // }
-      // andPredicates.add(EQ(ClusterConfig.ENABLED, true));
-      // andPredicates.add(EQ(ClusterConfig.STATUS, Status.ONLINE));
-      // List configs = (ArrayList) ((ArraySink) getClusterConfigDAO()
-      //   .where(AND((Predicate[]) andPredicates.toArray(new Predicate[andPredicates.size()])))
-      //   .select(new ArraySink())).getArray();
-
-      // List<DAO> newClients = new ArrayList<DAO>();
-      // for ( Object c : configs ) {
-      //   ClusterConfig clientConfig = (ClusterConfig) c;
-      //   if ( clientConfig.getNodeType() == NodeType.PRIMARY ) {
-      //     setPrimaryConfig(clientConfig);
-      //   }
-      // }
-
-      // if ( config.getNodeType().equals(NodeType.PRIMARY) &&
-      //   getPrimaryConfig() == null ) {
-      //   logger.error(this.getClass().getSimpleName(), "onDAOUpdate", "cluster configuration for PRIMARY not found.");
-      // }
-      // setIsPrimary(config.equals(getPrimaryConfig()));
-
-      // getPrimaryDAOs().clear();
       `
     },
     {
@@ -214,12 +170,35 @@ foam.CLASS({
         }
       ],
       javaCode: `
-    return AND(
+      return AND(
               EQ(ClusterConfig.ENABLED, true),
               EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
               EQ(ClusterConfig.ZONE, 0L)
            );
-     `
+      `
+    },
+    {
+      name: 'getVoters',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      javaType: `java.util.List`,
+      javaCode: `
+      ClusterConfig config = getConfig(x, getConfigId());
+      List arr = (ArrayList) ((ArraySink) ((DAO) x.get("localClusterConfigDAO"))
+        .where(
+          AND(
+            getVoterPredicate(x),
+            EQ(ClusterConfig.REALM, config.getRealm()),
+            EQ(ClusterConfig.REGION, config.getRegion())
+          )
+        )
+        .select(new ArraySink())).getArray();
+      return arr;
+      `
     },
     {
       name: 'canVote',
@@ -235,10 +214,10 @@ foam.CLASS({
         }
       ],
       javaCode: `
-    return
-      config.getEnabled() &&
-      config.getType() == MedusaType.MEDIATOR &&
-      config.getZone() == 0L;
+      return
+        config.getEnabled() &&
+        config.getType() == MedusaType.MEDIATOR &&
+        config.getZone() == 0L;
       `
     },
     {
@@ -316,6 +295,27 @@ foam.CLASS({
       config.setConnections(nu);
       ((DAO) x.get("localClusterConfigDAO")).put(config);
      `
-    }
+    },
+    {
+      documentation: 'Are at least half+1 of the expected instances online?',
+      name: 'hasQuorum',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+      ],
+      type: 'Boolean',
+      javaCode: `
+      int online = 0;
+      List<ClusterConfig> voters = getVoters(x);
+      for ( ClusterConfig voter : voters ) {
+        if ( voter.getStatus() == Status.ONLINE ) {
+          online += 1;
+        }
+      }
+      return online >= voters.size() / 2 + 1;
+      `
+    },
   ]
 });

@@ -8,6 +8,10 @@ foam.ENUM({
   
     values: [
       {
+        name: 'ADJOURNED',
+        label: 'Adjourned'
+      },
+      {
         name: 'ELECTION',
         label: 'Election'
       },

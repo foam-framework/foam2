@@ -120,6 +120,16 @@ foam.CLASS({
       factory: function() {
         return this.Outputter.create().copyFrom(foam.json.Network);
       }
+    },
+    {
+      class: 'Int',
+      name: 'connectTimeout',
+      value: 0
+    },
+    {
+      class: 'Int',
+      name: 'readTimeout',
+      value: 0
     }
   ],
 
@@ -245,7 +255,8 @@ try {
   if ( getAuthorizationType().equals(HTTPAuthorizationType.BEARER) ) {
     conn.setRequestProperty("Authorization", "BEARER "+getSessionID());
   }
-
+  conn.setConnectTimeout(getConnectTimeout());
+  conn.setReadTimeout(getReadTimeout());
   java.io.OutputStreamWriter output = new java.io.OutputStreamWriter(conn.getOutputStream(),
                                                                      java.nio.charset.StandardCharsets.UTF_8);
 
@@ -278,7 +289,6 @@ if ( len == 0 && read != -1 ) {
 }
 
 String str = new String(buf, 0, off, java.nio.charset.StandardCharsets.UTF_8);
-
 foam.core.FObject responseMessage = getX().create(foam.lib.json.JSONParser.class).parseString(str);
 
 if ( responseMessage == null ) {

@@ -4,8 +4,11 @@ p({
   "description":"Cluster Monitoring",
   "enabled":true,
   "schedule":{
-    "class":"foam.nanos.cron.CronSchedule",
-    "second":10
+    "class":"foam.nanos.cron.IntervalSchedule",
+    "duration":{
+      "class":"foam.nanos.cron.TimeHMS",
+      "second":10
+    }
   },
   "code":"new foam.nanos.medusa.ClusterConfigMonitor(x).execute(x);"
 })

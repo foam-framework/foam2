@@ -795,20 +795,15 @@ public class MMJournal
 
           if ( connectResult == false )
             throw new RuntimeException("Replay can not connect to: " + node.getId());
-          //          service.addConnection(x, node.getId());
+          service.addConnection(x, node.getId());
           nodeToSocketChannel.put(node.getId(), channel);
-          // if ( config != null ) {
-          //   config = service.addConnection(x, config, node.getId());
-          // } else {
-          //   logger.warning("ClusterConfigService.getConfig null");
-          // }
           logger.info(node.getId());
           nodeToBuffers.put(node.getId(), retrieveDataFromNode(x, channel, fromIndex));
           count++;
         } catch ( Exception e ) {
           logger.error("Failed replay from:", node.getId(), e);
           TCPNioServer.closeSocketChannel(channel);
-          //          service.removeConnection(x, node.getId());
+          service.removeConnection(x, node.getId());
           throw new RuntimeException(e);
         } finally {
           try {
@@ -1344,7 +1339,7 @@ public class MMJournal
         SocketChannel channel = SocketChannel.open();
         channel.configureBlocking(false);
         channel.connect(address);
-        //        service.addConnection(x, config.getId());
+        service.addConnection(x, config.getId());
         // if ( processor.acceptSocketChannel(channel) ) throw new RuntimeException("Socket connection error");
         processor.acceptSocketChannel(channel);
       }

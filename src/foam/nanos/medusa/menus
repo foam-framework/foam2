@@ -1,0 +1,20 @@
+p({
+  "class":"foam.nanos.menu.Menu",
+  "id":"admin.clusterConfig",
+  "label":"Cluster Config",
+  "handler":{
+    "class":"foam.nanos.menu.DAOMenu2",
+    "config":{
+      "class":"foam.comics.v2.DAOControllerConfig",
+      "daoKey":"clusterConfigDAO",
+      "browseViews":[{
+        "class":"foam.comics.v2.BrowseView",
+        "name":"Table",
+        "view":{
+          "class":"foam.u2.view.ScrollTableView"
+        }
+      }]
+    }
+  },
+  "parent":"admin"
+})

@@ -76,9 +76,10 @@ foam.CLASS({
 
         ClusterCommand cmd = new ClusterCommand(x, getServiceName(), ClusterCommand.PUT, record);
 
-        while ( ! service.getIsPrimary() ) {
-         try {
-           if ( electoralService.getState() == ElectoralServiceState.IN_SESSION ) {
+        while ( service != null &&
+                ! service.getIsPrimary() ) {
+        try {
+          if ( electoralService.getState() == ElectoralServiceState.IN_SESSION ) {
               logger.debug("to primary", service.getPrimaryConfigId(), cmd);
               FObject result = (FObject) service.getPrimaryDAO(x, getServiceName()).cmd_(x, cmd);
               logger.debug("from primary", result);
@@ -96,8 +97,9 @@ foam.CLASS({
                  retryAttempt >= getMaxRetryAttempts() ) {
               logger.debug("retryAttempt >= maxRetryAttempts", retryAttempt, getMaxRetryAttempts());
 
-              if ( electoralService.getState() == ElectoralServiceState.IN_SESSION ) {
-                electoralService.dissolve();
+              if ( electoralService.getState() == ElectoralServiceState.IN_SESSION ||
+                  electoralService.getState() == ElectoralServiceState.ADJOURNED ) {
+                electoralService.dissolve(x);
               }
               throw t;
             }
@@ -105,7 +107,8 @@ foam.CLASS({
 
             // delay
             try {
-              if ( electoralService.getState() == ElectoralServiceState.IN_SESSION ) {
+              if ( electoralService.getState() == ElectoralServiceState.IN_SESSION ||
+                  electoralService.getState() == ElectoralServiceState.ADJOURNED ) {
                 retryDelay *= 2;
               } else {
                 retryDelay = 1000;
@@ -122,8 +125,14 @@ foam.CLASS({
             }
           }
         }
-        logger.debug("primary delegating");
-        return getDelegate().put_(x, obj);
+        if ( service != null ) {
+          logger.debug("primary delegating");
+          return getDelegate().put_(x, obj);
+        } else {
+          // service is null.
+          logger.warning("ClusterConfigService not found, operation discarded.", obj);
+          throw new RuntimeException("ClusterConfigService not found, operation discarded.");
+        }
       `
     },
     {

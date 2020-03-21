@@ -3,88 +3,81 @@
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-
 package foam.nanos.http;
 
+import foam.box.Box;
+import foam.box.HTTPBox;
+import foam.box.Message;
+import foam.box.MessageReplyBox;
 import foam.core.*;
 import foam.nanos.logger.Logger;
 import java.io.PrintWriter;
 import java.io.IOException;
-import java.util.Date;
 
 public class PingService
   implements WebAgent
 {
   public PingService() {}
 
-  @Override
   public void execute(X x) {
     PrintWriter out = x.get(PrintWriter.class);
-    out.println("Pong: " + new Date());
+    foam.lib.json.Outputter outputter =
+      new foam.lib.json.Outputter(x)
+      .setPropertyPredicate(new foam.lib.NetworkPropertyPredicate());
+    Message msg = new Message(x);
+    msg.setObject(new Ping());
+    out.println(outputter.stringify(msg));
   }
 
   public Long ping(X x, String hostname, int port)
     throws IOException {
+    return ping(x, hostname, port, 3000);
+  }
+
+  public Long ping(X x, String hostname, int port, int timeout)
+    throws IOException {
+    Logger logger = (Logger) x.get("logger");
 
     // TODO: control http/https
     String urlString = "http://" + hostname + ":" + port + "/service" + "/ping";
+    //    logger.debug(this.getClass().getSimpleName(), urlString);
 
-    Logger logger = (Logger) x.get("logger");
-    logger.debug(this.getClass().getSimpleName(), urlString);
-
-    java.net.HttpURLConnection conn = null;
-    java.io.OutputStreamWriter output = null;
-
-    Long startTime = System.currentTimeMillis();
-    Long latency = 0L;
+    Box box = new HTTPBox.Builder(x)
+      .setUrl(urlString)
+      .setConnectTimeout(timeout)
+      .setReadTimeout(timeout)
+      .build();
 
     try {
-      java.net.URL url = new java.net.URL(urlString);
-      conn = (java.net.HttpURLConnection)url.openConnection();
-      conn.setDoOutput(true);
-      conn.setRequestMethod("GET");
-      //    conn.setRequestProperty("Accept", "application/json");
-      //    conn.setRequestProperty("Content-Type", "application/json");
+      Message msg = x.create(Message.class);
+      msg.setObject(new Ping());
+      msg.getAttributes().put("replyBox", new MessageReplyBox(x));
 
-      output = new java.io.OutputStreamWriter(
-                                              conn.getOutputStream(),
-                                              java.nio.charset.StandardCharsets.UTF_8);
-
-      output.write(System.getProperty("hostname", "localhost"));
-
-      byte[] buf = new byte[8388608];
-      java.io.InputStream input = conn.getInputStream();
-
-      int off = 0;
-      int len = buf.length;
-      int read = -1;
-      while ( len != 0 && ( read = input.read(buf, off, len) ) != -1 ) {
-        off += read;
-        len -= read;
-      }
+      Long latency = 0L;
+      Long startTime = System.currentTimeMillis();
+      box.send(msg);
       latency = System.currentTimeMillis() - startTime;
-
-      // expecting time stamp - is this still needed?
-      if ( len == 0 && read != -1 ) {
-        logger.debug("Invalid Ping Response: ", "zero length");
-        throw new IOException("Invalid Ping Response.");
+      MessageReplyBox reply = (MessageReplyBox) msg.getAttributes().get("replyBox");
+      //      logger.debug(this.getClass().getSimpleName(), "reply", reply);
+      Message response = reply.getMessage();
+      Object obj = response.getObject();
+      if ( obj != null ) {
+        if ( obj instanceof Throwable ) {
+          throw (Throwable) obj;
+        }
+        // TODO: unserialize Ping if useful, perhaps future can contain hops like Trace.
+        //        if ( obj instanceof Ping ) {
+        return latency;
+        //        }
+        //        throw new IOException("Invalid response type: " + obj.getClass().getName() + ", expected foam.nanos.http.Ping.");
       }
-
-      String str = new String(buf, 0, off, java.nio.charset.StandardCharsets.UTF_8);
-      if ( ! str.startsWith("Pong") ) {
-        logger.debug("Invalid Ping Response: ", str);
-        throw new IOException("Invalid Ping Response.");
-      }
-      //Long t = Long.parseLong(str);
-    } catch (Throwable e) {
-      logger.warning(this.getClass().getSimpleName(), urlString, e.getMessage());
+      throw new IOException("Invalid response type: null, expected foam.nanos.http.Ping.");
+    } catch (IOException e) {
+      //      logger.warning(this.getClass().getSimpleName(), urlString, e.getMessage()/*, e*/);
       throw e;
-    } finally {
-      if ( output != null ) {
-        output.close();
-      }
-      // REVIEW: need to close HttpURLConnection?
+    } catch (Throwable t) {
+      //      logger.warning(this.getClass().getSimpleName(), urlString, t.getMessage()/*, t*/);
+      throw new IOException(t.getMessage(), t);
     }
-    return latency;
   }
 }

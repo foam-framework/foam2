@@ -41,6 +41,13 @@ p({
   "serviceClass": "foam.nanos.medusa.DefaultClusterConfigService"
 })
 
+// p({
+//   "class": "foam.nanos.boot.NSpec",
+//   "name": "clusterConfigMonitor",
+//   "serve": false,
+//   "serviceClass": "foam.nanos.medusa.ClusterConfigMonitor"
+// })
+
 p({
   "class": "foam.nanos.boot.NSpec",
   "name": "cluster",

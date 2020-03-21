@@ -11,6 +11,12 @@ foam.INTERFACE({
     {
       name: 'dissolve',
       async: true,
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ]
     },
     {
       name: 'vote',

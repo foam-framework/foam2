@@ -81,15 +81,6 @@ configuration for contacting the primary node.`,
       ],
     },
     {
-      name: 'onDAOUpdate',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        }
-      ]
-    },
-    {
       name: 'getVoterPredicate',
       type: 'foam.mlang.predicate.Predicate',
       args: [
@@ -98,6 +89,16 @@ configuration for contacting the primary node.`,
           type: 'Context'
         }
       ]
+    },
+    {
+      name: 'getVoters',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      javaType: `java.util.List`,
     },
     {
       name: 'canVote',
@@ -138,6 +139,17 @@ configuration for contacting the primary node.`,
           type: 'String'
         }
       ]
+    },
+    {
+      documentation: 'Are at least half+1 of the expected instances online?',
+      name: 'hasQuorum',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+      ],
+      type: 'Boolean',
     }
   ]
 });

@@ -31,8 +31,8 @@ foam.CLASS({
     'type',
     'isPrimary',
     'status',
-    'quorumStatus',
     'pingLatency',
+    'connections',
     'lastModified'
   ],
   
