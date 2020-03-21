@@ -10,7 +10,8 @@ foam.CLASS({
       //typeOfConfig: String, Boolean, DAO (Enum), Number
       // 
       name: 'typeOfConfig',
-      class: 'String'
+      class: 'Reference',
+      of: 'foam.nanos.export.ExportDriverViewConfig'
     },
     {
       name: 'labelOfProperty',

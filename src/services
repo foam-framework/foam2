@@ -1068,7 +1068,7 @@ p({
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName(\"exportDriverAddOns\")
+      .setJournalName(\"exportDriverAddOnJunction\")
       .setOf(foam.nanos.export.ExportDriverRegistryExportDriverAddOnJunction.getOwnClassInfo())
       .build();
   """,

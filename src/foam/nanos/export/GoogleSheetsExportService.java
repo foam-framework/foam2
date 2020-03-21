@@ -13,6 +13,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.*;
+import foam.core.X;
 import foam.nanos.logger.Logger;
 
 import java.util.*;
@@ -26,15 +27,15 @@ public class GoogleSheetsExportService extends foam.core.AbstractFObject impleme
   private static final String DEFAULT_CURRENCY = "CAD";
 
 
-  public String createSheet(Object obj, Object metadataObj, Object config) {
+    public String createSheet(Object obj, Object metadataObj, Object config) {
 
     try {
       Map<String, ExportConfig> map = new HashMap<>();
 
-
+      X x = (X)obj;
       Object[] configObjArray = (Object[])config;
       for(int i = 0; i < configObjArray.length; i++) {
-        map.put(((ExportConfig)configObjArray[i]).getExportMetadata().getId(), (ExportConfig)configObjArray[i]);
+        map.put(((ExportConfig)configObjArray[i]).findExportMetadata(x).getId(), (ExportConfig)configObjArray[i]);
       }
 
       List<List<Object>> listOfValues = new ArrayList<>();

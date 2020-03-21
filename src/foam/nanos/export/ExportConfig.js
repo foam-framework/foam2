@@ -8,7 +8,7 @@ foam.CLASS({
     },
     {
       name: 'exportMetadata',
-      class: 'FObjectProperty',
+      class: 'Reference',
       of: 'foam.nanos.export.ExportDriverAddOn'
     }
   ]

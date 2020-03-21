@@ -21,7 +21,8 @@ foam.CLASS({
     'foam.u2.layout.Cols',
     'foam.u2.TextField',
     'foam.nanos.export.ExportConfig',
-    'foam.core.type.Map'
+    'foam.core.type.Map',
+    'foam.core.SimpleSlot'
   ],
 
   properties: [
@@ -72,8 +73,11 @@ foam.CLASS({
     {
       name: 'exportConfigArray',
       value: []
+    },
+    {
+      name: 'exportConfigAddOns',
+      value: []
     }
-    
   ],
 
   css: `
@@ -132,6 +136,9 @@ foam.CLASS({
       });
       
       self.exportDriverReg$.sub(function() {
+        self.exportDriverReg.getExportConfig(self.__context__).dao.select().then(function(v) {
+          self.exportConfigAddOns = v.array;
+        });
         self.isConvertAvailable =  self.exportDriverReg.isConvertible;
         self.isDownloadAvailable = self.exportDriverReg.isDownloadable;
         self.isOpenAvailable = self.exportDriverReg.isOpenable;
@@ -147,14 +154,12 @@ foam.CLASS({
         .start()
           .start().addClass('label').add('Data Type').end()
           .start(this.DATA_TYPE).end()
-          .add(this.slot(function(exportDriverReg) {
-            if ( exportDriverReg && exportDriverReg.exportConfig) {
-              return self.E().forEach(this.exportDriverReg.exportConfig, function(a) {
-                var obj = self.ExportConfig.create({ exportMetadata: a, configValue: false });
-                self.exportConfigArray.push(obj);
-                return this.start().addClass('label').add(a.labelOfProperty).add(obj.CONFIG_VALUE).end();
-              });
-            }
+          .add(self.slot(function(exportConfigAddOns) {
+            return self.E().forEach(this.exportConfigAddOns, function(a) {
+              var obj = self.ExportConfig.create({ exportMetadata: a, configValue: false });
+              self.exportConfigArray.push(obj);
+              return this.start().addClass('label').add(a.labelOfProperty).add(obj.CONFIG_VALUE).end();
+            });
           }))
           .start().addClass('label').add('Response').end()
           .start(this.NOTE).addClass('input-box').addClass('note').end()
