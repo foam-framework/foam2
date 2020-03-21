@@ -97,13 +97,6 @@ foam.CLASS({
       documentation: 'Mode of a node (read-only, read-write or write-only)'
     },
     {
-      class: 'Enum',
-      of: 'foam.nanos.medusa.quorum.InstanceState',
-      name: 'quorumStatus',
-      value: 'NONE',
-      storageTransient: true
-    },
-    {
       name: 'servicePort',
       class: 'Int',
       value: 8080

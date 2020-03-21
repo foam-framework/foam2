@@ -1406,7 +1406,6 @@ public class MMJournal
   private void processEntry(Long groupId, MedusaEntry entry) {
     ClusterConfigService service = (ClusterConfigService) getX().get("clusterConfigService");
     if ( service.getIsPrimary() ) return;
-    //    if ( quorumService.exposeState == InstanceState.PRIMARY ) return;
     Map<MedusaEntry, Integer> entryCount = cachedEntry.get(groupId);
     //TODO: provide a way to clear cache.
     synchronized ( entryCount ) {
@@ -1580,16 +1579,13 @@ public class MMJournal
     }
   }
 
-  // private volatile InstanceState currentState = InstanceState.ELECTING;
   public synchronized void primary(X x) {
     logger.info("start primary: " + journalKey);
     this.leaveSecondary(getX());
     this.updateData(getX(), false);
-    //   currentState = InstanceState.PRIMARY;
   }
 
   public boolean isPrimary(X x) {
-    //return currentState == InstanceState.PRIMARY;
     ClusterConfigService service = (ClusterConfigService) getX().get("clusterConfigService");
     return service.getIsPrimary();
   }
@@ -1598,17 +1594,14 @@ public class MMJournal
      logger.info("start secondary: " + journalKey);
      leavePrimary(getX());
      updateData(getX(), true);
-    //    currentState = InstanceState.SECONDARY;
   }
 
   public boolean isSecondary(X x) {
-    //  return currentState == InstanceState.SECONDARY;
     ClusterConfigService service = (ClusterConfigService) getX().get("clusterConfigService");
     return ! service.getIsPrimary();
  }
 
   public synchronized void leaveSecondary(X x) {
-    //    currentState = InstanceState.ELECTING;
     logger.info("leaveSecondary");
     stopReplay(x);
     cleanConnection(x);
@@ -1618,7 +1611,6 @@ public class MMJournal
   }
 
   public synchronized void leavePrimary(X x) {
-    //    currentState = InstanceState.ELECTING;
     cleanConnection(x);
     needReplay = true;
   }
