@@ -156,9 +156,13 @@ foam.CLASS({
           .start(this.DATA_TYPE).end()
           .add(self.slot(function(exportConfigAddOns) {
             return self.E().forEach(this.exportConfigAddOns, function(a) {
+              a.typeOfConfig$find.then((v) => {
+                return this.addClass('label').start().add(a.labelOfProperty).end().start(obj.CONFIG_VALUE.clone().copyFrom({
+                  view: { class: v.viewClass }
+                })).end();
+              });
               var obj = self.ExportConfig.create({ exportMetadata: a, configValue: false });
               self.exportConfigArray.push(obj);
-              return this.start().addClass('label').add(a.labelOfProperty).add(obj.CONFIG_VALUE).end();
             });
           }))
           .start().addClass('label').add('Response').end()
