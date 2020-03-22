@@ -157,8 +157,19 @@ foam.CLASS({
           .add(self.slot(function(exportConfigAddOns) {
             return self.E().forEach(this.exportConfigAddOns, function(a) {
               a.typeOfConfig$find.then((v) => {
-                return this.addClass('label').start().add(a.labelOfProperty).end().start(obj.CONFIG_VALUE.clone().copyFrom({
-                  view: { class: v.viewClass }
+
+                var view = { class: v.viewClass };
+                if ( a.options ) {
+                  view.choices = a.options;
+                } else if ( a.daoSource && a.daoSource.length > 0 ) {
+                  view.dao = self.__context__[a.daoSource];
+                  view.objToChoice = function(a) {
+                    return [a.id, a.id];
+                  };
+                }
+                
+                return this.start().addClass('label').add(a.labelOfProperty).end().start(obj.CONFIG_VALUE.clone().copyFrom({
+                  view: view
                 })).end();
               });
               var obj = self.ExportConfig.create({ exportMetadata: a, configValue: false });
