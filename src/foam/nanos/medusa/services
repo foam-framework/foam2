@@ -76,13 +76,6 @@ p({
 
 p({
   "class":"foam.nanos.boot.NSpec",
-  "name":"quorumService",
-  "lazy":false,
-  "serviceClass":"foam.nanos.medusa.quorum.QuorumService"
-})
-
-p({
-  "class":"foam.nanos.boot.NSpec",
   "name":"electoralService",
   "lazy":false,
   "serve":true,
@@ -90,4 +83,60 @@ p({
   "authenticate": true,
   "serviceClass":"foam.nanos.medusa.ElectoralServiceServer",
   "client":"{ \"class\":\"foam.nanos.medusa.ClientElectoralService\" }"
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "daggerService",
+  "lazy": false,
+  "serve": false,
+  "serviceClass": "foam.nanos.medusa.DefaultDaggerService"
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "localMedusaEntryDAO",
+  "lazy": true,
+  "serve": false,
+  "serviceScript": `
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.medusa.MedusaEntry.getOwnClassInfo())
+      .setCluster(false)
+      .setRuler(false)
+      .setAuthorize(false)
+      .setPm(true)
+      .build();
+   `
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "medusaEntryDAO",
+  "lazy": true,
+  "serve": true,
+  "serviceScript": `
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.medusa.MedusaEntry.getOwnClassInfo())
+      .setGuid(true)
+      .setInnerDAO((foam.dao.DAO) x.get("localMedusaEntryDAO"))
+      .setCluster(false)
+      .setRuler(false)
+      .setEnableInterfaceDecorators(false)
+      .setDecorator(new foam.nanos.medusa.MedusaEntryConsensusDAO.Builder(x)
+        .setDelegate(new foam.nanos.medusa.MedusaEntryRouterDAO.Builder(x)
+          .setDelegate(new foam.dao.NullDAO(x, foam.nanos.medusa.MedusaEntry.getOwnClassInfo()))
+          .buid())
+        .build())
+      .build();
+  `,
+  "client": "{\"of\":\"foam.nanos.medusa.MedusaEntry\"}"
+  // Index: global index.
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "localNodesDAO",
+  "lazy": true,
+  "serve": false,
+  "serviceClass": "foam.nanos.medusa.NodesDAO"
 })

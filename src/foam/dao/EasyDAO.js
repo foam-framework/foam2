@@ -132,7 +132,14 @@ foam.CLASS({
             delegate = new foam.nanos.medusa.MNDAO(getX(), getOf(), getJournalName());
           } else if ( getCluster() == true ) {
             setMdao(new foam.dao.MDAO(getOf()));
-            delegate = new foam.nanos.medusa.MMDAO(getX(), getNSpec().getName(), getMdao(), "singleJournal", getJournalName());
+ //           delegate = new foam.nanos.medusa.MMDAO(getX(), getNSpec().getName(), getMdao(), "singleJournal", getJournalName());
+
+            delegate = new foam.nanos.medusa.MedusaEntryDAO.Builder(getX())
+              .setNSpec(getNSpec())
+              .setDelegate(new foam.nanos.medusa.MedusaEntryBlockingDAO.Builder(getX())
+                .setDelegate(new foam.dao.NullDAO(getX(), getOf()))
+                .build())
+              .build();
           } else if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
             setMdao(new foam.dao.MDAO(getOf()));
             if ( getWriteOnly() ) {

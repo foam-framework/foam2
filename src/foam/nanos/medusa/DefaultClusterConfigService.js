@@ -26,6 +26,7 @@ foam.CLASS({
     'foam.dao.DAO',
     'static foam.mlang.MLang.*',
     'foam.mlang.predicate.Predicate',
+    'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'foam.util.SafetyUtil',
     'java.net.HttpURLConnection',
@@ -65,7 +66,20 @@ foam.CLASS({
       class: 'Map',
       visibility: 'HIDDEN',
       javaFactory: 'return new java.util.HashMap();'
-    }
+    },
+    {
+      name: 'logger',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.logger.Logger',
+      visibility: 'HIDDEN',
+      transient: true,
+      javaFactory: `
+        Logger logger = (Logger) getX().get("logger");
+        return new PrefixLogger(new Object[] {
+          this.getClass().getSimpleName()
+        }, logger);
+      `
+    },
   ],
 
   methods: [
@@ -85,8 +99,7 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        Logger logger = (Logger) x.get("logger");
-        logger.debug(this.getClass().getSimpleName(), "execute");
+        getLogger().debug(this.getClass().getSimpleName(), "execute");
 
         DAO dao = (DAO) getX().get("localClusterConfigDAO");
         ClusterConfig config = (ClusterConfig) dao.find(getConfigId());
@@ -98,7 +111,7 @@ foam.CLASS({
           // NOTE: Initial dissolve will be triggered by ClusterConfigMonitor
           //((ElectoralService) getX().get("electoralService")).dissolve(x);
         } else {
-          ((Logger) getX().get("logger")).warning("ClusterConfig not found", getConfigId());
+          getLogger().warning("ClusterConfig not found", getConfigId());
         }
         // TODO/REVIEW: Optionally run as cronjob or timertask if cronjobs are not available on secondaries
         //getX().get("clusterConfigMonitor");
@@ -129,10 +142,10 @@ foam.CLASS({
           path = "/" + path;
         }
         java.net.URI uri = new java.net.URI("http", null, config.getId(), config.getServicePort(), path+"/"+serviceName, null, null);
-        // ((Logger) x.get("logger")).debug(this.getClass().getSimpleName(), "buildURL", serviceName, uri.toURL().toString());
+        //getLogger.debug("buildURL", serviceName, uri.toURL().toString());
         return uri.toURL().toString();
       } catch (java.net.MalformedURLException | java.net.URISyntaxException e) {
-        ((Logger) getX().get("logger")).error(e);
+        getLogger().error(e);
         return ""; // TODO:
       }
       `
@@ -314,6 +327,20 @@ foam.CLASS({
         }
       }
       return online >= voters.size() / 2 + 1;
+      `
+    },
+     {
+      name: 'getNodesForConsensus',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      type: 'Integer',
+      javaCode: `
+      // TODO: calculate and update on daoupdate
+      return 2;
       `
     },
   ]

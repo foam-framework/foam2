@@ -115,6 +115,16 @@ configuration for contacting the primary node.`,
       ]
     },
     {
+      name: 'getNodesForConsensus',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      type: 'Integer',
+    },
+    {
       name: 'addConnection',
       args: [
         {
@@ -150,6 +160,24 @@ configuration for contacting the primary node.`,
         },
       ],
       type: 'Boolean',
+    },
+    {
+      name: 'buildURL',
+      type: 'String',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'serviceName',
+          type: 'String'
+        },
+        {
+          name: 'config',
+          type: 'foam.nanos.medusa.ClusterConfig'
+        },
+      ],
     }
   ]
 });

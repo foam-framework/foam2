@@ -8,22 +8,34 @@ foam.CLASS({
   package: 'foam.nanos.medusa',
   name: 'MedusaEntry',
 
+  implements: [
+    'foam.nanos.medusa.DaggerLink'
+  ],
+
   properties: [
     {
+      class: 'String',
+      name: 'id'
+    },
+    {
+      // TODO: remove
       class: 'String',
       name: 'serviceName'
     },
     {
       class: 'String',
       name: 'nspecKey'
+    //   name: 'nSpecName'
     },
     {
+      // rename to op or operation
       class: 'String',
       name: 'action'
     },
     {
       class: 'Long',
       name: 'globalIndex1'
+      // rename to 'index1'
     },
     {
       class: 'String',
@@ -32,6 +44,7 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'globalIndex2'
+      // rename to index2
     },
     {
       class: 'String',
@@ -40,15 +53,18 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'myIndex'
+      // TODO: rename to index
     },
     {
       class: 'String',
       name: 'myHash'
+      // TODO: rename to hash
     },
     {
       //TODO: make it networkTransist.
       class: 'String',
-      name: 'localHash'
+      name: 'localHash',
+      networkTransient: true
     },
     {
       class: 'FObjectProperty',
@@ -66,6 +82,19 @@ foam.CLASS({
       class: 'String',
       name: 'internalHash',
       includeInDigest: false,
+    },
+
+    // DaggerLink
+    // TODO: rename above.
+    {
+      name: 'index',
+      class: 'Long',
+      javaGetter: 'return getMyIndex();'
+    },
+    {
+      name: 'hash',
+      class: 'String',
+      javaGetter: 'return getMyHash();'
     }
   ],
 
