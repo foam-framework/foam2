@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.nanos.export',
   name: 'ExportDriverAddOn',
@@ -8,7 +14,6 @@ foam.CLASS({
     },
     {
       //typeOfConfig: String, Boolean, DAO (Enum), Number
-      // 
       name: 'typeOfConfig',
       class: 'Reference',
       of: 'foam.nanos.export.ExportDriverDataTypeViewConfig'
