@@ -23,7 +23,7 @@ foam.CLASS({
     },
     {
       name: 'configValue',
-      factory: function(exportMetadata$find) {
+      factory: function(exportMetadata) {
         this.exportMetadata$find.then(v => {
           if ( v.typeOfConfig === 'Boolean' )
             this.configValue = false;
@@ -31,6 +31,14 @@ foam.CLASS({
             this.configValue = 0;
           else if ( v.typeOfConfig === 'Float' )
             this.configValue = 0;
+          else if ( v.doesProvideOptions && v.optionsChoice === 'Array' )
+            this.configValue = v.options[0];
+          else if ( v.doesProvideOptions && v.optionsChoice === 'DAO' ) {
+            var dao = this.__context__[v.daoSource];
+            dao.select().then((o) => {
+              this.configValue = o.array[0].id;
+            });
+          }
           else
             this.configValue = '';
         });
