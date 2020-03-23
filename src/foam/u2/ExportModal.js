@@ -19,7 +19,7 @@ foam.CLASS({
   requires: [
     'foam.u2.ModalHeader',
     'foam.u2.layout.Cols',
-    'foam.nanos.export.ExportConfig',
+    'foam.nanos.export.ExportDriverConfigView'
   ],
 
   properties: [
@@ -151,43 +151,7 @@ foam.CLASS({
         .start()
           .start().addClass('label').add('Data Type').end()
           .start(this.DATA_TYPE).end()
-          .add(self.slot(function(exportConfigAddOns) {
-            return self.E().forEach(exportConfigAddOns, function(a) {
-              a.typeOfConfig$find.then((v) => {
-
-                var view = { class: v.viewClass };
-                if ( a.doesProvideOptions && a.optionsChoice === 'Array' ) {
-                  view.choices = a.options;
-                } else if ( a.doesProvideOptions && a.optionsChoice === 'DAO' ) {
-                  view.dao = self.__context__[a.daoSource];
-                  view.objToChoice = function(o) {
-                    return [o.id, o.id];
-                  };
-                }
-                
-                return this.addClass('label').start().add(a.labelOfProperty).end()
-                  .start()
-                    .startContext({ data: obj })
-                      .add(obj.CONFIG_VALUE.clone().copyFrom({
-                        view: view
-                      }))
-                    .endContext()
-                .end();
-              });
-              var obj = self.ExportConfig.create({ exportMetadata: a });
-              obj.configValue$.sub(function() {
-                if ( obj.configValue ) {
-                  if ( obj.configValue.toSummary )
-                    obj.configValueString = obj.configValue.toSummary();
-                  else
-                    obj.configValueString = obj.configValue.toString();
-                } else {
-                  obj.configValueString = '';
-                }              
-              });
-              self.exportConfigArray.push(obj);
-            });
-          }))
+          .add(self.ExportDriverConfigView.create({ exportConfigArray$: self.exportConfigArray$, exportConfigAddOns$: self.exportConfigAddOns$ }))
           .start().addClass('label').add('Response').end()
           .start(this.NOTE).addClass('input-box').addClass('note').end()
           .add(

@@ -155,6 +155,7 @@ FOAM_FILES([
   { name: "foam/nanos/export/ClientGoogleSheetsExportService" },
   { name: "foam/nanos/export/ExportConfig" },
   { name: "foam/nanos/export/ExportDriverAddOn" },
+  { name: "foam/nanos/export/ExportDriverConfigView" },
   { name: "foam/nanos/export/ExportDriverRegistry" },
   { name: "foam/nanos/export/ExportDriverDataTypeViewConfig" },
   { name: "foam/nanos/export/ExportDriver" },
