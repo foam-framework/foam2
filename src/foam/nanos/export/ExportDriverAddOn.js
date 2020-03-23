@@ -45,8 +45,8 @@ foam.CLASS({
     {
       name: 'options',
       class: 'StringArray',
-      visibility: function(optionsChoice) {
-        return optionsChoice === 'Array' ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
+      visibility: function(doesProvideOptions, optionsChoice) {
+        return doesProvideOptions ? optionsChoice === 'Array' ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN : foam.u2.DisplayMode.HIDDEN;
       }
     }
   ]
