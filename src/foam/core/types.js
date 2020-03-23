@@ -311,7 +311,7 @@ foam.CLASS({
             // Push value
             this[self.name].push(v);
             // Force property update
-            this[self.name] = this[self.name];
+            this.propertyChange.pub(self.name, this.slot(self.name));
           }
         },
         configurable: true
@@ -327,7 +327,7 @@ foam.CLASS({
                 newArry.push(oldArry[i]);
               }
             }
-            this[self.name] = newArry;
+            this.propertyChange.pub(self.name, this.slot(self.name));
           }
         },
         configurable: true
@@ -596,6 +596,34 @@ foam.CLASS({
       }
     ],
     [ 'type', 'Map' ]
+  ],
+
+  methods: [
+    function installInProto(proto) {
+      this.SUPER(proto);
+      var self = this;
+      Object.defineProperty(proto, self.name + '$set', {
+        get: function mapSet() {
+          return function (k, v) {
+            console.log('uhh', this);
+            // Set value on map
+            this[self.name][k] = v;
+            // Force property update
+            this.propertyChange.pub(self.name, this.slot(self.name));
+          }
+        }
+      });
+      Object.defineProperty(proto, self.name + '$remove', {
+        get: function mapRemove() {
+          return function (k) {
+            // Remove value from map
+            delete this[self.name][k];
+            // Force property update
+            this.propertyChange.pub(self.name, this.slot(self.name));
+          }
+        }
+      })
+    }
   ]
 });
 
