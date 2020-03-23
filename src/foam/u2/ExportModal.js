@@ -174,7 +174,7 @@ foam.CLASS({
                     .endContext()
                 .end();
               });
-              var obj = self.ExportConfig.create({ exportMetadata: a, configValue: false });
+              var obj = self.ExportConfig.create({ exportMetadata: a, configValue: '' });
               self.exportConfigArray.push(obj);
             });
           }))
