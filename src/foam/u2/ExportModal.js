@@ -176,7 +176,14 @@ foam.CLASS({
               });
               var obj = self.ExportConfig.create({ exportMetadata: a });
               obj.configValue$.sub(function() {
-                obj.configValueString = obj.configValue.toString();
+                if ( obj.configValue ) {
+                  if ( obj.configValue.toSummary )
+                    obj.configValueString = obj.configValue.toSummary();
+                  else
+                    obj.configValueString = obj.configValue.toString();
+                } else {
+                  obj.configValueString = '';
+                }              
               });
               self.exportConfigArray.push(obj);
             });
