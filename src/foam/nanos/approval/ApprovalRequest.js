@@ -553,9 +553,9 @@
              return false;
         }
         
-        var objId = self.ctrl.__subContext__[self.daoKey_].of.ID.type === 'Long' ? parseInt(this.objId) : this.objId;
+        var objId = ctrl.__subContext__[self.daoKey_].of.ID.type === 'Long' ? parseInt(self.objId) : self.objId;
 
-        return self.ctrl.__subContext__[this.daoKey_]
+        return ctrl.__subContext__[this.daoKey_]
           .find(objId)
           .then((obj) => {
             return !! obj;
