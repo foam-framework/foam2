@@ -53,7 +53,7 @@ foam.CLASS({
         .start(this.TextField, {
           type: this.type,
           data$: this.data$,
-          placeholder: this.placeHolder
+          placeholder: this.placeholder
         })
           .addClass(this.myClass('input'))
         .end()
