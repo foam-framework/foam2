@@ -117,22 +117,17 @@ foam.CLASS({
     },
     {
       name: 'save',
-      code: async function(x) {
+      code: function(x) {
 
-        var capabilityDAO = x.capabilityDAO;
         var userCapabilityJunctionDAO = x.userCapabilityJunctionDAO;
 
-        this.sectionsList.forEach((m) => {
-          capabilityDAO
-            .find(this.EQ(foam.nanos.crunch.Capability.OF, m.data.cls_))
-            .then((cap) => {
-              var ucj = foam.nanos.crunch.UserCapabilityJunction.create({
-                sourceId: this.data.businessId,
-                targetId: cap.id,
-                data: m.data
-              });
-              userCapabilityJunctionDAO.put_(x, ucj);
-            });
+        this.sectionsList.forEach((m, i) => {
+          var ucj = foam.nanos.crunch.UserCapabilityJunction.create({
+            sourceId: x.user.id,
+            targetId: this.capsList[i],
+            data: m.data
+          });
+          userCapabilityJunctionDAO.put_(x, ucj)
         });
         
         x.ctrl.notify('Your progress has been saved.');
