@@ -23,18 +23,18 @@ foam.CLASS({
     },
     {
       name: 'configValue',
-      factory: function() {
+      factory: function(exportMetadata$find) {
         this.exportMetadata$find.then(v => {
-          if ( v.typeOfConfig === "Boolean" )
-            return false;
-          else if ( v.typeOfConfig === "Integer" )
-            return 0;
-          else if ( v.typeOfConfig === "Float" )
-            return 0.0;
+          if ( v.typeOfConfig === 'Boolean' )
+            this.configValue = false;
+          else if ( v.typeOfConfig === 'Integer' )
+            this.configValue = 0;
+          else if ( v.typeOfConfig === 'Float' )
+            this.configValue = 0;
           else
-            return '';
+            this.configValue = '';
         });
-        
+        return;
       }
     }
   ]
