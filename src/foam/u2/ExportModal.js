@@ -181,7 +181,7 @@ foam.CLASS({
           .start().addClass('label').add('Response').end()
           .start(this.NOTE).addClass('input-box').addClass('note').end()
           .add(
-            self.slot(function(exportDriverReg$isAllColumnExportSupported ) {
+            self.slot(function(exportDriverReg$isAllColumnExportSupported) {
               if ( exportDriverReg$isAllColumnExportSupported ) {
                 return self.E().start().addClass('label').startContext({ data: self }).tag(self.EXPORT_ALL_COLUMNS).endContext().end();
               }
