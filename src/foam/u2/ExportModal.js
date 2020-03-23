@@ -156,9 +156,9 @@ foam.CLASS({
               a.typeOfConfig$find.then((v) => {
 
                 var view = { class: v.viewClass };
-                if ( a.options ) {
+                if ( a.doesProvideOptions && a.optionsChoice === 'Array' ) {
                   view.choices = a.options;
-                } else if ( a.daoSource && a.daoSource.length > 0 ) {
+                } else if ( a.doesProvideOptions && a.optionsChoice === 'DAO' ) {
                   view.dao = self.__context__[a.daoSource];
                   view.objToChoice = function(o) {
                     return [o.id, o.id];
