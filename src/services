@@ -1073,5 +1073,10 @@ p({
       .setOf(foam.nanos.export.ExportDriverRegistryExportDriverAddOnJunction.getOwnClassInfo())
       .build();
   """,
-  "client": "{\"of\":\"foam.nanos.export.ExportDriverRegistryExportDriverAddOnJunction\", \"remoteListenerSupport\": false}"
+   "client":
+  """
+    {
+      "of": "foam.nanos.export.ExportDriverRegistryExportDriverAddOnJunction"
+    }
+  """
 })

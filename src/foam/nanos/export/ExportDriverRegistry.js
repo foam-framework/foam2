@@ -42,7 +42,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'isOpenable'
-    },
+    }
   ]
 });
 

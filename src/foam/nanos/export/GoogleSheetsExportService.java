@@ -13,7 +13,6 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.*;
-import foam.core.X;
 import foam.nanos.logger.Logger;
 
 import java.util.*;
@@ -32,7 +31,6 @@ public class GoogleSheetsExportService extends foam.core.AbstractFObject impleme
     try {
       Map<String, ExportConfig> map = new HashMap<>();
 
-      X x = getX();
       Object[] configObjArray = (Object[])config;
       if(configObjArray != null) {
         for(int i = 0; i < configObjArray.length; i++) {
