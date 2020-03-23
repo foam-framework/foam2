@@ -1065,7 +1065,6 @@ p({
   "name": "exportDriverAddOnJunctionDAO",
   "serve": true,
   "authenticate": false,
-  "description": "DAO responsible for storing agent authentication permission information.",
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
