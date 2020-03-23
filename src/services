@@ -1016,23 +1016,23 @@ p({
     "class":"foam.nanos.export.GoogleApiCredentials"
   }
 })
-
 p({
   "class": "foam.nanos.boot.NSpec",
-  "name": "exportDriverViewConfigDAO",
+  "name": "exportDriverDataTypeViewConfigDAO",
   "serve": true,
   "authenticate": false,
   "serviceScript":
   """
     return new foam.dao.EasyDAO.Builder(x)
-      .setOf(foam.nanos.export.ExportDriverViewConfig.getOwnClassInfo())
-      .setName("exportDriverViewConfigs")
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("exportDriverDataTypeViewConfigs")
+      .setOf(foam.nanos.export.ExportDriverDataTypeViewConfig.getOwnClassInfo())
       .build();
   """,
   "client":
   """
     {
-      "of": "foam.nanos.export.ExportDriverViewConfig"
+      "of": "foam.nanos.export.ExportDriverDataTypeViewConfig"
     }
   """
 })
@@ -1047,8 +1047,9 @@ p({
   "serviceScript":
   """
     return new foam.dao.EasyDAO.Builder(x)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("exportDriverAddOns")
       .setOf(foam.nanos.export.ExportDriverAddOn.getOwnClassInfo())
-      .setName("exportDriverAddOns")
       .build();
   """,
   "client":
@@ -1062,8 +1063,8 @@ p({
 p({
   "class": "foam.nanos.boot.NSpec",
   "name": "exportDriverAddOnJunctionDAO",
-  "lazy": false,
   "serve": true,
+  "authenticate": false,
   "description": "DAO responsible for storing agent authentication permission information.",
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)

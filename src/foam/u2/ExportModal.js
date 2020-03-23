@@ -155,7 +155,7 @@ foam.CLASS({
           .start().addClass('label').add('Data Type').end()
           .start(this.DATA_TYPE).end()
           .add(self.slot(function(exportConfigAddOns) {
-            return self.E().forEach(this.exportConfigAddOns, function(a) {
+            return self.E().forEach(exportConfigAddOns, function(a) {
               a.typeOfConfig$find.then((v) => {
 
                 var view = { class: v.viewClass };
@@ -163,14 +163,19 @@ foam.CLASS({
                   view.choices = a.options;
                 } else if ( a.daoSource && a.daoSource.length > 0 ) {
                   view.dao = self.__context__[a.daoSource];
-                  view.objToChoice = function(a) {
-                    return [a.id, a.id];
+                  view.objToChoice = function(o) {
+                    return [o.id, o.id];
                   };
                 }
                 
-                return this.start().addClass('label').add(a.labelOfProperty).end().start(obj.CONFIG_VALUE.clone().copyFrom({
-                  view: view
-                })).end();
+                return this.addClass('label').start().add(a.labelOfProperty).end()
+                  .start()
+                    .startContext({ data: obj })
+                      .add(obj.CONFIG_VALUE.clone().copyFrom({
+                        view: view
+                      }))
+                    .endContext()
+                .end();
               });
               var obj = self.ExportConfig.create({ exportMetadata: a, configValue: false });
               self.exportConfigArray.push(obj);

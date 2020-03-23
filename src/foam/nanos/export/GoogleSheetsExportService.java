@@ -32,10 +32,10 @@ public class GoogleSheetsExportService extends foam.core.AbstractFObject impleme
     try {
       Map<String, ExportConfig> map = new HashMap<>();
 
-      X x = (X)obj;
+      X x = getX();
       Object[] configObjArray = (Object[])config;
       for(int i = 0; i < configObjArray.length; i++) {
-        map.put(((ExportConfig)configObjArray[i]).findExportMetadata(x).getId(), (ExportConfig)configObjArray[i]);
+        map.put(((ExportConfig)configObjArray[i]).getExportMetadata(), (ExportConfig)configObjArray[i]);
       }
 
       List<List<Object>> listOfValues = new ArrayList<>();
@@ -58,7 +58,7 @@ public class GoogleSheetsExportService extends foam.core.AbstractFObject impleme
         .build();
 
       Spreadsheet st = new Spreadsheet().setProperties(
-        new SpreadsheetProperties().setTitle(map.get("title") == null ? ("NanopayExport" + new Date()) : map.get("title").getConfigValue()));
+        new SpreadsheetProperties().setTitle(map.get("docTitle") == null ? ("NanopayExport" + new Date()) : map.get("docTitle").getConfigValue()));
 
 
       List<ValueRange> data = new ArrayList<>();

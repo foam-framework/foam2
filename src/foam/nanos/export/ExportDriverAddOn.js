@@ -11,7 +11,7 @@ foam.CLASS({
       // 
       name: 'typeOfConfig',
       class: 'Reference',
-      of: 'foam.nanos.export.ExportDriverViewConfig'
+      of: 'foam.nanos.export.ExportDriverDataTypeViewConfig'
     },
     {
       name: 'labelOfProperty',
@@ -33,8 +33,8 @@ foam.CLASS({
     {
       name: 'daoSource',
       class: 'String',
-      visibility: function(optionsChoice) {
-        return optionsChoice === 'DAO' ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
+      visibility: function(doesProvideOptions, optionsChoice) {
+        return doesProvideOptions ? optionsChoice === 'DAO' ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN : foam.u2.DisplayMode.HIDDEN;
       }
     },
     {
@@ -48,7 +48,7 @@ foam.CLASS({
 });
 
 foam.RELATIONSHIP({
-  sourceModel: 'foam.nanos.export.ExportDriverViewConfig',
+  sourceModel: 'foam.nanos.export.ExportDriverDataTypeViewConfig',
   targetModel: 'foam.nanos.export.ExportDriverAddOn',
   forwardName: 'exportDriverAddOns',
   inverseName: 'typeOfConfig',
