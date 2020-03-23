@@ -31,7 +31,7 @@
     {
       name: 'perValuePatternSpecificValues',
       class: 'StringArray',
-      //value: []
+      value: []
     }
   ]
 });

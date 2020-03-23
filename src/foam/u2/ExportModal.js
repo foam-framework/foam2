@@ -19,10 +19,7 @@ foam.CLASS({
   requires: [
     'foam.u2.ModalHeader',
     'foam.u2.layout.Cols',
-    'foam.u2.TextField',
     'foam.nanos.export.ExportConfig',
-    'foam.core.type.Map',
-    'foam.core.SimpleSlot'
   ],
 
   properties: [

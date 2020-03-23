@@ -27,7 +27,7 @@ public class GoogleSheetsExportService extends foam.core.AbstractFObject impleme
   private static final String DEFAULT_CURRENCY = "CAD";
 
 
-    public String createSheet(Object obj, Object metadataObj, Object config) {
+  public String createSheet(Object obj, Object metadataObj, Object config) {
 
     try {
       Map<String, ExportConfig> map = new HashMap<>();
