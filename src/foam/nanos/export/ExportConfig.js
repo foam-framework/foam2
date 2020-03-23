@@ -11,10 +11,7 @@ foam.CLASS({
     {
       name: 'configValueString',
       class: 'String',
-      value: '',
-      expression: function(configValue) {
-        return configValue.toString();
-      }
+      value: ''
     },
     {
       name: 'exportMetadata',
