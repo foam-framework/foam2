@@ -385,7 +385,24 @@ foam.CLASS({
       return this.delegate.then(function(d) {
         return d.read(buffer, offset);
       });
-    }
+    },
+    {
+      name: 'compareTo',
+      type: 'int',
+      args:
+        [
+          {
+            name: 'o',
+            type: 'Object',
+          }
+        ],
+      javaCode: `
+        IdentifiedBlob o2 = (IdentifiedBlob) o;
+        if ( o2 == null ) return 1;
+        if ( o2 == this ) return 0;
+        return foam.util.SafetyUtil.compare(getId(), o2.getId());
+      `
+    },
   ]
 });
 
