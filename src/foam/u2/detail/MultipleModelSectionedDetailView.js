@@ -57,6 +57,11 @@ foam.CLASS({
 
         return sections;
       }
+    },
+    {
+      class: 'Array',
+      name: 'capsList',
+      documentation: 'Contains ids of capabilities to create ucjs with.'
     }
   ],
 

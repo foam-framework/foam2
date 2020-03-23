@@ -81,7 +81,8 @@ foam.CLASS({
               title: cap.name,
               daoList: daoList,
               ofList: ofList,
-              argsList: argsList
+              argsList: argsList,
+              capsList: tcList
             });
         });
       });
