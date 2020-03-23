@@ -605,7 +605,6 @@ foam.CLASS({
       Object.defineProperty(proto, self.name + '$set', {
         get: function mapSet() {
           return function (k, v) {
-            console.log('uhh', this);
             // Set value on map
             this[self.name][k] = v;
             // Force property update
