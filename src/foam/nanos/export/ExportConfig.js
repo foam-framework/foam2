@@ -20,7 +20,7 @@ foam.CLASS({
     },
     {
       name: 'configValue',
-      factory: function(exportMetadata) {
+      factory: function() {
         this.exportMetadata$find.then(v => {
           if ( v.typeOfConfig === 'Boolean' )
             this.configValue = false;
