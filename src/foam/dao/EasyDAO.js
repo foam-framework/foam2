@@ -128,8 +128,8 @@ foam.CLASS({
             delegate = new foam.dao.NullDAO.Builder(getX())
               .setOf(getOf())
               .build();
-          } else if ( getMedusaNode() ) {
-            delegate = new foam.nanos.medusa.MNDAO(getX(), getOf(), getJournalName());
+          // } else if ( getMedusaNode() ) {
+          //   delegate = new foam.nanos.medusa.MNDAO(getX(), getOf(), getJournalName());
           } else if ( getCluster() == true ) {
             setMdao(new foam.dao.MDAO(getOf()));
  //           delegate = new foam.nanos.medusa.MMDAO(getX(), getNSpec().getName(), getMdao(), "singleJournal", getJournalName());

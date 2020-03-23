@@ -123,8 +123,8 @@ public class MNFJournal extends FileJournal {
         while( ( line = reader.readLine() ) != null ) {
           if ( "".equals(line.trim()) ) continue;
           MedusaEntry entry = (MedusaEntry) getX().create(JSONParser.class).parseString(line);
-          if ( entry.getMyIndex() < minGlobalIndex ) minGlobalIndex = entry.getMyIndex();
-          if ( entry.getMyIndex() > maxGlobalIndex ) maxGlobalIndex = entry.getMyIndex();
+          if ( entry.getIndex() < minGlobalIndex ) minGlobalIndex = entry.getIndex();
+          if ( entry.getIndex() > maxGlobalIndex ) maxGlobalIndex = entry.getIndex();
           entryCount++;
         }
 
@@ -157,13 +157,13 @@ public class MNFJournal extends FileJournal {
        md.update(hash1.getBytes(StandardCharsets.UTF_8));
        md.update(hash2.getBytes(StandardCharsets.UTF_8));
        String myHash = byte2Hex(entry.getNu().hash(md));
-       entry.setMyHash(myHash);
+       entry.setHash(myHash);
      } catch ( Exception e ) {
        logger.info(e);
        throw new RuntimeException(e);
      }
     String msg = new Outputter(x).stringify(obj);
-    doWrite(x, msg + "\n", entry.getMyIndex());
+    doWrite(x, msg + "\n", entry.getIndex());
     return obj;
   }
 
@@ -179,12 +179,12 @@ public class MNFJournal extends FileJournal {
       md.update(hash1.getBytes(StandardCharsets.UTF_8));
       md.update(hash2.getBytes(StandardCharsets.UTF_8));
       String myHash = byte2Hex(entry.getNu().hash(md));
-      entry.setMyHash(myHash);
+      entry.setHash(myHash);
     } catch ( Exception e ) {
       logger.info(e);
       throw new RuntimeException(e);
     }
-    doWrite(x, new Outputter(x).stringify(obj) + "\n", entry.getMyIndex());
+    doWrite(x, new Outputter(x).stringify(obj) + "\n", entry.getIndex());
     return obj;
   }
 
@@ -309,7 +309,7 @@ public class MNFJournal extends FileJournal {
             MedusaEntry entry = null;
             try {
               entry = (MedusaEntry) x.create(JSONParser.class).parseString(line);
-              if ( entry.getMyIndex() < indexFrom ) continue;
+              if ( entry.getIndex() < indexFrom ) continue;
               //TODO: hash check.
               Outputter outputter = new Outputter(x);
               String entryString = outputter.stringify(entry);
@@ -398,9 +398,9 @@ public class MNFJournal extends FileJournal {
           MedusaEntry entry = null;
           try {
             entry = (MedusaEntry) x.create(JSONParser.class).parseString(line);
-            if ( entry.getMyIndex() < indexFrom ) continue;
-            if ( entry.getMyIndex() < minIndex ) minIndex = entry.getMyIndex();
-            if ( entry.getMyIndex() > maxIndex ) maxIndex = entry.getMyIndex();
+            if ( entry.getIndex() < indexFrom ) continue;
+            if ( entry.getIndex() < minIndex ) minIndex = entry.getIndex();
+            if ( entry.getIndex() > maxIndex ) maxIndex = entry.getIndex();
             //TODO: hash check.
             Outputter outputter = new Outputter(x);
             String entryString = outputter.stringify(entry);

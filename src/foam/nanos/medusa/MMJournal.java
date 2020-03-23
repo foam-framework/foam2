@@ -190,16 +190,16 @@ public class MMJournal
 
       //TODO: Configure Very first two Index; Very Important
       parent1 = new MedusaEntry();
-      parent1.setMyHash("aaaaaa");
-      parent1.setMyIndex(-1L);
+      parent1.setHash("aaaaaa");
+      parent1.setIndex(-1L);
 
       parent2 = new MedusaEntry();
-      parent2.setMyHash("bbbbbb");
-      parent2.setMyIndex(0L);
+      parent2.setHash("bbbbbb");
+      parent2.setIndex(0L);
 
       indexHashMap = new HashMap<Long, String>();
-      indexHashMap.put(parent1.getMyIndex(), parent1.getMyHash());
-      indexHashMap.put(parent2.getMyIndex(), parent2.getMyHash());
+      indexHashMap.put(parent1.getIndex(), parent1.getHash());
+      indexHashMap.put(parent2.getIndex(), parent2.getHash());
 
       logger.debug("initialize", "isPrimary", service.getIsPrimary());
 
@@ -283,10 +283,10 @@ public class MMJournal
     while ( ( p2 = parent2) == null ) {}
     Message msg =
       createMessage(
-          p1.getMyIndex(),
-          p1.getMyHash(),
-          p2.getMyIndex(),
-          p2.getMyHash(),
+          p1.getIndex(),
+          p1.getHash(),
+          p2.getIndex(),
+          p2.getHash(),
           myIndex,
           "put_",
           "p",
@@ -338,10 +338,10 @@ public class MMJournal
     while ( ( p2 = parent2) == null ) {}
     Message msg =
       createMessage(
-          p1.getMyIndex(),
-          p1.getMyHash(),
-          p2.getMyIndex(),
-          p2.getMyHash(),
+          p1.getIndex(),
+          p1.getHash(),
+          p2.getIndex(),
+          p2.getHash(),
           myIndex,
           "remove_",
           "r",
@@ -446,16 +446,16 @@ public class MMJournal
     //put or remove
     rpc.setName(method);
     MedusaEntry entry = getX().create(MedusaEntry.class);
-    entry.setServiceName(this.journalKey);
+    //    entry.setServiceName(this.journalKey);
     // p or r
     entry.setAction(action);
     entry.setGlobalIndex1(globalIndex1);
     entry.setHash1(hash1);
     entry.setGlobalIndex2(globalIndex2);
     entry.setHash2(hash2);
-    entry.setMyIndex(myIndex);
+    entry.setIndex(myIndex);
     entry.setOld(old);
-    entry.setNspecKey(prefix);
+    entry.setNSpecName(prefix);
     entry.setNu(nu);
     Object[] args = {null, entry};
     rpc.setArgs(args);
@@ -687,13 +687,13 @@ public class MMJournal
 
   private void cacheOrMDAO(MedusaEntry entry, boolean verifyhash) {
     synchronized ( cacheOrMDAOLock ) {
-      logger.debug("MMJournal", "cacheOrMDAO", entry.getNspecKey());
+      logger.debug("MMJournal", "cacheOrMDAO", entry.getNSpecName());
       // Data already in the MDAO.
-      if ( entry.getMyIndex() < globalIndex.get() ) return;
-      if ( entry.getMyIndex() != globalIndex.get() ) throw new RuntimeException("Wrong globalIndex [ expect=" + globalIndex + ", receive=" + entry.getMyIndex() + " ]");
+      if ( entry.getIndex() < globalIndex.get() ) return;
+      if ( entry.getIndex() != globalIndex.get() ) throw new RuntimeException("Wrong globalIndex [ expect=" + globalIndex + ", receive=" + entry.getIndex() + " ]");
 
-      if ( registerDAOs.get(entry.getNspecKey()) != null ) {
-        DAO dao = registerDAOs.get(entry.getNspecKey());
+      if ( registerDAOs.get(entry.getNSpecName()) != null ) {
+        DAO dao = registerDAOs.get(entry.getNSpecName());
         try {
           if ( "p".equals(entry.getAction()) ) {
             //TODO: investigating on TransactionDAO.
@@ -707,10 +707,10 @@ public class MMJournal
           logger.error("cacheOrMDAO error: " + e);
         }
       } else {
-        if ( readyToUseEntry.get(entry.getNspecKey()) == null ) {
-          readyToUseEntry.put(entry.getNspecKey(), new LinkedList<MedusaEntry>() );
+        if ( readyToUseEntry.get(entry.getNSpecName()) == null ) {
+          readyToUseEntry.put(entry.getNSpecName(), new LinkedList<MedusaEntry>() );
         }
-        List<MedusaEntry> entryList = readyToUseEntry.get(entry.getNspecKey());
+        List<MedusaEntry> entryList = readyToUseEntry.get(entry.getNSpecName());
         entryList.add(entry);
       }
 
@@ -721,8 +721,8 @@ public class MMJournal
           md.update(indexHashMap.get(entry.getGlobalIndex1()).getBytes(StandardCharsets.UTF_8));
           md.update(indexHashMap.get(entry.getGlobalIndex2()).getBytes(StandardCharsets.UTF_8));
           String myHash = MNJournal.byte2Hex(entry.getNu().hash(md));
-          if ( ! myHash.equals(entry.getMyHash()) ) {
-            logger.info("Invalid Hash: [ \n" + "expect Hash value: " + myHash + "\n" + "receive Hash value: " + entry.getMyHash() + "\n]");
+          if ( ! myHash.equals(entry.getHash()) ) {
+            logger.info("Invalid Hash: [ \n" + "expect Hash value: " + myHash + "\n" + "receive Hash value: " + entry.getHash() + "\n]");
             throw new RuntimeException("Invalid hash");
           }
         } catch ( Exception e ) {
@@ -731,14 +731,14 @@ public class MMJournal
         }
       } 
 
-      globalIndex.set(entry.getMyIndex() + 1L);
+      globalIndex.set(entry.getIndex() + 1L);
       updateHash(entry);
       //TODO: important clear this map
-      indexHashMap.put(entry.getMyIndex(), entry.getMyHash());
+      indexHashMap.put(entry.getIndex(), entry.getHash());
 
       //TODO: update globalIndex and parent, varify hash.
       ////close hash for now to see the performance difference.
-      //globalIndex.set(entry.getMyIndex() + 1L);
+      //globalIndex.set(entry.getIndex() + 1L);
       //recordIndex = recordIndex + 1L;
       //updateHash(entry);
       //try {
@@ -748,11 +748,11 @@ public class MMJournal
       //  md.update(indexHashMap.get(entry.getGlobalIndex2()).getBytes(StandardCharsets.UTF_8));
       //  String myHash = MNJournal.byte2Hex(entry.getNu().hash(md));
       //  logger.info(myHash);
-      //  logger.info(entry.getMyHash());
-      //  if ( ! myHash.equals(entry.getMyHash()) ) {
+      //  logger.info(entry.getHash());
+      //  if ( ! myHash.equals(entry.getHash()) ) {
       //    throw new RuntimeException("hash invalid");
       //  }
-      //  indexHashMap.put(entry.getMyIndex(), entry.getMyHash());
+      //  indexHashMap.put(entry.getIndex(), entry.getHash());
       //} catch ( Exception e ) {
       //  e.printStackTrace();
       //  throw new RuntimeException(e);
@@ -1021,15 +1021,15 @@ public class MMJournal
 
     for ( Map.Entry<String, List<MedusaEntry>> entry2: nodeToEntry.entrySet() ) {
       for ( MedusaEntry entry : entry2.getValue() ) {
-        if ( entryCount.get(entry.getMyIndex()) == null ) {
-          entryCount.put(entry.getMyIndex(), 1);
+        if ( entryCount.get(entry.getIndex()) == null ) {
+          entryCount.put(entry.getIndex(), 1);
           ArrayList<MedusaEntry> list = new ArrayList<MedusaEntry>();
           list.add(entry);
-          entryRecord.put(entry.getMyIndex(), list);
+          entryRecord.put(entry.getIndex(), list);
         } else {
           //TODO: check if hash equal.
-          entryCount.put(entry.getMyIndex(), entryCount.get(entry.getMyIndex()) + 1);
-          entryRecord.get(entry.getMyIndex()).add(entry);
+          entryCount.put(entry.getIndex(), entryCount.get(entry.getIndex()) + 1);
+          entryRecord.get(entry.getIndex()).add(entry);
         }
       }
     }
@@ -1046,13 +1046,13 @@ public class MMJournal
         boolean hashSuccess = false;
         for ( MedusaEntry e : collectEntries ) {
           errorMessage = "\n" + e.toString(); 
-          if ( quorumHashRecord.get(e.getMyHash()) != null ) {
-            quorumHashRecord.put(e.getMyHash(), quorumHashRecord.get(e.getMyHash()).intValue() + 1);
+          if ( quorumHashRecord.get(e.getHash()) != null ) {
+            quorumHashRecord.put(e.getHash(), quorumHashRecord.get(e.getHash()).intValue() + 1);
           } else {
-            quorumHashRecord.put(e.getMyHash(), 1);
+            quorumHashRecord.put(e.getHash(), 1);
           }
 
-          if ( quorumHashRecord.get(e.getMyHash()).intValue() >= hashQuorumSize ) {
+          if ( quorumHashRecord.get(e.getHash()).intValue() >= hashQuorumSize ) {
             entryList.add(e);
             hashSuccess = true;
             break;
@@ -1088,8 +1088,8 @@ public class MMJournal
   private class SortbyIndex implements Comparator<MedusaEntry> {
 
     public int compare(MedusaEntry a, MedusaEntry b) {
-      Long obj1 = a.getMyIndex();
-      Long obj2 = b.getMyIndex();
+      Long obj1 = a.getIndex();
+      Long obj2 = b.getIndex();
 
       return obj1.compareTo(obj2);
     }
@@ -1410,7 +1410,7 @@ public class MMJournal
     //TODO: provide a way to clear cache.
     synchronized ( entryCount ) {
       //TODO: rewrite this method.
-      if ( entry.getMyIndex() < globalIndex.get() ) return;
+      if ( entry.getIndex() < globalIndex.get() ) return;
       if ( entryCount.get(entry) == null ) {
         addEntryIntoCachedMap(entry);
         return;
@@ -1431,10 +1431,10 @@ public class MMJournal
   //   if ( quorumService.exposeState == InstanceState.PRIMARY ) return;
   //   Map<Long, Integer> entryCount = entryCounts.get(groupId);
   //   synchronized ( entryCount ) {
-  //     if ( entry.getMyIndex() < globalIndex.get() ) return;
-  //     if ( entryCount.get(entry.getMyIndex()) == null ) {
-  //       entryCount.set(entry.getMyIndex(), new Integer(1));
-  //       entryRecords.put(entry.getMyIndex(), (new ArrayList<MedusaEntry>()).add(entry));
+  //     if ( entry.getIndex() < globalIndex.get() ) return;
+  //     if ( entryCount.get(entry.getIndex()) == null ) {
+  //       entryCount.set(entry.getIndex(), new Integer(1));
+  //       entryRecords.put(entry.getIndex(), (new ArrayList<MedusaEntry>()).add(entry));
   //       addEntryIntoCachedMap(entry);
   //     } else {
 
@@ -1445,8 +1445,8 @@ public class MMJournal
 
   private void addEntryIntoCachedMap(MedusaEntry entry) {
     synchronized ( cachedEntryMapLock ) {
-      if ( entry.getMyIndex() < globalIndex.get() ) return;
-      cachedEntryMap.put(entry.getMyIndex(), entry);
+      if ( entry.getIndex() < globalIndex.get() ) return;
+      cachedEntryMap.put(entry.getIndex(), entry);
     }
   }
 

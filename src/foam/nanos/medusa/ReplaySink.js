@@ -6,16 +6,17 @@
 
 foam.CLASS({
   package: 'foam.nanos.medusa',
-  name: 'MedusaEntryClientDAO',
-  extends: 'foam.dao.ProxyDAO',
+  name: 'ReplaySink',
+  extends: 'foam.dao.AbstractSink',
 
-  documentation: `Write MedusaEntry to the Medusa Nodes`,
+  documentation: '',
 
   javaImports: [
     'foam.box.Box',
     'foam.box.HTTPBox',
     'foam.box.SessionClientBox',
     'foam.core.FObject',
+    'foam.core.X',
     'foam.dao.ClientDAO',
     'foam.dao.DAO',
     'foam.dao.MDAO',
@@ -58,70 +59,59 @@ foam.CLASS({
           this.getClass().getSimpleName()
         }, logger);
       `
-    },
+    }
+  ],
+  
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(foam.java.Code.create({
+          data: `
+  public ReplaySink(X x, String clusterConfigId, String serviceName) {
+    setX(x);
+    setClusterConfigId(clusterConfigId);
+    setServiceName(serviceName);
+  }
+         `
+        }));
+      }
+    }
   ],
   
   methods: [
     {
       name: 'put_',
-      javaCode: `
-      int retryAttempt = 0;
-      int retryDelay = 10;
-
-      DAO dao = getClientDAO(x);
-      while ( true ) {
-        try {
-          return (FObject) getClientDAO(x).put_(x, obj);
-        } catch ( Throwable t ) {
-          getLogger().error(t);
-
-          if ( getMaxRetryAttempts() > -1 &&
-               retryAttempt >= getMaxRetryAttempts() ) {
-            getLogger().warning("put, retryAttempt >= maxRetryAttempts", retryAttempt, getMaxRetryAttempts());
-
-            // report,
-            // TODO: Alarm
-            throw new RuntimeException("put rejected, retry limit reached.", t);
-          }
-          retryAttempt += 1;
-
-          // delay
-          try {
-            retryDelay *= 2;
-            if ( retryDelay > getMaxRetryDelay() ) {
-              retryDelay = 10;
-            }
-            getLogger().debug("put, retry attempt", retryAttempt, "delay", retryDelay);
-            Thread.sleep(retryDelay);
-          } catch(InterruptedException e) {
-            Thread.currentThread().interrupt();
-            getLogger().debug("InterruptedException");
-            throw new RuntimeException(e.getMessage(), e);
-          }
+      args: [
+        {
+          name: 'obj',
+          type: 'Object'
+        },
+        {
+          name: 'sub',
+          type: 'foam.core.Detachable'
         }
-      }
-      `
-    },
-    {
-      name: 'cmd_',
+      ],
       javaCode: `
       int retryAttempt = 0;
       int retryDelay = 10;
 
-      DAO dao = getClientDAO(x);
+      DAO dao = getClientDAO(getX());
       while ( true ) {
         try {
-          return getClientDAO(x).cmd_(x, obj);
+          getClientDAO(getX()).put_(getX(), (FObject)obj);
+          break;
         } catch ( Throwable t ) {
           getLogger().error(t);
 
           if ( getMaxRetryAttempts() > -1 &&
                retryAttempt >= getMaxRetryAttempts() ) {
-            getLogger().warning("cmd, retryAttempt >= maxRetryAttempts", retryAttempt, getMaxRetryAttempts());
+            getLogger().warning("retryAttempt >= maxRetryAttempts", retryAttempt, getMaxRetryAttempts());
 
             // report,
             // TODO: Alarm
-            throw new RuntimeException("cmd rejected, retry limit reached.", t);
+            //throw new RuntimeException("Rejected, retry limit reached.", t);
+            break;
           }
           retryAttempt += 1;
 
@@ -131,12 +121,13 @@ foam.CLASS({
             if ( retryDelay > getMaxRetryDelay() ) {
               retryDelay = 10;
             }
-            getLogger().debug("cmd, retry attempt", retryAttempt, "delay", retryDelay);
+            getLogger().debug("retry attempt", retryAttempt, "delay", retryDelay);
             Thread.sleep(retryDelay);
           } catch(InterruptedException e) {
             Thread.currentThread().interrupt();
             getLogger().debug("InterruptedException");
-            throw new RuntimeException(e.getMessage(), e);
+            //throw new RuntimeException(e.getMessage(), e);
+            break;
           }
         }
       }
@@ -168,5 +159,10 @@ foam.CLASS({
       return dao; 
       `
     },
+    {
+      // avoid null pointer on ProxySink.eof()
+      name: 'eof',
+      javaCode: `//nop`
+    }
   ]
 });

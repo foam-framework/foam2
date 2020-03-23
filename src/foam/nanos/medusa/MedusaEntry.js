@@ -12,89 +12,94 @@ foam.CLASS({
     'foam.nanos.medusa.DaggerLink'
   ],
 
+  tableColumns: [
+    "id",
+    "nSpecName",
+    "index",
+    "globalIndex1",
+    "globalIndex2",
+    "hasConsensus"
+  ],
+
   properties: [
     {
       class: 'String',
-      name: 'id'
-    },
-    {
-      // TODO: remove
-      class: 'String',
-      name: 'serviceName'
+      name: 'id',
+      visibility: 'RO'
     },
     {
       class: 'String',
-      name: 'nspecKey'
-    //   name: 'nSpecName'
-    },
-    {
-      // rename to op or operation
-      class: 'String',
-      name: 'action'
-    },
-    {
-      class: 'Long',
-      name: 'globalIndex1'
-      // rename to 'index1'
+      name: 'nSpecName',
+      visibility: 'RO'
     },
     {
       class: 'String',
-      name: 'hash1'
+      name: 'action',
+      visibility: 'RO'
     },
-    {
-      class: 'Long',
-      name: 'globalIndex2'
-      // rename to index2
-    },
-    {
-      class: 'String',
-      name: 'hash2'
-    },
-    {
-      class: 'Long',
-      name: 'myIndex'
-      // TODO: rename to index
-    },
-    {
-      class: 'String',
-      name: 'myHash'
-      // TODO: rename to hash
-    },
-    {
-      //TODO: make it networkTransist.
-      class: 'String',
-      name: 'localHash',
-      networkTransient: true
-    },
-    {
-      class: 'FObjectProperty',
-      name: 'old'
-    },
-    {
-      class: 'FObjectProperty',
-      name: 'nu'
-    },
-    {
-      class: 'String',
-      name: 'signature'
-    },
-    {
-      class: 'String',
-      name: 'internalHash',
-      includeInDigest: false,
-    },
-
-    // DaggerLink
-    // TODO: rename above.
     {
       name: 'index',
       class: 'Long',
-      javaGetter: 'return getMyIndex();'
+      visibility: 'RO'
     },
     {
       name: 'hash',
       class: 'String',
-      javaGetter: 'return getMyHash();'
+      visibility: 'RO'
+    },
+    {
+      class: 'Long',
+      name: 'globalIndex1',
+      visibility: 'RO'
+    },
+    {
+      class: 'String',
+      name: 'hash1',
+      visibility: 'RO'
+    },
+    {
+      class: 'Long',
+      name: 'globalIndex2',
+      visibility: 'RO'
+    },
+    {
+      class: 'String',
+      name: 'hash2',
+      visibility: 'RO'
+    },
+    {
+      class: 'FObjectProperty',
+      name: 'old',
+      visibility: 'RO'
+    },
+    {
+      class: 'FObjectProperty',
+      name: 'nu',
+      visibility: 'RO'
+    },
+    {
+      // TODO: what is this?
+      class: 'String',
+      name: 'localHash',
+      visibility: 'RO',
+      networkTransient: true
+    },
+    {
+      class: 'String',
+      name: 'signature',
+      visibility: 'RO'
+    },
+    {
+      class: 'String',
+      name: 'internalHash',
+      visibility: 'RO',
+      includeInDigest: false,
+    },
+    {
+      name: 'hasConsensus',
+      class: 'Boolean',
+      value: false,
+      visibility: 'RO'
     }
   ],
 
@@ -109,7 +114,7 @@ foam.CLASS({
         if ( ! ( o instanceof MedusaEntry ) ) return 1;
 
         MedusaEntry entry = (MedusaEntry) o;
-        return Long.compare(this.getMyIndex(), entry.getMyIndex());
+        return Long.compare(this.getIndex(), entry.getIndex());
       `
     }
   ]

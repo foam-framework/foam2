@@ -46,7 +46,8 @@ foam.CLASS({
       javaCode: `
       MedusaEntry entry = (MedusaEntry) ((DAO) x.get("localMedusaEntryDAO")).put_(x, obj);
                    entry = (MedusaEntry) ((DAO) x.get("localNodesDAO")).put_(x, entry);
-      waitOn(x, entry.getMyIndex());
+      getLogger().debug("waitOn", entry.getIndex());
+      waitOn(x, entry.getIndex());
       return entry;
       `
     },
@@ -54,8 +55,10 @@ foam.CLASS({
       name: 'cmd_',
       javaCode: `
       if ( obj instanceof MedusaEntry ) {
-        notifyOn(x, ((MedusaEntry) obj).getMyIndex());
-        return obj;
+        MedusaEntry entry = (MedusaEntry) obj;
+        getLogger().debug("notifyOn", entry.getId());
+        notifyOn(x, entry.getIndex());
+        return entry;
       } else {
         return getDelegate().cmd_(x, obj);
       }
@@ -87,6 +90,7 @@ foam.CLASS({
 
       try {
         latch.await();
+        getLogger().debug("wake", index);
       } catch (InterruptedException e) {
         ((Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "latch", index, "await", e.getMessage());
       } finally {

@@ -6,24 +6,24 @@
 
 foam.CLASS({
   package: 'foam.nanos.medusa',
-  name: 'NodesDAO',
+  name: 'MedusaEntryBroadcastDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  documentation: `Write MedusaEntry to the Medusa Nodes`,
+  documentation: `Broadcast MedusaEntrys Mediators`,
 
   javaImports: [
     'foam.dao.ArraySink',
     'foam.dao.DAO',
-    'static foam.mlang.MLang.AND',
-    'static foam.mlang.MLang.EQ',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
+    'static foam.mlang.MLang.AND',
+    'static foam.mlang.MLang.EQ',
     'java.util.ArrayList',
-    'java.util.List',
     'java.util.HashMap',
+    'java.util.List',
     'java.util.Map'
   ],
-
+  
   properties: [
     {
       class: 'Object',
@@ -37,14 +37,15 @@ foam.CLASS({
       javaFactory: 'return new HashMap();'
     },
     {
-      name: 'logger',
       class: 'FObjectProperty',
       of: 'foam.nanos.logger.Logger',
+      name: 'logger',
       visibility: 'HIDDEN',
       javaFactory: `
+        Logger logger = (Logger) getX().get("logger");
         return new PrefixLogger(new Object[] {
           this.getClass().getSimpleName()
-        }, (Logger) getX().get("logger"));
+        }, logger);
       `
     },
   ],
@@ -53,17 +54,25 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-      // using assembly line, write to all online nodes - in all a zones.
+      MedusaEntry entry = (MedusaEntry) getDelegate().put_(x, obj);
+
+      // using assembly line, write to all online mediators in zone 0 and same realm,region
+      ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
+      ClusterConfig myConfig = service.getConfig(x, service.getConfigId());
+// TODO: move this to property and update on daoupdate. 
       List<ClusterConfig> arr = (ArrayList) ((ArraySink) ((DAO) x.get("localClusterConfigDAO"))
         .where(
           AND(
             EQ(ClusterConfig.ENABLED, true),
             EQ(ClusterConfig.STATUS, Status.ONLINE),
-            EQ(ClusterConfig.TYPE, MedusaType.NODE)
+            EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
+            EQ(ClusterConfig.ZONE, 0),
+            EQ(ClusterConfig.REGION, myConfig.getRegion()),
+            EQ(ClusterConfig.REALM, myConfig.getRealm())
           )
         )
-        .orderBy(ClusterConfig.ZONE)
         .select(new ArraySink())).getArray();
+
       for ( ClusterConfig config : arr ) {
         getLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
           public void executeJob() {
@@ -75,36 +84,14 @@ foam.CLASS({
                   .build();
                 getClients().put(config.getId(), dao);
               }
-              dao.put_(x, obj);
+              dao.put_(x, entry);
             } catch ( Throwable t ) {
               getLogger().error(t);
             }
           }
         });
       }
-      return obj;
-      `
-    },
-    {
-      name: 'cmd_',
-      javaCode: `
-      String configId = null;
-      if ( obj instanceof ReplayCmd ) {
-        ReplayCmd cmd = (ReplayCmd) obj;
-        configId = cmd.getResponder();
-      } else if ( obj instanceof ReplayDetailsCmd ) {
-        ReplayDetailsCmd cmd = (ReplayDetailsCmd) obj;
-        configId = cmd.getResponder();
-      }
-      if ( configId != null ) {
-        DAO dao = new MedusaEntryClientDAO.Builder(x)
-          .setClusterConfigId(configId)
-          .build();
-        getLogger().debug("cmd", obj);
-        return dao.cmd_(x, obj);
-      } else {
-        return getDelegate().cmd_(x, obj);
-      }
+      return entry;
       `
     }
   ]

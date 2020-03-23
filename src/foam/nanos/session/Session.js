@@ -133,7 +133,18 @@ foam.CLASS({
       javaFactory: 'return reset(getX());',
       hidden: true,
       transient: true
-    }
+    },
+    {
+      name: 'logger',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.logger.Logger',
+      visibility: 'HIDDEN',
+      javaFactory: `
+        return new PrefixLogger(new Object[] {
+          this.getClass().getSimpleName()
+        }, (Logger) getX().get("logger"));
+      `
+    },
   ],
 
   methods: [
@@ -326,6 +337,7 @@ foam.CLASS({
          || (user instanceof DeletedAware && ((DeletedAware)user).getDeleted()
          || (user instanceof LifecycleAware && ((LifecycleAware)user).getLifecycleState() != LifecycleState.ACTIVE) )
        ) {
+          getLogger().warning("User not found.", userId, user);
           throw new RuntimeException(String.format("User with id '%d' not found.", userId));
         }
 

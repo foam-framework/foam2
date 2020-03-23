@@ -135,7 +135,7 @@ public class MNJournal extends FileJournal {
         md.update(hash1.getBytes(StandardCharsets.UTF_8));
         md.update(hash2.getBytes(StandardCharsets.UTF_8));
         String myHash = byte2Hex(entry.getNu().hash(md));
-        entry.setMyHash(myHash);
+        entry.setHash(myHash);
 
         //internal hash.
         md = MessageDigest.getInstance("SHA-256");
@@ -147,7 +147,7 @@ public class MNJournal extends FileJournal {
       }
     }
     String msg = new Outputter(x).stringify(obj);
-    doWrite(x, msg + "\n", entry.getMyIndex());
+    doWrite(x, msg + "\n", entry.getIndex());
     return obj;
   }
 
@@ -167,7 +167,7 @@ public class MNJournal extends FileJournal {
         md.update(hash1.getBytes(StandardCharsets.UTF_8));
         md.update(hash2.getBytes(StandardCharsets.UTF_8));
         String myHash = byte2Hex(entry.getNu().hash(md));
-        entry.setMyHash(myHash);
+        entry.setHash(myHash);
 
         //internal hash.
         md = MessageDigest.getInstance("SHA-256");
@@ -178,7 +178,7 @@ public class MNJournal extends FileJournal {
         throw new RuntimeException(e);
       }
     }
-    doWrite(x, new Outputter(x).stringify(obj) + "\n", entry.getMyIndex());
+    doWrite(x, new Outputter(x).stringify(obj) + "\n", entry.getIndex());
     return obj;
   }
 
@@ -261,8 +261,8 @@ public class MNJournal extends FileJournal {
       while ( ( line = reader.readLine() ) != null ) {
         if ( "".equals(line.trim()) ) continue;
         MedusaEntry entry = (MedusaEntry) getX().create(JSONParser.class).parseString(line);
-        if ( entry.getMyIndex() < minIndex ) minIndex = entry.getMyIndex();
-        if ( entry.getMyIndex() > maxIndex ) maxIndex = entry.getMyIndex();
+        if ( entry.getIndex() < minIndex ) minIndex = entry.getIndex();
+        if ( entry.getIndex() > maxIndex ) maxIndex = entry.getIndex();
         count++;
       }
       if ( count > 0 ) {
@@ -545,9 +545,9 @@ public class MNJournal extends FileJournal {
           try {
             entry = (MedusaEntry) x.create(JSONParser.class).parseString(line);
             if ( entry == null ) throw new RuntimeException("parse error: " + line);
-            if ( entry.getMyIndex() < indexFrom ) continue;
-            if ( entry.getMyIndex() < minIndex ) minIndex = entry.getMyIndex();
-            if ( entry.getMyIndex() > maxIndex ) maxIndex = entry.getMyIndex();
+            if ( entry.getIndex() < indexFrom ) continue;
+            if ( entry.getIndex() < minIndex ) minIndex = entry.getIndex();
+            if ( entry.getIndex() > maxIndex ) maxIndex = entry.getIndex();
             //TODO: Use HashingJDAO to replay following code + 
             //Support rollingHash for internal.
             //only verify internalHash.
@@ -556,7 +556,7 @@ public class MNJournal extends FileJournal {
                 MessageDigest md = MessageDigest.getInstance("SHA-256");
                 String internalHash = MNJournal.byte2Hex(entry.hash(md));
                 if ( ! internalHash.equals(entry.getInternalHash()) ) {
-                  //logger.info("Internal Hash verify FAIL: [ \n" + "expect Hash value: " + myHash + "\n" + "caculate Hash value: " + entry.getMyHash() + "\n]");
+                  //logger.info("Internal Hash verify FAIL: [ \n" + "expect Hash value: " + myHash + "\n" + "caculate Hash value: " + entry.getHash() + "\n]");
                   throw new RuntimeException("internal hash fail -> line: " + line);
                 }
               } catch ( Exception e ) {

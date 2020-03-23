@@ -54,7 +54,7 @@ foam.CLASS({
       }
 
       // Notify any blocked Primary puts
-      String name = entry.getNSpecName();
+      String name = entry.getNspecKey();
       ((DAO) x.get(name)).cmd_(x, entry);
 
       return entry;
@@ -74,7 +74,7 @@ foam.CLASS({
       ],
       type: 'foam.dao.DAO',
       javaCode: `
-      String name = entry.getNSpecName();
+      String name = entry.getNspecKey();
       DAO mdao = (DAO) getMdaos().get(name);
       if ( mdao != null ) {
         return mdao;

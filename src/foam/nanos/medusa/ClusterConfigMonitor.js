@@ -72,6 +72,7 @@ foam.CLASS({
       );
       dao.select(new ClusterConfigPingSink(x, dao, getTimeout()));
 
+      if ( electoralService != null ) {
       if ( ! service.hasQuorum(x) ) {
         if ( electoralService.getState() == ElectoralServiceState.IN_SESSION) {
           ((Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "lost quorum");
@@ -80,6 +81,7 @@ foam.CLASS({
       } else if ( electoralService.getState() == ElectoralServiceState.ADJOURNED ) {
         ((Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "acquired quorum");
         electoralService.dissolve(x);
+      }
       }
       `
     }

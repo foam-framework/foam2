@@ -18,9 +18,9 @@ foam.CLASS({
   javaImports: [
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
-    'java.util.concurrent.ThreadLocalRandom',
-    'java.util.Random',
-    'java.util.UUID'
+    // 'java.util.concurrent.ThreadLocalRandom',
+    // 'java.util.Random',
+    // 'java.util.UUID'
   ],
 
   properties: [
@@ -90,20 +90,20 @@ foam.CLASS({
 
       DaggerService daggar = (DaggerService) x.get("daggerService");
       DaggerLinks links = daggar.getNextLinks(x);
-      java.util.Random r = ThreadLocalRandom.current();
+      // java.util.Random r = ThreadLocalRandom.current();
 
       MedusaEntry entry = x.create(MedusaEntry.class);
       // TODO: put this in context factory - not sure where to install.
-      entry.setId(new UUID(r.nextLong(), r.nextLong()).toString());
+      //entry.setId(new UUID(r.nextLong(), r.nextLong()).toString());
       entry.setAction(op);
       entry.setGlobalIndex1(links.getLink1().getIndex());
       entry.setHash1(links.getLink1().getHash());
       entry.setGlobalIndex1(links.getLink2().getIndex());
       entry.setHash1(links.getLink2().getHash());
-      entry.setMyIndex(links.getGlobalIndex());
-      entry.setNspecKey(getNSpec().getName());
+      entry.setIndex(links.getGlobalIndex());
+      entry.setNSpecName(getNSpec().getName());
 
-      if ( "p".equals(entry.getAction()) ) {
+      if ( "p".equals(op) ) {
         entry.setNu(obj);
       } else {
         entry.setOld(obj);
@@ -111,7 +111,7 @@ foam.CLASS({
 
       entry = (MedusaEntry) getDelegate().put_(x, entry);
 
-      if ( "p".equals(entry.getAction()) ) {
+      if ( "p".equals(op) ) {
         return entry.getNu();
       } else {
         return entry.getOld();

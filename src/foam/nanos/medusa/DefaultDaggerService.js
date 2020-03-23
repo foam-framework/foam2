@@ -48,13 +48,13 @@ foam.CLASS({
       name: 'start',
       javaCode: `
       MedusaEntry entry = getX().create(MedusaEntry.class);
-      entry.setMyHash("aaaaaa");
-      entry.setMyIndex(-1L);
+      entry.setHash("aaaaaa");
+      entry.setIndex(-1L);
       updateLinks(getX(), entry);
 
       entry = getX().create(MedusaEntry.class);
-      entry.setMyHash("bbbbbb");
-      entry.setMyIndex(-1L);
+      entry.setHash("bbbbbb");
+      entry.setIndex(-1L);
       updateLinks(getX(), entry);
       `
     },

@@ -10,8 +10,12 @@ foam.CLASS({
   extends: 'foam.dao.AbstractSink',
 
   javaImports: [
+    'foam.dao.DAO',
     'foam.nanos.http.PingService',
-    'foam.nanos.logger.Logger'
+    'foam.nanos.logger.PrefixLogger',
+    'foam.nanos.logger.Logger',
+    'foam.mlang.sink.Max',
+    'static foam.mlang.MLang.MAX'
   ],
 
   axioms: [
@@ -35,8 +39,19 @@ foam.CLASS({
       name: 'timeout',
       class: 'Int',
       value: 3000,
+    },
+    {
+      name: 'logger',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.logger.Logger',
+      visibility: 'HIDDEN',
+      javaFactory: `
+        return new PrefixLogger(new Object[] {
+          this.getClass().getSimpleName()
+        }, (Logger) getX().get("logger"));
+      `
     }
-  ],
+ ],
 
   methods: [
     {
@@ -52,26 +67,57 @@ foam.CLASS({
         }
       ],
       javaCode: `
+      ClusterConfigService service = (ClusterConfigService) getX().get("clusterConfigService");
+      ClusterConfig myConfig = service.getConfig(getX(), service.getConfigId());
       ClusterConfig config = (ClusterConfig) ((ClusterConfig) obj).fclone();
-      Long startTime = System.currentTimeMillis();
       PingService ping = (PingService) getX().get("ping");
+
+      Long startTime = System.currentTimeMillis();
       try {
         Long latency = ping.ping(getX(), config.getId(), config.getServicePort(), getTimeout());
         config.setPingLatency(latency);
         if ( config.getStatus() != Status.ONLINE) {
           config.setStatus(Status.ONLINE);
-          ((Logger) getX().get("logger")).info(this.getClass().getSimpleName(), config.getId(), config.getStatus().getLabel());
+          getLogger().info(config.getId(), config.getType().getLabel(), config.getStatus().getLabel());
+
+          // If a Node comming online, begin replay from it.
+          if ( myConfig.getType() == MedusaType.MEDIATOR &&
+               config.getType() == MedusaType.NODE &&
+               config.getZone() == 0L &&
+               config.getRegion() == myConfig.getRegion() &&
+               config.getRealm() == myConfig.getRealm() ) {
+            DAO dao = (DAO) getX().get("localMedusaEntryDAO");
+            Max max = (Max) MAX(MedusaEntry.INDEX);
+            dao.select(max);
+            Long index = 0L;
+            if ( max != null &&
+                 max.getValue() != null ) {
+              index = (Long) max.getValue();
+            }
+
+            ReplayCmd cmd = new ReplayCmd();
+            cmd.setRequester(myConfig.getId());
+            cmd.setResponder(config.getId());
+            cmd.setFromIndex(index);
+            // TODO: configuration
+            cmd.setServiceName("medusaEntryDAO");
+            getLogger().info("Requesting replay",cmd);
+            DAO nodesDAO = (DAO) getX().get("localNodesDAO");
+            nodesDAO.cmd(cmd);
+          }
         }
         ClusterConfig.PING_INFO.clear(config);
         if ( latency > config.getMaxPingLatency() ) {
           // TODO: Alarm
-          ((Logger) getX().get("logger")).warning(this.getClass().getSimpleName(), config.getId(), "exceeded max ping latency", latency, " > ", config.getMaxPingLatency());
+          getLogger().warning(config.getId(), config.getType().getLabel(), config.getStatus().getLabel(), "exceeded max ping latency", latency, " > ", config.getMaxPingLatency());
         }
+      } catch (NullPointerException t) {
+        getLogger().error(t);
       } catch (Throwable t) {
         if ( config.getStatus() != Status.OFFLINE ) {
           config.setPingInfo(t.getMessage());
           config.setStatus(Status.OFFLINE);
-          ((Logger) getX().get("logger")).warning(this.getClass().getSimpleName(), config.getId(), config.getStatus().getLabel(), t.getMessage());
+          getLogger().warning(config.getId(), config.getType().getLabel(), config.getStatus().getLabel(), t.getMessage());
         // TODO: Alarm.
         }
       }
