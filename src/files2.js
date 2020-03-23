@@ -580,5 +580,7 @@ FOAM_FILES([
   { name: "foam/build/ClassLoaderContext" },
 
   { name: "foam/core/CoreTypesValidationTest" },
-  { name: "foam/core/CoreTypesValidationTestModel" }
+  { name: "foam/core/CoreTypesValidationTestModel" },
+
+  { name: "foam/u2/view/BusinessDirectorArrayView", flags: ['web'] },
 ]);
