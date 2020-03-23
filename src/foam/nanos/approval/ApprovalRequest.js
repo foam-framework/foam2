@@ -553,17 +553,19 @@
              return false;
         }
         
-        var objId = self.__subContext__[self.daoKey_].of.ID.type === 'Long' ? parseInt(self.objId) : self.objId;
-
-        return self.__subContext__[this.daoKey_]
-          .find(objId)
-          .then((obj) => {
-            return !! obj;
-          })
-          .catch((err) => {
-            console.warn(err.message || err);
-            return false;
-          });
+        if ( self.__subContext__[self.daoKey_] ) {
+          var property = self.__subContext__[self.daoKey_].of.ID;
+          var objId = property.adapt.call(property, self.objId, self.objId, property);
+          return self.__subContext__[this.daoKey_]
+            .find(objId)
+            .then((obj) => {
+              return !! obj;
+            })
+            .catch((err) => {
+              console.warn(err.message || err);
+              return false;
+            });
+          }
       },
       code: function(X) {
         var self = this;
