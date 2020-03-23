@@ -9,6 +9,8 @@ foam.CLASS({
   name: 'IconTextFieldView',
   extends: 'foam.u2.View',
 
+  documentation: 'A TextField with an icon attached.',
+
   requires: [
     'foam.u2.TextField'
   ],
@@ -33,14 +35,6 @@ foam.CLASS({
     {
       class: 'String',
       name: 'icon'
-    },
-    {
-      class: 'String',
-      name: 'type'
-    },
-    {
-      class: 'String',
-      name: 'placeHolder'
     }
   ],
 
@@ -64,6 +58,17 @@ foam.CLASS({
           .addClass(this.myClass('input'))
         .end()
       .end();
+    },
+
+    function fromProperty(prop) {
+
+      if ( ! this.placeholder && prop.placeholder ) {
+        this.placeholder = prop.placeholder;
+      }
+
+      if ( ! this.type && prop.type) {
+        this.type = prop.type;
+      }
     }
   ]
 })

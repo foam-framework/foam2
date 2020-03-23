@@ -23,6 +23,15 @@ foam.CLASS({
     'foam.u2.layout.Rows'
   ],
 
+  css: `
+    .subtitle {
+      color: /*%GREY2%*/ #8e9090';
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 15px;
+    }
+  `,
+
   properties: [
     {
       class: 'String',
@@ -61,12 +70,7 @@ foam.CLASS({
               this.start('h2').add(section$title).end();
             })
             .callIf(section$subTitle, function() {
-              this.start().style({
-                'color': '/*%GREY4%*/ #8e9090',
-                'font-size': '14px',
-                'line-height': '1.5',
-                'margin-bottom': '15px'
-              }).add(section$subTitle).end();
+              this.start().addClass('subtitle').add(section$subTitle).end();
             })
             .start(self.Grid)
               .forEach(section.properties, function(p, index) {
