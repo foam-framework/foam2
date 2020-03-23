@@ -62,11 +62,11 @@ foam.CLASS({
 
     function fromProperty(prop) {
 
-      if ( ! this.placeholder && !! prop.placeholder ) {
+      if ( ! this.placeholder && prop.placeholder ) {
         this.placeholder = prop.placeholder;
       }
 
-      if ( ! this.type && !! prop.type) {
+      if ( ! this.type && prop.type) {
         this.type = prop.type;
       }
     }
