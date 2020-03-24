@@ -20,6 +20,10 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'subTitle'
+    },
+    {
+      class: 'String',
       name: 'help'
     },
     {
