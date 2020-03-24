@@ -37,6 +37,7 @@ foam.CLASS({
   imports: [
     'classloader',
     'window',
+    'theme'
   ],
 
   exports: [
@@ -61,6 +62,10 @@ foam.CLASS({
     {
       name: 'locale',
       postSet: function(_, n) { foam.locale = n; }
+    },
+    {
+      name: 'theme',
+      postSet: function(_, n) { this.theme = n; }
     },
     {
       class: 'String',
