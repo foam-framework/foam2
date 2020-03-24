@@ -21,7 +21,7 @@ if ( foamlinkMode ) {
 }
 
 var logger = {};
-logger.debug = (...args) => {};
+logger.debug = () => {};
 
 // Store debug files but only if DEBUG_DATA_DIR is set in environment
 var debugDataDir = null;
