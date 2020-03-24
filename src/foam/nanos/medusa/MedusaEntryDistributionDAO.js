@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.nanos.medusa',
-  name: 'NodesDAO',
+  name: 'MedusaEntryDistributionDAO',
   extends: 'foam.dao.ProxyDAO',
 
   documentation: `Write MedusaEntry to the Medusa Nodes`,
@@ -53,6 +53,8 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
+      MedusaEntry entry = (MedusaEntry) getDelegate().put_(x, obj);
+      getLogger().debug("put", entry);
       // using assembly line, write to all online nodes - in all a zones.
       List<ClusterConfig> arr = (ArrayList) ((ArraySink) ((DAO) x.get("localClusterConfigDAO"))
         .where(
@@ -73,16 +75,17 @@ foam.CLASS({
                 dao = new MedusaEntryClientDAO.Builder(x)
                   .setClusterConfigId(config.getId())
                   .build();
+                getLogger().debug("client", config.getId(), "put");
                 getClients().put(config.getId(), dao);
               }
-              dao.put_(x, obj);
+              dao.put_(x, entry);
             } catch ( Throwable t ) {
               getLogger().error(t);
             }
           }
         });
       }
-      return obj;
+      return entry;
       `
     },
     {

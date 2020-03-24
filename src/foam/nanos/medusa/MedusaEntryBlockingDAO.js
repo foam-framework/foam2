@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'MedusaEntryBlockingDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  documentation: 'Wait for consensus on MedusaEntry before returning from put.',
+  documentation: 'Wait for consensus on MedusaEntry before returning from put(). See MedusaEntryRoutingDAO for notification.',
 
   javaImports: [
     'foam.dao.DAO',
@@ -44,8 +44,7 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-      MedusaEntry entry = (MedusaEntry) ((DAO) x.get("localMedusaEntryDAO")).put_(x, obj);
-                   entry = (MedusaEntry) ((DAO) x.get("localNodesDAO")).put_(x, entry);
+      MedusaEntry entry = (MedusaEntry) getDelegate().put_(x, obj);
       getLogger().debug("waitOn", entry.getIndex());
       waitOn(x, entry.getIndex());
       return entry;

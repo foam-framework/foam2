@@ -74,7 +74,7 @@ foam.CLASS({
 
       Long startTime = System.currentTimeMillis();
       try {
-        Long latency = ping.ping(getX(), config.getId(), config.getServicePort(), getTimeout());
+        Long latency = ping.ping(getX(), config.getId(), config.getPort(), getTimeout());
         config.setPingLatency(latency);
         if ( config.getStatus() != Status.ONLINE) {
           config.setStatus(Status.ONLINE);
@@ -102,7 +102,7 @@ foam.CLASS({
             // TODO: configuration
             cmd.setServiceName("medusaEntryDAO");
             getLogger().info("Requesting replay",cmd);
-            DAO nodesDAO = (DAO) getX().get("localNodesDAO");
+            DAO nodesDAO = (DAO) getX().get("localMedusaEntryDAO");
             nodesDAO.cmd(cmd);
           }
         }

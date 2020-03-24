@@ -56,7 +56,7 @@ public class ClusterDAOTest
       .setId("primary")
       .setIsPrimary(true)
       .setAccessMode(AccessMode.RW)
-      .setServicePort(8080)
+      .setPort(8080)
       .setSessionId("primary")
       .build();
     ((DAO) x.get("clusterConfigDAO")).put(config);
@@ -64,7 +64,7 @@ public class ClusterDAOTest
     config = new ClusterConfig.Builder(x)
       .setId("secondary")
       .setIsPrimary(false)
-      .setServicePort(8090)
+      .setPort(8090)
       .setSessionId("secondary")
       .build();
     ((DAO) x.get("clusterConfigDAO")).put(config);

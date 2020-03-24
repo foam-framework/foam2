@@ -114,10 +114,10 @@ public class Boot {
       DAO    scriptDAO = (DAO) root_.get("scriptDAO");
       Script script    = (Script) scriptDAO.find(startScript);
       if ( script != null ) {
-        logger.info("Boot Script", startScript);
+        logger.info("Boot, Script", startScript);
         script.runScript(root_);
       } else {
-        logger.warning("Boot Script not found", startScript);
+        logger.warning("Boot, Script not found", startScript);
       }
     }
   }

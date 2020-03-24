@@ -6,21 +6,19 @@
 
 foam.CLASS({
   package: 'foam.nanos.medusa',
-  name: 'MedusaEntryDAO',
+  name: 'MedusaEntryAdapterDAO',
   extends: 'foam.dao.ProxyDAO',
 
   implements: [
     'foam.nanos.boot.NSpecAware',
   ],
 
-  documentation: `Create a medusa object, assign a global index`,
+  documentation: `Create a medusa entry for argument model. NOTE:  delegate is parent MDAO, but only used as holder for MedusaEntryRoutingDAO to find.`,
 
   javaImports: [
+    'foam.core.FObject',
     'foam.nanos.logger.PrefixLogger',
-    'foam.nanos.logger.Logger',
-    // 'java.util.concurrent.ThreadLocalRandom',
-    // 'java.util.Random',
-    // 'java.util.UUID'
+    'foam.nanos.logger.Logger'
   ],
 
   properties: [
@@ -30,9 +28,10 @@ foam.CLASS({
       of: 'foam.nanos.boot.NSpec'
     },
     {
-      name: 'mdao',
+      name: 'medusaEntryDAO',
       class: 'FObjectProperty',
-      of: 'foam.dao.MDAO',
+      of: 'foam.dao.DAO',
+      javaFactory: 'return (foam.dao.DAO) getX().get("localMedusaEntryDAO");'
     },
     {
       name: 'logger',
@@ -40,10 +39,9 @@ foam.CLASS({
       of: 'foam.nanos.logger.Logger',
       visibility: 'HIDDEN',
       javaFactory: `
-        Logger logger = (Logger) getX().get("logger");
         return new PrefixLogger(new Object[] {
           this.getClass().getSimpleName()
-        }, logger);
+        }, (Logger) getX().get("logger"));
       `
     }
   ],
@@ -52,13 +50,13 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-      return submit(x, (foam.core.FObject) obj, "p");
+      return submit(x, (FObject) obj, "p");
       `
     },
     {
       name: 'remove_',
       javaCode: `
-      return submit(x, (foam.core.FObject) obj, "r");
+      return submit(x, (FObject) obj, "r");
       `
     },
     {
@@ -70,14 +68,14 @@ foam.CLASS({
         },
         {
           name: 'obj',
-          type: 'foam.core.FObject'
+          type: 'FObject'
         },
         {
           name: 'op',
           type: 'String'
         }
       ],
-      type: 'foam.core.FObject',
+      type: 'FObject',
       javaCode: `
       ElectoralService electoralService = (ElectoralService) x.get("electoralService");
       ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
@@ -90,11 +88,8 @@ foam.CLASS({
 
       DaggerService daggar = (DaggerService) x.get("daggerService");
       DaggerLinks links = daggar.getNextLinks(x);
-      // java.util.Random r = ThreadLocalRandom.current();
 
       MedusaEntry entry = x.create(MedusaEntry.class);
-      // TODO: put this in context factory - not sure where to install.
-      //entry.setId(new UUID(r.nextLong(), r.nextLong()).toString());
       entry.setAction(op);
       entry.setGlobalIndex1(links.getLink1().getIndex());
       entry.setHash1(links.getLink1().getHash());
@@ -108,8 +103,8 @@ foam.CLASS({
       } else {
         entry.setOld(obj);
       }
-
-      entry = (MedusaEntry) getDelegate().put_(x, entry);
+      getLogger().debug("put", "entry", entry);
+      entry = (MedusaEntry) getMedusaEntryDAO().put_(x, entry);
 
       if ( "p".equals(op) ) {
         return entry.getNu();

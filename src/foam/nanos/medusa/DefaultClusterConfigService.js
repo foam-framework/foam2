@@ -141,7 +141,7 @@ foam.CLASS({
         if ( ! SafetyUtil.isEmpty(path) ) {
           path = "/" + path;
         }
-        java.net.URI uri = new java.net.URI("http", null, config.getId(), config.getServicePort(), path+"/"+serviceName, null, null);
+        java.net.URI uri = new java.net.URI("http", null, config.getId(), config.getPort(), path+"/"+serviceName, null, null);
         //getLogger.debug("buildURL", serviceName, uri.toURL().toString());
         return uri.toURL().toString();
       } catch (java.net.MalformedURLException | java.net.URISyntaxException e) {

@@ -21,6 +21,7 @@ foam.INTERFACE({
     },
     {
       name: 'updateLinks',
+      synchronized: true,
       args: [
         {
           name: 'x',

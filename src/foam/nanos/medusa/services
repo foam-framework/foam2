@@ -60,11 +60,4 @@ p({
   """
 })
 
-p({
-  "class":"foam.nanos.boot.NSpec",
-  "name":"tcpServer",
-  "lazy":false,
-  "serviceClass":"foam.nanos.medusa.TCPNioServer"
-})
-
 // See deployment/mm and mn for type specific setup

@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'MedusaEntryRoutingDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  documentation: `Route real put to mdao, and cmd to context dao.`,
+  documentation: `Consensus has been reached for an object, put it into it's MDAO. Also generate a notification to wake any blocked Primary puts.`,
 
   javaImports: [
     'foam.dao.DAO',
@@ -33,10 +33,9 @@ foam.CLASS({
       of: 'foam.nanos.logger.Logger',
       visibility: 'HIDDEN',
       javaFactory: `
-        Logger logger = (Logger) getX().get("logger");
         return new PrefixLogger(new Object[] {
           this.getClass().getSimpleName()
-        }, logger);
+        }, (Logger) getX().get("logger"));
       `
     }
   ],
@@ -45,7 +44,11 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-      MedusaEntry entry = (MedusaEntry) obj;
+      MedusaEntry entry = (MedusaEntry) getDelegate().put_(x, obj);
+      if ( ! entry.getHasConsensus() ) {
+        return entry;
+      }
+
       DAO mdao = getMdao(x, entry);
       if ( "p".equals(entry.getAction()) ) {
         mdao.put_(x, entry.getNu());

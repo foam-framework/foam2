@@ -87,7 +87,7 @@ p({
   "name": "ping",
   "lazy": false,
   "authenticate": false,
-  "serviceClass": "foam.nanos.http.PingService"
+  "serviceClass": "foam.nanos.medusa.ClusterPingService"
 })
 
 p({
@@ -164,12 +164,14 @@ p({
 p({
   "class":"foam.nanos.boot.NSpec",
   "name":"scriptDAO",
+  "lazy":false,
   "serve":true,
   "serviceScript":"""
     return new foam.dao.EasyDAO.Builder(x)
-      .setPm(true)
-      .setGuid(true)
       .setOf(foam.nanos.script.Script.getOwnClassInfo())
+      .setGuid(true)
+      .setCluster(true)
+      .setPm(true)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("scripts")
       .setDecorator(new foam.nanos.script.ScriptRunnerDAO(new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.script.Script.getOwnClassInfo()).build()))

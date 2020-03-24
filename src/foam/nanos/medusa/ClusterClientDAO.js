@@ -12,6 +12,7 @@ foam.CLASS({
   documentation: 'Marshall put and remove operations to the ClusterServer.',
 
   javaImports: [
+    'foam.core.ContextAware',
     'foam.core.FObject',
     'foam.core.X',
     'foam.dao.DAO',
@@ -59,6 +60,8 @@ foam.CLASS({
 
       foam.core.FObject old = getDelegate().find_(x, obj.getProperty("id"));
       foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(x).setPropertyPredicate(new foam.lib.ClusterPropertyPredicate());
+      // Clear context so it's not marshalled across the network
+      ((ContextAware) obj).setX(null);
 
         //TODO: outputDelta has problem when output array. Fix bugs then use output delta.
         // String record = ( old != null ) ?
@@ -75,6 +78,8 @@ foam.CLASS({
         int retryDelay = 10;
 
         ClusterCommand cmd = new ClusterCommand(x, getServiceName(), ClusterCommand.PUT, record);
+        // NOTE: set context to null after init so it's not marshalled across network
+        cmd.setX(null);
 
         while ( service != null &&
                 ! service.getIsPrimary() ) {

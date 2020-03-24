@@ -91,6 +91,7 @@ foam.CLASS({
           throw new RuntimeException(e);
         }
       }
+      getLogger().debug("put", entry);
       return getDelegate().put_(x, entry);
       `
     }

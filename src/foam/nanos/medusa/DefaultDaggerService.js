@@ -40,6 +40,17 @@ foam.CLASS({
       name: 'links',
       class: 'Array',
       javaFactory: 'return new foam.nanos.medusa.DaggerLink[2];'
+    },
+    {
+      name: 'logger',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.logger.Logger',
+      visibility: 'HIDDEN',
+      javaFactory: `
+        return new PrefixLogger(new Object[] {
+          this.getClass().getSimpleName()
+        }, (Logger) getX().get("logger"));
+      `
     }
   ],
 
@@ -78,6 +89,7 @@ foam.CLASS({
     },
     {
       name: 'updateLinks',
+      synchronized: true,
       args: [
         {
           name: 'x',
@@ -90,6 +102,7 @@ foam.CLASS({
       ],
       javaCode: `
       linksIndex_ ^= 1;
+      getLogger().debug("updateLinks", linksIndex_, link);
       getLinks()[linksIndex_] = link;
       `
     }

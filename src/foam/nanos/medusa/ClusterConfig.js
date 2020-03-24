@@ -25,14 +25,15 @@ foam.CLASS({
   tableColumns: [
     'id',
     'enabled',
-    'realm',
-    'region',
-    'zone',
+    'status',
     'type',
     'isPrimary',
-    'status',
+    'port',
     'pingLatency',
     'connections',
+    'zone',
+    'region',
+    'realm',
     'lastModified'
   ],
   
@@ -97,19 +98,9 @@ foam.CLASS({
       documentation: 'Mode of a node (read-only, read-write or write-only)'
     },
     {
-      name: 'servicePort',
+      name: 'port',
       class: 'Int',
       value: 8080
-    },
-    {
-      name: 'socketPort',
-      class: 'Int',
-      value: 8082
-    },
-    {
-      name: 'electionPort',
-      class: 'Int',
-      value: 8083
     },
     {
       documentation: 'Ping delay greater than this value will trigger alarms.',

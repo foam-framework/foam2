@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.nanos.medusa',
   name: 'ElectoralServiceServer',
@@ -107,7 +113,7 @@ foam.CLASS({
       javaCode: `
       try {
         // TODO: protocol - http will do for now as we are behind the load balancers.
-        java.net.URI uri = new java.net.URI("http", null, config.getId(), config.getServicePort(), "/service/electoralService", null, null);
+        java.net.URI uri = new java.net.URI("http", null, config.getId(), config.getPort(), "/service/electoralService", null, null);
         ((Logger) getX().get("logger")).debug("buildURL", config.getId(), uri.toURL().toString());
         return uri.toURL().toString();
       } catch (java.net.MalformedURLException | java.net.URISyntaxException e) {

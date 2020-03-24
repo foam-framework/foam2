@@ -24,7 +24,7 @@ public class PingService
     foam.lib.json.Outputter outputter =
       new foam.lib.json.Outputter(x)
       .setPropertyPredicate(new foam.lib.NetworkPropertyPredicate());
-    Message msg = new Message(x);
+    Message msg = new Message();
     msg.setObject(new Ping());
     out.println(outputter.stringify(msg));
   }

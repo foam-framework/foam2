@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'MedusaEntryBroadcastDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  documentation: `Broadcast MedusaEntrys Mediators`,
+  documentation: `Broadcast MedusaEntrys back to Mediators.`,
 
   javaImports: [
     'foam.dao.ArraySink',
@@ -55,6 +55,7 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       MedusaEntry entry = (MedusaEntry) getDelegate().put_(x, obj);
+      getLogger().debug("put", entry);
 
       // using assembly line, write to all online mediators in zone 0 and same realm,region
       ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
@@ -84,6 +85,7 @@ foam.CLASS({
                   .build();
                 getClients().put(config.getId(), dao);
               }
+              getLogger().debug("put", config.getId());
               dao.put_(x, entry);
             } catch ( Throwable t ) {
               getLogger().error(t);

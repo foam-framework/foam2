@@ -78,6 +78,7 @@ foam.CLASS({
   imports: [ 'document', 'log' ],
 
   javaImports: [
+    'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger'
   ],
 
@@ -117,35 +118,32 @@ foam.CLASS({
       type: 'foam.nanos.boot.NSpec'
     },
     {
+      name: 'logger',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.logger.Logger',
+      visibility: 'HIDDEN',
+      javaFactory: `
+        return new PrefixLogger(new Object[] {
+          this.getClass().getSimpleName()
+        }, (Logger) getX().get("logger"));
+      `
+    },
+    {
       /** This is set automatically when you create an EasyDAO.
         @private */
       name: 'delegate',
       javaFactory: `
-        Logger logger = (Logger) getX().get("logger");
         foam.dao.DAO delegate = getInnerDAO();
         if ( delegate == null ) {
           if ( getNullify() ) {
             delegate = new foam.dao.NullDAO.Builder(getX())
               .setOf(getOf())
               .build();
-          // } else if ( getMedusaNode() ) {
-          //   delegate = new foam.nanos.medusa.MNDAO(getX(), getOf(), getJournalName());
-          } else if ( getCluster() == true ) {
-            setMdao(new foam.dao.MDAO(getOf()));
- //           delegate = new foam.nanos.medusa.MMDAO(getX(), getNSpec().getName(), getMdao(), "singleJournal", getJournalName());
-
-            delegate = new foam.nanos.medusa.MedusaEntryDAO.Builder(getX())
-              .setNSpec(getNSpec())
-              .setDelegate(new foam.nanos.medusa.MedusaEntryBlockingDAO.Builder(getX())
-                .setDelegate(new foam.dao.NullDAO(getX(), getOf()))
-                .build())
-              .build();
           } else if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
             setMdao(new foam.dao.MDAO(getOf()));
             if ( getWriteOnly() ) {
               delegate = new foam.dao.WriteOnlyJDAO(getX(), getMdao(), getOf(), getJournalName());
             } else {
-              setMdao(new foam.dao.MDAO(getOf()));
               delegate = new foam.dao.java.JDAO(getX(), getMdao(), getJournalName());
             }
           } else {
@@ -182,37 +180,24 @@ foam.CLASS({
               pxy.setDelegate(fixedSizeDAO);
             }
           } else {
-            logger.error(this.getClass().getSimpleName(), "NSpec.name", (getNSpec() != null ) ? getNSpec().getName() : null, "of_", of_, "FixedSizeDAO did not find instanceof MDAO");
+            getLogger().error(this.getClass().getSimpleName(), "NSpec.name", (getNSpec() != null ) ? getNSpec().getName() : null, "of_", of_, "FixedSizeDAO did not find instanceof MDAO");
             System.exit(1);
           }
         }
 
-        // if ( getCluster() &&
-        //      getMdao() != null ) {
-        //     delegate = new foam.nanos.medusa.ClusterClientDAO.Builder(getX())
-        //                   .setServiceName(getNSpec().getName())
-        //                   .setDelegate(delegate)
-        //                   .build();
-        //   // // test if chain already has ClusterConfigDAO
-        //   // boolean found = false;
-        //   // foam.dao.DAO next = delegate;
-        //   // while ( next instanceof foam.dao.ProxyDAO &&
-        //   //   ! ( next instanceof foam.nanos.medusa.ClusterClientDAO ) ) {
-        //   //   next = ((foam.dao.ProxyDAO) next).getDelegate();
-        //   // }
-        //   // if ( ! ( next instanceof foam.nanos.medusa.ClusterClientDAO ) ) {
-        //   //   delegate = new foam.nanos.medusa.ClusterClientDAO.Builder(getX())
-        //   //                 .setServiceName(getNSpec().getName())
-        //   //                 .setDelegate(delegate)
-        //   //                 .build();
-        //   // }
-        // }
+        if ( getCluster() &&
+             getMdao() != null ) {
+          delegate = new foam.nanos.medusa.MedusaEntryAdapterDAO.Builder(getX())
+          .setNSpec(getNSpec())
+          .setDelegate(delegate)
+          .build();
+        }
 
         delegate = getOuterDAO(delegate);
 
         if ( getDecorator() != null ) {
           if ( ! ( getDecorator() instanceof ProxyDAO ) ) {
-            logger.error(this.getClass().getSimpleName(), "delegate", "NSpec.name", (getNSpec() != null ) ? getNSpec().getName() : null, "of_", of_ , "delegateDAO", getDecorator(), "not instanceof ProxyDAO");
+            getLogger().error(this.getClass().getSimpleName(), "delegate", "NSpec.name", (getNSpec() != null ) ? getNSpec().getName() : null, "of_", of_ , "delegateDAO", getDecorator(), "not instanceof ProxyDAO");
             System.exit(1);
           }
           // The decorator dao may be a proxy chain
@@ -271,7 +256,7 @@ foam.CLASS({
         }
 
         if ( getDeletedAware() ) {
-          logger.warning("EasyDAO", getName(), "DEPRECATED: DeletedAware. Use LifecycleAware instead");
+          getLogger().warning("EasyDAO", getName(), "DEPRECATED: DeletedAware. Use LifecycleAware instead");
 
           delegate = new foam.nanos.auth.DeletedAwareDAO.Builder(getX())
             .setDelegate(delegate)
@@ -321,23 +306,18 @@ foam.CLASS({
 
         if ( getCluster() &&
              getMdao() != null ) {
+          // test if chain already has ClusterConfigDAO
+          foam.dao.DAO next = delegate;
+          while ( next instanceof foam.dao.ProxyDAO &&
+            ! ( next instanceof foam.nanos.medusa.ClusterClientDAO ) ) {
+            next = ((foam.dao.ProxyDAO) next).getDelegate();
+          }
+          if ( ! ( next instanceof foam.nanos.medusa.ClusterClientDAO ) ) {
             delegate = new foam.nanos.medusa.ClusterClientDAO.Builder(getX())
                           .setServiceName(getNSpec().getName())
                           .setDelegate(delegate)
                           .build();
-          // // test if chain already has ClusterConfigDAO
-          // boolean found = false;
-          // foam.dao.DAO next = delegate;
-          // while ( next instanceof foam.dao.ProxyDAO &&
-          //   ! ( next instanceof foam.nanos.medusa.ClusterClientDAO ) ) {
-          //   next = ((foam.dao.ProxyDAO) next).getDelegate();
-          // }
-          // if ( ! ( next instanceof foam.nanos.medusa.ClusterClientDAO ) ) {
-          //   delegate = new foam.nanos.medusa.ClusterClientDAO.Builder(getX())
-          //                 .setServiceName(getNSpec().getName())
-          //                 .setDelegate(delegate)
-          //                 .build();
-          // }
+          }
         }
 
         if ( getAuthorize() ) {
@@ -348,7 +328,7 @@ foam.CLASS({
         }
 
         if ( getNSpec() != null && getNSpec().getServe() && ! getAuthorize() && ! getReadOnly() )
-          logger.warning("EasyDAO", getNSpec().getName(), "Served DAO should be Authorized, or ReadOnly");
+          getLogger().warning("EasyDAO", getNSpec().getName(), "Served DAO should be Authorized, or ReadOnly");
 
         if ( getPermissioned() && ( getNSpec() != null && getNSpec().getServe() ) )
           delegate = new foam.nanos.auth.PermissionedPropertyDAO.Builder(getX()).setDelegate(delegate).build();
@@ -370,21 +350,6 @@ foam.CLASS({
         ((ProxyDAO)delegate_).setDelegate(delegate);
         return delegate_;
       `
-    },
-    {
-      class: 'Boolean',
-      name: 'medusaNode',
-      value: false
-    },
-    {
-      class: 'String',
-      name: 'mnPersistServiceName',
-      value: 'singleJournal'
-    },
-    {
-      class: 'Boolean',
-      name: 'medusaMediator',
-      value: false
     },
     {
       class: 'Object',
@@ -773,9 +738,8 @@ model from which to test ServiceProvider ID (spid)`,
       name: 'init_',
       javaCode: `
        if ( of_ == null ) {
-         foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
-         if ( logger != null ) {
-           logger.error("EasyDAO", getName(), "'of' not set.", new Exception("of not set"));
+         if ( getLogger() != null ) {
+           getLogger().error("EasyDAO", getName(), "'of' not set.", new Exception("of not set"));
          } else {
            System.err.println("EasyDAO "+getName()+" 'of' not set.");
          }

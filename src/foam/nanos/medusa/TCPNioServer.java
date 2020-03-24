@@ -85,7 +85,7 @@ public class TCPNioServer extends AbstractFObject implements NanoService {
     //ClusterConfig myself = (ClusterConfig) clusterDAO.find(clusterId);
     if ( myself == null ) throw new RuntimeException("ClusterConfig not found: " + hostname);
 
-    InetSocketAddress serverAddress = new InetSocketAddress(myself.getId(), myself.getSocketPort());
+    InetSocketAddress serverAddress = new InetSocketAddress(myself.getId(), myself.getPort()); //SocketPort());
     logger.info("socket open at:", serverAddress);
     // int totalProcessors = totalCores * 1;
     // Double size of MM.

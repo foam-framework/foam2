@@ -370,7 +370,7 @@ public class MMJournal
 
       for ( int j = 0 ; j < nodes.size() ; j++ ) {
         ClusterConfig node = nodes.get(j);
-        tasks[j] = new FutureTask<String>(new Sender(node.getId(), node.getServicePort(), medusaEntry));
+        tasks[j] = new FutureTask<String>(new Sender(node.getId(), node.getPort(), medusaEntry));
         //TODO: use threadpool.
         //new Thread((FutureTask<String>) tasks[j]).start();
         pool.execute(new Thread((FutureTask<String>) tasks[j]));
@@ -789,7 +789,7 @@ public class MMJournal
         try {
           channel = SocketChannel.open();
           channel.configureBlocking(true);
-          InetSocketAddress address = new InetSocketAddress(node.getId(), node.getSocketPort());
+          InetSocketAddress address = new InetSocketAddress(node.getId(), node.getPort()); //node.getSocketPort());
           //The system should wait for connection at here.
           boolean connectResult = channel.connect(address);
 
@@ -1335,7 +1335,7 @@ public class MMJournal
       processor.start();
       for ( ClusterConfig config : group.getValue() ) {
         //TODO: create socketChannel;
-        InetSocketAddress address = new InetSocketAddress(config.getId(), config.getSocketPort());
+        InetSocketAddress address = new InetSocketAddress(config.getId(), config.getPort()); //SocketPort());
         SocketChannel channel = SocketChannel.open();
         channel.configureBlocking(false);
         channel.connect(address);
