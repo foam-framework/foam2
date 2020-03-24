@@ -3,6 +3,8 @@
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
+var path_ = require('path');
+var fs_ = require('fs');
 
 process.on('unhandledRejection', function(e) {
   console.error("ERROR: Unhandled promise rejection ", e);
@@ -18,10 +20,18 @@ if ( foamlinkMode ) {
   global.FOAMLINK_DATA = process.env['FOAMLINK_DATA'];
 }
 
+var logger = {};
+logger.debug = () => {};
+
 // Store debug files but only if DEBUG_DATA_DIR is set in environment
 var debugDataDir = null;
 if ( process.env.hasOwnProperty('DEBUG_DATA_DIR') ) {
   debugDataDir = process.env['DEBUG_DATA_DIR'];
+  logger.debug = (...args) => {
+    fs_.appendFileSync(path_.join(debugDataDir, 'debugLog.jrl'),
+      args.join('p({"type": "debug", "value": ' + JSON.stringify(args) + '})\n')
+    );
+  };
 }
 
 require('../src/foam.js');
@@ -50,10 +60,8 @@ if ( process.argv.length > 5  &&
      process.argv[5] !== '--' &&
      process.argv[5] != '' ) {
   incrementalMeta = JSON.parse(process.argv[5]);
+  logger.debug('INCREMENTAL', process.argv[5]);
 }
-
-var path_ = require('path');
-var fs_ = require('fs');
 
 var indir = process.argv[2];
 indir = path_.resolve(path_.normalize(indir));
@@ -78,9 +86,11 @@ var debugFilesWritten = [];
 if ( incrementalMeta !== null && foamlinkMode ) {
   fileWhitelist = {}; // set
   for ( var i = 0; i < incrementalMeta.modified.length; i++ ) {
-    fileWhitelist[incrementalMeta.modified[i]] = true;
+    let relativePath = path_.relative(process.cwd(), incrementalMeta.modified[i]);
+    fileWhitelist[relativePath] = true;
   }
 }
+logger.debug('fileWhitelist', fileWhitelist);
 
 [
   'FObject',
@@ -166,14 +176,18 @@ function loadClass(c) {
 }
 
 function generateClass(cls) {
+  logger.debug('call/generateClass:cls', ''+cls);
   if ( foam.Array.isInstance(cls) ) {
     cls = cls[1];
   }
   if ( typeof cls === 'string' )
     cls = foam.lookup(cls);
 
+  logger.debug('call/generateClass:cls.id', cls.id);
+
   if ( fileWhitelist !== null ) {
     let src = cls.model_.source;
+    logger.debug('call/generateClass:src', cls.id, src);
     if ( ! src ) {
       classesNotFound[cls.id] = true;
     } else {
@@ -184,6 +198,7 @@ function generateClass(cls) {
       }
     }
   }
+  logger.debug('call/generateClass:cls.id,build?', cls.id, 'true');
 
   var outfile = outdir + path_.sep +
     cls.id.replace(/\./g, path_.sep) + '.java';
