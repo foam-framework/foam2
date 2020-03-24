@@ -164,7 +164,7 @@ foam.CLASS({
         if ( lifecycleObj.getLifecycleState() == LifecycleState.PENDING ){
           lifecycleObj.setLifecycleState(LifecycleState.ACTIVE);
         }
-        return super.put_(x,obj);
+        return super.put_(getX(),obj);
       }
 
       // system and admins override the approval process
@@ -263,12 +263,12 @@ foam.CLASS({
 
             if ( fulfilledRequest.getStatus() == ApprovalStatus.APPROVED ) {
               lifecycleObj.setLifecycleState(LifecycleState.ACTIVE);
-              return super.put_(x,obj);
+              return super.put_(getX(),obj);
             } 
 
             // create request has been rejected is only where we mark the object as REJECTED
             lifecycleObj.setLifecycleState(LifecycleState.REJECTED);
-            return super.put_(x,obj); 
+            return super.put_(getX(),obj); 
           } 
           if ( approvedObjCreateRequests.size() > 1 ) {
             logger.error("Something went wrong cannot have multiple approved/rejected requests for the same request!");
