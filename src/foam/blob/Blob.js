@@ -399,7 +399,7 @@ foam.CLASS({
         if ( o2 == this ) return 0;
         return foam.util.SafetyUtil.compare(getId(), o2.getId());
       `,
-      code: function compareTo(other) {
+      code: function(other) {
             return foam.blob.IdentifiedBlob.isInstance(other) && other.id == this.id;
       },
     },
