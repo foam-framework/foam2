@@ -610,7 +610,8 @@ foam.CLASS({
             // Force property update
             this.propertyChange.pub(self.name, this.slot(self.name));
           }
-        }
+        },
+        configurable: true
       });
       Object.defineProperty(proto, self.name + '$remove', {
         get: function mapRemove() {
@@ -620,7 +621,8 @@ foam.CLASS({
             // Force property update
             this.propertyChange.pub(self.name, this.slot(self.name));
           }
-        }
+        },
+        configurable: true
       })
     }
   ]
