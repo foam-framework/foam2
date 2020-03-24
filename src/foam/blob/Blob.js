@@ -400,7 +400,8 @@ foam.CLASS({
         return foam.util.SafetyUtil.compare(getId(), o2.getId());
       `,
       code: function(other) {
-            return foam.blob.IdentifiedBlob.isInstance(other) && other.id == this.id;
+        if ( other === null ) return 1;
+        return this.id.localeCompare(other.id);
       },
     },
   ]
