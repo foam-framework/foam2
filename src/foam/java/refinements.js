@@ -1779,13 +1779,6 @@ foam.CLASS({
                 + this.of + '[value == null ? 0 : value.length];\n'
                 + 'if ( value != null ) System.arraycopy(value, 0, ret, 0, value.length);\n'
                 + 'return ret;';
-      // TODO: Change to ClassInfo return type once primitive support is added
-      info.method({
-        name: 'of',
-        visibility: 'public',
-        type: 'String',
-        body: 'return "' + (this.of ? this.of.id ? this.of.id : this.of : null) + '";'
-      });
 
       var isDefaultValue = info.getMethod('isDefaultValue');
       isDefaultValue.body = 'return java.util.Arrays.equals(get_(o), null);';
