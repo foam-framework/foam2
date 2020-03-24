@@ -147,6 +147,14 @@ foam.CLASS({
       cursor: pointer;
       color: #233E8B;
     }
+
+    ^ .foam-u2-dialog-Popup-inner {
+      width: 75%;
+      height: 80%;
+      border-radius: 5px;
+    }
+
+    
   `,
 
   messages: [
