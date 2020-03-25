@@ -11,10 +11,11 @@ import foam.dao.AbstractDAO;
 import foam.dao.Sink;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
-import static foam.dao.AbstractDAO.decorateSink;
 import foam.mlang.predicate.True;
 import foam.mlang.sink.GroupBy;
+import static foam.dao.AbstractDAO.decorateSink;
 
+/** AATree implementation. See: https://en.wikipedia.org/wiki/AA_tree **/
 public class TreeNode {
   protected Object   key;
   protected Object   value;
