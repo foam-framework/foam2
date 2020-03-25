@@ -215,6 +215,16 @@ foam.CLASS({
         delegateIsSet_ = true;
         delegate_ = new ProxyDAO.Builder(getX()).setDelegate(delegate).build();
 
+        if ( getApprovableAware() ) {
+          delegate = new foam.nanos.approval.ApprovableAwareDAO
+          .Builder(getX())
+          .setDaoKey(getName())
+          .setOf(getOf())
+          .setDelegate(delegate)
+          .setIsEnabled(getApprovableAwareEnabled())
+          .build();
+        }
+
         if ( getGuid() && getSeqNo() )
           throw new RuntimeException("EasyDAO GUID and SeqNo are mutually exclusive");
 
@@ -224,16 +234,6 @@ foam.CLASS({
           setProperty(getSeqPropertyName()).
           setStartingValue(getSeqStartingValue()).
           build();
-        }
-
-        if ( getApprovableAware() ) {
-          delegate = new foam.nanos.approval.ApprovableAwareDAO
-          .Builder(getX())
-          .setDaoKey(getName())
-          .setOf(getOf())
-          .setDelegate(delegate)
-          .setIsEnabled(getApprovableAwareEnabled())
-          .build();
         }
         
         if ( getGuid() )

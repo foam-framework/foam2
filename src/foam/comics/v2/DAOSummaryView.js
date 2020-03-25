@@ -183,7 +183,7 @@ foam.CLASS({
 
       // Get a fresh copy of the data, especially when we've been returned
       // to this view from the edit view on the stack.
-      this.config.dao.find(this.data).then(d => { 
+      this.config.dao.inX(this.__subContext__).find(this.data).then(d => { 
         if ( d ) self.data = d; 
 
         this
