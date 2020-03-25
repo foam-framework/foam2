@@ -449,14 +449,14 @@ public class MMJournal
     //    entry.setServiceName(this.journalKey);
     // p or r
     entry.setAction(action);
-    entry.setGlobalIndex1(globalIndex1);
+    entry.setIndex1(globalIndex1);
     entry.setHash1(hash1);
-    entry.setGlobalIndex2(globalIndex2);
+    entry.setIndex2(globalIndex2);
     entry.setHash2(hash2);
     entry.setIndex(myIndex);
-    entry.setOld(old);
+    //    entry.setData(old);
     entry.setNSpecName(prefix);
-    entry.setNu(nu);
+    entry.setData(nu);
     Object[] args = {null, entry};
     rpc.setArgs(args);
 
@@ -654,10 +654,10 @@ public class MMJournal
       for ( MedusaEntry obj : readyToUseEntry.get(nspecKey) ) {
         if ( "p".equals(obj.getAction()) ) {
           //TODO: investigating on TransactionDAO.
-          logger.debug("replay", "put", obj.getNu());
-          dao.put(obj.getNu());
+          logger.debug("replay", "put", obj.getData());
+          dao.put(obj.getData());
         } else if ( "r".equals(obj.getAction()) ) {
-          dao.remove(obj.getNu());
+          dao.remove(obj.getData());
         } else {
           throw new RuntimeException("Do not have action inMedusaEntry");
         }
@@ -697,9 +697,9 @@ public class MMJournal
         try {
           if ( "p".equals(entry.getAction()) ) {
             //TODO: investigating on TransactionDAO.
-            dao.put(entry.getNu());
+            dao.put(entry.getData());
           } else if ( "r".equals(entry.getAction()) ) {
-            dao.remove(entry.getNu());
+            dao.remove(entry.getData());
           } else {
             throw new RuntimeException("Do not have action inMedusaEntry");
           }
@@ -718,9 +718,9 @@ public class MMJournal
         try {
           //TODO: turn hash on.
           MessageDigest md = MessageDigest.getInstance("SHA-256");
-          md.update(indexHashMap.get(entry.getGlobalIndex1()).getBytes(StandardCharsets.UTF_8));
-          md.update(indexHashMap.get(entry.getGlobalIndex2()).getBytes(StandardCharsets.UTF_8));
-          String myHash = MNJournal.byte2Hex(entry.getNu().hash(md));
+          md.update(indexHashMap.get(entry.getIndex1()).getBytes(StandardCharsets.UTF_8));
+          md.update(indexHashMap.get(entry.getIndex2()).getBytes(StandardCharsets.UTF_8));
+          String myHash = MNJournal.byte2Hex(entry.getData().hash(md));
           if ( ! myHash.equals(entry.getHash()) ) {
             logger.info("Invalid Hash: [ \n" + "expect Hash value: " + myHash + "\n" + "receive Hash value: " + entry.getHash() + "\n]");
             throw new RuntimeException("Invalid hash");
@@ -746,7 +746,7 @@ public class MMJournal
       //  MessageDigest md = MessageDigest.getInstance("SHA-256");
       //  md.update(indexHashMap.get(entry.getGlobalIndex1()).getBytes(StandardCharsets.UTF_8));
       //  md.update(indexHashMap.get(entry.getGlobalIndex2()).getBytes(StandardCharsets.UTF_8));
-      //  String myHash = MNJournal.byte2Hex(entry.getNu().hash(md));
+      //  String myHash = MNJournal.byte2Hex(entry.getData().hash(md));
       //  logger.info(myHash);
       //  logger.info(entry.getHash());
       //  if ( ! myHash.equals(entry.getHash()) ) {

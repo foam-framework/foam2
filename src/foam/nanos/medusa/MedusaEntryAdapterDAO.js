@@ -13,12 +13,17 @@ foam.CLASS({
     'foam.nanos.boot.NSpecAware',
   ],
 
+  // TODO: deal with retries.
+
   documentation: `Create a medusa entry for argument model. NOTE:  delegate is parent MDAO, but only used as holder for MedusaEntryRoutingDAO to find.`,
 
   javaImports: [
     'foam.core.FObject',
     'foam.nanos.logger.PrefixLogger',
-    'foam.nanos.logger.Logger'
+    'foam.nanos.logger.Logger',
+    'java.util.concurrent.ThreadLocalRandom',
+    'java.util.Random',
+    'java.util.UUID'
   ],
 
   properties: [
@@ -86,31 +91,20 @@ foam.CLASS({
         throw new RuntimeException("Reject put() on non-primary or during election. (primary: " + service.getIsPrimary() + ", state: " + electoralService.getState().getLabel());
       }
 
-      DaggerService daggar = (DaggerService) x.get("daggerService");
-      DaggerLinks links = daggar.getNextLinks(x);
-
       MedusaEntry entry = x.create(MedusaEntry.class);
-      entry.setAction(op);
-      entry.setGlobalIndex1(links.getLink1().getIndex());
-      entry.setHash1(links.getLink1().getHash());
-      entry.setGlobalIndex1(links.getLink2().getIndex());
-      entry.setHash1(links.getLink2().getHash());
-      entry.setIndex(links.getGlobalIndex());
+
+      java.util.Random r = ThreadLocalRandom.current();
+      entry.setId(new UUID(r.nextLong(), r.nextLong()).toString());
+
+      DaggerService daggar = (DaggerService) x.get("daggerService");
+      entry = daggar.link(x, entry);
+
+      entry.setMediator(service.getConfigId());
       entry.setNSpecName(getNSpec().getName());
-
-      if ( "p".equals(op) ) {
-        entry.setNu(obj);
-      } else {
-        entry.setOld(obj);
-      }
+      entry.setAction(op);
+      entry.setData(obj);
       getLogger().debug("put", "entry", entry);
-      entry = (MedusaEntry) getMedusaEntryDAO().put_(x, entry);
-
-      if ( "p".equals(op) ) {
-        return entry.getNu();
-      } else {
-        return entry.getOld();
-      }
+      return getMedusaEntryDAO().put_(x, entry);
       `
     }
   ]

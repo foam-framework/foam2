@@ -38,13 +38,18 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
+      getLogger().debug("put", "in", entry);
       if ( entry.isFrozen() ) {
         entry = (MedusaEntry) entry.fclone();
       }
 
       java.util.Random r = ThreadLocalRandom.current();
       entry.setId(new UUID(r.nextLong(), r.nextLong()).toString());
-      getLogger().debug("put", entry);
+
+      ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
+      entry.setNode(service.getConfigId());
+
+      getLogger().debug("put", "out", entry);
       return (MedusaEntry) getDelegate().put_(x, entry);
       `
     }

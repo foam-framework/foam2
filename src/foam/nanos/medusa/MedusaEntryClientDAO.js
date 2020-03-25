@@ -77,7 +77,7 @@ foam.CLASS({
 
           if ( getMaxRetryAttempts() > -1 &&
                retryAttempt >= getMaxRetryAttempts() ) {
-            getLogger().warning("put, retryAttempt >= maxRetryAttempts", retryAttempt, getMaxRetryAttempts());
+            getLogger().warning("put", getClusterConfigId(), "retry", "retryAttempt >= maxRetryAttempts", retryAttempt, getMaxRetryAttempts());
 
             // report,
             // TODO: Alarm
@@ -91,11 +91,11 @@ foam.CLASS({
             if ( retryDelay > getMaxRetryDelay() ) {
               retryDelay = 10;
             }
-            getLogger().debug("put, retry attempt", retryAttempt, "delay", retryDelay);
+            getLogger().debug("put", getClusterConfigId(), "retry attempt", retryAttempt, "delay", retryDelay);
             Thread.sleep(retryDelay);
           } catch(InterruptedException e) {
             Thread.currentThread().interrupt();
-            getLogger().debug("InterruptedException");
+            getLogger().debug("put", getClusterConfigId(), "retry", "InterruptedException");
             throw new RuntimeException(e.getMessage(), e);
           }
         }
@@ -117,7 +117,7 @@ foam.CLASS({
 
           if ( getMaxRetryAttempts() > -1 &&
                retryAttempt >= getMaxRetryAttempts() ) {
-            getLogger().warning("cmd, retryAttempt >= maxRetryAttempts", retryAttempt, getMaxRetryAttempts());
+            getLogger().warning("cmd", getClusterConfigId(), "retryAttempt >= maxRetryAttempts", retryAttempt, getMaxRetryAttempts());
 
             // report,
             // TODO: Alarm
@@ -131,7 +131,7 @@ foam.CLASS({
             if ( retryDelay > getMaxRetryDelay() ) {
               retryDelay = 10;
             }
-            getLogger().debug("cmd, retry attempt", retryAttempt, "delay", retryDelay);
+            getLogger().debug("cmd", getClusterConfigId(), "retry attempt", retryAttempt, "delay", retryDelay);
             Thread.sleep(retryDelay);
           } catch(InterruptedException e) {
             Thread.currentThread().interrupt();

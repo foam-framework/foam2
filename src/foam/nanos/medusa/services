@@ -43,6 +43,14 @@ p({
 
 p({
   "class": "foam.nanos.boot.NSpec",
+  "name": "daggerService",
+  "lazy": false,
+  "serve": false,
+  "serviceClass": "foam.nanos.medusa.DefaultDaggerService"
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
   "name": "cluster",
   "lazy": false,
   "serve": true,

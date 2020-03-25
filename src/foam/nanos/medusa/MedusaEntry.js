@@ -16,8 +16,8 @@ foam.CLASS({
     "id",
     "nSpecName",
     "index",
-    "globalIndex1",
-    "globalIndex2",
+    "index1",
+    "index2",
     "hasConsensus"
   ],
 
@@ -49,32 +49,29 @@ foam.CLASS({
     },
     {
       class: 'Long',
-      name: 'globalIndex1',
+      name: 'index1',
       visibility: 'RO'
     },
     {
       class: 'String',
       name: 'hash1',
-      visibility: 'RO'
+      visibility: 'RO',
+      storageTransient: true
     },
     {
       class: 'Long',
-      name: 'globalIndex2',
+      name: 'index2',
       visibility: 'RO'
     },
     {
       class: 'String',
       name: 'hash2',
-      visibility: 'RO'
+      visibility: 'RO',
+      storageTransient: true
     },
     {
       class: 'FObjectProperty',
-      name: 'old',
-      visibility: 'RO'
-    },
-    {
-      class: 'FObjectProperty',
-      name: 'nu',
+      name: 'data',
       visibility: 'RO'
     },
     {
@@ -82,12 +79,8 @@ foam.CLASS({
       class: 'String',
       name: 'localHash',
       visibility: 'RO',
-      networkTransient: true
-    },
-    {
-      class: 'String',
-      name: 'signature',
-      visibility: 'RO'
+      networkTransient: true,
+      includeInDigest: false,
     },
     {
       class: 'String',
@@ -96,10 +89,28 @@ foam.CLASS({
       includeInDigest: false,
     },
     {
+      class: 'String',
+      name: 'signature',
+      visibility: 'RO'
+    },
+    {
       name: 'hasConsensus',
       class: 'Boolean',
       value: false,
-      visibility: 'RO'
+      visibility: 'RO',
+      includeInDigest: false,
+    },
+    {
+      name: 'mediator',
+      class: 'String',
+      visibility: 'RO',
+      includeInDigest: false,
+    },
+    {
+      name: 'node',
+      class: 'String',
+      visibility: 'RO',
+      includeInDigest: false,
     }
   ],
 

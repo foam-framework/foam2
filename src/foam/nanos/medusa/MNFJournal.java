@@ -156,7 +156,7 @@ public class MNFJournal extends FileJournal {
        MessageDigest md = MessageDigest.getInstance("SHA-256");
        md.update(hash1.getBytes(StandardCharsets.UTF_8));
        md.update(hash2.getBytes(StandardCharsets.UTF_8));
-       String myHash = byte2Hex(entry.getNu().hash(md));
+       String myHash = byte2Hex(entry.getData().hash(md));
        entry.setHash(myHash);
      } catch ( Exception e ) {
        logger.info(e);
@@ -178,7 +178,7 @@ public class MNFJournal extends FileJournal {
       MessageDigest md = MessageDigest.getInstance("SHA-256");
       md.update(hash1.getBytes(StandardCharsets.UTF_8));
       md.update(hash2.getBytes(StandardCharsets.UTF_8));
-      String myHash = byte2Hex(entry.getNu().hash(md));
+      String myHash = byte2Hex(entry.getData().hash(md));
       entry.setHash(myHash);
     } catch ( Exception e ) {
       logger.info(e);

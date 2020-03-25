@@ -51,9 +51,9 @@ foam.CLASS({
 
       DAO mdao = getMdao(x, entry);
       if ( "p".equals(entry.getAction()) ) {
-        mdao.put_(x, entry.getNu());
+        mdao.put_(x, entry.getData());
       } else {
-        mdao.remove_(x, entry.getNu());
+        mdao.remove_(x, entry.getData());
       }
 
       // Notify any blocked Primary puts
@@ -85,8 +85,8 @@ foam.CLASS({
       DAO dao = (DAO) x.get(name);
       while ( dao != null ) {
         if ( dao instanceof MDAO ) {
-          getMdaos().put(name, mdao);
-          return mdao;
+          getMdaos().put(name, dao);
+          return dao;
         }
         if ( dao instanceof ProxyDAO ) {
           dao = ((ProxyDAO) dao).getDelegate();

@@ -24,16 +24,31 @@ foam.CLASS({
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'java.util.ArrayList',
+    'java.util.concurrent.atomic.AtomicLong',
     'java.util.HashMap',
     'java.util.List',
-    'java.util.Map',
+    'java.util.Map'
+  ],
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(foam.java.Code.create({
+          data: `
+  // NOTE: HACK: starting at 2, as indexes 1 and 2 are used to prime the system.
+  private volatile AtomicLong localIndex_ = new AtomicLong(2);
+          `
+        }));
+      }
+    }
   ],
 
   properties: [
     {
       name: 'index',
       class: 'Long',
-      visibilty: 'RO'
+      visibilty: 'RO',
+      javaGetter: `return localIndex_.longValue();`
     },
     {
       name: 'logger',
@@ -41,10 +56,9 @@ foam.CLASS({
       of: 'foam.nanos.logger.Logger',
       visibility: 'HIDDEN',
       javaFactory: `
-        Logger logger = (Logger) getX().get("logger");
         return new PrefixLogger(new Object[] {
           this.getClass().getSimpleName()
-        }, logger);
+        }, (Logger) getX().get("logger"));
       `
     }
   ],
@@ -57,18 +71,20 @@ foam.CLASS({
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
       if ( entry.getIndex() < getIndex() ) {
-        getLogger().debug("Discarding", entry);
+        getLogger().debug("put", "discarding", entry);
         return entry;
       }
+      getLogger().debug("put", entry);
 
       entry = (MedusaEntry) getDelegate().put_(x, entry);
 
       MedusaEntry ce = getConsensusEntry(x, entry);
       if ( ce != null &&
            ce.getIndex() == getIndex() + 1 )  {
-        getLogger().debug("consensus/promoting", ce.getIndex(), ce);
-        setIndex(getIndex() + 1);
         DaggerService service = (DaggerService) x.get("daggerService");
+        service.verify(x, ce);
+        getLogger().debug("promoting", ce.getIndex(), ce);
+        setIndex(localIndex_.getAndIncrement());
         service.updateLinks(x, ce);
         return ce;
       }
@@ -121,6 +137,9 @@ foam.CLASS({
       MedusaEntry match = null;
       for ( MedusaEntry e : arr ) {
         Long count = counts.get(e.getHash());
+        if ( count == null ) {
+          count = Long.valueOf(0L);
+        }
         count += 1;
         counts.put(e.getHash(), count);
         if ( count >= max ) {
@@ -132,6 +151,7 @@ foam.CLASS({
       ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
       if ( max >= service.getNodesForConsensus(x) ) {
         // Remove all but one entry for index.
+        getLogger().debug("cleanup");
         for ( MedusaEntry e : arr ) {
           if ( e.getId() != match.getId() ) {
             getDelegate().remove_(x, e);

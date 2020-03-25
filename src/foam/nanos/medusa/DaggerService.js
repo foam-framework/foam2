@@ -32,6 +32,49 @@ foam.INTERFACE({
           type: 'foam.nanos.medusa.DaggerLink'
         }
       ]
+    },
+    {
+      name: 'link',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'entry',
+          type: 'foam.nanos.medusa.MedusaEntry'
+        }
+      ],
+      type: 'foam.nanos.medusa.MedusaEntry'
+    },
+    {
+      name: 'hash',
+      type: 'String',
+      javaThrows: ['java.security.DigestException',
+                    'java.security.NoSuchAlgorithmException'],
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'entry',
+          type: 'foam.nanos.medusa.MedusaEntry'
+        }
+      ]
+    },
+    {
+      name: 'verify',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'entry',
+          type: 'foam.nanos.medusa.MedusaEntry'
+        }
+      ]
     }
   ]
 });
