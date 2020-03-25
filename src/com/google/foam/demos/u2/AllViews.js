@@ -25,12 +25,23 @@ foam.CLASS({
     'foam.dao.EasyDAO',
     'foam.dao.MDAO',
     'foam.u2.MultiView',
-    'foam.u2.view.ReferenceView'
-  ],
+    'foam.u2.view.ReferenceView',
+    'foam.u2.layout.DisplayWidth'
+   ],
 
-  exports: [ 'sampleDataDAO' ],
+  exports: [ 'sampleDataDAO', 'displayWidth' ],
 
   properties: [
+    {
+      class: 'Enum',
+      of: 'foam.u2.layout.DisplayWidth',
+      name: 'displayWidth',
+      factory: function() {
+        return this.DisplayWidth.VALUES
+          .sort((a, b) => b.minWidth - a.minWidth)
+          .find(o => o.minWidth <= window.innerWidth);
+      }
+    },
     {
       name: 'sampleDataDAO',
       factory: function() {
@@ -51,6 +62,12 @@ foam.CLASS({
         class: 'foam.u2.DAOList',
         rowView: { class: 'com.google.foam.demos.heroes.CitationView' }
       }
+    },
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'dao',
+      createVisibility: '',
+      factory: function() { return this.sampleDataDAO; }
     },
     {
       class: 'Reference',
