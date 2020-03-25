@@ -52,31 +52,29 @@ foam.CLASS({
     'x',
     'y',
     {
-      class: 'Int',
-      name: 'myWeight',
-      expression: function(removed) { return removed ? 0 : 100; }
+      class: 'Boolean',
+      name: 'base'
     },
     {
+      class: 'Int',
       name: 'weight',
-      expression: function(myWeight, topWeight, leftWeight, rightWeight, removed) {
-        if ( removed ) return 0;
-        return myWeight + topWeight;
-//        return (myWeight + leftWeight + rightWeight)/3 + topWeight;
+      expression: function(removed) { return removed ? 0 : 10; }
+    },
+    {
+      class: 'Int',
+      name: 'force',
+      expression: function(weight, upForce, downForce) {
+        return weight - upForce + downForce;
       }
     },
     {
       class: 'Int',
-      name: 'topWeight',
+      name: 'upForce',
       value: 0
     },
     {
       class: 'Int',
-      name: 'leftWeight',
-      value: 0
-    },
-    {
-      class: 'Int',
-      name: 'rightWeight',
+      name: 'downForce',
       value: 0
     },
     {
@@ -93,7 +91,7 @@ foam.CLASS({
         enableClass(this.myClass('removed'), this.removed$).
         on('click',       this.click).
 //        on('contextmenu', this.mark).
-        start('span').add(this.weight$).end();
+        start('span').add(this.upForce$, '-', this.force$, '-', this.downForce$).end();
 
     }
   ],

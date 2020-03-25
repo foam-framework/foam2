@@ -603,9 +603,14 @@ foam.LIB({
             name: 'compareTo',
             type: 'int',
             args:[{ name: 'o', type: 'Object' }],
-            body: [cls.name+' o2 = ('+ cls.name + ') o;\n'
-              +'if ( o2 == null ) return 1;'
-              +'if ( o2 == this ) return 0;'
+            body: [''
+              +'if ( o == null ) return 1;'
+              +'if ( o == this ) return 0;'
+              +'if ( ! ( o instanceof foam.core.FObject ) ) return 1;'
+              +'if ( getClass() != o.getClass() ) {'
+                +'return getClassInfo().getId().compareTo(((foam.core.FObject)o).getClassInfo().getId());'
+              +'}'
+              +cls.name+' o2 = ('+ cls.name + ') o;\n'
               +'int cmp;\n'].concat(props.map(function(f) {
                 return 'cmp = foam.util.SafetyUtil.compare(get'+foam.String.capitalize(f.name)+'(), o2.get'+foam.String.capitalize(f.name)+'());\n'
                   +'if ( cmp != 0 ) return cmp;';
@@ -1774,13 +1779,6 @@ foam.CLASS({
                 + this.of + '[value == null ? 0 : value.length];\n'
                 + 'if ( value != null ) System.arraycopy(value, 0, ret, 0, value.length);\n'
                 + 'return ret;';
-      // TODO: Change to ClassInfo return type once primitive support is added
-      info.method({
-        name: 'of',
-        visibility: 'public',
-        type: 'String',
-        body: 'return "' + (this.of ? this.of.id ? this.of.id : this.of : null) + '";'
-      });
 
       var isDefaultValue = info.getMethod('isDefaultValue');
       isDefaultValue.body = 'return java.util.Arrays.equals(get_(o), null);';

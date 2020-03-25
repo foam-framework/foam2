@@ -45,7 +45,6 @@ foam.CLASS({
     {
       class: 'Password',
       name: 'password',
-      required: true,
       view: { class: 'foam.u2.view.PasswordView', passwordIcon: true }
     },
     {

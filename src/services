@@ -1,5 +1,6 @@
 p({"class":"foam.nanos.boot.NSpec", "name":"nSpecDAO",                           "serve":true,  "authenticate": false, "serviceClass":"foam.dao.ProxyDAO", "client":"{\"of\":\"foam.nanos.boot.NSpec\",\"cache\":true}"})
 
+p({"class":"foam.nanos.boot.NSpec", "name":"googleSheetsDataExport",                       "serve":true,  "boxClass":"foam.nanos.export.GoogleSheetsExportSkeleton", "serviceClass":"foam.nanos.export.GoogleSheetsExportService","client":"{\"class\":\"foam.nanos.export.ClientGoogleSheetsExportService\",\"delegate\":{\"class\":\"foam.box.HTTPBox\", \"url\":\"service/googleSheetsDataExport\"}}"})
 
 p({
   "class":"foam.nanos.boot.NSpec",
@@ -486,10 +487,20 @@ p({
 p({"class":"foam.nanos.boot.NSpec", "name":"digDAO",                            "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setPm(true).setGuid(true).setOf(foam.nanos.dig.DIG.getOwnClassInfo()).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"digs\").build();","client":"{\"of\":\"foam.nanos.dig.DIG\",\"decorators\": [{\"class\":\"foam.nanos.fs.FileDAODecorator\"},{\"class\":\"foam.nanos.fs.FileArrayDAODecorator\"}]}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"demoObjectDAO",                      "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"demoObjects\").setGuid(true).setOf(foam.nanos.demo.DemoObject.getOwnClassInfo()).build();", "client":"{\"of\":\"foam.nanos.demo.DemoObject\", \"remoteListenerSupport\": false}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"fileDAO",                            "serve":true,  "serviceScript":"return new foam.dao.PMDAO(x, new foam.dao.KeyValueDAO.Builder(x).setDelegate(new foam.dao.GUIDDAO(new foam.dao.java.JDAO(x, foam.nanos.fs.File.getOwnClassInfo(), \"files\"))).build());","client":"{\"of\":\"foam.nanos.fs.File\",\"cache\":false,\"decorators\": [{\"class\":\"foam.blob.BlobServiceDecorator\"}]}"})
+
 p({
   "class":"foam.nanos.boot.NSpec",
   "name":"localServiceProviderDAO",
-  "serviceScript":"return new foam.dao.PMDAO(x, new foam.dao.java.JDAO(x, foam.nanos.auth.ServiceProvider.getOwnClassInfo(), \"spids\"));"
+  "serviceScript":
+  """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setAuthorize(false)
+      .setOf(foam.nanos.auth.ServiceProvider.getOwnClassInfo())
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("spids")
+      .build()
+  """
 })
 
 p({
@@ -977,4 +988,34 @@ p({
       }
     }
   """
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"googleDriveService",
+  "lazy":false,
+  "service": {
+    "class":"foam.nanos.export.GoogleDriveService"
+  },
+  "documentation": "googleDriveService is used for making calls to Google Drive API"
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"googleApiAuthService",
+  "lazy":false,
+  "service": {
+    "class":"foam.nanos.export.GoogleApiAuthService"
+  },
+  "documentation": "googleApiAuthService configures authoriziation (sets scope of permissions which are needed to be granted by user, sets port which will be listening to response and sets folder in which tokens will be stored) and authorize Google API calls"
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"googleApiCredentialsConfig",
+  "lazy":false,
+  "service": {
+    "class":"foam.nanos.export.GoogleApiCredentials"
+  },
+  "documentation": "Service for setting authorization request parameters which are required in order to retrieve access token. To download credentials visit Google Developers Console"
 })
