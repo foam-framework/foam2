@@ -60,6 +60,17 @@ foam.CLASS({
       margin: 0;
     }
 
+    ^handle-remove {
+      margin: 0;
+      padding: 0 8px;
+      color: red;
+    }
+
+    ^handle-remove:hover {
+      cursor: pointer;
+      color: darkred;
+    }
+
     ^ .foam-u2-filter-advanced-CriteriaView {
       max-height: 0;
       overflow: hidden;
@@ -95,7 +106,8 @@ foam.CLASS({
 
   messages: [
     { name: 'TITLE_HEADER', message: 'Advanced Filters' },
-    { name: 'LABEL_CRITERIA', message: 'Criteria'}
+    { name: 'LABEL_CRITERIA', message: 'Criteria'},
+    { name: 'LABEL_REMOVE', message: 'Remove'}
   ],
 
   properties: [
@@ -104,6 +116,7 @@ foam.CLASS({
       documentation: 'To be passed in from the FilterView'
     },
     {
+      class: 'Map',
       name: 'criterias',
       documentation: 'Each criteria to be treated with an OR',
       factory: function() {
@@ -136,12 +149,15 @@ foam.CLASS({
           return this.E().addClass(self.myClass('container-advanced'))
             .forEach(keys, function(key, index) {
               var criteria = criterias[key];
-              // TODO: Draw each criteria as a box of property filters
               this.start().addClass(self.myClass('container-handle'))
-                .on('click', () => { self.toggleDrawer(index) })
-                .start('p').addClass(self.myClass('handle-title')).add(`${self.LABEL_CRITERIA} ${index + 1}`).end()
+                .on('click', () => { self.toggleDrawer(key); })
+                .start('p').addClass(self.myClass('handle-title')).add(`${self.LABEL_CRITERIA} ${Number.parseInt(key) + 1}`).end()
+                .start('p').addClass(self.myClass('handle-remove'))
+                  .on('click', () => { self.removeCriteria(key); })
+                  .add(`${self.LABEL_REMOVE}`)
+                .end()
                 .add(self.slot(function(isOpenIndex) {
-                  var iconPath = self.getIconPath(index);
+                  var iconPath = self.getIconPath(key);
                   return this.E().start({ class: 'foam.u2.tag.Image', data: iconPath}).end()
                 }))
               .end()
@@ -150,7 +166,7 @@ foam.CLASS({
                 filterController$: self.filterController$
               })).enableClass(
                 self.myClass('isOpen'),
-                self.slot(function(isOpenIndex){ return index === isOpenIndex; })
+                self.slot(function(isOpenIndex){ return key == isOpenIndex; })
               ).end();
             })
             // TODO: Style button
@@ -167,8 +183,8 @@ foam.CLASS({
 
     },
 
-    function getIconPath(index) {
-      return index === this.isOpenIndex ? 'images/expand-less.svg' : 'images/expand-more.svg';
+    function getIconPath(key) {
+      return key == this.isOpenIndex ? 'images/expand-less.svg' : 'images/expand-more.svg';
     }
   ],
 
@@ -177,10 +193,9 @@ foam.CLASS({
       name: 'addCriteria',
       label: 'Add another criteria',
       code: function(X) {
-        var newIndex = Object.keys(this.criterias).length
-        this.criterias[newIndex] = {};
-        // TODO: Eric working on Map property changes
-        this.criterias = Object.assign({}, this.criterias);
+        var keys = Object.keys(this.criterias);
+        var newIndex = Number.parseInt(keys[keys.length - 1]) + 1;
+        this.criterias$set(newIndex, {});
         this.isOpenIndex = newIndex;
       }
     },
@@ -220,13 +235,24 @@ foam.CLASS({
   listeners: [
     {
       name: 'toggleDrawer',
-      code: function(index) {
-        console.log(`toggleDrawer called with index: ${index}`);
-        if ( index === this.isOpenIndex ) {
+      code: function(key) {
+        if ( key == this.isOpenIndex ) {
           this.isOpenIndex = -1;
           return;
         }
-        this.isOpenIndex = index;
+        this.isOpenIndex = key;
+      }
+    },
+    {
+      name: 'removeCriteria',
+      code: function(key) {
+        if ( key == this.isOpenIndex ) this.isOpenIndex = -1;
+        if ( Object.keys(this.criterias).length === 1 ) {
+          this.clearAll();
+          return;
+        }
+        debugger;
+        this.criterias$remove(key);
       }
     }
   ]
