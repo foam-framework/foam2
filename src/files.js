@@ -709,7 +709,6 @@ FOAM_FILES([
   { name: "foam/u2/layout/GridColumns" },
 
   { name: "foam/comics/v2/CannedQuery" },
-  { name: "foam/comics/v2/CannedQuery" },
   { name: "foam/comics/v2/EnabledActionsAuth" },
   { name: "foam/comics/v2/BasicEnabledActionsAuth" },
   { name: "foam/comics/v2/CRUDEnabledActionsAuth" },
