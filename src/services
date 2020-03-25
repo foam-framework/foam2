@@ -1,5 +1,6 @@
 p({"class":"foam.nanos.boot.NSpec", "name":"nSpecDAO",                           "serve":true,  "authenticate": false, "serviceClass":"foam.dao.ProxyDAO", "client":"{\"of\":\"foam.nanos.boot.NSpec\",\"cache\":true}"})
 
+p({"class":"foam.nanos.boot.NSpec", "name":"googleSheetsDataExport",                       "serve":true,  "boxClass":"foam.nanos.export.GoogleSheetsExportSkeleton", "serviceClass":"foam.nanos.export.GoogleSheetsExportService","client":"{\"class\":\"foam.nanos.export.ClientGoogleSheetsExportService\",\"delegate\":{\"class\":\"foam.box.HTTPBox\", \"url\":\"service/googleSheetsDataExport\"}}"})
 
 p({
   "class":"foam.nanos.boot.NSpec",
@@ -987,4 +988,34 @@ p({
       }
     }
   """
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"googleDriveService",
+  "lazy":false,
+  "service": {
+    "class":"foam.nanos.export.GoogleDriveService"
+  },
+  "documentation": "googleDriveService is used for making calls to Google Drive API"
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"googleApiAuthService",
+  "lazy":false,
+  "service": {
+    "class":"foam.nanos.export.GoogleApiAuthService"
+  },
+  "documentation": "googleApiAuthService configures authoriziation (sets scope of permissions which are needed to be granted by user, sets port which will be listening to response and sets folder in which tokens will be stored) and authorize Google API calls"
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"googleApiCredentialsConfig",
+  "lazy":false,
+  "service": {
+    "class":"foam.nanos.export.GoogleApiCredentials"
+  },
+  "documentation": "Service for setting authorization request parameters which are required in order to retrieve access token. To download credentials visit Google Developers Console"
 })

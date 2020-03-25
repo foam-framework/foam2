@@ -207,7 +207,8 @@ foam.CLASS({
           ApprovalRequest fulfilledRequest = (ApprovalRequest) approvedObjRemoveRequests.get(0);
           fulfilledRequest.setIsFulfilled(true);
 
-          approvalRequestDAO.put_(x, fulfilledRequest);
+          X approvalX = getX().put("user", new User.Builder(x).setId(fulfilledRequest.getLastModifiedBy()).build());
+          approvalRequestDAO.put_(approvalX, fulfilledRequest);
 
           if ( fulfilledRequest.getStatus() == ApprovalStatus.APPROVED ) {
             return super.put_(x,obj);
@@ -257,7 +258,8 @@ foam.CLASS({
             ApprovalRequest fulfilledRequest = (ApprovalRequest) approvedObjCreateRequests.get(0);
             fulfilledRequest.setIsFulfilled(true);
 
-            approvalRequestDAO.put_(x, fulfilledRequest);
+            X approvalX = getX().put("user", new User.Builder(x).setId(fulfilledRequest.getLastModifiedBy()).build());
+            approvalRequestDAO.put_(approvalX, fulfilledRequest);
 
             if ( fulfilledRequest.getStatus() == ApprovalStatus.APPROVED ) {
               lifecycleObj.setLifecycleState(LifecycleState.ACTIVE);
@@ -356,7 +358,8 @@ foam.CLASS({
           ApprovalRequest fulfilledRequest = (ApprovalRequest) approvedObjUpdateRequests.get(0);
           fulfilledRequest.setIsFulfilled(true);
 
-          approvalRequestDAO.put_(x, fulfilledRequest);
+          X approvalX = getX().put("user", new User.Builder(x).setId(fulfilledRequest.getLastModifiedBy()).build());
+          approvalRequestDAO.put_(approvalX, fulfilledRequest);
 
           if ( fulfilledRequest.getStatus() == ApprovalStatus.APPROVED ) {
             return super.put_(x,obj);

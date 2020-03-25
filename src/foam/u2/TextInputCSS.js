@@ -50,7 +50,7 @@ foam.CLASS({
         }
 
         ^:disabled {
-          color: /*%GREY2%*/ #9ba1a6;
+          color: /*%GREY1%*/ #5e6061;
           background-color: /*%GREY5%*/ #f5f7fa;
           border-color: /*%GREY3%*/ #cbcfd4;
         }
