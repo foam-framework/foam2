@@ -27,12 +27,6 @@ foam.CLASS({
       class: 'String'
     },
     {
-      // deprecated - temporary.
-      name: 'mdao',
-      class: 'foam.dao.DAOProperty',
-      visibility: 'HIDDEN'
-    },
-    {
       name: 'maxRetryAttempts',
       class: 'Int',
       documentation: 'Set to -1 to infinitely retry.',

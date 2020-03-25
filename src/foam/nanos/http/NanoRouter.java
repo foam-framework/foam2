@@ -196,8 +196,6 @@ public class NanoRouter
         obj = ((ProxyDAO) obj).getDelegate();
       } else if ( obj instanceof ProxyWebAgent ) {
         obj = ((ProxyWebAgent) obj).getDelegate();
-      // } else if ( obj instanceof Skeleton ) {
-      //   obj = ((Skeleton) obj).getDelegateObject();
       } else {
         obj = null;
       }

@@ -12,6 +12,7 @@ import foam.nanos.app.AppConfig;
 import foam.nanos.auth.AuthenticationException;
 import foam.nanos.auth.AuthorizationException;
 import foam.nanos.auth.Group;
+import foam.nanos.auth.User;
 import foam.nanos.boot.Boot;
 import foam.nanos.boot.NSpec;
 import foam.nanos.logger.Logger;
@@ -90,7 +91,19 @@ public class SessionServerBox
           session.setRemoteHost(req.getRemoteHost());
         }
 
-        if ( sessionID != null ) {
+        //        session = (Session) sessionDAO.put(session);
+        if ( System.getProperty("CLUSTER") != null ) {
+          // how to avoid based on user?
+          DAO userDAO = (DAO) getX().get("localUserDAO");
+          User user = (User) userDAO.find(session.getUserId());
+          if ( user != null &&
+               "system".equals(user.getGroup()) ) {
+            logger.warning("SessionServerBox", "Session not updated for user", session.getUserId());
+            session.setX(getX());
+          } else {
+            session = (Session) sessionDAO.put(session);
+          }
+        } else {
           session = (Session) sessionDAO.put(session);
         }
       } else if ( req != null ) {

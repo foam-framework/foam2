@@ -25,10 +25,6 @@ foam.CLASS({
     //    'httpResponse'
   ],
 
-  javaImports: [
-    'foam.nanos.logger.Logger'
-  ],
-
   methods: [
     {
       name: 'send',
@@ -37,7 +33,6 @@ foam.CLASS({
       },
       swiftCode: 'throw FoamError("unimplemented")',
       javaCode: `
-
 try {
   javax.servlet.http.HttpServletResponse response = (javax.servlet.http.HttpServletResponse)getX().get("httpResponse");
   response.setContentType("application/json");

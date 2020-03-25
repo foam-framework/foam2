@@ -329,23 +329,6 @@ try {
       `
     },
     {
-      name: 'writeRaw',
-      args: [
-        { name: 'x', type: 'Context' },
-        { name: 'obj', type: 'foam.core.FObject' },
-      ],
-      synchronized: true,
-      javaCode: `
-        try {
-            String record = getOutputter().stringify(obj);
-            write_(record);
-        } catch ( Throwable t ) {
-          getLogger().error("Failed to write remove entry to journal", t);
-          throw new RuntimeException(t);
-        }
-      `
-    },
-    {
       name: 'write_',
      // synchronized: true,
       javaThrows: [
