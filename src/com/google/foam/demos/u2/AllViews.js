@@ -274,6 +274,14 @@ foam.CLASS({
       of: 'com.google.foam.demos.u2.SampleData'
     },
     {
+      class: 'FObjectArray',
+      name: 'fobjectArray2',
+      of: 'com.google.foam.demos.u2.SampleData',
+      factory: function() {
+        return this.sampleDataDAO.testData;
+      }
+    },
+    {
       class: 'EMail',
       name: 'defaultEMail',
       value: 'someone@somewhere.com'
