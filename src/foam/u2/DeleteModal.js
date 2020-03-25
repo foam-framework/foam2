@@ -5,8 +5,19 @@ foam.CLASS({
 
   documentation: 'View for deleting any object',
 
+  implements: [
+    'foam.mlang.Expressions'
+  ],
+
+  requires: [
+    'net.nanopay.model.Invitation',
+    'net.nanopay.model.InvitationStatus'
+  ],
+
   imports: [
-    'notify'
+    'businessInvitationDAO',
+    'notify',
+    'tokenDAO'
   ],
 
   css: `
@@ -52,7 +63,12 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       name: 'data'
-    }
+    },
+    {
+      class: 'Long',
+      name: 'sourceId',
+      documentation: 'Id for deleting clientUserJunction and filtering businessInvitation by createdID'
+    },
   ],
 
   methods: [
@@ -84,6 +100,7 @@ foam.CLASS({
       name: 'delete',
       label: 'Delete',
       code: function(X) {
+        var self = this;
         this.dao.remove(this.data).then((o) => {
           if ( foam.comics.v2.userfeedback.UserFeedbackAware.isInstance(o) && o.userFeedback ){
             var currentFeedback = o.userFeedback;
@@ -93,11 +110,32 @@ foam.CLASS({
 
               currentFeedback = currentFeedback.next;
             }
+          } else if ( net.nanopay.model.ClientUserJunction.isInstance(o) ) {
+            self.businessInvitationDAO
+              .where(
+                self.AND(
+                  self.EQ(self.Invitation.EMAIL, o.email.toString()),
+                  self.EQ(self.Invitation.STATUS, self.InvitationStatus.SENT),
+                  self.EQ(self.Invitation.CREATED_BY, self.sourceId)
+                )
+              ).select({
+                put: (invite) => {
+                  invite.status = self.InvitationStatus.CANCELLED;
+                  self.businessInvitationDAO.put(invite).then(function() {
+                    self.notify(self.data.model_.label + self.SUCCESS_MSG);
+                    self.onDelete();
+                  }).catch((err) => {
+                    var message = err ? err.message : self.FAIL_MSG;
+                    self.notify(message, 'error');
+                  })
+               }
+            });
           } else {
             this.notify(this.data.model_.label + this.SUCCESS_MSG);
           }
 
-          this.onDelete();
+          if ( ! net.nanopay.model.ClientUserJunction.isInstance(o) )
+            this.onDelete();
         }).catch((err) => {
 
           // TODO: Uncomment once we turn UserFeedbackException in to a throwable
@@ -119,7 +157,7 @@ foam.CLASS({
             this.notify(err.message || this.FAIL_MSG, 'error');
           }
 
-          
+
         });
         X.closeDialog();
       }
