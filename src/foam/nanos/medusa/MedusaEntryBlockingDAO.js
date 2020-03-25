@@ -55,7 +55,7 @@ foam.CLASS({
       javaCode: `
       if ( obj instanceof MedusaEntry ) {
         MedusaEntry entry = (MedusaEntry) obj;
-        getLogger().debug("notifyOn", entry.getId());
+        getLogger().debug("notifyOn", entry.getIndex());
         notifyOn(x, entry.getIndex());
         return entry;
       } else {
@@ -89,7 +89,7 @@ foam.CLASS({
 
       try {
         latch.await();
-        getLogger().debug("wake", index);
+        getLogger().debug("wakeOn", index);
       } catch (InterruptedException e) {
         ((Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "latch", index, "await", e.getMessage());
       } finally {

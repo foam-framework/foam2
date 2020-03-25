@@ -56,7 +56,8 @@ foam.CLASS({
       class: 'String',
       name: 'hash1',
       visibility: 'RO',
-      storageTransient: true
+      storageTransient: true,
+      includeInDigest: false
     },
     {
       class: 'Long',
@@ -67,7 +68,8 @@ foam.CLASS({
       class: 'String',
       name: 'hash2',
       visibility: 'RO',
-      storageTransient: true
+      storageTransient: true,
+      includeInDigest: false
     },
     {
       class: 'FObjectProperty',
@@ -75,7 +77,7 @@ foam.CLASS({
       visibility: 'RO'
     },
     {
-      // TODO: what is this?
+      // TODO: what is this? - handled by HashingJDAO
       class: 'String',
       name: 'localHash',
       visibility: 'RO',

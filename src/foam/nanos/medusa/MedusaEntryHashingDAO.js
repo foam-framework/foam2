@@ -39,14 +39,14 @@ foam.CLASS({
       DaggerService service = (DaggerService) x.get("daggerService");
       try {
         entry.setHash(service.hash(x, entry));
+        getLogger().debug("put", entry);
+        return getDelegate().put_(x, entry);
       } catch ( Exception e ) {
         getLogger().error(e);
         // TODO: Alarm
-        // Who will catch this.
+        // REVIEW: Who will catch this.
         throw new RuntimeException(e);
       }
-      getLogger().debug("put", entry);
-      return getDelegate().put_(x, entry);
       `
     }
   ]

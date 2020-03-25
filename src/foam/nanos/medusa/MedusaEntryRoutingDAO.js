@@ -46,9 +46,12 @@ foam.CLASS({
       javaCode: `
       MedusaEntry entry = (MedusaEntry) getDelegate().put_(x, obj);
       if ( ! entry.getHasConsensus() ) {
+        getLogger().debug("put", "consensus", false);
         return entry;
       }
+      getLogger().debug("put", "consensus", true);
 
+      try {
       DAO mdao = getMdao(x, entry);
       if ( "p".equals(entry.getAction()) ) {
         mdao.put_(x, entry.getData());
@@ -57,9 +60,12 @@ foam.CLASS({
       }
 
       // Notify any blocked Primary puts
-      String name = entry.getNSpecName();
-      ((DAO) x.get(name)).cmd_(x, entry);
+      ((DAO) x.get("localMedusaEntryDAO")).cmd_(x, entry);
 
+      } catch (Throwable t) {
+        // TODO: Alarm
+        getLogger().error(t);
+      }
       return entry;
       `
     },

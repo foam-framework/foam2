@@ -55,13 +55,15 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-      return submit(x, (FObject) obj, "p");
+      FObject o = submit(x, (FObject) obj, "p");
+      return getDelegate().put_(x, o);
       `
     },
     {
       name: 'remove_',
       javaCode: `
-      return submit(x, (FObject) obj, "r");
+      FObject o = submit(x, (FObject) obj, "r");
+      return getDelegate().remove_(x, o);
       `
     },
     {
@@ -104,7 +106,8 @@ foam.CLASS({
       entry.setAction(op);
       entry.setData(obj);
       getLogger().debug("put", "entry", entry);
-      return getMedusaEntryDAO().put_(x, entry);
+
+      return ((MedusaEntry)getMedusaEntryDAO().put_(x, entry)).getData();
       `
     }
   ]

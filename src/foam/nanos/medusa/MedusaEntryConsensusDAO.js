@@ -79,6 +79,7 @@ foam.CLASS({
       entry = (MedusaEntry) getDelegate().put_(x, entry);
 
       MedusaEntry ce = getConsensusEntry(x, entry);
+      getLogger().debug("put", "index", getIndex(), "ce", entry);
       if ( ce != null &&
            ce.getIndex() == getIndex() + 1 )  {
         DaggerService service = (DaggerService) x.get("daggerService");
@@ -153,12 +154,12 @@ foam.CLASS({
         // Remove all but one entry for index.
         getLogger().debug("cleanup");
         for ( MedusaEntry e : arr ) {
-          if ( e.getId() != match.getId() ) {
-            getDelegate().remove_(x, e);
-          } else {
+          if ( e.getId().equals(match.getId()) ) {
             match = (MedusaEntry) match.fclone();
             match.setHasConsensus(true);
             match = (MedusaEntry) getDelegate().put_(x, match);
+          } else {
+            getDelegate().remove_(x, e);
           }
         }
         return match;

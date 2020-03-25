@@ -96,6 +96,8 @@ foam.CLASS({
       int retryAttempt = 0;
       int retryDelay = 10;
 
+      // TODO: any hash verification?
+
       DAO dao = getClientDAO(getX());
       while ( true ) {
         try {

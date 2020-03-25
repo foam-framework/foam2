@@ -68,9 +68,9 @@ foam.CLASS({
       of: 'foam.nanos.logger.Logger',
       visibility: 'HIDDEN',
       javaFactory: `
-        return new PrefixLogger(new Object[] {
-          this.getClass().getSimpleName()
-        }, (Logger) getX().get("logger"));
+      return new PrefixLogger(new Object[] {
+        this.getClass().getSimpleName()
+      }, (Logger) getX().get("logger"));
       `
     }
   ],
@@ -122,19 +122,17 @@ foam.CLASS({
     {
       name: 'hash',
       javaCode: `
-//        try {
-        // TODO: also getProvider
-        MessageDigest md = MessageDigest.getInstance(getHashingAlgorithm());
-        md.update(Long.toString(entry.getIndex1()).getBytes(StandardCharsets.UTF_8));
-        md.update(entry.getHash1().getBytes(StandardCharsets.UTF_8));
-        md.update(Long.toString(entry.getIndex2()).getBytes(StandardCharsets.UTF_8));
-        md.update(entry.getHash2().getBytes(StandardCharsets.UTF_8));
-        if ( entry.getData() != null ) {
-          return byte2Hex(entry.getData().hash(md));
-        } else {
-          return byte2Hex(md.digest());
-        }
-  //      } catch ( Exception e ) {
+      // TODO: also getProvider
+      MessageDigest md = MessageDigest.getInstance(getHashingAlgorithm());
+      md.update(Long.toString(entry.getIndex1()).getBytes(StandardCharsets.UTF_8));
+      md.update(entry.getHash1().getBytes(StandardCharsets.UTF_8));
+      md.update(Long.toString(entry.getIndex2()).getBytes(StandardCharsets.UTF_8));
+      md.update(entry.getHash2().getBytes(StandardCharsets.UTF_8));
+      if ( entry.getData() != null ) {
+        return byte2Hex(entry.getData().hash(md));
+      } else {
+        return byte2Hex(md.digest());
+      }
       `
     },
     {
@@ -176,9 +174,13 @@ foam.CLASS({
         }
       ],
       javaCode: `
+      try {
       linksIndex_ ^= 1;
       getLogger().debug("updateLinks", linksIndex_, link);
       getLinks()[linksIndex_] = link;
+      } catch (Throwable t) {
+        getLogger().error(t);
+      }
       `
     }
   ]
