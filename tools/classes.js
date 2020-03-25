@@ -336,14 +336,6 @@ var classes = [
   'foam.nanos.medusa.ReplaySink',
   'foam.nanos.medusa.Status',
   'foam.nanos.medusa.MedusaMessage',
-  'foam.nanos.medusa.TcpMessage',
-  'foam.nanos.medusa.FileMeta',
-  'foam.nanos.medusa.MedusaEntry',
-  'foam.nanos.medusa.FilePacket',
-  'foam.nanos.medusa.MNService',
-  'foam.nanos.medusa.BlockInfo',
-  'foam.nanos.medusa.EntryRecord',
-  'foam.nanos.medusa.MNServiceMate',
   'foam.box.BackoffBox',
 
   'foam.comics.v2.EnabledActionsAuth',
@@ -639,7 +631,6 @@ var skeletons = [
   'foam.nanos.test.EchoService',
   'foam.strategy.StrategizerService',
   'foam.nanos.auth.UserQueryService',
-  'foam.nanos.medusa.MNService',
   'foam.nanos.medusa.ElectoralService',
   'foam.nanos.export.GoogleSheetsExport'
 ];
