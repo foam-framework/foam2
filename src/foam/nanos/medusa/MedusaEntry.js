@@ -9,6 +9,8 @@ foam.CLASS({
   name: 'MedusaEntry',
 
   implements: [
+    'foam.nanos.auth.LastModifiedAware',
+    'foam.nanos.auth.LastModifiedByAware',
     'foam.nanos.medusa.DaggerLink'
   ],
 
@@ -77,20 +79,6 @@ foam.CLASS({
       visibility: 'RO'
     },
     {
-      // TODO: what is this? - handled by HashingJDAO
-      class: 'String',
-      name: 'localHash',
-      visibility: 'RO',
-      networkTransient: true,
-      includeInDigest: false,
-    },
-    {
-      class: 'String',
-      name: 'internalHash',
-      visibility: 'RO',
-      includeInDigest: false,
-    },
-    {
       class: 'String',
       name: 'signature',
       visibility: 'RO'
@@ -103,32 +91,31 @@ foam.CLASS({
       includeInDigest: false,
     },
     {
+      documentation: 'Solely for information. Originating Mediator.',
       name: 'mediator',
       class: 'String',
       visibility: 'RO',
       includeInDigest: false,
     },
     {
+      documentation: 'Solely for information. Broadcasting Node',
       name: 'node',
       class: 'String',
       visibility: 'RO',
       includeInDigest: false,
-    }
-  ],
-
-  methods: [
+    },
     {
-      name: 'compareTo',
-      type: 'int',
-      args: [ { name: 'o', type: 'Any' } ],
-      javaCode: `
-        if ( o == this ) return 0;
-        if ( o == null ) return 1;
-        if ( ! ( o instanceof MedusaEntry ) ) return 1;
-
-        MedusaEntry entry = (MedusaEntry) o;
-        return Long.compare(this.getIndex(), entry.getIndex());
-      `
+      documentation: 'Not necessary but added so date is in object and not added as meta data. Also, a non-null value is required.',
+      name: 'lastModifiedBy',
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      visibility: 'RO',
+      javaFactory: 'return 2L;'
+    },
+    {
+      name: 'lastModified',
+      class: 'Date',
+      visibility: 'RO'
     }
   ]
 });

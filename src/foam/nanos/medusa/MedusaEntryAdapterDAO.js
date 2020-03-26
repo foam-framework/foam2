@@ -55,15 +55,13 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-      FObject o = submit(x, (FObject) obj, "p");
-      return getDelegate().put_(x, o);
+      return submit(x, (FObject) obj, "p");
       `
     },
     {
       name: 'remove_',
       javaCode: `
-      FObject o = submit(x, (FObject) obj, "r");
-      return getDelegate().remove_(x, o);
+      return submit(x, (FObject) obj, "r");
       `
     },
     {
@@ -86,7 +84,7 @@ foam.CLASS({
       javaCode: `
       ElectoralService electoralService = (ElectoralService) x.get("electoralService");
       ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
-      getLogger().debug("state", electoralService.getState().getLabel());
+      getLogger().debug("submit", "state", electoralService.getState().getLabel());
       if ( electoralService.getState() != ElectoralServiceState.IN_SESSION ||
            ! service.getIsPrimary()) {
         getLogger().warning("Reject put(). primary:", service.getIsPrimary(), ", state:", electoralService.getState().getLabel());
@@ -107,7 +105,8 @@ foam.CLASS({
       entry.setData(obj);
       getLogger().debug("put", "entry", entry);
 
-      return ((MedusaEntry)getMedusaEntryDAO().put_(x, entry)).getData();
+      FObject result = ((MedusaEntry)getMedusaEntryDAO().put_(x, entry)).getData();
+      return getDelegate().find(result.getProperty("id"));
       `
     }
   ]

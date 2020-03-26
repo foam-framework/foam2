@@ -25,10 +25,9 @@ foam.CLASS({
       of: 'foam.nanos.logger.Logger',
       visibility: 'HIDDEN',
       javaFactory: `
-        Logger logger = (Logger) getX().get("logger");
         return new PrefixLogger(new Object[] {
           this.getClass().getSimpleName()
-        }, logger);
+        }, (Logger) getX().get("logger"));
       `
     }
   ],
@@ -41,17 +40,19 @@ foam.CLASS({
         return getDelegate().cmd_(x, obj);
       }
       ReplayCmd cmd = (ReplayCmd) obj;
-      getLogger().debug(cmd);
-      DAO dao = getDelegate(); //(DAO) x.get("medusaEntryDAO");
-      dao.where(
+      getLogger().debug("cmd", cmd);
+
+      getDelegate().where(
         GTE(MedusaEntry.INDEX, cmd.getFromIndex())
       )
       .orderBy(MedusaEntry.INDEX)
-      .select(new ReplaySink(
-        x,
-        cmd.getRequester(),
-        cmd.getServiceName()
-      ));
+      .select(
+        new ReplaySink(
+          x,
+          cmd.getRequester(),
+          cmd.getServiceName()
+        )
+      );
       return cmd;
       `
     }

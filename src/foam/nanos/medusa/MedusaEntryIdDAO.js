@@ -39,6 +39,7 @@ foam.CLASS({
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
       getLogger().debug("put", "in", entry);
+      getLogger().debug("put", new Exception("stacktrace"));
       if ( entry.isFrozen() ) {
         entry = (MedusaEntry) entry.fclone();
       }

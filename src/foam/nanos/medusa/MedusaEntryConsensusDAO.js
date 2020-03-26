@@ -19,10 +19,12 @@ foam.CLASS({
     'foam.mlang.sink.GroupBy',
     'static foam.mlang.MLang.AND',
     'static foam.mlang.MLang.EQ',
+    'static foam.mlang.MLang.HAS',
     'static foam.mlang.MLang.COUNT',
     'static foam.mlang.MLang.GROUP_BY',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
+    'foam.util.SafetyUtil',
     'java.util.ArrayList',
     'java.util.concurrent.atomic.AtomicLong',
     'java.util.HashMap',
@@ -70,11 +72,15 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
-      if ( entry.getIndex() < getIndex() ) {
+      getLogger().debug("put", getIndex(), entry);
+
+      // REVIEW: multiple nodes will be responding symultanously.
+      synchronized ( Long.toString(entry.getIndex()).intern() ) {
+
+      if ( entry.getIndex() <= getIndex() ) {
         getLogger().debug("put", "discarding", entry);
         return entry;
       }
-      getLogger().debug("put", entry);
 
       entry = (MedusaEntry) getDelegate().put_(x, entry);
 
@@ -88,6 +94,7 @@ foam.CLASS({
         setIndex(localIndex_.getAndIncrement());
         service.updateLinks(x, ce);
         return ce;
+      }
       }
       return entry;
       `
@@ -106,29 +113,12 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      // String hash = null;
-      // long max = 0L;
-      // MedusaEntry me = null;
-      // GroupBy groupBy = (GroupBy) getDelegate().where(
-      //   AND(
-      //     EQ(MedusaEntry.INDEX, entry.getIndex())
-      //   )
-      // ).select(GROUP_BY(MedusaEntry.HASH, COUNT()));
-
-      // Map<String, Count> groups = groupBy.getGroups();
-      // for ( Map.Entry<String, Count> e : groups.entrySet() ) {
-      //   if ( e.getValue().getValue() > max ) {
-      //     hash = e.getKey();
-      //     max = e.getValue().getValue();
-      //     me = e;
-      //   }
-      // }
-
       // Tally by hash.
       List<MedusaEntry> arr = (ArrayList) ((ArraySink) getDelegate()
         .where(
           AND(
-            EQ(MedusaEntry.INDEX, entry.getIndex())
+            EQ(MedusaEntry.INDEX, entry.getIndex()) //,
+            // HAS(MedusaEntry.HASH)
           )
         )
         .select(new ArraySink())).getArray();
@@ -137,6 +127,9 @@ foam.CLASS({
       Long max = 0L;
       MedusaEntry match = null;
       for ( MedusaEntry e : arr ) {
+        if ( SafetyUtil.isEmpty(e.getHash()) ) {
+          continue;
+        }
         Long count = counts.get(e.getHash());
         if ( count == null ) {
           count = Long.valueOf(0L);
@@ -165,6 +158,27 @@ foam.CLASS({
         return match;
       }
       return null;
+
+      // Alternate approches
+      // perform count, if >= nodes, then select again and test hashes.
+
+      // String hash = null;
+      // long max = 0L;
+      // MedusaEntry me = null;
+      // GroupBy groupBy = (GroupBy) getDelegate().where(
+      //   AND(
+      //     EQ(MedusaEntry.INDEX, entry.getIndex())
+      //   )
+      // ).select(GROUP_BY(MedusaEntry.HASH, COUNT()));
+
+      // Map<String, Count> groups = groupBy.getGroups();
+      // for ( Map.Entry<String, Count> e : groups.entrySet() ) {
+      //   if ( e.getValue().getValue() > max ) {
+      //     hash = e.getKey();
+      //     max = e.getValue().getValue();
+      //     me = e;
+      //   }
+      // }
       `
     }
   ]

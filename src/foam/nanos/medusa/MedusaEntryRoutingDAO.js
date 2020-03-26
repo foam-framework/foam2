@@ -25,7 +25,8 @@ foam.CLASS({
     {
       name: 'mdaos',
       class: 'Map',
-      javaFactory: 'return new HashMap();'
+      javaFactory: 'return new HashMap();',
+      visibility: 'HIDDEN'
     },
     {
       name: 'logger',

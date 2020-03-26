@@ -54,10 +54,9 @@ foam.CLASS({
       of: 'foam.nanos.logger.Logger',
       visibility: 'HIDDEN',
       javaFactory: `
-        Logger logger = (Logger) getX().get("logger");
         return new PrefixLogger(new Object[] {
           this.getClass().getSimpleName()
-        }, logger);
+        }, (Logger) getX().get("logger"));
       `
     }
   ],
@@ -97,6 +96,7 @@ foam.CLASS({
       int retryDelay = 10;
 
       // TODO: any hash verification?
+      getLogger().debug("put", obj);
 
       DAO dao = getClientDAO(getX());
       while ( true ) {

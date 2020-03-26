@@ -79,12 +79,10 @@ foam.CLASS({
                 ! service.getIsPrimary() ) {
         try {
           if ( electoralService.getState() == ElectoralServiceState.IN_SESSION ) {
-              logger.debug("to primary", service.getPrimaryConfigId(), cmd);
+              logger.debug("put", "to primary", service.getPrimaryConfigId(), cmd);
               FObject result = (FObject) service.getPrimaryDAO(x, getServiceName()).cmd_(x, cmd);
-              logger.debug("from primary", result);
-              obj = obj.copyFrom(result);
-              logger.debug("obj after copyFrom", obj);
-              return obj;
+              logger.debug("put", "from primary", service.getPrimaryConfigId(), result);
+              return result;
             } else {
               logger.debug("Election in progress.", electoralService.getState().getLabel());
               throw new RuntimeException("Election in progress.");
