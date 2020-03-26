@@ -119,9 +119,7 @@ foam.CLASS({
 
       UserQueryService userQueryService = (UserQueryService) x.get("userQueryService");
 
-      User currentUser = (User) x.get("user");
-
-      List<Long> approverIds = userQueryService.getAllApprovers(x, modelName, currentUser);
+      List<Long> approverIds = userQueryService.getAllApprovers(x, modelName);
 
       if ( approverIds.size() <= 0 ) {
         logger.error("No Approvers exist for the model: " + modelName);
