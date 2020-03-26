@@ -55,9 +55,8 @@
               }
               Map diff = oldObj == null ? null : oldObj.diff(obj);
               if ( diff != null ) {
-                // if obj uses seqNoDao ids, need to remove id, otherwise doesnt
-                if ( diff.containsKey("id") && diff.get("id") instanceof Long ) diff.remove("id");
-                // remove timestamps and userfeedback
+                // remove ids, timestamps and userfeedback
+                diff.remove("id");
                 diff.remove("created");
                 diff.remove("lastModified");
                 diff.remove("userFeedback");
@@ -74,6 +73,8 @@
                   diff.put(prop, Arrays.asList((Object[]) diff.get(prop)).hashCode());
                 }
               }
+
+              System.out.println(diff);
               String key = diff == null || diff.size() == 0 ? ((ApprovableAware) obj).getApprovableKey() : obj.getClass().getSimpleName() + String.valueOf(diff.hashCode());
               return key;
             `
