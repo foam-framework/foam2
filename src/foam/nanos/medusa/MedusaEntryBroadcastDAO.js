@@ -80,9 +80,12 @@ foam.CLASS({
             try {
               DAO dao = (DAO) getClients().get(config.getId());
               if ( dao == null ) {
-                dao = new MedusaEntryClientDAO.Builder(x)
-                  .setClusterConfigId(config.getId())
-                  .build();
+                DAO clientDAO = service.getClientDAO(x, "medusaEntryDAO", config, config);
+                dao = new RetryClientSinkDAO.Builder(x)
+                        .setDelegate(clientDAO)
+                        .setMaxRetryAttempts(service.getMaxRetryAttempts())
+                        .setMaxRetryDelay(service.getMaxRetryDelay())
+                        .build();
                 getClients().put(config.getId(), dao);
               }
               getLogger().debug("put", config.getId());

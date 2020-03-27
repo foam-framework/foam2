@@ -178,6 +178,36 @@ configuration for contacting the primary node.`,
           type: 'foam.nanos.medusa.ClusterConfig'
         },
       ],
+    },
+    {
+      name: 'getClientDAO',
+      type: 'foam.dao.DAO',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'serviceName',
+          type: 'String'
+        },
+        {
+          name: 'sendClusterConfig',
+          type: 'ClusterConfig'
+        },
+        {
+          name: 'recieveClusterConfig',
+          type: 'ClusterConfig'
+        }
+      ]
+    },
+    {
+      name: 'getMaxRetryAttempts',
+      type: 'Integer'
+    },
+    {
+      name: 'getMaxRetryDelay',
+      type: 'Integer'
     }
   ]
 });

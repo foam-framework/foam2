@@ -12,10 +12,14 @@ foam.CLASS({
   documentation: `Response to ReplayCmd`,
 
   javaImports: [
+    'foam.core.FObject',
+    'foam.core.X',
     'foam.dao.DAO',
+    'static foam.mlang.MLang.COUNT',
     'static foam.mlang.MLang.GTE',
+    'foam.mlang.sink.Count',
     'foam.nanos.logger.PrefixLogger',
-    'foam.nanos.logger.Logger'
+    'foam.nanos.logger.Logger',
   ],
 
   properties: [
@@ -42,17 +46,28 @@ foam.CLASS({
       ReplayCmd cmd = (ReplayCmd) obj;
       getLogger().debug("cmd", cmd);
 
-      getDelegate().where(
+      // DEBUG
+      Count count = (Count) getDelegate().where(
+        GTE(MedusaEntry.INDEX, cmd.getFromIndex()))
+      .orderBy(MedusaEntry.INDEX)
+      .select(COUNT());
+      getLogger().debug("cmd", "count", count.getValue());
+
+      ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
+      ClusterConfig fromConfig = service.getConfig(x, cmd.getResponder());
+      ClusterConfig toConfig = service.getConfig(x, cmd.getRequester());
+
+      DAO clientDAO = service.getClientDAO(x, cmd.getServiceName(), fromConfig, toConfig);
+
+     getDelegate().where(
         GTE(MedusaEntry.INDEX, cmd.getFromIndex())
       )
       .orderBy(MedusaEntry.INDEX)
-      .select(
-        new ReplaySink(
-          x,
-          cmd.getRequester(),
-          cmd.getServiceName()
-        )
-      );
+      .select(new RetryClientSinkDAO.Builder(x)
+        .setDelegate(clientDAO)
+        .setMaxRetryAttempts(service.getMaxRetryAttempts())
+        .setMaxRetryDelay(service.getMaxRetryDelay())
+        .build());
       return cmd;
       `
     }

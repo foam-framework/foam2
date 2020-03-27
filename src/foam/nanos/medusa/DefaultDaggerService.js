@@ -143,6 +143,12 @@ foam.CLASS({
       `
     },
     {
+      name: 'sign',
+      javaCode: `
+      return null;
+      `
+    },
+    {
       name: 'getNextLinks',
       args: [
         {

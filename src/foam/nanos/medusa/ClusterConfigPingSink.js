@@ -15,6 +15,7 @@ foam.CLASS({
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'foam.mlang.sink.Max',
+    'static foam.mlang.MLang.EQ',
     'static foam.mlang.MLang.MAX'
   ],
 
@@ -87,8 +88,8 @@ foam.CLASS({
                config.getRegion() == myConfig.getRegion() &&
                config.getRealm() == myConfig.getRealm() ) {
             DAO dao = (DAO) getX().get("localMedusaEntryDAO");
-            Max max = (Max) MAX(MedusaEntry.INDEX);
-            dao.select(max);
+            dao = dao.where(EQ(MedusaEntry.HAS_CONSENSUS, true));
+            Max max = (Max) dao.select(MAX(MedusaEntry.INDEX));
             Long index = 0L;
             if ( max != null &&
                  max.getValue() != null ) {

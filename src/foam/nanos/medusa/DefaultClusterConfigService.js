@@ -62,6 +62,17 @@ foam.CLASS({
       value: false
     },
     {
+      name: 'maxRetryAttempts',
+      class: 'Int',
+      documentation: 'Set to -1 to infinitely retry.',
+      value: 20
+    },
+    {
+      class: 'Int',
+      name: 'maxRetryDelay',
+      value: 20000
+    },
+    {
       name: 'primaryDAOs',
       class: 'Map',
       visibility: 'HIDDEN',
@@ -153,23 +164,14 @@ foam.CLASS({
     {
       name: 'getPrimaryDAO',
       javaCode: `
-        DAO pDao = (DAO) getPrimaryDAOs().get(serviceName);
-        if ( pDao == null ) {
+        DAO dao = (DAO) getPrimaryDAOs().get(serviceName);
+        if ( dao == null ) {
           ClusterConfig primaryConfig = getConfig(x, getPrimaryConfigId());
           ClusterConfig config = getConfig(x, getConfigId());
-          pDao = new ClientDAO.Builder(x)
-                   .setDelegate(new SessionClientBox.Builder(x)
-                     .setSessionID(config.getSessionId())
-                     .setDelegate(new HTTPBox.Builder(x)
-                       .setAuthorizationType(foam.box.HTTPAuthorizationType.BEARER)
-                       .setSessionID(config.getSessionId())
-                       .setUrl(buildURL(x, getServiceName(), primaryConfig))
-                       .build())
-                     .build())
-                  .build();
-          getPrimaryDAOs().put(serviceName, pDao);
+          dao = getClientDAO(x, serviceName, config, primaryConfig);
+          getPrimaryDAOs().put(serviceName, dao);
         }
-        return pDao;
+        return dao;
       `
     },
     {
@@ -329,7 +331,7 @@ foam.CLASS({
       return online >= voters.size() / 2 + 1;
       `
     },
-     {
+    {
       name: 'getNodesForConsensus',
       args: [
         {
@@ -343,5 +345,39 @@ foam.CLASS({
       return 2;
       `
     },
+    {
+      name: 'getClientDAO',
+      type: 'foam.dao.DAO',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'serviceName',
+          type: 'String'
+        },
+        {
+          name: 'sendClusterConfig',
+          type: 'ClusterConfig'
+        },
+        {
+          name: 'receiveClusterConfig',
+          type: 'ClusterConfig'
+        }
+      ],
+      javaCode: `
+      return new ClientDAO.Builder(x)
+        .setDelegate(new SessionClientBox.Builder(x)
+        .setSessionID(sendClusterConfig.getSessionId())
+        .setDelegate(new HTTPBox.Builder(x)
+          .setAuthorizationType(foam.box.HTTPAuthorizationType.BEARER)
+            .setSessionID(sendClusterConfig.getSessionId())
+            .setUrl(buildURL(x, serviceName, receiveClusterConfig))
+            .build())
+           .build())
+        .build();
+      `
+    }
   ]
 });

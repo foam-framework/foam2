@@ -27,7 +27,8 @@ foam.CLASS({
     {
       class: 'String',
       name: 'id',
-      visibility: 'RO'
+      visibility: 'RO',
+      includeInDigest: false
     },
     {
       class: 'String',
@@ -57,7 +58,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'hash1',
-      visibility: 'RO',
+      visibility: 'HIDDEN',
       storageTransient: true,
       includeInDigest: false
     },
@@ -69,14 +70,17 @@ foam.CLASS({
     {
       class: 'String',
       name: 'hash2',
-      visibility: 'RO',
+      visibility: 'HIDDEN',
       storageTransient: true,
       includeInDigest: false
     },
     {
       class: 'FObjectProperty',
       name: 'data',
-      visibility: 'RO'
+      visibility: 'RO',
+      view: {
+        class: 'foam.u2.CitationView'
+      }
     },
     {
       class: 'String',
@@ -101,7 +105,7 @@ foam.CLASS({
       documentation: 'Solely for information. Broadcasting Node',
       name: 'node',
       class: 'String',
-      visibility: 'RO',
+      visibility: 'HIDDEN',
       includeInDigest: false,
     },
     {
@@ -109,13 +113,15 @@ foam.CLASS({
       name: 'lastModifiedBy',
       class: 'Reference',
       of: 'foam.nanos.auth.User',
-      visibility: 'RO',
-      javaFactory: 'return 2L;'
+      visibility: 'HIDDEN',
+      value: 2,
+      includeInDigest: false,
     },
     {
       name: 'lastModified',
       class: 'Date',
-      visibility: 'RO'
+      visibility: 'RO',
+      includeInDigest: false,
     }
   ]
 });

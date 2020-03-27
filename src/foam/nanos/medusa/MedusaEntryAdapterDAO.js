@@ -106,6 +106,7 @@ foam.CLASS({
       getLogger().debug("put", "entry", entry);
 
       FObject result = ((MedusaEntry)getMedusaEntryDAO().put_(x, entry)).getData();
+      getLogger().debug("submit", "find", entry.getId());
       return getDelegate().find(result.getProperty("id"));
       `
     }

@@ -6,37 +6,21 @@
 
 foam.CLASS({
   package: 'foam.nanos.medusa',
-  name: 'ReplaySink',
-  extends: 'foam.dao.AbstractSink',
+  name: 'RetryClientSinkDAO',
+  extends: 'foam.dao.ProxyDAO',
+  implements: ['foam.dao.Sink'],
 
   documentation: '',
 
   javaImports: [
-    'foam.box.Box',
-    'foam.box.HTTPBox',
-    'foam.box.SessionClientBox',
     'foam.core.FObject',
     'foam.core.X',
-    'foam.dao.ClientDAO',
     'foam.dao.DAO',
-    'foam.dao.MDAO',
     'foam.nanos.logger.PrefixLogger',
-    'foam.nanos.logger.Logger',
-    'foam.util.SafetyUtil',
-    'java.net.HttpURLConnection',
-    'java.net.URL',
+    'foam.nanos.logger.Logger'
   ],
-  
+
   properties: [
-    {
-      name: 'clusterConfigId',
-      class: 'String'
-    },
-    {
-      name: 'serviceName',
-      class: 'String',
-      value: 'medusaEntryDAO'
-    },
     {
       name: 'maxRetryAttempts',
       class: 'Int',
@@ -60,49 +44,88 @@ foam.CLASS({
       `
     }
   ],
-  
   axioms: [
     {
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-  public ReplaySink(X x, String clusterConfigId, String serviceName) {
-    setX(x);
-    setClusterConfigId(clusterConfigId);
-    setServiceName(serviceName);
+  public RetryClientSinkDAO(X x, DAO delegate) {
+    super(x, delegate);
   }
          `
         }));
       }
     }
   ],
-  
+
   methods: [
     {
       name: 'put_',
       args: [
         {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'obj',
+          type: 'FObject'
+        }
+      ],
+      javaCode: `
+      getLogger().debug("put_", obj);
+      return (FObject) submit(x, obj, "put");
+      `
+    },
+    {
+      name: 'cmd_',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'obj',
+          type: 'Object'
+        }
+      ],
+      javaCode: `
+      getLogger().debug("cmd_", obj);
+      return submit(x, obj, "cmd");
+      `
+    },
+    {
+      name: 'submit',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
           name: 'obj',
           type: 'Object'
         },
         {
-          name: 'sub',
-          type: 'foam.core.Detachable'
+          name: 'op',
+          type: 'String'
         }
       ],
+      javaType: 'Object',
       javaCode: `
       int retryAttempt = 0;
       int retryDelay = 10;
 
-      // TODO: any hash verification?
-      getLogger().debug("put", obj);
+      getLogger().debug("submit", op, obj);
 
-      DAO dao = getClientDAO(getX());
       while ( true ) {
         try {
-          getClientDAO(getX()).put_(getX(), (FObject)obj);
-          break;
+          if ( "put".equals(op) ) {
+            return getDelegate().put_(getX(), (FObject)obj);
+          } else if ( "cmd".equals(op) ) {
+            return getDelegate().cmd_(getX(), obj);
+          } else {
+            throw new UnsupportedOperationException("Unknown operation: "+op);
+          }
         } catch ( Throwable t ) {
           getLogger().error(t);
 
@@ -128,42 +151,41 @@ foam.CLASS({
           } catch(InterruptedException e) {
             Thread.currentThread().interrupt();
             getLogger().debug("InterruptedException");
-            //throw new RuntimeException(e.getMessage(), e);
-            break;
           }
         }
       }
+      return obj;
       `
     },
+    // Sink
     {
-      name: 'getClientDAO',
+      name: 'put',
       args: [
         {
-          name: 'x',
-          type: 'Context'
+          name: 'obj',
+          type: 'Object'
+        },
+        {
+          name: 'sub',
+          type: 'foam.core.Detachable'
         }
       ],
-      javaType: 'foam.dao.DAO',
       javaCode: `
-      ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
-      ClusterConfig config = (ClusterConfig) ((DAO) x.get("clusterConfigDAO")).find(getClusterConfigId());
-
-      DAO dao = new ClientDAO.Builder(x)
-        .setDelegate(new SessionClientBox.Builder(x)
-        .setSessionID(config.getSessionId())
-        .setDelegate(new HTTPBox.Builder(x)
-          .setAuthorizationType(foam.box.HTTPAuthorizationType.BEARER)
-            .setSessionID(config.getSessionId())
-            .setUrl(service.buildURL(x, getServiceName(), config))
-            .build())
-           .build())
-        .build();
-      return dao; 
+      getLogger().debug("put", obj);
+      submit(getX(), obj, "put");
       `
     },
     {
-      // avoid null pointer on ProxySink.eof()
+      // TODO:
+      name: 'remove',
+      javaCode: `//nop`
+    },
+    {
       name: 'eof',
+      javaCode: `//nop`
+    },
+    {
+      name: 'reset',
       javaCode: `//nop`
     }
   ]

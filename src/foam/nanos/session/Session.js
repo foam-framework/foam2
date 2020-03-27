@@ -206,6 +206,7 @@ foam.CLASS({
         return x
           .put(Session.class, this)
           .put("user", null)
+          .put("spid", null)
           .put("agent", null)
           .put("group", null)
           .put("twoFactorSuccess", false)
@@ -277,15 +278,14 @@ foam.CLASS({
           ? new Object[] { String.format("%s (%d)", user.label(), user.getId()) }
           : new Object[] { String.format("%s (%d) acting as %s (%d)", agent.label(), agent.getId(), user.label(), user.getId()) };
 
-        rtn = rtn
-          .put("user", user)
-          .put("agent", agent)
-          .put("logger", new PrefixLogger(prefix, (Logger) x.get("logger")))
-          .put("twoFactorSuccess", getContext().get("twoFactorSuccess"))
-          .put(CachingAuthService.CACHE_KEY, getContext().get(CachingAuthService.CACHE_KEY));
-
         if ( user != null ) {
-          rtn = rtn.put("spid", user.getSpid());
+          rtn = rtn
+            .put("user", user)
+            .put("spid", user.getSpid())
+            .put("agent", agent)
+            .put("logger", new PrefixLogger(prefix, (Logger) x.get("logger")))
+            .put("twoFactorSuccess", getContext().get("twoFactorSuccess"))
+            .put(CachingAuthService.CACHE_KEY, getContext().get(CachingAuthService.CACHE_KEY));
         }
 
         // We need to do this after the user and agent have been put since

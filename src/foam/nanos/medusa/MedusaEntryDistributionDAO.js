@@ -55,7 +55,10 @@ foam.CLASS({
       javaCode: `
       MedusaEntry entry = (MedusaEntry) getDelegate().put_(x, obj);
       getLogger().debug("put", entry);
-      // using assembly line, write to all online nodes - in all a zones.
+
+      ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
+
+     // using assembly line, write to all online nodes - in all a zones.
       List<ClusterConfig> arr = (ArrayList) ((ArraySink) ((DAO) x.get("localClusterConfigDAO"))
         .where(
           AND(
@@ -72,10 +75,12 @@ foam.CLASS({
             try {
               DAO dao = (DAO) getClients().get(config.getId());
               if ( dao == null ) {
-                dao = new MedusaEntryClientDAO.Builder(x)
-                  .setClusterConfigId(config.getId())
-                  .build();
-                getLogger().debug("client", config.getId(), "put");
+                DAO clientDAO = service.getClientDAO(x, "medusaEntryDAO", config, config);
+                dao = new RetryClientSinkDAO.Builder(x)
+                        .setDelegate(clientDAO)
+                        .setMaxRetryAttempts(service.getMaxRetryAttempts())
+                        .setMaxRetryDelay(service.getMaxRetryDelay())
+                        .build();
                 getClients().put(config.getId(), dao);
               }
               dao.put_(x, entry);
@@ -100,9 +105,14 @@ foam.CLASS({
         configId = cmd.getResponder();
       }
       if ( configId != null ) {
-        DAO dao = new MedusaEntryClientDAO.Builder(x)
-          .setClusterConfigId(configId)
-          .build();
+        ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
+        ClusterConfig config = service.getConfig(x, configId);
+        DAO clientDAO = service.getClientDAO(x, "medusaEntryDAO", config, config);
+        DAO dao = new RetryClientSinkDAO.Builder(x)
+                         .setDelegate(clientDAO)
+                         .setMaxRetryAttempts(service.getMaxRetryAttempts())
+                         .setMaxRetryDelay(service.getMaxRetryDelay())
+                         .build();
         getLogger().debug("cmd", obj);
         return dao.cmd_(x, obj);
       } else {

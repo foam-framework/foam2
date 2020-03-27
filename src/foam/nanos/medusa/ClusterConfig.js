@@ -89,7 +89,8 @@ foam.CLASS({
       name: 'status',
       class: 'Enum',
       of: 'foam.nanos.medusa.Status',
-      value: 'OFFLINE'
+      value: 'OFFLINE',
+      storageTransient: true
     },
     {
       name: 'accessMode',
@@ -126,6 +127,7 @@ foam.CLASS({
       value: 500
     },
     {
+      // TODO: move to clusterconfig service
       name: 'sessionId',
       class: 'String'
     },

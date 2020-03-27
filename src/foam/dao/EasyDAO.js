@@ -304,6 +304,23 @@ foam.CLASS({
             delegate = delegate.orderBy(comp);
         }
 
+        if ( getAuthorize() ) {
+          delegate = new foam.nanos.auth.AuthorizationDAO.Builder(getX())
+            .setDelegate(delegate)
+            .setAuthorizer(getAuthorizer())
+            .build();
+        }
+
+        if ( getNSpec() != null &&
+            getNSpec().getServe() &&
+            ! getAuthorize() &&
+            ! getReadOnly() )
+          getLogger().warning("EasyDAO", getNSpec().getName(), "Served DAO should be Authorized, or ReadOnly");
+
+        if ( getPermissioned() &&
+            ( getNSpec() != null && getNSpec().getServe() ) )
+          delegate = new foam.nanos.auth.PermissionedPropertyDAO.Builder(getX()).setDelegate(delegate).build();
+
         if ( getCluster() &&
              getMdao() != null ) {
           // test if chain already has ClusterConfigDAO
@@ -319,19 +336,6 @@ foam.CLASS({
                           .build();
           }
         }
-
-        if ( getAuthorize() ) {
-          delegate = new foam.nanos.auth.AuthorizationDAO.Builder(getX())
-            .setDelegate(delegate)
-            .setAuthorizer(getAuthorizer())
-            .build();
-        }
-
-        if ( getNSpec() != null && getNSpec().getServe() && ! getAuthorize() && ! getReadOnly() )
-          getLogger().warning("EasyDAO", getNSpec().getName(), "Served DAO should be Authorized, or ReadOnly");
-
-        if ( getPermissioned() && ( getNSpec() != null && getNSpec().getServe() ) )
-          delegate = new foam.nanos.auth.PermissionedPropertyDAO.Builder(getX()).setDelegate(delegate).build();
 
         if ( getReadOnly() )
           delegate = new foam.dao.ReadOnlyDAO.Builder(getX()).setDelegate(delegate).build();

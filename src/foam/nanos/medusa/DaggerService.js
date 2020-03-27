@@ -75,6 +75,22 @@ foam.INTERFACE({
           type: 'foam.nanos.medusa.MedusaEntry'
         }
       ]
-    }
+    },
+    {
+      name: 'sign',
+      type: 'String',
+      javaThrows: ['java.security.DigestException',
+                    'java.security.NoSuchAlgorithmException'],
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'entry',
+          type: 'foam.nanos.medusa.MedusaEntry'
+        }
+      ]
+    },
   ]
 });

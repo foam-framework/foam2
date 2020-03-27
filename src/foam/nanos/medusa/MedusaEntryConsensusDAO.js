@@ -78,7 +78,7 @@ foam.CLASS({
       synchronized ( Long.toString(entry.getIndex()).intern() ) {
 
       if ( entry.getIndex() <= getIndex() ) {
-        getLogger().debug("put", "discarding", entry);
+        getLogger().debug("put", getIndex(), "discarding", entry);
         return entry;
       }
 
@@ -90,7 +90,7 @@ foam.CLASS({
            ce.getIndex() == getIndex() + 1 )  {
         DaggerService service = (DaggerService) x.get("daggerService");
         service.verify(x, ce);
-        getLogger().debug("promoting", ce.getIndex(), ce);
+        getLogger().debug("put", getIndex(), "promoting", ce.getIndex(), ce);
         setIndex(localIndex_.getAndIncrement());
         service.updateLinks(x, ce);
         return ce;
@@ -118,7 +118,7 @@ foam.CLASS({
         .where(
           AND(
             EQ(MedusaEntry.INDEX, entry.getIndex()) //,
-            // HAS(MedusaEntry.HASH)
+//            NEQ(MedusaEntry.HASH, null)
           )
         )
         .select(new ArraySink())).getArray();
@@ -166,10 +166,11 @@ foam.CLASS({
       // long max = 0L;
       // MedusaEntry me = null;
       // GroupBy groupBy = (GroupBy) getDelegate().where(
+      // Sink sink = getDelegate().where(
       //   AND(
       //     EQ(MedusaEntry.INDEX, entry.getIndex())
       //   )
-      // ).select(GROUP_BY(MedusaEntry.HASH, COUNT()));
+      // ).select(GROUP_BY(MedusaEntry.HASH, new Sequence(new foam.dao.Sink[] {COUNT()})));
 
       // Map<String, Count> groups = groupBy.getGroups();
       // for ( Map.Entry<String, Count> e : groups.entrySet() ) {
