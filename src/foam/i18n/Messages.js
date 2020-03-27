@@ -23,7 +23,7 @@ foam.SCRIPT({
   }
 });
 
-foam.SCRIPT({
+foam.CLASS({
   package: 'foam.i18n',
   name: 'ThemeMessage',
 
