@@ -654,7 +654,7 @@ foam.CLASS({
         // fetch context from session and check two factor success if enabled.
         Session session = x.get(Session.class);
         if ( session == null ) {
-          throw new AuthenticationException("No session exists for user.");
+          throw new AuthenticationException("No session exists.");
         }
 
         // check for two-factor authentication
