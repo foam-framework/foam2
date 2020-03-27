@@ -28,6 +28,8 @@ foam.CLASS({
         for ( var i = 0 ; i < props.length ; i++ ) {
           if ( props[i].networkTransient )
             continue;
+          if ( props[i].cls_.id === "foam.core.Action" )
+            continue;
           var cellType = 'STRING';
           var pattern = '';
           if ( props[i].cls_.id === "foam.core.UnitValue" ) {
@@ -89,6 +91,8 @@ foam.CLASS({
               propValues.push(obj[columnMethadata[i].columnName].toString().substring(0, 8));
               columnMethadata[i].perValuePatternSpecificValues.push(obj[columnMethadata[i].columnName].toString().substring(8));
             }
+            else if ( obj[columnMethadata[i].columnName].toSummary )
+              propValues.push(obj[columnMethadata[i].columnName].toSummary());
             else
               propValues.push(obj[columnMethadata[i].columnName].toString());
           }
