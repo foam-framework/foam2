@@ -9,6 +9,10 @@ foam.CLASS({
   name: 'EnumView',
   extends: 'foam.u2.view.ChoiceView',
 
+  imports: [
+    'auth'
+  ],
+
   properties: [
     {
       class: 'Class',
@@ -18,7 +22,10 @@ foam.CLASS({
     {
       name: 'choices',
       expression: function(of) {
-        return of ? of.VALUES.map(function(v) { return [ v, v.label ]; }) : [];
+        var self = this;
+       return of ? of.VALUES.map(function(v) {
+         return [ v, v.label ];
+       }) : [];
       }
     }
   ],
