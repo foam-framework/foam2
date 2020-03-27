@@ -793,6 +793,12 @@ foam.CLASS({
       value: 0,
       documentation: 'the y of the last required to element draw in the canvas.',
     },
+    {
+      name: 'allowedModels',
+    },
+    {
+      name: 'allowedProperties',
+    }
   ],
 
   methods: [
@@ -801,6 +807,10 @@ foam.CLASS({
       var nbrOfPropInNonConventionalDiag = 5;
       var propertyHeight = 20;
       this.className  = this.data.name;
+
+      if ( Array.isArray(this.allowedModels) && this.allowedModels.length && this.allowedModels.includes(this.className))
+        return -1;
+
       this.elementMap = new Map();
       this.properties = this.getAllProperties( data );
 
@@ -1145,7 +1155,7 @@ foam.CLASS({
       for ( var key in data.axiomMap_ ) {
         if ( Object.hasOwnProperty.call(data.axiomMap_, key) ) {
           var a  = data.axiomMap_[key];
-          if ( foam.core.Property.isInstance( a ) ) {
+          if ( foam.core.Property.isInstance( a ) && !(Array.isArray(this.allowedProperties) && this.allowedProperties.length && this.allowedProperties.includes(a.name)) ) {
             prop.push(a);
           }
         }
