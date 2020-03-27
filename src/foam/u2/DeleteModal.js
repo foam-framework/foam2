@@ -118,17 +118,17 @@ foam.CLASS({
                   self.EQ(self.Invitation.STATUS, self.InvitationStatus.SENT),
                   self.EQ(self.Invitation.CREATED_BY, self.sourceId)
                 )
-              ).select({
-                put: (invite) => {
-                  invite.status = self.InvitationStatus.CANCELLED;
-                  self.businessInvitationDAO.put(invite).then(function() {
+              ).select().then(function(invite) {
+                console.log("removed");
+                for ( var i = 0; i < invite.array.length; i++ ) {
+                  self.businessInvitationDAO.remove(invite.array[i]).then(function() {
                     self.notify(self.data.model_.label + self.SUCCESS_MSG);
                     self.onDelete();
                   }).catch((err) => {
                     var message = err ? err.message : self.FAIL_MSG;
                     self.notify(message, 'error');
                   })
-               }
+                }
             });
           } else {
             this.notify(this.data.model_.label + this.SUCCESS_MSG);
