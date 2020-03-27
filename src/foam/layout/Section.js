@@ -48,7 +48,8 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'fromClass'
+      name: 'fromClass',
+      documentation: 'The class name to which the section belongs to.'
     }
   ],
 
