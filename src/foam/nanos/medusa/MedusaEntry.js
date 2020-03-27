@@ -20,7 +20,8 @@ foam.CLASS({
     "index",
     "index1",
     "index2",
-    "hasConsensus"
+    "hasConsensus",
+    "lastModified"
   ],
 
   properties: [
@@ -119,6 +120,7 @@ foam.CLASS({
     },
     {
       name: 'lastModified',
+      label: 'Created',
       class: 'Date',
       visibility: 'RO',
       includeInDigest: false,
