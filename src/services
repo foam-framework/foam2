@@ -1,6 +1,24 @@
 p({"class":"foam.nanos.boot.NSpec", "name":"nSpecDAO",                           "serve":true,  "authenticate": false, "serviceClass":"foam.dao.ProxyDAO", "client":"{\"of\":\"foam.nanos.boot.NSpec\",\"cache\":true}"})
 
-p({"class":"foam.nanos.boot.NSpec", "name":"googleSheetsDataExport",                       "serve":true,  "authenticate": false, "boxClass":"foam.nanos.export.GoogleSheetsExportSkeleton", "serviceClass":"foam.nanos.export.GoogleSheetsExportService","client":"{\"class\":\"foam.nanos.export.ClientGoogleSheetsExportService\",\"delegate\":{\"class\":\"foam.box.HTTPBox\", \"url\":\"service/googleSheetsDataExport\"}}"})
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"googleSheetsDataExport",
+  "serve":true,
+  "authenticate": false,
+  "boxClass":"foam.nanos.export.GoogleSheetsExportSkeleton",
+  "serviceClass":"foam.nanos.export.GoogleSheetsExportService",
+  "client":"""
+    {
+      "class":"foam.nanos.export.ClientGoogleSheetsExportService",
+      "delegate":"""
+        {
+          "class":"foam.box.HTTPBox",
+          "url":"service/googleSheetsDataExport"
+        }
+      """
+    }
+  """
+  })
 
 p({
   "class":"foam.nanos.boot.NSpec",
