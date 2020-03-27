@@ -11,12 +11,12 @@ foam.CLASS({
 
   javaImports: [
     'foam.dao.DAO',
+    'static foam.mlang.MLang.EQ',
+    'static foam.mlang.MLang.MAX',
+    'foam.mlang.sink.Max',
     'foam.nanos.http.PingService',
     'foam.nanos.logger.PrefixLogger',
-    'foam.nanos.logger.Logger',
-    'foam.mlang.sink.Max',
-    'static foam.mlang.MLang.EQ',
-    'static foam.mlang.MLang.MAX'
+    'foam.nanos.logger.Logger'
   ],
 
   axioms: [
