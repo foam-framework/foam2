@@ -15,6 +15,8 @@ foam.CLASS({
     'foam.nanos.medusa.DaggerLink'
   ],
 
+  documentation: `Ledger entry.`,
+
   tableColumns: [
     "id",
     "nSpecName",
@@ -23,6 +25,19 @@ foam.CLASS({
     "index2",
     "hasConsensus",
     "lastModified"
+  ],
+
+  constants: [
+    {
+      name: 'PUT',
+      type: 'String',
+      value: 'put'
+    },
+    {
+      name: 'REMOVE',
+      type: 'String',
+      value: 'remove'
+    }
   ],
 
   properties: [

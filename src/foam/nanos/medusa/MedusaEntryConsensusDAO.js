@@ -96,7 +96,7 @@ foam.CLASS({
            ce.getIndex() == getIndex() + 1 )  {
         // DaggerService service = (DaggerService) x.get("daggerService");
         service.verify(x, ce);
-        getLogger().debug("put", getIndex(), "promoting", ce.getIndex(), ce.getIndex(), ce.getHasConsensus());
+        getLogger().debug("put", getIndex(), "promoting", ce.getIndex(), ce.getIndex(), ce.getHasConsensus(), ce);
         setIndex(localIndex_.getAndIncrement());
         service.updateLinks(x, ce);
         return ce;

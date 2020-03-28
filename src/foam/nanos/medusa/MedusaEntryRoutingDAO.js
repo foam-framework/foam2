@@ -54,7 +54,7 @@ foam.CLASS({
 
       try {
       DAO mdao = getMdao(x, entry);
-      if ( "p".equals(entry.getAction()) ) {
+      if ( MedusaEntry.PUT.equals(entry.getAction()) ) {
         mdao.put_(x, entry.getData());
       } else {
         mdao.remove_(x, entry.getData());

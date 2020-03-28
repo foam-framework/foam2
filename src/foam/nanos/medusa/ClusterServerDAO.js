@@ -18,25 +18,38 @@ foam.CLASS({
     'foam.nanos.logger.PrefixLogger'
   ],
 
+  properties: [
+    {
+      name: 'logger',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.logger.Logger',
+      visibility: 'HIDDEN',
+      javaFactory: `
+        Logger logger = (Logger) getX().get("logger");
+        if ( logger == null ) {
+          logger = new foam.nanos.logger.StdoutLogger();
+        }
+        return new PrefixLogger(new Object[] {
+          this.getClass().getSimpleName(),
+          "cmd_"
+        }, logger);
+      `
+    }
+  ],
+
   methods: [
     {
       name: 'cmd_',
       javaCode: `
       if ( obj instanceof ClusterCommand ) {
         ClusterCommand request = (ClusterCommand) obj;
-        X y = request.applyTo(x);
 
-        Logger logger = new PrefixLogger(new Object[] {
-          this.getClass().getSimpleName(),
-          "cmd_",
-           request.getServiceName(),
-           request.getCommand()
-        }, (Logger) y.get("logger"));
+        X y = request.applyTo(x);
 
         ClusterConfigService service = (ClusterConfigService) y.get("clusterConfigService");
         ElectoralServiceServer electoralService = (ElectoralServiceServer) y.get("electoralService");
 
-        logger.debug("isPrimary", service.getIsPrimary(), "electoral state", electoralService.getState().getLabel());
+        getLogger().debug(request.getServiceName(), request.getCommand(), "isPrimary", service.getIsPrimary(), "electoral state", electoralService.getState().getLabel());
 
         if ( ! service.getIsPrimary() ) {
           throw new UnsupportedOperationException("Cluster command not supported on non-primary instance");
@@ -45,18 +58,16 @@ foam.CLASS({
           throw new RuntimeException("Election in progress");
         }
 
-        logger.debug(request);
-
         DAO dao = (DAO) y.get(request.getServiceName());
         if ( dao == null ) {
-          logger.error("DAO not found");
+          getLogger().error("DAO not found.", request.getServiceName());
           throw new RuntimeException("Cluster requested service not found: "+request.getServiceName());
         }
         dao = dao.inX(y);
 
         foam.core.FObject nu = y.create(foam.lib.json.JSONParser.class).parseString(request.getObj());
         if ( nu == null ) {
-          logger.error("Failed to parse", request.getObj());
+          getLogger().error("Failed to parse", request.getObj());
           throw new RuntimeException("Error parsing request.");
         }
 
@@ -70,7 +81,7 @@ foam.CLASS({
         } else if ( ClusterCommand.REMOVE.equals(request.getCommand()) ) {
           return dao.remove_(y, nu);
         } else {
-          logger.warning("Unsupported operation", request.getCommand());
+          getLogger().warning("Unsupported operation", request.getCommand());
           throw new UnsupportedOperationException(request.getCommand());
         }
       }

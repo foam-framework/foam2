@@ -55,13 +55,13 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-      return submit(x, (FObject) obj, "p");
+      return submit(x, (FObject) obj, MedusaEntry.PUT);
       `
     },
     {
       name: 'remove_',
       javaCode: `
-      return submit(x, (FObject) obj, "r");
+      return submit(x, (FObject) obj, MedusaEntry.REMOVE);
       `
     },
     {
@@ -103,11 +103,19 @@ foam.CLASS({
       entry.setNSpecName(getNSpec().getName());
       entry.setAction(op);
       entry.setData(obj);
-      getLogger().debug("put", "entry", entry.getIndex());
 
-      FObject result = ((MedusaEntry)getMedusaEntryDAO().put_(x, entry)).getData();
-      getLogger().debug("submit", "find", entry.getIndex());
-      return getDelegate().find(result.getProperty("id"));
+      getLogger().debug("submit", entry.getIndex(), entry);
+
+      FObject data = ((MedusaEntry)getMedusaEntryDAO().put_(x, entry)).getData();
+      getLogger().debug("submit", "find", data.getProperty("id"), data);
+      FObject result = getDelegate().find_(x, data.getProperty("id"));
+      if ( result == null ) {
+        getLogger().error("Object not found", data.getProperty("id"), data);
+        return data;
+      } else {
+        getLogger().debug("submit", "found", result);
+      }
+      return result;
       `
     }
   ]

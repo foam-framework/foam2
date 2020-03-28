@@ -22,9 +22,15 @@ foam.CLASS({
 
   properties: [
     {
-      documentation: `nSpec service name at the remote node.`,
+      documentation: `DAO nSpec service name which the remote must route.`,
       name: 'serviceName',
       class: 'String'
+    },
+    {
+      documentation: `cluster nSpec service name at the remote node.`,
+      name: 'clusterServiceName',
+      class: 'String',
+      value: 'cluster'
     },
     {
       name: 'maxRetryAttempts',
@@ -79,9 +85,9 @@ foam.CLASS({
                 ! service.getIsPrimary() ) {
         try {
           if ( electoralService.getState() == ElectoralServiceState.IN_SESSION ) {
-              logger.debug("put", "to primary", service.getPrimaryConfigId(), cmd);
-              FObject result = (FObject) service.getPrimaryDAO(x, getServiceName()).cmd_(x, cmd);
-              logger.debug("put", "from primary", service.getPrimaryConfigId(), result);
+              logger.debug("to primary", service.getPrimaryConfigId(), cmd);
+              FObject result = (FObject) service.getPrimaryDAO(x, getClusterServiceName()).cmd_(x, cmd);
+              logger.debug("from primary", service.getPrimaryConfigId(), result);
               return result;
             } else {
               logger.debug("Election in progress.", electoralService.getState().getLabel());
