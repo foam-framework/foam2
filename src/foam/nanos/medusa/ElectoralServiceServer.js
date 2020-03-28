@@ -350,10 +350,6 @@ foam.CLASS({
       name: 'report',
       javaCode: `
       ClusterConfigService service = (ClusterConfigService) getX().get("clusterConfigService");
-      // ((Logger) getX().get("logger")).debug(this.getClass().getSimpleName(), "report", winner, getState().getLabel(), "service", service.getConfigId(), "before", "primary", service.getPrimaryConfigId(), service.getIsPrimary());
-
-      //if ( winner != service.getPrimaryConfigId() ) {
-
       service.setPrimaryConfigId(winner);
       service.setIsPrimary(service.getConfigId().equals(winner));
 
@@ -366,15 +362,14 @@ foam.CLASS({
           // found the winner, and it is the 'new' primary, may or may not be us.
           ((Logger) getX().get("logger")).debug(this.getClass().getSimpleName(), "report", winner, "new primary", config.getId());
           config.setIsPrimary(true);
-          dao.put_(getX(), config);
+          config = (ClusterConfig) dao.put_(getX(), config);
         } else if ( config.getIsPrimary() ) {
           // no longer primary
           ((Logger) getX().get("logger")).debug(this.getClass().getSimpleName(), "report", winner, "old primary", config.getId());
           config.setIsPrimary(false);
-          dao.put_(getX(), config);
+          config = (ClusterConfig) dao.put_(getX(), config);
         }
       }
-      //} 
       setState(ElectoralServiceState.IN_SESSION);
 
       ((Logger) getX().get("logger")).debug(this.getClass().getSimpleName(), "report", winner, getState().getLabel(), "service", service.getConfigId(), "primary", service.getPrimaryConfigId(), service.getIsPrimary());
