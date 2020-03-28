@@ -102,7 +102,7 @@ foam.CLASS({
             cmd.setFromIndex(index);
             // TODO: configuration
             cmd.setServiceName("medusaEntryDAO");
-            getLogger().info("Requesting replay",cmd);
+            getLogger().info("Requesting replay", cmd);
             DAO nodesDAO = (DAO) getX().get("localMedusaEntryDAO");
             nodesDAO.cmd(cmd);
           }

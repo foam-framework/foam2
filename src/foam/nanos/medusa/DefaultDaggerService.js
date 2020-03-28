@@ -30,7 +30,8 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-  private volatile AtomicLong globalIndex_ = new AtomicLong(1);
+  // TODO/REVIEW - don't think we need AtomicLong - see get/set methods below.
+  private volatile AtomicLong globalIndex_ = new AtomicLong(0);
   private int linksIndex_ = 1;
 
   public static String byte2Hex(byte[] bytes) {
@@ -81,7 +82,7 @@ foam.CLASS({
       javaCode: `
       DAO dao = (DAO) getX().get("internalMedusaEntryDAO");
       MedusaEntry entry = getX().create(MedusaEntry.class);
-      entry.setIndex(globalIndex_.getAndIncrement());
+      entry.setIndex(getNextGlobalIndex(getX()));
       entry.setIndex1(-1L);
       entry.setHash1("466c58623cd600209e95a981bad03e5d899ea6d6905cebee5ea0746bf16e1534");
       entry.setIndex2(-1L);
@@ -93,7 +94,7 @@ foam.CLASS({
       updateLinks(getX(), entry);
 
       entry = getX().create(MedusaEntry.class);
-      entry.setIndex(globalIndex_.getAndIncrement());
+      entry.setIndex(getNextGlobalIndex(getX()));
       entry.setIndex1(-1L);
       entry.setHash1("a651071e965f3c0e07cf9d09761e124a57f27dd75316a4c18079bc0e5accf9d2");
       entry.setIndex2(-1L);
@@ -160,7 +161,7 @@ foam.CLASS({
       javaCode: `
       return new DaggerLinks(
         x,
-        globalIndex_.getAndIncrement(),
+        getNextGlobalIndex(x),
         (DaggerLink)getLinks()[0],
         (DaggerLink)getLinks()[1]
       );
@@ -182,10 +183,60 @@ foam.CLASS({
       javaCode: `
       try {
       linksIndex_ ^= 1;
-      getLogger().debug("updateLinks", linksIndex_, link);
+      getLogger().debug("updateLinks", linksIndex_, link.getIndex(), link.getHash());
       getLinks()[linksIndex_] = link;
       } catch (Throwable t) {
         getLogger().error(t);
+      }
+      `
+    },
+    {
+      name: 'setGlobalIndex',
+      synchronized: true,
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'index',
+          type: 'Long'
+        }
+      ],
+      type: 'Long',
+      javaCode: `
+      if ( index > globalIndex_.get() ) {
+        return globalIndex_.getAndSet(index);
+      }
+      return globalIndex_.get();
+      `
+    },
+    {
+      name: 'getGlobalIndex',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+      ],
+      type: 'Long',
+      javaCode: `
+      return globalIndex_.get();
+      `
+    },
+    {
+      name: 'getNextGlobalIndex',
+      synchronized: true,
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      type: 'Long',
+      javaCode: `
+      synchronized ( globalIndex_ ) {
+        return globalIndex_.incrementAndGet();
       }
       `
     }

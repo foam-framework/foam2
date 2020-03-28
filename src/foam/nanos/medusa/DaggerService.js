@@ -92,5 +92,39 @@ foam.INTERFACE({
         }
       ]
     },
+    {
+      name: 'setGlobalIndex',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'index',
+          type: 'Long'
+        }
+      ],
+      type: 'Long'
+    },
+    {
+      name: 'getGlobalIndex',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+      ],
+      type: 'Long'
+    },
+    {
+      name: 'getNextGlobalIndex',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+      ],
+      type: 'Long'
+    },
   ]
 });

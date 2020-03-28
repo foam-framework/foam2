@@ -29,10 +29,9 @@ foam.CLASS({
       of: 'foam.nanos.logger.Logger',
       visibility: 'HIDDEN',
       javaFactory: `
-        Logger logger = (Logger) getX().get("logger");
         return new PrefixLogger(new Object[] {
           this.getClass().getSimpleName()
-        }, logger);
+        }, (Logger) getX().get("logger"));
       `
     }
   ],
@@ -42,6 +41,7 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
+      getLogger().debug("put_", entry.getIndex());
       MedusaEntry old = (MedusaEntry) getDelegate().find(entry.getId());
       if ( old == null ) {
         ((DAO) x.get("localNodesDAO")).put_(x, entry);

@@ -39,7 +39,7 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
-      getLogger().debug("put_", entry);
+      getLogger().debug("put_", entry.getIndex());
       Count count = (Count) getDelegate().where(
         EQ(MedusaEntry.INDEX, entry.getIndex())
       ).select(COUNT());

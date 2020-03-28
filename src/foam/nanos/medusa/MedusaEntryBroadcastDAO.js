@@ -42,10 +42,9 @@ foam.CLASS({
       name: 'logger',
       visibility: 'HIDDEN',
       javaFactory: `
-        Logger logger = (Logger) getX().get("logger");
         return new PrefixLogger(new Object[] {
           this.getClass().getSimpleName()
-        }, logger);
+        }, (Logger) getX().get("logger"));
       `
     },
   ],
@@ -55,7 +54,7 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       MedusaEntry entry = (MedusaEntry) getDelegate().put_(x, obj);
-      getLogger().debug("put", entry);
+      getLogger().debug("put", entry.getIndex());
 
       // using assembly line, write to all online mediators in zone 0 and same realm,region
       ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
@@ -88,7 +87,7 @@ foam.CLASS({
                         .build();
                 getClients().put(config.getId(), dao);
               }
-              getLogger().debug("put", config.getId());
+              getLogger().debug("put", entry.getIndex(), config.getId());
               dao.put_(x, entry);
             } catch ( Throwable t ) {
               getLogger().error(t);

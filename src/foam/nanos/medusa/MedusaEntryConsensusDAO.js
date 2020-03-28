@@ -72,25 +72,31 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
-      getLogger().debug("put", getIndex(), entry);
+      getLogger().debug("put", getIndex(), entry.getIndex(), entry.getHasConsensus());
+
+      DaggerService service = (DaggerService) x.get("daggerService");
+      if ( entry.getIndex() > service.getGlobalIndex(x) ) {
+        service.setGlobalIndex(x, entry.getIndex());
+        getLogger().debug("put_", "setGlobalIndex", entry.getIndex());
+      }
 
       // REVIEW: multiple nodes will be responding symultanously.
       synchronized ( Long.toString(entry.getIndex()).intern() ) {
 
       if ( entry.getIndex() <= getIndex() ) {
-        getLogger().debug("put", getIndex(), "discarding", entry);
+        getLogger().debug("put", getIndex(), "discarding", entry.getIndex());
         return entry;
       }
 
       entry = (MedusaEntry) getDelegate().put_(x, entry);
 
       MedusaEntry ce = getConsensusEntry(x, entry);
-      getLogger().debug("put", "index", getIndex(), "ce", entry);
+      getLogger().debug("put", "index", getIndex(), "ce", entry.getIndex(), entry.getHasConsensus());
       if ( ce != null &&
            ce.getIndex() == getIndex() + 1 )  {
-        DaggerService service = (DaggerService) x.get("daggerService");
+        // DaggerService service = (DaggerService) x.get("daggerService");
         service.verify(x, ce);
-        getLogger().debug("put", getIndex(), "promoting", ce.getIndex(), ce);
+        getLogger().debug("put", getIndex(), "promoting", ce.getIndex(), ce.getIndex(), ce.getHasConsensus());
         setIndex(localIndex_.getAndIncrement());
         service.updateLinks(x, ce);
         return ce;

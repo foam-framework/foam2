@@ -9,6 +9,7 @@ foam.CLASS({
   name: 'MedusaEntry',
 
   implements: [
+    'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.LastModifiedAware',
     'foam.nanos.auth.LastModifiedByAware',
     'foam.nanos.medusa.DaggerLink'
@@ -110,6 +111,12 @@ foam.CLASS({
       includeInDigest: false,
     },
     {
+      name: 'created',
+      class: 'DateTime',
+      visibility: 'RO',
+      includeInDigest: false,
+    },
+    {
       documentation: 'Not necessary but added so date is in object and not added as meta data. Also, a non-null value is required.',
       name: 'lastModifiedBy',
       class: 'Reference',
@@ -120,8 +127,8 @@ foam.CLASS({
     },
     {
       name: 'lastModified',
-      label: 'Created',
-      class: 'Date',
+      label: 'Stored',
+      class: 'DateTime',
       visibility: 'RO',
       includeInDigest: false,
     }

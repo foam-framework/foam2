@@ -47,10 +47,10 @@ foam.CLASS({
       javaCode: `
       MedusaEntry entry = (MedusaEntry) getDelegate().put_(x, obj);
       if ( ! entry.getHasConsensus() ) {
-        getLogger().debug("put", "consensus", false);
+        getLogger().debug("put", entry.getIndex(), "consensus", false);
         return entry;
       }
-      getLogger().debug("put", "consensus", true);
+      getLogger().debug("put", entry.getIndex(), "consensus", true);
 
       try {
       DAO mdao = getMdao(x, entry);
@@ -93,6 +93,7 @@ foam.CLASS({
       while ( dao != null ) {
         if ( dao instanceof MDAO ) {
           getMdaos().put(name, dao);
+          getLogger().debug("mdao", name, dao.getOf());
           return dao;
         }
         if ( dao instanceof ProxyDAO ) {

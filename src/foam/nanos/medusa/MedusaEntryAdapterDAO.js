@@ -103,10 +103,10 @@ foam.CLASS({
       entry.setNSpecName(getNSpec().getName());
       entry.setAction(op);
       entry.setData(obj);
-      getLogger().debug("put", "entry", entry);
+      getLogger().debug("put", "entry", entry.getIndex());
 
       FObject result = ((MedusaEntry)getMedusaEntryDAO().put_(x, entry)).getData();
-      getLogger().debug("submit", "find", entry.getId());
+      getLogger().debug("submit", "find", entry.getIndex());
       return getDelegate().find(result.getProperty("id"));
       `
     }

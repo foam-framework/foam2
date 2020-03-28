@@ -73,7 +73,6 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      getLogger().debug("put_", obj);
       return (FObject) submit(x, obj, "put");
       `
     },
@@ -90,7 +89,6 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      getLogger().debug("cmd_", obj);
       return submit(x, obj, "cmd");
       `
     },
@@ -171,7 +169,6 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      getLogger().debug("put", obj);
       submit(getX(), obj, "put");
       `
     },

@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'MedusaEntryIdDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  documentation: `Explicitly set ID, so all copies from nodes are unique.  The original entry was distributed, and when broadcast back from the Nodes set ID so all copies are unique and can be tallied for consensus.`,
+  documentation: `Explicitly set ID, so all node copies are unique.  The Mediator will retain all copies until consensus.`,
 
   javaImports: [
     'foam.nanos.logger.PrefixLogger',
@@ -38,8 +38,7 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
-      getLogger().debug("put", "in", entry);
-      getLogger().debug("put", new Exception("stacktrace"));
+      getLogger().debug("put", "in", entry.getIndex());
       if ( entry.isFrozen() ) {
         entry = (MedusaEntry) entry.fclone();
       }
@@ -50,7 +49,7 @@ foam.CLASS({
       ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
       entry.setNode(service.getConfigId());
 
-      getLogger().debug("put", "out", entry);
+      getLogger().debug("put", "out", entry.getIndex());
       return (MedusaEntry) getDelegate().put_(x, entry);
       `
     }

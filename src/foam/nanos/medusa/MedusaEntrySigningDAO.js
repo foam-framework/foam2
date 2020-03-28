@@ -35,11 +35,10 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
-      getLogger().debug("put", entry);
+      getLogger().debug("put", entry.getIndex());
       DaggerService service = (DaggerService) x.get("daggerService");
       try {
         entry.setSignature(service.sign(x, entry));
-        getLogger().debug("put", entry);
         return getDelegate().put_(x, entry);
       } catch ( Exception e ) {
         getLogger().error(e);
