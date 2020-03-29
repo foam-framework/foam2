@@ -150,7 +150,7 @@ foam.CLASS({
       try {
         // TODO: protocol - http will do for now as we are behind the load balancers.
         String address = config.getId();
-        DAO hostDAO = (DAO) x.get("hosts");
+        DAO hostDAO = (DAO) x.get("hostDAO");
         Host host = (Host) hostDAO.find(config.getId());
         if ( host != null ) {
           address = host.getAddress();
