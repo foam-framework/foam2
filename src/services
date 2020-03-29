@@ -672,11 +672,11 @@ p({
   "serve":true,
   "serviceScript":"""
     return new foam.dao.EasyDAO.Builder(x)
-      .setPm(true)
-      .setGuid(true)
       .setOf(foam.nanos.dig.SUGAR.getOwnClassInfo())
+      .setGuid(true)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName(\"sugars\")
+      .setJournalName("sugars")
+      .setPm(true)
       .build();
   """,
   "client":"{\"of\":\"foam.nanos.dig.SUGAR\"}"
@@ -688,12 +688,13 @@ p({
   "serve": true,
   "serviceScript": """
     dao = new foam.dao.EasyDAO.Builder(x)
-      .setPm(true)
-      .setGuid(true)
       .setOf(foam.nanos.ruler.Rule.getOwnClassInfo())
+      .setGuid(true)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("rules")
       .setRuler(false)
+      .setCluster(false)
+      .setPm(true)
       .build();
 
     dao = new foam.dao.ValidatingDAO(x, dao);
@@ -713,12 +714,13 @@ p({
   "serve": true,
   "serviceScript": """
     ed = new foam.dao.EasyDAO.Builder(x)
-      .setPm(true)
-      .setGuid(true)
       .setOf(foam.nanos.ruler.RuleGroup.getOwnClassInfo())
+      .setGuid(true)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("ruleGroups")
       .setRuler(false)
+      .setCluster(false)
+      .setPm(true)
       .build();
     return new foam.dao.ValidatingDAO(x, ed);
   """,
@@ -734,12 +736,13 @@ p({
   "serve":true,
   "serviceScript":"""
     return new foam.dao.EasyDAO.Builder(x)
-      .setPm(true)
-      .setSeqNo(true)
       .setOf(foam.nanos.ruler.RuleHistory.getOwnClassInfo())
+      .setSeqNo(true)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("ruleHistory")
+      .setRuler(false)
       .setCluster(false)
+      .setPm(true)
       .build();
     """,
     "client":"{\"of\":\"foam.nanos.ruler.RuleHistory\"}"
