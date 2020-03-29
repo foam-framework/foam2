@@ -28,6 +28,7 @@ foam.CLASS({
     'foam.mlang.predicate.Predicate',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
+    'foam.net.Host',
     'foam.util.SafetyUtil',
     'java.net.HttpURLConnection',
     'java.net.URL',
@@ -148,11 +149,18 @@ foam.CLASS({
       javaCode: `
       try {
         // TODO: protocol - http will do for now as we are behind the load balancers.
+        String address = config.getId();
+        DAO hostDAO = (DAO) x.get("hosts");
+        Host host = (Host) hostDAO.find(config.getId());
+        if ( host != null ) {
+          address = host.getAddress();
+        }
+
         String path = getPath();
         if ( ! SafetyUtil.isEmpty(path) ) {
           path = "/" + path;
         }
-        java.net.URI uri = new java.net.URI("http", null, config.getId(), config.getPort(), path+"/"+serviceName, null, null);
+        java.net.URI uri = new java.net.URI("http", null, address, config.getPort(), path+"/"+serviceName, null, null);
         //getLogger.debug("buildURL", serviceName, uri.toURL().toString());
         return uri.toURL().toString();
       } catch (java.net.MalformedURLException | java.net.URISyntaxException e) {
