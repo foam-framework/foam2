@@ -1,5 +1,5 @@
 p({
-  "class":"foam.net.Hosts",
+  "class":"foam.net.Host",
   "name":"hostDAO",
   "serve":true,
   "serviceScript":`
@@ -11,6 +11,6 @@ p({
       .setCluster(false)
       .setPm(true)
       .build();
-    """,
+    `,
     "client":"{\"of\":\"foam.net.Host\"}"
 })
