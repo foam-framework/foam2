@@ -10,7 +10,9 @@ import foam.box.HTTPBox;
 import foam.box.Message;
 import foam.box.MessageReplyBox;
 import foam.core.*;
+import foam.dao.DAO;
 import foam.nanos.logger.Logger;
+import foam.net.Host;
 import java.io.PrintWriter;
 import java.io.IOException;
 
@@ -38,8 +40,14 @@ public class PingService
     throws IOException {
     Logger logger = (Logger) x.get("logger");
 
+    String address = hostname;
+    Host host = (Host) ((DAO) x.get("hostDAO")).find(hostname);
+    if ( host != null ) {
+      address = host.getAddress();
+    }
+
     // TODO: control http/https
-    String urlString = "http://" + hostname + ":" + port + "/service" + "/ping";
+    String urlString = "http://" + address + ":" + port + "/service" + "/ping";
     //    logger.debug(this.getClass().getSimpleName(), urlString);
 
     Box box = new HTTPBox.Builder(x)

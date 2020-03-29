@@ -1,5 +1,5 @@
 p({
-  "class":"foam.net.Host",
+  "class":"foam.nanos.boot.NSpec",
   "name":"hostDAO",
   "serve":true,
   "serviceScript":`

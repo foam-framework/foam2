@@ -161,11 +161,11 @@ foam.CLASS({
           path = "/" + path;
         }
         java.net.URI uri = new java.net.URI("http", null, address, config.getPort(), path+"/"+serviceName, null, null);
-        //getLogger.debug("buildURL", serviceName, uri.toURL().toString());
+        // getLogger.debug("buildURL", serviceName, uri.toURL().toString());
         return uri.toURL().toString();
       } catch (java.net.MalformedURLException | java.net.URISyntaxException e) {
         getLogger().error(e);
-        return ""; // TODO:
+        throw new RuntimeException(e);
       }
       `
     },

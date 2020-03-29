@@ -20,6 +20,7 @@ foam.CLASS({
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'static foam.mlang.MLang.*',
+    'foam.net.Host',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'foam.util.SafetyUtil',
@@ -59,8 +60,21 @@ foam.CLASS({
       name: 'winner',
       class: 'String',
       value: ""
-    }
-  ],
+    },
+    {
+      name: 'logger',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.logger.Logger',
+      visibility: 'HIDDEN',
+      transient: true,
+      javaFactory: `
+        return new PrefixLogger(new Object[] {
+          this.getClass().getSimpleName()
+        }, (Logger) getX().get("logger"));
+
+      `
+    },
+ ],
 
   methods: [
     {
@@ -91,10 +105,10 @@ foam.CLASS({
       ],
       javaCode: `
       if ( result >= 0 ) {
-        ((Logger) getX().get("logger")).debug(this.getClass().getSimpleName(), "recordResult", config.getName(), result);
+        getLogger().debug("recordResult", config.getName(), result);
         setVotes(getVotes() + 1);
         if ( result > getCurrentSeq() ) {
-          ((Logger) getX().get("logger")).debug(this.getClass().getSimpleName(), "recordResult", config.getName(), result, "winner");
+          getLogger().debug("recordResult", config.getName(), result, "winner");
           setCurrentSeq(result);
           setWinner(config.getId());
         }
@@ -113,12 +127,18 @@ foam.CLASS({
       javaCode: `
       try {
         // TODO: protocol - http will do for now as we are behind the load balancers.
-        java.net.URI uri = new java.net.URI("http", null, config.getId(), config.getPort(), "/service/electoralService", null, null);
-        ((Logger) getX().get("logger")).debug("buildURL", config.getName(), uri.toURL().toString());
+        String address = config.getId();
+        DAO hostDAO = (DAO) getX().get("hostDAO");
+        Host host = (Host) hostDAO.find(config.getId());
+        if ( host != null ) {
+          address = host.getAddress();
+        }
+        java.net.URI uri = new java.net.URI("http", null, address, config.getPort(), "/service/electoralService", null, null);
+        // getLogger().debug("buildURL", config.getName(), uri.toURL().toString());
         return uri.toURL().toString();
       } catch (java.net.MalformedURLException | java.net.URISyntaxException e) {
-        ((Logger) getX().get("logger")).error(e);
-        return ""; // TODO: 
+        getLogger().error(e);
+        throw new RuntimeException(e);
       }
       `
     },
@@ -156,15 +176,11 @@ foam.CLASS({
       javaCode: `
       ClusterConfigService service = (ClusterConfigService) getX().get("clusterConfigService");
       ClusterConfig config = service.getConfig(getX(), service.getConfigId());
-      Logger logger = new PrefixLogger(new Object[] {
-        this.getClass().getSimpleName(),
-        "dissolve"
-      }, (Logger) getX().get("logger"));
-      logger.debug(getState().getLabel());
+      getLogger().debug("dissolve", getState().getLabel());
 
       if ( getState() == ElectoralServiceState.ELECTION &&
           getElectionTime() > 0L ) {
-        logger.debug("Election in progress since", getElectionTime());
+        getLogger().debug("dissolve", "Election in progress since", getElectionTime());
         return;
       }
 
@@ -187,7 +203,7 @@ foam.CLASS({
       try {
         if ( voters.size() <= 1 ) {
           // nothing to do.
-          logger.warning("election, but no members", voters.size());
+          getLogger().warning("dissolve", "election, but no members", voters.size());
           return;
         }
 
@@ -231,9 +247,9 @@ foam.CLASS({
              .build();
           
           voteCallables.add(() -> {
-            logger.debug("call", "vote", clientConfig.getId());
+            getLogger().debug("dissove","call", "vote", clientConfig.getId());
             long result = electoralService.vote(clientConfig.getId(), getElectionTime());
-            logger.debug("call", "vote", clientConfig.getId(), "response", result);
+            getLogger().debug("dissolve", "call", "vote", clientConfig.getId(), "response", result);
             recordResult(result, clientConfig);
             return result;
           });
@@ -250,11 +266,11 @@ foam.CLASS({
                 long vote = voteResult.get(5, TimeUnit.SECONDS);
               }
             } catch(Exception e) {
-              logger.error(e);
+              getLogger().error(e);
             }
           }
         } catch ( Exception e) {
-          logger.error(e);
+          getLogger().error(e);
         }
         try {
             if (getState().equals(ElectoralServiceState.ELECTION) &&
@@ -278,7 +294,7 @@ foam.CLASS({
                    .build();
 
                 reportCallables.add(() -> {
-                  logger.debug("call", "report", getWinner());
+                  getLogger().debug("dissolve", "call", "report", getWinner());
                   electoralService2.report(getWinner());
                   return null;
                 });
@@ -290,36 +306,36 @@ foam.CLASS({
                   try {
                     reportResult.get(5, TimeUnit.SECONDS);
                   } catch(Exception e) {
-                    logger.error(e);
+                    getLogger().error(e);
                   }
                 }
               } catch ( Exception e) {
-                logger.error(e);
+                getLogger().error(e);
               }
 
               // call last as this will change the electoral state.
               report(getWinner());
             } else {
-              logger.debug("no quorum", "votes", getVotes(), "voters", voters.size(), getState().getLabel());
+              getLogger().debug("dissolve", "no quorum", "votes", getVotes(), "voters", voters.size(), getState().getLabel());
             }
         } catch ( Exception e) {
-          logger.error(e);
+          getLogger().error(e);
         }
 
         pool.shutdown();
         pool.awaitTermination(5, TimeUnit.SECONDS);
       } catch (InterruptedException e) {
-        logger.error(e);
+        getLogger().error(e);
       } finally {
         if ( pool != null ) {
           pool.shutdownNow();
         }
-        logger.debug("finally", "votes", getVotes(), "voters", voters.size(), getState().getLabel());
+        getLogger().debug("dissolve", "finally", "votes", getVotes(), "voters", voters.size(), getState().getLabel());
       }
         try {
           Thread.sleep(2000);
         } catch ( InterruptedException e ) {
-          logger.error(e);
+          getLogger().error(e);
           break;
         }
       }
@@ -329,7 +345,7 @@ foam.CLASS({
     {
       name: 'vote',
       javaCode: `
-      ((Logger) getX().get("logger")).debug(this.getClass().getSimpleName(), "vote", id, time);
+      getLogger().debug("vote", id, time);
       if ( findConfig(getX()).getEnabled() ) {
         if ( getState().equals(ElectoralServiceState.ELECTION) &&
             time < getElectionTime() ) {
@@ -339,7 +355,7 @@ foam.CLASS({
         }
         // return our vote
         long v = ThreadLocalRandom.current().nextInt(255);
-        ((Logger) getX().get("logger")).debug(this.getClass().getSimpleName(), "vote", id, time, "response", v);
+        getLogger().debug("vote", id, time, "response", v);
         return v;
 //        return ThreadLocalRandom.current().nextInt(255);
       }
@@ -360,19 +376,19 @@ foam.CLASS({
         if ( winner.equals(config.getId()) &&
              ! config.getIsPrimary() ) {
           // found the winner, and it is the 'new' primary, may or may not be us.
-          ((Logger) getX().get("logger")).debug(this.getClass().getSimpleName(), "report", winner, "new primary", config.getId());
+          getLogger().debug("report", winner, "new primary", config.getId());
           config.setIsPrimary(true);
           config = (ClusterConfig) dao.put_(getX(), config);
         } else if ( config.getIsPrimary() ) {
           // no longer primary
-          ((Logger) getX().get("logger")).debug(this.getClass().getSimpleName(), "report", winner, "old primary", config.getId(), config.getName());
+          getLogger().debug("report", winner, "old primary", config.getId(), config.getName());
           config.setIsPrimary(false);
           config = (ClusterConfig) dao.put_(getX(), config);
         }
       }
       setState(ElectoralServiceState.IN_SESSION);
 
-      ((Logger) getX().get("logger")).debug(this.getClass().getSimpleName(), "report", winner, getState().getLabel(), "service", service.getConfigId(), "primary", service.getPrimaryConfigId(), service.getIsPrimary());
+      getLogger().debug("report", winner, getState().getLabel(), "service", service.getConfigId(), "primary", service.getPrimaryConfigId(), service.getIsPrimary());
      `
     }
   ]
