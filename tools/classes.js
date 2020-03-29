@@ -73,6 +73,7 @@ var classes = [
   'foam.mlang.predicate.OlderThan',
   'foam.mlang.predicate.isAuthorizedToRead',
   'foam.mlang.predicate.isAuthorizedToDelete',
+  'foam.net.Host',
   'foam.box.Box',
   'foam.box.Skeleton',
   'foam.box.AbstractSkeleton',

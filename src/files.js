@@ -301,6 +301,7 @@ FOAM_FILES([
   { name: "foam/blob/Blob" },
   { name: "lib/node/json_dao", flags: ['node'] },
   { name: "lib/utf8" },
+  { name: "foam/net/Host" },
   { name: "foam/net/NotConnectedException" },
   { name: "foam/net/ConnectionFailedException" },
   { name: "foam/net/web/WebSocket" },

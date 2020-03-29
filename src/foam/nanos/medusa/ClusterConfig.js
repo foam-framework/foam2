@@ -39,7 +39,7 @@ foam.CLASS({
   
   properties: [
     {
-      documentation: 'Local network IP or DNS name',
+      documentation: 'Local network IP or DNS name, or id to look up in HostDAO',
       name: 'id',
       class: 'String',
       label: 'Hostname',
