@@ -106,6 +106,7 @@ foam.CLASS({
 
       getLogger().debug("submit", entry.getIndex(), entry);
 
+      try {
       FObject data = ((MedusaEntry)getMedusaEntryDAO().put_(x, entry)).getData();
       getLogger().debug("submit", "find", data.getProperty("id"), data);
       FObject result = getDelegate().find_(x, data.getProperty("id"));
@@ -116,6 +117,10 @@ foam.CLASS({
         getLogger().debug("submit", "found", result);
       }
       return result;
+      } catch (Throwable t) {
+        getLogger().error("put_", t.getMessage(), entry, t);
+        throw t;
+      }
       `
     }
   ]

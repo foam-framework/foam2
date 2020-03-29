@@ -42,7 +42,7 @@ foam.CLASS({
         entry.setHash(service.hash(x, entry));
         return getDelegate().put_(x, entry);
       } catch ( Exception e ) {
-        getLogger().error(e);
+        getLogger().error("put_", e.getMessage(), entry, e);
         // TODO: Alarm
         // REVIEW: Who will catch this.
         throw new RuntimeException(e);
