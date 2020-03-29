@@ -91,10 +91,10 @@ foam.CLASS({
       ],
       javaCode: `
       if ( result >= 0 ) {
-        ((Logger) getX().get("logger")).debug(this.getClass().getSimpleName(), "recordResult", config.getId(), result);
+        ((Logger) getX().get("logger")).debug(this.getClass().getSimpleName(), "recordResult", config.getName(), result);
         setVotes(getVotes() + 1);
         if ( result > getCurrentSeq() ) {
-          ((Logger) getX().get("logger")).debug(this.getClass().getSimpleName(), "recordResult", config.getId(), result, "winner");
+          ((Logger) getX().get("logger")).debug(this.getClass().getSimpleName(), "recordResult", config.getName(), result, "winner");
           setCurrentSeq(result);
           setWinner(config.getId());
         }
@@ -114,7 +114,7 @@ foam.CLASS({
       try {
         // TODO: protocol - http will do for now as we are behind the load balancers.
         java.net.URI uri = new java.net.URI("http", null, config.getId(), config.getPort(), "/service/electoralService", null, null);
-        ((Logger) getX().get("logger")).debug("buildURL", config.getId(), uri.toURL().toString());
+        ((Logger) getX().get("logger")).debug("buildURL", config.getName(), uri.toURL().toString());
         return uri.toURL().toString();
       } catch (java.net.MalformedURLException | java.net.URISyntaxException e) {
         ((Logger) getX().get("logger")).error(e);
@@ -365,7 +365,7 @@ foam.CLASS({
           config = (ClusterConfig) dao.put_(getX(), config);
         } else if ( config.getIsPrimary() ) {
           // no longer primary
-          ((Logger) getX().get("logger")).debug(this.getClass().getSimpleName(), "report", winner, "old primary", config.getId());
+          ((Logger) getX().get("logger")).debug(this.getClass().getSimpleName(), "report", winner, "old primary", config.getId(), config.getName());
           config.setIsPrimary(false);
           config = (ClusterConfig) dao.put_(getX(), config);
         }

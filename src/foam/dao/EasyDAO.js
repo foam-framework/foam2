@@ -368,14 +368,12 @@ foam.CLASS({
     {
       class: 'Boolean',
       documentation: 'Creates pipelinePMDAOs around each decorator to measure their performance',
-      name: 'pipelinePm',
-      value: false
+      name: 'pipelinePm'
     },
     {
       documentation: 'Have EasyDAO use a sequence number to index items. Note that .seqNo and .guid features are mutuallyexclusive.',
       class: 'Boolean',
-      name: 'seqNo',
-      value: false
+      name: 'seqNo'
     },
     {
       class: 'Long',
@@ -386,8 +384,7 @@ foam.CLASS({
       documentation: 'Have EasyDAO generate guids to index items. Note that .seqNo and .guid features are mutually exclusive',
       class: 'Boolean',
       name: 'guid',
-      label: 'GUID',
-      value: false
+      label: 'GUID'
     },
     {
       class: 'String',
@@ -404,7 +401,6 @@ foam.CLASS({
       documentation: 'Enable local in-memory caching of the DAO',
       class: 'Boolean',
       name: 'cache',
-      value: false,
       generateJava: false
     },
     {
@@ -451,25 +447,21 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'readOnly',
-      value: false
+      name: 'readOnly'
     },
     {
       class: 'Boolean',
-      name: 'writeOnly',
-      value: false
+      name: 'writeOnly'
     },
     {
       documentation: 'Sets the inner dao to a nullDAO',
       class: 'Boolean',
-      name: 'nullify',
-      value: false
+      name: 'nullify'
     },
     {
       documentation: 'Wrap in PermissionedPropertiesDAO',
       class: 'Boolean',
-      name: 'permissioned',
-      value: true
+      name: 'permissioned'
     },
     {
       documentation: 'Add a validatingDAO decorator',
@@ -486,8 +478,7 @@ foam.CLASS({
       documentation: 'Enable value de-duplication to save memory when caching',
       class: 'Boolean',
       name: 'dedup',
-      generateJava: false,
-      value: false,
+      generateJava: false
     },
     {
       documentation: 'Keep a history of all state changes to the DAO',
@@ -509,25 +500,21 @@ foam.CLASS({
     {
       documentation: 'Enable logging on the DAO',
       class: 'Boolean',
-      name: 'logging',
-      value: false,
+      name: 'logging'
     },
     {
       documentation: 'Enable time tracking for concurrent DAO operations',
       class: 'Boolean',
-      name: 'timing',
-      value: false
+      name: 'timing'
     },
     {
       class: 'Boolean',
-      name: 'pm',
-      value: false
+      name: 'pm'
     },
     {
       documentation: 'Contextualize objects on .find, re-creating them with this EasyDAO\'s exports, as if they were children of this EasyDAO.',
       class: 'Boolean',
-      name: 'contextualize',
-      value: false
+      name: 'contextualize'
     },
     {
       class: 'Boolean',
@@ -564,22 +551,19 @@ foam.CLASS({
       class: 'Boolean',
       generateJava: false,
       name: 'autoIndex',
-      documentation: 'not currently supported',
-      value: false
+      documentation: 'not currently supported'
     },
     {
       documentation: 'Turn on to activate synchronization with a server. Specify serverUri and syncProperty as well',
       class: 'Boolean',
       name: 'syncWithServer',
-      generateJava: false,
-      value: false
+      generateJava: false
     },
     {
       documentation: 'Turn on to enable remote listener support. Only useful with daoType = CLIENT',
       class: 'Boolean',
       generateJava: false,
-      name: 'remoteListenerSupport',
-      value: false
+      name: 'remoteListenerSupport'
     },
     {
       documentation: 'Setting to true activates polling, periodically checking in with the server. If sockets are used, polling is optional as the server can push changes to this client',
@@ -592,8 +576,7 @@ foam.CLASS({
       documentation: 'Set to true if you are running this on a server, and clients will synchronize with this DAO',
       class: 'Boolean',
       generateJava: false,
-      name: 'isServer',
-      value: false
+      name: 'isServer'
     },
     {
       documentation: 'The property to synchronize on. This is typically an integer value indicating the version last seen on the remote',

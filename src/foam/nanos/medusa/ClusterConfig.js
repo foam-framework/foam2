@@ -39,11 +39,16 @@ foam.CLASS({
   
   properties: [
     {
-      documentation: 'Node local network or DNS name',
+      documentation: 'Local network IP or DNS name',
       name: 'id',
       class: 'String',
       label: 'Hostname',
-      aliases: ['hostname', 'name'],
+      required: true
+    },
+    {
+      documentation: 'External DNS name, or name instance is known by. Used in log messages.',
+      name: 'name',
+      class: 'String',
       required: true
     },
     {

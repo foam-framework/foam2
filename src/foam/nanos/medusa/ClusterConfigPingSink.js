@@ -68,6 +68,7 @@ foam.CLASS({
         }
       ],
       javaCode: `
+      DaggerService dagger = (DaggerService) getX().get("daggerService");
       ClusterConfigService service = (ClusterConfigService) getX().get("clusterConfigService");
       ClusterConfig myConfig = service.getConfig(getX(), service.getConfigId());
       ClusterConfig config = (ClusterConfig) ((ClusterConfig) obj).fclone();
@@ -79,7 +80,7 @@ foam.CLASS({
         config.setPingLatency(latency);
         if ( config.getStatus() != Status.ONLINE) {
           config.setStatus(Status.ONLINE);
-          getLogger().info(config.getId(), config.getType().getLabel(), config.getStatus().getLabel());
+          getLogger().info(config.getName(), config.getType().getLabel(), config.getStatus().getLabel());
 
           // If a Node comming online, begin replay from it.
           if ( myConfig.getType() == MedusaType.MEDIATOR &&
@@ -96,6 +97,15 @@ foam.CLASS({
               index = (Long) max.getValue();
             }
 
+            DAO nodesDAO = (DAO) getX().get("localMedusaEntryDAO");
+            // get Node details
+            // ReplayDetailsCmd details = new ReplayDetailsCmd();
+            // details = nodesDAO.cmd(cmd);
+            // if ( details.getMaxIndex() > 0 ) {
+            //   dagger.setReplayIndex(getX(), details.getMaxIndex());
+            //
+            // }
+            // if ( details.getMaxIndex() > dagger.getGlobalIndex(getX())) {
             ReplayCmd cmd = new ReplayCmd();
             cmd.setRequester(myConfig.getId());
             cmd.setResponder(config.getId());
@@ -103,14 +113,14 @@ foam.CLASS({
             // TODO: configuration
             cmd.setServiceName("medusaEntryDAO");
             getLogger().info("Requesting replay", cmd);
-            DAO nodesDAO = (DAO) getX().get("localMedusaEntryDAO");
             nodesDAO.cmd(cmd);
+            // }
           }
         }
         ClusterConfig.PING_INFO.clear(config);
         if ( latency > config.getMaxPingLatency() ) {
           // TODO: Alarm
-          getLogger().warning(config.getId(), config.getType().getLabel(), config.getStatus().getLabel(), "exceeded max ping latency", latency, " > ", config.getMaxPingLatency());
+          getLogger().warning(config.getName(), config.getType().getLabel(), config.getStatus().getLabel(), "exceeded max ping latency", latency, " > ", config.getMaxPingLatency());
         }
       } catch (NullPointerException t) {
         getLogger().error(t);
@@ -118,7 +128,7 @@ foam.CLASS({
         if ( config.getStatus() != Status.OFFLINE ) {
           config.setPingInfo(t.getMessage());
           config.setStatus(Status.OFFLINE);
-          getLogger().warning(config.getId(), config.getType().getLabel(), config.getStatus().getLabel(), t.getMessage());
+          getLogger().warning(config.getName(), config.getType().getLabel(), config.getStatus().getLabel(), t.getMessage());
         // TODO: Alarm.
         }
       }

@@ -115,6 +115,7 @@ public class Boot {
       Script script    = (Script) scriptDAO.find(startScript);
       if ( script != null ) {
         logger.info("Boot, Script", startScript);
+        script = (Script) script.fclone();
         script.runScript(root_);
       } else {
         logger.warning("Boot, Script not found", startScript);

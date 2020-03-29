@@ -59,6 +59,10 @@ foam.CLASS({
       javaFactory: 'return new foam.nanos.medusa.DaggerLink[2];'
     },
     {
+      name: 'replayIndex',
+      class: 'Long'
+    },
+    {
       name: 'hashingAlgorithm',
       class: 'String',
       value: 'SHA-256'

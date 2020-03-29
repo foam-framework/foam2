@@ -87,7 +87,7 @@ foam.CLASS({
                         .build();
                 getClients().put(config.getId(), dao);
               }
-              getLogger().debug("put", entry.getIndex(), config.getId());
+              getLogger().debug("put", entry.getIndex(), config.getName());
               dao.put_(x, entry);
             } catch ( Throwable t ) {
               getLogger().error(t);

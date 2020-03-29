@@ -13,6 +13,10 @@ foam.CLASS({
       documentation: 'Instance supplying replay details',
       name: 'responder',
       class: 'String',
+    },
+    {
+      name: 'maxIndex',
+      class: 'Long'
     }
   ]
 });

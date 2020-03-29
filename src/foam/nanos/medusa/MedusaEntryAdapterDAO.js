@@ -87,7 +87,7 @@ foam.CLASS({
       getLogger().debug("submit", "state", electoralService.getState().getLabel());
       if ( electoralService.getState() != ElectoralServiceState.IN_SESSION ||
            ! service.getIsPrimary()) {
-        getLogger().warning("Reject put(). primary:", service.getIsPrimary(), ", state:", electoralService.getState().getLabel());
+        getLogger().warning("Reject put(). primary:", service.getIsPrimary(), ", state:", electoralService.getState().getLabel(), obj);
         throw new RuntimeException("Reject put() on non-primary or during election. (primary: " + service.getIsPrimary() + ", state: " + electoralService.getState().getLabel());
       }
 

@@ -112,7 +112,7 @@ foam.INTERFACE({
         {
           name: 'x',
           type: 'Context'
-        },
+        }
       ],
       type: 'Long'
     },
@@ -122,9 +122,22 @@ foam.INTERFACE({
         {
           name: 'x',
           type: 'Context'
-        },
+        }
       ],
       type: 'Long'
     },
+    {
+      name: 'getReplayIndex',
+      type: 'Long'
+    },
+    {
+      name: 'setReplayIndex',
+      args: [
+        {
+          name: 'index',
+          type: 'Long'
+        }
+      ]
+    }
   ]
 });
