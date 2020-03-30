@@ -28,11 +28,13 @@ foam.CLASS({
         for ( var i = 0 ; i < props.length ; i++ ) {
           if ( props[i].networkTransient )
             continue;
+          if ( props[i].cls_.id === "foam.core.Action" )
+            continue;
           var cellType = 'STRING';
           var pattern = '';
           if ( props[i].cls_.id === "foam.core.UnitValue" ) {
             cellType = 'CURRENCY';
-            pattern = '\"$\"#0.0#\" CAD\"';
+            pattern = '\"$\"#0.00\" CAD\"';
           } else if ( props[i].cls_.id === 'foam.core.Date' ) {
             cellType = 'DATE';
             pattern = 'yyyy-mm-dd';
@@ -71,7 +73,7 @@ foam.CLASS({
     {
       name: 'outputObjectForProperties',
       type: 'StringArray',
-      code: function(obj, columnMethadata) {
+      code: async function(obj, columnMethadata) {
         var propValues = [];
         for (var i = 0 ; i < columnMethadata.length ; i++ ) {
           if ( obj[columnMethadata[i].columnName] ) {
@@ -89,8 +91,13 @@ foam.CLASS({
               propValues.push(obj[columnMethadata[i].columnName].toString().substring(0, 8));
               columnMethadata[i].perValuePatternSpecificValues.push(obj[columnMethadata[i].columnName].toString().substring(8));
             }
-            else
-              propValues.push(obj[columnMethadata[i].columnName].toString());
+            else if ( obj[columnMethadata[i].columnName].toSummary ) {
+              if ( obj[columnMethadata[i].columnName].toSummary() instanceof Promise )
+                propValues.push(await obj[columnMethadata[i].columnName].toSummary());
+              else
+                propValues.push(obj[columnMethadata[i].columnName].toSummary());
+            } else
+              propValues.push(obj[columnMethadata[i].columnName].toString());            
           }
           else
             propValues.push('');
@@ -101,10 +108,10 @@ foam.CLASS({
     {
       name: 'outputArray',
       type: 'Array',
-      code: function(arr, props) {
+      code: async function(arr, props) {
         var valuesArray = [];
         for ( var i = 0 ; i < arr.length ; i++ ) {
-          valuesArray.push(this.outputObjectForProperties(arr[i], props));
+          valuesArray.push(await this.outputObjectForProperties(arr[i], props));
         }
         return valuesArray;
       }

@@ -146,7 +146,7 @@ public class GoogleSheetsExportService extends foam.core.AbstractFObject impleme
                 continue;
               requests.add(new Request().setRepeatCell(
                 new RepeatCellRequest()
-                  .setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(metadata[i].getCellType()).setPattern("\"$\"#0.0#\"" + metadata[i].getPerValuePatternSpecificValues()[j] + "\""))))
+                  .setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(metadata[i].getCellType()).setPattern("\"$\"#0.00\" " + metadata[i].getPerValuePatternSpecificValues()[j] + "\""))))
                   .setRange(new GridRange().setStartColumnIndex(i).setEndColumnIndex(i+1).setStartRowIndex(j+1).setEndRowIndex(j+2))
                   .setFields(NUMBER_FORMAT)
               ));

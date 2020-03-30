@@ -18,7 +18,7 @@
   ],
 
   imports: [
-    'userDAO'
+    'userDAO?'
   ],
 
   javaImports: [
@@ -137,6 +137,9 @@
     {
       class: 'foam.mlang.predicate.PredicateProperty',
       name: 'predicate',
+      factory: function () {
+        return foam.mlang.predicate.True.create();
+      },
       javaFactory: `
       return foam.mlang.MLang.TRUE;
       `,
