@@ -129,8 +129,7 @@ public class TreeIndex
       state = ((TreeNode)state).update((TreeNode)state, prop_, key, obj, oldObj, tail_, props);
     }
     else {
-      remove(state, oldObj);
-      put(state, obj);
+      state =  remove(state, oldObj);
       state =  put(state, obj);
     }
     return state;
