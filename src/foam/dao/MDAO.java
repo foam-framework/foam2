@@ -111,19 +111,20 @@ public class MDAO
   }
 
   public void update(FObject obj, FObject oldObj) {
+    Object  state    = getState();
     Map diff = obj.diff(oldObj);
+    Set<String> propSet = new HashSet<>();
+
     if(diff.keySet().size() != 0) {
       Iterator i = diff.keySet().iterator();
-      //get list of properties that need to be updated
-      Set<String> propSet = new HashSet<>();
       while(i.hasNext()) {
         PropertyInfo p = (PropertyInfo)of_.getAxiomByName(i.next().toString());
         if(p != null)
           propSet.add(p.getName());
       }
-
-      setState(index_.update(getState(), obj, oldObj, propSet));
     }
+    state = index_.update(state, obj, oldObj, propSet);
+    setState(state);
   }
 
   public FObject remove_(X x, FObject obj) {
