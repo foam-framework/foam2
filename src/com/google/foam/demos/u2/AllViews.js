@@ -15,6 +15,48 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'com.google.foam.demos.u2',
+  name: 'SampleData2',
+  properties: [
+    {
+      class: 'String',
+      name: 'firstName',
+      label: 'First name',
+      gridColumns: 6,
+      validationPredicates: [
+        {
+          args: ['firstName'],
+          predicateFactory: function(e) {
+            return e.GT(
+              foam.mlang.StringLength.create({
+                arg1: com.google.foam.demos.u2.FIRST_NAME
+              }), 0);
+          },
+          errorString: 'Please enter a first name.'
+        }
+      ]
+    },
+    {
+      class: 'String',
+      name: 'lastName',
+      label: 'Last name',
+      gridColumns: 6,
+      validationPredicates: [
+        {
+          args: ['lastName'],
+          predicateFactory: function(e) {
+            return e.GT(
+              foam.mlang.StringLength.create({
+                arg1: com.google.foam.demos.u2.LAST_NAME
+              }), 0);
+          },
+          errorString: 'Please enter a last name'
+        }
+      ]
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'com.google.foam.demos.u2',
@@ -66,6 +108,7 @@ foam.CLASS({
     {
       class: 'foam.dao.DAOProperty',
       name: 'dao',
+      label: 'DAO',
       createVisibility: '',
       factory: function() { return this.sampleDataDAO; }
     },
@@ -299,6 +342,41 @@ foam.CLASS({
       }
     },
     {
+      class: 'FObjectArray',
+      name: 'fobjectArray3',
+      of: 'com.google.foam.demos.u2.SampleData2',
+      view: {
+        class: 'foam.u2.view.FObjectArrayView',
+        mode: 'RW',
+        enableAdding: true,
+        enableRemoving: true,
+        defaultNewItem: ''
+      },
+      autoValidate: true,
+      validationTextVisible: true,
+      validateObj: function(fobjectArray3) {
+        if ( fobjectArray3.length < 1 )
+          return 'Please enter fobjectArray3 information'
+
+        for ( var i = 0; i < fobjectArray3.length; i++ ) {
+          if ( fobjectArray3[i].errors_$ != null ) {
+            fobjectArray3[i].errors_$.sub(this.errorsUpdate);
+
+            return this.errorsUpdate(null, null, null, fobjectArray3[i].errors_$);
+          }
+        }
+      }
+    },
+    {
+      class: 'FObjectArray',
+      name: 'fobjectArray4',
+      of: 'com.google.foam.demos.u2.SampleData',
+      view: { class: 'foam.u2.view.DAOtoFObjectArrayView', xxxdelegate: { class: 'foam.comics.InlineBrowserView' } },
+      factory: function() {
+        return this.sampleDataDAO.testData;
+      }
+    },
+    {
       class: 'EMail',
       name: 'defaultEMail',
       value: 'someone@somewhere.com'
@@ -439,5 +517,14 @@ foam.CLASS({
         ]
       }
     }
-  ]
+  ],
+
+  listeners: [
+    {
+      name: 'errorsUpdate',
+      code: function (_, __ ,___, errs) {
+        return errs.get();
+      }
+    }
+  ],
 })
