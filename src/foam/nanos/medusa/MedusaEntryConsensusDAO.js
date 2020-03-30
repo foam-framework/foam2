@@ -9,12 +9,18 @@ foam.CLASS({
   name: 'MedusaEntryConsensusDAO',
   extends: 'foam.dao.ProxyDAO',
 
+  implements: [
+    'foam.core.ContextAgent',
+    'foam.nanos.NanoService'
+  ],
+
   documentation: `On put test for consensus, cleanup, and notify.`,
 
   javaImports: [
+    'foam.core.Agency',
+    'foam.core.FObject',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
-    'foam.core.FObject',
     'foam.mlang.sink.Count',
     'foam.mlang.sink.GroupBy',
     'static foam.mlang.MLang.AND',
@@ -31,6 +37,7 @@ foam.CLASS({
     'java.util.List',
     'java.util.Map'
   ],
+
   axioms: [
     {
       name: 'javaExtras',
@@ -40,7 +47,7 @@ foam.CLASS({
   // NOTE: HACK: starting at 2, as indexes 1 and 2 are used to prime the system.
   // REVIEW: needed?
   private volatile AtomicLong localIndex_ = new AtomicLong(2);
-  private Object catchUpLock_ = new Object();
+  private Object promoteLock_ = new Object();
           `
         }));
       }
@@ -53,6 +60,11 @@ foam.CLASS({
       class: 'Long',
       visibilty: 'RO',
       javaGetter: `return localIndex_.longValue();`
+    },
+    {
+      name: 'threadPoolName',
+      class: 'String',
+      value: 'threadPool'
     },
     {
       name: 'logger',
@@ -82,40 +94,30 @@ foam.CLASS({
         getLogger().debug("put_", "setGlobalIndex", entry.getIndex());
       }
 
-      // REVIEW: synchronization/locking
-    synchronized ( Long.toString(entry.getIndex()).intern() ) {
 
       if ( entry.getIndex() <= getIndex() ) {
         getLogger().warning("put", getIndex(), "discarding", entry.getIndex());
         return entry;
       }
 
-      entry = (MedusaEntry) getDelegate().put_(x, entry);
+      // REVIEW: synchronization/locking
+      MedusaEntry ce = null;
+      synchronized ( Long.toString(entry.getIndex()).intern() ) {
+        MedusaEntry me = (MedusaEntry) getDelegate().put_(x, entry);
 
-      MedusaEntry ce = getConsensusEntry(x, entry);
-      getLogger().debug("put", "index", getIndex(), "ce", entry.getIndex(), entry.getHasConsensus());
+        ce = getConsensusEntry(x, me);
+      }
       if ( ce != null ) {
         if ( ce.getIndex() == getIndex() + 1 ) {
           return promote(x, ce);
         }
-        if ( ce.getIndex() > getIndex() ) {
-        // catch up.
-        // REVIEW: synchronization/locking
-        synchronized ( this ) {
-          while ( ce.getIndex() > getIndex() ) {
-            MedusaEntry me = (MedusaEntry) getDelegate().find(getIndex() + 1);
-            if ( me != null &&
-                 me.getHasConsensus() ) {
-              getLogger().info("put", "catch-up", getIndex(), ce.getIndex(), me.getIndex());
-              promote(x, me);
-            } else {
-              break;
-            }
+        if ( ce.getIndex() > getIndex() + 1 ) {
+          getLogger().debug("put", getIndex(), "notify");
+          synchronized ( promoteLock_ ) {
+            promoteLock_.notify();
           }
         }
       }
-      }
-    }
       return entry;
       `
     },
@@ -223,6 +225,45 @@ foam.CLASS({
       //   }
       // }
       `
+    },
+    {
+      name: 'start',
+      javaCode: `
+      getLogger().debug("start");
+      ((Agency) getX().get(getThreadPoolName())).submit(getX(), this, "Consensus Promotion");
+      `
+    },
+    {
+      name: 'execute',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      javaCode: `
+      getLogger().debug("promoter");
+      try {
+        while (true) {
+          MedusaEntry entry = (MedusaEntry) getDelegate().find_(x, getIndex() + 1);
+          if ( entry != null &&
+               entry.getHasConsensus() ) {
+            promote(x, entry);
+          } else {
+            getLogger().debug("execute", "wait");
+            synchronized ( promoteLock_ ) {
+              promoteLock_.wait();
+            }
+            getLogger().debug("execute", "wake");
+          }
+        }
+      } catch ( InterruptedException e ) {
+        // nop
+      } catch ( Exception e ) {
+        getLogger().error("execute", e.getMessage(), e);
+        // TODO: Alarm
+      }
+     `
     }
   ]
 });
