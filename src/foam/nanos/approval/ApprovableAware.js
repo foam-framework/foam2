@@ -17,6 +17,7 @@
     'foam.core.FObject',
     'foam.core.X',
     'foam.nanos.logger.Logger',
+    'foam.nanos.approval.ApprovableAware',
     'java.util.Iterator',
     'java.util.ArrayList',
     'java.util.Arrays',
