@@ -180,6 +180,21 @@ foam.CLASS({
       return s.split(locked).skew(locked);
     },
 
+    function update(key, obj, oldObj, compare, props, nullNode, locked) {
+      var s = this.maybeClone(locked);
+      
+      if ( ! s )
+        return;
+      
+      var r = compare(s.key, key);
+      if ( r === 0 ) {
+        s.value.update(obj, oldObj, props);
+      } else {
+        var side = r > 0 ? 'left' : 'right';
+        s[side].update(key, obj, oldObj, compare, props, nullNode, locked);
+      }
+    },
+
     function removeKeyValue(key, value, compare, locked, nullNode) {
       var s = this.maybeClone(locked);
       var side;

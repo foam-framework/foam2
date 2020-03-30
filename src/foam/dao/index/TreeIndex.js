@@ -348,6 +348,22 @@ foam.CLASS({
       }
     },
 
+    function update(obj, oldObj, props) {
+      if ( ! props.includes(this.index.prop) )
+        this.root.update(
+          this.index.prop.f(obj),
+          obj,
+          oldObj,
+          this.index.compare,
+          props,
+          this.index.nullNode,
+          this.selectCount > 0);
+      else {
+        this.remove(oldObj);
+        this.put(obj);
+      }
+    },
+
     function put(newValue) {
       this.root = this.root.putKeyValue(
           this.index.prop.f(newValue),
@@ -606,6 +622,22 @@ foam.CLASS({
           this.selectCount > 0);
     },
 
+    function update(obj, oldObj, props) {
+      if ( ! props.includes(this.index.prop) )
+        this.root.update(
+          this.index.prop.f(obj).toLowerCase(),
+          obj,
+          oldObj,
+          this.index.compare,
+          props,
+          this.index.nullNode,
+          this.selectCount > 0);
+      else {
+        this.remove(oldObj);
+        this.put(obj);
+      }
+    },
+    
     function remove(value) {
       this.root = this.root.removeKeyValue(
           this.index.prop.f(value).toLowerCase(),
@@ -672,6 +704,47 @@ foam.CLASS({
         }
       } else {
         this.root = this.root.putKeyValue('', newValue, this.index.compare, this.index.dedup);
+      }
+    },
+
+    function update(obj, oldObj, props) {
+      var a = this.index.prop.f(obj);
+          
+      
+      if ( a.length ) {
+        var diffs = obj[this.index.prop].diff(oldObj[this.index.prop]);
+        var propNames = [];
+
+        if ( diffs.length !== 0 ) {
+          for (var i in diffs) {
+            var propertyThatWasChanged = this.of.getAxiomByName(i);
+            propNames.push(propertyThatWasChanged);
+          }
+
+          for ( var i = 0 ; i < a.length ; i++ ) {
+            if ( ! props.includes(this.index.prop) ) {
+              this.root.update(
+                a[i],
+                obj,
+                oldObj,
+                this.index.compare,
+                props,
+                this.index.nullNode,
+                this.selectCount > 0);
+            } else {
+              this.root = this.root.putKeyValue(
+                a[i],
+                oldObj,
+                this.index.compare,
+                this.index.dedup);
+              this.root = this.root.putKeyValue(
+                a[i],
+                obj,
+                this.index.compare,
+                this.index.dedup);
+            }
+          }
+        }
       }
     },
 

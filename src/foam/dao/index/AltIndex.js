@@ -184,6 +184,12 @@ foam.CLASS({
       }
     },
 
+    function update(newValue) {
+      for ( var i = 0 ; i < this.delegates.length ; i++ ) {
+        this.delegates[i].update(newValue);
+      }
+    },
+
     function remove(obj) {
       for ( var i = 0 ; i < this.delegates.length ; i++ ) {
         this.delegates[i].remove(obj);

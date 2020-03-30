@@ -149,11 +149,25 @@ foam.CLASS({
     function put_(x, obj) {
       var oldValue = this.findSync_(obj.id);
       if ( oldValue ) {
-        this.index.remove(oldValue);
+        this.update(obj, oldValue);
+      } else {
+        this.index.put(obj);
       }
-      this.index.put(obj);
       this.pub('on', 'put', obj);
       return Promise.resolve(obj);
+    },
+
+    function update(obj, oldObj) {
+      var diffs = obj.diff(oldObj);
+      var propNames = [];
+      if ( diffs.length !== 0 ) {
+        for (var i in diffs) {
+          var propertyThatWasChanged = this.of.getAxiomByName(i);
+          if ( propertyThatWasChanged )
+            propNames.push(propertyThatWasChanged);
+        }
+        this.index.update(obj, oldObj, propNames);
+      }
     },
 
     function find_(x, objOrKey) {

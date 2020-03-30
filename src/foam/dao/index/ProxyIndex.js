@@ -60,6 +60,8 @@ foam.CLASS({
 
     function put(o) { return this.delegate.put(o); },
 
+    function update(obj, oldObj, props) { this.delegate.update(obj, oldObj, props); },
+
     function remove(o) { return this.delegate.remove(o); },
 
     function plan(sink, skip, limit, order, predicate, root) {
