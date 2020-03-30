@@ -86,10 +86,9 @@ foam.CLASS({
       visibility: 'HIDDEN',
       transient: true,
       javaFactory: `
-        Logger logger = (Logger) getX().get("logger");
         return new PrefixLogger(new Object[] {
           this.getClass().getSimpleName()
-        }, logger);
+        }, (Logger) getX().get("logger"));
       `
     },
   ],
@@ -119,14 +118,9 @@ foam.CLASS({
           config = (ClusterConfig) config.fclone();
           config.setStatus(Status.ONLINE);
           config = (ClusterConfig) dao.put(config);
-
-          // NOTE: Initial dissolve will be triggered by ClusterConfigMonitor
-          //((ElectoralService) getX().get("electoralService")).dissolve(x);
         } else {
           getLogger().warning("ClusterConfig not found", getConfigId());
         }
-        // TODO/REVIEW: Optionally run as cronjob or timertask if cronjobs are not available on secondaries
-        //getX().get("clusterConfigMonitor");
       `
     },
     {
@@ -306,16 +300,20 @@ foam.CLASS({
       ClusterConfig config = (ClusterConfig) ((DAO) x.get("localClusterConfigDAO")).find(getConfigId()).fclone();
       String[] old = config.getConnections();
       String[] nu = new String[old.length - 1];
+      boolean found = false;
       int c = 0;
       for ( int i = 0; i < old.length; ++i) {
         if ( name.equals(old[i]) ) {
+          found = true;
           continue;
         }
         nu[c] = old[i];
         c++;
       }
-      config.setConnections(nu);
-      ((DAO) x.get("localClusterConfigDAO")).put(config);
+      if ( found ) {
+        config.setConnections(nu);
+        ((DAO) x.get("localClusterConfigDAO")).put(config);
+      }
      `
     },
     {

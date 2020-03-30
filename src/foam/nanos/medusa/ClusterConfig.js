@@ -186,7 +186,7 @@ foam.CLASS({
       name: 'lastModified',
       class: 'DateTime',
       visibility: 'RO',
-      storageTransient: true /* only thing being written out */
+//      storageTransient: true /* only thing being written out */
     },
     {
       documentation: `The id of the user who created the transaction.`,
