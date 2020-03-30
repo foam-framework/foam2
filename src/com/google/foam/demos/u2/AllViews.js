@@ -66,6 +66,7 @@ foam.CLASS({
     {
       class: 'foam.dao.DAOProperty',
       name: 'dao',
+      label: 'DAO',
       createVisibility: '',
       factory: function() { return this.sampleDataDAO; }
     },
@@ -294,6 +295,15 @@ foam.CLASS({
       class: 'FObjectArray',
       name: 'fobjectArray2',
       of: 'com.google.foam.demos.u2.SampleData',
+      factory: function() {
+        return this.sampleDataDAO.testData;
+      }
+    },
+    {
+      class: 'FObjectArray',
+      name: 'fobjectArray3',
+      of: 'com.google.foam.demos.u2.SampleData',
+      view: { class: 'foam.u2.view.DAOtoFObjectArrayView', xxxdelegate: { class: 'foam.comics.InlineBrowserView' } },
       factory: function() {
         return this.sampleDataDAO.testData;
       }
