@@ -12,11 +12,16 @@ import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
 import java.io.IOException;
+import java.util.Set;
 
 public interface Index {
-  // Add or update an object
+  // Add an object
   public Object put(Object state, FObject value);
 
+  // Update an object
+  //props will tell names of properties that have been changed
+  public Object update(Object state, FObject obj, FObject oldObj, Set<String> props);
+  
   // Remove an object
   public Object remove(Object state, FObject value);
 

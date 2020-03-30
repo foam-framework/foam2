@@ -11,6 +11,7 @@ import foam.dao.Sink;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 import java.util.ArrayList;
+import java.util.Set;
 
 /** Note this class is not thread safe because ArrayList isn't thread-safe. Needs to be made safe by containment. **/
 public class AltIndex
@@ -71,6 +72,14 @@ public class AltIndex
     return s;
   }
 
+  public Object update(Object state, FObject value, FObject oldObject, Set<String> props) {
+    Object[] s = toObjectArray(state);
+
+    for(int i = 0; i < delegates_.size(); i++) {
+      s[i] = delegates_.get(i).update(s[i], value, oldObject, props);
+    }
+    return s;
+  }
 
   public Object remove(Object state, FObject value) {
     Object[] s = toObjectArray(state);

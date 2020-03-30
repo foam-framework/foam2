@@ -15,6 +15,8 @@ import static foam.dao.AbstractDAO.decorateSink;
 import foam.mlang.predicate.True;
 import foam.mlang.sink.GroupBy;
 
+import java.util.Set;
+
 public class TreeNode {
   protected Object   key;
   protected Object   value;
@@ -97,6 +99,26 @@ public class TreeNode {
     }
 
     return split(skew(state, tail), tail);
+  }
+
+  public Object update(TreeNode state, PropertyInfo prop, Object key, FObject obj, FObject oldObj, Index tail, Set<String> props) {
+    if ( state == null || state.equals(TreeNode.getNullNode()) )
+      return state;
+
+    int r = prop.comparePropertyToValue(key, state.key);
+
+    if ( r == 0 ) {
+      state.value = tail.update(state.value, obj, oldObj, props);
+      return state;
+    } else {
+      if ( r < 0 ) {
+        state.left =  (TreeNode)((TreeNode) state.left).update(state.left, prop, key, obj, oldObj, tail, props);
+        return state;
+      } else {
+        state.right = (TreeNode)((TreeNode) state.right).update(state.right, prop, key, obj, oldObj, tail, props);
+        return state;
+      }
+    }
   }
 
   public TreeNode skew(TreeNode node, Index tail) {

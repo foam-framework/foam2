@@ -14,6 +14,7 @@ import foam.mlang.predicate.Binary;
 import foam.mlang.sink.Count;
 import foam.mlang.sink.GroupBy;
 import java.util.Arrays;
+import java.util.Set;
 
 public class TreeIndex
   extends AbstractIndex
@@ -113,6 +114,26 @@ public class TreeIndex
 
     return ((TreeNode) state).putKeyValue((TreeNode)state,
       prop_, key, value, tail_);
+  }
+
+  @Override
+  public Object update(Object state, FObject obj, FObject oldObj, Set<String> props) {
+
+    if( ! props.contains(prop_.getName()) ) {
+      Object key;
+      try {
+        key = prop_.f(obj);
+      } catch (ClassCastException e) {
+        return state;
+      }
+      state = ((TreeNode)state).update((TreeNode)state, prop_, key, obj, oldObj, tail_, props);
+    }
+    else {
+      remove(state, oldObj);
+      put(state, obj);
+      state =  put(state, obj);
+    }
+    return state;
   }
 
   public Object remove(Object state, FObject value) {
