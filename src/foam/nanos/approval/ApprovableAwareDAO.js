@@ -150,7 +150,7 @@ foam.CLASS({
           approverIds = ucjQueryService.getAllApprovers(getX(), modelName, outgoingAccount);
         } else {
           UCJQueryService ucjQueryService = (UCJQueryService) x.get("ucjQueryService");
-          approverIds = ucjQueryService.getAllApprovers(getX(), modelName, user);
+          approverIds = ucjQueryService.getAllApprovers(getX(), modelName);
         }
           
         if ( approverIds == null || approverIds.size() <= 0 ) {
