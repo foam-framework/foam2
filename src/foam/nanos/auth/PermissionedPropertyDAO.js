@@ -56,8 +56,13 @@ foam.CLASS({
       javaCode: `
       if ( x.get("auth") != null ) {
         if ( predicate != null ) predicate.authorize(x);
-        foam.dao.Sink sink2 = ( sink != null ) ? new HidePropertiesSink(x, sink, this) : sink;
-        super.select_(x, sink2, skip, limit, order, predicate);
+          // don't decorate the sink if it's a Count or GroupBy
+          if ( ! ( sink instanceof foam.mlang.sink.Count || sink instanceof foam.mlang.sink.GroupBy) ) {
+            foam.dao.Sink sink2 = ( sink != null ) ? new HidePropertiesSink(x, sink, this) : sink;
+            super.select_(x, sink2, skip, limit, order, predicate);
+          } else {
+            super.select_(x, sink, skip, limit, order, predicate);
+          }
         return sink;
       }
       return super.select_(x, sink, skip, limit, order, predicate);
