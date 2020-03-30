@@ -23,6 +23,7 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.mlang.sink.Count',
     'foam.mlang.sink.GroupBy',
+    'foam.mlang.sink.Sequence',
     'static foam.mlang.MLang.AND',
     'static foam.mlang.MLang.EQ',
     'static foam.mlang.MLang.HAS',
@@ -91,7 +92,7 @@ foam.CLASS({
       DaggerService service = (DaggerService) x.get("daggerService");
       if ( entry.getIndex() > service.getGlobalIndex(x) ) {
         service.setGlobalIndex(x, entry.getIndex());
-        getLogger().debug("put_", "setGlobalIndex", entry.getIndex());
+        getLogger().debug("put", getIndex(), "setGlobalIndex", entry.getIndex());
       }
 
 
@@ -107,7 +108,8 @@ foam.CLASS({
 
         ce = getConsensusEntry(x, me);
       }
-      if ( ce != null ) {
+      if ( ce != null &&
+           ce.getHasConsensus() ) {
         if ( ce.getIndex() == getIndex() + 1 ) {
           return promote(x, ce);
         }
@@ -135,12 +137,12 @@ foam.CLASS({
       ],
       type: 'foam.nanos.medusa.MedusaEntry',
       javaCode: `
-        DaggerService service = (DaggerService) x.get("daggerService");
-        service.verify(x, entry);
-        getLogger().info("promote", getIndex(), entry.getIndex());
-        setIndex(localIndex_.getAndIncrement());
-        service.updateLinks(x, entry);
-        return entry;
+      DaggerService service = (DaggerService) x.get("daggerService");
+      service.verify(x, entry);
+      getLogger().info("promote", getIndex(), entry.getIndex());
+      setIndex(localIndex_.getAndIncrement());
+      service.updateLinks(x, entry);
+      return entry;
       `
     },
     {
@@ -158,72 +160,49 @@ foam.CLASS({
       ],
       javaCode: `
       // Tally by hash.
-      List<MedusaEntry> arr = (ArrayList) ((ArraySink) getDelegate()
-        .where(
-          AND(
-            EQ(MedusaEntry.INDEX, entry.getIndex()) //,
-//            NEQ(MedusaEntry.HASH, null)
-          )
-        )
-        .select(new ArraySink())).getArray();
-
-      Map<String, Long> counts = new HashMap();
-      Long max = 0L;
-      MedusaEntry match = null;
-      for ( MedusaEntry e : arr ) {
-        if ( SafetyUtil.isEmpty(e.getHash()) ) {
-          continue;
-        }
-        Long count = counts.get(e.getHash());
-        if ( count == null ) {
-          count = Long.valueOf(0L);
-        }
-        count += 1;
-        counts.put(e.getHash(), count);
-        if ( count >= max ) {
-          max = count;
-          match = e;
-        }
-      }
+      getLogger().debug("getConsensus", entry.getIndex());
 
       ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
+      MedusaEntry match = null;
+      String hash = null;
+      long max = 0L;
+
+      GroupBy groupBy = (GroupBy) getDelegate().where(
+        EQ(MedusaEntry.INDEX, entry.getIndex())
+      ).select(GROUP_BY(MedusaEntry.HASH, COUNT()));
+
+      Map<String, Count> groups = groupBy.getGroups();
+      for ( Map.Entry<String, Count> e : groups.entrySet() ) {
+        if ( e.getValue().getValue() > max ) {
+          max = e.getValue().getValue();
+          hash = e.getKey();
+        }
+      }
+
       if ( max >= service.getNodesForConsensus(x) ) {
-        // Remove all but one entry for index.
-        getLogger().debug("cleanup");
-        for ( MedusaEntry e : arr ) {
-          if ( e.getId().equals(match.getId()) ) {
-            match = (MedusaEntry) match.fclone();
+        // TODO: consider reporting the split if max
+        // does not equal number of nodes.
+
+        List<MedusaEntry> list = (ArrayList) ((ArraySink) getDelegate().where(
+          EQ(MedusaEntry.INDEX, entry.getIndex())
+        ).select(new ArraySink())).getArray();
+        getLogger().debug("match");
+        for ( MedusaEntry e : list ) {
+          if ( match == null &&
+               e.getHash().equals(hash) ) {
+            match = (MedusaEntry) e.fclone();
             match.setHasConsensus(true);
             match = (MedusaEntry) getDelegate().put_(x, match);
-          } else {
-            getDelegate().remove_(x, e);
           }
         }
-        return match;
+        if ( match != null ) {
+          getLogger().debug("cleanup");
+          getDelegate().where(
+            EQ(MedusaEntry.INDEX, entry.getIndex())
+          ).removeAll();
+        }
       }
-      return null;
-
-      // Alternate approches
-      // perform count, if >= nodes, then select again and test hashes.
-
-      // String hash = null;
-      // long max = 0L;
-      // MedusaEntry me = null;
-      // GroupBy groupBy = (GroupBy) getDelegate().where(
-      // Sink sink = getDelegate().where(
-      //   AND(
-      //     EQ(MedusaEntry.INDEX, entry.getIndex())
-      //   )
-      // ).select(GROUP_BY(MedusaEntry.HASH, new Sequence(new foam.dao.Sink[] {COUNT()})));
-
-      // Map<String, Count> groups = groupBy.getGroups();
-      // for ( Map.Entry<String, Count> e : groups.entrySet() ) {
-      //   if ( e.getValue().getValue() > max ) {
-      //     hash = e.getKey();
-      //     max = e.getValue().getValue();
-      //     me = e;
-      //   }
-      // }
+      return match;
       `
     },
     {

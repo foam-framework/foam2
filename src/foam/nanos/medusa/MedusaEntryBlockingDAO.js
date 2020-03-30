@@ -58,9 +58,8 @@ foam.CLASS({
         getLogger().debug("notifyOn", entry.getIndex());
         notifyOn(x, entry.getIndex());
         return entry;
-      } else {
-        return getDelegate().cmd_(x, obj);
       }
+      return getDelegate().cmd_(x, obj);
       `
     },
     {
