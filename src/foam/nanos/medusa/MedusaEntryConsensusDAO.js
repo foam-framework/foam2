@@ -38,7 +38,9 @@ foam.CLASS({
         cls.extras.push(foam.java.Code.create({
           data: `
   // NOTE: HACK: starting at 2, as indexes 1 and 2 are used to prime the system.
+  // REVIEW: needed?
   private volatile AtomicLong localIndex_ = new AtomicLong(2);
+  private Object catchUpLock_ = new Object();
           `
         }));
       }
@@ -80,11 +82,11 @@ foam.CLASS({
         getLogger().debug("put_", "setGlobalIndex", entry.getIndex());
       }
 
-      // REVIEW: multiple nodes will be responding symultanously.
-      synchronized ( Long.toString(entry.getIndex()).intern() ) {
+      // REVIEW: synchronization/locking
+    synchronized ( Long.toString(entry.getIndex()).intern() ) {
 
       if ( entry.getIndex() <= getIndex() ) {
-        getLogger().debug("put", getIndex(), "discarding", entry.getIndex());
+        getLogger().warning("put", getIndex(), "discarding", entry.getIndex());
         return entry;
       }
 
@@ -92,17 +94,51 @@ foam.CLASS({
 
       MedusaEntry ce = getConsensusEntry(x, entry);
       getLogger().debug("put", "index", getIndex(), "ce", entry.getIndex(), entry.getHasConsensus());
-      if ( ce != null &&
-           ce.getIndex() == getIndex() + 1 )  {
-        // DaggerService service = (DaggerService) x.get("daggerService");
-        service.verify(x, ce);
-        getLogger().debug("put", getIndex(), "promoting", ce.getIndex(), ce.getIndex(), ce.getHasConsensus(), ce);
-        setIndex(localIndex_.getAndIncrement());
-        service.updateLinks(x, ce);
-        return ce;
+      if ( ce != null ) {
+        if ( ce.getIndex() == getIndex() + 1 ) {
+          return promote(x, ce);
+        }
+        if ( ce.getIndex() > getIndex() ) {
+        // catch up.
+        // REVIEW: synchronization/locking
+        synchronized ( this ) {
+          while ( ce.getIndex() > getIndex() ) {
+            MedusaEntry me = (MedusaEntry) getDelegate().find(getIndex() + 1);
+            if ( me != null &&
+                 me.getHasConsensus() ) {
+              getLogger().info("put", "catch-up", getIndex(), ce.getIndex(), me.getIndex());
+              promote(x, me);
+            } else {
+              break;
+            }
+          }
+        }
       }
       }
+    }
       return entry;
+      `
+    },
+    {
+      name: 'promote',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'entry',
+          type: 'foam.nanos.medusa.MedusaEntry'
+        }
+      ],
+      type: 'foam.nanos.medusa.MedusaEntry',
+      javaCode: `
+        DaggerService service = (DaggerService) x.get("daggerService");
+        service.verify(x, entry);
+        getLogger().info("promote", getIndex(), entry.getIndex());
+        setIndex(localIndex_.getAndIncrement());
+        service.updateLinks(x, entry);
+        return entry;
       `
     },
     {

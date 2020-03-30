@@ -247,9 +247,9 @@ foam.CLASS({
              .build();
           
           voteCallables.add(() -> {
-            getLogger().debug("dissove","call", "vote", clientConfig.getId());
+            getLogger().debug("dissove","call", "vote", clientConfig.getName());
             long result = electoralService.vote(clientConfig.getId(), getElectionTime());
-            getLogger().debug("dissolve", "call", "vote", clientConfig.getId(), "response", result);
+            getLogger().debug("dissolve", "call", "vote", clientConfig.getName(), "response", result);
             recordResult(result, clientConfig);
             return result;
           });
@@ -376,12 +376,12 @@ foam.CLASS({
         if ( winner.equals(config.getId()) &&
              ! config.getIsPrimary() ) {
           // found the winner, and it is the 'new' primary, may or may not be us.
-          getLogger().debug("report", winner, "new primary", config.getId());
+          getLogger().debug("report", winner, "new primary", config.getName());
           config.setIsPrimary(true);
           config = (ClusterConfig) dao.put_(getX(), config);
         } else if ( config.getIsPrimary() ) {
           // no longer primary
-          getLogger().debug("report", winner, "old primary", config.getId(), config.getName());
+          getLogger().debug("report", winner, "old primary", config.getName());
           config.setIsPrimary(false);
           config = (ClusterConfig) dao.put_(getX(), config);
         }

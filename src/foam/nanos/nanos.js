@@ -136,6 +136,8 @@ FOAM_FILES([
   { name: "foam/nanos/medusa/ElectoralServiceState" },
   { name: "foam/nanos/medusa/ElectoralServiceServer" },
   { name: "foam/nanos/medusa/MedusaEntry" },
+  { name: "foam/nanos/medusa/MedusaEntryAgent" },
+  { name: "foam/nanos/medusa/MedusaEntryAgencyDAO" },
   { name: "foam/nanos/medusa/MedusaEntryAdapterDAO" },
   { name: "foam/nanos/medusa/MedusaEntryBlockingDAO" },
   { name: "foam/nanos/medusa/MedusaEntryBroadcastDAO" },

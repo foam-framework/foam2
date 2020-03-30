@@ -318,6 +318,8 @@ var classes = [
   'foam.nanos.medusa.ElectoralServiceState',
   'foam.nanos.medusa.ElectoralServiceServer',
   'foam.nanos.medusa.MedusaEntry',
+  'foam.nanos.medusa.MedusaEntryAgent',
+  'foam.nanos.medusa.MedusaEntryAgencyDAO',
   'foam.nanos.medusa.MedusaEntryAdapterDAO',
   'foam.nanos.medusa.MedusaEntryBlockingDAO',
   'foam.nanos.medusa.MedusaEntryBroadcastDAO',
