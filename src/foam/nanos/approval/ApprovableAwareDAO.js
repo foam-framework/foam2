@@ -109,8 +109,6 @@ foam.CLASS({
       javaCode:`
       Logger logger = (Logger) x.get("logger");
 
-
-
       if ( getIsTrackingRequestSent() ) {
         ApprovalRequest trackingRequest = (ApprovalRequest) request.fclone();
         trackingRequest.setIsTrackingRequest(true);
