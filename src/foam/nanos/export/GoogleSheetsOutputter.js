@@ -34,7 +34,7 @@ foam.CLASS({
           var pattern = '';
           if ( props[i].cls_.id === "foam.core.UnitValue" ) {
             cellType = 'CURRENCY';
-            pattern = '\"$\"#0.0#\" CAD\"';
+            pattern = '\"$\"#0.00\" CAD\"';
           } else if ( props[i].cls_.id === 'foam.core.Date' ) {
             cellType = 'DATE';
             pattern = 'yyyy-mm-dd';
