@@ -109,16 +109,14 @@ public class TreeNode {
 
     if ( r == 0 ) {
       state.value = tail.update(state.value, obj, oldObj, props);
-      return state;
     } else {
       if ( r < 0 ) {
         state.left =  (TreeNode)((TreeNode) state.left).update(state.left, prop, key, obj, oldObj, tail, props);
-        return state;
       } else {
         state.right = (TreeNode)((TreeNode) state.right).update(state.right, prop, key, obj, oldObj, tail, props);
-        return state;
       }
     }
+    return state;
   }
 
   public TreeNode skew(TreeNode node, Index tail) {

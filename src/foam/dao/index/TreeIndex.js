@@ -709,73 +709,73 @@ foam.CLASS({
 
     function update(obj, oldObj, props) {
       var a = this.index.prop.f(obj);
-          
-      if ( props.includes(this.index.prop) ) {
+      var b = this.index.prop.f(oldObj);
         if ( ! a.length ) {
+          var diffs = a.diff(b);
+
+          var propProperties = [];
+          if ( a.cls_ ) {
+            for ( var i in diffs ) {
+              var propertyThatWasChanged = a.cls_.getAxiomByName(i);
+              if ( propertyThatWasChanged )
+                propProperties.push(propertyThatWasChanged);
+            }
+          }
+
           this.root.update(
                 '',
+                obj,
+                oldObj,
+                this.index.compare,
+                propProperties,
+                this.index.nullNode,
+                this.selectCount > 0);
+        } else {
+          if ( props.includes(this.index.prop) ) {
+            var newValues = [[...a].filter(v => !b.has(v))];
+            var valuesThatNeedToBeDeleted = [[...b].filter(v => !a.has(v))];
+            var valuesThatNeedToBeUpdated = [...a].filter(v => b.has(v));
+  
+  
+            for ( var i = 0; i < newValues.length; i++ ) {
+              this.root = this.root.putKeyValue(
+                newValues[i],
+                obj,
+                this.index.compare,
+                this.index.dedup);
+            }
+  
+            for ( var i = 0; i < valuesThatNeedToBeDeleted.length; i++ ) {
+              this.root = this.root.removeKeyValue(
+                valuesThatNeedToBeDeleted[i],
+                obj,
+                this.index.compare,
+                this.index.nullNode);
+            }
+  
+            for ( var i = 0; i < valuesThatNeedToBeUpdated.length; i++ ) {
+              this.root.update(
+                valuesThatNeedToBeUpdated[i],
                 obj,
                 oldObj,
                 this.index.compare,
                 props,
                 this.index.nullNode,
                 this.selectCount > 0);
-        } else {
-          var newValues = [[...a].filter(v => !b.has(v))];
-          var valuesThatNeedToBeDeleted = [[...b].filter(v => !a.has(v))];
-          var valuesThatNeedToBeUpdated = [...a].filter(v => b.has(v));
-
-
-          for ( var i = 0; i < newValues.length; i++ ) {
-            this.root = this.root.putKeyValue(
-              newValues[i],
-              obj,
-              this.index.compare,
-              this.index.dedup);
-          }
-
-          for ( var i = 0; i < valuesThatNeedToBeDeleted.length; i++ ) {
-            this.root = this.root.removeKeyValue(
-              valuesThatNeedToBeDeleted[i],
-              obj,
-              this.index.compare,
-              this.index.nullNode);
-          }
-
-          for ( var i = 0; i < valuesThatNeedToBeUpdated.length; i++ ) {
-            this.root.update(
-              valuesThatNeedToBeUpdated[i],
-              obj,
-              oldObj,
-              this.index.compare,
-              props,
-              this.index.nullNode,
-              this.selectCount > 0);
-          }
-        }
-      } else {
-        if ( ! a.length ) {
-          this.root.update(
-                '',
+            }
+          } else {
+            for ( var i = 0; i < a.length; i++ ) {
+              this.root.update(
+                a[i],
                 obj,
                 oldObj,
                 this.index.compare,
                 props,
                 this.index.nullNode,
                 this.selectCount > 0);
-        } else {
-          for ( var i = 0; i < a.length; i++ ) {
-            this.root.update(
-              a[i],
-              obj,
-              oldObj,
-              this.index.compare,
-              props,
-              this.index.nullNode,
-              this.selectCount > 0);
+            }
           }
         }
-      }
     },
 
     function remove(value) {
