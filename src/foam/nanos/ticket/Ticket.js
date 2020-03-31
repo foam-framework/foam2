@@ -156,10 +156,7 @@ foam.CLASS({
         {
           args: ['title', 'type'],
           predicateFactory: function(e) {
-            return e.GT(
-              foam.mlang.StringLength.create({
-                arg1: foam.nanos.ticket.Ticket.TITLE
-              }), 0);
+            return e.NEQ(foam.nanos.ticket.Ticket.TITLE, "");
           },
           errorString: 'Please provide a summary of the Ticket.'
         }
@@ -181,15 +178,9 @@ foam.CLASS({
             return e.OR(
               e.AND(
                 e.EQ(foam.nanos.ticket.Ticket.ID, 0),
-                e.GT(
-                  foam.mlang.StringLength.create({
-                    arg1: foam.nanos.ticket.Ticket.TITLE
-                  }), 0)
+                e.NEQ(foam.nanos.ticket.Ticket.TITLE, "")
               ),
-              e.GT(
-              foam.mlang.StringLength.create({
-                arg1: foam.nanos.ticket.Ticket.COMMENT
-              }), 0)
+              e.NEQ(foam.nanos.ticket.Ticket.COMMENT, "")
             );
           },
           errorString: 'Please provide a comment.'
