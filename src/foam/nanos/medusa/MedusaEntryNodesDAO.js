@@ -41,7 +41,7 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
-      getLogger().debug("put_", entry.getIndex());
+      getLogger().debug("put", entry.getIndex());
       MedusaEntry old = (MedusaEntry) getDelegate().find(entry.getId());
       if ( old == null ) {
         ((DAO) x.get("localNodesDAO")).put_(x, entry);

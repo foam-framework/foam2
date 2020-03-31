@@ -51,12 +51,12 @@ foam.CLASS({
   
   methods: [
     {
+      documentation: 'Using assembly line, write to all online mediators in zone 0 and same realm,region',
       name: 'put_',
       javaCode: `
       MedusaEntry entry = (MedusaEntry) getDelegate().put_(x, obj);
       getLogger().debug("put", entry.getIndex());
 
-      // using assembly line, write to all online mediators in zone 0 and same realm,region
       ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
       ClusterConfig myConfig = service.getConfig(x, service.getConfigId());
 // TODO: move this to property and update on daoupdate. 

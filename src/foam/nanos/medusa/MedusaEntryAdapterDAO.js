@@ -107,18 +107,18 @@ foam.CLASS({
       getLogger().debug("submit", entry.getIndex(), entry);
 
       try {
-      FObject data = ((MedusaEntry)getMedusaEntryDAO().put_(x, entry)).getData();
-      getLogger().debug("submit", "find", data.getProperty("id"), data);
-      FObject result = getDelegate().find_(x, data.getProperty("id"));
-      if ( result == null ) {
-        getLogger().error("Object not found", data.getProperty("id"), data);
-        return data;
-      } else {
-        getLogger().debug("submit", "found", result);
-      }
-      return result;
+        FObject data = ((MedusaEntry)getMedusaEntryDAO().put_(x, entry)).getData();
+        getLogger().debug("submit", entry.getIndex(), "find", data.getProperty("id"));
+        FObject result = getDelegate().find_(x, data.getProperty("id"));
+        if ( result == null ) {
+          getLogger().error("Object not found", data.getProperty("id"), data);
+          return data;
+        } else {
+          getLogger().debug("submit", entry.getIndex(), "found", result);
+        }
+        return result;
       } catch (Throwable t) {
-        getLogger().error("put_", t.getMessage(), entry, t);
+        getLogger().error("submit", t.getMessage(), entry, t);
         throw t;
       }
       `

@@ -14,7 +14,7 @@ foam.CLASS({
     'foam.nanos.NanoService'
   ],
 
-  documentation: `On put test for consensus, cleanup, and notify.`,
+  documentation: `Receive Entry's from the Nodes. Test for consensus on hash, cleanup, and notify.`,
 
   javaImports: [
     'foam.core.Agency',
@@ -23,7 +23,6 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.mlang.sink.Count',
     'foam.mlang.sink.GroupBy',
-    'foam.mlang.sink.Sequence',
     'static foam.mlang.MLang.AND',
     'static foam.mlang.MLang.EQ',
     'static foam.mlang.MLang.HAS',
@@ -33,8 +32,6 @@ foam.CLASS({
     'foam.nanos.logger.Logger',
     'foam.util.SafetyUtil',
     'java.util.ArrayList',
-    'java.util.concurrent.atomic.AtomicLong',
-    'java.util.HashMap',
     'java.util.List',
     'java.util.Map'
   ],
@@ -45,10 +42,8 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-  // NOTE: HACK: starting at 2, as indexes 1 and 2 are used to prime the system.
-  // REVIEW: needed?
-  private volatile AtomicLong localIndex_ = new AtomicLong(2);
   private Object promoteLock_ = new Object();
+  private Object indexLock_ = new Object();
           `
         }));
       }
@@ -60,7 +55,7 @@ foam.CLASS({
       name: 'index',
       class: 'Long',
       visibilty: 'RO',
-      javaGetter: `return localIndex_.longValue();`
+//      javaGetter: `return localIndex_.longValue();`
     },
     {
       name: 'threadPoolName',
@@ -82,8 +77,7 @@ foam.CLASS({
 
   methods: [
     {
-  // TODO: this needs to be really fast.
-
+      // TODO: this needs to be really fast.
       name: 'put_',
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
@@ -95,35 +89,34 @@ foam.CLASS({
         getLogger().debug("put", getIndex(), "setGlobalIndex", entry.getIndex());
       }
 
-
       if ( entry.getIndex() <= getIndex() ) {
         getLogger().warning("put", getIndex(), "discarding", entry.getIndex());
         return entry;
       }
 
-      // REVIEW: synchronization/locking
       MedusaEntry ce = null;
       synchronized ( Long.toString(entry.getIndex()).intern() ) {
         MedusaEntry me = (MedusaEntry) getDelegate().put_(x, entry);
 
         ce = getConsensusEntry(x, me);
-      }
-      if ( ce != null &&
-           ce.getHasConsensus() ) {
-        if ( ce.getIndex() == getIndex() + 1 ) {
-          return promote(x, ce);
+        if ( ce != null &&
+             ce.getIndex() == getIndex() + 1 ) {
+          ce =  promote(x, ce);
         }
-        if ( ce.getIndex() > getIndex() + 1 ) {
-          getLogger().debug("put", getIndex(), "notify");
+      }
+      if ( ce != null ) {
+        if ( service.getGlobalIndex(x) > getIndex() ) {
           synchronized ( promoteLock_ ) {
             promoteLock_.notify();
           }
         }
+        return ce;
       }
       return entry;
       `
     },
     {
+      documentation: 'Make an entry available for Dagger hasing.',
       name: 'promote',
       args: [
         {
@@ -140,12 +133,17 @@ foam.CLASS({
       DaggerService service = (DaggerService) x.get("daggerService");
       service.verify(x, entry);
       getLogger().info("promote", getIndex(), entry.getIndex());
-      setIndex(localIndex_.getAndIncrement());
+      synchronized ( indexLock_ ) {
+        if ( entry.getIndex() == getIndex() + 1 ) {
+          setIndex(entry.getIndex());
+        }
+      }
       service.updateLinks(x, entry);
       return entry;
       `
     },
     {
+      documentation: 'Tally same index entries (one from each node) by hash. If a quorum of nodes have the same hash, then cleanup and return a match.',
       name: 'getConsensusEntry',
       type: 'foam.nanos.medusa.MedusaEntry',
       args: [
@@ -159,8 +157,7 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      // Tally by hash.
-      getLogger().debug("getConsensus", entry.getIndex());
+      getLogger().debug("consensus", entry.getIndex());
 
       ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
       MedusaEntry match = null;
@@ -206,13 +203,15 @@ foam.CLASS({
       `
     },
     {
+      documentation: 'NanoService implementation.',
       name: 'start',
       javaCode: `
       getLogger().debug("start");
-      ((Agency) getX().get(getThreadPoolName())).submit(getX(), this, "Consensus Promotion");
+      ((Agency) getX().get(getThreadPoolName())).submit(getX(), this, "Consensus Promoter");
       `
     },
     {
+      documetation: 'ContextAgent implementation. Handling out of order consensus updates. Check if next (index + 1) has reach consensus and promote.',
       name: 'execute',
       args: [
         {
@@ -229,11 +228,9 @@ foam.CLASS({
                entry.getHasConsensus() ) {
             promote(x, entry);
           } else {
-            getLogger().debug("execute", "wait");
             synchronized ( promoteLock_ ) {
               promoteLock_.wait();
             }
-            getLogger().debug("execute", "wake");
           }
         }
       } catch ( InterruptedException e ) {

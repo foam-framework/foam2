@@ -51,6 +51,7 @@ foam.CLASS({
   
   methods: [
     {
+      documentation: 'Using assembly line, write to all online nodes - in all a zones.',
       name: 'put_',
       javaCode: `
       MedusaEntry entry = (MedusaEntry) getDelegate().put_(x, obj);
@@ -58,7 +59,6 @@ foam.CLASS({
 
       ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
 
-     // using assembly line, write to all online nodes - in all a zones.
       List<ClusterConfig> arr = (ArrayList) ((ArraySink) ((DAO) x.get("localClusterConfigDAO"))
         .where(
           AND(

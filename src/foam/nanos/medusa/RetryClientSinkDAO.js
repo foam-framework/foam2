@@ -10,7 +10,7 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
   implements: ['foam.dao.Sink'],
 
-  documentation: '',
+  documentation: 'Implements both Sink and DAO and performs Retry on Sink.put and DAO.put,remove,cmd.',
 
   javaImports: [
     'foam.core.FObject',
@@ -131,7 +131,6 @@ foam.CLASS({
                retryAttempt >= getMaxRetryAttempts() ) {
             getLogger().warning("retryAttempt >= maxRetryAttempts", retryAttempt, getMaxRetryAttempts());
 
-            // report,
             // TODO: Alarm
             //throw new RuntimeException("Rejected, retry limit reached.", t);
             break;

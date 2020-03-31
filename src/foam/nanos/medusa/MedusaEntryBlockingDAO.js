@@ -24,7 +24,8 @@ foam.CLASS({
     {
       name: 'latches',
       class: 'Map',
-      javaFactory: `return new HashMap();`
+      javaFactory: `return new HashMap();`,
+      visibility: 'HIDDEN'
     },
     {
       name: 'logger',
@@ -32,10 +33,9 @@ foam.CLASS({
       of: 'foam.nanos.logger.Logger',
       visibility: 'HIDDEN',
       javaFactory: `
-        Logger logger = (Logger) getX().get("logger");
         return new PrefixLogger(new Object[] {
           this.getClass().getSimpleName()
-        }, logger);
+        }, (Logger) getX().get("logger"));
       `
     },
   ],
@@ -45,7 +45,6 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       MedusaEntry entry = (MedusaEntry) getDelegate().put_(x, obj);
-      getLogger().debug("waitOn", entry.getIndex());
       waitOn(x, entry.getIndex());
       return entry;
       `
@@ -55,7 +54,6 @@ foam.CLASS({
       javaCode: `
       if ( obj instanceof MedusaEntry ) {
         MedusaEntry entry = (MedusaEntry) obj;
-        getLogger().debug("notifyOn", entry.getIndex());
         notifyOn(x, entry.getIndex());
         return entry;
       }
@@ -64,7 +62,6 @@ foam.CLASS({
     },
     {
       name: 'waitOn',
-      synchronized: true, // TODO: if string then intern
       args: [
         {
           name: 'x',
@@ -87,10 +84,11 @@ foam.CLASS({
       }
 
       try {
+        getLogger().debug("waitOn", index);
         latch.await();
         getLogger().debug("wakeOn", index);
       } catch (InterruptedException e) {
-        ((Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "latch", index, "await", e.getMessage());
+        // nop
       } finally {
         getLatches().remove(index);
       }
@@ -118,7 +116,7 @@ foam.CLASS({
           getLatches().put(index, latch);
         }
       }
-
+      getLogger().debug("notifyOn", index);
       latch.countDown();
       `
     }

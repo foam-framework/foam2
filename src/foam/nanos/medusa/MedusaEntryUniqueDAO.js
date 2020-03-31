@@ -39,13 +39,13 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
-      getLogger().debug("put_", entry.getIndex());
+      getLogger().debug("put", entry.getIndex());
       Count count = (Count) getDelegate().where(
         EQ(MedusaEntry.INDEX, entry.getIndex())
       ).select(COUNT());
       if ( count.getValue() > 0 ) {
-        getLogger().error("put_", "duplicate index", entry);
-        throw new RuntimeException("Duplicate index");
+        getLogger().error("put", "duplicate index", entry);
+        throw new RuntimeException("Duplicate index: "+entry.getIndex());
       }
       return getDelegate().put_(x, obj);
       `
