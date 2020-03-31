@@ -48,7 +48,6 @@ public class PingService
 
     // TODO: control http/https
     String urlString = "http://" + address + ":" + port + "/service" + "/ping";
-    //    logger.debug(this.getClass().getSimpleName(), urlString);
 
     Box box = new HTTPBox.Builder(x)
       .setUrl(urlString)
@@ -66,7 +65,7 @@ public class PingService
       box.send(msg);
       latency = System.currentTimeMillis() - startTime;
       MessageReplyBox reply = (MessageReplyBox) msg.getAttributes().get("replyBox");
-      //      logger.debug(this.getClass().getSimpleName(), "reply", reply);
+
       Message response = reply.getMessage();
       Object obj = response.getObject();
       if ( obj != null ) {
@@ -81,10 +80,8 @@ public class PingService
       }
       throw new IOException("Invalid response type: null, expected foam.nanos.http.Ping.");
     } catch (IOException e) {
-      //      logger.warning(this.getClass().getSimpleName(), urlString, e.getMessage()/*, e*/);
       throw e;
     } catch (Throwable t) {
-      //      logger.warning(this.getClass().getSimpleName(), urlString, t.getMessage()/*, t*/);
       throw new IOException(t.getMessage(), t);
     }
   }

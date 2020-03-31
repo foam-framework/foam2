@@ -13,8 +13,6 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.core.Agency',
-    'foam.core.AgencyTimerTask',
     'foam.core.ContextAgent',
     'foam.core.X',
     'foam.dao.DAO',
@@ -22,16 +20,10 @@ foam.CLASS({
     'static foam.mlang.MLang.AND',
     'static foam.mlang.MLang.EQ',
     'static foam.mlang.MLang.NEQ',
-    'static foam.mlang.MLang.NOT',
-    'java.util.Timer'
+    'static foam.mlang.MLang.NOT'
   ],
 
   properties: [
-    {
-      name: 'interval',
-      class: 'Long',
-      value: 5000
-    },
     {
       name: 'timeout',
       class: 'Int',
@@ -40,17 +32,6 @@ foam.CLASS({
   ],
 
   methods: [
-    {
-      documentation: 'Start as a NanoService',
-      name: 'start',
-      javaCode: `
-      Timer timer = new Timer(this.getClass().getSimpleName());
-      timer.scheduleAtFixedRate(
-        new AgencyTimerTask(getX(), this),
-        1000,
-        getInterval());
-      `
-    },
     {
       name: 'execute',
       args: [

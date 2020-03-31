@@ -168,7 +168,6 @@ var classes = [
   'foam.dao.PutOnlyDAO',
   'foam.dao.ORBRequest',
   'foam.dao.ORBitalDAO',
-  'foam.dao.RetryDAO',
   'foam.mlang.order.Comparator',
   'foam.mlang.order.Desc',
   'foam.mlang.sink.Count',
