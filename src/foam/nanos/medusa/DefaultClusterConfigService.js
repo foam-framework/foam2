@@ -379,7 +379,7 @@ foam.CLASS({
           .setSessionID(sendClusterConfig.getSessionId())
           .setDelegate(new PMBox.Builder(x)
             .setClassType(MedusaEntry.getOwnClassInfo())
-            .setName(sendClusterConfig.getName()+"-"+getServiceName() +"-"+receiveClusterConfig.getName())
+            .setName("ClientDAO:"+sendClusterConfig.getName()+":"+getServiceName() +":"+receiveClusterConfig.getName())
             .setDelegate(new HTTPBox.Builder(x)
               .setAuthorizationType(foam.box.HTTPAuthorizationType.BEARER)
               .setSessionID(sendClusterConfig.getSessionId())
