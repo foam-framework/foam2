@@ -75,7 +75,7 @@ public class AltIndex
   public Object update(Object state, FObject obj, FObject oldObject, Set<String> props) {
     Object[] s = toObjectArray(state);
 
-    for(int i = 0; i < delegates_.size(); i++) {
+    for ( int i = 0; i < delegates_.size(); i++ ) {
       s[i] = delegates_.get(i).update(s[i], obj, oldObject, props);
     }
     return s;

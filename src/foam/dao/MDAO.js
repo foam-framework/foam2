@@ -159,14 +159,14 @@ foam.CLASS({
 
     function update(obj, oldObj) {
       var diffs = obj.diff(oldObj);
-      var propNames = [];
+      var props = [];
       if ( diffs.length !== 0 ) {
-        for (var i in diffs) {
+        for ( var i in diffs ) {
           var propertyThatWasChanged = this.of.getAxiomByName(i);
           if ( propertyThatWasChanged )
-            propNames.push(propertyThatWasChanged);
+          props.push(propertyThatWasChanged);
         }
-        this.index.update(obj, oldObj, propNames);
+        this.index.update(obj, oldObj, props);
       }
     },
 

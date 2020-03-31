@@ -123,11 +123,11 @@ public class MDAO
           Map diff = obj.diff(oldObj);
           Set<String> propSet = new HashSet<>();
 
-          if (diff.keySet().size() != 0) {
+          if ( diff.keySet().size() != 0 ) {
             Iterator i = diff.keySet().iterator();
-            while (i.hasNext()) {
+            while ( i.hasNext() ) {
               PropertyInfo p = (PropertyInfo) of_.getAxiomByName(i.next().toString());
-              if (p != null)
+              if ( p != null )
                 propSet.add(p.getName());
             }
           }
