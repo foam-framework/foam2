@@ -31,9 +31,10 @@ foam.CLASS({
     'foam.nanos.logger.Logger',
     'foam.dao.DAO',
     'foam.mlang.MLang',
+    'foam.nanos.auth.User',
     'foam.nanos.crunch.UserCapabilityJunction',
     'net.nanopay.liquidity.crunch.ApproverLevel',
-    'net.nanopay.liquidity.crunch.GlobalLiquidCapability'
+    'net.nanopay.liquidity.crunch.GlobalLiquidCapability',
   ],
 
   methods: [
@@ -49,10 +50,6 @@ foam.CLASS({
         {
           name: 'modelToApprove',
           type: 'String'
-        },
-        {
-          name: 'requestingUser',
-          type: 'foam.nanos.auth.User'
         }
       ],
       javaCode: `  
@@ -60,7 +57,9 @@ foam.CLASS({
           
       Logger logger = (Logger) x.get("logger");
 
-      String groupName = requestingUser.getGroup();
+      User user = (User) x.get("user");
+
+      String groupName = user.getGroup();
 
       Group currentGroup = (Group) groupDAO.find(groupName);
 
