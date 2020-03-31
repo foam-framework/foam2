@@ -178,9 +178,9 @@ foam.CLASS({
         .select(sink, skip, limit, order, predicate, cache);
     },
 
-    function put(newValue) {
+    function put(obj, oldObj, props) {
       for ( var i = 0 ; i < this.delegates.length ; i++ ) {
-        this.delegates[i].put(newValue);
+        this.delegates[i].put(obj, oldObj, props);
       }
     },
 

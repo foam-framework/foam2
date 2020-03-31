@@ -713,16 +713,17 @@ foam.CLASS({
       
       if ( a.length ) {
         var diffs = obj[this.index.prop].diff(oldObj[this.index.prop]);
-        var propNames = [];
+        var propProperties = [];
 
         if ( diffs.length !== 0 ) {
-          for (var i in diffs) {
-            var propertyThatWasChanged = this.of.getAxiomByName(i);
-            propNames.push(propertyThatWasChanged);
+          for ( var i in diffs ) {
+            var propertyThatWasChanged = a.cls_.getAxiomByName(i);
+            if ( propertyThatWasChanged )
+              propProperties.push(propertyThatWasChanged);
           }
 
           for ( var i = 0 ; i < a.length ; i++ ) {
-            if ( ! props.includes(this.index.prop) ) {
+            if ( ! propProperties.includes(a[i]) ) {
               this.root.update(
                 a[i],
                 obj,
