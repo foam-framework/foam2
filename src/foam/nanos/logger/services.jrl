@@ -70,7 +70,8 @@ p({
     ProxyLogger logLevelFilterLogger = (ProxyLogger) x.get("logLevelFilterLogger");
     logLevelFilterLogger.setX(x);
     AppConfig app = (AppConfig) x.get("appConfig");
-    if ( app.getMode() == Mode.PRODUCTION ) {
+    if ( app.getMode() == Mode.PRODUCTION ||
+         app.getMode() == Mode.TEST ) {
       logLevelFilterLogger.setLogDebug(false);
     }
     DAOLogger daoLogger = new DAOLogger(x);
