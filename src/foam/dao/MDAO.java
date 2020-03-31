@@ -97,9 +97,8 @@ public class MDAO
     obj = objIn(obj);
 
     while ( true ) {
-      FObject oldValue;
       synchronized ( writeLock_ ) {
-        oldValue = find_(x, obj);
+        FObject oldValue = find_(x, obj);
 
         if ( oldValue == null ) {
           Object state = getState();
@@ -107,7 +106,7 @@ public class MDAO
           break;
         }
       }
-      update(obj, oldValue);
+      update(x, obj);
       break;
     }
 
@@ -115,22 +114,30 @@ public class MDAO
     return obj;
   }
 
-  public void update(FObject obj, FObject oldObj) {
-    synchronized ( updateLock_ ) {
-      Object state = getState();
-      Map diff = obj.diff(oldObj);
-      Set<String> propSet = new HashSet<>();
+  public void update(X x, FObject obj) {
+    while ( true ) {
+      synchronized (updateLock_) {
+        FObject oldObj = find_(x, obj);
+        if ( oldObj != null ) {
+          Object state = getState();
+          Map diff = obj.diff(oldObj);
+          Set<String> propSet = new HashSet<>();
 
-      if ( diff.keySet().size() != 0 ) {
-        Iterator i = diff.keySet().iterator();
-        while(i.hasNext()) {
-          PropertyInfo p = (PropertyInfo)of_.getAxiomByName(i.next().toString());
-          if ( p != null )
-            propSet.add(p.getName());
+          if (diff.keySet().size() != 0) {
+            Iterator i = diff.keySet().iterator();
+            while (i.hasNext()) {
+              PropertyInfo p = (PropertyInfo) of_.getAxiomByName(i.next().toString());
+              if (p != null)
+                propSet.add(p.getName());
+            }
+          }
+          state = index_.update(state, obj, oldObj, propSet);
+          setState(state);
+          break;
         }
       }
-      state = index_.update(state, obj, oldObj, propSet);
-      setState(state);
+      put_(x, obj);
+      break;
     }
   }
 
