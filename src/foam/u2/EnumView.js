@@ -9,8 +9,17 @@ foam.CLASS({
   name: 'EnumView',
   extends: 'foam.u2.view.ChoiceView',
 
+  implements: [
+    'foam.mlang.Expressions'
+  ],
+
+  requires: [
+    'foam.nanos.auth.GroupPermissionJunction'
+  ],
+
   imports: [
-    'auth'
+    'auth',
+    'groupPermissionJunctionDAO'
   ],
 
   properties: [
@@ -22,10 +31,24 @@ foam.CLASS({
     {
       name: 'choices',
       expression: function(of) {
-        var self = this;
-       return of ? of.VALUES.map(function(v) {
-         return [ v, v.label ];
-       }) : [];
+        return of ? of.VALUES.map(async (v) => {
+          console.log(v);
+          var allReadPermission = of.name.toLowerCase() + '.read.*';
+          var readPermission = of.name.toLowerCase() + '.read.' + v.label.toLowerCase();
+        
+          var allPermissionsGranted = await this.auth.check(null, allReadPermission);
+
+          if ( allPermissionsGranted ) {
+            return [v, v.label];
+          } else {
+            var readPermissionGranted = await this.auth.check(null, readPermission);
+            if ( readPermissionGranted ) {
+              return [v, v.label];
+            } else {
+              return [];
+            }
+          }
+        }) : [];
       }
     }
   ],
