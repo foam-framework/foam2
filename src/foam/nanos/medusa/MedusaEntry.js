@@ -109,6 +109,7 @@ foam.CLASS({
       class: 'Boolean',
       value: false,
       visibility: 'RO',
+      storageTransient: true,
       includeInDigest: false,
     },
     {
