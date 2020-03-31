@@ -52,10 +52,11 @@ foam.CLASS({
 
   properties: [
     {
+      // NOTE: starting at 2 as indexes 1 and 2 are used to prime the system.
       name: 'index',
       class: 'Long',
+      value: 2,
       visibilty: 'RO',
-//      javaGetter: `return localIndex_.longValue();`
     },
     {
       name: 'threadPoolName',
