@@ -41,10 +41,10 @@ foam.CLASS({
       LogMessage lm = (LogMessage) getDelegate().put_(x, obj);
       if ( getEnabled() &&
            lm != null ) {
-        // Only write WARN, ERROR to SYSLOG in production to reduce
+        // Only write INFO, WARN, ERROR to SYSLOG in production to reduce
         // burden on syslogd, journald. With our own journal logs we are
         // effectively writing out logs twice. 
-        if ( lm.getSeverity().getOrdinal() > LogLevel.INFO.getOrdinal() ||
+        if ( lm.getSeverity().getOrdinal() >= LogLevel.INFO.getOrdinal() ||
             getMode() != Mode.PRODUCTION ) {
           System.out.println(lm.getCreated() + ","+lm.getThread()+","+lm.getSeverity()+","+lm.getMessage());
         }
