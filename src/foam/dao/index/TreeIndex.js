@@ -743,8 +743,30 @@ foam.CLASS({
           }
 
           for ( var i = 0; i < valuesThatNeedToBeUpdated.length; i++ ) {
-            this.root = this.root.update(
+            this.root.update(
               valuesThatNeedToBeUpdated[i],
+              obj,
+              oldObj,
+              this.index.compare,
+              props,
+              this.index.nullNode,
+              this.selectCount > 0);
+          }
+        }
+      } else {
+        if ( ! a.length ) {
+          this.root.update(
+                '',
+                obj,
+                oldObj,
+                this.index.compare,
+                props,
+                this.index.nullNode,
+                this.selectCount > 0);
+        } else {
+          for ( var i = 0; i < a.length; i++ ) {
+            this.root.update(
+              a[i],
               obj,
               oldObj,
               this.index.compare,
