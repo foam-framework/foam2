@@ -710,40 +710,47 @@ foam.CLASS({
     function update(obj, oldObj, props) {
       var a = this.index.prop.f(obj);
           
-      
-      if ( a.length ) {
-        var diffs = obj[this.index.prop].diff(oldObj[this.index.prop]);
-        var propProperties = [];
-
-        if ( diffs.length !== 0 ) {
-          for ( var i in diffs ) {
-            var propertyThatWasChanged = a.cls_.getAxiomByName(i);
-            if ( propertyThatWasChanged )
-              propProperties.push(propertyThatWasChanged);
-          }
-
-          for ( var i = 0 ; i < a.length ; i++ ) {
-            if ( ! propProperties.includes(a[i]) ) {
-              this.root.update(
-                a[i],
+      if ( props.includes(this.index.prop) ) {
+        if ( ! a.length ) {
+          this.root.update(
+                '',
                 obj,
                 oldObj,
                 this.index.compare,
                 props,
                 this.index.nullNode,
                 this.selectCount > 0);
-            } else {
-              this.root = this.root.putKeyValue(
-                a[i],
-                oldObj,
-                this.index.compare,
-                this.index.dedup);
-              this.root = this.root.putKeyValue(
-                a[i],
-                obj,
-                this.index.compare,
-                this.index.dedup);
-            }
+        } else {
+          var newValues = [[...a].filter(v => !b.has(v))];
+          var valuesThatNeedToBeDeleted = [[...b].filter(v => !a.has(v))];
+          var valuesThatNeedToBeUpdated = [...a].filter(v => b.has(v));
+
+
+          for ( var i = 0; i < newValues.length; i++ ) {
+            this.root = this.root.putKeyValue(
+              newValues[i],
+              obj,
+              this.index.compare,
+              this.index.dedup);
+          }
+
+          for ( var i = 0; i < valuesThatNeedToBeDeleted.length; i++ ) {
+            this.root = this.root.removeKeyValue(
+              valuesThatNeedToBeDeleted[i],
+              obj,
+              this.index.compare,
+              this.index.nullNode);
+          }
+
+          for ( var i = 0; i < valuesThatNeedToBeUpdated.length; i++ ) {
+            this.root = this.root.update(
+              valuesThatNeedToBeUpdated[i],
+              obj,
+              oldObj,
+              this.index.compare,
+              props,
+              this.index.nullNode,
+              this.selectCount > 0);
           }
         }
       }
