@@ -91,21 +91,7 @@ public class SessionServerBox
           session.setRemoteHost(req.getRemoteHost());
         }
 
-        //        session = (Session) sessionDAO.put(session);
-        // if ( System.getProperty("CLUSTER") != null ) {
-        //   // how to avoid based on user?
-        //   DAO userDAO = (DAO) getX().get("localUserDAO");
-        //   User user = (User) userDAO.find(session.getUserId());
-        //   if ( user != null &&
-        //        "system".equals(user.getGroup()) ) {
-        //     logger.warning("SessionServerBox", "Session not updated for user", session.getUserId());
-        //     session.setX(getX());
-        //   } else {
-        //     session = (Session) sessionDAO.put(session);
-        //   }
-        // } else {
-           session = (Session) sessionDAO.put(session);
-        // }
+        session = (Session) sessionDAO.put(session);
       } else if ( req != null ) {
         // if req == null it means that we're being accessed via webSockets
         if ( ! session.validRemoteHost(req.getRemoteHost()) ) {
