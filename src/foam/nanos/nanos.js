@@ -90,6 +90,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/twofactor/TwoFactorSignInView" },
   { name: "foam/nanos/auth/twofactor/refinements" },
   { name: "foam/nanos/auth/UserAndGroupAuthService" },
+  { name: "foam/nanos/auth/CheckUserAuthService" },
   { name: "foam/nanos/auth/UserQueryService" },
   { name: "foam/nanos/auth/SimpleUserQueryService" },
   { name: "foam/nanos/bench/Benchmark" },

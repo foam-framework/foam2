@@ -67,6 +67,9 @@ p({
       .setDelegate(auth)
       .build();
     return auth;
+    auth = new foam.nanos.auth.CheckUserAuthService.Builder(x)
+      .setDelegate(auth)
+      .build();
     auth = new foam.nanos.auth.SystemAuthService.Builder(x)
       .setDelegate(auth)
       .build();
