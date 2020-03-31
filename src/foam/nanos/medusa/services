@@ -1,5 +1,13 @@
 p({
   "class": "foam.nanos.boot.NSpec",
+  "name": "medusaThreadPool",
+  "lazy": false,
+  "serve": false,
+  "serviceClass": "foam.nanos.pool.ThreadPoolAgency"
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
   "name": "localClusterConfigDAO",
   "lazy": true,
   "serve": false,

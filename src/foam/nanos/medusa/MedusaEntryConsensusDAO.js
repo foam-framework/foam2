@@ -61,7 +61,7 @@ foam.CLASS({
     {
       name: 'threadPoolName',
       class: 'String',
-      value: 'threadPool'
+      value: 'medusaThreadPool'
     },
     {
       name: 'logger',
@@ -107,7 +107,9 @@ foam.CLASS({
       }
       if ( ce != null ) {
         if ( service.getGlobalIndex(x) > getIndex() ) {
+          getLogger().debug("put", "lock-notify", getIndex(), entry.getIndex());
           synchronized ( promoteLock_ ) {
+            getLogger().debug("put", "notify", getIndex(), entry.getIndex());
             promoteLock_.notify();
           }
         }
@@ -223,14 +225,17 @@ foam.CLASS({
       javaCode: `
       getLogger().debug("promoter");
       try {
-        while (true) {
+        while ( true ) {
           MedusaEntry entry = (MedusaEntry) getDelegate().find_(x, getIndex() + 1);
           if ( entry != null &&
                entry.getHasConsensus() ) {
             promote(x, entry);
           } else {
+            getLogger().debug("promoter", "lock-wait", getIndex());
             synchronized ( promoteLock_ ) {
+              getLogger().debug("promoter", "wait", getIndex());
               promoteLock_.wait();
+              getLogger().debug("promoter", "wake", getIndex());
             }
           }
         }

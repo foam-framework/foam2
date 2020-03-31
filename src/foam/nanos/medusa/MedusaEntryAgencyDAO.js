@@ -22,7 +22,7 @@ foam.CLASS({
     {
       name: 'threadPoolName',
       class: 'String',
-      value: 'threadPool'
+      value: 'medusaThreadPool'
     },
     {
       name: 'logger',
@@ -44,7 +44,7 @@ foam.CLASS({
       MedusaEntry entry = (MedusaEntry) obj;
       getLogger().debug("put", entry.getIndex());
       ContextAgent agent = new MedusaEntryAgent(x, entry, getDelegate());
-      ((Agency) x.get(getThreadPoolName())).submit(x, agent, Long.toString(entry.getIndex()));
+      ((Agency) x.get(getThreadPoolName())).submit(x, agent, "MedusaEntryAgent-"+entry.getMediator()+"-"+entry.getNode()+"-"+Long.toString(entry.getIndex()));
       return entry;
       `
     }

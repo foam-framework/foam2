@@ -1,0 +1,14 @@
+<title>Medusa</title>
+
+<h2>Issues</h2>
+<ol>
+  <li>under load <i>promotion</i> stalls, so the Dagger parent index and hash entries are not updated, resulting in all subsequent links using the same parent index/hashes</li>
+</ol>
+
+<h2>Quirks</h2>
+<ul>
+  <li>incorrect admin password on secondary will hose the cluster. Have to restart the mediators.</li>
+</ul>
+
+<h2>Setup</h2>
+<h3>Development</h3>
