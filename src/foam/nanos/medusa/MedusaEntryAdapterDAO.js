@@ -21,6 +21,7 @@ foam.CLASS({
     'foam.core.FObject',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
+    'foam.nanos.pm.PM',
     'java.util.concurrent.ThreadLocalRandom',
     'java.util.Random',
     'java.util.UUID'
@@ -82,6 +83,7 @@ foam.CLASS({
       ],
       type: 'FObject',
       javaCode: `
+      PM pm = createPM(x, op);
       ElectoralService electoralService = (ElectoralService) x.get("electoralService");
       ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
       getLogger().debug("submit", "state", electoralService.getState().getLabel());
@@ -120,7 +122,34 @@ foam.CLASS({
       } catch (Throwable t) {
         getLogger().error("submit", t.getMessage(), entry, t);
         throw t;
+      } finally {
+        pm.log(x);
       }
+      `
+    },
+
+    // PMs
+    {
+      name: 'putName',
+      class: 'String',
+      javaFactory: 'return getNSpec().getName() + ":Medusa:put";',
+      visibility: 'RO'
+    },
+    {
+      name: 'createPM',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'op',
+          type: 'String'
+        }
+      ],
+      javaType: 'PM',
+      javaCode: `
+    return PM.create(x, this.getOf(), op);
       `
     }
   ]
