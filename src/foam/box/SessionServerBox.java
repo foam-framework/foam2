@@ -103,13 +103,12 @@ public class SessionServerBox
       }
 
       msg.getLocalAttributes().put("x", effectiveContext);
+      getDelegate().send(msg);
     } catch (Throwable t) {
       logger.error("Error throw in SessionServerBox: " + t, " ,service: " + spec.getName(), t);
       t.printStackTrace();
       msg.replyWithException(t);
       return;
     }
-
-    getDelegate().send(msg);
   }
 }

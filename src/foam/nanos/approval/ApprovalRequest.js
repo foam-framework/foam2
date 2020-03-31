@@ -418,6 +418,11 @@
           foam.u2.DisplayMode.RO :
           foam.u2.DisplayMode.HIDDEN;
       }
+    },
+    {
+      class: 'String',
+      name: 'approvableCreateKey',
+      hidden: true
     }
   ],
 

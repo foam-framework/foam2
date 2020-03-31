@@ -18,6 +18,7 @@
 foam.CLASS({
   package: 'foam.core',
   name: 'ValidationPredicate',
+
   properties: [
     {
       name: 'predicateFactory'
@@ -67,6 +68,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'PropertyValidationRefinement',
@@ -105,15 +107,17 @@ foam.CLASS({
             const axiom = this.cls_.getAxiomByName(name);
             return axiom.isDefaultValue(this[name]) && (`Please enter ${label.toLowerCase()}`);
           }]
-      },
-    },
+      }
+    }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.core',
   name: 'StringPropertyValidationRefinement',
   refines: 'foam.core.String',
+
   properties: [
     'minLength',
     'maxLength',
@@ -123,7 +127,8 @@ foam.CLASS({
       name: 'validationPredicates',
       factory: function() {
         var self = this;
-        var a = [];
+        var a    = [];
+
         if ( foam.Number.isInstance(this.minLength) ) {
           a.push({
             args: [this.name],
@@ -133,6 +138,7 @@ foam.CLASS({
             errorString: `Please enter ${this.label.toLowerCase()} with at least ${this.minLength} character${this.minLength>1?'s':''}`
           });
         }
+
         if ( foam.Number.isInstance(this.maxLength) ) {
           a.push({
             args: [this.name],
@@ -142,6 +148,7 @@ foam.CLASS({
             errorString: `Please enter ${this.label.toLowerCase()} with at most ${this.maxLength} character${this.maxLength>1?'s':''}`
           });
         }
+
         if ( this.required && ! foam.Number.isInstance(this.minLength) ) {
           a.push({
             args: [this.name],
@@ -157,10 +164,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'FObjectPropertyValidationRefinement',
   refines: 'foam.core.FObjectProperty',
+
   properties: [
     {
       class: 'Boolean',
@@ -178,15 +187,17 @@ foam.CLASS({
           ];
         }
         return foam.core.Property.VALIDATE_OBJ.expression.apply(this, arguments);
-      },
-    },
+      }
+    }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.core',
   name: 'IntPropertyValidationRefinement',
   refines: 'foam.core.Int',
+
   properties: [
     {
       class: 'Boolean',
@@ -197,7 +208,8 @@ foam.CLASS({
       factory: function() {
         if ( ! this.autoValidate ) return [];
         var self = this;
-        var a = [];
+        var a    = [];
+
         if ( foam.Number.isInstance(self.min) ) {
           a.push({
             args: [self.name],
@@ -207,6 +219,7 @@ foam.CLASS({
             errorString: `Please enter ${self.label.toLowerCase()} greater than or equal to ${self.min}.`
           });
         }
+
         if ( foam.Number.isInstance(self.max) ) {
           a.push({
             args: [self.name],
@@ -216,6 +229,7 @@ foam.CLASS({
             errorString: `Please enter ${self.label.toLowerCase()} less than or equal to ${self.max}`
           });
         }
+
         return a;
       }
     }
@@ -316,10 +330,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'EmailPropertyValidationRefinement',
   refines: 'foam.core.EMail',
+
   properties: [
     {
       class: 'FObjectArray',
@@ -355,6 +371,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.core',
@@ -403,10 +420,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'DatePropertyValidationRefinement',
   refines: 'foam.core.Date',
+
   properties: [
     {
       class: 'FObjectArray',
