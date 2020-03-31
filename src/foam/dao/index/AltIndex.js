@@ -178,15 +178,15 @@ foam.CLASS({
         .select(sink, skip, limit, order, predicate, cache);
     },
 
-    function put(obj, oldObj, props) {
+    function put(newValue) {
       for ( var i = 0 ; i < this.delegates.length ; i++ ) {
-        this.delegates[i].put(obj, oldObj, props);
+        this.delegates[i].put(newValue);
       }
     },
 
-    function update(newValue) {
+    function update(obj, oldObj, props) {
       for ( var i = 0 ; i < this.delegates.length ; i++ ) {
-        this.delegates[i].update(newValue);
+        this.delegates[i].update(obj, oldObj, props);
       }
     },
 
