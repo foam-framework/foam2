@@ -17,7 +17,8 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.DAO',
     'foam.nanos.logger.Logger',
-    'foam.nanos.logger.PrefixLogger'
+    'foam.nanos.logger.PrefixLogger',
+    'foam.nanos.pm.PM'
   ],
 
   properties: [
@@ -86,7 +87,9 @@ foam.CLASS({
         try {
           if ( electoralService.getState() == ElectoralServiceState.IN_SESSION ) {
               logger.debug("to primary", service.getPrimaryConfigId(), cmd);
+              PM pm = new PM(ClusterClientDAO.getOwnClassInfo(), getServiceName());
               FObject result = (FObject) service.getPrimaryDAO(x, getClusterServiceName()).cmd_(x, cmd);
+              pm.log(x);
               logger.debug("from primary", service.getPrimaryConfigId(), result);
               return result;
             } else {

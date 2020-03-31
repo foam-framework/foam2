@@ -28,6 +28,7 @@ foam.CLASS({
     'foam.mlang.predicate.Predicate',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
+    'foam.nanos.pm.PMBox',
     'foam.net.Host',
     'foam.util.SafetyUtil',
     'java.net.HttpURLConnection',
@@ -375,13 +376,17 @@ foam.CLASS({
       javaCode: `
       return new ClientDAO.Builder(x)
         .setDelegate(new SessionClientBox.Builder(x)
-        .setSessionID(sendClusterConfig.getSessionId())
-        .setDelegate(new HTTPBox.Builder(x)
-          .setAuthorizationType(foam.box.HTTPAuthorizationType.BEARER)
-            .setSessionID(sendClusterConfig.getSessionId())
-            .setUrl(buildURL(x, serviceName, receiveClusterConfig))
+          .setSessionID(sendClusterConfig.getSessionId())
+          .setDelegate(new PMBox.Builder(x)
+            .setClassType(MedusaEntry.getOwnClassInfo())
+            .setName(sendClusterConfig.getName()+"-"+getServiceName() +"-"+receiveClusterConfig.getName())
+            .setDelegate(new HTTPBox.Builder(x)
+              .setAuthorizationType(foam.box.HTTPAuthorizationType.BEARER)
+              .setSessionID(sendClusterConfig.getSessionId())
+              .setUrl(buildURL(x, serviceName, receiveClusterConfig))
+              .build())
             .build())
-           .build())
+          .build())
         .build();
       `
     }

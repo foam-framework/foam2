@@ -269,6 +269,7 @@ var classes = [
   'foam.nanos.om.OMLogger',
   'foam.nanos.pm.NullPM',
   'foam.nanos.pm.PM',
+  'foam.nanos.pm.PMBox',
   'foam.nanos.script.Language',
   'foam.nanos.auth.Language',
   'foam.nanos.auth.Region',

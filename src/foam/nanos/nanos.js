@@ -218,6 +218,7 @@ FOAM_FILES([
   { name: "foam/nanos/pm/PMTemperatureCellFormatter" },
   { name: "foam/nanos/pm/NullPM" },
   { name: "foam/nanos/pm/PM" },
+  { name: "foam/nanos/pm/PMBox" },
   { name: "foam/nanos/pm/PMInfo" },
   { name: "foam/nanos/pm/PMTableView", flags:['web'] },
   { name: "foam/nanos/pm/TemperatureCView" },
