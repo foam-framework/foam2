@@ -102,7 +102,7 @@ public class MDAO
         oldValue = find_(x, obj);
 
         if ( oldValue == null ) {
-          Object  state    = getState();
+          Object state = getState();
           setState(index_.put(state, obj));
           break;
         }
@@ -117,15 +117,15 @@ public class MDAO
 
   public void update(FObject obj, FObject oldObj) {
     synchronized ( updateLock_ ) {
-      Object  state    = getState();
+      Object state = getState();
       Map diff = obj.diff(oldObj);
       Set<String> propSet = new HashSet<>();
 
-      if(diff.keySet().size() != 0) {
+      if ( diff.keySet().size() != 0 ) {
         Iterator i = diff.keySet().iterator();
         while(i.hasNext()) {
           PropertyInfo p = (PropertyInfo)of_.getAxiomByName(i.next().toString());
-          if(p != null)
+          if ( p != null )
             propSet.add(p.getName());
         }
       }
