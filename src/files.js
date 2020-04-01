@@ -759,6 +759,7 @@ FOAM_FILES([
   { name: "foam/util/filesystem/FileWalker" },
 
   // DocuSign
+  { name: 'foam/nanos/docusign/DocuSignAPIHelper' },
   { name: 'foam/nanos/docusign/DocuSignElement' },
   { name: 'foam/nanos/docusign/DocuSignWritable' },
   { name: 'foam/nanos/docusign/DocuSignConfig' },

@@ -10,13 +10,23 @@ foam.CLASS({
     },
     {
       name: 'refreshToken',
-      aliases: ['access_token'],
+      aliases: ['refresh_token'],
       class: 'String'
     },
     {
       name: 'expiresIn',
       aliases: ['expires_in'],
-      class: 'Int'
+      class: 'Int',
+      javaPostSet: `
+        setExpireTimestamp(
+          System.currentTimeMillis() / 1000L
+          + (long) val
+        );
+      `
+    },
+    {
+      name: 'expireTimestamp',
+      class: 'Long'
     }
   ]
 });

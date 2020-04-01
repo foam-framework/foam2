@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.common.collect.Lists;
 
 import foam.nanos.docusign.DocuSignAccessTokens;
+import foam.nanos.docusign.DocuSignAPIHelper;
 import foam.nanos.docusign.DocuSignConfig;
 import foam.nanos.docusign.DocuSignSession;
 import foam.nanos.docusign.DocuSignUserAccount;
@@ -85,11 +86,13 @@ public class DocuSignWebAgent implements WebAgent {
       return;
     }
 
+    DocuSignAPIHelper dsAPI = new DocuSignAPIHelper.Builder(x)
+      .setDocuSignConfig(docuSignConfig)
+      .build();
+
     List<NameValuePair> tokenRequestParams = Lists.newArrayList();
     tokenRequestParams.add(new BasicNameValuePair("grant_type", "authorization_code"));
     tokenRequestParams.add(new BasicNameValuePair("code", authCode));
-
-    HttpURLConnection conn = null;
 
     // Values that we will attempt to populate
     DocuSignAccessTokens accessTokens = null;
@@ -97,59 +100,11 @@ public class DocuSignWebAgent implements WebAgent {
 
     // === STEP 1: Send the authorization code to DocuSign to get the access code
     try {
-      URL url = new URL(docuSignConfig.getOAuthBaseURI() + "/token");
-      conn = (HttpURLConnection) url.openConnection();
-      conn.setRequestMethod("POST");
-      conn.setDoInput(true);
-      conn.setDoOutput(true);
-      conn.setRequestProperty("Authorization",
-        "Basic "+docuSignConfig.getAuthorizationHeaderValue());
+      accessTokens = dsAPI.getAccessTokens(x, authCode);
     } catch (Exception e) {
-      if ( conn != null ) conn.disconnect();
       logger.error(e);
       resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       return;
-    }
-
-    try {
-      try (
-        BufferedWriter w = new BufferedWriter(new OutputStreamWriter(
-          conn.getOutputStream(), StandardCharsets.UTF_8))
-      ) {
-        w.write(URLEncodedUtils.format(tokenRequestParams, StandardCharsets.UTF_8));
-        w.flush();
-      }
-
-      String line = null;
-      int code = conn.getResponseCode();
-      StringBuilder builder = new StringBuilder();
-
-      if ( code != 200 ) {
-        logger.warning(String.format("DocuSign oauth/token responded with HTTP %d", code));
-      }
-
-      try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-          code >= 200 && code < 300 ? conn.getInputStream() : conn.getErrorStream()))) {
-        while ((line = reader.readLine()) != null) {
-          builder.append(line);
-        }
-      }
-
-      System.out.println("\033[32;1m==== RESPONSE FROM /oath/token ====\033[0m");
-      System.out.println(builder.toString());
-      System.out.println("\033[32;1m==== -------- ---- ====\033[0m");
-
-      JSONParser parser = x.create(JSONParser.class);
-      accessTokens = (DocuSignAccessTokens)
-        parser.parseString(builder.toString(), DocuSignAccessTokens.class);
-      // TODO: parse response
-    } catch (IOException e) {
-      logger.error(e);
-      resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      return;
-    } finally {
-      if ( conn != null ) conn.disconnect();
-      conn = null;
     }
 
     System.out.println(String.format(
@@ -157,6 +112,8 @@ public class DocuSignWebAgent implements WebAgent {
       accessTokens.getAccessToken()));
 
     // === STEP 2: Request user info
+    HttpURLConnection conn = null;
+
     try {
       URL url = new URL(docuSignConfig.getOAuthBaseURI() + "/userinfo");
       conn = (HttpURLConnection) url.openConnection();

@@ -562,6 +562,7 @@ var classes = [
   'foam.nanos.approval.FulfilledApprovableRule',
 
   // DocuSign
+  'foam.nanos.docusign.DocuSignAPIHelper',
   'foam.nanos.docusign.DocuSignWritable',
   'foam.nanos.docusign.DocuSignTag',
   'foam.nanos.docusign.DocuSignString',
