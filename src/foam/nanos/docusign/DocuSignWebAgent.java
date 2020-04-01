@@ -112,59 +112,17 @@ public class DocuSignWebAgent implements WebAgent {
       accessTokens.getAccessToken()));
 
     // === STEP 2: Request user info
-    HttpURLConnection conn = null;
-
     try {
-      URL url = new URL(docuSignConfig.getOAuthBaseURI() + "/userinfo");
-      conn = (HttpURLConnection) url.openConnection();
-      conn.setRequestMethod("GET");
-      conn.setDoInput(true);
-      conn.setDoOutput(true);
-      conn.setRequestProperty("Authorization",
-        "Bearer "+accessTokens.getAccessToken());
-      conn.connect();
+      userInfo = dsAPI.getUserInfo(x, accessTokens);
     } catch (Exception e) {
-      if ( conn != null ) conn.disconnect();
       logger.error(e);
       resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       return;
     }
 
-    try {
-      String line = null;
-      int code = conn.getResponseCode();
-      StringBuilder builder = new StringBuilder();
-
-      if ( code != 200 ) {
-        logger.warning(String.format("DocuSign oauth/userinfo responded with HTTP %d", code));
-      }
-
-      try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-          code >= 200 && code < 300 ? conn.getInputStream() : conn.getErrorStream()))) {
-        while ((line = reader.readLine()) != null) {
-          builder.append(line);
-        }
-      }
-
-      System.out.println("\033[32;1m==== RESPONSE FROM /oath/userinfo ====\033[0m");
-      System.out.println(builder.toString());
-      System.out.println("\033[32;1m==== -------- ---- ====\033[0m");
-
-      JSONParser parser = x.create(JSONParser.class);
-      userInfo = (DocuSignUserInfo)
-        parser.parseString(builder.toString(), DocuSignUserInfo.class);
-
-      System.out.println(String.format(
-        "Just making sure this works: [%s|%s]",
-        userInfo.getName(), userInfo.getAccounts()[0].getName()));
-    } catch (IOException e) {
-      logger.error(e);
-      resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      return;
-    } finally {
-      if ( conn != null ) conn.disconnect();
-      conn = null;
-    }
+    System.out.println(String.format(
+      "Just making sure this works: [%s|%s]",
+      userInfo.getName(), userInfo.getAccounts()[0].getName()));
 
     DocuSignUserAccount defaultAccount = null;
     for ( DocuSignUserAccount acc : userInfo.getAccounts() ) {

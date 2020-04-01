@@ -34,13 +34,14 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'post_',
+      name: 'fetch_',
       documentation: `
         Performs a post, converts programmer error exceptions to runtime exceptions,
         and throws IOException.
       `,
       javaThrows: ['java.io.IOException'],
       args: [
+        { name: 'method', type: 'String' },
         { name: 'urlStr', type: 'String' },
         { name: 'auth', type: 'String' },
       ],
@@ -50,7 +51,7 @@ foam.CLASS({
         try {
           URL url = new URL(urlStr);
           conn = (HttpURLConnection) url.openConnection();
-          conn.setRequestMethod("POST");
+          conn.setRequestMethod(method);
           conn.setDoInput(true);
           conn.setDoOutput(true);
           conn.setRequestProperty("Authorization", auth);
@@ -58,7 +59,6 @@ foam.CLASS({
           throw new RuntimeException(
             "malformed url: " + e.getMessage());
         } catch ( ProtocolException e ) {
-          // This will never happen
           throw new RuntimeException(
             "invalid protocol: " + e.getMessage());
         } catch ( IOException e ) {
@@ -121,10 +121,6 @@ foam.CLASS({
           name: 'authCode',
           type: 'String'
         }
-        // {
-        //   name: 'accessTokens',
-        //   type: 'foam.nanos.docusign.DocuSignAccessTokens'
-        // }
       ],
       javaThrows: ['IOException', 'DocuSignException'],
       javaType: 'foam.nanos.docusign.DocuSignAccessTokens',
@@ -143,7 +139,7 @@ foam.CLASS({
         DocuSignAccessTokens accessTokens = null;
 
         try {
-          conn = post_(
+          conn = fetch_("POST",
             getDocuSignConfig().getOAuthBaseURI() + "/token",
             "Basic "+getDocuSignConfig().getAuthorizationHeaderValue()
           );
@@ -168,6 +164,55 @@ System.out.println("\\033[32;1m==== -------- ---- ====\\033[0m");
         }
         
         return accessTokens;
+      `
+    },
+    {
+      name: 'getUserInfo',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'accessTokens',
+          type: 'foam.nanos.docusign.DocuSignAccessTokens'
+        }
+      ],
+      javaThrows: ['IOException', 'DocuSignException'],
+      javaType: 'foam.nanos.docusign.DocuSignUserInfo',
+      javaCode: `
+        Logger logger = (Logger) x.get("logger");
+
+        // Send request to DocuSign
+        HttpURLConnection conn = null;
+        DocuSignUserInfo userInfo = null;
+
+        try {
+          conn = fetch_("GET",
+            getDocuSignConfig().getOAuthBaseURI() + "/userInfo",
+            "Bearer " + accessTokens.getAccessToken()
+          );
+          conn.connect();
+          String response = stringifyResponse_(conn);
+
+System.out.println("\\033[36;1m==== RESPONSE FROM /oath/userinfo ====\\033[0m");
+System.out.println(response.toString());
+System.out.println("\\033[36;1m==== -------- ---- ====\\033[0m");
+
+          int code = conn.getResponseCode();
+          if ( code != 200 ) {
+            logger.warning(String.format("DocuSign oauth/token responded with HTTP %d", code));
+            throw new DocuSignException(code, response);
+          }
+
+          JSONParser parser = x.create(JSONParser.class);
+          userInfo = (DocuSignUserInfo)
+            parser.parseString(response, DocuSignUserInfo.class);
+        } finally {
+          if ( conn != null ) conn.disconnect();
+        }
+        
+        return userInfo;
       `
     }
   ]
