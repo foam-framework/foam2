@@ -113,7 +113,7 @@ foam.CLASS({
   actions: [
     {
       name: 'sendEmail',
-      label: 'Send reset password email',
+      label: 'Submit',
       isEnabled: function(errors_) {
         return ! errors_;
       },
