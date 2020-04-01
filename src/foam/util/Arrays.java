@@ -134,7 +134,7 @@ public class Arrays {
 
     if ( end-start < 10 ) {
       for ( int i = start ; i < end ; i++ ) {
-        for ( int j = i ; i <= end; j++ ) {
+        for ( int j = i ; j <= end; j++ ) {
           if ( c.compare(a[j], a[i]) < 0 ) swap(a, i, j);
         }
       }
@@ -144,25 +144,29 @@ public class Arrays {
 
     int p1 = start, p2 = end;
 
-    if ( c.compare(a[p1], a[p2]) < 0 ) swap(a, p1, p2);
+    if ( c.compare(a[p1], a[p2]) > 0 ) swap(a, p1, p2);
 
-    for ( var i = start + 1 ; i < end ; i++ ) {
+    for ( var i = start + 1; i < p2; i++ ) {
       int d = c.compare(a[p1], a[i]);
       if ( d == 1 ) {
         swap(a, p1, p1+1);
-        swap(a, p1+1, i);
-        p1++;
-      } else if ( d == 0 ) {
-        swap(a, p1+1, i);
+        if(p1 + 1 != i) {
+          swap(a, p1, i);
+          i--;
+        }
         p1++;
       } else {
-        d = c.compare(a[p2], a[i]);
+        d = c.compare(a[i], a[p2]);
         if ( d == 1 ) {
-          swap(a, p2, p1+1);
-          swap(a, p2-1, i);
+          swap(a, p2, p2-1);
+          if(p2-1 != i) {
+            swap(a, p2, i);
+            i--;
+          }
           p2--;
         } else if ( d == 0 ) {
           swap(a, p2-1, i);
+          i--;
           p2--;
         }
       }
