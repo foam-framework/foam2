@@ -201,7 +201,10 @@ foam.CLASS({
         if ( match != null ) {
           getLogger().debug("cleanup");
           getDelegate().where(
-            EQ(MedusaEntry.INDEX, entry.getIndex())
+            AND(
+              EQ(MedusaEntry.INDEX, entry.getIndex()),
+              NEQ(MedusaEntry.INDEX, match.getIndex())
+            )
           ).removeAll();
         }
       }
