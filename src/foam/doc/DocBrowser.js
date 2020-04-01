@@ -794,10 +794,10 @@ foam.CLASS({
       documentation: 'the y of the last required to element draw in the canvas.',
     },
     {
-      name: 'allowedModels',
+      name: 'allowedModels'
     },
     {
-      name: 'allowedProperties',
+      name: 'allowedProperties'
     }
   ],
 
