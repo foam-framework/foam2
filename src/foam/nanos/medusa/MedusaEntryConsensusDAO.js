@@ -26,6 +26,7 @@ foam.CLASS({
     'static foam.mlang.MLang.HAS',
     'static foam.mlang.MLang.COUNT',
     'static foam.mlang.MLang.GROUP_BY',
+    'static foam.mlang.MLang.NEQ',
     'foam.mlang.sink.Count',
     'foam.mlang.sink.GroupBy',
     'foam.nanos.logger.PrefixLogger',
