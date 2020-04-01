@@ -1,0 +1,27 @@
+foam.CLASS({
+  package: 'foam.nanos.docusign',
+  name: 'DocuSignUserAccount',
+
+  properties: [
+    {
+      name: 'id',
+      aliases: ['account_id'],
+      class: 'String'
+    },
+    {
+      name: 'name',
+      aliases: ['account_name'],
+      class: 'String'
+    },
+    {
+      name: 'baseURI',
+      aliases: ['base_uri'],
+      class: 'String'
+    },
+    {
+      name: 'isDefault',
+      aliases: ['is_default'],
+      class: 'Boolean'
+    }
+  ]
+});

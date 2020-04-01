@@ -559,7 +559,18 @@ var classes = [
   'foam.nanos.approval.ApprovableApprovalRequestsPredicate',
   'foam.nanos.approval.ApprovableApprovalRequestsRule',
   'foam.nanos.approval.FulfilledApprovablePredicate',
-  'foam.nanos.approval.FulfilledApprovableRule'
+  'foam.nanos.approval.FulfilledApprovableRule',
+
+  // DocuSign
+  'foam.nanos.docusign.DocuSignWritable',
+  'foam.nanos.docusign.DocuSignTag',
+  'foam.nanos.docusign.DocuSignString',
+  'foam.nanos.docusign.DocuSignConfig',
+  'foam.nanos.docusign.DocuSignAccessTokens',
+  'foam.nanos.docusign.DocuSignUserAccount',
+  'foam.nanos.docusign.DocuSignUserInfo',
+  'foam.nanos.docusign.DocuSignSession',
+  'foam.nanos.docusign.example.ExampleDocument',
 ];
 
 var abstractClasses = [

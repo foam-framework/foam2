@@ -757,4 +757,14 @@ FOAM_FILES([
   { name: "foam/foamlink/FoamlinkExec" },
   { name: "foam/foamlink/lib" },
   { name: "foam/util/filesystem/FileWalker" },
+
+  // DocuSign
+  { name: 'foam/nanos/docusign/DocuSignElement' },
+  { name: 'foam/nanos/docusign/DocuSignWritable' },
+  { name: 'foam/nanos/docusign/DocuSignConfig' },
+  { name: 'foam/nanos/docusign/DocuSignAccessTokens' },
+  { name: 'foam/nanos/docusign/DocuSignSession' },
+  { name: 'foam/nanos/docusign/api/DocuSignUserAccount' },
+  { name: 'foam/nanos/docusign/api/DocuSignUserInfo' },
+  { name: 'foam/nanos/docusign/example/ExampleDocument' },
 ]);

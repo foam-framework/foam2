@@ -1,0 +1,3 @@
+https://account-d.docusign.com/oauth/auth?response_type=code&scope=signature&client_id=560a0ec0-d028-4b9e-9100-75c119caa738&redirect_uri=http://localhost:8080/service/dsRedirectHandler&state=dbc9bc71-08df-483f-9e31-62996d794713
+
+ctrl.__subContext__.sessionDAO.find(foam.mlang.Expressions.create().EQ(foam.nanos.session.Session.USER_ID, ctrl.__subContext__.user.id)).then(o => { console.log(`https://account-d.docusign.com/oauth/auth?response_type=code&scope=signature&client_id=560a0ec0-d028-4b9e-9100-75c119caa738&redirect_uri=http://localhost:8080/service/dsRedirectHandler&state=${o.id}`) }

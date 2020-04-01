@@ -1,0 +1,238 @@
+package foam.nanos.docusign;
+
+import foam.core.X;
+import foam.dao.DAO;
+import foam.lib.json.JSONParser;
+import foam.nanos.auth.AuthenticationException;
+import foam.nanos.auth.User;
+import foam.nanos.http.WebAgent;
+import foam.nanos.logger.Logger;
+import foam.nanos.session.Session;
+import foam.util.SafetyUtil;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.google.common.collect.Lists;
+
+import foam.nanos.docusign.DocuSignAccessTokens;
+import foam.nanos.docusign.DocuSignConfig;
+import foam.nanos.docusign.DocuSignSession;
+import foam.nanos.docusign.DocuSignUserAccount;
+import foam.nanos.docusign.DocuSignUserInfo;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+
+public class DocuSignWebAgent implements WebAgent {
+  public DocuSignWebAgent() {
+  }
+
+  @Override
+  public void execute(X x) {
+    Logger              logger = (Logger) x.get("logger");
+    HttpServletRequest  req  = x.get(HttpServletRequest.class);
+    HttpServletResponse resp = x.get(HttpServletResponse.class);
+
+
+    // find session
+    String sessionId = req.getParameter("state");
+    Session session = (Session)
+      ((DAO) x.get("localSessionDAO")).find(sessionId);
+    if ( session == null || session.getContext() == null ) {
+      throw new AuthenticationException("Session not found");
+    }
+
+    // find user
+    User user = (User)
+      ((DAO) x.get("localUserDAO")).find(session.getUserId());
+
+    if ( user == null ) {
+      throw new AuthenticationException("User not found");
+    }
+
+    // DocuSign documentation interchangably calls this an
+    // authorization code and an authentication code.
+    String authCode = req.getParameter("code");
+    if ( SafetyUtil.isEmpty(authCode) ) {
+      logger.warning("empty 'code' parameter received by DocuSignWebAgent");
+      try {
+        resp.sendError(
+          HttpServletResponse.SC_BAD_REQUEST,
+          "Expected authentication code in request parameter");
+      } catch (IOException e) {
+        logger.error(e);
+      } finally {
+        return;
+      }
+    }
+
+    DocuSignConfig docuSignConfig = (DocuSignConfig) x.get("docuSignConfig");
+    if ( docuSignConfig == null ) {
+      logger.error("No docuSignConfig in context! Sending INTERNAL_SERVER_ERROR.");
+      resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      return;
+    }
+
+    List<NameValuePair> tokenRequestParams = Lists.newArrayList();
+    tokenRequestParams.add(new BasicNameValuePair("grant_type", "authorization_code"));
+    tokenRequestParams.add(new BasicNameValuePair("code", authCode));
+
+    HttpURLConnection conn = null;
+
+    // Values that we will attempt to populate
+    DocuSignAccessTokens accessTokens = null;
+    DocuSignUserInfo userInfo = null;
+
+    // === STEP 1: Send the authorization code to DocuSign to get the access code
+    try {
+      URL url = new URL(docuSignConfig.getOAuthBaseURI() + "/token");
+      conn = (HttpURLConnection) url.openConnection();
+      conn.setRequestMethod("POST");
+      conn.setDoInput(true);
+      conn.setDoOutput(true);
+      conn.setRequestProperty("Authorization",
+        "Basic "+docuSignConfig.getAuthorizationHeaderValue());
+    } catch (Exception e) {
+      if ( conn != null ) conn.disconnect();
+      logger.error(e);
+      resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      return;
+    }
+
+    try {
+      try (
+        BufferedWriter w = new BufferedWriter(new OutputStreamWriter(
+          conn.getOutputStream(), StandardCharsets.UTF_8))
+      ) {
+        w.write(URLEncodedUtils.format(tokenRequestParams, StandardCharsets.UTF_8));
+        w.flush();
+      }
+
+      String line = null;
+      int code = conn.getResponseCode();
+      StringBuilder builder = new StringBuilder();
+
+      if ( code != 200 ) {
+        logger.warning(String.format("DocuSign oauth/token responded with HTTP %d", code));
+      }
+
+      try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+          code >= 200 && code < 300 ? conn.getInputStream() : conn.getErrorStream()))) {
+        while ((line = reader.readLine()) != null) {
+          builder.append(line);
+        }
+      }
+
+      System.out.println("\033[32;1m==== RESPONSE FROM /oath/token ====\033[0m");
+      System.out.println(builder.toString());
+      System.out.println("\033[32;1m==== -------- ---- ====\033[0m");
+
+      JSONParser parser = x.create(JSONParser.class);
+      accessTokens = (DocuSignAccessTokens)
+        parser.parseString(builder.toString(), DocuSignAccessTokens.class);
+      // TODO: parse response
+    } catch (IOException e) {
+      logger.error(e);
+      resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      return;
+    } finally {
+      if ( conn != null ) conn.disconnect();
+      conn = null;
+    }
+
+    System.out.println(String.format(
+      "Just making sure this works: [%s]",
+      accessTokens.getAccessToken()));
+
+    // === STEP 2: Request user info
+    try {
+      URL url = new URL(docuSignConfig.getOAuthBaseURI() + "/userinfo");
+      conn = (HttpURLConnection) url.openConnection();
+      conn.setRequestMethod("GET");
+      conn.setDoInput(true);
+      conn.setDoOutput(true);
+      conn.setRequestProperty("Authorization",
+        "Bearer "+accessTokens.getAccessToken());
+      conn.connect();
+    } catch (Exception e) {
+      if ( conn != null ) conn.disconnect();
+      logger.error(e);
+      resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      return;
+    }
+
+    try {
+      String line = null;
+      int code = conn.getResponseCode();
+      StringBuilder builder = new StringBuilder();
+
+      if ( code != 200 ) {
+        logger.warning(String.format("DocuSign oauth/userinfo responded with HTTP %d", code));
+      }
+
+      try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+          code >= 200 && code < 300 ? conn.getInputStream() : conn.getErrorStream()))) {
+        while ((line = reader.readLine()) != null) {
+          builder.append(line);
+        }
+      }
+
+      System.out.println("\033[32;1m==== RESPONSE FROM /oath/userinfo ====\033[0m");
+      System.out.println(builder.toString());
+      System.out.println("\033[32;1m==== -------- ---- ====\033[0m");
+
+      JSONParser parser = x.create(JSONParser.class);
+      userInfo = (DocuSignUserInfo)
+        parser.parseString(builder.toString(), DocuSignUserInfo.class);
+
+      System.out.println(String.format(
+        "Just making sure this works: [%s|%s]",
+        userInfo.getName(), userInfo.getAccounts()[0].getName()));
+    } catch (IOException e) {
+      logger.error(e);
+      resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      return;
+    } finally {
+      if ( conn != null ) conn.disconnect();
+      conn = null;
+    }
+
+    DocuSignUserAccount defaultAccount = null;
+    for ( DocuSignUserAccount acc : userInfo.getAccounts() ) {
+      if ( acc.getIsDefault() ) {
+        defaultAccount = acc;
+        break;
+      }
+    }
+
+    if ( defaultAccount == null ) {
+      logger.error(
+        "DocuSign did not provide a default account", userInfo
+      );
+      resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      return;
+    }
+
+    // === STEP 3: Add information to docuSignSession
+    DocuSignSession dsSession = new DocuSignSession.Builder(x)
+      .setAccessTokens(accessTokens)
+      .setUserInfo(userInfo)
+      .setActiveAccount(defaultAccount)
+      .setId(user.getId())
+      .build();
+    
+      ((DAO) x.get("docuSignSessionDAO")).put(dsSession);
+  }
+}
