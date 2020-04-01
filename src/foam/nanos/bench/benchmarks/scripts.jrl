@@ -44,7 +44,7 @@ p({
 
     b1 = new MDAOPutBanchmark();
 
-    r1 = new BenchmarkRunner.Builder(x).setInvocationCount(10000000).setBenchmark(b1).build();
+    r1 = new BenchmarkRunner.Builder(x).setInvocationCount(1000).setBenchmark(b1).build();
     r1.execute(x);""",
       "lastModifiedBy": 1348
     })
@@ -63,7 +63,7 @@ p({
 
     b2 = new MDAOPutFind();
 
-    r2 = new BenchmarkRunner.Builder(x).setThreadCount(1).setInvocationCount(10000000).setBenchmark(b2).build();
+    r2 = new BenchmarkRunner.Builder(x).setThreadCount(1).setInvocationCount(1000).setBenchmark(b2).build();
     r2.execute(x);""",
       "lastModifiedBy": 1348
     })
@@ -82,7 +82,7 @@ p({
 
     b3 = new MDAOPutSelect();
 
-    r3 = new BenchmarkRunner.Builder(x).setThreadCount(1).setInvocationCount(10000000).setBenchmark(b3).build();
+    r3 = new BenchmarkRunner.Builder(x).setThreadCount(1).setInvocationCount(1000).setBenchmark(b3).build();
     r3.execute(x);""",
       "lastModifiedBy": 1348
     })
@@ -101,7 +101,7 @@ p({
 
     b4 = new MDAOUpdateBenchmark();
 
-    r4 = new BenchmarkRunner.Builder(x).setThreadCount(1).setInvocationCount(10000000).setBenchmark(b4).build();
+    r4 = new BenchmarkRunner.Builder(x).setThreadCount(1000).setInvocationCount(1).setBenchmark(b4).build();
     r4.execute(x);""",
       "lastModifiedBy": 1348
     })
@@ -120,7 +120,7 @@ p({
 
     b5 = new MDAOUpdateFind();
 
-    r5 = new BenchmarkRunner.Builder(x).setThreadCount(1).setInvocationCount(10000000).setBenchmark(b5).build();
+    r5 = new BenchmarkRunner.Builder(x).setThreadCount(1).setInvocationCount(1000).setBenchmark(b5).build();
     r5.execute(x);""",
       "lastModifiedBy": 1348
     })
@@ -140,7 +140,7 @@ p({
     b6 = new MDAOUpdateSelect();
 
 
-    r6 = new BenchmarkRunner.Builder(x).setThreadCount(1).setInvocationCount(10000000).setBenchmark(b6).build();
+    r6 = new BenchmarkRunner.Builder(x).setThreadCount(1).setInvocationCount(1000).setBenchmark(b6).build();
     r6.execute(x);""",
       "lastModifiedBy": 1348
 })

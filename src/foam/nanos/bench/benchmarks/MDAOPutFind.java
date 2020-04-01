@@ -15,8 +15,10 @@ import java.util.Set;
 public class MDAOPutFind implements Benchmark {
 
   protected DAO dao_;
+  protected Country[] countries;
   protected Country a1_;
   private char[] alphabet = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
+
 
   @Override
   public void setup(X x) {
@@ -24,10 +26,9 @@ public class MDAOPutFind implements Benchmark {
     ((MDAO) dao_).addIndex(new foam.core.PropertyInfo[] {Country.NAME});
     ((MDAO) dao_).addIndex(new foam.core.PropertyInfo[] {Country.CODE});
 
-    int numOfCountries = 0;
+    countries = new Country[1000];
 
     Set<String> ids = new HashSet<>();
-    //TO make index trees more usefull
     Set<String> names = new HashSet<>();
     Set<String> codes = new HashSet<>();
 
@@ -36,7 +37,8 @@ public class MDAOPutFind implements Benchmark {
 
     Country newCountry = null;
     StringBuffer sb;
-    while(ids.size() < 1000000) {
+    int i = 0;
+    while(ids.size() < 1000999) {
       int randomLength = 8;
       int j = 0;
       String s = "";
@@ -47,7 +49,6 @@ public class MDAOPutFind implements Benchmark {
       }
       s = sb.toString();
       if ( ! ids.contains(s) ) {
-        numOfCountries++;
         ids.add(s);
 
         newCountry = new Country.Builder(x).setId(s).setCode(s).setName(s).build();
@@ -60,11 +61,15 @@ public class MDAOPutFind implements Benchmark {
         newCountry.setName(names.toArray()[rand.nextInt(names.size())].toString());
         newCountry.setCode(codes.toArray()[rand.nextInt(codes.size())].toString());
 
-        dao_.put_(x, newCountry);
+        if ( ids.size() <= 1000000)
+          dao_.put_(x, newCountry);
+        else {
+          countries[i] = newCountry;
+          i++;
+        }
       }
     }
-
-    a1_= new Country.Builder(x).setId("AA").setCode("AA").setName("AA").build();
+    countries[i] = new Country.Builder(x).setId("AA").setCode("AA").setName("AA").build();
   }
 
   @Override
@@ -74,7 +79,9 @@ public class MDAOPutFind implements Benchmark {
   @Override
   public void execute(X x) {
 
-    dao_.put_(x, a1_);
-    Country c = (Country)dao_.find("AA");
+    for(int i = 0; i < countries.length; i++) {
+      dao_.put_(x, countries[i]);
+      Country c = (Country)dao_.find(countries[i].getId());
+    }
   }
 }

@@ -14,16 +14,17 @@ import java.util.Set;
 public class MDAOUpdateFind implements Benchmark {
 
   protected DAO dao_;
-  protected Country a1_;
+  protected Country[] countries;
   private char[] alphabet = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
+
 
   @Override
   public void setup(X x) {
-   dao_ = new MDAO(Country.getOwnClassInfo());
+    dao_ = new MDAO(Country.getOwnClassInfo());
     ((MDAO) dao_).addIndex(new foam.core.PropertyInfo[] {Country.NAME});
     ((MDAO) dao_).addIndex(new foam.core.PropertyInfo[] {Country.CODE});
 
-    int numOfCountries = 0;
+    countries = new Country[1000];
 
     Set<String> ids = new HashSet<>();
     Set<String> names = new HashSet<>();
@@ -34,9 +35,8 @@ public class MDAOUpdateFind implements Benchmark {
 
     Country newCountry = null;
     StringBuffer sb;
-    a1_= new Country.Builder(x).setId("AB").setCode("AA").setName("AA").build();
-    dao_.put_(x, a1_);
-    while(ids.size() < 999998) {
+    int i = 0;
+    while(ids.size() < 1001000) {
       int randomLength = 8;
       int j = 0;
       String s = "";
@@ -47,7 +47,6 @@ public class MDAOUpdateFind implements Benchmark {
       }
       s = sb.toString();
       if ( ! ids.contains(s) ) {
-        numOfCountries++;
         ids.add(s);
 
         newCountry = new Country.Builder(x).setId(s).setCode(s).setName(s).build();
@@ -57,17 +56,36 @@ public class MDAOUpdateFind implements Benchmark {
         if ( codes.size() < 256 ) {
           codes.add(s);
         }
-
         newCountry.setName(names.toArray()[rand.nextInt(names.size())].toString());
         newCountry.setCode(codes.toArray()[rand.nextInt(codes.size())].toString());
 
         dao_.put_(x, newCountry);
+        if ( i < 1000 ) {
+          if ( i != 0 ) {
+            int randValue = 0;
+            while(true) {
+              randValue = rand.nextInt(names.size());
+              if (! newCountry.getName().equals(names.toArray()[randValue]) )
+                break;
+            }
+            newCountry.setName(names.toArray()[randValue].toString());
+
+            while(true) {
+              randValue = rand.nextInt(codes.size());
+
+              if (! newCountry.getCode().equals(codes.toArray()[randValue]) )
+                break;
+            }
+            newCountry.setCode(codes.toArray()[randValue].toString());
+
+          }
+
+
+          countries[i] = newCountry;
+          i++;
+        }
       }
     }
-
-    a1_= new Country.Builder(x).setId("AA").setCode("AA").setName("AA").build();
-
-    dao_.put_(x, a1_);
   }
 
   @Override
@@ -76,8 +94,9 @@ public class MDAOUpdateFind implements Benchmark {
 
   @Override
   public void execute(X x) {
-    a1_.setCode("BB");
-    dao_.put_(x, a1_);
-    Country c = (Country)dao_.find("AA");
+    for(int i = 0; i < countries.length; i++) {
+      dao_.put_(x, countries[i]);
+      Country c = (Country)dao_.find(countries[i].getId());
+    }
   }
 }
