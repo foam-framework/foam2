@@ -27,7 +27,6 @@ public class MDAOUpdateSelect implements Benchmark {
     int numOfCountries = 0;
 
     Set<String> ids = new HashSet<>();
-    //TO make index trees more usefull
     Set<String> names = new HashSet<>();
     Set<String> codes = new HashSet<>();
 
@@ -36,7 +35,9 @@ public class MDAOUpdateSelect implements Benchmark {
 
     Country newCountry = null;
     StringBuffer sb;
-    while(ids.size() < 1000000) {
+    a1_= new Country.Builder(x).setId("AB").setCode("AA").setName("AA").build();
+    dao_.put_(x, a1_);
+    while(ids.size() < 999998) {
       int randomLength = 8;
       int j = 0;
       String s = "";
@@ -57,6 +58,7 @@ public class MDAOUpdateSelect implements Benchmark {
         if ( codes.size() < 256 ) {
           codes.add(s);
         }
+
         newCountry.setName(names.toArray()[rand.nextInt(names.size())].toString());
         newCountry.setCode(codes.toArray()[rand.nextInt(codes.size())].toString());
 
