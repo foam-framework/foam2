@@ -39,7 +39,7 @@ foam.CLASS({
         Performs a post, converts programmer error exceptions to runtime exceptions,
         and throws IOException.
       `,
-      javaThrows: ['java.io.IOException'],
+      javaThrows: ['IOException'],
       args: [
         { name: 'method', type: 'String' },
         { name: 'urlStr', type: 'String' },
@@ -90,7 +90,7 @@ foam.CLASS({
       args: [
         { name: 'conn', javaType: 'HttpURLConnection' },
       ],
-      javaThrows: ['IOException'],
+      javaThrows: ['IOException', 'DocuSignException'],
       type: 'String',
       javaCode: `
         String line = null;
@@ -105,6 +105,10 @@ foam.CLASS({
           while ( (line = reader.readLine()) != null ) {
             builder.append(line);
           }
+        }
+
+        if ( code != 200 ) {
+          throw new DocuSignException(code, builder.toString());
         }
 
         return builder.toString();
@@ -125,8 +129,6 @@ foam.CLASS({
       javaThrows: ['IOException', 'DocuSignException'],
       javaType: 'foam.nanos.docusign.DocuSignAccessTokens',
       javaCode: `
-        Logger logger = (Logger) x.get("logger");
-
         // Set parameters
         List<NameValuePair> params = Lists.newArrayList();
         params.add(new BasicNameValuePair("grant_type",
@@ -149,12 +151,6 @@ foam.CLASS({
 System.out.println("\\033[32;1m==== RESPONSE FROM /oath/token ====\\033[0m");
 System.out.println(response.toString());
 System.out.println("\\033[32;1m==== -------- ---- ====\\033[0m");
-
-          int code = conn.getResponseCode();
-          if ( code != 200 ) {
-            logger.warning(String.format("DocuSign oauth/token responded with HTTP %d", code));
-            throw new DocuSignException(code, response);
-          }
 
           JSONParser parser = x.create(JSONParser.class);
           accessTokens = (DocuSignAccessTokens)
@@ -181,8 +177,6 @@ System.out.println("\\033[32;1m==== -------- ---- ====\\033[0m");
       javaThrows: ['IOException', 'DocuSignException'],
       javaType: 'foam.nanos.docusign.DocuSignUserInfo',
       javaCode: `
-        Logger logger = (Logger) x.get("logger");
-
         // Send request to DocuSign
         HttpURLConnection conn = null;
         DocuSignUserInfo userInfo = null;
@@ -199,12 +193,6 @@ System.out.println("\\033[36;1m==== RESPONSE FROM /oath/userinfo ====\\033[0m");
 System.out.println(response.toString());
 System.out.println("\\033[36;1m==== -------- ---- ====\\033[0m");
 
-          int code = conn.getResponseCode();
-          if ( code != 200 ) {
-            logger.warning(String.format("DocuSign oauth/token responded with HTTP %d", code));
-            throw new DocuSignException(code, response);
-          }
-
           JSONParser parser = x.create(JSONParser.class);
           userInfo = (DocuSignUserInfo)
             parser.parseString(response, DocuSignUserInfo.class);
@@ -214,6 +202,51 @@ System.out.println("\\033[36;1m==== -------- ---- ====\\033[0m");
         
         return userInfo;
       `
-    }
+    },
+    {
+      name: 'refreshAccessToken',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'accessTokens',
+          type: 'foam.nanos.docusign.DocuSignAccessTokens'
+        }
+      ],
+      javaThrows: ['IOException', 'DocuSignException'],
+      javaType: 'foam.nanos.docusign.DocuSignAccessTokens',
+      javaCode: `
+        Logger logger = (Logger) x.get("logger");
+
+        // Set parameters
+        List<NameValuePair> params = Lists.newArrayList();
+        params.add(new BasicNameValuePair("grant_type",
+          "refresh_token"));
+        params.add(new BasicNameValuePair("refresh_token",
+          accessTokens.getRefreshToken()));
+
+        // Send request to DocuSign
+        HttpURLConnection conn = null;
+
+        try {
+          conn = fetch_("POST",
+            getDocuSignConfig().getOAuthBaseURI() + "/token",
+            "Basic "+getDocuSignConfig().getAuthorizationHeaderValue()
+          );
+          writeURLEncodedForm_(conn, params);
+          String response = stringifyResponse_(conn);
+
+          JSONParser parser = x.create(JSONParser.class);
+          accessTokens = (DocuSignAccessTokens)
+            parser.parseString(response, DocuSignAccessTokens.class);
+        } finally {
+          if ( conn != null ) conn.disconnect();
+        }
+        
+        return accessTokens;
+      `
+    },
   ]
 });
