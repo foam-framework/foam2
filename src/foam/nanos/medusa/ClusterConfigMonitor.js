@@ -8,11 +8,16 @@ foam.CLASS({
   package: 'foam.nanos.medusa',
   name: 'ClusterConfigMonitor',
 
+  documentation: 'NOTE: do not start with cronjob. This process starts the ClusterConfigPinkSing which polls the Mediators and Nodes and will initiate Replay, and Elections.',
+
   implements: [
-    'foam.core.ContextAgent'
+    'foam.core.ContextAgent',
+    'foam.nanos.NanoService'
   ],
 
   javaImports: [
+    'foam.core.Agency',
+    'foam.core.AgencyTimerTask',
     'foam.core.ContextAgent',
     'foam.core.X',
     'foam.dao.DAO',
@@ -20,10 +25,16 @@ foam.CLASS({
     'static foam.mlang.MLang.AND',
     'static foam.mlang.MLang.EQ',
     'static foam.mlang.MLang.NEQ',
-    'static foam.mlang.MLang.NOT'
+    'static foam.mlang.MLang.NOT',
+    'java.util.Timer'
   ],
 
   properties: [
+    {
+      name: 'interval',
+      class: 'Long',
+      value: 3000
+    },
     {
       name: 'timeout',
       class: 'Int',
@@ -32,6 +43,17 @@ foam.CLASS({
   ],
 
   methods: [
+    {
+      documentation: 'Start as a NanoService',
+      name: 'start',
+      javaCode: `
+      Timer timer = new Timer(this.getClass().getSimpleName());
+      timer.scheduleAtFixedRate(
+        new AgencyTimerTask(getX(), this),
+        getInterval(),
+        getInterval());
+      `
+    },
     {
       name: 'execute',
       args: [

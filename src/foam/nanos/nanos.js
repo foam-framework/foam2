@@ -153,7 +153,6 @@ FOAM_FILES([
   { name: "foam/nanos/medusa/ReplayCmd" },
   { name: "foam/nanos/medusa/ReplayDAO" },
   { name: "foam/nanos/medusa/ReplayDetailsCmd" },
-  { name: "foam/nanos/medusa/ReplayDetailsDAO" },
   { name: "foam/nanos/medusa/RetryClientSinkDAO" },
   { name: "foam/nanos/medusa/Status" },
   { name: "foam/nanos/session/Session" },

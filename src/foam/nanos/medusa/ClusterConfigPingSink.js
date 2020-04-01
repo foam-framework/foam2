@@ -97,24 +97,26 @@ foam.CLASS({
               index = (Long) max.getValue();
             }
 
-            DAO nodesDAO = (DAO) getX().get("localMedusaEntryDAO");
-            // get Node details
-            // ReplayDetailsCmd details = new ReplayDetailsCmd();
-            // details = nodesDAO.cmd(cmd);
-            // if ( details.getMaxIndex() > 0 ) {
-            //   dagger.setReplayIndex(getX(), details.getMaxIndex());
-            //
-            // }
-            // if ( details.getMaxIndex() > dagger.getGlobalIndex(getX())) {
             ReplayCmd cmd = new ReplayCmd();
             cmd.setRequester(myConfig.getId());
             cmd.setResponder(config.getId());
             cmd.setFromIndex(index);
             // TODO: configuration
             cmd.setServiceName("medusaEntryDAO");
-            getLogger().info("Requesting replay", cmd);
-            nodesDAO.cmd(cmd);
-            // }
+
+            DAO clientDAO = service.getClientDAO(getX(), "medusaEntryDAO", myConfig, config);
+            clientDAO = new RetryClientSinkDAO.Builder(getX())
+              .setDelegate(clientDAO)
+              .setMaxRetryAttempts(service.getMaxRetryAttempts())
+              .setMaxRetryDelay(service.getMaxRetryDelay())
+              .build();
+            getLogger().debug(myConfig.getId(), "Request replay from", config.getId());
+            Object response = clientDAO.cmd_(getX(), cmd);
+
+            // TODO/REVIEW: not sure how to implement replay mode
+            if ( response instanceof ReplayDetailsCmd ) {
+              getLogger().debug(myConfig.getId(), "Request replay response", response);
+            }
           }
         }
         ClusterConfig.PING_INFO.clear(config);

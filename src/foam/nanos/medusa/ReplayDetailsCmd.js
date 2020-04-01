@@ -15,7 +15,15 @@ foam.CLASS({
       class: 'String',
     },
     {
+      name: 'minIndex',
+      class: 'Long'
+    },
+    {
       name: 'maxIndex',
+      class: 'Long'
+    },
+    {
+      name: 'count',
       class: 'Long'
     }
   ]

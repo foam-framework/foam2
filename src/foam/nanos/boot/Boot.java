@@ -116,7 +116,13 @@ public class Boot {
       if ( script != null ) {
         logger.info("Boot, Script", startScript);
         script = (Script) script.fclone();
-        script.runScript(root_);
+        try {
+          // During boot with Medusa, everything must be
+          // read-only until Replay is complete.
+          script.runScript(new foam.core.ReadOnlyDAOContext(root_));
+        } catch (UnsupportedOperationException e) {
+          // ignore
+        }
       } else {
         logger.warning("Boot, Script not found", startScript);
       }

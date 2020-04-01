@@ -21,13 +21,13 @@ foam.CLASS({
     'foam.core.FObject',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
-    'foam.mlang.sink.Count',
-    'foam.mlang.sink.GroupBy',
     'static foam.mlang.MLang.AND',
     'static foam.mlang.MLang.EQ',
     'static foam.mlang.MLang.HAS',
     'static foam.mlang.MLang.COUNT',
     'static foam.mlang.MLang.GROUP_BY',
+    'foam.mlang.sink.Count',
+    'foam.mlang.sink.GroupBy',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'foam.util.SafetyUtil',
@@ -42,8 +42,8 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-  private Object promoteLock_ = new Object();
   private Object indexLock_ = new Object();
+  private Object promoteLock_ = new Object();
           `
         }));
       }
@@ -82,7 +82,7 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
-      getLogger().debug("put", getIndex(), entry.getIndex(), entry.getHasConsensus());
+      getLogger().debug("put", getIndex(), entry.getIndex());
 
       DaggerService service = (DaggerService) x.get("daggerService");
       if ( entry.getIndex() > service.getGlobalIndex(x) ) {
@@ -90,13 +90,15 @@ foam.CLASS({
         getLogger().debug("put", getIndex(), "setGlobalIndex", entry.getIndex());
       }
 
-      if ( entry.getIndex() <= getIndex() ) {
-        getLogger().warning("put", getIndex(), "discarding", entry.getIndex());
-        return entry;
-      }
-
       MedusaEntry ce = null;
+
       synchronized ( Long.toString(entry.getIndex()).intern() ) {
+
+        if ( entry.getIndex() <= getIndex() ) {
+          getLogger().info("put", getIndex(), "discarding", entry.getIndex());
+          return entry;
+        }
+
         MedusaEntry me = (MedusaEntry) getDelegate().put_(x, entry);
 
         ce = getConsensusEntry(x, me);
@@ -105,9 +107,10 @@ foam.CLASS({
           ce =  promote(x, ce);
         }
       }
+
       if ( ce != null ) {
         if ( service.getGlobalIndex(x) > getIndex() ) {
-          getLogger().debug("put", "lock-notify", getIndex(), entry.getIndex());
+          getLogger().debug("put", "lock", getIndex(), entry.getIndex());
           synchronized ( promoteLock_ ) {
             getLogger().debug("put", "notify", getIndex(), entry.getIndex());
             promoteLock_.notify();
@@ -214,7 +217,7 @@ foam.CLASS({
       `
     },
     {
-      documetation: 'ContextAgent implementation. Handling out of order consensus updates. Check if next (index + 1) has reach consensus and promote.',
+      documentation: 'ContextAgent implementation. Handling out of order consensus updates. Check if next (index + 1) has reach consensus and promote.',
       name: 'execute',
       args: [
         {
@@ -231,7 +234,7 @@ foam.CLASS({
                entry.getHasConsensus() ) {
             promote(x, entry);
           } else {
-            getLogger().debug("promoter", "lock-wait", getIndex());
+            getLogger().debug("promoter", "lock", getIndex());
             synchronized ( promoteLock_ ) {
               getLogger().debug("promoter", "wait", getIndex());
               promoteLock_.wait();

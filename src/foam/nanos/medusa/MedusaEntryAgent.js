@@ -16,7 +16,8 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.DAO',
     'foam.nanos.logger.PrefixLogger',
-    'foam.nanos.logger.Logger'
+    'foam.nanos.logger.Logger',
+    'foam.nanos.pm.PM'
   ],
 
   properties: [
@@ -71,11 +72,14 @@ foam.CLASS({
       javaCode: `
       MedusaEntry entry = getEntry();
       getLogger().debug("execute", entry.getIndex());
+      PM pm = PM.create(x, MedusaEntryAgent.getOwnClassInfo(), "put:"+Long.toString(entry.getIndex()));
       try {
         getDelegate().put_(x, entry);
       } catch ( Exception e ) {
         getLogger().error("execute", e.getMessage(), entry, e);
         // TODO: Alarm
+      } finally {
+        pm.log(x);
       }
       `
     }

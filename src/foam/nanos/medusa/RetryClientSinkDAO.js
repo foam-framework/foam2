@@ -113,7 +113,7 @@ foam.CLASS({
       int retryAttempt = 0;
       int retryDelay = 10;
 
-      getLogger().debug("submit", op, obj);
+      getLogger().debug("submit", op);
 
       while ( true ) {
         try {

@@ -46,7 +46,8 @@ foam.CLASS({
       visibility: 'HIDDEN',
       javaFactory: `
         return new PrefixLogger(new Object[] {
-          this.getClass().getSimpleName()
+          this.getClass().getSimpleName(),
+          getNSpec().getName()
         }, (Logger) getX().get("logger"));
       `
     }
@@ -106,17 +107,17 @@ foam.CLASS({
       entry.setAction(op);
       entry.setData(obj);
 
-      getLogger().debug("submit", entry.getIndex(), entry);
+      getLogger().debug("submit", entry.getIndex());
 
       try {
         FObject data = ((MedusaEntry)getMedusaEntryDAO().put_(x, entry)).getData();
         getLogger().debug("submit", entry.getIndex(), "find", data.getProperty("id"));
         FObject result = getDelegate().find_(x, data.getProperty("id"));
         if ( result == null ) {
-          getLogger().error("Object not found", data.getProperty("id"), data);
+          getLogger().error("Object not found", data.getProperty("id"));
           return data;
         } else {
-          getLogger().debug("submit", entry.getIndex(), "found", result);
+          getLogger().debug("submit", entry.getIndex(), "found", result.getProperty("id"));
         }
         return result;
       } catch (Throwable t) {

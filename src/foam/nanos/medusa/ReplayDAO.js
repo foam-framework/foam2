@@ -14,10 +14,14 @@ foam.CLASS({
   javaImports: [
     'foam.core.FObject',
     'foam.core.X',
+    'foam.dao.ArraySink',
     'foam.dao.DAO',
-    'static foam.mlang.MLang.COUNT',
+    'foam.dao.Sink',
     'static foam.mlang.MLang.GTE',
     'foam.mlang.sink.Count',
+    'foam.mlang.sink.Max',
+    'foam.mlang.sink.Min',
+    'foam.mlang.sink.Sequence',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
   ],
@@ -47,11 +51,18 @@ foam.CLASS({
       getLogger().debug("cmd", cmd);
 
       // DEBUG
-      Count count = (Count) getDelegate().where(
+      Min min = new Min();
+      Max max = new Max();
+      Count count = new Count();
+      Sequence seq = new Sequence.Builder(x)
+        .setArgs(new Sink[] {count, min, max})
+        .build();
+
+      getDelegate().where(
         GTE(MedusaEntry.INDEX, cmd.getFromIndex()))
       .orderBy(MedusaEntry.INDEX)
-      .select(COUNT());
-      getLogger().debug("cmd", "count", count.getValue());
+      .select(seq);
+      getLogger().debug("cmd", "details", "count", count.getValue(), "min", min.getValue(), "max", max.getValue());
 
       ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
       ClusterConfig fromConfig = service.getConfig(x, cmd.getResponder());
@@ -59,7 +70,17 @@ foam.CLASS({
 
       DAO clientDAO = service.getClientDAO(x, cmd.getServiceName(), fromConfig, toConfig);
 
-     getDelegate().where(
+      ReplayDetailsCmd details = new ReplayDetailsCmd();
+      details.setResponder(fromConfig.getId());
+      if ( count != null &&
+           ((Long) count.getValue()) > 0 ) {
+        details.setMinIndex((Long)min.getValue());
+        details.setMaxIndex((Long)max.getValue());
+        details.setCount((Long) count.getValue());
+      }
+      getDelegate().cmd_(x, details);
+
+      getDelegate().where(
         GTE(MedusaEntry.INDEX, cmd.getFromIndex())
       )
       .orderBy(MedusaEntry.INDEX)
@@ -68,7 +89,8 @@ foam.CLASS({
         .setMaxRetryAttempts(service.getMaxRetryAttempts())
         .setMaxRetryDelay(service.getMaxRetryDelay())
         .build());
-      return cmd;
+
+      return details;
       `
     }
   ]

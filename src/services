@@ -89,7 +89,7 @@ p({
   "name": "ping",
   "lazy": false,
   "authenticate": false,
-  "serviceClass": "foam.nanos.medusa.ClusterPingService"
+  "serviceClass": "foam.nanos.http.PingService"
 })
 
 p({
@@ -172,7 +172,6 @@ p({
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.script.Script.getOwnClassInfo())
       .setGuid(true)
-      .setCluster(true)
       .setPm(true)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("scripts")
@@ -198,7 +197,6 @@ p({
       .setDecorator(new foam.nanos.cron.CronScheduleDAO.Builder(x)
         .setDelegate(new foam.nanos.script.ScriptRunnerDAO(new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.cron.Cron.getOwnClassInfo()).build()))
         .build())
-      .setCluster(false)
       .build();
   """,
   "client":"{\"of\":\"foam.nanos.cron.Cron\"}"
@@ -304,10 +302,11 @@ p({
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.session.Session.getOwnClassInfo())
-      .setPm(true)
-      .setAuthorize(false)
       .setInnerDAO(((foam.dao.DAO) x.get("localSessionDAO")))
+      .setAuthorize(false)
       .setOrder(new foam.mlang.order.Comparator[] { new foam.mlang.order.Desc.Builder(x).setArg1(foam.nanos.session.Session.LAST_USED).build() })
+      .setCluster(false)
+      .setPm(true)
       .build();
   """,
   "client": "{\"of\":\"foam.nanos.session.Session\"}",
@@ -738,8 +737,7 @@ p({
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.ruler.RuleHistory.getOwnClassInfo())
       .setSeqNo(true)
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName("ruleHistory")
+      .setNullify(true)
       .setRuler(false)
       .setCluster(false)
       .setPm(true)

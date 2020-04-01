@@ -92,33 +92,6 @@ foam.CLASS({
       }
       return entry;
       `
-    },
-    {
-      name: 'cmd_',
-      javaCode: `
-      String configId = null;
-      if ( obj instanceof ReplayCmd ) {
-        ReplayCmd cmd = (ReplayCmd) obj;
-        configId = cmd.getResponder();
-      } else if ( obj instanceof ReplayDetailsCmd ) {
-        ReplayDetailsCmd cmd = (ReplayDetailsCmd) obj;
-        configId = cmd.getResponder();
-      }
-      if ( configId != null ) {
-        ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
-        ClusterConfig config = service.getConfig(x, configId);
-        DAO clientDAO = service.getClientDAO(x, "medusaEntryDAO", config, config);
-        DAO dao = new RetryClientSinkDAO.Builder(x)
-                         .setDelegate(clientDAO)
-                         .setMaxRetryAttempts(service.getMaxRetryAttempts())
-                         .setMaxRetryDelay(service.getMaxRetryDelay())
-                         .build();
-        getLogger().debug("cmd", obj);
-        return dao.cmd_(x, obj);
-      } else {
-        return getDelegate().cmd_(x, obj);
-      }
-      `
     }
   ]
 });

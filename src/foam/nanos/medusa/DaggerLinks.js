@@ -10,7 +10,7 @@ foam.CLASS({
 
   properties: [
     {
-      documenation: 'next global index',
+      documentation: 'next global index',
       name: 'globalIndex',
       class: 'Long'
     },

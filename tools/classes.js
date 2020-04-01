@@ -335,7 +335,6 @@ var classes = [
   'foam.nanos.medusa.ReplayCmd',
   'foam.nanos.medusa.ReplayDAO',
   'foam.nanos.medusa.ReplayDetailsCmd',
-  'foam.nanos.medusa.ReplayDetailsDAO',
   'foam.nanos.medusa.RetryClientSinkDAO',
   'foam.nanos.medusa.Status',
   'foam.nanos.medusa.MedusaMessage',
