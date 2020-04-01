@@ -56,6 +56,10 @@ public class PropertyParser
 
     if ( prop_.getShortName() != null ) names.add(prop_.getShortName());
 
+    for ( String alias : prop_.getAliases() ) {
+      names.add(alias);
+    }
+
     Collections.sort(names, new Comparator<String>() {
       public int compare(String s1, String s2) {
         int l1 = s1.length(), l2 = s2.length();
