@@ -30,6 +30,7 @@ foam.CLASS({
     }
     
     ^ .top-bar {
+      background: /*%LOGOBACKGROUNDCOLOUR%*/ #202341;
       width: 100%;
       height: 8vh;
       border-bottom: solid 1px #e2e2e3
@@ -52,9 +53,9 @@ foam.CLASS({
 
     ^ .subtitle {
       color: #525455;
-      font-size: 16px;
+      font-size: 1em;
       line-height: 1.5;
-      margin-bottom: 15px;
+      margin-bottom: 2vh;
       text-align: center;
     }
 
