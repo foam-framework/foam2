@@ -21,11 +21,13 @@ foam.CLASS({
     'foam.nanos.boot.NSpec',
   ],
 
-  imports: [
-    'nSpecDAO',
-  ],
+  imports: [ 'nSpecDAO' ],
+
+  exports: [ 'conventionalUML' ],
+
 
   properties: [
+    [ 'conventionalUML', false ],
     {
       name: 'modelDAO',
       expression: function(nSpecDAO) {
