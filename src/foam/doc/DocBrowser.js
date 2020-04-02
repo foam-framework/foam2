@@ -732,7 +732,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'className',
-      value: 'className',
+      value: 'className'
     },
     {
       name: 'elementMap'
@@ -740,15 +740,15 @@ foam.CLASS({
     {
       class: 'String',
       name: 'prop',
-      value: 'propName',
+      value: 'propName'
     },
     {
       name: 'triangleSize',
-      value: 5,
+      value: 5
     },
     {
       name: 'dashedstep',
-      value: 10,
+      value: 10
     },
     {
       name: 'properties',
@@ -792,7 +792,7 @@ foam.CLASS({
       name: 'lastRelatedToY',
       value: 0,
       documentation: 'the y of the last required to element draw in the canvas.',
-    },
+    }
   ],
 
   methods: [
@@ -1060,8 +1060,7 @@ foam.CLASS({
         width: w || defaultWidth,
         height: h || this.conventionalUML ? step * this.properties.length : step * 5,
         color: '#ffffff', //this.UNSELECTED_COLOR
-        border: 'black',
-        text: this.prop
+        border: 'black'
       });
 
       this.selected = this.canvas.add( modelBox, modelNameLabel, propertyBox );
