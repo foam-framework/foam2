@@ -117,24 +117,24 @@ public class Arrays {
    * sortRange(array, comparator, 0, 1) will put the smallest value at array[0]
    * sortRange(array, comparator, array.length-1, 1) will put the largest value at array[length-1]
    **/
-  public void sortRange(Object[] a, Comparator c, int skip, int limit) {
+  public static void sortRange(Object[] a, Comparator c, int skip, int limit) {
     sortRange(a, c, skip, limit, 0, a.length-1);
   }
 
-  protected void swap(Object[] a, int i1, int i2) {
+  protected static void swap(Object[] a, int i1, int i2) {
     Object tmp = a[i1];
     a[i1] = a[i2];
     a[i2] = tmp;
   }
 
-  protected void sortRange(Object[] a, Comparator c, int skip, int limit, int start, int end) {
+  protected static void sortRange(Object[] a, Comparator c, int skip, int limit, int start, int end) {
     if ( end <= start ) return;
     if ( start > skip + limit ) return;
     if ( end < skip ) return;
 
     if ( end - start < 10 ) {
-      for ( int i = start; i < end; i++ ) {
-        for ( int j = i; j <= end; j++ ) {
+      for ( int i = start ; i < end ; i++ ) {
+        for ( int j = i ; j <= end ; j++ ) {
           if ( c.compare(a[j], a[i]) < 0 ) swap(a, i, j);
         }
       }
@@ -145,7 +145,7 @@ public class Arrays {
 
     if ( c.compare(a[p1], a[p2]) > 0 ) swap(a, p1, p2);
 
-    for ( var i = start + 1; i < p2; i++ ) {
+    for ( var i = start + 1 ; i < p2 ; i++ ) {
       int d = c.compare(a[p1], a[i]);
       if ( d == 1 ) {
         swap(a, p1, p1 + 1);
