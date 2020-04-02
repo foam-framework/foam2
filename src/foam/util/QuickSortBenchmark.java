@@ -16,14 +16,12 @@ public class QuickSortBenchmark {
     runBenchmark(600000, 0, 600000);
 
     // benchmark range
-    runBenchmark(1000000, 0, 100);
-    runBenchmark(2000000, 0, 200);
-    runBenchmark(3000000, 0, 300);
-    runBenchmark(4000000, 0, 400);
-    runBenchmark(5000000, 0, 500);
-    runBenchmark(6000000, 0, 600);
-    runBenchmark(7000000, 0, 700);
-    runBenchmark(8000000, 0, 800);
+    runBenchmark( 1000000, 0, 20);
+    runBenchmark( 2000000, 0, 20);
+    runBenchmark( 4000000, 0, 20);
+    runBenchmark( 8000000, 0, 20);
+    runBenchmark(16000000, 0, 20);
+    runBenchmark(32000000, 0, 20);
 
     runBenchmark(1000000, 100, 1000000);
     runBenchmark(2000000, 200, 2000000);
@@ -64,4 +62,3 @@ public class QuickSortBenchmark {
     count++;
   }
 }
-
