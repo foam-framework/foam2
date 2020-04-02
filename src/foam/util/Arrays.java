@@ -1,6 +1,7 @@
 package foam.util;
 
 import java.lang.reflect.Array;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -96,4 +97,83 @@ public class Arrays {
     }
     return s;
   }
+
+  /**
+   * Implement a dual-pivot quicksort which only sorts over the specified range.
+   * Often data needs to be sorted, but the end user will only view a range
+   * of the data because of pagination or scrolling. This algorithm takes
+   * into account the provided 'skip' (number of initial rows not seen) and
+   * 'limit' (numberof rows seen) to optimize the sort by only partially sorting
+   * the data. All data in the specified skip/limit range is fully sorted and
+   * all data before the range is less than or equal to the first value in the
+   * range and all data after the range is greater to or euqal to the last
+   * value in the range. Data outside of the specified range is partitioned
+   * but not sorted. The algorithm uses a quicksort (a dual-pivot variant),
+   * which works by first partitioning the data and then recursing on each
+   * partition. This algorithm works by stopping the recursion for partitions
+   * which it knows are out of range.
+   *
+   * sortRange(array, comparator, 0, array.length) is the same as a full sort
+   * sortRange(array, comparator, 0, 1) will put the smallest value at array[0]
+   * sortRange(array, comparator, array.length-1, 1) will put the largest value at array[length-1]
+   **/
+  public static void sortRange(Object[] a, Comparator c, int skip, int limit) {
+    sortRange(a, c, skip, limit, 0, a.length-1);
+  }
+
+  protected static void swap(Object[] a, int i1, int i2) {
+    Object tmp = a[i1];
+    a[i1] = a[i2];
+    a[i2] = tmp;
+  }
+
+  protected static void sortRange(Object[] a, Comparator c, int skip, int limit, int start, int end) {
+    if ( end <= start ) return;
+    if ( start >= skip + limit ) return;
+    if ( end < skip ) return;
+
+    if ( end - start < 15 ) {
+      for ( int i = start ; i < end ; i++ ) {
+        int smallest = start;
+        for ( int j = i+1 ; j <= end ; j++ ) {
+          if ( c.compare(a[j], a[smallest]) < 0 ) smallest = j;
+        }
+        if ( i != smallest ) swap(a, i, smallest);
+      }
+      return;
+    }
+
+    int p1 = start, p2 = end;
+
+    if ( c.compare(a[p1], a[p2]) > 0 ) swap(a, p1, p2);
+
+    for ( var i = start + 1 ; i < p2 ; i++ ) {
+      int d = c.compare(a[p1], a[i]);
+      if ( d == 1 ) {
+        swap(a, p1, p1 + 1);
+        if ( p1 + 1 != i )
+          swap(a, p1, i);
+        p1++;
+      } else {
+        d = c.compare(a[i], a[p2]);
+        if ( d == 1 ) {
+          swap(a, p2, p2 - 1);
+          if ( p2 - 1 != i ) {
+            swap(a, p2, i);
+            i--;
+          }
+          p2--;
+        } else if ( d == 0 ) {
+          swap(a, p2 - 1, i);
+          i--;
+          p2--;
+        }
+      }
+    }
+
+    sortRange(a, c, skip, limit, start, p1 - 1);
+    sortRange(a, c, skip, limit, p1 + 1, p2 - 1);
+    sortRange(a, c, skip, limit, p2 + 1, end);
+  }
+
 }
