@@ -16,6 +16,8 @@ foam.CLASS({
   ],
 
   documentation: `
+    DEPRECATED: Please use LifecycleAware and LifecycleAwareDAO
+
     DAO decorator that sets deleted property when an object is being removed and
     filters out deleted=true objects based on permission.
 

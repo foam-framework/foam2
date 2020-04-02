@@ -9,6 +9,10 @@ foam.CLASS({
   name: 'DeletedAwareDAOTest',
   extends: 'foam.nanos.test.Test',
 
+  documentation: `
+    DEPRECATED: Please use LifecycleAware and LifecycleAwareDAO
+  `,
+
   javaImports: [
     'foam.core.X',
     'foam.core.FObject',
