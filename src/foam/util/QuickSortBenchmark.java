@@ -10,10 +10,8 @@ public class QuickSortBenchmark {
     // compare two algorithms for full sort
     runBenchmark(100000, 0, 100000);
     runBenchmark(200000, 0, 200000);
-    runBenchmark(300000, 0, 300000);
     runBenchmark(400000, 0, 400000);
-    runBenchmark(500000, 0, 500000);
-    runBenchmark(600000, 0, 600000);
+    runBenchmark(800000, 0, 800000);
 
     // benchmark range
     runBenchmark( 1000000, 0, 20);
@@ -23,14 +21,10 @@ public class QuickSortBenchmark {
     runBenchmark(16000000, 0, 20);
     runBenchmark(32000000, 0, 20);
 
-    runBenchmark(1000000, 100, 1000000);
-    runBenchmark(2000000, 200, 2000000);
-    runBenchmark(3000000, 300, 3000000);
-    runBenchmark(4000000, 400, 4000000);
-    runBenchmark(5000000, 500, 5000000);
-    runBenchmark(6000000, 600, 6000000);
-    runBenchmark(7000000, 700, 7000000);
-    runBenchmark(8000000, 800, 8000000);
+    runBenchmark(1000000, 10000, 20);
+    runBenchmark(2000000, 10000, 20);
+    runBenchmark(4000000, 10000, 20);
+    runBenchmark(8000000, 10000, 20);
   }
 
   private static void benchmarkQuickSort(Integer[] array, int skip, int limit) {
