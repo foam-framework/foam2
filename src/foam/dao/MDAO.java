@@ -96,49 +96,37 @@ public class MDAO
     // Clone and freeze outside of lock to minimize time spent under lock
     obj = objIn(obj);
 
-    while ( true ) {
+    //while ( true ) {
       synchronized ( writeLock_ ) {
         FObject oldValue = find_(x, obj);
 
         if ( oldValue == null ) {
           Object state = getState();
           setState(index_.put(state, obj));
-          break;
+          //break;
+        } else {
+          update(obj, oldValue);
         }
       }
-      update(x, obj);
-      break;
-    }
+      //update(x, obj);
+      //break;
+   // }
 
     onPut(obj);
     return obj;
   }
 
-  public void update(X x, FObject obj) {
-    while ( true ) {
-      synchronized (updateLock_) {
-        FObject oldObj = find_(x, obj);
-        if ( oldObj != null ) {
+  public void update(FObject obj, FObject oldObj) {
+   // while ( true ) {
+      //synchronized (updateLock_) {
           Object state = getState();
-          Map diff = obj.diff(oldObj);
-          Set<String> propSet = new HashSet<>();
-
-          if ( diff.keySet().size() != 0 ) {
-            Iterator i = diff.keySet().iterator();
-            while ( i.hasNext() ) {
-              PropertyInfo p = (PropertyInfo) of_.getAxiomByName(i.next().toString());
-              if ( p != null )
-                propSet.add(p.getName());
-            }
-          }
-          state = index_.update(state, obj, oldObj, propSet);
+          state = index_.update(state, oldObj, obj);
           setState(state);
-          break;
-        }
-      }
-      put_(x, obj);
-      break;
-    }
+         // break;
+      //}
+     // put_(x, obj);
+     // break;
+    //}
   }
 
   public FObject remove_(X x, FObject obj) {
@@ -177,7 +165,7 @@ public class MDAO
   }
 
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    synchronized ( updateLock_ ) {
+    //synchronized ( updateLock_ ) {
       Logger logger = (Logger) x.get("logger");
       SelectPlan plan;
       Predicate simplePredicate = null;
@@ -224,11 +212,11 @@ public class MDAO
 
       sink.eof();
       return sink;
-    }
+    //}
   }
 
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
-    synchronized ( updateLock_ ) {
+    //synchronized ( updateLock_ ) {
       if ( predicate == null && skip == 0 && limit == MAX_SAFE_INTEGER ) {
         synchronized (writeLock_) {
           setState(null);
@@ -236,6 +224,6 @@ public class MDAO
       } else {
         super.removeAll_(x, skip, limit, order, predicate);
       }
-    }
+    //}
   }
 }

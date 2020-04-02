@@ -117,21 +117,23 @@ public class TreeIndex
   }
 
   @Override
-  public Object update(Object state, FObject obj, FObject oldObj, Set<String> props) {
+  public Object update(Object state, FObject oldValue, FObject newValue) {
 
-    if( ! props.contains(prop_.getName()) ) {
       Object key;
+      Object oldKey;
       try {
-        key = prop_.f(obj);
+        key = prop_.f(newValue);
+        oldKey = prop_.f(oldValue);
       } catch (ClassCastException e) {
         return state;
       }
-      state = ((TreeNode)state).update((TreeNode)state, prop_, key, obj, oldObj, tail_, props);
-    }
-    else {
-      state =  remove(state, oldObj);
-      state =  put(state, obj);
-    }
+      if(key.equals(oldKey))
+        state = ((TreeNode)state).update((TreeNode)state, prop_, key, oldValue, newValue, tail_);
+      else {
+        state =  remove(state, oldValue);
+        state =  put(state, newValue);
+      }
+
     return state;
   }
 

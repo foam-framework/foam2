@@ -20,7 +20,7 @@ public interface Index {
 
   // Update an object
   //props will tell names of properties that have been changed
-  public Object update(Object state, FObject obj, FObject oldObj, Set<String> props);
+  public Object update(Object state, FObject oldValue, FObject newValue);
   
   // Remove an object
   public Object remove(Object state, FObject value);

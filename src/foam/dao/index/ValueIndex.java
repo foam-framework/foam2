@@ -33,7 +33,7 @@ public class ValueIndex
   }
 
   @Override
-  public Object update(Object state, FObject obj, FObject oldObj, Set<String> props) {
+  public Object update(Object state, FObject oldObj, FObject obj) {
     return obj;
   }
 

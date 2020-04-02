@@ -41,8 +41,8 @@ public class ProxyIndex
   }
 
   @Override
-  public Object update(Object state, FObject obj, FObject oldObject, Set<String> props) {
-    return getDelegate().update(state, obj, oldObject, props);
+  public Object update(Object state,  FObject oldValue, FObject newValue) {
+    return getDelegate().update(state, oldValue, newValue);
   }
 
   @Override

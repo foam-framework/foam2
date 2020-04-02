@@ -19,7 +19,7 @@ import java.util.Set;
 
 public class TreeNode {
   protected Object   key;
-  protected Object   value;
+  protected volatile Object   value;
   protected long     size;
   protected byte     level;
   protected TreeNode left;
@@ -101,19 +101,19 @@ public class TreeNode {
     return split(skew(state, tail), tail);
   }
 
-  public Object update(TreeNode state, PropertyInfo prop, Object key, FObject obj, FObject oldObj, Index tail, Set<String> props) {
+  public Object update(TreeNode state, PropertyInfo prop, Object key, FObject oldValue, FObject newValue, Index tail) {
     if ( state == null || state.equals(TreeNode.getNullNode()) )
       return state;
 
     int r = prop.comparePropertyToValue(key, state.key);
 
     if ( r == 0 ) {
-      state.value = tail.update(state.value, obj, oldObj, props);
+      state.value = tail.update(state.value, oldValue, newValue);
     } else {
       if ( r < 0 ) {
-        state.left =  (TreeNode)((TreeNode) state.left).update(state.left, prop, key, obj, oldObj, tail, props);
+        state.left =  (TreeNode)((TreeNode) state.left).update(state.left, prop, key, oldValue, newValue, tail);
       } else {
-        state.right = (TreeNode)((TreeNode) state.right).update(state.right, prop, key, obj, oldObj, tail, props);
+        state.right = (TreeNode)((TreeNode) state.right).update(state.right, prop, key, oldValue, newValue, tail);
       }
     }
     return state;
