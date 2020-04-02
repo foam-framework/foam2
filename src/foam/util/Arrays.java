@@ -132,13 +132,12 @@ public class Arrays {
     if ( start > skip + limit ) return;
     if ( end < skip ) return;
 
-    if ( end-start < 10 ) {
-      for ( int i = start ; i < end ; i++ ) {
-        for ( int j = i ; j <= end; j++ ) {
+    if ( end - start < 10 ) {
+      for ( int i = start; i < end; i++ ) {
+        for ( int j = i; j <= end; j++ ) {
           if ( c.compare(a[j], a[i]) < 0 ) swap(a, i, j);
         }
       }
-
       return;
     }
 
@@ -149,32 +148,30 @@ public class Arrays {
     for ( var i = start + 1; i < p2; i++ ) {
       int d = c.compare(a[p1], a[i]);
       if ( d == 1 ) {
-        swap(a, p1, p1+1);
-        if(p1 + 1 != i) {
+        swap(a, p1, p1 + 1);
+        if ( p1 + 1 != i )
           swap(a, p1, i);
-          i--;
-        }
         p1++;
       } else {
         d = c.compare(a[i], a[p2]);
         if ( d == 1 ) {
-          swap(a, p2, p2-1);
-          if(p2-1 != i) {
+          swap(a, p2, p2 - 1);
+          if ( p2 - 1 != i ) {
             swap(a, p2, i);
             i--;
           }
           p2--;
         } else if ( d == 0 ) {
-          swap(a, p2-1, i);
+          swap(a, p2 - 1, i);
           i--;
           p2--;
         }
       }
     }
 
-    sortRange(a, c, skip, limit, start, p1-1);
-    sortRange(a, c, skip, limit, p1+1,  p2-1);
-    sortRange(a, c, skip, limit, p2+1,  end);
+    sortRange(a, c, skip, limit, start, p1 - 1);
+    sortRange(a, c, skip, limit, p1 + 1, p2 - 1);
+    sortRange(a, c, skip, limit, p2 + 1, end);
   }
 
 }
