@@ -118,7 +118,7 @@ foam.CLASS({
     function put(obj) {},
 
     /** Updates the given value in the index */
-    function update(obj, oldObj, props) {},
+    function update(oldValue, newValue) {},
 
     /** Removes the given value from the index */
     function remove(obj) {},

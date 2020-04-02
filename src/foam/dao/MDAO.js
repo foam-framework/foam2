@@ -149,7 +149,7 @@ foam.CLASS({
     function put_(x, obj) {
       var oldValue = this.findSync_(obj.id);
       if ( oldValue ) {
-        this.update(obj, oldValue);
+        this.update(oldValue, obj);
       } else {
         this.index.put(obj);
       }
@@ -157,17 +157,8 @@ foam.CLASS({
       return Promise.resolve(obj);
     },
 
-    function update(obj, oldObj) {
-      var diffs = obj.diff(oldObj);
-      var props = [];
-      if ( diffs.length !== 0 ) {
-        for ( var i in diffs ) {
-          var propertyThatWasChanged = this.of.getAxiomByName(i);
-          if ( propertyThatWasChanged )
-          props.push(propertyThatWasChanged);
-        }
-        this.index.update(obj, oldObj, props);
-      }
+    function update(oldValue, newValue) {
+      this.index.update(oldValue, newValue);
     },
 
     function find_(x, objOrKey) {

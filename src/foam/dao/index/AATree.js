@@ -180,7 +180,16 @@ foam.CLASS({
       return s.split(locked).skew(locked);
     },
 
-    function update(key, obj, oldObj, compare, props, nullNode, locked) {
+    function update(oldKey, key, oldValue, newValue, compare, nullNode, dedup, locked) {
+      if ( oldKey && key == oldKey) {
+        this.updateValue(key, oldValue, newValue, compare, nullNode, locked);
+      } else {
+        this.removeKeyValue(oldKey, oldValue, compare, locked, nullNode);
+        this.putKeyValue(key, newValue, compare, dedup, locked);
+      }
+    },
+
+    function updateValue(key, oldValue, newValue, compare, nullNode, locked) {
       var s = this.maybeClone(locked);
       
       if ( ! s )
@@ -188,10 +197,10 @@ foam.CLASS({
       
       var r = compare(s.key, key);
       if ( r === 0 ) {
-        s.value.update(obj, oldObj, props);
+        s.value.update(oldValue, newValue);
       } else {
         var side = r > 0 ? 'left' : 'right';
-        s[side].update(key, obj, oldObj, compare, props, nullNode, locked);
+        s[side].update(key, oldValue, newValue, compare, nullNode, locked);
       }
     },
 

@@ -60,7 +60,7 @@ foam.CLASS({
 
     function put(o) { return this.delegate.put(o); },
 
-    function update(obj, oldObj, props) { this.delegate.update(obj, oldObj, props); },
+    function update(oldValue, newValue) { this.delegate.update(oldValue, newValue); },
 
     function remove(o) { return this.delegate.remove(o); },
 

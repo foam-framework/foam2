@@ -184,9 +184,9 @@ foam.CLASS({
       }
     },
 
-    function update(obj, oldObj, props) {
+    function update(oldValue, newValue) {
       for ( var i = 0 ; i < this.delegates.length ; i++ ) {
-        this.delegates[i].update(obj, oldObj, props);
+        this.delegates[i].update(oldValue, newValue);
       }
     },
 
