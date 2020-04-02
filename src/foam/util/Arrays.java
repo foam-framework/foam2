@@ -129,14 +129,16 @@ public class Arrays {
 
   protected static void sortRange(Object[] a, Comparator c, int skip, int limit, int start, int end) {
     if ( end <= start ) return;
-    if ( start > skip + limit ) return;
+    if ( start >= skip + limit ) return;
     if ( end < skip ) return;
 
-    if ( end - start < 10 ) {
+    if ( end - start < 15 ) {
       for ( int i = start ; i < end ; i++ ) {
-        for ( int j = i ; j <= end ; j++ ) {
-          if ( c.compare(a[j], a[i]) < 0 ) swap(a, i, j);
+        int smallest = start;
+        for ( int j = i+1 ; j <= end ; j++ ) {
+          if ( c.compare(a[j], a[smallest]) < 0 ) smallest = j;
         }
+        if ( i != smallest ) swap(a, i, smallest);
       }
       return;
     }
