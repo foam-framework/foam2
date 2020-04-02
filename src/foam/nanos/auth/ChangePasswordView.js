@@ -53,7 +53,6 @@ foam.CLASS({
       padding-left: 2vh;
     }
     ^ .top-bar {
-      background: /*%LOGOBACKGROUNDCOLOUR%*/ #202341;
       width: 100%;
       height: 8vh;
       border-bottom: solid 1px #e2e2e3;
