@@ -571,6 +571,13 @@ var classes = [
   'foam.nanos.docusign.DocuSignUserAccount',
   'foam.nanos.docusign.DocuSignUserInfo',
   'foam.nanos.docusign.DocuSignSession',
+  'foam.nanos.docusign.DocuSignDocument',
+  'foam.nanos.docusign.DocuSignSendToMeDAO',
+  'foam.nanos.docusign.DocuSignHTMLDefinition',
+  'foam.nanos.docusign.DocuSignDocumentEntry',
+  'foam.nanos.docusign.DocuSignEnvelope',
+  'foam.nanos.docusign.DocuSignRecipient',
+  'foam.nanos.docusign.DocuSignEnvelopeRecipients',
   'foam.nanos.docusign.example.ExampleDocument',
 ];
 

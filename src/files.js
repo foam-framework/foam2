@@ -765,7 +765,12 @@ FOAM_FILES([
   { name: 'foam/nanos/docusign/DocuSignConfig' },
   { name: 'foam/nanos/docusign/DocuSignAccessTokens' },
   { name: 'foam/nanos/docusign/DocuSignSession' },
+  { name: 'foam/nanos/docusign/DocuSignDocument' },
+  { name: 'foam/nanos/docusign/DocuSignSendToMeDAO' },
   { name: 'foam/nanos/docusign/api/DocuSignUserAccount' },
   { name: 'foam/nanos/docusign/api/DocuSignUserInfo' },
+  { name: 'foam/nanos/docusign/api/DocuSignDocumentEntry' },
+  { name: 'foam/nanos/docusign/api/DocuSignEnvelope' },
   { name: 'foam/nanos/docusign/example/ExampleDocument' },
+  { name: 'foam/nanos/docusign/example/DemoView' },
 ]);

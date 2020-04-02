@@ -1,7 +1,7 @@
 foam.CLASS({
   package: 'foam.nanos.docusign.example',
   name: 'ExampleDocument',
-  flags: ['java'],
+  extends: 'foam.nanos.docusign.DocuSignDocument',
 
   implements: ['foam.nanos.docusign.DocuSignWritable'],
 
