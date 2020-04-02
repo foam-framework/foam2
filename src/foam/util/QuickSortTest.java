@@ -6,6 +6,8 @@ import java.util.Random;
 public class QuickSortTest {
 
   public static void main(String[] args) {
+    testArraySorting(5387, 0, 5387);
+    testArraySorting(9174, 375, 9174);
     testArraySorting(1666, 234, 185);
     testArraySorting(2349, 0, 236);
     testArraySorting(88888, 2111, 0);
