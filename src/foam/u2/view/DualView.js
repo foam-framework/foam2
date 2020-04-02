@@ -20,7 +20,7 @@ foam.CLASS({
   name: 'DualView',
   extends: 'foam.u2.MultiView',
 
-  deprecated: 'Use foam.u2.MultiView instead.',
+  // deprecated: 'Use foam.u2.MultiView instead.',
 
   css: `
     ^viewa, ^viewb { padding: 2px 0; }
