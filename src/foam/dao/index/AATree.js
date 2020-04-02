@@ -200,7 +200,7 @@ foam.CLASS({
         s.value.update(oldValue, newValue);
       } else {
         var side = r > 0 ? 'left' : 'right';
-        s[side].update(key, oldValue, newValue, compare, nullNode, locked);
+        s[side].updateValue(key, oldValue, newValue, compare, nullNode, locked);
       }
     },
 
