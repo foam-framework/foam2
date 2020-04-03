@@ -96,37 +96,25 @@ public class MDAO
     // Clone and freeze outside of lock to minimize time spent under lock
     obj = objIn(obj);
 
-    //while ( true ) {
-      synchronized ( writeLock_ ) {
-        FObject oldValue = find_(x, obj);
+    synchronized ( writeLock_ ) {
+      FObject oldValue = find_(x, obj);
 
-        if ( oldValue == null ) {
-          Object state = getState();
-          setState(index_.put(state, obj));
-          //break;
-        } else {
-          update(obj, oldValue);
-        }
+      if ( oldValue == null ) {
+        Object state = getState();
+        setState(index_.put(state, obj));
+      } else {
+        update(obj, oldValue);
       }
-      //update(x, obj);
-      //break;
-   // }
+    }
 
     onPut(obj);
     return obj;
   }
 
   public void update(FObject obj, FObject oldObj) {
-   // while ( true ) {
-      //synchronized (updateLock_) {
-          Object state = getState();
-          state = index_.update(state, oldObj, obj);
-          setState(state);
-         // break;
-      //}
-     // put_(x, obj);
-     // break;
-    //}
+    Object state = getState();
+    state = index_.update(state, oldObj, obj);
+    setState(state);
   }
 
   public FObject remove_(X x, FObject obj) {
