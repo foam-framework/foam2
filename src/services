@@ -516,12 +516,14 @@ p({
   "serviceScript":
   """
     dao = new foam.dao.KeyValueDAO.Builder(x)
-      .setDelegate(new foam.dao.GUIDDAO(new foam.dao.NullDAO(x, foam.nanos.fs.File.getOwnClassInfo())))
+      .setDelegate(new foam.dao.NullDAO(x, foam.nanos.fs.File.getOwnClassInfo()))
       .build();
+
     return new foam.dao.EasyDAO.Builder(x)
       .setPm(true)
+      .setGuid(true)
+      .setDecorator(dao)
       .setOf(foam.nanos.fs.File.getOwnClassInfo())
-      .setInnerDAO(dao)
       .setJournalName("files")
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .build()
@@ -592,7 +594,6 @@ p({
       .setOf(foam.nanos.auth.HtmlDoc.getOwnClassInfo())
       .setJournalName("htmlDoc")
       .build();
-//    return new foam.dao.PMDAO(x, new foam.dao.SequenceNumberDAO (new foam.dao.java.JDAO(x, foam.nanos.auth.HtmlDoc.getOwnClassInfo(), \"htmlDoc\")));
   """,
   "client":
   """
