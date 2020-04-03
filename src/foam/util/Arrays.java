@@ -132,14 +132,8 @@ public class Arrays {
     if ( start >= skip + limit ) return;
     if ( end < skip ) return;
 
-    if ( end - start < 15 ) {
-      for ( int i = start ; i < end ; i++ ) {
-        int smallest = start;
-        for ( int j = i+1 ; j <= end ; j++ ) {
-          if ( c.compare(a[j], a[smallest]) < 0 ) smallest = j;
-        }
-        if ( i != smallest ) swap(a, i, smallest);
-      }
+    if ( end - start < 17 || ( skip <= start && skip + limit - 1 >= end ) ) {
+      java.util.Arrays.sort(a, start, end, c);
       return;
     }
 
