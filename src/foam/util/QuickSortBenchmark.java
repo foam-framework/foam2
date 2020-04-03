@@ -37,7 +37,7 @@ public class QuickSortBenchmark {
 
   private static void benchmarkSort(Integer[] array) {
     long startTime = System.currentTimeMillis();
-    java.util.Arrays.sort(array);
+    java.util.Arrays.sort(array, Comparator.comparingInt(o -> (int) o));
     long endTime = System.currentTimeMillis();
     System.out.println("Time to sort with java.util.Arrays.sort is " + (endTime - startTime) + "ms");
   }

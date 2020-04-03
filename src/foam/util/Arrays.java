@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.util;
 
 import java.lang.reflect.Array;
@@ -25,12 +31,8 @@ public class Arrays {
   **/
   public static <T> T[] append(T[] array, T... items) {
 
-    if( array == null ) {
-      return items;
-    }
-    if ( items == null) {
-      return array;
-    }
+    if ( array == null ) return items;
+    if ( items == null ) return array;
 
     T[] mergedArray = (T[]) Array.newInstance( array.getClass().getComponentType(), array.length + items.length );
     System.arraycopy( array, 0, mergedArray, 0, array.length );
@@ -41,11 +43,11 @@ public class Arrays {
 
   public static Object deepClone(Object value) {
     if ( value == null ) return null;
+
     if ( ! value.getClass().isArray() )
       throw new RuntimeException("Tried to clone non array " + value.getClass().getName() + " with foam.util.Arrays.deepClone().");
 
-
-    int length = java.lang.reflect.Array.getLength(value);
+    int    length = java.lang.reflect.Array.getLength(value);
     Object result = java.lang.reflect.Array.newInstance(value.getClass().getComponentType(), length);
 
     // TODO: This may be slow when dealing with primitive value arrays
@@ -132,14 +134,8 @@ public class Arrays {
     if ( start >= skip + limit ) return;
     if ( end < skip ) return;
 
-    if ( end - start < 15 ) {
-      for ( int i = start ; i < end ; i++ ) {
-        int smallest = start;
-        for ( int j = i+1 ; j <= end ; j++ ) {
-          if ( c.compare(a[j], a[smallest]) < 0 ) smallest = j;
-        }
-        if ( i != smallest ) swap(a, i, smallest);
-      }
+    if ( end - start < 17 || ( skip <= start && skip + limit - 1 >= end ) ) {
+      java.util.Arrays.sort(a, start, end, c);
       return;
     }
 
