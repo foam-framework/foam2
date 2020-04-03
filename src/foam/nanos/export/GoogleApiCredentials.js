@@ -7,38 +7,39 @@
 foam.CLASS({
   package: 'foam.nanos.export',
   name: 'GoogleApiCredentials',
+
   properties: [
     {
       class: 'String',
-      name: 'clientId',
+      name: 'clientId'
     },
     {
       class: 'String',
-      name: 'projectId',
+      name: 'projectId'
     },
     {
       class: 'String',
-      name: 'authUri',
+      name: 'authUri'
     },
     {
       class: 'String',
-      name: 'tokenUri',
+      name: 'tokenUri'
     },
     {
       class: 'String',
-      name: 'authProviderCertUrl',
+      name: 'authProviderCertUrl'
     },
     {
       class: 'String',
-      name: 'clientSecret',
+      name: 'clientSecret'
     },
     {
       class: 'StringArray',
-      name: 'redirectUris',
+      name: 'redirectUris'
     },
     {
       class: 'StringArray',
-      name: 'javascriptOrigins',
+      name: 'javascriptOrigins'
     },
     {
       class: 'Int',
