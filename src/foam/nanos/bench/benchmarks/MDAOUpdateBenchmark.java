@@ -32,8 +32,7 @@ public class MDAOUpdateBenchmark implements Benchmark {
 
     Random rand = new Random();
 
-
-    Country newCountry = null;
+    Country newCountry;
     StringBuffer sb;
     int i = 0;
     while ( ids.size() < 1001000 ) {
@@ -62,8 +61,8 @@ public class MDAOUpdateBenchmark implements Benchmark {
         dao_.put_(x, newCountry);
         if ( i < 1000 ) {
           if ( i != 0 ) {
-            int randValue = 0;
-            while( true ) {
+            int randValue;
+            while ( true ) {
               randValue = rand.nextInt(names.size());
               if ( ! newCountry.getName().equals(names.toArray()[randValue]) )
                 break;
@@ -77,7 +76,6 @@ public class MDAOUpdateBenchmark implements Benchmark {
                 break;
             }
             newCountry.setCode(codes.toArray()[randValue].toString());
-
           }
 
           countries[i] = newCountry;

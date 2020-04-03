@@ -42,7 +42,7 @@ public class MDAOPutBanchmark implements Benchmark {
       int j = 0;
       String s = "";
       sb = new StringBuffer();
-      while(j < randomLength) {
+      while ( j < randomLength ) {
         sb.append(alphabet[rand.nextInt(alphabet.length)]);
         j++;
       }
