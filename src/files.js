@@ -580,6 +580,7 @@ FOAM_FILES([
   { name: "foam/doc/ClassLink", flags: ['debug', 'web'] },
   { name: "foam/doc/CodeTabs" },
   { name: "foam/doc/DocBrowser", flags: ['debug', 'web'] },
+  { name: "foam/doc/ModelBrowser", flags: ['debug', 'web'] },
 
   { name: "com/google/net/node/Google2LOAuthAgent", flags: ['node', 'gcloud'] },
   { name: "com/google/cloud/datastore/types", flags: ['gcloud'] },
@@ -700,6 +701,7 @@ FOAM_FILES([
   { name: "foam/u2/view/date/DateTimePicker" },
   { name: "foam/u2/view/date/Month" },
   { name: "foam/u2/view/date/Weekday" },
+  { name: "foam/u2/view/DAOtoFObjectArrayView" },
 
   { name: "foam/u2/layout/DisplayWidth" },
   { name: "foam/u2/layout/Layouts" },
