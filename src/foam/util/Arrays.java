@@ -134,7 +134,7 @@ public class Arrays {
     if ( start >= skip + limit ) return;
     if ( end < skip ) return;
 
-    if ( end - start < 17 || ( skip <= start && skip + limit - 1 >= end ) ) {
+    if ( end - start < 27 || ( skip <= start && skip + limit - 1 >= end ) ) {
       java.util.Arrays.sort(a, start, end, c);
       return;
     }
