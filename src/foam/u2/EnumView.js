@@ -29,26 +29,30 @@ foam.CLASS({
       required: true
     },
     {
+      name: 'hasAllReadPermission',
+      expression: async function(of) {
+        if ( of ) {
+          var allReadPermission = this.of.name.toLowerCase() + '.read.*';
+          return await this.auth.check(null, allReadPermission);
+        } else {
+          return false;
+        }
+      }
+    },
+    {
       name: 'choices',
-      expression: function(of) {
-        return of ? of.VALUES.map(async (v) => {
-          console.log(v);
-          var allReadPermission = of.name.toLowerCase() + '.read.*';
-          var readPermission = of.name.toLowerCase() + '.read.' + v.label.toLowerCase();
-        
-          var allPermissionsGranted = await this.auth.check(null, allReadPermission);
-
-          if ( allPermissionsGranted ) {
-            return [v, v.label];
-          } else {
-            var readPermissionGranted = await this.auth.check(null, readPermission);
-            if ( readPermissionGranted ) {
+      expression: function(of, hasAllReadPermission) {
+        if ( of ) {
+          if ( hasAllReadPermission ) {
+            return of.VALUES.map((v) => {
               return [v, v.label];
-            } else {
-              return [];
-            }
+            });
+          } else {
+            return [];
           }
-        }) : [];
+        } else {
+          return [];
+        }
       }
     }
   ],
