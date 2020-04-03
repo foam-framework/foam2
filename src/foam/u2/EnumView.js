@@ -29,27 +29,16 @@ foam.CLASS({
       required: true
     },
     {
-      name: 'hasAllReadPermission',
+      name: 'permissionResults',
       expression: async function(of) {
         if ( of ) {
-          var allReadPermission = this.of.name.toLowerCase() + '.read.*';
-          return await this.auth.check(null, allReadPermission);
-        } else {
-          return false;
-        }
-      }
-    },
-    {
-      name: 'choices',
-      expression: function(of, hasAllReadPermission) {
-        if ( of ) {
-          if ( hasAllReadPermission ) {
-            return of.VALUES.map((v) => {
-              return [v, v.label];
-            });
-          } else {
-            return [];
+          var results = [];
+          for ( var i = 0; i < of.VALUES.length; i++ ) {
+            var readPermission = of.name.toLowerCase() + '.read.' + of.VALUES[i].label.toLowerCase();
+            var permResult = await this.auth.check(null, readPermission);
+            results.push([of.VALUES[i].label, permResult]);
           }
+          return results;
         } else {
           return [];
         }
@@ -58,9 +47,33 @@ foam.CLASS({
   ],
 
   methods: [
+    function initE() {
+      this.SUPER();
+      this.permissionedChoices();
+    },
+
     function fromProperty(p) {
       this.SUPER(p);
       if ( ! this.of ) this.of = p.of;
+    },
+
+    function permissionedChoices() {
+      this.permissionResults.then((array) => {
+        if ( this.of ) {
+          var hash = {};
+          for ( var i = 0; i < array.length; i+=1 ) {
+            hash[array[i]] = i;
+          }
+          return this.of.VALUES.map((v) => {
+            var value = [v.label, true];
+            if ( hash.hasOwnProperty(value) ) {
+              return [v, v.label];
+            }
+          });
+        }
+      }).then((array) => {
+        this.choices = array;
+      });
     }
   ]
 });
