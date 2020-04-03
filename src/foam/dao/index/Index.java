@@ -19,7 +19,6 @@ public interface Index {
   public Object put(Object state, FObject value);
 
   // Update an object
-  //props will tell names of properties that have been changed
   public Object update(Object state, FObject oldValue, FObject newValue);
   
   // Remove an object

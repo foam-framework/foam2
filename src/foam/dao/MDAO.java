@@ -153,65 +153,61 @@ public class MDAO
   }
 
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    //synchronized ( updateLock_ ) {
-      Logger logger = (Logger) x.get("logger");
-      SelectPlan plan;
-      Predicate simplePredicate = null;
-      PM pm = null;
+    Logger logger = (Logger) x.get("logger");
+    SelectPlan plan;
+    Predicate simplePredicate = null;
+    PM pm = null;
 
-      // use partialEval to wipe out such useless predicate such as: And(EQ()) ==> EQ(), And(And(EQ()),GT()) ==> And(EQ(),GT())
-      if ( predicate != null ) simplePredicate = predicate.partialEval();
+    // use partialEval to wipe out such useless predicate such as: And(EQ()) ==> EQ(), And(And(EQ()),GT()) ==> And(EQ(),GT())
+    if ( predicate != null ) simplePredicate = predicate.partialEval();
 
-      Object state = getState();
+    Object state = getState();
 
-      // We handle OR logic by seperate request from MDAO. We return different plan for each parameter of OR logic.
-      if ( simplePredicate instanceof Or ) {
-        Sink dependSink = new ArraySink();
-        // When we have groupBy, order, skip, limit such requirement, we can't do it separately so I replace a array sink to temporarily holde the whole data
-        //Then after the plan wa slelect we change it to the origin sink
-        int length = ((Or) simplePredicate).getArgs().length;
-        List<Plan> planList = new ArrayList<>();
-        for ( int i = 0 ; i < length ; i++ ) {
-          Predicate arg = ((Or) simplePredicate).getArgs()[i];
-          planList.add(index_.planSelect(state, dependSink, 0, AbstractDAO.MAX_SAFE_INTEGER, null, arg));
-        }
-        plan = new OrPlan(simplePredicate, planList);
-      } else {
-        plan = index_.planSelect(state, sink, skip, limit, order, simplePredicate);
+    // We handle OR logic by seperate request from MDAO. We return different plan for each parameter of OR logic.
+    if ( simplePredicate instanceof Or ) {
+      Sink dependSink = new ArraySink();
+      // When we have groupBy, order, skip, limit such requirement, we can't do it separately so I replace a array sink to temporarily holde the whole data
+      //Then after the plan wa slelect we change it to the origin sink
+      int length = ((Or) simplePredicate).getArgs().length;
+      List<Plan> planList = new ArrayList<>();
+      for ( int i = 0 ; i < length ; i++ ) {
+        Predicate arg = ((Or) simplePredicate).getArgs()[i];
+        planList.add(index_.planSelect(state, dependSink, 0, AbstractDAO.MAX_SAFE_INTEGER, null, arg));
       }
+      plan = new OrPlan(simplePredicate, planList);
+    } else {
+      plan = index_.planSelect(state, sink, skip, limit, order, simplePredicate);
+    }
 
-      if ( state != null && predicate != null && plan.cost() > 10 && plan.cost() >= index_.size(state) ) {
-        pm = new PM(this.getClass(), "MDAO:UnindexedSelect:" + getOf().getId());
-        if ( ! unindexed_.contains(getOf().getId()) ) {
-          if ( ! predicate.equals(simplePredicate ) &&
-            logger != null) {
-            logger.debug(String.format("The original predicate was %s but it was simplified to %s.", predicate.toString(), simplePredicate.toString()));
-          }
-          unindexed_.add(getOf().getId());
-          if ( logger != null ) {
-            logger.warning("Unindexed search on MDAO", getOf().getId(), simplePredicate.toString());
-          }
+    if ( state != null && predicate != null && plan.cost() > 10 && plan.cost() >= index_.size(state) ) {
+      pm = new PM(this.getClass(), "MDAO:UnindexedSelect:" + getOf().getId());
+      if ( ! unindexed_.contains(getOf().getId()) ) {
+        if ( ! predicate.equals(simplePredicate ) &&
+          logger != null) {
+          logger.debug(String.format("The original predicate was %s but it was simplified to %s.", predicate.toString(), simplePredicate.toString()));
+        }
+        unindexed_.add(getOf().getId());
+        if ( logger != null ) {
+          logger.warning("Unindexed search on MDAO", getOf().getId(), simplePredicate.toString());
         }
       }
+    }
 
-      plan.select(state, sink, skip, limit, order, simplePredicate);
+    plan.select(state, sink, skip, limit, order, simplePredicate);
 
-      if (pm != null) pm.log(x);
+    if (pm != null) pm.log(x);
 
-      sink.eof();
-      return sink;
-    //}
+    sink.eof();
+    return sink;
   }
 
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
-    //synchronized ( updateLock_ ) {
-      if ( predicate == null && skip == 0 && limit == MAX_SAFE_INTEGER ) {
-        synchronized (writeLock_) {
-          setState(null);
-        }
-      } else {
-        super.removeAll_(x, skip, limit, order, predicate);
+    if ( predicate == null && skip == 0 && limit == MAX_SAFE_INTEGER ) {
+      synchronized (writeLock_) {
+        setState(null);
       }
-    //}
+    } else {
+      super.removeAll_(x, skip, limit, order, predicate);
+    }
   }
 }
