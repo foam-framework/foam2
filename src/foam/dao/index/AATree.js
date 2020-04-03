@@ -181,7 +181,7 @@ foam.CLASS({
     },
 
     function update(oldKey, key, oldValue, newValue, compare, nullNode, dedup, locked) {
-      if ( oldKey && key == oldKey) {
+      if ( oldKey && foam.util.equals(key, oldKey)) { 
         this.updateValue(key, oldValue, newValue, compare, nullNode, locked);
       } else {
         this.removeKeyValue(oldKey, oldValue, compare, locked, nullNode);

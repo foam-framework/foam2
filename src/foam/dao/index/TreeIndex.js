@@ -700,15 +700,60 @@ foam.CLASS({
     },
 
     function update(oldValue, newValue) {
-      this.root.update(
-        '',
-        '',
-        oldValue,
-        newValue,
-        this.index.compare,
-        this.index.nullNode,
-        this.index.dedup,
-        this.selectCount > 0);
+      var a = this.index.prop.f(newValue);
+      var b = this.index.prop.f(oldValue);
+
+      if ( a.length ) {
+        if ( a !== b ) {
+          var newValues = [[...a].filter(v => !b.has(v))];
+          var valuesThatNeedToBeDeleted = [[...b].filter(v => !a.has(v))];
+          var valuesThatNeedToBeUpdated = [[...a].filter(v => b.has(v))];
+  
+          for ( var i = 0 ; i < newValues.length ; i++ ) {
+            this.root = this.root.putKeyValue(
+              newValues[i],
+              newValue,
+              this.index.compare,
+              this.index.dedup);
+          }
+          for ( var i = 0 ; i < valuesThatNeedToBeDeleted.length ; i++ ) {
+            this.root = this.root.removeKeyValue(
+              valuesThatNeedToBeDeleted[i],
+              oldValue,
+              this.index.compare,
+              this.index.nullNode);
+          }
+          for ( var i = 0 ; i < valuesThatNeedToBeUpdated.length ; i++ ) {
+            this.root.updateValue(
+              valuesThatNeedToBeUpdated[i],
+              oldValue,
+              newValue,
+              this.index.compare,
+              this.index.nullNode,
+              this.index.dedup,
+              this.selectCount > 0);
+          }  
+        } else {
+          this.root.update(
+            b,
+            a,
+            oldValue,
+            newValue,
+            this.index.compare,
+            this.index.nullNode,
+            this.index.dedup,
+            this.selectCount > 0);
+        }      
+      } else {
+        this.root.updateValue(
+          '',
+          oldValue,
+          newValue,
+          this.index.compare,
+          this.index.nullNode,
+          this.index.dedup,
+          this.selectCount > 0);
+      }
     },
 
     function remove(value) {
