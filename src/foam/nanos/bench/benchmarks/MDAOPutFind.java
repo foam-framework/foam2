@@ -17,6 +17,7 @@ public class MDAOPutFind implements Benchmark {
   protected DAO dao_;
   protected Country[] countries;
   protected Country a1_;
+  protected int i = 0;
   private char[] alphabet = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
 
 
@@ -78,10 +79,8 @@ public class MDAOPutFind implements Benchmark {
 
   @Override
   public void execute(X x) {
-
-    for ( int i = 0 ; i < countries.length ; i++ ) {
-      dao_.put_(x, countries[i]);
-      Country c = (Country)dao_.find(countries[i].getId());
-    }
+    dao_.put_(x, countries[i]);
+    Country c = (Country)dao_.find(countries[i].getId());
+    i++;
   }
 }

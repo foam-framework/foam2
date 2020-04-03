@@ -16,6 +16,7 @@ public class MDAOUpdateSelect implements Benchmark {
 
   protected DAO dao_;
   protected Country[] countries;
+  protected int i = 0;
   private char[] alphabet = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
 
 
@@ -65,14 +66,13 @@ public class MDAOUpdateSelect implements Benchmark {
             int randValue;
             while ( true ) {
               randValue = rand.nextInt(names.size());
-              if (! newCountry.getName().equals(names.toArray()[randValue]) )
+              if ( ! newCountry.getName().equals(names.toArray()[randValue]) )
                 break;
             }
             newCountry.setName(names.toArray()[randValue].toString());
 
             while ( true ) {
               randValue = rand.nextInt(codes.size());
-
               if ( ! newCountry.getCode().equals(codes.toArray()[randValue]) )
                 break;
             }
@@ -91,10 +91,9 @@ public class MDAOUpdateSelect implements Benchmark {
 
   @Override
   public void execute(X x) {
-    for ( int i = 0 ; i < countries.length ; i++ ) {
-      dao_.put_(x, countries[i]);
-    }
+    dao_.put_(x, countries[i]);
     ArraySink s = new ArraySink();
     dao_.select(s);
+    i++;
   }
 }

@@ -17,6 +17,7 @@ public class MDAOPutSelect implements Benchmark {
   protected DAO dao_;
   protected Country[] countries;
   protected Country a1_;
+  protected int  i = 0;
   private char[] alphabet = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
 
 
@@ -33,7 +34,6 @@ public class MDAOPutSelect implements Benchmark {
     Set<String> codes = new HashSet<>();
 
     Random rand = new Random();
-
 
     Country newCountry = null;
     StringBuffer sb;
@@ -79,10 +79,9 @@ public class MDAOPutSelect implements Benchmark {
   @Override
   public void execute(X x) {
 
-    for ( int i = 0 ; i < countries.length ; i++ ) {
-      dao_.put_(x, countries[i]);
-    }
+    dao_.put_(x, countries[i]);
     ArraySink s = new ArraySink();
     dao_.select(s);
+    i++;
   }
 }
