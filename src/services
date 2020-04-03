@@ -1015,7 +1015,9 @@ p({
   "name":"googleApiCredentialsConfig",
   "lazy":false,
   "service": {
-    "class":"foam.nanos.export.GoogleApiCredentials"
+    "class":"foam.nanos.export.GoogleApiCredentials",
+    "port":64349,
+    "tokensFolderPath":"/tmp"
   },
   "documentation": "Service for setting authorization request parameters which are required in order to retrieve access token. To download credentials visit Google Developers Console"
 })

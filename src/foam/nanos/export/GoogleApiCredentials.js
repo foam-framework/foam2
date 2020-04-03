@@ -42,7 +42,8 @@ foam.CLASS({
     },
     {
       class: 'Int',
-      name: 'port'
+      name: 'port',
+      visibility: 'RO'
     },
     {
       class: 'String',
