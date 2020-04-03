@@ -23,5 +23,16 @@ foam.CLASS({
       aliases: ['is_default'],
       class: 'Boolean'
     }
+  ],
+
+  methods: [
+    {
+      name: 'getUrlAPI21',
+      type: 'String',
+      javaCode: `
+        return getBaseURI() + "/restapi/2.1/accounts/"
+          + getId();
+      `
+    }
   ]
 });

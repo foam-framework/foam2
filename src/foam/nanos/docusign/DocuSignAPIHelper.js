@@ -4,7 +4,10 @@ foam.CLASS({
 
   javaImports: [
     'com.google.common.collect.Lists',
+    'foam.core.FObject',
+    'foam.lib.StoragePropertyPredicate',
     'foam.lib.json.JSONParser',
+    'foam.lib.json.Outputter',
     'foam.nanos.docusign.DocuSignAccessTokens',
     'foam.nanos.docusign.DocuSignException',
     'foam.nanos.logger.Logger',
@@ -47,6 +50,12 @@ foam.CLASS({
       ],
       javaType: 'HttpURLConnection',
       javaCode: `
+        boolean json = false;
+        if ( "JSON".equals(method) ) {
+          json = true;
+          method = "POST";
+        }
+
         HttpURLConnection conn = null;
         try {
           URL url = new URL(urlStr);
@@ -54,6 +63,8 @@ foam.CLASS({
           conn.setRequestMethod(method);
           conn.setDoInput(true);
           conn.setDoOutput(true);
+          if ( json ) conn.setRequestProperty(
+            "Content-Type", "application/json");
           conn.setRequestProperty("Authorization", auth);
         } catch ( MalformedURLException e ) {
           throw new RuntimeException(
@@ -86,6 +97,28 @@ foam.CLASS({
       `
     },
     {
+      name: 'writeJSON_',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'conn', javaType: 'HttpURLConnection' },
+        { name: 'data', javaType: 'FObject' }
+      ],
+      javaThrows: ['IOException'],
+      javaCode: `
+        try (
+          BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+            conn.getOutputStream(), StandardCharsets.UTF_8))
+        ) {
+          writer.write(
+            new Outputter(x)
+              .setPropertyPredicate(new StoragePropertyPredicate())
+              .setOutputClassNames(false)
+              .stringify(data));
+          writer.flush();
+        }
+      `
+    },
+    {
       name: 'stringifyResponse_',
       args: [
         { name: 'conn', javaType: 'HttpURLConnection' },
@@ -107,7 +140,7 @@ foam.CLASS({
           }
         }
 
-        if ( code != 200 ) {
+        if ( code < 200 || code >= 300 ) {
           throw new DocuSignException(code, builder.toString());
         }
 
@@ -246,6 +279,105 @@ System.out.println("\\033[36;1m==== -------- ---- ====\\033[0m");
         }
         
         return accessTokens;
+      `
+    },
+    {
+      name: 'sendEnvelope',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'sendingSession',
+          type: 'DocuSignSession'
+        },
+        {
+          name: 'envelope',
+          type: 'DocuSignEnvelope'
+        }
+      ],
+      type: 'DocuSignEnvelopeResponse',
+      javaThrows: ['IOException', 'DocuSignException'],
+      javaCode: `
+        // Send request to DocuSign
+        HttpURLConnection conn = null;
+        DocuSignEnvelopeResponse envelopeSummary = null;
+
+        try {
+          conn = fetch_("JSON",
+            sendingSession.getActiveAccount()
+              .getUrlAPI21() + "/envelopes",
+            "Bearer " + sendingSession.getAccessTokens()
+              .getAccessToken()
+          );
+          writeJSON_(x, conn, envelope);
+          String response = stringifyResponse_(conn);
+
+System.out.println("\\033[32;1m==== RESPONSE FROM envelope ====\\033[0m");
+System.out.println(response.toString());
+System.out.println("\\033[32;1m==== -------- ---- ====\\033[0m");
+
+          JSONParser parser = x.create(JSONParser.class);
+          envelopeSummary = (DocuSignEnvelopeResponse)
+            parser.parseString(response, DocuSignEnvelopeResponse.class);
+        } finally {
+          if ( conn != null ) conn.disconnect();
+        }
+        
+        return envelopeSummary;
+      `
+    },
+    {
+      name: 'getRecipient',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'sendingSession',
+          type: 'DocuSignSession'
+        },
+        {
+          name: 'envelopeId',
+          type: 'String'
+        },
+        {
+          name: 'data',
+          type: 'DocuSignRecipientRequest'
+        }
+      ],
+      type: 'DocuSignRecipientResponse',
+      javaThrows: ['IOException', 'DocuSignException'],
+      javaCode: `
+        // Send request to DocuSign
+        HttpURLConnection conn = null;
+        DocuSignRecipientResponse envelopeSummary = null;
+
+        try {
+          conn = fetch_("JSON",
+            sendingSession.getActiveAccount()
+              .getUrlAPI21() + "/envelopes/"
+              + envelopeId + "/views/recipient",
+            "Bearer " + sendingSession.getAccessTokens()
+              .getAccessToken()
+          );
+          writeJSON_(x, conn, data);
+          String response = stringifyResponse_(conn);
+
+System.out.println("\\033[32;1m==== RESPONSE FROM envelope ====\\033[0m");
+System.out.println(response.toString());
+System.out.println("\\033[32;1m==== -------- ---- ====\\033[0m");
+
+          JSONParser parser = x.create(JSONParser.class);
+          envelopeSummary = (DocuSignRecipientResponse)
+            parser.parseString(response, DocuSignRecipientResponse.class);
+        } finally {
+          if ( conn != null ) conn.disconnect();
+        }
+        
+        return envelopeSummary;
       `
     },
   ]

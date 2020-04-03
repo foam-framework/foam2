@@ -9,6 +9,10 @@ foam.CLASS({
       value: 'sent'
     },
     {
+      name: 'emailSubject',
+      class: 'String'
+    },
+    {
       name: 'documents',
       class: 'FObjectArray',
       of: 'foam.nanos.docusign.DocuSignDocumentEntry'
@@ -50,6 +54,11 @@ foam.CLASS({
     {
       name: 'clientUserId',
       class: 'String'
-    }
+    },
+    {
+      name: 'recipientId',
+      class: 'String',
+      value: '1'
+    },
   ],
 });

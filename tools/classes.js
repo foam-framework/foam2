@@ -579,6 +579,9 @@ var classes = [
   'foam.nanos.docusign.DocuSignRecipient',
   'foam.nanos.docusign.DocuSignEnvelopeRecipients',
   'foam.nanos.docusign.example.ExampleDocument',
+  'foam.nanos.docusign.DocuSignRecipientRequest',
+  'foam.nanos.docusign.DocuSignRecipientResponse',
+  'foam.nanos.docusign.DocuSignEnvelopeResponse',
 ];
 
 var abstractClasses = [

@@ -35,8 +35,12 @@ foam.CLASS({
         String documentSource = document.getDocuSignHTML();
 
         DocuSignEnvelope envelope = new DocuSignEnvelope.Builder(x)
+          .setStatus("sent")
+          .setEmailSubject("Test envelope")
           .setDocuments(new DocuSignDocumentEntry[] {
             new DocuSignDocumentEntry.Builder(x)
+              .setName("Test Document")
+              .setDocumentId("1")
               .setHtmlDefinition(
                 new DocuSignHTMLDefinition.Builder(x)
                   .setSource(documentSource)
@@ -53,14 +57,46 @@ foam.CLASS({
                 + user.getLastName())
               .setEmail(user.getEmail())
               .setClientUserId(String.valueOf(user.getId()))
+              .setRecipientId("1")
               .build()
           })
           .build());
 
         // Send request to DocuSign API
+        DocuSignEnvelopeResponse envResponse = null;
+        try {
+          DocuSignAPIHelper dsAPI = new DocuSignAPIHelper.Builder(x)
+            .build();
+          
+          envResponse =
+            dsAPI.sendEnvelope(x, dsSession, envelope);
+        } catch ( Exception e ) {
+          throw new RuntimeException(e.getMessage());
+        }
+        String envId = envResponse.getEnvelopeId();
+          
+        DocuSignRecipientResponse res = null;
+        try {
+          DocuSignAPIHelper dsAPI = new DocuSignAPIHelper.Builder(x)
+            .build();
+          
+          res =
+            dsAPI.getRecipient(x, dsSession, envId,
+              new DocuSignRecipientRequest.Builder(x)
+                .setUserName(user.getFirstName() + " "
+                  + user.getLastName())
+                .setEmail(user.getEmail())
+                .setClientUserId(String.valueOf(user.getId()))
+                .setAuthenticationMethod("email")
+                .setReturnUrl("http://localhost:8080")
+                .build()
+            );
+        } catch ( Exception e ) {
+          throw new RuntimeException(e.getMessage());
+        }
 
         // Return document with signing url set
-        document.setSigningURL("test value");
+        document.setSigningURL(res.getUrl());
         System.out.println("e");
         return document;
       `
@@ -72,10 +108,6 @@ foam.CLASS({
     {
       name: 'removeAll_',
       javaCode: `throw new UnsupportedOperationException("Cannot removeAll from DocuSignSendEnvelopeDAO");`,
-    },
-    {
-      name: 'select_',
-      javaCode: `throw new UnsupportedOperationException("Cannot select on DocuSignSendEnvelopeDAO");`,
     },
     {
       name: 'select_',

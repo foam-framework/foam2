@@ -771,6 +771,8 @@ FOAM_FILES([
   { name: 'foam/nanos/docusign/api/DocuSignUserInfo' },
   { name: 'foam/nanos/docusign/api/DocuSignDocumentEntry' },
   { name: 'foam/nanos/docusign/api/DocuSignEnvelope' },
+  { name: 'foam/nanos/docusign/api/DocuSignEnvelopeResponse' },
+  { name: 'foam/nanos/docusign/api/DocuSignRecipientRequest' },
   { name: 'foam/nanos/docusign/example/ExampleDocument' },
   { name: 'foam/nanos/docusign/example/DemoView' },
 ]);
