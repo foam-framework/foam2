@@ -77,7 +77,6 @@ public class MDAOUpdateFind implements Benchmark {
             }
             newCountry.setCode(codes.toArray()[randValue].toString());
           }
-
           countries[i] = newCountry;
           i++;
         }
