@@ -14,7 +14,6 @@ import foam.mlang.sink.GroupBy;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
 
-import java.lang.Exception;
 import java.util.*;
 
 /**
@@ -47,7 +46,6 @@ public class MDAO
   protected Object   state_ = null;
   protected Object   writeLock_ = new Object();
   protected Set      unindexed_ = new HashSet();
-  protected Object   updateLock_ = new Object();
 
   public MDAO(ClassInfo of) {
     setOf(of);
@@ -195,7 +193,7 @@ public class MDAO
 
     plan.select(state, sink, skip, limit, order, simplePredicate);
 
-    if (pm != null) pm.log(x);
+    if ( pm != null ) pm.log(x);
 
     sink.eof();
     return sink;
@@ -203,7 +201,7 @@ public class MDAO
 
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
     if ( predicate == null && skip == 0 && limit == MAX_SAFE_INTEGER ) {
-      synchronized (writeLock_) {
+      synchronized ( writeLock_ ) {
         setState(null);
       }
     } else {
