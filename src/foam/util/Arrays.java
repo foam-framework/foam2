@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.util;
 
 import java.lang.reflect.Array;
@@ -25,12 +31,8 @@ public class Arrays {
   **/
   public static <T> T[] append(T[] array, T... items) {
 
-    if( array == null ) {
-      return items;
-    }
-    if ( items == null) {
-      return array;
-    }
+    if ( array == null ) return items;
+    if ( items == null ) return array;
 
     T[] mergedArray = (T[]) Array.newInstance( array.getClass().getComponentType(), array.length + items.length );
     System.arraycopy( array, 0, mergedArray, 0, array.length );
@@ -41,11 +43,11 @@ public class Arrays {
 
   public static Object deepClone(Object value) {
     if ( value == null ) return null;
+
     if ( ! value.getClass().isArray() )
       throw new RuntimeException("Tried to clone non array " + value.getClass().getName() + " with foam.util.Arrays.deepClone().");
 
-
-    int length = java.lang.reflect.Array.getLength(value);
+    int    length = java.lang.reflect.Array.getLength(value);
     Object result = java.lang.reflect.Array.newInstance(value.getClass().getComponentType(), length);
 
     // TODO: This may be slow when dealing with primitive value arrays
