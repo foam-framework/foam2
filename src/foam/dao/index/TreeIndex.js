@@ -705,8 +705,8 @@ foam.CLASS({
 
       if ( a.length ) {
         if ( a !== b ) {
-          var newValues = [[...a].filter(v => !b.has(v))];
-          var valuesThatNeedToBeDeleted = [[...b].filter(v => !a.has(v))];
+          var newValues = [[...a].filter(v => ! b.has(v))];
+          var valuesThatNeedToBeDeleted = [[...b].filter(v => ! a.has(v))];
           var valuesThatNeedToBeUpdated = [[...a].filter(v => b.has(v))];
   
           for ( var i = 0 ; i < newValues.length ; i++ ) {

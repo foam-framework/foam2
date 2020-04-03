@@ -96,23 +96,17 @@ public class MDAO
 
     synchronized ( writeLock_ ) {
       FObject oldValue = find_(x, obj);
+      Object state = getState();
 
       if ( oldValue == null ) {
-        Object state = getState();
         setState(index_.put(state, obj));
       } else {
-        update(obj, oldValue);
+        setState(index_.update(state, oldValue, obj));
       }
     }
 
     onPut(obj);
     return obj;
-  }
-
-  public void update(FObject obj, FObject oldObj) {
-    Object state = getState();
-    state = index_.update(state, oldObj, obj);
-    setState(state);
   }
 
   public FObject remove_(X x, FObject obj) {

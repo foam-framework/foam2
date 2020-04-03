@@ -75,7 +75,7 @@ public class AltIndex
   public Object update(Object state, FObject oldObject, FObject obj) {
     Object[] s = toObjectArray(state);
 
-    for ( int i = 0; i < delegates_.size(); i++ ) {
+    for ( int i = 0 ; i < delegates_.size() ; i++ ) {
       s[i] = delegates_.get(i).update(s[i], oldObject, obj);
     }
     return s;

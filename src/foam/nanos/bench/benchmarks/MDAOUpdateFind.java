@@ -36,12 +36,12 @@ public class MDAOUpdateFind implements Benchmark {
     Country newCountry = null;
     StringBuffer sb;
     int i = 0;
-    while(ids.size() < 1001000) {
+    while ( ids.size() < 1001000 ) {
       int randomLength = 8;
       int j = 0;
       String s = "";
       sb = new StringBuffer();
-      while(j < randomLength) {
+      while ( j < randomLength ) {
         sb.append(alphabet[rand.nextInt(alphabet.length)]);
         j++;
       }
@@ -80,7 +80,6 @@ public class MDAOUpdateFind implements Benchmark {
 
           }
 
-
           countries[i] = newCountry;
           i++;
         }
@@ -94,7 +93,7 @@ public class MDAOUpdateFind implements Benchmark {
 
   @Override
   public void execute(X x) {
-    for(int i = 0; i < countries.length; i++) {
+    for ( int i = 0 ; i < countries.length ; i++ ) {
       dao_.put_(x, countries[i]);
       Country c = (Country)dao_.find(countries[i].getId());
     }

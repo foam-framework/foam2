@@ -38,12 +38,12 @@ public class MDAOPutSelect implements Benchmark {
     Country newCountry = null;
     StringBuffer sb;
     int i = 0;
-    while(ids.size() < 1000999) {
+    while ( ids.size() < 1000999 ) {
       int randomLength = 8;
       int j = 0;
       String s = "";
       sb = new StringBuffer();
-      while(j < randomLength) {
+      while ( j < randomLength ) {
         sb.append(alphabet[rand.nextInt(alphabet.length)]);
         j++;
       }
@@ -61,7 +61,7 @@ public class MDAOPutSelect implements Benchmark {
         newCountry.setName(names.toArray()[rand.nextInt(names.size())].toString());
         newCountry.setCode(codes.toArray()[rand.nextInt(codes.size())].toString());
 
-        if ( ids.size() <= 1000000)
+        if ( ids.size() <= 1000000 )
           dao_.put_(x, newCountry);
         else {
           countries[i] = newCountry;
@@ -79,7 +79,7 @@ public class MDAOPutSelect implements Benchmark {
   @Override
   public void execute(X x) {
 
-    for(int i = 0; i < countries.length; i++) {
+    for ( int i = 0 ; i < countries.length ; i++ ) {
       dao_.put_(x, countries[i]);
     }
     ArraySink s = new ArraySink();

@@ -127,7 +127,7 @@ public class TreeIndex
       } catch (ClassCastException e) {
         return state;
       }
-      if ( oldKey != null && key.equals(oldKey) )
+      if ( key != null && key.equals(oldKey) )
         state = ((TreeNode)state).update((TreeNode)state, prop_, key, oldValue, newValue, tail_);
       else {
         state =  remove(state, oldValue);
