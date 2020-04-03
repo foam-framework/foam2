@@ -42,7 +42,9 @@ foam.CLASS({
     },
     {
       class: 'Int',
-      name: 'port'
+      name: 'port',
+      hidden: true,
+      documentation: 'Port server uses for communication with authorization service'
     },
     {
       class: 'String',
