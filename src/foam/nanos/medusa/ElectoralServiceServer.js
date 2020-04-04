@@ -28,19 +28,15 @@ foam.CLASS({
     'java.util.ArrayList',
     'java.util.concurrent.*',
     'java.util.concurrent.Callable',
-    'java.util.concurrent.ExecutorService',
-    'java.util.concurrent.Executors',
-    'java.util.concurrent.ThreadLocalRandom',
-
     'java.util.concurrent.LinkedBlockingQueue',
     'java.util.concurrent.ExecutorService',
     'java.util.concurrent.Executors',
     'java.util.concurrent.RejectedExecutionException',
     'java.util.concurrent.ThreadFactory',
+    'java.util.concurrent.ThreadLocalRandom',
     'java.util.concurrent.ThreadPoolExecutor',
     'java.util.concurrent.TimeUnit',
     'java.util.concurrent.atomic.AtomicInteger',
-
     'java.util.Date',
     'java.util.List'
   ],

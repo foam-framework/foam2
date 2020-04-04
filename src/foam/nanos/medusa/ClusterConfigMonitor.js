@@ -81,7 +81,7 @@ foam.CLASS({
       ],
       javaCode: `
       ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
-      getLogger().debug("execute");
+//      getLogger().debug("execute");
 
       DAO dao = (DAO) x.get("localClusterConfigDAO");
       dao = dao.where(
@@ -98,7 +98,7 @@ foam.CLASS({
           getLogger().warning("execute", "electoralService, null");
           return;
         }
-        getLogger().debug("execute", "quorum", service.hasQuorum(x), electoralService.getState().getLabel());
+//        getLogger().debug("execute", "quorum", service.hasQuorum(x), electoralService.getState().getLabel());
         if ( ! service.hasQuorum(x) ) {
           if ( electoralService.getState() == ElectoralServiceState.IN_SESSION ||
                electoralService.getState() == ElectoralServiceState.ADJOURNED) {

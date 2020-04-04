@@ -34,8 +34,9 @@ foam.CLASS({
     'foam.util.SafetyUtil',
     'java.util.ArrayList',
     'java.util.concurrent.atomic.AtomicInteger',
+    'java.util.HashMap',
     'java.util.List',
-    'java.util.Map'
+    'java.util.Map',
   ],
 
   axioms: [
@@ -47,7 +48,6 @@ foam.CLASS({
   protected Object indexLock_ = new Object();
   protected Object promoteLock_ = new Object();
   protected Object replayLock_ = new Object();
-  protected AtomicInteger replayCount_ = new AtomicInteger(0);
           `
         }));
       }
@@ -82,6 +82,11 @@ foam.CLASS({
       class: 'Boolean',
       value: true,
       visibilty: 'RO',
+    },
+    {
+      name: 'replayNodes',
+      class: 'Map',
+      javaFactory: 'return new HashMap();'
     },
     {
       name: 'threadPoolName',
@@ -163,12 +168,12 @@ foam.CLASS({
           DaggerService dagger = (DaggerService) x.get("daggerService");
           dagger.setGlobalIndex(x, cmd.getMaxIndex());
         }
-        replayCount_.incrementAndGet();
+        getReplayNodes().put(cmd.getResponder(), cmd);
       }
 
       // if no replay data, then replay complete.
-      getLogger().debug("cmd", "replayCount", replayCount_.get(), "node quorum", service.getNodeQuorum(x), "replayIndex", getReplayIndex());
-      if ( replayCount_.get() >= service.getNodeQuorum(x) &&
+      getLogger().debug("cmd", "replayNodes", getReplayNodes().size(), "node quorum", service.getNodeQuorum(x), "replayIndex", getReplayIndex());
+      if ( getReplayNodes().size() >= service.getNodeQuorum(x) &&
            getReplayIndex() == 2L /*MedusaEntryConsensusDAO.INITIAL_INDEX_OFFSET*/ ) {
         getLogger().debug("cmd", "replay complete");
         setReplaying(false);
