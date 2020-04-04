@@ -378,8 +378,6 @@ foam.CLASS({
     {
       name: 'vote',
       javaCode: `
-      System.out.println("vote "+ id +", "+time+", "+getElectionTime()+", "+getState().getLabel());
-
       getLogger().debug("vote", id, time, getElectionTime(), getState().getLabel());
       long v = -1L; 
       try {
