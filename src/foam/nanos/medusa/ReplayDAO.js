@@ -18,6 +18,8 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.dao.Sink',
     'static foam.mlang.MLang.GTE',
+    'static foam.mlang.MLang.MIN',
+    'static foam.mlang.MLang.MAX',
     'foam.mlang.sink.Count',
     'foam.mlang.sink.Max',
     'foam.mlang.sink.Min',
@@ -51,8 +53,8 @@ foam.CLASS({
       getLogger().debug("cmd", cmd);
 
       // DEBUG
-      Min min = new Min();
-      Max max = new Max();
+      Min min = (Min) MIN(MedusaEntry.INDEX);
+      Max max = (Max) MAX(MedusaEntry.INDEX);
       Count count = new Count();
       Sequence seq = new Sequence.Builder(x)
         .setArgs(new Sink[] {count, min, max})

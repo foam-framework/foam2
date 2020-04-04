@@ -279,7 +279,7 @@ foam.CLASS({
           getDelegate().where(
             AND(
               EQ(MedusaEntry.INDEX, entry.getIndex()),
-              NEQ(MedusaEntry.INDEX, match.getIndex())
+              NEQ(MedusaEntry.ID, match.getId())
             )
           ).removeAll();
         }
