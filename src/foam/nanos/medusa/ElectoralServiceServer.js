@@ -9,8 +9,9 @@ foam.CLASS({
   name: 'ElectoralServiceServer',
 
   implements: [
+    'foam.core.ContextAgent',
     'foam.nanos.medusa.ElectoralService',
-    'foam.core.ContextAgent'
+    'foam.nanos.NanoService'
   ],
 
   javaImports: [
@@ -30,10 +31,35 @@ foam.CLASS({
     'java.util.concurrent.ExecutorService',
     'java.util.concurrent.Executors',
     'java.util.concurrent.ThreadLocalRandom',
+
+    'java.util.concurrent.LinkedBlockingQueue',
+    'java.util.concurrent.ExecutorService',
+    'java.util.concurrent.Executors',
+    'java.util.concurrent.RejectedExecutionException',
+    'java.util.concurrent.ThreadFactory',
+    'java.util.concurrent.ThreadPoolExecutor',
+    'java.util.concurrent.TimeUnit',
+    'java.util.concurrent.atomic.AtomicInteger',
+
     'java.util.Date',
     'java.util.List'
   ],
 
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(foam.java.Code.create({
+          data: `
+  private Object electionLock_ = new Object();
+  private Object voteLock_ = new Object();
+  protected ThreadPoolExecutor pool_ = null;
+        `
+        }));
+      }
+    }
+  ],
+  
   properties: [
     {
       name: 'state',
@@ -62,6 +88,11 @@ foam.CLASS({
       value: ""
     },
     {
+      name: 'threadPoolName',
+      class: 'String',
+      value: 'medusaThreadPool'
+    },
+    {
       name: 'logger',
       class: 'FObjectProperty',
       of: 'foam.nanos.logger.Logger',
@@ -74,9 +105,40 @@ foam.CLASS({
 
       `
     },
- ],
+  ],
 
   methods: [
+    {
+      name: 'start',
+      javaCode: `
+    pool_ = new ThreadPoolExecutor(
+      3,
+      3,
+      10,
+      TimeUnit.SECONDS,
+      new LinkedBlockingQueue<Runnable>(),
+      new ThreadFactory() {
+        final AtomicInteger threadNumber = new AtomicInteger(1);
+
+        public Thread newThread(Runnable runnable) {
+          Thread thread = new Thread(
+                                     Thread.currentThread().getThreadGroup(),
+                                     runnable,
+                                     "election" + "-" + threadNumber.getAndIncrement(),
+                                     0
+                                     );
+          // Thread don not block server from shut down.
+          thread.setDaemon(true);
+          thread.setPriority(Thread.NORM_PRIORITY);
+          return thread;
+        }
+      }
+    );
+    pool_.allowCoreThreadTimeOut(true);
+
+    ((Agency) getX().get(getThreadPoolName())).submit(getX(), this, "election");
+     `
+    },
     {
       name: 'hasQuorum',
       type: 'Boolean',
@@ -95,6 +157,10 @@ foam.CLASS({
       synchronized: true,
       args: [
         {
+          name: 'x',
+          type: 'Context',
+        },
+        {
           name: 'result',
           type: 'Long',
         },
@@ -105,14 +171,16 @@ foam.CLASS({
       ],
       javaCode: `
       if ( result >= 0 ) {
-        getLogger().debug("recordResult", config.getName(), result);
-        setVotes(getVotes() + 1);
-        if ( result > getCurrentSeq() ) {
-          getLogger().debug("recordResult", config.getName(), result, "winner");
-          setCurrentSeq(result);
-          setWinner(config.getId());
+        synchronized ( voteLock_ ) {
+          setVotes(getVotes() + 1);
+          if ( result > getCurrentSeq() ) {
+            getLogger().debug("recordResult", config.getName(), result, "winner");
+            setCurrentSeq(result);
+            setWinner(config.getId());
+          }
         }
       }
+      getLogger().debug("recordResult", config.getName(), result, "votes", getVotes());
     `
     },
     {
@@ -162,7 +230,22 @@ foam.CLASS({
       documentation: 'Intended for Agency submission, so dissolve can run with  own thread.',
       name: 'dissolve',
       javaCode: `
-      ((Agency) x.get("threadPool")).submit(x, (ContextAgent)this, this.getClass().getSimpleName()+".dissolve.");
+      getLogger().debug("dissolve", "agency", "submit");
+      synchronized ( electionLock_ ) {
+        if ( getState() == ElectoralServiceState.ELECTION &&
+            getElectionTime() > 0L ) {
+          getLogger().debug("execute", "Election in progress since", getElectionTime());
+        } else if ( getState() == ElectoralServiceState.VOTING ) {
+          // nop
+        } else {
+          // run a new campaigne
+          setElectionTime(System.currentTimeMillis());
+          setState(ElectoralServiceState.ELECTION);
+
+          electionLock_.notify();
+        }
+      }
+//      ((Agency) x.get(getThreadPoolName())).submit(x, (ContextAgent)this, this.getClass().getSimpleName());
       `
     },
     {
@@ -174,62 +257,77 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      ClusterConfigService service = (ClusterConfigService) getX().get("clusterConfigService");
-      ClusterConfig config = service.getConfig(getX(), service.getConfigId());
-      getLogger().debug("dissolve", getState().getLabel());
-
-      if ( getState() == ElectoralServiceState.ELECTION &&
-          getElectionTime() > 0L ) {
-        getLogger().debug("dissolve", "Election in progress since", getElectionTime());
-        return;
-      }
-
-      setElectionTime(System.currentTimeMillis());
-      setState(ElectoralServiceState.ELECTION);
-
-      ExecutorService pool = null;
-      List<Callable<Long>> voteCallables = new ArrayList<>();
-      List<Future<Long>> voteResults = null;
-      List<Callable<Void>> reportCallables = new ArrayList<>();
-      List<Future<Void>> reportResults = null;
-
-      while ( getState() == ElectoralServiceState.ELECTION ) {
-
-      setVotes(0);
-      recordResult(vote(config.getId(), getElectionTime()), config);
-
-      List voters = service.getVoters(getX());
-
-      try {
-        if ( voters.size() <= 1 ) {
-          // nothing to do.
-          getLogger().warning("dissolve", "election, but no members", voters.size());
+      // wait for first dissolve.
+      synchronized ( electionLock_ ) {
+        try {
+          getLogger().debug("execute", "state", getState().getLabel(), "wait", "initial");
+          electionLock_.wait();
+        } catch (InterruptedException e) {
           return;
         }
+      }
 
-        // clear previous run
-        if ( voteResults != null ) {
-          for( Future<Long> voteResult : voteResults ) {
-            if ( ! voteResult.isDone() ) {
-              voteResult.cancel(true);
-            }
-          }
-          voteResults = null;
+    while( true ) {
+      getLogger().debug("execute", "state", getState().getLabel(), "election time", getElectionTime());
+      try {
+        if ( getState() != ElectoralServiceState.IN_SESSION ) {
+          callVote(x);
         }
-        voteCallables.clear();
-
-        if ( reportResults != null ) {
-          for( Future<Void> reportResult : reportResults ) {
-            if ( ! reportResult.isDone() ) {
-              reportResult.cancel(true);
+      } catch(Throwable t) {
+        getLogger().error(t);
+      } finally {
+        synchronized ( electionLock_ ) {
+          try {
+            if ( getState() == ElectoralServiceState.IN_SESSION ) {
+              setElectionTime(0L);
+              setCurrentSeq(0L);
+              getLogger().debug("execute", "state", getState().getLabel(), "wait");
+              electionLock_.wait();
             }
+          } catch (InterruptedException e) {
+            break;
           }
-          reportResults = null;
         }
-        reportCallables.clear();
+      }
+      try {
+        Thread.currentThread().sleep(2000);
+      } catch (InterruptedException e) {
+        return;
+      }
+    }
+      `
+    },
+    {
+      name: 'callVote',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      javaCode: `
+      ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
+      ClusterConfig config = service.getConfig(x, service.getConfigId());
+      List voters = service.getVoters(x);
 
-        pool = Executors.newFixedThreadPool(voters.size());
+      if ( voters.size() <= 1 ) {
+        // nothing to do.
+        getLogger().warning("callVote", "no voters", voters.size());
+        return;
+      }
+      getLogger().debug("callVote", "voters", voters.size());
 
+      ThreadPoolExecutor pool = pool_;
+      List<Callable<Long>> voteCallables = new ArrayList<>();
+      List<Future<Long>> voteResults = null;
+
+      try {
+        setVotes(0);
+
+        // record own vote
+        recordResult(x, generateVote(x), config);
+
+        // request votes from others
         for (int i = 0; i < voters.size(); i++) {
           ClusterConfig clientConfig = (ClusterConfig) voters.get(i);
           if ( clientConfig.getId().equals(config.getId())) {
@@ -247,19 +345,24 @@ foam.CLASS({
              .build();
           
           voteCallables.add(() -> {
-            getLogger().debug("dissove","call", "vote", clientConfig.getName());
+            getLogger().debug("callVote", "call", "vote", clientConfig.getName());
+            try {
             long result = electoralService.vote(clientConfig.getId(), getElectionTime());
-            getLogger().debug("dissolve", "call", "vote", clientConfig.getName(), "response", result);
-            recordResult(result, clientConfig);
+            getLogger().debug("callVote", "call", "vote", clientConfig.getName(), "response", result);
+            recordResult(x, result, clientConfig);
+            callReport(x);
             return result;
+            } catch (Throwable e) {
+              getLogger().debug(clientConfig.getId(), "vote", e.getMessage());
+              return -1L;
+            }
           });
         }
 
-        try {
           voteResults =  pool.invokeAll(voteCallables);
           for( Future<Long> voteResult : voteResults ) {
             try {
-              if ( getState().equals(ElectoralServiceState.VOTING) &&
+              if ( getState() == ElectoralServiceState.VOTING &&
                    ! voteResult.isDone() ) {
                 voteResult.cancel(true);
               } else {
@@ -269,12 +372,80 @@ foam.CLASS({
               getLogger().error(e);
             }
           }
-        } catch ( Exception e) {
-          getLogger().error(e);
+      } catch ( Exception e) {
+        getLogger().error(e);
+      } finally {
+        getLogger().debug("callVote", "end", "votes", getVotes(), "voters", voters.size(), getState().getLabel());
+      }
+      `
+    },
+    {
+      name: 'vote',
+      javaCode: `
+      System.out.println("vote "+ id +", "+time+", "+getElectionTime()+", "+getState().getLabel());
+
+      getLogger().debug("vote", id, time, getElectionTime(), getState().getLabel());
+      long v = -1L; 
+      try {
+        if ( getState() == ElectoralServiceState.ELECTION &&
+            time < getElectionTime() ) {
+          // abandone our election.
+          getLogger().debug("vote", id, time, "abandon election");
+          synchronized ( electionLock_ ) {
+            setState(ElectoralServiceState.VOTING);
+          }
         }
-        try {
-            if (getState().equals(ElectoralServiceState.ELECTION) &&
-                hasQuorum(voters.size())) {
+        if ( getState() == ElectoralServiceState.VOTING ) { 
+          v = generateVote(getX());
+        }
+        getLogger().debug("vote", id, time, "response", v);
+      } catch (Throwable t) {
+        getLogger().error("vote", id, time, "response", v, t);
+      }
+      return v;
+     `
+    },
+    {
+      name: 'generateVote',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      type: 'int',
+      javaCode: `
+      return ThreadLocalRandom.current().nextInt(255);
+     `
+    },
+    {
+      name: 'callReport',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      javaCode: `
+      ClusterConfigService service = (ClusterConfigService) getX().get("clusterConfigService");
+      ClusterConfig config = service.getConfig(x, service.getConfigId());
+      List voters = service.getVoters(getX());
+      try {
+        synchronized ( electionLock_ ) {
+          if ( ! ( getState() == ElectoralServiceState.ELECTION &&
+                   hasQuorum(voters.size()) ) )  {
+            getLogger().debug("callReport", "no quorum", "votes", getVotes(), "voters", voters.size(), getState().getLabel());
+            return;
+          }
+        }
+
+        getLogger().debug("callReport", "votes", getVotes(), "voters", voters.size(), getState().getLabel());
+
+        report(getWinner());
+
+        ThreadPoolExecutor pool = pool_;
+        List<Callable<Void>> reportCallables = new ArrayList<>();
+        List<Future<Void>> reportResults = null;
 
               for (int j = 0; j < voters.size(); j++) {
                 ClusterConfig clientConfig2 = (ClusterConfig) voters.get(j);
@@ -292,15 +463,20 @@ foam.CLASS({
                      .setReadTimeout(3000)
                      .build())
                    .build();
-
+                
                 reportCallables.add(() -> {
-                  getLogger().debug("dissolve", "call", "report", getWinner());
-                  electoralService2.report(getWinner());
+                  getLogger().debug("callReport", "call", "report", getWinner());
+                  try {
+                    electoralService2.report(getWinner());
+                  } catch (Throwable e) {
+                    getLogger().debug(clientConfig2.getId(), "report", e.getMessage());
+                  }
                   return null;
                 });
               }
 
               try {
+                getLogger().debug("callReport", "invoke reportCallables");
                 reportResults = pool.invokeAll(reportCallables);
                 for( Future<Void> reportResult : reportResults ) {
                   try {
@@ -312,55 +488,10 @@ foam.CLASS({
               } catch ( Exception e) {
                 getLogger().error(e);
               }
-
-              // call last as this will change the electoral state.
-              report(getWinner());
-            } else {
-              getLogger().debug("dissolve", "no quorum", "votes", getVotes(), "voters", voters.size(), getState().getLabel());
-            }
-        } catch ( Exception e) {
-          getLogger().error(e);
-        }
-
-        pool.shutdown();
-        pool.awaitTermination(5, TimeUnit.SECONDS);
-      } catch (InterruptedException e) {
+      } catch ( Exception e) {
         getLogger().error(e);
-      } finally {
-        if ( pool != null ) {
-          pool.shutdownNow();
-        }
-        getLogger().debug("dissolve", "finally", "votes", getVotes(), "voters", voters.size(), getState().getLabel());
       }
-        try {
-          Thread.sleep(2000);
-        } catch ( InterruptedException e ) {
-          getLogger().error(e);
-          break;
-        }
-      }
-      setElectionTime(0L);
-     `
-    },
-    {
-      name: 'vote',
-      javaCode: `
-      getLogger().debug("vote", id, time);
-      if ( findConfig(getX()).getEnabled() ) {
-        if ( getState().equals(ElectoralServiceState.ELECTION) &&
-            time < getElectionTime() ) {
-          // abandone our election.
-          setState(ElectoralServiceState.VOTING);
-          return -1L;
-        }
-        // return our vote
-        long v = ThreadLocalRandom.current().nextInt(255);
-        getLogger().debug("vote", id, time, "response", v);
-        return v;
-//        return ThreadLocalRandom.current().nextInt(255);
-      }
-      return -1L;
-     `
+      `
     },
     {
       name: 'report',
@@ -386,7 +517,9 @@ foam.CLASS({
           config = (ClusterConfig) dao.put_(getX(), config);
         }
       }
-      setState(ElectoralServiceState.IN_SESSION);
+      synchronized ( electionLock_ ) {
+        setState(ElectoralServiceState.IN_SESSION);
+      }
 
       getLogger().debug("report", winner, getState().getLabel(), "service", service.getConfigId(), "primary", service.getPrimaryConfigId(), service.getIsPrimary());
      `

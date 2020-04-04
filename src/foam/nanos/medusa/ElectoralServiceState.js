@@ -5,30 +5,30 @@
  */
 
 foam.ENUM({
-    package: 'foam.nanos.medusa',
-    name: 'ElectoralServiceState',
+  package: 'foam.nanos.medusa',
+  name: 'ElectoralServiceState',
   
-    documentation: `
+  documentation: `
         Voting state of a node/instance in a cluster.
       `,
   
-    values: [
-      {
-        name: 'ADJOURNED',
-        label: 'Adjourned'
-      },
-      {
-        name: 'ELECTION',
-        label: 'Election'
-      },
-      {
-        name: 'VOTING',
-        label: 'Voting'
-      },
-      {
-        name: 'IN_SESSION',
-        label: 'In session'
-      }
-    ]
-  });
-  
+  values: [
+    {
+      name: 'ADJOURNED',
+      label: 'Adjourned'
+    },
+    {
+      name: 'ELECTION',
+      label: 'Election'
+    },
+    {
+      name: 'VOTING',
+      label: 'Voting'
+    },
+    {
+      name: 'IN_SESSION',
+      label: 'In session'
+    }
+  ]
+});
+

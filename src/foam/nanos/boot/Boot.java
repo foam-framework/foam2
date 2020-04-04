@@ -111,14 +111,17 @@ public class Boot {
 
     String startScript = System.getProperty("foam.main", "main");
     if ( startScript != null ) {
-      DAO    scriptDAO = (DAO) root_.get("scriptDAO");
+      DAO    scriptDAO = (DAO) root_.get("bootScriptDAO");
+      if ( scriptDAO == null ) {
+        logger.warning("DAO Not Found: bootScriptDAO. Falling back to scriptDAO");
+        scriptDAO = (DAO) root_.get("scriptDAO");
+      }
       Script script    = (Script) scriptDAO.find(startScript);
       if ( script != null ) {
-        logger.info("Boot, Script", startScript);
+        logger.info("Boot,script", startScript);
         script = (Script) script.fclone();
         try {
-          // During boot with Medusa, everything must be
-          // read-only until Replay is complete.
+          // NOTE: is read-only and will throw exception when it updates rundate.
           script.runScript(new foam.core.ReadOnlyDAOContext(root_));
         } catch (UnsupportedOperationException e) {
           // ignore

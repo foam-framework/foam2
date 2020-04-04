@@ -63,10 +63,10 @@ foam.CLASS({
       List<ClusterConfig> arr = (ArrayList) ((ArraySink) ((DAO) x.get("localClusterConfigDAO"))
         .where(
           AND(
-            EQ(ClusterConfig.ENABLED, true),
-            EQ(ClusterConfig.STATUS, Status.ONLINE),
-            EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
             EQ(ClusterConfig.ZONE, 0),
+            EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
+            EQ(ClusterConfig.STATUS, Status.ONLINE),
+            EQ(ClusterConfig.ENABLED, true),
             EQ(ClusterConfig.REGION, myConfig.getRegion()),
             EQ(ClusterConfig.REALM, myConfig.getRealm())
           )
@@ -77,16 +77,17 @@ foam.CLASS({
         getLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
           public void executeJob() {
             try {
-              DAO dao = (DAO) getClients().get(config.getId());
-              if ( dao == null ) {
+              // TODO: clear map onDAOUpdate
+//              DAO dao = (DAO) getClients().get(config.getId());
+//              if ( dao == null ) {
                 DAO clientDAO = service.getClientDAO(x, "medusaEntryDAO", config, config);
-                dao = new RetryClientSinkDAO.Builder(x)
+                DAO dao = new RetryClientSinkDAO.Builder(x)
                         .setDelegate(clientDAO)
                         .setMaxRetryAttempts(service.getMaxRetryAttempts())
                         .setMaxRetryDelay(service.getMaxRetryDelay())
                         .build();
-                getClients().put(config.getId(), dao);
-              }
+//                getClients().put(config.getId(), dao);
+//              }
               getLogger().debug("put", entry.getIndex(), config.getName());
               dao.put_(x, entry);
             } catch ( Throwable t ) {

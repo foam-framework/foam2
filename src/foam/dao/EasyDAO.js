@@ -188,9 +188,9 @@ foam.CLASS({
         if ( getCluster() &&
              getMdao() != null ) {
           delegate = new foam.nanos.medusa.MedusaEntryAdapterDAO.Builder(getX())
-          .setNSpec(getNSpec())
-          .setDelegate(delegate)
-          .build();
+            .setNSpec(getNSpec())
+            .setDelegate(delegate)
+            .build();
         }
 
         delegate = getOuterDAO(delegate);

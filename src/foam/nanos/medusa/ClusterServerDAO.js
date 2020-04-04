@@ -30,8 +30,7 @@ foam.CLASS({
           logger = new foam.nanos.logger.StdoutLogger();
         }
         return new PrefixLogger(new Object[] {
-          this.getClass().getSimpleName(),
-          "cmd_"
+          this.getClass().getSimpleName()
         }, logger);
       `
     }

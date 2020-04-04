@@ -19,6 +19,14 @@ public class AgencyTimerTask
 
   X x_;
   ContextAgent agent_;
+  String threadPoolName_ = "threadPool";
+
+  public AgencyTimerTask(X x, String threadPoolName, ContextAgent agent) {
+    super();
+    this.x_ = x;
+    this.agent_ = agent;
+    this.threadPoolName_ = threadPoolName;
+  }
 
   public AgencyTimerTask(X x, ContextAgent agent) {
     super();
@@ -27,6 +35,6 @@ public class AgencyTimerTask
   }
 
   public void run() {
-    ((Agency) x_.get("threadPool")).submit(x_, agent_, agent_.getClass().getSimpleName());
+    ((Agency) x_.get(threadPoolName_)).submit(x_, agent_, agent_.getClass().getSimpleName());
   }
 }

@@ -21,10 +21,7 @@ foam.CLASS({
     'foam.core.FObject',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
-    'foam.nanos.pm.PM',
-    'java.util.concurrent.ThreadLocalRandom',
-    'java.util.Random',
-    'java.util.UUID'
+    'foam.nanos.pm.PM'
   ],
 
   properties: [
@@ -88,20 +85,14 @@ foam.CLASS({
       ElectoralService electoralService = (ElectoralService) x.get("electoralService");
       ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
       getLogger().debug("submit", "state", electoralService.getState().getLabel());
-      if ( electoralService.getState() != ElectoralServiceState.IN_SESSION ||
+      if ( service.getOnline(x) &&
+           electoralService.getState() != ElectoralServiceState.IN_SESSION ||
            ! service.getIsPrimary()) {
         getLogger().warning("Reject put(). primary:", service.getIsPrimary(), ", state:", electoralService.getState().getLabel(), obj);
         throw new RuntimeException("Reject put() on non-primary or during election. (primary: " + service.getIsPrimary() + ", state: " + electoralService.getState().getLabel());
       }
 
       MedusaEntry entry = x.create(MedusaEntry.class);
-
-      java.util.Random r = ThreadLocalRandom.current();
-      entry.setId(new UUID(r.nextLong(), r.nextLong()).toString());
-
-      DaggerService daggar = (DaggerService) x.get("daggerService");
-      entry = daggar.link(x, entry);
-
       entry.setMediator(service.getConfigId());
       entry.setNSpecName(getNSpec().getName());
       entry.setAction(op);

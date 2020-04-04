@@ -23,11 +23,9 @@ foam.CLASS({
     {
       buildJavaClass: function(cls) {
         cls.extras.push(`
-          protected foam.dao.DAO dao_;
-
           public ClusterConfigPingSink(foam.core.X x, foam.dao.DAO dao, int timeout) {
             setX(x);
-            dao_ = dao;
+            setDao(dao);
             setTimeout(timeout);
           }
         `);
@@ -40,6 +38,10 @@ foam.CLASS({
       name: 'timeout',
       class: 'Int',
       value: 3000,
+    },
+    {
+      name: 'dao',
+      class: 'foam.dao.DAOProperty'
     },
     {
       name: 'logger',
@@ -88,19 +90,18 @@ foam.CLASS({
                config.getZone() == 0L &&
                config.getRegion() == myConfig.getRegion() &&
                config.getRealm() == myConfig.getRealm() ) {
-            DAO dao = (DAO) getX().get("localMedusaEntryDAO");
+            // NOTE: using internalMedusaEntryDAO else we'll block on ReplayingDAO.
+            DAO dao = (DAO) getX().get("internalMedusaEntryDAO");
             dao = dao.where(EQ(MedusaEntry.HAS_CONSENSUS, true));
             Max max = (Max) dao.select(MAX(MedusaEntry.INDEX));
-            Long index = 0L;
-            if ( max != null &&
-                 max.getValue() != null ) {
-              index = (Long) max.getValue();
-            }
 
             ReplayCmd cmd = new ReplayCmd();
             cmd.setRequester(myConfig.getId());
             cmd.setResponder(config.getId());
-            cmd.setFromIndex(index);
+            if ( max != null &&
+                 max.getValue() != null ) {
+              cmd.setFromIndex((Long) max.getValue());
+            }
             // TODO: configuration
             cmd.setServiceName("medusaEntryDAO");
 
@@ -110,12 +111,16 @@ foam.CLASS({
               .setMaxRetryAttempts(service.getMaxRetryAttempts())
               .setMaxRetryDelay(service.getMaxRetryDelay())
               .build();
+
             getLogger().debug(myConfig.getId(), "Request replay from", config.getId());
             Object response = clientDAO.cmd_(getX(), cmd);
 
-            // TODO/REVIEW: not sure how to implement replay mode
             if ( response instanceof ReplayDetailsCmd ) {
               getLogger().debug(myConfig.getId(), "Request replay response", response);
+              ReplayDetailsCmd details = (ReplayDetailsCmd) response;
+              ((DAO) getX().get("medusaEntryDAO")).cmd(details);
+            } else {
+              getLogger().debug(myConfig.getId(), "Invalid cmd response. Expected ReplayDetailsCmd. received", cmd.getClass().getSimpleName());
             }
           }
         }
@@ -126,7 +131,8 @@ foam.CLASS({
         }
       } catch (NullPointerException t) {
         getLogger().error(t);
-      } catch (Throwable t) {
+      } catch (java.io.IOException t) {
+        getLogger().debug("ping", config.getId(), t.getMessage());
         if ( config.getStatus() != Status.OFFLINE ) {
           config.setPingInfo(t.getMessage());
           config.setStatus(Status.OFFLINE);
@@ -134,7 +140,7 @@ foam.CLASS({
         // TODO: Alarm.
         }
       }
-      dao_.put_(getX(), config);
+      getDao().put_(getX(), config);
       `
     },
     {

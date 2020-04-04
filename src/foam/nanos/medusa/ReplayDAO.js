@@ -78,7 +78,7 @@ foam.CLASS({
         details.setMaxIndex((Long)max.getValue());
         details.setCount((Long) count.getValue());
       }
-      getDelegate().cmd_(x, details);
+      //getDelegate().cmd_(x, details);
 
       getDelegate().where(
         GTE(MedusaEntry.INDEX, cmd.getFromIndex())

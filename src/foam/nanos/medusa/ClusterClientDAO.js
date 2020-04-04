@@ -37,12 +37,24 @@ foam.CLASS({
       name: 'maxRetryAttempts',
       class: 'Int',
       documentation: 'Set to -1 to infinitely retry.',
-      value: 20
+      value: -1
     },
     {
       class: 'Int',
       name: 'maxRetryDelay',
       value: 20000
+    },
+    {
+      name: 'logger',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.logger.Logger',
+      visibility: 'HIDDEN',
+      javaFactory: `
+        return new PrefixLogger(new Object[] {
+          this.getClass().getSimpleName(),
+          getServiceName()
+        }, (Logger) getX().get("logger"));
+      `
     }
   ],
 
@@ -50,15 +62,9 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-      Logger logger = new PrefixLogger(new Object[] {
-        this.getClass().getSimpleName(),
-        getServiceName(),
-        "put_",
-      }, (Logger) x.get("logger"));
-
       ElectoralService electoralService = (ElectoralService) x.get("electoralService");
       ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
-
+      getLogger().debug("put", "electoral", electoralService.getState().getLabel(), "online", service.getOnline(x));
       foam.core.FObject old = getDelegate().find_(x, obj.getProperty("id"));
       foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(x).setPropertyPredicate(new foam.lib.ClusterPropertyPredicate());
       // Clear context so it's not marshalled across the network
@@ -71,7 +77,7 @@ foam.CLASS({
         String record = outputter.stringify(obj);
         if ( foam.util.SafetyUtil.isEmpty(record) ||
             "{}".equals(record.trim()) ) {
-          logger.debug("no changes", record);
+          getLogger().debug("no changes", record);
           return obj;
         }
 
@@ -86,22 +92,22 @@ foam.CLASS({
                 ! service.getIsPrimary() ) {
         try {
           if ( electoralService.getState() == ElectoralServiceState.IN_SESSION ) {
-              logger.debug("to primary", service.getPrimaryConfigId(), cmd);
+              getLogger().debug("to primary", service.getPrimaryConfigId(), cmd);
               PM pm = new PM(ClusterClientDAO.getOwnClassInfo(), getServiceName());
               FObject result = (FObject) service.getPrimaryDAO(x, getClusterServiceName()).cmd_(x, cmd);
               pm.log(x);
-              logger.debug("from primary", service.getPrimaryConfigId(), result);
+              getLogger().debug("from primary", service.getPrimaryConfigId(), result);
               return result;
-            } else {
-              logger.debug("Election in progress.", electoralService.getState().getLabel());
+          } else {
+              // getLogger().debug("Election in progress.", electoralService.getState().getLabel());
               throw new RuntimeException("Election in progress.");
-            }
-          } catch ( Throwable t ) {
-            logger.debug("from primary, error", t.getMessage());
+          }
+        } catch ( Throwable t ) {
+            getLogger().debug(t.getMessage());
 
             if ( getMaxRetryAttempts() > -1 &&
-                 retryAttempt >= getMaxRetryAttempts() ) {
-              logger.debug("retryAttempt >= maxRetryAttempts", retryAttempt, getMaxRetryAttempts());
+                 retryAttempt == getMaxRetryAttempts() ) {
+              getLogger().debug("retryAttempt >= maxRetryAttempts", retryAttempt, getMaxRetryAttempts());
 
               if ( electoralService.getState() == ElectoralServiceState.IN_SESSION ||
                   electoralService.getState() == ElectoralServiceState.ADJOURNED ) {
@@ -122,21 +128,21 @@ foam.CLASS({
               if ( retryDelay > getMaxRetryDelay() ) {
                 retryDelay = 10;
               }
-              logger.debug("retry attempt", retryAttempt, "delay", retryDelay);
+              getLogger().debug("retry attempt", retryAttempt, "delay", retryDelay);
               Thread.sleep(retryDelay);
            } catch(InterruptedException e) {
               Thread.currentThread().interrupt();
-              logger.debug("InterruptedException");
+              getLogger().debug("InterruptedException");
               throw t;
             }
           }
         }
         if ( service != null ) {
-          logger.debug("primary delegating");
+          getLogger().debug("primary delegating");
           return getDelegate().put_(x, obj);
         } else {
           // service is null.
-          logger.warning("ClusterConfigService not found, operation discarded.", obj);
+          getLogger().warning("ClusterConfigService not found, operation discarded.", obj);
           throw new RuntimeException("ClusterConfigService not found, operation discarded.");
         }
       `
@@ -145,12 +151,6 @@ foam.CLASS({
       // TODO: refactor  like put.
       name: 'remove_',
       javaCode: `
-      Logger logger = new PrefixLogger(new Object[] {
-        this.getClass().getSimpleName(),
-        getServiceName(),
-        "remove_",
-      }, (Logger) x.get("logger"));
-
       // TODO: Add Retry
 
       ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
@@ -162,11 +162,11 @@ foam.CLASS({
         String record = outputter.stringify(obj);
 
         ClusterCommand cmd = new ClusterCommand(x, getServiceName(), ClusterCommand.REMOVE, record);
-        logger.debug("to primary", cmd);
+        getLogger().debug("to primary", cmd);
         FObject result = (FObject) service.getPrimaryDAO(x, getServiceName()).cmd_(x, cmd);
-        logger.debug("from primary", result.getClass().getSimpleName(), result);
+        getLogger().debug("from primary", result.getClass().getSimpleName(), result);
         obj = obj.copyFrom(result);
-        logger.debug("obj after copyFrom", obj);
+        getLogger().debug("obj after copyFrom", obj);
         return obj;
       } else {
         return getDelegate().remove_(x, obj);

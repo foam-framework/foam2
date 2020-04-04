@@ -37,7 +37,7 @@ public class ClusterPingService
          config.getStatus() == Status.ONLINE ) {
       msg.setObject(new Ping());
     } else {
-      Throwable t = new java.net.ConnectException("Connection refushed: "+Status.OFFLINE.getLabel());
+      Throwable t = new java.net.ConnectException("Connection refused: "+Status.OFFLINE.getLabel());
       RemoteException wrapper = new RemoteException();
       wrapper.setId(t.getClass().getName());
       wrapper.setMessage(t.getMessage());

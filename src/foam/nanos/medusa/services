@@ -3,7 +3,11 @@ p({
   "name": "medusaThreadPool",
   "lazy": false,
   "serve": false,
-  "serviceClass": "foam.nanos.pool.ThreadPoolAgency"
+  "serviceScript": `
+    return new foam.nanos.pool.ThreadPoolAgency.Builder(x)
+      .setPrefix("medusa")
+      .build();
+  `
 })
 
 p({
@@ -46,7 +50,7 @@ p({
   "name": "clusterConfigService",
   "lazy": false,
   "serve": false,
-  "serviceClass": "foam.nanos.medusa.DefaultClusterConfigService"
+  "serviceClass": "foam.nanos.medusa.ClusterConfigService"
 })
 
 p({

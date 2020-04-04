@@ -33,6 +33,7 @@ foam.CLASS({
     'foam.nanos.logger.Logger',
     'foam.util.SafetyUtil',
     'java.util.ArrayList',
+    'java.util.concurrent.atomic.AtomicInteger',
     'java.util.List',
     'java.util.Map'
   ],
@@ -43,11 +44,21 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-  private Object indexLock_ = new Object();
-  private Object promoteLock_ = new Object();
+  protected Object indexLock_ = new Object();
+  protected Object promoteLock_ = new Object();
+  protected Object replayLock_ = new Object();
+  protected AtomicInteger replayCount_ = new AtomicInteger(0);
           `
         }));
       }
+    }
+  ],
+
+  constants: [
+    {
+      name: 'INITIAL_INDEX_OFFSET',
+      class: 'Long',
+      value: 2
     }
   ],
 
@@ -56,7 +67,20 @@ foam.CLASS({
       // NOTE: starting at 2 as indexes 1 and 2 are used to prime the system.
       name: 'index',
       class: 'Long',
-      value: 2,
+      value: 2, /*MedusaEntryConsensusDAO.INITIAL_INDEX_OFFSET,*/
+      visibilty: 'RO',
+    },
+    {
+      // NOTE: starting at 2 as indexes 1 and 2 are used to prime the system.
+      name: 'replayIndex',
+      class: 'Long',
+      value: 2, /*MedusaEntryConsensusDAO.INITIAL_INDEX_OFFSET,*/
+      visibilty: 'RO',
+    },
+    {
+      name: 'replaying',
+      class: 'Boolean',
+      value: true,
       visibilty: 'RO',
     },
     {
@@ -85,10 +109,13 @@ foam.CLASS({
       MedusaEntry entry = (MedusaEntry) obj;
       getLogger().debug("put", getIndex(), entry.getIndex());
 
+// TODO: move do own dao
       DaggerService service = (DaggerService) x.get("daggerService");
       if ( entry.getIndex() > service.getGlobalIndex(x) ) {
-        service.setGlobalIndex(x, entry.getIndex());
-        getLogger().debug("put", getIndex(), "setGlobalIndex", entry.getIndex());
+//        service.setGlobalIndex(x, entry.getIndex());
+//        getLogger().debug("put", getIndex(), "setGlobalIndex", entry.getIndex());
+        getLogger().error("put", "index > globalIndex", getIndex(), service.getGlobalIndex(x));
+        // TODO: now what?
       }
 
       MedusaEntry ce = null;
@@ -103,27 +130,56 @@ foam.CLASS({
         MedusaEntry me = (MedusaEntry) getDelegate().put_(x, entry);
 
         ce = getConsensusEntry(x, me);
-        if ( ce != null &&
-             ce.getIndex() == getIndex() + 1 ) {
-          ce =  promote(x, ce);
+        if ( ce != null) {
+          if ( ce.getIndex() == getIndex() + 1 ) {
+            ce =  promote(x, ce);
+          } else {
+            synchronized ( promoteLock_ ) {
+              getLogger().debug("put", "notify", getIndex(), ce.getIndex());
+              promoteLock_.notify();
+            }
+          }
+          return ce;
         }
       }
 
-      if ( ce != null ) {
-        if ( service.getGlobalIndex(x) > getIndex() ) {
-          getLogger().debug("put", "lock", getIndex(), entry.getIndex());
-          synchronized ( promoteLock_ ) {
-            getLogger().debug("put", "notify", getIndex(), entry.getIndex());
-            promoteLock_.notify();
-          }
-        }
-        return ce;
-      }
       return entry;
       `
     },
     {
-      documentation: 'Make an entry available for Dagger hasing.',
+      name: 'cmd_',
+      javaCode: `
+      if ( ! ( obj instanceof ReplayDetailsCmd ) ) {
+        return getDelegate().cmd_(x, obj);
+      }
+
+      ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
+
+      ReplayDetailsCmd cmd = (ReplayDetailsCmd) obj;
+      getLogger().debug("cmd", cmd);
+      synchronized ( replayLock_ ) {
+        if ( cmd.getMaxIndex() > getReplayIndex() ) {
+          setReplayIndex(cmd.getMaxIndex());
+          DaggerService dagger = (DaggerService) x.get("daggerService");
+          dagger.setGlobalIndex(x, cmd.getMaxIndex());
+        }
+        replayCount_.incrementAndGet();
+      }
+
+      // if no replay data, then replay complete.
+      getLogger().debug("cmd", "replayCount", replayCount_.get(), "node quorum", service.getNodeQuorum(x), "replayIndex", getReplayIndex());
+      if ( replayCount_.get() >= service.getNodeQuorum(x) &&
+           getReplayIndex() == 2L /*MedusaEntryConsensusDAO.INITIAL_INDEX_OFFSET*/ ) {
+        getLogger().debug("cmd", "replay complete");
+        setReplaying(false);
+        ((DAO) x.get("localMedusaEntryDAO")).cmd(new ReplayCompleteCmd());
+        service.setOnline(x, true);
+      }
+      return obj;
+      `
+    },
+    {
+      documentation: 'Make an entry available for Dagger hashing.',
       name: 'promote',
       args: [
         {
@@ -137,15 +193,29 @@ foam.CLASS({
       ],
       type: 'foam.nanos.medusa.MedusaEntry',
       javaCode: `
-      DaggerService service = (DaggerService) x.get("daggerService");
-      service.verify(x, entry);
+      DaggerService dagger = (DaggerService) x.get("daggerService");
+      dagger.verify(x, entry);
       getLogger().info("promote", getIndex(), entry.getIndex());
       synchronized ( indexLock_ ) {
         if ( entry.getIndex() == getIndex() + 1 ) {
           setIndex(entry.getIndex());
         }
       }
-      service.updateLinks(x, entry);
+
+      dagger.updateLinks(x, entry);
+
+      if ( getReplaying() &&
+         getIndex() >= getReplayIndex() + 2 /*TODO*/) {
+        getLogger().debug("promote", "replay complete");
+        setReplaying(false);
+        ((DAO) x.get("localMedusaEntryDAO")).cmd(new ReplayCompleteCmd());
+        ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
+        service.setOnline(x, true);
+        synchronized ( promoteLock_ ) {
+          promoteLock_.notify();
+        }
+      }
+
       return entry;
       `
     },
@@ -183,7 +253,7 @@ foam.CLASS({
         }
       }
 
-      if ( max >= service.getNodesForConsensus(x) ) {
+      if ( max >= (service.getNodeCount(x) / 2 + 1) ) {
         // TODO: consider reporting the split if max
         // does not equal number of nodes.
 
