@@ -115,16 +115,15 @@ foam.CLASS({
       getLogger().debug("put", getIndex(), entry.getIndex());
 
 // TODO: move do own dao
-      DaggerService service = (DaggerService) x.get("daggerService");
-      if ( entry.getIndex() > service.getGlobalIndex(x) ) {
-//        service.setGlobalIndex(x, entry.getIndex());
-//        getLogger().debug("put", getIndex(), "setGlobalIndex", entry.getIndex());
-        getLogger().error("put", "index > globalIndex", getIndex(), service.getGlobalIndex(x));
-        // TODO: now what?
-      }
+      // DaggerService service = (DaggerService) x.get("daggerService");
+      // if ( entry.getIndex() > service.getGlobalIndex(x) ) {
+      //   service.setGlobalIndex(x, entry.getIndex());
+      //   getLogger().debug("put", getIndex(), "setGlobalIndex", entry.getIndex());
+      //   getLogger().error("put", "index > globalIndex", getIndex(), service.getGlobalIndex(x));
+      //   // TODO: now what?
+      // }
 
       MedusaEntry ce = null;
-
       synchronized ( Long.toString(entry.getIndex()).intern() ) {
 
         if ( entry.getIndex() <= getIndex() ) {
@@ -135,17 +134,20 @@ foam.CLASS({
         MedusaEntry me = (MedusaEntry) getDelegate().put_(x, entry);
 
         ce = getConsensusEntry(x, me);
-        if ( ce != null) {
-          if ( ce.getIndex() == getIndex() + 1 ) {
-            ce =  promote(x, ce);
-          } else {
-            synchronized ( promoteLock_ ) {
-              getLogger().debug("put", "notify", getIndex(), ce.getIndex());
-              promoteLock_.notify();
-            }
-          }
+        if ( ce != null &&
+             ce.getIndex() == getIndex() + 1 ) {
+          ce =  promote(x, ce);
           return ce;
         }
+      } // release lock
+
+      if ( ce != null &&
+           ce.getIndex() > getIndex() ) {
+        getLogger().debug("put", "promoteLock_.notify", getIndex(), ce.getIndex());
+        synchronized ( promoteLock_ ) {
+          promoteLock_.notify();
+        }
+        return ce;
       }
 
       return entry;
@@ -167,6 +169,7 @@ foam.CLASS({
           setReplayIndex(cmd.getMaxIndex());
           DaggerService dagger = (DaggerService) x.get("daggerService");
           dagger.setGlobalIndex(x, cmd.getMaxIndex());
+          getLogger().debug("cmd", "update", "globlalIndex", cmd.getMaxIndex(), dagger.getGlobalIndex(x));
         }
         getReplayNodes().put(cmd.getResponder(), cmd);
       }
@@ -175,10 +178,8 @@ foam.CLASS({
       getLogger().debug("cmd", "replayNodes", getReplayNodes().size(), "node quorum", service.getNodeQuorum(x), "replayIndex", getReplayIndex());
       if ( getReplayNodes().size() >= service.getNodeQuorum(x) &&
            getReplayIndex() == 2L /*MedusaEntryConsensusDAO.INITIAL_INDEX_OFFSET*/ ) {
-        getLogger().debug("cmd", "replay complete");
-        setReplaying(false);
-        ((DAO) x.get("localMedusaEntryDAO")).cmd(new ReplayCompleteCmd());
-        service.setOnline(x, true);
+        getLogger().debug("cmd", "replayComplete");
+        replayComplete(x);
       }
       return obj;
       `
@@ -210,12 +211,9 @@ foam.CLASS({
       dagger.updateLinks(x, entry);
 
       if ( getReplaying() &&
-         getIndex() >= getReplayIndex() + 2 /*TODO*/) {
-        getLogger().debug("promote", "replay complete");
-        setReplaying(false);
-        ((DAO) x.get("localMedusaEntryDAO")).cmd(new ReplayCompleteCmd());
-        ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
-        service.setOnline(x, true);
+         getIndex() >= getReplayIndex() ) { //+ 2 /*MedusaEntryConsensusDAO.INITIAL_INDEX_OFFSET*/) {
+        getLogger().debug("promote", "replayComplete");
+        replayComplete(x);
         synchronized ( promoteLock_ ) {
           promoteLock_.notify();
         }
@@ -265,17 +263,17 @@ foam.CLASS({
         List<MedusaEntry> list = (ArrayList) ((ArraySink) getDelegate().where(
           EQ(MedusaEntry.INDEX, entry.getIndex())
         ).select(new ArraySink())).getArray();
-        getLogger().debug("match");
         for ( MedusaEntry e : list ) {
           if ( match == null &&
                e.getHash().equals(hash) ) {
             match = (MedusaEntry) e.fclone();
             match.setHasConsensus(true);
             match = (MedusaEntry) getDelegate().put_(x, match);
+            getLogger().debug("match", match.getIndex());
           }
         }
         if ( match != null ) {
-          getLogger().debug("cleanup");
+          getLogger().debug("cleanup", entry.getIndex());
           getDelegate().where(
             AND(
               EQ(MedusaEntry.INDEX, entry.getIndex()),
@@ -328,6 +326,21 @@ foam.CLASS({
         // TODO: Alarm
       }
      `
+    },
+    {
+      name: 'replayComplete',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      javaCode: `
+      getLogger().debug("replayComplete");
+      setReplaying(false);
+      ((DAO) x.get("localMedusaEntryDAO")).cmd(new ReplayCompleteCmd());
+      ((ClusterConfigService) x.get("clusterConfigService")).setOnline(x, true);
+      `
     }
   ]
 });
