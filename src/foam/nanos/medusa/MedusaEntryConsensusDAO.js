@@ -111,42 +111,45 @@ foam.CLASS({
       // TODO: this needs to be really fast.
       name: 'put_',
       javaCode: `
-      MedusaEntry entry = (MedusaEntry) obj;
-      getLogger().debug("put", getIndex(), entry.getIndex());
+      MedusaEntry entry = (MedusaEntry) getDelegate().put_(x, obj);
+      getLogger().debug("put", getIndex(), entry.getIndex(), entry.getNode());
+      ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
 
-// TODO: move do own dao
-      // DaggerService service = (DaggerService) x.get("daggerService");
-      // if ( entry.getIndex() > service.getGlobalIndex(x) ) {
-      //   service.setGlobalIndex(x, entry.getIndex());
-      //   getLogger().debug("put", getIndex(), "setGlobalIndex", entry.getIndex());
-      //   getLogger().error("put", "index > globalIndex", getIndex(), service.getGlobalIndex(x));
-      //   // TODO: now what?
-      // }
+      if ( entry.getIndex() <= getIndex() ) {
+        getLogger().info("put", getIndex(), entry.getIndex(), entry.getNode(), "discarding");
+        return entry;
+      }
+
+      Count count = (Count) getDelegate().where(
+        EQ(MedusaEntry.INDEX, entry.getIndex())
+      ).select(COUNT());
+      if ( (Long)count.getValue() < service.getNodeQuorum(x) ) {
+        getLogger().info("put", getIndex(), entry.getIndex(), entry.getNode(), "consensus", "false");
+        return entry;
+      }
 
       MedusaEntry ce = null;
       synchronized ( Long.toString(entry.getIndex()).intern() ) {
-
         if ( entry.getIndex() <= getIndex() ) {
-          getLogger().info("put", getIndex(), "discarding", entry.getIndex());
+          getLogger().info("put", getIndex(), entry.getIndex(), entry.getNode(), "discarding");
           return entry;
         }
-
-        MedusaEntry me = (MedusaEntry) getDelegate().put_(x, entry);
-
-        ce = getConsensusEntry(x, me);
+        ce = getConsensusEntry(x, entry);
+        getLogger().debug("put", getIndex(), ce.getIndex(), ce.getNode(), "consensus entry", ce.getHasConsensus());
         if ( ce != null &&
              ce.getIndex() == getIndex() + 1 ) {
           ce =  promote(x, ce);
           return ce;
         }
-      } // release lock
+      }
 
       if ( ce != null &&
            ce.getIndex() > getIndex() ) {
-        getLogger().debug("put", "promoteLock_.notify", getIndex(), ce.getIndex());
+        getLogger().debug("put", getIndex(), ce.getIndex(), ce.getNode(), "promoteLock_.notify");
         synchronized ( promoteLock_ ) {
           promoteLock_.notify();
         }
+        getLogger().debug("put", getIndex(), ce.getIndex(), ce.getNode(), "promoteLock_.notify", "return");
         return ce;
       }
 
@@ -175,9 +178,9 @@ foam.CLASS({
       }
 
       // if no replay data, then replay complete.
-      getLogger().debug("cmd", "replayNodes", getReplayNodes().size(), "node quorum", service.getNodeQuorum(x), "replayIndex", getReplayIndex());
+      getLogger().debug("cmd", "replayNodes", getReplayNodes().size(), "node quorum", service.getNodeQuorum(x), "replayIndex", getReplayIndex(), "index", getIndex());
       if ( getReplayNodes().size() >= service.getNodeQuorum(x) &&
-           getReplayIndex() == 2L /*MedusaEntryConsensusDAO.INITIAL_INDEX_OFFSET*/ ) {
+           getReplayIndex() <= getIndex() ) {
         getLogger().debug("cmd", "replayComplete");
         replayComplete(x);
       }
@@ -199,9 +202,10 @@ foam.CLASS({
       ],
       type: 'foam.nanos.medusa.MedusaEntry',
       javaCode: `
+      getLogger().info("promote", getIndex(), entry.getIndex());
+
       DaggerService dagger = (DaggerService) x.get("daggerService");
       dagger.verify(x, entry);
-      getLogger().info("promote", getIndex(), entry.getIndex());
       synchronized ( indexLock_ ) {
         if ( entry.getIndex() == getIndex() + 1 ) {
           setIndex(entry.getIndex());
@@ -210,11 +214,13 @@ foam.CLASS({
 
       dagger.updateLinks(x, entry);
 
+      getLogger().debug("promote", getIndex(), entry.getIndex(), getReplayIndex(), getReplaying());
       if ( getReplaying() &&
          getIndex() >= getReplayIndex() ) { //+ 2 /*MedusaEntryConsensusDAO.INITIAL_INDEX_OFFSET*/) {
         getLogger().debug("promote", "replayComplete");
         replayComplete(x);
         synchronized ( promoteLock_ ) {
+          getLogger().debug("promote", "notify");
           promoteLock_.notify();
         }
       }
@@ -240,7 +246,6 @@ foam.CLASS({
       getLogger().debug("consensus", entry.getIndex());
 
       ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
-      MedusaEntry match = null;
       String hash = null;
       long max = 0L;
 
@@ -256,33 +261,33 @@ foam.CLASS({
         }
       }
 
-      if ( max >= (service.getNodeCount(x) / 2 + 1) ) {
-        // TODO: consider reporting the split if max
-        // does not equal number of nodes.
+      if ( max >= service.getNodeQuorum(x) ) {
+        // TODO: consider reporting the split if groups > 1
 
         List<MedusaEntry> list = (ArrayList) ((ArraySink) getDelegate().where(
-          EQ(MedusaEntry.INDEX, entry.getIndex())
-        ).select(new ArraySink())).getArray();
-        for ( MedusaEntry e : list ) {
-          if ( match == null &&
-               e.getHash().equals(hash) ) {
-            match = (MedusaEntry) e.fclone();
-            match.setHasConsensus(true);
-            match = (MedusaEntry) getDelegate().put_(x, match);
-            getLogger().debug("match", match.getIndex());
-          }
-        }
-        if ( match != null ) {
-          getLogger().debug("cleanup", entry.getIndex());
-          getDelegate().where(
-            AND(
-              EQ(MedusaEntry.INDEX, entry.getIndex()),
-              NEQ(MedusaEntry.ID, match.getId())
-            )
-          ).removeAll();
-        }
+          AND(
+            EQ(MedusaEntry.INDEX, entry.getIndex()),
+            EQ(MedusaEntry.HASH, hash)
+          ))
+          .limit(1)
+          .select(new ArraySink())).getArray();
+
+        MedusaEntry match = (MedusaEntry) list.get(0).fclone();
+        match.setHasConsensus(true);
+        match = (MedusaEntry) getDelegate().put_(x, match);
+        getLogger().debug("match", match.getIndex());
+
+        getLogger().debug("cleanup", entry.getIndex());
+        getDelegate().where(
+          AND(
+            EQ(MedusaEntry.INDEX, entry.getIndex()),
+            NEQ(MedusaEntry.ID, match.getId())
+          ))
+          .removeAll();
+
+        return match;
       }
-      return match;
+      return entry;
       `
     },
     {
@@ -306,7 +311,15 @@ foam.CLASS({
       getLogger().debug("promoter");
       try {
         while ( true ) {
-          MedusaEntry entry = (MedusaEntry) getDelegate().find_(x, getIndex() + 1);
+          List<MedusaEntry> list = ((ArraySink) getDelegate()
+            .where(EQ(MedusaEntry.INDEX, getIndex() + 1))
+            .limit(1)
+            .select(new ArraySink())).getArray();
+
+          MedusaEntry entry = null;
+          if ( list.size() > 0 ) {
+            entry = list.get(0);
+          }
           if ( entry != null &&
                entry.getHasConsensus() ) {
             promote(x, entry);
@@ -338,8 +351,8 @@ foam.CLASS({
       javaCode: `
       getLogger().debug("replayComplete");
       setReplaying(false);
-      ((DAO) x.get("localMedusaEntryDAO")).cmd(new ReplayCompleteCmd());
       ((ClusterConfigService) x.get("clusterConfigService")).setOnline(x, true);
+      ((DAO) x.get("localMedusaEntryDAO")).cmd(new ReplayCompleteCmd());
       `
     }
   ]

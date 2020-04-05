@@ -306,13 +306,13 @@ foam.CLASS({
       ClusterConfig config = service.getConfig(x, service.getConfigId());
       List voters = service.getVoters(x);
 
-      if ( voters.size() <= 1 ) {
+      if ( voters.size() < service.getMediatorQuorum(x) ) {
         // nothing to do.
-        getLogger().warning("callVote", "no voters", voters.size());
+        getLogger().warning("callVote", "waiting for mediator quorum", voters.size(), service.getMediatorQuorum(x));
         return;
       }
-      getLogger().debug("callVote", "voters", voters.size());
-
+      getLogger().debug("callVote", "achieved mediator quorum", voters.size(), service.getMediatorQuorum(x));
+ 
       ThreadPoolExecutor pool = pool_;
       List<Callable<Long>> voteCallables = new ArrayList<>();
       List<Future<Long>> voteResults = null;

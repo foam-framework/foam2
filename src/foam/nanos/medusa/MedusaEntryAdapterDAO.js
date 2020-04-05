@@ -64,6 +64,15 @@ foam.CLASS({
       `
     },
     {
+      name: 'cmd_',
+      javaCode: `
+      if ( foam.dao.MDAO.GET_MDAO_CMD.equals(obj) ) {
+        return getDelegate().cmd_(x, obj);
+      }
+      return getMedusaEntryDAO().cmd_(x, obj);
+      `
+    },
+    {
       name: 'submit',
       args: [
         {

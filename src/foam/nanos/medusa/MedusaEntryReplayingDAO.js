@@ -140,6 +140,8 @@ foam.CLASS({
           service.setOnline(x, true);
         }
         return obj;
+      } else if ( obj instanceof MedusaEntry ) {
+        return getDelegate().cmd_(x, obj);
       } else {
         synchronized ( replayingLock_ ) {
           if ( getReplaying() ) {

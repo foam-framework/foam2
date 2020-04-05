@@ -13,6 +13,7 @@ foam.CLASS({
 
   javaImports: [
     'foam.dao.DAO',
+    'foam.dao.EasyDAO',
     'foam.dao.MDAO',
     'foam.dao.ProxyDAO',
     'foam.nanos.logger.PrefixLogger',
@@ -53,19 +54,23 @@ foam.CLASS({
       getLogger().debug("put", entry.getIndex(), "consensus", true);
 
       try {
-      DAO mdao = getMdao(x, entry);
-      if ( MedusaEntry.PUT.equals(entry.getAction()) ) {
-        mdao.put_(x, entry.getData());
-      } else {
-        mdao.remove_(x, entry.getData());
-      }
+        DAO mdao = getMdao(x, entry);
+        if ( MedusaEntry.PUT.equals(entry.getAction()) ) {
+          getLogger().debug("put", entry.getIndex(), "mdao", "put");
+          mdao.put_(x, entry.getData());
+        } else {
+          getLogger().debug("put", entry.getIndex(), "mdao", "remove");
+          mdao.remove_(x, entry.getData());
+        }
 
-      // Notify any blocked Primary puts
-      ((DAO) x.get("localMedusaEntryDAO")).cmd_(x, entry);
+        // Notify any blocked Primary puts
+        getLogger().debug("put", entry.getIndex(), "notify");
+        ((DAO) x.get("localMedusaEntryDAO")).cmd_(x, entry);
+        getLogger().debug("put", entry.getIndex(), "notified");
 
       } catch (Throwable t) {
-        // TODO: Alarm
         getLogger().error(t);
+        // TODO: Alarm
       }
       return entry;
       `
@@ -85,22 +90,41 @@ foam.CLASS({
       type: 'foam.dao.DAO',
       javaCode: `
       String name = entry.getNSpecName();
-      DAO mdao = (DAO) getMdaos().get(name);
-      if ( mdao != null ) {
-        return mdao;
+      getLogger().debug("mdao", name);
+      DAO dao = (DAO) getMdaos().get(name);
+      if ( dao != null ) {
+        getLogger().debug("mdao", name, "cache", dao.getOf());
+        return dao;
       } 
-      DAO dao = (DAO) x.get(name);
-      while ( dao != null ) {
-        if ( dao instanceof MDAO ) {
-          getMdaos().put(name, dao);
-          getLogger().debug("mdao", name, dao.getOf());
-          return dao;
+      dao = (DAO) x.get(name);
+      Object result = dao.cmd(MDAO.GET_MDAO_CMD);
+      if ( result != null &&
+           result instanceof MDAO ) {
+        getLogger().debug("mdao", name, "cmd", dao.getOf());
+        dao = (DAO) result;
+      } else {
+        while ( dao != null ) {
+          getLogger().debug("mdao", name, "while", dao.getOf());
+          if ( dao instanceof MDAO ) {
+            break;
+          }
+          if ( dao instanceof EasyDAO ) {
+            dao = ((EasyDAO) dao).getMdao();
+            if ( dao != null ) {
+              break;
+            }
+          }
+          if ( dao instanceof ProxyDAO ) {
+            dao = ((ProxyDAO) dao).getDelegate();
+          } else {
+            dao = null;
+          }
         }
-        if ( dao instanceof ProxyDAO ) {
-          dao = ((ProxyDAO) dao).getDelegate();
-        } else {
-          break;
-        }
+      }
+      if ( dao != null ) {
+        getMdaos().put(name, dao);
+        getLogger().debug("mdao", name, "found", dao.getOf());
+        return dao;
       }
       throw new IllegalArgumentException("MDAO not found: "+name); 
       `

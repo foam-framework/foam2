@@ -82,6 +82,7 @@ foam.CLASS({
         config.setPingLatency(latency);
         if ( config.getStatus() != Status.ONLINE) {
           config.setStatus(Status.ONLINE);
+          config = (ClusterConfig) getDao().put_(getX(), config);
           getLogger().info(config.getName(), config.getType().getLabel(), config.getStatus().getLabel());
 
           // If a Node comming online, begin replay from it.
@@ -136,6 +137,7 @@ foam.CLASS({
         if ( config.getStatus() != Status.OFFLINE ) {
           config.setPingInfo(t.getMessage());
           config.setStatus(Status.OFFLINE);
+          config = (ClusterConfig) getDao().put_(getX(), config);
           getLogger().warning(config.getName(), config.getType().getLabel(), config.getStatus().getLabel(), t.getMessage());
         // TODO: Alarm.
         }
