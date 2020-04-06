@@ -1,0 +1,121 @@
+<title>DocuSign Integration</title>
+
+<h1>Status of DocuSign Integration</h1>
+
+<b>WIP</b>
+
+<p>So far this integration is capable of sending documents for
+signing, but does not accept DocuSign Connect requests, and
+therefore doesn't verify that a document was signed.
+</p>
+
+<h1>DocuSign Integration Setup</h1>
+
+<h2>Step 1: Service `docuSignConfig`</h2>
+
+<p>The first step is to add a `docuSignConfig` service. This will be
+used by other DocuSign-related services. You will need a DocuSign
+integration key and secret key to complete this step.
+</p>
+
+<p>The `connectHandlerURL` parameter will be used to redirect
+DocuSign Connect requests, however as of this writing the
+DocuSignConnectHandler is incomplete, so this feature is not
+supported.
+</p>
+
+<p><i>contributor note:</i> if you are working on developing
+DocuSignConnectHandler, you may want to use a service like
+webhook.site, and set your webhook URL as `connectHandlerURL`.
+This will allow you to see the request body (XML format) that
+DocuSign sends to the server.
+</p>
+
+<p>Add the following to your services.jrl:
+</p>
+
+<code>
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"docuSignConfig",
+  "lazy":false,
+  "service": {
+    "class": "foam.nanos.docusign.DocuSignConfig",
+    "integrationKey": "YOUR-INTEGRATION-KEY",
+    "secretKey": "YOUR-SECRET-KEY",
+    "connectHandlerURL": "https://localhost:8080/docuSignConnect"
+  }
+})
+</code>
+
+<h2>Step 2: Service `docuSignSessionDAO`</h2>
+
+Add the following to your services.jrl to enable storage of
+DocuSign sessions:
+
+<code>
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"docuSignSessionDAO",
+  "authenticate": false,
+  "serve": true,
+  "serviceScript": `
+    dao = new foam.dao.EasyDAO.Builder(x)
+      .setAuthorize(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("docuSignSessions")
+      .setOf(foam.nanos.docusign.model.DocuSignSession.getOwnClassInfo())
+      .build();
+  `,
+  "client":"{\"of\":\"foam.nanos.docusign.model.DocuSignSession\"}"
+})
+</code>
+
+<h2>Step 3: Service `dsRedirectHandler`</h2>
+
+Look at `foam.nanos.docusign.example.DemoView`. This view generates
+an example signing url. You will notice that a redirect URL is
+specified in the query string. DocuSign needs to redirect the user
+back to your application to complete the OAuth2 flow.
+
+<code>
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"dsRedirectHandler",
+  "authenticate": false,
+  "serviceScript": `
+    return new foam.nanos.docusign.DocuSignWebAgent();
+  `
+})
+</code>
+
+<h2>Step 4: Service `docuSignSendToMeDAO`<h2>
+
+<p>The DocuSignSendToMeDAO enables a user to have a document sent to
+them. The logic for generating the document is server-side, but the
+FObject which configures the document is generated on the client.
+When applicable, proper care should be taken to ensure a user
+cannot generate a document they don't have permission to sign.
+This can be done by decorating the DAO.
+</p>
+
+<p>The document will be sent be the user specified in the service.
+This user must always have an active DocuSign session, so it is
+recommended to use a 30-day token for this user.
+</p>
+
+<code>
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"docuSignSendToMeDAO",
+  "authenticate": false,
+  "serve": true,
+  "serviceScript": `
+    dao = new foam.nanos.docusign.DocuSignSendToMeDAO.Builder(x)
+      .setDocuSignSessionId(9001)
+      .build();
+    return dao;
+  `,
+  "client":"{\"of\":\"foam.nanos.docusign.DocuSignDocument\"}"
+})
+</code>
