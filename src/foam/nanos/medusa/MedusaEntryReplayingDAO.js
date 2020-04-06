@@ -59,7 +59,7 @@ foam.CLASS({
           try {
             replayingLock_.wait();
           } catch (InterruptedException e) {
-            // nop
+            throw new RuntimeException(e);
           }
         }
       }
@@ -74,7 +74,7 @@ foam.CLASS({
           try {
             replayingLock_.wait();
           } catch (InterruptedException e) {
-            // nop
+            throw new RuntimeException(e);
           }
         }
       }
@@ -89,7 +89,7 @@ foam.CLASS({
           try {
             replayingLock_.wait();
           } catch (InterruptedException e) {
-            // nop
+            throw new RuntimeException(e);
           }
         }
       }
@@ -104,7 +104,7 @@ foam.CLASS({
           try {
             replayingLock_.wait();
           } catch (InterruptedException e) {
-            // nop
+            throw new RuntimeException(e);
           }
         }
       }
@@ -119,7 +119,7 @@ foam.CLASS({
           try {
             replayingLock_.wait();
           } catch (InterruptedException e) {
-            // nop
+            throw new RuntimeException(e);
           }
         }
       }
@@ -148,7 +148,7 @@ foam.CLASS({
             try {
               replayingLock_.wait();
             } catch (InterruptedException e) {
-              // nop
+              throw new RuntimeException(e);
             }
           }
         }
@@ -158,14 +158,11 @@ foam.CLASS({
     },
     {
       name: 'blockOnReply',
+      javaThrows: ['InterruptedException'],
       javaCode: `
       synchronized ( replayingLock_ ) {
         if ( getReplaying() ) {
-          try {
-            replayingLock_.wait();
-          } catch (InterruptedException e) {
-            // nop
-          }
+          replayingLock_.wait();
         }
       }
       `

@@ -77,7 +77,7 @@ foam.CLASS({
         getLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
           public void executeJob() {
             try {
-              // TODO: clear map onDAOUpdate
+              // TODO: clear map onDAOUpdate, this doesn't cache miss.
 //              DAO dao = (DAO) getClients().get(config.getId());
 //              if ( dao == null ) {
                 DAO clientDAO = service.getClientDAO(x, "medusaEntryDAO", config, config);
@@ -88,7 +88,7 @@ foam.CLASS({
                         .build();
 //                getClients().put(config.getId(), dao);
 //              }
-              getLogger().debug("put", entry.getIndex(), config.getName());
+              getLogger().debug("put", entry.getIndex(), config.getName(), "data", (entry.getData() != null) ? entry.getData().getClass().getSimpleName():"null");
               dao.put_(x, entry);
             } catch ( Throwable t ) {
               getLogger().error(t);

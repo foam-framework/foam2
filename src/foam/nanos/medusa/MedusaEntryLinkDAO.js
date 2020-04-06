@@ -39,11 +39,12 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
-      DaggerService daggar = (DaggerService) x.get("daggerService");
+      DaggerService dagger = (DaggerService) x.get("daggerService");
+      getLogger().debug("put", entry.getIndex(), "before", "global", dagger.getGlobalIndex(x));
       java.util.Random r = ThreadLocalRandom.current();
       entry.setId(new UUID(r.nextLong(), r.nextLong()).toString());
-      entry = daggar.link(x, entry);
-      getLogger().debug("put", entry.getIndex());
+      entry = dagger.link(x, entry);
+      getLogger().debug("put", entry.getIndex(), "after", "global", dagger.getGlobalIndex(x));
       return getDelegate().put_(x, entry);
       `
     }

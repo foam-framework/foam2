@@ -67,7 +67,7 @@ foam.CLASS({
       // NOTE: starting at 2 as indexes 1 and 2 are used to prime the system.
       name: 'index',
       class: 'Long',
-      value: 2, /*MedusaEntryConsensusDAO.INITIAL_INDEX_OFFSET,*/
+      value: 2, /*DaggerService.INITIAL_INDEX_OFFSET,*/
       visibilty: 'RO',
     },
     {
@@ -116,7 +116,7 @@ foam.CLASS({
       ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
 
       if ( entry.getIndex() <= getIndex() ) {
-        getLogger().info("put", getIndex(), entry.getIndex(), entry.getNode(), "discarding");
+        getLogger().info("put", "pre-lock", getIndex(), entry.getIndex(), entry.getNode(), "discarding");
         return entry;
       }
 
@@ -124,19 +124,21 @@ foam.CLASS({
         EQ(MedusaEntry.INDEX, entry.getIndex())
       ).select(COUNT());
       if ( (Long)count.getValue() < service.getNodeQuorum(x) ) {
-        getLogger().info("put", getIndex(), entry.getIndex(), entry.getNode(), "consensus", "false");
+        getLogger().info("put", getIndex(), entry.getIndex(), entry.getNode(), "waiting for node quorum");
         return entry;
       }
 
       MedusaEntry ce = null;
       synchronized ( Long.toString(entry.getIndex()).intern() ) {
         if ( entry.getIndex() <= getIndex() ) {
-          getLogger().info("put", getIndex(), entry.getIndex(), entry.getNode(), "discarding");
+          getLogger().info("put", "in-lock", getIndex(), entry.getIndex(), entry.getNode(), "discarding");
           return entry;
         }
+
         ce = getConsensusEntry(x, entry);
-        getLogger().debug("put", getIndex(), ce.getIndex(), ce.getNode(), "consensus entry", ce.getHasConsensus());
+        getLogger().debug("put", getIndex(), ce.getIndex(), ce.getNode(), "consensus", ce.getHasConsensus());
         if ( ce != null &&
+             ce.getHasConsensus() &&
              ce.getIndex() == getIndex() + 1 ) {
           ce =  promote(x, ce);
           return ce;
@@ -144,6 +146,7 @@ foam.CLASS({
       }
 
       if ( ce != null &&
+           ce.getHasConsensus() &&
            ce.getIndex() > getIndex() ) {
         getLogger().debug("put", getIndex(), ce.getIndex(), ce.getNode(), "promoteLock_.notify");
         synchronized ( promoteLock_ ) {
@@ -214,9 +217,12 @@ foam.CLASS({
 
       dagger.updateLinks(x, entry);
 
-      getLogger().debug("promote", getIndex(), entry.getIndex(), getReplayIndex(), getReplaying());
+      getLogger().debug("promote", getIndex(), entry.getIndex());
+      if ( getReplaying() ) {
+        getLogger().debug("promote", "replay", getReplayIndex(), getReplaying());
+      }
       if ( getReplaying() &&
-         getIndex() >= getReplayIndex() ) { //+ 2 /*MedusaEntryConsensusDAO.INITIAL_INDEX_OFFSET*/) {
+         getIndex() >= getReplayIndex() ) {
         getLogger().debug("promote", "replayComplete");
         replayComplete(x);
         synchronized ( promoteLock_ ) {
@@ -274,8 +280,8 @@ foam.CLASS({
 
         MedusaEntry match = (MedusaEntry) list.get(0).fclone();
         match.setHasConsensus(true);
-        match = (MedusaEntry) getDelegate().put_(x, match);
         getLogger().debug("match", match.getIndex());
+        match = (MedusaEntry) getDelegate().put_(x, match);
 
         getLogger().debug("cleanup", entry.getIndex());
         getDelegate().where(

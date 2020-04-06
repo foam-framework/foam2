@@ -51,7 +51,7 @@ foam.CLASS({
         getLogger().debug("put", entry.getIndex(), "consensus", false);
         return entry;
       }
-      getLogger().debug("put", entry.getIndex(), "consensus", true);
+      getLogger().debug("put", entry.getIndex(), "consensus", "TRUE");
 
       try {
         DAO mdao = getMdao(x, entry);

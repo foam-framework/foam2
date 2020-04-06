@@ -281,7 +281,7 @@ foam.CLASS({
               electionLock_.wait();
             }
           } catch (InterruptedException e) {
-            break;
+            return;
           }
         }
       }
@@ -384,7 +384,13 @@ foam.CLASS({
         if ( getState() == ElectoralServiceState.ELECTION &&
             time < getElectionTime() ) {
           // abandone our election.
-          getLogger().debug("vote", id, time, "abandon election");
+          getLogger().info("vote", id, time, "abandon own election", getState().getLabel(), "->", ElectoralServiceState.VOTING.getLabel());
+          synchronized ( electionLock_ ) {
+            setState(ElectoralServiceState.VOTING);
+          }
+        } else if ( getState() == ElectoralServiceState.IN_SESSION ||
+                    getState() == ElectoralServiceState.ADJOURNED ) {
+          getLogger().info("vote", id, time, getState().getLabel(), "->", ElectoralServiceState.VOTING.getLabel());
           synchronized ( electionLock_ ) {
             setState(ElectoralServiceState.VOTING);
           }
