@@ -732,7 +732,9 @@ foam.LIB({
                 "In foam.core.JSON.parse(Object): JSON parser tried to deserialize class '"
                   + cls + "' and failed. Is this class available to the client?"
               );
+              return null;
             }
+
             // TODO(markdittmer): Turn into static method: "parseJSON" once
             // https://github.com/foam-framework/foam2/issues/613 is fixed.
             if ( c.PARSE_JSON ) return c.PARSE_JSON(json, opt_class, opt_ctx);

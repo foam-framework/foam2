@@ -377,15 +377,33 @@ foam.CLASS({
   ],
 
   methods: [
-    function compareTo(other) {
-      return foam.blob.IdentifiedBlob.isInstance(other) && other.id == this.id;
-    },
-
     function read(buffer, offset) {
       return this.delegate.then(function(d) {
         return d.read(buffer, offset);
       });
-    }
+    },
+
+    {
+      name: 'compareTo',
+      type: 'int',
+      args:
+        [
+          {
+            name: 'o',
+            type: 'Object',
+          }
+        ],
+      javaCode: `
+        IdentifiedBlob o2 = (IdentifiedBlob) o;
+        if ( o2 == null ) return 1;
+        if ( o2 == this ) return 0;
+        return foam.util.SafetyUtil.compare(getId(), o2.getId());
+      `,
+      code: function(other) {
+        if ( other === null ) return 1;
+        return this.id.localeCompare(other.id);
+      },
+    },
   ]
 });
 

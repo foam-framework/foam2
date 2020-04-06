@@ -263,8 +263,13 @@ foam.CLASS({
         for ( PropertyInfo p : props ) {
           try {
             if ( p.isSet(obj) ) p.set(this, p.get(obj));
-          } catch (java.lang.ClassCastException e) {
-            // nop - ignore - only copy common properties.
+          } catch (ClassCastException e) {
+            try {
+              PropertyInfo p2 = (PropertyInfo) obj.getClassInfo().getAxiomByName(p.getName());
+              if ( p2 != null ) {
+                if ( p2.isSet(obj) ) p.set(this, p2.get(obj));
+              }
+            } catch (ClassCastException e2) {}
           }
         }
         return this;
