@@ -10,8 +10,6 @@ foam.CLASS({
       class: 'foam.u2.ViewSpec',
       name: 'wrapper',
       type: 'foam.lib.json.UnknownFObject',
-      javaInfoType: 'foam.core.AbstractFObjectPropertyInfo',
-      javaJSONParser: 'new foam.lib.json.UnknownFObjectParser()',
       fromJSON: function fromJSON(value, ctx, prop, json) { return value; }
     },
     {
@@ -25,8 +23,6 @@ foam.CLASS({
       class: 'foam.u2.ViewSpec',
       name: 'view',
       type: 'foam.lib.json.UnknownFObject',
-      javaInfoType: 'foam.core.AbstractFObjectPropertyInfo',
-      javaJSONParser: 'new foam.lib.json.UnknownFObjectParser()',
       fromJSON: function fromJSON(value, ctx, prop, json) { return value; }
     }
   ],
