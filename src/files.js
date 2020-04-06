@@ -175,6 +175,7 @@ FOAM_FILES([
   { name: "foam/box/Remote" },
   { name: 'foam/u2/DeleteModal', flags: ['web'] },
   { name: 'foam/u2/ModalHeader', flags: ['web'] },
+  { name: 'foam/u2/ModalWrapper', flags: ['web'] },
   { name: 'foam/u2/ExportModal', flags: ['web'] },
   { name: 'foam/u2/MultiView' },
   { name: "foam/u2/AttrSlot" },
@@ -402,6 +403,7 @@ FOAM_FILES([
   { name: "foam/swift/refines/Remote", flags: ['swift'] },
 
   { name: "foam/nanos/menu/DAOMenu2" },
+  { name: "foam/nanos/menu/MenuToolBar" },
 
   { name: "foam/box/LogBox" },
   { name: "foam/box/MultiDelegateBox" },
