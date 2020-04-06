@@ -91,14 +91,15 @@ foam.CLASS({
       type: 'FObject',
       javaCode: `
       PM pm = createPM(x, op);
+      getLogger().debug("submit", obj.getClass().getName());
+
       ElectoralService electoralService = (ElectoralService) x.get("electoralService");
       ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
-      getLogger().debug("submit", "state", electoralService.getState().getLabel());
-      if ( service.getOnline(x) &&
-           electoralService.getState() != ElectoralServiceState.IN_SESSION ||
-           ! service.getIsPrimary()) {
-        getLogger().error("Reject put(). primary:", service.getIsPrimary(), ", state:", electoralService.getState().getLabel(), obj);
-        throw new RuntimeException("Reject put() on non-primary or during election. (primary: " + service.getIsPrimary() + ", state: " + electoralService.getState().getLabel());
+      if ( ! service.getIsPrimary() ||
+           ! service.getOnline(x) ||
+           electoralService.getState() != ElectoralServiceState.IN_SESSION ) {
+        getLogger().error("Reject put(), primary", service.getIsPrimary(), "status", "Offline", "state", electoralService.getState().getLabel(), obj);
+        throw new RuntimeException("Cluster not ready.");
       }
 
       MedusaEntry entry = x.create(MedusaEntry.class);

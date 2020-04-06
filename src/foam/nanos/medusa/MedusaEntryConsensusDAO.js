@@ -173,9 +173,6 @@ foam.CLASS({
       synchronized ( replayLock_ ) {
         if ( cmd.getMaxIndex() > getReplayIndex() ) {
           setReplayIndex(cmd.getMaxIndex());
-          DaggerService dagger = (DaggerService) x.get("daggerService");
-          dagger.setGlobalIndex(x, cmd.getMaxIndex());
-          getLogger().debug("cmd", "update", "globlalIndex", cmd.getMaxIndex(), dagger.getGlobalIndex(x));
         }
         getReplayNodes().put(cmd.getResponder(), cmd);
       }

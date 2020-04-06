@@ -76,14 +76,13 @@ foam.CLASS({
       ClusterConfig config = (ClusterConfig) ((ClusterConfig) obj).fclone();
       PingService ping = (PingService) getX().get("ping");
 
-      Long startTime = System.currentTimeMillis();
       try {
         Long latency = ping.ping(getX(), config.getId(), config.getPort(), getTimeout());
         config.setPingLatency(latency);
         if ( config.getStatus() != Status.ONLINE) {
+          getLogger().info(config.getName(), config.getType().getLabel(), config.getStatus().getLabel(), "->", "ONLINE");
           config.setStatus(Status.ONLINE);
           config = (ClusterConfig) getDao().put_(getX(), config);
-          getLogger().info(config.getName(), config.getType().getLabel(), config.getStatus().getLabel());
 
           // If a Node comming online, begin replay from it.
           if ( myConfig.getType() == MedusaType.MEDIATOR &&
@@ -91,20 +90,6 @@ foam.CLASS({
                config.getZone() == 0L &&
                config.getRegion() == myConfig.getRegion() &&
                config.getRealm() == myConfig.getRealm() ) {
-            // NOTE: using internalMedusaEntryDAO else we'll block on ReplayingDAO.
-            DAO dao = (DAO) getX().get("internalMedusaEntryDAO");
-            dao = dao.where(EQ(MedusaEntry.HAS_CONSENSUS, true));
-            Max max = (Max) dao.select(MAX(MedusaEntry.INDEX));
-
-            ReplayCmd cmd = new ReplayCmd();
-            cmd.setRequester(myConfig.getId());
-            cmd.setResponder(config.getId());
-            if ( max != null &&
-                 max.getValue() != null ) {
-              cmd.setFromIndex((Long) max.getValue());
-            }
-            // TODO: configuration
-            cmd.setServiceName("medusaEntryDAO");
 
             DAO clientDAO = service.getClientDAO(getX(), "medusaEntryDAO", myConfig, config);
             clientDAO = new RetryClientSinkDAO.Builder(getX())
@@ -113,16 +98,35 @@ foam.CLASS({
               .setMaxRetryDelay(service.getMaxRetryDelay())
               .build();
 
-            getLogger().debug(myConfig.getId(), "Request replay from", config.getId());
-            Object response = clientDAO.cmd_(getX(), cmd);
+            ReplayDetailsCmd details = new ReplayDetailsCmd();
+            details.setRequester(myConfig.getId());
+            details.setResponder(config.getId());
+            getLogger().debug(myConfig.getId(), "ReplayDetailsCmd to", config.getId());
+            details = (ReplayDetailsCmd) clientDAO.cmd_(getX(), details);
+            getLogger().debug(myConfig.getId(), "ReplayDetailsCmd from", config.getId(), details);
 
-            if ( response instanceof ReplayDetailsCmd ) {
-              getLogger().debug(myConfig.getId(), "Request replay response", response);
-              ReplayDetailsCmd details = (ReplayDetailsCmd) response;
-              ((DAO) getX().get("medusaEntryDAO")).cmd(details);
-            } else {
-              getLogger().debug(myConfig.getId(), "Invalid cmd response. Expected ReplayDetailsCmd. received", cmd.getClass().getSimpleName());
+            dagger.setGlobalIndex(getX(), details.getMaxIndex());
+
+            // Send to Consensus DAO to prepare for Replay
+            ((DAO) getX().get("medusaEntryDAO")).cmd(details);
+
+            // NOTE: using internalMedusaEntryDAO else we'll block on ReplayingDAO.
+            DAO dao = (DAO) getX().get("internalMedusaEntryDAO");
+            dao = dao.where(EQ(MedusaEntry.HAS_CONSENSUS, true));
+            Max max = (Max) dao.select(MAX(MedusaEntry.INDEX));
+
+            ReplayCmd cmd = new ReplayCmd();
+            cmd.setRequester(myConfig.getId());
+            cmd.setResponder(config.getId());
+            cmd.setServiceName("medusaEntryDAO"); // TODO: configuration
+            if ( max != null &&
+                 max.getValue() != null ) {
+              cmd.setFromIndex((Long) max.getValue());
             }
+
+            getLogger().debug(myConfig.getId(), "ReplayCmd to", config.getId());
+            cmd = (ReplayCmd) clientDAO.cmd_(getX(), cmd);
+            getLogger().debug(myConfig.getId(), "ReplayCmd from", config.getId(), cmd);
           }
         }
         ClusterConfig.PING_INFO.clear(config);
@@ -135,14 +139,13 @@ foam.CLASS({
       } catch (java.io.IOException t) {
         getLogger().debug("ping", config.getId(), t.getMessage());
         if ( config.getStatus() != Status.OFFLINE ) {
+          getLogger().warning(config.getName(), config.getType().getLabel(), config.getStatus().getLabel(), "->", "OFFLINE",  t.getMessage());
           config.setPingInfo(t.getMessage());
           config.setStatus(Status.OFFLINE);
           config = (ClusterConfig) getDao().put_(getX(), config);
-          getLogger().warning(config.getName(), config.getType().getLabel(), config.getStatus().getLabel(), t.getMessage());
         // TODO: Alarm.
         }
       }
-      getDao().put_(getX(), config);
       `
     },
     {

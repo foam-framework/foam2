@@ -10,6 +10,11 @@ foam.CLASS({
 
   properties: [
     {
+      documentation: 'Instance requesting replay details',
+      name: 'requester',
+      class: 'String',
+    },
+    {
       documentation: 'Instance supplying replay details',
       name: 'responder',
       class: 'String',

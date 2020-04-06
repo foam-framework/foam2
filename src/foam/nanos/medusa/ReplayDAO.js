@@ -46,53 +46,51 @@ foam.CLASS({
     {
       name: 'cmd_',
       javaCode: `
-      if ( ! ( obj instanceof ReplayCmd ) ) {
-        return getDelegate().cmd_(x, obj);
+      if ( obj instanceof ReplayDetailsCmd ) {
+        ReplayDetailsCmd details = (ReplayDetailsCmd) obj;
+        getLogger().debug("cmd", details);
+
+        Min min = (Min) MIN(MedusaEntry.INDEX);
+        Max max = (Max) MAX(MedusaEntry.INDEX);
+        Count count = new Count();
+        Sequence seq = new Sequence.Builder(x)
+          .setArgs(new Sink[] {count, min, max})
+          .build();
+
+        getDelegate().select(seq);
+        getLogger().debug("cmd", "details", "count", count.getValue(), "min", min.getValue(), "max", max.getValue());
+
+        if ( count != null &&
+             ((Long) count.getValue()) > 0 ) {
+          details.setMinIndex((Long)min.getValue());
+          details.setMaxIndex((Long)max.getValue());
+          details.setCount((Long) count.getValue());
+        }
+        return details;
       }
-      ReplayCmd cmd = (ReplayCmd) obj;
-      getLogger().debug("cmd", cmd);
 
-      // DEBUG
-      Min min = (Min) MIN(MedusaEntry.INDEX);
-      Max max = (Max) MAX(MedusaEntry.INDEX);
-      Count count = new Count();
-      Sequence seq = new Sequence.Builder(x)
-        .setArgs(new Sink[] {count, min, max})
-        .build();
+      if ( obj instanceof ReplayCmd ) {
+        ReplayCmd cmd = (ReplayCmd) obj;
+        getLogger().debug("cmd", cmd);
 
-      getDelegate().where(
-        GTE(MedusaEntry.INDEX, cmd.getFromIndex()))
-      .orderBy(MedusaEntry.INDEX)
-      .select(seq);
-      getLogger().debug("cmd", "details", "count", count.getValue(), "min", min.getValue(), "max", max.getValue());
+        ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
+        ClusterConfig fromConfig = service.getConfig(x, cmd.getResponder());
+        ClusterConfig toConfig = service.getConfig(x, cmd.getRequester());
+        DAO clientDAO = service.getClientDAO(x, cmd.getServiceName(), fromConfig, toConfig);
+        getDelegate().where(
+          GTE(MedusaEntry.INDEX, cmd.getFromIndex())
+        )
+        .orderBy(MedusaEntry.INDEX)
+        .select(new RetryClientSinkDAO.Builder(x)
+          .setDelegate(clientDAO)
+          .setMaxRetryAttempts(service.getMaxRetryAttempts())
+          .setMaxRetryDelay(service.getMaxRetryDelay())
+          .build());
 
-      ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
-      ClusterConfig fromConfig = service.getConfig(x, cmd.getResponder());
-      ClusterConfig toConfig = service.getConfig(x, cmd.getRequester());
-
-      DAO clientDAO = service.getClientDAO(x, cmd.getServiceName(), fromConfig, toConfig);
-
-      ReplayDetailsCmd details = new ReplayDetailsCmd();
-      details.setResponder(fromConfig.getId());
-      if ( count != null &&
-           ((Long) count.getValue()) > 0 ) {
-        details.setMinIndex((Long)min.getValue());
-        details.setMaxIndex((Long)max.getValue());
-        details.setCount((Long) count.getValue());
+        return cmd;
       }
-      //getDelegate().cmd_(x, details);
 
-      getDelegate().where(
-        GTE(MedusaEntry.INDEX, cmd.getFromIndex())
-      )
-      .orderBy(MedusaEntry.INDEX)
-      .select(new RetryClientSinkDAO.Builder(x)
-        .setDelegate(clientDAO)
-        .setMaxRetryAttempts(service.getMaxRetryAttempts())
-        .setMaxRetryDelay(service.getMaxRetryDelay())
-        .build());
-
-      return details;
+      return getDelegate().cmd_(x, obj);
       `
     }
   ]
