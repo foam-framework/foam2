@@ -56,7 +56,13 @@ public class SessionServerBox
           if ( st.hasMoreTokens() ) {
             String authType = st.nextToken();
             if ( HTTPAuthorizationType.BEARER.getName().equalsIgnoreCase(authType) ) {
-              sessionID = st.nextToken();
+              if ( st.hasMoreTokens() ) {
+                sessionID = st.nextToken();
+              } else {
+                logger.warning(this.getClass().getSimpleName(), "send", "Authorization: "+authType+" token not found.");
+                msg.replyWithException(new IllegalArgumentException("Authorization: "+authType+ " token not found."));
+                return;
+              }
             } else {
               logger.warning(this.getClass().getSimpleName(), "send", "Authorization: "+authType+" not supported.");
               msg.replyWithException(new IllegalArgumentException("Authorization: "+authType+ " not supported."));
