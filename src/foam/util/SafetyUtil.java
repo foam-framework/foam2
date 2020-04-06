@@ -60,6 +60,12 @@ public class SafetyUtil {
     return ((Comparable) o1).compareTo(o2);
   }
 
+  public static int compare(Object[] o1, Object[] o2) {
+    if ( o2 == null ) return  1;
+    if ( o1 == null ) return -1;
+    return compare(o1.length, o2.length);
+  }
+
   public static int compare(FObject o1, FObject o2) {
     if ( o1 == o2   ) return  0;
     if ( o2 == null ) return  1;
