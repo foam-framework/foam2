@@ -219,13 +219,23 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        //Command it out for GS demo.
-        // foam.nanos.medusa.ClusterConfigService service = (foam.nanos.medusa.ClusterConfigService) x.get("clusterConfigService");
-        // if ( service != null &&
-        //     ! service.getIsPrimary() ) {
-        //   // nop when not primary
-        //   return;
-        // }
+        // Allow boot script to run on all instances,
+        // otherwise, only on ONLINE, non-Node instances.
+        String startScript = System.getProperty("foam.main", "main");
+        if ( ! getId().equals(startScript) ) {
+          foam.nanos.medusa.ClusterConfigService service = (foam.nanos.medusa.ClusterConfigService) x.get("clusterConfigService");
+          if ( service != null ) {
+            // TODO: considering how to only run on one of the secondaries, could be largest secondary.
+            if ( ! service.getIsPrimary() ) {
+              return;
+            }
+            foam.nanos.medusa.ClusterConfig config = service.getConfig(x, service.getConfigId());
+            if ( config.getType() == foam.nanos.medusa.MedusaType.NODE ||
+                 config.getStatus() != foam.nanos.medusa.Status.ONLINE ) {
+              return;
+            }
+          }
+        }
 
         ByteArrayOutputStream baos  = new ByteArrayOutputStream();
         PrintStream           ps    = new PrintStream(baos);

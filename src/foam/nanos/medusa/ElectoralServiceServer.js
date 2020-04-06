@@ -378,8 +378,15 @@ foam.CLASS({
     {
       name: 'vote',
       javaCode: `
-      getLogger().debug("vote", id, time, getElectionTime(), getState().getLabel());
-      long v = -1L; 
+      ClusterConfigService service = (ClusterConfigService) getX().get("clusterConfigService");
+      ClusterConfig config = service.getConfig(getX(), service.getConfigId());
+      long v = -1L;
+
+      getLogger().debug("vote", id, time, getElectionTime(), getState().getLabel(), config.getStatus().getLabel());
+      if ( config.getStatus() != Status.ONLINE ) {
+       return v;
+      }
+
       try {
         if ( getState() == ElectoralServiceState.ELECTION &&
             time < getElectionTime() ) {

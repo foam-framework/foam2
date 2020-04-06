@@ -12,7 +12,6 @@ p({
       .setDecorator(new foam.nanos.cron.CronScheduleDAO.Builder(x)
         .setDelegate(new foam.nanos.script.ScriptRunnerDAO(null))
         .build())
-      .setCluster(false)
       .build();
   """,
   "client":"{\"of\":\"foam.nanos.cron.Cron\"}"

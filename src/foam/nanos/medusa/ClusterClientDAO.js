@@ -92,11 +92,11 @@ foam.CLASS({
                 ! service.getIsPrimary() ) {
         try {
           if ( electoralService.getState() == ElectoralServiceState.IN_SESSION ) {
-              getLogger().debug("to primary", service.getPrimaryConfigId(), cmd);
+              getLogger().debug("to primary", service.getPrimaryConfigId(), "attempt", retryAttempt, cmd);
               PM pm = new PM(ClusterClientDAO.getOwnClassInfo(), getServiceName());
               FObject result = (FObject) service.getPrimaryDAO(x, getClusterServiceName()).cmd_(x, cmd);
               pm.log(x);
-              getLogger().debug("from primary", service.getPrimaryConfigId(), result);
+              getLogger().debug("from primary", service.getPrimaryConfigId(), "attempt", retryAttempt, result);
               return result;
           } else {
               // getLogger().debug("Election in progress.", electoralService.getState().getLabel());
@@ -109,8 +109,8 @@ foam.CLASS({
                  retryAttempt == getMaxRetryAttempts() ) {
               getLogger().debug("retryAttempt >= maxRetryAttempts", retryAttempt, getMaxRetryAttempts());
 
-              if ( electoralService.getState() == ElectoralServiceState.IN_SESSION ||
-                  electoralService.getState() == ElectoralServiceState.ADJOURNED ) {
+              if ( electoralService.getState() == ElectoralServiceState.IN_SESSION /*||
+                  electoralService.getState() == ElectoralServiceState.ADJOURNED*/ ) {
                 electoralService.dissolve(x);
               }
               throw t;
@@ -119,8 +119,8 @@ foam.CLASS({
 
             // delay
             try {
-              if ( electoralService.getState() == ElectoralServiceState.IN_SESSION ||
-                  electoralService.getState() == ElectoralServiceState.ADJOURNED ) {
+              if ( electoralService.getState() == ElectoralServiceState.IN_SESSION /*||
+                  electoralService.getState() == ElectoralServiceState.ADJOURNED*/ ) {
                 retryDelay *= 2;
               } else {
                 retryDelay = 1000;
