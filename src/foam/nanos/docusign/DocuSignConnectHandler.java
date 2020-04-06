@@ -15,5 +15,10 @@ public class DocuSignConnectHandler implements WebAgent {
     Logger              logger = (Logger) x.get("logger");
     HttpServletRequest  req  = x.get(HttpServletRequest.class);
     HttpServletResponse resp = x.get(HttpServletResponse.class);
+
+    logger.error("Unimplemented DocuSignConnectHandler in use.");
+    resp.sendError(
+      HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+      "This service has not been implemented.");
   }
 }
