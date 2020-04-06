@@ -59,17 +59,19 @@ foam.CLASS({
 
     function permissionedChoices() {
       this.permissionResults.then((array) => {
+        var values = [];
         if ( this.of ) {
           var hash = {};
           for ( var i = 0; i < array.length; i+=1 ) {
             hash[array[i]] = i;
           }
-          return this.of.VALUES.map((v) => {
+          this.of.VALUES.map((v) => {
             var value = [v.label, true];
             if ( hash.hasOwnProperty(value) ) {
-              return [v, v.label];
+              values.push([v, v.label]);
             }
           });
+          return values;
         }
       }).then((array) => {
         this.choices = array;
