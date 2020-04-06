@@ -36,7 +36,7 @@ foam.CLASS({
           Object[] metadataArr = (Object[])metadataObj;
           GoogleSheetsPropertyMetadata[] metadata = new GoogleSheetsPropertyMetadata[metadataArr.length];
     
-          for(int i = 0; i < metadata.length; i++) {
+          for ( int i = 0 ; i < metadata.length ; i++ ) {
             metadata[i] = (GoogleSheetsPropertyMetadata)metadataArr[i];
           }
     
@@ -103,14 +103,14 @@ foam.CLASS({
     
           requests.add(new Request().setAutoResizeDimensions(new AutoResizeDimensionsRequest().setDimensions(new DimensionRange().setSheetId(0).setDimension("COLUMNS").setEndIndex(metadata.length))));
     
-          for(int i = 0; i < metadata.length; i++) {
-            if(metadata[i].getColumnWidth() > 0)
+          for ( int i = 0 ; i < metadata.length ; i++ ) {
+            if ( metadata[i].getColumnWidth() > 0 )
               requests.add(new Request().setUpdateDimensionProperties(new UpdateDimensionPropertiesRequest().setRange(new DimensionRange().setSheetId(0).setDimension("COLUMNS").setStartIndex(i).setEndIndex(i+1)).setProperties(new DimensionProperties().setPixelSize(metadata[i].getColumnWidth())).setFields("pixelSize")));
-            if(metadata[i].getCellType().equals("STRING"))
+            if ( metadata[i].getCellType().equals("STRING") )
               continue;
     
-            if(metadata[i].getCellType().equals("DATE_TIME")) {
-              for(int j = 0; j < metadata[i].getPerValuePatternSpecificValues().length; j++) {
+            if ( metadata[i].getCellType().equals("DATE_TIME") ) {
+              for ( int j = 0 ; j < metadata[i].getPerValuePatternSpecificValues().length ; j++ ) {
                 requests.add(new Request().setRepeatCell(
                   new RepeatCellRequest()
                     .setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(metadata[i].getCellType()).setPattern("ddd mmm d yyyy hh/mm/ss\\" " + metadata[i].getPerValuePatternSpecificValues()[j] + "\\""))))
@@ -118,8 +118,8 @@ foam.CLASS({
                     .setFields(NUMBER_FORMAT)
                 ));
               }
-            } else if(metadata[i].getCellType().equals("TIME")) {
-              for(int j = 0; j < metadata[i].getPerValuePatternSpecificValues().length; j++) {
+            } else if ( metadata[i].getCellType().equals("TIME") ) {
+              for ( int j = 0 ; j < metadata[i].getPerValuePatternSpecificValues().length ; j++ ) {
                 requests.add(new Request().setRepeatCell(
                   new RepeatCellRequest()
                     .setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(metadata[i].getCellType()).setPattern("hh/mm/ss\\" " + metadata[i].getPerValuePatternSpecificValues()[j] + "\\""))))
@@ -128,7 +128,7 @@ foam.CLASS({
                 ));
               }
             } else {
-              if( metadata[i].getPattern().isEmpty())
+              if ( metadata[i].getPattern().isEmpty() )
                 requests.add(new Request().setRepeatCell(
                   new RepeatCellRequest()
                     .setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(metadata[i].getCellType()))))
@@ -143,9 +143,9 @@ foam.CLASS({
                     .setFields(NUMBER_FORMAT)
                 ));
     
-              if(metadata[i].getCellType().equals("CURRENCY")) {
-                for(int j = 0; j < metadata[i].getPerValuePatternSpecificValues().length; j++) {
-                  if(metadata[i].getPerValuePatternSpecificValues()[j].equals(DEFAULT_CURRENCY))
+              if ( metadata[i].getCellType().equals("CURRENCY") ) {
+                for ( int j = 0 ; j < metadata[i].getPerValuePatternSpecificValues().length ; j++ ) {
+                  if ( metadata[i].getPerValuePatternSpecificValues()[j].equals(DEFAULT_CURRENCY) )
                     continue;
                   requests.add(new Request().setRepeatCell(
                     new RepeatCellRequest()
