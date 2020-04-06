@@ -754,7 +754,12 @@ foam.LIB({
             for ( var key in json ) {
               var prop = c.getAxiomByName(key);
               if ( prop ) {
-                json[key] = prop.fromJSON(json[key], opt_ctx, prop, this);
+                var js = prop.fromJSON(json[key], opt_ctx, prop, this);
+                if ( js == null && json[key] != 'null' ) {
+                  console.warn('Unable to parse property "' + key + '"', 'in', json);
+                } else {
+                  json[key] = js;
+                }
               }
             }
 
