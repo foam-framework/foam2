@@ -44,7 +44,8 @@ foam.CLASS({
       name: 'id',
       class: 'String',
       label: 'Hostname',
-      required: true
+      required: true,
+      tableWidth: 200,
     },
     {
       documentation: 'External DNS name, or name instance is known by. Used in log messages.',

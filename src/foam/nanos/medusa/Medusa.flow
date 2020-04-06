@@ -12,3 +12,8 @@
 
 <h2>Setup</h2>
 <h3>Development</h3>
+
+
+<h2>Todo</h2>
+<h3>Replay</h3>
+- when a node comes ONLINE, request Details, update global index, inform ConsensusDAO. Request Replay.  When ConsenusDAO processes all expected replay records, then marks Instance ONLINE.

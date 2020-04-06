@@ -94,20 +94,19 @@ foam.CLASS({
       ClusterConfig config = service.getConfig(x, service.getConfigId());
       if ( config.getType() == MedusaType.MEDIATOR ) {
         ElectoralService electoralService = (ElectoralService) getX().get("electoralService");
-        if ( electoralService == null ) {
-          getLogger().warning("execute", "electoralService, null");
-          return;
-        }
-//        getLogger().debug("execute", "quorum", service.hasQuorum(x), electoralService.getState().getLabel());
-        if ( ! service.hasQuorum(x) ) {
-          if ( electoralService.getState() == ElectoralServiceState.IN_SESSION ||
-               electoralService.getState() == ElectoralServiceState.ADJOURNED) {
-            getLogger().warning(this.getClass().getSimpleName(), "lost quorum");
+        if ( electoralService != null ) {
+          if ( ! service.hasQuorum(x) ) {
+            if ( electoralService.getState() == ElectoralServiceState.IN_SESSION ||
+                 electoralService.getState() == ElectoralServiceState.ADJOURNED) {
+              getLogger().warning(this.getClass().getSimpleName(), "lost quorum");
+              electoralService.dissolve(x);
+            }
+          } else if ( electoralService.getState() == ElectoralServiceState.ADJOURNED ) {
+            getLogger().warning(this.getClass().getSimpleName(), "acquired quorum");
             electoralService.dissolve(x);
           }
-        } else if ( electoralService.getState() == ElectoralServiceState.ADJOURNED ) {
-          getLogger().warning(this.getClass().getSimpleName(), "acquired quorum");
-          electoralService.dissolve(x);
+        } else {
+          getLogger().warning("ElectoralService not found.");
         }
       } else if ( config.getType() == MedusaType.NODE &&
                   config.getEnabled() &&

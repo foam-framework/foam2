@@ -21,7 +21,12 @@ foam.CLASS({
     'foam.nanos.logger.Logger',
     'java.nio.charset.StandardCharsets',
     'java.security.MessageDigest',
-    'java.util.concurrent.atomic.AtomicLong'
+    'java.time.Instant',
+    'java.util.concurrent.atomic.AtomicLong',
+    'java.util.concurrent.ThreadLocalRandom',
+    'java.util.Date',
+    'java.util.Random',
+    'java.util.UUID'
   ],
 
   axioms: [
@@ -82,31 +87,39 @@ foam.CLASS({
 
   methods: [
     {
+      // TODO: get initial hashes from HSM for new deployment
       name: 'start',
       javaCode: `
       DAO dao = (DAO) getX().get("internalMedusaEntryDAO");
+      java.util.Random r = ThreadLocalRandom.current();
+      Date date = Date.from(Instant.parse("2017-01-01T00:00:00.000Z"));
+
       MedusaEntry entry = getX().create(MedusaEntry.class);
+      entry.setId(new UUID(r.nextLong(), r.nextLong()).toString());
       entry.setIndex(getNextGlobalIndex(getX()));
       entry.setIndex1(-1L);
       entry.setHash1("466c58623cd600209e95a981bad03e5d899ea6d6905cebee5ea0746bf16e1534");
       entry.setIndex2(-1L);
       entry.setHash2("9232622261b1df4dff84067b2df22ecae387162742626326216bf9b4d0d29a3f");
       entry.setHash(hash(getX(), entry));
-      if ( dao != null ) { // null on Nodes
-        entry = (MedusaEntry) dao.put_(getX(), entry);
-      }
+      entry.setCreated(date);
+      entry.setLastModified(date);
+      entry.setLastModifiedBy(2L);
+      entry = (MedusaEntry) dao.put_(getX(), entry);
       updateLinks(getX(), entry);
 
       entry = getX().create(MedusaEntry.class);
+      entry.setId(new UUID(r.nextLong(), r.nextLong()).toString());
       entry.setIndex(getNextGlobalIndex(getX()));
       entry.setIndex1(-1L);
       entry.setHash1("a651071e965f3c0e07cf9d09761e124a57f27dd75316a4c18079bc0e5accf9d2");
       entry.setIndex2(-1L);
       entry.setHash2("50c1071e836bdd4f2d4b5907bb6090fae6891d6cacdb70dcd72770bfd43dc814");
       entry.setHash(hash(getX(), entry));
-      if ( dao != null ) { // null on Nodes
-        entry = (MedusaEntry) dao.put_(getX(), entry);
-      }
+      entry.setCreated(date);
+      entry.setLastModified(date);
+      entry.setLastModifiedBy(2L);
+      entry = (MedusaEntry) dao.put_(getX(), entry);
       updateLinks(getX(), entry);
       `
     },
