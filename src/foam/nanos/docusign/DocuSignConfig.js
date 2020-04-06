@@ -19,6 +19,10 @@ foam.CLASS({
       name: 'oAuthBaseURI',
       class: 'String',
       value: 'https://account-d.docusign.com/oauth'
+    },
+    {
+      name: 'connectHandlerURL',
+      class: 'String'
     }
   ],
 

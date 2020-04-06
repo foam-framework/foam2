@@ -1,5 +1,5 @@
 foam.CLASS({
-  package: 'foam.nanos.docusign',
+  package: 'foam.nanos.docusign.model',
   name: 'DocuSignSession',
 
   properties: [

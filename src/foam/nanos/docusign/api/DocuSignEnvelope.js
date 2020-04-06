@@ -21,8 +21,41 @@ foam.CLASS({
       name: 'recipients',
       class: 'FObjectProperty',
       of: 'foam.nanos.docusign.DocuSignEnvelopeRecipients'
+    },
+    {
+      name: 'eventNotification',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.docusign.DocuSignEnvelopeEventNotification'
     }
   ],
+});
+
+foam.CLASS({
+  package: 'foam.nanos.docusign',
+  name: 'DocuSignEnvelopeEventNotification',
+
+  properties: [
+    {
+      name: 'envelopeEvents',
+      class: 'FObjectArray',
+      of: 'foam.nanos.docusign.DocuSignEnvelopeEvent'
+    },
+    {
+      name: 'url',
+      class: 'String'
+    }
+  ]
+});
+foam.CLASS({
+  package: 'foam.nanos.docusign',
+  name: 'DocuSignEnvelopeEvent',
+
+  properties: [
+    {
+      name: 'envelopeEventStatusCode',
+      class: 'String'
+    }
+  ]
 });
 
 foam.CLASS({

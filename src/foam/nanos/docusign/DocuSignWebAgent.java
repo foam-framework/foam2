@@ -26,12 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.common.collect.Lists;
 
-import foam.nanos.docusign.DocuSignAccessTokens;
-import foam.nanos.docusign.DocuSignAPIHelper;
-import foam.nanos.docusign.DocuSignConfig;
-import foam.nanos.docusign.DocuSignSession;
-import foam.nanos.docusign.DocuSignUserAccount;
-import foam.nanos.docusign.DocuSignUserInfo;
+import foam.nanos.docusign.model.DocuSignSession;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;

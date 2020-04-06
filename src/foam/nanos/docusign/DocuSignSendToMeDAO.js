@@ -5,7 +5,8 @@ foam.CLASS({
 
   javaImports: [
     'foam.dao.DAO',
-    'foam.nanos.auth.User'
+    'foam.nanos.docusign.model.DocuSignSession',
+    'foam.nanos.auth.User',
   ],
 
   properties: [
@@ -26,6 +27,11 @@ foam.CLASS({
         if ( dsSession == null ) {
           throw new RuntimeException("docuSignSessionId not found");
         }
+        
+        DocuSignConfig docuSignConfig = (DocuSignConfig) x.get("docuSignConfig");
+        if ( docuSignConfig == null ) {
+          throw new RuntimeException("No docuSignConfig in context");
+        }
 
         // Get user from context to set recipient
         User user = (User) x.get("user");
@@ -37,6 +43,22 @@ foam.CLASS({
         DocuSignEnvelope envelope = new DocuSignEnvelope.Builder(x)
           .setStatus("sent")
           .setEmailSubject("Test envelope")
+          .setEventNotification(
+            new DocuSignEnvelopeEventNotification.Builder(x)
+              .setUrl(docuSignConfig.getConnectHandlerURL())
+              .setEnvelopeEvents(new DocuSignEnvelopeEvent[]{
+                new DocuSignEnvelopeEvent.Builder(x)
+                  .setEnvelopeEventStatusCode("Completed")
+                  .build(),
+                new DocuSignEnvelopeEvent.Builder(x)
+                  .setEnvelopeEventStatusCode("Voided")
+                  .build(),
+                new DocuSignEnvelopeEvent.Builder(x)
+                  .setEnvelopeEventStatusCode("Declined")
+                  .build()
+              })
+              .build()
+          )
           .setDocuments(new DocuSignDocumentEntry[] {
             new DocuSignDocumentEntry.Builder(x)
               .setName("Test Document")
