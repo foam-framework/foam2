@@ -82,6 +82,7 @@ foam.CLASS({
         if ( config.getStatus() != Status.ONLINE) {
           getLogger().info(config.getName(), config.getType().getLabel(), config.getStatus().getLabel(), "->", "ONLINE");
           config.setStatus(Status.ONLINE);
+          config.setPingInfo("");
           config = (ClusterConfig) getDao().put_(getX(), config);
 
           // If a Node comming online, begin replay from it.
