@@ -14,6 +14,18 @@ foam.CLASS({
     'java.util.Collections',
     'java.util.List',
   ],
+  constants: [
+    {
+      name: 'JSON_FACTORY',
+      javaType: 'com.google.api.client.json.JsonFactory',
+      javaValue: `JacksonFactory.getDefaultInstance()`
+    },
+    {
+      name: 'SCOPES',
+      javaType: 'List<String>',
+      javaValue: `Collections.singletonList(DriveScopes.DRIVE)`
+    }
+  ],
   methods: [
     {
       name: 'deleteFile',
@@ -36,15 +48,6 @@ foam.CLASS({
     
         service.files().delete(fileId).execute();
       `
-    }
-  ],
-  axioms: [
-    {
-      name: 'javaExtras',
-      buildJavaClass: function(cls) {
-        cls.extras.push(`private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-        private static final List<String> SCOPES = Collections.singletonList(DriveScopes.DRIVE);`);
-      }
     }
   ]
 });

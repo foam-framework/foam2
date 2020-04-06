@@ -16,6 +16,33 @@ foam.CLASS({
 
     'java.util.*'
   ],
+  constants: [
+    {
+      name: 'JSON_FACTORY',
+      javaType: 'com.google.api.client.json.JsonFactory',
+      javaValue: `JacksonFactory.getDefaultInstance()`
+    },
+    {
+      name: 'SCOPES',
+      javaType: 'List<String>',
+      javaValue: `Collections.singletonList(SheetsScopes.DRIVE_FILE)`
+    },
+    {
+      name: 'COLUMN_TITLES_ROW_INDEX',
+      javaType: 'int',
+      javaValue: `1`
+    },
+    {
+      name: 'NUMBER_FORMAT',
+      javaType: 'String',
+      javaValue: `"userEnteredFormat.numberFormat"`
+    },
+    {
+      name: 'DEFAULT_CURRENCY',
+      javaType: 'String',
+      javaValue: `"CAD"`
+    }
+  ],
   methods: [
     {
       name: 'createSheet',
@@ -189,20 +216,6 @@ foam.CLASS({
           l.error(e);
         }
       `
-    }
-  ],
-  axioms: [
-    {
-      name: 'javaExtras',
-      buildJavaClass: function(cls) {
-        cls.extras.push(`
-        private static final List<String> SCOPES = Collections.singletonList(SheetsScopes.DRIVE_FILE);
-        private static final int COLUMN_TITLES_ROW_INDEX = 1;
-        private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-        private static final String NUMBER_FORMAT = "userEnteredFormat.numberFormat";
-        private static final String DEFAULT_CURRENCY = "CAD";
-        `);
-      }
     }
   ]
 });

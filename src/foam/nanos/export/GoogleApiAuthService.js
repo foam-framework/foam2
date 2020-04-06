@@ -17,6 +17,13 @@ foam.CLASS({
     'java.util.Arrays',
     'java.util.List'
   ],
+  constants: [
+    {
+      name: 'JSON_FACTORY',
+      javaType: 'com.google.api.client.json.JsonFactory',
+      javaValue: `JacksonFactory.getDefaultInstance();`
+    }
+  ],
   methods: [
     {
       name: 'getCredentials',
@@ -52,14 +59,6 @@ foam.CLASS({
         LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(credentialsConfig.getPort()).build();
         return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
       `
-    }
-  ],
-  axioms: [
-    {
-      name: 'javaExtras',
-      buildJavaClass: function(cls) {
-        cls.extras.push(`private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();`);
-      }
     }
   ]
 });
