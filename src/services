@@ -241,7 +241,7 @@ p({
   "name":"localGroupDAO",
   "serviceScript":"""
     return new foam.dao.EasyDAO.Builder(x)
-      .setPm(false)
+      .setPm(true)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("groups")
       .setOf(foam.nanos.auth.Group.getOwnClassInfo())
