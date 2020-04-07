@@ -41,10 +41,7 @@ foam.CLASS({
     'java.util.Iterator',
     'java.util.List',
     'java.util.Map',
-    'java.util.Set',
-    'net.nanopay.liquidity.approvalRequest.AccountApprovableAware',
-    'net.nanopay.liquidity.ucjQuery.AccountUCJQueryService',
-    'net.nanopay.liquidity.ucjQuery.UCJQueryService'
+    'java.util.Set'
   ],
 
   properties: [
@@ -137,21 +134,8 @@ foam.CLASS({
         DAO requestingDAO = (DAO) x.get(getDaoKey());
 
         String modelName = requestingDAO.getOf().getObjClass().getSimpleName();
-        List<Long> approverIds = null;
-
-        // query for approvers based on whether or not the object is account-based
-        if ( obj instanceof AccountApprovableAware ) {
-          AccountUCJQueryService ucjQueryService = (AccountUCJQueryService) x.get("accountUcjQueryService");
-          AccountApprovableAware aaaObj = (AccountApprovableAware) obj;
-          Long outgoingAccount = operation == Operations.CREATE ? aaaObj.getOutgoingAccountCreate(x) : 
-                                 operation == Operations.UPDATE ? aaaObj.getOutgoingAccountUpdate(x) : 
-                                                                  aaaObj.getOutgoingAccountDelete(x);
-          
-          approverIds = ucjQueryService.getAllApprovers(getX(), modelName, outgoingAccount);
-        } else {
-          UCJQueryService ucjQueryService = (UCJQueryService) x.get("ucjQueryService");
-          approverIds = ucjQueryService.getAllApprovers(getX(), modelName);
-        }
+        UserQueryService userQueryService = (UserQueryService) x.get("userQueryService");
+        List<Long> approverIds = userQueryService.getAllApprovers(x, modelName);
           
         if ( approverIds == null || approverIds.size() <= 0 ) {
           logger.log("No Approvers exist for the model: " + modelName);
