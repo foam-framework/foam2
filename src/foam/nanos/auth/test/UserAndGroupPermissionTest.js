@@ -92,7 +92,6 @@ foam.CLASS({
           .setFirstName("first")
           .setLastName("last")
           .setEmail("99999@test.com")
-          .setLifecycleState(LifecycleState.ACTIVE)
           .setGroup("test")
           .setLifecycleState(LifecycleState.ACTIVE)
           .build();
@@ -106,7 +105,6 @@ foam.CLASS({
           .setFirstName("first_two")
           .setLastName("last_two")
           .setEmail("99998@test.com")
-          .setLifecycleState(LifecycleState.ACTIVE)
           .setGroup("test")
           .setLifecycleState(LifecycleState.ACTIVE)
           .build();
@@ -165,7 +163,6 @@ foam.CLASS({
           .setFirstName("three")
           .setLastName("last")
           .setEmail("three@test.com")
-          .setLifecycleState(LifecycleState.ACTIVE)
           .setGroup("test")
           .setLifecycleState(LifecycleState.ACTIVE)
           .build();
