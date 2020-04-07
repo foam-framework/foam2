@@ -298,7 +298,6 @@ p({
       .setInnerDAO(((foam.dao.DAO) x.get("localSessionDAO")))
       .setAuthorize(false)
       .setOrder(new foam.mlang.order.Comparator[] { new foam.mlang.order.Desc.Builder(x).setArg1(foam.nanos.session.Session.LAST_USED).build() })
-      .setCluster(false)
       .setPm(true)
       .build();
   """,

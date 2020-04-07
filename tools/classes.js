@@ -303,6 +303,7 @@ var classes = [
   'foam.nanos.menu.ViewMenu',
   'foam.nanos.medusa.AccessMode',
   'foam.nanos.medusa.ClientElectoralService',
+  'foam.nanos.medusa.Clusterable',
   'foam.nanos.medusa.ClusterClientDAO',
   'foam.nanos.medusa.ClusterCommand',
   'foam.nanos.medusa.ClusterConfig',

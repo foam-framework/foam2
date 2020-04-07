@@ -65,7 +65,8 @@ public class SessionServerBox
                     Session session = (Session) sessionDAO.find(sessionID);
                     if ( session != null ) {
                       logger.debug("Using internalSessionDAO");
-                      setX(getX().put("localSessionDAO", sessionDAO));
+                      //setX(getX().put("localSessionDAO", sessionDAO));
+                      session.setClusterable(false);
                     }
                   }
                 }

@@ -63,13 +63,25 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-      return submit(x, obj, ClusterCommand.PUT);
+      Boolean clusterable = false;
+      if ( obj instanceof Clusterable &&
+           ! ((Clusterable) obj).getClusterable() ) {
+        return getDelegate().put_(x, obj);
+      } else {
+        return submit(x, obj, ClusterCommand.PUT);
+      }
       `
     },
     {
       name: 'remove_',
       javaCode: `
-      return submit(x, obj, ClusterCommand.REMOVE);
+      Boolean clusterable = false;
+      if ( obj instanceof Clusterable &&
+           ! ((Clusterable) obj).getClusterable() ) {
+        return getDelegate().remove_(x, obj);
+      } else {
+        return submit(x, obj, ClusterCommand.REMOVE);
+      }
       `
     },
     {

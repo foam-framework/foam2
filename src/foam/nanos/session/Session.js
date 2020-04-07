@@ -10,7 +10,8 @@ foam.CLASS({
 
   implements: [
     'foam.nanos.auth.CreatedAware',
-    'foam.nanos.auth.CreatedByAware'
+    'foam.nanos.auth.CreatedByAware',
+    'foam.nanos.medusa.Clusterable'
   ],
 
   javaImports: [
@@ -43,6 +44,14 @@ foam.CLASS({
       class: 'String',
       name: 'id',
       visibility: 'RO'
+    },
+    {
+      class: 'Boolean',
+      name: 'clusterable',
+      value: true,
+      visibility: 'HIDDEN',
+      storageTransient: true,
+      clusterTransient: true
     },
     {
       class: 'Long',
