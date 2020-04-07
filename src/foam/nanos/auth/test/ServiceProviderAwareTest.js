@@ -22,7 +22,6 @@ foam.CLASS({
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.Group',
     'foam.nanos.auth.User',
-    'foam.nanos.auth.LifecycleState',
     'foam.util.Auth',
     'foam.util.SafetyUtil',
     'foam.nanos.auth.AuthorizationException',
