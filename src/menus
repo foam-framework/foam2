@@ -122,7 +122,7 @@ p({
 })
 p({"class":"foam.nanos.menu.Menu","id":"admin.support","label":"Support","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.support.view.TicketView"}},"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"admin.support-email","label":"Support Email","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.support.view.SupportEmailView"}},"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.tests","label":"Tests","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"testDAO","summaryView":{"class":"foam.nanos.test.TestBorder"}},"parent":"admin"})8
+p({"class":"foam.nanos.menu.Menu","id":"admin.tests","label":"Tests","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"testDAO","summaryView":{"class":"foam.nanos.test.TestBorder"}},"parent":"admin"})
 p({
   "class":"foam.nanos.menu.Menu",
   "id":"admin.users",
