@@ -3,8 +3,8 @@ foam.CLASS({
     name: 'MenuToolBar',
     extends: 'foam.u2.View',
   
-    documentation: 'Creates a toolbar out menus from the given menu classification.',
-  
+    documentation: 'A toolbar made out of menus according to a given classification.',
+    
     implements: [
       'foam.mlang.Expressions'
     ],
