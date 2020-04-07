@@ -94,6 +94,7 @@ foam.CLASS({
           .setEmail("99999@test.com")
           .setLifecycleState(LifecycleState.ACTIVE)
           .setGroup("test")
+          .setLifecycleState(LifecycleState.ACTIVE)
           .build();
 
         user1 = (User) dao.put(user1);
@@ -107,6 +108,7 @@ foam.CLASS({
           .setEmail("99998@test.com")
           .setLifecycleState(LifecycleState.ACTIVE)
           .setGroup("test")
+          .setLifecycleState(LifecycleState.ACTIVE)
           .build();
         user2 = (User) dao.put(user2);
 
@@ -165,6 +167,7 @@ foam.CLASS({
           .setEmail("three@test.com")
           .setLifecycleState(LifecycleState.ACTIVE)
           .setGroup("test")
+          .setLifecycleState(LifecycleState.ACTIVE)
           .build();
 
         try {

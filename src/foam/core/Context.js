@@ -60,7 +60,7 @@ foam.SCRIPT({
       if ( ! opt_suppress ) {
         foam.assert(
           ret,
-          'Could not find any registered class for ' + id);
+          'Could not find any registered class for', id);
       }
 
       return foam.Function.isInstance(ret) ? ret() : ret;
@@ -144,7 +144,7 @@ foam.SCRIPT({
       foam.assert(
         ! hasOld ||
             (foam.Function.isInstance(old) && ! foam.Function.isInstance(cls)),
-        name + ' is already registered in this context.');
+        name, 'is already registered in this context.');
 
       cache[name] = cls;
     },

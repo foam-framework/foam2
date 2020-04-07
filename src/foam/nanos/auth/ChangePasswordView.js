@@ -32,11 +32,14 @@ foam.CLASS({
   ],
 
   css: `
-    ^ .centerVertical {
-      max-width: 30vw;
-      margin: 0 auto;
+    ^ {
+      background: #ffffff;
+      height: 100vh;
     }
-
+    ^ .centerVertical {
+      max-width: 40vw;
+      margin: 6% auto;
+    }
     ^ .logoCenterVertical {
       margin: 0 auto;
       text-align: center;
@@ -50,22 +53,45 @@ foam.CLASS({
       padding-left: 2vh;
     }
     ^ .top-bar {
-      background: /*%PRIMARY1%*/ #202341;
+      background: /*%LOGOBACKGROUNDCOLOUR%*/ #202341;
       width: 100%;
       height: 8vh;
-      border-bottom: solid 1px #e2e2e3
+      border-bottom: solid 1px #e2e2e3;
     }
     ^ .top-bar img {
       height: 4vh;
-      padding-top: 1vh;
+      padding-top: 2vh;
+      display: block;
+      margin: 0 auto;
+    }
+    ^ .title-top {
+      font-size: 2.5em;
+      padding-top: 2vh;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 0
+    }
+    ^ .subtitle {
+      color: #525455;
+      font-size: 1em;
+      line-height: 1.5;
+      margin-bottom: 2vh;
+      text-align: center;
+    }
+    ^ .contents {
+      max-width: 25vw;
+      margin: 0 auto;
+    }
+    ^ .submitBtn {
+      text-align: center;
     }
   `,
 
   sections: [
     {
       name: 'resetPasswordSection',
-      title: 'Reset your password',
-      help: `Create a new password for your account.`
+      title: '',
+      help: 'Create a new password for your account',
     }
   ],
 
@@ -140,6 +166,8 @@ foam.CLASS({
   ],
 
   messages: [
+    { name: 'TITLE', message: 'Reset your password' },
+    { name: 'SUBTITLE', message: 'Create a new password for your account' },
     { name: 'SUCCESS_MSG', message: 'Your password was successfully updated.' }
   ],
 
@@ -165,11 +193,12 @@ foam.CLASS({
     function initE() {
       this.makeHorizontal(this.horizontal);
       this.SUPER();
+      const logo = this.theme.largeLogo ? this.theme.largeLogo : this.theme.logo;
       this
         .addClass(this.myClass())
           .start().addClass('top-bar').show(this.topBarShow)
             .start('img')
-              .attr('src', this.theme.logo)
+              .attr('src', logo)
               .callIfElse( this.horizontal, function() {
                 this.addClass('logoHorizontal');
               }, function() {
@@ -183,13 +212,17 @@ foam.CLASS({
             }, function() {
               this.addClass('centerVertical');
             })
+            .start('h1').addClass('title-top').add(this.TITLE).end()
+            .start('p').addClass('subtitle').add(this.SUBTITLE).end()
             .start(this.SectionView, {
               data: this,
               sectionName: 'resetPasswordSection'
-            }).end()
+            }).addClass('contents').end()
             .br().br()
-            .tag(this.UPDATE_PASSWORD)
-            .tag(this.RESET_PASSWORD)
+            .start().addClass('submitBtn')
+              .start(this.UPDATE_PASSWORD, { size: 'LARGE' }).end()
+              .start(this.RESET_PASSWORD, { size: 'LARGE' }).end()
+            .end()
           .end();
       }
   ],
@@ -197,6 +230,7 @@ foam.CLASS({
   actions: [
     {
       name: 'resetPassword',
+      label: 'Confirm',
       isAvailable: function() {
         return !! this.token;
       },
