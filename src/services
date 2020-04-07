@@ -1,4 +1,4 @@
-p({"class":"foam.nanos.boot.NSpec", "name":"nSpecDAO",                           "serve":true,  "authenticate": false, "serviceClass":"foam.dao.ProxyDAO", "client":"{\"of\":\"foam.nanos.boot.NSpec\",\"cache\":true}"})
+p({"class":"foam.nanos.boot.NSpec", "name":"nSpecDAO",                           "serve":true,  "authenticate": false, "serviceClass":"foam.dao.ProxyDAO", "client":"{\"of\":\"foam.nanos.boot.NSpec\",\"cache\":true,\"ttlPurgeTime\":0,\"ttlSelectPurgeTime\": 25000}"})
 
 p({
   "class": "foam.nanos.boot.NSpec",
@@ -1032,7 +1032,9 @@ p({
   "name":"googleApiCredentialsConfig",
   "lazy":false,
   "service": {
-    "class":"foam.nanos.export.GoogleApiCredentials"
+    "class":"foam.nanos.export.GoogleApiCredentials",
+    "port":64349,
+    "tokensFolderPath":"/tmp"
   },
   "documentation": "Service for setting authorization request parameters which are required in order to retrieve access token. To download credentials visit Google Developers Console"
 })

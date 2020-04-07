@@ -109,8 +109,6 @@ foam.CLASS({
       javaCode:`
       Logger logger = (Logger) x.get("logger");
 
-
-
       if ( getIsTrackingRequestSent() ) {
         ApprovalRequest trackingRequest = (ApprovalRequest) request.fclone();
         trackingRequest.setIsTrackingRequest(true);
@@ -152,7 +150,7 @@ foam.CLASS({
           approverIds = ucjQueryService.getAllApprovers(getX(), modelName, outgoingAccount);
         } else {
           UCJQueryService ucjQueryService = (UCJQueryService) x.get("ucjQueryService");
-          approverIds = ucjQueryService.getAllApprovers(getX(), modelName, user);
+          approverIds = ucjQueryService.getAllApprovers(getX(), modelName);
         }
           
         if ( approverIds == null || approverIds.size() <= 0 ) {
@@ -180,16 +178,22 @@ foam.CLASS({
       Logger logger = (Logger) x.get("logger");
 
       LifecycleAware lifecycleObj = (LifecycleAware) obj;
+
+      DAO approvalRequestDAO = (DAO) x.get("approvalRequestDAO");
+      DAO dao = (DAO) x.get(getDaoKey());
+
+      ApprovableAware approvableAwareObj = (ApprovableAware) obj;
+      FObject currentObjectInDAO = (FObject) dao.find(approvableAwareObj.getApprovableKey());
       
       if ( ! getIsEnabled() ){
-        if ( lifecycleObj.getLifecycleState() == LifecycleState.PENDING ){
+        if ( lifecycleObj.getLifecycleState() == LifecycleState.PENDING && currentObjectInDAO == null ){
           lifecycleObj.setLifecycleState(LifecycleState.ACTIVE);
         }
         return super.put_(x,obj);
       }
 
       // system and admins override the approval process
-      if ( user != null && ( user.getId() == User.SYSTEM_USER_ID || user.getGroup().equals("admin") || user.getGroup().equals("system") ) ) {
+      if ( currentObjectInDAO == null && user != null && ( user.getId() == User.SYSTEM_USER_ID || user.getGroup().equals("admin") || user.getGroup().equals("system") ) ) {
         if ( lifecycleObj.getLifecycleState() == LifecycleState.PENDING && user.getId() != User.SYSTEM_USER_ID ){
           lifecycleObj.setLifecycleState(LifecycleState.ACTIVE);
         } 
@@ -200,12 +204,6 @@ foam.CLASS({
         }
         return super.put_(x,obj);
       }
-
-      DAO approvalRequestDAO = (DAO) x.get("approvalRequestDAO");
-      DAO dao = (DAO) x.get(getDaoKey());
-
-      ApprovableAware approvableAwareObj = (ApprovableAware) obj;
-      FObject currentObjectInDAO = (FObject) dao.find(approvableAwareObj.getApprovableKey());
       
       Operations operation = lifecycleObj.getLifecycleState() == LifecycleState.DELETED ? Operations.REMOVE : 
         ( ( currentObjectInDAO == null || ((LifecycleAware) currentObjectInDAO).getLifecycleState() == LifecycleState.PENDING ) ? 
