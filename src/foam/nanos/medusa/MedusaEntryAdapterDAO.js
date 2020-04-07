@@ -103,7 +103,7 @@ foam.CLASS({
       }
 
       MedusaEntry entry = x.create(MedusaEntry.class);
-      entry.setMediator(service.getConfigId());
+      entry.setMediator(service.getConfigName());
       entry.setNSpecName(getNSpec().getName());
       entry.setAction(op);
       entry.setData(obj);
