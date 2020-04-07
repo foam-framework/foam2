@@ -58,6 +58,17 @@ public class SessionServerBox
             if ( HTTPAuthorizationType.BEARER.getName().equalsIgnoreCase(authType) ) {
               if ( st.hasMoreTokens() ) {
                 sessionID = st.nextToken();
+                if ( sessionID != null ) {
+                  // test and use non-clustered medusa sessions
+                  DAO sessionDAO = (DAO) getX().get("internalSessionDAO");
+                  if ( sessionDAO != null ) {
+                    Session session = (Session) sessionDAO.find(sessionID);
+                    if ( session != null ) {
+                      logger.debug("Using internalSessionDAO");
+                      setX(getX().put("localSessionDAO", sessionDAO));
+                    }
+                  }
+                }
               } else {
                 logger.warning(this.getClass().getSimpleName(), "send", "Authorization: "+authType+" token not found.");
                 msg.replyWithException(new IllegalArgumentException("Authorization: "+authType+ " token not found."));

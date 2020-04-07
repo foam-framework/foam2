@@ -54,7 +54,8 @@ foam.CLASS({
           this.getClass().getSimpleName(),
           getServiceName()
         }, (Logger) getX().get("logger"));
-      `
+      `,
+      transient: true
     }
   ],
 
@@ -62,14 +63,46 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
+      return submit(x, obj, ClusterCommand.PUT);
+      `
+    },
+    {
+      name: 'remove_',
+      javaCode: `
+      return submit(x, obj, ClusterCommand.REMOVE);
+      `
+    },
+    {
+      name: 'submit',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'obj',
+          type: 'foam.core.FObject'
+        },
+        {
+          name: 'op',
+          type: 'String'
+        }
+      ],
+      javaType: 'foam.core.FObject',
+      javaCode: `
       ElectoralService electoralService = (ElectoralService) x.get("electoralService");
       ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
-      getLogger().debug("put", "electoral", electoralService.getState().getLabel(), "online", service.getOnline(x));
-      foam.core.FObject old = getDelegate().find_(x, obj.getProperty("id"));
+      getLogger().debug(op, "electoral", electoralService.getState().getLabel(), "online", service.getOnline(x));
+      foam.core.FObject old = null;
+      if ( ClusterCommand.PUT == op ) {
+        old = getDelegate().find_(x, obj.getProperty("id"));
+      }
       foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(x).setPropertyPredicate(new foam.lib.ClusterPropertyPredicate());
       // Clear context so it's not marshalled across the network
       ((ContextAware) obj).setX(null);
-
+      if ( obj instanceof foam.nanos.session.Session ) {
+        ((foam.nanos.session.Session) obj).setContext(null);
+      }
         //TODO: outputDelta has problem when output array. Fix bugs then use output delta.
         // String record = ( old != null ) ?
         //   outputter.stringifyDelta(old, obj) :
@@ -84,7 +117,7 @@ foam.CLASS({
         int retryAttempt = 0;
         int retryDelay = 10;
 
-        ClusterCommand cmd = new ClusterCommand(x, getServiceName(), ClusterCommand.PUT, record);
+        ClusterCommand cmd = new ClusterCommand(x, getServiceName(), op, record);
         // NOTE: set context to null after init so it's not marshalled across network
         cmd.setX(null);
 
@@ -139,7 +172,14 @@ foam.CLASS({
         }
         if ( service != null ) {
           getLogger().debug("primary delegating");
-          return getDelegate().put_(x, obj);
+          if ( ClusterCommand.PUT == op ) {
+            return getDelegate().put_(x, obj);
+          }
+          if ( ClusterCommand.REMOVE == op ) {
+            return getDelegate().remove_(x, obj);
+          }
+          getLogger().error("Unsupported operation", op);
+          throw new UnsupportedOperationException(op);
         } else {
           // service is null.
           getLogger().warning("ClusterConfigService not found, operation discarded.", obj);
@@ -147,31 +187,5 @@ foam.CLASS({
         }
       `
     },
-    {
-      // TODO: refactor  like put.
-      name: 'remove_',
-      javaCode: `
-      // TODO: Add Retry
-
-      ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
-      if ( service != null &&
-           service.getConfigId() != null &&
-           ! service.getIsPrimary() ) {
-
-        foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(x).setPropertyPredicate(new foam.lib.ClusterPropertyPredicate());
-        String record = outputter.stringify(obj);
-
-        ClusterCommand cmd = new ClusterCommand(x, getServiceName(), ClusterCommand.REMOVE, record);
-        getLogger().debug("to primary", cmd);
-        FObject result = (FObject) service.getPrimaryDAO(x, getServiceName()).cmd_(x, cmd);
-        getLogger().debug("from primary", result.getClass().getSimpleName(), result);
-        obj = obj.copyFrom(result);
-        getLogger().debug("obj after copyFrom", obj);
-        return obj;
-      } else {
-        return getDelegate().remove_(x, obj);
-      }
-      `
-    }
   ]
 });
