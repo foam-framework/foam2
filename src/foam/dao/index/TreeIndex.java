@@ -106,7 +106,6 @@ public class TreeIndex
   }
 
   public Object put(Object state, FObject oldValue, FObject newValue) {
-
     Object key;
     try {
       key = prop_.f(newValue);

@@ -350,7 +350,15 @@ foam.CLASS({
 
     function put(oldValue, newValue) {
       var key = this.index.prop.f(newValue);
-      if ( oldValue ) {
+      if ( !oldValue ) {
+        this.root = this.root.putKeyValue(
+          key,
+          oldValue,
+          newValue,
+          this.index.compare,
+          this.index.dedup,
+          this.selectCount > 0);
+      } else {
         var oldKey = this.index.prop.f(oldValue);
         if ( oldKey && foam.util.equals(oldKey, key) ) { 
           this.root.updateValue(key, oldValue, newValue, this.index.compare, this.index.nullNode, this.selectCount > 0);
@@ -369,15 +377,6 @@ foam.CLASS({
               this.index.dedup, 
               this.selectCount > 0);
         }
-      }
-      else {
-       this.root = this.root.putKeyValue(
-        key,
-        oldValue,
-        newValue,
-        this.index.compare,
-        this.index.dedup,
-        this.selectCount > 0);
       }
     },
 
