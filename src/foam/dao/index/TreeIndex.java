@@ -124,6 +124,7 @@ public class TreeIndex
         state = ((TreeNode)state).update((TreeNode)state, prop_, key, oldValue, newValue, tail_);
       else {
         state =  remove(state, oldValue);
+        if ( state == null ) state = TreeNode.getNullNode();
         state =  ((TreeNode) state).putKeyValue((TreeNode)state,
         prop_, key, null, newValue, tail_);
       }
