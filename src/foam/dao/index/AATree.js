@@ -158,35 +158,26 @@ foam.CLASS({
       this.right.getAll(key, compare, retArray);
     },
 
-    function putKeyValue(key, value, compare, dedup, locked) {
+    function putKeyValue(key, oldValue, newValue, compare, dedup, locked) {
       var s = this.maybeClone(locked);
 
       var r = compare(s.key, key);
 
       if ( r === 0 ) {
-        dedup(value, s.key);
+        dedup(newValue, s.key);
 
         s.size -= s.value.size();
-        s.value.put(value);
+        s.value.put(oldValue, newValue);
         s.size += s.value.size();
       } else {
         var side = r > 0 ? 'left' : 'right';
 
         if ( s[side].level ) s.size -= s[side].size;
-        s[side] = s[side].putKeyValue(key, value, compare, dedup, locked);
+        s[side] = s[side].putKeyValue(key, oldValue, newValue, compare, dedup, locked);
         s.size += s[side].size;
       }
 
       return s.split(locked).skew(locked);
-    },
-
-    function update(oldKey, key, oldValue, newValue, compare, nullNode, dedup, locked) {
-      if ( oldKey && foam.util.equals(key, oldKey) ) { 
-        this.updateValue(key, oldValue, newValue, compare, nullNode, locked);
-      } else {
-        this.removeKeyValue(oldKey, oldValue, compare, locked, nullNode);
-        this.putKeyValue(key, newValue, compare, dedup, locked);
-      }
     },
 
     function updateValue(key, oldValue, newValue, compare, nullNode, locked) {
@@ -197,7 +188,7 @@ foam.CLASS({
       
       var r = compare(s.key, key);
       if ( r === 0 ) {
-        s.value.update(oldValue, newValue);
+        s.value.put(oldValue, newValue);
       } else {
         var side = r > 0 ? 'left' : 'right';
         s[side].updateValue(key, oldValue, newValue, compare, nullNode, locked);
@@ -462,9 +453,9 @@ foam.CLASS({
     function updateSize()    {  },
 
     /** Add a new value to the tree */
-    function putKeyValue(key, value) {
+    function putKeyValue(key, oldValue, newValue) {
       var subIndex = this.tail.createNode();
-      subIndex.put(value);
+      subIndex.put(oldValue, newValue);
       var n = this.treeNode.create();
       n.left  = this;
       n.right = this;
@@ -492,7 +483,7 @@ foam.CLASS({
 
       var tree = this;
       var m    = start + Math.floor((end-start+1) / 2);
-      tree = tree.putKeyValue(keyExtractor(a[m]), a[m]);
+      tree = tree.putKeyValue(keyExtractor(a[m]), null, a[m]);
 
       tree.left  = tree.left.bulkLoad_(a, start, m-1, keyExtractor);
       tree.right = tree.right.bulkLoad_(a, m+1, end, keyExtractor);

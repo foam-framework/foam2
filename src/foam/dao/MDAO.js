@@ -148,11 +148,7 @@ foam.CLASS({
 
     function put_(x, obj) {
       var oldValue = this.findSync_(obj.id);
-      if ( oldValue ) {
-        this.index.update(oldValue, obj);
-      } else {
-        this.index.put(obj);
-      }
+      this.index.put(oldValue, obj);
       this.pub('on', 'put', obj);
       return Promise.resolve(obj);
     },

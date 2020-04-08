@@ -343,30 +343,42 @@ foam.CLASS({
         this.root = this.root.bulkLoad_(a, 0, a.length-1, prop.f);
       } else {
         for ( var i = 0 ; i < a.length ; i++ ) {
-          this.put(a[i]);
+          this.put(null, a[i]);
         }
       }
     },
 
-    function update(oldValue, newValue) {
-      this.root.update(
-        this.index.prop.f(oldValue),
-        this.index.prop.f(newValue),
+    function put(oldValue, newValue) {
+      var key = this.index.prop.f(newValue);
+      if ( oldValue ) {
+        var oldKey = this.index.prop.f(oldValue);
+        if ( oldKey && foam.util.equals(oldKey, key) ) { 
+          this.root.updateValue(key, oldValue, newValue, this.index.compare, this.index.nullNode, this.selectCount > 0);
+        } else {
+          this.root = this.root.removeKeyValue(
+              oldKey, 
+              oldValue, 
+              this.index.compare, 
+              this.selectCount > 0, 
+              this.index.nullNode);
+          this.root = this.root.putKeyValue(
+              key, 
+              oldValue,
+              newValue, 
+              this.index.compare, 
+              this.index.dedup, 
+              this.selectCount > 0);
+        }
+      }
+      else {
+       this.root = this.root.putKeyValue(
+        key,
         oldValue,
         newValue,
         this.index.compare,
-        this.index.nullNode,
         this.index.dedup,
         this.selectCount > 0);
-    },
-
-    function put(newValue) {
-      this.root = this.root.putKeyValue(
-          this.index.prop.f(newValue),
-          newValue,
-          this.index.compare,
-          this.index.dedup,
-          this.selectCount > 0);
+      }
     },
 
     function remove(value) {
@@ -609,25 +621,36 @@ foam.CLASS({
   extends: 'foam.dao.index.TreeIndexNode',
 
   methods: [
-    function put(newValue) {
-      this.root = this.root.putKeyValue(
-          this.index.prop.f(newValue).toLowerCase(),
-          newValue,
-          this.index.compare,
-          this.index.dedup,
-          this.selectCount > 0);
-    },
-
-    function update(oldValue, newValue) {
-      this.root.update(
-        this.index.prop.f(oldValue).toLowerCase(),
-        this.index.prop.f(newValue).toLowerCase(),
-        oldValue,
-        newValue,
-        this.index.compare,
-        this.index.nullNode,
-        this.index.dedup,
-        this.selectCount > 0);
+    function put(oldValue, newValue) {
+      var key = this.index.prop.f(newValue).toLowerCase();
+      if ( !oldValue )
+        this.root = this.root.putKeyValue(
+            key,
+            oldValue,
+            newValue,
+            this.index.compare,
+            this.index.dedup,
+            this.selectCount > 0);
+      else {
+        var oldKey = this.index.prop.f(oldValue).toLowerCase();
+        if ( oldKey && foam.util.equals(oldKey, key) ) { 
+          this.root.updateValue(key, oldValue, newValue, this.index.compare, this.index.nullNode, this.selectCount > 0);
+        } else {
+          this.root = this.root.removeKeyValue(
+              oldKey, 
+              oldValue, 
+              this.index.compare, 
+              this.selectCount > 0, 
+              this.index.nullNode);
+          this.root = this.root.putKeyValue(
+              key,
+              oldValue,
+              newValue, 
+              this.index.compare, 
+              this.index.dedup, 
+              this.selectCount > 0);
+        }
+      }
     },
     
     function remove(value) {
@@ -646,7 +669,7 @@ foam.CLASS({
       a = a.array || a;
       this.root = this.index.nullNode;
       for ( var i = 0 ; i < a.length ; i++ ) {
-        this.put(a[i]);
+        this.put(null, a[i]);
       }
     }
   ]
@@ -679,80 +702,82 @@ foam.CLASS({
       a = a.array || a;
       this.root = this.index.nullNode;
       for ( var i = 0 ; i < a.length ; i++ ) {
-        this.put(a[i]);
+        this.put(null, a[i]);
       }
     },
 
-    function put(newValue) {
+    function put(oldValue, newValue) {
       var a = this.index.prop.f(newValue);
 
-      if ( a.length ) {
-        for ( var i = 0 ; i < a.length ; i++ ) {
-          this.root = this.root.putKeyValue(
-              a[i],
-              newValue,
-              this.index.compare,
-              this.index.dedup);
+      if ( !oldValue ) {
+        if ( a.length ) {
+          for ( var i = 0 ; i < a.length ; i++ ) {
+            this.root = this.root.putKeyValue(
+                a[i],
+                oldValue,
+                newValue,
+                this.index.compare,
+                this.index.dedup);
+          }
+        } else {
+          this.root = this.root.putKeyValue('', oldValue, newValue, this.index.compare, this.index.dedup);
         }
       } else {
-        this.root = this.root.putKeyValue('', newValue, this.index.compare, this.index.dedup);
-      }
-    },
-
-    function update(oldValue, newValue) {
-      var a = this.index.prop.f(newValue);
-      var b = this.index.prop.f(oldValue);
-
-      if ( a.length ) {
-        if ( a !== b ) {
-          var newValues = [[...a].filter(v => ! b.has(v))];
-          var valuesThatNeedToBeDeleted = [[...b].filter(v => ! a.has(v))];
-          var valuesThatNeedToBeUpdated = [[...a].filter(v => b.has(v))];
-  
-          for ( var i = 0 ; i < newValues.length ; i++ ) {
-            this.root = this.root.putKeyValue(
-              newValues[i],
-              newValue,
-              this.index.compare,
-              this.index.dedup);
-          }
-          for ( var i = 0 ; i < valuesThatNeedToBeDeleted.length ; i++ ) {
-            this.root = this.root.removeKeyValue(
-              valuesThatNeedToBeDeleted[i],
-              oldValue,
-              this.index.compare,
-              this.index.nullNode);
-          }
-          for ( var i = 0 ; i < valuesThatNeedToBeUpdated.length ; i++ ) {
+        var a = this.index.prop.f(newValue);
+        var b = this.index.prop.f(oldValue);
+        
+        if ( a.length ) {
+          if ( a !== b ) {
+            var newValues = [[...a].filter(v => ! b.has(v))];
+            var valuesThatNeedToBeDeleted = [[...b].filter(v => ! a.has(v))];
+            var valuesThatNeedToBeUpdated = [[...a].filter(v => b.has(v))];
+    
+            for ( var i = 0 ; i < newValues.length ; i++ ) {
+              this.root = this.root.putKeyValue(
+                newValues[i],
+                null,
+                newValue,
+                this.index.compare,
+                this.index.dedup);
+            }
+            for ( var i = 0 ; i < valuesThatNeedToBeDeleted.length ; i++ ) {
+              this.root = this.root.removeKeyValue(
+                valuesThatNeedToBeDeleted[i],
+                oldValue,
+                this.index.compare,
+                this.index.nullNode);
+            }
+            for ( var i = 0 ; i < valuesThatNeedToBeUpdated.length ; i++ ) {
+              this.root.updateValue(
+                valuesThatNeedToBeUpdated[i],
+                oldValue,
+                newValue,
+                this.index.compare,
+                this.index.nullNode,
+                this.index.dedup,
+                this.selectCount > 0);
+            }  
+          } else {
             this.root.updateValue(
-              valuesThatNeedToBeUpdated[i],
+              b,
+              a,
               oldValue,
               newValue,
               this.index.compare,
               this.index.nullNode,
               this.index.dedup,
               this.selectCount > 0);
-          }  
+          }      
         } else {
-          this.root.update(
-            b,
-            a,
+          this.root.updateValue(
+            '',
             oldValue,
             newValue,
             this.index.compare,
             this.index.nullNode,
             this.index.dedup,
             this.selectCount > 0);
-        }      
-      } else {
-        this.root.updateValue(
-          '',
-          oldValue,
-          newValue,
-          this.index.compare,
-          this.index.nullNode,
-          this.index.dedup,
-          this.selectCount > 0);
+        }
       }
     },
 
