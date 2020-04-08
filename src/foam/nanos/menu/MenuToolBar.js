@@ -1,9 +1,15 @@
+/**
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
     package: 'foam.nanos.menu',
     name: 'MenuToolBar',
     extends: 'foam.u2.View',
   
-    documentation: 'A toolbar made out of menus according to a given classification.',
+    documentation: 'A toolbar made out of menus according to a given classification (menu id prefix).',
     
     implements: [
       'foam.mlang.Expressions'
