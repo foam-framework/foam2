@@ -68,10 +68,7 @@ public class AltIndex
 
     for ( int i = 0 ; i < delegates_.size() ; i++ ) {
       s[i] = delegates_.get(i).put(s[i], oldValue, newValue);
-      if(s[i] instanceof String)
-        System.out.println('x');
     }
-
 
     return s;
   }
