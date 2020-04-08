@@ -30,7 +30,7 @@ foam.CLASS({
           var results = [];
           if ( permissioned ) {
             var model = of.name.toLowerCase();
-            for ( var i = 0 ; i < of.VALUES.length  ; i++ ) {
+            for ( var i = 0 ; i < of.VALUES.length ; i++ ) {
               var readPermission = model + '.read.' + of.VALUES[i].label.toLowerCase();
               var permResult = await this.auth.check(null, readPermission);
               results.push([of.VALUES[i].label, permResult]);
@@ -46,8 +46,8 @@ foam.CLASS({
       name: 'choices',
       expression: function(of) {
         return of ? of.VALUES.map(function(v) {
-           return [v, v.label];
-          }) : [];
+          return [v, v.label];
+        }) : [];
       }
     }
   ],
