@@ -76,32 +76,13 @@ foam.CLASS({
 
         // get user from session id
         User user = (User) ((DAO) getLocalUserDAO()).find(session.getUserId());
-        if ( user == null ) {
-          throw new AuthenticationException("User not found: " + session.getUserId());
-        }
 
-        // check that the user is active
-        assertUserIsActive(user);
-
-        // check if user enabled
-        if ( ! user.getEnabled() ) {
-          throw new AuthenticationException("User disabled");
-        }
-
-        // check if user login enabled
-        if ( ! user.getLoginEnabled() ) {
-          throw new AuthenticationException("Login disabled");
-        }
+        user.validateAuth(x);
 
         // check if group enabled
         Group group = getCurrentGroup(x);
         if ( group != null && ! group.getEnabled() ) {
           throw new AuthenticationException("Group disabled");
-        }
-
-        // check for two-factor authentication
-        if ( user.getTwoFactorEnabled() && ! session.getContext().getBoolean("twoFactorSuccess") ) {
-          throw new AuthenticationException("User requires two-factor authentication");
         }
 
         return user;
@@ -432,7 +413,7 @@ foam.CLASS({
             );
 
             if ( junction == null ) {
-              throw new RuntimeException("There was a user and an agent in the context, but a junction between then was not found.");
+              throw new RuntimeException("There was a user and an agent in the context, but a junction between them was not found.");
             }
 
             return (Group) ((DAO) getLocalGroupDAO()).inX(x).find(junction.getGroup());

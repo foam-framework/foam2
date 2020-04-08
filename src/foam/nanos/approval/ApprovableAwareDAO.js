@@ -21,6 +21,7 @@ foam.CLASS({
     'foam.dao.AbstractSink',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
+    'foam.dao.ProxySink',
     'foam.lib.PropertyPredicate',
     'foam.mlang.MLang',
     'foam.mlang.MLang.*',
@@ -40,7 +41,7 @@ foam.CLASS({
     'java.util.Iterator',
     'java.util.List',
     'java.util.Map',
-    'java.util.Set',
+    'java.util.Set'
   ],
 
   properties: [
@@ -99,39 +100,11 @@ foam.CLASS({
       args: [
         { name: 'x', type: 'Context' },
         { name: 'request', type: 'ApprovalRequest' },
-        { name: 'obj', type: 'FObject' }
+        { name: 'obj', type: 'FObject' },
+        { name: 'approverIds', type: 'List', javaType: 'List<Long>' }
       ],
       javaCode:`
-      DAO requestingDAO;
       Logger logger = (Logger) x.get("logger");
-
-      if ( request.getDaoKey().equals("approvableDAO") ) {
-        DAO approvableDAO = (DAO) x.get("approvableDAO");
-
-        Approvable approvable = (Approvable) approvableDAO.find(request.getObjId());
-
-        requestingDAO = (DAO) x.get(approvable.getDaoKey());
-      } else {
-        requestingDAO = (DAO) x.get(request.getDaoKey());
-      }
-
-      String modelName = requestingDAO.getOf().getObjClass().getSimpleName();
-
-      UserQueryService userQueryService = (UserQueryService) x.get("userQueryService");
-
-      User currentUser = (User) x.get("user");
-
-      List<Long> approverIds = userQueryService.getAllApprovers(x, modelName, currentUser);
-
-      if ( approverIds.size() <= 0 ) {
-        logger.error("No Approvers exist for the model: " + modelName);
-        throw new RuntimeException("No Approvers exist for the model: " + modelName);
-      }
-
-      if ( ! getCanMakerApproveOwnRequest() && approverIds.size() == 1 && approverIds.get(0) == request.getCreatedBy() ) {
-        logger.log("The only approver of " + modelName + " is the maker of this request!");
-        throw new RuntimeException("The only approver of " + modelName + " is the maker of this request!");
-      }
 
       if ( getIsTrackingRequestSent() ) {
         ApprovalRequest trackingRequest = (ApprovalRequest) request.fclone();
@@ -148,6 +121,36 @@ foam.CLASS({
       `
     },
     {
+      name: 'findApprovers',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'obj', type: 'FObject' },
+        { name: 'operation', javaType: 'foam.nanos.ruler.Operations' },
+        { name: 'user', javaType: 'foam.nanos.auth.User' }
+      ],
+      javaType: 'List<Long>',
+      javaCode: ` 
+        Logger logger = (Logger) x.get("logger");
+        DAO requestingDAO = (DAO) x.get(getDaoKey());
+
+        String modelName = requestingDAO.getOf().getObjClass().getSimpleName();
+        UserQueryService userQueryService = (UserQueryService) x.get("userQueryService");
+        List<Long> approverIds = userQueryService.getAllApprovers(x, modelName);
+          
+        if ( approverIds == null || approverIds.size() <= 0 ) {
+          logger.log("No Approvers exist for the model: " + modelName);
+          throw new RuntimeException("No Approvers exist for the model: " + modelName);
+        }
+
+        if ( ! getCanMakerApproveOwnRequest() && approverIds.size() == 1 && approverIds.get(0) == user.getId() ) {
+          logger.log("The only approver of " + modelName + " is the maker of this request!");
+          throw new RuntimeException("The only approver of " + modelName + " is the maker of this request!");
+        }
+
+        return approverIds;
+      `
+    },
+    {
       name: 'put_',
       javaCode: `
       if ( ! ( obj instanceof LifecycleAware ) )
@@ -159,16 +162,22 @@ foam.CLASS({
       Logger logger = (Logger) x.get("logger");
 
       LifecycleAware lifecycleObj = (LifecycleAware) obj;
+
+      DAO approvalRequestDAO = (DAO) x.get("approvalRequestDAO");
+      DAO dao = (DAO) x.get(getDaoKey());
+
+      ApprovableAware approvableAwareObj = (ApprovableAware) obj;
+      FObject currentObjectInDAO = (FObject) dao.find(approvableAwareObj.getApprovableKey());
       
       if ( ! getIsEnabled() ){
-        if ( lifecycleObj.getLifecycleState() == LifecycleState.PENDING ){
+        if ( lifecycleObj.getLifecycleState() == LifecycleState.PENDING && currentObjectInDAO == null ){
           lifecycleObj.setLifecycleState(LifecycleState.ACTIVE);
         }
         return super.put_(x,obj);
       }
 
       // system and admins override the approval process
-      if ( user != null && ( user.getId() == User.SYSTEM_USER_ID || user.getGroup().equals("admin") || user.getGroup().equals("system") ) ) {
+      if ( currentObjectInDAO == null && user != null && ( user.getId() == User.SYSTEM_USER_ID || user.getGroup().equals("admin") || user.getGroup().equals("system") ) ) {
         if ( lifecycleObj.getLifecycleState() == LifecycleState.PENDING && user.getId() != User.SYSTEM_USER_ID ){
           lifecycleObj.setLifecycleState(LifecycleState.ACTIVE);
         } 
@@ -179,29 +188,56 @@ foam.CLASS({
         }
         return super.put_(x,obj);
       }
-
-      DAO approvalRequestDAO = (DAO) x.get("approvalRequestDAO");
-      DAO dao = (DAO) x.get(getDaoKey());
-
-      ApprovableAware approvableAwareObj = (ApprovableAware) obj;
-      FObject currentObjectInDAO = (FObject) dao.find(approvableAwareObj.getApprovableKey());
       
-      if ( obj instanceof LifecycleAware && ((LifecycleAware) obj).getLifecycleState() == LifecycleState.DELETED ) {
+      Operations operation = lifecycleObj.getLifecycleState() == LifecycleState.DELETED ? Operations.REMOVE : 
+        ( ( currentObjectInDAO == null || ((LifecycleAware) currentObjectInDAO).getLifecycleState() == LifecycleState.PENDING ) ? 
+            Operations.CREATE :
+            Operations.UPDATE
+        );
+
+      List<Long> approverIds = findApprovers(x, (FObject) obj, operation, user);
+
+      // a proxysink which removes the users who have already been sent approvalrequests from the list of approverIds
+      ProxySink proxy = new ProxySink(x, new ArraySink()) {
+        @Override
+        public void put(Object o, Detachable sub) {
+          Long approver = ((ApprovalRequest) o).getApprover();
+          approverIds.remove(approver);
+          getDelegate().put(o, sub);  
+        }
+      };
+
+      if ( operation == Operations.REMOVE ) {
         approvableAwareObj = (ApprovableAware) currentObjectInDAO;
 
-        List approvedObjRemoveRequests = ((ArraySink) approvalRequestDAO
+        DAO filteredApprovalRequestDAO = (DAO) approvalRequestDAO
           .where(
             foam.mlang.MLang.AND(
               foam.mlang.MLang.EQ(ApprovalRequest.DAO_KEY, getDaoKey()),
               foam.mlang.MLang.EQ(ApprovalRequest.OBJ_ID, approvableAwareObj.getApprovableKey()),
+              foam.mlang.MLang.EQ(ApprovalRequest.CREATED_BY, user.getId()),
               foam.mlang.MLang.EQ(ApprovalRequest.OPERATION, Operations.REMOVE),
-              foam.mlang.MLang.EQ(ApprovalRequest.IS_FULFILLED, false),
-              foam.mlang.MLang.OR(
-                foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.APPROVED),
-                foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.REJECTED)
-              )
+              foam.mlang.MLang.EQ(ApprovalRequest.IS_FULFILLED, false)
             )
-          ).select(new ArraySink())).getArray();
+          );
+
+        List pendingRequests = ((ArraySink) ((ProxySink) filteredApprovalRequestDAO
+        .where(foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.REQUESTED))
+        .select(proxy))
+        .getDelegate())
+        .getArray();
+
+        // if the new list of approvers include users who are not in the original list of approvers, we want to send them the ar 
+        // we dont need the proxysink for this operation sink if this is non-empty, we do not need to know if there's any 
+        // new approvers to whom an approvalrequest for this operation should be sent.
+        List approvedObjRemoveRequests = ((ArraySink) filteredApprovalRequestDAO
+          .where(foam.mlang.MLang.OR(
+            foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.APPROVED),
+            foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.REJECTED)
+          )).select(new ArraySink())).getArray();
+
+        if ( pendingRequests.size() > 0 && approvedObjRemoveRequests.size() == 0 && approverIds.size() == 0 ) 
+          throw new RuntimeException("There already exists approval requests for this operation");
 
         if ( approvedObjRemoveRequests.size() == 1 ) {
           ApprovalRequest fulfilledRequest = (ApprovalRequest) approvedObjRemoveRequests.get(0);
@@ -227,32 +263,48 @@ foam.CLASS({
           .setObjId(approvableAwareObj.getApprovableKey())
           .setClassification(getOf().getObjClass().getSimpleName())
           .setOperation(Operations.REMOVE)
-          .setCreatedBy(((User) x.get("user")).getId())
+          .setCreatedBy(user.getId())
           .setStatus(ApprovalStatus.REQUESTED).build();
 
-        fullSend(x, approvalRequest, obj);
+        fullSend(x, approvalRequest, obj, approverIds);
 
         // TODO: the following is a temporary fix will need to create an actual exception and pass feedback as a property
         throw new RuntimeException("An approval request has been sent out."); // we aren't updating to deleted
       }
 
-      if ( currentObjectInDAO == null || ((LifecycleAware) currentObjectInDAO).getLifecycleState() == LifecycleState.PENDING ) {
+      if ( operation == Operations.CREATE ) {
         if ( lifecycleObj.getLifecycleState() == LifecycleState.ACTIVE ) { 
           return super.put_(x,obj);
         } else if ( lifecycleObj.getLifecycleState() == LifecycleState.PENDING ) {
-          List approvedObjCreateRequests = ((ArraySink) approvalRequestDAO
+
+          DAO filteredApprovalRequestDAO = (DAO) approvalRequestDAO
             .where(
               foam.mlang.MLang.AND(
                 foam.mlang.MLang.EQ(ApprovalRequest.DAO_KEY, getDaoKey()),
-                foam.mlang.MLang.EQ(ApprovalRequest.OBJ_ID, approvableAwareObj.getApprovableKey()),
+                foam.mlang.MLang.EQ(ApprovalRequest.APPROVABLE_CREATE_KEY, ApprovableAware.getApprovableCreateKey(x, obj)),
+                foam.mlang.MLang.EQ(ApprovalRequest.CREATED_BY, user.getId()),
                 foam.mlang.MLang.EQ(ApprovalRequest.OPERATION, Operations.CREATE),
-                foam.mlang.MLang.EQ(ApprovalRequest.IS_FULFILLED, false),
-                foam.mlang.MLang.OR(
-                  foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.APPROVED),
-                  foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.REJECTED)
-                )
+                foam.mlang.MLang.EQ(ApprovalRequest.IS_FULFILLED, false)
               )
-            ).select(new ArraySink())).getArray();
+            );
+
+          List pendingRequests = ((ArraySink) ((ProxySink) filteredApprovalRequestDAO
+            .where(foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.REQUESTED))
+            .select(proxy))
+            .getDelegate())
+            .getArray();
+
+          // if the new list of approvers include users who are not in the original list of approvers, we want to send them the ar 
+          // we dont need the proxysink for this operation sink if this is non-empty, we do not need to know if there's any 
+          // new approvers to whom an approvalrequest for this operation should be sent.
+          List approvedObjCreateRequests = ((ArraySink) filteredApprovalRequestDAO
+            .where(foam.mlang.MLang.OR(
+              foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.APPROVED),
+              foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.REJECTED)
+            )).select(new ArraySink())).getArray();
+
+          if ( pendingRequests.size() > 0 && approvedObjCreateRequests.size() == 0 ) 
+            throw new RuntimeException("There already exists approval requests for this operation");
 
           if ( approvedObjCreateRequests.size() == 1 ) {
             ApprovalRequest fulfilledRequest = (ApprovalRequest) approvedObjCreateRequests.get(0);
@@ -277,13 +329,14 @@ foam.CLASS({
 
           ApprovalRequest approvalRequest = new ApprovalRequest.Builder(x)
             .setDaoKey(getDaoKey())
+            .setApprovableCreateKey(ApprovableAware.getApprovableCreateKey(x, obj))
             .setObjId(approvableAwareObj.getApprovableKey())
             .setClassification(getOf().getObjClass().getSimpleName())
             .setOperation(Operations.CREATE)
-            .setCreatedBy(((User) x.get("user")).getId())
+            .setCreatedBy(user.getId())
             .setStatus(ApprovalStatus.REQUESTED).build();
 
-          fullSend(x, approvalRequest, obj);
+          fullSend(x, approvalRequest, obj, approverIds);
 
           // we are storing the object in it's related dao with a lifecycle state of PENDING
           UserFeedbackAware feedbackAwareObj = (UserFeedbackAware) obj;
@@ -330,7 +383,11 @@ foam.CLASS({
         }
 
         // change last modified by to be the user
-        updatedProperties.put("lastModifiedBy", ((User) x.get("user")).getId());
+        updatedProperties.put("lastModifiedBy", user.getId());
+
+        // remove lastmodified prop to exclude it from hash
+        Object lastModified = updatedProperties.remove("lastModified");
+
         DAO approvableDAO = (DAO) x.get("approvableDAO");
 
         String daoKey = "d" + getDaoKey();
@@ -339,20 +396,37 @@ foam.CLASS({
   
         String hashedId = daoKey + objId + hashedMap;
 
+        // put back lastmodified prop after hashing 
+        updatedProperties.put("lastModified", lastModified);
 
-        List approvedObjUpdateRequests = ((ArraySink) approvalRequestDAO
+        DAO filteredApprovalRequestDAO = (DAO) approvalRequestDAO
           .where(
             foam.mlang.MLang.AND(
               foam.mlang.MLang.EQ(ApprovalRequest.DAO_KEY, "approvableDAO"),
               foam.mlang.MLang.EQ(ApprovalRequest.OBJ_ID, hashedId),
+              foam.mlang.MLang.EQ(ApprovalRequest.CREATED_BY, user.getId()),
               foam.mlang.MLang.EQ(ApprovalRequest.OPERATION, Operations.UPDATE),
-              foam.mlang.MLang.EQ(ApprovalRequest.IS_FULFILLED, false),
-              foam.mlang.MLang.OR(
-                foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.APPROVED),
-                foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.REJECTED)
-              )
+              foam.mlang.MLang.EQ(ApprovalRequest.IS_FULFILLED, false)
             )
-          ).select(new ArraySink())).getArray();
+          );
+
+        List pendingRequests = ((ArraySink) ((ProxySink) filteredApprovalRequestDAO
+          .where(foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.REQUESTED))
+          .select(proxy))
+          .getDelegate())
+          .getArray();
+
+        // if the new list of approvers include users who are not in the original list of approvers, we want to send them the ar 
+        // we dont need the proxysink for this operation sink if this is non-empty, we do not need to know if there's any 
+        // new approvers to whom an approvalrequest for this operation should be sent.
+        List approvedObjUpdateRequests = ((ArraySink) filteredApprovalRequestDAO
+          .where(foam.mlang.MLang.OR(
+            foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.APPROVED),
+            foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.REJECTED)
+          )).select(new ArraySink())).getArray();
+
+        if ( pendingRequests.size() > 0 && approvedObjUpdateRequests.size() == 0 ) 
+          throw new RuntimeException("There already exists approval requests for this operation");
 
         if ( approvedObjUpdateRequests.size() == 1 ) {
           ApprovalRequest fulfilledRequest = (ApprovalRequest) approvedObjUpdateRequests.get(0);
@@ -373,6 +447,8 @@ foam.CLASS({
           throw new RuntimeException("Something went wrong cannot have multiple approved/rejected requests for the same request!");
         }
 
+        updatedProperties.put("lastModified", lastModified);
+
         Approvable approvable = (Approvable) approvableDAO.put_(x, new Approvable.Builder(x)
           .setId(hashedId)
           .setDaoKey(getDaoKey())
@@ -385,10 +461,10 @@ foam.CLASS({
           .setObjId(approvable.getId())
           .setClassification(getOf().getObjClass().getSimpleName())
           .setOperation(Operations.UPDATE)
-          .setCreatedBy(((User) x.get("user")).getId())
+          .setCreatedBy(user.getId())
           .setStatus(ApprovalStatus.REQUESTED).build();
 
-        fullSend(x, approvalRequest, obj);
+        fullSend(x, approvalRequest, obj, approverIds);
 
         UserFeedbackAware feedbackAwareObj = (UserFeedbackAware) obj;
 

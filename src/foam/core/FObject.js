@@ -747,19 +747,19 @@ foam.CLASS({
       this.pub('propertyChange', prop.name, slot);
     },
 
-    function slot(obj) {
+    function slot(obj /*, argList if obj is a function */) {
       /**
        * Creates a Slot for an Axiom.
        */
       if ( typeof obj === 'function' ) {
         return foam.core.ExpressionSlot.create(
-            arguments.length === 1 ?
-                { code: obj, obj: this } :
-                {
-                  code: obj,
-                  obj: this,
-                  args: Array.prototype.slice.call(arguments, 1)
-                });
+          arguments.length === 1 ?
+            { code: obj, obj: this } :
+            {
+              code: obj,
+              obj: this,
+              args: Array.prototype.slice.call(arguments, 1)
+            });
       }
 
       if ( foam.Array.isInstance(obj) ) {
