@@ -40,7 +40,7 @@ public class AltIndex
     final Object[] sa = toObjectArray(state);
     Sink sink = new AbstractSink() {
       public void put(Object obj, foam.core.Detachable sub) {
-        sa[sa.length-1] = i.put(sa[sa.length-1], (FObject) obj);
+        sa[sa.length-1] = i.put(sa[sa.length-1], null, (FObject) obj);
       }
     };
 
@@ -63,21 +63,16 @@ public class AltIndex
     return s2;
   }
 
-  public Object put(Object state, FObject value) {
-    Object[] s = toObjectArray(state);
-
-    for ( int i = 0 ; i < delegates_.size() ; i++ )
-      s[i] = delegates_.get(i).put(s[i], value);
-
-    return s;
-  }
-
-  public Object update(Object state, FObject oldObject, FObject obj) {
+  public Object put(Object state, FObject oldValue, FObject newValue) {
     Object[] s = toObjectArray(state);
 
     for ( int i = 0 ; i < delegates_.size() ; i++ ) {
-      s[i] = delegates_.get(i).update(s[i], oldObject, obj);
+      s[i] = delegates_.get(i).put(s[i], oldValue, newValue);
+      if(s[i] instanceof String)
+        System.out.println('x');
     }
+
+
     return s;
   }
 

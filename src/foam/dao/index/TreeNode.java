@@ -63,7 +63,7 @@ public class TreeNode {
     if ( end < start ) return null;
 
     int m = start + (int) Math.floor((end-start+1)/2);
-    TreeNode tree = this.putKeyValue(this, prop, prop.f(a[m]), a[m], tail);
+    TreeNode tree = this.putKeyValue(this, prop, prop.f(a[m]), null, a[m], tail);
     tree.left  = (TreeNode) this.bulkLoad(tail, prop, start, m-1, a);
     tree.right = (TreeNode) this.bulkLoad(tail, prop, m+1, end, a);
     tree.size  = this.size(tree.left) + this.size(tree.right);
@@ -71,29 +71,29 @@ public class TreeNode {
     return tree;
   }
 
-  public TreeNode putKeyValue(TreeNode state, PropertyInfo prop, Object key, FObject value, Index tail) {
+  public TreeNode putKeyValue(TreeNode state, PropertyInfo prop, Object key, FObject oldValue, FObject newValue, Index tail) {
     if ( state == null || state.equals(TreeNode.getNullNode()) ) {
-      return new TreeNode(key, tail.put(null, value), 1, (byte) 1, null, null);
+      return new TreeNode(key, tail.put(null, oldValue, newValue), 1, (byte) 1, null, null);
     }
     state = maybeClone(state);
     int r = prop.comparePropertyToValue(key, state.key);
 
     if ( r == 0 ) {
       state.size -= tail.size(state.value);
-      state.value = tail.put(state.value, value);
+      state.value = tail.put(state.value, oldValue, newValue);
       state.size += tail.size(state.value);
     } else {
       if ( r < 0 ) {
         if ( state.left != null ) {
           state.size -= state.left.size;
         }
-        state.left = this.putKeyValue(state.left, prop, key, value, tail);
+        state.left = this.putKeyValue(state.left, prop, key, oldValue, newValue, tail);
         state.size += state.left.size;
       } else {
         if ( state.right != null ) {
           state.size -= state.right.size;
         }
-        state.right = this.putKeyValue(state.right, prop, key, value, tail);
+        state.right = this.putKeyValue(state.right, prop, key, oldValue, newValue, tail);
         state.size += state.right.size;
       }
     }
@@ -101,19 +101,25 @@ public class TreeNode {
     return split(skew(state, tail), tail);
   }
 
-  public Object update(TreeNode state, PropertyInfo prop, Object key, FObject oldValue, FObject newValue, Index tail) {
+  public TreeNode update(TreeNode state, PropertyInfo prop, Object key, FObject oldValue, FObject newValue, Index tail) {
     if ( state == null || state.equals(TreeNode.getNullNode()) )
       return state;
 
     int r = prop.comparePropertyToValue(key, state.key);
 
     if ( r == 0 ) {
-      state.value = tail.update(state.value, oldValue, newValue);
+      if (state == null || tail == null)
+        System.out.println('x');
+      state.value = tail.put(state.value, oldValue, newValue);
     } else {
       if ( r < 0 ) {
-        state.left =  (TreeNode)((TreeNode) state.left).update(state.left, prop, key, oldValue, newValue, tail);
+        if (state == null || state.left == null)
+          System.out.println('x');
+        state.left =  state.left.update(state.left, prop, key, oldValue, newValue, tail);
       } else {
-        state.right = (TreeNode)((TreeNode) state.right).update(state.right, prop, key, oldValue, newValue, tail);
+        if (state == null || state.right == null)
+          System.out.println('x');
+        state.right = state.right.update(state.right, prop, key, oldValue, newValue, tail);
       }
     }
     return state;

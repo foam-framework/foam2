@@ -16,10 +16,7 @@ import java.util.Set;
 
 public interface Index {
   // Add an object
-  public Object put(Object state, FObject value);
-
-  // Update an object
-  public Object update(Object state, FObject oldValue, FObject newValue);
+  public Object put(Object state, FObject oldValue, FObject newValue);
   
   // Remove an object
   public Object remove(Object state, FObject value);

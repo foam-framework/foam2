@@ -28,13 +28,8 @@ public class ValueIndex
   public void onAdd(Sink sink) {
   }
 
-  public Object put(Object state, FObject value) {
-    return value;
-  }
-
-  @Override
-  public Object update(Object state, FObject oldObj, FObject obj) {
-    return obj;
+  public Object put(Object state, FObject oldValue, FObject newValue) {
+    return newValue;
   }
 
   public Object remove(Object state, FObject value) {

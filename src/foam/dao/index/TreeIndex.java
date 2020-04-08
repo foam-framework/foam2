@@ -13,6 +13,8 @@ import foam.mlang.predicate.*;
 import foam.mlang.predicate.Binary;
 import foam.mlang.sink.Count;
 import foam.mlang.sink.GroupBy;
+import foam.util.SafetyUtil;
+
 import java.util.Arrays;
 import java.util.Set;
 
@@ -103,26 +105,18 @@ public class TreeIndex
     return new Object[]{state, predicate};
   }
 
-  public Object put(Object state, FObject value) {
-    if ( state == null ) state = TreeNode.getNullNode();
+  public Object put(Object state, FObject oldValue, FObject newValue) {
+
     Object key;
     try {
-      key = prop_.f(value);
+      key = prop_.f(newValue);
     } catch (ClassCastException e) {
       return state;
     }
 
-    return ((TreeNode) state).putKeyValue((TreeNode)state,
-      prop_, key, value, tail_);
-  }
-
-  @Override
-  public Object update(Object state, FObject oldValue, FObject newValue) {
-
-      Object key;
+    if ( oldValue != null ) {
       Object oldKey;
       try {
-        key = prop_.f(newValue);
         oldKey = prop_.f(oldValue);
       } catch (ClassCastException e) {
         return state;
@@ -131,9 +125,14 @@ public class TreeIndex
         state = ((TreeNode)state).update((TreeNode)state, prop_, key, oldValue, newValue, tail_);
       else {
         state =  remove(state, oldValue);
-        state =  put(state, newValue);
+        state =  ((TreeNode) state).putKeyValue((TreeNode)state,
+        prop_, key, null, newValue, tail_);
       }
-
+    } else {
+      if ( state == null ) state = TreeNode.getNullNode();
+      state =  ((TreeNode) state).putKeyValue((TreeNode)state,
+        prop_, key, null, newValue, tail_);
+    }
     return state;
   }
 

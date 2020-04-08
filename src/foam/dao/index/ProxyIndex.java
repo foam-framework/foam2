@@ -36,13 +36,8 @@ public class ProxyIndex
   }
 
   @Override
-  public Object put(Object state, FObject value) {
-    return wrap(getDelegate().put(unwrap(state), value));
-  }
-
-  @Override
-  public Object update(Object state,  FObject oldValue, FObject newValue) {
-    return getDelegate().update(state, oldValue, newValue);
+  public Object put(Object state, FObject oldValue, FObject newValue) {
+    return wrap(getDelegate().put(unwrap(state), oldValue, newValue));
   }
 
   @Override
