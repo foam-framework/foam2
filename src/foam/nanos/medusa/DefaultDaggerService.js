@@ -10,7 +10,7 @@ foam.CLASS({
 
   implements: [
     'foam.nanos.medusa.DaggerService',
-//    'foam.nanos.NanoService',
+    'foam.nanos.NanoService',
   ],
 
   documentation: `Manage global indexes and hashes`,
@@ -70,11 +70,6 @@ foam.CLASS({
       value: 'SHA-256'
     },
     {
-      name: 'initialized',
-      class: 'Boolean',
-      value: false
-    },
-    {
       name: 'logger',
       class: 'FObjectProperty',
       of: 'foam.nanos.logger.Logger',
@@ -90,15 +85,10 @@ foam.CLASS({
   methods: [
     {
       // TODO: get initial hashes from HSM for new deployment
-//      name: 'start',
-      name: 'initialize',
+      name: 'start',
       synchronized: true,
       javaCode: `
-      if ( getInitialized() ) {
-        return;
-      }
-      getLogger().debug("initialize");
-    try {
+      getLogger().debug("start");
       DAO dao = (DAO) getX().get("internalMedusaEntryDAO");
       Date date = Date.from(Instant.parse("2017-04-03T11:00:00.000Z")); // Kevin's first day
 
@@ -149,10 +139,6 @@ foam.CLASS({
           // nop
         }
       });
-      setInitialized(true);
-    } catch (java.security.DigestException | java.security.NoSuchAlgorithmException e) {
-      getLogger().error(e);
-    }
       `
     },
     {
@@ -208,7 +194,6 @@ foam.CLASS({
       ],
       type: 'foam.nanos.medusa.DaggerLinks',
       javaCode: `
-      initialize();
       return new DaggerLinks(
         x,
         getNextGlobalIndex(x),
@@ -255,7 +240,6 @@ foam.CLASS({
       ],
       type: 'Long',
       javaCode: `
-      initialize();
       if ( index > globalIndex_.get() ) {
         return globalIndex_.getAndSet(index);
       }
