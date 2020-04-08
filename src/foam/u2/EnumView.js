@@ -9,14 +9,6 @@ foam.CLASS({
   name: 'EnumView',
   extends: 'foam.u2.view.ChoiceView',
 
-  implements: [
-    'foam.mlang.Expressions'
-  ],
-
-  requires: [
-    'foam.nanos.auth.Permission'
-  ],
-
   imports: [
     'auth'
   ],
