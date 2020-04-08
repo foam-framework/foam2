@@ -173,7 +173,8 @@ foam.CLASS({
         if ( lifecycleObj.getLifecycleState() == LifecycleState.PENDING && currentObjectInDAO == null ){
           lifecycleObj.setLifecycleState(LifecycleState.ACTIVE);
         }
-        return super.put_(x,obj);
+        // only system/admin should have permission to change lifecycle state
+        return super.put_(getX(), obj);
       }
 
       // system and admins override the approval process
@@ -186,7 +187,7 @@ foam.CLASS({
           Object primaryKey = obj instanceof foam.core.Identifiable ? ((foam.core.Identifiable)obj).getPrimaryKey() : null;
           logger.warning("SYSTEM UPDATE - Not automatically setting LifecycleState from PENDING to ACTIVE for " + obj.getClass().getSimpleName() + ": " + primaryKey);
         }
-        return super.put_(x,obj);
+        return super.put_(getX(), obj);
       }
       
       Operations operation = lifecycleObj.getLifecycleState() == LifecycleState.DELETED ? Operations.REMOVE : 
@@ -315,12 +316,12 @@ foam.CLASS({
 
             if ( fulfilledRequest.getStatus() == ApprovalStatus.APPROVED ) {
               lifecycleObj.setLifecycleState(LifecycleState.ACTIVE);
-              return super.put_(x,obj);
+              return super.put_(getX(), obj);
             } 
 
             // create request has been rejected is only where we mark the object as REJECTED
             lifecycleObj.setLifecycleState(LifecycleState.REJECTED);
-            return super.put_(x,obj); 
+            return super.put_(getX(), obj);
           } 
           if ( approvedObjCreateRequests.size() > 1 ) {
             logger.error("Something went wrong cannot have multiple approved/rejected requests for the same request!");
