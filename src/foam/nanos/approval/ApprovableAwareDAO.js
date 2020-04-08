@@ -41,10 +41,7 @@ foam.CLASS({
     'java.util.Iterator',
     'java.util.List',
     'java.util.Map',
-    'java.util.Set',
-    'net.nanopay.liquidity.approvalRequest.AccountApprovableAware',
-    'net.nanopay.liquidity.ucjQuery.AccountUCJQueryService',
-    'net.nanopay.liquidity.ucjQuery.UCJQueryService'
+    'java.util.Set'
   ],
 
   properties: [
@@ -137,21 +134,8 @@ foam.CLASS({
         DAO requestingDAO = (DAO) x.get(getDaoKey());
 
         String modelName = requestingDAO.getOf().getObjClass().getSimpleName();
-        List<Long> approverIds = null;
-
-        // query for approvers based on whether or not the object is account-based
-        if ( obj instanceof AccountApprovableAware ) {
-          AccountUCJQueryService ucjQueryService = (AccountUCJQueryService) x.get("accountUcjQueryService");
-          AccountApprovableAware aaaObj = (AccountApprovableAware) obj;
-          Long outgoingAccount = operation == Operations.CREATE ? aaaObj.getOutgoingAccountCreate(x) : 
-                                 operation == Operations.UPDATE ? aaaObj.getOutgoingAccountUpdate(x) : 
-                                                                  aaaObj.getOutgoingAccountDelete(x);
-          
-          approverIds = ucjQueryService.getAllApprovers(getX(), modelName, outgoingAccount);
-        } else {
-          UCJQueryService ucjQueryService = (UCJQueryService) x.get("ucjQueryService");
-          approverIds = ucjQueryService.getAllApprovers(getX(), modelName);
-        }
+        UserQueryService userQueryService = (UserQueryService) x.get("userQueryService");
+        List<Long> approverIds = userQueryService.getAllApprovers(x, modelName);
           
         if ( approverIds == null || approverIds.size() <= 0 ) {
           logger.log("No Approvers exist for the model: " + modelName);
@@ -178,16 +162,22 @@ foam.CLASS({
       Logger logger = (Logger) x.get("logger");
 
       LifecycleAware lifecycleObj = (LifecycleAware) obj;
+
+      DAO approvalRequestDAO = (DAO) x.get("approvalRequestDAO");
+      DAO dao = (DAO) x.get(getDaoKey());
+
+      ApprovableAware approvableAwareObj = (ApprovableAware) obj;
+      FObject currentObjectInDAO = (FObject) dao.find(approvableAwareObj.getApprovableKey());
       
       if ( ! getIsEnabled() ){
-        if ( lifecycleObj.getLifecycleState() == LifecycleState.PENDING ){
+        if ( lifecycleObj.getLifecycleState() == LifecycleState.PENDING && currentObjectInDAO == null ){
           lifecycleObj.setLifecycleState(LifecycleState.ACTIVE);
         }
         return super.put_(x,obj);
       }
 
       // system and admins override the approval process
-      if ( user != null && ( user.getId() == User.SYSTEM_USER_ID || user.getGroup().equals("admin") || user.getGroup().equals("system") ) ) {
+      if ( currentObjectInDAO == null && user != null && ( user.getId() == User.SYSTEM_USER_ID || user.getGroup().equals("admin") || user.getGroup().equals("system") ) ) {
         if ( lifecycleObj.getLifecycleState() == LifecycleState.PENDING && user.getId() != User.SYSTEM_USER_ID ){
           lifecycleObj.setLifecycleState(LifecycleState.ACTIVE);
         } 
@@ -198,12 +188,6 @@ foam.CLASS({
         }
         return super.put_(x,obj);
       }
-
-      DAO approvalRequestDAO = (DAO) x.get("approvalRequestDAO");
-      DAO dao = (DAO) x.get(getDaoKey());
-
-      ApprovableAware approvableAwareObj = (ApprovableAware) obj;
-      FObject currentObjectInDAO = (FObject) dao.find(approvableAwareObj.getApprovableKey());
       
       Operations operation = lifecycleObj.getLifecycleState() == LifecycleState.DELETED ? Operations.REMOVE : 
         ( ( currentObjectInDAO == null || ((LifecycleAware) currentObjectInDAO).getLifecycleState() == LifecycleState.PENDING ) ? 
