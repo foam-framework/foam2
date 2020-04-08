@@ -32,9 +32,7 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.mlang.MLang',
     'foam.nanos.auth.User',
-    'foam.nanos.crunch.UserCapabilityJunction',
-    'net.nanopay.liquidity.crunch.ApproverLevel',
-    'net.nanopay.liquidity.crunch.GlobalLiquidCapability',
+    'foam.nanos.crunch.UserCapabilityJunction'
   ],
 
   methods: [

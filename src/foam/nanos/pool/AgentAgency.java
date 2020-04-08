@@ -4,11 +4,12 @@ import foam.core.Agency;
 import foam.core.ContextAgent;
 import foam.core.ContextAgentRunnable;
 import foam.core.X;
-
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class AgentAgency implements Agency {
+public class AgentAgency
+  implements Agency
+{
   Queue<Runnable> agents = new LinkedList<>();
 
   @Override

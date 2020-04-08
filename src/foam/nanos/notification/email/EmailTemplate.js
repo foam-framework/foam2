@@ -74,6 +74,7 @@ foam.CLASS({
       javaFactory: 'return getBody() != null ? getBody().getBytes(StandardCharsets.UTF_8) : null;'
     }
   ],
+
   methods: [
     {
       name: 'apply',

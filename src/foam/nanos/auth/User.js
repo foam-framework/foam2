@@ -15,6 +15,7 @@ foam.CLASS({
     'foam.nanos.auth.HumanNameTrait',
     'foam.nanos.auth.LastModifiedAware',
     'foam.nanos.auth.ServiceProviderAware',
+    'foam.nanos.auth.LifecycleAware',
     'foam.nanos.notification.Notifiable'
   ],
 
@@ -496,6 +497,13 @@ foam.CLASS({
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
       section: 'administrative'
+    },
+    {
+      class: 'foam.core.Enum',
+      of: 'foam.nanos.auth.LifecycleState',
+      name: 'lifecycleState',
+      value: foam.nanos.auth.LifecycleState.PENDING,
+      writePermissionRequired: true
     }
   ],
 
