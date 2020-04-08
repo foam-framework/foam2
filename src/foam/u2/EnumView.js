@@ -26,8 +26,8 @@ foam.CLASS({
     {
       name: 'permissionResults',
       expression: async function(of, permissioned) {
+        var results = [];
         if ( of ) {
-          var results = [];
           if ( permissioned ) {
             var model = of.name.toLowerCase();
             for ( var i = 0 ; i < of.VALUES.length ; i++ ) {
@@ -36,10 +36,8 @@ foam.CLASS({
               results.push([of.VALUES[i].label, permResult]);
             }
           }
-          return results;
-        } else {
-          return [];
         }
+        return results;
       }
     },
     {
@@ -79,8 +77,8 @@ foam.CLASS({
                 values.push([v, v.label]);
               }
             });
-            return values;
         }
+        return values;
       }).then((array) => {
         this.choices = array;
       });
