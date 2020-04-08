@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.Set;
 
 public interface Index {
-  // Add an object
+  // Add or update an object
   public Object put(Object state, FObject oldValue, FObject newValue);
   
   // Remove an object
