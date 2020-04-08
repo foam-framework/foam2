@@ -117,7 +117,7 @@ foam.CLASS({
         .start()
           .start('strong').add(this.TWO_FACTOR_NOTES_1).end()
           .start('a').addClass('app-link')
-            .attrs({ href: this.appConfig.supportEmail })
+            .attrs({ href: 'mailto:' + this.appConfig.supportEmail })
             .add(this.TWO_FACTOR_NOTES_2)
           .end()
         .end()
