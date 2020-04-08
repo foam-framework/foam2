@@ -27,14 +27,12 @@ foam.CLASS({
       name: 'permissionResults',
       expression: async function(of, permissioned) {
         var results = [];
-        if ( of ) {
-          if ( permissioned ) {
-            var model = of.name.toLowerCase();
-            for ( var i = 0 ; i < of.VALUES.length ; i++ ) {
-              var readPermission = model + '.read.' + of.VALUES[i].label.toLowerCase();
-              var permResult = await this.auth.check(null, readPermission);
-              results.push([of.VALUES[i].label, permResult]);
-            }
+        if ( of && permissioned ) {
+          var model = of.name.toLowerCase();
+          for ( var i = 0 ; i < of.VALUES.length ; i++ ) {
+            var readPermission = model + '.read.' + of.VALUES[i].label.toLowerCase();
+            var permResult = await this.auth.check(null, readPermission);
+            results.push([of.VALUES[i].label, permResult]);
           }
         }
         return results;
