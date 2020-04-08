@@ -81,7 +81,8 @@ foam.CLASS({
       ],
       javaCode: `
       ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
-//      getLogger().debug("execute");
+
+// TODO: Nodes don't need to ping anything, just useful for reporting and network graph - the ping time could be reduced.
 
       DAO dao = (DAO) x.get("localClusterConfigDAO");
       dao = dao.where(

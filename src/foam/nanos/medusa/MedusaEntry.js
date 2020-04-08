@@ -18,13 +18,13 @@ foam.CLASS({
   documentation: `Ledger entry.`,
 
   tableColumns: [
-    "id",
-    "nSpecName",
-    "index",
-    "index1",
-    "index2",
-    "hasConsensus",
-    "lastModified"
+    'id',
+    'nSpecName',
+    'index',
+    'index1',
+    'index2',
+    'hasConsensus',
+    'lastModified'
   ],
 
   constants: [

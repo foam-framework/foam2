@@ -99,7 +99,7 @@ foam.CLASS({
            ! service.getOnline(x) ||
            electoralService.getState() != ElectoralServiceState.IN_SESSION ) {
         getLogger().error("Reject put(), primary", service.getIsPrimary(), "status", "Offline", "state", electoralService.getState().getLabel(), obj);
-        throw new RuntimeException("Cluster not ready.");
+        throw new UnsupportedOperationException("Cluster not ready.");
       }
 
       ClusterConfig config = service.getConfig(x, service.getConfigId());

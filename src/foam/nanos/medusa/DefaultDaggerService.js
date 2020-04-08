@@ -10,7 +10,7 @@ foam.CLASS({
 
   implements: [
     'foam.nanos.medusa.DaggerService',
-    'foam.nanos.NanoService',
+//    'foam.nanos.NanoService',
   ],
 
   documentation: `Manage global indexes and hashes`,
@@ -23,10 +23,7 @@ foam.CLASS({
     'java.security.MessageDigest',
     'java.time.Instant',
     'java.util.concurrent.atomic.AtomicLong',
-    'java.util.concurrent.ThreadLocalRandom',
-    'java.util.Date',
-    'java.util.Random',
-    'java.util.UUID'
+    'java.util.Date'
   ],
 
   axioms: [
@@ -73,6 +70,11 @@ foam.CLASS({
       value: 'SHA-256'
     },
     {
+      name: 'initialized',
+      class: 'Boolean',
+      value: false
+    },
+    {
       name: 'logger',
       class: 'FObjectProperty',
       of: 'foam.nanos.logger.Logger',
@@ -88,39 +90,69 @@ foam.CLASS({
   methods: [
     {
       // TODO: get initial hashes from HSM for new deployment
-      name: 'start',
+//      name: 'start',
+      name: 'initialize',
+      synchronized: true,
       javaCode: `
+      if ( getInitialized() ) {
+        return;
+      }
+      getLogger().debug("initialize");
+    try {
       DAO dao = (DAO) getX().get("internalMedusaEntryDAO");
-      java.util.Random r = ThreadLocalRandom.current();
-      Date date = Date.from(Instant.parse("2017-01-01T00:00:00.000Z"));
+      Date date = Date.from(Instant.parse("2017-04-03T11:00:00.000Z")); // Kevin's first day
 
-      MedusaEntry entry = getX().create(MedusaEntry.class);
-      entry.setId(new UUID(r.nextLong(), r.nextLong()).toString());
+      MedusaEntry entry = new MedusaEntry();
       entry.setIndex(getNextGlobalIndex(getX()));
       entry.setIndex1(-1L);
       entry.setHash1("466c58623cd600209e95a981bad03e5d899ea6d6905cebee5ea0746bf16e1534");
       entry.setIndex2(-1L);
       entry.setHash2("9232622261b1df4dff84067b2df22ecae387162742626326216bf9b4d0d29a3f");
       entry.setHash(hash(getX(), entry));
+      entry.setHasConsensus(true);
       entry.setCreated(date);
       entry.setLastModified(date);
       entry.setLastModifiedBy(2L);
       entry = (MedusaEntry) dao.put_(getX(), entry);
+      getLogger().debug("start", "entry1", entry.getId());
       updateLinks(getX(), entry);
 
-      entry = getX().create(MedusaEntry.class);
-      entry.setId(new UUID(r.nextLong(), r.nextLong()).toString());
+      entry = new MedusaEntry();
       entry.setIndex(getNextGlobalIndex(getX()));
       entry.setIndex1(-1L);
       entry.setHash1("a651071e965f3c0e07cf9d09761e124a57f27dd75316a4c18079bc0e5accf9d2");
       entry.setIndex2(-1L);
       entry.setHash2("50c1071e836bdd4f2d4b5907bb6090fae6891d6cacdb70dcd72770bfd43dc814");
       entry.setHash(hash(getX(), entry));
+      entry.setHasConsensus(true);
       entry.setCreated(date);
       entry.setLastModified(date);
       entry.setLastModifiedBy(2L);
       entry = (MedusaEntry) dao.put_(getX(), entry);
+      getLogger().debug("start", "entry2", entry.getId());
       updateLinks(getX(), entry);
+
+      dao.select(new foam.dao.Sink() {
+        public void put(Object obj, foam.core.Detachable sub) {
+          getLogger().debug("select", obj);
+        }
+
+        public void remove(Object obj, foam.core.Detachable sub) {
+          // nop
+        }
+
+        public void eof() {
+          // nop
+        }
+
+        public void reset(foam.core.Detachable sub) {
+          // nop
+        }
+      });
+      setInitialized(true);
+    } catch (java.security.DigestException | java.security.NoSuchAlgorithmException e) {
+      getLogger().error(e);
+    }
       `
     },
     {
@@ -176,6 +208,7 @@ foam.CLASS({
       ],
       type: 'foam.nanos.medusa.DaggerLinks',
       javaCode: `
+      initialize();
       return new DaggerLinks(
         x,
         getNextGlobalIndex(x),
@@ -222,6 +255,7 @@ foam.CLASS({
       ],
       type: 'Long',
       javaCode: `
+      initialize();
       if ( index > globalIndex_.get() ) {
         return globalIndex_.getAndSet(index);
       }

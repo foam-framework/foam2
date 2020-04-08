@@ -335,6 +335,7 @@ var classes = [
   'foam.nanos.medusa.MedusaEntryReplayingDAO',
   'foam.nanos.medusa.MedusaEntryRoutingDAO',
   'foam.nanos.medusa.MedusaEntrySigningDAO',
+  'foam.nanos.medusa.MedusaEntryTestingDAO',
   'foam.nanos.medusa.MedusaEntryUniqueDAO',
   'foam.nanos.medusa.MedusaType',
   'foam.nanos.medusa.ReplayCmd',
