@@ -175,7 +175,6 @@ FOAM_FILES([
   { name: "foam/box/Remote" },
   { name: 'foam/u2/DeleteModal', flags: ['web'] },
   { name: 'foam/u2/ModalHeader', flags: ['web'] },
-  { name: 'foam/u2/ModalWrapper', flags: ['web'] },
   { name: 'foam/u2/ExportModal', flags: ['web'] },
   { name: 'foam/u2/MultiView' },
   { name: "foam/u2/AttrSlot" },
