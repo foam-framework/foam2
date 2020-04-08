@@ -14,12 +14,11 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.nanos.auth.GroupPermissionJunction'
+    'foam.nanos.auth.Permission'
   ],
 
   imports: [
-    'auth',
-    'groupPermissionJunctionDAO'
+    'auth'
   ],
 
   properties: [
@@ -29,16 +28,28 @@ foam.CLASS({
       required: true
     },
     {
+       class: 'Boolean',
+       name: 'permissioned',
+       value: false
+    },
+    {
       name: 'permissionResults',
-      expression: async function(of) {
+      expression: async function(of, permissioned) {
         if ( of ) {
-          var results = [];
-          for ( var i = 0; i < of.VALUES.length; i++ ) {
-            var readPermission = of.name.toLowerCase() + '.read.' + of.VALUES[i].label.toLowerCase();
-            var permResult = await this.auth.check(null, readPermission);
-            results.push([of.VALUES[i].label, permResult]);
+          if ( permissioned ) {
+            var results = [];
+            var model = of.name.toLowerCase();
+            for ( var i = 0; i < of.VALUES.length; i++ ) {
+              var readPermission = model + '.read.' + of.VALUES[i].label.toLowerCase();
+              var permResult = await this.auth.check(null, readPermission);
+              results.push([of.VALUES[i].label, permResult]);
+            }
+            return results;
+          } else {
+            return of.VALUES.map((v) => {
+              return [v, v.label];
+            });
           }
-          return results;
         } else {
           return [];
         }
@@ -61,17 +72,21 @@ foam.CLASS({
       this.permissionResults.then((array) => {
         var values = [];
         if ( this.of ) {
-          var hash = {};
-          for ( var i = 0; i < array.length; i+=1 ) {
-            hash[array[i]] = i;
-          }
-          this.of.VALUES.map((v) => {
-            var value = [v.label, true];
-            if ( hash.hasOwnProperty(value) ) {
-              values.push([v, v.label]);
+          if ( this.permissioned ) {
+            var hash = {};
+            for ( var i = 0; i < array.length; i+=1 ) {
+              hash[array[i]] = i;
             }
-          });
-          return values;
+            this.of.VALUES.map((v) => {
+              var value = [v.label, true];
+              if ( hash.hasOwnProperty(value) ) {
+                values.push([v, v.label]);
+              }
+            });
+            return values;
+          } else {
+            return array;
+          }
         }
       }).then((array) => {
         this.choices = array;
