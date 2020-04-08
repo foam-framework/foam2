@@ -226,7 +226,6 @@ foam.CLASS({
       this
         .addClass(this.myClass())
         .add(this.slot(function(mode, prop, prop$label) {
-          if ( mode === self.DisplayMode.HIDDEN ) return null;
 
           var errorSlot = prop.validateObj && prop.validationTextVisible ?
             this.data.slot(prop.validateObj) :
