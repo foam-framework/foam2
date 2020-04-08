@@ -54,7 +54,7 @@ foam.CLASS({
           throw new UnsupportedOperationException("Cluster command not supported on non-primary instance");
         }
         if ( electoralService.getState() != ElectoralServiceState.IN_SESSION ) {
-          throw new RuntimeException("Election in progress");
+          throw new IllegalStateException("Election in progress");
         }
 
         DAO dao = (DAO) y.get(request.getServiceName());

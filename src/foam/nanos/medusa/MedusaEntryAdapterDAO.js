@@ -102,8 +102,9 @@ foam.CLASS({
         throw new RuntimeException("Cluster not ready.");
       }
 
+      ClusterConfig config = service.getConfig(x, service.getConfigId());
       MedusaEntry entry = x.create(MedusaEntry.class);
-      entry.setMediator(service.getConfigName());
+      entry.setMediator(config.getName());
       entry.setNSpecName(getNSpec().getName());
       entry.setAction(op);
       entry.setData(obj);

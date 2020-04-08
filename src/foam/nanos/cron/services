@@ -4,14 +4,15 @@ p({
   "serve":true,
   "serviceScript":"""
     return new foam.dao.EasyDAO.Builder(x)
-      .setPm(true)
-      .setGuid(true)
       .setOf(foam.nanos.cron.Cron.getOwnClassInfo())
+      .setGuid(true)
+      .setCluster(false)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("cronjobs")
       .setDecorator(new foam.nanos.cron.CronScheduleDAO.Builder(x)
         .setDelegate(new foam.nanos.script.ScriptRunnerDAO(null))
         .build())
+      .setPm(true)
       .build();
   """,
   "client":"{\"of\":\"foam.nanos.cron.Cron\"}"

@@ -61,27 +61,31 @@ foam.CLASS({
       name: 'state',
       class: 'Enum',
       of: 'foam.nanos.medusa.ElectoralServiceState',
-      value: 'foam.nanos.medusa.ElectoralServiceState.ADJOURNED'
+      value: 'foam.nanos.medusa.ElectoralServiceState.ADJOURNED',
+      visibility: 'RO'
     },
     {
       name: 'electionTime',
       class: 'Long',
-      value: 0
+      value: 0,
+      visibility: 'RO'
     },
     {
       name: 'votes',
       class: 'Int',
-      value: 0
+      value: 0,
+      visibility: 'RO'
     },
     {
       name: 'currentSeq',
       class: 'Long',
-      value: 0
+      value: 0,
+      visibility: 'RO'
     },
     {
       name: 'winner',
       class: 'String',
-      value: ""
+      visibility: 'RO'
     },
     {
       name: 'threadPoolName',

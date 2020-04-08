@@ -115,11 +115,11 @@ foam.CLASS({
       if ( obj instanceof foam.nanos.session.Session ) {
         ((foam.nanos.session.Session) obj).setContext(null);
       }
-        //TODO: outputDelta has problem when output array. Fix bugs then use output delta.
-        // String record = ( old != null ) ?
-        //   outputter.stringifyDelta(old, obj) :
-        //   outputter.stringify(obj);
-        String record = outputter.stringify(obj);
+
+        String record = ( old != null ) ?
+          outputter.stringifyDelta(old, obj) :
+          outputter.stringify(obj);
+
         if ( foam.util.SafetyUtil.isEmpty(record) ||
             "{}".equals(record.trim()) ) {
           getLogger().debug("no changes", record);
@@ -144,12 +144,19 @@ foam.CLASS({
               getLogger().debug("from primary", service.getPrimaryConfigId(), "attempt", retryAttempt, result);
               return result;
           } else {
-              // getLogger().debug("Election in progress.", electoralService.getState().getLabel());
-              throw new RuntimeException("Election in progress.");
+            throw new IllegalStateException("Election in progress.");
           }
         } catch ( Throwable t ) {
+          if ( t instanceof UnsupportedOperationException ) {
+            // primary has changed
             getLogger().debug(t.getMessage());
-
+          } else if ( t instanceof IllegalStateException ) {
+            // election in progress
+            getLogger().debug(t.getMessage());
+          } else {
+            getLogger().error(t.getMessage(), t);
+            throw t;
+          }
             if ( getMaxRetryAttempts() > -1 &&
                  retryAttempt == getMaxRetryAttempts() ) {
               getLogger().debug("retryAttempt >= maxRetryAttempts", retryAttempt, getMaxRetryAttempts());
@@ -172,6 +179,9 @@ foam.CLASS({
               }
               if ( retryDelay > getMaxRetryDelay() ) {
                 retryDelay = 10;
+                if ( t instanceof UnsupportedOperationException ) {
+                  electoralService.dissolve(x);
+                }
               }
               getLogger().debug("retry attempt", retryAttempt, "delay", retryDelay);
               Thread.sleep(retryDelay);

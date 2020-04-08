@@ -127,6 +127,8 @@ FOAM_FILES([
   { name: "foam/nanos/medusa/ClusterConfigPingSink" },
   { name: "foam/nanos/medusa/ClusterConfigMonitor" },
   { name: "foam/nanos/medusa/ClusterConfigService" },
+  { name: "foam/nanos/medusa/ClusterHTTPBox" },
+  { name: "foam/nanos/medusa/ClusterHTTPReplyBox" },
   { name: "foam/nanos/medusa/ClusterServerDAO" },
   { name: "foam/nanos/medusa/DaggerService" },
   { name: "foam/nanos/medusa/DefaultDaggerService" },

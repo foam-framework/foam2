@@ -19,7 +19,7 @@ configuration for contacting the primary node.`,
 
   javaImports: [
     'foam.box.Box',
-    'foam.box.HTTPBox',
+//    'foam.box.HTTPBox',
     'foam.box.SessionClientBox',
     'foam.core.Agency',
     'foam.core.FObject',
@@ -514,7 +514,7 @@ configuration for contacting the primary node.`,
           .setDelegate(new PMBox.Builder(x)
             .setClassType(MedusaEntry.getOwnClassInfo())
             .setName("ClientDAO:"+sendClusterConfig.getName()+":"+getServiceName() +":"+receiveClusterConfig.getName())
-            .setDelegate(new HTTPBox.Builder(x)
+            .setDelegate(new ClusterHTTPBox.Builder(x)
               .setAuthorizationType(foam.box.HTTPAuthorizationType.BEARER)
               .setSessionID(sendClusterConfig.getSessionId())
               .setUrl(buildURL(x, serviceName, receiveClusterConfig))

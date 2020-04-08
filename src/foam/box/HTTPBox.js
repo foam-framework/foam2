@@ -188,7 +188,7 @@ protected class ResponseThread implements Runnable {
         // instead we will mutate replyBox and put it back after.
         var replyBox = msg.attributes.replyBox;
 
-        msg.attributes.replyBox = this.HTTPReplyBox.create();
+        msg.attributes.replyBox = this.getReplyBox();
 
         var payload = this.outputter.stringify(msg);
 
@@ -216,7 +216,7 @@ protected class ResponseThread implements Runnable {
       swiftCode: function() {/*
 let msg = msg!
 let replyBox = msg.attributes["replyBox"] as? foam_box_Box
-msg.attributes["replyBox"] = HTTPReplyBox_create()
+msg.attributes["replyBox"] = getReplyBox()
 
 var request = URLRequest(url: Foundation.URL(string: self.url)!)
 request.httpMethod = "POST"
@@ -262,7 +262,7 @@ try {
 
 
   // TODO: Clone message or something when it clones safely.
-  msg.getAttributes().put("replyBox", getX().create(foam.box.HTTPReplyBox.class));
+  msg.getAttributes().put("replyBox", getReplyBox());
 
 
   foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(getX()).setPropertyPredicate(new foam.lib.NetworkPropertyPredicate());
@@ -308,6 +308,19 @@ replyBox.send((foam.box.Message)responseMessage);
   replyBox.send(replyMessage);
 }
 `
+    },
+    {
+      name: 'getReplyBox',
+      type: 'foam.box.Box',
+      code: function() {
+        return this.HTTPReplyBox.create();
+      },
+      swiftCode: function() {/*
+      return HTTPReplyBox_create()
+                             */},
+      javaCode: `
+        return getX().create(foam.box.HTTPReplyBox.class);
+      `
     }
   ]
 });
