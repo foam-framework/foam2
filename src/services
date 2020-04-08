@@ -1,4 +1,4 @@
-p({"class":"foam.nanos.boot.NSpec", "name":"nSpecDAO",                           "serve":true,  "authenticate": false, "serviceClass":"foam.dao.ProxyDAO", "client":"{\"of\":\"foam.nanos.boot.NSpec\",\"cache\":true}"})
+p({"class":"foam.nanos.boot.NSpec", "name":"nSpecDAO",                           "serve":true,  "authenticate": false, "serviceClass":"foam.dao.ProxyDAO", "client":"{\"of\":\"foam.nanos.boot.NSpec\",\"cache\":true,\"ttlPurgeTime\":0,\"ttlSelectPurgeTime\": 25000}"})
 
 p({
   "class": "foam.nanos.boot.NSpec",
@@ -66,7 +66,6 @@ p({
     auth = new foam.nanos.auth.twofactor.TwoFactorAuthService.Builder(x)
       .setDelegate(auth)
       .build();
-    return auth;
     auth = new foam.nanos.auth.SystemAuthService.Builder(x)
       .setDelegate(auth)
       .build();
@@ -667,8 +666,8 @@ p({
       .setRuler(false)
       .build();
 
-    dao = new foam.dao.ValidatingDAO(x, dao);
     dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.ruler.Rule.NAME });
+    dao = new foam.dao.ValidatingDAO(x, dao);
 
     return dao;
   """,
@@ -959,7 +958,9 @@ p({
   "name":"googleApiCredentialsConfig",
   "lazy":false,
   "service": {
-    "class":"foam.nanos.export.GoogleApiCredentials"
+    "class":"foam.nanos.export.GoogleApiCredentials",
+    "port":64349,
+    "tokensFolderPath":"/tmp"
   },
   "documentation": "Service for setting authorization request parameters which are required in order to retrieve access token. To download credentials visit Google Developers Console"
 })
