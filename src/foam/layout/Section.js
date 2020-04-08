@@ -45,6 +45,11 @@ foam.CLASS({
       value: function(data$) {
         return foam.core.ConstantSlot.create({value: true});
       }
+    },
+    {
+      class: 'String',
+      name: 'fromClass',
+      documentation: 'The class name to which the section belongs to.'
     }
   ],
 
@@ -70,6 +75,7 @@ foam.CLASS({
       this.copyFrom(a);
       this.copyFrom({
         createIsAvailableFor: a.createIsAvailableFor.bind(a),
+        fromClass: a.sourceCls_.name,
         properties: cls.getAxiomsByClass(this.Property)
           .filter(p => p.section == a.name)
           .filter(p => ! p.hidden)

@@ -35,13 +35,15 @@ foam.CLASS({
     {
       class: 'String',
       name: 'icon'
+    },
+    {
+      class: 'Boolean',
+      name: 'onKey'
     }
   ],
 
   methods: [
     function initE() {
-      this.SUPER();
-  
       this.start()
         .addClass(this.myClass())
         .start({
@@ -53,7 +55,8 @@ foam.CLASS({
         .start(this.TextField, {
           type: this.type,
           data$: this.data$,
-          placeholder: this.placeholder
+          placeholder: this.placeholder,
+          onKey: this.onKey
         })
           .addClass(this.myClass('input'))
         .end()
