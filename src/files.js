@@ -406,6 +406,7 @@ FOAM_FILES([
   { name: "foam/swift/refines/Remote", flags: ['swift'] },
 
   { name: "foam/nanos/menu/DAOMenu2" },
+  { name: "foam/nanos/menu/MenuToolBar" },
 
   { name: "foam/box/LogBox" },
   { name: "foam/box/MultiDelegateBox" },
