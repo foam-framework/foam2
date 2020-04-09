@@ -111,20 +111,23 @@ foam.CLASS({
       // TODO: this needs to be really fast.
       name: 'put_',
       javaCode: `
-      MedusaEntry entry = (MedusaEntry) getDelegate().put_(x, obj);
+      MedusaEntry entry = (MedusaEntry) obj;
       getLogger().debug("put", getIndex(), entry.getIndex(), entry.getNode());
-      ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
 
       if ( entry.getIndex() <= getIndex() ) {
-        getLogger().info("put", "pre-lock", getIndex(), entry.getIndex(), entry.getNode(), "discarding");
+        getLogger().info("put", getIndex(), entry.getIndex(), entry.getNode(), "discarding");
         return entry;
       }
+
+      entry = (MedusaEntry) getDelegate().put_(x, entry);
+
+      ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
 
       Count count = (Count) getDelegate().where(
         EQ(MedusaEntry.INDEX, entry.getIndex())
       ).select(COUNT());
       if ( (Long)count.getValue() < service.getNodeQuorum(x) ) {
-        getLogger().info("put", getIndex(), entry.getIndex(), entry.getNode(), "waiting for node quorum");
+        getLogger().info("put", getIndex(), entry.getIndex(), entry.getNode(), "waiting for node quorum", count.getValue(), service.getNodeQuorum(x));
         return entry;
       }
 
