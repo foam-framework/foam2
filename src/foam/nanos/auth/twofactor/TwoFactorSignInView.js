@@ -7,126 +7,139 @@
 foam.CLASS({
   package: 'foam.nanos.auth.twofactor',
   name: 'TwoFactorSignInView',
-  extends: 'foam.u2.View',
+  extends: 'foam.u2.Controller',
 
   documentation: 'Two-Factor sign in view',
 
   imports: [
+    'appConfig',
     'loginSuccess',
-    'twofactor',
-    'user'
-  ],
-
-  exports: [
-    'as data'
-  ],
-
-  requires: [
-    'foam.u2.dialog.NotificationMessage'
+    'menuDAO',
+    'notify',
+    'stack',
+    'twofactor'
   ],
 
   css: `
     ^ {
-      width: 490px;
+      width: 500px;
       margin: auto;
+      margin-top: 20vh;
+    }
+    ^ .app-link {
+      text-decoration: none;
+      margin-left: 5px;
+    }
+    ^ .foam-u2-ActionView-verify {
+      width: 91%;
+      margin-top: 20px;
     }
     ^ .tfa-container {
-      padding-top: 20px;
-      width: 490px;
-      height: 150px;
       border-radius: 2px;
-      background-color: #ffffff;
+      margin-top: 26px;
     }
-    ^ p {
-      display: inline-block;
+    ^ .img-text {
+      display: flex;
     }
-    ^ .label {
-      height: 16px;
-      font-family: Roboto;
-      font-size: 14px;
-      font-weight: 300;
-      text-align: left;
-      color: /*%BLACK%*/ #1e1f21;
-      margin-bottom: 8px;
-      margin-left: 25px;
-    }
-    ^ .full-width-input {
+    ^ .img-text > p {
       width: 90%;
-      height: 40px;
-      margin-left: 5%;
-      margin-bottom: 15px;
-      outline: none;
-      padding: 10px;
+      margin: 20px;
     }
-    ^ .full-width-button {
-      width: 90%;
-      height: 40px;
-      border-radius: 2px;
-      border: solid 1px #59a5d5;
-      margin: 0 auto;
-      background-color: #59aadd;
-      text-align: center;
-      line-height: 40px;
-      cursor: pointer;
-      color: #ffffff;
-      margin-top: 10px;
-      margin-left: 25px;
-    }
-    ^ .full-width-button > span {
+    ^ .error-msg > span {
+      margin-left: 10px;
       position: relative;
-      top: -5px;
+      bottom: 3px;
     }
   `,
 
+  constants: [
+    { name: 'PHONE_IPHONE_IMAGE', value: 'images/phone-iphone-24-px.png' },
+    { name: 'ERROR_ICON', value: 'images/inline-error-icon.svg' }
+  ],
+
   properties: [
+    {
+      class: 'Boolean',
+      name: 'incorrectCode'
+    },
     {
       class: 'String',
       name: 'twoFactorToken',
+      view: function(_, X) {
+        return {
+          class: 'foam.u2.view.MultiBoxInputView',
+          incorrectCode$: X.data.incorrectCode$
+        };
+      }
     }
   ],
 
   messages: [
-    { name: 'TwoFactorNoTokenError', message: 'Please enter a verification token.' },
-    { name: 'TwoFactorSuccess', message: 'Login successful.' },
-    { name: 'TwoFactorError', message: 'Login failed. Please try again.' }
+    { name: 'TWO_FACTOR_NO_TOKEN', message: 'Please enter a verification code.' },
+    { name: 'TWO_FACTOR_LABEL', message: 'Enter verification code' },
+    { name: 'TWO_FACTOR_ERROR', message: 'Incorrect code. Please try again.' },
+    { name: 'TWO_FACTOR_TITLE', message: 'Two-factor authentication' },
+    { name: 'TWO_FACTOR_EXPLANATION', message: `Open your Google Authenticator app on your mobile device to view the 6-digit code and verify your identity` },
+    { name: 'TWO_FACTOR_NOTES_1', message: `Need another way to authenticate?` },
+    { name: 'TWO_FACTOR_NOTES_2', message: `Contact us` },
   ],
 
   methods: [
-    function initE() {
+    async function initE() {
       this.SUPER();
 
-      this
-        .addClass(this.myClass())
-        .start()
-          .start('h1').add('Two-Factor Authentication').end()
-          .start('form').addClass('tfa-container')
-            .start().addClass('label').add('Token').end()
-            .start(this.TWO_FACTOR_TOKEN).addClass('full-width-input').end()
-            .start(this.VERIFY).addClass('full-width-button').end()
+      this.start().addClass(this.myClass())
+        .start().addClass('tf-container')
+          .start('h2').add(this.TWO_FACTOR_TITLE).end()
+          .start().addClass('img-text')
+            .start('img').attr('src', this.PHONE_IPHONE_IMAGE).end()
+            .start('p').add(this.TWO_FACTOR_EXPLANATION).end()
           .end()
-        .end();
+          .start('form')
+            .addClass('tfa-container')
+            .start('label').add(this.TWO_FACTOR_LABEL).end()
+            .start()
+              .tag(this.TWO_FACTOR_TOKEN)
+              .start().addClass('error-msg').show( this.incorrectCode$ )
+                .start({
+                  class: 'foam.u2.tag.Image',
+                  data: this.ERROR_ICON,
+                  displayHeight: 16,
+                  displayWidth: 16
+                }).addClass('error-string')
+                .end()
+                .start('span').add(this.TWO_FACTOR_ERROR).end()
+              .end()
+            .end()
+            .tag(this.VERIFY)
+          .end()
+        .end()
+        .start()
+          .start('strong').add(this.TWO_FACTOR_NOTES_1).end()
+          .start('a').addClass('app-link')
+            .attrs({ href: 'mailto:' + this.appConfig.supportEmail })
+            .add(this.TWO_FACTOR_NOTES_2)
+          .end()
+        .end()
+      .end();
     }
   ],
 
   actions: [
     {
       name: 'verify',
+      isEnabled: function(twoFactorToken) {
+        return twoFactorToken.trim();
+      },
       code: function(X) {
-        var self = this;
-
-        if ( ! this.twoFactorToken ) {
-          this.add(this.NotificationMessage.create({ message: this.TwoFactorNoTokenError, type: 'error' }));
-          return;
-        }
-
         this.twofactor.verifyToken(null, this.twoFactorToken)
-        .then(function(result) {
+        .then((result) => {
           if ( result ) {
-            self.loginSuccess = true;
-            self.add(self.NotificationMessage.create({ message: self.TwoFactorSuccess }));
+            this.menuDAO.cmd_(X, foam.dao.CachingDAO.PURGE);
+            this.loginSuccess = true;
           } else {
-            self.loginSuccess = false;
-            self.add(self.NotificationMessage.create({ message: self.TwoFactorError, type: 'error' }));
+            this.incorrectCode = true;
+            this.loginSuccess = false;
           }
         });
       }
