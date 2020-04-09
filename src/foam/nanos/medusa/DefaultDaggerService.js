@@ -99,12 +99,7 @@ foam.CLASS({
       entry.setIndex2(-1L);
       entry.setHash2("9232622261b1df4dff84067b2df22ecae387162742626326216bf9b4d0d29a3f");
       entry.setHash(hash(getX(), entry));
-      entry.setHasConsensus(true);
-      entry.setCreated(date);
-      entry.setLastModified(date);
-      entry.setLastModifiedBy(2L);
       entry = (MedusaEntry) dao.put_(getX(), entry);
-      getLogger().debug("start", "entry1", entry.getId());
       updateLinks(getX(), entry);
 
       entry = new MedusaEntry();
@@ -114,31 +109,8 @@ foam.CLASS({
       entry.setIndex2(-1L);
       entry.setHash2("50c1071e836bdd4f2d4b5907bb6090fae6891d6cacdb70dcd72770bfd43dc814");
       entry.setHash(hash(getX(), entry));
-      entry.setHasConsensus(true);
-      entry.setCreated(date);
-      entry.setLastModified(date);
-      entry.setLastModifiedBy(2L);
       entry = (MedusaEntry) dao.put_(getX(), entry);
-      getLogger().debug("start", "entry2", entry.getId());
       updateLinks(getX(), entry);
-
-      dao.select(new foam.dao.Sink() {
-        public void put(Object obj, foam.core.Detachable sub) {
-          getLogger().debug("select", obj);
-        }
-
-        public void remove(Object obj, foam.core.Detachable sub) {
-          // nop
-        }
-
-        public void eof() {
-          // nop
-        }
-
-        public void reset(foam.core.Detachable sub) {
-          // nop
-        }
-      });
       `
     },
     {
