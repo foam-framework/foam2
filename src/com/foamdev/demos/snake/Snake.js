@@ -5,6 +5,7 @@
  */
 
 foam.CLASS({
+  package: 'foam.movement',
   name: 'Movement',
   methods: [
     function animate(t, f) {
@@ -129,16 +130,16 @@ foam.CLASS({
         y: -0.5,
         width: 15,
         height: 20,
-        background: 'gray'
+        color: 'gray'
       }));
     },
 
     function explode() {
       this.stem.background = 'red';
       this.movement.animate(200, function() {
-        this.scaleX = this.scaleY = 30;
-        this.alpha = 0;
-        this.a = Math.PI * 1.5;
+        this.scaleX     = this.scaleY = 30;
+        this.alpha      = 0;
+        this.a          = Math.PI * 1.5;
         this.stem.alpha = 0;
       }.bind(this)/*, function() { this.table.removeChild(o2); }.bind(this)*/)();
     }
@@ -179,7 +180,7 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   requires: [
-    'Movement',
+    'foam.movement.Movement',
     'foam.util.Timer',
     'com.google.foam.demos.robot.Robot',
     'com.foamdev.demos.snake.Laser',
@@ -187,7 +188,7 @@ foam.CLASS({
     'com.foamdev.demos.snake.Mushroom',
     'com.foamdev.demos.snake.Food',
     'foam.graphics.CView',
-    'foam.graphics.Rectangle',
+    'foam.graphics.Box as Rectangle',
     'foam.physics.Collider'
   ],
 
@@ -218,8 +219,11 @@ foam.CLASS({
     {
       name: 'table',
       factory: function() {
-        return this.CView.create({background: 'lightblue', width: window.innerWidth, height: window.innerHeight}).add(
-          this.snake);
+        return this.Rectangle.create({
+          color: 'lightblue',
+          width: window.innerWidth,
+          height: window.innerHeight
+        }).add(this.snake);
       }
     },
     {
