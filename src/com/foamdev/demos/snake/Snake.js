@@ -6,10 +6,88 @@
 
 foam.CLASS({
   package: 'foam.movement',
-  name: 'Movement',
+  name: 'Animation',
+
+  properties: [
+    {
+      class: 'Int',
+      name: 'duration',
+      units: 'ms',
+      value: 1000
+    },
+    {
+      name: 'f',
+    },
+    {
+      class: 'Array',
+      name: 'objs'
+    },
+    {
+      name: 'onEnd',
+      value: function() {}
+    },
+    {
+      name: 'startTime_'
+    },
+    {
+      class: 'Map',
+      name: 'slots_'
+    }
+  ],
+
   methods: [
-    function animate(t, f) {
-      return f;
+    function start() {
+      var self    = this;
+      var cleanup = foam.core.FObject.create();
+
+      this.objs.forEach(function(o) {
+        cleanup.onDetach(o.propertyChange.sub(self.propertySet));
+      });
+
+      this.f();
+
+      cleanup.detach();
+
+      this.startTime_ = Date.now();
+
+      this.animateValues();
+      this.tick();
+    },
+
+    function animateValues() {
+      for ( var key in this.slots_ ) {
+        var s = this.slots_[key];
+        var slot = s[0], startValue = s[1], endValue = s[2];
+        var completion = Math.min(1, (Date.now() - this.startTime_) / this.duration);
+        var value = startValue + (endValue-startValue) * completion;
+        slot.set(value);
+      }
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'propertySet',
+      code: function(_, __, __, slot) {
+        if ( this.slots_[slot] ) return;
+
+        var oldValue = slot.getPrev(), newValue = slot.get();
+
+        this.slots_[slot] = [ slot, oldValue, newValue ];
+      }
+    },
+    {
+      name: 'tick',
+      isFramed: true,
+      code: function() {
+        this.animateValues();
+
+        if ( Date.now() < this.startTime_ + this.duration ) {
+          this.tick();
+        } else {
+          this.onEnd();
+        }
+      }
     }
   ]
 });
@@ -89,7 +167,7 @@ foam.CLASS({
   name: 'Food',
   extends: 'foam.graphics.Circle',
 
-  imports: [ 'movement' ],
+  requires: [ 'foam.movement.Animation' ],
 
   properties: [
     [ 'color', 'darkblue' ],
@@ -100,10 +178,17 @@ foam.CLASS({
     function init() {
       this.SUPER();
 
+      this.Animation.create({
+        duration: 5000,
+        f: ()=> this.radius = 0,
+        objs: [this]
+      }).start();
+      /*
       this.movement.animate(15000, function() {
         // TODO:
-        //this.radius = 0;
-      }.bind(this))();
+        this.radius = 0;
+      }.bind(this), this)();
+      */
     }
   ]
 });
@@ -240,7 +325,7 @@ foam.CLASS({
     {
       name: 'tick',
       code: function(_, __, ___, t) {
-        if ( t.get() % 100 == 0 ) this.addFood();
+        if ( t.get() % 10 == 0 ) this.addFood();
         if ( Math.random() < 0.02 ) this.addMushroom();
       }
     }
@@ -352,9 +437,12 @@ foam.CLASS({
         scaleX: 0.1,
         scaleY: 0.1});
 
+        /*
+        TODO
       this.movement.animate(7000, function() {
         m.scaleX = m.scaleY = 1;
       })();
+      */
 
       this.addChild(m);
     }
