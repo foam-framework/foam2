@@ -116,8 +116,10 @@ foam.CLASS({
   imports: [ 'R as r', 'movement' ],
 
   properties: [
+    [ 'radius', 20 ],
     [ 'color',    'red' ],
-    [ 'endAngle', Math.PI ],
+    [ 'start', Math.PI ],
+    [ 'end', 0 ],
     'stem'
   ],
 
