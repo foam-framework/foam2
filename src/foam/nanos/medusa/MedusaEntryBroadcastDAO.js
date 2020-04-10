@@ -9,6 +9,7 @@ foam.CLASS({
   name: 'MedusaEntryBroadcastDAO',
   extends: 'foam.dao.ProxyDAO',
 
+  // TODO: Pass off to threadpool for broadcast so calling thread (mediator) can return.
   documentation: `Broadcast MedusaEntrys back to Mediators.`,
 
   javaImports: [
