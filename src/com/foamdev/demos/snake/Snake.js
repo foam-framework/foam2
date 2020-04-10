@@ -402,7 +402,7 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this.focus();
-      this.add(this.table);
+      this.style({display:'inline'}).add(this.table);
     },
 
     function gameOver() {
