@@ -118,6 +118,7 @@ foam.CLASS({
   package: 'foam.movement',
   name: 'Animation',
 
+  // TODO: add support for interpolating colours
   properties: [
     {
       class: 'Int',
@@ -166,10 +167,10 @@ foam.CLASS({
 
     function animateValues() {
       for ( var key in this.slots_ ) {
-        var s = this.slots_[key];
-        var slot = s[0], startValue = s[1], endValue = s[2];
+        var s          = this.slots_[key];
+        var slot       = s[0], startValue = s[1], endValue = s[2];
         var completion = Math.min(1, (Date.now() - this.startTime_) / this.duration);
-        var value = startValue + (endValue-startValue) * completion;
+        var value      = startValue + (endValue-startValue) * completion;
         slot.set(value);
       }
     }
@@ -182,6 +183,8 @@ foam.CLASS({
         if ( this.slots_[slot] ) return;
 
         var oldValue = slot.getPrev(), newValue = slot.get();
+
+        if ( ! foam.Number.isInstance(oldValue) || Number.isNaN(oldValue) ) return;
 
         this.slots_[slot] = [ slot, oldValue, newValue ];
       }
@@ -279,6 +282,8 @@ foam.CLASS({
 
   requires: [ 'foam.movement.Animation' ],
 
+  imports: [ 'game' ],
+
   properties: [
     [ 'color', 'darkblue' ],
     [ 'radius', 10 ]
@@ -291,14 +296,9 @@ foam.CLASS({
       this.Animation.create({
         duration: 5000,
         f: ()=> this.radius = 0,
+        onEnd: () => this.game.removeChild(this),
         objs: [this]
       }).start();
-      /*
-      this.movement.animate(15000, function() {
-        // TODO:
-        this.radius = 0;
-      }.bind(this), this)();
-      */
     }
   ]
 });
@@ -308,23 +308,25 @@ foam.CLASS({
   package: 'com.foamdev.demos.snake',
   name: 'Mushroom',
   extends: 'foam.graphics.Circle',
-  requires: [ 'foam.graphics.Box as Rectangle' ],
 
-  imports: [ 'R as r', 'movement' ],
+  requires: [ 'foam.graphics.Box', 'foam.movement.Animation' ],
+
+  imports: [ 'game' ],
 
   properties: [
     [ 'radius', 20 ],
-    [ 'color',    'red' ],
-    [ 'start', Math.PI ],
-    [ 'end', 0 ],
-    'stem'
+    [ 'color',  'red' ],
+    [ 'start',  Math.PI ],
+    [ 'end',    0 ],
+    'stem',
+    [ 'exploded', false ]
   ],
 
   methods: [
     function init() {
       this.SUPER();
 
-      this.add(this.stem = this.Rectangle.create({
+      this.add(this.stem = this.Box.create({
         x: -7.5,
         y: -0.5,
         width: 15,
@@ -334,13 +336,22 @@ foam.CLASS({
     },
 
     function explode() {
+      if ( this.exploded ) return;
+      this.exploded = true;
+
       this.stem.background = 'red';
-      this.movement.animate(200, function() {
-        this.scaleX     = this.scaleY = 30;
-        this.alpha      = 0;
-        this.a          = Math.PI * 1.5;
-        this.stem.alpha = 0;
-      }.bind(this)/*, function() { this.table.removeChild(o2); }.bind(this)*/)();
+
+      this.Animation.create({
+        duration: 600,
+        f: ()=> {
+          this.scaleX     = this.scaleY = 10;
+          this.alpha      = 0;
+          this.rotation   = Math.PI * 6;
+        },
+        onEnd: () => this.game.removeChild(this),
+        slots: [ this.scaleX$, this.scaleY$, this.alpha$, this.rotation$ ],
+        objs: [this, this.stem]
+      }).start();
     }
   ]
 });
@@ -372,6 +383,7 @@ foam.CLASS({
           this.x += 2000 * this.vx;
           this.y += 2000 * this.vy;
         },
+        onEnd: () => this.game.removeChild(this),
         objs: [ this ]
       }).start();
     }
@@ -435,7 +447,7 @@ foam.CLASS({
           color: 'lightblue',
           width: 800, //window.innerWidth,
           height: 500, //window.innerHeight
-        }).add(this.snake);
+        });
       }
     },
     {
@@ -465,10 +477,10 @@ foam.CLASS({
 //      this.gamepad.pressed.sub('button1', () => robot.x+=10);
       this.gamepad.pressed.sub(function() { console.log('pressed', arguments); });
 
-      this.table.add(this.robot);
+      this.addChild(this.robot);
+      this.addChild(this.snake);
 
       // Setup Physics
-      this.collider.add(this.snake);
       this.collider.collide = function(o1, o2) {
         if ( this.Laser.isInstance(o2) || this.Snake.isInstance(o2) ) {
           var tmp = o1;
@@ -510,16 +522,16 @@ foam.CLASS({
 
     function addChild(c) {
       this.table.add(c);
-      // TODO
-     // if ( c.intersects ) this.collider.add(c);
+      if ( c.intersects ) this.collider.add(c);
     },
 
     function removeChild(c) {
-      this.table.removeChild(c);
+      this.table.remove(c);
       if ( c.intersects ) this.collider.remove(c);
     },
 
     function addFood() {
+return;
       var R = this.R;
       var f = this.Food.create({
         x: Math.round(1+Math.random()*(this.table.width -4*R)/R)*2*R,
@@ -533,8 +545,8 @@ foam.CLASS({
       var m = this.Mushroom.create({
         x: Math.round(1+Math.random()*(this.table.width -4*R)/R)*2*R,
         y: Math.round(1+Math.random()*(this.table.height-4*R)/R)*2*R,
-        scaleX: 0.1,
-        scaleY: 0.1});
+        scaleX: 1,
+        scaleY: 1});
 
         /*
         TODO
