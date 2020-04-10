@@ -350,11 +350,13 @@ foam.CLASS({
   package: 'com.foamdev.demos.snake',
   name: 'Laser',
   extends: 'foam.graphics.Circle',
-  imports: [ 'game', 'movement' ],
+
+  requires: [ 'foam.movement.Animation' ],
+  imports: [ 'game'],
 
   properties: [
     [ 'color', 'yellow' ],
-    [ 'r', 12 ],
+    [ 'radius', 12 ],
     'vx',
     'vy'
   ],
@@ -363,11 +365,15 @@ foam.CLASS({
     function init() {
       this.SUPER();
 
-      this.game.add(this);
-      this.movement.animate(5000, function() {
-        this.x += 2000 * this.vx;
-        this.y += 2000 * this.vy;
-      }.bind(this))();
+      this.game.addChild(this);
+      this.Animation.create({
+        duration: 5000,
+        f: () => {
+          this.x += 2000 * this.vx;
+          this.y += 2000 * this.vy;
+        },
+        objs: [ this ]
+      }).start();
     }
   ]
 });
@@ -376,7 +382,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'com.foamdev.demos.snake',
   name: 'Game',
-  extends: 'foam.u2.View',
+  extends: 'foam.u2.Element',
 
   requires: [
     'com.foamdev.demos.snake.Food',
@@ -444,50 +450,6 @@ foam.CLASS({
     }
   ],
 
-  listeners: [
-    {
-      name: 'tick',
-      code: function(_, __, ___, t) {
-        if ( this.gamepad.button0 ) this.robot.y-=3;
-        if ( this.gamepad.button1 ) this.robot.x+=3;
-        if ( this.gamepad.button2 ) this.robot.y+=3;
-        if ( this.gamepad.button3 ) this.robot.x-=3;
-        if ( this.gamepad.button5 || this.gamepad.button4 ) this.fire();
-
-        if ( t.get() % 10 == 0 ) this.addFood();
-        if ( Math.random() < 0.02 ) this.addMushroom();
-      }
-    }
-  ],
-
-  actions: [
-    {
-      name: 'up',
-      keyboardShortcuts: [ 38 /* up arrow */, 'w' ],
-      code: function() { this.snake.up(); }
-    },
-    {
-      name: 'down',
-      keyboardShortcuts: [ 40 /* down arrow */, 's' ],
-      code: function() { this.snake.down(); }
-    },
-    {
-      name: 'left',
-      keyboardShortcuts: [ 37 /* left arrow */, 'a' ],
-      code: function() { this.snake.left(); }
-    },
-    {
-      name: 'right',
-      keyboardShortcuts: [ 39 /* right arrow */, 'd' ],
-      code: function() { this.snake.right(); }
-    },
-    {
-      name: 'fire',
-      keyboardShortcuts: [ ' ', 'x' ],
-      code: function() { this.snake.fire(); }
-    }
-  ],
-
   methods: [
     function init() {
       this.SUPER();
@@ -496,6 +458,9 @@ foam.CLASS({
 
       this.timer.i$.sub(this.tick);
       this.timer.start();
+
+      this.gamepad.pressed.sub('button4', () => this.fire());
+      this.gamepad.pressed.sub('button5', () => this.fire());
 
 //      this.gamepad.pressed.sub('button1', () => robot.x+=10);
       this.gamepad.pressed.sub(function() { console.log('pressed', arguments); });
@@ -579,6 +544,49 @@ foam.CLASS({
       */
 
       this.addChild(m);
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'tick',
+      code: function(_, __, ___, t) {
+        if ( this.gamepad.button0 ) this.robot.y -= 3;
+        if ( this.gamepad.button1 ) this.robot.x += 3;
+        if ( this.gamepad.button2 ) this.robot.y += 3;
+        if ( this.gamepad.button3 ) this.robot.x -= 3;
+
+        if ( t.get() % 10 == 0 ) this.addFood();
+        if ( Math.random() < 0.02 ) this.addMushroom();
+      }
+    }
+  ],
+
+  actions: [
+    {
+      name: 'up',
+      keyboardShortcuts: [ 38 /* up arrow */, 'w' ],
+      code: function() { this.snake.up(); }
+    },
+    {
+      name: 'down',
+      keyboardShortcuts: [ 40 /* down arrow */, 's' ],
+      code: function() { this.snake.down(); }
+    },
+    {
+      name: 'left',
+      keyboardShortcuts: [ 37 /* left arrow */, 'a' ],
+      code: function() { this.snake.left(); }
+    },
+    {
+      name: 'right',
+      keyboardShortcuts: [ 39 /* right arrow */, 'd' ],
+      code: function() { this.snake.right(); }
+    },
+    {
+      name: 'fire',
+      keyboardShortcuts: [ ' ', 'x' ],
+      code: function() { this.snake.fire(); }
     }
   ]
 });
