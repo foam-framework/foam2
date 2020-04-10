@@ -131,9 +131,9 @@ foam.CLASS({
     );
     pool_.allowCoreThreadTimeOut(true);
 
-     ClusterConfigService service = (ClusterConfigService) getX().get("clusterConfigService");
+     ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
 
-    ((Agency) getX().get(service.getThreadPoolName())).submit(getX(), this, "election");
+    ((Agency) getX().get(support.getThreadPoolName())).submit(getX(), this, "election");
      `
     },
     {
@@ -218,9 +218,9 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       DAO dao = (DAO) x.get("localClusterConfigDAO");
-      return (ClusterConfig) dao.find_(x, service.getConfigId());
+      return (ClusterConfig) dao.find_(x, support.getConfigId());
       `
     },
     {
@@ -303,16 +303,16 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
-      ClusterConfig config = service.getConfig(x, service.getConfigId());
-      List voters = service.getVoters(x);
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      ClusterConfig config = support.getConfig(x, support.getConfigId());
+      List voters = support.getVoters(x);
 
-      if ( voters.size() < service.getMediatorQuorum(x) ) {
+      if ( voters.size() < support.getMediatorQuorum(x) ) {
         // nothing to do.
-        getLogger().warning("callVote", "waiting for mediator quorum", voters.size(), service.getMediatorQuorum(x));
+        getLogger().warning("callVote", "waiting for mediator quorum", voters.size(), support.getMediatorQuorum(x));
         return;
       }
-      getLogger().debug("callVote", "achieved mediator quorum", voters.size(), service.getMediatorQuorum(x));
+      getLogger().debug("callVote", "achieved mediator quorum", voters.size(), support.getMediatorQuorum(x));
  
       ThreadPoolExecutor pool = pool_;
       List<Callable<Long>> voteCallables = new ArrayList<>();
@@ -379,8 +379,8 @@ foam.CLASS({
     {
       name: 'vote',
       javaCode: `
-      ClusterConfigService service = (ClusterConfigService) getX().get("clusterConfigService");
-      ClusterConfig config = service.getConfig(getX(), service.getConfigId());
+      ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
+      ClusterConfig config = support.getConfig(getX(), support.getConfigId());
       long v = -1L;
 
       getLogger().debug("vote", id, time, getElectionTime(), getState().getLabel(), config.getStatus().getLabel());
@@ -435,9 +435,9 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      ClusterConfigService service = (ClusterConfigService) getX().get("clusterConfigService");
-      ClusterConfig config = service.getConfig(x, service.getConfigId());
-      List voters = service.getVoters(getX());
+      ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
+      ClusterConfig config = support.getConfig(x, support.getConfigId());
+      List voters = support.getVoters(getX());
       try {
         synchronized ( electionLock_ ) {
           if ( ! ( getState() == ElectoralServiceState.ELECTION &&
@@ -504,12 +504,12 @@ foam.CLASS({
     {
       name: 'report',
       javaCode: `
-      ClusterConfigService service = (ClusterConfigService) getX().get("clusterConfigService");
-      service.setPrimaryConfigId(winner);
-      service.setIsPrimary(service.getConfigId().equals(winner));
+      ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
+      support.setPrimaryConfigId(winner);
+      support.setIsPrimary(support.getConfigId().equals(winner));
 
       DAO dao = (DAO) getX().get("localClusterConfigDAO");
-      List voters = service.getVoters(getX());
+      List voters = support.getVoters(getX());
       for (int i = 0; i < voters.size(); i++) {
         ClusterConfig config = (ClusterConfig) ((ClusterConfig) voters.get(i)).fclone();
         if ( winner.equals(config.getId()) &&
@@ -529,7 +529,7 @@ foam.CLASS({
         setState(ElectoralServiceState.IN_SESSION);
       }
 
-      getLogger().debug("report", service.getConfigId(), winner, getState().getLabel(), "primary", service.getPrimaryConfigId());
+      getLogger().debug("report", support.getConfigId(), winner, getState().getLabel(), "primary", support.getPrimaryConfigId());
      `
     }
   ]

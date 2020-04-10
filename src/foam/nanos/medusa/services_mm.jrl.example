@@ -1,0 +1,126 @@
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "clusterConfigMonitor",
+  "lazy": false,
+  "service": {"class":"foam.nanos.medusa.ClusterConfigMonitor"}
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"electoralService",
+  "serve":true,
+  "boxClass":"foam.nanos.medusa.ElectoralServiceSkeleton",
+  "authenticate": true,
+  "serviceClass":"foam.nanos.medusa.ElectoralServiceServer",
+  "client":"{ \"class\":\"foam.nanos.medusa.ClientElectoralService\" }"
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "testingMedusaEntryDAO",
+  "serve": true,
+  "serviceScript": `
+    dao = new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.medusa.MedusaEntry.getOwnClassInfo())
+      .setGuid(true)
+      .setAuthorize(false)
+      .setCluster(false)
+      .setRuler(false)
+      .setOrder(new foam.mlang.order.Comparator[] {
+        new foam.mlang.order.Desc.Builder(x).setArg1(foam.nanos.medusa.MedusaEntry.INDEX).build()
+      })
+      .build();
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] {
+      foam.nanos.medusa.MedusaEntry.INDEX
+    });
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] {
+      foam.nanos.medusa.MedusaEntry.HASH
+    });
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] {
+      foam.nanos.medusa.MedusaEntry.HAS_CONSENSUS
+    });
+    return dao;
+  `,
+  "client": "{\"of\":\"foam.nanos.medusa.MedusaEntry\"}"
+})
+
+// NOTE: see MedusaEntryInternalDAO for access to this DAO.
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "internalMedusaEntryDAO",
+  "serviceScript": `
+    dao = new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.medusa.MedusaEntry.getOwnClassInfo())
+      .setGuid(true)
+      .setAuthorize(false)
+      .setCluster(false)
+      .setRuler(false)
+// NOTE: if enabling the TestingDAO, comment out 'cleanup' in ConsensusDAO
+//      .setDecorator(new foam.nanos.medusa.MedusaEntryTestingDAO.Builder(x).build())
+      .setOrder(new foam.mlang.order.Comparator[] {
+        new foam.mlang.order.Desc.Builder(x).setArg1(foam.nanos.medusa.MedusaEntry.INDEX).build()
+      })
+      .build();
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] {
+      foam.nanos.medusa.MedusaEntry.INDEX
+    });
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] {
+      foam.nanos.medusa.MedusaEntry.HASH
+    });
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] {
+      foam.nanos.medusa.MedusaEntry.HAS_CONSENSUS
+    });
+    return dao;
+   `
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "localMedusaEntryDAO",
+  "serviceScript": `
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.medusa.MedusaEntry.getOwnClassInfo())
+      .setAuthorize(false)
+      .setCluster(false)
+      .setRuler(false)
+      .setPm(true)
+      .setDecorator(new foam.nanos.medusa.MedusaEntryReplayingDAO.Builder(x)
+      .setDelegate(new foam.nanos.medusa.MedusaEntryLinkDAO.Builder(x)
+      .setDelegate(new foam.nanos.medusa.MedusaEntryBlockingDAO.Builder(x)
+      .setDelegate(new foam.nanos.medusa.MedusaEntryDistributionDAO.Builder(x)
+      .setDelegate(new foam.nanos.medusa.MedusaEntryInternalDAO.Builder(x)
+        .setDelegate(new foam.dao.NullDAO(x, foam.nanos.medusa.MedusaEntry.getOwnClassInfo()))
+        .build())
+//      .setDelegate((foam.dao.DAO) x.get("internalMedusaEntryDAO"))
+      .build())
+      .build())
+      .build())
+      .build())
+      .build();
+   `
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "medusaEntryDAO",
+  "serve": true,
+  "serviceScript": `
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.medusa.MedusaEntry.getOwnClassInfo())
+      .setCluster(false)
+      .setRuler(false)
+      .setPm(true)
+//      .setDecorator(new foam.nanos.medusa.MedusaEntryAgencyDAO.Builder(x)
+      .setDecorator(new foam.nanos.medusa.MedusaEntryConsensusDAO.Builder(x)
+      .setDelegate(new foam.nanos.medusa.MedusaEntryRoutingDAO.Builder(x)
+//      .setDelegate((foam.dao.DAO) x.get("internalMedusaEntryDAO"))
+      .setDelegate(new foam.nanos.medusa.MedusaEntryInternalDAO.Builder(x)
+        .setDelegate(new foam.dao.NullDAO(x, foam.nanos.medusa.MedusaEntry.getOwnClassInfo()))
+        .build())
+      .build())
+      .build())
+//      .build())
+      .build()
+   `,
+  "client": "{\"of\":\"foam.nanos.medusa.MedusaEntry\"}"
+})

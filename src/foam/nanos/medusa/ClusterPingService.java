@@ -25,8 +25,8 @@ public class ClusterPingService
   public ClusterPingService() {}
 
   public void execute(X x) {
-    ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
-    ClusterConfig config = service.getConfig(x, service.getConfigId());
+    ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+    ClusterConfig config = support.getConfig(x, support.getConfigId());
     PrintWriter out = x.get(PrintWriter.class);
     foam.lib.json.Outputter outputter =
       new foam.lib.json.Outputter(x)

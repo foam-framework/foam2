@@ -73,18 +73,18 @@ foam.CLASS({
         ReplayCmd cmd = (ReplayCmd) obj;
         getLogger().debug("cmd", cmd);
 
-        ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
-        ClusterConfig fromConfig = service.getConfig(x, cmd.getResponder());
-        ClusterConfig toConfig = service.getConfig(x, cmd.getRequester());
-        DAO clientDAO = service.getClientDAO(x, cmd.getServiceName(), fromConfig, toConfig);
+        ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+        ClusterConfig fromConfig = support.getConfig(x, cmd.getResponder());
+        ClusterConfig toConfig = support.getConfig(x, cmd.getRequester());
+        DAO clientDAO = support.getClientDAO(x, cmd.getServiceName(), fromConfig, toConfig);
         getDelegate().where(
           GTE(MedusaEntry.INDEX, cmd.getFromIndex())
         )
         .orderBy(MedusaEntry.INDEX)
         .select(new RetryClientSinkDAO.Builder(x)
           .setDelegate(clientDAO)
-          .setMaxRetryAttempts(service.getMaxRetryAttempts())
-          .setMaxRetryDelay(service.getMaxRetryDelay())
+          .setMaxRetryAttempts(support.getMaxRetryAttempts())
+          .setMaxRetryDelay(support.getMaxRetryDelay())
           .build());
 
         return cmd;

@@ -10,6 +10,10 @@ foam.CLASS({
 
   documentation: 'NOTE: do not start with cronjob. This process starts the ClusterConfigPinkSing which polls the Mediators and Nodes and will initiate Replay, and Elections.',
 
+  axioms: [
+    foam.pattern.Singleton.create()
+  ],
+
   implements: [
     'foam.core.ContextAgent',
     'foam.nanos.NanoService'
@@ -71,10 +75,10 @@ foam.CLASS({
       documentation: 'Start as a NanoService',
       name: 'start',
       javaCode: `
-      ClusterConfigService service = (ClusterConfigService) getX().get("clusterConfigService");
+      ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
       Timer timer = new Timer(this.getClass().getSimpleName());
       timer.scheduleAtFixedRate(
-        new AgencyTimerTask(getX(), service.getThreadPoolName(), this),
+        new AgencyTimerTask(getX(), support.getThreadPoolName(), this),
         getInitialTimerDelay(),
         getTimerInterval());
       `
@@ -97,7 +101,7 @@ foam.CLASS({
         setIsRunning(true);
       }
 
-      ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
 
 // TODO: Nodes don't need to ping anything, just useful for reporting and network graph - the ping time could be reduced.
 
@@ -105,15 +109,15 @@ foam.CLASS({
       dao = dao.where(
         AND(
           EQ(ClusterConfig.ENABLED, true),
-          NOT(EQ(ClusterConfig.ID, service.getConfigId()))
+          NOT(EQ(ClusterConfig.ID, support.getConfigId()))
         ));
       dao.select(new ClusterConfigPingSink(x, dao, getPingTimeout()));
 
-      ClusterConfig config = service.getConfig(x, service.getConfigId());
+      ClusterConfig config = support.getConfig(x, support.getConfigId());
       if ( config.getType() == MedusaType.MEDIATOR ) {
         ElectoralService electoralService = (ElectoralService) getX().get("electoralService");
         if ( electoralService != null ) {
-          if ( ! service.hasQuorum(x) ) {
+          if ( ! support.hasQuorum(x) ) {
             if ( electoralService.getState() == ElectoralServiceState.IN_SESSION ||
                  electoralService.getState() == ElectoralServiceState.ADJOURNED) {
               getLogger().warning(this.getClass().getSimpleName(), "lost quorum");

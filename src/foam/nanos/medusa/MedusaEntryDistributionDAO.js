@@ -58,7 +58,7 @@ foam.CLASS({
 //      MedusaEntry entry = (MedusaEntry) ((DaggerService) x.get("daggerService")).internal().put_(x, obj);
       getLogger().debug("put", entry.getIndex());
 
-      ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
 
       List<ClusterConfig> arr = (ArrayList) ((ArraySink) ((DAO) x.get("localClusterConfigDAO"))
         .where(
@@ -76,11 +76,11 @@ foam.CLASS({
             try {
               DAO dao = (DAO) getClients().get(config.getId());
               if ( dao == null ) {
-                DAO clientDAO = service.getClientDAO(x, "medusaEntryDAO", config, config);
+                DAO clientDAO = support.getClientDAO(x, "medusaEntryDAO", config, config);
                 dao = new RetryClientSinkDAO.Builder(x)
                         .setDelegate(clientDAO)
-                        .setMaxRetryAttempts(service.getMaxRetryAttempts())
-                        .setMaxRetryDelay(service.getMaxRetryDelay())
+                        .setMaxRetryAttempts(support.getMaxRetryAttempts())
+                        .setMaxRetryDelay(support.getMaxRetryDelay())
                         .build();
                 getClients().put(config.getId(), dao);
               }

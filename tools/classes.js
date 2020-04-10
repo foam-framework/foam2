@@ -309,7 +309,7 @@ var classes = [
   'foam.nanos.medusa.ClusterConfig',
   'foam.nanos.medusa.ClusterConfigPingSink',
   'foam.nanos.medusa.ClusterConfigMonitor',
-  'foam.nanos.medusa.ClusterConfigService',
+  'foam.nanos.medusa.ClusterConfigSupport',
   'foam.nanos.medusa.ClusterHTTPBox',
   'foam.nanos.medusa.ClusterHTTPReplyBox',
   'foam.nanos.medusa.ClusterServerDAO',

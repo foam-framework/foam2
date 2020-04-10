@@ -73,14 +73,14 @@ foam.CLASS({
       ],
       javaCode: `
       DaggerService dagger = (DaggerService) getX().get("daggerService");
-      ClusterConfigService service = (ClusterConfigService) getX().get("clusterConfigService");
-      ClusterConfig myConfig = service.getConfig(getX(), service.getConfigId());
+      ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
+      ClusterConfig myConfig = support.getConfig(getX(), support.getConfigId());
       ClusterConfig config = (ClusterConfig) obj;
       PingService ping = (PingService) getX().get("ping");
 
       try {
         Long latency = ping.ping(getX(), config.getId(), config.getPort(), getTimeout());
-        config = (ClusterConfig) service.getConfig(getX(), config.getId()).fclone();
+        config = (ClusterConfig) support.getConfig(getX(), config.getId()).fclone();
         config.setPingLatency(latency);
         if ( config.getStatus() != Status.ONLINE) {
           getLogger().info(config.getName(), config.getType().getLabel(), config.getStatus().getLabel(), "->", "ONLINE");
@@ -95,11 +95,11 @@ foam.CLASS({
                config.getRegion() == myConfig.getRegion() &&
                config.getRealm() == myConfig.getRealm() ) {
 
-            DAO clientDAO = service.getClientDAO(getX(), "medusaEntryDAO", myConfig, config);
+            DAO clientDAO = support.getClientDAO(getX(), "medusaEntryDAO", myConfig, config);
             clientDAO = new RetryClientSinkDAO.Builder(getX())
               .setDelegate(clientDAO)
-              .setMaxRetryAttempts(service.getMaxRetryAttempts())
-              .setMaxRetryDelay(service.getMaxRetryDelay())
+              .setMaxRetryAttempts(support.getMaxRetryAttempts())
+              .setMaxRetryDelay(support.getMaxRetryDelay())
               .build();
 
             ReplayDetailsCmd details = new ReplayDetailsCmd();

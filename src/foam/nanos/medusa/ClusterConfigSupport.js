@@ -6,10 +6,9 @@
 
 foam.CLASS({
   package: 'foam.nanos.medusa',
-  // TODO: rename to Support
-  name: 'ClusterConfigService',
+  name: 'ClusterConfigSupport',
 
-  documentation: `Service from which an instance may inquire it\'s
+  documentation: `Support service from which an instance may inquire it\'s
 cluster type - such as primary. It also provides access to
 configuration for contacting the primary node.`,
 

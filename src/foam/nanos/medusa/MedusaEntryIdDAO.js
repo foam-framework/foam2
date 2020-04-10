@@ -46,8 +46,8 @@ foam.CLASS({
       java.util.Random r = ThreadLocalRandom.current();
       entry.setId(new UUID(r.nextLong(), r.nextLong()).toString());
 
-      ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
-      ClusterConfig config = service.getConfig(x, service.getConfigId());
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      ClusterConfig config = support.getConfig(x, support.getConfigId());
       entry.setNode(config.getName());
 
       return (MedusaEntry) getDelegate().put_(x, entry);

@@ -223,13 +223,13 @@ foam.CLASS({
         // otherwise, only on ONLINE, non-Node instances.
         String startScript = System.getProperty("foam.main", "main");
         if ( ! getId().equals(startScript) ) {
-          foam.nanos.medusa.ClusterConfigService service = (foam.nanos.medusa.ClusterConfigService) x.get("clusterConfigService");
-          if ( service != null ) {
+          foam.nanos.medusa.ClusterConfigSupport support = (foam.nanos.medusa.ClusterConfigSupport) x.get("clusterConfigSupport");
+          if ( support != null ) {
             // TODO: considering how to only run on one of the secondaries, could be largest secondary.
-            if ( ! service.getIsPrimary() ) {
+            if ( ! support.getIsPrimary() ) {
               return;
             }
-            foam.nanos.medusa.ClusterConfig config = service.getConfig(x, service.getConfigId());
+            foam.nanos.medusa.ClusterConfig config = support.getConfig(x, support.getConfigId());
             if ( config.getType() == foam.nanos.medusa.MedusaType.NODE ||
                  config.getStatus() != foam.nanos.medusa.Status.ONLINE ) {
               return;

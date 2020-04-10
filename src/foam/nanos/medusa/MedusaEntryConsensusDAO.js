@@ -118,13 +118,13 @@ foam.CLASS({
 
       entry = (MedusaEntry) getDelegate().put_(x, entry);
 
-      ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
 
       // Count count = (Count) getDelegate().where(
       //   EQ(MedusaEntry.INDEX, entry.getIndex())
       // ).select(COUNT());
-      // if ( (Long)count.getValue() < service.getNodeQuorum(x) ) {
-      //   getLogger().info("put", getIndex(), entry.getIndex(), entry.getNode(), "waiting for node quorum", count.getValue(), service.getNodeQuorum(x));
+      // if ( (Long)count.getValue() < support.getNodeQuorum(x) ) {
+      //   getLogger().info("put", getIndex(), entry.getIndex(), entry.getNode(), "waiting for node quorum", count.getValue(), support.getNodeQuorum(x));
       //   return entry;
       // }
 
@@ -166,7 +166,7 @@ foam.CLASS({
         return getDelegate().cmd_(x, obj);
       }
 
-      ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
 
       ReplayDetailsCmd cmd = (ReplayDetailsCmd) obj;
       getLogger().debug("cmd", cmd);
@@ -178,8 +178,8 @@ foam.CLASS({
       }
 
       // if no replay data, then replay complete.
-      getLogger().debug("cmd", "replayNodes", getReplayNodes().size(), "node quorum", service.getNodeQuorum(x), "replayIndex", getReplayIndex(), "index", getIndex());
-      if ( getReplayNodes().size() >= service.getNodeQuorum(x) &&
+      getLogger().debug("cmd", "replayNodes", getReplayNodes().size(), "node quorum", support.getNodeQuorum(x), "replayIndex", getReplayIndex(), "index", getIndex());
+      if ( getReplayNodes().size() >= support.getNodeQuorum(x) &&
            getReplayIndex() <= getIndex() ) {
         getLogger().debug("cmd", "replayComplete");
         replayComplete(x);
@@ -248,7 +248,7 @@ foam.CLASS({
       javaCode: `
       getLogger().debug("consensus", entry.getIndex());
 
-      ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       String hash = null;
       long max = 0L;
 
@@ -264,7 +264,7 @@ foam.CLASS({
         }
       }
 
-      if ( max >= service.getNodeQuorum(x) ) {
+      if ( max >= support.getNodeQuorum(x) ) {
         // TODO: consider reporting the split if groups > 1
 
         List<MedusaEntry> list = (ArrayList) ((ArraySink) getDelegate().where(
@@ -298,8 +298,8 @@ foam.CLASS({
       name: 'start',
       javaCode: `
       getLogger().debug("start");
-      ClusterConfigService service = (ClusterConfigService) getX().get("clusterConfigService");
-      ((Agency) getX().get(service.getThreadPoolName())).submit(getX(), this, "Consensus Promoter");
+      ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
+      ((Agency) getX().get(support.getThreadPoolName())).submit(getX(), this, "Consensus Promoter");
       `
     },
     {
@@ -355,9 +355,9 @@ foam.CLASS({
       javaCode: `
       getLogger().debug("replayComplete");
       setReplaying(false);
-      ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
-      service.setStatus(Status.ONLINE);
-      service.setIsReplaying(false);
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      support.setStatus(Status.ONLINE);
+      support.setIsReplaying(false);
       ((DAO) x.get("localMedusaEntryDAO")).cmd(new ReplayCompleteCmd());
       `
     }

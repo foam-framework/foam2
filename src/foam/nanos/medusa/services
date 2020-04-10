@@ -42,9 +42,9 @@ p({
 
 p({
   "class": "foam.nanos.boot.NSpec",
-  "name": "clusterConfigService",
+  "name": "clusterConfigSupport",
   "serve": true,
-  "service": {"class":"foam.nanos.medusa.ClusterConfigService"}
+  "service": {"class":"foam.nanos.medusa.ClusterConfigSupport"}
 })
 
 p({

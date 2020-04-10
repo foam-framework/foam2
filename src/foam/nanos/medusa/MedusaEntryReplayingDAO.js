@@ -136,9 +136,9 @@ foam.CLASS({
           replayingLock_.notifyAll();
 
           // Replay complete - bring instance ONLINE. 
-          ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
-          service.setStatus(Status.ONLINE);
-          service.setIsReplaying(false);
+          ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+          support.setStatus(Status.ONLINE);
+          support.setIsReplaying(false);
         }
         return obj;
       } else if ( obj instanceof MedusaEntry ) {

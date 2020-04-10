@@ -103,8 +103,8 @@ foam.CLASS({
       javaType: 'foam.core.FObject',
       javaCode: `
       ElectoralService electoralService = (ElectoralService) x.get("electoralService");
-      ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
-      getLogger().debug(op, electoralService.getState().getLabel(), service.getStatus().getLabel());
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      getLogger().debug(op, electoralService.getState().getLabel(), support.getStatus().getLabel());
       foam.core.FObject old = null;
       if ( ClusterCommand.PUT == op ) {
         old = getDelegate().find_(x, obj.getProperty("id"));
@@ -133,15 +133,15 @@ foam.CLASS({
         // NOTE: set context to null after init so it's not marshalled across network
         cmd.setX(null);
 
-        while ( service != null &&
-                ! service.getIsPrimary() ) {
+        while ( support != null &&
+                ! support.getIsPrimary() ) {
         try {
           if ( electoralService.getState() == ElectoralServiceState.IN_SESSION ) {
-              getLogger().debug("to primary", service.getPrimaryConfigId(), "attempt", retryAttempt, cmd);
+              getLogger().debug("to primary", support.getPrimaryConfigId(), "attempt", retryAttempt, cmd);
               PM pm = new PM(ClusterClientDAO.getOwnClassInfo(), getServiceName());
-              FObject result = (FObject) service.getPrimaryDAO(x, getClusterServiceName()).cmd_(x, cmd);
+              FObject result = (FObject) support.getPrimaryDAO(x, getClusterServiceName()).cmd_(x, cmd);
               pm.log(x);
-              getLogger().debug("from primary", service.getPrimaryConfigId(), "attempt", retryAttempt, result);
+              getLogger().debug("from primary", support.getPrimaryConfigId(), "attempt", retryAttempt, result);
               return result;
           } else {
             throw new IllegalStateException("Election in progress.");
@@ -192,7 +192,7 @@ foam.CLASS({
             }
           }
         }
-        if ( service != null ) {
+        if ( support != null ) {
           getLogger().debug("primary delegating");
           if ( ClusterCommand.PUT == op ) {
             return getDelegate().put_(x, obj);
@@ -203,9 +203,9 @@ foam.CLASS({
           getLogger().error("Unsupported operation", op);
           throw new UnsupportedOperationException(op);
         } else {
-          // service is null.
-          getLogger().warning("ClusterConfigService not found, operation discarded.", obj);
-          throw new RuntimeException("ClusterConfigService not found, operation discarded.");
+          // support is null.
+          getLogger().warning("ClusterConfigSupport not found, operation discarded.", obj);
+          throw new RuntimeException("ClusterConfigSupport not found, operation discarded.");
         }
       `
     },

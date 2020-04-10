@@ -94,8 +94,8 @@ foam.CLASS({
       getLogger().debug("submit", obj.getClass().getName());
 
       ElectoralService electoralService = (ElectoralService) x.get("electoralService");
-      ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
-      ClusterConfig config = service.getConfig(x, service.getConfigId());
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      ClusterConfig config = support.getConfig(x, support.getConfigId());
       if ( ! config.getIsPrimary() ||
            config.getStatus() != Status.ONLINE  ||
            electoralService.getState() != ElectoralServiceState.IN_SESSION ) {

@@ -39,8 +39,8 @@ foam.CLASS({
       MedusaEntry entry = (MedusaEntry) obj;
       getLogger().debug("put", entry.getIndex());
       ContextAgent agent = new MedusaEntryAgent(x, entry, getDelegate());
-      ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
-      ((Agency) x.get(service.getThreadPoolName())).submit(x, agent, "MedusaEntryAgent-"+entry.getMediator()+"-"+entry.getNode()+"-"+Long.toString(entry.getIndex()));
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      ((Agency) x.get(support.getThreadPoolName())).submit(x, agent, "MedusaEntryAgent-"+entry.getMediator()+"-"+entry.getNode()+"-"+Long.toString(entry.getIndex()));
       return entry;
       `
     }

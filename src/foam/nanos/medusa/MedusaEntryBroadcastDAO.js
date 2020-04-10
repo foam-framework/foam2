@@ -58,8 +58,8 @@ foam.CLASS({
       MedusaEntry entry = (MedusaEntry) getDelegate().put_(x, obj);
       getLogger().debug("put", entry.getIndex());
 
-      ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
-      ClusterConfig myConfig = service.getConfig(x, service.getConfigId());
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
 // TODO: move this to property and update on daoupdate. 
       List<ClusterConfig> arr = (ArrayList) ((ArraySink) ((DAO) x.get("localClusterConfigDAO"))
         .where(
@@ -81,11 +81,11 @@ foam.CLASS({
               // TODO: clear map onDAOUpdate, this doesn't cache miss.
 //              DAO dao = (DAO) getClients().get(config.getId());
 //              if ( dao == null ) {
-                DAO clientDAO = service.getClientDAO(x, "medusaEntryDAO", config, config);
+                DAO clientDAO = support.getClientDAO(x, "medusaEntryDAO", config, config);
                 DAO dao = new RetryClientSinkDAO.Builder(x)
                         .setDelegate(clientDAO)
-                        .setMaxRetryAttempts(service.getMaxRetryAttempts())
-                        .setMaxRetryDelay(service.getMaxRetryDelay())
+                        .setMaxRetryAttempts(support.getMaxRetryAttempts())
+                        .setMaxRetryDelay(support.getMaxRetryDelay())
                         .build();
 //                getClients().put(config.getId(), dao);
 //              }
