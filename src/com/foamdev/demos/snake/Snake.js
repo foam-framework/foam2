@@ -5,6 +5,116 @@
  */
 
 foam.CLASS({
+  package: 'foam.input',
+  name: 'Gamepad',
+
+  imports: [ 'timer' ],
+
+  topics: [ 'pressed' ],
+
+  properties: [
+    {
+      name: 'id',
+      value: 0
+    },
+    { class: 'Boolean', name: 'button0' },
+    { class: 'Boolean', name: 'button1' },
+    { class: 'Boolean', name: 'button2' },
+    { class: 'Boolean', name: 'button3' },
+    { class: 'Boolean', name: 'button4' },
+    { class: 'Boolean', name: 'button5' },
+    { class: 'Boolean', name: 'button6' },
+    { class: 'Boolean', name: 'button7' },
+    { class: 'Boolean', name: 'button8' },
+    { class: 'Boolean', name: 'button9' }
+  ],
+
+  methods: [
+    function init() {
+      if ( this.timer ) this.timer.i$.sub(this.update);
+    }
+  ],
+
+  listeners: [
+    function update() {
+      var gp = navigator.getGamepads()[this.id];
+      if ( gp ) {
+        for ( var i = 0 ; i < 10 ; i++ ) {
+          var pressed = gp.buttons[i].pressed;
+          var button  = 'button' + i;
+          if ( pressed && ! this[button] ) {
+            this.pressed.pub(button);
+          }
+          this[button] = pressed;
+        }
+      } else {
+        for ( var i = 0 ; i < 10 ; i++ ) {
+          this['button' + i] = false;
+        }
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.foamdev.demos.snake',
+  name: 'Question1',
+  properties: [
+    {
+      name: 'question',
+      label: 'Who was the best Star Wars robot?',
+      view: {
+        class: 'foam.u2.view.ChoiceView',
+        class: 'foam.u2.view.RadioView',
+        placeholder: 'Please select',
+        choices: [
+          'C3-PO',
+          'R2-D2',
+          'BB-8',
+          'K-2SO'
+        ]
+      }
+    },
+    {
+      name: 'answer',
+      hidden: true,
+      value: 'R2-D2'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'com.foamdev.demos.snake',
+  name: 'Question2',
+  properties: [
+    {
+      name: 'question',
+      label: 'Which of the following do robots make',
+      view: {
+        class: 'foam.u2.view.ChoiceView',
+//        class: 'foam.u2.view.RadioView',
+        placeholder: 'Please select',
+        choices: [
+          'Cars',
+          'Washing Machines',
+          'Computers',
+          'Robots',
+          'All of the Above'
+
+        ]
+      }
+    },
+    {
+      name: 'answer',
+      hidden: true,
+      value: 'All of the Above'
+    }
+  ]
+});
+
+
+foam.CLASS({
   package: 'foam.movement',
   name: 'Animation',
 
@@ -269,16 +379,19 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   requires: [
-    'foam.movement.Movement',
-    'foam.util.Timer',
-    'com.google.foam.demos.robot.Robot',
-    'com.foamdev.demos.snake.Laser',
-    'com.foamdev.demos.snake.Snake',
-    'com.foamdev.demos.snake.Mushroom',
     'com.foamdev.demos.snake.Food',
-    'foam.graphics.CView',
+    'com.foamdev.demos.snake.Laser',
+    'com.foamdev.demos.snake.Mushroom',
+    'com.foamdev.demos.snake.Question1',
+    'com.foamdev.demos.snake.Question2',
+    'com.foamdev.demos.snake.Snake',
+    'com.google.foam.demos.robot.Robot',
     'foam.graphics.Box as Rectangle',
-    'foam.physics.Collider'
+    'foam.graphics.CView',
+    'foam.input.Gamepad',
+    'foam.movement.Movement',
+    'foam.physics.Collider',
+    'foam.util.Timer'
   ],
 
   exports: [
@@ -291,6 +404,10 @@ foam.CLASS({
   constants: { R: 20 },
 
   properties: [
+    {
+      name: 'gamepad',
+      factory: function() { return this.Gamepad.create(); }
+    },
     {
       name: 'movement',
       factory: function() { return this.Movement.create(); }
@@ -316,6 +433,12 @@ foam.CLASS({
       }
     },
     {
+      name: 'robot',
+      factory: function() {
+        return this.Robot.create({x:200, y:200});
+      }
+    },
+    {
       name: 'collider',
       factory: function() { return this.Collider.create(); }
     }
@@ -325,6 +448,12 @@ foam.CLASS({
     {
       name: 'tick',
       code: function(_, __, ___, t) {
+        if ( this.gamepad.button0 ) this.robot.y-=3;
+        if ( this.gamepad.button1 ) this.robot.x+=3;
+        if ( this.gamepad.button2 ) this.robot.y+=3;
+        if ( this.gamepad.button3 ) this.robot.x-=3;
+        if ( this.gamepad.button5 || this.gamepad.button4 ) this.fire();
+
         if ( t.get() % 10 == 0 ) this.addFood();
         if ( Math.random() < 0.02 ) this.addMushroom();
       }
@@ -368,7 +497,10 @@ foam.CLASS({
       this.timer.i$.sub(this.tick);
       this.timer.start();
 
-      this.table.add(this.Robot.create({x:200, y:200}));
+//      this.gamepad.pressed.sub('button1', () => robot.x+=10);
+      this.gamepad.pressed.sub(function() { console.log('pressed', arguments); });
+
+      this.table.add(this.robot);
 
       // Setup Physics
       this.collider.add(this.snake);
@@ -402,7 +534,7 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this.focus();
-      this.style({display:'inline'}).add(this.table);
+      this.style({display:'flex'}).add(this.table).add(this.Question2.create());
     },
 
     function gameOver() {
