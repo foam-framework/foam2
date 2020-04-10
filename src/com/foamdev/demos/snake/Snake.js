@@ -120,7 +120,7 @@ foam.CLASS({
 //    { name: 'scales', factory: function() { return []; } },
     [ 'sx', 240 ],
     [ 'sy', 240 ],
-    [ 'vx', 1 ],
+    [ 'vx', 1/5 ],
     [ 'vy', 0 ],
     [ 'length', 5 ]
   ],
@@ -131,10 +131,10 @@ foam.CLASS({
 
       this.timer.i$.sub(this.tick);
     },
-    function up()    { this.vy = -1; this.vx =  0; },
-    function down()  { this.vy =  1; this.vx =  0; },
-    function left()  { this.vy =  0; this.vx = -1; },
-    function right() { this.vy =  0; this.vx =  1; },
+    function up()    { this.vy = -1/5; this.vx =  0; },
+    function down()  { this.vy =  1/5; this.vx =  0; },
+    function left()  { this.vy =  0; this.vx = -1/5; },
+    function right() { this.vy =  0; this.vx =  1/5; },
     function fire () {
       this.Laser.create({x: this.sx, y: this.sy, vx: this.vx, vy: this.vy});
     },
@@ -310,8 +310,8 @@ foam.CLASS({
       factory: function() {
         return this.Rectangle.create({
           color: 'lightblue',
-          width: window.innerWidth,
-          height: window.innerHeight
+          width: 800, //window.innerWidth,
+          height: 500, //window.innerHeight
         }).add(this.snake);
       }
     },
@@ -400,6 +400,8 @@ foam.CLASS({
     },
 
     function initE() {
+      this.SUPER();
+      this.focus();
       this.add(this.table);
     },
 
