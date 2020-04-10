@@ -92,7 +92,8 @@ foam.CLASS({
   imports: [ 'movement' ],
 
   properties: [
-    [ 'color', 'darkblue' ]
+    [ 'color', 'darkblue' ],
+    [ 'radius', 10 ]
   ],
 
   methods: [
@@ -100,7 +101,8 @@ foam.CLASS({
       this.SUPER();
 
       this.movement.animate(15000, function() {
-        this.r = 0;
+        // TODO:
+        //this.radius = 0;
       }.bind(this))();
     }
   ]
@@ -238,7 +240,7 @@ foam.CLASS({
     {
       name: 'tick',
       code: function(_, __, ___, t) {
-        if ( t % 100 == 0 ) this.addFood();
+        if ( t.get() % 100 == 0 ) this.addFood();
         if ( Math.random() < 0.02 ) this.addMushroom();
       }
     }
