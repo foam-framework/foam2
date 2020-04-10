@@ -56,42 +56,39 @@ foam.CLASS({
 
   constants: [
     {
-      name: 'INITIAL_INDEX_OFFSET',
-      class: 'Long',
+      documentation: 'starting at 2 as indexes 1 and 2 are used to prime the system.',
+      name: 'INDEX_OFFSET',
+      type: 'Long',
       value: 2
     }
   ],
 
   properties: [
     {
-      // NOTE: starting at 2 as indexes 1 and 2 are used to prime the system.
       name: 'index',
       class: 'Long',
-      value: 2, /*DaggerService.INITIAL_INDEX_OFFSET,*/
-      visibilty: 'RO',
+      factory: function() { return this.INDEX_OFFSET; },
+      javaFactory: 'return INDEX_OFFSET;',
+      visibility: 'RO',
     },
     {
-      // NOTE: starting at 2 as indexes 1 and 2 are used to prime the system.
       name: 'replayIndex',
       class: 'Long',
-      value: 2, /*MedusaEntryConsensusDAO.INITIAL_INDEX_OFFSET,*/
-      visibilty: 'RO',
+      factory: function() { return this.INDEX_OFFSET; },
+      javaFactory: 'return INDEX_OFFSET;',
+      visibility: 'RO',
     },
     {
       name: 'replaying',
       class: 'Boolean',
       value: true,
-      visibilty: 'RO',
+      visibility: 'RO',
     },
     {
       name: 'replayNodes',
       class: 'Map',
-      javaFactory: 'return new HashMap();'
-    },
-    {
-      name: 'threadPoolName',
-      class: 'String',
-      value: 'medusaThreadPool'
+      javaFactory: 'return new HashMap();',
+      visibility: 'HIDDEN',
     },
     {
       name: 'logger',
@@ -123,13 +120,13 @@ foam.CLASS({
 
       ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
 
-      Count count = (Count) getDelegate().where(
-        EQ(MedusaEntry.INDEX, entry.getIndex())
-      ).select(COUNT());
-      if ( (Long)count.getValue() < service.getNodeQuorum(x) ) {
-        getLogger().info("put", getIndex(), entry.getIndex(), entry.getNode(), "waiting for node quorum", count.getValue(), service.getNodeQuorum(x));
-        return entry;
-      }
+      // Count count = (Count) getDelegate().where(
+      //   EQ(MedusaEntry.INDEX, entry.getIndex())
+      // ).select(COUNT());
+      // if ( (Long)count.getValue() < service.getNodeQuorum(x) ) {
+      //   getLogger().info("put", getIndex(), entry.getIndex(), entry.getNode(), "waiting for node quorum", count.getValue(), service.getNodeQuorum(x));
+      //   return entry;
+      // }
 
       MedusaEntry ce = null;
       synchronized ( Long.toString(entry.getIndex()).intern() ) {
@@ -301,7 +298,8 @@ foam.CLASS({
       name: 'start',
       javaCode: `
       getLogger().debug("start");
-      ((Agency) getX().get(getThreadPoolName())).submit(getX(), this, "Consensus Promoter");
+      ClusterConfigService service = (ClusterConfigService) getX().get("clusterConfigService");
+      ((Agency) getX().get(service.getThreadPoolName())).submit(getX(), this, "Consensus Promoter");
       `
     },
     {
@@ -357,7 +355,9 @@ foam.CLASS({
       javaCode: `
       getLogger().debug("replayComplete");
       setReplaying(false);
-      ((ClusterConfigService) x.get("clusterConfigService")).setOnline(x, true);
+      ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
+      service.setStatus(Status.ONLINE);
+      service.setIsReplaying(false);
       ((DAO) x.get("localMedusaEntryDAO")).cmd(new ReplayCompleteCmd());
       `
     }

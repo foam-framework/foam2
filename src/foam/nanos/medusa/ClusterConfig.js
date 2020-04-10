@@ -139,13 +139,6 @@ foam.CLASS({
       class: 'String'
     },
     {
-      name: 'connections',
-      class: 'StringArray',
-      storageTransient: true,
-      visibilty: 'RO',
-      javaFactory: 'return new String[0];'
-    },
-    {
       documentation: 'Creation date.',
       name: 'created',
       class: 'DateTime',

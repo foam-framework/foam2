@@ -32,25 +32,32 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'interval',
+      name: 'timerInterval',
       class: 'Long',
       value: 3000
     },
     {
-      name: 'timeout',
+      name: 'initialTimerDelay',
+      class: 'Int',
+      value: 5000
+    },
+    {
+      name: 'pingTimeout',
       class: 'Int',
       value: 3000
     },
     {
-      name: 'threadPoolName',
-      class: 'String',
-      value: 'medusaThreadPool'
+      name: 'isRunning',
+      class: 'Boolean',
+      value: false,
+      visibility: 'HIDDEN'
     },
     {
       name: 'logger',
       class: 'FObjectProperty',
       of: 'foam.nanos.logger.Logger',
       visibility: 'HIDDEN',
+      transient: true,
       javaFactory: `
         return new PrefixLogger(new Object[] {
           this.getClass().getSimpleName()
@@ -64,11 +71,12 @@ foam.CLASS({
       documentation: 'Start as a NanoService',
       name: 'start',
       javaCode: `
+      ClusterConfigService service = (ClusterConfigService) getX().get("clusterConfigService");
       Timer timer = new Timer(this.getClass().getSimpleName());
       timer.scheduleAtFixedRate(
-        new AgencyTimerTask(getX(), getThreadPoolName(), this),
-        getInterval(),
-        getInterval());
+        new AgencyTimerTask(getX(), service.getThreadPoolName(), this),
+        getInitialTimerDelay(),
+        getTimerInterval());
       `
     },
     {
@@ -80,6 +88,15 @@ foam.CLASS({
         }
       ],
       javaCode: `
+    try {
+      synchronized ( this ) {
+        if ( getIsRunning() ) {
+          getLogger().debug("already running");
+          return;
+        }
+        setIsRunning(true);
+      }
+
       ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
 
 // TODO: Nodes don't need to ping anything, just useful for reporting and network graph - the ping time could be reduced.
@@ -90,7 +107,7 @@ foam.CLASS({
           EQ(ClusterConfig.ENABLED, true),
           NOT(EQ(ClusterConfig.ID, service.getConfigId()))
         ));
-      dao.select(new ClusterConfigPingSink(x, dao, getTimeout()));
+      dao.select(new ClusterConfigPingSink(x, dao, getPingTimeout()));
 
       ClusterConfig config = service.getConfig(x, service.getConfigId());
       if ( config.getType() == MedusaType.MEDIATOR ) {
@@ -116,6 +133,9 @@ foam.CLASS({
         config.setStatus(Status.ONLINE);
         ((DAO) x.get("localClusterConfigDAO")).put(config);
       }
+    } finally {
+      setIsRunning(false);
+    }
       `
     }
   ]

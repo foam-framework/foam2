@@ -20,11 +20,6 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'threadPoolName',
-      class: 'String',
-      value: 'medusaThreadPool'
-    },
-    {
       name: 'logger',
       class: 'FObjectProperty',
       of: 'foam.nanos.logger.Logger',
@@ -44,7 +39,8 @@ foam.CLASS({
       MedusaEntry entry = (MedusaEntry) obj;
       getLogger().debug("put", entry.getIndex());
       ContextAgent agent = new MedusaEntryAgent(x, entry, getDelegate());
-      ((Agency) x.get(getThreadPoolName())).submit(x, agent, "MedusaEntryAgent-"+entry.getMediator()+"-"+entry.getNode()+"-"+Long.toString(entry.getIndex()));
+      ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
+      ((Agency) x.get(service.getThreadPoolName())).submit(x, agent, "MedusaEntryAgent-"+entry.getMediator()+"-"+entry.getNode()+"-"+Long.toString(entry.getIndex()));
       return entry;
       `
     }

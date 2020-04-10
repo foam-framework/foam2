@@ -47,6 +47,7 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       MedusaEntry entry = (MedusaEntry) getDelegate().put_(x, obj);
+
       if ( ! entry.getHasConsensus() ) {
         getLogger().debug("put", entry.getIndex(), "consensus", false);
         return entry;

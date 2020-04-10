@@ -330,6 +330,7 @@ var classes = [
   'foam.nanos.medusa.MedusaEntryDistributionDAO',
   'foam.nanos.medusa.MedusaEntryHashingDAO',
   'foam.nanos.medusa.MedusaEntryIdDAO',
+  'foam.nanos.medusa.MedusaEntryInternalDAO',
   'foam.nanos.medusa.MedusaEntryLinkDAO',
   'foam.nanos.medusa.MedusaEntryNodesDAO',
   'foam.nanos.medusa.MedusaEntryReplayingDAO',

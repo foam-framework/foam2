@@ -292,6 +292,7 @@ String str = new String(buf, 0, off, java.nio.charset.StandardCharsets.UTF_8);
 foam.core.FObject responseMessage = getX().create(foam.lib.json.JSONParser.class).parseString(str);
 
 if ( responseMessage == null ) {
+  ((foam.nanos.logger.Logger) getX().get("logger")).error("HTTPBox", "Error parsing response.", str);
   throw new RuntimeException("Error parsing response.");
 }
 

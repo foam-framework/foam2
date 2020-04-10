@@ -95,14 +95,14 @@ foam.CLASS({
 
       ElectoralService electoralService = (ElectoralService) x.get("electoralService");
       ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
-      if ( ! service.getIsPrimary() ||
-           ! service.getOnline(x) ||
+      ClusterConfig config = service.getConfig(x, service.getConfigId());
+      if ( ! config.getIsPrimary() ||
+           config.getStatus() != Status.ONLINE  ||
            electoralService.getState() != ElectoralServiceState.IN_SESSION ) {
-        getLogger().error("Reject put(), primary", service.getIsPrimary(), "status", "Offline", "state", electoralService.getState().getLabel(), obj);
+        getLogger().error("Reject put(), primary", config.getIsPrimary(), "status", config.getStatus().getLabel(), "state", electoralService.getState().getLabel(), obj);
         throw new UnsupportedOperationException("Cluster not ready.");
       }
 
-      ClusterConfig config = service.getConfig(x, service.getConfigId());
       MedusaEntry entry = x.create(MedusaEntry.class);
       entry.setMediator(config.getName());
       entry.setNSpecName(getNSpec().getName());

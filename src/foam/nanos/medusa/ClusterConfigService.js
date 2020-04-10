@@ -6,20 +6,19 @@
 
 foam.CLASS({
   package: 'foam.nanos.medusa',
+  // TODO: rename to Support
   name: 'ClusterConfigService',
 
   documentation: `Service from which an instance may inquire it\'s
 cluster type - such as primary. It also provides access to
 configuration for contacting the primary node.`,
 
-  implements: [
-    'foam.core.ContextAgent',
-    'foam.nanos.NanoService'
+  axioms: [
+    foam.pattern.Singleton.create()
   ],
 
   javaImports: [
     'foam.box.Box',
-//    'foam.box.HTTPBox',
     'foam.box.SessionClientBox',
     'foam.core.Agency',
     'foam.core.FObject',
@@ -56,17 +55,55 @@ configuration for contacting the primary node.`,
     },
     {
       name: 'configId',
+      label: 'Self',
       class: 'String',
-      javaFactory: 'return System.getProperty("hostname", "localhost");'
+      javaFactory: 'return System.getProperty("hostname", "localhost");',
+      visibility: 'RO'
     },
     {
       name: 'primaryConfigId',
+      label: 'Primary',
       class: 'String',
+      visibility: 'RO'
     },
     {
       name: 'isPrimary',
       class: 'Boolean',
-      value: false
+      value: false,
+      visibility: 'RO'
+    },
+    {
+      documentation: 'Setting instance to true (ONLINE) will make this instance visible to the cluster.',
+      name: 'status',
+      class: 'Enum',
+      of: 'foam.nanos.medusa.Status',
+      value: 'OFFLINE',
+//      visibility: 'RO',
+      javaSetter: `
+      Status old = status_;
+      status_ = val;
+      DAO dao = (DAO) getX().get("localClusterConfigDAO");
+      ClusterConfig config = (ClusterConfig) dao.find(getConfigId());
+      if ( status_ == Status.ONLINE &&
+           config.getStatus() == Status.OFFLINE ) {
+        config = (ClusterConfig) config.fclone();
+        getLogger().info("status", config.getStatus().getLabel(), "->", "ONLINE");
+        config.setStatus(Status.ONLINE);
+        config = (ClusterConfig) dao.put(config);
+      } if ( status_ == Status.OFFLINE &&
+           config.getStatus() == Status.ONLINE ) {
+        config = (ClusterConfig) config.fclone();
+        getLogger().info("status", config.getStatus().getLabel(), "->", "OFFLINE");
+        config.setStatus(Status.OFFLINE);
+        config = (ClusterConfig) dao.put(config);
+      }
+      `
+    },
+    {
+      name: 'isReplaying',
+      class: 'Boolean',
+      value: true,
+      visibility: 'RO'
     },
     {
       name: 'maxRetryAttempts',
@@ -80,15 +117,15 @@ configuration for contacting the primary node.`,
       value: 20000
     },
     {
+      name: 'threadPoolName',
+      class: 'String',
+      value: 'medusaThreadPool'
+    },
+    {
       name: 'primaryDAOs',
       class: 'Map',
       visibility: 'HIDDEN',
       javaFactory: 'return new java.util.HashMap();'
-    },
-    {
-      name: 'threadPoolName',
-      class: 'String',
-      value: 'medusaThreadPool'
     },
     {
       name: 'logger',
@@ -104,77 +141,7 @@ configuration for contacting the primary node.`,
     },
   ],
 
-  // axioms: [
-  //   {
-  //     buildJavaClass: function(cls) {
-  //       cls.extras.push(`
-  //       `);
-  //     }
-  //   }
-  // ],
-
   methods: [
-    {
-      documentation: `Upon initialization create the ClusterServer configuration and register nSpec.`,
-      name: 'start',
-      javaCode: `
-      ((Agency) getX().get(getThreadPoolName())).submit(getX(), this, getClass().getSimpleName());
-      `
-    },
-    {
-      name: 'execute',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        }
-      ],
-      javaCode: `
-      getLogger().debug(this.getClass().getSimpleName(), "execute");
-
-      DAO dao = (DAO) getX().get("localClusterConfigDAO");
-      ClusterConfig config = (ClusterConfig) dao.find(getConfigId());
-      if ( config == null ) {
-        getLogger().error("ClusterConfig not found", getConfigId());
-      }
-      `
-    },
-    {
-      documentation: 'Setting instance to true (ONLINE) will make this instance visible to the cluster.',
-      name: 'setOnline',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'online',
-          type: 'Boolean'
-        }
-      ],
-      javaCode: `
-      DAO dao = (DAO) x.get("localClusterConfigDAO");
-      ClusterConfig config = (ClusterConfig) dao.find(getConfigId());
-      config = (ClusterConfig) config.fclone();
-      config.setStatus(Status.ONLINE);
-      config = (ClusterConfig) dao.put(config);
-      `
-    },
-    {
-      name: 'getOnline',
-      type: 'Boolean',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-      ],
-      javaCode: `
-      DAO dao = (DAO) x.get("localClusterConfigDAO");
-      ClusterConfig config = (ClusterConfig) dao.find(getConfigId());
-      return config.getStatus() == Status.ONLINE;
-      `
-    },
     {
       name: 'buildURL',
       type: 'String',
@@ -254,70 +221,6 @@ configuration for contacting the primary node.`,
       type: 'foam.nanos.medusa.ClusterConfig',
       javaCode: `
       return (ClusterConfig) ((DAO) x.get("localClusterConfigDAO")).find(id).fclone();
-     `
-    },
-    {
-      name: 'addConnection',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'name',
-          type: 'String'
-        }
-      ],
-      javaCode: `
-      ClusterConfig config = (ClusterConfig) ((DAO) x.get("localClusterConfigDAO")).find(getConfigId()).fclone();
-      String[] old = config.getConnections();
-      boolean found = false;
-      for ( int i = 0; i < old.length; ++i) {
-        if ( name.equals(old[i]) ) {
-          found = true;
-          break;
-        }
-      }
-      if ( ! found ) {
-        String[] nu = new String[old.length + 1];
-        System.arraycopy(old, 0, nu, 0, old.length);
-        nu[nu.length - 1] = name;
-        config = (ClusterConfig) config.fclone();
-        config.setConnections(nu);
-        ((DAO) x.get("localClusterConfigDAO")).put(config);
-      }
-     `
-    },
-    {
-      name: 'removeConnection',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'name',
-          type: 'String'
-        }
-      ],
-      javaCode: `
-      ClusterConfig config = (ClusterConfig) ((DAO) x.get("localClusterConfigDAO")).find(getConfigId()).fclone();
-      String[] old = config.getConnections();
-      String[] nu = new String[old.length - 1];
-      boolean found = false;
-      int c = 0;
-      for ( int i = 0; i < old.length; ++i) {
-        if ( name.equals(old[i]) ) {
-          found = true;
-          continue;
-        }
-        nu[c] = old[i];
-        c++;
-      }
-      if ( found ) {
-        config.setConnections(nu);
-        ((DAO) x.get("localClusterConfigDAO")).put(config);
-      }
      `
     },
     {

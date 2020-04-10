@@ -94,6 +94,7 @@ foam.INTERFACE({
     },
     {
       name: 'setGlobalIndex',
+      synchronized: true,
       args: [
         {
           name: 'x',
@@ -125,19 +126,6 @@ foam.INTERFACE({
         }
       ],
       type: 'Long'
-    },
-    {
-      name: 'getReplayIndex',
-      type: 'Long'
-    },
-    {
-      name: 'setReplayIndex',
-      args: [
-        {
-          name: 'index',
-          type: 'Long'
-        }
-      ]
     }
   ]
 });

@@ -104,7 +104,7 @@ foam.CLASS({
       javaCode: `
       ElectoralService electoralService = (ElectoralService) x.get("electoralService");
       ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");
-      getLogger().debug(op, "electoral", electoralService.getState().getLabel(), "online", service.getOnline(x));
+      getLogger().debug(op, electoralService.getState().getLabel(), service.getStatus().getLabel());
       foam.core.FObject old = null;
       if ( ClusterCommand.PUT == op ) {
         old = getDelegate().find_(x, obj.getProperty("id"));

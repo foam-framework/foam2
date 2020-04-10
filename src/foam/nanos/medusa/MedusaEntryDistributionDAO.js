@@ -55,6 +55,7 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       MedusaEntry entry = (MedusaEntry) getDelegate().put_(x, obj);
+//      MedusaEntry entry = (MedusaEntry) ((DaggerService) x.get("daggerService")).internal().put_(x, obj);
       getLogger().debug("put", entry.getIndex());
 
       ClusterConfigService service = (ClusterConfigService) x.get("clusterConfigService");

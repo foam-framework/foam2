@@ -1,8 +1,6 @@
 p({
   "class": "foam.nanos.boot.NSpec",
   "name": "medusaThreadPool",
-  "lazy": false,
-  "serve": false,
   "serviceScript": `
     return new foam.nanos.pool.ThreadPoolAgency.Builder(x)
       .setPrefix("medusa")
@@ -13,8 +11,6 @@ p({
 p({
   "class": "foam.nanos.boot.NSpec",
   "name": "localClusterConfigDAO",
-  "lazy": true,
-  "serve": false,
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.medusa.ClusterConfig.getOwnClassInfo())
@@ -31,7 +27,6 @@ p({
 p({
   "class": "foam.nanos.boot.NSpec",
   "name": "clusterConfigDAO",
-  "lazy": true,
   "serve": true,
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
@@ -48,25 +43,21 @@ p({
 p({
   "class": "foam.nanos.boot.NSpec",
   "name": "clusterConfigService",
-  "lazy": false,
-  "serve": false,
-  "serviceClass": "foam.nanos.medusa.ClusterConfigService"
+  "serve": true,
+  "service": {"class":"foam.nanos.medusa.ClusterConfigService"}
 })
 
 p({
   "class": "foam.nanos.boot.NSpec",
   "name": "daggerService",
-  "lazy": true,
-  "serve": false,
-  "serviceClass": "foam.nanos.medusa.DefaultDaggerService"
+  "serve": true,
+  "service": {"class":"foam.nanos.medusa.DefaultDaggerService"}
 })
 
 p({
   "class": "foam.nanos.boot.NSpec",
   "name": "cluster",
-  "lazy": false,
   "serve": true,
-  "authenticate":true,
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.medusa.ClusterServerDAO.getOwnClassInfo())

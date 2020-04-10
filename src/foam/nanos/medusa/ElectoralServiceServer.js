@@ -88,11 +88,6 @@ foam.CLASS({
       visibility: 'RO'
     },
     {
-      name: 'threadPoolName',
-      class: 'String',
-      value: 'medusaThreadPool'
-    },
-    {
       name: 'logger',
       class: 'FObjectProperty',
       of: 'foam.nanos.logger.Logger',
@@ -136,7 +131,9 @@ foam.CLASS({
     );
     pool_.allowCoreThreadTimeOut(true);
 
-    ((Agency) getX().get(getThreadPoolName())).submit(getX(), this, "election");
+     ClusterConfigService service = (ClusterConfigService) getX().get("clusterConfigService");
+
+    ((Agency) getX().get(service.getThreadPoolName())).submit(getX(), this, "election");
      `
     },
     {
@@ -532,7 +529,7 @@ foam.CLASS({
         setState(ElectoralServiceState.IN_SESSION);
       }
 
-      getLogger().debug("report", winner, getState().getLabel(), "service", service.getConfigId(), "primary", service.getPrimaryConfigId(), service.getIsPrimary());
+      getLogger().debug("report", service.getConfigId(), winner, getState().getLabel(), "primary", service.getPrimaryConfigId());
      `
     }
   ]

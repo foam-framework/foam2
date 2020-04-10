@@ -74,7 +74,7 @@ public class NSpecFactory
         }
       }
       if ( logger != null ) {
-        logger.info("Created Service", spec_.getName(), ns_ != null ? ns_.getClass().getSimpleName() : '-');
+        logger.info("Created Service", spec_.getName(), ns_ != null ? ns_.getClass().getSimpleName() : "null");
       } else {
         System.out.println("Created Service: " + spec_.getName());
       }

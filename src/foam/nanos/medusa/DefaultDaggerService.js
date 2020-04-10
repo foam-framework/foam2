@@ -10,7 +10,11 @@ foam.CLASS({
 
   implements: [
     'foam.nanos.medusa.DaggerService',
-    'foam.nanos.NanoService',
+    'foam.nanos.NanoService'
+  ],
+
+  axioms: [
+    foam.pattern.Singleton.create()
   ],
 
   documentation: `Manage global indexes and hashes`,
@@ -21,9 +25,6 @@ foam.CLASS({
     'foam.nanos.logger.Logger',
     'java.nio.charset.StandardCharsets',
     'java.security.MessageDigest',
-    'java.time.Instant',
-    'java.util.concurrent.atomic.AtomicLong',
-    'java.util.Date'
   ],
 
   axioms: [
@@ -32,10 +33,6 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-  // TODO/REVIEW - don't think we need AtomicLong - see get/set methods below.
-  private volatile AtomicLong globalIndex_ = new AtomicLong(0);
-  private int linksIndex_ = 1;
-
   public static String byte2Hex(byte[] bytes) {
     StringBuffer stringBuffer = new StringBuffer();
     String temp = null;
@@ -56,18 +53,33 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'links',
-      class: 'Array',
-      javaFactory: 'return new foam.nanos.medusa.DaggerLink[2];'
-    },
-    {
-      name: 'replayIndex',
-      class: 'Long'
+      name: 'index',
+      label: 'Global Index',
+      class: 'Long',
+      visibility: 'RO'
     },
     {
       name: 'hashingAlgorithm',
       class: 'String',
       value: 'SHA-256'
+    },
+    {
+      name: 'linksIndex',
+      class: 'Int',
+      value: 1,
+      visibility: 'HIDDEN'
+    },
+    {
+      name: 'links',
+      class: 'Array',
+      javaFactory: 'return new foam.nanos.medusa.DaggerLink[2];',
+      visibility: 'HIDDEN'
+    },
+    {
+      name: 'initialized',
+      class: 'Boolean',
+      value: false,
+      visibility: 'HIDDEN'
     },
     {
       name: 'logger',
@@ -86,11 +98,8 @@ foam.CLASS({
     {
       // TODO: get initial hashes from HSM for new deployment
       name: 'start',
-      synchronized: true,
       javaCode: `
-      getLogger().debug("start");
       DAO dao = (DAO) getX().get("internalMedusaEntryDAO");
-      Date date = Date.from(Instant.parse("2017-04-03T11:00:00.000Z")); // Kevin's first day
 
       MedusaEntry entry = new MedusaEntry();
       entry.setIndex(getNextGlobalIndex(getX()));
@@ -111,7 +120,7 @@ foam.CLASS({
       entry.setHash(hash(getX(), entry));
       entry = (MedusaEntry) dao.put_(getX(), entry);
       updateLinks(getX(), entry);
-      `
+     `
     },
     {
       name: 'link',
@@ -158,12 +167,6 @@ foam.CLASS({
     },
     {
       name: 'getNextLinks',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        }
-      ],
       type: 'foam.nanos.medusa.DaggerLinks',
       javaCode: `
       return new DaggerLinks(
@@ -177,74 +180,34 @@ foam.CLASS({
     {
       name: 'updateLinks',
       synchronized: true,
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'link',
-          type: 'foam.nanos.medusa.DaggerLink'
-        }
-      ],
       javaCode: `
-      try {
       linksIndex_ ^= 1;
       getLogger().debug("updateLinks", linksIndex_, link.getIndex(), link.getHash());
       getLinks()[linksIndex_] = link;
-      } catch (Throwable t) {
-        getLogger().error(t);
-      }
       `
     },
     {
       name: 'setGlobalIndex',
       synchronized: true,
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'index',
-          type: 'Long'
-        }
-      ],
-      type: 'Long',
       javaCode: `
-      if ( index > globalIndex_.get() ) {
-        return globalIndex_.getAndSet(index);
+      if ( index > getIndex() ) {
+        setIndex(index);
       }
-      return globalIndex_.get();
+      return getIndex();
       `
     },
     {
       name: 'getGlobalIndex',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-      ],
-      type: 'Long',
       javaCode: `
-      return globalIndex_.get();
+      return getIndex();
       `
     },
     {
       name: 'getNextGlobalIndex',
       synchronized: true,
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        }
-      ],
-      type: 'Long',
       javaCode: `
-      synchronized ( globalIndex_ ) {
-        return globalIndex_.incrementAndGet();
-      }
+      setIndex(getIndex() + 1);
+      return getIndex();
       `
     }
   ]

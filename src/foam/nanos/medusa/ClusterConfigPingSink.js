@@ -9,6 +9,8 @@ foam.CLASS({
   name: 'ClusterConfigPingSink',
   extends: 'foam.dao.AbstractSink',
 
+  documenation: 'Attempt to contact Nodes and Mediators, record ping time and mark them ONLINE or OFFLINE.  When a Node transitions to ONLINE request Replay from it.',
+
   javaImports: [
     'foam.dao.DAO',
     'static foam.mlang.MLang.EQ',
@@ -73,17 +75,18 @@ foam.CLASS({
       DaggerService dagger = (DaggerService) getX().get("daggerService");
       ClusterConfigService service = (ClusterConfigService) getX().get("clusterConfigService");
       ClusterConfig myConfig = service.getConfig(getX(), service.getConfigId());
-      ClusterConfig config = (ClusterConfig) ((ClusterConfig) obj).fclone();
+      ClusterConfig config = (ClusterConfig) obj;
       PingService ping = (PingService) getX().get("ping");
 
       try {
         Long latency = ping.ping(getX(), config.getId(), config.getPort(), getTimeout());
+        config = (ClusterConfig) service.getConfig(getX(), config.getId()).fclone();
         config.setPingLatency(latency);
         if ( config.getStatus() != Status.ONLINE) {
           getLogger().info(config.getName(), config.getType().getLabel(), config.getStatus().getLabel(), "->", "ONLINE");
           config.setStatus(Status.ONLINE);
           config.setPingInfo("");
-          config = (ClusterConfig) getDao().put_(getX(), config);
+          config = (ClusterConfig) getDao().put_(getX(), config).fclone();
 
           // If a Node comming online, begin replay from it.
           if ( myConfig.getType() == MedusaType.MEDIATOR &&
@@ -137,10 +140,11 @@ foam.CLASS({
         }
       } catch (NullPointerException t) {
         getLogger().error(t);
-      } catch (java.io.IOException t) {
+      } catch (RuntimeException | java.io.IOException t) {
         getLogger().debug("ping", config.getId(), t.getMessage());
         if ( config.getStatus() != Status.OFFLINE ) {
           getLogger().warning(config.getName(), config.getType().getLabel(), config.getStatus().getLabel(), "->", "OFFLINE",  t.getMessage());
+          config = (ClusterConfig) config.fclone();
           config.setPingInfo(t.getMessage());
           config.setStatus(Status.OFFLINE);
           config = (ClusterConfig) getDao().put_(getX(), config);

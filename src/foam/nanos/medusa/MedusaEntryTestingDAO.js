@@ -29,6 +29,10 @@ foam.CLASS({
   
   properties: [
     {
+      name: 'count',
+      class: 'Long'
+    },
+    {
       class: 'FObjectProperty',
       of: 'foam.nanos.logger.Logger',
       name: 'logger',
@@ -45,37 +49,32 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-      MedusaEntry entry = (MedusaEntry) getDelegate().put_(x, obj);
-      getLogger().debug("put", entry.getIndex(), entry.getId());
+try {
+      MedusaEntry entry = (MedusaEntry) obj;
+ 
+      long before = (Long) ((Count) getDelegate().select(COUNT())).getValue();
+      if ( before < getCount() ) {
+        getLogger().error("internal,reset,found", before, "expected", getCount());
+      }
+      getLogger().debug("put", "count", "internal", "before", before);
+      getLogger().debug("put", "internal", entry.getIndex(), entry.getId(), entry);
+      /*MedusaEntry*/ entry = (MedusaEntry) getDelegate().put_(x, obj);
 
-      Count count = (Count) getDelegate()
-      .where(
-        OR(
-          EQ(MedusaEntry.INDEX1, -1L),
-          EQ(MedusaEntry.INDEX2, -1L)
-        ))
-      .select(COUNT());
-      getLogger().debug("put", "index -1 count", count.getValue());
+      getLogger().debug("put", "count", "internal", "after", ((Count) getDelegate().select(COUNT())).getValue());
 
-      // .select(new foam.dao.Sink() {
-      //   public void put(Object obj, foam.core.Detachable sub) {
-      //     getLogger().debug("select", obj);
-      //   }
-
-      //   public void remove(Object obj, foam.core.Detachable sub) {
-      //     // nop
-      //   }
-
-      //   public void eof() {
-      //     // nop
-      //   }
-
-      //   public void reset(foam.core.Detachable sub) {
-      //     // nop
-      //   }
-      // });
+      foam.dao.DAO testing = (foam.dao.DAO) x.get("testingMedusaEntryDAO");
+      getLogger().debug("put", "count", "testing", "before", ((Count) testing.select(COUNT())).getValue());
+      getLogger().debug("put", "testing", entry.getIndex(), entry.getId());
+      testing.put_(x, obj);
+      long count = (Long) ((Count) testing.select(COUNT())).getValue();
+      getLogger().debug("put", "count", "testing", "after", count);
+      setCount(count);
 
       return entry;
+} catch (Throwable t) {
+  getLogger().error(t);
+}
+return null;
       `
     },
     {

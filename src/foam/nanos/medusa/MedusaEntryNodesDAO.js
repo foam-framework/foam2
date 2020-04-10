@@ -21,7 +21,7 @@ foam.CLASS({
     {
       name: 'index',
       class: 'Long',
-      visibilty: 'RO'
+      visibility: 'RO'
     },
     {
       name: 'logger',
