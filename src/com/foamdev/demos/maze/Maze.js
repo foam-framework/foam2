@@ -61,6 +61,25 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'com.foamdev.demos.maze',
+  name: 'Door',
+  extends: 'foam.graphics.Box',
+  properties: [
+    [ 'color', 'red' ]
+  ]
+});
+
+foam.CLASS({
+  package: 'com.foamdev.demos.maze',
+  name: 'Wall',
+  extends: 'foam.graphics.Box',
+  properties: [
+    [ 'color', 'gray' ]
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.foamdev.demos.maze',
   name: 'Laser',
   extends: 'foam.graphics.Circle',
 
@@ -100,6 +119,8 @@ foam.CLASS({
 
   requires: [
     'com.foamdev.demos.maze.Laser',
+    'com.foamdev.demos.maze.Door',
+    'com.foamdev.demos.maze.Wall',
     'com.foamdev.demos.maze.Question1',
     'com.foamdev.demos.maze.Question2',
     'com.google.foam.demos.robot.Robot',
@@ -137,7 +158,7 @@ foam.CLASS({
     MAZE_VERT: [
       [true, null, true, null, null, true, true, true, true, null, true, true],
       [true, true, true, true, true, null, true, true, null, true, null, true],
-      [true, null, null, true, null, true, null, null, true, null, null, 'door'],
+      [true, null, null, true, null, true, null, null, true, null, null, true],
       [true, true, null, null, null, null, null, true, null, null, null, true],
       [true, true, true, null, null, true, null, null, true, true, null, true],
       [true, true, null, null, true, null, true, true, true, null, true, true],
@@ -165,7 +186,7 @@ foam.CLASS({
       name: 'table',
       factory: function() {
         return this.Rectangle.create({
-          color: 'lightblue',
+          color: '#222',
           width: 500, // window.innerWidth,
           height: 500 // window.innerHeight
         });
@@ -174,7 +195,7 @@ foam.CLASS({
     {
       name: 'robot',
       factory: function() {
-        return this.Robot.create({x:200, y:200, scaleX: 0.4, scaleY: 0.4});
+        return this.Robot.create({x:37.5, y:435, scaleX: 0.4, scaleY: 0.4});
       }
     },
     {
@@ -241,12 +262,12 @@ foam.CLASS({
         var rowdata = m[row];
         for ( var col = 0 ; col < rowdata.length ; col++ ) {
           if ( rowdata[col] ) {
-            this.addChild(this.Rectangle.create({
-              color: rowdata[col] == 'door' ? 'blue' : 'red',
+            var blockType = rowdata[col] == 'door' ? this.Door : this.Wall;
+            this.addChild(blockType.create({
               x: this.BRICK_SIZE/2 + col*this.BRICK_SIZE,
               y: this.BRICK_SIZE/2 + row*this.BRICK_SIZE,
               width: this.BRICK_SIZE,
-              height: rowdata[col] == 'door' ? 5 : 1
+              height: 3
             }));
           }
         }
@@ -258,11 +279,11 @@ foam.CLASS({
         var rowdata = m[row];
         for ( var col = 0 ; col < rowdata.length ; col++ ) {
           if ( rowdata[col] ) {
-            this.addChild(this.Rectangle.create({
-              color: rowdata[col] == 'door' ? 'blue' : 'red',
+            var blockType = rowdata[col] == 'door' ? this.Door : this.Wall;
+            this.addChild(blockType.create({
               x: this.BRICK_SIZE/2 + col*this.BRICK_SIZE,
               y: this.BRICK_SIZE/2 + row*this.BRICK_SIZE,
-              width: rowdata[col] == 'door' ? 5 : 1,
+              width: 3,
               height: this.BRICK_SIZE
             }));
           }
@@ -343,7 +364,12 @@ foam.CLASS({
     {
       name: 'fire',
       keyboardShortcuts: [ ' ', 'x' ],
-      code: function() { this.robot.fire(); }
+      code: function() {
+        this.Laser.create({x: this.robot.x, y: this.robot.y, vx: 1, vy: 0});
+        this.Laser.create({x: this.robot.x, y: this.robot.y, vx: 0, vy: 1});
+        this.Laser.create({x: this.robot.x, y: this.robot.y, vx: -1, vy: 0});
+        this.Laser.create({x: this.robot.x, y: this.robot.y, vx: 0, vy: -1});
+      }
     }
   ]
 });
