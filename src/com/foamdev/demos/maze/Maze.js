@@ -65,9 +65,18 @@ foam.CLASS({
   name: 'Door',
   extends: 'foam.graphics.Box',
   properties: [
-    [ 'color', 'red' ]
+    [ 'color', 'red' ],
+    [ 'isClosed', true ]
+  ],
+  methods: [
+    function open() {
+      this.isClosed = false;
+      this.rotation = Math.PI / 4;
+//      this.width = this.height = 0;
+    }
   ]
 });
+
 
 foam.CLASS({
   package: 'com.foamdev.demos.maze',
@@ -75,6 +84,16 @@ foam.CLASS({
   extends: 'foam.graphics.Box',
   properties: [
     [ 'color', 'gray' ]
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.foamdev.demos.maze',
+  name: 'Exit',
+  extends: 'foam.graphics.Box',
+  properties: [
+    [ 'color', 'blue' ]
   ]
 });
 
@@ -119,11 +138,12 @@ foam.CLASS({
   extends: 'foam.u2.Element',
 
   requires: [
-    'com.foamdev.demos.maze.Laser',
     'com.foamdev.demos.maze.Door',
-    'com.foamdev.demos.maze.Wall',
+    'com.foamdev.demos.maze.Exit',
+    'com.foamdev.demos.maze.Laser',
     'com.foamdev.demos.maze.Question1',
     'com.foamdev.demos.maze.Question2',
+    'com.foamdev.demos.maze.Wall',
     'com.google.foam.demos.robot.Robot',
     'foam.animation.Animation',
     'foam.audio.Speak',
@@ -143,31 +163,31 @@ foam.CLASS({
   constants: {
     BRICK_SIZE: 40,
     MAZE_HORIZ: [
-      [true, true, true, true, 'door', true, true, true, true, true, true],
-      [true, null, null, true, null, true, null, null, true],
-      [null, 'door', null, null, null, null, null, true, null, true, true],
-      [null, true, true, null, true, true, true, null, true, true, true],
-      [null, null, true, true, true, null, true, true, null, true, true],
-      [null, null, 'door', true, null, 'door', null, null, null, true],
-      [true, 'door', null, true, null, null, null, null, true, null, true],
-      [true, true, null, true, true, null, null, 'door', null, true],
-      [true, null, true, true, null, true, null, null, true, null, true],
-      [null, null, true, null, true, null, true, null, null, true, true],
-      [null, true, true, true, true, true, true, null, true, null, true],
-      ['door', true, true, true, true, true, true, true, true, true, true]
+      ['Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall'],
+      ['Wall', null, null, 'Wall', null, 'Wall', null, null, 'Wall'],
+      [null, 'Door', null, null, null, null, null, 'Wall', null, 'Wall', 'Wall'],
+      [null, 'Wall', 'Wall', null, 'Wall', 'Wall', 'Wall', null, 'Wall', 'Wall', null],
+      [null, null, 'Wall', 'Wall', 'Wall', null, 'Wall', 'Wall', null, 'Wall', 'Wall'],
+      [null, null, 'Door', 'Wall', null, 'Door', null, null, null, 'Wall'],
+      ['Wall', 'Door', null, 'Wall', null, null, null, null, 'Wall', null, 'Wall'],
+      ['Wall', 'Wall', null, 'Wall', 'Wall', null, null, 'Door', null, 'Wall'],
+      ['Wall', null, 'Wall', 'Wall', null, 'Wall', null, null, 'Wall', null, 'Wall'],
+      [null, null, 'Wall', null, 'Wall', null, 'Wall', null, null, 'Wall', 'Wall'],
+      [null, 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', null, 'Wall', null, 'Wall'],
+      ['Door', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall']
     ],
     MAZE_VERT: [
-      [true, null, true, null, null, true, true, true, true, null, true, true],
-      [true, true, true, true, true, null, true, true, null, true, null, true],
-      [true, null, null, true, null, true, null, null, true, null, null, true],
-      [true, true, null, null, null, null, null, true, null, null, null, true],
-      [true, true, true, null, null, true, null, null, true, true, null, true],
-      [true, true, null, null, true, null, true, true, true, null, true, true],
-      [true, null, null, true, null, 'door', true, true, null, true, null, true],
-      [true, null, true, null, null, null, true, true, true, null, true, 'door'],
-      [true, true, null, null, true, true, null, true, true, null, null, true],
-      [true, true, null, true, null, null, null, true, null, true, null, true],
-      [true, null, null, null, null, null, null, null, true, null, false, true]
+      ['Wall', null, 'Wall', null, null, 'Wall', 'Wall', 'Wall', null, null, 'Wall', 'Exit'],
+      ['Wall', 'Wall', 'Wall', 'Wall', 'Wall', null, 'Wall', 'Wall', null, 'Wall', null, 'Wall'],
+      ['Wall', null, null, 'Wall', null, 'Wall', null, null, 'Wall', null, null, 'Wall'],
+      ['Wall', 'Wall', null, null, null, null, null, 'Wall', null, null, null, 'Wall'],
+      ['Wall', 'Wall', 'Wall', null, null, 'Wall', null, null, 'Wall', 'Wall', null, 'Wall'],
+      ['Wall', 'Wall', null, null, 'Wall', null, 'Wall', 'Wall', 'Wall', null, 'Wall', 'Wall'],
+      ['Wall', null, null, 'Wall', null, 'Door', 'Wall', 'Wall', null, 'Wall', null, 'Wall'],
+      ['Wall', null, 'Wall', null, null, null, 'Wall', 'Wall', 'Wall', null, 'Wall', 'Wall'],
+      ['Wall', 'Wall', null, null, 'Wall', 'Wall', null, 'Wall', 'Wall', null, null, 'Wall'],
+      ['Wall', 'Wall', null, 'Wall', null, null, null, 'Wall', null, 'Wall', null, 'Wall'],
+      ['Wall', null, null, null, null, null, null, null, 'Wall', null, false, 'Wall']
     ]
    },
 
@@ -187,7 +207,7 @@ foam.CLASS({
       name: 'table',
       factory: function() {
         return this.Rectangle.create({
-          color: '#222',
+          color: 'black',
           width: 500, // window.innerWidth,
           height: 500 // window.innerHeight
         });
@@ -196,15 +216,15 @@ foam.CLASS({
     {
       name: 'robot',
       factory: function() {
-//        return this.Robot.create({x:37.5, y:435, scaleX: 0.4, scaleY: 0.4});
-        return this.Robot.create({x:10, y:480, scaleX: 0.4, scaleY: 0.4, width: 4, height: 4});
+        return this.Robot.create({x:37.5, y:435, scaleX: 0.5, scaleY: 0.5, width: 3, height: 3});
       }
     },
     {
       name: 'collider',
       factory: function() { return this.Collider.create(); }
     },
-    'lastX', 'lastY', 'hittingWall'
+    'lastX', 'lastY', 'hittingWall',
+    'questionArea'
   ],
 
   methods: [
@@ -225,10 +245,17 @@ foam.CLASS({
         }
         if ( o1 == this.robot ) {
           if ( this.Door.isInstance(o2) ) {
+            if ( ! o2.isClosed ) return;
             console.log('*************************** Door');
+            o2.open();
+            this.hittingWall = true;
+            this.questionArea.removeAllChildren();
+            this.questionArea.add(this.Question1.create());
           } else if ( this.Wall.isInstance(o2) ) {
             console.log('*************************** Wall');
             this.hittingWall = true;
+          } else if ( this.Exit.isInstance(o2) ) {
+            this.gameOver();
           }
         }
       }.bind(this);
@@ -245,12 +272,12 @@ foam.CLASS({
         var rowdata = m[row];
         for ( var col = 0 ; col < rowdata.length ; col++ ) {
           if ( rowdata[col] ) {
-            var blockType = rowdata[col] == 'door' ? this.Door : this.Wall;
+            var blockType = this[rowdata[col]];
             this.addChild(blockType.create({
               x: this.BRICK_SIZE/2 + col*this.BRICK_SIZE,
               y: this.BRICK_SIZE/2 + row*this.BRICK_SIZE,
               width: this.BRICK_SIZE,
-              height: 3
+              height: 5
             }));
           }
         }
@@ -262,11 +289,11 @@ foam.CLASS({
         var rowdata = m[row];
         for ( var col = 0 ; col < rowdata.length ; col++ ) {
           if ( rowdata[col] ) {
-            var blockType = rowdata[col] == 'door' ? this.Door : this.Wall;
+            var blockType = this[rowdata[col]];
             this.addChild(blockType.create({
               x: this.BRICK_SIZE/2 + col*this.BRICK_SIZE,
               y: this.BRICK_SIZE/2 + row*this.BRICK_SIZE,
-              width: 3,
+              width: 5,
               height: this.BRICK_SIZE
             }));
           }
@@ -278,25 +305,29 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this.focus();
-      this.style({display:'flex'}).add(this.table).add(' ',this.Question2.create());
+      this.style({display:'flex'}).add(this.table).add(' ').tag(null, null, this.questionArea$);
     },
 
     function gameOver() {
       if ( this.isGameOver ) return;
       this.isGameOver = true;
 
-      this.timer.stop();
-      this.table.color = 'orange';
-      this.addChild(this.Label.create({
-        text: 'Game Over',
+      this.table.color = 'white';
+      this.addChild(label = this.Label.create({
+        text: 'You Win!',
         align: 'center',
-        color: 'white',
-        scaleX: 10,
-        scaleY: 10,
+        color: 'red',
         x: this.table.width/2,
-        y: 100
+        y: 180
       }));
-      this.Speak.create({text: 'Game Over'}).play();
+
+      this.Animation.create({
+        duration: 2000,
+        f: ()=> { label.scaleX = label.scaleY = 10; label.rotation = 2 * Math.PI; },
+        objs: [label]
+      }).start();
+
+      this.Speak.create({text: "You Win! You're so smart!"}).play();
     },
 
     function addChild(c) {
