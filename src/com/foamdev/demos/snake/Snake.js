@@ -6,63 +6,6 @@
 
 foam.CLASS({
   package: 'com.foamdev.demos.snake',
-  name: 'Question1',
-  properties: [
-    {
-      name: 'question',
-      label: 'Who was the best Star Wars robot?',
-      view: {
-        class: 'foam.u2.view.ChoiceView',
-        class: 'foam.u2.view.RadioView',
-        placeholder: 'Please select',
-        choices: [
-          'C3-PO',
-          'R2-D2',
-          'BB-8',
-          'K-2SO'
-        ]
-      }
-    },
-    {
-      name: 'answer',
-      hidden: true,
-      value: 'R2-D2'
-    }
-  ]
-});
-
-foam.CLASS({
-  package: 'com.foamdev.demos.snake',
-  name: 'Question2',
-  properties: [
-    {
-      name: 'question',
-      label: 'Which of the following do robots make',
-      view: {
-        class: 'foam.u2.view.ChoiceView',
-//        class: 'foam.u2.view.RadioView',
-        placeholder: 'Please select',
-        choices: [
-          'Cars',
-          'Washing Machines',
-          'Computers',
-          'Robots',
-          'All of the Above'
-
-        ]
-      }
-    },
-    {
-      name: 'answer',
-      hidden: true,
-      value: 'All of the Above'
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'com.foamdev.demos.snake',
   name: 'Scale',
   extends: 'foam.graphics.Circle',
 });
@@ -199,7 +142,7 @@ foam.CLASS({
       this.Animation.create({
         duration: 600,
         f: ()=> {
-          this.scaleX   = this.scaleY = 10;
+          this.scaleX   = this.scaleY = 20;
           this.alpha    = 0;
           this.rotation = Math.PI * 6;
         },
@@ -233,10 +176,10 @@ foam.CLASS({
 
       this.game.addChild(this);
       this.Animation.create({
-        duration: 5000,
+        duration: 4000,
         f: () => {
-          this.x += 2000 * this.vx;
-          this.y += 2000 * this.vy;
+          this.x += 3000 * this.vx;
+          this.y += 3000 * this.vy;
         },
         onEnd: () => this.game.removeChild(this),
         objs: [ this ]
@@ -255,10 +198,7 @@ foam.CLASS({
     'com.foamdev.demos.snake.Food',
     'com.foamdev.demos.snake.Laser',
     'com.foamdev.demos.snake.Mushroom',
-    'com.foamdev.demos.snake.Question1',
-    'com.foamdev.demos.snake.Question2',
     'com.foamdev.demos.snake.Snake',
-    'com.google.foam.demos.robot.Robot',
     'foam.animation.Animation',
     'foam.audio.Speak',
     'foam.graphics.Box as Rectangle',
@@ -297,16 +237,10 @@ foam.CLASS({
       name: 'table',
       factory: function() {
         return this.Rectangle.create({
-          color: 'lightblue',
-          width: 800, // window.innerWidth,
-          height: 500 // window.innerHeight
+          color:  'lightblue',
+          width:  window.innerWidth,
+          height: window.innerHeight
         });
-      }
-    },
-    {
-      name: 'robot',
-      factory: function() {
-        return this.Robot.create({x:200, y:200});
       }
     },
     {
@@ -327,10 +261,8 @@ foam.CLASS({
       this.gamepad.pressed.sub('button4', () => this.fire());
       this.gamepad.pressed.sub('button5', () => this.fire());
 
-//      this.gamepad.pressed.sub('button1', () => robot.x+=10);
       this.gamepad.pressed.sub(function() { console.log('pressed', arguments); });
 
-      this.addChild(this.robot);
       this.addChild(this.snake);
 
       // Setup Physics
@@ -365,7 +297,7 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this.focus();
-      this.style({display:'flex'}).add(this.table).add(this.Question2.create());
+      this.style({display:'flex'}).add(this.table);
     },
 
     function gameOver() {
@@ -415,7 +347,7 @@ foam.CLASS({
         scaleY: 0.1});
 
       this.Animation.create({
-        duration: 5000,
+        duration: 3000,
         f: ()=> { m.scaleX = 1; m.scaleY = 1; },
         onEnd: () => m.color = 'red',
         objs: [m]
@@ -429,12 +361,12 @@ foam.CLASS({
     {
       name: 'tick',
       code: function(_, __, ___, t) {
-        if ( this.gamepad.button0 ) this.robot.y -= 3;
-        if ( this.gamepad.button1 ) this.robot.x += 3;
-        if ( this.gamepad.button2 ) this.robot.y += 3;
-        if ( this.gamepad.button3 ) this.robot.x -= 3;
+        if ( this.gamepad.button0 ) this.up();
+        if ( this.gamepad.button1 ) this.right();
+        if ( this.gamepad.button2 ) this.down();
+        if ( this.gamepad.button3 ) this.left();
 
-        if ( t.get() % 10 == 0 ) this.addFood();
+        if ( t.get() % 20 == 0 ) this.addFood();
         if ( Math.random() < 0.02 ) this.addMushroom();
       }
     }
