@@ -12,7 +12,6 @@ foam.CLASS({
       name: 'question',
       label: 'Who was the best Star Wars robot?',
       view: {
-        class: 'foam.u2.view.ChoiceView',
         class: 'foam.u2.view.RadioView',
         placeholder: 'Please select',
         choices: [
@@ -39,8 +38,7 @@ foam.CLASS({
       name: 'question',
       label: 'Which of the following do robots make',
       view: {
-        class: 'foam.u2.view.ChoiceView',
-//        class: 'foam.u2.view.RadioView',
+        class: 'foam.u2.view.RadioView',
         placeholder: 'Please select',
         choices: [
           'Cars',
@@ -123,31 +121,31 @@ foam.CLASS({
   constants: {
     BRICK_SIZE: 40,
     MAZE_HORIZ: [
-      [true,null,true,true,true,null,true,true,null,true,true],
-      [true,null,null,true,null,true,null,null,true],
-      [null,true,null,null,true && 0,null,null,true,null,true,true],
-      [null,true,true,null,true,true,true,null,true,true,true],
-      [null,null,true,true,true,null,true,true,null,true,true],
-      [null,null,true,true,null,'door',null,null,null,true],
-      [true,true,null,true,null,null,null,null,true,null,true],
-      [true,true,null,true,true,null,null,true,null,true],
-      [true,null,true,true,null,true,null,null,true,null,true],
-      [null,null,true,null,true,null,true,null,null,true,true],
-      [null,true,true,true,true,true,true,null,true,null,true],
-      [true,true,true,true,true,true,true,true,true,true]
+      [true, true, true, true, 'door', true, true, true, true, true, true],
+      [true, null, null, true, null, true, null, null, true],
+      [null, 'door', null, null, null, null, null, true, null, true, true],
+      [null, true, true, null, true, true, true, null, true, true, true],
+      [null, null, true, true, true, null, true, true, null, true, true],
+      [null, null, 'door', true, null, 'door', null, null, null, true],
+      [true, 'door', null, true, null, null, null, null, true, null, true],
+      [true, true, null, true, true, null, null, 'door', null, true],
+      [true, null, true, true, null, true, null, null, true, null, true],
+      [null, null, true, null, true, null, true, null, null, true, true],
+      [null, true, true, true, true, true, true, null, true, null, true],
+      ['door', true, true, true, true, true, true, true, true, true, true]
     ],
     MAZE_VERT: [
-      [true,null,true,null,null,true,true,true,true,null,true,true],
-      [true,true,true,true,true,null,true,true,null,true,null,true],
-      [true,null,null,true,null,true,null,null,true],
-      [true,true,null,null,null,null,null,true,null,null,null,true],
-      [true,true,true,null,null,true,null,null,true,true,null,true],
-      [null,true,null,null,true,null,true,true,true,null,true],
-      [true,null,null,true,null,true,true,true,null,true,null,true],
-      [null,null,true,null,null,null,true,true,true,null,true,true],
-      [true,true,null,null,true,true,null,true,true,null,null,true],
-      [true,true,null,true,null,null,null,true,null,true],
-      [true,null,null,null,null,null,null,null,true,null,true,true]
+      [true, null, true, null, null, true, true, true, true, null, true, true],
+      [true, true, true, true, true, null, true, true, null, true, null, true],
+      [true, null, null, true, null, true, null, null, true, null, null, 'door'],
+      [true, true, null, null, null, null, null, true, null, null, null, true],
+      [true, true, true, null, null, true, null, null, true, true, null, true],
+      [true, true, null, null, true, null, true, true, true, null, true, true],
+      [true, null, null, true, null, 'door', true, true, null, true, null, true],
+      [true, null, true, null, null, null, true, true, true, null, true, 'door'],
+      [true, true, null, null, true, true, null, true, true, null, null, true],
+      [true, true, null, true, null, null, null, true, null, true, null, true],
+      [true, null, null, null, null, null, null, null, true, null, false, true]
     ]
    },
 
@@ -176,7 +174,7 @@ foam.CLASS({
     {
       name: 'robot',
       factory: function() {
-        return this.Robot.create({x:200, y:200});
+        return this.Robot.create({x:200, y:200, scaleX: 0.4, scaleY: 0.4});
       }
     },
     {
@@ -248,7 +246,7 @@ foam.CLASS({
               x: this.BRICK_SIZE/2 + col*this.BRICK_SIZE,
               y: this.BRICK_SIZE/2 + row*this.BRICK_SIZE,
               width: this.BRICK_SIZE,
-              height: rowdata[col] == 'door' ? 2 : 1
+              height: rowdata[col] == 'door' ? 5 : 1
             }));
           }
         }
@@ -264,7 +262,7 @@ foam.CLASS({
               color: rowdata[col] == 'door' ? 'blue' : 'red',
               x: this.BRICK_SIZE/2 + col*this.BRICK_SIZE,
               y: this.BRICK_SIZE/2 + row*this.BRICK_SIZE,
-              width: rowdata[col] == 'door' ? 2 : 1,
+              width: rowdata[col] == 'door' ? 5 : 1,
               height: this.BRICK_SIZE
             }));
           }
@@ -329,7 +327,7 @@ foam.CLASS({
     },
     {
       name: 'down',
-      keyboardShortcuts: [ this.BRICK_SIZE /* down arrow */, 's' ],
+      keyboardShortcuts: [ 40 /* down arrow */, 's' ],
       code: function() { this.robot.y += 3; }
     },
     {
