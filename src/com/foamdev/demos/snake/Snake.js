@@ -260,6 +260,7 @@ foam.CLASS({
     'com.foamdev.demos.snake.Snake',
     'com.google.foam.demos.robot.Robot',
     'foam.animation.Animation',
+    'foam.audio.Speak',
     'foam.graphics.Box as Rectangle',
     'foam.graphics.CView',
     'foam.graphics.Label',
@@ -277,6 +278,7 @@ foam.CLASS({
   constants: { R: 20 },
 
   properties: [
+    [ 'isGameOver', false ],
     [ 'width', 1600 ],
     [ 'height', 800 ],
     {
@@ -367,6 +369,9 @@ foam.CLASS({
     },
 
     function gameOver() {
+      if ( this.isGameOver ) return;
+      this.isGameOver = true;
+
       this.timer.stop();
 //      this.collider.stop(); // TODO: add stop() method to collider
       this.table.color = 'orange';
@@ -379,6 +384,7 @@ foam.CLASS({
         x: this.table.width/2,
         y: 100
       }));
+      this.Speak.create({text: 'Game Over'}).play();
     },
 
     function addChild(c) {
