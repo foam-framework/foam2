@@ -194,14 +194,14 @@ foam.CLASS({
       if ( this.exploded ) return;
       this.exploded = true;
 
-      this.stem.background = 'red';
+      this.stem.color = 'red';
 
       this.Animation.create({
         duration: 600,
         f: ()=> {
-          this.scaleX     = this.scaleY = 10;
-          this.alpha      = 0;
-          this.rotation   = Math.PI * 6;
+          this.scaleX   = this.scaleY = 10;
+          this.alpha    = 0;
+          this.rotation = Math.PI * 6;
         },
         onEnd: () => this.game.removeChild(this),
         slots: [ this.scaleX$, this.scaleY$, this.alpha$, this.rotation$ ],
@@ -261,6 +261,7 @@ foam.CLASS({
     'com.google.foam.demos.robot.Robot',
     'foam.graphics.Box as Rectangle',
     'foam.graphics.CView',
+    'foam.graphics.Label',
     'foam.input.Gamepad',
     'foam.movement.Movement',
     'foam.physics.Collider',
@@ -345,6 +346,7 @@ foam.CLASS({
         if ( this.Laser.isInstance(o1) ) {
           if ( this.Mushroom.isInstance(o2) ) {
             o2.explode();
+            this.removeChild(o1);
           } else if ( this.Food.isInstance(o2) ) {
           }
         }
@@ -372,7 +374,16 @@ foam.CLASS({
     function gameOver() {
       this.timer.stop();
 //      this.collider.stop(); // TODO: add stop() method to collider
-      this.table.background='orange';
+      this.table.color = 'orange';
+      this.addChild(this.Label.create({
+        text: 'Game Over',
+        align: 'center',
+        color: 'white',
+        scaleX: 10,
+        scaleY: 10,
+        x: this.table.width/2,
+        y: 100
+      }));
     },
 
     function addChild(c) {
@@ -386,7 +397,6 @@ foam.CLASS({
     },
 
     function addFood() {
-return;
       var R = this.R;
       var f = this.Food.create({
         x: Math.round(1+Math.random()*(this.table.width -4*R)/R)*2*R,
