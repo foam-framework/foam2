@@ -4,6 +4,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+
 foam.CLASS({
   package: 'com.foamdev.demos.maze',
   name: 'Question1',
@@ -195,13 +196,15 @@ foam.CLASS({
     {
       name: 'robot',
       factory: function() {
-        return this.Robot.create({x:37.5, y:435, scaleX: 0.4, scaleY: 0.4});
+//        return this.Robot.create({x:37.5, y:435, scaleX: 0.4, scaleY: 0.4});
+        return this.Robot.create({x:10, y:480, scaleX: 0.4, scaleY: 0.4, width: 4, height: 4});
       }
     },
     {
       name: 'collider',
       factory: function() { return this.Collider.create(); }
-    }
+    },
+    'lastX', 'lastY', 'hittingWall'
   ],
 
   methods: [
@@ -209,49 +212,29 @@ foam.CLASS({
       this.SUPER();
 
       this.buildMaze();
-
-//      this.addChild(this.collider);
-
-      this.timer.i$.sub(this.tick);
-      this.timer.start();
+      this.addChild(this.robot);
 
       this.gamepad.pressed.sub('button4', () => this.fire());
       this.gamepad.pressed.sub('button5', () => this.fire());
 
-//      this.gamepad.pressed.sub('button1', () => robot.x+=10);
-      this.gamepad.pressed.sub(function() { console.log('pressed', arguments); });
-
-      this.addChild(this.robot);
-
       // Setup Physics
       this.collider.collide = function(o1, o2) {
-        /*
-        if ( this.Laser.isInstance(o2) || this.Snake.isInstance(o2) ) {
-          var tmp = o1;
-          o1 = o2;
-          o2 = tmp;
+        if ( o2 == this.robot ) {
+          o2 = o1;
+          o1 = this.robot;
         }
-        if ( this.Laser.isInstance(o1) ) {
-          if ( this.Mushroom.isInstance(o2) ) {
-            o2.explode();
-            this.removeChild(o1);
-          } else if ( this.Food.isInstance(o2) ) {
+        if ( o1 == this.robot ) {
+          if ( this.Door.isInstance(o2) ) {
+            console.log('*************************** Door');
+          } else if ( this.Wall.isInstance(o2) ) {
+            console.log('*************************** Wall');
+            this.hittingWall = true;
           }
         }
-        if ( this.Snake.isInstance(o1) && this.Mushroom.isInstance(o2) ) {
-          if ( o2.scaleX == 1 )
-            this.gameOver();
-          else
-            this.removeChild(o2);
-        }
-        if ( this.Snake.isInstance(o1) && this.Food.isInstance(o2) ) {
-          this.removeChild(o2);
-          this.snake.length++;
-        }
-        */
-//        console.log('BANG', o1, o2);
       }.bind(this);
       this.collider.start();
+      this.timer.i$.sub(this.tick);
+      this.timer.start();
     },
 
     function buildMaze() {
@@ -295,7 +278,7 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this.focus();
-      this.style({display:'flex'}).add(this.table).add(this.Question2.create());
+      this.style({display:'flex'}).add(this.table).add(' ',this.Question2.create());
     },
 
     function gameOver() {
@@ -303,7 +286,6 @@ foam.CLASS({
       this.isGameOver = true;
 
       this.timer.stop();
-//      this.collider.stop(); // TODO: add stop() method to collider
       this.table.color = 'orange';
       this.addChild(this.Label.create({
         text: 'Game Over',
@@ -331,11 +313,20 @@ foam.CLASS({
   listeners: [
     {
       name: 'tick',
-      code: function(_, __, ___, t) {
-        if ( this.gamepad.button0 ) this.robot.y -= 3;
-        if ( this.gamepad.button1 ) this.robot.x += 3;
-        if ( this.gamepad.button2 ) this.robot.y += 3;
-        if ( this.gamepad.button3 ) this.robot.x -= 3;
+      code: function() {
+        if ( this.hittingWall ) {
+          this.robot.x = this.lastX;
+          this.robot.y = this.lastY;
+          this.hittingWall = false;
+        } else {
+          this.lastX = this.robot.x;
+          this.lastY = this.robot.y;
+        }
+
+        if ( this.gamepad.button0 ) this.up();
+        if ( this.gamepad.button1 ) this.right();
+        if ( this.gamepad.button2 ) this.down();
+        if ( this.gamepad.button3 ) this.left();
       }
     }
   ],
