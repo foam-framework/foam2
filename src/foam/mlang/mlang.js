@@ -2863,12 +2863,12 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       type: 'foam.mlang.order.Comparator',
-      javaJSONParser: 'foam.lib.json.ExprParser.instance()',
       adapt: function(_, a) {
         // TODO(adamvy): We should fix FObjectProperty's default adapt when the
         // of parameter is an interface rather than a class.
         return a;
       },
+      javaJSONParser: 'foam.lib.json.ExprParser.instance()',
       name: 'tail'
     }
   ],
