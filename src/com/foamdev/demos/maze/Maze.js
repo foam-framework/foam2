@@ -108,7 +108,7 @@ foam.CLASS({
 
   properties: [
     [ 'color', 'yellow' ],
-    [ 'radius', 12 ],
+    [ 'radius', 8 ],
     'vx',
     'vy'
   ],
@@ -208,6 +208,8 @@ foam.CLASS({
       factory: function() {
         return this.Rectangle.create({
           color: 'black',
+          scaleX: 1.8,
+          scaleY: 1.8,
           width: 500, // window.innerWidth,
           height: 500 // window.innerHeight
         });
@@ -313,13 +315,15 @@ foam.CLASS({
       this.isGameOver = true;
 
       this.table.color = 'white';
-      this.addChild(label = this.Label.create({
+
+      var label = this.Label.create({
         text: 'You Win!',
         align: 'center',
         color: 'red',
         x: this.table.width/2,
         y: 180
-      }));
+      });
+      this.addChild(label);
 
       this.Animation.create({
         duration: 2000,
@@ -327,7 +331,7 @@ foam.CLASS({
         objs: [label]
       }).start();
 
-      this.Speak.create({text: "You Win! You're so smart!"}).play();
+      this.Speak.create({text: "You Win! You're so smart! You're a JavaScript master!"}).play();
     },
 
     function addChild(c) {
