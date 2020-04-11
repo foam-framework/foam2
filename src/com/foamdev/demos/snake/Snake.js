@@ -170,7 +170,7 @@ foam.CLASS({
 
   properties: [
     [ 'radius', 20 ],
-    [ 'color',  'red' ],
+    [ 'color',  'gray' ],
     [ 'start',  Math.PI ],
     [ 'end',    0 ],
     'stem',
@@ -259,11 +259,11 @@ foam.CLASS({
     'com.foamdev.demos.snake.Question2',
     'com.foamdev.demos.snake.Snake',
     'com.google.foam.demos.robot.Robot',
+    'foam.animation.Animation',
     'foam.graphics.Box as Rectangle',
     'foam.graphics.CView',
     'foam.graphics.Label',
     'foam.input.Gamepad',
-    'foam.movement.Movement',
     'foam.physics.Collider',
     'foam.util.Timer'
   ],
@@ -271,27 +271,22 @@ foam.CLASS({
   exports: [
     'R',
     'timer',
-    'as game',
-    'movement'
+    'as game'
   ],
 
   constants: { R: 20 },
 
   properties: [
+    [ 'width', 1600 ],
+    [ 'height', 800 ],
     {
       name: 'gamepad',
       factory: function() { return this.Gamepad.create(); }
     },
     {
-      name: 'movement',
-      factory: function() { return this.Movement.create(); }
-    },
-    {
       name: 'timer',
       factory: function() { return this.Timer.create(); }
     },
-    [ 'width', 1600 ],
-    [ 'height', 800 ],
     {
       name: 'snake',
       factory: function() { return this.Snake.create(); }
@@ -301,8 +296,8 @@ foam.CLASS({
       factory: function() {
         return this.Rectangle.create({
           color: 'lightblue',
-          width: 800, //window.innerWidth,
-          height: 500, //window.innerHeight
+          width: 800, // window.innerWidth,
+          height: 500 // window.innerHeight
         });
       }
     },
@@ -410,15 +405,15 @@ foam.CLASS({
       var m = this.Mushroom.create({
         x: Math.round(1+Math.random()*(this.table.width -4*R)/R)*2*R,
         y: Math.round(1+Math.random()*(this.table.height-4*R)/R)*2*R,
-        scaleX: 1,
-        scaleY: 1});
+        scaleX: 0.1,
+        scaleY: 0.1});
 
-        /*
-        TODO
-      this.movement.animate(7000, function() {
-        m.scaleX = m.scaleY = 1;
-      })();
-      */
+      this.Animation.create({
+        duration: 5000,
+        f: ()=> { m.scaleX = 1; m.scaleY = 1; },
+        onEnd: () => m.color = 'red',
+        objs: [m]
+      }).start();
 
       this.addChild(m);
     }
