@@ -73,7 +73,6 @@ externalFile.blacklist.forEach(function(cls) {
   'foam.dao.FlowControl',
   'foam.dao.sync.SyncRecord',
   'foam.dao.sync.VersionedSyncRecord',
-  'foam.mlang.order.ThenBy',
   'foam.mlang.Expressions',
   'foam.nanos.menu.MenuBar',
 
