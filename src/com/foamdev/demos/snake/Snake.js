@@ -62,98 +62,6 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.movement',
-  name: 'Animation',
-
-  // TODO: add support for interpolating colours
-  properties: [
-    {
-      class: 'Int',
-      name: 'duration',
-      units: 'ms',
-      value: 1000
-    },
-    {
-      name: 'f',
-    },
-    {
-      class: 'Array',
-      name: 'objs'
-    },
-    {
-      name: 'onEnd',
-      value: function() {}
-    },
-    {
-      name: 'startTime_'
-    },
-    {
-      class: 'Map',
-      name: 'slots_'
-    }
-  ],
-
-  methods: [
-    function start() {
-      var self    = this;
-      var cleanup = foam.core.FObject.create();
-
-      this.objs.forEach(function(o) {
-        cleanup.onDetach(o.propertyChange.sub(self.propertySet));
-      });
-
-      this.f();
-
-      cleanup.detach();
-
-      this.startTime_ = Date.now();
-
-      this.animateValues();
-      this.tick();
-    },
-
-    function animateValues() {
-      for ( var key in this.slots_ ) {
-        var s          = this.slots_[key];
-        var slot       = s[0], startValue = s[1], endValue = s[2];
-        var completion = Math.min(1, (Date.now() - this.startTime_) / this.duration);
-        var value      = startValue + (endValue-startValue) * completion;
-        slot.set(value);
-      }
-    }
-  ],
-
-  listeners: [
-    {
-      name: 'propertySet',
-      code: function(_, __, __, slot) {
-        if ( this.slots_[slot] ) return;
-
-        var oldValue = slot.getPrev(), newValue = slot.get();
-
-        if ( ! foam.Number.isInstance(oldValue) || Number.isNaN(oldValue) ) return;
-
-        this.slots_[slot] = [ slot, oldValue, newValue ];
-      }
-    },
-    {
-      name: 'tick',
-      isFramed: true,
-      code: function() {
-        this.animateValues();
-
-        if ( Date.now() < this.startTime_ + this.duration ) {
-          this.tick();
-        } else {
-          this.onEnd();
-        }
-      }
-    }
-  ]
-});
-
-
-foam.CLASS({
   package: 'com.foamdev.demos.snake',
   name: 'Scale',
   extends: 'foam.graphics.Circle',
@@ -227,7 +135,7 @@ foam.CLASS({
   name: 'Food',
   extends: 'foam.graphics.Circle',
 
-  requires: [ 'foam.movement.Animation' ],
+  requires: [ 'foam.animation.Animation' ],
 
   imports: [ 'game' ],
 
@@ -256,7 +164,7 @@ foam.CLASS({
   name: 'Mushroom',
   extends: 'foam.graphics.Circle',
 
-  requires: [ 'foam.graphics.Box', 'foam.movement.Animation' ],
+  requires: [ 'foam.graphics.Box', 'foam.animation.Animation' ],
 
   imports: [ 'game' ],
 
@@ -309,7 +217,7 @@ foam.CLASS({
   name: 'Laser',
   extends: 'foam.graphics.Circle',
 
-  requires: [ 'foam.movement.Animation' ],
+  requires: [ 'foam.animation.Animation' ],
   imports: [ 'game'],
 
   properties: [
