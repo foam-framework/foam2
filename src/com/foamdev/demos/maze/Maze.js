@@ -132,12 +132,11 @@ foam.CLASS({
       name: 'question',
       label: 'What company was JavaScript invented in?',
       view: {
-        class: 'foam.u2.view.ChoiceView',
         class: 'foam.u2.view.RadioView',
         choices: [
           'Redknee',
           'Verizon',
-          'Nasa',
+          'NASA',
           'Netscape Communications'
         ]
       }
@@ -468,8 +467,8 @@ foam.CLASS({
     'com.foamdev.demos.maze.Question7',
     'com.foamdev.demos.maze.Question8',
     'com.foamdev.demos.maze.Question9',
-    'com.foamdev.demos.maze.Wall',
     'com.foamdev.demos.maze.Robot',
+    'com.foamdev.demos.maze.Wall',
     'foam.animation.Animation',
     'foam.audio.Speak',
     'foam.graphics.Box',
@@ -535,7 +534,7 @@ foam.CLASS({
       factory: function() {
         return this.Box.create({
           color:  'black',
-          scaleX: 1.8,
+          scaleX: 2,
           scaleY: 1.8,
           width:  500,
           height: 500
