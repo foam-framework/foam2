@@ -32,6 +32,7 @@ foam.CLASS({
 
       // Build the Robot
       var body = this.Box.create({
+        x: -10,
         width:  20,
         height: 30,
         color:  '#ccc'
@@ -84,11 +85,12 @@ foam.CLASS({
         var t = timer.time/16;
 
         // Animate parts of the robot
-        body.y        = 5 * Math.cos(t/9);
+        body.y        = 5 * Math.cos(t/9) - 15;
         body.rotation = Math.PI / 12 * Math.cos(t/40);
-        pupil.x       = 4* Math.cos(t/15);
+        pupil.x       = 4 * Math.cos(t/15);
         neck.height   = 15 + 8 * Math.cos(t/15);
-        neck.y        = -13 - 10* Math.cos(t/15);
+        neck.y        = -13 - 8 * Math.cos(t/15);
+        engine.alpha  = 0.9 - Math.sin(t/15) / 10;
       });
       timer.start();
     }
@@ -684,7 +686,7 @@ foam.CLASS({
           label.scaleX      = label.scaleY = 10;
           label.rotation    = 2 * Math.PI;
           this.robot.scaleX = this.robot.scaleY = 5;
-          this.robot.x      = this.maze.width/2-50;
+          this.robot.x      = this.maze.width/2;
           this.robot.y      = this.maze.height/2-20;
         },
         objs: [label, this.robot]
