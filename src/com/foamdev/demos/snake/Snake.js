@@ -147,7 +147,6 @@ foam.CLASS({
           this.rotation = Math.PI * 6;
         },
         onEnd: () => this.game.removeChild(this),
-        slots: [ this.scaleX$, this.scaleY$, this.alpha$, this.rotation$ ],
         objs: [this, this.stem]
       }).start();
     }
