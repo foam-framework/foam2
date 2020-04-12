@@ -302,14 +302,15 @@ foam.CLASS({
       factory: function() { return this.Timer.create(); }
     },
     {
+      // Canvas object used to draw graphics on.
       name: 'table',
       factory: function() {
         return this.Box.create({
           color:  'black',
           scaleX: 1.8,
           scaleY: 1.8,
-          width:  500, // window.innerWidth,
-          height: 500 // window.innerHeight
+          width:  500,
+          height: 500
         });
       }
     },
@@ -436,8 +437,14 @@ foam.CLASS({
 
       this.Animation.create({
         duration: 2000,
-        f:        ()=> { label.scaleX = label.scaleY = 10; label.rotation = 2 * Math.PI; },
-        objs:     [label]
+        f: ()=> {
+          label.scaleX      = label.scaleY = 10;
+          label.rotation    = 2 * Math.PI;
+          this.robot.scaleX = this.robot.scaleY = 5;
+          this.robot.x      = this.table.width/2-50;
+          this.robot.y      = this.table.height/2-20;
+        },
+        objs: [label, this.robot]
       }).start();
 
       this.Speak.create({text: "You Win! You're so smart! You're a JavaScript master!"}).play();
