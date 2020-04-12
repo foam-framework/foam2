@@ -64,15 +64,22 @@ foam.CLASS({
   package: 'com.foamdev.demos.maze',
   name: 'Door',
   extends: 'foam.graphics.Box',
+
+  requires: [ 'foam.animation.Animation' ],
+
   properties: [
     [ 'color', 'red' ],
     [ 'isClosed', true ]
   ],
+
   methods: [
     function open() {
       this.isClosed = false;
-      this.rotation = Math.PI / 4;
-//      this.width = this.height = 0;
+      this.Animation.create({
+        duration: 300,
+        f: () => this.rotation = Math.PI /4,
+        objs: [ this ]
+      }).start();
     }
   ]
 });
