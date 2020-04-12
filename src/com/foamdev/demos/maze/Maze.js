@@ -589,9 +589,6 @@ foam.CLASS({
         // Remove the question
         this.questionArea.removeAllChildren();
         this.currentDoor = null;
-
-        // Set focus again so arrow keys keep working
-        this.focus();
       });
     },
 
@@ -604,8 +601,10 @@ foam.CLASS({
 
     function buildMaze() {
       // Build the maze, including doors and the exit
-      var m = this.MAZE_HORIZ;
-var doorNumber = 1;
+
+      var doorNumber = 1;
+      var m          = this.MAZE_HORIZ;
+
       // Add horizontal lines
       for ( var row = 0 ; row < m.length ; row++ ) {
         var rowdata = m[row];
@@ -652,10 +651,6 @@ var doorNumber = 1;
 
     function initE() {
       this.SUPER();
-
-      // Set focus so arrow keys work
-      this.focus();
-
       // Create the HTML
       this.style({display:'flex'}).add(this.maze).add(' ').tag(null, null, this.questionArea$);
     },
@@ -707,6 +702,9 @@ var doorNumber = 1;
     {
       name: 'tick',
       code: function() {
+        // Set focus so arrow keys keep working
+        this.focus();
+
         // If hitting a wall, move robot back to last good position
         if ( this.hittingWall ) {
           this.robot.x     = this.lastX;
