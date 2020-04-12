@@ -272,13 +272,13 @@ foam.CLASS({
     MAZE_HORIZ: [
       ['Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall'],
       ['Wall', null, null, 'Wall', null, 'Wall', null, null, 'Wall'],
-      [null, 'Door', null, null, null, null, null, 'Wall', null, 'Wall', 'Wall'],
+      [null, null, null, null, null, null, null, 'Wall', null, 'Wall', 'Wall'],
       [null, 'Wall', 'Wall', null, 'Wall', 'Wall', 'Wall', null, 'Wall', 'Wall', null],
       [null, null, 'Wall', 'Wall', 'Wall', null, 'Wall', 'Wall', null, 'Wall', 'Wall'],
       [null, null, 'Door', 'Wall', null, 'Door', null, null, null, 'Wall'],
-      ['Wall', 'Door', null, 'Wall', null, null, null, null, 'Wall', null, 'Wall'],
-      ['Wall', 'Wall', null, 'Wall', 'Wall', null, null, 'Door', null, 'Wall'],
-      ['Wall', null, 'Wall', 'Wall', null, 'Wall', null, null, 'Wall', null, 'Wall'],
+      ['Wall', 'Door', 'Wall', 'Wall', null, null, null, null, 'Wall', null, 'Wall'],
+      ['Wall', 'Wall', null, 'Wall', 'Wall', 'Door', null, 'Door', null, 'Wall'],
+      ['Wall', null, 'Wall', 'Wall', null, 'Wall', null, null, 'Wall', 'Door', 'Wall'],
       [null, null, 'Wall', null, 'Wall', null, 'Wall', null, null, 'Wall', 'Wall'],
       [null, 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', null, 'Wall', null, 'Wall'],
       ['Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall']
@@ -286,11 +286,11 @@ foam.CLASS({
     MAZE_VERT: [
       ['Wall', null, 'Wall', null, null, 'Wall', 'Wall', 'Wall', null, null, 'Wall', 'Exit'],
       ['Wall', 'Wall', 'Wall', 'Wall', 'Wall', null, 'Wall', 'Wall', null, 'Wall', null, 'Wall'],
-      ['Wall', null, null, 'Wall', null, 'Wall', null, null, 'Wall', null, null, 'Wall'],
-      ['Wall', 'Wall', null, null, null, null, null, 'Wall', null, null, null, 'Wall'],
+      ['Wall', null, null, 'Wall', null, 'Wall', null, null, 'Wall', 'Door', null, 'Wall'],
+      ['Wall', 'Wall', null, null, 'Wall', null, null, 'Wall', null, null, null, 'Wall'],
       ['Wall', 'Wall', 'Wall', null, null, 'Wall', null, null, 'Wall', 'Wall', null, 'Wall'],
       ['Wall', 'Wall', null, null, 'Wall', null, 'Wall', 'Wall', 'Wall', null, 'Wall', 'Wall'],
-      ['Wall', null, null, 'Wall', null, 'Door', 'Wall', 'Wall', null, 'Wall', null, 'Wall'],
+      ['Wall', null, null, 'Wall', null, null, 'Wall', 'Wall', null, 'Wall', null, 'Wall'],
       ['Wall', null, 'Wall', null, null, null, 'Wall', 'Wall', 'Wall', null, 'Wall', 'Wall'],
       ['Wall', 'Wall', null, null, 'Wall', 'Wall', null, 'Wall', 'Wall', null, null, 'Wall'],
       ['Wall', 'Wall', null, 'Wall', null, null, null, 'Wall', null, 'Wall', null, 'Wall'],
@@ -325,7 +325,7 @@ foam.CLASS({
     {
       name: 'robot',
       factory: function() {
-        return this.Robot.create({x:37.5, y:435, scaleX: 0.5, scaleY: 0.5, width: 3, height: 3});
+        return this.Robot.create({scaleX: 0.5, scaleY: 0.5, width: 3, height: 3});
       }
     },
     {
@@ -342,6 +342,7 @@ foam.CLASS({
 
       this.buildMaze();
       this.addChild(this.robot);
+      this.resetRobotLocation();
 
       this.gamepad.pressed.sub('button4', () => this.fire());
       this.gamepad.pressed.sub('button5', () => this.fire());
@@ -373,7 +374,15 @@ foam.CLASS({
       this.timer.start();
     },
 
+    function resetRobotLocation() {
+      // Reset the robot's location at start of game or when user gets
+      // a question wrong.
+      this.robot.x = 37.5;
+      this.robot.y = 435;
+    },
+
     function buildMaze() {
+      // Build the maze, including doors and the exit
       var m = this.MAZE_HORIZ;
 
       // draw horizontal lines
@@ -408,27 +417,32 @@ foam.CLASS({
           }
         }
       }
-
     },
 
     function initE() {
+      // Create the HTML
       this.SUPER();
+
+      // set focus so arrow keys work
       this.focus();
+
       this.style({display:'flex'}).add(this.table).add(' ').tag(null, null, this.questionArea$);
     },
 
     function gameOver() {
+      // Call when user reaches the exit and the game is over
+
       if ( this.isGameOver ) return;
       this.isGameOver = true;
 
       this.table.color = 'white';
 
       var label = this.Label.create({
-        text: 'You Win!',
+        text:  'You Win!',
         align: 'center',
         color: 'red',
-        x: this.table.width/2,
-        y: 180
+        x:     this.table.width/2,
+        y:     180
       });
       this.addChild(label);
 
@@ -465,10 +479,12 @@ foam.CLASS({
           this.lastY = this.robot.y;
         }
 
+        // Check for joystick controls
         if ( this.gamepad.button0 ) this.up();
         if ( this.gamepad.button1 ) this.right();
         if ( this.gamepad.button2 ) this.down();
         if ( this.gamepad.button3 ) this.left();
+        // TODO: add fire
       }
     }
   ],
@@ -498,10 +514,10 @@ foam.CLASS({
       name: 'fire',
       keyboardShortcuts: [ ' ', 'x' ],
       code: function() {
-        this.Laser.create({x: this.robot.x, y: this.robot.y, vx: 1, vy: 0});
-        this.Laser.create({x: this.robot.x, y: this.robot.y, vx: 0, vy: 1});
+        this.Laser.create({x: this.robot.x, y: this.robot.y, vx: 1,  vy: 0});
+        this.Laser.create({x: this.robot.x, y: this.robot.y, vx: 0,  vy: 1});
         this.Laser.create({x: this.robot.x, y: this.robot.y, vx: -1, vy: 0});
-        this.Laser.create({x: this.robot.x, y: this.robot.y, vx: 0, vy: -1});
+        this.Laser.create({x: this.robot.x, y: this.robot.y, vx: 0,  vy: -1});
       }
     }
   ]
