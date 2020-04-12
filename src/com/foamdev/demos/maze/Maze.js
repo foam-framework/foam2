@@ -343,7 +343,9 @@ foam.CLASS({
   name: 'Door',
   extends: 'foam.graphics.Box',
 
-  requires: [ 'foam.animation.Animation' ],
+  requires: [ 'foam.animation.Animation', 'foam.audio.Speak' ],
+
+  imports: [ 'game' ],
 
   properties: [
     [ 'color', 'red' ],
@@ -359,6 +361,35 @@ foam.CLASS({
         f: () => this.rotation = Math.PI /4,
         objs: [ this ]
       }).start();
+    },
+
+    function connectToQuestion(q) {
+      this.question = q;
+
+      q.question$.sub(() => {
+        if ( q.question == q.answer ) {
+          // Open door if correct answer
+          this.open();
+          this.Speak.create({text: "Correct!"}).play();
+        } else {
+          // Put robot back to starting location if wrong
+          this.game.resetRobotLocation();
+          this.Speak.create({text: "Wrong! Back to the beginning for you."}).play();
+        }
+
+        // Remove the question
+        this.game.questionArea.removeAllChildren();
+        this.game.currentDoor = null;
+      });
+    },
+
+    function askQuestion() {
+      if ( this.game.currentDoor == this ) return;
+      this.game.currentDoor = this;
+
+      var q = this.question;
+      this.game.questionArea.removeAllChildren();
+      this.game.questionArea.add(q);
     }
   ]
 });
@@ -552,7 +583,7 @@ foam.CLASS({
           if ( this.Door.isInstance(o2) ) {
             if ( o2.isClosed ) {
               this.hittingWall = true;
-              this.askQuestion(o2);
+              o2.askQuestion();
             }
           } else if ( this.Wall.isInstance(o2) ) {
             this.hittingWall = true;
@@ -566,30 +597,6 @@ foam.CLASS({
       this.collider.start();
       this.timer.start();
       this.timer.i$.sub(this.tick);
-    },
-
-    function askQuestion(door) {
-      if ( this.currentDoor == door ) return;
-      this.currentDoor = door;
-
-      var q = door.question;
-      this.questionArea.removeAllChildren();
-      this.questionArea.add(q);
-      q.question$.sub(() => {
-        if ( q.question == q.answer ) {
-          // Open door if correct answer
-          door.open();
-          this.Speak.create({text: "Correct!"}).play();
-        } else {
-          // Put robot back to starting location if wrong
-          this.resetRobotLocation();
-          this.Speak.create({text: "Wrong! Back to the beginning for you."}).play();
-        }
-
-        // Remove the question
-        this.questionArea.removeAllChildren();
-        this.currentDoor = null;
-      });
     },
 
     function resetRobotLocation() {
@@ -618,7 +625,7 @@ foam.CLASS({
               height: 5
             });
             if ( rowdata[col] == 'Door' ) {
-              block.question = this['Question' + doorNumber].create();
+              block.connectToQuestion(this['Question' + doorNumber].create());
               doorNumber = doorNumber+1;
             }
             this.addChild(block);
@@ -640,7 +647,7 @@ foam.CLASS({
               height: this.BRICK_SIZE
             });
             if ( rowdata[col] == 'Door' ) {
-              block.question = this['Question' + doorNumber].create();
+              block.connectToQuestion(this['Question' + doorNumber].create());
               doorNumber = doorNumber+1;
             }
             this.addChild(block);
