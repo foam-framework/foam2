@@ -9,13 +9,13 @@ foam.CLASS({
   name: 'ClusterConfigPingSink',
   extends: 'foam.dao.AbstractSink',
 
-  documenation: 'Attempt to contact Nodes and Mediators, record ping time and mark them ONLINE or OFFLINE.  When a Node transitions to ONLINE request Replay from it.',
+  documenation: 'Attempt to contact Nodes and Mediators, record ping time and mark them ONLINE or OFFLINE.',
 
   javaImports: [
     'foam.dao.DAO',
-    'static foam.mlang.MLang.EQ',
-    'static foam.mlang.MLang.MAX',
-    'foam.mlang.sink.Max',
+    // 'static foam.mlang.MLang.EQ',
+    // 'static foam.mlang.MLang.MAX',
+    // 'foam.mlang.sink.Max',
     'foam.nanos.http.PingService',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger'
@@ -83,55 +83,9 @@ foam.CLASS({
         config = (ClusterConfig) support.getConfig(getX(), config.getId()).fclone();
         config.setPingLatency(latency);
         if ( config.getStatus() != Status.ONLINE) {
-          getLogger().info(config.getName(), config.getType().getLabel(), config.getStatus().getLabel(), "->", "ONLINE");
           config.setStatus(Status.ONLINE);
           config.setPingInfo("");
           config = (ClusterConfig) getDao().put_(getX(), config).fclone();
-
-          // If a Node comming online, begin replay from it.
-          if ( myConfig.getType() == MedusaType.MEDIATOR &&
-               config.getType() == MedusaType.NODE &&
-               config.getZone() == 0L &&
-               config.getRegion() == myConfig.getRegion() &&
-               config.getRealm() == myConfig.getRealm() ) {
-
-            DAO clientDAO = support.getClientDAO(getX(), "medusaEntryDAO", myConfig, config);
-            clientDAO = new RetryClientSinkDAO.Builder(getX())
-              .setDelegate(clientDAO)
-              .setMaxRetryAttempts(support.getMaxRetryAttempts())
-              .setMaxRetryDelay(support.getMaxRetryDelay())
-              .build();
-
-            ReplayDetailsCmd details = new ReplayDetailsCmd();
-            details.setRequester(myConfig.getId());
-            details.setResponder(config.getId());
-            getLogger().debug(myConfig.getId(), "ReplayDetailsCmd to", config.getId());
-            details = (ReplayDetailsCmd) clientDAO.cmd_(getX(), details);
-            getLogger().debug(myConfig.getId(), "ReplayDetailsCmd from", config.getId(), details);
-
-            dagger.setGlobalIndex(getX(), details.getMaxIndex());
-
-            // Send to Consensus DAO to prepare for Replay
-            ((DAO) getX().get("medusaEntryDAO")).cmd(details);
-
-            // NOTE: using internalMedusaEntryDAO else we'll block on ReplayingDAO.
-            DAO dao = (DAO) getX().get("internalMedusaEntryDAO");
-            dao = dao.where(EQ(MedusaEntry.HAS_CONSENSUS, true));
-            Max max = (Max) dao.select(MAX(MedusaEntry.INDEX));
-
-            ReplayCmd cmd = new ReplayCmd();
-            cmd.setRequester(myConfig.getId());
-            cmd.setResponder(config.getId());
-            cmd.setServiceName("medusaEntryDAO"); // TODO: configuration
-            if ( max != null &&
-                 max.getValue() != null ) {
-              cmd.setFromIndex((Long) max.getValue());
-            }
-
-            getLogger().debug(myConfig.getId(), "ReplayCmd to", config.getId());
-            cmd = (ReplayCmd) clientDAO.cmd_(getX(), cmd);
-            getLogger().debug(myConfig.getId(), "ReplayCmd from", config.getId(), cmd);
-          }
         }
         ClusterConfig.PING_INFO.clear(config);
         if ( latency > config.getMaxPingLatency() ) {
@@ -143,7 +97,6 @@ foam.CLASS({
       } catch (RuntimeException | java.io.IOException t) {
         getLogger().debug("ping", config.getId(), t.getMessage());
         if ( config.getStatus() != Status.OFFLINE ) {
-          getLogger().warning(config.getName(), config.getType().getLabel(), config.getStatus().getLabel(), "->", "OFFLINE",  t.getMessage());
           config = (ClusterConfig) config.fclone();
           config.setPingInfo(t.getMessage());
           config.setStatus(Status.OFFLINE);

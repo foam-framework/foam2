@@ -14,12 +14,17 @@ p({
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.medusa.ClusterConfig.getOwnClassInfo())
-      .setCluster(false)
-      .setRuler(false)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("clusterConfig")
+      .setCluster(false)
+      .setRuler(false)
       .setAuthorize(false)
       .setPm(true)
+      .setDecorator(new foam.nanos.medusa.ClusterConfigReplayDAO.Builder(x)
+      .setDelegate(new foam.nanos.medusa.ClusterConfigStatusDAO.Builder(x)
+        .setDelegate(new foam.dao.NullDAO(x, foam.nanos.medusa.ClusterConfig.getOwnClassInfo()))
+      .build())
+      .build())
       .build();
    """
 })

@@ -77,7 +77,6 @@ configuration for contacting the primary node.`,
       class: 'Enum',
       of: 'foam.nanos.medusa.Status',
       value: 'OFFLINE',
-//      visibility: 'RO',
       javaSetter: `
       Status old = status_;
       status_ = val;
@@ -86,13 +85,11 @@ configuration for contacting the primary node.`,
       if ( status_ == Status.ONLINE &&
            config.getStatus() == Status.OFFLINE ) {
         config = (ClusterConfig) config.fclone();
-        getLogger().info("status", config.getStatus().getLabel(), "->", "ONLINE");
         config.setStatus(Status.ONLINE);
         config = (ClusterConfig) dao.put(config);
       } if ( status_ == Status.OFFLINE &&
            config.getStatus() == Status.ONLINE ) {
         config = (ClusterConfig) config.fclone();
-        getLogger().info("status", config.getStatus().getLabel(), "->", "OFFLINE");
         config.setStatus(Status.OFFLINE);
         config = (ClusterConfig) dao.put(config);
       }
@@ -119,6 +116,11 @@ configuration for contacting the primary node.`,
       name: 'threadPoolName',
       class: 'String',
       value: 'medusaThreadPool'
+    },
+    {
+      name: 'replayBatchTimerInterval',
+      class: 'Long',
+      value: 16
     },
     {
       name: 'primaryDAOs',
@@ -154,13 +156,21 @@ configuration for contacting the primary node.`,
           type: 'String'
         },
         {
+          name: 'query',
+          type: 'String'
+        },
+        {
+          name: 'fragment',
+          type: 'String'
+        },
+        {
           name: 'config',
           type: 'foam.nanos.medusa.ClusterConfig'
         },
       ],
       javaCode: `
-      try {
-        // TODO: protocol - http will do for now as we are behind the load balancers.
+       try {
+         // TODO: protocol - http will do for now as we are behind the load balancers.
         String address = config.getId();
         DAO hostDAO = (DAO) x.get("hostDAO");
         Host host = (Host) hostDAO.find(config.getId());
@@ -168,11 +178,14 @@ configuration for contacting the primary node.`,
           address = host.getAddress();
         }
 
-        String path = getPath();
-        if ( ! SafetyUtil.isEmpty(path) ) {
-          path = "/" + path;
-        }
-        java.net.URI uri = new java.net.URI("http", null, address, config.getPort(), path+"/"+serviceName, null, null);
+        StringBuilder path = new StringBuilder();
+        path.append("/");
+        path.append(getPath());
+        path.append("/");
+        path.append(serviceName);
+
+        java.net.URI uri = new java.net.URI("http", null, address, config.getPort(), path.toString(), query, fragment);
+
         // getLogger.debug("buildURL", serviceName, uri.toURL().toString());
         return uri.toURL().toString();
       } catch (java.net.MalformedURLException | java.net.URISyntaxException e) {
@@ -398,7 +411,7 @@ configuration for contacting the primary node.`,
         },
         {
           name: 'serviceName',
-          type: 'String'
+          type: 'String',
         },
         {
           name: 'sendClusterConfig',
@@ -419,7 +432,7 @@ configuration for contacting the primary node.`,
             .setDelegate(new ClusterHTTPBox.Builder(x)
               .setAuthorizationType(foam.box.HTTPAuthorizationType.BEARER)
               .setSessionID(sendClusterConfig.getSessionId())
-              .setUrl(buildURL(x, serviceName, receiveClusterConfig))
+              .setUrl(buildURL(x, serviceName, null, null, receiveClusterConfig))
               .build())
             .build())
           .build())

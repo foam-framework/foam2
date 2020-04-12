@@ -17,6 +17,7 @@ foam.CLASS({
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.dao.Sink',
+    'static foam.mlang.MLang.GT',
     'static foam.mlang.MLang.GTE',
     'static foam.mlang.MLang.MIN',
     'static foam.mlang.MLang.MAX',
@@ -74,19 +75,15 @@ foam.CLASS({
         getLogger().debug("cmd", cmd);
 
         ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-        ClusterConfig fromConfig = support.getConfig(x, cmd.getResponder());
-        ClusterConfig toConfig = support.getConfig(x, cmd.getRequester());
+        ClusterConfig fromConfig = support.getConfig(x, cmd.getDetails().getResponder());
+        ClusterConfig toConfig = support.getConfig(x, cmd.getDetails().getRequester());
         DAO clientDAO = support.getClientDAO(x, cmd.getServiceName(), fromConfig, toConfig);
+        // NOTE: toIndex not yet used.
         getDelegate().where(
-          GTE(MedusaEntry.INDEX, cmd.getFromIndex())
+          GT(MedusaEntry.INDEX, cmd.getFromIndex())
         )
         .orderBy(MedusaEntry.INDEX)
-        .select(new RetryClientSinkDAO.Builder(x)
-          .setDelegate(clientDAO)
-          .setMaxRetryAttempts(support.getMaxRetryAttempts())
-          .setMaxRetryDelay(support.getMaxRetryDelay())
-          .build());
-
+        .select(new ReplayBatchSink(x, clientDAO, cmd.getDetails()));
         return cmd;
       }
 

@@ -119,7 +119,10 @@ foam.CLASS({
       swiftFactory: 'return SwiftOutputter_create()',
       factory: function() {
         return this.Outputter.create().copyFrom(foam.json.Network);
-      }
+      },
+      // javaFactory: `
+      // return foam.lib.json.Outputter outputter = new Outputter(getX());
+      // `
     },
     {
       class: 'Int',
@@ -241,74 +244,33 @@ let task = URLSession.shared.dataTask(with: request) { data, response, error in
 task.resume()
       */},
       javaCode: `
-// TODO: Go async and make request in a separate thread.
-java.net.HttpURLConnection conn;
-foam.box.Box replyBox = (foam.box.Box)msg.getAttributes().get("replyBox");
+      // TODO: Go async and make request in a separate thread.
 
-try {
-  java.net.URL url = new java.net.URL(getUrl());
-  conn = (java.net.HttpURLConnection)url.openConnection();
-  conn.setDoOutput(true);
-  conn.setRequestMethod("POST");
-  conn.setRequestProperty("Accept", "application/json");
-  conn.setRequestProperty("Content-Type", "application/json");
-  if ( getAuthorizationType().equals(HTTPAuthorizationType.BEARER) ) {
-    conn.setRequestProperty("Authorization", "BEARER "+getSessionID());
-  }
-  conn.setConnectTimeout(getConnectTimeout());
-  conn.setReadTimeout(getReadTimeout());
-  java.io.OutputStreamWriter output = new java.io.OutputStreamWriter(conn.getOutputStream(),
-                                                                     java.nio.charset.StandardCharsets.UTF_8);
+      java.net.HttpURLConnection conn;
+      foam.box.Box replyBox = (foam.box.Box)msg.getAttributes().get("replyBox");
 
+      try {
+        conn = getConnection();
+        java.io.OutputStreamWriter output =
+          new java.io.OutputStreamWriter(conn.getOutputStream(),
+                                            java.nio.charset.StandardCharsets.UTF_8);
 
-  // TODO: Clone message or something when it clones safely.
-  msg.getAttributes().put("replyBox", getReplyBox());
+        // TODO: Clone message or something when it clones safely.
+        msg.getAttributes().put("replyBox", getReplyBox());
 
+        output.write(new Outputter(getX()).stringify(msg));
 
-  foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(getX()).setPropertyPredicate(new foam.lib.NetworkPropertyPredicate());
-  output.write(outputter.stringify(msg));
+        msg.getAttributes().put("replyBox", replyBox);
+        output.close();
 
-  msg.getAttributes().put("replyBox", replyBox);
+        replyBox.send((foam.box.Message)getResponseMessage(conn));
 
-  output.close();
-
-// TODO: Switch to ReaderPStream when https://github.com/foam-framework/foam2/issues/745 is fixed.
-byte[] buf = new byte[8388608];
-java.io.InputStream input = conn.getInputStream();
-
-int off = 0;
-int len = buf.length;
-int read = -1;
-while ( len != 0 && ( read = input.read(buf, off, len) ) != -1 ) {
-  off += read;
-  len -= read;
-}
-
-if ( len == 0 && read != -1 ) {
-  throw new RuntimeException("Message too large.");
-}
-
-String str = new String(buf, 0, off, java.nio.charset.StandardCharsets.UTF_8);
-foam.core.FObject responseMessage = getX().create(foam.lib.json.JSONParser.class).parseString(str);
-
-if ( responseMessage == null ) {
-  ((foam.nanos.logger.Logger) getX().get("logger")).error("HTTPBox", "Error parsing response.", str);
-  throw new RuntimeException("Error parsing response.");
-}
-
-if ( ! ( responseMessage instanceof foam.box.Message ) ) {
-  throw new RuntimeException("Invalid response type: " + responseMessage.getClass().getName() + " expected foam.box.Message.");
-}
-
-
-replyBox.send((foam.box.Message)responseMessage);
-
-} catch(java.io.IOException e) {
-  foam.box.Message replyMessage = getX().create(foam.box.Message.class);
-  replyMessage.setObject(e);
-  replyBox.send(replyMessage);
-}
-`
+      } catch(java.io.IOException e) {
+        foam.box.Message replyMessage = getX().create(foam.box.Message.class);
+        replyMessage.setObject(e);
+        replyBox.send(replyMessage);
+      }
+      `
     },
     {
       name: 'getReplyBox',
@@ -321,6 +283,65 @@ replyBox.send((foam.box.Message)responseMessage);
                              */},
       javaCode: `
         return getX().create(foam.box.HTTPReplyBox.class);
+      `
+    },
+    {
+      name: 'getConnection',
+      javaType: 'java.net.HttpURLConnection',
+      javaThrows: ['java.io.IOException'],
+      javaCode: `
+      java.net.URL url = new java.net.URL(getUrl());
+      java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
+      conn.setDoOutput(true);
+      conn.setRequestMethod("POST");
+      conn.setRequestProperty("Accept", "application/json");
+      conn.setRequestProperty("Content-Type", "application/json");
+      if ( getAuthorizationType().equals(HTTPAuthorizationType.BEARER) ) {
+        conn.setRequestProperty("Authorization", "BEARER "+getSessionID());
+      }
+      conn.setConnectTimeout(getConnectTimeout());
+      conn.setReadTimeout(getReadTimeout());
+      return conn;
+      `
+    },
+    {
+      name: 'getResponseMessage',
+      args: [
+        {
+          name: 'conn',
+          type: 'java.net.HttpURLConnection'
+        }
+      ],
+      javaType: 'foam.core.FObject',
+      javaThrows: ['java.io.IOException'],
+      javaCode: `
+      // TODO: Switch to ReaderPStream when https://github.com/foam-framework/foam2/issues/745 is fixed.
+      byte[] buf = new byte[8388608];
+      java.io.InputStream input = conn.getInputStream();
+
+      int off = 0;
+      int len = buf.length;
+      int read = -1;
+      while ( len != 0 && ( read = input.read(buf, off, len) ) != -1 ) {
+        off += read;
+        len -= read;
+      }
+
+      if ( len == 0 && read != -1 ) {
+        throw new RuntimeException("Message too large.");
+      }
+
+      String str = new String(buf, 0, off, java.nio.charset.StandardCharsets.UTF_8);
+      foam.core.FObject responseMessage = getX().create(foam.lib.json.JSONParser.class).parseString(str);
+
+      if ( responseMessage == null ) {
+        ((foam.nanos.logger.Logger) getX().get("logger")).error("HTTPBox", "Error parsing response.", str);
+        throw new RuntimeException("Error parsing response.");
+      }
+      if ( ! ( responseMessage instanceof foam.box.Message ) ) {
+        throw new RuntimeException("Invalid response type: " + responseMessage.getClass().getName() + " expected foam.box.Message.");
+      }
+      return responseMessage;
       `
     }
   ]
