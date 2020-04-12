@@ -5,6 +5,106 @@
  */
 
 
+ foam.CLASS({
+   package: 'com.foamdev.demos.maze',
+   name: 'Robot',
+   extends: 'foam.graphics.CView',
+
+   implements: [ 'foam.physics.Physical' ],
+
+   // author: Sebastian Greer (age 11)
+
+   requires: [
+     'foam.graphics.Arc',
+     'foam.graphics.Box as Rectangle',
+     'foam.graphics.Circle',
+     'foam.graphics.CView',
+     'foam.graphics.ImageCView',
+     'foam.util.Timer'
+   ],
+
+   properties: [
+     [ 'width',  25 ],
+     [ 'height', 45 ],
+     {
+       name: 'timer',
+       hidden: true,
+       factory: function() {
+         return this.__context__.timer || this.Timer.create();
+       }
+     }
+   ],
+
+   methods: [
+     function initCView() {
+       this.SUPER();
+
+       var body = this.Rectangle.create({
+         width:  20,
+         height: 30,
+         color:  '#ccc'
+       });
+       this.add(body);
+
+ //      var logo = this.ImageCView.create({src:'./js/com/google/watlobby/img/foam_red.png', x:17, y:3, width: 30, height: 5, a: Math.PI/2});
+ //      body.add(logo);
+
+       var neck = this.Rectangle.create({
+         color:  'white',
+         width:  2,
+         y:     -13,
+         x:      9,
+         height: 15
+       });
+       body.add(neck);
+
+       var head = this.Circle.create({
+         radius: 10,
+         color:  'orange',
+         x:      0,
+         y:      -5
+       });
+       neck.add(head);
+
+       var engine = this.Circle.create({
+         radius: 8,
+         color:  'red',
+         border: null,
+         x:      10,
+         y:      30.5,
+         start:  0,
+         end:    Math.PI
+       });
+       body.add(engine);
+
+       var eye = this.Circle.create({
+         radius: 7,
+         color:  'white'
+       });
+       head.add(eye);
+
+       var pupil = this.Circle.create({
+         radius: 3,
+         color:  'lightblue'
+       });
+       eye.add(pupil);
+
+       // animate
+       var timer = this.timer;
+       timer.time$.sub(function() {
+         var t = timer.time/16;
+         body.y        = 5 * Math.cos(t/9);
+         body.rotation = Math.PI / 12 * Math.cos(t/40);
+         pupil.x       = 4* Math.cos(t/15);
+         neck.height   = 15 + 8 * Math.cos(t/15);
+         neck.y        = -13 - 10* Math.cos(t/15);
+       });
+       timer.start();
+     }
+   ]
+ });
+
+
 foam.CLASS({
   package: 'com.foamdev.demos.maze',
   name: 'Question1',
@@ -151,7 +251,7 @@ foam.CLASS({
     'com.foamdev.demos.maze.Question1',
     'com.foamdev.demos.maze.Question2',
     'com.foamdev.demos.maze.Wall',
-    'com.google.foam.demos.robot.Robot',
+    'com.foamdev.demos.maze.Robot',
     'foam.animation.Animation',
     'foam.audio.Speak',
     'foam.graphics.Box as Rectangle',
@@ -181,7 +281,7 @@ foam.CLASS({
       ['Wall', null, 'Wall', 'Wall', null, 'Wall', null, null, 'Wall', null, 'Wall'],
       [null, null, 'Wall', null, 'Wall', null, 'Wall', null, null, 'Wall', 'Wall'],
       [null, 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', null, 'Wall', null, 'Wall'],
-      ['Door', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall']
+      ['Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall']
     ],
     MAZE_VERT: [
       ['Wall', null, 'Wall', null, null, 'Wall', 'Wall', 'Wall', null, null, 'Wall', 'Exit'],
@@ -194,7 +294,7 @@ foam.CLASS({
       ['Wall', null, 'Wall', null, null, null, 'Wall', 'Wall', 'Wall', null, 'Wall', 'Wall'],
       ['Wall', 'Wall', null, null, 'Wall', 'Wall', null, 'Wall', 'Wall', null, null, 'Wall'],
       ['Wall', 'Wall', null, 'Wall', null, null, null, 'Wall', null, 'Wall', null, 'Wall'],
-      ['Wall', null, null, null, null, null, null, null, 'Wall', null, false, 'Wall']
+      ['Wall', null, null, null, null, null, null, 'Door', 'Wall', null, false, 'Wall']
     ]
    },
 
