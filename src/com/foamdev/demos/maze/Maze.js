@@ -5,104 +5,96 @@
  */
 
 
- foam.CLASS({
-   package: 'com.foamdev.demos.maze',
-   name: 'Robot',
-   extends: 'foam.graphics.CView',
+foam.CLASS({
+  package: 'com.foamdev.demos.maze',
+  name: 'Robot',
+  extends: 'foam.graphics.CView',
 
-   implements: [ 'foam.physics.Physical' ],
+  // author: Sebastian Greer (age 11)
 
-   // author: Sebastian Greer (age 11)
+  implements: [ 'foam.physics.Physical' ],
 
-   requires: [
-     'foam.graphics.Arc',
-     'foam.graphics.Box as Rectangle',
-     'foam.graphics.Circle',
-     'foam.graphics.CView',
-     'foam.graphics.ImageCView',
-     'foam.util.Timer'
-   ],
+  imports: [ 'timer' ],
 
-   properties: [
-     [ 'width',  25 ],
-     [ 'height', 45 ],
-     {
-       name: 'timer',
-       hidden: true,
-       factory: function() {
-         return this.__context__.timer || this.Timer.create();
-       }
-     }
-   ],
+  requires: [
+   'foam.graphics.Arc',
+   'foam.graphics.Box',
+   'foam.graphics.Circle'
+  ],
 
-   methods: [
-     function initCView() {
-       this.SUPER();
+  properties: [
+    [ 'width',  25 ],
+    [ 'height', 45 ]
+  ],
 
-       var body = this.Rectangle.create({
-         width:  20,
-         height: 30,
-         color:  '#ccc'
-       });
-       this.add(body);
+  methods: [
+    function initCView() {
+      this.SUPER();
 
- //      var logo = this.ImageCView.create({src:'./js/com/google/watlobby/img/foam_red.png', x:17, y:3, width: 30, height: 5, a: Math.PI/2});
- //      body.add(logo);
+      // Build the Robot
+      var body = this.Box.create({
+        width:  20,
+        height: 30,
+        color:  '#ccc'
+      });
+      this.add(body);
 
-       var neck = this.Rectangle.create({
-         color:  'white',
-         width:  2,
-         y:     -13,
-         x:      9,
-         height: 15
-       });
-       body.add(neck);
+      var neck = this.Box.create({
+        color:  'white',
+        width:  2,
+        y:     -13,
+        x:      9,
+        height: 15
+      });
+      body.add(neck);
 
-       var head = this.Circle.create({
-         radius: 10,
-         color:  'orange',
-         x:      0,
-         y:      -5
-       });
-       neck.add(head);
+      var head = this.Circle.create({
+        radius: 10,
+        color:  'orange',
+        x:      0,
+        y:      -5
+      });
+      neck.add(head);
 
-       var engine = this.Circle.create({
-         radius: 8,
-         color:  'red',
-         border: null,
-         x:      10,
-         y:      30.5,
-         start:  0,
-         end:    Math.PI
-       });
-       body.add(engine);
+      var engine = this.Circle.create({
+        radius: 8,
+        color:  'red',
+        border: null,
+        x:      10,
+        y:      30.5,
+        start:  0,
+        end:    Math.PI
+      });
+      body.add(engine);
 
-       var eye = this.Circle.create({
-         radius: 7,
-         color:  'white'
-       });
-       head.add(eye);
+      var eye = this.Circle.create({
+        radius: 7,
+        color:  'white'
+      });
+      head.add(eye);
 
-       var pupil = this.Circle.create({
-         radius: 3,
-         color:  'lightblue'
-       });
-       eye.add(pupil);
+      var pupil = this.Circle.create({
+        radius: 3,
+        color:  'lightblue'
+      });
+      eye.add(pupil);
 
-       // animate
-       var timer = this.timer;
-       timer.time$.sub(function() {
-         var t = timer.time/16;
-         body.y        = 5 * Math.cos(t/9);
-         body.rotation = Math.PI / 12 * Math.cos(t/40);
-         pupil.x       = 4* Math.cos(t/15);
-         neck.height   = 15 + 8 * Math.cos(t/15);
-         neck.y        = -13 - 10* Math.cos(t/15);
-       });
-       timer.start();
-     }
-   ]
- });
+      // animate
+      var timer = this.timer;
+      timer.time$.sub(function() {
+        var t = timer.time/16;
+
+        // Animate parts of the robot
+        body.y        = 5 * Math.cos(t/9);
+        body.rotation = Math.PI / 12 * Math.cos(t/40);
+        pupil.x       = 4* Math.cos(t/15);
+        neck.height   = 15 + 8 * Math.cos(t/15);
+        neck.y        = -13 - 10* Math.cos(t/15);
+      });
+      timer.start();
+    }
+  ]
+});
 
 
 foam.CLASS({
@@ -254,8 +246,7 @@ foam.CLASS({
     'com.foamdev.demos.maze.Robot',
     'foam.animation.Animation',
     'foam.audio.Speak',
-    'foam.graphics.Box as Rectangle',
-    'foam.graphics.CView',
+    'foam.graphics.Box',
     'foam.graphics.Label',
     'foam.input.Gamepad',
     'foam.physics.Collider',
@@ -313,11 +304,11 @@ foam.CLASS({
     {
       name: 'table',
       factory: function() {
-        return this.Rectangle.create({
-          color: 'black',
+        return this.Box.create({
+          color:  'black',
           scaleX: 1.8,
           scaleY: 1.8,
-          width: 500, // window.innerWidth,
+          width:  500, // window.innerWidth,
           height: 500 // window.innerHeight
         });
       }
@@ -344,11 +335,8 @@ foam.CLASS({
       this.addChild(this.robot);
       this.resetRobotLocation();
 
-      this.gamepad.pressed.sub('button4', () => this.fire());
-      this.gamepad.pressed.sub('button5', () => this.fire());
-
-      // Setup Physics
-      this.collider.collide = function(o1, o2) {
+      // Setup collision detection
+      this.collider.collide = (o1, o2) => {
         if ( o2 == this.robot ) {
           o2 = o1;
           o1 = this.robot;
@@ -356,19 +344,19 @@ foam.CLASS({
         if ( o1 == this.robot ) {
           if ( this.Door.isInstance(o2) ) {
             if ( ! o2.isClosed ) return;
-            console.log('*************************** Door');
             o2.open();
             this.hittingWall = true;
             this.questionArea.removeAllChildren();
             this.questionArea.add(this.Question1.create());
           } else if ( this.Wall.isInstance(o2) ) {
-            console.log('*************************** Wall');
             this.hittingWall = true;
           } else if ( this.Exit.isInstance(o2) ) {
             this.gameOver();
           }
         }
-      }.bind(this);
+      };
+
+      // Start Timer and Collider
       this.collider.start();
       this.timer.i$.sub(this.tick);
       this.timer.start();
@@ -385,23 +373,23 @@ foam.CLASS({
       // Build the maze, including doors and the exit
       var m = this.MAZE_HORIZ;
 
-      // draw horizontal lines
+      // Add horizontal lines
       for ( var row = 0 ; row < m.length ; row++ ) {
         var rowdata = m[row];
         for ( var col = 0 ; col < rowdata.length ; col++ ) {
           if ( rowdata[col] ) {
             var blockType = this[rowdata[col]];
             this.addChild(blockType.create({
-              x: this.BRICK_SIZE/2 + col*this.BRICK_SIZE,
-              y: this.BRICK_SIZE/2 + row*this.BRICK_SIZE,
-              width: this.BRICK_SIZE,
+              x:      this.BRICK_SIZE/2 + col*this.BRICK_SIZE,
+              y:      this.BRICK_SIZE/2 + row*this.BRICK_SIZE,
+              width:  this.BRICK_SIZE,
               height: 5
             }));
           }
         }
       }
 
-      // draw vertical lines
+      // Add vertical lines
       m = this.MAZE_VERT;
       for ( var row = 0 ; row < m.length ; row++ ) {
         var rowdata = m[row];
@@ -409,9 +397,9 @@ foam.CLASS({
           if ( rowdata[col] ) {
             var blockType = this[rowdata[col]];
             this.addChild(blockType.create({
-              x: this.BRICK_SIZE/2 + col*this.BRICK_SIZE,
-              y: this.BRICK_SIZE/2 + row*this.BRICK_SIZE,
-              width: 5,
+              x:      this.BRICK_SIZE/2 + col*this.BRICK_SIZE,
+              y:      this.BRICK_SIZE/2 + row*this.BRICK_SIZE,
+              width:  5,
               height: this.BRICK_SIZE
             }));
           }
@@ -420,12 +408,12 @@ foam.CLASS({
     },
 
     function initE() {
-      // Create the HTML
       this.SUPER();
 
-      // set focus so arrow keys work
+      // Set focus so arrow keys work
       this.focus();
 
+      // Create the HTML
       this.style({display:'flex'}).add(this.table).add(' ').tag(null, null, this.questionArea$);
     },
 
@@ -448,8 +436,8 @@ foam.CLASS({
 
       this.Animation.create({
         duration: 2000,
-        f: ()=> { label.scaleX = label.scaleY = 10; label.rotation = 2 * Math.PI; },
-        objs: [label]
+        f:        ()=> { label.scaleX = label.scaleY = 10; label.rotation = 2 * Math.PI; },
+        objs:     [label]
       }).start();
 
       this.Speak.create({text: "You Win! You're so smart! You're a JavaScript master!"}).play();
@@ -470,11 +458,13 @@ foam.CLASS({
     {
       name: 'tick',
       code: function() {
+        // If hitting a wall, move robot back to last good position
         if ( this.hittingWall ) {
-          this.robot.x = this.lastX;
-          this.robot.y = this.lastY;
+          this.robot.x     = this.lastX;
+          this.robot.y     = this.lastY;
           this.hittingWall = false;
         } else {
+          // If not hitting a wall, record this position
           this.lastX = this.robot.x;
           this.lastY = this.robot.y;
         }
@@ -484,7 +474,8 @@ foam.CLASS({
         if ( this.gamepad.button1 ) this.right();
         if ( this.gamepad.button2 ) this.down();
         if ( this.gamepad.button3 ) this.left();
-        // TODO: add fire
+        if ( this.gamepad.button4 ) this.fire();
+        if ( this.gamepad.button5 ) this.fire();
       }
     }
   ],
