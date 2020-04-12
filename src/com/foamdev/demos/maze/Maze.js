@@ -99,53 +99,240 @@ foam.CLASS({
 foam.CLASS({
   package: 'com.foamdev.demos.maze',
   name: 'Question1',
+  label: 'Question',
   properties: [
     {
       name: 'question',
-      label: 'Who was the best Star Wars robot?',
+      label: 'Who created JavaScript?',
       view: {
         class: 'foam.u2.view.RadioView',
-        placeholder: 'Please select',
         choices: [
-          'C3-PO',
-          'R2-D2',
-          'BB-8',
-          'K-2SO'
+          'Elon Musk',
+          'Brendan Eich',
+          'Mich Chung',
+          'Cha Min'
         ]
       }
     },
     {
       name: 'answer',
       hidden: true,
-      value: 'R2-D2'
+      value: 'Brendan Eich'
     }
   ]
 });
 
+
 foam.CLASS({
   package: 'com.foamdev.demos.maze',
   name: 'Question2',
+  label: 'Question',
   properties: [
     {
       name: 'question',
-      label: 'Which of the following do robots make',
+      label: 'What company was JavaScript invented in?',
       view: {
+        class: 'foam.u2.view.ChoiceView',
         class: 'foam.u2.view.RadioView',
-        placeholder: 'Please select',
         choices: [
-          'Cars',
-          'Washing Machines',
-          'Computers',
-          'Robots',
-          'All of the Above'
-
+          'Redknee',
+          'Verizon',
+          'Nasa',
+          'Netscape Communications'
         ]
       }
     },
     {
       name: 'answer',
       hidden: true,
-      value: 'All of the Above'
+      value: 'Netscape Communications'
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.foamdev.demos.maze',
+  name: 'Question3',
+  label: 'Question',
+  properties: [
+    {
+      name: 'question',
+      label: 'What computer language was JavaScript coded in?',
+      view: {
+        class: 'foam.u2.view.RadioView',
+        choices: [
+          'C++',
+          'C#',
+          'French',
+          'Java'
+        ]
+      }
+    },
+    {
+      name: 'answer',
+      hidden: true,
+      value: 'C++'
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.foamdev.demos.maze',
+  name: 'Question4',
+  label: 'Question',
+  properties: [
+    {
+      name: 'question',
+      label: 'Is JavaScript a compiled language or an interpreted language?',
+      view: {
+        class: 'foam.u2.view.RadioView',
+        choices: [
+          'Interpreted',
+          'Compiled'
+        ]
+      }
+    },
+    {
+      name: 'answer',
+      hidden: true,
+      value: 'Interpreted'
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.foamdev.demos.maze',
+  name: 'Question5',
+  label: 'Question',
+  properties: [
+    {
+      name: 'question',
+      label: 'What is the main purpose of JavaScript?',
+      view: {
+        class: 'foam.u2.view.RadioView',
+        choices: [
+          'Video Games',
+          'Animation',
+          'Mobile software',
+          'Web development'
+        ]
+      }
+    },
+    {
+      name: 'answer',
+      hidden: true,
+      value: 'Web development'
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.foamdev.demos.maze',
+  name: 'Question6',
+  label: 'Question',
+  properties: [
+    {
+      name: 'question',
+      label: 'How long does it take to become adequate in JavaScript on average?',
+      view: {
+        class: 'foam.u2.view.RadioView',
+        choices: [
+          '1 month',
+          '2 months',
+          '4 months',
+          '6 months'
+        ]
+      }
+    },
+    {
+      name: 'answer',
+      hidden: true,
+      value: '1 month'
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.foamdev.demos.maze',
+  name: 'Question7',
+  label: 'Question',
+  properties: [
+    {
+      name: 'question',
+      label: 'Which one of these famous apps were made using Java Script?',
+      view: {
+        class: 'foam.u2.view.RadioView',
+        choices: [
+          'Netlix',
+          'Facebook',
+          'Candy Crush',
+          'All of the above'
+        ]
+      }
+    },
+    {
+      name: 'answer',
+      hidden: true,
+      value: 'All of the above'
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.foamdev.demos.maze',
+  name: 'Question8',
+  label: 'Question',
+  properties: [
+    {
+      name: 'question',
+      label: 'When was JavaScript invented?',
+      view: {
+        class: 'foam.u2.view.RadioView',
+        choices: [
+          '1985',
+          '1990',
+          '1995',
+          '2001'
+        ]
+      }
+    },
+    {
+      name: 'answer',
+      hidden: true,
+      value: '1995'
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.foamdev.demos.maze',
+  name: 'Question9',
+  label: 'Question',
+  properties: [
+    {
+      name: 'question',
+      label: 'What was JavaScript\'s first name?',
+      view: {
+        class: 'foam.u2.view.RadioView',
+        choices: [
+          'NetScript',
+          'C67',
+          'Swarrovski',
+          'Mocha'
+        ]
+      }
+    },
+    {
+      name: 'answer',
+      hidden: true,
+      value: 'Mocha'
     }
   ]
 });
@@ -160,7 +347,8 @@ foam.CLASS({
 
   properties: [
     [ 'color', 'red' ],
-    [ 'isClosed', true ]
+    [ 'isClosed', true ],
+    'question'
   ],
 
   methods: [
@@ -242,6 +430,13 @@ foam.CLASS({
     'com.foamdev.demos.maze.Laser',
     'com.foamdev.demos.maze.Question1',
     'com.foamdev.demos.maze.Question2',
+    'com.foamdev.demos.maze.Question3',
+    'com.foamdev.demos.maze.Question4',
+    'com.foamdev.demos.maze.Question5',
+    'com.foamdev.demos.maze.Question6',
+    'com.foamdev.demos.maze.Question7',
+    'com.foamdev.demos.maze.Question8',
+    'com.foamdev.demos.maze.Question9',
     'com.foamdev.demos.maze.Wall',
     'com.foamdev.demos.maze.Robot',
     'foam.animation.Animation',
@@ -277,7 +472,7 @@ foam.CLASS({
     MAZE_VERT: [
       ['Wall',   null, 'Wall',   null,   null, 'Wall', 'Wall', 'Wall',   null,   null, 'Wall', 'Exit'],
       ['Wall', 'Wall', 'Wall', 'Wall', 'Wall',   null, 'Wall', 'Wall',   null, 'Wall',   null, 'Wall'],
-      ['Wall',   null,   null, 'Wall',   null, 'Wall',   null,   null, 'Wall', 'Door',   null, 'Wall'],
+      ['Wall',   null,   null, 'Wall',   null, 'Wall',   null, 'Door', 'Wall', 'Door',   null, 'Wall'],
       ['Wall', 'Wall',   null,   null, 'Wall',   null,   null, 'Wall',   null,   null,   null, 'Wall'],
       ['Wall', 'Wall', 'Wall',   null,   null, 'Wall',   null,   null, 'Wall', 'Wall',   null, 'Wall'],
       ['Wall', 'Wall',   null,   null, 'Wall',   null, 'Wall', 'Wall', 'Wall',   null, 'Wall', 'Wall'],
@@ -334,7 +529,9 @@ foam.CLASS({
     'hittingWall',
 
     // Area in HTML to display questions
-    'questionArea'
+    'questionArea',
+
+    'currentDoor'
   ],
 
   methods: [
@@ -355,7 +552,7 @@ foam.CLASS({
           if ( this.Door.isInstance(o2) ) {
             if ( o2.isClosed ) {
               this.hittingWall = true;
-              this.askQuestion(this.Question1.create(), o2);
+              this.askQuestion(o2);
             }
           } else if ( this.Wall.isInstance(o2) ) {
             this.hittingWall = true;
@@ -371,8 +568,11 @@ foam.CLASS({
       this.timer.i$.sub(this.tick);
     },
 
-    function askQuestion(question, door) {
-      var q = this.Question1.create();
+    function askQuestion(door) {
+      if ( this.currentDoor == door ) return;
+      this.currentDoor = door;
+
+      var q = door.question;
       this.questionArea.removeAllChildren();
       this.questionArea.add(q);
       q.question$.sub(() => {
@@ -388,6 +588,7 @@ foam.CLASS({
 
         // Remove the question
         this.questionArea.removeAllChildren();
+        this.currentDoor = null;
 
         // Set focus again so arrow keys keep working
         this.focus();
@@ -404,19 +605,24 @@ foam.CLASS({
     function buildMaze() {
       // Build the maze, including doors and the exit
       var m = this.MAZE_HORIZ;
-
+var doorNumber = 1;
       // Add horizontal lines
       for ( var row = 0 ; row < m.length ; row++ ) {
         var rowdata = m[row];
         for ( var col = 0 ; col < rowdata.length ; col++ ) {
           if ( rowdata[col] ) {
             var blockType = this[rowdata[col]];
-            this.addChild(blockType.create({
+            var block = blockType.create({
               x:      this.BRICK_SIZE/2 + col*this.BRICK_SIZE,
               y:      this.BRICK_SIZE/2 + row*this.BRICK_SIZE,
               width:  this.BRICK_SIZE,
               height: 5
-            }));
+            });
+            if ( rowdata[col] == 'Door' ) {
+              block.question = this['Question' + doorNumber].create();
+              doorNumber = doorNumber+1;
+            }
+            this.addChild(block);
           }
         }
       }
@@ -428,12 +634,17 @@ foam.CLASS({
         for ( var col = 0 ; col < rowdata.length ; col++ ) {
           if ( rowdata[col] ) {
             var blockType = this[rowdata[col]];
-            this.addChild(blockType.create({
+            var block = blockType.create({
               x:      this.BRICK_SIZE/2 + col*this.BRICK_SIZE,
               y:      this.BRICK_SIZE/2 + row*this.BRICK_SIZE,
               width:  5,
               height: this.BRICK_SIZE
-            }));
+            });
+            if ( rowdata[col] == 'Door' ) {
+              block.question = this['Question' + doorNumber].create();
+              doorNumber = doorNumber+1;
+            }
+            this.addChild(block);
           }
         }
       }
