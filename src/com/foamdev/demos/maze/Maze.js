@@ -4,7 +4,6 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-
 foam.CLASS({
   package: 'com.foamdev.demos.maze',
   name: 'Robot',
@@ -303,7 +302,7 @@ foam.CLASS({
     },
     {
       // Canvas object used to draw graphics on.
-      name: 'table',
+      name: 'maze',
       factory: function() {
         return this.Box.create({
           color:  'black',
@@ -415,7 +414,7 @@ foam.CLASS({
       this.focus();
 
       // Create the HTML
-      this.style({display:'flex'}).add(this.table).add(' ').tag(null, null, this.questionArea$);
+      this.style({display:'flex'}).add(this.maze).add(' ').tag(null, null, this.questionArea$);
     },
 
     function gameOver() {
@@ -424,13 +423,13 @@ foam.CLASS({
       if ( this.isGameOver ) return;
       this.isGameOver = true;
 
-      this.table.color = 'white';
+      this.maze.color = 'white';
 
       var label = this.Label.create({
         text:  'You Win!',
         align: 'center',
         color: 'red',
-        x:     this.table.width/2,
+        x:     this.maze.width/2,
         y:     180
       });
       this.addChild(label);
@@ -441,8 +440,8 @@ foam.CLASS({
           label.scaleX      = label.scaleY = 10;
           label.rotation    = 2 * Math.PI;
           this.robot.scaleX = this.robot.scaleY = 5;
-          this.robot.x      = this.table.width/2-50;
-          this.robot.y      = this.table.height/2-20;
+          this.robot.x      = this.maze.width/2-50;
+          this.robot.y      = this.maze.height/2-20;
         },
         objs: [label, this.robot]
       }).start();
@@ -451,12 +450,12 @@ foam.CLASS({
     },
 
     function addChild(c) {
-      this.table.add(c);
+      this.maze.add(c);
       if ( c.intersects ) this.collider.add(c);
     },
 
     function removeChild(c) {
-      this.table.remove(c);
+      this.maze.remove(c);
       if ( c.intersects ) this.collider.remove(c);
     }
   ],
