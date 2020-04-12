@@ -202,7 +202,8 @@ foam.CLASS({
   extends: 'foam.graphics.Circle',
 
   requires: [ 'foam.animation.Animation' ],
-  imports: [ 'game'],
+
+  imports: [ 'game' ],
 
   properties: [
     [ 'color', 'yellow' ],
@@ -261,42 +262,44 @@ foam.CLASS({
     BRICK_SIZE: 40,
     MAZE_HORIZ: [
       ['Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall'],
-      ['Wall', null, null, 'Wall', null, 'Wall', null, null, 'Wall'],
-      [null, null, null, null, null, null, null, 'Wall', null, 'Wall', 'Wall'],
-      [null, 'Wall', 'Wall', null, 'Wall', 'Wall', 'Wall', null, 'Wall', 'Wall', null],
-      [null, null, 'Wall', 'Wall', 'Wall', null, 'Wall', 'Wall', null, 'Wall', 'Wall'],
-      [null, null, 'Door', 'Wall', null, 'Door', null, null, null, 'Wall'],
-      ['Wall', 'Door', 'Wall', 'Wall', null, null, null, null, 'Wall', null, 'Wall'],
-      ['Wall', 'Wall', null, 'Wall', 'Wall', 'Door', null, 'Door', null, 'Wall'],
-      ['Wall', null, 'Wall', 'Wall', null, 'Wall', null, null, 'Wall', 'Door', 'Wall'],
-      [null, null, 'Wall', null, 'Wall', null, 'Wall', null, null, 'Wall', 'Wall'],
-      [null, 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', null, 'Wall', null, 'Wall'],
+      ['Wall',   null,   null, 'Wall',   null, 'Wall',   null,   null, 'Wall',   null,   null],
+      [  null,   null,   null,   null,   null,   null,   null, 'Wall',   null, 'Wall', 'Wall'],
+      [  null, 'Wall', 'Wall',   null, 'Wall', 'Wall', 'Wall',   null, 'Wall', 'Wall',   null],
+      [  null,   null, 'Wall', 'Wall', 'Wall',   null, 'Wall', 'Wall',   null, 'Wall', 'Wall'],
+      [  null,   null, 'Door', 'Wall',   null, 'Door',   null,   null,   null, 'Wall',   null],
+      ['Wall', 'Door', 'Wall', 'Wall',   null,   null,   null,   null, 'Wall',   null, 'Wall'],
+      ['Wall', 'Wall',   null, 'Wall', 'Wall', 'Door',   null, 'Door',   null, 'Wall',   null],
+      ['Wall',   null, 'Wall', 'Wall',   null, 'Wall',   null,   null, 'Wall', 'Door', 'Wall'],
+      [  null,   null, 'Wall',   null, 'Wall',   null, 'Wall',   null,   null, 'Wall', 'Wall'],
+      [  null, 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall',   null, 'Wall',   null, 'Wall'],
       ['Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall']
     ],
     MAZE_VERT: [
-      ['Wall', null, 'Wall', null, null, 'Wall', 'Wall', 'Wall', null, null, 'Wall', 'Exit'],
-      ['Wall', 'Wall', 'Wall', 'Wall', 'Wall', null, 'Wall', 'Wall', null, 'Wall', null, 'Wall'],
-      ['Wall', null, null, 'Wall', null, 'Wall', null, null, 'Wall', 'Door', null, 'Wall'],
-      ['Wall', 'Wall', null, null, 'Wall', null, null, 'Wall', null, null, null, 'Wall'],
-      ['Wall', 'Wall', 'Wall', null, null, 'Wall', null, null, 'Wall', 'Wall', null, 'Wall'],
-      ['Wall', 'Wall', null, null, 'Wall', null, 'Wall', 'Wall', 'Wall', null, 'Wall', 'Wall'],
-      ['Wall', null, null, 'Wall', null, null, 'Wall', 'Wall', null, 'Wall', null, 'Wall'],
-      ['Wall', null, 'Wall', null, null, null, 'Wall', 'Wall', 'Wall', null, 'Wall', 'Wall'],
-      ['Wall', 'Wall', null, null, 'Wall', 'Wall', null, 'Wall', 'Wall', null, null, 'Wall'],
-      ['Wall', 'Wall', null, 'Wall', null, null, null, 'Wall', null, 'Wall', null, 'Wall'],
-      ['Wall', null, null, null, null, null, null, 'Door', 'Wall', null, false, 'Wall']
+      ['Wall',   null, 'Wall',   null,   null, 'Wall', 'Wall', 'Wall',   null,   null, 'Wall', 'Exit'],
+      ['Wall', 'Wall', 'Wall', 'Wall', 'Wall',   null, 'Wall', 'Wall',   null, 'Wall',   null, 'Wall'],
+      ['Wall',   null,   null, 'Wall',   null, 'Wall',   null,   null, 'Wall', 'Door',   null, 'Wall'],
+      ['Wall', 'Wall',   null,   null, 'Wall',   null,   null, 'Wall',   null,   null,   null, 'Wall'],
+      ['Wall', 'Wall', 'Wall',   null,   null, 'Wall',   null,   null, 'Wall', 'Wall',   null, 'Wall'],
+      ['Wall', 'Wall',   null,   null, 'Wall',   null, 'Wall', 'Wall', 'Wall',   null, 'Wall', 'Wall'],
+      ['Wall',   null,   null, 'Wall',   null,   null, 'Wall', 'Wall',   null, 'Wall',   null, 'Wall'],
+      ['Wall',   null, 'Wall',   null,   null,   null, 'Wall', 'Wall', 'Wall',   null, 'Wall', 'Wall'],
+      ['Wall', 'Wall',   null,   null, 'Wall', 'Wall',   null, 'Wall', 'Wall',   null,   null, 'Wall'],
+      ['Wall', 'Wall',   null, 'Wall',   null,   null,   null, 'Wall',   null, 'Wall',   null, 'Wall'],
+      ['Wall',   null,   null,   null,   null,   null,   null, 'Door', 'Wall',   null,  false, 'Wall']
     ]
    },
 
   properties: [
     [ 'isGameOver', false ],
-    [ 'width', 1600 ],
-    [ 'height', 800 ],
+    [ 'width',      1600 ],
+    [ 'height',     800 ],
     {
+      // Joystick
       name: 'gamepad',
       factory: function() { return this.Gamepad.create(); }
     },
     {
+      // Timer used to tick every frame to cause game to run
       name: 'timer',
       factory: function() { return this.Timer.create(); }
     },
@@ -323,7 +326,14 @@ foam.CLASS({
       name: 'collider',
       factory: function() { return this.Collider.create(); }
     },
-    'lastX', 'lastY', 'hittingWall',
+
+    // Last non-wall-hitting location
+    'lastX', 'lastY',
+
+    // True if robot currently hitting a wall
+    'hittingWall',
+
+    // Area in HTML to display questions
     'questionArea'
   ],
 
@@ -357,8 +367,8 @@ foam.CLASS({
 
       // Start Timer and Collider
       this.collider.start();
-      this.timer.i$.sub(this.tick);
       this.timer.start();
+      this.timer.i$.sub(this.tick);
     },
 
     function askQuestion(question, door) {
@@ -533,6 +543,7 @@ foam.CLASS({
       name: 'fire',
       keyboardShortcuts: [ ' ', 'x' ],
       code: function() {
+        // Fire four lasers, one in each direction
         this.Laser.create({x: this.robot.x, y: this.robot.y, vx: 1,  vy: 0});
         this.Laser.create({x: this.robot.x, y: this.robot.y, vx: 0,  vy: 1});
         this.Laser.create({x: this.robot.x, y: this.robot.y, vx: -1, vy: 0});
