@@ -343,11 +343,10 @@ foam.CLASS({
         }
         if ( o1 == this.robot ) {
           if ( this.Door.isInstance(o2) ) {
-            if ( ! o2.isClosed ) return;
-            o2.open();
-            this.hittingWall = true;
-            this.questionArea.removeAllChildren();
-            this.questionArea.add(this.Question1.create());
+            if ( o2.isClosed ) {
+              this.hittingWall = true;
+              this.askQuestion(this.Question1.create(), o2);
+            }
           } else if ( this.Wall.isInstance(o2) ) {
             this.hittingWall = true;
           } else if ( this.Exit.isInstance(o2) ) {
@@ -360,6 +359,29 @@ foam.CLASS({
       this.collider.start();
       this.timer.i$.sub(this.tick);
       this.timer.start();
+    },
+
+    function askQuestion(question, door) {
+      var q = this.Question1.create();
+      this.questionArea.removeAllChildren();
+      this.questionArea.add(q);
+      q.question$.sub(() => {
+        if ( q.question == q.answer ) {
+          // Open door if correct answer
+          door.open();
+          this.Speak.create({text: "Correct!"}).play();
+        } else {
+          // Put robot back to starting location if wrong
+          this.resetRobotLocation();
+          this.Speak.create({text: "Wrong! Back to the beginning for you."}).play();
+        }
+
+        // Remove the question
+        this.questionArea.removeAllChildren();
+
+        // Set focus again so arrow keys keep working
+        this.focus();
+      });
     },
 
     function resetRobotLocation() {
