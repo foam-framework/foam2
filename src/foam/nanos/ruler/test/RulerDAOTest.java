@@ -10,6 +10,7 @@ import foam.nanos.auth.User;
 import foam.nanos.ruler.*;
 import foam.nanos.test.Test;
 import foam.test.TestUtils;
+import foam.nanos.auth.LifecycleState;
 
 import java.util.List;
 
@@ -109,6 +110,7 @@ public class RulerDAOTest extends Test {
     Predicate pred10 = EQ(DOT(NEW_OBJ, foam.nanos.auth.User.EMAIL), "nanos@nanos.net");
     rule10.setPredicate(pred10);
     rule10.setOperation(Operations.CREATE_OR_UPDATE);
+    rule10.setLifecycleState(LifecycleState.ACTIVE);
 
     // test array of 1 action
     RuleAction[] actions = new RuleAction[1];
@@ -150,6 +152,7 @@ public class RulerDAOTest extends Test {
     rule7.setOperation(Operations.CREATE);
     rule7.setAfter(false);
     rule7.setPriority(100);
+    rule7.setLifecycleState(LifecycleState.ACTIVE);
     RuleAction action7 = (x1, obj, oldObj, ruler, rule7, agent) -> ruler.stop();
     rule7.setAction(action7);
     rule7 = (Rule) ruleDAO.put_(x, rule7);
@@ -184,6 +187,7 @@ public class RulerDAOTest extends Test {
     rule1.setPriority(60);
     RuleAction action1 = (x1, obj, oldObj, ruler, rule1, agent) -> ruler.stop();
     rule1.setAction(action1);
+    rule1.setLifecycleState(LifecycleState.ACTIVE);
     rule1 = (Rule) ruleDAO.put_(x, rule1);
 
     //the rule has a higher priority than the first rule, changes user's email from nanos@nanos.net to foam@nanos.net
@@ -193,6 +197,7 @@ public class RulerDAOTest extends Test {
     rule2.setRuleGroup("users:email filter");
     rule2.setDaoKey("localUserDAO");
     rule2.setOperation(Operations.CREATE);
+    rule2.setLifecycleState(LifecycleState.ACTIVE);
     rule2.setAfter(false);
     rule2.setPriority(80);
     Predicate predicate2 = AND(
@@ -218,6 +223,7 @@ public class RulerDAOTest extends Test {
     rule3.setRuleGroup("users:email filter");
     rule3.setDaoKey("localUserDAO");
     rule3.setOperation(Operations.CREATE);
+    rule3.setLifecycleState(LifecycleState.ACTIVE);
     rule3.setAfter(false);
     rule3.setPriority(20);
     RuleAction action3 = (x14, obj, oldObj, ruler, rule3, agent) -> {
@@ -235,6 +241,7 @@ public class RulerDAOTest extends Test {
     rule4.setOperation(Operations.CREATE);
     rule4.setAfter(false);
     rule4.setPriority(10);
+    rule4.setLifecycleState(LifecycleState.ACTIVE);
     Predicate predicate4 = EQ(DOT(NEW_OBJ, INSTANCE_OF(foam.nanos.auth.User.class)), true);
     rule4.setPredicate(predicate4);
     RuleAction action4 = (x15, obj, oldObj, ruler, rule4, agent) -> {
@@ -254,6 +261,7 @@ public class RulerDAOTest extends Test {
     rule5.setDaoKey("localUserDAO");
     rule5.setOperation(Operations.UPDATE);
     rule5.setAfter(false);
+    rule5.setLifecycleState(LifecycleState.ACTIVE);
     Predicate predicate5 = EQ(DOT(NEW_OBJ, INSTANCE_OF(foam.nanos.auth.User.class)), true);
     rule5.setPredicate(predicate5);
     RuleAction action5 = (x17, obj, oldObj, ruler, rule5, agency) -> {
@@ -299,6 +307,7 @@ public class RulerDAOTest extends Test {
     rule6.setDaoKey("localUserDAO");
     rule6.setOperation(Operations.UPDATE);
     rule6.setSaveHistory(true);
+    rule6.setLifecycleState(LifecycleState.ACTIVE);
     rule6.setPredicate(EQ(DOT(NEW_OBJ, foam.nanos.auth.User.EMAIL), "user2@nanos.net"));
     RuleAction action6 = (x19, obj, oldObj, ruler, rule6, agent) -> ruler.putResult("Pending");
     rule6.setAction(action6);
@@ -324,6 +333,7 @@ public class RulerDAOTest extends Test {
     rule8.setDaoKey("localUserDAO");
     rule8.setOperation(Operations.CREATE);
     rule8.setAfter(false);
+    rule8.setLifecycleState(LifecycleState.ACTIVE);
     rule8.setPredicate(new DummyErroneousPredicate());
     RuleAction action8 = (x111, obj, oldObj, ruler, rule8, agent) -> ruler.stop();
     rule8.setAction(action8);
@@ -341,6 +351,7 @@ public class RulerDAOTest extends Test {
     rule9.setOperation(Operations.UPDATE);
     rule9.setAfter(false);
     rule9.setPredicate(EQ(foam.nanos.auth.User.EMAIL, "nanos@nanos.net"));
+    rule9.setLifecycleState(LifecycleState.ACTIVE);
     RuleAction action9 = (x113, obj, oldObj, ruler, rule9, agent) -> {
       User user = (User) obj;
       user.setEmailVerified(true);
