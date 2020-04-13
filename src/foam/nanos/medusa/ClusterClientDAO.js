@@ -16,6 +16,7 @@ foam.CLASS({
     'foam.core.FObject',
     'foam.core.X',
     'foam.dao.DAO',
+    'foam.dao.DOP',
     'foam.nanos.logger.Logger',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.pm.PM'
@@ -68,7 +69,7 @@ foam.CLASS({
            ! ((Clusterable) obj).getClusterable() ) {
         return getDelegate().put_(x, obj);
       } else {
-        return submit(x, obj, ClusterCommand.PUT);
+        return submit(x, obj, DOP.PUT);
       }
       `
     },
@@ -80,7 +81,7 @@ foam.CLASS({
            ! ((Clusterable) obj).getClusterable() ) {
         return getDelegate().remove_(x, obj);
       } else {
-        return submit(x, obj, ClusterCommand.REMOVE);
+        return submit(x, obj, DOP.REMOVE);
       }
       `
     },
@@ -96,8 +97,8 @@ foam.CLASS({
           type: 'foam.core.FObject'
         },
         {
-          name: 'op',
-          type: 'String'
+          name: 'dop',
+          type: 'foam.dao.DOP'
         }
       ],
       javaType: 'foam.core.FObject',
@@ -105,9 +106,10 @@ foam.CLASS({
       ElectoralService electoralService = (ElectoralService) x.get("electoralService");
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       ClusterConfig config = support.getConfig(x, support.getConfigId());
-      getLogger().debug(op, electoralService.getState().getLabel(), config.getName(), config.getStatus().getLabel());
+      getLogger().debug(dop.getLabel(), electoralService.getState().getLabel(), config.getName(), config.getIsPrimary(), config.getStatus().getLabel(), config.getId(), support.getPrimaryConfigId());
+
       foam.core.FObject old = null;
-      if ( ClusterCommand.PUT == op ) {
+      if ( DOP.PUT == dop ) {
         old = getDelegate().find_(x, obj.getProperty("id"));
       }
       foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(x).setPropertyPredicate(new foam.lib.ClusterPropertyPredicate());
@@ -130,7 +132,7 @@ foam.CLASS({
         int retryAttempt = 0;
         int retryDelay = 10;
 
-        ClusterCommand cmd = new ClusterCommand(x, getServiceName(), op, record);
+        ClusterCommand cmd = new ClusterCommand(x, getServiceName(), dop, record);
         // NOTE: set context to null after init so it's not marshalled across network
         cmd.setX(null);
 
@@ -194,22 +196,19 @@ foam.CLASS({
               throw t;
             }
           }
+          // refresh
+          config = support.getConfig(x, support.getConfigId());
         }
-        if ( support != null ) {
-          getLogger().debug("primary delegating");
-          if ( ClusterCommand.PUT == op ) {
-            return getDelegate().put_(x, obj);
-          }
-          if ( ClusterCommand.REMOVE == op ) {
-            return getDelegate().remove_(x, obj);
-          }
-          getLogger().error("Unsupported operation", op);
-          throw new UnsupportedOperationException(op);
-        } else {
-          // support is null.
-          getLogger().warning("ClusterConfigSupport not found, operation discarded.", obj);
-          throw new RuntimeException("ClusterConfigSupport not found, operation discarded.");
+
+        getLogger().debug("primary delegating");
+        if ( DOP.PUT == dop ) {
+          return getDelegate().put_(x, obj);
         }
+        if ( DOP.REMOVE == dop ) {
+          return getDelegate().remove_(x, obj);
+        }
+        getLogger().error("Unsupported operation", dop.getLabel());
+        throw new UnsupportedOperationException(dop.getLabel());
       `
     },
   ]

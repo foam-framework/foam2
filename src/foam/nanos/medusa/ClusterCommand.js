@@ -23,32 +23,15 @@ foam.CLASS({
     'foam.nanos.session.Session'
   ],
 
-  constants: [
-    {
-      name: 'PUT',
-      type: 'String',
-      value: 'put'
-    },
-    {
-      name: 'REMOVE',
-      type: 'String',
-      value: 'remove'
-    },
-    {
-      name: 'CMD',
-      type: 'String',
-      value: 'cmd'
-    },
-  ],
-
   properties: [
     {
       name: 'serviceName',
       class: 'String'
     },
     {
-      name: 'command',
-      class: 'String'
+      name: 'dop',
+      class: 'Enum',
+      of: 'foam.dao.DOP'
     },
     {
       name: 'obj',
@@ -71,9 +54,9 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-  public ClusterCommand(X x, String serviceName, String command, String obj) {
+  public ClusterCommand(X x, String serviceName, foam.dao.DOP dop, String obj) {
     setServiceName(serviceName);
-    setCommand(command);
+    setDop(dop);
     setObj(obj);
 
     User user = (User) x.get("user");

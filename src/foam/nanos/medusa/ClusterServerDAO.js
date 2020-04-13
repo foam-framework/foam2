@@ -14,6 +14,7 @@ foam.CLASS({
   javaImports: [
     'foam.core.X',
     'foam.dao.DAO',
+    'foam.dao.DOP',
     'foam.nanos.logger.Logger',
     'foam.nanos.logger.PrefixLogger'
   ],
@@ -49,7 +50,7 @@ foam.CLASS({
         ClusterConfig config = support.getConfig(y, support.getConfigId());
         ElectoralServiceServer electoralService = (ElectoralServiceServer) y.get("electoralService");
 
-        getLogger().debug(request.getServiceName(), request.getCommand(), config.getName(), "isPrimary", config.getIsPrimary(), config.getStatus().getLabel(), "electoral state", electoralService.getState().getLabel());
+        getLogger().debug(request.getServiceName(), request.getDop().getLabel(), config.getName(), "isPrimary", config.getIsPrimary(), config.getStatus().getLabel(), "electoral state", electoralService.getState().getLabel());
 
         if ( ! config.getIsPrimary() ) {
           throw new UnsupportedOperationException("Cluster command not supported on non-primary instance");
@@ -79,13 +80,13 @@ foam.CLASS({
           nu = old.fclone().copyFrom(nu);
         }
 
-        if ( ClusterCommand.PUT.equals(request.getCommand()) ) {
+        if ( DOP.PUT == request.getDop() ) {
           return dao.put_(y, nu);
-        } else if ( ClusterCommand.REMOVE.equals(request.getCommand()) ) {
+        } else if ( DOP.REMOVE == request.getDop() ) {
           return dao.remove_(y, nu);
         } else {
-          getLogger().warning("Unsupported operation", request.getCommand());
-          throw new UnsupportedOperationException(request.getCommand());
+          getLogger().warning("Unsupported operation", request.getDop().getLabel());
+          throw new UnsupportedOperationException(request.getDop().getLabel());
         }
       }
       return getDelegate().cmd_(x, obj);
