@@ -104,7 +104,8 @@ foam.CLASS({
       javaCode: `
       ElectoralService electoralService = (ElectoralService) x.get("electoralService");
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      getLogger().debug(op, electoralService.getState().getLabel(), support.getStatus().getLabel());
+      ClusterConfig config = support.getConfig(x, support.getConfigId());
+      getLogger().debug(op, electoralService.getState().getLabel(), config.getName(), config.getStatus().getLabel());
       foam.core.FObject old = null;
       if ( ClusterCommand.PUT == op ) {
         old = getDelegate().find_(x, obj.getProperty("id"));
@@ -133,30 +134,32 @@ foam.CLASS({
         // NOTE: set context to null after init so it's not marshalled across network
         cmd.setX(null);
 
-        while ( support != null &&
-                ! support.getIsPrimary() ) {
-        try {
-          if ( electoralService.getState() == ElectoralServiceState.IN_SESSION ) {
-              getLogger().debug("to primary", support.getPrimaryConfigId(), "attempt", retryAttempt, cmd);
-              PM pm = new PM(ClusterClientDAO.getOwnClassInfo(), getServiceName());
-              FObject result = (FObject) support.getPrimaryDAO(x, getClusterServiceName()).cmd_(x, cmd);
-              pm.log(x);
-              getLogger().debug("from primary", support.getPrimaryConfigId(), "attempt", retryAttempt, result);
-              return result;
-          } else {
-            throw new IllegalStateException("Election in progress.");
-          }
-        } catch ( Throwable t ) {
-          if ( t instanceof UnsupportedOperationException ) {
-            // primary has changed
-            getLogger().debug(t.getMessage());
-          } else if ( t instanceof IllegalStateException ) {
-            // election in progress
-            getLogger().debug(t.getMessage());
-          } else {
-            getLogger().error(t.getMessage(), t);
-            throw t;
-          }
+        while ( ! config.getIsPrimary() ) {
+          try {
+            if ( config.getStatus() != Status.ONLINE ) {
+              throw new IllegalStateException("Cluster Client not ready.");
+            }
+            if ( electoralService.getState() != ElectoralServiceState.IN_SESSION ) {
+              throw new IllegalStateException("Election in progress.");
+            }
+
+            getLogger().debug("to primary", support.getPrimaryConfigId(), "attempt", retryAttempt, cmd);
+            PM pm = new PM(ClusterClientDAO.getOwnClassInfo(), getServiceName());
+            FObject result = (FObject) support.getPrimaryDAO(x, getClusterServiceName()).cmd_(x, cmd);
+            pm.log(x);
+            getLogger().debug("from primary", support.getPrimaryConfigId(), "attempt", retryAttempt, result);
+            return result;
+          } catch ( Throwable t ) {
+            if ( t instanceof UnsupportedOperationException ) {
+              // primary has changed
+              getLogger().debug(t.getMessage());
+            } else if ( t instanceof IllegalStateException ) {
+              // election in progress
+              getLogger().debug(t.getMessage());
+            } else {
+              getLogger().error(t.getMessage(), t);
+              throw t;
+            }
             if ( getMaxRetryAttempts() > -1 &&
                  retryAttempt == getMaxRetryAttempts() ) {
               getLogger().debug("retryAttempt >= maxRetryAttempts", retryAttempt, getMaxRetryAttempts());

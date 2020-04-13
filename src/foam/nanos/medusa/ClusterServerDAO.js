@@ -46,12 +46,16 @@ foam.CLASS({
         X y = request.applyTo(x);
 
         ClusterConfigSupport support = (ClusterConfigSupport) y.get("clusterConfigSupport");
+        ClusterConfig config = support.getConfig(y, support.getConfigId());
         ElectoralServiceServer electoralService = (ElectoralServiceServer) y.get("electoralService");
 
-        getLogger().debug(request.getServiceName(), request.getCommand(), "isPrimary", support.getIsPrimary(), "electoral state", electoralService.getState().getLabel());
+        getLogger().debug(request.getServiceName(), request.getCommand(), config.getName(), "isPrimary", config.getIsPrimary(), config.getStatus().getLabel(), "electoral state", electoralService.getState().getLabel());
 
-        if ( ! support.getIsPrimary() ) {
+        if ( ! config.getIsPrimary() ) {
           throw new UnsupportedOperationException("Cluster command not supported on non-primary instance");
+        }
+        if ( config.getStatus() != Status.ONLINE ) {
+          throw new IllegalStateException("Cluster Server not ready.");
         }
         if ( electoralService.getState() != ElectoralServiceState.IN_SESSION ) {
           throw new IllegalStateException("Election in progress");
@@ -60,7 +64,7 @@ foam.CLASS({
         DAO dao = (DAO) y.get(request.getServiceName());
         if ( dao == null ) {
           getLogger().error("DAO not found.", request.getServiceName());
-          throw new RuntimeException("Cluster requested service not found: "+request.getServiceName());
+          throw new RuntimeException("Service not found: "+request.getServiceName());
         }
         dao = dao.inX(y);
 

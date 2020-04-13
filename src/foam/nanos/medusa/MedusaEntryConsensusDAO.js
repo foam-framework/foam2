@@ -356,7 +356,10 @@ foam.CLASS({
       getLogger().debug("replayComplete");
       setReplaying(false);
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      support.setStatus(Status.ONLINE);
+      DAO dao = (DAO) x.get("clusterConfigDAO");
+      ClusterConfig config = (ClusterConfig) dao.find(support.getConfigId()).fclone();
+      config.setStatus(Status.ONLINE);
+      dao.put(config);
       support.setIsReplaying(false);
       ((DAO) x.get("localMedusaEntryDAO")).cmd(new ReplayCompleteCmd());
       `

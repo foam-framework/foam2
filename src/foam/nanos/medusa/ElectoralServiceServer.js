@@ -131,7 +131,7 @@ foam.CLASS({
     );
     pool_.allowCoreThreadTimeOut(true);
 
-     ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
+    ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
 
     ((Agency) getX().get(support.getThreadPoolName())).submit(getX(), this, "election");
      `
@@ -224,7 +224,7 @@ foam.CLASS({
       `
     },
     {
-      documentation: 'Intended for Agency submission, so dissolve can run with  own thread.',
+      documentation: 'Intended for Agency submission, so dissolve can run with own thread.',
       name: 'dissolve',
       javaCode: `
       getLogger().debug("dissolve", "agency", "submit");
@@ -239,10 +239,11 @@ foam.CLASS({
           setElectionTime(System.currentTimeMillis());
           setState(ElectoralServiceState.ELECTION);
 
-          electionLock_.notify();
+          //electionLock_.notify();
+          ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+          ((Agency) x.get(support.getThreadPoolName())).submit(x, (ContextAgent)this, this.getClass().getSimpleName());
         }
       }
-//      ((Agency) x.get(getThreadPoolName())).submit(x, (ContextAgent)this, this.getClass().getSimpleName());
       `
     },
     {
@@ -255,14 +256,14 @@ foam.CLASS({
       ],
       javaCode: `
       // wait for first dissolve.
-      synchronized ( electionLock_ ) {
-        try {
-          getLogger().debug("execute", "state", getState().getLabel(), "wait", "initial");
-          electionLock_.wait();
-        } catch (InterruptedException e) {
-          return;
-        }
-      }
+      // synchronized ( electionLock_ ) {
+      //   try {
+      //     getLogger().debug("execute", "state", getState().getLabel(), "wait", "initial");
+      //     electionLock_.wait();
+      //   } catch (InterruptedException e) {
+      //     return;
+      //   }
+      // }
 
     while( true ) {
       getLogger().debug("execute", "state", getState().getLabel(), "election time", getElectionTime());
@@ -274,16 +275,17 @@ foam.CLASS({
         getLogger().error(t);
       } finally {
         synchronized ( electionLock_ ) {
-          try {
+ //         try {
             if ( getState() == ElectoralServiceState.IN_SESSION ) {
               setElectionTime(0L);
               setCurrentSeq(0L);
               getLogger().debug("execute", "state", getState().getLabel(), "wait");
-              electionLock_.wait();
+             // electionLock_.wait();
+              return;
             }
-          } catch (InterruptedException e) {
-            return;
-          }
+//          } catch (InterruptedException e) {
+//            return;
+//          }
         }
       }
       try {
@@ -383,7 +385,7 @@ foam.CLASS({
       ClusterConfig config = support.getConfig(getX(), support.getConfigId());
       long v = -1L;
 
-      getLogger().debug("vote", id, time, getElectionTime(), getState().getLabel(), config.getStatus().getLabel());
+      getLogger().debug("vote", id, time, getElectionTime(), getState().getLabel(), support.getStatus().getLabel(), config.getStatus().getLabel());
       if ( config.getStatus() != Status.ONLINE ) {
        return v;
       }
@@ -529,7 +531,8 @@ foam.CLASS({
         setState(ElectoralServiceState.IN_SESSION);
       }
 
-      getLogger().debug("report", support.getConfigId(), winner, getState().getLabel(), "primary", support.getPrimaryConfigId());
+      ClusterConfig config = support.getConfig(getX(), support.getConfigId());
+      getLogger().debug("report", support.getConfigId(), "primary", winner, getState().getLabel(), config.getStatus().getLabel());
      `
     }
   ]

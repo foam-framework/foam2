@@ -77,23 +77,24 @@ configuration for contacting the primary node.`,
       class: 'Enum',
       of: 'foam.nanos.medusa.Status',
       value: 'OFFLINE',
-      javaSetter: `
-      Status old = status_;
-      status_ = val;
-      DAO dao = (DAO) getX().get("localClusterConfigDAO");
-      ClusterConfig config = (ClusterConfig) dao.find(getConfigId());
-      if ( status_ == Status.ONLINE &&
-           config.getStatus() == Status.OFFLINE ) {
-        config = (ClusterConfig) config.fclone();
-        config.setStatus(Status.ONLINE);
-        config = (ClusterConfig) dao.put(config);
-      } if ( status_ == Status.OFFLINE &&
-           config.getStatus() == Status.ONLINE ) {
-        config = (ClusterConfig) config.fclone();
-        config.setStatus(Status.OFFLINE);
-        config = (ClusterConfig) dao.put(config);
-      }
-      `
+      visibility: 'RO'
+      // javaSetter: `
+      // Status old = status_;
+      // status_ = val;
+      // DAO dao = (DAO) getX().get("localClusterConfigDAO");
+      // ClusterConfig config = (ClusterConfig) dao.find(getConfigId());
+      // if ( status_ == Status.ONLINE &&
+      //      config.getStatus() == Status.OFFLINE ) {
+      //   config = (ClusterConfig) config.fclone();
+      //   config.setStatus(Status.ONLINE);
+      //   config = (ClusterConfig) dao.put(config);
+      // } if ( status_ == Status.OFFLINE &&
+      //      config.getStatus() == Status.ONLINE ) {
+      //   config = (ClusterConfig) config.fclone();
+      //   config.setStatus(Status.OFFLINE);
+      //   config = (ClusterConfig) dao.put(config);
+      // }
+      // `
     },
     {
       name: 'isReplaying',

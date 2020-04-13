@@ -31,7 +31,6 @@ foam.CLASS({
     'isPrimary',
     'port',
     'pingLatency',
-    'connections',
     'zone',
     'region',
     'realm',

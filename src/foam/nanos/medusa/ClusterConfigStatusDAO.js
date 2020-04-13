@@ -50,6 +50,10 @@ foam.CLASS({
 
         getLogger().info(nu.getName(), old.getStatus().getLabel(), "->", nu.getStatus().getLabel().toUpperCase());
 
+        if ( nu.getId() == support.getConfigId() ) {
+          support.setStatus(nu.getStatus());
+        }
+
         ElectoralService electoralService = (ElectoralService) x.get("electoralService");
         if ( electoralService != null ) {
           ClusterConfig config = support.getConfig(x, support.getConfigId());
