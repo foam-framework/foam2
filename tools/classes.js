@@ -361,6 +361,7 @@ var classes = [
   'foam.nanos.export.ExportDriverAddOn',
   'foam.nanos.export.ExportDriverDataTypeViewConfig',
   'foam.nanos.export.ExportDriverRegistry',
+  'foam.nanos.export.ExportDriverRegistryExportDriverAddOnJunction',
   'foam.nanos.export.GoogleApiAuthService',
   'foam.nanos.export.GoogleApiCredentials',
   'foam.nanos.export.GoogleDriveService',
