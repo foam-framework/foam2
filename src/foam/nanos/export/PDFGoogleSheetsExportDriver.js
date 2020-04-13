@@ -14,6 +14,13 @@ foam.CLASS({
     'foam.nanos.export.GoogleSheetsOutputter'
   ],
 
+  documentation: `
+    Driver retrieves data, transforms it and makes calls to googleSheetsDataExport.
+    googleSheetsDataExport retrieves permission from a user to make calls to Google Sheets API on their behalf,
+    creates Google Sheet, sends data to api and returns sheet id which is used for returning link to user.
+    Driver makes a link for downloading pdf, returns it to user and sends request to delete the sheet.
+  `,
+
   properties: [
     {
       name: 'outputter',
@@ -31,7 +38,7 @@ foam.CLASS({
         var props = X.filteredTableColumns ? X.filteredTableColumns : self.outputter.getAllPropertyNames(dao.of);
         var metadata = self.outputter.getColumnMethadata(dao.of, props);
         stringArray.push(metadata.map(m => m.columnLabel));
-        var values = self.outputter.outputArray([ obj ], metadata);
+        var values = await  self.outputter.outputArray([ obj ], metadata);
         stringArray = stringArray.concat(values);
 
         sheetId = await X.googleSheetsDataExport.createSheet(stringArray, metadata, config);
@@ -50,7 +57,7 @@ foam.CLASS({
       var props = X.filteredTableColumns ? X.filteredTableColumns : self.outputter.getAllPropertyNames(dao.of);
       var metadata = self.outputter.getColumnMethadata(dao.of, props);
       stringArray.push(metadata.map(m => m.columnLabel));
-      var values = self.outputter.outputArray(sink.array, metadata);
+      var values = await self.outputter.outputArray(sink.array, metadata);
       stringArray = stringArray.concat(values);
 
       sheetId = await X.googleSheetsDataExport.createSheet(stringArray, metadata, config);

@@ -52,9 +52,13 @@ foam.CLASS({
     'x',
     'y',
     {
+      class: 'Boolean',
+      name: 'base'
+    },
+    {
       class: 'Int',
       name: 'weight',
-      expression: function(removed) { return removed ? 0 : 100; }
+      expression: function(removed) { return removed ? 0 : 10; }
     },
     {
       class: 'Int',
@@ -87,7 +91,7 @@ foam.CLASS({
         enableClass(this.myClass('removed'), this.removed$).
         on('click',       this.click).
 //        on('contextmenu', this.mark).
-        start('span').add(this.upForce$).end();
+        start('span').add(this.upForce$, '-', this.force$, '-', this.downForce$).end();
 
     }
   ],

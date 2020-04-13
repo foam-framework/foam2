@@ -141,17 +141,17 @@ foam.CLASS({
     {
       name: 'restingIcon',
       documentation: 'Image for grayed out double arrow when table header is not sorting',
-      value: 'images/resting-arrow.svg'
+      value: '/images/resting-arrow.svg'
     },
     {
       name: 'ascIcon',
       documentation: 'Image for table header ascending sorting arrow',
-      value: 'images/up-arrow.svg'
+      value: '/images/up-arrow.svg'
     },
     {
       name: 'descIcon',
       documentation: 'Image for table header descending sorting arrow',
-      value: 'images/down-arrow.svg'
+      value: '/images/down-arrow.svg'
     },
     {
       name: 'selection',

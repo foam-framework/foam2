@@ -19,13 +19,16 @@ foam.CLASS({
   ],
 
   css: `
+    ^ {
+      background: #ffffff;
+      height: 100vh;
+    }
+
     ^ .sizeCenter {
-      max-width: 30vw;
+      max-width: 45vw;
       margin: 6% auto;
     }
-    ^ .center {
-      text-align: center;
-    }
+    
     ^ .top-bar {
       background: /*%LOGOBACKGROUNDCOLOUR%*/ #202341;
       width: 100%;
@@ -44,6 +47,25 @@ foam.CLASS({
       font-size: 2.5em;
       padding-top: 2vh;
       font-weight: bold;
+      text-align: center;
+      margin-bottom: 0;
+    }
+
+    ^ .subtitle {
+      color: #525455;
+      font-size: 1em;
+      line-height: 1.5;
+      margin-bottom: 2vh;
+      text-align: center;
+    }
+
+    ^ .contents {
+      max-width: 25vw;
+      margin: 0 auto;
+    }
+
+    ^ .submitBtn {
+      text-align: center;
     }
   `,
 
@@ -56,7 +78,7 @@ foam.CLASS({
     {
       name: 'emailPasswordSection',
       title: '',
-      help: `Enter your account email and we will send you an email with a link to create a new one.`
+      help: 'Enter your account email and we will send you an email with a link to create a new one.'
     }
   ],
 
@@ -74,13 +96,14 @@ foam.CLASS({
     { name: 'INSTRUC_TWO', message: 'Please check your inbox to continue.' },
     { name: 'REDIRECTION_TO', message: 'Back to Sign in' },
     { name: 'TITLE', message: 'Forgot your password?' },
+    { name: 'SUBTITLE', message: 'Enter the email you signed up with and we\'ll send you a link to reset your password.' },
     { name: 'ACTION_PRESS', message: 'click' }
   ],
 
   methods: [
     function initE() {
       this.SUPER();
-      let logo = this.theme.largeLogo ? this.theme.largeLogo : this.theme.logo;
+      const logo = this.theme.largeLogo ? this.theme.largeLogo : this.theme.logo;
       this
         .addClass(this.myClass())
         .startContext({ data: this })
@@ -91,11 +114,12 @@ foam.CLASS({
           .end()
           .start().addClass('sizeCenter')
             .start('h1').addClass('title-top').add(this.TITLE).end()
+            .start('p').addClass('subtitle').add(this.SUBTITLE).end()
             .start(this.SectionView, {
               data: this,
               sectionName: 'emailPasswordSection'
-            }).end()
-            .start().addClass('center').br().br()
+            }).addClass('contents').end()
+            .start().addClass('submitBtn').br().br()
               .start(this.SEND_EMAIL, { size: 'LARGE' }).end()
               .br().br()
               .start().addClass('link')
@@ -113,7 +137,7 @@ foam.CLASS({
   actions: [
     {
       name: 'sendEmail',
-      label: 'Send reset password email',
+      label: 'Submit',
       isEnabled: function(errors_) {
         return ! errors_;
       },

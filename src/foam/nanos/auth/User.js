@@ -15,6 +15,7 @@ foam.CLASS({
     'foam.nanos.auth.HumanNameTrait',
     'foam.nanos.auth.LastModifiedAware',
     'foam.nanos.auth.ServiceProviderAware',
+    'foam.nanos.auth.LifecycleAware',
     'foam.nanos.notification.Notifiable'
   ],
 
@@ -28,6 +29,9 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.DAO',
     'foam.dao.ArraySink',
+    'foam.nanos.auth.LifecycleAware',
+    'foam.nanos.auth.LifecycleState',
+    'foam.nanos.session.Session',
 
     'foam.nanos.notification.NotificationSetting',
     'foam.util.SafetyUtil',
@@ -493,6 +497,13 @@ foam.CLASS({
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
       section: 'administrative'
+    },
+    {
+      class: 'foam.core.Enum',
+      of: 'foam.nanos.auth.LifecycleState',
+      name: 'lifecycleState',
+      value: foam.nanos.auth.LifecycleState.PENDING,
+      writePermissionRequired: true
     }
   ],
 
@@ -628,6 +639,39 @@ foam.CLASS({
         List<NotificationSetting> settings = ((ArraySink) getNotificationSettings(x).select(new ArraySink())).getArray();
         for( NotificationSetting setting : settings ) {
           setting.sendNotification(x, this, notification);
+        }
+      `
+    },
+    {
+      name: 'validateAuth',
+      args: [
+        { name: 'x', type: 'Context' }
+      ],
+      javaCode: `
+
+        // check if user enabled
+        if ( ! this.getEnabled() ) {
+          throw new AuthenticationException("User disabled");
+        }
+
+        // check if user login enabled
+        if ( ! this.getLoginEnabled() ) {
+          throw new AuthenticationException("Login disabled");
+        }
+
+        // fetch context from session and check two factor success if enabled.
+        Session session = x.get(Session.class);
+        if ( session == null ) {
+          throw new AuthenticationException("No session exists.");
+        }
+
+        // check for two-factor authentication
+        if ( this.getTwoFactorEnabled() && ! session.getContext().getBoolean("twoFactorSuccess") ) {
+          throw new AuthenticationException("User requires two-factor authentication");
+        }
+
+        if ( this instanceof LifecycleAware && ((LifecycleAware) this).getLifecycleState() != LifecycleState.ACTIVE ) {
+          throw new AuthenticationException("User is not active");
         }
       `
     }
