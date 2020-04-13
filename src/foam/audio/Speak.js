@@ -29,6 +29,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'text',
+      value: 'hello world',
       width: 60
     },
     {
@@ -79,22 +80,53 @@ foam.CLASS({
           var firstChoice;
           view.choices = synth.getVoices().map(function(v) {
             var choice = [v, v.name];
-            if ( ! view.data && v.lang === 'en-US' ) firstChoice = choice;
+//            if ( ! view.data && v.lang === 'en-US' ) firstChoice = choice;
             return choice;
           });
-          if ( firstChoice ) view.choice = firstChoice;
+         // if ( firstChoice ) view.choice = firstChoice;
         }
 
         updateChoices();
+//        this.voices$.sub(updateChoices);
         synth.addEventListener('voiceschanged', updateChoices);
 
         return view;
+      }
+    },
+    {
+      name: 'voices',
+      hidden: true
+    }
+  ],
+
+  methods: [
+    function init() {
+      var synth = this.window.speechSynthesis;
+      this.voicesChanged();
+      synth.addEventListener('voiceschanged', this.voicesChanged);
+    }
+  ],
+
+  listeners: [
+    function voicesChanged() {
+      var synth = this.window.speechSynthesis;
+      this.voices = synth.getVoices();
+      if ( this.voices && ! this.voice ) {
+        for ( var i = 0 ; i < this.voices.length ; i++ ) {
+          var v = this.voices[i];
+          if ( v.lang === 'en-US' ) { this.voice = v; return; }
+        }
       }
     }
   ],
 
   actions: [
     function play() {
+      if ( ! this.voices ) {
+        window.setTimeout(50, () => this.play());
+        return;
+      }
+
       var synth = this.window.speechSynthesis;
       var u     = new SpeechSynthesisUtterance(this.text);
 
