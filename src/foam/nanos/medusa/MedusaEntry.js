@@ -27,19 +27,6 @@ foam.CLASS({
     'lastModified'
   ],
 
-  constants: [
-    {
-      name: 'PUT',
-      type: 'String',
-      value: 'put'
-    },
-    {
-      name: 'REMOVE',
-      type: 'String',
-      value: 'remove'
-    }
-  ],
-
   properties: [
     {
       class: 'String',
@@ -53,8 +40,9 @@ foam.CLASS({
       visibility: 'RO'
     },
     {
-      class: 'String',
-      name: 'action',
+      class: 'Enum',
+      of: 'foam.dao.DOP',
+      name: 'dop',
       visibility: 'RO'
     },
     {

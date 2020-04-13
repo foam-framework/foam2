@@ -13,6 +13,7 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.core.FObject',
     'foam.core.X',
     'foam.dao.DAO',
     'foam.nanos.logger.PrefixLogger',
@@ -22,9 +23,13 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'entry',
-      class: 'FObjectProperty',
-      of: 'foam.nanos.medusa.MedusaEntry'
+      name: 'dop',
+      class: 'Enum',
+      of: 'foam.dao.DOP'
+    },
+    {
+      name: 'obj',
+      class: 'Object',
     },
     {
       name: 'delegate',
@@ -49,9 +54,10 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-  public MedusaEntryAgent(X x, MedusaEntry entry, DAO delegate) {
+  public MedusaEntryAgent(X x, foam.dao.DOP dop, Object obj, DAO delegate) {
     setX(x);
-    setEntry(entry);
+    setDop(dop);
+    setObj(obj);
     setDelegate(delegate);
   }
          `
@@ -70,13 +76,18 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      MedusaEntry entry = getEntry();
-      getLogger().debug("execute", entry.getIndex());
-      PM pm = PM.create(x, MedusaEntryAgent.getOwnClassInfo(), "put:"+Long.toString(entry.getIndex()));
+      PM pm = PM.create(x, MedusaEntryAgent.getOwnClassInfo(), getDop().getLabel()+":"+getObj().getClass().getSimpleName());
       try {
-        getDelegate().put_(x, entry);
+        if ( foam.dao.DOP.PUT == getDop() ) {
+          MedusaEntry entry = (MedusaEntry) getObj();
+          getLogger().debug("execute", entry.getIndex());
+          getDelegate().put_(x, (FObject) getObj());
+        } else if ( foam.dao.DOP.CMD == getDop() ) {
+          getLogger().debug("execute", getObj().getClass().getSimpleName());
+          getDelegate().cmd_(x, getObj());
+        }
       } catch ( Exception e ) {
-        getLogger().error("execute", e.getMessage(), entry, e);
+        getLogger().error("execute", e.getMessage(), e);
         // TODO: Alarm
       } finally {
         pm.log(x);

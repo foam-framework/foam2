@@ -19,6 +19,7 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.FObject',
+    'foam.dao.DOP',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM'
@@ -54,13 +55,13 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-      return submit(x, (FObject) obj, MedusaEntry.PUT);
+      return submit(x, (FObject) obj, DOP.PUT);
       `
     },
     {
       name: 'remove_',
       javaCode: `
-      return submit(x, (FObject) obj, MedusaEntry.REMOVE);
+      return submit(x, (FObject) obj, DOP.REMOVE);
       `
     },
     {
@@ -84,14 +85,14 @@ foam.CLASS({
           type: 'FObject'
         },
         {
-          name: 'op',
-          type: 'String'
+          name: 'dop',
+          type: 'foam.dao.DOP'
         }
       ],
       type: 'FObject',
       javaCode: `
-      PM pm = createPM(x, op);
-      getLogger().debug("submit", obj.getClass().getName());
+      PM pm = createPM(x, dop);
+      getLogger().debug("submit", dop.getLabel(), obj.getClass().getName());
 
       ElectoralService electoralService = (ElectoralService) x.get("electoralService");
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
@@ -106,7 +107,7 @@ foam.CLASS({
       MedusaEntry entry = x.create(MedusaEntry.class);
       entry.setMediator(config.getName());
       entry.setNSpecName(getNSpec().getName());
-      entry.setAction(op);
+      entry.setDop(dop);
       entry.setData(obj);
 
       getLogger().debug("submit", entry.getIndex());
@@ -146,13 +147,13 @@ foam.CLASS({
           type: 'Context'
         },
         {
-          name: 'op',
-          type: 'String'
+          name: 'dop',
+          type: 'foam.dao.DOP'
         }
       ],
       javaType: 'PM',
       javaCode: `
-    return PM.create(x, this.getOf(), op);
+    return PM.create(x, this.getOf(), dop.getLabel());
       `
     }
   ]

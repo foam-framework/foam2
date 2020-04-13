@@ -255,27 +255,16 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      // wait for first dissolve.
-      // synchronized ( electionLock_ ) {
-      //   try {
-      //     getLogger().debug("execute", "state", getState().getLabel(), "wait", "initial");
-      //     electionLock_.wait();
-      //   } catch (InterruptedException e) {
-      //     return;
-      //   }
-      // }
-
-    while( true ) {
-      getLogger().debug("execute", "state", getState().getLabel(), "election time", getElectionTime());
-      try {
-        if ( getState() != ElectoralServiceState.IN_SESSION ) {
-          callVote(x);
-        }
-      } catch(Throwable t) {
-        getLogger().error(t);
-      } finally {
-        synchronized ( electionLock_ ) {
- //         try {
+      while( true ) {
+        getLogger().debug("execute", "state", getState().getLabel(), "election time", getElectionTime());
+        try {
+          if ( getState() != ElectoralServiceState.IN_SESSION ) {
+            callVote(x);
+          }
+        } catch(Throwable t) {
+          getLogger().error(t);
+        } finally {
+          synchronized ( electionLock_ ) {
             if ( getState() == ElectoralServiceState.IN_SESSION ) {
               setElectionTime(0L);
               setCurrentSeq(0L);
@@ -283,17 +272,14 @@ foam.CLASS({
              // electionLock_.wait();
               return;
             }
-//          } catch (InterruptedException e) {
-//            return;
-//          }
+          }
+        }
+        try {
+          Thread.currentThread().sleep(2000);
+        } catch (InterruptedException e) {
+          return;
         }
       }
-      try {
-        Thread.currentThread().sleep(2000);
-      } catch (InterruptedException e) {
-        return;
-      }
-    }
       `
     },
     {
@@ -385,7 +371,7 @@ foam.CLASS({
       ClusterConfig config = support.getConfig(getX(), support.getConfigId());
       long v = -1L;
 
-      getLogger().debug("vote", id, time, getElectionTime(), getState().getLabel(), support.getStatus().getLabel(), config.getStatus().getLabel());
+      getLogger().debug("vote", id, time, getElectionTime(), getState().getLabel(),config.getStatus().getLabel());
       if ( config.getStatus() != Status.ONLINE ) {
        return v;
       }

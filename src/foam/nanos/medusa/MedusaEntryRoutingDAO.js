@@ -13,6 +13,7 @@ foam.CLASS({
 
   javaImports: [
     'foam.dao.DAO',
+    'foam.dao.DOP',
     'foam.dao.EasyDAO',
     'foam.dao.MDAO',
     'foam.dao.ProxyDAO',
@@ -55,13 +56,14 @@ foam.CLASS({
       getLogger().debug("put", entry.getIndex(), "consensus", "TRUE");
 
       try {
+        getLogger().debug("put", entry.getIndex(), "mdao", entry.getDop().getLabel());
         DAO mdao = getMdao(x, entry);
-        if ( MedusaEntry.PUT.equals(entry.getAction()) ) {
-          getLogger().debug("put", entry.getIndex(), "mdao", "put");
+        if ( DOP.PUT == entry.getDop() ) {
           mdao.put_(x, entry.getData());
-        } else {
-          getLogger().debug("put", entry.getIndex(), "mdao", "remove");
+        } else if ( DOP.REMOVE == entry.getDop() ) {
           mdao.remove_(x, entry.getData());
+        } else {
+          throw new UnsupportedOperationException(entry.getDop().getLabel());
         }
 
         // Notify any blocked Primary puts

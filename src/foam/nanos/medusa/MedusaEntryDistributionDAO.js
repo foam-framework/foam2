@@ -7,13 +7,15 @@
 foam.CLASS({
   package: 'foam.nanos.medusa',
   name: 'MedusaEntryDistributionDAO',
-  extends: 'foam.dao.ProxyDAO',
+  extends: 'foam.dao.BatchClientDAO',
+//  extends: 'foam.dao.ProxyDAO',
 
   documentation: `Write MedusaEntry to the Medusa Nodes`,
 
   javaImports: [
     'foam.dao.ArraySink',
     'foam.dao.DAO',
+    'foam.dao.DOP',
     'static foam.mlang.MLang.AND',
     'static foam.mlang.MLang.EQ',
     'foam.nanos.logger.PrefixLogger',
@@ -54,9 +56,36 @@ foam.CLASS({
       documentation: 'Using assembly line, write to all online nodes - in all a zones.',
       name: 'put_',
       javaCode: `
-      MedusaEntry entry = (MedusaEntry) getDelegate().put_(x, obj);
-//      MedusaEntry entry = (MedusaEntry) ((DaggerService) x.get("daggerService")).internal().put_(x, obj);
-      getLogger().debug("put", entry.getIndex());
+      return super.put_(x, getDelegate().put_(x, obj));
+      `
+    },
+    {
+      documentation: 'Using assembly line, write to all online nodes - in all a zones.',
+      name: 'cmd_',
+      javaCode: `
+      return submit(x, obj, DOP.CMD);
+      `
+    },
+    {
+      documentation: 'Using assembly line, write to all online mediators in zone 0 and same realm,region',
+      name: 'submit',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'obj',
+          type: 'Object'
+        },
+        {
+          name: 'dop',
+          type: 'foam.dao.DOP'
+        },
+      ],
+      type: 'Object',
+      javaCode: `
+      getLogger().debug("submit", dop.getLabel(), obj.getClass().getSimpleName());
 
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
 
@@ -84,14 +113,21 @@ foam.CLASS({
                         .build();
                 getClients().put(config.getId(), dao);
               }
-              dao.put_(x, entry);
+              if ( DOP.PUT == dop ) {
+                MedusaEntry entry = (MedusaEntry) obj;
+                getLogger().debug("submit", dop.getLabel(), entry.getIndex(), config.getName(), "data", (entry.getData() != null) ? entry.getData().getClass().getSimpleName():"null");
+                dao.put_(x, entry);
+              } else if ( DOP.CMD == dop ) {
+                getLogger().debug("submit", dop.getLabel(), obj.getClass().getSimpleName(), config.getName());
+                dao.cmd_(x, obj);
+              }
             } catch ( Throwable t ) {
               getLogger().error(t);
             }
           }
         });
       }
-      return entry;
+      return obj;
       `
     }
   ]

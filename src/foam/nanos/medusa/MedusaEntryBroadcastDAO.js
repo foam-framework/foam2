@@ -7,14 +7,16 @@
 foam.CLASS({
   package: 'foam.nanos.medusa',
   name: 'MedusaEntryBroadcastDAO',
-  extends: 'foam.dao.ProxyDAO',
+  extends: 'foam.dao.BatchClientDAO',
+//  extends: 'foam.dao.ProxyDAO',
 
-  // TODO: Pass off to threadpool for broadcast so calling thread (mediator) can return.
   documentation: `Broadcast MedusaEntrys back to Mediators.`,
 
   javaImports: [
+    'foam.core.FObject',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
+    'foam.dao.DOP',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'static foam.mlang.MLang.AND',
@@ -55,8 +57,37 @@ foam.CLASS({
       documentation: 'Using assembly line, write to all online mediators in zone 0 and same realm,region',
       name: 'put_',
       javaCode: `
-      MedusaEntry entry = (MedusaEntry) getDelegate().put_(x, obj);
-      getLogger().debug("put", entry.getIndex());
+      return super.put_(x, getDelegate().put_(x, obj));
+//      return (FObject) submit(x, getDelegate().put_(x, obj), DOP.PUT);
+      `
+    },
+    {
+      documentation: 'Using assembly line, write to all online mediators in zone 0 and same realm,region',
+      name: 'cmd_',
+      javaCode: `
+      return submit(x, obj, DOP.CMD);
+      `
+    },
+    {
+      documentation: 'Using assembly line, write to all online mediators in zone 0 and same realm,region',
+      name: 'submit',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'obj',
+          type: 'Object'
+        },
+        {
+          name: 'dop',
+          type: 'foam.dao.DOP'
+        },
+      ],
+      type: 'Object',
+      javaCode: `
+      getLogger().debug("submit", dop.getLabel(), obj.getClass().getSimpleName());
 
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
@@ -89,15 +120,21 @@ foam.CLASS({
                         .build();
 //                getClients().put(config.getId(), dao);
 //              }
-              getLogger().debug("put", entry.getIndex(), config.getName(), "data", (entry.getData() != null) ? entry.getData().getClass().getSimpleName():"null");
-              dao.put_(x, entry);
+              if ( DOP.PUT == dop ) {
+                MedusaEntry entry = (MedusaEntry) obj;
+                getLogger().debug("submit", dop.getLabel(), entry.getIndex(), config.getName(), "data", (entry.getData() != null) ? entry.getData().getClass().getSimpleName():"null");
+                dao.put_(x, entry);
+              } else if ( DOP.CMD == dop ) {
+                getLogger().debug("submit", dop.getLabel(), obj.getClass().getSimpleName(), config.getName());
+                dao.cmd_(x, obj);
+              }
             } catch ( Throwable t ) {
               getLogger().error(t);
             }
           }
         });
       }
-      return entry;
+      return obj;
       `
     }
   ]

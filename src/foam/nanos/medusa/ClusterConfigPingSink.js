@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'ClusterConfigPingSink',
   extends: 'foam.dao.AbstractSink',
 
-  documenation: 'Attempt to contact Nodes and Mediators, record ping time and mark them ONLINE or OFFLINE.',
+  documentation: 'Attempt to contact Nodes and Mediators, record ping time and mark them ONLINE or OFFLINE.',
 
   javaImports: [
     'foam.dao.DAO',

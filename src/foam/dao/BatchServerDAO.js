@@ -5,20 +5,19 @@
  */
 
 foam.CLASS({
-  package: 'foam.nanos.medusa',
-  name: 'MedusaEntryReplayBatchDAO',
+  package: 'foam.dao',
+  name: 'BatchServerDAO',
   extends: 'foam.dao.ProxyDAO',
 
-
-  documentation: `Handle ReplayBatchCmd, issuing Mediator side puts()`,
+  documenation: 'Unpack BatchCmd List and issue individual dao operations',
 
   javaImports: [
-    'foam.dao.BatchCmd',
+    'foam.core.FObject',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
-    'java.util.List'
+    'java.util.List',
   ],
-  
+
   properties: [
     {
       name: 'logger',
@@ -39,15 +38,11 @@ foam.CLASS({
       javaCode: `
       if ( obj instanceof BatchCmd ) {
         BatchCmd cmd = (BatchCmd) obj;
-        getLogger().info("cmd", cmd.getClass().getSimpleName());
-        if ( cmd instanceof ReplayBatchCmd ) {
-          ReplayBatchCmd rbc = (ReplayBatchCmd) obj;
-          getLogger().info("cmd", "ReplayBatchCmd", rbc.getFromIndex(), rbc.getToIndex(), rbc.getDetails().getResponder());
-        }
+        getLogger().info("cmd", "BatchCmd");
 
-        List<MedusaEntry> list = cmd.getBatch();
-        for (MedusaEntry entry : list) {
-          getDelegate().put_(x, entry);
+        List<FObject> list = cmd.getBatch();
+        for (FObject fobject : list) {
+          getDelegate().put_(x, fobject);
         }
         return cmd;
       }
@@ -56,4 +51,3 @@ foam.CLASS({
     }
   ]
 });
- 

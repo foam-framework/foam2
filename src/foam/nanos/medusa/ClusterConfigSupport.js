@@ -311,7 +311,7 @@ configuration for contacting the primary node.`,
         .where(
           AND(
             EQ(ClusterConfig.ZONE, 0),
-            EQ(ClusterConfig.TYPE, MedusaType.NODE),
+            EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
             EQ(ClusterConfig.ENABLED, true)
           ))
         .select(COUNT());

@@ -152,7 +152,6 @@ FOAM_FILES([
   { name: "foam/nanos/medusa/MedusaEntryInternalDAO" },
   { name: "foam/nanos/medusa/MedusaEntryLinkDAO" },
   { name: "foam/nanos/medusa/MedusaEntryNodesDAO" },
-  { name: "foam/nanos/medusa/MedusaEntryReplayBatchDAO" },
   { name: "foam/nanos/medusa/MedusaEntryReplayingDAO" },
   { name: "foam/nanos/medusa/MedusaEntryRoutingDAO" },
   { name: "foam/nanos/medusa/MedusaEntrySigningDAO" },

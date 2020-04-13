@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.nanos.medusa',
   name: 'ReplayBatchCmd',
+  extends: 'foam.dao.BatchCmd',
 
   properties: [
     {
@@ -14,40 +15,17 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.nanos.medusa.ReplayDetailsCmd'
     },
-    // {
-    //   documentation: 'Instance requesting replay details',
-    //   name: 'requester',
-    //   class: 'String',
-    // },
-    // {
-    //   documentation: 'Instance supplying replay details',
-    //   name: 'responder',
-    //   class: 'String',
-    // },
-    // {
-    //   name: 'minIndex',
-    //   class: 'Long'
-    // },
-    // {
-    //   name: 'maxIndex',
-    //   class: 'Long'
-    // },
-    // {
-    //   name: 'count',
-    //   class: 'Long'
-    // },
     {
       name: 'fromIndex',
-      class: 'Long',
+      class: 'Long'
     },
     {
       name: 'toIndex',
-      class: 'Long',
+      class: 'Long'
     },
     {
       name: 'batch',
-      class: 'List',
-//      of: 'foam.nanos.medusa.MedusaEntry'
+      class: 'List'
     }
   ]
 });

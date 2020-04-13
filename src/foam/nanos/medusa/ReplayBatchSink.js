@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'ReplayBatchSink',
   extends: 'foam.dao.AbstractSink',
 
-  documenation: 'Batch replies in some time window into a single (HTTP) send operation.',
+  documentation: 'Batch replies in some time window into a single (HTTP) send operation.',
 
   implements: [
     'foam.core.ContextAgent'
@@ -66,7 +66,7 @@ foam.CLASS({
     {
       name: 'timer',
       class: 'Object',
-      visibilty: 'HIDDEN'
+      visibility: 'HIDDEN'
     },
     {
       name: 'complete',

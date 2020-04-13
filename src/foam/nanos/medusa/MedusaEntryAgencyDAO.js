@@ -14,6 +14,7 @@ foam.CLASS({
   javaImports: [
     'foam.core.Agency',
     'foam.core.ContextAgent',
+    'foam.dao.DOP',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
   ],
@@ -38,10 +39,20 @@ foam.CLASS({
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
       getLogger().debug("put", entry.getIndex());
-      ContextAgent agent = new MedusaEntryAgent(x, entry, getDelegate());
+      ContextAgent agent = new MedusaEntryAgent(x, DOP.PUT, entry, getDelegate());
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      ((Agency) x.get(support.getThreadPoolName())).submit(x, agent, "MedusaEntryAgent-"+entry.getMediator()+"-"+entry.getNode()+"-"+Long.toString(entry.getIndex()));
+      ((Agency) x.get(support.getThreadPoolName())).submit(x, agent, "MedusaEntryAgent-"+obj.getClass().getSimpleName());
       return entry;
+      `
+    },
+    {
+      name: 'cmd_',
+      javaCode: `
+      getLogger().debug("cmd", obj.getClass().getSimpleName());
+      ContextAgent agent = new MedusaEntryAgent(x, DOP.CMD, obj, getDelegate());
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      ((Agency) x.get(support.getThreadPoolName())).submit(x, agent, "MedusaEntryAgent-"+obj.getClass().getSimpleName());
+      return obj;
       `
     }
   ]
