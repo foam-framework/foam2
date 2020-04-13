@@ -35,7 +35,7 @@ foam.CLASS({
         };
       },
       postSet: function(oldValue, newValue) {
-        if ( newValue !== oldValue /*&& oldValue !== ''*/ ) {
+        if ( newValue !== oldValue && oldValue !== '') {
           if ( this.data && this.data.cls_.name === newValue ) return;
           var m = this.__context__.lookup(newValue, true);
           if ( m ) {
