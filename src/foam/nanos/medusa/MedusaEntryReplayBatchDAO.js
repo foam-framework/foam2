@@ -39,10 +39,10 @@ foam.CLASS({
       javaCode: `
       if ( obj instanceof BatchCmd ) {
         BatchCmd cmd = (BatchCmd) obj;
-        getLogger().info("cmd", cmd.getClass().getSimpleName());
+        getLogger().debug("cmd", cmd.getClass().getSimpleName());
         if ( cmd instanceof ReplayBatchCmd ) {
           ReplayBatchCmd rbc = (ReplayBatchCmd) obj;
-          getLogger().info("cmd", "ReplayBatchCmd", rbc.getFromIndex(), rbc.getToIndex(), rbc.getDetails().getResponder());
+          getLogger().debug("cmd", "ReplayBatchCmd", rbc.getFromIndex(), rbc.getToIndex(), rbc.getDetails().getResponder());
         }
 
         List<MedusaEntry> list = cmd.getBatch();

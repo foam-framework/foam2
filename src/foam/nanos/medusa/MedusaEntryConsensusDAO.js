@@ -112,7 +112,7 @@ foam.CLASS({
       getLogger().debug("put", getIndex(), entry.getIndex(), entry.getNode());
 
       if ( entry.getIndex() <= getIndex() ) {
-        getLogger().info("put", getIndex(), entry.getIndex(), entry.getNode(), "discarding");
+        getLogger().debug("put", getIndex(), entry.getIndex(), entry.getNode(), "discarding");
         return entry;
       }
 
@@ -120,18 +120,10 @@ foam.CLASS({
 
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
 
-      // Count count = (Count) getDelegate().where(
-      //   EQ(MedusaEntry.INDEX, entry.getIndex())
-      // ).select(COUNT());
-      // if ( (Long)count.getValue() < support.getNodeQuorum(x) ) {
-      //   getLogger().info("put", getIndex(), entry.getIndex(), entry.getNode(), "waiting for node quorum", count.getValue(), support.getNodeQuorum(x));
-      //   return entry;
-      // }
-
       MedusaEntry ce = null;
       synchronized ( Long.toString(entry.getIndex()).intern() ) {
         if ( entry.getIndex() <= getIndex() ) {
-          getLogger().info("put", "in-lock", getIndex(), entry.getIndex(), entry.getNode(), "discarding");
+          getLogger().debug("put", "in-lock", getIndex(), entry.getIndex(), entry.getNode(), "discarding");
           return entry;
         }
 
@@ -202,7 +194,7 @@ foam.CLASS({
       ],
       type: 'foam.nanos.medusa.MedusaEntry',
       javaCode: `
-      getLogger().info("promote", getIndex(), entry.getIndex());
+      getLogger().debug("promote", getIndex(), entry.getIndex());
 
       DaggerService dagger = (DaggerService) x.get("daggerService");
       dagger.verify(x, entry);

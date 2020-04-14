@@ -38,7 +38,7 @@ foam.CLASS({
       javaCode: `
       if ( obj instanceof BatchCmd ) {
         BatchCmd cmd = (BatchCmd) obj;
-        getLogger().info("cmd", "BatchCmd");
+        // getLogger().debug("cmd", "BatchCmd");
 
         List<FObject> list = cmd.getBatch();
         for (FObject fobject : list) {
