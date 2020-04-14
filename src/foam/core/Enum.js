@@ -275,11 +275,11 @@ foam.CLASS({
     }
   ],
 
-  static: {
-    function fromOrdinal(i) {
+  static: [
+    function forOrdinal(i) {
       return this.VALUES.find((e) => e.ordinal == i);
     }
-  },
+  ],
 
   properties: [
     {
