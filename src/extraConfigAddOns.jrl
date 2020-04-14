@@ -1,1 +1,1 @@
-p({"class":"foam.nanos.extraconfig.ExtraConfigAddOn","id":"docTitle","configForClass":"foam.nanos.export.GoogleSheetsExport","labelForConfig":"Document Title"})
+p({"class":"foam.nanos.extraconfig.AddOn","id":"docTitle","configForClass":"foam.nanos.export.GoogleSheetsExport","labelForConfig":"Document Title"})

@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.nanos.extraconfig',
-  name: 'ExtraConfig',
+  name: 'Config',
   properties: [
     {
       name: 'configValueString',
@@ -16,7 +16,7 @@ foam.CLASS({
     {
       name: 'exportMetadata',
       class: 'Reference',
-      of: 'foam.nanos.extraconfig.ExtraConfigAddOn'
+      of: 'foam.nanos.extraconfig.AddOn'
     },
     {
       name: 'configValue',

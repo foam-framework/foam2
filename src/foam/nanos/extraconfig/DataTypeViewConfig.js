@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.nanos.extraconfig',
-  name: 'ExtraConfigDataTypeViewConfig',
+  name: 'DataTypeViewConfig',
   properties: [
     {
       name: 'id',//typeOfConfig: String, Boolean, DAO / StringArray, Number

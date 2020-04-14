@@ -1130,13 +1130,13 @@ p({
     return new foam.dao.EasyDAO.Builder(x)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("extraConfigDataTypeViewConfigs")
-      .setOf(foam.nanos.extraconfig.ExtraConfigDataTypeViewConfig.getOwnClassInfo())
+      .setOf(foam.nanos.extraconfig.DataTypeViewConfig.getOwnClassInfo())
       .build();
   """,
   "client":
   """
     {
-      "of": "foam.nanos.extraconfig.ExtraConfigDataTypeViewConfig"
+      "of": "foam.nanos.extraconfig.DataTypeViewConfig"
     }
   """
 })
@@ -1153,13 +1153,13 @@ p({
     return new foam.dao.EasyDAO.Builder(x)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("extraConfigAddOns")
-      .setOf(foam.nanos.extraconfig.ExtraConfigAddOn.getOwnClassInfo())
+      .setOf(foam.nanos.extraconfig.AddOn.getOwnClassInfo())
       .build();
   """,
   "client":
   """
     {
-      "of": "foam.nanos.extraconfig.ExtraConfigAddOn"
+      "of": "foam.nanos.extraconfig.AddOn"
     }
   """
 })

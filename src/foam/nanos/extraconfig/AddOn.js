@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.nanos.extraconfig',
-  name: 'ExtraConfigAddOn',
+  name: 'AddOn',
   properties: [
     {
       name: 'id',
@@ -20,7 +20,7 @@ foam.CLASS({
       //typeOfConfig: String, Boolean, DAO (Enum), Number
       name: 'typeOfConfig',
       class: 'Reference',
-      of: 'foam.nanos.extraconfig.ExtraConfigDataTypeViewConfig'
+      of: 'foam.nanos.extraconfig.DataTypeViewConfig'
     },
     {
       name: 'labelForConfig',
@@ -57,8 +57,8 @@ foam.CLASS({
 });
 
 foam.RELATIONSHIP({
-  sourceModel: 'foam.nanos.extraconfig.ExtraConfigDataTypeViewConfig',
-  targetModel: 'foam.nanos.extraconfig.ExtraConfigAddOn',
+  sourceModel: 'foam.nanos.extraconfig.DataTypeViewConfig',
+  targetModel: 'foam.nanos.extraconfig.AddOn',
   forwardName: 'extraConfigAddOns',
   inverseName: 'typeOfConfig',
   cardinality: '1:*'
