@@ -59,12 +59,13 @@ foam.CLASS({
           onKey: this.onKey
         })
           .addClass(this.myClass('input'))
+          .attr('name', this.myClass('input'))
         .end()
       .end();
     },
 
     function fromProperty(prop) {
-
+      this.SUPER(prop);
       if ( ! this.placeholder && prop.placeholder ) {
         this.placeholder = prop.placeholder;
       }
