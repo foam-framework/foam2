@@ -381,6 +381,7 @@ foam.CLASS({
 
         // Remove the question
         this.game.question = null;
+        this.game.focus();
       });
     },
 
@@ -450,6 +451,8 @@ foam.CLASS({
   package: 'com.foamdev.demos.maze',
   name: 'Game',
   extends: 'foam.u2.Element',
+
+  documentation: 'Javascript quiz maze game.',
 
   requires: [
     'com.foamdev.demos.maze.Door',
