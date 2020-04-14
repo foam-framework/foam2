@@ -185,7 +185,8 @@ configuration for contacting the primary node.`,
         path.append("/");
         path.append(serviceName);
 
-        java.net.URI uri = new java.net.URI("http", null, address, config.getPort(), path.toString(), query, fragment);
+        String scheme = config.getUseHttps() ? "https" : "http";
+        java.net.URI uri = new java.net.URI(scheme, null, address, config.getPort(), path.toString(), query, fragment);
 
         // getLogger.debug("buildURL", serviceName, uri.toURL().toString());
         return uri.toURL().toString();

@@ -110,6 +110,11 @@ foam.CLASS({
       value: 8080
     },
     {
+      name: 'useHttps',
+      class: 'Boolean',
+      value: false
+    },
+    {
       documentation: 'Ping delay greater than this value will trigger alarms.',
       name: 'pingLatency',
       class: 'Long',

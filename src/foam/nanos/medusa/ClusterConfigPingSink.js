@@ -79,7 +79,7 @@ foam.CLASS({
       PingService ping = (PingService) getX().get("ping");
 
       try {
-        Long latency = ping.ping(getX(), config.getId(), config.getPort(), getTimeout());
+        Long latency = ping.ping(getX(), config.getId(), config.getPort(), getTimeout(), config.getUseHttps());
         config = (ClusterConfig) support.getConfig(getX(), config.getId()).fclone();
         config.setPingLatency(latency);
         if ( config.getStatus() != Status.ONLINE) {
