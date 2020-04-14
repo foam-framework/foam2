@@ -79,8 +79,10 @@ foam.CLASS({
       var cs = this.children;
       for ( var i = start ; i <= end ; i++ ) {
         var c1 = cs[i];
+        if ( c1 == null ) break;
         for ( var j = i+1 ; j <= end ; j++ ) {
           var c2 = cs[j];
+          if ( c2 == null ) break;
           try {
             if ( c1.intersects && c1.intersects(c2) ) this.collide(c1, c2);
           } catch (x) {
