@@ -179,7 +179,7 @@
      },
 
      function isFiltering() {
-       if ( this.hasExistingPredicate() ) {
+       if ( this.hasExistingPredicate() && this.firstTime_ ) {
          this.labelFiltering = this.LABEL_PROPERTY_FILTER;
          return;
        }

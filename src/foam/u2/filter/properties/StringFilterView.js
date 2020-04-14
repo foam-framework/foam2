@@ -263,6 +263,15 @@ foam.CLASS({
      */
     function clear() {
       this.selectedOptions = [];
+    },
+
+    /**
+     * Restores the view based on passed in predicate
+     */
+    function restoreFromPredicate(predicate) {
+      if ( predicate === this.TRUE ) return;
+      this.selectedOptions = Array.isArray(predicate.arg2.value) ?
+        predicate.arg2.value : [predicate.arg2.value];
     }
   ],
 

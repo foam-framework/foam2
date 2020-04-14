@@ -223,8 +223,14 @@ foam.CLASS({
     */
     function restoreFromPredicate(predicate) {
       if ( predicate === this.TRUE ) return;
-      console.log(predicate.stringify());
-      // this.property.of.VALUES.filter((e) => { return e.ordinal === 0})
+
+      // NOTE: This is a workaround until KGR adds enum lookup via ordinal
+      if ( Array.isArray(predicate.arg2.value) ) {
+        var ordinals = predicate.arg2.value.map((e) => { return e.ordinal; });
+        this.selectedOptions = this.property.of.VALUES.filter((e) => { return ordinals.includes(e.ordinal); });
+        return;
+      }
+      this.selectedOptions = this.property.of.VALUES.filter((e) => { return e.ordinal === predicate.arg2.value.ordinal; })
     }
   ],
 
@@ -233,7 +239,6 @@ foam.CLASS({
       name: 'selectOption',
       code: function(index) {
         this.selectedOptions$push(this.filteredOptions[index]);
-        // this.selectedOptions = this.selectedOptions.concat([this.filteredOptions[index]]);
       }
     },
     {
