@@ -232,7 +232,12 @@ foam.CLASS({
       javaSetter:
       `email_ = val.toLowerCase();
        emailIsSet_ = true;`,
-      section: 'personal'
+      section: 'personal',
+      validateObj: function(email) {
+        if ( ! email.trim() ) {
+          return 'Email address required.';
+        }
+      }
     },
     {
       class: 'Boolean',
