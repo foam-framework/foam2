@@ -5,21 +5,25 @@
  */
 
 foam.CLASS({
-  package: 'foam.nanos.export',
-  name: 'ExportDriverAddOn',
+  package: 'foam.nanos.extraconfig',
+  name: 'ExtraConfigAddOn',
   properties: [
     {
       name: 'id',
       class: 'String'
     },
     {
+      name: 'configForClass',
+      class: 'String'
+    },
+    {
       //typeOfConfig: String, Boolean, DAO (Enum), Number
       name: 'typeOfConfig',
       class: 'Reference',
-      of: 'foam.nanos.export.ExportDriverDataTypeViewConfig'
+      of: 'foam.nanos.extraconfig.ExtraConfigDataTypeViewConfig'
     },
     {
-      name: 'labelOfProperty',
+      name: 'labelForConfig',
       class: 'String'
     },
     {
@@ -53,9 +57,9 @@ foam.CLASS({
 });
 
 foam.RELATIONSHIP({
-  sourceModel: 'foam.nanos.export.ExportDriverDataTypeViewConfig',
-  targetModel: 'foam.nanos.export.ExportDriverAddOn',
-  forwardName: 'exportDriverAddOns',
+  sourceModel: 'foam.nanos.extraconfig.ExtraConfigDataTypeViewConfig',
+  targetModel: 'foam.nanos.extraconfig.ExtraConfigAddOn',
+  forwardName: 'extraConfigAddOns',
   inverseName: 'typeOfConfig',
   cardinality: '1:*'
 });

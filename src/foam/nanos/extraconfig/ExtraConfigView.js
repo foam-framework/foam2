@@ -5,8 +5,8 @@
  */
 
 foam.CLASS({
-  package: 'foam.nanos.export',
-  name: 'ExportDriverConfigView',
+  package: 'foam.nanos.config',
+  name: 'ExtraConfigView',
   extends: 'foam.u2.View',
   requires: [
     'foam.nanos.export.ExportConfig'

@@ -136,9 +136,8 @@ p({
   },
   "parent":"admin"
 })
-p({"class":"foam.nanos.menu.Menu","id":"admin.exportDriversConfigType","label":"Export Drivers Config Types","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"exportDriverDataTypeViewConfigDAO"},"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.exportDriversConfig","label":"Export Drivers Config","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"exportDriverAddOnJunctionDAO"},"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.exportDriversConfigAddOns","label":"Export Drivers Config Add Ons","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"exportDriverAddOnDAO"},"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.extraConfigType","label":"Extra Config Types","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"extraConfigDataTypeViewConfigDAO"},"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.extraConfigAddOns","label":"Extra Config Add Ons","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"extraConfigAddOnDAO"},"parent":"admin"})
 
 // integration
 p({"class":"foam.nanos.menu.Menu","id":"integration","label":"Integration","handler":{"class":"foam.nanos.menu.SubMenu"},"parent":""})

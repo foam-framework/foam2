@@ -5,8 +5,8 @@
  */
 
 foam.CLASS({
-  package: 'foam.nanos.export',
-  name: 'ExportDriverDataTypeViewConfig',
+  package: 'foam.nanos.extraconfig',
+  name: 'ExtraConfigDataTypeViewConfig',
   properties: [
     {
       name: 'id',//typeOfConfig: String, Boolean, DAO / StringArray, Number
