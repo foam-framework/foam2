@@ -154,7 +154,7 @@ foam.CLASS({
       border-radius: 5px;
     }
 
-    
+
   `,
 
   messages: [
@@ -203,7 +203,9 @@ foam.CLASS({
     {
       name: 'generalSearchField',
       postSet: function(o, n) {
-        this.filterController.add(n);
+        // TODO: Since add expects criteria and all criterias are ORed,
+        //       we need to find a different location to AND it.
+        // this.filterController.add(n);
       }
     },
     {
@@ -211,7 +213,7 @@ foam.CLASS({
       factory: function() {
         return this.FilterController.create({
           dao$: this.dao$,
-          predicate$: this.data$
+          finalPredicate$: this.data$
         });
       }
     },
@@ -290,9 +292,10 @@ foam.CLASS({
                 var axiom = self.dao.of.getAxiomByName(f);
                 if ( axiom ){
                   this.start(self.PropertyFilterView, {
+                    criteria: 0,
                     searchView: axiom.searchView,
                     property: axiom,
-                    dao$: self.dao$
+                    dao: self.dao
                   })
                   .hide(self.filterController$.dot('isAdvanced'))
                   .end();
@@ -395,9 +398,10 @@ foam.CLASS({
     {
       name: 'getResultCount',
       code: function() {
-        this.filterController.filteredDAO.select(this.COUNT()).then((count) => {
-          this.resultsCount = count.value;
-        });
+        this.filterController.dao.where(this.filterController.finalPredicate)
+          .select(this.COUNT()).then((count) => {
+            this.resultsCount = count.value;
+          });
       }
     },
     {
@@ -438,10 +442,11 @@ foam.CLASS({
     {
       name: 'openAdvanced',
       code: function() {
-        console.log('TODO: Create modal for advanced filter');
+        // console.log('TODO: Create modal for advanced filter');
+        this.filterController.switchToPreview();
         this.add(this.Popup.create().tag({
           class: 'foam.u2.filter.advanced.AdvancedFilterView',
-          filterController$: this.filterController$,
+          criterias$: this.filterController$.dot('criterias'),
           dao$: this.dao$
         }));
       }

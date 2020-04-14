@@ -13,6 +13,10 @@ foam.CLASS({
     'foam.u2.filter.property.PropertyFilterView'
   ],
 
+  imports: [
+    'filterController'
+  ],
+
   css: `
     ^ {
       position: relative;
@@ -28,10 +32,6 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'filterController',
-      documentation: 'To be passed in from the AdvancedFilterView'
-    },
-    {
       class: 'Array',
       name: 'modelProps',
       documentation: 'Array of properties that this filter will filter on',
@@ -46,6 +46,9 @@ foam.CLASS({
           .filter((prop) => prop.searchView && ! prop.hidden)
           .map(foam.core.Property.NAME.f);
       }
+    },
+    {
+      name: 'criteria'
     }
   ],
 
@@ -57,9 +60,10 @@ foam.CLASS({
           var axiom = self.filterController.dao.of.getAxiomByName(property);
           if ( axiom ) {
             this.start(self.PropertyFilterView, {
+              criteria: this.criteria,
               searchView: axiom.searchView,
               property: axiom,
-              dao$: self.filterController$.dot('dao')
+              dao: self.filterController.dao
             })
             .end();
           }

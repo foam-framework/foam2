@@ -110,12 +110,12 @@ foam.CLASS({
         .start(this.QUALIFIER)
           .start('div').addClass(this.myClass('carrot')).end()
         .end()
-        .add(this.slot(function(qualifier) {
-          if ( ! qualifier ) return this.E();
+        .add(this.onDetach(this.slot(function(qualifier) {
+          if ( ! qualifier || qualifier === 'True' ) return this.E();
           return qualifier === 'Bt' ?
             this.E().add(self.DATE1).add(self.DATE2) :
             this.E().add(self.DATE1);
-        }));
+        })));
     },
 
     /**
@@ -124,6 +124,24 @@ foam.CLASS({
      */
     function clear() {
       this.qualifier = 'True';
+    },
+
+    /**
+     * Restores the view based on passed in predicate
+     */
+    function restoreFromPredicate(predicate) {
+      if ( predicate === this.TRUE ) return;
+
+      var qualifier = predicate.cls_.name;
+
+      if ( qualifier == 'And' ) {
+        this.qualifier = 'Bt';
+        this.date1 = predicate.args[0].arg2.value;
+        this.date2 = predicate.args[1].arg2.value;
+      } else {
+        this.qualifier = qualifier;
+        this.date1 = predicate.arg2.value;
+      }
     }
   ]
 });

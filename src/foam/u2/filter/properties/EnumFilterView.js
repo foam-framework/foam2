@@ -96,6 +96,7 @@ foam.CLASS({
       name: 'search'
     },
     {
+      class: 'Array',
       name: 'selectedOptions',
       factory: function() {
         return [];
@@ -215,6 +216,15 @@ foam.CLASS({
      */
     function clear() {
       this.selectedOptions = [];
+    },
+
+    /**
+    * Restores the view based on passed in predicate
+    */
+    function restoreFromPredicate(predicate) {
+      if ( predicate === this.TRUE ) return;
+      console.log(predicate.stringify());
+      // this.property.of.VALUES.filter((e) => { return e.ordinal === 0})
     }
   ],
 
@@ -222,12 +232,14 @@ foam.CLASS({
     {
       name: 'selectOption',
       code: function(index) {
-        this.selectedOptions = this.selectedOptions.concat([this.filteredOptions[index]]);
+        this.selectedOptions$push(this.filteredOptions[index]);
+        // this.selectedOptions = this.selectedOptions.concat([this.filteredOptions[index]]);
       }
     },
     {
       name: 'deselectOption',
       code: function(index) {
+        // this.selectedOptions$remove(index);
         this.selectedOptions = this.selectedOptions.filter(function(_, selectedIndex) {
           return index !== selectedIndex;
         });

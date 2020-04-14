@@ -11,6 +11,10 @@
 
    documentation: 'Manages the FilterViews',
 
+   implements: [
+     'foam.mlang.Expressions'
+   ],
+
    imports: [
      'filterController'
    ],
@@ -112,6 +116,9 @@
        class: 'String',
        name: 'iconPath',
        value: 'images/expand-more.svg'
+     },
+     {
+       name: 'criteria'
      }
    ],
 
@@ -138,7 +145,7 @@
          .start('div', null, this.container_$).addClass(this.myClass('container-filter'))
            .show(this.active$)
          .end();
-
+       this.isFiltering();
      }
    ],
 
@@ -156,17 +163,36 @@
          dao$: this.dao$
        }, this.view_$);
 
-       this.filterController.add(this.view_);
+       if ( this.hasExistingPredicate() ) {
+         this.view_.restoreFromPredicate(this.filterController
+           .criterias[this.criteria]
+           .views[this.property.name]
+           .predicate
+         );
+       }
+
+       this.filterController.add(this.view_, this.property.name, this.criteria);
+
        this.firstTime_ = false;
 
        this.onDetach(this.view_$.dot('predicate').sub(this.isFiltering));
      },
 
      function isFiltering() {
+       if ( this.hasExistingPredicate() ) {
+         this.labelFiltering = this.LABEL_PROPERTY_FILTER;
+         return;
+       }
+       if ( ! this.view_ ) return;
        const instance = this.view_.predicate.instance_;
        this.labelFiltering = instance.arg1 || instance.args ?
          this.LABEL_PROPERTY_FILTER :
          this.LABEL_PROPERTY_ALL;
+     },
+
+     function hasExistingPredicate() {
+       var existingView = this.filterController.criterias[this.criteria].views[this.property.name];
+       return existingView && existingView.predicate != this.TRUE;
      }
    ]
  });

@@ -125,6 +125,16 @@ foam.CLASS({
     function clear() {
       this.boolT = false;
       this.boolF = false;
+    },
+
+    /**
+    * Restores the view based on passed in predicate
+    */
+    function restoreFromPredicate(predicate) {
+      if ( predicate == this.TRUE ) return;
+
+      if ( predicate.arg2.value ) this.boolT = true;
+      if ( ! predicate.arg2.value ) this.boolF = true;
     }
   ]
 });
