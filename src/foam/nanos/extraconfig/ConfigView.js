@@ -5,11 +5,11 @@
  */
 
 foam.CLASS({
-  package: 'foam.nanos.config',
-  name: 'ExtraConfigView',
+  package: 'foam.nanos.extraconfig',
+  name: 'ConfigView',
   extends: 'foam.u2.View',
   requires: [
-    'foam.nanos.export.ExportConfig'
+    'foam.nanos.extraconfig.Config'
   ],
   properties: [
     'exportConfigArray',
@@ -22,7 +22,6 @@ foam.CLASS({
       this.add(this.slot(function(exportConfigAddOns) {
         return self.E().forEach(exportConfigAddOns, function(a) {
           a.typeOfConfig$find.then((v) => {
-
             var view = { class: v.viewClass };
             if ( a.doesProvideOptions && a.optionsChoice === 'Array' ) {
               view.choices = a.options;
@@ -32,7 +31,6 @@ foam.CLASS({
                 return [o.id, o.id];
               };
             }
-            
             return this.addClass('label').start().add(a.labelForConfig).end()
               .start()
                 .startContext({ data: obj })
@@ -42,7 +40,7 @@ foam.CLASS({
                 .endContext()
             .end();
           });
-          var obj = self.ExportConfig.create({ exportMetadata: a });
+          var obj = self.Config.create({ exportMetadata: a });
           obj.configValue$.sub(function() {
             if ( obj.configValue ) {
               if ( obj.configValue.toSummary )

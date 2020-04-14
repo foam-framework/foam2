@@ -13,13 +13,16 @@ foam.CLASS({
 
   imports: [
     'exportDriverRegistryDAO',
-    'filteredTableColumns'
+    'filteredTableColumns',
+    'extraConfigAddOnDAO'
   ],
 
   requires: [
     'foam.u2.ModalHeader',
     'foam.u2.layout.Cols',
-    'foam.nanos.export.ExportDriverConfigView'
+    'foam.nanos.extraconfig.AddOn',
+    'foam.nanos.extraconfig.ConfigView',
+    'foam.mlang.predicate.ContainsIC'
   ],
 
   properties: [
@@ -133,7 +136,7 @@ foam.CLASS({
       });
       
       self.exportDriverReg$.sub(function() {
-        self.exportDriverReg.getExportConfig(self.__context__).dao.select().then(function(v) {
+        self.extraConfigAddOnDAO.where(self.ContainsIC.create({ arg1: self.AddOn.CONFIG_FOR_CLASS, arg2: self.exportDriverReg.driverName})).select().then(function(v){
           self.exportConfigAddOns = v.array;
         });
         self.isConvertAvailable =  self.exportDriverReg.isConvertible;
@@ -151,7 +154,7 @@ foam.CLASS({
         .start()
           .start().addClass('label').add('Data Type').end()
           .start(this.DATA_TYPE).end()
-          .add(self.ExportDriverConfigView.create({ exportConfigArray$: self.exportConfigArray$, exportConfigAddOns$: self.exportConfigAddOns$ }))
+          .add(self.ConfigView.create({ exportConfigArray$: self.exportConfigArray$, exportConfigAddOns$: self.exportConfigAddOns$ }))
           .start().addClass('label').add('Response').end()
           .start(this.NOTE).addClass('input-box').addClass('note').end()
           .add(

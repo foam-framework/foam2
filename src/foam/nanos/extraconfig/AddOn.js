@@ -62,6 +62,6 @@ foam.RELATIONSHIP({
   forwardName: 'extraConfigAddOns',
   inverseName: 'typeOfConfig',
   sourceDAOKey: 'extraConfigDataTypeViewConfigDAO',
-  targetDAO: 'extraConfigAddOnDAO',
+  targetDAOKey: 'extraConfigAddOnDAO',
   cardinality: '1:*'
 });

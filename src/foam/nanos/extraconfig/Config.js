@@ -15,30 +15,28 @@ foam.CLASS({
     },
     {
       name: 'exportMetadata',
-      class: 'Reference',
+      class: 'FObjectProperty',
       of: 'foam.nanos.extraconfig.AddOn'
     },
     {
       name: 'configValue',
-      factory: function() {
-        this.exportMetadata$find.then(v => {
-          if ( v.typeOfConfig === 'Boolean' )
+      factory: function() {     
+          if ( this.exportMetadata.typeOfConfig === 'Boolean' )
             this.configValue = false;
-          else if ( v.typeOfConfig === 'Integer' )
+          else if ( this.exportMetadata.typeOfConfig === 'Integer' )
             this.configValue = 0;
-          else if ( v.typeOfConfig === 'Float' )
+          else if ( this.exportMetadata.typeOfConfig === 'Float' )
             this.configValue = 0;
-          else if ( v.doesProvideOptions && v.optionsChoice === 'Array' )
-            this.configValue = v.options[0];
-          else if ( v.doesProvideOptions && v.optionsChoice === 'DAO' ) {
+          else if ( this.exportMetadata.doesProvideOptions && this.exportMetadata.optionsChoice === 'Array' )
+            this.configValue = this.exportMetadata.options[0];
+          else if ( this.exportMetadata.doesProvideOptions && this.exportMetadata.optionsChoice === 'DAO' ) {
             var dao = this.__context__[v.daoSource];
             dao.select().then((o) => {
               this.configValue = o.array[0].id;
             });
           }
           else
-            this.configValue = '';
-        });
+            return '';       
         return;
       }
     }
