@@ -198,7 +198,8 @@ foam.CLASS({
         if ( host != null ) {
           address = host.getAddress();
         }
-        java.net.URI uri = new java.net.URI("http", null, address, config.getPort(), "/service/electoralService", null, null);
+        String scheme = config.getUseHttps() ? "https" : "http";
+        java.net.URI uri = new java.net.URI(scheme, null, address, config.getPort(), "/service/electoralService", null, null);
         // getLogger().debug("buildURL", config.getName(), uri.toURL().toString());
         return uri.toURL().toString();
       } catch (java.net.MalformedURLException | java.net.URISyntaxException e) {

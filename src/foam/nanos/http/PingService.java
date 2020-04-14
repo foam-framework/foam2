@@ -33,10 +33,10 @@ public class PingService
 
   public Long ping(X x, String hostname, int port)
     throws IOException {
-    return ping(x, hostname, port, 3000);
+    return ping(x, hostname, port, 3000, false);
   }
 
-  public Long ping(X x, String hostname, int port, int timeout)
+  public Long ping(X x, String hostname, int port, int timeout, boolean useHttps)
     throws IOException {
     Logger logger = (Logger) x.get("logger");
 
@@ -47,7 +47,7 @@ public class PingService
     }
 
     // TODO: control http/https
-    String urlString = "http://" + address + ":" + port + "/service" + "/ping";
+    String urlString = useHttps ? "https://" : "http://" + address + ":" + port + "/service" + "/ping";
 
     Box box = new HTTPBox.Builder(x)
       .setUrl(urlString)
