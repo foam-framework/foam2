@@ -50,7 +50,7 @@ foam.CLASS({
         ClusterConfig config = support.getConfig(y, support.getConfigId());
         ElectoralServiceServer electoralService = (ElectoralServiceServer) y.get("electoralService");
 
-        getLogger().debug(request.getServiceName(), request.getDop().getLabel(), config.getName(), "isPrimary", config.getIsPrimary(), config.getStatus().getLabel(), "electoral state", electoralService.getState().getLabel());
+        getLogger().debug(request.getServiceName(), request.getDop().getLabel(), config.getId(), config.getName(), "isPrimary", config.getIsPrimary(), "primary", support.getPrimaryConfigId(), config.getStatus().getLabel(), "electoral state", electoralService.getState().getLabel());
 
         if ( ! config.getIsPrimary() ) {
           throw new UnsupportedOperationException("Cluster command not supported on non-primary instance");
@@ -75,7 +75,7 @@ foam.CLASS({
           throw new RuntimeException("Error parsing request.");
         }
 
-        foam.core.FObject old = dao.find_(x, nu.getProperty("id"));
+        foam.core.FObject old = dao.find_(y, nu.getProperty("id"));
         if (  old != null ) {
           nu = old.fclone().copyFrom(nu);
         }

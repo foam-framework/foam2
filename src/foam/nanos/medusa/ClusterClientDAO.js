@@ -106,7 +106,7 @@ foam.CLASS({
       ElectoralService electoralService = (ElectoralService) x.get("electoralService");
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       ClusterConfig config = support.getConfig(x, support.getConfigId());
-      getLogger().debug(dop.getLabel(), electoralService.getState().getLabel(), config.getName(), config.getIsPrimary(), config.getStatus().getLabel(), config.getId(), support.getPrimaryConfigId());
+      getLogger().debug(dop.getLabel(), electoralService.getState().getLabel(), config.getName(), config.getIsPrimary(), config.getStatus().getLabel(), config.getId(), "primary", support.getPrimaryConfigId());
 
       foam.core.FObject old = null;
       if ( DOP.PUT == dop ) {

@@ -84,7 +84,7 @@ NOTE: override cmd_ in child class to control delegate call`,
         if ( getTimer() == null ) {
           scheduleTimer(getX(), getBatch().size());
         }
-        getLogger().debug("put", "batch", "size", getBatch().size());
+        //getLogger().debug("put", "batch", "size", getBatch().size());
       }
       return obj;
       `

@@ -227,23 +227,21 @@ foam.CLASS({
       documentation: 'Intended for Agency submission, so dissolve can run with own thread.',
       name: 'dissolve',
       javaCode: `
-      getLogger().debug("dissolve", "agency", "submit");
       synchronized ( electionLock_ ) {
+        getLogger().debug("dissolve", "state", getState().getLabel(), "election time", getElectionTime());
         if ( getState() == ElectoralServiceState.ELECTION &&
-            getElectionTime() > 0L ) {
+          getElectionTime() > 0L ) {
           getLogger().debug("execute", "Election in progress since", getElectionTime());
+          return;
         } else if ( getState() == ElectoralServiceState.VOTING ) {
-          // nop
-        } else {
-          // run a new campaigne
-          setElectionTime(System.currentTimeMillis());
-          setState(ElectoralServiceState.ELECTION);
-
-          //electionLock_.notify();
-          ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-          ((Agency) x.get(support.getThreadPoolName())).submit(x, (ContextAgent)this, this.getClass().getSimpleName());
-        }
+          return;
+        } 
+        // run a new campaigne
+        setElectionTime(System.currentTimeMillis());
+        setState(ElectoralServiceState.ELECTION);
       }
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      ((Agency) x.get(support.getThreadPoolName())).submit(x, (ContextAgent)this, this.getClass().getSimpleName());
       `
     },
     {
@@ -256,30 +254,25 @@ foam.CLASS({
       ],
       javaCode: `
       while( true ) {
-        getLogger().debug("execute", "state", getState().getLabel(), "election time", getElectionTime());
         try {
-          if ( getState() != ElectoralServiceState.IN_SESSION ) {
-            callVote(x);
-          }
-        } catch(Throwable t) {
-          getLogger().error(t);
-        } finally {
           synchronized ( electionLock_ ) {
+            getLogger().debug("execute", "state", getState().getLabel(), "election time", getElectionTime());
             if ( getState() == ElectoralServiceState.IN_SESSION ) {
-              setElectionTime(0L);
-              setCurrentSeq(0L);
-              getLogger().debug("execute", "state", getState().getLabel(), "wait");
-             // electionLock_.wait();
-              return;
+              break;
             }
           }
+          callVote(x);
+        } catch(Throwable t) {
+          getLogger().error(t);
+          break;
         }
         try {
           Thread.currentThread().sleep(2000);
         } catch (InterruptedException e) {
-          return;
+          break;
         }
       }
+      getLogger().debug("execute", "exit", "state", getState().getLabel(), "election time", getElectionTime());
       `
     },
     {
@@ -318,6 +311,7 @@ foam.CLASS({
           if ( clientConfig.getId().equals(config.getId())) {
             continue;
           }
+          getLogger().debug("callVote", "config", config.getId(), "client", clientConfig.getId());
           ClientElectoralService electoralService =
             new ClientElectoralService.Builder(getX())
              .setDelegate(new HTTPBox.Builder(getX())
@@ -328,17 +322,17 @@ foam.CLASS({
                .setReadTimeout(3000)
                .build())
              .build();
-          
+
           voteCallables.add(() -> {
-            getLogger().debug("callVote", "call", "vote", clientConfig.getName());
+            getLogger().debug("callVote", "call", "vote", clientConfig.getId(), clientConfig.getName());
             try {
             long result = electoralService.vote(clientConfig.getId(), getElectionTime());
-            getLogger().debug("callVote", "call", "vote", clientConfig.getName(), "response", result);
+            getLogger().debug("callVote", "call", "vote", clientConfig.getId(), clientConfig.getName(), "response", result);
             recordResult(x, result, clientConfig);
             callReport(x);
             return result;
             } catch (Throwable e) {
-              getLogger().debug(clientConfig.getId(), "vote", e.getMessage());
+              getLogger().debug(clientConfig.getId(), clientConfig.getName(), "vote", e.getMessage());
               return -1L;
             }
           });
@@ -373,22 +367,26 @@ foam.CLASS({
 
       getLogger().debug("vote", id, time, getElectionTime(), getState().getLabel(),config.getStatus().getLabel());
       if ( config.getStatus() != Status.ONLINE ) {
-       return v;
+        return v;
       }
 
       try {
         if ( getState() == ElectoralServiceState.ELECTION &&
             time < getElectionTime() ) {
-          // abandone our election.
+          // abandon our election.
           getLogger().info("vote", id, time, "abandon own election", getState().getLabel(), "->", ElectoralServiceState.VOTING.getLabel());
           synchronized ( electionLock_ ) {
             setState(ElectoralServiceState.VOTING);
+            setElectionTime(0L);
+            setCurrentSeq(0L);
           }
         } else if ( getState() == ElectoralServiceState.IN_SESSION ||
                     getState() == ElectoralServiceState.ADJOURNED ) {
           getLogger().info("vote", id, time, getState().getLabel(), "->", ElectoralServiceState.VOTING.getLabel());
           synchronized ( electionLock_ ) {
             setState(ElectoralServiceState.VOTING);
+            setElectionTime(0L);
+            setCurrentSeq(0L);
           }
         }
         if ( getState() == ElectoralServiceState.VOTING ) { 
@@ -503,18 +501,20 @@ foam.CLASS({
         if ( winner.equals(config.getId()) &&
              ! config.getIsPrimary() ) {
           // found the winner, and it is the 'new' primary, may or may not be us.
-          getLogger().debug("report", winner, "new primary", config.getName());
-          config.setIsPrimary(true);
+          getLogger().debug("report", winner, "new primary", config.getId(), config.getName());
+           config.setIsPrimary(true);
           config = (ClusterConfig) dao.put_(getX(), config);
         } else if ( config.getIsPrimary() ) {
           // no longer primary
-          getLogger().debug("report", winner, "old primary", config.getName());
+          getLogger().debug("report", winner, "old primary", config.getId(), config.getName());
           config.setIsPrimary(false);
           config = (ClusterConfig) dao.put_(getX(), config);
         }
       }
       synchronized ( electionLock_ ) {
         setState(ElectoralServiceState.IN_SESSION);
+        setElectionTime(0L);
+        setCurrentSeq(0L);
       }
 
       ClusterConfig config = support.getConfig(getX(), support.getConfigId());
