@@ -33,7 +33,7 @@ foam.CLASS({
               };
             }
             
-            return this.addClass('label').start().add(a.labelOfProperty).end()
+            return this.addClass('label').start().add(a.labelForConfig).end()
               .start()
                 .startContext({ data: obj })
                   .add(obj.CONFIG_VALUE.clone().copyFrom({

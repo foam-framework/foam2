@@ -14,7 +14,7 @@ foam.CLASS({
     },
     {
       name: 'configForClass',
-      class: 'String'
+      class: 'StringArray'
     },
     {
       //typeOfConfig: String, Boolean, DAO (Enum), Number
@@ -61,5 +61,7 @@ foam.RELATIONSHIP({
   targetModel: 'foam.nanos.extraconfig.AddOn',
   forwardName: 'extraConfigAddOns',
   inverseName: 'typeOfConfig',
+  sourceDAOKey: 'extraConfigDataTypeViewConfigDAO',
+  targetDAO: 'extraConfigAddOnDAO',
   cardinality: '1:*'
 });
