@@ -263,7 +263,7 @@ foam.CLASS({
   properties: [
     {
       name: 'question',
-      label: 'Which one of these famous apps were made using Java Script?',
+      label: 'Which one of these famous apps were made using JavaScript?',
       view: {
         class: 'foam.u2.view.RadioView',
         choices: [
@@ -660,7 +660,7 @@ foam.CLASS({
       this.focus();
 
       // Create the HTML
-      this.style({display:'flex'}).add(this.maze).add(' ').add(this.question$);
+      this.style({display:'flex'}).add(this.maze, ' ', this.question$);
     },
 
     function gameOver() {
@@ -757,10 +757,10 @@ foam.CLASS({
       keyboardShortcuts: [ ' ', 'x' ],
       code: function() {
         // Fire four lasers, one in each direction
-        this.Laser.create({x: this.robot.x, y: this.robot.y, vx: 1,  vy: 0});
-        this.Laser.create({x: this.robot.x, y: this.robot.y, vx: 0,  vy: 1});
-        this.Laser.create({x: this.robot.x, y: this.robot.y, vx: -1, vy: 0});
-        this.Laser.create({x: this.robot.x, y: this.robot.y, vx: 0,  vy: -1});
+        this.Laser.create({x: this.robot.x, y: this.robot.y, vx:  1, vy:  0});
+        this.Laser.create({x: this.robot.x, y: this.robot.y, vx:  0, vy:  1});
+        this.Laser.create({x: this.robot.x, y: this.robot.y, vx: -1, vy:  0});
+        this.Laser.create({x: this.robot.x, y: this.robot.y, vx:  0, vy: -1});
       }
     }
   ]
