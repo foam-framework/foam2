@@ -388,8 +388,7 @@
       factory: function(o, n) {
         var key = this.daoKey;
         var X = this.ctrl.__subContext__;
-        
-        // FIXME: change to a better implementation
+
         if ( ! X[key] ) {
           // if DAO doesn't exist in context, change daoKey from localMyDAO
           // (server-side) to myDAO (accessible on front-end)
