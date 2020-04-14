@@ -94,6 +94,10 @@ if ( typeof global.FOAMLINK_DATA !== 'undefined' ) {
  * Usage of console.assert directly is slow, and not all platforms agree
  * on what to do with extra arguments, some ignore them, some join them
  * to the message.
+ *
+ * However just defining as console.assert.bind(console); gives better stack
+ * traces which start on the calling line so are easier to breakpoint,
+ * so maybe this isn't worth doing anymore?
  */
 foam.assert = function assert(cond) {
   if ( ! cond ) {
