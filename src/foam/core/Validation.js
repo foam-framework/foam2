@@ -1,18 +1,7 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2016 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
@@ -39,6 +28,8 @@ foam.CLASS({
     },
     {
       class: 'Function',
+      // TODO: it isn't normal for JS functions to have a 'js' prefix
+      // TODO: poor choice of name, should be something with 'assert'
       name: 'jsFunc',
       expression: function(predicate, jsErr) {
         return function() {
@@ -52,18 +43,23 @@ foam.CLASS({
     },
     {
       class: 'Function',
+      // TODO: it isn't normal for JS functions to have a 'js' prefix
       name: 'jsErr',
       expression: function(errorString) {
         return function() { return errorString; };
       }
     }
   ],
+
   methods: [
     function createErrorSlotFor(data) {
+      return data.slot(this.jsFunc, this.args);
+      /*
       return this.ExpressionSlot.create({
         args: this.args.map(a => data[a+'$']),
         code: this.jsFunc.bind(data)
       });
+      */
     }
   ]
 });
