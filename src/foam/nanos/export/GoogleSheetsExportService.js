@@ -67,8 +67,8 @@ foam.CLASS({
           Map<String, Config> map = new HashMap<>();
 
           Object[] configObjArray = (Object[])config;
-          if(configObjArray != null) {
-            for(int i = 0; i < configObjArray.length; i++) {
+          if ( configObjArray != null ) {
+            for ( int i = 0 ; i < configObjArray.length ; i++ ) {
               map.put(((Config)configObjArray[i]).getExportMetadata().getId(), (Config)configObjArray[i]);
             }
           }
