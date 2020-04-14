@@ -380,20 +380,12 @@ foam.CLASS({
         }
 
         // Remove the question
-        this.game.questionArea.removeAllChildren();
-        this.game.focus();
-        this.game.currentDoor = null;
+        this.game.question = null;
       });
     },
 
     function askQuestion() {
-      if ( this.game.currentDoor == this ) return;
-      this.game.currentDoor = this;
-
-      var q = this.question;
-      this.game.questionArea.removeAllChildren();
-      this.game.focus();
-      this.game.questionArea.add(q);
+      this.game.question = this.question;
     }
   ]
 });
@@ -563,10 +555,8 @@ foam.CLASS({
     // True if robot currently hitting a wall
     'hittingWall',
 
-    // Area in HTML to display questions
-    'questionArea',
-
-    'currentDoor'
+    // Current question being asked
+    'question'
   ],
 
   methods: [
@@ -667,7 +657,7 @@ foam.CLASS({
       this.focus();
 
       // Create the HTML
-      this.style({display:'flex'}).add(this.maze).add(' ').tag(null, null, this.questionArea$);
+      this.style({display:'flex'}).add(this.maze).add(' ').add(this.question$);
     },
 
     function gameOver() {
