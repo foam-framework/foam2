@@ -29,13 +29,14 @@ foam.CLASS({
     'bsh.Interpreter',
     'foam.core.*',
     'foam.dao.*',
-    'foam.nanos.logger.Logger',
+    'static foam.mlang.MLang.*',
     'foam.nanos.auth.*',
+    'foam.nanos.logger.PrefixLogger',
+    'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
     'java.io.ByteArrayOutputStream',
     'java.io.PrintStream',
     'java.util.Date',
-    'static foam.mlang.MLang.*',
   ],
 
   tableColumns: [
@@ -189,6 +190,18 @@ foam.CLASS({
       visibility: 'HIDDEN',
       documentation: `Name of dao which journal will be used to store script run logs. To set from inheritor
       just change property value`
+    },
+    {
+      name: 'logger',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.logger.Logger',
+      visibility: 'HIDDEN',
+      transient: true,
+      javaFactory: `
+        return new PrefixLogger(new Object[] {
+          this.getClass().getSimpleName()
+        }, (Logger) getX().get("logger"));
+      `
     }
   ],
 
@@ -240,13 +253,16 @@ foam.CLASS({
           foam.nanos.medusa.ClusterConfigSupport support = (foam.nanos.medusa.ClusterConfigSupport) x.get("clusterConfigSupport");
           if ( support != null ) {
             // TODO: considering how to only run on one of the secondaries, could be largest secondary.
-            if ( ! support.getIsPrimary() ) {
-              return;
-            }
             foam.nanos.medusa.ClusterConfig config = support.getConfig(x, support.getConfigId());
+            if ( config.getType() == foam.nanos.medusa.MedusaType.MEDIATOR &&
+                 ! config.getIsPrimary() ) {
+              ((Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "Medusa disabled Script execution on this instance.");
+              throw new RuntimeException("Script execution disabled.");
+            }
             if ( config.getType() == foam.nanos.medusa.MedusaType.NODE ||
                  config.getStatus() != foam.nanos.medusa.Status.ONLINE ) {
-              return;
+              ((Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "Medusa disabled Script execution on this instance.");
+              throw new RuntimeException("Script execution disabled.");
             }
           }
         }
