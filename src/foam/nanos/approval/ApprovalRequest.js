@@ -390,15 +390,10 @@
         var X = this.ctrl.__subContext__;
 
         if ( ! X[key] ) {
-          // if DAO doesn't exist in context, change daoKey from localMyDAO
-          // (server-side) to myDAO (accessible on front-end)
-          for ( var i = 0 ; i < key.length ; i++ ) {
-            if ( key.charAt(i) == key.charAt(i).toUpperCase() ) {
-              key = key.substring(i);
-              break;
-            }
+          if ( key.startsWith('local') ) {
+            key = key.replace('local', '');
+            key = key.charAt(0).toLowerCase() + key.slice(1);
           }
-          key = key.charAt(0).toLowerCase() + key.slice(1);
         }
         return key;
       }
