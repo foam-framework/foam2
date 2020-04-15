@@ -68,7 +68,7 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'isHiddenSME',
+      name: 'isHiddenOnSME',
       value: true,
       documentation: 'value to prevent duplicate close button for SMEModal'
     }
