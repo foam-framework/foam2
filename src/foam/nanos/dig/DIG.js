@@ -11,7 +11,11 @@ foam.CLASS({
 
   documentation: 'Data Integration Gateway - Perform DAO operations against a web service',
 
-  requires: ['foam.net.web.HTTPRequest'],
+  requires: [
+    'foam.net.web.HTTPRequest',
+    'foam.nanos.extraconfig.AddOn',
+     'foam.mlang.predicate.ContainsIC'
+  ],
 
   tableColumns: [
     'id',
@@ -173,6 +177,26 @@ foam.CLASS({
       view: { class: 'foam.nanos.dig.ResultView' },
 //       view: { class: 'foam.u2.tag.TextArea', rows: 5, cols: 120 },
       visibility: 'RO'
+    },
+    {
+      name: 'exportConfigArray',
+      value: [],
+      hidden: true
+    },
+    {
+      name: 'exportConfigAddOns',
+      factory: function() {
+        this.__context__.extraConfigAddOnDAO.where(this.ContainsIC.create({ arg1: this.AddOn.CONFIG_FOR_CLASS, arg2: this.cls_.id})).select().then((v) => {
+          this.exportConfigAddOns = v.array;
+        });
+        return [];
+      },
+      view: function(_, X) {
+        var view  = foam.nanos.extraconfig.ConfigView.create();
+        view.exportConfigArray$  = X.data.exportConfigArray$;
+        view.exportConfigAddOns$ = X.data.exportConfigAddOns$;
+        return view;
+      }
     }
   ],
 
