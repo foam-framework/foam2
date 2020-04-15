@@ -25,6 +25,10 @@ foam.CLASS({
     'foam.nanos.logger.Logger',
     'java.nio.charset.StandardCharsets',
     'java.security.MessageDigest',
+    'java.util.List',
+    'java.util.ArrayList',
+    'static foam.mlang.MLang.*',
+    'foam.dao.ArraySink'
   ],
 
   axioms: [
@@ -157,6 +161,42 @@ foam.CLASS({
       javaCode: `
         // verify hash itself
         // and compare hashes of parent indexes.
+        DAO dao = (DAO) getX().get("internalMedusaEntryDAO");
+
+        List<MedusaEntry> list1 = (ArrayList) ((ArraySink) dao.where(
+          // EQ(MedusaEntry.INDEX, entry.getIndex1())
+          EQ(MedusaEntry.INDEX, entry.getIndex1())
+          )
+          .select(new ArraySink())).getArray();
+        List<MedusaEntry> list2 = (ArrayList) ((ArraySink) dao.where(
+          EQ(MedusaEntry.INDEX, entry.getIndex2())
+          )
+          .select(new ArraySink())).getArray();
+
+        if ( list1.size() == 0 ) throw new RuntimeException("Not Found MedusaEntry with index: " + entry.getIndex1());
+        if ( list2.size() == 0 ) throw new RuntimeException("Not Found MedusaEntry with index: " + entry.getIndex2());
+
+        MedusaEntry parent1 = list1.get(0);
+        MedusaEntry parent2 = list2.get(0);
+        if ( ! parent1.getHash().equals(entry.getHash1()) ) throw new RuntimeException("MedusaEntry hash1 do not match parent1 hash");
+        if ( ! parent2.getHash().equals(entry.getHash2()) ) throw new RuntimeException("MedusaEntry hash2 do not match parent2 hash");
+        //Recalculate hash.
+        String calculatedHash = "";
+        try {
+          MessageDigest md = MessageDigest.getInstance(getHashingAlgorithm());
+          md.update(Long.toString(entry.getIndex1()).getBytes(StandardCharsets.UTF_8));
+          md.update(entry.getHash1().getBytes(StandardCharsets.UTF_8));
+          md.update(Long.toString(entry.getIndex2()).getBytes(StandardCharsets.UTF_8));
+          md.update(entry.getHash2().getBytes(StandardCharsets.UTF_8));
+          if ( entry.getData() != null ) {
+            calculatedHash = byte2Hex(entry.getData().hash(md));
+          } else {
+            calculatedHash = byte2Hex(md.digest());
+          }
+        } catch ( java.security.NoSuchAlgorithmException e ) {
+          throw new RuntimeException(e);
+        }
+        if ( ! calculatedHash.equals(entry.getHash()) ) throw new RuntimeException("MedusaHash do not match");
       `
     },
     {
