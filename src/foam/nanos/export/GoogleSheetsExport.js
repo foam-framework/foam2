@@ -15,6 +15,10 @@ foam.INTERFACE({
       async: true,
       args: [
         {
+          name: 'x',
+          type: 'Context',
+        },
+        {
           name: 'obj',
           type: 'Object'
         },
@@ -28,6 +32,10 @@ foam.INTERFACE({
     {
       name: 'deleteSheet',
       args: [
+        {
+          name: 'x',
+          type: 'Context',
+        },
         {
           name: 'sheetId',
           type: 'String'
