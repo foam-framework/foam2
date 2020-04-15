@@ -53,7 +53,8 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'tokensFolderPath'
+      name: 'tokensFolderPath',
+      value: '/tmp'
     }
   ]
 });
