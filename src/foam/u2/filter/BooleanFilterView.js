@@ -105,7 +105,7 @@ foam.CLASS({
             class: 'foam.u2.md.CheckBox',
             data$: this.boolT$,
             showLabel: true,
-            label: 'True'
+            label: this.BOOL_T.label
           }).end()
         .end()
         .start().addClass(this.myClass('container'))
@@ -113,7 +113,7 @@ foam.CLASS({
             class: 'foam.u2.md.CheckBox',
             data$: this.boolF$,
             showLabel: true,
-            label: 'False'
+            label: this.BOOL_F.label
           }).end()
         .end();
     },
