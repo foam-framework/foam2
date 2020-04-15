@@ -279,8 +279,7 @@
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
       readVisibility: 'RO',
-      // remember to uncomment for NP-657 do proper localRuleDAO migration
-      // writePermissionRequired: true
+      writePermissionRequired: true
     },
     {
       class: 'FObjectProperty',
