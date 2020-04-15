@@ -115,6 +115,14 @@ foam.CLASS({
       includeInDigest: false,
     },
     {
+      documenation: 'Server put is performed in user context',
+      name: 'sessionId',
+      class: 'String',
+      visibility: 'HIDDEN',
+      storageTransient: true,
+      includeInDigest: false,
+    },
+    {
       name: 'created',
       class: 'DateTime',
       visibility: 'RO',

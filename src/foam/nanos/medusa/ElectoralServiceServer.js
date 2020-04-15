@@ -284,7 +284,8 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      if ( getState() != ElectoralServiceState.ELECTION ) {
+     getLogger().debug("callVote", getState().getLabel());
+     if ( getState() != ElectoralServiceState.ELECTION ) {
         getLogger().debug("callVote", getState().getLabel(), "exit");
         return;
       }
@@ -294,10 +295,10 @@ foam.CLASS({
 
       if ( voters.size() < support.getMediatorQuorum(x) ) {
         // nothing to do.
-        getLogger().warning("callVote", "waiting for mediator quorum", voters.size(), support.getMediatorQuorum(x));
+        getLogger().warning("callVote", getState().getLabel(), "waiting for mediator quorum", voters.size(), support.getMediatorQuorum(x));
         return;
       }
-      getLogger().debug("callVote", "achieved mediator quorum", voters.size(), support.getMediatorQuorum(x));
+      getLogger().debug("callVote", getState().getLabel(), "achieved mediator quorum", voters.size(), support.getMediatorQuorum(x));
  
       ThreadPoolExecutor pool = pool_;
       List<Callable<Long>> voteCallables = new ArrayList<>();
@@ -315,7 +316,7 @@ foam.CLASS({
           if ( clientConfig.getId().equals(config.getId())) {
             continue;
           }
-          getLogger().debug("callVote", "config", config.getId(), "client", clientConfig.getId());
+          getLogger().debug("callVote", getState().getLabel(), "config", config.getId(), "client", clientConfig.getId());
           ClientElectoralService electoralService =
             new ClientElectoralService.Builder(getX())
              .setDelegate(new HTTPBox.Builder(getX())
@@ -328,10 +329,10 @@ foam.CLASS({
              .build();
 
           voteCallables.add(() -> {
-            getLogger().debug("callVote", "call", "vote", clientConfig.getId(), clientConfig.getName());
+            getLogger().debug("callVote", getState().getLabel(), "call", "vote", clientConfig.getId(), clientConfig.getName());
             try {
             long result = electoralService.vote(clientConfig.getId(), getElectionTime());
-            getLogger().debug("callVote", "call", "vote", clientConfig.getId(), clientConfig.getName(), "response", result);
+            getLogger().debug("callVote", getState().getLabel(), "call", "vote", clientConfig.getId(), clientConfig.getName(), "response", result);
             recordResult(x, result, clientConfig);
             callReport(x);
             return result;
@@ -358,7 +359,7 @@ foam.CLASS({
       } catch ( Exception e) {
         getLogger().error(e);
       } finally {
-        getLogger().debug("callVote", "end", "votes", getVotes(), "voters", voters.size(), getState().getLabel());
+        getLogger().debug("callVote", getState().getLabel(), "end", "votes", getVotes(), "voters", voters.size());
       }
       `
     },
@@ -370,7 +371,7 @@ foam.CLASS({
       ClusterConfig config = support.getConfig(getX(), support.getConfigId());
       long v = -1L;
 
-      getLogger().debug("vote", id, time, getElectionTime(), getState().getLabel(),config.getStatus().getLabel());
+      getLogger().debug("vote", getState().getLabel(), id, time, getElectionTime(), config.getStatus().getLabel());
       if ( config.getStatus() != Status.ONLINE ) {
         return v;
       }
@@ -394,7 +395,7 @@ foam.CLASS({
         if ( getState() == ElectoralServiceState.VOTING ) { 
           v = generateVote(getX());
         }
-        getLogger().debug("vote", id, time, "response", v);
+        getLogger().debug("vote", getState().getLabel(), id, time, "response", v);
       } catch (Throwable t) {
         getLogger().error("vote", id, time, "response", v, t);
       }
@@ -423,6 +424,11 @@ foam.CLASS({
         }
       ],
       javaCode: `
+      getLogger().debug("callReport", getState().getLabel());
+      if ( getState() == ElectoralServiceState.IN_SESSION ) {
+        getLogger().debug("callReport", getState().getLabel(), "exit");
+        return;
+      }
       ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
       ClusterConfig config = support.getConfig(x, support.getConfigId());
       List voters = support.getVoters(getX());
@@ -430,12 +436,12 @@ foam.CLASS({
         synchronized ( electionLock_ ) {
           if ( ! ( getState() == ElectoralServiceState.ELECTION &&
                    hasQuorum(voters.size()) ) )  {
-            getLogger().debug("callReport", "no quorum", "votes", getVotes(), "voters", voters.size(), getState().getLabel());
+            getLogger().debug("callReport", getState().getLabel(), "no quorum", "votes", getVotes(), "voters", voters.size());
             return;
           }
         }
 
-        getLogger().debug("callReport", "votes", getVotes(), "voters", voters.size(), getState().getLabel());
+        getLogger().debug("callReport", getState().getLabel(), "votes", getVotes(), "voters", voters.size());
 
         report(getWinner());
 
@@ -461,7 +467,7 @@ foam.CLASS({
                    .build();
                 
                 reportCallables.add(() -> {
-                  getLogger().debug("callReport", "call", "report", getWinner());
+                  getLogger().debug("callReport", getState().getLabel(), "call", "report", getWinner());
                   try {
                     electoralService2.report(getWinner());
                   } catch (Throwable e) {
@@ -472,7 +478,7 @@ foam.CLASS({
               }
 
               try {
-                getLogger().debug("callReport", "invoke reportCallables");
+                getLogger().debug("callReport", getState().getLabel(), "invoke reportCallables");
                 reportResults = pool.invokeAll(reportCallables);
                 for( Future<Void> reportResult : reportResults ) {
                   try {
@@ -493,6 +499,11 @@ foam.CLASS({
       name: 'report',
       synchronized: true,
       javaCode: `
+      getLogger().debug("report", getState().getLabel());
+      if ( getState() == ElectoralServiceState.IN_SESSION ) {
+        getLogger().debug("report", getState().getLabel(), "exit");
+        return;
+      }
       ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
       support.setPrimaryConfigId(winner);
       support.setIsPrimary(support.getConfigId().equals(winner));
@@ -504,15 +515,15 @@ foam.CLASS({
         if ( winner.equals(config.getId()) ) {
           if ( ! config.getIsPrimary() ) {
             // found the winner, and it is the 'new' primary, may or may not be us.
-            getLogger().debug("report", winner, "new primary", config.getId(), config.getName());
+            getLogger().debug("report", getState().getLabel(), winner, "new primary", config.getId(), config.getName());
             config.setIsPrimary(true);
             config = (ClusterConfig) dao.put_(getX(), config);
           } else {
-            getLogger().debug("report", winner, "primary", config.getId(), config.getName());
+            getLogger().debug("report", getState().getLabel(), winner, "primary", config.getId(), config.getName());
           }
         } else if ( config.getIsPrimary() ) {
           // no longer primary
-          getLogger().debug("report", winner, "old primary", config.getId(), config.getName());
+          getLogger().debug("report", getState().getLabel(), winner, "old primary", config.getId(), config.getName());
           config.setIsPrimary(false);
           config = (ClusterConfig) dao.put_(getX(), config);
         }
@@ -522,7 +533,7 @@ foam.CLASS({
       setCurrentSeq(0L);
 
       ClusterConfig config = support.getConfig(getX(), support.getConfigId());
-      getLogger().info("report", support.getConfigId(), "primary", winner, getState().getLabel(), config.getStatus().getLabel());
+      getLogger().info("report", getState().getLabel(), support.getConfigId(), "primary", winner, config.getStatus().getLabel());
      `
     }
   ]

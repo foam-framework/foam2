@@ -33,6 +33,7 @@ foam.CLASS({
     'pingLatency',
     'zone',
     'region',
+    'regionStatus',
     'realm',
     'lastModified'
   ],
@@ -68,6 +69,13 @@ foam.CLASS({
       documentation: 'Geographic region, like a Data Center, of group nodes. A sub group in the Realm.',
       name: 'region',
       class: 'String',
+    },
+    {
+      documentation: 'region status.',
+      name: 'regionStatus',
+      class: 'Enum',
+      of: 'foam.nanos.medusa.RegionStatus',
+      value: 'STANDBY'
     },
     {
       documentation: 'A sub-group of nodes in a region. An inner core of nodes in a Data Center.  0 (zero) has special meaning for Medusa Mediator clusters.',

@@ -14,21 +14,11 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.nanos.medusa.ReplayDetailsCmd'
     },
-    // {
-    //   documentation: 'Instance to replay to',
-    //   name: 'requester',
-    //   class: 'String',
-    // },
-    // {
-    //   documentation: 'Instance to replay from',
-    //   name: 'responder',
-    //   class: 'String'
-    // },
     {
       documentation: 'service name to replay to',
       name: 'serviceName',
       class: 'String',
-      value: 'medusaEntryDAO'
+      value: 'medusaConsensusDAO'
     },
     {
       name: 'fromIndex',

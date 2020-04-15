@@ -59,7 +59,7 @@ foam.CLASS({
                config.getRegion() == myConfig.getRegion() &&
                config.getRealm() == myConfig.getRealm() ) {
 
-            DAO clientDAO = support.getClientDAO(getX(), "medusaEntryDAO", myConfig, config);
+            DAO clientDAO = support.getClientDAO(getX(), "medusaNodeDAO", myConfig, config);
             clientDAO = new RetryClientSinkDAO.Builder(getX())
               .setDelegate(clientDAO)
               .setMaxRetryAttempts(support.getMaxRetryAttempts())
@@ -77,7 +77,7 @@ foam.CLASS({
             dagger.setGlobalIndex(getX(), details.getMaxIndex());
 
             // Send to Consensus DAO to prepare for Replay
-            ((DAO) getX().get("medusaEntryDAO")).cmd(details);
+            ((DAO) getX().get("medusaConsensusDAO")).cmd(details);
 
             // NOTE: using internalMedusaEntryDAO else we'll block on ReplayingDAO.
             DAO dao = (DAO) getX().get("internalMedusaEntryDAO");
@@ -86,7 +86,7 @@ foam.CLASS({
 
             ReplayCmd cmd = new ReplayCmd();
             cmd.setDetails(details);
-            cmd.setServiceName("medusaEntryDAO"); // TODO: configuration
+            cmd.setServiceName("medusaConsensusDAO"); // TODO: configuration
             if ( max != null &&
                  max.getValue() != null ) {
               cmd.setFromIndex((Long) max.getValue());

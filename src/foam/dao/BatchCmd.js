@@ -12,6 +12,12 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'dop',
+      class: 'Enum',
+      of: 'foam.dao.DOP',
+      value: 'PUT'
+    },
+    {
       name: 'batch',
       class: 'List',
     }

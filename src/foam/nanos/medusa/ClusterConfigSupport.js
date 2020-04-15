@@ -25,6 +25,9 @@ configuration for contacting the primary node.`,
     'foam.dao.ArraySink',
     'foam.dao.ClientDAO',
     'foam.dao.DAO',
+    'foam.dao.EasyDAO',
+    'foam.dao.MDAO',
+    'foam.dao.ProxyDAO',
     'static foam.mlang.MLang.*',
     'static foam.mlang.MLang.COUNT',
     'foam.mlang.sink.Count',
@@ -37,7 +40,9 @@ configuration for contacting the primary node.`,
     'java.net.HttpURLConnection',
     'java.net.URL',
     'java.util.ArrayList',
-    'java.util.List'
+    'java.util.HashMap',
+    'java.util.List',
+    'java.util.Map'
   ],
 
   properties: [
@@ -130,6 +135,12 @@ configuration for contacting the primary node.`,
       javaFactory: 'return new java.util.HashMap();'
     },
     {
+      name: 'mdaos',
+      class: 'Map',
+      javaFactory: 'return new HashMap();',
+      visibility: 'HIDDEN'
+    },
+    {
       name: 'logger',
       class: 'FObjectProperty',
       of: 'foam.nanos.logger.Logger',
@@ -212,12 +223,45 @@ configuration for contacting the primary node.`,
       javaCode: `
         DAO dao = (DAO) getPrimaryDAOs().get(serviceName);
         if ( dao == null ) {
-          ClusterConfig primaryConfig = getConfig(x, getPrimaryConfigId());
+         ClusterConfig primaryConfig = getPrimary(x);
           ClusterConfig config = getConfig(x, getConfigId());
           dao = getClientDAO(x, serviceName, config, primaryConfig);
           getPrimaryDAOs().put(serviceName, dao);
         }
         return dao;
+      `
+    },
+    {
+      name: 'getPrimary',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+      ],
+      type: 'foam.nanos.medusa.ClusterConfig',
+      javaCode: `
+      ClusterConfig primaryConfig = null;
+      DAO clusterConfigDAO = (DAO) x.get("clusterConfigDAO");
+      List<ClusterConfig> configs = ((ArraySink) clusterConfigDAO
+        .where(
+          AND(
+            EQ(ClusterConfig.IS_PRIMARY, true),
+            EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
+            EQ(ClusterConfig.ZONE, 0L),
+            EQ(ClusterConfig.STATUS, Status.ONLINE),
+            EQ(ClusterConfig.ENABLED, true)
+          ))
+        .select(new ArraySink())).getArray();
+      if ( configs.size() > 0 ) {
+        primaryConfig = configs.get(0);
+        if ( configs.size() > 1 ) {
+         getLogger().error("muliple primaries", configs.get(0), configs.get(1));
+        }
+        return primaryConfig;
+      } else {
+        throw new RuntimeException("Primary not found.");
+      }
       `
     },
     {
@@ -236,6 +280,43 @@ configuration for contacting the primary node.`,
       javaCode: `
       return (ClusterConfig) ((DAO) x.get("localClusterConfigDAO")).find(id).fclone();
      `
+    },
+    {
+      documentation: 'Any active region in realm.',
+      name: 'getActiveRegion',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'config',
+          type: 'foam.nanos.medusa.ClusterConfig'
+        }
+      ],
+      type: 'foam.nanos.medusa.ClusterConfig',
+      javaCode: `
+      DAO clusterConfigDAO = (DAO) x.get("clusterConfigDAO");
+      List<ClusterConfig> configs = ((ArraySink) clusterConfigDAO
+        .where(
+          AND(
+            EQ(ClusterConfig.REGION_STATUS, RegionStatus.ACTIVE),
+            EQ(ClusterConfig.REALM, config.getRealm()),
+            EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
+            EQ(ClusterConfig.ZONE, 0L),
+            EQ(ClusterConfig.STATUS, Status.ONLINE),
+            EQ(ClusterConfig.ENABLED, true)
+          ))
+        .orderBy(ClusterConfig.IS_PRIMARY)
+        .select(new ArraySink())).getArray();
+      if ( configs.size() > 0 ) {
+        // TODO: random or round-robin.
+        // Ordered by IS_PRIMARY if any are.
+        return configs.get(configs.size() -1);
+      } else {
+        throw new RuntimeException("Active Region not found.");
+      }
+      `
     },
     {
       name: 'getVoterPredicate',
@@ -440,6 +521,60 @@ configuration for contacting the primary node.`,
           .build())
         .build();
       `
-    }
+    },
+    // {
+    //   name: 'getMdao',
+    //   args: [
+    //     {
+    //       name: 'x',
+    //       type: 'Context'
+    //     },
+    //     {
+    //       name: 'entry',
+    //       type: 'foam.nanos.medusa.MedusaEntry'
+    //     }
+    //   ],
+    //   type: 'foam.dao.DAO',
+    //   javaCode: `
+    //   String name = entry.getNSpecName();
+    //   getLogger().debug("mdao", name);
+    //   DAO dao = (DAO) getMdaos().get(name);
+    //   if ( dao != null ) {
+    //     getLogger().debug("mdao", name, "cache", dao.getOf());
+    //     return dao;
+    //   }
+    //   dao = (DAO) x.get(name);
+    //   Object result = dao.cmd(MDAO.GET_MDAO_CMD);
+    //   if ( result != null &&
+    //        result instanceof MDAO ) {
+    //     getLogger().debug("mdao", name, "cmd", dao.getOf());
+    //     dao = (DAO) result;
+    //   } else {
+    //     while ( dao != null ) {
+    //       getLogger().debug("mdao", name, "while", dao.getOf());
+    //       if ( dao instanceof MDAO ) {
+    //         break;
+    //       }
+    //       if ( dao instanceof EasyDAO ) {
+    //         dao = ((EasyDAO) dao).getMdao();
+    //         if ( dao != null ) {
+    //           break;
+    //         }
+    //       }
+    //       if ( dao instanceof ProxyDAO ) {
+    //         dao = ((ProxyDAO) dao).getDelegate();
+    //       } else {
+    //         dao = null;
+    //       }
+    //     }
+    //   }
+    //   if ( dao != null ) {
+    //     getMdaos().put(name, dao);
+    //     getLogger().debug("mdao", name, "found", dao.getOf());
+    //     return dao;
+    //   }
+    //   throw new IllegalArgumentException("MDAO not found: "+name);
+    //   `
+    // }
   ]
 });

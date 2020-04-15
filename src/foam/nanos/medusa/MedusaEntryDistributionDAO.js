@@ -105,7 +105,7 @@ foam.CLASS({
             try {
               DAO dao = (DAO) getClients().get(config.getId());
               if ( dao == null ) {
-                DAO clientDAO = support.getClientDAO(x, "medusaEntryDAO", config, config);
+                DAO clientDAO = support.getClientDAO(x, "medusaNodeDAO", config, config);
                 dao = new RetryClientSinkDAO.Builder(x)
                         .setDelegate(clientDAO)
                         .setMaxRetryAttempts(support.getMaxRetryAttempts())

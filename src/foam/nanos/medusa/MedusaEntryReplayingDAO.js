@@ -13,6 +13,7 @@ foam.CLASS({
   documentation: `All DAO operations will block until Replay is complete.`,
 
   javaImports: [
+    'foam.dao.BatchCmd',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
   ],
@@ -56,6 +57,7 @@ foam.CLASS({
       javaCode: `
       synchronized ( replayingLock_ ) {
         if ( getReplaying() ) {
+          getLogger().debug("find");
           try {
             replayingLock_.wait();
           } catch (InterruptedException e) {
@@ -71,6 +73,7 @@ foam.CLASS({
       javaCode: `
       synchronized ( replayingLock_ ) {
         if ( getReplaying() ) {
+          getLogger().debug("select");
           try {
             replayingLock_.wait();
           } catch (InterruptedException e) {
@@ -86,6 +89,7 @@ foam.CLASS({
       javaCode: `
       synchronized ( replayingLock_ ) {
         if ( getReplaying() ) {
+          getLogger().debug("put");
           try {
             replayingLock_.wait();
           } catch (InterruptedException e) {
@@ -101,7 +105,8 @@ foam.CLASS({
       javaCode: `
       synchronized ( replayingLock_ ) {
         if ( getReplaying() ) {
-          try {
+         getLogger().debug("remove");
+         try {
             replayingLock_.wait();
           } catch (InterruptedException e) {
             throw new RuntimeException(e);
@@ -116,7 +121,8 @@ foam.CLASS({
       javaCode: `
       synchronized ( replayingLock_ ) {
         if ( getReplaying() ) {
-          try {
+         getLogger().debug("removeAll");
+         try {
             replayingLock_.wait();
           } catch (InterruptedException e) {
             throw new RuntimeException(e);
@@ -136,20 +142,23 @@ foam.CLASS({
           replayingLock_.notifyAll();
         }
         return obj;
-      } else if ( obj instanceof MedusaEntry ) {
-        return getDelegate().cmd_(x, obj);
-      } else {
-        synchronized ( replayingLock_ ) {
-          if ( getReplaying() ) {
-            try {
-              replayingLock_.wait();
-            } catch (InterruptedException e) {
-              throw new RuntimeException(e);
-            }
-          }
-        }
-        return getDelegate().cmd_(x, obj);
+      // } else if ( obj instanceof MedusaEntry ) {
+      //   return getDelegate().cmd_(x, obj);
+      // } else if ( obj instanceof BatchCmd ) {
+      //   return getDelegate().cmd_(x, obj);
+      // } else {
+      //   synchronized ( replayingLock_ ) {
+      //     if ( getReplaying() ) {
+      //       try {
+      //         replayingLock_.wait();
+      //       } catch (InterruptedException e) {
+      //         throw new RuntimeException(e);
+      //       }
+      //     }
+      //   }
+      //   return getDelegate().cmd_(x, obj);
       }
+      return getDelegate().cmd_(x, obj);
       `
     },
     {

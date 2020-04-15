@@ -20,6 +20,7 @@ NOTE: override cmd_ in child class to control delegate call`,
   javaImports: [
     'foam.core.Agency',
     'foam.core.AgencyTimerTask',
+    'foam.core.ContextAware',
     'foam.core.FObject',
     'foam.dao.DAO',
     'foam.nanos.logger.PrefixLogger',
@@ -52,6 +53,12 @@ NOTE: override cmd_ in child class to control delegate call`,
     },
     {
       name: 'batch',
+      class: 'List',
+      of: 'foam.nanos.medusa.MedusaEntry',
+      javaFactory: 'return new ArrayList();'
+    },
+    {
+      name: 'removeBatch',
       class: 'List',
       of: 'foam.nanos.medusa.MedusaEntry',
       javaFactory: 'return new ArrayList();'
@@ -93,6 +100,23 @@ NOTE: override cmd_ in child class to control delegate call`,
       `
     },
     {
+      documentation: 'Presently this is send and forget. Future - block and notify.',
+      name: 'remove_',
+      javaCode: `
+      synchronized ( batchLock_ ) {
+        // clear context, so not marshalled.
+        ((ContextAware) obj).setX(null);
+
+        getRemoveBatch().add(obj);
+        if ( getTimer() == null ) {
+          scheduleTimer(getX(), getRemoveBatch().size());
+        }
+        // getLogger().debug("put", "removeBatch", "size", getRemoveBatch().size());
+      }
+      return obj;
+      `
+    },
+    {
       name: 'execute',
       args: [
         {
@@ -106,7 +130,7 @@ NOTE: override cmd_ in child class to control delegate call`,
         batch = getBatch();
         BatchClientDAO.BATCH.clear(this);
       }
-      // getLogger().debug("execute", "batch", "size", batch.size());
+      getLogger().debug("execute", "batch", "size", batch.size());
 
       try {
         if ( batch.size() > 0 ) {

@@ -22,7 +22,8 @@ foam.CLASS({
     'foam.dao.DOP',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
-    'foam.nanos.pm.PM'
+    'foam.nanos.pm.PM',
+    'foam.nanos.session.Session'
   ],
 
   properties: [
@@ -94,20 +95,15 @@ foam.CLASS({
       PM pm = createPM(x, dop);
       getLogger().debug("submit", dop.getLabel(), obj.getClass().getName());
 
-      ElectoralService electoralService = (ElectoralService) x.get("electoralService");
+      // ElectoralService electoralService = (ElectoralService) x.get("electoralService");
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       ClusterConfig config = support.getConfig(x, support.getConfigId());
-      if ( ! config.getIsPrimary() ||
-           config.getStatus() != Status.ONLINE  ||
-           electoralService.getState() != ElectoralServiceState.IN_SESSION ) {
-        getLogger().error("Reject put(), primary", config.getIsPrimary(), "status", config.getStatus().getLabel(), "state", electoralService.getState().getLabel(), obj);
-        throw new UnsupportedOperationException("Cluster not ready.");
-      }
 
       MedusaEntry entry = x.create(MedusaEntry.class);
       entry.setMediator(config.getName());
       entry.setNSpecName(getNSpec().getName());
       entry.setDop(dop);
+//      entry.setSessionId(((Session) x.get("session")).getId());
       entry.setData(obj);
 
       getLogger().debug("submit", entry.getIndex());
