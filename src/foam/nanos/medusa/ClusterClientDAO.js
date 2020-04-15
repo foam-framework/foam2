@@ -144,12 +144,12 @@ foam.CLASS({
             if ( electoralService.getState() != ElectoralServiceState.IN_SESSION ) {
               throw new IllegalStateException("Election in progress.");
             }
-
-            getLogger().debug("to primary", support.getPrimaryConfigId(), "attempt", retryAttempt, cmd);
+            ClusterConfig primary = support.getPrimary(x);
+            getLogger().debug("to primary", primary.getId(), primary.getName(), "attempt", retryAttempt, cmd);
             PM pm = new PM(ClusterClientDAO.getOwnClassInfo(), getServiceName());
             FObject result = (FObject) support.getPrimaryDAO(x, getClusterServiceName()).cmd_(x, cmd);
             pm.log(x);
-            getLogger().debug("from primary", support.getPrimaryConfigId(), "attempt", retryAttempt, result);
+            getLogger().debug("from primary", primary.getId(), primary.getName(), "attempt", retryAttempt, result);
             return result;
           } catch ( Throwable t ) {
             if ( t instanceof UnsupportedOperationException ) {

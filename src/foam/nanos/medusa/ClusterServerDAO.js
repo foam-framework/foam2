@@ -49,8 +49,9 @@ foam.CLASS({
         ClusterConfigSupport support = (ClusterConfigSupport) y.get("clusterConfigSupport");
         ClusterConfig config = support.getConfig(y, support.getConfigId());
         ElectoralServiceServer electoralService = (ElectoralServiceServer) y.get("electoralService");
+        ClusterConfig primary = support.getPrimary(y);
 
-        getLogger().debug(request.getServiceName(), request.getDop().getLabel(), config.getId(), config.getName(), "isPrimary", config.getIsPrimary(), "primary", support.getPrimaryConfigId(), config.getStatus().getLabel(), "electoral state", electoralService.getState().getLabel());
+        getLogger().debug(request.getServiceName(), request.getDop().getLabel(), config.getId(), config.getName(), "isPrimary", config.getIsPrimary(), "primary", primary.getId(), primary.getName(), config.getStatus().getLabel(), "electoral state", electoralService.getState().getLabel());
 
         if ( ! config.getIsPrimary() ) {
           throw new UnsupportedOperationException("Cluster command not supported on non-primary instance");

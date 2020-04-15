@@ -284,6 +284,10 @@ foam.CLASS({
         }
       ],
       javaCode: `
+      if ( getState() != ElectoralServiceState.ELECTION ) {
+        getLogger().debug("callVote", getState().getLabel(), "exit");
+        return;
+      }
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       ClusterConfig config = support.getConfig(x, support.getConfigId());
       List voters = support.getVoters(x);

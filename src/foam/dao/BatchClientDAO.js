@@ -80,6 +80,9 @@ NOTE: override cmd_ in child class to control delegate call`,
       name: 'put_',
       javaCode: `
       synchronized ( batchLock_ ) {
+        // clear context, so not marshalled.
+        ((ContextAware) obj).setX(null);
+
         getBatch().add(obj);
         if ( getTimer() == null ) {
           scheduleTimer(getX(), getBatch().size());
@@ -109,7 +112,8 @@ NOTE: override cmd_ in child class to control delegate call`,
         if ( batch.size() > 0 ) {
           BatchCmd cmd = new BatchCmd();
           cmd.setBatch(batch);
-          this.cmd_(x, cmd);
+          Object result = this.cmd_(x, cmd);
+          // TODO/REVIEW - what to do with the result/reply?
         }
       } finally {
         scheduleTimer(x, batch.size());
