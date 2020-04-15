@@ -16,7 +16,6 @@ foam.CLASS({
   imports: [ 'timer' ],
 
   requires: [
-   'foam.graphics.Arc',
    'foam.graphics.Box',
    'foam.graphics.Circle'
   ],
@@ -32,9 +31,9 @@ foam.CLASS({
 
       // Build the Robot
       var body = this.Box.create({
-        x: -10,
+        x:      -10,
         width:  20,
-        height: 30,
+        height: 25,
         color:  '#ccc'
       });
       this.add(body);
@@ -42,7 +41,7 @@ foam.CLASS({
       var neck = this.Box.create({
         color:  'white',
         width:  2,
-        y:     -13,
+        y:      -13,
         x:      9,
         height: 15
       });
@@ -61,7 +60,7 @@ foam.CLASS({
         color:  'red',
         border: null,
         x:      10,
-        y:      30.5,
+        y:      25.5,
         start:  0,
         end:    Math.PI
       });
@@ -88,11 +87,10 @@ foam.CLASS({
         body.y        = 5 * Math.cos(t/9) - 15;
         body.rotation = Math.PI / 12 * Math.cos(t/40);
         pupil.x       = 4 * Math.cos(t/15);
-        neck.height   = 15 + 8 * Math.cos(t/15);
-        neck.y        = -13 - 8 * Math.cos(t/15);
-        engine.alpha  = 0.9 - Math.sin(t/15) / 10;
+        neck.height   = 15 + 6 * Math.cos(t/15);
+        neck.y        = -13 - 6 * Math.cos(t/15);
+        engine.alpha  = 0.9 - Math.sin(t/2) / 10;
       });
-      timer.start();
     }
   ]
 });
@@ -265,7 +263,7 @@ foam.CLASS({
   properties: [
     {
       name: 'question',
-      label: 'Which one of these famous apps were made using Java Script?',
+      label: 'Which one of these famous apps were made using JavaScript?',
       view: {
         class: 'foam.u2.view.RadioView',
         choices: [
@@ -344,12 +342,15 @@ foam.CLASS({
   name: 'Door',
   extends: 'foam.graphics.Box',
 
-  requires: [ 'foam.animation.Animation', 'foam.audio.Speak' ],
+  requires: [
+    'foam.animation.Animation',
+    'foam.audio.Speak'
+  ],
 
   imports: [ 'game' ],
 
   properties: [
-    [ 'color', 'red' ],
+    [ 'color',    'red' ],
     [ 'isClosed', true ],
     'question'
   ],
@@ -359,8 +360,8 @@ foam.CLASS({
       this.isClosed = false;
       this.Animation.create({
         duration: 300,
-        f: () => this.rotation = Math.PI /4,
-        objs: [ this ]
+        f:        () => this.rotation = Math.PI /4,
+        objs:     [ this ]
       }).start();
     },
 
@@ -379,18 +380,13 @@ foam.CLASS({
         }
 
         // Remove the question
-        this.game.questionArea.removeAllChildren();
-        this.game.currentDoor = null;
+        this.game.question = null;
+        this.game.focus();
       });
     },
 
     function askQuestion() {
-      if ( this.game.currentDoor == this ) return;
-      this.game.currentDoor = this;
-
-      var q = this.question;
-      this.game.questionArea.removeAllChildren();
-      this.game.questionArea.add(q);
+      this.game.question = this.question;
     }
   ]
 });
@@ -427,7 +423,7 @@ foam.CLASS({
 
   properties: [
     [ 'color', 'yellow' ],
-    [ 'radius', 8 ],
+    [ 'radius', 4 ],
     'vx',
     'vy'
   ],
@@ -438,10 +434,10 @@ foam.CLASS({
 
       this.game.addChild(this);
       this.Animation.create({
-        duration: 5000,
+        duration: 4000,
         f: () => {
-          this.x += 2000 * this.vx;
-          this.y += 2000 * this.vy;
+          this.x += 1500 * this.vx;
+          this.y += 1500 * this.vy;
         },
         onEnd: () => this.game.removeChild(this),
         objs: [ this ]
@@ -455,6 +451,8 @@ foam.CLASS({
   package: 'com.foamdev.demos.maze',
   name: 'Game',
   extends: 'foam.u2.Element',
+
+  documentation: 'Javascript quiz maze game.',
 
   requires: [
     'com.foamdev.demos.maze.Door',
@@ -491,13 +489,13 @@ foam.CLASS({
       ['Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall'],
       ['Wall',   null,   null, 'Wall',   null, 'Wall',   null,   null, 'Wall',   null,   null],
       [  null,   null,   null,   null,   null,   null,   null, 'Wall',   null, 'Wall', 'Wall'],
-      [  null, 'Wall', 'Wall',   null, 'Wall', 'Wall', 'Wall',   null, 'Wall', 'Wall',   null],
+      [  null, 'Wall', 'Wall', 'Door', 'Wall', 'Wall', 'Wall',   null, 'Wall', 'Wall',   null],
       [  null,   null, 'Wall', 'Wall', 'Wall',   null, 'Wall', 'Wall',   null, 'Wall', 'Wall'],
-      [  null,   null, 'Door', 'Wall',   null, 'Door',   null,   null,   null, 'Wall',   null],
-      ['Wall', 'Door', 'Wall', 'Wall',   null,   null,   null,   null, 'Wall',   null, 'Wall'],
-      ['Wall', 'Wall',   null, 'Wall', 'Wall', 'Door',   null, 'Door',   null, 'Wall',   null],
+      [  null,   null, 'Wall', 'Wall',   null, 'Door',   null,   null,   null, 'Wall',   null],
+      ['Wall', 'Door', 'Wall', 'Wall',   null,   null,   null, 'Door', 'Wall',   null, 'Wall'],
+      ['Wall', 'Wall',   null, 'Wall', 'Wall', 'Door',   null,   null,   null, 'Wall',   null],
       ['Wall',   null, 'Wall', 'Wall',   null, 'Wall',   null,   null, 'Wall', 'Door', 'Wall'],
-      [  null,   null, 'Wall',   null, 'Wall',   null, 'Wall',   null,   null, 'Wall', 'Wall'],
+      [  null,   null, 'Wall',   null, 'Wall',   null, 'Wall', 'Wall',   null, 'Wall', 'Wall'],
       [  null, 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall',   null, 'Wall',   null, 'Wall'],
       ['Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall', 'Wall']
     ],
@@ -508,8 +506,8 @@ foam.CLASS({
       ['Wall', 'Wall',   null,   null, 'Wall',   null,   null, 'Wall',   null,   null,   null, 'Wall'],
       ['Wall', 'Wall', 'Wall',   null,   null, 'Wall',   null,   null, 'Wall', 'Wall',   null, 'Wall'],
       ['Wall', 'Wall',   null,   null, 'Wall',   null, 'Wall', 'Wall', 'Wall',   null, 'Wall', 'Wall'],
-      ['Wall',   null,   null, 'Wall',   null,   null, 'Wall', 'Wall',   null, 'Wall',   null, 'Wall'],
-      ['Wall',   null, 'Wall',   null,   null,   null, 'Wall', 'Wall', 'Wall',   null, 'Wall', 'Wall'],
+      ['Wall',   null,   null, 'Wall',   null,   null, 'Wall', 'Wall', 'Wall', 'Wall',   null, 'Wall'],
+      ['Wall',   null, 'Wall',   null,   null,   null, 'Wall', 'Wall',   null,   null, 'Wall', 'Wall'],
       ['Wall', 'Wall',   null,   null, 'Wall', 'Wall',   null, 'Wall', 'Wall',   null,   null, 'Wall'],
       ['Wall', 'Wall',   null, 'Wall',   null,   null,   null, 'Wall',   null, 'Wall',   null, 'Wall'],
       ['Wall',   null,   null,   null,   null,   null,   null, 'Door', 'Wall',   null,  false, 'Wall']
@@ -517,9 +515,8 @@ foam.CLASS({
    },
 
   properties: [
-    [ 'isGameOver', false ],
-    [ 'width',      1600 ],
-    [ 'height',     800 ],
+    [ 'width',  1600 ],
+    [ 'height', 800 ],
     {
       // Joystick
       name: 'gamepad',
@@ -555,15 +552,14 @@ foam.CLASS({
     },
 
     // Last non-wall-hitting location
-    'lastX', 'lastY',
+    'lastX',
+    'lastY',
 
     // True if robot currently hitting a wall
     'hittingWall',
 
-    // Area in HTML to display questions
-    'questionArea',
-
-    'currentDoor'
+    // Current question being asked
+    'question'
   ],
 
   methods: [
@@ -619,7 +615,7 @@ foam.CLASS({
         for ( var col = 0 ; col < rowdata.length ; col++ ) {
           if ( rowdata[col] ) {
             var blockType = this[rowdata[col]];
-            var block = blockType.create({
+            var block     = blockType.create({
               x:      this.BRICK_SIZE/2 + col*this.BRICK_SIZE,
               y:      this.BRICK_SIZE/2 + row*this.BRICK_SIZE,
               width:  this.BRICK_SIZE,
@@ -641,11 +637,11 @@ foam.CLASS({
         for ( var col = 0 ; col < rowdata.length ; col++ ) {
           if ( rowdata[col] ) {
             var blockType = this[rowdata[col]];
-            var block = blockType.create({
+            var block     = blockType.create({
               x:      this.BRICK_SIZE/2 + col*this.BRICK_SIZE,
               y:      this.BRICK_SIZE/2 + row*this.BRICK_SIZE,
               width:  5,
-              height: this.BRICK_SIZE
+              height: this.BRICK_SIZE+5
             });
             if ( rowdata[col] == 'Door' ) {
               block.connectToQuestion(this['Question' + doorNumber].create());
@@ -659,15 +655,18 @@ foam.CLASS({
 
     function initE() {
       this.SUPER();
+
+      // Set focus so arrow keys work
+      this.focus();
+
       // Create the HTML
-      this.style({display:'flex'}).add(this.maze).add(' ').tag(null, null, this.questionArea$);
+      this.style({display:'flex'}).add(this.maze, ' ', this.question$);
     },
 
     function gameOver() {
       // Call when user reaches the exit and the game is over
 
-      if ( this.isGameOver ) return;
-      this.isGameOver = true;
+      this.collider.stop();
 
       this.maze.color = 'white';
 
@@ -687,7 +686,7 @@ foam.CLASS({
           label.rotation    = 2 * Math.PI;
           this.robot.scaleX = this.robot.scaleY = 5;
           this.robot.x      = this.maze.width/2;
-          this.robot.y      = this.maze.height/2-20;
+          this.robot.y      = this.maze.height/2;
         },
         objs: [label, this.robot]
       }).start();
@@ -710,9 +709,6 @@ foam.CLASS({
     {
       name: 'tick',
       code: function() {
-        // Set focus so arrow keys keep working
-        this.focus();
-
         // If hitting a wall, move robot back to last good position
         if ( this.hittingWall ) {
           this.robot.x     = this.lastX;
@@ -761,10 +757,10 @@ foam.CLASS({
       keyboardShortcuts: [ ' ', 'x' ],
       code: function() {
         // Fire four lasers, one in each direction
-        this.Laser.create({x: this.robot.x, y: this.robot.y, vx: 1,  vy: 0});
-        this.Laser.create({x: this.robot.x, y: this.robot.y, vx: 0,  vy: 1});
-        this.Laser.create({x: this.robot.x, y: this.robot.y, vx: -1, vy: 0});
-        this.Laser.create({x: this.robot.x, y: this.robot.y, vx: 0,  vy: -1});
+        this.Laser.create({x: this.robot.x, y: this.robot.y, vx:  1, vy:  0});
+        this.Laser.create({x: this.robot.x, y: this.robot.y, vx:  0, vy:  1});
+        this.Laser.create({x: this.robot.x, y: this.robot.y, vx: -1, vy:  0});
+        this.Laser.create({x: this.robot.x, y: this.robot.y, vx:  0, vy: -1});
       }
     }
   ]

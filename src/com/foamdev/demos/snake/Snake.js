@@ -17,8 +17,8 @@ foam.CLASS({
   extends: 'foam.graphics.CView',
 
   requires: [
-    'com.foamdev.demos.snake.Scale',
-    'com.foamdev.demos.snake.Laser'
+    'com.foamdev.demos.snake.Laser',
+    'com.foamdev.demos.snake.Scale'
   ],
 
   imports: [
@@ -29,10 +29,10 @@ foam.CLASS({
 
   properties: [
 //    { name: 'scales', factory: function() { return []; } },
-    [ 'sx', 240 ],
-    [ 'sy', 240 ],
-    [ 'vx', 1/5 ],
-    [ 'vy', 0 ],
+    [ 'sx',     240 ],
+    [ 'sy',     240 ],
+    [ 'vx',     1/5 ],
+    [ 'vy',     0 ],
     [ 'length', 5 ]
   ],
 
@@ -50,8 +50,7 @@ foam.CLASS({
       this.Laser.create({x: this.sx, y: this.sy, vx: this.vx, vy: this.vy});
     },
     function intersects(o) {
-      if ( ! this.children.length ) return false;
-      return this.children[this.children.length-1].intersects(o);
+      return this.children.length && this.children[this.children.length-1].intersects(o);
     }
   ],
 
@@ -62,9 +61,12 @@ foam.CLASS({
       code: function() {
         this.sx += this.vx * 2 * this.R;
         this.sy += this.vy * 2 * this.R;
+
         if ( this.children.length )
           this.children[this.children.length-1].color = 'green';
+
         this.add(this.Scale.create({x: this.sx, y: this.sy, radius: this.R, color: 'red'}));
+
         if ( this.children.length > this.length )
           this.children.shift();
       }
@@ -83,7 +85,7 @@ foam.CLASS({
   imports: [ 'game' ],
 
   properties: [
-    [ 'color', 'darkblue' ],
+    [ 'color',  'darkblue' ],
     [ 'radius', 10 ]
   ],
 
@@ -93,9 +95,9 @@ foam.CLASS({
 
       this.Animation.create({
         duration: 5000,
-        f: ()=> this.radius = 0,
-        onEnd: () => this.game.removeChild(this),
-        objs: [this]
+        f:        ()=> this.radius = 0,
+        onEnd:    () => this.game.removeChild(this),
+        objs:     [this]
       }).start();
     }
   ]
@@ -107,16 +109,18 @@ foam.CLASS({
   name: 'Mushroom',
   extends: 'foam.graphics.Circle',
 
-  requires: [ 'foam.graphics.Box', 'foam.animation.Animation' ],
+  requires: [
+    'foam.graphics.Box',
+    'foam.animation.Animation'
+  ],
 
   imports: [ 'game' ],
 
   properties: [
-    [ 'radius', 20 ],
-    [ 'color',  'gray' ],
-    [ 'start',  Math.PI ],
-    [ 'end',    0 ],
-    'stem',
+    [ 'radius',   20 ],
+    [ 'color',    'gray' ],
+    [ 'start',    Math.PI ],
+    [ 'end',      0 ],
     [ 'exploded', false ]
   ],
 
@@ -124,20 +128,18 @@ foam.CLASS({
     function init() {
       this.SUPER();
 
-      this.add(this.stem = this.Box.create({
-        x: -7.5,
-        y: -0.5,
-        width: 15,
+      this.add(this.Box.create({
+        x:      -7.5,
+        y:      -0.5,
+        width:  15,
         height: 20,
-        color: 'gray'
+        color:  'gray'
       }));
     },
 
     function explode() {
       if ( this.exploded ) return;
       this.exploded = true;
-
-      this.stem.color = 'red';
 
       this.Animation.create({
         duration: 600,
@@ -147,7 +149,7 @@ foam.CLASS({
           this.rotation = Math.PI * 6;
         },
         onEnd: () => this.game.removeChild(this),
-        objs: [this, this.stem]
+        objs: [this]
       }).start();
     }
   ]
@@ -200,7 +202,7 @@ foam.CLASS({
     'com.foamdev.demos.snake.Snake',
     'foam.animation.Animation',
     'foam.audio.Speak',
-    'foam.graphics.Box as Rectangle',
+    'foam.graphics.Box',
     'foam.graphics.CView',
     'foam.graphics.Label',
     'foam.input.Gamepad',
@@ -218,8 +220,8 @@ foam.CLASS({
 
   properties: [
     [ 'isGameOver', false ],
-    [ 'width', 1600 ],
-    [ 'height', 800 ],
+    [ 'width',      1600 ],
+    [ 'height',     800 ],
     {
       name: 'gamepad',
       factory: function() { return this.Gamepad.create(); }
@@ -235,7 +237,7 @@ foam.CLASS({
     {
       name: 'table',
       factory: function() {
-        return this.Rectangle.create({
+        return this.Box.create({
           color:  'lightblue',
           width:  window.innerWidth,
           height: window.innerHeight
@@ -288,7 +290,6 @@ foam.CLASS({
           this.removeChild(o2);
           this.snake.length++;
         }
-//        console.log('BANG', o1, o2);
       }.bind(this);
       this.collider.start();
     },
@@ -307,13 +308,13 @@ foam.CLASS({
 //      this.collider.stop(); // TODO: add stop() method to collider
       this.table.color = 'orange';
       this.addChild(this.Label.create({
-        text: 'Game Over',
-        align: 'center',
-        color: 'white',
+        text:   'Game Over',
+        align:  'center',
+        color:  'white',
         scaleX: 10,
         scaleY: 10,
-        x: this.table.width/2,
-        y: 100
+        x:      this.table.width/2,
+        y:      100
       }));
       this.Speak.create({text: 'Game Over'}).play();
     },
@@ -340,16 +341,16 @@ foam.CLASS({
     function addMushroom() {
       var R = this.R;
       var m = this.Mushroom.create({
-        x: Math.round(1+Math.random()*(this.table.width -4*R)/R)*2*R,
-        y: Math.round(1+Math.random()*(this.table.height-4*R)/R)*2*R,
+        x:      Math.round(1+Math.random()*(this.table.width -4*R)/R)*2*R,
+        y:      Math.round(1+Math.random()*(this.table.height-4*R)/R)*2*R,
         scaleX: 0.1,
         scaleY: 0.1});
 
       this.Animation.create({
         duration: 3000,
-        f: ()=> { m.scaleX = 1; m.scaleY = 1; },
-        onEnd: () => m.color = 'red',
-        objs: [m]
+        f:        ()=> { m.scaleX = 1; m.scaleY = 1; },
+        onEnd:    () => m.color = 'red',
+        objs:     [m]
       }).start();
 
       this.addChild(m);
