@@ -12,9 +12,9 @@ foam.CLASS({
   documentation: 'Data Integration Gateway - Perform DAO operations against a web service',
 
   requires: [
-    'foam.net.web.HTTPRequest',
+    'foam.mlang.predicate.ContainsIC',
     'foam.nanos.extraconfig.AddOn',
-     'foam.mlang.predicate.ContainsIC'
+    'foam.net.web.HTTPRequest'
   ],
 
   tableColumns: [

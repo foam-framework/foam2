@@ -12,17 +12,17 @@ foam.CLASS({
   documentation: 'Export Modal',
 
   imports: [
+    'extraConfigAddOnDAO',
     'exportDriverRegistryDAO',
-    'filteredTableColumns',
-    'extraConfigAddOnDAO'
+    'filteredTableColumns'
   ],
 
   requires: [
-    'foam.u2.ModalHeader',
     'foam.u2.layout.Cols',
+    'foam.u2.ModalHeader',
+    'foam.mlang.predicate.ContainsIC',
     'foam.nanos.extraconfig.AddOn',
-    'foam.nanos.extraconfig.ConfigView',
-    'foam.mlang.predicate.ContainsIC'
+    'foam.nanos.extraconfig.ConfigView'
   ],
 
   properties: [
