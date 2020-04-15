@@ -11,6 +11,8 @@ foam.CLASS({
   javaImports: [
     'foam.core.FObject',
     'foam.core.PropertyInfo',
+    'foam.mlang.sink.Count',
+    'foam.mlang.sink.GroupBy',
     'java.util.Iterator',
     'java.util.HashMap',
     'java.util.ArrayList',
@@ -56,8 +58,15 @@ foam.CLASS({
       javaCode: `
       if ( x.get("auth") != null ) {
         if ( predicate != null ) predicate.authorize(x);
-        foam.dao.Sink sink2 = ( sink != null ) ? new HidePropertiesSink(x, sink, this) : sink;
-        super.select_(x, sink2, skip, limit, order, predicate);
+        // don't decorate the sink if it's a Count or GroupBy(Count())
+        if ( ! ( sink instanceof Count ||
+            ((sink instanceof GroupBy) &&
+            ((GroupBy)sink).getArg2() instanceof Count )) ) {
+          foam.dao.Sink sink2 = ( sink != null ) ? new HidePropertiesSink(x, sink, this) : sink;
+          super.select_(x, sink2, skip, limit, order, predicate);
+        } else {
+          super.select_(x, sink, skip, limit, order, predicate);
+        }
         return sink;
       }
       return super.select_(x, sink, skip, limit, order, predicate);
@@ -161,7 +170,7 @@ foam.CLASS({
 
         propMap.put(of, properties);
       }
-        
+
       List properties = (List) propMap.get(of);
       Iterator e = properties.iterator();
 
@@ -262,7 +271,7 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(`
   private PermissionedPropertyDAO dao;
-  
+
   /** map of properties of a model that require model.permission.property for read / write operations **/
   protected Map<String, List<PropertyInfo>> propertyMap_ = new HashMap<>();
   public HidePropertiesSink(foam.core.X x, foam.dao.Sink delegate, PermissionedPropertyDAO dao) {

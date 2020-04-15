@@ -275,6 +275,12 @@ foam.CLASS({
     }
   ],
 
+  static: [
+    function forOrdinal(i) {
+      return this.VALUES.find((e) => e.ordinal == i);
+    }
+  ],
+
   properties: [
     {
       class: 'String',
@@ -372,14 +378,6 @@ foam.CLASS({
         }
 
         if ( ret ) return ret;
-
-        console.log("*** adamvy");
-        console.log("** name:",prop.name);
-        console.log("** of:",prop.of);
-        console.log("** type:",prop.type);
-        console.log("** typecls:", type);
-        console.log("** o: ", o);
-        console.log("** n: ", n);
 
         throw new Error('Attempt to set invalid Enum value. Enum: ' + type.id + ', value: ' + n);
       }

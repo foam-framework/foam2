@@ -22,15 +22,6 @@ foam.CLASS({
 
   documentation: 'View for one row/property of a DetailView.',
 
-  properties: [
-    'prop',
-    [ 'nodeName', 'tr' ],
-    {
-      name: 'label',
-      factory: function() { return this.prop.label }
-    }
-  ],
-
   css: `
     .foam-u2-PropertyView-label {
       color: #444;
@@ -52,6 +43,15 @@ foam.CLASS({
       text-align: right;
     }
   `,
+
+  properties: [
+    'prop',
+    [ 'nodeName', 'tr' ],
+    {
+      name: 'label',
+      factory: function() { return this.prop.label }
+    }
+  ],
 
   methods: [
     function initE() {

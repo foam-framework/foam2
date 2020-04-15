@@ -66,10 +66,9 @@ foam.CLASS({
 
     function detectCollisions() {
       /* implicit k-d-tree divide-and-conquer algorithm */
-      this.detectCollisions_(0, this.children.length-1, 'x', false, '');
-
+      // this.detectCollisions_(0, this.children.length-1, 'x', false, '');
       // TODO: put back above line when properly supports mixing circles and squares
-      // this.detectCollisions__(0, this.children.length-1, 'x', false, '');
+      this.detectCollisions__(0, this.children.length-1, 'x', false, '');
     },
 
     function detectCollisions__(start, end) {
@@ -80,9 +79,15 @@ foam.CLASS({
       var cs = this.children;
       for ( var i = start ; i <= end ; i++ ) {
         var c1 = cs[i];
+        if ( c1 == null ) break;
         for ( var j = i+1 ; j <= end ; j++ ) {
           var c2 = cs[j];
-          if ( c1.intersects && c1.intersects(c2) ) this.collide(c1, c2);
+          if ( c2 == null ) break;
+          try {
+            if ( c1.intersects && c1.intersects(c2) ) this.collide(c1, c2);
+          } catch (x) {
+            console.warn('Exception in collider', x);
+          }
         }
       }
     },

@@ -402,6 +402,7 @@ FOAM_FILES([
   { name: "foam/swift/refines/Remote", flags: ['swift'] },
 
   { name: "foam/nanos/menu/DAOMenu2" },
+  { name: "foam/nanos/menu/MenuToolBar" },
 
   { name: "foam/box/LogBox" },
   { name: "foam/box/MultiDelegateBox" },
@@ -585,6 +586,7 @@ FOAM_FILES([
   { name: "foam/doc/ClassLink", flags: ['debug', 'web'] },
   { name: "foam/doc/CodeTabs" },
   { name: "foam/doc/DocBrowser", flags: ['debug', 'web'] },
+  { name: "foam/doc/ModelBrowser", flags: ['debug', 'web'] },
 
   { name: "com/google/net/node/Google2LOAuthAgent", flags: ['node', 'gcloud'] },
   { name: "com/google/cloud/datastore/types", flags: ['gcloud'] },
@@ -705,6 +707,7 @@ FOAM_FILES([
   { name: "foam/u2/view/date/DateTimePicker" },
   { name: "foam/u2/view/date/Month" },
   { name: "foam/u2/view/date/Weekday" },
+  { name: "foam/u2/view/DAOtoFObjectArrayView" },
 
   { name: "foam/u2/layout/DisplayWidth" },
   { name: "foam/u2/layout/Layouts" },
@@ -713,7 +716,6 @@ FOAM_FILES([
   { name: "foam/u2/layout/GUnit" },
   { name: "foam/u2/layout/GridColumns" },
 
-  { name: "foam/comics/v2/CannedQuery" },
   { name: "foam/comics/v2/CannedQuery" },
   { name: "foam/comics/v2/EnabledActionsAuth" },
   { name: "foam/comics/v2/BasicEnabledActionsAuth" },

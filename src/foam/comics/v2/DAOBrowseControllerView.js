@@ -130,7 +130,7 @@ foam.CLASS({
             .start(self.CardBorder)
               .style({ position: 'relative' })
               .start(config$browseBorder)
-                .callIf(config$browseViews.length > 1, function() {
+                .callIf(config$browseViews.length > 1 && config.cannedQueries.length > 0, function() {
                   this
                     .start(self.IconChoiceView, {
                       choices:config$browseViews.map(o => [o.view, o.icon]),

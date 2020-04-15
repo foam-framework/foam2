@@ -83,6 +83,20 @@ foam.CLASS({
       tableWidth: 200
     },
     {
+      class: 'Int',
+      name: 'priority',
+      value: 5,
+      javaValue: 5,
+      view: {
+        class: 'foam.u2.view.ChoiceView',
+        choices: [
+          [ 4, 'Low'    ],
+          [ 5, 'Medium' ],
+          [ 6, 'High'   ]
+        ]
+      }
+    },
+    {
       class: 'DateTime',
       name: 'lastRun',
       documentation: 'Date and time the script ran last.',
@@ -219,29 +233,34 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        ByteArrayOutputStream baos  = new ByteArrayOutputStream();
-        PrintStream           ps    = new PrintStream(baos);
-        Interpreter           shell = createInterpreter(x);
-        PM                    pm    = new PM.Builder(x).setClassType(Script.getOwnClassInfo()).setName(getId()).build();
-
-        // TODO: import common packages like foam.core.*, foam.dao.*, etc.
+        Thread.currentThread().setPriority(getPriority());
         try {
-          setOutput("");
-          shell.setOut(ps);
-          shell.eval(getCode());
-        } catch (Throwable e) {
-          ps.println();
-          e.printStackTrace(ps);
-          Logger logger = (Logger) x.get("logger");
-          logger.error(e);
-        } finally {
-          pm.log(x);
-        }
+          ByteArrayOutputStream baos  = new ByteArrayOutputStream();
+          PrintStream           ps    = new PrintStream(baos);
+          Interpreter           shell = createInterpreter(x);
+          PM                    pm    = new PM.Builder(x).setClassType(Script.getOwnClassInfo()).setName(getId()).build();
 
-        setLastRun(new Date());
-        setLastDuration(pm.getTime());
-        ps.flush();
-        setOutput(baos.toString());
+          // TODO: import common packages like foam.core.*, foam.dao.*, etc.
+          try {
+            setOutput("");
+            shell.setOut(ps);
+            shell.eval(getCode());
+          } catch (Throwable e) {
+            ps.println();
+            e.printStackTrace(ps);
+            Logger logger = (Logger) x.get("logger");
+            logger.error(e);
+          } finally {
+            pm.log(x);
+          }
+
+          setLastRun(new Date());
+          setLastDuration(pm.getTime());
+          ps.flush();
+          setOutput(baos.toString());
+        } finally {
+          Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
+        }
     `
     },
     {
