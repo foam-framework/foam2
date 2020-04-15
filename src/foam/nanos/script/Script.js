@@ -256,13 +256,13 @@ foam.CLASS({
             foam.nanos.medusa.ClusterConfig config = support.getConfig(x, support.getConfigId());
             if ( config.getType() == foam.nanos.medusa.MedusaType.MEDIATOR &&
                  ! config.getIsPrimary() ) {
-              ((Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "Medusa disabled Script execution on this instance.");
+              ((Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "Medusa disabled Script execution on this instance.", getId(), getDescription());
               //throw new RuntimeException("Script execution disabled.");
               return;
             }
             if ( config.getType() == foam.nanos.medusa.MedusaType.NODE ||
                  config.getStatus() != foam.nanos.medusa.Status.ONLINE ) {
-              ((Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "Medusa disabled Script execution on this instance.");
+              ((Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "Medusa disabled Script execution on this instance.", getId(), getDescription());
               //throw new RuntimeException("Script execution disabled.");
               return;
             }
