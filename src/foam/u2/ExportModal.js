@@ -65,6 +65,12 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'isOpenAvailable'
+    },
+    {
+      class: 'Boolean',
+      name: 'isHiddenSME',
+      value: true,
+      documentation: 'value to prevent duplicate close button for SMEModal'
     }
   ],
 
@@ -122,13 +128,13 @@ foam.CLASS({
           self.exportDriverReg = val;
         });
       });
-      
+
       self.exportDriverReg$.sub(function() {
         self.isConvertAvailable =  self.exportDriverReg.isConvertible;
         self.isDownloadAvailable = self.exportDriverReg.isDownloadable;
         self.isOpenAvailable = self.exportDriverReg.isOpenable;
       });
-      
+
 
       this
       .tag(this.ModalHeader.create({
@@ -161,33 +167,33 @@ foam.CLASS({
   actions: [
     {
       name: 'convert',
-      isAvailable: function(isConvertAvailable) { 
-        return isConvertAvailable; 
+      isAvailable: function(isConvertAvailable) {
+        return isConvertAvailable;
       },
       code: async function() {
         if ( ! this.exportData && ! this.exportObj ) {
           console.log('Neither exportData nor exportObj exist');
           return;
         }
-  
+
         var filteredColumnsCopy = this.filteredTableColumns;
         if ( this.exportAllColumns )
           this.filteredTableColumns = null;
-  
+
         var exportDriver = foam.lookup(this.exportDriverReg.driverName).create();
-  
+
         this.note = this.exportData ?
           await exportDriver.exportDAO(this.__context__, this.exportData) :
           await exportDriver.exportFObject(this.__context__, this.exportObj);
-  
+
         if ( this.exportAllColumns )
           this.filteredTableColumns = filteredColumnsCopy;
       }
     },
     {
       name: 'download',
-      isAvailable: function(isDownloadAvailable) { 
-        return isDownloadAvailable; 
+      isAvailable: function(isDownloadAvailable) {
+        return isDownloadAvailable;
       },
       code: async function download() {
         var self = this;
@@ -195,17 +201,17 @@ foam.CLASS({
           console.log('Neither exportData nor exportObj exist');
           return;
         }
-  
+
         var filteredColumnsCopy = this.filteredTableColumns;
         if ( this.exportAllColumns )
           this.filteredTableColumns = null;
-  
+
         var exportDriver    = foam.lookup(this.exportDriverReg.driverName).create();
-  
+
         var p = this.exportData ?
           exportDriver.exportDAO(this.__context__, this.exportData) :
           Promise.resolve(exportDriver.exportFObject(this.__context__, this.exportObj));
-  
+
         p.then(result => {
           var link = document.createElement('a');
           var href = '';
@@ -215,7 +221,7 @@ foam.CLASS({
           } else {
             href = result;
           }
-          
+
           if ( href.length > 524288 ) {
             self.note = result;
             alert('Results exceed maximum download size.\nPlease cut and paste response data.');
@@ -233,11 +239,11 @@ foam.CLASS({
     },
     {
       name: 'open',
-      isAvailable: function(isOpenAvailable) { 
-        return isOpenAvailable; 
+      isAvailable: function(isOpenAvailable) {
+        return isOpenAvailable;
       },
       code: async function() {
-        
+
         var filteredColumnsCopy = this.filteredTableColumns;
         if ( this.exportAllColumns )
           this.filteredTableColumns = null;
@@ -246,7 +252,7 @@ foam.CLASS({
         var url = this.exportData ?
           await exportDriver.exportDAO(this.__context__, this.exportData) :
           await exportDriver.exportFObject(this.__context__, this.exportObj);
-        
+
         if ( this.exportAllColumns )
           this.filteredTableColumns = filteredColumnsCopy;
 
