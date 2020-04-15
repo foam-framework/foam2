@@ -15,9 +15,13 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
+    'foam.util.SafetyUtil',
     'java.util.concurrent.CountDownLatch',
+    'java.util.concurrent.ThreadLocalRandom',
     'java.util.HashMap',
-    'java.util.Map'
+    'java.util.Map',
+    'java.util.Random',
+    'java.util.UUID'
   ],
 
   properties: [
@@ -44,8 +48,13 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-      MedusaEntry entry = (MedusaEntry) getDelegate().put_(x, obj);
-      waitOn(x, entry.getIndex());
+      MedusaEntry entry = (MedusaEntry) obj;
+      if ( SafetyUtil.isEmpty(entry.getBlockingId()) ) {
+        java.util.Random r = ThreadLocalRandom.current();
+        entry.setBlockingId(new UUID(r.nextLong(), r.nextLong()).toString());
+      }
+      entry = (MedusaEntry) getDelegate().put_(x, entry);
+      waitOn(x, entry.getBlockingId());
       return entry;
       `
     },
@@ -54,7 +63,7 @@ foam.CLASS({
       javaCode: `
       if ( obj instanceof MedusaEntry ) {
         MedusaEntry entry = (MedusaEntry) obj;
-        notifyOn(x, entry.getIndex());
+        notifyOn(x, entry.getBlockingId());
         return entry;
       }
       return getDelegate().cmd_(x, obj);
@@ -68,29 +77,29 @@ foam.CLASS({
           type: 'Context'
         },
         {
-          name: 'index',
-          type: 'Long'
+          name: 'id',
+          type: 'String'
         }
       ],
       javaCode: `
       CountDownLatch latch = null;
 
-      synchronized ( String.valueOf(index).intern() ) {
-        latch = (CountDownLatch) getLatches().get(index);
+      synchronized ( String.valueOf(id).intern() ) {
+        latch = (CountDownLatch) getLatches().get(id);
         if ( latch == null ) {
           latch = new CountDownLatch(1);
-          getLatches().put(index, latch);
+          getLatches().put(id, latch);
         }
       }
 
       try {
-        getLogger().debug("waitOn", index);
+        getLogger().debug("waitOn", id);
         latch.await();
-        getLogger().debug("wakeOn", index);
+        getLogger().debug("wakeOn", id);
       } catch (InterruptedException e) {
         // nop
       } finally {
-        getLatches().remove(index);
+        getLatches().remove(id);
       }
       `
     },
@@ -102,21 +111,21 @@ foam.CLASS({
           type: 'Context'
         },
         {
-          name: 'index',
-          type: 'Long'
+          name: 'id',
+          type: 'String'
         }
       ],
       javaCode: `
       CountDownLatch latch = null;
 
-      synchronized ( String.valueOf(index).intern() ) {
-        latch = (CountDownLatch) getLatches().get(index);
+      synchronized ( String.valueOf(id).intern() ) {
+        latch = (CountDownLatch) getLatches().get(id);
         if ( latch == null ) {
           latch = new CountDownLatch(0);
-          getLatches().put(index, latch);
+          getLatches().put(id, latch);
         }
       }
-      getLogger().debug("notifyOn", index);
+      getLogger().debug("notifyOn", id);
       latch.countDown();
       `
     }

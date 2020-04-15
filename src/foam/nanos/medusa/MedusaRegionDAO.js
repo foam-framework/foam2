@@ -36,8 +36,7 @@ foam.CLASS({
       visibility: 'HIDDEN',
       javaFactory: `
         return new PrefixLogger(new Object[] {
-          this.getClass().getSimpleName(),
-          getServiceName()
+          this.getClass().getSimpleName()
         }, (Logger) getX().get("logger"));
       `,
       transient: true
@@ -51,6 +50,10 @@ foam.CLASS({
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       ClusterConfig config = support.getConfig(x, support.getConfigId());
       getLogger().debug("put", config.getRegionStatus().getLabel());
+
+      // This will throw an exception if an Active Region is not found before putting to batch.
+      ClusterConfig region = support.getActiveRegion(x, config);
+
       if ( config.getRegionStatus() == RegionStatus.STANDBY ) {
         return super.put_(x, obj);
       }

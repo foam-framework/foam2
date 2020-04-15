@@ -143,6 +143,12 @@ foam.CLASS({
       class: 'DateTime',
       visibility: 'RO',
       includeInDigest: false,
+    },
+    {
+      class: 'String',
+      name: 'blockingId',
+      visibility: 'RO',
+      includeInDigest: false
     }
   ]
 });

@@ -35,8 +35,7 @@ foam.CLASS({
       visibility: 'HIDDEN',
       javaFactory: `
         return new PrefixLogger(new Object[] {
-          this.getClass().getSimpleName(),
-          getServiceName()
+          this.getClass().getSimpleName()
         }, (Logger) getX().get("logger"));
       `,
       transient: true
@@ -49,7 +48,10 @@ foam.CLASS({
       javaCode: `
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       ClusterConfig config = support.getConfig(x, support.getConfigId());
-      getLogger().debug("put", config.getName(), config.getIsPrimary());
+      getLogger().debug("put", config.getName(), "primary", config.getIsPrimary());
+
+      // This will throw an exception if primary not found before putting to batch.
+      ClusterConfig region = support.getPrimary(x);
 
       if ( ! config.getIsPrimary() ) {
         return super.put_(x, obj);

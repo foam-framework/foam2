@@ -69,9 +69,9 @@ public class ClusterDAOTest
       .build();
     ((DAO) x.get("clusterConfigDAO")).put(config);
 
-    DAO client = new ClusterClientDAO.Builder(x)
-      .setServiceName(serviceName)
-      .build();
+    // DAO client = new ClusterClientDAO.Builder(x)
+    //   .setServiceName(serviceName)
+    //   .build();
 
     DAO countryDAO1 = (DAO) x.get("countryDAO1");
     Sink sink = countryDAO1.select(new ArraySink());
