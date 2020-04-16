@@ -176,7 +176,7 @@ foam.CLASS({
           throw new RuntimeException("Not Found MedusaEntry with index: " + entry.getIndex1());
         }
         if ( list2.size() == 0 ) {
-          getLogger().error("verify", "entry not found", "index2", entry.getIndex2(), entry.getInddex(), entry.getId());
+          getLogger().error("verify", "entry not found", "index2", entry.getIndex2(), entry.getIndex(), entry.getId());
           throw new RuntimeException("Not Found MedusaEntry with index: " + entry.getIndex2());
         }
 
@@ -192,12 +192,12 @@ foam.CLASS({
         }
         //Recalculate hash.
         try {
-          String calculatedHash = hash(entry);
+          String calculatedHash = hash(x, entry);
           if ( ! calculatedHash.equals(entry.getHash()) ) {
             getLogger().error("verify", "hashes do not match", entry.getIndex(), entry.getId());
             throw new RuntimeException("Hash verification failed.");
           }
-        } catch ( java.security.NoSuchAlgorithmException e ) {
+        } catch ( java.security.DigestException | java.security.NoSuchAlgorithmException e ) {
           getLogger().error(e);
           throw new RuntimeException(e);
         }

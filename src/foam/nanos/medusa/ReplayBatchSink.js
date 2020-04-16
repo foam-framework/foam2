@@ -105,7 +105,7 @@ foam.CLASS({
         if ( getTimer() == null ) {
           scheduleTimer(getX());
         }
-        getLogger().debug("put", "batch", "size", getBatch().size());
+        //getLogger().debug("put", "batch", "size", getBatch().size());
       }
       `
     },
