@@ -124,6 +124,14 @@ foam.CLASS({
 
       border-top: solid 1px #e7eaec;
     }
+
+    ^label-results {
+      margin: 0;
+      font-size: 12px;
+      padding: 0 8px;
+      flex: 1;
+      align-self: center;
+    }
   `,
 
   messages: [
@@ -165,6 +173,9 @@ foam.CLASS({
 
     function initE() {
       var self = this;
+      this.onDetach(this.filterController$.dot('previewPredicate').sub(this.getResultsCount));
+      this.getResultsCount();
+
       this.addClass(this.myClass())
         .start(this.ModalHeader.create({
           title: this.TITLE_HEADER
@@ -200,6 +211,9 @@ foam.CLASS({
             .endContext();
         }))
         .start().addClass(this.myClass('container-footer'))
+          .start('p').addClass(this.myClass('label-results'))
+            .add(this.resultLabel$)
+          .end()
           .startContext({ data: this })
             .start(this.CLEAR_ALL, { buttonStyle: 'TERTIARY' }).end()
             .start(this.FILTER).end()
@@ -231,7 +245,7 @@ foam.CLASS({
       name: 'clearAll',
       label: 'Clear All',
       code: function(X) {
-        console.log('TODO: Remove all local predicate changes')
+        this.filterController.removeAll();
       }
     },
     {
@@ -265,7 +279,7 @@ foam.CLASS({
       name: 'removeCriteria',
       code: function(key) {
         if ( key == this.isOpenIndex ) this.isOpenIndex = -1;
-        if ( Object.keys(this.criterias).length === 1 ) {
+        if ( Object.keys(this.filterController.previewCriterias).length === 1 ) {
           this.clearAll();
           return;
         }

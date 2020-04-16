@@ -286,6 +286,9 @@ foam.CLASS({
               .start({ class: 'foam.u2.tag.Image', data$: self.iconPath$}).end()
             .end()
           .end()
+          // .add(this.filterController.slot(function(criterias) {
+          //   self.E()
+          // }))
           .start().addClass(self.myClass('container-drawer'))
             .enableClass(self.myClass('container-drawer-open'), self.isOpen$)
               .forEach(filters, function(f) {
@@ -313,30 +316,6 @@ foam.CLASS({
                   .add(self.MESSAGE_VIEWADVANCED)
                 .end()
               .end()
-            // .add(this.slot(function(isAdvanced){
-            //   if ( ! isAdvanced ) {
-            //     return this.E().forEach(filters, function(f) {
-            //       var axiom = self.dao.of.getAxiomByName(f);
-            //
-            //       if ( axiom ){
-            //         this.start(self.PropertyFilterView, {
-            //           searchView: axiom.searchView,
-            //           property: axiom,
-            //           dao$: self.dao$
-            //         })
-            //         .end();
-            //       }
-            //     });
-            //   }
-            //   return this.E().start('p')
-            //       .addClass(self.myClass(''))
-            //       .add(self.MESSAGE_ADVANCEDMODE)
-            //     .end()
-            //     .start('p')
-            //       .addClass(self.myClass(''))
-            //       .add(self.MESSAGE_VIEWADVANCED)
-            //     .end();
-            // }))
           .end()
           .start().addClass(self.myClass('container-footer'))
             .start('p')
@@ -414,6 +393,7 @@ foam.CLASS({
       name: 'clearAll',
       code: function() {
         // clear all filters
+        this.filterController.removeAll();
         console.log('TODO: Clear filters');
       }
     },

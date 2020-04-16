@@ -16,12 +16,6 @@ foam.CLASS({
     'foam.mlang.Expressions'
   ],
 
-  // requires: [
-  //   'foam.mlang.predicate.And',
-  //   'foam.mlang.predicate.Or',
-  //   'foam.mlang.predicate.True'
-  // ],
-
   properties: [
     {
       class: 'Map',
@@ -47,8 +41,6 @@ foam.CLASS({
         modes.
       `
     },
-    // TODO(braden): See if there's a clever way to write the memento logic as
-    // an expression, instead of a set of clever postSets.
     {
       name: 'finalPredicate',
       factory: function() {
@@ -64,6 +56,9 @@ foam.CLASS({
       `,
       factory: function() {
         return this.TRUE;
+      },
+      postSet: function(_, n) {
+        console.log(n.stringify());
       }
     },
     {
@@ -72,7 +67,10 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'isPreview'
+      name: 'isPreview',
+      postSet: function(_, n) {
+        console.log(n);
+      }
     },
     {
       class: 'Boolean',
@@ -169,6 +167,7 @@ foam.CLASS({
       var orPredicate = this.Or.create({
         args: Object.values(criterias).map((criteria) => { return criteria.predicate; })
       }).partialEval();
+      if ( orPredicate === this.FALSE ) orPredicate = this.TRUE;
 
       if ( ! this.isPreview ) {
         this.finalPredicate = orPredicate;
@@ -178,52 +177,73 @@ foam.CLASS({
     },
 
     function switchToPreview() {
+      // At this point, user should be going into advanced mode
       this.isPreview = true;
       if ( Object.keys(this.previewCriterias).length === 0 ) this.addCriteria();
     },
 
     function applyPreview() {
+      // At this point, users should be coming from advanced mode
       console.log('Preview applied');
       this.isAdvanced = true;
       this.isPreview = false;
       this.finalPredicate = this.previewPredicate;
     },
 
-    function removeCriteria(criteria) {
-      this.isPreview ? this.previewCriterias$remove(criteria) : this.criterias$remove(criteria);
-      this.updateFilterPredicate();
-    },
-
-    function remove(viewOrName) {
+    function remove(viewOrName, criteria) {
       var view;
       var name;
+      // Get the right map to remove from
+      var criterias = this.isPreview ? this.previewCriterias : this.criterias;
+
       if ( typeof viewOrName === 'string' ) {
+        // If view name given, obtain it from map
+        view = criterias[criteria].views[viewOrName];
         name = viewOrName;
-        view = this.views[viewOrName];
       } else {
+        // If view given, less work. Just assign name for crosscheck
         view = viewOrName;
         name = view.name;
       }
 
-      if ( ! this.views[name] ) return;
+      // Don't remove if view does not exist or crosscheck fails
+      if ( ! view || ! criterias[criteria].views[name] ) return;
 
-      view.clear();
-      this.subs_[name].detach();
-      delete this.views[name];
-      delete this.subs_[name];
+      // Clear, detach, and remove view from the correct map
+      if ( this.isPreview ) {
+        this.previewCriterias[criteria].views[name].clear();
+        // this.previewCriterias[criteria].subs[name].detach();
+        // delete this.previewCriterias[criteria].views[name];
+        // delete this.previewCriterias[criteria].subs[name];
+      } else {
+        this.criterias[criteria].views[name].clear();
+        // this.criterias[criteria].subs[name].detach();
+        // delete this.criterias[criteria].views[name];
+        // delete this.criterias[criteria].subs[name];
+      }
+    },
+
+    function removeCriteria(criteria) {
+      var criterias = this.isPreview ? this.previewCriterias : this.criterias;
+      Object.values(criterias[criteria].views).forEach((view) => {
+        this.remove(view, criteria);
+      });
+
+      if ( this.isPreview ) this.previewCriterias$remove(criteria);
+      else this.criterias$remove(criteria);
+
+      console.log(this.previewCriterias);
+      this.updateFilterPredicate();
     },
 
     function removeAll() {
-      this.clear();
-      foam.Object.forEach(this.subs_, function(sub) {
-        sub.detach();
+      // Get the right map to clear
+      var criterias = this.isPreview ? this.previewCriterias : this.criterias;
+      // Clear each criteria properly (Which includes detaching subs)
+      Object.keys(criterias).forEach((key) => {
+        this.removeCriteria(key);
       });
-      this.views = {};
-      this.subs_ = {};
-    },
-
-    function clear() {
-      foam.Object.forEach(this.views, function(view) { view.clear(); });
+      this.addCriteria();
     }
   ]
 });

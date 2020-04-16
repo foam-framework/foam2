@@ -191,6 +191,7 @@
      },
 
      function hasExistingPredicate() {
+       if ( ! this.filterController.criterias[this.criteria] ) return false;
        var existingView = this.filterController.criterias[this.criteria].views[this.property.name];
        return existingView && existingView.predicate != this.TRUE;
      }
