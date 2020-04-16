@@ -6,23 +6,20 @@
 
 foam.CLASS({
   package: 'foam.nanos.medusa',
-  name: 'MedusaEntryNodesDAO',
+  name: 'MedusaIdDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  documentation: `If a new entry, forward to nodes`,
+  documentation: `Explicitly set ID, so all node copies are unique, as the Mediator will retain all copies until consensus.`,
 
   javaImports: [
-    'foam.dao.DAO',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
+    'java.util.concurrent.ThreadLocalRandom',
+    'java.util.Random',
+    'java.util.UUID'
   ],
 
   properties: [
-    {
-      name: 'index',
-      class: 'Long',
-      visibility: 'RO'
-    },
     {
       name: 'logger',
       class: 'FObjectProperty',
@@ -42,11 +39,18 @@ foam.CLASS({
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
       getLogger().debug("put", entry.getIndex());
-      MedusaEntry old = (MedusaEntry) getDelegate().find(entry.getId());
-      if ( old == null ) {
-        ((DAO) x.get("localNodesDAO")).put_(x, entry);
+      if ( entry.isFrozen() ) {
+        entry = (MedusaEntry) entry.fclone();
       }
-      return getDelegate().put_(x, entry);
+
+      java.util.Random r = ThreadLocalRandom.current();
+      entry.setId(new UUID(r.nextLong(), r.nextLong()).toString());
+
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      ClusterConfig config = support.getConfig(x, support.getConfigId());
+      entry.setNode(config.getName());
+
+      return (MedusaEntry) getDelegate().put_(x, entry);
       `
     }
   ]

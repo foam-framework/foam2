@@ -6,17 +6,15 @@
 
 foam.CLASS({
   package: 'foam.nanos.medusa',
-  name: 'MedusaEntryIdDAO',
+  name: 'MedusaHashingDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  documentation: `Explicitly set ID, so all node copies are unique, as the Mediator will retain all copies until consensus.`,
+  documentation: 'Calculate ledger hash for entry',
 
   javaImports: [
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
-    'java.util.concurrent.ThreadLocalRandom',
-    'java.util.Random',
-    'java.util.UUID'
+    'foam.nanos.medusa.DaggerService'
   ],
 
   properties: [
@@ -39,18 +37,15 @@ foam.CLASS({
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
       getLogger().debug("put", entry.getIndex());
-      if ( entry.isFrozen() ) {
-        entry = (MedusaEntry) entry.fclone();
+      DaggerService service = (DaggerService) x.get("daggerService");
+      try {
+        entry.setHash(service.hash(x, entry));
+        return getDelegate().put_(x, entry);
+      } catch ( Exception e ) {
+        getLogger().error("put", e.getMessage(), entry, e);
+        // TODO: Alarm
+        throw new RuntimeException(e);
       }
-
-      java.util.Random r = ThreadLocalRandom.current();
-      entry.setId(new UUID(r.nextLong(), r.nextLong()).toString());
-
-      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      ClusterConfig config = support.getConfig(x, support.getConfigId());
-      entry.setNode(config.getName());
-
-      return (MedusaEntry) getDelegate().put_(x, entry);
       `
     }
   ]

@@ -6,18 +6,14 @@
 
 foam.CLASS({
   package: 'foam.nanos.medusa',
-  name: 'MedusaEntryUniqueDAO',
+  name: 'MedusaSigningDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  // REVIEW: this may only be occuring during development.
-  documentation: `Enforce unique indexes on nodes`,
+  documentation: `Sign entry`,
 
   javaImports: [
-    'foam.mlang.sink.Count',
-    'static foam.mlang.MLang.COUNT',
-    'static foam.mlang.MLang.EQ',
     'foam.nanos.logger.PrefixLogger',
-    'foam.nanos.logger.Logger'
+    'foam.nanos.logger.Logger',
   ],
 
   properties: [
@@ -33,21 +29,23 @@ foam.CLASS({
       `
     }
   ],
-  
+
   methods: [
     {
       name: 'put_',
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
       getLogger().debug("put", entry.getIndex());
-      Count count = (Count) getDelegate().where(
-        EQ(MedusaEntry.INDEX, entry.getIndex())
-      ).select(COUNT());
-      if ( count.getValue() > 0 ) {
-        getLogger().error("put", "duplicate index", entry);
-        throw new RuntimeException("Duplicate index: "+entry.getIndex());
+      DaggerService service = (DaggerService) x.get("daggerService");
+      try {
+        entry.setSignature(service.sign(x, entry));
+        return getDelegate().put_(x, entry);
+      } catch ( Exception e ) {
+        getLogger().error(e);
+        // TODO: Alarm
+        // Who will catch this.
+        throw new RuntimeException(e);
       }
-      return getDelegate().put_(x, obj);
       `
     }
   ]

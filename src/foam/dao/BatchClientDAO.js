@@ -52,13 +52,13 @@ NOTE: override cmd_ in child class to control delegate call`,
       value: 'threadPool'
     },
     {
-      name: 'batch',
+      name: 'puts',
       class: 'List',
       of: 'foam.nanos.medusa.MedusaEntry',
       javaFactory: 'return new ArrayList();'
     },
     {
-      name: 'removeBatch',
+      name: 'removes',
       class: 'List',
       of: 'foam.nanos.medusa.MedusaEntry',
       javaFactory: 'return new ArrayList();'
@@ -90,11 +90,11 @@ NOTE: override cmd_ in child class to control delegate call`,
         // clear context, so not marshalled.
         ((ContextAware) obj).setX(null);
 
-        getBatch().add(obj);
+        getPuts().add(obj);
         if ( getTimer() == null ) {
-          scheduleTimer(getX(), getBatch().size());
+          scheduleTimer(getX(), getPuts().size());
         }
-        // getLogger().debug("put", "batch", "size", getBatch().size());
+        // getLogger().debug("put", "batch", "size", getPuts().size());
       }
       return obj;
       `
@@ -107,11 +107,11 @@ NOTE: override cmd_ in child class to control delegate call`,
         // clear context, so not marshalled.
         ((ContextAware) obj).setX(null);
 
-        getRemoveBatch().add(obj);
+        getRemoves().add(obj);
         if ( getTimer() == null ) {
-          scheduleTimer(getX(), getRemoveBatch().size());
+          scheduleTimer(getX(), getRemoves().size());
         }
-        // getLogger().debug("put", "removeBatch", "size", getRemoveBatch().size());
+        // getLogger().debug("remove", "batch", "size", getRemoves().size());
       }
       return obj;
       `
@@ -125,22 +125,33 @@ NOTE: override cmd_ in child class to control delegate call`,
         }
       ],
       javaCode: `
-      List<FObject> batch;
+      List<FObject> puts;
+      List<FObject> removes;
       synchronized ( batchLock_ ) {
-        batch = getBatch();
-        BatchClientDAO.BATCH.clear(this);
+        puts = getPuts();
+        removes = getRemoves();
+        BatchClientDAO.PUTS.clear(this);
+        BatchClientDAO.REMOVES.clear(this);
       }
-      getLogger().debug("execute", "batch", "size", batch.size());
+      getLogger().debug("execute", "put batch", "size", puts.size());
+      getLogger().debug("execute", "remove batch", "size", removes.size());
 
       try {
-        if ( batch.size() > 0 ) {
+        if ( puts.size() > 0 ) {
           BatchCmd cmd = new BatchCmd();
-          cmd.setBatch(batch);
+          cmd.setDop(DOP.PUT);
+          cmd.setBatch(puts);
           Object result = this.cmd_(x, cmd);
           // TODO/REVIEW - what to do with the result/reply?
         }
+        if ( removes.size() > 0 ) {
+          BatchCmd cmd = new BatchCmd();
+          cmd.setDop(DOP.REMOVE);
+          cmd.setBatch(removes);
+          Object result = this.cmd_(x, cmd);
+        }
       } finally {
-        scheduleTimer(x, batch.size());
+        scheduleTimer(x, Math.max(puts.size(), removes.size()));
       }
       `
     },

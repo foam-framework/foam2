@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.nanos.medusa',
-  name: 'MedusaEntryLinkDAO',
+  name: 'MedusaLinkDAO',
   extends: 'foam.dao.ProxyDAO',
 
   documentation: `Add Id and Dagger link values to the MedusaEntry`,

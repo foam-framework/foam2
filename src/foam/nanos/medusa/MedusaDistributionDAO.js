@@ -6,9 +6,8 @@
 
 foam.CLASS({
   package: 'foam.nanos.medusa',
-  name: 'MedusaEntryDistributionDAO',
+  name: 'MedusaDistributionDAO',
   extends: 'foam.dao.BatchClientDAO',
-//  extends: 'foam.dao.ProxyDAO',
 
   documentation: `Write MedusaEntry to the Medusa Nodes`,
 

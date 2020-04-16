@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.nanos.medusa',
-  name: 'MedusaEntryRoutingDAO',
+  name: 'MedusaRoutingDAO',
   extends: 'foam.dao.ProxyDAO',
 
   documentation: `Consensus has been reached for an object, put it into it's MDAO. Also generate a notification to wake any blocked Primary puts.`,

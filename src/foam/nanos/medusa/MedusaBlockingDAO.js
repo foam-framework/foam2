@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.nanos.medusa',
-  name: 'MedusaEntryBlockingDAO',
+  name: 'MedusaBlockingDAO',
   extends: 'foam.dao.ProxyDAO',
 
   documentation: 'Wait for consensus on MedusaEntry before returning from put(). See MedusaEntryRoutingDAO for notification.',

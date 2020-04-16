@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.nanos.medusa',
-  name: 'MedusaEntryConsensusDAO',
+  name: 'MedusaConsensusDAO',
   extends: 'foam.dao.ProxyDAO',
 
   implements: [

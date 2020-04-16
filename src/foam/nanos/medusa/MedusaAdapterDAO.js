@@ -6,14 +6,12 @@
 
 foam.CLASS({
   package: 'foam.nanos.medusa',
-  name: 'MedusaEntryAdapterDAO',
+  name: 'MedusaAdapterDAO',
   extends: 'foam.dao.ProxyDAO',
 
   implements: [
     'foam.nanos.boot.NSpecAware',
   ],
-
-  // TODO: deal with retries.
 
   documentation: `Create a medusa entry for argument model. NOTE:  delegate is parent MDAO, but only used as holder for MedusaEntryRoutingDAO to find.`,
 

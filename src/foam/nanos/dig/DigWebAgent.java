@@ -66,7 +66,11 @@ public class DigWebAgent
     String              subject  = p.getParameter("subject");
     String          fileAddress = p.getParameter("fileaddress");
     String               receipt = p.getParameter("receipt");
-    Boolean     itemizedReceipt = "itemized".equals(receipt);
+
+    Boolean     itemizedReceipt = true;
+    if ( ! SafetyUtil.isEmpty(receipt) ) {
+      itemizedReceipt = "itemized".equals(receipt);
+    }
     //
     // FIXME/TODO: ensuring XML and CSV flows return proper response objects and codes has not been completed since the switch to HttpParameters.
     //

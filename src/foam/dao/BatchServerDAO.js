@@ -34,18 +34,27 @@ foam.CLASS({
 
   methods: [
     {
-      // TODO: support remove
       name: 'cmd_',
       javaCode: `
       if ( obj instanceof BatchCmd ) {
         BatchCmd cmd = (BatchCmd) obj;
-        getLogger().debug("cmd", "BatchCmd");
+        getLogger().debug("cmd", "BatchCmd", cmd.getDop().getLabel(), cmd.getBatch().size());
 
-        List<FObject> list = cmd.getBatch();
-        for (FObject fobject : list) {
-          getDelegate().put_(x, fobject);
+        if ( DOP.PUT == cmd.getDop() ) {
+          List<FObject> list = cmd.getBatch();
+          for (FObject fobject : list) {
+            getDelegate().put_(x, fobject);
+          }
+          return cmd;
         }
-        return cmd;
+        if ( DOP.REMOVE == cmd.getDop() ) {
+          List<FObject> list = cmd.getBatch();
+          for (FObject fobject : list) {
+            getDelegate().remove_(x, fobject);
+          }
+          return cmd;
+        }
+        throw new UnsupportedOperationException(cmd.getDop().getLabel());
       }
       return getDelegate().cmd_(x, obj);
       `

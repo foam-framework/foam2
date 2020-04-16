@@ -187,7 +187,7 @@ foam.CLASS({
 
         if ( getCluster() &&
              getMdao() != null ) {
-          delegate = new foam.nanos.medusa.MedusaEntryAdapterDAO.Builder(getX())
+          delegate = new foam.nanos.medusa.MedusaAdapterDAO.Builder(getX())
             .setNSpec(getNSpec())
             .setDelegate(delegate)
             .build();
@@ -320,22 +320,6 @@ foam.CLASS({
         if ( getPermissioned() &&
             ( getNSpec() != null && getNSpec().getServe() ) )
           delegate = new foam.nanos.auth.PermissionedPropertyDAO.Builder(getX()).setDelegate(delegate).build();
-
-        // if ( getCluster() &&
-        //      getMdao() != null ) {
-        //   // test if chain already has ClusterConfigDAO
-        //   foam.dao.DAO next = delegate;
-        //   while ( next instanceof foam.dao.ProxyDAO &&
-        //     ! ( next instanceof foam.nanos.medusa.ClusterClientDAO ) ) {
-        //     next = ((foam.dao.ProxyDAO) next).getDelegate();
-        //   }
-        //   if ( ! ( next instanceof foam.nanos.medusa.ClusterClientDAO ) ) {
-        //     delegate = new foam.nanos.medusa.ClusterClientDAO.Builder(getX())
-        //                   .setServiceName(getNSpec().getName())
-        //                   .setDelegate(delegate)
-        //                   .build();
-        //   }
-        // }
 
         if ( getReadOnly() )
           delegate = new foam.dao.ReadOnlyDAO.Builder(getX()).setDelegate(delegate).build();

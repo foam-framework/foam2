@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.nanos.medusa',
-  name: 'MedusaEntryInternalDAO',
+  name: 'MedusaInternalDAO',
   extends: 'foam.dao.ProxyDAO',
 
   documentation: `Manage access to internal MedusaEntry DAO.
