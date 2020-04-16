@@ -169,7 +169,7 @@ foam.CLASS({
     function init() {
       this.SUPER();
       this.onDetach(() => {
-        if ( ! this.filterController.isAdvanced ) this.clearAll();
+        if ( ! this.filterController.isAdvanced ) this.clearAll(true);
         this.filterController.isPreview = false;
       });
     },
@@ -248,7 +248,14 @@ foam.CLASS({
       name: 'clearAll',
       label: 'Clear All',
       code: function(X) {
-        this.filterController.removeAll();
+        // Object.keys(this.filterController.previewCriterias).forEach((key) => {
+        //   if ( key !== 0 ) {
+        //     this.filterController.clearCriteria(key, true);
+        //     continue;
+        //   }
+        //   this.filterController.clearCriteria(key);
+        // });
+        this.filterController.clearAll(true);
       }
     },
     {
@@ -283,10 +290,10 @@ foam.CLASS({
       code: function(key) {
         if ( key == this.isOpenIndex ) this.isOpenIndex = -1;
         if ( Object.keys(this.filterController.previewCriterias).length === 1 ) {
-          this.clearAll();
+          this.clearAll(true);
           return;
         }
-        this.filterController.removeCriteria(key);
+        this.filterController.clearCriteria(key, true);
       }
     },
     {

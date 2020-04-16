@@ -99,8 +99,9 @@ foam.CLASS({
       this.previewCriterias$set(newIndex, {
         views: {},
         subs: {},
-        predicate: this.TRUE
+        predicate: newIndex === 0 ? this.criterias[newIndex].predicate : this.TRUE
       });
+      this.updateFilterPredicate();
     },
 
     function add(view, name, criteria) {
@@ -116,7 +117,6 @@ foam.CLASS({
         });
       }
       this.onCriteriaPredicateUpdate(criteria);
-      return view;
     },
 
     function onCriteriaPredicateUpdate(criteria) {
@@ -174,6 +174,10 @@ foam.CLASS({
       // At this point, user should be going into advanced mode
       this.isPreview = true;
       if ( Object.keys(this.previewCriterias).length === 0 ) this.addCriteria();
+      if ( ! this.isAdvanced ) {
+        this.previewCriterias[0].predicate = this.criterias[0].predicate;
+        this.updateFilterPredicate();
+      }
     },
 
     function applyPreview() {
@@ -184,7 +188,7 @@ foam.CLASS({
       this.finalPredicate = this.previewPredicate;
     },
 
-    function remove(viewOrName, criteria) {
+    function clear(viewOrName, criteria, remove) {
       var view;
       var name;
       // Get the right map to remove from
@@ -197,47 +201,54 @@ foam.CLASS({
       } else {
         // If view given, less work. Just assign name for crosscheck
         view = viewOrName;
-        name = view.name;
+        name = view.property.name;
       }
 
-      // Don't remove if view does not exist or crosscheck fails
+      // Don't clear if view does not exist or crosscheck fails
       if ( ! view || ! criterias[criteria].views[name] ) return;
 
       // Clear, detach, and remove view from the correct map
       if ( this.isPreview ) {
         this.previewCriterias[criteria].views[name].clear();
-        // this.previewCriterias[criteria].subs[name].detach();
-        // delete this.previewCriterias[criteria].views[name];
-        // delete this.previewCriterias[criteria].subs[name];
+        this.previewCriterias[criteria].predicate = this.TRUE;
+        if ( remove ) {
+          this.previewCriterias[criteria].subs[name].detach();
+          delete this.previewCriterias[criteria].views[name];
+          delete this.previewCriterias[criteria].subs[name];
+        }
       } else {
         this.criterias[criteria].views[name].clear();
-        // this.criterias[criteria].subs[name].detach();
-        // delete this.criterias[criteria].views[name];
-        // delete this.criterias[criteria].subs[name];
+        this.criterias[criteria].predicate = this.TRUE;
+        if ( remove ) {
+          this.criterias[criteria].subs[name].detach();
+          delete this.criterias[criteria].views[name];
+          delete this.criterias[criteria].subs[name];
+        }
       }
     },
 
-    function removeCriteria(criteria) {
+    function clearCriteria(criteria, remove) {
       var criterias = this.isPreview ? this.previewCriterias : this.criterias;
       Object.values(criterias[criteria].views).forEach((view) => {
-        this.remove(view, criteria);
+        this.clear(view, criteria, remove);
       });
 
-      if ( this.isPreview ) this.previewCriterias$remove(criteria);
-      else this.criterias$remove(criteria);
+      if ( remove ) {
+        if ( this.isPreview ) this.previewCriterias$remove(criteria);
+        else this.criterias$remove(criteria);
+      }
 
-      console.log(this.previewCriterias);
       this.updateFilterPredicate();
     },
 
-    function removeAll() {
+    function clearAll(remove) {
       // Get the right map to clear
       var criterias = this.isPreview ? this.previewCriterias : this.criterias;
       // Clear each criteria properly (Which includes detaching subs)
       Object.keys(criterias).forEach((key) => {
-        this.removeCriteria(key);
+        this.clearCriteria(key, remove);
       });
-      this.addCriteria();
+      if ( remove ) this.addCriteria();
     }
   ]
 });

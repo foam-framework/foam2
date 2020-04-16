@@ -393,7 +393,7 @@ foam.CLASS({
       name: 'clearAll',
       code: function() {
         // clear all filters
-        this.filterController.removeAll();
+        this.filterController.clearAll();
         console.log('TODO: Clear filters');
       }
     },
