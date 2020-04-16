@@ -360,7 +360,7 @@ foam.CLASS({
       this.isClosed = false;
       this.Animation.create({
         duration: 300,
-        f:        () => this.rotation = Math.PI /4,
+        f:        () => this.rotation = Math.PI / 4,
         objs:     [ this ]
       }).start();
     },
