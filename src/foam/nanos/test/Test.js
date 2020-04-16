@@ -25,7 +25,7 @@ foam.CLASS({
   tableColumns: [
     'id', 'enabled', /*'description',*/ 'server',
     'passed', 'failed', 'lastRun', 'lastDuration',
-    'status', 'run'
+    /*'status',*/ 'run'
   ],
 
   searchColumns: ['id', 'description'],

@@ -61,7 +61,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'id',
-      tableWidth: 280
+      tableWidth: 220
     },
     {
       class: 'Boolean',
@@ -126,6 +126,11 @@ foam.CLASS({
       class: 'Boolean',
       name: 'server',
       documentation: 'Runs on server side if enabled.',
+      tableCellFormatter: function(value) {
+        this.start()
+          .add(value ? 'Y' : 'N')
+        .end();
+      },
       value: true,
       tableWidth: 80
     },
@@ -297,7 +302,7 @@ foam.CLASS({
   actions: [
     {
       name: 'run',
-      tableWidth: 70,
+      tableWidth: 90,
       confirmationRequired: true,
       code: function() {
         var self = this;
