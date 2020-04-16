@@ -48,6 +48,9 @@ foam.CLASS({
     function fire () {
       this.Laser.create({x: this.sx, y: this.sy, vx: this.vx, vy: this.vy});
     },
+    function notIntersects(o) {
+      return this.children.length && ! this.children[this.children.length-1].intersects(o);
+    },
     function intersects(o) {
       return this.children.length && this.children[this.children.length-1].intersects(o);
     },
@@ -64,8 +67,8 @@ foam.CLASS({
       isMerged: true,
       mergeDelay: 75,
       code: function() {
-        this.sx += this.vx * this.R * 2;
-        this.sy += this.vy * this.R * 2;
+        this.sx += this.vx * this.R*2;
+        this.sy += this.vy * this.R*2;
 
         if ( this.children.length )
           this.children[this.children.length-1].color = 'green';
@@ -225,8 +228,8 @@ foam.CLASS({
   constants: { R: 20 },
 
   properties: [
-    [ 'width',      1600 ],
-    [ 'height',     800 ],
+    [ 'width',  1600 ],
+    [ 'height', 800 ],
     {
       name: 'gamepad',
       factory: function() { return this.Gamepad.create(); }
@@ -253,6 +256,16 @@ foam.CLASS({
           height: window.innerHeight
         });
       }
+    },
+    {
+      name: 'inBounds',
+      factory: function() {
+        return this.Box.create({
+          x: 4*this.R,
+          y: 4*this.R,
+          width: this.table.width-8*this.R-1,
+          height: this.table.height-8*this.R-1})
+        }
     },
     {
       name: 'collider',
@@ -398,12 +411,8 @@ foam.CLASS({
         if ( Math.random() < 0.02 ) this.addMushroom();
 
         // Detect snake running of the edge of the screen
-        // TODO: better
-        if ( this.snake.children.length && ! this.snake.intersects(this.Box.create({x: 4*this.R, y: 4*this.R, width: this.table.width-8*this.R-1, height: this.table.height-8*this.R-1})) )
+        if ( this.snake.notIntersects(this.inBounds) || this.snake.isSteppingOnTail() )
           this.gameOver();
-
-        if ( this.snake.isSteppingOnTail() )
-        this.gameOver();
       }
     }
   ],
