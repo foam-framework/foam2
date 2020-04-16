@@ -1095,8 +1095,6 @@ foam.LIB({
 })();
 
 (function() {
-  var typeOf = foam.typeOf;
-
   foam.LIB({
     name: 'foam.error',
 
