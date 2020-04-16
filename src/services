@@ -162,7 +162,11 @@ p({
   "name":"pmInfoDAO",
   "serve":true,
   "serviceScript":`
-    return new foam.nanos.pm.PMInfoMDAO().orderBy(foam.mlang.MLang.DESC(foam.nanos.pm.PMInfo.TOTAL_TIME));
+    dao = new foam.nanos.pm.PMInfoMDAO().orderBy(foam.mlang.MLang.DESC(foam.nanos.pm.PMInfo.TOTAL_TIME));
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.pm.PM.getOwnClassInfo())
+      .setDelegate(dao)
+      .build();
   `,
   "client":"{\"of\":\"foam.nanos.pm.PMInfo\", \"remoteListenerSupport\": false}"
 })
