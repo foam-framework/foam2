@@ -56,9 +56,6 @@ foam.CLASS({
       `,
       factory: function() {
         return this.TRUE;
-      },
-      postSet: function(_, n) {
-        console.log(n.stringify());
       }
     },
     {
@@ -67,10 +64,7 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'isPreview',
-      postSet: function(_, n) {
-        console.log(n);
-      }
+      name: 'isPreview'
     },
     {
       class: 'Boolean',
