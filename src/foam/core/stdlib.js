@@ -1094,6 +1094,23 @@ foam.LIB({
   });
 })();
 
+(function() {
+  var typeOf = foam.typeOf;
+
+  foam.LIB({
+    name: 'foam.error',
+
+    methods: [
+      function thro(message, details) {
+        throw new Error(
+          message+"\n"+Object.keys(details).map(k =>
+            `\t${k}: ${details[k]}\n`)
+        );
+      }
+    ]
+  });
+})();
+
 
 foam.LIB({
   name: 'foam.package',
