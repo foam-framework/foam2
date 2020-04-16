@@ -154,7 +154,7 @@ FOAM_FILES([
   { name: "foam/nanos/medusa/MedusaRoutingDAO" },
   { name: "foam/nanos/medusa/MedusaServerDAO" },
   { name: "foam/nanos/medusa/MedusaSigningDAO" },
-  { name: "foam/nanos/medusa/MedusaEntryTestingDAO" },
+  { name: "foam/nanos/medusa/MedusaTestingDAO" },
   { name: "foam/nanos/medusa/MedusaUniqueDAO" },
   { name: "foam/nanos/medusa/MedusaType" },
   { name: "foam/nanos/medusa/RegionStatus" },

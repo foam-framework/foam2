@@ -157,14 +157,12 @@ foam.CLASS({
       `
     },
     {
+      documentation: 'Verify entry hash, and compare hashes of parent indexes.',
       name: 'verify',
       javaCode: `
-        // verify hash itself
-        // and compare hashes of parent indexes.
         DAO dao = (DAO) getX().get("internalMedusaEntryDAO");
 
         List<MedusaEntry> list1 = (ArrayList) ((ArraySink) dao.where(
-          // EQ(MedusaEntry.INDEX, entry.getIndex1())
           EQ(MedusaEntry.INDEX, entry.getIndex1())
           )
           .select(new ArraySink())).getArray();
@@ -173,30 +171,36 @@ foam.CLASS({
           )
           .select(new ArraySink())).getArray();
 
-        if ( list1.size() == 0 ) throw new RuntimeException("Not Found MedusaEntry with index: " + entry.getIndex1());
-        if ( list2.size() == 0 ) throw new RuntimeException("Not Found MedusaEntry with index: " + entry.getIndex2());
+        if ( list1.size() == 0 ) {
+          getLogger().error("verify", "entry not found", "index1", entry.getIndex1(), entry.getIndex(), entry.getId());
+          throw new RuntimeException("Not Found MedusaEntry with index: " + entry.getIndex1());
+        }
+        if ( list2.size() == 0 ) {
+          getLogger().error("verify", "entry not found", "index2", entry.getIndex2(), entry.getInddex(), entry.getId());
+          throw new RuntimeException("Not Found MedusaEntry with index: " + entry.getIndex2());
+        }
 
         MedusaEntry parent1 = list1.get(0);
         MedusaEntry parent2 = list2.get(0);
-        if ( ! parent1.getHash().equals(entry.getHash1()) ) throw new RuntimeException("MedusaEntry hash1 do not match parent1 hash");
-        if ( ! parent2.getHash().equals(entry.getHash2()) ) throw new RuntimeException("MedusaEntry hash2 do not match parent2 hash");
+        if ( ! parent1.getHash().equals(entry.getHash1()) ) {
+          getLogger().error("verify", "hash1 != parent1.hash", entry.getIndex(), entry.getId());
+          throw new RuntimeException("Hash Verification Failed.");
+        }
+        if ( ! parent2.getHash().equals(entry.getHash2()) ) {
+          getLogger().error("verify", "hash2 != parent2.hash", entry.getIndex(), entry.getId());
+          throw new RuntimeException("Hash Verification Failed.");
+        }
         //Recalculate hash.
-        String calculatedHash = "";
         try {
-          MessageDigest md = MessageDigest.getInstance(getHashingAlgorithm());
-          md.update(Long.toString(entry.getIndex1()).getBytes(StandardCharsets.UTF_8));
-          md.update(entry.getHash1().getBytes(StandardCharsets.UTF_8));
-          md.update(Long.toString(entry.getIndex2()).getBytes(StandardCharsets.UTF_8));
-          md.update(entry.getHash2().getBytes(StandardCharsets.UTF_8));
-          if ( entry.getData() != null ) {
-            calculatedHash = byte2Hex(entry.getData().hash(md));
-          } else {
-            calculatedHash = byte2Hex(md.digest());
+          String calculatedHash = hash(entry);
+          if ( ! calculatedHash.equals(entry.getHash()) ) {
+            getLogger().error("verify", "hashes do not match", entry.getIndex(), entry.getId());
+            throw new RuntimeException("Hash verification failed.");
           }
         } catch ( java.security.NoSuchAlgorithmException e ) {
+          getLogger().error(e);
           throw new RuntimeException(e);
         }
-        if ( ! calculatedHash.equals(entry.getHash()) ) throw new RuntimeException("MedusaHash do not match");
       `
     },
     {

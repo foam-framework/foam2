@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.nanos.medusa',
-  name: 'MedusaEntryTestingDAO',
+  name: 'MedusaTestingDAO',
   extends: 'foam.dao.ProxyDAO',
 
   documentation: `Test for index -1 entries`,

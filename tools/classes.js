@@ -341,7 +341,7 @@ var classes = [
   'foam.nanos.medusa.MedusaRoutingDAO',
   'foam.nanos.medusa.MedusaServerDAO',
   'foam.nanos.medusa.MedusaSigningDAO',
-  'foam.nanos.medusa.MedusaEntryTestingDAO',
+  'foam.nanos.medusa.MedusaTestingDAO',
   'foam.nanos.medusa.MedusaUniqueDAO',
   'foam.nanos.medusa.MedusaType',
   'foam.nanos.medusa.RegionStatus',

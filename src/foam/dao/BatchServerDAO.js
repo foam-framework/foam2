@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'BatchServerDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  documenation: 'Unpack BatchCmd List and issue individual dao operations',
+  documentation: 'Unpack BatchCmd List and issue individual dao operations',
 
   javaImports: [
     'foam.core.FObject',

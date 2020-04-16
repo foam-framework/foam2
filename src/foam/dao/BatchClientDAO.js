@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'BatchClientDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  documenation: `Group all 'put' operations in some time window into a single cmd operation.
+  documentation: `Group all 'put' operations in some time window into a single cmd operation.
 Presently this is send and forget.
 NOTE: override cmd_ in child class to control delegate call`,
 
@@ -66,7 +66,7 @@ NOTE: override cmd_ in child class to control delegate call`,
     {
       name: 'timer',
       class: 'Object',
-      visibilty: 'HIDDEN'
+      visibility: 'HIDDEN'
     },
     {
       name: 'logger',
