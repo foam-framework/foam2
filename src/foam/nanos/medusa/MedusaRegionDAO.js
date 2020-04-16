@@ -55,6 +55,9 @@ foam.CLASS({
       ClusterConfig region = support.getActiveRegion(x, config);
 
       if ( config.getRegionStatus() == RegionStatus.STANDBY ) {
+        if ( obj instanceof foam.nanos.session.Session ) {
+          ((foam.nanos.session.Session) obj).setContext(null);
+        }
         return super.put_(x, obj);
       }
       return getDelegate().put_(x, obj);

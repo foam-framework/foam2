@@ -46,6 +46,11 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
+      if ( obj instanceof Clusterable &&
+           ! ((Clusterable) obj).getClusterable() ) {
+        return getDelegate().put_(x, obj);
+      }
+
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       ClusterConfig config = support.getConfig(x, support.getConfigId());
       getLogger().debug("put", config.getName(), "primary", config.getIsPrimary());
@@ -54,6 +59,9 @@ foam.CLASS({
       ClusterConfig region = support.getPrimary(x);
 
       if ( ! config.getIsPrimary() ) {
+        if ( obj instanceof foam.nanos.session.Session ) {
+          ((foam.nanos.session.Session) obj).setContext(null);
+        }
         return super.put_(x, obj);
       }
       return getDelegate().put_(x, obj);
