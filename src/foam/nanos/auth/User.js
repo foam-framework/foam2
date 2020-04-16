@@ -139,12 +139,6 @@ foam.CLASS({
       class: 'String',
       name: 'firstName',
       documentation: 'The first name of the User.',
-      // TODO: Use validatationPredicates instead.
-      validateObj: function(firstName) {
-        if ( ! firstName.trim() ) {
-          return 'First name required.';
-        }
-      },
       gridColumns: 4,
       section: 'personal',
       includeInDigest: true
@@ -161,12 +155,6 @@ foam.CLASS({
       class: 'String',
       name: 'lastName',
       documentation: 'The last name of the User.',
-      // TODO: Use validatationPredicates instead.
-      validateObj: function(lastName) {
-        if ( ! lastName.trim() ) {
-          return 'Last name required.';
-        }
-      },
       gridColumns: 4,
       section: 'personal',
       includeInDigest: true
