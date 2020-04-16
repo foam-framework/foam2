@@ -55,80 +55,40 @@ foam.CLASS({
     {
       name: 'find_',
       javaCode: `
-      synchronized ( replayingLock_ ) {
-        if ( getReplaying() ) {
-          getLogger().debug("find");
-          try {
-            replayingLock_.wait();
-          } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-          }
-        }
-      }
+      getLogger().debug("find");
+      blockOnReplay();
       return getDelegate().find_(x, id);
       `
     },
     {
       name: 'select_',
       javaCode: `
-      synchronized ( replayingLock_ ) {
-        if ( getReplaying() ) {
-          getLogger().debug("select");
-          try {
-            replayingLock_.wait();
-          } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-          }
-        }
-      }
+      getLogger().debug("select");
+      blockOnReplay();
       return getDelegate().select_(x, sink, skip, limit, order, predicate);
       `
     },
     {
       name: 'put_',
       javaCode: `
-      synchronized ( replayingLock_ ) {
-        if ( getReplaying() ) {
-          getLogger().debug("put");
-          try {
-            replayingLock_.wait();
-          } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-          }
-        }
-      }
+      getLogger().debug("put");
+      blockOnReplay();
       return getDelegate().put_(x, obj);
       `
     },
     {
       name: 'remove_',
       javaCode: `
-      synchronized ( replayingLock_ ) {
-        if ( getReplaying() ) {
-         getLogger().debug("remove");
-         try {
-            replayingLock_.wait();
-          } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-          }
-        }
-      }
+      getLogger().debug("remove");
+      blockOnReplay();
       return getDelegate().remove_(x, obj);
       `
     },
     {
       name: 'removeAll_',
       javaCode: `
-      synchronized ( replayingLock_ ) {
-        if ( getReplaying() ) {
-         getLogger().debug("removeAll");
-         try {
-            replayingLock_.wait();
-          } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-          }
-        }
-      }
+      getLogger().debug("removeAll");
+      blockOnReplay();
       getDelegate().removeAll_(x, skip, limit, order, predicate);
       `
     },
@@ -139,35 +99,26 @@ foam.CLASS({
         getLogger().info("replay complete");
         synchronized ( replayingLock_ ) {
           setReplaying(false);
+          getLogger().debug("notifyAll");
           replayingLock_.notifyAll();
         }
         return obj;
-      // } else if ( obj instanceof MedusaEntry ) {
-      //   return getDelegate().cmd_(x, obj);
-      // } else if ( obj instanceof BatchCmd ) {
-      //   return getDelegate().cmd_(x, obj);
-      // } else {
-      //   synchronized ( replayingLock_ ) {
-      //     if ( getReplaying() ) {
-      //       try {
-      //         replayingLock_.wait();
-      //       } catch (InterruptedException e) {
-      //         throw new RuntimeException(e);
-      //       }
-      //     }
-      //   }
-      //   return getDelegate().cmd_(x, obj);
       }
       return getDelegate().cmd_(x, obj);
       `
     },
     {
-      name: 'blockOnReply',
-      javaThrows: ['InterruptedException'],
+      name: 'blockOnReplay',
       javaCode: `
       synchronized ( replayingLock_ ) {
         if ( getReplaying() ) {
-          replayingLock_.wait();
+          try {
+            getLogger().debug("wait");
+            replayingLock_.wait();
+            getLogger().debug("wake");
+          } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+          }
         }
       }
       `
