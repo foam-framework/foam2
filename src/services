@@ -870,11 +870,13 @@ p({
   "serve":true,
   "serviceScript":
   """
-    return new foam.nanos.analytics.FoldManagerDAODecorator.Builder(x)
-      .setDelegate(new foam.dao.NullDAO.Builder(x)
-      .setOf(foam.nanos.pm.PM.getOwnClassInfo())
-      .build())
+    dao = new foam.nanos.analytics.FoldManagerDAODecorator.Builder(x)
+      .setDelegate(new foam.dao.NullDAO(x, foam.nanos.pm.PM.getOwnClassInfo()))
       .setFm((foam.nanos.analytics.DAOFoldManager) x.get("pmFoldManager"))
+      .build();
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.pm.PM.getOwnClassInfo())
+      .setDelegate(dao)
       .build();
   """,
   "client":"{\"of\":\"foam.nanos.pm.PM\", \"remoteListenerSupport\": false}"
