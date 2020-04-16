@@ -201,7 +201,7 @@ foam.CLASS({
               start('span').
               show(this.hasChildren$).
               style({
-                'margin-right':   '36px',
+                'margin-right':   '38px',
                 'vertical-align': 'middle',
                 'font-weight':    'bold',
                 'display':        'inline-block',
