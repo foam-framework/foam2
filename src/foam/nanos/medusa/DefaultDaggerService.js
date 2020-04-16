@@ -150,6 +150,7 @@ foam.CLASS({
       md.update(Long.toString(entry.getIndex2()).getBytes(StandardCharsets.UTF_8));
       md.update(entry.getHash2().getBytes(StandardCharsets.UTF_8));
       if ( entry.getData() != null ) {
+        getLogger().debug("hash", entry.getIndex(), "data", entry.getData().getClass().getSimpleName());
         return byte2Hex(entry.getData().hash(md));
       } else {
         return byte2Hex(md.digest());
@@ -192,12 +193,22 @@ foam.CLASS({
         }
         //Recalculate hash.
         try {
-          String calculatedHash = hash(x, entry);
-          if ( ! calculatedHash.equals(entry.getHash()) ) {
-            getLogger().error("verify", "hashes do not match", entry.getIndex(), entry.getId());
-            throw new RuntimeException("Hash verification failed.");
+          MessageDigest md = MessageDigest.getInstance(getHashingAlgorithm());
+          md.update(Long.toString(parent1.getIndex()).getBytes(StandardCharsets.UTF_8));
+          md.update(parent1.getHash().getBytes(StandardCharsets.UTF_8));
+          md.update(Long.toString(parent2.getIndex()).getBytes(StandardCharsets.UTF_8));
+          md.update(parent2.getHash().getBytes(StandardCharsets.UTF_8));
+          String calculatedHash = null;
+          if ( entry.getData() != null ) {
+            calculatedHash = byte2Hex(entry.getData().hash(md));
+          } else {
+            calculatedHash = byte2Hex(md.digest());
           }
-        } catch ( java.security.DigestException | java.security.NoSuchAlgorithmException e ) {
+          if ( ! calculatedHash.equals(entry.getHash()) ) {
+            getLogger().error("verify", "hash verification failure", entry.getIndex(), entry.getId());
+//            throw new RuntimeException("Hash verification failed.");
+          }
+        } catch ( java.security.NoSuchAlgorithmException e ) {
           getLogger().error(e);
           throw new RuntimeException(e);
         }

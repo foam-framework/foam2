@@ -50,8 +50,7 @@ foam.INTERFACE({
     {
       name: 'hash',
       type: 'String',
-      javaThrows: ['java.security.DigestException',
-                    'java.security.NoSuchAlgorithmException'],
+      javaThrows: ['java.security.NoSuchAlgorithmException'],
       args: [
         {
           name: 'x',
