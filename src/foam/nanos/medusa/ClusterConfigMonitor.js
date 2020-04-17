@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.nanos.medusa',
   name: 'ClusterConfigMonitor',
 
-  documentation: 'NOTE: do not start with cronjob. This process starts the ClusterConfigPinkSing which polls the Mediators and Nodes and will initiate Replay, and Elections.',
+  documentation: 'NOTE: do not start with cronjob. This process starts the ClusterConfigPingSing which polls the Mediators and Nodes and will initiate Replay, and Elections.',
 
   axioms: [
     foam.pattern.Singleton.create()

@@ -19,6 +19,9 @@ import foam.nanos.logger.Logger;
 import java.io.PrintWriter;
 import java.io.IOException;
 
+/**
+ * Differs from PingService by not responding unless instance is ONLINE
+ */
 public class ClusterPingService
   extends PingService
 {

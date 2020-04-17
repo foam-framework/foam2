@@ -46,7 +46,6 @@ public class PingService
       address = host.getAddress();
     }
 
-    // TODO: control http/https
     String urlString = useHttps ? "https://" : "http://" + address + ":" + port + "/service" + "/ping";
 
     Box box = new HTTPBox.Builder(x)

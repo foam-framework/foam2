@@ -18,6 +18,7 @@ foam.CLASS({
     'org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest',
     'org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse',
     'org.eclipse.jetty.websocket.servlet.WebSocketCreator',
+    'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'java.util.Set',
     'java.util.HashSet',
@@ -82,6 +83,17 @@ foam.CLASS({
       name: 'filterMappings',
       of: 'foam.nanos.servlet.FilterMapping',
       javaFactory: 'return new foam.nanos.servlet.FilterMapping[0];'
+    },
+    {
+      name: 'logger',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.logger.Logger',
+      visibility: 'HIDDEN',
+      javaFactory: `
+        return new PrefixLogger(new Object[] {
+          this.getClass().getSimpleName()
+        }, (Logger) getX().get("logger"));
+      `
     }
   ],
   methods: [
@@ -96,11 +108,11 @@ foam.CLASS({
             port = Integer.parseInt(portStr);
             setPort(port);
           } catch ( NumberFormatException e ) {
-            System.err.println(this.getClass().getSimpleName()+" invalid http.port '"+portStr+"'");
+            getLogger().error("invalid port", portStr);
             port = getPort();
           }
         }
-        System.out.println("Starting Jetty http server at Port: " + port);
+        getLogger().info("Starting Jetty http server. port", port);
 
         org.eclipse.jetty.server.Server server =
           new org.eclipse.jetty.server.Server(port);
@@ -211,9 +223,7 @@ foam.CLASS({
 
         server.start();
       } catch(Exception e) {
-        Logger logger = (Logger) getX().get("logger");
-        if ( logger != null )
-          logger.error(e);
+        getLogger().error(e);
       }
       `
     },
