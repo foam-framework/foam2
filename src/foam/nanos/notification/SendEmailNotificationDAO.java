@@ -11,6 +11,7 @@ import foam.core.X;
 import foam.dao.DAO;
 import foam.dao.ProxyDAO;
 import foam.nanos.app.AppConfig;
+import foam.nanos.auth.LifecycleState;
 import foam.nanos.auth.User;
 import foam.nanos.notification.email.EmailMessage;
 import foam.util.Emails.EmailsUtility;
@@ -39,6 +40,10 @@ public class SendEmailNotificationDAO extends ProxyDAO {
     if ( oldNotif != null ) return super.put_(x, obj);
 
     if ( ! notif.getEmailIsEnabled() || user == null ) return super.put_(x, obj);
+
+    if ( user.getLifecycleState() != LifecycleState.ACTIVE ) {
+      return getDelegate().put_(x, obj);
+    }
 
     if ( user.getDisabledTopicsEmail() != null ) {
       List disabledTopics = Arrays.asList(user.getDisabledTopicsEmail());
