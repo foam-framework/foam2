@@ -84,38 +84,37 @@ foam.CLASS({
       }).partialEval();
     },
 
-    function addCriteria() {
+    function addCriteria(key) {
       var criterias = this.isPreview ? this.previewCriterias : this.criterias;
       var keys = Object.keys(criterias);
-      var newIndex = keys.length > 0 ? Number.parseInt(keys[keys.length - 1]) + 1 : 0;
+      var newKey;
+      if ( key ) {
+        newKey = key;
+      } else {
+        newKey = keys.length > 0 ? Number.parseInt(keys[keys.length - 1]) + 1 : 0;
+      }
       if ( ! this.isPreview ) {
-        this.criterias$set(newIndex, {
+        this.criterias$set(newKey, {
           views: {},
           subs: {},
           predicate: this.TRUE
         });
         return;
       }
-      this.previewCriterias$set(newIndex, {
+      this.previewCriterias$set(newKey, {
         views: {},
         subs: {},
-        predicate: newIndex === 0 ? this.criterias[newIndex].predicate : this.TRUE
+        predicate: newKey === 0 ? this.criterias[newKey].predicate : this.TRUE
       });
       this.updateFilterPredicate();
     },
 
     function add(view, name, criteria) {
-      if ( ! this.isPreview ) {
-        this.criterias[criteria].views[name] = view;
-        this.criterias[criteria].subs[name] = view.predicate$.sub(() => {
-          this.onCriteriaPredicateUpdate(criteria);
-        });
-      } else {
-        this.previewCriterias[criteria].views[name] = view;
-        this.previewCriterias[criteria].subs[name] = view.predicate$.sub(() => {
-          this.onCriteriaPredicateUpdate(criteria);
-        });
-      }
+      var criterias = this.isPreview ? this.previewCriterias : this.criterias;
+      criterias[criteria].views[name] = view;
+      criterias[criteria].subs[name] = view.predicate$.sub(() => {
+        this.onCriteriaPredicateUpdate(criteria);
+      });
       this.onCriteriaPredicateUpdate(criteria);
     },
 
@@ -124,13 +123,7 @@ foam.CLASS({
       var criteriaViews = criterias[criteria].views;
       var predicate = this.and(criteriaViews);
 
-      if ( predicate == this.TRUE ) return;
-
-      if ( ! this.isPreview ) {
-        this.criterias[criteria].predicate = predicate;
-      } else {
-        this.previewCriterias[criteria].predicate = predicate;
-      }
+      criterias[criteria].predicate = predicate;
 
       this.reciprocateCriteriaViews(criteria);
     },
@@ -147,11 +140,7 @@ foam.CLASS({
         });
         // Temp now holds all the other views. Combine all their predicates to
         // get the reciprocal predicate for this view.
-        if ( ! this.isPreview ) {
-          this.criterias[criteria].views[name].dao = this.dao.where(this.and(temp));
-        } else {
-          this.previewCriterias[criteria].views[name].dao = this.dao.where(this.and(temp));
-        }
+        criterias[criteria].views[name].dao = this.dao.where(this.and(temp));
       }.bind(this));
       this.updateFilterPredicate();
     },
@@ -173,19 +162,45 @@ foam.CLASS({
     function switchToPreview() {
       // At this point, user should be going into advanced mode
       this.isPreview = true;
-      if ( Object.keys(this.previewCriterias).length === 0 ) this.addCriteria();
-      if ( ! this.isAdvanced ) {
-        this.previewCriterias[0].predicate = this.criterias[0].predicate;
-        this.updateFilterPredicate();
-      }
+      this.clearAll(true);
+      // Assign the predicates to the previews to reconstruct the view
+      Object.keys(this.criterias).forEach((key) => {
+        this.addCriteria(key);
+        this.previewCriterias[key].predicate = this.criterias[key].predicate;
+      });
+      this.updateFilterPredicate();
     },
 
     function applyPreview() {
       // At this point, users should be coming from advanced mode
-      console.log('Preview applied');
       this.isAdvanced = true;
       this.isPreview = false;
+      this.clearAll(true);
+      // Copy required information to be reconstructed
+      Object.keys(this.previewCriterias).forEach((criteriaKey) => {
+        this.addCriteria(criteriaKey);
+        Object.keys(this.previewCriterias[criteriaKey].views).forEach((viewKey) => {
+          var view = this.previewCriterias[criteriaKey].views[viewKey];
+          this.criterias[criteriaKey].views[viewKey] = {
+            property: view.property,
+            predicate: view.predicate
+          };
+        });
+        this.criterias[criteriaKey].predicate = this.previewCriterias[criteriaKey].predicate;
+      });
+      // This will apply the predicate onto the DAO
       this.finalPredicate = this.previewPredicate;
+    },
+
+    function switchToSimple() {
+      // Essentially a reset
+      this.isPreview = true;
+      this.clearAll(true);
+      this.updateFilterPredicate();
+      this.isPreview = false;
+      this.clearAll(true);
+      this.updateFilterPredicate();
+      this.isAdvanced = false;
     },
 
     function clear(viewOrName, criteria, remove) {
@@ -206,24 +221,16 @@ foam.CLASS({
 
       // Don't clear if view does not exist or crosscheck fails
       if ( ! view || ! criterias[criteria].views[name] ) return;
-
-      // Clear, detach, and remove view from the correct map
-      if ( this.isPreview ) {
-        this.previewCriterias[criteria].views[name].clear();
-        this.previewCriterias[criteria].predicate = this.TRUE;
-        if ( remove ) {
-          this.previewCriterias[criteria].subs[name].detach();
-          delete this.previewCriterias[criteria].views[name];
-          delete this.previewCriterias[criteria].subs[name];
-        }
-      } else {
-        this.criterias[criteria].views[name].clear();
-        this.criterias[criteria].predicate = this.TRUE;
-        if ( remove ) {
-          this.criterias[criteria].subs[name].detach();
-          delete this.criterias[criteria].views[name];
-          delete this.criterias[criteria].subs[name];
-        }
+      // There could be a case where the view's data is for reconstruction
+      // Therefore, there won't be a method called clear
+      if ( criterias[criteria].views[name].clear ) criterias[criteria].views[name].clear();
+      criterias[criteria].predicate = this.TRUE;
+      if ( remove ) {
+        // There could be a case where the view's data is for reconstruction
+        // Therefore, there won't be any subs
+        if ( criterias[criteria].subs[name] ) criterias[criteria].subs[name].detach();
+        delete criterias[criteria].views[name];
+        delete criterias[criteria].subs[name];
       }
     },
 
@@ -232,7 +239,6 @@ foam.CLASS({
       Object.values(criterias[criteria].views).forEach((view) => {
         this.clear(view, criteria, remove);
       });
-
       if ( remove ) {
         if ( this.isPreview ) this.previewCriterias$remove(criteria);
         else this.criterias$remove(criteria);

@@ -260,7 +260,7 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
-      this.onDetach(this.isFiltering$.sub(this.getResultCount));
+      this.onDetach(this.filterController$.dot('finalPredicate').sub(this.getResultCount));
       this
         .addClass(self.myClass())
         .add(this.slot(function(filters) {
@@ -323,6 +323,7 @@ foam.CLASS({
               .add(self.resultLabel$)
             .end()
             .start('p')
+              .hide(self.filterController$.dot('isAdvanced'))
               .addClass(self.myClass('link-mode'))
               .on('click', self.clearAll)
               .add(self.LABEL_CLEAR)
@@ -393,8 +394,8 @@ foam.CLASS({
       name: 'clearAll',
       code: function() {
         // clear all filters
+        if ( this.filterController.isAdvanced ) return;
         this.filterController.clearAll();
-        console.log('TODO: Clear filters');
       }
     },
     {
@@ -403,19 +404,12 @@ foam.CLASS({
         if ( this.filterController.isAdvanced ) {
           // Switch back to simple mode
           // Clear out all active filters
-          this.clearAll();
-          this.filterController.isAdvanced = !this.filterController.isAdvanced;
+          this.filterController.switchToSimple();
           return;
         }
 
         // Make modal appear, switch to advance mode once user has selected
         // filter criteria
-        // Clear out all active filters
-
-        // TODO: Remove this once advanced filter is in charge of changing the
-        //       flag. This was only meant for testing purposes
-        // this.filterController.isAdvanced = !this.filterController.isAdvanced;
-
         this.openAdvanced();
       }
     },
