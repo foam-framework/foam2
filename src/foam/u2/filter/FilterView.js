@@ -403,7 +403,6 @@ foam.CLASS({
       code: function() {
         if ( this.filterController.isAdvanced ) {
           // Switch back to simple mode
-          // Clear out all active filters
           this.filterController.switchToSimple();
           return;
         }
@@ -416,11 +415,9 @@ foam.CLASS({
     {
       name: 'openAdvanced',
       code: function() {
-        // console.log('TODO: Create modal for advanced filter');
         this.filterController.switchToPreview();
         this.add(this.Popup.create().tag({
           class: 'foam.u2.filter.advanced.AdvancedFilterView',
-          criterias$: this.filterController$.dot('criterias'),
           dao$: this.dao$
         }));
       }
