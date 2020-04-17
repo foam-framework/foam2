@@ -116,7 +116,7 @@ public class Boot {
       DAO    scriptDAO = (DAO) root_.get("scriptDAO");
       Script script    = (Script) scriptDAO.find(startScript);
       if ( script != null ) {
-        script.runScript(root_);
+        ((Script) script.fclone()).runScript(root_);
       }
     }
   }
