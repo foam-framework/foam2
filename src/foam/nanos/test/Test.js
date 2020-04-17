@@ -25,7 +25,7 @@ foam.CLASS({
   tableColumns: [
     'id', 'enabled', /*'description',*/ 'server',
     'passed', 'failed', 'lastRun', 'lastDuration',
-    'status', 'run'
+    /*'status',*/ 'run'
   ],
 
   searchColumns: ['id', 'description'],
@@ -59,6 +59,15 @@ foam.CLASS({
     {
       class: 'String',
       name: 'testSuite'
+    },
+    {
+      class: 'String',
+      name: 'daoKey',
+      value: 'testDAO',
+      transient: true,
+      visibility: 'HIDDEN',
+      documentation: `Name of dao which journal will be used to store script run logs. To set from inheritor
+      just change property value`
     }
   ],
 

@@ -122,7 +122,7 @@ public class Boot {
         script = (Script) script.fclone();
         try {
           // NOTE: is read-only and will throw exception when it updates rundate.
-          script.runScript(new foam.core.ReadOnlyDAOContext(root_));
+          ((Script)script.clone()).runScript(new foam.core.ReadOnlyDAOContext(root_));
         } catch (UnsupportedOperationException e) {
           // ignore
         }

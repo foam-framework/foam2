@@ -62,7 +62,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'id',
-      tableWidth: 280
+      tableWidth: 220
     },
     {
       class: 'Boolean',
@@ -127,6 +127,11 @@ foam.CLASS({
       class: 'Boolean',
       name: 'server',
       documentation: 'Runs on server side if enabled.',
+      tableCellFormatter: function(value) {
+        this.start()
+          .add(value ? 'Y' : 'N')
+        .end();
+      },
       value: true,
       tableWidth: 80
     },
@@ -187,6 +192,7 @@ foam.CLASS({
       class: 'String',
       name: 'daoKey',
       value: 'scriptDAO',
+      transient: true,
       visibility: 'HIDDEN',
       documentation: `Name of dao which journal will be used to store script run logs. To set from inheritor
       just change property value`
@@ -333,7 +339,7 @@ foam.CLASS({
   actions: [
     {
       name: 'run',
-      tableWidth: 70,
+      tableWidth: 90,
       confirmationRequired: true,
       code: function() {
         var self = this;
