@@ -18,7 +18,8 @@ foam.CLASS({
 
   requires: [
     'com.foamdev.demos.snake.Laser',
-    'com.foamdev.demos.snake.Scale'
+    'com.foamdev.demos.snake.Scale',
+    'foam.animation.Animation'
   ],
 
   imports: [
@@ -58,14 +59,27 @@ foam.CLASS({
       for ( var i = 0 ; i < this.children.length-2 ; i++ )
         if ( this.intersects(this.children[i]) ) return true;
       return false;
+    },
+    function explode() {
+      this.children.forEach((c) => {
+        this.Animation.create({
+          duration: 2000,
+          f: () => {
+            c.x += Math.random()*4000-2000;
+            c.y += Math.random()*4000-2000;
+          },
+          objs: [ c ]
+        }).start();
+      });
     }
   ],
 
   listeners: [
     {
       name: 'tick',
+      // only run every 85ms, otherwise game runs too fast
       isMerged: true,
-      mergeDelay: 75,
+      mergeDelay: 85,
       code: function() {
         this.sx += this.vx * this.R*2;
         this.sy += this.vy * this.R*2;
@@ -261,10 +275,10 @@ foam.CLASS({
       name: 'inBounds',
       factory: function() {
         return this.Box.create({
-          x: 4*this.R,
-          y: 4*this.R,
-          width: this.table.width-8*this.R-1,
-          height: this.table.height-8*this.R-1})
+          x: 2*this.R,
+          y: 2*this.R,
+          width: this.table.width-4*this.R-1,
+          height: this.table.height-4*this.R-1})
         }
     },
     {
@@ -288,7 +302,7 @@ foam.CLASS({
       this.addChild(this.snake);
 
       this.addChild(this.Label.create({
-        text$:   this.highScore$.map((score)=>'High Score: ' + score),
+        text$:  this.highScore$.map((score)=>'High Score: ' + score),
         color:  'white',
         scaleX: 5,
         scaleY: 5,
@@ -321,10 +335,12 @@ foam.CLASS({
         } else if ( this.Snake.isInstance(o1) ) {
           if ( this.Mushroom.isInstance(o2) ) {
             // Only die from fully grown mushrooms
-            if ( o2.scaleX == 1 )
+            if ( o2.scaleX == 1 ) {
+              o1.explode();
               this.gameOver();
-            else
+            } else {
               this.removeChild(o2);
+            }
           } else if ( this.Food.isInstance(o2) ) {
             this.removeChild(o2);
             if ( this.snake.length++ > this.highScore ) this.highScore = this.snake.length-5;
@@ -354,7 +370,7 @@ foam.CLASS({
         scaleX: 10,
         scaleY: 10,
         x:      this.table.width/2,
-        y:      100
+        y:      this.table.height/2-100
       }));
 
       this.Speak.create({text: 'Game Over'}).play();
@@ -402,6 +418,10 @@ foam.CLASS({
     {
       name: 'tick',
       code: function(_, __, ___, t) {
+        // Detect snake running of the edge of the screen
+        if ( this.snake.notIntersects(this.inBounds) || this.snake.isSteppingOnTail() )
+          this.gameOver();
+
         if ( this.gamepad.button0 ) this.up();
         if ( this.gamepad.button1 ) this.right();
         if ( this.gamepad.button2 ) this.down();
@@ -409,10 +429,6 @@ foam.CLASS({
 
         if ( t.get() % 30 == 0 ) this.addFood();
         if ( Math.random() < 0.02 ) this.addMushroom();
-
-        // Detect snake running of the edge of the screen
-        if ( this.snake.notIntersects(this.inBounds) || this.snake.isSteppingOnTail() )
-          this.gameOver();
       }
     }
   ],
