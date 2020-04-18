@@ -14,7 +14,7 @@ foam.CLASS({
   name: 'Cell',
   extends: 'foam.u2.Element',
 
-  imports: [ 'board' ],
+  imports: [ 'board', 'gameOver' ],
 
   constants: {
     COLOURS: [ '', 'green', 'blue', 'orange', 'red', 'red', 'red', 'red' ],
@@ -63,6 +63,9 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'covered',
+      postSet: function(_, covered) {
+        if ( ! covered && this.mined ) this.gameOver();
+      },
       value: true
     },
     {

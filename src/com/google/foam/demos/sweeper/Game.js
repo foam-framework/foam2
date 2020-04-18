@@ -16,6 +16,8 @@ foam.CLASS({
 
   requires: [ 'com.google.foam.demos.sweeper.Board' ],
 
+  exports: [ 'gameOver' ],
+
   properties: [
     {
       class: 'Int',
@@ -24,6 +26,9 @@ foam.CLASS({
     {
       name: 'board',
       factory: function() { return this.Board.create(); }
+    },
+    {
+      name: 'gameOver_'
     }
   ],
 
@@ -32,6 +37,10 @@ foam.CLASS({
       this.SUPER();
       this.add(this.time$).tag('br').add(this.board);
       this.tick();
+    },
+
+    function gameOver() {
+      this.gameOver_ = true;
     }
   ],
 
@@ -40,7 +49,11 @@ foam.CLASS({
       name: 'tick',
       isMerged: true,
       mergeDelay: 1000,
-      code: function() { this.time++; this.tick(); }
+      code: function() {
+        if ( this.gameOver_ ) return;
+        this.time++;
+        this.tick();
+      }
     }
   ]
 });
