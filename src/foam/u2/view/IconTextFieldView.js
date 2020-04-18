@@ -39,6 +39,10 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'onKey'
+    },
+    {
+      class: 'String',
+      name: 'fromPropertyName'
     }
   ],
 
@@ -51,6 +55,7 @@ foam.CLASS({
           data: this.icon
         })
           .addClass(this.myClass('icon'))
+          .attr('name', this.fromPropertyName + 'Icon')
         .end()
         .start(this.TextField, {
           type: this.type,
@@ -59,12 +64,13 @@ foam.CLASS({
           onKey: this.onKey
         })
           .addClass(this.myClass('input'))
+          .attr('name', this.fromPropertyName + 'Input')
         .end()
       .end();
     },
 
     function fromProperty(prop) {
-
+      this.SUPER(prop);
       if ( ! this.placeholder && prop.placeholder ) {
         this.placeholder = prop.placeholder;
       }
@@ -72,6 +78,7 @@ foam.CLASS({
       if ( ! this.type && prop.type) {
         this.type = prop.type;
       }
+      this.fromPropertyName = prop.name;
     }
   ]
 })
