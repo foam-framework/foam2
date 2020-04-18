@@ -96,7 +96,7 @@ foam.CLASS({
         start('span').addClass(this.myClass('flag')).entity('#x2691').end();
 
       if ( this.mined ) {
-        this.start('font').entity('#x2699').end();
+        this.start('font').style({'padding-left':'4px'}).entity('#x2699').end();
       }
 
       if ( ! this.mined && this.mineCount ) {
@@ -106,7 +106,7 @@ foam.CLASS({
   ],
 
   listeners: [
-    function mark(e)  { this.marked = ! this.marked; e.preventDefault(); },
-    function sweep(e) { this.covered = false; }
+    function mark(e)  { if ( this.covered ) this.marked = ! this.marked; e.preventDefault(); },
+    function sweep(e) { if ( ! this.marked ) this.covered = false; }
   ]
 });

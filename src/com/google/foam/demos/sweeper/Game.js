@@ -18,6 +18,13 @@ foam.CLASS({
 
   exports: [ 'gameOver' ],
 
+  css: `
+    ^ {
+      font-family: sans-serif;
+      margin: 20px;
+    }
+  `,
+
   properties: [
     {
       class: 'Int',
@@ -28,19 +35,29 @@ foam.CLASS({
       factory: function() { return this.Board.create(); }
     },
     {
-      name: 'gameOver_'
+      class: 'Boolean',
+      name: 'isGameOver'
     }
   ],
 
   methods: [
     function init() {
       this.SUPER();
-      this.add(this.time$).tag('br').add(this.board);
+      this.
+        addClass(this.myClass()).
+        add('Time: ', this.time$).
+        start('span').
+          show(this.isGameOver_$).
+          style({color: 'red', "margin-Left": "250px"}).
+          add('Game Over!').
+        end().
+        br().
+        add(this.board);
       this.tick();
     },
 
     function gameOver() {
-      this.gameOver_ = true;
+      this.isGameOver_ = true;
     }
   ],
 
@@ -50,7 +67,7 @@ foam.CLASS({
       isMerged: true,
       mergeDelay: 1000,
       code: function() {
-        if ( this.gameOver_ ) return;
+        if ( this.isGameOver_ ) return;
         this.time++;
         this.tick();
       }
