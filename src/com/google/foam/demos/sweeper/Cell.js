@@ -14,7 +14,7 @@ foam.CLASS({
   name: 'Cell',
   extends: 'foam.u2.Element',
 
-  imports: [ 'board', 'gameOver' ],
+  imports: [ 'board', 'youLose', 'unminedCount' ],
 
   constants: {
     COLOURS: [ '', 'green', 'blue', 'orange', 'red', 'red', 'red', 'red' ],
@@ -63,8 +63,10 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'covered',
-      postSet: function(_, covered) {
-        if ( ! covered && this.mined ) this.gameOver();
+      postSet: function(old, covered) {
+        if ( old && ! covered ) {
+          if ( this.mined ) this.youLose(); else this.unminedCount--;
+        }
       },
       value: true
     },
@@ -87,6 +89,8 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      if ( ! this.mined ) this.unminedCount++;
+
       this.
         setNodeName('span').
         addClass(this.myClass()).

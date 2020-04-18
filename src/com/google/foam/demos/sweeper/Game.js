@@ -19,12 +19,13 @@ foam.CLASS({
     'foam.audio.Speak'
   ],
 
-  exports: [ 'gameOver' ],
+  exports: [ 'youLose', 'unminedCount' ],
 
   css: `
     ^ {
       font-family: sans-serif;
       margin: 20px;
+      width: 394px;
     }
   `,
 
@@ -39,7 +40,16 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'isGameOver'
+      name: 'isYouWin'
+    },
+    {
+      class: 'Boolean',
+      name: 'isYouLose'
+    },
+    {
+      class: 'Int',
+      name: 'unminedCount',
+      postSet: function(_, count) { if ( ! count ) this.youWin(); }
     }
   ],
 
@@ -50,18 +60,28 @@ foam.CLASS({
         addClass(this.myClass()).
         add('Time: ', this.time$).
         start('span').
-          show(this.isGameOver_$).
-          style({color: 'red', "margin-Left": "250px"}).
-          add('Game Over!').
+          show(this.isYouLose$).
+          style({color: 'red', float: "right"}).
+          add('You Lose!').
+        end().
+        start('span').
+          show(this.isYouWin$).
+          style({color: 'green', float: "right"}).
+          add('You Win!').
         end().
         br().
         add(this.board);
       this.tick();
     },
 
-    function gameOver() {
-      this.isGameOver_ = true;
+    function youLose() {
+      this.isYouLose = true;
       this.Speak.create({text: "Boom! Game Over."}).play();
+    },
+
+    function youWin() {
+      this.isYouWin = true;
+      this.Speak.create({text: "You Win!"}).play();
     }
   ],
 
@@ -71,7 +91,7 @@ foam.CLASS({
       isMerged: true,
       mergeDelay: 1000,
       code: function() {
-        if ( this.isGameOver_ ) return;
+        if ( this.isYouWin || this.isYouLose ) return;
         this.time++;
         this.tick();
       }

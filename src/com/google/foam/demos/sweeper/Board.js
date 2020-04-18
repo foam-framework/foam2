@@ -28,7 +28,7 @@ foam.CLASS({
   `,
 
   properties: [
-    [ 'width', 14 ],
+    [ 'width',  14 ],
     [ 'height', 14 ],
     {
       name: 'cells',
