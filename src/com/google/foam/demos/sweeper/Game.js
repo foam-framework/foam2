@@ -14,7 +14,10 @@ foam.CLASS({
   name: 'Game',
   extends: 'foam.u2.Element',
 
-  requires: [ 'com.google.foam.demos.sweeper.Board' ],
+  requires: [
+    'com.google.foam.demos.sweeper.Board',
+    'foam.audio.Speak'
+  ],
 
   exports: [ 'gameOver' ],
 
@@ -58,6 +61,7 @@ foam.CLASS({
 
     function gameOver() {
       this.isGameOver_ = true;
+      this.Speak.create({text: "Boom! Game Over."}).play();
     }
   ],
 
