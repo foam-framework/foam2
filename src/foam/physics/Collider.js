@@ -66,9 +66,10 @@ foam.CLASS({
 
     function detectCollisions() {
       /* implicit k-d-tree divide-and-conquer algorithm */
-      // this.detectCollisions_(0, this.children.length-1, 'x', false, '');
-      // TODO: put back above line when properly supports mixing circles and squares
-      this.detectCollisions__(0, this.children.length-1, 'x', false, '');
+      this.detectCollisions_(0, this.children.length-1, 'x', false, '');
+
+      // simpler and less efficient version, use to debug above
+      // this.detectCollisions__(0, this.children.length-1, 'x', false, '');
     },
 
     function detectCollisions__(start, end) {
@@ -93,23 +94,23 @@ foam.CLASS({
     },
 
     function choosePivot(start, end, axis) {
+      axis = axis + '_';
       var p = 0, cs = this.children, n = end-start;
       for ( var i = start ; i <= end ; i++ ) p += cs[i][axis] / n;
       return p;
     },
 
-    // TODO: Add support for rectangular objects
     function detectCollisions_(start, end, axis, oneD) {
       if ( start >= end ) return;
 
-      var cs = this.children;
-      var pivot = this.choosePivot(start, end, axis);
+      var cs       = this.children;
+      var pivot    = this.choosePivot(start, end, axis);
       var nextAxis = oneD ? axis : axis === 'x' ? 'y' : 'x' ;
 
       var p = start;
       for ( var i = start ; i <= end ; i++ ) {
         var c = cs[i];
-        if ( c[axis] - c.radius < pivot ) {
+        if ( c[axis == 'x' ? 'left_' : 'top_']  < pivot ) {
           var t = cs[p];
           cs[p] = c;
           cs[i] = t;
@@ -129,7 +130,7 @@ foam.CLASS({
         p--;
         for ( var i = p ; i >= start ; i-- ) {
           var c = cs[i];
-          if ( c[axis] + c.radius > pivot ) {
+          if ( c[axis == 'x' ? 'right_' : 'bottom_'] > pivot ) {
             var t = cs[p];
             cs[p] = c;
             cs[i] = t;
@@ -148,17 +149,20 @@ foam.CLASS({
       }
     },
 
-    // TODO: add support for rectangles
+    function angleOfImpact(c1, c2) {
+      return Math.atan2(c2.y_-c1.y_, c2.x_-c1.x_);
+    },
+
     function collide(c1, c2) {
       c1.collideWith && c1.collideWith(c2);
       c2.collideWith && c2.collideWith(c1);
 
       if ( ! c1.mass || ! c2.mass ) return;
 
-      var a  = Math.atan2(c2.y-c1.y, c2.x-c1.x);
+      var a  = this.angleOfImpact(c1, c2);
       var m1 =  c1.momentumAtAngle(a);
       var m2 = -c2.momentumAtAngle(a);
-      var m  = ( m1 + m2 )/2;
+      var m  = (m1 + m2) * 2;
 
       // ensure a minimum amount of momentum so that objects don't overlap
       if ( m >= 0 ) {
