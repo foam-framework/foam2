@@ -125,8 +125,8 @@ foam.CLASS({
 
       // Position Paddles
       this.lPaddle.x = 25;
-      this.rPaddle.x = this.canvas.width-25-this.rPaddle.width;
-      this.lPaddle.y = this.rPaddle.y = (this.canvas.height-this.rPaddle.height)/2;
+      this.rPaddle.x = this.canvas.width-25;
+      this.lPaddle.y = this.rPaddle.y = this.canvas.height/2;
 
       // Setup Ball
       this.ball.x  = 210;
