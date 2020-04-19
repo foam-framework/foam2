@@ -12,7 +12,7 @@ foam.CLASS({
   documentation: 'A view for configuring table columns.',
 
   requires: [
-    'foam.u2.md.CheckBox'
+    'foam.u2.tag.ColumnSelect'
   ],
 
   css: `
@@ -31,8 +31,9 @@ foam.CLASS({
       this.SUPER();
       this
         .addClass(this.myClass())
-        .start('span').call(this.data.axiom.tableHeaderFormatter, [this.data.axiom]).end()
-        .tag(this.data.VISIBILITY);
+        .add(this.ColumnSelect.create({currentProperty: this.data.axiom, props: this.data.of.getAxiomsByClass(foam.core.Property)}));
+        // .start('span').call(this.data.axiom.tableHeaderFormatter, [this.data.axiom]).end()
+        // .tag(this.data.VISIBILITY);
     }
   ]
 });
