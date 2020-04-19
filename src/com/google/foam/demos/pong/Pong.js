@@ -201,8 +201,8 @@ foam.CLASS({
         var ball = this.ball;
 
         // Make sure the ball doesn't go too slow horizontally
-        if ( ball.vx > 0 && ball.vx < 5  ) ball.vx *= 1.1;
-        if ( ball.vx < 0 && ball.vx > -5 ) ball.vx *= 1.1;
+        if ( ball.vx > 0 && ball.vx < 5  ) ball.vx *= 1.01;
+        if ( ball.vx < 0 && ball.vx > -5 ) ball.vx *= 1.01;
 
         // Make sure the ball doesn't go too fast
         if ( ball.velocity >  10 ) ball.velocity =  10;
@@ -210,12 +210,12 @@ foam.CLASS({
 
         // Bounce off of top wall
         if ( ball.y - ball.radius <= 0 ) {
-          ball.vy *= -1;
+          ball.vy = Math.abs(ball.vy);
           this.onBounceOnWall();
         }
         // Bounce off of bottom wall
         if ( ball.y + ball.radius >= this.canvas.height ) {
-          ball.vy *= -1;
+          ball.vy = -Math.abs(ball.vy);
           this.onBounceOnWall();
         }
         // Bounce off of left wall
