@@ -571,22 +571,16 @@ foam.CLASS({
       this.resetRobotLocation();
 
       // Setup collision detection
-      this.collider.collide = (o1, o2) => {
-        if ( o2 == this.robot ) {
-          o2 = o1;
-          o1 = this.robot;
-        }
-        if ( o1 == this.robot ) {
-          if ( this.Door.isInstance(o2) ) {
-            if ( o2.isClosed ) {
-              this.hittingWall = true;
-              o2.askQuestion();
-            }
-          } else if ( this.Wall.isInstance(o2) ) {
+      this.robot.collideWith = (o) => {
+        if ( this.Door.isInstance(o) ) {
+          if ( o.isClosed ) {
             this.hittingWall = true;
-          } else if ( this.Exit.isInstance(o2) ) {
-            this.gameOver();
+            o.askQuestion();
           }
+        } else if ( this.Wall.isInstance(o) ) {
+          this.hittingWall = true;
+        } else if ( this.Exit.isInstance(o) ) {
+          this.gameOver();
         }
       };
 
