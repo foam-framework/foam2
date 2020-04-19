@@ -355,7 +355,7 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       // Set focus to receive keyboard input
-      this.focus().style({display:'flex'}).add(this.table);
+      this.focus().style({display:'flex', outline: 'none'}).add(this.table);
     },
 
     function gameOver() {
