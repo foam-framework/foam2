@@ -660,7 +660,7 @@ foam.CLASS({
       this.focus();
 
       // Create the HTML
-      this.style({display:'flex'}).add(this.maze, ' ', this.question$);
+      this.style({display: 'flex', outline: 'none'}).add(this.maze, ' ', this.question$);
     },
 
     function gameOver() {
