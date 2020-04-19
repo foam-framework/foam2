@@ -6,11 +6,12 @@
 
 foam.CLASS({
   package: 'com.google.foam.demos.bubbles',
-  name: 'Bubbles',
+  name: 'SquareBubbles',
   extends: 'foam.graphics.Box',
 
   requires: [
     'foam.physics.PhysicalCircle',
+    'foam.physics.PhysicalBox',
     'foam.physics.PhysicsEngine',
     'foam.util.Timer'
   ],
@@ -43,13 +44,14 @@ foam.CLASS({
 
       for ( var x = 0 ; x < N ; x++ ) {
         for ( var y = 0 ; y < N ; y++ ) {
-          var c = this.PhysicalCircle.create({
-            radius: 15,
+          var c = this.PhysicalBox.create({
+            width: 30,
+            height: 30,
             x: 400+(x-(N-1)/2)*70,
             y: 200+(y-(N-1)/2)*70,
-            arcWidth: 6,
             friction: 0.96,
             gravity: 0.03,
+            borderWidth: 5,
             border: this.hsl(x/N*100, (70+y/N*30), 60)
           });
           this.engine.add(c);

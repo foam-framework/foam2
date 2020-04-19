@@ -23,11 +23,12 @@ foam.CLASS({
     ^ {
       border: 1px solid gray;
       display: inline-block;
+      margin-top: 10px;
     }
   `,
 
   properties: [
-    [ 'width', 14 ],
+    [ 'width',  14 ],
     [ 'height', 14 ],
     {
       name: 'cells',

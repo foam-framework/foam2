@@ -14,7 +14,7 @@ foam.CLASS({
   name: 'Cell',
   extends: 'foam.u2.Element',
 
-  imports: [ 'board' ],
+  imports: [ 'board', 'youLose', 'unminedCount' ],
 
   constants: {
     COLOURS: [ '', 'green', 'blue', 'orange', 'red', 'red', 'red', 'red' ],
@@ -63,6 +63,11 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'covered',
+      postSet: function(old, covered) {
+        if ( old && ! covered ) {
+          if ( this.mined ) this.youLose(); else this.unminedCount--;
+        }
+      },
       value: true
     },
     {
@@ -84,6 +89,8 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      if ( ! this.mined ) this.unminedCount++;
+
       this.
         setNodeName('span').
         addClass(this.myClass()).
@@ -93,7 +100,7 @@ foam.CLASS({
         start('span').addClass(this.myClass('flag')).entity('#x2691').end();
 
       if ( this.mined ) {
-        this.start('font').entity('#x2699').end();
+        this.start('font').style({'padding-left':'4px'}).entity('#x2699').end();
       }
 
       if ( ! this.mined && this.mineCount ) {
@@ -103,7 +110,7 @@ foam.CLASS({
   ],
 
   listeners: [
-    function mark(e)  { this.marked = ! this.marked; e.preventDefault(); },
-    function sweep(e) { this.covered = false; }
+    function mark(e)  { if ( this.covered ) this.marked = ! this.marked; e.preventDefault(); },
+    function sweep(e) { if ( ! this.marked ) this.covered = false; }
   ]
 });

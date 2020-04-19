@@ -18,37 +18,22 @@
 foam.CLASS({
   package: 'com.google.foam.demos.pong',
   name: 'Ball',
-  extends: 'foam.graphics.Circle',
-
-  implements: [
-    'foam.physics.Physical',
-//    'foam.graphics.MotionBlur'
-  ],
-
-  properties: [
-    {
-      name: 'vx',
-      preSet: function(_, v) { return Math.sign(v) * Math.max(5, Math.abs(v)); }
-    }
-  ]
+  extends: 'foam.physics.PhysicalCircle'
 });
 
 
 foam.CLASS({
   package: 'com.google.foam.demos.pong',
   name: 'Paddle',
-  extends: 'foam.graphics.Box',
+  extends: 'foam.graphics.Arc',
 
-  implements: [
-    'foam.physics.Physical',
-//    'foam.graphics.Shadow'
-  ],
+  implements: [ 'foam.physics.Physical' ],
 
   properties: [
-    [ 'border', null ],
-    [ 'color', 'white' ],
-    [ 'width', 20 ],
-    [ 'height', 180 ],
+    [ 'radius', 80 ],
+    [ 'border', 'white' ],
+    [ 'color',  null ],
+    [ 'arcWidth', 10 ],
     {
       name: 'mass',
       factory: function() { return this.INFINITE_MASS; }
@@ -78,7 +63,7 @@ foam.CLASS({
   properties: [
     {
       name: 'canvas',
-      factory: function() { return this.Box.create({width: 1000, height: 300, color: 'lightgray'}); }
+      factory: function() { return this.Box.create({width: 1200, height: 600, color: 'lightgray'}); }
     },
     {
       name: 'ball',
@@ -86,11 +71,11 @@ foam.CLASS({
     },
     {
       name: 'lPaddle',
-      factory: function() { return this.Paddle.create(); }
+      factory: function() { return this.Paddle.create({end:Math.PI/2, start:-Math.PI/2}); }
     },
     {
       name: 'rPaddle',
-      factory: function() { return this.Paddle.create(); }
+      factory: function() { return this.Paddle.create({start:Math.PI/2, end:-Math.PI/2}); }
     },
     {
       class: 'Int',
@@ -106,41 +91,57 @@ foam.CLASS({
     }
   ],
 
-  listeners: [
-    {
-      name: 'onBallMove',
-      isFramed: true,
-      code: function() {
-        var ball = this.ball;
+  methods: [
+    function init() {
+      this.SUPER();
 
-        if ( ball.velocity >  20 ) ball.velocity =  20;
-        if ( ball.velocity < -20 ) ball.velocity = -20;
+      var lScoreLabel = this.Label.create({
+        text$:  this.lScore$,
+        align:  'center',
+        x:      this.canvas.width/2-120,
+        y:      25,
+        color:  'white',
+        font:   '70px Arial',
+        width:  0,
+        height: 70});
 
-        // Bounce off of top wall
-        if ( ball.y - ball.radius <= 0 ) {
-          ball.vy = Math.abs(ball.vy);
-        }
-        // Bounce off of bottom wall
-        if ( ball.y + ball.radius >= this.canvas.height ) {
-          ball.vy = -Math.abs(ball.vy);
-        }
-        // Bounce off of left wall
-        if ( ball.x <= 0 ) {
-          this.rScore++;
-          ball.x = 150;
-          ball.vx *= -1;
-        }
-        // Bounce off of right wall
-        if ( ball.x >= this.canvas.width ) {
-          this.lScore++;
-          ball.x = this.canvas.width - 150;
-          ball.vx *= -1;
-        }
-        // Reset scores
-        if ( this.lScore == 100 || this.rScore == 100 ) {
-          this.lScore = this.rScore = 0;
-        }
-      }
+      var rScoreLabel = this.Label.create({
+        text$:  this.rScore$,
+        align:  'center',
+        x:      this.canvas.width/2+100,
+        y:      25,
+        color:  'white',
+        font:   '70px Arial',
+        width:  0,
+        height: 70});
+
+      this.canvas.add(
+          this.Box.create({x: this.canvas.width/2-5, width:10, height: this.canvas.height, border:'rgba(0,0,0,0)' , color: 'white'}),
+          this.ball,
+          lScoreLabel,
+          rScoreLabel,
+          this.lPaddle,
+          this.rPaddle);
+
+      // Position Paddles
+      this.lPaddle.x = 25;
+      this.rPaddle.x = this.canvas.width-25;
+      this.lPaddle.y = this.rPaddle.y = this.canvas.height/2;
+
+      // Setup Ball
+      this.ball.x  = 210;
+      this.ball.y  = this.rPaddle.y;
+      this.ball.vx = this.ball.vy = 10;
+
+      this.collider.onTick.sub(this.onBallMove);
+
+      // Setup Physics
+      this.collider.add(this.ball, this.lPaddle, this.rPaddle).start();
+    },
+
+    function initE() {
+      this.SUPER();
+      this.style({outline: 'none'}).focus().add(this.canvas);
     }
   ],
 
@@ -167,60 +168,46 @@ foam.CLASS({
     }
   ],
 
-  methods: [
-    function initE() {
-      // TODO: CViews don't attach keyboard listeners yet, so
-      // we wrap canvas in an Element. This extra level can
-      // be removed when it's supported.
-      this.SUPER();
-      this.style({outline: 'none'}).focus().add(this.canvas);
-    },
+  listeners: [
+    {
+      name: 'onBallMove',
+      isFramed: true,
+      code: function() {
+        var ball = this.ball;
 
-    function init() {
-      this.SUPER();
+        // Make sure the ball doesn't go too slow horizontally
+        if ( ball.vx > 0 && ball.vx < 5  ) ball.vx *= 1.1;
+        if ( ball.vx < 0 && ball.vx > -5 ) ball.vx *= 1.1;
 
-      var lScoreLabel = this.Label.create({
-        text$: this.lScore$,
-        align: 'center',
-        x: this.canvas.width/4,
-        y: 25,
-        color: 'white',
-        font: '70px Arial',
-        width: 200,
-        height: 70});
+        // Make sure the ball doesn't go too fast
+        if ( ball.velocity >  10 ) ball.velocity =  10;
+        if ( ball.velocity < -10 ) ball.velocity = -10;
 
-      var rScoreLabel = this.Label.create({
-        text$: this.rScore$,
-        align: 'center',
-        x: this.canvas.width/2,
-        y: 25,
-        color: 'white',
-        font: '70px Arial',
-        width: 200,
-        height: 70});
-
-      this.canvas.add(
-          this.Box.create({x: this.canvas.width/2-5, width:10, height: this.canvas.height, border:'rgba(0,0,0,0)' , color: 'white'}),
-          this.ball,
-          lScoreLabel,
-          rScoreLabel,
-          this.lPaddle,
-          this.rPaddle);
-
-      // Position Paddles
-      this.lPaddle.x = 25;
-      this.rPaddle.x = this.canvas.width-25-this.rPaddle.width;
-      this.lPaddle.y = this.rPaddle.y = (this.canvas.height-this.rPaddle.height)/2;
-
-      // Setup Ball
-      this.ball.x  = 110;
-      this.ball.y  = this.rPaddle.y;
-      this.ball.vx = this.ball.vy = 10;
-
-      this.ball.x$.sub(this.onBallMove);
-
-      // Setup Physics
-      this.collider.add(this.ball, this.lPaddle, this.rPaddle).start();
+        // Bounce off of top wall
+        if ( ball.y - ball.radius <= 0 ) {
+          ball.vy *= -1;
+        }
+        // Bounce off of bottom wall
+        if ( ball.y + ball.radius >= this.canvas.height ) {
+          ball.vy *= -1;
+        }
+        // Bounce off of left wall
+        if ( ball.x <= 0 ) {
+          this.rScore++;
+          ball.x = 150;
+          ball.vx *= -1;
+        }
+        // Bounce off of right wall
+        if ( ball.x >= this.canvas.width ) {
+          this.lScore++;
+          ball.x = this.canvas.width - 150;
+          ball.vx *= -1;
+        }
+        // Reset scores
+        if ( this.lScore == 100 || this.rScore == 100 ) {
+          this.lScore = this.rScore = 0;
+        }
+      }
     }
   ]
 });
