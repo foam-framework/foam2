@@ -16,7 +16,7 @@ foam.CLASS({
 
   implements: [
     'foam.core.ContextAgent',
-    'foam.nanos.NanoService'
+//    'foam.nanos.NanoService'
   ],
 
   javaImports: [

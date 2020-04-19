@@ -20,15 +20,15 @@ foam.CLASS({
   documentation: `Manage global indexes and hashes`,
 
   javaImports: [
+    'foam.dao.ArraySink',
     'foam.dao.DAO',
+    'static foam.mlang.MLang.*',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'java.nio.charset.StandardCharsets',
     'java.security.MessageDigest',
-    'java.util.List',
     'java.util.ArrayList',
-    'static foam.mlang.MLang.*',
-    'foam.dao.ArraySink'
+    'java.util.List'
   ],
 
   axioms: [
@@ -130,12 +130,12 @@ foam.CLASS({
       name: 'link',
       javaCode: `
       DaggerLinks links = getNextLinks(x);
-
       entry.setIndex(links.getGlobalIndex());
       entry.setIndex1(links.getLink1().getIndex());
       entry.setHash1(links.getLink1().getHash());
       entry.setIndex2(links.getLink2().getIndex());
       entry.setHash2(links.getLink2().getHash());
+      getLogger().debug("link", entry.getIndex(), entry.getIndex1(), entry.getHash1(), entry.getIndex2(), entry.getHash2());
 
       return entry;
       `
@@ -144,6 +144,7 @@ foam.CLASS({
       name: 'hash',
       javaCode: `
       // TODO: also getProvider
+       getLogger().debug("hash", entry.getIndex(), entry.getIndex1(), entry.getHash1(), entry.getIndex2(), entry.getHash2());
       MessageDigest md = MessageDigest.getInstance(getHashingAlgorithm());
       md.update(Long.toString(entry.getIndex1()).getBytes(StandardCharsets.UTF_8));
       md.update(entry.getHash1().getBytes(StandardCharsets.UTF_8));
@@ -161,37 +162,21 @@ foam.CLASS({
       documentation: 'Verify entry hash, and compare hashes of parent indexes.',
       name: 'verify',
       javaCode: `
+        getLogger().debug("verify", entry.getIndex(), entry.getIndex1(), entry.getIndex2());
+
         DAO dao = (DAO) getX().get("internalMedusaEntryDAO");
+        MedusaEntry parent1 = (MedusaEntry) dao.find(EQ(MedusaEntry.INDEX, entry.getIndex1()));
+        if ( parent1 == null ) {
+          getLogger().error("verify", "parent not found", entry.getIndex1(), "entry", entry.getId());
+          throw new RuntimeException("Hash Verification Failed");
+        }
+        MedusaEntry parent2 = (MedusaEntry) dao.find(EQ(MedusaEntry.INDEX, entry.getIndex2()));
+        if ( parent2 == null ) {
+          getLogger().error("verify", "parent not found", entry.getIndex2(), "entry", entry.getId());
+          throw new RuntimeException("Hash Verification Failed");
+        }
+        getLogger().debug("verify", entry.getIndex(), "parent", parent1.getIndex(), parent1.getHash(), parent2.getIndex(), parent2.getHash());
 
-        List<MedusaEntry> list1 = (ArrayList) ((ArraySink) dao.where(
-          EQ(MedusaEntry.INDEX, entry.getIndex1())
-          )
-          .select(new ArraySink())).getArray();
-        List<MedusaEntry> list2 = (ArrayList) ((ArraySink) dao.where(
-          EQ(MedusaEntry.INDEX, entry.getIndex2())
-          )
-          .select(new ArraySink())).getArray();
-
-        if ( list1.size() == 0 ) {
-          getLogger().error("verify", "entry not found", "index1", entry.getIndex1(), entry.getIndex(), entry.getId());
-          throw new RuntimeException("Not Found MedusaEntry with index: " + entry.getIndex1());
-        }
-        if ( list2.size() == 0 ) {
-          getLogger().error("verify", "entry not found", "index2", entry.getIndex2(), entry.getIndex(), entry.getId());
-          throw new RuntimeException("Not Found MedusaEntry with index: " + entry.getIndex2());
-        }
-
-        MedusaEntry parent1 = list1.get(0);
-        MedusaEntry parent2 = list2.get(0);
-        if ( ! parent1.getHash().equals(entry.getHash1()) ) {
-          getLogger().error("verify", "hash1 != parent1.hash", entry.getIndex(), entry.getId());
-          throw new RuntimeException("Hash Verification Failed.");
-        }
-        if ( ! parent2.getHash().equals(entry.getHash2()) ) {
-          getLogger().error("verify", "hash2 != parent2.hash", entry.getIndex(), entry.getId());
-          throw new RuntimeException("Hash Verification Failed.");
-        }
-        //Recalculate hash.
         try {
           MessageDigest md = MessageDigest.getInstance(getHashingAlgorithm());
           md.update(Long.toString(parent1.getIndex()).getBytes(StandardCharsets.UTF_8));
@@ -205,7 +190,7 @@ foam.CLASS({
             calculatedHash = byte2Hex(md.digest());
           }
           if ( ! calculatedHash.equals(entry.getHash()) ) {
-            getLogger().error("verify", "hash verification failure", entry.getIndex(), entry.getId());
+            getLogger().error("verify", "hash", "fail", entry.getIndex(), entry.getId());
 //            throw new RuntimeException("Hash verification failed.");
           }
         } catch ( java.security.NoSuchAlgorithmException e ) {

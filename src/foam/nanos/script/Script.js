@@ -10,7 +10,8 @@ foam.CLASS({
 
   implements: [
     'foam.nanos.auth.EnabledAware',
-    'foam.nanos.auth.LastModifiedByAware'
+    'foam.nanos.auth.LastModifiedByAware',
+    'foam.nanos.medusa.Clusterable'
   ],
 
   requires: [
@@ -40,7 +41,12 @@ foam.CLASS({
   ],
 
   tableColumns: [
-    'id', 'server', 'description', 'lastDuration', 'status', 'run'
+    'id',
+    'server',
+    'description',
+    'lastDuration',
+    'status',
+    'run'
   ],
 
   searchColumns: ['id', 'description'],
@@ -96,6 +102,12 @@ foam.CLASS({
           [ 6, 'High'   ]
         ]
       }
+    },
+    {
+      documentation: 'A non-clusterable script can run on all instances, and any run info will be stored locally',
+      name: 'clusterable',
+      class: 'Boolean',
+      value: true
     },
     {
       class: 'DateTime',
@@ -252,24 +264,23 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        // Allow boot script to run on all instances,
-        // otherwise, only on ONLINE, non-Node instances.
         String startScript = System.getProperty("foam.main", "main");
-        if ( ! getId().equals(startScript) ) {
+        // Run on all instances if:
+        // - startup "main" script
+        // - not-clusterable and Online
+        // otherwise only on
+        // - Primary Mediator - REVIEW
+
+        if ( ! getId().equals(startScript) &&
+             getClusterable() ) {
           foam.nanos.medusa.ClusterConfigSupport support = (foam.nanos.medusa.ClusterConfigSupport) x.get("clusterConfigSupport");
           if ( support != null ) {
-            // TODO: considering how to only run on one of the secondaries, could be largest secondary.
             foam.nanos.medusa.ClusterConfig config = support.getConfig(x, support.getConfigId());
             if ( config.getType() == foam.nanos.medusa.MedusaType.MEDIATOR &&
-                 ! config.getIsPrimary() ) {
-              ((Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "Medusa disabled Script execution on this instance.", getId(), getDescription());
-              //throw new RuntimeException("Script execution disabled.");
-              return;
-            }
-            if ( config.getType() == foam.nanos.medusa.MedusaType.NODE ||
-                 config.getStatus() != foam.nanos.medusa.Status.ONLINE ) {
-              ((Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "Medusa disabled Script execution on this instance.", getId(), getDescription());
-              //throw new RuntimeException("Script execution disabled.");
+                 ! config.getIsPrimary() ||
+                config.getType() == foam.nanos.medusa.MedusaType.NODE ||
+                config.getStatus() != foam.nanos.medusa.Status.ONLINE ) {
+              ((Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "Script execution disabled", getId(), getDescription());
               return;
             }
           }

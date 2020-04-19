@@ -308,7 +308,11 @@ foam.CLASS({
       try {
         while ( true ) {
           List<MedusaEntry> list = ((ArraySink) getDelegate()
-            .where(EQ(MedusaEntry.INDEX, getIndex() + 1))
+            .where(
+              AND(
+                EQ(MedusaEntry.INDEX, getIndex() + 1),
+                EQ(MedusaEntry.HAS_CONSENSUS, true)
+              ))
             .limit(1)
             .select(new ArraySink())).getArray();
 

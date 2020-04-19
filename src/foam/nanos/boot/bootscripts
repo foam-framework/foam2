@@ -1,6 +1,7 @@
 p({
   "class":"foam.nanos.script.Script",
   "id":"main",
+  "clusterable":false,
   "code":"""
   /* Set AppConfig version from nanopay jar manifest*/
   import foam.nanos.app.Mode;

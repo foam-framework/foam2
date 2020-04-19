@@ -21,43 +21,43 @@ foam.ENUM({
     },
     {
       name: 'FIND',
-      value: 'find'
+      label: 'find'
     },
     {
       name: 'FIND_',
-      value: 'find_'
+      label: 'find_'
     },
     {
       name: 'SELECT',
-      value: 'select'
+      label: 'select'
     },
     {
       name: 'SELECT_',
-      value: 'select_'
+      label: 'select_'
     },
     {
       name: 'REMOVE',
-      value: 'remove'
+      label: 'remove'
     },
     {
       name: 'REMOVE_',
-      value: 'remove_'
+      label: 'remove_'
     },
     {
       name: 'REMOVE_ALL',
-      value: 'removeAll'
+      label: 'removeAll'
     },
     {
       name: 'REMOVE_ALL_',
-      value: 'removeAll_'
+      label: 'removeAll_'
     },
     {
       name: 'CMD',
-      value: 'cmd'
+      label: 'cmd'
     },
     {
       name: 'CMD_',
-      value: 'cmd_'
+      label: 'cmd_'
     }
   ]
 });
