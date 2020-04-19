@@ -550,6 +550,8 @@ foam.CLASS({
       hidden: true,
       value: true
     },
+    { name: 'x_',      hidden: true, transient: true, getter: function() { return this.x + this.width/2; } },
+    { name: 'y_',      hidden: true, transient: true, getter: function() { return this.y + this.height/2; } },
     { name: 'top_',    hidden: true, transient: true, getter: function() { return this.y; } },
     { name: 'left_',   hidden: true, transient: true, getter: function() { return this.x; } },
     { name: 'bottom_', hidden: true, transient: true, getter: function() { return this.y+this.height; } },
@@ -1014,6 +1016,8 @@ foam.CLASS({
       name: 'border',
       value: '#000000'
     },
+    { name: 'x_',      hidden: true, transient: true, getter: function() { return this.x; } },
+    { name: 'y_',      hidden: true, transient: true, getter: function() { return this.y; } },
     { name: 'top_',    hidden: true, transient: true, getter: function() { return this.y-this.radius; } },
     { name: 'left_',   hidden: true, transient: true, getter: function() { return this.x-this.radius; } },
     { name: 'bottom_', hidden: true, transient: true, getter: function() { return this.y+this.radius; } },
@@ -1031,7 +1035,22 @@ foam.CLASS({
         x.lineWidth = this.arcWidth;
         x.stroke();
       }
-   },
+    },
+
+    function hitTest(p) {
+     var r = this.radius + this.arcWidth/2 - 1;
+     return p.x*p.x + p.y*p.y <= r*r;
+    },
+
+    function intersects(c) {
+     if ( ! c.radius ) return c.intersects(this);
+     var r = this.radius + c.radius;
+     if ( this.border ) r += this.arcWidth/2-1;
+     if ( c.border    ) r += c.arcWidth/2-1;
+     var dx = this.x-c.x;
+     var dy = this.y-c.y;
+     return dx * dx + dy * dy <= r * r;
+    },
 
     function toE(args, X) {
       return this.Canvas.create({ cview: this }, X).attrs({
@@ -1072,21 +1091,6 @@ foam.CLASS({
   ],
 
   methods: [
-    function hitTest(p) {
-      var r = this.radius + this.arcWidth/2 - 1;
-      return p.x*p.x + p.y*p.y <= r*r;
-    },
-
-    function intersects(c) {
-      if ( ! c.radius ) return c.intersects(this);
-      var r = this.radius + c.radius;
-      if ( this.border ) r += this.arcWidth/2-1;
-      if ( c.border    ) r += c.arcWidth/2-1;
-      var dx = this.x-c.x;
-      var dy = this.y-c.y;
-      return dx * dx + dy * dy <= r * r;
-    },
-
     function paintSelf(x) {
       x.beginPath();
       x.arc(0, 0, this.radius, this.start, this.end);
@@ -1102,7 +1106,7 @@ foam.CLASS({
         x.lineWidth = this.arcWidth;
         x.stroke();
       }
-   }
+    }
   ]
 });
 
@@ -1163,6 +1167,8 @@ foam.CLASS({
       getter: function() { return 2 * this.radiusY; },
       setter: function(h) { this.radiusY = h / 2; }
     },
+    { name: 'x_',      hidden: true, transient: true, getter: function() { return this.x; } },
+    { name: 'y_',      hidden: true, transient: true, getter: function() { return this.y; } },
     { name: 'top_',    hidden: true, transient: true, getter: function() { return this.y; } },
     { name: 'left_',   hidden: true, transient: true, getter: function() { return this.x; } },
     { name: 'bottom_', hidden: true, transient: true, getter: function() { return this.y+2*this.radiusY; } },
