@@ -150,8 +150,10 @@ foam.CLASS({
       md.update(entry.getHash1().getBytes(StandardCharsets.UTF_8));
       md.update(Long.toString(entry.getIndex2()).getBytes(StandardCharsets.UTF_8));
       md.update(entry.getHash2().getBytes(StandardCharsets.UTF_8));
+      getLogger().debug("hash", "digest (no data)", byte2Hex(md.digest()));
       if ( entry.getData() != null ) {
         getLogger().debug("hash", entry.getIndex(), "data", entry.getData().getClass().getSimpleName());
+        getLogger().debug("hash", "digest (with data)", byte2Hex(entry.getData().hash(md)));
         return byte2Hex(entry.getData().hash(md));
       } else {
         return byte2Hex(md.digest());
@@ -183,8 +185,11 @@ foam.CLASS({
           md.update(parent1.getHash().getBytes(StandardCharsets.UTF_8));
           md.update(Long.toString(parent2.getIndex()).getBytes(StandardCharsets.UTF_8));
           md.update(parent2.getHash().getBytes(StandardCharsets.UTF_8));
+          getLogger().debug("verify", "digest (no data)", byte2Hex(md.digest()));
           String calculatedHash = null;
           if ( entry.getData() != null ) {
+            getLogger().debug("verify", entry.getIndex(), "data", entry.getData().getClass().getSimpleName());
+            getLogger().debug("verify", "digest (with data)", byte2Hex(entry.getData().hash(md)));
             calculatedHash = byte2Hex(entry.getData().hash(md));
           } else {
             calculatedHash = byte2Hex(md.digest());
