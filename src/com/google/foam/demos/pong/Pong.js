@@ -1,11 +1,8 @@
 /**
  * @license
- * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * Copyright 2015 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-
-// TODO:
-// sound effects
 
 foam.CLASS({
   package: 'com.google.foam.demos.pong',
@@ -42,6 +39,7 @@ foam.CLASS({
   requires: [
     'com.google.foam.demos.pong.Ball',
     'com.google.foam.demos.pong.Paddle',
+    'foam.audio.Beep',
     'foam.graphics.Box',
     'foam.graphics.CView',
     'foam.graphics.Label',
@@ -136,8 +134,24 @@ foam.CLASS({
 
       this.collider.onTick.sub(this.tick);
 
+      this.ball.collideWith = (o) => {
+        this.onBounceOnPaddle();
+      };
+
       // Setup Physics
       this.collider.add(this.ball, this.lPaddle, this.rPaddle).start();
+    },
+
+    function onBounceOnWall() {
+      this.Beep.create({duration: 60, type: 'sine', frequency: 220, envelope: true, attack: 5, decay: 5}).play();
+    },
+
+    function onBounceOnPaddle() {
+      this.Beep.create({duration: 70, type: 'sine', frequency: 330, envelope: true, attack: 5, decay: 5}).play();
+    },
+
+    function onScore() {
+      this.Beep.create({duration: 320, frequency: 180, envelope: true, attack: 5, decay: 5}).play();
     },
 
     function initE() {
@@ -197,22 +211,26 @@ foam.CLASS({
         // Bounce off of top wall
         if ( ball.y - ball.radius <= 0 ) {
           ball.vy *= -1;
+          this.onBounceOnWall();
         }
         // Bounce off of bottom wall
         if ( ball.y + ball.radius >= this.canvas.height ) {
           ball.vy *= -1;
+          this.onBounceOnWall();
         }
         // Bounce off of left wall
         if ( ball.x <= 0 ) {
           this.rScore++;
           ball.x = 150;
           ball.vx *= -1;
+          this.onScore();
         }
         // Bounce off of right wall
         if ( ball.x >= this.canvas.width ) {
           this.lScore++;
           ball.x = this.canvas.width - 150;
           ball.vx *= -1;
+          this.onScore();
         }
         // Reset scores
         if ( this.lScore == 100 || this.rScore == 100 ) {
