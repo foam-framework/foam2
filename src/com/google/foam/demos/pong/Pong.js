@@ -30,10 +30,10 @@ foam.CLASS({
   implements: [ 'foam.physics.Physical' ],
 
   properties: [
-    [ 'radius', 80 ],
-    [ 'border', 'white' ],
-    [ 'color',  null ],
-    [ 'arcWidth', 10 ],
+    [ 'radius',   80 ],
+    [ 'border',   'white' ],
+    [ 'color',    null ],
+    [ 'arcWidth', 12 ],
     {
       name: 'mass',
       factory: function() { return this.INFINITE_MASS; }
@@ -53,6 +53,7 @@ foam.CLASS({
     'foam.graphics.Box',
     'foam.graphics.CView',
     'foam.graphics.Label',
+    'foam.input.Gamepad',
     'foam.physics.PhysicsEngine'
   ],
 
@@ -64,6 +65,14 @@ foam.CLASS({
     {
       name: 'canvas',
       factory: function() { return this.Box.create({width: 1200, height: 600, color: 'lightgray'}); }
+    },
+    {
+      name: 'lGamepad',
+      factory: function() { return this.Gamepad.create(); }
+    },
+    {
+      name: 'rGamepad',
+      factory: function() { return this.Gamepad.create({id: 1}); }
     },
     {
       name: 'ball',
@@ -133,7 +142,7 @@ foam.CLASS({
       this.ball.y  = this.rPaddle.y;
       this.ball.vx = this.ball.vy = 10;
 
-      this.collider.onTick.sub(this.onBallMove);
+      this.collider.onTick.sub(this.tick);
 
       // Setup Physics
       this.collider.add(this.ball, this.lPaddle, this.rPaddle).start();
@@ -170,9 +179,15 @@ foam.CLASS({
 
   listeners: [
     {
-      name: 'onBallMove',
-      isFramed: true,
+      name: 'tick',
       code: function() {
+        this.lGamepad.update();
+        this.rGamepad.update();
+        if ( this.lGamepad.button0 ) this.lUp();
+        if ( this.lGamepad.button2 ) this.lDown();
+        if ( this.rGamepad.button0 ) this.rUp();
+        if ( this.rGamepad.button2 ) this.rDown();
+
         var ball = this.ball;
 
         // Make sure the ball doesn't go too slow horizontally
