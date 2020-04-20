@@ -94,8 +94,10 @@ foam.CLASS({
     },
 
     function choosePivot(start, end, axis) {
+      var cs = this.children;
+      while ( end && ! cs[end] ) end--;
       axis = axis + '_';
-      var p = 0, cs = this.children, n = end-start;
+      var p = 0, n = end-start;
       for ( var i = start ; i <= end ; i++ ) p += cs[i][axis] / n;
       return p;
     },
@@ -103,49 +105,55 @@ foam.CLASS({
     function detectCollisions_(start, end, axis, oneD) {
       if ( start >= end ) return;
 
-      var cs       = this.children;
-      var pivot    = this.choosePivot(start, end, axis);
-      var nextAxis = oneD ? axis : axis === 'x' ? 'y' : 'x' ;
+      try {
+        var cs       = this.children;
+        var pivot    = this.choosePivot(start, end, axis);
+        var nextAxis = oneD ? axis : axis === 'x' ? 'y' : 'x' ;
 
-      var p = start;
-      for ( var i = start ; i <= end ; i++ ) {
-        var c = cs[i];
-        if ( c[axis == 'x' ? 'left_' : 'top_']  < pivot ) {
-          var t = cs[p];
-          cs[p] = c;
-          cs[i] = t;
-          p++;
-        }
-      }
-
-      if ( p === end + 1 ) {
-        if ( oneD ) {
-          this.detectCollisions__(start, end);
-        } else {
-          this.detectCollisions_(start, end, nextAxis, true);
-        }
-      } else {
-        this.detectCollisions_(start, p-1, nextAxis, oneD);
-
-        p--;
-        for ( var i = p ; i >= start ; i-- ) {
+        var p = start;
+        for ( var i = start ; i <= end ; i++ ) {
           var c = cs[i];
-          if ( c[axis == 'x' ? 'right_' : 'bottom_'] > pivot ) {
+          if ( c[axis == 'x' ? 'left_' : 'top_']  < pivot ) {
             var t = cs[p];
             cs[p] = c;
             cs[i] = t;
-            p--;
+            p++;
           }
         }
-        if ( p === start-1 ) {
+
+        if ( p === end + 1 ) {
           if ( oneD ) {
             this.detectCollisions__(start, end);
           } else {
             this.detectCollisions_(start, end, nextAxis, true);
           }
         } else {
-          this.detectCollisions_(p+1, end, nextAxis, oneD);
+          this.detectCollisions_(start, p-1, nextAxis, oneD);
+
+          p--;
+          for ( var i = p ; i >= start ; i-- ) {
+            var c = cs[i];
+            if ( c[axis == 'x' ? 'right_' : 'bottom_'] > pivot ) {
+              var t = cs[p];
+              cs[p] = c;
+              cs[i] = t;
+              p--;
+            }
+          }
+          if ( p === start-1 ) {
+            if ( oneD ) {
+              this.detectCollisions__(start, end);
+            } else {
+              this.detectCollisions_(start, end, nextAxis, true);
+            }
+          } else {
+            this.detectCollisions_(p+1, end, nextAxis, oneD);
+          }
         }
+      } catch (x) {
+        // some collisions might result in the object being
+        // removed which could cause a NPE, so don't worry
+        // about it
       }
     },
 
