@@ -22,14 +22,12 @@ foam.CLASS({
     function init() {
       var age = this.snake.age;
 
-      this.snake.exploded$.sub(() => this.explode());
+      this.onDetach(this.snake.exploded$.sub(() => this.explode()));
 
-      var l = this.snake.age$.sub(() => {
-        if ( this.snake.age - age >= this.snake.length ) {
+      this.onDetach(this.snake.age$.sub(() => {
+        if ( this.snake.age - age >= this.snake.length )
           this.game.removeChild(this);
-          l.detach();
-        }
-      });
+      }));
     },
     function explode() {
       this.Animation.create({
@@ -62,7 +60,7 @@ foam.CLASS({
 
   properties: [
     [ 'color',    'red' ],
-    [ 'x',        240 ],
+    [ 'x',        40 ],
     [ 'y',        240 ],
     [ 'vx',       1 ],
     [ 'vy',       0 ],
@@ -228,7 +226,6 @@ foam.CLASS({
     function collideWith(o) {
       if ( this.Mushroom.isInstance(o) ) {
         o.explode();
-        this.game.removeChild(o);
       }
     }
   ]
@@ -284,7 +281,7 @@ foam.CLASS({
       postSet: function(_, score) { localStorage.snakeHighScore = score; }
     },
     {
-      name: 'table',
+      name: 'canvas',
       factory: function() {
         return this.Box.create({
           color:  'lightblue',
@@ -299,8 +296,8 @@ foam.CLASS({
         return this.Box.create({
           x: 2*this.R,
           y: 2*this.R,
-          width: this.table.width-4*this.R-1,
-          height: this.table.height-4*this.R-1})
+          width: this.canvas.width-4*this.R-1,
+          height: this.canvas.height-4*this.R-1})
         }
     },
     {
@@ -335,7 +332,7 @@ foam.CLASS({
         color:  'white',
         scaleX: 5,
         scaleY: 5,
-        x:      this.table.width-250,
+        x:      this.canvas.width-250,
         y:      25
       }));
 
@@ -364,42 +361,43 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       // Set focus to receive keyboard input
-      this.focus().style({display:'flex', outline: 'none'}).add(this.table);
+      this.focus().style({display:'flex', outline: 'none'}).add(this.canvas);
     },
 
     function gameOver() {
       this.timer.stop();
       this.collider.stop();
 
-      this.table.color = 'orange';
+      this.canvas.color = 'orange';
       this.addChild(this.Label.create({
         text:   'Game Over',
         align:  'center',
         color:  'white',
         scaleX: 10,
         scaleY: 10,
-        x:      this.table.width/2,
-        y:      this.table.height/2-100
+        x:      this.canvas.width/2,
+        y:      this.canvas.height/2-100
       }));
 
       this.Speak.create({text: 'Game Over'}).play();
     },
 
     function addChild(c) {
-      this.table.add(c);
+      this.canvas.add(c);
       if ( c.intersects ) this.collider.add(c);
     },
 
     function removeChild(c) {
-      this.table.remove(c);
+      this.canvas.remove(c);
       if ( c.intersects ) this.collider.remove(c);
+      c.detach();
     },
 
     function addFood() {
       var R = this.R;
       var f = this.Food.create({
-        x: Math.round(1+Math.random()*(this.table.width -4*R)/R)*2*R,
-        y: Math.round(1+Math.random()*(this.table.height-4*R)/R)*2*R,
+        x: Math.round(1+Math.random()*(this.canvas.width -4*R)/R)*2*R,
+        y: Math.round(1+Math.random()*(this.canvas.height-4*R)/R)*2*R,
       });
       this.addChild(f);
     },
@@ -407,8 +405,8 @@ foam.CLASS({
     function addMushroom() {
       var R = this.R;
       var m = this.Mushroom.create({
-        x:      Math.round(1+Math.random()*(this.table.width -4*R)/R)*2*R,
-        y:      Math.round(1+Math.random()*(this.table.height-4*R)/R)*2*R,
+        x:      Math.round(1+Math.random()*(this.canvas.width -4*R)/R)*2*R,
+        y:      Math.round(1+Math.random()*(this.canvas.height-4*R)/R)*2*R,
         scaleX: 0.1,
         scaleY: 0.1});
 
