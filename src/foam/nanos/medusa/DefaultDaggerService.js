@@ -104,7 +104,6 @@ foam.CLASS({
       name: 'start',
       javaCode: `
       DAO dao = (DAO) getX().get("internalMedusaEntryDAO");
-
       MedusaEntry entry = new MedusaEntry();
       entry.setIndex(getNextGlobalIndex(getX()));
       entry.setIndex1(-1L);
@@ -144,16 +143,17 @@ foam.CLASS({
       name: 'hash',
       javaCode: `
       // TODO: also getProvider
-       getLogger().debug("hash", entry.getIndex(), entry.getIndex1(), entry.getHash1(), entry.getIndex2(), entry.getHash2());
+      getLogger().debug("hash", entry.getIndex(), entry.getIndex1(), entry.getIndex2());
+//      getLogger().debug("hash", entry.getIndex(), entry.getIndex1(), entry.getHash1(), entry.getIndex2(), entry.getHash2());
       MessageDigest md = MessageDigest.getInstance(getHashingAlgorithm());
       md.update(Long.toString(entry.getIndex1()).getBytes(StandardCharsets.UTF_8));
       md.update(entry.getHash1().getBytes(StandardCharsets.UTF_8));
       md.update(Long.toString(entry.getIndex2()).getBytes(StandardCharsets.UTF_8));
       md.update(entry.getHash2().getBytes(StandardCharsets.UTF_8));
-      getLogger().debug("hash", "digest (no data)", byte2Hex(md.digest()));
+      getLogger().debug("hash", entry.getIndex(), "digest (without data)", byte2Hex(md.digest()));
       if ( entry.getData() != null ) {
+        getLogger().debug("hash", entry.getIndex(), "digest (with data)", byte2Hex(entry.getData().hash(md)));
         getLogger().debug("hash", entry.getIndex(), "data", entry.getData().getClass().getSimpleName());
-        getLogger().debug("hash", "digest (with data)", byte2Hex(entry.getData().hash(md)));
         return byte2Hex(entry.getData().hash(md));
       } else {
         return byte2Hex(md.digest());
@@ -169,15 +169,14 @@ foam.CLASS({
         DAO dao = (DAO) getX().get("internalMedusaEntryDAO");
         MedusaEntry parent1 = (MedusaEntry) dao.find(EQ(MedusaEntry.INDEX, entry.getIndex1()));
         if ( parent1 == null ) {
-          getLogger().error("verify", "parent not found", entry.getIndex1(), "entry", entry.getId());
+          getLogger().error("verify", entry.getIndex(), "parent not found", entry.getIndex1(), "entry", entry.getId());
           throw new RuntimeException("Hash Verification Failed");
         }
         MedusaEntry parent2 = (MedusaEntry) dao.find(EQ(MedusaEntry.INDEX, entry.getIndex2()));
         if ( parent2 == null ) {
-          getLogger().error("verify", "parent not found", entry.getIndex2(), "entry", entry.getId());
+          getLogger().error("verify", entry.getIndex(), "parent not found", entry.getIndex2(), "entry", entry.getId());
           throw new RuntimeException("Hash Verification Failed");
         }
-        getLogger().debug("verify", entry.getIndex(), "parent", parent1.getIndex(), parent1.getHash(), parent2.getIndex(), parent2.getHash());
 
         try {
           MessageDigest md = MessageDigest.getInstance(getHashingAlgorithm());
@@ -185,17 +184,17 @@ foam.CLASS({
           md.update(parent1.getHash().getBytes(StandardCharsets.UTF_8));
           md.update(Long.toString(parent2.getIndex()).getBytes(StandardCharsets.UTF_8));
           md.update(parent2.getHash().getBytes(StandardCharsets.UTF_8));
-          getLogger().debug("verify", "digest (no data)", byte2Hex(md.digest()));
+          getLogger().debug("verify", entry.getIndex(), "digest (without data)", byte2Hex(md.digest()));
           String calculatedHash = null;
           if ( entry.getData() != null ) {
+            getLogger().debug("verify", entry.getIndex(), "digest (with data)", byte2Hex(entry.getData().hash(md)));
             getLogger().debug("verify", entry.getIndex(), "data", entry.getData().getClass().getSimpleName());
-            getLogger().debug("verify", "digest (with data)", byte2Hex(entry.getData().hash(md)));
             calculatedHash = byte2Hex(entry.getData().hash(md));
           } else {
             calculatedHash = byte2Hex(md.digest());
           }
           if ( ! calculatedHash.equals(entry.getHash()) ) {
-            getLogger().error("verify", "hash", "fail", entry.getIndex(), entry.getId());
+            getLogger().error("verify", entry.getIndex(), "hash", "fail", entry.getId());
 //            throw new RuntimeException("Hash verification failed.");
           }
         } catch ( java.security.NoSuchAlgorithmException e ) {
