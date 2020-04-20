@@ -225,7 +225,12 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'includeInDigest',
-      value: true
+      value: 'return ! ( getStorageTransient() || getClusterTransient() );'
+    },
+    {
+      class: 'Boolean',
+      name: 'includeInSignature',
+      value: 'return includeInDigest();'
     },
     {
       class: 'Boolean',
