@@ -128,7 +128,6 @@ foam.CLASS({
     },
     'thisPropertyView',
     'views',
-    'headerProp'
   ],
 
   methods: [
@@ -141,10 +140,10 @@ foam.CLASS({
       });
 
       this.isPropertySelected$.sub(function() {
-        if ( self.thisPropertyView.name !== self.selectedProp[self.selectedProp.length - 1].name ) {
+        if ( self.thisPropertyView.currentProperty.name !== self.selectedProp[self.selectedProp.length - 1] ) {
           self.views.push(self.thisPropertyView);
-          for ( var i = 0; i < this.views.length - 1; i++) {
-            if ( self.views[i].currentProperty.name === self.selectedProp[self.selectedProp.length - 1].name ) {
+          for ( var i = 0; i < self.views.length - 1; i++) {
+            if ( self.views[i].currentProperty.name === self.selectedProp[self.selectedProp.length - 1]) {
               self.thisPropertyView = self.views[i];
               self.views.splice(i, 1);
               break;
@@ -160,13 +159,13 @@ foam.CLASS({
       this.views = [];
 
       var i = 0;
-      if ( !this.headerProp ) {
+      if ( !this.currentProperty ) {
         this.thisPropertyView = self.ColumnView.create({currentProperty: this.props[i], selectedProp: this.selectedProp, isPropertySelected$: this.isPropertySelected$, open$:this.open$});
         i = 1;
       }
 
       for ( ; i < this.props.length; i++ ) {
-        if ( this.props[i].name === this.headerProp  )
+        if ( this.props[i].name === this.currentProperty.name  )
           this.thisPropertyView = self.ColumnView.create({currentProperty: this.props[i], selectedProp: this.selectedProp, isPropertySelected$: this.isPropertySelected$, open$:this.open$});
         else
           this.views.push(self.ColumnView.create({currentProperty: this.props[i], selectedProp: this.selectedProp, isPropertySelected$: this.isPropertySelected$, open$:this.open$}));
@@ -174,11 +173,15 @@ foam.CLASS({
       this
       .start()
         .start()//
-        .start()//.addClass(self.myClass('container-handle'))
-          .tag(this.thisPropertyView.header)
-        .end()
-        .start()
-              .tag(this.thisPropertyView.body)
+          .start()//.addClass(self.myClass('container-handle'))
+            .add(this.slot(function(thisPropertyView) {
+              return self.E().tag(this.thisPropertyView.header);
+            }))
+          .end()
+          .start()
+            .add(this.slot(function(thisPropertyView) {
+              return self.E().tag(this.thisPropertyView.body);
+            }))
           .end()
           .start()
               .show(self.open$)
@@ -307,12 +310,12 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpec',
       name: 'header',
-      factory: function() {return this.ColumnViewHeader.create({hasSubProperties: this.hasSubProperties, isPropertySelected:this.isPropertySelected, expanded:this.expanded, currentProperty:this.currentProperty, isThisPropSelected:this.isThisPropSelected, selectedProp:this.selectedProp, open$:this.open$});}
+      factory: function() {return this.ColumnViewHeader.create({hasSubProperties: this.hasSubProperties, isPropertySelected$:this.isPropertySelected$, expanded:this.expanded, currentProperty:this.currentProperty, isThisPropSelected:this.isThisPropSelected, selectedProp:this.selectedProp, open$:this.open$});}
     },
     {
       class: 'foam.u2.ViewSpec',
       name: 'body',
-      factory: function() { return this.ColumnViewBody.create({hasSubProperties:this.hasSubProperties, currentProperty:this.currentProperty, selectedProp:this.selectedProp, expanded:this.expanded, subProperties:this.subProperties}); }
+      factory: function() { return this.ColumnViewBody.create({hasSubProperties:this.hasSubProperties, currentProperty:this.currentProperty, selectedProp$:this.selectedProp$, expanded:this.expanded, subProperties:this.subProperties}); }
     },
     'isPropertySelected',
     'open',
@@ -398,9 +401,11 @@ foam.CLASS({
       if ( this.hasSubProperties )
         this.expanded = !this.expanded;
       else {
-        this.isThisPropSelected = true;
-        if ( !this.open )
+        if ( this.open ) {
+          this.isThisPropSelected = true;//not sure that this is needed
           this.selectedProp.push(this.currentProperty.name);
+          this.isPropertySelected = true;
+        }
         this.open = !this.open;
       }
     }
