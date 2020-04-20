@@ -55,27 +55,30 @@
                 logger.error("Error instantiating : ", obj.getClass().getSimpleName(), e);
               }
               Map diff = oldObj == null ? null : oldObj.diff(obj);
+              String hash = obj.getClass().getSimpleName();
+
               if ( diff != null ) {
                 // remove ids, timestamps and userfeedback
                 diff.remove("id");
                 diff.remove("created");
                 diff.remove("lastModified");
                 diff.remove("userFeedback");
+                
                 // convert array properties to list to get consistent hash
+                // and create hash
                 Iterator it = diff.entrySet().iterator();
-                List<String> arrayProps = new ArrayList<String>();
+
                 while( it.hasNext() ) {
                   Map.Entry next = (Map.Entry) it.next();
-                  if ( next.getValue() instanceof Object[] ) {
-                    arrayProps.add((String) next.getKey());
+                  Object nextValue = next.getValue();
+                  if ( nextValue instanceof Object[] ) {
+                    next.setValue(Arrays.asList((Object[]) nextValue));
                   }
-                }
-                for ( String prop : arrayProps ) {
-                  diff.put(prop, Arrays.asList((Object[]) diff.get(prop)).hashCode());
+                  hash += ":" + String.valueOf(next.hashCode());
                 }
               }
 
-              String key = diff == null || diff.size() == 0 ? ((ApprovableAware) obj).getStringId() : obj.getClass().getSimpleName() + String.valueOf(diff.hashCode());
+              String key = diff == null || diff.size() == 0 ? ((ApprovableAware) obj).getStringId() : hash;
               return key;
             `
           })
