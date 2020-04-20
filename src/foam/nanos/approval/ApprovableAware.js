@@ -55,7 +55,7 @@
                 logger.error("Error instantiating : ", obj.getClass().getSimpleName(), e);
               }
               Map diff = oldObj == null ? null : oldObj.diff(obj);
-              String hash = obj.getClass().getSimpleName();
+              StringBuilder hash_sb = new StringBuilder(obj.getClass().getSimpleName());
 
               if ( diff != null ) {
                 // remove ids, timestamps and userfeedback
@@ -74,11 +74,11 @@
                   if ( nextValue instanceof Object[] ) {
                     next.setValue(Arrays.asList((Object[]) nextValue));
                   }
-                  hash += ":" + String.valueOf(next.hashCode());
+                  hash_sb.append(":" + String.valueOf(next.hashCode()));
                 }
               }
 
-              String key = diff == null || diff.size() == 0 ? ((ApprovableAware) obj).getStringId() : hash;
+              String key = diff == null || diff.size() == 0 ? ((ApprovableAware) obj).getStringId() : hash_sb.toString();
               return key;
             `
           })
