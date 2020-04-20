@@ -208,6 +208,10 @@ foam.CLASS({
             .build();
         }
 
+        if ( getDeletedAware() ) {
+          System.out.println("DEPRECATED: Will be completely removed after services journal migration script. No functionality as of now.");
+        }
+
         if ( getRuler() ) {
           String name = foam.util.SafetyUtil.isEmpty(getRulerDaoKey()) ? getName() : getRulerDaoKey();
           delegate = new foam.nanos.ruler.RulerDAO(getX(), delegate, name);
@@ -643,6 +647,14 @@ model from which to test ServiceProvider ID (spid)`,
 
       `,
       javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.approval.ApprovableAware.class.isAssignableFrom(getOf().getObjClass());'
+    },
+    {	
+      name: 'deletedAware',	
+      class: 'Boolean',	
+      documentation: `
+        DEPRECATING: Completely removing until services migration journal script is in
+      `,
+      javaFactory: 'return false;'	
     },
  ],
 
