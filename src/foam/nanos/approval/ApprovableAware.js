@@ -27,7 +27,7 @@
 
   methods: [
     {
-      name: 'getApprovableKey',
+      name: 'getStringId',
       type: 'String'
     }  
   ],
@@ -75,7 +75,7 @@
                 }
               }
 
-              String key = diff == null || diff.size() == 0 ? ((ApprovableAware) obj).getApprovableKey() : obj.getClass().getSimpleName() + String.valueOf(diff.hashCode());
+              String key = diff == null || diff.size() == 0 ? ((ApprovableAware) obj).getStringId() : obj.getClass().getSimpleName() + String.valueOf(diff.hashCode());
               return key;
             `
           })
