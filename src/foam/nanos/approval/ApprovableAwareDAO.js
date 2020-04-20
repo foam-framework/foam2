@@ -403,7 +403,10 @@ foam.CLASS({
           .where(
             foam.mlang.MLang.AND(
               foam.mlang.MLang.EQ(ApprovalRequest.DAO_KEY, "approvableDAO"),
-              foam.mlang.MLang.EQ(ApprovalRequest.OBJ_ID, hashedId),
+              foam.mlang.MLang.OR(
+                foam.mlang.MLang.EQ(ApprovalRequest.OBJ_ID, hashedId),
+                foam.mlang.MLang.EQ(ApprovalRequest.APPROVABLE_CREATE_KEY, ApprovableAware.getApprovableCreateKey(x, obj))
+              ),
               foam.mlang.MLang.EQ(ApprovalRequest.CREATED_BY, user.getId()),
               foam.mlang.MLang.EQ(ApprovalRequest.OPERATION, Operations.UPDATE),
               foam.mlang.MLang.EQ(ApprovalRequest.IS_FULFILLED, false)
@@ -459,6 +462,7 @@ foam.CLASS({
         ApprovalRequest approvalRequest = new ApprovalRequest.Builder(x)
           .setDaoKey("approvableDAO")
           .setObjId(approvable.getId())
+          .setApprovableCreateKey(ApprovableAware.getApprovableCreateKey(x, obj))
           .setClassification(getOf().getObjClass().getSimpleName())
           .setOperation(Operations.UPDATE)
           .setCreatedBy(user.getId())
