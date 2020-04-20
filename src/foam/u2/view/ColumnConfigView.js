@@ -31,7 +31,7 @@ foam.CLASS({
       this.SUPER();
       this
         .addClass(this.myClass())
-        .add(this.ColumnSelect.create({currentProperty: this.data.axiom, props: this.data.of.getAxiomsByClass(foam.core.Property)}));
+        .add(this.ColumnSelect.create({currentProperty: this.data.axiom, props: this.data.of.getAxiomsByClass(foam.core.Property), headerProp: this.data.axiom.name}));
         // .start('span').call(this.data.axiom.tableHeaderFormatter, [this.data.axiom]).end()
         // .tag(this.data.VISIBILITY);
     }
