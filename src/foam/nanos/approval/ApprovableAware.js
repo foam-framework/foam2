@@ -38,7 +38,7 @@
       buildJavaClass: function(cls) {
         cls.methods.push(
           foam.java.Method.create({
-            name: 'getApprovableCreateKey',
+            name: 'getApprovableHashKey',
             type: 'String',
             static: true,
             visibility: 'public',
