@@ -49,6 +49,7 @@ foam.CLASS({
   ],
 
   imports: [
+    'capabilityDAO',
     'installCSS',
     'sessionSuccess',
     'window'
@@ -59,6 +60,8 @@ foam.CLASS({
     'agent',
     'appConfig',
     'as ctrl',
+    'capabilityAquired',
+    'capabilityCancelled',
     'currentMenu',
     'group',
     'lastMenuLaunched',
@@ -68,6 +71,7 @@ foam.CLASS({
     'menuListener',
     'notify',
     'pushMenu',
+    'requestCapability',
     'requestLogin',
     'signUpEnabled',
     'loginVariables',
@@ -214,6 +218,14 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'loginSuccess'
+    },
+    {
+      class: 'Boolean',
+      name: 'capabilityAquired'
+    },
+    {
+      class: 'Boolean',
+      name: 'capabilityCancelled'
     },
     {
       class: 'FObjectProperty',
@@ -421,6 +433,30 @@ foam.CLASS({
       return new Promise(function(resolve, reject) {
         self.stack.push({ class: 'foam.u2.view.LoginView', mode_: 'SignIn' }, self);
         self.loginSuccess$.sub(resolve);
+      });
+    },
+
+    function requestCapability(capabilityInfo) {
+      var self = this;
+      self.capabilityAquired = false;
+      self.capabilityCancelled = false;
+      return new Promise(function(resolve, reject) {
+        self.stack.push({
+          class: 'foam.u2.crunch.CapabilityInterceptView',
+          data: self.__subContext__.capabilityDAO,
+          capabilityOptions: capabilityInfo.capabilityOptions
+        });
+        var s1, s2;
+        s1 = self.capabilityAquired$.sub(() => {
+          s1.detach();
+          s2.detach();
+          resolve();
+        });
+        s2 = self.capabilityCancelled$.sub(() => {
+          s1.detach();
+          s2.detach();
+          reject();
+        });
       });
     },
 

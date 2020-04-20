@@ -27,6 +27,7 @@ foam.CLASS({
     'foam.mlang.predicate.AbstractPredicate',
     'foam.mlang.predicate.Predicate',
     'foam.nanos.crunch.Capability',
+    'foam.nanos.crunch.CapabilityRuntimeException',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.logger.Logger',
@@ -144,7 +145,10 @@ foam.CLASS({
 
         String key = user.getId() + permission;
         Boolean result = ( (Map<String, Boolean>) getCache() ).get(key);
-        if ( result != null ) return result || getDelegate().checkUser(x, user, permission);
+        if ( result != null ) {
+          if ( ! result ) maybeIntercept(permission);
+          return result;
+        }
 
         result = false;
 
@@ -205,7 +209,43 @@ foam.CLASS({
           logger.error("check", permission, e);
         }
 
-        return result;
+        if ( result ) return true;
+        maybeIntercept(permission);
+        return false;
+      `
+    },
+    {
+      name: 'maybeIntercept',
+      documentation: `
+        This method might throw a CapabilityRuntimeException if a capability can intercept.
+      `,
+      args: [
+        {
+          name: 'permission',
+          type: 'String'
+        }
+      ],
+      javaCode: `
+        DAO capabilityDAO = (getX().get("localCapabilityDAO") == null ) ? (DAO) getX().get("capabilityDAO") : (DAO) getX().get("localCapabilityDAO");
+
+        // Find intercepting capabilities
+        List<Capability> capabilities =
+          ( (ArraySink) capabilityDAO.where(IN(
+            permission, Capability.PERMISSIONS_INTERCEPTED))
+            .select(new ArraySink()) ).getArray();
+
+        List<Capability> capabilitiesAll =
+          ( (ArraySink) capabilityDAO
+            .select(new ArraySink()) ).getArray();
+
+        // Do not throw runtime exception of there are no intercepts
+        if ( capabilities.size() < 1 ) return;
+
+        // Add capabilities to a runtime exception and throw it
+        CapabilityRuntimeException ex = new CapabilityRuntimeException(
+          "Permission denied; capabilities available.");
+        for ( Capability cap : capabilities ) ex.addCapabilityId(cap.getId());
+        throw ex;
       `
     }
   ]
