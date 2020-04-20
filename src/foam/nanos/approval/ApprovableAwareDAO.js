@@ -382,31 +382,14 @@ foam.CLASS({
           return obj;
         }
 
-        // change last modified by to be the user
-        updatedProperties.put("lastModifiedBy", user.getId());
-
-        // remove lastmodified prop to exclude it from hash
-        Object lastModified = updatedProperties.remove("lastModified");
-
+        String approvableHashKey = ApprovableAware.getApprovableHashKey(x, obj);
         DAO approvableDAO = (DAO) x.get("approvableDAO");
-
-        String daoKey = "d" + getDaoKey();
-        String objId = ":o" + approvableAwareObj.getStringId();
-        String hashedMap = ":m" + String.valueOf(updatedProperties.hashCode());
-  
-        String hashedId = daoKey + objId + hashedMap;
-
-        // put back lastmodified prop after hashing 
-        updatedProperties.put("lastModified", lastModified);
 
         DAO filteredApprovalRequestDAO = (DAO) approvalRequestDAO
           .where(
             foam.mlang.MLang.AND(
               foam.mlang.MLang.EQ(ApprovalRequest.DAO_KEY, "approvableDAO"),
-              foam.mlang.MLang.OR(
-                foam.mlang.MLang.EQ(ApprovalRequest.OBJ_ID, hashedId),
-                foam.mlang.MLang.EQ(ApprovalRequest.APPROVABLE_HASH_KEY, ApprovableAware.getApprovableHashKey(x, obj))
-              ),
+              foam.mlang.MLang.EQ(ApprovalRequest.OBJ_ID, approvableHashKey),
               foam.mlang.MLang.EQ(ApprovalRequest.CREATED_BY, user.getId()),
               foam.mlang.MLang.EQ(ApprovalRequest.OPERATION, Operations.UPDATE),
               foam.mlang.MLang.EQ(ApprovalRequest.IS_FULFILLED, false)
@@ -450,10 +433,8 @@ foam.CLASS({
           throw new RuntimeException("Something went wrong cannot have multiple approved/rejected requests for the same request!");
         }
 
-        updatedProperties.put("lastModified", lastModified);
-
         Approvable approvable = (Approvable) approvableDAO.put_(x, new Approvable.Builder(x)
-          .setId(hashedId)
+          .setId(approvableHashKey)
           .setDaoKey(getDaoKey())
           .setStatus(ApprovalStatus.REQUESTED)
           .setObjId(approvableAwareObj.getStringId())
@@ -461,8 +442,7 @@ foam.CLASS({
 
         ApprovalRequest approvalRequest = new ApprovalRequest.Builder(x)
           .setDaoKey("approvableDAO")
-          .setObjId(approvable.getId())
-          .setApprovableHashKey(ApprovableAware.getApprovableHashKey(x, obj))
+          .setObjId(approvableHashKey)
           .setClassification(getOf().getObjClass().getSimpleName())
           .setOperation(Operations.UPDATE)
           .setCreatedBy(user.getId())
