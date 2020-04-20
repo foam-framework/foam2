@@ -126,10 +126,8 @@ foam.CLASS({
       documentation: 'Ping delay greater than this value will trigger alarms.',
       name: 'pingLatency',
       class: 'Long',
+      units: 'ms',
       visibility: 'RO',
-      tableCellFormatter: function(value, obj, axiom) {
-        this.add(obj.pingLatency).add('(ms)');
-      },
       storageTransient: true
     },
     {
