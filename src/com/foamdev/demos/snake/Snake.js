@@ -4,17 +4,49 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+// TODO:
+//  Add sound affects.
+
 foam.CLASS({
   package: 'com.foamdev.demos.snake',
   name: 'Scale',
   extends: 'foam.graphics.Circle',
+
+  requires: [ 'foam.animation.Animation' ],
+
+  imports: [ 'game', 'snake' ],
+
+  properties: [ [ 'color', 'green' ] ],
+
+  methods: [
+    function init() {
+      var age = this.snake.age;
+
+      this.onDetach(this.snake.exploded$.sub(() => this.explode()));
+
+      this.onDetach(this.snake.age$.sub(() => {
+        if ( this.snake.age - age >= this.snake.length )
+          this.game.removeChild(this);
+      }));
+    },
+    function explode() {
+      this.Animation.create({
+        duration: 2000,
+        f: () => {
+          this.x += Math.random()*4000-2000;
+          this.y += Math.random()*4000-2000;
+        },
+        objs: [ this ]
+      }).start();
+    }
+  ],
 });
 
 
 foam.CLASS({
   package: 'com.foamdev.demos.snake',
   name: 'Snake',
-  extends: 'foam.graphics.CView',
+  extends: 'foam.graphics.Circle',
 
   requires: [
     'com.foamdev.demos.snake.Laser',
@@ -22,18 +54,19 @@ foam.CLASS({
     'foam.animation.Animation'
   ],
 
-  imports: [
-    'game',
-    'timer',
-    'R'
-  ],
+  imports: [ 'game', 'timer' ],
+
+  exports: [ 'as snake' ],
 
   properties: [
-    [ 'sx',     240 ],
-    [ 'sy',     240 ],
-    [ 'vx',     1 ],
-    [ 'vy',     0 ],
-    [ 'length', 5 ]
+    [ 'color',    'red' ],
+    [ 'x',        40 ],
+    [ 'y',        240 ],
+    [ 'vx',       1 ],
+    [ 'vy',       0 ],
+    [ 'length',   0 ],
+    [ 'exploded', false ],
+    [ 'age',      0 ]
   ],
 
   methods: [
@@ -47,30 +80,10 @@ foam.CLASS({
     function left()  { this.vy =  0; this.vx = -1; },
     function right() { this.vy =  0; this.vx =  1; },
     function fire () {
-      this.Laser.create({x: this.sx, y: this.sy, vx: this.vx, vy: this.vy});
-    },
-    function notIntersects(o) {
-      return this.children.length && ! this.children[this.children.length-1].intersects(o);
-    },
-    function intersects(o) {
-      return this.children.length && this.children[this.children.length-1].intersects(o);
-    },
-    function isSteppingOnTail() {
-      for ( var i = 0 ; i < this.children.length-2 ; i++ )
-        if ( this.intersects(this.children[i]) ) return true;
-      return false;
+      this.Laser.create({x: this.x, y: this.y, vx: this.vx, vy: this.vy});
     },
     function explode() {
-      this.children.forEach((c) => {
-        this.Animation.create({
-          duration: 2000,
-          f: () => {
-            c.x += Math.random()*4000-2000;
-            c.y += Math.random()*4000-2000;
-          },
-          objs: [ c ]
-        }).start();
-      });
+      this.exploded = true;
     }
   ],
 
@@ -81,16 +94,13 @@ foam.CLASS({
       isMerged: true,
       mergeDelay: 85,
       code: function() {
-        this.sx += this.vx * this.R*2;
-        this.sy += this.vy * this.R*2;
+        this.age++;
 
-        if ( this.children.length )
-          this.children[this.children.length-1].color = 'green';
+        if ( this.length )
+          this.game.addChild(this.Scale.create({x: this.x, y: this.y, radius: this.radius}));
 
-        this.add(this.Scale.create({x: this.sx, y: this.sy, radius: this.R, color: 'red'}));
-
-        if ( this.children.length > this.length )
-          this.children.shift();
+        this.x += this.vx * this.radius*2;
+        this.y += this.vy * this.radius*2;
       }
     }
   ]
@@ -183,7 +193,10 @@ foam.CLASS({
   name: 'Laser',
   extends: 'foam.graphics.Circle',
 
-  requires: [ 'foam.animation.Animation' ],
+  requires: [
+    'com.foamdev.demos.snake.Mushroom',
+    'foam.animation.Animation'
+  ],
 
   imports: [ 'game'],
 
@@ -208,6 +221,12 @@ foam.CLASS({
         onEnd: () => this.game.removeChild(this),
         objs: [ this ]
       }).start();
+    },
+
+    function collideWith(o) {
+      if ( this.Mushroom.isInstance(o) ) {
+        o.explode();
+      }
     }
   ]
 });
@@ -223,6 +242,7 @@ foam.CLASS({
     'com.foamdev.demos.snake.Laser',
     'com.foamdev.demos.snake.Mushroom',
     'com.foamdev.demos.snake.Snake',
+    'com.foamdev.demos.snake.Scale',
     'foam.animation.Animation',
     'foam.audio.Speak',
     'foam.graphics.Box',
@@ -234,7 +254,6 @@ foam.CLASS({
   ],
 
   exports: [
-    'R',
     'timer',
     'as game'
   ],
@@ -254,7 +273,7 @@ foam.CLASS({
     },
     {
       name: 'snake',
-      factory: function() { return this.Snake.create(); }
+      factory: function() { return this.Snake.create({radius: this.R}); }
     },
     {
       name: 'highScore',
@@ -262,7 +281,7 @@ foam.CLASS({
       postSet: function(_, score) { localStorage.snakeHighScore = score; }
     },
     {
-      name: 'table',
+      name: 'canvas',
       factory: function() {
         return this.Box.create({
           color:  'lightblue',
@@ -277,8 +296,8 @@ foam.CLASS({
         return this.Box.create({
           x: 2*this.R,
           y: 2*this.R,
-          width: this.table.width-4*this.R-1,
-          height: this.table.height-4*this.R-1})
+          width: this.canvas.width-4*this.R-1,
+          height: this.canvas.height-4*this.R-1})
         }
     },
     {
@@ -297,8 +316,6 @@ foam.CLASS({
       this.gamepad.pressed.sub('button4', () => this.fire());
       this.gamepad.pressed.sub('button5', () => this.fire());
 
-      // this.gamepad.pressed.sub(function() { console.log('pressed', arguments); });
-
       this.addChild(this.snake);
 
       this.addChild(this.Label.create({
@@ -311,86 +328,76 @@ foam.CLASS({
       }));
 
       this.addChild(this.Label.create({
-        text$:   this.snake.length$.map((l)=>'Score: ' + (l-5)),
+        text$:   this.snake.length$.map((l)=>'Score: ' + l),
         color:  'white',
         scaleX: 5,
         scaleY: 5,
-        x:      this.table.width-250,
+        x:      this.canvas.width-250,
         y:      25
       }));
 
-      // Collision Behaviour
-      this.collider.collide = (o1, o2) => {
-        if ( this.Laser.isInstance(o2) || this.Snake.isInstance(o2) ) {
-          var tmp = o1;
-          o1 = o2;
-          o2 = tmp;
-        }
-        if ( this.Laser.isInstance(o1) ) {
-          if ( this.Mushroom.isInstance(o2) ) {
-            o2.explode();
-            this.removeChild(o1);
-          } else if ( this.Food.isInstance(o2) ) {
-          }
-        } else if ( this.Snake.isInstance(o1) ) {
-          if ( this.Mushroom.isInstance(o2) ) {
-            // Only die from fully grown mushrooms
-            if ( o2.scaleX == 1 ) {
-              o1.explode();
-              this.gameOver();
-            } else {
-              this.removeChild(o2);
-            }
-          } else if ( this.Food.isInstance(o2) ) {
-            this.removeChild(o2);
-            if ( this.snake.length++ > this.highScore ) this.highScore = this.snake.length-5;
-          } else if ( this.Scale.isInstance(o2) ) {
+      // Snake Collisions
+      this.snake.collideWith = (o) => {
+        if ( this.Mushroom.isInstance(o) ) {
+          // Only die from fully grown mushrooms
+          if ( o.scaleX == 1 ) {
+            this.snake.explode();
+            o.explode();
             this.gameOver();
+          } else {
+            this.removeChild(o);
           }
+        } else if ( this.Food.isInstance(o) ) {
+          this.removeChild(o);
+          if ( this.snake.length++ > this.highScore ) this.highScore = this.snake.length;
+        } else if ( this.Scale.isInstance(o) ) {
+          this.gameOver();
         }
       };
+
       this.collider.start();
     },
 
     function initE() {
       this.SUPER();
       // Set focus to receive keyboard input
-      this.focus().style({display:'flex', outline: 'none'}).add(this.table);
+      this.focus().style({display:'flex', outline: 'none'}).add(this.canvas);
     },
 
     function gameOver() {
       this.timer.stop();
       this.collider.stop();
 
-      this.table.color = 'orange';
+      this.canvas.color = 'orange';
       this.addChild(this.Label.create({
         text:   'Game Over',
         align:  'center',
         color:  'white',
         scaleX: 10,
         scaleY: 10,
-        x:      this.table.width/2,
-        y:      this.table.height/2-100
+        x:      this.canvas.width/2,
+        y:      this.canvas.height/2-100
       }));
 
       this.Speak.create({text: 'Game Over'}).play();
     },
 
     function addChild(c) {
-      this.table.add(c);
+      this.canvas.add(c);
       if ( c.intersects ) this.collider.add(c);
     },
 
     function removeChild(c) {
-      this.table.remove(c);
+      this.canvas.remove(c);
       if ( c.intersects ) this.collider.remove(c);
+      c.detach();
     },
 
     function addFood() {
       var R = this.R;
       var f = this.Food.create({
-        x: Math.round(1+Math.random()*(this.table.width -4*R)/R)*2*R,
-        y: Math.round(1+Math.random()*(this.table.height-4*R)/R)*2*R,
+        x: Math.round(1+Math.random()*(this.canvas.width -4*R)/R)*2*R,
+        y: Math.round(1+Math.random()*(this.canvas.height-4*R)/R)*2*R,
       });
       this.addChild(f);
     },
@@ -398,8 +405,8 @@ foam.CLASS({
     function addMushroom() {
       var R = this.R;
       var m = this.Mushroom.create({
-        x:      Math.round(1+Math.random()*(this.table.width -4*R)/R)*2*R,
-        y:      Math.round(1+Math.random()*(this.table.height-4*R)/R)*2*R,
+        x:      Math.round(1+Math.random()*(this.canvas.width -4*R)/R)*2*R,
+        y:      Math.round(1+Math.random()*(this.canvas.height-4*R)/R)*2*R,
         scaleX: 0.1,
         scaleY: 0.1});
 
@@ -419,7 +426,7 @@ foam.CLASS({
       name: 'tick',
       code: function(_, __, ___, t) {
         // Detect snake running of the edge of the screen
-        if ( this.snake.notIntersects(this.inBounds) || this.snake.isSteppingOnTail() )
+        if ( ! this.snake.intersects(this.inBounds) )
           this.gameOver();
 
         if ( this.gamepad.button0 ) this.up();

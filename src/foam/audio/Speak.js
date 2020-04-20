@@ -95,7 +95,8 @@ foam.CLASS({
     },
     {
       name: 'voices',
-      hidden: true
+      hidden: true,
+      transient: true
     }
   ],
 
