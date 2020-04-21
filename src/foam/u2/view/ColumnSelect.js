@@ -144,11 +144,13 @@ foam.CLASS({
           self.views.push(self.thisPropertyView);
           for ( var i = 0; i < self.views.length - 1; i++) {
             if ( self.views[i].currentProperty.name === self.selectedProp[self.selectedProp.length - 1]) {
+              self.currentProperty = self.views[i].currentProperty;
               self.thisPropertyView = self.views[i];
               self.views.splice(i, 1);
               break;
             }
           }
+          self.isPropertySelected = false;
         }
         
         // if ( self.isPropertySelected )
@@ -160,6 +162,7 @@ foam.CLASS({
 
       var i = 0;
       if ( !this.currentProperty ) {
+        this.currentProperty = this.props[0];
         this.thisPropertyView = self.ColumnView.create({currentProperty: this.props[i], selectedProp: this.selectedProp, isPropertySelected$: this.isPropertySelected$, open$:this.open$});
         i = 1;
       }

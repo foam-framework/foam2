@@ -70,23 +70,19 @@ foam.CLASS({
     },
     {
       name: 'columns_',
-      expression: function(columns, of, allColumns, editColumnsEnabled) {
+      expression: function(columns, of, allColumns, editColumnsEnabled, selectedColumnNames) {
         if ( ! of ) return [];
         if ( ! editColumnsEnabled ) return columns;
 
         // Reorder allColumns to respect the order of columns first followed by
         // the order of allColumns.
         allColumns = columns.concat(allColumns);
-        allColumns = allColumns.filter((c, i) => {
-          return allColumns.findIndex(a => a[0] == c[0]) == i;
+        allColumns = allColumns.filter(c => {
+          var x = selectedColumnNames.includes(c[0]) > -1;
+          return selectedColumnNames.includes(c[0]) > -1;
         });
 
-        return allColumns.filter(c => {
-          var v = this.ColumnConfig.create({ of: of, axiom : (typeof c[0] === 'string' ? of.getAxiomByName(c[0]) : c[0]) }).visibility;
-          return v == this.ColumnVisibility.ALWAYS_HIDE ? false :
-                 v == this.ColumnVisibility.ALWAYS_SHOW ? true :
-                 columns.some(c2 => c[0] == c2[0]);
-        });
+        return allColumns;
       },
     },
     {
@@ -212,6 +208,23 @@ foam.CLASS({
           return acc + (axiom.tableWidth || this.MIN_COLUMN_WIDTH_FALLBACK);
         }, this.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH) + 'px';
       }
+    },
+    {
+      name: 'selectedColumnNames',
+      expression: function(allColumns, of) {
+        var ls = JSON.parse(localStorage.getItem(of.id));
+        if ( ls )
+          return ls;
+        var tc = of.getAxiomByName('tableColumns');
+        return tc ? tc.columns : allColumns.map(c => c[0]);
+      },
+      // factory: function() {
+      //   var ls = JSON.parse(localStorage.getItem(this.of.id));
+      //   if ( ls )
+      //     return ls;
+      //   var tc = this.of.getAxiomByName('tableColumns');
+      //   return tc ? tc.columns : this.allColumns;
+      // }
     }
   ],
 
@@ -321,7 +334,8 @@ foam.CLASS({
                       view.stack.push({
                         class: 'foam.u2.view.EditColumnsView',
                         of: view.of,
-                        allColumns: view.allColumns
+                        allColumns: view.allColumns,
+                        selectedColumns$: view.selectedColumnNames$
                       });
                     }).
                     tag(view.Image, { data: '/images/Icon_More_Resting.svg' }).
