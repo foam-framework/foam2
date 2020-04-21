@@ -2202,6 +2202,7 @@ foam.ENUM({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'PropertyViewRefinements',
@@ -2329,19 +2330,18 @@ foam.CLASS({
         var visSlot  = slot;
         var permSlot = data$.map((data) => {
           if ( ! data || ! data.__subContext__.auth ) return PPVC.HIDDEN;
-          var auth = data.__subContext__.auth;
-
+          var auth     = data.__subContext__.auth;
           var propName = this.name.toLowerCase();
           var clsName  = this.forClass_.substring(this.forClass_.lastIndexOf('.') + 1).toLowerCase();
           var canRead  = this.readPermissionRequired === false;
 
           return auth.check(null, `${clsName}.rw.${propName}`)
-              .then(function(rw) {
-                if ( rw ) return PPVC.ANYTHING;
-                if ( canRead ) return PPVC.RO_OR_HIDDEN;
-                return auth.check(null, `${clsName}.ro.${propName}`)
-                  .then((ro) => ro ? PPVC.RO_OR_HIDDEN : PPVC.HIDDEN);
-              });
+            .then(function(rw) {
+              if ( rw ) return PPVC.ANYTHING;
+              if ( canRead ) return PPVC.RO_OR_HIDDEN;
+              return auth.check(null, `${clsName}.ro.${propName}`)
+                .then((ro) => ro ? PPVC.RO_OR_HIDDEN : PPVC.HIDDEN);
+            });
         });
 
         slot = foam.core.ArraySlot.create({ slots: [visSlot, permSlot] }).map((arr) => {
