@@ -292,7 +292,7 @@
 
   methods: [
     {
-      name: 'getApprovableKey',
+      name: 'getStringId',
       type: 'String',
       javaCode: `
         String id = (String) getId();
