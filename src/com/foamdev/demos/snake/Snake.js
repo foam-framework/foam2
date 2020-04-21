@@ -14,7 +14,7 @@ foam.CLASS({
 
   requires: [ 'foam.animation.Animation' ],
 
-  imports: [ 'game', 'snake' ],
+  imports: [ 'addSprite', 'snake' ],
 
   properties: [ [ 'color', 'green' ] ],
 
@@ -26,7 +26,7 @@ foam.CLASS({
 
       this.onDetach(this.snake.age$.sub(() => {
         if ( this.snake.age - age >= this.snake.length )
-          this.game.removeChild(this);
+          this.detach();
       }));
     },
     function explode() {
@@ -49,12 +49,12 @@ foam.CLASS({
   extends: 'foam.graphics.Circle',
 
   requires: [
-    'com.foamdev.demos.snake.Laser',
+    'com.foamdev.demos.snake.Bullet',
     'com.foamdev.demos.snake.Scale',
     'foam.animation.Animation'
   ],
 
-  imports: [ 'game', 'timer' ],
+  imports: [ 'addSprite', 'timer' ],
 
   exports: [ 'as snake' ],
 
@@ -80,7 +80,7 @@ foam.CLASS({
     function left()  { this.vy =  0; this.vx = -1; },
     function right() { this.vy =  0; this.vx =  1; },
     function fire () {
-      this.Laser.create({x: this.x, y: this.y, vx: this.vx, vy: this.vy});
+      this.Bullet.create({x: this.x, y: this.y, vx: this.vx, vy: this.vy});
     },
     function explode() {
       this.exploded = true;
@@ -97,7 +97,7 @@ foam.CLASS({
         this.age++;
 
         if ( this.length )
-          this.game.addChild(this.Scale.create({x: this.x, y: this.y, radius: this.radius}));
+          this.addSprite(this.Scale.create({x: this.x, y: this.y, radius: this.radius}));
 
         this.x += this.vx * this.radius*2;
         this.y += this.vy * this.radius*2;
@@ -114,7 +114,7 @@ foam.CLASS({
 
   requires: [ 'foam.animation.Animation' ],
 
-  imports: [ 'game' ],
+  imports: [ 'addSprite' ],
 
   properties: [
     [ 'color',  'darkblue' ],
@@ -127,8 +127,8 @@ foam.CLASS({
 
       this.Animation.create({
         duration: 10000,
-        f:        ()=> this.radius = 4,
-        onEnd:    () => this.game.removeChild(this),
+        f:        () => this.radius = 4,
+        onEnd:    () => this.detach(),
         objs:     [this]
       }).start();
     }
@@ -145,8 +145,6 @@ foam.CLASS({
     'foam.graphics.Box',
     'foam.animation.Animation'
   ],
-
-  imports: [ 'game' ],
 
   properties: [
     [ 'radius',   20 ],
@@ -180,7 +178,7 @@ foam.CLASS({
           this.alpha    = 0;
           this.rotation = Math.PI * 6;
         },
-        onEnd: () => this.game.removeChild(this),
+        onEnd: () => this.detach(),
         objs: [this]
       }).start();
     }
@@ -190,7 +188,7 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'com.foamdev.demos.snake',
-  name: 'Laser',
+  name: 'Bullet',
   extends: 'foam.graphics.Circle',
 
   requires: [
@@ -198,7 +196,7 @@ foam.CLASS({
     'foam.animation.Animation'
   ],
 
-  imports: [ 'game'],
+  imports: [ 'addSprite' ],
 
   properties: [
     [ 'color', 'yellow' ],
@@ -211,22 +209,20 @@ foam.CLASS({
     function init() {
       this.SUPER();
 
-      this.game.addChild(this);
+      this.addSprite(this);
       this.Animation.create({
         duration: 4000,
         f: () => {
           this.x += 3000 * this.vx;
           this.y += 3000 * this.vy;
         },
-        onEnd: () => this.game.removeChild(this),
+        onEnd: () => this.detach(),
         objs: [ this ]
       }).start();
     },
 
     function collideWith(o) {
-      if ( this.Mushroom.isInstance(o) ) {
-        o.explode();
-      }
+      if ( this.Mushroom.isInstance(o) ) { o.explode(); this.detach(); }
     }
   ]
 });
@@ -239,7 +235,7 @@ foam.CLASS({
 
   requires: [
     'com.foamdev.demos.snake.Food',
-    'com.foamdev.demos.snake.Laser',
+    'com.foamdev.demos.snake.Bullet',
     'com.foamdev.demos.snake.Mushroom',
     'com.foamdev.demos.snake.Snake',
     'com.foamdev.demos.snake.Scale',
@@ -254,8 +250,8 @@ foam.CLASS({
   ],
 
   exports: [
-    'timer',
-    'as game'
+    'addSprite',
+    'timer'
   ],
 
   constants: { R: 20 },
@@ -316,9 +312,9 @@ foam.CLASS({
       this.gamepad.pressed.sub('button4', () => this.fire());
       this.gamepad.pressed.sub('button5', () => this.fire());
 
-      this.addChild(this.snake);
+      this.addSprite(this.snake);
 
-      this.addChild(this.Label.create({
+      this.addSprite(this.Label.create({
         text$:  this.highScore$.map((score)=>'High Score: ' + score),
         color:  'white',
         scaleX: 5,
@@ -327,7 +323,7 @@ foam.CLASS({
         y:      25
       }));
 
-      this.addChild(this.Label.create({
+      this.addSprite(this.Label.create({
         text$:   this.snake.length$.map((l)=>'Score: ' + l),
         color:  'white',
         scaleX: 5,
@@ -345,10 +341,10 @@ foam.CLASS({
             o.explode();
             this.gameOver();
           } else {
-            this.removeChild(o);
+            o.detach();
           }
         } else if ( this.Food.isInstance(o) ) {
-          this.removeChild(o);
+          o.detach();
           if ( this.snake.length++ > this.highScore ) this.highScore = this.snake.length;
         } else if ( this.Scale.isInstance(o) ) {
           this.gameOver();
@@ -369,7 +365,7 @@ foam.CLASS({
       this.collider.stop();
 
       this.canvas.color = 'orange';
-      this.addChild(this.Label.create({
+      this.addSprite(this.Label.create({
         text:   'Game Over',
         align:  'center',
         color:  'white',
@@ -382,15 +378,13 @@ foam.CLASS({
       this.Speak.create({text: 'Game Over'}).play();
     },
 
-    function addChild(c) {
+    function addSprite(c) {
       this.canvas.add(c);
       if ( c.intersects ) this.collider.add(c);
-    },
-
-    function removeChild(c) {
-      this.canvas.remove(c);
-      if ( c.intersects ) this.collider.remove(c);
-      c.detach();
+      c.onDetach(() => {
+        this.canvas.remove(c);
+        if ( c.intersects ) this.collider.remove(c);
+      });
     },
 
     function addFood() {
@@ -399,7 +393,7 @@ foam.CLASS({
         x: Math.round(1+Math.random()*(this.canvas.width -4*R)/R)*2*R,
         y: Math.round(1+Math.random()*(this.canvas.height-4*R)/R)*2*R,
       });
-      this.addChild(f);
+      this.addSprite(f);
     },
 
     function addMushroom() {
@@ -417,7 +411,7 @@ foam.CLASS({
         objs:     [m]
       }).start();
 
-      this.addChild(m);
+      this.addSprite(m);
     }
   ],
 
