@@ -218,7 +218,7 @@ foam.CLASS({
           configSupportPhone = ! SafetyUtil.isEmpty(group.getSupportPhone()) && SafetyUtil.isEmpty(configSupportPhone) ?
               group.getSupportPhone() : configSupportPhone;
 
-          if ( ! SafetyUtil.isEmpty(group.getUrl()) && SafetyUtil.isEmpty(configUrl) ) break;
+          if ( ! SafetyUtil.isEmpty(group.getUrl()) && ! SafetyUtil.isEmpty(configUrl) ) break;
           group = (Group) groupDAO.find(group.getParent());
         }
 
