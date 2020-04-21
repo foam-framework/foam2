@@ -281,7 +281,7 @@ foam.CLASS({
             .where(
               foam.mlang.MLang.AND(
                 foam.mlang.MLang.EQ(ApprovalRequest.DAO_KEY, getDaoKey()),
-                foam.mlang.MLang.EQ(ApprovalRequest.APPROVABLE_HASH_KEY, ApprovableAware.getApprovableHashKey(x, obj)),
+                foam.mlang.MLang.EQ(ApprovalRequest.APPROVABLE_HASH_KEY, ApprovableAware.getApprovableHashKey(x, obj, Operations.CREATE)),
                 foam.mlang.MLang.EQ(ApprovalRequest.CREATED_BY, user.getId()),
                 foam.mlang.MLang.EQ(ApprovalRequest.OPERATION, Operations.CREATE),
                 foam.mlang.MLang.EQ(ApprovalRequest.IS_FULFILLED, false)
@@ -329,7 +329,7 @@ foam.CLASS({
 
           ApprovalRequest approvalRequest = new ApprovalRequest.Builder(x)
             .setDaoKey(getDaoKey())
-            .setApprovableHashKey(ApprovableAware.getApprovableHashKey(x, obj))
+            .setApprovableHashKey(ApprovableAware.getApprovableHashKey(x, obj, Operations.CREATE))
             .setObjId(approvableAwareObj.getStringId())
             .setClassification(getOf().getObjClass().getSimpleName())
             .setOperation(Operations.CREATE)
@@ -382,14 +382,21 @@ foam.CLASS({
           return obj;
         }
 
-        String approvableHashKey = ApprovableAware.getApprovableHashKey(x, obj);
+        String hashedId = new StringBuilder("d")
+          .append(getDaoKey())
+          .append(":o")
+          .append(approvableAwareObj.getStringId())
+          .toString();
+
+        String approvableHashKey = ApprovableAware.getApprovableHashKey(x, obj, Operations.UPDATE);
         DAO approvableDAO = (DAO) x.get("approvableDAO");
 
         DAO filteredApprovalRequestDAO = (DAO) approvalRequestDAO
           .where(
             foam.mlang.MLang.AND(
               foam.mlang.MLang.EQ(ApprovalRequest.DAO_KEY, "approvableDAO"),
-              foam.mlang.MLang.EQ(ApprovalRequest.OBJ_ID, approvableHashKey),
+              foam.mlang.MLang.EQ(ApprovalRequest.OBJ_ID, hashedId),
+              foam.mlang.MLang.EQ(ApprovalRequest.APPROVABLE_HASH_KEY, approvableHashKey),
               foam.mlang.MLang.EQ(ApprovalRequest.CREATED_BY, user.getId()),
               foam.mlang.MLang.EQ(ApprovalRequest.OPERATION, Operations.UPDATE),
               foam.mlang.MLang.EQ(ApprovalRequest.IS_FULFILLED, false)
@@ -434,7 +441,7 @@ foam.CLASS({
         }
 
         Approvable approvable = (Approvable) approvableDAO.put_(x, new Approvable.Builder(x)
-          .setId(approvableHashKey)
+          .setId(hashedId)
           .setDaoKey(getDaoKey())
           .setStatus(ApprovalStatus.REQUESTED)
           .setObjId(approvableAwareObj.getStringId())
@@ -442,7 +449,8 @@ foam.CLASS({
 
         ApprovalRequest approvalRequest = new ApprovalRequest.Builder(x)
           .setDaoKey("approvableDAO")
-          .setObjId(approvableHashKey)
+          .setObjId(hashedId)
+          .setApprovableHashKey(approvableHashKey)
           .setClassification(getOf().getObjClass().getSimpleName())
           .setOperation(Operations.UPDATE)
           .setCreatedBy(user.getId())
