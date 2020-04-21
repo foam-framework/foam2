@@ -14,7 +14,8 @@
     'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.CreatedByAware',
     'foam.nanos.auth.LastModifiedAware',
-    'foam.nanos.auth.LastModifiedByAware'
+    'foam.nanos.auth.LastModifiedByAware',
+    'foam.nanos.approval.ApprovableAware'
   ],
 
   imports: [
@@ -269,10 +270,35 @@
           }
         }.bind(this));
       }
+    },
+    {
+      class: 'foam.core.Enum',
+      of: 'foam.nanos.auth.LifecycleState',
+      name: 'lifecycleState',
+      value: foam.nanos.auth.LifecycleState.PENDING,
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      readVisibility: 'RO',
+      writePermissionRequired: true
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.comics.v2.userfeedback.UserFeedback',
+      name: 'userFeedback',
+      storageTransient: true,
+      visibility: 'HIDDEN'
     }
   ],
 
   methods: [
+    {
+      name: 'getApprovableKey',
+      type: 'String',
+      javaCode: `
+        String id = (String) getId();
+        return id;
+      `
+    },
     {
       name: 'f',
       type: 'Boolean',

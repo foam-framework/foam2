@@ -64,19 +64,6 @@ foam.CLASS({
 
         LifecycleAware lifecycleAwareObj = (LifecycleAware) obj;
 
-        // ! we are also handling the deprecated DeletedAware until we fully remove it from the system
-        if ( obj instanceof DeletedAware ){
-          DeletedAware deletedAwareObj = (DeletedAware) obj;
-
-          if ( (
-              ( lifecycleAwareObj.getLifecycleState() == LifecycleState.DELETED || deletedAwareObj.getDeleted() == true ) && ! canReadDeleted(x) ) || 
-              ( lifecycleAwareObj.getLifecycleState() == LifecycleState.REJECTED && ! canReadRejected(x) )
-            ) {
-            return null;
-          }
-          return obj;
-        }
-
         if ( 
             ( lifecycleAwareObj.getLifecycleState() == LifecycleState.DELETED && ! canReadDeleted(x) ) ||  
             ( lifecycleAwareObj.getLifecycleState() == LifecycleState.REJECTED && ! canReadRejected(x) )
@@ -104,13 +91,6 @@ foam.CLASS({
           {
             Predicate deletedPredicate = MLang.EQ(getOf().getAxiomByName("lifecycleState"), LifecycleState.DELETED);
             predicateList.add(deletedPredicate);
-          }
-
-          // !! we are also handling the deprecated DeletedAware until we fully remove it from the system !!
-          if ( foam.nanos.auth.DeletedAware.class.isAssignableFrom(getOf().getObjClass()) )
-          {
-            Predicate deprecatedDeletedPredicate = MLang.EQ(getOf().getAxiomByName("deleted"), true);
-            predicateList.add(deprecatedDeletedPredicate);
           }
         }
 
