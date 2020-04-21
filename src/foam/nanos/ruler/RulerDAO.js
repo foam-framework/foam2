@@ -182,32 +182,32 @@ for ( Object key : sink.getGroupKeys() ) {
           type: 'Context'
         }
       ],
-      javaCode: `DAO ruleDAO = ((DAO) x.get("ruleDAO")).where(
+      javaCode: `DAO localRuleDAO = ((DAO) x.get("localRuleDAO")).where(
   EQ(Rule.DAO_KEY, getDaoKey())
 );
-ruleDAO.listen(
+localRuleDAO.listen(
   new UpdateRulesListSink.Builder(getX())
     .setDao(this)
     .build()
   , null
 );
 
-ruleDAO = ruleDAO.where(
+localRuleDAO = localRuleDAO.where(
   EQ(Rule.ENABLED, true)
 ).orderBy(new Desc(Rule.PRIORITY));
-ruleDAO.select(new AbstractSink(new ReadOnlyDAOContext(getX())) {
+localRuleDAO.select(new AbstractSink(new ReadOnlyDAOContext(getX())) {
       @Override
       public void put(Object obj, Detachable sub) {
         Rule rule = (Rule) obj;
         rule.setX(getX());
       }
     });
-addRuleList(ruleDAO, getCreateBefore());
-addRuleList(ruleDAO, getUpdateBefore());
-addRuleList(ruleDAO, getRemoveBefore());
-addRuleList(ruleDAO, getCreateAfter());
-addRuleList(ruleDAO, getUpdateAfter());
-addRuleList(ruleDAO, getRemoveAfter());`
+addRuleList(localRuleDAO, getCreateBefore());
+addRuleList(localRuleDAO, getUpdateBefore());
+addRuleList(localRuleDAO, getRemoveBefore());
+addRuleList(localRuleDAO, getCreateAfter());
+addRuleList(localRuleDAO, getUpdateAfter());
+addRuleList(localRuleDAO, getRemoveAfter());`
     },
     {
       name: 'cmd_',
