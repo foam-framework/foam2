@@ -203,6 +203,11 @@ foam.CLASS({
         passwordIcon: true
       },
       minLength: 6
+    },
+    {
+      class: 'Boolean',
+      name: 'receiveOnly',
+      visibility: 'HIDDEN'
     }
   ],
 
@@ -265,7 +270,8 @@ foam.CLASS({
             welcomeEmailSent: true,
             jobTitle: this.jobTitle,
             phone: this.Phone.create({ number: this.phone }),
-            group: this.group_
+            group: this.group_,
+            receiveOnly: this.receiveOnly
           }))
           .then((user) => {
             this.user.copyFrom(user);
