@@ -113,11 +113,3 @@ foam.CLASS({
     }
   ]
 });
-
-/*
-window.onload = () => {
-  var ss = com.google.foam.demos.squares.Squares.create();
-  ss.write();
-  foam.u2.DetailView.create({data: ss, showActions: true}).write();
-};
-*/
