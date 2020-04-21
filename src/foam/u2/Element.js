@@ -1713,7 +1713,12 @@ foam.CLASS({
           // No use adding new children if the parent has already been removed
           if ( self.state === foam.u2.Element.UNLOADED ) return;
 
-          if ( update ) o = o.clone();
+          if ( update ) {
+            o = o.clone();
+            o.propertyChange.sub(function() {
+              o.copyFrom(dao.put(o.clone()));
+            });
+          }
 
           self.startContext({data: o});
 
@@ -1723,12 +1728,6 @@ foam.CLASS({
           // want anything to be added.
           if ( e === undefined )
             this.__context__.warn(self.SELECT_BAD_USAGE);
-
-          if ( update ) {
-            o.propertyChange.sub(function(_,__,prop,slot) {
-              dao.put(o.clone());
-            });
-          }
 
           self.endContext();
 
