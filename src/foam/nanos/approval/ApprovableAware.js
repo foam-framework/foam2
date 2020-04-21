@@ -18,6 +18,7 @@
     'foam.core.X',
     'foam.nanos.logger.Logger',
     'foam.nanos.approval.ApprovableAware',
+    'foam.nanos.ruler.Operations',
     'java.util.Iterator',
     'java.util.ArrayList',
     'java.util.Arrays',
@@ -44,7 +45,8 @@
             visibility: 'public',
             args: [
               { name: 'x', type: 'X' },
-              { name: 'obj', type: 'FObject' }
+              { name: 'obj', type: 'FObject' },
+              { name: 'operation', type: 'Operations' }
             ],
             body: `
               FObject oldObj = null;
@@ -56,10 +58,11 @@
               }
               Map diff = oldObj == null ? null : oldObj.diff(obj);
               StringBuilder hash_sb = new StringBuilder(obj.getClass().getSimpleName());
+              if ( operation == Operations.UPDATE) hash_sb.append(((ApprovableAware) obj).getStringId());
 
               if ( diff != null ) {
                 // remove ids, timestamps and userfeedback
-                diff.remove("id");
+                if ( operation == Operations.CREATE ) diff.remove("id");
                 diff.remove("created");
                 diff.remove("lastModified");
                 diff.remove("userFeedback");
@@ -74,7 +77,7 @@
                   if ( nextValue instanceof Object[] ) {
                     next.setValue(Arrays.asList((Object[]) nextValue));
                   }
-                  hash_sb.append(":" + String.valueOf(next.hashCode()));
+                  hash_sb.append(":").append(String.valueOf(next.hashCode()));
                 }
               }
 
