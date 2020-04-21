@@ -70,19 +70,11 @@ foam.CLASS({
     },
     {
       name: 'columns_',
-      expression: function(columns, of, allColumns, editColumnsEnabled, selectedColumnNames) {
+      expression: function(columns, of, allColumns, editColumnsEnabled, selectedColumnNames, isColumnChanged) {
         if ( ! of ) return [];
         if ( ! editColumnsEnabled ) return columns;
 
-        // Reorder allColumns to respect the order of columns first followed by
-        // the order of allColumns.
-        allColumns = columns.concat(allColumns);
-        allColumns = allColumns.filter(c => {
-          var x = selectedColumnNames.includes(c[0]) > -1;
-          return selectedColumnNames.includes(c[0]) > -1;
-        });
-
-        return allColumns;
+        return selectedColumnNames.map(a => [a, null]);
       },
     },
     {
@@ -218,6 +210,7 @@ foam.CLASS({
         var tc = of.getAxiomByName('tableColumns');
         return tc ? tc.columns : allColumns.map(c => c[0]);
       },
+      
       // factory: function() {
       //   var ls = JSON.parse(localStorage.getItem(this.of.id));
       //   if ( ls )
@@ -225,6 +218,11 @@ foam.CLASS({
       //   var tc = this.of.getAxiomByName('tableColumns');
       //   return tc ? tc.columns : this.allColumns;
       // }
+    },
+    { 
+      name: 'isColumnChanged',
+      class: 'Boolean', 
+      value: false
     }
   ],
 
@@ -237,6 +235,13 @@ foam.CLASS({
 
     function initE() {
       var view = this;
+
+      this.isColumnChanged$.sub(function(){
+        console.log('sdfsdv');
+      });
+
+      this.isColumnChanged = ! this.isColumnChanged;
+      //this.isColumnChanged = ;
 
       if ( this.filteredTableColumns$ ) {
         this.onDetach(this.filteredTableColumns$.follow(
@@ -333,9 +338,7 @@ foam.CLASS({
                       if ( ! view.stack ) return;
                       view.stack.push({
                         class: 'foam.u2.view.EditColumnsView',
-                        of: view.of,
-                        allColumns: view.allColumns,
-                        selectedColumns$: view.selectedColumnNames$
+                        data: view
                       });
                     }).
                     tag(view.Image, { data: '/images/Icon_More_Resting.svg' }).

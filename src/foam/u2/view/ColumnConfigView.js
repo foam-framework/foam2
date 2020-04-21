@@ -40,6 +40,7 @@ foam.CLASS({
         return props;
       }
     },
+    'isColumnChanged'
   ],
 
   css: `
@@ -59,12 +60,14 @@ foam.CLASS({
       this.SUPER();
       var views  = [];
 
+
       for (var i = 0; i < self.properties.length; i++) {
-        views.push({ i: i, view: this.ColumnSelect.create({currentProperty: self.properties[i], props: self.allProperties, selectedColumns$:self.selectedColumns$})});
+        views.push({ i: i, view: this.ColumnSelect.create({currentProperty: self.properties[i], props: self.allProperties})});
       }
 
       for (var v of views) {
         v.view.currentProperty$.sub(function() {
+          self.isColumnChanged = true;
           if ( foam.core.StringArray.isInstance(self.selectedColumns[0]) ) self.selectedColumns[v.i] = [ v.view.currentProperty.name, null ];
           else self.selectedColumns[v.i] = v.view.currentProperty.name;
         });

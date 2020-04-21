@@ -87,7 +87,13 @@ foam.CLASS({
       //   allColumns$: this.allColumns$
       // }
     },
-    'selectedColumns'
+    'selectedColumns',
+    { 
+      name: 'isColumnChanged',
+      class: 'Boolean', 
+     // value: false
+    },
+        'view'
   ],
   // This shouldn't be needed.
   imports: [
@@ -117,15 +123,22 @@ foam.CLASS({
     {
       name: 'save',
       code: function() {
-        localStorage.removeItem(this.of.id);
-        localStorage.setItem(this.of.id, JSON.stringify(this.columns.map(c => foam.core.StringArray.isInstance(c) ? c[0] : c)));
+        if ( this.view.isColumnChanged ) {
+          localStorage.removeItem(this.data.of.id);
+          localStorage.setItem(this.data.of.id, JSON.stringify(this.data.selectedColumnNames));
+          this.data.isColumnChanged = !this.data.isColumnChanged;
+        }
         this.stack.back();
       }
     }
   ],
   methods: [
     function initE() {
-      this.add(this.ColumnsConfigView.create({of:this.of, allColumns:this.allColumns, selectedColumns$:this.selectedColumns$}))//;//this.DetailView.create({ data: this });
+      this.data.isColumnChanged;
+
+      this.data.isColumnChanged = !this.data.isColumnChanged;
+      this.view = this.ColumnsConfigView.create({of:this.data.of, allColumns:this.data.allColumns, selectedColumns$:this.data.selectedColumnNames$});
+      this.add(this.view)//;//this.DetailView.create({ data: this });
       .startContext({ data: this })
         .add(this.CANCEL)
         .add(this.SAVE)
