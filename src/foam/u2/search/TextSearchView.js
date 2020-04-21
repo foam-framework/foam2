@@ -117,6 +117,8 @@ foam.CLASS({
   listeners: [
     {
       name: 'updateValue',
+      isMerged: true,
+      mergeDelay: 500,
       code: function() {
         var value = this.view.data;
         this.predicate = ! value ?
