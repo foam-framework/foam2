@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -99,10 +99,7 @@ foam.CLASS({
           return 'update';
         }
         const token = new URLSearchParams(location.search).get('token');
-        if ( token ) {
-          return 'reset';
-        }
-        return 'send';
+        return token ? 'reset' : 'send';
       }
     },
     {
@@ -113,9 +110,8 @@ foam.CLASS({
           return this.UpdatePassword.create();
         } else if ( this.mode === 'reset' ) {
           return this.ResetPassword.create();
-        } else {
-          return this.SendPassword.create();
         }
+        return this.SendPassword.create();
       }
     }
   ],
@@ -127,12 +123,12 @@ foam.CLASS({
         // evaluation of this gridColumns on a property does not handle an evaluation, only an int, thus function here managing this.
         if ( isHorizontal ) {
           if ( this.mode === 'update' ) {
-            this.UpdatePassword.getAxiomByName('originalPassword').gridColumns = 4;
-            this.UpdatePassword.getAxiomByName('newPassword').gridColumns = 4;
-            this.UpdatePassword.getAxiomByName('confirmationPassword').gridColumns = 4;
+            this.UpdatePassword.ORIGINAL_PASSWORD.gridColumns = 4;
+            this.UpdatePassword.NEW_PASSWORD.gridColumns = 4;
+            this.UpdatePassword.CONFIRMATION_PASSWORD.gridColumns = 4;
           } else if ( this.mode === 'reset' ) {
-            this.ResetPassword.getAxiomByName('newPassword').gridColumns = 6;
-            this.ResetPassword.getAxiomByName('confirmationPassword').gridColumns = 6;
+            this.ResetPassword.NEW_PASSWORD.gridColumns = 6;
+            this.ResetPassword.CONFIRMATION_PASSWORD.gridColumns = 6;
           }
         }
       }

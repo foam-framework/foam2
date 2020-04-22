@@ -88,7 +88,7 @@ foam.CLASS({
         this.clearProperty('confirmationPassword');
         if ( this.token ) window.history.replaceState(null, null, window.location.origin + '/#reset');
       }
-    },
+    }
   ],
 
   actions: [
