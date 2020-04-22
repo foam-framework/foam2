@@ -40,6 +40,7 @@ public class HistoryDAO
    * @return The formatted string
    */
   private String formatUserName(User user) {
+    if ( user == null ) return "";
     return user.getLastName() +", " +
         user.getFirstName() +
         "(" + user.getId() + ")";
