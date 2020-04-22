@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -25,10 +25,13 @@ foam.CLASS({
 
   css: `
     .subtitle {
-      color: /*%GREY2%*/ #8e9090';
+      color: /*%GREY2%*/ #8e9090;
       font-size: 14px;
       line-height: 1.5;
       margin-bottom: 15px;
+    }
+    ^center {
+      text-align: center;
     }
   `,
 
@@ -52,6 +55,12 @@ foam.CLASS({
       class: 'Boolean',
       name: 'showTitle',
       value: true
+    },
+    {
+      class: 'String',
+      name: 'isCentered',
+      documentation: 'setting this to true centers items in sectionView',
+      value: false
     }
   ],
 
@@ -62,15 +71,19 @@ foam.CLASS({
 
       self
         .addClass(self.myClass())
-        .add(self.slot(function(section, showTitle, section$title, section$subTitle) {
+        .add(self.slot(function(section, showTitle, section$title, section$subTitle, isCentered) {
           if ( ! section ) return;
           return self.Rows.create()
             .show(section.createIsAvailableFor(self.data$))
             .callIf(showTitle && section$title, function() {
-              this.start('h2').add(section$title).end();
+              this.start('h2').enableClass(self.myClass('center'), isCentered)
+                .add(section$title).end();
             })
             .callIf(section$subTitle, function() {
-              this.start().addClass('subtitle').add(section$subTitle).end();
+              this.start()
+                .addClass('subtitle')
+                .enableClass(self.myClass('center'), isCentered)
+                  .add(section$subTitle).end();
             })
             .start(self.Grid)
               .forEach(section.properties, function(p, index) {
@@ -87,7 +100,7 @@ foam.CLASS({
             .end()
             .start(self.Cols)
               .style({
-                'justify-content': 'end',
+                'justify-content': isCentered ? 'center' : 'end',
                 'margin-top': section.actions.length ? '4vh' : 'initial'
               })
               .forEach(section.actions, function(a) {

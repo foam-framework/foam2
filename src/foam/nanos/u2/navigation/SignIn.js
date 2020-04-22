@@ -71,7 +71,7 @@ foam.CLASS({
       name: 'subfooterLink',
       code: function() {
         this.stack.push({
-          class: 'foam.nanos.auth.resetPassword.ForgotPasswordView'
+          class: 'foam.nanos.auth.ChangePasswordView'
         });
       }
     },
