@@ -19,4 +19,15 @@ foam.INTERFACE({
   package: 'foam.core',
   name: 'Exception',
   swiftImplements: ['Error'],
+
+  properties: [
+    {
+      name: 'message',
+      class: 'String'
+    },
+    {
+      name: 'fields',
+      class: 'Map'
+    }
+  ],
 });

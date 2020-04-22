@@ -1038,6 +1038,13 @@ foam.LIB({
       f.defaultMethod = opt_defaultMethod;
       f.args = [];
       return f;
+    },
+
+    function Error(msg, fields) {
+      return foam.core.Exception.create({
+        message: msg,
+        fields: fields
+      });
     }
   ]
 });
