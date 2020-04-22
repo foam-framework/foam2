@@ -42,7 +42,7 @@ foam.CLASS({
       class: 'String',
       name: 'agent',
       label: 'Updated By',
-      documentation: 'agent that made the update'
+      documentation: 'Agent that made the update'
     },
     {
       class: 'DateTime',
