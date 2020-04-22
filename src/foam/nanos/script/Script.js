@@ -68,11 +68,13 @@ foam.CLASS({
     {
       class: 'String',
       name: 'id',
+      includeInDigest: true,
       tableWidth: 220
     },
     {
       class: 'Boolean',
       name: 'enabled',
+      includeInDigest: true,
       documentation: 'Enables script.',
       tableCellFormatter: function(value) {
         this.start()
@@ -86,6 +88,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'description',
+      includeInDigest: false,
       documentation: 'Description of the script.',
       tableWidth: 200
     },
@@ -94,6 +97,7 @@ foam.CLASS({
       name: 'priority',
       value: 5,
       javaValue: 5,
+      includeInDigest: false,
       view: {
         class: 'foam.u2.view.ChoiceView',
         choices: [
@@ -107,11 +111,13 @@ foam.CLASS({
       documentation: 'A non-clusterable script can run on all instances, and any run info will be stored locally',
       name: 'clusterable',
       class: 'Boolean',
-      value: true
+      value: true,
+      includeInDigest: false,
     },
     {
       class: 'DateTime',
       name: 'lastRun',
+      includeInDigest: false,
       documentation: 'Date and time the script ran last.',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
@@ -120,6 +126,7 @@ foam.CLASS({
     {
       class: 'Duration',
       name: 'lastDuration',
+      includeInDigest: false,
       documentation: 'Date and time the script took to complete.',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
@@ -138,6 +145,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'server',
+      includeInDigest: false,
       documentation: 'Runs on server side if enabled.',
       tableCellFormatter: function(value) {
         this.start()
@@ -162,11 +170,13 @@ foam.CLASS({
     {
       class: 'Code',
       name: 'code',
+      includeInDigest: true,
       writePermissionRequired: true
     },
     {
       class: 'String',
       name: 'output',
+      includeInDigest: false,
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
       view: {
@@ -192,12 +202,14 @@ foam.CLASS({
     {
       class: 'String',
       name: 'notes',
+      includeInDigest: false,
       view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 144 }
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'lastModifiedBy',
+      includeInDigest: true,
       documentation: 'User who last modified script'
     },
     {

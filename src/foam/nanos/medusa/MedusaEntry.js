@@ -80,6 +80,8 @@ foam.CLASS({
       includeInDigest: false
     },
     {
+      document: 'Stringified FObject',
+      //      class: 'String',
       class: 'FObjectProperty',
       name: 'data',
       visibility: 'RO',

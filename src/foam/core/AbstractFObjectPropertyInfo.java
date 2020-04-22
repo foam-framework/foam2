@@ -66,6 +66,8 @@ public abstract class AbstractFObjectPropertyInfo
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
       if ( ! prop.includeInDigest() ) continue;
+      if ( prop.getStorageTransient() ) continue;
+      if ( prop.getClusterTransient() ) continue;
       md.update(prop.getNameAsByteArray());
       prop.updateDigest(val, md);
     }
@@ -82,6 +84,8 @@ public abstract class AbstractFObjectPropertyInfo
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
       if ( ! prop.includeInSignature() ) continue;
+      if ( prop.getStorageTransient() ) continue;
+      if ( prop.getClusterTransient() ) continue;
       sig.update(prop.getNameAsByteArray());
       prop.updateSignature(val, sig);
     }

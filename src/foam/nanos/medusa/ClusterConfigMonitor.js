@@ -126,7 +126,8 @@ foam.CLASS({
       dao = dao.where(
         AND(
           EQ(ClusterConfig.ENABLED, true),
-          NOT(EQ(ClusterConfig.ID, support.getConfigId()))
+          NOT(EQ(ClusterConfig.ID, support.getConfigId())),
+          EQ(ClusterConfig.REALM, config.getRealm())
         ));
       dao.select(new ClusterConfigPingSink(x, dao, getPingTimeout()));
     } finally {

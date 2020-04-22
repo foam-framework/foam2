@@ -43,23 +43,11 @@ DAO stacks both end at x.get("internalMedusaEntryDAO").`,
   ],
   
   methods: [
-    // {
-    //   name: 'getDelegate',
-    //   type: 'foam.dao.DAO',
-    //   javaCode: `
-    //   DAO dao = super.getDelegate();
-    //   if ( dao == null ) {
-    //     dao = (DAO) getX().get("internalMedusaEntryDAO");
-    //     setDelegate(dao);
-    //   }
-    //   return dao;
-    //   `
-    // },
     {
       name: 'put_',
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
-      getLogger().debug("put", entry.getIndex(), entry.getId());
+      getLogger().debug("put", entry.getIndex(), "id", entry.getId(), "hash", entry.getHash());
       return getDao().put_(x, entry);
       `
     },
@@ -67,7 +55,7 @@ DAO stacks both end at x.get("internalMedusaEntryDAO").`,
       name: 'remove_',
       javaCode: `
       MedusaEntry entry = (MedusaEntry) getDao().remove_(x, obj);
-      getLogger().debug("remove", entry.getId(), entry.getIndex());
+      getLogger().debug("remove", entry.getIndex(), "id", entry.getId(), "hash", entry.getHash());
       return entry;
     `
     }

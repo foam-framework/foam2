@@ -54,13 +54,13 @@ NOTE: override cmd_ in child class to control delegate call`,
     {
       name: 'puts',
       class: 'List',
-      of: 'foam.nanos.medusa.MedusaEntry',
+      of: 'foam.core.FObject',
       javaFactory: 'return new ArrayList();'
     },
     {
       name: 'removes',
       class: 'List',
-      of: 'foam.nanos.medusa.MedusaEntry',
+      of: 'foam.core.FObject',
       javaFactory: 'return new ArrayList();'
     },
     {

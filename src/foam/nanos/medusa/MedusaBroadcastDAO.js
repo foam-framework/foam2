@@ -21,6 +21,7 @@ foam.CLASS({
     'foam.nanos.logger.Logger',
     'static foam.mlang.MLang.AND',
     'static foam.mlang.MLang.EQ',
+    'static foam.mlang.MLang.OR',
     'java.util.ArrayList',
     'java.util.HashMap',
     'java.util.List',
@@ -95,7 +96,10 @@ foam.CLASS({
       List<ClusterConfig> arr = (ArrayList) ((ArraySink) ((DAO) x.get("localClusterConfigDAO"))
         .where(
           AND(
-            EQ(ClusterConfig.ZONE, 0),
+            OR(
+              EQ(ClusterConfig.ZONE, 0),
+              EQ(ClusterConfig.ZONE, 1)
+            )
             EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
             EQ(ClusterConfig.STATUS, Status.ONLINE),
             EQ(ClusterConfig.ENABLED, true),

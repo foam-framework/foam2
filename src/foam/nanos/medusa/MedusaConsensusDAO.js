@@ -281,6 +281,8 @@ foam.CLASS({
           .removeAll();
 
         return match;
+      } else {
+        getLogger().debug("consensus", entry.getIndex(), "groups", groups.size());
       }
       return entry;
       `

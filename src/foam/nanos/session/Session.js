@@ -43,6 +43,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'id',
+      includeInDigest: true,
       visibility: 'RO'
     },
     {
@@ -56,6 +57,7 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'userId',
+      includeInDigest: true,
       tableCellFormatter: function(value, obj) {
         this.add(value);
         this.__context__.userDAO.find(value).then(function(user) {
@@ -68,6 +70,7 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'agentId',
+      includeInDigest: true,
       tableCellFormatter: function(value, obj) {
         if ( ! value ) return;
         this.add(value);
@@ -80,18 +83,21 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'created',
+      includeInDigest: true,
       visibility: 'RO'
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdBy',
+      includeInDigest: true,
       visibility: 'RO'
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdByAgent',
+      includeInDigest: true,
       visibility: 'RO'
     },
     {
@@ -106,6 +112,7 @@ foam.CLASS({
       label: 'TTL',
       documentation: 'The "time to live" of the session. The amount of time in milliseconds that the session should be kept alive after its last use before being destroyed. Must be a positive value or zero.',
       value: 28800000, // 1000 * 60 * 60 * 8 = number of milliseconds in 8 hours
+      includeInDigest: true,
       tableWidth: 70,
       validationPredicates: [
         {
@@ -126,13 +133,15 @@ foam.CLASS({
     {
       class: 'String',
       name: 'remoteHost',
+      includeInDigest: true,
       visibility: 'RO',
       tableWidth: 120
     },
     {
       documentation: 'Intended to be used with long TTL sessions, further restricting to a known set of IPs.',
       class: 'StringArray',
-      name: 'remoteHostWhiteList'
+      name: 'remoteHostWhiteList',
+      includeInDigest: true
     },
     {
       class: 'Object',

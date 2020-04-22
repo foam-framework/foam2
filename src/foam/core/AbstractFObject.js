@@ -398,6 +398,8 @@ foam.CLASS({
         while ( i.hasNext() ) {
           PropertyInfo prop = (PropertyInfo) i.next();
           if ( ! prop.includeInDigest() ) continue;
+          if ( prop.getStorageTransient() ) continue;
+          if ( prop.getClusterTransient() ) continue;
           md.update(prop.getNameAsByteArray());
           prop.updateDigest(this, md);
         }
@@ -420,6 +422,8 @@ foam.CLASS({
         while ( i.hasNext() ) {
           PropertyInfo prop = (PropertyInfo) i.next();
           if ( ! prop.includeInSignature() ) continue;
+          if ( prop.getStorageTransient() ) continue;
+          if ( prop.getClusterTransient() ) continue;
           signer.update(prop.getNameAsByteArray());
           prop.updateSignature(this, signer);
         }

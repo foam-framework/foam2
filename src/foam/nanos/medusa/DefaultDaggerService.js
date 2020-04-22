@@ -103,6 +103,13 @@ foam.CLASS({
       // TODO: get initial hashes from HSM for new deployment
       name: 'start',
       javaCode: `
+      ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
+      ClusterConfig config = support.getConfig(getX(), support.getConfigId());
+      if ( config != null &&
+           config.getType() == MedusaType.NODE ) {
+        getLogger().debug("start", "node", "exit");
+        return;
+      }
       DAO dao = (DAO) getX().get("internalMedusaEntryDAO");
       MedusaEntry entry = new MedusaEntry();
       entry.setIndex(getNextGlobalIndex(getX()));
@@ -143,8 +150,9 @@ foam.CLASS({
       name: 'hash',
       javaCode: `
       // TODO: also getProvider
-      getLogger().debug("hash", entry.getIndex(), entry.getIndex1(), entry.getIndex2());
-//      getLogger().debug("hash", entry.getIndex(), entry.getIndex1(), entry.getHash1(), entry.getIndex2(), entry.getHash2());
+//      getLogger().debug("hash", entry.getIndex(), entry.getIndex1(), entry.getIndex2());
+      getLogger().debug("hash", entry.getIndex(), "1", entry.getIndex1(), entry.getHash1());
+      getLogger().debug("hash", entry.getIndex(), "2", entry.getIndex2(), entry.getHash2());
       MessageDigest md = MessageDigest.getInstance(getHashingAlgorithm());
       md.update(Long.toString(entry.getIndex1()).getBytes(StandardCharsets.UTF_8));
       md.update(entry.getHash1().getBytes(StandardCharsets.UTF_8));

@@ -54,13 +54,14 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-      return submit(x, (FObject) obj, DOP.PUT);
+      FObject old = getDelegate().find_(x, obj.getProperty("id"));
+      return submit(x, (FObject) obj, old, DOP.PUT);
       `
     },
     {
       name: 'remove_',
       javaCode: `
-      return submit(x, (FObject) obj, DOP.REMOVE);
+      return submit(x, (FObject) obj, null, DOP.REMOVE);
       `
     },
     {
@@ -84,6 +85,10 @@ foam.CLASS({
           type: 'FObject'
         },
         {
+          name: 'old',
+          type: 'FObject'
+        },
+        {
           name: 'dop',
           type: 'foam.dao.DOP'
         }
@@ -104,18 +109,27 @@ foam.CLASS({
 //      entry.setSessionId(((Session) x.get("session")).getId());
       entry.setData(obj);
 
-      getLogger().debug("submit", entry.getIndex());
+      // TODO/REVIEW: to reduce network load, just marshal delta. But this won't work in practise as
+      // HashingDAO needs the complete object to generate a hash()
+      foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(x).setPropertyPredicate(new foam.lib.ClusterPropertyPredicate());
+//      String d = ( old != null ) ?
+//        outputter.stringifyDelta(old, obj) :
+        String d = outputter.stringify(obj);
+      // entry.setData(d);
+      getLogger().debug("submit", entry.getIndex(), obj.getClass().getSimpleName(), "stringify", d);
+
+//      getLogger().debug("submit", entry.getIndex());
 
       try {
         FObject data = ((MedusaEntry)getMedusaEntryDAO().put_(x, entry)).getData();
+//        ((MedusaEntry)getMedusaEntryDAO().put_(x, entry));
         getLogger().debug("submit", entry.getIndex(), "find", data.getProperty("id"));
         FObject result = getDelegate().find_(x, data.getProperty("id"));
         if ( result == null ) {
           getLogger().error("Object not found", data.getProperty("id"));
           return data;
-        } else {
-          getLogger().debug("submit", entry.getIndex(), "found", result.getProperty("id"));
         }
+        getLogger().debug("submit", entry.getIndex(), "found", result.getProperty("id"));
         return result;
       } catch (Throwable t) {
         getLogger().error("submit", t.getMessage(), entry, t);
