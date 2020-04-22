@@ -50,7 +50,7 @@ foam.CLASS({
               a.array.map(function(nspec) {
                 return self.parseClientModel(nspec)
               }).filter(function(cls) {
-                return !!cls && (allowedModels.size == undefined? true : allowedModels[cls.id]);
+                return cls && (allowedModels.size == undefined? true : allowedModels[cls.id]);
               }).map(function(cls) {
                 return dao.put(cls.model_);
               })
