@@ -32,6 +32,16 @@ foam.CLASS({
       name: 'stopped_',
       value: true,
       hidden: true
+    },
+    {
+      class: 'Boolean',
+      name: 'colliding_',
+      hidden: true
+    },
+    {
+      name: 'removedChildren_',
+      factory: function() { return []; },
+      hidden: true
     }
   ],
 
@@ -58,7 +68,7 @@ foam.CLASS({
       this.detectCollisions_(0, this.children.length-1, 'x', false, '');
 
       // simpler and less efficient version, use to debug above
-      // this.detectCollisions__(0, this.children.length-1, 'x', false, '');
+      //this.detectCollisions__(0, this.children.length-1, 'x', false, '');
     },
 
     function detectCollisions__(start, end) {
@@ -73,18 +83,13 @@ foam.CLASS({
         for ( var j = i+1 ; j <= end ; j++ ) {
           var c2 = cs[j];
           if ( c2 == null ) break;
-          try {
-            if ( c1.intersects && c1.intersects(c2) ) this.collide(c1, c2);
-          } catch (x) {
-            console.warn('Exception in collider', x);
-          }
+          if ( c1.intersects && c1.intersects(c2) ) this.collide(c1, c2);
         }
       }
     },
 
     function choosePivot(start, end, axis) {
       var cs = this.children;
-      while ( end && ! cs[end] ) end--;
       axis = axis + '_';
       var p = 0, n = end-start;
       for ( var i = start ; i <= end ; i++ ) p += cs[i][axis] / n;
@@ -94,7 +99,6 @@ foam.CLASS({
     function detectCollisions_(start, end, axis, oneD) {
       if ( start >= end ) return;
 
-      try {
         var cs       = this.children;
         var pivot    = this.choosePivot(start, end, axis);
         var nextAxis = oneD ? axis : axis === 'x' ? 'y' : 'x' ;
@@ -139,11 +143,6 @@ foam.CLASS({
             this.detectCollisions_(p+1, end, nextAxis, oneD);
           }
         }
-      } catch (x) {
-        // some collisions might result in the object being
-        // removed which could cause a NPE, so don't worry
-        // about it
-      }
     },
 
     function angleOfImpact(c1, c2) {
@@ -203,7 +202,11 @@ foam.CLASS({
 
     function remove() {
       for ( var i = 0 ; i < arguments.length ; i++ ) {
-        foam.Array.remove(this.children, arguments[i]);
+        if ( this.colliding_ ) {
+          this.removedChildren_.push(arguments[i]);
+        } else {
+          foam.Array.remove(this.children, arguments[i]);
+        }
       }
       return this;
     },
@@ -236,9 +239,18 @@ foam.CLASS({
       isFramed: true,
       code: function tick() {
         if ( this.stopped_ ) return;
-        this.onTick.pub();
-        this.detectCollisions();
-        this.updateChildren();
+
+        this.colliding_ = true;
+          this.onTick.pub();
+          this.detectCollisions();
+          this.updateChildren();
+        this.colliding_ = false;
+
+        // Now remove all children that were requested to be removed
+        // while detecting collisions. We don't remove while colliding
+        // because it messes up the children array causing errors.
+        this.remove(this.removedChildren_);
+        this.removedChildren_.length = 0;
 
         this.tick();
       }
