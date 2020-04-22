@@ -79,7 +79,7 @@
                     next.setValue(Arrays.asList((Object[]) nextValue));
                   }
                   if ( nextValue instanceof FObject ) {
-                    String hashedKey = getApprovableHashKey(x, (FObject) nextValue, Operations.CREATE);
+                    String hashedKey = getApprovableHashKey(x, (FObject) nextValue, operation);
                     if ( hashedKey.toLowerCase().equals(nextValue.getClass().getSimpleName().toLowerCase()) ) continue;
                     next.setValue(hashedKey);
                   }
