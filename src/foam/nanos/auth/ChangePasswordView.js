@@ -107,7 +107,7 @@ foam.CLASS({
     },
     {
       name: 'passwordModel',
-      documentation: 'password model to used for this view',
+      documentation: 'password model used for this view',
       factory: function() {
         if ( this.mode === 'update' ) {
           return this.UpdatePassword.create();
