@@ -201,10 +201,10 @@ foam.CLASS({
     },
 
     function remove() {
-      for ( var i = 0 ; i < arguments.length ; i++ ) {
-        if ( this.colliding_ ) {
-          this.removedChildren_.push(arguments[i]);
-        } else {
+      if ( this.colliding_ ) {
+        this.removedChildren_.push.apply(this.removedChildren_, arguments);
+      } else {
+        for ( var i = 0 ; i < arguments.length ; i++ ) {
           foam.Array.remove(this.children, arguments[i]);
         }
       }
@@ -249,7 +249,7 @@ foam.CLASS({
         // Now remove all children that were requested to be removed
         // while detecting collisions. We don't remove while colliding
         // because it messes up the children array causing errors.
-        this.remove(this.removedChildren_);
+        this.remove.apply(this, this.removedChildren_);
         this.removedChildren_.length = 0;
 
         this.tick();

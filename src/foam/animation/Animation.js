@@ -85,6 +85,10 @@ foam.CLASS({
     {
       class: 'Map',
       name: 'slots_'
+    },
+    {
+      class: 'Boolean',
+      name: 'stopped'
     }
   ],
 
@@ -105,6 +109,10 @@ foam.CLASS({
 
       this.animateValues();
       this.tick();
+
+      this.onDetach(() => this.stopped = true);
+
+      return this;
     },
 
     function animateValues() {
