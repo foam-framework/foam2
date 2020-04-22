@@ -58,7 +58,8 @@
               }
               Map diff = oldObj == null ? null : oldObj.diff(obj);
               StringBuilder hash_sb = new StringBuilder(obj.getClass().getSimpleName());
-              if ( operation == Operations.UPDATE) hash_sb.append(((ApprovableAware) obj).getStringId());
+              if ( operation == Operations.UPDATE && obj instanceof ApprovableAware ) 
+                hash_sb.append(((ApprovableAware) obj).getStringId());
 
               if ( diff != null ) {
                 // remove ids, timestamps and userfeedback
@@ -66,7 +67,7 @@
                 diff.remove("created");
                 diff.remove("lastModified");
                 diff.remove("userFeedback");
-                
+
                 // convert array properties to list to get consistent hash
                 // and create hash
                 Iterator it = diff.entrySet().iterator();
@@ -77,11 +78,20 @@
                   if ( nextValue instanceof Object[] ) {
                     next.setValue(Arrays.asList((Object[]) nextValue));
                   }
+                  if ( nextValue instanceof FObject ) {
+                    String hashedKey = getApprovableHashKey(x, (FObject) nextValue, Operations.CREATE);
+                    if ( hashedKey.toLowerCase().equals(nextValue.getClass().getSimpleName().toLowerCase()) ) continue;
+                    next.setValue(hashedKey);
+                  }
+
                   hash_sb.append(":").append(String.valueOf(next.hashCode()));
                 }
               }
 
-              String key = diff == null || diff.size() == 0 ? ((ApprovableAware) obj).getStringId() : hash_sb.toString();
+              String key = ( diff == null || diff.size() == 0 ) && obj instanceof ApprovableAware ? 
+                ((ApprovableAware) obj).getStringId() : 
+                hash_sb.toString();
+              
               return key;
             `
           })
