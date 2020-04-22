@@ -278,23 +278,17 @@ foam.CLASS({
       javaCode: `
         String startScript = System.getProperty("foam.main", "main");
         // Run on all instances if:
-        // - startup "main" script
-        // - not-clusterable and Online
-        // otherwise only on
-        // - Primary Mediator - REVIEW
+        // - startup "main" script, or
+        // - not-clusterable, or
+        // - a suitable cluster configuration
 
         if ( ! getId().equals(startScript) &&
              getClusterable() ) {
           foam.nanos.medusa.ClusterConfigSupport support = (foam.nanos.medusa.ClusterConfigSupport) x.get("clusterConfigSupport");
-          if ( support != null ) {
-            foam.nanos.medusa.ClusterConfig config = support.getConfig(x, support.getConfigId());
-            if ( config.getType() == foam.nanos.medusa.MedusaType.MEDIATOR &&
-                 ! config.getIsPrimary() ||
-                config.getType() == foam.nanos.medusa.MedusaType.NODE ||
-                config.getStatus() != foam.nanos.medusa.Status.ONLINE ) {
-              ((Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "Script execution disabled", getId(), getDescription());
-              return;
-            }
+          if ( support != null &&
+               ! support.cronEnabled(x) ) {
+            ((Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "Script execution disabled", getId(), getDescription());
+            return;
           }
         }
 

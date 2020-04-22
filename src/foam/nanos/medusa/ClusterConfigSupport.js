@@ -575,6 +575,27 @@ configuration for contacting the primary node.`,
     //   }
     //   throw new IllegalArgumentException("MDAO not found: "+name);
     //   `
-    // }
+    // },
+    {
+      name: 'cronEnabled',
+      type: 'Boolean',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+      ],
+      javaCode: `
+      ClusterConfig config = getConfig(x, getConfigId());
+      if ( config.getType() == MedusaType.MEDIATOR &&
+           ! config.getIsPrimary() &&
+           config.getZone() == 0L ||
+           config.getType() == MedusaType.NODE ||
+           config.getStatus() != Status.ONLINE ) {
+        return false;
+      }
+      return true;
+     `
+    }
   ]
 });
