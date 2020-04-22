@@ -2332,7 +2332,7 @@ foam.CLASS({
           if ( ! data || ! data.__subContext__.auth ) return PPVC.HIDDEN;
           var auth     = data.__subContext__.auth;
           var propName = this.name.toLowerCase();
-          var clsName  = this.forClass_.substring(this.forClass_.lastIndexOf('.') + 1).toLowerCase();
+          var clsName  = data.cls_.name.toLowerCase();
           var canRead  = this.readPermissionRequired === false;
 
           return auth.check(null, `${clsName}.rw.${propName}`)
