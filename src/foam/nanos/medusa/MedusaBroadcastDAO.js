@@ -99,7 +99,7 @@ foam.CLASS({
             OR(
               EQ(ClusterConfig.ZONE, 0),
               EQ(ClusterConfig.ZONE, 1)
-            )
+            ),
             EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
             EQ(ClusterConfig.STATUS, Status.ONLINE),
             EQ(ClusterConfig.ENABLED, true),
