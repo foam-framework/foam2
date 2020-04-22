@@ -80,4 +80,3 @@ p({
   """,
   "output":""
 })
-p({"class":"foam.nanos.auth.DeletedAwareDAOTest","id":"DeletedAwareDAOTest"})

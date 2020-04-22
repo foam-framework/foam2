@@ -1926,9 +1926,7 @@ foam.CLASS({
         var v2 = this.arg2.f(o);
 
         // TODO This first check shouldn't be necessary.
-        return  ( v1 !== undefined ||
-                  v2 !== null ) &&
-          ! foam.util.equals(v1, v2);
+        return  ( v1 !== undefined || v2 !== null ) && ! foam.util.equals(v1, v2);
       },
       swiftCode: `
 let v1 = arg1!.f(obj)

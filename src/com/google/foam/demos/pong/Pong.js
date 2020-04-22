@@ -36,6 +36,8 @@ foam.CLASS({
   name: 'Pong',
   extends: 'foam.u2.Element',
 
+  documentation: 'Classic Pong videogame. Use two gamepads to play.',
+
   requires: [
     'com.google.foam.demos.pong.Ball',
     'com.google.foam.demos.pong.Paddle',
@@ -114,8 +116,16 @@ foam.CLASS({
         width:  0,
         height: 70});
 
+      var centerLine = this.Box.create({
+        x:      this.canvas.width/2-5,
+        width:  10,
+        height: this.canvas.height,
+        border: null, //'rgba(0,0,0,0)',
+        color:  'white'
+      });
+
       this.canvas.add(
-          this.Box.create({x: this.canvas.width/2-5, width:10, height: this.canvas.height, border:'rgba(0,0,0,0)' , color: 'white'}),
+          centerLine,
           this.ball,
           lScoreLabel,
           rScoreLabel,
@@ -132,11 +142,11 @@ foam.CLASS({
       this.ball.y  = this.rPaddle.y;
       this.ball.vx = this.ball.vy = 10;
 
+      // We could make a foam.util.Timer, but the collider already has a timer
+      // so just subscribe to its tick instead.
       this.collider.onTick.sub(this.tick);
 
-      this.ball.collideWith = (o) => {
-        this.onBounceOnPaddle();
-      };
+      this.ball.collideWith = (o) => this.onBounceOnPaddle();
 
       // Setup Physics
       this.collider.add(this.ball, this.lPaddle, this.rPaddle).start();
@@ -208,6 +218,9 @@ foam.CLASS({
         if ( ball.velocity >  10 || ball.velocity < -10 )
           ball.velocity *=  0.99;
 
+        // Bouncing could have been done with the Collider by just adding
+        // border objects.
+
         // Bounce off of top wall
         if ( ball.y - ball.radius <= 0 ) {
           ball.vy = Math.abs(ball.vy);
@@ -232,6 +245,7 @@ foam.CLASS({
           ball.vx *= -1;
           this.onScore();
         }
+
         // Reset scores
         if ( this.lScore == 100 || this.rScore == 100 ) {
           this.lScore = this.rScore = 0;

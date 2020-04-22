@@ -208,6 +208,41 @@ for ( Object key : sink.getGroupKeys() ) {
 }`
     },
     {
+      name: 'updateRules',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      javaCode: `DAO localRuleDAO = ((DAO) x.get("localRuleDAO")).where(
+  EQ(Rule.DAO_KEY, getDaoKey())
+);
+localRuleDAO.listen(
+  new UpdateRulesListSink.Builder(getX())
+    .setDao(this)
+    .build()
+  , null
+);
+
+localRuleDAO = localRuleDAO.where(
+  EQ(Rule.ENABLED, true)
+).orderBy(new Desc(Rule.PRIORITY));
+localRuleDAO.select(new AbstractSink(new ReadOnlyDAOContext(getX())) {
+      @Override
+      public void put(Object obj, Detachable sub) {
+        Rule rule = (Rule) obj;
+        rule.setX(getX());
+      }
+    });
+addRuleList(localRuleDAO, getCreateBefore());
+addRuleList(localRuleDAO, getUpdateBefore());
+addRuleList(localRuleDAO, getRemoveBefore());
+addRuleList(localRuleDAO, getCreateAfter());
+addRuleList(localRuleDAO, getUpdateAfter());
+addRuleList(localRuleDAO, getRemoveAfter());`
+    },
+    {
       name: 'cmd_',
       javaCode: `if ( PUT_CMD == obj ) {
   getDelegate().put((FObject) x.get("OBJ"));

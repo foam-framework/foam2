@@ -742,13 +742,10 @@ p({
   "serve": true,
   "serviceScript": """
     dao = new foam.dao.EasyDAO.Builder(x)
+      .setEnableInterfaceDecorators(false)
       .setOf(foam.nanos.ruler.Rule.getOwnClassInfo())
-      .setGuid(true)
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName("rules")
       .setRuler(false)
-      .setCluster(false)
-      .setPm(true)
+      .setInnerDAO(x.get("localRuleDAO"))
       .build();
 
     dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.ruler.Rule.NAME });
@@ -762,6 +759,38 @@ p({
     }
   """
 })
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "localRuleDAO",
+  "serviceScript":
+  """
+    dao = new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setGuid(true)
+      .setOf(foam.nanos.ruler.Rule.getOwnClassInfo())
+      .setGuid(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("rules")
+      .setContextualize(true)
+      .setValidated(true)
+      .setRuler(false)
+      .setCluster(false)
+      .setAuthorize(false)
+      .setApprovableAwareEnabled(false)
+      .build();
+
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.ruler.Rule.NAME });
+
+    return dao;
+  """,
+  "client": """
+    {
+      "of": "foam.nanos.ruler.Rule"
+    }
+  """
+})
+
 p({
   "class": "foam.nanos.boot.NSpec",
   "name": "ruleGroupDAO",
