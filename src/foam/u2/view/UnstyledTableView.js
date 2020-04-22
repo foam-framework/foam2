@@ -206,9 +206,9 @@ foam.CLASS({
       expression: function(allColumns, of) {
         var ls = JSON.parse(localStorage.getItem(of.id));
         if ( ls )
-          return ls;
+          return ls.map(c => [c]);
         var tc = of.getAxiomByName('tableColumns');
-        return tc ? tc.columns : allColumns.map(c => c[0]);
+        return tc ? tc.columns : allColumns.map(c => [c[0]]);
       },
       
       // factory: function() {
@@ -244,6 +244,7 @@ foam.CLASS({
       //this.isColumnChanged = ;
 
       if ( this.filteredTableColumns$ ) {
+        //change this
         this.onDetach(this.filteredTableColumns$.follow(
           this.columns_$.map((cols) => cols.map(([axiomOrColumnName, overrides]) => {
             return (typeof axiomOrColumnName) === 'string' ? axiomOrColumnName : axiomOrColumnName.name;
@@ -296,10 +297,20 @@ foam.CLASS({
               }).
 
               // Render the table headers for the property columns.
-              forEach(columns_, function([axiomOrColumnName, overrides]) {
-                var column = typeof axiomOrColumnName === 'string'
-                  ? view.of.getAxiomByName(axiomOrColumnName)
-                  : axiomOrColumnName;
+              forEach(columns_, function([arayOfAxiomNames, overrides]) {
+                var cls = view.of;
+                var column;
+                for ( var i = arayOfAxiomNames.length-1; i > -1; i--) {
+                  column = typeof arayOfAxiomNames[i] === 'string'
+                  ? view.of.getAxiomByName(arayOfAxiomNames[i])
+                  :  foam.Array.isInstance(arayOfAxiomNames[i]) ? 
+                  view.of.getAxiomByName(arayOfAxiomNames[i][0]) : arayOfAxiomNames[i];
+                  if ( !column ) {
+                    //need to come up with behavior
+                    break;
+                  }
+                  cls = column.cls_;
+                }
                 if ( overrides ) column = column.clone().copyFrom(overrides);
                 this.start().
                   addClass(view.myClass('th')).
@@ -476,20 +487,32 @@ foam.CLASS({
                   });
                 }).
 
-                forEach(columns_, function([axiomOrColumnName, overrides]) {
-                  var column = typeof axiomOrColumnName === 'string'
-                    ? obj.cls_.getAxiomByName(axiomOrColumnName)
-                    : axiomOrColumnName;
+                forEach(columns_, function([arayOfAxiomNames, overrides]) {
+                  var theObj = obj;
+                  var column;
+                  //var value;
+                  for(var i = arayOfAxiomNames.length-1; i > -1; i--) {
+                    if ( i != arayOfAxiomNames.length-1 )
+                      theObj = column.f(theObj);
+                    column = typeof arayOfAxiomNames[i] === 'string'
+                    ? theObj.cls_.getAxiomByName(arayOfAxiomNames[i])
+                    : foam.Array.isInstance(arayOfAxiomNames[i]) ? theObj.cls_.getAxiomByName(arayOfAxiomNames[i][0]) : arayOfAxiomNames[i];
+                    if ( !column ) {
+                      //value = '-'; no need as column.f null
+                      break;
+                    }
+                  }
+                  
                   if ( overrides ) column = column.clone().copyFrom(overrides);
                   this.
                     start().
                       addClass(view.myClass('td')).
                       callOn(column.tableCellFormatter, 'format', [
-                        column.f ? column.f(obj) : null, obj, column
+                        column.f ? column.f(theObj) : null, theObj, column
                       ]).
                       callIf(column.f, function() {
                         try {
-                          var value = column.f(obj);
+                          var value = column.f(theObj);
                           if ( foam.util.isPrimitive(value) ) {
                             this.attr('title', value);
                           }

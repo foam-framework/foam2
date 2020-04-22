@@ -68,8 +68,13 @@ foam.CLASS({
       for (var v of views) {
         v.view.currentProperty$.sub(function() {
           self.isColumnChanged = true;
-          if ( foam.core.StringArray.isInstance(self.selectedColumns[0]) ) self.selectedColumns[v.i] = [ v.view.currentProperty.name, null ];
-          else self.selectedColumns[v.i] = v.view.currentProperty.name;
+          var currView = v.view;
+          self.selectedColumns[v.i] = [];
+          while(currView && currView.currentProperty) {
+            if ( foam.core.StringArray.isInstance(self.selectedColumns[0]) ) self.selectedColumns[v.i].push([ currView.currentProperty.name, null ]);
+            else self.selectedColumns[v.i].push(currView.currentProperty.name);
+            currView = currView.body;
+          }
         });
       }
 

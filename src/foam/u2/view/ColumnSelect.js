@@ -320,6 +320,7 @@ foam.CLASS({
       class: 'Boolean',
       value: false
     },
+    'isThisPropertyPathSelected',
     {
       class: 'foam.u2.ViewSpec',
       name: 'body',
@@ -330,7 +331,7 @@ foam.CLASS({
       class: 'foam.u2.ViewSpec',
       name: 'header',
       //value: { class: 'foam.u2.tag.ColumnViewHeader', hasSubProperties: this.hasSubProperties, isPropertySelected$:this.isPropertySelected$, expanded:this.expanded, currentProperty:this.currentProperty, isThisPropSelected:this.isThisPropSelected, selectedProp:this.selectedProp, open$:this.open$},
-      factory: function() { return { class: 'foam.u2.tag.ColumnViewHeader', hasSubProperties: this.hasSubProperties, isPropertySelected$:this.isPropertySelected$, expanded:this.expanded, currentProperty:this.currentProperty, isThisPropSelected:this.isThisPropSelected, selectedProp:this.selectedProp, open$:this.open$}; }
+      factory: function() { return { class: 'foam.u2.tag.ColumnViewHeader', hasSubProperties: this.hasSubProperties, isPropertySelected$:this.isThisPropertyPathSelected$, expanded:this.expanded, currentProperty:this.currentProperty, isThisPropSelected:this.isThisPropSelected, selectedProp:this.selectedProp, open$:this.open$}; }
     },
     'isPropertySelected',
     'open',
@@ -340,6 +341,13 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       var self = this;
+
+      self.isThisPropertyPathSelected$.sub(function() {
+        if ( self.isThisPropertyPathSelected ) {
+          self.selectedProp.push(self.currentProperty.name);
+          self.isPropertySelected = self.isThisPropertyPathSelected;
+        }
+      });
 
       // this.header = this.ColumnViewHeader.create({hasSubProperties: this.hasSubProperties, isPropertySelected:this.isPropertySelected, expanded:this.expanded, currentProperty:this.currentProperty}); 
       // this.body = this.ColumnViewBody.create({hasSubProperties:this.hasSubProperties, currentProperty:this.currentProperty, selectedProp:this.selectedProp, expanded:this.expanded, subProperties:this.subProperties}); 
