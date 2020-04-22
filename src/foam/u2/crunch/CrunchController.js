@@ -68,7 +68,7 @@ foam.CLASS({
               .map((capID) => capabilityMap[capID].daoKey);
 
             argsList = tcList
-              .filter((capID) => !! capabilityMap[capID].of && !! capabilityMap[capID].daoKey)
+              .filter((capID) => !! capabilityMap[capID].of && !! capabilityMap[capID].daoFindKey)
               .map((capID) =>
                 this.ctrl[capabilityMap[capID].daoFindKey].id);
           });

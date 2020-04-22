@@ -221,6 +221,10 @@ foam.CLASS({
       `,
       args: [
         {
+          name: 'x',
+          type: 'Context'
+        },
+        {
           name: 'permission',
           type: 'String'
         }
@@ -230,21 +234,26 @@ foam.CLASS({
 
         // Find intercepting capabilities
         List<Capability> capabilities =
-          ( (ArraySink) capabilityDAO.where(IN(
-            permission, Capability.PERMISSIONS_INTERCEPTED))
+          ( (ArraySink) capabilityDAO.where(IN(permission, Capability.PERMISSIONS_INTERCEPTED))
             .select(new ArraySink()) ).getArray();
 
-        List<Capability> capabilitiesAll =
-          ( (ArraySink) capabilityDAO
-            .select(new ArraySink()) ).getArray();
-
-        // Do not throw runtime exception of there are no intercepts
         if ( capabilities.size() < 1 ) return;
 
-        // Add capabilities to a runtime exception and throw it
+        List<Capability> filteredCapabilities = new java.util.ArrayList<Capability>(capabilities);
+
+        for ( Capability c : capabilities ) {
+          if ( ! c.getInterceptIf().f(x) ) {
+            filteredCapabilities.remove(c);
+          }
+        }
+
+        // Do not throw runtime exception of there are no intercepts
+        if ( filteredCapabilities.size() < 1 ) return;
+
+        // Add filteredCapabilities to a runtime exception and throw it
         CapabilityRuntimeException ex = new CapabilityRuntimeException(
-          "Permission denied; capabilities available.");
-        for ( Capability cap : capabilities ) ex.addCapabilityId(cap.getId());
+          "Permission ["+ permission +"] denied; filteredCapabilities available.");
+        for ( Capability cap : filteredCapabilities ) ex.addCapabilityId(cap.getId());
         throw ex;
       `
     }

@@ -151,7 +151,15 @@ foam.CLASS({
       name: 'daoFindKey',
       class: 'String',
       documentation: 'need to find things dynamically, thus have a string here to specify the object in context to look up.'
-    }
+    },
+    {
+      class: 'foam.mlang.predicate.PredicateProperty',
+      name: 'interceptIf',
+      javaFactory: `
+      return foam.mlang.MLang.TRUE;
+      `,
+      documentation: 'condition under which the permissions that may be intercepted by this capability will be intercepted.'
+    },
   ],
 
 
