@@ -58,11 +58,6 @@ foam.CLASS({
           // Get the Capability objects in a map because it's faster than sorting
           var capabilityMap = {};
           results.array.forEach((cap) => capabilityMap[cap.id] = cap);
-            // tcList.forEach((capId) => {
-            //   console.log(capabilityMap[capId]);
-            //   console.log(capabilityMap[capId].daoFindKey);
-            // });
-            // console.log(this.ctrl);
             // Collect lists for fullfilling the requirements for any given capability.
             ofList = tcList
               .filter((capID) => !! capabilityMap[capID].of)
