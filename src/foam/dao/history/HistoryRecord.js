@@ -39,6 +39,12 @@ foam.CLASS({
       tableWidth: 200
     },
     {
+      class: 'String',
+      name: 'agent',
+      label: 'Updated By',
+      documentation: 'agent that made the update'
+    },
+    {
       class: 'DateTime',
       name: 'timestamp',
       documentation: 'Date and time history record was created.',
@@ -50,12 +56,6 @@ foam.CLASS({
       name: 'updates',
       label: 'Updated Properties',
       documentation: 'Properties updated, contains new and old values.'
-    },
-    {
-      class: 'String',
-      name: 'agent',
-      label: 'Updated By',
-      documentation: 'agent that made the update'
     }
   ]
 });
