@@ -284,17 +284,17 @@ foam.CLASS({
           this.dao.select().then(s => s.array) :
           this.dao.find(this.data).then(o => o ? [o] : []);
 
-        p.then(function(a) {
+        p.then(a => {
           var choices = a.map(this.objToChoice);
-          var choiceLabels = a.map((o) => { return this.objToChoice(o)[1]});
-          Promise.all(choiceLabels).then(function(resolvedChoiceLabels) {
+          var choiceLabels = a.map(o => { return this.objToChoice(o)[1]});
+          Promise.all(choiceLabels).then(resolvedChoiceLabels => {
             for ( let i = 0; i < choices.length; i++ ) {
               choices[i][1] = resolvedChoiceLabels[i];
             }
             this.choices = choices;
-          }.bind(this));
+          });
           if ( this.data == null && this.index === -1 ) this.index = this.placeholder ? -1 : 0;
-        }.bind(this));
+        });
       }
     }
   ],
