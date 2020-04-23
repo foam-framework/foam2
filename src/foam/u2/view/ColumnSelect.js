@@ -70,21 +70,12 @@ foam.CLASS({
     background-image: linear-gradient(to bottom, #ffffff, #d3d6d8);
   }
   
+  ^move-right {
+    margin-left: 15px;
+  }
   `,
 
   properties: [
-    {
-      name: 'choices',
-      factory: function() {
-        return [];
-      }
-    },
-    {
-      name: 'placeholder',
-      factory: function() {
-        return undefined;
-      }
-    },
     {
       name: 'hasSubProperties',
       class: 'Boolean',
@@ -95,27 +86,12 @@ foam.CLASS({
       }
     },
     {
-      name: 'expanded',
-      class: 'Boolean',
-      value: false
-    },
-    {
-      name: 'open',
-      class: 'Boolean',
-      value: false
-    },
-    'currentProperty',
-    {
       name: 'subProperties',
       expression: function(currentProperty) {
         if ( currentProperty.cls_.name === 'FObjectProperty' )
-          return currentProperty.cls_.getAxiomsByClass(foam.core.Property);
+          return currentProperty.of.getAxiomsByClass(foam.core.Property);
         return [];
       }
-    },
-    {
-      name: 'selectedProp',
-      value: []
     },
     {
       name: 'props',
@@ -135,24 +111,37 @@ foam.CLASS({
         return this.ColumnView;
       }
     },
-
+    {
+      name: 'open',
+      class: 'Boolean',
+      value: false
+    },
+    'selectedColumns',
+    {
+      name: 'level',
+      class: 'Int',
+      value: 0//default??
+    },
+    {
+      name: 'currentProperty',
+      expression: function(props, selectedColumns, level) {
+        if ( level > selectedColumns.length - 1 )
+          return props[0];
+        return props.find(p => p.name == selectedColumns[selectedColumns.length - 1 - level]);
+      }
+    }
   ],
 
   methods: [
     function initE() {
       this.SUPER();
       var self = this;
-      this.selectedProp = [];
-
-      this.open$.sub(function() {
-        console.log('ddd');
-      });
 
       this.isPropertySelected$.sub(function() {
-        if ( self.thisPropertyView.currentProperty.name !== self.selectedProp[self.selectedProp.length - 1] ) {
+        if ( self.thisPropertyView.currentProperty.name !== self.selectedColumns[self.selectedColumns.length - 1] ) {
           self.views.push(self.thisPropertyView);
           for ( var i = 0; i < self.views.length - 1; i++) {
-            if ( self.views[i].currentProperty.name === self.selectedProp[self.selectedProp.length - 1]) {
+            if ( self.views[i].currentProperty.name === self.selectedColumns[self.selectedColumns.length - 1]) {
               self.currentProperty = self.views[i].currentProperty;
               self.thisPropertyView = self.views[i];
               self.views.splice(i, 1);
@@ -161,26 +150,25 @@ foam.CLASS({
           }
           self.isPropertySelected = false;
         }
-        
-        // if ( self.isPropertySelected )
-        //   self.open = !self.open;
       });
-
-     // var thisPropertyView;// = self.ColumnView.create({currentProperty: this.currentProperty, selectedProp: this.currentProperty, isPropertySelected$: this.isThisPropSelected$});
       this.views = [];
-
       var i = 0;
       if ( !this.currentProperty ) {
         this.currentProperty = this.props[0];
-        this.thisPropertyView = foam.u2.ViewSpec.createView(self.ColumnView, {currentProperty: this.props[i], selectedProp: this.selectedProp, isPropertySelected$: this.isPropertySelected$, open$:this.open$}, this, this.__subSubContext__);
+        this.thisPropertyView = foam.u2.ViewSpec.createView(self.ColumnView, {currentProperty: this.props[i], isThisPropertyPathSelected$: self.isPropertySelected$, selectedColumns$: self.selectedColumns$, level:0 }, this, this.__subSubContext__);
         i = 1;
       }
 
       for ( ; i < this.props.length; i++ ) {
         if ( this.props[i].name === this.currentProperty.name  )
-          this.thisPropertyView = foam.u2.ViewSpec.createView(self.ColumnView, { currentProperty: self.props[i], selectedProp: self.selectedProp, isPropertySelected: self.isPropertySelected, open$:self.open$}, self, self.__subSubContext__);
+          this.thisPropertyView = foam.u2.ViewSpec.createView(self.ColumnView, { currentProperty: self.props[i], isThisPropertyPathSelected$: self.isPropertySelected$, selectedColumns$: self.selectedColumns$, level:0 }, self, self.__subSubContext__);
         else
-          self.views.push(foam.u2.ViewSpec.createView(self.ColumnView, {currentProperty: self.props[i], selectedProp: self.selectedProp, isPropertySelected: self.isPropertySelected, open$:self.open$}, self, self.__subSubContext__));
+          self.views.push(foam.u2.ViewSpec.createView(self.ColumnView, {currentProperty: self.props[i], isThisPropertyPathSelected$: self.isPropertySelected$, selectedColumns$: self.selectedColumns$, level:0 }, self, self.__subSubContext__));
+      }
+      for ( i = 0; i < self.views.length; i++ ) {
+        self.views[i].isThisPropertyPathSelected$.sub(function() {
+          self.isPropertySelected = true;
+        });
       }
       this
       .start()
@@ -199,14 +187,19 @@ foam.CLASS({
               .forEach(self.views, function(v) {
                 self
                   .start()
-                  .show(self.open$)
+                  .addClass(self.myClass('move-right'))
+                  .show(self.thisPropertyView.expanded$)
                     .add(v)
                   .end();
               })
           .end()
         .end()
       .end();
-      
+
+
+      self.thisPropertyView.expanded$.sub(function() {
+        console.log('expended changed');
+      });
     }
   ]
 });
@@ -219,7 +212,6 @@ foam.CLASS({
   requires: [
     'foam.u2.tag.ColumnViewHeader',
     'foam.u2.tag.ColumnViewBody'
-
   ],
   css:`
   ^ {
@@ -291,23 +283,27 @@ foam.CLASS({
       name: 'hasSubProperties',
       class: 'Boolean',
       expression: function(subProperties) {
-        if ( !subProperties && subProperties.length !== 0 )
+        if ( subProperties && subProperties.length !== 0 )
           return true;
         return false;
       }
+    },
+    {
+      class: 'Int',
+      name: 'level'
+    },
+    {
+      name: 'selectedColumns',
+      value: []
     },
     'currentProperty',
     {
       name: 'subProperties',
       expression: function(currentProperty) {
         if ( currentProperty.cls_.name === 'FObjectProperty' )
-          return currentProperty.cls_.getAxiomsByClass(foam.core.Property);
+          return currentProperty.of.getAxiomsByClass(foam.core.Property);
         return [];
       }
-    },
-    {
-      name: 'selectedProp',
-      value: []
     },
     {
       name: 'expanded',
@@ -319,21 +315,23 @@ foam.CLASS({
       class: 'Boolean',
       value: false
     },
-    'isThisPropertyPathSelected',
+    {
+      name: 'isThisPropertyPathSelected',
+      class: 'Boolean',
+      value: false
+    },
     {
       class: 'foam.u2.ViewSpec',
       name: 'body',
       //value: { class: 'foam.u2.tag.ColumnViewBody', hasSubProperties: this.hasSubProperties, isPropertySelected$:this.isPropertySelected$, expanded:this.expanded, currentProperty:this.currentProperty, isThisPropSelected:this.isThisPropSelected, selectedProp:this.selectedProp, open$:this.open$},
-      factory: function() { return { class: 'foam.u2.tag.ColumnViewBody', hasSubProperties:this.hasSubProperties, currentProperty:this.currentProperty, selectedProp:this.selectedProp, expanded:this.expanded, subProperties:this.subProperties, open$:this.open$}; }
+      factory: function() { return { class: 'foam.u2.tag.ColumnViewBody', hasSubProperties$:this.hasSubProperties$, currentProperty$:this.currentProperty$, expanded$:this.expanded$, subProperties:this.subProperties, isThisPropSelected$:this.isThisPropSelected$, isThisPropertyPathSelected$:this.isThisPropertyPathSelected$, level$:this.level$, selectedColumns$: this.selectedColumns$ }; }
     },
     {
       class: 'foam.u2.ViewSpec',
       name: 'header',
       //value: { class: 'foam.u2.tag.ColumnViewHeader', hasSubProperties: this.hasSubProperties, isPropertySelected$:this.isPropertySelected$, expanded:this.expanded, currentProperty:this.currentProperty, isThisPropSelected:this.isThisPropSelected, selectedProp:this.selectedProp, open$:this.open$},
-      factory: function() { return { class: 'foam.u2.tag.ColumnViewHeader', hasSubProperties: this.hasSubProperties, isPropertySelected:this.isThisPropertyPathSelected, expanded:this.expanded, currentProperty:this.currentProperty, isThisPropSelected:this.isThisPropSelected, selectedProp:this.selectedProp, open$:this.open$}; }
-    },
-    'isPropertySelected',
-    'open',
+      factory: function() { return { class: 'foam.u2.tag.ColumnViewHeader', hasSubProperties$: this.hasSubProperties$, expanded$:this.expanded$, currentProperty:this.currentProperty, isThisPropSelected$:this.isThisPropSelected$, selectedColumns$: this.selectedColumns$, level:this.level }; }
+    }
   ],
 
   methods: [
@@ -341,33 +339,17 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
-      self.isThisPropertyPathSelected$.sub(function() {
-        if ( self.isThisPropertyPathSelected ) {
-          self.selectedProp.push(self.currentProperty.name);
-          self.isPropertySelected = self.isThisPropertyPathSelected;
-        }
-      });
-
-      // this.header = this.ColumnViewHeader.create({hasSubProperties: this.hasSubProperties, isPropertySelected:this.isPropertySelected, expanded:this.expanded, currentProperty:this.currentProperty}); 
-      // this.body = this.ColumnViewBody.create({hasSubProperties:this.hasSubProperties, currentProperty:this.currentProperty, selectedProp:this.selectedProp, expanded:this.expanded, subProperties:this.subProperties}); 
-
       self.isThisPropSelected$.sub(function() {
-        self.isPropertySelected = true;
-      });
-
-      self.selectedProp$.sub(function() {
-        self.expanded = false;
+        self.isThisPropertyPathSelected = !self.isThisPropertyPathSelected;
       });
 
       this
         .start()
-          .addClass(this.myClass('container-handle'))
+          //.addClass(this.myClass('container-handle'))
           .start()
-            .show( this.selectedProp.length === 0 || ( this.selectedProp.length > 0 && this.isThisPropSelected ) )
             .tag(this.header)
           .end()
           .start()
-            .show( this.selectedProp.length === 0 || ( this.selectedProp.length > 0 && this.isThisPropSelected ) )
             .tag(this.body)
           .end()
         .end();
@@ -379,29 +361,33 @@ foam.CLASS({
   package: 'foam.u2.tag',
   name: 'ColumnViewHeader',
   extends: 'foam.u2.View',
+  css: `
+  
+  ^selected {
+    background: green;
+  }
+  `,
   properties: [
     'hasSubProperties',
-    {
-      name: 'isPropertySelected',
-      class: 'Boolean',
-      value: false
-    },
     'expanded',
     'currentProperty',
     'isThisPropSelected',
-    'selectedProp',
-    'open'
+    'level',
+    'selectedColumns'
+   // 'open'
   ],
   methods: [
     function initE() {
       this.SUPER();
       var self = this;
       this.start()
+        .enableClass(this.myClass('selected'), this.selectedColumns[this.selectedColumns.length - 1 - this.level] == this.currentProperty.name)
         .on('click', this.toggleExpanded)
-        .addClass(self.myClass('handle-title')).add(this.currentProperty.name)
+        //.addClass(self.myClass('handle-title'))
         .start()
+          .add(this.currentProperty.name)
           .start('span')
-            .show( this.hasSubProperties )
+            .show(this.hasSubProperties$)
             .style({
               'margin-right':   '36px',
               'vertical-align': 'middle',
@@ -415,20 +401,16 @@ foam.CLASS({
             .on('click', this.toggleExpanded)
             .add('\u2303')
           .end()
-        .end();
+        .end()
+      .end();
     }
   ],
   listeners: [
     function toggleExpanded(e) {
-      if ( this.hasSubProperties )
-        this.expanded = !this.expanded;
-      else {
-        if ( this.open ) {
-          this.isThisPropSelected = true;//not sure that this is needed
-          this.selectedProp.push(this.currentProperty.name);
-          this.isPropertySelected = true;
-        }
-        this.open = !this.open;
+      this.expanded = !this.expanded;
+      if ( !this.hasSubProperties ) {
+        //this.selectedProp.push(this.currentProperty.name);
+        this.isThisPropSelected = !this.expanded;//not sure that this is needed
       }
     }
   ]
@@ -444,22 +426,55 @@ foam.CLASS({
   properties: [
     'hasSubProperties',
     'currentProperty',
-    'selectedProp',
     'expanded',
     'subProperties',
-    'open'
+    'isThisPropSelected',
+    'isThisPropertyPathSelected',
+    'selectedColumns',
+    'level'
   ],
+  css: `
+  
+  ^move-right {
+    margin-left: 20px;
+  }
+  `,
   methods: [
     function initE() {
       this.SUPER();
       var self = this;
+      var childrenLevel = this.level + 1;
+
+      self.expanded$.sub(function() {
+        console.log('ColumnViewBody expanded changed');
+      });
+
+      self.isThisPropSelected$.sub(function() {
+        console.log('isThisPropSelected expanded changed');
+      });
+      self.isThisPropSelected$.sub(function() {
+        if ( self.isThisPropSelected ) {
+          if ( self.level > self.selectedColumns.length - 1 ) {
+            self.selectedColumns.push(self.currentProperty.name);
+          } else {
+            self.selectedColumns[self.selectedColumns.length - 1 - self.level] = self.currentProperty.name;
+
+            //if level higher then previous one 
+            if ( !self.hasSubProperties && self.level !== self.selectedColumns.length - 1 ) {
+              self.selectedColumns.splice(0, self.selectedColumns.length - 1 - self.level);
+            }
+          }
+          self.isThisPropertyPathSelected = !self.isThisPropertyPathSelected;
+        }
+      });
+
       this
         .start()
-          .addClass(self.myClass('margin-left'))
-          .show(this.hasSubProperties && this.expanded)
           .forEach(this.subProperties, function(p) {
-            this
-              .add(foam.u2.ViewSpec.createView(self.ColumnView, {currentProperty: p, selectedProp: self.selectedProp, isThisPropSelected:this.isThisPropSelected, open:this.open}, self, self.__subSubContext__));
+            self
+              .show(self.expanded$)
+              .addClass(self.myClass('move-right'))
+              .add(foam.u2.ViewSpec.createView(self.ColumnView, {currentProperty: p, isThisPropertyPathSelected$:self.isThisPropSelected$, selectedColumns$: self.selectedColumns$, level:childrenLevel }, self, self.__subSubContext__));
           })
         .end();
     }

@@ -83,9 +83,9 @@ foam.CLASS({
         return ! of ? [] : [].concat(
           of.getAxiomsByClass(foam.core.Property)
             .filter(p => p.tableCellFormatter && ! p.hidden)
-            .map(a => [a.name, null]),
+            .map(a => [[a.name], null]),
           of.getAxiomsByClass(foam.core.Action)
-            .map(a => [a.name, null])
+            .map(a => [[a.name], null])
         );
       }
     },
@@ -206,9 +206,9 @@ foam.CLASS({
       expression: function(allColumns, of) {
         var ls = JSON.parse(localStorage.getItem(of.id));
         if ( ls )
-          return ls.map(c => [c]);
+          return ls;
         var tc = of.getAxiomByName('tableColumns');
-        return tc ? tc.columns : allColumns.map(c => [c[0]]);
+        return tc ? tc.columns.map(c => [c]) : allColumns.map(c => [c[0]]);
       },
       
       // factory: function() {
@@ -237,7 +237,7 @@ foam.CLASS({
       var view = this;
 
       this.isColumnChanged$.sub(function(){
-        console.log('sdfsdv');
+        console.log('isColumnChanged');
       });
 
       this.isColumnChanged = ! this.isColumnChanged;
@@ -302,14 +302,14 @@ foam.CLASS({
                 var column;
                 for ( var i = arayOfAxiomNames.length-1; i > -1; i--) {
                   column = typeof arayOfAxiomNames[i] === 'string'
-                  ? view.of.getAxiomByName(arayOfAxiomNames[i])
+                  ? cls.getAxiomByName(arayOfAxiomNames[i])
                   :  foam.Array.isInstance(arayOfAxiomNames[i]) ? 
-                  view.of.getAxiomByName(arayOfAxiomNames[i][0]) : arayOfAxiomNames[i];
+                  cls.getAxiomByName(arayOfAxiomNames[i]) : arayOfAxiomNames[i];
                   if ( !column ) {
                     //need to come up with behavior
                     break;
                   }
-                  cls = column.cls_;
+                  cls = column.of;
                 }
                 if ( overrides ) column = column.clone().copyFrom(overrides);
                 this.start().
@@ -488,43 +488,48 @@ foam.CLASS({
                 }).
 
                 forEach(columns_, function([arayOfAxiomNames, overrides]) {
-                  var theObj = obj;
+                  var cls = view.of;
                   var column;
-                  //var value;
-                  for(var i = arayOfAxiomNames.length-1; i > -1; i--) {
-                    if ( i != arayOfAxiomNames.length-1 )
-                      theObj = column.f(theObj);
+                  var theObj = obj;
+                  for ( var i = arayOfAxiomNames.length-1; i > -1; i--) {
+                    if ( i != arayOfAxiomNames.length-1) {
+                      if (theObj)
+                        theObj = column.f(theObj);
+                    }
                     column = typeof arayOfAxiomNames[i] === 'string'
-                    ? theObj.cls_.getAxiomByName(arayOfAxiomNames[i])
-                    : foam.Array.isInstance(arayOfAxiomNames[i]) ? theObj.cls_.getAxiomByName(arayOfAxiomNames[i][0]) : arayOfAxiomNames[i];
+                    ? cls.getAxiomByName(arayOfAxiomNames[i])
+                    :  foam.Array.isInstance(arayOfAxiomNames[i]) ? 
+                    cls.getAxiomByName(arayOfAxiomNames[i]) : arayOfAxiomNames[i];
                     if ( !column ) {
-                      //value = '-'; no need as column.f null
+                      //need to come up with behavior
                       break;
                     }
+                    cls = column.of;
                   }
+                  
                   
                   if ( overrides ) column = column.clone().copyFrom(overrides);
                   this.
                     start().
-                      addClass(view.myClass('td')).
-                      callOn(column.tableCellFormatter, 'format', [
-                        column.f ? column.f(theObj) : null, theObj, column
-                      ]).
-                      callIf(column.f, function() {
-                        try {
-                          var value = column.f(theObj);
-                          if ( foam.util.isPrimitive(value) ) {
-                            this.attr('title', value);
-                          }
-                        } catch (err) {}
-                      }).
-                      call(function() {
-                        if ( column.tableWidth ) {
-                          this.style({ flex: `0 0 ${column.tableWidth}px` });
-                        } else {
-                          this.style({ flex: '1 0 0' });
+                    addClass(view.myClass('td')).
+                    callOn(column.tableCellFormatter, 'format', [
+                      column.f ? column.f(theObj) : null, theObj, column
+                    ]).
+                    callIf(column.f, function() {
+                      try {
+                        var value = column.f(theObj);
+                        if ( foam.util.isPrimitive(value) ) {
+                          this.attr('title', value);
                         }
-                      }).
+                      } catch (err) {}
+                    }).
+                    call(function() {
+                      if ( column.tableWidth ) {
+                        this.style({ flex: `0 0 ${column.tableWidth}px` });
+                      } else {
+                        this.style({ flex: '1 0 0' });
+                      }
+                    }).
                     end();
                 }).
                 start().

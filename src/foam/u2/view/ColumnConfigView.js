@@ -19,28 +19,21 @@ foam.CLASS({
     'allColumns',
     'selectedColumns',
     {
-      name: 'properties',
-      expression: function(selectedColumns) {
-        var props = [];
-        this.selectedColumns.map(axiomName => {//what is overridesMap??? can't find
-            const axiom = this.of.getAxiomByName(axiomName);
-            props.push(axiom);
-          });
-        return props;
-      }
-    },
-    {
       name: 'allProperties',
-      expression: function(allColumns) {
+      expression: function(allColumns, of) {
         var props = [];
-        this.allColumns.map(axiomName => {//what is overridesMap??? can't find
+        allColumns.map(axiomName => {//what is overridesMap??? can't find
           props.push(this.of.getAxiomByName(axiomName[0]));
           });
         
         return props;
       }
     },
-    'isColumnChanged'
+    'isColumnChanged',
+    {
+      name: 'views',
+      value: []
+    }
   ],
 
   css: `
@@ -58,29 +51,27 @@ foam.CLASS({
     function initE() {
       var self = this;
       this.SUPER();
-      var views  = [];
 
-
-      for (var i = 0; i < self.properties.length; i++) {
-        views.push({ i: i, view: this.ColumnSelect.create({currentProperty: self.properties[i], props: self.allProperties})});
+      for (var i = 0; i < self.selectedColumns.length; i++) {
+        this.views.push({ i: i, view: this.ColumnSelect.create({props: self.allProperties, selectedColumns:self.selectedColumns[i] })});
       }
 
-      for (var v of views) {
-        v.view.currentProperty$.sub(function() {
+      for (var v of this.views) {
+        const v1 = v;
+        v1.view.isPropertySelected$.sub(function() {
           self.isColumnChanged = true;
-          var currView = v.view;
-          self.selectedColumns[v.i] = [];
-          while(currView && currView.currentProperty) {
-            if ( foam.core.StringArray.isInstance(self.selectedColumns[0]) ) self.selectedColumns[v.i].push([ currView.currentProperty.name, null ]);
-            else self.selectedColumns[v.i].push(currView.currentProperty.name);
-            currView = currView.body;
-          }
+          self.selectedColumns[v1.i] = v1.view.selectedColumns;
+          // while(currView && currView.currentProperty) {
+          //   if ( foam.core.StringArray.isInstance(self.selectedColumns[0]) ) self.selectedColumns[v.i].push([ currView.currentProperty.name, null ]);
+          //   else self.selectedColumns[v.i].push(currView.currentProperty.name);
+          //   currView = currView.body;
+          // }
         });
       }
 
       this
         .addClass(this.myClass())
-        .forEach(views, function(v) {
+        .forEach(this.views, function(v) {
           self.add(v.view);
         });
         //.add(this.ColumnSelect.create({currentProperty$: this.data.axiom$, props: this.data.of.getAxiomsByClass(foam.core.Property), headerProp: this.data.axiom.name}));
