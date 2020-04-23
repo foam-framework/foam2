@@ -68,7 +68,7 @@ foam.CLASS({
       this.detectCollisions_(0, this.children.length-1, 'x', false, '');
 
       // simpler and less efficient version, use to debug above
-      //this.detectCollisions__(0, this.children.length-1, 'x', false, '');
+      // this.detectCollisions__(0, this.children.length-1, 'x', false, '');
     },
 
     function detectCollisions__(start, end) {
@@ -77,7 +77,7 @@ foam.CLASS({
         once data is partitioned.
       */
       var cs = this.children;
-      for ( var i = start ; i <= end ; i++ ) {
+      for ( var i = start ; i < end ; i++ ) {
         var c1 = cs[i];
         if ( c1 == null ) break;
         for ( var j = i+1 ; j <= end ; j++ ) {
@@ -91,7 +91,7 @@ foam.CLASS({
     function choosePivot(start, end, axis) {
       var cs = this.children;
       axis = axis + '_';
-      var p = 0, n = end-start;
+      var p = 0, n = end-start+1;
       for ( var i = start ; i <= end ; i++ ) p += cs[i][axis] / n;
       return p;
     },
@@ -99,50 +99,50 @@ foam.CLASS({
     function detectCollisions_(start, end, axis, oneD) {
       if ( start >= end ) return;
 
-        var cs       = this.children;
-        var pivot    = this.choosePivot(start, end, axis);
-        var nextAxis = oneD ? axis : axis === 'x' ? 'y' : 'x' ;
+      var cs       = this.children;
+      var pivot    = this.choosePivot(start, end, axis);
+      var nextAxis = oneD ? axis : axis === 'x' ? 'y' : 'x' ;
 
-        var p = start;
-        for ( var i = start ; i <= end ; i++ ) {
+      var p = start;
+      for ( var i = start ; i <= end ; i++ ) {
+        var c = cs[i];
+        if ( c[axis == 'x' ? 'left_' : 'top_']  < pivot ) {
+          var t = cs[p];
+          cs[p] = c;
+          cs[i] = t;
+          p++;
+        }
+      }
+
+      if ( p === end + 1 ) {
+        if ( oneD ) {
+          this.detectCollisions__(start, end);
+        } else {
+          this.detectCollisions_(start, end, nextAxis, true);
+        }
+      } else {
+        this.detectCollisions_(start, p-1, nextAxis, oneD);
+
+        p--;
+        for ( var i = p ; i >= start ; i-- ) {
           var c = cs[i];
-          if ( c[axis == 'x' ? 'left_' : 'top_']  < pivot ) {
+          if ( c[axis == 'x' ? 'right_' : 'bottom_'] > pivot ) {
             var t = cs[p];
             cs[p] = c;
             cs[i] = t;
-            p++;
+            p--;
           }
         }
-
-        if ( p === end + 1 ) {
+        if ( p === start-1 ) {
           if ( oneD ) {
             this.detectCollisions__(start, end);
           } else {
             this.detectCollisions_(start, end, nextAxis, true);
           }
         } else {
-          this.detectCollisions_(start, p-1, nextAxis, oneD);
-
-          p--;
-          for ( var i = p ; i >= start ; i-- ) {
-            var c = cs[i];
-            if ( c[axis == 'x' ? 'right_' : 'bottom_'] > pivot ) {
-              var t = cs[p];
-              cs[p] = c;
-              cs[i] = t;
-              p--;
-            }
-          }
-          if ( p === start-1 ) {
-            if ( oneD ) {
-              this.detectCollisions__(start, end);
-            } else {
-              this.detectCollisions_(start, end, nextAxis, true);
-            }
-          } else {
-            this.detectCollisions_(p+1, end, nextAxis, oneD);
-          }
+          this.detectCollisions_(p+1, end, nextAxis, oneD);
         }
+      }
     },
 
     function angleOfImpact(c1, c2) {
