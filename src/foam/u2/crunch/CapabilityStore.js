@@ -88,7 +88,7 @@ foam.CLASS({
           .end()
           // TODO: replace this .call with a .select once
           //       duplication error is fixed
-          .call(function () {
+          .call(function() {
             self.capabilityCategoryDAO.select().then((a) => {
               for ( let i=0; i < a.array.length; i++ ) {
                 let category = a.array[i];
@@ -99,8 +99,8 @@ foam.CLASS({
                 this.add(e);
               }
             });
-        .end()
-        ;
+          })
+        .end();
     },
     function renderFeatured() {
       var self = this;
