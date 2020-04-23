@@ -56,6 +56,10 @@ foam.CLASS({
       line-height: 1.5;
       text-align: center;
     }
+    /* button */
+    ^ ^section .foam-u2-layout-Cols {
+      justify-content: center !important; /* centers button */
+    }
     ^link {
       color: /*%PRIMARY3%*/ #604aff;
       cursor: pointer;
@@ -112,8 +116,7 @@ foam.CLASS({
           .start().addClass(this.myClass('section'))
             .start(foam.u2.detail.SectionView, {
               data: this.model,
-              sectionName: this.model.cls_.model_.sections[0].name,
-              isCentered: true
+              sectionName: this.model.cls_.model_.sections[0].name
             }).end()
           .end()
           // link
