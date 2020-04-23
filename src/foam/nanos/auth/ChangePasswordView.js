@@ -81,7 +81,7 @@ foam.CLASS({
                         class: 'foam.nanos.auth.ChangePasswordView',
                         modelOf: 'foam.nanos.auth.RetrievePassword'
                       })
-                     `,
+                     `
     },
     {
       class: 'FObjectProperty',
