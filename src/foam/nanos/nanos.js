@@ -72,7 +72,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/token/AbstractTokenService" },
   { name: "foam/nanos/auth/ChangePasswordView" },
   { name: "foam/nanos/auth/ResetPassword" },
-  { name: "foam/nanos/auth/SendPassword" },
+  { name: "foam/nanos/auth/RetrievePassword" },
   { name: "foam/nanos/auth/UpdatePassword" },
   { name: 'foam/nanos/auth/HumanNameTrait' },
   { name: "foam/nanos/auth/User" },

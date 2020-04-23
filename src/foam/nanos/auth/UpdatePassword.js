@@ -17,11 +17,6 @@ foam.CLASS({
     'user'
   ],
 
-  requires: [
-    'foam.nanos.auth.User',
-    'foam.u2.detail.SectionView'
-  ],
-
   messages: [
     { name: 'SUCCESS_MSG', message: 'Your password was successfully updated.' }
   ],
@@ -74,17 +69,36 @@ foam.CLASS({
           errorString: 'Passwords do not match.'
         }
       ]
+    },
+    {
+      class: 'Boolean',
+      name: 'isHorizontal',
+      documentation: 'setting this to true makes password fields to be displayed horizontally',
+      value: true,
+      hidden: true
     }
   ],
 
   methods: [
+    function init() {
+      if ( this.isHorizontal ) {
+        this.makeHorizontal();
+      };
+    },
+    {
+      name: 'makeHorizontal',
+      code: function() {
+        this.ORIGINAL_PASSWORD.gridColumns = 4;
+        this.NEW_PASSWORD.gridColumns = 4;
+        this.CONFIRMATION_PASSWORD.gridColumns = 4;
+      }
+    },
     {
       name: 'reset_',
       code: function() {
         this.clearProperty('originalPassword');
         this.clearProperty('newPassword');
         this.clearProperty('confirmationPassword');
-        if ( this.token ) window.history.replaceState(null, null, window.location.origin + '/#reset');
       }
     }
   ],
@@ -98,7 +112,7 @@ foam.CLASS({
         return ! errors_;
       },
 
-      code: function(X) {
+      code: function() {
         this.auth.updatePassword(null, this.originalPassword, this.newPassword)
         .then((result) => {
           this.user.copyFrom(result);

@@ -17,13 +17,6 @@ foam.CLASS({
     'user'
   ],
 
-  requires: [
-    'foam.u2.detail.SectionView',
-    'foam.nanos.auth.SendPassword',
-    'foam.nanos.auth.UpdatePassword',
-    'foam.nanos.auth.ResetPassword'
-  ],
-
   css: `
     ^ {
       background: #ffffff;
@@ -43,7 +36,8 @@ foam.CLASS({
     }
     ^content {
       max-width: 30vw;
-      margin: 4vh auto 0 auto;
+      padding-top: 4vh;
+      margin: 0 auto;
     }
     ^section {
     }
@@ -75,69 +69,32 @@ foam.CLASS({
       class: 'Boolean',
       name: 'showHeader',
       documentation: `This property toggles the view from having a top bar displayed.`,
-      hidden: true,
-      factory: function() {
-        // implement a logic to hide logo in certain places
-        return true;
-      }
-    },
-    {
-      class: 'Boolean',
-      name: 'isHorizontal',
-      documentation: 'setting this to true makes input fields in passwordModel to be displayed horizontally',
-      factory: function() {
-        return this.mode === 'update';
-      }
+      value: true,
+      hidden: true
     },
     {
       class: 'String',
-      name: 'mode',
-      documentation: 'name of password model used for this view',
-      factory: function() {
-        if ( window.location.hash.includes('personal-settings') ||
-             window.location.hash.includes('set-personal') ) {
-          return 'update';
-        }
-        const token = new URLSearchParams(location.search).get('token');
-        return token ? 'reset' : 'send';
-      }
+      name: 'modelOf',
+      documentation: `Password model used for this view.
+                      Pass this property along when you create this view.
+                      e.g., stack.push({
+                        class: 'foam.nanos.auth.ChangePasswordView',
+                        modelOf: 'foam.nanos.auth.RetrievePassword'
+                      })
+                     `,
     },
     {
-      name: 'passwordModel',
-      documentation: 'password model used for this view',
-      factory: function() {
-        if ( this.mode === 'update' ) {
-          return this.UpdatePassword.create();
-        } else if ( this.mode === 'reset' ) {
-          return this.ResetPassword.create();
-        }
-        return this.SendPassword.create();
+      class: 'FObjectProperty',
+      of: this.modelOf,
+      name: 'model',
+      documentation: 'instance of password model used for this view',
+      expression: function(modelOf) {
+        return foam.lookup(modelOf).create({}, this);
       }
     }
   ],
 
   methods: [
-    {
-      name: 'resizeInputFields',
-      code: function(isHorizontal) {
-        // evaluation of this gridColumns on a property does not handle an evaluation, only an int, thus function here managing this.
-        if ( isHorizontal ) {
-          if ( this.mode === 'update' ) {
-            this.UpdatePassword.ORIGINAL_PASSWORD.gridColumns = 4;
-            this.UpdatePassword.NEW_PASSWORD.gridColumns = 4;
-            this.UpdatePassword.CONFIRMATION_PASSWORD.gridColumns = 4;
-          } else if ( this.mode === 'reset' ) {
-            this.ResetPassword.NEW_PASSWORD.gridColumns = 6;
-            this.ResetPassword.CONFIRMATION_PASSWORD.gridColumns = 6;
-          }
-        }
-      }
-    },
-
-    function init() {
-      this.resizeInputFields(this.isHorizontal);
-    },
-
     function initE() {
       const self = this;
       const logo = this.theme.largeLogo || this.theme.logo;
@@ -153,16 +110,16 @@ foam.CLASS({
         .start().addClass(this.myClass('content'))
           // section
           .start().addClass(this.myClass('section'))
-            .start(this.SectionView, {
-              data: this.passwordModel,
-              sectionName: this.passwordModel.cls_.model_.sections[0].name,
+            .start(foam.u2.detail.SectionView, {
+              data: this.model,
+              sectionName: this.model.cls_.model_.sections[0].name,
               isCentered: true
             }).end()
           .end()
           // link
-          .callIf(this.mode === 'send', function() {
+          .callIf(this.model.hasBackLink, function() {
             this.start().addClass(self.myClass('link'))
-              .add(self.SendPassword.REDIRECTION_TO)
+              .add(self.model.REDIRECTION_TO)
               .on('click', function() {
                 self.stack.push({ class: 'foam.u2.view.LoginView', mode_: 'SignIn' }, self);
               })

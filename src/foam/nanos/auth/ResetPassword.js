@@ -19,8 +19,7 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.nanos.auth.User',
-    'foam.u2.detail.SectionView'
+    'foam.nanos.auth.User'
   ],
 
   messages: [
@@ -70,23 +69,32 @@ foam.CLASS({
     {
       class: 'String',
       name: 'token',
-      documentation: `This property toggles the view from updating a user password to resetting a user password.`,
       factory: function() {
         const searchParams = new URLSearchParams(location.search);
         return searchParams.get('token');
       },
       hidden: true
+    },
+    {
+      class: 'Boolean',
+      name: 'isHorizontal',
+      documentation: 'setting this to true makes password fields to be displayed horizontally',
+      value: false,
+      hidden: true
     }
   ],
 
   methods: [
+    function init() {
+      if ( this.isHorizontal ) {
+        this.makeHorizontal();
+      }
+    },
     {
-      name: 'reset_',
+      name: 'makeHorizontal',
       code: function() {
-        this.clearProperty('originalPassword');
-        this.clearProperty('newPassword');
-        this.clearProperty('confirmationPassword');
-        if ( this.token ) window.history.replaceState(null, null, window.location.origin + '/#reset');
+        this.NEW_PASSWORD.gridColumns = 6;
+        this.CONFIRMATION_PASSWORD.gridColumns = 6;
       }
     }
   ],
@@ -101,13 +109,12 @@ foam.CLASS({
         return ! errors_;
       },
 
-      code: function(X) {
+      code: function() {
         const user = this.User.create({
           desiredPassword: this.newPassword
         });
         this.resetPasswordToken.processToken(null, user, this.token)
         .then((_) => {
-          this.reset_();
           this.stack.push({ class: 'foam.u2.view.LoginView', mode_: 'SignIn' }, this);
           this.notify(this.SUCCESS_MSG);
         }).catch((err) => {

@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.nanos.auth',
-  name: 'SendPassword',
+  name: 'RetrievePassword',
 
   documentation: 'Forgot Password Resend Model',
 
@@ -17,8 +17,7 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.nanos.auth.User',
-    'foam.u2.detail.SectionView'
+    'foam.nanos.auth.User'
   ],
 
   messages: [
@@ -42,6 +41,13 @@ foam.CLASS({
       name: 'email',
       section: 'emailPasswordSection',
       required: true
+    },
+    {
+      class: 'Boolean',
+      name: 'hasBackLink',
+      documentation: 'checks if back link to login page is needed',
+      value: true,
+      hidden: true
     }
   ],
 
