@@ -146,7 +146,7 @@ foam.CLASS({
         String key = user.getId() + permission;
         Boolean result = ( (Map<String, Boolean>) getCache() ).get(key);
         if ( result != null ) {
-          if ( ! result ) maybeIntercept(permission);
+          if ( ! result ) maybeIntercept(x, permission);
           return result;
         }
 
@@ -210,7 +210,7 @@ foam.CLASS({
         }
 
         if ( result ) return true;
-        maybeIntercept(permission);
+        maybeIntercept(x, permission);
         return false;
       `
     },
