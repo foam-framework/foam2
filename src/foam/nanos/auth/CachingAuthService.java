@@ -11,6 +11,7 @@ import foam.core.XFactory;
 import foam.dao.DAO;
 import foam.dao.Sink;
 import foam.mlang.predicate.Predicate;
+import foam.nanos.auth.User;
 import foam.nanos.session.Session;
 import java.security.Permission;
 import java.util.concurrent.ConcurrentHashMap;
@@ -60,7 +61,10 @@ public class CachingAuthService
 
   protected static Map<String,Boolean> getPermissionMap(final X x) {
     Session             session = x.get(Session.class);
-    Map<String,Boolean> map     = (Map) session.getContext().get(CACHE_KEY);
+    Map<String,Boolean> map = session.getUserId() == ((User) x.get("user")).getId() ? 
+      (Map) session.getContext().get(CACHE_KEY) :
+      null;
+    
 
     if ( map == null ) {
       Sink purgeSink = new Sink() {
