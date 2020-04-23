@@ -19,7 +19,7 @@
   Accessible through browser at location path static/foam2/src/foam/nanos/controller/index.html
   Available on browser console as ctrl. (exports axiom)
 */
-foam.CLASS({
+foam.CLASS({ 
   package: 'foam.nanos.controller',
   name: 'ApplicationController',
   extends: 'foam.u2.Element',
