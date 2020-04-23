@@ -187,6 +187,7 @@
     },
     function locateStoreObj() {
       var d = this.daoKey.replace('local', ''); // since client cant find local anything
+      d = this.daoKey.replace('bare', ''); // since client cant find bare anything
       d = d.charAt(0).toLowerCase() + d.substring(1); // confirm syntaxStandard with lowerCase first letter;
       this.ctrl.__subContext__[d].find(this.objId)
         .then((ob) => this.obj = ob)
