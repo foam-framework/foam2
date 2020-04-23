@@ -308,7 +308,7 @@ foam.CLASS({
       code: function() {
         this.isLoading = true;
         this.dao.select(this.GROUP_BY(this.property, this.COUNT())).then(function(result) {
-          self.daoContents = result.groupKeys; //  gets contents from the source dao
+          self.daoContents = result.groupKeys; // gets contents from the source dao
           self.isLoading = false;
         });
       }

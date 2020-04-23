@@ -69,12 +69,24 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'isAdvanced'
+    },
+    {
+      class: 'Long',
+      name: 'resultsCount'
+    },
+    {
+      class: 'Long',
+      name: 'totalCount'
     }
   ],
 
   methods: [
     function init() {
       this.addCriteria();
+      this.onDetach(this.dao$.sub(this.onDAOUpdate));
+      this.onDAOUpdate();
+      this.onDetach(this.finalPredicate$.sub(this.getResultCount));
+      this.onDetach(this.previewPredicate$.sub(this.getResultCount));
     },
 
     function and(views) {
@@ -175,7 +187,7 @@ foam.CLASS({
       // At this point, users should be coming from advanced mode
       this.isAdvanced = true;
       this.isPreview = false;
-      this.clearAll(true);
+      // this.clearAll(true);
       // Copy required information to be reconstructed
       Object.keys(this.previewCriterias).forEach((criteriaKey) => {
         this.addCriteria(criteriaKey);
@@ -215,8 +227,9 @@ foam.CLASS({
         name = viewOrName;
       } else {
         // If view given, less work. Just assign name for crosscheck
+        // Name may be from TextSearchView as well
         view = viewOrName;
-        name = view.property.name;
+        name = view.property ? view.property.name : view.name;
       }
 
       // Don't clear if view does not exist or crosscheck fails
@@ -255,6 +268,27 @@ foam.CLASS({
         this.clearCriteria(key, remove);
       });
       if ( remove ) this.addCriteria();
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'onDAOUpdate',
+      code: function() {
+        this.dao.select(this.COUNT()).then((count) => {
+          // This will need scalability testing
+          this.totalCount = count.value;
+        });
+      }
+    },
+    {
+      name: 'getResultCount',
+      code: function() {
+        var predicate = this.isPreview ? this.previewPredicate : this.finalPredicate;
+        this.dao.where(predicate).select(this.COUNT()).then((count) => {
+          this.resultsCount = count.value;
+        });
+      }
     }
   ]
 });

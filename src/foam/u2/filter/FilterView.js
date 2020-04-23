@@ -203,9 +203,7 @@ foam.CLASS({
     {
       name: 'generalSearchField',
       postSet: function(o, n) {
-        // TODO: Since add expects criteria and all criterias are ORed,
-        //       we need to find a different location to AND it.
-        // this.filterController.add(n);
+        this.filterController.add(n, n.name, 0);
       }
     },
     {
@@ -230,15 +228,11 @@ foam.CLASS({
       }
     },
     {
-      class: 'Long',
-      name: 'resultsCount'
-    },
-    {
       class: 'String',
       name: 'resultLabel',
-      expression: function(isFiltering, resultsCount) {
+      expression: function(isFiltering, filterController$totalCount, filterController$resultsCount ) {
         if ( ! isFiltering ) return '';
-        return `${this.LABEL_RESULTS}${resultsCount}`;
+        return `${this.LABEL_RESULTS}${filterController$resultsCount} of ${filterController$totalCount}`;
       }
     },
     {
@@ -260,7 +254,7 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
-      this.onDetach(this.filterController$.dot('finalPredicate').sub(this.getResultCount));
+      this.onDetach(this.filterController$.dot('isAdvanced').sub(this.isAdvancedChanged));
       this
         .addClass(self.myClass())
         .add(this.slot(function(filters) {
@@ -363,27 +357,10 @@ foam.CLASS({
       });
 
       return range? range : 'Value too large';
-
-      // if ( num < 1000 ) return `${num}`; // Less than K
-      // if ( num < 1000000) return `> ${Math.round(num/1000)}K`; // Less than M
-      // if ( num < 1000000000) return `> ${Math.round(num/1000000)}M`; // Less than B
-      // if ( num < 1000000000000) return `> ${Math.round(num/1000000000)}B`; // Less than T
-      // if ( num < 1000000000000000) return `> ${Math.round(num/1000000000000)}T`; // Less than Q
-
-      // return 'Value too large';
     }
   ],
 
   listeners: [
-    {
-      name: 'getResultCount',
-      code: function() {
-        this.filterController.dao.where(this.filterController.finalPredicate)
-          .select(this.COUNT()).then((count) => {
-            this.resultsCount = count.value;
-          });
-      }
-    },
     {
       name: 'toggleDrawer',
       code: function() {
@@ -396,6 +373,7 @@ foam.CLASS({
         // clear all filters
         if ( this.filterController.isAdvanced ) return;
         this.filterController.clearAll();
+        this.generalSearchField.view.data = '';
       }
     },
     {
@@ -407,8 +385,6 @@ foam.CLASS({
           return;
         }
 
-        // Make modal appear, switch to advance mode once user has selected
-        // filter criteria
         this.openAdvanced();
       }
     },
@@ -420,6 +396,18 @@ foam.CLASS({
           class: 'foam.u2.filter.advanced.AdvancedFilterView',
           dao$: this.dao$
         }));
+      }
+    },
+    {
+      name: 'isAdvancedChanged',
+      code: function() {
+        // (Kenny) TODO: Seems kinda hacky. But I do not want to modify the TextSearchView just yet
+        if ( ! this.filterController.isAdvanced ) {
+          this.filterController.add(this.generalSearchField, 'generalSearchField', 0);
+          this.generalSearchField.visibility = foam.u2.Visibility.RW;
+        } else {
+          this.generalSearchField.visibility = foam.u2.Visibility.DISABLED;
+        }
       }
     }
   ]

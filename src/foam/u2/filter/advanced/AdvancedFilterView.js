@@ -89,6 +89,7 @@ foam.CLASS({
 
     ^isOpen {
       max-height: 1000px !important;
+      overflow: visible !important;
     }
 
     ^ .foam-u2-ActionView-addCriteria {
@@ -138,7 +139,7 @@ foam.CLASS({
     { name: 'TITLE_HEADER', message: 'Advanced Filters' },
     { name: 'LABEL_CRITERIA', message: 'Criteria'},
     { name: 'LABEL_REMOVE', message: 'Remove'},
-    { name: 'LABEL_RESULTS', message: 'Filter Results: '}
+    { name: 'LABEL_RESULTS', message: 'Filter Results Preview: '}
   ],
 
   properties: [
@@ -159,8 +160,8 @@ foam.CLASS({
     {
       class: 'String',
       name: 'resultLabel',
-      expression: function(resultsCount) {
-        return `${this.LABEL_RESULTS}${resultsCount}`;
+      expression: function(filterController$totalCount, filterController$resultsCount ) {
+        return `${this.LABEL_RESULTS}${filterController$resultsCount} of ${filterController$totalCount}`;
       }
     }
   ],
@@ -248,26 +249,18 @@ foam.CLASS({
       name: 'clearAll',
       label: 'Clear All',
       code: function(X) {
-        // Object.keys(this.filterController.previewCriterias).forEach((key) => {
-        //   if ( key !== 0 ) {
-        //     this.filterController.clearCriteria(key, true);
-        //     continue;
-        //   }
-        //   this.filterController.clearCriteria(key);
-        // });
         this.filterController.clearAll(true);
       }
     },
     {
       name: 'filter',
-      label: 'Filter',
-      isEnabled: function(filterController$criterias) {
+      label: 'Apply Filter',
+      isEnabled: function(filterController$previewPredicate) {
         // console.log('TODO: Check if the criteria is filtering');
         // return criterias && Object.keys(criterias).length > 0;
-        return true;
+        return filterController$previewPredicate !== this.TRUE;
       },
       code: function(X) {
-        console.log('TODO: Apply advanced mode and create predicates');
         this.filterController.applyPreview();
         X.closeDialog();
       }
