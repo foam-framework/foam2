@@ -190,7 +190,7 @@
       if ( this.daoKey.includes('local') ){
         d = this.daoKey.replace('local', '');
       } else if ( this.daoKey.includes('bare') ){
-        d = this.daoKey.replace('bare', ''); // since client cant find bare anything
+        d = this.daoKey.replace('bare', '');
       }
       d = d.charAt(0).toLowerCase() + d.substring(1); // confirm syntaxStandard with lowerCase first letter;
       this.ctrl.__subContext__[d].find(this.objId)
