@@ -137,6 +137,7 @@ FOAM_FILES([
   { name: "foam/nanos/medusa/ClusterConfigReplayDAO" },
   { name: "foam/nanos/medusa/ClusterConfigStatusDAO" },
   { name: "foam/nanos/medusa/ClusterConfigSupport" },
+  { name: "foam/nanos/medusa/ClusterConfigSupportDAO" },
   { name: "foam/nanos/medusa/ClusterHTTPBox" },
   { name: "foam/nanos/medusa/ClusterHTTPReplyBox" },
   { name: "foam/nanos/medusa/DaggerService" },

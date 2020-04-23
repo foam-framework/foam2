@@ -12,7 +12,7 @@ p({
   "class": "foam.nanos.boot.NSpec",
   "name": "localClusterConfigDAO",
   "serviceScript": """
-    return new foam.dao.EasyDAO.Builder(x)
+    dao = new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.medusa.ClusterConfig.getOwnClassInfo())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("clusterConfig")
@@ -22,10 +22,20 @@ p({
       .setPm(true)
       .setDecorator(new foam.nanos.medusa.ClusterConfigReplayDAO.Builder(x)
       .setDelegate(new foam.nanos.medusa.ClusterConfigStatusDAO.Builder(x)
+      .setDelegate(new foam.nanos.medusa.ClusterConfigSupportDAO.Builder(x)
         .setDelegate(new foam.dao.NullDAO(x, foam.nanos.medusa.ClusterConfig.getOwnClassInfo()))
       .build())
       .build())
+      .build())
       .build();
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] {
+      foam.nanos.medusa.ClusterConfig.ENABLED,
+      foam.nanos.medusa.ClusterConfig.REALM,
+      foam.nanos.medusa.ClusterConfig.REGION,
+      foam.nanos.medusa.ClusterConfig.STATUS,
+      foam.nanos.medusa.ClusterConfig.TYPE,
+      foam.nanos.medusa.ClusterConfig.ZONE,
+    });
    """
 })
 

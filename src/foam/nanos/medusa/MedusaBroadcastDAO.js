@@ -116,7 +116,7 @@ foam.CLASS({
               // TODO: clear map onDAOUpdate, this doesn't cache miss.
 //              DAO dao = (DAO) getClients().get(config.getId());
 //              if ( dao == null ) {
-                DAO clientDAO = support.getClientDAO(x, "medusaConsensusDAO", config, config);
+                DAO clientDAO = support.getClientDAO(x, "medusaConsensusDAO", myConfig, config);
                 DAO dao = new RetryClientSinkDAO.Builder(x)
                         .setDelegate(clientDAO)
                         .setMaxRetryAttempts(support.getMaxRetryAttempts())

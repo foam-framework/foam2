@@ -21,7 +21,8 @@ foam.CLASS({
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
-    'foam.nanos.session.Session'
+    'foam.nanos.session.Session',
+    'foam.util.SafetyUtil'
   ],
 
   properties: [
@@ -107,27 +108,22 @@ foam.CLASS({
       entry.setNSpecName(getNSpec().getName());
       entry.setDop(dop);
 //      entry.setSessionId(((Session) x.get("session")).getId());
-      entry.setData(obj);
 
-      // TODO/REVIEW: to reduce network load, just marshal delta. But this won't work in practise as
-      // HashingDAO needs the complete object to generate a hash()
       foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(x).setPropertyPredicate(new foam.lib.ClusterPropertyPredicate());
-//      String d = ( old != null ) ?
-//        outputter.stringifyDelta(old, obj) :
-        String d = outputter.stringify(obj);
-      // entry.setData(d);
-      getLogger().debug("submit", entry.getIndex(), obj.getClass().getSimpleName(), "stringify", d);
-
-//      getLogger().debug("submit", entry.getIndex());
+      String data = ( old != null ) ?
+        outputter.stringifyDelta(old, obj) :
+        outputter.stringify(obj);
+      entry.setData(data);
+      getLogger().debug("submit", entry.getIndex(), obj.getClass().getSimpleName(), "stringify", data);
 
       try {
-        FObject data = ((MedusaEntry)getMedusaEntryDAO().put_(x, entry)).getData();
-//        ((MedusaEntry)getMedusaEntryDAO().put_(x, entry));
-        getLogger().debug("submit", entry.getIndex(), "find", data.getProperty("id"));
-        FObject result = getDelegate().find_(x, data.getProperty("id"));
+        getMedusaEntryDAO().put_(x, entry);
+        getLogger().debug("submit", entry.getIndex(), "find", obj.getProperty("id"));
+        FObject result = getDelegate().find_(x, obj.getProperty("id"));
         if ( result == null ) {
-          getLogger().error("Object not found", data.getProperty("id"));
-          return data;
+          getLogger().error("Object not found", obj.getProperty("id"));
+          // REVIEW: what to do?
+          throw new RuntimeException("Data lost");
         }
         getLogger().debug("submit", entry.getIndex(), "found", result.getProperty("id"));
         return result;
@@ -161,7 +157,7 @@ foam.CLASS({
       ],
       javaType: 'PM',
       javaCode: `
-    return PM.create(x, this.getOf(), dop.getLabel());
+      return PM.create(x, this.getOwnClassInfo(), dop.getLabel());
       `
     }
   ]

@@ -25,6 +25,8 @@ foam.CLASS({
     'static foam.mlang.MLang.*',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
+    'foam.nanos.pm.PM',
+    'foam.util.SafetyUtil',
     'java.nio.charset.StandardCharsets',
     'java.security.MessageDigest',
     'java.util.ArrayList',
@@ -61,6 +63,11 @@ foam.CLASS({
       label: 'Global Index',
       class: 'Long',
       visibility: 'RO'
+    },
+    {
+      name: 'hashingEnabled',
+      class: 'Boolean',
+      value: true
     },
     {
       name: 'hashingAlgorithm',
@@ -104,6 +111,7 @@ foam.CLASS({
       name: 'start',
       javaCode: `
       ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
+      setHashingEnabled(support.getHashingEnabled());
       ClusterConfig config = support.getConfig(getX(), support.getConfigId());
       if ( config != null &&
            config.getType() == MedusaType.NODE ) {
@@ -150,21 +158,33 @@ foam.CLASS({
       name: 'hash',
       javaCode: `
       // TODO: also getProvider
+      PM pm = createPM(x, "hash");
+      try {
 //      getLogger().debug("hash", entry.getIndex(), entry.getIndex1(), entry.getIndex2());
       getLogger().debug("hash", entry.getIndex(), "1", entry.getIndex1(), entry.getHash1());
       getLogger().debug("hash", entry.getIndex(), "2", entry.getIndex2(), entry.getHash2());
+      if ( ! getHashingEnabled() ) {
+        return byte2Hex(Long.toString(entry.getIndex()).getBytes(StandardCharsets.UTF_8));
+      }
+
       MessageDigest md = MessageDigest.getInstance(getHashingAlgorithm());
       md.update(Long.toString(entry.getIndex1()).getBytes(StandardCharsets.UTF_8));
       md.update(entry.getHash1().getBytes(StandardCharsets.UTF_8));
       md.update(Long.toString(entry.getIndex2()).getBytes(StandardCharsets.UTF_8));
       md.update(entry.getHash2().getBytes(StandardCharsets.UTF_8));
-      getLogger().debug("hash", entry.getIndex(), "digest (without data)", byte2Hex(md.digest()));
-      if ( entry.getData() != null ) {
-        getLogger().debug("hash", entry.getIndex(), "digest (with data)", byte2Hex(entry.getData().hash(md)));
-        getLogger().debug("hash", entry.getIndex(), "data", entry.getData().getClass().getSimpleName());
-        return byte2Hex(entry.getData().hash(md));
+//      getLogger().debug("hash", entry.getIndex(), "digest (without data)", byte2Hex(md.digest()));
+      if ( ! SafetyUtil.isEmpty(entry.getData()) ) {
+//        getLogger().debug("hash", entry.getIndex(), "digest (with data)", byte2Hex(entry.getData().hash(md)));
+        getLogger().debug("hash", entry.getIndex(), "data", entry.getData());
+//        getLogger().debug("hash", entry.getIndex(), "data", entry.getData().getClass().getSimpleName());
+//        return byte2Hex(entry.getData().hash(md));
+        md.update(entry.getData().getBytes(StandardCharsets.UTF_8));
+        return byte2Hex(md.digest());
       } else {
         return byte2Hex(md.digest());
+      }
+      } finally {
+        pm.log(x);
       }
       `
     },
@@ -172,7 +192,13 @@ foam.CLASS({
       documentation: 'Verify entry hash, and compare hashes of parent indexes.',
       name: 'verify',
       javaCode: `
+      PM pm = createPM(x, "verify");
+      try {
         getLogger().debug("verify", entry.getIndex(), entry.getIndex1(), entry.getIndex2());
+
+        if ( ! getHashingEnabled() ) {
+          return;
+        }
 
         DAO dao = (DAO) getX().get("internalMedusaEntryDAO");
         MedusaEntry parent1 = (MedusaEntry) dao.find(EQ(MedusaEntry.INDEX, entry.getIndex1()));
@@ -192,12 +218,14 @@ foam.CLASS({
           md.update(parent1.getHash().getBytes(StandardCharsets.UTF_8));
           md.update(Long.toString(parent2.getIndex()).getBytes(StandardCharsets.UTF_8));
           md.update(parent2.getHash().getBytes(StandardCharsets.UTF_8));
-          getLogger().debug("verify", entry.getIndex(), "digest (without data)", byte2Hex(md.digest()));
+//          getLogger().debug("verify", entry.getIndex(), "digest (without data)", byte2Hex(md.digest()));
           String calculatedHash = null;
           if ( entry.getData() != null ) {
-            getLogger().debug("verify", entry.getIndex(), "digest (with data)", byte2Hex(entry.getData().hash(md)));
-            getLogger().debug("verify", entry.getIndex(), "data", entry.getData().getClass().getSimpleName());
-            calculatedHash = byte2Hex(entry.getData().hash(md));
+//            getLogger().debug("verify", entry.getIndex(), "digest (with data)", byte2Hex(entry.getData().hash(md)));
+//            getLogger().debug("verify", entry.getIndex(), "data", entry.getData().getClass().getSimpleName());
+            md.update(entry.getData().getBytes(StandardCharsets.UTF_8));
+            // calculatedHash = byte2Hex(entry.getData().hash(md));
+            calculatedHash = byte2Hex(md.digest());
           } else {
             calculatedHash = byte2Hex(md.digest());
           }
@@ -209,6 +237,9 @@ foam.CLASS({
           getLogger().error(e);
           throw new RuntimeException(e);
         }
+      } finally {
+        pm.log(x);
+      }
       `
     },
     {
@@ -260,6 +291,23 @@ foam.CLASS({
       javaCode: `
       setIndex(getIndex() + 1);
       return getIndex();
+      `
+    },
+    {
+      name: 'createPM',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'name',
+          type: 'String'
+        }
+      ],
+      javaType: 'PM',
+      javaCode: `
+      return PM.create(x, DefaultDaggerService.getOwnClassInfo(), name);
       `
     }
   ]

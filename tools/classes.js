@@ -326,6 +326,7 @@ var classes = [
   'foam.nanos.medusa.ClusterConfigReplayDAO',
   'foam.nanos.medusa.ClusterConfigStatusDAO',
   'foam.nanos.medusa.ClusterConfigSupport',
+  'foam.nanos.medusa.ClusterConfigSupportDAO',
   'foam.nanos.medusa.ClusterHTTPBox',
   'foam.nanos.medusa.ClusterHTTPReplyBox',
   'foam.nanos.medusa.DaggerService',

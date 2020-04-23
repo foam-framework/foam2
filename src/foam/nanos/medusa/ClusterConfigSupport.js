@@ -58,6 +58,11 @@ configuration for contacting the primary node.`,
       value: 'cluster'
     },
     {
+      name: 'hashingEnabled',
+      class: 'Boolean',
+      value: true
+    },
+    {
       name: 'configId',
       label: 'Self',
       class: 'String',
@@ -83,23 +88,6 @@ configuration for contacting the primary node.`,
       of: 'foam.nanos.medusa.Status',
       value: 'OFFLINE',
       visibility: 'RO'
-      // javaSetter: `
-      // Status old = status_;
-      // status_ = val;
-      // DAO dao = (DAO) getX().get("localClusterConfigDAO");
-      // ClusterConfig config = (ClusterConfig) dao.find(getConfigId());
-      // if ( status_ == Status.ONLINE &&
-      //      config.getStatus() == Status.OFFLINE ) {
-      //   config = (ClusterConfig) config.fclone();
-      //   config.setStatus(Status.ONLINE);
-      //   config = (ClusterConfig) dao.put(config);
-      // } if ( status_ == Status.OFFLINE &&
-      //      config.getStatus() == Status.ONLINE ) {
-      //   config = (ClusterConfig) config.fclone();
-      //   config.setStatus(Status.OFFLINE);
-      //   config = (ClusterConfig) dao.put(config);
-      // }
-      // `
     },
     {
       name: 'isReplaying',
@@ -139,6 +127,38 @@ configuration for contacting the primary node.`,
       class: 'Map',
       javaFactory: 'return new HashMap();',
       visibility: 'HIDDEN'
+    },
+    {
+      documentation: 'see ClusterConfigSupportDAO',
+      name: 'mediatorCount',
+      class: 'Int',
+      javaFactory: `
+      Count count = (Count) ((DAO) getX().get("localClusterConfigDAO"))
+        .where(
+          AND(
+            EQ(ClusterConfig.ZONE, 0),
+            EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
+            EQ(ClusterConfig.ENABLED, true)
+          ))
+        .select(COUNT());
+      return ((Long)count.getValue()).intValue();
+      `
+    },
+    {
+      documentation: 'see ClusterConfigSupportDAO',
+      name: 'nodeCount',
+      class: 'Int',
+      javaFactory: `
+      Count count = (Count) ((DAO) getX().get("localClusterConfigDAO"))
+        .where(
+          AND(
+            EQ(ClusterConfig.ZONE, 0),
+            EQ(ClusterConfig.TYPE, MedusaType.NODE),
+            EQ(ClusterConfig.ENABLED, true)
+          ))
+        .select(COUNT());
+      return ((Long)count.getValue()).intValue();
+      `
     },
     {
       name: 'logger',
@@ -379,27 +399,27 @@ configuration for contacting the primary node.`,
         config.getZone() == 0L;
       `
     },
-    {
-      name: 'getMediatorCount',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        }
-      ],
-      type: 'Integer',
-      javaCode: `
-      Count count = (Count) ((DAO) x.get("localClusterConfigDAO"))
-        .where(
-          AND(
-            EQ(ClusterConfig.ZONE, 0),
-            EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
-            EQ(ClusterConfig.ENABLED, true)
-          ))
-        .select(COUNT());
-      return ((Long)count.getValue()).intValue();
-      `
-    },
+    // {
+    //   name: 'getMediatorCount',
+    //   args: [
+    //     {
+    //       name: 'x',
+    //       type: 'Context'
+    //     }
+    //   ],
+    //   type: 'Integer',
+    //   javaCode: `
+    //   Count count = (Count) ((DAO) x.get("localClusterConfigDAO"))
+    //     .where(
+    //       AND(
+    //         EQ(ClusterConfig.ZONE, 0),
+    //         EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
+    //         EQ(ClusterConfig.ENABLED, true)
+    //       ))
+    //     .select(COUNT());
+    //   return ((Long)count.getValue()).intValue();
+    //   `
+    // },
     {
       name: 'getMediatorQuorum',
       args: [
@@ -410,7 +430,7 @@ configuration for contacting the primary node.`,
       ],
       type: 'Integer',
       javaCode: `
-      return getMediatorCount(x) / 2 + 1;
+      return getMediatorCount() / 2 + 1;
       `
     },
     {
@@ -427,27 +447,27 @@ configuration for contacting the primary node.`,
       return getVoters(x).size() >= getMediatorQuorum(x);
       `
     },
-    {
-      name: 'getNodeCount',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        }
-      ],
-      type: 'Integer',
-      javaCode: `
-      Count count = (Count) ((DAO) x.get("localClusterConfigDAO"))
-        .where(
-          AND(
-            EQ(ClusterConfig.ZONE, 0),
-            EQ(ClusterConfig.TYPE, MedusaType.NODE),
-            EQ(ClusterConfig.ENABLED, true)
-          ))
-        .select(COUNT());
-      return ((Long)count.getValue()).intValue();
-      `
-    },
+    // {
+    //   name: 'getNodeCount',
+    //   args: [
+    //     {
+    //       name: 'x',
+    //       type: 'Context'
+    //     }
+    //   ],
+    //   type: 'Integer',
+    //   javaCode: `
+    //   Count count = (Count) ((DAO) x.get("localClusterConfigDAO"))
+    //     .where(
+    //       AND(
+    //         EQ(ClusterConfig.ZONE, 0),
+    //         EQ(ClusterConfig.TYPE, MedusaType.NODE),
+    //         EQ(ClusterConfig.ENABLED, true)
+    //       ))
+    //     .select(COUNT());
+    //   return ((Long)count.getValue()).intValue();
+    //   `
+    // },
     {
       name: 'getNodeQuorum',
       args: [
@@ -458,7 +478,7 @@ configuration for contacting the primary node.`,
       ],
       type: 'Integer',
       javaCode: `
-      return getNodeCount(x) / 2 + 1;
+      return getNodeCount() / 2 + 1;
       `
     },
     {
@@ -522,60 +542,6 @@ configuration for contacting the primary node.`,
         .build();
       `
     },
-    // {
-    //   name: 'getMdao',
-    //   args: [
-    //     {
-    //       name: 'x',
-    //       type: 'Context'
-    //     },
-    //     {
-    //       name: 'entry',
-    //       type: 'foam.nanos.medusa.MedusaEntry'
-    //     }
-    //   ],
-    //   type: 'foam.dao.DAO',
-    //   javaCode: `
-    //   String name = entry.getNSpecName();
-    //   getLogger().debug("mdao", name);
-    //   DAO dao = (DAO) getMdaos().get(name);
-    //   if ( dao != null ) {
-    //     getLogger().debug("mdao", name, "cache", dao.getOf());
-    //     return dao;
-    //   }
-    //   dao = (DAO) x.get(name);
-    //   Object result = dao.cmd(MDAO.GET_MDAO_CMD);
-    //   if ( result != null &&
-    //        result instanceof MDAO ) {
-    //     getLogger().debug("mdao", name, "cmd", dao.getOf());
-    //     dao = (DAO) result;
-    //   } else {
-    //     while ( dao != null ) {
-    //       getLogger().debug("mdao", name, "while", dao.getOf());
-    //       if ( dao instanceof MDAO ) {
-    //         break;
-    //       }
-    //       if ( dao instanceof EasyDAO ) {
-    //         dao = ((EasyDAO) dao).getMdao();
-    //         if ( dao != null ) {
-    //           break;
-    //         }
-    //       }
-    //       if ( dao instanceof ProxyDAO ) {
-    //         dao = ((ProxyDAO) dao).getDelegate();
-    //       } else {
-    //         dao = null;
-    //       }
-    //     }
-    //   }
-    //   if ( dao != null ) {
-    //     getMdaos().put(name, dao);
-    //     getLogger().debug("mdao", name, "found", dao.getOf());
-    //     return dao;
-    //   }
-    //   throw new IllegalArgumentException("MDAO not found: "+name);
-    //   `
-    // },
     {
       name: 'cronEnabled',
       type: 'Boolean',
@@ -596,6 +562,60 @@ configuration for contacting the primary node.`,
       }
       return true;
      `
+    },
+    {
+      name: 'getMdao',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'entry',
+          type: 'foam.nanos.medusa.MedusaEntry'
+        }
+      ],
+      type: 'foam.dao.DAO',
+      javaCode: `
+      String name = entry.getNSpecName();
+      getLogger().debug("mdao", name);
+      DAO dao = (DAO) getMdaos().get(name);
+      if ( dao != null ) {
+        getLogger().debug("mdao", name, "cache", dao.getOf());
+        return dao;
+      }
+      dao = (DAO) x.get(name);
+      Object result = dao.cmd(MDAO.GET_MDAO_CMD);
+      if ( result != null &&
+           result instanceof MDAO ) {
+        getLogger().debug("mdao", name, "cmd", dao.getOf());
+        dao = (DAO) result;
+      } else {
+        while ( dao != null ) {
+          getLogger().debug("mdao", name, "while", dao.getOf());
+          if ( dao instanceof MDAO ) {
+            break;
+          }
+          if ( dao instanceof EasyDAO ) {
+            dao = ((EasyDAO) dao).getMdao();
+            if ( dao != null ) {
+              break;
+            }
+          }
+          if ( dao instanceof ProxyDAO ) {
+            dao = ((ProxyDAO) dao).getDelegate();
+          } else {
+            dao = null;
+          }
+        }
+      }
+      if ( dao != null ) {
+        getMdaos().put(name, dao);
+        getLogger().debug("mdao", name, "found", dao.getOf());
+        return dao;
+      }
+      throw new IllegalArgumentException("MDAO not found: "+name);
+      `
     }
   ]
 });

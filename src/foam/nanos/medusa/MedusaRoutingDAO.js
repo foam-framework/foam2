@@ -12,24 +12,16 @@ foam.CLASS({
   documentation: `Consensus has been reached for an object, put it into it's MDAO. Also generate a notification to wake any blocked Primary puts.`,
 
   javaImports: [
+    'foam.core.FObject',
     'foam.dao.DAO',
     'foam.dao.DOP',
-    'foam.dao.EasyDAO',
-    'foam.dao.MDAO',
-    'foam.dao.ProxyDAO',
+    'foam.lib.json.JSONParser',
+    'foam.util.SafetyUtil',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
-    'java.util.Map',
-    'java.util.HashMap',
   ],
 
   properties: [
-    {
-      name: 'mdaos',
-      class: 'Map',
-      javaFactory: 'return new HashMap();',
-      visibility: 'HIDDEN'
-    },
     {
       name: 'logger',
       class: 'FObjectProperty',
@@ -56,16 +48,31 @@ foam.CLASS({
       getLogger().debug("put", entry.getIndex(), "consensus", "TRUE");
 
       try {
-        getLogger().debug("put", entry.getIndex(), "mdao", entry.getDop().getLabel());
-        DAO mdao = getMdao(x, entry);
-        if ( DOP.PUT == entry.getDop() ) {
-          mdao.put_(x, entry.getData());
-        } else if ( DOP.REMOVE == entry.getDop() ) {
-          mdao.remove_(x, entry.getData());
-        } else {
-          throw new UnsupportedOperationException(entry.getDop().getLabel());
-        }
+        String data = entry.getData();
+        getLogger().debug("put", entry.getIndex(), "mdao", entry.getDop().getLabel(), data);
+        if ( ! SafetyUtil.isEmpty(data) ) {
+          ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+          FObject nu = x.create(JSONParser.class).parseString(entry.getData());
+          if ( nu == null ) {
+            getLogger().error("Failed to parse", entry.getData());
+            throw new RuntimeException("Error parsing data.");
+          }
 
+          DAO dao = support.getMdao(x, entry);
+          FObject old = dao.find_(x, nu.getProperty("id"));
+          if (  old != null ) {
+            nu = old.fclone().copyFrom(nu);
+          }
+
+          if ( DOP.PUT == entry.getDop() ) {
+            dao.put_(x, nu);
+          } else if ( DOP.REMOVE == entry.getDop() ) {
+            dao.remove_(x, nu);
+          } else {
+            getLogger().warning("Unsupported operation", entry.getDop().getLabel());
+            throw new UnsupportedOperationException(entry.getDop().getLabel());
+          }
+        }
         // Notify any blocked Primary puts
         getLogger().debug("put", entry.getIndex(), "notify");
         ((DAO) x.get("localMedusaEntryDAO")).cmd_(x, entry);
@@ -76,60 +83,6 @@ foam.CLASS({
         // TODO: Alarm
       }
       return entry;
-      `
-    },
-    {
-      name: 'getMdao',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'entry',
-          type: 'foam.nanos.medusa.MedusaEntry'
-        }
-      ],
-      type: 'foam.dao.DAO',
-      javaCode: `
-      String name = entry.getNSpecName();
-      getLogger().debug("mdao", name);
-      DAO dao = (DAO) getMdaos().get(name);
-      if ( dao != null ) {
-        getLogger().debug("mdao", name, "cache", dao.getOf());
-        return dao;
-      } 
-      dao = (DAO) x.get(name);
-      Object result = dao.cmd(MDAO.GET_MDAO_CMD);
-      if ( result != null &&
-           result instanceof MDAO ) {
-        getLogger().debug("mdao", name, "cmd", dao.getOf());
-        dao = (DAO) result;
-      } else {
-        while ( dao != null ) {
-          getLogger().debug("mdao", name, "while", dao.getOf());
-          if ( dao instanceof MDAO ) {
-            break;
-          }
-          if ( dao instanceof EasyDAO ) {
-            dao = ((EasyDAO) dao).getMdao();
-            if ( dao != null ) {
-              break;
-            }
-          }
-          if ( dao instanceof ProxyDAO ) {
-            dao = ((ProxyDAO) dao).getDelegate();
-          } else {
-            dao = null;
-          }
-        }
-      }
-      if ( dao != null ) {
-        getMdaos().put(name, dao);
-        getLogger().debug("mdao", name, "found", dao.getOf());
-        return dao;
-      }
-      throw new IllegalArgumentException("MDAO not found: "+name); 
       `
     }
   ]

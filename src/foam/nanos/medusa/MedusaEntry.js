@@ -81,13 +81,18 @@ foam.CLASS({
     },
     {
       document: 'Stringified FObject',
-      //      class: 'String',
-      class: 'FObjectProperty',
+      class: 'String',
+//      class: 'FObjectProperty',
       name: 'data',
       visibility: 'RO',
       view: {
-        class: 'foam.u2.CitationView'
+        class: 'foam.u2.tag.TextArea',
+        rows: 4,
+        cols: 144
       }
+      // view: {
+      //   class: 'foam.u2.CitationView'
+      // }
     },
     {
       class: 'String',

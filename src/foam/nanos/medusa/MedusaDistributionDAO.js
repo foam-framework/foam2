@@ -19,6 +19,7 @@ foam.CLASS({
     'static foam.mlang.MLang.EQ',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
+    'foam.nanos.pm.PM',
     'java.util.ArrayList',
     'java.util.List',
     'java.util.HashMap',
@@ -84,9 +85,12 @@ foam.CLASS({
       ],
       type: 'Object',
       javaCode: `
+      PM pm = createPM(x, dop.getLabel());
+      try {
       getLogger().debug("submit", dop.getLabel(), obj.getClass().getSimpleName());
 
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
 
       List<ClusterConfig> arr = (ArrayList) ((ArraySink) ((DAO) x.get("localClusterConfigDAO"))
         .where(
@@ -104,7 +108,7 @@ foam.CLASS({
             try {
               DAO dao = (DAO) getClients().get(config.getId());
               if ( dao == null ) {
-                DAO clientDAO = support.getClientDAO(x, "medusaNodeDAO", config, config);
+                DAO clientDAO = support.getClientDAO(x, "medusaNodeDAO", myConfig, config);
                 dao = new RetryClientSinkDAO.Builder(x)
                         .setDelegate(clientDAO)
                         .setMaxRetryAttempts(support.getMaxRetryAttempts())
@@ -127,6 +131,26 @@ foam.CLASS({
         });
       }
       return obj;
+      } finally {
+        pm.log(x);
+      }
+      `
+    },
+    {
+      name: 'createPM',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'name',
+          type: 'String'
+        }
+      ],
+      javaType: 'PM',
+      javaCode: `
+      return PM.create(x, this.getOwnClassInfo(), name);
       `
     }
   ]
