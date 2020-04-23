@@ -86,11 +86,19 @@ foam.CLASS({
           .start(self.Tab, { label: this.TAB_ALL, selected: true })
             .add(self.renderFeatured())
           .end()
-          .select(self.capabilityCategoryDAO, function(category) {
-            return self.Tab.create({ label: category.name })
-              .add(self.renderSection(category))
-              ;
-          }, false, true)
+          // TODO: replace this .call with a .select once
+          //       duplication error is fixed
+          .call(function () {
+            self.capabilityCategoryDAO.select().then((a) => {
+              for ( let i=0; i < a.array.length; i++ ) {
+                let category = a.array[i];
+                console.log(category);
+                let e = self.Tab.create({ label: category.name })
+                  .add(self.renderSection(category))
+                  ;
+                this.add(e);
+              }
+            });
         .end()
         ;
     },

@@ -50,7 +50,10 @@ foam.CLASS({
         .end()
         .start()
           .addClass(self.s.myClass('card-description'))
-          .add(self.data.description)
+          .add(
+            self.data.description ||
+              'no description'
+          )
         .end()
         .s.addBinds(self)
         ;

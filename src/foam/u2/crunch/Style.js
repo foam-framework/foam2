@@ -46,7 +46,7 @@ foam.CLASS({
     }
 
     ^card-title {
-      height: 20px;
+      min-height: 20px;
       font-family: IBMPlexSans;
       font-size: 16px;
       font-weight: 600;
