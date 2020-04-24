@@ -39,7 +39,7 @@ foam.CLASS({
   css: `
     ^ {
       padding: 8px 0;
-      display: grid;
+      //display: grid;
       grid-template-columns: 1fr 1fr;
     }
     ^ > * {

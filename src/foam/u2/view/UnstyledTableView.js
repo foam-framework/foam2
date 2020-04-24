@@ -236,12 +236,9 @@ foam.CLASS({
     function initE() {
       var view = this;
 
-      this.isColumnChanged$.sub(function(){
-        console.log('isColumnChanged');
-      });
-
-      this.isColumnChanged = ! this.isColumnChanged;
-      //this.isColumnChanged = ;
+      // this.isColumnChanged$.sub(function(){
+      //   console.log('isColumnChanged');
+      // });
 
       if ( this.filteredTableColumns$ ) {
         //change this

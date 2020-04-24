@@ -136,7 +136,7 @@ foam.CLASS({
     function initE() {
       this.data.isColumnChanged;
 
-      this.data.isColumnChanged = !this.data.isColumnChanged;
+      //this.data.isColumnChanged = !this.data.isColumnChanged;
       this.view = this.ColumnsConfigView.create({of:this.data.of, allColumns:this.data.allColumns, selectedColumns$:this.data.selectedColumnNames$ });
       this.add(this.view)//;//this.DetailView.create({ data: this });
       .startContext({ data: this })
