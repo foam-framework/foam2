@@ -427,7 +427,7 @@
     },
     {
       class: 'String',
-      name: 'approvableCreateKey',
+      name: 'approvableHashKey',
       hidden: true
     }
   ],

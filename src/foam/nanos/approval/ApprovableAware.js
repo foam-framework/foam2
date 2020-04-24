@@ -18,6 +18,7 @@
     'foam.core.X',
     'foam.nanos.logger.Logger',
     'foam.nanos.approval.ApprovableAware',
+    'foam.nanos.ruler.Operations',
     'java.util.Iterator',
     'java.util.ArrayList',
     'java.util.Arrays',
@@ -27,7 +28,7 @@
 
   methods: [
     {
-      name: 'getApprovableKey',
+      name: 'getStringId',
       type: 'String'
     }  
   ],
@@ -38,13 +39,14 @@
       buildJavaClass: function(cls) {
         cls.methods.push(
           foam.java.Method.create({
-            name: 'getApprovableCreateKey',
+            name: 'getApprovableHashKey',
             type: 'String',
             static: true,
             visibility: 'public',
             args: [
               { name: 'x', type: 'X' },
-              { name: 'obj', type: 'FObject' }
+              { name: 'obj', type: 'FObject' },
+              { name: 'operation', type: 'Operations' }
             ],
             body: `
               FObject oldObj = null;
@@ -55,27 +57,41 @@
                 logger.error("Error instantiating : ", obj.getClass().getSimpleName(), e);
               }
               Map diff = oldObj == null ? null : oldObj.diff(obj);
+              StringBuilder hash_sb = new StringBuilder(obj.getClass().getSimpleName());
+              if ( operation == Operations.UPDATE && obj instanceof ApprovableAware ) 
+                hash_sb.append(((ApprovableAware) obj).getStringId());
+
               if ( diff != null ) {
                 // remove ids, timestamps and userfeedback
-                diff.remove("id");
+                if ( operation == Operations.CREATE ) diff.remove("id");
                 diff.remove("created");
                 diff.remove("lastModified");
                 diff.remove("userFeedback");
+
                 // convert array properties to list to get consistent hash
+                // and create hash
                 Iterator it = diff.entrySet().iterator();
-                List<String> arrayProps = new ArrayList<String>();
+
                 while( it.hasNext() ) {
                   Map.Entry next = (Map.Entry) it.next();
-                  if ( next.getValue() instanceof Object[] ) {
-                    arrayProps.add((String) next.getKey());
+                  Object nextValue = next.getValue();
+                  if ( nextValue instanceof Object[] ) {
+                    next.setValue(Arrays.asList((Object[]) nextValue));
                   }
-                }
-                for ( String prop : arrayProps ) {
-                  diff.put(prop, Arrays.asList((Object[]) diff.get(prop)).hashCode());
+                  if ( nextValue instanceof FObject ) {
+                    String hashedKey = getApprovableHashKey(x, (FObject) nextValue, operation);
+                    if ( hashedKey.toLowerCase().equals(nextValue.getClass().getSimpleName().toLowerCase()) ) continue;
+                    next.setValue(hashedKey);
+                  }
+
+                  hash_sb.append(":").append(String.valueOf(next.hashCode()));
                 }
               }
 
-              String key = diff == null || diff.size() == 0 ? ((ApprovableAware) obj).getApprovableKey() : obj.getClass().getSimpleName() + String.valueOf(diff.hashCode());
+              String key = ( diff == null || diff.size() == 0 ) && obj instanceof ApprovableAware ? 
+                ((ApprovableAware) obj).getStringId() : 
+                hash_sb.toString();
+              
               return key;
             `
           })
