@@ -43,10 +43,9 @@ public class ApprovalDAO
       DAO requests = ApprovalRequestUtil.getAllRequests(x, request.getObjId(), request.getClassification());
       // if not a cancellation request and points are sufficient to consider object approved
       if ( 
-        request.getStatus() != ApprovalStatus.CANCELLED && (
-          getCurrentPoints(requests) >= request.getRequiredPoints() ||
-          getCurrentRejectedPoints(requests) >= request.getRequiredRejectedPoints()
-        )
+        request.getStatus() == ApprovalStatus.CANCELLED ||
+        getCurrentPoints(requests) >= request.getRequiredPoints() ||
+        getCurrentRejectedPoints(requests) >= request.getRequiredRejectedPoints()
       ) {
 
         //removes all the requests that were not approved to clean up approvalRequestDAO
