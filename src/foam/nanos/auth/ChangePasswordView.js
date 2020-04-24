@@ -19,8 +19,7 @@ foam.CLASS({
 
   css: `
     ^ {
-      background: #ffffff;
-      height: 100vh;
+      margin-bottom: 24px
     }
     ^top-bar {
       background: /*%LOGOBACKGROUNDCOLOUR%*/ #202341;
