@@ -31,7 +31,7 @@
 
         this.addSprite(this);
         this.onDetach(this.Animation.create({
-          duration: 10000,
+          duration: 8000,
           f: () => {
            this.x += 3000 * this.vx;
            this.y += 3000 * this.vy;
@@ -56,33 +56,57 @@
 foam.CLASS({
   package: 'com.google.foam.demos.spacewars',
   name: 'Ship',
-  extends: 'foam.physics.PhysicalBox',
+  extends: 'foam.physics.PhysicalCircle',
 
   requires: [
     'com.google.foam.demos.spacewars.Bullet',
-    'foam.graphics.Circle'
+    'foam.graphics.Box',
+    'foam.graphics.Circle',
+    'foam.input.Gamepad'
   ],
 
   imports: [ 'addSprite' ],
 
   properties: [
-    [ 'width',  50 ],
-    [ 'height', 10 ],
-    [ 'border', 'white' ]
+    [ 'id', 0 ],
+    [ 'radius', 15 ],
+    [ 'border', 'white' ],
+    [ 'shield', 999 ],
+    {
+      name: 'gamepad',
+      factory: function() { return this.Gamepad.create({id: this.id}); }
+    }
   ],
 
   methods: [
     function init() {
       var engine = this.Circle.create({
-        radius: 5,
+        radius: 7,
         color:  'red',
         border: null,
-        x:      0,
-        y:      5,
+        x:      -this.radius+1,
+        y:      0,
         start:  Math.PI/2,
         end:    Math.PI*3/2
       });
       this.add(engine);
+
+      var gun = this.Box.create({
+        width: 8,
+        height: 4,
+        color:  'white',
+        border: null,
+        x:      this.radius+1,
+        y:      -2
+      });
+      this.add(gun);
+    },
+
+    function collideWith(c) {
+      if ( this.Bullet.isInstance(c) ) {
+        if ( c.color != this.color ) this.shield--;
+        c.detach();
+      }
     },
 
     function thrust() {
@@ -90,20 +114,34 @@ foam.CLASS({
     },
 
     function turnLeft() {
-      this.rotation += 2 * Math.PI/180;
+      this.rotation += 1 * Math.PI/180;
     },
 
     function turnRight() {
-      this.rotation -= 2 * Math.PI/180;
+      this.rotation -= 1 * Math.PI/180;
     },
 
     function fire() {
-      var b = this.Bullet.create({x: this.x, y: this.y-this.height/2, color: this.color});
+      var b = this.Bullet.create({x: this.x, y: this.y, color: this.color});
       b.applyMomentum(3 * b.mass, -this.rotation);
       this.applyMomentum(-0.01, this.rotation);
-      //b.x += b.vx * 45;
-      //b.y += b.vy * 45;
+      b.x += b.vx * this.radius/2;
+      b.y += b.vy * this.radius/2;
       this.addSprite(b);
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'tick',
+      code: function() {
+        this.gamepad.update();
+        if ( this.gamepad.button0 ) this.thrust();
+        if ( this.gamepad.button1 ) this.turnRight();
+        if ( this.gamepad.button3 ) this.turnLeft();
+        if ( this.gamepad.button4 ) this.fire();
+        if ( this.gamepad.button5 ) this.fire();
+      }
     }
   ]
 });
@@ -131,10 +169,10 @@ foam.CLASS({
 
       if ( c == star ) return;
 
+      // Apply Gravity
       var dx = c.x - star.x, dy = c.y - star.y;
       var dsquared = Math.max(star.radius * star.radius, dx * dx + dy * dy);
-
-      c.applyMomentum(-1000 * c.mass / dsquared, this.angleOfImpact(this.star, c));
+      c.applyMomentum(-750 * c.mass / dsquared, this.angleOfImpact(this.star, c));
     },
     function collide(c1, c2) {
       if ( this.Bullet.isInstance(c1) && this.Bullet.isInstance(c1) ) return;
@@ -159,7 +197,6 @@ foam.CLASS({
     'foam.graphics.Box',
     'foam.graphics.CView',
     'foam.graphics.Label',
-    'foam.input.Gamepad',
     'foam.physics.PhysicalCircle'
   ],
 
@@ -177,14 +214,6 @@ foam.CLASS({
       factory: function() { return this.Box.create({width: 1200, height: 600, color: 'black'}); }
     },
     {
-      name: 'lGamepad',
-      factory: function() { return this.Gamepad.create(); }
-    },
-    {
-      name: 'rGamepad',
-      factory: function() { return this.Gamepad.create({id: 1}); }
-    },
-    {
       name: 'star',
       factory: function() { return this.PhysicalCircle.create({border: null, color: 'yellow', radius: 70, mass: 1000}); }
     },
@@ -194,7 +223,7 @@ foam.CLASS({
     },
     {
       name: 'rShip',
-      factory: function() { return this.Ship.create({color: 'orange', rotation: Math.PI}); }
+      factory: function() { return this.Ship.create({id: 1, color: 'orange', rotation: Math.PI}); }
     },
     {
       class: 'Int',
@@ -222,36 +251,23 @@ foam.CLASS({
         }
       };
 
-      this.lShip.collideWith = (c) => {
-        if ( this.Bullet.isInstance(c) && c.color != this.lShip.color ) {
-          this.rScore++;
-          c.detach();
-        }
-      };
-      this.rShip.collideWith = (c) => {
-        if ( this.Bullet.isInstance(c) && c.color != this.rShip.color ) {
-          this.lScore++;
-          c.detach();
-        }
-      };
-
       var lScoreLabel = this.Label.create({
-        text$:  this.lScore$.map((s) => s.toString().padStart(3, '0')),
+        text$:  this.lShip.shield$.map((s) => 'Shield: ' + s.toString().padStart(3, '0')),
         align:  'center',
         x:      170,
         y:      25,
         color:  'blue',
-        font:   '70px Arial',
+        font:   '50px Arial',
         width:  0,
         height: 70});
 
       var rScoreLabel = this.Label.create({
-        text$:  this.rScore$.map((s) => s.toString().padStart(3, '0')),
+        text$:  this.rShip.shield$.map((s) => 'Shield: ' + s.toString().padStart(3, '0')),
         align:  'center',
         x:      this.canvas.width-170,
         y:      25,
         color:  'orange',
-        font:   '70px Arial',
+        font:   '50px Arial',
         width:  0,
         height: 70});
 
@@ -270,6 +286,8 @@ foam.CLASS({
       // We could make a foam.util.Timer, but the collider already has a timer
       // so just subscribe to its tick instead.
       this.collider.onTick.sub(this.tick);
+      this.collider.onTick.sub(this.lShip.tick);
+      this.collider.onTick.sub(this.rShip.tick);
 
 //      this.ball.collideWith = (o) => this.onBounceOnShip();
 
@@ -351,22 +369,13 @@ foam.CLASS({
     {
       name: 'tick',
       code: function() {
-        //  this.lShip.fire();
-        //this.rShip.fire();
-
+        // Add friction
         this.lShip.velocity *= 0.99;
         this.rShip.velocity *= 0.99;
 
-        this.lGamepad.update();
-        if ( this.lGamepad.button0 ) this.lUp();
-        if ( this.lGamepad.button2 ) this.lDown();
-
-        this.rGamepad.update();
-        if ( this.rGamepad.button0 ) this.rUp();
-        if ( this.rGamepad.button2 ) this.rDown();
-
         // Reset scores
-        if ( this.lScore >= 1000 || this.rScore >= 1000 ) {
+        if ( this.lScore <= 0 || this.rScore <= 0 ) {
+          // this.gameOver();
           this.lScore = this.rScore = 0;
         }
       }
