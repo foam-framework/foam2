@@ -30,7 +30,7 @@ foam.CLASS({
       class: 'String',
       name: 'identifier',
       required: true,
-      //TODO: rename label to 'Email or Username' when integrating
+      // TODO: rename label to 'Email or Username' when integrating
       label: 'Email',
       view: {
         class: 'foam.u2.TextField',
@@ -71,7 +71,8 @@ foam.CLASS({
       name: 'subfooterLink',
       code: function() {
         this.stack.push({
-          class: 'foam.nanos.auth.resetPassword.ForgotPasswordView'
+          class: 'foam.nanos.auth.ChangePasswordView',
+          modelOf: 'foam.nanos.auth.RetrievePassword'
         });
       }
     },
