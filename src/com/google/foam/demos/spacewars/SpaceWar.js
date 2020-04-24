@@ -68,7 +68,7 @@ foam.CLASS({
   imports: [ 'addSprite' ],
 
   properties: [
-    [ 'id', 0 ],
+    [ 'id',     0 ],
     [ 'radius', 15 ],
     [ 'border', 'white' ],
     [ 'shield', 999 ],
@@ -81,18 +81,20 @@ foam.CLASS({
   methods: [
     function init() {
       var engine = this.Circle.create({
-        radius: 7,
-        color:  'red',
-        border: null,
-        x:      -this.radius+1,
-        y:      0,
-        start:  Math.PI/2,
-        end:    Math.PI*3/2
+        radius:      7,
+        color:       'red',
+        border:      null,
+        x:           -this.radius+1,
+        y:           0,
+        shadowColor: 'yellow',
+        shadowBlur:  5,
+        start:       Math.PI/2,
+        end:         Math.PI*3/2
       });
       this.add(engine);
 
       var gun = this.Box.create({
-        width: 8,
+        width:  8,
         height: 4,
         color:  'white',
         border: null,
@@ -114,17 +116,17 @@ foam.CLASS({
     },
 
     function turnLeft() {
-      this.rotation += 1 * Math.PI/180;
+      this.rotation += 2 * Math.PI/180;
     },
 
     function turnRight() {
-      this.rotation -= 1 * Math.PI/180;
+      this.rotation -= 2 * Math.PI/180;
     },
 
     function fire() {
       var b = this.Bullet.create({x: this.x, y: this.y, color: this.color});
       b.applyMomentum(3 * b.mass, -this.rotation);
-      this.applyMomentum(-0.01, this.rotation);
+      //this.applyMomentum(-0.01, this.rotation);
       b.x += b.vx * this.radius/2;
       b.y += b.vy * this.radius/2;
       this.addSprite(b);
@@ -211,11 +213,18 @@ foam.CLASS({
   properties: [
     {
       name: 'canvas',
-      factory: function() { return this.Box.create({width: 1200, height: 600, color: 'black'}); }
+      factory: function() { return this.Box.create({width: 1200, height: 800, color: 'black'}); }
     },
     {
       name: 'star',
-      factory: function() { return this.PhysicalCircle.create({border: null, color: 'yellow', radius: 70, mass: 1000}); }
+      factory: function() { return this.PhysicalCircle.create({
+        shadowBlur: 50,
+        shadowColor: 'white',
+        border: null,
+        color: 'black',
+        radius: 70,
+        mass: 1000
+      }); }
     },
     {
       name: 'lShip',
@@ -318,6 +327,9 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this.style({outline: 'none'}).focus().add(this.canvas);
+    },
+
+    function gameOver() {
     }
   ],
 
@@ -370,13 +382,12 @@ foam.CLASS({
       name: 'tick',
       code: function() {
         // Add friction
-        this.lShip.velocity *= 0.99;
-        this.rShip.velocity *= 0.99;
+        this.lShip.velocity *= 0.995;
+        this.rShip.velocity *= 0.995;
 
         // Reset scores
-        if ( this.lScore <= 0 || this.rScore <= 0 ) {
-          // this.gameOver();
-          this.lScore = this.rScore = 0;
+        if ( this.lShip.shield <= 0 || this.rShip.shield <= 0 ) {
+          this.gameOver();
         }
       }
     }
