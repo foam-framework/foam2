@@ -85,7 +85,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'isHorizontal',
-      documentation: `Toggles the view from displaying text fields horizontally or vertically.
+      documentation: `Toggles the view from displaying input fields horizontally or vertically.
         Not recommended to set this to true if there are less than three input fields for password model.
       `,
       value: false,
