@@ -35,9 +35,14 @@ foam.CLASS({
       margin: 0 auto;
     }
     ^content {
-      max-width: 30vw;
       padding-top: 4vh;
       margin: 0 auto;
+    }
+    ^content-horizontal {
+      width: 90%;
+    }
+    ^content-vertical {
+      width: 30vw;
     }
     ^section {
     }
@@ -46,6 +51,7 @@ foam.CLASS({
       margin-top: 0;
       margin-bottom: 4vh;
       font-size: 2.5rem;
+      text-align: center;
     }
     /* subtitle */
     ^ ^section .subtitle {
@@ -77,24 +83,35 @@ foam.CLASS({
       hidden: true
     },
     {
+      class: 'Boolean',
+      name: 'isHorizontal',
+      documentation: `Toggles the view from displaying text fields horizontally or vertically.
+        Not recommended to set this to true if there are less than three input fields for password model.
+      `,
+      value: false,
+      hidden: true
+    },
+    {
       class: 'String',
       name: 'modelOf',
       documentation: `Password model used for this view.
-                      Pass this property along when you create this view.
-                      e.g., stack.push({
-                        class: 'foam.nanos.auth.ChangePasswordView',
-                        modelOf: 'foam.nanos.auth.RetrievePassword'
-                      })
-                     `
+        Pass this property along when you create this view.
+        e.g., stack.push({
+          class: 'foam.nanos.auth.ChangePasswordView',
+          modelOf: 'foam.nanos.auth.RetrievePassword'
+        })
+      `
     },
     {
       class: 'FObjectProperty',
       of: this.modelOf,
       name: 'model',
       documentation: 'instance of password model used for this view',
-      expression: function(modelOf) {
-        return foam.lookup(modelOf).create({}, this);
-      }
+      factory: function() {
+        return foam.lookup(this.modelOf)
+          .create({ isHorizontal: this.isHorizontal }, this);
+      },
+      view: { class: 'foam.u2.detail.VerticalDetailView' }
     }
   ],
 
@@ -111,13 +128,16 @@ foam.CLASS({
           .end();
         })
         // body
-        .start().addClass(this.myClass('content'))
+        .start()
+          .addClass(this.myClass('content'))
+          .callIfElse(this.isHorizontal, function() {
+            this.addClass(self.myClass('content-horizontal'));
+          }, function() {
+            this.addClass(self.myClass('content-vertical'));
+          })
           // section
           .start().addClass(this.myClass('section'))
-            .start(foam.u2.detail.SectionView, {
-              data: this.model,
-              sectionName: this.model.cls_.model_.sections[0].name
-            }).end()
+            .start(this.MODEL).end()
           .end()
           // link
           .callIf(this.model.hasBackLink, function() {

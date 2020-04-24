@@ -59,8 +59,8 @@ foam.CLASS({
           args: ['newPassword', 'confirmationPassword'],
           predicateFactory: function(e) {
             return e.EQ(
-              foam.nanos.auth.UpdatePassword.NEW_PASSWORD,
-              foam.nanos.auth.UpdatePassword.CONFIRMATION_PASSWORD);
+              foam.nanos.auth.ResetPassword.NEW_PASSWORD,
+              foam.nanos.auth.ResetPassword.CONFIRMATION_PASSWORD);
           },
           errorString: 'Passwords do not match.'
         }
