@@ -75,23 +75,42 @@ foam.CLASS({
     {
       name: 'gamepad',
       factory: function() { return this.Gamepad.create({id: this.id}); }
-    }
+    },
+    'engine1', 'engine2'
   ],
 
   methods: [
     function init() {
-      var engine = this.Circle.create({
+      this.engine1 = this.Circle.create({
         radius:      7,
         color:       'red',
         border:      null,
-        x:           -this.radius+1,
-        y:           0,
-        shadowColor: 'yellow',
-        shadowBlur:  5,
-        start:       Math.PI/2,
-        end:         Math.PI*3/2
+        x:           -this.radius+5,
+        y:           -12,
+        shadowColor: 'red',
+        shadowBlur:  10,
+        scaleX:      1.8
       });
-      this.add(engine);
+
+      this.engine2 = this.Circle.create({
+        radius:      7,
+        color:       'red',
+        border:      null,
+        x:           -this.radius+5,
+        y:           12,
+        shadowColor: 'red',
+        shadowBlur:  10,
+        scaleX:      1.8
+      });
+
+      var hull = this.Circle.create({
+        color: this.color,
+        radius: this.radius,
+        border: 'gray',
+        scaleX: 1.4
+      });
+
+      this.add(this.engine1, this.engine2, hull);
 
       var gun = this.Box.create({
         width:  8,
@@ -113,14 +132,17 @@ foam.CLASS({
 
     function thrust() {
       this.applyMomentum(0.25, -this.rotation);
+      this.engine1.alpha = this.engine2.alpha = 1;
     },
 
     function turnLeft() {
       this.rotation += 2 * Math.PI/180;
+      this.engine2.alpha = 1.2;
     },
 
     function turnRight() {
       this.rotation -= 2 * Math.PI/180;
+      this.engine1.alpha = 1.2;
     },
 
     function fire() {
@@ -143,6 +165,8 @@ foam.CLASS({
         if ( this.gamepad.button3 ) this.turnLeft();
         if ( this.gamepad.button4 ) this.fire();
         if ( this.gamepad.button5 ) this.fire();
+        if ( this.engine1.alpha > 0.3 ) this.engine1.alpha *= 0.95;
+        if ( this.engine2.alpha > 0.3 ) this.engine2.alpha *= 0.95;
       }
     }
   ]
@@ -228,7 +252,7 @@ foam.CLASS({
     },
     {
       name: 'lShip',
-      factory: function() { return this.Ship.create({color: 'blue'}); }
+      factory: function() { return this.Ship.create({color: 'lightblue'}); }
     },
     {
       name: 'rShip',
@@ -265,7 +289,7 @@ foam.CLASS({
         align:  'center',
         x:      170,
         y:      25,
-        color:  'blue',
+        color:  'lightblue',
         font:   '50px Arial',
         width:  0,
         height: 70});
