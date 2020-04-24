@@ -53,6 +53,7 @@ foam.CLASS({
       text-align: center;
     }
     /* subtitle */
+    /* using nested CSS selector to give a higher sepcificy and prevent being overriden  */
     ^ ^section .subtitle {
       color: /*%GREY2%*/ #8e9090;
       font-size: 1rem;
