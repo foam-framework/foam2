@@ -10,7 +10,7 @@ foam.RELATIONSHIP({
   unauthorizedTargetDAOKey: 'localTicketDAO',
   // REVIEW: unable to get owner to display in any section on Ticket.
   targetProperty: {
-    readVisibility: 'RO',
+    visibility: 'RO',
     section: 'infoSection',
     tableCellFormatter: function(value) {
       this.add(this.__subSubContext__.userDAO.find(value)
