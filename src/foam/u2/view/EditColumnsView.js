@@ -137,8 +137,7 @@ foam.CLASS({
       this.data.isColumnChanged;
 
       //this.data.isColumnChanged = !this.data.isColumnChanged;
-      this.view = this.ColumnsConfigView.create({of:this.data.of, allColumns:this.data.allColumns, selectedColumns$:this.data.selectedColumnNames$ });
-      this.add(this.view)//;//this.DetailView.create({ data: this });
+      this.add(foam.u2.ViewSpec.createView(this.ColumnsConfigView, {data$:this.data$}, this, this.__subSubContext__))//;//this.DetailView.create({ data: this });
       .startContext({ data: this })
         .add(this.CANCEL)
         .add(this.SAVE)
