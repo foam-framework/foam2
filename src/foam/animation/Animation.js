@@ -1,19 +1,9 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2016 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
+
 
 // Experimental Animation Support
 // What about nested objects?
@@ -89,6 +79,10 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'stopped'
+    },
+    {
+      name: 'interp',
+      value: foam.animation.Interp.linear
     }
   ],
 
@@ -117,10 +111,10 @@ foam.CLASS({
 
     function animateValues() {
       for ( var key in this.slots_ ) {
-        var s          = this.slots_[key];
-        var slot       = s[0], startValue = s[1], endValue = s[2];
-        var completion = Math.min(1, (Date.now() - this.startTime_) / this.duration);
-        var value      = startValue + (endValue-startValue) * completion;
+        var s     = this.slots_[key];
+        var slot  = s[0], startValue = s[1], endValue = s[2];
+        var time  = Math.min(1, (Date.now() - this.startTime_) / this.duration);
+        var value = startValue + (endValue-startValue) * this.interp(time);
         slot.set(value);
       }
     }
