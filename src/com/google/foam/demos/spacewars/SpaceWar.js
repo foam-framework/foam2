@@ -122,17 +122,16 @@ foam.CLASS({
         alpha: 1
       });
 
-      this.add(this.engine1, this.engine2, hull, this.forcefield);
-
       var gun = this.Box.create({
         width:  8,
         height: 4,
         color:  'white',
         border: null,
-        x:      this.radius-8,
+        x:      this.radius-15,
         y:      -2
       });
-      this.add(gun);
+
+      this.add(this.engine1, this.engine2, hull, this.forcefield, gun);
     },
 
     function paintSelf() {},
