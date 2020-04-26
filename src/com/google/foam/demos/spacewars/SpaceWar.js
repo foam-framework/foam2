@@ -57,21 +57,21 @@ foam.CLASS({
       });
 
       var hull = this.Circle.create({
-        color: this.color,
+        color:  this.color,
         radius: this.radius-24,
         border: 'gray',
         scaleX: 1.4
       });
 
       this.forcefield = this.Arc.create({
-        start: 0,
-        end: Math.PI*2,
-        radius: this.radius,
+        start:       0,
+        end:         Math.PI*2,
+        radius:      this.radius,
         shadowBlur:  10,
         shadowColor: 'white',
-        border: 'white',
-        arcWidth: 8,
-        alpha: 1
+        border:      'white',
+        arcWidth:    8,
+        alpha:       1
       });
 
       var gun = this.Box.create({
@@ -97,7 +97,6 @@ foam.CLASS({
           }
           this.forcefield.alpha = Math.min(1.1, this.forcefield.alpha+0.25);
           this.shield = Math.max(0, this.shield-1);
-          console.log(this.shield + ' ' + c.$UID);
         }
         c.detach();
       }
@@ -183,8 +182,6 @@ foam.CLASS({
     'foam.animation.Animation'
    ],
 
-   imports: [ 'addSprite' ],
-
    properties: [
     [ 'color',  'white' ],
     [ 'radius', 3 ],
@@ -196,7 +193,6 @@ foam.CLASS({
      function init() {
        this.SUPER();
 
-       this.addSprite(this);
        this.onDetach(this.Animation.create({
          duration: 8000,
          f: () => {
