@@ -4,55 +4,6 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-// TODO: use friction
-// base Animation and Collider off of same Timer
-
- foam.CLASS({
-    package: 'com.google.foam.demos.spacewars',
-    name: 'Bullet',
-    extends: 'foam.physics.PhysicalCircle',
-
-    requires: [
-     'foam.animation.Animation'
-    ],
-
-    imports: [ 'addSprite' ],
-
-    properties: [
-     [ 'color',  'white' ],
-     [ 'radius', 3 ],
-     [ 'mass',   0.05 ],
-     [ 'border', null ]
-    ],
-
-    methods: [
-      function init() {
-        this.SUPER();
-
-        this.addSprite(this);
-        this.onDetach(this.Animation.create({
-          duration: 8000,
-          f: () => {
-           this.x += 3000 * this.vx;
-           this.y += 3000 * this.vy;
-          },
-          onEnd: () => this.detach(),
-          objs: [ this ]
-        }).start());
-      },
-
-      function collideWith(o) {
-        /*
-        if( this.cls_.isInstance(o) && o.color !== this.color ) {
-          this.detach();
-          o.detach();
-        }
-        */
-      }
-    ]
- });
-
-
 foam.CLASS({
   package: 'com.google.foam.demos.spacewars',
   name: 'Ship',
@@ -60,6 +11,7 @@ foam.CLASS({
 
   requires: [
     'com.google.foam.demos.spacewars.Bullet',
+    'foam.animation.Animation',
     'foam.graphics.Arc',
     'foam.graphics.Box',
     'foam.graphics.Circle',
@@ -168,6 +120,32 @@ foam.CLASS({
       b.x += b.vx * this.radius/2;
       b.y += b.vy * this.radius/2;
       this.addSprite(b);
+    },
+
+    function explode() {
+      for ( var i = 0 ; i < 100 ; i++ ) {
+        let c = this.Circle.create({
+          x: Math.random() * 60 - 30,
+          y: Math.random() * 60 - 30,
+          color: 'rgba(255,' + Math.random()*255 + ',0)',
+          radius: 0,
+          border: null,
+          alpha: 0.3
+        });
+        this.add(c);
+        this.Animation.create({
+          delay: Math.random() * 1500,
+          duration: 1000,
+          f: () => { c.radius = Math.random() * 150; },
+          objs: [ c ],
+          interp: Math.sqrt
+        }).start();
+      }
+      this.Animation.create({
+        duration: 2000,
+        f: () => this.alpha = 0,
+        objs: [ this ]
+      }).start();
     }
   ],
 
@@ -187,6 +165,52 @@ foam.CLASS({
       }
     }
   ]
+});
+
+
+foam.CLASS({
+   package: 'com.google.foam.demos.spacewars',
+   name: 'Bullet',
+   extends: 'foam.physics.PhysicalCircle',
+
+   requires: [
+    'foam.animation.Animation'
+   ],
+
+   imports: [ 'addSprite' ],
+
+   properties: [
+    [ 'color',  'white' ],
+    [ 'radius', 3 ],
+    [ 'mass',   0.05 ],
+    [ 'border', null ]
+   ],
+
+   methods: [
+     function init() {
+       this.SUPER();
+
+       this.addSprite(this);
+       this.onDetach(this.Animation.create({
+         duration: 8000,
+         f: () => {
+          this.x += 3000 * this.vx;
+          this.y += 3000 * this.vy;
+         },
+         onEnd: () => this.detach(),
+         objs: [ this ]
+       }).start());
+     },
+
+     function collideWith(o) {
+       /*
+       if( this.cls_.isInstance(o) && o.color !== this.color ) {
+         this.detach();
+         o.detach();
+       }
+       */
+     }
+   ]
 });
 
 
