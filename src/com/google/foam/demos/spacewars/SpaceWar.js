@@ -18,7 +18,7 @@ foam.CLASS({
     'foam.input.Gamepad'
   ],
 
-  imports: [ 'addSprite' ],
+  imports: [ 'addSprite', 'gameOver' ],
 
   properties: [
     [ 'id',     0 ],
@@ -91,8 +91,13 @@ foam.CLASS({
     function collideWith(c) {
       if ( this.Bullet.isInstance(c) ) {
         if ( c.color != this.color ) {
+          if ( this.shield == 1 ) {
+            this.explode();
+            this.gameOver(this.id + 1, this.color);
+          }
           this.forcefield.alpha = Math.min(1.1, this.forcefield.alpha+0.25);
-          this.shield--;
+          this.shield = Math.max(0, this.shield-1);
+          console.log(this.shield + ' ' + c.$UID);
         }
         c.detach();
       }
@@ -123,6 +128,7 @@ foam.CLASS({
     },
 
     function explode() {
+      // TODO: add sound effect
       for ( var i = 0 ; i < 100 ; i++ ) {
         let c = this.Circle.create({
           x: Math.random() * 60 - 30,
@@ -130,13 +136,13 @@ foam.CLASS({
           color: 'rgba(255,' + Math.random()*255 + ',0)',
           radius: 0,
           border: null,
-          alpha: 0.3
+          alpha: 0.1
         });
         this.add(c);
         this.Animation.create({
-          delay: Math.random() * 1500,
+          delay: Math.random() * 1000,
           duration: 1000,
-          f: () => { c.radius = Math.random() * 150; },
+          f: () => { c.radius = Math.random() * 150; c.x *= 2; c.y *= 2; },
           objs: [ c ],
           interp: Math.sqrt
         }).start();
@@ -271,7 +277,7 @@ foam.CLASS({
   ],
 
   exports: [
-    'addSprite', 'star'
+    'addSprite', 'gameOver', 'star'
   ],
 
   constants: {
@@ -493,13 +499,6 @@ foam.CLASS({
         // Add friction
         this.lShip.velocity *= 0.996;
         this.rShip.velocity *= 0.996;
-
-        if ( this.lShip.shield <= 0 ) {
-          this.gameOver('2', this.rShip.color);
-        }
-        else if ( this.rShip.shield <= 0  ) {
-          this.gameOver('1', this.lShip.color);
-        }
       }
     }
   ]
