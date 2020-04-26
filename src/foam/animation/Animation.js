@@ -50,8 +50,15 @@ foam.CLASS({
   package: 'foam.animation',
   name: 'Animation',
 
+  imports: [ 'setTimeout' ],
+
   // TODO: add support for interpolating colours
   properties: [
+    {
+      class: 'Int',
+      name: 'delay',
+      units: 'ms'
+    },
     {
       class: 'Int',
       name: 'duration',
@@ -82,12 +89,20 @@ foam.CLASS({
     },
     {
       name: 'interp',
-      value: foam.animation.Interp.linear
+      value: function(t) { return t; }
     }
   ],
 
   methods: [
     function start() {
+      if ( this.delay > 0 ) {
+        window.setTimeout(this.start_.bind(this), this.delay);
+      } else {
+        this.start_();
+      }
+    },
+
+    function start_() {
       var self    = this;
       var cleanup = foam.core.FObject.create();
 
