@@ -53,7 +53,7 @@ foam.CLASS({
       this.SUPER();
       var self = this;
       for (var i = 0; i < this.data.selectedColumnNames.length; i++) {
-        self.columns.push(self.ColumnOptionsSelectConfig.create({selectedColumns: self.data.selectedColumnNames[i], of:self.data.of}));
+        self.columns.push(self.ColumnOptionsSelectConfig.create({selectedColumns: self.data.selectedColumnNames[i][0], of:self.data.of}));
       }
 
       // for (var v of self.columns) {
@@ -136,10 +136,6 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
-      self.data.rootProperty.expanded$.sub(function() {
-        console.log('options: ' + self.data.expanded);
-      });
-
       this.start()//.addClass(self.data.myClass('container-handle'))
         .start()
             .add(foam.u2.ViewSpec.createView(this.ColumnViewHeader, {data$:this.data.rootProperty$},  this, this.__subSubContext__))
@@ -207,7 +203,7 @@ foam.CLASS({
       of: 'foam.u2.view.SubColumnSelectConfig',
       expression: function(of) {
        var p = of.getAxiomByName(this.selectedColumns[this.selectedColumns.length - 1]);
-       return this.SubColumnSelectConfig.create({ rootProperty: p, hasOtherOptions:true, selectedColumns$:this.selectedColumns$, level: 0 });
+       return this.SubColumnSelectConfig.create({ rootProperty: p, hasOtherOptions:true, selectedColumns$:this.selectedColumns$, level:0 });
       }
     },
     {
@@ -219,7 +215,7 @@ foam.CLASS({
         var propViews = [];
         props = props.filter(p => p.name !== this.selectedColumns[this.selectedColumns.length - 1]);
         for ( var i = 0; i < props.length; i++) {
-          propViews.push(this.SubColumnSelectConfig.create({ rootProperty: props[i], hasOtherOptions:false, selectedColumns$:this.selectedColumns$, level: 1 }));
+          propViews.push(this.SubColumnSelectConfig.create({ rootProperty: props[i], hasOtherOptions:false, selectedColumns$:this.selectedColumns$, level:0, expanded$:this.rootProperty.expanded$ }));
         }
         return propViews;
        }
@@ -275,6 +271,7 @@ foam.CLASS({
         } else {
           if ( this.data.selectedColumns[this.data.selectedColumns.length - 1 - this.data.level] !== this.data.rootProperty.name )
             this.data.selectedColumns[this.data.selectedColumns.length - 1 - this.data.level] = this.data.rootProperty.name;
+            this.data.isPropertySelected = !this.data.isPropertySelected;
 
           //if level higher then previous one 
           if ( !this.data.hasSubProperties && this.data.level !== this.data.selectedColumns.length - 1 ) {
@@ -304,17 +301,17 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
-      self.data.expanded$.sub(function() {
-        console.log(self.data.expanded);
+      self.data.rootProperty.expanded$.sub(function() {
+        console.log(self.data.rootProperty.expanded);
       });
 
       this
         .start()
-          .show(self.data.expanded$)
+          .show(self.data.rootProperty.expanded$)
             .forEach(this.data.subColumnSelectConfig, function(p) {
             self
               .addClass(self.myClass('move-right'))
-              .add(foam.u2.ViewSpec.createView(self.RootColumnConfigPropView, {data:self.SubColumnSelectConfig.create({ rootProperty: p, hasOtherOptions:false, selectedColumns:self.data.selectedColumns })}, self, self.__subSubContext__));
+              .add(foam.u2.ViewSpec.createView(self.RootColumnConfigPropView, {data:self.SubColumnSelectConfig.create({ rootProperty: p, hasOtherOptions:false, selectedColumns:self.data.selectedColumns, expanded$:self.data.rootProperty.expanded$ })}, self, self.__subSubContext__));
           })
         .end();
     }
@@ -360,12 +357,12 @@ foam.CLASS({
     },
     {
       name: 'isPropertySelected',
-      class: 'Boolean',
-      expression: function(rootProperty, selectedColumns, level) {
-        if ( rootProperty.name === selectedColumns[selectedColumns.length - 1 - level]  )
-          return true;
-        return false;
-      }
+      class: 'Boolean'//,
+      // expression: function(rootProperty, selectedColumns, level) {
+      //   if ( rootProperty.name === selectedColumns[selectedColumns.length - 1 - level]  )
+      //     return true;
+      //   return false;
+      // }
     },
     {
       name: 'level',

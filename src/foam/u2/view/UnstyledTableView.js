@@ -70,34 +70,50 @@ foam.CLASS({
     },
     {
       name: 'columns_',
-      expression: function(columns, of, allColumns, editColumnsEnabled, selectedColumnNames, isColumnChanged) {
+      expression: function(columns, of, editColumnsEnabled, selectedColumnNames, isColumnChanged) {
         if ( ! of ) return [];
         if ( ! editColumnsEnabled ) return columns;
 
-        return selectedColumnNames.map(a => [a, null]);
+        return selectedColumnNames;
       },
     },
     {
       name: 'allColumns',
       expression: function(of) {
-        return ! of ? [] : [].concat(
+        var x = [].concat(
           of.getAxiomsByClass(foam.core.Property)
             .filter(p => p.tableCellFormatter && ! p.hidden)
             .map(a => [[a.name], null]),
           of.getAxiomsByClass(foam.core.Action)
             .map(a => [[a.name], null])
         );
+        var y = !of ? [] : [].concat(
+          of.getAxiomsByClass(foam.core.Property)
+            .filter(p => p.tableCellFormatter && ! p.hidden)
+            .map(a => a.name),
+          of.getAxiomsByClass(foam.core.Action)
+            .map(a => a.name)
+        );
+        console.log(y);
+        return y;
+      }
+    },
+    {
+      name: 'selectedColumnNames',
+      adapt: function(_, cols) {
+        return cols.map(c => Array.isArray(c) ? c : [[c], null]);
+      },
+      expression: function(columns, of) {
+        var ls = JSON.parse(localStorage.getItem(of.id));
+        return ls ? ls : columns.map(c => [[c], null]);
       }
     },
     {
       name: 'columns',
-      adapt: function(_, cols) {
-        return cols.map(c => Array.isArray(c) ? c : [c, null]);
-      },
       expression: function(of, allColumns) {
         if ( ! of ) return [];
         var tc = of.getAxiomByName('tableColumns');
-        return tc ? tc.columns.map(c => [c, null]) : allColumns;
+        return tc ? tc : allColumns;
       },
     },
     {
@@ -200,17 +216,7 @@ foam.CLASS({
           return acc + (axiom.tableWidth || this.MIN_COLUMN_WIDTH_FALLBACK);
         }, this.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH) + 'px';
       }
-    },
-    {
-      name: 'selectedColumnNames',
-      expression: function(allColumns, of) {
-        var ls = JSON.parse(localStorage.getItem(of.id));
-        if ( ls )
-          return ls;
-        var tc = of.getAxiomByName('tableColumns');
-        return tc ? tc.columns.map(c => [c]) : allColumns.map(c => [c[0]]);
-      },
-      
+    },      
       // factory: function() {
       //   var ls = JSON.parse(localStorage.getItem(this.of.id));
       //   if ( ls )
@@ -218,7 +224,6 @@ foam.CLASS({
       //   var tc = this.of.getAxiomByName('tableColumns');
       //   return tc ? tc.columns : this.allColumns;
       // }
-    },
     { 
       name: 'isColumnChanged',
       class: 'Boolean', 

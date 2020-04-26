@@ -439,7 +439,6 @@ FOAM_FILES([
   { name: "foam/u2/HTMLElement", flags: ['web'] },
   { name: "foam/u2/HTMLView", flags: ['web'] },
   { name: "foam/u2/tag/Select", flags: ['web'] },
-  { name: "foam/u2/view/ColumnSelect", flags: ['web'] },
   { name: "foam/u2/UnstyledTabs", flags: ['web'] },
   { name: "foam/u2/Tabs", flags: ['web'] },
   { name: "foam/u2/TimeView", flags: ['web'] },
