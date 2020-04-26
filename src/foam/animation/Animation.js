@@ -96,7 +96,7 @@ foam.CLASS({
   methods: [
     function start() {
       if ( this.delay > 0 ) {
-        window.setTimeout(this.start_.bind(this), this.delay);
+        this.setTimeout(this.start_.bind(this), this.delay);
       } else {
         this.start_();
       }
