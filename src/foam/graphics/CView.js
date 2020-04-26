@@ -750,7 +750,7 @@ foam.CLASS({
     },
 
     function intersects(c) {
-      if ( c.radius ) {
+      if ( c.RADIUS ) {
         return ! (
             this.x + this.width  < c.x - c.radius ||
             this.y + this.height < c.y - c.radius ||
@@ -1007,10 +1007,10 @@ foam.CLASS({
     },
     { name: 'x_',      hidden: true, transient: true, getter: function() { return this.x; } },
     { name: 'y_',      hidden: true, transient: true, getter: function() { return this.y; } },
-    { name: 'top_',    hidden: true, transient: true, getter: function() { return this.y-this.radius; } },
-    { name: 'left_',   hidden: true, transient: true, getter: function() { return this.x-this.radius; } },
-    { name: 'bottom_', hidden: true, transient: true, getter: function() { return this.y+this.radius; } },
-    { name: 'right_',  hidden: true, transient: true, getter: function() { return this.x+this.radius; } }
+    { name: 'top_',    hidden: true, transient: true, getter: function() { return this.y-this.radius-this.arcWidth; } },
+    { name: 'left_',   hidden: true, transient: true, getter: function() { return this.x-this.radius-this.arcWidth; } },
+    { name: 'bottom_', hidden: true, transient: true, getter: function() { return this.y+this.radius+this.arcWidth; } },
+    { name: 'right_',  hidden: true, transient: true, getter: function() { return this.x+this.radius+this.arcWidth; } }
   ],
 
   methods: [
@@ -1032,7 +1032,7 @@ foam.CLASS({
     },
 
     function intersects(c) {
-     if ( ! c.radius ) return c.intersects(this);
+     if ( ! c.RADIUS ) return c.intersects(this);
      var r = this.radius + c.radius;
      if ( this.border ) r += this.arcWidth/2-1;
      if ( c.border    ) r += c.arcWidth/2-1;
@@ -1043,7 +1043,7 @@ foam.CLASS({
 
     function toE(args, X) {
       return this.Canvas.create({ cview: this }, X).attrs({
-        width: this.x + this.radius + this.arcWidth,
+        width:  this.x + this.radius + this.arcWidth,
         height: this.y + this.radius + this.arcWidth
       });
     }
