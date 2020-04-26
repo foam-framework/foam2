@@ -65,10 +65,10 @@ foam.CLASS({
 
     function detectCollisions() {
       /* implicit k-d-tree divide-and-conquer algorithm */
-      this.detectCollisions_(0, this.children.length-1, 'x', false, '');
+      this.detectCollisions_(0, this.children.length-1, 'x', false);
 
       // simpler and less efficient version, use to debug above
-      // this.detectCollisions__(0, this.children.length-1, 'x', false, '');
+      // this.detectCollisions__(0, this.children.length-1, 'x', false);
     },
 
     function detectCollisions__(start, end) {
@@ -79,10 +79,8 @@ foam.CLASS({
       var cs = this.children;
       for ( var i = start ; i < end ; i++ ) {
         var c1 = cs[i];
-        if ( c1 == null ) break;
         for ( var j = i+1 ; j <= end ; j++ ) {
           var c2 = cs[j];
-          if ( c2 == null ) break;
           if ( c1.intersects && c1.intersects(c2) ) this.collide(c1, c2);
         }
       }
@@ -99,14 +97,23 @@ foam.CLASS({
     function detectCollisions_(start, end, axis, oneD) {
       if ( start >= end ) return;
 
+      /*
+      I think some collisions are missed, and adding this code makes it worse.
+
+      if ( end - start < 10 ) {
+        this.detectCollisions__(start, end);
+        return;
+      }
+      */
+
       var cs       = this.children;
       var pivot    = this.choosePivot(start, end, axis);
       var nextAxis = oneD ? axis : axis === 'x' ? 'y' : 'x' ;
 
-      var p = start;
+      var p = start; // pivot, all values left of 'p' are in first half
       for ( var i = start ; i <= end ; i++ ) {
         var c = cs[i];
-        if ( c[axis == 'x' ? 'left_' : 'top_']  < pivot ) {
+        if ( c[axis == 'x' ? 'left_' : 'top_'] < pivot ) {
           var t = cs[p];
           cs[p] = c;
           cs[i] = t;
@@ -114,10 +121,13 @@ foam.CLASS({
         }
       }
 
+      // If all values are in first half
       if ( p === end + 1 ) {
         if ( oneD ) {
+          // switch to simple detection if already 1-dimensional
           this.detectCollisions__(start, end);
         } else {
+          // switch to one dimensional search
           this.detectCollisions_(start, end, nextAxis, true);
         }
       } else {
@@ -243,7 +253,6 @@ foam.CLASS({
         this.colliding_ = true;
           this.onTick.pub();
           this.detectCollisions();
-          this.updateChildren();
         this.colliding_ = false;
 
         // Now remove all children that were requested to be removed
@@ -251,6 +260,8 @@ foam.CLASS({
         // because it messes up the children array causing errors.
         this.remove.apply(this, this.removedChildren_);
         this.removedChildren_.length = 0;
+
+        this.updateChildren();
 
         this.tick();
       }
