@@ -57,6 +57,6 @@ public class AsyncAssemblyLine
          if ( q_ == job ) q_ = null;
        }
      }
-   }}, "SyncAssemblyLine");
+   }}, "AsyncAssemblyLine");
  }
 }

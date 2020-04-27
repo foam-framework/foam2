@@ -85,6 +85,7 @@ foam.CLASS({
             Max max = (Max) dao.select(MAX(MedusaEntry.INDEX));
 
             ReplayCmd cmd = new ReplayCmd();
+            details.COUNT.clear(details);
             cmd.setDetails(details);
             cmd.setServiceName("medusaConsensusDAO"); // TODO: configuration
             if ( max != null &&

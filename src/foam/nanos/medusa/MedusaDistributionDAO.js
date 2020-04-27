@@ -31,12 +31,17 @@ foam.CLASS({
       class: 'Object',
       name: 'line',
       javaType: 'foam.util.concurrent.AssemblyLine',
-      javaFactory: 'return new foam.util.concurrent.SyncAssemblyLine();'
+      javaFactory: 'return new foam.util.concurrent.AsyncAssemblyLine(getX());'
     },
     {
       name: 'clients',
       class: 'Map',
       javaFactory: 'return new HashMap();'
+    },
+    {
+      name: 'threadPoolName',
+      class: 'String',
+      value: 'medusaThreadPool'
     },
     {
       name: 'logger',
@@ -56,6 +61,8 @@ foam.CLASS({
       documentation: 'Using assembly line, write to all online nodes - in all a zones.',
       name: 'put_',
       javaCode: `
+      MedusaEntry entry = (MedusaEntry) obj;
+      getLogger().debug("put", entry.getIndex());
       return super.put_(x, getDelegate().put_(x, obj));
       `
     },
@@ -97,10 +104,12 @@ foam.CLASS({
           AND(
             EQ(ClusterConfig.ENABLED, true),
             EQ(ClusterConfig.STATUS, Status.ONLINE),
-            EQ(ClusterConfig.TYPE, MedusaType.NODE)
+            EQ(ClusterConfig.TYPE, MedusaType.NODE),
+            EQ(ClusterConfig.ZONE, 0L)
+//            EQ(ClusterConfig.ZONE, myConfig.getZone())
           )
         )
-        .orderBy(ClusterConfig.ZONE)
+//        .orderBy(ClusterConfig.ZONE)
         .select(new ArraySink())).getArray();
       for ( ClusterConfig config : arr ) {
         getLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
@@ -151,6 +160,34 @@ foam.CLASS({
       javaType: 'PM',
       javaCode: `
       return PM.create(x, this.getOwnClassInfo(), name);
+      `
+    },
+    {
+      name: 'getBatchTimerInterval',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+      ],
+      type: 'Long',
+      javaCode: `
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      return support.getBatchTimerInterval();
+      `
+    },
+    {
+      name: 'getMaxBatchSize',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+      ],
+      type: 'Long',
+      javaCode: `
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      return support.getMaxBatchSize();
       `
     }
   ]

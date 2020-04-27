@@ -19,7 +19,7 @@ foam.CLASS({
     },
     {
       name: 'batch',
-      class: 'List',
+      class: 'Map',
     }
   ]
 });

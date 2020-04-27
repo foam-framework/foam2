@@ -17,13 +17,11 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.Agency',
-    'foam.core.AgencyTimerTask',
     'foam.dao.DAO',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
-    'java.util.ArrayList',
-    'java.util.List',
-    'java.util.Timer'
+    'java.util.HashMap',
+    'java.util.Map'
   ],
 
   axioms: [
@@ -36,6 +34,7 @@ foam.CLASS({
             setX(x);
             setDao(dao);
             setDetails(details);
+            init_();
           }
 
         `);
@@ -50,23 +49,31 @@ foam.CLASS({
       of: 'foam.nanos.medusa.ReplayDetailsCmd'
     },
     {
-      name: 'count',
-      class: 'Long'
-    },
-    {
       name: 'dao',
       class: 'foam.dao.DAOProperty'
     },
     {
       name: 'batch',
-      class: 'List',
-      of: 'foam.nanos.medusa.MedusaEntry',
-      javaFactory: 'return new ArrayList();'
+      class: 'Map',
+      javaFactory: 'return new HashMap();'
     },
     {
-      name: 'timer',
-      class: 'Object',
-      visibility: 'HIDDEN'
+      name: 'from',
+      class: 'Long'
+    },
+    {
+      name: 'to',
+      class: 'Long'
+    },
+    {
+      name: 'batchTimerInterval',
+      class: 'Long',
+      value: 5
+    },
+    {
+      name: 'maxBatchSize',
+      class: 'Long',
+      value: 1000
     },
     {
       name: 'complete',
@@ -88,6 +95,15 @@ foam.CLASS({
 
   methods: [
     {
+      name: 'init_',
+      javaCode: `
+      ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
+      setBatchTimerInterval(support.getBatchTimerInterval());
+      setMaxBatchSize(support.getMaxBatchSize());
+     ((Agency) getX().get(support.getThreadPoolName())).submit(getX(), this, this.getClass().getSimpleName());
+     `
+    },
+    {
       name: 'put',
       args: [
         {
@@ -101,16 +117,29 @@ foam.CLASS({
       ],
       javaCode: `
       synchronized ( batchLock_ ) {
-        getBatch().add(obj);
-        if ( getTimer() == null ) {
-          scheduleTimer(getX());
+        while ( getBatch().size() >= getMaxBatchSize() ) {
+          try {
+            getLogger().debug("put", "wait");
+            batchLock_.wait(100);
+          } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+          }
         }
-        //getLogger().debug("put", "batch", "size", getBatch().size());
+        MedusaEntry entry = (MedusaEntry) obj;
+        if ( getFrom() == 0L ) {
+          setFrom(entry.getIndex());
+        } else {
+          setFrom(Math.min(getFrom(), entry.getIndex()));
+        }
+        setTo(Math.max(getTo(), entry.getIndex()));
+        getBatch().put(entry.getIndex(), entry);
+        if ( getBatch().size() >= getMaxBatchSize() ) {
+          batchLock_.notify();
+        }
       }
       `
     },
     {
-      // avoid null pointer on ProxySink.eof()
       name: 'eof',
       javaCode: `
       setComplete(true);
@@ -126,59 +155,44 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      List<MedusaEntry> batch;
-      synchronized ( batchLock_ ) {
-        batch = getBatch();
-        ReplayBatchSink.BATCH.clear(this);
-      }
-      getLogger().debug("execute", "batch", "size", batch.size());
+    try {
+      while ( ! getComplete() ||
+              getTo() < getDetails().getMaxIndex() ) {
+        Map batch;
+        synchronized ( batchLock_ ) {
+          batch = getBatch();
+          ReplayBatchSink.BATCH.clear(this);
+          batchLock_.notify();
+        }
 
-      try {
-        if ( batch.size() == 0 ) {
-          return;
+        getLogger().info("execute", "batch", "size", batch.size(), "to", getTo(), "details", getDetails());
+        long starttime = System.currentTimeMillis();
+
+        if ( batch.size() > 0 ) {
+          ReplayBatchCmd cmd = new ReplayBatchCmd();
+          cmd.setDetails(getDetails());
+          cmd.setFromIndex(getFrom());
+          cmd.setToIndex(getTo());
+          cmd.setBatch(batch);
+          getDao().cmd_(x, cmd);
+          // TODO - process results
         }
-        ReplayBatchCmd cmd = new ReplayBatchCmd();
-        cmd.setDetails(getDetails());
-        cmd.setFromIndex(batch.get(0).getIndex());
-        cmd.setToIndex(batch.get(batch.size()-1).getIndex());
-        cmd.setBatch(batch);
-        getDao().cmd_(x, cmd);
-      } finally {
-        setCount(getCount() + batch.size());
-        scheduleTimer(x);
+
+        synchronized ( batchLock_ ) {
+          long delay = getBatchTimerInterval() - (System.currentTimeMillis() - starttime);
+          if ( delay > 0 ) {
+            getLogger().debug("execute", "wait", delay);
+            batchLock_.wait(delay);
+          }
+        }
       }
+      getLogger().debug("execute", "exit");
+    } catch (InterruptedException e) {
+      // nop
+    } catch ( Throwable t ) {
+      getLogger().error(t);
+    }
       `
-    },
-    {
-      name: 'scheduleTimer',
-      synchronized: true,
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        }
-      ],
-      javaCode: `
-      if ( ! getComplete() &&
-           getCount() < getDetails().getCount() ) {
-        if ( getTimer() == null ) {
-          ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-          Timer timer = new Timer(this.getClass().getSimpleName(), true);
-          timer.scheduleAtFixedRate(
-            new AgencyTimerTask(x, support.getThreadPoolName(), this),
-            support.getReplayBatchTimerInterval(),
-            support.getReplayBatchTimerInterval()
-          );
-          setTimer(timer);
-          getLogger().debug("timer", "scheduled");
-        }
-      } else if ( getTimer() != null ) {
-        Timer timer = (Timer) getTimer();
-        timer.cancel();
-        timer.purge();
-        getLogger().debug("timer", "cancel");
-      }
-      `
-    },
+    }
   ]
 });

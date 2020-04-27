@@ -33,12 +33,17 @@ foam.CLASS({
       class: 'Object',
       name: 'line',
       javaType: 'foam.util.concurrent.AssemblyLine',
-      javaFactory: 'return new foam.util.concurrent.SyncAssemblyLine();'
+      javaFactory: 'return new foam.util.concurrent.AsyncAssemblyLine(getX());'
     },
     {
       name: 'clients',
       class: 'Map',
       javaFactory: 'return new HashMap();'
+    },
+    {
+      name: 'threadPoolName',
+      class: 'String',
+      value: 'medusaThreadPool'
     },
     {
       class: 'FObjectProperty',
@@ -58,8 +63,9 @@ foam.CLASS({
       documentation: 'Using assembly line, write to all online mediators in zone 0 and same realm,region',
       name: 'put_',
       javaCode: `
+      MedusaEntry entry = (MedusaEntry) obj;
+      getLogger().debug("put", entry.getIndex());
       return super.put_(x, getDelegate().put_(x, obj));
-//      return (FObject) submit(x, getDelegate().put_(x, obj), DOP.PUT);
       `
     },
     {
@@ -97,8 +103,8 @@ foam.CLASS({
         .where(
           AND(
             OR(
-              EQ(ClusterConfig.ZONE, 0),
-              EQ(ClusterConfig.ZONE, 1)
+              EQ(ClusterConfig.ZONE, myConfig.getZone()),
+              EQ(ClusterConfig.ZONE, myConfig.getZone()+1)
             ),
             EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
             EQ(ClusterConfig.STATUS, Status.ONLINE),
@@ -140,6 +146,34 @@ foam.CLASS({
       }
       return obj;
       `
+    },
+    {
+      name: 'getBatchTimerInterval',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+      ],
+      type: 'Long',
+      javaCode: `
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      return support.getBatchTimerInterval();
+      `
+    },
+    {
+      name: 'getMaxBatchSize',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+      ],
+      type: 'Long',
+      javaCode: `
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      return support.getMaxBatchSize();
+      `
     }
-  ]
+   ]
 });

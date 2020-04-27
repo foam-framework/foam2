@@ -49,7 +49,7 @@ foam.CLASS({
       javaCode: `
       if ( obj instanceof ReplayDetailsCmd ) {
         ReplayDetailsCmd details = (ReplayDetailsCmd) obj;
-        getLogger().debug("cmd", details);
+        getLogger().debug("cmd", "request", details);
 
         Min min = (Min) MIN(MedusaEntry.INDEX);
         Max max = (Max) MAX(MedusaEntry.INDEX);
@@ -59,7 +59,6 @@ foam.CLASS({
           .build();
 
         getDelegate().select(seq);
-        getLogger().debug("cmd", "details", "count", count.getValue(), "min", min.getValue(), "max", max.getValue());
 
         if ( count != null &&
              ((Long) count.getValue()) > 0 ) {
@@ -67,6 +66,7 @@ foam.CLASS({
           details.setMaxIndex((Long)max.getValue());
           details.setCount((Long) count.getValue());
         }
+        getLogger().debug("cmd", "response", details);
         return details;
       }
 

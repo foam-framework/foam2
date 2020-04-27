@@ -293,12 +293,13 @@ foam.CLASS({
       ClusterConfig config = support.getConfig(x, support.getConfigId());
       List voters = support.getVoters(x);
 
-      if ( voters.size() < support.getMediatorQuorum(x) ) {
+      int mediatorQuorum = support.getMediatorQuorum(x);
+      if ( voters.size() < mediatorQuorum ) {
         // nothing to do.
-        getLogger().warning("callVote", getState().getLabel(), "waiting for mediator quorum", voters.size(), support.getMediatorQuorum(x));
+        getLogger().warning("callVote", getState().getLabel(), "waiting for mediator quorum", voters.size(), mediatorQuorum);
         return;
       }
-      getLogger().debug("callVote", getState().getLabel(), "achieved mediator quorum", voters.size(), support.getMediatorQuorum(x));
+      getLogger().debug("callVote", getState().getLabel(), "achieved mediator quorum", voters.size(), mediatorQuorum);
  
       ThreadPoolExecutor pool = pool_;
       List<Callable<Long>> voteCallables = new ArrayList<>();

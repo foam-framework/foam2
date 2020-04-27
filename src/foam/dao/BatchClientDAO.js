@@ -19,15 +19,13 @@ NOTE: override cmd_ in child class to control delegate call`,
 
   javaImports: [
     'foam.core.Agency',
-    'foam.core.AgencyTimerTask',
     'foam.core.ContextAware',
     'foam.core.FObject',
     'foam.dao.DAO',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
-    'java.util.ArrayList',
-    'java.util.List',
-    'java.util.Timer'
+    'java.util.HashMap',
+    'java.util.Map'
   ],
 
   axioms: [
@@ -42,9 +40,14 @@ NOTE: override cmd_ in child class to control delegate call`,
 
   properties: [
     {
-      name: 'batchTimerInterval',
+      name: 'defaultBatchTimerInterval',
       class: 'Long',
-      value: 16
+      value: 10
+    },
+    {
+      name: 'defaultMaxBatchSize',
+      class: 'Long',
+      value: 10
     },
     {
       name: 'threadPoolName',
@@ -53,18 +56,21 @@ NOTE: override cmd_ in child class to control delegate call`,
     },
     {
       name: 'puts',
-      class: 'List',
-      of: 'foam.core.FObject',
-      javaFactory: 'return new ArrayList();'
+      class: 'Map',
+      javaFactory: 'return new HashMap();'
     },
     {
       name: 'removes',
-      class: 'List',
-      of: 'foam.core.FObject',
-      javaFactory: 'return new ArrayList();'
+      class: 'Map',
+      javaFactory: 'return new HashMap();'
     },
     {
-      name: 'timer',
+      name: 'lastSend',
+      class: 'Long',
+      visibility: 'RO'
+    },
+    {
+      name: 'agent',
       class: 'Object',
       visibility: 'HIDDEN'
     },
@@ -86,15 +92,21 @@ NOTE: override cmd_ in child class to control delegate call`,
       documentation: 'Presently this is send and forget. Future - block and notify.',
       name: 'put_',
       javaCode: `
-      synchronized ( batchLock_ ) {
-        // clear context, so not marshalled.
-        ((ContextAware) obj).setX(null);
+      // clear context, so not marshalled.
+      ((ContextAware) obj).setX(null);
 
-        getPuts().add(obj);
-        if ( getTimer() == null ) {
-          scheduleTimer(getX(), getPuts().size());
+      synchronized ( batchLock_ ) {
+        while ( getPuts().size() >= getMaxBatchSize(x) ) {
+          try {
+            getLogger().debug("put", "wait");
+            batchLock_.wait(100);
+          } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+          }
         }
-        // getLogger().debug("put", "batch", "size", getPuts().size());
+        getLogger().debug("put", "puts");
+        getPuts().put(obj.getProperty("id"), obj);
+        send(x);
       }
       return obj;
       `
@@ -103,17 +115,48 @@ NOTE: override cmd_ in child class to control delegate call`,
       documentation: 'Presently this is send and forget. Future - block and notify.',
       name: 'remove_',
       javaCode: `
-      synchronized ( batchLock_ ) {
-        // clear context, so not marshalled.
-        ((ContextAware) obj).setX(null);
+      // clear context, so not marshalled.
+      ((ContextAware) obj).setX(null);
 
-        getRemoves().add(obj);
-        if ( getTimer() == null ) {
-          scheduleTimer(getX(), getRemoves().size());
+      synchronized ( batchLock_ ) {
+        while ( getRemoves().size() >= getMaxBatchSize(x) ) {
+          try {
+            getLogger().debug("remove", "wait");
+            batchLock_.wait(100);
+          } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+          }
         }
-        // getLogger().debug("remove", "batch", "size", getRemoves().size());
+        getRemoves().put(obj.getProperty("id"), obj);
+        send(x);
       }
       return obj;
+      `
+    },
+    {
+      name: 'send',
+       args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      javaCode: `
+      synchronized ( batchLock_ ) {
+       getLogger().debug("send");
+       if ( getAgent() != null ) {
+          if ( getPuts().size() >= getMaxBatchSize(x) ||
+               getRemoves().size() >= getMaxBatchSize(x) ||
+               System.currentTimeMillis() - getLastSend() > getBatchTimerInterval(x) ) {
+            getLogger().debug("send", "notify");
+            batchLock_.notify();
+          }
+        } else {
+          getLogger().debug("send", "agency");
+          setAgent(this);
+          ((Agency) x.get(getThreadPoolName())).submit(x, this, this.getClass().getSimpleName());
+        }
+      }
       `
     },
     {
@@ -125,70 +168,86 @@ NOTE: override cmd_ in child class to control delegate call`,
         }
       ],
       javaCode: `
-      List<FObject> puts;
-      List<FObject> removes;
-      synchronized ( batchLock_ ) {
-        puts = getPuts();
-        removes = getRemoves();
-        BatchClientDAO.PUTS.clear(this);
-        BatchClientDAO.REMOVES.clear(this);
-      }
-      getLogger().debug("execute", "put batch", "size", puts.size());
-      getLogger().debug("execute", "remove batch", "size", removes.size());
-
       try {
-        if ( puts.size() > 0 ) {
-          BatchCmd cmd = new BatchCmd();
-          cmd.setDop(DOP.PUT);
-          cmd.setBatch(puts);
-          Object result = this.cmd_(x, cmd);
-          // TODO/REVIEW - what to do with the result/reply?
+        while ( true ) {
+          getLogger().debug("execute");
+          Map puts;
+          Map removes;
+          long starttime = System.currentTimeMillis();
+
+          synchronized ( batchLock_ ) {
+            puts = getPuts();
+            BatchClientDAO.PUTS.clear(this);
+            removes = getRemoves();
+            BatchClientDAO.REMOVES.clear(this);
+            batchLock_.notify();
+          }
+
+          if ( puts.size() > 0 ) {
+            getLogger().info("execute", "put batch", "size", puts.size());
+            BatchCmd cmd = new BatchCmd();
+            cmd.setDop(DOP.PUT);
+            cmd.setBatch(puts);
+            this.cmd_(x, cmd);
+            // TODO - process results.
+            setLastSend(System.currentTimeMillis());
+          }
+          if ( removes.size() > 0 ) {
+            getLogger().info("execute", "remove batch", "size", removes.size());
+            BatchCmd cmd = new BatchCmd();
+            cmd.setDop(DOP.REMOVE);
+            cmd.setBatch(removes);
+            this.cmd_(x, cmd);
+            setLastSend(System.currentTimeMillis());
+            // TODO - process results.
+          }
+
+          synchronized ( batchLock_ ) {
+            long count = Math.max(puts.size(), removes.size());
+            if ( count > 0L ) {
+              // sleep one interval before exiting on zero send.
+              long delay = getBatchTimerInterval(x) - (System.currentTimeMillis() - starttime);
+              if ( delay > 0 ) {
+                getLogger().debug("execute", "wait", delay);
+                batchLock_.wait(delay);
+              }
+            } else {
+              getLogger().debug("execute", "exit", getPuts().size());
+              BatchClientDAO.AGENT.clear(this);
+              break;
+            }
+          }
         }
-        if ( removes.size() > 0 ) {
-          BatchCmd cmd = new BatchCmd();
-          cmd.setDop(DOP.REMOVE);
-          cmd.setBatch(removes);
-          Object result = this.cmd_(x, cmd);
-        }
+      } catch ( InterruptedException e ) {
+        // nop
+      } catch ( Throwable t ) {
+        getLogger().error(t);
       } finally {
-        scheduleTimer(x, Math.max(puts.size(), removes.size()));
+        BatchClientDAO.AGENT.clear(this);
       }
       `
     },
     {
-      name: 'scheduleTimer',
+      name: 'getBatchTimerInterval',
       args: [
         {
           name: 'x',
           type: 'Context'
         },
-        {
-          name: 'count',
-          type: 'Long'
-        }
       ],
-      javaCode: `
-      synchronized ( batchLock_ ) {
-        if ( count > 0 ) {
-          if ( getTimer() == null ) {
-            Timer timer = new Timer(this.getClass().getSimpleName(), true);
-            timer.scheduleAtFixedRate(
-              new AgencyTimerTask(x, getThreadPoolName(), this),
-              getBatchTimerInterval(),
-              getBatchTimerInterval()
-            );
-            setTimer(timer);
-            getLogger().debug("timer", "scheduled");
-          }
-        } else if ( getTimer() != null ) {
-          Timer timer = (Timer) getTimer();
-          timer.cancel();
-          timer.purge();
-          BatchClientDAO.TIMER.clear(this);
-          getLogger().debug("timer", "cancel");
-        }
-      }
-      `
+      type: 'Long',
+      javaCode: `return getDefaultBatchTimerInterval();`
     },
+    {
+      name: 'getMaxBatchSize',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+      ],
+      type: 'Long',
+      javaCode: `return getDefaultMaxBatchSize();`
+    }
   ]
 });

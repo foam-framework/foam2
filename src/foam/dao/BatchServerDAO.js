@@ -15,10 +15,16 @@ foam.CLASS({
     'foam.core.FObject',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
-    'java.util.List',
+    'java.util.Map',
   ],
 
   properties: [
+    {
+      class: 'Object',
+      name: 'line',
+      javaType: 'foam.util.concurrent.AssemblyLine',
+      javaFactory: 'return new foam.util.concurrent.AsyncAssemblyLine(getX());'
+    },
     {
       name: 'logger',
       class: 'FObjectProperty',
@@ -38,20 +44,40 @@ foam.CLASS({
       javaCode: `
       if ( obj instanceof BatchCmd ) {
         BatchCmd cmd = (BatchCmd) obj;
-        getLogger().debug("cmd", "BatchCmd", cmd.getDop().getLabel(), cmd.getBatch().size());
+        getLogger().info("cmd", "BatchCmd", cmd.getDop().getLabel(), cmd.getBatch().size());
 
         if ( DOP.PUT == cmd.getDop() ) {
-          List<FObject> list = cmd.getBatch();
-          for (FObject fobject : list) {
-            getDelegate().put_(x, fobject);
+          Map<Object, Object> map = cmd.getBatch();
+          for (Map.Entry<Object, Object> entry : map.entrySet()) {
+            getLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
+              public void executeJob() {
+                try {
+                  getDelegate().put_(x, (FObject) entry.getValue());
+                } catch ( Throwable t ) {
+//                  map.put(entry.getKey(), t.getMessage());
+                  getLogger().error(t);
+                }
+              }
+            });
           }
+          BatchCmd.BATCH.clear(cmd);
           return cmd;
         }
         if ( DOP.REMOVE == cmd.getDop() ) {
-          List<FObject> list = cmd.getBatch();
-          for (FObject fobject : list) {
-            getDelegate().remove_(x, fobject);
+          Map<Object, Object> map = cmd.getBatch();
+          for (Map.Entry<Object, Object> entry : map.entrySet()) {
+            getLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
+              public void executeJob() {
+                try {
+                  getDelegate().remove_(x, (FObject) entry.getValue());
+                } catch (Throwable t ) {
+//                  map.put(entry.getKey(), t.getMessage());
+                  getLogger().error(t);
+                }
+              }
+            });
           }
+          BatchCmd.BATCH.clear(cmd);
           return cmd;
         }
         throw new UnsupportedOperationException(cmd.getDop().getLabel());

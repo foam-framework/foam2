@@ -112,9 +112,14 @@ configuration for contacting the primary node.`,
       value: 'medusaThreadPool'
     },
     {
-      name: 'replayBatchTimerInterval',
+      name: 'batchTimerInterval',
       class: 'Long',
-      value: 16
+      value: 5
+    },
+    {
+      name: 'maxBatchSize',
+      class: 'Long',
+      value: 1000
     },
     {
       name: 'primaryDAOs',
@@ -132,13 +137,17 @@ configuration for contacting the primary node.`,
       documentation: 'see ClusterConfigSupportDAO',
       name: 'mediatorCount',
       class: 'Int',
+      visibility: 'RO',
       javaFactory: `
+      ClusterConfig config = getConfig(getX(), getConfigId());
       Count count = (Count) ((DAO) getX().get("localClusterConfigDAO"))
         .where(
           AND(
             EQ(ClusterConfig.ZONE, 0),
             EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
-            EQ(ClusterConfig.ENABLED, true)
+            EQ(ClusterConfig.ENABLED, true),
+            EQ(ClusterConfig.REALM, config.getRealm()),
+            EQ(ClusterConfig.REGION, config.getRegion())
           ))
         .select(COUNT());
       return ((Long)count.getValue()).intValue();
@@ -148,6 +157,7 @@ configuration for contacting the primary node.`,
       documentation: 'see ClusterConfigSupportDAO',
       name: 'nodeCount',
       class: 'Int',
+      visibility: 'RO',
       javaFactory: `
       Count count = (Count) ((DAO) getX().get("localClusterConfigDAO"))
         .where(
@@ -579,10 +589,20 @@ configuration for contacting the primary node.`,
       javaCode: `
       String name = entry.getNSpecName();
       getLogger().debug("mdao", name);
-      DAO dao = (DAO) getMdaos().get(name);
-      if ( dao != null ) {
+      Object obj = getMdaos().get(name);
+      DAO dao;
+//      DAO dao = (DAO) getMdaos().get(name);
+//      if ( dao != null ) {
+      if ( obj != null &&
+           obj instanceof DAO ) {
+        dao = (DAO) obj;
+
         getLogger().debug("mdao", name, "cache", dao.getOf());
         return dao;
+      }
+      if ( obj != null &&
+           ! ( obj instanceof DAO ) ) {
+        getLogger().error("getMdao" ,name, "not instance of dao", obj.getClass().getSimpleName());
       }
       dao = (DAO) x.get(name);
       Object result = dao.cmd(MDAO.GET_MDAO_CMD);
