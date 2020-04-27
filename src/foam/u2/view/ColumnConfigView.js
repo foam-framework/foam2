@@ -56,71 +56,14 @@ foam.CLASS({
         self.columns.push(self.ColumnOptionsSelectConfig.create({selectedColumns: self.data.selectedColumnNames[i][0], of:self.data.of}));
       }
 
-      // this.data.selectedColumnNames[i][0][0].sub(function() {
-      //   console.log('selected column changed');
-      // });
-
-      // for (var v of self.columns) {
-      //   const v1 = v;
-      //   v1.config.isPropertySelected$.sub(function() {
-      //     self.isColumnChanged = true;
-      //     self.selectedColumnNames[v1.i] = v1.config.selectedColumns;
-      //   });
-      // }
-
       this
         .addClass(this.myClass())
         .forEach(this.columns, function(c) {
           self.add(foam.u2.ViewSpec.createView(self.ColumnConfigPropView, {data:c},  this, this.__subSubContext__));
         });
-        //.add(this.ColumnSelect.create({currentProperty$: this.data.axiom$, props: this.data.of.getAxiomsByClass(foam.core.Property), headerProp: this.data.axiom.name}));
-        // .start('span').call(this.data.axiom.\tableHeaderFormatter, [this.data.axiom]).end()
-        // .tag(this.data.VISIBILITY);
     }
   ]
 });
-
-// foam.CLASS({
-//   package: 'foam.u2.view',
-//   name: 'ColumnConfigView',
-//   extends: 'foam.u2.View',
-
-//   documentation: 'A view for configuring table columns.',
-
-//   requires: [
-//     'foam.u2.view.ColumnConfigPropView',
-//     'foam.u2.view.ColumnOptionsSelectConfig',
-//   ],
-
-//   css: `
-//     ^ {
-//       padding: 8px 0;
-//       // display: grid;
-//       grid-template-columns: 1fr 1fr;
-//     }
-//     ^ > * {
-//       align-self: center;
-//     }
-//   `,
-
-//   methods: [
-//     function initE() {
-//       this.SUPER();
-//       var self = this;
-
-//       var viewConfig = self.ColumnOptionsSelectConfig.create({selectedColumns$: self.data$selectedColumns[i], of$:self.data.of$});
-//       this.data.selectedColumns[0].sub(function() {
-//         console.log('selected column changed');
-//       });
-//       this
-//         .addClass(this.myClass())
-//         .forEach(this.data.selectedColumns, function(s) {
-//           self
-//             .add(foam.u2.ViewSpec.createView(self.ColumnConfigPropView, {data:viewConfig},  this, this.__subSubContext__));
-//         });
-//     }
-//   ]
-// });
 
 foam.CLASS({
   package: 'foam.u2.view',
@@ -143,22 +86,26 @@ foam.CLASS({
       var self = this;
 
       this.start()//.addClass(self.data.myClass('container-handle'))
-        .add(this.slot(function(data, data$isPropertySelected, data$columnOptions, data$rootProperty) {
-          return this.E().start()
-            .add(foam.u2.ViewSpec.createView(this.ColumnViewHeader, {data$:this.data.rootProperty$},  this, this.__subSubContext__))
-          .end()
-          .start()
-          .show(self.data.rootProperty.expanded$)
-          .forEach(self.data.columnOptions, function(o) {
-            self
+          .add(this.slot(function(data, data$isPropertySelected, data$columnOptions, data$rootProperty, data$rootProperty$expanded) {
+            return this.E()
+            .start()
+              .add(foam.u2.ViewSpec.createView(self.ColumnViewHeader, {data$:self.data.rootProperty$},  self, self.__subSubContext__))
+            .end()
+            .start()
+              //.show(self.data.rootProperty.expanded$)
               .start()
-              .show(self.data.rootProperty.expanded$)
-              .addClass(self.myClass('move-right'))
-                .add(foam.u2.ViewSpec.createView(self.RootColumnConfigPropView, {data:o},  self, self.__subSubContext__))
-              .end();
-          })
-          .end();
-        }))
+                .add(foam.u2.ViewSpec.createView(self.ColumnViewBody, {data$:self.data.rootProperty$},  self, self.__subSubContext__))
+              .end()
+              .forEach(self.data.columnOptions, function(o) {
+                this
+                  .start()
+                    .show(self.data.rootProperty.expanded$)
+                    .addClass(self.myClass('move-right'))
+                      .add(foam.u2.ViewSpec.createView(self.RootColumnConfigPropView, {data:o},  self, self.__subSubContext__))
+                  .end();
+              })
+            .end();
+          }))
         .end();
     }
   ]
@@ -184,11 +131,11 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this
-      .start()//.addClass(self.data.myClass('container-handle'))
+      .start()
           .add(foam.u2.ViewSpec.createView(this.head, {data$:this.data$},  this, this.__subSubContext__))
         .end()
         .start()
-          .add(foam.u2.ViewSpec.createView(self.body, {data$:self.data$},  this, this.__subSubContext__))
+          .add(foam.u2.ViewSpec.createView(this.body, {data$:this.data$},  this, this.__subSubContext__))
         .end();
     }
   ]
@@ -268,7 +215,6 @@ foam.CLASS({
       this.start()
         .enableClass(this.myClass('selected'), this.data.selectedColumns[this.data.selectedColumns.length - 1 - this.data.level] == this.data.rootProperty.name)
         .on('click', this.toggleExpanded)
-        //.addClass(self.myClass('handle-title'))
         .start()
           .add(this.data.rootProperty.name)
           .start('span')
@@ -277,7 +223,6 @@ foam.CLASS({
               'margin-right':   '36px',
               'vertical-align': 'middle',
               'font-weight':    'bold',
-              // 'display':        'inline-block',
               'visibility':     'visible',
               'font-size':      '16px',
               'float':          'right',
@@ -329,9 +274,9 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
-      self.data.rootProperty.expanded$.sub(function() {
-        console.log(self.data.rootProperty.expanded);
-      });
+      // self.data.rootProperty.expanded$.sub(function() {
+      //   console.log(self.data.rootProperty.expanded);
+      // });
 
       this
         .start()

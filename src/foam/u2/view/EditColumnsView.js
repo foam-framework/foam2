@@ -123,11 +123,11 @@ foam.CLASS({
     {
       name: 'save',
       code: function() {
-        if ( this.view.isColumnChanged ) {
+        // if ( this.view.isColumnChanged ) {
           localStorage.removeItem(this.data.of.id);
           localStorage.setItem(this.data.of.id, JSON.stringify(this.data.selectedColumnNames));
           this.data.isColumnChanged = !this.data.isColumnChanged;
-        }
+        // }
         this.stack.back();
       }
     }
