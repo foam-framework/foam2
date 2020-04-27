@@ -143,21 +143,22 @@ foam.CLASS({
       var self = this;
 
       this.start()//.addClass(self.data.myClass('container-handle'))
-        .start()
+        .add(this.slot(function(data, data$isPropertySelected, data$columnOptions, data$rootProperty) {
+          return this.E().start()
             .add(foam.u2.ViewSpec.createView(this.ColumnViewHeader, {data$:this.data.rootProperty$},  this, this.__subSubContext__))
           .end()
           .start()
-            .show(self.data.rootProperty.expanded$)
-            .forEach(self.data.columnOptions, function(o) {
-              self
-                .start()
-                .show(self.data.rootProperty.expanded$)
-                .addClass(self.myClass('move-right'))
-                  .add(foam.u2.ViewSpec.createView(self.RootColumnConfigPropView, {data:o},  self, self.__subSubContext__))
-                .end();
-            })
-            //.add(foam.u2.ViewSpec.createView(this.ColumnViewBody, {data$:this.data.rootProperty$},  this, this.__subSubContext__))
-          .end()
+          .show(self.data.rootProperty.expanded$)
+          .forEach(self.data.columnOptions, function(o) {
+            self
+              .start()
+              .show(self.data.rootProperty.expanded$)
+              .addClass(self.myClass('move-right'))
+                .add(foam.u2.ViewSpec.createView(self.RootColumnConfigPropView, {data:o},  self, self.__subSubContext__))
+              .end();
+          })
+          .end();
+        }))
         .end();
     }
   ]
