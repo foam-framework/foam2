@@ -82,9 +82,9 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'strategizerDisabled',
-      documentation: 'Set this to true to disable the rendering of the strategizer.',
-      value: false
+      name: 'enableStrategizer',
+      documentation: 'Boolean toggle for rendering the strategizer.',
+      value: true
     }
   ],
 
@@ -95,7 +95,7 @@ foam.CLASS({
     },
 
     function updateChoices() {
-      if ( this.of == null || this.strategizerDisabled ) {
+      if ( this.of == null || ! this.enableStrategizer ) {
         this.choices = [];
         return;
       }
