@@ -74,7 +74,7 @@ foam.CLASS({
         if ( ! of ) return [];
         if ( ! editColumnsEnabled ) return columns;
 
-        return selectedColumnNames;
+        return selectedColumnNames.map(c => Array.isArray(c) ? [c, null] : [[c], null]);
       },
     },
     {
@@ -83,9 +83,9 @@ foam.CLASS({
         var x = [].concat(
           of.getAxiomsByClass(foam.core.Property)
             .filter(p => p.tableCellFormatter && ! p.hidden)
-            .map(a => [[a.name], null]),
+            .map(a => [a.name]),
           of.getAxiomsByClass(foam.core.Action)
-            .map(a => [[a.name], null])
+            .map(a => [a.name])
         );
         var y = !of ? [] : [].concat(
           of.getAxiomsByClass(foam.core.Property)
@@ -100,12 +100,12 @@ foam.CLASS({
     },
     {
       name: 'selectedColumnNames',
-      adapt: function(_, cols) {
-        return cols.map(c => Array.isArray(c) ? c : [[c], null]);
-      },
+      // adapt: function(_, cols) {
+      //   return cols.map(c => Array.isArray(c) ? c : [[c], null]);
+      // },
       expression: function(columns, of) {
         var ls = JSON.parse(localStorage.getItem(of.id));
-        return ls ? ls : columns.map(c => [[c], null]);
+        return ls ? ls : columns.map(c => [c]);//.map(c => [[c], null]);
       }
     },
     {
@@ -302,7 +302,7 @@ foam.CLASS({
               forEach(columns_, function([arayOfAxiomNames, overrides]) {
                 var cls = view.of;
                 var column;
-                for ( var i = arayOfAxiomNames.length-1; i > -1; i--) {
+                for ( var i = 0; i <  arayOfAxiomNames.length; i++) {
                   column = typeof arayOfAxiomNames[i] === 'string'
                   ? cls.getAxiomByName(arayOfAxiomNames[i])
                   :  foam.Array.isInstance(arayOfAxiomNames[i]) ? 
@@ -493,16 +493,17 @@ foam.CLASS({
                   var cls = view.of;
                   var column;
                   var theObj = obj;
-                  for ( var i = arayOfAxiomNames.length-1; i > -1; i--) {
-                    if ( i != arayOfAxiomNames.length-1) {
-                      if (theObj)
-                        theObj = column.f(theObj);
-                    }
+                  for ( var i = 0; i <  arayOfAxiomNames.length; i++) {
                     column = typeof arayOfAxiomNames[i] === 'string'
                     ? cls.getAxiomByName(arayOfAxiomNames[i])
                     :  foam.Array.isInstance(arayOfAxiomNames[i]) ? 
                     cls.getAxiomByName(arayOfAxiomNames[i]) : arayOfAxiomNames[i];
-                    if ( !column ) {
+                    if ( i != arayOfAxiomNames.length-1) {
+                      if (theObj)
+                        theObj = column.f(theObj);
+                    }
+                    
+                    if ( !column || !theObj ) {
                       //need to come up with behavior
                       break;
                     }

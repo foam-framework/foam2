@@ -53,7 +53,7 @@ foam.CLASS({
       this.SUPER();
       var self = this;
       for (var i = 0; i < this.data.selectedColumnNames.length; i++) {
-        self.columns.push(self.ColumnOptionsSelectConfig.create({selectedColumns: self.data.selectedColumnNames[i][0], of:self.data.of}));
+        self.columns.push(self.ColumnOptionsSelectConfig.create({selectedColumns: self.data.selectedColumnNames[i], of:self.data.of}));
       }
 
       this
@@ -239,17 +239,16 @@ foam.CLASS({
     function toggleExpanded(e) {
       this.data.expanded = !this.data.expanded;
       if ( !this.data.expanded ) {
-        if ( this.data.level > this.data.selectedColumns.length - 1 ) {
-          this.data.selectedColumns.push(this.data.rootProperty.name);
-        } else {
-          if ( this.data.selectedColumns[this.data.selectedColumns.length - 1 - this.data.level] !== this.data.rootProperty.name )
-            this.data.selectedColumns[this.data.selectedColumns.length - 1 - this.data.level] = this.data.rootProperty.name;
-            this.data.isPropertySelected = true;
+        while ( this.data.level > this.data.selectedColumns.length - 1 ) {
+          this.data.selectedColumns.push(undefined);
+        } 
+      if ( this.data.selectedColumns[this.data.selectedColumns.length - 1 - this.data.level] !== this.data.rootProperty.name )
+        this.data.selectedColumns[this.data.selectedColumns.length - 1 - this.data.level] = this.data.rootProperty.name;
+        this.data.isPropertySelected = true;
 
-          //if level higher then previous one 
-          if ( !this.data.hasSubProperties && this.data.level !== this.data.selectedColumns.length - 1 ) {
-            this.data.selectedColumns.splice(0, this.data.selectedColumns.length - 1 - this.data.level);
-          }
+        //if level higher then previous one 
+        if ( !this.data.hasSubProperties && this.data.level !== this.data.selectedColumns.length - 1 ) {
+          this.data.selectedColumns.splice(0, this.data.selectedColumns.length - 1 - this.data.level);
         }
       }
     }
@@ -261,8 +260,8 @@ foam.CLASS({
   name: 'ColumnViewBody',
   extends: 'foam.u2.View',
   requires: [
-    // 'foam.u2.view.RootColumnConfigPropView',
-    // 'foam.u2.view.SubColumnSelectConfig'
+    'foam.u2.view.RootColumnConfigPropView',
+    'foam.u2.view.SubColumnSelectConfig'
   ],
   css: `
   ^move-right {
@@ -280,11 +279,11 @@ foam.CLASS({
 
       this
         .start()
-          .show(self.data.rootProperty.expanded$)
             .forEach(this.data.subColumnSelectConfig, function(p) {
             self
               .addClass(self.myClass('move-right'))
-              .add(foam.u2.ViewSpec.createView(self.RootColumnConfigPropView, {data:self.SubColumnSelectConfig.create({ rootProperty: p, hasOtherOptions:false, selectedColumns$:self.data.selectedColumns$, expanded$:self.data.rootProperty.expanded$, isPropertySelected$:self.isPropertySelected$ })}, self, self.__subSubContext__));
+              .show(self.data.expanded$)
+              .add(foam.u2.ViewSpec.createView(self.RootColumnConfigPropView, {data:p}, self, self.__subSubContext__));
           })
         .end();
     }
@@ -320,8 +319,9 @@ foam.CLASS({
       name: 'subColumnSelectConfig',
       expression: function(subProperties, level) {
         var arr = [];
+        var l = level + 1;
         for ( var i = 0; i < subProperties.length; i++ )
-          arr.push(this.cls_.create({ rootProperty: subProperties[i], selectedColumns$:this.selectedColumns$, level:level++, isPropertySelected$:this.isPropertySelected$ }));
+          arr.push(this.cls_.create({ rootProperty: subProperties[i], selectedColumns$:this.selectedColumns$, level:l, isPropertySelected$:this.isPropertySelected$, expanded$:this.expanded$ }));
         return arr;
       }
     },
