@@ -79,6 +79,12 @@ foam.CLASS({
         model in the 'of' property. The user can choose to create an instance
         of one of the models in this list.
       `
+    },
+    {
+      class: 'Boolean',
+      name: 'enableStrategizer',
+      documentation: 'Boolean toggle for rendering the strategizer.',
+      value: true
     }
   ],
 
@@ -89,7 +95,7 @@ foam.CLASS({
     },
 
     function updateChoices() {
-      if ( this.of == null ) {
+      if ( this.of == null || ! this.enableStrategizer ) {
         this.choices = [];
         return;
       }
