@@ -39,6 +39,7 @@ foam.CLASS({
 
   css: `
     ^ {
+      font-size: 18px;
       padding: 8px 0;
       //display: grid;
       grid-template-columns: 1fr 1fr;
@@ -92,7 +93,7 @@ foam.CLASS({
               .add(foam.u2.ViewSpec.createView(self.ColumnViewHeader, {data$:self.data.rootProperty$},  self, self.__subSubContext__))
             .end()
             .start()
-              //.show(self.data.rootProperty.expanded$)
+              //.show(self.data.rootProperty.parentExpanded$)
               .start()
                 .add(foam.u2.ViewSpec.createView(self.ColumnViewBody, {data$:self.data.rootProperty$},  self, self.__subSubContext__))
               .end()
@@ -190,7 +191,7 @@ foam.CLASS({
       var propViews = [];
       props = props.filter(p => p.name !== this.selectedColumns[0]);
       for ( var i = 0; i < props.length; i++) {
-        propViews.push(this.SubColumnSelectConfig.create({ rootProperty: props[i], hasOtherOptions:false, selectedColumns$:this.selectedColumns$, level:0, expanded$:this.rootProperty.expanded$, isPropertySelected$:this.isPropertySelected$ }));
+        propViews.push(this.SubColumnSelectConfig.create({ rootProperty: props[i], hasOtherOptions:false, selectedColumns$:this.selectedColumns$, level:0, parentExpanded$:this.rootProperty.parentExpanded$, isPropertySelected$:this.isPropertySelected$ }));
       }
       this.isPropertySelected = false;
       return propViews;
@@ -213,6 +214,7 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this.start()
+        //.style({'margin-right': '20px'})
         .enableClass(this.myClass('selected'), this.data.level < this.data.selectedColumns.length && this.data.selectedColumns[this.data.level] == this.data.rootProperty.name)
         .on('click', this.toggleExpanded)
         .start()
@@ -220,7 +222,6 @@ foam.CLASS({
           .start('span')
             .show(this.data.hasOtherOptions || this.data.hasSubProperties)
             .style({
-              'margin-right':   '36px',
               'vertical-align': 'middle',
               'font-weight':    'bold',
               'visibility':     'visible',
@@ -238,17 +239,22 @@ foam.CLASS({
   listeners: [
     function toggleExpanded(e) {
       this.data.expanded = !this.data.expanded;
+
       if ( !this.data.expanded ) {
         while ( this.data.level > this.data.selectedColumns.length - 1 ) {
           this.data.selectedColumns.push(undefined);
         } 
-      if ( this.data.selectedColumns[this.data.level] !== this.data.rootProperty.name )
-        this.data.selectedColumns[this.data.level] = this.data.rootProperty.name;
-        this.data.isPropertySelected = true;
+        if ( this.data.selectedColumns[this.data.level] !== this.data.rootProperty.name )
+          this.data.selectedColumns[this.data.level] = this.data.rootProperty.name;
+          this.data.isPropertySelected = true;
 
-        //if level higher then previous one 
+          //if level higher then previous one 
         if ( !this.data.hasSubProperties && this.data.level !== this.data.selectedColumns.length - 1 ) {
           this.data.selectedColumns.splice(0, this.data.selectedColumns.length - 1 - this.data.level);
+        }
+
+        if ( !this.data.hasSubProperties ) {
+          this.parentExpanded = !this.parentExpanded;
         }
       }
     }
@@ -273,7 +279,7 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
-      // self.data.rootProperty.expanded$.sub(function() {
+      // self.data.rootProperty.parentExpanded$.sub(function() {
       //   console.log(self.data.rootProperty.expanded);
       // });
 
@@ -321,7 +327,7 @@ foam.CLASS({
         var arr = [];
         var l = level + 1;
         for ( var i = 0; i < subProperties.length; i++ )
-          arr.push(this.cls_.create({ rootProperty: subProperties[i], selectedColumns$:this.selectedColumns$, level:l, isPropertySelected$:this.isPropertySelected$, expanded$:this.expanded$ }));
+          arr.push(this.cls_.create({ rootProperty: subProperties[i], selectedColumns$:this.selectedColumns$, level:l, isPropertySelected$:this.isPropertySelected$, parentExpanded$:this.expanded$ }));
         return arr;
       }
     },
@@ -337,10 +343,20 @@ foam.CLASS({
       class: 'Int',
     },
     {
+      name: 'parentExpanded',
+      class: 'Boolean',
+      value: false
+    },
+    {
       name: 'expanded',
       class: 'Boolean',
       value: false
     },
+    // {
+    //   name: 'parentExpanded',
+    //   class: 'Boolean',
+    //   value: false
+    // },
     {
       name: 'hasOtherOptions',
       class: 'Boolean',
