@@ -58,7 +58,9 @@ foam.CLASS({
           .setArgs(new Sink[] {count, min, max})
           .build();
 
-        getDelegate().select(seq);
+        getDelegate()
+          .where(GT(MedusaEntry.INDEX, details.getMinIndex()))
+          .select(seq);
 
         if ( count != null &&
              ((Long) count.getValue()) > 0 ) {
@@ -80,7 +82,7 @@ foam.CLASS({
         DAO clientDAO = support.getClientDAO(x, cmd.getServiceName(), fromConfig, toConfig);
         // NOTE: toIndex not yet used.
         getDelegate().where(
-          GT(MedusaEntry.INDEX, cmd.getFromIndex())
+          GTE(MedusaEntry.INDEX, cmd.getDetails().getMinIndex())
         )
         .orderBy(MedusaEntry.INDEX)
         .select(new ReplayBatchSink(x, clientDAO, cmd.getDetails()));

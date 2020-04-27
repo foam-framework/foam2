@@ -66,9 +66,19 @@ foam.CLASS({
               .setMaxRetryDelay(support.getMaxRetryDelay())
               .build();
 
+            // NOTE: using internalMedusaEntryDAO else we'll block on ReplayingDAO.
+            DAO dao = (DAO) getX().get("internalMedusaEntryDAO");
+            dao = dao.where(EQ(MedusaEntry.HAS_CONSENSUS, true));
+            Max max = (Max) dao.select(MAX(MedusaEntry.INDEX));
+
             ReplayDetailsCmd details = new ReplayDetailsCmd();
             details.setRequester(myConfig.getId());
             details.setResponder(config.getId());
+            if ( max != null &&
+                 max.getValue() != null ) {
+              //cmd.setFromIndex((Long) max.getValue());
+              details.setMinIndex((Long) max.getValue());
+            }
             getLogger().debug(myConfig.getId(), "ReplayDetailsCmd to", config.getId());
             details = (ReplayDetailsCmd) clientDAO.cmd_(getX(), details);
             getLogger().debug(myConfig.getId(), "ReplayDetailsCmd from", config.getId(), details);
@@ -79,19 +89,9 @@ foam.CLASS({
             // Send to Consensus DAO to prepare for Replay
             ((DAO) getX().get("medusaConsensusDAO")).cmd(details);
 
-            // NOTE: using internalMedusaEntryDAO else we'll block on ReplayingDAO.
-            DAO dao = (DAO) getX().get("internalMedusaEntryDAO");
-            dao = dao.where(EQ(MedusaEntry.HAS_CONSENSUS, true));
-            Max max = (Max) dao.select(MAX(MedusaEntry.INDEX));
-
             ReplayCmd cmd = new ReplayCmd();
-            details.COUNT.clear(details);
             cmd.setDetails(details);
             cmd.setServiceName("medusaConsensusDAO"); // TODO: configuration
-            if ( max != null &&
-                 max.getValue() != null ) {
-              cmd.setFromIndex((Long) max.getValue());
-            }
 
             getLogger().debug(myConfig.getId(), "ReplayCmd to", config.getId());
             cmd = (ReplayCmd) clientDAO.cmd_(getX(), cmd);

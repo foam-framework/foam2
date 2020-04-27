@@ -66,6 +66,10 @@ foam.CLASS({
       class: 'Long'
     },
     {
+      name: 'count',
+      class: 'Long'
+    },
+    {
       name: 'batchTimerInterval',
       class: 'Long',
       value: 5
@@ -157,15 +161,18 @@ foam.CLASS({
       javaCode: `
     try {
       while ( ! getComplete() ||
-              getTo() < getDetails().getMaxIndex() ) {
+//              getTo() < getDetails().getMaxIndex() ||
+              getCount() < getDetails().getCount() ||
+              getBatch().size() > 0 ) {
         Map batch;
         synchronized ( batchLock_ ) {
           batch = getBatch();
           ReplayBatchSink.BATCH.clear(this);
+          setCount(getCount() + batch.size());
           batchLock_.notify();
         }
 
-        getLogger().info("execute", "batch", "size", batch.size(), "to", getTo(), "details", getDetails());
+        getLogger().info("execute", "batch", "size", batch.size(), "count", getCount(), "to", getTo(), "details", getDetails());
         long starttime = System.currentTimeMillis();
 
         if ( batch.size() > 0 ) {
@@ -186,7 +193,7 @@ foam.CLASS({
           }
         }
       }
-      getLogger().debug("execute", "exit");
+      getLogger().debug("execute", "exit", "batch", "size", getBatch().size(), "count", getCount(), "to", getTo(), "details", getDetails());
     } catch (InterruptedException e) {
       // nop
     } catch ( Throwable t ) {

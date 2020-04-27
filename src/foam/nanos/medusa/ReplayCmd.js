@@ -20,13 +20,13 @@ foam.CLASS({
       class: 'String',
       value: 'medusaConsensusDAO'
     },
-    {
-      name: 'fromIndex',
-      class: 'Long',
-    },
-    {
-      name: 'toIndex',
-      class: 'Long',
-    }
+    // {
+    //   name: 'fromIndex',
+    //   class: 'Long',
+    // },
+    // {
+    //   name: 'toIndex',
+    //   class: 'Long',
+    // }
   ]
 });
