@@ -182,13 +182,13 @@ foam.CLASS({
   ],
   methods: [
     function updateRootProperty() {
-      var p = this.of.getAxiomByName(this.selectedColumns[this.selectedColumns.length - 1]);
+      var p = this.of.getAxiomByName(this.selectedColumns[0]);
       return this.SubColumnSelectConfig.create({ rootProperty: p, hasOtherOptions:true, selectedColumns$:this.selectedColumns$, level:0, isPropertySelected$:this.isPropertySelected$ });
     },
     function updateOptionsProperty() {
       var props = this.of.getAxiomsByClass(foam.core.Property);
       var propViews = [];
-      props = props.filter(p => p.name !== this.selectedColumns[this.selectedColumns.length - 1]);
+      props = props.filter(p => p.name !== this.selectedColumns[0]);
       for ( var i = 0; i < props.length; i++) {
         propViews.push(this.SubColumnSelectConfig.create({ rootProperty: props[i], hasOtherOptions:false, selectedColumns$:this.selectedColumns$, level:0, expanded$:this.rootProperty.expanded$, isPropertySelected$:this.isPropertySelected$ }));
       }
@@ -213,7 +213,7 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this.start()
-        .enableClass(this.myClass('selected'), this.data.selectedColumns[this.data.selectedColumns.length - 1 - this.data.level] == this.data.rootProperty.name)
+        .enableClass(this.myClass('selected'), this.data.level < this.data.selectedColumns.length && this.data.selectedColumns[this.data.level] == this.data.rootProperty.name)
         .on('click', this.toggleExpanded)
         .start()
           .add(this.data.rootProperty.name)
@@ -242,8 +242,8 @@ foam.CLASS({
         while ( this.data.level > this.data.selectedColumns.length - 1 ) {
           this.data.selectedColumns.push(undefined);
         } 
-      if ( this.data.selectedColumns[this.data.selectedColumns.length - 1 - this.data.level] !== this.data.rootProperty.name )
-        this.data.selectedColumns[this.data.selectedColumns.length - 1 - this.data.level] = this.data.rootProperty.name;
+      if ( this.data.selectedColumns[this.data.level] !== this.data.rootProperty.name )
+        this.data.selectedColumns[this.data.level] = this.data.rootProperty.name;
         this.data.isPropertySelected = true;
 
         //if level higher then previous one 
