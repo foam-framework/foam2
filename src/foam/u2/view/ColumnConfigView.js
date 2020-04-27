@@ -30,7 +30,6 @@ foam.CLASS({
         return props;
       }
     },
-    'isColumnChanged',
     {
       name: 'columns',
       value: []
@@ -239,7 +238,7 @@ foam.CLASS({
   listeners: [
     function toggleExpanded(e) {
       this.data.expanded = !this.data.expanded;
-      if ( !this.data.expanded || !(this.data.hasSubProperties || this.data.hasOtherOptions)) {
+      if ( !this.data.expanded && !(this.data.hasSubProperties || this.data.hasOtherOptions)) {
         if ( !this.data.hasSubProperties ) {
           this.data.parentExpanded = !this.data.parentExpanded;
         }
