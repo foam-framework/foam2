@@ -292,14 +292,6 @@
 
   methods: [
     {
-      name: 'getStringId',
-      type: 'String',
-      javaCode: `
-        String id = (String) getId();
-        return id;
-      `
-    },
-    {
       name: 'f',
       type: 'Boolean',
       args: [
