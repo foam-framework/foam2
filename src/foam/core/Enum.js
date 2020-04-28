@@ -328,7 +328,8 @@ foam.CLASS({
     },
     {
       class: 'StringArray',
-      name: 'extraClasses'
+      name: 'extraClasses',
+      generateJava: false
     }
   ],
 
