@@ -104,7 +104,7 @@ foam.CLASS({
       expression: function(of, allColumns) {
         if ( ! of ) return [];
         var tc = of.getAxiomByName('tableColumns');
-        return tc ? tc : allColumns;
+        return tc ? tc.columns : allColumns;
       },
     },
     {
