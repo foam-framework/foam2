@@ -52,8 +52,9 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       var self = this;
+      var columnsAvailable = this.data.of.getAxiomsByClass(foam.core.Property).filter(p => !p.hidden).map(p => p.name);
       for (var i = 0; i < this.data.selectedColumnNames.length; i++) {
-        self.columns.push(self.ColumnOptionsSelectConfig.create({selectedColumns: self.data.selectedColumnNames[i], of:self.data.of}));
+        self.columns.push(self.ColumnOptionsSelectConfig.create({selectedColumns: self.data.selectedColumnNames[i], of:self.data.of, columnsAvailable:columnsAvailable}));
       }
 
       this
@@ -167,6 +168,10 @@ foam.CLASS({
       }
     },
     {
+      name: 'columnsAvailable',
+      class: 'StringArray',
+    },
+    {
       name: 'isPropertySelected',
       class: 'Boolean',
       value: true,
@@ -181,19 +186,16 @@ foam.CLASS({
   ],
   methods: [
     function updateRootProperty() {
-      var p;
-      if ( this.selectedColumns.length === 0 )
-        p = this.of.getAxiomsByClass(foam.core.Property)[0];
-      else
-        p = this.of.getAxiomByName(this.selectedColumns[0]);
-      return this.SubColumnSelectConfig.create({ rootProperty: p.name, hasOtherOptions:true, selectedColumns$:this.selectedColumns$, level:0, isPathSelected$:this.isPropertySelected$, of:this.of });
+      var p = this.columnsAvailable.find(c => c === this.selectedColumns[0]);
+      if ( !p )
+        p = this.columnsAvailable[0];
+      return this.SubColumnSelectConfig.create({ rootProperty: p, hasOtherOptions:true, selectedColumns$:this.selectedColumns$, level:0, isPathSelected$:this.isPropertySelected$, of:this.of });
     },
     function updateOptionsProperty() {
-      var props = this.of.getAxiomsByClass(foam.core.Property);
       var propViews = [];
-      props = props.filter(p => p !== this.selectedColumns[0]);
+      var props = this.columnsAvailable.filter(p => p !== this.selectedColumns[0]);
       for ( var i = 0; i < props.length; i++) {
-        propViews.push(this.SubColumnSelectConfig.create({ rootProperty: props[i].name, hasOtherOptions:false, selectedColumns$:this.selectedColumns$, level:0, isPathSelected$:this.isPropertySelected$, of:this.of }));
+        propViews.push(this.SubColumnSelectConfig.create({ rootProperty: props[i], hasOtherOptions:false, selectedColumns$:this.selectedColumns$, level:0, isPathSelected$:this.isPropertySelected$, of:this.of }));
       }
       this.isPropertySelected = false;
       return propViews;
