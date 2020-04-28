@@ -109,7 +109,11 @@ foam.CLASS({
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(value) {
-        this.add(value.label)
+        this.start().
+          addClasses(value.classes()).
+          style(value.toStyle()).
+          add(value.label).
+        end();
       }
     }
   ]

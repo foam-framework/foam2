@@ -309,6 +309,26 @@ foam.CLASS({
       final: true,
       transient: true,
       factory: function() { return this.name; }
+    },
+    {
+      class: 'String',
+      name: 'color'
+    },
+    {
+      class: 'String',
+      name: 'background'
+    },
+    {
+      class: 'Boolean',
+      name: 'italic'
+    },
+    {
+      class: 'Boolean',
+      name: 'bold'
+    },
+    {
+      class: 'StringArray',
+      name: 'extraClasses'
     }
   ],
 
@@ -317,6 +337,19 @@ foam.CLASS({
       o.out(this.ordinal);
     },
     function toSummary() { return this.label; },
+    function toStyle() {
+      var style = {};
+
+      if ( this.color      ) style.color          = this.color;
+      if ( this.background ) style.background     = this.background;
+      if ( this.italic     ) style['font-style']  = 'italic';
+      if ( this.bold       ) style['font-weight'] = 'bold';
+
+      return style;
+    },
+    function classes() {
+      return this.extraClasses.concat(foam.String.cssClassize(this.cls_.id));
+    },
     function toString() { return this.name; }
   ]
 });

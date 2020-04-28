@@ -479,6 +479,7 @@ FOAM_FILES([
   { name: "foam/u2/view/FObjectPropertyView", flags: ['web'] },
   { name: "foam/u2/view/CodeView", flags: ['web'] },
   { name: "foam/u2/view/ReferencePropertyView", flags: ['web'] },
+  { name: "foam/u2/view/ReadOnlyEnumView", flags: ['web'] },
   { name: "foam/u2/view/EnumView", flags: ['web'] },
   { name: "foam/u2/view/ColorView", flags: ['web'] },
   { name: "foam/u2/view/ReadColorView", flags: ['web'] },
