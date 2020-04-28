@@ -29,6 +29,7 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(`
           private Object batchLock_ = new Object();
+          private Object executeLock_ = new Object();
 
           public ReplayBatchSink(foam.core.X x, foam.dao.DAO dao, ReplayDetailsCmd details) {
             setX(x);
@@ -137,8 +138,10 @@ foam.CLASS({
         }
         setTo(Math.max(getTo(), entry.getIndex()));
         getBatch().put(entry.getIndex(), entry);
-        if ( getBatch().size() >= getMaxBatchSize() ) {
-          batchLock_.notify();
+      }
+      if ( getBatch().size() >= getMaxBatchSize() ) {
+        synchronized ( executeLock_ ) {
+          executeLock_.notify();
         }
       }
       `
@@ -161,19 +164,18 @@ foam.CLASS({
       javaCode: `
     try {
       while ( ! getComplete() ||
-//              getTo() < getDetails().getMaxIndex() ||
               getCount() < getDetails().getCount() ||
               getBatch().size() > 0 ) {
         Map batch;
         synchronized ( batchLock_ ) {
           batch = getBatch();
           ReplayBatchSink.BATCH.clear(this);
-          setCount(getCount() + batch.size());
-          batchLock_.notify();
+          batchLock_.notifyAll();
         }
+        setCount(getCount() + batch.size());
+        long startTime = System.currentTimeMillis();
 
         getLogger().info("execute", "batch", "size", batch.size(), "count", getCount(), "to", getTo(), "details", getDetails());
-        long starttime = System.currentTimeMillis();
 
         if ( batch.size() > 0 ) {
           ReplayBatchCmd cmd = new ReplayBatchCmd();
@@ -185,11 +187,11 @@ foam.CLASS({
           // TODO - process results
         }
 
-        synchronized ( batchLock_ ) {
-          long delay = getBatchTimerInterval() - (System.currentTimeMillis() - starttime);
-          if ( delay > 0 ) {
+        long delay = getBatchTimerInterval() - (System.currentTimeMillis() - startTime);
+        if ( delay > 0 ) {
+          synchronized ( executeLock_ ) {
             getLogger().debug("execute", "wait", delay);
-            batchLock_.wait(delay);
+            executeLock_.wait(delay);
           }
         }
       }

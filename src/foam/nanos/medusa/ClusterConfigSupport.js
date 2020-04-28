@@ -114,7 +114,7 @@ configuration for contacting the primary node.`,
     {
       name: 'batchTimerInterval',
       class: 'Long',
-      value: 20
+      value: 1
     },
     {
       name: 'maxBatchSize',

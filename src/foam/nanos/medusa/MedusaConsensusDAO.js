@@ -228,10 +228,6 @@ foam.CLASS({
            getIndex() >= getReplayIndex() ) {
         getLogger().debug("promote", "replayComplete");
         replayComplete(x);
-        // synchronized ( promoteLock_ ) {
-        //   getLogger().debug("promote", "notify");
-        //   promoteLock_.notify();
-        // }
       } else if ( getReplaying() ) {
         getLogger().debug("promote", "replay", getReplayIndex(), getReplaying());
       }

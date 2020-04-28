@@ -33,6 +33,7 @@ NOTE: override cmd_ in child class to control delegate call`,
       buildJavaClass: function(cls) {
         cls.extras.push(`
           private Object batchLock_ = new Object();
+          private Object executeLock_ = new Object();
         `);
       }
     }
@@ -142,14 +143,14 @@ NOTE: override cmd_ in child class to control delegate call`,
         }
       ],
       javaCode: `
-      synchronized ( batchLock_ ) {
+      synchronized ( executeLock_ ) {
        getLogger().debug("send");
        if ( getAgent() != null ) {
           if ( getPuts().size() >= getMaxBatchSize(x) ||
                getRemoves().size() >= getMaxBatchSize(x) ||
                System.currentTimeMillis() - getLastSend() > getBatchTimerInterval(x) ) {
             getLogger().debug("send", "notify");
-            batchLock_.notify();
+            executeLock_.notify();
           }
         } else {
           getLogger().debug("send", "agency");
@@ -173,14 +174,14 @@ NOTE: override cmd_ in child class to control delegate call`,
           getLogger().debug("execute");
           Map puts;
           Map removes;
-          long starttime = System.currentTimeMillis();
+          long startTime = System.currentTimeMillis();
 
           synchronized ( batchLock_ ) {
             puts = getPuts();
             BatchClientDAO.PUTS.clear(this);
             removes = getRemoves();
             BatchClientDAO.REMOVES.clear(this);
-            batchLock_.notify();
+            batchLock_.notifyAll();
           }
 
           if ( puts.size() > 0 ) {
@@ -198,20 +199,22 @@ NOTE: override cmd_ in child class to control delegate call`,
             cmd.setDop(DOP.REMOVE);
             cmd.setBatch(removes);
             this.cmd_(x, cmd);
-            setLastSend(System.currentTimeMillis());
             // TODO - process results.
+            setLastSend(System.currentTimeMillis());
           }
 
-          synchronized ( batchLock_ ) {
-            long count = Math.max(puts.size(), removes.size());
-            if ( count > 0L ) {
-              // sleep one interval before exiting on zero send.
-              long delay = getBatchTimerInterval(x) - (System.currentTimeMillis() - starttime);
-              if ( delay > 0 ) {
+          long count = Math.max(puts.size(), removes.size());
+          if ( count > 0L ) {
+            // sleep one interval before exiting on zero send.
+            long delay = getBatchTimerInterval(x) - (System.currentTimeMillis() - startTime);
+            if ( delay > 0 ) {
+              synchronized ( executeLock_ ) {
                 getLogger().debug("execute", "wait", delay);
-                batchLock_.wait(delay);
+                executeLock_.wait(delay);
               }
-            } else {
+            }
+          } else {
+            synchronized ( executeLock_ ) {
               getLogger().debug("execute", "exit", getPuts().size());
               BatchClientDAO.AGENT.clear(this);
               break;
