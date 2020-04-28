@@ -10,10 +10,10 @@ foam.ENUM({
   documentation: 'Color Enum example.',
 
   values: [
-    { name: 'UNKNOWN', label: 'Unknown', color: 'white',  background: 'gray', italic: true },
+    { name: 'UNKNOWN', label: 'Unknown', color: 'white',  background: 'gray', isItalic: true },
     { name: 'LOW',     label: 'Low' },
     { name: 'MEDIUM',  label: 'Medium',  color: 'yellow', background: 'gray'  },
-    { name: 'HIGH',    label: 'High',    color: 'red',    background: 'black', bold: true, extraClasses: [ 'important' ] }
+    { name: 'HIGH',    label: 'High',    color: 'red',    background: 'black', isBold: true, extraClasses: [ 'important' ] }
   ]
 });
 

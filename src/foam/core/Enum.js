@@ -320,11 +320,11 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'italic'
+      name: 'isItalic'
     },
     {
       class: 'Boolean',
-      name: 'bold'
+      name: 'isBold'
     },
     {
       class: 'StringArray',
@@ -342,8 +342,8 @@ foam.CLASS({
 
       if ( this.color      ) style.color          = this.color;
       if ( this.background ) style.background     = this.background;
-      if ( this.italic     ) style['font-style']  = 'italic';
-      if ( this.bold       ) style['font-weight'] = 'bold';
+      if ( this.isItalic   ) style['font-style']  = 'italic';
+      if ( this.isBold     ) style['font-weight'] = 'bold';
 
       return style;
     },
