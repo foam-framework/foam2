@@ -85,14 +85,13 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
-      this.start()//.addClass(self.data.myClass('container-handle'))
+      this.start()
           .add(this.slot(function(data, data$isPropertySelected, data$columnOptions, data$rootProperty, data$rootProperty$expanded) {
             return this.E()
             .start()
               .add(foam.u2.ViewSpec.createView(self.ColumnViewHeader, {data$:self.data.rootProperty$},  self, self.__subSubContext__))
             .end()
             .start()
-              //.show(self.data.rootProperty.parentExpanded$)
               .start()
                 .add(foam.u2.ViewSpec.createView(self.ColumnViewBody, {data$:self.data.rootProperty$},  self, self.__subSubContext__))
               .end()
@@ -217,7 +216,6 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this.start()
-        //.style({'margin-right': '20px'})
         .enableClass(this.myClass('selected'), this.data.level < this.data.selectedColumns.length && this.data.selectedColumns[this.data.level] == this.data.rootProperty)
         .on('click', this.toggleExpanded)
         .start()
@@ -269,10 +267,6 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       var self = this;
-
-      // self.data.rootProperty.parentExpanded$.sub(function() {
-      //   console.log(self.data.rootProperty.expanded);
-      // });
 
       this
         .start()
@@ -343,7 +337,6 @@ foam.CLASS({
           if ( this.selectedColumns[this.level] !== this.rootProperty)
             this.selectedColumns[this.level] = this.rootProperty;
   
-            //if level higher then previous one 
           if ( !this.hasSubProperties && this.level !== this.selectedColumns.length - 1 ) {
             this.selectedColumns.splice(this.level, this.selectedColumns.length - 1 - this.level);
           }
