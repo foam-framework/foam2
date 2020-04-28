@@ -33,10 +33,11 @@ foam.CLASS({
       this.Animation.create({
         duration: 2000,
         f: () => {
-          this.x += Math.random()*4000-2000;
-          this.y += Math.random()*4000-2000;
+          this.x += Math.random()*1200-600;
+          this.y += Math.random()*1200-600;
         },
-        objs: [ this ]
+        objs: [ this ],
+        interp: Math.sqrt
       }).start();
     }
   ],

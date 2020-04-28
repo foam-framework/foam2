@@ -1010,6 +1010,23 @@ new ${self.cls_.id}.Builder(foam.core.EmptyX.instance())
 
 foam.CLASS({
   package: 'foam.java',
+  name: 'AbstractEnumJavaRefinement',
+  refines: 'foam.core.AbstractEnum',
+  flags: ['java'],
+  methods: [
+    {
+      name: 'asJavaValue',
+      code: function() {
+        var self = this;
+        return `${self.cls_.id}.${self.name}`
+      },
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.java',
   name: 'AbstractInterfaceJavaRefinement',
   refines: 'foam.core.AbstractInterface',
   flags: ['java'],

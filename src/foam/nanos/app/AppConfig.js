@@ -86,6 +86,10 @@ foam.CLASS({
     {
       class: 'String',
       name: 'externalUrl'
-    }
+    },
+    {
+      class: 'String',
+      name: 'supportPhone'
+    },
   ]
 });

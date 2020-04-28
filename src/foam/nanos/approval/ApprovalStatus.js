@@ -23,6 +23,11 @@
       name: 'REJECTED',
       label: 'Rejected',
       documentation: 'Request was rejected.'
+    },
+    {
+      name: 'CANCELLED',
+      label: 'Cancelled',
+      documentation: 'Request was cancelled.'
     }
   ]
 });

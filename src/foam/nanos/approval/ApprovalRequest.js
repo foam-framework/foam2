@@ -109,6 +109,16 @@
     },
     {
       class: 'foam.comics.v2.CannedQuery',
+      label: 'Cancelled',
+      predicateFactory: function(e) {
+        return  e.EQ(
+          foam.nanos.approval.ApprovalRequest.STATUS,
+          foam.nanos.approval.ApprovalStatus.CANCELLED
+        );
+      }
+    },
+    {
+      class: 'foam.comics.v2.CannedQuery',
       label: 'All',
       predicateFactory: function(e) {
         return e.TRUE;
@@ -422,7 +432,7 @@
     },
     {
       class: 'String',
-      name: 'approvableCreateKey',
+      name: 'approvableHashKey',
       hidden: true
     }
   ],
@@ -435,6 +445,10 @@
     {
       name: 'SUCCESS_REJECTED',
       message: 'You have successfully rejected this request.'
+    },
+    {
+      name: 'SUCCESS_CANCELLED',
+      message: 'You have successfully cancelled this request.'
     },
     {
       name: 'REQUESTED',
@@ -483,7 +497,8 @@
       isAvailable: (isTrackingRequest, status) => {
         if (
           status === foam.nanos.approval.ApprovalStatus.REJECTED ||
-          status === foam.nanos.approval.ApprovalStatus.APPROVED
+          status === foam.nanos.approval.ApprovalStatus.APPROVED ||
+          status === foam.nanos.approval.ApprovalStatus.CANCELLED
         ) {
           return false;
         }
@@ -518,7 +533,8 @@
       isAvailable: (isTrackingRequest, status) => {
         if (
           status === foam.nanos.approval.ApprovalStatus.REJECTED ||
-          status === foam.nanos.approval.ApprovalStatus.APPROVED
+          status === foam.nanos.approval.ApprovalStatus.APPROVED ||
+          status === foam.nanos.approval.ApprovalStatus.CANCELLED
         ) {
           return false;
         }
@@ -548,11 +564,49 @@
       }
     },
     {
+      name: 'cancel',
+      section: 'requestDetails',
+      isAvailable: (isTrackingRequest, status) => {
+        if (
+          status === foam.nanos.approval.ApprovalStatus.REJECTED ||
+          status === foam.nanos.approval.ApprovalStatus.APPROVED ||
+          status === foam.nanos.approval.ApprovalStatus.CANCELLED
+        ) {
+          return false;
+        }
+        return isTrackingRequest;
+      },
+      code: function(X) {
+        var cancelledApprovalRequest = this.clone();
+        cancelledApprovalRequest.status = this.ApprovalStatus.CANCELLED;
+
+        X.approvalRequestDAO.put(cancelledApprovalRequest).then(o => {
+          X.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
+          this.finished.pub();
+          X.ctrl.add(this.NotificationMessage.create({
+            message: this.SUCCESS_CANCELLED
+          }));
+
+          if ( X.currentMenu.id !== X.stack.top[2] ) {
+            X.stack.back();
+          }
+        }, e => {
+          this.throwError.pub(e);
+          X.ctrl.add(this.NotificationMessage.create({
+            message: e.message,
+            type: 'error'
+          }));
+        });
+      }
+    },
+    {
       name: 'viewReference',
       isDefault: true,
       isAvailable: function() {
         var self = this;
 
+        // TODO: To consider in new approval system rework: should we allow people to view reference for a deleted or rejected object
+        // since it will now just be stored in the approvable dao
         // Do not show the action if the request was reject or approved and removed
         if (self.status == foam.nanos.approval.ApprovalStatus.REJECTED ||
            (self.status == foam.nanos.approval.ApprovalStatus.APPROVED && self.operation == foam.nanos.ruler.Operations.REMOVE)) {

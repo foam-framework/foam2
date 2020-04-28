@@ -52,6 +52,10 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       name: 'data'
+    },
+    {
+      class: 'String',
+      name: 'label'
     }
   ],
 
@@ -63,10 +67,10 @@ foam.CLASS({
         .start()
           .addClass(this.myClass('main'))
           .start('h2')
-            .add(this.TITLE).add(this.data.model_.label).add('?')
+            .add(this.TITLE).add(this.label ? this.label : this.data.model_.label).add('?')
           .end()
           .start('p')
-            .add(`${this.CONFIRM_DELETE_1} ${this.data.toSummary()}?`)
+            .add(`${this.CONFIRM_DELETE_1} `).add(this.label ? this.label : `${this.data.toSummary()}`).add('?')
           .end()
         .end()
         .start()
@@ -96,10 +100,8 @@ foam.CLASS({
           } else {
             this.notify(this.data.model_.label + this.SUCCESS_MSG);
           }
-
           this.onDelete();
         }).catch((err) => {
-
           // TODO: Uncomment once we turn UserFeedbackException in to a throwable
           // if ( foam.comics.v2.userfeedback.UserFeedbackException.isInstance(err) && err.userFeedback  ){
           //   var currentFeedback = err.userFeedback;
@@ -119,7 +121,6 @@ foam.CLASS({
             this.notify(err.message || this.FAIL_MSG, 'error');
           }
 
-          
         });
         X.closeDialog();
       }

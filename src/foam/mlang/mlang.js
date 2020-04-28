@@ -3433,12 +3433,13 @@ foam.CLASS({
   extends: 'foam.mlang.Expressions',
 
   documentation: 'A convenience object which provides access to all mlangs.',
-  // TODO: why is this needed?
+  // TODO: why is this needed? Why not just make Expressions a Singleton?
 
   axioms: [
     foam.pattern.Singleton.create()
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang.predicate',

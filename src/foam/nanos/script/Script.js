@@ -364,21 +364,25 @@ foam.CLASS({
         this.status = this.ScriptStatus.SCHEDULED;
         if ( this.server ) {
           this.__context__[this.daoKey].put(this).then(function(script) {
-              self.copyFrom(script);
-              if ( script.status === self.ScriptStatus.RUNNING ) {
-                self.poll();
-              }
+            self.copyFrom(script);
+            if ( script.status === self.ScriptStatus.RUNNING ) {
+              self.poll();
+            }
           });
         } else {
           this.status = this.ScriptStatus.RUNNING;
-          this.runScript().then(() => {
-            this.status = this.ScriptStatus.UNSCHEDULED;
-            this.__context__[this.daoKey].put(this);
-          }).catch((err) => {
-            console.log(err);
-            this.status = this.ScriptStatus.ERROR;
-            this.__context__[this.daoKey].put(this);
-          });
+          this.runScript().then(
+            () => {
+              this.status = this.ScriptStatus.UNSCHEDULED;
+              this.__context__[this.daoKey].put(this);
+            },
+            (err) => {
+              this.output += '\n' + err.stack;
+              console.log(err);
+              this.status = this.ScriptStatus.ERROR;
+              this.__context__[this.daoKey].put(this);
+            }
+          );
         }
       }
     }
