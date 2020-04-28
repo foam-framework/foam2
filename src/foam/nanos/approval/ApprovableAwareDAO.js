@@ -233,7 +233,8 @@ foam.CLASS({
         List approvedObjRemoveRequests = ((ArraySink) filteredApprovalRequestDAO
           .where(foam.mlang.MLang.OR(
             foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.APPROVED),
-            foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.REJECTED)
+            foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.REJECTED),
+            foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.CANCELLED)
           )).select(new ArraySink())).getArray();
 
         if ( pendingRequests.size() > 0 && approvedObjRemoveRequests.size() == 0 && approverIds.size() == 0 ) 
@@ -253,7 +254,7 @@ foam.CLASS({
             return super.put_(x,obj);
           } 
 
-          return null;  // as request has been REJECTED
+          return null;  // as request has been REJECTED or CANCELLED
         } 
 
         if ( approvedObjRemoveRequests.size() > 1 ) {
@@ -303,7 +304,8 @@ foam.CLASS({
           List approvedObjCreateRequests = ((ArraySink) filteredApprovalRequestDAO
             .where(foam.mlang.MLang.OR(
               foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.APPROVED),
-              foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.REJECTED)
+              foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.REJECTED),
+              foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.CANCELLED)
             )).select(new ArraySink())).getArray();
 
           if ( pendingRequests.size() > 0 && approvedObjCreateRequests.size() == 0 ) 
@@ -324,7 +326,8 @@ foam.CLASS({
               return super.put_(x,obj);
             } 
 
-            // create request has been rejected is only where we mark the object as REJECTED
+            // TODO: will rework rejection
+            // create request has been rejected or cancelled is only where we mark the object as REJECTED
             lifecycleObj.setLifecycleState(LifecycleState.REJECTED);
             return super.put_(x,obj); 
           } 
@@ -421,7 +424,8 @@ foam.CLASS({
         List approvedObjUpdateRequests = ((ArraySink) filteredApprovalRequestDAO
           .where(foam.mlang.MLang.OR(
             foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.APPROVED),
-            foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.REJECTED)
+            foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.REJECTED),
+            foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.CANCELLED)
           )).select(new ArraySink())).getArray();
 
         if ( pendingRequests.size() > 0 && approvedObjUpdateRequests.size() == 0 ) 
@@ -441,11 +445,11 @@ foam.CLASS({
             return super.put_(x,obj);
           }
 
-          return null; // as request has been REJECTED
+          return null; // as request has been REJECTED or CANCELLED
         }
 
         if ( approvedObjUpdateRequests.size() > 1 ) {
-          logger.error("Something went wrong cannot have multiple approved/rejected requests for the same request!");
+          logger.error("Something went wrong cannot have multiple approved/rejected/cancelled requests for the same request!");
           throw new RuntimeException("Something went wrong cannot have multiple approved/rejected requests for the same request!");
         }
 

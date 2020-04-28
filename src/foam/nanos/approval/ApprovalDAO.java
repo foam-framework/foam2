@@ -13,8 +13,6 @@ import foam.dao.ProxyDAO;
 import foam.mlang.sink.Sum;
 import foam.nanos.auth.User;
 import foam.nanos.ruler.Operations;
-import foam.nanos.approval.ApprovalStatus;
-import foam.nanos.approval.ApprovalRequest;
 
 import static foam.mlang.MLang.*;
 
@@ -41,13 +39,15 @@ public class ApprovalDAO
       || old == null && request.getStatus() != ApprovalStatus.REQUESTED
     ) {
       DAO requests = ApprovalRequestUtil.getAllRequests(x, request.getObjId(), request.getClassification());
-      // if points are sufficient to consider object approved
-      if ( getCurrentPoints(requests) >= request.getRequiredPoints() ||
-           getCurrentRejectedPoints(requests) >= request.getRequiredRejectedPoints() ) {
+      // if not a cancellation request and points are sufficient to consider object approved
+      if ( 
+        request.getStatus() == ApprovalStatus.CANCELLED ||
+        getCurrentPoints(requests) >= request.getRequiredPoints() ||
+        getCurrentRejectedPoints(requests) >= request.getRequiredRejectedPoints()
+      ) {
 
         //removes all the requests that were not approved to clean up approvalRequestDAO
         removeUnusedRequests(requests);
-
         if ( 
           request.getStatus() == ApprovalStatus.APPROVED ||
           ( 
@@ -62,6 +62,10 @@ public class ApprovalDAO
             getDelegate().put(request);
             throw new RuntimeException(e);
           }
+        } else {
+          // since no more needs to be done with the request from thiss point onwards
+          request.setIsFulfilled(true);
+          getDelegate().put(request);
         }
       }
     }
