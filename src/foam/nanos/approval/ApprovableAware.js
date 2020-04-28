@@ -26,13 +26,6 @@
     'java.util.Map',
   ],
 
-  methods: [
-    {
-      name: 'getStringId',
-      type: 'String'
-    }  
-  ],
-
   axioms: [
     {
       name: 'javaExtras',
@@ -59,7 +52,7 @@
               Map diff = oldObj == null ? null : oldObj.diff(obj);
               StringBuilder hash_sb = new StringBuilder(obj.getClass().getSimpleName());
               if ( operation == Operations.UPDATE && obj instanceof ApprovableAware ) 
-                hash_sb.append(((ApprovableAware) obj).getStringId());
+                hash_sb.append(String.valueOf(obj.getProperty("id")));
 
               if ( diff != null ) {
                 // remove ids, timestamps and userfeedback
@@ -89,7 +82,7 @@
               }
 
               String key = ( diff == null || diff.size() == 0 ) && obj instanceof ApprovableAware ? 
-                ((ApprovableAware) obj).getStringId() : 
+                String.valueOf(obj.getProperty("id")) : 
                 hash_sb.toString();
               
               return key;
