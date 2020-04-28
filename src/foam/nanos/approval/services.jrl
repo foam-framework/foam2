@@ -1,0 +1,30 @@
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "approvalRequestDAO",
+  "serve": true,
+  "serviceScript": """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.approval.ApprovalRequest.getOwnClassInfo())
+      .setAuthorize(false)
+      .setPm(true)
+      .setPipelinePm(true)
+      .setSeqNo(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("approvalRequests")
+      .setValidated(true)
+      .setRulerDaoKey("approvalRequestDAO")
+      .setDecorator(
+        new foam.nanos.approval.SendGroupRequestApprovalDAO(x,
+          new foam.nanos.approval.AuthenticatedApprovalDAO(x,
+            new foam.nanos.approval.ApprovalRequestNotificationDAO(x,
+              new foam.nanos.approval.ApprovalDAO(x, new foam.dao.NullDAO(x, foam.nanos.approval.ApprovalRequest.getOwnClassInfo()))
+            )
+          )
+        )
+      )
+      .setIndex(new foam.core.PropertyInfo[] {foam.nanos.approval.ApprovalRequest.CREATED})
+      .build()
+      .orderBy(foam.mlang.MLang.DESC(foam.nanos.approval.ApprovalRequest.CREATED));
+  """,
+  "client": "{\"of\":\"foam.nanos.approval.ApprovalRequest\"}"
+})

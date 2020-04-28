@@ -258,6 +258,10 @@ FOAM_FILES([
   { name: "foam/dao/VersionNoDAO" },
   { name: "foam/dao/sync/SyncRecord" },
   { name: "foam/dao/SyncDAO" },
+
+  // approval
+  { name: 'foam/nanos/approval/UserRefines' },
+
   { name: "foam/nanos/u2/navigation/SignUp" },
   { name: "foam/nanos/u2/navigation/SignIn" },
   { name: "foam/nanos/boot/NSpec" },
