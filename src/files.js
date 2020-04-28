@@ -261,6 +261,7 @@ FOAM_FILES([
 
   // approval
   { name: 'foam/nanos/approval/UserRefines' },
+  { name: 'foam/nanos/approval/AuthenticatedApprovalDAOAuthorizer' },
 
   { name: "foam/nanos/u2/navigation/SignUp" },
   { name: "foam/nanos/u2/navigation/SignIn" },

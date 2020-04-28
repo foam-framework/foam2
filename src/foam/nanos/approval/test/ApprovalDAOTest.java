@@ -29,7 +29,7 @@ import foam.nanos.approval.ApprovalRequest;
 import foam.nanos.approval.ApprovalRequestUtil;
 import foam.nanos.approval.ApprovalStatus;
 import foam.nanos.approval.SendGroupRequestApprovalDAO;
-import foam.nanos.approval.AuthenticatedApprovalDAO;
+//import foam.nanos.approval.AuthenticatedApprovalDAOAuthorizer;
 
 public class ApprovalDAOTest
 extends Test {
@@ -50,7 +50,11 @@ extends Test {
     groupDAO = ((DAO) x.get("localGroupDAO"));
     x = x.put("groupDAO", groupDAO);
 
-    requestDAO = new SendGroupRequestApprovalDAO(x, new foam.dao.ValidatingDAO(x, new SequenceNumberDAO(new AuthenticatedApprovalDAO(x, new ApprovalDAO(x, new MDAO(ApprovalRequest.getOwnClassInfo()))))));
+    requestDAO = new SendGroupRequestApprovalDAO(x, new foam.dao.ValidatingDAO(x, new SequenceNumberDAO(new ApprovalDAO(x, new MDAO(ApprovalRequest.getOwnClassInfo())))));
+    requestDAO = new foam.nanos.auth.AuthorizationDAO.Builder(x)
+      .setDelegate(requestDAO)
+      .setAuthorizer(new foam.nanos.approval.AuthenticatedApprovalDAOAuthorizer())
+      .build();
     x = x.put("approvalRequestDAO", requestDAO);
     userDAO = ((DAO) x.get("localUserDAO"));
 

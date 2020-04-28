@@ -5,7 +5,8 @@ p({
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.approval.ApprovalRequest.getOwnClassInfo())
-      .setAuthorize(false)
+      .setAuthorize(true)
+      .setAuthorizer(new foam.nanos.approval.AuthenticatedApprovalDAOAuthorizer())
       .setPm(true)
       .setPipelinePm(true)
       .setSeqNo(true)
@@ -15,10 +16,8 @@ p({
       .setRulerDaoKey("approvalRequestDAO")
       .setDecorator(
         new foam.nanos.approval.SendGroupRequestApprovalDAO(x,
-          new foam.nanos.approval.AuthenticatedApprovalDAO(x,
-            new foam.nanos.approval.ApprovalRequestNotificationDAO(x,
-              new foam.nanos.approval.ApprovalDAO(x, new foam.dao.NullDAO(x, foam.nanos.approval.ApprovalRequest.getOwnClassInfo()))
-            )
+          new foam.nanos.approval.ApprovalRequestNotificationDAO(x,
+            new foam.nanos.approval.ApprovalDAO(x, new foam.dao.NullDAO(x, foam.nanos.approval.ApprovalRequest.getOwnClassInfo()))
           )
         )
       )
