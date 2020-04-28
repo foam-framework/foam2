@@ -3,68 +3,6 @@
  * Copyright 2020 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-foam.CLASS({
-  package: 'foam.u2.view',
-  name: 'ColumnsConfigView',
-  extends: 'foam.u2.View',
-
-  documentation: 'A view for configuring table columns.',
-
-  requires: [
-    'foam.u2.view.ColumnConfigPropView',
-    'foam.u2.view.ColumnOptionsSelectConfig',
-  ],
-
-  properties: [
-    'of',
-    'allColumns',
-    'selectedColumns',
-    {
-      name: 'allProperties',
-      expression: function(allColumns, of) {
-        var props = [];
-        allColumns.map(axiomName => {//what is overridesMap??? can't find
-          props.push(this.of.getAxiomByName(axiomName[0]));
-          });
-        
-        return props;
-      }
-    },
-    {
-      name: 'columns',
-      value: []
-    }
-  ],
-
-  css: `
-    ^ {
-      font-size: 18px;
-      padding: 8px 0;
-      //display: grid;
-      grid-template-columns: 1fr 1fr;
-    }
-    ^ > * {
-      align-self: center;
-    }
-  `,
-
-  methods: [
-    function initE() {
-      this.SUPER();
-      var self = this;
-      var columnsAvailable = this.data.of.getAxiomsByClass(foam.core.Property).filter(p => !p.hidden).map(p => p.name);
-      for (var i = 0; i < this.data.selectedColumnNames.length; i++) {
-        self.columns.push(self.ColumnOptionsSelectConfig.create({selectedColumns: self.data.selectedColumnNames[i], of:self.data.of, columnsAvailable:columnsAvailable}));
-      }
-
-      this
-        .addClass(this.myClass())
-        .forEach(this.columns, function(c) {
-          self.add(foam.u2.ViewSpec.createView(self.ColumnConfigPropView, {data:c},  this, this.__subSubContext__));
-        });
-    }
-  ]
-});
 
 foam.CLASS({
   package: 'foam.u2.view',

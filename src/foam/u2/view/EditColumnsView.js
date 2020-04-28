@@ -33,11 +33,9 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'EditColumnsView',
-  extends: 'foam.u2.View',// it will imports 'data'
-
   requires: [
     'foam.u2.DetailView',
-    'foam.u2.view.ColumnsConfigView'
+    'foam.u2.view.ColumnOptionsSelectConfig'
   ],
   properties: [
     {
@@ -45,55 +43,29 @@ foam.CLASS({
       name: 'of',
       hidden: true
     },
-    // {
-    //   class: 'FObjectArray',
-    //   of: 'foam.u2.view.ColumnConfig',
-    //   name: 'columns',
-    //   view: {
-    //     class: 'foam.u2.view.ColumnConfigView',
-    //     allColumns$: this.allColumns$
-    //   },
-    //   factory: function() {
-    //     var rtn = JSON.parse(localStorage.getItem(this.of.id))
-    //     if ( !rtn ) {
-    //       rtn = this.allColumns.map(([axiomName, overridesMap]) => {//what is overridesMap??? can't find
-    //         const axiom = this.of.getAxiomByName(axiomName);
-    //         if ( overridesMap ) axiom = axiom.clone().copyFrom(overridesMap);
-    //         return this.ColumnConfig.create({ of: this.of, axiom: axiom });
-    //       });
-    //     } else {
-    //       rtn = this.allColumns.map((axiomName) => {//what is overridesMap??? can't find
-    //         const axiom = this.of.getAxiomByName(axiomName);
-    //         return this.ColumnConfig.create({ of: this.of, axiom: axiom });
-    //       });
-    //     }
-        
-
-    //     // Sort columns alphabetically. This doesn't quite work since what we
-    //     // actually display is up to tableHeaderFormatter, which works directly
-    //     // with the view instead of returning a String, so there's no way for
-    //     // us to actually know what the user is going to see.
-    //     rtn.sort((l, r) => l.label < r.label ? -1 : 1);
-
-    //     return rtn;
-    //   }
-    // },
     {
-      class: 'Array',
-      name: 'allColumns',
-      hidden: true,
-      // view: {
-      //   class: 'foam.u2.view.ColumnsConfigView',
-      //   allColumns$: this.allColumns$
-      // }
+      name: 'columnsAvailable',
+      hidden: true
     },
-    'selectedColumns',
-    { 
-      name: 'isColumnChanged',
-      class: 'Boolean', 
-     // value: false
+    {
+      name: 'columns',
+      factory: function() {
+        var arr = [];
+        for (var i = 0; i < this.selectedColumnNames.length; i++) {
+          arr.push(this.ColumnOptionsSelectConfig.create({selectedColumns: this.selectedColumnNames[i], of:this.of, columnsAvailable:this.columnsAvailable}));
+        }
+        return arr;
+      },
+      view: {
+        class: 'foam.u2.view.FObjectArrayView',
+        of: 'foam.u2.view.ColumnOptionsSelectConfig',
+        valueView: 'foam.u2.view.ColumnConfigPropView'
+      }
     },
-        'view'
+    {
+      name: 'selectedColumnNames',
+      hidden: true
+    }
   ],
   // This shouldn't be needed.
   imports: [
@@ -114,12 +86,19 @@ foam.CLASS({
       }
     },
     {
-      name: 'resetAll',
+      name: 'add',
       code: function() {//fix to tableColumns
         this.columns.forEach(c => c.visibility = 'DEFAULT');
       },
       confirmationRequired: true
     },
+    // {
+    //   name: 'resetAll',
+    //   code: function() {//fix to tableColumns
+    //     this.columns.forEach(c => c.visibility = 'DEFAULT');
+    //   },
+    //   confirmationRequired: true
+    // },
     {
       name: 'save',
       code: function() {
@@ -133,15 +112,8 @@ foam.CLASS({
     }
   ],
   methods: [
-    function initE() {
-      this.data.isColumnChanged;
-
-      //this.data.isColumnChanged = !this.data.isColumnChanged;
-      this.add(foam.u2.ViewSpec.createView(this.ColumnsConfigView, {data$:this.data$}, this, this.__subSubContext__))//;//this.DetailView.create({ data: this });
-      .startContext({ data: this })
-        .add(this.CANCEL)
-        .add(this.SAVE)
-      .endContext();
+    function toE() {
+      return this.DetailView.create({ data: this });
     }
   ]
 });

@@ -342,7 +342,9 @@ foam.CLASS({
                       if ( ! view.stack ) return;
                       view.stack.push({
                         class: 'foam.u2.view.EditColumnsView',
-                        data: view
+                        of: view.of,
+                        columnsAvailable: view.allColumns,
+                        selectedColumnNames: view.selectedColumnNames
                       });
                     }).
                     tag(view.Image, { data: '/images/Icon_More_Resting.svg' }).
