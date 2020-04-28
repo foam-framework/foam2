@@ -179,6 +179,8 @@ foam.CLASS({
         if ( this.isPropertySelected) {
           this.rootProperty = this.updateRootProperty();
           this.columnOptions = this.updateOptionsProperty();
+          this.rootProperty.parentExpanded = false;
+          this.rootProperty.expanded = false;
           this.isPropertySelected = false;
         }
       }
@@ -242,10 +244,7 @@ foam.CLASS({
   listeners: [
     function toggleExpanded(e) {
       this.data.expanded = !this.data.expanded;
-      if ( !this.data.expanded && !(this.data.hasSubProperties || this.data.hasOtherOptions)) {
-        if ( !this.data.hasSubProperties ) {
-          this.data.parentExpanded = !this.data.parentExpanded;
-        }
+      if ( ( !this.data.expanded && this.data.hasOtherOptions ) || ( !this.data.hasSubProperties && !this.data.hasOtherOptions ) ) {
         this.data.isPropertySelected = true;
       }
     }
@@ -358,7 +357,11 @@ foam.CLASS({
     {
       name: 'parentExpanded',
       class: 'Boolean',
-      value: false
+      value: false,
+      postSet: function() {
+        if ( !this.parentExpanded )
+          this.expanded = false;
+      }
     },
     {
       name: 'expanded',

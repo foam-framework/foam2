@@ -80,22 +80,13 @@ foam.CLASS({
     {
       name: 'allColumns',
       expression: function(of) {
-        var x = [].concat(
-          of.getAxiomsByClass(foam.core.Property)
-            .filter(p => p.tableCellFormatter && ! p.hidden)
-            .map(a => [a.name]),
-          of.getAxiomsByClass(foam.core.Action)
-            .map(a => [a.name])
-        );
-        var y = !of ? [] : [].concat(
+        return !of ? [] : [].concat(
           of.getAxiomsByClass(foam.core.Property)
             .filter(p => p.tableCellFormatter && ! p.hidden)
             .map(a => a.name),
           of.getAxiomsByClass(foam.core.Action)
             .map(a => a.name)
         );
-        console.log(y);
-        return y;
       }
     },
     {
