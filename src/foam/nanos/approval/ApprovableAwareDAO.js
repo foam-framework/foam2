@@ -166,8 +166,7 @@ foam.CLASS({
       DAO approvalRequestDAO = (DAO) x.get("approvalRequestDAO");
       DAO dao = (DAO) x.get(getDaoKey());
 
-      ApprovableAware approvableAwareObj = (ApprovableAware) obj;
-      FObject currentObjectInDAO = (FObject) dao.find(approvableAwareObj.getStringId());
+      FObject currentObjectInDAO = (FObject) dao.find(String.valueOf(obj.getProperty("id")));
       
       if ( ! getIsEnabled() ){
         if ( lifecycleObj.getLifecycleState() == LifecycleState.PENDING && currentObjectInDAO == null ){
@@ -208,13 +207,12 @@ foam.CLASS({
       };
 
       if ( operation == Operations.REMOVE ) {
-        approvableAwareObj = (ApprovableAware) currentObjectInDAO;
 
         DAO filteredApprovalRequestDAO = (DAO) approvalRequestDAO
           .where(
             foam.mlang.MLang.AND(
               foam.mlang.MLang.EQ(ApprovalRequest.DAO_KEY, getDaoKey()),
-              foam.mlang.MLang.EQ(ApprovalRequest.OBJ_ID, approvableAwareObj.getStringId()),
+              foam.mlang.MLang.EQ(ApprovalRequest.OBJ_ID, String.valueOf(obj.getProperty("id"))),
               foam.mlang.MLang.EQ(ApprovalRequest.CREATED_BY, user.getId()),
               foam.mlang.MLang.EQ(ApprovalRequest.OPERATION, Operations.REMOVE),
               foam.mlang.MLang.EQ(ApprovalRequest.IS_FULFILLED, false)
@@ -264,7 +262,7 @@ foam.CLASS({
 
         ApprovalRequest approvalRequest = new ApprovalRequest.Builder(x)
           .setDaoKey(getDaoKey())
-          .setObjId(approvableAwareObj.getStringId())
+          .setObjId(String.valueOf(obj.getProperty("id")))
           .setClassification(getOf().getObjClass().getSimpleName())
           .setOperation(Operations.REMOVE)
           .setCreatedBy(user.getId())
@@ -339,7 +337,7 @@ foam.CLASS({
           ApprovalRequest approvalRequest = new ApprovalRequest.Builder(x)
             .setDaoKey(getDaoKey())
             .setApprovableHashKey(ApprovableAware.getApprovableHashKey(x, obj, Operations.CREATE))
-            .setObjId(approvableAwareObj.getStringId())
+            .setObjId(String.valueOf(obj.getProperty("id")))
             .setClassification(getOf().getObjClass().getSimpleName())
             .setOperation(Operations.CREATE)
             .setCreatedBy(user.getId())
@@ -394,7 +392,7 @@ foam.CLASS({
         String hashedId = new StringBuilder("d")
           .append(getDaoKey())
           .append(":o")
-          .append(approvableAwareObj.getStringId())
+          .append(String.valueOf(obj.getProperty("id")))
           .toString();
 
         String approvableHashKey = ApprovableAware.getApprovableHashKey(x, obj, Operations.UPDATE);
@@ -457,7 +455,7 @@ foam.CLASS({
           .setId(hashedId)
           .setDaoKey(getDaoKey())
           .setStatus(ApprovalStatus.REQUESTED)
-          .setObjId(approvableAwareObj.getStringId())
+          .setObjId(String.valueOf(obj.getProperty("id")))
           .setPropertiesToUpdate(updatedProperties).build());
 
         ApprovalRequest approvalRequest = new ApprovalRequest.Builder(x)
