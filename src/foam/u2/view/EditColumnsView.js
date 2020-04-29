@@ -56,10 +56,13 @@ foam.CLASS({
         }
         return arr;
       },
-      view: {
-        class: 'foam.u2.view.FObjectArrayView',
-        of: 'foam.u2.view.ColumnOptionsSelectConfig',
-        valueView: 'foam.u2.view.ColumnConfigPropView'
+      view: function(_, X) {
+        return {
+          class: 'foam.u2.view.FObjectArrayView',
+          of: 'foam.u2.view.ColumnOptionsSelectConfig',
+          valueView: 'foam.u2.view.ColumnConfigPropView',
+          defaultNewItem: foam.u2.view.ColumnOptionsSelectConfig.create({selectedColumns:[], of:X.data.of, columnsAvailable:X.data.columnsAvailable })
+        };
       }
     },
     {
@@ -86,26 +89,20 @@ foam.CLASS({
       }
     },
     {
-      name: 'add',
-      code: function() {//fix to tableColumns
-        this.columns.forEach(c => c.visibility = 'DEFAULT');
-      },
-      confirmationRequired: true
+      name: 'isColumnChanged',
     },
-    // {
-    //   name: 'resetAll',
-    //   code: function() {//fix to tableColumns
-    //     this.columns.forEach(c => c.visibility = 'DEFAULT');
-    //   },
-    //   confirmationRequired: true
-    // },
     {
       name: 'save',
       code: function() {
+        var selectedColumns = [];
+        for ( var i = 0; i < this.columns.length; i++ ) {
+          if ( this.columns[i].selectedColumns.length != 0)
+            selectedColumns.push(this.columns[i].selectedColumns);
+        }
         // if ( this.view.isColumnChanged ) {
-          localStorage.removeItem(this.data.of.id);
-          localStorage.setItem(this.data.of.id, JSON.stringify(this.data.selectedColumnNames));
-          this.data.isColumnChanged = !this.data.isColumnChanged;
+          localStorage.removeItem(this.of.id);
+          localStorage.setItem(this.of.id, JSON.stringify(this.selectedColumnNames));
+          this.isColumnChanged = !this.isColumnChanged;
         // }
         this.stack.back();
       }
