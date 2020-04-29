@@ -20,6 +20,7 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
+    'foam.nanos.pm.PM',
     'java.util.HashMap',
     'java.util.Map'
   ],
@@ -162,6 +163,7 @@ foam.CLASS({
         }
       ],
       javaCode: `
+    String pmName = getDetails().getResponder()+":"+getDetails().getRequester();
     try {
       while ( ! getComplete() ||
               getCount() < getDetails().getCount() ||
@@ -183,7 +185,9 @@ foam.CLASS({
           cmd.setFromIndex(getFrom());
           cmd.setToIndex(getTo());
           cmd.setBatch(batch);
+          PM pm = createPM(x, pmName);
           getDao().cmd_(x, cmd);
+          pm.log(x);
           // TODO - process results
         }
 
@@ -202,6 +206,23 @@ foam.CLASS({
       getLogger().error(t);
     }
       `
-    }
+    },
+    {
+      name: 'createPM',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'name',
+          type: 'String',
+        }
+      ],
+      javaType: 'PM',
+      javaCode: `
+      return PM.create(x, this.getOwnClassInfo(), name);
+      `
+    },
   ]
 });

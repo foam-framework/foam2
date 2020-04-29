@@ -155,7 +155,7 @@ NOTE: override cmd_ in child class to control delegate call`,
         } else {
           getLogger().debug("send", "agency");
           setAgent(this);
-          ((Agency) x.get(getThreadPoolName())).submit(x, this, this.getClass().getSimpleName());
+          ((Agency) x.get(getThreadPoolName())).submit(x, this, "client");
         }
       }
       `

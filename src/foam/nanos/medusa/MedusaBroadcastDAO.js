@@ -8,20 +8,20 @@ foam.CLASS({
   package: 'foam.nanos.medusa',
   name: 'MedusaBroadcastDAO',
   extends: 'foam.dao.BatchClientDAO',
-//  extends: 'foam.dao.ProxyDAO',
 
-  documentation: `Broadcast MedusaEntrys back to Mediators.`,
+  documentation: `Broadcast MedusaEntry back to Mediators.`,
 
   javaImports: [
     'foam.core.FObject',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.dao.DOP',
-    'foam.nanos.logger.PrefixLogger',
-    'foam.nanos.logger.Logger',
     'static foam.mlang.MLang.AND',
     'static foam.mlang.MLang.EQ',
     'static foam.mlang.MLang.OR',
+    'foam.nanos.logger.PrefixLogger',
+    'foam.nanos.logger.Logger',
+    'foam.nanos.pm.PM',
     'java.util.ArrayList',
     'java.util.HashMap',
     'java.util.List',
@@ -33,7 +33,7 @@ foam.CLASS({
       class: 'Object',
       name: 'line',
       javaType: 'foam.util.concurrent.AssemblyLine',
-      javaFactory: 'return new foam.util.concurrent.AsyncAssemblyLine(getX());'
+      javaFactory: 'return new foam.util.concurrent.AsyncAssemblyLine(getX(), this.getClass().getSimpleName());'
     },
     {
       name: 'clients',
@@ -59,6 +59,12 @@ foam.CLASS({
   ],
   
   methods: [
+    {
+      name: 'init_',
+      javaCode: `
+      
+      `
+    },
     {
       documentation: 'Using assembly line, write to all online mediators in zone 0 and same realm,region',
       name: 'put_',
@@ -94,6 +100,8 @@ foam.CLASS({
       ],
       type: 'Object',
       javaCode: `
+      PM pm = createPM(x, dop.getLabel());
+      try {
       getLogger().debug("submit", dop.getLabel(), obj.getClass().getSimpleName());
 
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
@@ -119,17 +127,12 @@ foam.CLASS({
         getLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
           public void executeJob() {
             try {
-              // TODO: clear map onDAOUpdate, this doesn't cache miss.
-//              DAO dao = (DAO) getClients().get(config.getId());
-//              if ( dao == null ) {
-                DAO clientDAO = support.getClientDAO(x, "medusaConsensusDAO", myConfig, config);
-                DAO dao = new RetryClientSinkDAO.Builder(x)
-                        .setDelegate(clientDAO)
-                        .setMaxRetryAttempts(support.getMaxRetryAttempts())
-                        .setMaxRetryDelay(support.getMaxRetryDelay())
-                        .build();
-//                getClients().put(config.getId(), dao);
-//              }
+              DAO clientDAO = support.getClientDAO(x, "medusaConsensusDAO", myConfig, config);
+              DAO dao = new RetryClientSinkDAO.Builder(x)
+                          .setDelegate(clientDAO)
+                          .setMaxRetryAttempts(support.getMaxRetryAttempts())
+                          .setMaxRetryDelay(support.getMaxRetryDelay())
+                          .build();
               if ( DOP.PUT == dop ) {
                 MedusaEntry entry = (MedusaEntry) obj;
                 getLogger().debug("submit", dop.getLabel(), entry.getIndex(), config.getName(), "data", (entry.getData() != null) ? entry.getData().getClass().getSimpleName():"null");
@@ -145,6 +148,26 @@ foam.CLASS({
         });
       }
       return obj;
+      } finally {
+        pm.log(x);
+      }
+      `
+    },
+    {
+      name: 'createPM',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'name',
+          type: 'String'
+        }
+      ],
+      javaType: 'PM',
+      javaCode: `
+      return PM.create(x, this.getOwnClassInfo(), name);
       `
     },
     {

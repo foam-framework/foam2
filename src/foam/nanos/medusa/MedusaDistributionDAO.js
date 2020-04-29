@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'MedusaDistributionDAO',
   extends: 'foam.dao.BatchClientDAO',
 
-  documentation: `Write MedusaEntry to the Medusa Nodes`,
+  documentation: `Distribute MedusaEntry to the Medusa Nodes`,
 
   javaImports: [
     'foam.dao.ArraySink',
@@ -31,7 +31,7 @@ foam.CLASS({
       class: 'Object',
       name: 'line',
       javaType: 'foam.util.concurrent.AssemblyLine',
-      javaFactory: 'return new foam.util.concurrent.AsyncAssemblyLine(getX());'
+      javaFactory: 'return new foam.util.concurrent.AsyncAssemblyLine(getX(), this.getClass().getSimpleName());'
     },
     {
       name: 'clients',

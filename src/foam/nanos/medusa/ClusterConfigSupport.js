@@ -122,7 +122,7 @@ configuration for contacting the primary node.`,
       value: 1000
     },
     {
-      name: 'primaryDAOs',
+      name: 'clients',
       class: 'Map',
       visibility: 'HIDDEN',
       javaFactory: 'return new java.util.HashMap();'
@@ -251,14 +251,7 @@ configuration for contacting the primary node.`,
       ],
       type: 'foam.dao.DAO',
       javaCode: `
-        DAO dao = (DAO) getPrimaryDAOs().get(serviceName);
-        if ( dao == null ) {
-         ClusterConfig primaryConfig = getPrimary(x);
-          ClusterConfig config = getConfig(x, getConfigId());
-          dao = getClientDAO(x, serviceName, config, primaryConfig);
-          getPrimaryDAOs().put(serviceName, dao);
-        }
-        return dao;
+      return getClientDAO(x, serviceName, getConfig(x, getConfigId()), getPrimary(x));
       `
     },
     {
@@ -409,27 +402,6 @@ configuration for contacting the primary node.`,
         config.getZone() == 0L;
       `
     },
-    // {
-    //   name: 'getMediatorCount',
-    //   args: [
-    //     {
-    //       name: 'x',
-    //       type: 'Context'
-    //     }
-    //   ],
-    //   type: 'Integer',
-    //   javaCode: `
-    //   Count count = (Count) ((DAO) x.get("localClusterConfigDAO"))
-    //     .where(
-    //       AND(
-    //         EQ(ClusterConfig.ZONE, 0),
-    //         EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
-    //         EQ(ClusterConfig.ENABLED, true)
-    //       ))
-    //     .select(COUNT());
-    //   return ((Long)count.getValue()).intValue();
-    //   `
-    // },
     {
       name: 'getMediatorQuorum',
       args: [
@@ -457,27 +429,6 @@ configuration for contacting the primary node.`,
       return getVoters(x).size() >= getMediatorQuorum(x);
       `
     },
-    // {
-    //   name: 'getNodeCount',
-    //   args: [
-    //     {
-    //       name: 'x',
-    //       type: 'Context'
-    //     }
-    //   ],
-    //   type: 'Integer',
-    //   javaCode: `
-    //   Count count = (Count) ((DAO) x.get("localClusterConfigDAO"))
-    //     .where(
-    //       AND(
-    //         EQ(ClusterConfig.ZONE, 0),
-    //         EQ(ClusterConfig.TYPE, MedusaType.NODE),
-    //         EQ(ClusterConfig.ENABLED, true)
-    //       ))
-    //     .select(COUNT());
-    //   return ((Long)count.getValue()).intValue();
-    //   `
-    // },
     {
       name: 'getNodeQuorum',
       args: [
@@ -536,12 +487,23 @@ configuration for contacting the primary node.`,
         }
       ],
       javaCode: `
-      return new ClientDAO.Builder(x)
+      StringBuilder sb = new StringBuilder();
+      sb.append(sendClusterConfig.getName());
+      sb.append(":");
+      sb.append(serviceName);
+      sb.append(":");
+      sb.append(receiveClusterConfig.getName());
+      String id = sb.toString();
+      DAO client = (DAO) getClients().get(id);
+      if ( client != null ) {
+        return client;
+      }
+      client = new ClientDAO.Builder(x)
         .setDelegate(new SessionClientBox.Builder(x)
           .setSessionID(sendClusterConfig.getSessionId())
           .setDelegate(new PMBox.Builder(x)
             .setClassType(MedusaEntry.getOwnClassInfo())
-            .setName("ClientDAO:"+sendClusterConfig.getName()+":"+getServiceName() +":"+receiveClusterConfig.getName())
+            .setName("ClientDAO:"+id)
             .setDelegate(new ClusterHTTPBox.Builder(x)
               .setAuthorizationType(foam.box.HTTPAuthorizationType.BEARER)
               .setSessionID(sendClusterConfig.getSessionId())
@@ -550,6 +512,8 @@ configuration for contacting the primary node.`,
             .build())
           .build())
         .build();
+      getClients().put(id, client);
+      return client;
       `
     },
     {
@@ -591,6 +555,7 @@ configuration for contacting the primary node.`,
       getLogger().debug("mdao", name);
       Object obj = getMdaos().get(name);
       DAO dao;
+// REVIEW: periodically the result returned from get is a Map.
 //      DAO dao = (DAO) getMdaos().get(name);
 //      if ( dao != null ) {
       if ( obj != null &&

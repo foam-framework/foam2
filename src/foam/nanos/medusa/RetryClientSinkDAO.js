@@ -22,6 +22,16 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'name',
+      class: 'String',
+      javaFactory: `
+      if ( getDelegate() != null ) {
+        return getDelegate().getOf().getId();
+      }
+      return this.getClass().getSimpleName();
+      `
+    },
+    {
       name: 'maxRetryAttempts',
       class: 'Int',
       documentation: 'Set to -1 to infinitely retry.',
