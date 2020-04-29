@@ -169,6 +169,7 @@ var classes = [
   'foam.mlang.sink.Count',
   'foam.mlang.sink.Max',
   'foam.mlang.sink.Min',
+  'foam.mlang.sink.Projection',
   'foam.mlang.sink.Sum',
   'foam.mlang.sink.Average',
   'foam.mlang.sink.Map',

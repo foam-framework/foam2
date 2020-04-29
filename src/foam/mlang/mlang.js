@@ -59,7 +59,7 @@ foam.CLASS({
       class: 'Array',
       type: 'foam.dao.Sink[]',
       name: 'args'
-    },
+    }
   ],
 
   methods: [
@@ -2443,7 +2443,7 @@ foam.CLASS({
     },
 
     function toString() {
-      return 'MAP(' + this.arg1.toString() + ')';
+      return 'MAP(' + this.arg1.toString() + ',' + this.f.toString() + ')';
     }
   ]
 });
@@ -2647,9 +2647,52 @@ return clone;`
 
 foam.CLASS({
   package: 'foam.mlang.sink',
+  name: 'Projection',
+  extends: 'foam.dao.AbstractSink',
+  implements: [ 'foam.core.Serializable' ],
+
+  properties: [
+    {
+      class: 'Array',
+      type: 'foam.mlang.Expr[]',
+      name: 'exprs'
+    },
+    {
+      class: 'List',
+      name: 'array',
+      factory: function() { return []; },
+      javaFactory: `return new java.util.ArrayList();`
+    }
+  ],
+
+  methods: [
+    {
+      name: 'put',
+      code: function put(o, sub) {
+        var a = [];
+        for ( var i = 0 ; i < this.exprs.length ; i++ )
+          a[i] = this.exprs[i].f(o);
+        this.array.push(a);
+      },
+// TODO:      swiftCode: 'array.append(obj)',
+      javaCode: `
+        Object[] a = new Object[getExprs().length];
+
+        for ( int i = 0 ; i < getExprs().length ; i++ )
+          a[i] = getExprs()[i].f(obj);
+        this.getArray().add(a);
+      `
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.mlang.sink',
   name: 'Plot',
   extends: 'foam.dao.AbstractSink',
   implements: [ 'foam.core.Serializable' ],
+
   properties: [
     {
       class: 'foam.mlang.ExprArrayProperty',
@@ -3342,6 +3385,7 @@ foam.CLASS({
     'foam.mlang.sink.Map',
     'foam.mlang.sink.Max',
     'foam.mlang.sink.Min',
+    'foam.mlang.sink.Projection',
     'foam.mlang.sink.Plot',
     'foam.mlang.sink.Sequence',
     'foam.mlang.sink.Sum',
@@ -3411,6 +3455,13 @@ foam.CLASS({
     function MUX(cond, a, b) { return this.Mux.create({ cond: cond, a: a, b: b }); },
     function PARTITION_BY(arg1, delegate) { return this.Partition.create({ arg1: arg1, delegate: delegate }); },
     function SEQ() { return this._nary_("Sequence", arguments); },
+    function PROJECTION(exprs) {
+      return this.Projection.create({
+        exprs: foam.Array.isInstance(exprs) ?
+          exprs :
+          foam.Array.clone(arguments)
+        });
+    },
     function REG_EXP(arg1, regExp) { return this.RegExp.create({ arg1: arg1, regExp: regExp }); },
     {
       name: 'DESC',
