@@ -390,10 +390,8 @@
         var X = this.ctrl.__subContext__;
 
         if ( ! X[key] ) {
-          // TODO: Remove check for bareUserDAO when it is removed and replaced with localUserDAO
-          if ( key.startsWith('bare') ) {
-            key = key.replace('bare', '');
-            key = key.charAt(0).toLowerCase() + key.slice(1);
+          if ( key == 'bareUserDAO' ) {
+            key = 'userDAO';
           }
           if ( key.startsWith('local') ) {
             key = key.replace('local', '');
