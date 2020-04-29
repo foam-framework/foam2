@@ -57,7 +57,7 @@ extends ProxyDAO {
       .build();
     //notification.setEmailName("future email template name"); !!! PROPER WAY TO SET EMAIL TEMPLATE (when it is done) !!!
     //notification.setEmailArgs(MAP_GOES_HERE); !!! PROPER WAY TO SET EMAIL ARGS FOR TEMPLATE !!!
-    ret.getApprover().doNotify(x, notification);
+    ret.findApprover(x).doNotify(x, notification);
     return ret;
   }
 
