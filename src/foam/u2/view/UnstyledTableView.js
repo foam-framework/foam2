@@ -72,7 +72,7 @@ foam.CLASS({
       name: 'columns_',
       expression: function(columns, of, editColumnsEnabled, selectedColumnNames, isColumnChanged) {
         if ( ! of ) return [];
-        if ( ! editColumnsEnabled ) return columns;
+        if ( ! editColumnsEnabled ) return columns.map(c => Array.isArray(c) ? [c, null] : [[c], null]);
 
         return selectedColumnNames.map(c => Array.isArray(c) ? [c, null] : [[c], null]);
       },
