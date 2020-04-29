@@ -66,7 +66,7 @@ foam.CLASS({
           class: 'foam.u2.view.FObjectArrayView',
           of: 'foam.u2.view.ColumnOptionsSelectConfig',
           valueView: 'foam.u2.view.ColumnConfigPropView',
-          defaultNewItem: foam.u2.view.ColumnOptionsSelectConfig.create({selectedColumns:[], of:X.data.of, columnsAvailable:X.data.columnsAvailable, labels:this.labels })
+          defaultNewItem: foam.u2.view.ColumnOptionsSelectConfig.create({selectedColumns:[], of:X.data.of, columnsAvailable:X.data.columnsAvailable, labels:X.data.labels })
         };
       }
     },
