@@ -57,7 +57,7 @@ foam.CLASS({
       factory: function() {
         var arr = [];
         for (var i = 0; i < this.selectedColumnNames.length; i++) {
-          arr.push(this.ColumnOptionsSelectConfig.create({selectedColumns: this.selectedColumnNames[i], of:this.of, columnsAvailable:this.columnsAvailable}));
+          arr.push(this.ColumnOptionsSelectConfig.create({selectedColumns: this.selectedColumnNames[i], of:this.of, columnsAvailable:this.columnsAvailable, labels:this.labels }));
         }
         return arr;
       },
@@ -66,8 +66,20 @@ foam.CLASS({
           class: 'foam.u2.view.FObjectArrayView',
           of: 'foam.u2.view.ColumnOptionsSelectConfig',
           valueView: 'foam.u2.view.ColumnConfigPropView',
-          defaultNewItem: foam.u2.view.ColumnOptionsSelectConfig.create({selectedColumns:[], of:X.data.of, columnsAvailable:X.data.columnsAvailable })
+          defaultNewItem: foam.u2.view.ColumnOptionsSelectConfig.create({selectedColumns:[], of:X.data.of, columnsAvailable:X.data.columnsAvailable, labels:this.labels })
         };
+      }
+    },
+    {
+      name: 'labels',
+      hidden: true,
+      factory: function() {
+        var arr = [];
+        for ( var i = 0; i < this.columnsAvailable.length; i++ ) {
+          var p = this.of.getAxiomByName(this.columnsAvailable[i]);
+          arr.push([p.name, p.label ? p.label : p.name]);
+        }
+        return arr;
       }
     },
     {
