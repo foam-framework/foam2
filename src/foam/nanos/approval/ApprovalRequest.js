@@ -390,9 +390,6 @@
         var X = this.ctrl.__subContext__;
 
         if ( ! X[key] ) {
-          if ( key == 'bareUserDAO' ) {
-            key = 'userDAO';
-          }
           if ( key.startsWith('local') ) {
             key = key.replace('local', '');
             key = key.charAt(0).toLowerCase() + key.slice(1);
