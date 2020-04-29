@@ -22,6 +22,12 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Array',
+      name: 'useSections',
+      documentation: `Predefined list of sections alternative to default behaviour
+          where all sections of class and parent classes are used.`
+    },
+    {
       class: 'FObjectProperty',
       name: 'data',
       factory: function() {
@@ -75,7 +81,9 @@ foam.CLASS({
       expression: function(of) {
         if ( ! of ) return [];
 
-        sections = of.getAxiomsByClass(this.SectionAxiom)
+        var selectSections = of.getAxiomsByClass(this.SectionAxiom);
+        if ( this.useSections.length ) selectSections = selectSections.filter((a) => this.useSections.includes(a.name));
+        sections = Array.from(selectSections)
           // Why not Section.AXIOM.ORDER on next line?
           .sort((a, b) => a.order - b.order)
           .map((a) => this.Section.create().fromSectionAxiom(a, of));
