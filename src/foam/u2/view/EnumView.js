@@ -19,7 +19,7 @@ foam.CLASS({
   properties: [
     {
       name: 'readView',
-      value: { class: 'foam.u2.CitationView' }
+      value: { class: 'foam.u2.view.ReadOnlyEnumView' }
     },
     {
       name: 'writeView',

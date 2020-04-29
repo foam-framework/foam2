@@ -1,18 +1,7 @@
 /**
  * @license
- * Copyright 2014 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2014 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 /** Collision detection manager. **/
@@ -43,6 +32,16 @@ foam.CLASS({
       name: 'stopped_',
       value: true,
       hidden: true
+    },
+    {
+      class: 'Boolean',
+      name: 'colliding_',
+      hidden: true
+    },
+    {
+      name: 'removedChildren_',
+      factory: function() { return []; },
+      hidden: true
     }
   ],
 
@@ -66,10 +65,10 @@ foam.CLASS({
 
     function detectCollisions() {
       /* implicit k-d-tree divide-and-conquer algorithm */
-      this.detectCollisions_(0, this.children.length-1, 'x', false, '');
+      this.detectCollisions_(0, this.children.length-1, 'x', false);
 
       // simpler and less efficient version, use to debug above
-      // this.detectCollisions__(0, this.children.length-1, 'x', false, '');
+      // this.detectCollisions__(0, this.children.length-1, 'x', false);
     },
 
     function detectCollisions__(start, end) {
@@ -78,26 +77,19 @@ foam.CLASS({
         once data is partitioned.
       */
       var cs = this.children;
-      for ( var i = start ; i <= end ; i++ ) {
+      for ( var i = start ; i < end ; i++ ) {
         var c1 = cs[i];
-        if ( c1 == null ) break;
         for ( var j = i+1 ; j <= end ; j++ ) {
           var c2 = cs[j];
-          if ( c2 == null ) break;
-          try {
-            if ( c1.intersects && c1.intersects(c2) ) this.collide(c1, c2);
-          } catch (x) {
-            console.warn('Exception in collider', x);
-          }
+          if ( c1.intersects && c1.intersects(c2) ) this.collide(c1, c2);
         }
       }
     },
 
     function choosePivot(start, end, axis) {
       var cs = this.children;
-      while ( end && ! cs[end] ) end--;
       axis = axis + '_';
-      var p = 0, n = end-start;
+      var p = 0, n = end-start+1;
       for ( var i = start ; i <= end ; i++ ) p += cs[i][axis] / n;
       return p;
     },
@@ -105,55 +97,61 @@ foam.CLASS({
     function detectCollisions_(start, end, axis, oneD) {
       if ( start >= end ) return;
 
-      try {
-        var cs       = this.children;
-        var pivot    = this.choosePivot(start, end, axis);
-        var nextAxis = oneD ? axis : axis === 'x' ? 'y' : 'x' ;
+      /*
+      I think some collisions are missed, and adding this code makes it worse.
 
-        var p = start;
-        for ( var i = start ; i <= end ; i++ ) {
+      if ( end - start < 10 ) {
+        this.detectCollisions__(start, end);
+        return;
+      }
+      */
+
+      var cs       = this.children;
+      var pivot    = this.choosePivot(start, end, axis);
+      var nextAxis = oneD ? axis : axis === 'x' ? 'y' : 'x' ;
+
+      var p = start; // pivot, all values left of 'p' are in first half
+      for ( var i = start ; i <= end ; i++ ) {
+        var c = cs[i];
+        if ( c[axis == 'x' ? 'left_' : 'top_'] < pivot ) {
+          var t = cs[p];
+          cs[p] = c;
+          cs[i] = t;
+          p++;
+        }
+      }
+
+      // If all values are in first half
+      if ( p === end + 1 ) {
+        if ( oneD ) {
+          // switch to simple detection if already 1-dimensional
+          this.detectCollisions__(start, end);
+        } else {
+          // switch to one dimensional search
+          this.detectCollisions_(start, end, nextAxis, true);
+        }
+      } else {
+        this.detectCollisions_(start, p-1, nextAxis, oneD);
+
+        p--;
+        for ( var i = p ; i >= start ; i-- ) {
           var c = cs[i];
-          if ( c[axis == 'x' ? 'left_' : 'top_']  < pivot ) {
+          if ( c[axis == 'x' ? 'right_' : 'bottom_'] > pivot ) {
             var t = cs[p];
             cs[p] = c;
             cs[i] = t;
-            p++;
+            p--;
           }
         }
-
-        if ( p === end + 1 ) {
+        if ( p === start-1 ) {
           if ( oneD ) {
             this.detectCollisions__(start, end);
           } else {
             this.detectCollisions_(start, end, nextAxis, true);
           }
         } else {
-          this.detectCollisions_(start, p-1, nextAxis, oneD);
-
-          p--;
-          for ( var i = p ; i >= start ; i-- ) {
-            var c = cs[i];
-            if ( c[axis == 'x' ? 'right_' : 'bottom_'] > pivot ) {
-              var t = cs[p];
-              cs[p] = c;
-              cs[i] = t;
-              p--;
-            }
-          }
-          if ( p === start-1 ) {
-            if ( oneD ) {
-              this.detectCollisions__(start, end);
-            } else {
-              this.detectCollisions_(start, end, nextAxis, true);
-            }
-          } else {
-            this.detectCollisions_(p+1, end, nextAxis, oneD);
-          }
+          this.detectCollisions_(p+1, end, nextAxis, oneD);
         }
-      } catch (x) {
-        // some collisions might result in the object being
-        // removed which could cause a NPE, so don't worry
-        // about it
       }
     },
 
@@ -213,8 +211,12 @@ foam.CLASS({
     },
 
     function remove() {
-      for ( var i = 0 ; i < arguments.length ; i++ ) {
-        foam.Array.remove(this.children, arguments[i]);
+      if ( this.colliding_ ) {
+        this.removedChildren_.push.apply(this.removedChildren_, arguments);
+      } else {
+        for ( var i = 0 ; i < arguments.length ; i++ ) {
+          foam.Array.remove(this.children, arguments[i]);
+        }
       }
       return this;
     },
@@ -247,8 +249,18 @@ foam.CLASS({
       isFramed: true,
       code: function tick() {
         if ( this.stopped_ ) return;
-        this.onTick.pub();
-        this.detectCollisions();
+
+        this.colliding_ = true;
+          this.onTick.pub();
+          this.detectCollisions();
+        this.colliding_ = false;
+
+        // Now remove all children that were requested to be removed
+        // while detecting collisions. We don't remove while colliding
+        // because it messes up the children array causing errors.
+        this.remove.apply(this, this.removedChildren_);
+        this.removedChildren_.length = 0;
+
         this.updateChildren();
 
         this.tick();
