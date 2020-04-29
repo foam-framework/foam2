@@ -5,7 +5,6 @@ p({
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.approval.ApprovalRequest.getOwnClassInfo())
-      .setAuthorize(true)
       .setAuthorizer(new foam.nanos.approval.AuthenticatedApprovalDAOAuthorizer())
       .setPm(true)
       .setPipelinePm(true)
