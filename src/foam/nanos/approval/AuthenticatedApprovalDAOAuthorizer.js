@@ -30,7 +30,7 @@ foam.CLASS({
       javaCode: `
         AuthService authService = (AuthService) x.get("auth");
         Long userId = ((User) x.get("user")).getId();
-        if ( ! authService.check(x, "approval.create") && ! SafetyUtil.equals(((ApprovalRequest) obj).getApprover(), userId) ) {
+        if ( ! authService.check(x, "approval.create") ) {
           throw new AuthorizationException();
         }
       `
