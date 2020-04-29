@@ -24,8 +24,8 @@ foam.CLASS({
     {
       class: 'Array',
       name: 'useSections',
-      documentation: `Predefined list of sections alternative to default behaviour
-          where all sections of class and parent classes are used.`
+      documentation: `List of sections to be used in section detail view. Set if you would like to
+          filter section list, alternative to default behaviour where all sections of class and parent classes are used.`
     },
     {
       class: 'FObjectProperty',
