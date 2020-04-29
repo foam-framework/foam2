@@ -79,7 +79,13 @@ foam.CLASS({
           var p = this.of.getAxiomByName(this.columnsAvailable[i]);
           arr.push([p.name, p.label ? p.label : p.name]);
         }
-        return arr;
+        return arr.sort((a, b) => {
+        if (a[1].toLowerCase() < b[1].toLowerCase())
+          return -1;
+        if (a[1].toLowerCase() > b[1].toLowerCase())
+          return 1;      
+        return 0;
+      });
       }
     },
     {
