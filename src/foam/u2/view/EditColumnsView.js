@@ -44,6 +44,11 @@ foam.CLASS({
       hidden: true
     },
     {
+      name: 'isColumnChanged',
+      class: 'Boolean',
+      hidden:true
+    },
+    {
       name: 'columnsAvailable',
       hidden: true
     },
@@ -89,9 +94,6 @@ foam.CLASS({
       }
     },
     {
-      name: 'isColumnChanged',
-    },
-    {
       name: 'save',
       code: function() {
         var selectedColumns = [];
@@ -101,7 +103,7 @@ foam.CLASS({
         }
         // if ( this.view.isColumnChanged ) {
           localStorage.removeItem(this.of.id);
-          localStorage.setItem(this.of.id, JSON.stringify(this.selectedColumnNames));
+          localStorage.setItem(this.of.id, JSON.stringify(selectedColumns));
           this.isColumnChanged = !this.isColumnChanged;
         // }
         this.stack.back();
