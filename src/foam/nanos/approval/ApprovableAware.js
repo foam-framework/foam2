@@ -51,6 +51,8 @@
                 logger.error("Error instantiating : ", obj.getClass().getSimpleName(), e);
               }
 
+              // convert hashmap of the diff to a treemap to avoid inconsistencies
+              // in the order when building the hashkey
               Map diffHashmap = oldObj == null ? null : oldObj.diff(obj);
               TreeMap diff = null;
               if ( diffHashmap != null ) {
