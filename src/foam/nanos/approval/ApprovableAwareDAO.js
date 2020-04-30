@@ -389,13 +389,16 @@ foam.CLASS({
           return obj;
         }
 
+        String approvableHashKey = ApprovableAware.getApprovableHashKey(x, obj, Operations.UPDATE);
+
         String hashedId = new StringBuilder("d")
           .append(getDaoKey())
           .append(":o")
           .append(String.valueOf(obj.getProperty("id")))
+          .append(":h")
+          .append(String.valueOf(approvableHashKey))
           .toString();
 
-        String approvableHashKey = ApprovableAware.getApprovableHashKey(x, obj, Operations.UPDATE);
         DAO approvableDAO = (DAO) x.get("approvableDAO");
 
         DAO filteredApprovalRequestDAO = (DAO) approvalRequestDAO
@@ -403,7 +406,6 @@ foam.CLASS({
             foam.mlang.MLang.AND(
               foam.mlang.MLang.EQ(ApprovalRequest.DAO_KEY, "approvableDAO"),
               foam.mlang.MLang.EQ(ApprovalRequest.OBJ_ID, hashedId),
-              foam.mlang.MLang.EQ(ApprovalRequest.APPROVABLE_HASH_KEY, approvableHashKey),
               foam.mlang.MLang.EQ(ApprovalRequest.CREATED_BY, user.getId()),
               foam.mlang.MLang.EQ(ApprovalRequest.OPERATION, Operations.UPDATE),
               foam.mlang.MLang.EQ(ApprovalRequest.IS_FULFILLED, false)
@@ -452,7 +454,7 @@ foam.CLASS({
         }
 
         Approvable approvable = (Approvable) approvableDAO.put_(x, new Approvable.Builder(x)
-          .setId(hashedId)
+          .setLookupId(hashedId)
           .setDaoKey(getDaoKey())
           .setStatus(ApprovalStatus.REQUESTED)
           .setObjId(String.valueOf(obj.getProperty("id")))
@@ -460,7 +462,7 @@ foam.CLASS({
 
         ApprovalRequest approvalRequest = new ApprovalRequest.Builder(x)
           .setDaoKey("approvableDAO")
-          .setObjId(hashedId)
+          .setObjId(approvable.getId())
           .setApprovableHashKey(approvableHashKey)
           .setClassification(getOf().getObjClass().getSimpleName())
           .setOperation(Operations.UPDATE)

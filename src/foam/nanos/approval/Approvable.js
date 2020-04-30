@@ -18,7 +18,11 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'id',
+      name: 'id'
+    },
+    {
+      class: 'String',
+      name: 'lookupId',
       documentation: `
         A function of daoKey, objId and a hashed properties to update, to be used
         to distinguish update requests on the same object

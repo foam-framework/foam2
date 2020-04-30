@@ -16,6 +16,7 @@
   javaImports: [
     'foam.core.FObject',
     'foam.core.X',
+    'foam.core.PropertyInfo',
     'foam.nanos.logger.Logger',
     'foam.nanos.approval.ApprovableAware',
     'foam.nanos.ruler.Operations',
@@ -24,6 +25,7 @@
     'java.util.Arrays',
     'java.util.List',
     'java.util.Map',
+    'java.util.TreeMap'
   ],
 
   axioms: [
@@ -49,19 +51,40 @@
                 Logger logger = (Logger) x.get("logger");
                 logger.error("Error instantiating : ", obj.getClass().getSimpleName(), e);
               }
-              Map diff = oldObj == null ? null : oldObj.diff(obj);
+              Map diffHashmap = oldObj == null ? null : oldObj.diff(obj);
+              TreeMap diff = null;
+              if ( diffHashmap != null ) {
+                diff = new TreeMap<>();
+                diff.putAll(diffHashmap);
+              }
+              
               StringBuilder hash_sb = new StringBuilder(obj.getClass().getSimpleName());
               if ( operation == Operations.UPDATE && obj instanceof ApprovableAware ) 
                 hash_sb.append(String.valueOf(obj.getProperty("id")));
 
               if ( diff != null ) {
-                // remove ids, timestamps and userfeedback
+                // remove ids, timestamps and storageTransient properties
                 if ( operation == Operations.CREATE ) diff.remove("id");
                 diff.remove("created");
                 diff.remove("lastModified");
-                diff.remove("userFeedback");
 
-                // convert array properties to list to get consistent hash
+                Iterator allProperties = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class).iterator();
+
+                List<String> storageTransientPropertyNames = new ArrayList<>();
+        
+                while ( allProperties.hasNext() ){
+                  PropertyInfo prop = (PropertyInfo) allProperties.next();
+        
+                  if ( prop.getStorageTransient() ){
+                    storageTransientPropertyNames.add(prop.getName());
+                  }
+                }
+        
+                for ( int i = 0; i < storageTransientPropertyNames.size(); i++ ){
+                  diff.remove(storageTransientPropertyNames.get(i));
+                }
+        
+                // convert array properties to sorted list to get consistent hash
                 // and create hash
                 Iterator it = diff.entrySet().iterator();
 
