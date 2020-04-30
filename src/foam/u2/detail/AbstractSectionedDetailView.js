@@ -95,18 +95,23 @@ foam.CLASS({
             map[a.name] = true;
             return map;
           }, {});
-        var unusedProperties = of.getAxiomsByClass(this.Property)
-            .filter((p) => ! usedAxioms[p.name])
-            .filter((p) => ! p.hidden);
-        var unusedActions = of.getAxiomsByClass(this.Action)
-            .filter((a) => ! usedAxioms[a.name]);
 
-            if ( unusedProperties.length || unusedActions.length ) {
-          sections.push(this.Section.create({
-            properties: unusedProperties,
-            actions: unusedActions
-          }));
+
+        if ( ! this.useSections.length ) {
+          var unusedProperties = of.getAxiomsByClass(this.Property)
+              .filter((p) => ! usedAxioms[p.name])
+              .filter((p) => ! p.hidden);
+          var unusedActions = of.getAxiomsByClass(this.Action)
+              .filter((a) => ! usedAxioms[a.name]);
+
+          if ( unusedProperties.length || unusedActions.length ) {
+            sections.push(this.Section.create({
+              properties: unusedProperties,
+              actions: unusedActions
+            }));
+          }
         }
+
 
         if ( this.propertyWhitelist ) {
           sections = sections
