@@ -27,6 +27,8 @@ FOAM_FILES([
   { name: "foam/nanos/app/EmailConfig" },
   { name: "foam/nanos/app/ClientAppConfigService" },
   { name: "foam/nanos/theme/Theme" },
+  { name: "foam/nanos/theme/ThemeDomain" },
+  { name: "foam/nanos/theme/ThemeDomainsDAO" },
   { name: "foam/nanos/controller/ApplicationController" },
   { name: "foam/nanos/app/Mode" },
   { name: "foam/nanos/auth/DayOfWeek" },

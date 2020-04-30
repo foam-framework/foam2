@@ -38,6 +38,7 @@ foam.CLASS({
     'foam.nanos.auth.ResendVerificationEmail',
     'foam.nanos.auth.User',
     'foam.nanos.theme.Theme',
+    'foam.nanos.theme.ThemeDomain',
     'foam.nanos.u2.navigation.TopNavigation',
     'foam.nanos.u2.navigation.FooterView',
     'foam.u2.stack.Stack',
@@ -483,24 +484,32 @@ foam.CLASS({
         } else {
           // If they don't, then we fetch the most appropriate theme based on
           // a few different parameters.
+          var predicate = this.TRUE;
           var predicates = [];
+          var themeDAO = this.client.themeDAO;
+          var themeDomainDAO = this.client.themeDomainDAO;
 
+          // legacy support
           if ( this.webApp ) {
             predicates.push(this.EQ(this.Theme.APP_NAME, this.webApp));
+            try {
+              this.theme = await themeDAO.find(predicate);
+              if ( ! lastTheme || lastTheme.id != this.theme.id ) this.useCustomElements();
+              return;
+            } catch (err) {
+              console.warning(err);
+              // continue
+            }
           }
-
-          if ( this.user && this.user.spid ) {
-            predicates.push(this.EQ(this.Theme.SPID, this.user.spid));
-          }
-
-          var dao = this.client.themeDAO;
-          var predicate = this.TRUE;
-
-          if ( predicates.length ) {
-            predicate = this.Or.create({ args: predicates });
-          }
-
-          this.theme = await dao.find(predicate);
+          predicates = [];
+          var domain = window.location.hostname;
+          var themeDomain = await themeDomainDAO.find(this.domain);
+          predicates.push(
+            this.AND(
+              this.EQ(this.Theme.ID, this.themeDomain.theme),
+              this.EQ(this.Theme.ENABLED, true)
+            ));
+          this.theme = await themeDAO.find(predicates);
         }
       } catch (err) {
         this.notify(this.LOOK_AND_FEEL_NOT_FOUND, 'error');
