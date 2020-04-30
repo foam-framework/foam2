@@ -24,6 +24,7 @@
     'java.util.Arrays',
     'java.util.List',
     'java.util.Map',
+    'java.util.TreeMap'
   ],
 
   axioms: [
@@ -49,7 +50,16 @@
                 Logger logger = (Logger) x.get("logger");
                 logger.error("Error instantiating : ", obj.getClass().getSimpleName(), e);
               }
-              Map diff = oldObj == null ? null : oldObj.diff(obj);
+
+              // convert hashmap of the diff to a treemap to avoid inconsistencies
+              // in the order when building the hashkey
+              Map diffHashmap = oldObj == null ? null : oldObj.diff(obj);
+              TreeMap diff = null;
+              if ( diffHashmap != null ) {
+                diff = new TreeMap<>();
+                diff.putAll(diffHashmap);
+              }
+
               StringBuilder hash_sb = new StringBuilder(obj.getClass().getSimpleName());
               if ( operation == Operations.UPDATE && obj instanceof ApprovableAware ) 
                 hash_sb.append(String.valueOf(obj.getProperty("id")));
