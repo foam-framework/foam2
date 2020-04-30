@@ -52,8 +52,11 @@
               }
 
               Map diffHashmap = oldObj == null ? null : oldObj.diff(obj);
-              TreeMap diff = new TreeMap<>();
-              diff.putAll(diffHashmap);
+              TreeMap diff = null;
+              if ( diffHashmap != null ) {
+                diff = new TreeMap<>();
+                diff.putAll(diffHashmap);
+              }
 
               StringBuilder hash_sb = new StringBuilder(obj.getClass().getSimpleName());
               if ( operation == Operations.UPDATE && obj instanceof ApprovableAware ) 
