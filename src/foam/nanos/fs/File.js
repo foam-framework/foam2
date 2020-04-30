@@ -97,6 +97,9 @@ foam.CLASS({
     {
       name: 'authorizeOnUpdate',
       javaCode: `
+        User user = (User) x.get("user");
+        if ( user != null && user.getId() == getOwner() ) return;
+
         AuthService auth = (AuthService) x.get("auth");
         if ( ! auth.check(x, "file.update." + getId()) ) {
           throw new AuthorizationException();
