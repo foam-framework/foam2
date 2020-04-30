@@ -11,7 +11,7 @@ p({
       .setGuid(true)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("themes")
- //     .addDecorator(new foam.nanos.theme.ThemeDomainsDAO.Builder(x).setDelegate(new foam.dao.NullDAO(x, foam.nanos.theme.Theme.getOwnClassInfo())).build())
+      .setDecorator(new foam.nanos.theme.ThemeDomainsDAO.Builder(x).setDelegate(new foam.dao.NullDAO(x, foam.nanos.theme.Theme.getOwnClassInfo())).build())
       .setIndex(new foam.core.PropertyInfo[] {foam.nanos.theme.Theme.NAME, foam.nanos.auth.GroupPermissionJunction.TARGET_ID})
       .setPm(true)
       .build()

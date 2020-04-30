@@ -17,6 +17,7 @@ foam.CLASS({
     'static foam.mlang.MLang.AND',
     'static foam.mlang.MLang.EQ',
     'java.util.Arrays',
+    'java.util.ArrayList',
     'java.util.List',
   ],
 
@@ -25,7 +26,8 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       Theme nu = (Theme) obj;
-      Theme old = (Theme) getDelegate().find(nu.getId());
+      Theme old = (Theme) getDelegate().find_(x, nu.getId());
+      nu = (Theme) getDelegate().put_(x, nu);
       if ( old != null ) {
         List<String> removed = null;
         List<String> added = null;
@@ -33,8 +35,8 @@ foam.CLASS({
         if ( old.getDomains().length > 0 &&
              nu.getDomains().length > 0 ) {
           // compare domains.
-          List<String> n = Arrays.asList(nu.getDomains());
-          removed = Arrays.asList(old.getDomains());
+          List<String> n = new ArrayList(Arrays.asList(nu.getDomains()));
+          removed = new ArrayList(Arrays.asList(old.getDomains()));
           removed.removeAll(n);
           n.removeAll(Arrays.asList(old.getDomains()));
           added = n;
