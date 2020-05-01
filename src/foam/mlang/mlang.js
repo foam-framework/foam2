@@ -2680,7 +2680,8 @@ foam.CLASS({
 
         for ( int i = 0 ; i < getExprs().length ; i++ )
           a[i] = getExprs()[i].f(obj);
-        this.getArray().add(a);
+
+        getArray().add(a);
       `
     }
   ]
@@ -3299,6 +3300,9 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
+      code: function(o) {
+        return o[this.key];
+      },
       javaCode: `
         return ((foam.core.X) obj).get(getKey());
       `
