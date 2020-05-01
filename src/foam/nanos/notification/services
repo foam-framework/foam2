@@ -46,7 +46,13 @@ p({
   "lazy":false,
   "serve":true,
   "serviceScript":"""
-    return new foam.dao.PMDAO(x, new foam.dao.SequenceNumberDAO(new foam.dao.java.JDAO(x, foam.nanos.notification.Notification.getOwnClassInfo(), "notificationTemplates")));
+    return new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setSeqNo(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("notificationTemplates")
+      .setOf(foam.nanos.notification.Notification.getOwnClassInfo())
+      .build();
     """,
     "client":"{\"of\":\"foam.nanos.notification.Notification\"}"
 })

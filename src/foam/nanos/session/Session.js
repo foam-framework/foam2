@@ -322,8 +322,7 @@ foam.CLASS({
         User user = (User) ((DAO) x.get("localUserDAO")).find(userId);
 
        if ( user == null
-         || (user instanceof DeletedAware && ((DeletedAware)user).getDeleted()
-         || (user instanceof LifecycleAware && ((LifecycleAware)user).getLifecycleState() != LifecycleState.ACTIVE) )
+         || (user instanceof LifecycleAware && ((LifecycleAware)user).getLifecycleState() != LifecycleState.ACTIVE)
        ) {
           throw new RuntimeException(String.format("User with id '%d' not found.", userId));
         }

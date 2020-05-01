@@ -65,7 +65,7 @@ foam.CLASS({
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
       section: 'basicInfo'
-    }, 
+    },
     {
       name: 'name',
       class: 'String',
@@ -164,6 +164,12 @@ foam.CLASS({
 
 
   methods: [
+    {
+      name: 'toSummary',
+      code: function() {
+        return this.name;
+      }
+    },
     {
       name: 'implies',
       type: 'Boolean',

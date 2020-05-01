@@ -40,5 +40,12 @@ foam.CLASS({
         */
       }
     }
+  ],
+
+  methods: [
+    function fromProperty(p) {
+      this.SUPER(p);
+      if ( ! this.of && p.of ) this.of = p.of;
+    }
   ]
 });

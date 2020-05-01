@@ -323,7 +323,7 @@ foam.CLASS({
         prop = this.clone();
 
         // sourceCls_ isn't a real property so it gets lost during the clone.
-        prop.sourceCls_ = c; 
+        prop.sourceCls_ = c;
 
         c.axiomMap_[prop.name] = prop;
       }
@@ -381,7 +381,7 @@ foam.CLASS({
       // Take Axiom from class rather than using 'this' directly,
       // since installInClass() may have created a modified version
       // to inherit Property Properties from a super-Property.
-      var prop        = proto.cls_.getAxiomByName(this.name);
+      var prop = proto.cls_.getAxiomByName(this.name);
       if ( prop !== this ) {
         // Delegate to the installInProto found in the class in case it
         // has custom behaviour it wants to do.  See Class property for

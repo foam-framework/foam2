@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'DAOtoFObjectArrayView',
-  extends: 'foam.u2.View',
+  extends: 'foam.u2.Controller',
 
   documentation: 'Adapt a DAOView for use with viewing an FObjectArray',
 
@@ -21,7 +21,7 @@ foam.CLASS({
   properties: [
     {
       name: 'stack',
-      view: 'foam.u2.stack.StackView',
+      view: { class: 'foam.u2.stack.StackView', showActions: false },
       factory: function() {
         return this.Stack.create();
       }
@@ -51,11 +51,9 @@ foam.CLASS({
 
       // I'm not sure why we need to add a Stack. Shouldn't InlineBrowserView
       // do that itself? -- KGR
-      this.
-        start(this.STACK, {data: this.stack}).
-          start(foam.u2.ViewSpec.createView(this.daoView, { data: this.dao }, this, this.__subContext__), {data: this.dao}).
-          end().
-        end();
+      this.tag(this.STACK);
+
+      this.stack.push({class: 'foam.comics.InlineBrowserView', data: this.dao }, this);
     }
   ]
 });

@@ -35,7 +35,7 @@ foam.CLASS({
         };
       },
       postSet: function(oldValue, newValue) {
-        if ( newValue !== oldValue /*&& oldValue !== ''*/ ) {
+        if ( newValue !== oldValue && oldValue !== '') {
           if ( this.data && this.data.cls_.name === newValue ) return;
           var m = this.__context__.lookup(newValue, true);
           if ( m ) {
@@ -79,6 +79,12 @@ foam.CLASS({
         model in the 'of' property. The user can choose to create an instance
         of one of the models in this list.
       `
+    },
+    {
+      class: 'Boolean',
+      name: 'enableStrategizer',
+      documentation: 'Boolean toggle for rendering the strategizer.',
+      value: true
     }
   ],
 
@@ -89,7 +95,7 @@ foam.CLASS({
     },
 
     function updateChoices() {
-      if ( this.of == null ) {
+      if ( this.of == null || ! this.enableStrategizer ) {
         this.choices = [];
         return;
       }

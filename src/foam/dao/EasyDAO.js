@@ -201,10 +201,6 @@ foam.CLASS({
           delegate = dao;
         }
 
-        if ( getLifecycleAware() && getDeletedAware() ){
-          throw new RuntimeException("Both DeletedAware and LifecycleAware cannot be used simultaneously");
-        }
-
         if ( getLifecycleAware() ) {
           delegate = new foam.nanos.auth.LifecycleAwareDAO.Builder(getX())
             .setDelegate(delegate)
@@ -213,12 +209,7 @@ foam.CLASS({
         }
 
         if ( getDeletedAware() ) {
-          logger.warning("EasyDAO", getName(), "DEPRECATED: DeletedAware. Use LifecycleAware instead");
-
-          delegate = new foam.nanos.auth.DeletedAwareDAO.Builder(getX())
-            .setDelegate(delegate)
-            .setName(getPermissionPrefix())
-            .build();
+          System.out.println("DEPRECATED: Will be completely removed after services journal migration script. No functionality as of now.");
         }
 
         if ( getRuler() ) {
@@ -612,11 +603,6 @@ model from which to test ServiceProvider ID (spid)`,
       javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.auth.LifecycleAware.class.isAssignableFrom(getOf().getObjClass());'
     },
     {
-      name: 'deletedAware',
-      class: 'Boolean',
-      javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.auth.DeletedAware.class.isAssignableFrom(getOf().getObjClass());'
-    },
-    {
       name: 'createdAware',
       class: 'Boolean',
       javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.auth.CreatedAware.class.isAssignableFrom(getOf().getObjClass());'
@@ -661,6 +647,14 @@ model from which to test ServiceProvider ID (spid)`,
 
       `,
       javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.approval.ApprovableAware.class.isAssignableFrom(getOf().getObjClass());'
+    },
+    {	
+      name: 'deletedAware',	
+      class: 'Boolean',	
+      documentation: `
+        DEPRECATING: Completely removing until services migration journal script is in
+      `,
+      javaFactory: 'return false;'	
     },
  ],
 
