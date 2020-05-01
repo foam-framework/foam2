@@ -15,7 +15,9 @@ foam.CLASS({
   javaImports: [
     'foam.core.*',
     'java.util.List',
-    'java.util.Date'
+    'java.util.Date',
+    'foam.nanos.column.ColumnConfigToPropertyConverter',
+    'foam.nanos.column.ColumnPropertyValue'
   ],
 
   properties: [
@@ -143,8 +145,14 @@ foam.CLASS({
         { type: 'Context', name: 'x' }
       ],
       code: function(x) {
+        var columnConfig = this.__context__.columnConfigToPropertyConverter;
         this.props
-          .map((name) => this.of.getAxiomByName(name))
+          .map((propName) => {
+            var prop = propName;
+            if ( typeof prop === 'string' )
+              prop = columnConfig.returnProperty(this.of, propName);
+            return prop;
+          })
           .forEach((p) => {
             if ( foam.core.Property.isInstance(p) ) p.toCSVLabel.call(p, x, this);
           });
@@ -152,8 +160,9 @@ foam.CLASS({
         this.isFirstRow = false;
       },
       javaCode: `
-        for (String name: getProps()) {
-          Object p = getOf().getAxiomByName(name);
+        ColumnConfigToPropertyConverter columnConfig = (ColumnConfigToPropertyConverter)x.get("columnConfigToPropertyConverter");
+        for (String prop: getProps()) {
+          PropertyInfo p = columnConfig.returnProperty(getOf(), prop);
           if ( p != null && p instanceof PropertyInfo ) ((PropertyInfo)p).toCSVLabel(x, this);
         }
         newLine_();
@@ -165,19 +174,27 @@ foam.CLASS({
       code: function(x, obj) {
         if ( ! this.of ) this.of = obj.cls_;
         if ( this.isFirstRow ) this.outputHeader(x);
+        var columnConfig = this.__context__.columnConfigToPropertyConverter;
         this.props
-          .map((name) => this.of.getAxiomByName(name))
-          .forEach((p) => {
-            if ( foam.core.Property.isInstance(p) ) p.toCSV.call(p, x, obj, this);
+          .forEach((propName) => {
+            var prop = propName;
+            var obj1 = obj;
+            if ( typeof prop === 'string' ) {
+              var val = columnConfig.returnPropertyAndObject(this.of, propName, obj1);
+              prop = val.propertyValue;
+              obj1 = val.objValue;
+            }
+            if ( foam.core.Property.isInstance(prop) ) prop.toCSV.call(prop, x, obj1, this);
           });
         this.newLine_();
       },
       javaCode: `
         if ( getOf() == null ) setOf(obj.getClassInfo());
         if ( getIsFirstRow() ) outputHeader(x);
-        for (String name : getProps()) {
-          Object p = getOf().getAxiomByName(name);
-          if ( p != null && p instanceof PropertyInfo ) ((PropertyInfo)p).toCSV(x, obj, this);
+        ColumnConfigToPropertyConverter columnConfig = (ColumnConfigToPropertyConverter)x.get("columnConfigToPropertyConverter");
+        for (String propName : getProps()) {
+          ColumnPropertyValue val = columnConfig.returnPropertyAndObject(x, getOf(), propName, obj);
+          if ( val.getPropertyValue() != null && val.getPropertyValue() instanceof PropertyInfo ) ((PropertyInfo)val.getPropertyValue()).toCSV(x, val.getObjValue(), this);
         }
         newLine_();
       `

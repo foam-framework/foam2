@@ -105,6 +105,14 @@ p({
 })
 
 p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"columnConfigToPropertyConverter",
+  "serve": true,
+  "lazy":false,
+  "serviceClass": "foam.nanos.column.ColumnConfigToPropertyConverter",
+  "client": "{\"class\":\"foam.nanos.column.ColumnConfigToPropertyConverter\"}"
+})
+p({
   "class": "foam.nanos.boot.NSpec",
   "name": "static",
   "authenticate": false,

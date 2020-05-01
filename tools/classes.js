@@ -337,6 +337,8 @@ var classes = [
   'foam.nanos.script.TestRunnerConfig',
   'foam.nanos.script.TestRunnerScript',
   'foam.nanos.test.Test',
+  'foam.nanos.column.ColumnConfigToPropertyConverter',
+  'foam.nanos.column.ColumnPropertyValue',
   'foam.nanos.cron.Cron',
   'foam.nanos.cron.TimeHMS',
   'foam.nanos.cron.Schedule',

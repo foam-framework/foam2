@@ -312,18 +312,8 @@ foam.CLASS({
                 var cls = view.of;
                 var column;
                 if ( typeof property === 'string') {
-                  var props = property.split('.');
-                  for ( var i = 0; i < props.length; i++ ) {
-                    column = typeof props[i] === 'string'
-                    ? cls.getAxiomByName(props[i])
-                    :  foam.Array.isInstance(props[i]) ? 
-                    cls.getAxiomByName(props[i]) : props[i];
-                    if ( !column ) {
-                      //need to come up with behavior
-                      break;
-                    }
-                    cls = column.of;
-                  }
+                  var columnConfig = this.__context__.columnConfigToPropertyConverter;
+                  column = columnConfig.returnProperty(view.of, property);
                 } else
                   column = property;
                 if ( overrides ) column = column.clone().copyFrom(overrides);
@@ -508,23 +498,12 @@ foam.CLASS({
                 forEach(columns_, function([property, overrides]) {
                   var cls = view.of;
                   var column;
-                  var theObj = obj;
+                  var obj1 = obj;
                   if ( typeof property === 'string') {
-                    var props = property.split('.');
-                    for ( var i = 0; i < props.length; i++ ) {
-                      column = typeof props[i] === 'string'
-                      ? cls.getAxiomByName(props[i])
-                      :  foam.Array.isInstance(props[i]) ? 
-                      cls.getAxiomByName(props[i]) : props[i];
-                      if ( !column ) {
-                        //need to come up with behavior
-                        break;
-                      }
-                      cls = column.of;
-
-                      if ( i !==  props.length - 1 )
-                        theObj = theObj[props[i]];
-                    }
+                    var columnConfig = this.__context__.columnConfigToPropertyConverter;
+                    var val = columnConfig.returnPropertyAndObject(view.of, property, obj1);
+                    column = val.propertyValue;
+                    obj1 = val.objValue;
                   } else
                     column = property;
                   
@@ -533,11 +512,11 @@ foam.CLASS({
                     start().
                     addClass(view.myClass('td')).
                     callOn(column.tableCellFormatter, 'format', [
-                      column.f ? column.f(theObj) : null, theObj, column
+                      column.f ? column.f(obj1) : null, obj1, column
                     ]).
                     callIf(column.f, function() {
                       try {
-                        var value = column.f(theObj);
+                        var value = column.f(obj1);
                         if ( foam.util.isPrimitive(value) ) {
                           this.attr('title', value);
                         }
