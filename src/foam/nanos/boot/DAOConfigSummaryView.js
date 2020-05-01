@@ -165,7 +165,7 @@ foam.CLASS({
         end()
         .start()
           .style({ 'width': 'fit-content', 'float': 'right', 'margin-right': '4%' })
-            .add(this.SEARCH)
+            .start(this.SEARCH).focus().end()
             .addClass('foam-u2-search-TextSearchView')
             .addClass(this.myClass('foam-u2-search-TextSearchView'))
           .end()

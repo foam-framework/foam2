@@ -97,7 +97,7 @@ FOAM_FILES([
   { name: "foam/core/CompoundContextAgency" },
   { name: "foam/core/Validatable" },
   { name: "foam/core/AxiomCloner" },
-  { name: "foam/java/Authorizable" },
+  { name: "foam/nanos/auth/Authorizable" },
   { name: "foam/i18n/TranslationFormatStringParser", flags: ['swift'] },
   { name: "foam/swift/SwiftLib", flags: ['swift'] },
   { name: "foam/swift/SwiftClass", flags: ['swift'] },
@@ -403,6 +403,7 @@ FOAM_FILES([
   { name: "foam/swift/refines/Remote", flags: ['swift'] },
 
   { name: "foam/nanos/menu/DAOMenu2" },
+  { name: "foam/nanos/menu/MenuToolBar" },
 
   { name: "foam/box/LogBox" },
   { name: "foam/box/MultiDelegateBox" },
@@ -479,6 +480,7 @@ FOAM_FILES([
   { name: "foam/u2/view/FObjectPropertyView", flags: ['web'] },
   { name: "foam/u2/view/CodeView", flags: ['web'] },
   { name: "foam/u2/view/ReferencePropertyView", flags: ['web'] },
+  { name: "foam/u2/view/ReadOnlyEnumView", flags: ['web'] },
   { name: "foam/u2/view/EnumView", flags: ['web'] },
   { name: "foam/u2/view/ColorView", flags: ['web'] },
   { name: "foam/u2/view/ReadColorView", flags: ['web'] },

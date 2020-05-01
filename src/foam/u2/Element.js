@@ -1449,6 +1449,11 @@ foam.CLASS({
       return this;
     },
 
+    function addClasses(a) {
+      a && a.forEach((i) => this.addClass(i));
+      return this;
+    },
+
     function enableCls(cls, enabled, opt_negate) {
       console.warn('Deprecated use of Element.enableCls(). Use enableClass() instead.');
       return this.enableClass(cls, enabled, opt_negate);
@@ -1713,7 +1718,12 @@ foam.CLASS({
           // No use adding new children if the parent has already been removed
           if ( self.state === foam.u2.Element.UNLOADED ) return;
 
-          if ( update ) o = o.clone();
+          if ( update ) {
+            o = o.clone();
+            o.propertyChange.sub(function() {
+              o.copyFrom(dao.put(o.clone()));
+            });
+          }
 
           self.startContext({data: o});
 
@@ -1723,12 +1733,6 @@ foam.CLASS({
           // want anything to be added.
           if ( e === undefined )
             this.__context__.warn(self.SELECT_BAD_USAGE);
-
-          if ( update ) {
-            o.propertyChange.sub(function(_,__,prop,slot) {
-              dao.put(o.clone());
-            });
-          }
 
           self.endContext();
 
@@ -2203,6 +2207,7 @@ foam.ENUM({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'PropertyViewRefinements',
@@ -2330,19 +2335,18 @@ foam.CLASS({
         var visSlot  = slot;
         var permSlot = data$.map((data) => {
           if ( ! data || ! data.__subContext__.auth ) return PPVC.HIDDEN;
-          var auth = data.__subContext__.auth;
-
+          var auth     = data.__subContext__.auth;
           var propName = this.name.toLowerCase();
-          var clsName  = this.forClass_.substring(this.forClass_.lastIndexOf('.') + 1).toLowerCase();
+          var clsName  = data.cls_.name.toLowerCase();
           var canRead  = this.readPermissionRequired === false;
 
           return auth.check(null, `${clsName}.rw.${propName}`)
-              .then(function(rw) {
-                if ( rw ) return PPVC.ANYTHING;
-                if ( canRead ) return PPVC.RO_OR_HIDDEN;
-                return auth.check(null, `${clsName}.ro.${propName}`)
-                  .then((ro) => ro ? PPVC.RO_OR_HIDDEN : PPVC.HIDDEN);
-              });
+            .then(function(rw) {
+              if ( rw ) return PPVC.ANYTHING;
+              if ( canRead ) return PPVC.RO_OR_HIDDEN;
+              return auth.check(null, `${clsName}.ro.${propName}`)
+                .then((ro) => ro ? PPVC.RO_OR_HIDDEN : PPVC.HIDDEN);
+            });
         });
 
         slot = foam.core.ArraySlot.create({ slots: [visSlot, permSlot] }).map((arr) => {

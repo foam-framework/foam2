@@ -7,6 +7,9 @@
 var d = Tabata.create();
 foam.u2.DetailView.create({ data: d, showActions: true }).write();
 //      TabataBarCView.create({ data: d }).write();
+
+document.write('<br>');
+
 TabataCView.create({ data: d }).write();
 TabataSoundView.create({ data: d });
 /*
