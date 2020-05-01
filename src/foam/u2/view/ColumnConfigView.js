@@ -15,8 +15,24 @@ foam.CLASS({
 
   ],
   css: `
-    ^move-right {
-      margin-left: 15px;
+    ^ {
+      max-width: 200px;
+    }
+
+    ^header {
+      border: 2px solid grey;
+      border-radius: 5px;
+      margin-bottom:5px;
+    }
+
+    ^dropdown {
+      margin-bottom: 20px;
+      position: absolute;
+      background-color: #f9f9f9;
+      margin-bottom: 20px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      min-width: 1118px;
+      z-index: 1;
     }
   `,
   methods: [
@@ -28,9 +44,11 @@ foam.CLASS({
           .add(this.slot(function(data, data$isPropertySelected, data$columnOptions, data$rootProperty, data$rootProperty$expanded) {
             return this.E()
             .start()
+              .addClass(self.myClass('header'))
               .add(foam.u2.ViewSpec.createView(self.ColumnViewHeader, {data$:self.data.rootProperty$},  self, self.__subSubContext__))
             .end()
             .start()
+              .addClass(self.myClass('dropdown'))
               .start()
                 .add(foam.u2.ViewSpec.createView(self.ColumnViewBody, {data$:self.data.rootProperty$},  self, self.__subSubContext__))
               .end()
@@ -38,7 +56,6 @@ foam.CLASS({
                 this
                   .start()
                     .show(self.data.rootProperty.expanded$)
-                    .addClass(self.myClass('move-right'))
                       .add(foam.u2.ViewSpec.createView(self.RootColumnConfigPropView, {data:o},  self, self.__subSubContext__))
                   .end();
               })
@@ -151,18 +168,28 @@ foam.CLASS({
   css: `
   
   ^selected {
-    background: lightblue;
+    background: #cfdbff;
+  }
+  ^some-padding {
+    padding: 3px;
   }
   `,
 
   methods: [
     function initE() {
       this.SUPER();
-      this.start()
-        .enableClass(this.myClass('selected'), this.data.level < this.data.selectedColumns.length && this.data.selectedColumns[this.data.level] == this.data.rootProperty[0])
+      this
         .on('click', this.toggleExpanded)
         .start()
-          .add(this.data.rootProperty[1])
+        .enableClass(this.myClass('selected'), this.data.level < this.data.selectedColumns.length && this.data.selectedColumns[this.data.level] === this.data.rootProperty[0])
+        .start()
+          .addClass(this.myClass('some-padding'))
+          .style({
+            'padding-left' : this.data.level * 15 + ( ( this.data.level === 0 && this.data.selectedColumns.length > 0 && this.data.selectedColumns[this.data.level] !== this.data.rootProperty[0]) ? 5 : 0 ) + 'px'
+          })
+          .start('span')
+            .add(this.data.rootProperty[1])
+          .end()
           .start('span')
             .show(this.data.hasOtherOptions || this.data.hasSubProperties)
             .style({
@@ -198,11 +225,6 @@ foam.CLASS({
     'foam.u2.view.RootColumnConfigPropView',
     'foam.u2.view.SubColumnSelectConfig'
   ],
-  css: `
-  ^move-right {
-    margin-left: 20px;
-  }
-  `,
   methods: [
     function initE() {
       this.SUPER();
@@ -212,7 +234,6 @@ foam.CLASS({
         .start()
             .forEach(this.data.subColumnSelectConfig, function(p) {
             self
-              .addClass(self.myClass('move-right'))
               .show(self.data.expanded$)
               .add(foam.u2.ViewSpec.createView(self.RootColumnConfigPropView, {data:p}, self, self.__subSubContext__));
           })
