@@ -27,7 +27,6 @@ foam.CLASS({
     'name',
     'description',
     'domains',
-    'priority',
     'preview'
   ],
 
@@ -84,13 +83,6 @@ foam.CLASS({
       section: 'infoSection',
     },
     {
-      // deprecated
-      class: 'String',
-      name: 'appName',
-      section: 'infoSection',
-      visibility: 'RO'
-    },
-    {
       class: 'String',
       name: 'description',
       section: 'infoSection',
@@ -101,24 +93,6 @@ foam.CLASS({
       value: true,
       includeInDigest: true,
       section: 'administration'
-    },
-    {
-      class: 'Long',
-      name: 'priority',
-      includeInDigest: true,
-      documentation: `
-        When multiple Theme objects could be applied to a given situation,
-        this property is used to determine which one will be used.
-
-        For example, if an application has a default Theme but a user
-        copies it and modifies it to create their own Theme object, then
-        when that user logs in, we could either give them their own Theme
-        or the app's default Theme. Whichever Theme has the higher
-        priority will be used, which in this case should be the user's custom
-        Theme (assuming its priority was set to be greater than the
-        default Theme's priority).
-      `,
-      section: 'infoSection'
     },
     {
       name: 'domains',
@@ -144,6 +118,10 @@ foam.CLASS({
       name: 'logo',
       documentation: 'The logo to display in the application.',
       displayWidth: 60,
+      view: {
+        class: 'foam.u2.tag.TextArea',
+        rows: 4, cols: 80
+      },
       section: 'images'
     },
     {
@@ -151,6 +129,10 @@ foam.CLASS({
       name: 'largeLogo',
       documentation: 'A large logo to display in the application.',
       displayWidth: 60,
+      view: {
+        class: 'foam.u2.tag.TextArea',
+        rows: 4, cols: 80
+      },
       section: 'images'
     },
     {
@@ -163,7 +145,7 @@ foam.CLASS({
       class: 'Color',
       name: 'logoBackgroundColour',
       documentation: 'The logo background colour to display in the application.',
-      section: 'colours'
+      section: 'images'
     },
     {
       class: 'String',

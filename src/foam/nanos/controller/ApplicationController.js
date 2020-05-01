@@ -51,7 +51,7 @@ foam.CLASS({
   imports: [
     'installCSS',
     'sessionSuccess',
-    'window'
+    'window',
   ],
 
   exports: [
@@ -482,34 +482,24 @@ foam.CLASS({
           // If the user has a personal theme, use that.
           this.theme = await this.user.personalTheme$find;
         } else {
-          // If they don't, then we fetch the most appropriate theme based on
-          // a few different parameters.
-          var predicate = this.TRUE;
-          var predicates = [];
-          var themeDAO = this.client.themeDAO;
-          var themeDomainDAO = this.client.themeDomainDAO;
-
-          // legacy support
-          if ( this.webApp ) {
-            predicates.push(this.EQ(this.Theme.APP_NAME, this.webApp));
-            try {
-              this.theme = await themeDAO.find(predicate);
-              if ( ! lastTheme || lastTheme.id != this.theme.id ) this.useCustomElements();
-              return;
-            } catch (err) {
-              console.warning(err);
-              // continue
-            }
-          }
-          predicates = [];
           var domain = window.location.hostname;
-          var themeDomain = await themeDomainDAO.find(this.domain);
-          predicates.push(
-            this.AND(
-              this.EQ(this.Theme.ID, this.themeDomain.theme),
-              this.EQ(this.Theme.ENABLED, true)
-            ));
-          this.theme = await themeDAO.find(predicates);
+
+          var themeDomain = await this.client.themeDomainDAO.find(domain);
+          if ( ! themeDomain ) {
+            console.warn('Domain not found: '+domain);
+            themeDomain = this.ThemeDomain.create({'theme':'foam'});
+          }
+
+          var predicate = this.AND(
+            this.EQ(this.Theme.ID, themeDomain.theme),
+            this.EQ(this.Theme.ENABLED, true)
+          );
+
+          this.theme = await this.client.themeDAO.find(predicate);
+          if ( ! this.theme ) {
+            console.warn('Theme not found: '+domain);
+            return this.Theme.create({});
+          }
         }
       } catch (err) {
         this.notify(this.LOOK_AND_FEEL_NOT_FOUND, 'error');

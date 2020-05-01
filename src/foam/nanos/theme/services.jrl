@@ -15,7 +15,6 @@ p({
       .setIndex(new foam.core.PropertyInfo[] {foam.nanos.theme.Theme.NAME, foam.nanos.auth.GroupPermissionJunction.TARGET_ID})
       .setPm(true)
       .build()
-      .orderBy(foam.mlang.MLang.DESC(foam.nanos.theme.Theme.PRIORITY));
   """,
   "client": "{\"of\":\"foam.nanos.theme.Theme\"}",
   "authNotes": "Needs to be unauthenticated because we need to be able to theme apps before the user has logged in. However, we still need to restrict write access, which we do via an AuthorizationDAO."
