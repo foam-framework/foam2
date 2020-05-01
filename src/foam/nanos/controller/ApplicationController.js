@@ -481,12 +481,16 @@ foam.CLASS({
         if ( this.user && this.user.personalTheme ) {
           // If the user has a personal theme, use that.
           this.theme = await this.user.personalTheme$find;
-        } else {
+          if ( ! this.theme ) {
+            console.warn('User Theme not found: '+this.user.id);
+          }
+        }
+        if ( ! this.theme ) {
           var domain = window.location.hostname;
 
           var themeDomain = await this.client.themeDomainDAO.find(domain);
           if ( ! themeDomain ) {
-            console.warn('Domain not found: '+domain);
+            console.warn('ThemeDomain not found: '+domain);
             themeDomain = this.ThemeDomain.create({'theme':'foam'});
           }
 
@@ -498,7 +502,7 @@ foam.CLASS({
           this.theme = await this.client.themeDAO.find(predicate);
           if ( ! this.theme ) {
             console.warn('Theme not found: '+domain);
-            return this.Theme.create({});
+            this.theme = this.Theme.create({'id':'foam'});
           }
         }
       } catch (err) {
