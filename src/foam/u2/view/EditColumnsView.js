@@ -57,7 +57,7 @@ foam.CLASS({
       factory: function() {
         var arr = [];
         for (var i = 0; i < this.selectedColumnNames.length; i++) {
-          arr.push(this.ColumnOptionsSelectConfig.create({selectedColumns: this.selectedColumnNames[i], of:this.of, columnsAvailable:this.columnsAvailable, labels:this.labels }));
+          arr.push(this.ColumnOptionsSelectConfig.create({selectedColumns: this.selectedColumnNames[i].split('.'), of:this.of, columnsAvailable:this.columnsAvailable, labels:this.labels }));
         }
         return arr;
       },
@@ -117,7 +117,7 @@ foam.CLASS({
         var selectedColumns = [];
         for ( var i = 0; i < this.columns.length; i++ ) {
           if ( this.columns[i].selectedColumns.length != 0)
-            selectedColumns.push(this.columns[i].selectedColumns);
+            selectedColumns.push(this.columns[i].selectedColumns.join('.'));
         }
         // if ( this.view.isColumnChanged ) {
           localStorage.removeItem(this.of.id);

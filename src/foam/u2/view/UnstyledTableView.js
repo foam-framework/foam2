@@ -72,9 +72,9 @@ foam.CLASS({
       name: 'columns_',
       expression: function(columns, of, editColumnsEnabled, selectedColumnNames, isColumnChanged) {
         if ( ! of ) return [];
-        if ( ! editColumnsEnabled ) return columns.map(c => Array.isArray(c) ? [c, null] : [[c], null]);
+        if ( ! editColumnsEnabled ) return columns.map(c => [c, null]);
 
-        return selectedColumnNames.map(c => Array.isArray(c) ? [c, null] : [[c], null]);
+        return selectedColumnNames.map(c => [c, null]);
       },
     },
     {
@@ -96,7 +96,7 @@ foam.CLASS({
       // },
       expression: function(columns, of) {
         var ls = JSON.parse(localStorage.getItem(of.id));
-        return ls ? ls : columns.map(c => [c]);//.map(c => [[c], null]);
+        return ls ? ls : columns;//.map(c => [[c], null]);
       }
     },
     {
@@ -203,7 +203,25 @@ foam.CLASS({
       documentation: 'Width of the whole table. Used to get proper scrolling on narrow screens.',
       expression: function(of, columns_) {
         return columns_.reduce((acc, col) => {
-          const axiom = typeof col[0] === 'string' ? of.getAxiomByName(col[0]) : col[0];
+          var cls = this.of;
+          var axiom;
+
+          if ( typeof col[0] === 'string') {
+            var props = col[0].split('.');
+            for ( var i = 0; i < props.length; i++ ) {
+              axiom = typeof props[i] === 'string'
+              ? cls.getAxiomByName(props[i])
+              :  foam.Array.isInstance(props[i]) ? 
+              cls.getAxiomByName(props[i]) : props[i];
+              if ( !axiom ) {
+                //need to come up with behavior
+                break;
+              }
+              cls = axiom.of;
+            }
+          } else 
+            axiom = col[0];
+         
           return acc + (axiom.tableWidth || this.MIN_COLUMN_WIDTH_FALLBACK);
         }, this.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH) + 'px';
       }
@@ -290,20 +308,24 @@ foam.CLASS({
               }).
 
               // Render the table headers for the property columns.
-              forEach(columns_, function([arayOfAxiomNames, overrides]) {
+              forEach(columns_, function([property, overrides]) {
                 var cls = view.of;
                 var column;
-                for ( var i = 0; i <  arayOfAxiomNames.length; i++) {
-                  column = typeof arayOfAxiomNames[i] === 'string'
-                  ? cls.getAxiomByName(arayOfAxiomNames[i])
-                  :  foam.Array.isInstance(arayOfAxiomNames[i]) ? 
-                  cls.getAxiomByName(arayOfAxiomNames[i]) : arayOfAxiomNames[i];
-                  if ( !column ) {
-                    //need to come up with behavior
-                    break;
+                if ( typeof property === 'string') {
+                  var props = property.split('.');
+                  for ( var i = 0; i < props.length; i++ ) {
+                    column = typeof props[i] === 'string'
+                    ? cls.getAxiomByName(props[i])
+                    :  foam.Array.isInstance(props[i]) ? 
+                    cls.getAxiomByName(props[i]) : props[i];
+                    if ( !column ) {
+                      //need to come up with behavior
+                      break;
+                    }
+                    cls = column.of;
                   }
-                  cls = column.of;
-                }
+                } else
+                  column = property;
                 if ( overrides ) column = column.clone().copyFrom(overrides);
                 this.start().
                   addClass(view.myClass('th')).
@@ -483,27 +505,28 @@ foam.CLASS({
                   });
                 }).
 
-                forEach(columns_, function([arayOfAxiomNames, overrides]) {
+                forEach(columns_, function([property, overrides]) {
                   var cls = view.of;
                   var column;
                   var theObj = obj;
-                  for ( var i = 0; i <  arayOfAxiomNames.length; i++) {
-                    column = typeof arayOfAxiomNames[i] === 'string'
-                    ? cls.getAxiomByName(arayOfAxiomNames[i])
-                    :  foam.Array.isInstance(arayOfAxiomNames[i]) ? 
-                    cls.getAxiomByName(arayOfAxiomNames[i]) : arayOfAxiomNames[i];
-                    if ( i != arayOfAxiomNames.length-1) {
-                      if (theObj)
-                        theObj = column.f(theObj);
+                  if ( typeof property === 'string') {
+                    var props = property.split('.');
+                    for ( var i = 0; i < props.length; i++ ) {
+                      column = typeof props[i] === 'string'
+                      ? cls.getAxiomByName(props[i])
+                      :  foam.Array.isInstance(props[i]) ? 
+                      cls.getAxiomByName(props[i]) : props[i];
+                      if ( !column ) {
+                        //need to come up with behavior
+                        break;
+                      }
+                      cls = column.of;
+
+                      if (  props.length - 1 )
+                        theObj = theObj[props[i]];
                     }
-                    
-                    if ( !column || !theObj ) {
-                      //need to come up with behavior
-                      break;
-                    }
-                    cls = column.of;
-                  }
-                  
+                  } else
+                    column = property;
                   
                   if ( overrides ) column = column.clone().copyFrom(overrides);
                   this.
