@@ -278,12 +278,22 @@ foam.CLASS({
         if ( lifecycleObj.getLifecycleState() == LifecycleState.ACTIVE ) { 
           return super.put_(x,obj);
         } else if ( lifecycleObj.getLifecycleState() == LifecycleState.PENDING ) {
+          
+          String approvableHashKey = ApprovableAware.getApprovableHashKey(x, obj, Operations.CREATE);
+
+          String hashedId = new StringBuilder("d")
+            .append(getDaoKey())
+            .append(":o")
+            .append(String.valueOf(obj.getProperty("id")))
+            .append(":h")
+            .append(String.valueOf(approvableHashKey))
+            .toString();
 
           DAO filteredApprovalRequestDAO = (DAO) approvalRequestDAO
             .where(
               foam.mlang.MLang.AND(
-                foam.mlang.MLang.EQ(ApprovalRequest.DAO_KEY, getDaoKey()),
-                foam.mlang.MLang.EQ(ApprovalRequest.APPROVABLE_HASH_KEY, ApprovableAware.getApprovableHashKey(x, obj, Operations.CREATE)),
+                foam.mlang.MLang.EQ(ApprovalRequest.DAO_KEY, "approvableDAO"),
+                foam.mlang.MLang.EQ(ApprovalRequest.OBJ_ID, hashedId),
                 foam.mlang.MLang.EQ(ApprovalRequest.CREATED_BY, user.getId()),
                 foam.mlang.MLang.EQ(ApprovalRequest.OPERATION, Operations.CREATE),
                 foam.mlang.MLang.EQ(ApprovalRequest.IS_FULFILLED, false)
@@ -324,20 +334,60 @@ foam.CLASS({
               return super.put_(x,obj);
             } 
 
-            // TODO: will rework rejection
-            // create request has been rejected or cancelled is only where we mark the object as REJECTED
-            lifecycleObj.setLifecycleState(LifecycleState.REJECTED);
-            return super.put_(x,obj); 
+            // create request has been rejected
+            return null; 
           } 
           if ( approvedObjCreateRequests.size() > 1 ) {
             logger.error("Something went wrong cannot have multiple approved/rejected requests for the same request!");
             throw new RuntimeException("Something went wrong cannot have multiple approved/rejected requests for the same request!");
-          } 
+          }
+
+          DAO approvableDAO = (DAO) x.get("approvableDAO");
+
+        Iterator allProperties = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class).iterator();
+
+        List<String> storageTransientPropertyNames = new ArrayList<>();
+
+        while ( allProperties.hasNext() ){
+          PropertyInfo prop = (PropertyInfo) allProperties.next();
+
+          if ( prop.getStorageTransient() ){
+            storageTransientPropertyNames.add(prop.getName());
+          }
+        }
+
+        // then handle the diff here and attach it into the approval request
+        FObject emptyObject;
+
+        try {
+          emptyObject = (FObject) obj.getClassInfo().newInstance();
+        } catch (Exception e){
+          throw new RuntimeException(e);
+        }
+
+        Map newObjectProperties = emptyObject.diff(obj);
+
+        for ( int i = 0; i < storageTransientPropertyNames.size(); i++ ){
+          newObjectProperties.remove(storageTransientPropertyNames.get(i));
+        }
+
+        // No change, just returns obj
+        if ( newObjectProperties.isEmpty() ) {
+          return obj;
+        }
+
+          Approvable approvable = (Approvable) approvableDAO.put_(x, new Approvable.Builder(x)
+            .setLookupId(hashedId)
+            .setDaoKey(getDaoKey())
+            .setStatus(ApprovalStatus.REQUESTED)
+            .setObjId(String.valueOf(obj.getProperty("id")))
+            .setOperation(Operations.CREATE)
+            .setOf(obj.getClassInfo())
+            .setPropertiesToUpdate(newObjectProperties).build());
 
           ApprovalRequest approvalRequest = new ApprovalRequest.Builder(x)
-            .setDaoKey(getDaoKey())
-            .setApprovableHashKey(ApprovableAware.getApprovableHashKey(x, obj, Operations.CREATE))
-            .setObjId(String.valueOf(obj.getProperty("id")))
+            .setDaoKey("approvableDAO")
+            .setObjId(approvable.getId())
             .setClassification(getOf().getObjClass().getSimpleName())
             .setOperation(Operations.CREATE)
             .setCreatedBy(user.getId())
@@ -358,8 +408,9 @@ foam.CLASS({
           UserFeedbackAware feedbackAwareClonedObj = (UserFeedbackAware) clonedObj;
 
           feedbackAwareClonedObj.setUserFeedback(newUserFeedback);
-
-          return super.put_(x,clonedObj);
+          
+          // we are not putting the object in the dao
+          return clonedObj;
         } else {
           logger.error("Something went wrong used an invalid lifecycle status for create!");
           throw new RuntimeException("Something went wrong used an invalid lifecycle status for create!");
@@ -458,12 +509,13 @@ foam.CLASS({
           .setDaoKey(getDaoKey())
           .setStatus(ApprovalStatus.REQUESTED)
           .setObjId(String.valueOf(obj.getProperty("id")))
+          .setOperation(Operations.UPDATE)
+          .setOf(obj.getClassInfo())
           .setPropertiesToUpdate(updatedProperties).build());
 
         ApprovalRequest approvalRequest = new ApprovalRequest.Builder(x)
           .setDaoKey("approvableDAO")
           .setObjId(approvable.getId())
-          .setApprovableHashKey(approvableHashKey)
           .setClassification(getOf().getObjClass().getSimpleName())
           .setOperation(Operations.UPDATE)
           .setCreatedBy(user.getId())

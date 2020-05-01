@@ -52,7 +52,16 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.nanos.approval.ApprovalStatus',
       name: 'status'
-    }
+    },
+    {
+      class: 'Enum',
+      of: 'foam.nanos.ruler.Operations',
+      name: 'operation'
+    },
+    {
+      class: 'Class',
+      name: 'of',
+    },
   ],
 
   methods: [
