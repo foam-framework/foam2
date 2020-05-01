@@ -166,8 +166,7 @@ foam.CLASS({
       DAO approvalRequestDAO = (DAO) x.get("approvalRequestDAO");
       DAO dao = (DAO) x.get(getDaoKey());
 
-      ApprovableAware approvableAwareObj = (ApprovableAware) obj;
-      FObject currentObjectInDAO = (FObject) dao.find(approvableAwareObj.getStringId());
+      FObject currentObjectInDAO = (FObject) dao.find(String.valueOf(obj.getProperty("id")));
       
       if ( ! getIsEnabled() ){
         if ( lifecycleObj.getLifecycleState() == LifecycleState.PENDING && currentObjectInDAO == null ){
@@ -208,13 +207,12 @@ foam.CLASS({
       };
 
       if ( operation == Operations.REMOVE ) {
-        approvableAwareObj = (ApprovableAware) currentObjectInDAO;
 
         DAO filteredApprovalRequestDAO = (DAO) approvalRequestDAO
           .where(
             foam.mlang.MLang.AND(
               foam.mlang.MLang.EQ(ApprovalRequest.DAO_KEY, getDaoKey()),
-              foam.mlang.MLang.EQ(ApprovalRequest.OBJ_ID, approvableAwareObj.getStringId()),
+              foam.mlang.MLang.EQ(ApprovalRequest.OBJ_ID, String.valueOf(obj.getProperty("id"))),
               foam.mlang.MLang.EQ(ApprovalRequest.CREATED_BY, user.getId()),
               foam.mlang.MLang.EQ(ApprovalRequest.OPERATION, Operations.REMOVE),
               foam.mlang.MLang.EQ(ApprovalRequest.IS_FULFILLED, false)
@@ -233,7 +231,8 @@ foam.CLASS({
         List approvedObjRemoveRequests = ((ArraySink) filteredApprovalRequestDAO
           .where(foam.mlang.MLang.OR(
             foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.APPROVED),
-            foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.REJECTED)
+            foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.REJECTED),
+            foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.CANCELLED)
           )).select(new ArraySink())).getArray();
 
         if ( pendingRequests.size() > 0 && approvedObjRemoveRequests.size() == 0 && approverIds.size() == 0 ) 
@@ -253,7 +252,7 @@ foam.CLASS({
             return super.put_(x,obj);
           } 
 
-          return null;  // as request has been REJECTED
+          return null;  // as request has been REJECTED or CANCELLED
         } 
 
         if ( approvedObjRemoveRequests.size() > 1 ) {
@@ -263,7 +262,7 @@ foam.CLASS({
 
         ApprovalRequest approvalRequest = new ApprovalRequest.Builder(x)
           .setDaoKey(getDaoKey())
-          .setObjId(approvableAwareObj.getStringId())
+          .setObjId(String.valueOf(obj.getProperty("id")))
           .setClassification(getOf().getObjClass().getSimpleName())
           .setOperation(Operations.REMOVE)
           .setCreatedBy(user.getId())
@@ -303,7 +302,8 @@ foam.CLASS({
           List approvedObjCreateRequests = ((ArraySink) filteredApprovalRequestDAO
             .where(foam.mlang.MLang.OR(
               foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.APPROVED),
-              foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.REJECTED)
+              foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.REJECTED),
+              foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.CANCELLED)
             )).select(new ArraySink())).getArray();
 
           if ( pendingRequests.size() > 0 && approvedObjCreateRequests.size() == 0 ) 
@@ -324,7 +324,8 @@ foam.CLASS({
               return super.put_(x,obj);
             } 
 
-            // create request has been rejected is only where we mark the object as REJECTED
+            // TODO: will rework rejection
+            // create request has been rejected or cancelled is only where we mark the object as REJECTED
             lifecycleObj.setLifecycleState(LifecycleState.REJECTED);
             return super.put_(x,obj); 
           } 
@@ -336,7 +337,7 @@ foam.CLASS({
           ApprovalRequest approvalRequest = new ApprovalRequest.Builder(x)
             .setDaoKey(getDaoKey())
             .setApprovableHashKey(ApprovableAware.getApprovableHashKey(x, obj, Operations.CREATE))
-            .setObjId(approvableAwareObj.getStringId())
+            .setObjId(String.valueOf(obj.getProperty("id")))
             .setClassification(getOf().getObjClass().getSimpleName())
             .setOperation(Operations.CREATE)
             .setCreatedBy(user.getId())
@@ -391,7 +392,7 @@ foam.CLASS({
         String hashedId = new StringBuilder("d")
           .append(getDaoKey())
           .append(":o")
-          .append(approvableAwareObj.getStringId())
+          .append(String.valueOf(obj.getProperty("id")))
           .toString();
 
         String approvableHashKey = ApprovableAware.getApprovableHashKey(x, obj, Operations.UPDATE);
@@ -421,7 +422,8 @@ foam.CLASS({
         List approvedObjUpdateRequests = ((ArraySink) filteredApprovalRequestDAO
           .where(foam.mlang.MLang.OR(
             foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.APPROVED),
-            foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.REJECTED)
+            foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.REJECTED),
+            foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.CANCELLED)
           )).select(new ArraySink())).getArray();
 
         if ( pendingRequests.size() > 0 && approvedObjUpdateRequests.size() == 0 ) 
@@ -441,11 +443,11 @@ foam.CLASS({
             return super.put_(x,obj);
           }
 
-          return null; // as request has been REJECTED
+          return null; // as request has been REJECTED or CANCELLED
         }
 
         if ( approvedObjUpdateRequests.size() > 1 ) {
-          logger.error("Something went wrong cannot have multiple approved/rejected requests for the same request!");
+          logger.error("Something went wrong cannot have multiple approved/rejected/cancelled requests for the same request!");
           throw new RuntimeException("Something went wrong cannot have multiple approved/rejected requests for the same request!");
         }
 
@@ -453,7 +455,7 @@ foam.CLASS({
           .setId(hashedId)
           .setDaoKey(getDaoKey())
           .setStatus(ApprovalStatus.REQUESTED)
-          .setObjId(approvableAwareObj.getStringId())
+          .setObjId(String.valueOf(obj.getProperty("id")))
           .setPropertiesToUpdate(updatedProperties).build());
 
         ApprovalRequest approvalRequest = new ApprovalRequest.Builder(x)

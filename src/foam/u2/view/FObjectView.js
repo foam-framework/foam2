@@ -36,7 +36,7 @@ foam.CLASS({
       },
       postSet: function(oldValue, newValue) {
         if ( newValue !== oldValue && oldValue !== '') {
-          if ( this.data && this.data.cls_.name === newValue ) return;
+          if ( this.data && this.data.cls_.id === newValue ) return;
           var m = this.__context__.lookup(newValue, true);
           if ( m ) {
             this.data = m.create(null, this);
@@ -79,6 +79,12 @@ foam.CLASS({
         model in the 'of' property. The user can choose to create an instance
         of one of the models in this list.
       `
+    },
+    {
+      class: 'Boolean',
+      name: 'enableStrategizer',
+      documentation: 'Boolean toggle for rendering the strategizer.',
+      value: true
     }
   ],
 
@@ -89,7 +95,7 @@ foam.CLASS({
     },
 
     function updateChoices() {
-      if ( this.of == null ) {
+      if ( this.of == null || ! this.enableStrategizer ) {
         this.choices = [];
         return;
       }
@@ -105,9 +111,15 @@ foam.CLASS({
       // implements and extends relations.
       if ( this.strategizer != null ) {
         this.strategizer.query(null, this.of.id).then((strategyReferences) => {
+          // 'found' is set to true if the current data's objectClass is one
+          // of the valid choices. If it isn't, then the objectClass is set
+          // to the first choice to cause a new 'data' to be created.
+          var found = false;
+          var data = this.data;
+
           if ( ! Array.isArray(strategyReferences) || strategyReferences.length === 0 ) {
             this.choices = [[this.of.id, this.of.model_.label]];
-            found = data && data.cls_.name == this.of.id;
+            found = data && data.cls_.id == this.of.id;
             return;
           }
 
@@ -118,7 +130,7 @@ foam.CLASS({
                 return arr;
               }
 
-              if ( data && data.cls_.name === sr.strategy.id ) found = true;
+              if ( data && data.cls_.id === sr.strategy.id ) found = true;
               return arr.concat([[sr.strategy.id, sr.label || sr.strategy.model_.label]]);
             }, [])
             .filter(x => x);

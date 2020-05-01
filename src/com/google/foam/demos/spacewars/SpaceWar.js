@@ -4,55 +4,6 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-// TODO: use friction
-// base Animation and Collider off of same Timer
-
- foam.CLASS({
-    package: 'com.google.foam.demos.spacewars',
-    name: 'Bullet',
-    extends: 'foam.physics.PhysicalCircle',
-
-    requires: [
-     'foam.animation.Animation'
-    ],
-
-    imports: [ 'addSprite' ],
-
-    properties: [
-     [ 'color',  'white' ],
-     [ 'radius', 3 ],
-     [ 'mass',   0.05 ],
-     [ 'border', null ]
-    ],
-
-    methods: [
-      function init() {
-        this.SUPER();
-
-        this.addSprite(this);
-        this.onDetach(this.Animation.create({
-          duration: 8000,
-          f: () => {
-           this.x += 3000 * this.vx;
-           this.y += 3000 * this.vy;
-          },
-          onEnd: () => this.detach(),
-          objs: [ this ]
-        }).start());
-      },
-
-      function collideWith(o) {
-        /*
-        if( this.cls_.isInstance(o) && o.color !== this.color ) {
-          this.detach();
-          o.detach();
-        }
-        */
-      }
-    ]
- });
-
-
 foam.CLASS({
   package: 'com.google.foam.demos.spacewars',
   name: 'Ship',
@@ -60,23 +11,25 @@ foam.CLASS({
 
   requires: [
     'com.google.foam.demos.spacewars.Bullet',
+    'foam.animation.Animation',
+    'foam.graphics.Arc',
     'foam.graphics.Box',
     'foam.graphics.Circle',
     'foam.input.Gamepad'
   ],
 
-  imports: [ 'addSprite' ],
+  imports: [ 'addSprite', 'gameOver' ],
 
   properties: [
     [ 'id',     0 ],
-    [ 'radius', 15 ],
+    [ 'radius', 40 ],
     [ 'border', 'white' ],
-    [ 'shield', 999 ],
+    [ 'shield', 1000 ],
     {
       name: 'gamepad',
       factory: function() { return this.Gamepad.create({id: this.id}); }
     },
-    'engine1', 'engine2'
+    'engine1', 'engine2', 'forcefield'
   ],
 
   methods: [
@@ -85,54 +38,73 @@ foam.CLASS({
         radius:      7,
         color:       'red',
         border:      null,
-        x:           -this.radius+5,
-        y:           -12,
+        x:           -this.radius+20,
+        y:           -14,
         shadowColor: 'red',
         shadowBlur:  10,
-        scaleX:      1.8
+        scaleX:      2
       });
 
       this.engine2 = this.Circle.create({
         radius:      7,
         color:       'red',
         border:      null,
-        x:           -this.radius+5,
-        y:           12,
+        x:           -this.radius+20,
+        y:           14,
         shadowColor: 'red',
         shadowBlur:  10,
-        scaleX:      1.8
+        scaleX:      2
       });
 
       var hull = this.Circle.create({
-        color: this.color,
-        radius: this.radius,
+        color:  this.color,
+        radius: this.radius-24,
         border: 'gray',
         scaleX: 1.4
       });
 
-      this.add(this.engine1, this.engine2, hull);
+      this.forcefield = this.Arc.create({
+        start:       0,
+        end:         Math.PI*2,
+        radius:      this.radius,
+        shadowBlur:  10,
+        shadowColor: 'white',
+        border:      'white',
+        arcWidth:    8,
+        alpha:       1
+      });
 
       var gun = this.Box.create({
         width:  8,
         height: 4,
         color:  'white',
         border: null,
-        x:      this.radius+1,
+        x:      this.radius-15,
         y:      -2
       });
-      this.add(gun);
+
+      this.add(this.engine1, this.engine2, hull, this.forcefield, gun);
     },
+
+    function paintSelf() {},
 
     function collideWith(c) {
       if ( this.Bullet.isInstance(c) ) {
-        if ( c.color != this.color ) this.shield--;
+        if ( c.color != this.color ) {
+          if ( this.shield == 1 ) {
+            this.explode();
+            this.gameOver(this.id + 1, this.color);
+          }
+          this.forcefield.alpha = Math.min(1.1, this.forcefield.alpha+0.25);
+          this.shield = Math.max(0, this.shield-1);
+        }
         c.detach();
       }
     },
 
     function thrust() {
       this.applyMomentum(0.25, -this.rotation);
-      this.engine1.alpha = this.engine2.alpha = 1;
+      this.engine1.alpha = this.engine2.alpha = 1.5;
     },
 
     function turnLeft() {
@@ -152,6 +124,33 @@ foam.CLASS({
       b.x += b.vx * this.radius/2;
       b.y += b.vy * this.radius/2;
       this.addSprite(b);
+    },
+
+    function explode() {
+      // TODO: add sound effect
+      for ( var i = 0 ; i < 100 ; i++ ) {
+        let c = this.Circle.create({
+          x: Math.random() * 60 - 30,
+          y: Math.random() * 60 - 30,
+          color: 'rgba(255,' + Math.random()*255 + ',0)',
+          radius: 0,
+          border: null,
+          alpha: 0.1
+        });
+        this.add(c);
+        this.Animation.create({
+          delay: Math.random() * 1000,
+          duration: 1000,
+          f: () => { c.radius = Math.random() * 150; c.x *= 2; c.y *= 2; },
+          objs: [ c ],
+          interp: Math.sqrt
+        }).start();
+      }
+      this.Animation.create({
+        duration: 2000,
+        f: () => this.alpha = 0,
+        objs: [ this ]
+      }).start();
     }
   ],
 
@@ -165,11 +164,55 @@ foam.CLASS({
         if ( this.gamepad.button3 ) this.turnLeft();
         if ( this.gamepad.button4 ) this.fire();
         if ( this.gamepad.button5 ) this.fire();
-        if ( this.engine1.alpha > 0.3 ) this.engine1.alpha *= 0.95;
-        if ( this.engine2.alpha > 0.3 ) this.engine2.alpha *= 0.95;
+        if ( this.engine1.alpha > 0.4 ) this.engine1.alpha *= 0.95;
+        if ( this.engine2.alpha > 0.4 ) this.engine2.alpha *= 0.95;
+        this.forcefield.alpha *= 0.96;
       }
     }
   ]
+});
+
+
+foam.CLASS({
+   package: 'com.google.foam.demos.spacewars',
+   name: 'Bullet',
+   extends: 'foam.physics.PhysicalCircle',
+
+   requires: [
+    'foam.animation.Animation'
+   ],
+
+   properties: [
+    [ 'color',  'white' ],
+    [ 'radius', 3 ],
+    [ 'mass',   0.05 ],
+    [ 'border', null ]
+   ],
+
+   methods: [
+     function init() {
+       this.SUPER();
+
+       this.onDetach(this.Animation.create({
+         duration: 8000,
+         f: () => {
+          this.x += 3000 * this.vx;
+          this.y += 3000 * this.vy;
+         },
+         onEnd: () => this.detach(),
+         objs: [ this ]
+       }).start());
+     },
+
+     function collideWith(o) {
+       /*
+       if( this.cls_.isInstance(o) && o.color !== this.color ) {
+         this.detach();
+         o.detach();
+       }
+       */
+     }
+   ]
 });
 
 
@@ -197,8 +240,8 @@ foam.CLASS({
 
       // Apply Gravity
       var dx = c.x - star.x, dy = c.y - star.y;
-      var dsquared = Math.max(star.radius * star.radius, dx * dx + dy * dy);
-      c.applyMomentum(-750 * c.mass / dsquared, this.angleOfImpact(this.star, c));
+      var dsquared = dx * dx + dy * dy;
+      c.applyMomentum(-1200 * c.mass / dsquared, this.angleOfImpact(this.star, c));
     },
     function collide(c1, c2) {
       if ( this.Bullet.isInstance(c1) && this.Bullet.isInstance(c1) ) return;
@@ -219,15 +262,18 @@ foam.CLASS({
     'com.google.foam.demos.spacewars.Bullet',
     'com.google.foam.demos.spacewars.GravityEngine',
     'com.google.foam.demos.spacewars.Ship',
+    'foam.animation.Animation',
     'foam.audio.Beep',
+    'foam.audio.Speak',
     'foam.graphics.Box',
+    'foam.graphics.Circle',
     'foam.graphics.CView',
     'foam.graphics.Label',
     'foam.physics.PhysicalCircle'
   ],
 
   exports: [
-    'addSprite', 'star'
+    'addSprite', 'gameOver', 'star'
   ],
 
   constants: {
@@ -246,7 +292,7 @@ foam.CLASS({
         shadowColor: 'white',
         border: null,
         color: 'black',
-        radius: 70,
+        radius: 80,
         mass: 1000
       }); }
     },
@@ -276,6 +322,8 @@ foam.CLASS({
     function init() {
       this.SUPER();
 
+      this.addStars();
+
       this.star.x = this.canvas.width/2;
       this.star.y = this.canvas.height/2;
       this.star.collideWith = (c) => {
@@ -285,9 +333,9 @@ foam.CLASS({
       };
 
       var lScoreLabel = this.Label.create({
-        text$:  this.lShip.shield$.map((s) => 'Shield: ' + s.toString().padStart(3, '0')),
+        text$:  this.lShip.shield$.map((s) => 'Shield: ' + (s/10).toFixed(1) + '%'),
         align:  'center',
-        x:      170,
+        x:      200,
         y:      25,
         color:  'lightblue',
         font:   '50px Arial',
@@ -295,9 +343,9 @@ foam.CLASS({
         height: 70});
 
       var rScoreLabel = this.Label.create({
-        text$:  this.rShip.shield$.map((s) => 'Shield: ' + s.toString().padStart(3, '0')),
+        text$:  this.rShip.shield$.map((s) => 'Shield: ' + (s/10).toFixed(1) + '%'),
         align:  'center',
-        x:      this.canvas.width-170,
+        x:      this.canvas.width-200,
         y:      25,
         color:  'orange',
         font:   '50px Arial',
@@ -348,12 +396,51 @@ foam.CLASS({
       this.Beep.create({duration: 320, frequency: 180, envelope: true, attack: 5, decay: 5}).play();
     },
 
+    function addStars() {
+      for ( var i = 0 ; i < 512 ; i++ ) {
+        this.canvas.add(this.Circle.create({
+          x: Math.random() * this.canvas.width,
+          y: Math.random() * this.canvas.height,
+          radius: 0.7 + 1 * Math.random(),
+          border: null,
+          color: 'white'
+        }));
+      }
+    },
+
     function initE() {
       this.SUPER();
       this.style({outline: 'none'}).focus().add(this.canvas);
     },
 
-    function gameOver() {
+    function gameOver(playerNumber, playerColor) {
+      this.collider.stop();
+
+      this.star.add(this.Label.create({
+        text:        'Game Over',
+        align:       'center',
+        color:       'black',
+        shadowColor: playerColor,
+        shadowBlur:  20,
+        y:           -12
+      }));
+
+      this.star.add(this.Label.create({
+        text:        'Player ' + playerNumber + ' Wins!',
+        align:       'center',
+        color:       'black',
+        shadowColor: playerColor,
+        shadowBlur:  20,
+        y:           0
+      }));
+
+      this.Animation.create({
+        duration: 2000,
+        f:        ()=> { this.star.scaleX = this.star.scaleY = 18; },
+        objs:     [this.star]
+      }).start();
+
+      this.Speak.create({text: 'Game Over. Player ' + playerNumber + ' Wins!'}).play();
     }
   ],
 
@@ -406,13 +493,8 @@ foam.CLASS({
       name: 'tick',
       code: function() {
         // Add friction
-        this.lShip.velocity *= 0.995;
-        this.rShip.velocity *= 0.995;
-
-        // Reset scores
-        if ( this.lShip.shield <= 0 || this.rShip.shield <= 0 ) {
-          this.gameOver();
-        }
+        this.lShip.velocity *= 0.996;
+        this.rShip.velocity *= 0.996;
       }
     }
   ]
