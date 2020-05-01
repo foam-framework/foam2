@@ -2680,7 +2680,8 @@ foam.CLASS({
 
         for ( int i = 0 ; i < getExprs().length ; i++ )
           a[i] = getExprs()[i].f(obj);
-        this.getArray().add(a);
+
+        getArray().add(a);
       `
     }
   ]
