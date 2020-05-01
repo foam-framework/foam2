@@ -26,7 +26,7 @@ foam.CLASS({
     }
 
     ^dropdown {
-      margin-bottom: 20px;
+      border-radius: 4px;
       position: absolute;
       background-color: #f9f9f9;
       margin-bottom: 20px;
