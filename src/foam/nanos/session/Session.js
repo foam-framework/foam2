@@ -16,14 +16,16 @@ foam.CLASS({
   javaImports: [
     'foam.core.X',
     'foam.dao.DAO',
+    'static foam.mlang.MLang.*',
     'foam.nanos.app.AppConfig',
     'foam.nanos.auth.*',
     'foam.nanos.boot.NSpec',
     'foam.nanos.logger.Logger',
     'foam.nanos.logger.PrefixLogger',
+    'foam.nanos.theme.Theme',
+    'foam.nanos.theme.ThemeDomain',
     'foam.util.SafetyUtil',
     'java.util.Date',
-    'static foam.mlang.MLang.*',
     'javax.servlet.http.HttpServletRequest',
     'org.eclipse.jetty.server.Request'
   ],
@@ -233,6 +235,18 @@ foam.CLASS({
           }
           AppConfig appConfig = (AppConfig) x.get("appConfig");
           appConfig = (AppConfig) appConfig.fclone();
+
+          ThemeDomain td = (ThemeDomain) ((DAO) x.get("themeDomainDAO")).find(req.getServerName());
+          if ( td != null ) {
+            Theme theme = (Theme) ((DAO) x.get("themeDAO")).find(td.getTheme());
+            if ( theme != null ) {
+              AppConfig themeAppConfig = theme.getAppConfig();
+              if ( themeAppConfig != null ) {
+                appConfig.copyFrom(themeAppConfig);
+              }
+            }
+          }
+
           String configUrl = ((Request) req).getRootURL().toString();
 
           if ( appConfig.getForceHttps() ) {
@@ -248,6 +262,7 @@ foam.CLASS({
             configUrl = configUrl.substring(0, configUrl.length()-1);
           }
           appConfig.setUrl(configUrl);
+
           rtn = rtn.put("appConfig", appConfig);
 
           return rtn;

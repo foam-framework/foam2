@@ -74,7 +74,8 @@ foam.CLASS({
       name: 'supportEmail'
     },
     {
-      class: 'String',
+      class: 'Reference',
+      of: 'foam.nanos.auth.ServiceProvider',
       name: 'defaultSpid'
     },
     {

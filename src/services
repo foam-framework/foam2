@@ -813,28 +813,6 @@ p({"class":"foam.nanos.boot.NSpec","name":"emailConfig",                       "
 p({"class":"foam.nanos.boot.NSpec", "name":"serializationTestEchoService", "boxClass": "foam.nanos.test.EchoServiceSkeleton",  "serve":true, "serviceClass":"foam.nanos.test.SerializationTestEchoService", "client":"{\"class\":\"foam.nanos.test.ClientEchoService\",\"delegate\":{\"class\":\"foam.box.SessionClientBox\",\"delegate\":{\"class\":\"foam.box.HTTPBox\",\"method\":\"POST\",\"url\":\"service/serializationTestEchoService\"}}}"})
 
 p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "themeDAO",
-  "description": "Stores Themes, which are used to style the application.",
-  "serve": true,
-  "authenticate": false,
-  "serviceScript": """
-    return new foam.dao.EasyDAO.Builder(x)
-      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("themeDAO"))
-      .setPm(true)
-      .setSeqNo(true)
-      .setOf(foam.nanos.theme.Theme.getOwnClassInfo())
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName("themes")
-      .setIndex(new foam.core.PropertyInfo[] {foam.nanos.auth.GroupPermissionJunction.TARGET_ID})
-      .build()
-      .orderBy(foam.mlang.MLang.DESC(foam.nanos.theme.Theme.PRIORITY));
-  """,
-  "client": "{\"of\":\"foam.nanos.theme.Theme\"}",
-  "authNotes": "Needs to be unauthenticated because we need to be able to theme apps before the user has logged in. However, we still need to restrict write access, which we do via an AuthorizationDAO."
-})
-
-p({
   "class":"foam.nanos.boot.NSpec",
   "name":"localGroupPermissionJunctionDAO",
   "description":"The junction DAO for the many-to-many relationship between groups and permissions",
