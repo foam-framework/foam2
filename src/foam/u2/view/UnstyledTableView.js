@@ -522,7 +522,7 @@ foam.CLASS({
                       }
                       cls = column.of;
 
-                      if (  props.length - 1 )
+                      if ( i !==  props.length - 1 )
                         theObj = theObj[props[i]];
                     }
                   } else
