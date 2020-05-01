@@ -10,6 +10,8 @@ import foam.dao.Sink;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
+import java.util.Set;
+
 public class ValueIndex
   extends AbstractIndex
 {
@@ -26,8 +28,8 @@ public class ValueIndex
   public void onAdd(Sink sink) {
   }
 
-  public Object put(Object state, FObject value) {
-    return value;
+  public Object put(Object state, FObject oldValue, FObject newValue) {
+    return newValue;
   }
 
   public Object remove(Object state, FObject value) {

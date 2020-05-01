@@ -13,10 +13,8 @@ import foam.mlang.predicate.Predicate;
 import foam.mlang.sink.GroupBy;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.HashSet;
-import java.util.Set;
+
+import java.util.*;
 
 /**
  The MDAO class for an ordering, fast lookup, single value,
@@ -98,13 +96,8 @@ public class MDAO
 
     synchronized ( writeLock_ ) {
       FObject oldValue = find_(x, obj);
-      Object  state    = getState();
-
-      if ( oldValue != null ) {
-        state = index_.remove(state, oldValue);
-      }
-
-      setState(index_.put(state, obj));
+      Object state = getState();
+      setState(index_.put(state, oldValue, obj));
     }
 
     onPut(obj);
@@ -147,10 +140,10 @@ public class MDAO
   }
 
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    Logger     logger = (Logger) x.get("logger");
+    Logger logger = (Logger) x.get("logger");
     SelectPlan plan;
-    Predicate  simplePredicate = null;
-    PM         pm = null;
+    Predicate simplePredicate = null;
+    PM pm = null;
 
     // use partialEval to wipe out such useless predicate such as: And(EQ()) ==> EQ(), And(And(EQ()),GT()) ==> And(EQ(),GT())
     if ( predicate != null ) simplePredicate = predicate.partialEval();
@@ -175,10 +168,10 @@ public class MDAO
 
     if ( state != null && predicate != null && plan.cost() > 10 && plan.cost() >= index_.size(state) ) {
       pm = new PM(this.getClass(), "MDAO:UnindexedSelect:" + getOf().getId());
-      if ( ! unindexed_.contains(getOf().getId())) {
-        if ( ! predicate.equals(simplePredicate) && 
-             logger != null ) {
-            logger.debug(String.format("The original predicate was %s but it was simplified to %s.", predicate.toString(), simplePredicate.toString()));
+      if ( ! unindexed_.contains(getOf().getId()) ) {
+        if ( ! predicate.equals(simplePredicate ) &&
+          logger != null) {
+          logger.debug(String.format("The original predicate was %s but it was simplified to %s.", predicate.toString(), simplePredicate.toString()));
         }
         unindexed_.add(getOf().getId());
         if ( logger != null ) {

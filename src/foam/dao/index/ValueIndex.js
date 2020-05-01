@@ -62,7 +62,7 @@ foam.CLASS({
     },
 
     // from Index
-    function put(s) { this.value = s; },
+    function put(oldValue, newValue) { this.value = newValue; },
     function remove() { this.value = undefined; },
     function get() { return this.value; },
     function size() { return typeof this.value === 'undefined' ? 0 : 1; },

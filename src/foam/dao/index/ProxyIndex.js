@@ -58,7 +58,7 @@ foam.CLASS({
       this.delegate = this.delegate || this.index.delegate.createNode();
     },
 
-    function put(o) { return this.delegate.put(o); },
+    function put(oldValue, newValue) { return this.delegate.put(oldValue, newValue); },
 
     function remove(o) { return this.delegate.remove(o); },
 

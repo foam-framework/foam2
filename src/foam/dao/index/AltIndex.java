@@ -11,6 +11,7 @@ import foam.dao.Sink;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 import java.util.ArrayList;
+import java.util.Set;
 
 /** Note this class is not thread safe because ArrayList isn't thread-safe. Needs to be made safe by containment. **/
 public class AltIndex
@@ -39,7 +40,7 @@ public class AltIndex
     final Object[] sa = toObjectArray(state);
     Sink sink = new AbstractSink() {
       public void put(Object obj, foam.core.Detachable sub) {
-        sa[sa.length-1] = i.put(sa[sa.length-1], (FObject) obj);
+        sa[sa.length-1] = i.put(sa[sa.length-1], null, (FObject) obj);
       }
     };
 
@@ -62,15 +63,15 @@ public class AltIndex
     return s2;
   }
 
-  public Object put(Object state, FObject value) {
+  public Object put(Object state, FObject oldValue, FObject newValue) {
     Object[] s = toObjectArray(state);
 
-    for ( int i = 0 ; i < delegates_.size() ; i++ )
-      s[i] = delegates_.get(i).put(s[i], value);
+    for ( int i = 0 ; i < delegates_.size() ; i++ ) {
+      s[i] = delegates_.get(i).put(s[i], oldValue, newValue);
+    }
 
     return s;
   }
-
 
   public Object remove(Object state, FObject value) {
     Object[] s = toObjectArray(state);

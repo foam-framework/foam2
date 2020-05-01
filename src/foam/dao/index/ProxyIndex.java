@@ -12,6 +12,7 @@ import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
 import java.io.IOException;
+import java.util.Set;
 
 public class ProxyIndex
   extends AbstractIndex
@@ -35,8 +36,8 @@ public class ProxyIndex
   }
 
   @Override
-  public Object put(Object state, FObject value) {
-    return wrap(getDelegate().put(unwrap(state), value));
+  public Object put(Object state, FObject oldValue, FObject newValue) {
+    return wrap(getDelegate().put(unwrap(state), oldValue, newValue));
   }
 
   @Override

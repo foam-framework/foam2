@@ -30,6 +30,134 @@ runner.execute(x);""",
 	"lastModifiedBy": 1348
 })
 
+//MDAO update method 
+
+p({
+  "class": "foam.nanos.script.Script",
+  "id": "benchmarkMDAOPut",
+  "description": "Benchmark MDAO put",
+  "code": """
+    import foam.nanos.bench.*;
+    import foam.nanos.bench.benchmarks.*;
+    import net.nanopay.bench.*;
+
+    x = x.put("pmLogger", null);
+
+    b1 = new MDAOPutBanchmark();
+
+    r1 = new BenchmarkRunner.Builder(x).setThreadCount(1).setInvocationCount(1000).setBenchmark(b1).build();
+    r1.execute(x);
+  """,
+    "lastModifiedBy": 1348
+  })
+})
+
+
+p({
+  "class": "foam.nanos.script.Script",
+  "id": "benchmarkMDAOPutFind",
+  "description": "Benchmark MDAO put and find",
+  "code": """
+    import foam.nanos.bench.*;
+    import foam.nanos.bench.benchmarks.*;
+    import net.nanopay.bench.*;
+
+    x = x.put("pmLogger", null);
+
+    b2 = new MDAOPutFind();
+
+    r2 = new BenchmarkRunner.Builder(x).setThreadCount(1).setInvocationCount(1000).setBenchmark(b2).build();
+    r2.execute(x);
+  """,
+    "lastModifiedBy": 1348
+  })
+})
+
+
+p({
+  "class": "foam.nanos.script.Script",
+  "id": "benchmarkMDAOPutSelect",
+  "description": "Benchmark MDAO put and select",
+  "code": """
+    import foam.nanos.bench.*;
+    import foam.nanos.bench.benchmarks.*;
+    import net.nanopay.bench.*;
+
+    x = x.put("pmLogger", null);
+
+    b3 = new MDAOPutSelect();
+
+    r3 = new BenchmarkRunner.Builder(x).setThreadCount(1).setInvocationCount(1000).setBenchmark(b3).build();
+    r3.execute(x);
+  """,
+    "lastModifiedBy": 1348
+  })
+})
+
+
+p({
+  "class": "foam.nanos.script.Script",
+  "id": "benchmarkMDAOUpdate",
+  "description": "Benchmark MDAO update",
+  "code": """
+    import foam.nanos.bench.*;
+    import foam.nanos.bench.benchmarks.*;
+    import net.nanopay.bench.*;
+
+    x = x.put("pmLogger", null);
+
+    b4 = new MDAOUpdateBenchmark();
+
+    r4 = new BenchmarkRunner.Builder(x).setThreadCount(1).setInvocationCount(1000).setBenchmark(b4).build();
+    r4.execute(x);
+  """,
+    "lastModifiedBy": 1348
+  })
+})
+
+
+p({
+  "class": "foam.nanos.script.Script",
+  "id": "benchmarkMDAOUpdateFind",
+  "description": "Benchmark MDAO update and find",
+  "code": """
+    import foam.nanos.bench.*;
+    import foam.nanos.bench.benchmarks.*;
+    import net.nanopay.bench.*;
+
+    x = x.put("pmLogger", null);
+
+    b5 = new MDAOUpdateFind();
+
+    r5 = new BenchmarkRunner.Builder(x).setThreadCount(1).setInvocationCount(1000).setBenchmark(b5).build();
+    r5.execute(x);
+  """,
+    "lastModifiedBy": 1348
+  })
+})
+
+
+p({
+  "class": "foam.nanos.script.Script",
+  "id": "benchmarkMDAOUpdateSelect",
+  "description": "Benchmark MDAO update and select",
+  "code": """
+    import foam.nanos.bench.*;
+    import foam.nanos.bench.benchmarks.*;
+    import net.nanopay.bench.*;
+
+    x = x.put("pmLogger", null);
+
+    b6 = new MDAOUpdateSelect();
+
+
+    r6 = new BenchmarkRunner.Builder(x).setThreadCount(1).setInvocationCount(1000).setBenchmark(b6).build();
+    r6.execute(x);
+  """,
+    "lastModifiedBy": 1348
+})
+
+
 p({
 	"class": "foam.nanos.script.Script",
 	"id": "benchmarkJSONEscaping",

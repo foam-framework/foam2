@@ -155,17 +155,17 @@ describe('ValueIndex', function() {
   });
 
   it('stores a value', function() {
-    idx.put(data[0]);
+    idx.put(null, data[0]);
     expect(idx.get()).toBe(data[0]);
   });
   it('clears its value', function() {
-    idx.put(data[0]);
+    idx.put(null, data[0]);
     expect(idx.get()).toBe(data[0]);
     idx.remove();
     expect(idx.get()).toBeUndefined();
   });
   it('selects when skip and limit allow', function() {
-    idx.put(data[0]);
+    idx.put(null, data[0]);
 
     var sink = { put: function(o) { this.putted = o; } };
 
@@ -213,7 +213,7 @@ describe('ValueIndex', function() {
   });
 
   it('selects when predicate allows', function() {
-    idx.put(data[0]);
+    idx.put(null, data[0]);
 
     var sink = { put: function(o) { this.putted = o; } };
 
@@ -231,9 +231,9 @@ describe('ValueIndex', function() {
 
   it('returns proper size', function() {
     expect(idx.size()).toEqual(0);
-    idx.put(data[0]);
+    idx.put(null, data[0]);
     expect(idx.size()).toEqual(1);
-    idx.put(data[1]);
+    idx.put(null, data[1]);
     expect(idx.size()).toEqual(1);
     idx.remove();
     expect(idx.size()).toEqual(0);
@@ -241,7 +241,7 @@ describe('ValueIndex', function() {
 
   it('covers toString()', function() {
     idx.toString(); // empty
-    idx.put(data[0]);
+    idx.put(null, data[0]);
     idx.toString(); // with value
   });
 
@@ -273,7 +273,7 @@ describe('ValueIndex (as Plan)', function() {
 
 
   it('plans for a value', function() {
-    idx.put(data[0]);
+    idx.put(null, data[0]);
     plan = idx.plan();
 
     var sink = { put: function(o) { this.putted = o; } };
@@ -788,7 +788,7 @@ describe('AltIndex', function() {
     expect(sink.array.length).toEqual(0);
 
     // puts back
-    idx.put(data[0]);
+    idx.put(null, data[0]);
     plan = callPlan(idx, sink, m.EQ(test.Indexable.FLOAT, data[0].float));
     expect(sink.array.length).toEqual(1);
 
