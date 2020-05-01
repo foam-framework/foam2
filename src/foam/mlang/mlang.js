@@ -3300,6 +3300,9 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
+      code: function(o) {
+        return o[this.key];
+      },
       javaCode: `
         return ((foam.core.X) obj).get(getKey());
       `
