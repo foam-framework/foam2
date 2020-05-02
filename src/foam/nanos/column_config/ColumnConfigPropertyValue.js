@@ -44,10 +44,10 @@ foam.CLASS({
       javaCode: `
         ClassInfo ci = of;
         PropertyInfo p = null;
-        for(int i = 0; i < propInfo.split(".").length; i++) {
-          if ( p == null || ci == null )
+        for(int i = 0; i < propInfo.split("\\\\.").length; i++) {
+          if ( ( p == null && i != 0 ) || ci == null )
             break;
-          p = (PropertyInfo) ci.getAxiomByName(propInfo.split(".")[i]);
+          p = (PropertyInfo) ci.getAxiomByName(propInfo.split("\\\\.")[i]);
           ci = p.getClassInfo();
         }
         return p;
@@ -100,19 +100,15 @@ foam.CLASS({
       },
       javaCode: `
         ClassInfo ci = of;
-        FObject obj1 = null;
+        FObject obj1 = obj;
         PropertyInfo p = null;
-        for(int i = 0; i < propInfo.split(".").length; i++) {
-          if ( p == null || (obj1 == null && i == 1) || ci == null )
+        for(int i = 0; i < propInfo.split("\\\\.").length; i++) {
+          if ( ( p == null && i != 0 ) || ci == null )
             break;
-          p = (PropertyInfo) ci.getAxiomByName(propInfo.split(".")[i]);
+          p = (PropertyInfo) ci.getAxiomByName(propInfo.split("\\\\.")[i]);
           if ( i < propInfo.split(".").length - 1 ) {
-            if ( i > 0 )
+            if ( i > 0 && obj1 != null)
               obj1 = (FObject) p.f(obj1);
-            else {
-              if(obj1 != null)
-                obj1 = (FObject) p.f(obj);
-            }
           }
           ci = p.getClassInfo();
         }

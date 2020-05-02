@@ -12,6 +12,10 @@ foam.CLASS({
     'foam.lib.csv.CSVOutputter'
   ],
 
+  // imports: [
+  //   'columnConfigToPropertyConverter'
+  // ],
+
   javaImports: [
     'foam.core.*',
     'java.util.List',
@@ -145,7 +149,7 @@ foam.CLASS({
         { type: 'Context', name: 'x' }
       ],
       code: function(x) {
-        var columnConfig = this.__context__.columnConfigToPropertyConverter;
+        var columnConfig = x.columnConfigToPropertyConverter;
         this.props
           .map((propName) => {
             var prop = propName;
@@ -174,7 +178,7 @@ foam.CLASS({
       code: function(x, obj) {
         if ( ! this.of ) this.of = obj.cls_;
         if ( this.isFirstRow ) this.outputHeader(x);
-        var columnConfig = this.__context__.columnConfigToPropertyConverter;
+        var columnConfig = x.columnConfigToPropertyConverter;
         this.props
           .forEach((propName) => {
             var prop = propName;
