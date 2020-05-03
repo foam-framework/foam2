@@ -181,6 +181,13 @@ foam.CLASS({
     {
           class: 'StringArray',
           name: 'keywords'
+    },
+    {
+      class: 'String',
+      name: '_choiceText_',
+      transient: true,
+      javaGetter: 'return getName();',
+      getter: function() { return this.name; }
     }
     // TODO: permissions, lazy, parent
   ],

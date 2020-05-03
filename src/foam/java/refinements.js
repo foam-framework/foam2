@@ -1716,7 +1716,7 @@ foam.CLASS({
       }
     },
     ['javaInfoType',   'foam.core.AbstractArrayPropertyInfo'],
-    ['javaJSONParser', 'new foam.lib.json.ArrayParser()']
+    ['javaJSONParser', 'foam.lib.json.ArrayParser.instance()']
   ],
 
   methods: [
@@ -1732,6 +1732,9 @@ foam.CLASS({
         type: 'String',
         body: 'return "' + (this.of ? this.of.id ? this.of.id : this.of : null) + '";'
       });
+
+      if ( this.javaType != 'byte[]' && this.javaType != 'Object[]' )
+        info.getMethod('cast').body = 'Object[] a = (Object[]) o; return java.util.Arrays.copyOf(a, a.length, ' + this.javaType + '.class);';
 
       var isDefaultValue = info.getMethod('isDefaultValue');
       isDefaultValue.body = 'return java.util.Arrays.equals(get_(o), null);';
@@ -1843,7 +1846,7 @@ foam.CLASS({
   properties: [
     ['javaType', 'ArrayList'],
     ['javaInfoType', 'foam.core.AbstractPropertyInfo'],
-    ['javaJSONParser', 'new foam.lib.json.ArrayParser()']
+    ['javaJSONParser', 'oam.lib.json.ArrayParser.instance()']
   ],
 
   methods: [

@@ -107,6 +107,7 @@ foam.CLASS({
       'grey4',
       'grey5',
       'black',
+      'white',
       'inputHeight',
       'inputVerticalPadding',
       'inputHorizontalPadding'

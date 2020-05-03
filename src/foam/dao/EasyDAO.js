@@ -235,7 +235,7 @@ foam.CLASS({
           setStartingValue(getSeqStartingValue()).
           build();
         }
-        
+
         if ( getGuid() )
           delegate = new foam.dao.GUIDDAO.Builder(getX()).setDelegate(delegate).build();
 
@@ -573,7 +573,7 @@ foam.CLASS({
           delegate: this.remoteListenerSupport ?
             this.WebSocketBox.create({ uri: this.serviceName }) :
             this.HTTPBox.create({ url: this.serviceName })
-        })
+        });
         if ( this.retryBoxMaxAttempts != 0 ) {
           box = this.RetryBox.create({
             maxAttempts: this.retryBoxMaxAttempts,
@@ -673,7 +673,7 @@ model from which to test ServiceProvider ID (spid)`,
       documentation: `
         Denotes if a model is approvable aware, and if so it should ALWAYS have this decorator on,
         if an object is approvableAware but the user does not want the approval requests turned on,
-        they should set the approvableAwareEnabled property to false instead of setting the 
+        they should set the approvableAwareEnabled property to false instead of setting the
         approvableAware property to false
       `,
       javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.approval.ApprovableAware.class.isAssignableFrom(getOf().getObjClass());'
@@ -688,13 +688,13 @@ model from which to test ServiceProvider ID (spid)`,
       `,
       javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.approval.ApprovableAware.class.isAssignableFrom(getOf().getObjClass());'
     },
-    {	
-      name: 'deletedAware',	
-      class: 'Boolean',	
+    {
+      name: 'deletedAware',
+      class: 'Boolean',
       documentation: `
         DEPRECATING: Completely removing until services migration journal script is in
       `,
-      javaFactory: 'return false;'	
+      javaFactory: 'return false;'
     },
  ],
 
