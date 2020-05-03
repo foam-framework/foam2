@@ -29,3 +29,4 @@ src/cronjobs
 src/notifications
 src/ruleHistory
 src/agentJunctions
+src/sessions

@@ -53,7 +53,7 @@ public class CCLoader extends ClassLoader {
     Iterable<? extends JavaFileObject> it = manager.getJavaFileObjectsFromFiles((new ArrayList<>(Arrays.asList(javaFile))));
 
     List<String> options = new ArrayList<>();
-    options.addAll(Arrays.asList("-classpath", classpath, "-d", outDir));
+    options.addAll(Arrays.asList("-nowarn", "-classpath", classpath, "-d", outDir));
     JavaCompiler.CompilationTask task = compiler.getTask(null, manager, null, options, null, it);
     return task.call();
   }
