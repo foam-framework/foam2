@@ -55,11 +55,6 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'isEnabled',
-      value: true
-    },
-    {
-      class: 'Boolean',
       name: 'canMakerApproveOwnRequest',
       value: false
     },
@@ -170,9 +165,7 @@ foam.CLASS({
       FObject currentObjectInDAO = (FObject) dao.find(String.valueOf(obj.getProperty("id")));
       Predicate checkerPredicate = approvableAwareObj.getCheckerPredicate();
 
-      if ( ! getIsEnabled()
-        || (checkerPredicate != null && ! checkerPredicate.f(obj))
-      ){
+      if ( checkerPredicate != null && ! checkerPredicate.f(obj) ){
         if ( lifecycleObj.getLifecycleState() == LifecycleState.PENDING && currentObjectInDAO == null ){
           lifecycleObj.setLifecycleState(LifecycleState.ACTIVE);
         }

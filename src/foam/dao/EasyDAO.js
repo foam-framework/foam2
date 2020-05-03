@@ -168,7 +168,6 @@ foam.CLASS({
           .setDaoKey(getName())
           .setOf(getOf())
           .setDelegate(delegate)
-          .setIsEnabled(getApprovableAwareEnabled())
           .build();
         }
 
@@ -632,19 +631,12 @@ model from which to test ServiceProvider ID (spid)`,
       class: 'Boolean',
       documentation: `
         Denotes if a model is approvable aware, and if so it should ALWAYS have this decorator on,
-        if an object is approvableAware but the user does not want the approval requests turned on,
-        they should set the approvableAwareEnabled property to false instead of setting the
-        approvableAware property to false
-      `,
-      javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.approval.ApprovableAware.class.isAssignableFrom(getOf().getObjClass());'
-    },
-    {
-      name: 'approvableAwareEnabled',
-      class: 'Boolean',
-      documentation: `
-        Handles the approval process set to true, otherwise if set to false it will automatically
-        bypass the approval system
+        if an object is ApprovableAware but the user want the object to skip the checker/approval
+        phase, they should set the object checkerPredicate such that it is evaluated to false.
 
+        Setting easyDAO.approvableAware to false, on the other hand, would opt-out the decorator
+        (ie. ApprovableAwareDAO) completely and since ApprovableAware interface implements
+        LifecycleAware the lifecycleState property on the object will not be changed to ACTIVE.
       `,
       javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.approval.ApprovableAware.class.isAssignableFrom(getOf().getObjClass());'
     },
