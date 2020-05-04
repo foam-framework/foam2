@@ -13,7 +13,6 @@ foam.CLASS({
   documentation: `All DAO operations will block until Replay is complete.`,
 
   javaImports: [
-    'foam.dao.BatchCmd',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
   ],

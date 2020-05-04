@@ -189,6 +189,7 @@ NOTE: override cmd_ in child class to control delegate call`,
             BatchCmd cmd = new BatchCmd();
             cmd.setDop(DOP.PUT);
             cmd.setBatch(puts);
+            cmd.setHostname(System.getProperty("hostname"));
             this.cmd_(x, cmd);
             // TODO - process results.
             setLastSend(System.currentTimeMillis());
@@ -198,6 +199,7 @@ NOTE: override cmd_ in child class to control delegate call`,
             BatchCmd cmd = new BatchCmd();
             cmd.setDop(DOP.REMOVE);
             cmd.setBatch(removes);
+            cmd.setHostname(System.getProperty("hostname"));
             this.cmd_(x, cmd);
             // TODO - process results.
             setLastSend(System.currentTimeMillis());

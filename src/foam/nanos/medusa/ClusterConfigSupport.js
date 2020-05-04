@@ -279,7 +279,8 @@ configuration for contacting the primary node.`,
       if ( configs.size() > 0 ) {
         primaryConfig = configs.get(0);
         if ( configs.size() > 1 ) {
-         getLogger().error("muliple primaries", configs.get(0), configs.get(1));
+          getLogger().error("muliple primaries", configs.get(0), configs.get(1));
+          throw new RuntimeException("Multiple primaries found.");
         }
         return primaryConfig;
       } else {
@@ -306,7 +307,7 @@ configuration for contacting the primary node.`,
     },
     {
       documentation: 'Any active region in realm.',
-      name: 'getActiveRegion',
+      name: 'getActiveRegionConfig',
       args: [
         {
           name: 'x',
@@ -326,11 +327,13 @@ configuration for contacting the primary node.`,
             EQ(ClusterConfig.REGION_STATUS, RegionStatus.ACTIVE),
             EQ(ClusterConfig.REALM, config.getRealm()),
             EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
-            EQ(ClusterConfig.ZONE, 0L),
+//            EQ(ClusterConfig.ZONE, 0L),
             EQ(ClusterConfig.STATUS, Status.ONLINE),
             EQ(ClusterConfig.ENABLED, true)
           ))
-        .orderBy(ClusterConfig.IS_PRIMARY)
+        // send to outermost zone.
+        .orderBy(foam.mlang.MLang.DESC(ClusterConfig.ZONE))
+//        .orderBy(ClusterConfig.IS_PRIMARY)
         .select(new ArraySink())).getArray();
       if ( configs.size() > 0 ) {
         // TODO: random or round-robin.
@@ -338,6 +341,40 @@ configuration for contacting the primary node.`,
         return configs.get(configs.size() -1);
       } else {
         throw new RuntimeException("Active Region not found.");
+      }
+      `
+    },
+    {
+      documentation: 'Any active region in realm.',
+      name: 'getNextZoneConfig',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'config',
+          type: 'foam.nanos.medusa.ClusterConfig'
+        }
+      ],
+      type: 'foam.nanos.medusa.ClusterConfig',
+      javaCode: `
+      DAO clusterConfigDAO = (DAO) x.get("clusterConfigDAO");
+      List<ClusterConfig> configs = ((ArraySink) clusterConfigDAO
+        .where(
+          AND(
+            EQ(ClusterConfig.REGION_STATUS, RegionStatus.ACTIVE),
+            EQ(ClusterConfig.REALM, config.getRealm()),
+            EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
+            EQ(ClusterConfig.ZONE, Math.max(0L, config.getZone() -1)),
+            EQ(ClusterConfig.STATUS, Status.ONLINE),
+            EQ(ClusterConfig.ENABLED, true)
+          ))
+        .select(new ArraySink())).getArray();
+      if ( configs.size() > 0 ) {
+        return configs.get(configs.size() -1);
+      } else {
+        throw new RuntimeException("Next Zone not found.");
       }
       `
     },
@@ -517,6 +554,34 @@ configuration for contacting the primary node.`,
       `
     },
     {
+      documentation: 'determine the next server to route request to.',
+      name: 'getNextServerConfig',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      type: 'ClusterConfig',
+      javaCode: `
+      DAO dao = (DAO) x.get("localClusterConfigDAO");
+      ClusterConfig config = (ClusterConfig) dao.find(getConfigId());
+
+      // standby region -> active region
+      if ( config.getRegionStatus() != RegionStatus.ACTIVE ) {
+        return getActiveRegionConfig(x, config);
+      }
+
+      // active region, zone # -> zone # -1 (primary if known)
+      if ( config.getZone() > 0 ) {
+        return getNextZoneConfig(x, config);
+      }
+
+      // route to primary
+      return getPrimary(x);
+      `
+    },
+    {
       name: 'cronEnabled',
       type: 'Boolean',
       args: [
@@ -545,39 +610,38 @@ configuration for contacting the primary node.`,
           type: 'Context'
         },
         {
-          name: 'entry',
-          type: 'foam.nanos.medusa.MedusaEntry'
+          name: 'serviceName',
+          type: 'String'
         }
       ],
       type: 'foam.dao.DAO',
       javaCode: `
-      String name = entry.getNSpecName();
-      getLogger().debug("mdao", name);
-      Object obj = getMdaos().get(name);
+      getLogger().debug("mdao", serviceName);
+      Object obj = getMdaos().get(serviceName);
       DAO dao;
 // REVIEW: periodically the result returned from get is a Map.
-//      DAO dao = (DAO) getMdaos().get(name);
+//      DAO dao = (DAO) getMdaos().get(serviceName);
 //      if ( dao != null ) {
       if ( obj != null &&
            obj instanceof DAO ) {
         dao = (DAO) obj;
 
-        getLogger().debug("mdao", name, "cache", dao.getOf());
+        getLogger().debug("mdao", serviceName, "cache", dao.getOf());
         return dao;
       }
       if ( obj != null &&
            ! ( obj instanceof DAO ) ) {
-        getLogger().error("getMdao" ,name, "not instance of dao", obj.getClass().getSimpleName());
+        getLogger().error("getMdao" ,serviceName, "not instance of dao", obj.getClass().getSimpleName());
       }
-      dao = (DAO) x.get(name);
+      dao = (DAO) x.get(serviceName);
       Object result = dao.cmd(MDAO.GET_MDAO_CMD);
       if ( result != null &&
            result instanceof MDAO ) {
-        getLogger().debug("mdao", name, "cmd", dao.getOf());
+        getLogger().debug("mdao", serviceName, "cmd", dao.getOf());
         dao = (DAO) result;
       } else {
         while ( dao != null ) {
-          getLogger().debug("mdao", name, "while", dao.getOf());
+          getLogger().debug("mdao", serviceName, "while", dao.getOf());
           if ( dao instanceof MDAO ) {
             break;
           }
@@ -595,11 +659,11 @@ configuration for contacting the primary node.`,
         }
       }
       if ( dao != null ) {
-        getMdaos().put(name, dao);
-        getLogger().debug("mdao", name, "found", dao.getOf());
+        getMdaos().put(serviceName, dao);
+        getLogger().debug("mdao", serviceName, "found", dao.getOf());
         return dao;
       }
-      throw new IllegalArgumentException("MDAO not found: "+name);
+      throw new IllegalArgumentException("MDAO not found: "+serviceName);
       `
     }
   ]

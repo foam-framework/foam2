@@ -149,6 +149,10 @@ foam.CLASS({
       class: 'String'
     },
     {
+      name: 'replayIndex',
+      class: 'Long'
+    },
+    {
       documentation: 'Creation date.',
       name: 'created',
       class: 'DateTime',

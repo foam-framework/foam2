@@ -44,7 +44,7 @@ foam.CLASS({
       javaCode: `
       if ( obj instanceof BatchCmd ) {
         BatchCmd cmd = (BatchCmd) obj;
-        getLogger().info("cmd", "BatchCmd", cmd.getDop().getLabel(), cmd.getBatch().size());
+        getLogger().debug("cmd", "BatchCmd", cmd.getHostname(), cmd.getDop().getLabel(), cmd.getBatch().size());
 
         if ( DOP.PUT == cmd.getDop() ) {
           Map<Object, Object> map = cmd.getBatch();
@@ -54,7 +54,6 @@ foam.CLASS({
                 try {
                   getDelegate().put_(x, (FObject) entry.getValue());
                 } catch ( Throwable t ) {
-//                  map.put(entry.getKey(), t.getMessage());
                   getLogger().error(t);
                 }
               }
@@ -71,7 +70,6 @@ foam.CLASS({
                 try {
                   getDelegate().remove_(x, (FObject) entry.getValue());
                 } catch (Throwable t ) {
-//                  map.put(entry.getKey(), t.getMessage());
                   getLogger().error(t);
                 }
               }

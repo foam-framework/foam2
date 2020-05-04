@@ -12,6 +12,11 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'hostname',
+      class: 'String',
+      javaFactory: 'return System.getProperty("hostname");'
+    },
+    {
       name: 'dop',
       class: 'Enum',
       of: 'foam.dao.DOP',

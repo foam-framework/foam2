@@ -13,7 +13,7 @@ foam.CLASS({
     'foam.nanos.boot.NSpecAware',
   ],
 
-  documentation: `Create a medusa entry for argument model. NOTE:  delegate is parent MDAO, but only used as holder for MedusaEntryRoutingDAO to find.`,
+  documentation: `Create a medusa entry for argument model. NOTE:  delegate is real NSpec MDAO.`,
 
   javaImports: [
     'foam.core.FObject',
@@ -21,8 +21,10 @@ foam.CLASS({
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
-    'foam.nanos.session.Session',
-    'foam.util.SafetyUtil'
+    'java.util.concurrent.ThreadLocalRandom',
+    'java.util.Random',
+    'foam.util.SafetyUtil',
+    'java.util.UUID'
   ],
 
   properties: [
@@ -56,13 +58,15 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       FObject old = getDelegate().find_(x, obj.getProperty("id"));
-      return submit(x, (FObject) obj, old, DOP.PUT);
+      FObject nu = getDelegate().put_(x, obj);
+      return submit(x, (FObject) nu, old, DOP.PUT);
       `
     },
     {
       name: 'remove_',
       javaCode: `
-      return submit(x, (FObject) obj, null, DOP.REMOVE);
+      FObject nu = getDelegate().remove_(x, obj);
+      return submit(x, (FObject) nu, null, DOP.REMOVE);
       `
     },
     {
@@ -99,17 +103,19 @@ foam.CLASS({
       PM pm = createPM(x, dop);
       getLogger().debug("submit", dop.getLabel(), obj.getClass().getName());
 
-      // ElectoralService electoralService = (ElectoralService) x.get("electoralService");
+      DaggerService dagger = (DaggerService) x.get("daggerService");
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       ClusterConfig config = support.getConfig(x, support.getConfigId());
 
       MedusaEntry entry = x.create(MedusaEntry.class);
+      java.util.Random r = ThreadLocalRandom.current();
+      entry.setId(new UUID(r.nextLong(), r.nextLong()).toString());
+      entry = dagger.link(x, entry);
       entry.setMediator(config.getName());
       entry.setNSpecName(getNSpec().getName());
       entry.setDop(dop);
-//      entry.setSessionId(((Session) x.get("session")).getId());
 
-      foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(x).setPropertyPredicate(new foam.lib.ClusterPropertyPredicate());
+      foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(x).setPropertyPredicate(new foam.lib.StoragePropertyPredicate());
       String data = ( old != null ) ?
         outputter.stringifyDelta(old, obj) :
         outputter.stringify(obj);

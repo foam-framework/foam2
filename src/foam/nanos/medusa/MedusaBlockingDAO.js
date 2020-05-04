@@ -49,12 +49,8 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
-      if ( SafetyUtil.isEmpty(entry.getBlockingId()) ) {
-        java.util.Random r = ThreadLocalRandom.current();
-        entry.setBlockingId(new UUID(r.nextLong(), r.nextLong()).toString());
-      }
       entry = (MedusaEntry) getDelegate().put_(x, entry);
-      waitOn(x, entry.getBlockingId());
+      waitOn(x, entry);
       return entry;
       `
     },
@@ -63,7 +59,7 @@ foam.CLASS({
       javaCode: `
       if ( obj instanceof MedusaEntry ) {
         MedusaEntry entry = (MedusaEntry) obj;
-        notifyOn(x, entry.getBlockingId());
+        notifyOn(x, entry);
         return entry;
       }
       return getDelegate().cmd_(x, obj);
@@ -77,13 +73,13 @@ foam.CLASS({
           type: 'Context'
         },
         {
-          name: 'id',
-          type: 'String'
+          name: 'entry',
+          type: 'MedusaEntry'
         }
       ],
       javaCode: `
       CountDownLatch latch = null;
-
+      Long id = entry.getIndex();
       synchronized ( String.valueOf(id).intern() ) {
         latch = (CountDownLatch) getLatches().get(id);
         if ( latch == null ) {
@@ -111,13 +107,13 @@ foam.CLASS({
           type: 'Context'
         },
         {
-          name: 'id',
-          type: 'String'
+          name: 'entry',
+          type: 'MedusaEntry'
         }
       ],
       javaCode: `
       CountDownLatch latch = null;
-
+      Long id = entry.getIndex();
       synchronized ( String.valueOf(id).intern() ) {
         latch = (CountDownLatch) getLatches().get(id);
         if ( latch == null ) {

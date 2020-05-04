@@ -14,6 +14,7 @@ foam.CLASS({
   javaImports: [
     'foam.dao.DAO',
     'static foam.mlang.MLang.EQ',
+    'static foam.mlang.MLang.GTE',
     'static foam.mlang.MLang.MAX',
     'foam.mlang.sink.Max',
     'foam.nanos.logger.PrefixLogger',
@@ -68,7 +69,7 @@ foam.CLASS({
 
             // NOTE: using internalMedusaEntryDAO else we'll block on ReplayingDAO.
             DAO dao = (DAO) getX().get("internalMedusaEntryDAO");
-            dao = dao.where(EQ(MedusaEntry.HAS_CONSENSUS, true));
+            dao = dao.where(GTE(MedusaEntry.CONSENSUS_COUNT, support.getNodeQuorum(x)));
             Max max = (Max) dao.select(MAX(MedusaEntry.INDEX));
 
             ReplayDetailsCmd details = new ReplayDetailsCmd();

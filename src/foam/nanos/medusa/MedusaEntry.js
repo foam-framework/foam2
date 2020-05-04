@@ -23,7 +23,7 @@ foam.CLASS({
     'index',
     'index1',
     'index2',
-    'hasConsensus',
+    'consensusCount',
     'lastModified'
   ],
 
@@ -64,8 +64,7 @@ foam.CLASS({
       class: 'String',
       name: 'hash1',
       visibility: 'HIDDEN',
-      storageTransient: true,
-      includeInDigest: false
+      storageTransient: true
     },
     {
       class: 'Long',
@@ -76,13 +75,11 @@ foam.CLASS({
       class: 'String',
       name: 'hash2',
       visibility: 'HIDDEN',
-      storageTransient: true,
-      includeInDigest: false
+      storageTransient: true
     },
     {
       document: 'Stringified FObject',
       class: 'String',
-//      class: 'FObjectProperty',
       name: 'data',
       visibility: 'RO',
       view: {
@@ -90,9 +87,6 @@ foam.CLASS({
         rows: 4,
         cols: 144
       }
-      // view: {
-      //   class: 'foam.u2.CitationView'
-      // }
     },
     {
       class: 'String',
@@ -100,34 +94,24 @@ foam.CLASS({
       visibility: 'RO'
     },
     {
-      name: 'hasConsensus',
-      class: 'Boolean',
-      value: false,
+      name: 'consensusCount',
+      class: 'Int',
       visibility: 'RO',
       storageTransient: true,
-      includeInDigest: false,
     },
     {
       documentation: 'Solely for information. Originating Mediator.',
       name: 'mediator',
       class: 'String',
       visibility: 'RO',
-      includeInDigest: false,
+      storageTransient: true
     },
     {
       documentation: 'Solely for information. Broadcasting Node',
       name: 'node',
       class: 'String',
       visibility: 'HIDDEN',
-      includeInDigest: false,
-    },
-    {
-      documentation: 'Server put is performed in user context',
-      name: 'sessionId',
-      class: 'String',
-      visibility: 'HIDDEN',
-      storageTransient: true,
-      includeInDigest: false,
+      storageTransient: true
     },
     {
       name: 'created',
@@ -150,12 +134,6 @@ foam.CLASS({
       class: 'DateTime',
       visibility: 'RO',
       includeInDigest: false,
-    },
-    {
-      class: 'String',
-      name: 'blockingId',
-      visibility: 'RO',
-      includeInDigest: false
     }
   ]
 });

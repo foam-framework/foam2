@@ -177,7 +177,7 @@ foam.CLASS({
         setCount(getCount() + batch.size());
         long startTime = System.currentTimeMillis();
 
-        getLogger().info("execute", "batch", "size", batch.size(), "count", getCount(), "to", getTo(), "details", getDetails());
+        getLogger().debug("execute", "batch", "size", batch.size(), "count", getCount(), "to", getTo(), "details", getDetails());
 
         if ( batch.size() > 0 ) {
           ReplayBatchCmd cmd = new ReplayBatchCmd();

@@ -7,6 +7,7 @@
 foam.ENUM({
   package: 'foam.nanos.medusa',
   name: 'MedusaType',
+  // todo: rename to InstanceType
 
   documentation: 'Distinguish between Medusa functionality.',
 
@@ -18,6 +19,14 @@ foam.ENUM({
     {
       name: 'NODE',
       label: 'Node'
+    },
+    {
+      name: 'NERF',
+      label: 'NERF'
+    },
+    {
+      name: 'ARCHIVE',
+      label: 'Archive'
     }
   ]
 });
