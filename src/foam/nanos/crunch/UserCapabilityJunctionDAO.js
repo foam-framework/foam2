@@ -55,8 +55,9 @@ foam.CLASS({
       documentation: `Check if current user has permission to add this junction`,
       javaCode: `
         User user = getUser(x);
+        User agent = (User) x.get("agent");
         AuthService auth = (AuthService) x.get("auth");
-        boolean isOwner = obj.getSourceId() == user.getId();
+        boolean isOwner = obj.getSourceId() == user.getId() || ( agent != null && obj.getSourceId() == agent.getId() );
         if ( ! isOwner && ! auth.check(x, "*") ) throw new AuthorizationException();
       `
     },
@@ -97,6 +98,7 @@ foam.CLASS({
       If status is set to GRANTED, check if junctions depending on current can be granted
       `,
       javaCode: `
+      System.out.println("ucjdao put !!");
       UserCapabilityJunction ucJunction = (UserCapabilityJunction) obj;
       
       checkOwnership(x, ucJunction);
