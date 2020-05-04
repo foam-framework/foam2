@@ -6,6 +6,7 @@ foam.CLASS({
     'foam.core.FObject',
     'foam.core.PropertyInfo',
     'foam.core.X',
+    'java.lang.reflect.InvocationTargetException'
   ],
   methods: [
     {
@@ -48,7 +49,21 @@ foam.CLASS({
           if ( ( p == null && i != 0 ) || ci == null )
             break;
           p = (PropertyInfo) ci.getAxiomByName(propInfo.split("\\\\.")[i]);
-          ci = p.getClassInfo();
+          if ( i != propInfo.split("\\\\.").length - 1 ) {
+            Class cls = p.getValueClass();
+            try {
+              ci = (ClassInfo) cls.getMethod("getOwnClassInfo").invoke(null);
+            } catch (IllegalAccessException e) {
+              e.printStackTrace();
+              return null;
+            } catch (InvocationTargetException e) {
+              e.printStackTrace();
+              return null;
+            } catch (NoSuchMethodException e) {
+              e.printStackTrace();
+              return null;
+            }
+          }
         }
         return p;
       `
@@ -106,11 +121,23 @@ foam.CLASS({
           if ( ( p == null && i != 0 ) || ci == null )
             break;
           p = (PropertyInfo) ci.getAxiomByName(propInfo.split("\\\\.")[i]);
-          if ( i < propInfo.split(".").length - 1 ) {
-            if ( i > 0 && obj1 != null)
-              obj1 = (FObject) p.f(obj1);
+
+          if ( i != propInfo.split("\\\\.").length - 1 ) {
+            obj1 = (FObject) p.f(obj1);
+            Class cls = p.getValueClass();
+            try {
+              ci = (ClassInfo) cls.getMethod("getOwnClassInfo").invoke(null);
+            } catch (IllegalAccessException e) {
+              e.printStackTrace();
+              return new ColumnPropertyValue.Builder(x).setPropertyValue(null).setObjValue(null).build();
+            } catch (InvocationTargetException e) {
+              e.printStackTrace();
+              return new ColumnPropertyValue.Builder(x).setPropertyValue(null).setObjValue(null).build();
+            } catch (NoSuchMethodException e) {
+              e.printStackTrace();
+              return new ColumnPropertyValue.Builder(x).setPropertyValue(null).setObjValue(null).build();
+            }
           }
-          ci = p.getClassInfo();
         }
         return new ColumnPropertyValue.Builder(x).setPropertyValue(p).setObjValue(obj1).build();
       `
@@ -155,55 +182,7 @@ foam.CLASS({
         return arr;
       `
     }
-  ],
-  // axioms: [
-  //   {
-  //     buildJavaClass: function(cls) {
-  //       cls.extras.push(`
-  //         public final static foam.nanos.column.ColumnPropertyValue returnPropertyAndObject(X x, ClassInfo of, String[] propNames, Object obj) {
-  //           ClassInfo ci = of;
-  //           FObject obj1 = null;
-  //           PropertyInfo p = null;
-  //           for(int i = 0; i < propNames.length; i++) {
-  //             if ( p == null || (obj1 == null && i == 1) || ci == null )
-  //               break;
-  //             p = (PropertyInfo) ci.getAxiomByName(propNames[i]);
-  //             if ( i > 0 )
-  //               obj1 = (FObject) p.f(obj1);
-  //             else
-  //               obj1 = (FObject) p.f(obj);
-  //             ci = obj1.getClassInfo();
-  //           }
-  //           return new ColumnPropertyValue.Builder(x).setProperty(p).setObj(obj1).build();
-  //         }
-
-  //         public final static foam.nanos.column.ColumnPropertyValue[] returnPropertyAndObjectArray(X x, ClassInfo of, String[][] propertyNameArrays, Object obj) {
-    
-  //           ClassInfo ci = of;
-  //           foam.nanos.column.ColumnPropertyValue[] arr = new foam.nanos.column.ColumnPropertyValue[propertyNameArrays.length];
-  //           for (int i = 0; i < propertyNameArrays.length; i++) {
-  //             arr[i] = returnPropertyAndObject(x, of, propertyNameArrays[i], obj);
-  //           }
-  //           return arr;
-  //         }
-
-  //         public final static PropertyInfo returnProperty(ClassInfo of, String[] propertyNameArrays) {
-    
-  //           ClassInfo ci = of;
-  //           PropertyInfo p = null;
-  //           for(int i = 0; i < propertyNameArrays.length; i++) {
-  //             if ( p == null || ci == null )
-  //               break;
-  //             p = (PropertyInfo) ci.getAxiomByName(propertyNameArrays[i]);
-  //             ci = p.getClassInfo();
-  //           }
-  //           return p;
-  //         }
-
-  //       `)
-  //     }
-  //   }
-  // ]
+  ]
 });
 
 foam.CLASS({
