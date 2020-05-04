@@ -140,7 +140,7 @@ foam.CLASS({
         if ( x == null || permission == null ) return false;
         if ( x.get(Session.class) == null ) return false;
         if ( user == null || ! user.getEnabled() ) return false;
-
+        User agent = (User) x.get("agent");
         this.initialize(x);
 
         String key = user.getId() + permission;
@@ -155,27 +155,39 @@ foam.CLASS({
         try {
           DAO capabilityDAO = ( x.get("localCapabilityDAO") == null ) ? (DAO) x.get("capabilityDAO") : (DAO) x.get("localCapabilityDAO");
           DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
-
           // 1. check if there is a capability matching the name of the permission 
           // that is enabled and not deprecated, and granted to the user 
           Capability cap = (Capability) capabilityDAO.find(EQ(foam.nanos.crunch.Capability.NAME, permission));
-
-          Predicate capabilityScope = AND(
-            EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
-            OR(
+          Predicate userPredicate = EQ(UserCapabilityJunction.SOURCE_ID, user.getId());
+          Predicate capabilityScope = OR(
               NOT(HAS(UserCapabilityJunction.EXPIRY)),
               NOT(EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.EXPIRED))
-            )
           );
 
           if ( cap != null && cap.getEnabled() ) {
 
             if ( userCapabilityJunctionDAO.find(
               AND(
+                userPredicate,
                 capabilityScope,
                 EQ(UserCapabilityJunction.TARGET_ID, cap.getId()),
                 EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
-              )) != null ) result = true;
+              )) != null ) {
+              result = true;
+            } else if ( cap != null && agent != null && agent.getId() != user.getId() ) {
+              // if the agent is in the context and is not the same as user, check 
+              // if the agent has capability
+              userPredicate = EQ(UserCapabilityJunction.SOURCE_ID, agent.getId());
+              key = agent.getId() + permission;
+              if ( userCapabilityJunctionDAO.find(
+                AND(
+                  userPredicate,
+                  capabilityScope,
+                  EQ(UserCapabilityJunction.TARGET_ID, cap.getId()),
+                  EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
+                )) != null )
+                result = true;
+            }
             // if the user has the permission, store this in the cache and return the result
             // otherwise, move on to the 2nd part of the check
             if ( result ) {
@@ -185,6 +197,8 @@ foam.CLASS({
           }
 
           // 2. check if the user has a capability that grants the permission
+          userPredicate = EQ(UserCapabilityJunction.SOURCE_ID, user.getId());
+          key = user.getId() + permission;
           AbstractPredicate predicate = new AbstractPredicate(x) {
             @Override
             public boolean f(Object obj) {
@@ -196,14 +210,29 @@ foam.CLASS({
               return false;
             }
           };
-
-          if ( userCapabilityJunctionDAO.find(AND(capabilityScope, predicate)) != null ) {
+          if ( userCapabilityJunctionDAO.find(AND(userPredicate, capabilityScope, predicate)) != null ) {
             result = true;
           }
-
           // Add the result to the cache
-          (( Map<String, Boolean> ) getCache()).put(key, result);
+          if ( result ) {
+            (( Map<String, Boolean> ) getCache()).put(key, result);
+            return true;
+          }
 
+          // 3. check if the agent has a capability that grants the permission
+          if ( agent != null ) {
+            userPredicate = EQ(UserCapabilityJunction.SOURCE_ID, agent.getId());
+            key = agent.getId() + permission;
+            if ( userCapabilityJunctionDAO.find(AND(userPredicate, capabilityScope, predicate)) != null ) {
+              result = true;
+            }
+
+            // Add the result to the cache
+            if ( result ) {
+              (( Map<String, Boolean> ) getCache()).put(key, result);
+              return true;
+            }
+          }
         } catch (Exception e) {
           Logger logger = (Logger) x.get("logger");
           logger.error("check", permission, e);
