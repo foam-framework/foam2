@@ -94,6 +94,12 @@ foam.CLASS({
       return p;
     },
 
+    function swap(a, i1, i2) {
+      var tmp = a[i1];
+      a[i1] = a[i2];
+      a[i2] = tmp;
+    },
+
     function detectCollisions_(start, end, axis, oneD) {
       if ( start >= end ) return;
 
@@ -113,10 +119,8 @@ foam.CLASS({
       var p = start; // pivot, all values left of 'p' are in first half
       for ( var i = start ; i <= end ; i++ ) {
         var c = cs[i];
-        if ( c[axis == 'x' ? 'left_' : 'top_'] < pivot ) {
-          var t = cs[p];
-          cs[p] = c;
-          cs[i] = t;
+        if ( c[axis == 'x' ? 'left_' : 'top_'] <= pivot ) {
+          this.swap(cs, p, i);
           p++;
         }
       }
@@ -136,10 +140,8 @@ foam.CLASS({
         p--;
         for ( var i = p ; i >= start ; i-- ) {
           var c = cs[i];
-          if ( c[axis == 'x' ? 'right_' : 'bottom_'] > pivot ) {
-            var t = cs[p];
-            cs[p] = c;
-            cs[i] = t;
+          if ( c[axis == 'x' ? 'right_' : 'bottom_'] >= pivot ) {
+            this.swap(cs, p, i);
             p--;
           }
         }
