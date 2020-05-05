@@ -26,7 +26,15 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'foam.comics.v2.userfeedback.UserFeedback',
-      name: 'next'
+      name: 'next',
+      javaToCSV: `
+        outputter.outputValue("next");
+      `,
+      javaToCSVLabel: `
+      //to remove "infinite" loop
+      //but need to come up with logic here
+        outputter.outputValue("");
+      `
     }
   ],
 });
