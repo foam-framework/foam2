@@ -14,12 +14,14 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'foam.nanos.auth.User',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.auth.User',
       name: 'user',
       documentation: 'Authenticated user'
     },
     {
-      class: 'foam.nanos.auth.User',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.auth.User',
       name: 'effectiveUser',
       documentation: 'Current user role(acts as effectiveUser)',
       javaSetter: `
