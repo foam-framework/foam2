@@ -10,7 +10,8 @@ foam.CLASS({
 
   implements: [
     'foam.nanos.auth.CreatedAware',
-    'foam.nanos.auth.CreatedByAware'
+    'foam.nanos.auth.CreatedByAware',
+    'foam.nanos.medusa.Clusterable'
   ],
 
   javaImports: [
@@ -42,11 +43,21 @@ foam.CLASS({
     {
       class: 'String',
       name: 'id',
+      includeInDigest: true,
       visibility: 'RO'
+    },
+    {
+      class: 'Boolean',
+      name: 'clusterable',
+      value: true,
+      visibility: 'HIDDEN',
+      storageTransient: true,
+      clusterTransient: true
     },
     {
       class: 'Long',
       name: 'userId',
+      includeInDigest: true,
       tableCellFormatter: function(value, obj) {
         this.add(value);
         this.__context__.userDAO.find(value).then(function(user) {
@@ -59,6 +70,7 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'agentId',
+      includeInDigest: true,
       tableCellFormatter: function(value, obj) {
         if ( ! value ) return;
         this.add(value);
@@ -71,18 +83,21 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'created',
+      includeInDigest: true,
       visibility: 'RO'
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdBy',
+      includeInDigest: true,
       visibility: 'RO'
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdByAgent',
+      includeInDigest: true,
       visibility: 'RO'
     },
     {
@@ -97,6 +112,7 @@ foam.CLASS({
       label: 'TTL',
       documentation: 'The "time to live" of the session. The amount of time in milliseconds that the session should be kept alive after its last use before being destroyed. Must be a positive value or zero.',
       value: 28800000, // 1000 * 60 * 60 * 8 = number of milliseconds in 8 hours
+      includeInDigest: true,
       tableWidth: 70,
       validationPredicates: [
         {
@@ -117,21 +133,25 @@ foam.CLASS({
     {
       class: 'String',
       name: 'remoteHost',
+      includeInDigest: true,
       visibility: 'RO',
       tableWidth: 120
     },
     {
       documentation: 'Intended to be used with long TTL sessions, further restricting to a known set of IPs.',
       class: 'StringArray',
-      name: 'remoteHostWhiteList'
+      name: 'remoteHostWhiteList',
+      includeInDigest: true
     },
     {
       class: 'Object',
       name: 'context',
       type: 'Context',
       javaFactory: 'return reset(getX());',
-      hidden: true,
-      transient: true
+      visibility: 'HIDDEN',
+      transient: true,
+      networkTransient: true,
+      clusterTransient: true
     }
   ],
 
@@ -194,6 +214,7 @@ foam.CLASS({
         return x
           .put(Session.class, this)
           .put("user", null)
+          .put("spid", null)
           .put("agent", null)
           .put("group", null)
           .put("twoFactorSuccess", false)
@@ -265,15 +286,14 @@ foam.CLASS({
           ? new Object[] { String.format("%s (%d)", user.toSummary(), user.getId()) }
           : new Object[] { String.format("%s (%d) acting as %s (%d)", agent.toSummary(), agent.getId(), user.toSummary(), user.getId()) };
 
-        rtn = rtn
-          .put("user", user)
-          .put("agent", agent)
-          .put("logger", new PrefixLogger(prefix, (Logger) x.get("logger")))
-          .put("twoFactorSuccess", getContext().get("twoFactorSuccess"))
-          .put(CachingAuthService.CACHE_KEY, getContext().get(CachingAuthService.CACHE_KEY));
-
         if ( user != null ) {
-          rtn = rtn.put("spid", user.getSpid());
+          rtn = rtn
+            .put("user", user)
+            .put("spid", user.getSpid())
+            .put("agent", agent)
+            .put("logger", new PrefixLogger(prefix, (Logger) x.get("logger")))
+            .put("twoFactorSuccess", getContext().get("twoFactorSuccess"))
+            .put(CachingAuthService.CACHE_KEY, getContext().get(CachingAuthService.CACHE_KEY));
         }
 
         // We need to do this after the user and agent have been put since
@@ -324,6 +344,7 @@ foam.CLASS({
        if ( user == null
          || (user instanceof LifecycleAware && ((LifecycleAware)user).getLifecycleState() != LifecycleState.ACTIVE)
        ) {
+          ((Logger) x.get("logger")).warning("Session", "User not found.", userId, user);
           throw new RuntimeException(String.format("User with id '%d' not found.", userId));
         }
 

@@ -117,6 +117,7 @@ foam.CLASS({
       name: 'enabled',
       documentation: 'Determines whether the User is permitted certain actions.',
       value: true,
+      includeInDigest: true,
       section: 'administrative'
     },
     {
@@ -124,12 +125,14 @@ foam.CLASS({
       name: 'loginEnabled',
       documentation: 'Determines whether the User can login to the platform.',
       writePermissionRequired: true,
+      includeInDigest: false,
       value: true,
       section: 'administrative'
     },
     {
       class: 'DateTime',
       name: 'lastLogin',
+      includeInDigest: false,
       documentation: 'The date and time of last login by User.',
       section: 'administrative',
       createVisibility: 'HIDDEN',
@@ -138,6 +141,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'firstName',
+      includeInDigest: true,
       documentation: 'The first name of the User.',
       gridColumns: 4,
       section: 'personal',
@@ -146,28 +150,30 @@ foam.CLASS({
     {
       class: 'String',
       name: 'middleName',
+      includeInDigest: true,
       documentation: 'The middle name of the User.',
       gridColumns: 4,
       section: 'personal',
-      includeInDigest: true
     },
     {
       class: 'String',
       name: 'lastName',
+      includeInDigest: true,
       documentation: 'The last name of the User.',
       gridColumns: 4,
       section: 'personal',
-      includeInDigest: true
     },
     {
       name: 'legalName',
+      includeInDigest: true,
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
       section: 'personal'
     },
-   {
+    {
       class: 'String',
       name: 'jobTitle',
+      includeInDigest: false,
       section: 'personal',
       view: function(args, X) {
         return {
@@ -187,6 +193,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'organization',
+      includeInDigest: false,
       documentation: 'The organization/business associated with the User.',
       displayWidth: 80,
       width: 100,
@@ -196,6 +203,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'department',
+      includeInDigest: false,
       documentation: `The department associated with the organization/business
         of the User.`,
       width: 50,
@@ -206,6 +214,7 @@ foam.CLASS({
       class: 'String',
       name: 'userName',
       label: 'Username',
+      includeInDigest: true,
       documentation: 'The username of the User.',
       section: 'personal'
     },
@@ -213,10 +222,10 @@ foam.CLASS({
       class: 'EMail',
       name: 'email',
       label: 'Email Address',
+      includeInDigest: true,
       documentation: 'The email address of the User.',
       displayWidth: 80,
       width: 100,
-      includeInDigest: true,
       javaSetter:
       `email_ = val.toLowerCase();
        emailIsSet_ = true;`,
@@ -225,6 +234,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'emailVerified',
+      includeInDigest: false,
       documentation: 'Determines whether the email address of the User is valid.',
       writePermissionRequired: true,
       section: 'administrative'
@@ -233,6 +243,7 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Phone',
       name: 'phone',
+      includeInDigest: false,
       documentation: 'Personal phone number.',
       factory: function() {
         return this.Phone.create();
@@ -244,12 +255,14 @@ foam.CLASS({
     {
       class: 'PhoneNumber',
       name: 'phoneNumber',
+      includeInDigest: true,
       documentation: 'Personal phone number.',
       section: 'personal'
     },
     {
       class: 'Boolean',
       name: 'phoneNumberVerified',
+      includeInDigest: false,
       writePermissionRequired: true,
       section: 'personal'
     },
@@ -257,6 +270,7 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Phone',
       name: 'mobile',
+      includeInDigest: false,
       documentation: 'Returns the mobile phone number of the User from the Phone model.',
       factory: function() {
         return this.Phone.create();
@@ -264,11 +278,11 @@ foam.CLASS({
       view: { class: 'foam.u2.detail.VerticalDetailView' },
       section: 'personal',
       createVisibility: 'HIDDEN',
-      includeInDigest: true
     },
     {
       class: 'PhoneNumber',
       name: 'mobileNumber',
+      includeInDigest: true,
       documentation: 'Returns the mobile phone number of the User from the Phone model.',
       createVisibility: 'HIDDEN',
       section: 'personal'
@@ -276,6 +290,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'mobileNumberVerified',
+      includeInDigest: false,
       writePermissionRequired: true,
       section: 'personal'
     },
@@ -299,12 +314,14 @@ foam.CLASS({
     {
       class: 'Date',
       name: 'birthday',
+      includeInDigest: false,
       documentation: 'The date of birth of the individual person, or real user.',
       section: 'personal'
     },
     {
       class: 'foam.nanos.fs.FileProperty',
       name: 'profilePicture',
+      includeInDigest: false,
       documentation: `The profile picture of the individual user, initially
         defaulting to a placeholder picture.`,
       view: {
@@ -316,6 +333,7 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Address',
+      includeInDigest: false,
       name: 'address',
       documentation: 'Returns the postal address from the Address model.',
       factory: function() {
@@ -335,6 +353,7 @@ foam.CLASS({
     {
       class: 'Reference',
       name: 'language',
+      includeInDigest: false,
       documentation: 'The default language preferred by the User.',
       of: 'foam.nanos.auth.Language',
       value: 'en',
@@ -344,6 +363,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'timeZone',
+      includeInDigest: false,
       documentation: 'The preferred time zone of the User.',
       width: 5,
       createVisibility: 'HIDDEN',
@@ -374,16 +394,17 @@ foam.CLASS({
     {
       class: 'Password',
       name: 'password',
+      includeInDigest: true,
       documentation: 'The password that is currently active with the User.',
       hidden: true,
       networkTransient: true,
       section: 'administrative',
-      includeInDigest: true
     },
     {
       name: 'passwordHistory',
       class: 'FObjectArray',
       of: 'foam.nanos.auth.PriorPassword',
+      includeInDigest: false,
       javaFactory: `
         foam.nanos.auth.PriorPassword[] priorPasswords = new foam.nanos.auth.PriorPassword[1];
         priorPasswords[0] = new foam.nanos.auth.PriorPassword();
@@ -400,6 +421,7 @@ foam.CLASS({
     {
       class: 'Password',
       name: 'previousPassword',
+      includeInDigest: false,
       documentation: 'The password that was previously active with the User.',
       hidden: true,
       networkTransient: true,
@@ -408,6 +430,7 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'passwordLastModified',
+      includeInDigest: false,
       documentation: 'The date and time that the password was last modified.',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
@@ -416,6 +439,7 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'passwordExpiry',
+      includeInDigest: false,
       documentation: `The date and time that the current password of the User
         will expire.`,
       section: 'administrative'
@@ -425,6 +449,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'note',
+      includeInDigest: false,
       documentation: 'A field for a note that can be added and appended to the User.',
       displayWidth: 70,
       view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 100 },
@@ -434,6 +459,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'businessName',
+      includeInDigest: false,
       documentation: 'The name of the business associated with the User.',
       width: 50,
       section: 'business',
@@ -442,6 +468,7 @@ foam.CLASS({
     {
       class: 'StringArray',
       name: 'disabledTopics',
+      includeInDigest: false,
       documentation: 'Disables types for notifications.',
       createVisibility: 'HIDDEN',
       section: 'administrative'
@@ -449,6 +476,7 @@ foam.CLASS({
     {
       class: 'StringArray',
       name: 'disabledTopicsEmail',
+      includeInDigest: false,
       documentation: 'Disables types for email notifications.',
       createVisibility: 'HIDDEN',
       section: 'administrative'
@@ -456,6 +484,7 @@ foam.CLASS({
     {
       class: 'URL',
       name: 'website',
+      includeInDigest: false,
       documentation: 'A URL link to the website of the User.',
       displayWidth: 80,
       width: 2048,
@@ -472,15 +501,16 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'created',
+      includeInDigest: true,
       documentation: 'The date and time of when the User was created in the system.',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
       section: 'administrative',
-      includeInDigest: true
     },
     {
       class: 'DateTime',
       name: 'lastModified',
+      includeInDigest: true,
       documentation: 'The date and time the User was last modified.',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
@@ -490,6 +520,7 @@ foam.CLASS({
       class: 'foam.core.Enum',
       of: 'foam.nanos.auth.LifecycleState',
       name: 'lifecycleState',
+      includeInDigest: true,
       value: foam.nanos.auth.LifecycleState.PENDING,
       writePermissionRequired: true
     }

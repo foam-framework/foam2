@@ -149,8 +149,7 @@ class XI
     return getRightChild().get(x, skey);
   }
 
-  @Override
-  public String toString() {
+  public String toDebugString() {
     return getLeftChild().toString() + ( "{Key: " + key_ + ", Object: "  + value_ + "}\n" ) + getRightChild().toString();
   }
 }

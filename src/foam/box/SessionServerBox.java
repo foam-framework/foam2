@@ -12,13 +12,16 @@ import foam.nanos.app.AppConfig;
 import foam.nanos.auth.AuthenticationException;
 import foam.nanos.auth.AuthorizationException;
 import foam.nanos.auth.Group;
+import foam.nanos.auth.User;
 import foam.nanos.boot.Boot;
 import foam.nanos.boot.NSpec;
 import foam.nanos.logger.Logger;
+import foam.nanos.logger.PrefixLogger;
 import foam.nanos.session.Session;
 import foam.util.SafetyUtil;
 import org.eclipse.jetty.server.Request;
 
+import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -40,29 +43,72 @@ public class SessionServerBox
   }
 
   public void send(Message msg) {
-    String sessionID = (String) msg.getAttributes().get("sessionId");
-    Logger logger    = (Logger) getX().get("logger");
-
-    if ( sessionID == null && authenticate_ ) {
-      msg.replyWithException(new IllegalArgumentException("sessionid required for authenticated services"));
-      return;
-    }
-
+    Logger logger = (Logger) getX().get("logger");
     NSpec spec = getX().get(NSpec.class);
+    String sessionID = null;
 
     try {
-      HttpServletRequest req        = getX().get(HttpServletRequest.class);
-      DAO                sessionDAO = (DAO) getX().get("localSessionDAO");
-      Session            session    = sessionID == null ? null : (Session) sessionDAO.find(sessionID);
+      HttpServletRequest req = getX().get(HttpServletRequest.class);
+      if ( req != null ) {
+        String authorization = req.getHeader("Authorization");
+        if ( ! SafetyUtil.isEmpty(authorization) ) {
+          StringTokenizer st = new StringTokenizer(authorization);
+          if ( st.hasMoreTokens() ) {
+            String authType = st.nextToken();
+            if ( HTTPAuthorizationType.BEARER.getName().equalsIgnoreCase(authType) ) {
+              if ( st.hasMoreTokens() ) {
+                sessionID = st.nextToken();
+                if ( sessionID != null ) {
+                  // test and use non-clustered medusa sessions
+                  DAO sessionDAO = (DAO) getX().get("internalSessionDAO");
+                  if ( sessionDAO != null ) {
+                    Session session = (Session) sessionDAO.find(sessionID);
+                    if ( session != null ) {
+                      logger.debug("Using internalSessionDAO");
+                      session.setClusterable(false);
+                    }
+                  }
+                }
+              } else {
+                logger.warning(this.getClass().getSimpleName(), "send", "Authorization: "+authType+" token not found.");
+                msg.replyWithException(new IllegalArgumentException("Authorization: "+authType+ " token not found."));
+                return;
+              }
+            } else {
+              logger.warning(this.getClass().getSimpleName(), "send", "Authorization: "+authType+" not supported.");
+              msg.replyWithException(new IllegalArgumentException("Authorization: "+authType+ " not supported."));
+              return;
+            }
+            if ( SafetyUtil.isEmpty(sessionID) ) {
+              logger.warning(this.getClass().getSimpleName(), "send", "Authorization: Bearer token not found.");
+              msg.replyWithException(new IllegalArgumentException("Authorization: Bearer token not found"));
+              return;
+            }
+          }
+        }
+      }
+
+      if ( sessionID == null ) {
+        sessionID = (String) msg.getAttributes().get("sessionId");
+
+      }
+
+      if ( sessionID == null && authenticate_ ) {
+        msg.replyWithException(new IllegalArgumentException("sessionid required for authenticated services"));
+        return;
+      }
+
+      DAO sessionDAO = (DAO) getX().get("localSessionDAO");
+      Session session = sessionID == null ? null : (Session) sessionDAO.find(sessionID);
 
       if ( session == null ) {
         session = new Session((X) getX().get(Boot.ROOT));
         session.setId(sessionID == null ? "anonymous" : sessionID);
-        if ( req != null ) session.setRemoteHost(req.getRemoteHost());
-
-        if ( sessionID != null ) {
-          session = (Session) sessionDAO.put(session);
+        if ( req != null ) {
+          session.setRemoteHost(req.getRemoteHost());
         }
+
+        session = (Session) sessionDAO.put(session);
       } else if ( req != null ) {
         // if req == null it means that we're being accessed via webSockets
         if ( ! session.validRemoteHost(req.getRemoteHost()) ) {

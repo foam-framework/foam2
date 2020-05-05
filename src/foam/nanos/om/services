@@ -9,11 +9,11 @@ p({
   "serve": true,
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
-      .setPm(true)
-      .setPipelinePm(true)
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName("OMMinutely")
+      .setPm(false)
+      .setPipelinePm(false)
+      .setInnerDAO(new foam.dao.MDAO(foam.nanos.analytics.Candlestick.getOwnClassInfo()))
       .setOf(foam.nanos.analytics.Candlestick.getOwnClassInfo())
+      .setCluster(false)
       .setWriteOnly(true)
       .build();
   """,
@@ -25,11 +25,12 @@ p({
   "serve": true,
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
-      .setPm(true)
-      .setPipelinePm(true)
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName("OMHourly")
+      .setPm(false)
+      .setPipelinePm(false)
       .setOf(foam.nanos.analytics.Candlestick.getOwnClassInfo())
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("OMDAILY")
+      .setCluster(false)
       .setWriteOnly(true)
       .build();
   """,
@@ -41,10 +42,12 @@ p({
   "serve": true,
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
-      .setPm(true)
-      .setPipelinePm(true)
+      .setPm(false)
+      .setPipelinePm(false)
+      .setOf(foam.nanos.analytics.Candlestick.getOwnClassInfo())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("OMDAILY")
+      .setCluster(false)
       .setOf(foam.nanos.analytics.Candlestick.getOwnClassInfo())
       .setWriteOnly(true)
       .build();

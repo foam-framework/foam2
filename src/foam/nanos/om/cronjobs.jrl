@@ -1,3 +1,23 @@
-p({"class":"foam.nanos.cron.Cron","schedule":{"class":"foam.nanos.cron.CronSchedule","minute":0,"hour":-1,"dayOfMonth":-1,"month":-1,"dayOfWeek":-1,"second":0},"scheduledTime":"2019-09-09T17:00:00.000Z","enabled":true,"id":"omHourlyReduce","lastRun":"2019-09-09T16:55:32.140Z","lastDuration":0,"output":""})
-p({"class":"foam.nanos.cron.Cron","schedule":{"class":"foam.nanos.cron.CronSchedule","minute":-1,"hour":0,"dayOfMonth":-1,"month":-1,"dayOfWeek":-1,"second":0},"scheduledTime":"2019-09-06T00:00:00.000Z","id":"omDailyReduce","lastRun":"2019-09-05T00:59:00.840Z","lastDuration":1,"output":""})
-p({"class":"foam.nanos.cron.Cron","schedule":{"class":"foam.nanos.cron.CronSchedule","minute":-1,"hour":-1,"dayOfMonth":-1,"month":-1,"dayOfWeek":-1,"second":0},"scheduledTime":"2019-09-09T16:56:00.000Z","enabled":true,"id":"omReduceManager","lastRun":"2019-09-09T16:55:32.150Z","lastDuration":0,"output":""})
+p({
+  "class":"foam.nanos.cron.Cron",
+  "id":"omHourlyReduce",
+  "enabled":true,
+  "clusterable":false,
+  "schedule":{"class":"foam.nanos.cron.CronSchedule","minute":0,"hour":-1,"dayOfMonth":-1,"month":-1,"dayOfWeek":-1,"second":0}
+})
+
+p({
+  "class":"foam.nanos.cron.Cron",
+  "id":"omDailyReduce",
+  "enabled":true,
+  "clusterable":false,
+  "schedule":{"class":"foam.nanos.cron.CronSchedule","minute":-1,"hour":0,"dayOfMonth":-1,"month":-1,"dayOfWeek":-1,"second":0}
+})
+
+p({
+  "class":"foam.nanos.cron.Cron",
+  "id":"omReduceManager",
+  "enabled":true,
+  "clusterable":false,
+  "schedule":{"class":"foam.nanos.cron.CronSchedule","minute":-1,"hour":-1,"dayOfMonth":-1,"month":-1,"dayOfWeek":-1,"second":0}
+})

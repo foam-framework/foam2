@@ -28,10 +28,12 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'id',
+      includeInDigest: true,
     },
     {
       class: 'DateTime',
       name: 'created',
+      includeInDigest: true,
       tableWidth: 170
     },
     {
@@ -39,32 +41,39 @@ foam.CLASS({
       of: 'foam.nanos.auth.User',
       name: 'createdBy',
       documentation: 'User who created the entry',
+      includeInDigest: true,
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdByAgent',
       documentation: 'User who created the entry',
+      includeInDigest: true,
     },
     {
       class: 'StringArray',
-      name: 'to'
+      name: 'to',
+      includeInDigest: true,
     },
     {
       class: 'StringArray',
       name: 'cc',
+      includeInDigest: true,
     },
     {
       class: 'StringArray',
-      name: 'bcc'
+      name: 'bcc',
+      includeInDigest: true,
     },
     {
       class: 'String',
-      name: 'subject'
+      name: 'subject',
+      includeInDigest: true,
     },
     {
       class: 'String',
       name: 'body',
+      includeInDigest: true,
       view: {
         class: 'foam.u2.MultiView',
         views: [
@@ -76,16 +85,19 @@ foam.CLASS({
     {
       class: 'String',
       name: 'from',
+      includeInDigest: true,
       value: null
     },
     {
       class: 'String',
       name: 'displayName',
+      includeInDigest: true,
       value: null
     },
     {
       class: 'String',
       name: 'replyTo',
+      includeInDigest: true,
       value: null
     },
     {
@@ -102,11 +114,13 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.nanos.notification.email.Status',
       name: 'status',
+      includeInDigest: false,
       tableWidth: 100
     },
     {
       class: 'Map',
       name: 'templateArguments',
+      includeInDigest: true,
       view: { class: 'foam.u2.view.MapView' }
     }
   ]

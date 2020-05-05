@@ -19,6 +19,7 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'EasyDAO',
   extends: 'foam.dao.ProxyDAO',
+
   implements: [
     'foam.mlang.Expressions',
     'foam.nanos.boot.NSpecAware'
@@ -77,6 +78,7 @@ foam.CLASS({
   imports: [ 'document', 'log' ],
 
   javaImports: [
+    'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger'
   ],
 
@@ -116,41 +118,88 @@ foam.CLASS({
       type: 'foam.nanos.boot.NSpec'
     },
     {
+      name: 'logger',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.logger.Logger',
+      visibility: 'HIDDEN',
+      javaFactory: `
+        return new PrefixLogger(new Object[] {
+          this.getClass().getSimpleName()
+        }, (Logger) getX().get("logger"));
+      `
+    },
+    {
       /** This is set automatically when you create an EasyDAO.
         @private */
       name: 'delegate',
       javaFactory: `
-        Logger logger = (Logger) getX().get("logger");
-
         foam.dao.DAO delegate = getInnerDAO();
-        foam.dao.DAO head = delegate;
-        foam.dao.ProxyDAO pxy = null;
-        while( head instanceof foam.dao.ProxyDAO ) {
-          pxy = (foam.dao.ProxyDAO) head;
-          head = ( (ProxyDAO) head).getDelegate();
-        }
-        if ( head instanceof foam.dao.MDAO ) {
-          setMdao((foam.dao.MDAO)head);
-          if ( getIndex() != null && getIndex().length > 0 )
-            getMdao().addIndex(getIndex());
-        }
-        if ( getFixedSize() != null ) {
-          if ( head instanceof foam.dao.MDAO && pxy != null ) {
-            foam.dao.ProxyDAO fixedSizeDAO = (foam.dao.ProxyDAO) getFixedSize();
-            fixedSizeDAO.setDelegate(head);
-            pxy.setDelegate(fixedSizeDAO);
+        if ( delegate == null ) {
+          if ( getNullify() ) {
+            delegate = new foam.dao.NullDAO(getX(), getOf());
+          } else if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
+            setMdao(new foam.dao.MDAO(getOf()));
+             if ( getWriteOnly() ) {
+               delegate = new foam.dao.WriteOnlyJDAO(getX(), getMdao(), getOf(), getJournalName());
+             } else {
+               delegate = new foam.dao.java.JDAO(getX(), getMdao(), getJournalName(), getCluster() /* read-only */);
+             }
+          } else {
+            setMdao(new foam.dao.MDAO(getOf()));
+            delegate = getMdao();
           }
-          else {
-            logger.error(this.getClass().getSimpleName(), "NSpec.name", (getNSpec() != null ) ? getNSpec().getName() : null, "of_", of_, "FixedSizeDAO did not find instanceof MDAO");
+        }
+
+        foam.dao.ProxyDAO pxy = null;
+
+        if ( getMdao() == null ) {
+          foam.dao.DAO head = delegate;
+          while( head instanceof foam.dao.ProxyDAO ) {
+            pxy = (foam.dao.ProxyDAO) head;
+            head = ((ProxyDAO) head).getDelegate();
+          }
+          if ( head instanceof foam.dao.MDAO ) {
+            setMdao((foam.dao.MDAO)head);
+          }
+        }
+
+        if ( getMdao() != null &&
+             getIndex() != null && getIndex().length > 0 ) {
+          getMdao().addIndex(getIndex());
+        }
+
+        if ( getFixedSize() != null ) {
+          if ( getMdao() != null ) {
+            foam.dao.ProxyDAO fixedSizeDAO = (foam.dao.ProxyDAO) getFixedSize();
+            fixedSizeDAO.setDelegate(getMdao());
+            if ( pxy == null ) {
+              delegate = fixedSizeDAO;
+            } else {
+              pxy.setDelegate(fixedSizeDAO);
+            }
+          } else {
+            getLogger().error("NSpec.name", (getNSpec() != null ) ? getNSpec().getName() : null, "of_", of_, "FixedSizeDAO did not find instanceof MDAO");
             System.exit(1);
           }
+        }
+
+        if ( getCluster() &&
+             getMdao() != null &&
+             ( ! getNSpec().getServe() ||
+               getNSpec().getServe() &&
+               getInnerDAO() == null ) ) {
+          getLogger().debug(getNSpec().getName(), "cluster", "delegate", delegate.getClass().getSimpleName());
+          delegate = new foam.nanos.medusa.ClusterClientDAO.Builder(getX())
+            .setNSpec(getNSpec())
+            .setDelegate(delegate)
+            .build();
         }
 
         delegate = getOuterDAO(delegate);
 
         if ( getDecorator() != null ) {
           if ( ! ( getDecorator() instanceof ProxyDAO ) ) {
-            logger.error(this.getClass().getSimpleName(), "delegate", "NSpec.name", (getNSpec() != null ) ? getNSpec().getName() : null, "of_", of_ , "delegateDAO", getDecorator(), "not instanceof ProxyDAO");
+            getLogger().error("delegate", "NSpec.name", (getNSpec() != null ) ? getNSpec().getName() : null, "of_", of_ , "delegateDAO", getDecorator(), "not instanceof ProxyDAO");
             System.exit(1);
           }
           // The decorator dao may be a proxy chain
@@ -161,6 +210,12 @@ foam.CLASS({
           proxy.setDelegate(delegate);
           delegate = (ProxyDAO) getDecorator();
         }
+
+        // set inner delegate_ to handle reentrant
+        // DelegateFactory calls from subsequent DAOs which may
+        // have init_ methods which in turn call getDelegate().
+        delegateIsSet_ = true;
+        delegate_ = new ProxyDAO.Builder(getX()).setDelegate(delegate).build();
 
         if ( getApprovableAware() ) {
           delegate = new foam.nanos.approval.ApprovableAwareDAO
@@ -217,6 +272,7 @@ foam.CLASS({
           delegate = new foam.nanos.ruler.RulerDAO(getX(), delegate, name);
         }
 
+
         if ( getCreatedAware() )
           delegate = new foam.nanos.auth.CreatedAwareDAO.Builder(getX()).setDelegate(delegate).build();
 
@@ -248,10 +304,14 @@ foam.CLASS({
             .build();
         }
 
-        if ( getNSpec() != null && getNSpec().getServe() && ! getAuthorize() && ! getReadOnly() )
-          logger.warning("EasyDAO", getNSpec().getName(), "Served DAO should be Authorized, or ReadOnly");
+        if ( getNSpec() != null &&
+            getNSpec().getServe() &&
+            ! getAuthorize() &&
+            ! getReadOnly() )
+          getLogger().warning("EasyDAO", getNSpec().getName(), "Served DAO should be Authorized, or ReadOnly");
 
-        if ( getPermissioned() && ( getNSpec() != null && getNSpec().getServe() ) )
+        if ( getPermissioned() &&
+            ( getNSpec() != null && getNSpec().getServe() ) )
           delegate = new foam.nanos.auth.PermissionedPropertyDAO.Builder(getX()).setDelegate(delegate).build();
 
         if ( getReadOnly() )
@@ -267,26 +327,15 @@ foam.CLASS({
         if ( getPm() )
           delegate = new foam.dao.PMDAO.Builder(getX()).setNSpec(getNSpec()).setDelegate(delegate).build();
 
-        return delegate;
+        // see comments above regarding DAOs with init_
+        ((ProxyDAO)delegate_).setDelegate(delegate);
+        return delegate_;
       `
     },
     {
       class: 'Object',
       type: 'foam.dao.DAO',
-      name: 'innerDAO',
-      javaFactory: `
-      if ( getNullify() ) {
-        return new foam.dao.NullDAO.Builder(getX())
-        .setOf(getOf())
-        .build();
-      }
-      if ( getWriteOnly() ) {
-        return new foam.dao.WriteOnlyJDAO(getX(), new foam.dao.MDAO(getOf()), getOf(), getJournalName());
-      }
-      if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) )
-        return new foam.dao.java.JDAO(getX(), getOf(), getJournalName());
-      return new foam.dao.MDAO(getOf());
-      `
+      name: 'innerDAO'
     },
     {
       class: 'Object',
@@ -296,14 +345,12 @@ foam.CLASS({
     {
       class: 'Boolean',
       documentation: 'Creates pipelinePMDAOs around each decorator to measure their performance',
-      name: 'pipelinePm',
-      value: false
+      name: 'pipelinePm'
     },
     {
       documentation: 'Have EasyDAO use a sequence number to index items. Note that .seqNo and .guid features are mutuallyexclusive.',
       class: 'Boolean',
-      name: 'seqNo',
-      value: false
+      name: 'seqNo'
     },
     {
       class: 'Long',
@@ -314,8 +361,7 @@ foam.CLASS({
       documentation: 'Have EasyDAO generate guids to index items. Note that .seqNo and .guid features are mutually exclusive',
       class: 'Boolean',
       name: 'guid',
-      label: 'GUID',
-      value: false
+      label: 'GUID'
     },
     {
       class: 'String',
@@ -332,7 +378,6 @@ foam.CLASS({
       documentation: 'Enable local in-memory caching of the DAO',
       class: 'Boolean',
       name: 'cache',
-      value: false,
       generateJava: false
     },
     {
@@ -379,25 +424,21 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'readOnly',
-      value: false
+      name: 'readOnly'
     },
     {
       class: 'Boolean',
-      name: 'writeOnly',
-      value: false
+      name: 'writeOnly'
     },
     {
       documentation: 'Sets the inner dao to a nullDAO',
       class: 'Boolean',
-      name: 'nullify',
-      value: false
+      name: 'nullify'
     },
     {
       documentation: 'Wrap in PermissionedPropertiesDAO',
       class: 'Boolean',
-      name: 'permissioned',
-      value: true
+      name: 'permissioned'
     },
     {
       documentation: 'Add a validatingDAO decorator',
@@ -414,8 +455,7 @@ foam.CLASS({
       documentation: 'Enable value de-duplication to save memory when caching',
       class: 'Boolean',
       name: 'dedup',
-      generateJava: false,
-      value: false,
+      generateJava: false
     },
     {
       documentation: 'Keep a history of all state changes to the DAO',
@@ -437,25 +477,21 @@ foam.CLASS({
     {
       documentation: 'Enable logging on the DAO',
       class: 'Boolean',
-      name: 'logging',
-      value: false,
+      name: 'logging'
     },
     {
       documentation: 'Enable time tracking for concurrent DAO operations',
       class: 'Boolean',
-      name: 'timing',
-      value: false
+      name: 'timing'
     },
     {
       class: 'Boolean',
-      name: 'pm',
-      value: false
+      name: 'pm'
     },
     {
       documentation: 'Contextualize objects on .find, re-creating them with this EasyDAO\'s exports, as if they were children of this EasyDAO.',
       class: 'Boolean',
-      name: 'contextualize',
-      value: false
+      name: 'contextualize'
     },
     {
       class: 'Boolean',
@@ -492,22 +528,19 @@ foam.CLASS({
       class: 'Boolean',
       generateJava: false,
       name: 'autoIndex',
-      documentation: 'not currently supported',
-      value: false
+      documentation: 'not currently supported'
     },
     {
       documentation: 'Turn on to activate synchronization with a server. Specify serverUri and syncProperty as well',
       class: 'Boolean',
       name: 'syncWithServer',
-      generateJava: false,
-      value: false
+      generateJava: false
     },
     {
       documentation: 'Turn on to enable remote listener support. Only useful with daoType = CLIENT',
       class: 'Boolean',
       generateJava: false,
-      name: 'remoteListenerSupport',
-      value: false
+      name: 'remoteListenerSupport'
     },
     {
       documentation: 'Setting to true activates polling, periodically checking in with the server. If sockets are used, polling is optional as the server can push changes to this client',
@@ -520,8 +553,7 @@ foam.CLASS({
       documentation: 'Set to true if you are running this on a server, and clients will synchronize with this DAO',
       class: 'Boolean',
       generateJava: false,
-      name: 'isServer',
-      value: false
+      name: 'isServer'
     },
     {
       documentation: 'The property to synchronize on. This is typically an integer value indicating the version last seen on the remote',
@@ -530,6 +562,7 @@ foam.CLASS({
     },
     {
       name: 'retryBoxMaxAttempts',
+      class: 'Boolean',
       generateJava: false,
     },
     {
@@ -553,8 +586,17 @@ foam.CLASS({
       }
     },
     {
+      /** Cluster this DAO */
+      name: 'cluster',
+      class: 'Boolean',
+      javaFactory: `
+    return "true".equals(System.getProperty("CLUSTER"));
+      `
+    },
+    {
       /** Simpler alternative than providing serverBox. */
       name: 'serviceName',
+      class: 'String',
       generateJava: false
     },
     {
@@ -663,9 +705,8 @@ model from which to test ServiceProvider ID (spid)`,
       name: 'init_',
       javaCode: `
        if ( of_ == null ) {
-         foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
-         if ( logger != null ) {
-           logger.error("EasyDAO", getName(), "'of' not set.", new Exception("of not set"));
+         if ( getLogger() != null ) {
+           getLogger().error("EasyDAO", getName(), "'of' not set.", new Exception("of not set"));
          } else {
            System.err.println("EasyDAO "+getName()+" 'of' not set.");
          }
@@ -909,6 +950,7 @@ model from which to test ServiceProvider ID (spid)`,
       javaCode: `
         if ( getMdao() != null ) {
           getMdao().addIndex(props);
+//          ((foam.dao.MDAO) getMdao().getDelegate()).addIndex(props);
         }
         return this;
       `
@@ -932,6 +974,7 @@ model from which to test ServiceProvider ID (spid)`,
       javaCode: `
         if ( getMdao() != null )
           getMdao().addIndex(index);
+//          ((foam.dao.MDAO) getMdao().getDelegate()).addIndex(index);
         return this;
       `
     },

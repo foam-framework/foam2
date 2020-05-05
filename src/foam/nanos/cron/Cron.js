@@ -20,7 +20,13 @@ foam.CLASS({
   documentation: 'FOAM class that models a Cron script',
 
   tableColumns: [
-    'id', 'enabled', 'description', 'lastDuration', 'status', 'scheduledTime', 'run'
+    'id',
+    'enabled',
+    'description',
+    'lastDuration',
+    'status',
+    'scheduledTime',
+    'run'
   ],
 
   searchColumns: ['id', 'description'],
@@ -38,6 +44,12 @@ foam.CLASS({
   ],
 
   properties: [
+    {
+      documentation: 'Cron jobs shall be enabled as a deployment step.',
+      class: 'Boolean',
+      name: 'enabled',
+      value: false,
+    },
     {
       name: 'server',
       hidden: true,
@@ -61,11 +73,6 @@ foam.CLASS({
       section: 'scheduling',
       visibility: 'RO',
       javaFactory: 'return getNextScheduledTime();'
-    },
-    {
-      class: 'Boolean',
-      name: 'enabled',
-      value: false
     }
   ],
 

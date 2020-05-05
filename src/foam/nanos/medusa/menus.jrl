@@ -1,0 +1,72 @@
+p({
+  "class":"foam.nanos.menu.Menu",
+  "id":"medusa",
+  "label":"Medusa / Clustering",
+  "handler":{"class":"foam.nanos.menu.SubMenu"},
+  "parent":"",
+  "icon":"images/parent-menu-icon.png",
+  "parent":"admin"
+})
+
+p({
+  "class":"foam.nanos.menu.Menu",
+  "id":"admin.clusterConfig",
+  "label":"Cluster Config",
+  "handler":{
+    "class":"foam.nanos.menu.DAOMenu2",
+    "config":{
+      "class":"foam.comics.v2.DAOControllerConfig",
+      "daoKey":"clusterConfigDAO",
+      "browseViews":[{
+        "class":"foam.comics.v2.BrowseView",
+        "name":"Table",
+        "view":{
+          "class":"foam.u2.view.ScrollTableView"
+        }
+      }]
+    }
+  },
+  "parent":"medusa"
+})
+
+p({
+  "class":"foam.nanos.menu.Menu",
+  "id":"admin.medusaEntry",
+  "label":"Medusa Entry",
+  "handler":{
+    "class":"foam.nanos.menu.DAOMenu2",
+    "config":{
+      "class":"foam.comics.v2.DAOControllerConfig",
+      "daoKey":"medusaEntryDAO",
+      "browseViews":[{
+        "class":"foam.comics.v2.BrowseView",
+        "name":"Table",
+        "view":{
+          "class":"foam.u2.view.ScrollTableView"
+        }
+      }]
+    }
+  },
+  "parent":"medusa"
+})
+
+p({
+  "class":"foam.nanos.menu.Menu",
+  "id":"admin.hosts",
+  "label":"Hosts",
+  "handler":{
+    "class":"foam.nanos.menu.DAOMenu2",
+    "config":{
+      "class":"foam.comics.v2.DAOControllerConfig",
+      "daoKey":"hostsDAO",
+      "browseViews":[{
+        "class":"foam.comics.v2.BrowseView",
+        "name":"Table",
+        "view":{
+          "class":"foam.u2.view.ScrollTableView"
+        }
+      }]
+    }
+  },
+  "parent":"admin"
+})

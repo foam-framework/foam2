@@ -149,7 +149,6 @@ sink?.eof()
 return sink
 `
     },
-
     {
       name: 'removeAll_',
       code: function removeAll_(x, skip, limit, order, predicate) {
@@ -162,7 +161,14 @@ return sink
       javaCode: 'super.removeAll_(null, skip, limit, order, predicate);',
       swiftCode: 'try super.removeAll_(nil, skip, limit, order, predicate)'
     },
-
+    {
+      name: 'cmd_',
+      code:     function cmd_(x, obj) {
+        return this.SUPER(null, obj);
+      },
+      javaCode: 'return super.cmd_(null, obj);',
+      swiftCode: 'return try super.cmd_(nil, obj)'
+    },
     {
       name: 'listen_',
       code: function listen_(x, sink, predicate) {

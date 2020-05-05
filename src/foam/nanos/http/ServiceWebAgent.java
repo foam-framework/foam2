@@ -84,7 +84,8 @@ public class ServiceWebAgent
 
       if ( ((AppConfig) x.get("appConfig")).getMode() != Mode.PRODUCTION ) {
         resp.setHeader("Access-Control-Allow-Origin", "*");
-      } else if ( ! req.getHeader("Origin").equals("null") ){
+      } else if ( ! foam.util.SafetyUtil.isEmpty(req.getHeader("Origin")) &&
+                  ! "null".equals(req.getHeader("Origin")) ) {
         URL url = new URL(req.getHeader("Origin"));
         if ( ((VirtualHostRoutingServlet) http.getServletMappings()[0].getServletObject()).getHostMapping().containsKey(url.getHost()) )
           resp.setHeader("Access-Control-Allow-Origin", req.getHeader("Origin"));

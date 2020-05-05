@@ -1,0 +1,18 @@
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"scriptDAO",
+  "serve":true,
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setGuid(true)
+      .setOf(foam.nanos.script.Script.getOwnClassInfo())
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("scripts")
+      .setDecorator(new foam.nanos.script.ScriptRunnerDAO(null))
+      .setOrder(new foam.core.PropertyInfo[] {foam.nanos.script.Script.ID})
+      .setIndex(new foam.core.PropertyInfo[] {foam.nanos.script.Script.ID})
+      .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.script.Script\"}"
+})

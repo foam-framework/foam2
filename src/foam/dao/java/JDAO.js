@@ -22,20 +22,32 @@ foam.CLASS({
         cls.extras.push(`
           // TODO: These convenience constructors should be removed and done using the facade pattern.
           public JDAO(X x, foam.core.ClassInfo classInfo, String filename) {
-            this(x, new foam.dao.MDAO(classInfo), filename);
+            this(x, new foam.dao.MDAO(classInfo), filename, false);
           }
 
           public JDAO(X x, foam.dao.DAO delegate, String filename) {
+            this(x, delegate, filename, false);
+          }
+
+          public JDAO(X x, foam.dao.DAO delegate, String filename, Boolean readOnly) {
             setX(x);
             setOf(delegate.getOf());
             setDelegate(delegate);
 
             // create journal
-            setJournal(new foam.dao.FileJournal.Builder(x)
-              .setDao(delegate)
-              .setFilename(filename)
-              .setCreateFile(true)
-              .build());
+            if ( readOnly ) {
+              setJournal(new foam.dao.ReadOnlyFileJournal.Builder(x)
+                .setDao(delegate)
+                .setFilename(filename)
+                .setCreateFile(true)
+                .build());
+            } else {
+              setJournal(new foam.dao.FileJournal.Builder(x)
+                .setDao(delegate)
+                .setFilename(filename)
+                .setCreateFile(false)
+                .build());
+            }
 
             /* Create a composite journal of repo journal and runtime journal
               and load them all.*/

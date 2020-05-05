@@ -135,13 +135,14 @@ foam.CLASS({
   javaImports: [
     'foam.dao.ArraySink',
     'foam.dao.DAO',
+    'static foam.mlang.MLang.EQ',
     'foam.nanos.app.AppConfig',
+    'foam.nanos.theme.Theme',
     'foam.util.SafetyUtil',
-    'org.eclipse.jetty.server.Request',
+    'java.util.List',
     'javax.security.auth.AuthPermission',
     'javax.servlet.http.HttpServletRequest',
-    'java.util.List',
-    'static foam.mlang.MLang.EQ'
+    'org.eclipse.jetty.server.Request',
   ],
 
   methods: [
@@ -202,6 +203,7 @@ foam.CLASS({
         AppConfig config          = (AppConfig) ((AppConfig) x.get("appConfig")).fclone();
         Group group               = this;
         DAO groupDAO              = (DAO) x.get("groupDAO");
+        Theme theme              = (Theme) x.get("theme");
 
         String configUrl           = "";
         String configSupportEmail  = "";

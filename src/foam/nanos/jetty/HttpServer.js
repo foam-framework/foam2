@@ -18,6 +18,7 @@ foam.CLASS({
     'org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest',
     'org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse',
     'org.eclipse.jetty.websocket.servlet.WebSocketCreator',
+    'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'java.util.Set',
     'java.util.HashSet',
@@ -82,6 +83,17 @@ foam.CLASS({
       name: 'filterMappings',
       of: 'foam.nanos.servlet.FilterMapping',
       javaFactory: 'return new foam.nanos.servlet.FilterMapping[0];'
+    },
+    {
+      name: 'logger',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.logger.Logger',
+      visibility: 'HIDDEN',
+      javaFactory: `
+        return new PrefixLogger(new Object[] {
+          this.getClass().getSimpleName()
+        }, (Logger) getX().get("logger"));
+      `
     }
   ],
   methods: [
@@ -89,7 +101,6 @@ foam.CLASS({
       name: 'start',
       javaCode: `
       try {
-        System.out.println("Starting Jetty http server.");
         int port = getPort();
         String portStr = System.getProperty("http.port");
         if ( portStr != null && ! portStr.isEmpty() ) {
@@ -97,10 +108,11 @@ foam.CLASS({
             port = Integer.parseInt(portStr);
             setPort(port);
           } catch ( NumberFormatException e ) {
-            System.err.println(this.getClass().getSimpleName()+" invalid http.port '"+portStr+"'");
+            getLogger().error("invalid port", portStr);
             port = getPort();
           }
         }
+        getLogger().info("Starting Jetty http server. port", port);
 
         org.eclipse.jetty.server.Server server =
           new org.eclipse.jetty.server.Server(port);
@@ -111,7 +123,7 @@ foam.CLASS({
           response headers.
           2. Configure Jetty server to interpret the X-Fowarded-for header
         */
-        
+
         // we are converting the ForwardedForProxyWhitelist array into a set here
         // so that it makes more sense algorithmically to check against IPs
         Set<String> forwardedForProxyWhitelist = new HashSet<>(Arrays.asList(getForwardedForProxyWhitelist()));
@@ -119,7 +131,7 @@ foam.CLASS({
         for ( org.eclipse.jetty.server.Connector conn : server.getConnectors() ) {
           for ( org.eclipse.jetty.server.ConnectionFactory f : conn.getConnectionFactories() ) {
             if ( f instanceof org.eclipse.jetty.server.HttpConnectionFactory ) {
-              
+
               // 1. hiding the version number in response headers
               ((org.eclipse.jetty.server.HttpConnectionFactory) f).getHttpConfiguration().setSendServerVersion(false);
 
@@ -206,14 +218,12 @@ foam.CLASS({
 
         addJettyShutdownHook(server);
         server.setHandler(handler);
-                
+
         this.configHttps(server);
-                
+
         server.start();
       } catch(Exception e) {
-        Logger logger = (Logger) getX().get("logger");
-        if ( logger != null )
-          logger.error(e);
+        getLogger().error(e);
       }
       `
     },
@@ -271,16 +281,16 @@ foam.CLASS({
           SslContextFactory sslContextFactory = new SslContextFactory();
           sslContextFactory.setKeyStorePath(this.getKeystorePath());
           sslContextFactory.setKeyStorePassword(this.getKeystorePassword());
-  
+
           ServerConnector sslConnector = new ServerConnector(server,
             new SslConnectionFactory(sslContextFactory, "http/1.1"),
             new HttpConnectionFactory(https));
           sslConnector.setPort(this.getHttpsPort());
-  
+
           server.addConnector(sslConnector);
-  
+
         } catch ( java.io.FileNotFoundException e ) {
-          logger.error("No KeyStore file found at path: " + this.getKeystorePath(), 
+          logger.error("No KeyStore file found at path: " + this.getKeystorePath(),
                        "Please see: https://docs.google.com/document/d/1hXVdHjL8eASG2AG2F7lPwpO1VmcW2PHnAW7LuDC5xgA/edit?usp=sharing", e);
         } catch ( java.io.IOException e ) {
           logger.error("Invalid KeyStore file password, please make sure you have set the correct password.",
@@ -290,7 +300,7 @@ foam.CLASS({
         } finally {
           IOUtils.closeQuietly(is);
         }
-  
+
       }
       `
     }

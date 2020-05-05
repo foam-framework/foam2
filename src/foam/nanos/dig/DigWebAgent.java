@@ -51,27 +51,34 @@ public class DigWebAgent
     Logger              logger   = (Logger) x.get("logger");
     HttpServletResponse resp     = x.get(HttpServletResponse.class);
     HttpParameters      p        = x.get(HttpParameters.class);
-    PrintWriter         out      = x.get(PrintWriter.class);
+    PrintWriter          out      = x.get(PrintWriter.class);
     CharBuffer          buffer_  = CharBuffer.allocate(65535);
-    String              data     = p.getParameter("data");
+    String               data     = p.getParameter("data");
     String              daoName  = p.getParameter("dao");
-    Command             command  = (Command) p.get(Command.class);
+    Command           command  = (Command) p.get(Command.class);
     Format              format   = (Format) p.get(Format.class);
-    String              id       = p.getParameter("id");
-    String              q        = p.getParameter("q");
-    String              limit    = p.getParameter("limit");
-    DAO                 nSpecDAO = (DAO) x.get("AuthenticatedNSpecDAO");
+    String               id       = p.getParameter("id");
+    String               q        = p.getParameter("q");
+    String               limit    = p.getParameter("limit");
+    DAO                nSpecDAO = (DAO) x.get("AuthenticatedNSpecDAO");
     String[]            email    = p.getParameterValues("email");
-    boolean             emailSet = email != null && email.length > 0 && ! SafetyUtil.isEmpty(email[0]);
+    boolean            emailSet = email != null && email.length > 0 && ! SafetyUtil.isEmpty(email[0]);
     String              subject  = p.getParameter("subject");
-    String              fileAddress = p.getParameter("fileaddress");
+    String          fileAddress = p.getParameter("fileaddress");
+    String               receipt = p.getParameter("receipt");
 
+    Boolean     itemizedReceipt = true;
+    if ( ! SafetyUtil.isEmpty(receipt) ) {
+      itemizedReceipt = "itemized".equals(receipt);
+    }
     //
     // FIXME/TODO: ensuring XML and CSV flows return proper response objects and codes has not been completed since the switch to HttpParameters.
     //
     PM pm = new PM(getClass(), command.getName()+'/'+format.getName());
 
     logger = new PrefixLogger(new Object[] { this.getClass().getSimpleName() }, logger);
+    logger.debug(command.getName(), format.getName(), daoName);
+
     try {
       if ( SafetyUtil.isEmpty(daoName) ) {
         resp.setContentType("text/html");
@@ -89,7 +96,8 @@ public class DigWebAgent
       NSpec nspec = (NSpec) nSpecDAO.find(daoName);
 
       if ( nspec == null || ! nspec.getServe() ) {
-         DigErrorMessage error = new DAONotFoundException.Builder(x)
+        logger.warning("NSpec not found", daoName, (nspec == null ? "null":"serve=false"));
+        DigErrorMessage error = new DAONotFoundException.Builder(x)
                                       .setMessage("DAO not found: " + daoName)
                                       .build();
         DigUtil.outputException(x, error, format);
@@ -168,12 +176,13 @@ public class DigWebAgent
               Object[] objs = (Object[]) o;
               for ( int j = 0 ; j < objs.length ; j++ ) {
                 obj = (FObject) objs[j];
-                daoPut(dao, obj);
+                objs[j] = daoPut(dao, obj);
               }
-              outputterJson.output(objs);
+              if ( itemizedReceipt ) {
+                outputterJson.output(objs);
+              }
             } else {
-              obj = (FObject) o;
-              obj = daoPut(dao, obj);
+              obj = daoPut(dao, (FObject) o);
               outputterJson.output(obj);
             }
 
@@ -269,7 +278,7 @@ public class DigWebAgent
           }
 
           for ( int i = 0 ; i < list.size() ; i++ ) {
-            daoPut(dao, (FObject) list.get(i));
+            list.set(i, daoPut(dao, (FObject) list.get(i)));
           }
         } else if ( Format.HTML == format ) {
           DigErrorMessage error = new UnsupportException.Builder(x)
@@ -319,14 +328,15 @@ public class DigWebAgent
             if ( o instanceof Object[] ) {
               Object[] objs = (Object[]) o;
               for ( int j = 0 ; j < objs.length ; j++ ) {
-                obj = (FObject) objs[j];
-                daoPut(dao, obj);
+                objs[j] = daoPut(dao, (FObject) objs[j]);
+              }
+              if ( itemizedReceipt ) {
+                outputterJson.output(objs);
               }
             } else {
-              obj = (FObject) o;
-              obj = daoPut(dao, obj);
+              obj = daoPut(dao, (FObject) o);
+              outputterJson.output(obj);
             }
-            outputterJson.output(o);
             out.println(outputterJson);
             resp.setStatus(HttpServletResponse.SC_OK);
             return;

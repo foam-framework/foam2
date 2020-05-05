@@ -225,7 +225,12 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'includeInDigest',
-      value: false
+//      value: 'return ! ( getStorageTransient() || getClusterTransient() );'
+    },
+    {
+      class: 'Boolean',
+      name: 'includeInSignature',
+      value: 'return includeInDigest();'
     },
     {
       class: 'Boolean',
@@ -300,6 +305,7 @@ foam.CLASS({
         readPermissionRequired:  this.readPermissionRequired,
         writePermissionRequired: this.writePermissionRequired,
         storageTransient:        this.storageTransient,
+        clusterTransient:        this.clusterTransient,
         xmlAttribute:            this.xmlAttribute,
         xmlTextNode:             this.xmlTextNode,
         sqlType:                 this.sqlType,

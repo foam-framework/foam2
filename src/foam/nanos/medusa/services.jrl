@@ -1,0 +1,100 @@
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "medusaThreadPool",
+  "serviceScript": `
+    return new foam.nanos.pool.ThreadPoolAgency.Builder(x)
+      .setPrefix("medusa")
+      .build();
+  `
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "localClusterConfigDAO",
+  "serviceScript": """
+    dao = new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.medusa.ClusterConfig.getOwnClassInfo())
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("clusterConfig")
+      .setCluster(false)
+      .setRuler(false)
+      .setAuthorize(false)
+      .setPm(true)
+      .setDecorator(new foam.nanos.medusa.ClusterConfigReplayDAO.Builder(x)
+      .setDelegate(new foam.nanos.medusa.ClusterConfigStatusDAO.Builder(x)
+      .setDelegate(new foam.nanos.medusa.ClusterConfigSupportDAO.Builder(x)
+        .setDelegate(new foam.dao.NullDAO(x, foam.nanos.medusa.ClusterConfig.getOwnClassInfo()))
+      .build())
+      .build())
+      .build())
+      .build();
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] {
+      foam.nanos.medusa.ClusterConfig.ENABLED,
+      foam.nanos.medusa.ClusterConfig.REALM,
+      foam.nanos.medusa.ClusterConfig.REGION,
+      foam.nanos.medusa.ClusterConfig.STATUS,
+      foam.nanos.medusa.ClusterConfig.TYPE,
+      foam.nanos.medusa.ClusterConfig.ZONE,
+    });
+   """
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "clusterConfigDAO",
+  "serve": true,
+  "serviceScript": """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.medusa.ClusterConfig.getOwnClassInfo())
+      .setInnerDAO((foam.dao.DAO) x.get("localClusterConfigDAO"))
+      .setCluster(false)
+      .setRuler(false)
+      .setEnableInterfaceDecorators(false)
+      .build();
+  """,
+  "client": "{\"of\":\"foam.nanos.medusa.ClusterConfig\"}"
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "clusterConfigSupport",
+  "serve": true,
+  "service": {"class":"foam.nanos.medusa.ClusterConfigSupport"}
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "cluster",
+  "serve": true,
+  "serviceScript": """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.medusa.ClusterServerDAO.getOwnClassInfo())
+      .setInnerDAO(new foam.nanos.medusa.ClusterServerDAO.Builder(x).build())
+      .setCluster(false)
+      .setNullify(true)
+      .setEnableInterfaceDecorators(false)
+      .setRuler(false)
+      .setAuthorize(false)
+      .build();
+  """
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"internalSessionDAO",
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.session.Session.getOwnClassInfo())
+      .setGuid(true)
+      .setCreatedAware(true)
+      .setCreatedByAware(true)
+      .setJournalName("sessionsinternal")
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setAuthorize(false)
+      .setCluster(false)
+      .setDecorator(new foam.dao.ValidatingDAO(x, new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.session.Session.getOwnClassInfo()).build()))
+      .build();
+  """
+})
+
+// See deployment/mm and mn for type specific setup

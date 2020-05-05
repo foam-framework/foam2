@@ -17,46 +17,53 @@ import foam.core.X;
 public class AsyncAssemblyLine
   extends SyncAssemblyLine
 {
- protected Agency pool_;
- protected X      x_;
+  protected Agency pool_;
+  protected X      x_;
+  protected String agencyName_ = "AsyncAssemblyLine";
 
- public AsyncAssemblyLine(X x) {
-   x_    = x;
-   pool_ = (Agency) x.get("threadPool");
- }
+  public AsyncAssemblyLine(X x) {
+    x_    = x;
+    pool_ = (Agency) x.get("threadPool");
+  }
 
- public void enqueue(Assembly job) {
-   final Assembly previous;
+  public AsyncAssemblyLine(X x, String agencyName) {
+    x_     = x;
+    pool_  = (Agency) x.get("threadPool");
+    agencyName_ += ":" + agencyName;
+  }
 
-   synchronized ( startLock_ ) {
-     previous = q_;
-     q_ = job;
-     try {
-       job.executeUnderLock();
-       job.startJob();
-     } catch (Throwable t) {
-       q_ = previous;
-       throw t;
-     }
-   }
+  public void enqueue(Assembly job) {
+    final Assembly previous;
 
-   pool_.submit(x_, new ContextAgent() { public void execute(X x) {
-     try {
-       job.executeJob();
+    synchronized ( startLock_ ) {
+      previous = q_;
+      q_ = job;
+      try {
+        job.executeUnderLock();
+        job.startJob();
+      } catch (Throwable t) {
+        q_ = previous;
+        throw t;
+      }
+    }
 
-       if ( previous != null ) previous.waitToComplete();
+    pool_.submit(x_, new ContextAgent() { public void execute(X x) {
+      try {
+        job.executeJob();
 
-       synchronized ( endLock_ ) {
-         job.endJob();
-         job.complete();
-       }
-     } finally {
-       // Isn't required, but helps GC last entry.
-       synchronized ( startLock_ ) {
-         // If I'm still the only job in the queue, then remove me
-         if ( q_ == job ) q_ = null;
-       }
-     }
-   }}, "SyncAssemblyLine");
- }
+        if ( previous != null ) previous.waitToComplete();
+
+        synchronized ( endLock_ ) {
+          job.endJob();
+          job.complete();
+        }
+      } finally {
+        // Isn't required, but helps GC last entry.
+        synchronized ( startLock_ ) {
+          // If I'm still the only job in the queue, then remove me
+          if ( q_ == job ) q_ = null;
+        }
+      }
+    }}, agencyName_);
+  }
 }
