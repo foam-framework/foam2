@@ -27,6 +27,7 @@ foam.CLASS({
   ],
 
   imports: [
+    'auth',
     'capabilityCategoryDAO',
     'capabilityDAO',
     'capabilityCategoryCapabilityJunctionDAO',
@@ -77,6 +78,8 @@ foam.CLASS({
   methods: [
     function initE() {
       this.SUPER();
+      this.signingOfficerQuestion();
+      
       var self = this;
       window.cstore = self;
 
@@ -92,7 +95,6 @@ foam.CLASS({
             self.capabilityCategoryDAO.select().then((a) => {
               for ( let i=0; i < a.array.length; i++ ) {
                 let category = a.array[i];
-                console.log(category);
                 let e = self.Tab.create({ label: category.name })
                   .add(self.renderSection(category))
                   ;
@@ -201,6 +203,9 @@ foam.CLASS({
         this.EQ(
           this.CapabilityCategoryCapabilityJunction.SOURCE_ID,
           categoryId));
+    },
+    function signingOfficerQuestion() {
+      return this.auth.check(this.__subContext__, "businessHasSigningOfficer");
     }
   ]
 });
