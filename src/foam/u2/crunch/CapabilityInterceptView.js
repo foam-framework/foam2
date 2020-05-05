@@ -22,7 +22,8 @@ foam.CLASS({
     'capabilityAquired',
     'capabilityCancelled',
     'crunchController',
-    'stack'
+    'stack',
+    'capabilityCache'
   ],
 
   properties: [
@@ -51,6 +52,13 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      this.capabilityOptions.forEach((c) => {
+        if ( this.capabilityCache.has(c) && this.capabilityCache.get(c) === true ) {
+          capabilityAquired = true;
+          this.stack.back();
+        }
+      });
+
       var view = this;
       this
         .addClass(this.myClass())
@@ -94,16 +102,26 @@ foam.CLASS({
     {
       name: 'cancel',
       code: function() {
-        this.stack.back();
+        // todo find which capability was applied for
+        this.capabilityOptions.forEach((c) => {
+          this.capabilityCache.set(c, true);
+        });
         if ( ! this.capabilityAquired ) this.capabilityCancelled = true;
+        this.stack.back();
       }
     },
     {
       name: 'aquire',
       label: 'return with capabilityAquired=true',
       code: function() {
+        // todo find which capability was applied for
         this.capabilityAquired = true;
+        this.capabilityOptions.forEach((c) => {
+          this.capabilityCache.set(c, true);
+        });
         this.stack.back();
+        alert('Your permissions has changed.');
+        location.reload();
       }
     }
   ]
