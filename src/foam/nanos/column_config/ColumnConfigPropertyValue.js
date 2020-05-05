@@ -69,6 +69,80 @@ foam.CLASS({
       `
     },
     {
+      name: 'returnValue',
+      type: 'FObject',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'of',
+          type: 'ClassInfo'
+        },
+        {
+          name: 'propInfo',
+          class: 'String',
+        },
+        {
+          name: 'obj',
+          type: 'FObject'
+        }
+      ],
+      code: function(of, propInfo, obj) {
+        var cls = of;
+        var property;
+        var obj1 = obj;
+       // if ( typeof propInfo === 'string') {
+          var props = propInfo.split('.');
+          for ( var i = 0; i < props.length; i++ ) {
+            property = typeof props[i] === 'string'
+            ? cls.getAxiomByName(props[i])
+            :  foam.Array.isInstance(props[i]) ? 
+            cls.getAxiomByName(props[i]) : props[i];
+            if ( !property ) {
+              //need to come up with behavior
+              break;
+            }
+            cls = property.of;
+
+            if ( i !== props.length - 1 && obj1 )
+              obj1 = property.f(obj1);
+          }
+        // } else
+        //   property = propInfo;
+        return obj1;
+      },
+      javaCode: `
+        ClassInfo ci = of;
+        FObject obj1 = obj;
+        PropertyInfo p = null;
+        for(int i = 0; i < propInfo.split("\\\\.").length; i++) {
+          if ( ( p == null && i != 0 ) || ci == null )
+            break;
+          p = (PropertyInfo) ci.getAxiomByName(propInfo.split("\\\\.")[i]);
+
+          if ( i != propInfo.split("\\\\.").length - 1 ) {
+            obj1 = (FObject) p.f(obj1);
+            Class cls = p.getValueClass();
+            try {
+              ci = (ClassInfo) cls.getMethod("getOwnClassInfo").invoke(null);
+            } catch (IllegalAccessException e) {
+              e.printStackTrace();
+              return new ColumnPropertyValue.Builder(x).setPropertyValue(null).setObjValue(null).build();
+            } catch (InvocationTargetException e) {
+              e.printStackTrace();
+              return new ColumnPropertyValue.Builder(x).setPropertyValue(null).setObjValue(null).build();
+            } catch (NoSuchMethodException e) {
+              e.printStackTrace();
+              return new ColumnPropertyValue.Builder(x).setPropertyValue(null).setObjValue(null).build();
+            }
+          }
+        }
+        return obj1;
+      `
+    },
+    {
       name: 'returnPropertyAndObject',
       type: 'foam.nanos.column.ColumnPropertyValue',
       args: [

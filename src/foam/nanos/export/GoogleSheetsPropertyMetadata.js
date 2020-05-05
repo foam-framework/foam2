@@ -32,6 +32,10 @@
       name: 'perValuePatternSpecificValues',
       class: 'StringArray',
       value: []
+    },
+    {
+      name: 'propName',
+      class: 'String'
     }
   ]
 });
