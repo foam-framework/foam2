@@ -10,10 +10,6 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
 
   documentation: `Marshall put and remove operations to the ClusterServer.
-The client has three options for delegating:
-1. If not mediator, proxy to the next 'server' determined by ClusterConfigSupport, delegate result.
-2. If mediator, but not primary, proxy to next 'server', find result.
-3. If primary mediator, then delegate to medusaAdapter, accept result.
 `,
 
   implements: [
@@ -65,6 +61,10 @@ The client has three options for delegating:
     },
     {
       // TODO: clear on ClusterConfigDAO update.
+      documentation: `The client has three options for delegating:
+1. If not mediator, proxy to the next 'server' determined by ClusterConfigSupport, delegate result.
+2. If mediator, but not primary, proxy to next 'server', find result.
+3. If primary mediator, then delegate to medusaAdapter, accept result.`,
       name: 'dao',
       class: 'foam.dao.DAOProperty',
       javaFactory: `
@@ -97,12 +97,6 @@ The client has three options for delegating:
 
   methods: [
     {
-      name: 'init_',
-      javaCode: `
-
-      `
-    },
-    {
       name: 'put_',
       javaCode: `
       getLogger().debug("put", obj.getProperty("id"), "primary", getConfig().getIsPrimary(), getConfig().getType().getLabel());
@@ -114,11 +108,18 @@ The client has three options for delegating:
         FObject found = getDelegate().find_(x, obj.getProperty("id"));
         if ( found == null ||
             ! found.equals(result) ) {
-          getLogger().error("put", "corrupt", "found != result");
+          getLogger().error("put", "corrupt", "found != response");
         }
-        return result;
+        return found;
       }
+      try {
       return getDelegate().put_(x, result);
+      } catch (Throwable t) {
+        getLogger().error(t.getMessage());
+        ((ContextAware) result).setX(null);
+        getLogger().debug("put", "response", result);
+        throw t;
+      }
       `
     },
     {
@@ -194,10 +195,11 @@ The client has three options for delegating:
       while ( true ) {
         try {
           DAO  dao = getDao();
-          getLogger().debug("submit", "dao", dao.getClass().getSimpleName(), dop.getLabel(), obj.getProperty("id"), "request");
-          FObject result = (FObject) getDao().cmd_(x, cmd);
-          getLogger().debug("submit", "dao", dao.getClass().getSimpleName(), dop.getLabel(), obj.getProperty("id"), "response");
-          return result;
+          getLogger().debug("submit", "dao", dao.getClass().getSimpleName(), dop.getLabel(), obj.getClass().getSimpleName(), obj.getProperty("id"), "request");
+          cmd = (ClusterCommand) getDao().cmd_(x, cmd);
+          FObject data = cmd.getData();
+          getLogger().debug("submit", "dao", dao.getClass().getSimpleName(), dop.getLabel(), data.getClass().getSimpleName(), data.getProperty("id"), "response");
+          return data;
         } catch ( Throwable t ) {
           getLogger().debug("submit", t.getMessage());
 

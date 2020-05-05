@@ -185,7 +185,7 @@ NOTE: override cmd_ in child class to control delegate call`,
           }
 
           if ( puts.size() > 0 ) {
-            getLogger().info("execute", "put batch", "size", puts.size());
+            getLogger().debug("execute", "put batch", "size", puts.size());
             BatchCmd cmd = new BatchCmd();
             cmd.setDop(DOP.PUT);
             cmd.setBatch(puts);
@@ -195,7 +195,7 @@ NOTE: override cmd_ in child class to control delegate call`,
             setLastSend(System.currentTimeMillis());
           }
           if ( removes.size() > 0 ) {
-            getLogger().info("execute", "remove batch", "size", removes.size());
+            getLogger().debug("execute", "remove batch", "size", removes.size());
             BatchCmd cmd = new BatchCmd();
             cmd.setDop(DOP.REMOVE);
             cmd.setBatch(removes);

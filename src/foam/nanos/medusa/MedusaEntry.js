@@ -17,8 +17,12 @@ foam.CLASS({
 
   documentation: `Ledger entry.`,
 
+  ids: [
+    'index'
+  ],
+
   tableColumns: [
-    'id',
+//    'id',
     'nSpecName',
     'index',
     'index1',
@@ -28,12 +32,12 @@ foam.CLASS({
   ],
 
   properties: [
-    {
-      class: 'String',
-      name: 'id',
-      visibility: 'RO',
-      includeInDigest: false
-    },
+    // {
+    //   class: 'String',
+    //   name: 'id',
+    //   visibility: 'RO',
+    //   includeInDigest: false
+    // },
     {
       class: 'String',
       name: 'nSpecName',

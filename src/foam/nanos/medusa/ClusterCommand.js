@@ -94,8 +94,8 @@ foam.CLASS({
         setHops(new String[] { support.getConfigId() });
       } else {
         String[] hops = new String[getHops().length + 1];
-        System.arraycopy(getHops(), 0, hops, 0, hops.length);
-        hops[hops.length] = support.getConfigId();
+        System.arraycopy(getHops(), 0, hops, 0, getHops().length);
+        hops[hops.length - 1] = support.getConfigId();
         setHops(hops);
       }
       `

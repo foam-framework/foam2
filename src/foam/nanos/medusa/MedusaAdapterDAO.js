@@ -21,10 +21,7 @@ foam.CLASS({
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
-    'java.util.concurrent.ThreadLocalRandom',
-    'java.util.Random',
-    'foam.util.SafetyUtil',
-    'java.util.UUID'
+    'foam.util.SafetyUtil'
   ],
 
   properties: [
@@ -108,8 +105,6 @@ foam.CLASS({
       ClusterConfig config = support.getConfig(x, support.getConfigId());
 
       MedusaEntry entry = x.create(MedusaEntry.class);
-      java.util.Random r = ThreadLocalRandom.current();
-      entry.setId(new UUID(r.nextLong(), r.nextLong()).toString());
       entry = dagger.link(x, entry);
       entry.setMediator(config.getName());
       entry.setNSpecName(getNSpec().getName());
@@ -124,30 +119,19 @@ foam.CLASS({
 
       try {
         getMedusaEntryDAO().put_(x, entry);
-        getLogger().debug("submit", entry.getIndex(), "find", obj.getProperty("id"));
-        FObject result = getDelegate().find_(x, obj.getProperty("id"));
-        if ( result == null ) {
-          getLogger().error("Object not found", obj.getProperty("id"));
-          // REVIEW: what to do?
-          throw new RuntimeException("Data lost");
+        FObject nu = getDelegate().find_(x, obj.getProperty("id"));
+        if ( nu == null ) {
+          getLogger().error("submit", entry.getIndex(), "delegate", "find", obj.getProperty("id"), "not found");
+          throw new RuntimeException("Object not found.");
         }
-        getLogger().debug("submit", entry.getIndex(), "found", result.getProperty("id"));
-        return result;
+        return nu;
       } catch (Throwable t) {
-        getLogger().error("submit", t.getMessage(), entry, t);
+        getLogger().error("submit", entry.getIndex(), t.getMessage(), t);
         throw t;
       } finally {
         pm.log(x);
       }
       `
-    },
-
-    // PMs
-    {
-      name: 'putName',
-      class: 'String',
-      javaFactory: 'return getNSpec().getName() + ":Medusa:put";',
-      visibility: 'RO'
     },
     {
       name: 'createPM',

@@ -359,23 +359,27 @@ configuration for contacting the primary node.`,
       ],
       type: 'foam.nanos.medusa.ClusterConfig',
       javaCode: `
-      DAO clusterConfigDAO = (DAO) x.get("clusterConfigDAO");
-      List<ClusterConfig> configs = ((ArraySink) clusterConfigDAO
-        .where(
-          AND(
-            EQ(ClusterConfig.REGION_STATUS, RegionStatus.ACTIVE),
-            EQ(ClusterConfig.REALM, config.getRealm()),
-            EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
-            EQ(ClusterConfig.ZONE, Math.max(0L, config.getZone() -1)),
-            EQ(ClusterConfig.STATUS, Status.ONLINE),
-            EQ(ClusterConfig.ENABLED, true)
-          ))
-        .select(new ArraySink())).getArray();
-      if ( configs.size() > 0 ) {
-        return configs.get(configs.size() -1);
-      } else {
-        throw new RuntimeException("Next Zone not found.");
+      long zone = config.getZone();
+      while ( zone > 0 ) {
+        zone -= 1;
+        DAO clusterConfigDAO = (DAO) x.get("clusterConfigDAO");
+        List<ClusterConfig> configs = ((ArraySink) clusterConfigDAO
+          .where(
+            AND(
+              EQ(ClusterConfig.REGION_STATUS, RegionStatus.ACTIVE),
+              EQ(ClusterConfig.REALM, config.getRealm()),
+              EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
+              EQ(ClusterConfig.ZONE, zone),
+              EQ(ClusterConfig.STATUS, Status.ONLINE),
+              EQ(ClusterConfig.ENABLED, true)
+            ))
+          .orderBy(foam.mlang.MLang.DESC(ClusterConfig.IS_PRIMARY))
+          .select(new ArraySink())).getArray();
+        if ( configs.size() > 0 ) {
+          return configs.get(configs.size() -1);
+        }
       }
+      throw new RuntimeException("Next Zone not found.");
       `
     },
     {
@@ -592,11 +596,15 @@ configuration for contacting the primary node.`,
       ],
       javaCode: `
       ClusterConfig config = getConfig(x, getConfigId());
-      if ( config.getType() == MedusaType.MEDIATOR &&
-           ! config.getIsPrimary() &&
-           config.getZone() == 0L ||
-           config.getType() == MedusaType.NODE ||
-           config.getStatus() != Status.ONLINE ) {
+      if ( config.getType() == MedusaType.MEDIATOR ) {
+        if ( config.getIsPrimary() &&
+             config.getStatus() == Status.ONLINE &&
+             config.getZone() == 0L ) {
+          return true;
+        }
+        return false;
+      }
+      if ( config.getType() == MedusaType.NODE ) {
         return false;
       }
       return true;

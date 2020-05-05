@@ -69,7 +69,6 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      DaggerService dagger = (DaggerService) getX().get("daggerService");
       ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
       ClusterConfig myConfig = support.getConfig(getX(), support.getConfigId());
       ClusterConfig config = (ClusterConfig) obj;
@@ -92,7 +91,7 @@ foam.CLASS({
       } catch (NullPointerException t) {
         getLogger().error(t);
       } catch (RuntimeException | java.io.IOException t) {
-        getLogger().debug("ping", config.getId(), t.getMessage());
+        // getLogger().debug("ping", config.getId(), t.getMessage());
         if ( config.getStatus() != Status.OFFLINE ) {
           config = (ClusterConfig) config.fclone();
           config.setPingInfo(t.getMessage());

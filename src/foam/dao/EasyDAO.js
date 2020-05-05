@@ -136,16 +136,14 @@ foam.CLASS({
         foam.dao.DAO delegate = getInnerDAO();
         if ( delegate == null ) {
           if ( getNullify() ) {
-            delegate = new foam.dao.NullDAO.Builder(getX())
-              .setOf(getOf())
-              .build();
+            delegate = new foam.dao.NullDAO(getX(), getOf());
           } else if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
             setMdao(new foam.dao.MDAO(getOf()));
-            if ( getWriteOnly() ) {
-              delegate = new foam.dao.WriteOnlyJDAO(getX(), getMdao(), getOf(), getJournalName());
-            } else {
-              delegate = new foam.dao.java.JDAO(getX(), getMdao(), getJournalName());
-            }
+             // if ( getWriteOnly() ) {
+             //   delegate = new foam.dao.WriteOnlyJDAO(getX(), getMdao(), getOf(), getJournalName());
+             // } else {
+              delegate = new foam.dao.java.JDAO(getX(), getMdao(), getJournalName(), getCluster() /* read-only */);
+             // }
           } else {
             setMdao(new foam.dao.MDAO(getOf()));
             delegate = getMdao();
@@ -180,13 +178,17 @@ foam.CLASS({
               pxy.setDelegate(fixedSizeDAO);
             }
           } else {
-            getLogger().error(this.getClass().getSimpleName(), "NSpec.name", (getNSpec() != null ) ? getNSpec().getName() : null, "of_", of_, "FixedSizeDAO did not find instanceof MDAO");
+            getLogger().error("NSpec.name", (getNSpec() != null ) ? getNSpec().getName() : null, "of_", of_, "FixedSizeDAO did not find instanceof MDAO");
             System.exit(1);
           }
         }
 
         if ( getCluster() &&
-             getMdao() != null ) {
+             getMdao() != null &&
+             ( ! getNSpec().getServe() ||
+               getNSpec().getServe() &&
+               getInnerDAO() == null ) ) {
+          getLogger().debug(getNSpec().getName(), "cluster", "delegate", delegate.getClass().getSimpleName());
           delegate = new foam.nanos.medusa.ClusterClientDAO.Builder(getX())
             .setNSpec(getNSpec())
             .setDelegate(delegate)
@@ -197,7 +199,7 @@ foam.CLASS({
 
         if ( getDecorator() != null ) {
           if ( ! ( getDecorator() instanceof ProxyDAO ) ) {
-            getLogger().error(this.getClass().getSimpleName(), "delegate", "NSpec.name", (getNSpec() != null ) ? getNSpec().getName() : null, "of_", of_ , "delegateDAO", getDecorator(), "not instanceof ProxyDAO");
+            getLogger().error("delegate", "NSpec.name", (getNSpec() != null ) ? getNSpec().getName() : null, "of_", of_ , "delegateDAO", getDecorator(), "not instanceof ProxyDAO");
             System.exit(1);
           }
           // The decorator dao may be a proxy chain
@@ -948,6 +950,7 @@ model from which to test ServiceProvider ID (spid)`,
       javaCode: `
         if ( getMdao() != null ) {
           getMdao().addIndex(props);
+//          ((foam.dao.MDAO) getMdao().getDelegate()).addIndex(props);
         }
         return this;
       `
@@ -971,6 +974,7 @@ model from which to test ServiceProvider ID (spid)`,
       javaCode: `
         if ( getMdao() != null )
           getMdao().addIndex(index);
+//          ((foam.dao.MDAO) getMdao().getDelegate()).addIndex(index);
         return this;
       `
     },

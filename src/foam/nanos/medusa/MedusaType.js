@@ -27,6 +27,10 @@ foam.ENUM({
     {
       name: 'ARCHIVE',
       label: 'Archive'
+    },
+    {
+      name: 'OTHER',
+      label: 'Other'
     }
   ]
 });

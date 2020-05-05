@@ -267,9 +267,9 @@ foam.CLASS({
           } else {
             getLogger().debug("promoter", "lock", getIndex());
             synchronized ( promoteLock_ ) {
-              getLogger().debug("promoter", "wait", getIndex());
+//              getLogger().debug("promoter", "wait", getIndex());
               promoteLock_.wait(1000);
-              getLogger().debug("promoter", "wake", getIndex());
+//              getLogger().debug("promoter", "wake", getIndex());
             }
           }
         }
@@ -309,7 +309,7 @@ foam.CLASS({
           if ( ! SafetyUtil.isEmpty(data) ) {
             FObject nu = x.create(JSONParser.class).parseString(entry.getData());
             if ( nu == null ) {
-              getLogger().error("Failed to parse", entry.getData());
+              getLogger().error("Failed to parse", entry.getIndex(), entry.getNSpecName(), entry.getData());
               throw new RuntimeException("Error parsing data.");
             }
 
@@ -330,9 +330,9 @@ foam.CLASS({
           }
         }
         // Notify any blocked Primary puts
-        getLogger().debug("mdao", entry.getIndex(), "notify");
+//        getLogger().debug("mdao", entry.getIndex(), "notify");
         ((DAO) x.get("localMedusaEntryDAO")).cmd_(x, entry);
-        getLogger().debug("mdao", entry.getIndex(), "notified");
+//        getLogger().debug("mdao", entry.getIndex(), "notified");
       } catch (Throwable t) {
         getLogger().error(t);
         // TODO: Alarm

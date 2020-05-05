@@ -109,6 +109,9 @@ foam.CLASS({
     {
       name: 'blockOnReplay',
       javaCode: `
+      if ( ! getReplaying() ) {
+        return;
+      }
       synchronized ( replayingLock_ ) {
         if ( getReplaying() ) {
           try {
