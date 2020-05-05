@@ -81,12 +81,19 @@ foam.CLASS({
       expression: function(of) {
         if ( ! of ) return [];
 
-        var selectSections = of.getAxiomsByClass(this.SectionAxiom);
-        if ( this.useSections.length ) selectSections = selectSections.filter((a) => this.useSections.includes(a.name));
-        sections = Array.from(selectSections)
-          // Why not Section.AXIOM.ORDER on next line?
-          .sort((a, b) => a.order - b.order)
-          .map((a) => this.Section.create().fromSectionAxiom(a, of));
+        sections = of.getAxiomsByClass(this.SectionAxiom)
+        // Why not Section.AXIOM.ORDER on next line?
+        .sort((a, b) => a.order - b.order)
+        .reduce((map, a) => {
+          if ( this.useSections.length ) {
+            if ( this.useSections.includes(a.name) ) {
+              map.push(this.Section.create().fromSectionAxiom(a, of));
+            }
+          } else {
+            map.push(this.Section.create().fromSectionAxiom(a, of));
+          }
+          return map;
+        }, []);
 
         var usedAxioms = sections
           .map((s) => s.properties.concat(s.actions))
