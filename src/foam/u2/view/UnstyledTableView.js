@@ -72,9 +72,9 @@ foam.CLASS({
       name: 'columns_',
       expression: function(columns, of, editColumnsEnabled, selectedColumnNames, isColumnChanged) {
         if ( ! of ) return [];
-        if ( ! editColumnsEnabled ) return columns.map(c => [c, null]);
+        if ( ! editColumnsEnabled ) return columns.map(c => foam.Array.isInstance(c) ? c : [c, null]);
 
-        return selectedColumnNames.map(c => [c, null]);
+        return selectedColumnNames.map(c => foam.Array.isInstance(c) ? c : [c, null]);
       },
     },
     {
@@ -309,10 +309,10 @@ foam.CLASS({
 
               // Render the table headers for the property columns.
               forEach(columns_, function([property, overrides]) {
-                var cls = view.of;
                 var column;
                 if ( typeof property === 'string') {
                   var columnConfig = this.__context__.columnConfigToPropertyConverter;
+                  if (!columnConfig) columnConfig = this.__context__.lookup('foam.nanos.column.ColumnConfigToPropertyConverter').create();
                   column = columnConfig.returnProperty(view.of, property);
                 } else
                   column = property;
@@ -501,6 +501,7 @@ foam.CLASS({
                   var obj1 = obj;
                   if ( typeof property === 'string') {
                     var columnConfig = this.__context__.columnConfigToPropertyConverter;
+                    if (!columnConfig) columnConfig = this.__context__.lookup('foam.nanos.column.ColumnConfigToPropertyConverter').create();
                     var val = columnConfig.returnPropertyAndObject(view.of, property, obj1);
                     column = val.propertyValue;
                     obj1 = val.objValue;
