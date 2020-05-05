@@ -98,7 +98,6 @@ foam.CLASS({
       If status is set to GRANTED, check if junctions depending on current can be granted
       `,
       javaCode: `
-      System.out.println("ucjdao put !!");
       UserCapabilityJunction ucJunction = (UserCapabilityJunction) obj;
       
       checkOwnership(x, ucJunction);
