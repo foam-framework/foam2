@@ -327,10 +327,12 @@ foam.CLASS({
       postSet: function(oldValue, newValue) {
         this.sections.forEach((section) => {
           if ( newValue ) {
-            var pred = this.KEYWORD(newValue);
             if ( section.searchBy.length > 0 ) {
               var arrOfExpressions = section.searchBy.map((prop) => this.CONTAINS_IC(prop, newValue));
-              pred = this.Or.create({ args: arrOfExpressions });
+              var pred = this.Or.create({ args: arrOfExpressions });
+            }
+            else {
+              var pred = this.KEYWORD(newValue);
             }
             section.filteredDAO = section.dao.where(pred);
           }
