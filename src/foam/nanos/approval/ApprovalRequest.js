@@ -159,9 +159,7 @@
       tableCellFormatter: function(approver, data) {
         let self = this;
         this.__subSubContext__.userDAO.find(approver).then(user => {
-          if ( data.status != foam.nanos.approval.ApprovalStatus.REQUESTED ) {
-            self.add(user ? user.toSummary() : `User #${approver}`);
-          } else if ( user ) {
+          if ( user && data.status != foam.nanos.approval.ApprovalStatus.REQUESTED ) {
             if ( self.__subSubContext__.user.id == user.id ) {
               self.add(user.toSummary());
             } else {
