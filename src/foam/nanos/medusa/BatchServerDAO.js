@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.dao',
+  package: 'foam.nanos.medusa',
   name: 'BatchServerDAO',
   extends: 'foam.dao.ProxyDAO',
 
@@ -13,6 +13,7 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.FObject',
+    'foam.dao.DOP',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'java.util.Map',

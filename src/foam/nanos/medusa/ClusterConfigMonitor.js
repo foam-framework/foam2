@@ -104,23 +104,28 @@ foam.CLASS({
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       ClusterConfig config = support.getConfig(x, support.getConfigId());
 
-      if ( config.getType() == MedusaType.NODE &&
-           config.getEnabled() &&
-          config.getStatus() == Status.OFFLINE ) {
+      if ( config.getType() == MedusaType.NODE ) {
+         if ( config.getEnabled() &&
+              config.getStatus() == Status.OFFLINE ) {
 
-        // Wait for own replay to complete,
-        // then set node ONLINE.
-        DAO dao = ((DAO) x.get("localMedusaEntryDAO"));
+          // Wait for own replay to complete,
+          // then set node ONLINE.
+          DAO dao = ((DAO) x.get("localMedusaEntryDAO"));
 
-        // TODO: deal with digest failures - and Node taking self OFFLINE.
-        // this timer will continually set it back to ONLINE.
+          // TODO: deal with digest failures - and Node taking self OFFLINE.
+          // this timer will continually set it back to ONLINE.
 
+          config = (ClusterConfig) config.fclone();
+          config.setStatus(Status.ONLINE);
+          ((DAO) x.get("localClusterConfigDAO")).put(config);
+        }
+      } else if ( config.getType() != MedusaType.MEDIATOR ) {
         config = (ClusterConfig) config.fclone();
         config.setStatus(Status.ONLINE);
         ((DAO) x.get("localClusterConfigDAO")).put(config);
       }
 
-// TODO: Nodes don't need to ping anything, just useful for reporting and network graph - the ping time could be reduced - see mn/services.jrl
+// TODO: Non-Mediators don't need to ping anything, just useful for reporting and network graph - the ping time could be reduced - see mn/services.jrl
 
       DAO dao = (DAO) x.get("localClusterConfigDAO");
       dao = dao.where(

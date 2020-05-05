@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.nanos.medusa',
   name: 'MedusaBroadcastDAO',
-  extends: 'foam.dao.BatchClientDAO',
+  extends: 'foam.nanos.medusa.BatchClientDAO',
 
   documentation: `Broadcast MedusaEntry back to Mediators.`,
 

@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.dao',
+  package: 'foam.nanos.medusa',
   name: 'BatchCmd',
 
   documentation: `See BatchClientDAO and BatchServerDAO.  The cmd captures a group of dao operations to be delegated together.`,

@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.nanos.medusa',
   name: 'ReplayBatchCmd',
-  extends: 'foam.dao.BatchCmd',
+  extends: 'foam.nanos.medusa.BatchCmd',
 
   properties: [
     {

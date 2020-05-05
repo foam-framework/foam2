@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.dao',
+  package: 'foam.nanos.medusa',
   name: 'BatchClientDAO',
   extends: 'foam.dao.ProxyDAO',
 
@@ -22,6 +22,7 @@ NOTE: override cmd_ in child class to control delegate call`,
     'foam.core.ContextAware',
     'foam.core.FObject',
     'foam.dao.DAO',
+    'foam.dao.DOP',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'java.util.HashMap',

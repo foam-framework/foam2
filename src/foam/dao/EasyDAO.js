@@ -139,11 +139,11 @@ foam.CLASS({
             delegate = new foam.dao.NullDAO(getX(), getOf());
           } else if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
             setMdao(new foam.dao.MDAO(getOf()));
-             // if ( getWriteOnly() ) {
-             //   delegate = new foam.dao.WriteOnlyJDAO(getX(), getMdao(), getOf(), getJournalName());
-             // } else {
-              delegate = new foam.dao.java.JDAO(getX(), getMdao(), getJournalName(), getCluster() /* read-only */);
-             // }
+             if ( getWriteOnly() ) {
+               delegate = new foam.dao.WriteOnlyJDAO(getX(), getMdao(), getOf(), getJournalName());
+             } else {
+               delegate = new foam.dao.java.JDAO(getX(), getMdao(), getJournalName(), getCluster() /* read-only */);
+             }
           } else {
             setMdao(new foam.dao.MDAO(getOf()));
             delegate = getMdao();
