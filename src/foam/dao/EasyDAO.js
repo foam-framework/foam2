@@ -169,6 +169,10 @@ foam.CLASS({
           .setOf(getOf())
           .setDelegate(delegate)
           .build();
+
+          if ( getApprovableAwareEnabled() ) {
+            logger.warning("DEPRECATED: EasyDAO", getName(), "'approvableAwareEnabled' is deprecated. Please remove it from the nspec.");
+          }
         }
 
         if ( getGuid() && getSeqNo() )
@@ -639,6 +643,14 @@ model from which to test ServiceProvider ID (spid)`,
         LifecycleAware the lifecycleState property on the object will not be changed to ACTIVE.
       `,
       javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.approval.ApprovableAware.class.isAssignableFrom(getOf().getObjClass());'
+    },
+    {
+      name: 'approvableAwareEnabled',
+      class: 'Boolean',
+      documentation: `
+        DEPRECATING: Will be removed after services migration. Please use 'approvableAware' instead.
+      `,
+      javaFactory: 'return false;'
     },
     {
       name: 'deletedAware',
