@@ -395,22 +395,8 @@ foam.CLASS({
 
           fullSend(x, approvalRequest, obj, approverIds);
 
-          // we are storing the object in it's related dao with a lifecycle state of PENDING
-          UserFeedbackAware feedbackAwareObj = (UserFeedbackAware) obj;
-
-          UserFeedback newUserFeedback = new UserFeedback.Builder(x)
-            .setStatus(UserFeedbackStatus.SUCCESS)
-            .setMessage("An approval request has been sent out.")
-            .setNext(feedbackAwareObj.getUserFeedback()).build();
-
-          FObject clonedObj = obj.fclone();
-
-          UserFeedbackAware feedbackAwareClonedObj = (UserFeedbackAware) clonedObj;
-
-          feedbackAwareClonedObj.setUserFeedback(newUserFeedback);
-          
-          // we are not putting the object in the dao
-          return clonedObj;
+          // TODO: the following is a temporary fix will need to create an actual exception and pass feedback as a property
+          throw new RuntimeException("An approval request has been sent out."); // we aren't storing the object in the dao
         } else {
           logger.error("Something went wrong used an invalid lifecycle status for create!");
           throw new RuntimeException("Something went wrong used an invalid lifecycle status for create!");
