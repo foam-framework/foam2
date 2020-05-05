@@ -72,6 +72,7 @@ foam.CLASS({
     'notify',
     'pushMenu',
     'requestCapability',
+    'capabilityCache',
     'requestLogin',
     'signUpEnabled',
     'loginVariables',
@@ -242,7 +243,13 @@ foam.CLASS({
       factory: function() {
         return this.CrunchController.create();
       }
-
+    },
+    {
+      class: 'Map',
+      name: 'capabilityCache',
+      factory: function() {
+        return new Map();
+      }
     },
     {
       class: 'FObjectProperty',
@@ -441,6 +448,11 @@ foam.CLASS({
 
     function requestCapability(capabilityInfo) {
       var self = this;
+
+      capabilityInfo.capabilityOptions.forEach((c) => {
+        self.capabilityCache.set(c, false);
+      });
+
       self.capabilityAquired = false;
       self.capabilityCancelled = false;
       return new Promise(function(resolve, reject) {
