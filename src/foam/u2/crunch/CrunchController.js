@@ -13,28 +13,29 @@ foam.CLASS({
     'capabilityDAO',
     'ctrl',
     'prerequisiteCapabilityJunctionDAO',
-    'stack'
+    'stack',
+    'user',
+    'userCapabilityJunctionDAO'
   ],
 
   requires: [
     'foam.nanos.crunch.Capability',
-    'foam.nanos.crunch.CapabilityCapabilityJunction'
+    'foam.nanos.crunch.CapabilityCapabilityJunction',
+    'foam.nanos.crunch.UserCapabilityJunction',
+    'foam.nanos.crunch.ui.CapabilityWizardSection'
   ],
 
   methods: [
-    function launchWizard(capabilityId) {
-      var self = this;
-
-      var ofList = []; // This is what the wizard wants
-      var tcList = []; // but we need this first
+    function getTC(capabilityId) {
+      var tcList = [];
       var tcRecurse = () => {}; // and we'll do it with this
 
       // Pre-Order Traversial of Capability Dependancies.
       // Using Pre-Order here will cause the wizard to display
       // dependancies in a logical order.
       tcRecurse = (sourceId) => {
-        return self.prerequisiteCapabilityJunctionDAO.where(
-          self.EQ(self.CapabilityCapabilityJunction.SOURCE_ID, sourceId)
+        return this.prerequisiteCapabilityJunctionDAO.where(
+          this.EQ(this.CapabilityCapabilityJunction.SOURCE_ID, sourceId)
         ).select().then((result) => {
           var arry = result.array;
 
@@ -50,42 +51,33 @@ foam.CLASS({
         });
       };
 
-      // Create "ofList" for the wizard
-      let p = tcRecurse(capabilityId).then(() => {
-        return self.capabilityDAO.where(
-          self.IN(self.Capability.ID, tcList)
-        ).select().then((results) => {
-          // Get the Capability objects in a map because it's faster than sorting
-          var capabilityMap = {};
-          results.array.forEach((cap) => capabilityMap[cap.id] = cap);
-            // Collect lists for fullfilling the requirements for any given capability.
-            ofList = tcList
-              .filter((capID) => !! capabilityMap[capID].of)
-              .map((capID) => capabilityMap[capID].of);
+      return tcRecurse(capabilityId).then(() => tcList);
+    },
+    function getCapabilities(capabilityId) {
+      return this.getTC(capabilityId).then(
+        tcList => Promise.all(tcList.map(
+          capId => this.capabilityDAO.find(capId))));
+    },
+    function launchWizard(capabilityId) {
+      var self = this;
 
-            daoList = tcList
-              .filter((capID) => !! capabilityMap[capID].of && !! capabilityMap[capID].daoKey)
-              .map((capID) => capabilityMap[capID].daoKey);
-
-            argsList = tcList
-              .filter((capID) => !! capabilityMap[capID].of && !! capabilityMap[capID].daoFindKey)
-              .map((capID) =>
-                this.ctrl[capabilityMap[capID].daoFindKey].id);
-          });
-        });
-        this.capabilityDAO.find(capabilityId).then((cap) => {
-          // Summon the wizard; accio!
-          p.then(() => {
-            self.stack.push({
-              class: 'foam.nanos.crunch.ui.ScrollSectionWizardView',
-              title: cap.name,
-              daoList: daoList,
-              ofList: ofList,
-              argsList: argsList,
-              capsList: tcList
-            });
+      this.getCapabilities(capabilityId).then(capabilities => {
+        // Map capabilities to CapabilityWizardSection objects
+        return Promise.all(capabilities.filter(
+          cap => cap.of
+        ).map(
+          cap => this.CapabilityWizardSection.create({
+            capability: cap
+          }).updateUCJ()
+        ));
+      }).then(sections => {
+        console.log(sections);
+        self.stack.push({
+          class: "foam.nanos.crunch.ui.ScrollSectionWizardView",
+          sectionsList: sections
         });
       });
+
     }
   ]
 });

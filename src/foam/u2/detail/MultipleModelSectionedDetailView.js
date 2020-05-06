@@ -40,23 +40,7 @@ foam.CLASS({
       }
     },
     {
-      name: 'sectionsList',
-      factory: null,
-      expression: function(ofList) {
-        if ( ! ofList ) return [];
-
-        sections = ofList.map((of, index) => {
-          let listOfSectionAxiomsFromClass = of.getAxiomsByClass(this.SectionAxiom);
-          var listOfSectionsFromClass = listOfSectionAxiomsFromClass
-            .sort((a, b) => a.order - b.order)
-            .map((a) => this.Section.create().fromSectionAxiom(a, of));
-          let unSectionedPropertiesSection = this.checkForUnusedProperties(listOfSectionsFromClass, of); // this also will handle models with no sections
-          if ( unSectionedPropertiesSection ) listOfSectionsFromClass.push(unSectionedPropertiesSection);
-          return { 'data': of.create({}, this), 'sections': listOfSectionsFromClass, 'dao': daoList[index], 'daoKey': this.argsList[index] };
-        });
-
-        return sections;
-      }
+      name: 'sectionsList'
     },
     {
       class: 'Array',
