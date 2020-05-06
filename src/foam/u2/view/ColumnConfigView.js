@@ -302,7 +302,7 @@ foam.CLASS({
         if (isSelected)
           this.selectedColumns.push(propertyNameSoFar ? this.rootProperty[0] + '.' + propertyNameSoFar : this.rootProperty[0]);
         else
-          this.selectedColumns.splice(this.selectedColumns.indexof(propertyNameSoFar ? this.rootProperty[0] + '.' + propertyNameSoFar : this.rootProperty[0]), 1);
+          this.selectedColumns.splice(this.selectedColumns.indexOf(propertyNameSoFar ? this.rootProperty[0] + '.' + propertyNameSoFar : this.rootProperty[0]), 1);
         this.updateParent();
       }
       else
