@@ -183,13 +183,11 @@ function generateClass(cls) {
   if ( typeof cls === 'string' )
     cls = foam.lookup(cls);
 
-<<<<<<< HEAD
   /*
   if ( foam.core.AbstractException.isSubClass(cls) ) {
     generateNativeException(cls);
   }
   */
-=======
   logger.debug('call/generateClass:cls.id', cls.id);
 
   if ( fileWhitelist !== null ) {
@@ -206,7 +204,6 @@ function generateClass(cls) {
     }
   }
   logger.debug('call/generateClass:cls.id,build?', cls.id, 'true');
->>>>>>> 330b113944f079e51c6493b6f24c0c7ba40b9205
 
   var outfile = outdir + path_.sep +
     cls.id.replace(/\./g, path_.sep) + '.java';
