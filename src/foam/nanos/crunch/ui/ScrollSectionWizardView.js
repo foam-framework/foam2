@@ -121,7 +121,7 @@ foam.CLASS({
     {
       name: 'save',
       code: function(x) {
-        this.sectionList.forEach(wizardSection => {
+        this.sectionsList.forEach(wizardSection => {
           wizardSection.save();
         })
         

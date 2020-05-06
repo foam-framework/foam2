@@ -64,11 +64,11 @@ foam.CLASS({
     },
     {
       name: 'data',
-      expression: function (ucj) {
-        if ( ucj === null ) {
+      factory: function () {
+        if ( this.ucj === null ) {
           return this.of.create({}, this);
         }
-        return ucj.data;
+        return this.ucj.data;
       }
     }
   ],
@@ -79,6 +79,12 @@ foam.CLASS({
       code: function() {
         this.updateUCJ().then(() => {
           var ucj = this.ucj;
+          if ( ucj === null ) {
+            ucj = this.UserCapabilityJunction.create({
+              sourceId: this.user.id,
+              targetId: this.capability.id
+            })
+          }
           ucj.data = this.data;
           return this.userCapabilityJunctionDAO.put(ucj);
         });
