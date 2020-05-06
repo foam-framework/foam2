@@ -31,11 +31,15 @@ foam.CLASS({
     },
     function fromModel(model) {
       [ // List of attributes to copy from model to Exception
-        'name','package','source','abstract'
+        'name','package','source'
       ].forEach((attr) => this[attr] = model[attr]);
+      console.error(model)
 
-      this.extends = model.extends == 'foam.core.AbstractException'
-        ? 'java.lang.Exception' : model.extends;
+      if ( this.name == 'AbstractException' && this.package == 'foam.core' ) {
+        this.extends = 'java.lang.Exception'
+      } else {
+        this.extends = model.extends
+      }
 
       // By default, extend java.lang.Exception
       // TODO: Implementation of AbstractExceptions could be handled here
@@ -94,6 +98,11 @@ foam.CLASS({
     },
     function extendsException() {
       return foam.core.AbstractException.isSubClass(this.__context__.lookup(this.of.model_.extends));
+    },
+    function buildJavaClass() {
+      // TODO Build the native java class for an exception here, will need to deep copy this
+      console.log("NPTAG")
+      return this;
     }
   ]
 });

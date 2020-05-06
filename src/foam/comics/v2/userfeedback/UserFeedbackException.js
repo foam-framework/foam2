@@ -4,9 +4,10 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-foam.CLASS({
+foam.EXCEPTION({
   package: 'foam.comics.v2.userfeedback',
   name: 'UserFeedbackException',
+  javaExceptionExtends: 'SecurityException',
   implements: ['foam.core.Exception'],
   documentation: `
     In cases where the object is not returned to client user after a request,

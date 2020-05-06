@@ -183,11 +183,9 @@ function generateClass(cls) {
   if ( typeof cls === 'string' )
     cls = foam.lookup(cls);
 
-  /*
   if ( foam.core.AbstractException.isSubClass(cls) ) {
     generateNativeException(cls);
   }
-  */
   logger.debug('call/generateClass:cls.id', cls.id);
 
   if ( fileWhitelist !== null ) {
@@ -251,15 +249,16 @@ function generateNativeException(cls) {
   if ( typeof cls === 'string' )
     cls = foam.lookup(cls);
 
+  // cls.name = foam.String.toNativeExceptionName(cls.name)
+  console.log(">>>>>>", cls)
   var outfile = outdir + path_.sep +
     cls.package.replace(/\./g, path_.sep) +
-    path_.sep + nativeExceptionName + '.java';
+    path_.sep + foam.String.toNativeExceptionName(cls.name) + '.java';
 
   ensurePath(outfile);
 
-  writeFileIfUpdated(outfile, foam.java.Exception.create({
-    of: cls,
-  }).buildJavaClass().toJavaSource());
+  writeFileIfUpdated(outfile, foam.java.Exception.create({ of: cls }).buildJavaClass().toJavaSource());
+  // writeFileIfUpdated(outfile, cls.buildJavaClass().toJavaSource());
 }
 
 function generateProxy(intf) {
