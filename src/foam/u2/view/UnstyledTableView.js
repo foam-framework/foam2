@@ -363,7 +363,8 @@ foam.CLASS({
                   callIf(view.editColumnsEnabled, function() {
                     this.addClass(view.myClass('th-editColumns'))
                     .on('click', function(e) {
-                      view.selectColumnsExpanded = !view.selectColumnsExpanded;
+                      if (!view.selectColumnsExpanded)
+                        view.selectColumnsExpanded = !view.selectColumnsExpanded;
                     }).
                     tag(view.Image, { data: '/images/Icon_More_Resting.svg' }).
                     addClass(view.myClass('vertDots')).
