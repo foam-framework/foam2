@@ -63,12 +63,8 @@ public class SendNotificationDAO
     return obj;
   }
 
-  public void send(User user, Notification notif, X x) {
-    Notification notification = (Notification) notif.fclone();
-    notification.setId(0L);
-    notification.setUserId(user.getId());
-    notification.setBroadcasted(false);
-    notification.setGroupId(null);
-    ((DAO) x.get("localNotificationDAO")).put_(x, notification);
+  public void send(User user, Notification notification, X x) {
+    NotificationSetting notificationSetting = new NotificationSetting.Builder(x).build();
+    notificationSetting.sendNotification(x, user, notification);
   }
 }

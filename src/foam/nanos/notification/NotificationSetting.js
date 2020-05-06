@@ -47,7 +47,8 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'enabled'
+      name: 'enabled',
+      value: 'True'
     },
     {
       class: 'StringArray',
@@ -64,6 +65,15 @@ foam.CLASS({
         { name: 'notification', type: 'foam.nanos.notification.Notification' }
       ],
       javaCode: `
+        if ( ! getEnabled() ) return;
+
+        if ( getDisabledTopics() != null ) {
+          List disabledTopics = Arrays.asList(getDisabledTopics());
+          if ( disabledTopics.contains(notification.getNotificationType()) ) {
+            return;
+          }
+        }
+
         DAO notificationDAO = (DAO) x.get("localNotificationDAO");
         notification = (Notification) notification.fclone();
         notification.setId(0L);

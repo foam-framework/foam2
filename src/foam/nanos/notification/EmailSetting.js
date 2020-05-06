@@ -57,31 +57,35 @@ foam.CLASS({
     {
       name: 'sendNotification',
       javaCode: `
-        if ( user.getDisabledTopicsEmail() != null ) {
-          List disabledTopics = Arrays.asList(user.getDisabledTopicsEmail());
-          if ( ! disabledTopics.contains(notification.getNotificationType()) ) {
-            EmailMessage message = new EmailMessage();
-            message.setTo(new String[]{user.getEmail()});
-            notification = (Notification) notification.fclone();
+        if ( ! getEnabled() ) return;
 
-            if ( notification.getEmailArgs() != null ) {
-              Map<String, Object> emailArgs = resolveNotificationArguments(x, notification.getEmailArgs(), user);
-              notification.setEmailArgs(emailArgs);
-            }
-
-            try {
-              if ( foam.util.SafetyUtil.isEmpty(notification.getEmailName()) ) {
-                message.setSubject(notification.getTemplate());
-                message.setBody(notification.getBody());
-                EmailsUtility.sendEmailFromTemplate(x, null, message, null, null);
-              } else {
-                EmailsUtility.sendEmailFromTemplate(x, user, message, notification.getEmailName(), notification.getEmailArgs());
-              }
-            } catch(Throwable t) {
-              Logger logger = (Logger) x.get("logger");
-              logger.error("Error sending notification email message: " + message + ". Error: " + t);
-            }
+        if ( getDisabledTopics() != null ) {
+          List disabledTopics = Arrays.asList(getDisabledTopics());
+          if ( disabledTopics.contains(notification.getNotificationType()) ) {
+            return;
           }
+        }
+
+        EmailMessage message = new EmailMessage();
+        message.setTo(new String[]{user.getEmail()});
+        notification = (Notification) notification.fclone();
+
+        if ( notification.getEmailArgs() != null ) {
+          Map<String, Object> emailArgs = resolveNotificationArguments(x, notification.getEmailArgs(), user);
+          notification.setEmailArgs(emailArgs);
+        }
+
+        try {
+          if ( foam.util.SafetyUtil.isEmpty(notification.getEmailName()) ) {
+            message.setSubject(notification.getTemplate());
+            message.setBody(notification.getBody());
+            EmailsUtility.sendEmailFromTemplate(x, null, message, null, null);
+          } else {
+            EmailsUtility.sendEmailFromTemplate(x, user, message, notification.getEmailName(), notification.getEmailArgs());
+          }
+        } catch(Throwable t) {
+          Logger logger = (Logger) x.get("logger");
+          logger.error("Error sending notification email message: " + message + ". Error: " + t);
         }
       `
     }
