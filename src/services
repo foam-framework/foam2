@@ -778,7 +778,6 @@ p({
       .setRuler(false)
       .setCluster(false)
       .setAuthorize(false)
-      .setApprovableAwareEnabled(false)
       .build();
 
     dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.ruler.Rule.NAME });
