@@ -45,9 +45,12 @@ import java.util.Date;
 public class ObjectDateParser
   extends ProxyParser
 {
+  private final static Parser instance__ = new ObjectDateParser();
 
-  public ObjectDateParser() {
-    super(new Seq0(
+  public static Parser instance() { return instance__; }
+
+  private ObjectDateParser() {
+    super(new Seq1(15,
       Whitespace.instance(),
       Literal.create("{"),
       Whitespace.instance(),
@@ -63,25 +66,8 @@ public class ObjectDateParser
       Whitespace.instance(),
       Literal.create(":"),
       Whitespace.instance(),
-      new Parser() {
-       private Parser delegate = new LongParser();
-       public PStream parse(PStream ps, ParserContext x) {
-         ps = ps.apply(delegate, x);
-         if ( ps != null ) x.set("value", ps.value());
-         return ps;
-       }
-      },
+        DateParser.instance(),
       Whitespace.instance(),
       Literal.create("}")));
-  }
-
-  public PStream parse(PStream ps, ParserContext x) {
-    try {
-      if ((ps = super.parse(ps, x)) == null) return null;
-      long timestamp = (long) x.get("value");
-      return ps.setValue(new Date(timestamp));
-    } catch ( Throwable t ) {
-      return null;
-    }
   }
 }
