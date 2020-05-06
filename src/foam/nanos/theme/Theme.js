@@ -246,6 +246,11 @@ foam.CLASS({
       section: 'colours'
     },
     {
+      class: 'Color',
+      name: 'white',
+      section: 'colours'
+    },
+    {
       class: 'String',
       name: 'inputHeight',
       documentation: 'Used to enforce consistent height across text-based inputs.',

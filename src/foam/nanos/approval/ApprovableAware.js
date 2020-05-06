@@ -27,6 +27,21 @@
     'java.util.TreeMap'
   ],
 
+  properties: [
+    {
+      class: 'Object',
+      type: 'foam.mlang.predicate.Predicate',
+      documentation: `
+        Predicate to test if the object on 'put()' should go through the checker
+        flow of the maker/checker process (i.e. ApprovableAwareDAO).
+
+        If absent/null, which is the default, the checker flow is mandatory.`,
+      name: 'checkerPredicate',
+      transient: true,
+      visibility: 'HIDDEN'
+    }
+  ],
+
   axioms: [
     {
       name: 'javaExtras',
