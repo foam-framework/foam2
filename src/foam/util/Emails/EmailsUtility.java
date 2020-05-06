@@ -4,11 +4,13 @@ import foam.core.X;
 import foam.dao.DAO;
 import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
+import foam.nanos.theme.Theme;
 import foam.nanos.notification.email.EmailMessage;
 import foam.nanos.notification.email.EmailPropertyService;
 import foam.util.SafetyUtil;
 import java.util.HashMap;
 import java.util.Map;
+import static foam.mlang.MLang;
 
 public class EmailsUtility {
   /*
@@ -52,6 +54,11 @@ public class EmailsUtility {
         templateArgs = new HashMap<>();
         templateArgs.put("template", templateName);
       }
+      DAO themeDAO = (DAO) x.get("themeDAO");
+      Theme theme = (Theme) themeDAO.find(
+            MLang.EQ(Theme.SPID, user.getSpid())
+          );
+      templateArgs.put("theme", theme.appConfig);
       emailMessage.setTemplateArguments(templateArgs);
     }
 
