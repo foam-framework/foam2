@@ -27,10 +27,10 @@ public class AnyParser
         new Not(Literal.create("."))
       ),
       DoubleParser.instance(),
-      new ObjectDateParser(),
       StringArrayParser.instance(),
       new StringDoubleArrayParser(),
       new PropertyReferenceParser(),
+      ObjectDateParser.instance(),
       ClassReferenceParser.instance(),
       ArrayParser.instance(),
       FObjectParser.instance(),
