@@ -2487,6 +2487,11 @@ foam.CLASS({
       name: 'arg2'
     },
     {
+      class: 'Int',
+      name: 'groupLimit',
+      value: -1
+    },
+    {
       class: 'Map',
       name: 'groups',
       hidden: true,
@@ -2571,7 +2576,7 @@ return getGroupKeys();`
     },
     function reset() {
       this.arg2.reset();
-      this.groups = undefined;
+      this.groups    = undefined;
       this.groupKeys = undefined;
     },
     {
@@ -2591,6 +2596,7 @@ return getGroupKeys();`
         } else {
           this.putInGroup_(sub, key, obj);
         }
+        if ( this.groupLimit == this.groups.size ) sub.detach();
       },
       javaCode:
 `Object arg1 = getArg1().f(obj);
@@ -2601,7 +2607,10 @@ if ( getProcessArrayValuesIndividually() && arg1 instanceof Object[] ) {
   }
 } else {
   putInGroup_(sub, arg1, obj);
-}`
+}
+if ( getGroupLimit() != -1 ) System.err.println("************************************* " + getGroupLimit() + " " + getGroups().size() + " " + sub);
+if ( getGroupLimit() == getGroups().size() && sub != null ) sub.detach();
+`
     },
 
     function eof() { },
@@ -3446,7 +3455,7 @@ foam.CLASS({
     function MUL(a, b) { return this._binary_("Mul", a, b); },
 
     function UNIQUE(expr, sink) { return this.Unique.create({ expr: expr, delegate: sink }); },
-    function GROUP_BY(expr, sinkProto) { return this.GroupBy.create({ arg1: expr, arg2: sinkProto }); },
+    function GROUP_BY(expr, opt_sinkProto, opt_limit) { return this.GroupBy.create({ arg1: expr, arg2: opt_sinkProto || this.COUNT(), groupLimit: opt_limit || -1 }); },
     function PLOT() { return this._nary_('Plot', arguments); },
     function MAP(expr, sink) { return this.Map.create({ arg1: expr, delegate: sink }); },
     function EXPLAIN(sink) { return this.Explain.create({ delegate: sink }); },
