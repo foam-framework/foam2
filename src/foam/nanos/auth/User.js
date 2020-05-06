@@ -239,6 +239,7 @@ foam.CLASS({
       },
       view: { class: 'foam.u2.detail.VerticalDetailView' },
       createVisibility: 'HIDDEN',
+      hidden: true,
       section: 'personal'
     },
     {
@@ -264,6 +265,7 @@ foam.CLASS({
       view: { class: 'foam.u2.detail.VerticalDetailView' },
       section: 'personal',
       createVisibility: 'HIDDEN',
+      hidden: true,
       includeInDigest: true
     },
     {
