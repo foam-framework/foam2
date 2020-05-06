@@ -237,6 +237,11 @@ foam.CLASS({
       name: 'isColumnChanged',
       class: 'Boolean', 
       value: false
+    },
+    {
+      name: 'selectColumnsExpanded',
+      class: 'Boolean', 
+      value: false
     }
   ],
 
@@ -247,8 +252,17 @@ foam.CLASS({
         column;
     },
 
+    // function createSelectColumnView() {
+    //   var editor = this.EditColumnsView.create({of: this.of,
+    //       columnsAvailable: this.allColumns,
+    //       selectedColumnNames: this.selectedColumnNames,
+    //       isColumnChanged: this.isColumnChanged});
+    //   return editor;
+    // },
+
     function initE() {
       var view = this;
+      var columnSelectionE;
 
       // this.isColumnChanged$.sub(function(){
       //   console.log('isColumnChanged');
@@ -349,22 +363,31 @@ foam.CLASS({
                   addClass(view.myClass('th')).
                   style({ flex: `0 0 ${view.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH}px` }).
                   callIf(view.editColumnsEnabled, function() {
-                    this.addClass(view.myClass('th-editColumns')).
-                    on('click', function(e) {
-                      if ( ! view.stack ) return;
-                      view.stack.push({
-                        class: 'foam.u2.view.EditColumnsView',
-                        of: view.of,
-                        columnsAvailable: view.allColumns,
-                        selectedColumnNames: view.selectedColumnNames,
-                        isColumnChanged: view.isColumnChanged
-                      });
+                    this.addClass(view.myClass('th-editColumns'))
+                    .on('click', function(e) {
+                      view.selectColumnsExpanded = !view.selectColumnsExpanded;
                     }).
                     tag(view.Image, { data: '/images/Icon_More_Resting.svg' }).
                     addClass(view.myClass('vertDots')).
-                    addClass(view.myClass('noselect'));
+                    addClass(view.myClass('noselect'))
+                    ;
                   }).
-                  tag('div', null, view.dropdownOrigin$).
+                  tag('div', null, view.dropdownOrigin$)
+                  .start()
+                    .show(true)//view.selectColumnsExpanded$
+                    .style({
+                        'top': '20px',
+                        'right': '8%',
+                        'font-size': '12px',
+                        'position': 'absolute',
+                        'background-color': '#f9f9f9',
+                        'margin-bottom': '20px',
+                        'box-shadow': '0px 8px 16px 0px rgba(0,0,0,0.2)',
+                        'z-index': '1024',
+                    })
+                    // .add('helloWorld')
+                    .add(foam.u2.ViewSpec.createView({ class: 'foam.u2.view.ColumnConfigPropView'}, {data:view}, view, view.__subSubContext__))
+                  .end().
                 end();
               });
           })).

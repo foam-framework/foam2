@@ -40,28 +40,17 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
-      this.start()
-          .add(this.slot(function(data, data$isPropertySelected, data$columnOptions, data$rootProperty, data$rootProperty$expanded) {
-            return this.E()
-            .start()
-              .addClass(self.myClass('header'))
-              .add(foam.u2.ViewSpec.createView(self.ColumnViewHeader, {data$:self.data.rootProperty$},  self, self.__subSubContext__))
-            .end()
-            .start()
-              .addClass(self.myClass('dropdown'))
+      this
+        .start()
+         // .addClass(self.myClass('dropdown'))
+          .forEach(self.data.allColumns, function(c) {
+            var subColumnSelectConfig = foam.u2.view.SubColumnSelectConfig.create({ rootProperty: [self.data.of.getAxiomByName(c).name, self.data.of.getAxiomByName(c).label ? self.data.of.getAxiomByName(c).label : self.data.of.getAxiomByName(c).name], level:0, of:self.data.of, selectedColumns:self.data.selectedColumnNames, });
+            this
               .start()
-                .add(foam.u2.ViewSpec.createView(self.ColumnViewBody, {data$:self.data.rootProperty$},  self, self.__subSubContext__))
-              .end()
-              .forEach(self.data.columnOptions, function(o) {
-                this
-                  .start()
-                    .show(self.data.rootProperty.expanded$)
-                      .add(foam.u2.ViewSpec.createView(self.RootColumnConfigPropView, {data:o},  self, self.__subSubContext__))
-                  .end();
-              })
-            .end();
-          }))
-        .end();
+                .add(foam.u2.ViewSpec.createView(self.RootColumnConfigPropView, {data:subColumnSelectConfig},  self, self.__subSubContext__))
+              .end();
+          })
+      .end();
     }
   ]
 });
@@ -109,22 +98,7 @@ foam.CLASS({
     {
       name: 'rootProperty',
       class: 'FObjectProperty',
-      of: 'foam.u2.view.SubColumnSelectConfig',
-      expression: function(of, selectedColumns, isPropertySelected) {
-        return this.updateRootProperty();
-      }
-    },
-    {
-      name: 'columnOptions',
-      class: 'FObjectArray',
-      of: 'foam.u2.view.SubColumnSelectConfig',
-      factory: function() {
-        return this.updateOptionsProperty();
-      }
-    },
-    {
-      name: 'columnsAvailable',
-      class: 'StringArray',
+      of: 'foam.u2.view.SubColumnSelectConfig'
     },
     {
       name: 'isPropertySelected',
@@ -133,7 +107,6 @@ foam.CLASS({
       postSet: function() {
         if ( this.isPropertySelected) {
           this.rootProperty = this.updateRootProperty();
-          this.columnOptions = this.updateOptionsProperty();
           this.rootProperty.parentExpanded = false;
           this.rootProperty.expanded = false;
           this.isPropertySelected = false;
@@ -141,23 +114,6 @@ foam.CLASS({
       }
     },
     'labels'
-  ],
-  methods: [
-    function updateRootProperty() {
-      var p = this.labels.find(c => c[0] === this.selectedColumns[0]);
-      if ( !p )
-        p = this.labels[0];
-      return this.SubColumnSelectConfig.create({ rootProperty: p, hasOtherOptions:true, selectedColumns$:this.selectedColumns$, level:0, isPathSelected$:this.isPropertySelected$, of:this.of });
-    },
-    function updateOptionsProperty() {
-      var propViews = [];
-      var props = this.labels.filter(p => p[0] !== this.selectedColumns[0]);
-      for ( var i = 0; i < props.length; i++) {
-        propViews.push(this.SubColumnSelectConfig.create({ rootProperty: props[i], hasOtherOptions:false, selectedColumns$:this.selectedColumns$, level:0, isPathSelected$:this.isPropertySelected$, of:this.of }));
-      }
-      this.isPropertySelected = false;
-      return propViews;
-    }
   ]
 });
 
@@ -171,23 +127,34 @@ foam.CLASS({
     background: #cfdbff;
   }
   ^some-padding {
+    text-align: left;
     padding: 3px;
   }
   `,
-
+  constants: [
+    {
+      name: 'CHECK_MARK',
+      type: 'String',
+      value: '\u2713'
+    },],
   methods: [
     function initE() {
       this.SUPER();
       this
         .on('click', this.toggleExpanded)
         .start()
-        .enableClass(this.myClass('selected'), this.data.level < this.data.selectedColumns.length && this.data.selectedColumns[this.data.level] === this.data.rootProperty[0])
+        // .enableClass(this.myClass('selected'), this.data.isPropertySelected)
         .start()
           .addClass(this.myClass('some-padding'))
           .style({
             'padding-left' : this.data.level * 15 + ( ( this.data.level === 0 && this.data.selectedColumns.length > 0 && this.data.selectedColumns[this.data.level] !== this.data.rootProperty[0]) ? 5 : 0 ) + 'px'
           })
           .start('span')
+            .show(this.data.isPropertySelected$)
+            .add(this.CHECK_MARK)
+          .end()
+          .start('span')
+            .style({'padding-left' : this.data.isPropertySelected$.map(function(s) { return s ? '4px' : '13px';})})
             .add(this.data.rootProperty[1])
           .end()
           .start('span')
@@ -210,8 +177,8 @@ foam.CLASS({
   listeners: [
     function toggleExpanded(e) {
       this.data.expanded = !this.data.expanded;
-      if ( ( !this.data.expanded && this.data.hasOtherOptions ) || ( !this.data.hasSubProperties && !this.data.hasOtherOptions ) ) {
-        this.data.isPropertySelected = true;
+      if ( !this.data.hasSubProperties ) {//|| ( this.data.hasSubProperties && this.data.isPropertySelected )
+        this.data.isPropertySelected = !this.data.isPropertySelected;
       }
     }
   ]
@@ -229,9 +196,9 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       var self = this;
-
       this
         .start()
+        .show(self.data.expanded$)
             .forEach(this.data.subColumnSelectConfig, function(p) {
             self
               .show(self.data.expanded$)
@@ -245,6 +212,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'SubColumnSelectConfig',
+  extends: 'foam.u2.View',
   properties: [
     'of',
     {
@@ -263,7 +231,7 @@ foam.CLASS({
     {
       name: 'subProperties',
       expression: function(rootProperty) {
-        if ( !this.of )
+        if ( !this.of || !this.of.getAxiomByName)
           return [];
         var r = this.of.getAxiomByName(this.rootProperty[0]);
         if ( r && r.cls_ && r.cls_.name === 'FObjectProperty' )
@@ -274,13 +242,13 @@ foam.CLASS({
     {
       name: 'subColumnSelectConfig',
       expression: function(subProperties, level) {
-        if ( !this.of )
+        if ( !this.of || !this.of.getAxiomByName)
           return [];
         var arr = [];
         var l = level + 1;
         var r = this.of.getAxiomByName(this.rootProperty[0]);
         for ( var i = 0; i < subProperties.length; i++ )
-          arr.push(this.cls_.create({ rootProperty: subProperties[i], selectedColumns$:this.selectedColumns$, level:l, isPathSelected$:this.isPropertySelected$, parentExpanded$:this.expanded$, of:r.of.getAxiomByName([subProperties[i][0]]).cls_ }));
+          arr.push(this.cls_.create({ rootProperty: subProperties[i], selectedColumns$:this.selectedColumns$, level:l+1, parentExpanded$:this.expanded$, of: r && r.of ? r.of.getAxiomByName([subProperties[i][0]]).cls_ : r, updateParent:this.callOnSelect}));
         return arr;
       }
     },
@@ -290,26 +258,21 @@ foam.CLASS({
     {
       name: 'isPropertySelected',
       class: 'Boolean',
+      expression: function() {
+        return this.selectedColumns.find(s => {
+          var propNames = s.split('.');
+          return propNames.length > this.level && propNames[this.level] === this.rootProperty[0];
+        }) != undefined;
+      },
       postSet: function() {
-        if ( this.isPropertySelected ) {
-          while ( this.level > this.selectedColumns.length - 1 ) {
-            this.selectedColumns.push(undefined);
-          } 
-          if ( this.selectedColumns[this.level] !== this.rootProperty[0])
-            this.selectedColumns[this.level] = this.rootProperty[0];
-  
-          if ( !this.hasSubProperties && this.level !== this.selectedColumns.length - 1 ) {
-            this.selectedColumns.splice(this.level, this.selectedColumns.length - 1 - this.level);
-          }
-          this.isPathSelected = true;
-        }
+        this.callOnSelect(this.isPropertySelected);
       }
     },
-    {
-      name: 'isPathSelected',
-      class: 'Boolean',
-      value: false
-    },
+    // {
+    //   name: 'isPathSelected',
+    //   class: 'Boolean',
+    //   value: false
+    // },
     {
       name: 'level',
       class: 'Int',
@@ -328,10 +291,18 @@ foam.CLASS({
       class: 'Boolean',
       value: false
     },
-    {
-      name: 'hasOtherOptions',
-      class: 'Boolean',
-      value: false
+    'updateParent'
+  ],
+  methods: [
+    function callOnSelect(isSelected, propertyNameSoFar) {
+      if ( this.level === 0 ) {
+        if (isSelected)
+          this.selectedColumns.push(propertyNameSoFar);
+        else
+          this.selectedColumns.splice(this.selectedColumns.indexof(propertyNameSoFar), 1);
+      }
+      else
+        this.updateParent(isSelected, propertyNameSoFar ? this.rootProperty[0] + '.' + propertyNameSoFar : this.rootProperty[0] );
     }
   ]
 });
