@@ -20,6 +20,8 @@ foam.CLASS({
   name: 'ChoiceView',
   extends: 'foam.u2.View',
 
+  implements: [ 'foam.mlang.Expressions' ],
+
   documentation: `
     Wraps a tag that represents a singular choice. That is,
     this controller shows the user a fixed, probably small set of
@@ -280,6 +282,13 @@ foam.CLASS({
       code: function() {
         if ( ! foam.dao.DAO.isInstance(this.dao) ) return;
 
+        var of = this.dao.of
+        if ( of._CHOICE_TEXT_ ) {
+          this.dao.select(this.PROJECTION(of.ID, of._CHOICE_TEXT_)).then((s) => {
+            this.choices = s.array;
+          });
+          return;
+        }
         var p = this.mode === foam.u2.DisplayMode.RW ?
           this.dao.select().then(s => s.array) :
           this.dao.find(this.data).then(o => o ? [o] : []);
