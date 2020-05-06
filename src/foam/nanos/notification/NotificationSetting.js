@@ -18,7 +18,9 @@ foam.CLASS({
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.AuthorizationException',
     'foam.nanos.auth.User',
-    'foam.nanos.logger.Logger'
+    'foam.nanos.logger.Logger',
+    'java.util.Arrays',
+    'java.util.List'
   ],
 
   messages: [
@@ -48,7 +50,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'enabled',
-      value: 'True'
+      value: true
     },
     {
       class: 'StringArray',

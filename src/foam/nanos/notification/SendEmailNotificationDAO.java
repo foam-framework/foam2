@@ -45,8 +45,8 @@ public class SendEmailNotificationDAO extends ProxyDAO {
       return getDelegate().put_(x, obj);
     }
 
-    if ( user.getDisabledTopicsEmail() != null ) {
-      List disabledTopics = Arrays.asList(user.getDisabledTopicsEmail());
+    if ( user.getDisabledTopicsEmail2() != null ) {
+      List disabledTopics = Arrays.asList(user.getDisabledTopicsEmail2());
       if ( disabledTopics.contains(notif.getNotificationType()) ) {
         return super.put_(x,obj);
       }
