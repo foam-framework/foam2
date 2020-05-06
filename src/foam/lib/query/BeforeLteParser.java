@@ -18,16 +18,17 @@ public class BeforeLteParser extends foam.lib.parse.ProxyParser {
 
   public BeforeLteParser(Parser valueParser) {
     setDelegate(
-        new Seq1(1,
-                new Alt(new Literal("<="),
-                        new LiteralIC("-before:")),
-                valueParser)
-        );
+      new Seq1(1,
+        new Alt(Literal.create("<="),
+          new LiteralIC("-before:")),
+        valueParser)
+    );
   }
 
   @Override
   public PStream parse(PStream ps, ParserContext x) {
     ps = super.parse( ps, x );
+
     if ( ps == null ) return ps;
 
     foam.mlang.predicate.Binary predicate = new foam.mlang.predicate.Lte();

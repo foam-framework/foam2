@@ -7,6 +7,9 @@
 foam.INTERFACE({
   package: 'foam.nanos.auth',
   name: 'DeletedAware',
+  documentation: `
+    DEPRECATED: Please use LifecycleAware and LifecycleAwareDAO
+  `,
 
   methods: [
     {
@@ -42,7 +45,8 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'deleted'
+      name: 'deleted',
+      writePermissionRequired: true
     }
   ]
 });

@@ -31,12 +31,14 @@ foam.CLASS({
       documentation: `
         The id of the model that the referenced strategy is a strategy for.
       `,
+      help: 'The id of the model that the referenced strategy is a strategy for.',
       required: true
     },
     {
       class: 'Class',
       name: 'strategy',
       documentation: 'The strategy for the desired model.',
+      help: 'The strategy for the desired model.',
       required: true
     },
     {
@@ -64,6 +66,11 @@ foam.CLASS({
         'Outputter' and target = 'Transaction', then the special outputter would
         be included in the results.
       `
+    },
+    {
+      class: 'String',
+      name: 'label',
+      documentation: 'Override the default model label for Strategizer Choice selections.'
     }
   ]
 });

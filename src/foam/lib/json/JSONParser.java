@@ -9,14 +9,14 @@ package foam.lib.json;
 import foam.lib.parse.*;
 import foam.core.*;
 
-// Note: JSONParser.java has a limitation - the class has to be 
-// the first key, to avoid having to build an intermediate object 
+// Note: JSONParser.java has a limitation - the class has to be
+// the first key, to avoid having to build an intermediate object
 // to hold all the args while we parse
 
 public class JSONParser
   extends foam.core.ContextAwareSupport
 {
-  protected Parser        parser   = new ExprParser();
+  protected Parser        parser   = ExprParser.instance();
   protected StringPStream stringps = new StringPStream();
 
   public FObject parseString(String data) {
@@ -29,7 +29,7 @@ public class JSONParser
     ps.setString(data);
     ParserContext x = new ParserContextImpl();
     x.set("X", getX());
-    ps = (StringPStream) ps.apply(defaultClass == null ? parser : new ExprParser(defaultClass), x);
+    ps = (StringPStream) ps.apply(defaultClass == null ? parser : ExprParser.create(defaultClass), x);
 
     return ps == null ? null : (FObject) ps.value();
   }
@@ -40,7 +40,7 @@ public class JSONParser
     ParserContext x = new ParserContextImpl();
     x.set("X", getX());
 
-    ps = (StringPStream) ps.apply(new FObjectArrayParser(defaultClass), x);
+    ps = (StringPStream) ps.apply(FObjectArrayParser.create(defaultClass), x);
     return ps == null ? null : (Object[]) ps.value();
   }
 

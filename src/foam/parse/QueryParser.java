@@ -1,8 +1,17 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.parse;
 
+import foam.core.ClassInfo;
+import foam.core.PropertyInfo;
 import foam.lib.parse.Alt;
 import foam.lib.parse.Parser;
 import foam.lib.parse.ParserContext;
+import foam.lib.parse.ProxyParser;
 import foam.lib.parse.PStream;
 import foam.lib.query.AndParser;
 import foam.lib.query.HasParser;
@@ -17,24 +26,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QueryParser
-  extends foam.lib.parse.ProxyParser
+  extends ProxyParser
 {
-  protected foam.core.ClassInfo info_;
+  protected ClassInfo info_;
 
-  public QueryParser(foam.core.ClassInfo classInfo) {
+  public QueryParser(ClassInfo classInfo) {
     info_ = classInfo;
 
-    java.util.List properties = classInfo.getAxiomsByClass(foam.core.PropertyInfo.class);
-
+    List         properties  = classInfo.getAxiomsByClass(PropertyInfo.class);
     List<Parser> expressions = new ArrayList<Parser>();
 
     for ( Object prop : properties ) {
-      foam.core.PropertyInfo info = (foam.core.PropertyInfo) prop;
+      PropertyInfo info = (PropertyInfo) prop;
 
-      expressions.add(new PropertyExpressionParser(info));
-      expressions.add(new NegateParser(new PropertyExpressionParser(info)));
+      expressions.add(PropertyExpressionParser.create(info));
+      expressions.add(new NegateParser(PropertyExpressionParser.create(info)));
       expressions.add(new HasParser(info));
-      expressions.add(new ParenParser(new PropertyExpressionParser(info)));
+      expressions.add(new ParenParser(PropertyExpressionParser.create(info)));
 
       if ( info.getSQLType().equalsIgnoreCase("BOOLEAN") ) expressions.add(new IsParser(info));
     }
@@ -43,10 +51,12 @@ public class QueryParser
     expressions.add(new IsInstanceOfParser());
 
     Parser[] parsers = expressions.toArray(new Parser[expressions.size()]);
+    Parser altParser = new Alt(parsers);
+
     setDelegate(new Alt(
-      new ParenParser (new OrParser(new AndParser(new Alt(parsers)))),
-      new ParenParser (new OrParser(new ParenParser(new AndParser(new Alt(parsers))))),
-      new OrParser(new AndParser(new Alt(parsers)))));
+      new ParenParser(new OrParser(new AndParser(altParser))),
+      new ParenParser(new OrParser(new ParenParser(new AndParser(altParser)))),
+      new OrParser(new AndParser(altParser))));
   }
 
   @Override

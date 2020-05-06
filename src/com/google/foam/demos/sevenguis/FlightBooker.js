@@ -53,7 +53,8 @@ foam.CLASS({
     {
       class: 'Date',
       name: 'departDate',
-      permissionRequired: true,
+      readPermissionRequired: true,
+      writePermissionRequired: true,
       factory: function() { return new Date(Date.now()+3600000*24); },
       validateObj: function(departDate) {
         var today = new Date();
@@ -65,8 +66,8 @@ foam.CLASS({
       class: 'Date',
       name: 'returnDate',
       factory: function() { return new Date(Date.now()+2*3600000*24); },
-      visibilityExpression: function(isReturn) {
-        return isReturn ? foam.u2.Visibility.RW : foam.u2.Visibility.HIDDEN;
+      visibility: function(isReturn) {
+        return isReturn ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
       },
       validateObj: function(isReturn, returnDate, departDate) {
         if ( isReturn && foam.Date.compare(returnDate, departDate) < 0 ) return 'Must not be before depart date.';

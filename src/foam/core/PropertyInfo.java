@@ -8,24 +8,22 @@ package foam.core;
 
 import foam.crypto.hash.Hasher;
 import foam.crypto.sign.Signer;
-import foam.dao.SQLStatement;
 import foam.dao.jdbc.IndexedPreparedStatement;
+import foam.dao.SQLStatement;
 import foam.lib.parse.Parser;
 import foam.mlang.Expr;
 import foam.mlang.order.Comparator;
-
-import javax.xml.stream.XMLStreamReader;
 import java.util.Map;
+import javax.xml.stream.XMLStreamReader;
 
 // ???: Why is this interface mutable?
 public interface PropertyInfo
-    extends Axiom, Comparator, Expr, SQLStatement, Validator, Hasher, Signer, Comparable
+  extends Axiom, Comparator, Expr, SQLStatement, Validator, Hasher, Signer, Comparable, ClassInfoAware
 {
-  public PropertyInfo setClassInfo(ClassInfo p);
-  public ClassInfo getClassInfo();
 
   public boolean getNetworkTransient();
-  public boolean getPermissionRequired();
+  public boolean getReadPermissionRequired();
+  public boolean getWritePermissionRequired();
   public boolean getStorageTransient();
   public boolean getXMLAttribute();
   public boolean getXMLTextNode();
@@ -42,6 +40,7 @@ public interface PropertyInfo
   public Parser queryParser();
   public Parser csvParser();
   public void toJSON(foam.lib.json.Outputter outputter, Object value);
+  public void format(foam.lib.formatter.FObjectFormatter outputter, FObject obj);
   public void toCSV(X x, Object obj, foam.lib.csv.CSVOutputter outputter);
   public void toCSVLabel(X x, foam.lib.csv.CSVOutputter outputter);
   public void toXML(foam.lib.xml.Outputter outputter, Object value);

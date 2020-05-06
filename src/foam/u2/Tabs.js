@@ -34,7 +34,6 @@ foam.CLASS({
   extends: 'foam.u2.UnstyledTabs',
   css: `
     ^tabRow {
-      height: 48px;
       border-bottom: 1px solid #e7eaec;
       background-color: white;
     }

@@ -130,17 +130,17 @@ public class HttpParametersWebAgent
       if ( ! SafetyUtil.isEmpty(cmd) ) {
         switch ( cmd.toLowerCase() ) {
           case "put":
-            command = Command.put;
+            command = Command.PUT;
             break;
           case "select":
-            command = Command.select;
+            command = Command.SELECT;
             if ( ! SafetyUtil.isEmpty(req.getParameter("id")) ) {
               parameters.set("id", req.getParameter("id"));
               logger.debug("id", req.getParameter("id"));
             }
             break;
           case "remove":
-            command = Command.remove;
+            command = Command.REMOVE;
             parameters.set("id", req.getParameter("id"));
             logger.debug("id", req.getParameter("id"));
             break;
@@ -148,19 +148,19 @@ public class HttpParametersWebAgent
       } else {
         switch ( methodName.toUpperCase() ) {  // set default command
           case "POST":
-            command = Command.put;
+            command = Command.PUT;
             break;
           case "PUT":
-            command = Command.put;
+            command = Command.PUT;
             break;
           case "DELETE":
-            command = Command.remove;
+            command = Command.REMOVE;
             break;
           case "GET":
-            command = Command.select;
+            command = Command.SELECT;
             break;
           default:
-            command = Command.select;
+            command = Command.SELECT;
             logger.warning("cmd/method could not be determined, defaulting to SELECT.");
             break;
         }

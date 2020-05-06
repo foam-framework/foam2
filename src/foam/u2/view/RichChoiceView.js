@@ -6,6 +6,43 @@
 
 foam.CLASS({
   package: 'foam.u2.view',
+  name: 'RichChoiceViewSection',
+
+  documentation: 'Models one section of the dropdown for a RichChoiceView.',
+
+  properties: [
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'dao',
+      documentation: 'The DAO that will be used to populate the options in this section.'
+    },
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'filteredDAO',
+      documentation: 'A filtered version of the underlying DAO, depending on the search term the user has typed in.',
+      factory: function() { return this.dao; }
+    },
+    {
+      class: 'Boolean',
+      name: 'hideIfEmpty',
+      documentation: 'This section will be hidden if there are no items in it if this is set to true.'
+    },
+    {
+      class: 'Boolean',
+      name: 'disabled',
+      documentation: 'Rows in this section will not be selectable if this is set to true.'
+    },
+    {
+      class: 'String',
+      name: 'heading',
+      documentation: 'The heading text for this section.'
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2.view',
   name: 'RichChoiceView',
   extends: 'foam.u2.View',
 
@@ -48,20 +85,38 @@ foam.CLASS({
     'foam.mlang.Expressions'
   ],
 
+  imports: [
+    'window'
+  ],
+
   exports: [
     'of'
+  ],
+
+  messages: [
+    {
+      name: 'CHOOSE_FROM',
+      message: 'Choose from '
+    },
+    {
+      name: 'CLEAR_SELECTION',
+      message: 'Clear'
+    }
   ],
 
   css: `
     ^ {
       display: inline-block;
       position: relative;
+    }
+
+    ^setAbove {
       z-index: 1;
     }
 
     ^container {
       position: absolute;
-      bottom: 0;
+      bottom: -4px;
       left: 0;
       transform: translateY(100%);
       background: white;
@@ -71,7 +126,8 @@ foam.CLASS({
       box-sizing: border-box;
       width: 100%;
       min-width: fit-content;
-      -webkit-appearance: textfield;
+      border-radius: 3px;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 2px 8px 0 rgba(0, 0, 0, 0.16);
     }
 
     ^heading {
@@ -82,20 +138,27 @@ foam.CLASS({
     }
 
     ^selection-view {
-      background-color: white;
       display: inline-flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 11px;
+      width: 100%;
+
+      height: /*%INPUTHEIGHT%*/ 32px;
+      font-size: 14px;
+      padding-left: /*%INPUTHORIZONTALPADDING%*/ 8px;
+      padding-right: /*%INPUTHORIZONTALPADDING%*/ 8px;
+      border: 1px solid;
+      border-radius: 3px;
+      color: /*%BLACK%*/ #1e1f21;
+      background-color: white;
+      border-color: /*%GREY3%*/ #cbcfd4;
       box-sizing: border-box;
-      -webkit-appearance: textfield;
-      padding: 1px 2px;
       cursor: default;
-      border: 1px solid /*%GREY3%*/ #cbcfd4;
       min-width: 94px;
     }
 
-    ^selection-view:hover {
+    ^selection-view:hover,
+    ^selection-view:hover ^clear-btn {
       border-color: /*%GREY2%*/ #9ba1a6;
     }
 
@@ -103,7 +166,8 @@ foam.CLASS({
       outline: none;
     }
 
-    ^:focus ^selection-view {
+    ^:focus ^selection-view,
+    ^:focus ^selection-view ^clear-btn {
       border-color: /*%PRIMARY3%*/ #406dea;
     }
 
@@ -116,29 +180,26 @@ foam.CLASS({
       flex-grow: 1;
     }
 
+    ^ .search .property-filter_ {
+      width: 100%;
+    }
+
     ^ .search input {
       width: 100%;
       border: none;
-      border-bottom: 1px solid #f4f4f9;
-    }
-
-    ^ .search input:focus {
-      border: none;
+      padding-left: /*%INPUTHORIZONTALPADDING%*/ 8px;
+      padding-right: /*%INPUTHORIZONTALPADDING%*/ 8px;
+      height: /*%INPUTHEIGHT%*/ 32px;
     }
 
     ^ .search img {
       width: 15px;
-      position: absolute;
-      left: 10px;
-      top: 13px;
+      margin-left: 8px;
     }
 
     ^ .search {
       border-bottom: 1px solid #f4f4f9;
-    }
-
-    ^ .property-filter_ {
-      padding-left: 25px;
+      display: flex;
     }
 
     ^ .disabled {
@@ -147,6 +208,24 @@ foam.CLASS({
 
     ^ .disabled:hover {
       cursor: default;
+    }
+
+    ^clear-btn {
+      display: flex;
+      align-items: center;
+      border-left: 1px;
+      padding-left: /*%INPUTHORIZONTALPADDING%*/ 8px;
+      padding-right: /*%INPUTHORIZONTALPADDING%*/ 8px;
+      height: /*%INPUTHEIGHT%*/ 32px;
+      border-left: 1px solid;
+      border-color: /*%GREY3%*/ #cbcfd4;
+      margin-left: 12px;
+      padding-left: 16px;
+    }
+
+    ^clear-btn:hover {
+      color: /*%DESTRUCTIVE3%*/ #d9170e;
+      cursor: pointer;
     }
   `,
 
@@ -179,6 +258,18 @@ foam.CLASS({
       documentation: `
         An internal property used to determine whether the options list is
         visible or not.
+      `,
+      postSet: function(_, nv) {
+        if ( nv && ! this.hasBeenOpenedYet_ ) this.hasBeenOpenedYet_ = true;
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'hasBeenOpenedYet_',
+      documentation: `
+        Used internally to keep track of whether the dropdown has been opened
+        yet or not. We don't want to waste resources pulling from the DAO until
+        we know the user is going to interact with this dropdown.
       `
     },
     {
@@ -194,15 +285,13 @@ foam.CLASS({
       }
     },
     {
-      class: 'Array',
+      class: 'FObjectArray',
+      of: 'foam.u2.view.RichChoiceViewSection',
       name: 'sections',
       documentation: `
         This lets you pass different predicated versions of a dao in different
         sections, which can be used to do things like grouping by some property
         for each section.
-        Each object in the array must have a 'label' property of type string
-        which will be used for the section heading, and a 'dao' property of type
-        DAO that will be used to populate the list in that section.
       `,
     },
     {
@@ -231,12 +320,10 @@ foam.CLASS({
       name: 'filter_',
       documentation: 'The text that the user typed in to search by.',
       postSet: function(oldValue, newValue) {
-        this.sections = this.sections.map((section) => {
-          return Object.assign({}, section, {
-            filtered: newValue
-              ? section.dao.where(this.KEYWORD(newValue))
-              : section.dao
-          });
+        this.sections.forEach((section) => {
+          section.filteredDAO = newValue
+            ? section.dao.where(this.KEYWORD(newValue))
+            : section.dao;
         });
       }
     },
@@ -249,7 +336,11 @@ foam.CLASS({
     {
       class: 'String',
       name: 'choosePlaceholder',
-      documentation: 'Replaces choose from placeholder with passed in string.'
+      documentation: 'Replaces choose from placeholder with passed in string.',
+      expression: function(of) {
+        var plural = of.model_.plural.toLowerCase();
+        return this.CHOOSE_FROM + plural + '...';
+      }
     },
     {
       type: 'Action',
@@ -257,6 +348,13 @@ foam.CLASS({
       documentation: `
         Optional. If this is provided, an action will be included at the bottom
         of the dropdown.
+      `
+    },
+    {
+      class: 'Boolean',
+      name: 'allowClearingSelection',
+      documentation: `
+        Set to true if you want the user to be able to clear their selection.
       `
     }
   ],
@@ -277,6 +375,45 @@ foam.CLASS({
       // passed to the selectionView to use it if it wants to.
       this.onDetach(this.data$.sub(this.onDataUpdate));
       this.onDataUpdate();
+
+      // Set up an event listener on the window so we can close the dropdown
+      // when the user clicks somewhere else.
+      var containerU2Element;
+      const fn = function(evt) {
+        // This prevents a console error when opening the dropdown.
+        if ( containerU2Element === undefined ) return;
+
+        var selfDOMElement = self.el();
+        var containerDOMElement = containerU2Element.el();
+
+        // If an ancestor U2 Element was removed but didn't properly detach us,
+        // then the DOM elements will be removed but the listener will still be
+        // in place. Here we detect such a situation and remove the listener if
+        // it arises, preventing a memory leak.
+        if ( selfDOMElement == null || containerDOMElement == null ) {
+          self.window.removeEventListener('click', fn);
+          return;
+        }
+
+        var selfRect = selfDOMElement.getClientRects()[0];
+        var containerRect = containerDOMElement.getClientRects()[0];
+
+        // This prevents a console error when making a selection.
+        if ( containerRect === undefined ) return;
+
+        if (
+          ! (
+              evt.clientX >= selfRect.x &&
+              evt.clientX <= selfRect.x + selfRect.width &&
+              evt.clientY >= selfRect.y &&
+              evt.clientY <= containerRect.y + containerRect.height
+            )
+        ) {
+          self.isOpen_ = false;
+        }
+      };
+      this.window.addEventListener('click', fn);
+      this.onDetach(() => this.window.removeEventListener('click', fn));
 
       this
         .add(this.slot(function(mode, fullObject_) {
@@ -308,69 +445,79 @@ foam.CLASS({
                 .start()
                   .addClass(this.myClass('chevron'))
                 .end()
-              .end()
-              .start()
-                .addClass(this.myClass('container'))
-                .show(self.isOpen_$)
-                .add(self.search$.map((searchEnabled) => {
-                  if ( ! searchEnabled ) return null;
+                .add(this.slot(function(allowClearingSelection) {
+                  if ( ! allowClearingSelection ) return null;
                   return this.E()
-                    .start()
-                      .start('img')
-                        .attrs({ src: 'images/ic-search.svg' })
-                      .end()
-                      .startContext({ data: self })
-                        .addClass('search')
-                        .add(self.FILTER_.clone().copyFrom({ view: {
-                          class: 'foam.u2.view.TextField',
-                          placeholder: this.searchPlaceholder,
-                          onKey: true
-                        } }))
-                      .endContext()
-                    .end();
+                    .addClass(self.myClass('clear-btn'))
+                    .on('click', self.clearSelection)
+                    .add(self.CLEAR_SELECTION)
                 }))
-                .add(this.slot(function(sections) {
-                  var promiseArray = [];
-                  sections.forEach(function(section) {
-                    promiseArray.push(section.dao.select(self.COUNT()));
-                  });
-      
-                  return Promise.all(promiseArray).then((resp) => {
-                    var index = 0;
-                    return this.E().forEach(sections, function(section) {
-                      this
-                        .start().hide(!! section.hideIfEmpty && resp[index].value <= 0 || ! section.heading)
-                          .addClass(self.myClass('heading'))
-                          .add(section.heading)
-                        .end()
-                        .start()
-                          .select(section.filtered || section.dao, (obj) => {
-                            return this.E()
-                              .start(self.rowView, { data: obj })
-                                .enableClass('disabled', section.disabled)
-                                .callIf(! section.disabled, function() {
-                                  this.on('click', () => {
-                                    self.fullObject_ = obj;
-                                    self.data = obj.id;
-                                    self.isOpen_ = false;
-                                  });
-                                })
-                              .end();
-                          })
-                        .end();
-                        index++;
-                    });
-                  });
-                }))
-                .add(this.slot(function(action) {
-                  if ( action ) {
+              .end()
+              .add(this.slot(function(hasBeenOpenedYet_) {
+                if ( ! hasBeenOpenedYet_ ) return this.E();
+                return this.E()
+                  .addClass(self.myClass('container'))
+                  .call(function() { containerU2Element = this; })
+                  .show(self.isOpen_$)
+                  .add(self.search$.map((searchEnabled) => {
+                    if ( ! searchEnabled ) return null;
                     return this.E()
-                      .start(self.DefaultActionView, { action: action })
-                        .addClass(self.myClass('action'))
+                      .start()
+                        .start('img')
+                          .attrs({ src: 'images/ic-search.svg' })
+                        .end()
+                        .startContext({ data: self })
+                          .addClass('search')
+                          .add(self.FILTER_.clone().copyFrom({ view: {
+                            class: 'foam.u2.view.TextField',
+                            placeholder: this.searchPlaceholder,
+                            onKey: true
+                          } }))
+                        .endContext()
                       .end();
-                  }
-                }))
-              .end();
+                  }))
+                  .add(self.slot(function(sections) {
+                    var promiseArray = [];
+                    sections.forEach(function(section) {
+                      promiseArray.push(section.dao.select(self.COUNT()));
+                    });
+
+                    return Promise.all(promiseArray).then((resp) => {
+                      var index = 0;
+                      return this.E().forEach(sections, function(section) {
+                        this.addClass(self.myClass('setAbove'))
+                          .start().hide(!! section.hideIfEmpty && resp[index].value <= 0 || ! section.heading)
+                            .addClass(self.myClass('heading'))
+                            .add(section.heading)
+                          .end()
+                          .start()
+                            .select(section.filteredDAO$proxy, (obj) => {
+                              return this.E()
+                                .start(self.rowView, { data: obj })
+                                  .enableClass('disabled', section.disabled)
+                                  .callIf(! section.disabled, function() {
+                                    this.on('click', () => {
+                                      self.fullObject_ = obj;
+                                      self.data = obj.id;
+                                      self.isOpen_ = false;
+                                    });
+                                  })
+                                .end();
+                            })
+                          .end();
+                          index++;
+                      });
+                    });
+                  }))
+                  .add(this.slot(function(action) {
+                    if ( action ) {
+                      return this.E()
+                        .start(self.DefaultActionView, { action: action })
+                          .addClass(self.myClass('action'))
+                        .end();
+                    }
+                  }));
+              }))
           } else {
             return self.E().add(fullObject_ ? fullObject_.toSummary() : '');
           }
@@ -381,6 +528,11 @@ foam.CLASS({
       if ( mode !== foam.u2.DisplayMode.RW ) {
         this.isOpen_ = false;
       }
+    },
+
+    function fromProperty(property) {
+      this.SUPER(property);
+      this.prop = property;
     }
   ],
 
@@ -394,6 +546,20 @@ foam.CLASS({
           });
         }
       }
+    },
+    function clearSelection(evt) {
+      evt.stopImmediatePropagation();
+      this.fullObject_ = undefined;
+
+      // If this view is being used for a property, then when the user clears
+      // their selection we set the value back to the default value for that
+      // property type. We can't simply set it to undefined because that
+      // introduces a bug where it's impossible to update an object to set a
+      // Reference property back to a default value, since a value of undefined
+      // will cause the JSON outputter to ignore that property when performing
+      // the put. Instead, we need to explicitly set the value to the default
+      // value.
+      this.data = this.prop ? this.prop.value : undefined;
     }
   ],
 
@@ -457,24 +623,14 @@ foam.CLASS({
         'of'
       ],
 
-      messages: [
-        {
-          name: 'CHOOSE_FROM',
-          message: 'Choose from '
-        }
-      ],
-
       properties: [
         {
           name: 'data',
           documentation: 'The id of the selected object.',
         },
         {
-          name: 'defaultSelectionPrompt',
-          expression: function(of) {
-            var plural = of.model_.plural.toLowerCase();
-            return this.CHOOSE_FROM + plural;
-          }
+          class: 'String',
+          name: 'defaultSelectionPrompt'
         },
         {
           name: 'fullObject',

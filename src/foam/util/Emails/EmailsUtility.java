@@ -52,6 +52,7 @@ public class EmailsUtility {
         templateArgs = new HashMap<>();
         templateArgs.put("template", templateName);
       }
+      emailMessage.setTemplateArguments(templateArgs);
     }
 
     // SERVICE CALL: to fill in email properties. 

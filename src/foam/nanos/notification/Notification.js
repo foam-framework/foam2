@@ -17,8 +17,7 @@ foam.CLASS({
   javaImports: [
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.AuthorizationException',
-    'foam.nanos.auth.User',
-    'java.util.Date'
+    'foam.nanos.auth.User'
   ],
 
   tableColumns: ['id', 'body', 'notificationType', 'broadcasted', 'userId', 'groupId' ],
@@ -28,12 +27,18 @@ foam.CLASS({
       class: 'Boolean',
       name: 'read',
       documentation: 'Determines if notification has been read.',
-      visibility: foam.u2.Visibility.RO
+      visibility: 'RO'
     },
     {
       class: 'Long',
       name: 'id',
-      visibility: foam.u2.Visibility.RO
+      visibility: 'RO'
+    },
+    {
+      class: 'String',
+      name: 'hostname',
+      visibility: 'RO',
+      javaFactory: 'return System.getProperty("hostname", "localhost");'
     },
     {
       class: 'String',
@@ -52,7 +57,8 @@ foam.CLASS({
       factory: function() { return new Date(); },
       label: 'Notification Date',
       documentation: 'Date notification was created.',
-      visibility: foam.u2.Visibility.RO
+      visibility: 'RO',
+      javaFactory: `return new java.util.Date();`
     },
     {
       class: 'Date',
@@ -90,7 +96,7 @@ foam.CLASS({
     {
       class: 'Map',
       name: 'emailArgs',
-      visibility: foam.u2.Visibility.HIDDEN,
+      visibility: 'HIDDEN',
       documentation: 'Arguments for email template.',
       javaFactory: 'return new java.util.HashMap<String, Object>();'
     },
@@ -160,7 +166,7 @@ foam.CLASS({
       name: 'authorizeOnRead',
       javaCode: `
       AuthService auth = (AuthService) x.get("auth");
-      if ( ! checkOwnership(x) ) throw new AuthorizationException("You don't have permission to read notifications you do not own.");
+      if ( ! checkOwnership(x) && ! auth.check(x, createPermission("read")) ) throw new AuthorizationException("You don't have permission to read notifications you do not own.");
       `
     },
     {

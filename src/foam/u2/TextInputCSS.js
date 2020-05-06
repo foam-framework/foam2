@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'TextInputCSS',
@@ -16,10 +22,11 @@ foam.CLASS({
       name: 'code',
       value: `
         ^ {
-          height: %INPUTHEIGHT%;
+          min-width: 64px;
+          height: /*%INPUTHEIGHT%*/ 32px;
           font-size: 14px;
-          padding-left: %INPUTHORIZONTALPADDING%;
-          padding-right: %INPUTHORIZONTALPADDING%;
+          padding-left: /*%INPUTHORIZONTALPADDING%*/ 8px;
+          padding-right: /*%INPUTHORIZONTALPADDING%*/ 8px;
           border: 1px solid;
           border-radius: 3px;
           color: /*%BLACK%*/ #1e1f21;
@@ -43,7 +50,7 @@ foam.CLASS({
         }
 
         ^:disabled {
-          color: /*%GREY2%*/ #9ba1a6;
+          color: /*%GREY1%*/ #5e6061;
           background-color: /*%GREY5%*/ #f5f7fa;
           border-color: /*%GREY3%*/ #cbcfd4;
         }
@@ -57,4 +64,3 @@ foam.CLASS({
     },
   ],
 });
-

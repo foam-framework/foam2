@@ -14,7 +14,7 @@ public class UnknownFObjectArrayParser
 {
 
   public PStream parse(PStream ps, ParserContext x) {
-    ps = ps.apply(new Whitespace(), x);
+    ps = ps.apply(Whitespace.instance(), x);
     if ( ps == null ) return null;
 
     ps = ps.apply(new UnknownArrayParser(), x);

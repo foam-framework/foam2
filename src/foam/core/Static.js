@@ -49,8 +49,8 @@ foam.CLASS({
         }
 
         return foam.core.Static.isInstance(o) ?
-            o :
-            foam.core.Static.create(o) ;
+          o :
+          foam.core.Static.create(o) ;
       }
     }
   ]

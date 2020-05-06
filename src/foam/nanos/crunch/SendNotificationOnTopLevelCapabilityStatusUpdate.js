@@ -3,6 +3,7 @@
  * Copyright 2019 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
+
 foam.CLASS({
   package: 'foam.nanos.crunch',
   name: 'SendNotificationOnTopLevelCapabilityStatusUpdate',
@@ -17,10 +18,7 @@ foam.CLASS({
     'foam.core.ContextAgent',
     'foam.core.X',
     'foam.dao.DAO',
-    'foam.nanos.crunch.CapabilityJunctionStatus',
-    'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.notification.Notification',
-    'java.lang.StringBuilder',
     'java.util.Date'
   ],
 
@@ -33,12 +31,12 @@ foam.CLASS({
         public void execute(X x) {
           UserCapabilityJunction junction = (UserCapabilityJunction) obj;
           Capability cap = (Capability) ((DAO) x.get("capabilityDAO")).find(((String)junction.getTargetId()));
-          if ( ! cap.getVisible() ) return;
+          if ( cap == null || ! cap.getVisible() ) return;
 
           DAO notificationDAO = (DAO) x.get("notificationDAO");
 
           StringBuilder sb = new StringBuilder("The Capability '")
-          .append(((String)junction.getTargetId()))
+          .append(cap.getName())
           .append("' has been set to ")
           .append(junction.getStatus())
           .append(".");

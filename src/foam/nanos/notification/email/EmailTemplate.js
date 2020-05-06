@@ -8,13 +8,11 @@ foam.CLASS({
   package: 'foam.nanos.notification.email',
   name: 'EmailTemplate',
 
-  documentation: `Represents an email template that stores the default properties of a specific email, 
+  documentation: `Represents an email template that stores the default properties of a specific email,
   mimics the EmailMessage which is the end obj that is processed into email.`,
 
   javaImports: [
-    'foam.core.X',
     'foam.nanos.logger.Logger',
-    'foam.nanos.notification.email.EmailMessage',
     'foam.util.SafetyUtil',
     'java.nio.charset.StandardCharsets',
     'org.jtwig.environment.EnvironmentConfiguration',
@@ -76,6 +74,7 @@ foam.CLASS({
       javaFactory: 'return getBody() != null ? getBody().getBytes(StandardCharsets.UTF_8) : null;'
     }
   ],
+
   methods: [
     {
       name: 'apply',
@@ -105,7 +104,7 @@ foam.CLASS({
       ],
       javaCode: `
         Logger logger = (Logger) x.get("logger");
-        
+
         if ( emailMessage == null ) {
           throw new NoSuchFieldException("emailMessage is Null");
         }
@@ -126,10 +125,6 @@ foam.CLASS({
         // Creating model from template
         for ( Object key : templateArgs.keySet() ) {
           value = templateArgs.get((String)key);
-          if ( value instanceof String ) {
-            tempKeyString = (String) value;
-            templateArgs.put((String) key, new String(tempKeyString.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8));
-          }
           model = JtwigModel.newModel(templateArgs);
           if ( model == null ) {
             throw new NoSuchFieldException("JtwigModel is Null");
@@ -140,11 +135,11 @@ foam.CLASS({
         if ( ! emailMessage.isPropertySet("body") ) {
           emailMessage.setBody((JtwigTemplate.inlineTemplate(getBody(), config)).render(model));
         }
-        
+
         // REPLY TO:
         if ( ! emailMessage.isPropertySet("replyTo") && ! SafetyUtil.isEmpty(getReplyTo()) ) {
             emailMessage.setReplyTo((JtwigTemplate.inlineTemplate(getReplyTo(), config)).render(model));
-        } 
+        }
 
         // DISPLAY NAME:
         if ( ! emailMessage.isPropertySet("displayName") && ! SafetyUtil.isEmpty(getDisplayName()) ) {

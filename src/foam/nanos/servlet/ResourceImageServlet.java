@@ -49,7 +49,7 @@ public class ResourceImageServlet
       String ext = EXTS.get(request.substring(request.lastIndexOf('.') +1));
       try ( BufferedInputStream bis = new BufferedInputStream(is) ) {
         resp.setContentType(!SafetyUtil.isEmpty(ext) ? ext : DEFAULT_EXT);
-        resp.setHeader("Content-Disposition", "filename=\"" + StringEscapeUtils.escapeHtml4(request) + "\"");
+        resp.setHeader("Cache-Control", "public, max-age=3600"); // cache for 1 hour
 
         IOUtils.copy(bis, resp.getOutputStream());
         return;

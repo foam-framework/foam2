@@ -1,0 +1,2 @@
+p({"class":"foam.nanos.auth.Permission","id":"historyrecord.read.*","description":""})
+p({"class":"foam.nanos.auth.Permission","id":"historyrecord.create","description":""})

@@ -164,11 +164,24 @@ foam.CLASS({
     'required',
 
     /**
-      When set to true, model.permission.property is needed for read / write on this property
+      When set to true, the '<model>.ro.<property>' permission is required for a
+      user to be able to read this property. If false, any user can read the
+      value of this property.
      */
     {
       class: 'Boolean',
-      name: 'permissionRequired',
+      name: 'readPermissionRequired',
+      value: false
+    },
+
+    /**
+      When set to true, the '<model>.rw.<property>' permission is required for a
+      user to be able to write this property. If false, any user can set the
+      value of this property.
+     */
+    {
+      class: 'Boolean',
+      name: 'writePermissionRequired',
       value: false
     },
 
@@ -210,7 +223,7 @@ foam.CLASS({
       transient: true,
       factory: function() {
         var name = this.name;
-        return function f(o) { return o[name]; }
+        return function f(o) { return o != null ? o[name] : null; }
       }
     },
 
@@ -310,7 +323,7 @@ foam.CLASS({
         prop = this.clone();
 
         // sourceCls_ isn't a real property so it gets lost during the clone.
-        prop.sourceCls_ = c; 
+        prop.sourceCls_ = c;
 
         c.axiomMap_[prop.name] = prop;
       }
@@ -368,7 +381,7 @@ foam.CLASS({
       // Take Axiom from class rather than using 'this' directly,
       // since installInClass() may have created a modified version
       // to inherit Property Properties from a super-Property.
-      var prop        = proto.cls_.getAxiomByName(this.name);
+      var prop = proto.cls_.getAxiomByName(this.name);
       if ( prop !== this ) {
         // Delegate to the installInProto found in the class in case it
         // has custom behaviour it wants to do.  See Class property for
@@ -378,7 +391,7 @@ foam.CLASS({
       }
 
       var name        = prop.name;
-      var adapt       = prop.adapt
+      var adapt       = prop.adapt;
       var assertValue = prop.assertValue;
       var preSet      = prop.preSet;
       var postSet     = prop.postSet;
@@ -421,7 +434,7 @@ foam.CLASS({
           return prop.toSlot(this);
         },
         set: function propertySlotSetter(slot2) {
-          prop.toSlot(this).linkFrom(slot2);
+          this.onDetach(prop.toSlot(this).linkFrom(slot2));
         },
         configurable: true,
         enumerable: false

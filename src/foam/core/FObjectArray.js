@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.core',
   name: 'FObjectArray',
-  extends: 'Property',
+  extends: 'foam.core.Array',
 
   documentation: "A Property which contains an array of 'of' FObjects.",
 
@@ -30,10 +30,6 @@ foam.CLASS({
         return this.of + '[]';
       }
     },
-    [
-      'factory',
-      function() { return []; }
-    ],
     [ 'adapt', function(_, /* array? */ a, prop) {
         if ( ! a ) return [];
         // If not an array, allow assertValue to assert the type-check.

@@ -50,7 +50,7 @@ public abstract class AbstractFObjectArrayPropertyInfo
             }
             break;
           case XMLStreamConstants.END_ELEMENT:
-            if ( reader.getLocalName() == startTag ) {
+            if ( reader.getLocalName().equals(startTag) ) {
               return objList.toArray();
             }
         }

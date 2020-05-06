@@ -1,28 +1,43 @@
 package foam.util;
 
+/**
+ * A string splitting mechanism which doesn't not split if the
+ * separator has been escaped.
+ */
 public class StringUtil {
-  /**
-   * A string splitting mechanism which doesn't not split if the
-   * separator has been escaped.
-   */
 
-  private static ThreadLocal<java.util.List<String>> storage =
+  protected static ThreadLocal<StringBuilder> builder__ = new ThreadLocal<StringBuilder>() {
+    @Override
+    protected StringBuilder initialValue() {
+      return new StringBuilder();
+    }
+    @Override
+    public StringBuilder get() {
+      StringBuilder sb = super.get();
+      sb.setLength(0);
+      return sb;
+    }
+  };
+
+  private static ThreadLocal<java.util.List<String>> storage__ =
     new ThreadLocal<java.util.List<String>>() {
       @Override
       protected java.util.List<String> initialValue() {
         return new java.util.ArrayList<String>(30);
       }
+
+      @Override
+      public java.util.List<String> get() {
+        java.util.List<String> a = super.get();
+        a.clear();
+        return a;
+      }
     };
 
   public static String[] split(String s, char separator) {
-    java.util.List<String> list = storage.get();
+    java.util.List<String> list = storage__.get();
 
-    // TODO: Check if this retains the capacity of the list.
-    // otherwise we might want to manage the inner array ourselves for
-    // performance.
-    list.clear();
-
-    StringBuilder sb = new StringBuilder();
+    StringBuilder sb = builder__.get();
     boolean escaping = false;
     char escape = '\\';
     char prev;

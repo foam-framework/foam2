@@ -10,7 +10,6 @@ import foam.util.SafetyUtil;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.text.StringEscapeUtils;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -50,13 +49,14 @@ public class ImageServlet
     throws ServletException, IOException
   {
     // get path
-    String cwd = System.getProperty("user.dir");
-    String[] paths = getServletConfig().getInitParameter("paths").split(":");
-    String reqPath = req.getRequestURI().replaceFirst("/?images/?", "/");
+    String   cwd     = System.getProperty("user.dir");
+    String[] paths   = getServletConfig().getInitParameter("paths").split(":");
+    String   reqPath = req.getRequestURI().replaceFirst("/?images/?", "/");
 
     // enumerate each file path
     for ( int i = 0 ; i < paths.length ; i++ ) {
       File src = new File(cwd + "/" + paths[i] + reqPath);
+      // Checking that it starts with the CanonicalPath prevents path escaping
       if ( src.isFile() && src.canRead() && src.getCanonicalPath().startsWith(new File(paths[i]).getCanonicalPath()) ) {
         String ext = EXTS.get(FilenameUtils.getExtension(src.getName()));
         try ( BufferedInputStream is = new BufferedInputStream(new FileInputStream(src)) ) {
@@ -69,7 +69,7 @@ public class ImageServlet
         }
       }
     }
-    
+
     resp.sendError(resp.SC_NOT_FOUND);
   }
 }

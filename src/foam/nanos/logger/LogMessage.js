@@ -8,40 +8,89 @@ foam.CLASS({
   package: 'foam.nanos.logger',
   name: 'LogMessage',
 
-  documentation: `Modelled log output.
-Implement LastModifiedByAware to suppress 'modified by' comment in journal output.`,
+  documentation: 'Modelled log output.',
 
-  implements: [
-    'foam.nanos.auth.CreatedAware',
-    'foam.nanos.auth.CreatedByAware',
-    'foam.nanos.auth.LastModifiedByAware'
+  javaImports: [
+    'foam.core.X',
+    'foam.log.LogLevel',
+    'foam.nanos.auth.User'
   ],
 
   tableColumns: [
     'created',
     'severity',
-    'createdBy',
-    'lastModifiedBy',
     'message'
   ],
 
   searchColumns: [
+    'hostname',
+    'created',
     'severity',
-    'exception'
+    'message'
   ],
 
   properties: [
     {
-      class: 'DateTime',
-      name: 'created',
+      name: 'hostname',
+      class: 'String',
       visibility: 'RO'
+    },
+    {
+      class: 'String',
+      name: 'created',
+      visibility: 'RO',
+      tableWidth: 180
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdBy',
+      documentation: `The unique identifier of the user.`,
+      visibility: 'RO',
+      tableCellFormatter: function(value, obj, axiom) {
+        this.__subSubContext__.userDAO
+          .find(value)
+          .then((user) => {
+            if ( user ) {
+              this.add(user.legalName);
+            }
+          })
+          .catch((error) => {
+            this.add(value);
+          });
+      }
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdByAgent',
+      documentation: `The unique identifier of the agent`,
+      visibility: 'RO',
+      tableCellFormatter: function(value, obj, axiom) {
+        this.__subSubContext__.userDAO
+          .find(value)
+          .then((user) => {
+            if ( user ) {
+              this.add(user.legalName);
+            }
+          })
+          .catch((error) => {
+            this.add(value);
+          });
+      }
+    },
+    {
+      name: 'thread',
+      class: 'String',
+      visibility: 'RO',
+      javaFactory: `return Thread.currentThread().getName();`,
     },
     {
       name: 'severity',
       class: 'Enum',
       of: 'foam.log.LogLevel',
       toJSON: function(value) { return value && value.label; },
-      visibility: 'RO',
+      updateVisibility: 'RO',
       tableCellFormatter: function(severity, obj, axiom) {
          this
           .start()
@@ -50,50 +99,31 @@ Implement LastModifiedByAware to suppress 'modified by' comment in journal outpu
             .style({ color: severity.color })
           .end();
       },
+      tableWidth: 90
     },
     {
       name: 'id',
       class: 'Long',
       storageTransient: 'true',
-      hidden: 'true',
-      visibility: 'RO'
-    },
-    {
-      class: 'Reference',
-      of: 'foam.nanos.auth.User',
-      name: 'createdBy',
-      documentation: 'User who created the entry',
-      visibility: 'RO'
-    },
-    {
-      class: 'Reference',
-      of: 'foam.nanos.auth.User',
-      name: 'lastModifiedBy',
-      value: '1',
-      transient: true,
-      hidden: true,
-      documentation: 'Added to suppress journal comments regarding "modified by". Also, a non-null value is required.',
-      javaFactory: 'return 1L;',
-      visibility: 'RO'
+      visibility: 'HIDDEN'
     },
     {
       name: 'message',
       class: 'String',
       label: 'Log Message',
-      visibility: foam.u2.Visibility.RO,
-      view: { class: 'foam.u2.tag.TextArea', rows: 5, cols: 80 },
-      visibility: 'RO'
+      view: { class: 'foam.u2.view.PreView' },
+      updateVisibility: 'RO'
     },
     // TODO: implement via an additional method on Logger logger.flag(x, y).log(message)
     // {
     //   name: 'flags',
     //   class: 'Map'
     // },
-    {
-      name: 'exception',
-      class: 'Object',
-      visibility: 'RO',
-      view: { class: 'foam.u2.tag.TextArea', rows: 5, col: 80 }
-    }
+    // {
+    //   name: 'exception',
+    //   class: 'Object',
+    //   view: { class: 'foam.u2.view.PreView' },
+    //   updateVisibility: 'RO'
+    // }
   ]
 });

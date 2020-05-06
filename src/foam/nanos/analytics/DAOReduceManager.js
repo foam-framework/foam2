@@ -9,7 +9,6 @@ foam.CLASS({
   name: 'DAOReduceManager',
   javaImports: [
     'java.util.Date',
-    'foam.nanos.analytics.Candlestick',
     'static foam.mlang.MLang.*'
   ],
   properties: [

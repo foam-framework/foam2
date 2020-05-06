@@ -10,9 +10,34 @@ foam.CLASS({
 
   documentation: 'Export driver registry model',
 
+  tableColumns: [ 'id', 'driverName', 'targetModel', 'extension' ],
+
   properties: [
-    { class: 'String', name: 'id' },
-    { class: 'String', name: 'driverName' },
-    { class: 'String', name: 'targetModel' }
+    { class: 'String', name: 'id', tableWidth: 80 },
+    { class: 'String', name: 'driverName', tableWidth: 300 },
+    { class: 'String', name: 'targetModel' },
+    {
+      class: 'String',
+      name: 'extension',
+      value: 'csv',
+      tableWidth: 80
+    },
+    {
+      class: 'String',
+      name: 'mimeType',
+      value: 'text/csv;charset=utf-8'
+    },
+    {
+      class: 'Boolean',
+      name: 'isConvertible'
+    },
+    {
+      class: 'Boolean',
+      name: 'isDownloadable'
+    },
+    {
+      class: 'Boolean',
+      name: 'isOpenable'
+    }
   ]
 });

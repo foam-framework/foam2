@@ -83,18 +83,24 @@ foam.CLASS({
 
         if ( searchColumns ) return searchColumns;
 
-        if ( of.model_.searchColumns ) return of.model_.searchColumns;
+        var searchColumnsAxiom = of.getAxiomByName('searchColumns');
 
-        if ( of.model_.tableColumns ) {
-          return of.model_.tableColumns.filter(function(c) {
+        if ( searchColumnsAxiom != null && Array.isArray(searchColumnsAxiom.columns) ) {
+          return searchColumnsAxiom.columns;
+        }
+
+        var tableColumnsAxiom = of.getAxiomByName('tableColumns');
+
+        if ( tableColumnsAxiom != null && Array.isArray(tableColumnsAxiom.columns) ) {
+          return tableColumnsAxiom.columns.filter(function(c) {
             var axiom = of.getAxiomByName(c);
             return axiom && axiom.searchView;
           });
         }
 
         return of.getAxiomsByClass(foam.core.Property)
-            .filter((prop) => prop.searchView && ! prop.hidden)
-            .map(foam.core.Property.NAME.f);
+          .filter((prop) => prop.searchView && ! prop.hidden)
+          .map(foam.core.Property.NAME.f);
       }
     },
     {
@@ -150,8 +156,6 @@ foam.CLASS({
       this.
         addClass(self.myClass()).
         add(this.slot(function(filters) {
-          self.show(filters.length);
-
           this.searchManager.filteredDAO$.sub(self.updateSelectedCount);
           self.updateSelectedCount(0, 0, 0, this.searchManager.filteredDAO$);
 
@@ -161,8 +165,7 @@ foam.CLASS({
 
           var slot = self.SimpleSlot.create();
 
-          e
-            .start(self.TextSearchView, {
+          e.start(self.TextSearchView, {
                 richSearch: true,
                 of: self.dao.of.id,
                 onKey: true,
@@ -171,8 +174,8 @@ foam.CLASS({
                   focused: true
                 }
             }, slot)
-              .addClass('general-query')
-            .end();
+            .addClass('general-query')
+          .end();
 
           this.searchManager.add(slot.value);
 
@@ -213,7 +216,7 @@ foam.CLASS({
     {
       name: 'clear',
       code: function() {
-        this.data = undefined;
+        this.data    = undefined;
         this.filters = this.filters.slice();
       }
     }
@@ -222,7 +225,8 @@ foam.CLASS({
   listeners: [
     {
       name: 'updateTotalCount',
-      isFramed: true,
+      isMerged: true,
+      mergeDelay: 250,
       code: function() {
         this.loadingRequests++;
         this.dao
@@ -237,7 +241,8 @@ foam.CLASS({
     },
     {
       name: 'updateSelectedCount',
-      isFramed: true,
+      isMerged: true,
+      mergeDelay: 500,
       code: function(_, __, ___, sink) {
         this.loadingRequests++;
         sink

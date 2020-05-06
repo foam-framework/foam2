@@ -71,6 +71,8 @@ public class ClassInfoImpl
     // that has setClassInfo and make PropertyInfo implement it.
     if ( a instanceof PropertyInfo ) {
       ((PropertyInfo)a).setClassInfo(this);
+    } else if ( a instanceof MethodInfo ) {
+      ((MethodInfo)a).setClassInfo(this);
     }
     axioms.add(a);
     axiomsByName_.put(a.getName(), a);
@@ -162,5 +164,9 @@ public class ClassInfoImpl
     ret.addAll(getParent().getAxiomsByClass(cls));
     axiomMap_.put(cls, ret);
     return ret;
+  }
+
+  public String toString() {
+    return "ClassInfoImpl(" + getId() + ")";
   }
 }

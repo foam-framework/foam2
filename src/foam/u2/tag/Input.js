@@ -21,7 +21,7 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   css: `
-    ^:read-only:not(^:disabled) { border: none; background: rgba(0,0,0,0); }
+    ^:read-only { border: none; background: rgba(0,0,0,0); }
     /* Still show outline when focused as read-only to help accessibility *
     ^:read-only:focus { outline: 1px solid rgb(238, 238, 238); }
   `,
@@ -136,7 +136,6 @@ foam.CLASS({
     function fromProperty(p) {
       this.SUPER(p);
 
-      this.visibility$.follow(p.createVisibilityFor(this.__context__.data$));
       if ( ! this.hasOwnProperty('onKey') && p.validateObj ) this.onKey = true;
     },
 

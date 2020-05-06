@@ -17,7 +17,7 @@ public class BeforeLtParser extends foam.lib.parse.ProxyParser {
   public BeforeLtParser(Parser valueParser) {
     setDelegate(
         new Seq1(1,
-                 new Literal("<"),
+                 Literal.create("<"),
                  valueParser)
         );
   }

@@ -86,7 +86,9 @@ foam.CLASS({
     ^error .foam-u2-IntView,
     ^error .foam-u2-FloatView,
     ^error .foam-u2-DateView,
-    ^error .foam-u2-view-date-DateTimePicker .date-display-box
+    ^error .foam-u2-view-date-DateTimePicker .date-display-box,
+    ^error .foam-u2-view-RichChoiceView-selection-view,
+    ^error .foam-u2-view-RichChoiceView-clear-btn
     {
       border-color: /*%DESTRUCTIVE3%*/ #d9170e !important;
     }
@@ -122,7 +124,6 @@ foam.CLASS({
     ^ .foam-u2-view-RichChoiceView-selection-view {
       width: 100%;
       border-radius: 3px;
-      border: solid 1px #8e9090;
       background-color: #ffffff;
       box-sizing: border-box;
       -webkit-appearance: none;
@@ -188,80 +189,18 @@ foam.CLASS({
       margin-right: auto;
     }
 
-
     ^ .foam-u2-view-RadioView label {
       margin-left: 12px;
     }
-
-    /*
-      !IMPORTANT!
-      For the following inputs below, we are planning
-      encode these changes in the actual foam files
-    */
-
-    /*
-    ^ .foam-u2-CheckBox {
-      -webkit-appearance: none;
-      border-radius: 2px;
-      border: solid 1px #8e9090;
-      box-sizing: border-box;
-      display: inline-block;
-      fill: rgba(0, 0, 0, 0);
-
-      vertical-align: middle;
-
-      height: 16px;
-      width: 16px;
-
-      opacity: 1;
-
-      transition: background-color 140ms, border-color 140ms;
-    }
-
-    ^ .foam-u2-CheckBox:checked {
-      background-color: #604aff;
-      fill: white;
-      border: solid 1px #604aff;
-    }
-
-    ^ .foam-u2-CheckBox:checked:after {
-      content: url(data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%2048%2048%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2215%22%20height%3D%2215%22%20version%3D%221.1%22%3E%0A%20%20%20%3Cpath%20fill%3D%22white%22%20stroke-width%3D%223%22%20d%3D%22M18%2032.34L9.66%2024l-2.83%202.83L18%2038l24-24-2.83-2.83z%22/%3E%0A%3C/svg%3E);
-    }
-
-    ^ input[type="radio" i] {
-      -webkit-appearance: none;
-      border-radius: 8px;
-      background-color: #ffffff;
-      border: solid 1px #8e9090;
-      box-sizing: border-box;
-      display: inline-block;
-      fill: rgba(0, 0, 0, 0);
-
-      vertical-align: middle;
-
-      height: 16px;
-      width: 16px;
-
-      opacity: 1;
-
-      transition: background-color 140ms, border-color 140ms;
-    }
-
-    ^ input[type="radio" i]:checked {
-      background-color: #604aff;
-    }
-
-    ^ input[type="radio" i]:checked:after {
-      content: url('images/active-radio.svg');
-    }
-    */
   `,
 
   requires: [
+    'foam.core.ConstantSlot',
     'foam.core.ProxySlot',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
-    'foam.u2.Visibility'
+    'foam.u2.ControllerMode',
+    'foam.u2.DisplayMode'
   ],
 
   properties: [
@@ -271,7 +210,7 @@ foam.CLASS({
       of: 'foam.core.Slot',
       name: 'visibilitySlot',
       expression: function(prop) {
-        return prop.createVisibilityFor(this.data$).map((m) => m !== this.Visibility.HIDDEN);
+        return prop.createVisibilityFor(this.data$, this.controllerMode$);
       }
     }
   ],
@@ -281,17 +220,20 @@ foam.CLASS({
       var self = this;
       this.SUPER();
 
+      const vis$ = this.ProxySlot.create({ delegate$: this.visibilitySlot$ });
+      this.onDetach(this.mode$.follow(vis$));
+
       this
-        .show(this.ProxySlot.create({ delegate$: this.visibilitySlot$ }))
         .addClass(this.myClass())
-        .add(this.slot(function(data, prop, prop$label) {
+        .add(this.slot(function(mode, prop, prop$label) {
+
           var errorSlot = prop.validateObj && prop.validationTextVisible ?
-            data.slot(prop.validateObj) :
+            this.data.slot(prop.validateObj) :
             foam.core.ConstantSlot.create({ value: null });
 
           return self.E()
             .start(self.Rows)
-              .callIf(prop$label, function() {
+              .callIf(prop$label && prop.view.class != 'foam.u2.CheckBox', function() {
                 this.start('m3')
                   .add(prop$label)
                   .style({ 'line-height': '2' })
@@ -300,8 +242,8 @@ foam.CLASS({
               .start()
                 .style({ 'position': 'relative', 'display': 'inline-flex', 'width': '100%' })
                 .start()
-                  .style({ 'flex-grow': 1 })
-                  .add(prop)
+                  .style({ 'flex-grow': 1, 'max-width': '100%' })
+                  .tag(prop, { mode$: vis$ })
                   .callIf(prop.validationStyleEnabled, function() {
                     this.enableClass(self.myClass('error'), errorSlot);
                   })
@@ -328,10 +270,10 @@ foam.CLASS({
                         .addClass(self.myClass('arrow-right'))
                       .end()
                     .end()
-                  .end()
+                  .end();
                 })
               .end()
-              .callIf(prop.validationTextVisible, function() {
+              .callIf(prop.validationTextVisible && mode === self.DisplayMode.RW, function() {
                 this
                   .start()
                     .style({ 'align-items': 'center' })
@@ -341,8 +283,8 @@ foam.CLASS({
                       .start({
                         class: 'foam.u2.tag.Image',
                         data: 'images/inline-error-icon.svg',
-                        displayHeight: 16,
-                        displayWidth: 16
+                        displayHeight: '16px',
+                        displayWidth: '16px'
                       })
                         .style({
                           'justify-content': 'flex-start',

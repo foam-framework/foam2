@@ -275,6 +275,12 @@ foam.CLASS({
     }
   ],
 
+  static: [
+    function forOrdinal(i) {
+      return this.VALUES.find((e) => e.ordinal == i);
+    }
+  ],
+
   properties: [
     {
       class: 'String',
@@ -303,12 +309,47 @@ foam.CLASS({
       final: true,
       transient: true,
       factory: function() { return this.name; }
+    },
+    {
+      class: 'String',
+      name: 'color'
+    },
+    {
+      class: 'String',
+      name: 'background'
+    },
+    {
+      class: 'Boolean',
+      name: 'isItalic'
+    },
+    {
+      class: 'Boolean',
+      name: 'isBold'
+    },
+    {
+      class: 'StringArray',
+      name: 'extraClasses',
+      generateJava: false
     }
   ],
 
   methods: [
     function outputFObject(o) {
       o.out(this.ordinal);
+    },
+    function toSummary() { return this.label; },
+    function toStyle() {
+      var style = {};
+
+      if ( this.color      ) style.color          = this.color;
+      if ( this.background ) style.background     = this.background;
+      if ( this.isItalic   ) style['font-style']  = 'italic';
+      if ( this.isBold     ) style['font-weight'] = 'bold';
+
+      return style;
+    },
+    function classes() {
+      return this.extraClasses.concat(foam.String.cssClassize(this.cls_.id) + '-' + this.name);
     },
     function toString() { return this.name; }
   ]
@@ -371,14 +412,6 @@ foam.CLASS({
         }
 
         if ( ret ) return ret;
-
-        console.log("*** adamvy");
-        console.log("** name:",prop.name);
-        console.log("** of:",prop.of);
-        console.log("** type:",prop.type);
-        console.log("** typecls:", type);
-        console.log("** o: ", o);
-        console.log("** n: ", n);
 
         throw new Error('Attempt to set invalid Enum value. Enum: ' + type.id + ', value: ' + n);
       }

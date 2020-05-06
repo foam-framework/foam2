@@ -86,7 +86,7 @@ var createData2 = function createData2(dataCount) {
   var arr = [];
   var count = dataCount || 20;
 
-  for (var i = 0; i < count; i++ ) {
+  for ( var i = 0 ; i < count ; i++ ) {
     arr.push({
       int: i,
       float: count - i,
@@ -850,150 +850,150 @@ describe('AND', function() {
 
 
 
-describe('AutoIndex', function() {
-  var idx;
-  var idxInstance;
-  var plan;
-  var m;
-  var sink;
-  var mdao;
-  var fakeRoot;
+//  describe('AutoIndex', function() {
+//   var idx;
+//   var idxInstance;
+//   var plan;
+//   var m;
+//   var sink;
+//   var mdao;
+//   var fakeRoot;
 
-  beforeEach(function() {
-    idx = foam.dao.index.AutoIndex.create({
-      idIndex: test.Indexable.ID.toIndex(foam.dao.index.ValueIndex.create())
-    });
+//   beforeEach(function() {
+//     idx = foam.dao.index.AutoIndex.create({
+//       idIndex: test.Indexable.ID.toIndex(foam.dao.index.ValueIndex.create())
+//     });
 
-    idxInstance = idx.createNode();
+//     idxInstance = idx.createNode();
 
-    idxInstance.bulkLoad(createData2(1000));
+//     idxInstance.bulkLoad(createData2(1000));
 
-    fakeRoot = {
-      size: function() { return 1; },
-      index: { toPrettyString: function() { return ""; }}
-    };
+//     fakeRoot = {
+//       size: function() { return 1; },
+//       index: { toPrettyString: function() { return ""; }}
+//     };
 
-    m = foam.mlang.Expressions.create();
-    sink = foam.dao.ArraySink.create();
-  });
+//     m = foam.mlang.Expressions.create();
+//     sink = foam.dao.ArraySink.create();
+//   });
 
-  it('covers toString()', function() {
-    idx.toString();
-  });
+//   it('covers toString()', function() {
+//     idx.toString();
+//   });
 
-  it('supports manual addIndex()', function() {
-    idxInstance.addPropertyIndex(test.Indexable.INT, idxInstance);
-    expect(idxInstance.delegate.delegates.length).toEqual(2);
-    expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
-  });
+//   it('supports manual addIndex()', function() {
+//     idxInstance.addPropertyIndex(test.Indexable.INT, idxInstance);
+//     expect(idxInstance.delegate.delegates.length).toEqual(2);
+//     expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
+//   });
 
-  it('auto indexes on ordering', function() {
-    idxInstance
-      .plan(sink, undefined, undefined, test.Indexable.FLOAT, undefined, fakeRoot)
-      .execute([], sink, undefined, undefined, test.Indexable.FLOAT, undefined);
+//   it('auto indexes on ordering', function() {
+//     idxInstance
+//       .plan(sink, undefined, undefined, test.Indexable.FLOAT, undefined, fakeRoot)
+//       .execute([], sink, undefined, undefined, test.Indexable.FLOAT, undefined);
 
-    expect(idxInstance.delegate.delegates.length).toEqual(2);
-    expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
+//     expect(idxInstance.delegate.delegates.length).toEqual(2);
+//     expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
 
-    idxInstance
-      .plan(sink, undefined, undefined, m.DESC(test.Indexable.INT), undefined, fakeRoot)
-      .execute([], sink, undefined, undefined, m.DESC(test.Indexable.INT), undefined);
+//     idxInstance
+//       .plan(sink, undefined, undefined, m.DESC(test.Indexable.INT), undefined, fakeRoot)
+//       .execute([], sink, undefined, undefined, m.DESC(test.Indexable.INT), undefined);
 
-    expect(idxInstance.delegate.delegates.length).toEqual(3);
-    expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
-    expect(idxInstance.delegate.delegates[2].size()).toEqual(1000);
+//     expect(idxInstance.delegate.delegates.length).toEqual(3);
+//     expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
+//     expect(idxInstance.delegate.delegates[2].size()).toEqual(1000);
 
-  });
+//   });
 
-  it('skips already auto indexed orderings', function() {
-    idxInstance
-      .plan(sink, undefined, undefined, test.Indexable.FLOAT, undefined, fakeRoot)
-      .execute([], sink, undefined, undefined, test.Indexable.FLOAT, undefined);
+//   it('skips already auto indexed orderings', function() {
+//     idxInstance
+//       .plan(sink, undefined, undefined, test.Indexable.FLOAT, undefined, fakeRoot)
+//       .execute([], sink, undefined, undefined, test.Indexable.FLOAT, undefined);
 
-    expect(idxInstance.delegate.delegates.length).toEqual(2);
-    expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
+//     expect(idxInstance.delegate.delegates.length).toEqual(2);
+//     expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
 
-    idxInstance
-      .plan(sink, undefined, undefined, m.DESC(test.Indexable.FLOAT), undefined, fakeRoot)
-      .execute([], sink, undefined, undefined, m.DESC(test.Indexable.FLOAT), undefined);
+//     idxInstance
+//       .plan(sink, undefined, undefined, m.DESC(test.Indexable.FLOAT), undefined, fakeRoot)
+//       .execute([], sink, undefined, undefined, m.DESC(test.Indexable.FLOAT), undefined);
 
-    expect(idxInstance.delegate.delegates.length).toEqual(2);
-    expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
-  });
+//     expect(idxInstance.delegate.delegates.length).toEqual(2);
+//     expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
+//   });
 
-  it('auto indexes on predicate', function() {
+//   it('auto indexes on predicate', function() {
 
-    var pred = m.AND(
-      m.OR(
-        m.LT(test.Indexable.INT, 8),
-        m.EQ(test.Indexable.FLOAT, 4)
-      ),
-      m.CONTAINS_IC(test.Indexable.STRING, "we"),
-      m.OR(
-        m.GT(test.Indexable.INT, 8),
-        m.LTE(test.Indexable.FLOAT, 4)
-      )
-    );
+//     var pred = m.AND(
+//       m.OR(
+//         m.LT(test.Indexable.INT, 8),
+//         m.EQ(test.Indexable.FLOAT, 4)
+//       ),
+//       m.CONTAINS_IC(test.Indexable.STRING, "we"),
+//       m.OR(
+//         m.GT(test.Indexable.INT, 8),
+//         m.LTE(test.Indexable.FLOAT, 4)
+//       )
+//     );
 
-    pred = m.OR(
-      pred,
-      m.AND(
-        m.CONTAINS_IC(test.Indexable.STRING, "we"),
-        m.EQ(test.Indexable.DATE, new Date())
-      )
-    );
+//     pred = m.OR(
+//       pred,
+//       m.AND(
+//         m.CONTAINS_IC(test.Indexable.STRING, "we"),
+//         m.EQ(test.Indexable.DATE, new Date())
+//       )
+//     );
 
-    pred = pred.toDisjunctiveNormalForm();
+//     pred = pred.toDisjunctiveNormalForm();
 
-    // the results end up small enough that the first index is good enough
-    // for all subpred cases
-    for ( var i = 0; i < pred.args.length; i++ ) {
-      var subpred = pred.args[i];
-      idxInstance
-        .plan(sink, undefined, undefined, undefined, subpred, fakeRoot)
-        .execute([], sink, undefined, undefined, undefined, subpred);
-    }
-    expect(idxInstance.delegate.delegates.length).toEqual(2);
-    expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
-  });
+//     // the results end up small enough that the first index is good enough
+//     // for all subpred cases
+//     for ( var i = 0; i < pred.args.length; i++ ) {
+//       var subpred = pred.args[i];
+//       idxInstance
+//         .plan(sink, undefined, undefined, undefined, subpred, fakeRoot)
+//         .execute([], sink, undefined, undefined, undefined, subpred);
+//     }
+//     expect(idxInstance.delegate.delegates.length).toEqual(2);
+//     expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
+//   });
 
-  it('dnf works with NOT', function() {
+//   it('dnf works with NOT', function() {
 
-    var pred = m.OR(
-      m.NOT(m.HAS(test.Indexable.STRING)),
-      m.EQ(test.Indexable.STRING, 'none')
-    );
+//     var pred = m.OR(
+//       m.NOT(m.HAS(test.Indexable.STRING)),
+//       m.EQ(test.Indexable.STRING, 'none')
+//     );
 
-    pred = pred.toDisjunctiveNormalForm();
-  });
+//     pred = pred.toDisjunctiveNormalForm();
+//   });
 
 
 
-  it('auto indexes on more predicates', function() {
+//   it('auto indexes on more predicates', function() {
 
-    var preds = [
-      m.AND(
-        m.LT(test.Indexable.INT, 8),
-        m.EQ(test.Indexable.FLOAT, 4)
-      ),
-      m.CONTAINS_IC(test.Indexable.STRING, "we"),
-      m.LT(test.Indexable.DATE, 8)
-    ];
+//     var preds = [
+//       m.AND(
+//         m.LT(test.Indexable.INT, 8),
+//         m.EQ(test.Indexable.FLOAT, 4)
+//       ),
+//       m.CONTAINS_IC(test.Indexable.STRING, "we"),
+//       m.LT(test.Indexable.DATE, 8)
+//     ];
 
-    // the results end up small enough that the first index is good enough
-    // for all subpred cases
-    for ( var i = 0; i < preds.length; i++ ) {
-      var subpred = preds[i];
-      idxInstance
-        .plan(sink, undefined, undefined, undefined, subpred, fakeRoot)
-        .execute([], sink, undefined, undefined, undefined, subpred);
+//     // the results end up small enough that the first index is good enough
+//     // for all subpred cases
+//     for ( var i = 0; i < preds.length; i++ ) {
+//       var subpred = preds[i];
+//       idxInstance
+//         .plan(sink, undefined, undefined, undefined, subpred, fakeRoot)
+//         .execute([], sink, undefined, undefined, undefined, subpred);
 
-      expect(idxInstance.delegate.delegates.length).toEqual(i+2);
-      expect(idxInstance.delegate.delegates[i+1].size()).toEqual(1000);
-    }
-  });
+//       expect(idxInstance.delegate.delegates.length).toEqual(i+2);
+//       expect(idxInstance.delegate.delegates[i+1].size()).toEqual(1000);
+//     }
+//   });
 
-});
+// });
 
 
 

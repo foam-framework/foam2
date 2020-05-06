@@ -8,13 +8,13 @@ package foam.nanos.tomcat;
 
 import foam.nanos.http.NanoRouter;
 import foam.nanos.logger.Logger;
-
+import java.util.concurrent.ThreadLocalRandom;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
-import javax.websocket.Session;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpointConfig;
+import javax.websocket.Session;
 
 public class TomcatRouter
   extends NanoRouter
@@ -83,7 +83,7 @@ public class TomcatRouter
     }
 
     private foam.box.RawWebSocketBox returnBox_;
-    private Integer id_;
+    private Integer                  id_;
 
     @OnOpen
     public void onOpen(javax.websocket.Session session) {
@@ -91,7 +91,7 @@ public class TomcatRouter
 
       final java.util.concurrent.BlockingQueue<String> queue = new java.util.concurrent.LinkedTransferQueue<String>();
       final javax.websocket.RemoteEndpoint.Basic capturedEndpoint = session.getBasicRemote();
-      final Integer id = new java.util.Random().nextInt();
+      final Integer id = ThreadLocalRandom.current().nextInt();
       id_ = id;
 
 
@@ -110,7 +110,6 @@ public class TomcatRouter
         });
 
       socketThread.start();
-
 
       returnBox_.setSocket(new foam.net.WebSocket() {
           @Override

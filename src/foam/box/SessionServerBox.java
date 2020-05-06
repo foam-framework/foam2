@@ -79,7 +79,6 @@ public class SessionServerBox
           logger.warning("Remote host for session ", sessionID, " changed from ", session.getRemoteHost(), " to ", req.getRemoteHost(), ". Deleting session and forcing the user to sign in again.");
           sessionDAO.remove(session);
           msg.replyWithException(new AuthenticationException("IP address changed. Your session was deleted to keep your account secure. Please sign in again to verify your identity."));
-          return;
         }
       }
 
@@ -94,26 +93,6 @@ public class SessionServerBox
 
       session.touch();
 
-      // TODO: Shouldn't this go somewhere else?
-      if ( req != null && ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
-        AppConfig appConfig = (AppConfig) effectiveContext.get("appConfig");
-        appConfig = (AppConfig) appConfig.fclone();
-        String configUrl = ((Request) req).getRootURL().toString();
-
-        if ( appConfig.getForceHttps() ) {
-          if ( configUrl.startsWith("https://") ) {
-            // Don't need to do anything.
-          } else if ( configUrl.startsWith("http://") ) {
-            configUrl = "https" + configUrl.substring(4);
-          } else {
-            configUrl = "https://" + configUrl;
-          }
-        }
-
-        appConfig.setUrl(configUrl);
-        effectiveContext = effectiveContext.put("appConfig", appConfig);
-      }
-
       try {
         spec.checkAuthorization(effectiveContext);
       } catch (AuthorizationException e) {
@@ -124,13 +103,12 @@ public class SessionServerBox
       }
 
       msg.getLocalAttributes().put("x", effectiveContext);
+      getDelegate().send(msg);
     } catch (Throwable t) {
-      logger.error("Error throw in SessionServerBox: " + t, " ,service: " + spec.getName());
+      logger.error("Error throw in SessionServerBox: " + t, " ,service: " + spec.getName(), t);
       t.printStackTrace();
       msg.replyWithException(t);
       return;
     }
-
-    getDelegate().send(msg);
   }
 }

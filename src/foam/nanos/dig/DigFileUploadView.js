@@ -103,6 +103,11 @@ foam.CLASS({
       name: 'dragActive',
       value: false
     },
+    {
+      class: 'String',
+      name: 'acceptFormat',
+      value: 'application/vnd.ms-excel, text/csv'
+    },
     [ 'uploadHidden', false ],
     [ 'removeHidden', false ],
     [ 'boxHidden', false ],
@@ -178,7 +183,7 @@ foam.CLASS({
             .start('input').addClass('attachment-input')
               .attrs({
                 type: 'file',
-                accept: 'application/vnd.ms-excel, text/csv'
+                accept: this.acceptFormat
               })
               .on('change', this.onChange)
             .end()

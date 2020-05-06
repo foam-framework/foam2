@@ -11,6 +11,8 @@ foam.CLASS({
   javaImports: [
     'foam.core.FObject',
     'foam.core.PropertyInfo',
+    'foam.mlang.sink.Count',
+    'foam.mlang.sink.GroupBy',
     'java.util.Iterator',
     'java.util.HashMap',
     'java.util.ArrayList',
@@ -23,7 +25,8 @@ foam.CLASS({
   documentation: `A DAO decorator that prevents users from updating / reading
       properties for which they do not have the update / read permission.
 
-      To require update / read permission on a property, set the permissionRequired
+      To require update / read permission on a property, set the
+      readPermissionRequired or writePermissionRequired properties
       to be true, and add the corresponding permissions,
       i.e. model.ro.prop / model.rw.prop to  the groups who are granted permissions
       on the property.`,
@@ -55,8 +58,15 @@ foam.CLASS({
       javaCode: `
       if ( x.get("auth") != null ) {
         if ( predicate != null ) predicate.authorize(x);
-        foam.dao.Sink sink2 = ( sink != null ) ? new HidePropertiesSink(x, sink, this) : sink;
-        super.select_(x, sink2, skip, limit, order, predicate);
+        // don't decorate the sink if it's a Count or GroupBy(Count())
+        if ( ! ( sink instanceof Count ||
+            ((sink instanceof GroupBy) &&
+            ((GroupBy)sink).getArg2() instanceof Count )) ) {
+          foam.dao.Sink sink2 = ( sink != null ) ? new HidePropertiesSink(x, sink, this) : sink;
+          super.select_(x, sink2, skip, limit, order, predicate);
+        } else {
+          super.select_(x, sink, skip, limit, order, predicate);
+        }
         return sink;
       }
       return super.select_(x, sink, skip, limit, order, predicate);
@@ -81,27 +91,33 @@ foam.CLASS({
         }
       ],
       javaCode: `
-  String of = obj.getClass().getSimpleName().toLowerCase();
+  String      of   = obj.getClass().getSimpleName().toLowerCase();
   AuthService auth = (AuthService) x.get("auth");
 
   if ( propertyMap_.containsKey(of) ) {
     List properties = propertyMap_.get(of);
     Iterator e = properties.iterator();
+
     while ( e.hasNext() ) {
       PropertyInfo axiom = (PropertyInfo) e.next();
       maybeReset(axiom, of, auth, x, obj, oldObj);
     }
   } else {
     List<PropertyInfo> properties = new ArrayList<>();
-    List list = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
-    Iterator e = list.iterator();
+    List               list       = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    Iterator           e          = list.iterator();
+
     while ( e.hasNext() ) {
       PropertyInfo axiom = (PropertyInfo) e.next();
-      if ( axiom.getPermissionRequired() ) {
+
+      // This method is only called on puts, so we only need to check for write
+      // permission.
+      if ( axiom.getWritePermissionRequired() ) {
         properties.add(axiom);
         maybeReset(axiom, of, auth, x, obj, oldObj);
       }
     }
+
     propertyMap_.put(of, properties);
   }
 
@@ -127,31 +143,42 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      String of = oldObj.getClass().getSimpleName().toLowerCase();
-      FObject obj = oldObj.fclone();
+      String      of   = oldObj.getClass().getSimpleName().toLowerCase();
+      FObject     obj  = oldObj.fclone();
       AuthService auth = (AuthService) x.get("auth");
+
       if ( ! propMap.containsKey(of) ) {
         List<PropertyInfo> properties = new ArrayList<>();
         List list = oldObj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
         Iterator e = list.iterator();
+
         while ( e.hasNext() ) {
           PropertyInfo axiom = (PropertyInfo) e.next();
-          if ( axiom.getPermissionRequired() ) {
-            boolean authCheck = auth.check(x, of + ".rw." + axiom.getName().toLowerCase()) || auth.check(x, of + ".ro." + axiom.getName().toLowerCase());
-            if ( ! authCheck ) {
-              properties.add(axiom);
-            }
+
+          // Only called on finds and selects, so only need to check for read
+          // permission.
+          if (
+            axiom.getReadPermissionRequired() &&
+            ! (
+              auth.check(x, of + ".rw." + axiom.getName().toLowerCase()) ||
+              auth.check(x, of + ".ro." + axiom.getName().toLowerCase())
+            )
+          ) {
+            properties.add(axiom);
           }
         }
+
         propMap.put(of, properties);
       }
-        
+
       List properties = (List) propMap.get(of);
       Iterator e = properties.iterator();
+
       while ( e.hasNext() ) {
         PropertyInfo axiom = (PropertyInfo) e.next();
         axiom.clear(obj);
       }
+
       return obj;
       `,
     },
@@ -244,7 +271,7 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(`
   private PermissionedPropertyDAO dao;
-  
+
   /** map of properties of a model that require model.permission.property for read / write operations **/
   protected Map<String, List<PropertyInfo>> propertyMap_ = new HashMap<>();
   public HidePropertiesSink(foam.core.X x, foam.dao.Sink delegate, PermissionedPropertyDAO dao) {

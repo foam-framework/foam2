@@ -19,7 +19,7 @@ import foam.mlang.predicate.Not;
 public class NegateParser extends foam.lib.parse.ProxyParser  {
 
   public NegateParser(Parser exprParser) {
-    setDelegate(new Alt(new Seq1(1,new Literal("-"),
+    setDelegate(new Alt(new Seq1(1,Literal.create("-"),
                                 exprParser),
                         new Seq1(1,new LiteralIC("NOT "),
                                 exprParser)));

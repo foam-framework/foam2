@@ -62,6 +62,11 @@ foam.CLASS({
     },
     'preventFeedback_'
   ],
+  css: `
+    .other-choice-label {
+      margin-top: 20px;
+  }
+  `,
   reactions: [
     ['', 'propertyChange.choiceData_', 'toData'],
     ['', 'propertyChange.otherData_', 'toData'],
@@ -106,7 +111,10 @@ foam.CLASS({
           .tag(choiceView, { data$: self.choiceData_$ }, self.choiceView_$)
           .start('m3')
             .show(self.showOther_$)
-            .add(self.otherLabel$)
+            .start()
+              .addClass('other-choice-label')
+              .add(self.otherLabel$)
+            .end()
           .end()
           .start()
             .show(self.showOther_$)

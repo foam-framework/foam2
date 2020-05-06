@@ -21,12 +21,29 @@ foam.ENUM({
 
   documentation: 'CRUD controller modes: CREATE/VIEW/EDIT.',
 
+  properties: [
+    {
+      class: 'String',
+      name: 'modePropertyName'
+    }
+  ],
+
+  methods: [
+    {
+      name: 'getVisibilityValue',
+      code: function(prop) {
+        return prop.visibility || prop[this.modePropertyName];
+      }
+    }
+  ],
+
   values: [
-    { name: 'CREATE', label: 'Create' },
-    { name: 'VIEW',   label: 'View'   },
-    { name: 'EDIT',   label: 'Edit'   }
+    { name: 'CREATE', label: 'Create', modePropertyName: 'createVisibility' },
+    { name: 'VIEW',   label: 'View',   modePropertyName: 'readVisibility'   },
+    { name: 'EDIT',   label: 'Edit',   modePropertyName: 'updateVisibility' }
   ]
 });
+
 
 foam.ENUM({
   package: 'foam.u2',
@@ -697,7 +714,7 @@ foam.CLASS({
     {
       documentation: `
         State of an Element after it has been removed from the DOM.
-        An unloaded Element can be readded to the DOM.
+        An unloaded Element can be re-added to the DOM.
       `,
       name: 'UNLOADED',
       type: 'foam.u2.UnloadedElementState',
@@ -793,7 +810,7 @@ foam.CLASS({
         '39': 'right',
         '40': 'down'
       }
-    },
+    }
   ],
 
   css: `
@@ -820,6 +837,12 @@ foam.CLASS({
       name: 'id',
       transient: true,
       factory: function() { return this.NEXT_ID(); }
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.ControllerMode',
+      name: 'controllerMode',
+      factory: function() { return this.__context__.controllerMode || foam.u2.ControllerMode.CREATE; }
     },
     {
       name: 'state',
@@ -850,7 +873,11 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'tooltip'
+      name: 'tooltip',
+      postSet: function(o, n) {
+        if ( n && ! o && this.state == this.LOADED ) this.initTooltip();
+        return n;
+      }
     },
     {
       name: 'parentNode',
@@ -1050,7 +1077,11 @@ foam.CLASS({
     },
 
     function initTooltip() {
-      if ( this.tooltip ) this.Tooltip.create({target: this, text:this.tooltip});
+      if ( this.tooltip ) {
+        this.Tooltip.create({target: this, text$: this.tooltip$});
+      } else if ( this.getAttribute('title') ) {
+        this.Tooltip.create({target: this, text$: this.attrSlot('title')});
+      }
     },
 
     function initKeyboardShortcuts() {
@@ -1418,6 +1449,11 @@ foam.CLASS({
       return this;
     },
 
+    function addClasses(a) {
+      a && a.forEach((i) => this.addClass(i));
+      return this;
+    },
+
     function enableCls(cls, enabled, opt_negate) {
       console.warn('Deprecated use of Element.enableCls(). Use enableClass() instead.');
       return this.enableClass(cls, enabled, opt_negate);
@@ -1679,7 +1715,15 @@ foam.CLASS({
       var listener = this.RenderSink.create({
         dao: dao,
         addRow: function(o) {
-          if ( update ) o = o.clone();
+          // No use adding new children if the parent has already been removed
+          if ( self.state === foam.u2.Element.UNLOADED ) return;
+
+          if ( update ) {
+            o = o.clone();
+            o.propertyChange.sub(function() {
+              o.copyFrom(dao.put(o.clone()));
+            });
+          }
 
           self.startContext({data: o});
 
@@ -1689,12 +1733,6 @@ foam.CLASS({
           // want anything to be added.
           if ( e === undefined )
             this.__context__.warn(self.SELECT_BAD_USAGE);
-
-          if ( update ) {
-            o.propertyChange.sub(function(_,__,prop,slot) {
-              dao.put(o.clone());
-            });
-          }
 
           self.endContext();
 
@@ -2113,6 +2151,63 @@ foam.CLASS({
 });
 
 
+foam.ENUM({
+  package: 'foam.u2',
+  name: 'PermissionedPropertyVisibilityConstraints',
+
+  properties: [
+    {
+      class: 'Array',
+      name: 'allowedValues',
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.DisplayMode',
+      name: 'fallbackValue'
+    }
+  ],
+
+  methods: [
+    function applyConstraints(displayMode) {
+      return this.allowedValues.some(x => displayMode === x)
+        ? displayMode
+        : this.fallbackValue;
+    }
+  ],
+
+  values: [
+    {
+      name: 'HIDDEN',
+      documentation: 'The visibility must be HIDDEN because the user lacks the requisite permission.',
+      allowedValues: [
+        foam.u2.DisplayMode.HIDDEN
+      ],
+      fallbackValue: foam.u2.DisplayMode.HIDDEN
+    },
+    {
+      name: 'RO_OR_HIDDEN',
+      documentation: 'The visibility must be read-only or hidden because the user has permission to read but not to write.',
+      allowedValues: [
+        foam.u2.DisplayMode.RO,
+        foam.u2.DisplayMode.HIDDEN
+      ],
+      fallbackValue: foam.u2.DisplayMode.RO
+    },
+    {
+      name: 'ANYTHING',
+      documentation: 'The user has all requisite permissions so the visibility is unconstrained.',
+      allowedValues: [
+        foam.u2.DisplayMode.RO,
+        foam.u2.DisplayMode.RW,
+        foam.u2.DisplayMode.HIDDEN,
+        foam.u2.DisplayMode.DISABLED
+      ],
+      fallbackValue: foam.u2.DisplayMode.RW
+    }
+  ]
+});
+
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'PropertyViewRefinements',
@@ -2138,15 +2233,23 @@ foam.CLASS({
       value: { class: 'foam.u2.TextField' }
     },
     {
-      class: 'Enum',
-      of: 'foam.u2.Visibility',
       name: 'visibility',
+      documentation: 'Exists for backwards compatability. You should set createVisibility, updateVisibility, or readVisibility instead. If this property is set, it will override the other three.'
+    },
+    {
+      name: 'createVisibility',
+      documentation: 'The display mode for this property when the controller mode is CREATE.',
       value: 'RW'
     },
     {
-      class: 'Function',
-      name: 'visibilityExpression',
-      value: null
+      name: 'readVisibility',
+      documentation: 'The display mode for this property when the controller mode is VIEW.',
+      value: 'RO'
+    },
+    {
+      name: 'updateVisibility',
+      documentation: 'The display mode for this property when the controller mode is EDIT.',
+      value: 'RW'
     },
     {
       class: 'Boolean',
@@ -2186,41 +2289,71 @@ foam.CLASS({
       return e;
     },
 
-    function createVisibilityFor(data$) {
-      var Visibility = foam.u2.Visibility;
+    function createVisibilityFor(data$, controllerMode$) {
+      /**
+       * Return a slot of DisplayMode based on:
+       *   * visibility
+       *   * createVisibility
+       *   * updateVisibility
+       *   * readVisibility
+       *   * readPermissionRequired
+       *   * writePermissionRequired
+       */
+      const DisplayMode = foam.u2.DisplayMode;
 
-      var slot = this.visibilityExpression ?
-        foam.core.ExpressionSlot.create({
-          obj$: data$,
-          code: this.visibilityExpression
-        }) :
-        foam.core.ConstantSlot.create({value: this.visibility});
+      var slot = foam.core.ProxySlot.create({
+        delegate$: controllerMode$.map((controllerMode) => {
+          var value = controllerMode.getVisibilityValue(this);
 
-      if ( this.permissionRequired ) {
+          if ( foam.String.isInstance(value) ) {
+            return foam.core.ConstantSlot.create({
+              value: DisplayMode[foam.String.constantize(value)]
+            });
+          }
+
+          if ( DisplayMode.isInstance(value) ) {
+            return foam.core.ConstantSlot.create({ value: value });
+          }
+
+          if ( foam.Function.isInstance(value) ) {
+            return foam.core.ExpressionSlot.create({
+              obj$: data$,
+              code: value
+            });
+          }
+
+          if ( foam.core.Slot.isInstance(value) ) {
+            return value;
+          }
+
+          throw new Error('Property.visibility must be set to one of the following: (1) a value of DisplayMode, (2) a function that returns a value of DisplayMode, or (3) a slot whose value is a value of DisplayMode. Property ' + this.name + ' was set to ' + value + ' instead.');
+        })
+      });
+
+      if ( this.readPermissionRequired || this.writePermissionRequired ) {
+        const PPVC = foam.u2.PermissionedPropertyVisibilityConstraints;
         var visSlot  = slot;
-        var permSlot = data$.map(data => {
-          if ( ! data || ! data.__subContext__.auth ) return Visibility.HIDDEN;
-          var auth = data.__subContext__.auth;
-
+        var permSlot = data$.map((data) => {
+          if ( ! data || ! data.__subContext__.auth ) return PPVC.HIDDEN;
+          var auth     = data.__subContext__.auth;
           var propName = this.name.toLowerCase();
-          var clsName  = this.forClass_.substring(this.forClass_.lastIndexOf('.') + 1).toLowerCase();
+          var clsName  = data.cls_.name.toLowerCase();
+          var canRead  = this.readPermissionRequired === false;
 
           return auth.check(null, `${clsName}.rw.${propName}`)
-              .then(function(rw) {
-                if ( rw ) return Visibility.RW;
-                return auth.check(null, `${clsName}.ro.${propName}`)
-                  .then(ro => ro ? Visibility.RO : Visibility.HIDDEN);
-              });
+            .then(function(rw) {
+              if ( rw ) return PPVC.ANYTHING;
+              if ( canRead ) return PPVC.RO_OR_HIDDEN;
+              return auth.check(null, `${clsName}.ro.${propName}`)
+                .then((ro) => ro ? PPVC.RO_OR_HIDDEN : PPVC.HIDDEN);
+            });
         });
 
-        slot = foam.core.ArraySlot.create({slots: [visSlot, permSlot]}).map(arr => {
+        slot = foam.core.ArraySlot.create({ slots: [visSlot, permSlot] }).map((arr) => {
           var vis  = arr[0];
-          var perm = arr[1] || Visibility.HIDDEN;
+          var perm = arr[1] || PPVC.HIDDEN;
 
-          return perm === Visibility.HIDDEN ? perm :
-            vis  === Visibility.HIDDEN ? vis :
-            perm === Visibility.RO ? perm :
-            vis;
+          return perm.applyConstraints(vis);
         });
       }
 
@@ -2234,12 +2367,25 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'StringDisplayWidthRefinement',
   refines: 'foam.core.String',
+  requires: [ 'foam.u2.view.StringView' ],
   properties: [
     {
       class: 'Int',
       name: 'displayWidth',
       expression: function(width) { return width; }
-    }
+    },
+    [ 'view', { class: 'foam.u2.view.StringView' } ]
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'ArrayViewRefinement',
+  refines: 'foam.core.Array',
+  requires: [ 'foam.u2.view.ArrayView' ],
+  properties: [
+    [ 'view', { class: 'foam.u2.view.ArrayView' } ]
   ]
 });
 
@@ -2248,6 +2394,7 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'StringArrayViewRefinement',
   refines: 'foam.core.StringArray',
+  requires: [ 'foam.u2.view.StringArrayView' ],
   properties: [
     [ 'view', { class: 'foam.u2.view.StringArrayView' } ]
   ]
@@ -2258,8 +2405,9 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'DateViewRefinement',
   refines: 'foam.core.Date',
+  requires: [ 'foam.u2.view.DateView' ],
   properties: [
-    [ 'view', { class: 'foam.u2.DateView' } ]
+    [ 'view', { class: 'foam.u2.view.DateView' } ]
   ]
 });
 
@@ -2268,8 +2416,9 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'DateTimeViewRefinement',
   refines: 'foam.core.DateTime',
+  requires: [ 'foam.u2.view.DateTimeView' ],
   properties: [
-    [ 'view', { class: 'foam.u2.DateTimeView' } ]
+    [ 'view', { class: 'foam.u2.view.DateTimeView' } ]
   ]
 });
 
@@ -2278,9 +2427,9 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'TimeViewRefinement',
   refines: 'foam.core.Time',
-  requires: [ 'foam.u2.TimeView' ],
+  requires: [ 'foam.u2.view.TimeView' ],
   properties: [
-    [ 'view', { class: 'foam.u2.TimeView' } ]
+    [ 'view', { class: 'foam.u2.view.TimeView' } ]
   ]
 });
 
@@ -2289,10 +2438,10 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'FloatViewRefinement',
   refines: 'foam.core.Float',
-  requires: [ 'foam.u2.FloatView' ],
+  requires: [ 'foam.u2.view.FloatView' ],
   properties: [
     [ 'displayWidth', 12 ],
-    [ 'view', { class: 'foam.u2.FloatView' } ]
+    [ 'view', { class: 'foam.u2.view.FloatView' } ]
   ]
 });
 
@@ -2301,22 +2450,22 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'IntViewRefinement',
   refines: 'foam.core.Int',
-  requires: [ 'foam.u2.IntView' ],
+  requires: [ 'foam.u2.view.IntView' ],
   properties: [
     [ 'displayWidth', 10 ],
-    [ 'view', { class: 'foam.u2.IntView' } ]
+    [ 'view', { class: 'foam.u2.view.IntView' } ]
   ]
 });
 
 
 foam.CLASS({
   package: 'foam.u2',
-  name: 'CurrencyViewRefinement',
-  refines: 'foam.core.Currency',
-  requires: [ 'foam.u2.CurrencyView' ],
+  name: 'UnitValueViewRefinement',
+  refines: 'foam.core.UnitValue',
+  requires: [ 'foam.u2.view.CurrencyView' ],
   properties: [
     [ 'displayWidth', 15 ],
-    [ 'view', { class: 'foam.u2.CurrencyView' } ]
+    [ 'view', { class: 'foam.u2.view.CurrencyView' } ]
   ]
 });
 
@@ -2329,20 +2478,16 @@ foam.CLASS({
   properties: [
     {
       name: 'view',
-      expression: function(label2, label2Formatter) {
+      expression: function(label, labelFormatter) {
         return {
           class: 'foam.u2.CheckBox',
-          label: label2,
-          labelFormatter: label2Formatter
+          label: label,
+          labelFormatter: labelFormatter
         };
       }
     },
     {
-      class: 'String',
-      name: 'label2'
-    },
-    {
-      name: 'label2Formatter'
+      name: 'labelFormatter'
     }
   ]
 });
@@ -2352,13 +2497,27 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'ColorViewRefinement',
   refines: 'foam.core.Color',
+  requires: [
+    'foam.u2.MultiView',
+    'foam.u2.TextField',
+    'foam.u2.view.ColorPicker',
+    'foam.u2.view.ModeAltView',
+    'foam.u2.view.ReadColorView'
+  ],
   properties: [
     {
       name: 'view',
       value: {
-        class: 'foam.u2.view.DualView',
-        viewa: 'foam.u2.TextField',
-        viewb: { class: 'foam.u2.view.ColorPicker', onKey: true }
+        class: 'foam.u2.view.ModeAltView',
+        readView: { class: 'foam.u2.view.ReadColorView' },
+        writeView: {
+          class: 'foam.u2.MultiView',
+          views: [
+            { class: 'foam.u2.TextField' },
+            { class: 'foam.u2.view.ColorPicker', onKey: true },
+            { class: 'foam.u2.view.ReadColorView' }
+          ]
+        }
       }
     }
   ]
@@ -2369,10 +2528,11 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'FObjectPropertyViewRefinement',
   refines: 'foam.core.FObjectProperty',
+  requires: [ 'foam.u2.view.FObjectPropertyView' ],
   properties: [
     {
       name: 'view',
-      value: { class: 'foam.u2.DetailView' },
+      value: { class: 'foam.u2.view.FObjectPropertyView' },
     },
     {
       name: 'validationTextVisible',
@@ -2436,13 +2596,9 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'ReferenceViewRefinement',
   refines: 'foam.core.Reference',
+  requires: [ 'foam.u2.view.ReferencePropertyView' ],
   properties: [
-    {
-      name: 'view',
-      value: {
-        class: 'foam.u2.view.ReferenceView'
-      }
-    }
+    [ 'view', { class: 'foam.u2.view.ReferencePropertyView' } ]
   ]
 });
 
@@ -2451,8 +2607,9 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'EnumViewRefinement',
   refines: 'foam.core.Enum',
+  requires: [ 'foam.u2.view.EnumView' ],
   properties: [
-    [ 'view',          { class: 'foam.u2.EnumView' } ],
+    [ 'view', { class: 'foam.u2.view.EnumView' } ],
     [ 'tableCellView', function(obj) { return this.get(obj).label; } ]
   ]
 });
@@ -2460,17 +2617,102 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2',
-  name: 'ControllerViewTrait',
+  name: 'ObjectViewRefinement',
+  refines: 'foam.core.Object',
+  requires: [ 'foam.u2.view.AnyView' ],
+  properties: [
+    [ 'view', { class: 'foam.u2.view.AnyView' } ]
+  ]
+});
 
-  documentation: 'Trait for adding a ControllerMode controllerMode Property.',
 
-  exports: [ 'controllerMode' ],
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'CodeViewRefinement',
+  refines: 'foam.core.Code',
+  requires: [ 'foam.u2.view.CodeView' ],
+  properties: [
+    [ 'view', { class: 'foam.u2.view.CodeView' } ]
+  ]
+});
 
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'DurationViewRefinement',
+  refines: 'foam.core.Duration',
+  requires: [
+    'foam.u2.view.IntView',
+    'foam.u2.view.TableCellFormatterReadView'
+  ],
+  properties: [
+    [ 'view', {
+      class: 'foam.u2.view.IntView',
+      readView: { class: 'foam.u2.view.TableCellFormatterReadView' }
+    } ]
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'PredicatePropertyRefinement',
+  refines: 'foam.mlang.predicate.PredicateProperty',
+  requires: [
+    'foam.u2.view.FObjectPropertyView',
+    'foam.u2.view.FObjectView'
+  ],
   properties: [
     {
-      class: 'Enum',
-      of: 'foam.u2.ControllerMode',
-      name: 'controllerMode'
+      name: 'view',
+      value: {
+        class: 'foam.u2.view.FObjectPropertyView',
+        writeView: {
+          class: 'foam.u2.view.FObjectView',
+          of: 'foam.mlang.predicate.Predicate'
+        }
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'ExprPropertyRefinement',
+  refines: 'foam.mlang.ExprProperty',
+  requires: [
+    'foam.u2.view.FObjectPropertyView',
+    'foam.u2.view.FObjectView'
+  ],
+  properties: [
+    {
+      name: 'view',
+      value: {
+        class: 'foam.u2.view.FObjectPropertyView',
+        writeView: {
+          class: 'foam.u2.view.FObjectView',
+          of: 'foam.mlang.Expr'
+        }
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'PasswordPropertyRefinement',
+  refines: 'foam.core.Password',
+  requires: [
+    'foam.u2.view.PasswordView'
+  ],
+  properties: [
+    {
+      name: 'view',
+      value: {
+        class: 'foam.u2.view.PasswordView',
+        passwordIcon: true
+      }
     }
   ]
 });
@@ -2505,12 +2747,6 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Enum',
-      of: 'foam.u2.ControllerMode',
-      name: 'controllerMode',
-      factory: function() { return this.__context__.controllerMode || foam.u2.ControllerMode.CREATE; }
-    },
-    {
       name: 'data',
       attribute: true
     },
@@ -2520,40 +2756,15 @@ foam.CLASS({
     // },
     {
       class: 'Enum',
-      of: 'foam.u2.Visibility',
-      name: 'visibility',
-      postSet: function() { this.updateMode_(this.mode); },
-      attribute: true,
-      value: 'RW'
-    },
-    {
-      class: 'Enum',
       of: 'foam.u2.DisplayMode',
       name: 'mode',
       attribute: true,
       postSet: function(_, mode) { this.updateMode_(mode); },
-      expression: function(visibility, controllerMode) {
-        if ( visibility === foam.u2.Visibility.HIDDEN ) {
-          return foam.u2.DisplayMode.HIDDEN;
-        }
-
-        if ( visibility === foam.u2.Visibility.RO ) {
-          return foam.u2.DisplayMode.RO;
-        }
-
-        if ( visibility === foam.u2.Visibility.DISABLED ) {
-          return foam.u2.DisplayMode.DISABLED;
-        }
-
-        if ( visibility === foam.u2.Visibility.FINAL && controllerMode !== foam.u2.ControllerMode.CREATE ) {
-          return foam.u2.DisplayMode.RO;
-        }
-
+      expression: function(controllerMode) {
         return controllerMode === foam.u2.ControllerMode.VIEW ?
           foam.u2.DisplayMode.RO :
           foam.u2.DisplayMode.RW ;
-      },
-      attribute: true
+      }
     }
   ],
 
@@ -2570,20 +2781,7 @@ foam.CLASS({
     },
 
     function fromProperty(p) {
-      this.visibility = p.visibility;
-
       this.attr('name', p.name);
-
-      if ( p.validateObj ) {
-        /*
-        var s = foam.core.ExpressionSlot.create({
-          obj$: this.__context__.data$,
-          code: p.validateObj
-        });
-        this.error_$.follow(s);
-        */
-//        this.error_$.follow(this.__context__.data.slot(p.validateObj));
-      }
     }
   ]
 });
@@ -2609,10 +2807,18 @@ foam.CLASS({
     'foam.u2.ActionView'
   ],
 
+  properties: [
+    {
+      name: 'view',
+      value: function(args, X) {
+        return { class: 'foam.u2.ActionView', action: this };
+      }
+    }
+  ],
+
   methods: [
     function toE(args, X) {
-      var view = foam.u2.ViewSpec.createView(
-        { class: 'foam.u2.ActionView', action: this }, args, this, X);
+      var view = foam.u2.ViewSpec.createView(this.view, args, this, X);
 
       if ( X.data$ && ! ( args && ( args.data || args.data$ ) ) ) {
         view.data$ = X.data$;
@@ -2690,18 +2896,6 @@ foam.CLASS({
       postSet: function(_, cs) {
         this.axioms_.push(foam.u2.SearchColumns.create({columns: cs}));
       }
-    }
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.u2',
-  name: 'PredicatePropertyRefine',
-  refines: 'foam.mlang.predicate.PredicateProperty',
-  properties: [
-    {
-      name: 'view',
-      value: { class: 'foam.u2.view.JSONTextView' }
     }
   ]
 });

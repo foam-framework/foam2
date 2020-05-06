@@ -71,6 +71,7 @@
         { name: 'obj', type: 'foam.core.FObject' },
         { name: 'oldObj', type: 'foam.core.FObject' },
         { name: 'ruler', type: 'foam.nanos.ruler.RuleEngine' },
+        { name: 'rule', type: 'foam.nanos.ruler.Rule' },
         { name: 'agency', type: 'foam.core.Agency' }
       ]
     }

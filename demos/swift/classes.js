@@ -74,7 +74,6 @@ var classes = [
   'foam.u2.ControllerMode',
   'foam.u2.DisplayMode',
   'foam.swift.ui.ScrollingViewController',
-  'foam.u2.Visibility',
   'somepackage.TestApp',
   'somepackage.TestDetailView',
   'somepackage.TestExtended',

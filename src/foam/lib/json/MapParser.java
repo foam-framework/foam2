@@ -11,21 +11,24 @@ import foam.lib.parse.*;
 public class MapParser
   extends ObjectNullParser
 {
-  public MapParser() {
+  private final static Parser instance__ = new MapParser();
+
+  public static Parser instance() { return instance__; }
+  private MapParser() {
     super(new Seq1(3,
-                   new Whitespace(),
-                   new Literal("{"),
-                   new Whitespace(),
-                   new Repeat(new Seq2(1, 5,
-                                       new Whitespace(),
-                                       new AnyKeyParser(),
-                                       new Whitespace(),
-                                       new Literal(":"),
-                                       new Whitespace(),
-                                       AnyParser.instance()),
-                              new Seq0(new Whitespace(), new Literal(","))),
-                   new Whitespace(),
-                   new Literal("}")));
+      Whitespace.instance(),
+      Literal.create("{"),
+      Whitespace.instance(),
+      new Repeat(new Seq2(1, 5,
+                 Whitespace.instance(),
+                 new AnyKeyParser(),
+                 Whitespace.instance(),
+                 Literal.create(":"),
+                 Whitespace.instance(),
+                 AnyParser.instance()),
+        new Seq0(Whitespace.instance(), Literal.create(","))),
+      Whitespace.instance(),
+      Literal.create("}")));
   }
 
   public PStream parse(PStream ps, ParserContext x) {

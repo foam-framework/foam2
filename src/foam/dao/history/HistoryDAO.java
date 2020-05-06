@@ -40,12 +40,13 @@ public class HistoryDAO
    * @return The formatted string
    */
   private String formatUserName(User user) {
+    if ( user == null ) return "";
     return user.getLastName() +", " +
         user.getFirstName() +
         "(" + user.getId() + ")";
   }
 
-  /**git
+  /**
    * Returns an array of updated properties
    *
    * @param currentValue current value
@@ -70,6 +71,7 @@ public class HistoryDAO
   @Override
   public FObject put_(X x, FObject obj) {
     User user = (User) x.get("user");
+    User agent = (User) x.get("agent");
     FObject current = this.find_(x, obj);
 
     try {
@@ -78,6 +80,7 @@ public class HistoryDAO
       HistoryRecord historyRecord = new HistoryRecord();
       historyRecord.setObjectId(objectId);
       historyRecord.setUser(formatUserName(user));
+      historyRecord.setAgent(formatUserName(agent));
       historyRecord.setTimestamp(new Date());
       if ( current != null ) {
         historyRecord.setUpdates(getUpdatedProperties(current, obj));
@@ -86,7 +89,7 @@ public class HistoryDAO
       historyDAO_.put_(x, historyRecord);
     } catch (Throwable t) {
       Logger l = (Logger) x.get("logger");
-      l.error("Unexpected error creating history record.", t);
+      l.error("Unexpected error creating history record for", obj.getClassInfo().getId(), t);
     }
 
     return super.put_(x, obj);

@@ -13,7 +13,8 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'deviceToken'
+      name: 'deviceToken',
+      section: 'administrative'
     }
   ]
 });

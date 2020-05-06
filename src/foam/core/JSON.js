@@ -732,7 +732,9 @@ foam.LIB({
                 "In foam.core.JSON.parse(Object): JSON parser tried to deserialize class '"
                   + cls + "' and failed. Is this class available to the client?"
               );
+              return null;
             }
+
             // TODO(markdittmer): Turn into static method: "parseJSON" once
             // https://github.com/foam-framework/foam2/issues/613 is fixed.
             if ( c.PARSE_JSON ) return c.PARSE_JSON(json, opt_class, opt_ctx);
@@ -740,7 +742,12 @@ foam.LIB({
             for ( var key in json ) {
               var prop = c.getAxiomByName(key);
               if ( prop ) {
-                json[key] = prop.fromJSON(json[key], opt_ctx, prop, this);
+                var js = prop.fromJSON(json[key], opt_ctx, prop, this);
+                if ( js == null && json[key] != 'null' ) {
+                  console.warn('Unable to parse property "' + key + '"', 'in', json);
+                } else {
+                  json[key] = js;
+                }
               }
             }
 
@@ -772,6 +779,7 @@ foam.LIB({
           return r;
         } else if ( foam.Object.isInstance(o) ) {
           for ( var key in o ) {
+            if ( ! o[key] ) continue;
             if ( key === 'type' && foam.String.isInstance(o[key]) ) {
               foam.core.type.toType(o[key]).refs().forEach(function(id) {
                 r.push(x.classloader.maybeLoad(id));

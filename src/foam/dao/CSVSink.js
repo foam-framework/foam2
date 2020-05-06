@@ -8,14 +8,12 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'CSVSink',
   extends: 'foam.dao.AbstractSink',
-  implements: [ 
+  implements: [
     'foam.core.Serializable'
   ],
   javaImports: [
     'foam.core.PropertyInfo',
-    'java.util.ArrayList',
-    'java.util.List',
-    'java.util.stream.Collectors'
+    'java.util.List'
   ],
 
   documentation: 'Sink runs the csv outputter, and contains the resulting string in this.csv',
@@ -24,7 +22,9 @@ foam.CLASS({
     {
       class: 'String',
       name: 'csv',
-      view: 'foam.u2.tag.TextArea'
+      view: 'foam.u2.tag.TextArea',
+      factory: function() { return this.outputter.toString(); },
+      javaGetter: 'return getOutputter().toString();'
     },
     {
       class: 'Class',
@@ -38,8 +38,8 @@ foam.CLASS({
         if ( ! this.of ) return [];
         if ( tc = this.of.getAxiomByName('tableColumns') ) return tc.columns;
         return this.of.getAxiomsByClass(foam.core.Property)
-          .filter(p => ! p.networkTransient)
-          .map(p => p.name);
+          .filter((p) => ! p.networkTransient)
+          .map((p) => p.name);
       },
       javaFactory: `
         if ( getOf() == null ) return new String[]{};
@@ -59,7 +59,7 @@ foam.CLASS({
       factory: function() {
         return foam.lib.csv.CSVOutputterImpl.create({
           of: this.of,
-          props: this.props,
+          props: this.props
         });
       },
       javaFactory: `
@@ -78,6 +78,7 @@ foam.CLASS({
         this.outputter.outputFObject(this.__context__, obj);
       },
       javaCode: `
+        setCsv("");
         getOutputter().outputFObject(getX(), (foam.core.FObject)obj);
       `
     },

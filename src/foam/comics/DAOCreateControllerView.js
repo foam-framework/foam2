@@ -70,7 +70,7 @@ foam.CLASS({
       }
     },
     {
-      class: 'String',
+      class: 'foam.u2.ViewSpec',
       name: 'detailView'
     }
   ],
@@ -109,9 +109,10 @@ foam.CLASS({
         .start()
           .addClass(this.myClass('detail-container'))
           .tag({
-            class: this.detailView,
+            class: 'foam.u2.view.FObjectView',
             of: this.dao.of,
-            data$: this.data$.dot('data')
+            data$: this.data$.dot('data'),
+            dataView: this.detailView
           })
         .end();
     }

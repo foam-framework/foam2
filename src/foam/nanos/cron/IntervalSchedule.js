@@ -29,11 +29,16 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.cron.TimeHMS',
-      name: 'duration'
+      name: 'duration',
+      factory: () => {
+        return foam.nanos.cron.TimeHMS.create();
+      }
     },
     {
       class: 'DateTime',
-      name: 'start'
+      name: 'start',
+      factory: function() { return new Date(); },
+      javaFactory: 'return new Date();'
     }
   ],
 
@@ -71,4 +76,3 @@ return next.getTime();
     }
   ]
 });
-

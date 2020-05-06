@@ -100,16 +100,25 @@ foam.CLASS({
       name: 'columns',
       view: {
         class: 'foam.u2.view.FObjectArrayView',
-        valueView: {
-          class: 'foam.u2.detail.SectionView',
-          sectionName: '_defaultSection'
-        },
-        mode: 'RO'
+        valueView: { class: 'foam.u2.view.ColumnConfigView' },
+        mode: 'RO',
+        enableAdding: false,
+        enableRemoving: false
       },
       factory: function() {
-        return this.allColumns.map(c => {
-          return this.ColumnConfig.create({ of: this.of, axiom: c });
+        var rtn = this.allColumns.map(([axiomName, overridesMap]) => {
+          const axiom = this.of.getAxiomByName(axiomName);
+          if ( overridesMap ) axiom = axiom.clone().copyFrom(overridesMap);
+          return this.ColumnConfig.create({ of: this.of, axiom: axiom });
         });
+
+        // Sort columns alphabetically. This doesn't quite work since what we
+        // actually display is up to tableHeaderFormatter, which works directly
+        // with the view instead of returning a String, so there's no way for
+        // us to actually know what the user is going to see.
+        rtn.sort((l, r) => l.label < r.label ? -1 : 1);
+
+        return rtn;
       }
     },
     {
@@ -124,16 +133,24 @@ foam.CLASS({
   ],
   actions: [
     {
-      name: 'resetAll',
-      code: function() {
-        this.columns.forEach(c => c.visibility = 'DEFAULT');
-      }
-    },
-    {
       name: 'cancel',
       code: function() {
         this.stack.back();
+      },
+      view: function() {
+        return {
+          class: 'foam.u2.ActionView',
+          action: this,
+          buttonStyle: 'SECONDARY'
+        };
       }
+    },
+    {
+      name: 'resetAll',
+      code: function() {
+        this.columns.forEach(c => c.visibility = 'DEFAULT');
+      },
+      confirmationRequired: true
     },
     {
       name: 'save',

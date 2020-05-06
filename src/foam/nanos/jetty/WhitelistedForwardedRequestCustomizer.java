@@ -171,7 +171,7 @@ public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCusto
      */
     if ( isIPv6HexCompressedAddress(leftMost) || isIPv6StdAddress(leftMost) ) {
       // we need to enclose the string with square brackets
-      StringBuffer ipv6Formatted = new StringBuffer(leftMost);
+      StringBuilder ipv6Formatted = new StringBuilder(leftMost);
       ipv6Formatted.append(']');
       ipv6Formatted.insert(0, '[');
 

@@ -33,6 +33,13 @@ foam.CLASS({
   ],
 
   methods: [
+    function method(m) {
+      if ( m.setter ) {
+        m.visibility = 'protected';
+      }
+      return this.SUPER(m);
+    },
+
     function writeDeclarations(o) {
       o.indent();
       o.out(this.declarations, ';\n\n');

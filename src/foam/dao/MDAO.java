@@ -22,7 +22,7 @@ import java.util.Set;
  The MDAO class for an ordering, fast lookup, single value,
  index multiplexer, or any other MDAO select() assistance class.
 
- The assitance class TreeiNdex implements the
+ The assitance class TreeIndex implements the
  data nodes that hold the indexed items and plan and execute
  queries. For any particular operational Index, there may be
  many IndexNode instances:
@@ -89,7 +89,7 @@ public class MDAO
   }
 
   public FObject objOut(FObject obj) {
-    return AbstractFObject.maybeClone(obj);
+    return obj;
   }
 
   public FObject put_(X x, FObject obj) {
@@ -176,10 +176,9 @@ public class MDAO
     if ( state != null && predicate != null && plan.cost() > 10 && plan.cost() >= index_.size(state) ) {
       pm = new PM(this.getClass(), "MDAO:UnindexedSelect:" + getOf().getId());
       if ( ! unindexed_.contains(getOf().getId())) {
-        if ( ! predicate.equals(simplePredicate) ) {
-          if ( logger != null ) {
+        if ( ! predicate.equals(simplePredicate) && 
+             logger != null ) {
             logger.debug(String.format("The original predicate was %s but it was simplified to %s.", predicate.toString(), simplePredicate.toString()));
-          }
         }
         unindexed_.add(getOf().getId());
         if ( logger != null ) {

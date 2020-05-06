@@ -55,7 +55,6 @@ public class WebSocketServer
       String                path       = conn.getResourceDescriptor();
       String[]              urlParts   = path.split("/");
       String                serviceKey = urlParts[2];
-      Object                service    = getX().get(serviceKey);
       foam.dao.DAO          nSpecDAO   = (foam.dao.DAO) getX().get("nSpecDAO");
       foam.nanos.boot.NSpec spec       = (foam.nanos.boot.NSpec) nSpecDAO.find(serviceKey);
 

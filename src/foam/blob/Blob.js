@@ -377,15 +377,33 @@ foam.CLASS({
   ],
 
   methods: [
-    function compareTo(other) {
-      return foam.blob.IdentifiedBlob.isInstance(other) && other.id == this.id;
-    },
-
     function read(buffer, offset) {
       return this.delegate.then(function(d) {
         return d.read(buffer, offset);
       });
-    }
+    },
+
+    {
+      name: 'compareTo',
+      type: 'int',
+      args:
+        [
+          {
+            name: 'o',
+            type: 'Object',
+          }
+        ],
+      javaCode: `
+        IdentifiedBlob o2 = (IdentifiedBlob) o;
+        if ( o2 == null ) return 1;
+        if ( o2 == this ) return 0;
+        return foam.util.SafetyUtil.compare(getId(), o2.getId());
+      `,
+      code: function(other) {
+        if ( other === null ) return 1;
+        return this.id.localeCompare(other.id);
+      },
+    },
   ]
 });
 
@@ -489,10 +507,11 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'org.apache.commons.io.IOUtils',
-    'org.apache.commons.codec.binary.Hex',
     'java.io.File',
     'java.io.FileOutputStream',
+    'java.io.IOException',
+    'org.apache.commons.codec.binary.Hex',
+    'org.apache.commons.io.IOUtils',
     'foam.nanos.fs.Storage'
   ],
 
@@ -711,18 +730,18 @@ return file;`
 }
 
 this.setup(x);
-HashingOutputStream os = null;
+long size = blob.getSize();
+File tmp = allocateTmp(x, 1);
 
-try {
-  long size = blob.getSize();
-  File tmp = allocateTmp(x, 1);
-  os = new HashingOutputStream(new FileOutputStream(tmp));
+try ( HashingOutputStream os = new HashingOutputStream(new FileOutputStream(tmp)) ) {
   blob.read(os, 0, size);
   os.close();
 
   String digest = new String(Hex.encodeHexString(os.digest()));
   File dest = x.get(Storage.class).get(getSha256() + File.separator + digest);
-  tmp.renameTo(dest);
+  if ( !tmp.renameTo(dest) ) {
+    throw new IOException("Rename failed!");
+  }
 
   IdentifiedBlob result = new IdentifiedBlob();
   result.setId(digest);
@@ -730,9 +749,8 @@ try {
   return result;
 } catch (Throwable t) {
   return null;
-} finally {
-  IOUtils.closeQuietly(os);
-}`
+}
+`
     },
     function filename(blob) {
       if ( ! foam.blob.IdentifiedBlob.isInstance(blob) ) return null;

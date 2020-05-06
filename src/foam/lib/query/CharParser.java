@@ -12,13 +12,15 @@ import foam.lib.parse.PStream;
 import foam.lib.parse.ParserContext;
 import foam.lib.parse.Range;
 
-public class CharParser extends foam.lib.parse.ProxyParser {
+public class CharParser
+  extends foam.lib.parse.ProxyParser
+{
 
   public CharParser() {
     setDelegate(
-        new Alt(new Range('A', 'z'), new Range('0', '9'), new Literal("-"), new Literal("^"),
-            new Literal("_"), new Literal("@"), new Literal("%"), new Literal("."))
-        );
+      new Alt(Range.create('A', 'z'), Range.create('0', '9'), Literal.create("-"), Literal.create("^"),
+          Literal.create("_"), Literal.create("@"), Literal.create("%"), Literal.create("."))
+      );
   }
 
   @Override

@@ -3,6 +3,7 @@
  * Copyright 2019 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
+
 foam.CLASS({
   package: 'foam.nanos.crunch',
   name: 'Capability',
@@ -13,14 +14,11 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.core.FObject',
-    'foam.core.X',
+
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.dao.Sink',
     'foam.mlang.sink.Count',
-    'foam.nanos.crunch.Capability',
-    'foam.nanos.crunch.CapabilityCapabilityJunction',
     'java.util.List',
     'static foam.mlang.MLang.*'
   ],
@@ -31,6 +29,7 @@ foam.CLASS({
 
   tableColumns: [
     'id',
+    'name',
     'description',
     'version',
     'enabled',
@@ -39,21 +38,50 @@ foam.CLASS({
     'daoKey'
   ],
 
+  sections: [
+    {
+      name: '_defaultSection',
+      title: 'Administrative'
+    },
+    {
+      name: 'basicInfo',
+      title: 'Basic Info'
+    },
+    {
+      name: 'uiSettings',
+      title: 'UI Settings',
+      help: 'These properties are used to control how this capability appears in the GUI.'
+    },
+    {
+      name: 'capabilityRelationships',
+      title: 'Capability Relationships'
+    }
+  ],
+
   properties: [
-    
     {
       name: 'id',
-      class: 'String'
+      class: 'String',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      section: 'basicInfo'
     }, 
+    {
+      name: 'name',
+      class: 'String',
+      section: 'basicInfo'
+    },
     {
       name: 'icon',
       class: 'Image',
-      documentation: `Path to capability icon`
+      documentation: `Path to capability icon`,
+      section: 'uiSettings'
     },
     {
       name: 'description',
       class: 'String',
-      documentation: `Description of capability`
+      documentation: `Description of capability`,
+      section: 'uiSettings'
     },
     {
       name: 'notes',
@@ -63,6 +91,14 @@ foam.CLASS({
         rows: 12, 
         cols: 120
       }
+    },
+    {
+      name: 'price',
+      class: 'Long'
+    },
+    {
+      name: 'keywords',
+      class: 'StringArray'
     },
     {
       name: 'version',
@@ -78,12 +114,19 @@ foam.CLASS({
     {
       name: 'visible',
       class: 'Boolean',
-      documentation: `Hide sub-capabilities which aren't top-level and individually selectable. when true, capability is visible to the user`
+      documentation: `Hide sub-capabilities which aren't top-level and individually selectable. when true, capability is visible to the user`,
+      section: 'uiSettings'
     },
     {
       name: 'expiry',
       class: 'DateTime',
       documentation: `Datetime of when capability is no longer valid`
+    },
+    {
+      name: 'duration',
+      class: 'Int',
+      documentation: `To be used in the case where expiry is duration-based, represents the number of DAYS a junction is valid for before expiring.
+      The UserCapabilityJunction object will have its expiry configured to a DateTime based on the lower value of the two, expiry and duration`
     },
     {
       name: 'of',
@@ -97,8 +140,7 @@ foam.CLASS({
     },
     {
       name: 'daoKey',
-      class: 'String',
-      visibility: 'RO'
+      class: 'String'
     }
   ],
 
@@ -116,18 +158,18 @@ foam.CLASS({
         if ( ! this.getEnabled() ) return false;
 
         // check if permission is a capability string implied by this permission
-        if ( this.stringImplies(this.getId(), permission) ) return true;
+        if ( this.stringImplies(this.getName(), permission) ) return true;
 
         String[] permissionsGranted = this.getPermissionsGranted();
         for ( String permissionName : permissionsGranted ) {
           if ( this.stringImplies(permissionName, permission) ) return true; 
         }
 
-        List<CapabilityCapabilityJunction> prereqs = ((ArraySink) this.getPrerequisites(x).getJunctionDAO().where(EQ(CapabilityCapabilityJunction.TARGET_ID, (String) this.getId())).select(new ArraySink())).getArray();
+        List<CapabilityCapabilityJunction> prereqs = ((ArraySink) this.getPrerequisites(x).getJunctionDAO().where(EQ(CapabilityCapabilityJunction.SOURCE_ID, (String) this.getId())).select(new ArraySink())).getArray();
 
         DAO capabilityDAO = (DAO) x.get("capabilityDAO");
         for ( CapabilityCapabilityJunction prereqJunction : prereqs ) {
-          Capability capability = (Capability) capabilityDAO.find(prereqJunction.getSourceId());
+          Capability capability = (Capability) capabilityDAO.find(prereqJunction.getTargetId());
           if ( capability.implies(x, permission) ) return true;
         }
         return false;
@@ -175,7 +217,18 @@ foam.RELATIONSHIP({
   targetModel: 'foam.nanos.crunch.Capability',
   cardinality: '*:*',
   forwardName: 'capabilities',
-  inverseName: 'users'
+  inverseName: 'users',
+  sourceProperty: {
+    section: 'capabilities',
+    updateVisibility: 'RO'
+  }
+});
+
+foam.CLASS({
+  package: 'foam.nanos.crunch',
+  name: 'CRUNCHUserRefinement',
+  refines: 'foam.nanos.auth.User',
+  sections: [{ name: 'capabilities' }]
 });
 
 foam.RELATIONSHIP({
@@ -184,7 +237,13 @@ foam.RELATIONSHIP({
   cardinality: '*:*',
   forwardName: 'deprecated',
   inverseName: 'deprecating',
-  junctionDAOKey: 'deprecatedCapabilityJunctionDAO'
+  junctionDAOKey: 'deprecatedCapabilityJunctionDAO',
+  sourceProperty: {
+    section: 'capabilityRelationships'
+  },
+  targetProperty: {
+    section: 'capabilityRelationships'
+  }
 });
 
 foam.RELATIONSHIP({
@@ -193,5 +252,11 @@ foam.RELATIONSHIP({
   cardinality: '*:*',
   forwardName: 'prerequisites',
   inverseName: 'dependents',
-  junctionDAOKey: 'prerequisiteCapabilityJunctionDAO'
+  junctionDAOKey: 'prerequisiteCapabilityJunctionDAO',
+  sourceProperty: {
+    section: 'capabilityRelationships'
+  },
+  targetProperty: {
+    section: 'capabilityRelationships'
+  }
 });

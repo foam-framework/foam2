@@ -6,15 +6,27 @@
 
 package foam.util;
 
+import java.util.regex.Pattern;
+import foam.core.FObject;
+
 /** Convenience methods for performing standard operations with null checks. **/
 public class SafetyUtil {
+
+  // TODO: reuse Patterns and thread-local matchers
+  public static void assertPattern(String val, String patternStr, String argumentName)
+    throws IllegalArgumentException
+  {
+    Pattern pattern = Pattern.compile(patternStr);
+    if ( ! pattern.matcher(val).matches() )
+      throw new IllegalArgumentException(argumentName);
+  }
 
   public static boolean equals(Object o1, Object o2) {
     return compare(o1, o2) == 0;
   }
 
   public static int compare(Object o1, Object o2) {
-    if ( o1 == null && o2 == null ) return 0;
+    if ( o1 == o2   ) return  0;
     if ( o2 == null ) return  1;
     if ( o1 == null ) return -1;
 
@@ -37,8 +49,8 @@ public class SafetyUtil {
       double d2 = ((Number) o2).doubleValue();
 
       if ( d1 == d2 ) return  0;
-      if ( d1  > d2 ) return  1;
-      if ( d1  < d2 ) return -1;
+      if ( d1 > d2  ) return  1;
+      return -1;
     }
 
     if ( ! (o1 instanceof Comparable && o2 instanceof Comparable) ) return 0;
@@ -46,6 +58,62 @@ public class SafetyUtil {
     if ( ! (o1 instanceof Comparable) ) return -1;
 
     return ((Comparable) o1).compareTo(o2);
+  }
+
+  public static int compare(Object[] o1, Object[] o2) {
+    if ( o1 == o2   ) return  0;
+    if ( o2 == null ) return  1;
+    if ( o1 == null ) return -1;
+
+    int d = compare(o1.length, o2.length);
+    if ( d != 0 ) return d;
+
+    for ( int i = 0 ; i < o1.length ; i++ ) {
+      d = compare(o1[i], o2[i]);
+      if ( d != 0 ) return d;
+    }
+
+    return 0;
+  }
+
+  public static int compare(FObject o1, FObject o2) {
+    if ( o1 == o2   ) return  0;
+    if ( o2 == null ) return  1;
+    if ( o1 == null ) return -1;
+
+    return o1.compareTo(o2);
+  }
+
+  public static int compare(boolean o1, boolean o2) {
+    return o1 == o2 ? 0 : o1 ? 1 : -1;
+  }
+
+  public static int compare(String o1, String o2) {
+    if ( o1 == null && o2 == null ) return 0;
+    if ( o1 == null ) return -1;
+    if ( o2 == null ) return  1;
+
+    return o1.compareTo(o2);
+  }
+
+  public static int compare(short o1, short o2) {
+    return o1 == o2 ? 0 : o1 < o2 ? -1 : 1;
+  }
+
+  public static int compare(int o1, int o2) {
+    return o1 == o2 ? 0 : o1 < o2 ? -1 : 1;
+  }
+
+  public static int compare(long o1, long o2) {
+    return o1 == o2 ? 0 : o1 < o2 ? -1 : 1;
+  }
+
+  public static int compare(float o1, float o2) {
+    return o1 == o2 ? 0 : o1 < o2 ? -1 : 1;
+  }
+
+  public static int compare(double o1, double o2) {
+    return o1 == o2 ? 0 : o1 < o2 ? -1 : 1;
   }
 
   public static Object deepClone(Object o) {
@@ -63,7 +131,7 @@ public class SafetyUtil {
 
   public static java.util.Map deepCloneMap(java.util.Map o) {
     try {
-      java.util.Map result = (java.util.Map)o.getClass().newInstance();
+      java.util.Map result = (java.util.Map) o.getClass().newInstance();
 
       java.util.Iterator<java.util.Map.Entry> entries = o.entrySet().iterator();
 

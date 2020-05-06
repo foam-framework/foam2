@@ -193,7 +193,6 @@ public class POP3EmailService
   
   public String sendEmail(String requestor,String subject,String body) {
     String host = "pop.gmail.com";// change accordingly
-    String mailStoreType = "pop3";
     String username = "pat.dev.test1@gmail.com";// change accordingly
     String password = "Choose123";// change accordingly
     Properties props = new Properties();

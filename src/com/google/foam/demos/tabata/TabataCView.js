@@ -1,18 +1,7 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2016 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
@@ -34,13 +23,13 @@ foam.CLASS({
      this.SUPER();
 
      var self = this;
-     var d = this.data;
-     var i = this.position;
-     var r = this.round;
-     var n = d.workTime + d.restTime;
-     var a = -Math.PI/2 + (i-d.restTime-1)/n*Math.PI*2;
+     var d    = this.data;
+     var i    = this.position;
+     var r    = this.round;
+     var n    = d.workTime + d.restTime;
+     var a    = -Math.PI/2 + (i-d.restTime-1)/n*Math.PI*2;
 
-     this.border      = i > d.restTime ? '#0f0' : r > 1 ? '#f00' : 'yellow';
+     this.border      = i >= d.restTime ? '#0f0' : r > 1 ? '#f00' : 'yellow';
      this.arcWidth    = this.maxRadius / 2 / d.rounds - 4;
      this.radius      = this.maxRadius - r * this.maxRadius / 2 / d.rounds;
      this.start       = a+0.01;
@@ -52,12 +41,12 @@ foam.CLASS({
        self.shadowBlur = 0;
 
        if ( d.currentRound === self.round ) {
-         self.alpha = 0.75;
+         self.alpha      = 0.75;
          self.shadowBlur = 15;
        }
 
        if ( d.seconds === self.second ) {
-         self.alpha = 1;
+         self.alpha      = 1;
          self.shadowBlur = 25;
        }
 
@@ -75,17 +64,17 @@ foam.CLASS({
   extends: 'foam.graphics.Box',
 
   requires: [
-    'foam.graphics.Label',
     'foam.graphics.Circle',
+    'foam.graphics.Label',
     'Tick'
   ],
 
   exports: [ 'data' ],
 
   properties: [
-    [ 'color', 'black' ],
-    [ 'width',  500 ],
-    [ 'height', 500 ],
+    [ 'color',       'black' ],
+    [ 'width',       500 ],
+    [ 'height',      500 ],
     [ 'autoRepaint', true ],
     'data'
   ],
@@ -94,8 +83,10 @@ foam.CLASS({
    function initCView() {
      this.SUPER();
 
-//     var self = this;
-//     this.second$.sub(function() { self.invalidated.pub(); });
+     this.data.rounds$.sub(this.redraw2);
+     this.data.workTime$.sub(this.redraw2);
+     this.data.restTime$.sub(this.redraw2);
+     this.data.setupTime$.sub(this.redraw2);
 
      var d      = this.data;
      var second = 0;
@@ -105,21 +96,21 @@ foam.CLASS({
        var n = d.workTime + d.restTime;
        for ( var i = r ? 0 : d.restTime - d.setupTime ; i < n ; i++ ) {
          this.add(this.Tick.create({
-           x: this.width/2,
-           y: this.height/2,
+           x:         this.width/2,
+           y:         this.height/2,
            maxRadius: R,
-           position: i,
-           round: r+1,
-           second: second++
+           position:  i,
+           round:     r+1,
+           second:    second++
          }));
        }
      }
 
      var colors = {
-       Rest: '#f00',
+       Rest:     '#f00',
        Finished: 'white',
-       "WORK!": '#0f0',
-       Warmup: 'yellow'
+       "WORK!":  '#0f0',
+       Warmup:   'yellow'
      };
 
      var color$ = d.action$.map(function(s) { return colors[s]; });
@@ -137,45 +128,52 @@ foam.CLASS({
        }),
        */
        this.Label.create({
-         font: '50px Arial',
-         width: 60,
-         height: 60,
-         x: this.width  / 2 - 30,
-         y: this.height / 2 - 20,
-         align: 'center',
-         shadowBlur: 20,
-         color$: color$,
+         font:         '50px Arial',
+         width:        60,
+         height:       60,
+         x:            this.width  / 2 - 30,
+         y:            this.height / 2 - 20,
+         align:        'center',
+         shadowBlur:   20,
+         color$:       color$,
          shadowColor$: color$,
-         text$: d.action$
+         text$:        d.action$
        }),
        this.Label.create({
-         font: '30px Arial',
-         width: 60,
-         height: 60,
-         x: this.width  / 2 - 30,
-         y: this.height / 2 - 85,
-         align: 'center',
-         shadowBlur: 10,
+         font:        '30px Arial',
+         width:       60,
+         height:      60,
+         x:           this.width  / 2 - 30,
+         y:           this.height / 2 - 85,
+         align:       'center',
+         shadowBlur:  10,
          shadowColor: 'white',
-         color: 'white',
-         text$: d.slot(function(currentRound, rounds) { return currentRound + ' / ' + rounds; })
+         color:       'white',
+         text$:       d.slot(function(currentRound, rounds) { return currentRound + ' / ' + rounds; })
        }),
        this.Label.create({
-         font: '40px Arial',
-         width: 60,
-         height: 60,
-         x: this.width  / 2 - 30,
-         y: this.height / 2 + 35,
-         align: 'center',
-         shadowBlur: 10,
-         color$: color$,
+         font:         '40px Arial',
+         width:        60,
+         height:       60,
+         x:            this.width  / 2 - 30,
+         y:            this.height / 2 + 35,
+         align:        'center',
+         shadowBlur:   10,
+         color$:       color$,
          shadowColor$: color$,
          // TODO: why is this necessary?
-         text$: d.remaining$.map(function(s) { return s; })
+         text$:        d.remaining$
        })
      );
    }
-  ]
+ ],
+
+ listeners: [
+   function redraw2() {
+     this.removeAllChildren();
+     this.initCView();
+   }
+ ]
 });
 
 
@@ -184,16 +182,16 @@ foam.CLASS({
   extends: 'foam.graphics.Box',
 
   requires: [
-    'foam.graphics.Label',
-    'foam.graphics.Box'
+    'foam.graphics.Box',
+    'foam.graphics.Label'
   ],
 
   exports: [ 'data' ],
 
   properties: [
-    [ 'color', 'black' ],
-    [ 'width',  100 ],
-    [ 'height', 500 ],
+    [ 'color',       'black' ],
+    [ 'width',       100 ],
+    [ 'height',      500 ],
     [ 'autoRepaint', true ],
     'data'
   ],
@@ -202,8 +200,8 @@ foam.CLASS({
    function initCView() {
      this.SUPER();
 
-     var d = this.data;
-     var second = 0;
+     var d       = this.data;
+     var second  = 0;
      var seconds = d.rounds * ( d.workTime + d.restTime ) - d.restTime + d.setupTime;
 
      for ( var r = 0 ; r < d.rounds ; r++ ) {
@@ -211,16 +209,16 @@ foam.CLASS({
 
        this.add(
          this.Box.create({
-           color: r ? '#f00' : 'yellow',
-           x: 30,
-           y: second / seconds * this.height,
-           width : this.width - 20,
+           color:  r ? '#f00' : 'yellow',
+           x:      30,
+           y:      second / seconds * this.height,
+           width :  this.width - 20,
            height: restTime / seconds * this.height
          }),
          this.Box.create({
-           color: '#0f0',
-           x: 30,
-           y: (second+restTime) / seconds * this.height,
+           color:  '#0f0',
+           x:      30,
+           y:      (second+restTime) / seconds * this.height,
            width : this.width - 20,
            height: d.workTime / seconds * this.height
          })

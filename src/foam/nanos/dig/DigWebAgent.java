@@ -7,19 +7,16 @@
 package foam.nanos.dig;
 
 import foam.core.*;
+import foam.dao.AbstractDAO;
 import foam.dao.ArraySink;
 import foam.dao.DAO;
-import foam.lib.csv.CSVSupport;
+import foam.lib.*;
 import foam.lib.csv.CSVOutputter;
+import foam.lib.csv.CSVSupport;
 import foam.lib.json.JSONParser;
-import foam.lib.json.OutputterMode;
 import foam.lib.json.Outputter;
-import foam.lib.AndPropertyPredicate;
-import foam.lib.NetworkPropertyPredicate;
+import foam.lib.json.OutputterMode;
 import foam.lib.parse.*;
-import foam.lib.PermissionedPropertyPredicate;
-import foam.lib.PropertyPredicate;
-import foam.lib.StoragePropertyPredicate;
 import foam.mlang.MLang;
 import foam.mlang.predicate.Predicate;
 import foam.nanos.boot.NSpec;
@@ -28,13 +25,17 @@ import foam.nanos.http.*;
 import foam.nanos.logger.Logger;
 import foam.nanos.logger.PrefixLogger;
 import foam.nanos.notification.email.EmailMessage;
-import foam.util.Emails.EmailsUtility;
 import foam.nanos.pm.PM;
+import foam.util.Emails.EmailsUtility;
 import foam.util.SafetyUtil;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringReader;
 import java.lang.Exception;
 import java.net.URL;
 import java.nio.CharBuffer;
@@ -58,6 +59,7 @@ public class DigWebAgent
     Format              format   = (Format) p.get(Format.class);
     String              id       = p.getParameter("id");
     String              q        = p.getParameter("q");
+    String              limit    = p.getParameter("limit");
     DAO                 nSpecDAO = (DAO) x.get("AuthenticatedNSpecDAO");
     String[]            email    = p.getParameterValues("email");
     boolean             emailSet = email != null && email.length > 0 && ! SafetyUtil.isEmpty(email[0]);
@@ -90,7 +92,7 @@ public class DigWebAgent
          DigErrorMessage error = new DAONotFoundException.Builder(x)
                                       .setMessage("DAO not found: " + daoName)
                                       .build();
-        outputException(x, resp, format, out, error);
+        DigUtil.outputException(x, error, format);
         return;
       }
 
@@ -98,9 +100,11 @@ public class DigWebAgent
       try {
         nspec.checkAuthorization(x);
       } catch (foam.nanos.auth.AuthorizationException e) {
-        outputException(x, resp, format, out, new foam.nanos.dig.exception.AuthorizationException.Builder(x)
-          .setMessage(e.getMessage())
-          .build());
+        DigUtil.outputException(x,
+          new foam.nanos.dig.exception.AuthorizationException.Builder(x)
+            .setMessage(e.getMessage())
+            .build(),
+          format);
         return;
       }
 
@@ -110,7 +114,7 @@ public class DigWebAgent
         DigErrorMessage error = new DAONotFoundException.Builder(x)
                                       .setMessage("DAO not found: " + daoName)
                                       .build();
-        outputException(x, resp, format, out, error);
+        DigUtil.outputException(x, error, format);
         return;
       }
 
@@ -124,7 +128,14 @@ public class DigWebAgent
       logger.debug("predicate", pred.getClass(), pred.toString());
       dao = dao.where(pred);
 
-      if ( Command.put == command ) {
+      if ( ! SafetyUtil.isEmpty(limit) ) {
+        long l = Long.valueOf(limit);
+        if ( l != AbstractDAO.MAX_SAFE_INTEGER ) {
+          dao = dao.limit(l);
+        }
+      }
+
+      if ( Command.PUT == command ) {
         String returnMessage = "success";
 
         if ( Format.JSON == format ) {
@@ -136,7 +147,7 @@ public class DigWebAgent
           // let FObjectArray parse first
           if ( SafetyUtil.isEmpty(data) ) {
               DigErrorMessage error = new EmptyDataException.Builder(x).build();
-              outputException(x, resp, format, out, error);
+              DigUtil.outputException(x, error, format);
               return;
           }
           try {
@@ -146,7 +157,7 @@ public class DigWebAgent
               DigErrorMessage error = new ParsingErrorException.Builder(x)
                                             .setMessage("Invalid JSON Format")
                                             .build();
-              outputException(x, resp, format, out, error);
+              DigUtil.outputException(x, error, format);
               return;
             }
 
@@ -175,19 +186,22 @@ public class DigWebAgent
             DigErrorMessage error = new DAOPutException.Builder(x)
                                           .setMessage(e.getMessage())
                                           .build();
-            outputException(x, resp, format, out, error);
+            DigUtil.outputException(x, error, format);
             return;
           }
         } else if ( Format.XML == format ) {
           XMLSupport      xmlSupport = new XMLSupport();
           XMLInputFactory factory    = XMLInputFactory.newInstance();
+          factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
 
           if ( SafetyUtil.isEmpty(data) ) {
             DigErrorMessage error = new EmptyDataException.Builder(x)
               .build();
-            outputException(x, resp, format, out, error);
+            DigUtil.outputException(x, error, format);
             return;
           }
+
+          resp.setContentType("text/html");
 
           StringReader    reader     = new StringReader(data.toString());
           XMLStreamReader xmlReader  = factory.createXMLStreamReader(reader);
@@ -200,7 +214,7 @@ public class DigWebAgent
             DigErrorMessage error = new ParsingErrorException.Builder(x)
                                       .setMessage("Invalid XML Format")
                                       .build();
-            outputException(x, resp, format, out, error);
+            DigUtil.outputException(x, error, format);
             return;
           }
 
@@ -214,7 +228,7 @@ public class DigWebAgent
           if ( SafetyUtil.isEmpty(data) && SafetyUtil.isEmpty(fileAddress) ) {
             DigErrorMessage error = new EmptyDataException.Builder(x)
               .build();
-            outputException(x, resp, format, out, error);
+            DigUtil.outputException(x, error, format);
             return;
           }
 
@@ -234,7 +248,7 @@ public class DigWebAgent
                 DigErrorMessage error = new GeneralException.Builder(x)
                   .setMessage("File Not Found Exception")
                   .build();
-                outputException(x, resp, format, out, error);
+                DigUtil.outputException(x, error, format);
                 return;
             }
           }
@@ -250,7 +264,7 @@ public class DigWebAgent
             DigErrorMessage error = new ParsingErrorException.Builder(x)
               .setMessage("Invalid CSV Format")
               .build();
-            outputException(x, resp, format, out, error);
+            DigUtil.outputException(x, error, format);
             return;
           }
 
@@ -261,7 +275,7 @@ public class DigWebAgent
           DigErrorMessage error = new UnsupportException.Builder(x)
                                         .setMessage("Unsupported Format: " + format)
                                         .build();
-          outputException(x, resp, format, out, error);
+          DigUtil.outputException(x, error, format);
 
           return;
         } else if (Format.JSONJ == format ) {
@@ -285,7 +299,7 @@ public class DigWebAgent
           if ( SafetyUtil.isEmpty(dataJson) ) {
               DigErrorMessage error = new EmptyDataException.Builder(x)
                                             .build();
-              outputException(x, resp, format, out, error);
+              DigUtil.outputException(x, error, format);
               return;
           }
           try {
@@ -295,7 +309,7 @@ public class DigWebAgent
               DigErrorMessage error = new ParsingErrorException.Builder(x)
                                             .setMessage("Invalid JSONJ Format")
                                             .build();
-              outputException(x, resp, format, out, error);
+              DigUtil.outputException(x, error, format);
               return;
             }
 
@@ -322,12 +336,12 @@ public class DigWebAgent
             DigErrorMessage error = new DAOPutException.Builder(x)
                                           .setMessage(e.getMessage())
                                           .build();
-            outputException(x, resp, format, out, error);
+            DigUtil.outputException(x, error, format);
             return;
           }
         }
         out.println(returnMessage);
-      } else if ( Command.select == command ) {
+      } else if ( Command.SELECT == command ) {
         PropertyInfo idProp = (PropertyInfo) cInfo.getAxiomByName("id");
         ArraySink sink = (ArraySink) ( ! SafetyUtil.isEmpty(id) ?
           dao.where(MLang.EQ(idProp, id)).select(new ArraySink()) :
@@ -382,7 +396,7 @@ public class DigWebAgent
               out.println(outputterCsv.toString());
             }
           } else if ( Format.HTML == format ) {
-            foam.lib.html.Outputter outputterHtml = new foam.lib.html.Outputter(OutputterMode.NETWORK);
+            foam.lib.html.Outputter outputterHtml = new foam.lib.html.Outputter(cInfo, OutputterMode.NETWORK);
 
             outputterHtml.outputStartHtml();
             outputterHtml.outputStartTable();
@@ -425,11 +439,11 @@ public class DigWebAgent
           DigErrorMessage error = new ParsingErrorException.Builder(x)
             .setMessage("Unsupported DAO : " + daoName)
             .build();
-          outputException(x, resp, format, out, error);
+          DigUtil.outputException(x, error, format);
 
           return;
         }
-      } else if ( Command.remove == command ) {
+      } else if ( Command.REMOVE == command ) {
         PropertyInfo idProp     = (PropertyInfo) cInfo.getAxiomByName("id");
         Object       idObj      = idProp.fromString(id);
         FObject      targetFobj = dao.find(idObj);
@@ -437,7 +451,7 @@ public class DigWebAgent
         if ( targetFobj == null ) {
           DigErrorMessage error = new UnknownIdException.Builder(x)
             .build();
-          outputException(x, resp, format, out, error);
+          DigUtil.outputException(x, error, format);
 
           return;
         } else {
@@ -446,14 +460,14 @@ public class DigWebAgent
           DigErrorMessage error = new DigSuccessMessage.Builder(x)
             .setMessage("Success")
             .build();
-          outputException(x, resp, format, out, error);
+          DigUtil.outputException(x, error, format);
           return;
         }
       } else {
         DigErrorMessage error = new ParsingErrorException.Builder(x)
                                   .setMessage("Unsupported method: "+command)
                                   .build();
-        outputException(x, resp, format, out, error);
+        DigUtil.outputException(x, error, format);
         return;
       }
 
@@ -523,7 +537,7 @@ public class DigWebAgent
    * @return the error message
    */
   protected String getParsingError(X x, String buffer) {
-    Parser        parser = new foam.lib.json.ExprParser();
+    Parser        parser = foam.lib.json.ExprParser.instance();
     PStream       ps     = new StringPStream();
     ParserContext psx    = new ParserContextImpl();
 
@@ -533,57 +547,5 @@ public class DigWebAgent
     ErrorReportingPStream eps = new ErrorReportingPStream(ps);
     ps = eps.apply(parser, psx);
     return eps.getMessage();
-  }
-
-  protected void outputException(X x, HttpServletResponse resp, Format format, PrintWriter out, DigErrorMessage error) {
-    resp.setStatus(Integer.parseInt(error.getStatus()));
-    if ( format == Format.JSON ) {
-      //output error in json format
-
-      JSONParser jsonParser = new JSONParser();
-      jsonParser.setX(x);
-      Outputter outputterJson = new Outputter(x).setPropertyPredicate(new AndPropertyPredicate(x, new PropertyPredicate[] {new NetworkPropertyPredicate(), new PermissionedPropertyPredicate()}));
-      outputterJson.setOutputDefaultValues(true);
-      outputterJson.setOutputClassNames(true);
-      outputterJson.output(error);
-      out.println(outputterJson.toString());
-
-    } else if ( format == Format.XML )  {
-      //output error in xml format
-
-      foam.lib.xml.Outputter outputterXml = new foam.lib.xml.Outputter(OutputterMode.NETWORK);
-      outputterXml.output(error);
-      out.println(outputterXml.toString());
-
-    } else if ( format == Format.CSV )  {
-      //output error in csv format
-      CSVOutputter outputterCsv = new foam.lib.csv.CSVOutputterImpl.Builder(x).build();
-      outputterCsv.outputFObject(x, error);
-      out.println(outputterCsv.toString());
-
-    } else if ( format == Format.HTML ) {
-      foam.lib.html.Outputter outputterHtml = new foam.lib.html.Outputter(OutputterMode.NETWORK);
-
-      outputterHtml.outputStartHtml();
-      outputterHtml.outputStartTable();
-      outputterHtml.outputHead(error);
-      outputterHtml.put(error, null);
-      outputterHtml.outputEndTable();
-      outputterHtml.outputEndHtml();
-      out.println(outputterHtml.toString());
-    } else if ( format == Format.JSONJ ) {
-      //output error in jsonJ format
-
-      JSONParser jsonParser = new JSONParser();
-      jsonParser.setX(x);
-      Outputter outputterJson = new Outputter(x).setPropertyPredicate(new AndPropertyPredicate(new PropertyPredicate[] {new StoragePropertyPredicate(), new PermissionedPropertyPredicate()}));
-      outputterJson.setOutputDefaultValues(true);
-      outputterJson.setOutputClassNames(true);
-      outputterJson.outputJSONJFObject(error);
-      out.println(outputterJson.toString());
-
-    } else {
-      // TODO
-    }
   }
 }

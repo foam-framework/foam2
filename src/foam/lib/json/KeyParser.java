@@ -10,13 +10,12 @@ import foam.lib.parse.*;
 public class KeyParser
   implements Parser
 {
-  private Parser delegate;
+  protected Parser delegate;
 
   public KeyParser(String key) {
     delegate = new Alt(
-      new Literal("\"" + key + "\""),
-      new Literal(key));
-
+      Literal.create("\"" + key + "\""),
+      Literal.create(key));
   }
 
   public PStream parse(PStream ps, ParserContext x) {

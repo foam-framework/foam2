@@ -41,6 +41,12 @@ foam.CLASS({
       documentation: 'User who created the entry',
     },
     {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdByAgent',
+      documentation: 'User who created the entry',
+    },
+    {
       class: 'StringArray',
       name: 'to'
     },
@@ -98,5 +104,10 @@ foam.CLASS({
       name: 'status',
       tableWidth: 100
     },
+    {
+      class: 'Map',
+      name: 'templateArguments',
+      view: { class: 'foam.u2.view.MapView' }
+    }
   ]
 });

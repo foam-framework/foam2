@@ -18,14 +18,16 @@ foam.CLASS({
     'foam.doc.DocBorder',
     'foam.doc.SimpleClassView',
     'foam.doc.UMLDiagram',
-    'foam.nanos.boot.NSpec',
+    'foam.nanos.boot.NSpec'
   ],
 
-  imports: [
-    'nSpecDAO',
-  ],
+  imports: [ 'nSpecDAO' ],
+
+  exports: [ 'conventionalUML' ],
+
 
   properties: [
+    [ 'conventionalUML', false ],
     {
       name: 'modelDAO',
       expression: function(nSpecDAO) {

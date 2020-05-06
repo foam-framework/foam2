@@ -8,11 +8,13 @@ foam.CLASS({
   package: 'foam.graphics',
   name: 'ZoomMapView',
   extends: 'foam.graphics.CView',
+
   requires: [
     'foam.graphics.Box',
     'foam.graphics.CView',
     'foam.graphics.Circle'
   ],
+
   properties: [
     {
       class: 'Color',
@@ -206,6 +208,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function initCView() {
       this.SUPER();
@@ -223,6 +226,7 @@ foam.CLASS({
       this.attachHandleListener();
       this.attachNavScalerListener();
     },
+
     function attachViewPortListener() {
       var drag = false;
       var moveViewPort = e => {
@@ -243,6 +247,7 @@ foam.CLASS({
       this.onDetach(this.canvas.on('mouseup', _ => drag = false));
       this.onDetach(this.canvas.on('mousemove', moveViewPort));
     },
+
     function attachNavScalerListener() {
       var drag = null;
       var doHitTest = e => {
@@ -283,6 +288,7 @@ foam.CLASS({
         scaleNavView(e);
       }));
     },
+
     function attachHandleListener() {
       var drag = null;
       var doHitTest = e => {

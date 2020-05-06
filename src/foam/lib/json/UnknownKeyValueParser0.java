@@ -5,22 +5,22 @@
   */
 
   package foam.lib.json;
-  
+
   import foam.lib.parse.*;
-  
+
   public class UnknownKeyValueParser0
     extends ProxyParser
   {
     public UnknownKeyValueParser0() {
       super(new Parser() {
-        Parser delegate = new Seq2(1,5,new Whitespace(),
+        Parser delegate = new Seq2(1,5,Whitespace.instance(),
         new AnyKeyParser(),
-        new Whitespace(),
-        new Literal(":"),
-        new Whitespace(),
+        Whitespace.instance(),
+        Literal.create(":"),
+        Whitespace.instance(),
         new UnknownParser(),
-        new Whitespace());
-      
+        Whitespace.instance());
+
       public PStream parse(PStream ps, ParserContext x) {
         ps = ps.apply(delegate, x);
         if ( ps == null ) {

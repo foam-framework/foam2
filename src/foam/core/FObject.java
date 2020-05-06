@@ -8,11 +8,10 @@ package foam.core;
 
 import foam.crypto.hash.Hashable;
 import foam.crypto.sign.Signable;
-
 import java.util.Map;
 
-public interface FObject extends
-  Appendable, ContextAware, Comparable, Freezable, Hashable, Signable, Validatable
+public interface FObject
+  extends Appendable, ContextAware, Comparable, Freezable, Hashable, Signable, Validatable
 {
   ClassInfo getClassInfo();
   FObject copyFrom(FObject obj);
@@ -22,7 +21,7 @@ public interface FObject extends
   Map diff(FObject obj);
   FObject freeze();
   boolean isFrozen();
-  //Return is FObject that contain different fields between two FObjects.
+  // Return is FObject that contain different fields between two FObjects.
   FObject hardDiff(FObject obj);
   Object setProperty(String prop, Object value);
   Object getProperty(String prop);

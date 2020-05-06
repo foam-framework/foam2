@@ -17,7 +17,6 @@ foam.CLASS({
     'foam.nanos.app.EmailConfig',
     'foam.nanos.auth.User',
     'foam.nanos.session.Session',
-    'foam.util.SafetyUtil',
     'io.nayuki.qrcodegen.QrCode',
     'java.net.URI'
   ],

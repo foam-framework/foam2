@@ -14,8 +14,20 @@ foam.CLASS({
   `,
 
   properties: [
-    { name: 'hour',   class: 'Int' },
-    { name: 'minute', class: 'Int' },
-    { name: 'second', class: 'Int' }
+    {
+      class: 'Int',
+      name: 'hour',
+      gridColumns: 4
+    },
+    {
+      class: 'Int',
+      name: 'minute',
+      gridColumns: 4
+    },
+    {
+      class: 'Int',
+      name: 'second',
+      gridColumns: 4
+    }
   ]
 });

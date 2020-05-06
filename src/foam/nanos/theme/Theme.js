@@ -81,6 +81,23 @@ foam.CLASS({
       displayWidth: 60
     },
     {
+      class: 'Image',
+      name: 'largeLogo',
+      documentation: 'A large logo to display in the application.',
+      displayWidth: 60
+    },
+    {
+      class: 'Boolean',
+      name: 'largeLogoEnabled',
+      documentation: 'Uses largeLogo image on various views instead of logo.'
+    },
+    {
+      class: 'Color',
+      name: 'logoBackgroundColour',
+      documentation: 'The logo background colour to display in the application.',
+      section: 'colours'
+    },
+    {
       class: 'String',
       name: 'topNavigation',
       documentation: 'A custom top nav view to use.',
@@ -95,9 +112,8 @@ foam.CLASS({
       displayWidth: 45
     },
     {
-      class: 'String',
-      name: 'customCSS',
-      view: { class: 'foam.u2.tag.TextArea', rows: 16, cols: 60 },
+      class: 'Code',
+      name: 'customCSS'
     },
     {
       class: 'Color',

@@ -19,7 +19,7 @@ public class NSpecFactory
   NSpec  spec_;
   ProxyX x_;
   Thread creatingThread_ = null;
-  Object ns_ = null;
+  Object ns_             = null;
 
   public NSpecFactory(ProxyX x, NSpec spec) {
     x_    = x;
@@ -40,7 +40,7 @@ public class NSpecFactory
     }
     creatingThread_ = Thread.currentThread();
 
-    PM pm = new PM(this.getClass(), spec_ == null ? "-" : spec_.getName());
+    PM     pm     = new PM(this.getClass(), spec_.getName());
     Logger logger = (Logger) x.get("logger");
 
     try {
@@ -48,21 +48,22 @@ public class NSpecFactory
       ns_ = spec_.createService(x_.getX().put(NSpec.class, spec_));
       Object ns = ns_;
       while ( ns != null ) {
-        if (ns instanceof ContextAware) ((ContextAware) ns).setX(x_.getX());
-        if (ns instanceof NSpecAware) ((NSpecAware) ns).setNSpec(spec_);
-        if (ns instanceof NanoService) ((NanoService) ns).start();
-        if (ns instanceof ProxyDAO) {
+        if ( ns instanceof ContextAware ) ((ContextAware) ns).setX(x_.getX());
+        if ( ns instanceof NSpecAware )   ((NSpecAware) ns).setNSpec(spec_);
+        if ( ns instanceof NanoService )  ((NanoService) ns).start();
+        if ( ns instanceof ProxyDAO ) {
           ns = ((ProxyDAO) ns).getDelegate();
         } else {
           ns = null;
         }
       }
-      if ( logger != null ) logger.info("Created Service", spec_.getName(), ( ns_ != null ) ? ns_.getClass().getSimpleName() : ns_);
+      if ( logger != null )
+        logger.info("Created Service", spec_.getName(), ns_ != null ? ns_.getClass().getSimpleName() : '-');
     } catch (Throwable t) {
       if ( logger != null ) {
         logger.error("Error Creating Service", spec_.getName(), t);
       } else {
-        System.err.println("Error Creating Service: "+spec_.getName());
+        System.err.println("Error Creating Service: " + spec_.getName());
         t.printStackTrace();
       }
     } finally {

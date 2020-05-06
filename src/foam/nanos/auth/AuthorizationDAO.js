@@ -10,22 +10,18 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
 
   documentation: 'A DAO decorator to run authorization checks.',
-  
+
   javaImports: [
     'foam.core.FObject',
-    'foam.core.InvalidX',
     'foam.core.X',
     'foam.dao.*',
-    'foam.mlang.order.Comparator',
     'foam.mlang.predicate.Predicate',
-    'foam.nanos.auth.AuthorizationException',
-    'foam.nanos.auth.User',
 
     'static foam.mlang.MLang.AND',
     'static foam.mlang.MLang.IS_AUTHORIZED_TO_READ',
     'static foam.mlang.MLang.IS_AUTHORIZED_TO_DELETE'
   ],
-  
+
   axioms: [
     {
       name: 'javaExtras',
@@ -33,12 +29,9 @@ foam.CLASS({
         cls.extras.push(foam.java.Code.create({
           data:`
   public AuthorizationDAO(X x, DAO delegate, Authorizer authorizer) {
-    AuthorizationException exception = new AuthorizationException("When " +
-        "using a DAO decorated by AuthorizationDAO, you may only call the " +
-        "context-oriented methods: put_(), find_(), select_(), remove_(), " +
-        "removeAll_(). Alternatively, you can also " +
-        "use .inX() to set the context on the DAO.");
-    setX(new InvalidX(exception));
+    foam.nanos.logger.Logger log = (foam.nanos.logger.Logger) x.get("logger");
+    log.warning("Direct constructor use is deprecated. Use Builder instead. AuthorizationDAO");
+    setX(x);
     setDelegate(delegate);
     setAuthorizer(authorizer);
   }
@@ -92,17 +85,22 @@ foam.CLASS({
       name: 'find_',
       javaCode: `
     if ( id == null ) return null;
-    if ( getAuthorizer().checkGlobalRead(x) ) return super.find_(x, id);
+    if ( getAuthorizer().checkGlobalRead(x, null) ) return super.find_(x, id);
 
     FObject obj = super.find_(x, id);
-    if ( obj != null ) getAuthorizer().authorizeOnRead(x, obj);
-    return obj;
+    try {
+      if ( obj != null ) 
+        getAuthorizer().authorizeOnRead(x, obj);
+      return obj;
+    } catch (AuthorizationException ae) {
+      return null;
+    }
  `
     },
     {
       name: 'select_',
       javaCode: `
-    if ( ! getAuthorizer().checkGlobalRead(x) ) predicate = augmentPredicate(x, false, predicate);
+    if ( ! getAuthorizer().checkGlobalRead(x, predicate) ) predicate = augmentPredicate(x, false, predicate);
     return super.select_(x, sink, skip, limit, order, predicate);
  `
     },

@@ -17,13 +17,13 @@ foam.CLASS({
       type: 'String',
       name: 'USER_DAO_PUT',
       documentation: 'UserDAO expected put line',
-      value: `userDAO.p({"class":"foam.nanos.auth.User","id":1000,"firstName":"Kirk","lastName":"Eaton"})`
+      value: `userDAO.p({"class":"foam.nanos.auth.User","id":1000,"firstName":"Kirk","lastName":"Eaton"`
     },
     {
       type: 'String',
       name: 'GROUP_DAO_PUT',
       documentation: 'GroupDAO expected put line',
-      value: `groupDAO.p({"class":"foam.nanos.auth.Group","id":"admin","enabled":true})`
+      value: `groupDAO.p({"class":"foam.nanos.auth.Group","id":"admin","enabled":true`
 
     }
   ],
@@ -69,13 +69,14 @@ foam.CLASS({
 
         // check to see that lines are correctly output
         try ( java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(file)) ) {
-          boolean match = true;
+          boolean userMatch = true;
+          boolean groupMatch = true;
           for ( String line ; ( line = reader.readLine() ) != null ; ) {
             if ( foam.util.SafetyUtil.isEmpty(line) ) continue;
-            match = USER_DAO_PUT.equals(line) || GROUP_DAO_PUT.equals(line);
+            userMatch = line.startsWith(USER_DAO_PUT);
+            groupMatch = line.startsWith(GROUP_DAO_PUT);
+            test(userMatch || groupMatch, "RoutingJournal correctly outputs expected lines. User Match: " + userMatch + ", Group Match: " + groupMatch);
           }
-
-          test(match, "RoutingJournal correctly outputs expected lines");
         } catch ( Throwable t ) {
           throw new RuntimeException(t);
         }

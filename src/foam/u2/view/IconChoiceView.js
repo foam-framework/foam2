@@ -69,8 +69,7 @@ foam.CLASS({
             attrs({
               type: 'radio',
               name: this.id,
-              value: c[0],
-              checked: self.slot(function (data) { return data === c[0]; })
+              checked: self.slot(function(data) { return data === c[0]; })
             }).
             setID(id = self.NEXT_ID()).
             on('change', function(evt) {
@@ -78,14 +77,13 @@ foam.CLASS({
             }).
           end().
           start('label').
-            attrs({for: id}).
+            attrs({ for: id }).
             start('span').
-              start({ 
-                      class: 'foam.u2.tag.Image',
-                      data: c[1]
-                  }).
-              end().
-              enableClass(this.myClass('disabled-icon'), self.slot(function (data) { return data === c[0] })).
+              tag({
+                class: 'foam.u2.tag.Image',
+                data: c[1]
+              }).
+              enableClass(this.myClass('disabled-icon'), self.slot(function(data) { return data === c[0] })).
             end().
           end();
       }.bind(this)));

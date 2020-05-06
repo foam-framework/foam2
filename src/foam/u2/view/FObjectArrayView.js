@@ -15,8 +15,18 @@ foam.CLASS({
       name: 'of'
     },
     {
+      name: 'defaultNewItem',
+      expression: function(of) {
+        return foam.core.InterfaceModel.isInstance(of.model_)
+          ? null
+          : of.create();
+      }
+    },
+    {
       name: 'valueView',
       expression: function(of) {
+        return { class: 'foam.u2.DetailView' };
+        /*
         return {
           class: 'foam.u2.view.CollapseableDetailView',
           view: {
@@ -27,7 +37,15 @@ foam.CLASS({
             }
           }
         };
+        */
       }
+    }
+  ],
+
+  methods: [
+    function fromProperty(p) {
+      this.SUPER(p);
+      if ( ! this.of && p.of ) this.of = p.of;
     }
   ]
 });

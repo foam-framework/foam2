@@ -6,13 +6,9 @@
 
 package foam.lib.query;
 
-import java.util.Date;
-
-import foam.lib.parse.Alt;
-import foam.lib.parse.PStream;
-import foam.lib.parse.ParserContext;
-import foam.lib.parse.ProxyParser;
+import foam.lib.parse.*;
 import foam.mlang.Constant;
+import java.util.Date;
 
 //YYYY
 //YYYY-MM               YYYY/MM
@@ -25,34 +21,43 @@ import foam.mlang.Constant;
 public class DuringExpressionParser
   extends ProxyParser
 {
-  public DuringExpressionParser() {
+
+  private final static Parser instance__ = new DuringExpressionParser();
+
+  public static Parser instance() { return instance__; }
+
+
+  private DuringExpressionParser() {
     super(
-        new Alt(
-            //YYYY-MM-DD..YYYY-MM-DD
-            new YYYYMMDDRangeDateParser(),
+      new Alt(
+          //YYYY-MM-DD..YYYY-MM-DD
+          new YYYYMMDDRangeDateParser(),
 
-            //YYYY-MM-DDTHH:MM
-            //YYYY-MM-DDTHH
-            //YYYY-MM-DD
-            //YYYY-MM
-            //YYYY
-            new YYYYMMDDLiteralDateParser(),
+          //YYYY-MM-DDTHH:MM
+          //YYYY-MM-DDTHH
+          //YYYY-MM-DD
+          //YYYY-MM
+          //YYYY
+          new YYYYMMDDLiteralDateParser(),
 
-            //TODO new LongParser(),
+          //TODO new LongParser(),
 
-            //today-7
-            //today
-            new RelativeDateParser()));
+          //today-7
+          //today
+          new RelativeDateParser()));
   }
 
   public PStream parse(PStream ps, ParserContext x) {
     ps = super.parse( ps, x );
     if ( ps == null ) return null;
 
-    if ( ps.value() instanceof java.lang.Long ) return ps
-        .setValue( new java.util.Date(( java.lang.Long ) ps.value()));
+    if ( ps.value() instanceof java.lang.Long ) {
+      return ps.setValue( new java.util.Date(( java.lang.Long ) ps.value()));
+    }
+
     Object[] result;
     result = (Object[]) ps.value();
+
     if ( ps.value() instanceof Object[] ) {
       result = (Object[]) ps.value();
 
@@ -61,10 +66,12 @@ public class DuringExpressionParser
       Constant[] d = { d1, d2 };
 
       return ps.setValue( d );
-    } else if ( ps.value() != null ) {
-      return ps.setValue(result);
-    } else {
-      return null;
     }
+
+    if ( ps.value() != null ) {
+      return ps.setValue(result);
+    }
+
+    return null;
   }
 }

@@ -8,20 +8,22 @@ package foam.lib.csv;
 
 import foam.lib.parse.*;
 
-public class CSVNewlineParser implements Parser{
-  private static Parser delegate = new Alt(
-    new Seq0(new Literal("\\"), new Literal("r"), new Literal("\\"), new Literal("n")),
-    new Seq0(new Literal("\\"), new Literal("r")),
-    new Seq0(new Literal("\\"), new Literal("n"))
+public class CSVNewlineParser
+  implements Parser
+{
+
+  static Parser delegate__ = new Alt(
+    Literal.create("\\r\\n"),
+    Literal.create("\\r"),
+    Literal.create("\\n")
   );
+
   public PStream parse(PStream ps, ParserContext x) {
-    if ( ps == null ) {
-      return null;
-    }
-    ps = ps.apply(delegate, x);
-    if ( ps == null ) {
-      return null;
-    }
+    if ( ps == null ) return null;
+
+    ps = ps.apply(delegate__, x);
+    if ( ps == null ) return null;
+
     return ps.setValue("\n");
   }
 }

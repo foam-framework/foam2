@@ -28,8 +28,7 @@ public class StdoutLogger
   }
 
   protected class CustomFormatter extends Formatter {
-    long   prevTime;
-    String prevTimestamp;
+    foam.util.SyncFastTimestamper ts_ = new foam.util.SyncFastTimestamper();
 
     @Override
     public String format(LogRecord record) {
@@ -37,12 +36,10 @@ public class StdoutLogger
       String        msg = record.getMessage();
       StringBuilder str = sb.get();
 
-      if ( prevTime / 1000 != System.currentTimeMillis() / 1000 ) {
-        prevTime = System.currentTimeMillis();
-        prevTimestamp = sdf.get().format(prevTime);
-      }
+      str.append(ts_.createTimestamp());
+      str.append(',');
 
-      str.append(prevTimestamp);
+      str.append(Thread.currentThread().getName());
       str.append(',');
 
       // debug special case, fine level == 500

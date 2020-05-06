@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'NullPM',
   extends: 'foam.nanos.pm.PM',
 
-  documentation: `A PM that does not log.`,
+  documentation: 'A PM that does not log.',
 
   javaImports: [
     'foam.core.X'
@@ -29,7 +29,7 @@ foam.CLASS({
           type: 'X'
         }
       ],
-      javaCode: ``
+      javaCode: '/*nop*/'
     }
   ]
 });

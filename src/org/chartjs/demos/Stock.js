@@ -159,7 +159,7 @@ foam.CLASS({
         { name: 'id' },
         { class: 'Date', name: 'date' },
         { class: 'String', name: 'symbol' },
-        { class: 'Currency', name: 'price' },
+        { class: 'UnitValue', name: 'price' },
       ]
     },
     {
@@ -174,7 +174,7 @@ foam.CLASS({
             return v + '!'
           },
         },
-        { class: 'Currency', name: 'pricePerShare' },
+        { class: 'UnitValue', name: 'pricePerShare' },
         {
           class: 'Int',
           name: 'shares',

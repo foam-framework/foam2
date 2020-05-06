@@ -5,9 +5,133 @@
  */
 
 foam.CLASS({
+  package: 'com.google.foam.demos.u2',
+  name: 'SampleData',
+  properties: [
+    'id', 'name', 'value'
+  ],
+  methods: [
+    function toSummary() { return this.id + ' ' + this.value; }
+  ]
+});
+
+foam.CLASS({
+  package: 'com.google.foam.demos.u2',
+  name: 'SampleData2',
+  properties: [
+    {
+      class: 'String',
+      name: 'firstName',
+      label: 'First name',
+      gridColumns: 6,
+      xxxvalidationPredicates: [
+        {
+          args: ['firstName'],
+          predicateFactory: function(e) {
+            return e.GT(
+              foam.mlang.StringLength.create({
+                arg1: com.google.foam.demos.u2.FIRST_NAME
+              }), 0);
+          },
+          errorString: 'Please enter a first name.'
+        }
+      ]
+    },
+    {
+      class: 'String',
+      name: 'lastName',
+      label: 'Last name',
+      gridColumns: 6,
+      xxxvalidationPredicates: [
+        {
+          args: ['lastName'],
+          predicateFactory: function(e) {
+            return e.GT(
+              foam.mlang.StringLength.create({
+                arg1: com.google.foam.demos.u2.LAST_NAME
+              }), 0);
+          },
+          errorString: 'Please enter a last name'
+        }
+      ]
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'com.google.foam.demos.u2',
   name: 'AllViews',
 
+  requires: [
+    'com.google.foam.demos.u2.SampleData',
+    'foam.dao.EasyDAO',
+    'foam.dao.MDAO',
+    'foam.u2.MultiView',
+    'foam.u2.view.ReferenceView',
+    'foam.u2.layout.DisplayWidth'
+   ],
+
+  exports: [ 'sampleDataDAO', 'displayWidth' ],
+
   properties: [
+    {
+      class: 'Enum',
+      of: 'foam.u2.layout.DisplayWidth',
+      name: 'displayWidth',
+      factory: function() {
+        return this.DisplayWidth.VALUES
+          .sort((a, b) => b.minWidth - a.minWidth)
+          .find(o => o.minWidth <= window.innerWidth);
+      }
+    },
+    {
+      name: 'sampleDataDAO',
+      factory: function() {
+        return this.EasyDAO.create({
+          of: this.SampleData,
+          daoType: 'MDAO',
+          testData: [
+            { id: 'key1', name: 'John',  value: 'value1' },
+            { id: 'key2', name: 'Jane',  value: 'value2' },
+            { id: 'key3', name: 'Kevin', value: 'value3' },
+            { id: 'key4', name: 'Kim',   value: 'value4' },
+            { id: 'key5', name: 'Larry', value: 'value5' },
+            { id: 'key6', name: 'Linda', value: 'value6' }
+          ]
+        });
+      },
+      view: {
+        class: 'foam.u2.DAOList',
+        rowView: { class: 'com.google.foam.demos.heroes.CitationView' }
+      }
+    },
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'dao',
+      label: 'DAO',
+      createVisibility: '',
+      factory: function() { return this.sampleDataDAO; }
+    },
+    {
+      class: 'Reference',
+      of: 'com.google.foam.demos.u2.SampleData',
+      name: 'reference',
+      view: function(_, X) {
+        return foam.u2.MultiView.create({
+          views: [
+            X.data.ReferenceView.create({dao: X.data.sampleDataDAO, of: X.data.SampleData}),
+            foam.u2.TextField.create()
+          ]
+        });
+      }
+    },
+    {
+      class: 'Reference',
+      of: 'com.google.foam.demos.u2.SampleData',
+      name: 'referenceWithCustomObjToChoice',
+      view: { class: 'foam.u2.view.ReferenceView', objToChoice: function(obj) { return [obj.id, obj.name]; } },
+      targetDAOKey: 'sampleDataDAO'
+    },
     {
       class: 'Int',
       name: 'defaultInt'
@@ -18,7 +142,7 @@ foam.CLASS({
       min: 1,
       max: 5,
       value: 3,
-      units: ' rating (1-5)'
+      units: 'rating (1-5)'
     },
     {
       class: 'Int',
@@ -27,7 +151,6 @@ foam.CLASS({
         class: 'foam.u2.RangeView'
       }
     },
-    /*
     {
       class: 'Int',
       name: 'intWithTemperatureView',
@@ -35,7 +158,6 @@ foam.CLASS({
         class: 'foam.nanos.pm.TemperatureCView'
       }
     },
-    */
     {
       class: 'Int',
       name: 'intWithProgressView',
@@ -46,11 +168,28 @@ foam.CLASS({
     },
     {
       class: 'Int',
-      name: 'intWithDualView',
+      name: 'intWithMultiView',
+      view: {
+        class: 'foam.u2.MultiView',
+        views: [ 'foam.u2.RangeView', 'foam.u2.IntView' ]
+      }
+    },
+    {
+      class: 'Int',
+      name: 'intWithMultiViewVertical',
+      view: {
+        class: 'foam.u2.MultiView',
+        horizontal: false,
+        views: [ 'foam.u2.RangeView', 'foam.u2.IntView' ]
+      }
+    },
+    {
+      class: 'Int',
+      name: 'intWithDualView2',
       view: {
         class: 'foam.u2.view.DualView',
         viewa: 'foam.u2.RangeView',
-        viewb: 'foam.u2.IntView'
+        viewb: 'foam.u2.ProgressView'
       }
     },
     {
@@ -86,6 +225,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'textFieldWithChoices',
+      documentation: 'Like a Combo-Box.',
       view: {
         class: 'foam.u2.TextField',
         choices: ['Yes', 'No', 'Maybe']
@@ -97,6 +237,14 @@ foam.CLASS({
       view: {
         class: 'foam.u2.view.ChoiceView',
         choices: ['Yes', 'No', 'Maybe']
+      }
+    },
+    {
+      class: 'String',
+      name: 'choiceViewWithValues',
+      view: {
+        class: 'foam.u2.view.ChoiceView',
+        choices: [ [1, 'Yes'], [0, 'No'], [0.5, 'Maybe']]
       }
     },
     {
@@ -160,7 +308,8 @@ foam.CLASS({
     {
       class: 'Float',
       name: 'floatWithPrecision',
-      precision: 2
+      precision: 2,
+      value: 3.1415926
     },
     {
       class: 'Double',
@@ -173,13 +322,75 @@ foam.CLASS({
     {
       class: 'StringArray',
       name: 'stringArrayRowView',
-      view: 'foam.u2.view.StringArrayRowView',
+      view: { class: 'foam.u2.MultiView', views: [ 'foam.u2.view.StringArrayRowView', 'foam.u2.view.StringArrayRowView' ] },
+      xxview: 'foam.u2.view.StringArrayRowView',
       factory: function() { return ['row1', 'row2', 'row3']; }
+    },
+    {
+      class: 'FObjectArray',
+      name: 'fobjectArray',
+      of: 'com.google.foam.demos.u2.SampleData',
+      view: { class: 'foam.u2.view.FObjectArrayView', valueView: 'com.google.foam.demos.heroes.CitationView' }
+    },
+    {
+      class: 'FObjectArray',
+      name: 'fobjectArray2',
+      of: 'com.google.foam.demos.u2.SampleData',
+      factory: function() {
+        return this.sampleDataDAO.testData;
+      }
+    },
+    {
+      class: 'FObjectProperty',
+      name: 'xxxxxxx',
+      of: 'com.google.foam.demos.u2.SampleData2',
+      value: com.google.foam.demos.u2.SampleData2.create()
+    },
+    {
+      class: 'FObjectArray',
+      name: 'fobjectArray3',
+      of: 'com.google.foam.demos.u2.SampleData2',
+      view: {
+        class: 'foam.u2.view.FObjectArrayView',
+        mode: 'RW',
+        enableAdding: true,
+        enableRemoving: true,
+        defaultNewItem: ''
+      },
+      autoValidate: true,
+      validationTextVisible: true,
+      validateObj: function(fobjectArray3) {
+        if ( fobjectArray3.length < 1 )
+          return 'Please enter fobjectArray3 information'
+
+        for ( var i = 0; i < fobjectArray3.length; i++ ) {
+          if ( fobjectArray3[i].errors_$ != null ) {
+            fobjectArray3[i].errors_$.sub(this.errorsUpdate);
+
+            return this.errorsUpdate(null, null, null, fobjectArray3[i].errors_$);
+          }
+        }
+      }
+    },
+    {
+      class: 'FObjectArray',
+      name: 'fobjectArray4',
+      of: 'com.google.foam.demos.u2.SampleData',
+      view: { class: 'foam.u2.view.DAOtoFObjectArrayView', xxxdelegate: { class: 'foam.comics.InlineBrowserView' } },
+      factory: function() {
+        return this.sampleDataDAO.testData;
+      }
     },
     {
       class: 'EMail',
       name: 'defaultEMail',
       value: 'someone@somewhere.com'
+    },
+    {
+      class: 'EMail',
+      name: 'requiredEMail',
+      required: true,
+      value: ''
     },
     {
       class: 'Image',
@@ -201,6 +412,12 @@ foam.CLASS({
       name: 'defaultColor'
     },
     {
+      class: 'Color',
+      name: 'readOnlyColor',
+      value: 'orange',
+      view: 'foam.u2.view.ReadColorView'
+    },
+    {
       class: 'Password',
       name: 'defaultPassword',
       value: 'secret'
@@ -216,7 +433,7 @@ foam.CLASS({
       name: 'defaultPhoneNumber'
     },
     {
-      class: 'Currency',
+      class: 'UnitValue',
       name: 'defaultCurrency'
     },
     {
@@ -227,8 +444,13 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'defaultBooleanWithLabel',
+      view: { class: 'foam.u2.CheckBox', label: "Label goes here"}
+    },
+    {
+      class: 'Boolean',
       name: 'mdCheckboxBoolean',
-      label: 'md.CheckBox',
+      label: 'MD CheckBox',
       view: { class: 'foam.u2.md.CheckBox' }
     },
     {
@@ -236,6 +458,10 @@ foam.CLASS({
       name: 'htmlView',
       value: '<b>bold</b><br/><i>italic</i>',
       view: 'foam.u2.HTMLView'
+    },
+    {
+      class: 'Map',
+      name: 'map'
     },
     {
       class: 'FObjectProperty',
@@ -256,11 +482,54 @@ foam.CLASS({
       view: {
         class: 'foam.u2.view.FObjectView',
         choices: [
+          [ 'foam.util.Timer', 'Timer' ],
+          [ 'foam.core.Property', 'Property' ],
+          [ 'foam.nanos.menu.DAOMenu',  'DAO'     ],
+          [ 'foam.nanos.menu.SubMenu',  'SubMenu' ],
+          [ 'foam.nanos.menu.TabsMenu', 'Tabs'    ]
+        ]
+      }
+    },
+    {
+      class: 'FObjectProperty',
+      name: 'fObjectViewWithChoicesValueSet',
+      label: 'FObjectView With Choices (Value Set)',
+      value: foam.util.Timer.create(),
+      view: {
+        class: 'foam.u2.view.FObjectView',
+        choices: [
+          [ 'foam.core.Property', 'Property' ],
+          [ 'foam.util.Timer', 'Timer' ],
+          [ 'foam.nanos.menu.DAOMenu',  'DAO'     ],
+          [ 'foam.nanos.menu.SubMenu',  'SubMenu' ],
+          [ 'foam.nanos.menu.TabsMenu', 'Tabs'    ]
+        ]
+      }
+    },
+    {
+      class: 'FObjectProperty',
+      name: 'fObjectViewWithChoicesAndCustomClasses',
+      label: 'FObjectView With Choices and Custom Classes',
+      view: {
+        class: 'foam.u2.view.FObjectView',
+        allowCustom: true,
+        choices: [
+          [ 'foam.util.Timer', 'Timer' ],
+          [ 'foam.core.Property', 'Property' ],
           [ 'foam.nanos.menu.DAOMenu',  'DAO'     ],
           [ 'foam.nanos.menu.SubMenu',  'SubMenu' ],
           [ 'foam.nanos.menu.TabsMenu', 'Tabs'    ]
         ]
       }
     }
-  ]
+  ],
+
+  listeners: [
+    {
+      name: 'errorsUpdate',
+      code: function (_, __ ,___, errs) {
+        return errs.get();
+      }
+    }
+  ],
 })

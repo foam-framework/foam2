@@ -13,14 +13,13 @@ import foam.core.PropertyInfo;
 import foam.dao.AbstractSink;
 import foam.lib.json.OutputterMode;
 import foam.util.SafetyUtil;
-import org.apache.commons.io.IOUtils;
-
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
+import org.apache.commons.io.IOUtils;
 
 public class Outputter
   extends AbstractSink
@@ -50,6 +49,11 @@ public class Outputter
 
   public Outputter(OutputterMode mode) {
     this((PrintWriter) null, mode, true);
+  }
+
+  public Outputter(ClassInfo of, OutputterMode mode) {
+    this((PrintWriter) null, mode, true);
+    of_ = of;
   }
 
   public Outputter(OutputterMode mode, boolean outputHeaders) {
@@ -114,31 +118,6 @@ public class Outputter
     outputString(sdf.get().format(value));
   }
 
-  protected void outputFObject(FObject obj) {
-    ClassInfo info = obj.getClassInfo();
-
-    List axioms = info.getAxiomsByClass(PropertyInfo.class);
-    Iterator i = axioms.iterator();
-
-    writer_.append("<tr>");
-    while ( i.hasNext() ) {
-      PropertyInfo prop = (PropertyInfo) i.next();
-      if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) continue;
-      if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) continue;
-
-      //outputHead(prop);
-
-      Object value = prop.get(obj);
-      if ( value == null ) continue;
-
-      writer_.append("<td>");
-      writer_.append(prop.get((Object)obj).toString());
-      writer_.append("</td>");
-    }
-    writer_.append("</tr>");
-
-  }
-
   public void outputStartHtml() {
     writer_.append("<html><head></head><body>");
   }
@@ -148,7 +127,7 @@ public class Outputter
   }
 
   public void outputStartTable() {
-    writer_.append("<table>");
+    writer_.append("<table border=\"1\">");
   }
 
   public void outputEndTable() {
@@ -156,11 +135,12 @@ public class Outputter
   }
 
   public void outputHead(FObject obj) {
-    ClassInfo info = obj.getClassInfo();
-
     writer_.append("<thead><tr>");
-    List<PropertyInfo> prop = info.getAxiomsByClass(PropertyInfo.class);
-    for( PropertyInfo pi : prop ) {
+    List<PropertyInfo> prop = of_.getAxiomsByClass(PropertyInfo.class);
+    for ( PropertyInfo pi : prop ) {
+      if ( mode_ == OutputterMode.NETWORK && pi.getNetworkTransient() ) continue;
+      if ( mode_ == OutputterMode.STORAGE && pi.getStorageTransient() ) continue;
+
       writer_.append("<th>");
       writer_.append(pi.getName());
       writer_.append("</th>");
@@ -168,28 +148,50 @@ public class Outputter
     writer_.append("</tr></thead>");
   }
 
+  protected void outputFObject(FObject obj) {
+    List     axioms = of_.getAxiomsByClass(PropertyInfo.class);
+    Iterator i      = axioms.iterator();
+int j = 0;
+    writer_.append("<tr>");
+    while ( i.hasNext() ) {
+      PropertyInfo prop = (PropertyInfo) i.next();
+      if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) continue;
+      if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) continue;
+
+      writer_.append("<td col=" + (++j) + ">");
+      try {
+        output(prop.get(obj));
+      } catch (Throwable t) {
+        output("nbsp;<!-- error -->");
+      }
+      writer_.append("</td>");
+    }
+    writer_.append("</tr>");
+  }
+
   public void output(Object value) {
-    if ( value instanceof String ) {
-      outputString((String) value);
+    if ( value == null ) {
+      outputString("&nbsp;");
+    } else if ( value instanceof String ) {
+      String str = (String) value;
+      outputString(SafetyUtil.isEmpty(str) ? "&nbsp;" : str);
     } else if ( value instanceof Number ) {
       outputNumber((Number) value);
     } else if ( value instanceof Boolean ) {
       outputBoolean((Boolean) value);
     } else if ( value instanceof Date ) {
       outputDate((Date) value);
-    } else if ( value instanceof FObject ) {
-      outputFObject((FObject) value);
     }
   }
 
   @Override
   public String toString() {
-    return ( stringWriter_ != null ) ? stringWriter_.toString() : null;
+    return stringWriter_ != null ? stringWriter_.toString() : null;
   }
 
   @Override
   public void put(Object obj, Detachable sub) {
-    outputFObject((FObject)obj);
+    outputFObject((FObject) obj);
   }
 
   @Override

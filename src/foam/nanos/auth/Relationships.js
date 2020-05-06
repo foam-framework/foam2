@@ -37,6 +37,35 @@ foam.RELATIONSHIP({
   inverseName: 'personalTheme',
   sourceProperty: {
     hidden: true,
-    visibility: 'HIDDEN'
+    visibility: 'HIDDEN',
+  },
+  targetProperty: {
+    section: 'administrative'
   }
+});
+
+foam.RELATIONSHIP({
+  cardinality: '1:*',
+  sourceModel: 'foam.nanos.auth.UserUserJunction',
+  targetModel: 'foam.nanos.notification.NotificationSetting',
+  forwardName: 'notificationSettingsForUserUsers',
+  inverseName: 'userJunction',
+  sourceProperty: {
+    hidden: true
+  },
+  targetDAOKey: 'localNotificationSettingDAO',
+  unauthorizedTargetDAOKey: 'localNotificationSettingDAO'
+});
+
+foam.RELATIONSHIP({
+  cardinality: '1:*',
+  sourceModel: 'foam.nanos.auth.User',
+  targetModel: 'foam.nanos.notification.NotificationSetting',
+  forwardName: 'notificationSettings',
+  inverseName: 'owner',
+  sourceProperty: {
+    hidden: true
+  },
+  targetDAOKey: 'localNotificationSettingDAO',
+  unauthorizedTargetDAOKey: 'localNotificationSettingDAO'
 });

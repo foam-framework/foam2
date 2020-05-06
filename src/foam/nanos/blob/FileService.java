@@ -11,6 +11,8 @@ import foam.blob.BlobService;
 import foam.blob.IdentifiedBlob;
 import foam.core.X;
 import foam.dao.DAO;
+import foam.nanos.auth.AuthService;
+import foam.nanos.auth.User;
 import foam.nanos.fs.File;
 import org.apache.commons.io.IOUtils;
 
@@ -22,9 +24,6 @@ public class FileService
     extends HttpBlobService
 {
   protected DAO fileDAO_;
-  protected DAO userDAO_;
-  protected DAO sessionDAO_;
-
 
   public FileService(X x, BlobService delegate) {
     this(x, "httpFileService", delegate);
@@ -33,10 +32,6 @@ public class FileService
   public FileService(X x, String name, BlobService delegate) {
     super(x, name, delegate);
     fileDAO_ = (DAO) x.get("fileDAO");
-    // use the user dao instead of local user dao
-    // so that we get the authentication decoration
-    userDAO_ = (DAO) x.get("userDAO");
-    sessionDAO_ = (DAO) x.get("localSessionDAO");
   }
 
   @Override
@@ -45,6 +40,7 @@ public class FileService
     OutputStream os = null;
     HttpServletRequest  req  = x.get(HttpServletRequest.class);
     HttpServletResponse resp = x.get(HttpServletResponse.class);
+    AuthService auth       = (AuthService) x.get("auth");
 
     try {
       String path = req.getRequestURI();
@@ -61,11 +57,7 @@ public class FileService
       // fileDAO has been decorated to disallow enumeration and File
       // IDs are unguessable cryptographically strong UUIDs, so no
       // permission check is really necessary.
-      
-// if ( userDAO_.find_(x, file.getOwner()) == null ) {
-//  resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-//  return;
-// }
+      // NOTE: 'user' is validated in SessionWebAgent
 
       // get blob and blob size
       // TODO: figure out why delegate is not being set for IdentifiedBlob

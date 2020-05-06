@@ -19,11 +19,26 @@ foam.CLASS({
   package: 'foam.comics',
   name: 'InlineDAOControllerView',
   extends: 'foam.comics.DAOControllerView',
-  
+
+  properties: [
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'defaultSummaryView_',
+      value: {
+        class: 'foam.u2.view.ScrollTableView',
+        enableDynamicTableHeight: false
+      }
+    }
+  ],
+
   methods: [
     function initE() {
       this.
-        add(this.cls.FILTERED_DAO).
+        tag(this.summaryView, {
+          data$: this.data.filteredDAO$,
+          multiSelectEnabled: !! this.data.relationship,
+          selectedObjects$: this.data.selectedObjects$
+        }).
         start('span').
           show(this.mode$.map(function(m) { return m == foam.u2.DisplayMode.RW; })).
           add(this.cls.getAxiomsByClass(foam.core.Action)).

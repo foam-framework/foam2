@@ -19,9 +19,9 @@ public class AndValue extends foam.lib.parse.ProxyParser {
   public AndValue() {
     setDelegate(
         new Seq(
-            new Literal("("),
-            new Repeat(new ValueParser(), new Alt(new LiteralIC(" and "), new Literal(" ")), 1),
-            new Literal(")")
+            Literal.create("("),
+            new Repeat(new ValueParser(), new Alt(new LiteralIC(" and "), Literal.create(" ")), 1),
+            Literal.create(")")
         ));
   }
 

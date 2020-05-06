@@ -15,7 +15,6 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.nanos.notification.email.DAOResourceLoader',
     'foam.nanos.logger.Logger',
     'foam.util.SafetyUtil'
   ],
@@ -27,6 +26,9 @@ foam.CLASS({
       documentation: 'application of template args to emailTemplate and then onto the emailMessage',
       javaCode: `
       Logger logger = (Logger) x.get("logger");
+      if ( templateArgs == null ) {
+        return emailMessage;
+      }
       String templateName = (String)templateArgs.get("template");
       if ( SafetyUtil.isEmpty(templateName) ) return emailMessage;
 
@@ -37,9 +39,10 @@ foam.CLASS({
       try {
         emailMessage = emailTemplateObj.apply(x, group, emailMessage, templateArgs);
       } catch (Exception e) {
-        ((Logger) x.get("logger")).error(new NoSuchFieldException("@EmailTemplateApplyEmailPropertyService: emailTemplate.apply has failed. emailTemplate = {id:" + templateName + ", group:" + group + "}" + e));
+        if ( logger != null ) {
+          logger.error(new NoSuchFieldException("@EmailTemplateApplyEmailPropertyService: emailTemplate.apply has failed. emailTemplate = {id:" + templateName + ", group:" + group + "}" + e));
+        }
       }
-
       return emailMessage;
       `
     }

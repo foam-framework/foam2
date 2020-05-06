@@ -8,6 +8,7 @@ foam.CLASS({
   package: 'foam.u2.view',
   name: 'StringArrayView',
   extends: 'foam.u2.view.ArrayView',
+
   properties: [
     {
       name: 'valueView',

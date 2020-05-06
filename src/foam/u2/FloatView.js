@@ -22,7 +22,12 @@ foam.CLASS({
 
   documentation: 'View for editing Float Properties.',
 
-  css: `^:read-only:not(^:disabled) { border: none; background: rgba(0,0,0,0); }`,
+  css: `
+    ^:read-only {
+      border: none;
+      background: rgba(0,0,0,0);
+    }
+  `,
 
   properties: [
     ['type', 'number'],

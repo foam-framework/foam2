@@ -49,7 +49,11 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'permissionRequired'
+      name: 'readPermissionRequired'
+    },
+    {
+      class: 'Boolean',
+      name: 'writePermissionRequired'
     },
     {
       class: 'Boolean',
@@ -123,20 +127,6 @@ foam.CLASS({
             body: 'return "' + this.propName + '";'
           },
           {
-            name: 'getShortName',
-            visibility: 'public',
-            type: 'String',
-            body: this.propShortName ?
-              'return "' + this.propShortName + '";' :
-              'return null;'
-          },
-          {
-            name: 'getAliases',
-            visibility: 'public',
-            type: 'String[]',
-            body: 'return ' + this.getAliasesBody
-          },
-          {
             name: 'get',
             visibility: 'public',
             type: 'Object',
@@ -169,7 +159,7 @@ foam.CLASS({
             type: this.propType,
             visibility: 'public',
             args: [{ name: 'o', type: 'Object' }],
-            body: 'return (' + this.propType + ') o;'
+            body: 'return ' + ( this.propType == "Object" ? 'o;' : '( ' + this.propType + ') o;')
           },
           {
             name: 'compare',
@@ -211,42 +201,6 @@ foam.CLASS({
             body: 'return ' + ( this.csvParser ? this.csvParser : null ) + ';'
           },
           {
-            name: 'getNetworkTransient',
-            type: 'boolean',
-            visibility: 'public',
-            body: 'return ' + this.networkTransient + ';'
-          },
-          {
-            name: 'getPermissionRequired',
-            type: 'boolean',
-            visibility: 'public',
-            body: 'return ' + this.permissionRequired + ';'
-          },
-          {
-            name: 'getStorageTransient',
-            type: 'boolean',
-            visibility: 'public',
-            body: 'return ' + this.storageTransient + ';'
-          },
-          {
-            name: 'getXMLAttribute',
-            type: 'boolean',
-            visibility: 'public',
-            body: 'return ' + this.xmlAttribute + ';'
-          },
-          {
-            name: 'getXMLTextNode',
-            type: 'boolean',
-            visibility: 'public',
-            body: 'return ' + this.xmlTextNode + ';'
-          },
-          {
-            name: 'getRequired',
-            visibility: 'public',
-            type: 'boolean',
-            body: 'return ' + Boolean(this.propRequired) + ';'
-          },
-          {
             name: 'getValueClass',
             visibility: 'public',
             type: 'Class',
@@ -257,12 +211,6 @@ foam.CLASS({
             visibility: 'public',
             type: 'String',
             body: 'return "' + this.sqlType + '";'
-          },
-          {
-            name: 'createStatement',
-            visibility: 'public',
-            type: 'String',
-            body: 'return "' + this.propName.toLowerCase() + '";'
           },
           {
             name: 'isSet',
@@ -278,16 +226,6 @@ foam.CLASS({
             args: [{ name: 'o', type: 'Object' }],
             /* TODO: revise when/if expression support is added to Java */
             body: `return foam.util.SafetyUtil.compare(get_(o), ${this.propValue}) == 0;`
-          },
-          {
-            name: 'validateObj',
-            visibility: 'public',
-            type: 'void',
-            args: [
-              { name: 'x', type: 'foam.core.X' },
-              { name: 'obj', type: 'foam.core.FObject' }
-            ],
-            body: this.validateObj
           },
           {
             name: 'toCSV',
@@ -318,8 +256,122 @@ foam.CLASS({
               { name: 'map', type: 'java.util.Map<String, foam.lib.csv.FromCSVSetter>' }
             ],
             body: this.fromCSVLabelMapping
+          },
+          // TODO: move to AbstractPropertyInfo class for each type to avoid
+          // generating for each PropertyInfo.
+          {
+            name: 'format',
+            visibility: 'public',
+            type: 'void',
+            args: [
+              {
+                name: 'formatter',
+                type: 'foam.lib.formatter.FObjectFormatter'
+              },
+              {
+                name: 'obj',
+                type: 'foam.core.FObject'
+              }
+            ],
+            body: 'formatter.output(get_(obj));'
           }
         ];
+
+        if ( this.networkTransient ) {
+          m.push({
+            name: 'getNetworkTransient',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.networkTransient + ';'
+          });
+        }
+
+        if ( this.storageTransient ) {
+          m.push({
+            name: 'getStorageTransient',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.storageTransient + ';'
+          });
+        }
+
+        if ( this.readPermissionRequired ) {
+          m.push({
+            name: 'getReadPermissionRequired',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.readPermissionRequired + ';'
+          });
+        }
+
+        if ( this.writePermissionRequired ) {
+          m.push({
+            name: 'getWritePermissionRequired',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.writePermissionRequired + ';'
+          });
+        }
+
+        if ( this.xmlAttribute ) {
+          m.push({
+            name: 'getXMLAttribute',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.xmlAttribute + ';'
+          });
+        }
+
+        if ( this.xmlTextNode ) {
+          m.push({
+            name: 'getXMLTextNode',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.xmlTextNode + ';'
+          });
+        }
+
+        if ( this.propRequired ) {
+          m.push({
+            name: 'getRequired',
+            visibility: 'public',
+            type: 'boolean',
+            body: 'return ' + Boolean(this.propRequired) + ';'
+          });
+        }
+
+        if ( this.validateObj ) {
+          m.push({
+            name: 'validateObj',
+            visibility: 'public',
+            type: 'void',
+            args: [
+              { name: 'x', type: 'foam.core.X' },
+              { name: 'obj', type: 'foam.core.FObject' }
+            ],
+            body: this.validateObj
+          });
+        }
+
+        if ( this.propShortName ) {
+          m.push({
+            name: 'getShortName',
+            visibility: 'public',
+            type: 'String',
+            body: this.propShortName ?
+              'return "' + this.propShortName + '";' :
+              'return null;'
+          });
+        }
+
+        if ( this.propAliases.length ) {
+          m.push({
+            name: 'getAliases',
+            visibility: 'public',
+            type: 'String[]',
+            body: 'return ' + this.getAliasesBody
+          });
+        }
 
         if ( this.cloneProperty != null ) {
           m.push({

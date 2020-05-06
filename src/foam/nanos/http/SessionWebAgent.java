@@ -68,12 +68,17 @@ public class SessionWebAgent
       }
 
       // display a warning if querystring contains sessionId
+      // TODO: whitelist 'services' that we allow/expect sessionId,
+      // such as file requests
       if ( req.getQueryString().contains("sessionId") ) {
-        logger.warning(
-          "\033[31;1m" +
-          "Querystring contains 'sessionId'! Please inform the security team!" +
-          "\033[0m"
-        );
+        if ( ! req.getRequestURI().contains("httpFileService") ) {
+          logger.warning(
+                         "\033[31;1m" +
+                         req.getRequestURI() +
+                         " contains 'sessionId'! Please inform the security team!" +
+                         "\033[0m"
+                         );
+        }
       }
 
       // find session
@@ -96,9 +101,16 @@ public class SessionWebAgent
 
       // execute delegate
       getDelegate().execute(session.getContext().put(HttpServletResponse.class, resp).put(HttpServletRequest.class, req));
-  } catch ( Throwable t ) {
+
+    } catch ( AuthorizationException e ) {
+      // report permission issues
+      logger.warning("SessionWebAgent", e);
+      resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    } catch ( AuthenticationException e ) {
+      logger.debug("SessionWebAgent", e);
+      resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    } catch ( Throwable t ) {
       logger.error("Unexpected exception in SessionWebAgent", t);
-      // throw unauthorized on error
       resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
   }

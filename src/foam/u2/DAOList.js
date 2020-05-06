@@ -24,7 +24,8 @@ foam.CLASS({
 
   exports: [
     'selection',
-    'hoverSelection'
+    'hoverSelection',
+    'data as dao'
   ],
 
   imports: [
@@ -57,8 +58,8 @@ foam.CLASS({
         addClass(this.myClass()).
         select(this.data$proxy, function(obj) {
           return ( this.rowView ?
-                       foam.u2.ViewSpec.createView(this.rowView, { data: obj }, this, this.__subSubContext__) :
-                       this.rowFactory$f({ data: obj }) ).
+            foam.u2.ViewSpec.createView(this.rowView, { data: obj }, this, this.__subSubContext__) :
+            this.rowFactory$f({data: obj})).
               on('mouseover', function() { view.hoverSelection = obj; }).
               on('click', function() {
                 view.selection = obj;
@@ -74,6 +75,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.u2.view',
@@ -94,5 +96,4 @@ foam.CLASS({
       return this.DAOList.create(args, ctx);
     }
   ]
-
 });

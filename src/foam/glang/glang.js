@@ -75,6 +75,50 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.glang',
+  name: 'StartOfHour',
+  extends: 'foam.glang.AbstractDateGlang',
+  methods: [
+    {
+      name: 'f',
+      code: function(obj) {
+        var ts = new Date(this.delegate.f(obj));
+        ts.setMinutes(0, 0);
+        return ts;
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.glang',
+  name: 'EndOfHour',
+  extends: 'foam.glang.AbstractDateGlang',
+  methods: [
+    {
+      name: 'f',
+      code: function(obj) {
+        var ts = new Date(this.delegate.f(obj));
+        ts.setMinutes(59, 59);
+        ts.setMilliseconds(999);
+        return ts;
+      },
+      javaCode: `
+      // Convert to LocalDate
+      java.util.Date date = (java.util.Date) getDelegate().f(obj);
+      java.time.LocalDate localDate = java.time.Instant.ofEpochMilli(date.getTime()).atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+
+      // Convert to LocalDateTime set to End of Day
+      java.time.LocalDateTime localDateTime = localDate.atTime(java.time.LocalTime.MAX);
+
+      // Convert to Date using LocalDateTime
+      return java.util.Date.from(localDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant());
+      `
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.glang',
   name: 'StartOfDay',
   extends: 'foam.glang.AbstractDateGlang',
   methods: [
@@ -182,7 +226,7 @@ java.util.Date date = (java.util.Date) getDelegate().f(obj);
 java.time.LocalDate localDate = java.time.Instant.ofEpochMilli(date.getTime()).atZone(java.time.ZoneId.systemDefault()).toLocalDate();
 
 // Set to end of week
-localDate = localDate.plusDays(6 - localDate.getDayOfWeek().getValue());
+localDate = localDate.plusDays(6 - (long)localDate.getDayOfWeek().getValue());
 
 // Convert to LocalDateTime set to End of Day
 java.time.LocalDateTime localDateTime = localDate.atTime(java.time.LocalTime.MAX);
@@ -233,7 +277,7 @@ java.util.Date date = (java.util.Date) getDelegate().f(obj);
 java.time.LocalDate localDate = java.time.Instant.ofEpochMilli(date.getTime()).atZone(java.time.ZoneId.systemDefault()).toLocalDate();
 
 // Set to end of month
-localDate = localDate.plusDays(localDate.lengthOfMonth() - localDate.getDayOfMonth());
+localDate = localDate.plusDays((long)localDate.lengthOfMonth() - (long)localDate.getDayOfMonth());
 
 // Convert to LocalDateTime set to End of Day
 java.time.LocalDateTime localDateTime = localDate.atTime(java.time.LocalTime.MAX);
@@ -289,10 +333,10 @@ java.util.Date date = (java.util.Date) getDelegate().f(obj);
 java.time.LocalDate localDate = java.time.Instant.ofEpochMilli(date.getTime()).atZone(java.time.ZoneId.systemDefault()).toLocalDate();
 
 // Set month to end of quarter
-localDate = localDate.plusMonths(2 - (localDate.getMonthValue() - 1) % 3);
+localDate = localDate.plusMonths(2 - ((long)localDate.getMonthValue() - 1) % 3);
 
 // Set to end of month
-localDate = localDate.plusDays(localDate.lengthOfMonth() - localDate.getDayOfMonth());
+localDate = localDate.plusDays((long)localDate.lengthOfMonth() - (long)localDate.getDayOfMonth());
 
 // Convert to LocalDateTime set to End of Day
 java.time.LocalDateTime localDateTime = localDate.atTime(java.time.LocalTime.MAX);

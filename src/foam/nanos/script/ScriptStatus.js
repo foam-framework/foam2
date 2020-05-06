@@ -9,15 +9,15 @@ foam.ENUM({
   name: 'ScriptStatus',
   values: [
     {
-      name:'SCHEDULED',
+      name: 'SCHEDULED',
       label: 'Scheduled'
     },
     {
-      name:'UNSCHEDULED',
+      name: 'UNSCHEDULED',
       label: 'Unscheduled'
     },
     {
-      name:'RUNNING',
+      name: 'RUNNING',
       label: 'Running'
     },
     {

@@ -7,15 +7,18 @@
 foam.CLASS({
   package: 'foam.comics.v2',
   name: 'DAOBrowseControllerView',
+  extends: 'foam.u2.View',
+
   documentation: `
-    The inline DAO controller for a collection of instances of a model that can 
+    The inline DAO controller for a collection of instances of a model that can
     switch between multiple views
   `,
-  
-  extends: 'foam.u2.View',
+
   imports: [
+    'auth',
     'stack'
   ],
+
   requires: [
     'foam.comics.v2.DAOBrowserView',
     'foam.u2.borders.CardBorder',
@@ -75,14 +78,33 @@ foam.CLASS({
   actions: [
     {
       name: 'create',
+      isEnabled: function(config, data) {
+        if ( config.CRUDEnabledActionsAuth && config.CRUDEnabledActionsAuth.isEnabled ) {
+          try {
+            let permissionString = config.CRUDEnabledActionsAuth.enabledActionsAuth.permissionFactory(foam.nanos.ruler.Operations.CREATE, data);
+  
+            return this.auth.check(null, permissionString);
+          } catch(e) {
+            return false;
+          }
+        }
+        return true;
+      },
+      isAvailable: function(config) {
+        try {
+          return config.createPredicate.f();
+        } catch(e) {
+          return false;
+        }
+      },
       code: function() {
         if ( ! this.stack ) return;
         this.stack.push({
           class: 'foam.comics.v2.DAOCreateView',
-          data: this.data.of.create({}, this),
+          data: this.data.of.create({ mode: 'create' }, this),
           config$: this.config$,
           of: this.data.of
-        });
+        }, this.__subContext__);
       }
     }
   ],
@@ -103,14 +125,14 @@ foam.CLASS({
                 .addClass(self.myClass('browse-title'))
                 .add(config$browseTitle)
               .end()
-              .startContext({data: self}).add(self.CREATE).endContext()
+              .startContext({ data: self }).tag(self.CREATE).endContext()
             .end()
             .start(self.CardBorder)
               .style({ position: 'relative' })
               .start(config$browseBorder)
-                .callIf(config$browseViews.length > 1, function() {
+                .callIf(config$browseViews.length > 1 && config.cannedQueries.length > 0, function() {
                   this
-                    .start(self.IconChoiceView, { 
+                    .start(self.IconChoiceView, {
                       choices:config$browseViews.map(o => [o.view, o.icon]),
                       data$: self.browseView$
                     })

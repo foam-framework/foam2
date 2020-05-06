@@ -24,14 +24,12 @@ foam.CLASS({
     'foam.nanos.logger.Logger',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.StdoutLogger',
-    'foam.util.SafetyUtil',
     'java.io.BufferedReader',
     'java.io.BufferedWriter',
     'java.io.InputStreamReader',
     'java.io.InputStream',
     'java.io.OutputStream',
     'java.io.OutputStreamWriter',
-    'java.text.SimpleDateFormat',
     'java.util.Calendar',
     'java.util.Iterator',
     'java.util.List',
@@ -58,15 +56,6 @@ foam.CLASS({
               return b;
             }
           };
-
-          protected static final ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
-            @Override
-            protected SimpleDateFormat initialValue() {
-              SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-              sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-              return sdf;
-            }
-          };
         `);
       }
     }
@@ -75,11 +64,17 @@ foam.CLASS({
   properties: [
     {
       class: 'Object',
+      name: 'line',
+      javaType: 'foam.util.concurrent.AssemblyLine',
+      javaFactory: 'return new foam.util.concurrent.SyncAssemblyLine();'
+    },
+    {
+      class: 'Object',
       name: 'outputter',
       javaType: 'foam.lib.json.Outputter',
       javaFactory: `
-        foam.lib.json.Outputter outputter = new Outputter(getX()).setPropertyPredicate(new StoragePropertyPredicate()); 
-        outputter.setMultiLine(getMultiLineOutput()); 
+        foam.lib.json.Outputter outputter = new Outputter(getX()).setPropertyPredicate(new StoragePropertyPredicate());
+        outputter.setMultiLine(getMultiLineOutput());
         return outputter;
         `
     },
@@ -88,6 +83,12 @@ foam.CLASS({
       name: 'parser',
       javaType: 'foam.lib.json.JSONParser',
       javaFactory: `return getX().create(JSONParser.class);`
+    },
+    {
+      class: 'Object',
+      name: 'timeStamper',
+      javaType: 'foam.util.FastTimestamper',
+      javaFactory: `return new foam.util.FastTimestamper();`
     },
     {
       class: 'FObjectProperty',
@@ -126,7 +127,7 @@ foam.CLASS({
 try {
   InputStream is = getX().get(foam.nanos.fs.Storage.class).getInputStream(getFilename());
   if ( is == null ) {
-    getLogger().error("Failed to read from resource journal: " + getFilename());
+    getLogger().error("File not found - journal: " + getFilename());
   }
   return (is == null) ? null : new BufferedReader(new InputStreamReader(is));
 } catch ( Throwable t ) {
@@ -144,7 +145,7 @@ try {
 try {
   OutputStream os = getX().get(foam.nanos.fs.Storage.class).getOutputStream(getFilename());
   if ( os == null ) {
-    getLogger().error("Failed to read from resource journal: " + getFilename());
+    getLogger().error("File not found - journal: " + getFilename());
   }
   return (os == null) ? null : new BufferedWriter(new OutputStreamWriter(os));
 } catch ( Throwable t ) {
@@ -157,36 +158,60 @@ try {
 
   methods: [
     {
-      name: 'putWithPrefix_',
+      name: 'put',
+      type: 'FObject',
       args: [
-        { name: 'x', type: 'Context' },
-        { name: 'old', type: 'foam.core.FObject' },
-        { name: 'nu', type: 'foam.core.FObject' },
-        { name: 'prefix', type: 'String' }
+        { name: 'x',      type: 'Context' },
+        { name: 'prefix', type: 'String' },
+        { name: 'dao',    type: 'DAO' },
+        { name: 'obj',    type: 'foam.core.FObject' }
       ],
-      synchronized: true,
       javaCode: `
-        prefix = ( ! foam.util.SafetyUtil.isEmpty(prefix) )
-          ? prefix + "."
-          : "";
-        try {
-          String c = "";
-          if ( getMultiLineOutput() )
-            c = "\\n";
+        final Object id = obj.getProperty("id");
 
-          String record = ( old != null ) ?
-            getOutputter().stringifyDelta(old, nu) :
-            getOutputter().stringify(nu);
+        getLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
+          FObject old;
+          String  record_ = null;
 
-          if ( ! foam.util.SafetyUtil.isEmpty(record) ) {
-            writeComment_(x, nu);
-            writePut_(x, record, c, prefix);
+          public Object[] requestLocks() {
+            return new Object[] { id };
           }
 
-        } catch ( Throwable t ) {
-          getLogger().error("Failed to write put entry to journal", t);
-          throw new RuntimeException(t);
-        }
+          public void executeUnderLock() {
+            old = dao.find_(x, id);
+            dao.put_(x, obj);
+          }
+
+          public void executeJob() {}
+
+          public void endJob() {
+            try {
+              record_ = ( old != null ) ?
+                getOutputter().stringifyDelta(old, obj) :
+                getOutputter().stringify(obj);
+            } catch (Throwable t) {
+              getLogger().error("Failed to write put entry to journal", t);
+              record_ = null;
+            }
+
+            if ( foam.util.SafetyUtil.isEmpty(record_) ) return;
+
+            try {
+              writeComment_(x, obj);
+              writePut_(
+                x,
+                record_,
+                getMultiLineOutput() ? "\\n" : "",
+                foam.util.SafetyUtil.isEmpty(prefix) ? "" : prefix + ".");
+
+                if ( isLast() ) getWriter().flush();
+            } catch (Throwable t) {
+              getLogger().error("Failed to write put entry to journal", t);
+            }
+          }
+        });
+
+        return obj;
       `
     },
     {
@@ -223,33 +248,56 @@ try {
       `
     },
     {
-      name: 'removeWithPrefix_',
+      name: 'remove',
+      type: 'FObject',
       args: [
-        { name: 'x', type: 'Context' },
-        { name: 'obj', type: 'foam.core.FObject' },
-        { name: 'prefix', type: 'String' }
+        { name: 'x',      type: 'Context' },
+        { name: 'prefix', type: 'String' },
+        { name: 'dao',    type: 'DAO' },
+        { name: 'obj',    type: 'foam.core.FObject' }
       ],
-      synchronized: true,
       javaCode: `
-        prefix = ( ! foam.util.SafetyUtil.isEmpty(prefix) )
-          ? prefix + "."
-          : "";
-        try {
-          // TODO: Would be more efficient to output the ID portion of the object.  But
-          // if ID is an alias or multi part id we should only output the
-          // true properties that ID/MultiPartID maps too.
-          FObject toWrite = (FObject) obj.getClassInfo().newInstance();
-          toWrite.setProperty("id", obj.getProperty("id"));
-          String record = getOutputter().stringify(toWrite);
+      final Object id = obj.getProperty("id");
 
-          if ( ! foam.util.SafetyUtil.isEmpty(record) ) {
-            writeComment_(x, obj);
-            writeRemove_(x, record, prefix);
-          }
-        } catch ( Throwable t ) {
-          getLogger().error("Failed to write remove entry to journal", t);
-          throw new RuntimeException(t);
+      getLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
+        String record_ = null;
+
+        public Object[] requestLocks() {
+          return new Object[] { id };
         }
+
+        public void executeUnderLock() {
+          dao.remove_(x, obj);
+        }
+
+        public void executeJob() {
+          try {
+            // TODO: Would be more efficient to output the ID portion of the object.  But
+            // if ID is an alias or multi part id we should only output the
+            // true properties that ID/MultiPartID maps too.
+            FObject toWrite = (FObject) obj.getClassInfo().newInstance();
+            toWrite.setProperty("id", obj.getProperty("id"));
+            record_ = getOutputter().stringify(toWrite);
+          } catch (Throwable t) {
+            getLogger().error("Failed to write put entry to journal", t);
+          }
+        }
+
+        public void endJob() {
+          if ( foam.util.SafetyUtil.isEmpty(record_) ) return;
+
+          try {
+            writeComment_(x, obj);
+            writeRemove_(x, record_, foam.util.SafetyUtil.isEmpty(prefix) ? "" : prefix + ".");
+
+            if ( isLast() ) getWriter().flush();
+          } catch (Throwable t) {
+            getLogger().error("Failed to write put entry to journal", t);
+          }
+        }
+      });
+
+      return obj;
       `
     },
     {
@@ -282,7 +330,7 @@ try {
     },
     {
       name: 'write_',
-      synchronized: true,
+     // synchronized: true,
       javaThrows: [
         'java.io.IOException'
       ],
@@ -296,12 +344,11 @@ try {
         BufferedWriter writer = getWriter();
         writer.write(data);
         writer.newLine();
-        writer.flush();
       `
     },
     {
       name: 'writeComment_',
-      synchronized: true,
+     // synchronized: true,
       javaThrows: [
         'java.io.IOException'
       ],
@@ -320,14 +367,14 @@ try {
         if ( obj instanceof LastModifiedByAware && ((LastModifiedByAware) obj).getLastModifiedBy() != 0L ) return;
 
         User user = (User) x.get("user");
-        Calendar now = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+
         write_(sb.get()
           .append("// Modified by ")
-          .append(user.label())
+          .append(user.toSummary())
           .append(" (")
           .append(user.getId())
           .append(") at ")
-          .append(sdf.get().format(now.getTime()))
+          .append(getTimeStamper().createTimestamp())
           .toString());
       `
     },
@@ -371,7 +418,7 @@ try {
         }
       ],
       javaCode: `
-        Parser        parser = new ExprParser();
+        Parser        parser = ExprParser.instance();
         PStream       ps     = new StringPStream();
         ParserContext x      = new ParserContextImpl();
 
@@ -406,7 +453,7 @@ try {
           PropertyInfo prop = (PropertyInfo) e.next();
           mergeProperty(oldFObject, diffFObject, prop);
         }
-        return oldFObject;
+        return diffFObject.copyFrom(oldFObject);
       `
     },
     {

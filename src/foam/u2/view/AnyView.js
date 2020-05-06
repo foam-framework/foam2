@@ -8,6 +8,7 @@ foam.CLASS({
   package: 'foam.u2.view',
   name: 'AnyView',
   extends: 'foam.u2.View',
+
   requires: [
     'foam.u2.layout.Cols',
     'foam.u2.CheckBox',
@@ -17,11 +18,20 @@ foam.CLASS({
     'foam.u2.view.ChoiceView',
     'foam.u2.view.MapView'
   ],
+
   constants: [
     {
       name: 'DEFAULT_TYPES',
       factory: function() {
         return [
+          foam.u2.view.AnyView.Choice.create({
+            label: '--',
+            type: foam.Undefined,
+            view: foam.u2.View,
+            toType: function(o) {
+              return undefined;
+            }
+          }),
           foam.u2.view.AnyView.Choice.create({
             label: 'String',
             type: foam.String,
@@ -55,6 +65,14 @@ foam.CLASS({
             }
           }),
           foam.u2.view.AnyView.Choice.create({
+            label: 'FObject',
+            type: foam.core.FObject,
+            view: foam.u2.view.FObjectView,
+            toType: function(o) {
+              return foam.core.FObject.isInstance(o) ? o : foam.core.FObject.create();
+            }
+          }),
+          foam.u2.view.AnyView.Choice.create({
             label: 'Array',
             type: foam.Array,
             view: foam.u2.view.ArrayView,
@@ -75,6 +93,7 @@ foam.CLASS({
       }
     }
   ],
+
   classes: [
     {
       name: 'Choice',
@@ -102,6 +121,7 @@ foam.CLASS({
       ]
     }
   ],
+
   properties: [
     {
       name: 'types',
@@ -114,36 +134,39 @@ foam.CLASS({
       expression: function(data, types) {
         var type = foam.typeOf(data);
         var choice = types.find(t => type == t.type);
+        if ( ! choice ) {
+          console.warn("Unable to find view for type!");
+          console.log(data);
+        }
         return choice || types[0];
       }
     },
     {
-      name: 'view',
-      postSet: function(o, n) {
-        if ( o ) o.detach();
-        n.onDetach(n.data$.linkFrom(this.data$));
-      }
+      class: 'Boolean',
+      name: 'enableChoice',
+      value: true
     }
   ],
+
   methods: [
     function initE() {
       var self = this;
       this
         .start(self.Cols)
+          .callIf(this.enableChoice, function() {
+            this.start(self.ChoiceView, {
+              choices$: self.types$.map(types => types.map(t => [t, t.label])),
+              data$: self.selected$
+            })
+            .style({'margin-right': '8px'})
+            .end()
+          })
           .start()
             .style({flex: 1})
             .add(this.slot(function(selected) {
-              self.data = selected.toType(self.data);
               return self.E()
-                .startContext({data: null})
-                  .start(selected.view, null, this.view$).end()
-                .endContext();
+              .tag(selected.view, {data$: self.data$});
             }))
-          .end()
-          .start(this.ChoiceView, {
-            choices$: this.types$.map(types => types.map(t => [t, t.label])),
-            data$: this.selected$
-          })
           .end()
         .end();
     }

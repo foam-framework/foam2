@@ -30,7 +30,7 @@ foam.CLASS({
       name: 'stringValue',
       view: function(_, X) {
         return X.data.slot(function(width) {
-          return foam.u2.TextField.create({displayWidth: width, data$: this.stringValue$});
+          return foam.u2.TextField.create({size: width, data$: this.stringValue$, placeholder: width});
         });
       }
     },
