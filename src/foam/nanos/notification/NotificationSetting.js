@@ -44,6 +44,14 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'id'
+    },
+    {
+      class: 'Boolean',
+      name: 'enabled'
+    },
+    {
+      class: 'StringArray',
+      name: 'disabledTopics',
     }
   ],
 

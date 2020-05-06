@@ -441,14 +441,14 @@ foam.CLASS({
     },
     {
       class: 'StringArray',
-      name: 'disabledTopics',
+      name: 'disabledTopics2',
       documentation: 'Disables types for notifications.',
       createVisibility: 'HIDDEN',
       section: 'administrative'
     },
     {
       class: 'StringArray',
-      name: 'disabledTopicsEmail',
+      name: 'disabledTopicsEmail2',
       documentation: 'Disables types for email notifications.',
       createVisibility: 'HIDDEN',
       section: 'administrative'
