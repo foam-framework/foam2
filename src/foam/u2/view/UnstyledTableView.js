@@ -237,11 +237,6 @@ foam.CLASS({
       name: 'isColumnChanged',
       class: 'Boolean', 
       value: false
-    },
-    {
-      name: 'selectColumnsExpanded',
-      class: 'Boolean', 
-      value: false
     }
   ],
 
@@ -258,14 +253,13 @@ foam.CLASS({
       localStorage.setItem(this.of.id, JSON.stringify(this.selectedColumnNames));
     },
 
-    function closeDropDown(e) {
-      e.stopPropagation();
-      this.selectColumnsExpanded = !this.selectColumnsExpanded;
-    }, 
-
     function initE() {
       var view = this;
       var columnSelectionE;
+
+      //otherwise on adding new column creating new EditColumnsView, which is closed by default
+      if (view.editColumnsEnabled)
+        var editColumnView = foam.u2.view.EditColumnsView.create({data:view});//foam.u2.ViewSpec.createView({ class: 'foam.u2.view.EditColumnsView'}, {data:view}, view, view.__subSubContext__);
 
       // this.isColumnChanged$.sub(function(){
       //   console.log('isColumnChanged');
@@ -368,46 +362,20 @@ foam.CLASS({
                   callIf(view.editColumnsEnabled, function() {
                     this.addClass(view.myClass('th-editColumns'))
                     .on('click', function(e) {
-                      if (!view.selectColumnsExpanded)
-                        view.selectColumnsExpanded = !view.selectColumnsExpanded;
+                      if (!editColumnView.selectColumnsExpanded)
+                        editColumnView.selectColumnsExpanded = !editColumnView.selectColumnsExpanded;
                     }).
                     tag(view.Image, { data: '/images/Icon_More_Resting.svg' }).
                     addClass(view.myClass('vertDots')).
                     addClass(view.myClass('noselect'))
                     ;
                   }).
-                  tag('div', null, view.dropdownOrigin$)
-                  .start()
-                    .show(view.selectColumnsExpanded$)//view.selectColumnsExpanded$
-                    .style({
-                      'font-size': '12px',
-                      'position': 'fixed',
-                      'width': '100%',
-                      'height': '100%',
-                      'top': '0px',
-                      'left': '0px',
-                      'z-index': '1',
-                    })
-                    // .add('helloWorld')
-                    .start()
-                      .style({
-                        'background-color': '#f9f9f9',
-                        'top': '20px',
-                        'left': '2100px',
-                        'position': 'fixed',
-                        'overflow': 'scroll',
-                        'margin-bottom': '0px',
-                        'padding-bottom': '400px',
-                        'height': '100vh'
-                      })
-                      .add(foam.u2.ViewSpec.createView({ class: 'foam.u2.view.ColumnConfigPropView'}, {data:view}, view, view.__subSubContext__))
-                    .end()
-                  .on('click', view.closeDropDown.bind(view))
-                  .end()
-                .end();
-              });
-          })).
+                  tag('div', null, view.dropdownOrigin$).
+                end();
+                })
+              })).
         end().
+        callIf(view.editColumnsEnabled, function() {this.add(editColumnView);}).       
         add(this.rowsFrom(this.data$proxy));
     },
     {
