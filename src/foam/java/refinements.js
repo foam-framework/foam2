@@ -321,7 +321,7 @@ foam.CLASS({
       }
 
       var capitalized = foam.String.capitalize(this.name);
-      var setter = `assertNotFrozen();\n`;
+      var setter = checkFrozen ? `assertNotFrozen();\n` : ``;
 
       // add value assertion
       if ( this.javaAssertValue ) {
