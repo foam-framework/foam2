@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.nanos.notification.notifications',
   name: 'ScriptRunNotificationNotificationView',
-  extends: 'foam.nanos.notification.NotificationView',
+  extends: 'foam.nanos.notification.NotificationCitationView',
 
   requires: [
     'foam.comics.DAOUpdateControllerView'
