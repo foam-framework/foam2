@@ -82,7 +82,7 @@ foam.CLASS({
                 this.Notification.NOTIFICATION_TYPE,
                 this.user.disabledTopics))
           )
-        ).orderBy(this.DESC(this.Notification.ISSUED_DATE));
+        ).orderBy(this.DESC(this.Notification.CREATED));
       },
       view: {
         class: 'foam.u2.DAOList',
@@ -104,7 +104,7 @@ foam.CLASS({
                 this.Notification.NOTIFICATION_TYPE,
                 this.user.disabledTopics))
           )
-        ).orderBy(this.DESC(this.Notification.ISSUED_DATE));
+        ).orderBy(this.DESC(this.Notification.CREATED));
       },
       view: {
         class: 'foam.u2.DAOList',
