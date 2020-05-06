@@ -252,13 +252,11 @@ foam.CLASS({
         column;
     },
 
-    // function createSelectColumnView() {
-    //   var editor = this.EditColumnsView.create({of: this.of,
-    //       columnsAvailable: this.allColumns,
-    //       selectedColumnNames: this.selectedColumnNames,
-    //       isColumnChanged: this.isColumnChanged});
-    //   return editor;
-    // },
+    function updateColumns() {
+      this.isColumnChanged = !this.isColumnChanged;
+      localStorage.removeItem(this.of.id);
+      localStorage.setItem(this.of.id, JSON.stringify(this.selectedColumnNames));
+    },
 
     function initE() {
       var view = this;
