@@ -14,9 +14,9 @@ import foam.lib.parse.*;
 public class FObjectArrayParser extends ObjectNullParser {
   private final static Map    map__      = new ConcurrentHashMap();
   private final static Parser instance__ = new FObjectArrayParser();
-  
+
   public static Parser instance() { return instance__ == null  ? new ProxyParser() { public Parser getDelegate() { return instance__; } } : instance__; }
-  
+
   /**
    * Implement the multiton pattern so we don't create the same
    * parser more than once.
@@ -33,7 +33,7 @@ public class FObjectArrayParser extends ObjectNullParser {
 
     return p;
   }
-  
+
   private FObjectArrayParser() {
     this(null);
   }
@@ -44,11 +44,11 @@ public class FObjectArrayParser extends ObjectNullParser {
       Literal.create("["),
       Whitespace.instance(),
       new Repeat(
-          // Parses Alt(__Property__, FObject)
-          ExprParser.create(defaultClass),
-          new Seq0(Whitespace.instance(),
-              Literal.create(","),
-              Whitespace.instance())),
+        // Parses Alt(__Property__, FObject)
+        ExprParser.create(defaultClass),
+        new Seq0(Whitespace.instance(),
+          Literal.create(","),
+          Whitespace.instance())),
       Whitespace.instance(),
       Literal.create("]")));
   }
