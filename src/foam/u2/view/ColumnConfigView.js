@@ -176,6 +176,7 @@ foam.CLASS({
   ],
   listeners: [
     function toggleExpanded(e) {
+      e.stopPropagation();
       this.data.expanded = !this.data.expanded;
       if ( !this.data.hasSubProperties ) {//|| ( this.data.hasSubProperties && this.data.isPropertySelected )
         this.data.isPropertySelected = !this.data.isPropertySelected;

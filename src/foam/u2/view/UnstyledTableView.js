@@ -258,6 +258,11 @@ foam.CLASS({
       localStorage.setItem(this.of.id, JSON.stringify(this.selectedColumnNames));
     },
 
+    function closeDropDown(e) {
+      e.stopPropagation();
+      this.selectColumnsExpanded = !this.selectColumnsExpanded;
+    }, 
+
     function initE() {
       var view = this;
       var columnSelectionE;
@@ -373,21 +378,33 @@ foam.CLASS({
                   }).
                   tag('div', null, view.dropdownOrigin$)
                   .start()
-                    .show(true)//view.selectColumnsExpanded$
+                    .show(view.selectColumnsExpanded$)//view.selectColumnsExpanded$
                     .style({
-                        'top': '20px',
-                        'right': '8%',
-                        'font-size': '12px',
-                        'position': 'absolute',
-                        'background-color': '#f9f9f9',
-                        'margin-bottom': '20px',
-                        'box-shadow': '0px 8px 16px 0px rgba(0,0,0,0.2)',
-                        'z-index': '1024',
+                      'font-size': '12px',
+                      'position': 'fixed',
+                      'width': '100%',
+                      'height': '100%',
+                      'top': '0px',
+                      'left': '0px',
+                      'z-index': '1',
                     })
                     // .add('helloWorld')
-                    .add(foam.u2.ViewSpec.createView({ class: 'foam.u2.view.ColumnConfigPropView'}, {data:view}, view, view.__subSubContext__))
-                  .end().
-                end();
+                    .start()
+                      .style({
+                        'background-color': '#f9f9f9',
+                        'top': '20px',
+                        'left': '2100px',
+                        'position': 'fixed',
+                        'overflow': 'scroll',
+                        'margin-bottom': '0px',
+                        'padding-bottom': '400px',
+                        'height': '100vh'
+                      })
+                      .add(foam.u2.ViewSpec.createView({ class: 'foam.u2.view.ColumnConfigPropView'}, {data:view}, view, view.__subSubContext__))
+                    .end()
+                  .on('click', view.closeDropDown.bind(view))
+                  .end()
+                .end();
               });
           })).
         end().
