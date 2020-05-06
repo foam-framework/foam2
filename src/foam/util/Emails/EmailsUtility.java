@@ -58,7 +58,7 @@ public class EmailsUtility {
       Theme theme = (Theme) themeDAO.find(
             MLang.EQ(Theme.SPID, user.getSpid())
           );
-      templateArgs.put("theme", theme.appConfig);
+      templateArgs.put("theme", theme);
       emailMessage.setTemplateArguments(templateArgs);
     }
 
