@@ -65,7 +65,7 @@ foam.CLASS({
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
       section: 'basicInfo'
-    }, 
+    },
     {
       name: 'name',
       class: 'String',
@@ -88,7 +88,7 @@ foam.CLASS({
       class: 'String',
       view: {
         class: 'foam.u2.tag.TextArea',
-        rows: 12, 
+        rows: 12,
         cols: 120
       }
     },
@@ -139,13 +139,37 @@ foam.CLASS({
       documentation: `List of permissions granted by this capability`
     },
     {
+      name: 'permissionsIntercepted',
+      class: 'StringArray',
+      documentation: `List of permissions intercepted by this capability`
+    },
+    {
       name: 'daoKey',
       class: 'String'
-    }
+    },
+    {
+      name: 'daoFindKey',
+      class: 'String',
+      documentation: 'need to find things dynamically, thus have a string here to specify the object in context to look up.'
+    },
+    {
+      class: 'foam.mlang.predicate.PredicateProperty',
+      name: 'interceptIf',
+      javaFactory: `
+      return foam.mlang.MLang.TRUE;
+      `,
+      documentation: 'condition under which the permissions that may be intercepted by this capability will be intercepted.'
+    },
   ],
 
 
   methods: [
+    {
+      name: 'toSummary',
+      code: function() {
+        return this.name;
+      }
+    },
     {
       name: 'implies',
       type: 'Boolean',
@@ -179,8 +203,8 @@ foam.CLASS({
       name: 'stringImplies',
       type: 'Boolean',
       args: [
-        {name: 's1', type: 'String'},
-        {name: 's2', type: 'String'}
+        { name: 's1', type: 'String' },
+        { name: 's2', type: 'String' }
       ],
       documentation: `check if s1 implies s2 where s1 and s2 are permission or capability strings`,
       javaCode: `
@@ -195,7 +219,7 @@ foam.CLASS({
       name: 'isDeprecated',
       type: 'Boolean',
       args: [
-        {name: 'x', type: 'Context'}
+        { name: 'x', type: 'Context' }
       ],
       documentation: 'check if a given capability is deprecated',
       javaCode: `
@@ -232,7 +256,7 @@ foam.CLASS({
 });
 
 foam.RELATIONSHIP({
-  sourceModel: 'foam.nanos.crunch.Capability',  
+  sourceModel: 'foam.nanos.crunch.Capability',
   targetModel: 'foam.nanos.crunch.Capability',
   cardinality: '*:*',
   forwardName: 'deprecated',
@@ -247,7 +271,7 @@ foam.RELATIONSHIP({
 });
 
 foam.RELATIONSHIP({
-  sourceModel: 'foam.nanos.crunch.Capability',  
+  sourceModel: 'foam.nanos.crunch.Capability',
   targetModel: 'foam.nanos.crunch.Capability',
   cardinality: '*:*',
   forwardName: 'prerequisites',

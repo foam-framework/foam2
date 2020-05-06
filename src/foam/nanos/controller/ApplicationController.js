@@ -40,6 +40,7 @@ foam.CLASS({
     'foam.nanos.theme.Theme',
     'foam.nanos.u2.navigation.TopNavigation',
     'foam.nanos.u2.navigation.FooterView',
+    'foam.u2.crunch.CrunchController',
     'foam.u2.stack.Stack',
     'foam.u2.stack.StackView',
     'foam.u2.dialog.NotificationMessage',
@@ -48,6 +49,7 @@ foam.CLASS({
   ],
 
   imports: [
+    'capabilityDAO',
     'installCSS',
     'sessionSuccess',
     'window'
@@ -58,6 +60,8 @@ foam.CLASS({
     'agent',
     'appConfig',
     'as ctrl',
+    'capabilityAquired',
+    'capabilityCancelled',
     'currentMenu',
     'group',
     'lastMenuLaunched',
@@ -67,6 +71,8 @@ foam.CLASS({
     'menuListener',
     'notify',
     'pushMenu',
+    'requestCapability',
+    'capabilityCache',
     'requestLogin',
     'signUpEnabled',
     'loginVariables',
@@ -74,7 +80,8 @@ foam.CLASS({
     'user',
     'webApp',
     'wrapCSS as installCSS',
-    'sessionTimer'
+    'sessionTimer',
+    'crunchController'
   ],
 
   constants: {
@@ -215,11 +222,34 @@ foam.CLASS({
       name: 'loginSuccess'
     },
     {
+      class: 'Boolean',
+      name: 'capabilityAquired'
+    },
+    {
+      class: 'Boolean',
+      name: 'capabilityCancelled'
+    },
+    {
       class: 'FObjectProperty',
       of: 'foam.nanos.session.SessionTimer',
       name: 'sessionTimer',
       factory: function() {
         return this.SessionTimer.create();
+      }
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.u2.crunch.CrunchController',
+      name: 'crunchController',
+      factory: function() {
+        return this.CrunchController.create();
+      }
+    },
+    {
+      class: 'Map',
+      name: 'capabilityCache',
+      factory: function() {
+        return new Map();
       }
     },
     {
@@ -414,6 +444,35 @@ foam.CLASS({
       return new Promise(function(resolve, reject) {
         self.stack.push({ class: 'foam.u2.view.LoginView', mode_: 'SignIn' }, self);
         self.loginSuccess$.sub(resolve);
+      });
+    },
+
+    function requestCapability(capabilityInfo) {
+      var self = this;
+
+      capabilityInfo.capabilityOptions.forEach((c) => {
+        self.capabilityCache.set(c, false);
+      });
+
+      self.capabilityAquired = false;
+      self.capabilityCancelled = false;
+      return new Promise(function(resolve, reject) {
+        self.stack.push({
+          class: 'foam.u2.crunch.CapabilityInterceptView',
+          data: self.__subContext__.capabilityDAO,
+          capabilityOptions: capabilityInfo.capabilityOptions
+        });
+        var s1, s2;
+        s1 = self.capabilityAquired$.sub(() => {
+          s1.detach();
+          s2.detach();
+          resolve();
+        });
+        s2 = self.capabilityCancelled$.sub(() => {
+          s1.detach();
+          s2.detach();
+          reject();
+        });
       });
     },
 

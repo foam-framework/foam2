@@ -330,6 +330,7 @@ FOAM_FILES([
   { name: "foam/box/Box" },
   { name: "foam/box/AnonymousBox" },
   { name: "foam/box/RemoteException" },
+  { name: "foam/box/CapabilityRequiredRemoteException" },
   { name: "foam/box/Skeleton" },
   { name: "foam/box/PromisedBox" },
   { name: "foam/box/ProxyBox" },
@@ -536,6 +537,12 @@ FOAM_FILES([
   { name: 'foam/u2/search/Toolbar' },
   { name: "foam/u2/stack/Stack", flags: ['web'] },
   { name: "foam/u2/stack/StackView", flags: ['web'] },
+  { name: "foam/u2/crunch/Style", flags: ['web'] },
+  { name: "foam/u2/crunch/CrunchController", flags: ['web'] },
+  { name: "foam/u2/crunch/CapabilityCardView", flags: ['web'] },
+  { name: "foam/u2/crunch/CapabilityFeatureView", flags: ['web'] },
+  { name: "foam/u2/crunch/CapabilityStore", flags: ['web'] },
+  { name: "foam/u2/crunch/CapabilityInterceptView", flags: ['web'] },
   { name: "foam/apploader/ModelRefines" },
   { name: "foam/foamlink/FoamlinkNodeModelFileDAO" },
   { name: "foam/foamlink/FoamlinkNodeModelFileFetcher" },
@@ -740,6 +747,10 @@ FOAM_FILES([
   { name: "foam/u2/detail/WizardSectionsView" },
   { name: "foam/u2/detail/TabbedDetailView" },
   { name: "foam/u2/detail/SectionedDetailPropertyView" },
+
+  // Multiple model - crunch - wizard files
+  { name: "foam/u2/detail/MultipleModelSectionedDetailView" },
+  { name: "foam/nanos/crunch/ui/ScrollSectionWizardView" },
 
   { name: "foam/graphics/ZoomMapView" },
   { name: "foam/core/CoreTypesValidationTest" },
