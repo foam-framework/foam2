@@ -194,14 +194,13 @@ foam.CLASS({
               addClass(self.myClass('select-level')).
               style({
                 'font-weight': self.hasChildren$.map(function(c) { return c ? 'bold' : 'normal'; }),
-                'width': '100%'
+                'width': (83 - (5 * (self.level - 1))) + '%'
               }).
               addClass(self.myClass('label')).
               call(this.formatter, [self.data]).
               start('span').
               show(this.hasChildren$).
               style({
-                'margin-right':   '38px',
                 'vertical-align': 'middle',
                 'font-weight':    'bold',
                 'display':        'inline-block',
