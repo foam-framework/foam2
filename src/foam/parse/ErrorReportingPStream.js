@@ -67,12 +67,12 @@ foam.CLASS({
     function setValue(value) {
       if ( value === undefined ) value = null;
       var ps = this.cls_.create();
-      ps.pos = this.pos;
-      ps.limit = this.limit;
-      ps.intro = this.intro;
-      ps.report = this.report;
+      ps.pos      = this.pos;
+      ps.limit    = this.limit;
+      ps.intro    = this.intro;
+      ps.report   = this.report;
       ps.delegate = this.delegate.setValue(value);
-      ps.tail = this.tail;
+      ps.tail     = this.tail;
       return ps;
     },
 
