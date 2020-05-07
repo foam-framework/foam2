@@ -46,6 +46,11 @@ foam.CLASS({
       padding: 0 21px 0 38px;
     }
 
+    ^label-limit {
+      margin-top: 8px;
+      margin-bottom: 0;
+    }
+
     ^container-filter {
       max-height: 320px;
       overflow: scroll;
@@ -99,6 +104,7 @@ foam.CLASS({
 
   messages: [
     { name: 'LABEL_PLACEHOLDER', message: 'Search' },
+    { name: 'LABEL_LIMIT_REACHED', message: 'Please refine your search to view more options' },
     { name: 'LABEL_LOADING', message: '- LOADING OPTIONS -' },
     { name: 'LABEL_NO_OPTIONS', message: '- NO OPTIONS AVAILABLE -' },
     { name: 'LABEL_SELECTED', message: 'SELECTED OPTIONS' },
@@ -133,21 +139,15 @@ foam.CLASS({
       name: 'search',
       postSet: function(_, n) {
         this.isOverLimit = false;
-        this.dao.where(this.CONTAINS_IC(this.property, n)).limit(100).select(this.GroupBy.create({
-          arg1: this.property,
-          arg2: this.Count.create()
-        })).then((results) => {
+        this.dao.where(this.CONTAINS_IC(this.property, n)).select(this.GROUP_BY(this.property, null, 101)).then((results) => {
           this.countByContents = results.groups;
-          // if ( Object.keys(results.groups).length == 100 ) this.checkLimit();
+          if ( Object.keys(results.groups).length > 100 ) this.isOverLimit = true;
         });
       }
     },
     {
       class: 'Boolean',
-      name: 'isOverLimit',
-      postSet: function(_, n) {
-        console.log(`isOverLimit PostSet: ${n}`);
-      }
+      name: 'isOverLimit'
     },
     {
       name: 'selectedOptions',
@@ -212,6 +212,11 @@ foam.CLASS({
             placeholder: this.LABEL_PLACEHOLDER,
             onKey: true
           })
+          .end()
+          .start('p')
+            .addClass(this.myClass('label-limit'))
+            .show(this.isOverLimit$)
+            .add(this.LABEL_LIMIT_REACHED)
           .end()
         .end()
         .start().addClass(self.myClass('container-filter'))
@@ -280,14 +285,6 @@ foam.CLASS({
       return option;
     },
 
-    function checkLimit() {
-      this.dao.where(this.CONTAINS_IC(this.property, n)).select(this.COUNT()).then((count) => {
-        if ( count.value > 100 ) {
-          this.isOverLimit = true;
-        }
-      });
-    },
-
     /**
      * Clears the fields to their default values.
      * Required on all SearchViews. Called by ReciprocalSearch.
@@ -310,12 +307,11 @@ foam.CLASS({
     {
       name: 'daoUpdate',
       code: function() {
-        this.dao.limit(100).select(this.GroupBy.create({
-          arg1: this.property,
-          arg2: this.Count.create()
-        })).then((results) => {
+        this.isOverLimit = false;
+        this.isLoading = true;
+        this.dao.select(this.GROUP_BY(this.property, null, 101)).then((results) => {
           this.countByContents = results.groups;
-          // if ( Object.keys(results.groups).length == 100 ) this.checkLimit();
+          if ( Object.keys(results.groups).length > 100 ) this.isOverLimit = true;
           this.isLoading = false;
         });
       }
