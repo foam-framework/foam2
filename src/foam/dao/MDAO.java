@@ -45,7 +45,7 @@ public class MDAO
   extends AbstractDAO
 {
   protected AltIndex index_;
-  protected Object   state_ = null;
+  protected Object   state_     = null;
   protected Object   writeLock_ = new Object();
   protected Set      unindexed_ = new HashSet();
 
@@ -176,9 +176,8 @@ public class MDAO
     if ( state != null && predicate != null && plan.cost() > 10 && plan.cost() >= index_.size(state) ) {
       pm = new PM(this.getClass(), "MDAO:UnindexedSelect:" + getOf().getId());
       if ( ! unindexed_.contains(getOf().getId())) {
-        if ( ! predicate.equals(simplePredicate) && 
-             logger != null ) {
-            logger.debug(String.format("The original predicate was %s but it was simplified to %s.", predicate.toString(), simplePredicate.toString()));
+        if ( ! predicate.equals(simplePredicate) && logger != null ) {
+          logger.debug(String.format("The original predicate was %s but it was simplified to %s.", predicate.toString(), simplePredicate.toString()));
         }
         unindexed_.add(getOf().getId());
         if ( logger != null ) {
