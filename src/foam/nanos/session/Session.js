@@ -52,7 +52,7 @@ foam.CLASS({
       tableCellFormatter: function(value, obj) {
         this.add(value);
         this.__context__.userDAO.find(value).then(function(user) {
-          this.add(' ', user && user.label());
+          this.add(' ', user && user.toSummary());
         }.bind(this));
       },
       required: true,
@@ -65,7 +65,7 @@ foam.CLASS({
         if ( ! value ) return;
         this.add(value);
         this.__context__.userDAO.find(value).then(function(user) {
-          this.add(' ', user.label());
+          this.add(' ', user.toSummary());
         }.bind(this));
       },
       visibility: 'RO',
@@ -244,6 +244,7 @@ foam.CLASS({
               if ( themeAppConfig != null ) {
                 appConfig.copyFrom(themeAppConfig);
               }
+              rtn = rtn.put("theme", theme);
             }
           }
 
@@ -277,17 +278,6 @@ foam.CLASS({
         User user         = (User) localUserDAO.find(getUserId());
         User agent        = (User) localUserDAO.find(getAgentId());
         Object[] prefix   = agent == null
-          ? new Object[] { String.format("%s (%d)", user.label(), user.getId()) }
-          : new Object[] { String.format("%s (%d) acting as %s (%d)", agent.label(), agent.getId(), user.label(), user.getId()) };
-        
-        HttpServletRequest req = x.get(HttpServletRequest.class);
-        if ( req != null ) {
-          ThemeDomain td = (ThemeDomain) ((DAO) x.get("themeDomainDAO")).find(req.getServerName());
-          Theme theme = (Theme) ((DAO) x.get("themeDAO")).find(td.getTheme());
-        if ( theme != null ) {
-          rtn = rtn.put("theme", theme);
-          }
-        }
 
         rtn = rtn
           .put("user", user)

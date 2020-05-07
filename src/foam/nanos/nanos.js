@@ -308,5 +308,7 @@ FOAM_FILES([
   //authservice
   { name: "foam/nanos/auth/CapabilityAuthService" },
   // google
-  { name: "foam/nanos/geocode/GoogleMapsCredentials" }
+  { name: "foam/nanos/geocode/GoogleMapsCredentials" },
+
+  { name: "com/google/foam/demos/u2/AllViews" }
 ]);
