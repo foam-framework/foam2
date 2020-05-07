@@ -279,6 +279,15 @@ foam.CLASS({
         Object[] prefix   = agent == null
           ? new Object[] { String.format("%s (%d)", user.label(), user.getId()) }
           : new Object[] { String.format("%s (%d) acting as %s (%d)", agent.label(), agent.getId(), user.label(), user.getId()) };
+        
+        HttpServletRequest req = x.get(HttpServletRequest.class);
+        if ( req != null ) {
+          ThemeDomain td = (ThemeDomain) ((DAO) x.get("themeDomainDAO")).find(req.getServerName());
+          Theme theme = (Theme) ((DAO) x.get("themeDAO")).find(td.getTheme());
+        if ( theme != null ) {
+          rtn = rtn.put("theme", theme);
+          }
+        }
 
         rtn = rtn
           .put("user", user)
