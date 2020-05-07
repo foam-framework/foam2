@@ -56,8 +56,8 @@ public class EmailsUtility {
         templateArgs = new HashMap<>();
         templateArgs.put("template", templateName);
       }
-      templateArgs.put("appConfig", appConfig);
-      templateArgs.put("theme", theme);
+      templateArgs.put("supportPhone", (theme.findSupportUser(x)).getPhoneNumber());
+      templateArgs.put("supportEmail", (theme.findSupportUser(x)).getEmail());
       emailMessage.setTemplateArguments(templateArgs);
     }
 
