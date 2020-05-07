@@ -347,7 +347,7 @@ foam.CLASS({
       code: function() {
         if ( ! this.daoContents || this.daoContents.groupKeys.length === 0 ) return;
         this.__subContext__[this.targetDAOName].where(this.IN(this.property.of.ID, this.daoContents.groupKeys)).select().then((results) => {
-          this.referenceObjectsArray = result.array;
+          this.referenceObjectsArray = results.array;
         });
       }
     }
