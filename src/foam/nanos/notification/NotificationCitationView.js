@@ -38,6 +38,7 @@ foam.CLASS({
           .on('click', this.toggleFullVisibility)
           .show(this.data.body !== '')
           .add(this.data.body)
+          
         .end();
     }
   ],
