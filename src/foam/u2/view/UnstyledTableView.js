@@ -362,6 +362,7 @@ foam.CLASS({
                   callIf(view.editColumnsEnabled, function() {
                     this.addClass(view.myClass('th-editColumns'))
                     .on('click', function(e) {
+                      editColumnView.parentId = this.id;
                       if (!editColumnView.selectColumnsExpanded)
                         editColumnView.selectColumnsExpanded = !editColumnView.selectColumnsExpanded;
                     }).

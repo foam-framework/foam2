@@ -13,29 +13,12 @@ foam.CLASS({
     'foam.u2.view.ColumnConfigPropView',
     'foam.u2.view.SubColumnSelectConfig'
   ],
-  actions: [
-    {
-      name: 'save',
-      code: function() {
-        var selectedColumns = [];
-        for ( var i = 0; i < this.columns.length; i++ ) {
-          if ( this.columns[i].selectedColumns.length != 0)
-            selectedColumns.push(this.columns[i].selectedColumns.join('.'));
-        }
-        // if ( this.view.isColumnChanged ) {
-          localStorage.removeItem(this.of.id);
-          localStorage.setItem(this.of.id, JSON.stringify(selectedColumns));
-          this.isColumnChanged = !this.isColumnChanged;
-        // }
-        this.stack.back();
-      }
-    }
-  ],
   properties: [
     {
       name: 'selectColumnsExpanded',
       class: 'Boolean' 
-    }
+    },
+    'parentId'
   ],
   methods: [
     function closeDropDown(e) {
@@ -44,6 +27,9 @@ foam.CLASS({
     },
 
     function initE() {
+      this.SUPER();
+
+      var self = this;
       this.start()
         .show(this.selectColumnsExpanded$)
         .style({
@@ -58,13 +44,12 @@ foam.CLASS({
         .start()
           .style({
             'background-color': '#f9f9f9',
-            'top': '20px',
-            'left': '1050px',
+            'left': self.parentId$.map((v) => v ? ( document.getElementById(v).getBoundingClientRect().x - 100 ) : 0 + 'px'),
+            'top': self.parentId$.map((v) => v ? document.getElementById(v).getBoundingClientRect().y : 0 + 'px'),
             'position': 'fixed',
             'overflow': 'scroll',
-            'margin-bottom': '0px',
-            'padding-bottom': '400px',
-            'height': '100vh'
+            'margin-bottom': '20px',
+            'max-height': self.parentId$.map((v) => v ? window.innerWidth - document.getElementById(v).getBoundingClientRect().y - 100 : 500 + 'px'),
           })
           .add(foam.u2.ViewSpec.createView({ class: 'foam.u2.view.ColumnConfigPropView'}, {data$:this.data$}, this, this.__subSubContext__))
         .end()
