@@ -278,6 +278,8 @@ foam.CLASS({
         User user         = (User) localUserDAO.find(getUserId());
         User agent        = (User) localUserDAO.find(getAgentId());
         Object[] prefix   = agent == null
+          ? new Object[] { String.format("%s (%d)", user.toSummary(), user.getId()) }
+          : new Object[] { String.format("%s (%d) acting as %s (%d)", agent.toSummary(), agent.getId(), user.toSummary(), user.getId()) };
 
         rtn = rtn
           .put("user", user)
