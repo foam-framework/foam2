@@ -257,6 +257,7 @@ function generateNativeException(cls) {
 
   ensurePath(outfile);
 
+  // TODO Ensure this makes an actual native exception
   writeFileIfUpdated(outfile, foam.java.Exception.create({ of: cls }).buildJavaClass().toJavaSource());
   // writeFileIfUpdated(outfile, cls.buildJavaClass().toJavaSource());
 }
