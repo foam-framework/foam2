@@ -52,7 +52,7 @@ foam.CLASS({
       tableCellFormatter: function(value, obj) {
         this.add(value);
         this.__context__.userDAO.find(value).then(function(user) {
-          this.add(' ', user && user.label());
+          this.add(' ', user && user.toSummary());
         }.bind(this));
       },
       required: true,
@@ -65,7 +65,7 @@ foam.CLASS({
         if ( ! value ) return;
         this.add(value);
         this.__context__.userDAO.find(value).then(function(user) {
-          this.add(' ', user.label());
+          this.add(' ', user.toSummary());
         }.bind(this));
       },
       visibility: 'RO',

@@ -27,36 +27,36 @@ foam.INTERFACE({
       args: [
         {
           name: 'obj',
-          type: 'Any',
+          type: 'Any'
         },
         {
           name: 'sub',
-          type: 'foam.core.Detachable',
-        },
-      ],
+          type: 'foam.core.Detachable'
+        }
+      ]
     },
     {
       name: 'remove',
       args: [
         {
           name: 'obj',
-          type: 'Any',
+          type: 'Any'
         },
         {
           name: 'sub',
-          type: 'foam.core.Detachable',
+          type: 'foam.core.Detachable'
         }
       ]
     },
     {
-      name: 'eof',
+      name: 'eof'
     },
     {
       name: 'reset',
       args: [
         {
           name: 'sub',
-          type: 'foam.core.Detachable',
+          type: 'foam.core.Detachable'
         }
       ]
     }
@@ -151,14 +151,14 @@ foam.CLASS({
       code: function put(_, sub) {
         this.reset(sub);
       },
-      swiftCode: 'reset(sub)',
+      swiftCode: 'reset(sub)'
     },
     {
       name: 'remove',
       code: function remove(_, sub) {
         this.reset(sub);
       },
-      swiftCode: 'reset(sub)',
+      swiftCode: 'reset(sub)'
     },
   ]
 });
@@ -314,7 +314,6 @@ foam.CLASS({
       var s = this.sink;
       s && s.remove && s.remove(obj, sub);
     },
-
     function eof() {
       var s = this.sink;
       s && s.eof && s.eof();
@@ -399,7 +398,7 @@ if count <= limit {
   delegate.put(obj, sub)
 }`,
       javaCode: `if ( getCount() >= getLimit() ) {
-  if ( sub != null ) sub.detach();
+  if ( sub != null ) { sub.detach(); } else { System.err.println("***************** Can't limit " + getCount() + " " + getLimit()); }
 } else {
   setCount(getCount() + 1);
   getDelegate().put(obj, sub);
@@ -570,7 +569,7 @@ for obj in array {
       },
       swiftCode: '// TODO',
       javaCode: '// TODO'
-    },
+    }
   ]
 });
 
@@ -734,7 +733,7 @@ foam.CLASS({
           this.delegate[o[0]].apply(this.delegate, o[1]);
         }
       }
-    },
+    }
   ]
 });
 
@@ -777,7 +776,7 @@ foam.CLASS({
       name: 'eof',
       code: function() {},
       javaCode: `// NOOP`,
-      swiftCode: '// NOOP',
+      swiftCode: '// NOOP'
     },
     {
       name: 'reset',
@@ -819,7 +818,7 @@ foam.CLASS({
       code: function(o) {
         var x = this.__context__; // TODO: is this always correct?
         this.journal.put(x, '', this.dao, o);
-      },
+      }
     },
     {
       name: 'remove',
@@ -836,7 +835,7 @@ foam.CLASS({
       name: 'reset',
       code: function() {
         console.warn('use of unimplemented JournalSink.reset()');
-      },
+      }
     }
   ]
 });

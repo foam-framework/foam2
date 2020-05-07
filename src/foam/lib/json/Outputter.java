@@ -23,8 +23,9 @@ import java.util.*;
 import org.apache.commons.io.IOUtils;
 
 public class Outputter
-  extends AbstractSink
-  implements foam.lib.Outputter {
+  extends    AbstractSink
+  implements foam.lib.Outputter
+{
 
   protected static ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
     @Override
@@ -35,14 +36,14 @@ public class Outputter
     }
   };
 
-  protected foam.core.X x_;
-  public PrintWriter   writer_;
-  protected StringWriter  stringWriter_        = null;
-  protected boolean       outputShortNames_    = false;
-  protected boolean       outputDefaultValues_ = false;
-  protected boolean       multiLineOutput_     = false;
-  protected boolean       outputClassNames_    = true;
-  protected boolean       outputReadableDates_ = true;
+  protected foam.core.X       x_;
+  public    PrintWriter       writer_;
+  protected StringWriter      stringWriter_        = null;
+  protected boolean           outputShortNames_    = false;
+  protected boolean           outputDefaultValues_ = false;
+  protected boolean           multiLineOutput_     = false;
+  protected boolean           outputClassNames_    = true;
+  protected boolean           outputReadableDates_ = true;
   protected PropertyPredicate propertyPredicate_;
   protected Map<String, List<PropertyInfo>> propertyMap_ = new HashMap<>();
 
@@ -88,6 +89,10 @@ public class Outputter
 
   public void setWriter(PrintWriter writer) {
     writer_ = writer;
+  }
+
+  public void setOutputReadableDates(boolean f) {
+    outputReadableDates_ = f;
   }
 
   protected void outputUndefined() {
