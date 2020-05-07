@@ -148,9 +148,25 @@
       documentation: `The user that is requested for approval. When set, "group" property is ignored.`,
       view: function(_, X) {
         if ( X.data.status === foam.nanos.approval.ApprovalStatus.REQUESTED ) {
+          X.userDAO.find(X.approver$).then(user => {
+            let result = "";
+            if ( user ) {
+              if ( self.__subSubContext__.user.id == user.id ) {
+                result = user.toSummary();
+              } else {
+                result = user.group;
+              }
+            } else {
+              result = X.data$.REQUESTED;
+            }
+            // How do i update view to contain the new result?
+          });
           return {
             class: 'foam.u2.view.ValueView',
-            data$: X.data$.map((data) => data.REQUESTED)
+            data$: X.data$.map((data) => {
+              // Would like to use result here, need to sync up find with the function
+              return data.REQUESTED;
+            }) 
           };
         } else {
           return { class: 'foam.u2.view.ReferencePropertyView' };
@@ -159,7 +175,9 @@
       tableCellFormatter: function(approver, data) {
         let self = this;
         this.__subSubContext__.userDAO.find(approver).then(user => {
-          if ( user && data.status != foam.nanos.approval.ApprovalStatus.REQUESTED ) {
+          if ( data.status != foam.nanos.approval.ApprovalStatus.REQUESTED ) {
+            self.add(user ? user.toSummary() : `User #${approver}`);	
+          } else if ( user ) {
             if ( self.__subSubContext__.user.id == user.id ) {
               self.add(user.toSummary());
             } else {
