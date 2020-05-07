@@ -44,14 +44,15 @@ foam.CLASS({
         .start()
           .style({
             'background-color': '#f9f9f9',
-            'left': self.parentId$.map((v) => v ? ( document.getElementById(v).getBoundingClientRect().x - 100 ) : 0 + 'px'),
+            'left': self.parentId$.map((v) => v ? ( document.getElementById(v).getBoundingClientRect().x - 250 ) : 0 + 'px'),
             'top': self.parentId$.map((v) => v ? document.getElementById(v).getBoundingClientRect().y : 0 + 'px'),
             'position': 'fixed',
             'overflow': 'scroll',
             'margin-bottom': '20px',
-            'max-height': self.parentId$.map((v) => v ? window.innerWidth - document.getElementById(v).getBoundingClientRect().y - 100 : 500 + 'px'),
+            'height': '700px',//will write calculation later
+           // 'max-height': self.parentId$.map((v) => v ? window.innerWidth - document.getElementById(v).getBoundingClientRect().y - 1000 : 500 + 'px'),
           })
-          .add(foam.u2.ViewSpec.createView({ class: 'foam.u2.view.ColumnConfigPropView'}, {data$:this.data$}, this, this.__subSubContext__))
+          .add(foam.u2.view.ColumnConfigPropView.create({data:self.data}))
         .end()
       .on('click', this.closeDropDown.bind(this))
       .end();

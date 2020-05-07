@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'ColumnConfigPropView',
-  extends: 'foam.u2.View',
+  extends: 'foam.u2.Controller',
   requires: [
     'foam.u2.view.ColumnViewHeader',
     'foam.u2.view.ColumnViewBody',
@@ -35,6 +35,33 @@ foam.CLASS({
       z-index: 1;
     }
   `,
+  properties: [
+    'data',
+    {
+      name: 'columns',
+      expression: function(data) {
+        var arr = [];
+        data.allColumns.forEach(c => {
+          arr.push(foam.u2.view.SubColumnSelectConfig.create({ rootProperty: [data.of.getAxiomByName(c).name, data.of.getAxiomByName(c).label ? data.of.getAxiomByName(c).label : data.of.getAxiomByName(c).name], level:0, of:data.of, selectedColumns:data.selectedColumnNames, updateParent:data.updateColumns.bind(data) }));
+        });
+        return arr;
+      }
+    },
+    {
+      name: 'views',
+      expression: function(columns) {
+        var arr = [];
+        columns.forEach(c => {
+          arr.push(this.RootColumnConfigPropView.create({prop:c}));
+        });
+        return arr;
+      }
+    },
+    {
+      name: 'updateSort',
+      class: 'Boolean'
+    }
+  ],
   methods: [
     function initE() {
       this.SUPER();
@@ -43,14 +70,41 @@ foam.CLASS({
       this
         .start()
          // .addClass(self.myClass('dropdown'))
-          .forEach(self.data.allColumns, function(c) {
-            var subColumnSelectConfig = foam.u2.view.SubColumnSelectConfig.create({ rootProperty: [self.data.of.getAxiomByName(c).name, self.data.of.getAxiomByName(c).label ? self.data.of.getAxiomByName(c).label : self.data.of.getAxiomByName(c).name], level:0, of:self.data.of, selectedColumns:self.data.selectedColumnNames, updateParent:self.data.updateColumns.bind(self.data) });
-            this
-              .start()
-                .add(foam.u2.ViewSpec.createView(self.RootColumnConfigPropView, {data:subColumnSelectConfig},  self, self.__subSubContext__))
-              .end();
-          })
+         .add(this.slot(function(views) {
+           return this.E()
+            .forEach(views, function(view) {
+              this
+                .start()
+                .attrs({ draggable: 'true' }).
+                    on('dragstart', self.onDragStart.bind(self)).
+                    on('dragenter', self.onDragOver.bind(self)).
+                    on('dragover',  self.onDragOver.bind(self)).
+                    on('drop',      self.onDrop.bind(self))
+                  .add(view)
+                .end();
+            });
+         }))
       .end();
+    }
+  ],
+  listeners: [
+    function onDragStart(e){
+      console.log('dragstart');
+      e.dataTransfer.setData('draggableId', e.currentTarget.id);
+    },
+    function onDragOver(e){
+      console.log('dragover');
+      e.preventDefault();
+    },
+    function onDrop(e){
+      e.preventDefault();
+      e.stopPropagation();
+      console.log(e.target.id);
+      var targetView = this.views.find(v => v.id == document.getElementById(e.currentTarget.id).childNodes[0].id);
+      var draggableView = this.views.find(v => v.id == document.getElementById(e.dataTransfer.getData('draggableId')).childNodes[0].id);
+      var targetData = targetView.prop;
+      targetView.prop = draggableView.prop;
+      draggableView.prop = targetData;
     }
   ]
 });
@@ -58,8 +112,13 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'RootColumnConfigPropView',
-  extends: 'foam.u2.View',
+  extends: 'foam.u2.Controller',
   properties: [
+    // {
+    //   class: 'Boolean',
+    //   name: 'draggable',
+    //   documentation: 'Enable to allow drag&drop editing.'
+    // },
     {
       class: 'foam.u2.ViewSpec',
       name: 'head',
@@ -69,18 +128,22 @@ foam.CLASS({
       class: 'foam.u2.ViewSpec',
       name: 'body',
       value: { class:'foam.u2.view.ColumnViewBody'}
-    }
+    },
+    'prop'
   ],
   methods: [
     function initE() {
+      var self = this;
       this.SUPER();
       this
-      .start()
-          .add(foam.u2.ViewSpec.createView(this.head, {data$:this.data$},  this, this.__subSubContext__))
-        .end()
-        .start()
-          .add(foam.u2.ViewSpec.createView(this.body, {data$:this.data$},  this, this.__subSubContext__))
-        .end();
+        .add(self.slot(function(prop) {
+          return self.E().start()
+            .add(foam.u2.ViewSpec.createView(self.head, {data$:self.prop$},  self, self.__subSubContext__))
+          .end()
+          .start()
+            .add(foam.u2.ViewSpec.createView(self.body, {data$:self.prop$},  self, self.__subSubContext__))
+          .end();
+        }));
     }
   ]
 });
@@ -203,7 +266,7 @@ foam.CLASS({
             .forEach(this.data.subColumnSelectConfig, function(p) {
             self
               .show(self.data.expanded$)
-              .add(foam.u2.ViewSpec.createView(self.RootColumnConfigPropView, {data:p}, self, self.__subSubContext__));
+              .add(foam.u2.ViewSpec.createView(self.RootColumnConfigPropView, {prop:p}, self, self.__subSubContext__));
           })
         .end();
     }
