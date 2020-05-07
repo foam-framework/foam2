@@ -70,10 +70,6 @@ foam.CLASS({
       value: false
     },
     {
-      class: 'String',
-      name: 'supportEmail'
-    },
-    {
       class: 'Reference',
       of: 'foam.nanos.auth.ServiceProvider',
       name: 'defaultSpid'
@@ -81,10 +77,6 @@ foam.CLASS({
     {
       class: 'String',
       name: 'externalUrl'
-    },
-    {
-      class: 'String',
-      name: 'supportPhone'
-    },
+    }
   ]
 });
