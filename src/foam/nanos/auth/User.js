@@ -497,9 +497,9 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'label',
+      name: 'toSummary',
       type: 'String',
-      code: function label() {
+      code: function toSummary() {
         if ( this.legalName ) return this.legalName;
         if ( this.lastName && this.firstName ) return this.firstName + ' ' + this.lastName;
         if ( this.lastName ) return this.lastName;
@@ -614,12 +614,6 @@ foam.CLASS({
           throw new RuntimeException("You do not have permission to delete that user.");
         }
       `
-    },
-    {
-      name: 'toSummary',
-      code: function() {
-        return this.label();
-      }
     },
     {
       name: 'doNotify',
