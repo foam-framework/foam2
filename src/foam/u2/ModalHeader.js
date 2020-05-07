@@ -27,17 +27,16 @@ foam.CLASS({
       align-items: center;
 
       width: 100%; /* This is to fit the width of its parent container */
-      height: 40px;
-
-      background-color: /*%PRIMARY1%*/ #202341;
+      padding: 16px 24px;
+      box-sizing: border-box;
+      border-bottom: solid 1px #CBCFD4;
     }
     ^title{
       font-family: Roboto;
-      font-size: 14px;
-      color: #ffffff;
+      font-size: 18px;
+      font-weight: 600;
+      color: #1E1F21;
       margin: 0;
-      margin-left: 16px;
-
       flex: 1;
     }
     ^close{
@@ -69,7 +68,7 @@ foam.CLASS({
   actions: [
     {
       name: 'closeModal',
-      icon: 'images/ic-cancelwhite.svg',
+      icon: 'images/ic-cancelgray.svg',
       label: '',
       code: function(X) {
         X.closeDialog();

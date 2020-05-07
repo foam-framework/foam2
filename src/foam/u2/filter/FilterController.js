@@ -85,8 +85,8 @@ foam.CLASS({
       this.addCriteria();
       this.onDetach(this.dao$.sub(this.onDAOUpdate));
       this.onDAOUpdate();
-      this.onDetach(this.finalPredicate$.sub(this.getResultCount));
-      this.onDetach(this.previewPredicate$.sub(this.getResultCount));
+      this.onDetach(this.finalPredicate$.sub(this.getResultsCount));
+      this.onDetach(this.previewPredicate$.sub(this.getResultsCount));
     },
 
     function and(views) {
@@ -282,7 +282,7 @@ foam.CLASS({
       }
     },
     {
-      name: 'getResultCount',
+      name: 'getResultsCount',
       code: function() {
         var predicate = this.isPreview ? this.previewPredicate : this.finalPredicate;
         this.dao.where(predicate).select(this.COUNT()).then((count) => {

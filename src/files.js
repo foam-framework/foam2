@@ -518,7 +518,6 @@ FOAM_FILES([
   { name: 'foam/u2/filter/advanced/AdvancedFilterView', flags: ['web'] },
   { name: 'foam/u2/filter/advanced/CriteriaView', flags: ['web'] },
   { name: 'foam/u2/filter/FilterController', flags: ['web'] },
-  { name: 'foam/u2/filter/FilterViewController', flags: ['web'] },
   { name: 'foam/u2/filter/properties/PropertyFilterView', flags: ['web'] },
   { name: 'foam/u2/filter/properties/StringFilterView', flags: ['web'] },
   { name: 'foam/u2/filter/properties/IntegerFilterView', flags: ['web'] },

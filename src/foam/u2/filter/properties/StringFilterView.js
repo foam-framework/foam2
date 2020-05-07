@@ -119,18 +119,34 @@ foam.CLASS({
       required: true
     },
     {
-      name: 'daoContents'
+      name: 'daoContents',
+      expression: function(countByContents) {
+        if ( countByContents ) return Object.keys(countByContents);
+        return [];
+      }
+    },
+    {
+      name: 'countByContents'
     },
     {
       class: 'String',
       name: 'search',
       postSet: function(_, n) {
+        this.isOverLimit = false;
         this.dao.where(this.CONTAINS_IC(this.property, n)).limit(100).select(this.GroupBy.create({
           arg1: this.property,
           arg2: this.Count.create()
         })).then((results) => {
-          this.daoContents = results.groupKeys;
+          this.countByContents = results.groups;
+          // if ( Object.keys(results.groups).length == 100 ) this.checkLimit();
         });
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'isOverLimit',
+      postSet: function(_, n) {
+        console.log(`isOverLimit PostSet: ${n}`);
       }
     },
     {
@@ -215,7 +231,7 @@ foam.CLASS({
                         class: 'foam.u2.md.CheckBox',
                         data: true,
                         showLabel: true,
-                        label: option ? option : self.LABEL_EMPTY
+                        label: option ? self.getLabelWithCount(option) : self.LABEL_EMPTY
                       }).end()
                     .end();
                 });
@@ -248,13 +264,28 @@ foam.CLASS({
                         class: 'foam.u2.md.CheckBox',
                         data: false,
                         showLabel: true,
-                        label: option ? option : self.LABEL_EMPTY
+                        label: option ? self.getLabelWithCount(option) : self.LABEL_EMPTY
                       }).end()
                     .end();
                 });
               });
           }))
         .end();
+    },
+
+    function getLabelWithCount(option) {
+      if ( ! this.countByContents[option] ) console.error('String mismatch');
+      var value = this.countByContents[option].value;
+      if ( value > 1 ) return `[${this.countByContents[option].value}] ${option}`;
+      return option;
+    },
+
+    function checkLimit() {
+      this.dao.where(this.CONTAINS_IC(this.property, n)).select(this.COUNT()).then((count) => {
+        if ( count.value > 100 ) {
+          this.isOverLimit = true;
+        }
+      });
     },
 
     /**
@@ -283,7 +314,8 @@ foam.CLASS({
           arg1: this.property,
           arg2: this.Count.create()
         })).then((results) => {
-          this.daoContents = results.groupKeys;
+          this.countByContents = results.groups;
+          // if ( Object.keys(results.groups).length == 100 ) this.checkLimit();
           this.isLoading = false;
         });
       }

@@ -32,12 +32,23 @@ foam.CLASS({
 
     ^ .foam-u2-ModalHeader {
       border-radius: 5px 5px 0 0;
-      box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.08);
+    }
+
+    ^ .foam-u2-ModalHeader-title {
+      font-family: 'Open Sans', sans-serif;
+      font-spacing: 0;
+    }
+
+    ^label-subtitle {
+      margin: 0;
+      margin-bottom: 24px;
+      font-size: 16px;
+      font-weight: 300;
     }
 
     ^container-advanced {
       flex: 1;
-      padding: 16px 8px;
+      padding: 24px;
 
       overflow-y: scroll;
     }
@@ -121,9 +132,11 @@ foam.CLASS({
       display: flex;
       justify-content: flex-end;
 
-      padding: 8px;
+      padding: 16px 24px;
 
-      border-top: solid 1px #e7eaec;
+      border-top: solid 1px #CBCFD4;
+      border-radius: 0 0 5px 5px;
+      background-color: #F6F6F6;
     }
 
     ^label-results {
@@ -139,7 +152,8 @@ foam.CLASS({
     { name: 'TITLE_HEADER', message: 'Advanced Filters' },
     { name: 'LABEL_CRITERIA', message: 'Criteria'},
     { name: 'LABEL_REMOVE', message: 'Remove'},
-    { name: 'LABEL_RESULTS', message: 'Filter Results Preview: '}
+    { name: 'LABEL_RESULTS', message: 'Filter Results Preview: '},
+    { name: 'LABEL_INSTRUCTION', message: 'In Advanced Mode, the results are an accumulation of each criteria. Within each criteria, the results will be a reflection that fully matches your selection.' }
   ],
 
   properties: [
@@ -169,6 +183,7 @@ foam.CLASS({
   methods: [
     function init() {
       this.SUPER();
+      this.filterController.getResultsCount();
       this.onDetach(() => {
         if ( ! this.filterController.isAdvanced ) this.clearAll(true);
         this.filterController.isPreview = false;
@@ -187,6 +202,9 @@ foam.CLASS({
         .add(this.filterController.slot(function(previewCriterias) {
           var keys = Object.keys(previewCriterias);
           return self.E().addClass(self.myClass('container-advanced'))
+            .start('p').addClass(self.myClass('label-subtitle'))
+              .add(self.LABEL_INSTRUCTION)
+            .end()
             .forEach(keys, function(key, index) {
               var criteria = previewCriterias[key];
               this.start().addClass(self.myClass('container-handle'))
