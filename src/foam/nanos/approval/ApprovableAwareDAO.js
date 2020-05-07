@@ -261,7 +261,8 @@ foam.CLASS({
         } 
 
         ApprovalRequest approvalRequest = new ApprovalRequest.Builder(x)
-          .setDaoKey(getDaoKey())
+          .setDaoKey(getOf().getObjClass().getSimpleName().toLowerCase() + "DAO")
+          .setServerDaoKey(getDaoKey())
           .setObjId(String.valueOf(obj.getProperty("id")))
           .setClassification(getOf().getObjClass().getSimpleName())
           .setOperation(Operations.REMOVE)
@@ -378,7 +379,8 @@ foam.CLASS({
 
           Approvable approvable = (Approvable) approvableDAO.put_(x, new Approvable.Builder(x)
             .setLookupId(hashedId)
-            .setDaoKey(getDaoKey())
+            .setDaoKey(getOf().getObjClass().getSimpleName().toLowerCase() + "DAO")
+            .setServerDaoKey(getDaoKey())
             .setStatus(ApprovalStatus.REQUESTED)
             .setObjId(String.valueOf(obj.getProperty("id")))
             .setOperation(Operations.CREATE)
@@ -492,7 +494,8 @@ foam.CLASS({
 
         Approvable approvable = (Approvable) approvableDAO.put_(x, new Approvable.Builder(x)
           .setLookupId(hashedId)
-          .setDaoKey(getDaoKey())
+          .setDaoKey(getOf().getObjClass().getSimpleName().toLowerCase() + "DAO")
+          .setServerDaoKey(getDaoKey())
           .setStatus(ApprovalStatus.REQUESTED)
           .setObjId(String.valueOf(obj.getProperty("id")))
           .setOperation(Operations.UPDATE)

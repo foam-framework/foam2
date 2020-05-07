@@ -38,6 +38,12 @@ foam.CLASS({
       visibility: 'RO'
     },
     {
+      class: 'String',
+      name: 'serverDaoKey',
+      section: 'admin',
+      visibility: 'RO'
+    },
+    {
       class: 'Object',
       javaType: 'Object',
       name: 'objId',

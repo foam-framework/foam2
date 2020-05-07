@@ -73,7 +73,8 @@ public class ApprovalDAO
   }
 
   private void rePutObject(X x, ApprovalRequest request) {
-    DAO dao = (DAO) x.get(request.getDaoKey());
+    String daoKey = request.getServerDaoKey() != null && ! request.getServerDaoKey().isEmpty() ? request.getServerDaoKey() : request.getDaoKey();
+    DAO dao = (DAO) x.get(daoKey);
     FObject found = dao.inX(x).find(request.getObjId()).fclone();
 
     if ( request instanceof ApprovalRequest ) {
