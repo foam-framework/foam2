@@ -9,9 +9,7 @@ foam.CLASS({
   name: 'Notification',
 
   implements: [
-    'foam.nanos.auth.Authorizable',
-    'foam.nanos.auth.CreatedAware',
-    'foam.nanos.auth.CreatedByAware'
+    'foam.nanos.auth.Authorizable'
   ],
 
   documentation: 'Notification model responsible for system and integrated messaging notifications.',
@@ -54,15 +52,13 @@ foam.CLASS({
       value: 'General'
     },
     {
-      class: 'DateTime',
-      name: 'created',
-      documentation: 'The date and time of when the notification was created.'
-    },
-    {
-      class: 'Reference',
-      of: 'foam.nanos.auth.User',
-      name: 'createdBy',
-      documentation: 'The user that created the notification.'
+      class: 'Date',
+      name: 'issuedDate',
+      factory: function() { return new Date(); },
+      label: 'Notification Date',
+      documentation: 'Date notification was created.',
+      visibility: 'RO',
+      javaFactory: `return new java.util.Date();`
     },
     {
       class: 'Date',
