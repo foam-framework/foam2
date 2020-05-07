@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.nanos.u2.navigation',
   name: 'SignIn',
@@ -30,7 +36,7 @@ foam.CLASS({
       class: 'String',
       name: 'identifier',
       required: true,
-      //TODO: rename label to 'Email or Username' when integrating
+      // TODO: rename label to 'Email or Username' when integrating
       label: 'Email',
       view: {
         class: 'foam.u2.TextField',
@@ -71,7 +77,8 @@ foam.CLASS({
       name: 'subfooterLink',
       code: function() {
         this.stack.push({
-          class: 'foam.nanos.auth.resetPassword.ForgotPasswordView'
+          class: 'foam.nanos.auth.ChangePasswordView',
+          modelOf: 'foam.nanos.auth.RetrievePassword'
         });
       }
     },

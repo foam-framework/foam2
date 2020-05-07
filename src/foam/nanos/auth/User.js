@@ -139,12 +139,6 @@ foam.CLASS({
       class: 'String',
       name: 'firstName',
       documentation: 'The first name of the User.',
-      // TODO: Use validatationPredicates instead.
-      validateObj: function(firstName) {
-        if ( ! firstName.trim() ) {
-          return 'First name required.';
-        }
-      },
       gridColumns: 4,
       section: 'personal',
       includeInDigest: true
@@ -161,12 +155,6 @@ foam.CLASS({
       class: 'String',
       name: 'lastName',
       documentation: 'The last name of the User.',
-      // TODO: Use validatationPredicates instead.
-      validateObj: function(lastName) {
-        if ( ! lastName.trim() ) {
-          return 'Last name required.';
-        }
-      },
       gridColumns: 4,
       section: 'personal',
       includeInDigest: true
@@ -509,9 +497,9 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'label',
+      name: 'toSummary',
       type: 'String',
-      code: function label() {
+      code: function toSummary() {
         if ( this.legalName ) return this.legalName;
         if ( this.lastName && this.firstName ) return this.firstName + ' ' + this.lastName;
         if ( this.lastName ) return this.lastName;
@@ -626,12 +614,6 @@ foam.CLASS({
           throw new RuntimeException("You do not have permission to delete that user.");
         }
       `
-    },
-    {
-      name: 'toSummary',
-      code: function() {
-        return this.label();
-      }
     },
     {
       name: 'doNotify',

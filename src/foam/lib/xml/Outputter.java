@@ -11,13 +11,12 @@ import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.lib.json.OutputterMode;
 import foam.util.SafetyUtil;
-import org.apache.commons.io.IOUtils;
-
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.commons.io.IOUtils;
 
 public class Outputter
   implements foam.lib.Outputter

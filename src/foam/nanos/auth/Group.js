@@ -103,6 +103,10 @@ foam.CLASS({
       name: 'supportEmail'
     },
     {
+      class: 'String',
+      name: 'supportPhone'
+    },
+    {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.PasswordPolicy',
       name: 'passwordPolicy',
@@ -196,33 +200,30 @@ foam.CLASS({
       javaCode: `
         // Find Group details, by iterating up through group.parent
         AppConfig config          = (AppConfig) ((AppConfig) x.get("appConfig")).fclone();
-        String configUrl          = "";
-        String configSupportEmail = "";
-        Boolean urlFound          = false;
-        Boolean supportEmailFound = false;
         Group group               = this;
-        String grp                = "";
         DAO groupDAO              = (DAO) x.get("groupDAO");
 
+        String configUrl           = "";
+        String configSupportEmail  = "";
+        String configSupportPhone  = "";
+
+        // Get support info and url off group or parents.
         while ( group != null ) {
-          if ( ! urlFound &&
-               ! SafetyUtil.isEmpty(group.getUrl()) ) {
-            configUrl = group.getUrl();
-          }
-          configSupportEmail = supportEmailFound ? configSupportEmail : group.getSupportEmail();
-      
-          // Once true, stay true
-          urlFound          = urlFound   ? urlFound   : ! SafetyUtil.isEmpty(configUrl);
-          supportEmailFound = supportEmailFound ? supportEmailFound : ! SafetyUtil.isEmpty(configSupportEmail);
+          configUrl = ! SafetyUtil.isEmpty(group.getUrl()) && SafetyUtil.isEmpty(configUrl) ?
+              group.getUrl() : configUrl;
 
-          if ( urlFound && supportEmailFound ) break;
+          configSupportEmail = ! SafetyUtil.isEmpty(group.getSupportEmail()) && SafetyUtil.isEmpty(configSupportEmail) ?
+              group.getSupportEmail() : configSupportEmail;
 
-          grp   = group.getParent();
-          group = (Group)groupDAO.find(grp);
+          configSupportPhone = ! SafetyUtil.isEmpty(group.getSupportPhone()) && SafetyUtil.isEmpty(configSupportPhone) ?
+              group.getSupportPhone() : configSupportPhone;
+
+          if ( ! SafetyUtil.isEmpty(group.getUrl()) && ! SafetyUtil.isEmpty(configUrl) ) break;
+          group = (Group) groupDAO.find(group.getParent());
         }
 
-        // FIND URL
-        if ( ! urlFound ) {
+        // Find url on http request if one wasn't found on related groups.
+        if ( SafetyUtil.isEmpty(configUrl) ) {
           // populate AppConfig url with request's RootUrl
           HttpServletRequest req = x.get(HttpServletRequest.class);
           if ( (req != null) && ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
@@ -230,7 +231,7 @@ foam.CLASS({
           }
         }
 
-        // FORCE HTTPS IN URL?
+        // Force https if enabled
         if ( config.getForceHttps() ) {
           if ( ! configUrl.startsWith("https://") ) {
             if ( configUrl.startsWith("http://") ) {
@@ -249,9 +250,14 @@ foam.CLASS({
         // SET URL
         config.setUrl(configUrl);
 
-        // SET SupportEmail
-        if ( supportEmailFound ) {
+        // SET Support Email
+        if ( ! SafetyUtil.isEmpty(configSupportEmail) ) {
           config.setSupportEmail(configSupportEmail);
+        }
+
+        // SET Support Phone
+        if ( ! SafetyUtil.isEmpty(configSupportPhone) ) {
+          config.setSupportPhone(configSupportPhone);
         }
 
         return config;

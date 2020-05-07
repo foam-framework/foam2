@@ -1004,6 +1004,23 @@ new ${self.cls_.id}.Builder(foam.core.EmptyX.instance())
 
 foam.CLASS({
   package: 'foam.java',
+  name: 'AbstractEnumJavaRefinement',
+  refines: 'foam.core.AbstractEnum',
+  flags: ['java'],
+  methods: [
+    {
+      name: 'asJavaValue',
+      code: function() {
+        var self = this;
+        return `${self.cls_.id}.${self.name}`
+      },
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.java',
   name: 'AbstractInterfaceJavaRefinement',
   refines: 'foam.core.AbstractInterface',
   flags: ['java'],
@@ -1693,7 +1710,7 @@ foam.CLASS({
       }
     },
     ['javaInfoType',   'foam.core.AbstractArrayPropertyInfo'],
-    ['javaJSONParser', 'new foam.lib.json.ArrayParser()']
+    ['javaJSONParser', 'foam.lib.json.ArrayParser.instance()']
   ],
 
   methods: [
@@ -1709,6 +1726,9 @@ foam.CLASS({
         type: 'String',
         body: 'return "' + (this.of ? this.of.id ? this.of.id : this.of : null) + '";'
       });
+
+      if ( this.javaType != 'byte[]' && this.javaType != 'Object[]' )
+        info.getMethod('cast').body = 'Object[] a = (Object[]) o; return java.util.Arrays.copyOf(a, a.length, ' + this.javaType + '.class);';
 
       var isDefaultValue = info.getMethod('isDefaultValue');
       isDefaultValue.body = 'return java.util.Arrays.equals(get_(o), null);';
@@ -1820,7 +1840,7 @@ foam.CLASS({
   properties: [
     ['javaType', 'ArrayList'],
     ['javaInfoType', 'foam.core.AbstractPropertyInfo'],
-    ['javaJSONParser', 'new foam.lib.json.ArrayParser()']
+    ['javaJSONParser', 'oam.lib.json.ArrayParser.instance()']
   ],
 
   methods: [
@@ -2029,7 +2049,7 @@ foam.CLASS({
   flags: ['java'],
 
   properties: [
-    ['javaJSONParser', 'foam.lib.json.FObjectParser.instance()'],
+    ['javaJSONParser', 'foam.lib.json.ExprParser.instance()'],
     {
       name: 'javaGetter',
       factory: function() {

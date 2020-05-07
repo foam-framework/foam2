@@ -107,6 +107,7 @@ foam.CLASS({
       'grey4',
       'grey5',
       'black',
+      'white',
       'inputHeight',
       'inputVerticalPadding',
       'inputHorizontalPadding'
@@ -400,9 +401,12 @@ foam.CLASS({
       var self = this;
 
       // don't go to log in screen if going to reset password screen
-      if ( location.hash != null && location.hash === '#reset' ) {
+      if ( location.hash && location.hash === '#reset' ) {
         return new Promise(function(resolve, reject) {
-          self.stack.push({ class: 'foam.nanos.auth.ChangePasswordView' });
+          self.stack.push({
+            class: 'foam.nanos.auth.ChangePasswordView',
+            modelOf: 'foam.nanos.auth.ResetPassword'
+           });
           self.loginSuccess$.sub(resolve);
         });
       }

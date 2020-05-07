@@ -36,7 +36,6 @@ public class DateParser
   public DateParser() {
     super(new Alt(
       NullParser.instance(),
-      new LongParser(),
       new Seq(
         Literal.create("\""),
         IntParser.instance(),
@@ -51,21 +50,19 @@ public class DateParser
         Literal.create(":"),
         IntParser.instance(),
         Literal.create("."),
-        new Repeat(new Chars("0123456789")),
+        new Repeat(new Chars("0123456789"), null, 3, 3),
         Literal.create("Z"),
-        Literal.create("\""))));
+        Literal.create("\"")),
+      new LongParser()
+    ));
   }
 
   public PStream parse(PStream ps, ParserContext x) {
     ps = super.parse(ps, x);
 
-    if ( ps == null ) {
-      return null;
-    }
+    if ( ps == null ) return null;
 
-    if ( ps.value() == null ) {
-      return ps.setValue(null);
-    }
+    if ( ps.value() == null ) return ps.setValue(null);
 
     // Checks if Long Date (Timestamp from epoch)
     if ( ps.value() instanceof Long ) {
@@ -94,9 +91,7 @@ public class DateParser
 
     for ( int i = 0 ; i < millis.length ; i++ ) {
       // do not prefix with zeros
-      if ( zeroPrefixed && '0' == (char) millis[i] ) {
-        continue;
-      }
+      if ( zeroPrefixed && '0' == (char) millis[i] ) continue;
 
       // append millisecond
       if ( zeroPrefixed ) zeroPrefixed = false;
@@ -104,8 +99,11 @@ public class DateParser
     }
 
     // try to parse milliseconds, default to 0
-    c.add(Calendar.MILLISECOND, ! SafetyUtil.isEmpty(milliseconds.toString()) ?
-      Integer.parseInt(milliseconds.toString(), 10) : 0);
+    c.add(
+      Calendar.MILLISECOND,
+      ! SafetyUtil.isEmpty(milliseconds.toString()) ?
+        Integer.parseInt(milliseconds.toString(), 10) :
+        0);
 
     return ps.setValue(c.getTime());
   }

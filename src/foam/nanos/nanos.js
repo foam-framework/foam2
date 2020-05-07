@@ -64,14 +64,16 @@ FOAM_FILES([
   { name: "foam/nanos/auth/email/EmailDocInterface" },
   { name: "foam/nanos/auth/email/EmailDocService" },
   { name: "foam/nanos/auth/email/ClientEmailDocService" },
-  { name: "foam/nanos/auth/resetPassword/ForgotPasswordView" },
   { name: "foam/nanos/auth/resetPassword/SuccessView" },
   { name: "foam/nanos/auth/resetPassword/ResetPasswordTokenService" },
   { name: "foam/nanos/auth/token/TokenService" },
   { name: "foam/nanos/auth/token/ClientTokenService" },
   { name: "foam/nanos/auth/token/Token" },
   { name: "foam/nanos/auth/token/AbstractTokenService" },
-  { name: "foam/nanos/auth/ChangePasswordView"},
+  { name: "foam/nanos/auth/ChangePasswordView" },
+  { name: "foam/nanos/auth/ResetPassword" },
+  { name: "foam/nanos/auth/RetrievePassword" },
+  { name: "foam/nanos/auth/UpdatePassword" },
   { name: 'foam/nanos/auth/HumanNameTrait' },
   { name: "foam/nanos/auth/User" },
   { name: "foam/nanos/auth/PriorPassword" },
@@ -304,5 +306,7 @@ FOAM_FILES([
   //authservice
   { name: "foam/nanos/auth/CapabilityAuthService" },
   // google
-  { name: "foam/nanos/geocode/GoogleMapsCredentials" }
+  { name: "foam/nanos/geocode/GoogleMapsCredentials" },
+
+  { name: "com/google/foam/demos/u2/AllViews" }
 ]);

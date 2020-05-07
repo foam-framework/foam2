@@ -84,19 +84,14 @@ foam.CLASS({
     {
       name: 'authorizeOnRead',
       javaCode: `
-        User user = (User) x.get("user");
-        AuthService authService = (AuthService) x.get("auth");
-        if ( user!= null && user.getId() == getOwner() ) return;
-
-        String permission = "file.read." + getId();
-        if ( ! authService.check(x, permission) ) {
-          throw new AuthorizationException();
-        }
       `
     },
     {
       name: 'authorizeOnUpdate',
       javaCode: `
+        User user = (User) x.get("user");
+        if ( user != null && user.getId() == getOwner() ) return;
+
         AuthService auth = (AuthService) x.get("auth");
         if ( ! auth.check(x, "file.update." + getId()) ) {
           throw new AuthorizationException();
