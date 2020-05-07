@@ -2055,7 +2055,7 @@ foam.CLASS({
   flags: ['java'],
 
   properties: [
-    ['javaJSONParser', 'foam.lib.json.FObjectParser.instance()'],
+    ['javaJSONParser', 'foam.lib.json.ExprParser.instance()'],
     {
       name: 'javaGetter',
       factory: function() {

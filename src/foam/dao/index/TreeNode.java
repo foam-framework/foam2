@@ -382,7 +382,7 @@ public class TreeNode {
       // Each group need a new sink, so deepclone the origin sink of groupBy's arg2.
       Sink temp = (Sink) ( (FObject) ( (GroupBy) sink ).getArg2() ).deepClone();
       tail.planSelect(value, temp, 0, AbstractDAO.MAX_SAFE_INTEGER, null, null)
-          .select(value, temp, 0, AbstractDAO.MAX_SAFE_INTEGER, null, null);
+        .select(value, temp, 0, AbstractDAO.MAX_SAFE_INTEGER, null, null);
 
       // After operate every node in each group, just put the sink into groupBy's HashMap.
       ( ( (GroupBy) sink ).getGroups() ).put(currentNode.key, temp);

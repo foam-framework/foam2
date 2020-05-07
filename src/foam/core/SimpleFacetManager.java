@@ -22,12 +22,21 @@ public class SimpleFacetManager
   }
 
   public <T> T create(Class<T> type, Map<String, Object> args, X x) {
+    if ( type == foam.core.FObject.class ) {
+      Thread.dumpStack();
+      System.err.println("Unable to create FObject.");
+      return null;
+    }
     try {
       // Automatically load FooImpl if Foo is abstract.
       // KGR: Why/where do we do this?
       // KGR: I Think this is wrong. If Foo is Abstract it should be called AbstractFoos
       if ( java.lang.reflect.Modifier.isAbstract(type.getModifiers()) ) {
-        type = (Class<T>) Class.forName(type.getName() + "Impl");
+        try {
+          type = (Class<T>) Class.forName(type.getName() + "Impl");
+        } catch (ClassNotFoundException e) {
+          // NOP
+        }
       }
 
       try {
@@ -62,7 +71,7 @@ public class SimpleFacetManager
       }
 
       return obj;
-    } catch (java.lang.Exception e) {
+    } catch (Throwable e) {
       e.printStackTrace();
       throw new RuntimeException(e);
     }
