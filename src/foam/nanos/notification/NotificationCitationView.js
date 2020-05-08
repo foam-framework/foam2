@@ -36,9 +36,10 @@ foam.CLASS({
           .addClass('msg')
           .enableClass('fully-visible', this.fullyVisible$)
           .on('click', this.toggleFullVisibility)
+          .add(this.data.notificationType)
+          .add(this.data.issuedDate)
           .show(this.data.body !== '')
           .add(this.data.body)
-          
         .end();
     }
   ],
