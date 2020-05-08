@@ -6,6 +6,7 @@ import foam.core.X;
 import foam.dao.AbstractSink;
 import foam.dao.DAO;
 import foam.dao.ProxyDAO;
+import foam.mlang.Expressions;
 import foam.mlang.sink.Count;
 import foam.nanos.auth.LifecycleState;
 import foam.nanos.auth.User;
@@ -69,7 +70,7 @@ public class SendNotificationDAO
     // Retrieve the notification settings for this user
     NotificationSetting notificationSetting = (EmailSetting) notificationSettingDAO.find(
       AND(
-        EQ(Notification.OWNER, user.getId()),
+        EQ(NotificationSetting.OWNER, user.getId()),
         CLASS_OF(NotificationSetting.class)
       ));
 

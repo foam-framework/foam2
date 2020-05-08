@@ -60,7 +60,7 @@ public class SendEmailNotificationDAO extends ProxyDAO {
     // Retrieve the email settings for this user
     EmailSetting emailSetting = (EmailSetting) settingDAO.find(
       AND(
-        EQ(Notification.OWNER, user.getId()),
+        EQ(NotificationSetting.OWNER, user.getId()),
         CLASS_OF(EmailSetting.class)
       ));
 
