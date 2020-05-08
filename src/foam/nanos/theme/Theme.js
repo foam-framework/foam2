@@ -355,11 +355,6 @@ foam.CLASS({
       visibility: 'HIDDEN',
     },
     {
-      class: 'Reference',
-      of: 'foam.nanos.auth.User',
-      name: 'supportUser'
-    },
-    {
       class: 'DateTime',
       name: 'created',
       includeInDigest: true,
@@ -399,6 +394,14 @@ foam.CLASS({
       updateVisibility: 'RO',
       section: 'administration'
     },
+    {
+      class: 'String',
+      name: 'supportPhone'
+    },
+    {
+      class: 'String',
+      name: 'supportEmail'
+    }
  ],
 
   actions: [
