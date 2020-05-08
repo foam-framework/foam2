@@ -10,6 +10,7 @@ import foam.core.X;
 import foam.dao.DAO;
 import foam.nanos.auth.User;
 import foam.nanos.http.WebAgent;
+import foam.nanos.logger.Logger;
 import foam.nanos.notification.email.DAOResourceLoader;
 import foam.nanos.notification.email.EmailTemplate;
 import org.apache.commons.lang3.StringUtils;
@@ -59,10 +60,13 @@ public class EmailVerificationWebAgent
       if ( user.getEmailVerified() ) {
         throw new Exception("Email already verified.");
       }
-
+      user = (User) user.fclone();
       emailToken.processToken(x, user, token);
     } catch (Throwable t) {
-      message = "Problem verifying your email.<br>" + t.getMessage();
+      String msg = t.getMessage();
+      ((Logger) x.get("logger")).error(msg);
+      t.printStackTrace();
+      message = "Problem verifying your email.<br>" + msg;
     } finally {
       if ( config_ == null ) {
         config_ = EnvironmentConfigurationBuilder

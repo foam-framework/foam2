@@ -167,16 +167,21 @@ foam.CLASS({
     ^tertiary {
       border-color: transparent;
       background-color: transparent;
-      color: /*%BLACK%*/ #1e1f21;
+      color: /*%GREY1%*/ #5e6061;
+      border-radius: 0;
     }
 
     ^tertiary:hover:not(:disabled) {
       border-color: transparent;
       background-color: transparent;
+      color: /*%BLACK%*/ #1e1f21;
     }
 
-    ^tertiary:focus:not(:hover) {
+    ^tertiary:focus {
       border-bottom-color: /*%PRIMARY3%*/ #406dea;
+      border-left-width: 0;
+      border-right-width: 0;
+      color: /*%BLACK%*/ #1e1f21;
     }
 
     ^tertiary:disabled {
@@ -217,11 +222,6 @@ foam.CLASS({
       padding: 7px 15px;
     }
 
-    ^tertiary^small {
-      font-size: 12px;
-      padding: 8px 0px;
-    }
-
     ^medium {
       font-size: 14px;
       padding: 9px 16px;
@@ -229,10 +229,6 @@ foam.CLASS({
 
     ^medium:focus {
       padding: 8px 15px;
-    }
-
-    ^tertiary^medium {
-      padding: 8px 0px;
     }
 
     ^large {
@@ -244,8 +240,18 @@ foam.CLASS({
       padding: 9px 15px;
     }
 
+    ^tertiary^small,
+    ^tertiary^medium,
     ^tertiary^large {
-      padding: 10px 0px;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    ^tertiary^small:focus,
+    ^tertiary^medium:focus,
+    ^tertiary^large:focus {
+      padding-left: 1px;
+      padding-right: 1px;
     }
   `,
 
@@ -343,11 +349,10 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      
       this.tooltip = this.action.toolTip;
 
       this.SUPER();
-      
+
       this.initCls();
 
       this.on('click', this.click);
@@ -391,19 +396,21 @@ foam.CLASS({
 
   listeners: [
     function click(e) {
-      if ( this.buttonState == this.ButtonState.NO_CONFIRM ) {
-        this.action && this.action.maybeCall(this.__subContext__, this.data);
-      } else if ( this.buttonState == this.ButtonState.CONFIRM ) {
-        this.buttonState = this.ButtonState.DEBOUNCE;
-        this.removeAllChildren();
-        this.add(this.confirm);
-        this.debounce();
-      } else if ( this.buttonState == this.ButtonState.ARMED ) {
-        this.buttonState = this.ButtonState.CONFIRM;
-        this.removeAllChildren();
-        this.addContent();
-        this.action && this.action.maybeCall(this.__subContext__, this.data);
-      }
+      try {
+        if ( this.buttonState == this.ButtonState.NO_CONFIRM ) {
+          this.action && this.action.maybeCall(this.__subContext__, this.data);
+        } else if ( this.buttonState == this.ButtonState.CONFIRM ) {
+          this.buttonState = this.ButtonState.DEBOUNCE;
+          this.removeAllChildren();
+          this.add(this.confirm);
+          this.debounce();
+        } else if ( this.buttonState == this.ButtonState.ARMED ) {
+          this.buttonState = this.ButtonState.CONFIRM;
+          this.removeAllChildren();
+          this.addContent();
+          this.action && this.action.maybeCall(this.__subContext__, this.data);
+        }
+      } catch (x) {}
 
       e.preventDefault();
       e.stopPropagation();

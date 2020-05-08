@@ -22,6 +22,7 @@ foam.CLASS({
 
   requires: [
     'foam.mlang.sink.Count',
+    'foam.u2.search.StringRefinement',
     'foam.u2.search.BooleanRefinement',
     'foam.u2.search.EnumRefinement',
     'foam.u2.search.GroupAutocompleteSearchView',
@@ -377,7 +378,8 @@ foam.CLASS({
   listeners: [
     {
       name: 'onPredicateChange',
-      isFramed: true,
+      isMerged: true,
+      mergeDelay: 250,
       code: function() {
         this.filteredDAO.select(this.Count.create())
             .then(function(c) { this.count = c.value; }.bind(this));
@@ -385,7 +387,8 @@ foam.CLASS({
     },
     {
       name: 'updateCount',
-      isFramed: true,
+      isMerged: true,
+      mergeDelay: 250,
       code: function() {
         this.data.select(this.Count.create()).then(function(c) {
           this.totalCount = c.value;
@@ -395,7 +398,8 @@ foam.CLASS({
     },
     {
       name: 'updateSearchFields',
-      isFramed: true,
+      isMerged: true,
+      mergeDelay: 250,
       code: function() {
         if ( ! this.loaded_ || ! this.data ) return;
         var fields    = this.searchFields;
@@ -469,6 +473,19 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.u2.search',
+  name: 'StringRefinement',
+  refines: 'foam.core.String',
+
+  properties: [
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'searchView',
+      value: { class: 'foam.u2.filter.StringFilterView' }
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.u2.search',
@@ -479,14 +496,25 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpec',
       name: 'searchView',
-      value: {
-        class: 'foam.u2.search.GroupBySearchView',
-        viewSpec: { class: 'foam.u2.view.ChoiceView', size: 3 }
-      }
+      value: { class: 'foam.u2.filter.BooleanFilterView' }
     }
   ]
 });
 
+
+foam.CLASS({
+  package: 'foam.u2.search',
+  name: 'ReferenceRefinement',
+  refines: 'foam.core.Reference',
+
+  properties: [
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'searchView',
+      value: { class: 'foam.u2.filter.ReferenceFilterView' }
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.u2.search',
@@ -497,7 +525,7 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpec',
       name: 'searchView',
-      value: { class: 'foam.u2.search.GroupBySearchView' }
+      value: { class: 'foam.u2.filter.EnumFilterView' }
     }
   ]
 });
@@ -505,8 +533,8 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2.search',
-  name: 'CurrencyRefinement',
-  refines: 'foam.core.Currency',
+  name: 'UnitValueRefinement',
+  refines: 'foam.core.UnitValue',
 
   properties: [
     {
@@ -527,7 +555,7 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpec',
       name: 'searchView',
-      value: { class: 'foam.u2.search.DateSearchView' }
+      value: { class: 'foam.u2.filter.DateFilterView' }
     }
   ]
 });
@@ -542,7 +570,7 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpec',
       name: 'searchView',
-      value: { class: 'foam.u2.search.IntegerSearchView' }
+      value: { class: 'foam.u2.filter.IntegerFilterView' }
     }
   ]
 });
@@ -557,7 +585,7 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpec',
       name: 'searchView',
-      value: { class: 'foam.u2.search.IntegerSearchView' }
+      value: { class: 'foam.u2.filter.IntegerFilterView' }
     }
   ]
 });
@@ -572,7 +600,7 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpec',
       name: 'searchView',
-      value: { class: 'foam.u2.search.IntegerSearchView' }
+      value: { class: 'foam.u2.filter.IntegerFilterView' }
     }
   ]
 });
@@ -587,7 +615,7 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpec',
       name: 'searchView',
-      value: { class: 'foam.u2.search.IntegerSearchView' }
+      value: { class: 'foam.u2.filter.IntegerFilterView' }
     }
   ]
 });
@@ -602,7 +630,7 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpec',
       name: 'searchView',
-      value: { class: 'foam.u2.search.FloatSearchView' }
+      value: { class: 'foam.u2.filter.FloatFilterView' }
     }
   ]
 });

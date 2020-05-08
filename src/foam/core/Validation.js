@@ -1,23 +1,13 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2016 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
   package: 'foam.core',
   name: 'ValidationPredicate',
+
   properties: [
     {
       name: 'predicateFactory'
@@ -38,6 +28,8 @@ foam.CLASS({
     },
     {
       class: 'Function',
+      // TODO: it isn't normal for JS functions to have a 'js' prefix
+      // TODO: poor choice of name, should be something with 'assert'
       name: 'jsFunc',
       expression: function(predicate, jsErr) {
         return function() {
@@ -51,21 +43,27 @@ foam.CLASS({
     },
     {
       class: 'Function',
+      // TODO: it isn't normal for JS functions to have a 'js' prefix
       name: 'jsErr',
       expression: function(errorString) {
         return function() { return errorString; };
       }
     }
   ],
+
   methods: [
     function createErrorSlotFor(data) {
+      return data.slot(this.jsFunc, this.args);
+      /*
       return this.ExpressionSlot.create({
         args: this.args.map(a => data[a+'$']),
         code: this.jsFunc.bind(data)
       });
+      */
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.core',
@@ -76,7 +74,14 @@ foam.CLASS({
     {
       class: 'FObjectArray',
       of: 'foam.core.ValidationPredicate',
-      name: 'validationPredicates'
+      name: 'validationPredicates',
+      // We override 'compare' here because we need to avoid infinite recursion
+      // that occurs when a validation predicate for a given property contains a
+      // reference to the property itself.
+      // This is an incorrect implementation of compare since it will always
+      // return a match, even if the validation predicates are different. It
+      // would be preferable to find a way to deal with circular references.
+      compare: function() { return 0; }
     },
     {
       name: 'validateObj',
@@ -95,17 +100,20 @@ foam.CLASS({
         }
         return !required ? null : [[name],
           function() {
-            return !this.hasOwnProperty(name) && (`Please enter a ${label}`);
+            const axiom = this.cls_.getAxiomByName(name);
+            return axiom.isDefaultValue(this[name]) && (`Please enter ${label.toLowerCase()}`);
           }]
-      },
-    },
+      }
+    }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.core',
   name: 'StringPropertyValidationRefinement',
   refines: 'foam.core.String',
+
   properties: [
     'minLength',
     'maxLength',
@@ -115,23 +123,35 @@ foam.CLASS({
       name: 'validationPredicates',
       factory: function() {
         var self = this;
-        var a = [];
+        var a    = [];
+
         if ( foam.Number.isInstance(this.minLength) ) {
           a.push({
             args: [this.name],
             predicateFactory: function(e) {
               return e.GTE(foam.mlang.StringLength.create({ arg1: self }), self.minLength);
             },
-            errorString: `Please enter a ${this.label} with least ${this.minLength} character${this.minLength>1?'s':''}`
+            errorString: `Please enter ${this.label.toLowerCase()} with at least ${this.minLength} character${this.minLength>1?'s':''}`
           });
         }
+
         if ( foam.Number.isInstance(this.maxLength) ) {
           a.push({
             args: [this.name],
             predicateFactory: function(e) {
               return e.LTE(foam.mlang.StringLength.create({ arg1: self }), self.maxLength);
             },
-            errorString: `Please enter a ${this.label} with at most ${this.maxLength} character${this.maxLength>1?'s':''}`
+            errorString: `Please enter ${this.label.toLowerCase()} with at most ${this.maxLength} character${this.maxLength>1?'s':''}`
+          });
+        }
+
+        if ( this.required && ! foam.Number.isInstance(this.minLength) ) {
+          a.push({
+            args: [this.name],
+            predicateFactory: function(e) {
+              return e.GTE(foam.mlang.StringLength.create({ arg1: self }), 1);
+            },
+            errorString: `Please enter ${this.label.toLowerCase()}`
           });
         }
         return a;
@@ -140,10 +160,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'FObjectPropertyValidationRefinement',
   refines: 'foam.core.FObjectProperty',
+
   properties: [
     {
       class: 'Boolean',
@@ -156,20 +178,22 @@ foam.CLASS({
           return [
             [`${name}$errors_`],
             function(errs) {
-              return errs ? `Please enter a valid ${label}` : null;
+              return errs ? `Please enter valid ${label.toLowerCase()}` : null;
             }
           ];
         }
         return foam.core.Property.VALIDATE_OBJ.expression.apply(this, arguments);
-      },
-    },
+      }
+    }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.core',
   name: 'IntPropertyValidationRefinement',
   refines: 'foam.core.Int',
+
   properties: [
     {
       class: 'Boolean',
@@ -180,25 +204,28 @@ foam.CLASS({
       factory: function() {
         if ( ! this.autoValidate ) return [];
         var self = this;
-        var a = [];
+        var a    = [];
+
         if ( foam.Number.isInstance(self.min) ) {
           a.push({
             args: [self.name],
             predicateFactory: function(e) {
               return e.GTE(self, self.min);
             },
-            errorString: `Please enter a ${self.label} greater than or equal to ${self.min}.`
+            errorString: `Please enter ${self.label.toLowerCase()} greater than or equal to ${self.min}.`
           });
         }
+
         if ( foam.Number.isInstance(self.max) ) {
           a.push({
             args: [self.name],
             predicateFactory: function(e) {
               return e.LTE(self, self.max);
             },
-            errorString: `Please enter a ${self.label} less than or equal to ${self.max}`
+            errorString: `Please enter ${self.label.toLowerCase()} less than or equal to ${self.max}`
           });
         }
+
         return a;
       }
     }
@@ -282,7 +309,8 @@ foam.CLASS({
       return foam.core.ExpressionSlot.create({
         obj: obj,
         code: validateObject,
-        args: args});
+        args: args
+      });
     }
   ]
 });
@@ -298,10 +326,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'EmailPropertyValidationRefinement',
   refines: 'foam.core.EMail',
+
   properties: [
     {
       class: 'FObjectArray',
@@ -313,9 +343,12 @@ foam.CLASS({
           {
             args: [this.name],
             predicateFactory: function(e) {
-              return e.REG_EXP(self, /^$|.+@.+\..+/);
+              return e.OR(
+                e.EQ(self, ''),
+                e.REG_EXP(self, /\S+@\S+\.\S+/)
+              );
             },
-            errorString: 'Please enter an email address'
+            errorString: 'Please enter valid email address'
           }
         ];
         if ( this.required ) {
@@ -325,9 +358,9 @@ foam.CLASS({
               predicateFactory: function(e) {
                 return e.NEQ(self, '');
               },
-              errorString: 'Please enter an email address'
+              errorString: 'Please enter email address'
             }
-          )
+          );
         }
         return ret;
       }
@@ -335,10 +368,60 @@ foam.CLASS({
   ]
 });
 
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'PhoneNumberPropertyValidationRefinement',
+  refines: 'foam.core.PhoneNumber',
+
+  properties: [
+    {
+      class: 'FObjectArray',
+      of: 'foam.core.ValidationPredicate',
+      name: 'validationPredicates',
+      factory: function() {
+        var self = this;
+        const PHONE_NUMBER_REGEX = /^(?:\+?1[-.●]?)?\(?([0-9]{3})\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4})$/;
+        return this.required
+          ? [
+              {
+                args: [this.name],
+                predicateFactory: function(e) {
+                  return e.HAS(self);
+                },
+                errorString: 'Phone number required.'
+              },
+              {
+                args: [this.name],
+                predicateFactory: function(e) {
+                  return e.REG_EXP(self, PHONE_NUMBER_REGEX);
+                },
+                errorString: 'Invalid phone number.'
+              }
+            ]
+          : [
+              {
+                args: [this.name],
+                predicateFactory: function(e) {
+                    return e.OR(
+                      e.EQ(foam.mlang.StringLength.create({ arg1: self }), 0),
+                      e.REG_EXP(self, PHONE_NUMBER_REGEX)
+                    );
+                },
+                errorString: 'Invalid phone number.'
+              }
+            ];
+      }
+    }
+  ]
+});
+
+
 foam.CLASS({
   package: 'foam.core',
   name: 'DatePropertyValidationRefinement',
   refines: 'foam.core.Date',
+
   properties: [
     {
       class: 'FObjectArray',
@@ -350,24 +433,27 @@ foam.CLASS({
           {
             args: [self.name],
             predicateFactory: function(e) {
-              return e.AND(
-                e.LTE(
-                  self,
-                  // Maximum date supported by FOAM
-                  // (bounded by JavaScript's limit)
-                  new Date(8640000000000000)
-                ),
-                e.GTE(
-                  self,
-                  // Minimum date supported by FOAM
-                  // (bounded by JavaScript's limit)
-                  new Date(-8640000000000000)
+              return e.OR(
+                e.NOT(e.HAS(self)), // Allow null dates.
+                e.AND(
+                  e.LTE(
+                    self,
+                    // Maximum date supported by FOAM
+                    // (bounded by JavaScript's limit)
+                    new Date(8640000000000000)
+                  ),
+                  e.GTE(
+                    self,
+                    // Minimum date supported by FOAM
+                    // (bounded by JavaScript's limit)
+                    new Date(-8640000000000000)
+                  )
                 )
-              )
+              );
             },
             errorString: 'Invalid date value'
           }
-        ]
+        ];
       }
     }
   ]

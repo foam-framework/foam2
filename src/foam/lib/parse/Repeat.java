@@ -32,7 +32,7 @@ public class Repeat
   }
 
   public Repeat(Parser parser, String str) {
-    this(parser, new Literal(str));
+    this(parser, Literal.create(str));
   }
 
   public Repeat(Parser parser, Parser delimiter) {
@@ -44,7 +44,7 @@ public class Repeat
   }
 
   public Repeat(Parser parser, String delimiter, int minimum) {
-    this(parser, new Literal(delimiter), minimum);
+    this(parser, Literal.create(delimiter), minimum);
   }
 
   public Repeat(Parser parser, Parser delimiter, int minimum, int maximum) {

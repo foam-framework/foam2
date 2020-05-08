@@ -137,6 +137,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'Time',
@@ -160,7 +161,9 @@ foam.CLASS({
   label: 'Round byte numbers',
 
   properties: [
-    [ 'type', 'Byte' ]
+    [ 'type', 'Byte' ],
+    [ 'min', -128 ],
+    [ 'max', 127 ]
   ]
 });
 
@@ -174,7 +177,9 @@ foam.CLASS({
   label: 'Round short numbers',
 
   properties: [
-    [ 'type', 'Short' ]
+    [ 'type', 'Short' ],
+    [ 'min', -32768 ],
+    [ 'max', 32767 ]
   ]
 });
 
@@ -295,6 +300,40 @@ foam.CLASS({
       function(v) { return ! v || ! v.length; }
     ],
     [ 'type', 'Any[]' ]
+  ],
+
+  methods: [
+    function installInProto(proto) {
+      this.SUPER(proto);
+      var self = this;
+      Object.defineProperty(proto, self.name + '$push', {
+        get: function classGetter() {
+          return function (v) {
+            // Push value
+            this[self.name].push(v);
+            // Force property update
+            this.propertyChange.pub(self.name, this.slot(self.name));
+          }
+        },
+        configurable: true
+      });
+      Object.defineProperty(proto, self.name + '$remove', {
+        get: function classGetter() {
+          return function (predicate) {
+            // Faster than splice or filter as of the time this was added
+            let oldArry = this[self.name];
+            let newArry = [];
+            for ( let i=0 ; i < oldArry.length ; i++ ) {
+              if ( ! predicate.f(oldArry[i]) ) {
+                newArry.push(oldArry[i]);
+              }
+            }
+            this.propertyChange.pub(self.name, this.slot(self.name));
+          }
+        },
+        configurable: true
+      });
+    }
   ]
 });
 
@@ -412,7 +451,6 @@ foam.CLASS({
 
       Object.defineProperty(proto, name, desc);
 
-
       Object.defineProperty(proto, name + '$cls', {
         get: function classGetter() {
           console.warn("Deprecated use of 'cls.$cls'. Just use 'cls' instead.");
@@ -431,7 +469,16 @@ foam.CLASS({
   name: 'EMail',
   extends: 'String',
   // FUTURE: verify
-  label: 'Email address'
+  label: 'Email address',
+  properties: [
+    [ 'displayWidth', 50 ],
+    [
+      'preSet',
+      function(_, v) {
+        return v.toLowerCase().trim();
+      }
+    ]
+  ]
 });
 
 
@@ -476,14 +523,32 @@ foam.CLASS({
   package: 'foam.core',
   name: 'PhoneNumber',
   extends: 'String',
-  label: 'Phone number'
+  label: 'Phone number',
+  properties: [ [ 'displayWidth', 20 ] ]
 });
 
 
 foam.CLASS({
   package: 'foam.core',
-  name: 'Currency',
-  extends: 'Long'
+  name: 'Code',
+  extends: 'String'
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'UnitValue',
+  extends: 'Long',
+  properties: [
+    {
+      class: 'String',
+      name: 'unitPropName',
+      value: 'denomination',
+      documentation: `
+        The name of the property of a model that contains the denomination String.
+      `
+    }
+  ]
 });
 
 
@@ -532,6 +597,35 @@ foam.CLASS({
       }
     ],
     [ 'type', 'Map' ]
+  ],
+
+  methods: [
+    function installInProto(proto) {
+      this.SUPER(proto);
+      var self = this;
+      Object.defineProperty(proto, self.name + '$set', {
+        get: function mapSet() {
+          return function (k, v) {
+            // Set value on map
+            this[self.name][k] = v;
+            // Force property update
+            this.propertyChange.pub(self.name, this.slot(self.name));
+          }
+        },
+        configurable: true
+      });
+      Object.defineProperty(proto, self.name + '$remove', {
+        get: function mapRemove() {
+          return function (k) {
+            // Remove value from map
+            delete this[self.name][k];
+            // Force property update
+            this.propertyChange.pub(self.name, this.slot(self.name));
+          }
+        },
+        configurable: true
+      })
+    }
   ]
 });
 
@@ -681,6 +775,11 @@ foam.CLASS({
 
   properties: [
     { class: 'String',  name: 'name' },
+    {
+      class: 'String',
+      name: 'label',
+      expression: function(name) { return foam.String.labelize(name); }
+    },
     { class: 'Boolean', name: 'abstract' }
   ]
 });
@@ -722,6 +821,12 @@ foam.CLASS({
       ]
     </pre>
     */
+    { class: 'String',  name: 'name', required: true },
+    {
+      class: 'String',
+      name: 'label',
+      expression: function(name) { return foam.String.labelize(name); }
+    },
     { class: 'String', name: 'shortName' }
   ]
 });

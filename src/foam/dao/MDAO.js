@@ -191,7 +191,7 @@ foam.CLASS({
         self.pub('on', 'remove', found);
       }
 
-      return Promise.resolve();
+      return Promise.resolve(obj);
     },
 
     function removeAll_(x, skip, limit, order, predicate) {

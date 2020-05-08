@@ -10,8 +10,8 @@ import foam.core.*;
 import foam.dao.AbstractSink;
 import foam.dao.ArraySink;
 import foam.dao.DAO;
-import foam.dao.ProxyDAO;
 import foam.dao.java.JDAO;
+import foam.dao.ProxyDAO;
 import foam.nanos.auth.Group;
 import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
@@ -21,16 +21,15 @@ import foam.nanos.pm.NullPM;
 import foam.nanos.pm.PM;
 import foam.nanos.script.Script;
 import foam.nanos.session.Session;
-
+import foam.util.SafetyUtil;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
-
 import static foam.mlang.MLang.EQ;
 
 public class Boot {
   // Context key used to store the top-level root context in the context.
-  public final static String ROOT = "_ROOT_";
-  public static PM nullPM_ = new NullPM();
+  public final static String ROOT     = "_ROOT_";
+  public final static PM     NULLPM__ = new NullPM();
 
   protected DAO serviceDAO_;
   protected X   root_ = new ProxyX();
@@ -44,7 +43,7 @@ public class Boot {
     Logger logger = new ProxyLogger(new StdoutLogger());
     root_.put("logger", logger);
 
-    if ( datadir == null || datadir == "" ) {
+    if ( SafetyUtil.isEmpty(datadir) ) {
       datadir = System.getProperty("JOURNAL_HOME");
     }
 
@@ -79,15 +78,12 @@ public class Boot {
       }
     }, null);
 
-    // PM factory
+    // PM factory, only return a real PM 1% of the time
     root_ = root_.putFactory("PM", new XFactory() {
       public Object create(X x) {
-        int rand = ThreadLocalRandom.current().nextInt(0, 100);
-        if ( rand == 0 ) {
-          return new PM();
-        } else {
-          return nullPM_;
-        }
+        return ThreadLocalRandom.current().nextInt(0, 100) == 0 ?
+          new PM() :
+          NULLPM__ ;
       }
     });
 
@@ -103,10 +99,7 @@ public class Boot {
 
     // Export the ServiceDAO
     ((ProxyDAO) root_.get("nSpecDAO")).setDelegate(
-        new foam.nanos.auth.AuthorizationDAO(getX(), serviceDAO_, new foam.nanos.auth.GlobalReadAuthorizer("service")));
-    // 'read' authenticated version - for dig and docs
-    ((ProxyDAO) root_.get("AuthenticatedNSpecDAO")).setDelegate(
-        new foam.dao.PMDAO(root_, new foam.nanos.auth.AuthorizationDAO(getX(), (DAO) root_.get("nSpecDAO"), new foam.nanos.auth.StandardAuthorizer("service"))));
+      new foam.nanos.auth.AuthorizationDAO(getX(), serviceDAO_, new foam.nanos.auth.GlobalReadAuthorizer("service")));
 
     serviceDAO_.where(EQ(NSpec.LAZY, false)).select(new AbstractSink() {
       @Override
@@ -123,7 +116,7 @@ public class Boot {
       DAO    scriptDAO = (DAO) root_.get("scriptDAO");
       Script script    = (Script) scriptDAO.find(startScript);
       if ( script != null ) {
-        script.runScript(root_);
+        ((Script) script.fclone()).runScript(root_);
       }
     }
   }

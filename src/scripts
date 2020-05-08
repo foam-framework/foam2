@@ -12,10 +12,10 @@ p({
   "code":
   """
     import foam.dao.*;
-    
+
     setAccessibility(true);
     DAO dao = x.get("userDAO");
-    while ( ! ( dao instanceof JDAO ) ) 
+    while ( ! ( dao instanceof JDAO ) )
       dao = dao.getDelegate();
     print(dao.file_);
   """,

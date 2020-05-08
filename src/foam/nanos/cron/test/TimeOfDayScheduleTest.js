@@ -11,7 +11,6 @@ foam.CLASS({
 
   javaImports: [
     'foam.nanos.cron.*',
-    'java.util.Date',
     'java.util.Calendar'
   ],
 

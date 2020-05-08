@@ -62,6 +62,11 @@ foam.CLASS({
     ^ .foam-nanos-menu-MenuBar li {
       display: inline-block;
       cursor: pointer;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
     }
     ^ .menuItem {
       display: inline-block;
@@ -136,7 +141,7 @@ foam.CLASS({
       this
         .start()
           .addClass('logged-in-container')
-          .tag({ class: 'foam.nanos.u2.navigation.BusinessLogoView' })
+          .tag({ class: 'foam.nanos.u2.navigation.ApplicationLogoView' })
           .start(this.MenuBar, { menuName: this.group ? this.group.rootMenu : '' })
             .addClass('menuBar')
           .end()

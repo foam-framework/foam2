@@ -14,13 +14,19 @@ foam.CLASS({
   ],
 
   imports: [
+    'ctrl',
+    'group',
+    'loginSuccess',
     'requestLogin',
     'sessionTimer',
-    'group'
+    'window'
   ],
 
-  javaImports: [
-    'foam.nanos.auth.AuthenticationException'
+  messages: [
+    {
+      name: 'REFRESH_MSG',
+      message: 'Your session has expired. The page will now be refreshed so that you can log in again.',
+    }
   ],
 
   properties: [
@@ -42,6 +48,17 @@ foam.CLASS({
       code: function send(msg) {
         var self = this;
         if ( this.RPCErrorMessage.isInstance(msg.object) && msg.object.data.id === 'foam.nanos.auth.AuthenticationException' ) {
+          // If the user is already logged in when this happens, then we know
+          // that something occurred on the backend to destroy this user's
+          // session. Therefore we reset the client state and ask them to log
+          // in again.
+          if ( this.loginSuccess ) {
+            if ( this.ctrl )  this.ctrl.remove();
+            alert(this.REFRESH_MSG);
+            (this.window || window).location.reload(false);
+            return;
+          }
+
           this.requestLogin().then(function() {
             self.clientBox.send(self.msg);
           });

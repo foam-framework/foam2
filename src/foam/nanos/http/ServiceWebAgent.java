@@ -6,6 +6,7 @@
 
 package foam.nanos.http;
 
+import foam.nanos.app.Mode;
 import foam.box.Box;
 import foam.box.SessionServerBox;
 import foam.core.FObject;
@@ -14,12 +15,16 @@ import foam.core.X;
 import foam.lib.json.ExprParser;
 import foam.lib.json.JSONParser;
 import foam.lib.parse.*;
+import foam.nanos.app.AppConfig;
+import foam.nanos.jetty.HttpServer;
+import foam.nanos.jetty.HttpServer;
 import foam.nanos.logger.Logger;
-
+import foam.nanos.servlet.VirtualHostRoutingServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
+import java.net.URL;
 
 @SuppressWarnings("serial")
 public class ServiceWebAgent
@@ -75,11 +80,18 @@ public class ServiceWebAgent
       BufferedReader      reader         = req.getReader();
       X                   requestContext = x.put("httpRequest", req).put("httpResponse", resp);
       Logger              logger         = (Logger) x.get("logger");
+      HttpServer          http           = (HttpServer) x.get("http");
 
-      resp.setHeader("Access-Control-Allow-Origin", "*");
+      if ( ((AppConfig) x.get("appConfig")).getMode() != Mode.PRODUCTION ) {
+        resp.setHeader("Access-Control-Allow-Origin", "*");
+      } else if ( ! req.getHeader("Origin").equals("null") ){
+        URL url = new URL(req.getHeader("Origin"));
+        if ( ((VirtualHostRoutingServlet) http.getServletMappings()[0].getServletObject()).getHostMapping().containsKey(url.getHost()) )
+          resp.setHeader("Access-Control-Allow-Origin", req.getHeader("Origin"));
+      }
 
-      int read = 0;
-      int count = 0;
+      int read   = 0;
+      int count  = 0;
       int length = req.getContentLength();
 
       StringBuilder builder = sb.get();
@@ -126,7 +138,7 @@ public class ServiceWebAgent
    * @return the error message
    */
   protected String getParsingError(X x, String buffer) {
-    Parser        parser = new ExprParser();
+    Parser        parser = ExprParser.instance();
     PStream       ps     = new StringPStream();
     ParserContext psx    = new ParserContextImpl();
 

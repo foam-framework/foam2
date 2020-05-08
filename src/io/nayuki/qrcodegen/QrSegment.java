@@ -148,7 +148,7 @@ public final class QrSegment {
       bb.appendBits(6, 3);
       bb.appendBits(assignVal, 21);
     } else
-      throw new IllegalArgumentException("ECI assignment value out of range");
+        throw new IllegalArgumentException("ECI assignment value out of range");
     return new QrSegment(Mode.ECI, 0, bb);
   }
 

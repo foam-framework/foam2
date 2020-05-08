@@ -686,7 +686,6 @@ foam.CLASS({
         targetPropertyName: this.targetPropertyName,
         targetDAOKey: this.targetDAOKey,
         unauthorizedTargetDAOKey: this.unauthorizedTargetDAOKey
-        
       }).copyFrom(this.methodOverrides));
 
       cls.installAxiom(this.OneToManyRelationshipProperty.create({
@@ -703,9 +702,9 @@ foam.CLASS({
   extends: 'foam.dao.DAOProperty',
   properties: [
     {
-      name: 'visibilityExpression',
+      name: 'visibility',
       value: function(id) {
-        return !! id ? foam.u2.Visibility.RW : foam.u2.Visibility.HIDDEN;
+        return !! id ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
       }
     },
     {
@@ -1038,5 +1037,16 @@ foam.CLASS({
       flags: ['swift'],
       value: '// NOOP',
     },
+    {
+      name: 'createVisibility',
+      value: 'HIDDEN'
+    },
+    {
+      name: 'view',
+      value: {
+        class: 'foam.u2.view.FObjectPropertyView',
+        readView: { class: 'foam.u2.view.ReadManyToManyRelationshipPropertyView' }
+      }
+    }
   ],
 });

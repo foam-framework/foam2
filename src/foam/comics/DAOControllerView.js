@@ -14,6 +14,7 @@ foam.CLASS({
     'foam.comics.DAOController',
     'foam.comics.DAOUpdateControllerView',
     'foam.u2.view.ScrollTableView',
+    'foam.nanos.u2.navigation.IFrameTopNavigation',
     'foam.u2.dialog.Popup'
   ],
 
@@ -62,6 +63,7 @@ foam.CLASS({
 
     ^container {
       display: flex;
+      justify-content: space-between;
     }
 
     ^ .actions {
@@ -75,7 +77,6 @@ foam.CLASS({
 
     ^full-search-container {
       flex: 0 0 250px;
-      margin-right: 10px;
     }
 
     ^ .foam-u2-view-TableView {
@@ -100,11 +101,16 @@ foam.CLASS({
     },
     {
       class: 'foam.u2.ViewSpec',
+      name: 'defaultSummaryView_',
+      value: { class: 'foam.u2.view.ScrollTableView' }
+    },
+    {
+      class: 'foam.u2.ViewSpec',
       name: 'summaryView',
       factory: function() {
-        return this.data.summaryView || this.importedSummaryView || {
-          class: 'foam.u2.view.ScrollTableView'
-        };
+        return this.data.summaryView ||
+          this.importedSummaryView ||
+          this.defaultSummaryView_;
       }
     },
     {
@@ -187,11 +193,7 @@ foam.CLASS({
                   .show(self.mode$.map((m) => m === foam.u2.DisplayMode.RW))
                   .start()
                     .forEach(self.cls.getAxiomsByClass(foam.core.Action).filter((action) => {
-                      var rtn = action.name !== self.data.primaryAction.name;
-                      if ( self.data.searchMode !== self.SearchMode.FULL ) {
-                        rtn = rtn && action.name !== 'toggleFilters';
-                      }
-                      return rtn;
+                      return action.name !== self.data.primaryAction.name;
                     }), function(action) {
                       this.tag(action, { buttonStyle: 'TERTIARY' });
                     })
@@ -211,6 +213,15 @@ foam.CLASS({
           .end());
 
       this.add(this.data.border);
+      if ( this.isIframe() ) this.tag(this.IFrameTopNavigation);
+    },
+
+    function isIframe () {
+      try {
+        return window.self !== window.top;
+      } catch (e) {
+        return true;
+      }
     },
 
     function dblclick(obj) {
@@ -227,7 +238,7 @@ foam.CLASS({
       this.stack.push({
         class: this.createControllerView.class,
         detailView: this.data.detailView
-      }, this);
+      }, this.__subContext__);
     },
 
     function onEdit(s, edit, id) {
@@ -236,7 +247,7 @@ foam.CLASS({
         detailView: this.data.detailView,
         editEnabled: this.data.editEnabled,
         key: id
-      }, this);
+      }, this.__subContext__);
     },
 
     function onFinished() {

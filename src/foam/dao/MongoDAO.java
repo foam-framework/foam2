@@ -79,9 +79,9 @@ public class MongoDAO
     }
 
     MongoCollection<BsonDocument> collection = database.getCollection(collectionName, BsonDocument.class);
-    MongoCursor<BsonDocument> cursor = collection.find().iterator();
+    
 
-    try {
+    try(MongoCursor<BsonDocument> cursor = collection.find().iterator()) {
       while ( cursor.hasNext() ) {
         if ( sub.getDetached() ) break;
 
@@ -91,9 +91,7 @@ public class MongoDAO
           decorated.put(obj, sub);
         }
       }
-    } finally {
-      cursor.close();
-    }
+    } catch(Exception e) {}
 
     decorated.eof();
 

@@ -113,7 +113,6 @@ public class GoogleMapsGeocodingDAO
 
         String line = null;
         HttpURLConnection conn = null;
-        BufferedReader reader = null;
 
         try {
           URL url = new URL(builder.toString().replace(" ", "+"));
@@ -123,9 +122,10 @@ public class GoogleMapsGeocodingDAO
           conn.connect();
 
           builder.setLength(0);
-          reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-          while ( (line = reader.readLine()) != null ) {
-            builder.append(line);
+          try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+        	  while ( (line = reader.readLine()) != null ) {
+              builder.append(line);
+            } 
           }
 
           GoogleMapsGeocodeResponse response = (GoogleMapsGeocodeResponse) getX().create(JSONParser.class)
@@ -160,7 +160,6 @@ public class GoogleMapsGeocodingDAO
           GoogleMapsGeocodingDAO.super.put_(x, cloned);
         } catch (Throwable ignored) {
         } finally {
-          IOUtils.closeQuietly(reader);
           IOUtils.close(conn);
         }
       }

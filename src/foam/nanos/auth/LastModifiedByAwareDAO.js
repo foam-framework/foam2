@@ -13,13 +13,18 @@ foam.CLASS({
     {
       name: 'put_',
       code: function(x, obj) {
-        if ( foam.nanos.auth.LastModifiedByAware.isInstance(obj) ) {
-          obj.lastModifiedBy = x.user.id;
+        if ( ! foam.nanos.auth.LastModifiedByAware.isInstance(obj) ) {
+          return this.delegate.put_(x, obj);
         }
-        return this.SUPER(x, obj);
+        return this.delegate.find_(x, obj).then(function(old) {
+          if ( ! obj.equals(old) ) {
+            obj.lastModifiedBy = x.user.id;
+          }
+          return this.delegate.put_(x, obj);
+        }.bind(this));
       },
       javaCode: `
-        if ( obj instanceof LastModifiedByAware ) {
+        if ( obj instanceof LastModifiedByAware && ! obj.equals(getDelegate().find_(x, obj)) ) {
           User user = (User) x.get("user");
           User agent = (User) x.get("agent");
           ((LastModifiedByAware) obj).setLastModifiedBy(agent != null ? agent.getId() : user.getId());

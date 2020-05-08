@@ -45,9 +45,9 @@ foam.CLASS({
         {
           class: 'Boolean',
           name: 'array',
-        },
-      ],
-    },
+        }
+      ]
+    }
   ],
   methods: [
     {

@@ -13,7 +13,7 @@ foam.CLASS({
     {
       class: 'PhoneNumber',
       name: 'number',
-      label: 'Phone #',
+      label: 'Phone Number',
       validationPredicates: [
         {
           args: ['number'],
@@ -22,14 +22,15 @@ foam.CLASS({
               foam.nanos.auth.Phone.NUMBER,
               /^(?:\+?1[-.●]?)?\(?([0-9]{3})\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4})$/);
           },
-          errorString: 'Please enter a phone number'
+          errorString: 'Please enter phone number'
         }
       ]
     },
     {
       class: 'Boolean',
       name: 'verified',
-      permissionRequired: true
+      writePermissionRequired: true,
+      createVisibility: 'HIDDEN',
     }
   ]
 });

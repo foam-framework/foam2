@@ -313,6 +313,8 @@ foam.CLASS({
     }
   },
 
+  css: '^ { margin-top: 4px; }',
+
   properties: [
     {
       name: 'type',
@@ -323,6 +325,7 @@ foam.CLASS({
   methods: [
     function link() {
       var self = this;
+      this.addClass(this.myClass());
       this.attrSlot(null, this.onKey ? 'input' : null).relateFrom(this.data$,
         function(value) {
           if ( typeof value !== 'string' ) return value;

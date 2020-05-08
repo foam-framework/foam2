@@ -56,7 +56,7 @@ if ( ! Array.prototype.find ) {
   };
 }
 
-if ( !Array.prototype.flat ) {
+if ( ! Array.prototype.flat ) {
   Array.prototype.flat = function () {
     var depth = arguments[0];
     depth = depth === undefined ? 1 : Math.floor(depth);

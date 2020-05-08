@@ -43,7 +43,7 @@ foam.CLASS({
           }.bind(this), function(e) {
             this.error = e.message ? e.message : '' + e;
           }.bind(this));
-          return this.E('span').add('Lodaing...');
+          return this.E('span').add('Loading...');
         }
         if ( ! data ) {
           return this.E('span').add(this.error);

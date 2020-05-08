@@ -7,11 +7,15 @@ foam.CLASS({
   package: 'foam.nanos.boot',
   name: 'NSpec',
 
+  javaImplements: [
+    'foam.nanos.auth.EnabledAware'
+  ],
+
   requires: [
     {
       path: 'foam.comics.BrowserView',
-      flags: ['web'],
-    },
+      flags: ['web']
+    }
   ],
 
   javaImports: [
@@ -52,7 +56,7 @@ foam.CLASS({
             })
             .add(value ? ' Y' : '-')
           .end();
-      },
+      }
     },
     {
       class: 'Boolean',
@@ -114,44 +118,78 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       name: 'service',
-      view: { class: 'foam.u2.view.FObjectView' },
-      permissionRequired: true
+      view: 'foam.u2.DetailView',
+      // Why was this set to be a SectionedDetailView? Put back to DetailView. KGR
+      //      view: { class: 'foam.u2.detail.SectionedDetailView' },
+      readPermissionRequired: true,
+      writePermissionRequired: true
     },
     {
       class: 'String',
       name: 'serviceClass',
-      displayWidth: 80
+      displayWidth: 80,
+      readPermissionRequired: true,
+      writePermissionRequired: true
     },
     {
       class: 'String',
       name: 'boxClass',
-      displayWidth: 80
+      displayWidth: 80,
+      readPermissionRequired: true,
+      writePermissionRequired: true
     },
     {
-      class: 'String',
+      class: 'Code',
       name: 'serviceScript',
-      view: { class: 'io.c9.ace.Editor' },
-      permissionRequired: true
+      readPermissionRequired: true,
+      writePermissionRequired: true
     },
     {
-      class: 'String',
+      class: 'Code',
       name: 'client',
-      value: '{}',
-      view: { class: 'io.c9.ace.Editor' }
+      value: '{}'
     },
     {
       class: 'String',
       name: 'documentation',
-      view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 140 },
-      permissionRequired: true
+      view: {
+        class: 'foam.u2.view.ModeAltView',
+        writeView: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 140 },
+        readView: { class: 'foam.u2.view.PreView' }
+      },
+      readPermissionRequired: true,
+      writePermissionRequired: true
     },
     {
       class: 'String',
       name: 'authNotes',
-      view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 140 },
-      permissionRequired: true
+      view: {
+        class: 'foam.u2.view.ModeAltView',
+        writeView: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 140 },
+        readView: { class: 'foam.u2.view.PreView' }
+      },
+      readPermissionRequired: true,
+      writePermissionRequired: true
+    },
+    {
+      class: 'Boolean',
+      name: 'enabled',
+      value: true,
+      readPermissionRequired: true,
+      writePermissionRequired: true
+    },
+    {
+          class: 'StringArray',
+          name: 'keywords'
+    },
+    {
+      class: 'String',
+      name: '_choiceText_',
+      transient: true,
+      javaGetter: 'return getName();',
+      getter: function() { return this.name; }
     }
-    // TODO: permissions, keywords, lazy, parent
+    // TODO: permissions, lazy, parent
   ],
 
   methods: [

@@ -20,15 +20,17 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'java.util.Calendar',
-    'java.util.Date'
+    'java.util.Calendar'
   ],
 
   properties: [
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.cron.TimeHMS',
-      name: 'time'
+      name: 'time',
+      factory: () => {
+        return foam.nanos.cron.TimeHMS.create();
+      }
     }
   ],
 

@@ -20,6 +20,13 @@ package foam.lib.parse;
 public class AnyChar
   implements Parser
 {
+  private final static Parser instance__ = new AnyChar();
+
+  public static Parser instance() { return instance__; }
+
+  private AnyChar() {
+  }
+
   public PStream parse(PStream ps, ParserContext x) {
     if ( ps.valid() ) return ps.tail().setValue(ps.head());
     return null;

@@ -26,21 +26,12 @@ foam.CLASS({
   javaImports: [
     'foam.dao.DAO',
     'foam.dao.ArraySink',
-    'foam.dao.Sink',
     'foam.mlang.MLang',
-    'foam.nanos.app.AppConfig',
-    'foam.nanos.auth.token.Token',
-    'foam.nanos.auth.User',
     'foam.nanos.auth.HtmlDoc',
     'foam.nanos.logger.Logger',
     'foam.nanos.notification.email.EmailMessage',
     'foam.util.Emails.EmailsUtility',
-    'foam.util.Password',
-    'foam.util.SafetyUtil',
-    'java.util.Calendar',
-    'java.util.HashMap',
-    'java.util.List',
-    'java.util.UUID'
+    'java.util.HashMap'
   ],
 
   methods: [

@@ -152,7 +152,7 @@ foam.CLASS({
     {
       name: 'NotificationPreferencesHeading',
       message: 'Notification preferences'
-    },
+    }
   ],
 
   methods: [

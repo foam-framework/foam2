@@ -21,7 +21,7 @@ foam.CLASS({
           this.menuListener && this.menuListener(menu);
           return this.createView(X, menu);
         }.bind(this),
-        undefined,
+        X,
         menu.id);
     }
   ]

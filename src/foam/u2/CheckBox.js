@@ -22,6 +22,31 @@ foam.CLASS({
 
   documentation: 'Checkbox View.',
 
+  css: `
+    ^ {
+      margin: 8px 0;
+      padding: 8px;
+    }
+
+    ^label {
+      color: #444;
+      flex-grow: 1;
+      margin-left: 12px;
+      overflow: hidden;
+      white-space: nowrap;
+      display: inline;
+    }
+
+    ^noselect {
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+  `,
+
   properties: [
     {
       class: 'Boolean',
@@ -30,7 +55,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'showLabel',
-      factory: function() { return !! this.label || this.labelFormatter },
+      factory: function() { return this.label || this.labelFormatter },
     },
     {
       class: 'String',
@@ -53,9 +78,10 @@ foam.CLASS({
           .addClass(this.myClass('label'))
           .addClass(this.myClass('noselect'))
           .callIfElse(this.labelFormatter,
-                      this.labelFormatter,
-                      function() { this.add(self.label$); })
+            this.labelFormatter,
+            function() { this.add(self.label$); })
           .on('click', function() {
+            if ( self.getAttribute('disabled') ) return;
             this.data = ! this.data;
           }.bind(this))
         .end();
@@ -71,30 +97,5 @@ foam.CLASS({
     function link() {
       this.data$.linkTo(this.attrSlot('checked'));
     }
-  ],
-
-  css: `
-    ^ {
-      margin: 4px;
-      padding: 8px;
-    }
-
-    ^label {
-      color: #444;
-      flex-grow: 1;
-      margin-left: 12px;
-      overflow: hidden;
-      white-space: nowrap;
-      display: inline;
-    }
-
-    ^noselect {
-      -webkit-touch-callout: none;
-      -webkit-user-select: none;
-      -khtml-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
-    }
-  `
+  ]
 });

@@ -50,7 +50,7 @@ foam.CLASS({
       ],
       javaCode: `
         // setup parser
-        Parser classReferenceParser = new ClassReferenceParser();
+        Parser classReferenceParser = ClassReferenceParser.instance();
         StringPStream ps = new StringPStream(new Reference<>(data));
         ParserContext psx = new ParserContextImpl();
         psx.set("X", x);

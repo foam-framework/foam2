@@ -16,11 +16,13 @@ foam.CLASS({
     },
     {
       class: 'Object',
-      name: 'oldValue'
+      name: 'oldValue',
+      view: 'foam.u2.view.AnyView',
     },
     {
       class: 'Object',
-      name: 'newValue'
+      name: 'newValue',
+      view: 'foam.u2.view.AnyView'
     }
   ]
 });

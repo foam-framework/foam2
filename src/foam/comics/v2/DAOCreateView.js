@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.comics.v2',
   name: 'DAOCreateView',
   extends: 'foam.u2.View',
-
+  
   topics: [
     'finished',
     'throwError'
@@ -49,7 +49,8 @@ foam.CLASS({
     'foam.u2.dialog.NotificationMessage'
   ],
   imports: [
-    'stack'
+    'stack',
+    'ctrl'
   ],
   exports: [
     'controllerMode'
@@ -81,17 +82,65 @@ foam.CLASS({
   actions: [
     {
       name: 'save',
+      isEnabled: function(data$errors_) {
+        return ! data$errors_;
+      },
       code: function() {
-        this.config.dao.put(this.data).then(o => {
+        var cData = this.data;
+        
+        this.config.dao.put(cData).then((o) => {
           this.data = o;
           this.finished.pub();
+
+          if ( foam.comics.v2.userfeedback.UserFeedbackAware.isInstance(o) && o.userFeedback ){
+            var currentFeedback = o.userFeedback;
+            while ( currentFeedback ){
+              this.ctrl.add(this.NotificationMessage.create({
+                message: currentFeedback.message,
+                type: currentFeedback.status.name.toLowerCase()
+              }));
+
+              currentFeedback = currentFeedback.next;
+            }
+          } else {
+            this.ctrl.add(this.NotificationMessage.create({
+              message: `${this.data.model_.label} created.`
+            }));
+          }
+
           this.stack.back();
-        }, e => {
+        }, (e) => {
           this.throwError.pub(e);
-          this.add(this.NotificationMessage.create({
-            message: e.message,
-            type: 'error'
-          }));
+          
+          // TODO: uncomment this once turn UserFeedbackException into a throwable
+          // if ( foam.comics.v2.userfeedback.UserFeedbackException.isInstance(e) && e.userFeedback  ){
+          //   var currentFeedback = e.userFeedback;
+          //   while ( currentFeedback ){
+          //     this.ctrl.add(this.NotificationMessage.create({
+          //       message: currentFeedback.message,
+          //       type: currentFeedback.status.name.toLowerCase()
+          //     }));
+
+          //     currentFeedback = currentFeedback.next;
+          //   }
+          // } else {
+          //   this.ctrl.add(this.NotificationMessage.create({
+          //     message: e.message,
+          //     type: 'error'
+          //   }));
+          // }
+
+          if ( e.message === "An approval request has been sent out." ){
+            this.ctrl.add(this.NotificationMessage.create({
+              message: e.message,
+              type: 'success'
+            }));
+          } else {
+            this.ctrl.add(this.NotificationMessage.create({
+              message: e.message,
+              type: 'error'
+            }));
+          }
         });
       }
     },
@@ -102,7 +151,7 @@ foam.CLASS({
       this.SUPER();
       this
         .addClass(this.myClass())
-        .add(self.slot(function(config$viewBorder, config$browseTitle) {
+        .add(self.slot(function(config$viewBorder) {
           return self.E()
             .start(self.Rows)
               .start(self.Rows)
@@ -115,17 +164,17 @@ foam.CLASS({
                 .endContext()
                 .start(self.Cols).style({ 'align-items': 'center' })
                   .start()
-                    .add(`Create your ${config$browseTitle}`)
-                      .addClass(this.myClass('account-name'))
+                    .add(self.slot('config$createTitle'))
+                    .addClass(this.myClass('account-name'))
                   .end()
-                  .startContext({data: self}).add(self.SAVE).endContext()
+                  .startContext({ data: self }).add(self.SAVE).endContext()
                 .end()
               .end()
               .start(config$viewBorder)
                 .start().addClass(this.myClass('create-view-container'))
                   .tag(this.viewView, { data$: self.data$ })
                 .end()
-              .end()
+              .end();
         }));
     }
   ]

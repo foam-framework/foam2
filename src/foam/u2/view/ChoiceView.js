@@ -60,7 +60,7 @@ foam.CLASS({
 
         try {
           if ( ! n && this.placeholder ) {
-            this.data  = undefined;
+            this.data  = this.defaultValue;
             this.text  = this.placeholder;
             this.index = -1;
           } else {
@@ -201,28 +201,27 @@ foam.CLASS({
         this.index = 0;
       }
 
-      if ( this.dao ) this.onDAOUpdate();
+      this.onDAOUpdate();
 
-      this.add(this.slot(function(mode){
+      this.add(this.slot(function(mode) {
         if ( mode !== foam.u2.DisplayMode.RO ) {
           return self.E()
             .start(self.selectSpec, {
-              data$: self.index$,
-              label$: self.label$,
+              data$:            self.index$,
+              label$:           self.label$,
               alwaysFloatLabel: self.alwaysFloatLabel,
-              choices$: self.choices$,
-              placeholder$: self.placeholder$,
-              mode$: self.mode$,
-              size$: self.size$
+              choices$:         self.choices$,
+              placeholder$:     self.placeholder$,
+              mode$:            self.mode$,
+              size$:            self.size$
             })
               .attrs({ name: self.name })
               .enableClass('selection-made', self.index$.map((index) => index !== -1))
             .end();
-      
         } else {
-          return self.E().add(self.text$)
+          return self.E().add(self.text$);
         }
-      }))
+      }));
 
       this.dao$proxy.on.sub(this.onDAOUpdate);
     },
@@ -230,7 +229,7 @@ foam.CLASS({
     function findIndexOfChoice(choice) {
       if ( ! choice ) return -1;
       var choices = this.choices;
-      var data = choice[0];
+      var data    = choice[0];
       for ( var i = 0 ; i < choices.length ; i++ ) {
         if ( foam.util.equals(choices[i][0], data) ) return i;
       }
@@ -270,7 +269,8 @@ foam.CLASS({
       code: function() {
         var d = this.data;
         if ( this.choices.length ) {
-          this.choice = ( d != null && this.findChoiceByData(d) ) || this.defaultValue;
+          var choice = this.findChoiceByData(d);
+          this.choice = choice === null ? this.findChoiceByData(this.defaultValue) : choice;
         }
       }
     },
@@ -278,17 +278,27 @@ foam.CLASS({
       name: 'onDAOUpdate',
       isFramed: true,
       code: function() {
+        if ( ! foam.dao.DAO.isInstance(this.dao) ) return;
+
         var p = this.mode === foam.u2.DisplayMode.RW ?
           this.dao.select().then(s => s.array) :
           this.dao.find(this.data).then(o => o ? [o] : []);
 
-        p.then(function(a) {
-          this.choices = a.map(this.objToChoice);
+        p.then(a => {
+          var choices = a.map(this.objToChoice);
+          var choiceLabels = a.map(o => { return this.objToChoice(o)[1]});
+          Promise.all(choiceLabels).then(resolvedChoiceLabels => {
+            for ( let i = 0; i < choices.length; i++ ) {
+              choices[i][1] = resolvedChoiceLabels[i];
+            }
+            this.choices = choices;
+          });
           if ( this.data == null && this.index === -1 ) this.index = this.placeholder ? -1 : 0;
-        }.bind(this));
+        });
       }
     }
   ],
+
   reactions: [
     ['', 'propertyChange.mode', 'onDAOUpdate']
   ]

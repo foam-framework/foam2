@@ -8,6 +8,7 @@ foam.SCRIPT({
   package: 'foam.net',
   name: 'NodeLibScript',
   flags: ['node'],
+
   requires: [
     'foam.net.node.BaseHTTPRequest',
     'foam.net.node.HTTPRequest',
@@ -15,6 +16,7 @@ foam.SCRIPT({
     'foam.net.node.WebSocket',
     'foam.net.node.WebSocketService'
   ],
+
   code: function() {
     var pkg = 'foam.net.node';
     var clss = [

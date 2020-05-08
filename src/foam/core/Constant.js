@@ -52,7 +52,7 @@ foam.CLASS({
       },
     },
     'factory',
-    'documentation',
+    'documentation'
   ],
 
   methods: [

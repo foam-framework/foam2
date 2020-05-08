@@ -72,6 +72,7 @@ foam.CLASS({
     function send500(req, res, error) {
       this.sendMessage(req, res, 500, 'Internal server error');
       this.reportErrorMsg(req, 'Internal server error: ' + error);
+      console.log(error.stack);
     },
     function sendMessage(req, res, status, msg) {
       if ( req.headers.accept &&

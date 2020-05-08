@@ -80,7 +80,6 @@ public class AuthWebAgent
     HttpServletResponse resp         = x.get(HttpServletResponse.class);
     AuthService         auth         = (AuthService) x.get("auth");
     DAO                 sessionDAO   = (DAO) x.get("localSessionDAO");
-    DAO                 userDAO      = (DAO) x.get("localUserDAO");
 
     // query parameters
     String              email        = req.getParameter("user");
@@ -170,24 +169,27 @@ public class AuthWebAgent
               if ( tmp.validRemoteHost(req.getRemoteHost()) ) {
                 session = tmp;
                 session.setRemoteHost(req.getRemoteHost());
-                User user = (User) userDAO.find(
-                                                AND(
-                                                    EQ(User.ID, session.getUserId()),
-                                                    EQ(User.LOGIN_ENABLED, true)
-                                                    )
-                                                );
-                // TODO: replace with AuthService.loginWithSession()
+                X effectiveContext = session.applyTo(x);
+                session.setContext(effectiveContext);
+                User user = (User) effectiveContext.get("user");
+
                 try {
                   if ( user == null ) {
                     throw new AuthenticationException("User not found");
                   }
-                  Group group = user.findGroup(x);
-                  if ( group != null && ! group.getEnabled() ) {
+
+                  Group group = (Group) effectiveContext.get("group");
+
+                  if ( group == null ) {
+                    throw new AuthenticationException("Group not found.");
+                  }
+
+                  if ( ! group.getEnabled() ) {
                     throw new AuthenticationException("Group disabled");
                   }
-                  session.setContext(session.getContext().put("user", user).put("group", group));
-                  session = (Session) sessionDAO.put(session);
-                  return session;
+
+                  // Put to sessionDAO because we want to save the change to remoteHost.
+                  return (Session) sessionDAO.put(session);
                 } catch ( AuthenticationException e ) {
                   logger.debug("Invalid authentication token. User,Group of Session not found.", e.getMessage());
                   resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid authentication token.");
@@ -214,7 +216,7 @@ public class AuthWebAgent
       }
 
       try {
-        User user = auth.loginByEmail(session.getContext()
+        User user = auth.login(session.getContext()
           .put(HttpServletRequest.class,  req)
           .put(HttpServletResponse.class, resp), email, password);
 
@@ -234,7 +236,7 @@ public class AuthWebAgent
         }
 
         // user should not be null, any login failure should throw an Exception
-        logger.error("AuthService.loginByEmail returned null user and did not throw AuthenticationException.");
+        logger.error("AuthService.login returned null user and did not throw AuthenticationException.");
         // TODO: generate stack trace.
         if ( ! SafetyUtil.isEmpty(authHeader) ) {
           resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

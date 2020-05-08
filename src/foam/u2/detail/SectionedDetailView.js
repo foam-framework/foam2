@@ -17,8 +17,8 @@ foam.CLASS({
   ],
 
   css: `
-    .inner-card {
-      padding: 24px 16px
+    ^ .inner-card {
+      padding: 14px 16px
     }
 
     ^ .foam-u2-view-ScrollTableView table {
@@ -49,29 +49,47 @@ foam.CLASS({
         .addClass(this.myClass())
         .add(this.slot(function(sections, data) {
           if ( ! data ) return;
+          var grid = self.Grid.create()
+            .forEach(sections, function(s) {
+              var slot = s.createIsAvailableFor(self.data$).map(function(isAvailable) {
 
-          return self.E()
-            .start(self.Grid)
-              .forEach(sections, function(s) {
-                this
-                  .start(self.GUnit, { columns: s.gridColumns })
-                    .addClass(self.myClass('card-container'))
-                    .show(s.createIsAvailableFor(self.data$))
-                    .start('h2')
-                      .add(s.title$)
-                      .show(s.title$)
-                    .end()
-                    .start(self.border)
-                      .addClass('inner-card')
-                      .tag(self.SectionView, {
-                        data$: self.data$,
-                        section: s,
-                        showTitle: false
-                      })
-                    .end()
+                // NOTE: If we just return undefined here, then Element.slotE_
+                // will put a self.E('SPAN') here. That span will be a child of
+                // the Grid, which means the grid gap will apply to it, which
+                // means that hidden sections will produce undesirable
+                // whitespace that ruins the layout. Therefore we explicitly
+                // return a dummy element here and set display: none so that the
+                // grid doesn't add whitespace around it.
+                if ( ! isAvailable ) return self.E().style({ display: 'none' });
+
+                return self.GUnit.create({ columns: s.gridColumns })
+                  .addClass(self.myClass('card-container'))
+                  .start('h2')
+                    .add(s.title$)
+                    .show(s.title$)
+                  .end()
+                  .start(self.border)
+                    .addClass('inner-card')
+                    .tag(self.SectionView, {
+                      data$: self.data$,
+                      section: s,
+                      showTitle: false
+                    })
                   .end();
-              })
-            .end();
+              });
+              this.add(slot);
+
+              // NOTE: We need to trigger `resizeChildren` manually because when
+              // the slot changes and the view updates, it doesn't trigger the
+              // `onAddChildren` listener on Grid, which is what normally
+              // triggers `resizeChildren`, which is what sets the grid-related
+              // CSS properties. If resizeChildren doesn't fire, then any
+              // sections that updated when the slot changed won't have the grid
+              // CSS applied to them, so the layout will be broken.
+              this.onDetach(slot.sub(this.framed(function() { grid.resizeChildren(); })));
+            });
+
+          return grid;
         }));
     }
   ]

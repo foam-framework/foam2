@@ -22,19 +22,36 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'put_',
+      name: 'put',
+      type: 'FObject',
+      args: [
+        { name: 'x',      type: 'Context' },
+        { name: 'prefix', type: 'String' },
+        { name: 'dao',    type: 'DAO' },
+        { name: 'obj',    type: 'foam.core.FObject' }
+      ],
       javaCode: `
+        // TODO: only pass real 'dao' on one delegate call
         for ( Journal delegate : getDelegates() ) {
-          delegate.put_(x, old, nu);
+          delegate.put(x, prefix, dao, obj);
         }
+        return obj;
       `
     },
     {
       name: 'remove',
+      type: 'FObject',
+      args: [
+        { name: 'x',      type: 'Context' },
+        { name: 'prefix', type: 'String' },
+        { name: 'dao',    type: 'DAO' },
+        { name: 'obj',    type: 'foam.core.FObject' }
+      ],
       javaCode: `
         for ( Journal delegate : getDelegates() ) {
-          delegate.remove(x, obj);
+          delegate.remove(x, prefix, dao, obj);
         }
+        return obj;
       `
     },
     {

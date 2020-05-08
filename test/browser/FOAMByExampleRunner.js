@@ -28,15 +28,17 @@
 
 var oldInitArgs = foam.core.FObject.prototype.initArgs;
 foam.CLASS({
-    refines: 'foam.core.FObject',
+  package: 'foam.text.browser',
+  name: 'FOAMByExampleRunnerFObjectRefinement',
+  refines: 'foam.core.FObject',
 
-    methods: [
-      function initArgs(args, ctx) {
-        // Lock in the current default context, if needed
-        ctx = ctx || foam.__context__;
-        return oldInitArgs.call(this, args, ctx);
-      }
-    ]
+  methods: [
+    function initArgs(args, ctx) {
+      // Lock in the current default context, if needed
+      ctx = ctx || foam.__context__;
+      return oldInitArgs.call(this, args, ctx);
+    }
+  ]
 });
 
 

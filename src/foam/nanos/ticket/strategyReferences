@@ -1,0 +1,6 @@
+p({
+  "class":"foam.strategy.StrategyReference",
+  "id":"532a55c4-2775-69ed-fcc2-050070c8ebfc",
+  "desiredModelId":"foam.nanos.ticket.Ticket",
+  "strategy":"foam.nanos.ticket.Ticket"
+})

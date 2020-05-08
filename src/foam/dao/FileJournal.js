@@ -17,6 +17,7 @@ foam.CLASS({
   javaImports: [
     'foam.core.FObject',
     'foam.lib.json.JSONParser',
+    'foam.nanos.pm.PM',
     'foam.util.SafetyUtil',
     'java.io.BufferedReader'
   ],
@@ -25,39 +26,25 @@ foam.CLASS({
     {
       class: 'foam.dao.DAOProperty',
       name: 'dao'
-    },
+    }
   ],
 
   methods: [
     {
-      name: 'put',
-      javaCode: `
-        this.put_(x, null, nu);
-      `
-    },
-    {
-      name: 'put_',
-      javaCode: `
-        putWithPrefix_(x, old, nu, "");
-      `
-    },
-    {
-      name: 'remove',
-      javaCode: `
-        removeWithPrefix_(x, obj, "");
-      `
-    },
-    {
       name: 'replay',
       documentation: 'Replays the journal file',
       args: [
-        { name: 'x', type: 'Context' },
+        { name: 'x',   type: 'Context' },
         { name: 'dao', type: 'foam.dao.DAO' }
       ],
       javaCode: `
         // count number of entries successfully read
         int successReading = 0;
         JSONParser parser = getParser();
+
+        // NOTE: explicitly calling PM constructor as create only creates
+        // a percentage of PMs, but we want all replay statistics
+        PM pm = new PM(((foam.dao.AbstractDAO)dao).getOf(), "replay."+getFilename());
 
         try ( BufferedReader reader = getReader() ) {
           if ( reader == null ) {
@@ -81,7 +68,7 @@ foam.CLASS({
               switch ( operation ) {
                 case 'p':
                   foam.core.FObject old = dao.find(obj.getProperty("id"));
-                  dao.put(old != null ? mergeFObject(old, obj) : obj);
+                  dao.put(old != null ? mergeFObject(old.fclone(), obj) : obj);
                   break;
 
                 case 'r':
@@ -97,7 +84,8 @@ foam.CLASS({
         } catch ( Throwable t) {
           getLogger().error("Failed to read from journal", t);
         } finally {
-          getLogger().log("Successfully read " + successReading + " entries from file: " + getFilename());
+          pm.log(x);
+          getLogger().log("Successfully read " + successReading + " entries from file: " + getFilename() +" in: "+pm.getTime()+"(ms)");
         }
       `
     }

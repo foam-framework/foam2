@@ -14,6 +14,10 @@ foam.ENUM({
     {
       name: 'GRANTED',
       label: 'granted'
+    },
+    {
+      name: 'EXPIRED',
+      label: 'expired'
     }
   ]
 });

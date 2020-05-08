@@ -39,23 +39,26 @@ public class WebAgentQueryParser {
     throws IllegalArgumentException {
 
     if ( ! SafetyUtil.isEmpty(q) ) {
-      Logger logger = (Logger) x.get("logger");
-      logger.debug(this.getClass().getSimpleName(), "q", q);
-      StringPStream sps = new StringPStream();
-      sps.setString(q);
-      PStream ps = sps;
+      Logger        logger = (Logger) x.get("logger");
+      StringPStream sps    = new StringPStream();
+      PStream       ps = sps;
       ParserContext px = new ParserContextImpl();
+
+      sps.setString(q);
       ps = parser_.parse(ps, px);
+
       if ( ps == null ) {
         String message = getParsingError(x, q);
         logger.error(this.getClass().getSimpleName(), "failed to parse q", message);
-        throw new IllegalArgumentException("failed to parse [" + q + "]: "+message);
+        throw new IllegalArgumentException("failed to parse [" + q + "]: " + message);
       }
+
       parser_.setX(EmptyX.instance());
       Predicate pred = (Predicate) ps.value();
       logger.debug(this.getClass().getSimpleName(), "pred", pred.getClass(), pred.toString());
       return pred;
     }
+
     return MLang.TRUE;
   }
 
@@ -65,15 +68,14 @@ public class WebAgentQueryParser {
    * @return the error message
    */
   protected String getParsingError(X x, String buffer) {
-    Parser        parser = new foam.lib.json.ExprParser();
-    PStream       ps     = new StringPStream();
-    ParserContext psx    = new ParserContextImpl();
+    PStream       ps  = new StringPStream();
+    ParserContext psx = new ParserContextImpl();
 
     ((StringPStream) ps).setString(buffer);
     psx.set("X", x == null ? new ProxyX() : x);
 
     ErrorReportingPStream eps = new ErrorReportingPStream(ps);
-    ps = eps.apply(parser, psx);
+    ps = eps.apply(parser_, psx);
     return eps.getMessage();
   }
 }

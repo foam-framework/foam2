@@ -14,10 +14,8 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.*',
-    'java.util.ArrayList',
     'java.util.List',
-    'java.util.Date',
-    'java.util.stream.Collectors'
+    'java.util.Date'
   ],
 
   properties: [

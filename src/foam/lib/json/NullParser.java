@@ -8,8 +8,8 @@ package foam.lib.json;
 
 import foam.lib.parse.*;
 
-public class NullParser extends Literal {
-  public NullParser() {
-    super("null", null);
-  }
+public class NullParser {
+  private final static Parser instance__ = new Literal("null", null);
+
+  public static Parser instance() { return instance__; }
 }

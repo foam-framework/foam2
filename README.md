@@ -58,7 +58,7 @@ To access, run the following in the parent directory of foam2:
 
 * Run foam2/./tools/nanos.sh
 
-* Visit http://localhost:8080/static/foam2/src/foam/nanos/controller/index.html
+* Visit http://localhost:8080/src/foam/nanos/controller/index.html
 
 ## Style Guide
 

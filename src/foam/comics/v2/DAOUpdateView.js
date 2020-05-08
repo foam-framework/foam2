@@ -18,7 +18,11 @@ foam.CLASS({
     A configurable summary view for a specific instance
   `,
 
-  css:`
+  axioms: [
+    foam.pattern.Faceted.create()
+  ],
+
+  css: `
     ^ {
       padding: 32px
     }
@@ -50,12 +54,20 @@ foam.CLASS({
     'foam.u2.ControllerMode',
     'foam.u2.dialog.NotificationMessage'
   ],
+
   imports: [
+    'ctrl',
     'stack'
   ],
+
   exports: [
     'controllerMode'
   ],
+
+  messages: [
+    { name: 'BACK', message: 'Back' }
+  ],
+
   properties: [
     {
       class: 'FObjectProperty',
@@ -65,7 +77,7 @@ foam.CLASS({
       class: 'FObjectProperty',
       name: 'workingData',
       expression: function(data) {
-        return data.clone(this)
+        return data.clone(this);
       }
     },
     {
@@ -87,21 +99,67 @@ foam.CLASS({
       }
     }
   ],
+
   actions: [
     {
       name: 'save',
+      isEnabled: function(workingData$errors_) {
+        return ! workingData$errors_;
+      },
       code: function() {
-        this.data.copyFrom(this.workingData);
-        this.config.dao.put(this.data).then(o => {
-          this.data = o;
-          this.finished.pub();
+        this.config.dao.put(this.workingData).then((o) => {
+          if ( ! this.data.equals(o) ) {
+            this.data = o;
+            this.finished.pub();
+            if ( foam.comics.v2.userfeedback.UserFeedbackAware.isInstance(o) && o.userFeedback ) {
+              var currentFeedback = o.userFeedback;
+              while ( currentFeedback ) {
+                this.ctrl.add(this.NotificationMessage.create({
+                  message: currentFeedback.message,
+                  type: currentFeedback.status.name.toLowerCase()
+                }));
+
+                currentFeedback = currentFeedback.next;
+              }
+            } else {
+              this.ctrl.add(this.NotificationMessage.create({
+                message: `${this.data.model_.label} updated.`
+              }));
+            }
+          }
           this.stack.back();
-        }, e => {
+        }, (e) => {
           this.throwError.pub(e);
-          this.add(this.NotificationMessage.create({
-            message: e.message,
-            type: 'error'
-          }));
+
+          // TODO: uncomment this once we wire up a proper exception
+          // if ( foam.comics.v2.userfeedback.UserFeedbackException.isInstance(e) && e.userFeedback  ){
+          //   var currentFeedback = e.userFeedback;
+          //   while ( currentFeedback ){
+          //     this.ctrl.add(this.NotificationMessage.create({
+          //       message: currentFeedback.message,
+          //       type: currentFeedback.status.name.toLowerCase()
+          //     }));
+
+          //     currentFeedback = currentFeedback.next;
+          //   }
+          // } else {
+          //   this.ctrl.add(this.NotificationMessage.create({
+          //     message: e.message,
+          //     type: 'error'
+          //   }));
+          // }
+
+          if ( e.message === 'An approval request has been sent out.' ) {
+            this.ctrl.add(this.NotificationMessage.create({
+              message: e.message,
+              type: 'success'
+            }));
+          } else {
+            this.ctrl.add(this.NotificationMessage.create({
+              message: e.message,
+              type: 'error'
+            }));
+          }
         });
       }
     },
@@ -110,8 +168,6 @@ foam.CLASS({
     function initE() {
       var self = this;
       this.SUPER();
-      
-      const originalName = this.data.name
 
       this
         .addClass(this.myClass())
@@ -121,18 +177,19 @@ foam.CLASS({
               .start(self.Rows)
                 // we will handle this in the StackView instead
                 .startContext({ data: self.stack })
-                    .tag(self.stack.BACK, {
-                      buttonStyle: foam.u2.ButtonStyle.TERTIARY,
-                      icon: 'images/back-icon.svg',
-                      label: originalName
-                    })
+                  .tag(self.stack.BACK, {
+                    buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                    icon: 'images/back-icon.svg',
+                    label: this.BACK
+                  })
                 .endContext()
                 .start(self.Cols).style({ 'align-items': 'center' })
                   .start()
                     .add(data.toSummary())
                       .addClass(this.myClass('account-name'))
+                      .addClass('truncate-ellipsis')
                   .end()
-                  .startContext({data: self}).add(self.SAVE).endContext()
+                  .startContext({ data: self }).add(self.SAVE).endContext()
                 .end()
               .end()
 

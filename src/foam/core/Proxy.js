@@ -155,7 +155,6 @@ foam.CLASS({
           name: method.name,
           type: method.type,
           property: name,
-          flags: this.flags,
           args: method.args
         }));
       }
@@ -168,7 +167,6 @@ foam.CLASS({
           type: method.type,
           property: name,
           args: method.args,
-          flags: this.flags,
           delegate: true
         }));
       }

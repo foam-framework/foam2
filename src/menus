@@ -1,47 +1,197 @@
-p({"class":"foam.nanos.menu.Menu","id":"admin","label":"Admin","handler":{"class":"foam.nanos.menu.SubMenu"},"order":100,"parent":""})
-p({"class":"foam.nanos.menu.Menu","id":"admin.countries","label":"Countries","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"countryDAO"},"order":1000,"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.cron","label":"Cron Jobs","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"cronDAO"},"order":1000,"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.emailTemplates","label":"Email Templates","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"emailTemplateDAO"},"order":1000,"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.export","label":"Export Drivers","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"exportDriverRegistryDAO"},"order":1000,"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.lang","label":"Languages","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"languageDAO"},"order":1000,"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.log","label":"View Logs","order":1000,"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"menus","label":"Menus","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"menuDAO","summaryView":{"class":"foam.nanos.menu.TreeAltView"}},"order":1000,"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.nspec","label":"Services","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"nSpecDAO"},"order":1000,"parent":"admin"})
+// admin
+p({"class":"foam.nanos.menu.Menu","id":"admin","label":"Admin","handler":{"class":"foam.nanos.menu.SubMenu"},"parent":""})
+p({"class":"foam.nanos.menu.Menu","id":"admin.all-views","label":"All Views","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"com.google.foam.demos.u2.AllViews"}},"parent":"admin"})
+p({
+  "class":"foam.nanos.menu.Menu",
+  "id":"admin.countries",
+  "label":"Countries",
+  "handler":{
+    "class":"foam.nanos.menu.DAOMenu2",
+    "config":{
+      "class":"foam.comics.v2.DAOControllerConfig",
+      "daoKey":"countryDAO",
+      "browseViews":[{
+        "class":"foam.comics.v2.BrowseView",
+        "name":"Table",
+        "view":{
+          "class":"foam.u2.view.ScrollTableView"
+        }
+      }]
+    }
+  },
+  "parent":"admin"
+})
+p({"class":"foam.nanos.menu.Menu","id":"admin.cron","label":"Cron Jobs","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"cronDAO","browseViews":[{"class":"foam.comics.v2.BrowseView","name":"Table","view":{"class":"foam.u2.view.ScrollTableView"}}]}},"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"admin.data","label":"Data Management","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.boot.DAOConfigSummaryView"}},"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.regions","label":"Regions","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"regionDAO"},"order":1000,"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"logs","label":"Logs","handler":{"class":"foam.nanos.menu.DAOMenu","title":"Server Log","createEnabled":false,"daoKey":"logMessageDAO"},"order":1000,"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"reset","label":"Reset Password","handler":{"class":"foam.nanos.menu.ViewMenu"},"order":1000,"parent":"hidden"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.scripts","label":"Scripts","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"scriptDAO"},"order":1000,"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"sign-in","label":"Sign in","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.auth.SignInView"}},"order":1000,"parent":"hidden"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.tests","label":"Tests","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"testDAO","summaryView":{"class":"foam.nanos.test.TestBorder"}},"order":1000,"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.rules","label":"Rules","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"ruleDAO"},"order":1000,"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.emailmessages","label":"Email Messages","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"emailMessageDAO","browseViews":[{"class":"foam.comics.v2.BrowseView","name":"Table","view":{"class":"foam.u2.view.ScrollTableView"}}]}},"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.emailtemplates","label":"Email Templates","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"emailTemplateDAO","browseViews":[{"class":"foam.comics.v2.BrowseView","name":"Table","view":{"class":"foam.u2.view.ScrollTableView"}}]}},"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.export","label":"Export Drivers","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"exportDriverRegistryDAO","browseViews":[{"class":"foam.comics.v2.BrowseView","name":"Table","view":{"class":"foam.u2.view.ScrollTableView"}}]}},"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.groups","label":"Groups","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"groupDAO","browseViews":[{"class":"foam.comics.v2.BrowseView","name":"Table","view":{"class":"foam.u2.view.ScrollTableView"}}]}},"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.lang","label":"Languages","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"languageDAO","browseViews":[{"class":"foam.comics.v2.BrowseView","name":"Table","view":{"class":"foam.u2.view.ScrollTableView"}}]}},"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.logs","label":"Logs","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"logMessageDAO","browseViews":[{"class":"foam.comics.v2.BrowseView","name":"Table","view":{"class":"foam.u2.view.ScrollTableView"}}]}},"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.menus","label":"Menus","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"menuDAO","summaryView":{"class":"foam.nanos.menu.TreeAltView"}},"parent":"admin"})
+//p({"class":"foam.nanos.menu.Menu","id":"admin.menus","label":"Menus","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"menuDAO","browseViews":[{"class":"foam.comics.v2.BrowseView","name":"Table","view":{"class":"foam.nanos.menu.TreeAltView"}}]}},"parent":"admin"})
+p({
+  "class":"foam.nanos.menu.Menu",
+  "id":"admin.nspec",
+  "label":"Services",
+  "handler":{
+    "class":"foam.nanos.menu.DAOMenu2",
+    "config":{
+      "class":"foam.comics.v2.DAOControllerConfig",
+      "daoKey":"nSpecDAO",
+      "browseTitle":"Services",
+      "browseViews":[{
+        "class":"foam.comics.v2.BrowseView",
+        "name":"Table",
+        "view":{
+          "class":"foam.u2.view.ScrollTableView"
+        }
+      }]
+    }
+  },
+  "parent":"admin"
+})
+p({"class":"foam.nanos.menu.Menu","id":"admin.p","label":"Performance","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"pmInfoDAO","summaryView":{"class":"foam.nanos.pm.PMTableView"}},"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.permissionMatrix","label":"Permission Matrix","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.auth.PermissionTableView"}},"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.permissions","label":"Permissions","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"permissionDAO","browseViews":[{"class":"foam.comics.v2.BrowseView","name":"Table","view":{"class":"foam.u2.view.ScrollTableView"}}]}},"parent":"admin"})
+p({
+  "class":"foam.nanos.menu.Menu",
+  "id":"admin.regions",
+  "label":"Regions",
+    "handler":{
+    "class":"foam.nanos.menu.DAOMenu2",
+    "config":{
+      "class":"foam.comics.v2.DAOControllerConfig",
+      "daoKey":"regionDAO"
+    }
+  },
+  "parent":"admin"
+})
+p({
+  "class":"foam.nanos.menu.Menu",
+  "id":"admin.rules",
+  "label":"Rules",
+  "handler":{
+    "class":"foam.nanos.menu.DAOMenu2",
+    "config":{
+      "class":"foam.comics.v2.DAOControllerConfig",
+      "daoKey":"ruleDAO"
+    }
+  },
+  "parent":"admin"
+})
+p({
+  "class":"foam.nanos.menu.Menu",
+  "id":"admin.sessions",
+  "label":"Sessions",
+  "handler":{
+    "class":"foam.nanos.menu.DAOMenu2",
+    "config":{
+      "class":"foam.comics.v2.DAOControllerConfig",
+      "daoKey":"sessionDAO"
+    }
+  },
+  "parent":"admin"
+})
+p({
+  "class":"foam.nanos.menu.Menu",
+  "id":"admin.scripts",
+  "label":"Scripts",
+  "handler":{
+    "class":"foam.nanos.menu.DAOMenu2",
+    "config":{
+      "class":"foam.comics.v2.DAOControllerConfig",
+      "daoKey":"scriptDAO"
+    }
+  },
+  "parent":"admin"
+})
+p({
+  "class":"foam.nanos.menu.Menu",
+  "id":"admin.serviceproviders",
+  "label":"Service Providers",
+  "handler":{
+    "class":"foam.nanos.menu.DAOMenu2",
+    "config":{
+      "class":"foam.comics.v2.DAOControllerConfig",
+      "daoKey":"serviceProviderDAO"
+    }
+  },
+  "parent":"admin"
+})
+p({"class":"foam.nanos.menu.Menu","id":"admin.support","label":"Support","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.support.view.TicketView"}},"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.support-email","label":"Support Email","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.support.view.SupportEmailView"}},"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.tests","label":"Tests","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"testDAO","summaryView":{"class":"foam.nanos.test.TestBorder"}},"parent":"admin"})
+p({
+  "class":"foam.nanos.menu.Menu",
+  "id":"admin.users",
+  "label":"Users",
+  "handler":{
+    "class":"foam.nanos.menu.DAOMenu2",
+    "config":{
+      "class":"foam.comics.v2.DAOControllerConfig",
+      "daoKey":"userDAO"
+    }
+  },
+  "parent":"admin"
+})
+
+// integration
+p({"class":"foam.nanos.menu.Menu","id":"integration","label":"Integration","handler":{"class":"foam.nanos.menu.SubMenu"},"parent":""})
+p({
+  "class":"foam.nanos.menu.Menu",
+  "id":"integration.api-dig",
+  "label":"DIG - Data Integration Gateway",
+  "handler":{
+    "class":"foam.nanos.menu.DAOMenu2",
+    "config":{
+      "class":"foam.comics.v2.DAOControllerConfig",
+      "daoKey":"digDAO"
+    }
+  },
+  "parent":"integration"
+})
+p({
+  "class": "foam.nanos.menu.Menu",
+  "id": "integration.api-dug",
+  "label": "DUG - Data Update Gateway",
+  "handler": {
+    "class": "foam.nanos.menu.DAOMenu2",
+    "config": {
+      "class": "foam.comics.v2.DAOControllerConfig",
+      "daoKey": "ruleDAO",
+      "predicate": {
+        "class": "foam.mlang.predicate.IsInstanceOf",
+        "targetClass": "foam.nanos.dig.DUGRule"
+      },
+      "of": "foam.nanos.dig.DUGRule"
+    }
+  },
+  "parent": "integration"
+})
+p({
+  "class":"foam.nanos.menu.Menu",
+  "id":"integration.api-sugar",
+  "label":"SUGAR",
+  "handler":{
+    "class":"foam.nanos.menu.DAOMenu2",
+    "config":{
+      "class":"foam.comics.v2.DAOControllerConfig",
+      "daoKey":"sugarDAO"
+    }
+  },
+  "parent":"integration"
+})
+p({"class":"foam.nanos.menu.Menu","id":"integration.model-doc","label":"UML API Models","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.doc.ModelBrowser"}},"parent":"integration"})
+
+// settings
 p({"class":"foam.nanos.menu.Menu","id":"set-password","label":"Change Password","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.auth.ChangePasswordView"}},"order":100,"parent":"settings"})
 p({"class":"foam.nanos.menu.Menu","id":"set-security","label":"Log Out","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.auth.SignOutView"}},"order":110,"parent":"settings"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.support","label":"Support","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.support.view.TicketView"}},"order":1000,"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.support-email","label":"Support Email","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.support.view.SupportEmailView"}},"order":1000,"parent":"admin"})
-// p({"class":"foam.nanos.menu.Menu","id":"demos","label":"Demos","order":1000,"parent":"","handler":{"class":"foam.nanos.menu.SubMenu"}})
-// p({"class":"foam.nanos.menu.Menu","id":"demo","label":"Demo1","order":1000,"parent":"demos","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.demo.Demo"}}})
-// p({"class":"foam.nanos.menu.Menu","id":"relationshipDemo","label":"Relationship Demo","order":1000,"parent":"demos","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.demo.relationship.Controller"}}})
 
-//p({"class":"foam.nanos.menu.Menu","id":"admin.auth","label":"Authentication","handler":{"class":"foam.nanos.menu.SubMenu"},"order":1000,"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.groups","label":"Groups","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"groupDAO"},"order":1000,"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.sessions","label":"Sessions","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"sessionDAO"},"order":1000,"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.users","label":"Users","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"userDAO"},"order":1000,"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"permissionMatrix","label":"Permission Matrix","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.auth.PermissionTableView"}},"order":1000,"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.permissions","label":"Permissions","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"permissionDAO"},"order":1000,"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.spids","label":"Service Providers","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"serviceProviderDAO"},"order":1000,"parent":"admin"})
-
-p({"class":"foam.nanos.menu.Menu","id":"integration","label":"Integration","handler":{"class":"foam.nanos.menu.SubMenu"},"order":110,"parent":""})
-p({"class":"foam.nanos.menu.Menu","id":"dig","label":"DIG","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"digDAO"},"order":2000,"parent":"integration"})
-p({"class":"foam.nanos.menu.Menu","id":"dug","label":"DUG","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"dugDAO"},"order":2000,"parent":"integration"})
-//p({"class":"foam.nanos.menu.Menu","id":"docs","label":"Documentation Browser","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.doc.DocBrowser"}},"order":2000,"parent":"integration"})
-p({"class":"foam.nanos.menu.Menu","id":"model-doc","label":"UML API Documentation","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.doc.ModelBrowser"}},"order":1000,"parent":"integration"})
-p({"class":"foam.nanos.menu.Menu","id":"notifications","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.notification.NotificationListView"}},"order":1000,"parent":"hidden"})
-p({"class":"foam.nanos.menu.Menu","id":"intro-to-flow","label":"Intro to FLOW","handler":{"class":"foam.nanos.menu.DocumentFileMenu","docKey":"intro-to-flow"},"parent":"hidden"})
+// hidden
 p({"class":"foam.nanos.menu.Menu","id":"dashboard-demo","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.dashboard.Demo"}},"parent":"hidden"})
-p({"class":"foam.nanos.menu.Menu","id":"sugar","label":"SUGAR","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"sugarDAO"},"order":2000,"parent":"integration"})
-
-p({"class":"foam.nanos.menu.Menu","id":"admin.countries","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"countryDAO","browseViews":[{"class":"foam.comics.v2.BrowseView","name":"Table","view":{"class":"foam.u2.view.ScrollTableView"}}]}}})
-p({"class":"foam.nanos.menu.Menu","id":"admin.p.1minute","label":"Performance - 1 Minute","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"pm1MinuteDAO","createEnabled":false,"editEnabled":false},"order":1000,"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.p.hourly","label":"Performance - Hourly","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"pmHourlyDAO","createEnabled":false,"editEnabled":false},"order":1000,"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.p.daily","label":"Performance - Daily","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"pmDailyDAO","createEnabled":false,"editEnabled":false},"order":1000,"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"intro-to-flow","label":"Intro to FLOW","handler":{"class":"foam.nanos.menu.DocumentFileMenu","docKey":"intro-to-flow"},"parent":"hidden"})
+p({"class":"foam.nanos.menu.Menu","id":"notifications","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.notification.NotificationListView"}},"parent":"hidden"})
+p({"class":"foam.nanos.menu.Menu","id":"reset","label":"Reset Password","handler":{"class":"foam.nanos.menu.ViewMenu"},"parent":"hidden"})
+p({"class":"foam.nanos.menu.Menu","id":"sign-in","label":"Sign in","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.u2.view.LoginView","mode_":"SignIn"}},"parent":"hidden"})

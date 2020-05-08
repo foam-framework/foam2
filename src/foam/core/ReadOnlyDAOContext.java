@@ -13,7 +13,8 @@ import foam.dao.ReadOnlyDAO;
  * A Context where all returned DAOs are ReadOnly
  **/
 public class ReadOnlyDAOContext
-  extends ProxyX {
+  extends ProxyX
+{
 
   public ReadOnlyDAOContext(X x) {
     super(x);
@@ -21,10 +22,8 @@ public class ReadOnlyDAOContext
 
   @Override
   public Object get(X x, Object name) {
-    Object ret =  getX().get(x, name);
-    if ( ret instanceof DAO ) {
-      return new ReadOnlyDAO.Builder(x_).setDelegate((DAO)ret).build();
-    }
-    return ret;
+    Object ret = getX().get(x, name);
+    return ret instanceof DAO ?
+      new ReadOnlyDAO.Builder(x_).setDelegate((DAO) ret).build() : ret;
   }
 }

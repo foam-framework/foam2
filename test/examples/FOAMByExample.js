@@ -2017,8 +2017,87 @@ var examples = [
     }
   },
   {
+    name: 'SimpleSlot',
+    description: 'SimpleSlot creates a mutable slot.',
+    code: function() {
+      var s = foam.core.SimpleSlot.create({ value: 42 });
+      console.log("Intial value:", s.get());
+      s.value = 66;
+      s.set(66);
+      console.log("After set to 66:", s.get());
+    }
+  },
+  {
+    name: 'PromiseSlot',
+    description: 'PromiseSlot provides a declarative way of creating a slot that should contain the value of a promise when it resolves.',
+    code: function() {
+      var promise = new Promise(function(resolve, reject) {
+        window.setTimeout(function() {
+          resolve(66);
+        }, 3000);
+      }).then((value) => {
+        console.log('Promise resolved!', new Date());
+        console.log('Slot value:', value);
+      });
+      console.log('Promise created.', new Date());
+      var s = foam.core.PromiseSlot.create({
+        value: 42,
+        promise: promise
+      });
+      console.log("Intial value of the slot:", s.get());
+      window.setTimeout(() => {
+        console.log('Value 1 second later, at ' + new Date() + ':', s.get());
+      }, 1000);
+      return promise;
+    }
+  },
+  {
+    name: 'ArraySlot',
+    description: 'ArraySlot provides a way to group several slots together so that when any of them update we can invalidate.',
+    code: function() {
+      var promise = new Promise(function(resolve, reject) {
+        window.setTimeout(() => resolve('bar'), 3000);
+      });
+      var s1 = foam.core.SimpleSlot.create({ value: 42 });
+      var s2 = foam.core.PromiseSlot.create({ value: 'foo', promise: promise });
+      var arraySlot = foam.core.ArraySlot.create({ slots: [s1, s2] });
+      console.log('Initial value:', arraySlot.get());
+      arraySlot.sub((detachable, eventName, propName, slot) => {
+        console.log('Value updated to:', arraySlot.get());
+      });
+      s1.set(66);
+      return promise;
+    }
+  },
+  {
+    name: 'ProxySlot',
+    description: "ProxySlot provides a way to flatten/join a slot of a slot " +
+      "into what appears to be a slot of the inner slot's value. It lets you " +
+      "abstract away the inner slot." +
+
+      "Using ProxySlot in this way is similar to how Promises that return " +
+      "Promises are automatically flattened/joined for you. However, in the " +
+      "case of slots, you need to explicitly use ProxySlot if you want this " +
+      "joining behaviour, otherwise you'll simply have a slot whose value is " +
+      "a slot. In this regard, slots are more flexible than Promises because " +
+      "it is up to the programmer to decide whether they want " +
+      "flattening/joining behaviour or not.",
+    code: function() {
+      var s1 = foam.core.SimpleSlot.create({ value: 'fname' });
+      foam.CLASS({ name: 'Person', properties: ['fname', 'lname'] });
+      var p = Person.create({ fname: 'John', lname: 'Smith' });
+      var slotOfSlot = s1.map((propName) => {
+        return p.slot(propName).map((propValue) => propName + ' = ' + propValue);
+      });
+      var proxySlot = foam.core.ProxySlot.create({ delegate$: slotOfSlot });
+      console.log('Value:', proxySlot.get());
+      s1.set('lname');
+      console.log('Value:', proxySlot.get());
+    }
+  },
+  {
     name: 'Expression Slots',
-    description: 'ExpressionSlot creates a Slot from a list of Slots and a function to comine them',
+    description: 'ExpressionSlot creates a Slot from a list of Slots and a function to combine them',
     dependencies: [  ],
     code: function() {
       foam.CLASS({ name: 'Person', properties: ['fname', 'lname'] });

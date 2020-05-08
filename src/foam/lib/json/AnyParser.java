@@ -12,30 +12,28 @@ public class AnyParser
   extends ProxyParser
 {
 
-  private static AnyParser instance_ = null;
-  public static AnyParser instance() {
-    if ( instance_ == null ) {
-      instance_ = new AnyParser();
-      Alt delegate = new Alt(
-          new NullParser(),
-          new StringParser(),
-          new BooleanParser(),
-          // parse long but fail if decimal is found
-          new Seq1(0,
-            new LongParser(),
-            new Not(new Literal("."))),
-          new DoubleParser(),
-          new ObjectDateParser(),
-          new StringArrayParser(),
-          new StringDoubleArrayParser(),
-          new PropertyReferenceParser(),
-          new ClassReferenceParser(),
-          new ArrayParser(),
-          new FObjectParser(),
-          new MapParser());
-      instance_.setDelegate(delegate);
-    }
-    return instance_;
+  private static Parser instance__ = new AnyParser();
+
+  public static Parser instance() { return instance__ == null ? new ProxyParser() { public Parser getDelegate() { return instance__; } } : instance__; }
+
+  private AnyParser() {
+    setDelegate(new Alt(
+      NullParser.instance(),
+      StringParser.instance(),
+      BooleanParser.instance(),
+      // parse long but fail if decimal is found
+      new Seq1(0,
+        LongParser.instance(),
+        new Not(Literal.create("."))
+      ),
+      DoubleParser.instance(),
+      new ObjectDateParser(),
+      StringArrayParser.instance(),
+      new StringDoubleArrayParser(),
+      new PropertyReferenceParser(),
+      ClassReferenceParser.instance(),
+      ArrayParser.instance(),
+      FObjectParser.instance(),
+      MapParser.instance()));
   }
-  private AnyParser() {}
 }

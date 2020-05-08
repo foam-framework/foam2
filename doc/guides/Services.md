@@ -27,15 +27,15 @@ var skeletons = [
   - If serve is set to true, the skeleton will be generated
 
  Eg:
- 
+
  `p({"class":"foam.nanos.boot.NSpec", "name":"auth",                        "lazy":true,  "serve":true,  "authenticate": false, "boxClass":"foam.nanos.auth.AuthServiceSkeleton", "serviceClass":"foam.nanos.auth.UserAndGroupAuthService","client":"{\"class\":\"foam.nanos.auth.ClientAuthService\"}"})`
 
 ### CLIENT SIDE
-4. Create stub for Service on the client side 
+4. Create stub for Service on the client side
 Eg: https://github.com/foam-framework/foam2/blob/master/src/foam/nanos/auth/ClientAuthService.js
 
 5. Add Service to foam.nano.client.Client.js
-Eg: 
+Eg:
 ```
 {
   name: 'auth',
@@ -51,7 +51,7 @@ Eg:
 ```
 
 6. In controller, import the service
-Eg: 
+Eg:
 ```
 imports: [
   'stack', 'userDAO', 'user', 'auth'
@@ -60,7 +60,7 @@ imports: [
 
 Now, you can call the service in the controller:
 ```
-self.auth.loginByEmail("marc4@marc.com", "marc123").then(function(response) {
+self.auth.login("marc4@marc.com", "marc123").then(function(response) {
   console.log(response);
 }
 ```

@@ -31,12 +31,11 @@ public class Auth {
     if ( user == null ) throw new RuntimeException("Unknown user");
 
     Session session = new Session();
-    x = x.put(Session.class, session);
-    x = x.put("user", user);
-    x = x.put("group", ((DAO) x.get("localGroupDAO")).inX(x).find(user.getGroup()));
     session.setUserId(user.getId());
-    session.setContext(x);
+    X y = session.applyTo(x);
+    y = y.put(Session.class, session);
+    session.setContext(y);
 
-    return x;
+    return y;
   }
 }

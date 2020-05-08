@@ -33,22 +33,26 @@ foam.CLASS({
     {
       class: 'URL',
       name: 'activeImageURL',
-      value: 'images/Icon_More_Active.svg'
+      // value: 'images/Icon_More_Active.svg'
+      value: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAh0lEQVRIS2NkoDFgpLH5DCPIAp2Iyw6MDP/mg4L0PwNT4pUVugeICV6ig0gn8uIDRgZGebCh//8/uLxCX5GqFuhGXPzAwMjID/HB/4dXlusrUNUCUBAxMP5bAPEBUwLVg4gY12JTQ3Qc0NyC0VREMIhHUxFRQTRaFuENptFURDAVkauA5qUpAH6TVBkCb7ScAAAAAElFTkSuQmCC'
     },
     {
       class: 'URL',
       name: 'restingImageURL',
-      value: 'images/Icon_More_Resting.svg'
+      // value: 'images/Icon_More_Resting.svg'
+      value: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAhUlEQVRIS2NkoDFgpLH5DCPIgv7+fof/jIzzQUHK+P9/YmFh4QFigpfoIOrt73/AyMgoDzX0QVFBgSK1LfjAyMjIDzL0////D4sLCxWoagEoiP4xMCwAGcrEwJBA9SAixrXY1BAdBzS3YDQVEQzi0VREVBCNlkV4g2k0FRFMReQqoHlpCgDoa1EZV5fY0wAAAABJRU5ErkJggg=='
     },
     {
       class: 'URL',
       name: 'hoverImageURL',
-      value: 'images/Icon_More_Hover.svg'
+      // value: 'images/Icon_More_Hover.svg'
+      value: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAzklEQVRIS2O8f/++wL9///oZGBgCGBgYBBioBxYwMTEVMt65c2cDIyOjP/XMRZj0////hYx37979TwvDoWZ+oLUFDERb8ObNG4bzFy+CHWaor88gIiJClMeJtmDXnj0M379/BxvKxcXF4OrsTF0Ltm7fzvDnzx+woZycnAxuLi7UtQAUROcuXAAbamRgQP0gIsq5WBQRHQc0t2A0FREM4tFURFQQjZZFeINpxKaij7Sv9EHNlr9//y5gZGR0YGBg4CeYXolUAGpRMDMzFwAAKa+ydPFw0XUAAAAASUVORK5CYII=',
     },
     {
       class: 'URL',
       name: 'disabledImageURL',
-      value: 'images/Icon_More_Disabled.svg'
+      // value: 'images/Icon_More_Disabled.svg'
+      value: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAhUlEQVRIS2NkoDFgpLH5DCPIgv7+fof/jIzzQUHK+P9/YmFh4QFigpfoIOrt73/AyMgoDzX0QVFBgSK1LfjAyMjIDzL0////D4sLCxWoagEoiP4xMCwAGcrEwJBA9SAixrXY1BAdBzS3YDQVEQzi0VREVBCNlkV4g2k0FRFMReQqoHlpCgDoa1EZV5fY0wAAAABJRU5ErkJggg=='
     },
     {
       class: 'URL',

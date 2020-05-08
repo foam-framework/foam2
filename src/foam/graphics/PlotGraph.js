@@ -127,5 +127,4 @@ foam.CLASS({
       }, info );
     }
   ]
-
 });

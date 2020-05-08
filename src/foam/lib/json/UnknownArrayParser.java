@@ -14,14 +14,14 @@ public class UnknownArrayParser
   public UnknownArrayParser() {
     super(new Parser() {
       Parser delegate = new Seq1(3,
-      new Whitespace(),
-      new Literal("["),
-      new Whitespace(),
+      Whitespace.instance(),
+      Literal.create("["),
+      Whitespace.instance(),
       new Repeat(
         new UnknownParser(),
-        new Seq0(new Whitespace(), new Literal(","), new Whitespace())),
-      new Whitespace(),
-      new Literal("]"));
+        new Seq0(Whitespace.instance(), Literal.create(","), Whitespace.instance())),
+      Whitespace.instance(),
+      Literal.create("]"));
 
       public PStream parse(PStream ps, ParserContext x) {
         ps = ps.apply(delegate, x);

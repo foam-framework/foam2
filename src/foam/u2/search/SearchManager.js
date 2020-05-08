@@ -59,6 +59,7 @@ foam.CLASS({
     function and(views) {
       return this.And.create({
         args: Object.keys(views).map(function(k) { return views[k].predicate; })
+          .filter(function(predicate) { return predicate !== undefined })
       }).partialEval();
     },
 
@@ -75,7 +76,7 @@ foam.CLASS({
 
       this.views[view.name] = view;
       this.subs_[view.name] = view.predicate$.sub(this.onViewUpdate);
-      this.updateViews();
+      this.onViewUpdate();
       return view;
     },
 
@@ -116,7 +117,7 @@ foam.CLASS({
     {
       name: 'onViewUpdate',
       isMerged: true,
-      mergeDelay: 10,
+      mergeDelay: 250,
       code: function() {
         this.predicate = this.and(this.views);
         // That will tickle the expression for filteredDAO.
@@ -126,8 +127,10 @@ foam.CLASS({
     {
       name: 'updateViews',
       isMerged: true,
-      mergeDelay: 20,
+      mergeDelay: 250,
       code: function() {
+        // TODO: Why do we need this and not just one function combined with
+        //       onViewUpdate? Revisit
         // Deliberately a longer delay than onViewUpdate, since updating the
         // views is less important.
         foam.Object.forEach(this.views, function(view, name) {

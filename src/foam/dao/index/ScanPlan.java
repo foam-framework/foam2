@@ -51,7 +51,7 @@ public class ScanPlan
       if ( order_.toString().equals(propertyInfo.toString()) ) {
         // If the index is same with the property we would like to order, the order could be set to null. Because the order is already correct in the tree set.
         order_ = null;
-      } else if ( order_ instanceof Desc && ((Desc) order_).getArg1().toString().equals(propertyInfo.toString()) ) {
+      } else if ( order_ instanceof Desc && ((Desc) order_).getArg1().toString().equals(propertyInfo.toString()) && predicate_ == null ) {
         reverse_ = true;
         order_   = null;
       } else {
@@ -71,6 +71,7 @@ public class ScanPlan
     return null;
   }
 
+  @Override
   public void select(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     if ( state_ == null ) return;
     // Use the stale_, skip_, limit_, order_, predicate_... which we have already pre-processed.

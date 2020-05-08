@@ -109,9 +109,11 @@ describe('Date', function() {
     p.date = dateStr;
     expect(p.date).toEqual(new Date(dateStr));
   });
-  it('throws on invalid date strings', function() {
+  // Assigning invalid date is no longer throw.
+  // Please see foam.core.Date for detail.
+  it('not throws on invalid date strings', function() {
     var dateStr = "d ";
-    expect(function() { p.date = dateStr; }).toThrow();
+    expect(function() { p.date = dateStr; }).not.toThrow();
   });
   it('compares', function() {
     p.date = 55555;

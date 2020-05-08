@@ -58,12 +58,12 @@ public class FileWebAgent
     HttpServletRequest  req  = x.get(HttpServletRequest.class);
     HttpServletResponse resp = x.get(HttpServletResponse.class);
     String              path = null;
-    BufferedInputStream is   = null;
 
     try {
       path = req.getRequestURI().replaceFirst("/?service/" + nspec_.getName() + "/?", "") + path_;
       File src = new File(SafetyUtil.isEmpty(path) ? "./" : path);
 
+      // Checking that it starts with the CanonicalPath prevents path escaping
       boolean pathStartsWithCwd = src.getAbsolutePath().startsWith(cwd_);
       if ( ! pathStartsWithCwd ) {
         throw new FileNotFoundException("File not found: " + path);
@@ -93,16 +93,16 @@ public class FileWebAgent
       // handle reading of files
       if ( src.isFile() && src.canRead() ) {
         String ext = EXTS.get(FilenameUtils.getExtension(src.getName()));
-        is = new BufferedInputStream(new FileInputStream(src));
-
         resp.setContentType(! SafetyUtil.isEmpty(ext) ? ext : DEFAULT_EXT);
         resp.setHeader("Content-Disposition", "filename=\"" + StringEscapeUtils.escapeHtml4(src.getName()) + "\"");
         resp.setContentLengthLong(src.length());
 
         int read = 0;
         byte[] buffer = new byte[BUFFER_SIZE];
-        while ( (read = is.read(buffer, 0, BUFFER_SIZE)) != -1 ) {
-          resp.getOutputStream().write(buffer, 0, read);
+        try (BufferedInputStream is = new BufferedInputStream(new FileInputStream(src))) {
+        	while ( (read = is.read(buffer, 0, BUFFER_SIZE)) != -1 ) {
+            resp.getOutputStream().write(buffer, 0, read);
+          }
         }
         return;
       }
@@ -115,8 +115,6 @@ public class FileWebAgent
       resp.setContentType(EXTS.get("json"));
       PrintWriter pw = x.get(PrintWriter.class);
       pw.write("{\"error\": \"File not found\"," + "\"filename\": \"" + StringEscapeUtils.escapeJson(path) + "\"}");
-    } finally {
-      IOUtils.closeQuietly(is);
     }
   }
 

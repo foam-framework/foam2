@@ -39,7 +39,7 @@ foam.CLASS({
 
   css: `
     ^ {
-      width: 1024px;
+      max-width: 1024px;
       margin: auto;
     }
     ^action-container {
@@ -85,7 +85,7 @@ foam.CLASS({
       }
     },
     {
-      class: 'String',
+      class: 'foam.u2.ViewSpec',
       name: 'detailView'
     },
     {
@@ -154,12 +154,11 @@ foam.CLASS({
         // Container for the detailview
         .start('div', [], this.container_$)
           .addClass(this.myClass('detail-container'))
-          .tag({
-            class: this.detailView,
+          .tag(this.detailView, {
             of: this.dao.of,
             data$: this.data$.dot('obj'),
             showActions: true
-          }, [], this.detailViewElement_$)
+          }, this.detailViewElement_$)
         .end();
     }
   ],
@@ -178,12 +177,11 @@ foam.CLASS({
       },
       code: function() {
         this.controllerMode = this.ControllerMode.EDIT;
-        var newE = this.container_.createChild_({
-          class: this.detailView,
+        var newE = this.container_.createChild_(this.detailView, {
           of: this.dao.of,
           data$: this.data$.dot('obj'),
           showActions: true
-        }, []);
+        });
         this.container_.replaceChild(newE, this.detailViewElement_);
         this.detailViewElement_ = newE;
       }

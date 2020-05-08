@@ -30,10 +30,10 @@ public class EnumParserFactory {
 
   public static Parser buildInstance_(Class c) {
     return new Repeat0(new Seq0(
-                                new Whitespace(),
+                                Whitespace.instance(),
                                 new Alt(
                                         new Parser() {
-                                          Parser delegate = new KeyValueParser("ordinal", new IntParser());
+                                          Parser delegate = new KeyValueParser("ordinal", IntParser.instance());
 
                                           public PStream parse(PStream ps, ParserContext x) {
                                             ps = ps.apply(delegate, x);
@@ -59,6 +59,6 @@ public class EnumParserFactory {
                                           }
                                         },
                                         new KeyValueParser0())), // ignore unknown properties.
-                       new Literal(","));
+                       Literal.create(","));
   }
 }

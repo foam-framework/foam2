@@ -33,31 +33,25 @@ foam.CLASS({
 
   javaImports: [
     'foam.dao.DAO',
+    'foam.nanos.auth.LifecycleState',
     'foam.nanos.logger.Logger',
     'foam.nanos.session.Session',
     'foam.util.Email',
     'foam.util.Password',
     'foam.util.SafetyUtil',
+    'foam.nanos.auth.User',
 
+    'java.security.Permission',
     'java.util.Calendar',
-    'java.util.regex.Pattern',
     'javax.security.auth.AuthPermission',
 
     'static foam.mlang.MLang.AND',
-    'static foam.mlang.MLang.EQ'
+    'static foam.mlang.MLang.OR',
+    'static foam.mlang.MLang.EQ',
+    'static foam.mlang.MLang.CLASS_OF'
   ],
 
   constants: [
-    {
-      name: 'PASSWORD_VALIDATE_REGEX',
-      type: 'String',
-      value: '^.{6,}$'
-    },
-    {
-      name: 'PASSWORD_VALIDATION_ERROR_MESSAGE',
-      type: 'String',
-      value: 'Password must be at least 6 characters long.'
-    },
     {
       name: 'CHECK_USER_PERMISSION',
       type: 'String',
@@ -82,29 +76,13 @@ foam.CLASS({
 
         // get user from session id
         User user = (User) ((DAO) getLocalUserDAO()).find(session.getUserId());
-        if ( user == null ) {
-          throw new AuthenticationException("User not found: " + session.getUserId());
-        }
 
-        // check if user enabled
-        if ( ! user.getEnabled() ) {
-          throw new AuthenticationException("User disabled");
-        }
-
-        // check if user login enabled
-        if ( ! user.getLoginEnabled() ) {
-          throw new AuthenticationException("Login disabled");
-        }
+        user.validateAuth(x);
 
         // check if group enabled
         Group group = getCurrentGroup(x);
         if ( group != null && ! group.getEnabled() ) {
           throw new AuthenticationException("Group disabled");
-        }
-
-        // check for two-factor authentication
-        if ( user.getTwoFactorEnabled() && ! session.getContext().getBoolean("twoFactorSuccess") ) {
-          throw new AuthenticationException("User requires two-factor authentication");
         }
 
         return user;
@@ -113,7 +91,7 @@ foam.CLASS({
     {
       name: 'loginHelper',
       documentation: `Helper function to reduce duplicated code.`,
-      type: 'foam.nanos.auth.User',
+      type: 'User',
       args: [
         {
           name: 'x',
@@ -121,7 +99,7 @@ foam.CLASS({
         },
         {
           name: 'user',
-          type: 'foam.nanos.auth.User'
+          type: 'User'
         },
         {
           name: 'password',
@@ -133,6 +111,9 @@ foam.CLASS({
         if ( user == null ) {
           throw new AuthenticationException("User not found");
         }
+
+        // check that the user is active
+        assertUserIsActive(user);
 
         // check if user enabled
         if ( ! user.getEnabled() ) {
@@ -160,7 +141,7 @@ foam.CLASS({
 
         Session session = x.get(Session.class);
         session.setUserId(user.getId());
-        ((DAO) getLocalSessionDAO()).put(session);
+        ((DAO) getLocalSessionDAO()).inX(x).put(session);
         session.setContext(session.applyTo(session.getContext()));
 
         return user;
@@ -168,25 +149,20 @@ foam.CLASS({
     },
     {
       name: 'login',
-      documentation: `Login a user by the id provided, validate the password and
+      documentation: `Login a user by their identifier (email or username) provided, validate the password and
         return the user in the context`,
       javaCode: `
-        if ( userId < 1 || SafetyUtil.isEmpty(password) ) {
-          throw new AuthenticationException("Invalid Parameters");
-        }
-
-        return loginHelper(x, (User) ((DAO) getLocalUserDAO()).find(userId), password);
-      `
-    },
-    {
-      name: 'loginByEmail',
-      javaCode: `
-        User user = (User) ((DAO) getLocalUserDAO()).find(
-          AND(
-            EQ(User.EMAIL, email.toLowerCase()),
-            EQ(User.LOGIN_ENABLED, true)
-          )
-        );
+        User user = (User) ((DAO) getLocalUserDAO())
+          .inX(x)
+          .find(
+            AND(
+              OR(
+                EQ(User.EMAIL, identifier.toLowerCase()),
+                EQ(User.USER_NAME, identifier)
+              ),
+              CLASS_OF(User.class)
+            )
+          );
 
         if ( user == null ) {
           throw new AuthenticationException("User not found");
@@ -195,7 +171,7 @@ foam.CLASS({
       `
     },
     {
-      name: 'checkUserPermission',
+      name: 'checkUser',
       documentation: `Checks if the user passed into the method has the passed
         in permission attributed to it by checking their group. No check on User
         and group enabled flags.`,
@@ -215,7 +191,7 @@ foam.CLASS({
             if ( group == null ) break;
 
             // check permission
-            if ( group.implies(x, permission) ) return true;
+            if ( group.implies(x, new AuthPermission(permission)) ) return true;
 
             // check parent group
             groupId = group.getParent();
@@ -233,7 +209,7 @@ foam.CLASS({
       javaCode: `
         if ( x == null || permission == null ) return false;
 
-        java.security.Permission p = new AuthPermission(permission);
+        Permission p = new AuthPermission(permission);
 
         try {
           Group group = getCurrentGroup(x);
@@ -258,15 +234,50 @@ foam.CLASS({
     {
       name: 'validatePassword',
       javaCode: `
-        if ( SafetyUtil.isEmpty(potentialPassword) || ! (Pattern.compile(PASSWORD_VALIDATE_REGEX)).matcher(potentialPassword).matches() ) {
-          throw new RuntimeException(PASSWORD_VALIDATION_ERROR_MESSAGE);
+        // Password policy to validate against
+        PasswordPolicy passwordPolicy = null;
+
+        // Retrieve the logger
+        Logger logger = (Logger) x.get("logger");
+
+        // Retrieve the password policy from the user and group when available
+        if ( user != null ) {
+          Group ancestor = (Group) x.get("group");
+          if ( ancestor != null ) {
+            // Check password policy
+            passwordPolicy = ancestor.getPasswordPolicy();
+            while ( passwordPolicy == null || ! passwordPolicy.getEnabled() ) {
+              ancestor = ancestor.getAncestor(x, ancestor);
+              if ( ancestor == null ) break;
+              passwordPolicy = ancestor.getPasswordPolicy();
+            }
+          }
         }
+
+        // Use the default password policy if nothing is found
+        if ( passwordPolicy == null || ! passwordPolicy.getEnabled() ) {
+          passwordPolicy = new PasswordPolicy();
+          passwordPolicy.setEnabled(true);
+        }
+
+        // Validate the password against the password policy
+        passwordPolicy.validate(user, potentialPassword);
       `
     },
     {
-      name: 'checkUser',
+      name: 'assertUserIsActive',
+      documentation: `Given a user, we check whether the user is ACTIVE.`,
+      args: [
+        {
+          name: 'user',
+          type: 'foam.nanos.auth.User'
+        }
+      ],
       javaCode: `
-        return checkUserPermission(x, user, new AuthPermission(permission));
+      // check that the user is active
+      if ( user instanceof LifecycleAware && ((LifecycleAware)user).getLifecycleState() != LifecycleState.ACTIVE ) {
+        throw new AuthenticationException("User is not active");
+      }
       `
     },
     {
@@ -288,6 +299,9 @@ foam.CLASS({
           throw new AuthenticationException("User not found");
         }
 
+        // check that the user is active
+        assertUserIsActive(user);
+
         // check if user enabled
         if ( ! user.getEnabled() ) {
           throw new AuthenticationException("User disabled");
@@ -305,7 +319,7 @@ foam.CLASS({
         }
 
         // check if password is valid per validatePassword method
-        validatePassword(newPassword);
+        validatePassword(x, user, newPassword);
 
         // old password does not match
         if ( ! Password.verify(oldPassword, user.getPassword()) ) {
@@ -359,7 +373,7 @@ foam.CLASS({
           throw new AuthenticationException("Password is required for creating a user");
         }
 
-        validatePassword(user.getPassword());
+        validatePassword(x, user, user.getPassword());
       `
     },
     {
@@ -399,7 +413,7 @@ foam.CLASS({
             );
 
             if ( junction == null ) {
-              throw new RuntimeException("There was a user and an agent in the context, but a junction between then was not found.");
+              throw new RuntimeException("There was a user and an agent in the context, but a junction between them was not found.");
             }
 
             return (Group) ((DAO) getLocalGroupDAO()).inX(x).find(junction.getGroup());

@@ -35,7 +35,7 @@ public class SinkParser
   }
 
   public Parser starParser() {
-    return new Literal("*");
+    return Literal.create("*");
   }
 
   public Parser expressionListParser() {

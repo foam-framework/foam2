@@ -115,8 +115,8 @@ foam.CLASS({
 
   methods: [
     function fromModel(model) {
-      this.name = model.name;
-      this.package = model.package;
+      this.name     = model.name;
+      this.package  = model.package;
       this.abstract = model.abstract;
 
       if ( model.name != 'AbstractFObject' ) {
@@ -235,7 +235,7 @@ foam.CLASS({
           break;
         }
       }
-      if( isORBitalDAOed ){
+      if ( isORBitalDAOed ) {
         //TODO: add necessary constructs to generated java class that needs to be an ORBitalDAO'able
 
       }
@@ -246,7 +246,7 @@ foam.CLASS({
 
       this.fields.sort(function(o1, o2) {
         return foam.Number.compare(o1.order, o2.order);
-      }).forEach(function(f) { o.out(f, '\n'); });
+      }).forEach(function(f) { if ( ! self.isEnum || ! f.static )  o.out(f, '\n'); });
 
       this.methods.forEach(function(f) { o.out(f, '\n'); });
       this.classes.forEach(function(c) { o.out(c, '\n'); });

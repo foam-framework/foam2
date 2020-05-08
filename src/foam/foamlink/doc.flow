@@ -1,0 +1,126 @@
+<title>FOAMLink Documentation</title>
+<h1>FOAMLink Documentation</h1>
+
+FOAMLink walks the file tree to generate a map, associating model IDs with their respective files and vice-versa.
+
+FOAMLink also processes "foamlink.js" files at any directory level of your FOAM project. This manifest file allows you to ignore certain files and directories, and even inject temporary code before processing for meta information.
+
+<h2>Current State</h2>
+Currently FOAMLink is only used by the `genjava.js` script. Later it could act as a drop-in replacement for the current convention of manually registering source files in "files.js" - i.e. the ClassLoader in the web browser would use the FOAMLink data file to locate classes. 
+
+<h2>Using FOAMLink</h2>
+
+To invoke FOAMLink, issue the following command:
+<code>
+node foam2/tools/foamlink.js example_output_file.json
+</code>
+
+The file specified - example_output_file.json in the example above - is the output file FOAMLink will produce. This is called the <b>FOAMLink data file</b>. It contains associations between model IDs and file paths.
+
+FOAMLink expects a foamlink.js file to be in the working directory. It will follow the commands given by this file before it starts walking the file tree.
+
+<h3>FOAMLink "foamlink.js" Manifest Files</h3>
+
+The foamlink.js manifest tells FOAMLink where to look for source files, what subdirectories or files need to be ignored, and more.
+
+<h4>ROOTS command</h4>
+The ROOTS command specifies "root variables" that may be referred to by models in a directory. These are usually top-level package identifiers.
+
+<code>
+ROOTS("com", "net");
+</code>
+
+The example above ensures model sources can refer to com.a.b.c or net.d.e.f without producing errors. This is important because these source files don't have access to other classes when invoked by FOAMLink.
+
+The "foom" variable should not be included in ROOTS as this is handled specially by FOAMLink.
+
+<h4>REPO command</h4>
+
+The REPO command tells FOAMLink that source files exist in a particular directory. The root foamlink.js file (the one in the working directory when FOAMLink is run) must contain at least one REPO command for FOAMLink to generate a useful output.
+
+The following example tells FOAMLink to walk files under myproject/src relative to the working directory.
+<code>
+REPO("myproject/src");
+</code>
+
+<h4>IGNORE command</h4>
+
+The IGNORE command is useful when there are Javascript files that do not define FOAM models and should not be invoked by FOAMLink. Remember that FOAMLink executes the javascript files and assumes they contain model declarations like foam.CLASS().
+
+If the following example were located in myproject/src/foamlink.js, then files in myproject/src/com/example/cli_tools would be ignored.
+<code>
+IGNORE("com/example/cli_tools");
+</code>
+
+From this example, it follows that filepaths in a foamlink.js file are relative to the location of that file.
+
+<h4>BROKEN command</h4>
+
+BROKEN is a semantic alias for IGNORE. It is meant to be used to indicate a file is ignored because it is currently broken rather than because it doesn't contain model definitions.
+
+<h4>MANUAL command</h4>
+
+The MANUAL command is useful when certain files cannot be processed by FOAMLink. This could happen for files that define FOAM models, but also depend on other variables provided by their intended environment. MANUAL takes two arguments: a file path, and a list of model IDs.
+
+<code>
+MANUAL('com/example/test/tests.js', [
+  'test.Booking',
+  'test.Person',
+  'test.Train'
+]);
+</code>
+
+<h4>INJECT command</h4>
+
+The INJECT command is meant to be used sparingly. It allows specifying code that should be inserted at the top of a file before FOAMLink runs it (perhaps to populate variables that model definitions depend on). Note that this only affects the file while it is processed by FOAMLink, and does not affect the file contents as loaded by FOAM.
+
+The following example provides an empty list for a source file that expects "testData" to be in scope.
+
+<code>
+INJECT('path/to/example.js', `
+  var testData = [];
+`);
+</code>
+
+<h4>VERSION command</h4>
+
+This currently does not do anything, but is reserved for future use.
+
+<h3>Enhance genJava with FOAMLink</h3>
+The FOAMLink data file can be used to improve the performance of genJava, allowing it to only generate Java code for source files that were changed.
+
+To improve genJava performance:
+<ol>
+  <li>Set the FOAMLINK_DATA environment variable to the
+  path of the FOAMLink data file.
+    <code>export FOAMLINK_DATA="example_output_file.json"</code></li>
+  <li>Pass a list of files modified when invoking the genjava script. This is a JSON object with a key `modified` set to a list of file paths relative to the project directory. For example:
+    <code>node foam2/tools/genjava.js myproject/classes.js build/java myprpject/src '{"modified": ["myproject/src/com/example/Model.js"]}'</code></li>
+</ol>
+
+When the `FOAMLINK_DATA` environment variable is set, genjava will use the FOAMLink data file to determine what classes belong to modified files, and regenerate only those classes in Java.
+
+
+<h2>Foamlink Story</h2>
+
+<h3>Enter genJava</h3>
+
+<ul>
+  <li>The genJava script was unaware of which files have been modified</li>
+  <li>The classes.js files processed by genJava don't contain filenames</li>
+  <li>genJava will work for entries in classes.js that aren't in files.js, therefore requiring a files.js entry would break backwards compatibility</li>
+</ul>
+
+<h3>Enter foam.apploader.ClassLoader</h3>
+
+When a model is loaded using the ClassLoader, the result is not consistent with files.js. The reason for this is ClassLoader finds files based on the classname, and therefore doesn't support having multiple models in a file.
+
+<h3>Enter "walking all the files and generating a map of model IDs to filenames"</h3>
+
+Okay so this was complicated. Without invoking the classloader (that would be a bit of a catch 22) or depending on files.js, there were two options for processing the javascript files for meta information:
+<ul>
+  <li>Using a javascript AST parser</li>
+  <li>Run javascript files in an environment where `foam.CLASS` (and family) just reads the name of a model to store it in a map</li>
+</ul>
+
+The second option was chosen for simplicity, although it was more complicated than expected (classpaths like `foam.u2.CSS` being referenced outside of any functions, and similar issues). This was solved with a javascript native Proxy object that recurses to trick source files into thinking these variables and functions exist. It worked great! The only caveat is each "root variable" (ex: `foam`, `net`, `com`) needs to be specified. This is easy to maintain however, as there will only ever be a small number of these.

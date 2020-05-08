@@ -1,18 +1,7 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2016 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
@@ -38,33 +27,37 @@ foam.CLASS({
   css: `
     ^ {
       white-space: nowrap;
-      margin: 6px 20px;
       inset: none;
       cursor: pointer;
     }
 
-    ^label:hover {
-      border-radius: 2px;
-      background-color: rgba(0, 48, 249, 0.1);
-      color: #0098db;
+    ^:hover > ^heading {
+      background-color: #e7eaec;
+      color: #406dea;
     }
 
     ^label {
       min-width: 120px;
       padding: 4px;
       font-weight: 500;
+      display: inline-block;
+      font-size: 14px;
       color: /*%BLACK%*/ #1e1f21;
     }
 
-    ^selected > ^label {
-      border-radius: 2px;
-      background-color: rgba(0, 48, 249, 0.1);
-      color: #0098db;
+    ^heading {
+      border-left: 4px solid rgba(0,0,0,0);
     }
 
-    ^expanded {
-      transform: rotate(180deg);
+    ^select-level {
+      padding: 8px;
     }
+
+    ^selected > ^heading {
+      background-color: #e5f1fc !important;
+      color: #406dea;
+      border-left: 4px solid /*%PRIMARY3%*/ #406dea;
+      }
   `,
 
   properties: [
@@ -86,42 +79,102 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'draggable',
-      documentation: 'Enable to allow drag&drop editing.',
-      value: true
+      documentation: 'Enable to allow drag&drop editing.'
     },
     {
       class: 'Boolean',
       name: 'hasChildren'
+    },
+    {
+      class: 'Boolean',
+      name: 'doesThisIncludeSearch',
+      value: false
+    },
+    'query',
+    {
+      class: 'Boolean',
+      name: 'showThisRootOnSearch'
+    },
+    {
+      class: 'Array',
+      name: 'subMenus',
+      value: []
+    },
+    'showRootOnSearch',
+    {
+      class: 'Boolean',
+      name: 'updateThisRoot',
+      value: false
+    },
+    {
+      class: 'Function',
+      name: 'onClickAddOn'
+    },
+    {
+      class: 'Int',
+      name: 'level'
     }
   ],
 
   methods: [
     function initE() {
       var self = this;
+      var controlledSearchSlot = foam.core.SimpleSlot.create();
+
+      if ( this.query ) {
+        this.query.sub(function() {
+          self.updateThisRoot = true;
+          self.showThisRootOnSearch = false;
+          controlledSearchSlot.set(self.query.get());
+          self.updateThisRoot = false;
+        });
+      }
+
+      if ( self.showRootOnSearch )
+        self.showRootOnSearch.set(self.showRootOnSearch.get() || self.doesThisIncludeSearch);
+
+      this.data[self.relationship.forwardName].select().then(function(val){
+        self.hasChildren = val.array.length > 0;
+        self.subMenus    = val.array;
+      });
+
       this.
         addClass(this.myClass()).
+        show(this.slot(function(hasChildren, showThisRootOnSearch, updateThisRoot) {
+          if ( ! self.query ) return true;
+          var isThisItemRelatedToSearch = false;
+          if ( ! updateThisRoot ) {
+            self.doesThisIncludeSearch = self.query.get() ? self.data.label.toLowerCase().includes(self.query.get().toLowerCase()) : true;
+
+            if ( self.query.get() && !self.doesThisIncludeSearch && self.data.keywords ) {
+              for ( var i = 0; i < self.data.keywords.length; i++ ) {
+                if ( self.data.keywords[i].toLowerCase().includes(self.query.get().toLowerCase()) ) {
+                  self.doesThisIncludeSearch = true;
+                  break;
+                }
+              }
+            }
+
+            isThisItemRelatedToSearch = self.query.get() ? ( self.doesThisIncludeSearch && ( ! hasChildren || self.data.parent !== '' ) ) || ( hasChildren && showThisRootOnSearch ) : true;
+            if ( self.showRootOnSearch )
+              self.showRootOnSearch.set(self.showRootOnSearch.get() || isThisItemRelatedToSearch);
+          }
+          else {
+            isThisItemRelatedToSearch = true;
+          }
+          if( ! self.query.get() )
+            self.expanded = false;
+          else if ( self.query.get() && isThisItemRelatedToSearch )
+            self.expanded = true;
+          return isThisItemRelatedToSearch;
+        })).
         addClass(this.slot(function(selected, id) {
           if ( selected && foam.util.equals(selected.id, id) ) {
             return this.myClass('selected');
           }
           return '';
         }, this.selection$, this.data$.dot('id'))).
-        start('span').
-          style({
-            visibility: this.hasChildren$.map(function(c) { return c ? 'visible' : 'hidden'; }),
-            'margin-right': '5px',
-            'vertical-align': 'middle',
-            'font-weight': 'bold',
-            'display': 'inline-block',
-            'visibility': 'visible',
-            'font-size': '16px',
-            'transform': this.expanded$.map(function(c) { return c ? 'rotate(180deg)' : 'rotate(90deg)' })
-          }).
-          on('click', this.toggleExpanded).
-          add('\u2303').
-          entity('nbsp').
-        end().
-        on('click', this.selected).
+        on('click', this.onClickFunctions).
         on('dblclick', function() { self.dblclick && self.dblclick(self.data); }).
         callIf(this.draggable, function() {
           this.
@@ -131,21 +184,55 @@ foam.CLASS({
           on('dragover',  this.onDragOver).
           on('drop',      this.onDrop);
         }).
-        start('span').addClass(self.myClass('label')).call(this.formatter, [self.data]).end().
-        add(this.slot(function(e) {
-          var e2 = this.E('div');
-          if ( ! e ) return e2;
-          e2.select(this.data[self.relationship.forwardName]/*.dao*/, function(obj) {
-            self.hasChildren = true;
-            return self.cls_.create({
-              data: obj,
-              formatter: self.formatter,
-              relationship: self.relationship,
-              expanded: self.startExpanded
-            }, this);
-          });
-          return e2;
-        }, this.expanded$));
+        start().
+          addClass(self.myClass('heading')).
+          start('span').
+            style({
+              'padding-left': (( self.level * 16 ) + 'px')
+            }).
+            start().
+              addClass(self.myClass('select-level')).
+              style({
+                'font-weight': self.hasChildren$.map(function(c) { return c ? 'bold' : 'normal'; }),
+                'width': '100%'
+              }).
+              addClass(self.myClass('label')).
+              call(this.formatter, [self.data]).
+              start('span').
+              show(this.hasChildren$).
+              style({
+                'margin-right':   '38px',
+                'vertical-align': 'middle',
+                'font-weight':    'bold',
+                'display':        'inline-block',
+                'visibility':     'visible',
+                'font-size':      '16px',
+                'float':          'right',
+                'transform':      this.expanded$.map(function(c) { return c ? 'rotate(180deg)' : 'rotate(90deg)'; })
+              }).
+              on('click', this.toggleExpanded).
+              add('\u2303').
+            end().
+            end().
+          end().
+        end().
+        start().
+          show(this.expanded$).
+          add(this.slot(function(subMenus) {
+            return this.E().forEach(subMenus/*.dao*/, function(obj) {
+              this.add(self.cls_.create({
+                data:             obj,
+                formatter:        self.formatter,
+                relationship:     self.relationship,
+                expanded:         self.startExpanded,
+                showRootOnSearch: self.showThisRootOnSearch$,
+                query:            controlledSearchSlot,
+                onClickAddOn:     self.onClickAddOn,
+                level:            self.level + 1
+              }, self));
+            });
+          })).
+        end();
     }
   ],
 
@@ -201,6 +288,12 @@ foam.CLASS({
       e.stopPropagation();
     },
 
+    function onClickFunctions(e) {
+      if ( this.onClickAddOn )
+        this.onClickAddOn(this.data);
+      this.toggleExpanded(e);
+    },
+
     function toggleExpanded(e) {
       this.expanded = ! this.expanded;
       this.selection = this.data;
@@ -227,6 +320,12 @@ foam.CLASS({
     'startExpanded'
   ],
 
+  css: `
+    ^ {
+      padding-top: 10px;
+    }
+  `,
+
   properties: [
     {
       class: 'foam.dao.DAOProperty',
@@ -246,11 +345,18 @@ foam.CLASS({
       class: 'Boolean',
       name: 'startExpanded',
       value: false
+    },
+    'query',
+    {
+      class: 'Function',
+      name: 'onClickAddOn'
     }
   ],
 
   methods: [
     function initE() {
+      this.startExpanded = this.startExpanded;
+
       var M   = this.ExpressionsSingleton.create();
       var of  = this.__context__.lookup(this.relationship.sourceModel);
       var dao = this.data$proxy.where(
@@ -258,6 +364,7 @@ foam.CLASS({
 
       var self = this;
       var isFirstSet = false;
+
       this.addClass(this.myClass()).
         select(dao, function(obj) {
           if ( ! isFirstSet && ! self.selection ) {
@@ -268,7 +375,10 @@ foam.CLASS({
             data: obj,
             relationship: self.relationship,
             expanded: self.startExpanded,
-            formatter: self.formatter
+            formatter: self.formatter,
+            query: self.query,
+            onClickAddOn: self.onClickAddOn,
+            level: 1
           }, this);
         });
     },

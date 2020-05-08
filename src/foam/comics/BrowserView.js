@@ -39,7 +39,7 @@ foam.CLASS({
     {
       name: 'title',
       expression: function(data$of) {
-        return 'Browse ' + data$of.model_.plural;
+        return data$of.model_.plural;
       }
     },
     {
@@ -66,22 +66,26 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'createEnabled',
+      value: true,
       documentation: 'True to enable the create button.'
     },
     {
       class: 'Boolean',
       name: 'editEnabled',
-      documentation: 'True to enable the edit button.'
+      documentation: 'True to enable the edit button.',
+      value: true
     },
     {
       class: 'Boolean',
       name: 'selectEnabled',
+      value: true,
       documentation: 'True to enable the select button.'
     },
     {
       class: 'Boolean',
       name: 'exportEnabled',
-      documentation: 'True to enable the export button.'
+      documentation: 'True to enable the export button.',
+      value: true
     },
     {
       class: 'Boolean',
@@ -116,13 +120,14 @@ foam.CLASS({
         if ( searchMode )  config.searchMode  = searchMode;
         if ( subtitle )    config.subtitle    = subtitle;
         if ( title )       config.title       = title;
-        config.createEnabled = createEnabled;
-        config.detailView    = detailView;
-        config.editEnabled   = editEnabled;
-        config.exportEnabled = exportEnabled;
+        if ( detailView )  config.detailView  = detailView;
+
+        config.createEnabled    = createEnabled;
+        config.editEnabled      = editEnabled;
+        config.exportEnabled    = exportEnabled;
         config.exportCSVEnabled = exportCSVEnabled;
-        config.selectEnabled = selectEnabled;
-        config.toggleEnabled = toggleEnabled;
+        config.selectEnabled    = selectEnabled;
+        config.toggleEnabled    = toggleEnabled;
 
         if ( customDAOController ) {
           var controller = this.__context__.lookup(customDAOController).create(config, this);
@@ -148,9 +153,8 @@ foam.CLASS({
     // This is the DAOCreateControllerView, not the DetailView
     'createControllerView',
     {
-      class: 'String',
-      name: 'detailView',
-      value: 'foam.u2.DetailView'
+      class: 'foam.u2.ViewSpec',
+      name: 'detailView'
     }
   ],
 

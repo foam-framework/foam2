@@ -20,7 +20,9 @@ import foam.lib.parse.Seq;
 //YYYY-MM-DD
 //YYYY-MM
 //YYYY
-public class LiteralDateParser extends ProxyParser {
+public class LiteralDateParser
+  extends ProxyParser
+{
 
   public LiteralDateParser() {
     super(
@@ -28,60 +30,60 @@ public class LiteralDateParser extends ProxyParser {
 
             //YYYY-MM-DDTHH:MM
             new Seq(
-              new IntParser(),
+              IntParser.instance(),
               new Alt(
-                new Literal("-"),
-                new Literal("/")),
-              new IntParser(),
+                Literal.create("-"),
+                Literal.create("/")),
+              IntParser.instance(),
               new Alt(
-                new Literal("-"),
-                new Literal("/")),
-              new IntParser(),
-              new Literal("T"),
-              new IntParser(),
-              new Literal(":"),
-              new IntParser()),
+                Literal.create("-"),
+                Literal.create("/")),
+              IntParser.instance(),
+              Literal.create("T"),
+              IntParser.instance(),
+              Literal.create(":"),
+              IntParser.instance()),
 
             //YYYY-MM-DDTHH
             new Seq(
-              new IntParser(),
+              IntParser.instance(),
               new Alt(
-                new Literal("-"),
-                new Literal("/")),
-              new IntParser(),
+                Literal.create("-"),
+                Literal.create("/")),
+              IntParser.instance(),
               new Alt(
-                new Literal("-"),
-                new Literal("/")),
-              new IntParser(),
-              new Literal("T"),
-              new IntParser()),
+                Literal.create("-"),
+                Literal.create("/")),
+              IntParser.instance(),
+              Literal.create("T"),
+              IntParser.instance()),
 
         //YYYY-MM-DD
           new Seq(
-            //new Literal("\""),
-            new IntParser(),
+            //Literal.create("\""),
+            IntParser.instance(),
             new Alt(
-                new Literal("-"),
-                new Literal("/")),
-            new IntParser(),
+                Literal.create("-"),
+                Literal.create("/")),
+            IntParser.instance(),
             new Alt(
-                new Literal("-"),
-                new Literal("/")),
-            new IntParser(),
-            new Whitespace()),
+                Literal.create("-"),
+                Literal.create("/")),
+            IntParser.instance(),
+            Whitespace.instance()),
 
         //YYYY-MM
           new Seq(
-              new IntParser(),
+              IntParser.instance(),
               new Alt(
-                  new Literal("-"),
-                  new Literal("/")),
-              new IntParser(),
-              new Whitespace()),
+                  Literal.create("-"),
+                  Literal.create("/")),
+              IntParser.instance(),
+              Whitespace.instance()),
 
         //YYYY
           new Seq(
-              new IntParser())
+              IntParser.instance())
           ));
 
   }
@@ -93,14 +95,15 @@ public class LiteralDateParser extends ProxyParser {
     java.util.Calendar c = new java.util.GregorianCalendar();
     c.clear();
 
-    Object[] result=(Object[]) ps.value();
+    Object[] result = (Object[]) ps.value();
 
-    c.set(result.length > 1 ? (Integer) result[0] : 0,
-        result.length > 3 ? (Integer) result[2] - 1 : 0,
-        result.length > 5 ? (Integer) result[4] : 0,
-        result.length > 7 ? (Integer) result[6] : 0,
-        result.length > 9 ? (Integer) result[8] : 0,
-        result.length > 11 ? (Integer) result[10] : 0);
+    c.set(
+      result.length >  1 ? (Integer) result[0]     : 0,
+      result.length >  3 ? (Integer) result[2] - 1 : 0,
+      result.length >  5 ? (Integer) result[4]     : 0,
+      result.length >  7 ? (Integer) result[6]     : 0,
+      result.length >  9 ? (Integer) result[8]     : 0,
+      result.length > 11 ? (Integer) result[10]    : 0);
 
     return ps.setValue(c.getTime());
   }

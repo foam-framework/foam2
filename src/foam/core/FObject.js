@@ -747,19 +747,19 @@ foam.CLASS({
       this.pub('propertyChange', prop.name, slot);
     },
 
-    function slot(obj) {
+    function slot(obj /*, argList if obj is a function */) {
       /**
        * Creates a Slot for an Axiom.
        */
       if ( typeof obj === 'function' ) {
         return foam.core.ExpressionSlot.create(
-            arguments.length === 1 ?
-                { code: obj, obj: this } :
-                {
-                  code: obj,
-                  obj: this,
-                  args: Array.prototype.slice.call(arguments, 1)
-                });
+          arguments.length === 1 ?
+            { code: obj, obj: this } :
+            {
+              code: obj,
+              obj: this,
+              args: Array.prototype.slice.call(arguments, 1)
+            });
       }
 
       if ( foam.Array.isInstance(obj) ) {
@@ -844,7 +844,10 @@ foam.CLASS({
 
       // FUTURE: check 'id' first
       // FUTURE: order properties
-      var ps = this.cls_.getAxiomsByClass(foam.core.Property);
+      var ps = this.cls_.getAxiomsByClass(foam.core.Property).filter((p) => {
+        return ! foam.dao.DAOProperty.isInstance(p)
+          && ! foam.dao.ManyToManyRelationshipProperty.isInstance(p);
+      });
       for ( var i = 0 ; i < ps.length ; i++ ) {
         var r = ps[i].compare(this, other);
         if ( r ) return r;

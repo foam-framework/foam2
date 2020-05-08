@@ -22,26 +22,13 @@ foam.CLASS({
 
   documentation: 'View user name and user nav settings',
 
-  implements: [
-    'foam.mlang.Expressions'
-  ],
-
   imports: [
-    'currentMenu',
-    'group',
-    'lastMenuLaunched',
-    'menuDAO',
-    'notificationDAO',
-    'stack',
-    'user',
-    'window'
+    'user'
   ],
 
   requires: [
-    'foam.nanos.auth.Group',
     'foam.nanos.menu.Menu',
     'foam.nanos.menu.SubMenuView',
-    'foam.nanos.notification.Notification'
   ],
 
   css: `
@@ -52,12 +39,6 @@ foam.CLASS({
     ^ .icon-container {
       margin-top: 4;
       position: relative;
-    }
-    ^ .icon-container.selected {
-      padding-bottom: 0; /* Override */
-    }
-    ^ .icon-container:hover {
-      border-bottom: 1px solid white;
     }
     ^ h1 {
       font-size: 16px;
@@ -82,34 +63,6 @@ foam.CLASS({
     }
     ^ > .profile-container > * {
       margin: 0 5px 5px;
-    }
-    ^ img {
-      height: 25px;
-      width: 25px;
-      padding-bottom: 5px;
-      cursor: pointer;
-      border-bottom: 1px solid transparent;
-      -webkit-transition: all .15s ease-in-out;
-      -moz-transition: all .15s ease-in-out;
-      -ms-transition: all .15s ease-in-out;
-      -o-transition: all .15s ease-in-out;
-      transition: all .15s ease-in-out;
-    }
-    ^ .dot {
-      border-radius: 50%;
-      display: table-caption;
-      background: red;
-      width: 15px;
-      height: 15px;
-      position: absolute;
-      top: -2px;
-      left: 13px;
-      text-align: center;
-      font-size: 8px;
-    }
-    ^ .dot > span {
-        padding-top: 3px;
-        display: inline-block;
     }
     ^ .foam-nanos-menu-SubMenuView-inner {
       position: absolute;
@@ -153,57 +106,13 @@ foam.CLASS({
     }
   `,
 
-  properties: [
-    {
-      class: 'Int',
-      name: 'countUnread'
-    },
-    {
-      class: 'Boolean',
-      name: 'showCountUnread',
-      expression: (countUnread) => countUnread > 0
-    },
-    {
-      name: 'userCur',
-      factory: (user) => this.user
-    }
-  ],
-
   methods: [
     function initE() {
-      this.notificationDAO.on.sub(this.onDAOUpdate);
-      this.user$.dot('id').sub(this.onDAOUpdate);
-      this.group$.dot('id').sub(this.onDAOUpdate);
-      this.onDAOUpdate();
-
       this
-        .addClass(this.myClass())
-        this.otherViews();  //currency menu
+        .addClass(this.myClass());
+        this.otherViews();
 
-        // The notifications container
-        this.start('div')
-          .addClass('icon-container')
-
-          // Show blue underline if user is on notifications page.
-          .enableClass('selected', this.currentMenu$.map((menu) => {
-            return this.Menu.isInstance(menu) && menu.id === 'notifications';
-          }))
-
-          // Clicking on the bell icon will change to the notifications page.
-          .on('click', this.changeToNotificationsPage.bind(this))
-
-          .start('img')
-            .attrs({src: 'images/bell.png'})
-          .end()
-
-          // The unread notification count bubble. Only shown if there is at
-          // least one unread notification.
-          .start('span')
-            .addClass('dot')
-            .add(this.countUnread$)
-            .show(this.showCountUnread$)
-          .end()
-        .end()
+        this.tag({ class: 'foam.nanos.u2.navigation.NotificationMenuItem' })
 
         // The username and settings dropdown
         .start().addClass('profile-container')
@@ -213,53 +122,12 @@ foam.CLASS({
             }));
           })
           .start('h1')
-            .add( this.user.firstName$ ).addClass(this.myClass('user-name'))
+            .add( this.user$.dot('firstName') ).addClass(this.myClass('user-name'))
           .end()
-          .start('div')
+          .start()
             .addClass(this.myClass('carrot'))
           .end()
         .end();
-    },
-
-    function changeToNotificationsPage() {
-      this.menuDAO.find('notifications').then((queryResult) => {
-        if ( queryResult == null ) {
-          throw new Error('No menu in menuDAO with id "notifications".');
-        }
-        queryResult.launch();
-      });
-    },
-    function otherViews() {
-
-    }
-  ],
-
-  listeners: [
-    {
-      name: 'onDAOUpdate',
-      isFramed: true,
-      code: function() {
-        if ( ! this.group || ! this.user ) return;
-        var group = this.group.id;
-        var id    = this.user.id;
-        if ( id != 0 ) {
-          this.notificationDAO.where(
-            this.AND(
-              this.EQ(this.Notification.READ, false),
-              this.OR(
-                this.EQ(this.Notification.USER_ID, id),
-                this.EQ(this.Notification.GROUP_ID, group),
-                this.EQ(this.Notification.BROADCASTED, true)
-              ),
-              this.NOT(this.IN(
-                this.Notification.NOTIFICATION_TYPE,
-                this.user.disabledTopics))
-            )
-          ).select(this.COUNT()).then((count) => {
-            this.countUnread = count.value;
-          });
-        }
-      }
     }
   ]
 });

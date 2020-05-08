@@ -14,8 +14,7 @@ foam.CLASS({
   javaImports: [
     'java.io.PrintWriter',
     'java.io.StringWriter',
-    'java.io.Writer',
-    'java.text.SimpleDateFormat'
+    'java.io.Writer'
   ],
 
   axioms: [
@@ -23,14 +22,7 @@ foam.CLASS({
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
-          data:
-`protected static final ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
-  @Override
-  protected SimpleDateFormat initialValue() {
-    return new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss.SSS");
-  }
-};
-
+          data: `
 protected ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
   @Override
   protected StringBuilder initialValue() {
@@ -96,5 +88,3 @@ return String.valueOf(obj);`
     }
   ]
 });
-
-

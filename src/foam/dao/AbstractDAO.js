@@ -99,6 +99,7 @@ return getOf() == null ? null : (foam.core.PropertyInfo) getOf().getAxiomByName(
       */
       name: 'where',
       code: function where(p) {
+        foam.assert(foam.mlang.predicate.Predicate.isInstance(p), `DAO.where() was called with an argument that isn't a predicate!`);
         return this.FilteredDAO.create({
           delegate: this,
           predicate: p
@@ -517,11 +518,7 @@ return this.find_(this.getX(), id);
     {
       name: 'cmd_',
       code: function cmd_(x, obj) {
-        /** Force the DAO to publish a 'reset' notification. **/
-        if ( this.RESET_CMD == obj ) {
-          this.on.reset.pub();
-          return true;
-        }
+        console.warn('Unrecognized command');
         return undefined;
       },
       javaCode: `

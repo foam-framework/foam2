@@ -1,12 +1,7 @@
 /**
  * @license
- * Copyright 2015 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the License);
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Copyright 2015 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
@@ -23,11 +18,12 @@ foam.CLASS({
     ^ {
       border: 1px solid gray;
       display: inline-block;
+      margin-top: 10px;
     }
   `,
 
   properties: [
-    [ 'width', 14 ],
+    [ 'width',  14 ],
     [ 'height', 14 ],
     {
       name: 'cells',

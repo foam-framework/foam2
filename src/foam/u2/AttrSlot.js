@@ -47,14 +47,26 @@ foam.CLASS({
     },
 
     function sub(l) {
-      // TODO: remove listener on unsubscribe. But how?
+      var self = this;
+      const valueUpdateListener = function() {
+        self.value = self.get();
+      };
+
       if ( ! this.hasListeners() ) {
-        var self = this;
-        this.element.on(this.event, function() {
-          self.value = self.get();
-        });
+        this.element.on(this.event, valueUpdateListener);
       }
-      return this.SUPER('propertyChange', 'value', l);
+
+      var detachable = this.SUPER('propertyChange', 'value', l);
+
+      return {
+        detach: function() {
+          if ( self.hasListeners() ) {
+            self.element.removeEventListener(self.event, valueUpdateListener);
+          }
+
+          detachable.detach();
+        }
+      };
     },
 
     function toString() {

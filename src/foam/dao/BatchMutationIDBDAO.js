@@ -140,7 +140,7 @@ foam.CLASS({
       var deletes = [];
       for ( var i = 0; i < mutations.length; i++ ) {
         if ( mutations[i].type === this.IDBMutationType.REMOVE )
-        deletes.push(mutations[i]);
+          deletes.push(mutations[i]);
       }
       if ( deletes.length === 0 )
         return this.onGatheredDeletes(mutations, []).

@@ -15,16 +15,16 @@ public class IdParser
 {
   public IdParser() {
     super(new Seq1(7,
-        new Whitespace(),
-        new Literal("{"),
-        new Whitespace(),
+        Whitespace.instance(),
+        Literal.create("{"),
+        Whitespace.instance(),
         new KeyParser("id"),
-        new Whitespace(),
-        new Literal(":"),
-        new Whitespace(),
+        Whitespace.instance(),
+        Literal.create(":"),
+        Whitespace.instance(),
         AnyParser.instance(),
-        new Whitespace(),
-        new Literal("}")
+        Whitespace.instance(),
+        Literal.create("}")
     ));
   }
 }

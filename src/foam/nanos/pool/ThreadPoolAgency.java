@@ -6,23 +6,21 @@
 
 package foam.nanos.pool;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ExecutorService;
-
 import foam.core.Agency;
 import foam.core.ContextAgent;
 import foam.core.X;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
+import java.util.concurrent.*;
 
 public class ThreadPoolAgency
-  extends AbstractFixedThreadPool
+  extends    AbstractFixedThreadPool
   implements Agency
 {
-  protected ExecutorService pool_          = null;
-  protected Object          queuedLock_    = new Object();
-  protected Object          executingLock_ = new Object();
-  protected Object          executedLock_  = new Object();
+  protected ThreadPoolExecutor pool_          = null;
+  protected Object             queuedLock_    = new Object();
+  protected Object             executingLock_ = new Object();
+  protected Object             executedLock_  = new Object();
 
   class ContextAgentRunnable
     implements Runnable
@@ -39,12 +37,12 @@ public class ThreadPoolAgency
       incrExecuting(1);
 
       Logger logger = (Logger) x_.get("logger");
-      PM pm = new PM(this.getClass(), agent_.getClass().getName());
+      PM     pm     = new PM(this.getClass(), agent_.getClass().getName());
 
       try {
         agent_.execute(x_);
       } catch (Throwable t) {
-        logger.error(this.getClass(), t.getMessage());
+        logger.error(this.getClass(), t.getMessage(), t);
       } finally {
         incrExecuting(-1);
         incrExecuted();
@@ -54,6 +52,15 @@ public class ThreadPoolAgency
   }
 
   public ThreadPoolAgency() {
+    /* GC threads that haven't been used for 10 seconds. */
+    pool_ = new ThreadPoolExecutor(
+      getNumberOfThreads(),
+      getNumberOfThreads(),
+      10,
+      TimeUnit.SECONDS,
+      new LinkedBlockingQueue<Runnable>()
+    );
+    pool_.allowCoreThreadTimeOut(true);
   }
 
   public void incrExecuting(int d) {
@@ -74,13 +81,11 @@ public class ThreadPoolAgency
     }
   }
 
-  public synchronized ExecutorService getPool() {
-    if ( pool_ == null ) {
-      pool_ = Executors.newFixedThreadPool(getNumberOfThreads());
-    }
+  public ExecutorService getPool() {
     return pool_;
   }
 
+  // TODO: reverse order of 2nd and 3rd args
   public void submit(X x, ContextAgent agent, String description) {
     incrQueued();
     getPool().submit(new ContextAgentRunnable(x, agent));

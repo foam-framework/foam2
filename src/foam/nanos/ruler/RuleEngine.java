@@ -10,8 +10,11 @@ import foam.core.*;
 import foam.dao.DAO;
 import foam.nanos.auth.LastModifiedAware;
 import foam.nanos.auth.LastModifiedByAware;
+import foam.nanos.auth.LifecycleAware;
+import foam.nanos.auth.LifecycleState;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
+import foam.util.SafetyUtil;
 
 import java.lang.Exception;
 import java.time.Duration;
@@ -49,6 +52,9 @@ public class RuleEngine extends ContextAwareSupport {
    *
    * Each rule would check object applicability before applying action.
    *
+   * Before generating any logger.debug(...) calls rule.debug property should be tested:
+   *  if ( rule.getDebug() ) { logger.debug(…) };
+   *
    * @param rules - Rules to be considered applying
    * @param obj - FObject supplied to rules for execution
    * @param oldObj - Old FObject supplied to rules for execution
@@ -56,22 +62,28 @@ public class RuleEngine extends ContextAwareSupport {
   public void execute(List<Rule> rules, FObject obj, FObject oldObj) {
     CompoundContextAgency compoundAgency = new CompoundContextAgency();
     ContextualizingAgency agency = new ContextualizingAgency(compoundAgency, userX_, getX());
+    Logger logger = (Logger) getX().get("logger");
     for (Rule rule : rules) {
-      if ( stops_.get() ) break;
-      if ( ! isRuleApplicable(rule, obj, oldObj)) continue;
-      PM pm = (PM) x_.get("PM");
-      pm.setClassType(RulerDAO.getOwnClassInfo());
-      pm.setName(rule.getDaoKey() + ": " + rule.getId());
-      pm.init_();
-      applyRule(rule, obj, oldObj, agency);
-      pm.log(x_);
-      agency.submit(x_, x -> saveHistory(rule, obj), "Save history. Rule id:" + rule.getId());
+      try {
+        if ( stops_.get() ) break;
+        if ( ! isRuleApplicable(rule, obj, oldObj)) continue;
+        PM pm = (PM) x_.get("PM");
+        pm.setClassType(RulerDAO.getOwnClassInfo());
+        pm.setName(rule.getDaoKey() + ": " + rule.getId());
+        pm.init_();
+        applyRule(rule, obj, oldObj, agency);
+        pm.log(x_);
+        agency.submit(x_, x -> saveHistory(rule, obj), "Save history. Rule id:" + rule.getId());
+      } catch ( Exception e ) {
+        // logger.debug(this.getClass().getSimpleName(), "id", rule.getId(), "\\nrule", rule, "\\nobj", obj, "\\nold", oldObj, "\\n", e);
+        logger.error(this.getClass().getSimpleName(), "id", rule.getId(), e);
+        throw e;
+      }
     }
     try {
       compoundAgency.execute(x_);
     } catch (Exception e) {
-      Logger logger = (Logger) x_.get("logger");
-      logger.error(e.getMessage());
+      logger.error(e.getMessage(), e);
     }
 
     asyncApplyRules(rules, obj, oldObj);
@@ -144,17 +156,28 @@ public class RuleEngine extends ContextAwareSupport {
 
   private void applyRule(Rule rule, FObject obj, FObject oldObj, Agency agency) {
     ProxyX readOnlyX = new ReadOnlyDAOContext(userX_);
-    rule.apply(readOnlyX, obj, oldObj, this, agency);
+    rule.apply(readOnlyX, obj, oldObj, this, rule, agency);
   }
 
   private boolean isRuleApplicable(Rule rule, FObject obj, FObject oldObj) {
     currentRule_ = rule;
-    return rule.getAction() != null
+
+    // Check if the rule is in an ACTIVE state
+    Boolean isActive = true;
+    if (rule instanceof LifecycleAware) {
+      isActive = ((LifecycleAware) rule).getLifecycleState() == LifecycleState.ACTIVE;
+    }
+
+    return
+         isActive
+      && rule.getAction() != null
       && rule.f(userX_, obj, oldObj);
   }
 
   private void asyncApplyRules(List<Rule> rules, FObject obj, FObject oldObj) {
+    if (rules.isEmpty()) return;
     ((Agency) getX().get("threadPool")).submit(userX_, x -> {
+      Logger logger = (Logger) x.get("logger");
       for (Rule rule : rules) {
         if ( stops_.get() ) return;
 
@@ -166,12 +189,13 @@ public class RuleEngine extends ContextAwareSupport {
           // For that, greedy mode is used for object reload. For before rules,
           // object reload uses non-greedy mode so that changes on the original
           // object will be copied over to the reloaded object.
-          FObject nu = getDelegate().find_(x, obj);
+          FObject nu = getDelegate().find_(x, obj).fclone();
           nu = reloadObject(obj, oldObj, nu, rule.getAfter());
           try {
-            rule.asyncApply(x, nu, oldObj, RuleEngine.this);
+            rule.asyncApply(x, nu, oldObj, RuleEngine.this, rule);
             saveHistory(rule, nu);
           } catch (Exception ex) {
+            logger.warning("Retry asyncApply rule(" + rule.getId() + ").", ex);
             retryAsyncApply(x, rule, nu, oldObj);
           }
         }
@@ -180,8 +204,8 @@ public class RuleEngine extends ContextAwareSupport {
   }
 
   private void retryAsyncApply(X x, Rule rule, FObject obj, FObject oldObj) {
-    new RetryManager().submit(x, x1 -> {
-      rule.asyncApply(x, obj, oldObj, RuleEngine.this);
+    new RetryManager(rule.getName()).submit(x, x1 -> {
+      rule.asyncApply(x, obj, oldObj, RuleEngine.this, rule);
       saveHistory(rule, obj);
     });
   }
@@ -231,7 +255,7 @@ public class RuleEngine extends ContextAwareSupport {
    * @return Reloaded object
    */
   private FObject reloadObject(FObject obj, FObject oldObj, FObject nu, boolean greedy) {
-    FObject old = oldObj;
+    FObject old = (FObject) SafetyUtil.deepClone(oldObj);
     if ( old == null ) {
       try {
         old = obj.getClass().newInstance();

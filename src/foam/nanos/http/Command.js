@@ -11,9 +11,9 @@ foam.ENUM({
   documentation: 'Nanos equivelent HTTP methods',
 
   values: [
-    { name: 'select', label: 'SELECT' },
-    { name: 'put',    label: 'PUT' },
-    { name: 'remove', label: 'REMOVE' }
+    { name: 'SELECT', label: 'SELECT' },
+    { name: 'PUT',    label: 'PUT' },
+    { name: 'REMOVE', label: 'REMOVE' }
     //{ name: 'find',  label: 'FIND' },
     //{ name: 'help',   label: 'HELP' }
   ]

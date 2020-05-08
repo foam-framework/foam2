@@ -12,7 +12,6 @@ foam.CLASS({
   documentation: `Logger which builds a modelled LogMessage from the free form Logger calls and puts it into the LogMessageDAO`,
 
   javaImports: [
-    'foam.core.X',
     'foam.dao.DAO',
     'foam.dao.NullDAO',
     'foam.log.LogLevel'
@@ -20,26 +19,18 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'dao',
+      name: 'delegate',
       class: 'foam.dao.DAOProperty',
-      javaFactory: `
-initializing.set(true);
-String daoName = "localLogMessageDAO";
-DAO dao = (DAO) getX().put("logger", new foam.nanos.logger.StdoutLogger()).get(daoName);
-if ( dao == null ) {
-  System.err.println("DAOLogger DAO not found: "+daoName);
-  dao = new NullDAO();
-}
-initializing.set(false);
-return dao;
-`
+      visibility: 'HIDDEN'
     },
     {
       name: 'logger',
       class: 'Object',
-      javaFactory: `return new foam.nanos.logger.StdoutLogger();`
+      javaFactory: `return new foam.nanos.logger.StdoutLogger();`,
+      visibility: 'HIDDEN'
     }
   ],
+
   axioms: [
     {
       name: 'javaExtras',
@@ -72,13 +63,18 @@ return dao;
         }
       ],
       javaCode: `
-if ( initializing.get() ) {
-  System.out.println("DAOLogger initializing");
-  return;
-}
-LogMessage lm = new LogMessage.Builder(getX()).setSeverity(severity).setMessage(message).build();
-getDao().put_(getX().put("logger", (Logger) getLogger()), lm);
-`
+      if ( initializing.get() ) {
+        System.out.println("DAOLogger initializing");
+        return;
+      }
+
+      LogMessage lm = new LogMessage(getX());
+      lm.setThread(Thread.currentThread().getName());
+      lm.setSeverity(severity);
+      lm.setMessage(message);
+
+      getDelegate().put(lm);
+     `
     },
     {
       name: 'log',

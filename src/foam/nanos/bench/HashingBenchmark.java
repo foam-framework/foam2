@@ -30,6 +30,10 @@ public class HashingBenchmark
   }
 
   @Override
+  public void teardown(X x, java.util.Map stats) {
+  }
+
+  @Override
   public void execute(X x) {
     try {
       // get random user

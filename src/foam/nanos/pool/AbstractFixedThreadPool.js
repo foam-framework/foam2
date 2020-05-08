@@ -13,7 +13,7 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'numberOfThreads',
-      value: 16
+      javaFactory: 'return Runtime.getRuntime().availableProcessors();'
     },
     {
       class: 'Long',

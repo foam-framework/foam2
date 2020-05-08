@@ -93,7 +93,7 @@ describe("MDAO benchmarks", function() {
     foam.CLASS({
       name: 'Album',
       properties: [
-        { name: 'id', name: 'id' },
+        { name: 'id' },
         { class: 'Boolean', name: 'isLocal' },
         { class: 'Boolean', name: 'byAction' },
         { class: 'Date', name: 'timestamp' },

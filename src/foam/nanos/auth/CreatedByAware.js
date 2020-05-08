@@ -13,7 +13,18 @@ foam.INTERFACE({
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdBy',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
       documentation: 'User who created the entry'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdByAgent',
+      documentation: 'Agent acting as User who created the entry',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      section: 'administrative'
     }
   ]
 });
@@ -37,7 +48,19 @@ foam.CLASS({
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdBy',
-      documentation: 'User who created the entry'
+      documentation: 'User who created the entry',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      section: 'administrative'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdByAgent',
+      documentation: 'Agent acting as User who created the entry',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      section: 'administrative'
     }
   ]
 });

@@ -19,8 +19,8 @@ public class HasParser extends foam.lib.parse.ProxyParser {
   public HasParser(foam.core.PropertyInfo prop) {
     info_ = prop;
 
-    setDelegate(new Seq(new Literal("has:"),
-                        new Literal(prop.getName())));
+    setDelegate(new Seq(Literal.create("has:"),
+                        Literal.create(prop.getName())));
   }
 
   @Override

@@ -242,8 +242,8 @@ foam.CLASS( {
             y: BoxInfo.y + 1,
             color: '#ffffff',
             font: '16px Roboto',
-            width: 50 || 200,
-            height: 19 || 30,
+            width: 50,
+            height: 19,
             text: value
           } );
           this.selected = this.canvas.addChildren( BoxInfo, BoxInfoData );

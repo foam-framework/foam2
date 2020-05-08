@@ -40,6 +40,19 @@ foam.CLASS({
     'stack?'
   ],
 
+  constants: [
+    {
+      type: 'Int',
+      name: 'MIN_COLUMN_WIDTH_FALLBACK',
+      value: 100
+    },
+    {
+      type: 'Int',
+      name: 'EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH',
+      value: 60
+    }
+  ],
+
   properties: [
     {
       class: 'Class',
@@ -59,21 +72,20 @@ foam.CLASS({
       name: 'columns_',
       expression: function(columns, of, allColumns, editColumnsEnabled) {
         if ( ! of ) return [];
-        columns = columns.map(c => foam.String.isInstance(c) ? this.of.getAxiomByName(c) : c);
         if ( ! editColumnsEnabled ) return columns;
 
         // Reorder allColumns to respect the order of columns first followed by
         // the order of allColumns.
         allColumns = columns.concat(allColumns);
         allColumns = allColumns.filter((c, i) => {
-          return allColumns.findIndex(a => a.name == c.name) == i;
+          return allColumns.findIndex(a => a[0] == c[0]) == i;
         });
 
         return allColumns.filter(c => {
-          var v = this.ColumnConfig.create({ of: of, axiom : c }).visibility;
+          var v = this.ColumnConfig.create({ of: of, axiom : (typeof c[0] === 'string' ? of.getAxiomByName(c[0]) : c[0]) }).visibility;
           return v == this.ColumnVisibility.ALWAYS_HIDE ? false :
                  v == this.ColumnVisibility.ALWAYS_SHOW ? true :
-                 columns.find(c2 => c.name == c2.name)  ? true : false;
+                 columns.some(c2 => c[0] == c2[0]);
         });
       },
     },
@@ -82,17 +94,22 @@ foam.CLASS({
       expression: function(of) {
         return ! of ? [] : [].concat(
           of.getAxiomsByClass(foam.core.Property)
-            .filter(p => p.tableCellFormatter && ! p.hidden),
+            .filter(p => p.tableCellFormatter && ! p.hidden)
+            .map(a => [a.name, null]),
           of.getAxiomsByClass(foam.core.Action)
+            .map(a => [a.name, null])
         );
       }
     },
     {
       name: 'columns',
+      adapt: function(_, cols) {
+        return cols.map(c => Array.isArray(c) ? c : [c, null]);
+      },
       expression: function(of, allColumns) {
         if ( ! of ) return [];
         var tc = of.getAxiomByName('tableColumns');
-        return tc ? tc.columns.map(c => of.getAxiomByName(c)) : allColumns;
+        return tc ? tc.columns.map(c => [c, null]) : allColumns;
       },
     },
     {
@@ -124,17 +141,17 @@ foam.CLASS({
     {
       name: 'restingIcon',
       documentation: 'Image for grayed out double arrow when table header is not sorting',
-      value: 'images/resting-arrow.svg'
+      value: '/images/resting-arrow.svg'
     },
     {
       name: 'ascIcon',
       documentation: 'Image for table header ascending sorting arrow',
-      value: 'images/up-arrow.svg'
+      value: '/images/up-arrow.svg'
     },
     {
       name: 'descIcon',
       documentation: 'Image for table header descending sorting arrow',
-      value: 'images/down-arrow.svg'
+      value: '/images/down-arrow.svg'
     },
     {
       name: 'selection',
@@ -184,6 +201,17 @@ foam.CLASS({
       class: 'Boolean',
       name: 'allCheckBoxesEnabled_',
       documentation: 'Used internally to denote when the user has pressed the checkbox in the header to enable all checkboxes.'
+    },
+    {
+      class: 'Int',
+      name: 'tableWidth_',
+      documentation: 'Width of the whole table. Used to get proper scrolling on narrow screens.',
+      expression: function(of, columns_) {
+        return columns_.reduce((acc, col) => {
+          const axiom = typeof col[0] === 'string' ? of.getAxiomByName(col[0]) : col[0];
+          return acc + (axiom.tableWidth || this.MIN_COLUMN_WIDTH_FALLBACK);
+        }, this.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH) + 'px';
+      }
     }
   ],
 
@@ -196,11 +224,12 @@ foam.CLASS({
 
     function initE() {
       var view = this;
-      var columnSelectionE;
 
       if ( this.filteredTableColumns$ ) {
         this.onDetach(this.filteredTableColumns$.follow(
-          this.columns_$.map((cols) => cols.map((a) => a.name))));
+          this.columns_$.map((cols) => cols.map(([axiomOrColumnName, overrides]) => {
+            return (typeof axiomOrColumnName) === 'string' ? axiomOrColumnName : axiomOrColumnName.name;
+          }))));
       }
 
       this.
@@ -208,6 +237,7 @@ foam.CLASS({
         addClass(this.myClass(this.of.id.replace(/\./g, '-'))).
         start().
           addClass(this.myClass('thead')).
+          style({ 'min-width': this.tableWidth_$ }).
           show(this.showHeader$).
           add(this.slot(function(columns_) {
             return this.E().
@@ -248,7 +278,11 @@ foam.CLASS({
               }).
 
               // Render the table headers for the property columns.
-              forEach(columns_, function(column) {
+              forEach(columns_, function([axiomOrColumnName, overrides]) {
+                var column = typeof axiomOrColumnName === 'string'
+                  ? view.of.getAxiomByName(axiomOrColumnName)
+                  : axiomOrColumnName;
+                if ( overrides ) column = column.clone().copyFrom(overrides);
                 this.start().
                   addClass(view.myClass('th')).
                   addClass(view.myClass('th-' + column.name)).
@@ -279,7 +313,7 @@ foam.CLASS({
               call(function() {
                 this.start().
                   addClass(view.myClass('th')).
-                  style({ flex: '0 0 60px' }).
+                  style({ flex: `0 0 ${view.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH}px` }).
                   callIf(view.editColumnsEnabled, function() {
                     this.addClass(view.myClass('th-editColumns')).
                     on('click', function(e) {
@@ -361,6 +395,7 @@ foam.CLASS({
                       view.myClass('selected') : '';
                 })).
                 addClass(view.myClass('row')).
+                style({ 'min-width': view.tableWidth_$ }).
 
                 // If the multi-select feature is enabled, then we render a
                 // Checkbox in the first cell of each row.
@@ -405,7 +440,7 @@ foam.CLASS({
 
                     if ( checked ) {
                       var modification = {};
-                      modification[obj.id] = checked ? obj : null;
+                      modification[obj.id] = obj;
                       view.selectedObjects = Object.assign({}, view.selectedObjects, modification);
                     } else {
                       var temp = Object.assign({}, view.selectedObjects);
@@ -424,7 +459,11 @@ foam.CLASS({
                   });
                 }).
 
-                forEach(columns_, function(column) {
+                forEach(columns_, function([axiomOrColumnName, overrides]) {
+                  var column = typeof axiomOrColumnName === 'string'
+                    ? obj.cls_.getAxiomByName(axiomOrColumnName)
+                    : axiomOrColumnName;
+                  if ( overrides ) column = column.clone().copyFrom(overrides);
                   this.
                     start().
                       addClass(view.myClass('td')).
@@ -451,7 +490,7 @@ foam.CLASS({
                 start().
                   addClass(view.myClass('td')).
                   attrs({ name: 'contextMenuCell' }).
-                  style({ flex: '0 0 60px' }).
+                  style({ flex: `0 0 ${view.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH}px` }).
                   tag(view.OverlayActionListView, {
                     data: actions,
                     obj: obj

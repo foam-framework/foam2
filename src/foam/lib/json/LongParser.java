@@ -8,7 +8,17 @@ package foam.lib.json;
 
 import foam.lib.parse.*;
 
-public class LongParser implements Parser {
+public class LongParser
+  implements Parser
+{
+  private final static Parser instance__ = new LongParser();
+
+  public static Parser instance() { return instance__; }
+
+  // TODO: make private
+  public LongParser() {
+  }
+
   public PStream parse(PStream ps, ParserContext x) {
     long n = 0;
 

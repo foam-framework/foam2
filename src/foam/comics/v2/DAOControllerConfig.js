@@ -57,7 +57,12 @@ foam.CLASS({
       expression: function(of) { return foam.String.pluralize(of.model_.label); }
     },
     {
-      class: 'StringArray',
+      class: 'String',
+      name: 'createTitle',
+      expression: function(of) { return 'Create a New ' + of.model_.label; }
+    },
+    {
+      class: 'Array',
       name: 'defaultColumns',
       factory: null,
       expression: function(of) {
@@ -75,7 +80,7 @@ foam.CLASS({
       help: `
         The level of search capabilities that the controller should have.
       `,
-      value: 'SIMPLE'
+      value: 'FULL'
     },
     {
       class: 'foam.u2.ViewSpecWithJava',
@@ -107,11 +112,54 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpecWithJava',
       name: 'viewBorder',
-      expression: function() {
+      factory: function() {
         // Can't use a value here because java tries to generate a HasMap
         // for it which doesn't jive with the AbstractFObjectPropertyInfo.
         return { class: 'foam.u2.borders.NullBorder' };
       }
+    },
+    {
+      class: 'foam.mlang.predicate.PredicateProperty',
+      name: 'createPredicate',
+      documentation: 'If set to false, the "Create" button will not be visible.',
+      factory: function() {
+        return foam.mlang.predicate.True.create();
+      },
+      javaFactory: `
+        return foam.mlang.MLang.TRUE;
+      `
+    },
+    {
+      class: 'foam.mlang.predicate.PredicateProperty',
+      name: 'editPredicate',
+      documentation: 'True to enable the edit button.',
+      factory: function() {
+        return foam.mlang.predicate.True.create();
+      },
+      javaFactory: `
+        return foam.mlang.MLang.TRUE;
+      `
+    },
+    {
+      class: 'foam.mlang.predicate.PredicateProperty',
+      name: 'deletePredicate',
+      documentation: 'True to enable the delete button.',
+      factory: function() {
+        return foam.mlang.predicate.True.create();
+      },
+      javaFactory: `
+        return foam.mlang.MLang.TRUE;
+      `
+    },
+    {
+      of: 'foam.mlang.predicate.Predicate',
+      name: 'filterExportPredicate',
+      documentation: 'Filtering the types of formats user is able to export from TableView'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.comics.v2.CRUDEnabledActionsAuth',
+      name: 'CRUDEnabledActionsAuth'
     }
   ]
 });
