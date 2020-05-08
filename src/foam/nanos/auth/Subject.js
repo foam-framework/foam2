@@ -17,7 +17,13 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.User',
       name: 'user',
-      documentation: 'Authenticated user'
+      documentation: 'Authenticated user',
+      javaSetter: `
+        userPath_ = new java.util.ArrayList<foam.nanos.auth.User>();
+        userPath_.add(val);
+        user_ = val;
+        userIsSet_ = true;
+      `
     },
     {
       class: 'FObjectProperty',
@@ -32,6 +38,8 @@ foam.CLASS({
       else {
         userPath.remove(userPath.size());
       }
+
+      effectiveUser_ = val;
       `
     },
     {
