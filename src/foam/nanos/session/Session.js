@@ -243,6 +243,8 @@ foam.CLASS({
             } else {
               configUrl = "https://" + configUrl;
             }
+          } else {
+            configUrl = "http://localhost:8080";
           }
           if ( configUrl.endsWith("/") ) {
             configUrl = configUrl.substring(0, configUrl.length()-1);
