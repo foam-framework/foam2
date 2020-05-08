@@ -63,9 +63,7 @@ foam.CLASS({
 
       this.getCapabilities(capabilityId).then(capabilities => {
         // Map capabilities to CapabilityWizardSection objects
-        return Promise.all(capabilities.filter(
-          cap => cap.of
-        ).map(
+        return Promise.all(capabilities.map(
           cap => this.CapabilityWizardSection.create({
             capability: cap
           }).updateUCJ()

@@ -140,6 +140,11 @@ foam.CLASS({
       javaCode: `
       DAO capabilityDAO = (DAO) x.get("capabilityDAO");
       Capability capability = (Capability) capabilityDAO.find(obj.getTargetId());
+
+      if ( capability.getOf() == null ) return;
+
+      if ( obj.getData() == null ) 
+        throw new RuntimeException("UserCapabilityJunction data not submitted for capability: " + capability.getName());
       
       String daoKey = capability.getDaoKey();
       if ( daoKey == null ) return;
