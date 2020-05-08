@@ -6,7 +6,6 @@ import foam.core.X;
 import foam.dao.AbstractSink;
 import foam.dao.DAO;
 import foam.dao.ProxyDAO;
-import foam.mlang.Expressions;
 import foam.mlang.sink.Count;
 import foam.nanos.auth.LifecycleState;
 import foam.nanos.auth.User;
@@ -33,7 +32,7 @@ public class SendNotificationDAO
         @Override
         public void put(Object o, Detachable d) {
           User user = (User) o;
-          send(user, notif, x);
+          send(x, user, notif);
         }
       });
     } else if ( ! SafetyUtil.isEmpty(notif.getGroupId()) ) {
@@ -52,32 +51,51 @@ public class SendNotificationDAO
         @Override
         public void put(Object o, Detachable d) {
           User user = (User) o;
-          send(user, notif, x);
+          send(x, user, notif);
         }
       });
     }
 
     if ( SafetyUtil.isEmpty(notif.getGroupId()) && ! notif.getBroadcasted() ) {
+      User user = (User) userDAO.find(notif.getUserId())
+      if ( user != null ) {
+        NotificationSetting notificationSetting = getNotificationSetting(x, user);
+
+        // We cannot permanently disable in-app notifications, so mark them read automatically
+        if ( ! notificationSetting.getEnabled() && ! notif.getRead() ) {
+          notif = notif.clone();
+          notif.setRead(true);
+        }
+      }
+
       return super.put_(x, notif);
     }
 
     return obj;
   }
 
-  public void send(User user, Notification notification, X x) {
-    DAO          notificationSettingDAO = (DAO) x.get("localNotificationSettingDAO");
-
+  public void send(X x, User user, Notification notification) {
     // Retrieve the notification settings for this user
-    NotificationSetting notificationSetting = (EmailSetting) notificationSettingDAO.find(
-      AND(
-        EQ(NotificationSetting.OWNER, user.getId()),
-        CLASS_OF(NotificationSetting.class)
-      ));
-
-    // If no notification settings exist, use a new instance as notifications are assumed to be 'on'
-    notificationSetting = notificationSetting != null ? notificationSetting : new NotificationSetting.Builder(x).setOwner(user.getId()).build();
+    NotificationSetting notificationSetting = getNotificationSetting(x, user);
 
     // Send the notification
     notificationSetting.sendNotification(x, user, notification);
+  }
+
+  private NotificationSetting getNotificationSetting(X x, User user) {
+    DAO notificationSettingDAO = (DAO) x.get("localNotificationSettingDAO");
+
+    // Retrieve the notification settings for this user
+    NotificationSetting notificationSetting = null;
+    if ( user != null ) {
+      notificationSetting = (NotificationSetting) notificationSettingDAO.find(
+        AND(
+          EQ(NotificationSetting.OWNER, user.getId()),
+          CLASS_OF(NotificationSetting.class)
+        ));
+    }
+
+    // If no notification settings exist, use a new instance as notifications are assumed to be 'on'
+    return notificationSetting != null ? notificationSetting : new NotificationSetting.Builder(x).setOwner(user.getId()).build();
   }
 }

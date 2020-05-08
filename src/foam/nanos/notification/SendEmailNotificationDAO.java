@@ -19,9 +19,9 @@ import foam.nanos.notification.NotificationSetting;
 import foam.nanos.notification.EmailSetting;
 import foam.nanos.notification.email.EmailMessage;
 import foam.util.Emails.EmailsUtility;
-import foam.mlang.Expressions;
 import java.util.Arrays;
 import java.util.List;
+import static foam.mlang.MLang.*;
 
 // If notification's emailEnabled is true, the decorator creates an email based on provided or default emailTemplate, sets the reciever based on notification userId/groupId/broadcasted
 public class SendEmailNotificationDAO extends ProxyDAO {
