@@ -187,8 +187,10 @@ foam.CLASS({
     },
     {
       name: 'name',
-      documentation: `Required by SearchManager.`,
-      value: 'String search view'
+      documentation: 'Required by SearchManager.',
+      expression: function(property) {
+        return property.name;
+      }
     },
     {
       class: 'Boolean',
@@ -202,6 +204,7 @@ foam.CLASS({
     function initE() {
       this.onDetach(this.dao$.sub(this.daoUpdate));
       this.daoUpdate();
+
       var self = this;
       this
         .addClass(this.myClass())
@@ -309,7 +312,8 @@ foam.CLASS({
       code: function() {
         this.isOverLimit = false;
         this.isLoading = true;
-        this.dao.select(this.GROUP_BY(this.property, null, 101)).then((results) => {
+        var pred = this.search && this.search.trim().length > 0 ? this.CONTAINS_IC(this.property, this.search) : this.TRUE;
+        this.dao.where(pred).select(this.GROUP_BY(this.property, null, 101)).then((results) => {
           this.countByContents = results.groups;
           if ( Object.keys(results.groups).length > 100 ) this.isOverLimit = true;
           this.isLoading = false;

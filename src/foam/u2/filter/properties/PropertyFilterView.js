@@ -152,7 +152,7 @@
    listeners: [
      function switchActive() {
        this.active = ! this.active;
-       // NOTE: expand-less is off color
+       // NOTE: expand-less is off color?
        this.iconPath = this.active ? 'images/expand-less.svg' : 'images/expand-more.svg';
 
        if ( ! this.active ) return;

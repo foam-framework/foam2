@@ -148,6 +148,13 @@ foam.CLASS({
     },
 
     /**
+     * Restores the view based on passed in predicate
+     */
+    function restoreFromPredicate(predicate) {
+      // TODO
+    },
+
+    /**
     * Clears the fields to their default values.
     * Required on all SearchViews. Called by ReciprocalSearch.
     */
