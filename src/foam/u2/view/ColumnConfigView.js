@@ -49,13 +49,15 @@ foam.CLASS({
           else
             notSelectedColumns.push(c);
         });
-        notSelectedColumns.sort();
         for(var i = 0; i < selectedColumns.length; i++) {
-          arr.push(foam.u2.view.SubColumnSelectConfig.create({ index:i, rootProperty: [data.of.getAxiomByName(selectedColumns[i]).name, data.of.getAxiomByName(selectedColumns[i]).label ? data.of.getAxiomByName(selectedColumns[i]).label : data.of.getAxiomByName(selectedColumns[i]).name], level:0, of:data.of, selectedColumns:data.selectedColumnNames, updateParent:data.updateColumns.bind(data) }));
+          arr.push(foam.u2.view.SubColumnSelectConfig.create({ index:i, rootProperty: [data.of.getAxiomByName(selectedColumns[i]).name, data.of.getAxiomByName(selectedColumns[i]).label ? data.of.getAxiomByName(selectedColumns[i]).label : data.of.getAxiomByName(selectedColumns[i]).name], level:0, of:data.of, selectedColumns:data.selectedColumnNames, updateParent:this.onSelectionChanged.bind(this) }));
         }
+        var nonSelectedViewModels = [];
         for(i = 0; i < notSelectedColumns.length; i++) {
-          arr.push(foam.u2.view.SubColumnSelectConfig.create({ index:i+selectedColumns.length, rootProperty: [data.of.getAxiomByName(notSelectedColumns[i]).name, data.of.getAxiomByName(notSelectedColumns[i]).label ? data.of.getAxiomByName(notSelectedColumns[i]).label : data.of.getAxiomByName(notSelectedColumns[i]).name], level:0, of:data.of, selectedColumns:data.selectedColumnNames, updateParent:data.updateColumns.bind(data) }));
+          nonSelectedViewModels.push(foam.u2.view.SubColumnSelectConfig.create({ index:i+selectedColumns.length, rootProperty: [data.of.getAxiomByName(notSelectedColumns[i]).name, data.of.getAxiomByName(notSelectedColumns[i]).label ? data.of.getAxiomByName(notSelectedColumns[i]).label : data.of.getAxiomByName(notSelectedColumns[i]).name], level:0, of:data.of, selectedColumns:data.selectedColumnNames, updateParent:this.onSelectionChanged.bind(this) }));
         }
+        nonSelectedViewModels.sort((a, b) => { return a.rootProperty[1].toLowerCase().localeCompare(b.rootProperty[1].toLowerCase());});
+        arr = arr.concat(nonSelectedViewModels);
         return arr;
       }
     },
@@ -83,12 +85,15 @@ foam.CLASS({
         .start()
          // .addClass(self.myClass('dropdown'))
          .add(this.slot(function(views) {
+           var i = 0;
            return this.E()
             .forEach(views, function(view) {
+              view.prop.index = i;
               this
                 .start()
                  .add(view)
                 .end();
+              i++;
             });
          }))
       .end();
@@ -103,10 +108,12 @@ foam.CLASS({
       if (targetIndex > draggableIndex) {
         for (var i = draggableIndex; i < targetIndex; i++) {
           this.views[i].prop = thisProps[i+1];
+          this.views[i].prop.index = i;
         }
       } else {
         for (var i = targetIndex+1; i <= draggableIndex; i++) {
           this.views[i].prop = thisProps[i-1];
+          this.views[i].prop.index = i;
         }
       }
       this.views[replaceIndex].prop = prop;
@@ -124,6 +131,34 @@ foam.CLASS({
         }
       }
       return arr;
+    },
+    function onSelectionChanged(isColumnSelected, index) {
+      if ( isColumnSelected ) {
+        this.onSelect(index);
+      } else {
+        this.onUnSelect(index);
+      }
+    },
+
+    function onSelect(draggableIndex) {
+      var i = 0;
+      while(true) {
+        if ( !this.views[i].prop.isPropertySelected )
+          break;
+        i++;
+      }
+      this.resetProperties(i, draggableIndex);
+    },
+    function onUnSelect(draggableIndex) {
+      var i = draggableIndex;
+      var thisPropertyLabel = this.views[draggableIndex].prop.rootProperty[1].toLowerCase();
+      while(true) {
+        if ( !this.views[i].prop.isPropertySelected && thisPropertyLabel.toLowerCase().localeCompare(this.views[i].prop.rootProperty[1].toLowerCase()) < 0 )
+          break;
+        i++;
+
+      }
+      this.resetProperties(i, draggableIndex);
     }
   ],
   // listeners: [
@@ -453,7 +488,7 @@ foam.CLASS({
           this.selectedColumns.push(propertyNameSoFar ? this.rootProperty[0] + '.' + propertyNameSoFar : this.rootProperty[0]);
         else
           this.selectedColumns.splice(this.selectedColumns.indexOf(propertyNameSoFar ? this.rootProperty[0] + '.' + propertyNameSoFar : this.rootProperty[0]), 1);
-        this.updateParent();
+        this.updateParent(isSelected, this.index);
       }
       else
         this.updateParent(isSelected, propertyNameSoFar ? this.rootProperty[0] + '.' + propertyNameSoFar : this.rootProperty[0]);
