@@ -44,7 +44,7 @@ foam.CLASS({
     {
       name: 'applyAction',
       javaCode: `
-        FObject nu  = (FObject) NEW_OBJ.f(obj);
+        FObject nu  = (FObject) obj;
         Predicate [] propertiesToCheck = new Predicate [getProperties().length] ;
 
         for ( int i = 0; i < getProperties().length; i++ ) {
