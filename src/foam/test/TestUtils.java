@@ -84,6 +84,7 @@ public class TestUtils {
       threw = true;
       returnedMessage = t.getMessage();
       if ( ! wasCorrectExceptionType ) t.printStackTrace();
+      throw t;
     }
     if ( ! returnedMessage.equals(expectedExceptionMessage) ) {
       System.out.println("Error message was not correct.");

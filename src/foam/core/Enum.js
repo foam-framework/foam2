@@ -349,7 +349,7 @@ foam.CLASS({
       return style;
     },
     function classes() {
-      return this.extraClasses.concat(foam.String.cssClassize(this.cls_.id));
+      return this.extraClasses.concat(foam.String.cssClassize(this.cls_.id) + '-' + this.name);
     },
     function toString() { return this.name; }
   ]
