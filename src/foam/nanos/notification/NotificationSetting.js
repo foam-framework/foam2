@@ -51,10 +51,6 @@ foam.CLASS({
       class: 'Boolean',
       name: 'enabled',
       value: true
-    },
-    {
-      class: 'StringArray',
-      name: 'disabledTopics',
     }
   ],
 
@@ -83,13 +79,6 @@ foam.CLASS({
         { name: 'notification', type: 'foam.nanos.notification.Notification' },
       ],
       javaCode: `
-        if ( getDisabledTopics() != null ) {
-          List disabledTopics = Arrays.asList(getDisabledTopics());
-          if ( disabledTopics.contains(notification.getNotificationType()) ) {
-            return;
-          }
-        }
-
         DAO notificationDAO = (DAO) x.get("localNotificationDAO");
         notification = (Notification) notification.fclone();
         notification.setId(0L);
@@ -100,6 +89,12 @@ foam.CLASS({
         // We cannot permanently disable in-app notifications, so mark them read automatically
         if ( ! getEnabled() ) {
           notification.setRead(true);
+        }
+        else if ( user.getDisabledTopics() != null ) {
+          List disabledTopics = Arrays.asList(user.getDisabledTopics());
+          if ( disabledTopics.contains(notification.getNotificationType()) ) {
+            notification.setRead(true);
+          }
         }
 
         try {

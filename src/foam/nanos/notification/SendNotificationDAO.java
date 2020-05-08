@@ -57,18 +57,19 @@ public class SendNotificationDAO
     }
 
     if ( SafetyUtil.isEmpty(notif.getGroupId()) && ! notif.getBroadcasted() ) {
-      User user = (User) userDAO.find(notif.getUserId())
-      if ( user != null ) {
-        NotificationSetting notificationSetting = getNotificationSetting(x, user);
+      Notification notification = notif;
+      User nofifUser = (User) userDAO.find(notif.getUserId());
+      if ( nofifUser != null ) {
+        NotificationSetting notificationSetting = getNotificationSetting(x, nofifUser);
 
         // We cannot permanently disable in-app notifications, so mark them read automatically
         if ( ! notificationSetting.getEnabled() && ! notif.getRead() ) {
-          notif = notif.clone();
-          notif.setRead(true);
+          notification = (Notification) notif.fclone();
+          notification.setRead(true);
         }
       }
 
-      return super.put_(x, notif);
+      return super.put_(x, notification);
     }
 
     return obj;

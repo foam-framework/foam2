@@ -69,10 +69,13 @@ foam.CLASS({
     {
       name: 'sendNotification',
       javaCode: `
-        if ( ! getEnabled() ) return;
+        // Check if the user has disabled email notifications
+        if ( ! getEnabled() ) 
+          return;
 
-        if ( getDisabledTopics() != null ) {
-          List disabledTopics = Arrays.asList(getDisabledTopics());
+        // Skip sending email messages for disabled topics
+        if ( user.getDisabledTopics() != null ) {
+          List disabledTopics = Arrays.asList(user.getDisabledTopics());
           if ( disabledTopics.contains(notification.getNotificationType()) ) {
             return;
           }
