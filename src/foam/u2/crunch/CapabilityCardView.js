@@ -57,20 +57,20 @@ foam.CLASS({
           )).then(ucj => {
             if ( ! ucj ) {
               badge
-                .addClass(self.s.myClass('ok'))
+                .addClass(self.s.myClass('badge-info'))
                 .add("available")
                 ;
             }
             else switch ( ucj.status ) {
-              case self.CapabilityJunctionStatus.granted:
+              case self.CapabilityJunctionStatus.GRANTED:
                 badge
-                  .addClass(self.s.myClass('ok'))
+                  .addClass(self.s.myClass('badge-good'))
                   .add("granted")
                   ;
                   break;
               default:
                 badge
-                  .addClass(self.s.myClass('ok'))
+                  .addClass(self.s.myClass('badge-bad'))
                   .add("unknown state")
                   ;
             }

@@ -170,11 +170,17 @@ foam.CLASS({
       color: #ffffff;
     }
 
-    ^badge.ok {
+    ^badge-neutral {
+      background-color: #b5b5b5;
+    }
+    ^badge-good {
       background-color: #32bf5e;
     }
-    ^badge.info {
+    ^badge-info {
       background-color: #604aff;
+    }
+    ^badge-bad {
+      background-color: #bf3232;
     }
 
     ^category {
