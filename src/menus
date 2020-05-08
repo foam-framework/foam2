@@ -23,7 +23,7 @@ p({"class":"foam.nanos.menu.Menu","id":"admin.groups","label":"Groups","handler"
 p({"class":"foam.nanos.menu.Menu","id":"admin.lang","label":"Languages","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"languageDAO"}},"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"admin.logs","label":"Logs","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"logMessageDAO"}},"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"admin.menus","label":"Menus","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"menuDAO","summaryView":{"class":"foam.nanos.menu.TreeAltView"}},"parent":"admin"})
-//p({"class":"foam.nanos.menu.Menu","id":"admin.menus","label":"Menus","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"menuDAO","browseViews":[{"class":"foam.comics.v2.BrowseView","name":"Table","view":{"class":"foam.nanos.menu.TreeAltView"}}]}},"parent":"admin"})
+//p({"class":"foam.nanos.menu.Menu","id":"admin.menus","label":"Menus","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"menuDAO"}},"parent":"admin"})
 p({
   "class":"foam.nanos.menu.Menu",
   "id":"admin.nspec",
@@ -33,14 +33,7 @@ p({
     "config":{
       "class":"foam.comics.v2.DAOControllerConfig",
       "daoKey":"nSpecDAO",
-      "browseTitle":"Services",
-      "browseViews":[{
-        "class":"foam.comics.v2.BrowseView",
-        "name":"Table",
-        "view":{
-          "class":"foam.u2.view.ScrollTableView"
-        }
-      }]
+      "browseTitle":"Services"
     }
   },
   "parent":"admin"
