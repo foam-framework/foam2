@@ -67,7 +67,7 @@ foam.CLASS({
         }
 
         EmailMessage message = new EmailMessage();
-        message.setTo(new String[]{user.getEmail()});
+        message.setTo(new String[] { user.getEmail() });
         notification = (Notification) notification.fclone();
 
         if ( notification.getEmailArgs() != null ) {
@@ -87,6 +87,16 @@ foam.CLASS({
           Logger logger = (Logger) x.get("logger");
           logger.error("Error sending notification email message: " + message + ". Error: " + t);
         }
+      `
+    },
+    {
+      name: 'sendNotificationFromDAO',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'user', type: 'foam.nanos.auth.User' },
+        { name: 'notification', type: 'foam.nanos.notification.Notification' }
+      ],
+      javaCode: `
       `
     }
   ]

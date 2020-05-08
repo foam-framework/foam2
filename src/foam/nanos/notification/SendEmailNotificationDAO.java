@@ -13,8 +13,13 @@ import foam.dao.ProxyDAO;
 import foam.nanos.app.AppConfig;
 import foam.nanos.auth.LifecycleState;
 import foam.nanos.auth.User;
+import foam.nanos.logger.Logger;
+import foam.nanos.notification.Notification;
+import foam.nanos.notification.NotificationSetting;
+import foam.nanos.notification.EmailSetting;
 import foam.nanos.notification.email.EmailMessage;
 import foam.util.Emails.EmailsUtility;
+import foam.mlang.Expressions;
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,47 +36,40 @@ public class SendEmailNotificationDAO extends ProxyDAO {
   }
   @Override
   public FObject put_(X x, FObject obj) {
-    DAO          userDAO  = (DAO) x.get("localUserDAO");
-    AppConfig    config   = (AppConfig) x.get("appConfig");
-    Notification notif    = (Notification) obj;
-    User         user     = (User) userDAO.find(notif.getUserId());
-    Notification oldNotif = (Notification) getDelegate().find(obj);
+    DAO          userDAO         = (DAO) x.get("localUserDAO");
+    DAO          settingDAO      = (DAO) x.get("localNotificationSettingDAO");
+    AppConfig    config          = (AppConfig) x.get("appConfig");
+    Notification notification    = (Notification) obj;
+    User         user            = (User) userDAO.find(notification.getUserId());
+    Notification oldNotification = (Notification) getDelegate().find(obj);
 
-    if ( oldNotif != null ) return super.put_(x, obj);
+    if ( oldNotification != null ) 
+      return super.put_(x, obj);
 
-    if ( ! notif.getEmailIsEnabled() || user == null ) return super.put_(x, obj);
+    if ( ! notification.getEmailIsEnabled() || user == null ) 
+      return super.put_(x, obj);
 
-    if ( user.getLifecycleState() != LifecycleState.ACTIVE ) {
-      return getDelegate().put_(x, obj);
+    if ( user.getLifecycleState() != LifecycleState.ACTIVE )
+      return super.put_(x, obj);
+
+    if ( "notification".equals(notification.getEmailName()) ) {
+      notification.getEmailArgs().put("type", notification.getNotificationType());
+      notification.getEmailArgs().put("link", config.getUrl());
     }
+  
+    // Retrieve the email settings for this user
+    EmailSetting emailSetting = (EmailSetting) settingDAO.find(
+      AND(
+        EQ(Notification.OWNER, user.getId()),
+        CLASS_OF(EmailSetting.class)
+      ));
 
-    if ( user.getDisabledTopicsEmail2() != null ) {
-      List disabledTopics = Arrays.asList(user.getDisabledTopicsEmail2());
-      if ( disabledTopics.contains(notif.getNotificationType()) ) {
-        return super.put_(x,obj);
-      }
-    }
+    // If no email settings exist, use a new instance as notifications are assumed to be 'on'
+    emailSetting = (emailSetting != null) ? emailSetting : new EmailSetting.Builder(x).setOwner(user.getId()).build();
 
-    if ( "notification".equals(notif.getEmailName()) ) {
-      notif.getEmailArgs().put("type", notif.getNotificationType());
-      notif.getEmailArgs().put("link", config.getUrl());
-    }
+    // Send the email notification
+    emailSetting.sendNotification(x, user, notification);
 
-    EmailMessage message = new EmailMessage();
-    message.setTo(new String[]{user.getEmail()});
-
-    try {
-      if ( foam.util.SafetyUtil.isEmpty(notif.getEmailName()) ) {
-        message.setSubject(notif.getTemplate());
-        message.setBody(notif.getBody());
-        EmailsUtility.sendEmailFromTemplate(x, null, message, null, null);
-      } else {
-        EmailsUtility.sendEmailFromTemplate(x, user, message, notif.getEmailName(), notif.getEmailArgs());
-      }
-    } catch(Throwable t) {
-      System.err.println("Error sending notification email message: "+message+". Error: " + t);
-    }
-
-    return super.put_(x, notif);
+    return super.put_(x, notification);
   }
 }

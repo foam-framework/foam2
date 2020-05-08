@@ -64,7 +64,19 @@ public class SendNotificationDAO
   }
 
   public void send(User user, Notification notification, X x) {
-    NotificationSetting notificationSetting = new NotificationSetting.Builder(x).build();
+    DAO          notificationSettingDAO = (DAO) x.get("localNotificationSettingDAO");
+
+    // Retrieve the notification settings for this user
+    NotificationSetting notificationSetting = (EmailSetting) notificationSettingDAO.find(
+      AND(
+        EQ(Notification.OWNER, user.getId()),
+        CLASS_OF(NotificationSetting.class)
+      ));
+
+    // If no notification settings exist, use a new instance as notifications are assumed to be 'on'
+    notificationSetting = notificationSetting != null ? notificationSetting : new NotificationSetting.Builder(x).setOwner(user.getId()).build();
+
+    // Send the notification
     notificationSetting.sendNotification(x, user, notification);
   }
 }

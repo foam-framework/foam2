@@ -26,6 +26,7 @@ the notification will be handled. `,
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.dao.Sink',
+    'foam.nanos.logger.Logger',
     'java.util.List'
   ],
 
@@ -53,12 +54,13 @@ the notification will be handled. `,
         Notification notification = (Notification) obj;
         Notification template = notification;
         DAO dao = (DAO) x.get("notificationTemplateDAO");
-//System.out.println("NotificationTemplateDAO template: "+notification.getTemplate());
+        Logger logger = (Logger) x.get("logger");
+        logger.debug("NotificationTemplateDAO template: "+notification.getTemplate());
         if ( ! foam.util.SafetyUtil.isEmpty(notification.getTemplate()) ) {
           Sink sink = dao.where(foam.mlang.MLang.EQ(Notification.TEMPLATE, notification.getTemplate())).select(null);
           List templates = ((ArraySink) sink).getArray();
           if ( templates.size() > 1 ) {
-            System.err.println("Multiple Notification templates for "+notification.getTemplate()+" found.");
+            logger.error("Multiple Notification templates for "+notification.getTemplate()+" found.");
             return notification;
           } else if ( templates.size() == 1 ) {
             template = (Notification) ((FObject)templates.get(0)).fclone();
@@ -67,7 +69,7 @@ the notification will be handled. `,
             template.setBody(notification.getBody());
             template.setRead(notification.getRead());
           } else {
-            System.err.println("Notification template "+notification.getTemplate()+" not found.");
+            logger.error("Notification template "+notification.getTemplate()+" not found.");
             return notification;
           }
         }
