@@ -25,7 +25,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'FObjectArray',
+      class: 'Array',
       of: 'String',
       name: 'properties',
       javaFactory: 'return new String[0];'
