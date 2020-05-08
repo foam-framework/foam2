@@ -138,7 +138,6 @@ foam.CLASS({
     }
 
     ^mode-card {
-      margin-bottom: 40px;
     }
 
     ^mode-circle {
