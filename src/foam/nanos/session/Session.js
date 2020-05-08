@@ -227,8 +227,23 @@ foam.CLASS({
         // used as the argument to this method.
         X rtn = reset(x);
 
+        ThemeDomain td = null;
+        Theme    theme = null;
+
+        HttpServletRequest req = x.get(HttpServletRequest.class);
+        if ( req != null ) {
+          td = (ThemeDomain) ((DAO) x.get("themeDomainDAO")).find(req.getServerName());
+          theme = (Theme) ((DAO) x.get("themeDAO")).find(td.getTheme());
+        }
+
+        if ( theme != null ) {
+          rtn = rtn.put("theme", theme);
+        } else {
+          theme = new Theme();
+          rtn = rtn.put("theme", theme);
+        }
+
         if ( getUserId() == 0 ) {
-          HttpServletRequest req = x.get(HttpServletRequest.class);
           if ( req == null ) {
             // null during test runs
             return rtn;
@@ -236,16 +251,9 @@ foam.CLASS({
           AppConfig appConfig = (AppConfig) x.get("appConfig");
           appConfig = (AppConfig) appConfig.fclone();
 
-          ThemeDomain td = (ThemeDomain) ((DAO) x.get("themeDomainDAO")).find(req.getServerName());
-          if ( td != null ) {
-            Theme theme = (Theme) ((DAO) x.get("themeDAO")).find(td.getTheme());
-            if ( theme != null ) {
-              AppConfig themeAppConfig = theme.getAppConfig();
-              if ( themeAppConfig != null ) {
-                appConfig.copyFrom(themeAppConfig);
-              }
-              rtn = rtn.put("theme", theme);
-            }
+          AppConfig themeAppConfig = theme.getAppConfig();
+          if ( themeAppConfig != null ) {
+            appConfig.copyFrom(themeAppConfig);
           }
 
           String configUrl = ((Request) req).getRootURL().toString();

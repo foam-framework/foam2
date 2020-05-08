@@ -46,7 +46,7 @@ public class EmailsUtility {
 
     String group = user != null ? user.getGroup() : "";
     Theme theme = x.get("theme");
-    AppConfig appConfig = x.get("appConfig");
+    AppConfig appConfig = theme.getAppConfig();
 
     // Add template name to templateArgs, to avoid extra parameter passing
     if ( ! SafetyUtil.isEmpty(templateName) ) {
@@ -56,8 +56,11 @@ public class EmailsUtility {
         templateArgs = new HashMap<>();
         templateArgs.put("template", templateName);
       }
-      templateArgs.put("supportPhone", (theme.findSupportUser(x)).getPhoneNumber());
-      templateArgs.put("supportEmail", (theme.findSupportUser(x)).getEmail());
+      templateArgs.put("supportPhone", (theme.getSupportPhone());
+      templateArgs.put("supportEmail", (theme.getSupportEmail());
+      templateArgs.put("supportName", (theme.getName());
+      templateArgs.put("logo", (theme.getLogo());
+      templateArgs.put("link", (appConfig.getUrl());
       emailMessage.setTemplateArguments(templateArgs);
     }
 
