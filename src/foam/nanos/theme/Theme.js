@@ -352,8 +352,7 @@ foam.CLASS({
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
-      name: 'supportUser',
-      visibility: 'HIDDEN',
+      name: 'supportUser'
     },
     {
       class: 'DateTime',

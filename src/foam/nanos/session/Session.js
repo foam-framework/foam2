@@ -227,8 +227,16 @@ foam.CLASS({
         // used as the argument to this method.
         X rtn = reset(x);
 
+        ThemeDomain td = null;
+        Theme    theme = null;
+
+        HttpServletRequest req = x.get(HttpServletRequest.class);
+        if ( req != null ) {
+          td = (ThemeDomain) ((DAO) x.get("themeDomainDAO")).find(req.getServerName());
+          theme = (Theme) ((DAO) x.get("themeDAO")).find(td.getTheme());
+        }
+
         if ( getUserId() == 0 ) {
-          HttpServletRequest req = x.get(HttpServletRequest.class);
           if ( req == null ) {
             // null during test runs
             return rtn;
@@ -236,14 +244,10 @@ foam.CLASS({
           AppConfig appConfig = (AppConfig) x.get("appConfig");
           appConfig = (AppConfig) appConfig.fclone();
 
-          ThemeDomain td = (ThemeDomain) ((DAO) x.get("themeDomainDAO")).find(req.getServerName());
-          if ( td != null ) {
-            Theme theme = (Theme) ((DAO) x.get("themeDAO")).find(td.getTheme());
-            if ( theme != null ) {
-              AppConfig themeAppConfig = theme.getAppConfig();
-              if ( themeAppConfig != null ) {
-                appConfig.copyFrom(themeAppConfig);
-              }
+          if ( theme != null ) {
+            AppConfig themeAppConfig = theme.getAppConfig();
+            if ( themeAppConfig != null ) {
+              appConfig.copyFrom(themeAppConfig);
             }
           }
 
@@ -280,21 +284,19 @@ foam.CLASS({
           ? new Object[] { String.format("%s (%d)", user.label(), user.getId()) }
           : new Object[] { String.format("%s (%d) acting as %s (%d)", agent.label(), agent.getId(), user.label(), user.getId()) };
         
-        HttpServletRequest req = x.get(HttpServletRequest.class);
-        if ( req != null ) {
-          ThemeDomain td = (ThemeDomain) ((DAO) x.get("themeDomainDAO")).find(req.getServerName());
-          Theme theme = (Theme) ((DAO) x.get("themeDAO")).find(td.getTheme());
-        if ( theme != null ) {
-          rtn = rtn.put("theme", theme);
-          }
-        }
-
         rtn = rtn
           .put("user", user)
           .put("agent", agent)
           .put("logger", new PrefixLogger(prefix, (Logger) x.get("logger")))
           .put("twoFactorSuccess", getContext().get("twoFactorSuccess"))
           .put(CachingAuthService.CACHE_KEY, getContext().get(CachingAuthService.CACHE_KEY));
+
+        if ( theme != null ) {
+          rtn = rtn.put("theme", theme);
+        } else {
+          theme = new Theme();
+          rtn = rtn.put("theme", theme);
+        }
 
         if ( user != null ) {
           rtn = rtn.put("spid", user.getSpid());
