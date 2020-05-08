@@ -45,7 +45,7 @@ foam.CLASS({
           .style({
             'background-color': '#f9f9f9',
             'left': self.parentId$.map((v) => v ? ( document.getElementById(v).getBoundingClientRect().x - 250 ) : 0 + 'px'),
-            'top': self.parentId$.map((v) => v ? document.getElementById(v).getBoundingClientRect().y : 0 + 'px'),
+            'top': '20px',//self.parentId$.map((v) => v ? document.getElementById(v).getBoundingClientRect().y : 0 + 'px'),
             'position': 'fixed',
             'overflow': 'scroll',
             'margin-bottom': '20px',
