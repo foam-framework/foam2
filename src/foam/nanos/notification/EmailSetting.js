@@ -55,6 +55,18 @@ foam.CLASS({
       `
     },
     {
+      name: 'doNotify',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'user', type: 'foam.nanos.auth.User' },
+        { name: 'notification', type: 'foam.nanos.notification.Notification' },
+      ],
+      javaCode: `
+        // Proxy to sendNotificaiton method
+        sendNotification(x, user, notification);
+      `
+    },
+    {
       name: 'sendNotification',
       javaCode: `
         if ( ! getEnabled() ) return;
@@ -87,16 +99,6 @@ foam.CLASS({
           Logger logger = (Logger) x.get("logger");
           logger.error("Error sending notification email message: " + message + ". Error: " + t);
         }
-      `
-    },
-    {
-      name: 'sendNotificationFromDAO',
-      args: [
-        { name: 'x', type: 'Context' },
-        { name: 'user', type: 'foam.nanos.auth.User' },
-        { name: 'notification', type: 'foam.nanos.notification.Notification' }
-      ],
-      javaCode: `
       `
     }
   ]

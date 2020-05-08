@@ -620,7 +620,7 @@ foam.CLASS({
       javaCode: `
         List<NotificationSetting> settings = ((ArraySink) getNotificationSettings(x).select(new ArraySink())).getArray();
         for( NotificationSetting setting : settings ) {
-          setting.sendNotification(x, this, notification);
+          setting.doNotify(x, this, notification);
         }
       `
     },

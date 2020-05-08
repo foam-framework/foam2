@@ -60,11 +60,27 @@ foam.CLASS({
 
   methods: [
     {
+      name: 'doNotify',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'user', type: 'foam.nanos.auth.User' },
+        { name: 'notification', type: 'foam.nanos.notification.Notification' },
+      ],
+      javaCode: `
+        // Disable email sending when performing a doNotify to prevent duplicate emails
+        notification = (Notification) notification.fclone();
+        notification.setEmailIsEnabled(false);
+
+        // Proxy to sendNotificaiton method
+        sendNotification(x, user, notification);
+      `
+    },
+    {
       name: 'sendNotification',
       args: [
         { name: 'x', type: 'Context' },
         { name: 'user', type: 'foam.nanos.auth.User' },
-        { name: 'notification', type: 'foam.nanos.notification.Notification' }
+        { name: 'notification', type: 'foam.nanos.notification.Notification' },
       ],
       javaCode: `
         if ( ! getEnabled() ) return;
@@ -82,7 +98,6 @@ foam.CLASS({
         notification.setUserId(user.getId());
         notification.setBroadcasted(false);
         notification.setGroupId(null);
-        notification.setEmailIsEnabled(false);
         try {
           notificationDAO.put_(x, notification);
         } catch (Throwable t) {
