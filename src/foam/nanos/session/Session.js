@@ -236,6 +236,13 @@ foam.CLASS({
           theme = (Theme) ((DAO) x.get("themeDAO")).find(td.getTheme());
         }
 
+        if ( theme != null ) {
+          rtn = rtn.put("theme", theme);
+        } else {
+          theme = new Theme();
+          rtn = rtn.put("theme", theme);
+        }
+
         if ( getUserId() == 0 ) {
           if ( req == null ) {
             // null during test runs
@@ -244,11 +251,9 @@ foam.CLASS({
           AppConfig appConfig = (AppConfig) x.get("appConfig");
           appConfig = (AppConfig) appConfig.fclone();
 
-          if ( theme != null ) {
-            AppConfig themeAppConfig = theme.getAppConfig();
-            if ( themeAppConfig != null ) {
-              appConfig.copyFrom(themeAppConfig);
-            }
+          AppConfig themeAppConfig = theme.getAppConfig();
+          if ( themeAppConfig != null ) {
+            appConfig.copyFrom(themeAppConfig);
           }
 
           String configUrl = ((Request) req).getRootURL().toString();
@@ -290,13 +295,6 @@ foam.CLASS({
           .put("logger", new PrefixLogger(prefix, (Logger) x.get("logger")))
           .put("twoFactorSuccess", getContext().get("twoFactorSuccess"))
           .put(CachingAuthService.CACHE_KEY, getContext().get(CachingAuthService.CACHE_KEY));
-
-        if ( theme != null ) {
-          rtn = rtn.put("theme", theme);
-        } else {
-          theme = new Theme();
-          rtn = rtn.put("theme", theme);
-        }
 
         if ( user != null ) {
           rtn = rtn.put("spid", user.getSpid());
