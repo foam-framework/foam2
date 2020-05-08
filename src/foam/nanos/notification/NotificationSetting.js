@@ -60,7 +60,7 @@ foam.CLASS({
       args: [
         { name: 'x', type: 'Context' },
         { name: 'user', type: 'foam.nanos.auth.User' },
-        { name: 'notification', type: 'foam.nanos.notification.Notification' },
+        { name: 'notification', type: 'foam.nanos.notification.Notification' }
       ],
       javaCode: `
         // Disable email sending when performing a doNotify to prevent duplicate emails
@@ -76,7 +76,7 @@ foam.CLASS({
       args: [
         { name: 'x', type: 'Context' },
         { name: 'user', type: 'foam.nanos.auth.User' },
-        { name: 'notification', type: 'foam.nanos.notification.Notification' },
+        { name: 'notification', type: 'foam.nanos.notification.Notification' }
       ],
       javaCode: `
         DAO notificationDAO = (DAO) x.get("localNotificationDAO");
