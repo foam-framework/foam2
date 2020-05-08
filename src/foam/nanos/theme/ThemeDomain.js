@@ -26,7 +26,7 @@ foam.CLASS({
       class: 'Reference',
       of: 'foam.nanos.theme.Theme',
       tableCellFormatter: function(value, obj, axiom) {
-        value$find
+        obj.theme$find
           .then((theme) => {
             if ( theme ) {
               this.add(theme.toSummary);

@@ -16,10 +16,11 @@ foam.CLASS({
 
   implements: [
     'foam.nanos.auth.CreatedAware',
-    'foam.nanos.auth.CreatedByAware',
+// REVIEW: implementation properties are class: 'Long' as we have a cyclic reference with User, and hence can't use class: 'Reference'. But even as Long, enable these interfaces causes genjava failures: ERROR: Unhandled promise rejection TypeError: Cannot read property 'id' of null
+//    'foam.nanos.auth.CreatedByAware',
     'foam.nanos.auth.EnabledAware',
     'foam.nanos.auth.LastModifiedAware',
-    'foam.nanos.auth.LastModifiedByAware'
+//    'foam.nanos.auth.LastModifiedByAware'
   ],
 
   tableColumns: [
@@ -93,6 +94,11 @@ foam.CLASS({
       value: true,
       includeInDigest: true,
       section: 'administration'
+    },
+    {
+      class: 'String',
+      name: 'appName',
+      section: 'infoSection',
     },
     {
       name: 'domains',
@@ -327,8 +333,7 @@ foam.CLASS({
       factory: function() { return foam.nanos.app.AppConfig.create({}); }
     },
     {
-      class: 'Reference',
-      of: 'foam.nanos.auth.User',
+      class: 'Long',
       name: 'createdBy',
       includeInDigest: true,
       documentation: `The unique identifier of the user.`,
@@ -349,8 +354,7 @@ foam.CLASS({
       section: 'administration'
     },
     {
-      class: 'Reference',
-      of: 'foam.nanos.auth.User',
+      class: 'Long',
       name: 'createdByAgent',
       visibility: 'HIDDEN',
     },
@@ -364,8 +368,7 @@ foam.CLASS({
       section: 'administration'
     },
     {
-      class: 'Reference',
-      of: 'foam.nanos.auth.User',
+      class: 'Long',
       name: 'lastModifiedBy',
       includeInDigest: true,
       documentation: `The unique identifier of the user.`,
@@ -401,8 +404,16 @@ foam.CLASS({
     {
       class: 'String',
       name: 'supportEmail'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.nanos.auth.Address',
+      name: 'supportAddress',
+      factory: function() {
+        return this.Address.create();
+      },
     }
- ],
+  ],
 
   actions: [
     {

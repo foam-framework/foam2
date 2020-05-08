@@ -235,13 +235,10 @@ foam.CLASS({
           td = (ThemeDomain) ((DAO) x.get("themeDomainDAO")).find(req.getServerName());
           theme = (Theme) ((DAO) x.get("themeDAO")).find(td.getTheme());
         }
-
-        if ( theme != null ) {
-          rtn = rtn.put("theme", theme);
-        } else {
-          theme = new Theme();
-          rtn = rtn.put("theme", theme);
+        if ( theme == null ) {
+          theme = new Theme.Builder(x).setAppName("FOAM").build();
         }
+        rtn = rtn.put("theme", theme);
 
         if ( getUserId() == 0 ) {
           if ( req == null ) {
@@ -255,25 +252,9 @@ foam.CLASS({
           if ( themeAppConfig != null ) {
             appConfig.copyFrom(themeAppConfig);
           }
-
-          String configUrl = ((Request) req).getRootURL().toString();
-
-          if ( appConfig.getForceHttps() ) {
-            if ( configUrl.startsWith("https://") ) {
-               // Don't need to do anything.
-            } else if ( configUrl.startsWith("http://") ) {
-              configUrl = "https" + configUrl.substring(4);
-            } else {
-              configUrl = "https://" + configUrl;
-            }
-          }
-          if ( configUrl.endsWith("/") ) {
-            configUrl = configUrl.substring(0, configUrl.length()-1);
-          }
-          appConfig.setUrl(configUrl);
+          appConfig = appConfig.configure(x, null);
 
           rtn = rtn.put("appConfig", appConfig);
-
           return rtn;
         }
 
@@ -298,6 +279,7 @@ foam.CLASS({
 
         if ( user != null ) {
           rtn = rtn.put("spid", user.getSpid());
+          rtn = rtn.put("theme", user.getTheme(rtn));
         }
 
         // We need to do this after the user and agent have been put since

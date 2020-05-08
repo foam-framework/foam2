@@ -45,8 +45,8 @@ public class EmailsUtility {
     }
 
     String group = user != null ? user.getGroup() : "";
-    Theme theme = x.get("theme");
-    AppConfig appConfig = theme.getAppConfig();
+    Theme theme = (Theme) x.get("theme");
+    AppConfig appConfig = (AppConfig) x.get("appConfig");
 
     // Add template name to templateArgs, to avoid extra parameter passing
     if ( ! SafetyUtil.isEmpty(templateName) ) {
@@ -56,11 +56,13 @@ public class EmailsUtility {
         templateArgs = new HashMap<>();
         templateArgs.put("template", templateName);
       }
-      templateArgs.put("supportPhone", (theme.getSupportPhone());
-      templateArgs.put("supportEmail", (theme.getSupportEmail());
-      templateArgs.put("supportName", (theme.getName());
-      templateArgs.put("logo", (theme.getLogo());
-      templateArgs.put("link", (appConfig.getUrl());
+      templateArgs.put("supportPhone", (theme.getSupportPhone()));
+      templateArgs.put("supportEmail", (theme.getSupportEmail()));
+      foam.nanos.auth.Address address = theme.getSupportAddress();
+      templateArgs.put("supportAddress", address == null ? "" : address.toSummary());
+      templateArgs.put("appName", (theme.getAppName()));
+      templateArgs.put("logo", (theme.getLogo()));
+      templateArgs.put("link", (appConfig.getUrl()));
       emailMessage.setTemplateArguments(templateArgs);
     }
 

@@ -2,6 +2,7 @@ p({
   "class":"foam.nanos.theme.Theme",
   "id":"79B87FC0-C622-417A-A14A-2A04DD348CBD",
   "name":"foam",
+  "appName":"FOAM",
   "description":"The default FOAM theme.",
   "defaultMenu":"admin.nspec",
   "logo":"images/foam_red.png",
