@@ -2,10 +2,12 @@ package foam.util.Emails;
 
 import foam.core.X;
 import foam.dao.DAO;
+import foam.nanos.app.AppConfig;
 import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
 import foam.nanos.notification.email.EmailMessage;
 import foam.nanos.notification.email.EmailPropertyService;
+import foam.nanos.theme.Theme;
 import foam.util.SafetyUtil;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,6 +45,8 @@ public class EmailsUtility {
     }
 
     String group = user != null ? user.getGroup() : "";
+    Theme theme = (Theme) x.get("theme");
+    AppConfig appConfig = (AppConfig) x.get("appConfig");
 
     // Add template name to templateArgs, to avoid extra parameter passing
     if ( ! SafetyUtil.isEmpty(templateName) ) {
@@ -52,6 +56,13 @@ public class EmailsUtility {
         templateArgs = new HashMap<>();
         templateArgs.put("template", templateName);
       }
+      templateArgs.put("supportPhone", (theme.getSupportPhone()));
+      templateArgs.put("supportEmail", (theme.getSupportEmail()));
+      foam.nanos.auth.Address address = theme.getSupportAddress();
+      templateArgs.put("supportAddress", address == null ? "" : address.toSummary());
+      templateArgs.put("appName", (theme.getAppName()));
+      templateArgs.put("logo", (theme.getLogo()));
+      templateArgs.put("link", (appConfig.getUrl()));
       emailMessage.setTemplateArguments(templateArgs);
     }
 
