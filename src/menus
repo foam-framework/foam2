@@ -122,6 +122,19 @@ p({
   },
   "parent":"admin"
 })
+p({
+  "class":"foam.nanos.menu.Menu",
+  "id":"admin.googleApiCredentials",
+  "label":"Google Api Credentials",
+  "handler":{
+    "class":"foam.nanos.menu.DAOMenu2",
+    "config":{
+      "class":"foam.comics.v2.DAOControllerConfig",
+      "daoKey":"googleApiCredentialsDAO"
+    }
+  },
+  "parent":"admin"
+})
 
 // integration
 p({"class":"foam.nanos.menu.Menu","id":"integration","label":"Integration","handler":{"class":"foam.nanos.menu.SubMenu"},"parent":""})
