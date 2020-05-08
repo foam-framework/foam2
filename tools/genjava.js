@@ -183,9 +183,6 @@ function generateClass(cls) {
   if ( typeof cls === 'string' )
     cls = foam.lookup(cls);
 
-  if ( foam.core.AbstractException.isSubClass(cls) ) {
-    generateNativeException(cls);
-  }
   logger.debug('call/generateClass:cls.id', cls.id);
 
   if ( fileWhitelist !== null ) {
@@ -209,6 +206,9 @@ function generateClass(cls) {
   ensurePath(outfile);
 
   writeFileIfUpdated(outfile, cls.buildJavaClass().toJavaSource());
+  if ( foam.core.AbstractException.isSubClass(cls) ) {
+    generateNativeException(cls);
+  }
 }
 
 function generateAbstractClass(cls) {
@@ -249,8 +249,6 @@ function generateNativeException(cls) {
   if ( typeof cls === 'string' )
     cls = foam.lookup(cls);
 
-  // cls.name = foam.String.toNativeExceptionName(cls.name)
-  console.log(">>>>>>", cls)
   var outfile = outdir + path_.sep +
     cls.package.replace(/\./g, path_.sep) +
     path_.sep + foam.String.toNativeExceptionName(cls.name) + '.java';
