@@ -102,9 +102,25 @@ foam.CLASS({
       console.log(e.target.id);
       var targetView = this.views.find(v => v.id == document.getElementById(e.currentTarget.id).childNodes[0].id);
       var draggableView = this.views.find(v => v.id == document.getElementById(e.dataTransfer.getData('draggableId')).childNodes[0].id);
-      var targetData = targetView.prop;
-      targetView.prop = draggableView.prop;
-      draggableView.prop = targetData;
+      var targetIndex = this.views.indexOf(targetView);
+      var draggableIndex = this.views.indexOf(draggableView);
+
+      var thisProps = this.views.map(v => v.prop);
+      thisProps = [...thisProps];
+      var prop;
+      var replaceIndex;
+      prop = this.views[draggableIndex].prop;
+      replaceIndex = targetIndex;
+      if (targetIndex > draggableIndex) {
+        for (var i = draggableIndex; i < targetIndex; i++) {
+          this.views[i].prop = thisProps[i+1];
+        }
+      } else {
+        for (var i = targetIndex+1; i <= draggableIndex; i++) {
+          this.views[i].prop = thisProps[i-1];
+        }
+      }
+      this.views[replaceIndex].prop = prop;
     }
   ]
 });
