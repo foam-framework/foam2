@@ -63,9 +63,9 @@ foam.CLASS({
       name: 'views',
       expression: function(columns) {
         var arr = [];
-        columns.forEach(c => {
-          arr.push(this.RootColumnConfigPropView.create({prop:c}));
-        });
+        for(var i = 0; i < columns.length; i++) {
+          arr.push(this.RootColumnConfigPropView.create({index: i, prop:columns[i], onDragAndDrop:this.resetProperties.bind(this)}));
+        }
         return arr;
       }
     },
@@ -87,39 +87,13 @@ foam.CLASS({
             .forEach(views, function(view) {
               this
                 .start()
-                .callIf(view.prop.isPropertySelected, function() {
-                  this
-                    .attrs({ draggable: 'true' }).
-                    on('dragstart', self.onDragStart.bind(self)).
-                    on('dragenter', self.onDragOver.bind(self)).
-                    on('dragover',  self.onDragOver.bind(self)).
-                    on('drop',      self.onDrop.bind(self));
-                 })
                  .add(view)
                 .end();
             });
          }))
       .end();
-    }
-  ],
-  listeners: [
-    function onDragStart(e){
-      console.log('dragstart');
-      e.dataTransfer.setData('draggableId', e.currentTarget.id);
     },
-    function onDragOver(e){
-      console.log('dragover');
-      e.preventDefault();
-    },
-    function onDrop(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      console.log(e.target.id);
-      var targetView = this.views.find(v => v.id == document.getElementById(e.currentTarget.id).childNodes[0].id);
-      var draggableView = this.views.find(v => v.id == document.getElementById(e.dataTransfer.getData('draggableId')).childNodes[0].id);
-      var targetIndex = this.views.indexOf(targetView);
-      var draggableIndex = this.views.indexOf(draggableView);
-
+    function resetProperties(targetIndex, draggableIndex) {
       var thisProps = this.views.map(v => v.prop);
       thisProps = [...thisProps];
       var prop;
@@ -151,7 +125,45 @@ foam.CLASS({
       }
       return arr;
     }
-  ]
+  ],
+  // listeners: [
+  //   function onDragStart(e){
+  //     console.log('dragstart');
+  //     e.dataTransfer.setData('draggableId', e.currentTarget.id);
+  //   },
+  //   function onDragOver(e){
+  //     console.log('dragover');
+  //     e.preventDefault();
+  //   },
+  //   function onDrop(e) {
+  //     e.preventDefault();
+  //     e.stopPropagation();
+  //     console.log(e.target.id);
+  //     var targetView = this.views.find(v => v.id == document.getElementById(e.currentTarget.id).childNodes[0].id);
+  //     var draggableView = this.views.find(v => v.id == document.getElementById(e.dataTransfer.getData('draggableId')).childNodes[0].id);
+  //     var targetIndex = this.views.indexOf(targetView);
+  //     var draggableIndex = this.views.indexOf(draggableView);
+
+  //     var thisProps = this.views.map(v => v.prop);
+  //     thisProps = [...thisProps];
+  //     var prop;
+  //     var replaceIndex;
+  //     prop = this.views[draggableIndex].prop;
+  //     replaceIndex = targetIndex;
+  //     if (targetIndex > draggableIndex) {
+  //       for (var i = draggableIndex; i < targetIndex; i++) {
+  //         this.views[i].prop = thisProps[i+1];
+  //       }
+  //     } else {
+  //       for (var i = targetIndex+1; i <= draggableIndex; i++) {
+  //         this.views[i].prop = thisProps[i-1];
+  //       }
+  //     }
+  //     this.views[replaceIndex].prop = prop;
+  //     this.data.selectedColumnNames = this.rebuildSelectedColumns();
+  //     this.data.updateColumns();
+  //   }
+  // ]
 });
 
 foam.CLASS({
@@ -174,13 +186,25 @@ foam.CLASS({
       name: 'body',
       value: { class:'foam.u2.view.ColumnViewBody'}
     },
-    'prop'
+    'prop',
+    'onDragAndDrop',
+    'index'
   ],
   methods: [
     function initE() {
       var self = this;
       this.SUPER();
       this
+        .add(this.slot(function(prop$isPropertySelected){
+          this.callIf(self.prop.isPropertySelected, function() {
+            this
+              .attrs({ draggable: 'true' }).
+                on('dragstart', self.onDragStart.bind(self)).
+                on('dragenter', self.onDragOver.bind(self)).
+                on('dragover',  self.onDragOver.bind(self)).
+                on('drop',      self.onDrop.bind(self));
+          })
+        }))
         .add(self.slot(function(prop) {
           return self.E().start()
             .add(foam.u2.ViewSpec.createView(self.head, {data$:self.prop$},  self, self.__subSubContext__))
@@ -189,6 +213,22 @@ foam.CLASS({
             .add(foam.u2.ViewSpec.createView(self.body, {data$:self.prop$},  self, self.__subSubContext__))
           .end();
         }));
+    }
+  ],
+  listeners: [
+    function onDragStart(e){
+      console.log('dragstart');
+      e.dataTransfer.setData('draggableId', this.index);
+    },
+    function onDragOver(e){
+      console.log('dragover');
+      e.preventDefault();
+    },
+    function onDrop(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.onDragAndDrop(this.index, e.dataTransfer.getData('draggableId'));
+      console.log(e.target.id);
     }
   ]
 });
