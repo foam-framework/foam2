@@ -148,24 +148,35 @@ foam.CLASS({
     },
 
     function onSelect(draggableIndex) {
-      var i = 0;
-      while(true) {
-        if ( !this.views[i].prop.isPropertySelected )
-          break;
-        i++;
-      }
-      this.resetProperties(i, draggableIndex);
+      var startUnselectedIndex = this.views.find(v => !v.prop.isPropertySelected);
+      if (!startUnselectedIndex)
+        return;
+      startUnselectedIndex =  startUnselectedIndex.index;
+      
+      if ( draggableIndex > startUnselectedIndex )
+        return this.resetProperties(startUnselectedIndex, draggableIndex);
     },
     function onUnSelect(draggableIndex) {
-      var i = draggableIndex;
-      var thisPropertyLabel = this.views[draggableIndex].prop.rootProperty[1].toLowerCase();
-      while(true) {
-        if ( !this.views[i].prop.isPropertySelected && thisPropertyLabel.toLowerCase().localeCompare(this.views[i].prop.rootProperty[1].toLowerCase()) < 0 )
-          break;
-        i++;
+      var startUnselectedIndex = this.views.find(v => !v.prop.isPropertySelected && v.index !== draggableIndex);
+      if (!startUnselectedIndex)
+        return this.resetProperties(this.views.length - 1, draggableIndex);
 
+      startUnselectedIndex =  startUnselectedIndex.index;
+      if ( startUnselectedIndex - draggableIndex === 1 ) {
+        if ( this.views[draggableIndex].prop.rootProperty[1].toLowerCase().localeCompare(this.views[startUnselectedIndex].prop.rootProperty[1].toLowerCase()) < 1 )
+          return this.resetProperties(startUnselectedIndex-1, draggableIndex);
       }
-      this.resetProperties(i, draggableIndex);
+      
+      while(startUnselectedIndex < this.views.length) {
+        // if (startUnselectedIndex === this.views.length - 1)
+        //   return this.resetProperties(this.views.length - 1, draggableIndex);
+        
+        if (this.views[draggableIndex].prop.rootProperty[1].toLowerCase().localeCompare(this.views[startUnselectedIndex].prop.rootProperty[1].toLowerCase()) < 0 ) {
+          break;
+        }
+        startUnselectedIndex++;
+      }
+      return this.resetProperties(startUnselectedIndex-1, draggableIndex);
     }
   ]
 });
@@ -231,7 +242,7 @@ foam.CLASS({
     function onDrop(e) {
       e.preventDefault();
       e.stopPropagation();
-      this.onDragAndDrop(this.index, e.dataTransfer.getData('draggableId'));
+      this.onDragAndDrop(this.index, parseInt(e.dataTransfer.getData('draggableId')));
       console.log(e.target.id);
     }
   ]
@@ -300,7 +311,7 @@ foam.CLASS({
           .addClass(this.myClass('some-padding'))
           .add(this.slot(function(data$isPropertySelected) {
             this.style({
-              'padding-left' : this.data.level * 15 + ( ( this.data.level === 0 && this.data.selectedColumns.length > 0 && this.data.selectedColumns[this.data.level] !== this.data.rootProperty[0]) ? 5 : 0 ) + 'px'
+              'padding-left' : this.data.level * 15 + 5 + 'px'
             });
           }))
           .start('span')
