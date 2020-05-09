@@ -1623,8 +1623,10 @@ foam.CLASS({
       if ( this.javaType != 'byte[]' && this.javaType != 'Object[]' )
         info.getMethod('cast').body = 'Object[] a = (Object[]) o; return java.util.Arrays.copyOf(a, a.length, ' + this.javaType + '.class);';
 
+      // TODO: **********************************************************
+      // add 'if' to avoid breaking build, but check why, KGR
       var isDefaultValue = info.getMethod('isDefaultValue');
-      isDefaultValue.body = 'return java.util.Arrays.equals(get_(o), null);';
+      if ( isDefaultValue ) isDefaultValue.body = 'return java.util.Arrays.equals(get_(o), null);';
 
       return info;
     }
