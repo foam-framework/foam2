@@ -31,12 +31,12 @@ foam.CLASS({
     'foam.dao.ArraySink',
     'foam.nanos.auth.LifecycleAware',
     'foam.nanos.auth.LifecycleState',
-    'foam.nanos.session.Session',
-
+    'static foam.mlang.MLang.EQ',
     'foam.nanos.notification.NotificationSetting',
+    'foam.nanos.session.Session',
+    'foam.nanos.theme.Theme',
     'foam.util.SafetyUtil',
-    'java.util.List',
-    'static foam.mlang.MLang.EQ'
+    'java.util.List'
   ],
 
   documentation: `The User represents a person or entity with the ability
@@ -111,7 +111,11 @@ foam.CLASS({
       updateVisibility: 'RO',
       section: 'administrative',
       includeInDigest: true
-   },
+    },
+    {
+      name: 'spid',
+      class: 'String'
+    },
     {
       class: 'Boolean',
       name: 'enabled',
@@ -656,6 +660,33 @@ foam.CLASS({
           throw new AuthenticationException("User is not active");
         }
       `
+    },
+    {
+      documentation: `Acquire theme through users spid.`,
+      name: 'getTheme',
+      type: 'foam.nanos.theme.Theme',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      code: async function(x) {
+        var theme = await this.theme$find;
+        if ( theme ) return theme;
+        var group = await this.group$find;
+        theme = group.theme$find;
+        if ( theme ) return theme;
+        return x.theme;
+      },
+      javaCode: `
+      Theme theme = findTheme(x);
+      if ( theme != null ) return theme;
+      Group group = findGroup(x);
+      theme = group.findTheme(x);
+      if ( theme != null ) return theme;
+      return (Theme) x.get("theme");
+      `
     }
   ]
 });
@@ -734,4 +765,19 @@ foam.CLASS({
       name: 'group'
     }
   ]
+});
+
+foam.RELATIONSHIP({
+  sourceModel: 'foam.nanos.theme.Theme',
+  targetModel: 'foam.nanos.auth.User',
+  cardinality: '1:*',
+  forwardName: 'users',
+  inverseName: 'theme',
+  sourceProperty: {
+    hidden: true,
+    visibility: 'HIDDEN',
+  },
+  targetProperty: {
+    section: 'administrative'
+  }
 });
