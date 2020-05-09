@@ -298,9 +298,11 @@ foam.CLASS({
         // .enableClass(this.myClass('selected'), this.data.isPropertySelected)
         .start()
           .addClass(this.myClass('some-padding'))
-          .style({
-            'padding-left' : this.data.level * 15 + ( ( this.data.level === 0 && this.data.selectedColumns.length > 0 && this.data.selectedColumns[this.data.level] !== this.data.rootProperty[0]) ? 5 : 0 ) + 'px'
-          })
+          .add(this.slot(function(data$isPropertySelected) {
+            this.style({
+              'padding-left' : this.data.level * 15 + ( ( this.data.level === 0 && this.data.selectedColumns.length > 0 && this.data.selectedColumns[this.data.level] !== this.data.rootProperty[0]) ? 5 : 0 ) + 'px'
+            });
+          }))
           .start('span')
             .show(this.data.isPropertySelected$)
             .add(this.CHECK_MARK)
