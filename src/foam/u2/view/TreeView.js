@@ -36,17 +36,27 @@ foam.CLASS({
       color: #406dea;
     }
 
+    ^label-container {
+      display: flex;
+      align-items: center;
+    }
+
     ^label {
       min-width: 120px;
       padding: 4px;
-      font-weight: 500;
+      font-weight: normal;
       display: inline-block;
+      color: #9BA1A6;
+      font-family: "IBM Plex Sans";
       font-size: 14px;
-      color: /*%BLACK%*/ #1e1f21;
+      letter-spacing: 0;
+      line-height: 21px;
     }
 
     ^heading {
       border-left: 4px solid rgba(0,0,0,0);
+      display: flex;
+      align-items: center;
     }
 
     ^select-level {
@@ -55,9 +65,13 @@ foam.CLASS({
 
     ^selected > ^heading {
       background-color: #e5f1fc !important;
-      color: #406dea;
       border-left: 4px solid /*%PRIMARY3%*/ #406dea;
-      }
+    }
+
+    ^selected > ^heading > ^label{
+      color: #1E1F21 !important;
+      font-weight: bold;
+    }
   `,
 
   properties: [
@@ -186,32 +200,34 @@ foam.CLASS({
         }).
         start().
           addClass(self.myClass('heading')).
-          start('span').
             style({
-              'padding-left': (( self.level * 16 ) + 'px')
+              'padding-left': ((( self.level - 1) * 16 + 28) + 'px')
             }).
+            add(this.slot( function(level) {
+              if ( level === 1 ) {
+                return this.E().start('img').
+                  addClass(self.myClass('label-icon')).
+                  attrs({ 'src': 'images/ablii/settings.svg', 'width': '16px', 'height': '16px' }).
+                end();
+              }
+            })).
             start().
               addClass(self.myClass('select-level')).
               style({
-                'font-weight': self.hasChildren$.map(function(c) { return c ? 'bold' : 'normal'; }),
-                'width': (83 - (5 * (self.level - 1))) + '%'
+                'width': '100%',
+                'padding-right': '20px'
               }).
               addClass(self.myClass('label')).
               call(this.formatter, [self.data]).
               start('span').
               show(this.hasChildren$).
               style({
-                'vertical-align': 'middle',
-                'font-weight':    'bold',
-                'display':        'inline-block',
                 'visibility':     'visible',
                 'font-size':      '16px',
-                'float':          'right',
                 'transform':      this.expanded$.map(function(c) { return c ? 'rotate(180deg)' : 'rotate(90deg)'; })
               }).
               on('click', this.toggleExpanded).
               add('\u2303').
-            end().
             end().
           end().
         end().
