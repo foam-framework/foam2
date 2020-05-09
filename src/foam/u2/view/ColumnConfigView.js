@@ -98,6 +98,9 @@ foam.CLASS({
          }))
       .end();
     },
+    function onClose() {
+      this.columns.forEach(c => c.onClose());
+    },
     function onDragAndDrop(targetIndex, draggableIndex) {
       this.resetProperties(targetIndex, draggableIndex);
       this.data.updateColumns();
@@ -271,6 +274,7 @@ foam.CLASS({
         if ( this.isPropertySelected) {
           this.rootProperty = this.updateRootProperty();
           this.rootProperty.parentExpanded = false;
+          //set all to false
           this.rootProperty.expanded = false;
           this.isPropertySelected = false;
         }
@@ -456,13 +460,18 @@ foam.CLASS({
     'updateParent'
   ],
   methods: [
+    function onClose() {
+      this.subColumnSelectConfig.forEach(c => c.onClose());
+      this.expanded = false;
+    },
     function callOnSelect(isSelected, propertyNameSoFar) {
       var isSelectionChanged = this.isPropertySelected;
       if ( !this.hasSubProperties )
         this.isPropertySelected = isSelected;
       else {
         this.isPropertySelected = typeof this.subColumnSelectConfig.find(s => s.isPropertySelected) !== 'undefined';
-        this.expanded = false;
+        if ( !this.isPropertySelected )
+          this.expanded = false;
       }
       if ( this.level === 0 ) {
         if (isSelected)

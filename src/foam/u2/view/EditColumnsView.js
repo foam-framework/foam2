@@ -18,11 +18,13 @@ foam.CLASS({
       name: 'selectColumnsExpanded',
       class: 'Boolean' 
     },
-    'parentId'
+    'parentId',
+    'view'
   ],
   methods: [
     function closeDropDown(e) {
       e.stopPropagation();
+      this.view.onClose();
       this.selectColumnsExpanded = !this.selectColumnsExpanded;
     },
 
@@ -30,6 +32,7 @@ foam.CLASS({
       this.SUPER();
 
       var self = this;
+      this.view = foam.u2.view.ColumnConfigPropView.create({data:self.data});
       this.start()
         .show(this.selectColumnsExpanded$)
         .style({
@@ -52,7 +55,7 @@ foam.CLASS({
             'height': '700px',//will write calculation later
            // 'max-height': self.parentId$.map((v) => v ? window.innerWidth - document.getElementById(v).getBoundingClientRect().y - 1000 : 500 + 'px'),
           })
-          .add(foam.u2.view.ColumnConfigPropView.create({data:self.data}))
+          .add(this.view)
         .end()
       .on('click', this.closeDropDown.bind(this))
       .end();
