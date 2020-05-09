@@ -121,6 +121,7 @@ foam.CLASS({
         }
       }
       this.views[replaceIndex].prop = prop;
+      this.views[replaceIndex].prop.index = replaceIndex;
       this.data.selectedColumnNames = this.rebuildSelectedColumns();
     },
     function rebuildSelectedColumns() {
@@ -164,45 +165,7 @@ foam.CLASS({
       }
       this.resetProperties(i, draggableIndex);
     }
-  ],
-  // listeners: [
-  //   function onDragStart(e){
-  //     console.log('dragstart');
-  //     e.dataTransfer.setData('draggableId', e.currentTarget.id);
-  //   },
-  //   function onDragOver(e){
-  //     console.log('dragover');
-  //     e.preventDefault();
-  //   },
-  //   function onDrop(e) {
-  //     e.preventDefault();
-  //     e.stopPropagation();
-  //     console.log(e.target.id);
-  //     var targetView = this.views.find(v => v.id == document.getElementById(e.currentTarget.id).childNodes[0].id);
-  //     var draggableView = this.views.find(v => v.id == document.getElementById(e.dataTransfer.getData('draggableId')).childNodes[0].id);
-  //     var targetIndex = this.views.indexOf(targetView);
-  //     var draggableIndex = this.views.indexOf(draggableView);
-
-  //     var thisProps = this.views.map(v => v.prop);
-  //     thisProps = [...thisProps];
-  //     var prop;
-  //     var replaceIndex;
-  //     prop = this.views[draggableIndex].prop;
-  //     replaceIndex = targetIndex;
-  //     if (targetIndex > draggableIndex) {
-  //       for (var i = draggableIndex; i < targetIndex; i++) {
-  //         this.views[i].prop = thisProps[i+1];
-  //       }
-  //     } else {
-  //       for (var i = targetIndex+1; i <= draggableIndex; i++) {
-  //         this.views[i].prop = thisProps[i-1];
-  //       }
-  //     }
-  //     this.views[replaceIndex].prop = prop;
-  //     this.data.selectedColumnNames = this.rebuildSelectedColumns();
-  //     this.data.updateColumns();
-  //   }
-  // ]
+  ]
 });
 
 foam.CLASS({
@@ -451,20 +414,12 @@ foam.CLASS({
       name: 'isPropertySelected',
       class: 'Boolean',
       expression: function() {
-        return this.selectedColumns.find(s => {
+        return typeof this.selectedColumns.find(s => {
           var propNames = s.split('.');
           return propNames.length > this.level && propNames[this.level] === this.rootProperty[0];
-        }) || false;
+        }) !== 'undefined';
       }
     },
-    // {
-    //   name: 'isPathSelected',
-    //   class: 'Boolean',
-    //   value: false,
-    //   postSet: function() {
-    //     this.isPropertySelected = ;
-    //   }
-    // },
     {
       name: 'level',
       class: 'Int',
@@ -486,21 +441,13 @@ foam.CLASS({
     'updateParent'
   ],
   methods: [
-    // function updateIsPropertySelected() {
-    //   return typeof this.selectedColumns.find(s => {
-    //       var propNames = s.split('.');
-    //       return propNames.length > this.level && propNames[this.level] === this.rootProperty[0];
-    //     })  !== "undefined";
-    // },
     function callOnSelect(isSelected, propertyNameSoFar) {
-      //bug
-      //need a way to update isPropertySelected
-      //for ie 2d level
-      //check if one of the children is selected???
       if ( !this.hasSubProperties )
         this.isPropertySelected = isSelected;
-      else
-        this.isPropertySelected = this.subColumnSelectConfig.find(s => s.isPropertySelected) || false;
+      else {
+        this.isPropertySelected = typeof this.subColumnSelectConfig.find(s => s.isPropertySelected) !== 'undefined';
+        this.expanded = false;
+      }
       if ( this.level === 0 ) {
         if (isSelected)
           this.selectedColumns.push(propertyNameSoFar ? this.rootProperty[0] + '.' + propertyNameSoFar : this.rootProperty[0]);
