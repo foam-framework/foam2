@@ -14,165 +14,106 @@ foam.CLASS({
     here.
   `,
 
-  implements: [
-    'foam.nanos.auth.CreatedAware',
-// REVIEW: implementation properties are class: 'Long' as we have a cyclic reference with User, and hence can't use class: 'Reference'. But even as Long, enable these interfaces causes genjava failures: ERROR: Unhandled promise rejection TypeError: Cannot read property 'id' of null
-//    'foam.nanos.auth.CreatedByAware',
-    'foam.nanos.auth.EnabledAware',
-    'foam.nanos.auth.LastModifiedAware',
-//    'foam.nanos.auth.LastModifiedByAware'
-  ],
-
   tableColumns: [
-    'enabled',
-    'name',
+    'id',
+    'priority',
     'description',
-    'domains',
     'preview'
   ],
 
   sections: [
     {
-      name: 'infoSection',
-      title: 'Info'
-    },
-    {
-      name: 'urlMapping',
-      title: 'URL Mapping'
-    },
-    {
       name: 'colours',
-      title: 'Colours'
-    },
-    {
-      name: 'images',
-      title: 'Icons / Images'
-    },
-    {
-      name: 'sectionCss',
-      title: 'CSS'
-    },
-    {
-      name: 'navigation',
-      title: 'Navigation'
+      title: 'Colour Scheme'
     },
     {
       name: 'inputs',
       title: 'Inputs'
-    },
-    {
-      name: 'applicationSection',
-      title: 'Application'
-    },
-    {
-      name: 'administration'
     }
   ],
 
   properties: [
     {
-      class: 'String',
+      class: 'Long',
       name: 'id',
-      includeInDigest: true,
-      section: 'infoSection',
-      createVisibility: 'HIDDEN',
-      updateVisibility: 'RO'
+      tableWidth: 70
     },
     {
       class: 'String',
-      name: 'name',
-      section: 'infoSection',
+      name: 'description'
     },
     {
       class: 'String',
-      name: 'description',
-      section: 'infoSection',
-    },
-    {
-      name: 'enabled',
-      class: 'Boolean',
-      value: true,
-      includeInDigest: true,
-      section: 'administration'
+      name: 'appName'
     },
     {
       class: 'String',
-      name: 'appName',
-      section: 'infoSection',
+      name: 'spid'
     },
     {
-      name: 'domains',
-      class: 'Array',
-      of: 'String',
-      factory: function(){
-        return  ['localhost'];
-      },
-      javaFactory: 'return new String[] { "localhost" };',
-      includeInDigest: true,
-      section: 'urlMapping'
+      class: 'Long',
+      name: 'priority',
+      documentation: `
+        When multiple Theme objects could be applied to a given situation,
+        this property is used to determine which one will be used.
+
+        For example, if an application has a default Theme but a user
+        copies it and modifies it to create their own Theme object, then
+        when that user logs in, we could either give them their own Theme
+        or the app's default Theme. Whichever Theme has the higher
+        priority will be used, which in this case should be the user's custom
+        Theme (assuming its priority was set to be greater than the
+        default Theme's priority).
+      `,
+      tableWidth: 100
     },
     {
       class: 'Reference',
       targetDAOKey: 'menuDAO',
       name: 'defaultMenu',
       documentation: 'Menu user redirects to after login.',
-      of: 'foam.nanos.menu.Menu',
-      section: 'navigation'
+      of: 'foam.nanos.menu.Menu'
     },
     {
       class: 'Image',
       name: 'logo',
       documentation: 'The logo to display in the application.',
-      displayWidth: 60,
-      view: {
-        class: 'foam.u2.tag.TextArea',
-        rows: 4, cols: 80
-      },
-      section: 'images'
+      displayWidth: 60
     },
     {
       class: 'Image',
       name: 'largeLogo',
       documentation: 'A large logo to display in the application.',
-      displayWidth: 60,
-      view: {
-        class: 'foam.u2.tag.TextArea',
-        rows: 4, cols: 80
-      },
-      section: 'images'
+      displayWidth: 60
     },
     {
       class: 'Boolean',
       name: 'largeLogoEnabled',
-      documentation: 'Uses largeLogo image on various views instead of logo.',
-      section: 'images'
+      documentation: 'Uses largeLogo image on various views instead of logo.'
     },
     {
       class: 'Color',
       name: 'logoBackgroundColour',
       documentation: 'The logo background colour to display in the application.',
-      section: 'images'
+      section: 'colours'
     },
     {
       class: 'String',
       name: 'topNavigation',
       documentation: 'A custom top nav view to use.',
       value: 'foam.nanos.u2.navigation.TopNavigation',
-      displayWidth: 45,
-      section: 'navigation'
+      displayWidth: 45
     },
     {
       class: 'String',
       name: 'footerView',
       documentation: 'A custom footer view to use.',
       value: 'foam.nanos.u2.navigation.FooterView',
-      displayWidth: 45,
-      section: 'navigation'
+      displayWidth: 45
     },
     {
       class: 'Code',
-      name: 'customCSS',
-      section: 'sectionCss'
+      name: 'customCSS'
     },
     {
       class: 'Color',
@@ -324,94 +265,6 @@ foam.CLASS({
       class: 'String',
       name: 'inputHorizontalPadding',
       section: 'inputs'
-    },
-    {
-      name: 'appConfig',
-      class: 'foam.core.FObjectProperty',
-      of: 'foam.nanos.app.AppConfig',
-      section: 'applicationSection',
-      factory: function() { return foam.nanos.app.AppConfig.create({}); }
-    },
-    {
-      class: 'Long',
-      name: 'createdBy',
-      includeInDigest: true,
-      documentation: `The unique identifier of the user.`,
-      createVisibility: 'HIDDEN',
-      updateVisibility: 'RO',
-      tableCellFormatter: function(value, obj, axiom) {
-        this.__subSubContext__.userDAO
-          .find(value)
-          .then((user) => {
-            if ( user ) {
-              this.add(user.legalName);
-            }
-          })
-          .catch((error) => {
-            this.add(value);
-          });
-      },
-      section: 'administration'
-    },
-    {
-      class: 'Long',
-      name: 'createdByAgent',
-      visibility: 'HIDDEN',
-    },
-    {
-      class: 'DateTime',
-      name: 'created',
-      includeInDigest: true,
-      documentation: 'The date and time the User was last modified.',
-      createVisibility: 'HIDDEN',
-      updateVisibility: 'RO',
-      section: 'administration'
-    },
-    {
-      class: 'Long',
-      name: 'lastModifiedBy',
-      includeInDigest: true,
-      documentation: `The unique identifier of the user.`,
-      createVisibility: 'HIDDEN',
-      updateVisibility: 'RO',
-      tableCellFormatter: function(value, obj, axiom) {
-        this.__subSubContext__.userDAO
-          .find(value)
-          .then((user) => {
-            if ( user ) {
-              this.add(user.legalName);
-            }
-          })
-          .catch((error) => {
-            this.add(value);
-          });
-      },
-      section: 'administration'
-    },
-    {
-      class: 'DateTime',
-      name: 'lastModified',
-      includeInDigest: true,
-      documentation: 'The date and time the User was last modified.',
-      createVisibility: 'HIDDEN',
-      updateVisibility: 'RO',
-      section: 'administration'
-    },
-    {
-      class: 'String',
-      name: 'supportPhone'
-    },
-    {
-      class: 'String',
-      name: 'supportEmail'
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.nanos.auth.Address',
-      name: 'supportAddress',
-      factory: function() {
-        return this.Address.create();
-      },
     }
   ],
 
@@ -421,16 +274,6 @@ foam.CLASS({
       tableWidth: 100,
       code: function(X) {
         X.ctrl.theme = this;
-      },
-      section: 'infoSection'
-    }
-  ],
-
-  methods: [
-    {
-      name: 'toSummary',
-      code: function() {
-        return this.name + ' ' + this.description;
       }
     }
   ]

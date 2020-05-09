@@ -517,8 +517,6 @@ var classes = [
 
   // Themes
   'foam.nanos.theme.Theme',
-  'foam.nanos.theme.ThemeDomain',
-  'foam.nanos.theme.ThemeDomainsDAO',
 
   //SQL JBDC Support
   'foam.dao.jdbc.JDBCConnectionSpec',

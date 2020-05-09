@@ -258,7 +258,6 @@ foam.CLASS({
   methods: [
     {
       name: 'toSummary',
-      type: 'String',
       code: function() {
         var rtn = (this.suite ? this.suite + '-' : '') +
           this.streetNumber + ' ' +
@@ -268,27 +267,7 @@ foam.CLASS({
           this.countryId + ', ' +
           this.postalCode;
         return rtn === ' , , , , ' ? '' : rtn;
-      },
-      javaCode: `
-      StringBuilder sb = new StringBuilder();
-      if ( this.getSuite() != null ) {
-        sb.append(this.getSuite());
-        sb.append("-");
       }
-      sb.append(this.getStreetNumber());
-      sb.append(" ");
-      sb.append(this.getStreetName());
-      sb.append(", ");
-      sb.append(this.getCity());
-      sb.append(", ");
-      sb.append(this.getRegionId());
-      sb.append(", ");
-      sb.append(this.getCountryId());
-      sb.append(", ");
-      sb.append(this.getPostalCode());
-      String rtn = sb.toString();
-      return rtn.equals(" , , , , ") ? "" : rtn;
-      `
     },
     {
       name: 'getAddress',
