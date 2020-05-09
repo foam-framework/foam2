@@ -136,11 +136,13 @@ foam.CLASS({
       }
       return arr;
     },
-    function onSelectionChanged(isColumnSelected, index, isParentPropertySelected) {
-      if ( isColumnSelected && isParentPropertySelected ) {
-        this.onSelect(index);
-      } else if ( !isColumnSelected && !isParentPropertySelected ) {
-        this.onUnSelect(index);
+    function onSelectionChanged(isColumnSelected, index, isParentPropertySelectionChanged) {
+      if (isParentPropertySelectionChanged) {
+        if ( isColumnSelected ) {
+          this.onSelect(index);
+        } else if ( !isColumnSelected ) {
+          this.onUnSelect(index);
+        }
       }
       this.data.updateColumns();
     },
@@ -442,6 +444,7 @@ foam.CLASS({
   ],
   methods: [
     function callOnSelect(isSelected, propertyNameSoFar) {
+      var isSelectionChanged = this.isPropertySelected;
       if ( !this.hasSubProperties )
         this.isPropertySelected = isSelected;
       else {
@@ -454,7 +457,7 @@ foam.CLASS({
         else
           this.selectedColumns.splice(this.selectedColumns.indexOf(propertyNameSoFar ? this.rootProperty[0] + '.' + propertyNameSoFar : this.rootProperty[0]), 1);
         
-        this.updateParent(isSelected, this.index, this.isPropertySelected);
+        this.updateParent(isSelected, this.index, isSelectionChanged !== this.isPropertySelected);
       }
       else {
         this.updateParent(isSelected, propertyNameSoFar ? this.rootProperty[0] + '.' + propertyNameSoFar : this.rootProperty[0]);
