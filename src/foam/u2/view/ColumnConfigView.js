@@ -66,7 +66,7 @@ foam.CLASS({
       expression: function(columns) {
         var arr = [];
         for(var i = 0; i < columns.length; i++) {
-          arr.push(this.RootColumnConfigPropView.create({index: i, prop:columns[i], onDragAndDrop:this.resetProperties.bind(this)}));
+          arr.push(this.RootColumnConfigPropView.create({index: i, prop:columns[i], onDragAndDrop:this.onDragAndDrop.bind(this)}));
         }
         return arr;
       }
@@ -98,6 +98,10 @@ foam.CLASS({
          }))
       .end();
     },
+    function onDragAndDrop(targetIndex, draggableIndex) {
+      this.resetProperties(targetIndex, draggableIndex);
+      this.data.updateColumns();
+    },
     function resetProperties(targetIndex, draggableIndex) {
       var thisProps = this.views.map(v => v.prop);
       thisProps = [...thisProps];
@@ -118,7 +122,6 @@ foam.CLASS({
       }
       this.views[replaceIndex].prop = prop;
       this.data.selectedColumnNames = this.rebuildSelectedColumns();
-      this.data.updateColumns();
     },
     function rebuildSelectedColumns() {
       var arr = [];
@@ -132,12 +135,13 @@ foam.CLASS({
       }
       return arr;
     },
-    function onSelectionChanged(isColumnSelected, index) {
-      if ( isColumnSelected ) {
+    function onSelectionChanged(isColumnSelected, index, isParentPropertySelected) {
+      if ( isColumnSelected && isParentPropertySelected ) {
         this.onSelect(index);
-      } else {
+      } else if ( !isColumnSelected && !isParentPropertySelected ) {
         this.onUnSelect(index);
       }
+      this.data.updateColumns();
     },
 
     function onSelect(draggableIndex) {
@@ -238,7 +242,7 @@ foam.CLASS({
                 on('dragenter', self.onDragOver.bind(self)).
                 on('dragover',  self.onDragOver.bind(self)).
                 on('drop',      self.onDrop.bind(self));
-          })
+          });
         }))
         .add(self.slot(function(prop) {
           return self.E().start()
@@ -362,7 +366,7 @@ foam.CLASS({
       e.stopPropagation();
       this.data.expanded = !this.data.expanded;
       if ( !this.data.hasSubProperties ) {//|| ( this.data.hasSubProperties && this.data.isPropertySelected )
-        this.data.isPropertySelected = !this.data.isPropertySelected;
+        this.data.callOnSelect(!this.data.isPropertySelected);
       }
     }
   ]
@@ -432,8 +436,11 @@ foam.CLASS({
         var arr = [];
         var l = level + 1;
         var r = this.of.getAxiomByName(this.rootProperty[0]);
-        for ( var i = 0; i < subProperties.length; i++ )
+        for ( var i = 0; i < subProperties.length; i++ ) {
           arr.push(this.cls_.create({ index:i, rootProperty: subProperties[i], selectedColumns$:this.selectedColumns$, level:l, parentExpanded$:this.expanded$, of: r && r.of ? r.of.getAxiomByName([subProperties[i][0]]).cls_ : r, updateParent:this.callOnSelect.bind(this)}));
+          if (!this.isPropertySelected)
+            arr[i].isPropertySelected = false;
+        }
         return arr;
       }
     },
@@ -447,10 +454,7 @@ foam.CLASS({
         return this.selectedColumns.find(s => {
           var propNames = s.split('.');
           return propNames.length > this.level && propNames[this.level] === this.rootProperty[0];
-        }) != undefined;
-      },
-      postSet: function() {
-        this.callOnSelect(this.isPropertySelected);
+        }) || false;
       }
     },
     // {
@@ -482,16 +486,32 @@ foam.CLASS({
     'updateParent'
   ],
   methods: [
+    // function updateIsPropertySelected() {
+    //   return typeof this.selectedColumns.find(s => {
+    //       var propNames = s.split('.');
+    //       return propNames.length > this.level && propNames[this.level] === this.rootProperty[0];
+    //     })  !== "undefined";
+    // },
     function callOnSelect(isSelected, propertyNameSoFar) {
+      //bug
+      //need a way to update isPropertySelected
+      //for ie 2d level
+      //check if one of the children is selected???
+      if ( !this.hasSubProperties )
+        this.isPropertySelected = isSelected;
+      else
+        this.isPropertySelected = this.subColumnSelectConfig.find(s => s.isPropertySelected) || false;
       if ( this.level === 0 ) {
         if (isSelected)
           this.selectedColumns.push(propertyNameSoFar ? this.rootProperty[0] + '.' + propertyNameSoFar : this.rootProperty[0]);
         else
           this.selectedColumns.splice(this.selectedColumns.indexOf(propertyNameSoFar ? this.rootProperty[0] + '.' + propertyNameSoFar : this.rootProperty[0]), 1);
-        this.updateParent(isSelected, this.index);
+        
+        this.updateParent(isSelected, this.index, this.isPropertySelected);
       }
-      else
+      else {
         this.updateParent(isSelected, propertyNameSoFar ? this.rootProperty[0] + '.' + propertyNameSoFar : this.rootProperty[0]);
+      }
     },
     function returnSelectedProps() {
       if ( !this.hasSubProperties) {
@@ -502,7 +522,7 @@ foam.CLASS({
         var arr = [];
         for (var i = 0; i < this.subColumnSelectConfig.length; i++) {
           if (this.subColumnSelectConfig[i].isPropertySelected) {
-            var childProps = this.subColumnSelectConfig[i].returnSelectedProps()
+            var childProps = this.subColumnSelectConfig[i].returnSelectedProps();
             childProps.splice(0, 0, this.rootProperty[0]);
             arr.push(childProps);
           }
