@@ -228,20 +228,8 @@ foam.CLASS({
         // used as the argument to this method.
         X rtn = reset(x);
 
-//        ThemeDomain td = null;
-        Theme    theme = ((Themes) x.get("themes")).findTheme(x);
-
-        HttpServletRequest req = x.get(HttpServletRequest.class);
-        // if ( req != null ) {
-        //   td = (ThemeDomain) ((DAO) x.get("themeDomainDAO")).find(req.getServerName());
-        //   theme = (Theme) ((DAO) x.get("themeDAO")).find(td.getTheme());
-        // }
-        // if ( theme == null ) {
-        //   theme = new Theme.Builder(x).setAppName("FOAM").build();
-        // }
-        rtn = rtn.put("theme", theme);
-
         if ( getUserId() == 0 ) {
+          HttpServletRequest req = x.get(HttpServletRequest.class);
           if ( req == null ) {
             // null during test runs
             return rtn;
@@ -256,6 +244,10 @@ foam.CLASS({
           appConfig = appConfig.configure(x, null);
 
           rtn = rtn.put("appConfig", appConfig);
+
+          Theme theme = ((Themes) x.get("themes")).findTheme(x);
+          rtn = rtn.put("theme", theme);
+
           return rtn;
         }
 
@@ -280,7 +272,6 @@ foam.CLASS({
 
         if ( user != null ) {
           rtn = rtn.put("spid", user.getSpid());
-          rtn = rtn.put("theme", ((Themes) x.get("themes")).findTheme(rtn.put("user", user)));
         }
 
         // We need to do this after the user and agent have been put since
@@ -292,6 +283,7 @@ foam.CLASS({
             .put("group", group)
             .put("appConfig", group.getAppConfig(rtn));
         }
+        rtn = rtn.put("theme", ((Themes) x.get("themes")).findTheme(rtn);
 
         return rtn;
       `
