@@ -238,7 +238,12 @@ foam.CLASS({
       name: 'body',
       value: { class:'foam.u2.view.ColumnViewBody'}
     },
-    'prop',
+    {
+      name: 'prop',
+      postSet: function() {
+        this.subscribeSelected();
+      }
+    },
     'onDragAndDrop',
     'index',
     'childrenOnDragAndDrop',
@@ -248,14 +253,26 @@ foam.CLASS({
     function updateParent() {
       this.prop.subColumnSelectConfig = this.prop.subColumnSelectConfig.sort((s1, s2) => s1.index > s2.index ? 1 : -1);
     },
+    function subscribeSelected() {
+      var self = this;
+      this.prop.isPropertySelected$.sub(function() {
+        self.childrenOnSelectionChangedDragAndDrop(self.prop.index, self.prop.isPropertySelected);
+      });
+    },
     function initE() {
       var self = this;
-
-      this.prop.isPropertySelected$.sub(function() {
-        self.childrenOnSelectionChangedDragAndDrop(self.index, self.prop.isPropertySelected);
-      });
-
       this.SUPER();
+
+      // this.prop$.sub(function() {
+      //           //bug
+        
+      //   console.log('s');
+      // });
+
+      // this.prop.index$.sub(function() {
+      //   console.log('s');
+      // });
+
       this
         .add(this.slot(function(prop$isPropertySelected){
           this.callIf(self.prop.isPropertySelected, function() {
@@ -269,10 +286,10 @@ foam.CLASS({
         }))
         .add(self.slot(function(prop) {
           return self.E().start()
-            .add(foam.u2.ViewSpec.createView(self.head, {data$:self.prop$, dragAndDropOnSelect:this.childrenOnSelectionChangedDragAndDrop},  self, self.__subSubContext__))
+            .add(foam.u2.ViewSpec.createView(self.head, {data$:self.prop$},  self, self.__subSubContext__))
           .end()
           .start()
-            .add(foam.u2.ViewSpec.createView(self.body, {data$:self.prop$, childrenOnDragAndDrop:this.childrenOnDragAndDrop, parentUpdateSubproperties: this.updateParent.bind(this), childrenOnSelectionChangedDragAndDrop:this.childrenOnSelectionChangedDragAndDrop},  self, self.__subSubContext__))
+            .add(foam.u2.ViewSpec.createView(self.body, {data$:self.prop$, dragAndDropOnSelect:this.childrenOnSelectionChangedDragAndDrop, onDragAndDrop: this.onDragAndDrop, childrenOnDragAndDrop:this.childrenOnDragAndDrop, parentUpdateSubproperties: this.updateParent.bind(this), childrenOnSelectionChangedDragAndDrop:this.childrenOnSelectionChangedDragAndDrop },  self, self.__subSubContext__))
           .end();
         }));
     }
@@ -299,38 +316,6 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2.view',
-  name: 'ColumnOptionsSelectConfig',
-  requires: [
-    'foam.u2.view.SubColumnSelectConfig'
-  ],
-  properties: [
-    'selectedColumns',
-    'of',
-    {
-      name: 'rootProperty',
-      class: 'FObjectProperty',
-      of: 'foam.u2.view.SubColumnSelectConfig'
-    },
-    {
-      name: 'isPropertySelected',
-      class: 'Boolean',
-      value: true,
-      postSet: function() {
-        if ( this.isPropertySelected) {
-          this.rootProperty = this.updateRootProperty();
-          this.rootProperty.parentExpanded = false;
-          //set all to false
-          this.rootProperty.expanded = false;
-          this.isPropertySelected = false;
-        }
-      }
-    },
-    'labels'
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.u2.view',
   name: 'ColumnViewHeader',
   extends: 'foam.u2.View',
   css: `
@@ -349,9 +334,6 @@ foam.CLASS({
       type: 'String',
       value: '\u2713'
     }
-  ],
-  properties: [
-    'dragAndDropOnSelect'
   ],
   methods: [
     function initE() {
@@ -418,12 +400,13 @@ foam.CLASS({
       factory: function() {
         var arr = [];
         for(var i = 0; i < this.data.subColumnSelectConfig.length; i++) {
-          arr.push(this.RootColumnConfigPropView.create({index: i, prop:this.data.subColumnSelectConfig[i], onDragAndDrop:this.onChildrenDragAndDrop.bind(this), childrenOnSelectionChangedDragAndDrop:this.onChildrenSelectionChanged.bind(this)}));
+          arr.push(this.RootColumnConfigPropView.create({index: i, prop:this.data.subColumnSelectConfig[i], onDragAndDrop:this.onChildrenDragAndDrop.bind(this), childrenOnDragAndDrop:this.childrenOnDragAndDrop, childrenOnSelectionChangedDragAndDrop:this.onChildrenSelectionChanged.bind(this)}));
         }
         return arr;
       }
     },
     'onDragAndDrop',
+    'childrenOnDragAndDrop',
     'parentUpdateSubproperties',
     'childrenOnSelectionChangedDragAndDrop'
   ],
