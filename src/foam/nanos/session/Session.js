@@ -16,14 +16,16 @@ foam.CLASS({
   javaImports: [
     'foam.core.X',
     'foam.dao.DAO',
+    'static foam.mlang.MLang.*',
     'foam.nanos.app.AppConfig',
     'foam.nanos.auth.*',
     'foam.nanos.boot.NSpec',
     'foam.nanos.logger.Logger',
     'foam.nanos.logger.PrefixLogger',
+    'foam.nanos.theme.Theme',
+    'foam.nanos.theme.ThemeDomain',
     'foam.util.SafetyUtil',
     'java.util.Date',
-    'static foam.mlang.MLang.*',
     'javax.servlet.http.HttpServletRequest',
     'org.eclipse.jetty.server.Request'
   ],
@@ -225,31 +227,34 @@ foam.CLASS({
         // used as the argument to this method.
         X rtn = reset(x);
 
+        ThemeDomain td = null;
+        Theme    theme = null;
+
+        HttpServletRequest req = x.get(HttpServletRequest.class);
+        if ( req != null ) {
+          td = (ThemeDomain) ((DAO) x.get("themeDomainDAO")).find(req.getServerName());
+          theme = (Theme) ((DAO) x.get("themeDAO")).find(td.getTheme());
+        }
+        if ( theme == null ) {
+          theme = new Theme.Builder(x).setAppName("FOAM").build();
+        }
+        rtn = rtn.put("theme", theme);
+
         if ( getUserId() == 0 ) {
-          HttpServletRequest req = x.get(HttpServletRequest.class);
           if ( req == null ) {
             // null during test runs
             return rtn;
           }
           AppConfig appConfig = (AppConfig) x.get("appConfig");
           appConfig = (AppConfig) appConfig.fclone();
-          String configUrl = ((Request) req).getRootURL().toString();
 
-          if ( appConfig.getForceHttps() ) {
-            if ( configUrl.startsWith("https://") ) {
-               // Don't need to do anything.
-            } else if ( configUrl.startsWith("http://") ) {
-              configUrl = "https" + configUrl.substring(4);
-            } else {
-              configUrl = "https://" + configUrl;
-            }
+          AppConfig themeAppConfig = theme.getAppConfig();
+          if ( themeAppConfig != null ) {
+            appConfig.copyFrom(themeAppConfig);
           }
-          if ( configUrl.endsWith("/") ) {
-            configUrl = configUrl.substring(0, configUrl.length()-1);
-          }
-          appConfig.setUrl(configUrl);
+          appConfig = appConfig.configure(x, null);
+
           rtn = rtn.put("appConfig", appConfig);
-
           return rtn;
         }
 
@@ -274,6 +279,7 @@ foam.CLASS({
 
         if ( user != null ) {
           rtn = rtn.put("spid", user.getSpid());
+          rtn = rtn.put("theme", user.getTheme(rtn));
         }
 
         // We need to do this after the user and agent have been put since
