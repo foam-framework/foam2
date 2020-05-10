@@ -237,6 +237,9 @@ foam.CLASS({
           AppConfig appConfig = (AppConfig) x.get("appConfig");
           appConfig = (AppConfig) appConfig.fclone();
 
+          Theme theme = ((Themes) x.get("themes")).findTheme(x);
+          rtn = rtn.put("theme", theme);
+
           AppConfig themeAppConfig = theme.getAppConfig();
           if ( themeAppConfig != null ) {
             appConfig.copyFrom(themeAppConfig);
@@ -244,9 +247,6 @@ foam.CLASS({
           appConfig = appConfig.configure(x, null);
 
           rtn = rtn.put("appConfig", appConfig);
-
-          Theme theme = ((Themes) x.get("themes")).findTheme(x);
-          rtn = rtn.put("theme", theme);
 
           return rtn;
         }
@@ -283,7 +283,7 @@ foam.CLASS({
             .put("group", group)
             .put("appConfig", group.getAppConfig(rtn));
         }
-        rtn = rtn.put("theme", ((Themes) x.get("themes")).findTheme(rtn);
+        rtn = rtn.put("theme", ((Themes) x.get("themes")).findTheme(rtn));
 
         return rtn;
       `

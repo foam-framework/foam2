@@ -42,9 +42,10 @@ foam.CLASS({
           theme = await user.theme$find;
           if ( theme ) return theme;
           var group = await user.group$find;
-          if ( group ) {
-            theme = group.theme$find;
+          while ( group ) {
+            theme = await group.theme$find;
             if ( theme ) return theme;
+            group = await group.parent$find;
           }
         }
         var domain = window && window.location.hostname || 'localhost';
@@ -63,18 +64,18 @@ foam.CLASS({
         return foam.nanos.theme.Theme.create({ 'name': 'foam', 'appName': 'FOAM' });
       },
       javaCode: `
+      DAO groupDAO = (DAO) x.get("groupDAO");
       Theme theme = (Theme) x.get("theme");
-      try {
       if ( theme != null ) return theme;
       User user = (User) x.get("user");
       if ( user != null ) {
         theme = user.findTheme(x);
         if ( theme != null ) return theme;
         Group group = user.findGroup(x);
-        if ( group != null ) {
-          // occurs during test cases.
+        while ( group != null ) {
           theme = group.findTheme(x);
           if ( theme != null ) return theme;
+          group = (Group) groupDAO.find(group.getParent());
         }
       }
       String domain = "localhost";
@@ -93,9 +94,6 @@ foam.CLASS({
       }
       ((foam.nanos.logger.Logger) x.get("logger")).warning("Theme not found.", req.getServerName());
       return new Theme.Builder(x).setName("foam").setAppName("FOAM").build();
-      } finally {
-      ((foam.nanos.logger.Logger) x.get("logger")).debug("Theme", theme != null ? theme.getName() : "null");
-      }
       `
     }
   ]
