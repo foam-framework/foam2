@@ -50,11 +50,28 @@ foam.CLASS({
             notSelectedColumns.push(c);
         });
         for(var i = 0; i < selectedColumns.length; i++) {
-          arr.push(foam.u2.view.SubColumnSelectConfig.create({ index:i, rootProperty: [data.of.getAxiomByName(selectedColumns[i]).name, data.of.getAxiomByName(selectedColumns[i]).label ? data.of.getAxiomByName(selectedColumns[i]).label : data.of.getAxiomByName(selectedColumns[i]).name], level:0, of:data.of, selectedColumns:data.selectedColumnNames, updateParent:this.onSelectionChanged.bind(this) }));
+          arr.push(foam.u2.view.SubColumnSelectConfig.create({ 
+            index:i, 
+            rootProperty: [data.of.getAxiomByName(selectedColumns[i]).name, 
+            data.of.getAxiomByName(selectedColumns[i]).label ? data.of.getAxiomByName(selectedColumns[i]).label : data.of.getAxiomByName(selectedColumns[i]).name], 
+            level:0, 
+            of:data.of, 
+            selectedColumns$:data.selectedColumnNames$, 
+            updateParent:this.onTopPropertiesSelectionChange.bind(this),
+            childrenOnSelectionChangedDragAndDrop: this.onSelectionChanged
+          }));
         }
         var nonSelectedViewModels = [];
         for(i = 0; i < notSelectedColumns.length; i++) {
-          nonSelectedViewModels.push(foam.u2.view.SubColumnSelectConfig.create({ index:i+selectedColumns.length, rootProperty: [data.of.getAxiomByName(notSelectedColumns[i]).name, data.of.getAxiomByName(notSelectedColumns[i]).label ? data.of.getAxiomByName(notSelectedColumns[i]).label : data.of.getAxiomByName(notSelectedColumns[i]).name], level:0, of:data.of, selectedColumns:data.selectedColumnNames, updateParent:this.onSelectionChanged.bind(this) }));
+          nonSelectedViewModels.push(foam.u2.view.SubColumnSelectConfig.create({ 
+            index:i+selectedColumns.length, 
+            rootProperty: [data.of.getAxiomByName(notSelectedColumns[i]).name, data.of.getAxiomByName(notSelectedColumns[i]).label ? data.of.getAxiomByName(notSelectedColumns[i]).label : data.of.getAxiomByName(notSelectedColumns[i]).name], 
+            level:0, 
+            of:data.of, 
+            selectedColumns$:data.selectedColumnNames$, 
+            updateParent:this.onTopPropertiesSelectionChange.bind(this),
+            childrenOnSelectionChangedDragAndDrop: this.onSelectionChanged
+          }));
         }
         nonSelectedViewModels.sort((a, b) => { return a.rootProperty[1].toLowerCase().localeCompare(b.rootProperty[1].toLowerCase());});
         arr = arr.concat(nonSelectedViewModels);
@@ -66,7 +83,12 @@ foam.CLASS({
       expression: function(columns) {
         var arr = [];
         for(var i = 0; i < columns.length; i++) {
-          arr.push(this.RootColumnConfigPropView.create({index: i, prop:columns[i], onDragAndDrop:this.onDragAndDrop.bind(this)}));
+          arr.push(this.RootColumnConfigPropView.create({
+            index: i,
+            prop:columns[i],
+            onDragAndDrop:this.onTopLevelPropertiesDragAndDrop.bind(this),
+            childrenOnDragAndDrop: this.onDragAndDrop.bind(this),
+          }));
         }
         return arr;
       }
@@ -101,31 +123,36 @@ foam.CLASS({
     function onClose() {
       this.columns.forEach(c => c.onClose());
     },
-    function onDragAndDrop(targetIndex, draggableIndex) {
-      this.resetProperties(targetIndex, draggableIndex);
+    function onTopLevelPropertiesDragAndDrop(targetIndex, draggableIndex) {
+      this.onDragAndDrop(this.views, targetIndex, draggableIndex);
+    },
+    function onDragAndDrop(views, targetIndex, draggableIndex, updateParent) {
+      this.resetProperties(views, targetIndex, draggableIndex);
+      if (updateParent)
+        updateParent();
+      this.data.selectedColumnNames = this.rebuildSelectedColumns();
       this.data.updateColumns();
     },
-    function resetProperties(targetIndex, draggableIndex) {
-      var thisProps = this.views.map(v => v.prop);
+    function resetProperties(views, targetIndex, draggableIndex) {
+      var thisProps = views.map(v => v.prop);
       thisProps = [...thisProps];
       var prop;
       var replaceIndex;
-      prop = this.views[draggableIndex].prop;
+      prop = views[draggableIndex].prop;
       replaceIndex = targetIndex;
       if (targetIndex > draggableIndex) {
         for (var i = draggableIndex; i < targetIndex; i++) {
-          this.views[i].prop = thisProps[i+1];
-          this.views[i].prop.index = i;
+          views[i].prop = thisProps[i+1];
+          views[i].prop.index = i;
         }
       } else {
         for (var i = targetIndex+1; i <= draggableIndex; i++) {
-          this.views[i].prop = thisProps[i-1];
-          this.views[i].prop.index = i;
+          views[i].prop = thisProps[i-1];
+          views[i].prop.index = i;
         }
       }
-      this.views[replaceIndex].prop = prop;
-      this.views[replaceIndex].prop.index = replaceIndex;
-      this.data.selectedColumnNames = this.rebuildSelectedColumns();
+      views[replaceIndex].prop = prop;
+      views[replaceIndex].prop.index = replaceIndex;
     },
     function rebuildSelectedColumns() {
       var arr = [];
@@ -139,47 +166,54 @@ foam.CLASS({
       }
       return arr;
     },
-    function onSelectionChanged(isColumnSelected, index, isParentPropertySelectionChanged) {
-      if (isParentPropertySelectionChanged) {
-        if ( isColumnSelected ) {
-          this.onSelect(index);
-        } else if ( !isColumnSelected ) {
-          this.onUnSelect(index);
-        }
-      }
+
+    function onTopPropertiesSelectionChange(isColumnSelected, index, isParentPropertySelectionChanged) {
+      this.onSelectionChanged(isColumnSelected, index, isParentPropertySelectionChanged, this.views);
       this.data.updateColumns();
     },
 
-    function onSelect(draggableIndex) {
-      var startUnselectedIndex = this.views.find(v => !v.prop.isPropertySelected);
+    function onSelectionChanged(isColumnSelected, index, isParentPropertySelectionChanged, views, updateParent) {
+      if (isParentPropertySelectionChanged) {
+        if ( isColumnSelected ) {
+          this.onSelect(index, views);
+        } else if ( !isColumnSelected ) {
+          this.onUnSelect(index, views);
+        }
+      }
+      if ( updateParent )
+        updateParent();
+    },
+
+    function onSelect(draggableIndex, views) {
+      var startUnselectedIndex = views.find(v => !v.prop.isPropertySelected);
       if (!startUnselectedIndex)
         return;
       startUnselectedIndex =  startUnselectedIndex.index;
       
       if ( draggableIndex > startUnselectedIndex )
-        return this.resetProperties(startUnselectedIndex, draggableIndex);
+        return this.resetProperties(views, startUnselectedIndex, draggableIndex);
     },
-    function onUnSelect(draggableIndex) {
-      var startUnselectedIndex = this.views.find(v => !v.prop.isPropertySelected && v.index !== draggableIndex);
+    function onUnSelect(draggableIndex, views) {
+      var startUnselectedIndex = views.find(v => !v.prop.isPropertySelected && v.index !== draggableIndex);
       if (!startUnselectedIndex)
-        return this.resetProperties(this.views.length - 1, draggableIndex);
+        return this.resetProperties(views, views.length - 1, draggableIndex);
 
       startUnselectedIndex =  startUnselectedIndex.index;
       if ( startUnselectedIndex - draggableIndex === 1 ) {
-        if ( this.views[draggableIndex].prop.rootProperty[1].toLowerCase().localeCompare(this.views[startUnselectedIndex].prop.rootProperty[1].toLowerCase()) < 1 )
-          return this.resetProperties(startUnselectedIndex-1, draggableIndex);
+        if ( this.views[draggableIndex].prop.rootProperty[1].toLowerCase().localeCompare(views[startUnselectedIndex].prop.rootProperty[1].toLowerCase()) < 1 )
+          return this.resetProperties(views, startUnselectedIndex-1, draggableIndex);
       }
       
-      while(startUnselectedIndex < this.views.length) {
+      while(startUnselectedIndex < views.length) {
         // if (startUnselectedIndex === this.views.length - 1)
         //   return this.resetProperties(this.views.length - 1, draggableIndex);
         
-        if (this.views[draggableIndex].prop.rootProperty[1].toLowerCase().localeCompare(this.views[startUnselectedIndex].prop.rootProperty[1].toLowerCase()) < 0 ) {
+        if (this.views[draggableIndex].prop.rootProperty[1].toLowerCase().localeCompare(views[startUnselectedIndex].prop.rootProperty[1].toLowerCase()) < 0 ) {
           break;
         }
         startUnselectedIndex++;
       }
-      return this.resetProperties(startUnselectedIndex-1, draggableIndex);
+      return this.resetProperties(views, startUnselectedIndex-1, draggableIndex);
     }
   ]
 });
@@ -206,9 +240,14 @@ foam.CLASS({
     },
     'prop',
     'onDragAndDrop',
-    'index'
+    'index',
+    'childrenOnDragAndDrop',
+    'childrenOnSelectionChangedDragAndDrop'
   ],
   methods: [
+    function updateParent() {
+      this.prop.subColumnSelectConfig = this.prop.subColumnSelectConfig.sort((s1, s2) => s1.index > s2.index ? 1 : -1);
+    },
     function initE() {
       var self = this;
       this.SUPER();
@@ -228,7 +267,7 @@ foam.CLASS({
             .add(foam.u2.ViewSpec.createView(self.head, {data$:self.prop$},  self, self.__subSubContext__))
           .end()
           .start()
-            .add(foam.u2.ViewSpec.createView(self.body, {data$:self.prop$},  self, self.__subSubContext__))
+            .add(foam.u2.ViewSpec.createView(self.body, {data$:self.prop$, childrenOnDragAndDrop:this.childrenOnDragAndDrop, parentUpdateSubproperties: this.updateParent.bind(this) ,childrenOnSelectionChangedDragAndDrop:this.childrenOnSelectionChangedDragAndDrop},  self, self.__subSubContext__))
           .end();
         }));
     }
@@ -237,6 +276,7 @@ foam.CLASS({
     function onDragStart(e){
       console.log('dragstart');
       e.dataTransfer.setData('draggableId', this.index);
+      e.stopPropagation();
     },
     function onDragOver(e){
       console.log('dragover');
@@ -303,7 +343,11 @@ foam.CLASS({
       name: 'CHECK_MARK',
       type: 'String',
       value: '\u2713'
-    },],
+    }
+  ],
+  properties: [
+    'dragAndDropOnSelect'
+  ],
   methods: [
     function initE() {
       this.SUPER();
@@ -348,7 +392,10 @@ foam.CLASS({
       e.stopPropagation();
       this.data.expanded = !this.data.expanded;
       if ( !this.data.hasSubProperties ) {//|| ( this.data.hasSubProperties && this.data.isPropertySelected )
+        if (this.dragAndDropOnSelect)
+          this.dradAndDropOnSelect(this.prop.index, !this.data.isPropertySelected);
         this.data.callOnSelect(!this.data.isPropertySelected);
+        
       }
     }
   ]
@@ -362,6 +409,22 @@ foam.CLASS({
     'foam.u2.view.RootColumnConfigPropView',
     'foam.u2.view.SubColumnSelectConfig'
   ],
+  properties: [
+    {
+      name: 'views',
+      factory: function() {
+        var arr = [];
+        for(var i = 0; i < this.data.subColumnSelectConfig.length; i++) {
+          arr.push(this.RootColumnConfigPropView.create({index: i, prop:this.data.subColumnSelectConfig[i], onDragAndDrop:this.onChildrenDragAndDrop.bind(this)}));
+        }
+        return arr;
+      }
+    },
+    'onDragAndDrop',
+    'parentUpdateSubproperties',
+    'childrenOnDragAndDrop',
+    'childrenOnSelectionChangedDragAndDrop'
+  ],
   methods: [
     function initE() {
       this.SUPER();
@@ -369,12 +432,18 @@ foam.CLASS({
       this
         .start()
         .show(self.data.expanded$)
-            .forEach(this.data.subColumnSelectConfig, function(p) {
+            .forEach(this.views, function(v) {
             self
               .show(self.data.expanded$)
-              .add(foam.u2.ViewSpec.createView(self.RootColumnConfigPropView, {prop:p}, self, self.__subSubContext__));
+              .add(v);
           })
         .end();
+    },
+    function onChildrenDragAndDrop(targetIndex, draggableIndex) {
+      this.childrenOnDragAndDrop(this.views, targetIndex, draggableIndex, this.parentUpdateSubproperties);
+    },
+    function onChildrenSelectionChanged(index, isPropertySelected) {
+
     }
   ]
 });
@@ -418,10 +487,25 @@ foam.CLASS({
         var arr = [];
         var l = level + 1;
         var r = this.of.getAxiomByName(this.rootProperty[0]);
+
+        var selectedSubProperties = [];
+        var otherSubProperties = [];
+
+        var selectedColumn = this.selectedColumns.filter(c => c.split('.').length > this.level && c.split('.')[this.level] === this.rootProperty[0]);
+
         for ( var i = 0; i < subProperties.length; i++ ) {
-          arr.push(this.cls_.create({ index:i, rootProperty: subProperties[i], selectedColumns$:this.selectedColumns$, level:l, parentExpanded$:this.expanded$, of: r && r.of ? r.of.getAxiomByName([subProperties[i][0]]).cls_ : r, updateParent:this.callOnSelect.bind(this)}));
-          if (!this.isPropertySelected)
-            arr[i].isPropertySelected = false;
+          if ( selectedColumn.find(c => c.split('.').length > ( this.level + 1 ) && c.split('.')[this.level+1] === subProperties[i][0]) ) {
+            selectedSubProperties.push(subProperties[i]);
+          } else {
+            otherSubProperties.push(subProperties[i]);
+          }
+        }
+
+        for ( var i = 0; i < selectedSubProperties.length; i++  ) {
+          arr.push(this.cls_.create({ index:i, rootProperty: selectedSubProperties[i], selectedColumns$:this.selectedColumns$, level:l, parentExpanded$:this.expanded$, of: r && r.of ? r.of.getAxiomByName([selectedSubProperties[i][0]]).cls_ : r, updateParent:this.callOnSelect.bind(this)}));
+        }
+        for ( var i = 0; i < otherSubProperties.length; i++  ) {
+          arr.push(this.cls_.create({ index:selectedSubProperties.length+i, rootProperty: otherSubProperties[i], selectedColumns$:this.selectedColumns$, level:l, parentExpanded$:this.expanded$, of: r && r.of ? r.of.getAxiomByName([otherSubProperties[i][0]]).cls_ : r, updateParent:this.callOnSelect.bind(this), isPropertySelected:false}));
         }
         return arr;
       }
@@ -457,7 +541,8 @@ foam.CLASS({
       class: 'Boolean',
       value: false
     },
-    'updateParent'
+    'updateParent',
+    'childrenOnSelectionChangedDragAndDrop'
   ],
   methods: [
     function onClose() {
