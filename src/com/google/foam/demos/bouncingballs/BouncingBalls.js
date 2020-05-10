@@ -38,7 +38,6 @@ foam.CLASS({
   extends: 'foam.graphics.Box',
 
   requires: [
-//    'foam.physics.PhysicalCircle',
     'com.google.foam.demos.bouncingballs.FastCircle as PhysicalCircle',
     'foam.util.Timer'
   ],

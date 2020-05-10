@@ -117,4 +117,28 @@ public abstract class AbstractFObjectPropertyInfo
     this.set(diff, d);
     return d != null;
   }
+  
+  public String getSQLType() {
+    return "";
+  }
+  
+  public boolean isDefaultValue(Object o) {
+    return foam.util.SafetyUtil.compare(get_(o), null) == 0;
+  }
+  
+  public void format(foam.lib.formatter.FObjectFormatter formatter, foam.core.FObject obj) {
+    formatter.output(get_(obj));
+  }
+  
+  public int compare(Object o1, Object o2) {
+    return foam.util.SafetyUtil.compare(get_(o1), get_(o2));
+  }
+
+  public int comparePropertyToObject(Object key, Object o) {
+    return foam.util.SafetyUtil.compare(cast(key), get_(o));
+  }
+
+  public int comparePropertyToValue(Object key, Object value) {
+    return foam.util.SafetyUtil.compare(cast(key), cast(value));
+  }
 }

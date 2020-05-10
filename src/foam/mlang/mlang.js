@@ -2608,7 +2608,11 @@ if ( getProcessArrayValuesIndividually() && arg1 instanceof Object[] ) {
 } else {
   putInGroup_(sub, arg1, obj);
 }
-if ( getGroupLimit() != -1 ) System.err.println("************************************* " + getGroupLimit() + " " + getGroups().size() + " " + sub);
+/*
+if ( getGroupLimit() != -1 ) {
+  System.err.println("************************************* " + getGroupLimit() + " " + getGroups().size() + " " + sub);
+  Thread.dumpStack();
+}*/
 if ( getGroupLimit() == getGroups().size() && sub != null ) sub.detach();
 `
     },
@@ -2634,7 +2638,7 @@ return clone;`
     {
       name: 'toString',
       code: function toString() {
-        return this.groups.toString();
+        return 'groupBy(' + this.arg1 + "," + this.arg2 + "," + this.groupLimit + ')';
       },
       javaCode: 'return this.getGroups().toString();'
     },
