@@ -1116,12 +1116,21 @@ p({
 
 p({
   "class":"foam.nanos.boot.NSpec",
-  "name":"googleApiCredentialsConfig",
+  "name":"googleApiCredentialsDAO",
   "lazy":false,
-  "service": {
-    "class":"foam.nanos.export.GoogleApiCredentials",
-    "port":64349,
-    "tokensFolderPath":"/tmp"
-  },
-  "documentation": "Service for setting authorization request parameters which are required in order to retrieve access token. To download credentials visit Google Developers Console"
+  "serve":true,
+  "serviceScript":
+  """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.export.GoogleApiCredentials.getOwnClassInfo())
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("googleCredentials")
+      .build();
+  """,
+  "client":
+  """
+    {
+      "of":"foam.nanos.export.GoogleApiCredentials"
+    }
+  """
 })

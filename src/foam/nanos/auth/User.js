@@ -242,7 +242,7 @@ foam.CLASS({
         return this.Phone.create();
       },
       view: { class: 'foam.u2.detail.VerticalDetailView' },
-      createVisibility: 'HIDDEN',
+      visibility: 'HIDDEN',
       section: 'personal'
     },
     {
@@ -267,7 +267,7 @@ foam.CLASS({
       },
       view: { class: 'foam.u2.detail.VerticalDetailView' },
       section: 'personal',
-      createVisibility: 'HIDDEN',
+      visibility: 'HIDDEN',
       includeInDigest: true
     },
     {

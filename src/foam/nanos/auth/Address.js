@@ -134,6 +134,13 @@ foam.CLASS({
       }
     },
     {
+      class: 'String',
+      name: 'suite',
+      documentation: 'The structured field for the suite number of the postal address.',
+      gridColumns: 3,
+      width: 16
+    },
+    {
       // TODO: Remove structured, street number, and street name. This should be a view concern
       // and not baked into the model.
       class: 'String',
@@ -141,7 +148,7 @@ foam.CLASS({
       label: 'Street No.',
       width: 16,
       documentation: 'The structured field for the street number of the postal address.',
-      gridColumns: 2,
+      gridColumns: 3,
       validationPredicates: [
         {
           args: ['structured', 'streetNumber'],
@@ -159,17 +166,10 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'suite',
-      documentation: 'The structured field for the suite number of the postal address.',
-      gridColumns: 1,
-      width: 16
-    },
-    {
-      class: 'String',
       name: 'streetName',
       width: 70,
       documentation: 'The structured field for the street name of the postal address.',
-      gridColumns: 3,
+      gridColumns: 6,
       validationPredicates: [
         {
           args: ['structured', 'streetName'],
@@ -189,7 +189,7 @@ foam.CLASS({
       documentation: 'The city of the postal address.',
       required: true,
       minLength: 1,
-      gridColumns: 3,
+      gridColumns: 6,
     },
     {
       class: 'String',
@@ -198,7 +198,7 @@ foam.CLASS({
       preSet: function(oldValue, newValue) {
         return newValue.toUpperCase();
       },
-      gridColumns: 3,
+      gridColumns: 6,
       validationPredicates: [
         {
           args: ['postalCode', 'countryId'],
