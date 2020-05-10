@@ -57,8 +57,7 @@ foam.CLASS({
             level:0, 
             of:data.of, 
             selectedColumns$:data.selectedColumnNames$, 
-            updateParent:this.onTopPropertiesSelectionChange.bind(this),
-            childrenOnSelectionChangedDragAndDrop: this.onSelectionChanged
+           // updateParent:this.onTopPropertiesSelectionChange.bind(this),
           }));
         }
         var nonSelectedViewModels = [];
@@ -69,8 +68,7 @@ foam.CLASS({
             level:0, 
             of:data.of, 
             selectedColumns$:data.selectedColumnNames$, 
-            updateParent:this.onTopPropertiesSelectionChange.bind(this),
-            childrenOnSelectionChangedDragAndDrop: this.onSelectionChanged
+            //updateParent:this.onTopPropertiesSelectionChange.bind(this),
           }));
         }
         nonSelectedViewModels.sort((a, b) => { return a.rootProperty[1].toLowerCase().localeCompare(b.rootProperty[1].toLowerCase());});
@@ -86,9 +84,10 @@ foam.CLASS({
           arr.push(this.RootColumnConfigPropView.create({
             index: i,
             prop:columns[i],
-            onDragAndDrop:this.onTopLevelPropertiesDragAndDrop.bind(this),
-            childrenOnDragAndDrop: this.onDragAndDrop.bind(this),
-            childrenOnSelectionChangedDragAndDrop: this.onSelectionChanged.bind(this)
+            onDragAndDropParentFunction:this.onTopLevelPropertiesDragAndDrop.bind(this),
+            onSelectionChangedParentFunction: this.onTopPropertiesSelectionChange.bind(this),
+            onDragAndDrop: this.onDragAndDrop.bind(this),//for parent to call if on its  views on child drag and drop
+            onSelectionChanged: this.onSelectionChanged.bind(this)//for parent to call if on its  views on child selectionChanged
           }));
         }
         return arr;
@@ -168,9 +167,8 @@ foam.CLASS({
       return arr;
     },
 
-    function onTopPropertiesSelectionChange(isColumnSelected, index, isParentPropertySelectionChanged) {
-      if (isParentPropertySelectionChanged)
-        this.onSelectionChanged(isColumnSelected, index, this.views);
+    function onTopPropertiesSelectionChange(isColumnSelected, index) {
+      this.onSelectionChanged(isColumnSelected, index, this.views);
     },
 
     function onSelectionChanged(isColumnSelected, index, views, updateParent) {
@@ -244,10 +242,23 @@ foam.CLASS({
         this.subscribeSelected();
       }
     },
-    'onDragAndDrop',
     'index',
-    'childrenOnDragAndDrop',
-    'childrenOnSelectionChangedDragAndDrop'
+    {
+      name: 'onDragAndDropParentFunction',
+      documentation: 'parent\'s on this DragAndDrop function' 
+    },
+    {
+      name: 'onSelectionChangedParentFunction',
+      documentation: 'parent\'s on this onSelectionChanged function'
+    },
+    {
+      name: 'onDragAndDrop',
+      documentation: 'to reuse onDragAndDrop function'
+    },
+    {
+      name: 'onSelectionChanged',
+      documentation: 'to reuse onSelectionChanged function'
+    }
   ],
   methods: [
     function updateParent() {
@@ -256,7 +267,7 @@ foam.CLASS({
     function subscribeSelected() {
       var self = this;
       this.prop.isPropertySelected$.sub(function() {
-        self.childrenOnSelectionChangedDragAndDrop(self.prop.index, self.prop.isPropertySelected);
+        self.onSelectionChangedParentFunction(self.prop.isPropertySelected, self.prop.index);
       });
     },
     function initE() {
@@ -289,7 +300,7 @@ foam.CLASS({
             .add(foam.u2.ViewSpec.createView(self.head, {data$:self.prop$},  self, self.__subSubContext__))
           .end()
           .start()
-            .add(foam.u2.ViewSpec.createView(self.body, {data$:self.prop$, dragAndDropOnSelect:this.childrenOnSelectionChangedDragAndDrop, onDragAndDrop: this.onDragAndDrop, childrenOnDragAndDrop:this.childrenOnDragAndDrop, parentUpdateSubproperties: this.updateParent.bind(this), childrenOnSelectionChangedDragAndDrop:this.childrenOnSelectionChangedDragAndDrop },  self, self.__subSubContext__))
+            .add(foam.u2.ViewSpec.createView(self.body, {data$:self.prop$, parentUpdateSubproperties: this.updateParent.bind(this), onDragAndDrop: this.onDragAndDrop, onSelectionChanged: this.onSelectionChanged },  self, self.__subSubContext__))
           .end();
         }));
     }
@@ -307,7 +318,7 @@ foam.CLASS({
     function onDrop(e) {
       e.preventDefault();
       e.stopPropagation();
-      this.onDragAndDrop(this.index, parseInt(e.dataTransfer.getData('draggableId')));
+      this.onDragAndDropParentFunction(this.index, parseInt(e.dataTransfer.getData('draggableId')));
       console.log(e.target.id);
     }
   ]
@@ -400,15 +411,27 @@ foam.CLASS({
       factory: function() {
         var arr = [];
         for(var i = 0; i < this.data.subColumnSelectConfig.length; i++) {
-          arr.push(this.RootColumnConfigPropView.create({index: i, prop:this.data.subColumnSelectConfig[i], onDragAndDrop:this.onChildrenDragAndDrop.bind(this), childrenOnDragAndDrop:this.childrenOnDragAndDrop, childrenOnSelectionChangedDragAndDrop:this.onChildrenSelectionChanged.bind(this)}));
+          arr.push(this.RootColumnConfigPropView.create({
+            index: i,
+            prop:this.data.subColumnSelectConfig[i],
+            onDragAndDrop:this.onDragAndDrop,
+            onSelectionChanged:this.onSelectionChanged,
+            onSelectionChangedParentFunction:this.onChildrenSelectionChanged.bind(this),
+            onDragAndDropParentFunction: this.onChildrenDragAndDrop.bind(this)
+          }));
         }
         return arr;
       }
     },
-    'onDragAndDrop',
-    'childrenOnDragAndDrop',
     'parentUpdateSubproperties',
-    'childrenOnSelectionChangedDragAndDrop'
+    {
+      name: 'onDragAndDrop',
+      documentation: 'to reuse onDragAndDrop function'
+    },
+    {
+      name: 'onSelectionChanged',
+      documentation: 'to reuse onSelectionChanged function'
+    }
   ],
   methods: [
     function initE() {
@@ -427,8 +450,8 @@ foam.CLASS({
     function onChildrenDragAndDrop(targetIndex, draggableIndex) {
       this.childrenOnDragAndDrop(this.views, targetIndex, draggableIndex, this.parentUpdateSubproperties);
     },
-    function onChildrenSelectionChanged(index, isColumnSelected) {
-      this.childrenOnSelectionChangedDragAndDrop(isColumnSelected, index, this.views, this.parentUpdateSubproperties);
+    function onChildrenSelectionChanged(isColumnSelected, index) {
+      this.onSelectionChanged(isColumnSelected, index, this.views, this.parentUpdateSubproperties);
     }
   ]
 });
@@ -552,7 +575,7 @@ foam.CLASS({
         else
           this.selectedColumns.splice(this.selectedColumns.indexOf(propertyNameSoFar ? this.rootProperty[0] + '.' + propertyNameSoFar : this.rootProperty[0]), 1);
         
-        this.updateParent(isSelected, this.index, isSelectionChanged !== this.isPropertySelected);
+        // this.updateParent(isSelected, this.index, isSelectionChanged !== this.isPropertySelected);
       }
       else {
         this.updateParent(isSelected, propertyNameSoFar ? this.rootProperty[0] + '.' + propertyNameSoFar : this.rootProperty[0]);
