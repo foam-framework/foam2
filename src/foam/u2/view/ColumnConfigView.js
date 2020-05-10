@@ -448,7 +448,7 @@ foam.CLASS({
         .end();
     },
     function onChildrenDragAndDrop(targetIndex, draggableIndex) {
-      this.childrenOnDragAndDrop(this.views, targetIndex, draggableIndex, this.parentUpdateSubproperties);
+      this.onDragAndDrop(this.views, targetIndex, draggableIndex, this.parentUpdateSubproperties);
     },
     function onChildrenSelectionChanged(isColumnSelected, index) {
       this.onSelectionChanged(isColumnSelected, index, this.views, this.parentUpdateSubproperties);
