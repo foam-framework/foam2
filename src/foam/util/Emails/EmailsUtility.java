@@ -8,6 +8,7 @@ import foam.nanos.logger.Logger;
 import foam.nanos.notification.email.EmailMessage;
 import foam.nanos.notification.email.EmailPropertyService;
 import foam.nanos.theme.Theme;
+import foam.nanos.theme.Themes;
 import foam.util.SafetyUtil;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,7 +46,7 @@ public class EmailsUtility {
     }
 
     String group = user != null ? user.getGroup() : "";
-    Theme theme = (Theme) x.get("theme");
+    Theme theme = ((Themes) x.get("themes")).findTheme(x.put("user", user));
     AppConfig appConfig = (AppConfig) x.get("appConfig");
 
     // Add template name to templateArgs, to avoid extra parameter passing

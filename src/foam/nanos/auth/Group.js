@@ -1,3 +1,4 @@
+
 /**
  * @license
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
@@ -199,7 +200,6 @@ foam.CLASS({
       ],
       javaCode: `
         // Find Group details, by iterating up through group.parent
-        AppConfig config          = (AppConfig) ((AppConfig) x.get("appConfig")).fclone();
         Group group               = this;
         DAO groupDAO              = (DAO) x.get("groupDAO");
 
@@ -214,6 +214,7 @@ foam.CLASS({
           group = (Group) groupDAO.find(group.getParent());
         }
 
+        AppConfig config = (AppConfig) x.get("appConfig");
         return config.configure(x, configUrl);
         `
     },

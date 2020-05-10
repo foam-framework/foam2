@@ -479,6 +479,9 @@ foam.CLASS({
       var lastTheme = this.theme;
 
       try {
+        // var y = this.client.__subContext__.createSubContext;
+        // y.user = this.user;
+        // this.theme = this.client.themes.findTheme(y);
         if ( this.user && this.user.theme ) {
           this.theme = await this.user.theme$find;
         } else if ( this.group && this.group.theme ) {
@@ -490,7 +493,10 @@ foam.CLASS({
           var themeDomain = await this.client.themeDomainDAO.find(domain);
           if ( ! themeDomain ) {
             console.warn('ThemeDomain not found: '+domain);
-            themeDomain = this.ThemeDomain.create({'theme':'foam'});
+            themeDomain = await this.client.themeDomainDAO.find('localhost');
+            if ( ! themeDomain ) {
+              themeDomain = this.ThemeDomain.create({'theme':'foam'});
+            }
           }
 
           var predicate = this.AND(

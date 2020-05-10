@@ -660,33 +660,6 @@ foam.CLASS({
           throw new AuthenticationException("User is not active");
         }
       `
-    },
-    {
-      documentation: `Acquire theme through users spid.`,
-      name: 'getTheme',
-      type: 'foam.nanos.theme.Theme',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        }
-      ],
-      code: async function(x) {
-        var theme = await this.theme$find;
-        if ( theme ) return theme;
-        var group = await this.group$find;
-        theme = group.theme$find;
-        if ( theme ) return theme;
-        return x.theme;
-      },
-      javaCode: `
-      Theme theme = findTheme(x);
-      if ( theme != null ) return theme;
-      Group group = findGroup(x);
-      theme = group.findTheme(x);
-      if ( theme != null ) return theme;
-      return (Theme) x.get("theme");
-      `
     }
   ]
 });
