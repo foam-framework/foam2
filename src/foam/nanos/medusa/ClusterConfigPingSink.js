@@ -73,7 +73,6 @@ foam.CLASS({
       ClusterConfig myConfig = support.getConfig(getX(), support.getConfigId());
       ClusterConfig config = (ClusterConfig) obj;
       PingService ping = (PingService) getX().get("ping");
-
       try {
         Long latency = ping.ping(getX(), config.getId(), config.getPort(), getTimeout(), config.getUseHttps());
         config = (ClusterConfig) support.getConfig(getX(), config.getId()).fclone();
@@ -91,7 +90,7 @@ foam.CLASS({
       } catch (NullPointerException t) {
         getLogger().error(t);
       } catch (RuntimeException | java.io.IOException t) {
-        // getLogger().debug("ping", config.getId(), t.getMessage());
+        getLogger().debug("ping", config.getId(), t.getMessage());
         if ( config.getStatus() != Status.OFFLINE ) {
           config = (ClusterConfig) config.fclone();
           config.setPingInfo(t.getMessage());

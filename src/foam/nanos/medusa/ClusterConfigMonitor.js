@@ -25,12 +25,16 @@ foam.CLASS({
     'foam.core.ContextAgent',
     'foam.core.X',
     'foam.dao.DAO',
+    'foam.dao.Sink',
+    'foam.dao.ArraySink',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'static foam.mlang.MLang.AND',
     'static foam.mlang.MLang.EQ',
     'static foam.mlang.MLang.NEQ',
     'static foam.mlang.MLang.NOT',
+    'java.util.ArrayList',
+    'java.util.List',
     'java.util.Timer'
   ],
 
@@ -57,6 +61,11 @@ foam.CLASS({
       visibility: 'HIDDEN'
     },
     {
+      name: 'timer',
+      class: 'Object',
+      visibility: 'HIDDEN'
+    },
+    {
       name: 'logger',
       class: 'FObjectProperty',
       of: 'foam.nanos.logger.Logger',
@@ -77,6 +86,7 @@ foam.CLASS({
       javaCode: `
       ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
       Timer timer = new Timer(this.getClass().getSimpleName());
+      setTimer(timer);
       timer.scheduleAtFixedRate(
         new AgencyTimerTask(getX(), support.getThreadPoolName(), this),
         getInitialTimerDelay(),
@@ -103,14 +113,14 @@ foam.CLASS({
 
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       ClusterConfig config = support.getConfig(x, support.getConfigId());
-
+      // getLogger().debug("execute", config.getId(), config.getType().getLabel(), config.getStatus().getLabel());
       if ( config.getType() == MedusaType.NODE ) {
          if ( config.getEnabled() &&
               config.getStatus() == Status.OFFLINE ) {
 
-          // Wait for own replay to complete,
-          // then set node ONLINE.
-          DAO dao = ((DAO) x.get("localMedusaEntryDAO"));
+          // // Wait for own replay to complete,
+          // // then set node ONLINE.
+          DAO dao = ((DAO) x.get("medusaNodeDAO"));
 
           // TODO: deal with digest failures - and Node taking self OFFLINE.
           // this timer will continually set it back to ONLINE.
@@ -119,10 +129,41 @@ foam.CLASS({
           config.setStatus(Status.ONLINE);
           ((DAO) x.get("localClusterConfigDAO")).put(config);
         }
-      } else if ( config.getType() != MedusaType.MEDIATOR ) {
+      } else if ( config.getType() != MedusaType.MEDIATOR &&
+                  config.getStatus() == Status.OFFLINE ) {
         config = (ClusterConfig) config.fclone();
         config.setStatus(Status.ONLINE);
         ((DAO) x.get("localClusterConfigDAO")).put(config);
+      } else if ( config.getType() == MedusaType.MEDIATOR &&
+                  config.getStatus() == Status.OFFLINE &&
+                  support.getMediatorCount() == 1 ) {
+        // standalone mode.
+        config = (ClusterConfig) config.fclone();
+        config.setStatus(Status.ONLINE);
+        config.setIsPrimary(true);
+        ((DAO) x.get("localClusterConfigDAO")).put(config);
+
+        DAO dao = (DAO) x.get("localClusterConfigDAO");
+        List<ClusterConfig> nodes = (ArrayList) ((ArraySink) dao.where(
+          AND(
+            EQ(ClusterConfig.ZONE, 0),
+            EQ(ClusterConfig.TYPE, MedusaType.NODE),
+            EQ(ClusterConfig.ENABLED, true),
+            EQ(ClusterConfig.STATUS, Status.OFFLINE)
+          ))
+        .select(new ArraySink())).getArray();
+        for ( ClusterConfig node : nodes ) {
+          node = (ClusterConfig) node.fclone();
+          node.setStatus(Status.ONLINE);
+          dao.put_(x, node);
+        }
+      }
+
+      if ( config.getType() == MedusaType.MEDIATOR &&
+                  support.getMediatorCount() == 1 ) {
+        ((Timer)getTimer()).cancel();
+        ((Timer)getTimer()).purge();
+        return;
       }
 
 // TODO: Non-Mediators don't need to ping anything, just useful for reporting and network graph - the ping time could be reduced - see mn/services.jrl

@@ -49,10 +49,6 @@ foam.CLASS({
       name: 'data',
       class: 'FObjectProperty'
     },
-    // {
-    //   name: 'sessionId',
-    //   class: 'String'
-    // },
     {
       name: 'hops',
       class: 'Array'

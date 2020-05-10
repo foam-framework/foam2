@@ -13,7 +13,7 @@ foam.CLASS({
     'foam.nanos.boot.NSpecAware',
   ],
 
-  documentation: `Create a medusa entry for argument model. NOTE:  delegate is real NSpec MDAO.`,
+  documentation: `Create a medusa entry for argument model.`,
 
   javaImports: [
     'foam.core.FObject',
@@ -37,6 +37,27 @@ foam.CLASS({
       javaFactory: 'return (foam.dao.DAO) getX().get("localMedusaEntryDAO");'
     },
     {
+      name: 'clientDAO',
+      class: 'FObjectProperty',
+      of: 'foam.dao.DAO',
+      javaFactory: `
+      return new foam.nanos.medusa.ClusterClientDAO.Builder(getX())
+        .setNSpec(getNSpec())
+        .setDelegate(new foam.dao.NullDAO(getX(), getDelegate().getOf()))
+        .build();
+      `
+    },
+    {
+      // TODO: clear on ClusterConfigDAO update.
+      name: 'config',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.medusa.ClusterConfig',
+      javaFactory: `
+      ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
+      return support.getConfig(getX(), support.getConfigId());
+      `
+    },
+    {
       name: 'logger',
       class: 'FObjectProperty',
       of: 'foam.nanos.logger.Logger',
@@ -52,27 +73,71 @@ foam.CLASS({
 
   methods: [
     {
+      documentation: `
+      1. If primary mediator, then delegate to medusaAdapter, accept result.
+      2. If secondary mediator, proxy to next 'server', find result.
+      3. If not mediator, proxy to the next 'server', put result.`,
       name: 'put_',
       javaCode: `
-      FObject old = getDelegate().find_(x, obj.getProperty("id"));
-      FObject nu = getDelegate().put_(x, obj);
-      return submit(x, (FObject) nu, old, DOP.PUT);
+      getLogger().debug("put", "primary", getConfig().getIsPrimary());
+      if ( getConfig().getIsPrimary() ) {
+        FObject old = getDelegate().find_(x, obj.getProperty("id"));
+        FObject nu = getDelegate().put_(x, obj);
+        return submit(x, nu, old, DOP.PUT);
+      }
+      FObject result = getClientDAO().put_(x, obj);
+      if ( getConfig().getType() == MedusaType.MEDIATOR ) {
+        FObject found = getDelegate().find_(x, obj.getProperty("id"));
+        if ( found == null ||
+            ! found.equals(result) ) {
+          getLogger().error("put", "corrupt", "found != response");
+        }
+        return found;
+      }
+      return getDelegate().put_(x, result);
       `
     },
     {
       name: 'remove_',
       javaCode: `
-      FObject nu = getDelegate().remove_(x, obj);
-      return submit(x, (FObject) nu, null, DOP.REMOVE);
+      if ( getConfig().getIsPrimary() ) {
+        getDelegate().remove_(x, obj);
+        return submit(x, obj, null, DOP.REMOVE);
+      }
+      FObject result = getClientDAO().remove_(x, obj);
+      if ( getConfig().getType() == MedusaType.MEDIATOR ) {
+        return result;
+      }
+      return getDelegate().remove_(x, result);
       `
     },
     {
       name: 'cmd_',
       javaCode: `
+      if ( getConfig().getIsPrimary() ) {
+        if ( ClusterServerDAO.GET_CLIENT_CMD.equals(obj) ) {
+          getLogger().debug("cmd", "GET_CLIENT_CMD");
+          return this;
+        }
+        if ( obj instanceof ClusterCommand ) {
+          ClusterCommand cmd = (ClusterCommand) obj;
+          getLogger().debug("cmd", "ClusterCommand");
+
+          if ( DOP.PUT == cmd.getDop() ) {
+            cmd.setData(put_(x, cmd.getData()));
+          } else if ( DOP.REMOVE == cmd.getDop() ) {
+            cmd.setData(remove_(x, cmd.getData()));
+          } else {
+            getLogger().warning("Unsupported operation", cmd.getDop().getLabel());
+            throw new UnsupportedOperationException(cmd.getDop().getLabel());
+          }
+          return cmd;
+        }
+      }
       if ( foam.dao.MDAO.GET_MDAO_CMD.equals(obj) ) {
         return getDelegate().cmd_(x, obj);
       }
-      return getMedusaEntryDAO().cmd_(x, obj);
+      return getClientDAO().cmd_(x, obj);
       `
     },
     {

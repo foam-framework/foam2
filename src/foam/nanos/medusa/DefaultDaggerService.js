@@ -120,6 +120,7 @@ foam.CLASS({
       }
       DAO dao = (DAO) getX().get("internalMedusaEntryDAO");
       MedusaEntry entry = new MedusaEntry();
+      entry.setNSpecName("DAG Bootstrap");
       entry.setIndex(getNextGlobalIndex(getX()));
       entry.setIndex1(-1L);
       entry.setHash1("466c58623cd600209e95a981bad03e5d899ea6d6905cebee5ea0746bf16e1534");
@@ -130,6 +131,7 @@ foam.CLASS({
       updateLinks(getX(), entry);
 
       entry = new MedusaEntry();
+      entry.setNSpecName("DAG Bootstrap");
       entry.setIndex(getNextGlobalIndex(getX()));
       entry.setIndex1(-1L);
       entry.setHash1("a651071e965f3c0e07cf9d09761e124a57f27dd75316a4c18079bc0e5accf9d2");

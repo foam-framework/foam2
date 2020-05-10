@@ -28,12 +28,18 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'serviceName',
+      class: 'String',
+      value: 'medusaNodeDAO'
+    },
+    {
       class: 'Object',
       name: 'line',
       javaType: 'foam.util.concurrent.AssemblyLine',
       javaFactory: 'return new foam.util.concurrent.AsyncAssemblyLine(getX(), this.getClass().getSimpleName());'
     },
     {
+      // TODO: clear on ClusterConfig DAO updates
       name: 'clients',
       class: 'Map',
       javaFactory: 'return new HashMap();'
@@ -117,9 +123,16 @@ foam.CLASS({
             try {
               DAO dao = (DAO) getClients().get(config.getId());
               if ( dao == null ) {
-                DAO clientDAO = support.getClientDAO(x, "medusaNodeDAO", myConfig, config);
+                dao = (DAO) x.get(getServiceName());
+                if ( dao == null ) {
+                  getLogger().debug("client");
+                  dao = support.getClientDAO(x, getServiceName(), myConfig, config);
+                } else {
+                  getLogger().debug("short circuit");
+                }
+
                 dao = new RetryClientSinkDAO.Builder(x)
-                        .setDelegate(clientDAO)
+                        .setDelegate(dao)
                         .setMaxRetryAttempts(support.getMaxRetryAttempts())
                         .setMaxRetryDelay(support.getMaxRetryDelay())
                         .build();

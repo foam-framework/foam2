@@ -41,6 +41,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'nSpecName',
+      label: 'NSpec Name',
       visibility: 'RO'
     },
     {
@@ -138,6 +139,16 @@ foam.CLASS({
       class: 'DateTime',
       visibility: 'RO',
       includeInDigest: false,
+    }
+  ],
+
+  methods: [
+    {
+      name: 'freeze',
+      type: 'FObject',
+      javaCode: `
+      return this;
+      `
     }
   ]
 });

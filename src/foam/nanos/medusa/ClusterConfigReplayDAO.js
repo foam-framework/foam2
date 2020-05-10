@@ -60,13 +60,16 @@ foam.CLASS({
                config.getRegion() == myConfig.getRegion() &&
                config.getRealm() == myConfig.getRealm() ) {
 
-            DAO clientDAO = support.getClientDAO(getX(), "medusaNodeDAO", myConfig, config);
+            // in standalone configuration, node is local
+            DAO clientDAO = (DAO) x.get("medusaNodeDAO");
+            if ( clientDAO == null ) {
+            clientDAO = support.getClientDAO(getX(), "medusaNodeDAO", myConfig, config);
             clientDAO = new RetryClientSinkDAO.Builder(getX())
               .setDelegate(clientDAO)
               .setMaxRetryAttempts(support.getMaxRetryAttempts())
               .setMaxRetryDelay(support.getMaxRetryDelay())
               .build();
-
+            }
             // NOTE: using internalMedusaEntryDAO else we'll block on ReplayingDAO.
             DAO dao = (DAO) getX().get("internalMedusaEntryDAO");
             dao = dao.where(GTE(MedusaEntry.CONSENSUS_COUNT, support.getNodeQuorum(x)));
@@ -88,11 +91,11 @@ foam.CLASS({
             dagger.setGlobalIndex(getX(), details.getMaxIndex());
 
             // Send to Consensus DAO to prepare for Replay
-            ((DAO) getX().get("medusaConsensusDAO")).cmd(details);
+            ((DAO) getX().get("medusaMediatorDAO")).cmd(details);
 
             ReplayCmd cmd = new ReplayCmd();
             cmd.setDetails(details);
-            cmd.setServiceName("medusaConsensusDAO"); // TODO: configuration
+            cmd.setServiceName("medusaMediatorDAO"); // TODO: configuration
 
             getLogger().debug(myConfig.getId(), "ReplayCmd to", config.getId());
             cmd = (ReplayCmd) clientDAO.cmd_(getX(), cmd);

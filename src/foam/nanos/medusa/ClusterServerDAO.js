@@ -72,9 +72,18 @@ foam.CLASS({
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       ClusterConfig config = support.getConfig(x, support.getConfigId());
       DAO dao = (DAO) x.get(cmd.getServiceName());
-      if ( dao != null ) {
+
+      if ( dao != null ) _shortCircuit: {
         dao = (DAO) dao.cmd_(x, GET_CLIENT_CMD);
         if ( dao != null ) {
+          if ( dao instanceof ClusterClientDAO ) {
+            ClusterClientDAO client = (ClusterClientDAO) dao;
+            if ( config.getId().equals(cmd.getHops()[cmd.getHops().length - 1]) ) {
+              // short circuiting - self to self.
+              getLogger().debug("short circuit");
+              break _shortCircuit;
+            }
+          }
           return dao.cmd_(x, cmd);
         }
       }

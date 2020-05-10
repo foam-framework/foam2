@@ -18,7 +18,7 @@ foam.CLASS({
       documentation: 'service name to replay to',
       name: 'serviceName',
       class: 'String',
-      value: 'medusaConsensusDAO'
+      value: 'medusaMediatorDAO'
     },
     // {
     //   name: 'fromIndex',

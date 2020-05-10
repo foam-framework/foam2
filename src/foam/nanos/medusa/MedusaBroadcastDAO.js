@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'MedusaBroadcastDAO',
   extends: 'foam.nanos.medusa.BatchClientDAO',
 
-  documentation: `Broadcast MedusaEntry back to Mediators.`,
+  documentation: `Broadcast MedusaEntries.`,
 
   javaImports: [
     'foam.core.FObject',
@@ -30,12 +30,63 @@ foam.CLASS({
   
   properties: [
     {
-      class: 'Object',
-      name: 'line',
-      javaType: 'foam.util.concurrent.AssemblyLine',
-      javaFactory: 'return new foam.util.concurrent.AsyncAssemblyLine(getX(), this.getClass().getSimpleName());'
+      documentation: 'broadcast to this instance type',
+      name: 'type',
+      class: 'Enum',
+      of: 'foam.nanos.medusa.MedusaType',
+      value: 'MEDIATOR'
     },
     {
+      name: 'serviceName',
+      class: 'String',
+      javaFactory: `
+      if ( getType() == MedusaType.NODE ) {
+        return "medusaNodeDAO";
+      }
+      return "medusaMediatorDAO";
+      `
+    },
+    {
+      name: 'predicate',
+      class: 'foam.mlang.predicate.PredicateProperty',
+      factory: function() { return foam.mlang.MLang.FALSE; },
+      javaFactory: `
+      ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
+      ClusterConfig myConfig = support.getConfig(getX(), support.getConfigId());
+      if ( getType() == MedusaType.NODE ) {
+        return
+          AND(
+            EQ(ClusterConfig.ENABLED, true),
+            EQ(ClusterConfig.STATUS, Status.ONLINE),
+            EQ(ClusterConfig.TYPE, MedusaType.NODE),
+            EQ(ClusterConfig.ZONE, 0L),
+            EQ(ClusterConfig.REGION, myConfig.getRegion()),
+            EQ(ClusterConfig.REALM, myConfig.getRealm())
+          );
+      }
+      // MEDIATOR
+      return
+          AND(
+            OR(
+              EQ(ClusterConfig.ZONE, myConfig.getZone()),
+              EQ(ClusterConfig.ZONE, myConfig.getZone()+1)
+            ),
+            EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
+            EQ(ClusterConfig.STATUS, Status.ONLINE),
+            EQ(ClusterConfig.ENABLED, true),
+            EQ(ClusterConfig.REGION, myConfig.getRegion()),
+            EQ(ClusterConfig.REALM, myConfig.getRealm())
+          );
+      `
+    },
+    {
+      class: 'Object',
+      name: 'assemblyLine',
+      javaType: 'foam.util.concurrent.AssemblyLine',
+      javaFactory: 'return new foam.util.concurrent.AsyncAssemblyLine(getX(), this.getClass().getSimpleName()+":"+getServiceName());'
+    },
+    {
+      // TODO: clear on ClusterConfig DAO updates
       name: 'clients',
       class: 'Map',
       javaFactory: 'return new HashMap();'
@@ -52,7 +103,8 @@ foam.CLASS({
       visibility: 'HIDDEN',
       javaFactory: `
         return new PrefixLogger(new Object[] {
-          this.getClass().getSimpleName()
+          this.getClass().getSimpleName(),
+          this.getServiceName()
         }, (Logger) getX().get("logger"));
       `
     },
@@ -62,7 +114,7 @@ foam.CLASS({
     {
       name: 'init_',
       javaCode: `
-      
+      // listen on ClusterConfigDAO updates.
       `
     },
     {
@@ -106,33 +158,30 @@ foam.CLASS({
 
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
-// TODO: move this to property and update on daoupdate. 
       List<ClusterConfig> arr = (ArrayList) ((ArraySink) ((DAO) x.get("localClusterConfigDAO"))
-        .where(
-          AND(
-            OR(
-              EQ(ClusterConfig.ZONE, myConfig.getZone()),
-              EQ(ClusterConfig.ZONE, myConfig.getZone()+1)
-            ),
-            EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
-            EQ(ClusterConfig.STATUS, Status.ONLINE),
-            EQ(ClusterConfig.ENABLED, true),
-            EQ(ClusterConfig.REGION, myConfig.getRegion()),
-            EQ(ClusterConfig.REALM, myConfig.getRealm())
-          )
-        )
+        .where(getPredicate())
         .select(new ArraySink())).getArray();
 
       for ( ClusterConfig config : arr ) {
-        getLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
+        getAssemblyLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
           public void executeJob() {
             try {
-              DAO clientDAO = support.getClientDAO(x, "medusaConsensusDAO", myConfig, config);
-              DAO dao = new RetryClientSinkDAO.Builder(x)
-                          .setDelegate(clientDAO)
+              DAO dao = (DAO) getClients().get(config.getId());
+              if ( dao == null ) {
+                dao = (DAO) x.get(getServiceName());
+                if ( dao != null ) {
+                  getLogger().debug("short circuit");
+                } else {
+                  dao = support.getClientDAO(x, getServiceName(), myConfig, config);
+                  dao = new RetryClientSinkDAO.Builder(x)
+                          .setDelegate(dao)
                           .setMaxRetryAttempts(support.getMaxRetryAttempts())
                           .setMaxRetryDelay(support.getMaxRetryDelay())
                           .build();
+                }
+              }
+              getClients().put(config.getId(), dao);
+
               if ( DOP.PUT == dop ) {
                 MedusaEntry entry = (MedusaEntry) obj;
                 getLogger().debug("submit", dop.getLabel(), entry.getIndex(), config.getName(), "data", (entry.getData() != null) ? entry.getData().getClass().getSimpleName():"null");
@@ -167,7 +216,7 @@ foam.CLASS({
       ],
       javaType: 'PM',
       javaCode: `
-      return PM.create(x, this.getOwnClassInfo(), name);
+      return PM.create(x, this.getOwnClassInfo(), getServiceName()+":"+name);
       `
     },
     {

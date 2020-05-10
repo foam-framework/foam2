@@ -265,7 +265,7 @@ foam.CLASS({
             MedusaEntry entry = list.get(0);
             promote(x, entry);
           } else {
-            getLogger().debug("promoter", "lock", getIndex());
+//            getLogger().debug("promoter", "lock", getIndex());
             synchronized ( promoteLock_ ) {
 //              getLogger().debug("promoter", "wait", getIndex());
               promoteLock_.wait(1000);

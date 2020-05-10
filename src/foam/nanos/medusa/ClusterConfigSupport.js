@@ -34,6 +34,7 @@ configuration for contacting the primary node.`,
     'foam.mlang.predicate.Predicate',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
+    'foam.nanos.om.OMBox',
     'foam.nanos.pm.PMBox',
     'foam.net.Host',
     'foam.util.SafetyUtil',
@@ -539,20 +540,29 @@ configuration for contacting the primary node.`,
       if ( client != null ) {
         return client;
       }
-      client = new ClientDAO.Builder(x)
+      if ( sendClusterConfig.getId().equals(receiveClusterConfig.getId()) ) {
+        // short circuit
+        getLogger().debug("getClientDAO", "short circuit", sendClusterConfig.getId(), receiveClusterConfig.getId());
+        client = new ClusterServerDAO(x);
+      } else {
+        client = new ClientDAO.Builder(x)
         .setDelegate(new SessionClientBox.Builder(x)
           .setSessionID(sendClusterConfig.getSessionId())
           .setDelegate(new PMBox.Builder(x)
-            .setClassType(MedusaEntry.getOwnClassInfo())
-            .setName("ClientDAO:"+id)
-            .setDelegate(new ClusterHTTPBox.Builder(x)
-              .setAuthorizationType(foam.box.HTTPAuthorizationType.BEARER)
-              .setSessionID(sendClusterConfig.getSessionId())
-              .setUrl(buildURL(x, serviceName, null, null, receiveClusterConfig))
+            .setClassType(ClientDAO.getOwnClassInfo())
+            .setName(id)
+            .setDelegate(new OMBox.Builder(x)
+              .setName(id)
+              .setDelegate(new ClusterHTTPBox.Builder(x)
+                .setAuthorizationType(foam.box.HTTPAuthorizationType.BEARER)
+                .setSessionID(sendClusterConfig.getSessionId())
+                .setUrl(buildURL(x, serviceName, null, null, receiveClusterConfig))
+                .build())
               .build())
             .build())
           .build())
         .build();
+      }
       getClients().put(id, client);
       return client;
       `
@@ -582,7 +592,16 @@ configuration for contacting the primary node.`,
       }
 
       // route to primary
-      return getPrimary(x);
+      try {
+        return getPrimary(x);
+      } catch ( RuntimeException t ) {
+        // if in standalone mode, just route to self if only one mediator enabled.
+        getLogger().debug("getNextServerConfig", t.getMessage(), getMediatorCount());
+        if ( getMediatorCount() == 1 ) {
+          return config;
+        }
+        throw t;
+      }
       `
     },
     {
@@ -597,6 +616,9 @@ configuration for contacting the primary node.`,
       javaCode: `
       ClusterConfig config = getConfig(x, getConfigId());
       if ( config.getType() == MedusaType.MEDIATOR ) {
+        if ( getMediatorCount() == 1 ) {
+          return true;
+        }
         if ( config.getIsPrimary() &&
              config.getStatus() == Status.ONLINE &&
              config.getZone() == 0L ) {

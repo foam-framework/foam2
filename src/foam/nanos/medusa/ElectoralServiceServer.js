@@ -241,7 +241,13 @@ foam.CLASS({
       setElectionTime(System.currentTimeMillis());
       setState(ElectoralServiceState.ELECTION);
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      ((Agency) x.get(support.getThreadPoolName())).submit(x, (ContextAgent)this, this.getClass().getSimpleName());
+      if ( support.getMediatorCount() == 1 ) {
+        setState(ElectoralServiceState.IN_SESSION);
+        setElectionTime(0L);
+        setCurrentSeq(0L);
+      } else {
+        ((Agency) x.get(support.getThreadPoolName())).submit(x, (ContextAgent)this, this.getClass().getSimpleName());
+      }
       `
     },
     {

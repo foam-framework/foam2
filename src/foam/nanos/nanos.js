@@ -260,6 +260,7 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/email/Status' },
   { name: 'foam/nanos/notification/push/PushService' },
   { name: 'foam/nanos/notification/push/FirebasePushService' },
+  { name: 'foam/nanos/om/OMBox' },
   { name: 'foam/nanos/demo/DemoObject' },
   { name: 'foam/nanos/demo/Demo' },
   { name: 'foam/nanos/http/Format' },

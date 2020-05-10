@@ -189,7 +189,7 @@ foam.CLASS({
                getNSpec().getServe() &&
                getInnerDAO() == null ) ) {
           getLogger().debug(getNSpec().getName(), "cluster", "delegate", delegate.getClass().getSimpleName());
-          delegate = new foam.nanos.medusa.ClusterClientDAO.Builder(getX())
+          delegate = new foam.nanos.medusa.MedusaAdapterDAO.Builder(getX())
             .setNSpec(getNSpec())
             .setDelegate(delegate)
             .build();
@@ -226,7 +226,7 @@ foam.CLASS({
           .build();
 
           if ( getApprovableAwareEnabled() ) {
-            logger.warning("DEPRECATED: EasyDAO", getName(), "'approvableAwareEnabled' is deprecated. Please remove it from the nspec.");
+            getLogger().warning("DEPRECATED", getName(), "'approvableAwareEnabled' is deprecated. Please remove it from the nspec.");
           }
         }
 
