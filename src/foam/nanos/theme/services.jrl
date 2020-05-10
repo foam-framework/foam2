@@ -1,0 +1,50 @@
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "themeDAO",
+  "description": "Stores Themes, which are used to style the application.",
+  "serve": true,
+  "authenticate": false,
+  "serviceScript": """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.theme.Theme.getOwnClassInfo())
+      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("themeDAO"))
+      .setGuid(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("themes")
+      .setDecorator(new foam.nanos.theme.ThemeDomainsDAO.Builder(x).setDelegate(new foam.dao.NullDAO(x, foam.nanos.theme.Theme.getOwnClassInfo())).build())
+      .setIndex(new foam.core.PropertyInfo[] {foam.nanos.theme.Theme.NAME, foam.nanos.auth.GroupPermissionJunction.TARGET_ID})
+      .setPm(true)
+      .build()
+  """,
+  "client": "{\"of\":\"foam.nanos.theme.Theme\"}",
+  "authNotes": "Needs to be unauthenticated because we need to be able to theme apps before the user has logged in. However, we still need to restrict write access, which we do via an AuthorizationDAO."
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "themeDomainDAO",
+  "description": "Provides domain lookup for Themes",
+  "serve": true,
+  "authenticate": false,
+  "serviceScript": """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.theme.ThemeDomain.getOwnClassInfo())
+      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("themeDomainDAO"))
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("themeDomains")
+      .setPm(true)
+      .build()
+  """,
+  "client": "{\"of\":\"foam.nanos.theme.ThemeDomain\"}",
+  "authNotes": "Needs to be unauthenticated because we need to be able to theme apps before the user has logged in. However, we still need to restrict write access, which we do via an AuthorizationDAO."
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "themes",
+  "serve": true,
+  "serviceClass": "foam.nanos.theme.Themes",
+  "client":"""
+    {"of":"foam.nanos.theme.Themes"}
+    """
+})

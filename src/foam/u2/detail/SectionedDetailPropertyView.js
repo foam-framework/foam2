@@ -225,6 +225,7 @@ foam.CLASS({
 
       this
         .addClass(this.myClass())
+        .addClass(`sectioned-detail-property-${this.prop.name}`)
         .add(this.slot(function(mode, prop, prop$label) {
 
           var errorSlot = prop.validateObj && prop.validationTextVisible ?

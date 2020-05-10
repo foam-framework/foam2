@@ -11,6 +11,11 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
+      name: 'id',
+      documentation: 'Use app url as an id'
+    },
+    {
+      class: 'String',
       name: 'clientId'
     },
     {
@@ -44,12 +49,12 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'port',
-      hidden: true,
       documentation: 'Port server uses for communication with authorization service'
     },
     {
       class: 'String',
-      name: 'tokensFolderPath'
+      name: 'tokensFolderPath',
+      value: '/tmp'
     }
   ]
 });
