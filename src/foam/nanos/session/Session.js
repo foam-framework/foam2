@@ -23,6 +23,7 @@ foam.CLASS({
     'foam.nanos.logger.Logger',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.theme.Theme',
+    'foam.nanos.theme.Themes',
     'foam.nanos.theme.ThemeDomain',
     'foam.util.SafetyUtil',
     'java.util.Date',
@@ -227,17 +228,17 @@ foam.CLASS({
         // used as the argument to this method.
         X rtn = reset(x);
 
-        ThemeDomain td = null;
-        Theme    theme = null;
+//        ThemeDomain td = null;
+        Theme    theme = ((Themes) x.get("themes")).findTheme(x);
 
         HttpServletRequest req = x.get(HttpServletRequest.class);
-        if ( req != null ) {
-          td = (ThemeDomain) ((DAO) x.get("themeDomainDAO")).find(req.getServerName());
-          theme = (Theme) ((DAO) x.get("themeDAO")).find(td.getTheme());
-        }
-        if ( theme == null ) {
-          theme = new Theme.Builder(x).setAppName("FOAM").build();
-        }
+        // if ( req != null ) {
+        //   td = (ThemeDomain) ((DAO) x.get("themeDomainDAO")).find(req.getServerName());
+        //   theme = (Theme) ((DAO) x.get("themeDAO")).find(td.getTheme());
+        // }
+        // if ( theme == null ) {
+        //   theme = new Theme.Builder(x).setAppName("FOAM").build();
+        // }
         rtn = rtn.put("theme", theme);
 
         if ( getUserId() == 0 ) {
@@ -279,7 +280,7 @@ foam.CLASS({
 
         if ( user != null ) {
           rtn = rtn.put("spid", user.getSpid());
-          rtn = rtn.put("theme", user.getTheme(rtn));
+          rtn = rtn.put("theme", ((Themes) x.get("themes")).findTheme(rtn.put("user", user)));
         }
 
         // We need to do this after the user and agent have been put since

@@ -96,6 +96,7 @@ FOAM_FILES([
   { name: "foam/nanos/theme/Theme" },
   { name: "foam/nanos/theme/ThemeDomain" },
   { name: "foam/nanos/theme/ThemeDomainsDAO" },
+  { name: "foam/nanos/theme/Themes" },
   { name: "foam/nanos/bench/Benchmark" },
   { name: "foam/nanos/boot/DAOConfigSummaryView", flags: ['web'] },
   { name: "foam/nanos/session/Session" },

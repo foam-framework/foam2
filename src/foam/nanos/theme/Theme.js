@@ -432,6 +432,6 @@ foam.CLASS({
       code: function() {
         return this.name + ' ' + this.description;
       }
-    }
+    },
   ]
 });
