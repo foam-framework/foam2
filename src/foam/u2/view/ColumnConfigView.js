@@ -88,6 +88,7 @@ foam.CLASS({
             prop:columns[i],
             onDragAndDrop:this.onTopLevelPropertiesDragAndDrop.bind(this),
             childrenOnDragAndDrop: this.onDragAndDrop.bind(this),
+            childrenOnSelectionChangedDragAndDrop: this.onSelectionChanged.bind(this)
           }));
         }
         return arr;
@@ -168,20 +169,19 @@ foam.CLASS({
     },
 
     function onTopPropertiesSelectionChange(isColumnSelected, index, isParentPropertySelectionChanged) {
-      this.onSelectionChanged(isColumnSelected, index, isParentPropertySelectionChanged, this.views);
-      this.data.updateColumns();
+      if (isParentPropertySelectionChanged)
+        this.onSelectionChanged(isColumnSelected, index, this.views);
     },
 
-    function onSelectionChanged(isColumnSelected, index, isParentPropertySelectionChanged, views, updateParent) {
-      if (isParentPropertySelectionChanged) {
-        if ( isColumnSelected ) {
-          this.onSelect(index, views);
-        } else if ( !isColumnSelected ) {
-          this.onUnSelect(index, views);
-        }
+    function onSelectionChanged(isColumnSelected, index, views, updateParent) {
+      if ( isColumnSelected ) {
+        this.onSelect(index, views);
+      } else if ( !isColumnSelected ) {
+        this.onUnSelect(index, views);
       }
       if ( updateParent )
         updateParent();
+      this.data.updateColumns();
     },
 
     function onSelect(draggableIndex, views) {
@@ -200,7 +200,7 @@ foam.CLASS({
 
       startUnselectedIndex =  startUnselectedIndex.index;
       if ( startUnselectedIndex - draggableIndex === 1 ) {
-        if ( this.views[draggableIndex].prop.rootProperty[1].toLowerCase().localeCompare(views[startUnselectedIndex].prop.rootProperty[1].toLowerCase()) < 1 )
+        if ( views[draggableIndex].prop.rootProperty[1].toLowerCase().localeCompare(views[startUnselectedIndex].prop.rootProperty[1].toLowerCase()) < 1 )
           return this.resetProperties(views, startUnselectedIndex-1, draggableIndex);
       }
       
@@ -208,7 +208,7 @@ foam.CLASS({
         // if (startUnselectedIndex === this.views.length - 1)
         //   return this.resetProperties(this.views.length - 1, draggableIndex);
         
-        if (this.views[draggableIndex].prop.rootProperty[1].toLowerCase().localeCompare(views[startUnselectedIndex].prop.rootProperty[1].toLowerCase()) < 0 ) {
+        if ( views[draggableIndex].prop.rootProperty[1].toLowerCase().localeCompare(views[startUnselectedIndex].prop.rootProperty[1].toLowerCase()) < 0 ) {
           break;
         }
         startUnselectedIndex++;
@@ -250,6 +250,11 @@ foam.CLASS({
     },
     function initE() {
       var self = this;
+
+      this.prop.isPropertySelected$.sub(function() {
+        self.childrenOnSelectionChangedDragAndDrop(self.index, self.prop.isPropertySelected);
+      });
+
       this.SUPER();
       this
         .add(this.slot(function(prop$isPropertySelected){
@@ -264,10 +269,10 @@ foam.CLASS({
         }))
         .add(self.slot(function(prop) {
           return self.E().start()
-            .add(foam.u2.ViewSpec.createView(self.head, {data$:self.prop$},  self, self.__subSubContext__))
+            .add(foam.u2.ViewSpec.createView(self.head, {data$:self.prop$, dragAndDropOnSelect:this.childrenOnSelectionChangedDragAndDrop},  self, self.__subSubContext__))
           .end()
           .start()
-            .add(foam.u2.ViewSpec.createView(self.body, {data$:self.prop$, childrenOnDragAndDrop:this.childrenOnDragAndDrop, parentUpdateSubproperties: this.updateParent.bind(this) ,childrenOnSelectionChangedDragAndDrop:this.childrenOnSelectionChangedDragAndDrop},  self, self.__subSubContext__))
+            .add(foam.u2.ViewSpec.createView(self.body, {data$:self.prop$, childrenOnDragAndDrop:this.childrenOnDragAndDrop, parentUpdateSubproperties: this.updateParent.bind(this), childrenOnSelectionChangedDragAndDrop:this.childrenOnSelectionChangedDragAndDrop},  self, self.__subSubContext__))
           .end();
         }));
     }
@@ -350,6 +355,7 @@ foam.CLASS({
   ],
   methods: [
     function initE() {
+      var self = this;
       this.SUPER();
       this
         .on('click', this.toggleExpanded)
@@ -359,7 +365,7 @@ foam.CLASS({
           .addClass(this.myClass('some-padding'))
           .add(this.slot(function(data$isPropertySelected) {
             this.style({
-              'padding-left' : this.data.level * 15 + 5 + 'px'
+              'padding-left' : self.data.level * 15 + 5 + 'px'
             });
           }))
           .start('span')
@@ -392,10 +398,7 @@ foam.CLASS({
       e.stopPropagation();
       this.data.expanded = !this.data.expanded;
       if ( !this.data.hasSubProperties ) {//|| ( this.data.hasSubProperties && this.data.isPropertySelected )
-        if (this.dragAndDropOnSelect)
-          this.dradAndDropOnSelect(this.prop.index, !this.data.isPropertySelected);
         this.data.callOnSelect(!this.data.isPropertySelected);
-        
       }
     }
   ]
@@ -415,14 +418,13 @@ foam.CLASS({
       factory: function() {
         var arr = [];
         for(var i = 0; i < this.data.subColumnSelectConfig.length; i++) {
-          arr.push(this.RootColumnConfigPropView.create({index: i, prop:this.data.subColumnSelectConfig[i], onDragAndDrop:this.onChildrenDragAndDrop.bind(this)}));
+          arr.push(this.RootColumnConfigPropView.create({index: i, prop:this.data.subColumnSelectConfig[i], onDragAndDrop:this.onChildrenDragAndDrop.bind(this), childrenOnSelectionChangedDragAndDrop:this.onChildrenSelectionChanged.bind(this)}));
         }
         return arr;
       }
     },
     'onDragAndDrop',
     'parentUpdateSubproperties',
-    'childrenOnDragAndDrop',
     'childrenOnSelectionChangedDragAndDrop'
   ],
   methods: [
@@ -442,8 +444,8 @@ foam.CLASS({
     function onChildrenDragAndDrop(targetIndex, draggableIndex) {
       this.childrenOnDragAndDrop(this.views, targetIndex, draggableIndex, this.parentUpdateSubproperties);
     },
-    function onChildrenSelectionChanged(index, isPropertySelected) {
-
+    function onChildrenSelectionChanged(index, isColumnSelected) {
+      this.childrenOnSelectionChangedDragAndDrop(isColumnSelected, index, this.views, this.parentUpdateSubproperties);
     }
   ]
 });
@@ -500,13 +502,16 @@ foam.CLASS({
             otherSubProperties.push(subProperties[i]);
           }
         }
+        otherSubProperties.sort((a, b) => { return a[1].toLowerCase().localeCompare(b[1].toLowerCase());});
 
         for ( var i = 0; i < selectedSubProperties.length; i++  ) {
           arr.push(this.cls_.create({ index:i, rootProperty: selectedSubProperties[i], selectedColumns$:this.selectedColumns$, level:l, parentExpanded$:this.expanded$, of: r && r.of ? r.of.getAxiomByName([selectedSubProperties[i][0]]).cls_ : r, updateParent:this.callOnSelect.bind(this)}));
         }
+        
         for ( var i = 0; i < otherSubProperties.length; i++  ) {
           arr.push(this.cls_.create({ index:selectedSubProperties.length+i, rootProperty: otherSubProperties[i], selectedColumns$:this.selectedColumns$, level:l, parentExpanded$:this.expanded$, of: r && r.of ? r.of.getAxiomByName([otherSubProperties[i][0]]).cls_ : r, updateParent:this.callOnSelect.bind(this), isPropertySelected:false}));
         }
+
         return arr;
       }
     },
