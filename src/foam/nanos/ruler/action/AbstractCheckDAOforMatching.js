@@ -14,19 +14,18 @@ foam.CLASS({
   implements: ['foam.nanos.ruler.RuleAction'],
 
   javaImports: [
+    'foam.core.ContextAgent',
     'foam.core.FObject',
     'foam.core.X',
     'foam.dao.DAO',
-    'foam.nanos.logger.Logger',
-    'foam.core.ContextAgent',
     'foam.mlang.predicate.Predicate',
+    'foam.nanos.logger.Logger',
     'static foam.mlang.MLang.*'
   ],
 
   properties: [
     {
-      class: 'Array',
-      of: 'String',
+      class: 'StringArray',
       name: 'properties',
       javaFactory: 'return new String[0];'
     },
@@ -36,7 +35,8 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'useAgent'
+      name: 'readOnly',
+      documentation: 'Allows the user to specify whether the find operation is done on read-only DAOs or not.'
     }
   ],
 
@@ -52,30 +52,30 @@ foam.CLASS({
         }
         Predicate myPredicate = AND(propertiesToCheck);
 
-        if ( ! getUseAgent()) {
+        if ( readOnly()) {
           DAO myDAO = ((DAO) x.get( getDaoName() )).where(myPredicate);
-          doThis(x, nu, myDAO);
+          execute(x, nu, myDAO);
         }
         else {
           agency.submit(x, new ContextAgent() {
             @Override
             public void execute(X x) {
               DAO myDAO = ((DAO) x.get( getDaoName() )).where(myPredicate);
-              doThis(x, nu, myDAO);
+              execute(x, nu, myDAO);
             }
-          },"put the class name of this rule");
+          },"DAO find Operation");
         }
       `
     },
     {
-      name: 'doThis',
+      name: 'execute',
       args: [
         { name: 'x', type: 'Context' },
         { name: 'nu', type: 'foam.core.FObject' },
         { name: 'dao', type: 'foam.dao.DAO' },
       ],
       javaCode: `
-       // Your Code Here.
+       // Template method, add code in sub-class
       `
     },
 
