@@ -167,6 +167,7 @@ var classes = [
   'foam.dao.ORBitalDAO',
   'foam.mlang.order.Comparator',
   'foam.mlang.order.Desc',
+  'foam.mlang.order.ThenBy',
   'foam.mlang.sink.Count',
   'foam.mlang.sink.Max',
   'foam.mlang.sink.Min',
@@ -517,6 +518,9 @@ var classes = [
 
   // Themes
   'foam.nanos.theme.Theme',
+  'foam.nanos.theme.ThemeDomain',
+  'foam.nanos.theme.ThemeDomainsDAO',
+  'foam.nanos.theme.Themes',
 
   //SQL JBDC Support
   'foam.dao.jdbc.JDBCConnectionSpec',

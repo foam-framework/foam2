@@ -2608,7 +2608,11 @@ if ( getProcessArrayValuesIndividually() && arg1 instanceof Object[] ) {
 } else {
   putInGroup_(sub, arg1, obj);
 }
-if ( getGroupLimit() != -1 ) System.err.println("************************************* " + getGroupLimit() + " " + getGroups().size() + " " + sub);
+/*
+if ( getGroupLimit() != -1 ) {
+  System.err.println("************************************* " + getGroupLimit() + " " + getGroups().size() + " " + sub);
+  Thread.dumpStack();
+}*/
 if ( getGroupLimit() == getGroups().size() && sub != null ) sub.detach();
 `
     },
@@ -2634,7 +2638,7 @@ return clone;`
     {
       name: 'toString',
       code: function toString() {
-        return this.groups.toString();
+        return 'groupBy(' + this.arg1 + "," + this.arg2 + "," + this.groupLimit + ')';
       },
       javaCode: 'return this.getGroups().toString();'
     },
@@ -2908,6 +2912,7 @@ foam.CLASS({
         // of parameter is an interface rather than a class.
         return a;
       },
+      javaJSONParser: 'foam.lib.json.ExprParser.instance()',
       name: 'head'
     },
     {
@@ -2918,28 +2923,40 @@ foam.CLASS({
         // of parameter is an interface rather than a class.
         return a;
       },
+      javaJSONParser: 'foam.lib.json.ExprParser.instance()',
       name: 'tail'
-    },
-    {
-      name: 'compare',
-      swiftSupport: false,
-      transient: true,
-      documentation: 'Is a property so that it can be bound to "this" so that it works with Array.sort().',
-      factory: function() { return this.compare_.bind(this); }
     }
   ],
 
   methods: [
-    function compare_(o1, o2) {
-      // an equals of arg1.compare is falsy, which will then hit arg2
-      return this.head.compare(o1, o2) || this.tail.compare(o1, o2);
+    {
+      name: 'compare',
+      code: function(o1, o2) {
+        // an equals of arg1.compare is falsy, which will then hit arg2
+        return this.head.compare(o1, o2) || this.tail.compare(o1, o2);
+      },
+      javaCode: `
+        int ret = getHead().compare(o1, o2);
+        return ret == 0 ? getTail().compare(o1, o2) : ret;
+      `
     },
+    {
+      name: 'toString',
+      code: function() {
+        return 'THEN_BY(' + this.head.toString() + ', ' +
+          this.tail.toString() + ')';
+      },
+      javaCode: 'return "THEN_BY " + getHead().toString() + ", " + getTail().toString();'
 
-    function toString() {
-      return 'THEN_BY(' + this.head.toString() + ', ' +
-        this.tail.toString() + ')';
     },
-
+    {
+      name: 'createStatement',
+      javaCode: `return null;`
+    },
+    {
+      name: 'prepareStatement',
+      javaCode: `return;`
+    },
     function toIndex(tail) {
       return this.head && this.tail && this.head.toIndex(this.tail.toIndex(tail));
     },
@@ -3030,7 +3047,7 @@ foam.LIB({
       ret = tail = ThenBy.create({head: cs[0], tail: cs[1]});
 
       for ( var i = 2 ; i < cs.length ; i++ ) {
-        tail = tail.arg2 = ThenBy.create({arg1: tail.arg2, arg2: cs[i]});
+        tail = tail.tail = ThenBy.create({head: tail.tail, tail: cs[i]});
       }
 
       return ret;

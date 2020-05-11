@@ -29,8 +29,8 @@ foam.CLASS({
     'bsh.Interpreter',
     'foam.core.*',
     'foam.dao.*',
-    'foam.nanos.logger.Logger',
     'foam.nanos.auth.*',
+    'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
     'java.io.ByteArrayOutputStream',
     'java.io.PrintStream',
@@ -285,16 +285,16 @@ foam.CLASS({
                   scriptId: script.id,
                   notificationType: 'Script Execution',
                   body: `Status: ${script.status}
-                        Script Output: ${script.length > self.MAX_NOTIFICATION_OUTPUT_CHARS ?
-                          script.output.substring(0, self.MAX_NOTIFICATION_OUTPUT_CHARS) + '...' :
-                          script.output }
-                        LastDuration: ${script.lastDuration}`
+                    Script Output: ${script.length > self.MAX_NOTIFICATION_OUTPUT_CHARS ?
+                      script.output.substring(0, self.MAX_NOTIFICATION_OUTPUT_CHARS) + '...' :
+                      script.output }
+                    LastDuration: ${script.lastDuration}`
                 });
                 self.notificationDAO.put(notification);
               }
             }).catch(function() {
-               clearInterval(interval);
-              });
+              clearInterval(interval);
+            });
         }, 2000);
       }
     }

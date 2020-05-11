@@ -31,12 +31,12 @@ foam.CLASS({
     'foam.dao.ArraySink',
     'foam.nanos.auth.LifecycleAware',
     'foam.nanos.auth.LifecycleState',
-    'foam.nanos.session.Session',
-
+    'static foam.mlang.MLang.EQ',
     'foam.nanos.notification.NotificationSetting',
+    'foam.nanos.session.Session',
+    'foam.nanos.theme.Theme',
     'foam.util.SafetyUtil',
-    'java.util.List',
-    'static foam.mlang.MLang.EQ'
+    'java.util.List'
   ],
 
   documentation: `The User represents a person or entity with the ability
@@ -111,7 +111,11 @@ foam.CLASS({
       updateVisibility: 'RO',
       section: 'administrative',
       includeInDigest: true
-   },
+    },
+    {
+      name: 'spid',
+      class: 'String'
+    },
     {
       class: 'Boolean',
       name: 'enabled',
@@ -238,7 +242,7 @@ foam.CLASS({
         return this.Phone.create();
       },
       view: { class: 'foam.u2.detail.VerticalDetailView' },
-      createVisibility: 'HIDDEN',
+      visibility: 'HIDDEN',
       section: 'personal'
     },
     {
@@ -263,7 +267,7 @@ foam.CLASS({
       },
       view: { class: 'foam.u2.detail.VerticalDetailView' },
       section: 'personal',
-      createVisibility: 'HIDDEN',
+      visibility: 'HIDDEN',
       includeInDigest: true
     },
     {
@@ -734,4 +738,19 @@ foam.CLASS({
       name: 'group'
     }
   ]
+});
+
+foam.RELATIONSHIP({
+  sourceModel: 'foam.nanos.theme.Theme',
+  targetModel: 'foam.nanos.auth.User',
+  cardinality: '1:*',
+  forwardName: 'users',
+  inverseName: 'theme',
+  sourceProperty: {
+    hidden: true,
+    visibility: 'HIDDEN',
+  },
+  targetProperty: {
+    section: 'administrative'
+  }
 });

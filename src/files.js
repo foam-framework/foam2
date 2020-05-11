@@ -586,6 +586,17 @@ FOAM_FILES([
   { name: "foam/u2/view/FObjectArrayTableView", flags: ['web'] },
 
   // Doc
+  { name: "foam/doc/AxiomLink", flags: ['debug', 'web'] },
+  { name: "foam/doc/dao/PropertyPermissionCheckDecorator", flags: ['debug', 'web'] },
+  { name: "foam/doc/dao/AxiomDAO", flags: ['debug', 'web'] },
+  { name: "foam/doc/AxiomTableView", flags: ['debug', 'web'] },
+  { name: "foam/doc/MethodAxiom", flags: ['debug', 'web'] },
+  { name: "foam/doc/AxiomListView", flags: ['debug', 'web'] },
+  { name: "foam/doc/Axiom", flags: ['debug', 'web'] },
+  { name: "foam/doc/PropertyAxiom", flags: ['debug', 'web'] },
+  { name: "foam/doc/AxiomSummaryView", flags: ['debug', 'web'] },
+  { name: "foam/doc/SimpleClassView", flags: ['debug', 'web'] },
+
   { name: "foam/doc/ClassLink", flags: ['debug', 'web'] },
   { name: "foam/doc/CodeTabs" },
   { name: "foam/doc/DocBrowser", flags: ['debug', 'web'] },
