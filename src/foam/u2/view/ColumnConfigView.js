@@ -136,11 +136,10 @@ foam.CLASS({
     function resetProperties(views, targetIndex, draggableIndex) {
       var thisProps = views.map(v => v.prop);
       thisProps = [...thisProps];
-      var prop;
       var replaceIndex;
-      prop = views[draggableIndex].prop;
       replaceIndex = targetIndex;
-      if (targetIndex > draggableIndex) {
+      if ( draggableIndex < targetIndex ) {
+        
         for (var i = draggableIndex; i < targetIndex; i++) {
           thisProps[i+1].index = i;
           views[i].prop = thisProps[i+1];
@@ -583,7 +582,7 @@ foam.CLASS({
     },
     function returnSelectedProps() {
       if ( !this.hasSubProperties) {
-        if (this.level == 0)
+        if (this.level === 0)
           return [[this.rootProperty[0]]];
         return [this.rootProperty[0]];
       } else {
