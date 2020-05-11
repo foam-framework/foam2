@@ -108,7 +108,7 @@ public class SessionServerBox
       logger.error("Error throw in SessionServerBox: " + t, " ,service: " + spec.getName(), t);
       t.printStackTrace();
       msg.replyWithException(t);
-      return;
+      throw t;
     }
   }
 }

@@ -8,6 +8,13 @@ foam.CLASS({
   package: 'foam.nanos.app',
   name: 'AppConfig',
 
+  javaImports: [
+    'foam.nanos.theme.Theme',
+    'foam.nanos.theme.Themes',
+    'javax.servlet.http.HttpServletRequest',
+    'org.eclipse.jetty.server.Request'
+  ],
+
   properties: [
     {
       class: 'String',
@@ -70,20 +77,61 @@ foam.CLASS({
       value: false
     },
     {
-      class: 'String',
-      name: 'supportEmail'
-    },
-    {
-      class: 'String',
+      class: 'Reference',
+      of: 'foam.nanos.auth.ServiceProvider',
       name: 'defaultSpid'
     },
     {
       class: 'String',
       name: 'externalUrl'
-    },
+    }
+  ],
+
+  methods: [
     {
-      class: 'String',
-      name: 'supportPhone'
-    },
+      name: 'configure',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'url',
+          type: 'String'
+        }
+      ],
+      type: 'foam.nanos.app.AppConfig',
+      javaCode: `
+      AppConfig appConfig = (AppConfig) this.fclone();
+      Theme theme = ((Themes) x.get("themes")).findTheme(x);
+      AppConfig themeAppConfig = theme.getAppConfig();
+      if ( themeAppConfig != null ) {
+        appConfig.copyFrom(themeAppConfig);
+      }
+
+      String configUrl = url;
+      HttpServletRequest req = x.get(HttpServletRequest.class);
+      if ( req != null ) {
+        configUrl = ((Request) req).getRootURL().toString();
+      }
+      if ( ! foam.util.SafetyUtil.isEmpty(configUrl) ) {
+        if ( appConfig.getForceHttps() ) {
+          if ( configUrl.startsWith("https://") ) {
+             // nop
+          } else if ( configUrl.startsWith("http://") ) {
+            configUrl = "https" + configUrl.substring(4);
+          } else {
+            configUrl = "https://" + configUrl;
+          }
+        }
+        if ( configUrl.endsWith("/") ) {
+          configUrl = configUrl.substring(0, configUrl.length()-1);
+        }
+        appConfig.setUrl(configUrl);
+      }
+
+      return appConfig;
+      `
+    }
   ]
 });
