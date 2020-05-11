@@ -47,6 +47,10 @@ foam.CLASS({
     }
     ^four-column-grid {
       justify-content: space-between;
+      display: flex;
+      flex-direction: row;
+      height: fit-content;
+      align-items: stretch;
     }
   `,
   
@@ -112,15 +116,25 @@ foam.CLASS({
           var spot = this.E('span');
           featuredCapabilities.select().then((result) => {
             let arr = result.array;
-            let grid = self.Grid.create();
+            let grid = self.E();
             grid
               .addClass(self.myClass('four-column-grid'))
               ;
             for ( let i=0 ; i < arr.length ; i++ ) {
               let cap = arr[i];
               grid = grid
-                .start(self.GUnit, { columns: 3 })
-                  .tag(self.CapabilityFeatureView, { data: cap })
+                .start('div', { columns: 3 })
+                  .style({
+                    flex: 0,
+                    display: 'flex',
+                    height: 'auto'
+                  })
+                  .start(self.CapabilityFeatureView, { data: cap })
+                    .style({
+                      flex: 0,
+                      height: 'auto'
+                    })
+                  .end()
                   .on('click', () => {
                     self.crunchController.launchWizard(cap.id);
                   })

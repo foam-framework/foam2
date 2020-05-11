@@ -15,7 +15,8 @@ foam.CLASS({
     'foam.u2.Element',
     'foam.u2.crunch.Style',
     'foam.nanos.crunch.UserCapabilityJunction',
-    'foam.nanos.crunch.CapabilityJunctionStatus'
+    'foam.nanos.crunch.CapabilityJunctionStatus',
+    'foam.u2.view.ReadOnlyEnumView',
   ],
 
   imports: [
@@ -46,36 +47,35 @@ foam.CLASS({
             'background-position': '50% 50%',
           })
         .end()
+        .start('span')
         .call(function () {
-          var badge = self.Element.create();
-          this.add(badge);
-          badge
-            .addClass(self.s.myClass('badge'))
+          var badgeWrapper = self.Element.create({ nodeName: 'SPAN' });
+          this.add(badgeWrapper);
           self.userCapabilityJunctionDAO.find(self.AND(
             self.EQ(self.UserCapabilityJunction.SOURCE_ID, self.user.id),
             self.EQ(self.UserCapabilityJunction.TARGET_ID, self.data.id),
           )).then(ucj => {
             if ( ! ucj ) {
+              var badge = self.Element.create();
               badge
-                .addClass(self.s.myClass('ok'))
+                .addClass(self.s.myClass('badge'))
+                .addClass(self.s.myClass('badge-info'))
                 .add("available")
                 ;
+              badgeWrapper.add(badge);
             }
-            else switch ( ucj.status ) {
-              case self.CapabilityJunctionStatus.granted:
-                badge
-                  .addClass(self.s.myClass('ok'))
-                  .add("granted")
-                  ;
-                  break;
-              default:
-                badge
-                  .addClass(self.s.myClass('ok'))
-                  .add("unknown state")
-                  ;
+            else {
+              var badge = self.ReadOnlyEnumView.create({
+                data: ucj.status
+              })
+                .addClass(self.s.myClass('badge'))
+                .style({ 'background-color': ucj.status.background })
+                ;
+              badgeWrapper.add(badge);
             }
           });
         })
+        .end()
         .start()
           .addClass(self.s.myClass('card-title'))
           .add(( self.data.name != '') ? self.data.name : self.data.id)
