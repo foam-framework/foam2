@@ -21,6 +21,7 @@ foam.CLASS({
     'foam.nanos.approval.ApprovableAware',
     'foam.nanos.approval.ApprovalRequest',
     'foam.nanos.approval.ApprovalStatus',
+    'foam.mlang.predicate.Predicate',
     'foam.nanos.auth.LifecycleAware',
     'foam.nanos.auth.LifecycleState',
     'foam.nanos.auth.User',
@@ -41,6 +42,11 @@ foam.CLASS({
     {
       class: 'Class',
       name: 'of'
+    },
+    {
+      class: 'Boolean',
+      name: 'isEnabled',
+      value: true
     },
     {
       class: 'Boolean',
@@ -145,16 +151,14 @@ foam.CLASS({
       User user = (User) x.get("user");
       Logger logger = (Logger) x.get("logger");
 
-      ApprovableAware approvableAwareObj = (ApprovableAware) obj;
       LifecycleAware lifecycleObj = (LifecycleAware) obj;
 
       DAO approvalRequestDAO = (DAO) x.get("approvalRequestDAO");
       DAO dao = (DAO) x.get(getDaoKey());
 
       FObject currentObjectInDAO = (FObject) dao.find(String.valueOf(obj.getProperty("id")));
-      Predicate checkerPredicate = approvableAwareObj.getCheckerPredicate();
-
-      if ( checkerPredicate != null && ! checkerPredicate.f(obj) ){
+      
+      if ( ! getIsEnabled() ){
         if ( lifecycleObj.getLifecycleState() == LifecycleState.PENDING && currentObjectInDAO == null ){
           lifecycleObj.setLifecycleState(LifecycleState.ACTIVE);
         }
