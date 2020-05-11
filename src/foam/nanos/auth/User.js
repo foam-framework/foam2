@@ -35,6 +35,8 @@ foam.CLASS({
 
     'foam.nanos.notification.NotificationSetting',
     'foam.util.SafetyUtil',
+    'java.util.Arrays',
+    'java.util.HashSet',
     'java.util.List',
     'static foam.mlang.MLang.EQ'
   ],
@@ -444,7 +446,21 @@ foam.CLASS({
       name: 'disabledTopics',
       documentation: 'Disables types for notifications.',
       createVisibility: 'HIDDEN',
-      section: 'administrative'
+      section: 'administrative',
+      javaPostSet: `
+        if (null != val) {
+          HashSet<String> set = new HashSet<>(Arrays.asList(val));
+          setDisabledTopicSet(set);
+        }
+      `
+    },
+    {
+      class: 'Object',
+      /** @private */
+      name: 'disabledTopicSet',
+      javaType: 'java.util.HashSet',
+      hidden: true,
+      factory: function() { return {}; }
     },
     {
       class: 'URL',

@@ -16,9 +16,8 @@ foam.CLASS({
     'foam.nanos.logger.Logger',
     'foam.nanos.notification.email.EmailMessage',
     'foam.util.Emails.EmailsUtility',
-    'java.util.Arrays',
+    'java.util.HashSet',
     'java.util.Iterator',
-    'java.util.List',
     'java.util.Map',
     'static foam.mlang.MLang.EQ'
   ],
@@ -74,8 +73,8 @@ foam.CLASS({
           return;
 
         // Skip sending email messages for disabled topics
-        if ( user.getDisabledTopics() != null ) {
-          List disabledTopics = Arrays.asList(user.getDisabledTopics());
+        if ( user.getDisabledTopicSet() != null ) {
+          HashSet<String> disabledTopics = (HashSet<String>) user.getDisabledTopicSet();
           if ( disabledTopics.contains(notification.getNotificationType()) ) {
             return;
           }

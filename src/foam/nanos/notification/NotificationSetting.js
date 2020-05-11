@@ -19,8 +19,7 @@ foam.CLASS({
     'foam.nanos.auth.AuthorizationException',
     'foam.nanos.auth.User',
     'foam.nanos.logger.Logger',
-    'java.util.Arrays',
-    'java.util.List'
+    'java.util.HashSet'
   ],
 
   messages: [
@@ -90,9 +89,9 @@ foam.CLASS({
         if ( ! getEnabled() ) {
           notification.setRead(true);
         }
-        else if ( user.getDisabledTopics() != null ) {
-          List disabledTopics = Arrays.asList(user.getDisabledTopics());
-          if ( disabledTopics.contains(notification.getNotificationType()) ) {
+        else if ( user.getDisabledTopicSet() != null ) {
+          HashSet<String> disabledTopicsSet = (HashSet<String>) user.getDisabledTopicSet();
+          if ( disabledTopicsSet.contains(notification.getNotificationType()) ) {
             notification.setRead(true);
           }
         }
