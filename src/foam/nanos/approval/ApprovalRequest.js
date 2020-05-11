@@ -147,14 +147,28 @@
       section: 'requestDetails',
       documentation: `The user that is requested for approval. When set, "group" property is ignored.`,
       view: function(_, X) {
-        if ( X.data.status === foam.nanos.approval.ApprovalStatus.REQUESTED ) {
-          return {
-            class: 'foam.u2.view.ValueView',
-            data$: X.data$.map((data) => data.REQUESTED)
-          };
-        } else {
-          return { class: 'foam.u2.view.ReferencePropertyView' };
-        }
+        let slot = foam.core.SimpleSlot.create();
+        let data = X.data;
+        let approver = data.approver;
+
+        X.userDAO.find(approver).then(user => {
+          if ( data.status != foam.nanos.approval.ApprovalStatus.REQUESTED ) {
+            slot.set(user ? user.toSummary() : `User #${approver}`);	
+          } else if ( user ) {
+            if ( X.user.id == user.id ) {
+              slot.set(user.toSummary());
+            } else {
+              slot.set(user.group);
+            }
+          } else {
+            slot.set(data.REQUESTED);
+          }
+        });
+        
+        return {
+          class: 'foam.u2.view.ValueView',
+          data$: slot
+        };
       },
       tableCellFormatter: function(approver, data) {
         let self = this;

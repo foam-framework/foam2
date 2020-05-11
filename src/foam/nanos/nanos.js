@@ -26,7 +26,6 @@ FOAM_FILES([
   { name: "foam/nanos/app/AppConfigService" },
   { name: "foam/nanos/app/EmailConfig" },
   { name: "foam/nanos/app/ClientAppConfigService" },
-  { name: "foam/nanos/theme/Theme" },
   { name: "foam/nanos/controller/ApplicationController" },
   { name: "foam/nanos/app/Mode" },
   { name: "foam/nanos/auth/DayOfWeek" },
@@ -75,12 +74,12 @@ FOAM_FILES([
   { name: "foam/nanos/auth/RetrievePassword" },
   { name: "foam/nanos/auth/UpdatePassword" },
   { name: 'foam/nanos/auth/HumanNameTrait' },
+  { name: "foam/nanos/auth/CreatedByAware" },
+  { name: "foam/nanos/auth/CreatedByAwareDAO" },
   { name: "foam/nanos/auth/User" },
   { name: "foam/nanos/auth/PriorPassword" },
   { name: "foam/nanos/auth/ruler/AddPasswordHistoryAction" },
   { name: "foam/nanos/auth/test/PasswordPolicyTest" },
-  { name: "foam/nanos/auth/CreatedByAware" },
-  { name: "foam/nanos/auth/CreatedByAwareDAO" },
   { name: "foam/nanos/auth/LastModifiedByAware" },
   { name: "foam/nanos/auth/LastModifiedByAwareDAO" },
   { name: "foam/nanos/auth/PermissionedPropertyDAO" },
@@ -94,6 +93,10 @@ FOAM_FILES([
   { name: "foam/nanos/auth/UserAndGroupAuthService" },
   { name: "foam/nanos/auth/UserQueryService" },
   { name: "foam/nanos/auth/SimpleUserQueryService" },
+  { name: "foam/nanos/theme/Theme" },
+  { name: "foam/nanos/theme/ThemeDomain" },
+  { name: "foam/nanos/theme/ThemeDomainsDAO" },
+  { name: "foam/nanos/theme/Themes" },
   { name: "foam/nanos/bench/Benchmark" },
   { name: "foam/nanos/boot/DAOConfigSummaryView", flags: ['web'] },
   { name: "foam/nanos/session/Session" },
@@ -306,5 +309,7 @@ FOAM_FILES([
   //authservice
   { name: "foam/nanos/auth/CapabilityAuthService" },
   // google
-  { name: "foam/nanos/geocode/GoogleMapsCredentials" }
+  { name: "foam/nanos/geocode/GoogleMapsCredentials" },
+
+  { name: "com/google/foam/demos/u2/AllViews" }
 ]);

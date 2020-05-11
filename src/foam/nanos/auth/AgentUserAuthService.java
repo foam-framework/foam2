@@ -14,7 +14,6 @@ import foam.nanos.NanoService;
 import foam.nanos.session.Session;
 import foam.nanos.auth.AuthenticationException;
 import foam.nanos.auth.AuthorizationException;
-
 import static foam.mlang.MLang.EQ;
 import static foam.mlang.MLang.AND;
 
@@ -33,10 +32,10 @@ public class AgentUserAuthService
 
   @Override
   public void start() {
-    userDAO_     = (DAO) getX().get("localUserDAO");
-    groupDAO_    = (DAO) getX().get("groupDAO");
-    sessionDAO_  = (DAO) getX().get("localSessionDAO");
-    agentJunctionDAO_  = (DAO) getX().get("agentJunctionDAO");
+    userDAO_          = (DAO) getX().get("localUserDAO");
+    groupDAO_         = (DAO) getX().get("groupDAO");
+    sessionDAO_       = (DAO) getX().get("localSessionDAO");
+    agentJunctionDAO_ = (DAO) getX().get("agentJunctionDAO");
   }
 
   /*
@@ -46,7 +45,7 @@ public class AgentUserAuthService
   */
   public User actAs(X x, User entity) throws AuthenticationException {
     User agent = (User) x.get("user");
-    User user = (User) userDAO_.find(entity.getId());
+    User user  = (User) userDAO_.find(entity.getId());
 
     // Check for current context user
     if ( agent == null ) {
