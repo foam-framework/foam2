@@ -52,7 +52,7 @@ foam.CLASS({
         }
         Predicate myPredicate = AND(propertiesToCheck);
 
-        if ( readOnly()) {
+        if ( getReadOnly()) {
           DAO myDAO = ((DAO) x.get( getDaoName() )).where(myPredicate);
           execute(x, nu, myDAO);
         }
