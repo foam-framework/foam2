@@ -939,7 +939,7 @@ foam.typeOf = (function() {
     if ( tDate.isInstance(o) )      return tDate;
     if ( tFunction.isInstance(o) )  return tFunction;
     if ( tFObject.isInstance(o) )   return tFObject;
-    if ( tRegExp.isInstance(o) )   return tRegExp;
+    if ( tRegExp.isInstance(o) )    return tRegExp;
     return tObject;
   };
 })();
@@ -951,16 +951,16 @@ foam.typeOf = (function() {
 */
 
 foam.core.FObject.ordinal = 0;
-foam.Date.ordinal = 1;
-foam.RegExp.ordinal = 2;
-foam.Object.ordinal = 3;
-foam.Function.ordinal = 4;
-foam.Array.ordinal = 5;
-foam.String.ordinal = 6;
-foam.Number.ordinal = 7;
-foam.Boolean.ordinal = 8;
-foam.Null.ordinal = 9;
-foam.Undefined.ordinal = 10;
+foam.Date.ordinal         = 1;
+foam.RegExp.ordinal       = 2;
+foam.Object.ordinal       = 3;
+foam.Function.ordinal     = 4;
+foam.Array.ordinal        = 5;
+foam.String.ordinal       = 6;
+foam.Number.ordinal       = 7;
+foam.Boolean.ordinal      = 8;
+foam.Null.ordinal         = 9;
+foam.Undefined.ordinal    = 10;
 
 foam.LIB({
   name: 'foam',
@@ -990,16 +990,16 @@ foam.LIB({
         }
 
         var type = arg1 && arg1.cls_ && arg1.cls_[uid] ?
-            arg1.cls_ :
-            foam.typeOf(arg1) ;
+          arg1.cls_ :
+          foam.typeOf(arg1) ;
 
         if ( ! opt_defaultMethod ) {
           foam.assert(type, 'Unknown type: ', arg1,
-              'and no default method provided');
+            'and no default method provided');
           foam.assert(
-              type[uid],
-              'Missing ' + name + ' multi-method for type ', arg1, ' map: ', map,
-              'and no default method provided');
+            type[uid],
+            'Missing ' + name + ' multi-method for type ', arg1, ' map: ', map,
+            'and no default method provided');
         }
 
         return ( type[uid] || opt_defaultMethod ).apply(this, arguments);
@@ -1034,6 +1034,20 @@ foam.LIB({
 
 (function() {
   var typeOf = foam.typeOf;
+  /*
+  var typeOf = mmethod({
+    Undefined: () => foam.Undefined,
+    Null:      () => foam.Null,
+    String:    () => foam.String,
+    Number:    () => foam.Number,
+    Boolean:   () => foam.Boolean,
+    Date:      () => foam.Date,
+    Function:  () => foam.Function,
+    FObject:   () => foam.FObject,
+    Array:     () => foam.Array,
+    Object:    () => foam.Object
+  });
+  */
 
   foam.LIB({
     name: 'foam.util',
@@ -1056,7 +1070,7 @@ foam.LIB({
         var aType = typeOf(a);
         var bType = typeOf(b);
         return aType.ordinal > bType.ordinal ? 1 :
-            aType.ordinal < bType.ordinal ? -1 : aType.compare(a, b);
+          aType.ordinal < bType.ordinal ? -1 : aType.compare(a, b);
       },
       function hashCode(o)   { return typeOf(o).hashCode(o); },
       function diff(a, b)    {

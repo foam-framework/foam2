@@ -76,6 +76,7 @@ foam.CLASS({
       /** Template method used to add additional code in subclasses. */
       name: 'runTest',
       type: 'Void',
+      javaThrows: ['Throwable'],
       code: function(x) {
         return eval(this.code);
       },
@@ -193,6 +194,7 @@ foam.CLASS({
           // creates the testing method
           shell.eval("test(boolean exp, String message) { if ( exp ) { currentScript.setPassed(currentScript.getPassed()+1); } else { currentScript.setFailed(currentScript.getFailed()+1); } print((exp ? \\"SUCCESS: \\" : \\"FAILURE: \\")+message);}");
           shell.eval(getCode());
+          // if the test is a java class (not a script), it will just update the lastRun and lastDuration
           runTest(x);
         } catch (Throwable e) {
           setFailed(getFailed()+1);

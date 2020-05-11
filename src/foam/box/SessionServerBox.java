@@ -9,6 +9,7 @@ package foam.box;
 import foam.core.X;
 import foam.dao.DAO;
 import foam.nanos.app.AppConfig;
+import foam.nanos.app.Mode;
 import foam.nanos.auth.AuthenticationException;
 import foam.nanos.auth.AuthorizationException;
 import foam.nanos.auth.Group;
@@ -108,7 +109,10 @@ public class SessionServerBox
       logger.error("Error throw in SessionServerBox: " + t, " ,service: " + spec.getName(), t);
       t.printStackTrace();
       msg.replyWithException(t);
-      return;
+      
+      AppConfig appConfig = (AppConfig) getX().get("appConfig");
+      if ( Mode.TEST == appConfig.getMode() )
+        throw t;
     }
   }
 }

@@ -1,3 +1,4 @@
+
 /**
  * @license
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
@@ -199,68 +200,22 @@ foam.CLASS({
       ],
       javaCode: `
         // Find Group details, by iterating up through group.parent
-        AppConfig config          = (AppConfig) ((AppConfig) x.get("appConfig")).fclone();
         Group group               = this;
         DAO groupDAO              = (DAO) x.get("groupDAO");
 
         String configUrl           = "";
-        String configSupportEmail  = "";
-        String configSupportPhone  = "";
 
         // Get support info and url off group or parents.
         while ( group != null ) {
           configUrl = ! SafetyUtil.isEmpty(group.getUrl()) && SafetyUtil.isEmpty(configUrl) ?
               group.getUrl() : configUrl;
 
-          configSupportEmail = ! SafetyUtil.isEmpty(group.getSupportEmail()) && SafetyUtil.isEmpty(configSupportEmail) ?
-              group.getSupportEmail() : configSupportEmail;
-
-          configSupportPhone = ! SafetyUtil.isEmpty(group.getSupportPhone()) && SafetyUtil.isEmpty(configSupportPhone) ?
-              group.getSupportPhone() : configSupportPhone;
-
           if ( ! SafetyUtil.isEmpty(group.getUrl()) && ! SafetyUtil.isEmpty(configUrl) ) break;
           group = (Group) groupDAO.find(group.getParent());
         }
 
-        // Find url on http request if one wasn't found on related groups.
-        if ( SafetyUtil.isEmpty(configUrl) ) {
-          // populate AppConfig url with request's RootUrl
-          HttpServletRequest req = x.get(HttpServletRequest.class);
-          if ( (req != null) && ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
-            configUrl = ((Request) req).getRootURL().toString();
-          }
-        }
-
-        // Force https if enabled
-        if ( config.getForceHttps() ) {
-          if ( ! configUrl.startsWith("https://") ) {
-            if ( configUrl.startsWith("http://") ) {
-              configUrl = "https" + configUrl.substring(4);
-            } else {
-              configUrl = "https://" + configUrl;
-            }
-          }
-        }
-
-        // Strip trailing / to simplify other url building components, such as email templates. 
-        if ( configUrl.endsWith("/") ) {
-          configUrl = configUrl.substring(0, configUrl.length()-1);
-        } 
-
-        // SET URL
-        config.setUrl(configUrl);
-
-        // SET Support Email
-        if ( ! SafetyUtil.isEmpty(configSupportEmail) ) {
-          config.setSupportEmail(configSupportEmail);
-        }
-
-        // SET Support Phone
-        if ( ! SafetyUtil.isEmpty(configSupportPhone) ) {
-          config.setSupportPhone(configSupportPhone);
-        }
-
-        return config;
+        AppConfig config = (AppConfig) x.get("appConfig");
+        return config.configure(x, configUrl);
         `
     },
     {
@@ -432,4 +387,21 @@ foam.CLASS({
       `
     }
   ]
+});
+
+
+foam.RELATIONSHIP({
+  cardinality: '1:*',
+  sourceModel: 'foam.nanos.theme.Theme',
+  targetModel: 'foam.nanos.auth.Group',
+  forwardName: 'groups',
+  inverseName: 'theme',
+  sourceProperty: {
+    hidden: true
+  },
+  targetProperty: {
+    hidden: false,
+    tableWidth: 120,
+    section: 'administrative'
+  }
 });
