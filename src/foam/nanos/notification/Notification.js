@@ -121,6 +121,12 @@ foam.CLASS({
       class: 'String',
       name: 'slackMessage',
       documentation: 'Message to be sent to Slack if sendSlackMessage is enabled.'
+    },
+    {
+      class: 'Enum',
+      name: 'action',
+      of: 'foam.nanos.notification.NotificationAction',
+      value: 'ALL'
     }
   ],
 

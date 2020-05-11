@@ -34,6 +34,7 @@ public class SendEmailNotificationDAO extends ProxyDAO {
     setX(x);
     setDelegate(delegate);
   }
+  
   @Override
   public FObject put_(X x, FObject obj) {
     DAO          userDAO         = (DAO) x.get("localUserDAO");
@@ -47,6 +48,10 @@ public class SendEmailNotificationDAO extends ProxyDAO {
       return super.put_(x, obj);
 
     if ( user.getLifecycleState() != LifecycleState.ACTIVE )
+      return super.put_(x, obj);
+
+    if ( notification.getAction() != NotificationAction.ALL &&
+         notification.getAction() != NotificationAction.EMAIL )
       return super.put_(x, obj);
 
     if ( "notification".equals(notification.getEmailName()) ) {

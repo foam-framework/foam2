@@ -61,6 +61,9 @@ foam.CLASS({
         { name: 'notification', type: 'foam.nanos.notification.Notification' },
       ],
       javaCode: `
+        notification = (Notification) notification.fclone();
+        notification.setAction(NotificationAction.EMAIL);
+
         // Proxy to sendNotificaiton method
         sendNotification(x, user, notification);
       `
