@@ -13,6 +13,7 @@ import foam.dao.DAO;
 import foam.dao.java.JDAO;
 import foam.dao.ProxyDAO;
 import foam.nanos.auth.Group;
+import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
 import foam.nanos.logger.ProxyLogger;
@@ -94,6 +95,19 @@ public class Boot {
       }
     });
 
+    root_ = root_.putFactory("user", new XFactory() {
+      public Object create(X x) {
+        return ((Subject) x.get("subject")).getUser();
+      }
+    });
+
+    root_ = root_.putFactory("agent", new XFactory() {
+      public Object create(X x) {
+        return ((Subject) x.get("subject")).getEffectiveUser();
+      }
+    });
+
+
     // Revert root_ to non ProxyX to avoid letting children add new bindings.
     root_ = ((ProxyX) root_).getX();
 
@@ -149,7 +163,9 @@ public class Boot {
     session.setUserId(user.getId());
     session.setContext(root_);
 
-    root_.put("user", user);
+    Subject subject = new Subject();
+    subject.setUser(user);
+    root_.put("subject", subject);
     root_.put(Session.class, session);
 
     Group group = new Group();

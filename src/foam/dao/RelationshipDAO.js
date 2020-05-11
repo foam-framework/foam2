@@ -31,6 +31,11 @@ foam.CLASS({
 
   documentation: 'Adapts a DAO based on a Relationship.',
 
+  javaImports: [
+    'foam.nanos.auth.Subject',
+    'foam.nanos.auth.User'
+  ],
+
   properties: [
     {
       class: 'Object',
@@ -75,8 +80,8 @@ foam.CLASS({
       },
       javaFactory:`
       try {
-        foam.nanos.auth.User user = (foam.nanos.auth.User) getX().get("user");
-        if ( user != null && user.getId() == foam.nanos.auth.User.SYSTEM_USER_ID && getUnauthorizedTargetDAOKey().length() != 0 ) {
+        User user = ((Subject) getX().get("subject")).getUser();
+        if ( user != null && user.getId() == User.SYSTEM_USER_ID && getUnauthorizedTargetDAOKey().length() != 0 ) {
           return ((foam.dao.DAO) getX().get(getUnauthorizedTargetDAOKey())).inX(getX());
         }
         return ((foam.dao.DAO) getX().get(getTargetDAOKey())).inX(getX());
