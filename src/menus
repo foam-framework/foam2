@@ -9,28 +9,21 @@ p({
     "class":"foam.nanos.menu.DAOMenu2",
     "config":{
       "class":"foam.comics.v2.DAOControllerConfig",
-      "daoKey":"countryDAO",
-      "browseViews":[{
-        "class":"foam.comics.v2.BrowseView",
-        "name":"Table",
-        "view":{
-          "class":"foam.u2.view.ScrollTableView"
-        }
-      }]
+      "daoKey":"countryDAO"
     }
   },
   "parent":"admin"
 })
-p({"class":"foam.nanos.menu.Menu","id":"admin.cron","label":"Cron Jobs","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"cronDAO","browseViews":[{"class":"foam.comics.v2.BrowseView","name":"Table","view":{"class":"foam.u2.view.ScrollTableView"}}]}},"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.cron","label":"Cron Jobs","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"cronDAO"}},"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"admin.data","label":"Data Management","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.boot.DAOConfigSummaryView"}},"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.emailmessages","label":"Email Messages","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"emailMessageDAO","browseViews":[{"class":"foam.comics.v2.BrowseView","name":"Table","view":{"class":"foam.u2.view.ScrollTableView"}}]}},"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.emailtemplates","label":"Email Templates","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"emailTemplateDAO","browseViews":[{"class":"foam.comics.v2.BrowseView","name":"Table","view":{"class":"foam.u2.view.ScrollTableView"}}]}},"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.export","label":"Export Drivers","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"exportDriverRegistryDAO","browseViews":[{"class":"foam.comics.v2.BrowseView","name":"Table","view":{"class":"foam.u2.view.ScrollTableView"}}]}},"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.groups","label":"Groups","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"groupDAO","browseViews":[{"class":"foam.comics.v2.BrowseView","name":"Table","view":{"class":"foam.u2.view.ScrollTableView"}}]}},"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.lang","label":"Languages","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"languageDAO","browseViews":[{"class":"foam.comics.v2.BrowseView","name":"Table","view":{"class":"foam.u2.view.ScrollTableView"}}]}},"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.logs","label":"Logs","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"logMessageDAO","browseViews":[{"class":"foam.comics.v2.BrowseView","name":"Table","view":{"class":"foam.u2.view.ScrollTableView"}}]}},"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.emailmessages","label":"Email Messages","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"emailMessageDAO"}},"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.emailtemplates","label":"Email Templates","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"emailTemplateDAO"}},"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.export","label":"Export Drivers","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"exportDriverRegistryDAO"}},"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.groups","label":"Groups","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"groupDAO"}},"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.lang","label":"Languages","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"languageDAO"}},"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.logs","label":"Logs","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"logMessageDAO"}},"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"admin.menus","label":"Menus","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"menuDAO","summaryView":{"class":"foam.nanos.menu.TreeAltView"}},"parent":"admin"})
-//p({"class":"foam.nanos.menu.Menu","id":"admin.menus","label":"Menus","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"menuDAO","browseViews":[{"class":"foam.comics.v2.BrowseView","name":"Table","view":{"class":"foam.nanos.menu.TreeAltView"}}]}},"parent":"admin"})
+//p({"class":"foam.nanos.menu.Menu","id":"admin.menus","label":"Menus","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"menuDAO"}},"parent":"admin"})
 p({
   "class":"foam.nanos.menu.Menu",
   "id":"admin.nspec",
@@ -40,21 +33,14 @@ p({
     "config":{
       "class":"foam.comics.v2.DAOControllerConfig",
       "daoKey":"nSpecDAO",
-      "browseTitle":"Services",
-      "browseViews":[{
-        "class":"foam.comics.v2.BrowseView",
-        "name":"Table",
-        "view":{
-          "class":"foam.u2.view.ScrollTableView"
-        }
-      }]
+      "browseTitle":"Services"
     }
   },
   "parent":"admin"
 })
 p({"class":"foam.nanos.menu.Menu","id":"admin.p","label":"Performance","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"pmInfoDAO","summaryView":{"class":"foam.nanos.pm.PMTableView"}},"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"admin.permissionMatrix","label":"Permission Matrix","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.auth.PermissionTableView"}},"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.permissions","label":"Permissions","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"permissionDAO","browseViews":[{"class":"foam.comics.v2.BrowseView","name":"Table","view":{"class":"foam.u2.view.ScrollTableView"}}]}},"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.permissions","label":"Permissions","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"permissionDAO"}},"parent":"admin"})
 p({
   "class":"foam.nanos.menu.Menu",
   "id":"admin.regions",
@@ -136,6 +122,19 @@ p({
   },
   "parent":"admin"
 })
+p({
+  "class":"foam.nanos.menu.Menu",
+  "id":"admin.googleApiCredentials",
+  "label":"Google Api Credentials",
+  "handler":{
+    "class":"foam.nanos.menu.DAOMenu2",
+    "config":{
+      "class":"foam.comics.v2.DAOControllerConfig",
+      "daoKey":"googleApiCredentialsDAO"
+    }
+  },
+  "parent":"admin"
+})
 
 // integration
 p({"class":"foam.nanos.menu.Menu","id":"integration","label":"Integration","handler":{"class":"foam.nanos.menu.SubMenu"},"parent":""})
@@ -183,7 +182,7 @@ p({
   },
   "parent":"integration"
 })
-p({"class":"foam.nanos.menu.Menu","id":"integration.model-doc","label":"UML API Models","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.doc.ModelBrowser"}},"parent":"integration"})
+p({"class":"foam.nanos.menu.Menu","id":"integration.model-doc","label":"UML API Models","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.doc.ModelBrowser","allowedModels":{"net.nanopay.fx.afex.AFEXLog":true}}},"parent":"integration"})
 
 // settings
 p({"class":"foam.nanos.menu.Menu","id":"set-password","label":"Change Password","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.auth.ChangePasswordView"}},"order":100,"parent":"settings"})
