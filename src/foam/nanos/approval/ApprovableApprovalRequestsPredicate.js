@@ -32,7 +32,8 @@
             EQ(DOT(NEW_OBJ, ApprovalRequest.STATUS), ApprovalStatus.APPROVED),
             EQ(DOT(NEW_OBJ, ApprovalRequest.STATUS), ApprovalStatus.REJECTED),
             EQ(DOT(NEW_OBJ, ApprovalRequest.STATUS), ApprovalStatus.CANCELLED)
-          )
+          ),
+          EQ(DOT(NEW_OBJ, ApprovalRequest.IS_FULFILLED), false)
         ).f(obj);
       `
     } 
