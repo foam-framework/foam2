@@ -202,7 +202,7 @@ foam.CLASS({
         filteredApprovalRequestDAO = (DAO) approvalRequestDAO
           .where(
             foam.mlang.MLang.AND(
-              foam.mlang.MLang.EQ(ApprovalRequest.DAO_KEY, getDaoKey()),
+              foam.mlang.MLang.EQ(ApprovalRequest.SERVER_DAO_KEY, getDaoKey()),
               foam.mlang.MLang.EQ(ApprovalRequest.OBJ_ID, String.valueOf(obj.getProperty("id"))),
               foam.mlang.MLang.EQ(ApprovalRequest.CREATED_BY, user.getId()),
               foam.mlang.MLang.EQ(ApprovalRequest.OPERATION, operation),
@@ -289,7 +289,6 @@ foam.CLASS({
           if ( operation == Operations.CREATE ){
             lifecycleObj.setLifecycleState(LifecycleState.ACTIVE);
           }
-          
           return super.put_(x,obj);
         } 
 
