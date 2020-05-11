@@ -10,6 +10,8 @@ import foam.core.ClassInfo;
 import foam.core.X;
 import foam.dao.DAO;
 import foam.dao.MDAO;
+import foam.nanos.app.AppConfig;
+import foam.nanos.app.Mode;
 import foam.nanos.auth.User;
 import foam.nanos.fs.File;
 
@@ -70,6 +72,7 @@ public class TestUtils {
    * @return
    */
   public static boolean testThrows(
+      X x,
       Runnable fn,
       String expectedExceptionMessage,
       Class exceptionType
@@ -89,7 +92,10 @@ public class TestUtils {
         System.out.println("EXPECTED: \""+exceptionType.getName()+"\"");
         System.out.println("ACTUAL  : \""+t.getClass().getName()+"\"");
         t.printStackTrace();
-        throw t;
+        
+        AppConfig appConfig = (AppConfig) x.get("appConfig");
+        if ( Mode.TEST.equals(appConfig.getMode()) )
+          throw t;
       }
     }
     if ( ! returnedMessage.equals(expectedExceptionMessage) ) {
