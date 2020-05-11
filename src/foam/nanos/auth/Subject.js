@@ -9,6 +9,8 @@ foam.CLASS({
   name: 'Subject',
 
   javaImports: [
+    'foam.nanos.auth.User',
+    'java.util.ArrayList',
     'java.util.Stack'
   ],
 
@@ -19,8 +21,8 @@ foam.CLASS({
       name: 'user',
       documentation: 'Authenticated user',
       javaSetter: `
-        userPath_ = new java.util.ArrayList<foam.nanos.auth.User>();
-        userPath_.add(val);
+        setUserPath(new ArrayList<User>());
+        setEffectiveUser(val);
         user_ = val;
         userIsSet_ = true;
       `
@@ -31,8 +33,8 @@ foam.CLASS({
       name: 'effectiveUser',
       documentation: 'Current user role(acts as effectiveUser)',
       javaSetter: `
-      java.util.ArrayList userPath = getUserPath();
-      if ( userPath.size() < 2 || val != (foam.nanos.auth.User) userPath.get(userPath.size() - 1) ) {
+      ArrayList userPath = getUserPath();
+      if ( userPath.size() < 2 || val != (User) userPath.get(userPath.size() - 1) ) {
         userPath.add(val);
       }
       else {
@@ -44,10 +46,10 @@ foam.CLASS({
     },
     {
       class: 'List',
-      javaType: 'java.util.ArrayList<foam.nanos.auth.User>',
+      javaType: 'java.util.ArrayList<User>',
       name: 'userPath',
       documentation: 'path from user to effectiveUser',
-      javaFactory: 'return new java.util.ArrayList();'
+      javaFactory: 'return new ArrayList();'
     },
   ],
 
@@ -56,7 +58,11 @@ foam.CLASS({
       name: 'toString',
       type: 'String',
       javaCode: `
-        return "hahaha";
+      String ret = "";
+      for (User user : getUserPath()) {
+          ret += " >> " + user.getUserName() + "( " + user.getId() + " )";
+      }
+      return ret;
 `
      }
   ]
