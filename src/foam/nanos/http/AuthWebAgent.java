@@ -12,11 +12,7 @@ import static foam.mlang.MLang.AND;
 import static foam.mlang.MLang.EQ;
 
 import foam.nanos.app.AppConfig;
-import foam.nanos.auth.AgentAuthService;
-import foam.nanos.auth.AuthService;
-import foam.nanos.auth.AuthenticationException;
-import foam.nanos.auth.User;
-import foam.nanos.auth.Group;
+import foam.nanos.auth.*;
 import foam.nanos.boot.Boot;
 import foam.nanos.logger.Logger;
 import foam.nanos.session.Session;
@@ -107,7 +103,8 @@ public class AuthWebAgent
 
       // save cookie
       createCookie(x, session);
-      if ( ! attemptLogin && session.getContext().get("user") != null ) {
+      User user = ((Subject) session.getContext().get("subject")).getUser();
+      if ( ! attemptLogin && user != null ) {
         return session;
       }
     } else {
@@ -171,7 +168,7 @@ public class AuthWebAgent
                 session.setRemoteHost(req.getRemoteHost());
                 X effectiveContext = session.applyTo(x);
                 session.setContext(effectiveContext);
-                User user = (User) effectiveContext.get("user");
+                User user = ((Subject) effectiveContext.get("subject")).getUser();
 
                 try {
                   if ( user == null ) {

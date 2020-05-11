@@ -18,8 +18,9 @@ foam.CLASS({
 
   javaImports: [
     'foam.dao.DAO',
-    'foam.nanos.auth.User',
     'foam.nanos.auth.Group',
+    'foam.nanos.auth.Subject',
+    'foam.nanos.auth.User',
     'javax.servlet.http.HttpServletRequest',
     'org.eclipse.jetty.server.Request'
   ],
@@ -67,7 +68,7 @@ foam.CLASS({
       DAO groupDAO = (DAO) x.get("groupDAO");
       Theme theme = (Theme) x.get("theme");
       if ( theme != null ) return theme;
-      User user = (User) x.get("user");
+      User user = ((Subject) x.get("subject")).getUser();
       if ( user != null ) {
         theme = user.findTheme(x);
         if ( theme != null ) return theme;

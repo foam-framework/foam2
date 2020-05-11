@@ -44,7 +44,7 @@ public class AgentUserAuthService
     act on behalf of others while retaining information on the user.
   */
   public User actAs(X x, User entity) throws AuthenticationException {
-    User agent = (User) x.get("user");
+    User agent = ((Subject) x.get("subject")).getUser();
     User user  = (User) userDAO_.find(entity.getId());
 
     // Check for current context user

@@ -12,6 +12,7 @@ foam.CLASS({
   documentation: `Set the ticket's owner`,
 
   javaImports: [
+    'foam.nanos.auth.Subject',
     'foam.nanos.auth.User'
   ],
 
@@ -21,8 +22,9 @@ foam.CLASS({
       javaCode: `
     TicketComment comment = (TicketComment) obj;
     if ( comment.getOwner() == 0 ) {
-      User user = (User) x.get("user");
-      User agent = (User) x.get("agent");
+      Subject subject = (Subject) x.get("subject");
+      User user = subject.getUser();
+      User agent = subject.getEffectiveUser();
       comment.setOwner(agent != null ? agent.getId() : user.getId());
     }
     comment = (TicketComment) getDelegate().put_(x, comment);

@@ -17,6 +17,7 @@ foam.CLASS({
   javaImports: [
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.AuthorizationException',
+    'foam.nanos.auth.Subject',
     'foam.nanos.auth.User'
   ],
 
@@ -137,7 +138,7 @@ foam.CLASS({
       ],
       type: 'Boolean',
       javaCode: `
-        User user = (User) x.get("user");
+        User user = ((Subject) x.get("subject")).getUser();
         return user != null && getUserId() == user.getId();
       `
     },

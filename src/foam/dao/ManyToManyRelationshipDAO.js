@@ -75,7 +75,7 @@ foam.CLASS({
           .where(foam.mlang.MLang.EQ(getRelationship().getSourceProperty(), getRelationship().getSourceId()))
           .select(foam.mlang.MLang.MAP(getRelationship().getTargetProperty(), new foam.dao.ArraySink()));
 
-        foam.nanos.auth.User user = (foam.nanos.auth.User) getX().get("user");
+        foam.nanos.auth.User user = ((foam.nanos.auth.Subject) getX().get("subject")).getUser();
         if ( user != null && user.getId() == foam.nanos.auth.User.SYSTEM_USER_ID && getUnauthorizedTargetDAOKey().length() != 0 ) {
           setDelegate(((foam.dao.DAO) getX().get(getUnauthorizedTargetDAOKey())).inX(getX()));
         }

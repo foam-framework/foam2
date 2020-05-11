@@ -33,6 +33,7 @@ foam.CLASS({
       name: 'effectiveUser',
       documentation: 'Current user role(acts as effectiveUser)',
       javaSetter: `
+      if ( getUser() == null ) user_ = val;
       ArrayList userPath = getUserPath();
       if ( userPath.size() < 2 || val != (User) userPath.get(userPath.size() - 1) ) {
         userPath.add(val);
