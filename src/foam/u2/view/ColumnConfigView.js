@@ -151,8 +151,8 @@ foam.CLASS({
           views[i].prop = thisProps[i-1];
         }
       }
-      views[replaceIndex].prop = prop;
-      views[replaceIndex].prop.index = replaceIndex;
+      thisProps[draggableIndex].index = draggableIndex;
+      views[replaceIndex].prop = thisProps[draggableIndex];
     },
     function rebuildSelectedColumns() {
       var arr = [];
