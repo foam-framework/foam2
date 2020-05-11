@@ -4,11 +4,10 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-foam.EXCEPTION({
+foam.CLASS({
   package: 'foam.comics.v2.userfeedback',
   name: 'UserFeedbackException',
-  javaExceptionExtends: 'foam.core.AbstractNativeException',
-  // javaSuperArgs: [ 'message' ],
+  generateNativeException: true,
 
   documentation: `
     In cases where the object is not returned to client user after a request,

@@ -150,7 +150,6 @@ foam.CLASS({
       this.of.model_.instance_.name = name;
       this.of.model_.instance_.id = id;
       this.of.model_.extends = this.getCorrectExtends_();
-      this.of.MESSAGE.instance_.forClass_ = id;
       this.of.name = name;
       this.of.model_.nativeException = true;
 

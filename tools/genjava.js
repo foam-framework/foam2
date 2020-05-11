@@ -206,7 +206,7 @@ function generateClass(cls) {
   ensurePath(outfile);
 
   writeFileIfUpdated(outfile, cls.buildJavaClass().toJavaSource());
-  if ( foam.core.AbstractException.isSubClass(cls) ) {
+  if ( cls.model_.generateNativeException ) {
     generateNativeException(cls);
   }
 }
