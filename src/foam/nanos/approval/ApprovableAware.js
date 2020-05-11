@@ -10,7 +10,7 @@
   implements: [
     'foam.comics.v2.userfeedback.UserFeedbackAware',
     'foam.core.ContextAware',
-    'foam.nanos.auth.LifecycleAware',
+    'foam.nanos.auth.LifecycleAware'
   ],
 
   javaImports: [

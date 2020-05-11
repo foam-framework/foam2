@@ -67,7 +67,7 @@
               objectToPut.setProperty((String) keyArray[i],propsToUpdate.get(keyArray[i]));
             }
 
-            User createdBy = (User) ((DAO) x.get("bareUserDAO")).find(objectToPut.getProperty("createdBy"));
+            User createdBy = (User) ((DAO) x.get("bareUserDAO")).find(approvable.getCreatedBy());
 
             X createdX = x.put("user", createdBy);
 

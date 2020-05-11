@@ -7,6 +7,10 @@
 foam.CLASS({
   package: 'foam.nanos.approval',
   name: 'Approvable',
+  implements: [
+    'foam.nanos.auth.CreatedAware',
+    'foam.nanos.auth.CreatedByAware'
+  ],
 
   sections: [
     {
@@ -68,6 +72,20 @@ foam.CLASS({
       class: 'Class',
       name: 'of',
     },
+    {
+      class: 'DateTime',
+      name: 'created',
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdBy',
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdByAgent'
+    }
   ],
 
   methods: [
