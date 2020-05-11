@@ -142,13 +142,13 @@ foam.CLASS({
       replaceIndex = targetIndex;
       if (targetIndex > draggableIndex) {
         for (var i = draggableIndex; i < targetIndex; i++) {
+          thisProps[i+1].index = i;
           views[i].prop = thisProps[i+1];
-          views[i].prop.index = i;
         }
       } else {
         for (var i = targetIndex+1; i <= draggableIndex; i++) {
+          thisProps[i-1].index = i;
           views[i].prop = thisProps[i-1];
-          views[i].prop.index = i;
         }
       }
       views[replaceIndex].prop = prop;
