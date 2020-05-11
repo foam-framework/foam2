@@ -22,6 +22,13 @@ foam.CLASS({
     'static foam.mlang.MLang.EQ'
   ],
 
+  properties: [
+    {
+      name: 'action',
+      value: 'EMAIL'
+    }
+  ],
+
   methods: [
     {
       name: 'resolveNotificationArguments',
@@ -51,21 +58,6 @@ foam.CLASS({
           }
         }
         return arguments;
-      `
-    },
-    {
-      name: 'doNotify',
-      args: [
-        { name: 'x', type: 'Context' },
-        { name: 'user', type: 'foam.nanos.auth.User' },
-        { name: 'notification', type: 'foam.nanos.notification.Notification' },
-      ],
-      javaCode: `
-        notification = (Notification) notification.fclone();
-        notification.setAction(NotificationAction.EMAIL);
-
-        // Proxy to sendNotificaiton method
-        sendNotification(x, user, notification);
       `
     },
     {

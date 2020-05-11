@@ -50,6 +50,12 @@ foam.CLASS({
       class: 'Boolean',
       name: 'enabled',
       value: true
+    },
+    {
+      class: 'Enum',
+      name: 'action',
+      of: 'foam.nanos.notification.NotificationAction',
+      value: 'IN_APP'
     }
   ],
 
@@ -63,7 +69,7 @@ foam.CLASS({
       ],
       javaCode: `
         notification = (Notification) notification.fclone();
-        notification.setAction(NotificationAction.IN_APP);
+        notification.setAction(getAction());
 
         // Proxy to sendNotificaiton method
         sendNotification(x, user, notification);
