@@ -111,7 +111,7 @@ public class SessionServerBox
       msg.replyWithException(t);
       
       AppConfig appConfig = (AppConfig) getX().get("appConfig");
-      if ( Mode.TEST.equals(appConfig.getMode()) )
+      if ( Mode.TEST == appConfig.getMode() )
         throw t;
     }
   }
