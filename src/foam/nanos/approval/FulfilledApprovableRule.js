@@ -18,6 +18,7 @@
     'foam.core.FObject',
     'foam.core.X',
     'foam.dao.DAO',
+    'foam.nanos.auth.User',
     'foam.nanos.approval.Approvable',
     'foam.nanos.approval.ApprovableAware',
     'foam.nanos.approval.ApprovalRequest',
@@ -66,7 +67,11 @@
               objectToPut.setProperty((String) keyArray[i],propsToUpdate.get(keyArray[i]));
             }
 
-            dao.put_(getX(), objectToPut);
+            User createdBy = (User) ((DAO) x.get("bareUserDAO")).find(objectToPut.getProperty("createdBy"));
+
+            X createdX = x.put("user", createdBy);
+
+            dao.put_(createdX, objectToPut);
           }
         }, "Updated the object based on a approved approvable");
       `

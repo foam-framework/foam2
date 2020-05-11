@@ -71,6 +71,9 @@
                 diff.remove("created");
                 diff.remove("lastModified");
 
+                // remove lifecycle state
+                diff.remove("lifecycleState");
+
                 Iterator allProperties = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class).iterator();
 
                 List<String> storageTransientPropertyNames = new ArrayList<>();

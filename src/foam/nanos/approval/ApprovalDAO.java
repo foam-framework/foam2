@@ -77,18 +77,14 @@ public class ApprovalDAO
     DAO dao = (DAO) x.get(daoKey);
     FObject found = dao.inX(x).find(request.getObjId()).fclone();
 
-    if ( request instanceof ApprovalRequest ) {
-      DAO userDAO = (DAO) x.get("localUserDAO");
-      User initiatingUser = (User) userDAO.find(((ApprovalRequest) request).getCreatedBy());
-      X initiatingUserX = x.put("user", initiatingUser);
+    DAO userDAO = (DAO) x.get("localUserDAO");
+    User initiatingUser = (User) userDAO.find(((ApprovalRequest) request).getCreatedBy());
+    X initiatingUserX = x.put("user", initiatingUser);
 
-      if ( ((ApprovalRequest) request).getOperation() == Operations.REMOVE ) {
-        dao.inX(initiatingUserX).remove(found);
-      } else {
-        dao.inX(initiatingUserX).put(found);
-      }
+    if ( ((ApprovalRequest) request).getOperation() == Operations.REMOVE ) {
+      dao.inX(initiatingUserX).remove(found);
     } else {
-      dao.inX(x).put(found);
+      dao.inX(initiatingUserX).put(found);
     }
   }
 
