@@ -68,7 +68,7 @@ foam.CLASS({
       `
     },
     {
-      name: 'execute',
+      name: 'cmd',
       args: [
         { name: 'x', type: 'Context' },
         { name: 'nu', type: 'foam.core.FObject' },
