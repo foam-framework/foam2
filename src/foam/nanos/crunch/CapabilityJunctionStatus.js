@@ -9,15 +9,18 @@ foam.ENUM({
   values: [
     {
       name: 'PENDING',
-      label: 'pending'
+      label: 'pending',
+      background: '#bfae32'
     },
     {
       name: 'GRANTED',
-      label: 'granted'
+      label: 'granted',
+      background: '#32bf5e'
     },
     {
       name: 'EXPIRED',
-      label: 'expired'
+      label: 'expired',
+      background: '#bf3232'
     }
   ]
 });
