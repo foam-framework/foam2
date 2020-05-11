@@ -205,7 +205,19 @@ function generateClass(cls) {
 
   ensurePath(outfile);
 
-  writeFileIfUpdated(outfile, cls.buildJavaClass().toJavaSource());
+  let jcls = cls.buildJavaClass();
+  if ( cls.model_.generateNativeException ) {
+    console.log("NPTAG Generate newNative()");
+    jcls.method({
+      visibility: 'public',
+      type: 'java.lang.RuntimeException',
+      name: 'newNative',
+      args: [],
+      body: 'return new ' + foam.String.toNativeExceptionName(cls.name) + '(this);'
+    });
+  } 
+
+  writeFileIfUpdated(outfile, jcls.toJavaSource());
   if ( cls.model_.generateNativeException ) {
     generateNativeException(cls);
   }

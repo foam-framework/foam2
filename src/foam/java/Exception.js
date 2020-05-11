@@ -16,6 +16,7 @@ foam.CLASS({
 
   methods: [
     function fromFObjectClass(of) {
+      console.log("NPTAG Generating native exception for " + this.of_.model_.name)
       this.fromModel(of.model_);
       this.of_ = of;
 
@@ -135,7 +136,7 @@ foam.CLASS({
         return this.of.model_.extends;
       }
 
-      return 'java.lang.Exception';
+      return 'java.lang.RuntimeException';
     },
     function extendsException() {
       return foam.core.AbstractException.isSubClass(this.__context__.lookup(this.of.model_.extends));
@@ -151,7 +152,6 @@ foam.CLASS({
       this.of.model_.instance_.id = id;
       this.of.model_.extends = this.getCorrectExtends_();
       this.of.name = name;
-      this.of.model_.nativeException = true;
 
       return this.of.buildJavaClass();
     }
