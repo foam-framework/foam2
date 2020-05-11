@@ -31,7 +31,6 @@ foam.CLASS({
     'foam.dao.ArraySink',
     'foam.nanos.auth.LifecycleAware',
     'foam.nanos.auth.LifecycleState',
-    'static foam.mlang.MLang.EQ',
     'foam.nanos.notification.NotificationSetting',
     'foam.nanos.session.Session',
     'foam.nanos.theme.Theme',
@@ -39,7 +38,6 @@ foam.CLASS({
     'java.util.Arrays',
     'java.util.HashSet',
     'java.util.List',
-    'static foam.mlang.MLang.EQ'
   ],
 
   documentation: `The User represents a person or entity with the ability
