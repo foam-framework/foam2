@@ -109,13 +109,15 @@ foam.CLASS({
         appConfig.copyFrom(themeAppConfig);
       }
 
+      String configUrl = url;
       HttpServletRequest req = x.get(HttpServletRequest.class);
       if ( req != null ) {
-        String configUrl = url != null ? url : ((Request) req).getRootURL().toString();
-
+        configUrl = ((Request) req).getRootURL().toString();
+      }
+      if ( ! foam.util.SafetyUtil.isEmpty(configUrl) ) {
         if ( appConfig.getForceHttps() ) {
           if ( configUrl.startsWith("https://") ) {
-             // Don't need to do anything.
+             // nop
           } else if ( configUrl.startsWith("http://") ) {
             configUrl = "https" + configUrl.substring(4);
           } else {
@@ -127,6 +129,7 @@ foam.CLASS({
         }
         appConfig.setUrl(configUrl);
       }
+
       return appConfig;
       `
     }
