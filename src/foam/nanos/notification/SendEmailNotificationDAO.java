@@ -43,10 +43,7 @@ public class SendEmailNotificationDAO extends ProxyDAO {
     User         user            = (User) userDAO.find(notification.getUserId());
     Notification oldNotification = (Notification) getDelegate().find(obj);
 
-    if ( oldNotification != null ) 
-      return super.put_(x, obj);
-
-    if ( ! notification.getEmailIsEnabled() || user == null ) 
+    if ( oldNotification != null || user == null) 
       return super.put_(x, obj);
 
     if ( user.getLifecycleState() != LifecycleState.ACTIVE )

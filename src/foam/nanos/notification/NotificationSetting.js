@@ -62,10 +62,6 @@ foam.CLASS({
         { name: 'notification', type: 'foam.nanos.notification.Notification' }
       ],
       javaCode: `
-        // Disable email sending when performing a doNotify to prevent duplicate emails
-        notification = (Notification) notification.fclone();
-        notification.setEmailIsEnabled(false);
-
         // Proxy to sendNotificaiton method
         sendNotification(x, user, notification);
       `

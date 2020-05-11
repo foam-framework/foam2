@@ -109,11 +109,6 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'emailIsEnabled',
-      documentation: 'Determines an email is sent to user.'
-    },
-    {
-      class: 'Boolean',
       name: 'sendSlackMessage',
       documentation: 'Sends notification as a Slack message.'
     },
