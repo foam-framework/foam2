@@ -54,7 +54,7 @@ foam.CLASS({
 
         if ( getReadOnly()) {
           DAO myDAO = ((DAO) x.get( getDaoName() )).where(myPredicate);
-          execute(x, nu, myDAO);
+          cmd(x, nu, myDAO);
         }
         else {
           agency.submit(x, new ContextAgent() {
