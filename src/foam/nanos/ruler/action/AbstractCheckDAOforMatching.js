@@ -61,7 +61,7 @@ foam.CLASS({
             @Override
             public void execute(X x) {
               DAO myDAO = ((DAO) x.get( getDaoName() )).where(myPredicate);
-              execute(x, nu, myDAO);
+              cmd(x, nu, myDAO);
             }
           },"DAO find Operation");
         }
