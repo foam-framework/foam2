@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.comics.v2.userfeedback',
   name: 'UserFeedbackException',
+  extends: 'foam.core.AbstractException',
   generateNativeException: true,
 
   documentation: `

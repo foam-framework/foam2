@@ -529,22 +529,6 @@ foam.LIB({
         body: 'return classInfo_;'
       });
 
-      // Special case to add newNative method to any instance of
-      // AbstractException. The generated code depends on the
-      // name of the exception.
-      if ( foam.core.AbstractException.isSubClass(this) &&
-        !(this.model_.name == 'AbstractException' && this.model_.package == 'foam.core') ) {
-        let exceptionName = foam.String.toNativeExceptionName(this.name)
-        cls.method({
-          visibility: 'public',
-          type: 'java.lang.Exception',
-          name: 'newNative',
-          args: [{type: 'String', name: 'message'}],
-          body: 'return new ' + exceptionName +
-            '(this, message);'
-        });
-      }
-
       var flagFilter = foam.util.flagFilter(['java']);
       var axioms = this.getOwnAxioms().filter(flagFilter);
 
@@ -680,20 +664,6 @@ foam.LIB({
     }
   ]
 });
-
-foam.LIB({
-  name: 'foam.core.AbstractException',
-  flags: ['java'],
-
-  methods: [
-    function buildJavaClass(cls) {
-      cls = cls || foam.java.Exception.create();
-      cls.fromFObjectClass(this);
-      return cls;
-    }
-  ]
-});
-
 
 foam.CLASS({
   package: 'foam.java',

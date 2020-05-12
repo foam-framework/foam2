@@ -205,8 +205,9 @@ function generateClass(cls) {
   ensurePath(outfile);
 
   let jcls = cls.buildJavaClass();
+
+  // Generates a native exception class that extends RuntimeException, allows object to be thrown
   if ( cls.model_.generateNativeException ) {
-    console.log("NPTAG Generate newNative()");
     jcls.method({
       visibility: 'public',
       type: 'java.lang.RuntimeException',
@@ -267,7 +268,9 @@ function generateNativeException(cls) {
   ensurePath(outfile);
 
   // TODO Ensure this makes an actual native exception
-  writeFileIfUpdated(outfile, foam.java.Exception.create({ of: cls }).buildJavaClass().toJavaSource());
+  let exception = foam.java.Exception.create();
+  exception.fromFObjectClass(cls);
+  writeFileIfUpdated(outfile, exception.buildJavaClass().toJavaSource());
   // writeFileIfUpdated(outfile, cls.buildJavaClass().toJavaSource());
 }
 
