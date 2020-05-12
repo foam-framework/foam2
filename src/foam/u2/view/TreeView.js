@@ -47,10 +47,9 @@ foam.CLASS({
       font-weight: normal;
       display: inline-block;
       color: #9BA1A6;
-      font-family: "IBM Plex Sans";
+      font-family: 'IBM Plex Sans', sans-serif;
       font-size: 14px;
-      letter-spacing: 0;
-      line-height: 21px;
+      font-weight: normal;
     }
 
     ^heading {
@@ -64,7 +63,7 @@ foam.CLASS({
     }
 
     ^selected > ^heading {
-      background-color: #e5f1fc !important;
+      background-color: /*%PRIMARY5%*/ #e5f1fc !important;
       border-left: 4px solid /*%PRIMARY3%*/ #406dea;
     }
 
@@ -203,14 +202,19 @@ foam.CLASS({
             style({
               'padding-left': ((( self.level - 1) * 16 + 28) + 'px')
             }).
-            add(this.slot( function(level) {
+            add(this.slot( function(level, selected, id) {
               if ( level === 1 ) {
+                var isDefault = ! this.data.icon || ! this.data.activeIcon;
+                var imgUrl = isDefault ? 'images/settings-icon-resting.svg' : self.data.icon;
+                if ( selected && foam.util.equals(selected.id, id) ) {
+                  imgUrl = isDefault ? 'images/settings-icon-active.svg' : self.data.activeIcon;
+                }
                 return this.E().start('img').
                   addClass(self.myClass('label-icon')).
-                  attrs({ 'src': 'images/ablii/settings.svg', 'width': '16px', 'height': '16px' }).
+                  attrs({ 'src': imgUrl, 'width': '16px', 'height': '16px' }).
                 end();
               }
-            })).
+            }, self.level$, this.selection$, this.data$.dot('id'))).
             start().
               addClass(self.myClass('select-level')).
               style({
@@ -329,6 +333,10 @@ foam.CLASS({
     'foam.u2.view.TreeViewRow'
   ],
 
+  imports: [
+    'theme'
+  ],
+
   exports: [
     'onObjDrop',
     'selection',
@@ -375,8 +383,7 @@ foam.CLASS({
       var M   = this.ExpressionsSingleton.create();
       var of  = this.__context__.lookup(this.relationship.sourceModel);
       var dao = this.data$proxy.where(
-        M.NOT(M.HAS(of.getAxiomByName(this.relationship.inverseName))));
-
+        M.EQ(of.getAxiomByName(this.relationship.inverseName), this.theme.rootMenu));
       var self = this;
       var isFirstSet = false;
 
