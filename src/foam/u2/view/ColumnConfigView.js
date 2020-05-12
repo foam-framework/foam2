@@ -43,7 +43,7 @@ foam.CLASS({
         var arr = [];
         var selectedColumns = [];
         var notSelectedColumns = [];
-        data.selectedColumnNames = data.selectedColumnNames.map(c => foam.Array.isInstance(c) ? c[0] : c);
+        data.selectedColumnNames = data.selectedColumnNames.map(c => foam.Array.isInstance(c) ? c[0] : typeof c === 'string' ? c : c.name );
         data.allColumns.forEach(c => {
           if ( data.selectedColumnNames.find(s => s.split('.')[0] === c) != null )
             selectedColumns.push(c);
