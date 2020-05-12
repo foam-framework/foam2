@@ -34,7 +34,7 @@ foam.INTERFACE({
           expr.IN(foam.strategy.StrategyReference.STRATEGY, [foam.lookup('foam.nanos.auth.SomeUserClass'), foam.lookup('foam.nanos.auth.AnotherUserClass') ])
       );
       return foam.u2.view.FObjectView.create({
-        data: myData,
+        data: X.data.exampleProp,
         of: foam.nanos.auth.User,
         persistantData: { website: X.data.user.website },
         predicate: predicate
