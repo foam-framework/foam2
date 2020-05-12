@@ -68,6 +68,11 @@ foam.CLASS({
       tableWidth: 100
     },
     {
+      class: 'String',
+      name: 'rootMenu',
+      documentation: 'Specifies the root to be used in TreeView.'
+    },
+    {
       class: 'Reference',
       targetDAOKey: 'menuDAO',
       name: 'defaultMenu',
