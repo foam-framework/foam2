@@ -79,7 +79,7 @@ foam.CLASS({
     {
       name: 'save',
       code: function() {
-        this.updateUCJ().then(() => {
+        return this.updateUCJ().then(() => {
           var ucj = this.ucj;
           if ( ucj === null ) {
             ucj = this.UserCapabilityJunction.create({

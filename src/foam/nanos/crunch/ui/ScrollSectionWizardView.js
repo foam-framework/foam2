@@ -20,6 +20,11 @@ foam.CLASS({
     'foam.mlang.Expressions'
   ],
 
+  messages: [
+    { name: 'SaveSuccess', message: 'Your progress has been saved.' },
+    { name: 'SaveFail', message: 'An error occured while saving your progress.' },
+  ],
+
   css: `
     ^ {
       margin: 30px;
@@ -123,12 +128,14 @@ foam.CLASS({
     {
       name: 'save',
       code: function(x) {
-        this.sectionsList.forEach(wizardSection => {
-          wizardSection.save();
-        })
-        
-        x.ctrl.notify('Your progress has been saved.');
-        x.stack.back();
+        Promise.all(
+          this.sectionsList.map(wizardSection => wizardSection.save())
+        ).then(() => {
+          x.ctrl.notify(this.SAVE_SUCCESS);
+          x.stack.back();
+        }).catch(() => {
+          x.ctrl.notify(this.SAVE_ERROR, 'error');
+        });
       }
     }
   ]
