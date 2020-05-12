@@ -70,15 +70,24 @@ foam.CLASS({
           }).updateUCJ()
         ));
       }).then(sections => {
-        sections = sections.filter(wizardSection =>
-          wizardSection.ucj === null || ! foam.util.equals(
-            wizardSection.ucj.status,
-            self.CapabilityJunctionStatus.GRANTED
-          )
-        );
-        self.stack.push({
-          class: "foam.nanos.crunch.ui.ScrollSectionWizardView",
-          sectionsList: sections
+        return new Promise((wizardResolve) => {
+          var pos = self.stack.pos;
+          self.stack.pos$.sub(sub => {
+            if ( self.stack.pos === pos ) {
+              wizardResolve();
+              sub.detach();
+            }
+          });
+          sections = sections.filter(wizardSection =>
+            wizardSection.ucj === null || ! foam.util.equals(
+              wizardSection.ucj.status,
+              self.CapabilityJunctionStatus.GRANTED
+            )
+          );
+          self.stack.push({
+            class: "foam.nanos.crunch.ui.ScrollSectionWizardView",
+            sectionsList: sections
+          });
         });
       });
 
