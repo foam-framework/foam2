@@ -16,14 +16,17 @@ foam.CLASS({
   javaImports: [
     'foam.core.X',
     'foam.dao.DAO',
+    'static foam.mlang.MLang.*',
     'foam.nanos.app.AppConfig',
     'foam.nanos.auth.*',
     'foam.nanos.boot.NSpec',
     'foam.nanos.logger.Logger',
     'foam.nanos.logger.PrefixLogger',
+    'foam.nanos.theme.Theme',
+    'foam.nanos.theme.Themes',
+    'foam.nanos.theme.ThemeDomain',
     'foam.util.SafetyUtil',
     'java.util.Date',
-    'static foam.mlang.MLang.*',
     'javax.servlet.http.HttpServletRequest',
     'org.eclipse.jetty.server.Request'
   ],
@@ -50,7 +53,7 @@ foam.CLASS({
       tableCellFormatter: function(value, obj) {
         this.add(value);
         this.__context__.userDAO.find(value).then(function(user) {
-          this.add(' ', user && user.label());
+          this.add(' ', user && user.toSummary());
         }.bind(this));
       },
       required: true,
@@ -63,7 +66,7 @@ foam.CLASS({
         if ( ! value ) return;
         this.add(value);
         this.__context__.userDAO.find(value).then(function(user) {
-          this.add(' ', user.label());
+          this.add(' ', user.toSummary());
         }.bind(this));
       },
       visibility: 'RO',
@@ -233,21 +236,16 @@ foam.CLASS({
           }
           AppConfig appConfig = (AppConfig) x.get("appConfig");
           appConfig = (AppConfig) appConfig.fclone();
-          String configUrl = ((Request) req).getRootURL().toString();
 
-          if ( appConfig.getForceHttps() ) {
-            if ( configUrl.startsWith("https://") ) {
-               // Don't need to do anything.
-            } else if ( configUrl.startsWith("http://") ) {
-              configUrl = "https" + configUrl.substring(4);
-            } else {
-              configUrl = "https://" + configUrl;
-            }
+          Theme theme = ((Themes) x.get("themes")).findTheme(x);
+          rtn = rtn.put("theme", theme);
+
+          AppConfig themeAppConfig = theme.getAppConfig();
+          if ( themeAppConfig != null ) {
+            appConfig.copyFrom(themeAppConfig);
           }
-          if ( configUrl.endsWith("/") ) {
-            configUrl = configUrl.substring(0, configUrl.length()-1);
-          }
-          appConfig.setUrl(configUrl);
+          appConfig = appConfig.configure(x, null);
+
           rtn = rtn.put("appConfig", appConfig);
 
           return rtn;
@@ -262,8 +260,8 @@ foam.CLASS({
         User user         = (User) localUserDAO.find(getUserId());
         User agent        = (User) localUserDAO.find(getAgentId());
         Object[] prefix   = agent == null
-          ? new Object[] { String.format("%s (%d)", user.label(), user.getId()) }
-          : new Object[] { String.format("%s (%d) acting as %s (%d)", agent.label(), agent.getId(), user.label(), user.getId()) };
+          ? new Object[] { String.format("%s (%d)", user.toSummary(), user.getId()) }
+          : new Object[] { String.format("%s (%d) acting as %s (%d)", agent.toSummary(), agent.getId(), user.toSummary(), user.getId()) };
 
         rtn = rtn
           .put("user", user)
@@ -285,6 +283,7 @@ foam.CLASS({
             .put("group", group)
             .put("appConfig", group.getAppConfig(rtn));
         }
+        rtn = rtn.put("theme", ((Themes) x.get("themes")).findTheme(rtn));
 
         return rtn;
       `

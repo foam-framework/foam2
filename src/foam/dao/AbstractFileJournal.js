@@ -370,7 +370,7 @@ try {
 
         write_(sb.get()
           .append("// Modified by ")
-          .append(user.label())
+          .append(user.toSummary())
           .append(" (")
           .append(user.getId())
           .append(") at ")

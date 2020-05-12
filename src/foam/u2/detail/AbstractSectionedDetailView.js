@@ -22,6 +22,12 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Array',
+      name: 'useSections',
+      documentation: `List of sections to be used in section detail view. Set if you would like to
+          filter section list, alternative to default behaviour where all sections of class and parent classes are used.`
+    },
+    {
       class: 'FObjectProperty',
       name: 'data',
       factory: function() {
@@ -76,9 +82,18 @@ foam.CLASS({
         if ( ! of ) return [];
 
         sections = of.getAxiomsByClass(this.SectionAxiom)
-          // Why not Section.AXIOM.ORDER on next line?
-          .sort((a, b) => a.order - b.order)
-          .map((a) => this.Section.create().fromSectionAxiom(a, of));
+        // Why not Section.AXIOM.ORDER on next line?
+        .sort((a, b) => a.order - b.order)
+        .reduce((map, a) => {
+          if ( this.useSections.length ) {
+            if ( this.useSections.includes(a.name) ) {
+              map.push(this.Section.create().fromSectionAxiom(a, of));
+            }
+          } else {
+            map.push(this.Section.create().fromSectionAxiom(a, of));
+          }
+          return map;
+        }, []);
 
         var usedAxioms = sections
           .map((s) => s.properties.concat(s.actions))
@@ -87,18 +102,23 @@ foam.CLASS({
             map[a.name] = true;
             return map;
           }, {});
-        var unusedProperties = of.getAxiomsByClass(this.Property)
-            .filter((p) => ! usedAxioms[p.name])
-            .filter((p) => ! p.hidden);
-        var unusedActions = of.getAxiomsByClass(this.Action)
-            .filter((a) => ! usedAxioms[a.name]);
 
-            if ( unusedProperties.length || unusedActions.length ) {
-          sections.push(this.Section.create({
-            properties: unusedProperties,
-            actions: unusedActions
-          }));
+
+        if ( ! this.useSections.length ) {
+          var unusedProperties = of.getAxiomsByClass(this.Property)
+              .filter((p) => ! usedAxioms[p.name])
+              .filter((p) => ! p.hidden);
+          var unusedActions = of.getAxiomsByClass(this.Action)
+              .filter((a) => ! usedAxioms[a.name]);
+
+          if ( unusedProperties.length || unusedActions.length ) {
+            sections.push(this.Section.create({
+              properties: unusedProperties,
+              actions: unusedActions
+            }));
+          }
         }
+
 
         if ( this.propertyWhitelist ) {
           sections = sections

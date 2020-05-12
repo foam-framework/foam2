@@ -338,9 +338,9 @@ foam.CLASS({
         if ( this.Mushroom.isInstance(o) ) {
           // Only die from fully grown mushrooms
           if ( o.scaleX == 1 ) {
+            this.gameOver();
             this.snake.explode();
             o.explode();
-            this.gameOver();
           } else {
             o.detach();
           }
@@ -362,6 +362,7 @@ foam.CLASS({
     },
 
     function gameOver() {
+      if ( ! this.timer.isStarted ) return;
       this.timer.stop();
       this.collider.stop();
 

@@ -38,6 +38,7 @@ foam.CLASS({
     'foam.nanos.auth.ResendVerificationEmail',
     'foam.nanos.auth.User',
     'foam.nanos.theme.Theme',
+    'foam.nanos.theme.ThemeDomain',
     'foam.nanos.u2.navigation.TopNavigation',
     'foam.nanos.u2.navigation.FooterView',
     'foam.u2.stack.Stack',
@@ -50,7 +51,7 @@ foam.CLASS({
   imports: [
     'installCSS',
     'sessionSuccess',
-    'window'
+    'window',
   ],
 
   exports: [
@@ -107,6 +108,7 @@ foam.CLASS({
       'grey4',
       'grey5',
       'black',
+      'white',
       'inputHeight',
       'inputVerticalPadding',
       'inputHorizontalPadding'
@@ -475,32 +477,32 @@ foam.CLASS({
        * customize the look and feel of the application.
        */
       var lastTheme = this.theme;
-
       try {
-        if ( this.user && this.user.personalTheme ) {
-          // If the user has a personal theme, use that.
-          this.theme = await this.user.personalTheme$find;
-        } else {
-          // If they don't, then we fetch the most appropriate theme based on
-          // a few different parameters.
-          var predicates = [];
+//        this.theme = this.themes.findTheme(this.client);
+        if ( this.user && this.user.theme ) {
+          this.theme = await this.user.theme$find;
+        } else if ( this.group && this.group.theme ) {
+          this.theme = await this.group.theme$find;
+        }
+        if ( ! this.theme ) {
+          var domain = window.location.hostname;
 
-          if ( this.webApp ) {
-            predicates.push(this.EQ(this.Theme.APP_NAME, this.webApp));
+          var themeDomain = await this.client.themeDomainDAO.find(domain);
+          if ( ! themeDomain ) {
+            console.warn('ThemeDomain not found: '+domain);
+            themeDomain = this.ThemeDomain.create({'theme':'foam'});
           }
 
-          if ( this.user && this.user.spid ) {
-            predicates.push(this.EQ(this.Theme.SPID, this.user.spid));
+          var predicate = this.AND(
+            this.EQ(this.Theme.ID, themeDomain.theme),
+            this.EQ(this.Theme.ENABLED, true)
+          );
+
+          this.theme = await this.client.themeDAO.find(predicate);
+          if ( ! this.theme ) {
+            console.warn('Theme not found: '+domain);
+            this.theme = this.Theme.create({'name':'foam', 'appName':'FOAM'});
           }
-
-          var dao = this.client.themeDAO;
-          var predicate = this.TRUE;
-
-          if ( predicates.length ) {
-            predicate = this.Or.create({ args: predicates });
-          }
-
-          this.theme = await dao.find(predicate);
         }
       } catch (err) {
         this.notify(this.LOOK_AND_FEEL_NOT_FOUND, 'error');
