@@ -99,6 +99,9 @@ foam.CLASS({
       `,
       javaCode: `
       UserCapabilityJunction ucJunction = (UserCapabilityJunction) obj;
+
+      DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+      Capability capability = (Capability) capabilityDAO.find_(x, ucJunction.getTargetId());
       
       checkOwnership(x, ucJunction);
 
@@ -108,10 +111,13 @@ foam.CLASS({
         return getDelegate().put_(x, ucJunction);
 
       List<CapabilityCapabilityJunction> prereqJunctions = (List<CapabilityCapabilityJunction>) getPrereqs(x, obj);
-      if ( validateData(x, ucJunction) && checkPrereqs(x, ucJunction, prereqJunctions) ) {
+
+      boolean requiresData = capability.getOf() != null;
+
+      if ( ( ! requiresData || ( ucJunction.getData() != null && validateData(x, ucJunction)) ) && checkPrereqs(x, ucJunction, prereqJunctions) ) {
         ucJunction.setStatus(CapabilityJunctionStatus.GRANTED);
-        saveDataToDAO(x, ucJunction);
-        configureJunctionExpiry(x, ucJunction, old);
+        if ( requiresData && capability.getDaoKey() != null ) saveDataToDAO(x, capability.getDaoKey(), ucJunction);
+        configureJunctionExpiry(x, ucJunction, old, capability);
       }
       else ucJunction.setStatus(CapabilityJunctionStatus.PENDING);
 
@@ -127,6 +133,10 @@ foam.CLASS({
           type: 'Context'
         },
         {
+          name: 'daoKey',
+          type: 'String'
+        },
+        {
           name: 'obj',
           type: 'foam.nanos.crunch.UserCapabilityJunction'
         }
@@ -138,16 +148,8 @@ foam.CLASS({
       If the data on an UserCapabilityJunction should be stored in some DAO, the daoKey should be provided on its corresponding Capability object.
       `,
       javaCode: `
-      DAO capabilityDAO = (DAO) x.get("capabilityDAO");
-      Capability capability = (Capability) capabilityDAO.find(obj.getTargetId());
-
-      if ( capability.getOf() == null ) return;
-
       if ( obj.getData() == null ) 
-        throw new RuntimeException("UserCapabilityJunction data not submitted for capability: " + capability.getName());
-      
-      String daoKey = capability.getDaoKey();
-      if ( daoKey == null ) return;
+        throw new RuntimeException("UserCapabilityJunction data not submitted for capability: " + obj.getTargetId());
       
       DAO dao = (DAO) x.get(daoKey);
       if ( dao == null ) return;
@@ -176,6 +178,10 @@ foam.CLASS({
         {
           name: 'old',
           type: 'foam.nanos.crunch.UserCapabilityJunction'
+        },
+        {
+          name: 'capability',
+          type: 'foam.nanos.crunch.Capability'
         }
       ],
       type: 'foam.core.FObject',
@@ -186,8 +192,6 @@ foam.CLASS({
       if ( ( old != null && old.getStatus() == CapabilityJunctionStatus.GRANTED && old.getExpiry() != null ) || obj.getStatus() != CapabilityJunctionStatus.GRANTED ) 
         return obj;
 
-      DAO capabilityDAO = (DAO) x.get("capabilityDAO");
-      Capability capability = (Capability) capabilityDAO.find((String) obj.getTargetId());
       Date junctionExpiry = capability.getExpiry();
       
       if ( capability.getDuration() > 0 ) {
@@ -220,9 +224,7 @@ foam.CLASS({
       ],
       javaType: 'java.util.List<CapabilityCapabilityJunction>',
       documentation: `
-      check the prerequisites of the current capability in the junction. If the user does not have a junction with the 
-      prerequisite capability, set a junction between them.
-      Returns the list of prerequisiteCapabilityJunctions
+      Returns the list of prerequisiteCapabilityJunctions for the target capability of the ucj
       `, 
       javaCode: `
       DAO prerequisiteCapabilityJunctionDAO = (DAO) (x.get("prerequisiteCapabilityJunctionDAO"));
@@ -233,18 +235,6 @@ foam.CLASS({
       .select(new ArraySink()))
       .getArray();
 
-      // for each of those junctions, assign the user the prerequisite if the user does not already have it
-      for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
-        UserCapabilityJunction ucJunction = (UserCapabilityJunction) getDelegate().find(AND(
-          EQ(UserCapabilityJunction.SOURCE_ID, ((UserCapabilityJunction) obj).getSourceId()),
-          EQ(UserCapabilityJunction.TARGET_ID, ((CapabilityCapabilityJunction) ccJunction).getTargetId())));
-        if ( ucJunction == null ) {
-          UserCapabilityJunction junction = new UserCapabilityJunction();
-          junction.setSourceId(((UserCapabilityJunction) obj).getSourceId());
-          junction.setTargetId(((CapabilityCapabilityJunction) ccJunction).getTargetId());
-          ((DAO) x.get("userCapabilityJunctionDAO")).put_(x, junction);
-        }
-      }
       return ccJunctions;
       
       `
@@ -269,14 +259,23 @@ foam.CLASS({
       documentation: `Check if prerequisites of a capability is fulfilled`,
       javaCode: `
       // for each of those junctions, check if the prerequisite is granted, if not, return false
+      UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
       for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
         Capability cap = (Capability) ((DAO) x.get("capabilityDAO")).find((String) ccJunction.getSourceId());
-        if (!cap.getEnabled()) continue;
+        if ( ! cap.getEnabled() ) continue;
         UserCapabilityJunction ucJunction = (UserCapabilityJunction) getDelegate().find(AND(
-          EQ(UserCapabilityJunction.SOURCE_ID, ((UserCapabilityJunction) obj).getSourceId()),
+          EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId()),
           EQ(UserCapabilityJunction.TARGET_ID, (String) ccJunction.getTargetId())
         ));
-        if ( ucJunction != null && ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED ) return false;
+        if ( ucJunction == null || ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED ) {
+          UserCapabilityJunction junction = new UserCapabilityJunction.Builder(x)
+            .setSourceId(ucj.getSourceId())
+            .setTargetId(ccJunction.getTargetId())
+            .build();
+          junction = (UserCapabilityJunction) ((DAO) x.get("userCapabilityJunctionDAO")).put_(x, junction);
+          if ( junction == null || junction.getStatus() != CapabilityJunctionStatus.GRANTED )
+            return false;
+        }
       }
       return true;
       `
@@ -303,8 +302,9 @@ foam.CLASS({
           } catch(Exception e) {
             return false;
           }
+          return true;
         }
-        return true;
+        return false;
       `
     },
     {
