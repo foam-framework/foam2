@@ -24,6 +24,25 @@ foam.INTERFACE({
     Hence, a StrategizerService will give you references to strategies for
     something you want, which we refer to as the "desired model". The desired
     model might be an interface, abstract base class, or a concrete class.
+
+    Example of use of Strategizer on FObjectView:
+
+    name: 'exampleProp',
+    view: function(_, X) {
+      let predicate = expr.AND(
+          expr.EQ(foam.strategy.StrategyReference.DESIRED_MODEL_ID, 'foam.nanos.auth.User'),
+          expr.IN(foam.strategy.StrategyReference.STRATEGY, [foam.lookup('foam.nanos.auth.SomeUserClass'), foam.lookup('foam.nanos.auth.AnotherUserClass') ])
+      );
+      return foam.u2.view.FObjectView.create({
+        data: myData,
+        of: foam.nanos.auth.User,
+        persistantData: { website: X.data.user.website },
+        predicate: predicate
+      }, X);
+    }
+
+    - The FObjectView will persist X.data.user.website throughout any class selections.
+    - Strategizer class options will include SomeUserClass and AnotherUserClass excluding all other user subclasses. Granted the user has permissions to the strategies and if those classes exist.
   `,
 
   methods: [
