@@ -117,11 +117,11 @@ public class SafetyUtil {
   }
 
   public static int hashCode(Object o1) {
-    return java.util.Objects.hash(o1);
+    return o1 == null ? 0 : o1.hashCode();
   }
 
   public static int hashCode(FObject o1) {
-    return java.util.Objects.hash(o1);
+    return o1 == null ? 0 : o1.hashCode();
   }
 
   public static int hashCode(boolean o1) {
@@ -141,7 +141,7 @@ public class SafetyUtil {
   }
 
   public static int hashCode(long o1) {
-    return java.util.Objects.hashCode(o1);
+    return (int)(o1^(o1>>>32));
   }
 
   public static int hashCode(float o1) {
