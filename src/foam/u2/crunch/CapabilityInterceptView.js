@@ -15,7 +15,9 @@ foam.CLASS({
     'foam.u2.layout.Grid',
     'foam.u2.layout.GUnit',
     'foam.u2.crunch.CapabilityCardView',
-    'foam.nanos.crunch.Capability'
+    'foam.nanos.crunch.Capability',
+    'foam.nanos.crunch.CapabilityJunctionStatus',
+    'foam.nanos.crunch.UserCapabilityJunction'
   ],
 
   imports: [
@@ -23,7 +25,9 @@ foam.CLASS({
     'capabilityCancelled',
     'crunchController',
     'stack',
-    'capabilityCache'
+    'capabilityCache',
+    'user',
+    'userCapabilityJunctionDAO'
   ],
 
   properties: [
@@ -83,9 +87,26 @@ foam.CLASS({
                     .start(view.GUnit, { columns: 4 })
                       .tag(view.capabilityView, { data: cap })
                       .on('click', () => {
-                        view.crunchController.launchWizard(cap.id);
-                        // TODO: after wizard is done set capabilityAquired
-                        //       or capabilityCancelled
+                        var p = view.crunchController.launchWizard(cap.id);
+                        p.then(() => {
+                          // Query UCJ status
+                          this.userCapabilityJunctionDAO.where(this.AND(
+                            this.EQ(this.UserCapabilityJunction.SOURCE_ID, this.user.id),
+                            this.EQ(this.UserCapabilityJunction.TARGET_ID, cap.id)
+                          )).limit(1).select(this.PROJECTION(
+                            this.UserCapabilityJunction.STATUS
+                          )).then(results => {
+                            var status = results.array[0][0];
+                            switch (status) {
+                              case this.CapabilityJunctionStatus.GRANTED:
+                                view.aquire();
+                                break;
+                              default:
+                                view.reject();
+                                break;
+                            }
+                          });
+                        })
                       })
                     .end()
                     ;
@@ -95,6 +116,24 @@ foam.CLASS({
             return spot;
           }))
         .end();
+    },
+    function aquire() {
+      // todo find which capability was applied for
+      this.capabilityAquired = true;
+      this.capabilityOptions.forEach((c) => {
+        this.capabilityCache.set(c, true);
+      });
+      this.stack.back();
+      alert('Your permissions has changed.');
+      location.reload();
+    },
+    function reject() {
+      // todo find which capability was applied for
+      this.capabilityCancelled = true;
+      this.capabilityOptions.forEach((c) => {
+        this.capabilityCache.set(c, true);
+      });
+      this.stack.back();
     }
   ],
 
@@ -102,28 +141,8 @@ foam.CLASS({
     {
       name: 'cancel',
       code: function() {
-        // todo find which capability was applied for
-        this.capabilityOptions.forEach((c) => {
-          this.capabilityCache.set(c, true);
-        });
-        if ( ! this.capabilityAquired ) this.capabilityCancelled = true;
-        this.stack.back();
-      }
-    },
-    {
-      name: 'aquire',
-      label: 'return with capabilityAquired=true',
-      code: function() {
-        // todo find which capability was applied for
-        this.capabilityAquired = true;
-        this.capabilityOptions.forEach((c) => {
-          this.capabilityCache.set(c, true);
-        });
-        this.stack.back();
-        alert('Your permissions has changed.');
-        location.reload();
+        this.reject();
       }
     }
   ]
 });
-
