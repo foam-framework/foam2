@@ -38,6 +38,7 @@ foam.CLASS({
     'foam.nanos.auth.ResendVerificationEmail',
     'foam.nanos.auth.User',
     'foam.nanos.theme.Theme',
+    'foam.nanos.theme.Themes',
     'foam.nanos.theme.ThemeDomain',
     'foam.nanos.u2.navigation.TopNavigation',
     'foam.nanos.u2.navigation.FooterView',
@@ -477,39 +478,8 @@ foam.CLASS({
        * customize the look and feel of the application.
        */
       var lastTheme = this.theme;
-
       try {
-        // var y = this.client.__subContext__.createSubContext;
-        // y.user = this.user;
-        // this.theme = this.client.themes.findTheme(y);
-        if ( this.user && this.user.theme ) {
-          this.theme = await this.user.theme$find;
-        } else if ( this.group && this.group.theme ) {
-          this.theme = await this.group.theme$find;
-        }
-        if ( ! this.theme ) {
-          var domain = window.location.hostname;
-
-          var themeDomain = await this.client.themeDomainDAO.find(domain);
-          if ( ! themeDomain ) {
-            console.warn('ThemeDomain not found: '+domain);
-            themeDomain = await this.client.themeDomainDAO.find('localhost');
-            if ( ! themeDomain ) {
-              themeDomain = this.ThemeDomain.create({'theme':'foam'});
-            }
-          }
-
-          var predicate = this.AND(
-            this.EQ(this.Theme.ID, themeDomain.theme),
-            this.EQ(this.Theme.ENABLED, true)
-          );
-
-          this.theme = await this.client.themeDAO.find(predicate);
-          if ( ! this.theme ) {
-            console.warn('Theme not found: '+domain);
-            this.theme = this.Theme.create({'name':'foam', 'appName':'FOAM'});
-          }
-        }
+        this.theme = await this.Themes.create().findTheme(this);
       } catch (err) {
         this.notify(this.LOOK_AND_FEEL_NOT_FOUND, 'error');
         console.error(err);

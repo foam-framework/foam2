@@ -9,6 +9,8 @@ foam.CLASS({
   name: 'AppConfig',
 
   javaImports: [
+    'foam.nanos.theme.Theme',
+    'foam.nanos.theme.Themes',
     'javax.servlet.http.HttpServletRequest',
     'org.eclipse.jetty.server.Request'
   ],
@@ -100,26 +102,34 @@ foam.CLASS({
       ],
       type: 'foam.nanos.app.AppConfig',
       javaCode: `
-      HttpServletRequest req = x.get(HttpServletRequest.class);
-      if ( req == null ) {
-        return this;
-      }
       AppConfig appConfig = (AppConfig) this.fclone();
-      String configUrl = url != null ? url : ((Request) req).getRootURL().toString();
+      Theme theme = ((Themes) x.get("themes")).findTheme(x);
+      AppConfig themeAppConfig = theme.getAppConfig();
+      if ( themeAppConfig != null ) {
+        appConfig.copyFrom(themeAppConfig);
+      }
 
-      if ( appConfig.getForceHttps() ) {
-        if ( configUrl.startsWith("https://") ) {
-           // Don't need to do anything.
-        } else if ( configUrl.startsWith("http://") ) {
-          configUrl = "https" + configUrl.substring(4);
-        } else {
-          configUrl = "https://" + configUrl;
+      String configUrl = url;
+      HttpServletRequest req = x.get(HttpServletRequest.class);
+      if ( req != null ) {
+        configUrl = ((Request) req).getRootURL().toString();
+      }
+      if ( ! foam.util.SafetyUtil.isEmpty(configUrl) ) {
+        if ( appConfig.getForceHttps() ) {
+          if ( configUrl.startsWith("https://") ) {
+             // nop
+          } else if ( configUrl.startsWith("http://") ) {
+            configUrl = "https" + configUrl.substring(4);
+          } else {
+            configUrl = "https://" + configUrl;
+          }
         }
+        if ( configUrl.endsWith("/") ) {
+          configUrl = configUrl.substring(0, configUrl.length()-1);
+        }
+        appConfig.setUrl(configUrl);
       }
-      if ( configUrl.endsWith("/") ) {
-        configUrl = configUrl.substring(0, configUrl.length()-1);
-      }
-      appConfig.setUrl(configUrl);
+
       return appConfig;
       `
     }

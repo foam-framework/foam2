@@ -63,7 +63,7 @@ public class EmailsUtility {
       templateArgs.put("supportAddress", address == null ? "" : address.toSummary());
       templateArgs.put("appName", (theme.getAppName()));
       templateArgs.put("logo", (theme.getLogo()));
-      templateArgs.put("link", (appConfig.getUrl()));
+      templateArgs.put("appLink", (appConfig.getUrl()));
       emailMessage.setTemplateArguments(templateArgs);
     }
 

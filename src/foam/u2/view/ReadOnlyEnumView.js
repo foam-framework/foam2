@@ -17,7 +17,7 @@ foam.CLASS({
 
       this.add(this.slot((data) => {
         if ( ! data ) return '';
-        return this.E().addClasses(data.classes()).style(data.toStyle()).add(data.name);
+        return this.E().addClasses(data.classes()).style(data.toStyle()).add(data.label);
       }));
     }
   ]

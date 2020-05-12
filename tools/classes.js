@@ -479,6 +479,7 @@ var classes = [
   'foam.nanos.ruler.predicate.PropertyIsInstance',
   'foam.nanos.ruler.predicate.PropertyIsClass',
   'foam.nanos.ruler.action.ChangePropertyAction',
+  'foam.nanos.ruler.action.AbstractCheckDAOforMatching',
   'foam.comics.SearchMode',
 
   // Support Files
