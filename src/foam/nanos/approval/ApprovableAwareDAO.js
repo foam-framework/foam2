@@ -226,8 +226,6 @@ foam.CLASS({
 
         DAO approvableDAO = (DAO) x.get("approvableDAO");
 
-        List approvablesDebug = ((ArraySink) approvableDAO.inX(getX()).select(new ArraySink())).getArray();
-
         List approvablesPending = ((ArraySink) approvableDAO
           .where(foam.mlang.MLang.AND(
             foam.mlang.MLang.EQ(Approvable.LOOKUP_ID, hashedId),
@@ -268,18 +266,18 @@ foam.CLASS({
       // if the new list of approvers include users who are not in the original list of approvers, we want to send them the ar 
       // we dont need the proxysink for this operation sink if this is non-empty, we do not need to know if there's any 
       // new approvers to whom an approvalrequest for this operation should be sent.
-      List approvedObjRemoveRequests = ((ArraySink) filteredApprovalRequestDAO
+      List fulfilledRequests = ((ArraySink) filteredApprovalRequestDAO
         .where(foam.mlang.MLang.OR(
           foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.APPROVED),
           foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.REJECTED),
           foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.CANCELLED)
         )).inX(getX()).select(new ArraySink())).getArray();
 
-      if ( pendingRequests.size() > 0 && approvedObjRemoveRequests.size() == 0 && approverIds.size() == 0 ) 
+      if ( pendingRequests.size() > 0 && fulfilledRequests.size() == 0 && approverIds.size() == 0 ) 
         throw new RuntimeException("There already exists approval requests for this operation");
 
-      if ( approvedObjRemoveRequests.size() == 1 ) {
-        ApprovalRequest fulfilledRequest = (ApprovalRequest) approvedObjRemoveRequests.get(0);
+      if ( fulfilledRequests.size() == 1 ) {
+        ApprovalRequest fulfilledRequest = (ApprovalRequest) fulfilledRequests.get(0);
         fulfilledRequest.setIsFulfilled(true);
 
         User lastModifiedBy = (User) ((DAO) x.get("bareUserDAO")).find(fulfilledRequest.getLastModifiedBy());
@@ -299,7 +297,7 @@ foam.CLASS({
         return null;  // as request has been REJECTED or CANCELLED
       } 
 
-      if ( approvedObjRemoveRequests.size() > 1 ) {
+      if ( fulfilledRequests.size() > 1 ) {
         logger.error("Something went wrong cannot have multiple approved/rejected requests for the same request!");
         throw new RuntimeException("Something went wrong cannot have multiple approved/rejected requests for the same request!");
       }
