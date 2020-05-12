@@ -45,6 +45,10 @@ foam.INTERFACE({
           type: 'String',
           name: 'target',
           documentation: 'Optional. If specified, the Strategizer will include StrategyReferences that are not generally applicable, but are applicable to the target.'
+        },
+        {
+          name: 'strategyPredicate',
+          documentation: 'Provide a unique predicate to strategizer query. Useful when omitting or extending entries based on class types.'
         }
       ]
     }
