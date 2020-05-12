@@ -102,7 +102,8 @@ foam.CLASS({
       view: {
         class: 'foam.u2.TextField',
         type: 'search',
-        onKey: true
+        onKey: true,
+
       },
       value: '',
       postSet: function() {
@@ -121,6 +122,7 @@ foam.CLASS({
       .on('click', this.stopPropagation)
         .start()
           .start()
+            .attrs({ autocomplete: 'off' })
             .add(this.MENU_SEARCH)
             .addClass('foam-u2-search-TextSearchView')
           .end()
@@ -145,6 +147,7 @@ foam.CLASS({
       e.stopPropagation();
     },
     function onClose() {
+      this.menuSearch = '';
       this.columns.forEach(c => c.onClose());
     },
     function onTopLevelPropertiesDragAndDrop(targetIndex, draggableIndex) {
@@ -610,13 +613,15 @@ foam.CLASS({
           this.showOnSearch = this.rootProperty[1].toLowerCase().includes(query);
         } else
           this.showOnSearch = true;
-      }
-      this.showOnSearch = false;
-      for (var  i = 0; i < this.subColumnSelectConfig.length; i++) {
-        if ( this.subColumnSelectConfig[i].updateOnSearch(query) ) {
-          this.showOnSearch = true;
+      } else {
+        this.showOnSearch = false;
+        for (var  i = 0; i < this.subColumnSelectConfig.length; i++) {
+          if ( this.subColumnSelectConfig[i].updateOnSearch(query) ) {
+            this.showOnSearch = true;
+          }
         }
       }
+
       if ( query.length!== 0 && this.showOnSearch )
         this.expanded = true;
       if ( query.length === 0 )
