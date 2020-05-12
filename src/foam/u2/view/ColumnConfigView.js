@@ -606,11 +606,10 @@ foam.CLASS({
     },
     function updateOnSearch(query) {
       if ( !this.hasSubProperties) {
-        if ( query.length!== 0 ) {
+        if ( query.length !== 0 ) {
           this.showOnSearch = this.rootProperty[1].toLowerCase().includes(query);
         } else
           this.showOnSearch = true;
-        return this.showOnSearch;
       }
       this.showOnSearch = false;
       for (var  i = 0; i < this.subColumnSelectConfig.length; i++) {
@@ -618,6 +617,10 @@ foam.CLASS({
           this.showOnSearch = true;
         }
       }
+      if ( query.length!== 0 && this.showOnSearch )
+        this.expanded = true;
+      if ( query.length === 0 )
+        this.expanded = false;
       return this.showOnSearch;
     }
   ]
