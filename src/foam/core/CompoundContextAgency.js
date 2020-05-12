@@ -40,6 +40,7 @@ for ( Runnable agent : getAgents() ) {
   } catch (Throwable t) {
     logger.error(t.getMessage(), t);
     e.add(t);
+    throw t;
   }
 }
 e.maybeThrow();`

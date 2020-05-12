@@ -84,6 +84,7 @@ public class RuleEngine extends ContextAwareSupport {
       compoundAgency.execute(x_);
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
+      throw e;
     }
 
     asyncApplyRules(rules, obj, oldObj);
