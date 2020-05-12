@@ -203,7 +203,7 @@ foam.CLASS({
       documentation: 'Width of the whole table. Used to get proper scrolling on narrow screens.',
       expression: function(of, columns_) {
         return columns_.reduce((acc, col) => {
-          var cls = this.of;
+          var cls = of;
           var axiom;
 
           if ( typeof col[0] === 'string') {
