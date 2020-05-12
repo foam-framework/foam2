@@ -16,7 +16,6 @@ foam.CLASS({
   tableColumns: [
     'desiredModelId',
     'target',
-    'strategyPredicate',
     'strategy'
   ],
 
