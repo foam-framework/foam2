@@ -449,12 +449,10 @@ foam.CLASS({
           if ( !this.data.isPropertySelected )
             this.data.expanded = false;
         }
-
         this.updateSubColumnsOrder(hasPropertySelectionChanged === this.data.isPropertySelected);
       } else {
         this.updateSubColumnsOrder(true);
       }
-      
     }
   ]
 });
