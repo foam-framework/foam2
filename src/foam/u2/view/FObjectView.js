@@ -35,11 +35,13 @@ foam.CLASS({
         };
       },
       postSet: function(oldValue, newValue) {
-        if ( newValue !== oldValue && oldValue !== '') {
+        if ( newValue !== oldValue && oldValue !== '' ) {
           if ( this.data && this.data.cls_.id === newValue ) return;
           var m = this.__context__.lookup(newValue, true);
           if ( m ) {
-            this.data = m.create(null, this);
+            this.data = this.persistData ?
+                m.create(null, this).copyFrom(this.data) :
+                m.create(null, this);
           }
         }
       }
@@ -85,6 +87,11 @@ foam.CLASS({
       name: 'enableStrategizer',
       documentation: 'Boolean toggle for rendering the strategizer.',
       value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'persistData',
+      documentation: 'Allows data to persist to selected class instances.'
     }
   ],
 
@@ -100,9 +107,6 @@ foam.CLASS({
         return;
       }
 
-      // 'found' is set to true if the current data's objectClass is one
-      // of the valid choices. If it isn't, then the objectClass is set
-      // to the first choice to cause a new 'data' to be created.
       var found = false;
       var data  = this.data;
       // If this view is being used in a nanos application, then use the
