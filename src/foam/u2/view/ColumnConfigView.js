@@ -43,6 +43,7 @@ foam.CLASS({
         var arr = [];
         var selectedColumns = [];
         var notSelectedColumns = [];
+        data.selectedColumnNames = data.selectedColumnNames.map(c => foam.Array.isInstance(c) ? c[0] : c);
         data.allColumns.forEach(c => {
           if ( data.selectedColumnNames.find(s => s.split('.')[0] === c) != null )
             selectedColumns.push(c);
@@ -85,7 +86,7 @@ foam.CLASS({
             onDragAndDropParentFunction:this.onTopLevelPropertiesDragAndDrop.bind(this),
             onSelectionChangedParentFunction: this.onTopPropertiesSelectionChange.bind(this),
             onDragAndDrop: this.onDragAndDrop.bind(this),//for parent to call if on its  views on child drag and drop
-            onSelectionChanged: this.onSelectionChanged.bind(this)//for parent to call if on its  views on child selectionChanged
+            onSelectionChanged: this.onSelectionChanged.bind(this),//for parent to call if on its  views on child selectionChanged
           }));
         }
         return arr;
@@ -94,6 +95,21 @@ foam.CLASS({
     {
       name: 'updateSort',
       class: 'Boolean'
+    },
+    {
+      class: 'String',
+      name: 'menuSearch',
+      view: {
+        class: 'foam.u2.TextField',
+        type: 'search',
+        onKey: true
+      },
+      value: '',
+      postSet: function() {
+        for(var i = 0; i < this.columns.length; i++) {
+          this.columns[i].updateOnSearch(this.menuSearch);
+        }
+      }
     }
   ],
   methods: [
@@ -102,21 +118,31 @@ foam.CLASS({
       var self = this;
 
       this
+      .on('click', this.stopPropagation)
         .start()
-         // .addClass(self.myClass('dropdown'))
-         .add(this.slot(function(views) {
-           var i = 0;
-           return this.E()
-            .forEach(views, function(view) {
-              view.prop.index = i;
-              this
-                .start()
-                 .add(view)
-                .end();
-              i++;
-            });
-         }))
+          .start()
+            .add(this.MENU_SEARCH)
+            .addClass('foam-u2-search-TextSearchView')
+          .end()
+          .start()
+          .add(this.slot(function(views) {
+            var i = 0;
+            return this.E()
+              .forEach(views, function(view) {
+                view.prop.index = i;
+                this
+                  .start()
+                  .add(view)
+                  .end();
+                i++;
+              });
+          }))
+          .end()
       .end();
+    },
+    function stopPropagation(e) {
+      e.preventDefault();
+      e.stopPropagation();
     },
     function onClose() {
       this.columns.forEach(c => c.onClose());
@@ -249,7 +275,7 @@ foam.CLASS({
     {
       name: 'onSelectionChanged',
       documentation: 'to reuse onSelectionChanged function'
-    }
+    },
   ],
   methods: [
     function initE() {
@@ -268,7 +294,9 @@ foam.CLASS({
           });
         }))
         .add(self.slot(function(prop) {
-          return self.E().start()
+          return self.E()
+          .show(self.prop.showOnSearch$)
+          .start()
             .add(foam.u2.ViewSpec.createView(self.head, {data$:self.prop$, onSelectionChangedParentFunction:self.onSelectionChangedParentFunction},  self, self.__subSubContext__))
           .end()
           .start()
@@ -390,7 +418,7 @@ foam.CLASS({
             onDragAndDrop:this.onDragAndDrop,
             onSelectionChanged:this.onSelectionChanged,
             onSelectionChangedParentFunction:this.onChildrenSelectionChanged.bind(this),
-            onDragAndDropParentFunction: this.onChildrenDragAndDrop.bind(this)
+            onDragAndDropParentFunction: this.onChildrenDragAndDrop.bind(this),
           }));
         }
         return arr;
@@ -404,7 +432,7 @@ foam.CLASS({
     {
       name: 'onSelectionChanged',
       documentation: 'to reuse onSelectionChanged function'
-    }
+    },
   ],
   methods: [
     function initE() {
@@ -548,6 +576,11 @@ foam.CLASS({
       class: 'Boolean',
       value: false
     },
+    {
+      name: 'showOnSearch',
+      class: 'Boolean',
+      value: true
+    }
   ],
   methods: [
     function onClose() {
@@ -570,6 +603,22 @@ foam.CLASS({
         }
         return arr;
       }
+    },
+    function updateOnSearch(query) {
+      if ( !this.hasSubProperties) {
+        if ( query.length!== 0 ) {
+          this.showOnSearch = this.rootProperty[1].toLowerCase().includes(query);
+        } else
+          this.showOnSearch = true;
+        return this.showOnSearch;
+      }
+      this.showOnSearch = false;
+      for (var  i = 0; i < this.subColumnSelectConfig.length; i++) {
+        if ( this.subColumnSelectConfig[i].updateOnSearch(query) ) {
+          this.showOnSearch = true;
+        }
+      }
+      return this.showOnSearch;
     }
   ]
 });
