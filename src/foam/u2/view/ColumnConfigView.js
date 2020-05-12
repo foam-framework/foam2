@@ -124,8 +124,12 @@ foam.CLASS({
     function onTopLevelPropertiesDragAndDrop(targetIndex, draggableIndex) {
       this.onDragAndDrop(this.views, targetIndex, draggableIndex);
     },
-    function onTopPropertiesSelectionChange(isColumnSelected, index) {
-      this.onSelectionChanged(isColumnSelected, index, this.views);
+    function onTopPropertiesSelectionChange(isColumnSelected, index, isColumnSelectionHaventChanged) {
+      if ( isColumnSelectionHaventChanged ) {
+        this.data.selectedColumnNames = this.rebuildSelectedColumns();
+        this.data.updateColumns();
+      } else 
+        this.onSelectionChanged(isColumnSelected, index, this.views);
     },
     function onDragAndDrop(views, targetIndex, draggableIndex) {
       this.resetProperties(views, targetIndex, draggableIndex);
@@ -421,29 +425,36 @@ foam.CLASS({
           })
         .end();
     },
+    function updateSubColumnsOrder(selctionChanged) {
+      //re-order subproperties
+      this.data.subColumnSelectConfig.sort((a, b) => a.index > b.index ? 1 : -1);
+      //if selection changed call this
+      this.onSelectionChangedParentFunction(this.data.isPropertySelected, this.data.index, selctionChanged);
+    },
     function onChildrenDragAndDrop(targetIndex, draggableIndex) {
       this.onDragAndDrop(this.views, targetIndex, draggableIndex);
+      this.updateSubColumnsOrder(true);
     },
-    function onChildrenSelectionChanged(isColumnSelected, index) {
-      //to change view
-      this.onSelectionChanged(isColumnSelected, index, this.views);
-      //to set currentProperty isColumnSelected
-      if (this.data.isPropertySelected != isColumnSelected) {
+    function onChildrenSelectionChanged(isColumnSelected, index, isColumnSelectionHaventChanged) {//isColumnSelectionHaventChanged to be false on either selectionChanged or being undefined
+      if ( !isColumnSelectionHaventChanged ) {
+        //to change view 
+        this.onSelectionChanged(isColumnSelected, index, this.views);
         var hasPropertySelectionChanged = this.data.isPropertySelected;
-        //re-order subproperties
-        this.data.subColumnSelectConfig.sort((a, b) => a.index > b.index ? 1 : -1);
-        //need to re-check if isPropertySelected changed
-        var anySelected = this.data.subColumnSelectConfig.find(s => s.isPropertySelected);
-        this.data.isPropertySelected = typeof anySelected !== "undefined";
-        if ( hasPropertySelectionChanged != this.data.isPropertySelected ) {
-          //if selection changed call this
-          this.onSelectionChangedParentFunction(this.data.isPropertySelected, this.data.index);
-
+        //to set currentProperty isColumnSelected
+        if (this.data.isPropertySelected != isColumnSelected) {
+          //need to re-check if isPropertySelected changed
+          var anySelected = this.data.subColumnSelectConfig.find(s => s.isPropertySelected);
+          this.data.isPropertySelected = typeof anySelected !== "undefined";
           //close if not selected
           if ( !this.data.isPropertySelected )
             this.data.expanded = false;
         }
+
+        this.updateSubColumnsOrder(hasPropertySelectionChanged === this.data.isPropertySelected);
+      } else {
+        this.updateSubColumnsOrder(true);
       }
+      
     }
   ]
 });
