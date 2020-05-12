@@ -123,6 +123,8 @@ foam.CLASS({
     },
     function onTopLevelPropertiesDragAndDrop(targetIndex, draggableIndex) {
       this.onDragAndDrop(this.views, targetIndex, draggableIndex);
+      this.data.selectedColumnNames = this.rebuildSelectedColumns();
+      this.data.updateColumns();
     },
     function onTopPropertiesSelectionChange(isColumnSelected, index, isColumnSelectionHaventChanged) {
       if ( isColumnSelectionHaventChanged ) {
@@ -133,8 +135,6 @@ foam.CLASS({
     },
     function onDragAndDrop(views, targetIndex, draggableIndex) {
       this.resetProperties(views, targetIndex, draggableIndex);
-      this.data.selectedColumnNames = this.rebuildSelectedColumns();
-      this.data.updateColumns();
     },
     function resetProperties(views, targetIndex, draggableIndex) {
       var thisProps = views.map(v => v.prop);
@@ -174,8 +174,6 @@ foam.CLASS({
       } else if ( !isColumnSelected ) {
         this.onUnSelect(index, views);
       }
-      this.data.selectedColumnNames = this.rebuildSelectedColumns();
-      this.data.updateColumns();
     },
 
     function onSelect(draggableIndex, views) {
