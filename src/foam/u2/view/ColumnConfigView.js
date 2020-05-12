@@ -281,19 +281,16 @@ foam.CLASS({
   ],
   listeners: [
     function onDragStart(e){
-      console.log('dragstart');
       e.dataTransfer.setData('draggableId', this.index);
       e.stopPropagation();
     },
     function onDragOver(e){
-      console.log('dragover');
       e.preventDefault();
     },
     function onDrop(e) {
       e.preventDefault();
       e.stopPropagation();
       this.onDragAndDropParentFunction(this.index, parseInt(e.dataTransfer.getData('draggableId')));
-      console.log(e.target.id);
     }
   ]
 });
