@@ -50,6 +50,7 @@ foam.CLASS({
             return name; 
           });
         var tableColumns = this.data.columns;
+        //to keep record of columns that are selected
         var topLevelProps = [];
         for(var i = 0; i < data.selectedColumnNames.length; i++) {
           var rootProperty;
@@ -82,7 +83,7 @@ foam.CLASS({
         var notSelectedColumns = data.allColumns.filter(c => {
           return !topLevelProps.includes(c);
         });
-        // notSelectedColumns = notSelectedColumns.filter(n => typeof n === 'string' ? !tableColumns.includes(n) : !tableColumns.includes(n.name));
+        //to add properties that are specified in 'tableColumns' as an option
         notSelectedColumns = notSelectedColumns.concat(tableColumns);
         var nonSelectedViewModels = [];
         for(i = 0; i < notSelectedColumns.length; i++) {
@@ -93,6 +94,7 @@ foam.CLASS({
             rootProperty = [ axiom.name, axiom.label ? axiom.label : axiom.name ];
           } else 
             rootProperty = notSelectedColumns[i];
+          
           nonSelectedViewModels.push(foam.u2.view.SubColumnSelectConfig.create({ 
             index:data.selectedColumnNames.length + i, 
             rootProperty: rootProperty,
@@ -120,8 +122,8 @@ foam.CLASS({
             prop:columns[i],
             onDragAndDropParentFunction:this.onTopLevelPropertiesDragAndDrop.bind(this),
             onSelectionChangedParentFunction: this.onTopPropertiesSelectionChange.bind(this),
-            onDragAndDrop: this.onDragAndDrop.bind(this),//for parent to call if on its  views on child drag and drop
-            onSelectionChanged: this.onSelectionChanged.bind(this),//for parent to call if on its  views on child selectionChanged
+            onDragAndDrop: this.onDragAndDrop.bind(this),//for parent to call on its views on child drag and drop
+            onSelectionChanged: this.onSelectionChanged.bind(this),//for parent to call on its  views on child selectionChanged
           }));
         }
         return arr;
@@ -506,10 +508,10 @@ foam.CLASS({
       if ( !isColumnSelectionHaventChanged ) {
         //to change view 
         this.onSelectionChanged(isColumnSelected, index, this.views);
-        var hasPropertySelectionChanged = this.data.isPropertySelected;
         //to set currentProperty isColumnSelected
-        if (this.data.isPropertySelected != isColumnSelected) {
-          //need to re-check if isPropertySelected changed
+        var hasPropertySelectionChanged = this.data.isPropertySelected;
+        //to re-check if isPropertySelected changed
+        if ( this.data.isPropertySelected !== isColumnSelected ) {
           var anySelected = this.data.subColumnSelectConfig.find(s => s.isPropertySelected);
           this.data.isPropertySelected = typeof anySelected !== "undefined";
           //close if not selected
@@ -568,6 +570,7 @@ foam.CLASS({
         var otherSubProperties = [];
 
         var thisRootPropName = foam.Array.isInstance(this.rootProperty) ? this.rootProperty[0] : this.rootProperty.name;
+        //find selectedColumn for the root property 
         var selectedColumn = this.selectedColumns.filter(c => {
           var thisSelectedColumn = typeof c === 'string' ? c : c.name;
           return ( typeof c !== 'string' && this.level === 0 && thisSelectedColumn === thisRootPropName ) ||
@@ -575,7 +578,8 @@ foam.CLASS({
         });
 
         for ( var i = 0; i < subProperties.length; i++ ) {
-          //fix this
+          //the comparison above is working with the assumption that columns which are specified in 'tableColumns' are top level properties and
+          //we are not using nested "custom" table columns
           if ( selectedColumn.find(c => typeof c === 'string' && c.split('.').length > ( this.level + 1 ) && c.split('.')[this.level+1] === subProperties[i][0]) ) {
             selectedSubProperties.push(subProperties[i]);
           } else {
@@ -585,11 +589,22 @@ foam.CLASS({
         otherSubProperties.sort((a, b) => { return a[1].toLowerCase().localeCompare(b[1].toLowerCase());});
 
         for ( var i = 0; i < selectedSubProperties.length; i++  ) {
-          arr.push(this.cls_.create({ index:i, rootProperty: selectedSubProperties[i], selectedColumns$:this.selectedColumns$, level:l, parentExpanded$:this.expanded$, of: r && r.of ? r.of.getAxiomByName([selectedSubProperties[i][0]]).cls_ : r}));
+          arr.push(this.cls_.create({ 
+            index:i, 
+            rootProperty: selectedSubProperties[i], 
+            selectedColumns$:this.selectedColumns$, 
+            level:l, parentExpanded$:this.expanded$, 
+            of: r && r.of ? r.of.getAxiomByName([selectedSubProperties[i][0]]).cls_ : r}));
         }
         
         for ( var i = 0; i < otherSubProperties.length; i++  ) {
-          arr.push(this.cls_.create({ index:selectedSubProperties.length+i, rootProperty: otherSubProperties[i], selectedColumns$:this.selectedColumns$, level:l, parentExpanded$:this.expanded$, of: r && r.of ? r.of.getAxiomByName([otherSubProperties[i][0]]).cls_ : r, isPropertySelected:false}));
+          arr.push(this.cls_.create({ 
+            index:selectedSubProperties.length+i, 
+            rootProperty: otherSubProperties[i], 
+            selectedColumns$:this.selectedColumns$, 
+            level:l, parentExpanded$:this.expanded$, 
+            of: r && r.of ? r.of.getAxiomByName([otherSubProperties[i][0]]).cls_ : r, 
+            isPropertySelected:false}));
         }
 
         return arr;
@@ -650,7 +665,7 @@ foam.CLASS({
       } else {
         var arr = [];
         for (var i = 0; i < this.subColumnSelectConfig.length; i++) {
-          if (this.subColumnSelectConfig[i].isPropertySelected) {
+          if ( this.subColumnSelectConfig[i].isPropertySelected ) {
             var childProps = this.subColumnSelectConfig[i].returnSelectedProps();
             childProps.splice(0, 0, this.rootProperty[0]);
             arr.push(childProps);
@@ -662,7 +677,7 @@ foam.CLASS({
     function updateOnSearch(query) {
       if ( !this.hasSubProperties) {
         if ( query.length !== 0 ) {
-          this.showOnSearch = foam.Array.isInstance(this.rootProperty) ? this.rootProperty[1].toLowerCase().includes(query.toLowerCase()) : this.rootProperty.name.includes(query.toLowerCase());
+          this.showOnSearch = foam.Array.isInstance(this.rootProperty) ? this.rootProperty[1].toLowerCase().includes(query.toLowerCase()) : this.rootProperty.toLowerCase().name.includes(query.toLowerCase());
         } else
           this.showOnSearch = true;
       } else {
@@ -673,7 +688,6 @@ foam.CLASS({
           }
         }
       }
-
       if ( query.length!== 0 && this.showOnSearch )
         this.expanded = true;
       if ( query.length === 0 )
