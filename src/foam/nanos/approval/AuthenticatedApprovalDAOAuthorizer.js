@@ -48,9 +48,10 @@ foam.CLASS({
       name: 'authorizeOnUpdate',
       javaCode: `
         ApprovalRequest approvalRequest = (ApprovalRequest) oldObj;
+        User user = (User) x.get("user");
         Long userId = ((User) x.get("user")).getId();
         AuthService authService = (AuthService) x.get("auth");
-        if ( ! authService.check(x, "approval.update." + approvalRequest.getId()) && ! SafetyUtil.equals(approvalRequest.getApprover(), userId) ) {
+        if ( user == null || ! SafetyUtil.equals(approvalRequest.getApprover(), userId) && ! ( user.getId() == foam.nanos.auth.User.SYSTEM_USER_ID || user.getGroup().equals("admin") || user.getGroup().equals("system"))) {
           throw new AuthorizationException();
         }
       `
@@ -59,9 +60,8 @@ foam.CLASS({
       name: 'authorizeOnDelete',
       javaCode: `
         User user = (User) x.get("user");
-        AuthService authService = (AuthService) x.get("auth");
-        if ( user == null  || ! authService.check(x, "approval.remove." + ((ApprovalRequest)obj).getId())) {
-          throw new AuthorizationException();
+        if ( user == null  || ! ( user.getId() == foam.nanos.auth.User.SYSTEM_USER_ID || user.getGroup().equals("admin") || user.getGroup().equals("system")) ) {
+          throw new AuthorizationException("Approval can only be deleted by system");
         }
       `
     },
