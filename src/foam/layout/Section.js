@@ -9,8 +9,8 @@ foam.CLASS({
   name: 'Section',
 
   documentation: `
-    Provides model data sectioned viewing when using the Section Views.
-    Iterates over models sections and displays each section and it's associated properties.
+    Provides model data sectioned viewing when using section views.
+    Used for sectioning/grouping model properties and actions.
 
     Example:
     foam.CLASS({
@@ -36,12 +36,8 @@ foam.CLASS({
     });
 
     Displaying this model in foam.u2.detail.SectionView will section properties and display
-    the sections title and subtitles. Sections are capable of being available based on instance data
+    the sections title, subtitle, and help. Sections are capable of being available based on instance data
     and support dynamic titles and subtitles.
-
-    In the example above the mainSection section and it's properties will not be displayed if myProp is false.
-    Title will change based on the value of myProp.
-
   `,
 
   requires: [
