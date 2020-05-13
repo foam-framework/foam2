@@ -34,7 +34,7 @@ foam.CLASS({
     {
       name: 'dao',
       factory: function() {
-        return this.ArrayDAO.create({of: this.of, array: this.data});
+        return this.ArrayDAO.create({of: this.of, array$: this.data$});
       }
     },
     'of',
