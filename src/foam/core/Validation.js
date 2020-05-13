@@ -39,14 +39,20 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'errorMessage'
+    },
+    {
+      class: 'String',
       name: 'errorString'
     },
     {
       class: 'Function',
       // TODO: it isn't normal for JS functions to have a 'js' prefix
       name: 'jsErr',
-      expression: function(errorString) {
-        return function() { return errorString; };
+      expression: function(errorString, errorMessage) {
+        return function(obj) { 
+          return errorMessage && obj ? obj[errorMessage] : errorString;
+        }
       }
     }
   ],
@@ -93,7 +99,8 @@ foam.CLASS({
           return [args, function() {
             for ( var i = 0 ; i < validationPredicates.length ; i++ ) {
               var vp = validationPredicates[i];
-              if ( vp.jsFunc.bind(this)() ) return vp.jsErr.bind(this)();
+              var self = this;
+              if ( vp.jsFunc.bind(self)() ) return vp.jsErr.bind(self)(self);
             }
             return null;
           }];
