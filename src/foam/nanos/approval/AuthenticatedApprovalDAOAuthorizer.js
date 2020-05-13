@@ -38,7 +38,6 @@ foam.CLASS({
     {
       name: 'authorizeOnRead',
       javaCode: `
-        AuthService authService = (AuthService) x.get("auth");
         User user = (User) x.get("user");
         if ( user == null || ! SafetyUtil.equals(user.getId(), ((ApprovalRequest)obj).getApprover()) ) {
           throw new AuthorizationException();
