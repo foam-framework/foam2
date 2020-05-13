@@ -28,6 +28,7 @@ foam.CLASS({
 
       this.buildConstructor_();
     },
+    
     function fromModel(model) {
       [ // List of attributes to copy from model to Exception
         'name','package','source'
@@ -90,21 +91,11 @@ foam.CLASS({
           body: superConstructor + '\n' + setters
         })
     },
-    function getCorrectExtends_() {
-      // The javaExceptionExtends property always overrides
-      if ( this.of_.model_.javaExceptionExtends ) {
-        return this.of_.model_.javaExceptionExtends
-      }
 
-      if ( this.extendsException() ) {
-        return this.of_.model_.extends;
-      }
-
-      return 'java.lang.RuntimeException';
-    },
     function extendsException() {
       return foam.core.AbstractException.isSubClass(this.__context__.lookup(this.of_.model_.extends));
     },
+
     function buildJavaClass() {
       // ? Is this a necessary function
       return this;
