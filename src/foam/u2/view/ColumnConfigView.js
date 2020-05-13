@@ -372,14 +372,17 @@ foam.CLASS({
     },
     function onDragOver(e){
       e.preventDefault();
+      e.stopPropagation();
       e.currentTarget.style.setProperty("background-color", "#e5f1fc");
     },
     function onDragLeave(e){
       e.preventDefault();
+      e.stopPropagation();
       e.currentTarget.style.setProperty("background-color", "rgb(249, 249, 249)");
     },
     function onDrop(e) {
       e.preventDefault();
+      e.stopPropagation();
       e.currentTarget.style.setProperty("background-color", "rgb(249, 249, 249)");
       this.onDragAndDropParentFunction(this.index, parseInt(e.dataTransfer.getData('draggableId')));
     }
