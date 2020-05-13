@@ -52,7 +52,7 @@ foam.CLASS({
         var notSelectedColumns = data.allColumns.filter(c => {
           return typeof data.selectedColumnNames.find(s => typeof s === 'string' ? s.split('.')[0] === c : c === s.name) === "undefined";
         });
-        var tableColumns = this.data.of.getAxiomByName('tableColumns').columns;
+        var tableColumns = this.data.columns;
         var topLevelProps = [];
         for(var i = 0; i < data.selectedColumnNames.length; i++) {
           var rootProperty;
