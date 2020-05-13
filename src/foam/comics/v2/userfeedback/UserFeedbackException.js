@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.comics.v2.userfeedback',
   name: 'UserFeedbackException',
   extends: 'foam.core.AbstractException',
-  generateNativeException: true,
+  generateJavaException: true,
 
   documentation: `
     In cases where the object is not returned to client user after a request,

@@ -38,7 +38,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'AbstractException',
   implements: ['foam.core.MessageException'],
-  generateNativeException: true,
+  generateJavaException: true,
 
   documentation: 'Abstract base class for FOAM-side Exception classes.',
 
