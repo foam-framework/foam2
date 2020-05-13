@@ -79,11 +79,15 @@ foam.CLASS({
             topLevelProps.push(foam.Array.isInstance(rootProperty) ? rootProperty[0] : rootProperty.name);
           }
         }
+        tableColumns = tableColumns.filter(c => !topLevelProps.includes(c.name));
+        notSelectedColumns = notSelectedColumns.filter(n => !tableColumns.includes(n.name));
+        notSelectedColumns = notSelectedColumns.concat(tableColumns);
         var nonSelectedViewModels = [];
         for(i = 0; i < notSelectedColumns.length; i++) {
           var rootProperty;
           if ( typeof notSelectedColumns[i] === 'string' ) {
-            var axiom =  data.of.getAxiomByName(notSelectedColumns[i]);
+            var axiom =  tableColumns.find(c => c.name === notSelectedColumns[i]);
+            axiom = axiom || data.of.getAxiomByName(notSelectedColumns[i]);
             rootProperty = [ axiom.name, axiom.label ? axiom.label : axiom.name ];
           } else 
             rootProperty = notSelectedColumns[i];
@@ -96,8 +100,8 @@ foam.CLASS({
           }));
         }
         nonSelectedViewModels.sort((a, b) => { 
-          var aName = foam.Array.isInstance(a.rootProperty) ?  a.rootProperty[1] : a.name;
-          var bName = foam.Array.isInstance(b.rootProperty) ? b.rootProperty[1] : b.name;
+          var aName = foam.Array.isInstance(a.rootProperty) ?  a.rootProperty[1] : a.rootProperty.label ? a.rootProperty.label : a.rootProperty.name;
+          var bName = foam.Array.isInstance(b.rootProperty) ? b.rootProperty[1] : b.rootProperty.label ? b.rootProperty.label : b.rootProperty.name;
           return aName.toLowerCase().localeCompare(bName.toLowerCase());
         });
         arr = arr.concat(nonSelectedViewModels);
@@ -569,6 +573,7 @@ foam.CLASS({
         });
 
         for ( var i = 0; i < subProperties.length; i++ ) {
+          //fix this
           if ( selectedColumn.find(c => typeof c === 'string' && c.split('.').length > ( this.level + 1 ) && c.split('.')[this.level+1] === subProperties[i][0]) ) {
             selectedSubProperties.push(subProperties[i]);
           } else {
