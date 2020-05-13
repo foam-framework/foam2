@@ -15,11 +15,9 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'String',
       name: 'title'
     },
     {
-      class: 'String',
       name: 'subTitle'
     },
     {
@@ -27,7 +25,7 @@ foam.CLASS({
       name: 'help'
     },
     {
-      class:  'FObjectArray',
+      class: 'FObjectArray',
       of: 'foam.core.Property',
       name: 'properties'
     },
