@@ -26,6 +26,7 @@ the notification will be handled. `,
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.dao.Sink',
+    'foam.nanos.auth.User',
     'foam.nanos.logger.Logger',
     'java.util.List'
   ],
@@ -51,28 +52,38 @@ the notification will be handled. `,
         return this.delegate.put_(x, obj);
       },
       javaCode: `
+        Logger logger = (Logger) x.get("logger");  
         Notification notification = (Notification) obj;
         Notification template = notification;
-        DAO dao = (DAO) x.get("notificationTemplateDAO");
-        Logger logger = (Logger) x.get("logger");
-        logger.debug("NotificationTemplateDAO template: "+notification.getTemplate());
+
         if ( ! foam.util.SafetyUtil.isEmpty(notification.getTemplate()) ) {
-          Sink sink = dao.where(foam.mlang.MLang.EQ(Notification.TEMPLATE, notification.getTemplate())).select(null);
-          List templates = ((ArraySink) sink).getArray();
+          List templates = ((ArraySink) ((DAO) x.get("notificationTemplateDAO"))
+            .where(foam.mlang.MLang.EQ(Notification.TEMPLATE, notification.getTemplate()))
+            .select(new ArraySink()))
+            .getArray();
+
           if ( templates.size() > 1 ) {
-            logger.error("Multiple Notification templates for "+notification.getTemplate()+" found.");
+            logger.error("Multiple Notification templates for " + notification.getTemplate() + " found.");
             return notification;
           } else if ( templates.size() == 1 ) {
             template = (Notification) ((FObject)templates.get(0)).fclone();
-            // REVIEW/FIXME: no copyFrom in our java
             template.setId(notification.getId());
             template.setBody(notification.getBody());
             template.setRead(notification.getRead());
+
+            // Notify a user directly
+            DAO userDAO = (DAO) x.get("localUserDAO");
+            User user = (User) userDAO.find(template.getUserId());
+            if ( user != null ) {
+              user.doNotify(x, template);
+              return notification;
+            }
           } else {
-            logger.error("Notification template "+notification.getTemplate()+" not found.");
+            logger.error("Notification template " + notification.getTemplate() + " not found.");
             return notification;
           }
         }
+
         return getDelegate().put_(x, template);
       `
     }

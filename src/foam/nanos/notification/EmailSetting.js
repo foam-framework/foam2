@@ -13,6 +13,8 @@ foam.CLASS({
   javaImports: [
     'foam.core.PropertyInfo',
     'foam.nanos.auth.User',
+    'foam.nanos.auth.LifecycleState',
+    'foam.nanos.app.AppConfig',
     'foam.nanos.logger.Logger',
     'foam.nanos.notification.email.EmailMessage',
     'foam.util.Emails.EmailsUtility',
@@ -20,13 +22,6 @@ foam.CLASS({
     'java.util.Iterator',
     'java.util.Map',
     'static foam.mlang.MLang.EQ'
-  ],
-
-  properties: [
-    {
-      name: 'action',
-      value: 'EMAIL'
-    }
   ],
 
   methods: [
@@ -64,7 +59,11 @@ foam.CLASS({
       name: 'sendNotification',
       javaCode: `
         // Check if the user has disabled email notifications
-        if ( ! getEnabled() ) 
+        if ( ! getEnabled() || user == null ) 
+          return;
+
+        // Do not send notifications to users that are not yet active
+        if ( user.getLifecycleState() != LifecycleState.ACTIVE )
           return;
 
         // Skip sending email messages for disabled topics
@@ -83,6 +82,15 @@ foam.CLASS({
           Map<String, Object> emailArgs = resolveNotificationArguments(x, notification.getEmailArgs(), user);
           notification.setEmailArgs(emailArgs);
         }
+
+        if ( "notification".equals(notification.getEmailName()) ) {
+          notification.getEmailArgs().put("type", notification.getNotificationType());
+
+          AppConfig config = (AppConfig) x.get("appConfig");
+          if ( config != null ) {
+            notification.getEmailArgs().put("link", config.getUrl());
+          }
+        }    
 
         try {
           if ( foam.util.SafetyUtil.isEmpty(notification.getEmailName()) ) {

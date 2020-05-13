@@ -10,10 +10,9 @@ p({
       .setPm(true)
       .setSeqNo(true)
       .setDecorator(
-        new foam.nanos.notification.NotificationTemplateDAO.Builder(x).setDelegate(
-        new foam.nanos.notification.SendNotificationDAO(x,
-        new foam.nanos.notification.SendEmailNotificationDAO(
-        new foam.nanos.notification.SendSlackNotificationDAO(x)))).build())
+        new foam.nanos.notification.NotificationTemplateDAO.Builder(x)
+          .setDelegate(new foam.nanos.notification.NotificationExpansionDAO.Builder(x).build())
+          .build())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("notifications")
       .build();
