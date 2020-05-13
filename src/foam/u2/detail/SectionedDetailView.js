@@ -63,7 +63,7 @@ foam.CLASS({
                 if ( ! isAvailable ) return self.E().style({ display: 'none' });
 
                 // Support string titles and functions
-                var title$ = typeof s.title === 'function' ?
+                var title$ = foam.Function.isInstance(s.title) ?
                 foam.core.ExpressionSlot.create({
                   obj$: self.data$,
                   code: s.title

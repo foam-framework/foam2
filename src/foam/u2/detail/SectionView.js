@@ -67,7 +67,7 @@ foam.CLASS({
           return self.Rows.create()
             .show(section.createIsAvailableFor(self.data$))
             .callIf(showTitle, function() {
-              var slot$ = typeof self.section.title === 'function' ?
+              var slot$ = foam.Function.isInstance(self.section.title) ?
                 foam.core.ExpressionSlot.create({
                   obj$: self.data$,
                   code: section.title
@@ -75,7 +75,7 @@ foam.CLASS({
               this.start('h2').add(slot$).end();
             })
             .callIf(section$subTitle, function() {
-              var slot$ = typeof self.section.subTitle === 'function' ?
+              var slot$ = foam.Function.isInstance(self.section.subTitle) ?
               foam.core.ExpressionSlot.create({
                 obj$: self.data$,
                 code: section.subTitle
