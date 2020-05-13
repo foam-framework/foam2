@@ -8,6 +8,42 @@ foam.CLASS({
   package: 'foam.layout',
   name: 'Section',
 
+  documentation: `
+    Provides model data sectioned viewing when using the Section Views.
+    Iterates over models sections and displays each section and it's associated properties.
+
+    Example:
+    foam.CLASS({
+      name: 'myModel',
+      sections: [
+        {
+          name: 'mainSection'
+          title: function(myProp) {
+            return myProp ? 'Set this title if myProp true' : 'Set this title if myProp false';
+          }
+          isAvailable: function(myProp) {
+            return ! myProp;
+          }
+        }
+      ],
+      properties: [
+        {
+          class: 'Boolean',
+          name: 'myProp',
+          section: 'mainSection'
+        }
+      ]
+    });
+
+    Displaying this model in foam.u2.detail.SectionView will section properties and display
+    the sections title and subtitles. Sections are capable of being available based on instance data
+    and support dynamic titles and subtitles.
+
+    In the example above the mainSection section and it's properties will not be displayed if myProp is false.
+    Title will change based on the value of myProp.
+
+  `,
+
   requires: [
     'foam.core.Action',
     'foam.core.Property'
@@ -15,9 +51,11 @@ foam.CLASS({
 
   properties: [
     {
+      // Accepts function and string
       name: 'title'
     },
     {
+      // Accepts function and string
       name: 'subTitle'
     },
     {
