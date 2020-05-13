@@ -45,11 +45,6 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'isEnabled',
-      value: true
-    },
-    {
-      class: 'Boolean',
       name: 'canMakerApproveOwnRequest',
       value: false
     },
@@ -158,7 +153,6 @@ foam.CLASS({
       DAO dao = (DAO) x.get(getDaoKey());
 
       FObject currentObjectInDAO = (FObject) dao.find(String.valueOf(obj.getProperty("id")));
-      
       Predicate checkerPredicate = approvableAwareObj.getCheckerPredicate();
 
       if ( checkerPredicate != null && ! checkerPredicate.f(obj) ){
