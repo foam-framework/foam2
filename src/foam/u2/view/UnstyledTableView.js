@@ -250,7 +250,7 @@ foam.CLASS({
     function updateColumns() {
       this.isColumnChanged = !this.isColumnChanged;
       localStorage.removeItem(this.of.id);
-      localStorage.setItem(this.of.id, JSON.stringify(this.selectedColumnNames));
+      localStorage.setItem(this.of.id, JSON.stringify(this.selectedColumnNames.map(c => typeof c === "string" ? c : c.name )));
     },
 
     function initE() {

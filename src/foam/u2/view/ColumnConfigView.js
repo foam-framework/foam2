@@ -41,20 +41,27 @@ foam.CLASS({
       name: 'columns',
       expression: function(data) {
         var arr = [];
-        var selectedColumns = [];
         var notSelectedColumns = [];
-        data.selectedColumnNames = data.selectedColumnNames.map(c => foam.Array.isInstance(c) ? c[0] : typeof c === 'string' ? c : c.name );
-        data.allColumns.forEach(c => {
-          if ( data.selectedColumnNames.find(s => s.split('.')[0] === c) != null )
-            selectedColumns.push(c);
-          else
-            notSelectedColumns.push(c);
+        //selectedColumnNames misleading name cause can contain objects
+        data.selectedColumnNames = data.selectedColumnNames.map(c => 
+          {
+            var name = foam.Array.isInstance(c) ? c[0] : c;
+            name = typeof c === 'string' ? c : c;
+            return name; 
+          });
+        var notSelectedColumns = data.allColumns.filter(c => {
+          return typeof data.selectedColumnNames.find(s => typeof s === 'string' ? s.split('.')[0] === c : c === s.name) === "undefined";
         });
-        for(var i = 0; i < selectedColumns.length; i++) {
+        for(var i = 0; i < data.selectedColumnNames.length; i++) {
+          var rootProperty;
+          if ( typeof data.selectedColumnNames[i] === 'string' ) {
+            var axiom =  data.of.getAxiomByName(data.selectedColumnNames[i]);
+            rootProperty = [ axiom.name, axiom.label ? axiom.label : axiom.name ];
+          } else 
+            rootProperty = data.selectedColumnNames[i];
           arr.push(foam.u2.view.SubColumnSelectConfig.create({ 
             index:i, 
-            rootProperty: [data.of.getAxiomByName(selectedColumns[i]).name, 
-            data.of.getAxiomByName(selectedColumns[i]).label ? data.of.getAxiomByName(selectedColumns[i]).label : data.of.getAxiomByName(selectedColumns[i]).name], 
+            rootProperty:rootProperty, 
             level:0, 
             of:data.of, 
             selectedColumns$:data.selectedColumnNames$, 
@@ -62,15 +69,25 @@ foam.CLASS({
         }
         var nonSelectedViewModels = [];
         for(i = 0; i < notSelectedColumns.length; i++) {
+          var rootProperty;
+          if ( typeof notSelectedColumns[i] === 'string' ) {
+            var axiom =  data.of.getAxiomByName(notSelectedColumns[i]);
+            rootProperty = [ axiom.name, axiom.label ? axiom.label : axiom.name ];
+          } else 
+            rootProperty = notSelectedColumns[i];
           nonSelectedViewModels.push(foam.u2.view.SubColumnSelectConfig.create({ 
-            index:i+selectedColumns.length, 
-            rootProperty: [data.of.getAxiomByName(notSelectedColumns[i]).name, data.of.getAxiomByName(notSelectedColumns[i]).label ? data.of.getAxiomByName(notSelectedColumns[i]).label : data.of.getAxiomByName(notSelectedColumns[i]).name], 
+            index:data.selectedColumnNames.length + i, 
+            rootProperty: rootProperty,
             level:0, 
             of:data.of, 
             selectedColumns$:data.selectedColumnNames$, 
           }));
         }
-        nonSelectedViewModels.sort((a, b) => { return a.rootProperty[1].toLowerCase().localeCompare(b.rootProperty[1].toLowerCase());});
+        nonSelectedViewModels.sort((a, b) => { 
+          var aName = foam.Array.isInstance(a.rootProperty) ?  a.rootProperty[1] : a.name;
+          var bName = foam.Array.isInstance(b.rootProperty) ? b.rootProperty[1] : b.name;
+          return aName.toLowerCase().localeCompare(bName.toLowerCase());
+        });
         arr = arr.concat(nonSelectedViewModels);
         return arr;
       }
@@ -152,8 +169,6 @@ foam.CLASS({
     },
     function onTopLevelPropertiesDragAndDrop(targetIndex, draggableIndex) {
       this.onDragAndDrop(this.views, targetIndex, draggableIndex);
-      this.data.selectedColumnNames = this.rebuildSelectedColumns();
-      this.data.updateColumns();
     },
     function onTopPropertiesSelectionChange(isColumnSelected, index, isColumnSelectionHaventChanged) {
       if ( !isColumnSelectionHaventChanged )
@@ -163,6 +178,8 @@ foam.CLASS({
     },
     function onDragAndDrop(views, targetIndex, draggableIndex) {
       this.resetProperties(views, targetIndex, draggableIndex);
+      this.data.selectedColumnNames = this.rebuildSelectedColumns();
+      this.data.updateColumns();
     },
     function resetProperties(views, targetIndex, draggableIndex) {
       var thisProps = views.map(v => v.prop);
@@ -190,7 +207,10 @@ foam.CLASS({
         if (this.views[i].prop.isPropertySelected) {
           var propSelectedTraversed = this.views[i].prop.returnSelectedProps();
           for (var j = 0; j < propSelectedTraversed.length; j++) {
-            arr.push(propSelectedTraversed[j].join('.'));
+            if ( foam.Array.isInstance(propSelectedTraversed[j]) )
+              arr.push(propSelectedTraversed[j].join('.'));
+            else
+              arr.push(propSelectedTraversed[j]);
           }
         }
       }
@@ -220,12 +240,16 @@ foam.CLASS({
 
       startUnselectedIndex =  startUnselectedIndex.index;
       if ( startUnselectedIndex - draggableIndex === 1 ) {
+        var currentProp = foam.Array.isInstance(views[draggableIndex].prop.rootProperty) ? views[draggableIndex].prop.rootProperty[1] : views[draggableIndex].prop.rootProperty.name;
+        var comparedToProp = foam.Array.isInstance(views[startUnselectedIndex].prop.rootProperty) ? views[startUnselectedIndex].prop.rootProperty[1] : views[startUnselectedIndex].prop.rootProperty.name;
         if ( views[draggableIndex].prop.rootProperty[1].toLowerCase().localeCompare(views[startUnselectedIndex].prop.rootProperty[1].toLowerCase()) < 1 )
           return this.resetProperties(views, startUnselectedIndex-1, draggableIndex);
       }
       
       while(startUnselectedIndex < views.length) {
-        if ( views[draggableIndex].prop.rootProperty[1].toLowerCase().localeCompare(views[startUnselectedIndex].prop.rootProperty[1].toLowerCase()) < 0 ) {
+        var currentProp = foam.Array.isInstance(views[draggableIndex].prop.rootProperty) ? views[draggableIndex].prop.rootProperty[1] : views[draggableIndex].prop.rootProperty.name;
+        var comparedToProp = foam.Array.isInstance(views[startUnselectedIndex].prop.rootProperty) ? views[startUnselectedIndex].prop.rootProperty[1] : views[startUnselectedIndex].prop.rootProperty.name;
+        if ( currentProp.toLowerCase().localeCompare(comparedToProp.toLowerCase()) < 0 ) {
           break;
         }
         startUnselectedIndex++;
@@ -369,7 +393,7 @@ foam.CLASS({
           .end()
           .start('span')
             .style({'padding-left' : this.data.isPropertySelected$.map(function(s) { return s ? '4px' : '13px';})})
-            .add(this.data.rootProperty[1])
+            .add(foam.Array.isInstance(this.data.rootProperty) ? this.data.rootProperty[1] : this.data.rootProperty.label)
           .end()
           .start('span')
             .show(this.data.hasSubProperties)
@@ -505,9 +529,9 @@ foam.CLASS({
     {
       name: 'subProperties',
       expression: function(rootProperty) {
-        if ( !this.of || !this.of.getAxiomByName)
+        if ( !this.of || !this.of.getAxiomByName )
           return [];
-        var r = this.of.getAxiomByName(this.rootProperty[0]);
+        var r = this.of.getAxiomByName(foam.Array.isInstance(rootProperty) ? this.rootProperty[0] : rootProperty.name);
         if ( r && r.cls_ && r.cls_.name === 'FObjectProperty' )
           return r.of.getAxiomsByClass(foam.core.Property).map(p => [p.name, p.label ? p.label : p.name]);
         return [];
@@ -516,7 +540,7 @@ foam.CLASS({
     {
       name: 'subColumnSelectConfig',
       expression: function(subProperties, level) {
-        if ( !this.of || !this.of.getAxiomByName)
+        if ( !this.of || !this.of.getAxiomByName || subProperties.length === 0 )
           return [];
         var arr = [];
         var l = level + 1;
@@ -525,10 +549,15 @@ foam.CLASS({
         var selectedSubProperties = [];
         var otherSubProperties = [];
 
-        var selectedColumn = this.selectedColumns.filter(c => c.split('.').length > this.level && c.split('.')[this.level] === this.rootProperty[0]);
+        var thisRootPropName = foam.Array.isInstance(this.rootProperty) ? this.rootProperty[0] : this.rootProperty.name;
+        var selectedColumn = this.selectedColumns.filter(c => {
+          var thisSelectedColumn = typeof c === 'string' ? c : c.name;
+          return ( typeof c !== 'string' && this.level === 0 && thisSelectedColumn === thisRootPropName ) ||
+          ( typeof c === 'string' && c.split('.').length > this.level && c.split('.')[this.level] === this.rootProperty[0] );
+        });
 
         for ( var i = 0; i < subProperties.length; i++ ) {
-          if ( selectedColumn.find(c => c.split('.').length > ( this.level + 1 ) && c.split('.')[this.level+1] === subProperties[i][0]) ) {
+          if ( selectedColumn.find(c => c === 'string' && c.split('.').length > ( this.level + 1 ) && c.split('.')[this.level+1] === subProperties[i][0]) ) {
             selectedSubProperties.push(subProperties[i]);
           } else {
             otherSubProperties.push(subProperties[i]);
@@ -555,8 +584,10 @@ foam.CLASS({
       class: 'Boolean',
       expression: function() {
         return typeof this.selectedColumns.find(s => {
-          var propNames = s.split('.');
-          return propNames.length > this.level && propNames[this.level] === this.rootProperty[0];
+          var propNames = typeof s === 'string' ? s.split('.') : s.name;
+          var thisPropName = foam.Array.isInstance(this.rootProperty) ? this.rootProperty[0] : this.rootProperty.name;
+          return (typeof s === 'string' && propNames.length > this.level && propNames[this.level] === thisPropName) || 
+              (typeof s !== 'string' && this.level === 0 && propNames === thisPropName);
         }) !== 'undefined';
       }
     },
@@ -591,9 +622,13 @@ foam.CLASS({
     },
     function returnSelectedProps() {
       if ( !this.hasSubProperties) {
-        if (this.level === 0)
-          return [[this.rootProperty[0]]];
-        return [this.rootProperty[0]];
+        if (this.level === 0) {
+          if ( foam.Array.isInstance(this.rootProperty) )
+            return [[this.rootProperty[0]]];
+          else
+            return [this.rootProperty];
+        } else 
+          return [this.rootProperty[0]];
       } else {
         var arr = [];
         for (var i = 0; i < this.subColumnSelectConfig.length; i++) {
@@ -609,7 +644,7 @@ foam.CLASS({
     function updateOnSearch(query) {
       if ( !this.hasSubProperties) {
         if ( query.length !== 0 ) {
-          this.showOnSearch = this.rootProperty[1].toLowerCase().includes(query);
+          this.showOnSearch = foam.Array.isInstance(this.rootProperty) ? this.rootProperty[1].toLowerCase().includes(query) : this.rootProperty.name.includes(query);
         } else
           this.showOnSearch = true;
       } else {
