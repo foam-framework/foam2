@@ -39,9 +39,7 @@ foam.CLASS({
           if ( this.data && this.data.cls_.id === newValue ) return;
           var m = this.__context__.lookup(newValue, true);
           if ( m ) {
-            this.data = this.persistData ?
-                m.create(null, this).copyFrom(this.data) :
-                m.create(null, this);
+            this.data = m.create(this.persistantData, this);
           }
         }
       }
@@ -89,9 +87,13 @@ foam.CLASS({
       value: true
     },
     {
-      class: 'Boolean',
-      name: 'persistData',
-      documentation: 'Allows data to persist to selected class instances.'
+      class: 'Object',
+      name: 'persistantData',
+      documentation: 'Allows passed in data to persist to selected class instances.'
+    },
+    {
+      name: 'predicate',
+      documentation: 'Unique predicate to pass into strategizer query request.'
     }
   ],
 
@@ -114,10 +116,11 @@ foam.CLASS({
       // populate the list of choices using models related to 'of' via the
       // implements and extends relations.
       if ( this.strategizer != null ) {
-        this.strategizer.query(null, this.of.id).then((strategyReferences) => {
+        this.strategizer.query(null, this.of.id, null, this.predicate).then((strategyReferences) => {
           // 'found' is set to true if the current data's objectClass is one
           // of the valid choices. If it isn't, then the objectClass is set
           // to the first choice to cause a new 'data' to be created.
+
           var found = false;
           var data = this.data;
 
