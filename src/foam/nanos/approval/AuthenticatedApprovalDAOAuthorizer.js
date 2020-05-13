@@ -51,7 +51,7 @@ foam.CLASS({
         ApprovalRequest approvalRequest = (ApprovalRequest) oldObj;
         Long userId = ((User) x.get("user")).getId();
         AuthService authService = (AuthService) x.get("auth");
-        if ( ! authService.check(x, "approval.update.*") && ! SafetyUtil.equals(approvalRequest.getApprover(), userId) ) {
+        if ( ! authService.check(x, "approval.update" + oldObj.getId()) && ! SafetyUtil.equals(approvalRequest.getApprover(), userId) ) {
           throw new AuthorizationException();
         }
       `
@@ -61,7 +61,7 @@ foam.CLASS({
       javaCode: `
         User user = (User) x.get("user");
         AuthService authService = (AuthService) x.get("auth");
-        if ( user == null  || ! authService.check(x, "approval.remove.*")) {
+        if ( user == null  || ! authService.check(x, "approval.remove" + ((ApprovalRequest) obj).getApprover())) {
           throw new AuthorizationException();
         }
       `
