@@ -58,6 +58,11 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'browseSubtitle',
+      expression: function(of) { return "View All " + foam.String.pluralize(of.model_.label) }
+    },
+    {
+      class: 'String',
       name: 'createTitle',
       expression: function(of) { return 'Create a New ' + of.model_.label; }
     },
