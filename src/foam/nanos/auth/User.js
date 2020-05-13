@@ -36,6 +36,7 @@ foam.CLASS({
     'foam.nanos.theme.Theme',
     'foam.util.SafetyUtil',
     'java.util.Arrays',
+    'java.util.HashMap',
     'java.util.HashSet',
     'java.util.List',
   ],
@@ -630,8 +631,20 @@ foam.CLASS({
     {
       name: 'doNotify',
       javaCode: `
+        // Get the default settings for the user if none are already defined
+        List<NotificationSetting> settingDefaults = ((ArraySink) ((DAO) x.get("notificationSettingDefaultsDAO")).select(new ArraySink())).getArray();
+        HashMap<String, NotificationSetting> settingsMap = new HashMap<String, NotificationSetting>();
+        for ( NotificationSetting setting : settingDefaults ) {
+          settingsMap.put(setting.getClassInfo().getId(), setting);
+        }
+
+        // Get the configured notifications settings for the user and overwrite the defaults
         List<NotificationSetting> settings = ((ArraySink) getNotificationSettings(x).select(new ArraySink())).getArray();
-        for( NotificationSetting setting : settings ) {
+        for ( NotificationSetting setting : settings ) {
+          settingsMap.put(setting.getClassInfo().getId(), setting);
+        }
+
+        for ( NotificationSetting setting : settingsMap.values() ) {
           setting.doNotify(x, this, notification);
         }
       `

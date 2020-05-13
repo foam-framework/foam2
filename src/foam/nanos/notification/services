@@ -58,6 +58,22 @@ p({
 
 p({
   "class": "foam.nanos.boot.NSpec",
+  "name": "notificationSettingDefaultsDAO",
+  "serviceScript": """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setAuthorize(false)
+      .setSeqNo(true)
+      .setPm(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("notificationSettingDefaults")
+      .setOf(foam.nanos.notification.NotificationSetting.getOwnClassInfo())
+      .build();
+  """
+})
+
+
+p({
+  "class": "foam.nanos.boot.NSpec",
   "name": "localNotificationSettingDAO",
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
