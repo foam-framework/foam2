@@ -13,12 +13,14 @@ foam.CLASS({
     invalidated whenever the imported user's group changes.
   `,
   imports: [
+    'capabilityDAO',
     'user',
+    'userCapabilityJunctionDAO'
   ],
   properties: [
     {
       class: 'Map',
-      name: 'cache',
+      name: 'cache'
     },
   ],
   methods: [
@@ -26,6 +28,18 @@ foam.CLASS({
       this.onDetach(this.user$.dot('group').sub(function() {
         this.cache = {};
       }.bind(this)));
+      this.onDetach(this.userCapabilityJunctionDAO.on.sub(
+        (sub, _on, event, ucj) => {
+          if ( event !== 'put' && event !== 'remove' ) return;
+          this.capabilityDAO.find(ucj.targetId).then(cap => {
+            var permissions = [
+              ...cap.permissionsGranted,
+              ...cap.permissionsIntercepted,
+            ];
+            permissions.forEach(p => { delete this.cache[p] });
+          });
+        }
+      ));
     },
     function check(x, p) {
       if ( ! this.cache[p] ) this.cache[p] = this.delegate.check(x, p);
