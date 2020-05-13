@@ -207,17 +207,20 @@ foam.CLASS({
           var axiom;
 
           if ( typeof col[0] === 'string') {
-            var props = col[0].split('.');
-            for ( var i = 0; i < props.length; i++ ) {
-              axiom = typeof props[i] === 'string'
-              ? cls.getAxiomByName(props[i])
-              :  foam.Array.isInstance(props[i]) ? 
-              cls.getAxiomByName(props[i]) : props[i];
-              if ( !axiom ) {
-                //need to come up with behavior
-                break;
+            axiom = this.columns.find(c => c.name ===  col[0]);
+            if ( !axiom ) {
+              var props = col[0].split('.');
+              for ( var i = 0; i < props.length; i++ ) {
+                axiom = typeof props[i] === 'string'
+                ? cls.getAxiomByName(props[i])
+                :  foam.Array.isInstance(props[i]) ? 
+                cls.getAxiomByName(props[i]) : props[i];
+                if ( !axiom ) {
+                  //need to come up with behavior
+                  break;
+                }
+                cls = axiom.of;
               }
-              cls = axiom.of;
             }
           } else 
             axiom = col[0];
@@ -322,9 +325,12 @@ foam.CLASS({
               forEach(columns_, function([property, overrides]) {
                 var column;
                 if ( typeof property === 'string') {
+                 column = view.columns.find(c => c.name === property);
+                 if ( !column ) {
                   var columnConfig = this.__context__.columnConfigToPropertyConverter;
                   if (!columnConfig) columnConfig = this.__context__.lookup('foam.nanos.column.ColumnConfigToPropertyConverter').create();
                   column = columnConfig.returnProperty(view.of, property);
+                 }
                 } else
                   column = property;
                 if ( overrides ) column = column.clone().copyFrom(overrides);
@@ -508,11 +514,14 @@ foam.CLASS({
                   var column;
                   var obj1 = obj;
                   if ( typeof property === 'string') {
-                    var columnConfig = this.__context__.columnConfigToPropertyConverter;
-                    if (!columnConfig) columnConfig = this.__context__.lookup('foam.nanos.column.ColumnConfigToPropertyConverter').create();
-                    var val = columnConfig.returnPropertyAndObject(view.of, property, obj1);
-                    column = val.propertyValue;
-                    obj1 = val.objValue;
+                    column = view.columns.find(c => c.name === property);
+                    if ( !column ) {
+                      var columnConfig = this.__context__.columnConfigToPropertyConverter;
+                      if (!columnConfig) columnConfig = this.__context__.lookup('foam.nanos.column.ColumnConfigToPropertyConverter').create();
+                      var val = columnConfig.returnPropertyAndObject(view.of, property, obj1);
+                      column = val.propertyValue;
+                      obj1 = val.objValue;
+                    }
                   } else
                     column = property;
                   
