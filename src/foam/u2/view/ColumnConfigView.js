@@ -169,7 +169,6 @@ foam.CLASS({
       .on('click', this.stopPropagation)
         .start()
           .start()
-            .attrs({ autocomplete: 'off' })
             .add(this.MENU_SEARCH)
             .addClass('foam-u2-search-TextSearchView')
             .addClass(this.myClass('search'))
@@ -349,7 +348,9 @@ foam.CLASS({
                 on('dragstart', self.onDragStart.bind(self)).
                 on('dragenter', self.onDragOver.bind(self)).
                 on('dragover',  self.onDragOver.bind(self)).
-                on('drop',      self.onDrop.bind(self));
+                on('dragleave',  self.onDragLeave.bind(self)).
+                on('drop',      self.onDrop.bind(self))
+              .style({'cursor': self.prop.isPropertySelected ? 'pointer' : 'default'});
           });
         }))
         .add(self.slot(function(prop) {
@@ -371,10 +372,15 @@ foam.CLASS({
     },
     function onDragOver(e){
       e.preventDefault();
+      e.currentTarget.style.setProperty("background-color", "#e5f1fc");
+    },
+    function onDragLeave(e){
+      e.preventDefault();
+      e.currentTarget.style.setProperty("background-color", "rgb(249, 249, 249)");
     },
     function onDrop(e) {
       e.preventDefault();
-      e.stopPropagation();
+      e.currentTarget.style.setProperty("background-color", "rgb(249, 249, 249)");
       this.onDragAndDropParentFunction(this.index, parseInt(e.dataTransfer.getData('draggableId')));
     }
   ]
