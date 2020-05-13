@@ -50,12 +50,11 @@ foam.CLASS({
             'border': '1px solid /*%GREY4%*/ #e7eaec',
             'background-color': '#f9f9f9',
             'left': self.parentId$.map((v) => v ? ( document.getElementById(v).getBoundingClientRect().x - 250 > 0 ? document.getElementById(v).getBoundingClientRect().x - 250 : document.getElementById(v).getBoundingClientRect().x ) : 0 + 'px'),
-            'top': '40px',//self.parentId$.map((v) => v ? document.getElementById(v).getBoundingClientRect().y : 0 + 'px'),
+            'top': '40px',
             'position': 'fixed',
             'margin-bottom': '20px',
-            'height': 'fix-content',//will write calculation later
+            'height': 'fix-content',
             'max-height': window.innerHeight - 100 > 0 ? window.innerHeight - 100 : window.innerHeight + 'px'
-           // 'max-height': self.parentId$.map((v) => v ? window.innerWidth - document.getElementById(v).getBoundingClientRect().y - 1000 : 500 + 'px'),
           })
           .add(this.view)
         .end()

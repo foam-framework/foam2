@@ -18,23 +18,6 @@ foam.CLASS({
     ^ {
       max-width: 200px;
     }
-
-    ^header {
-      border: 2px solid grey;
-      border-radius: 5px;
-      margin-bottom:5px;
-    }
-
-    ^dropdown {
-      border-radius: 4px;
-      position: absolute;
-      background-color: #f9f9f9;
-      margin-bottom: 20px;
-      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-      min-width: 1118px;
-      z-index: 1;
-    }
-
     ^search {
       margin: 5px;
     }
@@ -313,9 +296,6 @@ foam.CLASS({
     },
     {
       name: 'prop',
-      // postSet: function() {
-      //   this.subscribeSelected();
-      // }
     },
     'index',
     {
@@ -334,6 +314,18 @@ foam.CLASS({
       name: 'onSelectionChanged',
       documentation: 'to reuse onSelectionChanged function'
     },
+  ],
+  constants: [
+    {
+      name: 'DEFAULT_BG_COLOR',
+      type: 'String',
+      value: 'rgb(249, 249, 249)'
+    },
+    {
+      name: 'ON_DRAG_OVER_BG_COLOR',
+      type: 'String',
+      value: '#e5f1fc'
+    }
   ],
   methods: [
     function initE() {
@@ -373,17 +365,17 @@ foam.CLASS({
     function onDragOver(e){
       e.preventDefault();
       e.stopPropagation();
-      e.currentTarget.style.setProperty("background-color", "#e5f1fc");
+      e.currentTarget.style.setProperty("background-color", this.ON_DRAG_OVER_BG_COLOR);
     },
     function onDragLeave(e){
       e.preventDefault();
       e.stopPropagation();
-      e.currentTarget.style.setProperty("background-color", "rgb(249, 249, 249)");
+      e.currentTarget.style.setProperty("background-color", this.DEFAULT_BG_COLOR);
     },
     function onDrop(e) {
       e.preventDefault();
       e.stopPropagation();
-      e.currentTarget.style.setProperty("background-color", "rgb(249, 249, 249)");
+      e.currentTarget.style.setProperty("background-color", this.DEFAULT_BG_COLOR);
       this.onDragAndDropParentFunction(this.index, parseInt(e.dataTransfer.getData('draggableId')));
     }
   ]
@@ -421,37 +413,34 @@ foam.CLASS({
       this
         .on('click', this.toggleExpanded)
         .start()
-        // .enableClass(this.myClass('selected'), this.data.isPropertySelected)
-        .start()
-          .addClass(this.myClass('some-padding'))
-          .add(this.slot(function(data$isPropertySelected) {
-            this.style({
-              'padding-left' : self.data.level * 15 + 5 + 'px'
-            });
-          }))
-          .start('span')
-            .show(this.data.isPropertySelected$)
-            .add(this.CHECK_MARK)
-          .end()
-          .start('span')
-            .style({'padding-left' : this.data.isPropertySelected$.map(function(s) { return s ? '4px' : '13px';})})
-            .add(foam.Array.isInstance(this.data.rootProperty) ? this.data.rootProperty[1] : this.data.rootProperty.label)
-          .end()
-          .start('span')
-            .show(this.data.hasSubProperties)
+          .start()
+            .addClass(this.myClass('some-padding'))
             .style({
-              'vertical-align': 'middle',
-              'font-weight':    'bold',
-              'visibility':     'visible',
-              'font-size':      '16px',
-              'float':          'right',
-              'transform':      this.data.expanded$.map(function(c) { return c ? 'rotate(180deg)' : 'rotate(90deg)'; })
+              'padding-left' : self.data.level * 15 + 5 + 'px'
             })
-            .on('click', this.toggleExpanded)
-            .add('\u2303')
+            .start('span')
+              .show(this.data.isPropertySelected$)
+              .add(this.CHECK_MARK)
+            .end()
+            .start('span')
+              .style({'padding-left' : this.data.isPropertySelected$.map(function(s) { return s ? '4px' : '13px';})})
+              .add(foam.Array.isInstance(this.data.rootProperty) ? this.data.rootProperty[1] : this.data.rootProperty.label)
+            .end()
+            .start('span')
+              .show(this.data.hasSubProperties)
+              .style({
+                'vertical-align': 'middle',
+                'font-weight':    'bold',
+                'visibility':     'visible',
+                'font-size':      '16px',
+                'float':          'right',
+                'transform':      this.data.expanded$.map(function(c) { return c ? 'rotate(180deg)' : 'rotate(90deg)'; })
+              })
+              .on('click', this.toggleExpanded)
+              .add('\u2303')
+            .end()
           .end()
-        .end()
-      .end();
+        .end();
     }
   ],
   listeners: [
@@ -600,7 +589,7 @@ foam.CLASS({
         });
 
         for ( var i = 0; i < subProperties.length; i++ ) {
-          //the comparison above is working with the assumption that columns which are specified in 'tableColumns' are top level properties and
+          //the comparison mentioned above is working with the assumption that columns which are specified in 'tableColumns' are top-level properties and
           //we are not using nested "custom" table columns
           if ( selectedColumn.find(c => typeof c === 'string' && c.split('.').length > ( this.level + 1 ) && c.split('.')[this.level+1] === subProperties[i][0]) ) {
             selectedSubProperties.push(subProperties[i]);
@@ -710,7 +699,7 @@ foam.CLASS({
           }
         }
       }
-      if ( query.length!== 0 && this.showOnSearch )
+      if ( query.length !== 0 && this.showOnSearch )
         this.expanded = true;
       if ( query.length === 0 )
         this.expanded = false;
