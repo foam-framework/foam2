@@ -116,6 +116,42 @@ public class SafetyUtil {
     return o1 == o2 ? 0 : o1 < o2 ? -1 : 1;
   }
 
+  public static int hashCode(Object o1) {
+    return o1 == null ? 0 : o1.hashCode();
+  }
+
+  public static int hashCode(FObject o1) {
+    return o1 == null ? 0 : o1.hashCode();
+  }
+
+  public static int hashCode(boolean o1) {
+    return o1 ? 1 : 0;
+  }
+
+  public static int hashCode(String o1) {
+    return o1 == null ? 0 : o1.hashCode();
+  }
+
+  public static int hashCode(short o1) {
+    return o1;
+  }
+
+  public static int hashCode(int o1) {
+    return o1;
+  }
+
+  public static int hashCode(long o1) {
+    return (int)(o1^(o1>>>32));
+  }
+
+  public static int hashCode(float o1) {
+    return  Float.floatToIntBits(o1);
+  }
+
+  public static int hashCode(double o1) {
+    return hashCode(Double.doubleToRawLongBits(o1));
+  }
+
   public static Object deepClone(Object o) {
     if ( o == null ) return null;
     if ( o instanceof foam.core.FObject ) return ((foam.core.FObject)o).deepClone();
