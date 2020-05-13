@@ -24,7 +24,9 @@ foam.CLASS({
   ],
 
   implements: [
-    'foam.mlang.Expressions'
+    'foam.mlang.Expressions',
+    'foam.nanos.auth.LastModifiedAware',
+    'foam.nanos.auth.LastModifiedByAware'
   ],
 
   tableColumns: [
@@ -159,6 +161,28 @@ foam.CLASS({
       return foam.mlang.MLang.TRUE;
       `,
       documentation: 'condition under which the permissions that may be intercepted by this capability will be intercepted.'
+    },
+    {
+      name: 'lastModified',
+      class: 'DateTime',
+      section: '_defaultSection',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO'
+    },
+    {
+      name: 'lastModifiedBy',
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      section: '_defaultSection',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      tableCellFormatter: function(value, obj) {
+        obj.userDAO.find(value).then(function(user) {
+          if ( user ) {
+            this.add(user.legalName);
+          }
+        }.bind(this));
+      }
     },
   ],
 
