@@ -1307,31 +1307,6 @@ ${this.VALUES.map(v => `\tcase "${v.label}": return ${cls.name}.${v.name};`).joi
   ]
 });
 
-
-foam.CLASS({
-  package: 'foam.java',
-  name: 'ExceptionModelJavaRefinement',
-  refines: 'foam.core.ExceptionModel',
-
-  properties: [
-    {
-      class: 'String',
-      name: 'javaExceptionExtends'
-    },
-    {
-      class: 'StringArray',
-      name: 'javaSuperArgs',
-      factory: () => [],
-    },
-    {
-      class: 'StringArray',
-      name: 'javaConstructorArgs',
-      factory: () => [],
-    },
-  ]
-});
-
-
 foam.CLASS({
   package: 'foam.java',
   name: 'DateTimeJavaRefinement',
