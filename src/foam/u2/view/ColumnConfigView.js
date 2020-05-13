@@ -83,12 +83,18 @@ foam.CLASS({
             topLevelProps.push(foam.Array.isInstance(rootProperty) ? rootProperty[0] : rootProperty.name);
           }
         }
-        tableColumns = tableColumns.filter(c => !topLevelProps.includes(typeof c === 'string' ? c : c.name));
         var notSelectedColumns = data.allColumns.filter(c => {
           return !topLevelProps.includes(c);
         });
         //to add properties that are specified in 'tableColumns' as an option
-        notSelectedColumns = notSelectedColumns.concat(tableColumns);
+        tableColumns = tableColumns.filter(c => !topLevelProps.includes(typeof c === 'string' ? c : c.name));
+        for(var i = 0; i < tableColumns.length; i++) {
+          var indexOfTableColumn = notSelectedColumns.indexOf(typeof tableColumns[i] === 'string' ? tableColumns[i] : tableColumns[i].name);
+          if ( indexOfTableColumn === -1)
+            notSelectedColumns.push(tableColumns[i]);
+          else
+            notSelectedColumns.splice(indexOfTableColumn, 1, tableColumns[i]);
+        }
         var nonSelectedViewModels = [];
         for(i = 0; i < notSelectedColumns.length; i++) {
           var rootProperty;
