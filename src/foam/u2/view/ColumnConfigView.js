@@ -655,7 +655,7 @@ foam.CLASS({
     function updateOnSearch(query) {
       if ( !this.hasSubProperties) {
         if ( query.length !== 0 ) {
-          this.showOnSearch = foam.Array.isInstance(this.rootProperty) ? this.rootProperty[1].toLowerCase().includes(query) : this.rootProperty.name.includes(query);
+          this.showOnSearch = foam.Array.isInstance(this.rootProperty) ? this.rootProperty[1].toLowerCase().includes(query.toLowerCase()) : this.rootProperty.name.includes(query.toLowerCase());
         } else
           this.showOnSearch = true;
       } else {
