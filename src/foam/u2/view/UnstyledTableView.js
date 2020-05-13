@@ -281,7 +281,7 @@ foam.CLASS({
         addClass(this.myClass(this.of.id.replace(/\./g, '-'))).
         start().
           addClass(this.myClass('thead')).
-          style({ 'min-width': this.tableWidth_$ }).
+          style({ 'min-width': this.tableWidth_ }).
           show(this.showHeader$).
           add(this.slot(function(columns_) {
             return this.E().
