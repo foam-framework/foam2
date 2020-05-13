@@ -49,9 +49,6 @@ foam.CLASS({
             name = typeof c === 'string' ? c : c;
             return name; 
           });
-        var notSelectedColumns = data.allColumns.filter(c => {
-          return typeof data.selectedColumnNames.find(s => typeof s === 'string' ? s.split('.')[0] === c : c === s.name) === "undefined";
-        });
         var tableColumns = this.data.columns;
         var topLevelProps = [];
         for(var i = 0; i < data.selectedColumnNames.length; i++) {
@@ -65,6 +62,8 @@ foam.CLASS({
               if (!axiom)
                 axiom = data.of.getAxiomByName(data.selectedColumnNames[i]);
             }
+            if ( !axiom )
+              continue;
             rootProperty = [ axiom.name, axiom.label ? axiom.label : axiom.name ];
           } else 
             rootProperty = data.selectedColumnNames[i];
@@ -79,8 +78,11 @@ foam.CLASS({
             topLevelProps.push(foam.Array.isInstance(rootProperty) ? rootProperty[0] : rootProperty.name);
           }
         }
-        tableColumns = tableColumns.filter(c => !topLevelProps.includes(c.name));
-        notSelectedColumns = notSelectedColumns.filter(n => !tableColumns.includes(n.name));
+        tableColumns = tableColumns.filter(c => !topLevelProps.includes(typeof c === 'string' ? c : c.name));
+        var notSelectedColumns = data.allColumns.filter(c => {
+          return !topLevelProps.includes(c);
+        });
+        // notSelectedColumns = notSelectedColumns.filter(n => typeof n === 'string' ? !tableColumns.includes(n) : !tableColumns.includes(n.name));
         notSelectedColumns = notSelectedColumns.concat(tableColumns);
         var nonSelectedViewModels = [];
         for(i = 0; i < notSelectedColumns.length; i++) {
