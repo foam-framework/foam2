@@ -46,13 +46,15 @@ foam.CLASS({
         })
         .start()
           .style({
+            'border-radius': '5px',
+            'border': '1px solid /*%GREY4%*/ #e7eaec',
             'background-color': '#f9f9f9',
-            'left': self.parentId$.map((v) => v ? ( document.getElementById(v).getBoundingClientRect().x - 250 ) : 0 + 'px'),
-            'top': '20px',//self.parentId$.map((v) => v ? document.getElementById(v).getBoundingClientRect().y : 0 + 'px'),
+            'left': self.parentId$.map((v) => v ? ( document.getElementById(v).getBoundingClientRect().x - 250 > 0 ? document.getElementById(v).getBoundingClientRect().x - 250 : document.getElementById(v).getBoundingClientRect().x ) : 0 + 'px'),
+            'top': '40px',//self.parentId$.map((v) => v ? document.getElementById(v).getBoundingClientRect().y : 0 + 'px'),
             'position': 'fixed',
-            'overflow': 'scroll',
             'margin-bottom': '20px',
-            'height': '700px',//will write calculation later
+            'height': 'fix-content',//will write calculation later
+            'max-height': window.innerHeight - 100 > 0 ? window.innerHeight - 100 : window.innerHeight + 'px'
            // 'max-height': self.parentId$.map((v) => v ? window.innerWidth - document.getElementById(v).getBoundingClientRect().y - 1000 : 500 + 'px'),
           })
           .add(this.view)

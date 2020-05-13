@@ -34,6 +34,10 @@ foam.CLASS({
       min-width: 1118px;
       z-index: 1;
     }
+
+    ^search {
+      margin: 5px;
+    }
   `,
   properties: [
     'data',
@@ -162,11 +166,14 @@ foam.CLASS({
             .attrs({ autocomplete: 'off' })
             .add(this.MENU_SEARCH)
             .addClass('foam-u2-search-TextSearchView')
+            .addClass(this.myClass('search'))
           .end()
           .start()
           .add(this.slot(function(views) {
             var i = 0;
             return this.E()
+            // - padding - search height
+              .style({'overflow': 'scroll', 'padding-bottom': '20px', 'max-height': window.innerHeight - 180 > 0 ? window.innerHeight - 180 : window.innerHeight + 'px'})
               .forEach(views, function(view) {
                 view.prop.index = i;
                 this
