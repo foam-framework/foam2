@@ -48,10 +48,10 @@ foam.CLASS({
         httpPost.setEntity(params);
         
         try {
-            CloseableHttpResponse response =  HttpClients.createDefault().execute(httpPost);
+          CloseableHttpResponse response =  HttpClients.createDefault().execute(httpPost);
             
-            if ( response.getStatusLine().getStatusCode() != 200 )
-              logger.warning("Could not post to Slack; error code - " + response.getStatusLine().getStatusCode());
+          if ( response.getStatusLine().getStatusCode() != 200 )
+            logger.warning("Could not post to Slack; error code - " + response.getStatusLine().getStatusCode());
         } catch (Throwable t) {
           logger.error("Error sending slack message: ", t);
         }

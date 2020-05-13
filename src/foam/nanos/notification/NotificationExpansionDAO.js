@@ -9,11 +9,7 @@ foam.CLASS({
   name: 'NotificationExpansionDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  documentation: `Expands a notification from a group or broadcast notification to a user specific notification. `,
-
-  implements: [
-    'foam.mlang.Expressions'
-  ],
+  documentation: `Expands a notification from a group or broadcast notification to a user specific notification.`,
 
   imports: [
     'notificationTemplateDAO'

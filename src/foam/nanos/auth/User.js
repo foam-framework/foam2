@@ -452,10 +452,7 @@ foam.CLASS({
       createVisibility: 'HIDDEN',
       section: 'administrative',
       javaPostSet: `
-        if (null != val) {
-          HashSet<String> set = new HashSet<>(Arrays.asList(val));
-          setDisabledTopicSet(set);
-        }
+        clearDisabledTopics();
       `
     },
     {
@@ -464,7 +461,15 @@ foam.CLASS({
       name: 'disabledTopicSet',
       javaType: 'java.util.HashSet',
       hidden: true,
-      factory: function() { return {}; }
+      transient: true,
+      factory: function() { return {}; },
+      javaFactory: `
+        HashSet<String> set = new HashSet<>();
+        for ( String s : getDisabledTopics() ) {
+          set.add(s);
+        }
+        return set;
+      `
     },
     {
       class: 'URL',
