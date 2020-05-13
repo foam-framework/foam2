@@ -62,15 +62,25 @@ foam.CLASS({
 
       self
         .addClass(self.myClass())
-        .add(self.slot(function(section, showTitle, section$title, section$subTitle) {
+        .add(self.slot(function(section, showTitle, section$subTitle) {
           if ( ! section ) return;
           return self.Rows.create()
             .show(section.createIsAvailableFor(self.data$))
-            .callIf(showTitle && section$title, function() {
-              this.start('h2').add(section$title).end();
+            .callIf(showTitle, function() {
+              var slot$ = foam.Function.isInstance(self.section.title) ?
+                foam.core.ExpressionSlot.create({
+                  obj$: self.data$,
+                  code: section.title
+                }) : section.title$;
+              this.start('h2').add(slot$).end();
             })
             .callIf(section$subTitle, function() {
-              this.start().addClass('subtitle').add(section$subTitle).end();
+              var slot$ = foam.Function.isInstance(self.section.subTitle) ?
+              foam.core.ExpressionSlot.create({
+                obj$: self.data$,
+                code: section.subTitle
+              }) : section.subTitle$;
+              this.start().addClass('subtitle').add(slot$).end();
             })
             .start(self.Grid)
               .forEach(section.properties, function(p, index) {
