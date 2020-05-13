@@ -204,6 +204,13 @@ foam.CLASS({
           delegate = dao;
         }
 
+        if ( getLifecycleAware() ) {
+          delegate = new foam.nanos.auth.LifecycleAwareDAO.Builder(getX())
+            .setDelegate(delegate)
+            .setName(getPermissionPrefix())
+            .build();
+        }
+
         if ( getDeletedAware() ) {
           System.out.println("DEPRECATED: Will be completely removed after services journal migration script. No functionality as of now.");
         }
@@ -211,13 +218,6 @@ foam.CLASS({
         if ( getRuler() ) {
           String name = foam.util.SafetyUtil.isEmpty(getRulerDaoKey()) ? getName() : getRulerDaoKey();
           delegate = new foam.nanos.ruler.RulerDAO(getX(), delegate, name);
-        }
-
-        if ( getLifecycleAware() ) {
-          delegate = new foam.nanos.auth.LifecycleAwareDAO.Builder(getX())
-            .setDelegate(delegate)
-            .setName(getPermissionPrefix())
-            .build();
         }
 
         if ( getCreatedAware() )
