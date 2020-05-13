@@ -116,7 +116,7 @@ foam.CLASS({
 
       if ( ( ! requiresData || ( ucJunction.getData() != null && validateData(x, ucJunction)) ) && checkPrereqs(x, ucJunction, prereqJunctions) ) {
         ucJunction.setStatus(CapabilityJunctionStatus.GRANTED);
-        if ( requiresData && capability.getDaoKey() != null ) saveDataToDAO(x, capability.getDaoKey(), ucJunction);
+        if ( requiresData && capability.getDaoKey() != null ) saveDataToDAO(x, capability, ucJunction);
         configureJunctionExpiry(x, ucJunction, old, capability);
       }
       else ucJunction.setStatus(CapabilityJunctionStatus.PENDING);
@@ -133,8 +133,8 @@ foam.CLASS({
           type: 'Context'
         },
         {
-          name: 'daoKey',
-          type: 'String'
+          name: 'capability',
+          type: 'Capability'
         },
         {
           name: 'obj',
@@ -151,16 +151,33 @@ foam.CLASS({
       if ( obj.getData() == null ) 
         throw new RuntimeException("UserCapabilityJunction data not submitted for capability: " + obj.getTargetId());
       
-      DAO dao = (DAO) x.get(daoKey);
+      DAO dao = (DAO) x.get(capability.getDaoKey());
       if ( dao == null ) return;
 
-      if ( dao.getOf().getId().equals((obj.getData()).getClassInfo().getId()) ) {
-        try {
-          dao.put(obj.getData());
-        } catch (Exception e) {
-          Logger logger = (Logger) x.get("logger");
-          logger.debug("Data cannot be added to " + daoKey + " for UserCapabilityJunction object : " + obj.getId() );
+      // Identify or create data to go into dao.
+      FObject objectToSave;
+      String contextDAOFindKey = (String)capability.getContextDAOFindKey();
+      if ( contextDAOFindKey != null && ! contextDAOFindKey.isEmpty() ) {
+        objectToSave = (FObject) x.get(contextDAOFindKey);
+        if ( objectToSave == null ) {
+          throw new RuntimeException("@UserCapabilityJunction capability.contextDAOFindKey not found in context. Please check capability: " + obj.getTargetId() + " and its contextDAOKey: " + capability.getContextDAOFindKey());
         }
+      } else {
+        try {
+          objectToSave = (FObject) dao.getOf().newInstance();
+        } catch (Exception e) {
+          objectToSave = (FObject) obj.getData();
+        }
+
+      }
+      objectToSave = objectToSave.fclone().copyFrom(obj.getData());
+
+      // save data to dao
+      try {
+        dao.put(objectToSave);
+      } catch (Exception e) {
+        Logger logger = (Logger) x.get("logger");
+        logger.debug("Data cannot be added to " + capability.getDaoKey() + " for UserCapabilityJunction object : " + obj.getId() );
       }
       `
     },

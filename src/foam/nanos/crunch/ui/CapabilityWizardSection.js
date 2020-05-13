@@ -37,18 +37,6 @@ foam.CLASS({
       }
     },
     {
-      name: 'daoKey',
-      expression: function (capability) {
-        return capability.daoKey
-      }
-    },
-    {
-      name: 'daoFindKey',
-      expression: function (capability) {
-        return capability.daoFindKey
-      }
-    },
-    {
       name: 'ofSections',
       factory: null,
       expression: function(of) {

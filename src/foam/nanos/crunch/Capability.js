@@ -150,7 +150,7 @@ foam.CLASS({
       class: 'String'
     },
     {
-      name: 'daoFindKey',
+      name: 'contextDAOFindKey',
       class: 'String',
       documentation: 'need to find things dynamically, thus have a string here to specify the object in context to look up.'
     },
