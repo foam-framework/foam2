@@ -452,7 +452,7 @@ foam.CLASS({
       createVisibility: 'HIDDEN',
       section: 'administrative',
       javaPostSet: `
-        clearDisabledTopics();
+        clearDisabledTopicSet();
       `
     },
     {
