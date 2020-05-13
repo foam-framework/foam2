@@ -35,15 +35,26 @@ foam.CLASS({
 
       this.name = foam.String.toNativeExceptionName(model.name);
 
-      if (model.name == 'AbstractException' && model.package == 'foam.core' )
+      if (model.name == 'AbstractException' && model.package == 'foam.core' ) {
         this.extends = "java.lang.RuntimeException";
-      else
+        this.field({
+          name: 'foamException',
+          type: 'foam.core.FObject'
+        });
+        this.method({
+          visibility: 'public',
+          name: 'getFoamException',
+          args: [],
+          type: 'foam.core.FObject',
+          body: 'return foamException;'
+        })
+      } else {
         this.extends = "foam.core.AbstractNativeException";
+      }
     },
     function buildConstructor_() {
       let argSetterMap = {};
       let argObjectMap = {};
-      let args = [];
       let setters = [];
       let superConstructor = '';
 
@@ -57,13 +68,12 @@ foam.CLASS({
         }
       });
 
+      if ( this.name == 'AbstractNativeException' && this.package == 'foam.core' ) {
+        argSetterMap['foamException'] = 'this.foamException = data'
+      }
+
       setters = Object.keys(argSetterMap)
         .map(key => argSetterMap[key]).join(';\n') + ';';
-      
-      args = [{
-        name: 'data',
-        type: foam.String.toFoamExceptionName(this.of_.model_.name)
-      }]
 
       if ( this.name == 'AbstractNativeException' && this.package == 'foam.core' )
         superConstructor = 'super();';
@@ -73,7 +83,10 @@ foam.CLASS({
       this.method({
           visibility: 'public',
           name: this.name,
-          args: args,
+          args: [{
+            name: 'data',
+            type: foam.String.toFoamExceptionName(this.of_.model_.name)
+          }],
           body: superConstructor + '\n' + setters
         })
     },
