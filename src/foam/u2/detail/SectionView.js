@@ -62,11 +62,11 @@ foam.CLASS({
 
       self
         .addClass(self.myClass())
-        .add(self.slot(function(section, showTitle, section$subTitle) {
+        .add(self.slot(function(section, showTitle, section$title, section$subTitle) {
           if ( ! section ) return;
           return self.Rows.create()
             .show(section.createIsAvailableFor(self.data$))
-            .callIf(showTitle, function() {
+            .callIf(showTitle && section$title, function() {
               var slot$ = foam.Function.isInstance(self.section.title) ?
                 foam.core.ExpressionSlot.create({
                   obj$: self.data$,
