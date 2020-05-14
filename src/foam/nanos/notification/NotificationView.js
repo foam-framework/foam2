@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.nanos.notification',
   name: 'NotificationView',
-  extends: 'foam.u2.View',
+  extends: 'foam.u2.Controller',
   documentation: 'Notification controller',
 
   implements: [
@@ -29,7 +29,6 @@ foam.CLASS({
   ],
 
   exports: [
-    'as data',
     'notificationDAO'
   ],
 
