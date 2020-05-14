@@ -20,6 +20,7 @@ foam.CLASS({
     }
     ^search {
       margin: 5px;
+      margin-bottom: 8px;
     }
   `,
   properties: [
