@@ -6,7 +6,7 @@ foam.CLASS({
     'foam.core.FObject',
     'foam.core.PropertyInfo',
     'foam.core.X',
-    'java.lang.reflect.InvocationTargetException'
+    'foam.nanos.logger.Logger'
   ],
   methods: [
     {
@@ -53,7 +53,8 @@ foam.CLASS({
             try {
               ci = (ClassInfo) cls.getMethod("getOwnClassInfo").invoke(null);
             } catch (Exception e) {
-              e.printStackTrace();
+              Logger logger = (Logger) getX().get("logger");
+              logger.error(e);
               return null;
             }
           }
@@ -120,7 +121,8 @@ foam.CLASS({
             try {
               ci = (ClassInfo) cls.getMethod("getOwnClassInfo").invoke(null);
             } catch (Exception e) {
-              e.printStackTrace();
+              Logger logger = (Logger) getX().get("logger");
+              logger.error(e);
               return new ColumnPropertyValue.Builder(x).setPropertyValue(null).setObjValue(null).build();
             }
           }
@@ -187,7 +189,8 @@ foam.CLASS({
             try {
               ci = (ClassInfo) cls.getMethod("getOwnClassInfo").invoke(null);
             } catch(Exception e) {
-              e.printStackTrace();
+              Logger logger = (Logger) getX().get("logger");
+              logger.error(e);
               return new ColumnPropertyValue.Builder(x).setPropertyValue(null).setObjValue(null).build();
             }
           }
