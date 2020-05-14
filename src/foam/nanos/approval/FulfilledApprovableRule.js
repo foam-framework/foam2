@@ -61,10 +61,9 @@
 
             Map propsToUpdate = approvable.getPropertiesToUpdate();
 
-            Object[] keyArray = propsToUpdate.keySet().toArray();
-
-            for ( int i = 0; i < keyArray.length; i++ ){
-              objectToPut.setProperty((String) keyArray[i],propsToUpdate.get(keyArray[i]));
+            for ( Object propName : propsToUpdate.keySet() ){
+              String propNameString = (String) propName;
+              objectToPut.setProperty(propNameString,propsToUpdate.get(propNameString));
             }
 
             User createdBy = (User) ((DAO) x.get("bareUserDAO")).find(approvable.getCreatedBy());
