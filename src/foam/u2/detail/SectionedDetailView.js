@@ -62,11 +62,19 @@ foam.CLASS({
                 // grid doesn't add whitespace around it.
                 if ( ! isAvailable ) return self.E().style({ display: 'none' });
 
+                // Support string titles and functions
+                var title$ = foam.Function.isInstance(s.title) ?
+                foam.core.ExpressionSlot.create({
+                  obj$: self.data$,
+                  code: s.title
+                }) :
+                s.title$;
+
                 return self.GUnit.create({ columns: s.gridColumns })
                   .addClass(self.myClass('card-container'))
                   .start('h2')
-                    .add(s.title$)
-                    .show(s.title$)
+                    .add(title$)
+                    .show(title$)
                   .end()
                   .start(self.border)
                     .addClass('inner-card')

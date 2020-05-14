@@ -397,8 +397,9 @@ foam.CLASS({
 if count <= limit {
   delegate.put(obj, sub)
 }`,
-      javaCode: `if ( getCount() >= getLimit() ) {
-  if ( sub != null ) { sub.detach(); } else { System.err.println("***************** Can't limit " + getCount() + " " + getLimit()); }
+      javaCode: `
+if ( getCount() >= getLimit() ) {
+  sub.detach();
 } else {
   setCount(getCount() + 1);
   getDelegate().put(obj, sub);
@@ -418,7 +419,7 @@ if count <= limit {
   delegate.remove(obj, sub)
 }`,
       javaCode: 'if ( getCount() >= getLimit() ) {\n'
-        + '  if ( sub != null ) sub.detach();\n'
+        + '  sub.detach();\n'
         + '} else {'
         + '  setCount(getCount() + 1);\n'
         + '  getDelegate().put(obj, sub);\n'

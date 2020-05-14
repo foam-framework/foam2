@@ -61,6 +61,10 @@ foam.CLASS({
         var domain = window && window.location.hostname || 'localhost';
         if ( domain ) {
           var themeDomain = await this.themeDomainDAO.find(domain);
+          if ( ! themeDomain &&
+               'localhost' != domain ) {
+            themeDomain = await this.themeDomainDAO.find('localhost');
+          }
           if ( themeDomain ) {
             var predicate = this.AND(
               this.EQ(foam.nanos.theme.Theme.ID, themeDomain.theme),
@@ -70,7 +74,7 @@ foam.CLASS({
             if ( theme ) return theme;
           }
         }
-        console.warning('Theme not found: '+domain);
+        console && console.warn('Theme not found: '+domain);
         return foam.nanos.theme.Theme.create({ 'name': 'foam', 'appName': 'FOAM' });
       },
       javaCode: `
@@ -94,6 +98,10 @@ foam.CLASS({
         domain = req.getServerName();
       }
       ThemeDomain td = (ThemeDomain) ((DAO) x.get("themeDomainDAO")).find(domain);
+      if ( td == null &&
+           ! "localhost".equals(domain) ) {
+        td = (ThemeDomain) ((DAO) x.get("themeDomainDAO")).find("localhost");
+      }
       if ( td != null ) {
         theme = (Theme) ((DAO) x.get("themeDAO")).find(
           foam.mlang.MLang.AND(
