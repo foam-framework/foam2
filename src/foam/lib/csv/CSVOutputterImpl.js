@@ -12,10 +12,6 @@ foam.CLASS({
     'foam.lib.csv.CSVOutputter'
   ],
 
-  // imports: [
-  //   'columnConfigToPropertyConverter'
-  // ],
-
   javaImports: [
     'foam.core.*',
     'java.util.List',
