@@ -207,19 +207,19 @@ function generateClass(cls) {
   let jcls = cls.buildJavaClass();
 
   // Generates a native exception class that extends RuntimeException, allows object to be thrown
-  if ( cls.model_.generateNativeException ) {
+  if ( cls.model_.generateJavaException ) {
     jcls.method({
       visibility: 'public',
       type: 'java.lang.RuntimeException',
-      name: 'newNative',
+      name: 'javaException',
       args: [],
       body: 'return new ' + foam.String.toNativeExceptionName(cls.name) + '(this);'
     });
   } 
 
   writeFileIfUpdated(outfile, jcls.toJavaSource());
-  if ( cls.model_.generateNativeException ) {
-    generateNativeException(cls);
+  if ( cls.model_.generateJavaException ) {
+    generateJavaException(cls);
   }
 }
 
@@ -254,7 +254,7 @@ function generateSkeleton(cls) {
   writeFileIfUpdated(outfile, foam.java.Skeleton.create({ of: cls }).buildJavaClass().toJavaSource());
 }
 
-function generateNativeException(cls) {
+function generateJavaException(cls) {
   if ( foam.Array.isInstance(cls) ) {
     cls = cls[1];
   }

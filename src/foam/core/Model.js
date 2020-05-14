@@ -34,7 +34,7 @@ foam.CLASS({
     'package',
     'abstract',
     'name',
-    'generateNativeException',
+    'generateJavaException',
     {
       name: 'flags',
       documentation: `
