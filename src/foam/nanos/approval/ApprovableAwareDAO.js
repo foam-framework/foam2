@@ -313,16 +313,6 @@ foam.CLASS({
 
         Iterator allProperties = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class).iterator();
 
-        List<String> storageTransientPropertyNames = new ArrayList<>();
-
-        while ( allProperties.hasNext() ){
-          PropertyInfo prop = (PropertyInfo) allProperties.next();
-
-          if ( prop.getStorageTransient() ){
-            storageTransientPropertyNames.add(prop.getName());
-          }
-        }
-
         // then handle the diff here and attach it into the approval request
         FObject objectToDiffAgainst = currentObjectInDAO;
 
@@ -336,12 +326,7 @@ foam.CLASS({
         }
 
         Map propertiesToApprove = objectToDiffAgainst.diff(obj);
-        
-
-        for ( int i = 0; i < storageTransientPropertyNames.size(); i++ ){
-          propertiesToApprove.remove(storageTransientPropertyNames.get(i));
-        }
-
+      
         // No change, just returns obj
         if ( propertiesToApprove.isEmpty() ) {
           return obj;
