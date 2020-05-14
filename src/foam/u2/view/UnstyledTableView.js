@@ -228,14 +228,7 @@ foam.CLASS({
           return acc + (axiom.tableWidth || this.MIN_COLUMN_WIDTH_FALLBACK);
         }, this.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH) + 'px';
       }
-    },      
-      // factory: function() {
-      //   var ls = JSON.parse(localStorage.getItem(this.of.id));
-      //   if ( ls )
-      //     return ls;
-      //   var tc = this.of.getAxiomByName('tableColumns');
-      //   return tc ? tc.columns : this.allColumns;
-      // }
+    },
     { 
       name: 'isColumnChanged',
       class: 'Boolean', 
