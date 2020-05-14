@@ -55,10 +55,12 @@ foam.CLASS({
       name: 'data',
       factory: function () {
         if ( ! this.of ) return null;
-        if ( this.ucj === null ) {
-          return this.of.create({}, this);
-        }
-        return this.ucj.data;
+
+        var ret = this.of.create({}, this);
+        if ( this.ucj === null ) return ret;
+      
+        ret = Object.assign(ret, this.ucj.data);
+        return ret;
       }
     }
   ],

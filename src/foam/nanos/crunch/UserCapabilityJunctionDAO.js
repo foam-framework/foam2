@@ -275,6 +275,8 @@ foam.CLASS({
       type: 'Boolean',
       documentation: `Check if prerequisites of a capability is fulfilled`,
       javaCode: `
+      boolean prerequisitesFulfilled = true;
+
       // for each of those junctions, check if the prerequisite is granted, if not, return false
       UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
       for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
@@ -285,16 +287,24 @@ foam.CLASS({
           EQ(UserCapabilityJunction.TARGET_ID, (String) ccJunction.getTargetId())
         ));
         if ( ucJunction == null || ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED ) {
-          UserCapabilityJunction junction = new UserCapabilityJunction.Builder(x)
-            .setSourceId(ucj.getSourceId())
-            .setTargetId(ccJunction.getTargetId())
-            .build();
-          junction = (UserCapabilityJunction) ((DAO) x.get("userCapabilityJunctionDAO")).put_(x, junction);
-          if ( junction == null || junction.getStatus() != CapabilityJunctionStatus.GRANTED )
-            return false;
+          // if ucJunction is null, create a ucj and put to ucjDAO
+          // if ucJunction exists but is not granted, try to re-put the ucj
+          ucJunction = ucJunction == null ? 
+            new UserCapabilityJunction.Builder(x)
+              .setSourceId(ucj.getSourceId())
+              .setTargetId(ccJunction.getTargetId())
+              .build() :
+            ucJunction;
+          try {
+            ucJunction = (UserCapabilityJunction) ((DAO) x.get("userCapabilityJunctionDAO")).put_(x, ucJunction);
+          } catch ( RuntimeException e ) {
+            prerequisitesFulfilled = false;
+          }
+          if ( ucJunction == null || ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED )
+            prerequisitesFulfilled = false;
         }
       }
-      return true;
+      return prerequisitesFulfilled;
       `
     },
     {

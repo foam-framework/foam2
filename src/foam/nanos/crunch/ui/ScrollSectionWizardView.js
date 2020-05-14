@@ -57,7 +57,7 @@ foam.CLASS({
         var check = true;
         sectionsList.forEach((wizardSection) => {
           if ( ! wizardSection.of ) return true;
-          if ( wizardSection.data.errors_ ) {
+          if ( ! wizardSection.data || wizardSection.data.errors_ ) {
             check = false;
           }
         });
