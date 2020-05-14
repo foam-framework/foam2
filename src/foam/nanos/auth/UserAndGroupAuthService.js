@@ -32,12 +32,14 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.core.X',
     'foam.dao.DAO',
     'foam.nanos.auth.LifecycleState',
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
     'foam.nanos.logger.Logger',
     'foam.nanos.session.Session',
+    'foam.util.Auth',
     'foam.util.Email',
     'foam.util.Password',
     'foam.util.SafetyUtil',
@@ -340,8 +342,7 @@ foam.CLASS({
         // TODO: modify line to allow actual setting of password expiry in cases where users are required to periodically update their passwords
         user.setPasswordExpiry(null);
         user = (User) ((DAO) getLocalUserDAO()).put(user);
-        Subject subject = new Subject.Builder(x).setUser(user).build();
-        session.setContext(session.getContext().put("subject", subject).put("group", group));
+        X userContext = Auth.sudo(session.getContext(), user);
         return user;
       `
     },
@@ -434,3 +435,4 @@ foam.CLASS({
     }
   ]
 });
+

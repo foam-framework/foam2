@@ -80,8 +80,9 @@ foam.CLASS({
       },
       javaFactory:`
       try {
-        User user = ((Subject) getX().get("subject")).getUser();
-        if ( user != null && user.getId() == User.SYSTEM_USER_ID && getUnauthorizedTargetDAOKey().length() != 0 ) {
+        Subject subject = (Subject) getX().get("subject");
+//        User user = ((Subject) getX().get("subject")).getUser();
+        if ( subject != null && subject.getUser() != null && subject.getUser().getId() == User.SYSTEM_USER_ID && getUnauthorizedTargetDAOKey().length() != 0 ) {
           return ((foam.dao.DAO) getX().get(getUnauthorizedTargetDAOKey())).inX(getX());
         }
         return ((foam.dao.DAO) getX().get(getTargetDAOKey())).inX(getX());
