@@ -128,7 +128,7 @@ public class AgentUserAuthService
 
     X sessionContext = session.getContext();
     // Get agent from session context
-    User agent = ((Subject) sessionContext.get("subject")).getEffectiveUser();
+    User agent = ((Subject) sessionContext.get("subject")).getRealUser();
     if ( agent != null ) {
       agent = (User) userDAO_.find(agent.getId());
       agent.validateAuth(x);

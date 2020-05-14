@@ -558,7 +558,7 @@ foam.CLASS({
       javaCode: `
         Subject subject = (Subject) x.get("subject");
         User user = subject.getUser();
-        User agent = subject.getEffectiveUser();
+        User agent = subject.getRealUser();
         AuthService auth = (AuthService) x.get("auth");
         boolean findSelf = SafetyUtil.equals(this.getId(), user.getId()) ||
           (
@@ -586,7 +586,7 @@ foam.CLASS({
         User oldUser = (User) oldObj;
 
         Subject subject = (Subject) x.get("subject");
-        User agent = subject.getEffectiveUser();
+        User agent = subject.getRealUser();
         boolean updatingSelf = SafetyUtil.equals(this.getId(), user.getId()) ||
           (
             agent != null &&

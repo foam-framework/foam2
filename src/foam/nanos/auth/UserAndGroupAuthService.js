@@ -402,12 +402,12 @@ foam.CLASS({
 
         Subject subject = (Subject) x.get("subject");
         User user = subject.getUser();
-        User agent = subject.getEffectiveUser();
+        User agent = subject.getRealUser();
 
         // Second highest precedence: If one user is acting as another, return the
         // group on the junction between them.
         if ( user != null ) {
-          if ( agent != null ) {
+          if ( agent != null && agent != user ) {
             DAO agentJunctionDAO = (DAO) x.get("agentJunctionDAO");
             UserUserJunction junction = (UserUserJunction) agentJunctionDAO.find(
               AND(

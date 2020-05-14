@@ -23,9 +23,8 @@ foam.CLASS({
     TicketComment comment = (TicketComment) obj;
     if ( comment.getOwner() == 0 ) {
       Subject subject = (Subject) x.get("subject");
-      User user = subject.getUser();
-      User agent = subject.getEffectiveUser();
-      comment.setOwner(agent != null ? agent.getId() : user.getId());
+      User realUser = subject.getRealUser();
+      comment.setOwner(realUser.getId());
     }
     comment = (TicketComment) getDelegate().put_(x, comment);
     return comment;

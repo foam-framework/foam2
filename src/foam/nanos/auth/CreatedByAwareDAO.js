@@ -31,9 +31,9 @@ foam.CLASS({
         if ( obj instanceof CreatedByAware && getDelegate().find_(x, obj) == null ) {
           Subject subject = (Subject) x.get("subject");
           User user = subject.getUser();
-          User agent = subject.getEffectiveUser();
+          User realUser = subject.getRealUser();
           ((CreatedByAware) obj).setCreatedBy(user.getId());
-          ((CreatedByAware) obj).setCreatedByAgent(agent != null ? agent.getId() : user.getId());
+          ((CreatedByAware) obj).setCreatedByAgent(realUser.getId());
         }
         return super.put_(x, obj);
       `

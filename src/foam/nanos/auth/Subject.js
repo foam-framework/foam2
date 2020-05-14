@@ -18,26 +18,22 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.User',
-      name: 'user',
-      documentation: 'Authenticated user',
+      name: 'realUser',
+      documentation: 'Authenticated logged in user',
       javaSetter: `
-        if ( user_ != null ) {
-          throw new RuntimeException("User is already set in the context");
-        }
-        user_ = val;
-        userIsSet_ = true;
-        setEffectiveUser(val);
+        throw new RuntimeException("You cannot set real user");
       `
     },
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.User',
-      name: 'effectiveUser',
-      documentation: 'Current user role(acts as effectiveUser)',
+      name: 'user',
+      documentation: 'Current user role(acts as user)',
       javaSetter: `
-      if ( getUser() == null ) {
-          user_ = val;
-          userIsSet_ = true;
+      if ( val == null ) return;
+      if ( getRealUser() == null ) {
+          realUser_ = val;
+          realUserIsSet_ = true;
       }
       ArrayList userPath = getUserPath();
       if ( userPath.size() < 2 || val != (User) userPath.get(userPath.size() - 1) ) {
@@ -46,15 +42,15 @@ foam.CLASS({
       else {
         userPath.remove(userPath.size());
       }
-      effectiveUserIsSet_ = true;
-      effectiveUser_ = val;
+      userIsSet_ = true;
+      user_ = val;
       `
     },
     {
       class: 'List',
       javaType: 'java.util.ArrayList<User>',
       name: 'userPath',
-      documentation: 'path from user to effectiveUser',
+      documentation: 'path from realUser to current user',
       javaFactory: 'return new ArrayList();'
     },
   ],
@@ -64,9 +60,9 @@ foam.CLASS({
       name: 'toString',
       type: 'String',
       javaCode: `
-      String ret = "";
+      String ret = "user path";
       for ( User user : getUserPath() ) {
-          ret += " >> " + user.getUserName() + "( " + user.getId() + " )";
+          ret += " >> " + user.getFirstName() + " " + user.getLastName();
       }
       return ret;
 `

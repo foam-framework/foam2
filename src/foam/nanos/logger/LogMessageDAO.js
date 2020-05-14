@@ -44,8 +44,8 @@ foam.CLASS({
       Subject subject = (Subject) x.get("subject");
       User user = subject.getUser();
       lm.setCreatedBy(user.getId());
-      User agent = subject.getEffectiveUser();
-      lm.setCreatedByAgent(agent != null ? agent.getId() : user.getId());
+      User realUser = subject.getRealUser();
+      lm.setCreatedByAgent(realUser.getId());
 
       return getDelegate().put_(x, lm);
       `

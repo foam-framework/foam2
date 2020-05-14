@@ -69,7 +69,7 @@ foam.CLASS({
         List<Session> sessions = sink.getArray();
 
         for (Session session : sessions) {
-          User agent = ((Subject) session.getContext().get("subject")).getEffectiveUser();
+          User agent = ((Subject) session.getContext().get("subject")).getRealUser();
           if (
             session.getUserId() == userId
             || (agent != null && agent.getId() == userId)

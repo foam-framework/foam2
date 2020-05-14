@@ -51,7 +51,7 @@ foam.CLASS({
       name: 'generateKeyAndQR',
       javaCode: `
         Subject subject = (Subject) x.get("subject");
-        User user = subject.getEffectiveUser() != null ? subject.getEffectiveUser() : subject.getUser() ;
+        User user = subject.getRealUser();
         DAO userDAO = (DAO) x.get("localUserDAO");
 
         // fetch from localUserDAO to get updated user before setting TwoFactorSecret
@@ -94,9 +94,9 @@ foam.CLASS({
         }
 
         Subject subject = (Subject) x.get("subject");
-        User user = subject.getEffectiveUser() != null ? subject.getEffectiveUser() : subject.getUser() ;
-        DAO userDAO    = (DAO) x.get("localUserDAO");
-        DAO sessionDAO = (DAO) x.get("localSessionDAO");
+        User user       = subject.getRealUser();
+        DAO userDAO     = (DAO) x.get("localUserDAO");
+        DAO sessionDAO  = (DAO) x.get("localSessionDAO");
 
         // fetch from user dao to get secret key
         user = (User) userDAO.find(user.getId());
@@ -109,7 +109,7 @@ foam.CLASS({
           }
 
           Subject sessionSubject = new Subject();
-          subject.setEffectiveUser(user);
+          sessionSubject.setUser(user);
           // update session with two factor success set to true
           Session session = x.get(Session.class);
           session.setContext(session.getContext().put("subject", sessionSubject).put("twoFactorSuccess", true));
@@ -125,7 +125,7 @@ foam.CLASS({
       javaCode: `
         if ( verifyToken(x, token) ) {
           Subject subject = (Subject) x.get("subject");
-          User user = subject.getEffectiveUser() != null ? subject.getEffectiveUser() : subject.getUser() ;
+          User user = subject.getRealUser();
           DAO userDAO = (DAO) x.get("localUserDAO");
 
           // fetch user from DAO and set two factor secret to null

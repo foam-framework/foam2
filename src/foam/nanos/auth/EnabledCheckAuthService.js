@@ -34,8 +34,8 @@ foam.CLASS({
         // Check if agent exists and is enabled. Note that it isn't mandatory
         // that an agent always be there, so it's fine if the agent is null.
         // However, if the agent _is_ there, then it needs to be enabled.
-        User agent = subject.getEffectiveUser();
-        if ( agent != null && ! agent.getEnabled() ) return false;
+        User realUser = subject.getRealUser();
+        if ( realUser != null && ! realUser.getEnabled() ) return false;
 
         // Check if group and all ancestor groups are enabled.
         Group group = getCurrentGroup(x);

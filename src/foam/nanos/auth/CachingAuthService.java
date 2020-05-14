@@ -85,10 +85,10 @@ public class CachingAuthService
       DAO groupPermissionJunctionDAO = (DAO) x.get("groupPermissionJunctionDAO");
       Subject subject   = (Subject) x.get("subject");
       User user         = subject.getUser();
-      User agent        = subject.getEffectiveUser();
+      User agent        = subject.getRealUser();
       Predicate predicate = EQ(User.ID, user.getId());
 
-      if ( agent != null ) {
+      if ( agent != user ) {
         predicate = OR(predicate, EQ(User.ID, agent.getId()));
       }
 

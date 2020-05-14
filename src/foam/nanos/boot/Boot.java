@@ -103,7 +103,7 @@ public class Boot {
 
 //    root_ = root_.putFactory("agent", new XFactory() {
 //      public Object create(X x) {
-//        return ((Subject) x.get("subject")).getEffectiveUser();
+//        return ((Subject) x.get("subject")).getRealUser();
 //      }
 //    });
 

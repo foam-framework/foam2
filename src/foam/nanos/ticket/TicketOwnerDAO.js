@@ -23,9 +23,8 @@ foam.CLASS({
     Ticket ticket = (Ticket) obj;
     if ( ticket.getOwner() == 0 ) {
       Subject subject = (Subject) x.get("subject");
-      User user = subject.getUser();
-      User agent = subject.getEffectiveUser();
-      ticket.setOwner(agent != null ? agent.getId() : user.getId());
+      User user = subject.getRealUser();
+      ticket.setOwner(user.getId());
     }
     ticket = (Ticket) getDelegate().put_(x, ticket);
     return ticket;

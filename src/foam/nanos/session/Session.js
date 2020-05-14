@@ -264,7 +264,9 @@ foam.CLASS({
           ? new Object[] { String.format("%s (%d)", user.toSummary(), user.getId()) }
           : new Object[] { String.format("%s (%d) acting as %s (%d)", agent.toSummary(), agent.getId(), user.toSummary(), user.getId()) };
 
-        Subject subject = new Subject.Builder(x).setUser(user).setEffectiveUser(agent).build();
+        Subject subject = new Subject();
+        subject.setUser(agent);
+        subject.setUser(user);
         rtn = rtn
           .put("subject", subject)
           .put("logger", new PrefixLogger(prefix, (Logger) x.get("logger")))

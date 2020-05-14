@@ -74,7 +74,7 @@ public class HistoryDAO
   public FObject put_(X x, FObject obj) {
     Subject subject = (Subject) x.get("subject");
     User user = subject.getUser();
-    User agent = subject.getEffectiveUser();
+    User agent = subject.getRealUser();
     FObject current = this.find_(x, obj);
 
     try {
