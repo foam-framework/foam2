@@ -14,10 +14,10 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.*',
-    'java.util.List',
-    'java.util.Date',
     'foam.nanos.column.ColumnConfigToPropertyConverter',
-    'foam.nanos.column.ColumnPropertyValue'
+    'foam.nanos.column.ColumnPropertyValue',
+    'java.util.List',
+    'java.util.Date'
   ],
 
   properties: [
@@ -149,7 +149,7 @@ foam.CLASS({
         this.props
           .map((propName) => {
             var prop = propName;
-            if ( typeof prop === 'string' )
+            if ( foam.String.isInstance(prop) )
               prop = columnConfig.returnProperty(this.of, propName);
             return prop;
           })
@@ -179,7 +179,7 @@ foam.CLASS({
           .forEach((propName) => {
             var prop = propName;
             var obj1 = obj;
-            if ( typeof prop === 'string' ) {
+            if ( foam.String.isInstance(prop) ) {
               var val = columnConfig.returnPropertyAndObject(this.of, propName, obj1);
               prop = val.propertyValue;
               obj1 = val.objValue;

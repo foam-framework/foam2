@@ -34,7 +34,7 @@ foam.CLASS({
         data.selectedColumnNames = data.selectedColumnNames.map(c => 
           {
             var name = foam.Array.isInstance(c) ? c[0] : c;
-            name = typeof c === 'string' ? c : c;
+            name = foam.String.isInstance(c) ? c : c;
             return name; 
           });
         var tableColumns = this.data.columns;
@@ -45,21 +45,21 @@ foam.CLASS({
         var topLevelProps = [];
         for(var i = 0; i < data.selectedColumnNames.length; i++) {
           var rootProperty;
-          if ( typeof data.selectedColumnNames[i] === 'string' ) {
+          if ( foam.String.isInstance(data.selectedColumnNames[i]) ) {
             var axiom;
             if (data.selectedColumnNames[i].includes('.'))
               axiom = data.of.getAxiomByName(data.selectedColumnNames[i].split('.')[0]);
             else {
               axiom = tableColumns.find(c => c.name === data.selectedColumnNames[i]);
-              if (!axiom)
+              if ( ! axiom )
                 axiom = data.of.getAxiomByName(data.selectedColumnNames[i]);
             }
-            if ( !axiom )
+            if ( ! axiom )
               continue;
             rootProperty = [ axiom.name, axiom.label ? axiom.label : axiom.name ];
           } else 
             rootProperty = data.selectedColumnNames[i];
-          if( !topLevelProps.includes(foam.Array.isInstance(rootProperty) ? rootProperty[0] : rootProperty.name) ) {
+          if ( ! topLevelProps.includes(foam.Array.isInstance(rootProperty) ? rootProperty[0] : rootProperty.name) ) {
             arr.push(foam.u2.view.SubColumnSelectConfig.create({ 
               index:i, 
               rootProperty:rootProperty, 
@@ -71,12 +71,12 @@ foam.CLASS({
           }
         }
         var notSelectedColumns = data.allColumns.filter(c => {
-          return !topLevelProps.includes(c);
+          return ! topLevelProps.includes(c);
         });
         //to add properties that are specified in 'tableColumns' as an option
-        tableColumns = tableColumns.filter(c => !topLevelProps.includes(typeof c === 'string' ? c : c.name));
+        tableColumns = tableColumns.filter(c => ! topLevelProps.includes(foam.String.isInstance(c) ? c : c.name));
         for(var i = 0; i < tableColumns.length; i++) {
-          var indexOfTableColumn = notSelectedColumns.indexOf(typeof tableColumns[i] === 'string' ? tableColumns[i] : tableColumns[i].name);
+          var indexOfTableColumn = notSelectedColumns.indexOf(foam.String.isInstance(tableColumns[i]) ? tableColumns[i] : tableColumns[i].name);
           if ( indexOfTableColumn === -1)
             notSelectedColumns.push(tableColumns[i]);
           else
@@ -85,7 +85,7 @@ foam.CLASS({
         var nonSelectedViewModels = [];
         for(i = 0; i < notSelectedColumns.length; i++) {
           var rootProperty;
-          if ( typeof notSelectedColumns[i] === 'string' ) {
+          if ( foam.String.isInstance(notSelectedColumns[i])) {
             var axiom =  tableColumns.find(c => c.name === notSelectedColumns[i]);
             axiom = axiom || data.of.getAxiomByName(notSelectedColumns[i]);
             rootProperty = [ axiom.name, axiom.label ? axiom.label : axiom.name ];
@@ -189,7 +189,7 @@ foam.CLASS({
       this.onDragAndDrop(this.views, targetIndex, draggableIndex);
     },
     function onTopPropertiesSelectionChange(isColumnSelected, index, isColumnSelectionHaventChanged) {
-      if ( !isColumnSelectionHaventChanged )
+      if ( ! isColumnSelectionHaventChanged )
         this.onSelectionChanged(isColumnSelected, index, this.views);
       this.data.selectedColumnNames = this.rebuildSelectedColumns();
       this.data.updateColumns();
@@ -237,14 +237,14 @@ foam.CLASS({
     function onSelectionChanged(isColumnSelected, index, views) {
       if ( isColumnSelected ) {
         this.onSelect(index, views);
-      } else if ( !isColumnSelected ) {
+      } else if ( ! isColumnSelected ) {
         this.onUnSelect(index, views);
       }
     },
 
     function onSelect(draggableIndex, views) {
-      var startUnselectedIndex = views.find(v => !v.prop.isPropertySelected);
-      if (!startUnselectedIndex)
+      var startUnselectedIndex = views.find(v => ! v.prop.isPropertySelected);
+      if ( ! startUnselectedIndex )
         return;
       startUnselectedIndex =  startUnselectedIndex.index;
       
@@ -252,8 +252,8 @@ foam.CLASS({
         return this.resetProperties(views, startUnselectedIndex, draggableIndex);
     },
     function onUnSelect(draggableIndex, views) {
-      var startUnselectedIndex = views.find(v => !v.prop.isPropertySelected && v.index !== draggableIndex);
-      if (!startUnselectedIndex)
+      var startUnselectedIndex = views.find(v => ! v.prop.isPropertySelected && v.index !== draggableIndex);
+      if ( ! startUnselectedIndex )
         return this.resetProperties(views, views.length - 1, draggableIndex);
 
       startUnselectedIndex =  startUnselectedIndex.index;
@@ -448,9 +448,9 @@ foam.CLASS({
   listeners: [
     function toggleExpanded(e) {
       e.stopPropagation();
-      this.data.expanded = !this.data.expanded;
-      if ( !this.data.hasSubProperties ) {
-        this.data.isPropertySelected = !this.data.isPropertySelected;
+      this.data.expanded = ! this.data.expanded;
+      if ( ! this.data.hasSubProperties ) {
+        this.data.isPropertySelected = ! this.data.isPropertySelected;
         this.onSelectionChangedParentFunction(this.data.isPropertySelected, this.data.index);
       }
     }
@@ -518,7 +518,7 @@ foam.CLASS({
       this.updateSubColumnsOrder(true);
     },
     function onChildrenSelectionChanged(isColumnSelected, index, isColumnSelectionHaventChanged) {//isColumnSelectionHaventChanged to be false on either selectionChanged or being undefined
-      if ( !isColumnSelectionHaventChanged ) {
+      if ( ! isColumnSelectionHaventChanged ) {
         //to change view 
         this.onSelectionChanged(isColumnSelected, index, this.views);
         //to set currentProperty isColumnSelected
@@ -528,7 +528,7 @@ foam.CLASS({
           var anySelected = this.data.subColumnSelectConfig.find(s => s.isPropertySelected);
           this.data.isPropertySelected = typeof anySelected !== 'undefined';
           //close if not selected
-          if ( !this.data.isPropertySelected )
+          if ( ! this.data.isPropertySelected )
             this.data.expanded = false;
         }
         this.updateSubColumnsOrder(hasPropertySelectionChanged === this.data.isPropertySelected);
@@ -562,7 +562,7 @@ foam.CLASS({
     {
       name: 'subProperties',
       expression: function(rootProperty) {
-        if ( !this.of || !this.of.getAxiomByName )
+        if ( ! this.of || ! this.of.getAxiomByName )
           return [];
         var r = this.of.getAxiomByName(foam.Array.isInstance(rootProperty) ? this.rootProperty[0] : rootProperty.name);
         if ( r && r.cls_ && r.cls_.name === 'FObjectProperty' )
@@ -573,7 +573,7 @@ foam.CLASS({
     {
       name: 'subColumnSelectConfig',
       expression: function(subProperties, level) {
-        if ( !this.of || !this.of.getAxiomByName || subProperties.length === 0 )
+        if ( ! this.of || ! this.of.getAxiomByName || subProperties.length === 0 )
           return [];
         var arr = [];
         var l = level + 1;
@@ -585,15 +585,15 @@ foam.CLASS({
         var thisRootPropName = foam.Array.isInstance(this.rootProperty) ? this.rootProperty[0] : this.rootProperty.name;
         //find selectedColumn for the root property 
         var selectedColumn = this.selectedColumns.filter(c => {
-          var thisSelectedColumn = typeof c === 'string' ? c : c.name;
-          return ( typeof c !== 'string' && this.level === 0 && thisSelectedColumn === thisRootPropName ) ||
-          ( typeof c === 'string' && c.split('.').length > this.level && c.split('.')[this.level] === this.rootProperty[0] );
+          var thisSelectedColumn = foam.String.isInstance(c) ? c : c.name;
+          return ( ! foam.String.isInstance(c) && this.level === 0 && thisSelectedColumn === thisRootPropName ) ||
+          ( foam.String.isInstance(c) && c.split('.').length > this.level && c.split('.')[this.level] === this.rootProperty[0] );
         });
 
         for ( var i = 0 ; i < subProperties.length ; i++ ) {
           //the comparison mentioned above is working with the assumption that columns which are specified in 'tableColumns' are top-level properties and
           //we are not using nested "custom" table columns
-          if ( selectedColumn.find(c => typeof c === 'string' && c.split('.').length > ( this.level + 1 ) && c.split('.')[this.level+1] === subProperties[i][0]) ) {
+          if ( selectedColumn.find(c => foam.String.isInstance(c) && c.split('.').length > ( this.level + 1 ) && c.split('.')[this.level+1] === subProperties[i][0]) ) {
             selectedSubProperties.push(subProperties[i]);
           } else {
             otherSubProperties.push(subProperties[i]);
@@ -632,7 +632,7 @@ foam.CLASS({
       expression: function() {
         var thisPropName = foam.Array.isInstance(this.rootProperty) ? this.rootProperty[0] : this.rootProperty.name;
         return typeof this.selectedColumns.find(s => {
-          var propName = typeof s === 'string' ? s.split('.') : s.name;
+          var propName = foam.String.isInstance(s) ? s.split('.') : s.name;
           return foam.Array.isInstance(propName) ? ( this.level < propName.length && propName[this.level] === thisPropName ) : thisPropName === propName;
         }) !== 'undefined';
       }
@@ -646,7 +646,7 @@ foam.CLASS({
       class: 'Boolean',
       value: false,
       postSet: function() {
-        if ( !this.parentExpanded )
+        if ( ! this.parentExpanded )
           this.expanded = false;
       }
     },
@@ -667,7 +667,7 @@ foam.CLASS({
       this.expanded = false;
     },
     function returnSelectedProps() {
-      if ( !this.hasSubProperties) {
+      if ( ! this.hasSubProperties ) {
         if ( this.level === 0 ) {
           if ( foam.Array.isInstance(this.rootProperty) )
             return [[this.rootProperty[0]]];
@@ -688,7 +688,7 @@ foam.CLASS({
       }
     },
     function updateOnSearch(query) {
-      if ( !this.hasSubProperties) {
+      if ( ! this.hasSubProperties ) {
         if ( query.length !== 0 ) {
           this.showOnSearch = foam.Array.isInstance(this.rootProperty) ? this.rootProperty[1].toLowerCase().includes(query.toLowerCase()) : this.rootProperty.name.toLowerCase().includes(query.toLowerCase());
         } else

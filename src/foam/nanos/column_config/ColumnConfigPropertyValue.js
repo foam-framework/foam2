@@ -7,6 +7,8 @@
 foam.CLASS({
   package: 'foam.nanos.column',
   name: 'ColumnConfigToPropertyConverter',
+  documentation: `ColumnConfigToPropertyConverter gathers methods for converting property name to property if required 
+      and returns property and obj, which will return the proprty value on f function call`,
   javaImports: [
     'foam.core.ClassInfo',
     'foam.core.FObject',
@@ -31,16 +33,15 @@ foam.CLASS({
       code: function(of, propInfo) {
         var cls = of;
         var property;
-        if ( typeof propInfo === 'string') {
+        if ( foam.String.isInstance(propInfo) ) {
           var props = propInfo.split('.');
           for ( var i = 0 ; i < props.length ; i++ ) {
-            property = typeof props[i] === 'string'
+            property = foam.String.isInstance(props[i])
             ? cls.getAxiomByName(props[i])
             :  foam.Array.isInstance(props[i]) ? 
             cls.getAxiomByName(props[i]) : props[i];
-            if ( !property ) {
+            if ( ! property )
               break;
-            }
             cls = property.of;
           }
         } else
@@ -93,10 +94,10 @@ foam.CLASS({
         var cls = of;
         var property;
         var obj1 = obj;
-        if ( typeof propInfo === 'string') {
+        if ( foam.String.isInstance(propInfo) ) {
           var props = propInfo.split('.');
           for ( var i = 0 ; i < props.length ; i++ ) {
-            property = typeof props[i] === 'string'
+            property = foam.String.isInstance(props[i])
             ? cls.getAxiomByName(props[i])
             :  foam.Array.isInstance(props[i]) ? 
             cls.getAxiomByName(props[i]) : props[i];
@@ -160,16 +161,15 @@ foam.CLASS({
         var cls = of;
         var property;
         var obj1 = obj;
-        if ( typeof propInfo === 'string') {
+        if ( foam.String.isInstance(propInfo) ) {
           var props = propInfo.split('.');
           for ( var i = 0; i < props.length; i++ ) {
-            property = typeof props[i] === 'string'
+            property = foam.String.isInstance(props[i])
             ? cls.getAxiomByName(props[i])
             :  foam.Array.isInstance(props[i]) ? 
             cls.getAxiomByName(props[i]) : props[i];
-            if ( !property ) {
+            if ( ! property )
               break;
-            }
             cls = property.of;
 
             if ( i !== props.length - 1 && obj1 )

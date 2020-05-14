@@ -1,16 +1,17 @@
-// /**
-//  * @license
-//  * Copyright 2019 The FOAM Authors. All Rights Reserved.
-//  * http://www.apache.org/licenses/LICENSE-2.0
-//  */
+/**
+ * @license
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'EditColumnsView',
   extends: 'foam.u2.View',
   requires: [
     'foam.u2.DetailView',
-    'foam.u2.view.ColumnOptionsSelectConfig',
     'foam.u2.view.ColumnConfigPropView',
+    'foam.u2.view.ColumnOptionsSelectConfig',
     'foam.u2.view.SubColumnSelectConfig'
   ],
   properties: [
@@ -25,7 +26,7 @@ foam.CLASS({
     function closeDropDown(e) {
       e.stopPropagation();
       this.view.onClose();
-      this.selectColumnsExpanded = !this.selectColumnsExpanded;
+      this.selectColumnsExpanded = ! this.selectColumnsExpanded;
     },
 
     function initE() {

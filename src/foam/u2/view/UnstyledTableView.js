@@ -80,7 +80,7 @@ foam.CLASS({
     {
       name: 'allColumns',
       expression: function(of) {
-        return !of ? [] : [].concat(
+        return ! of ? [] : [].concat(
           of.getAxiomsByClass(foam.core.Property)
             .filter(p => p.tableCellFormatter && ! p.hidden)
             .map(a => a.name),
@@ -206,16 +206,16 @@ foam.CLASS({
           var cls = of;
           var axiom;
 
-          if ( typeof col[0] === 'string') {
+          if ( foam.String.isInstance(col[0]) ) {
             axiom = this.columns.find(c => c.name ===  col[0]);
-            if ( !axiom ) {
+            if ( ! axiom ) {
               var props = col[0].split('.');
               for ( var i = 0 ; i < props.length ; i++ ) {
-                axiom = typeof props[i] === 'string'
+                axiom = foam.String.isInstance(props[i])
                 ? cls.getAxiomByName(props[i])
                 :  foam.Array.isInstance(props[i]) ? 
                 cls.getAxiomByName(props[i]) : props[i];
-                if ( !axiom ) {
+                if ( ! axiom ) {
                   break;
                 }
                 cls = axiom.of;
@@ -231,7 +231,8 @@ foam.CLASS({
     { 
       name: 'isColumnChanged',
       class: 'Boolean', 
-      value: false
+      value: false,
+      documentation: 'If isColumnChanged is changed, columns_ will be updated'
     }
   ],
 
@@ -245,7 +246,7 @@ foam.CLASS({
     function updateColumns() {
       this.isColumnChanged = !this.isColumnChanged;
       localStorage.removeItem(this.of.id);
-      localStorage.setItem(this.of.id, JSON.stringify(this.selectedColumnNames.map(c => typeof c === "string" ? c : c.name )));
+      localStorage.setItem(this.of.id, JSON.stringify(this.selectedColumnNames.map(c => foam.String.isInstance(c) ? c : c.name )));
     },
 
     function initE() {
@@ -256,8 +257,8 @@ foam.CLASS({
 
       if ( this.filteredTableColumns$ ) {
         this.onDetach(this.filteredTableColumns$.follow(
-          this.columns_$.map((cols) => cols.filter(([axiomOrColumnName, overrides]) => view.allColumns.includes(typeof axiomOrColumnName === 'string' ? axiomOrColumnName : axiomOrColumnName.name )).map(([axiomOrColumnName, overrides]) => {
-            return (typeof axiomOrColumnName) === 'string' ? axiomOrColumnName : axiomOrColumnName.name;
+          this.columns_$.map((cols) => cols.filter(([axiomOrColumnName, overrides]) => view.allColumns.includes(foam.String.isInstance(axiomOrColumnName) ? axiomOrColumnName : axiomOrColumnName.name )).map(([axiomOrColumnName, overrides]) => {
+            return foam.String.isInstance(axiomOrColumnName) ? axiomOrColumnName : axiomOrColumnName.name;
           }))));
       }
 
@@ -309,11 +310,11 @@ foam.CLASS({
               // Render the table headers for the property columns.
               forEach(columns_, function([property, overrides]) {
                 var column;
-                if ( typeof property === 'string') {
+                if ( foam.String.isInstance(property) ) {
                  column = view.columns.find(c => c.name === property);
-                 if ( !column ) {
+                 if ( ! column ) {
                   var columnConfig = this.__context__.columnConfigToPropertyConverter;
-                  if (!columnConfig) columnConfig = this.__context__.lookup('foam.nanos.column.ColumnConfigToPropertyConverter').create();
+                  if ( ! columnConfig ) columnConfig = this.__context__.lookup('foam.nanos.column.ColumnConfigToPropertyConverter').create();
                   column = columnConfig.returnProperty(view.of, property);
                  }
                 } else
@@ -354,7 +355,7 @@ foam.CLASS({
                     this.addClass(view.myClass('th-editColumns'))
                     .on('click', function(e) {
                       editColumnView.parentId = this.id;
-                      if (!editColumnView.selectColumnsExpanded)
+                      if ( ! editColumnView.selectColumnsExpanded )
                         editColumnView.selectColumnsExpanded = !editColumnView.selectColumnsExpanded;
                     }).
                     tag(view.Image, { data: '/images/Icon_More_Resting.svg' }).
@@ -498,11 +499,11 @@ foam.CLASS({
                   var cls = view.of;
                   var column;
                   var obj1 = obj;
-                  if ( typeof property === 'string') {
+                  if ( foam.String.isInstance(property) ) {
                     column = view.columns.find(c => c.name === property);
-                    if ( !column ) {
+                    if ( ! column ) {
                       var columnConfig = this.__context__.columnConfigToPropertyConverter;
-                      if ( !columnConfig ) columnConfig = this.__context__.lookup('foam.nanos.column.ColumnConfigToPropertyConverter').create();
+                      if ( ! columnConfig ) columnConfig = this.__context__.lookup('foam.nanos.column.ColumnConfigToPropertyConverter').create();
                       var val = columnConfig.returnPropertyAndObject(view.of, property, obj1);
                       column = val.propertyValue;
                       obj1 = val.objValue;
@@ -525,13 +526,7 @@ foam.CLASS({
                         }
                       } catch (err) {}
                     }).
-                    call(function() {
-                      if ( column.tableWidth ) {
-                        this.style({ flex: `0 0 ${column.tableWidth}px` });
-                      } else {
-                        this.style({ flex: '1 0 0' });
-                      }
-                    }).
+                    style({flex: column.tableWidth ? `0 0 ${column.tableWidth}px` : '1 0 0'}).
                     end();
                 }).
                 start().
