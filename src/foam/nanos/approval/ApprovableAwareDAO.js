@@ -278,7 +278,7 @@ foam.CLASS({
         if ( lastModifiedBy == null ) lastModifiedBy = new User.Builder(x).setId(fulfilledRequest.getLastModifiedBy()).build();
         X approvalX = getX().put("user", lastModifiedBy);
           
-        approvalRequestDAO.put_(approvalX, fulfilledRequest);
+        approvalRequestDAO.inX(approvalX).put(fulfilledRequest);
 
         if ( fulfilledRequest.getStatus() == ApprovalStatus.APPROVED ) {
 
