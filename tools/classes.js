@@ -331,6 +331,7 @@ var classes = [
   'foam.nanos.notification.push.FirebasePushService',
   'foam.nanos.notification.Notifiable',
   'foam.nanos.notification.Notification',
+  'foam.nanos.notification.NotificationExpansionDAO',
   'foam.nanos.notification.NotificationTemplateDAO',
   'foam.nanos.notification.notifications.ScriptRunNotification',
   'foam.nanos.notification.EmailSetting',
@@ -478,6 +479,7 @@ var classes = [
   'foam.nanos.ruler.predicate.PropertyIsInstance',
   'foam.nanos.ruler.predicate.PropertyIsClass',
   'foam.nanos.ruler.action.ChangePropertyAction',
+  'foam.nanos.ruler.action.AbstractCheckDAOforMatching',
   'foam.comics.SearchMode',
 
   // Support Files
