@@ -71,7 +71,7 @@
 
             X createdX = x.put("user", createdBy);
 
-            dao.put_(createdX, objectToPut);
+            dao.inX(createdX).put(objectToPut);
           }
         }, "Updated the object based on a approved approvable");
       `
