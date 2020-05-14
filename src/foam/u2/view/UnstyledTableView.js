@@ -216,7 +216,6 @@ foam.CLASS({
                 :  foam.Array.isInstance(props[i]) ? 
                 cls.getAxiomByName(props[i]) : props[i];
                 if ( !axiom ) {
-                  //need to come up with behavior
                   break;
                 }
                 cls = axiom.of;

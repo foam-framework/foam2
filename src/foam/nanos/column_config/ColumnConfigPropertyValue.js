@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.nanos.column',
   name: 'ColumnConfigToPropertyConverter',
@@ -95,7 +101,6 @@ foam.CLASS({
             :  foam.Array.isInstance(props[i]) ? 
             cls.getAxiomByName(props[i]) : props[i];
             if ( !property ) {
-              //need to come up with behavior
               break;
             }
             cls = property.of;
