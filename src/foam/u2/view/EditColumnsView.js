@@ -54,7 +54,8 @@ foam.CLASS({
             'position': 'fixed',
             'margin-bottom': '20px',
             'height': 'fix-content',
-            'max-height': window.innerHeight - 100 > 0 ? window.innerHeight - 100 : window.innerHeight + 'px'
+            'max-height': window.innerHeight - 100 > 0 ? window.innerHeight - 100 : window.innerHeight + 'px',
+            'width': '300px'
           })
           .add(this.view)
         .end()

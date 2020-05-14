@@ -415,7 +415,8 @@ foam.CLASS({
           .start()
             .addClass(this.myClass('some-padding'))
             .style({
-              'padding-left' : self.data.level * 15 + 5 + 'px'
+              'padding-left' : self.data.level * 15 + 15 + 'px',
+              'padding-right' : '15px'
             })
             .start('span')
               .show(this.data.isPropertySelected$)
