@@ -589,7 +589,7 @@ foam.CLASS({
           ( typeof c === 'string' && c.split('.').length > this.level && c.split('.')[this.level] === this.rootProperty[0] );
         });
 
-        for ( var i = 0; i < subProperties.length; i++ ) {
+        for ( var i = 0 ; i < subProperties.length ; i++ ) {
           //the comparison mentioned above is working with the assumption that columns which are specified in 'tableColumns' are top-level properties and
           //we are not using nested "custom" table columns
           if ( selectedColumn.find(c => typeof c === 'string' && c.split('.').length > ( this.level + 1 ) && c.split('.')[this.level+1] === subProperties[i][0]) ) {
@@ -600,7 +600,7 @@ foam.CLASS({
         }
         otherSubProperties.sort((a, b) => { return a[1].toLowerCase().localeCompare(b[1].toLowerCase());});
 
-        for ( var i = 0; i < selectedSubProperties.length; i++  ) {
+        for ( var i = 0 ; i < selectedSubProperties.length ; i++  ) {
           arr.push(this.cls_.create({ 
             index:i, 
             rootProperty: selectedSubProperties[i], 
@@ -609,7 +609,7 @@ foam.CLASS({
             of: r && r.of ? r.of.getAxiomByName([selectedSubProperties[i][0]]).cls_ : r}));
         }
         
-        for ( var i = 0; i < otherSubProperties.length; i++  ) {
+        for ( var i = 0 ; i < otherSubProperties.length ; i++  ) {
           arr.push(this.cls_.create({ 
             index:selectedSubProperties.length+i, 
             rootProperty: otherSubProperties[i], 
@@ -667,7 +667,7 @@ foam.CLASS({
     },
     function returnSelectedProps() {
       if ( !this.hasSubProperties) {
-        if (this.level === 0) {
+        if ( this.level === 0 ) {
           if ( foam.Array.isInstance(this.rootProperty) )
             return [[this.rootProperty[0]]];
           else
@@ -676,7 +676,7 @@ foam.CLASS({
           return [this.rootProperty[0]];
       } else {
         var arr = [];
-        for (var i = 0; i < this.subColumnSelectConfig.length; i++) {
+        for ( var i = 0 ; i < this.subColumnSelectConfig.length ; i++ ) {
           if ( this.subColumnSelectConfig[i].isPropertySelected ) {
             var childProps = this.subColumnSelectConfig[i].returnSelectedProps();
             childProps.splice(0, 0, this.rootProperty[0]);
@@ -694,7 +694,7 @@ foam.CLASS({
           this.showOnSearch = true;
       } else {
         this.showOnSearch = false;
-        for (var  i = 0; i < this.subColumnSelectConfig.length; i++) {
+        for ( var  i = 0 ; i < this.subColumnSelectConfig.length ; i++ ) {
           if ( this.subColumnSelectConfig[i].updateOnSearch(query) ) {
             this.showOnSearch = true;
           }

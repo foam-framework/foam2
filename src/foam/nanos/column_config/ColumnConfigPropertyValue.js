@@ -27,7 +27,7 @@ foam.CLASS({
         var property;
         if ( typeof propInfo === 'string') {
           var props = propInfo.split('.');
-          for ( var i = 0; i < props.length; i++ ) {
+          for ( var i = 0 ; i < props.length ; i++ ) {
             property = typeof props[i] === 'string'
             ? cls.getAxiomByName(props[i])
             :  foam.Array.isInstance(props[i]) ? 
@@ -89,7 +89,7 @@ foam.CLASS({
         var obj1 = obj;
         if ( typeof propInfo === 'string') {
           var props = propInfo.split('.');
-          for ( var i = 0; i < props.length; i++ ) {
+          for ( var i = 0 ; i < props.length ; i++ ) {
             property = typeof props[i] === 'string'
             ? cls.getAxiomByName(props[i])
             :  foam.Array.isInstance(props[i]) ? 
@@ -110,7 +110,7 @@ foam.CLASS({
         ClassInfo ci = of;
         FObject obj1 = obj;
         PropertyInfo p = null;
-        for(int i = 0; i < propInfo.split("\\\\.").length; i++) {
+        for ( int i = 0 ; i < propInfo.split("\\\\.").length ; i++ ) {
           if ( ( p == null && i != 0 ) || ci == null )
             break;
           p = (PropertyInfo) ci.getAxiomByName(propInfo.split("\\\\.")[i]);
@@ -178,7 +178,7 @@ foam.CLASS({
         ClassInfo ci = of;
         FObject obj1 = obj;
         PropertyInfo p = null;
-        for ( int i = 0; i < propInfo.split("\\\\.").length; i++ ) {
+        for ( int i = 0 ; i < propInfo.split("\\\\.").length ; i++ ) {
           if ( ( p == null && i != 0 ) || ci == null )
             break;
           p = (PropertyInfo) ci.getAxiomByName(propInfo.split("\\\\.")[i]);
@@ -224,7 +224,7 @@ foam.CLASS({
       ],
       code: function(of, propertyNameArrays, obj) {
         var arr = [];
-        for ( var i = 0; i < propertyNameArrays.length; i++) {
+        for ( var i = 0 ; i < propertyNameArrays.length ; i++) {
           arr.push(this.returnPropertyAndObject(of, propertyNameArrays, obj));
         }
         return arr;
@@ -232,7 +232,7 @@ foam.CLASS({
       javaCode: `
         ClassInfo ci = of;
         foam.nanos.column.ColumnPropertyValue[] arr = new foam.nanos.column.ColumnPropertyValue[propertyNameArrays.length];
-        for ( int i = 0; i < propertyNameArrays.length; i++ ) {
+        for ( int i = 0 ; i < propertyNameArrays.length ; i++ ) {
           arr[i] = returnPropertyAndObject(x, of, propertyNameArrays[i], obj);
         }
         return arr;
