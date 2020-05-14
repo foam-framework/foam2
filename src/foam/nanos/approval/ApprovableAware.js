@@ -81,7 +81,7 @@
                 hash_sb.append(String.valueOf(obj.getProperty("id")));
 
               if ( diff != null ) {
-                // remove ids, timestamps and storageTransient properties
+                // remove ids, timestamps, networkTransient and storageTransient properties for generating the lookup hash
                 if ( operation == Operations.CREATE ) diff.remove("id");
                 diff.remove("created");
                 diff.remove("lastModified");
