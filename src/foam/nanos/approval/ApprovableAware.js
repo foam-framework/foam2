@@ -91,27 +91,12 @@
 
                 Iterator allProperties = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class).iterator();
 
-                List<String> storageTransientPropertyNames = new ArrayList<>();
-                List<String> networkTransientPropertyNames = new ArrayList<>();
-        
                 while ( allProperties.hasNext() ){
                   PropertyInfo prop = (PropertyInfo) allProperties.next();
         
-                  if ( prop.getStorageTransient() ){
-                    storageTransientPropertyNames.add(prop.getName());
+                  if ( prop.getStorageTransient() || prop.getNetworkTransient() ){
+                    diff.remove(prop.getName());
                   }
-
-                  if ( prop.getNetworkTransient() ){
-                    networkTransientPropertyNames.add(prop.getName());
-                  }
-                }
-        
-                for ( int i = 0; i < storageTransientPropertyNames.size(); i++ ){
-                  diff.remove(storageTransientPropertyNames.get(i));
-                }
-
-                for ( int i = 0; i < networkTransientPropertyNames.size(); i++ ){
-                  diff.remove(networkTransientPropertyNames.get(i));
                 }
         
                 // convert array properties to sorted list to get consistent hash
