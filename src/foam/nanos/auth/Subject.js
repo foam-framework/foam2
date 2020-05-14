@@ -21,10 +21,12 @@ foam.CLASS({
       name: 'user',
       documentation: 'Authenticated user',
       javaSetter: `
-        setUserPath(new ArrayList<User>());
-        setEffectiveUser(val);
+        if ( user_ != null ) {
+          throw new RuntimeException("User is already set in the context");
+        }
         user_ = val;
         userIsSet_ = true;
+        setEffectiveUser(val);
       `
     },
     {
@@ -33,7 +35,10 @@ foam.CLASS({
       name: 'effectiveUser',
       documentation: 'Current user role(acts as effectiveUser)',
       javaSetter: `
-      if ( getUser() == null ) user_ = val;
+      if ( getUser() == null ) {
+          user_ = val;
+          userIsSet_ = true;
+      }
       ArrayList userPath = getUserPath();
       if ( userPath.size() < 2 || val != (User) userPath.get(userPath.size() - 1) ) {
         userPath.add(val);
@@ -41,7 +46,7 @@ foam.CLASS({
       else {
         userPath.remove(userPath.size());
       }
-
+      effectiveUserIsSet_ = true;
       effectiveUser_ = val;
       `
     },
@@ -60,7 +65,7 @@ foam.CLASS({
       type: 'String',
       javaCode: `
       String ret = "";
-      for (User user : getUserPath()) {
+      for ( User user : getUserPath() ) {
           ret += " >> " + user.getUserName() + "( " + user.getId() + " )";
       }
       return ret;
