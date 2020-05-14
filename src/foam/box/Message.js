@@ -54,7 +54,7 @@ foam.CLASS({
         wrapper.setMessage(t.getMessage());
         if (t instanceof foam.core.AbstractNativeException ) {
           var ane = (foam.core.AbstractNativeException) t;
-          wrapper.setData(ane.getFoamException());
+          wrapper.setFoamException(ane.getFoamException());
         }
 
 

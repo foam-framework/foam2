@@ -112,8 +112,8 @@ foam.CLASS({
         }, (e) => {
           this.throwError.pub(e);
           
-          if ( e.data && foam.comics.v2.userfeedback.UserFeedbackException.isInstance(e.data) && e.data.userFeedback  ){
-            var currentFeedback = e.data.userFeedback;
+          if ( e.foamException && foam.comics.v2.userfeedback.UserFeedbackException.isInstance(e.foamException) && e.foamException.userFeedback  ){
+            var currentFeedback = e.foamException.userFeedback;
             while ( currentFeedback ){
               this.ctrl.add(this.NotificationMessage.create({
                 message: currentFeedback.message,

@@ -19,7 +19,7 @@ foam.CLASS({
     },
     {
       class: 'Object',
-      name: 'data'
+      name: 'foamException'
     }
   ],
 
