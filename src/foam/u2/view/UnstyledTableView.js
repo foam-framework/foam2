@@ -258,20 +258,13 @@ foam.CLASS({
 
     function initE() {
       var view = this;
-      var columnSelectionE;
-
       //otherwise on adding new column creating new EditColumnsView, which is closed by default
       if (view.editColumnsEnabled)
         var editColumnView = foam.u2.view.EditColumnsView.create({data:view});//foam.u2.ViewSpec.createView({ class: 'foam.u2.view.EditColumnsView'}, {data:view}, view, view.__subSubContext__);
 
-      // this.isColumnChanged$.sub(function(){
-      //   console.log('isColumnChanged');
-      // });
-
       if ( this.filteredTableColumns$ ) {
-        //change this
         this.onDetach(this.filteredTableColumns$.follow(
-          this.columns_$.map((cols) => cols.map(([axiomOrColumnName, overrides]) => {
+          this.columns_$.map((cols) => cols.filter(([axiomOrColumnName, overrides]) => view.allColumns.includes(typeof axiomOrColumnName === 'string' ? axiomOrColumnName : axiomOrColumnName.name )).map(([axiomOrColumnName, overrides]) => {
             return (typeof axiomOrColumnName) === 'string' ? axiomOrColumnName : axiomOrColumnName.name;
           }))));
       }
