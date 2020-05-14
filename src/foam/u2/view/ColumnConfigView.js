@@ -175,7 +175,6 @@ foam.CLASS({
       .end();
     },
     function stopPropagation(e) {
-      e.preventDefault();
       e.stopPropagation();
     },
     function onClose() {
@@ -688,7 +687,7 @@ foam.CLASS({
     function updateOnSearch(query) {
       if ( !this.hasSubProperties) {
         if ( query.length !== 0 ) {
-          this.showOnSearch = foam.Array.isInstance(this.rootProperty) ? this.rootProperty[1].toLowerCase().includes(query.toLowerCase()) : this.rootProperty.toLowerCase().name.includes(query.toLowerCase());
+          this.showOnSearch = foam.Array.isInstance(this.rootProperty) ? this.rootProperty[1].toLowerCase().includes(query.toLowerCase()) : this.rootProperty.name.toLowerCase().includes(query.toLowerCase());
         } else
           this.showOnSearch = true;
       } else {
