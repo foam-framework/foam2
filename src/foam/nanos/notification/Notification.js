@@ -108,16 +108,6 @@ foam.CLASS({
       documentation: 'Email template name.'
     },
     {
-      class: 'Boolean',
-      name: 'emailIsEnabled',
-      documentation: 'Determines an email is sent to user.'
-    },
-    {
-      class: 'Boolean',
-      name: 'sendSlackMessage',
-      documentation: 'Sends notification as a Slack message.'
-    },
-    {
       class: 'String',
       name: 'slackWebhook',
       documentation: 'Webhook associated to Slack.'
@@ -125,7 +115,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'slackMessage',
-      documentation: 'Message to be sent to Slack if sendSlackMessage is enabled.'
+      documentation: 'Message to be sent to Slack.'
     }
   ],
 
