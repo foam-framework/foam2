@@ -69,7 +69,7 @@ foam.CLASS({
       code: function(prop, propName) {
           var cellType = 'STRING';
           var pattern = '';
-          if ( prop.cls_.id === "foam.core.UnitValue" ) {
+          if ( foam.core.UnitValue.isInstance(prop) ) {
             cellType = 'CURRENCY';
             pattern = '\"$\"#0.00\" CAD\"';
           } else if ( prop.cls_.id === 'foam.core.Date' ) {
