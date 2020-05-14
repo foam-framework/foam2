@@ -29,8 +29,19 @@ foam.CLASS({
   properties: [
     [ 'conventionalUML', false ],
     {
+      class: 'Map',
+      name: 'allowedModels',
+      adapt: function(_,models) {
+        if ( foam.Array.isInstance(models) ) {
+          var map = {};
+          models.forEach((m) => map[m.id] = true);
+        }
+        return models;
+      }
+    },
+    {
       name: 'modelDAO',
-      expression: function(nSpecDAO) {
+      expression: function(nSpecDAO,allowedModels) {
         var self = this;
         var dao = self.ArrayDAO.create({ of: self.Model })
         return self.PromisedDAO.create({
@@ -39,7 +50,7 @@ foam.CLASS({
               a.array.map(function(nspec) {
                 return self.parseClientModel(nspec)
               }).filter(function(cls) {
-                return !!cls;
+                return cls && (allowedModels == undefined? true : !!allowedModels[cls.id]);
               }).map(function(cls) {
                 return dao.put(cls.model_);
               })

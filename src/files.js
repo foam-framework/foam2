@@ -271,9 +271,6 @@ FOAM_FILES([
   { name: "foam/nanos/logger/Logger" },
   { name: "foam/nanos/logger/DAOLogger" },
   { name: "foam/nanos/logger/LoggingDAO" },
-  { name: "foam/nanos/notification/Notifiable" },
-  { name: "foam/nanos/notification/EmailSetting" },
-  { name: "foam/nanos/notification/NotificationSetting" },
   { name: "foam/dao/EasyDAO" },
   { name: "foam/dao/NoSelectAllDAO" },
   { name: "foam/dao/NullDAO" },
@@ -579,6 +576,17 @@ FOAM_FILES([
   { name: "foam/u2/view/FObjectArrayTableView", flags: ['web'] },
 
   // Doc
+  { name: "foam/doc/AxiomLink", flags: ['debug', 'web'] },
+  { name: "foam/doc/dao/PropertyPermissionCheckDecorator", flags: ['debug', 'web'] },
+  { name: "foam/doc/dao/AxiomDAO", flags: ['debug', 'web'] },
+  { name: "foam/doc/AxiomTableView", flags: ['debug', 'web'] },
+  { name: "foam/doc/MethodAxiom", flags: ['debug', 'web'] },
+  { name: "foam/doc/AxiomListView", flags: ['debug', 'web'] },
+  { name: "foam/doc/Axiom", flags: ['debug', 'web'] },
+  { name: "foam/doc/PropertyAxiom", flags: ['debug', 'web'] },
+  { name: "foam/doc/AxiomSummaryView", flags: ['debug', 'web'] },
+  { name: "foam/doc/SimpleClassView", flags: ['debug', 'web'] },
+
   { name: "foam/doc/ClassLink", flags: ['debug', 'web'] },
   { name: "foam/doc/CodeTabs" },
   { name: "foam/doc/DocBrowser", flags: ['debug', 'web'] },

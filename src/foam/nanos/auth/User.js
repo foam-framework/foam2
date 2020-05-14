@@ -31,12 +31,14 @@ foam.CLASS({
     'foam.dao.ArraySink',
     'foam.nanos.auth.LifecycleAware',
     'foam.nanos.auth.LifecycleState',
-    'foam.nanos.session.Session',
-
     'foam.nanos.notification.NotificationSetting',
+    'foam.nanos.session.Session',
+    'foam.nanos.theme.Theme',
     'foam.util.SafetyUtil',
+    'java.util.Arrays',
+    'java.util.HashMap',
+    'java.util.HashSet',
     'java.util.List',
-    'static foam.mlang.MLang.EQ'
   ],
 
   documentation: `The User represents a person or entity with the ability
@@ -111,7 +113,11 @@ foam.CLASS({
       updateVisibility: 'RO',
       section: 'administrative',
       includeInDigest: true
-   },
+    },
+    {
+      name: 'spid',
+      class: 'String'
+    },
     {
       class: 'Boolean',
       name: 'enabled',
@@ -238,7 +244,7 @@ foam.CLASS({
         return this.Phone.create();
       },
       view: { class: 'foam.u2.detail.VerticalDetailView' },
-      createVisibility: 'HIDDEN',
+      visibility: 'HIDDEN',
       section: 'personal'
     },
     {
@@ -263,7 +269,7 @@ foam.CLASS({
       },
       view: { class: 'foam.u2.detail.VerticalDetailView' },
       section: 'personal',
-      createVisibility: 'HIDDEN',
+      visibility: 'HIDDEN',
       includeInDigest: true
     },
     {
@@ -444,14 +450,26 @@ foam.CLASS({
       name: 'disabledTopics',
       documentation: 'Disables types for notifications.',
       createVisibility: 'HIDDEN',
-      section: 'administrative'
+      section: 'administrative',
+      javaPostSet: `
+        clearDisabledTopicSet();
+      `
     },
     {
-      class: 'StringArray',
-      name: 'disabledTopicsEmail',
-      documentation: 'Disables types for email notifications.',
-      createVisibility: 'HIDDEN',
-      section: 'administrative'
+      class: 'Object',
+      /** @private */
+      name: 'disabledTopicSet',
+      javaType: 'java.util.HashSet',
+      hidden: true,
+      transient: true,
+      factory: function() { return {}; },
+      javaFactory: `
+        HashSet<String> set = new HashSet<>();
+        for ( String s : getDisabledTopics() ) {
+          set.add(s);
+        }
+        return set;
+      `
     },
     {
       class: 'URL',
@@ -618,9 +636,21 @@ foam.CLASS({
     {
       name: 'doNotify',
       javaCode: `
+        // Get the default settings for the user if none are already defined
+        List<NotificationSetting> settingDefaults = ((ArraySink) ((DAO) x.get("notificationSettingDefaultsDAO")).select(new ArraySink())).getArray();
+        HashMap<String, NotificationSetting> settingsMap = new HashMap<String, NotificationSetting>();
+        for ( NotificationSetting setting : settingDefaults ) {
+          settingsMap.put(setting.getClassInfo().getId(), setting);
+        }
+
+        // Get the configured notifications settings for the user and overwrite the defaults
         List<NotificationSetting> settings = ((ArraySink) getNotificationSettings(x).select(new ArraySink())).getArray();
-        for( NotificationSetting setting : settings ) {
-          setting.sendNotification(x, this, notification);
+        for ( NotificationSetting setting : settings ) {
+          settingsMap.put(setting.getClassInfo().getId(), setting);
+        }
+
+        for ( NotificationSetting setting : settingsMap.values() ) {
+          setting.doNotify(x, this, notification);
         }
       `
     },
@@ -734,4 +764,19 @@ foam.CLASS({
       name: 'group'
     }
   ]
+});
+
+foam.RELATIONSHIP({
+  sourceModel: 'foam.nanos.theme.Theme',
+  targetModel: 'foam.nanos.auth.User',
+  cardinality: '1:*',
+  forwardName: 'users',
+  inverseName: 'theme',
+  sourceProperty: {
+    hidden: true,
+    visibility: 'HIDDEN',
+  },
+  targetProperty: {
+    section: 'administrative'
+  }
 });

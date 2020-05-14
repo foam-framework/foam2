@@ -31,6 +31,23 @@ runner.execute(x);""",
 })
 
 p({
+  "class": "foam.nanos.script.Script",
+  "id": "benchmarkPM",
+  "description": "Benchmark PM",
+  "code": """import foam.nanos.bench.*;
+import foam.nanos.bench.benchmarks.*;
+import net.nanopay.bench.*;
+import foam.nanos.pm.PM;
+
+x = x.put("pmLogger", null);
+PMBenchmark b = new PMBenchmark();
+builder = new BenchmarkRunner.Builder(x).setInvocationCount(10000).setBenchmark(b);
+runner = builder.build();
+runner.execute(x);""",
+  "lastModifiedBy": 1348
+})
+
+p({
 	"class": "foam.nanos.script.Script",
 	"id": "benchmarkJSONEscaping",
   "description": "Benchmark JSON String escaping. Each iteration escapes 1000 strings.",

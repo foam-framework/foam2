@@ -91,12 +91,12 @@ foam.CLASS({
     function collideWith(c) {
       if ( this.Bullet.isInstance(c) ) {
         if ( c.color != this.color ) {
-          if ( this.shield == 1 ) {
+          if ( this.shield == 10 ) {
             this.explode();
             this.gameOver(this.id + 1, this.color);
           }
           this.forcefield.alpha = Math.min(1.1, this.forcefield.alpha+0.25);
-          this.shield = Math.max(0, this.shield-1);
+          this.shield = Math.max(0, this.shield-10);
         }
         c.detach();
       }
@@ -119,10 +119,10 @@ foam.CLASS({
 
     function fire() {
       var b = this.Bullet.create({x: this.x, y: this.y, color: this.color});
-      b.applyMomentum(3 * b.mass, -this.rotation);
-      //this.applyMomentum(-0.01, this.rotation);
-      b.x += b.vx * this.radius/2;
-      b.y += b.vy * this.radius/2;
+      b.applyMomentum(4 * b.mass, -this.rotation);
+      this.applyMomentum(-0.01, this.rotation);
+      b.x += b.vx * this.radius/3;
+      b.y += b.vy * this.radius/3;
       this.addSprite(b);
     },
 
@@ -194,7 +194,7 @@ foam.CLASS({
        this.SUPER();
 
        this.onDetach(this.Animation.create({
-         duration: 8000,
+         duration: 15000,
          f: () => {
           this.x += 3000 * this.vx;
           this.y += 3000 * this.vy;
@@ -241,7 +241,7 @@ foam.CLASS({
       // Apply Gravity
       var dx = c.x - star.x, dy = c.y - star.y;
       var dsquared = dx * dx + dy * dy;
-      c.applyMomentum(-1200 * c.mass / dsquared, this.angleOfImpact(this.star, c));
+      c.applyMomentum(-4000 * c.mass / dsquared, this.angleOfImpact(this.star, c));
     },
     function collide(c1, c2) {
       if ( this.Bullet.isInstance(c1) && this.Bullet.isInstance(c1) ) return;
@@ -333,7 +333,7 @@ foam.CLASS({
       };
 
       var lScoreLabel = this.Label.create({
-        text$:  this.lShip.shield$.map((s) => 'Shield: ' + (s/10).toFixed(1) + '%'),
+        text$:  this.lShip.shield$.map((s) => 'Shield: ' + (s/10)/*.toFixed(1)*/ + '%'),
         align:  'center',
         x:      200,
         y:      25,
@@ -343,7 +343,7 @@ foam.CLASS({
         height: 70});
 
       var rScoreLabel = this.Label.create({
-        text$:  this.rShip.shield$.map((s) => 'Shield: ' + (s/10).toFixed(1) + '%'),
+        text$:  this.rShip.shield$.map((s) => 'Shield: ' + (s/10)/*.toFixed(1)*/ + '%'),
         align:  'center',
         x:      this.canvas.width-200,
         y:      25,

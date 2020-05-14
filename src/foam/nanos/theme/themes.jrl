@@ -1,1 +1,27 @@
-p({"class":"foam.nanos.theme.Theme","id":1,"description":"The default FOAM theme.","appName":"FOAM","priority":1,"defaultMenu":"admin.nspec","logo":"images/foam_red.png","primaryColor":"#1e1f21","secondaryColor":"#406dea","secondaryHoverColor":"#2d59d2","secondaryDisabledColor":"#a7beff","destructiveColor":"#d9170e","destructiveHoverColor":"#c4140b","destructiveDisabledColor":"#f79393","tableColor":"#f5f7fa","tableHoverColor":"#3cffa6","accentColor":"#e5f1fc","backgroundColor":"#f5f7fa","headerColor":"#202341","tertiaryColor":"#5e6061","tertiaryHoverColor":"#406dea","tertiaryDisabledColor":"#b4b4b4"})
+p({
+  "class":"foam.nanos.theme.Theme",
+  "id":"79B87FC0-C622-417A-A14A-2A04DD348CBD",
+  "name":"foam",
+  "appName":"FOAM",
+  "description":"The default FOAM theme.",
+  "defaultMenu":"admin.nspec",
+  "logo":"images/foam_red.png",
+  "primaryColor":"#1e1f21",
+  "secondaryColor":"#406dea",
+  "secondaryHoverColor":"#2d59d2",
+  "secondaryDisabledColor":"#a7beff",
+  "destructiveColor":"#d9170e",
+  "destructiveHoverColor":"#c4140b",
+  "destructiveDisabledColor":"#f79393",
+  "tableColor":"#f5f7fa",
+  "tableHoverColor":"#3cffa6",
+  "accentColor":"#e5f1fc",
+  "backgroundColor":"#f5f7fa",
+  "headerColor":"#202341",
+  "tertiaryColor":"#5e6061",
+  "tertiaryHoverColor":"#406dea",
+  "tertiaryDisabledColor":"#b4b4b4",
+  "createdBy":1,
+  "createdByAgent":1,
+  "created":"2020-04-29T22:32:52.685Z"
+})

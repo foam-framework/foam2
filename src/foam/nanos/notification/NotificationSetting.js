@@ -18,7 +18,8 @@ foam.CLASS({
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.AuthorizationException',
     'foam.nanos.auth.User',
-    'foam.nanos.logger.Logger'
+    'foam.nanos.logger.Logger',
+    'java.util.HashSet'
   ],
 
   messages: [
@@ -44,10 +45,27 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'id'
+    },
+    {
+      class: 'Boolean',
+      name: 'enabled',
+      value: true
     }
   ],
 
   methods: [
+    {
+      name: 'doNotify',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'user', type: 'foam.nanos.auth.User' },
+        { name: 'notification', type: 'foam.nanos.notification.Notification' }
+      ],
+      javaCode: `
+        // Proxy to sendNotificaiton method
+        sendNotification(x, user, notification);
+      `
+    },
     {
       name: 'sendNotification',
       args: [
@@ -56,14 +74,25 @@ foam.CLASS({
         { name: 'notification', type: 'foam.nanos.notification.Notification' }
       ],
       javaCode: `
-        DAO notificationDAO = (DAO) x.get("localNotificationDAO");
         notification = (Notification) notification.fclone();
         notification.setId(0L);
         notification.setUserId(user.getId());
         notification.setBroadcasted(false);
         notification.setGroupId(null);
-        notification.setEmailIsEnabled(false);
+
+        // We cannot permanently disable in-app notifications, so mark them read automatically
+        if ( ! getEnabled() ) {
+          notification.setRead(true);
+        }
+        else if ( user.getDisabledTopicSet() != null ) {
+          HashSet<String> disabledTopicsSet = (HashSet<String>) user.getDisabledTopicSet();
+          if ( disabledTopicsSet.contains(notification.getNotificationType()) ) {
+            notification.setRead(true);
+          }
+        }
+
         try {
+          DAO notificationDAO = (DAO) x.get("localNotificationDAO");
           notificationDAO.put_(x, notification);
         } catch (Throwable t) {
           Logger logger = (Logger) x.get("logger");
