@@ -22,16 +22,17 @@ foam.CLASS({
 
   tableColumns: ['id', 'body', 'notificationType', 'broadcasted', 'userId', 'groupId' ],
 
-  axioms: [
-    {
-      class: 'foam.comics.v2.namedViews.NamedViewCollection',
-      name: 'List',
-      view: {
-        class: 'foam.u2.DAOList'
-        // TODO: Add CitationView for RowView
-      },
-    },
-  ],
+  // TODO: Comment this out and add the citation view when ready
+  // axioms: [
+  //   {
+  //     class: 'foam.comics.v2.namedViews.NamedViewCollection',
+  //     name: 'List',
+  //     view: {
+  //       class: 'foam.u2.DAOList'
+  //       // TODO: Add CitationView for RowView
+  //     },
+  //   },
+  // ],
   
   properties: [
     {
