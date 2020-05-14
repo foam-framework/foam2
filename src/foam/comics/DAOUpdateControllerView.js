@@ -143,14 +143,14 @@ foam.CLASS({
               .add(this.data.cls_.getAxiomsByClass(foam.core.Action))
             .end()
             .start()
-              .show(this.mode$.map((m) => m === this.DisplayMode.RO))
+              .show(this.mode$.map((m) => m === this.DisplayMode.RW))
               .startContext({ data: this })
                 .add(this.EDIT)
               .endContext()
             .end()
           .end()
         .end()
-        
+
         // Container for the detailview
         .start('div', [], this.container_$)
           .addClass(this.myClass('detail-container'))
