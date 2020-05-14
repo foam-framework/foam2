@@ -675,6 +675,14 @@
                 var keyArray = Object.keys(propsToUpdate);
 
                 for ( var i = 0; i < keyArray.length; i++ ){
+                  var propObj = temporaryNewObject.cls_.getAxiomByName(keyArray[i]);
+                  if (
+                    ! propObj ||
+                    propObj.transient ||
+                    propObj.storageTransient ||
+                    propObj.networkTransient 
+                  ) continue;
+
                   temporaryNewObject[keyArray[i]] = propsToUpdate[keyArray[i]];
                 }
 
