@@ -85,7 +85,7 @@ foam.CLASS({
         var nonSelectedViewModels = [];
         for(i = 0; i < notSelectedColumns.length; i++) {
           var rootProperty;
-          if ( foam.String.isInstance(notSelectedColumns[i])) {
+          if ( foam.String.isInstance(notSelectedColumns[i]) ) {
             var axiom =  tableColumns.find(c => c.name === notSelectedColumns[i]);
             axiom = axiom || data.of.getAxiomByName(notSelectedColumns[i]);
             rootProperty = [ axiom.name, axiom.label ? axiom.label : axiom.name ];
