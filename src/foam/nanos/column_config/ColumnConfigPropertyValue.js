@@ -51,7 +51,7 @@ foam.CLASS({
       javaCode: `
         ClassInfo ci = of;
         PropertyInfo p = null;
-        for(int i = 0; i < propInfo.split("\\\\.").length; i++) {
+        for ( int i = 0; i < propInfo.split("\\\\.").length; i++ ) {
           if ( ( p == null && i != 0 ) || ci == null )
             break;
           p = (PropertyInfo) ci.getAxiomByName(propInfo.split("\\\\.")[i]);
@@ -193,7 +193,7 @@ foam.CLASS({
             Class cls = p.getValueClass();
             try {
               ci = (ClassInfo) cls.getMethod("getOwnClassInfo").invoke(null);
-            } catch(Exception e) {
+            } catch (Exception e) {
               Logger logger = (Logger) getX().get("logger");
               logger.error(e);
               return new ColumnPropertyValue.Builder(x).setPropertyValue(null).setObjValue(null).build();

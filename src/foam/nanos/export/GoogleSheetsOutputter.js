@@ -22,7 +22,7 @@ foam.CLASS({
           propNames = props.map(p => p.name);
         } else {
           var columnConfig = x.columnConfigToPropertyConverter;
-          for ( var i = 0; i < propNames.length ; i++ ) {
+          for ( var i = 0 ; i < propNames.length ; i++ ) {
             props.push(columnConfig.returnProperty(cls, propNames[i]));
           }
         }

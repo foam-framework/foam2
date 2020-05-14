@@ -91,12 +91,9 @@ foam.CLASS({
     },
     {
       name: 'selectedColumnNames',
-      // adapt: function(_, cols) {
-      //   return cols.map(c => Array.isArray(c) ? c : [[c], null]);
-      // },
       expression: function(columns, of) {
         var ls = JSON.parse(localStorage.getItem(of.id));
-        return ls ? ls : columns;//.map(c => [[c], null]);
+        return ls ? ls : columns;
       }
     },
     {
@@ -253,7 +250,7 @@ foam.CLASS({
       var view = this;
       //otherwise on adding new column creating new EditColumnsView, which is closed by default
       if (view.editColumnsEnabled)
-        var editColumnView = foam.u2.view.EditColumnsView.create({data:view});//foam.u2.ViewSpec.createView({ class: 'foam.u2.view.EditColumnsView'}, {data:view}, view, view.__subSubContext__);
+        var editColumnView = foam.u2.view.EditColumnsView.create({data:view});
 
       if ( this.filteredTableColumns$ ) {
         this.onDetach(this.filteredTableColumns$.follow(
@@ -365,8 +362,8 @@ foam.CLASS({
                   }).
                   tag('div', null, view.dropdownOrigin$).
                 end();
-                })
-              })).
+              });
+            })).
         end().
         callIf(view.editColumnsEnabled, function() {this.add(editColumnView);}).       
         add(this.rowsFrom(this.data$proxy));

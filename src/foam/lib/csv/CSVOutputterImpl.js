@@ -161,7 +161,7 @@ foam.CLASS({
       },
       javaCode: `
         ColumnConfigToPropertyConverter columnConfig = (ColumnConfigToPropertyConverter)x.get("columnConfigToPropertyConverter");
-        for (String prop: getProps()) {
+        for ( String prop : getProps() ) {
           PropertyInfo p = columnConfig.returnProperty(getOf(), prop);
           if ( p != null && p instanceof PropertyInfo ) ((PropertyInfo)p).toCSVLabel(x, this);
         }

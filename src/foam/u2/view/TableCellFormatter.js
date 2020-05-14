@@ -109,7 +109,6 @@ foam.CLASS({
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(value) {
-        //need to investigate
         if ( !value )
           this.add('-');
         else
