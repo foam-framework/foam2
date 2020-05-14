@@ -53,6 +53,7 @@ foam.CLASS({
     }
 
     ^heading {
+      min-height: 40px;
       border-left: 4px solid rgba(0,0,0,0);
       display: flex;
       align-items: center;
@@ -383,7 +384,7 @@ foam.CLASS({
       var M   = this.ExpressionsSingleton.create();
       var of  = this.__context__.lookup(this.relationship.sourceModel);
       var dao = this.data$proxy.where(
-        M.EQ(of.getAxiomByName(this.relationship.inverseName), this.theme.rootMenu));
+        M.EQ(of.getAxiomByName(this.relationship.inverseName), this.theme.navigationRootMenu));
       var self = this;
       var isFirstSet = false;
 
