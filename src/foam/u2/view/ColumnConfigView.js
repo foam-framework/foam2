@@ -38,6 +38,9 @@ foam.CLASS({
             return name; 
           });
         var tableColumns = this.data.columns;
+        //current implementation supports either proprety name or property itself
+        //fixing dashboard
+        tableColumns = tableColumns.map(c => Array.isArray(c) ? c[0] : c);
         //to keep record of columns that are selected
         var topLevelProps = [];
         for(var i = 0; i < data.selectedColumnNames.length; i++) {
@@ -525,7 +528,7 @@ foam.CLASS({
         //to re-check if isPropertySelected changed
         if ( this.data.isPropertySelected !== isColumnSelected ) {
           var anySelected = this.data.subColumnSelectConfig.find(s => s.isPropertySelected);
-          this.data.isPropertySelected = typeof anySelected !== "undefined";
+          this.data.isPropertySelected = typeof anySelected !== 'undefined';
           //close if not selected
           if ( !this.data.isPropertySelected )
             this.data.expanded = false;
