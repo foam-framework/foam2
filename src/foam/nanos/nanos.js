@@ -217,7 +217,6 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/notifications/ScriptRunNotification'},
   { name: 'foam/nanos/notification/NotificationView'},
   { name: 'foam/nanos/notification/NotificationExpansionDAO'},
-  { name: 'foam/nanos/notification/NotificationListView'},
   { name: 'foam/nanos/notification/NotificationRowView'},
   { name: 'foam/nanos/notification/NotificationSetting' },
   { name: 'foam/nanos/notification/NotificationSettingsView'},
