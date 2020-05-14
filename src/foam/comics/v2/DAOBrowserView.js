@@ -120,15 +120,8 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpec',
       name: 'summaryView',
-      factory: function() {
-        return {
-          class: 'foam.u2.view.ScrollTableView',
-          enableDynamicTableHeight: false,
-          css: {
-            width: '100%',
-            height: '424px'
-          }
-        };
+      expression: function(config$summaryView) {
+        return config$summaryView;
       }
     },
     {

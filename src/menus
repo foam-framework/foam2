@@ -202,7 +202,13 @@ p({
       "browseTitle": "Notifications",
       "createPredicate":{"class":"foam.mlang.predicate.False"},
       "editPredicate":{"class":"foam.mlang.predicate.False"},
-      "deletePredicate":{"class":"foam.mlang.predicate.False"}
+      "deletePredicate":{"class":"foam.mlang.predicate.False"},
+      "summaryView":{
+        "class":"foam.u2.DAOList",
+        "rowView":{
+          "class":"foam.nanos.notification.NotificationRowView"
+        }
+      }
     }
   },
 })

@@ -21,17 +21,6 @@ foam.CLASS({
   ],
 
   tableColumns: ['id', 'body', 'notificationType', 'broadcasted', 'userId', 'groupId' ],
-
-  axioms: [
-    {
-      class: 'foam.comics.v2.namedViews.NamedViewCollection',
-      name: 'List',
-      view: {
-        class: 'foam.u2.DAOList',
-        rowView: 'foam.nanos.notification.NotificationRowView'
-      },
-    },
-  ],
   
   properties: [
     {

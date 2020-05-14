@@ -57,6 +57,10 @@ foam.CLASS({
       expression: function(of) { return foam.String.pluralize(of.model_.label); }
     },
     {
+      class: 'foam.u2.ViewSpecWithJava',
+      name: 'summaryView',
+    },
+    {
       class: 'String',
       name: 'createTitle',
       expression: function(of) { return 'Create a New ' + of.model_.label; }
