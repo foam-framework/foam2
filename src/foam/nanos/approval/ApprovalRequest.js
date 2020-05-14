@@ -664,6 +664,8 @@
         return X[this.daoKey_]
           .find(objId)
           .then((obj) => {
+            var of = obj.cls_;
+
             // If the dif of objects is calculated and stored in Map(obj.propertiesToUpdate),
             // this is for updating object approvals
             if ( obj.propertiesToUpdate ) {
@@ -686,26 +688,30 @@
                   temporaryNewObject[keyArray[i]] = propsToUpdate[keyArray[i]];
                 }
 
+                of =  temporaryNewObject.cls_;
+
                 X.stack.push({
                   class: 'foam.comics.v2.DAOSummaryView',
                   data: temporaryNewObject,
-                  of: temporaryNewObject.cls_,
+                  of: of,
                   config: foam.comics.v2.DAOControllerConfig.create({
                     daoKey: obj.daoKey,
-                    of: temporaryNewObject.cls_,
+                    of: of,
                     editPredicate: foam.mlang.predicate.False.create(),
                     createPredicate: foam.mlang.predicate.False.create(),
                     deletePredicate: foam.mlang.predicate.False.create()
                   }),
                 });
               } else {
+                of = obj.of;
+
                 // then here we created custom view to display these properties
                 X.stack.push({
                   class: 'foam.nanos.approval.PropertiesToUpdateView',
                   propObject: obj.propertiesToUpdate,
                   objId: obj.objId,
                   daoKey: obj.daoKey,
-                  of: obj.of,
+                  of: of,
                   title: 'Updated Properties and Changes'
                 });
               }
@@ -717,10 +723,10 @@
             X.stack.push({
               class: 'foam.comics.v2.DAOSummaryView',
               data: obj,
-              of: obj.cls_,
+              of: of,
               config: foam.comics.v2.DAOControllerConfig.create({
                 daoKey: this.daoKey_,
-                of: obj.cls_,
+                of: of,
                 editPredicate: foam.mlang.predicate.False.create(),
                 createPredicate: foam.mlang.predicate.False.create(),
                 deletePredicate: foam.mlang.predicate.False.create()
