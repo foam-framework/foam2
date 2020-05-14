@@ -65,7 +65,7 @@ foam.CLASS({
     }
   ],
 
-  actions: [
+  methods: [
     {
       name: 'save',
       code: function() {
@@ -82,9 +82,6 @@ foam.CLASS({
         });
       }
     },
-  ],
-
-  methods: [
     {
       name: 'checkForUnusedProperties',
       code: function(sections, of) {
