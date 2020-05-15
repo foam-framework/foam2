@@ -112,6 +112,25 @@ foam.CLASS({
       section: 'urlMapping'
     },
     {
+      class: 'String',
+      name: 'navigationRootMenu',
+      documentation: 'Specifies the root menu to be used in top navigation settings drop-down.'
+    },
+    {
+      class: 'String',
+      name: 'settingsRootMenu',
+      documentation: 'Specifies the root menu to be used in top navigation settings drop-down.'
+    },
+    {
+      class: 'Boolean',
+      name: 'disableCurrencyChoice',
+      value: false
+    },
+    {
+      class: 'String',
+      name: 'logoRedirect',
+    },
+    {
       class: 'Reference',
       targetDAOKey: 'menuDAO',
       name: 'defaultMenu',

@@ -36,17 +36,27 @@ foam.CLASS({
       color: #406dea;
     }
 
+    ^label-container {
+      display: flex;
+      align-items: center;
+    }
+
     ^label {
       min-width: 120px;
       padding: 4px;
-      font-weight: 500;
+      font-weight: normal;
       display: inline-block;
+      color: #9BA1A6;
+      font-family: 'IBM Plex Sans', sans-serif;
       font-size: 14px;
-      color: /*%BLACK%*/ #1e1f21;
+      font-weight: normal;
     }
 
     ^heading {
+      min-height: 40px;
       border-left: 4px solid rgba(0,0,0,0);
+      display: flex;
+      align-items: center;
     }
 
     ^select-level {
@@ -54,10 +64,14 @@ foam.CLASS({
     }
 
     ^selected > ^heading {
-      background-color: #e5f1fc !important;
-      color: #406dea;
+      background-color: /*%PRIMARY5%*/ #e5f1fc !important;
       border-left: 4px solid /*%PRIMARY3%*/ #406dea;
-      }
+    }
+
+    ^selected > ^heading > ^label{
+      color: #1E1F21 !important;
+      font-weight: bold;
+    }
   `,
 
   properties: [
@@ -186,32 +200,39 @@ foam.CLASS({
         }).
         start().
           addClass(self.myClass('heading')).
-          start('span').
             style({
-              'padding-left': (( self.level * 16 ) + 'px')
+              'padding-left': ((( self.level - 1) * 16 + 28) + 'px')
             }).
+            add(this.slot( function(level, selected, id) {
+              if ( level === 1 ) {
+                var isDefault = ! this.data.icon || ! this.data.activeIcon;
+                var imgUrl = isDefault ? 'images/settings-icon-resting.svg' : self.data.icon;
+                if ( selected && foam.util.equals(selected.id, id) ) {
+                  imgUrl = isDefault ? 'images/settings-icon-active.svg' : self.data.activeIcon;
+                }
+                return this.E().start('img').
+                  addClass(self.myClass('label-icon')).
+                  attrs({ 'src': imgUrl, 'width': '16px', 'height': '16px' }).
+                end();
+              }
+            }, self.level$, this.selection$, this.data$.dot('id'))).
             start().
               addClass(self.myClass('select-level')).
               style({
-                'font-weight': self.hasChildren$.map(function(c) { return c ? 'bold' : 'normal'; }),
-                'width': (83 - (5 * (self.level - 1))) + '%'
+                'width': '100%',
+                'padding-right': '20px'
               }).
               addClass(self.myClass('label')).
               call(this.formatter, [self.data]).
               start('span').
               show(this.hasChildren$).
               style({
-                'vertical-align': 'middle',
-                'font-weight':    'bold',
-                'display':        'inline-block',
                 'visibility':     'visible',
                 'font-size':      '16px',
-                'float':          'right',
                 'transform':      this.expanded$.map(function(c) { return c ? 'rotate(180deg)' : 'rotate(90deg)'; })
               }).
               on('click', this.toggleExpanded).
               add('\u2303').
-            end().
             end().
           end().
         end().
@@ -313,6 +334,10 @@ foam.CLASS({
     'foam.u2.view.TreeViewRow'
   ],
 
+  imports: [
+    'theme'
+  ],
+
   exports: [
     'onObjDrop',
     'selection',
@@ -359,8 +384,7 @@ foam.CLASS({
       var M   = this.ExpressionsSingleton.create();
       var of  = this.__context__.lookup(this.relationship.sourceModel);
       var dao = this.data$proxy.where(
-        M.NOT(M.HAS(of.getAxiomByName(this.relationship.inverseName))));
-
+        M.EQ(of.getAxiomByName(this.relationship.inverseName), this.theme.navigationRootMenu));
       var self = this;
       var isFirstSet = false;
 
@@ -377,6 +401,7 @@ foam.CLASS({
             formatter: self.formatter,
             query: self.query,
             onClickAddOn: self.onClickAddOn,
+            selection$: self.selection$,
             level: 1
           }, this);
         });
