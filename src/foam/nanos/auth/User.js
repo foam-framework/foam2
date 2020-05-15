@@ -587,8 +587,9 @@ foam.CLASS({
       ],
       javaThrows: ['AuthorizationException'],
       javaCode: `
-        User user = (User) x.get("user");
-        User agent = (User) x.get("agent");
+        Subject subject = (Subject) x.get("subject");
+        User user = subject.getUser();
+        User agent = subject.getRealUser();
         AuthService auth = (AuthService) x.get("auth");
         boolean findSelf = SafetyUtil.equals(this.getId(), user.getId()) ||
           (
@@ -611,14 +612,16 @@ foam.CLASS({
       ],
       javaThrows: ['AuthorizationException'],
       javaCode: `
-        User user = (User) x.get("user");
+        User user = ((Subject) x.get("subject")).getUser();
         AuthService auth = (AuthService) x.get("auth");
         User oldUser = (User) oldObj;
 
+        Subject subject = (Subject) x.get("subject");
+        User agent = subject.getRealUser();
         boolean updatingSelf = SafetyUtil.equals(this.getId(), user.getId()) ||
           (
-            x.get("agent") != null &&
-            SafetyUtil.equals(((User) x.get("agent")).getId(), this.getId())
+            agent != null &&
+            SafetyUtil.equals(agent.getId(), this.getId())
           );
         boolean hasUserEditPermission = auth.check(x, "user.update." + this.getId());
 
@@ -652,7 +655,7 @@ foam.CLASS({
       ],
       javaThrows: ['AuthorizationException'],
       javaCode: `
-        User user = (User) x.get("user");
+        User user = ((Subject) x.get("subject")).getUser();
         AuthService auth = (AuthService) x.get("auth");
 
         if (

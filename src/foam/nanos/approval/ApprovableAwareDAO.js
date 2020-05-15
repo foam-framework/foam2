@@ -32,6 +32,7 @@ foam.CLASS({
     'foam.nanos.approval.ApprovalStatus',
     'foam.nanos.auth.LifecycleAware',
     'foam.nanos.auth.LifecycleState',
+    'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
     'foam.nanos.auth.UserQueryService',
     'foam.nanos.logger.Logger',
@@ -124,14 +125,14 @@ foam.CLASS({
         { name: 'user', javaType: 'foam.nanos.auth.User' }
       ],
       javaType: 'List<Long>',
-      javaCode: ` 
+      javaCode: `
         Logger logger = (Logger) x.get("logger");
         DAO requestingDAO = (DAO) x.get(getDaoKey());
 
         String modelName = requestingDAO.getOf().getObjClass().getSimpleName();
         UserQueryService userQueryService = (UserQueryService) x.get("userQueryService");
         List<Long> approverIds = userQueryService.getAllApprovers(x, modelName);
-          
+
         if ( approverIds == null || approverIds.size() <= 0 ) {
           logger.log("No Approvers exist for the model: " + modelName);
           throw new RuntimeException("No Approvers exist for the model: " + modelName);
@@ -153,7 +154,7 @@ foam.CLASS({
         return super.put_(x, obj);
       }
 
-      User user = (User) x.get("user");
+      User user = ((Subject) x.get("subject")).getUser();
       Logger logger = (Logger) x.get("logger");
 
       ApprovableAware approvableAwareObj = (ApprovableAware) obj;
@@ -176,7 +177,7 @@ foam.CLASS({
       if ( user != null && ( user.getId() == User.SYSTEM_USER_ID || user.getGroup().equals("admin") || user.getGroup().equals("system") ) ) {
         if ( currentObjectInDAO == null && lifecycleObj.getLifecycleState() == LifecycleState.PENDING && user.getId() != User.SYSTEM_USER_ID ){
           lifecycleObj.setLifecycleState(LifecycleState.ACTIVE);
-        } 
+        }
         else if ( lifecycleObj.getLifecycleState() == LifecycleState.PENDING && user.getId() == User.SYSTEM_USER_ID ) {
           // Adding log message in case this change breaks something unexpected
           Object primaryKey = obj instanceof foam.core.Identifiable ? ((foam.core.Identifiable)obj).getPrimaryKey() : null;
@@ -184,9 +185,9 @@ foam.CLASS({
         }
         return super.put_(x,obj);
       }
-      
-      Operations operation = lifecycleObj.getLifecycleState() == LifecycleState.DELETED ? Operations.REMOVE : 
-        ( ( currentObjectInDAO == null || ((LifecycleAware) currentObjectInDAO).getLifecycleState() == LifecycleState.PENDING ) ? 
+
+      Operations operation = lifecycleObj.getLifecycleState() == LifecycleState.DELETED ? Operations.REMOVE :
+        ( ( currentObjectInDAO == null || ((LifecycleAware) currentObjectInDAO).getLifecycleState() == LifecycleState.PENDING ) ?
             Operations.CREATE :
             Operations.UPDATE
         );
@@ -199,7 +200,7 @@ foam.CLASS({
         public void put(Object o, Detachable sub) {
           Long approver = ((ApprovalRequest) o).getApprover();
           approverIds.remove(approver);
-          getDelegate().put(o, sub);  
+          getDelegate().put(o, sub);
         }
       };
 
@@ -222,8 +223,8 @@ foam.CLASS({
         .getDelegate())
         .getArray();
 
-        // if the new list of approvers include users who are not in the original list of approvers, we want to send them the ar 
-        // we dont need the proxysink for this operation sink if this is non-empty, we do not need to know if there's any 
+        // if the new list of approvers include users who are not in the original list of approvers, we want to send them the ar
+        // we dont need the proxysink for this operation sink if this is non-empty, we do not need to know if there's any
         // new approvers to whom an approvalrequest for this operation should be sent.
         List approvedObjRemoveRequests = ((ArraySink) filteredApprovalRequestDAO
           .where(foam.mlang.MLang.OR(
@@ -232,7 +233,7 @@ foam.CLASS({
             foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.CANCELLED)
           )).select(new ArraySink())).getArray();
 
-        if ( pendingRequests.size() > 0 && approvedObjRemoveRequests.size() == 0 && approverIds.size() == 0 ) 
+        if ( pendingRequests.size() > 0 && approvedObjRemoveRequests.size() == 0 && approverIds.size() == 0 )
           throw new RuntimeException("There already exists approval requests for this operation");
 
         if ( approvedObjRemoveRequests.size() == 1 ) {
@@ -241,21 +242,22 @@ foam.CLASS({
 
           User lastModifiedBy = (User) ((DAO) x.get("bareUserDAO")).find(fulfilledRequest.getLastModifiedBy());
           if ( lastModifiedBy == null ) lastModifiedBy = new User.Builder(x).setId(fulfilledRequest.getLastModifiedBy()).build();
-          X approvalX = getX().put("user", lastModifiedBy);
-          
+          Subject subject = new Subject.Builder(x).setUser(lastModifiedBy).build();
+          X approvalX = getX().put("subject", subject);
+
           approvalRequestDAO.put_(approvalX, fulfilledRequest);
 
           if ( fulfilledRequest.getStatus() == ApprovalStatus.APPROVED ) {
             return super.put_(x,obj);
-          } 
+          }
 
           return null;  // as request has been REJECTED or CANCELLED
-        } 
+        }
 
         if ( approvedObjRemoveRequests.size() > 1 ) {
           logger.error("Something went wrong cannot have multiple approved/rejected requests for the same request!");
           throw new RuntimeException("Something went wrong cannot have multiple approved/rejected requests for the same request!");
-        } 
+        }
 
         ApprovalRequest approvalRequest = new ApprovalRequest.Builder(x)
           .setDaoKey(getDaoKey())
@@ -272,7 +274,7 @@ foam.CLASS({
       }
 
       if ( operation == Operations.CREATE ) {
-        if ( lifecycleObj.getLifecycleState() == LifecycleState.ACTIVE ) { 
+        if ( lifecycleObj.getLifecycleState() == LifecycleState.ACTIVE ) {
           return super.put_(x,obj);
         } else if ( lifecycleObj.getLifecycleState() == LifecycleState.PENDING ) {
 
@@ -293,8 +295,8 @@ foam.CLASS({
             .getDelegate())
             .getArray();
 
-          // if the new list of approvers include users who are not in the original list of approvers, we want to send them the ar 
-          // we dont need the proxysink for this operation sink if this is non-empty, we do not need to know if there's any 
+          // if the new list of approvers include users who are not in the original list of approvers, we want to send them the ar
+          // we dont need the proxysink for this operation sink if this is non-empty, we do not need to know if there's any
           // new approvers to whom an approvalrequest for this operation should be sent.
           List approvedObjCreateRequests = ((ArraySink) filteredApprovalRequestDAO
             .where(foam.mlang.MLang.OR(
@@ -303,7 +305,7 @@ foam.CLASS({
               foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.CANCELLED)
             )).select(new ArraySink())).getArray();
 
-          if ( pendingRequests.size() > 0 && approvedObjCreateRequests.size() == 0 ) 
+          if ( pendingRequests.size() > 0 && approvedObjCreateRequests.size() == 0 )
             throw new RuntimeException("There already exists approval requests for this operation");
 
           if ( approvedObjCreateRequests.size() == 1 ) {
@@ -312,24 +314,25 @@ foam.CLASS({
 
             User lastModifiedBy = (User) ((DAO) x.get("bareUserDAO")).find(fulfilledRequest.getLastModifiedBy());
             if ( lastModifiedBy == null ) lastModifiedBy = new User.Builder(x).setId(fulfilledRequest.getLastModifiedBy()).build();
-            X approvalX = getX().put("user", lastModifiedBy);
+            Subject subject = new Subject.Builder(x).setUser(lastModifiedBy).build();
+            X approvalX = getX().put("subject", subject);
 
             approvalRequestDAO.put_(approvalX, fulfilledRequest);
 
             if ( fulfilledRequest.getStatus() == ApprovalStatus.APPROVED ) {
               lifecycleObj.setLifecycleState(LifecycleState.ACTIVE);
               return super.put_(x,obj);
-            } 
+            }
 
             // TODO: will rework rejection
             // create request has been rejected or cancelled is only where we mark the object as REJECTED
             lifecycleObj.setLifecycleState(LifecycleState.REJECTED);
-            return super.put_(x,obj); 
-          } 
+            return super.put_(x,obj);
+          }
           if ( approvedObjCreateRequests.size() > 1 ) {
             logger.error("Something went wrong cannot have multiple approved/rejected requests for the same request!");
             throw new RuntimeException("Something went wrong cannot have multiple approved/rejected requests for the same request!");
-          } 
+          }
 
           ApprovalRequest approvalRequest = new ApprovalRequest.Builder(x)
             .setDaoKey(getDaoKey())
@@ -413,8 +416,8 @@ foam.CLASS({
           .getDelegate())
           .getArray();
 
-        // if the new list of approvers include users who are not in the original list of approvers, we want to send them the ar 
-        // we dont need the proxysink for this operation sink if this is non-empty, we do not need to know if there's any 
+        // if the new list of approvers include users who are not in the original list of approvers, we want to send them the ar
+        // we dont need the proxysink for this operation sink if this is non-empty, we do not need to know if there's any
         // new approvers to whom an approvalrequest for this operation should be sent.
         List approvedObjUpdateRequests = ((ArraySink) filteredApprovalRequestDAO
           .where(foam.mlang.MLang.OR(
@@ -423,7 +426,7 @@ foam.CLASS({
             foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.CANCELLED)
           )).select(new ArraySink())).getArray();
 
-        if ( pendingRequests.size() > 0 && approvedObjUpdateRequests.size() == 0 ) 
+        if ( pendingRequests.size() > 0 && approvedObjUpdateRequests.size() == 0 )
           throw new RuntimeException("There already exists approval requests for this operation");
 
         if ( approvedObjUpdateRequests.size() == 1 ) {
@@ -432,8 +435,9 @@ foam.CLASS({
 
           User lastModifiedBy = (User) ((DAO) x.get("bareUserDAO")).find(fulfilledRequest.getLastModifiedBy());
           if ( lastModifiedBy == null ) lastModifiedBy = new User.Builder(x).setId(fulfilledRequest.getLastModifiedBy()).build();
-          X approvalX = getX().put("user", lastModifiedBy);
-          
+          Subject subject = new Subject.Builder(x).setUser(lastModifiedBy).build();
+          X approvalX = getX().put("subject", subject);
+
           approvalRequestDAO.put_(approvalX, fulfilledRequest);
 
           if ( fulfilledRequest.getStatus() == ApprovalStatus.APPROVED ) {
