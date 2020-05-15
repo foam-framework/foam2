@@ -11,10 +11,9 @@ import foam.core.X;
 import foam.dao.DAO;
 import foam.dao.ProxyDAO;
 import foam.mlang.sink.Sum;
+import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
 import foam.nanos.ruler.Operations;
-import foam.nanos.approval.ApprovalStatus;
-import foam.nanos.approval.ApprovalRequest;
 
 import static foam.mlang.MLang.*;
 
@@ -41,17 +40,19 @@ public class ApprovalDAO
       || old == null && request.getStatus() != ApprovalStatus.REQUESTED
     ) {
       DAO requests = ApprovalRequestUtil.getAllRequests(x, request.getObjId(), request.getClassification());
-      // if points are sufficient to consider object approved
-      if ( getCurrentPoints(requests) >= request.getRequiredPoints() ||
-           getCurrentRejectedPoints(requests) >= request.getRequiredRejectedPoints() ) {
+      // if not a cancellation request and points are sufficient to consider object approved
+      if (
+        request.getStatus() == ApprovalStatus.CANCELLED ||
+        getCurrentPoints(requests) >= request.getRequiredPoints() ||
+        getCurrentRejectedPoints(requests) >= request.getRequiredRejectedPoints()
+      ) {
 
         //removes all the requests that were not approved to clean up approvalRequestDAO
         removeUnusedRequests(requests);
-
-        if ( 
+        if (
           request.getStatus() == ApprovalStatus.APPROVED ||
-          ( 
-            request.getStatus() == ApprovalStatus.REJECTED && ((ApprovalRequest) request).getOperation() == Operations.CREATE 
+          (
+            request.getStatus() == ApprovalStatus.REJECTED && ((ApprovalRequest) request).getOperation() == Operations.CREATE
           )
         ){
           //puts object to its original dao
@@ -62,6 +63,10 @@ public class ApprovalDAO
             getDelegate().put(request);
             throw new RuntimeException(e);
           }
+        } else {
+          // since no more needs to be done with the request from thiss point onwards
+          request.setIsFulfilled(true);
+          getDelegate().put(request);
         }
       }
     }
@@ -75,7 +80,8 @@ public class ApprovalDAO
     if ( request instanceof ApprovalRequest ) {
       DAO userDAO = (DAO) x.get("localUserDAO");
       User initiatingUser = (User) userDAO.find(((ApprovalRequest) request).getCreatedBy());
-      X initiatingUserX = x.put("user", initiatingUser);
+      Subject subject = new Subject.Builder(x).setUser(initiatingUser).build();
+      X initiatingUserX = x.put("subject", subject);
 
       if ( ((ApprovalRequest) request).getOperation() == Operations.REMOVE ) {
         dao.inX(initiatingUserX).remove(found);

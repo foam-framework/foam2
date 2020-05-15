@@ -109,6 +109,16 @@
     },
     {
       class: 'foam.comics.v2.CannedQuery',
+      label: 'Cancelled',
+      predicateFactory: function(e) {
+        return  e.EQ(
+          foam.nanos.approval.ApprovalRequest.STATUS,
+          foam.nanos.approval.ApprovalStatus.CANCELLED
+        );
+      }
+    },
+    {
+      class: 'foam.comics.v2.CannedQuery',
       label: 'All',
       predicateFactory: function(e) {
         return e.TRUE;
@@ -137,14 +147,28 @@
       section: 'requestDetails',
       documentation: `The user that is requested for approval. When set, "group" property is ignored.`,
       view: function(_, X) {
-        if ( X.data.status === foam.nanos.approval.ApprovalStatus.REQUESTED ) {
-          return {
-            class: 'foam.u2.view.ValueView',
-            data$: X.data$.map((data) => data.REQUESTED)
-          };
-        } else {
-          return { class: 'foam.u2.view.ReferencePropertyView' };
-        }
+        let slot = foam.core.SimpleSlot.create();
+        let data = X.data;
+        let approver = data.approver;
+
+        X.userDAO.find(approver).then(user => {
+          if ( data.status != foam.nanos.approval.ApprovalStatus.REQUESTED ) {
+            slot.set(user ? user.toSummary() : `User #${approver}`);	
+          } else if ( user ) {
+            if ( X.user.id == user.id ) {
+              slot.set(user.toSummary());
+            } else {
+              slot.set(user.group);
+            }
+          } else {
+            slot.set(data.REQUESTED);
+          }
+        });
+        
+        return {
+          class: 'foam.u2.view.ValueView',
+          data$: slot
+        };
       },
       tableCellFormatter: function(approver, data) {
         let self = this;
@@ -388,11 +412,12 @@
       factory: function(o, n) {
         var key = this.daoKey;
         var X = this.ctrl.__subContext__;
-        // FIXME: change to a better implementation
+
         if ( ! X[key] ) {
-          // if DAO doesn't exist in context, change daoKey from localMyDAO
-          // (server-side) to myDAO (accessible on front-end)
-          key = key.substring(5, 6).toLowerCase() + key.substring(6);
+          if ( key.startsWith('local') ) {
+            key = key.replace('local', '');
+            key = key.charAt(0).toLowerCase() + key.slice(1);
+          }
         }
         return key;
       }
@@ -421,7 +446,7 @@
     },
     {
       class: 'String',
-      name: 'approvableCreateKey',
+      name: 'approvableHashKey',
       hidden: true
     }
   ],
@@ -434,6 +459,10 @@
     {
       name: 'SUCCESS_REJECTED',
       message: 'You have successfully rejected this request.'
+    },
+    {
+      name: 'SUCCESS_CANCELLED',
+      message: 'You have successfully cancelled this request.'
     },
     {
       name: 'REQUESTED',
@@ -482,7 +511,8 @@
       isAvailable: (isTrackingRequest, status) => {
         if (
           status === foam.nanos.approval.ApprovalStatus.REJECTED ||
-          status === foam.nanos.approval.ApprovalStatus.APPROVED
+          status === foam.nanos.approval.ApprovalStatus.APPROVED ||
+          status === foam.nanos.approval.ApprovalStatus.CANCELLED
         ) {
           return false;
         }
@@ -517,7 +547,8 @@
       isAvailable: (isTrackingRequest, status) => {
         if (
           status === foam.nanos.approval.ApprovalStatus.REJECTED ||
-          status === foam.nanos.approval.ApprovalStatus.APPROVED
+          status === foam.nanos.approval.ApprovalStatus.APPROVED ||
+          status === foam.nanos.approval.ApprovalStatus.CANCELLED
         ) {
           return false;
         }
@@ -547,11 +578,49 @@
       }
     },
     {
+      name: 'cancel',
+      section: 'requestDetails',
+      isAvailable: (isTrackingRequest, status) => {
+        if (
+          status === foam.nanos.approval.ApprovalStatus.REJECTED ||
+          status === foam.nanos.approval.ApprovalStatus.APPROVED ||
+          status === foam.nanos.approval.ApprovalStatus.CANCELLED
+        ) {
+          return false;
+        }
+        return isTrackingRequest;
+      },
+      code: function(X) {
+        var cancelledApprovalRequest = this.clone();
+        cancelledApprovalRequest.status = this.ApprovalStatus.CANCELLED;
+
+        X.approvalRequestDAO.put(cancelledApprovalRequest).then(o => {
+          X.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
+          this.finished.pub();
+          X.ctrl.add(this.NotificationMessage.create({
+            message: this.SUCCESS_CANCELLED
+          }));
+
+          if ( X.currentMenu.id !== X.stack.top[2] ) {
+            X.stack.back();
+          }
+        }, e => {
+          this.throwError.pub(e);
+          X.ctrl.add(this.NotificationMessage.create({
+            message: e.message,
+            type: 'error'
+          }));
+        });
+      }
+    },
+    {
       name: 'viewReference',
       isDefault: true,
       isAvailable: function() {
         var self = this;
 
+        // TODO: To consider in new approval system rework: should we allow people to view reference for a deleted or rejected object
+        // since it will now just be stored in the approvable dao
         // Do not show the action if the request was reject or approved and removed
         if (self.status == foam.nanos.approval.ApprovalStatus.REJECTED ||
            (self.status == foam.nanos.approval.ApprovalStatus.APPROVED && self.operation == foam.nanos.ruler.Operations.REMOVE)) {

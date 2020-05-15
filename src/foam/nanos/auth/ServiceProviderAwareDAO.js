@@ -65,7 +65,7 @@ ServiceProviderAware`,
       if ( SafetyUtil.isEmpty(sp.getSpid()) ||
            ( ! SafetyUtil.isEmpty(sp.getSpid()) &&
              ! auth.check(x, "spid.create." + sp.getSpid()) ) ) {
-        User user = (User) x.get("user");
+        User user = ((Subject) x.get("subject")).getUser();
         if ( user != null &&
              ! SafetyUtil.isEmpty(user.getSpid()) ) {
           sp.setSpid(user.getSpid());

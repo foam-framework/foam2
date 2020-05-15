@@ -8,7 +8,10 @@ foam.CLASS({
   package: 'foam.input',
   name: 'Gamepad',
 
-  imports: [ 'timer' ],
+  // If timer is imported the Gamepad will use it to keep its state
+  // up to date. If not imported, the update() method must be called
+  // before reading Gamepad state.
+  imports: [ 'timer?' ],
 
   topics: [ 'pressed' ],
 

@@ -50,6 +50,10 @@ foam.CLASS({
               )
             );
 
+        if ( strategyPredicate != null  ) {
+          predicate = (Predicate) strategyPredicate;
+        }
+
         DAO strategyDAO = ((DAO) getStrategyDAO()).inX(x);
         List refs = ((ArraySink) strategyDAO
           .where(predicate)

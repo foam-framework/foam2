@@ -166,9 +166,11 @@ var classes = [
   'foam.dao.ORBitalDAO',
   'foam.mlang.order.Comparator',
   'foam.mlang.order.Desc',
+  'foam.mlang.order.ThenBy',
   'foam.mlang.sink.Count',
   'foam.mlang.sink.Max',
   'foam.mlang.sink.Min',
+  'foam.mlang.sink.Projection',
   'foam.mlang.sink.Sum',
   'foam.mlang.sink.Average',
   'foam.mlang.sink.Map',
@@ -206,6 +208,7 @@ var classes = [
   'foam.nanos.auth.Phone',
   'foam.nanos.auth.HumanNameTrait',
   'foam.nanos.auth.User',
+  'foam.nanos.auth.Subject',
   'foam.nanos.auth.PriorPassword',
   'foam.nanos.auth.ruler.AddPasswordHistoryAction',
   'foam.nanos.auth.test.PasswordPolicyTest',
@@ -328,6 +331,7 @@ var classes = [
   'foam.nanos.notification.push.FirebasePushService',
   'foam.nanos.notification.Notifiable',
   'foam.nanos.notification.Notification',
+  'foam.nanos.notification.NotificationExpansionDAO',
   'foam.nanos.notification.NotificationTemplateDAO',
   'foam.nanos.notification.notifications.ScriptRunNotification',
   'foam.nanos.notification.EmailSetting',
@@ -477,6 +481,7 @@ var classes = [
   'foam.nanos.ruler.predicate.PropertyIsInstance',
   'foam.nanos.ruler.predicate.PropertyIsClass',
   'foam.nanos.ruler.action.ChangePropertyAction',
+  'foam.nanos.ruler.action.AbstractCheckDAOforMatching',
   'foam.comics.SearchMode',
 
   // Support Files
@@ -517,6 +522,9 @@ var classes = [
 
   // Themes
   'foam.nanos.theme.Theme',
+  'foam.nanos.theme.ThemeDomain',
+  'foam.nanos.theme.ThemeDomainsDAO',
+  'foam.nanos.theme.Themes',
 
   //SQL JBDC Support
   'foam.dao.jdbc.JDBCConnectionSpec',

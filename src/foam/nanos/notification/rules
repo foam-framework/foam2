@@ -9,5 +9,6 @@ p({
   "after":false,
   "action":{"class":"foam.nanos.notification.NotificationHostnameRuleAction"},
   "enabled":true,
-  "saveHistory":false
+  "saveHistory":false,
+  "lifecycleState":1
 })

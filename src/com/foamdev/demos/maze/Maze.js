@@ -66,6 +66,17 @@ foam.CLASS({
       });
       body.add(engine);
 
+      var engine2 = this.Circle.create({
+        radius: 4,
+        color:  'orange',
+        border: null,
+        x:      10,
+        y:      25.5,
+        start:  0,
+        end:    Math.PI
+      });
+      body.add(engine2);
+
       var eye = this.Circle.create({
         radius: 7,
         color:  'white'
@@ -90,6 +101,7 @@ foam.CLASS({
         neck.height   = 15 + 6 * Math.cos(t/15);
         neck.y        = -13 - 6 * Math.cos(t/15);
         engine.alpha  = 0.9 - Math.sin(t/2) / 10;
+        engine2.alpha = 0.8 - Math.sin(t/3) / 5;
       });
     }
   ]
@@ -359,9 +371,10 @@ foam.CLASS({
     function open() {
       this.isClosed = false;
       this.Animation.create({
-        duration: 300,
-        f:        () => this.rotation = Math.PI /4,
-        objs:     [ this ]
+        duration: 1000,
+        f:        () => this.rotation = Math.PI / 4,
+        objs:     [ this ],
+        interp: foam.animation.Interp.oscillate(0.8, 0.3)
       }).start();
     },
 
@@ -414,12 +427,12 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'com.foamdev.demos.maze',
-  name: 'Laser',
+  name: 'Bullet',
   extends: 'foam.graphics.Circle',
 
   requires: [ 'foam.animation.Animation' ],
 
-  imports: [ 'game' ],
+  imports: [ 'addSprite' ],
 
   properties: [
     [ 'color', 'yellow' ],
@@ -432,14 +445,14 @@ foam.CLASS({
     function init() {
       this.SUPER();
 
-      this.game.addChild(this);
+      this.addSprite(this);
       this.Animation.create({
         duration: 4000,
         f: () => {
           this.x += 1500 * this.vx;
           this.y += 1500 * this.vy;
         },
-        onEnd: () => this.game.removeChild(this),
+        onEnd: () => this.detach,
         objs: [ this ]
       }).start();
     }
@@ -452,12 +465,12 @@ foam.CLASS({
   name: 'Game',
   extends: 'foam.u2.Element',
 
-  documentation: 'Javascript quiz maze game.',
+  documentation: 'Javascript quiz canvas game.',
 
   requires: [
     'com.foamdev.demos.maze.Door',
     'com.foamdev.demos.maze.Exit',
-    'com.foamdev.demos.maze.Laser',
+    'com.foamdev.demos.maze.Bullet',
     'com.foamdev.demos.maze.Question1',
     'com.foamdev.demos.maze.Question2',
     'com.foamdev.demos.maze.Question3',
@@ -480,6 +493,7 @@ foam.CLASS({
 
   exports: [
     'timer',
+    'addSprite',
     'as game'
   ],
 
@@ -529,7 +543,7 @@ foam.CLASS({
     },
     {
       // Canvas object used to draw graphics on.
-      name: 'maze',
+      name: 'canvas',
       factory: function() {
         return this.Box.create({
           color:  'black',
@@ -567,26 +581,20 @@ foam.CLASS({
       this.SUPER();
 
       this.buildMaze();
-      this.addChild(this.robot);
+      this.addSprite(this.robot);
       this.resetRobotLocation();
 
       // Setup collision detection
-      this.collider.collide = (o1, o2) => {
-        if ( o2 == this.robot ) {
-          o2 = o1;
-          o1 = this.robot;
-        }
-        if ( o1 == this.robot ) {
-          if ( this.Door.isInstance(o2) ) {
-            if ( o2.isClosed ) {
-              this.hittingWall = true;
-              o2.askQuestion();
-            }
-          } else if ( this.Wall.isInstance(o2) ) {
+      this.robot.collideWith = (o) => {
+        if ( this.Door.isInstance(o) ) {
+          if ( o.isClosed ) {
             this.hittingWall = true;
-          } else if ( this.Exit.isInstance(o2) ) {
-            this.gameOver();
+            o.askQuestion();
           }
+        } else if ( this.Wall.isInstance(o) ) {
+          this.hittingWall = true;
+        } else if ( this.Exit.isInstance(o) ) {
+          this.gameOver();
         }
       };
 
@@ -604,7 +612,7 @@ foam.CLASS({
     },
 
     function buildMaze() {
-      // Build the maze, including doors and the exit
+      // Build the canvas, including doors and the exit
 
       var doorNumber = 1;
       var m          = this.MAZE_HORIZ;
@@ -625,7 +633,7 @@ foam.CLASS({
               block.connectToQuestion(this['Question' + doorNumber].create());
               doorNumber = doorNumber+1;
             }
-            this.addChild(block);
+            this.addSprite(block);
           }
         }
       }
@@ -647,7 +655,7 @@ foam.CLASS({
               block.connectToQuestion(this['Question' + doorNumber].create());
               doorNumber = doorNumber+1;
             }
-            this.addChild(block);
+            this.addSprite(block);
           }
         }
       }
@@ -660,7 +668,7 @@ foam.CLASS({
       this.focus();
 
       // Create the HTML
-      this.style({display:'flex'}).add(this.maze, ' ', this.question$);
+      this.style({display: 'flex', outline: 'none'}).add(this.canvas, ' ', this.question$);
     },
 
     function gameOver() {
@@ -668,16 +676,16 @@ foam.CLASS({
 
       this.collider.stop();
 
-      this.maze.color = 'white';
+      this.canvas.color = 'white';
 
       var label = this.Label.create({
         text:  'You Win!',
         align: 'center',
         color: 'red',
-        x:     this.maze.width/2,
+        x:     this.canvas.width/2,
         y:     180
       });
-      this.addChild(label);
+      this.addSprite(label);
 
       this.Animation.create({
         duration: 2000,
@@ -685,8 +693,8 @@ foam.CLASS({
           label.scaleX      = label.scaleY = 10;
           label.rotation    = 2 * Math.PI;
           this.robot.scaleX = this.robot.scaleY = 5;
-          this.robot.x      = this.maze.width/2;
-          this.robot.y      = this.maze.height/2;
+          this.robot.x      = this.canvas.width/2;
+          this.robot.y      = this.canvas.height/2;
         },
         objs: [label, this.robot]
       }).start();
@@ -694,14 +702,13 @@ foam.CLASS({
       this.Speak.create({text: "You Win! You're so smart! You're a JavaScript master!"}).play();
     },
 
-    function addChild(c) {
-      this.maze.add(c);
+    function addSprite(c) {
+      this.canvas.add(c);
       if ( c.intersects ) this.collider.add(c);
-    },
-
-    function removeChild(c) {
-      this.maze.remove(c);
-      if ( c.intersects ) this.collider.remove(c);
+      c.onDetach(() => {
+        this.canvas.remove(c);
+        if ( c.intersects ) this.collider.remove(c);
+      });
     }
   ],
 
@@ -757,10 +764,10 @@ foam.CLASS({
       keyboardShortcuts: [ ' ', 'x' ],
       code: function() {
         // Fire four lasers, one in each direction
-        this.Laser.create({x: this.robot.x, y: this.robot.y, vx:  1, vy:  0});
-        this.Laser.create({x: this.robot.x, y: this.robot.y, vx:  0, vy:  1});
-        this.Laser.create({x: this.robot.x, y: this.robot.y, vx: -1, vy:  0});
-        this.Laser.create({x: this.robot.x, y: this.robot.y, vx:  0, vy: -1});
+        this.Bullet.create({x: this.robot.x, y: this.robot.y, vx:  1, vy:  0});
+        this.Bullet.create({x: this.robot.x, y: this.robot.y, vx:  0, vy:  1});
+        this.Bullet.create({x: this.robot.x, y: this.robot.y, vx: -1, vy:  0});
+        this.Bullet.create({x: this.robot.x, y: this.robot.y, vx:  0, vy: -1});
       }
     }
   ]

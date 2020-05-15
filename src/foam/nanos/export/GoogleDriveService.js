@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.nanos.export',
   name: 'GoogleDriveService',
@@ -31,6 +37,10 @@ foam.CLASS({
       name: 'deleteFile',
       args: [
         {
+          name: 'x',
+          type: 'Context',
+        },
+        {
           name: 'fileId',
           javaType: 'String'
         }
@@ -42,7 +52,7 @@ foam.CLASS({
       javaCode: `
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         GoogleApiAuthService googleApiAuthService = (GoogleApiAuthService)getX().get("googleApiAuthService");
-        Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY,  googleApiAuthService.getCredentials(HTTP_TRANSPORT, SCOPES))
+        Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY,  googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, SCOPES))
           .setApplicationName("nanopay")
           .build();
     

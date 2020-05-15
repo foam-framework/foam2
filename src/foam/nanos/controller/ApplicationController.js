@@ -38,6 +38,8 @@ foam.CLASS({
     'foam.nanos.auth.ResendVerificationEmail',
     'foam.nanos.auth.User',
     'foam.nanos.theme.Theme',
+    'foam.nanos.theme.Themes',
+    'foam.nanos.theme.ThemeDomain',
     'foam.nanos.u2.navigation.TopNavigation',
     'foam.nanos.u2.navigation.FooterView',
     'foam.u2.stack.Stack',
@@ -50,7 +52,7 @@ foam.CLASS({
   imports: [
     'installCSS',
     'sessionSuccess',
-    'window'
+    'window',
   ],
 
   exports: [
@@ -107,6 +109,7 @@ foam.CLASS({
       'grey4',
       'grey5',
       'black',
+      'white',
       'inputHeight',
       'inputVerticalPadding',
       'inputHorizontalPadding'
@@ -400,9 +403,12 @@ foam.CLASS({
       var self = this;
 
       // don't go to log in screen if going to reset password screen
-      if ( location.hash != null && location.hash === '#reset' ) {
+      if ( location.hash && location.hash === '#reset' ) {
         return new Promise(function(resolve, reject) {
-          self.stack.push({ class: 'foam.nanos.auth.ChangePasswordView' });
+          self.stack.push({
+            class: 'foam.nanos.auth.ChangePasswordView',
+            modelOf: 'foam.nanos.auth.ResetPassword'
+           });
           self.loginSuccess$.sub(resolve);
         });
       }
@@ -472,33 +478,8 @@ foam.CLASS({
        * customize the look and feel of the application.
        */
       var lastTheme = this.theme;
-
       try {
-        if ( this.user && this.user.personalTheme ) {
-          // If the user has a personal theme, use that.
-          this.theme = await this.user.personalTheme$find;
-        } else {
-          // If they don't, then we fetch the most appropriate theme based on
-          // a few different parameters.
-          var predicates = [];
-
-          if ( this.webApp ) {
-            predicates.push(this.EQ(this.Theme.APP_NAME, this.webApp));
-          }
-
-          if ( this.user && this.user.spid ) {
-            predicates.push(this.EQ(this.Theme.SPID, this.user.spid));
-          }
-
-          var dao = this.client.themeDAO;
-          var predicate = this.TRUE;
-
-          if ( predicates.length ) {
-            predicate = this.Or.create({ args: predicates });
-          }
-
-          this.theme = await dao.find(predicate);
-        }
+        this.theme = await this.Themes.create().findTheme(this);
       } catch (err) {
         this.notify(this.LOOK_AND_FEEL_NOT_FOUND, 'error');
         console.error(err);

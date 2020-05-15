@@ -733,12 +733,9 @@ p({
   "serve": true,
   "serviceScript": """
     dao = new foam.dao.EasyDAO.Builder(x)
-      .setPm(true)
-      .setGuid(true)
+      .setEnableInterfaceDecorators(false)
       .setOf(foam.nanos.ruler.Rule.getOwnClassInfo())
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName("rules")
-      .setRuler(false)
+      .setInnerDAO(x.get("localRuleDAO"))
       .build();
 
     dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.ruler.Rule.NAME });
@@ -752,6 +749,35 @@ p({
     }
   """
 })
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "localRuleDAO",
+  "serviceScript":
+  """
+    dao = new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setGuid(true)
+      .setOf(foam.nanos.ruler.Rule.getOwnClassInfo())
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("rules")
+      .setContextualize(true)
+      .setValidated(true)
+      .setRuler(false)
+      .setAuthorize(false)
+      .build();
+
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.ruler.Rule.NAME });
+
+    return dao;
+  """,
+  "client": """
+    {
+      "of": "foam.nanos.ruler.Rule"
+    }
+  """
+})
+
 p({
   "class": "foam.nanos.boot.NSpec",
   "name": "ruleGroupDAO",
@@ -791,28 +817,6 @@ p({
 //p({"class":"foam.nanos.boot.NSpec", "name":"ruleHistoryDAO",                     "serve":true,  "serviceScript":"dao = new foam.dao.EasyDAO.Builder(x).setPm(true).setSeqNo(true).setOf(foam.nanos.ruler.RuleHistory.getOwnClassInfo()).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"ruleHistory\").build(); ca = new foam.nanos.auth.CreatedAwareDAO.Builder(x).setDelegate(dao).build(); lma = new foam.nanos.auth.LastModifiedAwareDAO.Builder(x).setDelegate(ca).build(); return lma;", "client":"{\"of\":\"foam.nanos.ruler.RuleHistory\"}"})
 p({"class":"foam.nanos.boot.NSpec","name":"emailConfig",                       "lazy":false, "service":{"class":"foam.nanos.app.EmailConfig"}})
 p({"class":"foam.nanos.boot.NSpec", "name":"serializationTestEchoService", "boxClass": "foam.nanos.test.EchoServiceSkeleton",  "serve":true, "serviceClass":"foam.nanos.test.SerializationTestEchoService", "client":"{\"class\":\"foam.nanos.test.ClientEchoService\",\"delegate\":{\"class\":\"foam.box.SessionClientBox\",\"delegate\":{\"class\":\"foam.box.HTTPBox\",\"method\":\"POST\",\"url\":\"service/serializationTestEchoService\"}}}"})
-
-p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "themeDAO",
-  "description": "Stores Themes, which are used to style the application.",
-  "serve": true,
-  "authenticate": false,
-  "serviceScript": """
-    return new foam.dao.EasyDAO.Builder(x)
-      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("themeDAO"))
-      .setPm(true)
-      .setSeqNo(true)
-      .setOf(foam.nanos.theme.Theme.getOwnClassInfo())
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName("themes")
-      .setIndex(new foam.core.PropertyInfo[] {foam.nanos.auth.GroupPermissionJunction.TARGET_ID})
-      .build()
-      .orderBy(foam.mlang.MLang.DESC(foam.nanos.theme.Theme.PRIORITY));
-  """,
-  "client": "{\"of\":\"foam.nanos.theme.Theme\"}",
-  "authNotes": "Needs to be unauthenticated because we need to be able to theme apps before the user has logged in. However, we still need to restrict write access, which we do via an AuthorizationDAO."
-})
 
 p({
   "class":"foam.nanos.boot.NSpec",
@@ -1119,12 +1123,21 @@ p({
 
 p({
   "class":"foam.nanos.boot.NSpec",
-  "name":"googleApiCredentialsConfig",
+  "name":"googleApiCredentialsDAO",
   "lazy":false,
-  "service": {
-    "class":"foam.nanos.export.GoogleApiCredentials",
-    "port":64349,
-    "tokensFolderPath":"/tmp"
-  },
-  "documentation": "Service for setting authorization request parameters which are required in order to retrieve access token. To download credentials visit Google Developers Console"
+  "serve":true,
+  "serviceScript":
+  """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.export.GoogleApiCredentials.getOwnClassInfo())
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("googleCredentials")
+      .build();
+  """,
+  "client":
+  """
+    {
+      "of":"foam.nanos.export.GoogleApiCredentials"
+    }
+  """
 })

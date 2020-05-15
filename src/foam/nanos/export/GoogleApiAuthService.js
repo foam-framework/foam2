@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.nanos.export',
   name: 'GoogleApiAuthService',
@@ -11,6 +17,8 @@ foam.CLASS({
     'com.google.api.client.json.JsonFactory',
     'com.google.api.client.json.jackson2.JacksonFactory',
     'com.google.api.client.util.store.FileDataStoreFactory',
+    'foam.dao.DAO',
+    'foam.nanos.app.AppConfig',
     'java.io.FileInputStream',
     'java.io.IOException',
     'java.io.InputStreamReader',
@@ -30,6 +38,10 @@ foam.CLASS({
       javaType: 'com.google.api.client.auth.oauth2.Credential',
       args: [
         {
+          name: 'x',
+          type: 'Context',
+        },
+        {
           name: 'HTTP_TRANSPORT',
           javaType: 'com.google.api.client.http.javanet.NetHttpTransport'
         },
@@ -42,7 +54,9 @@ foam.CLASS({
         'java.io.IOException'
       ],
       javaCode: `
-        GoogleApiCredentials credentialsConfig = (GoogleApiCredentials)getX().get("googleApiCredentialsConfig");
+        GoogleApiCredentials credentialsConfig = (GoogleApiCredentials) ((DAO)getX().get("googleApiCredentialsDAO")).find(((AppConfig)x.get("appConfig")).getUrl());
+        if ( credentialsConfig == null )
+          return null;
         GoogleClientSecrets.Details details = new GoogleClientSecrets.Details()
                 .setClientId(credentialsConfig.getClientId())
                 .setClientSecret(credentialsConfig.getClientSecret())
