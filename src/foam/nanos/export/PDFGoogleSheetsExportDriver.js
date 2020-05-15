@@ -9,7 +9,6 @@ foam.CLASS({
   name: 'PDFGoogleSheetsExportDriver',
 
   implements: [ 
-    'foam.nanos.auth.EnabledAware',
     'foam.nanos.export.ExportDriver'
   ],
 
