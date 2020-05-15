@@ -128,8 +128,6 @@ foam.CLASS({
         this.capabilityCache.set(c, true);
       });
       this.stack.back();
-      alert('Your permissions has changed.');
-      location.reload();
     },
     function reject() {
       this.capabilityCancelled = true;
