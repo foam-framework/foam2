@@ -7,7 +7,7 @@ import foam.dao.NullDAO;
 import foam.dao.Sink;
 import foam.test.TestUtils;
 
-import foam.nanus.auth.Support;
+import foam.nanos.auth.Support;
 import foam.nanos.auth.User;
 import foam.nanos.auth.Country;
 import foam.nanos.boot.NSpec;
