@@ -9,6 +9,8 @@ foam.CLASS({
   name: 'DIG',
   extends: 'foam.nanos.http.DefaultHttpParameters',
 
+  implements: [ 'foam.mlang.Expressions' ],
+
   documentation: 'Data Integration Gateway - Perform DAO operations against a web service',
 
   requires: [
@@ -186,7 +188,7 @@ foam.CLASS({
     {
       name: 'exportConfigAddOns',
       factory: function() {
-        this.__context__.extraConfigAddOnDAO.where(this.ContainsIC.create({ arg1: this.AddOn.CONFIG_FOR_CLASS, arg2: this.cls_.id})).select().then((v) => {
+        this.__context__.extraConfigAddOnDAO.where(this.CONTAINS_IC( this.AddOn.CONFIG_FOR_CLASS, this.cls_.id )).select().then((v) => {
           this.exportConfigAddOns = v.array;
         });
         return [];

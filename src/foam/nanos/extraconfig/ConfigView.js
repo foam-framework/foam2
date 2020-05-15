@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'ConfigView',
   extends: 'foam.u2.View',
   requires: [
-    'foam.nanos.extraconfig.Config'
+    'foam.nanos.extraconfig.ExtraConfig'
   ],
   properties: [
     'exportConfigArray',
@@ -40,7 +40,7 @@ foam.CLASS({
                 .endContext()
             .end();
           });
-          var obj = self.Config.create({ exportMetadata: a });
+          var obj = self.ExtraConfig.create({ exportMetadata: a });
           obj.configValue$.sub(function() {
             if ( obj.configValue ) {
               if ( obj.configValue.toSummary )

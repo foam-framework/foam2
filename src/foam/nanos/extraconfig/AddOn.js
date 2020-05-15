@@ -57,11 +57,11 @@ foam.CLASS({
 });
 
 foam.RELATIONSHIP({
-  sourceModel: 'foam.nanos.extraconfig.DataTypeViewConfig',
-  targetModel: 'foam.nanos.extraconfig.AddOn',
-  forwardName: 'extraConfigAddOns',
-  inverseName: 'typeOfConfig',
+  sourceModel:  'foam.nanos.extraconfig.DataTypeViewConfig',
+  targetModel:  'foam.nanos.extraconfig.AddOn',
+  forwardName:  'extraConfigAddOns',
+  inverseName:  'typeOfConfig',
   sourceDAOKey: 'extraConfigDataTypeViewConfigDAO',
   targetDAOKey: 'extraConfigAddOnDAO',
-  cardinality: '1:*'
+  cardinality:  '1:*'
 });

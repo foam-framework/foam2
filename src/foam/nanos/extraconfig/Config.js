@@ -6,7 +6,9 @@
 
 foam.CLASS({
   package: 'foam.nanos.extraconfig',
-  name: 'Config',
+  name: 'ExtraConfigValue',
+  documentation: `Config class is used for storing value (configValueString) for a certain configuration (exportMetadata).
+    configValue is used for setting configValueString value from UI with toString method`,
   properties: [
     {
       name: 'configValueString',
@@ -23,11 +25,11 @@ foam.CLASS({
       factory: function() {     
           if ( this.exportMetadata.typeOfConfig === 'Boolean' )
             return false;
-          else if ( this.exportMetadata.typeOfConfig === 'Integer' || this.exportMetadata.typeOfConfig === 'Float' )
+          if ( this.exportMetadata.typeOfConfig === 'Integer' || this.exportMetadata.typeOfConfig === 'Float' )
             return 0;
-          else if ( this.exportMetadata.doesProvideOptions && this.exportMetadata.optionsChoice === 'Array' )
+          if ( this.exportMetadata.doesProvideOptions && this.exportMetadata.optionsChoice === 'Array' )
             return this.exportMetadata.options[0];
-          else if ( this.exportMetadata.doesProvideOptions && this.exportMetadata.optionsChoice === 'DAO' ) {
+          if ( this.exportMetadata.doesProvideOptions && this.exportMetadata.optionsChoice === 'DAO' ) {
             var dao = this.__context__[this.exportMetadata.daoSource];
             dao.select().then((o) => {
               return this.configValue = o.array[0].id;

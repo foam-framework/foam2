@@ -12,7 +12,7 @@ foam.CLASS({
     'com.google.api.services.sheets.v4.Sheets',
     'com.google.api.services.sheets.v4.SheetsScopes',
     'com.google.api.services.sheets.v4.model.*',
-    'foam.nanos.extraconfig.Config',
+    'foam.nanos.extraconfig.ExtraConfigValue',
     'foam.nanos.logger.Logger',
 
     'java.util.*'
@@ -64,12 +64,12 @@ foam.CLASS({
       ],
       javaCode: `
         try {
-          Map<String, Config> map = new HashMap<>();
+          Map<String, ExtraConfigValue> map = new HashMap<>();
 
           Object[] configObjArray = (Object[])config;
           if ( configObjArray != null ) {
             for ( int i = 0 ; i < configObjArray.length ; i++ ) {
-              map.put(((Config)configObjArray[i]).getExportMetadata().getId(), (Config)configObjArray[i]);
+              map.put(((ExtraConfigValue)configObjArray[i]).getExportMetadata().getId(), (ExtraConfigValue)configObjArray[i]);
             }
           }
 
