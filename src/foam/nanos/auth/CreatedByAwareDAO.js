@@ -29,10 +29,11 @@ foam.CLASS({
       javaCode: `
         // only set created by if object does not exist in DAO yet
         if ( obj instanceof CreatedByAware && getDelegate().find_(x, obj) == null ) {
-          User user = (User) x.get("user");
-          User agent = (User) x.get("agent");
+          Subject subject = (Subject) x.get("subject");
+          User user = subject.getUser();
+          User realUser = subject.getRealUser();
           ((CreatedByAware) obj).setCreatedBy(user.getId());
-          ((CreatedByAware) obj).setCreatedByAgent(agent != null ? agent.getId() : user.getId());
+          ((CreatedByAware) obj).setCreatedByAgent(realUser.getId());
         }
         return super.put_(x, obj);
       `

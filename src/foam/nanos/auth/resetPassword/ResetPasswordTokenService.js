@@ -24,11 +24,12 @@ foam.CLASS({
     'foam.dao.Sink',
     'foam.mlang.MLang',
     'foam.nanos.app.AppConfig',
-    'foam.nanos.auth.token.Token',
+    'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
+    'foam.nanos.auth.token.Token',
     'foam.nanos.notification.email.EmailMessage',
-    'foam.util.Emails.EmailsUtility',
     'foam.util.Email',
+    'foam.util.Emails.EmailsUtility',
     'foam.util.Password',
     'foam.util.SafetyUtil',
     'java.util.Calendar',
@@ -50,8 +51,9 @@ AppConfig appConfig = (AppConfig) x.get("appConfig");
 // context. Therefore we put the system user in the context here so that
 // decorators down the line won't throw NPEs when trying to access the user in
 // the context.
-User systemUser = (User) getX().get("user");
-x = x.put("user", systemUser);
+User systemUser = ((Subject) getX().get("subject")).getUser();
+Subject subject = new Subject.Builder(x).setUser(systemUser).build();
+x = x.put("subject", subject);
 
 DAO userDAO = (DAO) getLocalUserDAO();
 DAO tokenDAO = (DAO) getTokenDAO();
@@ -106,8 +108,9 @@ return true;`
 // decorators down the line won't throw NPEs when trying to access the user in
 // the context.
 AppConfig appConfig = (AppConfig) x.get("appConfig");
-User systemUser = (User) getX().get("user");
-x = x.put("user", systemUser);
+User systemUser = ((Subject) getX().get("subject")).getUser();
+Subject subject = new Subject.Builder(x).setUser(systemUser).build();
+x = x.put("subject", subject);
 
 
 String newPassword = user.getDesiredPassword();
