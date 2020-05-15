@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.nanos.extraconfig',
   name: 'AddOn',
+  documentation: 'This class is used to store information about configuration (what class configuration is used for / what label for configuration should be used / is there any options / number of options that can be used as an value)',
   properties: [
     {
       name: 'id',
