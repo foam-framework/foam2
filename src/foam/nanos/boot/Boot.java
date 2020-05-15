@@ -23,6 +23,8 @@ import foam.nanos.pm.PM;
 import foam.nanos.script.Script;
 import foam.nanos.session.Session;
 import foam.util.SafetyUtil;
+
+import java.lang.Exception;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import static foam.mlang.MLang.EQ;
@@ -97,14 +99,14 @@ public class Boot {
 
     root_ = root_.putFactory("user", new XFactory() {
       public Object create(X x) {
-        logger.warning("Deprecated use of x.get(\"user\")");
+        logger.warning(new Exception("Deprecated use of x.get(\"user\")"));
         return ((Subject) x.get("subject")).getUser();
       }
     });
 
     root_ = root_.putFactory("agent", new XFactory() {
       public Object create(X x) {
-        logger.warning("Deprecated use of x.get(\"agent\")");
+        logger.warning(new Exception("Deprecated use of x.get(\"agent\")"));
         return ((Subject) x.get("subject")).getRealUser();
       }
     });
