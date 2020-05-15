@@ -9,7 +9,9 @@ foam.CLASS({
   name: 'Notification',
 
   implements: [
-    'foam.nanos.auth.Authorizable'
+    'foam.nanos.auth.Authorizable',
+    'foam.nanos.auth.CreatedAware',
+    'foam.nanos.auth.CreatedByAware'
   ],
 
   documentation: 'Notification model responsible for system and integrated messaging notifications.',
@@ -50,6 +52,25 @@ foam.CLASS({
       label: 'Notification type',
       documentation: 'Type of notification.',
       value: 'General'
+    },
+    {
+      class: 'DateTime',
+      name: 'created',
+      documentation: 'Creation date.'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdBy',
+      documentation: 'User that created the Notification.'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdByAgent',
+      documentation: 'Agent user that created the Notification.',
+      readPermissionRequired: true,
+      writePermissionRequired: true
     },
     {
       class: 'Date',
@@ -108,16 +129,6 @@ foam.CLASS({
       documentation: 'Email template name.'
     },
     {
-      class: 'Boolean',
-      name: 'emailIsEnabled',
-      documentation: 'Determines an email is sent to user.'
-    },
-    {
-      class: 'Boolean',
-      name: 'sendSlackMessage',
-      documentation: 'Sends notification as a Slack message.'
-    },
-    {
       class: 'String',
       name: 'slackWebhook',
       documentation: 'Webhook associated to Slack.'
@@ -125,7 +136,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'slackMessage',
-      documentation: 'Message to be sent to Slack if sendSlackMessage is enabled.'
+      documentation: 'Message to be sent to Slack.'
     }
   ],
 

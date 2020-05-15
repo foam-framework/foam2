@@ -744,7 +744,6 @@ p({
     dao = new foam.dao.EasyDAO.Builder(x)
       .setEnableInterfaceDecorators(false)
       .setOf(foam.nanos.ruler.Rule.getOwnClassInfo())
-      .setRuler(false)
       .setCluster(false)
       .setInnerDAO(x.get("localRuleDAO"))
       .build();
