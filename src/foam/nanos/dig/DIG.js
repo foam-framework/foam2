@@ -187,7 +187,7 @@ foam.CLASS({
     {
       name: 'exportConfigAddOns',
       factory: function() {
-        this.__context__.extraConfigAddOnDAO.where(this.CONTAINS_IC( this.AddOn.CONFIG_FOR_CLASS, this.cls_.id )).select().then((v) => {
+        this.__context__.extraConfigAddOnDAO.where(this.CONTAINS_IC(this.AddOn.CONFIG_FOR_CLASS, this.cls_.id)).select().then((v) => {
           this.exportConfigAddOns = v.array;
         });
         return [];
