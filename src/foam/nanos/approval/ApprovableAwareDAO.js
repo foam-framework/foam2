@@ -24,6 +24,7 @@ foam.CLASS({
     'foam.mlang.predicate.Predicate',
     'foam.nanos.auth.LifecycleAware',
     'foam.nanos.auth.LifecycleState',
+    'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
     'foam.nanos.auth.UserQueryService',
     'foam.nanos.logger.Logger',
@@ -114,14 +115,14 @@ foam.CLASS({
         { name: 'user', javaType: 'foam.nanos.auth.User' }
       ],
       javaType: 'List<Long>',
-      javaCode: ` 
+      javaCode: `
         Logger logger = (Logger) x.get("logger");
         DAO requestingDAO = (DAO) x.get(getDaoKey());
 
         String modelName = requestingDAO.getOf().getObjClass().getSimpleName();
         UserQueryService userQueryService = (UserQueryService) x.get("userQueryService");
         List<Long> approverIds = userQueryService.getAllApprovers(x, modelName);
-          
+
         if ( approverIds == null || approverIds.size() <= 0 ) {
           logger.log("No Approvers exist for the model: " + modelName);
           throw new RuntimeException("No Approvers exist for the model: " + modelName);
@@ -143,7 +144,7 @@ foam.CLASS({
         return super.put_(x, obj);
       }
 
-      User user = (User) x.get("user");
+      User user = ((Subject) x.get("subject")).getUser();
       Logger logger = (Logger) x.get("logger");
 
       ApprovableAware approvableAwareObj = (ApprovableAware) obj;
@@ -166,7 +167,7 @@ foam.CLASS({
       if ( user != null && ( user.getId() == User.SYSTEM_USER_ID || user.getGroup().equals("admin") || user.getGroup().equals("system") ) ) {
         if ( currentObjectInDAO == null && lifecycleObj.getLifecycleState() == LifecycleState.PENDING && user.getId() != User.SYSTEM_USER_ID ){
           lifecycleObj.setLifecycleState(LifecycleState.ACTIVE);
-        } 
+        }
         else if ( lifecycleObj.getLifecycleState() == LifecycleState.PENDING && user.getId() == User.SYSTEM_USER_ID ) {
           // Adding log message in case this change breaks something unexpected
           Object primaryKey = obj instanceof foam.core.Identifiable ? ((foam.core.Identifiable)obj).getPrimaryKey() : null;
@@ -174,9 +175,9 @@ foam.CLASS({
         }
         return super.put_(x,obj);
       }
-      
-      Operations operation = lifecycleObj.getLifecycleState() == LifecycleState.DELETED ? Operations.REMOVE : 
-        ( ( currentObjectInDAO == null || ((LifecycleAware) currentObjectInDAO).getLifecycleState() == LifecycleState.PENDING ) ? 
+
+      Operations operation = lifecycleObj.getLifecycleState() == LifecycleState.DELETED ? Operations.REMOVE :
+        ( ( currentObjectInDAO == null || ((LifecycleAware) currentObjectInDAO).getLifecycleState() == LifecycleState.PENDING ) ?
             Operations.CREATE :
             Operations.UPDATE
         );
@@ -189,7 +190,7 @@ foam.CLASS({
         public void put(Object o, Detachable sub) {
           Long approver = ((ApprovalRequest) o).getApprover();
           approverIds.remove(approver);
-          getDelegate().put(o, sub);  
+          getDelegate().put(o, sub);
         }
       };
       
@@ -276,7 +277,8 @@ foam.CLASS({
 
         User lastModifiedBy = (User) ((DAO) x.get("bareUserDAO")).find(fulfilledRequest.getLastModifiedBy());
         if ( lastModifiedBy == null ) lastModifiedBy = new User.Builder(x).setId(fulfilledRequest.getLastModifiedBy()).build();
-        X approvalX = getX().put("user", lastModifiedBy);
+        Subject subject = new Subject.Builder(x).setUser(lastModifiedBy).build();
+        X approvalX = getX().put("subject", subject);
           
         approvalRequestDAO.inX(approvalX).put(fulfilledRequest);
 

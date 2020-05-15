@@ -13,6 +13,7 @@ import foam.dao.DAO;
 import foam.dao.java.JDAO;
 import foam.dao.ProxyDAO;
 import foam.nanos.auth.Group;
+import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
 import foam.nanos.logger.ProxyLogger;
@@ -22,6 +23,8 @@ import foam.nanos.pm.PM;
 import foam.nanos.script.Script;
 import foam.nanos.session.Session;
 import foam.util.SafetyUtil;
+
+import java.lang.Exception;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import static foam.mlang.MLang.EQ;
@@ -94,6 +97,21 @@ public class Boot {
       }
     });
 
+    root_ = root_.putFactory("user", new XFactory() {
+      public Object create(X x) {
+        logger.warning(new Exception("Deprecated use of x.get(\"user\")"));
+        return ((Subject) x.get("subject")).getUser();
+      }
+    });
+
+    root_ = root_.putFactory("agent", new XFactory() {
+      public Object create(X x) {
+        logger.warning(new Exception("Deprecated use of x.get(\"agent\")"));
+        return ((Subject) x.get("subject")).getRealUser();
+      }
+    });
+
+
     // Revert root_ to non ProxyX to avoid letting children add new bindings.
     root_ = ((ProxyX) root_).getX();
 
@@ -149,7 +167,9 @@ public class Boot {
     session.setUserId(user.getId());
     session.setContext(root_);
 
-    root_.put("user", user);
+    Subject subject = new Subject();
+    subject.setUser(user);
+    root_.put("subject", subject);
     root_.put(Session.class, session);
 
     Group group = new Group();

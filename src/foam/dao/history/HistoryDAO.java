@@ -11,12 +11,14 @@ import foam.core.PropertyInfo;
 import foam.core.X;
 import foam.dao.DAO;
 import foam.dao.ProxyDAO;
-import foam.dao.SequenceNumberDAO;
+import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
+
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
+
 import static foam.mlang.MLang.EQ;
 
 public class HistoryDAO
@@ -70,8 +72,9 @@ public class HistoryDAO
 
   @Override
   public FObject put_(X x, FObject obj) {
-    User user = (User) x.get("user");
-    User agent = (User) x.get("agent");
+    Subject subject = (Subject) x.get("subject");
+    User user = subject.getUser();
+    User agent = subject.getRealUser();
     FObject current = this.find_(x, obj);
 
     try {

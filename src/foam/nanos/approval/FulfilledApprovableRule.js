@@ -68,7 +68,8 @@
 
             User createdBy = (User) ((DAO) x.get("bareUserDAO")).find(approvable.getCreatedBy());
 
-            X createdX = x.put("user", createdBy);
+            Subject subject = new Subject.Builder(x).setUser(createdBy).build();
+            X createdX = x.put("subject", subject);
 
             dao.inX(createdX).put(objectToPut);
           }
