@@ -95,17 +95,19 @@ public class Boot {
       }
     });
 
-//    root_ = root_.putFactory("user", new XFactory() {
-//      public Object create(X x) {
-//        return ((Subject) x.get("subject")).getUser();
-//      }
-//    });
+    root_ = root_.putFactory("user", new XFactory() {
+      public Object create(X x) {
+        logger.warning("Deprecated use of x.get(\"user\")");
+        return ((Subject) x.get("subject")).getUser();
+      }
+    });
 
-//    root_ = root_.putFactory("agent", new XFactory() {
-//      public Object create(X x) {
-//        return ((Subject) x.get("subject")).getRealUser();
-//      }
-//    });
+    root_ = root_.putFactory("agent", new XFactory() {
+      public Object create(X x) {
+        logger.warning("Deprecated use of x.get(\"agent\")");
+        return ((Subject) x.get("subject")).getRealUser();
+      }
+    });
 
 
     // Revert root_ to non ProxyX to avoid letting children add new bindings.
