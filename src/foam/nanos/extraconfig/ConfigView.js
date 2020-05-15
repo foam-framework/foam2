@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'ConfigView',
   extends: 'foam.u2.View',
   requires: [
-    'foam.nanos.extraconfig.ExtraConfig'
+    'foam.nanos.extraconfig.ExtraConfigValue'
   ],
   properties: [
     'exportConfigArray',
@@ -21,6 +21,8 @@ foam.CLASS({
       this.SUPER();
       this.add(this.slot(function(exportConfigAddOns) {
         return self.E().forEach(exportConfigAddOns, function(a) {
+          var obj = self.ExtraConfigValue.create({ exportMetadata: a });
+
           a.typeOfConfig$find.then((v) => {
             var view = { class: v.viewClass };
             if ( a.doesProvideOptions && a.optionsChoice === 'Array' ) {
@@ -40,7 +42,6 @@ foam.CLASS({
                 .endContext()
             .end();
           });
-          var obj = self.ExtraConfig.create({ exportMetadata: a });
           obj.configValue$.sub(function() {
             if ( obj.configValue ) {
               if ( obj.configValue.toSummary )

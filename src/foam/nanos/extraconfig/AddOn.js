@@ -28,7 +28,10 @@ foam.CLASS({
     },
     {
       name: 'doesProvideOptions',
-      class: 'Boolean'
+      class: 'Boolean',
+      expression: function(typeOfConfig) {
+        return typeOfConfig === 'DAO';
+      }
     },
     {
       name: 'optionsChoice',
