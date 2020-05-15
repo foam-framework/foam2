@@ -254,7 +254,8 @@ foam.CLASS({
 
       if ( this.filteredTableColumns$ ) {
         this.onDetach(this.filteredTableColumns$.follow(
-          this.columns_$.map((cols) => cols.filter(([axiomOrColumnName, overrides]) => view.allColumns.includes(foam.String.isInstance(axiomOrColumnName) ? axiomOrColumnName : axiomOrColumnName.name )).map(([axiomOrColumnName, overrides]) => {
+          //to not export "custom" table columns
+          this.columns_$.map((cols) => cols.filter(([axiomOrColumnName, overrides]) => view.allColumns.includes(foam.String.isInstance(axiomOrColumnName) ? ( axiomOrColumnName.indexOf('.') > 0 ? axiomOrColumnName.split('.')[0] : axiomOrColumnName ) : axiomOrColumnName.name )).map(([axiomOrColumnName, overrides]) => {
             return foam.String.isInstance(axiomOrColumnName) ? axiomOrColumnName : axiomOrColumnName.name;
           }))));
       }
