@@ -26,6 +26,7 @@
     'foam.nanos.auth.LifecycleState',
     'foam.nanos.auth.LifecycleAware',
     'foam.nanos.ruler.Operations',
+    'foam.nanos.auth.Subject',
     'java.util.Map'
   ],
 
