@@ -25,18 +25,20 @@ Use: see ServiceProviderAwareTest
   // and add to generation where 'findFoo' is available to avoid reflection.,
 
   javaImports: [
+    'foam.core.FObject',
     'foam.core.PropertyInfo',
     'foam.core.X',
-    'foam.core.FObject',
     'foam.nanos.auth.AuthService',
-    'foam.nanos.auth.Authorizer',
     'foam.nanos.auth.AuthorizationException',
+    'foam.nanos.auth.Authorizer',
+    'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
     'foam.nanos.logger.Logger',
+
     'java.lang.reflect.Method',
     'java.util.HashMap',
     'java.util.Map',
-    'java.util.Map.Entry',
+    'java.util.Map.Entry'
   ],
 
   properties: [
@@ -75,7 +77,7 @@ returning true if the context users spid matches the current object.`,
       ],
       type: 'Boolean',
       javaCode: `
-      User user = (User) x.get("user");
+      User user = ((Subject) x.get("subject")).getUser();
       if ( user == null ) {
         // TODO/REVIEW: occurs during login. See AuthenticationApiTest
         return true;

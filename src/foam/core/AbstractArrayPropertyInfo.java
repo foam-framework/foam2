@@ -120,4 +120,8 @@ public abstract class AbstractArrayPropertyInfo
     this.set(diff, this.get(o2));
     return true;
   }
+  
+  public String getSQLType() {
+    return "TEXT";
+  }
 }
