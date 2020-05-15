@@ -7,7 +7,7 @@ import foam.dao.NullDAO;
 import foam.dao.Sink;
 import foam.test.TestUtils;
 
-import foam.nanos.auth.Support;
+import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
 import foam.nanos.auth.Country;
 import foam.nanos.boot.NSpec;
@@ -26,8 +26,8 @@ public class ClusterDAOTest
   public void runTest(X x) {
     x_ = x;
     Logger logger = (Logger) x.get("logger");
-    Support support = (Support) x.get("support");
-    User user = support.getUser();
+    Subject subject = (Subject) x.get("subject");
+    User user = subject.getUser();
     DAO sessionDAO = (DAO) x.get("sessionDAO");
     Session session = new Session.Builder(x)
       .setId("primary")
