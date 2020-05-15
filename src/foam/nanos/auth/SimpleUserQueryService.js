@@ -16,23 +16,25 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.core.Detachable',
+    'foam.core.FObject',
     'foam.core.X',
+    'foam.dao.ArraySink',
+    'foam.dao.DAO',
+    'foam.dao.Sink',
+    'foam.mlang.MLang',
+    'foam.nanos.auth.Subject',
+    'foam.nanos.auth.User',
+    'foam.nanos.crunch.UserCapabilityJunction',
+    'foam.nanos.logger.Logger',
+
     'java.util.ArrayList',
-    'java.util.concurrent.ConcurrentHashMap',
+    'java.util.HashMap',
+    'java.util.HashSet',
     'java.util.List',
     'java.util.Map',
-    'foam.core.Detachable',
-    'java.util.HashMap',
     'java.util.Set',
-    'java.util.HashSet',
-    'foam.core.FObject',
-    'foam.dao.Sink',
-    'foam.dao.ArraySink',
-    'foam.nanos.logger.Logger',
-    'foam.dao.DAO',
-    'foam.mlang.MLang',
-    'foam.nanos.auth.User',
-    'foam.nanos.crunch.UserCapabilityJunction'
+    'java.util.concurrent.ConcurrentHashMap'
   ],
 
   methods: [
@@ -50,19 +52,19 @@ foam.CLASS({
           type: 'String'
         }
       ],
-      javaCode: `  
+      javaCode: `
       DAO groupDAO = (DAO) x.get("groupDAO");
-          
+
       Logger logger = (Logger) x.get("logger");
 
-      User user = (User) x.get("user");
+      User user = ((Subject) x.get("subject")).getUser();
 
       String groupName = user.getGroup();
 
       Group currentGroup = (Group) groupDAO.find(groupName);
 
       List usersInGroup = ((ArraySink) currentGroup.getUsers(x).select(new ArraySink())).getArray();
-      
+
       return usersInGroup;
       `
     }

@@ -9,7 +9,7 @@ import foam.lib.formatter.JSONFObjectFormatter;
 Outputter            o = new Outputter(null);
 JSONFObjectFormatter f = new JSONFObjectFormatter(null);
 // User                 u = new User();
-u = x.get("user");
+u = x.get("subject").getUser();
 
 print(o.stringify(u));
 print(f.stringify(u));`,

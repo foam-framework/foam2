@@ -14,8 +14,9 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.nanos.auth.User',
     'foam.nanos.NanoService',
+    'foam.nanos.auth.Subject',
+    'foam.nanos.auth.User',
     'foam.nanos.session.Session'
   ],
 
@@ -32,7 +33,7 @@ foam.CLASS({
       name: 'check',
       javaCode: `
         Session session = x.get(Session.class);
-        User user = (User) x.get("user");
+        User user = ((Subject) x.get("subject")).getUser();
 
         return user != null &&
           user.getTwoFactorEnabled() &&

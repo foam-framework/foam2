@@ -32,23 +32,25 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.core.X',
     'foam.dao.DAO',
     'foam.nanos.auth.LifecycleState',
+    'foam.nanos.auth.Subject',
+    'foam.nanos.auth.User',
     'foam.nanos.logger.Logger',
     'foam.nanos.session.Session',
     'foam.util.Email',
     'foam.util.Password',
     'foam.util.SafetyUtil',
-    'foam.nanos.auth.User',
 
     'java.security.Permission',
     'java.util.Calendar',
     'javax.security.auth.AuthPermission',
 
     'static foam.mlang.MLang.AND',
-    'static foam.mlang.MLang.OR',
+    'static foam.mlang.MLang.CLASS_OF',
     'static foam.mlang.MLang.EQ',
-    'static foam.mlang.MLang.CLASS_OF'
+    'static foam.mlang.MLang.OR'
   ],
 
   constants: [
@@ -339,7 +341,8 @@ foam.CLASS({
         // TODO: modify line to allow actual setting of password expiry in cases where users are required to periodically update their passwords
         user.setPasswordExpiry(null);
         user = (User) ((DAO) getLocalUserDAO()).put(user);
-        session.setContext(session.getContext().put("user", user).put("group", group));
+        Subject subject = new Subject.Builder(x).setUser(user).build();
+        session.setContext(session.getContext().put("subject", subject).put("group", group));
         return user;
       `
     },
@@ -397,13 +400,14 @@ foam.CLASS({
 
         if ( group != null ) return group;
 
-        User user = (User) x.get("user");
-        User agent = (User) x.get("agent");
+        Subject subject = (Subject) x.get("subject");
+        User user = subject.getUser();
+        User agent = subject.getRealUser();
 
         // Second highest precedence: If one user is acting as another, return the
         // group on the junction between them.
         if ( user != null ) {
-          if ( agent != null ) {
+          if ( agent != null && agent != user ) {
             DAO agentJunctionDAO = (DAO) x.get("agentJunctionDAO");
             UserUserJunction junction = (UserUserJunction) agentJunctionDAO.find(
               AND(
@@ -431,3 +435,4 @@ foam.CLASS({
     }
   ]
 });
+
