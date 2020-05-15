@@ -401,6 +401,7 @@ foam.CLASS({
             formatter: self.formatter,
             query: self.query,
             onClickAddOn: self.onClickAddOn,
+            selection$: self.selection$,
             level: 1
           }, this);
         });
