@@ -13,6 +13,7 @@ import foam.dao.ProxyDAO;
 import foam.mlang.sink.Sum;
 import foam.nanos.auth.User;
 import foam.nanos.ruler.Operations;
+import foam.util.SafetyUtil;
 
 import static foam.mlang.MLang.*;
 
@@ -73,7 +74,7 @@ public class ApprovalDAO
   }
 
   private void rePutObject(X x, ApprovalRequest request) {
-    String daoKey = request.getServerDaoKey() != null && ! request.getServerDaoKey().isEmpty() ? request.getServerDaoKey() : request.getDaoKey();
+    String daoKey = request.getServerDaoKey() != null && ! SafetyUtil.isEmpty(request.getServerDaoKey()) ? request.getServerDaoKey() : request.getDaoKey();
     DAO dao = (DAO) x.get(daoKey);
     FObject found = dao.inX(x).find(request.getObjId()).fclone();
 
