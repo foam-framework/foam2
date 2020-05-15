@@ -165,7 +165,7 @@
 
        // Restore the search view using an existing predicate for that view
        // This requires that every search view implements restoreFromPredicate
-       var existingPredicate = this.hasExistingPredicate()
+       var existingPredicate = this.filterController.getExistingPredicate(this.criteria, this.property);
        if ( existingPredicate ) {
          this.view_.restoreFromPredicate(existingPredicate);
        }
@@ -183,7 +183,7 @@
      function isFiltering() {
        // Since the existing predicates are lazy loaded (on opening the view),
        // check to see if there is an existing predicate to use the correct label
-       if ( this.hasExistingPredicate() && this.firstTime_ ) {
+       if ( this.filterController.getExistingPredicate(this.criteria, this.property) && this.firstTime_ ) {
          this.labelFiltering = this.LABEL_PROPERTY_FILTER;
          return;
        }
@@ -192,28 +192,6 @@
        this.labelFiltering = this.view_.predicate !== this.TRUE ?
          this.LABEL_PROPERTY_FILTER :
          this.LABEL_PROPERTY_ALL;
-     },
-
-     function hasExistingPredicate() {
-       // Check if there is an existing predicate to rebuild from
-       var previewCriteria = this.filterController.previewCriterias[this.criteria];
-       var criteria = this.filterController.criterias[this.criteria];
-       if ( ! previewCriteria && ! criteria ) return false;
-
-       // Existing view can come from criterias or previewCriterias
-       var view;
-       // Preview predicate takes precendence
-       if ( previewCriteria ) {
-         view = previewCriteria.views[this.property.name]
-         if ( view && view.predicate !== this.TRUE ) return view.predicate;
-       }
-       // Preview criteria predicate does not exist, check main criteria predicate
-       if ( criteria ) {
-         view = criteria.views[this.property.name]
-         if ( view && view.predicate !== this.TRUE ) return view.predicate;
-       }
-
-       return false;
      }
    ]
  });

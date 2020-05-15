@@ -280,54 +280,53 @@ foam.CLASS({
               .start({ class: 'foam.u2.tag.Image', data$: self.iconPath$}).end()
             .end()
           .end()
-          // .add(this.filterController.slot(function(criterias) {
-          //   self.E()
-          // }))
-          .start().addClass(self.myClass('container-drawer'))
-            .enableClass(self.myClass('container-drawer-open'), self.isOpen$)
-              .forEach(filters, function(f) {
-                var axiom = self.dao.of.getAxiomByName(f);
-                if ( axiom ){
-                  this.start(self.PropertyFilterView, {
-                    criteria: 0,
-                    searchView: axiom.searchView,
-                    property: axiom,
-                    dao: self.dao
-                  })
-                  .hide(self.filterController$.dot('isAdvanced'))
-                  .end();
-                }
-              })
-              .start().addClass(self.myClass('container-message'))
-                .show(self.filterController$.dot('isAdvanced'))
-                .start('p')
-                  .addClass(self.myClass('message-advanced'))
-                  .add(self.MESSAGE_ADVANCEDMODE)
+          .add(this.filterController.slot(function (criterias) {
+            return self.E().start().addClass(self.myClass('container-drawer'))
+              .enableClass(self.myClass('container-drawer-open'), self.isOpen$)
+                .forEach(filters, function(f) {
+                  var axiom = self.dao.of.getAxiomByName(f);
+                  if ( axiom ){
+                    this.start(self.PropertyFilterView, {
+                      criteria: 0,
+                      searchView: axiom.searchView,
+                      property: axiom,
+                      dao: self.dao
+                    })
+                    .hide(self.filterController$.dot('isAdvanced'))
+                    .end();
+                  }
+                })
+                .start().addClass(self.myClass('container-message'))
+                  .show(self.filterController$.dot('isAdvanced'))
+                  .start('p')
+                    .addClass(self.myClass('message-advanced'))
+                    .add(self.MESSAGE_ADVANCEDMODE)
+                  .end()
+                  .start('p')
+                    .addClass(self.myClass('message-view'))
+                    .on('click', self.openAdvanced)
+                    .add(self.MESSAGE_VIEWADVANCED)
+                  .end()
                 .end()
-                .start('p')
-                  .addClass(self.myClass('message-view'))
-                  .on('click', self.openAdvanced)
-                  .add(self.MESSAGE_VIEWADVANCED)
-                .end()
+            .end()
+            .start().addClass(self.myClass('container-footer'))
+              .start('p')
+                .addClass(self.myClass('label-results'))
+                .add(self.resultLabel$)
               .end()
-          .end()
-          .start().addClass(self.myClass('container-footer'))
-            .start('p')
-              .addClass(self.myClass('label-results'))
-              .add(self.resultLabel$)
-            .end()
-            .start('p')
-              .hide(self.filterController$.dot('isAdvanced'))
-              .addClass(self.myClass('link-mode'))
-              .on('click', self.clearAll)
-              .add(self.LABEL_CLEAR)
-            .end()
-            .start('p')
-              .addClass(self.myClass('link-mode'))
-              .on('click', self.toggleMode)
-              .add(self.modeLabel$)
-            .end()
-          .end();
+              .start('p')
+                .hide(self.filterController$.dot('isAdvanced'))
+                .addClass(self.myClass('link-mode'))
+                .on('click', self.clearAll)
+                .add(self.LABEL_CLEAR)
+              .end()
+              .start('p')
+                .addClass(self.myClass('link-mode'))
+                .on('click', self.toggleMode)
+                .add(self.modeLabel$)
+              .end()
+            .end();
+          }))
 
           return e;
         }, this.filters$));
@@ -384,14 +383,13 @@ foam.CLASS({
           this.filterController.switchToSimple();
           return;
         }
-
+        this.filterController.switchToPreview();
         this.openAdvanced();
       }
     },
     {
       name: 'openAdvanced',
       code: function() {
-        this.filterController.switchToPreview();
         this.add(this.Popup.create().tag({
           class: 'foam.u2.filter.advanced.AdvancedFilterView',
           dao$: this.dao$
@@ -404,9 +402,10 @@ foam.CLASS({
         // (Kenny) TODO: Seems kinda hacky. But I do not want to modify the TextSearchView just yet
         if ( ! this.filterController.isAdvanced ) {
           this.filterController.add(this.generalSearchField, 'generalSearchField', 0);
-          this.generalSearchField.visibility = foam.u2.Visibility.RW;
+          this.generalSearchField.mode = foam.u2.DisplayMode.RW;
         } else {
-          this.generalSearchField.visibility = foam.u2.Visibility.DISABLED;
+          this.generalSearchField.data = '';
+          this.generalSearchField.mode = foam.u2.DisplayMode.DISABLED;
         }
       }
     }

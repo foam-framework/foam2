@@ -87,7 +87,7 @@ foam.CLASS({
       // All search views (in the SearchManager) need a name.
       // This defaults to 'query'.
       name: 'name',
-      value: 'query'
+      value: 'textSearchView'
     },
     {
       class: 'Boolean',
@@ -102,7 +102,8 @@ foam.CLASS({
         .tag(this.viewSpec, {
           alwaysFloatLabel: true,
           label$: this.label$,
-          onKey: this.onKey
+          onKey: this.onKey,
+          mode$: this.mode$
         }, this.view$);
 
       this.view.data$.sub(this.updateValue);

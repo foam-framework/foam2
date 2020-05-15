@@ -9,8 +9,13 @@ foam.CLASS({
   name: 'CriteriaView',
   extends: 'foam.u2.View',
 
+  implements: [
+    'foam.mlang.Expressions'
+  ],
+
   requires: [
-    'foam.u2.filter.property.PropertyFilterView'
+    'foam.u2.filter.property.PropertyFilterView',
+    'foam.u2.search.TextSearchView'
   ],
 
   imports: [
@@ -25,12 +30,44 @@ foam.CLASS({
       flex-wrap: wrap;
     }
 
+    ^general-field {
+      margin: 0 8px;
+      margin-top: 8px;
+      flex: 1 1 100%;
+    }
+
+    ^general-field .foam-u2-tag-Input {
+      width: 100%;
+      height: 34px;
+      border-radius: 5px;
+      border: solid 1px #cbcfd4;
+    }
+
     ^ .foam-u2-filter-property-PropertyFilterView {
       flex: 1 1 250px;
     }
   `,
 
   properties: [
+    {
+      name: 'searchView',
+      postSet: function(_, n) {
+        // Restore if an existing one has been made
+        var existingPredicate = this.filterController.getExistingPredicate(this.criteria, n.name);
+        console.log(`searchView create = criteria: ${this.criteria} || existingPredicate: ${existingPredicate}`);
+        if ( existingPredicate && existingPredicate !== this.TRUE ) {
+          // searchView's view may not have been instantiated by this point.
+          // Sub to it to restore previous search
+          n.view$.sub(() => {
+            console.log('hello');
+            n.view.data = existingPredicate.args[1].arg1.value;
+            n.predicate = existingPredicate;
+            // n.updateValue();
+          });
+        }
+        this.filterController.add(n, n.name, this.criteria);
+      }
+    },
     {
       class: 'Array',
       name: 'modelProps',
@@ -56,11 +93,21 @@ foam.CLASS({
     function initE() {
       var self = this;
       this.addClass(this.myClass())
+        .start(this.TextSearchView, {
+          richSearch: true,
+          of: this.filterController.dao.of.id,
+          onKey: true,
+          viewSpec: {
+            class: 'foam.u2.tag.Input',
+            placeholder: 'Search'
+          }
+        }, this.searchView$).addClass(self.myClass('general-field'))
+        .end()
         .forEach(this.modelProps, function(property) {
           var axiom = self.filterController.dao.of.getAxiomByName(property);
           if ( axiom ) {
             this.start(self.PropertyFilterView, {
-              criteria: this.criteria,
+              criteria: self.criteria,
               searchView: axiom.searchView,
               property: axiom,
               dao: self.filterController.dao

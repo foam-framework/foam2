@@ -105,6 +105,7 @@ foam.CLASS({
       } else {
         newKey = keys.length > 0 ? Number.parseInt(keys[keys.length - 1]) + 1 : 0;
       }
+
       if ( ! this.isPreview ) {
         this.criterias$set(newKey, {
           views: {},
@@ -171,23 +172,33 @@ foam.CLASS({
       this.previewPredicate = orPredicate;
     },
 
-    function switchToPreview() {
-      // At this point, user should be going into advanced mode
-      this.isPreview = true;
-      this.clearAll(true);
-      // Assign the predicates to the previews to reconstruct the view
-      Object.keys(this.criterias).forEach((key) => {
-        this.addCriteria(key);
-        this.previewCriterias[key].predicate = this.criterias[key].predicate;
-      });
-      this.updateFilterPredicate();
+    function getExistingPredicate(criteriaKey, property) {
+      // Check if there is an existing predicate to rebuild from
+      var propertyName = typeof property === 'string' ? property : property.name;
+      var previewCriteria = this.previewCriterias[criteriaKey];
+      var criteria = this.criterias[criteriaKey];
+      if ( ! previewCriteria && ! criteria ) return null;
+
+      // Existing view can come from criterias or previewCriterias
+      var view;
+      // Preview predicate takes precendence
+      if ( previewCriteria ) {
+        view = previewCriteria.views[propertyName]
+        if ( view && view.predicate !== this.TRUE ) return view.predicate;
+      }
+      // Preview criteria predicate does not exist, check main criteria predicate
+      if ( criteria ) {
+        view = criteria.views[propertyName]
+        if ( view && view.predicate !== this.TRUE ) return view.predicate;
+      }
+
+      return null;
     },
 
     function applyPreview() {
       // At this point, users should be coming from advanced mode
       this.isAdvanced = true;
       this.isPreview = false;
-      // this.clearAll(true);
       // Copy required information to be reconstructed
       Object.keys(this.previewCriterias).forEach((criteriaKey) => {
         this.addCriteria(criteriaKey);
@@ -202,6 +213,18 @@ foam.CLASS({
       });
       // This will apply the predicate onto the DAO
       this.finalPredicate = this.previewPredicate;
+    },
+
+    function switchToPreview() {
+      // At this point, user should be going into advanced mode
+      this.isPreview = true;
+      this.clearAll(true);
+      // Assign the predicates to the previews to reconstruct the view
+      Object.keys(this.criterias).forEach((key) => {
+        this.addCriteria(key);
+        this.previewCriterias[key].predicate = this.criterias[key].predicate;
+      });
+      this.updateFilterPredicate();
     },
 
     function switchToSimple() {

@@ -196,9 +196,7 @@ foam.CLASS({
       this.getResultsCount();
 
       this.addClass(this.myClass())
-        .start(this.ModalHeader.create({
-          title: this.TITLE_HEADER
-        })).end()
+        .start(this.ModalHeader, { title: this.TITLE_HEADER }).end()
         .add(this.filterController.slot(function(previewCriterias) {
           var keys = Object.keys(previewCriterias);
           return self.E().addClass(self.myClass('container-advanced'))
@@ -220,14 +218,11 @@ foam.CLASS({
                 }))
               .end()
 
-              .start(self.CriteriaView.create({
-                criteria: key
-              })).enableClass(
+              .start(self.CriteriaView, { criteria: key }).enableClass(
                 self.myClass('isOpen'),
                 self.slot(function(isOpenIndex){ return key == isOpenIndex; })
               ).end();
             })
-            // TODO: Style button
             .startContext({data: self})
               .start(self.ADD_CRITERIA, { buttonStyle: 'TERTIARY' }).end()
             .endContext();
@@ -274,8 +269,6 @@ foam.CLASS({
       name: 'filter',
       label: 'Apply Filter',
       isEnabled: function(filterController$previewPredicate) {
-        // console.log('TODO: Check if the criteria is filtering');
-        // return criterias && Object.keys(criterias).length > 0;
         return filterController$previewPredicate !== this.TRUE;
       },
       code: function(X) {
