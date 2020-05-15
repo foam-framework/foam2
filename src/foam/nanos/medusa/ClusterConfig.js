@@ -144,7 +144,6 @@ foam.CLASS({
       value: 500
     },
     {
-      // TODO: move to clusterconfig service
       name: 'sessionId',
       class: 'String'
     },

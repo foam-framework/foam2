@@ -102,7 +102,13 @@ foam.CLASS({
       name: 'consensusCount',
       class: 'Int',
       visibility: 'RO',
-      storageTransient: true,
+      transient: true,
+    },
+    {
+      name: 'verified',
+      class: 'Boolean',
+      visibility: 'RO',
+      transient: true,
     },
     {
       documentation: 'Solely for information. Originating Mediator.',

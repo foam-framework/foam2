@@ -205,6 +205,7 @@ foam.CLASS({
       try {
         DaggerService dagger = (DaggerService) x.get("daggerService");
         dagger.verify(x, entry);
+        entry.setVerified(true);
 
         synchronized ( indexLock_ ) {
           if ( entry.getIndex() == getIndex() + 1 ) {
@@ -223,10 +224,16 @@ foam.CLASS({
         }
 
         entry = mdao(x, entry);
+
+        // REVIEW: should delegate put (broadcast) occur before unblock?
+        // Notify any blocked Primary puts
+//        getLogger().debug("mdao", entry.getIndex(), "notify");
+        ((DAO) x.get("localMedusaEntryDAO")).cmd_(x, entry);
+//        getLogger().debug("mdao", entry.getIndex(), "notified");
       } finally {
         pm.log(x);
       }
-      return entry;
+      return (MedusaEntry) getDelegate().put_(x, entry);
       `
     },
     {
@@ -329,12 +336,9 @@ foam.CLASS({
             }
           }
         }
-        // Notify any blocked Primary puts
-//        getLogger().debug("mdao", entry.getIndex(), "notify");
-        ((DAO) x.get("localMedusaEntryDAO")).cmd_(x, entry);
-//        getLogger().debug("mdao", entry.getIndex(), "notified");
       } catch (Throwable t) {
         getLogger().error(t);
+        throw t;
         // TODO: Alarm
       } finally {
         pm.log(x);

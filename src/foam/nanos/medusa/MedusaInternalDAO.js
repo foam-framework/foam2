@@ -24,7 +24,7 @@ DAO stacks both end at x.get("internalMedusaEntryDAO").`,
       name: 'dao',
       class: 'foam.dao.DAOProperty',
       javaFactory: `
-      DAO dao = (DAO) getX().get("internalMedusaEntryDAO");
+      DAO dao = (DAO) getX().get("internalMedusaDAO");
       setDelegate(dao);
       return dao;
       `

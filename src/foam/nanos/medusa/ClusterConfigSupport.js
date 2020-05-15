@@ -144,7 +144,7 @@ configuration for contacting the primary node.`,
       Count count = (Count) ((DAO) getX().get("localClusterConfigDAO"))
         .where(
           AND(
-            EQ(ClusterConfig.ZONE, 0),
+            EQ(ClusterConfig.ZONE, Math.max(0, config.getZone() -1)),
             EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
             EQ(ClusterConfig.ENABLED, true),
             EQ(ClusterConfig.REALM, config.getRealm()),
@@ -605,6 +605,8 @@ configuration for contacting the primary node.`,
       `
     },
     {
+      // TODO/REVIEW: Cron itself needs better cluster support
+      // we can't have the same crons running everywhere.
       name: 'cronEnabled',
       type: 'Boolean',
       args: [
@@ -622,6 +624,10 @@ configuration for contacting the primary node.`,
         if ( config.getIsPrimary() &&
              config.getStatus() == Status.ONLINE &&
              config.getZone() == 0L ) {
+          return true;
+        }
+        if ( config.getStatus() == Status.ONLINE &&
+             config.getZone() > 0L ) {
           return true;
         }
         return false;

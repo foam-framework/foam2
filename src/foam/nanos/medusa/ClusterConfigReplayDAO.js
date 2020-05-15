@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'ClusterConfigReplayDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  documentation: `On Node status change to ONLINE initiate replay`,
+  documentation: `On status change to ONLINE initiate replay`,
 
   javaImports: [
     'foam.dao.DAO',
@@ -55,24 +55,32 @@ foam.CLASS({
         ClusterConfig myConfig = support.getConfig(getX(), support.getConfigId());
         // If a Node comming online, begin replay from it.
         if ( myConfig.getType() == MedusaType.MEDIATOR &&
-               config.getType() == MedusaType.NODE &&
-               config.getZone() == 0L &&
+               ( ( myConfig.getZone() == 0L &&
+                   config.getType() == MedusaType.NODE &&
+                   config.getZone() == 0L ) ||
+                 ( config.getType() == MedusaType.MEDIATOR &&
+                   config.getZone() == myConfig.getZone() - 1L ) ) &&
                config.getRegion() == myConfig.getRegion() &&
                config.getRealm() == myConfig.getRealm() ) {
 
             // in standalone configuration, node is local
             DAO clientDAO = (DAO) x.get("medusaNodeDAO");
             if ( clientDAO == null ) {
-            clientDAO = support.getClientDAO(getX(), "medusaNodeDAO", myConfig, config);
-            clientDAO = new RetryClientSinkDAO.Builder(getX())
-              .setDelegate(clientDAO)
-              .setMaxRetryAttempts(support.getMaxRetryAttempts())
-              .setMaxRetryDelay(support.getMaxRetryDelay())
-              .build();
+              String serviceName = "medusaNodeDAO";
+              if ( config.getType() == MedusaType.MEDIATOR ) {
+                serviceName = "medusaEntryDAO";
+              }
+              clientDAO = support.getClientDAO(getX(), serviceName, myConfig, config);
+              clientDAO = new RetryClientSinkDAO.Builder(getX())
+                .setDelegate(clientDAO)
+                .setMaxRetryAttempts(support.getMaxRetryAttempts())
+                .setMaxRetryDelay(support.getMaxRetryDelay())
+                .build();
             }
-            // NOTE: using internalMedusaEntryDAO else we'll block on ReplayingDAO.
-            DAO dao = (DAO) getX().get("internalMedusaEntryDAO");
+            // NOTE: using internalMedusaDAO else we'll block on ReplayingDAO.
+            DAO dao = (DAO) getX().get("internalMedusaDAO");
             dao = dao.where(GTE(MedusaEntry.CONSENSUS_COUNT, support.getNodeQuorum(x)));
+            // REVIEW: not sure we want our own max, could have wholes.
             Max max = (Max) dao.select(MAX(MedusaEntry.INDEX));
 
             ReplayDetailsCmd details = new ReplayDetailsCmd();

@@ -13,6 +13,7 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.DAO',
     'static foam.mlang.MLang.EQ',
+    'foam.nanos.auth.User',
     'foam.nanos.notification.Notification',
     'foam.nanos.logger.Logger'
   ],
@@ -40,11 +41,16 @@ foam.CLASS({
           public void execute(X x) {
             try {
               Notification notification = new Notification();
-              notification.setUserId(config.getAlertUser());
-              notification.setGroupId(config.getAlertGroup());
-              //notification.setEmailIsEnabled(config.getSendEmail());
-              notification.setNotificationType("Alarm");
               notification.setBody("An alarm has been triggered for " + config.getName());
+
+              // Notify a user
+              User user = (User) ((DAO) x.get("localUserDAO")).find(config.getAlertUser());
+              if ( user != null )
+                user.doNotify(x, notification);
+              // Notify a group when set
+              if ( foam.util.SafetyUtil.isEmpty(config.getAlertGroup()) ) 
+                return;
+              notification.setGroupId(config.getAlertGroup());
               ((DAO) x.get("localNotificationDAO")).put(notification);
             } catch (Exception e) {
               logger.error(e);

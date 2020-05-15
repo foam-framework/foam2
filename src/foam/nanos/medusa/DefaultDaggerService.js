@@ -93,6 +93,13 @@ foam.CLASS({
       visibility: 'HIDDEN'
     },
     {
+      name: 'dao',
+      class: 'foam.dao.DAOProperty',
+      javaFactory: `
+      return (DAO) getX().get("internalMedusaDAO");
+      `
+    },
+    {
       name: 'logger',
       class: 'FObjectProperty',
       of: 'foam.nanos.logger.Logger',
@@ -118,7 +125,7 @@ foam.CLASS({
         getLogger().debug("start", "node", "exit");
         return;
       }
-      DAO dao = (DAO) getX().get("internalMedusaEntryDAO");
+      DAO dao = getDao();
       MedusaEntry entry = new MedusaEntry();
       entry.setNSpecName("DAG Bootstrap");
       entry.setIndex(getNextGlobalIndex(getX()));
@@ -202,7 +209,7 @@ foam.CLASS({
           return;
         }
 
-        DAO dao = (DAO) getX().get("internalMedusaEntryDAO");
+        DAO dao = getDao();
         MedusaEntry parent1 = (MedusaEntry) dao.find(EQ(MedusaEntry.INDEX, entry.getIndex1()));
         if ( parent1 == null ) {
           getLogger().error("verify", entry.getIndex(), "parent not found", entry.getIndex1(), "entry", entry.getId());

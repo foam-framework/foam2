@@ -19,6 +19,7 @@ foam.CLASS({
     'static foam.mlang.MLang.AND',
     'static foam.mlang.MLang.EQ',
     'static foam.mlang.MLang.OR',
+    'foam.mlang.predicate.Predicate',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
@@ -65,12 +66,17 @@ foam.CLASS({
           );
       }
       // MEDIATOR
+      Predicate zones = EQ(ClusterConfig.ZONE, myConfig.getZone()+1);
+      if ( myConfig.getZone() == 0L ) {
+        zones =
+          OR(
+            EQ(ClusterConfig.ZONE, myConfig.getZone()),
+            zones
+          );
+      }
       return
           AND(
-            OR(
-              EQ(ClusterConfig.ZONE, myConfig.getZone()),
-              EQ(ClusterConfig.ZONE, myConfig.getZone()+1)
-            ),
+            zones,
             EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
             EQ(ClusterConfig.STATUS, Status.ONLINE),
             EQ(ClusterConfig.ENABLED, true),
@@ -114,16 +120,39 @@ foam.CLASS({
     {
       name: 'init_',
       javaCode: `
+      // TODO 
       // listen on ClusterConfigDAO updates.
       `
     },
     {
-      documentation: 'Using assembly line, write to all online mediators in zone 0 and same realm,region',
       name: 'put_',
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
       getLogger().debug("put", entry.getIndex());
-      return super.put_(x, getDelegate().put_(x, obj));
+
+      ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
+      ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
+
+      MedusaEntry old = (MedusaEntry) getDelegate().find_(x, entry.getId());
+      entry = (MedusaEntry) getDelegate().put_(x, entry);
+
+      // Always broadcast to/from NODE,
+      // otherwise only broadcast verified (promoted) entries to other MEDIATORS
+      if ( myConfig.getType() == MedusaType.NODE ||
+           getType() == MedusaType.NODE ||
+           ( myConfig.getType() == MedusaType.MEDIATOR &&
+               // REVIEW: to avoid broadcast during reply, wait until ONLINE,
+               // mediators may miss data between replayComplete and status change to ONLINE.
+             myConfig.getStatus() == Status.ONLINE &&
+             getType() == MedusaType.MEDIATOR &&
+             ( entry.getVerified() &&
+               ( old == null ||
+                 ! old.getVerified() ) ) ) ) {
+
+        // queue for broadcast
+        return super.put_(x, entry);
+      }
+      return entry;
       `
     },
     {
@@ -134,7 +163,7 @@ foam.CLASS({
       `
     },
     {
-      documentation: 'Using assembly line, write to all online mediators in zone 0 and same realm,region',
+      documentation: 'Using assembly line, write to mediators',
       name: 'submit',
       args: [
         {

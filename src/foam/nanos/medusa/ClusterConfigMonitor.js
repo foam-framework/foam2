@@ -159,6 +159,7 @@ foam.CLASS({
         }
       }
 
+      // no need for ping timer in standalone mode.
       if ( config.getType() == MedusaType.MEDIATOR &&
                   support.getMediatorCount() == 1 ) {
         ((Timer)getTimer()).cancel();
@@ -179,6 +180,8 @@ foam.CLASS({
     } finally {
       setIsRunning(false);
     }
+
+// See ConsensusDAO for Mediators - they transition to ONLINE when replay complete.
       `
     }
   ]
