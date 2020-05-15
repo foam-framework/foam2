@@ -8,6 +8,7 @@ foam.CLASS({
   package: 'foam.nanos.export',
   name: 'GoogleSheetsExportService',
   implements: [
+    'foam.nanos.auth.EnabledAware',
     'foam.nanos.export.GoogleSheetsExport'
   ],
   javaImports: [
@@ -21,6 +22,12 @@ foam.CLASS({
     'foam.nanos.logger.Logger',
 
     'java.util.*'
+  ],
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'enabled'
+    }
   ],
   constants: [
     {
