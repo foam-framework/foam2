@@ -43,7 +43,7 @@ foam.CLASS({
         tableColumns = tableColumns.map(c => Array.isArray(c) ? c[0] : c);
         //to keep record of columns that are selected
         var topLevelProps = [];
-        for(var i = 0; i < data.selectedColumnNames.length; i++) {
+        for ( var i = 0 ; i < data.selectedColumnNames.length ; i++ ) {
           var rootProperty;
           if ( foam.String.isInstance(data.selectedColumnNames[i]) ) {
             var axiom;
