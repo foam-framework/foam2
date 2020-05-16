@@ -75,7 +75,7 @@ foam.CLASS({
         });
         //to add properties that are specified in 'tableColumns' as an option
         tableColumns = tableColumns.filter(c => ! topLevelProps.includes(foam.String.isInstance(c) ? c : c.name));
-        for(var i = 0; i < tableColumns.length; i++) {
+        for ( var i = 0 ; i < tableColumns.length ; i++ ) {
           var indexOfTableColumn = notSelectedColumns.indexOf(foam.String.isInstance(tableColumns[i]) ? tableColumns[i] : tableColumns[i].name);
           if ( indexOfTableColumn === -1)
             notSelectedColumns.push(tableColumns[i]);
@@ -83,7 +83,7 @@ foam.CLASS({
             notSelectedColumns.splice(indexOfTableColumn, 1, tableColumns[i]);
         }
         var nonSelectedViewModels = [];
-        for(i = 0; i < notSelectedColumns.length; i++) {
+        for ( i = 0 ; i < notSelectedColumns.length ; i++ ) {
           var rootProperty;
           if ( foam.String.isInstance(notSelectedColumns[i]) ) {
             var axiom =  tableColumns.find(c => c.name === notSelectedColumns[i]);
@@ -113,7 +113,7 @@ foam.CLASS({
       name: 'views',
       expression: function(columns) {
         var arr = [];
-        for(var i = 0; i < columns.length; i++) {
+        for ( var i = 0 ; i < columns.length ; i++ ) {
           arr.push(this.RootColumnConfigPropView.create({
             index: i,
             prop:columns[i],
@@ -206,12 +206,12 @@ foam.CLASS({
       replaceIndex = targetIndex;
       if ( draggableIndex < targetIndex ) {
         
-        for (var i = draggableIndex; i < targetIndex; i++) {
+        for ( var i = draggableIndex ; i < targetIndex ; i++ ) {
           thisProps[i+1].index = i;
           views[i].prop = thisProps[i+1];
         }
       } else {
-        for (var i = targetIndex+1; i <= draggableIndex; i++) {
+        for ( var i = targetIndex + 1 ; i <= draggableIndex ; i++ ) {
           thisProps[i-1].index = i;
           views[i].prop = thisProps[i-1];
         }
@@ -221,10 +221,10 @@ foam.CLASS({
     },
     function rebuildSelectedColumns() {
       var arr = [];
-      for (var i = 0; i < this.views.length; i++) {
-        if (this.views[i].prop.isPropertySelected) {
+      for ( var i = 0 ; i < this.views.length ; i++ ) {
+        if ( this.views[i].prop.isPropertySelected ) {
           var propSelectedTraversed = this.views[i].prop.returnSelectedProps();
-          for (var j = 0; j < propSelectedTraversed.length; j++) {
+          for ( var j = 0 ; j < propSelectedTraversed.length ; j++ ) {
             if ( foam.Array.isInstance(propSelectedTraversed[j]) )
               arr.push(propSelectedTraversed[j].join('.'));
             else
@@ -601,7 +601,7 @@ foam.CLASS({
         }
         otherSubProperties.sort((a, b) => { return a[1].toLowerCase().localeCompare(b[1].toLowerCase());});
 
-        for ( var i = 0 ; i < selectedSubProperties.length ; i++  ) {
+        for ( var i = 0 ; i < selectedSubProperties.length ; i++ ) {
           arr.push(this.cls_.create({ 
             index:i, 
             rootProperty: selectedSubProperties[i], 
@@ -610,7 +610,7 @@ foam.CLASS({
             of: r && r.of ? r.of.getAxiomByName([selectedSubProperties[i][0]]).cls_ : r}));
         }
         
-        for ( var i = 0 ; i < otherSubProperties.length ; i++  ) {
+        for ( var i = 0 ; i < otherSubProperties.length ; i++ ) {
           arr.push(this.cls_.create({ 
             index:selectedSubProperties.length+i, 
             rootProperty: otherSubProperties[i], 
