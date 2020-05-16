@@ -339,12 +339,12 @@ foam.CLASS({
         .add(this.slot(function(prop$isPropertySelected) {
           this
           .attrs({ draggable: prop$isPropertySelected ? 'true' : 'false' }).
-            on('dragstart', self.onDragStart.bind(self)).
-            on('dragenter', self.onDragOver.bind(self)).
-            on('dragover',  self.onDragOver.bind(self)).
-            on('dragleave',  self.onDragLeave.bind(self)).
-            on('drop',      self.onDrop.bind(self))
-          .style({'cursor': self.prop.isPropertySelected ? 'pointer' : 'default'});
+            on('dragstart',   self.onDragStart.bind(self)).
+            on('dragenter',   self.onDragOver.bind(self)).
+            on('dragover',    self.onDragOver.bind(self)).
+            on('dragleave',   self.onDragLeave.bind(self)).
+            on('drop',        self.onDrop.bind(self))
+          .style({'cursor':   self.prop.isPropertySelected ? 'pointer' : 'default'});
         }))
         .add(self.slot(function(prop) {
           return self.E()
