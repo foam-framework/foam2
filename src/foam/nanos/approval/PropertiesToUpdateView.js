@@ -129,6 +129,7 @@
               if ( objProp.of && objProp.of.id === 'foam.nanos.auth.Address' ) byPass = true;
               if ( objProp.hidden ) continue;
               if ( objProp.visibility && objProp.visibility.name === 'HIDDEN' ) continue;
+              if ( objProp.transient || objProp.networkTransient || objProp.storageTransient ) continue;
             }
             addElement(this.propObject[prop], objProp, this.userReadPropTypeName(prop), n[prop], byPass);
             if ( objProp && objProp.FObjectPropertyView && ! byPass ) {

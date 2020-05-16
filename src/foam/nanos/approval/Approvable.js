@@ -7,6 +7,10 @@
 foam.CLASS({
   package: 'foam.nanos.approval',
   name: 'Approvable',
+  implements: [
+    'foam.nanos.auth.CreatedAware',
+    'foam.nanos.auth.CreatedByAware'
+  ],
 
   sections: [
     {
@@ -18,7 +22,11 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'id',
+      name: 'id'
+    },
+    {
+      class: 'String',
+      name: 'lookupId',
       documentation: `
         A function of daoKey, objId and a hashed properties to update, to be used
         to distinguish update requests on the same object
@@ -30,6 +38,12 @@ foam.CLASS({
     {
       class: 'String',
       name: 'daoKey',
+      section: 'admin',
+      visibility: 'RO'
+    },
+    {
+      class: 'String',
+      name: 'serverDaoKey',
       section: 'admin',
       visibility: 'RO'
     },
@@ -48,6 +62,29 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.nanos.approval.ApprovalStatus',
       name: 'status'
+    },
+    {
+      class: 'Enum',
+      of: 'foam.nanos.ruler.Operations',
+      name: 'operation'
+    },
+    {
+      class: 'Class',
+      name: 'of',
+    },
+    {
+      class: 'DateTime',
+      name: 'created',
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdBy',
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdByAgent'
     }
   ],
 

@@ -154,6 +154,8 @@ foam.CLASS({
               message: e.message,
               type: 'success'
             }));
+
+            this.stack.back();
           } else {
             this.ctrl.add(this.NotificationMessage.create({
               message: e.message,
