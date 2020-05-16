@@ -303,7 +303,12 @@ configuration for contacting the primary node.`,
       ],
       type: 'foam.nanos.medusa.ClusterConfig',
       javaCode: `
-      return (ClusterConfig) ((DAO) x.get("localClusterConfigDAO")).find(id).fclone();
+      ClusterConfig config = (ClusterConfig) ((DAO) x.get("localClusterConfigDAO")).find(id);
+      if ( config != null ) {
+        return (ClusterConfig) config.fclone();
+      }
+      getLogger().error("ClusterConfig not found:", id);
+      throw new RuntimeException("ClusterConfig not found: "+id);
      `
     },
     {
