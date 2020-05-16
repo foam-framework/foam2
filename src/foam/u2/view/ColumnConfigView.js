@@ -141,7 +141,7 @@ foam.CLASS({
       },
       value: '',
       postSet: function() {
-        for(var i = 0; i < this.columns.length; i++) {
+        for ( var i = 0 ; i < this.columns.length ; i++ ) {
           this.columns[i].updateOnSearch(this.menuSearch);
         }
       }
@@ -470,7 +470,7 @@ foam.CLASS({
       name: 'views',
       factory: function() {
         var arr = [];
-        for(var i = 0; i < this.data.subColumnSelectConfig.length; i++) {
+        for ( var i = 0 ; i < this.data.subColumnSelectConfig.length ; i++ ) {
           arr.push(this.RootColumnConfigPropView.create({
             index: i,
             prop:this.data.subColumnSelectConfig[i],
