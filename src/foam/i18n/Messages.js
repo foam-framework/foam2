@@ -23,6 +23,7 @@ foam.SCRIPT({
   }
 });
 
+
 foam.CLASS({
   package: 'foam.i18n',
   name: 'MessageAxiom',
