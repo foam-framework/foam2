@@ -26,9 +26,9 @@ foam.CLASS({
   ],
 
   imports: [
-    'localGroupDAO',
-    'localSessionDAO',
-    'localUserDAO'
+    'DAO localGroupDAO',
+    'DAO localSessionDAO',
+    'DAO localUserDAO'
   ],
 
   javaImports: [

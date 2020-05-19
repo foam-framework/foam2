@@ -42,7 +42,7 @@
   ],
 
   imports: [
-    'approvalRequestDAO',
+    'DAO approvalRequestDAO',
     'ctrl',
     'currentMenu',
     'stack',
