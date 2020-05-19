@@ -334,9 +334,11 @@ foam.CLASS({
           return obj;
         }
 
+        String dk = getOf().getObjClass().getSimpleName();
+        dk = Character.toLowerCase(dk.charAt(0)) + dk.substring(1) + "DAO";
         Approvable approvable = (Approvable) approvableDAO.put_(x, new Approvable.Builder(x)
           .setLookupId(hashedId)
-          .setDaoKey(getOf().getObjClass().getSimpleName().toLowerCase() + "DAO")
+          .setDaoKey(dk)
           .setServerDaoKey(getDaoKey())
           .setStatus(ApprovalStatus.REQUESTED)
           .setObjId(String.valueOf(obj.getProperty("id")))
