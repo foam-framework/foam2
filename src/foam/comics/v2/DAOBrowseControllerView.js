@@ -135,7 +135,7 @@ foam.CLASS({
                   .end()
                   .startContext({ data: self }).tag(self.CREATE).endContext()
                 .end()
-                .callIf(config$browseTitle.length > 0, function() {
+                .callIf(config$browseSubtitle.length > 0, function() {
                   this
                     .start()
                       .addClass(self.myClass('browse-subtitle'))
