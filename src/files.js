@@ -758,7 +758,6 @@ FOAM_FILES([
   { name: "foam/u2/detail/SectionedDetailPropertyView" },
 
   // Multiple model - crunch - wizard files
-  { name: "foam/u2/detail/MultipleModelSectionedDetailView" },
   { name: "foam/nanos/crunch/ui/ScrollSectionWizardView" },
   { name: "foam/nanos/crunch/ui/CapabilityWizardSection" },
 

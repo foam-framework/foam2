@@ -7,7 +7,8 @@
 foam.CLASS({
   package: 'foam.nanos.crunch.ui',
   name: 'ScrollSectionWizardView',
-  extends: 'foam.u2.detail.MultipleModelSectionedDetailView',
+  extends: 'foam.u2.View',
+  // extends: 'foam.u2.detail.MultipleModelSectionedDetailView',
 
   documentation: `Simply displays "sections" consecutively.`,
 
@@ -33,7 +34,8 @@ foam.CLASS({
 
   requires: [
     'foam.nanos.crunch.Capability',
-    'foam.nanos.crunch.UserCapabilityJunction'
+    'foam.nanos.crunch.UserCapabilityJunction',
+    'foam.u2.detail.VerticalDetailView'
   ],
 
   properties: [
@@ -49,6 +51,11 @@ foam.CLASS({
       class: 'foam.u2.ViewSpec',
       name: 'sectionView',
       value: { class: 'foam.u2.detail.SectionView' }
+    },
+    {
+      name: 'sectionsList',
+      class: 'FObjectArray',
+      of: 'foam.nanos.crunch.ui.CapabilityWizardSection'
     },
     {
       class: 'Boolean',
@@ -85,7 +92,6 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
-      this.SUPER();
       this.addClass(this.myClass());
       this.start('h1').add(this.title).end()
         .start()
@@ -94,11 +100,18 @@ foam.CLASS({
             return this.E().forEach(
               sectionsList.filter((section) => section.of),
               (wizardSection) => (wizardSection.ofSections).map(
-                (section) =>
-                  this.tag(this.sectionView, {
-                    section: section,
-                    data: wizardSection.data
-                  })
+                (section) => {
+                  var subThis = this.startContext({});
+                  subThis.__subSubContext__.register(
+                    this.VerticalDetailView,
+                    'foam.u2.detail.SectionedDetailView'
+                  );
+                  subThis
+                    .tag(this.sectionView, {
+                      section: section,
+                      data: wizardSection.data
+                    })
+                }
               )
             );
           }
