@@ -494,38 +494,61 @@ foam.CLASS({
                 }).
 
                 forEach(columns_, function([property, overrides]) {
-                  var cls = view.of;
                   var column;
                   var obj1 = obj;
+                  var val = foam.nanos.column.ColumnPropertyValue.create();
                   if ( foam.String.isInstance(property) ) {
                     column = view.columns.find(c => c.name === property);
                     if ( ! column ) {
                       var columnConfig = this.__context__.columnConfigToPropertyConverter;
                       if ( ! columnConfig ) columnConfig = this.__context__.lookup('foam.nanos.column.ColumnConfigToPropertyConverter').create();
-                      var val = columnConfig.returnPropertyAndObject(view.of, property, obj1);
-                      column = val.propertyValue;
-                      obj1 = val.objValue;
+                     
+                      var converted = columnConfig.returnPropertyAndObject(view.of, property, obj1);
+                      converted.then(value => {
+                        val.objValue = value.objValue;
+                        val.propertyValue = value.propertyValue;
+                        obj1 = value.objValue;
+                        column = value.propertyValue;
+                      });
+                    } else {
+                      val.propertyValue = column;
+                      val.objValue = obj1;
                     }
-                  } else
-                    column = property;
+                  } else {
+                    val.propertyValue = property;
+                    val.objValue = obj1;
+                  }
                   
                   if ( overrides ) column = column.clone().copyFrom(overrides);
-                  this.
-                    start().
-                    addClass(view.myClass('td')).
-                    callOn(column.tableCellFormatter, 'format', [
-                      column.f ? column.f(obj1) : null, obj1, column
-                    ]).
-                    callIf(column.f, function() {
+
+                  this
+                    .add(val.propertyValue$.map(v => {
+                      var value;
                       try {
-                        var value = column.f(obj1);
+                        column = val.propertyValue;
+                        value = val.propertyValue && val.propertyValue.f ? val.propertyValue.f(obj1) : ' - ';
                         if ( foam.util.isPrimitive(value) ) {
-                          this.attr('title', value);
-                        }
-                      } catch (err) {}
-                    }).
-                    style({flex: column.tableWidth ? `0 0 ${column.tableWidth}px` : '1 0 0'}).
-                    end();
+                        } else value = ' - ';
+                      } catch (err) {
+                        value = ' - ';
+                      }
+                      return this.E()
+                      .addClass(view.myClass('td'))
+                      .callIf((column && column.tableCellFormatter), function() {
+                        this.callOn(column.tableCellFormatter, 'format', [
+                          column.f ? column.f(obj1) : null, obj1, column
+                        ]);
+                      }).
+                      callIf(column && column.f, function() {
+                        try {
+                          var value = column.f(obj1);
+                          if ( foam.util.isPrimitive(value) ) {
+                            this.attr('title', value);
+                          }
+                        } catch (err) {}
+                      }).
+                      style({flex: val.propertyValue && val.propertyValue.tableWidth ? `0 0 ${column.tableWidth}px` : '1 0 0'})
+                    }));
                 }).
                 start().
                   addClass(view.myClass('td')).

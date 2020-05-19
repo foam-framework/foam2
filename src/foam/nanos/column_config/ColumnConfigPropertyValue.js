@@ -90,7 +90,7 @@ foam.CLASS({
           type: 'FObject'
         }
       ],
-      code: function(of, propInfo, obj) {
+      code: async function(of, propInfo, obj) {
         var cls = of;
         var property;
         var obj1 = obj;
@@ -157,7 +157,7 @@ foam.CLASS({
           type: 'FObject'
         }
       ],
-      code: function(of, propInfo, obj) {
+      code: async function(of, propInfo, obj) {
         var cls = of;
         var property;
         var obj1 = obj;
@@ -172,8 +172,13 @@ foam.CLASS({
               break;
             cls = property.of;
 
-            if ( i !== props.length - 1 && obj1 )
-              obj1 = property.f(obj1);
+            if ( i !== props.length - 1 && obj1 ) {
+              if ( property.cls_.name === 'Reference' ) {
+                obj1 = await obj1[property.name + '$find'].then(val => obj1 = val);
+              } else {
+                obj1 = property.f(obj1);
+              }
+            }
           }
         } else
           property = propInfo;

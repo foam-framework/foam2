@@ -565,7 +565,7 @@ foam.CLASS({
         if ( ! this.of || ! this.of.getAxiomByName )
           return [];
         var r = this.of.getAxiomByName(foam.Array.isInstance(rootProperty) ? this.rootProperty[0] : rootProperty.name);
-        if ( r && r.cls_ && r.cls_.name === 'FObjectProperty' )
+        if ( r && r.cls_ && ( r.cls_.name === 'FObjectProperty' || r.cls_.name === 'Reference' ) )
           return r.of.getAxiomsByClass(foam.core.Property).map(p => [p.name, p.label ? p.label : p.name]);
         return [];
       }
