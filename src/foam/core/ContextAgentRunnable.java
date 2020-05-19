@@ -24,6 +24,11 @@ public class ContextAgentRunnable
   }
 
   public void run() {
-    agent_.execute(x_);
+    try {
+      agent_.execute(x_);
+    } catch ( Throwable e ) {
+      e.printStackTrace();
+      throw e;
+    }
   }
 }

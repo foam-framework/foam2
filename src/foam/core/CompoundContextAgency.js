@@ -40,10 +40,13 @@ for ( Runnable agent : getAgents() ) {
   } catch (Throwable t) {
     logger.error(t.getMessage(), t);
     e.add(t);
-    throw t;
   }
 }
-e.maybeThrow();`
+try {
+  e.maybeThrow();
+} catch ( Throwable e1 ) {
+  e1.printStackTrace();
+}`
     },
     {
       name: 'submit',
