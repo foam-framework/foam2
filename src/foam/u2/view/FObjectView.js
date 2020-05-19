@@ -109,8 +109,6 @@ foam.CLASS({
         return;
       }
 
-      var found = false;
-      var data  = this.data;
       // If this view is being used in a nanos application, then use the
       // strategizer service to populate the list of choices. Otherwise
       // populate the list of choices using models related to 'of' via the

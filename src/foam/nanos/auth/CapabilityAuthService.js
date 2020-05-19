@@ -17,24 +17,26 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.dao.Sink',
-    'foam.dao.ProxySink',
-    'foam.dao.LimitedSink',
-    'foam.dao.ArraySink',
-    'foam.dao.DAO',
     'foam.core.Detachable',
     'foam.core.X',
+    'foam.dao.ArraySink',
+    'foam.dao.DAO',
+    'foam.dao.LimitedSink',
+    'foam.dao.ProxySink',
+    'foam.dao.Sink',
     'foam.mlang.predicate.AbstractPredicate',
     'foam.mlang.predicate.Predicate',
+    'foam.nanos.auth.Subject',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.logger.Logger',
     'foam.nanos.session.Session',
-    'java.util.concurrent.ConcurrentHashMap',
+
     'java.util.Date',
     'java.util.List',
     'java.util.Map',
+    'java.util.concurrent.ConcurrentHashMap',
     'static foam.mlang.MLang.*'
   ],
 
@@ -90,7 +92,7 @@ foam.CLASS({
         // Add the purge listener
         userCapabilityJunctionDAO.listen(purgeSink, TRUE);
         capabilityDAO.listen(purgeSink, TRUE);
-        
+
         // Initialization done
         setInitialized(true);
       `
@@ -101,7 +103,7 @@ foam.CLASS({
       Check if the given input string is in the userCapabilityJunctions or implied by a capability in userCapabilityJunctions for the current context user
       `,
       javaCode: `
-        User user = (User) x.get("user");
+        User user = ((Subject) x.get("subject")).getUser();
 
         if ( user != null && checkUser(x, user, permission) ) return true;
 
@@ -131,8 +133,8 @@ foam.CLASS({
           DAO capabilityDAO = ( x.get("localCapabilityDAO") == null ) ? (DAO) x.get("capabilityDAO") : (DAO) x.get("localCapabilityDAO");
           DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
 
-          // 1. check if there is a capability matching the name of the permission 
-          // that is enabled and not deprecated, and granted to the user 
+          // 1. check if there is a capability matching the name of the permission
+          // that is enabled and not deprecated, and granted to the user
           Capability cap = (Capability) capabilityDAO.find(EQ(foam.nanos.crunch.Capability.NAME, permission));
 
           Predicate capabilityScope = AND(

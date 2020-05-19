@@ -15,8 +15,9 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.nanos.auth.AuthorizationException',
     'foam.nanos.auth.AuthService',
+    'foam.nanos.auth.AuthorizationException',
+    'foam.nanos.auth.Subject',
     'foam.nanos.auth.User'
   ],
 
@@ -89,7 +90,7 @@ foam.CLASS({
     {
       name: 'authorizeOnUpdate',
       javaCode: `
-        User user = (User) x.get("user");
+        User user = ((Subject) x.get("subject")).getUser();
         if ( user != null && user.getId() == getOwner() ) return;
 
         AuthService auth = (AuthService) x.get("auth");
