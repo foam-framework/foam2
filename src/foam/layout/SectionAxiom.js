@@ -14,7 +14,6 @@ foam.CLASS({
       name: 'name'
     },
     {
-      class: 'String',
       name: 'title',
       expression: function(name) {
         if ( name === '_defaultSection' ) return '';
@@ -22,7 +21,6 @@ foam.CLASS({
       }
     },
     {
-      class: 'String',
       name: 'subTitle'
     },
     {

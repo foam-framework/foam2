@@ -216,7 +216,15 @@
       name: 'daoKey',
       documentation: `Used internally in approvalDAO to point where requested object can be found.
       Should not be used to retrieve approval requests for a given objects
-      since an object can have multiple requests of different nature.`
+      since an object can have multiple requests of different nature. When used in conjunction with serverDaoKey,
+      the daoKey is mainly used for interaction on the client such as view reference and the properties to update view.`
+    },
+    {
+      class: 'String',
+      name: 'serverDaoKey',
+      documentation: `Used internally in approvalDAO if an approval request concerns both a clientDAO and
+      a server side dao. The server dao key is mainly used for backend actions that get executed on
+      the object as a cause of the approval request being approved or rejected.`
     },
     {
       class: 'String',
@@ -626,7 +634,7 @@
            (self.status == foam.nanos.approval.ApprovalStatus.APPROVED && self.operation == foam.nanos.ruler.Operations.REMOVE)) {
              return false;
         }
-        
+
         if ( self.__subContext__[self.daoKey_] ) {
           var property = self.__subContext__[self.daoKey_].of.ID;
           var objId = property.adapt.call(property, self.objId, self.objId, property);
@@ -656,17 +664,57 @@
         return X[this.daoKey_]
           .find(objId)
           .then((obj) => {
+            var of = obj.cls_;
+
             // If the dif of objects is calculated and stored in Map(obj.propertiesToUpdate),
             // this is for updating object approvals
             if ( obj.propertiesToUpdate ) {
-              // then here we created custom view to display these properties
-              X.stack.push({
-                class: 'foam.nanos.approval.PropertiesToUpdateView',
-                propObject: obj.propertiesToUpdate,
-                objId: obj.objId,
-                daoKey: obj.daoKey,
-                title: 'Updated Properties and Changes'
-              });
+              if ( obj.operation === foam.nanos.ruler.Operations.CREATE ){
+                var temporaryNewObject = obj.of.create({}, X);
+
+                var propsToUpdate = obj.propertiesToUpdate;
+
+                var keyArray = Object.keys(propsToUpdate);
+
+                for ( var i = 0; i < keyArray.length; i++ ){
+                  var propObj = temporaryNewObject.cls_.getAxiomByName(keyArray[i]);
+                  if (
+                    ! propObj ||
+                    propObj.transient ||
+                    propObj.storageTransient ||
+                    propObj.networkTransient 
+                  ) continue;
+
+                  temporaryNewObject[keyArray[i]] = propsToUpdate[keyArray[i]];
+                }
+
+                of =  temporaryNewObject.cls_;
+
+                X.stack.push({
+                  class: 'foam.comics.v2.DAOSummaryView',
+                  data: temporaryNewObject,
+                  of: of,
+                  config: foam.comics.v2.DAOControllerConfig.create({
+                    daoKey: obj.daoKey,
+                    of: of,
+                    editPredicate: foam.mlang.predicate.False.create(),
+                    createPredicate: foam.mlang.predicate.False.create(),
+                    deletePredicate: foam.mlang.predicate.False.create()
+                  }),
+                });
+              } else {
+                of = obj.of;
+
+                // then here we created custom view to display these properties
+                X.stack.push({
+                  class: 'foam.nanos.approval.PropertiesToUpdateView',
+                  propObject: obj.propertiesToUpdate,
+                  objId: obj.objId,
+                  daoKey: obj.daoKey,
+                  of: of,
+                  title: 'Updated Properties and Changes'
+                });
+              }
               return;
             }
 
@@ -675,13 +723,13 @@
             X.stack.push({
               class: 'foam.comics.v2.DAOSummaryView',
               data: obj,
-              of: obj.cls_,
+              of: of,
               config: foam.comics.v2.DAOControllerConfig.create({
                 daoKey: this.daoKey_,
-                of: obj.cls_,
-                editEnabled: false,
-                createEnabled: false,
-                deleteEnabled: false
+                of: of,
+                editPredicate: foam.mlang.predicate.False.create(),
+                createPredicate: foam.mlang.predicate.False.create(),
+                deletePredicate: foam.mlang.predicate.False.create()
               })
             });
           })

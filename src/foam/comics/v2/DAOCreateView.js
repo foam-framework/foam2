@@ -119,7 +119,6 @@ foam.CLASS({
                 message: currentFeedback.message,
                 type: currentFeedback.status.name.toLowerCase()
               }));
-
               currentFeedback = currentFeedback.next;
             }
           } else {
