@@ -54,15 +54,11 @@ foam.CLASS({
       postSet: function(_, n) {
         // Restore if an existing one has been made
         var existingPredicate = this.filterController.getExistingPredicate(this.criteria, n.name);
-        console.log(`searchView create = criteria: ${this.criteria} || existingPredicate: ${existingPredicate}`);
         if ( existingPredicate && existingPredicate !== this.TRUE ) {
           // searchView's view may not have been instantiated by this point.
           // Sub to it to restore previous search
           n.view$.sub(() => {
-            console.log('hello');
             n.view.data = existingPredicate.args[1].arg1.value;
-            n.predicate = existingPredicate;
-            // n.updateValue();
           });
         }
         this.filterController.add(n, n.name, this.criteria);

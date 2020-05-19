@@ -308,6 +308,8 @@ foam.CLASS({
       name: 'getResultsCount',
       code: function() {
         var predicate = this.isPreview ? this.previewPredicate : this.finalPredicate;
+        console.log('isPreview: ', this.isPreview);
+        console.log(predicate);
         this.dao.where(predicate).select(this.COUNT()).then((count) => {
           this.resultsCount = count.value;
         });

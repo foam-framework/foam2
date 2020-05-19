@@ -107,6 +107,7 @@ foam.CLASS({
         }, this.view$);
 
       this.view.data$.sub(this.updateValue);
+      this.updateValue();
     },
 
     function clear() {

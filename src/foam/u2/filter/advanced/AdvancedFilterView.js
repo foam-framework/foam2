@@ -192,9 +192,6 @@ foam.CLASS({
 
     function initE() {
       var self = this;
-      this.onDetach(this.filterController$.dot('previewPredicate').sub(this.getResultsCount));
-      this.getResultsCount();
-
       this.addClass(this.myClass())
         .start(this.ModalHeader, { title: this.TITLE_HEADER }).end()
         .add(this.filterController.slot(function(previewCriterias) {
@@ -298,15 +295,6 @@ foam.CLASS({
           return;
         }
         this.filterController.clearCriteria(key, true);
-      }
-    },
-    {
-      name: 'getResultsCount',
-      code: function() {
-        this.dao.where(this.filterController.previewPredicate)
-          .select(this.COUNT()).then((count) => {
-            this.resultsCount = count.value;
-          });
       }
     }
   ]
