@@ -355,8 +355,12 @@ foam.CLASS({
 
       fullSend(x, approvalRequest, obj, approverIds);
 
-      // TODO: the following is a temporary fix will need to create an actual exception and pass feedback as a property
-      throw new RuntimeException("An approval request has been sent out."); // we aren't updating to deleted
+      throw new UserFeedbackException.Builder(x)
+        .setUserFeedback(new UserFeedback.Builder(x)
+          .setStatus(UserFeedbackStatus.SUCCESS)
+          .setMessage("An approval request has been sent out.")
+          .build())
+        .build().javaException();
       `
     }
   ]
