@@ -112,6 +112,25 @@ foam.CLASS({
       section: 'urlMapping'
     },
     {
+      class: 'String',
+      name: 'navigationRootMenu',
+      documentation: 'Specifies the root menu to be used in top navigation settings drop-down.'
+    },
+    {
+      class: 'String',
+      name: 'settingsRootMenu',
+      documentation: 'Specifies the root menu to be used in top navigation settings drop-down.'
+    },
+    {
+      class: 'Boolean',
+      name: 'disableCurrencyChoice',
+      value: false
+    },
+    {
+      class: 'String',
+      name: 'logoRedirect',
+    },
+    {
       class: 'Reference',
       targetDAOKey: 'menuDAO',
       name: 'defaultMenu',
@@ -125,8 +144,14 @@ foam.CLASS({
       documentation: 'The logo to display in the application.',
       displayWidth: 60,
       view: {
-        class: 'foam.u2.tag.TextArea',
-        rows: 4, cols: 80
+        class: 'foam.u2.MultiView',
+        views: [
+          {
+            class: 'foam.u2.tag.TextArea',
+            rows: 4, cols: 80
+          },
+          { class: 'foam.u2.view.ImageView' },
+        ]
       },
       section: 'images'
     },
@@ -136,8 +161,14 @@ foam.CLASS({
       documentation: 'A large logo to display in the application.',
       displayWidth: 60,
       view: {
-        class: 'foam.u2.tag.TextArea',
-        rows: 4, cols: 80
+        class: 'foam.u2.MultiView',
+        views: [
+          {
+            class: 'foam.u2.tag.TextArea',
+            rows: 4, cols: 80
+          },
+          { class: 'foam.u2.view.ImageView' },
+        ]
       },
       section: 'images'
     },
@@ -410,7 +441,7 @@ foam.CLASS({
       of: 'foam.nanos.auth.Address',
       name: 'supportAddress',
       factory: function() {
-        return this.Address.create();
+        return foam.nanos.auth.Address.create({});
       },
     }
   ],

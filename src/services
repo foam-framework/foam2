@@ -428,6 +428,7 @@ p({
       .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("exportDriverRegistry"))
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("exportDriverRegistrys")
+      .setDecorator(new foam.dao.EnabledAwareDAO.Builder(x).setOf(foam.nanos.export.ExportDriverRegistry.getOwnClassInfo()).build())
       .setOf(foam.nanos.export.ExportDriverRegistry.getOwnClassInfo())
       .build();
   """,
@@ -727,7 +728,6 @@ p({
     dao = new foam.dao.EasyDAO.Builder(x)
       .setEnableInterfaceDecorators(false)
       .setOf(foam.nanos.ruler.Rule.getOwnClassInfo())
-      .setRuler(false)
       .setInnerDAO(x.get("localRuleDAO"))
       .build();
 
@@ -958,6 +958,7 @@ p({
   "serve":true,
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
+      .setGuid(true)
       .setAuthorize(false)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("approvables")
