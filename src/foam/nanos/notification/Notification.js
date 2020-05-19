@@ -24,7 +24,7 @@ foam.CLASS({
   ],
 
   tableColumns: ['id', 'body', 'notificationType', 'broadcasted', 'userId', 'groupId' ],
-  
+
   properties: [
     {
       class: 'Boolean',

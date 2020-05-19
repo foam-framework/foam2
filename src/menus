@@ -188,31 +188,6 @@ p({"class":"foam.nanos.menu.Menu","id":"integration.model-doc","label":"UML API 
 p({"class":"foam.nanos.menu.Menu","id":"set-password","label":"Change Password","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.auth.ChangePasswordView"}},"order":100,"parent":"settings"})
 p({"class":"foam.nanos.menu.Menu","id":"set-security","label":"Log Out","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.auth.SignOutView"}},"order":110,"parent":"settings"})
 
-// notifications
-// TODO: remove this afterwards as the bell icon in the top right is the notification menu
-p({
-  "class": "foam.nanos.menu.Menu",
-  "id": "notifications",
-  "label": "Notifications",
-  "handler": {
-    "class": "foam.nanos.menu.DAOMenu2",
-    "config": {
-      "class": "foam.comics.v2.DAOControllerConfig",
-      "daoKey": "notificationDAO",
-      "browseTitle": "Notifications",
-      "createPredicate":{"class":"foam.mlang.predicate.False"},
-      "editPredicate":{"class":"foam.mlang.predicate.False"},
-      "deletePredicate":{"class":"foam.mlang.predicate.False"},
-      "summaryView":{
-        "class":"foam.u2.DAOList",
-        "rowView":{
-          "class":"foam.nanos.notification.NotificationRowView"
-        }
-      }
-    }
-  },
-})
-
 // hidden
 p({"class":"foam.nanos.menu.Menu","id":"dashboard-demo","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.dashboard.Demo"}},"parent":"hidden"})
 p({"class":"foam.nanos.menu.Menu","id":"intro-to-flow","label":"Intro to FLOW","handler":{"class":"foam.nanos.menu.DocumentFileMenu","docKey":"intro-to-flow"},"parent":"hidden"})
