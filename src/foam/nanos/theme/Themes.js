@@ -12,14 +12,24 @@ foam.CLASS({
 
   axioms: [ foam.pattern.Singleton.create() ],
 
+  implements: [
+    'foam.mlang.Expressions',
+  ],
+
   requires: [
     'foam.nanos.theme.ThemeDomain',
   ],
 
+  imports: [
+    'themeDAO',
+    'themeDomainDAO'
+  ],
+
   javaImports: [
     'foam.dao.DAO',
-    'foam.nanos.auth.User',
     'foam.nanos.auth.Group',
+    'foam.nanos.auth.Subject',
+    'foam.nanos.auth.User',
     'javax.servlet.http.HttpServletRequest',
     'org.eclipse.jetty.server.Request'
   ],
@@ -38,7 +48,8 @@ foam.CLASS({
       code: async function(x) {
         var theme;
         var user = x.user;
-        if ( user ) {
+        var group = x.group;
+        if ( user && group ) { // non-null when logged in.
           theme = await user.theme$find;
           if ( theme ) return theme;
           var group = await user.group$find;
@@ -50,24 +61,28 @@ foam.CLASS({
         }
         var domain = window && window.location.hostname || 'localhost';
         if ( domain ) {
-          var themeDomain = await x.themeDomainDAO.find(domain);
+          var themeDomain = await this.themeDomainDAO.find(domain);
+          if ( ! themeDomain &&
+               'localhost' != domain ) {
+            themeDomain = await this.themeDomainDAO.find('localhost');
+          }
           if ( themeDomain ) {
-            var predicate = foam.nanos.mlang.AND(
-              foam.mlang.EQ(foam.nanos.theme.Theme.ID, themeDomain.theme),
-              foam.mlang.EQ(foam.nanos.theme.Theme.ENABLED, true)
+            var predicate = this.AND(
+              this.EQ(foam.nanos.theme.Theme.ID, themeDomain.theme),
+              this.EQ(foam.nanos.theme.Theme.ENABLED, true)
             );
-            theme = await x.themeDAO.find(predicate);
+            theme = await this.themeDAO.find(predicate);
             if ( theme ) return theme;
           }
         }
-        console.warning('Theme not found: '+domain);
+        console && console.warn('Theme not found: '+domain);
         return foam.nanos.theme.Theme.create({ 'name': 'foam', 'appName': 'FOAM' });
       },
       javaCode: `
       DAO groupDAO = (DAO) x.get("groupDAO");
       Theme theme = (Theme) x.get("theme");
       if ( theme != null ) return theme;
-      User user = (User) x.get("user");
+      User user = ((Subject) x.get("subject")).getUser();
       if ( user != null ) {
         theme = user.findTheme(x);
         if ( theme != null ) return theme;
@@ -84,6 +99,10 @@ foam.CLASS({
         domain = req.getServerName();
       }
       ThemeDomain td = (ThemeDomain) ((DAO) x.get("themeDomainDAO")).find(domain);
+      if ( td == null &&
+           ! "localhost".equals(domain) ) {
+        td = (ThemeDomain) ((DAO) x.get("themeDomainDAO")).find("localhost");
+      }
       if ( td != null ) {
         theme = (Theme) ((DAO) x.get("themeDAO")).find(
           foam.mlang.MLang.AND(

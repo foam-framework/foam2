@@ -16,11 +16,12 @@ foam.CLASS({
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.nanos.auth.*',
-    'foam.nanos.auth.User',
     'foam.nanos.logger.Logger',
+
     'java.util.Calendar',
     'java.util.Date',
     'java.util.List',
+
     'static foam.mlang.MLang.*'
   ],
 
@@ -35,7 +36,7 @@ foam.CLASS({
       ],
       type: 'foam.nanos.auth.User',
       javaCode: `
-      User user = (User) x.get("user");
+      User user = ((Subject) x.get("subject")).getUser();
       if ( user == null ) throw new AuthenticationException("user not found");
       return user;
       `
@@ -77,11 +78,11 @@ foam.CLASS({
       if ( auth.check(x, "service.*") ) return getDelegate();
       return getDelegate().where(
         EQ(UserCapabilityJunction.SOURCE_ID, user.getId())
-      ); 
+      );
       `
     },
     {
-      name: 'put_', 
+      name: 'put_',
       args: [
         {
           name: 'x',
@@ -99,12 +100,12 @@ foam.CLASS({
       `,
       javaCode: `
       UserCapabilityJunction ucJunction = (UserCapabilityJunction) obj;
-      
+
       checkOwnership(x, ucJunction);
 
       // if the junction is being updated from GRANTED to EXPIRED, put into junctionDAO without checking prereqs and data
       UserCapabilityJunction old = (UserCapabilityJunction) getDelegate().find_(x, ucJunction.getId());
-      if ( old != null && old.getStatus() == CapabilityJunctionStatus.GRANTED && ucJunction.getStatus() == CapabilityJunctionStatus.EXPIRED ) 
+      if ( old != null && old.getStatus() == CapabilityJunctionStatus.GRANTED && ucJunction.getStatus() == CapabilityJunctionStatus.EXPIRED )
         return getDelegate().put_(x, ucJunction);
 
       List<CapabilityCapabilityJunction> prereqJunctions = (List<CapabilityCapabilityJunction>) getPrereqs(x, obj);
@@ -116,7 +117,7 @@ foam.CLASS({
       else ucJunction.setStatus(CapabilityJunctionStatus.PENDING);
 
       return getDelegate().put_(x, obj);
-      
+
       `
     },
     {
@@ -132,18 +133,18 @@ foam.CLASS({
         }
       ],
       documentation: `
-      We may or may not want to store the data in its own dao, based on the nature of the data. 
-      For example, if the data for some UserCapabilityJunction is a businessOnboarding object, we may want to store this object in 
+      We may or may not want to store the data in its own dao, based on the nature of the data.
+      For example, if the data for some UserCapabilityJunction is a businessOnboarding object, we may want to store this object in
       the businessOnboardingDAO for easier access.
       If the data on an UserCapabilityJunction should be stored in some DAO, the daoKey should be provided on its corresponding Capability object.
       `,
       javaCode: `
       DAO capabilityDAO = (DAO) x.get("capabilityDAO");
       Capability capability = (Capability) capabilityDAO.find(obj.getTargetId());
-      
+
       String daoKey = capability.getDaoKey();
       if ( daoKey == null ) return;
-      
+
       DAO dao = (DAO) x.get(daoKey);
       if ( dao == null ) return;
 
@@ -178,13 +179,13 @@ foam.CLASS({
       ever one comes first`,
       javaCode: `
       // Only update the expiry for non-active junctions, i.e., non-expired, non-pending, or granted junctions whose expiry is not yet set
-      if ( ( old != null && old.getStatus() == CapabilityJunctionStatus.GRANTED && old.getExpiry() != null ) || obj.getStatus() != CapabilityJunctionStatus.GRANTED ) 
+      if ( ( old != null && old.getStatus() == CapabilityJunctionStatus.GRANTED && old.getExpiry() != null ) || obj.getStatus() != CapabilityJunctionStatus.GRANTED )
         return obj;
 
       DAO capabilityDAO = (DAO) x.get("capabilityDAO");
       Capability capability = (Capability) capabilityDAO.find((String) obj.getTargetId());
       Date junctionExpiry = capability.getExpiry();
-      
+
       if ( capability.getDuration() > 0 ) {
         Date today = new Date();
         Calendar calendar = Calendar.getInstance();
@@ -199,7 +200,7 @@ foam.CLASS({
       }
       obj.setExpiry(junctionExpiry);
       return obj;
-      ` 
+      `
     },
     {
       name: 'getPrereqs',
@@ -215,10 +216,10 @@ foam.CLASS({
       ],
       javaType: 'java.util.List<CapabilityCapabilityJunction>',
       documentation: `
-      check the prerequisites of the current capability in the junction. If the user does not have a junction with the 
+      check the prerequisites of the current capability in the junction. If the user does not have a junction with the
       prerequisite capability, set a junction between them.
       Returns the list of prerequisiteCapabilityJunctions
-      `, 
+      `,
       javaCode: `
       DAO prerequisiteCapabilityJunctionDAO = (DAO) (x.get("prerequisiteCapabilityJunctionDAO"));
 
@@ -241,7 +242,7 @@ foam.CLASS({
         }
       }
       return ccJunctions;
-      
+
       `
     },
     {
@@ -333,4 +334,3 @@ foam.CLASS({
     }
   ]
 });
-  

@@ -16,19 +16,20 @@ foam.CLASS({
   javaImports: [
     'foam.core.X',
     'foam.dao.DAO',
-    'static foam.mlang.MLang.*',
     'foam.nanos.app.AppConfig',
     'foam.nanos.auth.*',
+    'foam.nanos.auth.Subject',
     'foam.nanos.boot.NSpec',
     'foam.nanos.logger.Logger',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.theme.Theme',
-    'foam.nanos.theme.Themes',
     'foam.nanos.theme.ThemeDomain',
+    'foam.nanos.theme.Themes',
     'foam.util.SafetyUtil',
     'java.util.Date',
     'javax.servlet.http.HttpServletRequest',
-    'org.eclipse.jetty.server.Request'
+    'org.eclipse.jetty.server.Request',
+    'static foam.mlang.MLang.*'
   ],
 
   tableColumns: [
@@ -194,10 +195,10 @@ foam.CLASS({
         entries have been reset to their empty default values.
       `,
       javaCode: `
+      Subject subject = new Subject.Builder(x).setUser(null).build();
         return x
           .put(Session.class, this)
-          .put("user", null)
-          .put("agent", null)
+          .put("subject", subject)
           .put("group", null)
           .put("twoFactorSuccess", false)
           .put(CachingAuthService.CACHE_KEY, null)
@@ -263,9 +264,11 @@ foam.CLASS({
           ? new Object[] { String.format("%s (%d)", user.toSummary(), user.getId()) }
           : new Object[] { String.format("%s (%d) acting as %s (%d)", agent.toSummary(), agent.getId(), user.toSummary(), user.getId()) };
 
+        Subject subject = new Subject();
+        subject.setUser(agent);
+        subject.setUser(user);
         rtn = rtn
-          .put("user", user)
-          .put("agent", agent)
+          .put("subject", subject)
           .put("logger", new PrefixLogger(prefix, (Logger) x.get("logger")))
           .put("twoFactorSuccess", getContext().get("twoFactorSuccess"))
           .put(CachingAuthService.CACHE_KEY, getContext().get(CachingAuthService.CACHE_KEY));

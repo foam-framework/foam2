@@ -191,6 +191,6 @@ p({"class":"foam.nanos.menu.Menu","id":"set-security","label":"Log Out","handler
 // hidden
 p({"class":"foam.nanos.menu.Menu","id":"dashboard-demo","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.dashboard.Demo"}},"parent":"hidden"})
 p({"class":"foam.nanos.menu.Menu","id":"intro-to-flow","label":"Intro to FLOW","handler":{"class":"foam.nanos.menu.DocumentFileMenu","docKey":"intro-to-flow"},"parent":"hidden"})
-p({"class":"foam.nanos.menu.Menu","id":"notifications","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.notification.NotificationListView"}},"parent":"hidden"})
+p({"class":"foam.nanos.menu.Menu","id":"notifications","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.notification.NotificationView"}},"parent":"hidden"})
 p({"class":"foam.nanos.menu.Menu","id":"reset","label":"Reset Password","handler":{"class":"foam.nanos.menu.ViewMenu"},"parent":"hidden"})
 p({"class":"foam.nanos.menu.Menu","id":"sign-in","label":"Sign in","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.u2.view.LoginView","mode_":"SignIn"}},"parent":"hidden"})
