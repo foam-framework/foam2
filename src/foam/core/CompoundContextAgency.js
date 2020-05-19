@@ -42,11 +42,8 @@ for ( Runnable agent : getAgents() ) {
     e.add(t);
   }
 }
-try {
-  e.maybeThrow();
-} catch ( Throwable e1 ) {
-  e1.printStackTrace();
-}`
+e.maybeThrow();
+`
     },
     {
       name: 'submit',
