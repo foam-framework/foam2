@@ -8,6 +8,7 @@ package foam.nanos.bench.benchmarks;
 
 import foam.core.X;
 import foam.lib.json.Outputter;
+import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
 import foam.nanos.bench.Benchmark;
 
@@ -19,7 +20,7 @@ public class JSONOutputterBenchmark
 
   @Override
   public void setup(X x) {
-    u_ = (User) x.get("user");
+    u_ = ((Subject) x.get("subject")).getUser();
   }
 
   @Override
