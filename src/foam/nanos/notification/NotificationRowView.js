@@ -11,8 +11,8 @@
 
     requires: [
       'foam.nanos.auth.User',
-      'foam.nanos.notification.NotificationCitationView',
-      'foam.u2.view.OverlayActionListView'
+      'foam.u2.view.OverlayActionListView',
+      'net.nanopay.liquidity.LiquidNotificationCitationView'
     ],
 
     imports: [
@@ -31,10 +31,11 @@
       ^ {
         position: relative;
         padding: 8px;
+        margin-right: 32px;
       }
       ^ .foam-u2-view-OverlayActionListView {
         position: absolute;
-        top: 8px;
+        top: 20px;
         right: 8px;
       }
       ^ i {
@@ -77,7 +78,7 @@
             ],
             obj: this.data
           })
-          .tag(this.NotificationCitationView, {
+          .tag(this.LiquidNotificationCitationView, {
             of: this.data.cls_,
             data: this.data
           });
