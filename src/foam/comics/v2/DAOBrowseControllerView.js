@@ -126,7 +126,7 @@ foam.CLASS({
         return self.E()
           .start(self.Rows)
             .addClass(self.myClass('container'))
-              .start(self.Rows)
+              .start()
                 .addClass(self.myClass('header-container'))
                 .start(self.Cols)
                   .start()
