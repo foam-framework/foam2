@@ -32,7 +32,10 @@ foam.CLASS({
     'java.util.ArrayList',
     'java.util.Iterator',
     'java.util.List',
-    'java.util.Map'
+    'java.util.Map',
+    'foam.comics.v2.userfeedback.UserFeedback',
+    'foam.comics.v2.userfeedback.UserFeedbackException',
+    'foam.comics.v2.userfeedback.UserFeedbackStatus'
   ],
 
   properties: [
