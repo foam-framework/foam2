@@ -44,6 +44,13 @@ foam.CLASS({
       color: #1e1f21;
     }
 
+    ^browse-subtitle {
+      font-size: 18px;
+      line-height: 1.56;
+      color: #5e6061;
+      width: 50%;
+    }
+
     ^altview-container {
       position: absolute;
       right: 0;
@@ -119,17 +126,23 @@ foam.CLASS({
         return self.E()
           .start(self.Rows)
             .addClass(self.myClass('container'))
-            .start(self.Cols)
-              .addClass(self.myClass('header-container'))
-              .start()
-                .addClass(self.myClass('browse-title'))
-                .add(config$browseTitle)
+              .start(self.Rows)
+                .addClass(self.myClass('header-container'))
+                .start(self.Cols)
+                  .start()
+                    .addClass(self.myClass('browse-title'))
+                    .add(config$browseTitle)
+                  .end()
+                  .startContext({ data: self }).tag(self.CREATE).endContext()
+                .end()
+                .callIf(config$browseTitle.length > 0, function() {
+                  this
+                    .start()
+                      .addClass(self.myClass('browse-subtitle'))
+                      .add(config$browseSubtitle)
+                    .end();
+                })
               .end()
-              .startContext({ data: self }).tag(self.CREATE).endContext()
-            .end()
-            .start()
-              .add(config$browseSubtitle)
-            .end()
             .start(self.CardBorder)
               .style({ position: 'relative' })
               .start(config$browseBorder)
