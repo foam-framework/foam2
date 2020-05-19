@@ -302,8 +302,10 @@ foam.CLASS({
 
       // remove doesn't need an approvable to be generated since we already have the object
       if ( operation == Operations.REMOVE ){
+        String dk = getOf().getObjClass().getSimpleName();
+        dk = Character.toLowerCase(dk.charAt(0)) + dk.substring(1) + "DAO";
         approvalRequest = new ApprovalRequest.Builder(x)
-          .setDaoKey(getOf().getObjClass().getSimpleName().toLowerCase() + "DAO")
+          .setDaoKey(dk)
           .setServerDaoKey(getDaoKey())
           .setObjId(String.valueOf(obj.getProperty("id")))
           .setClassification(getOf().getObjClass().getSimpleName())
