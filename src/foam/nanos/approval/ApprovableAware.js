@@ -10,12 +10,13 @@
   implements: [
     'foam.comics.v2.userfeedback.UserFeedbackAware',
     'foam.core.ContextAware',
-    'foam.nanos.auth.LifecycleAware',
+    'foam.nanos.auth.LifecycleAware'
   ],
 
   javaImports: [
     'foam.core.FObject',
     'foam.core.X',
+    'foam.core.PropertyInfo',
     'foam.nanos.logger.Logger',
     'foam.nanos.approval.ApprovableAware',
     'foam.nanos.ruler.Operations',
@@ -74,19 +75,31 @@
                 diff = new TreeMap<>();
                 diff.putAll(diffHashmap);
               }
-
+              
               StringBuilder hash_sb = new StringBuilder(obj.getClass().getSimpleName());
               if ( operation == Operations.UPDATE && obj instanceof ApprovableAware ) 
                 hash_sb.append(String.valueOf(obj.getProperty("id")));
 
               if ( diff != null ) {
-                // remove ids, timestamps and userfeedback
+                // remove ids, timestamps, networkTransient and storageTransient properties for generating the lookup hash
                 if ( operation == Operations.CREATE ) diff.remove("id");
                 diff.remove("created");
                 diff.remove("lastModified");
-                diff.remove("userFeedback");
 
-                // convert array properties to list to get consistent hash
+                // remove lifecycle state
+                diff.remove("lifecycleState");
+
+                Iterator allProperties = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class).iterator();
+
+                while ( allProperties.hasNext() ){
+                  PropertyInfo prop = (PropertyInfo) allProperties.next();
+        
+                  if ( prop.getStorageTransient() || prop.getNetworkTransient() ){
+                    diff.remove(prop.getName());
+                  }
+                }
+        
+                // convert array properties to sorted list to get consistent hash
                 // and create hash
                 Iterator it = diff.entrySet().iterator();
 

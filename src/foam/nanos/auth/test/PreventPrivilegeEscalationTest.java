@@ -8,12 +8,7 @@ package foam.nanos.auth.test;
 
 import foam.core.X;
 import foam.dao.DAO;
-import foam.nanos.auth.AuthService;
-import foam.nanos.auth.AuthorizationException;
-import foam.nanos.auth.Group;
-import foam.nanos.auth.GroupPermissionJunction;
-import foam.nanos.auth.Permission;
-import foam.nanos.auth.User;
+import foam.nanos.auth.*;
 import foam.nanos.logger.Logger;
 import foam.util.Auth;
 
@@ -368,7 +363,7 @@ public class PreventPrivilegeEscalationTest
 
     try {
       // Try to update the user's group to "admin".
-      User u = (User) ((User) userContext.get("user")).fclone();
+      User u = (User) ((Subject) userContext.get("subject")).getUser().fclone();
       u.setGroup("admin");
       u = (User) userDAO.inX(userContext).put(u);
 

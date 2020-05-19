@@ -3,6 +3,7 @@ package foam.util.Emails;
 import foam.core.X;
 import foam.dao.DAO;
 import foam.nanos.app.AppConfig;
+import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
 import foam.nanos.notification.email.EmailMessage;
@@ -15,8 +16,8 @@ import java.util.Map;
 
 public class EmailsUtility {
   /*
-  documentation: 
-  Purpose of this function/service is to facilitate the population of an email properties and then to actually send the email. 
+  documentation:
+  Purpose of this function/service is to facilitate the population of an email properties and then to actually send the email.
     STEP 1) EXIT CASES && VARIABLE SET UP
     STEP 2) SERVICE CALL: to fill in email properties.
     STEP 3) SERVICE CALL: passing emailMessage through to actual email service.
@@ -46,7 +47,8 @@ public class EmailsUtility {
     }
 
     String group = user != null ? user.getGroup() : "";
-    Theme theme = ((Themes) x.get("themes")).findTheme(x.put("user", user));
+    Subject subject = new Subject.Builder(x).setUser(user).build();
+    Theme theme = ((Themes) x.get("themes")).findTheme(x.put("subject", subject));
     AppConfig appConfig = (AppConfig) x.get("appConfig");
 
     // Add template name to templateArgs, to avoid extra parameter passing
@@ -67,7 +69,7 @@ public class EmailsUtility {
       emailMessage.setTemplateArguments(templateArgs);
     }
 
-    // SERVICE CALL: to fill in email properties. 
+    // SERVICE CALL: to fill in email properties.
     EmailPropertyService cts = (EmailPropertyService) x.get("emailPropertyService");
     try {
       cts.apply(x, group, emailMessage, templateArgs);

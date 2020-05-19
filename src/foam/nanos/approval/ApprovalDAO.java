@@ -11,8 +11,10 @@ import foam.core.X;
 import foam.dao.DAO;
 import foam.dao.ProxyDAO;
 import foam.mlang.sink.Sum;
+import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
 import foam.nanos.ruler.Operations;
+import foam.util.SafetyUtil;
 
 import static foam.mlang.MLang.*;
 
@@ -40,7 +42,7 @@ public class ApprovalDAO
     ) {
       DAO requests = ApprovalRequestUtil.getAllRequests(x, request.getObjId(), request.getClassification());
       // if not a cancellation request and points are sufficient to consider object approved
-      if ( 
+      if (
         request.getStatus() == ApprovalStatus.CANCELLED ||
         getCurrentPoints(requests) >= request.getRequiredPoints() ||
         getCurrentRejectedPoints(requests) >= request.getRequiredRejectedPoints()
@@ -48,10 +50,10 @@ public class ApprovalDAO
 
         //removes all the requests that were not approved to clean up approvalRequestDAO
         removeUnusedRequests(requests);
-        if ( 
+        if (
           request.getStatus() == ApprovalStatus.APPROVED ||
-          ( 
-            request.getStatus() == ApprovalStatus.REJECTED && ((ApprovalRequest) request).getOperation() == Operations.CREATE 
+          (
+            request.getStatus() == ApprovalStatus.REJECTED && ((ApprovalRequest) request).getOperation() == Operations.CREATE
           )
         ){
           //puts object to its original dao
@@ -73,21 +75,19 @@ public class ApprovalDAO
   }
 
   private void rePutObject(X x, ApprovalRequest request) {
-    DAO dao = (DAO) x.get(request.getDaoKey());
+    String daoKey = request.getServerDaoKey() != null && ! SafetyUtil.isEmpty(request.getServerDaoKey()) ? request.getServerDaoKey() : request.getDaoKey();
+    DAO dao = (DAO) x.get(daoKey);
     FObject found = dao.inX(x).find(request.getObjId()).fclone();
 
-    if ( request instanceof ApprovalRequest ) {
-      DAO userDAO = (DAO) x.get("localUserDAO");
-      User initiatingUser = (User) userDAO.find(((ApprovalRequest) request).getCreatedBy());
-      X initiatingUserX = x.put("user", initiatingUser);
+    DAO userDAO = (DAO) x.get("localUserDAO");
+    User initiatingUser = (User) userDAO.find(((ApprovalRequest) request).getCreatedBy());
+    Subject subject = new Subject.Builder(x).setUser(initiatingUser).build();
+    X initiatingUserX = x.put("subject", subject);
 
-      if ( ((ApprovalRequest) request).getOperation() == Operations.REMOVE ) {
-        dao.inX(initiatingUserX).remove(found);
-      } else {
-        dao.inX(initiatingUserX).put(found);
-      }
+    if ( ((ApprovalRequest) request).getOperation() == Operations.REMOVE ) {
+      dao.inX(initiatingUserX).remove(found);
     } else {
-      dao.inX(x).put(found);
+      dao.inX(initiatingUserX).put(found);
     }
   }
 

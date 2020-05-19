@@ -8,10 +8,7 @@ package foam.nanos.http;
 
 import foam.core.X;
 import foam.dao.DAO;
-import foam.nanos.auth.AuthService;
-import foam.nanos.auth.AuthenticationException;
-import foam.nanos.auth.AuthorizationException;
-import foam.nanos.auth.User;
+import foam.nanos.auth.*;
 import foam.nanos.logger.Logger;
 import foam.nanos.session.Session;
 import foam.util.SafetyUtil;
@@ -94,7 +91,8 @@ public class SessionWebAgent
       }
 
       // check permissions
-      session.setContext(session.getContext().put("user", user));
+      Subject subject = new Subject.Builder(x).setUser(user).build();
+      session.setContext(session.getContext().put("subject", subject));
       if ( ! auth.check(session.getContext(), permission_) ) {
         throw new AuthorizationException();
       }
