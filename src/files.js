@@ -260,7 +260,7 @@ FOAM_FILES([
   { name: "foam/dao/SyncDAO" },
 
   // approval
-  { name: 'foam/nanos/approval/UserRefines' },
+  { name: 'foam/nanos/approval/refinements' },
   { name: 'foam/nanos/approval/AuthenticatedApprovalDAOAuthorizer' },
 
   { name: "foam/nanos/u2/navigation/SignUp" },

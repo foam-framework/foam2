@@ -1,6 +1,6 @@
 foam.CLASS({
     package: 'foam.nanos.approval',
-    name: 'UserRefines',
+    name: 'refinements',
     refines: 'foam.nanos.auth.User',
     imports: [
       'approvalRequestDAO'
