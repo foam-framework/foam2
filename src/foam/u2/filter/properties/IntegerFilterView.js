@@ -11,7 +11,7 @@ foam.CLASS({
 
   documentation: 'Filter view for integers.',
 
-  imports: [
+  implements: [
     'foam.mlang.Expressions',
   ],
 
@@ -111,16 +111,15 @@ foam.CLASS({
           pred1 = 'Gte';
           pred2 = 'Lte';
         }
-
         return this.AND(
-            foam.mlang.predicate[pred1].create({
-              arg1: this.property,
-              arg2: amount1
-            }),
-            foam.mlang.predicate[pred2].create({
-              arg1: this.property,
-              arg2: amount2
-            })
+          foam.mlang.predicate[pred1].create({
+            arg1: this.property,
+            arg2: amount1
+          }),
+          foam.mlang.predicate[pred2].create({
+            arg1: this.property,
+            arg2: amount2
+          })
         );
       }
     },
@@ -151,7 +150,18 @@ foam.CLASS({
      * Restores the view based on passed in predicate
      */
     function restoreFromPredicate(predicate) {
-      // TODO
+      if ( predicate === this.TRUE ) return;
+
+      var qualifier = predicate.cls_.name;
+
+      if ( qualifier == 'And' ) {
+        this.qualifier = predicate.args[0].cls_.name == 'Gte' ? 'Bte' : 'Bt';
+        this.amount1 = predicate.args[0].arg2.value;
+        this.amount2 = predicate.args[1].arg2.value;
+      } else {
+        this.qualifier = qualifier;
+        this.amount1 = predicate.arg2.value;
+      }
     },
 
     /**
