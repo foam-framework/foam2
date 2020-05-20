@@ -203,8 +203,7 @@ foam.CLASS({
   methods: [
     function initE() {
       this.onDetach(this.dao$.sub(this.daoUpdate));
-      this.daoUpdate();
-
+      
       var self = this;
       this
         .addClass(this.myClass())
@@ -282,7 +281,7 @@ foam.CLASS({
     },
 
     function getLabelWithCount(option) {
-      if ( ! this.countByContents[option] ) console.error('String mismatch');
+      if ( ! this.countByContents[option] ) console.error('String mismatch: ', option);
       var value = this.countByContents[option].value;
       if ( value > 1 ) return `[${this.countByContents[option].value}] ${option}`;
       return option;

@@ -185,7 +185,6 @@ foam.CLASS({
       this.SUPER();
       this.filterController.getResultsCount();
       this.onDetach(() => {
-        if ( ! this.filterController.isAdvanced ) this.clearAll(true);
         this.filterController.isPreview = false;
       });
     },
