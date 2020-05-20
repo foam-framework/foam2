@@ -9,6 +9,14 @@ foam.CLASS({
   name: 'AdvancedFilterView',
   extends: 'foam.u2.View',
 
+  documentation: `
+    The Advanced Filter View allows a user to search for results that matches
+    multiple criterias set by them. It functions as a huge OR(AND(...)). In
+    other words, this allows for conflicting search criterias which is exactly
+    what the user may want to do. This advanced filter view functions primarily
+    in preview mode.
+  `,
+
   implements: [
     'foam.mlang.Expressions'
   ],
@@ -165,15 +173,18 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'isOpenIndex',
+      documentation: 'Keeps track what is open so we can close it when opening another criteria',
       value: 0
     },
     {
       class: 'Long',
-      name: 'resultsCount'
+      name: 'resultsCount',
+      documentation: 'Results of current criterias'
     },
     {
       class: 'String',
       name: 'resultLabel',
+      documentation: 'Returns a human readable result',
       expression: function(filterController$totalCount, filterController$resultsCount ) {
         return `${this.LABEL_RESULTS}${filterController$resultsCount} of ${filterController$totalCount}`;
       }
@@ -184,9 +195,8 @@ foam.CLASS({
     function init() {
       this.SUPER();
       this.filterController.getResultsCount();
-      this.onDetach(() => {
-        this.filterController.isPreview = false;
-      });
+      // This ensure that no matter how the view is closed, preview mode is disabled
+      this.onDetach(() => { this.filterController.isPreview = false; });
     },
 
     function initE() {
@@ -213,7 +223,6 @@ foam.CLASS({
                   return this.E().start({ class: 'foam.u2.tag.Image', data: iconPath}).end()
                 }))
               .end()
-
               .start(self.CriteriaView, { criteria: key }).enableClass(
                 self.myClass('isOpen'),
                 self.slot(function(isOpenIndex){ return key == isOpenIndex; })

@@ -9,6 +9,13 @@ foam.CLASS({
   name: 'CriteriaView',
   extends: 'foam.u2.View',
 
+  documentation: `
+    Criteria View obtains all the properties to be displayed from the Filter
+    Controller and displays the appropriate Property Filter. Unless the property
+    is hidden, the property filter will be shown. TODO: Show only permissioned
+    properties.
+  `,
+
   implements: [
     'foam.mlang.Expressions'
   ],
@@ -61,6 +68,7 @@ foam.CLASS({
             n.view.data = existingPredicate.args[1].arg1.value;
           });
         }
+        // Add view to controller for tracking
         this.filterController.add(n, n.name, this.criteria);
       }
     },
@@ -81,7 +89,8 @@ foam.CLASS({
       }
     },
     {
-      name: 'criteria'
+      name: 'criteria',
+      documentation: 'Keeps track which criteria this Criteria View belongs to'
     }
   ],
 

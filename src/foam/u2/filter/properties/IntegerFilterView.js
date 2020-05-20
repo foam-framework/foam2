@@ -46,14 +46,16 @@ foam.CLASS({
   properties: [
     {
       name: 'property',
-      documentation: `The property that this view is filtering by. Should be of
-      type Int, Short, Long, or Byte.`,
+      documentation: `
+        The property that this view is filtering by. Should be of type Int,
+        Short, Long, or Byte.
+      `,
       required: true
     },
     {
       class: 'String',
       name: 'qualifier',
-      documentation: `Lets the user choose an MLang predicate to filter by.`,
+      documentation: 'Lets the user choose an MLang predicate to filter by.',
       view: {
         class: 'foam.u2.view.ChoiceView',
         choices: [
@@ -73,7 +75,7 @@ foam.CLASS({
     {
       class: 'Float',
       name: 'amount1',
-      documentation: `The number to filter by.`,
+      documentation: 'The number to filter by.',
       view: {
         class: 'foam.u2.FloatView',
         onKey: true,
@@ -83,7 +85,7 @@ foam.CLASS({
     {
       class: 'Float',
       name: 'amount2',
-      documentation: `The number to filter by.`,
+      documentation: 'The number to filter by.',
       view: {
         class: 'foam.u2.FloatView',
         onKey: true,
@@ -92,9 +94,12 @@ foam.CLASS({
     },
     {
       name: 'predicate',
-      documentation: `All SearchViews must have a predicate as required by the
-      SearchManager. The SearchManager will read this predicate and use it
-      to filter the dao being displayed in the view.`,
+      documentation: `
+        All Search Views must have a predicate as required by the
+        Filter Controller. When this property changes, the Filter Controller will
+        generate a new main predicate and also reciprocate the changes to the
+        other Search Views.
+      `,
       expression: function(qualifier, amount1, amount2) {
         if ( ! qualifier ) return this.TRUE;
 
@@ -125,16 +130,17 @@ foam.CLASS({
     },
     {
       name: 'name',
-      documentation: `Required by SearchManager.`,
-      value: 'Integer filter view'
+      documentation: 'Required by Filter Controller.',
+      expression: function(property) {
+        return property.name;
+      }
     }
   ],
 
   methods: [
     function initE() {
       var self = this;
-      this
-        .addClass(this.myClass())
+      this.addClass(this.myClass())
         .start(this.QUALIFIER)
         .start('div').addClass(this.myClass('carrot')).end()
         .end()

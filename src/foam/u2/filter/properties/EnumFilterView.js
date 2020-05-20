@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -9,7 +9,11 @@ foam.CLASS({
   name: 'EnumFilterView',
   extends: 'foam.u2.Controller',
 
-  documentation: `A SearchView for properties of type ENUM.`,
+  documentation: `
+    A Search View for properties of type ENUM. Unlike String and Reference, this
+    view does not need to call the DAO. Therefore, it currently does not provide
+    the amount of results an option would provide.
+  `,
 
   implements: [
     'foam.mlang.Expressions'
@@ -87,8 +91,9 @@ foam.CLASS({
   properties: [
     {
       name: 'property',
-      documentation: `The property that this view is filtering by. Should be of
-          type Enum.`,
+      documentation: `
+        The property that this view is filtering by. Should be of type Enum.
+      `,
       required: true
     },
     {
@@ -128,7 +133,12 @@ foam.CLASS({
     },
     {
       name: 'predicate',
-      documentation: ``,
+      documentation: `
+        All Search Views must have a predicate as required by the
+        Filter Controller. When this property changes, the Filter Controller will
+        generate a new main predicate and also reciprocate the changes to the
+        other Search Views.
+      `,
       expression: function(selectedOptions) {
         if ( selectedOptions.length <= 0 ) return this.TRUE;
         var ordinals = selectedOptions.map(option => option.ordinal);
@@ -142,16 +152,17 @@ foam.CLASS({
     },
     {
       name: 'name',
-      documentation: `Required by SearchManager.`,
-      value: 'ENUM search view'
+      documentation: 'Required by Filter Controller.',
+      expression: function(property) {
+        return property.name;
+      }
     }
   ],
 
   methods: [
     function initE() {
       var self = this;
-      this
-        .addClass(this.myClass())
+      this.addClass(this.myClass())
         .start().addClass(this.myClass('container-search'))
           .start({
             class: 'foam.u2.TextField',
@@ -243,7 +254,6 @@ foam.CLASS({
     {
       name: 'deselectOption',
       code: function(index) {
-        // this.selectedOptions$remove(index);
         this.selectedOptions = this.selectedOptions.filter(function(_, selectedIndex) {
           return index !== selectedIndex;
         });

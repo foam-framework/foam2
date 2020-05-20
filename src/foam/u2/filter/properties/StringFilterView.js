@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'StringFilterView',
   extends: 'foam.u2.Controller',
 
-  documentation: `A SearchView for properties of type String.`,
+  documentation: 'A SearchView for properties of type String.',
 
   implements: [
     'foam.mlang.Expressions'
@@ -115,8 +115,9 @@ foam.CLASS({
   properties: [
     {
       name: 'property',
-      documentation: `The property that this view is filtering by. Should be of
-          type String.`,
+      documentation: `
+        The property that this view is filtering by. Should be of type String.
+      `,
       required: true
     },
     {
@@ -173,8 +174,19 @@ foam.CLASS({
       }
     },
     {
+      class: 'Boolean',
+      name: 'isLoading',
+      documentation: 'boolean tracking we are still loading info from DAO',
+      value: true
+    },
+    {
       name: 'predicate',
-      documentation: ``,
+      documentation: `
+        All Search Views must have a predicate as required by the
+        Filter Controller. When this property changes, the Filter Controller will
+        generate a new main predicate and also reciprocate the changes to the
+        other Search Views.
+      `,
       expression: function(selectedOptions) {
         if ( selectedOptions.length <= 0 ) return this.TRUE;
 
@@ -187,26 +199,19 @@ foam.CLASS({
     },
     {
       name: 'name',
-      documentation: 'Required by SearchManager.',
+      documentation: 'Required by Filter Controller.',
       expression: function(property) {
         return property.name;
       }
-    },
-    {
-      class: 'Boolean',
-      name: 'isLoading',
-      documentation: 'boolean tracking we are still loading info from DAO',
-      value: true
     }
   ],
 
   methods: [
     function initE() {
       this.onDetach(this.dao$.sub(this.daoUpdate));
-      
+
       var self = this;
-      this
-        .addClass(this.myClass())
+      this.addClass(this.myClass())
         .start().addClass(this.myClass('container-search'))
           .start({
             class: 'foam.u2.TextField',

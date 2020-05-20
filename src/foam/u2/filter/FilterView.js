@@ -1,6 +1,6 @@
 /**
 * @license
-* Copyright 2019 The FOAM Authors. All Rights Reserved.
+* Copyright 2020 The FOAM Authors. All Rights Reserved.
 * http://www.apache.org/licenses/LICENSE-2.0
 */
 
@@ -10,7 +10,7 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   documentation: `
-    Filter search takes the properties defined in 'searchColumns' and creates
+    Filter View takes the properties defined in 'searchColumns' and creates
     a filter option which allows a user to filter the DAO by.
   `,
 
@@ -153,8 +153,6 @@ foam.CLASS({
       height: 80%;
       border-radius: 5px;
     }
-
-
   `,
 
   messages: [
@@ -255,8 +253,7 @@ foam.CLASS({
     function initE() {
       var self = this;
       this.onDetach(this.filterController$.dot('isAdvanced').sub(this.isAdvancedChanged));
-      this
-        .addClass(self.myClass())
+      this.addClass(self.myClass())
         .add(this.slot(function(filters) {
           self.show(filters.length);
 
@@ -399,7 +396,6 @@ foam.CLASS({
     {
       name: 'isAdvancedChanged',
       code: function() {
-        // (Kenny) TODO: Seems kinda hacky. But I do not want to modify the TextSearchView just yet
         if ( ! this.filterController.isAdvanced ) {
           this.filterController.add(this.generalSearchField, 'generalSearchField', 0);
           this.generalSearchField.mode = foam.u2.DisplayMode.RW;
