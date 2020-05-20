@@ -14,7 +14,8 @@ foam.CLASS({
     'foam.core.FObject',
     'foam.core.PropertyInfo',
     'foam.core.X',
-    'foam.nanos.logger.Logger'
+    'foam.nanos.logger.Logger',
+    'java.lang.reflect.Method'
   ],
   methods: [
     {
@@ -51,13 +52,27 @@ foam.CLASS({
       javaCode: `
         ClassInfo ci = of;
         PropertyInfo p = null;
-        for ( int i = 0; i < propInfo.split("\\\\.").length; i++ ) {
+        String[] props = propInfo.split("\\\\.");
+
+        for ( int i = 0 ; i < props.length ; i++ ) {
           if ( ( p == null && i != 0 ) || ci == null )
             break;
-          p = (PropertyInfo) ci.getAxiomByName(propInfo.split("\\\\.")[i]);
-          if ( i != propInfo.split("\\\\.").length - 1 ) {
-            Class cls = p.getValueClass();
+          p = (PropertyInfo) ci.getAxiomByName(props[i]);
+          if ( i != props.length - 1 ) {
             try {
+              Class cls;
+              if ( p instanceof foam.core.AbstractFObjectPropertyInfo ) {
+                cls = p.getValueClass();
+              } else {
+                char[] arr = p.getName().toCharArray();
+                arr[0] = Character.toUpperCase(arr[0]);
+                sb.append(arr);
+                String s = sb.toString();
+                Method m = ci.getObjClass().getMethod(s, foam.core.X.class);
+                cls = m.getReturnType();
+                sb.setLength(4);//sb.delete(4, s.length);
+              }
+            
               ci = (ClassInfo) cls.getMethod("getOwnClassInfo").invoke(null);
             } catch (Exception e) {
               Logger logger = (Logger) getX().get("logger");
@@ -116,12 +131,13 @@ foam.CLASS({
         ClassInfo ci = of;
         FObject obj1 = obj;
         PropertyInfo p = null;
-        for ( int i = 0 ; i < propInfo.split("\\\\.").length ; i++ ) {
+        String[] props = propInfo.split("\\\\.");
+        for ( int i = 0 ; i < props.length ; i++ ) {
           if ( ( p == null && i != 0 ) || ci == null )
             break;
-          p = (PropertyInfo) ci.getAxiomByName(propInfo.split("\\\\.")[i]);
+          p = (PropertyInfo) ci.getAxiomByName(props[i]);
 
-          if ( i != propInfo.split("\\\\.").length - 1 ) {
+          if ( i != props.length - 1 ) {
             obj1 = (FObject) p.f(obj1);
             Class cls = p.getValueClass();
             try {
@@ -173,7 +189,7 @@ foam.CLASS({
             cls = property.of;
 
             if ( i !== props.length - 1 && obj1 ) {
-              if ( property.cls_.name === 'Reference' ) {
+              if ( foam.core.Reference.isInstance(property) ) {
                 obj1 = await obj1[property.name + '$find'].then(val => obj1 = val);
               } else {
                 obj1 = property.f(obj1);
@@ -188,15 +204,27 @@ foam.CLASS({
         ClassInfo ci = of;
         FObject obj1 = obj;
         PropertyInfo p = null;
-        for ( int i = 0 ; i < propInfo.split("\\\\.").length ; i++ ) {
+        String[] props = propInfo.split("\\\\.");
+        for ( int i = 0 ; i < props.length ; i++ ) {
           if ( ( p == null && i != 0 ) || ci == null )
             break;
-          p = (PropertyInfo) ci.getAxiomByName(propInfo.split("\\\\.")[i]);
+          p = (PropertyInfo) ci.getAxiomByName(props[i]);
 
-          if ( i != propInfo.split("\\\\.").length - 1 ) {
-            obj1 = (FObject) p.f(obj1);
-            Class cls = p.getValueClass();
+          if ( i != props.length - 1 ) {
             try {
+              Class cls;
+              if ( p instanceof foam.core.AbstractFObjectPropertyInfo ) {
+                obj1 = (FObject) p.f(obj1);
+                cls = p.getValueClass();
+              } else {
+                char[] arr = p.getName().toCharArray();
+                arr[0] = Character.toUpperCase(arr[0]);
+                sb.append(arr);
+                //String s = sb.toString();
+                obj1 = (FObject)obj1.getClass().getMethod(sb.toString(), foam.core.X.class).invoke(obj1, x);
+                sb.setLength(4);//delete(4, s.length);
+                cls = obj1.getClass();
+              }
               ci = (ClassInfo) cls.getMethod("getOwnClassInfo").invoke(null);
             } catch (Exception e) {
               Logger logger = (Logger) getX().get("logger");
@@ -247,6 +275,16 @@ foam.CLASS({
         }
         return arr;
       `
+    }
+  ],
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(`
+          private static StringBuilder sb = new StringBuilder("find");
+        `);
+      }
     }
   ]
 });
