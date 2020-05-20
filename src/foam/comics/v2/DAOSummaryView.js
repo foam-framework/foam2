@@ -140,6 +140,37 @@ foam.CLASS({
       }
     },
     {
+      name: 'create',
+      isEnabled: function(config, data) {
+        if ( config.CRUDEnabledActionsAuth && config.CRUDEnabledActionsAuth.isEnabled ) {
+          try {
+            let permissionString = config.CRUDEnabledActionsAuth.enabledActionsAuth.permissionFactory(foam.nanos.ruler.Operations.CREATE, data);
+
+            return this.auth.check(null, permissionString);
+          } catch(e) {
+            return false;
+          }
+        }
+        return true;
+      },
+      isAvailable: function(config) {
+        try {
+          return config.createPredicate.f();
+        } catch(e) {
+          return false;
+        }
+      },
+      code: function() {
+        if ( ! this.stack ) return;
+        this.stack.push({
+          class: 'foam.comics.v2.DAOUpdateView',
+          data: this.data,
+          config: this.config,
+          of: this.config.of
+        }, this.__subContext__);
+      }
+    },
+    {
       name: 'delete',
       isEnabled: function(config, data) {
         if ( config.CRUDEnabledActionsAuth && config.CRUDEnabledActionsAuth.isEnabled ) {
@@ -212,6 +243,10 @@ foam.CLASS({
                   .start(self.Cols).addClass(this.myClass('actions-header'))
                     .startContext({ data: self })
                       .tag(self.EDIT, {
+                        buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                        icon: 'images/edit-icon.svg'
+                      })
+                      .tag(self.CREATE, {
                         buttonStyle: foam.u2.ButtonStyle.TERTIARY,
                         icon: 'images/edit-icon.svg'
                       })
