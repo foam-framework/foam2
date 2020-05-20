@@ -142,7 +142,11 @@ foam.CLASS({
     {
       name: 'outputHeader',
       args: [
-        { type: 'Context', name: 'x' }
+        { type: 'Context', name: 'x' },
+        {
+          type: 'PropertyInfo...',
+          name: 'props'
+        }
       ],
       code: function(x) {
         var columnConfig = x.columnConfigToPropertyConverter;
@@ -161,10 +165,17 @@ foam.CLASS({
       },
       javaCode: `
         ColumnConfigToPropertyConverter columnConfig = (ColumnConfigToPropertyConverter)x.get("columnConfigToPropertyConverter");
-        for ( String prop : getProps() ) {
-          PropertyInfo p = columnConfig.returnProperty(getOf(), prop);
-          if ( p != null && p instanceof PropertyInfo ) ((PropertyInfo)p).toCSVLabel(x, this);
+        if ( props.length == 0 ) {
+          for ( String prop : getProps() ) {
+            PropertyInfo p = columnConfig.returnProperty(getOf(), prop);
+            if ( p != null && p instanceof PropertyInfo ) ((PropertyInfo)p).toCSVLabel(x, this);
+          }
+        } else {
+          for ( PropertyInfo p : props ) {
+            if ( p != null && p instanceof PropertyInfo ) ((PropertyInfo)p).toCSVLabel(x, this);
+          }
         }
+        
         newLine_();
         setIsFirstRow(false);
       `
@@ -190,8 +201,19 @@ foam.CLASS({
       },
       javaCode: `
         if ( getOf() == null ) setOf(obj.getClassInfo());
-        if ( getIsFirstRow() ) outputHeader(x);
         ColumnConfigToPropertyConverter columnConfig = (ColumnConfigToPropertyConverter)x.get("columnConfigToPropertyConverter");
+        String[] propNames = getProps();
+        ColumnPropertyValue[] columnPropValues = new ColumnPropertyValue[propNames.length];
+
+        for ( int i = 0 ; i < propNames.length ; i++ ) {
+          ColumnPropertyValue val = columnConfig.returnPropertyAndObject(x, getOf(), propNames[i], obj);
+          columnPropValues[i] = val;
+        }
+
+        PropertyInfo[] props = Arrays.stream(columnPropValues)
+          .map(ColumnPropertyValue::getPropertyValue)
+          .toArray(PropertyInfo[]::new);
+        if ( getIsFirstRow() ) outputHeader(x, props);
         for (String propName : getProps()) {
           ColumnPropertyValue val = columnConfig.returnPropertyAndObject(x, getOf(), propName, obj);
           if ( val.getPropertyValue() != null && val.getPropertyValue() instanceof PropertyInfo ) ((PropertyInfo)val.getPropertyValue()).toCSV(x, val.getObjValue(), this);
