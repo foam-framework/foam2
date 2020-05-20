@@ -157,8 +157,9 @@ foam.CLASS({
         try {
           DAO capabilityDAO = ( x.get("localCapabilityDAO") == null ) ? (DAO) x.get("capabilityDAO") : (DAO) x.get("localCapabilityDAO");
           DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
-          // 1. check if there is a capability matching the name of the permission 
-          // that is enabled and not deprecated, and granted to the user 
+
+          // 1. check if there is a capability matching the name of the permission
+          // that is enabled and not deprecated, and granted to the user
           Capability cap = (Capability) capabilityDAO.find(EQ(foam.nanos.crunch.Capability.NAME, permission));
           Predicate userPredicate = EQ(UserCapabilityJunction.SOURCE_ID, user.getId());
           Predicate capabilityScope = OR(
