@@ -54,7 +54,8 @@ foam.CLASS({
               if ( ! axiom )
                 axiom = data.of.getAxiomByName(data.selectedColumnNames[i]);
             }
-            if ( ! axiom )
+            //// uncomment
+            if ( ! axiom ) //|| ! axiom.networkTransient )
               continue;
             rootProperty = [ axiom.name, axiom.label ? axiom.label : axiom.name ];
           } else 
@@ -88,6 +89,9 @@ foam.CLASS({
           if ( foam.String.isInstance(notSelectedColumns[i]) ) {
             var axiom =  tableColumns.find(c => c.name === notSelectedColumns[i]);
             axiom = axiom || data.of.getAxiomByName(notSelectedColumns[i]);
+            //// uncomment
+            // if ( ! axiom.networkTransient )
+            //   continue;
             rootProperty = [ axiom.name, axiom.label ? axiom.label : axiom.name ];
           } else 
             rootProperty = notSelectedColumns[i];
@@ -565,7 +569,8 @@ foam.CLASS({
         if ( ! this.of || ! this.of.getAxiomByName )
           return [];
         var r = this.of.getAxiomByName(foam.Array.isInstance(rootProperty) ? this.rootProperty[0] : rootProperty.name);
-        if ( r && r.cls_ && ( r.cls_.name === 'FObjectProperty' || r.cls_.name === 'Reference' ) )
+        //// uncomment
+        if ( r && r.cls_ && ( foam.core.FObjectProperty.isInstance(r) || foam.core.Reference.isInstance(r) ) ) //&& r.networkTransient
           return r.of.getAxiomsByClass(foam.core.Property).map(p => [p.name, p.label ? p.label : p.name]);
         return [];
       }
