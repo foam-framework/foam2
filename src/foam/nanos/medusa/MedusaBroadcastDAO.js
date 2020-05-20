@@ -136,12 +136,16 @@ foam.CLASS({
       MedusaEntry old = (MedusaEntry) getDelegate().find_(x, entry.getId());
       entry = (MedusaEntry) getDelegate().put_(x, entry);
 
+      // Standalone
+      if ( support.getMediatorCount() == 1 ) {
+        return ((DAO) x.get(getServiceName())).put(entry);
+      }
+
       // REVIEW: move to property - calculate once. 
       // Always broadcast to/from NODE,
       // otherwise only broadcast verified (promoted) entries to other MEDIATORS
       if ( myConfig.getType() == MedusaType.NODE ||
            getType() == MedusaType.NODE ||
-           support.getMediatorCount() == 1 || // TODO: make this service/context param
            ( myConfig.getType() == MedusaType.MEDIATOR &&
                // REVIEW: to avoid broadcast during reply, wait until ONLINE,
                // mediators may miss data between replayComplete and status change to ONLINE.
