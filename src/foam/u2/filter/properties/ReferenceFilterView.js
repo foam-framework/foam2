@@ -310,7 +310,15 @@ foam.CLASS({
      * Restores the view based on passed in predicate
      */
     function restoreFromPredicate(predicate) {
-      // TODO
+      var selections = Array.isArray(predicate.arg2.value) ? predicate.arg2.value : [predicate.arg2.value];
+      // wait for idToStringDisplayMap to populate
+      this.idToStringDisplayMap$.sub(() => {
+        var options = [];
+        selections.forEach((selection) => {
+          options.push(this.idToStringDisplayMap[selection]);
+        });
+        this.selectedOptions = options;
+      })
     },
 
     /**
