@@ -204,7 +204,7 @@ foam.CLASS({
 
             if ( i !== props.length - 1 && obj1 ) {
               if ( foam.core.Reference.isInstance(property) ) {
-                obj1 = await obj1[property.name + '$find'].then(val => obj1 = val);
+                obj1 = await obj1[property.name + '$find'];
               } else {
                 obj1 = property.f(obj1);
               }
