@@ -67,7 +67,7 @@ foam.CLASS({
       javaCode: '// nothing here'
     },
     {
-      name: 'getCurrentUser',
+      name: 'getCurrentSubject',
       javaCode: `
         Session session = x.get(Session.class);
 
@@ -87,7 +87,9 @@ foam.CLASS({
           throw new AuthenticationException("Group disabled");
         }
 
-        return user;
+        Subject subject = (Subject) x.get("subject");
+
+        return subject;
       `
     },
     {

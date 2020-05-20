@@ -36,6 +36,7 @@ foam.CLASS({
     'foam.nanos.client.ClientBuilder',
     'foam.nanos.auth.Group',
     'foam.nanos.auth.ResendVerificationEmail',
+    'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
     'foam.nanos.theme.Theme',
     'foam.nanos.theme.Themes',
@@ -73,6 +74,7 @@ foam.CLASS({
     'signUpEnabled',
     'loginVariables',
     'stack',
+    'subject',
     'user',
     'webApp',
     'wrapCSS as installCSS',
@@ -202,6 +204,12 @@ foam.CLASS({
     },
     {
       class: 'foam.core.FObjectProperty',
+      of: 'foam.nanos.auth.Subject',
+      name: 'subject',
+      factory: function() { return this.Subject.create(); }
+    },
+    {
+      class: 'foam.core.FObjectProperty',
       of: 'foam.nanos.auth.Group',
       name: 'group'
     },
@@ -275,8 +283,9 @@ foam.CLASS({
       this.clientPromise.then(async function(client) {
         self.setPrivate_('__subContext__', client.__subContext__);
 
-        await self.fetchAgent();
-        await self.fetchUser();
+        await self.fetchSubject();
+        self.user = self.subject.user;
+        self.agent = self.subject.realUser;
 
         // Fetch the group only once the user has logged in. That's why we await
         // the line above before executing this one.
@@ -322,23 +331,38 @@ foam.CLASS({
       }
     },
 
-    async function fetchUser() {
+//    async function fetchUser() {
+//      /** Get current user, else show login. */
+//      try {
+//        var result = await this.client.auth.getCurrentUser(null);
+//        this.loginSuccess = !! result;
+//
+//        if ( ! result ) throw new Error();
+//
+//        this.user = result;
+//      } catch (err) {
+//        await this.requestLogin();
+//        return await this.fetchUser();
+//      }
+//    },
+//
+//    async function fetchAgent() {
+//      this.agent = await this.client.agentAuth.getCurrentAgent();
+//    },
+
+    async function fetchSubject() {
       /** Get current user, else show login. */
       try {
-        var result = await this.client.auth.getCurrentUser(null);
-        this.loginSuccess = !! result;
+        var result = await this.client.auth.getCurrentSubject(null);
+        this.loginSuccess = !! result && !! result.user;
 
-        if ( ! result ) throw new Error();
+        if ( ! this.loginSuccess ) throw new Error();
 
-        this.user = result;
+        this.subject = result;
       } catch (err) {
         await this.requestLogin();
-        return await this.fetchUser();
+        return await this.fetchSubject();
       }
-    },
-
-    async function fetchAgent() {
-      this.agent = await this.client.agentAuth.getCurrentAgent();
     },
 
     function expandShortFormMacro(css, m) {
