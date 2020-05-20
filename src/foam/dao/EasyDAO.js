@@ -954,7 +954,6 @@ model from which to test ServiceProvider ID (spid)`,
       javaCode: `
         if ( getMdao() != null ) {
           getMdao().addIndex(props);
-//          ((foam.dao.MDAO) getMdao().getDelegate()).addIndex(props);
         }
         return this;
       `
@@ -978,7 +977,6 @@ model from which to test ServiceProvider ID (spid)`,
       javaCode: `
         if ( getMdao() != null )
           getMdao().addIndex(index);
-//          ((foam.dao.MDAO) getMdao().getDelegate()).addIndex(index);
         return this;
       `
     },
