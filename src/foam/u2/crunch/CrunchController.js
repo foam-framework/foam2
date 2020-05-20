@@ -14,7 +14,6 @@ foam.CLASS({
     'ctrl',
     'prerequisiteCapabilityJunctionDAO',
     'stack',
-    'user',
     'userCapabilityJunctionDAO'
   ],
 

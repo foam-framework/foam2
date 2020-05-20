@@ -56,7 +56,7 @@ foam.CLASS({
       documentation: `Check if current user has permission to add this junction`,
       javaCode: `
         User user = getUser(x);
-        User agent = (User) x.get("agent");
+        User agent = ((Subject) x.get("subject")).getRealUser();
         AuthService auth = (AuthService) x.get("auth");
         boolean isOwner = obj.getSourceId() == user.getId() || ( agent != null && obj.getSourceId() == agent.getId() );
         if ( ! isOwner && ! auth.check(x, "*") ) throw new AuthorizationException();
@@ -158,26 +158,39 @@ foam.CLASS({
       DAO dao = (DAO) x.get(daoKey);
       if ( dao == null ) return;
 
-      // Identify or create data to go into dao.
-      FObject objectToSave;
+      FObject objectToSave;                                                  // Identify or create data to go into dao.
       String contextDAOFindKey = (String)capability.getContextDAOFindKey();
+
       if ( contextDAOFindKey != null && ! contextDAOFindKey.isEmpty() ) {
-        objectToSave = (FObject) x.get(contextDAOFindKey);
-        if ( objectToSave == null ) {
-          throw new RuntimeException("@UserCapabilityJunction capability.contextDAOFindKey not found in context. Please check capability: " + obj.getTargetId() + " and its contextDAOKey: " + capability.getContextDAOFindKey());
+        if ( contextDAOFindKey.toLowerCase().contains("subject") ) {         // 1- Case if subject lookup
+          String[] words = foam.util.StringUtil.split(contextDAOFindKey, '.');
+          objectToSave = (FObject) x.get("subject");
+          
+          if ( objectToSave == null || words.length < 2 )
+          throw new RuntimeException("@UserCapabilityJunction capability.contextDAOFindKey not found in context. Please check capability: " + obj.getTargetId() + " and its contextDAOFindKey: " + contextDAOFindKey);
+          
+          if ( words[1].toLowerCase().equals("user") ) {
+            objectToSave = ((Subject) objectToSave).getUser();
+          } else if ( words[1].toLowerCase().equals("realuser") ) {
+            objectToSave = ((Subject) objectToSave).getRealUser();
+          }
+        } else {                                                              // 2- Case if anything other then subject specified
+          objectToSave = (FObject) x.get(contextDAOFindKey);
+
+          if ( objectToSave == null )
+            throw new RuntimeException("@UserCapabilityJunction capability.contextDAOFindKey not found in context. Please check capability: " + obj.getTargetId() + " and its contextDAOFindKey: " + contextDAOFindKey);
         }
       } else {
-        try {
+        try {                                                                 // 3- Case where contextDAOFindKey not specified:
+          // Create new object of DAO type to copy over properties
           objectToSave = (FObject) dao.getOf().newInstance();
-        } catch (Exception e) {
+        } catch (Exception e) {                                               // 4- default case, try using ucj data directly.
           objectToSave = (FObject) obj.getData();
         }
-
       }
-      objectToSave = objectToSave.fclone().copyFrom(obj.getData());
+      objectToSave = objectToSave.fclone().copyFrom(obj.getData());           // finally copy user inputed data into objectToSave <- typed to the safest possibility from above cases
 
-      // save data to dao
-      try {
+      try {                                                                   // save data to dao
         dao.put(objectToSave);
       } catch (Exception e) {
         Logger logger = (Logger) x.get("logger");

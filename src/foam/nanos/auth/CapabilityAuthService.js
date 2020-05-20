@@ -142,7 +142,7 @@ foam.CLASS({
         if ( x == null || permission == null ) return false;
         if ( x.get(Session.class) == null ) return false;
         if ( user == null || ! user.getEnabled() ) return false;
-        User agent = (User) x.get("agent");
+        User agent = ((Subject) x.get("subject")).getRealUser();
         this.initialize(x);
 
         String key = user.getId() + permission;
