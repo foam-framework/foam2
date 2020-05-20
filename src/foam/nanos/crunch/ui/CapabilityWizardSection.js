@@ -37,21 +37,6 @@ foam.CLASS({
       }
     },
     {
-      name: 'ofSections',
-      factory: null,
-      expression: function(of) {
-        if ( ! of ) return null;
-        let listOfSectionAxiomsFromClass = of.getAxiomsByClass(this.SectionAxiom);
-        var listOfSectionsFromClass = listOfSectionAxiomsFromClass
-          .sort((a, b) => a.order - b.order)
-          .map((a) => this.Section.create().fromSectionAxiom(a, of));
-        let unSectionedPropertiesSection = this.checkForUnusedProperties(listOfSectionsFromClass, of); // this also will handle models with no sections
-        if ( unSectionedPropertiesSection )
-          listOfSectionsFromClass.push(unSectionedPropertiesSection);
-        return listOfSectionsFromClass;
-      }
-    },
-    {
       name: 'data',
       factory: function () {
         if ( ! this.of ) return null;
@@ -80,31 +65,6 @@ foam.CLASS({
           if ( this.of ) ucj.data = this.data;
           return this.userCapabilityJunctionDAO.put(ucj);
         });
-      }
-    },
-    {
-      name: 'checkForUnusedProperties',
-      code: function(sections, of) {
-        var usedAxioms = sections
-          .map((s) => s.properties.concat(s.actions))
-          .flat()
-          .reduce((map, a) => {
-            map[a.name] = true;
-            return map;
-          }, {});
-        var unusedProperties = of.getAxiomsByClass(this.Property)
-          .filter((p) => ! usedAxioms[p.name])
-          .filter((p) => ! p.hidden);
-        var unusedActions = of.getAxiomsByClass(this.Action)
-          .filter((a) => ! usedAxioms[a.name]);
-
-        if ( unusedProperties.length || unusedActions.length ) {
-          return this.Section.create({
-            properties: unusedProperties,
-            actions: unusedActions
-          });
-        }
-        return undefined;
       }
     },
     {

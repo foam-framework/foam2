@@ -98,21 +98,17 @@ foam.CLASS({
         .add(this.slot(
           (sectionsList) => {
             return this.E().forEach(
-              sectionsList.filter((section) => section.of),
-              (wizardSection) => (wizardSection.ofSections).map(
-                (section) => {
-                  var subThis = this.startContext({});
-                  subThis.__subSubContext__.register(
-                    this.VerticalDetailView,
-                    'foam.u2.detail.SectionedDetailView'
-                  );
-                  subThis
-                    .tag(this.sectionView, {
-                      section: section,
-                      data: wizardSection.data
-                    })
-                }
-              )
+              sectionsList.filter(section => section.of),
+              wizardSection => {
+                var subThis = this.startContext({});
+                subThis.__subSubContext__.register(
+                  this.VerticalDetailView,
+                  'foam.u2.detail.SectionedDetailView'
+                );
+                subThis.tag(this.VerticalDetailView, {
+                  data: wizardSection.data
+                });
+              }
             );
           }
         ))
