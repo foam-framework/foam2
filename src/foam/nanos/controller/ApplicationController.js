@@ -284,6 +284,8 @@ foam.CLASS({
         self.setPrivate_('__subContext__', client.__subContext__);
 
         await self.fetchSubject();
+
+        // add user and agent for backward compatibility
         self.user = self.subject.user;
         self.agent = self.subject.realUser;
 
@@ -330,25 +332,6 @@ foam.CLASS({
         console.error(err.message || this.GROUP_FETCH_ERR);
       }
     },
-
-//    async function fetchUser() {
-//      /** Get current user, else show login. */
-//      try {
-//        var result = await this.client.auth.getCurrentUser(null);
-//        this.loginSuccess = !! result;
-//
-//        if ( ! result ) throw new Error();
-//
-//        this.user = result;
-//      } catch (err) {
-//        await this.requestLogin();
-//        return await this.fetchUser();
-//      }
-//    },
-//
-//    async function fetchAgent() {
-//      this.agent = await this.client.agentAuth.getCurrentAgent();
-//    },
 
     async function fetchSubject() {
       /** Get current user, else show login. */
