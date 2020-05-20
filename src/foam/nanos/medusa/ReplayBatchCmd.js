@@ -16,14 +16,6 @@ foam.CLASS({
       of: 'foam.nanos.medusa.ReplayDetailsCmd'
     },
     {
-      name: 'fromIndex',
-      class: 'Long'
-    },
-    {
-      name: 'toIndex',
-      class: 'Long'
-    },
-    {
       name: 'batch',
       class: 'Map'
     }

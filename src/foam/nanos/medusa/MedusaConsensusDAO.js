@@ -132,8 +132,8 @@ foam.CLASS({
           if ( found == null ) {
             found = entry;
           } else {
-            // TODO: disable freezing.
-            found = (MedusaEntry) found.fclone();
+            // freezing disabled.
+            //found = (MedusaEntry) found.fclone();
           }
           found.setConsensusCount(found.getConsensusCount() + 1);
           entry = (MedusaEntry) getDelegate().put_(x, found);
@@ -141,7 +141,7 @@ foam.CLASS({
             if ( entry.getIndex() == getIndex() + 1 ) {
               promote(x, entry);
             } else {
-              getLogger().debug("put", getIndex(), entry.getIndex(), "promoteLock_.notify");
+              getLogger().debug("put", getIndex(), entry.getIndex(), "promoter", "notify");
               synchronized ( promoteLock_ ) {
                 promoteLock_.notify();
               }

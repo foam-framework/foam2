@@ -60,14 +60,6 @@ foam.CLASS({
       javaFactory: 'return new HashMap();'
     },
     {
-      name: 'from',
-      class: 'Long'
-    },
-    {
-      name: 'to',
-      class: 'Long'
-    },
-    {
       name: 'count',
       class: 'Long'
     },
@@ -132,12 +124,6 @@ foam.CLASS({
           }
         }
         MedusaEntry entry = (MedusaEntry) obj;
-        if ( getFrom() == 0L ) {
-          setFrom(entry.getIndex());
-        } else {
-          setFrom(Math.min(getFrom(), entry.getIndex()));
-        }
-        setTo(Math.max(getTo(), entry.getIndex()));
         getBatch().put(entry.getIndex(), entry);
       }
       if ( getBatch().size() >= getMaxBatchSize() ) {
@@ -177,18 +163,16 @@ foam.CLASS({
         setCount(getCount() + batch.size());
         long startTime = System.currentTimeMillis();
 
-        getLogger().debug("execute", "batch", "size", batch.size(), "count", getCount(), "to", getTo(), "details", getDetails());
+        getLogger().debug("execute", "count", getCount(), "details", getDetails());
 
         if ( batch.size() > 0 ) {
           ReplayBatchCmd cmd = new ReplayBatchCmd();
           cmd.setDetails(getDetails());
-          cmd.setFromIndex(getFrom());
-          cmd.setToIndex(getTo());
           cmd.setBatch(batch);
+          getLogger().debug("execute", "batch", batch.size());
           PM pm = createPM(x, pmName);
           getDao().cmd_(x, cmd);
           pm.log(x);
-          // TODO - process results
         }
 
         long delay = getBatchTimerInterval() - (System.currentTimeMillis() - startTime);
@@ -199,7 +183,7 @@ foam.CLASS({
           }
         }
       }
-      getLogger().debug("execute", "exit", "batch", "size", getBatch().size(), "count", getCount(), "to", getTo(), "details", getDetails());
+      getLogger().debug("execute", "exit", "count", getCount(), "details", getDetails());
     } catch (InterruptedException e) {
       // nop
     } catch ( Throwable t ) {
