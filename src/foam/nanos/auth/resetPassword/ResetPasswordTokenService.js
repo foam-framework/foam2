@@ -13,9 +13,9 @@ foam.CLASS({
 
   imports: [
     'appConfig',
-    'email',
-    'localUserDAO',
-    'tokenDAO'
+    'Email email',
+    'DAO localUserDAO',
+    'DAO tokenDAO'
   ],
 
   javaImports: [

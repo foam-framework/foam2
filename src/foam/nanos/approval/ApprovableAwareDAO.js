@@ -269,7 +269,7 @@ foam.CLASS({
         )).inX(getX()).select(new ArraySink())).getArray();
 
       if ( pendingRequests.size() > 0 && fulfilledRequests.size() == 0 && approverIds.size() == 0 ) 
-        throw new RuntimeException("There already exists approval requests for this operation");
+        throw new RuntimeException("There is an outstanding approval for this request.");
 
       if ( fulfilledRequests.size() == 1 ) {
         ApprovalRequest fulfilledRequest = (ApprovalRequest) fulfilledRequests.get(0);

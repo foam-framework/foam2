@@ -16,7 +16,7 @@ foam.CLASS({
   ],
 
   imports: [
-    'localUserDAO'
+    'DAO localUserDAO'
   ],
 
   javaImports: [
