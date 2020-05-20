@@ -360,20 +360,20 @@ public class Outputter
     ClassInfo info           = oldFObject.getClassInfo();
     ClassInfo newInfo        = newFObject.getClassInfo();
     boolean   outputComma    = true;
-    boolean   isDiff         = false;
+    boolean   opened         = false;
     boolean   isPropertyDiff = false;
 
     if ( ! oldFObject.equals(newFObject) ) {
       List     axioms = getProperties(info);
       Iterator i      = axioms.iterator();
 
-      writer_.append("{");
-      if ( multiLineOutput_ ) addInnerNewline();
+      addInnerNewline();
       while ( i.hasNext() ) {
         PropertyInfo prop = (PropertyInfo) i.next();
         isPropertyDiff = maybeOutputPropertyDelta(oldFObject, newFObject, prop);
         if ( isPropertyDiff) {
-          if ( ! isDiff ) {
+          if ( ! opened ) {
+            writer_.append("{");
             if ( outputClassNames_ ) {
               //output Class name
               writer_.append(beforeKey_());
@@ -386,7 +386,7 @@ public class Outputter
             addInnerNewline();
             PropertyInfo id = (PropertyInfo) newInfo.getAxiomByName("id");
             outputProperty(newFObject, id);
-            isDiff = true;
+            opened = true;
           }
           writer_.append(",");
           addInnerNewline();
@@ -394,8 +394,8 @@ public class Outputter
         }
       }
 
-      if ( isDiff ) {
-        if ( multiLineOutput_ )  writer_.append("\n");
+      if ( opened ) {
+        addInnerNewline();
         writer_.append("}");
       }
     }
