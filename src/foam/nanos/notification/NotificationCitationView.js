@@ -98,8 +98,8 @@ foam.CLASS({
       }
 
       // truncate string if it is too long
-      var description = this.data.description;
-      if ( description.length > 70 ) {
+      var description = this.data.description != '' ? this.data.description : this.data.body;
+      if ( description != '' && description.length > 70 ) {
         description = description.substr(0, 70-1) + '...';
       }
 
@@ -118,7 +118,7 @@ foam.CLASS({
             .show(this.data.entity != '').add(this.data.entity)
           .end()
           .start().addClass('description')
-            .add(description == '' ? this.data.body : description)
+            .add(description)
           .end()
           .callIf(this.data.approvalStatus == 'REQUESTED', () => {
             this.start().addClass('approvalStatus')
