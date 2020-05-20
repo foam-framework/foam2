@@ -7,6 +7,8 @@
 package foam.core;
 
 import java.util.ArrayList;
+import foam.nanos.app.AppConfig;
+import foam.nanos.app.Mode;
 
 public class CompoundException
   extends RuntimeException
@@ -17,10 +19,12 @@ public class CompoundException
     exceptions_.add(t);
   }
 
-  public void maybeThrow() throws Throwable {
-    for ( int i = 0 ; i < exceptions_.size() ; i++ ) {
-      System.out.println( "This is an error =======> " + ( (Throwable) exceptions_.get(i) ) );
-      throw (Throwable) exceptions_.get(i);
+  public void maybeThrow(AppConfig appConfig) {
+    if ( Mode.TEST == appConfig.getMode() ) {
+      for ( int i = 0 ; i < exceptions_.size() ; i++ ) {
+        System.out.println( "This is an error =======> " + ( (Throwable) exceptions_.get(i) ) );
+        throw (RuntimeException) exceptions_.get(i);
+      }
     }
   }
 }
