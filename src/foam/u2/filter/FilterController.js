@@ -258,10 +258,11 @@ foam.CLASS({
 
       // Don't clear if view does not exist or crosscheck fails
       if ( ! view || ! criterias[criteria].views[name] ) return;
+
       // There could be a case where the view's data is for reconstruction
       // Therefore, there won't be a method called clear
       if ( criterias[criteria].views[name].clear ) criterias[criteria].views[name].clear();
-      criterias[criteria].predicates = {};
+      criterias[criteria].predicates[name] = {};
       if ( remove ) {
         // There could be a case where the view's data is for reconstruction
         // Therefore, there won't be any subs
