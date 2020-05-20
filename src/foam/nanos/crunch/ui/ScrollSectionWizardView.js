@@ -139,15 +139,13 @@ foam.CLASS({
       code: function(x) {
         var p = Promise.resolve();
 
-        x.ctrl.notify('Saving...');
-
         this.sectionsList.reduce(
           (p, wizardSection) => p.then(() => wizardSection.save()), p
         ).then(() => {
           x.ctrl.notify('Your progress has been saved.');
           x.stack.back();
-        }).catch(() => {
-          x.ctrl.notify('Error saving progress')
+        }).catch((e) => {
+          x.ctrl.notify('Error saving progress:' + e)
         });
       }
     }

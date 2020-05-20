@@ -113,7 +113,7 @@ foam.INTERFACE({
     // parameter? Something like:
     //
     //   Boolean check(X x, String permission) {
-    //     User user = (User) x.get("user"); // Or use `getCurrentUser`
+    //     User user = (User) ((Subject)x.get("subject")).getRealUser(); // Or use `getCurrentUser`
     //     return check(x, user, permission);
     //   }
     //
