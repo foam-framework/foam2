@@ -11,8 +11,8 @@
 
     requires: [
       'foam.nanos.auth.User',
-      'foam.u2.view.OverlayActionListView',
-      'net.nanopay.liquidity.LiquidNotificationCitationView'
+      'foam.nanos.notification.NotificationCitationView',
+      'foam.u2.view.OverlayActionListView'
     ],
 
     imports: [
@@ -78,7 +78,7 @@
             ],
             obj: this.data
           })
-          .tag(this.LiquidNotificationCitationView, {
+          .tag(this.NotificationCitationView, {
             of: this.data.cls_,
             data: this.data
           });
