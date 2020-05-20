@@ -138,7 +138,6 @@ foam.CLASS({
     'foam.dao.DAO',
     'static foam.mlang.MLang.EQ',
     'foam.nanos.app.AppConfig',
-    'foam.nanos.theme.Theme',
     'foam.util.SafetyUtil',
     'java.util.List',
     'javax.security.auth.AuthPermission',
@@ -203,7 +202,6 @@ foam.CLASS({
         // Find Group details, by iterating up through group.parent
         Group group               = this;
         DAO groupDAO              = (DAO) x.get("groupDAO");
-        Theme theme              = (Theme) x.get("theme");
 
         String configUrl           = "";
 
