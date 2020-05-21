@@ -13,6 +13,7 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.nanos.app.AppConfig',
     'foam.nanos.logger.Logger',
     'java.util.ArrayList'
   ],
@@ -42,7 +43,7 @@ for ( Runnable agent : getAgents() ) {
     e.add(t);
   }
 }
-e.maybeThrow();`
+e.maybeThrow((AppConfig) getX().get("appConfig"));`
     },
     {
       name: 'submit',
