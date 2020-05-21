@@ -83,7 +83,7 @@ foam.CLASS({
     },
     {
       // All search views (in the SearchManager) need a name.
-      // This defaults to 'query'.
+      // This defaults to 'textSearchView'.
       name: 'name',
       value: 'textSearchView'
     },

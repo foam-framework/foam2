@@ -1,6 +1,6 @@
 /**
 * @license
-* Copyright 2020 The FOAM Authors. All Rights Reserved.
+* Copyright 2019 The FOAM Authors. All Rights Reserved.
 * http://www.apache.org/licenses/LICENSE-2.0
 */
 
@@ -201,7 +201,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'isLoading',
-      documentation: 'boolean tracking we are still loading info from DAO',
+      documentation: 'Boolean tracking that we are still loading info from DAO',
       value: false
     },
     {
