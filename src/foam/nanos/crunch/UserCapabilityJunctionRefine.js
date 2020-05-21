@@ -37,7 +37,12 @@ foam.CLASS({
       name: 'status',
       class: 'Enum',
       of: 'foam.nanos.crunch.CapabilityJunctionStatus',
-      value: foam.nanos.crunch.CapabilityJunctionStatus.PENDING
+      value: foam.nanos.crunch.CapabilityJunctionStatus.ACTION_REQUIRED
+    },
+    {
+      name: 'reviewed',
+      class: 'Boolean',
+      permissionRequired: true
     }
   ]
 });

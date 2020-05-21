@@ -95,11 +95,12 @@ foam.CLASS({
       ],
       type: 'foam.core.FObject',
       documentation: `
-      Set the status of the junction before putting by checking if prerequisites are fulfilled and data required is validated.
-      If status is set to GRANTED, check if junctions depending on current can be granted
+      Set the status of the junction before put by checking if prerequisites are fulfilled, data required is validated,
+      and whether review is required and set.
       `,
       javaCode: `
       UserCapabilityJunction ucJunction = (UserCapabilityJunction) obj;
+      UserCapabilityJunction old = (UserCapabilityJunction) getDelegate().find_(x, ucJunction.getId());
 
       DAO capabilityDAO = (DAO) x.get("capabilityDAO");
       Capability capability = (Capability) capabilityDAO.find_(x, ucJunction.getTargetId());
@@ -107,23 +108,35 @@ foam.CLASS({
       checkOwnership(x, ucJunction);
 
       // if the junction is being updated from GRANTED to EXPIRED, put into junctionDAO without checking prereqs and data
-      UserCapabilityJunction old = (UserCapabilityJunction) getDelegate().find_(x, ucJunction.getId());
       if ( old != null && old.getStatus() == CapabilityJunctionStatus.GRANTED && ucJunction.getStatus() == CapabilityJunctionStatus.EXPIRED )
         return getDelegate().put_(x, ucJunction);
 
-      List<CapabilityCapabilityJunction> prereqJunctions = (List<CapabilityCapabilityJunction>) getPrereqs(x, obj);
-
       boolean requiresData = capability.getOf() != null;
+      boolean requiresReview = capability.getReviewRequired();
 
-      if ( ( ! requiresData || ( ucJunction.getData() != null && validateData(x, ucJunction)) ) && checkPrereqs(x, ucJunction, prereqJunctions) ) {
-        ucJunction.setStatus(CapabilityJunctionStatus.GRANTED);
+      // case old == null or status is actionRequired
+      if ( old == null || ucJunction.getStatus() == CapabilityJunctionStatus.ACTION_REQUIRED || ucJunction.getStatus() == CapabilityJunctionStatus.EXPIRED ) {
+        // if all the prereqs are passed and the data is validated, the status can go to pending
+        if ( ( ! requiresData || ( ucJunction.getData() != null && validateData(x, ucJunction) ) ) && checkPrereqs(x, ucJunction) ) {
+          // if review is required for this Capability, set the status to pending so that rules can be triggered
+          // to call followup actions
+          if ( requiresReview ) ucJunction.setStatus(CapabilityJunctionStatus.PENDING);
+          else ucJunction.setStatus(CapabilityJunctionStatus.GRANTED);
+        } else {
+          ucJunction.setStatus(CapabilityJunctionStatus.ACTION_REQUIRED);
+        }
+      } 
+
+      if ( ucJunction.getStatus() == CapabilityJunctionStatus.PENDING ) {
+        if ( ! requiresReview || ucJunction.getReviewed() ) ucJunction.setStatus(CapabilityJunctionStatus.GRANTED);
+      }
+
+      if ( ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED ) {
         if ( requiresData && capability.getDaoKey() != null ) saveDataToDAO(x, capability, ucJunction);
         configureJunctionExpiry(x, ucJunction, old, capability);
       }
-      else ucJunction.setStatus(CapabilityJunctionStatus.PENDING);
 
-      return getDelegate().put_(x, obj);
-
+      return getDelegate().put_(x, ucJunction);
       `
     },
     {
@@ -283,16 +296,13 @@ foam.CLASS({
         {
           name: 'obj',
           type: 'foam.core.FObject'
-        },
-        {
-          name: 'ccJunctions',
-          javaType: 'java.util.List<CapabilityCapabilityJunction>'
         }
       ],
       type: 'Boolean',
       documentation: `Check if prerequisites of a capability is fulfilled`,
       javaCode: `
       boolean prerequisitesFulfilled = true;
+      List<CapabilityCapabilityJunction> ccJunctions = ( List<CapabilityCapabilityJunction> ) getPrereqs(x, obj);
 
       // for each of those junctions, check if the prerequisite is granted, if not, return false
       UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
