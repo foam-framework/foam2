@@ -100,12 +100,12 @@
         property. In this case, we are using the id.
       `,
       code: function(x) {
-        return this.id + " - " + this.name;
+        return this.id;
       }
     },
     {
       name: 'format',
-      code: function(amount) {
+      code: function(amount, hideId) {
         /**
          * Given a number, display it as a currency using the appropriate
          * precision, decimal character, delimiter, symbol, and placement
@@ -124,28 +124,32 @@
         var beforeDecimal = amount.substring(0, amount.length - this.precision);
         var formatted = isNegative ? '-' : '';
 
-        if ( this.leftOrRight === 'right' ) {
-          formatted += this.id;
-          formatted += ' ';
+        if ( ! hideId ) {
+          if ( this.leftOrRight === 'right' ) {
+            formatted += this.id;
+            formatted += ' ';
+          }
+          if ( this.leftOrRight === 'left' ) {
+            formatted += this.symbol;
+            if ( this.showSpace ) formatted += ' ';
+          }
         }
 
-        if ( this.leftOrRight === 'left' ) {
-          formatted += this.symbol;
-          if ( this.showSpace ) formatted += ' ';
-        }
         formatted += beforeDecimal.replace(/\B(?=(\d{3})+(?!\d))/g, this.delimiter) || '0';
         if ( this.precision > 0 ) {
           formatted += this.decimalCharacter;
           formatted += amount.substring(amount.length - this.precision);
         }
-        if ( this.leftOrRight === 'right' ) {
-          if ( this.showSpace ) formatted += ' ';
-          formatted += this.symbol;
-        }
 
-        if ( this.leftOrRight === 'left' ) {
-          formatted += ' ';
-          formatted += this.id;
+        if ( ! hideId ) {
+          if ( this.leftOrRight === 'right' ) {
+            if ( this.showSpace ) formatted += ' ';
+            formatted += this.symbol;
+          }
+          if ( this.leftOrRight === 'left' ) {
+            formatted += ' ';
+            formatted += this.id;
+          }
         }
 
         return formatted;
@@ -154,6 +158,10 @@
         {
           class: 'foam.core.UnitValue',
           name: 'amount'
+        },
+        {
+          class: 'Boolean',
+          name: 'hideId'
         }
       ],
       type: 'String',
@@ -168,7 +176,7 @@
         String formatted = isNegative ? "-" : "";
 
 
-        if ( SafetyUtil.equals(this.getLeftOrRight(), "left") ) {
+        if ( ! hideId && SafetyUtil.equals(this.getLeftOrRight(), "left") ) {
           formatted += this.getSymbol();
           if ( this.getShowSpace() ) {
             formatted += " ";
@@ -184,7 +192,7 @@
           formatted += amountStr.substring(amountStr.length() - this.getPrecision());
         }
 
-        if ( SafetyUtil.equals(this.getLeftOrRight(), "right") ) {
+        if ( ! hideId && SafetyUtil.equals(this.getLeftOrRight(), "right") ) {
           if ( this.getShowSpace() ) {
             formatted += " ";
           }
@@ -193,28 +201,6 @@
 
 
         return formatted;
-      `
-    },
-    {
-      name: 'formatPrecision',
-      documentation: `
-        Given a number, display it as a currency using the appropriate
-        precision. Use a period '.' for the decimal place and do not
-        include commas or currency symbols.
-        Suitable for use when exporting to CSV.
-      `,
-      code: function(amount) {
-        return (amount/Math.pow(2, this.precision)).toFixed(this.precision);
-      },
-      args: [
-        {
-          class: 'foam.core.UnitValue',
-          name: 'amount'
-        }
-      ],
-      type: 'String',
-      javaCode: `
-        return String.format("%." + getPrecision() + "f", amount/Math.pow(10, getPrecision()));
       `
     }
   ]

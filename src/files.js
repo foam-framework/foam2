@@ -474,6 +474,7 @@ FOAM_FILES([
   { name: "foam/u2/view/FloatView", flags: ['web'] },
   { name: "foam/u2/view/IntView", flags: ['web'] },
   { name: "foam/u2/view/CurrencyView", flags: ['web'] },
+  { name: "foam/u2/view/CurrencyInputView", flags: ['web'] },
   { name: "foam/u2/view/FObjectPropertyView", flags: ['web'] },
   { name: "foam/u2/view/CodeView", flags: ['web'] },
   { name: "foam/u2/view/ReferencePropertyView", flags: ['web'] },
