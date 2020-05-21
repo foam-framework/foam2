@@ -21,7 +21,12 @@ foam.ENUM({
       name: 'EXPIRED',
       label: 'expired',
       background: '#bf3232'
-    }
+    },
+    {
+      name: 'ACTION_REQUIRED',
+      label: 'action required',
+      background: '#bf3232'
+    },
   ]
 });
   

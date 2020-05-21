@@ -184,6 +184,11 @@ foam.CLASS({
         }.bind(this));
       }
     },
+    {
+      name: 'reviewRequired',
+      class: 'Boolean',
+      permissionRequired: true
+    }
   ],
 
 
