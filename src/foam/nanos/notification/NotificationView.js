@@ -35,27 +35,33 @@ foam.CLASS({
   css: `
      ^ .foam-u2-DAOList > div {
       background: white;
-      margin-top:16px;
-      min-height: 50px;
-      border-radius: 3px;
-      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
-      border: solid 1px #e7eaec;
-      background-color: #ffffff;
+      margin-top:1px;
+      min-height: 66px;
+    }
+     ^ .foam-u2-DAOList > div:nth-child(odd) {
+      background: #f6f9f9;
     }
      ^ .notifs {
-      margin-left: 32px;
+      width:500px;
+      margin:0 auto;
     }
-    ^ .title {
-      width: 208px;
-      height: 40px;
-      font-family: IBMPlexSans;
-      font-size: 35px;
-      font-weight: 600;
-      font-stretch: normal;
+     ^ h3 {
+      margin-bottom:20px;
+      width: 105px;
+      height: 20px;
+      opacity: 0.6;
+      font-family: Roboto;
+      font-size: 20px;
+      font-weight: 300;
       font-style: normal;
-      line-height: 1.14;
-      letter-spacing: normal;
-      color: #1e1f21;
+      font-stretch: normal;
+      line-height: 1;
+      letter-spacing: 0.3px;
+      text-align: left;
+      color: /*%BLACK%*/ #1e1f21;
+    }
+     ^ .unread .foam-u2-DAOList > div {
+      background-color: rgba(89, 165, 213, 0.3)
     }
   `,
 
@@ -114,10 +120,10 @@ foam.CLASS({
     function notificationsE() {
       return this.E()
         .addClass('notifs')
-        .start()
-          .add('Notifications').addClass('title')
+        .start('h3')
+          .add('Notifications')
         .end()
-        .start('div').add(this.UNREAD).end()
+        .start('div').addClass('unread').add(this.UNREAD).end()
         .add(this.NOTIFICATIONS);
     }
   ]
