@@ -42,6 +42,7 @@ foam.CLASS({
       name: 'rowView'
     },
     {
+      class: 'FObjectProperty',
       name: 'groupExpr',
       documentation: 'An expression which returns the group title. Can be a Property.'
     },
