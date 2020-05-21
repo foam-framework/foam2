@@ -53,6 +53,11 @@ foam.CLASS({
       class: 'Boolean',
       name: 'isTrackingRequestSent',
       value: true
+    },
+    {
+      class: 'String',
+      name: 'serviceName',
+      javaFactory: `return foam.util.StringUtil.daoize(getOf().getObjClass().getSimpleName());`
     }
   ],
 
@@ -303,7 +308,7 @@ foam.CLASS({
       // remove doesn't need an approvable to be generated since we already have the object
       if ( operation == Operations.REMOVE ){
         approvalRequest = new ApprovalRequest.Builder(x)
-          .setDaoKey(getOf().getObjClass().getSimpleName().toLowerCase() + "DAO")
+          .setDaoKey(getServiceName())
           .setServerDaoKey(getDaoKey())
           .setObjId(String.valueOf(obj.getProperty("id")))
           .setClassification(getOf().getObjClass().getSimpleName())
@@ -336,7 +341,7 @@ foam.CLASS({
 
         Approvable approvable = (Approvable) approvableDAO.put_(x, new Approvable.Builder(x)
           .setLookupId(hashedId)
-          .setDaoKey(getOf().getObjClass().getSimpleName().toLowerCase() + "DAO")
+          .setDaoKey(getServiceName())
           .setServerDaoKey(getDaoKey())
           .setStatus(ApprovalStatus.REQUESTED)
           .setObjId(String.valueOf(obj.getProperty("id")))
