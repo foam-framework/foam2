@@ -176,12 +176,18 @@ foam.CLASS({
   
         var exportDriver = foam.lookup(this.exportDriverReg.driverName).create();
   
-        this.note = this.exportData ?
-          await exportDriver.exportDAO(this.__context__, this.exportData) :
-          await exportDriver.exportFObject(this.__context__, this.exportObj);
+        var result = this.exportData ?
+          exportDriver.exportDAO(this.__context__, this.exportData) :
+          exportDriver.exportFObject(this.__context__, this.exportObj);
+
+        var self = this;
   
-        if ( this.exportAllColumns )
-          this.filteredTableColumns = filteredColumnsCopy;
+        result.then(function(val) {
+          self.note = val;
+
+          if ( this.exportAllColumns )
+            this.filteredTableColumns = filteredColumnsCopy;
+        });
       }
     },
     {

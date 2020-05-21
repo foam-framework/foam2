@@ -151,6 +151,7 @@ foam.CLASS({
       ],
       code: function(x, propValues) {
         var columnConfig = x.columnConfigToPropertyConverter;
+        if ( ! columnConfig ) columnConfig = this.__context__.lookup('foam.nanos.column.ColumnConfigToPropertyConverter').create();
         if ( ! propValues ) {
           propValues = this.props
           .map((propName) => {
@@ -203,8 +204,8 @@ foam.CLASS({
           for ( var columnPropValue of values ) {
             var prop = columnPropValue.propertyValue;
             if ( foam.core.Property.isInstance(prop) ) prop.toCSV.call(prop, x, obj1, self);
-            self.newLine_();
           }
+          self.newLine_();
         });
         
       },

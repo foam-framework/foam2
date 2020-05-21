@@ -24,9 +24,9 @@ foam.CLASS({
     },
     function exportDAO(X, dao) {
       return dao.select(this.CSVSink.create({
-          of: dao.of,
-          props: X.filteredTableColumns || undefined
-        }, X)).then( (s) => s.csv );
+        of: dao.of,
+        props: X.filteredTableColumns || undefined
+      }, X)).then( (s) => s.csv );
     }
   ]
 });

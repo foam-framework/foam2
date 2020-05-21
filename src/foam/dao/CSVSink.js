@@ -68,14 +68,19 @@ foam.CLASS({
           .setProps(getProps())
           .build();
       `
-    }
+    },
+    {
+      name: 'putPromises',
+      value: []
+    },
+    'eofPromise'
   ],
 
   methods: [
     {
       name: 'put',
       code: function(obj) {
-        this.outputter.outputFObject(this.__context__, obj);
+        this.putPromises.push(this.outputter.outputFObject(this.__context__, obj));
       },
       javaCode: `
         setCsv("");
@@ -86,7 +91,9 @@ foam.CLASS({
     {
       name: 'eof',
       code: function() {
-        this.csv = this.outputter.toString();
+        var self = this;
+        this.eofPromise = Promise.all(this.putPromises);
+        return this.eofPromise.then(function(values) { self.csv = self.outputter.toString(); });
       },
       javaCode: `
         setCsv(getOutputter().toString());
@@ -98,6 +105,8 @@ foam.CLASS({
       code: function() {
         this.outputter.flush();
         this.csv = '';
+        this.eofPromise = null;
+        this.putPromises = [];
       },
       javaCode: `
         getOutputter().flush();
