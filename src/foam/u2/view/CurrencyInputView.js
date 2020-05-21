@@ -53,6 +53,9 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'mode'
+    },
+    {
       name: 'contingentProperty'
     },
     {
@@ -68,9 +71,13 @@ foam.CLASS({
     {
       class: 'String',
       name: 'valueString',
-      value: '0',
+      factory: function() {
+        return this.data || 0;
+      },
       preSet: function(_, n) {
-        return this.currency.format(this.sanitizeString(n), true);
+        var sanitized = this.sanitizeString(n)
+        this.data = sanitized;
+        return this.currency ? this.currency.format(sanitized, true) : sanitized;
       },
       view: {
         class: 'foam.u2.tag.Input',
@@ -79,12 +86,8 @@ foam.CLASS({
     },
     {
       class: 'Long',
-      name: 'value',
-      documentation: 'Value stored is unformatted',
-      expression: function(valueString) {
-        console.log(this.sanitizeString(valueString));
-        return this.sanitizeString(valueString);
-      }
+      name: 'data',
+      documentation: 'Value stored is unformatted'
     }
   ],
 
