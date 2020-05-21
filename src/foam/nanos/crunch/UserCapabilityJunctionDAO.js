@@ -167,7 +167,7 @@ foam.CLASS({
           objectToSave = (FObject) x.get("subject");
           
           if ( objectToSave == null || words.length < 2 )
-          throw new RuntimeException("@UserCapabilityJunction capability.contextDAOFindKey not found in context. Please check capability: " + obj.getTargetId() + " and its contextDAOFindKey: " + contextDAOFindKey);
+            throw new RuntimeException("@UserCapabilityJunction capability.contextDAOFindKey not found in context. Please check capability: " + obj.getTargetId() + " and its contextDAOFindKey: " + contextDAOFindKey);
           
           if ( words[1].toLowerCase().equals("user") ) {
             objectToSave = ((Subject) objectToSave).getUser();
