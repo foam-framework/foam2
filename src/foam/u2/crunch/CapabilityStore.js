@@ -76,6 +76,17 @@ foam.CLASS({
         return this.visibleCapabilityDAO.where(this.IN(
           "featured", this.Capability.KEYWORDS));
       }
+    },
+    {
+      name: 'visibleCategoryDAO',
+      class: 'foam.dao.DAOProperty',
+      documentation: `
+        DAO Property to find categories that are visible.
+      `,
+      expression: function (capabilityCategoryDAO) {
+        return capabilityCategoryDAO
+          .where(this.EQ(this.CapabilityCategory.VISIBLE, true));
+      }
     }
   ],
 
@@ -96,7 +107,7 @@ foam.CLASS({
           // TODO: replace this .call with a .select once
           //       duplication error is fixed
           .call(function() {
-            self.capabilityCategoryDAO.select().then((a) => {
+            self.visibleCategoryDAO.select().then((a) => {
               for ( let i=0; i < a.array.length; i++ ) {
                 let category = a.array[i];
                 let e = self.Tab.create({ label: category.name })
@@ -118,8 +129,7 @@ foam.CLASS({
             let arr = result.array;
             let grid = self.E();
             grid
-              .addClass(self.myClass('four-column-grid'))
-              ;
+              .addClass(self.myClass('four-column-grid'));
             for ( let i=0 ; i < arr.length ; i++ ) {
               let cap = arr[i];
               grid = grid
@@ -146,7 +156,7 @@ foam.CLASS({
           return spot;
         }))
         // Capability Store Section Previews
-        .select(self.capabilityCategoryDAO, function(category) {
+        .select(self.visibleCategoryDAO, function(category) {
           var sectionElement = this.E('span');
           var returnElement = this.E()
             .start('h3')
