@@ -280,7 +280,7 @@ foam.CLASS({
           }
         }
 
-        // Do not throw runtime exception of there are no intercepts
+        // Do not throw runtime exception if there are no intercepts
         if ( filteredCapabilities.size() < 1 ) return;
 
         // Add filteredCapabilities to a runtime exception and throw it
@@ -292,4 +292,3 @@ foam.CLASS({
     }
   ]
 });
-
