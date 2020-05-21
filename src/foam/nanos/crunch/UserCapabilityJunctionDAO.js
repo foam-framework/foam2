@@ -207,7 +207,7 @@ foam.CLASS({
         dao.put(objectToSave);
       } catch (Exception e) {
         Logger logger = (Logger) x.get("logger");
-        logger.debug("Data cannot be added to " + capability.getDaoKey() + " for UserCapabilityJunction object : " + obj.getId() );
+        logger.warning("Data cannot be added to " + capability.getDaoKey() + " for UserCapabilityJunction object : " + obj.getId() );
       }
       `
     },

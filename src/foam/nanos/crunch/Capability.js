@@ -14,7 +14,6 @@ foam.CLASS({
   ],
 
   javaImports: [
-
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.dao.Sink',
@@ -147,7 +146,10 @@ foam.CLASS({
     },
     {
       name: 'daoKey',
-      class: 'String'
+      class: 'String',
+      documentation: `
+      daoKey.put() done in UserCapabilityJunctionDAO.
+      Uses contextDAOFindKey to find object to update/put.`
     },
     {
       name: 'contextDAOFindKey',

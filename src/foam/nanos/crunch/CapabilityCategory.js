@@ -22,8 +22,14 @@ foam.CLASS({
     },
     {
       name: 'description',
-      documentation: `Description of category`,
-      class: 'String'
+      class: 'String',
+      documentation: `Description of category`
+    },
+    {
+      name: 'visible',
+      class: 'Boolean',
+      documentation: 'categories are being used for UI display and also predicate rules on UCJDAO',
+      value: true
     }
   ]
 });
