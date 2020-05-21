@@ -14,7 +14,7 @@ foam.CLASS({
     {
       name: 'getColumnMethadata',
       type: 'foam.nanos.export.GoogleSheetsPropertyMetadata[]',
-      code: function(x, cls, propNames) {
+      code: async function(x, cls, propNames) {
         var metadata = [];
         var props = [];
         if ( ! propNames ) {
@@ -23,7 +23,7 @@ foam.CLASS({
         } else {
           var columnConfig = x.columnConfigToPropertyConverter;
           for ( var i = 0 ; i < propNames.length ; i++ ) {
-            props.push(columnConfig.returnProperty(cls, propNames[i]));
+            props.push(await columnConfig.returnProperty(cls, propNames[i]));
           }
         }
         
@@ -58,7 +58,7 @@ foam.CLASS({
         var values = [];
         var columnConfig = x.columnConfigToPropertyConverter;
         for (var i = 0 ; i < columnMetadata.length ; i++ ) {
-          var val = columnConfig.returnValue(cls, columnMetadata[i].propName, obj);
+          var val = await columnConfig.returnValue(cls, columnMetadata[i].propName, obj);
           values.push(await this.returnValueForMethadata(val, columnMetadata[i]));
         }
         return values;

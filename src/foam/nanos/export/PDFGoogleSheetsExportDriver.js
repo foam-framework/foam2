@@ -36,7 +36,7 @@ foam.CLASS({
         var sheetId  = '';
         var stringArray = [];
         var props = X.filteredTableColumns ? X.filteredTableColumns : self.outputter.getAllPropertyNames(obj.cls_);
-        var metadata = self.outputter.getColumnMethadata(X, obj.cls_, props);
+        var metadata = await self.outputter.getColumnMethadata(X, obj.cls_, props);
         stringArray.push(metadata.map(m => m.columnLabel));
         var values = await  self.outputter.outputArray(X, obj.cls_, [ obj ], metadata);
         stringArray = stringArray.concat(values);
@@ -55,7 +55,7 @@ foam.CLASS({
       var sheetId  = '';
       var stringArray = [];
       var props = X.filteredTableColumns ? X.filteredTableColumns : self.outputter.getAllPropertyNames(dao.of);
-      var metadata = self.outputter.getColumnMethadata(X, dao.of, props);
+      var metadata = await self.outputter.getColumnMethadata(X, dao.of, props);
       stringArray.push(metadata.map(m => m.columnLabel));
       var values = await self.outputter.outputArray(X, dao.of, sink.array, metadata);
       stringArray = stringArray.concat(values);
