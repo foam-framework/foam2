@@ -198,7 +198,7 @@ foam.CLASS({
               columnPropValues.push(col);
             }
           });
-         Promise.all(columnPropValues).then(values => {
+        return Promise.all(columnPropValues).then(values => {
           if ( this.isFirstRow ) self.outputHeader(x, values.map(c => c.propertyValue));
           for ( var columnPropValue of values ) {
             var prop = columnPropValue.propertyValue;
