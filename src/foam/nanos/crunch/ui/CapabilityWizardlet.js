@@ -1,6 +1,7 @@
 foam.CLASS({
   package: 'foam.nanos.crunch.ui',
-  name: 'CapabilityWizardSection',
+  name: 'CapabilityWizardlet',
+  extends: 'foam.u2.wizard.BaseWizardlet',
 
   implements: [
     'foam.mlang.Expressions'
