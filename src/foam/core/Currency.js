@@ -100,7 +100,7 @@
         property. In this case, we are using the id.
       `,
       code: function(x) {
-        return this.id;
+        return this.id + " - " + this.name;
       }
     },
     {
