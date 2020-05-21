@@ -16,6 +16,7 @@ foam.CLASS({
     'foam.core.*',
     'foam.nanos.column.ColumnConfigToPropertyConverter',
     'foam.nanos.column.ColumnPropertyValue',
+    'java.util.Arrays',
     'java.util.List',
     'java.util.Date'
   ],
@@ -148,16 +149,18 @@ foam.CLASS({
           name: 'props'
         }
       ],
-      code: function(x) {
+      code: function(x, propValues) {
         var columnConfig = x.columnConfigToPropertyConverter;
-        this.props
+        if ( ! propValues ) {
+          propValues = this.props
           .map((propName) => {
             var prop = propName;
             if ( foam.String.isInstance(prop) )
               prop = columnConfig.returnProperty(this.of, propName);
             return prop;
-          })
-          .forEach((p) => {
+          });
+        }
+        propValues.forEach((p) => {
             if ( foam.core.Property.isInstance(p) ) p.toCSVLabel.call(p, x, this);
           });
         this.newLine_();
@@ -183,21 +186,27 @@ foam.CLASS({
     {
       name: 'outputFObject',
       code: function(x, obj) {
+        var self = this;
         if ( ! this.of ) this.of = obj.cls_;
-        if ( this.isFirstRow ) this.outputHeader(x);
+        var columnPropValues = [];
         var columnConfig = x.columnConfigToPropertyConverter;
+        var obj1 = obj;
         this.props
           .forEach((propName) => {
-            var prop = propName;
-            var obj1 = obj;
-            if ( foam.String.isInstance(prop) ) {
-              var val = columnConfig.returnPropertyAndObject(this.of, propName, obj1);
-              prop = val.propertyValue;
-              obj1 = val.objValue;
+            if ( foam.String.isInstance(propName) ) {
+              var col = columnConfig.returnPropertyAndObject(this.of, propName, obj1);
+              columnPropValues.push(col);
             }
-            if ( foam.core.Property.isInstance(prop) ) prop.toCSV.call(prop, x, obj1, this);
           });
-        this.newLine_();
+         Promise.all(columnPropValues).then(values => {
+          if ( this.isFirstRow ) self.outputHeader(x, values.map(c => c.propertyValue));
+          for ( var columnPropValue of values ) {
+            var prop = columnPropValue.propertyValue;
+            if ( foam.core.Property.isInstance(prop) ) prop.toCSV.call(prop, x, obj1, self);
+            self.newLine_();
+          }
+        });
+        
       },
       javaCode: `
         if ( getOf() == null ) setOf(obj.getClassInfo());
