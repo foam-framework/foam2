@@ -15,7 +15,7 @@ foam.CLASS({
   ],
 
   imports: [
-    'EmailService email?'
+    'email?'
   ],
 
   properties: [

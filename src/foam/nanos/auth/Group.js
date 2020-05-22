@@ -354,14 +354,9 @@ foam.CLASS({
     it.
   `,
 
-  imports: [
-    'AuthService auth'
-  ],
+  imports: ['auth'],
 
-  javaImports: [
-    'foam.dao.DAO',
-    'foam.nanos.auth.AuthService'
-  ],
+  javaImports: ['foam.dao.DAO'],
 
   messages: [
     {

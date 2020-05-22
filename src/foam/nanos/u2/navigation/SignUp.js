@@ -22,6 +22,7 @@ foam.CLASS({
   requires: [
     'foam.nanos.auth.Address',
     'foam.nanos.auth.Country',
+    'foam.nanos.auth.Phone',
     'foam.nanos.auth.User'
   ],
 
@@ -269,7 +270,7 @@ foam.CLASS({
             address: this.Address.create({ countryId: this.countryId }),
             welcomeEmailSent: true,
             jobTitle: this.jobTitle,
-            phoneNumber: this.phone,
+            phone: this.Phone.create({ number: this.phone }),
             group: this.group_
           }))
           .then((user) => {

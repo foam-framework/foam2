@@ -7,7 +7,6 @@
 foam.CLASS({
   package: 'foam.flow',
   name: 'Document',
-
   properties: [
     {
       class: 'String',
@@ -23,7 +22,6 @@ foam.CLASS({
       view: { class: 'foam.flow.MarkupEditor' }
     }
   ],
-
   methods: [
     function toE(args, x) {
       var f = this.htmlish.parseString(this.markup, this.cls_.id);
@@ -31,7 +29,6 @@ foam.CLASS({
         x.E('span').add(this.htmlish.getLastError());
     }
   ],
-
   grammars: [
     {
       name: 'htmlish',
@@ -177,6 +174,7 @@ foam.CLASS({
           }
 
           return function(x) {
+            console.log("Tag", openIdent, "attributes", attributes);
             this.
               start(openIdent).
               attrs(attributes).

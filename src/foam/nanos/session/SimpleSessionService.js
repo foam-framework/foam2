@@ -17,9 +17,9 @@ foam.CLASS({
   implements: ['foam.nanos.session.SessionService'],
 
   imports: [
-    'AuthService auth',
-    'DAO localSessionDAO',
-    'DAO localUserDAO'
+    'auth',
+    'localSessionDAO',
+    'localUserDAO'
   ],
 
   javaImports: [

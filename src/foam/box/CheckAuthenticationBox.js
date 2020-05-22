@@ -21,11 +21,7 @@ foam.CLASS({
   extends: 'foam.box.ProxyBox',
 
   imports: [
-    'TokenVerifier tokenVerifier'
-  ],
-
-  javaImports: [
-    'com.google.auth.TokenVerifier'
+    'tokenVerifier'
   ],
 
   methods: [

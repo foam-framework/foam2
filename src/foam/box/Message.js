@@ -52,11 +52,6 @@ foam.CLASS({
         RemoteException wrapper = new RemoteException();
         wrapper.setId(t.getClass().getName());
         wrapper.setMessage(t.getMessage());
-        if (t instanceof foam.core.AbstractNativeException ) {
-          var ane = (foam.core.AbstractNativeException) t;
-          wrapper.setFoamException(ane.getFoamException());
-        }
-
 
         RPCErrorMessage reply = new RPCErrorMessage();
         reply.setData(wrapper);

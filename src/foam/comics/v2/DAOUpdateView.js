@@ -131,16 +131,31 @@ foam.CLASS({
         }, (e) => {
           this.throwError.pub(e);
 
-          if ( e.foamException && foam.comics.v2.userfeedback.UserFeedbackException.isInstance(e.foamException) && e.foamException.userFeedback  ){
-            var currentFeedback = e.foamException.userFeedback;
-            while ( currentFeedback ){
-              this.ctrl.add(this.NotificationMessage.create({
-                message: currentFeedback.message,
-                type: currentFeedback.status.name.toLowerCase()
-              }));
+          // TODO: uncomment this once we wire up a proper exception
+          // if ( foam.comics.v2.userfeedback.UserFeedbackException.isInstance(e) && e.userFeedback  ){
+          //   var currentFeedback = e.userFeedback;
+          //   while ( currentFeedback ){
+          //     this.ctrl.add(this.NotificationMessage.create({
+          //       message: currentFeedback.message,
+          //       type: currentFeedback.status.name.toLowerCase()
+          //     }));
 
-              currentFeedback = currentFeedback.next;
-            }
+          //     currentFeedback = currentFeedback.next;
+          //   }
+          // } else {
+          //   this.ctrl.add(this.NotificationMessage.create({
+          //     message: e.message,
+          //     type: 'error'
+          //   }));
+          // }
+
+          if ( e.message === 'An approval request has been sent out.' ) {
+            this.ctrl.add(this.NotificationMessage.create({
+              message: e.message,
+              type: 'success'
+            }));
+
+            this.stack.back();
           } else {
             this.ctrl.add(this.NotificationMessage.create({
               message: e.message,

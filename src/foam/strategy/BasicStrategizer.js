@@ -15,7 +15,7 @@ foam.CLASS({
   ],
 
   imports: [
-    'DAO strategyDAO'
+    'strategyDAO'
   ],
 
   javaImports: [
