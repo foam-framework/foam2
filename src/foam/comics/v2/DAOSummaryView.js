@@ -140,7 +140,7 @@ foam.CLASS({
       }
     },
     {
-      name: 'create',
+      name: 'copy',
       isEnabled: function(config, data) {
         if ( config.CRUDEnabledActionsAuth && config.CRUDEnabledActionsAuth.isEnabled ) {
           try {
@@ -162,9 +162,12 @@ foam.CLASS({
       },
       code: function() {
         if ( ! this.stack ) return;
+        let newRecord = this.data.clone();
+        // Clear PK so DAO can generate a new unique one
+        newRecord.id = undefined;
         this.stack.push({
-          class: 'foam.comics.v2.DAOUpdateView',
-          data: this.data,
+          class: 'foam.comics.v2.DAOCreateView',
+          data: newRecord,
           config: this.config,
           of: this.config.of
         }, this.__subContext__);
@@ -246,7 +249,7 @@ foam.CLASS({
                         buttonStyle: foam.u2.ButtonStyle.TERTIARY,
                         icon: 'images/edit-icon.svg'
                       })
-                      .tag(self.CREATE, {
+                      .tag(self.COPY, {
                         buttonStyle: foam.u2.ButtonStyle.TERTIARY,
                         icon: 'images/edit-icon.svg'
                       })
