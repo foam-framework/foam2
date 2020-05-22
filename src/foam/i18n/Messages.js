@@ -72,7 +72,7 @@ foam.CLASS({
       var name = this.name;
       Object.defineProperty(
         proto,
-        this.name,
+        foam.String.constantize(this.name),
         {
           get: function() { return this.cls_[name] },
           configurable: false

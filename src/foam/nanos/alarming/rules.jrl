@@ -1,0 +1,32 @@
+p({
+  "class": "foam.nanos.ruler.Rule",
+  "id": "68afcf0c-c718-98f8-0841-75e97a3ad16d62",
+  "name": "Alarming & Monitoring",
+  "priority": 80,
+  "ruleGroup": "am",
+  "documentation": "monitor and alarm on OMs which fall short of a preset expectation",
+  "daoKey": "monitoringReportDAO",
+  "operation": 3,
+  "after": false,
+  "action": {
+    "class": "foam.nanos.alarming.AlarmAndMonitoring"
+  },
+  "enabled": true,
+  "saveHistory": false,
+  "lifecycleState":1
+})
+p({"class":"foam.nanos.ruler.Rule","id":"68afcf0c-c718-98f8-0841-75e97a3ad16d63","name":"Alarm Alerting","priority":80,"ruleGroup":"am","documentation":"Alert if an alarm goes from off to on","daoKey":"alarmDAO","operation":3,"after":false,"action":{"class":"foam.nanos.alarming.Alarming"},"enabled":true,"saveHistory":false})
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"01-68afcf0c-c718-98f8-0841-75e97a3ad16d63",
+  "name":"Alarm Hostname",
+  "ruleGroup":"am",
+  "documentation":"Set hostname on created Alarms to distinguish them at a NOC.",
+  "daoKey":"alarmDAO",
+  "operation":0,
+  "after":false,
+  "action":{"class":"foam.nanos.alarming.AlarmHostnameRuleAction"},
+  "enabled":true,
+  "saveHistory":false,
+  "lifecycleState":1
+})
