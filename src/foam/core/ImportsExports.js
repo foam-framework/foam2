@@ -239,10 +239,12 @@ foam.CLASS({
   refines: 'foam.core.Model',
   package: 'foam.core',
   name: 'ImportExportModelRefine',
+
   requires: [
     'foam.core.Import',
     'foam.core.Export',
   ],
+
   properties: [
     {
       class: 'AxiomArray',
