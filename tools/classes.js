@@ -341,6 +341,11 @@ var classes = [
   'foam.nanos.notification.email.ClientPOP3EmailService',
   'foam.nanos.notification.push.PushService',
   'foam.nanos.notification.push.FirebasePushService',
+
+  // SMS models, services and interfaces
+  'foam.nanos.notification.sms.SMSMessage',
+  'foam.nanos.notification.sms.SMSService',
+
   'foam.nanos.notification.Notifiable',
   'foam.nanos.notification.Notification',
   'foam.nanos.notification.NotificationExpansionDAO',
