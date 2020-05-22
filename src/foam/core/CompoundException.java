@@ -27,8 +27,8 @@ public class CompoundException
     return super.getMessage();
   }
 
-  public void maybeThrow(AppConfig appConfig) {
-    if ( Mode.TEST == appConfig.getMode() ) {
+  public void maybeThrow(X x) {
+    if ( Mode.TEST == ((AppConfig) x.get("appConfig")).getMode() ) {
       if ( exceptions_.size() != 0 ) {
         throw this;
       }

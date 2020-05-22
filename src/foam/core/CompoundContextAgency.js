@@ -43,7 +43,7 @@ for ( Runnable agent : getAgents() ) {
     e.add(t);
   }
 }
-e.maybeThrow((AppConfig) getX().get("appConfig"));`
+e.maybeThrow(getX());`
     },
     {
       name: 'submit',
