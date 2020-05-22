@@ -14,11 +14,15 @@ foam.CLASS({
   tableColumns: [
     'timestamp',
     'objectId',
-    'user',
+    'subject',
     'updates'
   ],
 
   properties: [
+    {
+      name: 'user',
+      getter: function() { return this.subject.user; }
+    },
     {
       class: 'Long',
       name: 'seqNo',

@@ -20,7 +20,7 @@ foam.CLASS({
 
   imports: [
     'closeDialog',
-    'user',
+    'subject',
     'supportEmailDAO'
   ],
 
@@ -42,7 +42,7 @@ foam.CLASS({
       color: /*%BLACK%*/ #1e1f21;
       padding-left: 40px;
       margin-bottom: 100px;
-      
+
     }
     ^ .Mask {
       width: 448px;
@@ -83,7 +83,7 @@ foam.CLASS({
       color: #ffffff;
     }
     ^ .div {
-      margin-top: 40px; 
+      margin-top: 40px;
     }
     ^ .div2 {
       padding: 0 20px;
@@ -93,7 +93,11 @@ foam.CLASS({
     properties: [
       {
         class: 'String',
-        name: 'email'    
+        name: 'email'
+      },
+      {
+        name: 'user',
+        getter: function() { return this.subject.user; }
       },
       {
         class: 'Long',
@@ -101,10 +105,10 @@ foam.CLASS({
       },
       {
         class: 'String',
-        name: 'status',     
+        name: 'status',
     }
     ],
-    
+
     messages:[
       { name:'titlelabel', message:'Do you want to delete the email xx@xx.com?' },
     ],
@@ -118,7 +122,7 @@ foam.CLASS({
           title: 'Delete Email'
         }))
         .start().addClass('div2')
-          .start().addClass('label1') 
+          .start().addClass('label1')
             .add(this.titlelabel)
           .end()
           .start().addClass('div')
@@ -129,7 +133,7 @@ foam.CLASS({
         .end();
       }
     ],
-        
+
     actions: [
       {
         name: 'deleteButton',
@@ -137,7 +141,7 @@ foam.CLASS({
         code: function(X) {
           this.data.status = "Disabled"
           this.supportEmailDAO.put(this.data);
-          this.add(this.NotificationMessage.create({ message: 'Your email address is disabled and you need to update it ' })); 
+          this.add(this.NotificationMessage.create({ message: 'Your email address is disabled and you need to update it ' }));
           X.closeDialog()
         }
       },

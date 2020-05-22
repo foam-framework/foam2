@@ -16,7 +16,7 @@ foam.CLASS({
     'loginSuccess',
     'notify',
     'stack',
-    'user',
+    'subject',
     'menuDAO'
   ],
 
@@ -28,6 +28,10 @@ foam.CLASS({
   ],
 
   properties: [
+    {
+      name: 'user',
+      getter: function() { return this.subject.user; }
+    },
     {
       name: 'dao_',
       hidden: true

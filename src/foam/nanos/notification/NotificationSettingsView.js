@@ -20,7 +20,7 @@ foam.CLASS({
     'group',
     'notificationDAO',
     'stack',
-    'user',
+    'subject',
     'userDAO'
   ],
 
@@ -141,7 +141,11 @@ foam.CLASS({
       factory: function(notificationDAO) {
         return this.notificationDAO;
       }
-    }
+    },
+    {
+      name: 'user',
+      getter: function() { return this.subject.user; }
+    },
   ],
 
   messages: [

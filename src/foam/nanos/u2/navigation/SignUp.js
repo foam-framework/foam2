@@ -16,7 +16,7 @@ foam.CLASS({
     'auth',
     'notify',
     'stack',
-    'user'
+    'subject'
   ],
 
   requires: [
@@ -35,6 +35,10 @@ foam.CLASS({
     {
       name: 'dao_',
       hidden: true
+    },
+    {
+      name: 'user',
+      getter: function() { return this.subject.user; }
     },
     {
       class: 'String',

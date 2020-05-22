@@ -27,7 +27,7 @@ foam.CLASS({
     'closeDialog',
     'ctrl',
     'supportEmailDAO',
-    'user',
+    'subject',
   ],
 
   exports:[
@@ -91,7 +91,7 @@ foam.CLASS({
       color: #ffffff;
     }
     ^ .div {
-      margin-top: 40px; 
+      margin-top: 40px;
     }
     ^ .div2 {
       padding: 20px;
@@ -107,6 +107,10 @@ foam.CLASS({
       {
         class: 'String',
         name: 'email'
+      },
+      {
+        name: 'user',
+        getter: function() { return this.subject.user; }
       },
       {
         class: 'Long',
@@ -151,7 +155,7 @@ foam.CLASS({
           .end()
         .end();
       }
-    ], 
+    ],
 
     actions: [
       {
@@ -161,7 +165,7 @@ foam.CLASS({
           if(!this.email) return;
           var self = this;
           if (!this.emailRegex.test(this.email)) {
-            this.add(this.NotificationMessage.create({ message: this.emailInvalid, type: 'error' })); 
+            this.add(this.NotificationMessage.create({ message: this.emailInvalid, type: 'error' }));
             return;
           }
 

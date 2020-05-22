@@ -17,7 +17,7 @@ foam.CLASS({
   ],
 
   imports: [
-    'user',
+    'subject',
     'blobService'
   ],
 
@@ -94,6 +94,10 @@ foam.CLASS({
   `,
 
   properties: [
+    {
+      name: 'user',
+      getter: function() { return this.subject.user; }
+    },
     {
       class: 'foam.nanos.fs.FileProperty',
       name: 'data'

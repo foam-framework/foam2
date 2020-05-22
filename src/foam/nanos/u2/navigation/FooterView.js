@@ -19,7 +19,7 @@ foam.CLASS({
   imports: [
     'appConfig',
     'termsUrl',
-    'user'
+    'subject'
   ],
 
   exports: [
@@ -85,6 +85,13 @@ foam.CLASS({
       float: left;
     }
   `,
+
+  properties: [
+    {
+      name: 'user',
+      getter: function() { return this.subject.user; }
+    },
+  ],
 
   methods: [
     function initE() {

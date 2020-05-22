@@ -15,7 +15,7 @@ foam.CLASS({
     'notify',
     'resetPasswordToken',
     'stack',
-    'user'
+    'subject'
   ],
 
   requires: [
@@ -44,6 +44,10 @@ foam.CLASS({
         passwordIcon: true
       },
       minLength: 6
+    },
+    {
+      name: 'user',
+      getter: function() { return this.subject.user; }
     },
     {
       class: 'Password',

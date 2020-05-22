@@ -21,7 +21,7 @@ foam.CLASS({
   imports: [
     'notificationDAO',
     'scriptDAO',
-    'user'
+    'subject'
   ],
 
   javaImports: [
@@ -62,6 +62,10 @@ foam.CLASS({
       class: 'String',
       name: 'id',
       tableWidth: 220
+    },
+    {
+      name: 'user',
+      getter: function() { return this.subject.user; }
     },
     {
       class: 'Boolean',

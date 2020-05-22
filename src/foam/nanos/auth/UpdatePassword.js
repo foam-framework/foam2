@@ -14,7 +14,7 @@ foam.CLASS({
     'auth',
     'notify',
     'resetPasswordToken',
-    'user'
+    'subject'
   ],
 
   messages: [
@@ -38,6 +38,10 @@ foam.CLASS({
         class: 'foam.u2.view.PasswordView',
         passwordIcon: true
       },
+    },
+    {
+      name: 'user',
+      getter: function() { return this.subject.user; }
     },
     {
       class: 'Password',

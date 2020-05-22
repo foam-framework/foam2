@@ -75,7 +75,7 @@ foam.CLASS({
     'loginVariables',
     'stack',
     'subject',
-    'user',
+//    'user',
     'webApp',
     'wrapCSS as installCSS',
     'sessionTimer'

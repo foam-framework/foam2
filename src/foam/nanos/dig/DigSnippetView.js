@@ -11,7 +11,7 @@ foam.CLASS({
   documentation: 'View used to show snippets of select API calls.',
   imports: [
     'appConfig',
-    'user'
+    'subject'
   ],
   requires: [
     'foam.doc.CodeTabs',
@@ -47,6 +47,10 @@ foam.CLASS({
    `,
 
   properties: [
+    {
+      name: 'user',
+      getter: function() { return this.subject.user; }
+    },
     {
       name: 'url',
       expression: function(appConfig) {

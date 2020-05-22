@@ -19,7 +19,7 @@
       'invoiceDAO',
       'notificationDAO',
       'stack',
-      'user',
+      'subject',
       'userDAO'
     ],
 
@@ -61,7 +61,11 @@
     properties: [
       'of',
       'optionsBtn_',
-      'optionPopup_'
+      'optionPopup_',
+      {
+        name: 'user',
+        getter: function() { return this.subject.user; }
+      }
     ],
 
     methods: [

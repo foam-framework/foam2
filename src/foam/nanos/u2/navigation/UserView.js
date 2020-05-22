@@ -23,7 +23,7 @@ foam.CLASS({
   documentation: 'View user name and user nav settings',
 
   imports: [
-    'user'
+    'subject'
   ],
 
   requires: [
@@ -105,6 +105,13 @@ foam.CLASS({
       all:none !important;
     }
   `,
+
+  properties: [
+    {
+      name: 'user',
+      getter: function() { return this.subject.user; }
+    }
+  ],
 
   methods: [
     function initE() {

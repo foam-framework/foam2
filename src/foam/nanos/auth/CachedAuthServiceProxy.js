@@ -13,7 +13,7 @@ foam.CLASS({
     invalidated whenever the imported user's group changes.
   `,
   imports: [
-    'user',
+    'subject',
   ],
   properties: [
     {
@@ -23,7 +23,7 @@ foam.CLASS({
   ],
   methods: [
     function init() {
-      this.onDetach(this.user$.dot('group').sub(function() {
+      this.onDetach(this.subject$.dot('user').dot('group').sub(function() {
         this.cache = {};
       }.bind(this)));
     },

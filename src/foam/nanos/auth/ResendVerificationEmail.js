@@ -18,7 +18,7 @@ foam.CLASS({
     'auth',
     'emailToken',
     'stack',
-    'user'
+    'subject'
   ],
 
   css: `
@@ -53,7 +53,11 @@ foam.CLASS({
     {
       class: 'String',
       name: 'email'
-    }
+    },
+    {
+      name: 'user',
+      getter: function() { return this.subject.user; }
+    },
   ],
 
   messages: [

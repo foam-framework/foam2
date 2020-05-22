@@ -19,7 +19,7 @@ foam.CLASS({
     'group',
     'notificationDAO',
     'stack',
-    'user'
+    'subject'
   ],
 
   requires: [
@@ -66,6 +66,10 @@ foam.CLASS({
   `,
 
   properties: [
+    {
+      name: 'user',
+      getter: function() { return this.subject.user; }
+    },
     {
       name: 'notifications',
       expression: function(notificationDAO) {

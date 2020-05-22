@@ -27,7 +27,7 @@
     'regulatoryNotice',
     'regulatoryNoticeDAO',
     'stack',
-    'user'
+    'subject'
   ],
 
   exports: [
@@ -158,6 +158,10 @@
   `,
 
   properties: [
+    {
+      name: 'user',
+      getter: function() { return this.subject.user; }
+    },
     {
       class: 'foam.nanos.fs.FileArray',
       name: 'data_',

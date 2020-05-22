@@ -14,6 +14,10 @@ foam.CLASS({
     'java.util.Stack'
   ],
 
+  requires: [
+    'foam.nanos.auth.User',
+  ],
+
   properties: [
     {
       class: 'FObjectProperty',
@@ -44,7 +48,8 @@ foam.CLASS({
       }
       userIsSet_ = true;
       user_ = val;
-      `
+      `,
+      factory: function() { return this.User.create(); }
     },
     {
       class: 'List',

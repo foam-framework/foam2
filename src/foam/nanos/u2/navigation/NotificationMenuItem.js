@@ -23,7 +23,7 @@ foam.CLASS({
     'menuDAO',
     'notificationDAO',
     'pushMenu',
-    'user'
+    'subject'
   ],
 
   implements: [
@@ -80,6 +80,10 @@ foam.CLASS({
       class: 'Boolean',
       name: 'showCountUnread',
       expression: (countUnread) => countUnread > 0
+    },
+    {
+      name: 'user',
+      getter: function() { return this.subject.user; }
     }
   ],
 

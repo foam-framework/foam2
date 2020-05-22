@@ -23,7 +23,7 @@ foam.CLASS({
   imports:[
     'ctrl',
     'ticketDAO',
-    'user',
+    'subject',
     'hideSummary',
     'stack'
   ],
@@ -160,6 +160,10 @@ foam.CLASS({
   properties: [
     'submitAsMenuBtn_',
     'submitAsPopUp',
+    {
+      name: 'user',
+      getter: function() { return this.subject.user; }
+    },
     {
       name: 'dao',
       factory: function() { return this.user.tickets; }

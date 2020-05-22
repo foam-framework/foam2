@@ -22,11 +22,11 @@ foam.CLASS({
   ],
 
   imports: [
-    'user'
+    'subject'
   ],
 
   exports: [ 'as data' ],
- 
+
   css: `
     ^ {
       margin-bottom: 20px;
@@ -49,6 +49,10 @@ foam.CLASS({
     {
       name: 'dao',
       factory: function() { return this.user.tickets; }
+    },
+    {
+      name: 'user',
+      getter: function() { return this.subject.user; }
     },
     {
       class: 'Int',

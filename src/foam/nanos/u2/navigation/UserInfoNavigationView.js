@@ -17,7 +17,7 @@ foam.CLASS({
 
   imports: [
     'agent',
-    'user',
+    'subject',
     'theme'
   ],
 
@@ -57,6 +57,13 @@ foam.CLASS({
       height: 100%;
     }
   `,
+
+  properties: [
+    {
+      name: 'user',
+      getter: function() { return this.subject.user; }
+    }
+  ],
 
   methods: [
     function initE() {

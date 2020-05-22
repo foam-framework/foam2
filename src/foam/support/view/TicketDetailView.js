@@ -26,7 +26,7 @@ foam.CLASS({
     'stack',
     'userDAO',
     'hideSummary',
-    'user'
+    'subject'
   ],
 
   exports: [
@@ -134,6 +134,10 @@ foam.CLASS({
     'messages',
     'submitAsMenuBtn_',
     'submitAsPopUp',
+    {
+      name: 'user',
+      getter: function() { return this.subject.user; }
+    },
     {
       name: 'dao',
       factory: function () { return this.data.messages; }

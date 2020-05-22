@@ -17,7 +17,7 @@ foam.CLASS({
   ],
 
   imports: [
-    'user',
+    'subject',
     'blobService'
   ],
 
@@ -102,6 +102,10 @@ foam.CLASS({
   `,
 
   properties: [
+    {
+      name: 'user',
+      getter: function() { return this.subject.user; }
+    },
     {
       class: 'String',
       name: 'placeholderImage'

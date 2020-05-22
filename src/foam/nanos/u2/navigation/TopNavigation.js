@@ -32,7 +32,7 @@ foam.CLASS({
     'group',
     'loginSuccess',
     'menuDAO',
-    'user'
+    'subject'
   ],
 
   css: `
@@ -118,6 +118,10 @@ foam.CLASS({
     {
       name: 'dao',
       factory: () => this.menuDAO
+    },
+    {
+      name: 'user',
+      getter: function() { return this.subject.user; }
     }
   ],
 

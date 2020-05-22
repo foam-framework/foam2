@@ -46,7 +46,7 @@
     'ctrl',
     'currentMenu',
     'stack',
-    'user'
+    'subject'
   ],
 
   tableColumns: [
@@ -153,7 +153,7 @@
 
         X.userDAO.find(approver).then(user => {
           if ( data.status != foam.nanos.approval.ApprovalStatus.REQUESTED ) {
-            slot.set(user ? user.toSummary() : `User #${approver}`);	
+            slot.set(user ? user.toSummary() : `User #${approver}`);
           } else if ( user ) {
             if ( X.user.id == user.id ) {
               slot.set(user.toSummary());
@@ -164,7 +164,7 @@
             slot.set(data.REQUESTED);
           }
         });
-        
+
         return {
           class: 'foam.u2.view.ValueView',
           data$: slot
@@ -682,7 +682,7 @@
                     ! propObj ||
                     propObj.transient ||
                     propObj.storageTransient ||
-                    propObj.networkTransient 
+                    propObj.networkTransient
                   ) continue;
 
                   temporaryNewObject[keyArray[i]] = propsToUpdate[keyArray[i]];

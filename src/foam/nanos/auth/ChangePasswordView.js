@@ -14,7 +14,7 @@ foam.CLASS({
   imports: [
     'stack',
     'theme',
-    'user'
+    'subject'
   ],
 
   css: `
@@ -75,6 +75,10 @@ foam.CLASS({
   `,
 
   properties: [
+    {
+      name: 'user',
+      getter: function() { return this.subject.user; }
+    },
     {
       class: 'Boolean',
       name: 'showHeader',

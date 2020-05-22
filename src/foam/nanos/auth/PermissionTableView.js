@@ -28,7 +28,7 @@ foam.CLASS({
     'groupDAO',
     'groupPermissionJunctionDAO',
     'permissionDAO',
-    'user'
+    'subject'
   ],
 
   constants: {
@@ -104,6 +104,10 @@ foam.CLASS({
         placeholder: 'Permission Search',
         onKey: true
       }
+    },
+    {
+      name: 'user',
+      getter: function() { return this.subject.user; }
     },
     {
       class: 'String',

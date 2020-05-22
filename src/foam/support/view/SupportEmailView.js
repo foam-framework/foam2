@@ -16,9 +16,9 @@ foam.CLASS({
   ],
 
   imports: [
-    'createLabel',  
+    'createLabel',
     'ctrl',
-    'user'
+    'subject'
   ],
 
   css:`
@@ -46,7 +46,7 @@ foam.CLASS({
       color: #ffffff;
       position: relative;
       margin: auto;
-      margin-left: 
+      margin-left:
     }
     ^ .btn-mid {
       width: 100%;
@@ -119,7 +119,11 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'emptyDAO',
-    }
+    },
+    {
+      name: 'user',
+      getter: function() { return this.subject.user; }
+    },
   ],
 
   messages:[
@@ -130,7 +134,7 @@ foam.CLASS({
   methods: [
     function initE(){
       var self = this;
-      this.user.supportEmails.limit(1).select().then(function(a){ 
+      this.user.supportEmails.limit(1).select().then(function(a){
         self.emptyDAO = a.array.length == 0;
       });
 
@@ -141,7 +145,7 @@ foam.CLASS({
           .start()
             .add(this.title).addClass('title')
           .end()
-          .start().addClass('align').end() 
+          .start().addClass('align').end()
           .start({
             class: 'foam.u2.ListCreateController',
             dao: this.user.supportEmails,
@@ -156,7 +160,7 @@ foam.CLASS({
           .start().addClass('btn-mid')
             .start(this.NEW_EMAIL).end()
           .end()
-        .end()   
+        .end()
       .end();
     }
   ],
@@ -175,13 +179,17 @@ foam.CLASS({
     {
       name: 'EmailSupportTableView',
       extends: 'foam.u2.View',
-      
+
       exports: [ 'as data' ],
-      
-      imports: [ 'user' ],
-      
+
+      imports: [ 'subject' ],
+
       properties: [
         'selection',
+        {
+          name: 'user',
+          getter: function() { return this.subject.user; }
+        },
         {
           name: 'data',
           factory: function() {
@@ -189,7 +197,7 @@ foam.CLASS({
           }
         }
       ],
-      
+
       methods: [
         function initE() {
           this
@@ -206,7 +214,7 @@ foam.CLASS({
             .addClass(this.myClass('table'))
             .end();
         }
-      ] 
+      ]
     }
   ]
 });
