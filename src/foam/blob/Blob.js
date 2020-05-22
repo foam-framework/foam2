@@ -348,7 +348,7 @@ foam.CLASS({
   extends: 'foam.blob.ProxyBlob',
 
   imports: [
-    'blobStore?',
+    'BlobStore blobStore?',
     'blobService'
   ],
 
