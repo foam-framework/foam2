@@ -31,10 +31,11 @@
       ^ {
         position: relative;
         padding: 8px;
+        margin-right: 32px;
       }
       ^ .foam-u2-view-OverlayActionListView {
         position: absolute;
-        top: 8px;
+        top: 20px;
         right: 8px;
       }
       ^ i {
