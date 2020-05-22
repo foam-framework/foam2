@@ -40,7 +40,11 @@ foam.CLASS({
   implements: ['foam.core.MessageException'],
   generateJavaException: true,
 
-  documentation: 'Abstract base class for FOAM-side Exception classes.',
+  documentation: `
+  Abstract Exception base class, 
+  by extending this class and setting 'generateNativeException' to true, a java exception in the form exceptionNameNativeException will be generated,
+  This exception will be throwable, and the orignal foam exception can be retrieved from it via someNameNativeExcption.javaException()
+  `,
 
   properties: [
     {
