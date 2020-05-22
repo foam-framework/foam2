@@ -46,7 +46,7 @@ foam.CLASS({
 
       // truncate string if it is too long
       this.description = this.data.body;
-      if ( this.description != '' && this.description.length > 70 ) {
+      if ( this.description && this.description != '' && this.description.length > 70 ) {
         this.description = this.description.substr(0, 70-1) + '...';
       }
 
