@@ -32,7 +32,10 @@ foam.CLASS({
     'java.util.ArrayList',
     'java.util.Iterator',
     'java.util.List',
-    'java.util.Map'
+    'java.util.Map',
+    'foam.comics.v2.userfeedback.UserFeedback',
+    'foam.comics.v2.userfeedback.UserFeedbackException',
+    'foam.comics.v2.userfeedback.UserFeedbackStatus'
   ],
 
   properties: [
@@ -269,7 +272,7 @@ foam.CLASS({
         )).inX(getX()).select(new ArraySink())).getArray();
 
       if ( pendingRequests.size() > 0 && fulfilledRequests.size() == 0 && approverIds.size() == 0 ) 
-        throw new RuntimeException("There already exists approval requests for this operation");
+        throw new RuntimeException("There is an outstanding approval for this request.");
 
       if ( fulfilledRequests.size() == 1 ) {
         ApprovalRequest fulfilledRequest = (ApprovalRequest) fulfilledRequests.get(0);
@@ -355,8 +358,12 @@ foam.CLASS({
 
       fullSend(x, approvalRequest, obj, approverIds);
 
-      // TODO: the following is a temporary fix will need to create an actual exception and pass feedback as a property
-      throw new RuntimeException("An approval request has been sent out."); // we aren't updating to deleted
+      throw new UserFeedbackException.Builder(x)
+        .setUserFeedback(new UserFeedback.Builder(x)
+          .setStatus(UserFeedbackStatus.SUCCESS)
+          .setMessage("An approval request has been sent out.")
+          .build())
+        .build().javaException();
       `
     }
   ]
