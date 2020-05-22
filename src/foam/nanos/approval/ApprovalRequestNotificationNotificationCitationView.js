@@ -104,7 +104,7 @@ foam.CLASS({
       this.approvalRequestDAO.find(this.data.approvalRequest).then(function(approval) {
         self.created = approval.created.toUTCString();
         self.classification = approval.classification;
-        self.showClassification = self.classification;
+        self.showClassification = !! self.classification;
         self.status = approval.status;
 
         self.userDAO.find(approval.createdBy).then(function(user) {
