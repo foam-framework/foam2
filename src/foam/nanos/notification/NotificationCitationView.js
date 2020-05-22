@@ -32,15 +32,6 @@ foam.CLASS({
     }
   `,
 
-
-  // move to LiquidApprovalNotification
-  messages: [
-    {
-      name: 'NEEDS_APPROVAL_LABEL',
-      message: 'Needs approval'
-    }
-  ],
-
   properties: [
     'of',
     'created',
