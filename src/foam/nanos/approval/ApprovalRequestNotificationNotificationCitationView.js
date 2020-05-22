@@ -166,6 +166,7 @@ foam.CLASS({
       text-align: center;
       float: right;
       margin-right: 145px;
+      margin-top: 14px;
     }
     ^ .userSummaryDiv {
       position: relative;
