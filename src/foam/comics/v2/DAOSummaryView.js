@@ -251,7 +251,7 @@ foam.CLASS({
                       })
                       .tag(self.COPY, {
                         buttonStyle: foam.u2.ButtonStyle.TERTIARY,
-                        icon: 'images/edit-icon.svg'
+                        icon: 'images/copy-icon.svg'
                       })
                       .tag(self.DELETE, {
                         buttonStyle: foam.u2.ButtonStyle.TERTIARY,
