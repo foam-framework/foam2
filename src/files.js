@@ -770,4 +770,8 @@ FOAM_FILES([
   { name: "foam/foamlink/FoamlinkExec" },
   { name: "foam/foamlink/lib" },
   { name: "foam/util/filesystem/FileWalker" },
+
+  //Column config
+  { name: "foam/nanos/column_config/ColumnConfigPropertyValue" },
+  { name: "foam/nanos/column_config/NestedPropertiesExpression" },
 ]);

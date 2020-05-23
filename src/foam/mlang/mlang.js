@@ -3225,6 +3225,12 @@ foam.CLASS({
 
   documentation: 'A Binary Predicate which applies arg2.f() to arg1.f().',
 
+  javaImports: [
+    'foam.core.AbstractFObjectPropertyInfo',
+    'foam.core.FObject',
+    'foam.core.PropertyInfo'
+  ],
+
   properties: [
     {
       class: 'foam.mlang.ExprProperty',
@@ -3240,10 +3246,32 @@ foam.CLASS({
     {
       name: 'f',
       code: function(o) {
+        if ( foam.core.Reference.isInstance(this.arg1) ) {
+          return obj1[property.name + '$find'].then(val => obj1 = val);
+        }
         return this.arg2.f(this.arg1.f(o));
       },
       javaCode: `
-        return getArg2().f(getArg1().f(obj));
+        PropertyInfo p1 = (PropertyInfo) getArg1();
+        FObject obj1;
+        if ( p1 instanceof AbstractFObjectPropertyInfo) {
+          Object val = getArg1().f(obj);
+          if ( val == null )
+            return null;
+          return getArg2().f(val);
+        }
+        char[] arr = p1.getName().toCharArray();
+        arr[0] = Character.toUpperCase(arr[0]);
+        sb.append(arr);
+        try {
+          obj1 = (FObject)obj.getClass().getMethod(sb.toString(), foam.core.X.class).invoke(obj, ((FObject)obj).getX());
+        } catch (Exception e) {
+          sb.setLength(4);
+          return null;
+        }
+        sb.setLength(4);
+        if ( obj1 == null ) return null;
+        return getArg2().f(obj1);
       `
     },
 
@@ -3253,6 +3281,16 @@ foam.CLASS({
          Used by GroupBy
       **/
       return this.arg2.comparePropertyValues(o1, o2);
+    }
+  ],
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(`
+          private static StringBuilder sb = new StringBuilder("find");
+        `);
+      }
     }
   ]
 });
