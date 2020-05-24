@@ -85,8 +85,10 @@ public class RuleEngine extends ContextAwareSupport {
     } catch (Exception e) {
       // This should never happen.
       // It means there's a bug in a Rule agent and it should be fixed.
-      logger.error("CRITICAL UNEXPECTED EXCEPTION EXECUTING RULE", e.getMessage(), e);
-      throw new RuntimeException("CRITICAL UNEXPECTED EXCEPTION EXECUTING RULE", e);
+      var message = "CRITICAL UNEXPECTED EXCEPTION EXECUTING RULE";
+
+      logger.error(message, e.toString(), e);
+      throw new RuntimeException(message, e);
     }
 
     asyncApplyRules(rules, obj, oldObj);
