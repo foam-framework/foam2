@@ -30,7 +30,7 @@ foam.CLASS({
 
   css: `
   ^ input {
-    width: 220px;
+    width: 220px !important;
   }
 
   ^ .side-nav-view {
@@ -50,7 +50,7 @@ foam.CLASS({
 
   .foam-u2-search-TextSearchView {
     text-align: center;
-    margin: 4px 0;
+    margin: 14px 0 0;
   }
 
   ^ .foam-u2-view-TreeViewRow-label {
