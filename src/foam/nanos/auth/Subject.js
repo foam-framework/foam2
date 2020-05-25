@@ -26,7 +26,8 @@ foam.CLASS({
       documentation: 'Authenticated logged in user',
       javaSetter: `
         throw new RuntimeException("You cannot set real user");
-      `
+      `,
+      factory: function() { return this.User.create(); }
     },
     {
       class: 'FObjectProperty',

@@ -58,7 +58,7 @@ foam.CLASS({
 
   exports: [
     'displayWidth',
-    'agent',
+//    'agent',
     'appConfig',
     'as ctrl',
     'currentMenu',
@@ -286,8 +286,18 @@ foam.CLASS({
         await self.fetchSubject();
 
         // add user and agent for backward compatibility
-        self.user = self.subject.user;
-        self.agent = self.subject.realUser;
+        Object.defineProperty(self, 'user', {
+          get: function() {
+            console.warn("Deprecated use of user")
+            return this.subject.user;
+          }
+        });
+        Object.defineProperty(self, 'agent', {
+          get: function() {
+            console.warn("Deprecated use of agent")
+            return this.subject.realUser;
+          }
+        });
 
         // Fetch the group only once the user has logged in. That's why we await
         // the line above before executing this one.
@@ -443,7 +453,7 @@ foam.CLASS({
        *   - Update the look and feel of the app based on the group or user
        *   - Go to a menu based on either the hash or the group
        */
-      if ( ! this.user.emailVerified ) {
+      if ( ! this.subject.user.emailVerified ) {
         this.loginSuccess = false;
         this.stack.push({ class: 'foam.nanos.auth.ResendVerificationEmail' });
         return;

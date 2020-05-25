@@ -18,7 +18,7 @@ foam.CLASS({
         }
         return this.delegate.find_(x, obj).then(function(old) {
           if ( ! obj.equals(old) ) {
-            obj.lastModifiedBy = x.user.id;
+            obj.lastModifiedBy = X.subject.user.id;
           }
           return this.delegate.put_(x, obj);
         }.bind(this));

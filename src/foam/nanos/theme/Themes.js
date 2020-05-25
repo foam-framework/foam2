@@ -47,7 +47,7 @@ foam.CLASS({
       ],
       code: async function(x) {
         var theme;
-        var user = x.user;
+        var user = x.subject.user;
         var group = x.group;
         if ( user && group ) { // non-null when logged in.
           theme = await user.theme$find;

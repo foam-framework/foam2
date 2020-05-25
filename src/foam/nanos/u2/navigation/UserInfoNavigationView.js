@@ -16,7 +16,6 @@ foam.CLASS({
   ],
 
   imports: [
-    'agent',
     'subject',
     'theme'
   ],
@@ -62,6 +61,10 @@ foam.CLASS({
     {
       name: 'user',
       getter: function() { return this.subject.user; }
+    },
+    {
+      name: 'agent',
+      getter: function() { return this.subject.realUser; }
     }
   ],
 

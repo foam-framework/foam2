@@ -155,7 +155,7 @@
           if ( data.status != foam.nanos.approval.ApprovalStatus.REQUESTED ) {
             slot.set(user ? user.toSummary() : `User #${approver}`);
           } else if ( user ) {
-            if ( X.user.id == user.id ) {
+            if ( X.subject.user.id == user.id ) {
               slot.set(user.toSummary());
             } else {
               slot.set(user.group);

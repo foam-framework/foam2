@@ -30,7 +30,9 @@ foam.CLASS({
   properties: [
     {
       name: 'user',
-      getter: function() { return this.subject.user; }
+      getter: function() { return this.subject.user; },
+      hidden: true
+
     },
     {
       name: 'dao_',
