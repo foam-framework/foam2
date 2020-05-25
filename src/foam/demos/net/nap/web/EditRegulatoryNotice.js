@@ -160,7 +160,9 @@
   properties: [
     {
       name: 'user',
-      getter: function() { return this.subject.user; }
+      getter: function() { return this.subject.user; },
+      transient: true,
+      visibility: 'HIDDEN'
     },
     {
       class: 'foam.nanos.fs.FileArray',

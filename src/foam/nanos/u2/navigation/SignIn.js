@@ -31,7 +31,9 @@ foam.CLASS({
     {
       name: 'user',
       getter: function() { return this.subject.user; },
-      hidden: true
+      hidden: true,
+      transient: true,
+      visibility: 'HIDDEN'
 
     },
     {

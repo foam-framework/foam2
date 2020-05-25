@@ -48,7 +48,9 @@ foam.CLASS({
   properties: [
     {
       name: 'user',
-      getter: function() { return this.subject.user; }
+      getter: function() { return this.subject.user; },
+      transient: true,
+      visibility: 'HIDDEN'
     },
     {
       name: 'dao',
