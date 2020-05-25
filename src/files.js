@@ -774,4 +774,5 @@ FOAM_FILES([
   //Column config
   { name: "foam/nanos/column_config/ColumnConfigPropertyValue" },
   { name: "foam/nanos/column_config/NestedPropertiesExpression" },
+  { name: "foam/nanos/column_config/TableColumnOutputter" }
 ]);
