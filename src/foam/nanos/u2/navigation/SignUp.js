@@ -29,7 +29,11 @@ foam.CLASS({
   messages: [
     { name: 'TITLE', message: 'Create a free account' },
     { name: 'FOOTER_TXT', message: 'Already have an account?' },
-    { name: 'FOOTER_LINK', message: 'Sign in' }
+    { name: 'FOOTER_LINK', message: 'Sign in' },
+    { name: 'ERROR_MSG', message: 'There was a problem creating your account.' },
+    { name: 'SELECTION_TEXT', message: 'Select your country' },
+    { name: 'SELECTION', message: 'Please select...' },
+    { name: 'VALIDATION_ERR_TEXT', message: 'Please enter job title'}
   ],
 
   properties: [
@@ -102,7 +106,7 @@ foam.CLASS({
           otherKey: 'Other',
           choiceView: {
             class: 'foam.u2.view.ChoiceView',
-            placeholder: 'Please select...',
+            placeholder: X.data.SELECTION,
             dao: X.jobTitleDAO,
             objToChoice: function(a) {
               return [a.name, a.label];
@@ -116,7 +120,7 @@ foam.CLASS({
           predicateFactory: function(e) {
             return e.NEQ(foam.nanos.u2.navigation.SignUp.JOB_TITLE, '');
           },
-          errorString: 'Please enter job title'
+          errorMessage: 'VALIDATION_ERR_TEXT'
         }
       ],
       required: true
@@ -153,7 +157,7 @@ foam.CLASS({
           return X.countryDAO.where(E.IN(X.data.Country.ID, countryChoices_));
         });
         return foam.u2.view.ChoiceView.create({
-          placeholder: 'Select your country',
+          placeholder: X.data.SELECTION_TEXT,
           objToChoice: function(a) {
             return [a.id, a.name];
           },
@@ -277,7 +281,7 @@ foam.CLASS({
             this.user.copyFrom(user);
             this.updateUser(x);
           }).catch((err) => {
-            this.notify(err.message || 'There was a problem creating your account.', 'error');
+            this.notify(err.message || this.ERROR_MSG, 'error');
           })
           .finally(() => {
             this.isLoading_ = false;

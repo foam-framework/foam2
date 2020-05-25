@@ -106,7 +106,6 @@ var classes = [
   'foam.box.RawWebSocketBox',
   'foam.box.ReturnBox',
   'foam.box.BoxService',
-  'foam.box.CheckAuthenticationBox',
   'foam.box.SessionReplyBox',
   'foam.box.SessionClientBox',
   'foam.dao.DAO',
