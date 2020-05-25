@@ -10,12 +10,19 @@
 
    documentation: 'SMS message',
 
-   implements: [],
-
    properties: [
      {
-       class: 'Long',
-       name: 'id'
+       class: 'FObjectProperty',
+       of: 'foam.nanos.auth.User',
+       name: 'user'
+     },
+     {
+       class: 'String',
+       name: 'message'
+     },
+     {
+       class: 'String',
+       name: 'phoneNumber'
      }
    ]
  });
