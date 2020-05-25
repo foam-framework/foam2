@@ -12,13 +12,13 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.ClassInfo',
+    'foam.core.FObject',
     'foam.core.PropertyInfo',
     'foam.core.X',
-    'foam.nanos.logger.Logger',
-    'static foam.mlang.MLang.*',
-    'java.lang.reflect.Method',
     'foam.mlang.Expr',
-    'foam.core.FObject'
+    'foam.nanos.logger.Logger',
+    'java.lang.reflect.Method',
+    'static foam.mlang.MLang.*',
   ],
   properties: [
     {
@@ -35,8 +35,10 @@ foam.CLASS({
     {
       name: 'f',
       type: 'Any',
-      code: function(of, nestedProperty) {
-        return this.returnExpr(this.objClass, this.nestedProperty.split('.'), 0);
+      code: function(obj) {
+        var e =  this.returnExpr(this.objClass, this.nestedProperty.split('.'), 0);
+        if ( !e ) return null;
+        return e.f(obj);
       },
       javaCode: `
         Expr e = returnExpr(getObjClass(), getNestedProperty().split("\\\\."), 0);
@@ -147,8 +149,8 @@ foam.CLASS({
   javaImports: [
     'foam.core.X',
     'foam.mlang.Expr',
-    'static foam.mlang.MLang.*',
-    'java.util.ArrayList'
+    'java.util.ArrayList',
+    'static foam.mlang.MLang.*'
   ],
   // properties: [
   //   {
