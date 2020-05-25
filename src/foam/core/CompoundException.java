@@ -7,8 +7,6 @@
 package foam.core;
 
 import java.util.ArrayList;
-import foam.nanos.app.AppConfig;
-import foam.nanos.app.Mode;
 
 public class CompoundException
   extends RuntimeException
