@@ -13,40 +13,53 @@ foam.CLASS({
     foam.pattern.Faceted.create()
   ],
 
+  css: `
+    ^ {
+      line-height: 17px;
+    }
+    ^ .created {
+      font-family: IBMPlexSans;
+      font-size: 11px;
+      color: #5e6061;
+      margin-left: 16px;
+    }
+    ^ .description {
+      font-family: IBMPlexSans;
+      font-size: 14px;
+      color: #1e1f21;
+      margin-left: 32px;
+      display: inline-block;
+    }
+  `,
+
   properties: [
     'of',
-    {
-      class: 'Boolean',
-      name: 'fullyVisible',
-      documentation: `If a notification's body content is too long, it will be
-          truncated and an ellipsis will be added to the cutoff point. Clicking
-          on a notification toggles between truncated form and being fully
-          visible. This property tracks whether the notification is being
-          truncated or displayed in full.`,
-      value: false
-    }
+    'created',
+    'description'
   ],
 
   methods: [
     function initE() {
       this.SUPER();
+
+      this.created = this.data.created.toUTCString();
+
+      // truncate string if it is too long
+      this.description = this.data.body;
+      if ( this.description && this.description != '' && this.description.length > 70 ) {
+        this.description = this.description.substr(0, 70-1) + '...';
+      }
+
       this
         .addClass(this.myClass())
         .start()
-          .addClass('msg')
-          .enableClass('fully-visible', this.fullyVisible$)
-          .on('click', this.toggleFullVisibility)
-          .add(this.data.notificationType)
-          .add(this.data.issuedDate)
-          .show(this.data.body !== '')
-          .add(this.data.body)
+          .start().addClass('created')
+            .add(this.created$)
+          .end()
+          .start().addClass('description')
+            .add(this.description$)
+          .end()
         .end();
-    }
-  ],
-
-  listeners: [
-    function toggleFullVisibility() {
-      this.fullyVisible = ! this.fullyVisible;
     }
   ]
 });

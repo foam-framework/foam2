@@ -52,7 +52,6 @@ p({
         foam.nanos.alarming.Alarm.LAST_MODIFIED,
         new foam.mlang.order.Desc.Builder(x).setArg1(
           foam.nanos.alarming.Alarm.IS_ACTIVE).build()})
-      .setCluster(false)
      .build();
   `,
   "client":"{\"of\":\"foam.nanos.alarming.Alarm\"}"
@@ -65,7 +64,6 @@ p({
   "serviceScript":`
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.alarming.OMName.getOwnClassInfo())
-      .setCluster(false)
       .build();
     `
   ,"client":"{\"of\":\"foam.nanos.alarming.OMName\"}"
