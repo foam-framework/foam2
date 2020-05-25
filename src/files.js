@@ -770,6 +770,8 @@ FOAM_FILES([
   { name: "foam/u2/wizard/Wizardlet" },
   { name: "foam/u2/wizard/BaseWizardlet" },
   { name: "foam/u2/wizard/WizardletView" },
+  { name: "foam/u2/wizard/StepWizardletController" },
+  { name: "foam/u2/wizard/StepWizardletView" },
   { name: "foam/u2/wizard/ScrollWizardletView" },
   { name: "foam/nanos/crunch/ui/CapabilityWizardlet" },
 

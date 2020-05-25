@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.u2.wizard',
   name: 'StepWizardletView',
-  extends: 'foam.u2.wizard.WizardletView',
+  extends: 'foam.u2.View',
 
   documentation: `Displays wizardlets in individual screens.`,
 
@@ -44,65 +44,13 @@ foam.CLASS({
     }
   `,
 
-  properties: [
-    {
-      name: 'subStack',
-      class: 'FObjectProperty',
-      of: 'foam.u2.stack.Stack',
-      view: {
-        class: 'foam.u2.stack.StackView',
-        showActions: false
-      },
-      factory: function () {
-        return this.Stack.create();
-      }
-    },
-    {
-      name: 'currentWizardlet',
-      expression: function (subStack$pos) {
-        return this.wizardlets[subStack$pos];
-      }
-    },
-    {
-      name: 'isLastWizardlet',
-      expression: function (subStack$pos) {
-        return subStack$pos === this.wizardlets.length - 1;
-      }
-    },
-    {
-      name: 'highestIndex',
-      documentation: `
-        Tracks the highest index visited so that "save & exit"
-        can save all visited wizardlets.
-      `
-    },
-    {
-      name: 'stackContext'
-    }
-  ],
-
   methods: [
-    function init() {
-      this.stackContext =
-        this.__subSubContext__.createSubContext({ fu:'bar' });
-      this.stackContext.register(
-        // this.VerticalDetailView,
-        foam.u2.detail.VerticalDetailView,
-        'foam.u2.detail.SectionedDetailView'
-      );
-
-      this.subStack.push({
-        class: 'foam.u2.detail.VerticalDetailView',
-        data: this.wizardlets[0].data,
-      }, this.stackContext);
-    },
     function initE() {
       this
         .addClass(this.myClass())
-        .start('h1').add(this.title).end()
         .tag({
           class: 'foam.u2.stack.StackView',
-          data: this.subStack,
+          data$: this.data.subStack$,
           showActions: false
         })
         // .add(this.SUB_STACK)
@@ -110,7 +58,7 @@ foam.CLASS({
           .tag(this.DISCARD, { size: 'LARGE' })
           .tag(this.CLOSE, { size: 'LARGE' })
           .tag(this.GO_PREV, { size: 'LARGE' })
-          .callIfElse( this.isLastWizardlet,
+          .callIfElse( this.data.isLastWizardlet,
             function() {
               this.tag(this.GO_NEXT, { size: 'LARGE', label: this.ACTION_LABEL });
             },
@@ -134,10 +82,7 @@ foam.CLASS({
       name: 'close',
       label: 'Save for Later',
       code: function(x) {
-        var p = Promise.resolve();
-        this.wizardlets.slice(0, this.highestIndex).reduce(
-          (p, wizardlet) => p.then(() => wizardlet.save()), p
-        ).then(() => {
+        this.data.save().then(() => {
           x.stack.back();
         }).catch(e => {
           x.ctrl.notify(this.ERROR_MSG_DRAFT);
@@ -148,22 +93,16 @@ foam.CLASS({
       name: 'goPrev',
       label: 'back',
       code: function() {
-        this.subStack.back();
+        this.data.back();
       }
     },
     {
       name: 'goNext',
       label: 'next',
       code: function(x) {
-        this.currentWizardlet.save().then(() => {
-          if ( this.subStack.pos < this.wizardlets.length - 1 ) {
-            let newIndex = this.subStack.pos + 1;
-            this.highestIndex = newIndex;
-            this.subStack.push(this.wizardlets[newIndex].data,
-              this.stackContext);
-          } else {
+        this.data.next().then((isFinished) => {
+          if ( isFinished ) {
             this.stack.back();
-            x.ctrl.notify(this.ERROR_MSG_DRAFT);
           }
         }).catch(e => {
           x.ctrl.notify(this.ERROR_MSG);
