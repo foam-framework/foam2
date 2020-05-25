@@ -84,12 +84,12 @@ foam.CLASS({
           if ( foam.core.UnitValue.isInstance(prop) ) {
             cellType = 'CURRENCY';
             pattern = '\"$\"#0.00\" CAD\"';
-          } else if ( prop.cls_.id === 'foam.core.Date' ) {
+          } else if ( foam.core.Date.isInstance(prop) ) {
             cellType = 'DATE';
             pattern = 'yyyy-mm-dd';
-          } else if ( prop.cls_.id === 'foam.core.DateTime' ) {
+          } else if ( foam.core.DateTime.isInstance(prop) ) {
             cellType = 'DATE_TIME';
-          } else if ( prop.cls_.id === 'foam.core.Time' ) {
+          } else if ( foam.core.Time.isInstance(prop) ) {
             cellType = 'TIME';
           }
 
