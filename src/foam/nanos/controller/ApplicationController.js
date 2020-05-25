@@ -294,7 +294,9 @@ foam.CLASS({
           this
             .addClass(this.myClass())
             .start()
-              .tag(this.topNavigation_)
+              .add(this.slot(function (topNavigation_) {
+                return this.E().tag(topNavigation_);
+              }))
             .end()
             .start()
               .addClass('stack-wrapper')
@@ -305,7 +307,9 @@ foam.CLASS({
               })
             .end()
             .start()
-              .tag(this.footerView_)
+              .add(this.slot(function (footerView_) {
+                return this.E().tag(footerView_);
+              }))
             .end();
           });
       });
