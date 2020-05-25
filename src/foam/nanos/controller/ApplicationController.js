@@ -225,7 +225,11 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'capabilityAquired'
+      name: 'capabilityAquired',
+      documentation: `
+        The purpose of this is to handle the intercept flow for a capability that was granted,
+        via the InterceptView from this.requestCapability(exceptionCapabilityType).
+      `
     },
     {
       class: 'Boolean',
@@ -461,7 +465,6 @@ foam.CLASS({
       return new Promise(function(resolve, reject) {
         self.stack.push({
           class: 'foam.u2.crunch.CapabilityInterceptView',
-          data: self.__subContext__.capabilityDAO,
           capabilityOptions: capabilityInfo.capabilityOptions
         });
         var s1, s2;

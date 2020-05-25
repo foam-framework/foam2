@@ -12,20 +12,22 @@ foam.CLASS({
   implements: [ 'foam.mlang.Expressions' ],
 
   requires: [
-    'foam.u2.layout.Grid',
-    'foam.u2.layout.GUnit',
-    'foam.u2.crunch.CapabilityCardView',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityJunctionStatus',
-    'foam.nanos.crunch.UserCapabilityJunction'
+    'foam.nanos.crunch.UserCapabilityJunction',
+    'foam.u2.crunch.CapabilityCardView',
+    'foam.u2.layout.Grid',
+    'foam.u2.layout.GUnit'
   ],
 
   imports: [
     'capabilityAquired',
-    'capabilityCancelled',
-    'crunchController',
-    'stack',
     'capabilityCache',
+    'capabilityCancelled',
+    'capabilityDAO',
+    'crunchController',
+    'notify',
+    'stack',
     'user',
     'userCapabilityJunctionDAO'
   ],
@@ -42,6 +44,10 @@ foam.CLASS({
         return 'foam.u2.crunch.CapabilityCardView';
       }
     }
+  ],
+
+  messages: [
+    { name: 'REJECTED_MSG', message: 'Your choice to bypass this was stored, please refresh page to revert cancel selection.'}
   ],
 
   css: `
@@ -66,17 +72,11 @@ foam.CLASS({
       var view = this;
       this
         .addClass(this.myClass())
-
-        .startContext({ data: this })
-          .tag(this.CANCEL, { buttonStyle: 'SECONDARY' })
-          .tag(this.AQUIRE, { buttonStyle: 'SECONDARY' })
-        .endContext()
-
         .start()
           .addClass(this.myClass('detail-container'))
           .add(this.slot(function (capabilityOptions) {
             var spot = this.E('span')
-            this.data.where(
+            this.capabilityDAO.where(
                 this.IN(view.Capability.ID, capabilityOptions))
               .select().then((result) => {
                 let arr = result.array;
@@ -113,14 +113,16 @@ foam.CLASS({
                           });
                         })
                       })
-                    .end()
-                    ;
+                    .end();
                   spot.add(grid);
                 }
               })
             return spot;
           }))
-        .end();
+        .end()
+        .startContext({ data: this })
+          .tag(this.CANCEL, { buttonStyle: 'SECONDARY' })
+        .endContext();
     },
     function aquire() {
       this.capabilityAquired = true;
@@ -134,6 +136,7 @@ foam.CLASS({
       this.capabilityOptions.forEach((c) => {
         this.capabilityCache.set(c, true);
       });
+      this.notify(this.REJECTED_MSG);
       this.stack.back();
     }
   ],
@@ -141,6 +144,7 @@ foam.CLASS({
   actions: [
     {
       name: 'cancel',
+      label: 'Not interested in adding this functionality',
       code: function() {
         this.reject();
       }
