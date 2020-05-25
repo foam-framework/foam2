@@ -55,6 +55,7 @@ FOAM_FILES([
   { name: "foam/core/Requires" },
   { name: "foam/core/Slot" },
   { name: "foam/core/Proxy" },
+  { name: "foam/core/Latch" },
   { name: "foam/core/Promised" },
   { name: "foam/core/Interface" },
   { name: "foam/core/Type" },
