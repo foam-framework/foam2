@@ -21,7 +21,7 @@ foam.CLASS({
         return this.delegate.find_(x, obj).then(function(result) {
           if ( result == null ) {
             obj.createdBy = x.subject.user.id;
-            obj.createdByAgent = x.subject.user.id;
+            obj.createdByAgent = x.subject.realUser.id;
           }
           return this.delegate.put_(x, obj);
         }.bind(this));
