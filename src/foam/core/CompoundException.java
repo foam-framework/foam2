@@ -36,10 +36,6 @@ public class CompoundException
     return "CompoundException [exceptions_=" + exceptions_ + "]";
   }
 
-  public String getMessage() {
-    return super.getMessage();
-  }
-
   public void maybeThrow(X x) {
     if ( exceptions_.size() != 0 ) {
       throw this;
