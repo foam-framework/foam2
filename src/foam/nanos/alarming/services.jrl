@@ -1,0 +1,70 @@
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"alarmConfigDAO",
+  "serve":true,
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setGuid(true)
+      .setPm(true)
+      .setPipelinePm(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("alarmConfig")
+      .setOf(foam.nanos.alarming.AlarmConfig.getOwnClassInfo())
+      .setDecorator(new foam.nanos.alarming.AlarmConfigOMNameDAO.Builder(x)
+        .setDelegate(new foam.dao.NullDAO(x, foam.nanos.alarming.AlarmConfig.getOwnClassInfo()))
+        .build())
+      .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.alarming.AlarmConfig\"}"
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"monitoringReportDAO",
+  "serve":true,
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.alarming.MonitoringReport.getOwnClassInfo())
+      .setNullify(true)
+      .setSeqNo(true)
+      .setPm(true)
+      .setPipelinePm(true)
+      .setRuler(true)
+      .setIndex(new foam.core.PropertyInfo[] { foam.nanos.alarming.MonitoringReport.NAME })
+      .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.alarming.MonitoringReport\"}"
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"alarmDAO",
+  "serve":true,
+  "serviceScript":`
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.alarming.Alarm.getOwnClassInfo())
+      .setSeqNo(true)
+      .setPm(true)
+      .setPipelinePm(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("alarms")
+      .setOrder(new foam.mlang.order.Comparator[] {
+        foam.nanos.alarming.Alarm.LAST_MODIFIED,
+        new foam.mlang.order.Desc.Builder(x).setArg1(
+          foam.nanos.alarming.Alarm.IS_ACTIVE).build()})
+     .build();
+  `,
+  "client":"{\"of\":\"foam.nanos.alarming.Alarm\"}"
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"omNameDAO",
+  "serve":true,
+  "serviceScript":`
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.alarming.OMName.getOwnClassInfo())
+      .build();
+    `
+  ,"client":"{\"of\":\"foam.nanos.alarming.OMName\"}"
+})

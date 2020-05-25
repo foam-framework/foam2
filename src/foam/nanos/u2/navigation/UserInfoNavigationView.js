@@ -17,7 +17,8 @@ foam.CLASS({
 
   imports: [
     'agent',
-    'user'
+    'user',
+    'theme'
   ],
 
   css: `
@@ -64,21 +65,21 @@ foam.CLASS({
         .start().addClass(this.myClass('container'))
           .on('click', () => {
             this.tag(this.SubMenuView.create({
-              menu: this.Menu.create({ id: 'settings' })
+              menu: this.Menu.create({ id: this.theme.settingsRootMenu })
             }));
           })
           .start()
              .add(this.slot((user) => {
               return this.E().addClass('name-container')
                   .start('span').addClass(this.myClass('userName'))
-                    .add(user.label())
+                    .add(user.toSummary())
                   .end();
             }))
             .add(this.slot((agent) => {
               if ( ! agent ) return;
               return this.E().addClass('name-container')
                   .start('span').addClass(this.myClass('agentName'))
-                    .add( agent.label() )
+                    .add( agent.toSummary() )
                   .end();
             }))
           .end()

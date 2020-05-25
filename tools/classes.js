@@ -166,12 +166,26 @@ var classes = [
   'foam.dao.ORBitalDAO',
   'foam.mlang.order.Comparator',
   'foam.mlang.order.Desc',
+  'foam.mlang.order.ThenBy',
   'foam.mlang.sink.Count',
   'foam.mlang.sink.Max',
   'foam.mlang.sink.Min',
+  'foam.mlang.sink.Projection',
   'foam.mlang.sink.Sum',
   'foam.mlang.sink.Average',
   'foam.mlang.sink.Map',
+  'foam.nanos.alarming.Alarm',
+  'foam.nanos.alarming.AlarmConfig',
+  'foam.nanos.alarming.AlarmConfigOMNameDAO',
+  'foam.nanos.alarming.AlarmConfigOMNameSink',
+  'foam.nanos.alarming.AlarmHostnameRuleAction',
+  'foam.nanos.alarming.AlarmReason',
+  'foam.nanos.alarming.AlarmAndMonitoring',
+  'foam.nanos.alarming.Alarming',
+  'foam.nanos.alarming.AlarmingUniqueNameDAO',
+  'foam.nanos.alarming.MonitoringReport',
+  'foam.nanos.alarming.MonitorType',
+  'foam.nanos.alarming.OMName',
   'foam.nanos.actioncommand.ActionCommand',
   'foam.nanos.NanoService',
   'foam.nanos.boot.NSpec',
@@ -206,6 +220,7 @@ var classes = [
   'foam.nanos.auth.Phone',
   'foam.nanos.auth.HumanNameTrait',
   'foam.nanos.auth.User',
+  'foam.nanos.auth.Subject',
   'foam.nanos.auth.PriorPassword',
   'foam.nanos.auth.ruler.AddPasswordHistoryAction',
   'foam.nanos.auth.test.PasswordPolicyTest',
@@ -328,6 +343,7 @@ var classes = [
   'foam.nanos.notification.push.FirebasePushService',
   'foam.nanos.notification.Notifiable',
   'foam.nanos.notification.Notification',
+  'foam.nanos.notification.NotificationExpansionDAO',
   'foam.nanos.notification.NotificationTemplateDAO',
   'foam.nanos.notification.notifications.ScriptRunNotification',
   'foam.nanos.notification.EmailSetting',
@@ -475,6 +491,7 @@ var classes = [
   'foam.nanos.ruler.predicate.PropertyIsInstance',
   'foam.nanos.ruler.predicate.PropertyIsClass',
   'foam.nanos.ruler.action.ChangePropertyAction',
+  'foam.nanos.ruler.action.AbstractCheckDAOforMatching',
   'foam.comics.SearchMode',
 
   // Support Files
@@ -515,6 +532,9 @@ var classes = [
 
   // Themes
   'foam.nanos.theme.Theme',
+  'foam.nanos.theme.ThemeDomain',
+  'foam.nanos.theme.ThemeDomainsDAO',
+  'foam.nanos.theme.Themes',
 
   //SQL JBDC Support
   'foam.dao.jdbc.JDBCConnectionSpec',
@@ -555,6 +575,7 @@ var classes = [
 
   // approval
   'foam.nanos.approval.ApprovalRequest',
+  'foam.nanos.approval.ApprovalRequestNotification',
   'foam.nanos.approval.ApprovalStatus',
   'foam.nanos.approval.Approvable',
   'foam.nanos.approval.ApprovableAwareDAO',

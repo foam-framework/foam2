@@ -11,7 +11,7 @@
 
     requires: [
       'foam.nanos.auth.User',
-      'foam.nanos.notification.NotificationView',
+      'foam.nanos.notification.NotificationCitationView',
       'foam.u2.view.OverlayActionListView'
     ],
 
@@ -31,10 +31,11 @@
       ^ {
         position: relative;
         padding: 8px;
+        margin-right: 32px;
       }
       ^ .foam-u2-view-OverlayActionListView {
         position: absolute;
-        top: 8px;
+        top: 20px;
         right: 8px;
       }
       ^ i {
@@ -77,7 +78,7 @@
             ],
             obj: this.data
           })
-          .tag(this.NotificationView, {
+          .tag(this.NotificationCitationView, {
             of: this.data.cls_,
             data: this.data
           });
@@ -100,7 +101,7 @@
         self.user.disabledTopics.push(self.data.notificationType);
         self.userDAO.put(self.user);
         self.stack.push({
-          class: 'foam.nanos.notification.NotificationListView'
+          class: 'foam.nanos.notification.NotificationView'
         });
       },
 
@@ -119,7 +120,7 @@
           self.notificationDAO.put(self.data);
         }
         self.stack.push({
-          class: 'foam.nanos.notification.NotificationListView'
+          class: 'foam.nanos.notification.NotificationView'
         });
       }
     ]

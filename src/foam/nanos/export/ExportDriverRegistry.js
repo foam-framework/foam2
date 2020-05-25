@@ -7,6 +7,9 @@
 foam.CLASS({
   package: 'foam.nanos.export',
   name: 'ExportDriverRegistry',
+  implements: [
+    'foam.nanos.auth.EnabledAware'
+  ],
 
   documentation: 'Export driver registry model',
 
@@ -38,6 +41,11 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'isOpenable'
+    },
+    {
+      class: 'Boolean',
+      name: 'enabled',
+      value: true
     }
   ]
 });

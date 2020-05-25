@@ -10,12 +10,13 @@
   implements: [
     'foam.comics.v2.userfeedback.UserFeedbackAware',
     'foam.core.ContextAware',
-    'foam.nanos.auth.LifecycleAware',
+    'foam.nanos.auth.LifecycleAware'
   ],
 
   javaImports: [
     'foam.core.FObject',
     'foam.core.X',
+    'foam.core.PropertyInfo',
     'foam.nanos.logger.Logger',
     'foam.nanos.approval.ApprovableAware',
     'foam.nanos.ruler.Operations',
@@ -24,13 +25,22 @@
     'java.util.Arrays',
     'java.util.List',
     'java.util.Map',
+    'java.util.TreeMap'
   ],
 
-  methods: [
+  properties: [
     {
-      name: 'getStringId',
-      type: 'String'
-    }  
+      class: 'Object',
+      type: 'foam.mlang.predicate.Predicate',
+      documentation: `
+        Predicate to test if the object on 'put()' should go through the checker
+        flow of the maker/checker process (i.e. ApprovableAwareDAO).
+
+        If absent/null, which is the default, the checker flow is mandatory.`,
+      name: 'checkerPredicate',
+      transient: true,
+      visibility: 'HIDDEN'
+    }
   ],
 
   axioms: [
@@ -56,19 +66,40 @@
                 Logger logger = (Logger) x.get("logger");
                 logger.error("Error instantiating : ", obj.getClass().getSimpleName(), e);
               }
-              Map diff = oldObj == null ? null : oldObj.diff(obj);
+
+              // convert hashmap of the diff to a treemap to avoid inconsistencies
+              // in the order when building the hashkey
+              Map diffHashmap = oldObj == null ? null : oldObj.diff(obj);
+              TreeMap diff = null;
+              if ( diffHashmap != null ) {
+                diff = new TreeMap<>();
+                diff.putAll(diffHashmap);
+              }
+              
               StringBuilder hash_sb = new StringBuilder(obj.getClass().getSimpleName());
               if ( operation == Operations.UPDATE && obj instanceof ApprovableAware ) 
-                hash_sb.append(((ApprovableAware) obj).getStringId());
+                hash_sb.append(String.valueOf(obj.getProperty("id")));
 
               if ( diff != null ) {
-                // remove ids, timestamps and userfeedback
+                // remove ids, timestamps, networkTransient and storageTransient properties for generating the lookup hash
                 if ( operation == Operations.CREATE ) diff.remove("id");
                 diff.remove("created");
                 diff.remove("lastModified");
-                diff.remove("userFeedback");
 
-                // convert array properties to list to get consistent hash
+                // remove lifecycle state
+                diff.remove("lifecycleState");
+
+                Iterator allProperties = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class).iterator();
+
+                while ( allProperties.hasNext() ){
+                  PropertyInfo prop = (PropertyInfo) allProperties.next();
+        
+                  if ( prop.getStorageTransient() || prop.getNetworkTransient() ){
+                    diff.remove(prop.getName());
+                  }
+                }
+        
+                // convert array properties to sorted list to get consistent hash
                 // and create hash
                 Iterator it = diff.entrySet().iterator();
 
@@ -89,7 +120,7 @@
               }
 
               String key = ( diff == null || diff.size() == 0 ) && obj instanceof ApprovableAware ? 
-                ((ApprovableAware) obj).getStringId() : 
+                String.valueOf(obj.getProperty("id")) : 
                 hash_sb.toString();
               
               return key;

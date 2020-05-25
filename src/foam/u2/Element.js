@@ -1449,6 +1449,11 @@ foam.CLASS({
       return this;
     },
 
+    function addClasses(a) {
+      a && a.forEach((i) => this.addClass(i));
+      return this;
+    },
+
     function enableCls(cls, enabled, opt_negate) {
       console.warn('Deprecated use of Element.enableCls(). Use enableClass() instead.');
       return this.enableClass(cls, enabled, opt_negate);

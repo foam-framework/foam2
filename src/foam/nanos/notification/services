@@ -10,10 +10,9 @@ p({
       .setPm(true)
       .setSeqNo(true)
       .setDecorator(
-        new foam.nanos.notification.NotificationTemplateDAO.Builder(x).setDelegate(
-        new foam.nanos.notification.SendNotificationDAO(x,
-        new foam.nanos.notification.SendEmailNotificationDAO(
-        new foam.nanos.notification.SendSlackNotificationDAO(x)))).build())
+        new foam.nanos.notification.NotificationTemplateDAO.Builder(x)
+          .setDelegate(new foam.nanos.notification.NotificationExpansionDAO.Builder(x).build())
+          .build())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("notifications")
       .build();
@@ -56,6 +55,22 @@ p({
     """,
     "client":"{\"of\":\"foam.nanos.notification.Notification\"}"
 })
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "notificationSettingDefaultsDAO",
+  "serviceScript": """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setAuthorize(false)
+      .setSeqNo(true)
+      .setPm(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("notificationSettingDefaults")
+      .setOf(foam.nanos.notification.NotificationSetting.getOwnClassInfo())
+      .build();
+  """
+})
+
 
 p({
   "class": "foam.nanos.boot.NSpec",

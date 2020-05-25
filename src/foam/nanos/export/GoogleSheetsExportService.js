@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.nanos.export',
   name: 'GoogleSheetsExportService',
@@ -49,6 +55,10 @@ foam.CLASS({
       javaType: 'String',
       args: [
         {
+          name: 'x',
+          type: 'Context',
+        },
+        {
           name: 'obj',
           javaType: 'Object'
         },
@@ -74,7 +84,7 @@ foam.CLASS({
     
           final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
           GoogleApiAuthService googleApiAuthService = (GoogleApiAuthService)getX().get("googleApiAuthService");
-          Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleApiAuthService.getCredentials(HTTP_TRANSPORT, SCOPES))
+          Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, SCOPES))
             .setApplicationName("nanopay")
             .build();
     
@@ -203,6 +213,10 @@ foam.CLASS({
       name: 'deleteSheet',
       args: [
         {
+          name: 'x',
+          type: 'Context',
+        },
+        {
           name: 'sheetId',
           javaType: 'String'
         }
@@ -210,7 +224,7 @@ foam.CLASS({
       javaCode: `
         try {
           GoogleDriveService googleDriveService = (GoogleDriveService) getX().get("googleDriveService");
-          googleDriveService.deleteFile(sheetId);
+          googleDriveService.deleteFile(x, sheetId);
         } catch(Exception e) {
           Logger l = (Logger) getX().get("logger");
           l.error(e);

@@ -23,6 +23,11 @@ foam.CLASS({
       factory: function() { return this.dao; }
     },
     {
+      class: 'Array',
+      name: 'searchBy',
+      documentation: 'An array of PropertyInfos to reduce the filter scope by. If empty or not set, revert to KEYWORD lookup.'
+    },
+    {
       class: 'Boolean',
       name: 'hideIfEmpty',
       documentation: 'This section will be hidden if there are no items in it if this is set to true.'
@@ -321,9 +326,19 @@ foam.CLASS({
       documentation: 'The text that the user typed in to search by.',
       postSet: function(oldValue, newValue) {
         this.sections.forEach((section) => {
-          section.filteredDAO = newValue
-            ? section.dao.where(this.KEYWORD(newValue))
-            : section.dao;
+          if ( newValue ) {
+            if ( section.searchBy.length > 0 ) {
+              var arrOfExpressions = section.searchBy.map((prop) => this.CONTAINS_IC(prop, newValue));
+              var pred = this.Or.create({ args: arrOfExpressions });
+            }
+            else {
+              var pred = this.KEYWORD(newValue);
+            }
+            section.filteredDAO = section.dao.where(pred);
+          }
+          else {
+            section.filteredDAO = section.dao;
+          }
         });
       }
     },

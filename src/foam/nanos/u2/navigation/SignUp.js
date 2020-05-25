@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.nanos.u2.navigation',
   name: 'SignUp',
@@ -16,7 +22,6 @@ foam.CLASS({
   requires: [
     'foam.nanos.auth.Address',
     'foam.nanos.auth.Country',
-    'foam.nanos.auth.Phone',
     'foam.nanos.auth.User'
   ],
 
@@ -264,7 +269,7 @@ foam.CLASS({
             address: this.Address.create({ countryId: this.countryId }),
             welcomeEmailSent: true,
             jobTitle: this.jobTitle,
-            phone: this.Phone.create({ number: this.phone }),
+            phoneNumber: this.phone,
             group: this.group_
           }))
           .then((user) => {

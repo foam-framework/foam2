@@ -15,7 +15,7 @@ foam.CLASS({
   ],
 
   imports: [
-    'strategyDAO'
+    'DAO strategyDAO'
   ],
 
   javaImports: [
@@ -49,6 +49,10 @@ foam.CLASS({
                 EQ(StrategyReference.TARGET, target)
               )
             );
+
+        if ( strategyPredicate != null  ) {
+          predicate = (Predicate) strategyPredicate;
+        }
 
         DAO strategyDAO = ((DAO) getStrategyDAO()).inX(x);
         List refs = ((ArraySink) strategyDAO

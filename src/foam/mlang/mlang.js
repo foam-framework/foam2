@@ -59,7 +59,7 @@ foam.CLASS({
       class: 'Array',
       type: 'foam.dao.Sink[]',
       name: 'args'
-    },
+    }
   ],
 
   methods: [
@@ -2443,7 +2443,7 @@ foam.CLASS({
     },
 
     function toString() {
-      return 'MAP(' + this.arg1.toString() + ')';
+      return 'MAP(' + this.arg1.toString() + ',' + this.f.toString() + ')';
     }
   ]
 });
@@ -2485,6 +2485,11 @@ foam.CLASS({
     {
       class: 'foam.mlang.SinkProperty',
       name: 'arg2'
+    },
+    {
+      class: 'Int',
+      name: 'groupLimit',
+      value: -1
     },
     {
       class: 'Map',
@@ -2571,7 +2576,7 @@ return getGroupKeys();`
     },
     function reset() {
       this.arg2.reset();
-      this.groups = undefined;
+      this.groups    = undefined;
       this.groupKeys = undefined;
     },
     {
@@ -2591,6 +2596,7 @@ return getGroupKeys();`
         } else {
           this.putInGroup_(sub, key, obj);
         }
+        if ( this.groupLimit == this.groups.size ) sub.detach();
       },
       javaCode:
 `Object arg1 = getArg1().f(obj);
@@ -2601,7 +2607,14 @@ if ( getProcessArrayValuesIndividually() && arg1 instanceof Object[] ) {
   }
 } else {
   putInGroup_(sub, arg1, obj);
-}`
+}
+/*
+if ( getGroupLimit() != -1 ) {
+  System.err.println("************************************* " + getGroupLimit() + " " + getGroups().size() + " " + sub);
+  Thread.dumpStack();
+}*/
+if ( getGroupLimit() == getGroups().size() && sub != null ) sub.detach();
+`
     },
 
     function eof() { },
@@ -2625,7 +2638,7 @@ return clone;`
     {
       name: 'toString',
       code: function toString() {
-        return this.groups.toString();
+        return 'groupBy(' + this.arg1 + "," + this.arg2 + "," + this.groupLimit + ')';
       },
       javaCode: 'return this.getGroups().toString();'
     },
@@ -2647,9 +2660,53 @@ return clone;`
 
 foam.CLASS({
   package: 'foam.mlang.sink',
+  name: 'Projection',
+  extends: 'foam.dao.AbstractSink',
+  implements: [ 'foam.core.Serializable' ],
+
+  properties: [
+    {
+      class: 'Array',
+      type: 'foam.mlang.Expr[]',
+      name: 'exprs'
+    },
+    {
+      class: 'List',
+      name: 'array',
+      factory: function() { return []; },
+      javaFactory: `return new java.util.ArrayList();`
+    }
+  ],
+
+  methods: [
+    {
+      name: 'put',
+      code: function put(o, sub) {
+        var a = [];
+        for ( var i = 0 ; i < this.exprs.length ; i++ )
+          a[i] = this.exprs[i].f(o);
+        this.array.push(a);
+      },
+// TODO:      swiftCode: 'array.append(obj)',
+      javaCode: `
+        Object[] a = new Object[getExprs().length];
+
+        for ( int i = 0 ; i < getExprs().length ; i++ )
+          a[i] = getExprs()[i].f(obj);
+
+        getArray().add(a);
+      `
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.mlang.sink',
   name: 'Plot',
   extends: 'foam.dao.AbstractSink',
   implements: [ 'foam.core.Serializable' ],
+
   properties: [
     {
       class: 'foam.mlang.ExprArrayProperty',
@@ -2855,6 +2912,7 @@ foam.CLASS({
         // of parameter is an interface rather than a class.
         return a;
       },
+      javaJSONParser: 'foam.lib.json.ExprParser.instance()',
       name: 'head'
     },
     {
@@ -2865,28 +2923,40 @@ foam.CLASS({
         // of parameter is an interface rather than a class.
         return a;
       },
+      javaJSONParser: 'foam.lib.json.ExprParser.instance()',
       name: 'tail'
-    },
-    {
-      name: 'compare',
-      swiftSupport: false,
-      transient: true,
-      documentation: 'Is a property so that it can be bound to "this" so that it works with Array.sort().',
-      factory: function() { return this.compare_.bind(this); }
     }
   ],
 
   methods: [
-    function compare_(o1, o2) {
-      // an equals of arg1.compare is falsy, which will then hit arg2
-      return this.head.compare(o1, o2) || this.tail.compare(o1, o2);
+    {
+      name: 'compare',
+      code: function(o1, o2) {
+        // an equals of arg1.compare is falsy, which will then hit arg2
+        return this.head.compare(o1, o2) || this.tail.compare(o1, o2);
+      },
+      javaCode: `
+        int ret = getHead().compare(o1, o2);
+        return ret == 0 ? getTail().compare(o1, o2) : ret;
+      `
     },
+    {
+      name: 'toString',
+      code: function() {
+        return 'THEN_BY(' + this.head.toString() + ', ' +
+          this.tail.toString() + ')';
+      },
+      javaCode: 'return "THEN_BY " + getHead().toString() + ", " + getTail().toString();'
 
-    function toString() {
-      return 'THEN_BY(' + this.head.toString() + ', ' +
-        this.tail.toString() + ')';
     },
-
+    {
+      name: 'createStatement',
+      javaCode: `return null;`
+    },
+    {
+      name: 'prepareStatement',
+      javaCode: `return;`
+    },
     function toIndex(tail) {
       return this.head && this.tail && this.head.toIndex(this.tail.toIndex(tail));
     },
@@ -2977,7 +3047,7 @@ foam.LIB({
       ret = tail = ThenBy.create({head: cs[0], tail: cs[1]});
 
       for ( var i = 2 ; i < cs.length ; i++ ) {
-        tail = tail.arg2 = ThenBy.create({arg1: tail.arg2, arg2: cs[i]});
+        tail = tail.tail = ThenBy.create({head: tail.tail, tail: cs[i]});
       }
 
       return ret;
@@ -3256,6 +3326,9 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
+      code: function(o) {
+        return o[this.key];
+      },
       javaCode: `
         return ((foam.core.X) obj).get(getKey());
       `
@@ -3342,6 +3415,7 @@ foam.CLASS({
     'foam.mlang.sink.Map',
     'foam.mlang.sink.Max',
     'foam.mlang.sink.Min',
+    'foam.mlang.sink.Projection',
     'foam.mlang.sink.Plot',
     'foam.mlang.sink.Sequence',
     'foam.mlang.sink.Sum',
@@ -3398,7 +3472,7 @@ foam.CLASS({
     function MUL(a, b) { return this._binary_("Mul", a, b); },
 
     function UNIQUE(expr, sink) { return this.Unique.create({ expr: expr, delegate: sink }); },
-    function GROUP_BY(expr, sinkProto) { return this.GroupBy.create({ arg1: expr, arg2: sinkProto }); },
+    function GROUP_BY(expr, opt_sinkProto, opt_limit) { return this.GroupBy.create({ arg1: expr, arg2: opt_sinkProto || this.COUNT(), groupLimit: opt_limit || -1 }); },
     function PLOT() { return this._nary_('Plot', arguments); },
     function MAP(expr, sink) { return this.Map.create({ arg1: expr, delegate: sink }); },
     function EXPLAIN(sink) { return this.Explain.create({ delegate: sink }); },
@@ -3411,6 +3485,13 @@ foam.CLASS({
     function MUX(cond, a, b) { return this.Mux.create({ cond: cond, a: a, b: b }); },
     function PARTITION_BY(arg1, delegate) { return this.Partition.create({ arg1: arg1, delegate: delegate }); },
     function SEQ() { return this._nary_("Sequence", arguments); },
+    function PROJECTION(exprs) {
+      return this.Projection.create({
+        exprs: foam.Array.isInstance(exprs) ?
+          exprs :
+          foam.Array.clone(arguments)
+        });
+    },
     function REG_EXP(arg1, regExp) { return this.RegExp.create({ arg1: arg1, regExp: regExp }); },
     {
       name: 'DESC',

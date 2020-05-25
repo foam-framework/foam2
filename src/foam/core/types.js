@@ -333,7 +333,7 @@ foam.CLASS({
         },
         configurable: true
       });
-    },
+    }
   ]
 });
 
