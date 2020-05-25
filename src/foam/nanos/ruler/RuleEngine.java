@@ -87,7 +87,7 @@ public class RuleEngine extends ContextAwareSupport {
       // It means there's a bug in a Rule agent and it should be fixed.
       var message = "CRITICAL UNEXPECTED EXCEPTION EXECUTING RULE";
 
-      logger.error(message, e.toString(), e);
+      logger.error(message, e);
       throw new RuntimeException(message, e);
     }
 

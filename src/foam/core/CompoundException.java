@@ -37,22 +37,21 @@ public class CompoundException
   }
 
   @Override
-  public String toString() {
+  public String getMessage() {
     var str = sb_.get();
     var size = exceptions_.size();
 
-    str.append("CompoundException:");
     for ( int i = 0; i < size; i++ ) {
       Throwable t = (Throwable) exceptions_.get(i);
       var counter = i + 1;
 
-      str.append(" [").append(counter).append('/').append(size).append("] ")
-         .append(t);
+      str.append('[').append(counter).append('/').append(size).append("] ")
+        .append(t);
       while ( t.getCause() != null ) {
         t = t.getCause();
         str.append(", Cause: ").append(t);
       }
-      str.append(';');
+      if ( counter < size ) str.append(';');
     }
     return str.toString();
   }
