@@ -29,7 +29,6 @@ foam.CLASS({
       name: 'authorizeOnCreate',
       javaCode: `
         AuthService authService = (AuthService) x.get("auth");
-        Long userId = ((User) x.get("user")).getId();
         if ( ! authService.check(x, "approval.create") ) {
           throw new AuthorizationException();
         }
