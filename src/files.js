@@ -260,8 +260,6 @@ FOAM_FILES([
   { name: "foam/dao/sync/SyncRecord" },
   { name: "foam/dao/SyncDAO" },
 
-  // approval
-  { name: 'foam/nanos/approval/refinements' },
   { name: 'foam/nanos/approval/AuthenticatedApprovalDAOAuthorizer' },
 
   { name: "foam/nanos/approval/ApprovalRequestNotificationNotificationCitationView", flags: ['web'] },
