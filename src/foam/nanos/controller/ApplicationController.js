@@ -281,7 +281,7 @@ foam.CLASS({
         // Fetch the group only once the user has logged in. That's why we await
         // the line above before executing this one.
         await self.fetchGroup();
-        self.onUserAgentAndGroupLoaded();
+        await self.onUserAgentAndGroupLoaded();
       });
     },
 
