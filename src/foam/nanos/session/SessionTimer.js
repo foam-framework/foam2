@@ -10,7 +10,7 @@ foam.CLASS({
   documentation: `
     The session timer executes the callback once the soft session limit has been reached.
     
-    This timer is initialized at ApplicationController, enabled by SMEController/Controller,
+    This timer is initialized at ApplicationController, enabled by Controller,
     and it is started/refreshed by SessionClientBox.
   `,
 
