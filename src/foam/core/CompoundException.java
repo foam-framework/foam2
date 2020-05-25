@@ -28,10 +28,8 @@ public class CompoundException
   }
 
   public void maybeThrow(X x) {
-    if ( Mode.TEST == ((AppConfig) x.get("appConfig")).getMode() ) {
-      if ( exceptions_.size() != 0 ) {
-        throw this;
-      }
+    if ( exceptions_.size() != 0 ) {
+      throw this;
     }
   }
 }

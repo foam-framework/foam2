@@ -13,7 +13,6 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.nanos.app.AppConfig',
     'foam.nanos.logger.Logger',
     'java.util.ArrayList'
   ],
