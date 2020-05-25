@@ -65,8 +65,20 @@ foam.CLASS({
       }
     },
     {
+      name: 'outputStringForProperties',
+      type: 'StringArray',
+      code: async function(x, cls, obj, columnMetadata) {
+        var values = [];
+        for (var i = 0 ; i < columnMetadata.length ; i++ ) {
+          values.push(await this.returnStringForMethadata(obj[i], columnMetadata[i]));
+        }
+        return values;
+      }
+    },
+    {
       name: 'returnMetadataForProperty',
       code: function(prop, propName) {
+          //to constants
           var cellType = 'STRING';
           var pattern = '';
           if ( foam.core.UnitValue.isInstance(prop) ) {
@@ -123,12 +135,54 @@ foam.CLASS({
       }
     },
     {
+      name: 'returnStringForMethadata',
+      type: 'String',
+      code: async function(val, columnMethadata) {
+        if ( val ) {
+          if ( columnMethadata.cellType === 'CURRENCY' ) {
+            columnMethadata.perValuePatternSpecificValues.push(val.destinationCurrency);
+            return ( val / 100 ).toString();
+          }
+          else if ( columnMethadata.cellType === 'DATE' )
+            return val.toISOString().substring(0, 10);
+          else if ( columnMethadata.cellType === 'DATE_TIME' ) {
+            columnMethadata.perValuePatternSpecificValues.push(val.toString().substring(24));
+            return val.toString().substring(0, 24);
+          }
+          else if ( columnMethadata.cellType === 'TIME' ) {
+            columnMethadata.perValuePatternSpecificValues.push(val.toString().substring(8));
+            return val.toString().substring(0, 8);
+          }
+          else if ( val.toSummary ) {
+            if ( val.toSummary() instanceof Promise )
+              return await val.toSummary();
+            else
+              return val.toSummary();
+          } else
+            return val.toString();            
+        }
+        else
+          return '';
+      }
+    },
+    {
       name: 'outputArray',
       type: 'Array',
       code: async function(x, cls, arr, columnsMetadata) {
         var valuesArray = [];
         for ( var i = 0 ; i < arr.length ; i++ ) {
           valuesArray.push(await this.outputObjectForProperties(x, cls, arr[i], columnsMetadata));
+        }
+        return valuesArray;
+      }
+    },
+    {
+      name: 'outputStringArray',
+      type: 'Array',
+      code: async function(x, cls, arr, columnsMetadata) {
+        var valuesArray = [];
+        for ( var i = 0 ; i < arr.length ; i++ ) {
+          valuesArray.push(await this.outputStringForProperties(x, cls, arr[i], columnsMetadata));
         }
         return valuesArray;
       }

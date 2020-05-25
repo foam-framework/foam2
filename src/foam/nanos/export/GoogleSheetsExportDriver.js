@@ -41,21 +41,28 @@ foam.CLASS({
         stringArray = stringArray.concat(values);
 
         sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata);
-        if ( ! sheetId || sheetId.length == 0)
+        if ( ! sheetId || sheetId.length === 0)
           return '';
         var url = `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`;
         return url;
     },
     async function exportDAO(X, dao) {
       var self = this;
-      
-      var sink = await dao.select();
+      var allColumns = dao.of.getAxiomsByClass(foam.core.Property).map(p => p.name);
+    //  var filteredTableProperties = X.filteredTableColumns.map(c => allColumns.contains(c.split('.')[0]));
+    
+      var columnConfig = X.columnConfigToPropertyConverter;
+      var props = X.filteredTableColumns ? X.filteredTableColumns.filter(c => allColumns.includes(c.split('.')[0])) : self.outputter.getAllPropertyNames(dao.of);
+      var metadata = await self.outputter.getColumnMethadata(X, dao.of, props);
+      props = metadata.map(m => m.propName);
+
+      var expr = columnConfig.exprBuilder(dao.of, props);
+      var sink = await dao.select(expr);
       var sheetId  = '';
       var stringArray = [];
-      var props = X.filteredTableColumns ? X.filteredTableColumns : self.outputter.getAllPropertyNames(dao.of);
-      var metadata = await self.outputter.getColumnMethadata(X, dao.of, props);
+
       stringArray.push(metadata.map(m => m.columnLabel));
-      var values = await self.outputter.outputArray(X, dao.of, sink.array, metadata);
+      var values = await self.outputter.outputStringArray(X, dao.of, sink.array, metadata);
       stringArray = stringArray.concat(values);
 
       sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata);

@@ -40,6 +40,8 @@ foam.CLASS({
       },
       javaCode: `
         Expr e = returnExpr(getObjClass(), getNestedProperty().split("\\\\."), 0);
+        if ( e == null )
+          return null;
         //have no idea why but this context allows to execute find method, but object's context doesn't
         //need to investigate
         ((FObject)obj).setX(getX());
@@ -145,37 +147,53 @@ foam.CLASS({
   javaImports: [
     'foam.core.X',
     'foam.mlang.Expr',
-    'foam.mlang.sink.Projection',
     'static foam.mlang.MLang.*',
+    'java.util.ArrayList'
   ],
-  properties: [
-    {
-      name: 'objClass',
-      class: 'Object',
-      javaType: 'foam.core.ClassInfo'
-    },
-    {
-      name: 'propNames',
-      class: 'StringArray'
-    }
-  ],
+  // properties: [
+  //   {
+  //     name: 'objClass',
+  //     class: 'Object',
+  //     javaType: 'foam.core.ClassInfo'
+  //   },
+  //   {
+  //     name: 'propNames',
+  //     class: 'StringArray'
+  //   }
+  // ],
   methods: [
     {
       name: 'returnExpr',
       type: 'foam.mlang.Expr[]',
-      code: function(of, propNames) {
+      args: [
+        {
+          name: 'objClass',
+          class: 'Object',
+          javaType: 'foam.core.ClassInfo'
+        },
+        {
+          name: 'propNames',
+          class: 'StringArray'
+        }
+      ],
+      code: function(objClass, propNames) {
         var exprArray = [];
         for ( var propName of propNames ) {
-          exprArray.push(foam.nanos.column.NestedPropertiesExpression.create({ objClass: this.of, nestedProperty: propName }));
+          var expr = foam.nanos.column.NestedPropertiesExpression.create({ objClass: objClass, nestedProperty: propName });
+          if ( expr )
+            exprArray.push(expr);
         }
         return exprArray;
       },
       javaCode: `
-        foam.mlang.Expr[] exprs = new Expr[getPropNames().length];
-        for ( int i = 0 ; i < getPropNames().length ; i++ ) {
-          exprs[i] = new NestedPropertiesExpression.Builder(getX()).setObjClass(getObjClass()).setNestedProperty( getPropNames()[i]).build();
+        ArrayList<foam.mlang.Expr> exprs = new ArrayList();
+        for ( int i = 0 ; i < propNames.length ; i++ ) {
+          Expr expr = new NestedPropertiesExpression.Builder(getX()).setObjClass(objClass).setNestedProperty( propNames[i]).build();
+          if ( expr != null ) {
+            exprs.add(expr);
+          }
         }
-        return exprs;
+        return (Expr[]) exprs.toArray();
       `
     }
   ]

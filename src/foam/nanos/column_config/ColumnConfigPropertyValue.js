@@ -15,9 +15,42 @@ foam.CLASS({
     'foam.core.PropertyInfo',
     'foam.core.X',
     'foam.nanos.logger.Logger',
-    'java.lang.reflect.Method'
+    'java.lang.reflect.Method',
+    'foam.mlang.sink.Projection',
+    'foam.mlang.Expr'
   ],
   methods: [
+    {
+      name: 'exprBuilder',
+      type: 'Any',
+      args: [
+        {
+          name: 'of',
+          type: 'ClassInfo'
+        },
+        {
+          name: 'propNames',
+          class: 'StringArray'
+        }
+      ],
+      code: function(of, propNames) {
+        return foam.mlang.sink.Projection.create({ exprs: foam.nanos.column.ArrayOfExpressionForNestedProperties.create().returnExpr(of, propNames) });//foam.mlang.Expressions.create().PROJECTION(foam.nanos.column.ArrayOfExpressionForNestedProperties.create().returnExpr(of, propNames));
+      },
+      javaCode: `
+        Expr[] exprs = new foam.nanos.column.ArrayOfExpressionForNestedProperties.Builder(getX()).build().returnExpr(of, propNames);
+        return new Projection.Builder(getX()).setExprs(exprs).build();
+      `
+    },
+    function returnExpr(of, propNames, i) {
+      if (i === propNames.length - 1 ) {
+        return of.getAxiomByName(propNames[i]);
+      }
+      var prop = of.getAxiomByName(propNames[i]);
+      return this.returnPropExpr(prop, returnExpr(prop.of, propNames, ++i));
+    },
+    function returnPropExpr(prop1, prop2) {
+      return foam.mlang.Expressions.create().DOT(prop1, prop2);
+    },
     {
       name: 'returnProperty',
       type: 'PropertyInfo',
