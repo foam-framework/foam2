@@ -101,6 +101,23 @@ foam.CLASS({
       section: 'infoSection',
     },
     {
+      class: 'String',
+      name: 'loginDAO'
+    },
+    {
+      class: 'String',
+      name: 'loginImage'
+    },
+    {
+      class: 'String',
+      name: 'defaultGroup'
+    },
+    {
+      class: 'Array',
+      of: 'String',
+      name: 'loginCountryChoices'
+    },
+    {
       name: 'domains',
       class: 'Array',
       of: 'String',
@@ -114,7 +131,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'navigationRootMenu',
-      documentation: 'Specifies the root menu to be used in top navigation settings drop-down.'
+      documentation: 'Specifies the root menu to be used in side navigation.'
     },
     {
       class: 'String',
