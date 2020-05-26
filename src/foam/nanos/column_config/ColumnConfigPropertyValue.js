@@ -322,6 +322,63 @@ foam.CLASS({
         }
         return arr;
       `
+    },
+    {
+      name: 'returnValueForPropertyName',
+      type: 'FObject',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'of',
+          type: 'ClassInfo'
+        },
+        {
+          name: 'propInfo',
+          class: 'String',
+        },
+        {
+          name: 'obj',
+          type: 'FObject'
+        }
+      ],
+      code: async function(x, of, propName, obj) {
+      var columnPropertyVal = await this.returnPropertyAndObject(x, of, propName, obj);
+      if ( foam.core.Reference.isInstance(columnPropertyVal.propertyValue) )
+        return foam.nanos.column.ColumnPropertyValue.create({ propertyValue:columnPropertyVal.propertyValue, objValue: await columnPropertyVal.objValue[columnPropertyVal.propertyValue.name + '$find']});
+      return foam.nanos.column.ColumnPropertyValue.create({ propertyValue:columnPropertyVal.propertyValue, objValue: columnPropertyVal.propertyValue.f(columnPropertyVal.objValue)});
+      }
+    },
+    {
+      name: 'returnValueForArrayOfPropertyNames',
+      code: async function(x, of, propNames, obj) {
+        var values = [];
+        for ( var propName of  propNames ) {
+          values.push(await this.returnValueForPropertyName(x, of, propName, obj));
+        }
+        return values;
+      }
+    },
+    {
+      name: 'returnValueForArrayOfPropertyNamesAndArrayOfObjects',
+      code: async function(x, of, propNames, objArray) {
+        var values = [];
+        for ( var obj of objArray ) {
+          values.push(await this.returnValueForArrayOfPropertyNames(x, of, propNames, obj));
+        }
+        return values;
+      }
+    },
+    function returnProperties(of, propNames) {
+      var arr = [];
+
+      for ( var prop of propNames ) {
+        arr.push(this.returnProperty(of, prop));
+      }
+      
+      return arr;
     }
   ],
   axioms: [
