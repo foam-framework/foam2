@@ -571,8 +571,11 @@ var classes = [
   'foam.nanos.approval.ApprovableApprovalRequestsRule',
   'foam.nanos.approval.FulfilledApprovablePredicate',
   'foam.nanos.approval.FulfilledApprovableRule',
+
   'foam.box.network.SocketClientBox',
-  'foam.box.network.TCPSocketMgr'
+  'foam.box.network.TCPSocketMgr',
+  'foam.box.network.SocketReplyBox',
+  'foam.box.network.SocketServer'
 ];
 
 var abstractClasses = [
