@@ -13,13 +13,17 @@ foam.CLASS({
 
   imports: [
     'notify',
-    'stack'
+    'stack',
+    'theme'
   ],
 
   requires: [
     'foam.u2.stack.Stack',
     'foam.u2.stack.StackView',
-    'foam.u2.detail.VerticalDetailView'
+    'foam.u2.detail.VerticalDetailView',
+    'foam.u2.layout.Grid',
+    'foam.u2.layout.GUnit',
+    'foam.u2.wizard.StepWizardletStepsView'
   ],
 
   implements: [
@@ -37,35 +41,78 @@ foam.CLASS({
 
   css: `
     ^ {
-      margin: 30px;
+      position: relative;
+      height: auto;
+      background-color: %GREY5%;
+
+      /* this view handles its own scrolling */
+      height: 100%;
+    }
+    ^status {
+      background-color: %WHITE%;
+      padding: 50px;
+    }
+    ^entry {
+      background-color: %GREY5%;
+      padding: 50px;
+      overflow-y: scroll;
+    }
+    ^buttons {
+      height: 50px;
     }
     ^ .foam-u2-stack-StackView {
       height: auto;
+    }
+    ^fix-grid {
+      height: 100%;
     }
   `,
 
   methods: [
     function initE() {
+      var btn = { size: 'LARGE' };
+      var self = this;
+
       this
         .addClass(this.myClass())
-        .tag({
-          class: 'foam.u2.stack.StackView',
-          data$: this.data.subStack$,
-          showActions: false
-        })
-        // .add(this.SUB_STACK)
-        .startContext({ data: this })
-          .tag(this.DISCARD, { size: 'LARGE' })
-          .tag(this.CLOSE, { size: 'LARGE' })
-          .tag(this.GO_PREV, { size: 'LARGE' })
-          .callIfElse( this.data.isLastWizardlet,
-            function() {
-              this.tag(this.GO_NEXT, { size: 'LARGE', label: this.ACTION_LABEL });
-            },
-            function() {
-              this.tag(this.GO_NEXT, { size: 'LARGE' });
+        .start(this.Grid)
+          .addClass(this.myClass('fix-grid'))
+          .start(this.GUnit, { columns: 4 })
+            .addClass(this.myClass('status'))
+            .add(
+              this.slot(function (data, data$currentWizardlet) {
+                // return this.E().add(
+                //   'At step ' + this.data.subStack.pos)
+                return this.StepWizardletStepsView.create({
+                  data: data,
+                });
+              })
+            )
+          .end()
+          .start(this.GUnit, { columns: 8 })
+            .addClass(this.myClass('entry'))
+            .tag({
+              class: 'foam.u2.stack.StackView',
+              data$: this.data.subStack$,
+              showActions: false
             })
-        .endContext()
+            // .add(this.SUB_STACK)
+            .add(this.slot(function (data$isLastWizardlet) {
+              return this.E()
+                .startContext({ data: self })
+                .addClass(self.myClass('buttons'))
+                .tag(this.DISCARD, btn)
+                .tag(this.CLOSE, btn)
+                .tag(this.GO_PREV, btn)
+                .tag(this.GO_NEXT,
+                  data$isLastWizardlet
+                    ? { ...btn, label: this.ACTION_LABEL }
+                    : btn
+                )
+                .endContext();
+            }))
+          .end()
+        .end()
         ;
     }
   ],

@@ -53,6 +53,12 @@ foam.CLASS({
         ret = Object.assign(ret, this.ucj.data);
         return ret;
       }
+    },
+    {
+      name: 'title',
+      expression: function(capability) {
+        return capability.name;
+      }
     }
   ],
 

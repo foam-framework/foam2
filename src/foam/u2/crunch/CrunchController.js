@@ -110,11 +110,14 @@ foam.CLASS({
             )
           );
           self.stack.push({
-            class: "foam.u2.wizard.ScrollWizardletView",
-            wizardlets: sections
+            class: 'foam.u2.wizard.StepWizardletView',
+            data: foam.u2.wizard.StepWizardletController.create({
+              wizardlets: sections
+            })
           });
         });
-      });
+      }).catch(e => { console.log(e); });
+
     }
   ]
 });
