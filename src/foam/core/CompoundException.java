@@ -32,7 +32,10 @@ public class CompoundException
 
   public void maybeThrow() {
     if ( exceptions_.size() != 0 ) {
-      throw this;
+      for ( int i = 0 ; i < exceptions_.size() ; i++ ) {
+        System.out.println( "This is an error =======> " + ( (Throwable) exceptions_.get(i) ) );
+        throw (RuntimeException) exceptions_.get(i);
+      }
     }
   }
 
