@@ -110,7 +110,6 @@ foam.CLASS({
     },
 
     function initE() {
-    debugger;
       this.addToSelf_ = true;
       this.addClass(this.myClass('container'));
       var view = this;
