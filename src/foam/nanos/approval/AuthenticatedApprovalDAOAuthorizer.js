@@ -10,9 +10,6 @@ foam.CLASS({
   implements: ['foam.nanos.auth.Authorizer'],
 
   javaImports: [
-    'foam.core.FObject',
-    'foam.core.X',
-    'foam.dao.*',
     'foam.nanos.auth.AuthorizationException',
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.User',
