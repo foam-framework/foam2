@@ -30,7 +30,7 @@ foam.CLASS({
 
   css: `
   ^ input {
-    width: 220px !important;
+    width: 220px;
   }
 
   ^ .side-nav-view {
