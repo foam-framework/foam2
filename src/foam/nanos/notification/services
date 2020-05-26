@@ -143,6 +143,21 @@ p({
 
 p({
   "class":"foam.nanos.boot.NSpec",
-  "name":"twilioConfig",
+  "name":"smsService",
+  "serviceScript":"""
+    import foam.nanos.notification.sms.NullSMSService;
+    import foam.nanos.notification.sms.ProxySMSService;
+
+    return new ProxySMSService.Builder(x)
+      .setDelegate(
+        new NullSMSService.Builder(x).build())
+      .build();
+  """
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec", 
+  "name":"twilioConfig",                     
+  "lazy":false,  
   "service":{"class":"foam.nanos.app.TwilioConfig"}
 })

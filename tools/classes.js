@@ -343,8 +343,10 @@ var classes = [
   'foam.nanos.notification.push.FirebasePushService',
 
   // SMS models, services and interfaces
-  'foam.nanos.notification.sms.SMSMessage',
+  'foam.nanos.notification.sms.NullSMSService',
+  'foam.nanos.notification.sms.ProxySMSService',
   'foam.nanos.notification.sms.SMSService',
+  'foam.nanos.notification.sms.SMSMessage',
   'foam.nanos.notification.sms.SMSStatus',
   'foam.nanos.notification.sms.TwilioSMSService',
 
