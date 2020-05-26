@@ -5,14 +5,20 @@ foam.CLASS({
     {
       name: 'filterExportedProps',
       code: async function(x, cls, propNames) {
-        var props = [];
+        var props = cls.getAxiomsByClass(foam.core.Property);
+        var allColumnNames = props.map(p => p.name);
         if ( ! propNames ) {
-          props = cls.getAxiomsByClass(foam.core.Property);
-          propNames = props.map(p => p.name);
+          return props.filter(p => p.networkTransient);
         } else {
+          props = [];
+          //filter custom columns
+          propNames = propNames.filter(n => allColumnNames.includes(n.split('.')[0]));
+
           var columnConfig = x.columnConfigToPropertyConverter;
           for ( var i = 0 ; i < propNames.length ; i++ ) {
-            props.push(await columnConfig.returnProperty(cls, propNames[i]));
+            var prop = await columnConfig.returnProperty(cls, propNames[i]);
+            //if ( prop.networkTransient )
+              props.push(prop);
           }
         }
         return props;
@@ -61,7 +67,7 @@ foam.CLASS({
     {
       name: 'objectToTable',
       code: async function(x, of, propNames, obj) {
-        var props = this.filterExportedProps(x, of, propNames);
+        var props = await this.filterExportedProps(x, of, propNames);
         var columnConfig = x.columnConfigToPropertyConverter;
         var table = [ props.map( p => p.label ) ];
         var values = await columnConfig.returnStringArrayForArrayOfValues(props, columnConfig.returnValueForArrayOfPropertyNames(x, of, propNames, obj));
@@ -72,7 +78,7 @@ foam.CLASS({
     {
       name: 'returnTable',
       code: async function(x, of, propNames, values) {
-        var props =  x.columnConfigToPropertyConverter.returnProperties(of, propNames);     
+        var props = await this.filterExportedProps(x, of, propNames);
         var table =  [ props.map( p => p.label ) ];
         var values = await this.returnStringArrayForArrayOfValues(props, values);
         table = table.concat(values);
