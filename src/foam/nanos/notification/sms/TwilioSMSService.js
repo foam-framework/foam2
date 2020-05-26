@@ -45,6 +45,7 @@ foam.CLASS({
           return smsMessage;
         }
 
+        // check if message exists
         if ( ! SafetyUtil.isEmpty(smsMessage.getMessage()) ) {
           try {
             Message.creator(new PhoneNumber(phoneNumber), new PhoneNumber(twilioConfig.getPhoneNumber()),
