@@ -86,6 +86,7 @@ FOAM_FILES([
   { name: 'foam/nanos/auth/HumanNameTrait' },
   { name: "foam/nanos/auth/CreatedByAware" },
   { name: "foam/nanos/auth/CreatedByAwareDAO" },
+  { name: "foam/nanos/auth/Subject" },
   { name: "foam/nanos/auth/User" },
   { name: "foam/nanos/auth/PriorPassword" },
   { name: "foam/nanos/auth/ruler/AddPasswordHistoryAction" },
