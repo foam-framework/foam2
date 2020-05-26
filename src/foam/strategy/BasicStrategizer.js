@@ -37,10 +37,11 @@ foam.CLASS({
           throw new RuntimeException("A desired model id must be specified.");
         }
 
+        Predicate predicate;
         if ( strategyPredicate != null  ) {
           predicate = (Predicate) strategyPredicate;
         } else {
-          Predicate predicate = SafetyUtil.isEmpty(target)
+          predicate = SafetyUtil.isEmpty(target)
           ? AND(
               EQ(StrategyReference.DESIRED_MODEL_ID, desiredModelId),
               EQ(StrategyReference.TARGET, "")
