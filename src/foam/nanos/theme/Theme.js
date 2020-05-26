@@ -101,10 +101,6 @@ foam.CLASS({
       section: 'infoSection',
     },
     {
-      class: 'String',
-      name: 'loginDAO'
-    },
-    {
       class: 'Image',
       name: 'loginImage',
       displayWidth: 60,
@@ -118,15 +114,6 @@ foam.CLASS({
           { class: 'foam.u2.view.ImageView' },
         ]
       },
-    },
-    {
-      class: 'String',
-      name: 'defaultGroup'
-    },
-    {
-      class: 'Array',
-      of: 'String',
-      name: 'loginCountryChoices'
     },
     {
       name: 'domains',
