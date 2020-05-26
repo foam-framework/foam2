@@ -16,7 +16,7 @@ foam.CLASS({
   ],
 
   imports: [
-    'DAO notificationTemplateDAO as dao'
+    'notificationDAO'
   ],
 
   javaImports: [
@@ -74,7 +74,7 @@ foam.CLASS({
           template: this.cls_,
           body: log.severity.name + ': ' + log.message
         });
-        this.dao.put_(x, notif);
+        this.notificationDAO.put_(x, notif);
       },
       args: [
         {
@@ -99,7 +99,7 @@ foam.CLASS({
     String message = log.getSeverity().getName() + ": " + log.getMessage();
     notif.setBody(message);
 
-    if ( getDao() != null) getDao().put_(x, notif) ;
+    if (x.get("notificationDAO") != null) ((DAO) x.get("notificationDAO")).put_(x, notif) ;
   }
   catch (Throwable t) {
     Logger logger = (Logger) x.get("logger");
