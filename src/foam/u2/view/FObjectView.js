@@ -39,7 +39,7 @@ foam.CLASS({
           if ( this.data && this.data.cls_.id === newValue ) return;
           var m = this.__context__.lookup(newValue, true);
           if ( m ) {
-            this.data = m.create(this.persistantData, this);
+            this.data = m.create(this.persistentData, this);
           }
         }
       }
@@ -88,12 +88,18 @@ foam.CLASS({
     },
     {
       class: 'Object',
-      name: 'persistantData',
-      documentation: 'Allows passed in data to persist to selected class instances.'
+      name: 'persistentData',
+      documentation: `
+        Allows passed in data to persist to selected class instances.
+        Will copy over to any objects created after a strategizer class selection.
+      `
     },
     {
       name: 'predicate',
-      documentation: 'Unique predicate to pass into strategizer query request.'
+      documentation: `
+        Unique predicate to pass into strategizer query request.
+        Can omit or include additional strategizer class options.
+      `
     }
   ],
 

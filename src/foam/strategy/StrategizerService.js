@@ -36,7 +36,7 @@ foam.INTERFACE({
       return foam.u2.view.FObjectView.create({
         data: X.data.exampleProp,
         of: foam.nanos.auth.User,
-        persistantData: { website: X.data.user.website },
+        persistentData: { website: X.data.user.website },
         predicate: predicate
       }, X);
     }
