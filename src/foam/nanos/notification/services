@@ -124,6 +124,9 @@ p({
       .setSeqNo(true)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName(\"smsMessages\")
+      .setFixedSize(new foam.dao.FixedSizeDAO.Builder(x)
+        .setSize(1000)
+        .build())
       .build();
   """
 })
@@ -135,7 +138,7 @@ p({
   "serviceScript":"""
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.notification.sms.SMSMessage.getOwnClassInfo())
-      .setInnerDAO((foam.dao.DAO) x.get(\"localSmsMessageDAO\"))
+      .setInnerDAO(x.get("localSmsMessageDAO"))
       .build();
   """,
   "client":"{\"of\":\"foam.nanos.notification.sms.SMSMessage\"}"
