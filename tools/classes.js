@@ -345,6 +345,8 @@ var classes = [
   // SMS models, services and interfaces
   'foam.nanos.notification.sms.SMSMessage',
   'foam.nanos.notification.sms.SMSService',
+  'foam.nanos.notification.sms.SMSStatus',
+  'foam.nanos.notification.sms.TwilioSMSService',
 
   'foam.nanos.notification.Notifiable',
   'foam.nanos.notification.Notification',
@@ -508,6 +510,7 @@ var classes = [
   'foam.nanos.dig.exception.GeneralException',
 
   'foam.nanos.app.EmailConfig',
+  'foam.nanos.app.TwilioConfig',
 
   'foam.nanos.test.StockSnapshot',
   'foam.nanos.analytics.FoldManagerDAODecorator',

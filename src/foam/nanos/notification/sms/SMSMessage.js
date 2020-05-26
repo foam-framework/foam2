@@ -23,6 +23,11 @@
      {
        class: 'String',
        name: 'phoneNumber'
+     },
+     {
+       class: 'Enum',
+       of: 'foam.nanos.notification.sms.SMSStatus',
+       name: 'status'
      }
    ]
  });

@@ -140,3 +140,9 @@ p({
   """,
   "client":"{\"of\":\"foam.nanos.notification.sms.SMSMessage\"}"
 })
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"twilioConfig",
+  "service":{"class":"foam.nanos.app.TwilioConfig"}
+})
