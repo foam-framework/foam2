@@ -18,7 +18,6 @@ foam.CLASS({
     'com.twilio.rest.api.v2010.account.Message',
     'com.twilio.Twilio',
     'com.twilio.type.PhoneNumber',
-    'foam.dao.DAO',
     'foam.nanos.app.TwilioConfig',
     'foam.nanos.notification.sms.SMSStatus',
     'foam.nanos.om.OMLogger',
@@ -29,7 +28,6 @@ foam.CLASS({
     {
       name: 'sendSms',
       javaCode: `
-        DAO smsMessageDAO = (DAO) x.get("localSmsMessageDAO");
         OMLogger omLogger = (OMLogger) x.get("OMLogger");
         TwilioConfig twilioConfig = (TwilioConfig) x.get("twilioConfig");
         Twilio.init(twilioConfig.getAccountSid(), twilioConfig.getAuthToken());
@@ -44,7 +42,6 @@ foam.CLASS({
           status = SMSStatus.FAILED;
           status.setErrorMessage("Phone number not found, failed to send SMS.");
           smsMessage.setStatus(status);
-          smsMessageDAO.put(smsMessage);
           return smsMessage;
         }
 
@@ -54,20 +51,16 @@ foam.CLASS({
             smsMessage.getMessage()).create();
             smsMessage.setStatus(SMSStatus.SENT);
             omLogger.log(this.getClass().getSimpleName(), "message", "sent");
-            smsMessageDAO.put(smsMessage);
             return smsMessage;
           } catch (Exception e) {
             status = SMSStatus.FAILED;
             status.setErrorMessage(e.toString());
-            System.out.println("TWILIOERROR####: " + e.toString());
-            smsMessageDAO.put(smsMessage);
             return smsMessage;
           }
         } else {
           status = SMSStatus.FAILED;
           status.setErrorMessage("No message found, failed to send SMS.");
           smsMessage.setStatus(status);
-          smsMessageDAO.put(smsMessage);
           return smsMessage;
         }
       `
