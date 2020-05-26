@@ -41,8 +41,8 @@ foam.CLASS({
         if ( ! SafetyUtil.isEmpty(smsMessage.getPhoneNumber()) ) {
           phoneNumber = smsMessage.getPhoneNumber();
         } else {
-          status = SMSStatus.UNSENT;
-          status.setErrorMessage("Phone number not found, cannot send SMS.");
+          status = SMSStatus.FAILED;
+          status.setErrorMessage("Phone number not found, failed to send SMS.");
           smsMessage.setStatus(status);
           smsMessageDAO.put(smsMessage);
           return smsMessage;
