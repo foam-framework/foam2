@@ -27,7 +27,8 @@ foam.CLASS({
     'foam.nanos.crunch.CapabilityCapabilityJunction',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction',
-    'foam.nanos.crunch.ui.CapabilityWizardlet'
+    'foam.nanos.crunch.ui.CapabilityWizardlet',
+    'foam.u2.dialog.Popup'
   ],
   
   messages: [
@@ -109,12 +110,13 @@ foam.CLASS({
               ! foam.util.equals(wizardSection.ucj.status, self.CapabilityJunctionStatus.PENDING ) 
             )
           );
-          self.stack.push({
+          ctrl.add(this.Popup.create({ closeable: false }).tag({
             class: 'foam.u2.wizard.StepWizardletView',
             data: foam.u2.wizard.StepWizardletController.create({
               wizardlets: sections
-            })
-          });
+            }),
+            onClose: x => { x.closeDialog(); }
+          }));
         });
       }).catch(e => { console.log(e); });
 

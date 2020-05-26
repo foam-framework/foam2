@@ -68,6 +68,14 @@ foam.CLASS({
     }
   `,
 
+  properties: [
+    {
+      name: 'onClose',
+      class: 'Function',
+      factory: () => () => {}
+    }
+  ],
+
   methods: [
     function initE() {
       var btn = { size: 'LARGE' };
@@ -122,7 +130,7 @@ foam.CLASS({
       name: 'discard',
       confirmationRequired: true,
       code: function(x) {
-        x.stack.back();
+        this.onClose(x);
       }
     },
     {
@@ -130,7 +138,7 @@ foam.CLASS({
       label: 'Save for Later',
       code: function(x) {
         this.data.save().then(() => {
-          x.stack.back();
+          this.onClose(x);
         }).catch(e => {
           x.ctrl.notify(this.ERROR_MSG_DRAFT);
         });
@@ -149,7 +157,7 @@ foam.CLASS({
       code: function(x) {
         this.data.next().then((isFinished) => {
           if ( isFinished ) {
-            this.stack.back();
+            this.onClose(x);
           }
         }).catch(e => {
           x.ctrl.notify(this.ERROR_MSG);
