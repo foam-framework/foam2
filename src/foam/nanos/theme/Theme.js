@@ -105,8 +105,19 @@ foam.CLASS({
       name: 'loginDAO'
     },
     {
-      class: 'String',
-      name: 'loginImage'
+      class: 'Image',
+      name: 'loginImage',
+      displayWidth: 60,
+      view: {
+        class: 'foam.u2.MultiView',
+        views: [
+          {
+            class: 'foam.u2.tag.TextArea',
+            rows: 4, cols: 80
+          },
+          { class: 'foam.u2.view.ImageView' },
+        ]
+      },
     },
     {
       class: 'String',
