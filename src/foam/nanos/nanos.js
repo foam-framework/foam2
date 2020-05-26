@@ -101,6 +101,7 @@ FOAM_FILES([
   { name: "foam/nanos/boot/DAOConfigSummaryView", flags: ['web'] },
   { name: "foam/nanos/column_config/ColumnConfigPropertyValue"},
   { name: "foam/nanos/column_config/CSVTableExportDriver"},
+  { name: "foam/nanos/column_config/CSVTableOutputter"},
   { name: "foam/nanos/session/Session" },
   { name: "foam/nanos/session/SessionTimer" },
   { name: "foam/nanos/session/SessionService" },

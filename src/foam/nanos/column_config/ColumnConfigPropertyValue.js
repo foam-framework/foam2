@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.nanos.column',
   name: 'ColumnConfigToPropertyConverter',
-  documentation: `ColumnConfigToPropertyConverter gathers methods for converting property name to property if required 
+  documentation: `ColumnConfigToPropertyConverter gathers methods for converting (or mapping) property name to property if required 
       and returns property and obj, which will return the proprty value on f function call`,
   javaImports: [
     'foam.core.ClassInfo',
@@ -16,30 +16,30 @@ foam.CLASS({
     'foam.core.X',
     'foam.nanos.logger.Logger',
     'java.lang.reflect.Method',
-    'foam.mlang.sink.Projection',
     'foam.mlang.Expr'
   ],
   methods: [
     {
-      name: 'exprBuilder',
-      type: 'Any',
-      args: [
-        {
-          name: 'of',
-          type: 'ClassInfo'
-        },
-        {
-          name: 'propNames',
-          class: 'StringArray'
+      name: 'filterExportedProps',
+      code: async function(x, of, propNames) {
+        var props = of.getAxiomsByClass(foam.core.Property);
+        var allColumnNames = props.map(p => p.name);
+        if ( ! propNames ) {
+          return props.filter(p => p.networkTransient);
+        } else {
+          props = [];
+          //filter custom columns
+          propNames = propNames.filter(n => allColumnNames.includes(n.split('.')[0]));
+
+          var columnConfig = x.columnConfigToPropertyConverter;
+          for ( var i = 0 ; i < propNames.length ; i++ ) {
+            var prop = await columnConfig.returnProperty(of, propNames[i]);
+            //if ( prop.networkTransient ) //most of properties are not networkTransient that's why it's commented
+              props.push(prop);
+          }
         }
-      ],
-      code: function(of, propNames) {
-        return foam.mlang.sink.Projection.create({ exprs: foam.nanos.column.ArrayOfExpressionForNestedProperties.create().returnExpr(of, propNames) });//foam.mlang.Expressions.create().PROJECTION(foam.nanos.column.ArrayOfExpressionForNestedProperties.create().returnExpr(of, propNames));
-      },
-      javaCode: `
-        Expr[] exprs = new foam.nanos.column.ArrayOfExpressionForNestedProperties.Builder(getX()).build().returnExpr(of, propNames);
-        return new Projection.Builder(getX()).setExprs(exprs).build();
-      `
+        return props;
+      }
     },
     function returnExpr(of, propNames, i) {
       if (i === propNames.length - 1 ) {
@@ -323,63 +323,38 @@ foam.CLASS({
         return arr;
       `
     },
-    {
-      name: 'returnValueForPropertyName',
-      type: 'FObject',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'of',
-          type: 'ClassInfo'
-        },
-        {
-          name: 'propInfo',
-          class: 'String',
-        },
-        {
-          name: 'obj',
-          type: 'FObject'
-        }
-      ],
-      code: async function(x, of, propName, obj) {
+    async function returnValueForPropertyName(x, of, propName, obj) {
       var columnPropertyVal = await this.returnPropertyAndObject(x, of, propName, obj);
       if ( foam.core.Reference.isInstance(columnPropertyVal.propertyValue) )
         return foam.nanos.column.ColumnPropertyValue.create({ propertyValue:columnPropertyVal.propertyValue, objValue: await columnPropertyVal.objValue[columnPropertyVal.propertyValue.name + '$find']});
       return foam.nanos.column.ColumnPropertyValue.create({ propertyValue:columnPropertyVal.propertyValue, objValue: columnPropertyVal.propertyValue.f(columnPropertyVal.objValue)});
-      }
     },
-    {
-      name: 'returnValueForArrayOfPropertyNames',
-      code: async function(x, of, propNames, obj) {
-        var values = [];
-        for ( var propName of  propNames ) {
-          values.push(await this.returnValueForPropertyName(x, of, propName, obj));
-        }
-        return values;
+    async function returnValueForArrayOfPropertyNames(x, of, propNames, obj) {
+      var values = [];
+      for ( var propName of  propNames ) {
+        values.push(await this.returnValueForPropertyName(x, of, propName, obj));
       }
+      return values;
     },
-    {
-      name: 'returnValueForArrayOfPropertyNamesAndArrayOfObjects',
-      code: async function(x, of, propNames, objArray) {
-        var values = [];
-        for ( var obj of objArray ) {
-          values.push(await this.returnValueForArrayOfPropertyNames(x, of, propNames, obj));
-        }
-        return values;
+    async function returnValueForArrayOfPropertyNamesAndArrayOfObjects(x, of, propNames, objArray) {
+      var values = [];
+      for ( var obj of objArray ) {
+        values.push(await this.returnValueForArrayOfPropertyNames(x, of, propNames, obj));
       }
+      return values;
     },
     function returnProperties(of, propNames) {
       var arr = [];
 
+      var allColumns = of.getAxiomsByClass(foam.core.Property).map(p => p.name);
+      propNames = propNames.filter(p => allColumns.includes(p.split('.')[0]));
+
       for ( var prop of propNames ) {
         arr.push(this.returnProperty(of, prop));
       }
-      
       return arr;
-    }
+    },
+    
   ],
   axioms: [
     {

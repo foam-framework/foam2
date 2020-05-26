@@ -19,42 +19,21 @@ foam.CLASS({
       var props = X.filteredTableColumns ? X.filteredTableColumns.filter(c => allColumns.includes(c.split('.')[0])) : this.outputter.getAllPropertyNames(obj.cls_);
 
       var outputter  = this.TableColumnOutputter.create();
-      var table = outputter.objectToTable(X, obj.cls_, props, obj).then( ( values ) => {
-        var output = [];
-        for ( var row of values ) {
-          output.push(row.join(',') + '\n');
-        }
-        var str = '';
-        for ( var val of output) {
-          str += val;
-        }
-        return str;
+      return outputter.objectToTable(X, obj.cls_, props, obj).then( ( values ) => {
+        var ouputter = foam.nanos.column.CSVTableOutputter.create();
+        return ouputter.arrayToCSV(values);
       });
-      var output = [];
-      for ( var row of table ) {
-        output.put(row.join(','));
-      }
-      return output;
     },
     function exportDAO(X, dao) {
       var allColumns = dao.of.getAxiomsByClass(foam.core.Property).map(p => p.name);
       var columnConfig = X.columnConfigToPropertyConverter;
       var props = X.filteredTableColumns ? X.filteredTableColumns.filter(c => allColumns.includes(c.split('.')[0])) : this.outputter.getAllPropertyNames(dao.of);
-
       var outputter  = this.TableColumnOutputter.create();
-
-      var expr = columnConfig.exprBuilder(dao.of, props);
+      var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildExpr(dao.of, props);
       return dao.select(expr).then( (values) => {
-        return outputter.returnTable(X, dao.of, props, values.array).then( val => {
-          var output = [];
-          for ( var row of val ) {
-            output.push(row.join(',') + '\n');
-          }
-          var str = '';
-          for ( var val of output) {
-            str += val;
-          }
-          return str;
+        return outputter.returnTable(X, dao.of, props, values.array).then( values => {
+          var ouputter = foam.nanos.column.CSVTableOutputter.create();
+          return ouputter.arrayToCSV(values);
         }); 
       });
     }

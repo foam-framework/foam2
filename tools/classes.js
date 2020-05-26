@@ -341,7 +341,7 @@ var classes = [
   'foam.nanos.script.TestRunnerConfig',
   'foam.nanos.script.TestRunnerScript',
   'foam.nanos.test.Test',
-  'foam.nanos.column.ArrayOfExpressionForNestedProperties',
+  'foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder',
   'foam.nanos.column.ColumnConfigToPropertyConverter',
   'foam.nanos.column.ColumnPropertyValue',
   'foam.nanos.column.NestedPropertiesExpression',

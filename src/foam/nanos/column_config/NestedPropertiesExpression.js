@@ -8,7 +8,10 @@ foam.CLASS({
   package: 'foam.nanos.column',
   name: 'NestedPropertiesExpression',
   extends: 'foam.mlang.AbstractExpr',
+
   implements: ['foam.core.Serializable'],
+
+  documentation: 'Class for creating expression for a given nestedProperty ( e.g. address.countryId.name )',
 
   javaImports: [
     'foam.core.ClassInfo',
@@ -144,25 +147,18 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.nanos.column',
-  name: 'ArrayOfExpressionForNestedProperties',
+  name: 'ExpressionForArrayOfNestedPropertiesBuilder',
+
+  documentation: 'Class for creating expression for array of property\'s names',
 
   javaImports: [
+    'foam.core.ClassInfo',
     'foam.core.X',
     'foam.mlang.Expr',
+    'foam.mlang.sink.Projection',
     'java.util.ArrayList',
     'static foam.mlang.MLang.*'
   ],
-  // properties: [
-  //   {
-  //     name: 'objClass',
-  //     class: 'Object',
-  //     javaType: 'foam.core.ClassInfo'
-  //   },
-  //   {
-  //     name: 'propNames',
-  //     class: 'StringArray'
-  //   }
-  // ],
   methods: [
     {
       name: 'returnExpr',
@@ -197,6 +193,28 @@ foam.CLASS({
         }
         return (Expr[]) exprs.toArray();
       `
-    }
+    },
+    {
+      name: 'buildExpr',
+      type: 'Any',
+      args: [
+        {
+          name: 'of',
+          class: 'Class',
+          javaType: 'foam.core.ClassInfo'
+        },
+        {
+          name: 'propNames',
+          class: 'StringArray'
+        }
+      ],
+      code: function(of, propNames) {
+        return foam.mlang.sink.Projection.create({ exprs: foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create().returnExpr(of, propNames) });//foam.mlang.Expressions.create().PROJECTION(foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create().returnExpr(of, propNames));
+      },
+      javaCode: `
+        Expr[] exprs = new foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.Builder(getX()).build().returnExpr(of, propNames);
+        return new Projection.Builder(getX()).setExprs(exprs).build();
+      `
+    },
   ]
 });

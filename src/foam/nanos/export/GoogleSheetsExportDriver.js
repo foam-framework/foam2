@@ -50,14 +50,14 @@ foam.CLASS({
       var self = this;
       var allColumns = dao.of.getAxiomsByClass(foam.core.Property).map(p => p.name);
     //  var filteredTableProperties = X.filteredTableColumns.map(c => allColumns.contains(c.split('.')[0]));
-    
-      var columnConfig = X.columnConfigToPropertyConverter;
+
       var props = X.filteredTableColumns ? X.filteredTableColumns.filter(c => allColumns.includes(c.split('.')[0])) : self.outputter.getAllPropertyNames(dao.of);
+      var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildExpr(dao.of, props);
       var metadata = await self.outputter.getColumnMethadata(X, dao.of, props);
       props = metadata.map(m => m.propName);
 
-      var expr = columnConfig.exprBuilder(dao.of, props);
       var sink = await dao.select(expr);
+      
       var sheetId  = '';
       var stringArray = [];
 
