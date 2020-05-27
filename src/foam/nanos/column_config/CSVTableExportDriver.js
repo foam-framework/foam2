@@ -18,7 +18,7 @@ foam.CLASS({
       var columnConfig = X.columnConfigToPropertyConverter;
 
       var props = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(obj.cls);
-      props = columnConfig.filterExportedProps(X, obj.cls_, props);
+      props = columnConfig.filterExportedProps(obj.cls_, props);
 
       var outputter  = this.TableColumnOutputter.create();
       return outputter.objectToTable(X, obj.cls_, columnConfig.returnProperties(obj.cls_, props), obj).then( ( values ) => {
@@ -30,7 +30,7 @@ foam.CLASS({
       var columnConfig = X.columnConfigToPropertyConverter;
 
       var props = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(dao.of);
-      props = columnConfig.filterExportedProps(X, dao.of, props);
+      props = columnConfig.filterExportedProps(dao.of, props);
 
       var outputter  = this.TableColumnOutputter.create();
       var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildExpr(dao.of, props);

@@ -56,7 +56,7 @@ foam.CLASS({
       var columnConfig = X.columnConfigToPropertyConverter;
 
       var props = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(dao.of);
-      props = columnConfig.filterExportedProps(X, dao.of, props);
+      props = columnConfig.filterExportedProps(dao.of, props);
 
       var metadata = await self.outputter.getColumnMethadata(X, dao.of, props);
 
