@@ -3,6 +3,10 @@ foam.CLASS({
   name: 'CircleIndicator',
   extends: 'foam.u2.Element',
 
+  requires: [
+    'foam.core.ExpressionSlot'
+  ],
+
   css: `
     ^ {
       position: relative;
@@ -20,12 +24,17 @@ foam.CLASS({
   `,
 
   properties: [
+    // Configuration
     {
       name: 'label',
       class: 'String'
     },
     {
       name: 'borderColor',
+      class: 'String'
+    },
+    {
+      name: 'borderColorHover',
       class: 'String'
     },
     {
@@ -49,6 +58,24 @@ foam.CLASS({
       name: 'size',
       class: 'Int',
       value: 30
+    },
+
+    // State
+    {
+      name: 'hasMouseOver',
+      class: 'Boolean',
+      value: false
+    },
+    {
+      name: 'stateBorderColor_',
+      expression: function ( borderColor, borderColorHover, hasMouseOver ) {
+        return hasMouseOver ? borderColorHover : borderColor;
+      }
+    },
+    {
+      name: 'clickable',
+      class: 'Boolean',
+      value: false
     }
   ],
 
@@ -58,14 +85,28 @@ foam.CLASS({
         .addClass(this.myClass())
         .style({
           'background-color': this.backgroundColor,
-          'border-color': this.borderColor,
+          'border-color': this.stateBorderColor_$,
           'width': '' + this.size + 'px',
           'height': '' + this.size + 'px',
           'line-height': '' + this.size + 'px',
           'font-size': this.size * 0.65,
           'color': this.textColor,
           'border': '' + this.borderThickness + 'px solid',
-        });
+          'cursor': this.ExpressionSlot.create({
+            obj: this,
+            code: function (clickable) {
+              return clickable ? 'pointer' : 'default';
+            }
+          }),
+        })
+        .on('mouseover', () => {
+          this.hasMouseOver = true;
+        })
+        .on('mouseout', () => {
+          this.hasMouseOver = false;
+        })
+        .attr('border')
+        ;
 
       if ( this.icon ) {
         this.start('img')
