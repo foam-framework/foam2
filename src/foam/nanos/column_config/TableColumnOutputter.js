@@ -48,9 +48,11 @@ foam.CLASS({
     },
     {
       name: 'objectToTable',
-      code: async function(x, of, propNames, obj) {
-        var table = [ props.map( p => p.label ) ];
-        var values = await columnConfig.returnStringArrayForArrayOfValues(props, columnConfig.returnValueForArrayOfPropertyNames(x, of, propNames, obj));
+      code: async function(x, of, props, obj) {
+        var columnConfig = x.columnConfigToPropertyConverter;
+
+        var table =  [ props.map( p => p.label ) ];
+        var values = await this.returnStringArrayForArrayOfValues(props, columnConfig.returnValueForArrayOfPropertyNames(x, of, props.map(p => p.name), obj));
         table = table.concat(values);
         return table;
       }

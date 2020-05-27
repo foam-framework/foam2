@@ -14,13 +14,14 @@ foam.CLASS({
     'foam.core.FObject',
     'foam.core.PropertyInfo',
     'foam.core.X',
+    'foam.mlang.Expr',
     'foam.nanos.logger.Logger',
-    'java.lang.reflect.Method',
-    'foam.mlang.Expr'
+    'java.lang.reflect.Method'
   ],
   methods: [
     {
       name: 'filterExportedProps',
+      documentation: 'returns propNames that are properties of the class and are networkTransient',
       code: function(x, of, propNames) {
         var props = of.getAxiomsByClass(foam.core.Property);
         var allColumnNames = props.map(p => p.name);
@@ -32,18 +33,9 @@ foam.CLASS({
         });
       }
     },
-    function returnExpr(of, propNames, i) {
-      if (i === propNames.length - 1 ) {
-        return of.getAxiomByName(propNames[i]);
-      }
-      var prop = of.getAxiomByName(propNames[i]);
-      return this.returnPropExpr(prop, returnExpr(prop.of, propNames, ++i));
-    },
-    function returnPropExpr(prop1, prop2) {
-      return foam.mlang.Expressions.create().DOT(prop1, prop2);
-    },
     {
       name: 'returnProperty',
+      documentation: 'returns last property for chain of properties e.g. city property for address.city',
       type: 'PropertyInfo',
       args: [
         {
@@ -51,15 +43,15 @@ foam.CLASS({
           type: 'ClassInfo'
         },
         {
-          name: 'propInfo',
+          name: 'propName',
           class: 'String'
         }
       ],
-      code: function(of, propInfo) {
+      code: function(of, propName) {
         var cls = of;
         var property;
-        if ( foam.String.isInstance(propInfo) ) {
-          var props = propInfo.split('.');
+        if ( foam.String.isInstance(propName) ) {
+          var props = propName.split('.');
           for ( var i = 0 ; i < props.length ; i++ ) {
             property = foam.String.isInstance(props[i])
             ? cls.getAxiomByName(props[i])
@@ -70,13 +62,13 @@ foam.CLASS({
             cls = property.of;
           }
         } else
-          property = propInfo;
+          property = propName;
         return property;
       },
       javaCode: `
         ClassInfo ci = of;
         PropertyInfo p = null;
-        String[] props = propInfo.split("\\\\.");
+        String[] props = propName.split("\\\\.");
 
         for ( int i = 0 ; i < props.length ; i++ ) {
           if ( ( p == null && i != 0 ) || ci == null )
@@ -109,6 +101,8 @@ foam.CLASS({
     },
     {
       name: 'returnValue',
+      documentation: `returns value that is one before last as there are number of uses cases when property's method is called on object
+       e.g for propName 'address.countryId.name' we return country object which can be used by name property as parameter for such function calls as f or toCSV`,
       type: 'FObject',
       args: [
         {
@@ -120,7 +114,7 @@ foam.CLASS({
           type: 'ClassInfo'
         },
         {
-          name: 'propInfo',
+          name: 'propName',
           class: 'String',
         },
         {
@@ -128,12 +122,12 @@ foam.CLASS({
           type: 'FObject'
         }
       ],
-      code: async function(of, propInfo, obj) {
+      code: async function(of, propName, obj) {
         var cls = of;
         var property;
         var obj1 = obj;
-        if ( foam.String.isInstance(propInfo) ) {
-          var props = propInfo.split('.');
+        if ( foam.String.isInstance(propName) ) {
+          var props = propName.split('.');
           for ( var i = 0; i < props.length; i++ ) {
             property = foam.String.isInstance(props[i])
             ? cls.getAxiomByName(props[i])
@@ -145,7 +139,7 @@ foam.CLASS({
 
             if ( i !== props.length - 1 && obj1 ) {
               if ( foam.core.Reference.isInstance(property) ) {
-                obj1 = await obj1[property.name + '$find'].then(val => obj1 = val);
+                obj1 = await obj1[property.name + '$find'];
               } else {
                 obj1 = property.f(obj1);
               }
@@ -158,7 +152,7 @@ foam.CLASS({
         ClassInfo ci = of;
         FObject obj1 = obj;
         PropertyInfo p = null;
-        String[] props = propInfo.split("\\\\.");
+        String[] props = propName.split("\\\\.");
         for ( int i = 0 ; i < props.length ; i++ ) {
           if ( ( p == null && i != 0 ) || ci == null )
             break;
@@ -193,6 +187,7 @@ foam.CLASS({
     {
       name: 'returnPropertyAndObject',
       type: 'foam.nanos.column.ColumnPropertyValue',
+      documentation: `returns property and object on which such property's functions as f or toCSV can be called`,
       args: [
         {
           name: 'x',
@@ -203,7 +198,7 @@ foam.CLASS({
           type: 'ClassInfo'
         },
         {
-          name: 'propInfo',
+          name: 'propName',
           class: 'String',
         },
         {
@@ -211,12 +206,12 @@ foam.CLASS({
           type: 'FObject'
         }
       ],
-      code: async function(of, propInfo, obj) {
+      code: async function(of, propName, obj) {
         var cls = of;
         var property;
         var obj1 = obj;
-        if ( foam.String.isInstance(propInfo) ) {
-          var props = propInfo.split('.');
+        if ( foam.String.isInstance(propName) ) {
+          var props = propName.split('.');
           for ( var i = 0; i < props.length; i++ ) {
             property = foam.String.isInstance(props[i])
             ? cls.getAxiomByName(props[i])
@@ -235,14 +230,14 @@ foam.CLASS({
             }
           }
         } else
-          property = propInfo;
+          property = propName;
         return foam.nanos.column.ColumnPropertyValue.create({propertyValue:property, objValue:obj1});
       },
       javaCode: `
         ClassInfo ci = of;
         FObject obj1 = obj;
         PropertyInfo p = null;
-        String[] props = propInfo.split("\\\\.");
+        String[] props = propName.split("\\\\.");
         for ( int i = 0 ; i < props.length ; i++ ) {
           if ( ( p == null && i != 0 ) || ci == null )
             break;
@@ -315,6 +310,7 @@ foam.CLASS({
       `
     },
     async function returnValueForPropertyName(x, of, propName, obj) {
+      //returns property and value of the obj that corresponds to the property
       var columnPropertyVal = await this.returnPropertyAndObject(x, of, propName, obj);
       if ( foam.core.Reference.isInstance(columnPropertyVal.propertyValue) )
         return foam.nanos.column.ColumnPropertyValue.create({ propertyValue:columnPropertyVal.propertyValue, objValue: await columnPropertyVal.objValue[columnPropertyVal.propertyValue.name + '$find']});
