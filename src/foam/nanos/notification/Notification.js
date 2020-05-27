@@ -96,15 +96,6 @@ foam.CLASS({
     },
     {
       class: 'Date',
-      name: 'issuedDate',
-      factory: function() { return new Date(); },
-      label: 'Notification Date',
-      documentation: 'Date notification was created.',
-      visibility: 'RO',
-      javaFactory: `return new java.util.Date();`
-    },
-    {
-      class: 'Date',
       name: 'expiryDate',
       documentation: 'Expiration date of notification.',
       factory: function() {

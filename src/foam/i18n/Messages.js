@@ -31,7 +31,8 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'name'
+      name: 'name',
+      preSet: function(o, n) { return foam.String.constantize(n); }
     },
     {
       class: 'String',
@@ -73,7 +74,7 @@ foam.CLASS({
       var name = this.name;
       Object.defineProperty(
         proto,
-        foam.String.constantize(this.name),
+        this.name,
         {
           get: function() { return this.cls_[name] },
           configurable: false
