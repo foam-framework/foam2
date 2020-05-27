@@ -25,6 +25,27 @@ foam.CLASS({
 
   tableColumns: ['id', 'body', 'notificationType', 'broadcasted', 'userId', 'groupId' ],
 
+  axioms: [
+    {
+      class: 'foam.comics.v2.CannedQuery',
+      label: 'Unread',
+      predicateFactory: function(e) {
+        return e.AND(
+          e.EQ(foam.nanos.notification.Notification.READ, false),
+        );
+      }
+    },
+    {
+      class: 'foam.comics.v2.CannedQuery',
+      label: 'Read',
+      predicateFactory: function(e) {
+        return e.AND(
+          e.EQ(foam.nanos.notification.Notification.READ, true),
+        );
+      }
+    }
+  ],
+
   properties: [
     {
       class: 'Boolean',
