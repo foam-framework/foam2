@@ -12,7 +12,7 @@
 
    properties: [
      {
-       class: 'FObjectProperty',
+       class: 'Reference',
        of: 'foam.nanos.auth.User',
        name: 'user'
      },
