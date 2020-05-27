@@ -73,6 +73,7 @@ foam.CLASS({
     'signUpEnabled',
     'loginVariables',
     'stack',
+    'subject',
     'user',
     'webApp',
     'wrapCSS as installCSS',
