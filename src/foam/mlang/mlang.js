@@ -3247,7 +3247,7 @@ foam.CLASS({
       name: 'f',
       code: function(o) {
         if ( foam.core.Reference.isInstance(this.arg1) ) {
-          return obj1[property.name + '$find'].then(val => obj1 = val);
+          return o[property.name + '$find'].then(val => this.arg2.f(val));
         }
         return this.arg2.f(this.arg1.f(o));
       },
