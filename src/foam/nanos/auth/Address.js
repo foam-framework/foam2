@@ -260,24 +260,20 @@ foam.CLASS({
       name: 'toSummary',
       type: 'String',
       code: function() {
-        var rtn = (this.suite ? this.suite + '-' : '') +
-          this.streetNumber + ' ' +
-          this.streetName + ', ' +
-          this.city + ', ' +
-          this.regionId + ', ' +
-          this.countryId + ', ' +
-          this.postalCode;
-        return rtn === ' , , , , ' ? '' : rtn;
+        var rtn = this.getShortAddress();
+        rtn += ', ';
+        rtn += this.city;
+        rtn += ', ';
+        rtn += this.regionId;
+        rtn += ', ';
+        rtn += this.countryId;
+        rtn += ', ';
+        rtn += this.postalCode;
+        return rtn === ', , , , ' ? '' : rtn;
       },
       javaCode: `
       StringBuilder sb = new StringBuilder();
-      if ( this.getSuite() != null ) {
-        sb.append(this.getSuite());
-        sb.append("-");
-      }
-      sb.append(this.getStreetNumber());
-      sb.append(" ");
-      sb.append(this.getStreetName());
+      sb.append(getShortAddress());
       sb.append(", ");
       sb.append(this.getCity());
       sb.append(", ");
@@ -287,14 +283,54 @@ foam.CLASS({
       sb.append(", ");
       sb.append(this.getPostalCode());
       String rtn = sb.toString();
-      return rtn.equals(" , , , , ") ? "" : rtn;
+      return rtn.equals(", , , , ") ? "" : rtn;
+      `
+    },
+    {
+      name: 'getShortAddress',
+      type: 'String',
+      code: function() {
+        var rtn = '';
+        if ( this.structured ) {
+          rtn += this.suite;
+          rtn += (this.suite ? '-' : '');
+          rtn += this.streetNumber;
+          rtn += ' ';
+          rtn += this.streetName;
+        } else {
+          rtn += this.address1;
+          rtn += ' ';
+          rtn += this.address2;
+        }
+        return rtn.trim();
+      },
+      javaCode: `
+      StringBuilder sb = new StringBuilder();
+      if ( this.getStructured() ) {
+        if ( this.getSuite() != null ) {
+          sb.append(this.getSuite());
+          sb.append("-");
+        }
+        sb.append(this.getStreetNumber());
+        sb.append(" ");
+        sb.append(this.getStreetName());
+      } else {
+        sb.append(this.getAddress1());
+        sb.append(" ");
+        sb.append(this.getAddress2());
+      }
+      return sb.toString().trim();
       `
     },
     {
       name: 'getAddress',
       type: 'String',
-      code: function() { return this.structured ? this.streetNumber + ' ' + this.streetName : this.address1; },
-      javaCode: `return getStructured() ? getStreetNumber() + " " + getStreetName() : getAddress1();`
+      code: function() {
+        return this.getShortAddress();
+      },
+      javaCode: `
+      return getShortAddress();
+     `
     }
   ]
 });
