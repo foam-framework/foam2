@@ -1,17 +1,26 @@
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'CurrencyInputView',
-  extends: 'foam.u2.Controller',
+  extends: 'foam.u2.View',
 
-  documentation: '',
+  documentation: `
+    A currency input view that formats the user's input as they type it in.
+    Works similarly like a calculator or ATM machine where the values are filling
+    in from the right.
+  `,
 
   implements: [
     'foam.mlang.Expressions'
   ],
 
   imports: [
+    'ctrl',
     'currencyDAO',
     'data as parentObj'
+  ],
+
+  expors: [
+    'as data'
   ],
 
   css: `
@@ -52,9 +61,6 @@ foam.CLASS({
   `,
 
   properties: [
-    {
-      name: 'mode'
-    },
     {
       name: 'contingentProperty'
     },
@@ -102,17 +108,26 @@ foam.CLASS({
     },
 
     function initE() {
+      this.SUPER();
       var self = this;
       this.addClass(this.myClass())
-        .start().addClass(this.myClass('container-selection'))
-          .start('p').addClass(this.myClass('label-currency'))
-            .add(this.slot(function(currency) {
-              return currency ? `${currency.id} ${currency.symbol}` : '--';
-            }))
-          .end()
-        .end()
-        .start(this.VALUE_STRING).addClass(this.myClass('container-input'))
-        .end();
+        .add(this.slot(function(mode, currency) {
+          if ( mode === foam.u2.DisplayMode.RW ) {
+            return this.E().style({ 'display': 'flex' }).start().addClass(self.myClass('container-selection'))
+              .start('p').addClass(self.myClass('label-currency'))
+                .add(currency ? `${currency.id} ${currency.symbol}` : '--')
+              .end()
+            .end()
+            .startContext({ data: self })
+              .start(self.VALUE_STRING).addClass(self.myClass('container-input'))
+              .end()
+            .endContext();
+          }
+          return self.E().start('p').addClass(self.myClass('label-currency'))
+            .add(currency ? currency.format(self.data) : self.data)
+            .end();
+        }))
+
     },
 
     function sanitizeString(s) {
