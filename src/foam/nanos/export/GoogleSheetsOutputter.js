@@ -28,8 +28,6 @@ foam.CLASS({
         }
         
         for ( var i = 0 ; i < props.length ; i++ ) {
-          // if ( ! props[i].networkTransient )
-          //   continue;
           if ( props[i].cls_.id === "foam.core.Action" )
             continue;
           
