@@ -46,20 +46,20 @@ foam.CLASS({
         return stringValues;
       }
     },
+    async function objToArrayOfStringValues(x, of, props, obj) {
+      var columnConfig = x.columnConfigToPropertyConverter;
+      return columnConfig.returnValueForArrayOfPropertyNames(x, of, props.map(p => p.name), obj);
+    },
     {
       name: 'objectToTable',
       code: async function(x, of, props, obj) {
-        var columnConfig = x.columnConfigToPropertyConverter;
-
-        var table =  [ props.map( p => p.label ) ];
-        var values = await this.arrayOfValuesToArrayOfStrings(props, columnConfig.returnValueForArrayOfPropertyNames(x, of, props.map(p => p.name), obj));
-        table = table.concat(values);
-        return table;
+        var values = this.objToArrayOfStringValues(x, of, props, obj);
+        return this.returnTable(props, values);
       }
     },
     {
       name: 'returnTable',
-      code: async function(x, of, props, values) {
+      code: async function(props, values) {
         var table =  [ props.map( p => p.label ) ];
         var values = await this.arrayOfValuesToArrayOfStrings(props, values);
         table = table.concat(values);

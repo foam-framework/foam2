@@ -30,25 +30,25 @@ foam.CLASS({
 
   methods: [
     async function exportFObject(X, obj) {
-        var self = this;
-        
-        var sheetId  = '';
-        var stringArray = [];
-        var columnConfig = X.columnConfigToPropertyConverter;
+      var self = this;
+      
+      var sheetId  = '';
+      var stringArray = [];
+      var columnConfig = X.columnConfigToPropertyConverter;
 
-        var props = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(obj.cls);
-        props = columnConfig.filterExportedProps(X, obj.cls_, props);
-        
-        var metadata = await self.outputter.getColumnMethadata(X, obj.cls_, props);
-        stringArray.push(metadata.map(m => m.columnLabel));
-        var values = await self.outputter.outputArray(X, obj.cls_, [ obj ], metadata);
-        stringArray = stringArray.concat(values);
+      var props = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(obj.cls);
+      props = columnConfig.filterExportedProps(X, obj.cls_, props);
+      
+      var metadata = await self.outputter.getColumnMethadata(X, obj.cls_, props);
+      stringArray.push(metadata.map(m => m.columnLabel));
+      var values = await self.outputter.outputArray(X, obj.cls_, [ obj ], metadata);
+      stringArray = stringArray.concat(values);
 
-        sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata);
-        if ( ! sheetId || sheetId.length === 0)
-          return '';
-        var url = `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`;
-        return url;
+      sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata);
+      if ( ! sheetId || sheetId.length === 0)
+        return '';
+      var url = `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`;
+      return url;
     },
     async function exportDAO(X, dao) {
       var self = this;

@@ -35,7 +35,7 @@ foam.CLASS({
       var outputter  = this.TableColumnOutputter.create();
       var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(dao.of, props);
       return dao.select(expr).then( (values) => {
-        return outputter.returnTable(X, dao.of, columnConfig.returnProperties(dao.of, props), values.array).then( values => {
+        return outputter.returnTable(columnConfig.returnProperties(dao.of, props), values.array).then( values => {
           var ouputter = foam.nanos.column.CSVTableOutputter.create();
           return ouputter.arrayToCSV(values);
         }); 

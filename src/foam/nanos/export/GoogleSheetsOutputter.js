@@ -8,7 +8,9 @@ foam.CLASS({
   package: 'foam.nanos.export',
   name: 'GoogleSheetsOutputter',
   requires: [
-    'foam.nanos.export.GoogleSheetsPropertyMetadata'
+    'foam.nanos.column.ColumnConfigToPropertyConverter',
+    'foam.nanos.export.GoogleSheetsPropertyMetadata',
+
   ],
   methods: [
     {
@@ -67,9 +69,11 @@ foam.CLASS({
       type: 'StringArray',
       code: async function(x, cls, obj, columnMetadata) {
         var values = [];
-        for (var i = 0 ; i < columnMetadata.length ; i++ ) {
-          values.push(await this.returnStringForMethadata(obj[i], columnMetadata[i]));
-        }
+        var outputter = foam.nanos.column.TableColumnOutputter.create();
+        var columnConfig = x.columnConfigToPropertyConverter;
+
+        var props = columnConfig.returnProperties(cls, columnMetadata.map(m => m.propName));
+        values.push(await outputter.arrayOfValuesToArrayOfStrings(obj, props));
         return values;
       }
     },
@@ -133,37 +137,6 @@ foam.CLASS({
       }
     },
     {
-      name: 'returnStringForMethadata',
-      type: 'String',
-      code: async function(val, columnMethadata) {
-        if ( val ) {
-          if ( columnMethadata.cellType === 'CURRENCY' ) {
-            columnMethadata.perValuePatternSpecificValues.push(val.destinationCurrency);
-            return ( val / 100 ).toString();
-          }
-          else if ( columnMethadata.cellType === 'DATE' )
-            return val.toISOString().substring(0, 10);
-          else if ( columnMethadata.cellType === 'DATE_TIME' ) {
-            columnMethadata.perValuePatternSpecificValues.push(val.toString().substring(24));
-            return val.toString().substring(0, 24);
-          }
-          else if ( columnMethadata.cellType === 'TIME' ) {
-            columnMethadata.perValuePatternSpecificValues.push(val.toString().substring(8));
-            return val.toString().substring(0, 8);
-          }
-          else if ( val.toSummary ) {
-            if ( val.toSummary() instanceof Promise )
-              return await val.toSummary();
-            else
-              return val.toSummary();
-          } else
-            return val.toString();            
-        }
-        else
-          return '';
-      }
-    },
-    {
       name: 'outputArray',
       type: 'Array',
       code: async function(x, cls, arr, columnsMetadata) {
@@ -178,11 +151,13 @@ foam.CLASS({
       name: 'outputStringArray',
       type: 'Array',
       code: async function(x, cls, arr, columnsMetadata) {
-        var valuesArray = [];
-        for ( var i = 0 ; i < arr.length ; i++ ) {
-          valuesArray.push(await this.outputStringForProperties(x, cls, arr[i], columnsMetadata));
-        }
-        return valuesArray;
+        var outputter = foam.nanos.column.TableColumnOutputter.create();
+        var columnConfig = x.columnConfigToPropertyConverter;
+        columnConfig = columnConfig || this.ColumnConfigToPropertyConverter.create();
+
+        var props = columnConfig.returnProperties(cls, columnsMetadata.map(m => m.propName));
+
+        return await outputter.arrayOfValuesToArrayOfStrings(props, arr);
       }
     }
   ]
