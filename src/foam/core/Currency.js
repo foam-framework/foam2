@@ -202,6 +202,28 @@
 
         return formatted;
       `
+    },
+    {
+      name: 'formatPrecision',	
+      documentation: `
+        Given a number, display it as a currency using the appropriate
+        precision. Use a period '.' for the decimal place and do not
+        include commas or currency symbols.
+        Suitable for use when exporting to CSV.
+      `,
+      code: function(amount) {
+        return (amount/Math.pow(2, this.precision)).toFixed(this.precision);
+      },
+      args: [
+        {
+          class: 'foam.core.UnitValue',
+          name: 'amount'
+        }
+      ],
+      type: 'String',
+      javaCode: `
+        return String.format("%." + getPrecision() + "f", amount/Math.pow(10, getPrecision()));
+      `
     }
   ]
 });
