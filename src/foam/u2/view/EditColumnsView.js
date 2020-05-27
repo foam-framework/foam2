@@ -14,6 +14,18 @@ foam.CLASS({
     'foam.u2.view.ColumnOptionsSelectConfig',
     'foam.u2.view.SubColumnSelectConfig'
   ],
+  css: `
+  ^drop-down-bg {
+    font-size:        12px; 
+    position:         fixed; 
+    width:            100%; 
+    height:           100%; 
+    top:              0; 
+    left:             0; 
+    z-index:          100;
+    background:       rgba(0, 0, 0, 0.4);
+  }
+  `,
   properties: [
     {
       name: 'selectColumnsExpanded',
@@ -36,22 +48,14 @@ foam.CLASS({
       this.view = foam.u2.view.ColumnConfigPropView.create({data:self.data});
       this.start()
         .show(this.selectColumnsExpanded$)
-        .style({
-          'font-size': '12px',
-          'position': 'fixed',
-          'width': '100%',
-          'height': '100%',
-          'top': '0px',
-          'left': '0px',
-          'z-index': '3',
-        })
+        .addClass(this.myClass('drop-down-bg'))
         .start()
           .style({
             'border-radius': '5px',
             'border': '1px solid /*%GREY4%*/ #e7eaec',
             'background-color': '#f9f9f9',
             'left': self.parentId$.map((v) => v ? ( document.getElementById(v).getBoundingClientRect().x - 250 > 0 ? document.getElementById(v).getBoundingClientRect().x - 250 : document.getElementById(v).getBoundingClientRect().x ) : 0 + 'px'),
-            'top': '40px',
+            'top': '120px',
             'position': 'fixed',
             'margin-bottom': '20px',
             'height': 'fix-content',
