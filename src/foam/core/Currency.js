@@ -204,7 +204,7 @@
       `
     },
     {
-      name: 'formatPrecision',	
+      name: 'formatPrecision',
       documentation: `
         Given a number, display it as a currency using the appropriate
         precision. Use a period '.' for the decimal place and do not
