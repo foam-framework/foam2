@@ -47,6 +47,7 @@ foam.CLASS({
           blob: file
         })
       });
+      debugger;
     }
   ]
 });

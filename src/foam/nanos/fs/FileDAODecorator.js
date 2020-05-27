@@ -17,6 +17,11 @@ foam.CLASS({
     {
       class: 'Class',
       name: 'of'
+    },
+    {
+      class: 'Long',
+      name: 'minBlobSize',
+      value: 1024 * 1024 * 3
     }
   ],
 
@@ -35,11 +40,24 @@ foam.CLASS({
 
         if ( ! file ) return a();
 
+        if ( file.size <= this.minBlobSize ){
+        }
+
         return self.fileDAO.put(file).then(function (b) {
           prop.set(obj, b);
           return a();
         });
       });
-    }
+    },
+
+    async function encode(file) {
+      const toBase64 = file => new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = error => reject(error);
+      });
+      return await toBase64(file);
+    },
   ]
 });

@@ -15,10 +15,14 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.blob.BlobService',
+    'foam.blob.Blob',
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.AuthorizationException',
     'foam.nanos.auth.Subject',
-    'foam.nanos.auth.User'
+    'foam.nanos.auth.User',
+    'java.io.*',
+    'java.util.Base64',
   ],
 
   properties: [
@@ -44,8 +48,8 @@ foam.CLASS({
     },
     {
       class: 'Blob',
-      name: 'data',
-      documentation: 'File data',
+      name: 'dataBlob',
+      documentation: 'File data as a blob',
       /**
        * When we export this as the CSV, we are trying to create a new object if this property is undefined.
        * But because this 'Blob' is an interface, we can not instantiate it.
@@ -54,7 +58,16 @@ foam.CLASS({
        */
       adapt: function(oldObj, newObj) {
         return newObj;
-      }
+      },
+    },
+    {
+      class: 'String',
+      name: 'dataString',
+      documentation: 'File converted to base64 string',
+      javaSetter: `
+        String base64 = Base64.getEncoder().encodeToString(val.getBytes());
+        dataString_ = base64;
+      `
     },
     {
       class: 'String',
@@ -69,10 +82,69 @@ foam.CLASS({
         }
         return url;
       }
-    }
+    },
   ],
 
   methods: [
+    {
+      name: 'getData',
+      type: 'foam.blob.Blob',
+      javaCode:`
+        if ( this.getDataString() != null && this.getDataString() != "" ){
+          BlobService blobStore = new foam.blob.BlobStore();
+          byte[] decodedBytes = Base64.getDecoder().decode(getDataString());
+          InputStream is = new ByteArrayInputStream(decodedBytes);
+          Blob data = blobStore.put(new foam.blob.InputStreamBlob(is, decodedBytes.length));
+          return data;
+        } else {
+          return this.getDataBlob();
+        }
+      `,
+      code: function() {
+        if ( typeof this.dataString != 'undefined' && this.dataString != '' ) {
+          let b64Data = this.data.split(',')[1];
+          const b64toBlob = (b64Data, contentType=this.mimeType, sliceSize=512) => {
+            const byteCharacters = atob(b64Data);
+            const byteArrays = [];
+
+            for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+              const slice = byteCharacters.slice(offset, offset + sliceSize);
+
+              const byteNumbers = new Array(slice.length);
+              for (let i = 0; i < slice.length; i++) {
+                byteNumbers[i] = slice.charCodeAt(i);
+              }
+
+              const byteArray = new Uint8Array(byteNumbers);
+              byteArrays.push(byteArray);
+            }
+
+            const blob = new Blob(byteArrays, {type: contentType});
+            return  blob;
+          }
+          return this.BlobBlob.create({
+            blob: b64toBlob(b64Data)
+          });
+        } else if ( typeof this.dataBlob != 'undefined' && this.dataBlob != '' ) {
+            return this.dataBlob;
+        } else {
+          return null;
+        }
+      }
+    },
+    {
+      name: 'setData',
+      args: [
+        { name: 'data', type: 'foam.blob.Blob' }
+      ],
+      javaCode:`
+        if ( filesize_ > 3 * 1024 * 1024 ) {
+          setDataBlob(data);
+        } else {
+          return;
+        }
+      `
+    },
     {
       name: 'authorizeOnCreate',
       javaCode: `
