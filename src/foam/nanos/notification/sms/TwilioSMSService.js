@@ -19,6 +19,7 @@ foam.CLASS({
     'com.twilio.Twilio',
     'com.twilio.type.PhoneNumber',
     'foam.nanos.app.TwilioConfig',
+    'foam.nanos.logger.Logger',
     'foam.nanos.notification.sms.SMSStatus',
     'foam.nanos.om.OMLogger',
     'foam.util.SafetyUtil'
@@ -28,12 +29,21 @@ foam.CLASS({
     {
       name: 'send',
       javaCode: `
+        Logger logger = (Logger) x.get("logger");
         OMLogger omLogger = (OMLogger) x.get("OMLogger");
         TwilioConfig twilioConfig = (TwilioConfig) x.get("twilioConfig");
-        Twilio.init(twilioConfig.getAccountSid(), twilioConfig.getAuthToken());
-
         String phoneNumber = "";
         SMSStatus status;
+
+        // check if twilio credentials are set
+        if ( SafetyUtil.isEmpty(twilioConfig.getAccountSid()) || 
+             SafetyUtil.isEmpty(twilioConfig.getAuthToken()) ) {
+               logger.error("Twilio accountSid or authToken were not found. Message was not sent.");
+               smsMessage.setStatus(SMSStatus.UNSENT);
+               return smsMessage;
+        }
+
+        Twilio.init(twilioConfig.getAccountSid(), twilioConfig.getAuthToken());
 
         // check if phone number exists
         if ( ! SafetyUtil.isEmpty(smsMessage.getPhoneNumber()) ) {
