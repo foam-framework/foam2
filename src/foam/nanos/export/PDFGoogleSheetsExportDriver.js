@@ -35,10 +35,14 @@ foam.CLASS({
         
         var sheetId  = '';
         var stringArray = [];
-        var props = X.filteredTableColumns ? X.filteredTableColumns : self.outputter.getAllPropertyNames(obj.cls_);
+        var columnConfig = X.columnConfigToPropertyConverter;
+
+        var props = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(obj.cls);
+        props = columnConfig.filterExportedProps(X, obj.cls_, props);
+        
         var metadata = await self.outputter.getColumnMethadata(X, obj.cls_, props);
         stringArray.push(metadata.map(m => m.columnLabel));
-        var values = await  self.outputter.outputArray(X, obj.cls_, [ obj ], metadata);
+        var values = await self.outputter.outputArray(X, obj.cls_, [ obj ], metadata);
         stringArray = stringArray.concat(values);
 
         sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata);
@@ -50,14 +54,21 @@ foam.CLASS({
     },
     async function exportDAO(X, dao) {
       var self = this;
+      var columnConfig = X.columnConfigToPropertyConverter;
+
+      var props = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(dao.of);
+      props = columnConfig.filterExportedProps(X, dao.of, props);
+
+      var metadata = await self.outputter.getColumnMethadata(X, dao.of, props);
+
+      var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildExpr(dao.of, props);
+      var sink = await dao.select(expr);
       
-      var sink = await dao.select();
       var sheetId  = '';
       var stringArray = [];
-      var props = X.filteredTableColumns ? X.filteredTableColumns : self.outputter.getAllPropertyNames(dao.of);
-      var metadata = await self.outputter.getColumnMethadata(X, dao.of, props);
+
       stringArray.push(metadata.map(m => m.columnLabel));
-      var values = await self.outputter.outputArray(X, dao.of, sink.array, metadata);
+      var values = await self.outputter.outputStringArray(X, dao.of, sink.array, metadata);
       stringArray = stringArray.concat(values);
 
       sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata);

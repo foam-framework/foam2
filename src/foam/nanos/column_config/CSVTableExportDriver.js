@@ -14,24 +14,28 @@ foam.CLASS({
   ],
 
   methods: [
-    function exportFObject(X, obj) {
-      var allColumns = obj.cls_.getAxiomsByClass(foam.core.Property).map(p => p.name);
-      var props = X.filteredTableColumns ? X.filteredTableColumns.filter(c => allColumns.includes(c.split('.')[0])) : this.outputter.getAllPropertyNames(obj.cls_);
+    async function exportFObject(X, obj) {
+      var columnConfig = X.columnConfigToPropertyConverter;
+
+      var props = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(obj.cls);
+      props = columnConfig.filterExportedProps(X, obj.cls_, props);
 
       var outputter  = this.TableColumnOutputter.create();
-      return outputter.objectToTable(X, obj.cls_, props, obj).then( ( values ) => {
+      return outputter.objectToTable(X, obj.cls_, columnConfig.returnProperties(obj.cls_, props), obj).then( ( values ) => {
         var ouputter = foam.nanos.column.CSVTableOutputter.create();
         return ouputter.arrayToCSV(values);
       });
     },
-    function exportDAO(X, dao) {
-      var allColumns = dao.of.getAxiomsByClass(foam.core.Property).map(p => p.name);
+    async function exportDAO(X, dao) {
       var columnConfig = X.columnConfigToPropertyConverter;
-      var props = X.filteredTableColumns ? X.filteredTableColumns.filter(c => allColumns.includes(c.split('.')[0])) : this.outputter.getAllPropertyNames(dao.of);
+
+      var props = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(dao.of);
+      props = columnConfig.filterExportedProps(X, dao.of, props);
+
       var outputter  = this.TableColumnOutputter.create();
       var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildExpr(dao.of, props);
       return dao.select(expr).then( (values) => {
-        return outputter.returnTable(X, dao.of, props, values.array).then( values => {
+        return outputter.returnTable(X, dao.of, columnConfig.returnProperties(dao.of, props), values.array).then( values => {
           var ouputter = foam.nanos.column.CSVTableOutputter.create();
           return ouputter.arrayToCSV(values);
         }); 

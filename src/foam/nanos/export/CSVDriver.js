@@ -23,9 +23,14 @@ foam.CLASS({
       return outputter.toString();
     },
     function exportDAO(X, dao) {
+      var columnConfig = X.columnConfigToPropertyConverter;
+
+      var props = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(dao.of);
+      props = columnConfig.filterExportedProps(X, dao.of, props);
+
       return dao.select(this.CSVSink.create({
         of: dao.of,
-        props: X.filteredTableColumns || undefined
+        props: props
       }, X)).then( (s) => s.csv );
     }
   ]

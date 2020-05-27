@@ -21,24 +21,17 @@ foam.CLASS({
   methods: [
     {
       name: 'filterExportedProps',
-      code: async function(x, of, propNames) {
+      code: function(x, of, propNames) {
+        var self = this;
         var props = of.getAxiomsByClass(foam.core.Property);
         var allColumnNames = props.map(p => p.name);
         if ( ! propNames ) {
-          return props.filter(p => p.networkTransient);
-        } else {
-          props = [];
-          //filter custom columns
-          propNames = propNames.filter(n => allColumnNames.includes(n.split('.')[0]));
-
-          var columnConfig = x.columnConfigToPropertyConverter;
-          for ( var i = 0 ; i < propNames.length ; i++ ) {
-            var prop = await columnConfig.returnProperty(of, propNames[i]);
-            //if ( prop.networkTransient ) //most of properties are not networkTransient that's why it's commented
-              props.push(prop);
-          }
-        }
-        return props;
+          return props.filter(p => p.networkTransient).map(p => p.name);
+        } props = [];
+        //filter custom columns
+        return propNames.filter(n => { 
+          return allColumnNames.includes(n.split('.')[0]);// && self.returnProperty(of, n).networkTransient;
+        });
       }
     },
     function returnExpr(of, propNames, i) {
@@ -347,7 +340,6 @@ foam.CLASS({
       var arr = [];
 
       var allColumns = of.getAxiomsByClass(foam.core.Property).map(p => p.name);
-      propNames = propNames.filter(p => allColumns.includes(p.split('.')[0]));
 
       for ( var prop of propNames ) {
         arr.push(this.returnProperty(of, prop));

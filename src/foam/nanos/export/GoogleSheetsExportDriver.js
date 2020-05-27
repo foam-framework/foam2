@@ -34,7 +34,11 @@ foam.CLASS({
         
         var sheetId  = '';
         var stringArray = [];
-        var props = X.filteredTableColumns ? X.filteredTableColumns : self.outputter.getAllPropertyNames(obj.cls_);
+        var columnConfig = X.columnConfigToPropertyConverter;
+
+        var props = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(obj.cls);
+        props = columnConfig.filterExportedProps(X, obj.cls_, props);
+        
         var metadata = await self.outputter.getColumnMethadata(X, obj.cls_, props);
         stringArray.push(metadata.map(m => m.columnLabel));
         var values = await self.outputter.outputArray(X, obj.cls_, [ obj ], metadata);
@@ -48,14 +52,15 @@ foam.CLASS({
     },
     async function exportDAO(X, dao) {
       var self = this;
-      var allColumns = dao.of.getAxiomsByClass(foam.core.Property).map(p => p.name);
-    //  var filteredTableProperties = X.filteredTableColumns.map(c => allColumns.contains(c.split('.')[0]));
 
-      var props = X.filteredTableColumns ? X.filteredTableColumns.filter(c => allColumns.includes(c.split('.')[0])) : self.outputter.getAllPropertyNames(dao.of);
-      var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildExpr(dao.of, props);
+      var columnConfig = X.columnConfigToPropertyConverter;
+
+      var props = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(dao.of);
+      props = columnConfig.filterExportedProps(X, dao.of, props);
+
       var metadata = await self.outputter.getColumnMethadata(X, dao.of, props);
-      props = metadata.map(m => m.propName);
 
+      var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildExpr(dao.of, props);
       var sink = await dao.select(expr);
       
       var sheetId  = '';
