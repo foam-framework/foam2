@@ -16,6 +16,7 @@ foam.CLASS({
   requires: [
     'foam.core.SimpleSlot',
     'foam.dao.ProxyDAO',
+    'foam.nanos.column.ColumnConfigToPropertyConverter',
     'foam.u2.md.CheckBox',
     'foam.u2.md.OverlayDropdown',
     'foam.u2.view.OverlayActionListView',
@@ -312,7 +313,7 @@ foam.CLASS({
                  column = view.columns.find(c => c.name === property);
                  if ( ! column ) {
                   var columnConfig = this.__context__.columnConfigToPropertyConverter;
-                  if ( ! columnConfig ) columnConfig = this.__context__.lookup('foam.nanos.column.ColumnConfigToPropertyConverter').create();
+                  if ( ! columnConfig ) columnConfig = this.ColumnConfigToPropertyConverter.create();
                   column = columnConfig.returnProperty(view.of, property);
                  }
                 } else
@@ -501,7 +502,7 @@ foam.CLASS({
                     column = view.columns.find(c => c.name === property);
                     if ( ! column ) {
                       var columnConfig = this.__context__.columnConfigToPropertyConverter;
-                      if ( ! columnConfig ) columnConfig = this.__context__.lookup('foam.nanos.column.ColumnConfigToPropertyConverter').create();
+                      if ( ! columnConfig ) columnConfig = this.ColumnConfigToPropertyConverter.create();
                      
                       var converted = columnConfig.returnPropertyAndObject(view.of, property, obj1);
                       converted.then(value => {

@@ -209,7 +209,7 @@ foam.CLASS({
         }
       ],
       code: function(of, propNames) {
-        return foam.mlang.sink.Projection.create({ exprs: foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create().returnExpr(of, propNames) });//foam.mlang.Expressions.create().PROJECTION(foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create().returnExpr(of, propNames));
+        return foam.mlang.sink.Projection.create({ exprs: foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create().returnExpr(of, propNames) });
       },
       javaCode: `
         Expr[] exprs = new foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.Builder(getX()).build().returnExpr(of, propNames);

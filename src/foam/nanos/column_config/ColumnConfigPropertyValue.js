@@ -22,13 +22,11 @@ foam.CLASS({
     {
       name: 'filterExportedProps',
       code: function(x, of, propNames) {
-        var self = this;
         var props = of.getAxiomsByClass(foam.core.Property);
         var allColumnNames = props.map(p => p.name);
         if ( ! propNames ) {
           return props.filter(p => p.networkTransient).map(p => p.name);
         } props = [];
-        //filter custom columns
         return propNames.filter(n => { 
           return allColumnNames.includes(n.split('.')[0]);// && self.returnProperty(of, n).networkTransient;
         });
@@ -338,8 +336,6 @@ foam.CLASS({
     },
     function returnProperties(of, propNames) {
       var arr = [];
-
-      var allColumns = of.getAxiomsByClass(foam.core.Property).map(p => p.name);
 
       for ( var prop of propNames ) {
         arr.push(this.returnProperty(of, prop));
