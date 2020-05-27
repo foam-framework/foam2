@@ -10,7 +10,7 @@
 
    methods: [
      {
-       name: 'sendSms',
+       name: 'send',
        async: true,
        type: 'foam.nanos.notification.sms.SMSMessage',
        args: [

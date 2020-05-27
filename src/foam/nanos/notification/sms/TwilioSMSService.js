@@ -26,7 +26,7 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'sendSms',
+      name: 'send',
       javaCode: `
         OMLogger omLogger = (OMLogger) x.get("OMLogger");
         TwilioConfig twilioConfig = (TwilioConfig) x.get("twilioConfig");

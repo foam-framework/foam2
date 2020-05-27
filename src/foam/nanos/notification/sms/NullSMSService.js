@@ -14,7 +14,7 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'sendSms',
+      name: 'send',
       javaCode: 'return smsMessage;',
       code: function() {
         // NOP
