@@ -163,12 +163,15 @@ foam.CLASS({
         }
 
         if ( getApprovableAware() ) {
-          delegate = new foam.nanos.approval.ApprovableAwareDAO
-          .Builder(getX())
-          .setDaoKey(getName())
-          .setOf(getOf())
-          .setDelegate(delegate)
-          .build();
+          var delegateBuilder = new foam.nanos.approval.ApprovableAwareDAO
+            .Builder(getX())
+            .setDaoKey(getName())
+            .setOf(getOf())
+            .setDelegate(delegate);
+          if(approvableAwareServiceNameIsSet_)
+            delegateBuilder.setServiceName(getApprovableAwareServiceName());
+
+          delegate = delegateBuilder.build();
 
           if ( getApprovableAwareEnabled() ) {
             logger.warning("DEPRECATED: EasyDAO", getName(), "'approvableAwareEnabled' is deprecated. Please remove it from the nspec.");
@@ -660,6 +663,11 @@ model from which to test ServiceProvider ID (spid)`,
       `,
       javaFactory: 'return false;'
     },
+    {
+      name: 'approvableAwareServiceName',
+      class: 'String',
+      documentation: 'If the DAO is approvable aware, this sets the ApprovableAwareDAO ServiceName field'
+    }
  ],
 
   methods: [
