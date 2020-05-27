@@ -6,7 +6,7 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'returnStringForProperties',
+      name: 'returnStringValueForProperty',
       type: 'String',
       documentation: 'Method that converts value to string',
       code: async function(prop, val) {
@@ -33,13 +33,13 @@ foam.CLASS({
       }
     },
     {
-      name: 'returnStringArrayForArrayOfValues',
+      name: 'arrayOfValuesToArrayOfStrings',
       code: async function(props, values) {
         var stringValues = [];
         for ( var value of values ) {
           var stringArrayForValue = [];
           for ( var i = 0 ; i < value.length ; i++ ) {
-            stringArrayForValue.push(await this.returnStringForProperties(props[i], value[i]));
+            stringArrayForValue.push(await this.returnStringValueForProperty(props[i], value[i]));
           }
           stringValues.push(stringArrayForValue);
         }
@@ -52,7 +52,7 @@ foam.CLASS({
         var columnConfig = x.columnConfigToPropertyConverter;
 
         var table =  [ props.map( p => p.label ) ];
-        var values = await this.returnStringArrayForArrayOfValues(props, columnConfig.returnValueForArrayOfPropertyNames(x, of, props.map(p => p.name), obj));
+        var values = await this.arrayOfValuesToArrayOfStrings(props, columnConfig.returnValueForArrayOfPropertyNames(x, of, props.map(p => p.name), obj));
         table = table.concat(values);
         return table;
       }
@@ -61,7 +61,7 @@ foam.CLASS({
       name: 'returnTable',
       code: async function(x, of, props, values) {
         var table =  [ props.map( p => p.label ) ];
-        var values = await this.returnStringArrayForArrayOfValues(props, values);
+        var values = await this.arrayOfValuesToArrayOfStrings(props, values);
         table = table.concat(values);
         return table;
       }
