@@ -64,10 +64,11 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpecWithJava',
       name: 'summaryView',
-      factory: function() {
+      expression: function(defaultColumns) {
         return {
           class: 'foam.u2.view.ScrollTableView',
           enableDynamicTableHeight: false,
+          columns: defaultColumns,
           css: {
             width: '100%',
             height: '424px'
@@ -179,6 +180,10 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.comics.v2.CRUDEnabledActionsAuth',
       name: 'CRUDEnabledActionsAuth'
+    },
+    {
+      class: 'Boolean',
+      name: 'hideQueryBar'
     }
   ]
 });
