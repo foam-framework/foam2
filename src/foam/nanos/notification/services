@@ -123,7 +123,7 @@ p({
       .setAuthorize(false)
       .setSeqNo(true)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName(\"smsMessages\")
+      .setJournalName("smsMessages")
       .setFixedSize(new foam.dao.FixedSizeDAO.Builder(x)
         .setSize(1000)
         .build())

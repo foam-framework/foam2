@@ -48,6 +48,7 @@ foam.CLASS({
         // check if message exists
         if ( ! SafetyUtil.isEmpty(smsMessage.getMessage()) ) {
           try {
+            omLogger.log(this.getClass().getSimpleName(), "message", "sending");
             Message.creator(new PhoneNumber(phoneNumber), new PhoneNumber(twilioConfig.getPhoneNumber()),
             smsMessage.getMessage()).create();
             smsMessage.setStatus(SMSStatus.SENT);
