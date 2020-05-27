@@ -79,8 +79,8 @@
           .addClass(this.myClass())
           .tag(this.OverlayActionListView, {
             data: [
-              this.READ,
-              this.MARK_UNREAD,
+              this.MARK_AS_READ,
+              this.MARK_AS_UNREAD,
               this.HIDE_NOTIFICATION_TYPE,
               this.REMOVE_NOTIFICATION
             ],
@@ -176,7 +176,7 @@
         confirmationRequired: true
       },
       {
-        name: 'read',
+        name: 'markAsRead',
         isAvailable: (read) => {
           return ! read;
         },
@@ -199,7 +199,7 @@
         confirmationRequired: true
       },
       {
-        name: 'markUnread',
+        name: 'markAsUnread',
         isAvailable: (read) => {
           return read;
         },
