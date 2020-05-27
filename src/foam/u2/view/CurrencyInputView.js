@@ -35,7 +35,7 @@ foam.CLASS({
       text-align: center;
 
       box-sizing: border-box;
-      width: 58px;
+      width: 64px;
       height: 30px;
 
       border: 1px solid /*%GREY3%*/ #cbcfd4;
@@ -62,21 +62,28 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'contingentProperty'
+      name: 'contingentProperty',
+      documentation: `
+        The name of the property that determines the currency that this view
+        will use to format the value
+      `
     },
     {
       class: 'Reference',
       of: 'foam.core.Unit',
-      name: 'currencyId'
+      name: 'currencyId',
+      documentation: 'The currency ID (eg: "CAD")'
     },
     {
       class: 'FObjectProperty',
       of: 'foam.core.Currency',
-      name: 'currency'
+      name: 'currency',
+      documentation: 'The actual currency object that can format the value'
     },
     {
       class: 'String',
       name: 'valueString',
+      documentation: 'This is the front facing formatted value',
       factory: function() {
         return this.data || 0;
       },
@@ -93,7 +100,7 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'data',
-      documentation: 'Value stored is unformatted'
+      documentation: 'The value unformatted and should be bound to a property'
     }
   ],
 
@@ -101,6 +108,8 @@ foam.CLASS({
     function init() {
       this.SUPER();
       if ( this.contingentProperty && this.parentObj ) {
+        // If the currency is dependant on another property being set by parent
+        // object, listen to the changes to that property.
         this.currencyId$ = this.parentObj$.dot(this.contingentProperty);
       }
       this.onDetach(this.currencyId$.sub(this.currencyIdUpdate));
@@ -126,8 +135,7 @@ foam.CLASS({
           return self.E().start('p').addClass(self.myClass('label-currency'))
             .add(currency ? currency.format(self.data) : self.data)
             .end();
-        }))
-
+        }));
     },
 
     function sanitizeString(s) {
