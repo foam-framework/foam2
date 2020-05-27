@@ -316,20 +316,6 @@ foam.CLASS({
         return foam.nanos.column.ColumnPropertyValue.create({ propertyValue:columnPropertyVal.propertyValue, objValue: await columnPropertyVal.objValue[columnPropertyVal.propertyValue.name + '$find']});
       return foam.nanos.column.ColumnPropertyValue.create({ propertyValue:columnPropertyVal.propertyValue, objValue: columnPropertyVal.propertyValue.f(columnPropertyVal.objValue)});
     },
-    async function returnValueForArrayOfPropertyNames(x, of, propNames, obj) {
-      var values = [];
-      for ( var propName of  propNames ) {
-        values.push(await this.returnValueForPropertyName(x, of, propName, obj));
-      }
-      return values;
-    },
-    async function returnValueForArrayOfPropertyNamesAndArrayOfObjects(x, of, propNames, objArray) {
-      var values = [];
-      for ( var obj of objArray ) {
-        values.push(await this.returnValueForArrayOfPropertyNames(x, of, propNames, obj));
-      }
-      return values;
-    },
     function returnProperties(of, propNames) {
       var arr = [];
 

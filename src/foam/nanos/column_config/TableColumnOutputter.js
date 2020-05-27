@@ -46,9 +46,12 @@ foam.CLASS({
         return stringValues;
       }
     },
-    async function objToArrayOfStringValues(x, of, props, obj) {
-      var columnConfig = x.columnConfigToPropertyConverter;
-      return columnConfig.returnValueForArrayOfPropertyNames(x, of, props.map(p => p.name), obj);
+    async function objToArrayOfStringValues(x, of, propNames, obj) {
+      var values = [];
+      for ( var propName of  propNames ) {
+        values.push(await this.returnValueForPropertyName(x, of, propName, obj));
+      }
+      return values;
     },
     {
       name: 'objectToTable',
