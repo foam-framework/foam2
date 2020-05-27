@@ -21,7 +21,7 @@ foam.CLASS({
   ],
 
   imports: [
-    'capabilityAquired',
+    'capabilityAcquired',
     'capabilityCache',
     'capabilityCancelled',
     'capabilityDAO',
@@ -64,7 +64,7 @@ foam.CLASS({
     function initE() {
       this.capabilityOptions.forEach((c) => {
         if ( this.capabilityCache.has(c) && this.capabilityCache.get(c) === true ) {
-          capabilityAquired = true;
+          capabilityAcquired = true;
           this.stack.back();
         }
       });
@@ -125,7 +125,7 @@ foam.CLASS({
         .endContext();
     },
     function aquire() {
-      this.capabilityAquired = true;
+      this.capabilityAcquired = true;
       this.capabilityOptions.forEach((c) => {
         this.capabilityCache.set(c, true);
       });

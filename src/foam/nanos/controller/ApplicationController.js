@@ -62,7 +62,7 @@ foam.CLASS({
     'agent',
     'appConfig',
     'as ctrl',
-    'capabilityAquired',
+    'capabilityAcquired',
     'capabilityCancelled',
     'currentMenu',
     'group',
@@ -225,7 +225,7 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'capabilityAquired',
+      name: 'capabilityAcquired',
       documentation: `
         The purpose of this is to handle the intercept flow for a capability that was granted,
         via the InterceptView from this.requestCapability(exceptionCapabilityType).
@@ -460,7 +460,7 @@ foam.CLASS({
         self.capabilityCache.set(c, false);
       });
 
-      self.capabilityAquired = false;
+      self.capabilityAcquired = false;
       self.capabilityCancelled = false;
       return new Promise(function(resolve, reject) {
         self.stack.push({
@@ -468,7 +468,7 @@ foam.CLASS({
           capabilityOptions: capabilityInfo.capabilityOptions
         });
         var s1, s2;
-        s1 = self.capabilityAquired$.sub(() => {
+        s1 = self.capabilityAcquired$.sub(() => {
           s1.detach();
           s2.detach();
           resolve();
