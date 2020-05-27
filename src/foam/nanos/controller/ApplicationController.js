@@ -291,7 +291,7 @@ foam.CLASS({
             return this.subject.user;
           }
 
-          set: function() {
+          set: function(newValue) {
             console.warn("Deprecated use of user setter");
             this.subject.user = newValue;
           }
