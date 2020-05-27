@@ -53,7 +53,7 @@ foam.CLASS({
     {
       name: 'returnMetadataForProperty',
       code: function(prop, propName) {
-          //to constants
+          //to constants?
           var cellType = 'STRING';
           var pattern = '';
           if ( foam.core.UnitValue.isInstance(prop) ) {
@@ -79,14 +79,14 @@ foam.CLASS({
       }
     },
     {
-      name: 'outputStringArray',
+      name: 'outputTable',
       code: async function(x, cls, arr, columnsMetadata) {
         var columnConfig = x.columnConfigToPropertyConverter;
         columnConfig = columnConfig || this.ColumnConfigToPropertyConverter.create();
 
         var props = columnConfig.returnProperties(cls, columnsMetadata.map(m => m.propName));
 
-        return await this.arrayOfValuesToArrayOfStrings(props, arr);
+        return await this.returnTable(props, arr);
       }
     }
   ]

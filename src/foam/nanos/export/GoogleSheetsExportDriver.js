@@ -41,6 +41,7 @@ foam.CLASS({
       
       var metadata = await self.outputter.getColumnMethadata(X, obj.cls_, props);
       stringArray.push(metadata.map(m => m.columnLabel));
+      
       var values = [ await this.outputter.objToArrayOfStringValues(X, obj.cls_, [ obj ], metadata.map(p => p.propName)) ];
       stringArray = stringArray.concat(values);
 
@@ -64,11 +65,7 @@ foam.CLASS({
       var sink = await dao.select(expr);
       
       var sheetId  = '';
-      var stringArray = [];
-
-      stringArray.push(metadata.map(m => m.columnLabel));
-      var values = await self.outputter.outputStringArray(X, dao.of, sink.array, metadata);
-      stringArray = stringArray.concat(values);
+      var stringArray = await self.outputter.outputTable(X, dao.of, sink.array, metadata);
 
       sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata);
       if ( ! sheetId || sheetId.length == 0)
