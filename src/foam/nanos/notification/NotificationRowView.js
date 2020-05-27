@@ -12,19 +12,27 @@
     requires: [
       'foam.nanos.auth.User',
       'foam.nanos.notification.NotificationCitationView',
-      'foam.u2.view.OverlayActionListView'
+      'foam.u2.view.OverlayActionListView',
+      'foam.u2.dialog.NotificationMessage'
     ],
 
     imports: [
+      'summaryView?',
       'invoiceDAO',
       'notificationDAO',
       'stack',
       'user',
-      'userDAO'
+      'userDAO',
+      'ctrl'
     ],
 
     exports: [
       'as rowView'
+    ],
+
+    topics: [
+      'finished',
+      'throwError'
     ],
 
     css: `
@@ -90,38 +98,128 @@
         name: 'removeNotification',
         code: function(X) {
           var self = X.rowView;
-          self.notificationDAO.remove(self.data);
+          self.notificationDAO.remove(self.data).then(_ => {
+            self.finished.pub();
+            if ( self.summaryView && foam.u2.GroupingDAOList.isInstance(self.summaryView) ){
+              self.summaryView.update();
+            } else {
+              self.stack.push({
+                class: 'foam.nanos.notification.NotificationView'
+              });
+            }
+          })
         },
         confirmationRequired: true
       },
-
       function hideNotificationType(X) {
         var self = X.rowView;
         self.user = self.user.clone();
         self.user.disabledTopics.push(self.data.notificationType);
-        self.userDAO.put(self.user);
-        self.stack.push({
-          class: 'foam.nanos.notification.NotificationView'
-        });
-      },
+        self.userDAO.put(self.user).then(_ => {
+          self.finished.pub();
+          if ( self.summaryView && foam.u2.GroupingDAOList.isInstance(self.summaryView) ){
+            self.summaryView.update();
+          } else {
+            self.stack.push({
+              class: 'foam.nanos.notification.NotificationView'
+            });
+          }
+        }).catch(e => {
+          self.throwError.pub(e);
 
-      function read(X) {
-        var self = X.rowView;
-        if ( ! self.data.read ) {
-          self.data.read = true;
-          self.notificationDAO.put(this.data);
-        }
-      },
+          // TODO: uncomment this once we wire up a proper exception
+          // if ( foam.comics.v2.userfeedback.UserFeedbackException.isInstance(e) && e.userFeedback  ){
+          //   var currentFeedback = e.userFeedback;
+          //   while ( currentFeedback ){
+          //     self.ctrl.add(self.NotificationMessage.create({
+          //       message: currentFeedback.message,
+          //       type: currentFeedback.status.name.toLowerCase()
+          //     }));
 
-      function markUnread(X) {
-        var self = X.rowView;
-        if ( self.data.read ) {
-          self.data.read = false;
-          self.notificationDAO.put(self.data);
-        }
-        self.stack.push({
-          class: 'foam.nanos.notification.NotificationView'
-        });
+          //     currentFeedback = currentFeedback.next;
+          //   }
+          // } else {
+          //   self.ctrl.add(self.NotificationMessage.create({
+          //     message: e.message,
+          //     type: 'error'
+          //   }));
+          // }
+
+          if ( e.message === 'An approval request has been sent out.' ) {
+            self.ctrl.add(self.NotificationMessage.create({
+              message: e.message,
+              type: 'success'
+            }));
+          } else {
+            self.ctrl.add(self.NotificationMessage.create({
+              message: e.message,
+              type: 'error'
+            }));
+          }
+        })
+      },
+      {
+        name: 'removeNotification',
+        code: function(X) {
+          var self = X.rowView;
+          self.notificationDAO.remove(self.data).then(_ => {
+            self.finished.pub();
+            if ( self.summaryView && foam.u2.GroupingDAOList.isInstance(self.summaryView) ){
+              self.summaryView.update();
+            } else {
+              self.stack.push({
+                class: 'foam.nanos.notification.NotificationView'
+              });
+            }
+          })
+        },
+        confirmationRequired: true
+      },
+      {
+        name: 'read',
+        isAvailable: (read) => {
+          return ! read;
+        },
+        code: function(X) {
+          var self = X.rowView;
+          if ( ! self.data.read ) {
+            self.data.read = true;
+            self.notificationDAO.put(self.data).then(_ => {
+              self.finished.pub();
+              if ( self.summaryView && foam.u2.GroupingDAOList.isInstance(self.summaryView) ){
+                self.summaryView.update();
+              } else {
+                self.stack.push({
+                  class: 'foam.nanos.notification.NotificationView'
+                });
+              }
+            });
+          }
+        },
+        confirmationRequired: true
+      },
+      {
+        name: 'markUnread',
+        isAvailable: (read) => {
+          return read;
+        },
+        code: function(X) {
+          var self = X.rowView;
+          if ( self.data.read ) {
+            self.data.read = false;
+            self.notificationDAO.put(self.data).then(_ => {
+              self.finished.pub();
+              if ( self.summaryView && foam.u2.GroupingDAOList.isInstance(self.summaryView) ){
+                self.summaryView.update();
+              } else {
+                self.stack.push({
+                  class: 'foam.nanos.notification.NotificationView'
+                });
+              }
+            })
+          }
+        },
+        confirmationRequired: true
       }
     ]
   });

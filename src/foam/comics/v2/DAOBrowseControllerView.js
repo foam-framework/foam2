@@ -19,6 +19,10 @@ foam.CLASS({
     'stack'
   ],
 
+  exports: [
+    'as browseCtrl'
+  ],
+
   requires: [
     'foam.comics.v2.DAOBrowserView',
     'foam.u2.borders.CardBorder',
