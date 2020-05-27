@@ -176,7 +176,7 @@ foam.CLASS({
   
         var exportDriver = foam.lookup(this.exportDriverReg.driverName).create();
   
-        var result = this.exportData ?
+        var result = await this.exportData ?
           exportDriver.exportDAO(this.__context__, this.exportData) :
           exportDriver.exportFObject(this.__context__, this.exportObj);
 
@@ -184,7 +184,7 @@ foam.CLASS({
   
         result.then(function(val) {
           self.note = val;
-
+        }).finally(() => {
           if ( this.exportAllColumns )
             this.filteredTableColumns = filteredColumnsCopy;
         });
@@ -231,9 +231,9 @@ foam.CLASS({
             document.body.appendChild(link);
             link.click();
           }
-
+        }).finally(() => {
           if ( this.exportAllColumns )
-          this.filteredTableColumns = filteredColumnsCopy;
+            this.filteredTableColumns = filteredColumnsCopy;
         });
       }
     },
