@@ -87,6 +87,7 @@ FOAM_FILES([
   { name: 'foam/nanos/auth/HumanNameTrait' },
   { name: "foam/nanos/auth/CreatedByAware" },
   { name: "foam/nanos/auth/CreatedByAwareDAO" },
+  { name: "foam/nanos/auth/Subject" },
   { name: "foam/nanos/auth/User" },
   { name: "foam/nanos/auth/PriorPassword" },
   { name: "foam/nanos/auth/ruler/AddPasswordHistoryAction" },
@@ -110,6 +111,7 @@ FOAM_FILES([
   { name: "foam/nanos/theme/Themes" },
   { name: "foam/nanos/bench/Benchmark" },
   { name: "foam/nanos/boot/DAOConfigSummaryView", flags: ['web'] },
+  { name: "foam/nanos/boot/DAONSpecMenu" },
   { name: "foam/nanos/session/Session" },
   { name: "foam/nanos/session/SessionTimer" },
   { name: "foam/nanos/session/SessionService" },
@@ -317,6 +319,8 @@ FOAM_FILES([
 
   // approval
   { name: 'foam/nanos/approval/ApprovalRequest' },
+  { name: 'foam/nanos/approval/ApprovalRequestNotification' },
+  { name: 'foam/nanos/approval/ApprovalRequestNotificationNotificationCitationView', flags: ['web'] },
   { name: 'foam/nanos/approval/ApprovalStatus' },
   { name: 'foam/nanos/approval/ApprovableAware'},
   { name: 'foam/nanos/approval/PropertiesToUpdateView', flags: ['web'] },
