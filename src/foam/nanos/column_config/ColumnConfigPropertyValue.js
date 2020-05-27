@@ -86,7 +86,7 @@ foam.CLASS({
                 String s = sb.toString();
                 Method m = ci.getObjClass().getMethod(s, foam.core.X.class);
                 cls = m.getReturnType();
-                sb.setLength(4);//sb.delete(4, s.length);
+                sb.setLength(4);
               }
               ci = (ClassInfo) cls.getMethod("getOwnClassInfo").invoke(null);
             } catch (Exception e) {
@@ -168,9 +168,8 @@ foam.CLASS({
                 char[] arr = p.getName().toCharArray();
                 arr[0] = Character.toUpperCase(arr[0]);
                 sb.append(arr);
-                //String s = sb.toString();
                 obj1 = (FObject)obj1.getClass().getMethod(sb.toString(), foam.core.X.class).invoke(obj1, x);
-                sb.setLength(4);//delete(4, s.length);
+                sb.setLength(4);
                 cls = obj1.getClass();
               }
               ci = (ClassInfo) cls.getMethod("getOwnClassInfo").invoke(null);
