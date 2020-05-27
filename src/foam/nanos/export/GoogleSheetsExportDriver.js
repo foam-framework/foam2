@@ -41,7 +41,7 @@ foam.CLASS({
       
       var metadata = await self.outputter.getColumnMethadata(X, obj.cls_, props);
       stringArray.push(metadata.map(m => m.columnLabel));
-      var values = await self.outputter.outputArray(X, obj.cls_, [ obj ], metadata);
+      var values = [ await this.outputter.objToArrayOfStringValues(X, obj.cls_, [ obj ], metadata.map(p => p.propName)) ];
       stringArray = stringArray.concat(values);
 
       sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata);
