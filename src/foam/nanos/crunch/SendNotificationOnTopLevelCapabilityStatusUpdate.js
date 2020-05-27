@@ -44,7 +44,6 @@ foam.CLASS({
           Notification notification = new Notification();
           notification.setUserId(junction.getSourceId());
           notification.setNotificationType("Capabiltiy Status Update");
-          notification.setIssuedDate(new Date());
           notification.setBody(sb.toString());
           notificationDAO.put(notification);
         }
