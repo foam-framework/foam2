@@ -563,6 +563,7 @@ p({
       .setOf(foam.nanos.auth.ServiceProvider.getOwnClassInfo())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("spids")
+      .setValidated(true)
       .build()
   """
 })
