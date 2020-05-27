@@ -287,13 +287,18 @@ foam.CLASS({
         // add user and agent for backward compatibility
         Object.defineProperty(self, 'user', {
           get: function() {
-            console.info("Deprecated use of user. Use Subject to retrieve user")
+            console.info("Deprecated use of user. Use Subject to retrieve user");
             return this.subject.user;
+          }
+
+          set: function() {
+            console.warn("Deprecated use of user setter");
+            this.subject.user = newValue;
           }
         });
         Object.defineProperty(self, 'agent', {
           get: function() {
-            console.warn("Deprecated use of agent")
+            console.warn("Deprecated use of agent");
             return this.subject.realUser;
           }
         });
