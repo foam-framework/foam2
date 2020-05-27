@@ -47,9 +47,6 @@ foam.CLASS({
         Expr e = returnDotExprForNestedProperty(getObjClass(), getNestedProperty().split("\\\\."), 0);
         if ( e == null )
           return null;
-        //have no idea why but this context allows to execute find method, but object's context doesn't
-        //need to investigate
-        ((FObject)obj).setX(getX());
         return e.f(obj);
       `
     },
