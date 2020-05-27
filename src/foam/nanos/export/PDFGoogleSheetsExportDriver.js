@@ -61,7 +61,7 @@ foam.CLASS({
 
       var metadata = await self.outputter.getColumnMethadata(X, dao.of, props);
 
-      var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildExpr(dao.of, props);
+      var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(dao.of, props);
       var sink = await dao.select(expr);
       
       var sheetId  = '';
