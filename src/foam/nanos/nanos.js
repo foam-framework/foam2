@@ -109,6 +109,7 @@ FOAM_FILES([
   { name: "foam/nanos/theme/Themes" },
   { name: "foam/nanos/bench/Benchmark" },
   { name: "foam/nanos/boot/DAOConfigSummaryView", flags: ['web'] },
+  { name: "foam/nanos/boot/DAOSpecMenu" },
   { name: "foam/nanos/session/Session" },
   { name: "foam/nanos/session/SessionTimer" },
   { name: "foam/nanos/session/SessionService" },
