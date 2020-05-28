@@ -35,7 +35,8 @@ public class SocketWebAgent
       // new SessionServerBox(x, skeleton_, authenticate_).send(msg);
       skeleton_.send(msg);
     } catch ( Exception e ) {
-
+      Logger logger = (Logger) x.get("logger");
+      if ( logger != null ) logger.error(e);
     }
   }
 }

@@ -10,6 +10,7 @@ import foam.box.Box;
 import foam.core.X;
 import foam.core.ContextAware;
 import foam.nanos.tcp.SocketRouter;
+import foam.nanos.logger.Logger;
 
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -51,7 +52,8 @@ public class SocketServerProcessor
 
         socketRouter_.service(requestMsg, socket_);
       } catch ( IOException ioe ) {
-
+        Logger logger = (Logger) getX().get("logger");
+        if ( logger != null ) logger.error(ioe);
       }
 
     }

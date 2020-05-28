@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.box.network;
 
 import foam.core.X;
@@ -20,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Collections;
+import foam.nanos.logger.Logger;
 
 public class ConnectionBox
   extends Thread
@@ -91,7 +98,8 @@ public class ConnectionBox
         replayBox.send(response);
       }
     } catch ( Exception e ) {
-      //TODO: log
+      Logger logger = (Logger) getX().get("logger");
+      if ( logger != null ) logger.error(e);
     }
   }
 
@@ -113,7 +121,8 @@ public class ConnectionBox
       out_.write(requestBuffer.array(), 0, 4+messageSize);
       out_.flush();
     } catch ( Exception e ) {
-
+      Logger logger = (Logger) getX().get("logger");
+      if ( logger != null ) logger.error(e);
     }
 
   }

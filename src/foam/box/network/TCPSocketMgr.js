@@ -10,7 +10,8 @@ foam.CLASS({
 
   javaImports: [
     "java.net.Socket",
-    "foam.core.X"
+    "foam.core.X",
+    "foam.nanos.logger.Logger"
   ],
 
   properties: [
@@ -99,7 +100,8 @@ foam.CLASS({
           conBox.start();
           return conBox;
         } catch ( Exception e ) {
-
+          Logger logger = (Logger) getX().get("logger");
+          if ( logger != null ) logger.error(e);
         }
         return null;
       `

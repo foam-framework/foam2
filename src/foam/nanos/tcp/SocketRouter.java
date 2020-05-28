@@ -69,10 +69,10 @@ public class SocketRouter
     try {
       result = requestContext.create(JSONParser.class).parseString(requestMessage);
 
-    } catch ( Throwable t ) {
-      System.err.println("Unable to parse: " + requestMessage);
-      //TODO: send back error response
-      throw t;
+    } catch ( Exception e ) {
+      Logger logger = (Logger) getX().get("logger");
+      if ( logger != null ) logger.error(e);
+      throw e;
     }
 
     //TODO: how to response if result == null
@@ -97,10 +97,10 @@ public class SocketRouter
 
         serv.execute(requestContext);
       }
-    } catch (Throwable t) {
-      System.err.println("Error serving " + serviceKey);
-      t.printStackTrace();
-      throw t;
+    } catch (Exception e) {
+      Logger logger = (Logger) getX().get("logger");
+      if ( logger != null ) logger.error("Error serving" + serviceKey, e);
+      throw e;
     } finally {
       if ( ! serviceKey.equals("static") ) pm.log(x_);
     }
@@ -128,8 +128,8 @@ public class SocketRouter
         service = new SocketWebAgent(skeleton, spec.getAuthenticate());
         informService(service, spec);
       } catch (IllegalAccessException | InstantiationException | ClassNotFoundException ex) {
-        ex.printStackTrace();
-        ((Logger) getX().get("logger")).error("Unable to create NSPec servlet: " + spec.getName());
+        Logger logger = (Logger) getX().get("logger");
+        if ( logger != null ) logger.error("Unable to create NSPec servlet: " + spec.getName(), ex);
       }
     } else {
       if ( service instanceof WebAgent ) {
