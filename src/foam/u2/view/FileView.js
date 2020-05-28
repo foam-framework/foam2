@@ -23,10 +23,11 @@ foam.CLASS({
       this.setNodeName('span')
         .start('input').attrs({ type: 'file' }).on('change', this.onChange).end()
         .add(this.slot(function(data) {
+            debugger;
           return ! data ? this.E('span') : this.E('a')
             .attrs({
-              href: data.data && data.data.blob ?
-                URL.createObjectURL(data.data.blob) :
+              href: (data.dataBlob && data.dataBlob.blob) || data.dataString ?
+                URL.createObjectURL(data.getData().blob) :
                 data.address,
               target: '_blank'
             })
@@ -43,11 +44,10 @@ foam.CLASS({
         filename: file.name,
         filesize: file.size,
         mimeType: file.type,
-        data: this.BlobBlob.create({
+        dataBlob: this.BlobBlob.create({
           blob: file
         })
       });
-      debugger;
     }
   ]
 });

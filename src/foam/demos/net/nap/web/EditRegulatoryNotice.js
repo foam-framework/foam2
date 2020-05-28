@@ -424,7 +424,7 @@
           filename: files[i].name,
           filesize: files[i].size,
           mimeType: files[i].type,
-          data: this.BlobBlob.create({
+          dataBlob: this.BlobBlob.create({
             blob: files[i]
           })
         }))

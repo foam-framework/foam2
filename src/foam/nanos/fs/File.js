@@ -82,7 +82,7 @@ foam.CLASS({
         }
         return url;
       }
-    },
+    }
   ],
 
   methods: [
@@ -131,19 +131,6 @@ foam.CLASS({
           return null;
         }
       }
-    },
-    {
-      name: 'setData',
-      args: [
-        { name: 'data', type: 'foam.blob.Blob' }
-      ],
-      javaCode:`
-        if ( filesize_ > 3 * 1024 * 1024 ) {
-          setDataBlob(data);
-        } else {
-          return;
-        }
-      `
     },
     {
       name: 'authorizeOnCreate',

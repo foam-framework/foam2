@@ -41,6 +41,8 @@ foam.CLASS({
         if ( ! file ) return a();
 
         if ( file.size <= this.minBlobSize ){
+          file.dataString = encode(file.dataBlob.blob);
+          delete file.dataBlob;
         }
 
         return self.fileDAO.put(file).then(function (b) {
