@@ -37,6 +37,7 @@ foam.CLASS({
     'foam.nanos.auth.Group',
     'foam.nanos.auth.ResendVerificationEmail',
     'foam.nanos.auth.User',
+    'foam.nanos.auth.Subject',
     'foam.nanos.theme.Theme',
     'foam.nanos.theme.Themes',
     'foam.nanos.theme.ThemeDomain',
