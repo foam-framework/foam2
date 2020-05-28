@@ -98,8 +98,6 @@ foam.CLASS({
             .addClass(this.myClass('status'))
             .add(
               this.slot(function (data, data$currentWizardlet) {
-                // return this.E().add(
-                //   'At step ' + this.data.subStack.pos)
                 return this.StepWizardletStepsView.create({
                   data: data,
                 });
@@ -126,6 +124,8 @@ foam.CLASS({
               data$: this.data.subStack$,
               showActions: false
             })
+            // This should work!; Worth investigating why Stack
+            //   can't be rendered this way:
             // .add(this.SUB_STACK)
             .add(this.slot(function (data$isLastWizardlet) {
               return this.E()

@@ -55,8 +55,6 @@ foam.CLASS({
 
   methods: [
     function init() {
-      this.stackContext =
-        this.__subContext__.createSubContext({ fu:'bar' });
       this.stackContext.register(
         this.VerticalDetailView,
         'foam.u2.detail.SectionedDetailView'
@@ -72,22 +70,28 @@ foam.CLASS({
         (p, wizardlet) => p.then(() => wizardlet.save()), p
       );
     },
-    function next() {
-      return this.currentWizardlet.save().then(() => {
-        if ( this.subStack.pos < this.wizardlets.length - 1 ) {
-          let newIndex = this.subStack.pos + 1;
-          this.highestIndex = newIndex;
-          console.log(newIndex);
-          console.log(this.wizardlets);
-          this.subStack.push({
-            class: 'foam.u2.detail.VerticalDetailView',
-            data$: this.wizardlets[newIndex].data$,
-          }) 
-          return false; // isFinished
-        } else {
-          return true; // isFinished
-        }
-      });
+    {
+      name: 'next',
+      documentation: `
+        Saves the current wizardlet, then updates subStack to
+        display the next wizard item, or returns true IFF the
+        current wizardlet is already the last one.
+      `,
+      code: function next() {
+        return this.currentWizardlet.save().then(() => {
+          if ( this.subStack.pos < this.wizardlets.length - 1 ) {
+            let newIndex = this.subStack.pos + 1;
+            this.highestIndex = newIndex;
+            this.subStack.push({
+              class: 'foam.u2.detail.VerticalDetailView',
+              data$: this.wizardlets[newIndex].data$,
+            }) 
+            return false; // isFinished
+          } else {
+            return true; // isFinished
+          }
+        });
+      },
     },
     function back() {
       this.subStack.back();
