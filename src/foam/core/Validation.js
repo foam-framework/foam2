@@ -42,7 +42,7 @@ foam.CLASS({
       name: 'errorMessage',
       documentation: `
         Provide feedback to the user via a Message.
-      To use this, provide the name of the Message you wish to add.
+        To use this, provide the name of the Message you wish to add.
       When both errorString and errorMessage are specified, the errorMessage will be used.
       `
     },
