@@ -50,7 +50,7 @@ foam.CLASS({
       class: 'String',
       name: 'errorString',
       documentation: `
-      Provide feedback to the user via a String.
+        Provide feedback to the user via a String.
       When both errorString and errorMessage are specified, the errorMessage will be used.
       `
     },
