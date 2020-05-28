@@ -87,7 +87,8 @@ public class SocketRouter
 
     try {
       if ( serv == null ) {
-        System.err.println("No service found for: " + serviceKey);
+        Logger logger = (Logger) getX().get("logger");
+        logger.error("No service found for: " + serviceKey);
         // TODO: send response
       } else {
         requestContext = requestContext

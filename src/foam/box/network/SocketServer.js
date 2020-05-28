@@ -19,7 +19,7 @@ foam.CLASS({
     'foam.nanos.logger.Logger',
     'java.net.ServerSocket',
     'java.net.Socket',
-    'java.io.IOException'
+    'java.io.IOException',
   ],
 
   properties: [
@@ -35,7 +35,8 @@ foam.CLASS({
       name: 'start',
       javaCode: `
         try {
-          System.out.println("Starting TCP Server on port: " + getPort());
+          Logger logger = (Logger) getX().get("logger");
+          logger.info("Starting TCP Server on port: " + getPort());
           ServerSocket serverSocket = new ServerSocket(getPort());
           (new Thread() {
             @Override
