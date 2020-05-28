@@ -123,8 +123,8 @@ public class ConnectionBox
     } catch ( Exception e ) {
       Logger logger = (Logger) getX().get("logger");
       if ( logger != null ) logger.error(e);
+      ((TCPSocketMgr) getX().get("SocketMgr")).remove(this);
     }
-
   }
 
 }
