@@ -161,7 +161,8 @@
         },
         {
           class: 'Boolean',
-          name: 'hideId'
+          name: 'hideId',
+          documentation: 'If true, will not add symbol or ID to formatted currency'
         }
       ],
       type: 'String',
