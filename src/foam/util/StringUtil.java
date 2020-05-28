@@ -34,6 +34,12 @@ public class StringUtil {
       }
     };
 
+  public static String daoize(String s) {
+    return (s.length() > 0 ? s.substring(0,1).toLowerCase() : "")
+      + (s.length() > 1 ? s.substring(1) : "")
+      + "DAO";
+  }
+
   public static String[] split(String s, char separator) {
     java.util.List<String> list = storage__.get();
 

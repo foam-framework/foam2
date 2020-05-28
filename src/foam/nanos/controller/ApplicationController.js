@@ -79,6 +79,7 @@ foam.CLASS({
     'signUpEnabled',
     'loginVariables',
     'stack',
+    'subject',
     'user',
     'webApp',
     'wrapCSS as installCSS',
@@ -209,6 +210,12 @@ foam.CLASS({
     },
     {
       class: 'foam.core.FObjectProperty',
+      of: 'foam.nanos.auth.Subject',
+      name: 'subject',
+      factory: function() { return this.Subject.create(); }
+    },
+    {
+      class: 'foam.core.FObjectProperty',
       of: 'foam.nanos.auth.Group',
       name: 'group'
     },
@@ -305,12 +312,30 @@ foam.CLASS({
       this.clientPromise.then(async function(client) {
         self.setPrivate_('__subContext__', client.__subContext__);
 
-        await self.fetchAgent();
-        await self.fetchUser();
+        await self.fetchSubject();
+
+        // add user and agent for backward compatibility
+        Object.defineProperty(self, 'user', {
+          get: function() {
+            console.info("Deprecated use of user. Use Subject to retrieve user");
+            return this.subject.user;
+          },
+          set: function(newValue) {
+            console.warn("Deprecated use of user setter");
+            this.subject.user = newValue;
+          }
+        });
+        Object.defineProperty(self, 'agent', {
+          get: function() {
+            console.warn("Deprecated use of agent");
+            return this.subject.realUser;
+          }
+        });
 
         // Fetch the group only once the user has logged in. That's why we await
         // the line above before executing this one.
         await self.fetchGroup();
+        await self.fetchTheme();
         self.onUserAgentAndGroupLoaded();
       });
     },
@@ -324,7 +349,9 @@ foam.CLASS({
           this
             .addClass(this.myClass())
             .start()
-              .tag(this.topNavigation_)
+              .add(this.slot(function (topNavigation_) {
+                return this.E().tag(topNavigation_);
+              }))
             .end()
             .start()
               .addClass('stack-wrapper')
@@ -335,7 +362,9 @@ foam.CLASS({
               })
             .end()
             .start()
-              .tag(this.footerView_)
+              .add(this.slot(function (footerView_) {
+                return this.E().tag(footerView_);
+              }))
             .end();
           });
       });
@@ -352,23 +381,19 @@ foam.CLASS({
       }
     },
 
-    async function fetchUser() {
+    async function fetchSubject() {
       /** Get current user, else show login. */
       try {
-        var result = await this.client.auth.getCurrentUser(null);
-        this.loginSuccess = !! result;
+        var result = await this.client.auth.getCurrentSubject(null);
+        this.loginSuccess = !! result && !! result.user;
 
-        if ( ! result ) throw new Error();
+        if ( ! this.loginSuccess ) throw new Error();
 
-        this.user = result;
+        this.subject = result;
       } catch (err) {
         await this.requestLogin();
-        return await this.fetchUser();
+        return await this.fetchSubject();
       }
-    },
-
-    async function fetchAgent() {
-      this.agent = await this.client.agentAuth.getCurrentAgent();
     },
 
     function expandShortFormMacro(css, m) {
@@ -495,7 +520,7 @@ foam.CLASS({
        *   - Update the look and feel of the app based on the group or user
        *   - Go to a menu based on either the hash or the group
        */
-      if ( ! this.user.emailVerified ) {
+      if ( ! this.subject.user.emailVerified ) {
         this.loginSuccess = false;
         this.stack.push({ class: 'foam.nanos.auth.ResendVerificationEmail' });
         return;

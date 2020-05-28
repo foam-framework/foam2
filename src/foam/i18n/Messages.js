@@ -31,7 +31,8 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'name'
+      name: 'name',
+      preSet: function(o, n) { return foam.String.constantize(n); }
     },
     {
       class: 'String',

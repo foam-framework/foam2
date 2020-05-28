@@ -114,25 +114,4 @@ public class AgentUserAuthService
       return false;
     }
   }
-
-
-  /**
-    Retrieves the agent user from the current sessions context.
-  */
-  public User getCurrentAgent(X x) throws AuthorizationException {
-    // Fetch context and check if not null.
-    Session session = x.get(Session.class);
-    if ( session == null ) {
-      throw new AuthenticationException("Not logged in");
-    }
-
-    X sessionContext = session.getContext();
-    // Get agent from session context
-    User agent = ((Subject) sessionContext.get("subject")).getRealUser();
-    if ( agent != null ) {
-      agent = (User) userDAO_.find(agent.getId());
-      agent.validateAuth(x);
-    }
-    return agent;
-  }
 }
