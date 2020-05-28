@@ -20,7 +20,7 @@ foam.CLASS({
   name: 'Message',
 
   javaImports: [
-    'foam.nanos.crunch.CapabilityRuntimeException',
+    'foam.nanos.crunch.CapabilityRuntimeException'
   ],
 
   properties: [
