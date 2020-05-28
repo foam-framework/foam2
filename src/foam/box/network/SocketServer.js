@@ -20,6 +20,8 @@ foam.CLASS({
     'java.net.ServerSocket',
     'java.net.Socket',
     'java.io.IOException',
+    'foam.nanos.pool.ThreadPoolAgency',
+    'foam.core.ContextAgent'
   ],
 
   properties: [
@@ -27,6 +29,13 @@ foam.CLASS({
       class: 'Int',
       name: 'port',
       value: 7070
+    },
+    {
+      class: 'Object',
+      name: 'threadPoolAgency',
+      javaFactory:`
+        return new ThreadPoolAgency();
+      `
     }
   ],
 
@@ -38,18 +47,28 @@ foam.CLASS({
           Logger logger = (Logger) getX().get("logger");
           logger.info("Starting TCP Server on port: " + getPort());
           ServerSocket serverSocket = new ServerSocket(getPort());
-          (new Thread() {
-            @Override
-            public void run() {
-              try {
-                Socket client = serverSocket.accept();
-                new SocketServerProcessor(getX(), client).start();
-              } catch ( IOException ioe ) {
-                Logger logger = (Logger) getX().get("logger");
-                if ( logger != null ) logger.error(ioe);
+
+          ThreadPoolAgency poolAgency = (ThreadPoolAgency) getThreadPoolAgency();
+          poolAgency.submit(
+            getX(),
+            new ContextAgent() {
+              @Override
+              public void execute(X x) {
+                try {
+                  Socket client = serverSocket.accept();
+                  poolAgency.submit(
+                    getX(),
+                    new SocketServerProcessor(getX(), client),
+                    "socket, processor"
+                  );
+                } catch ( IOException ioe ) {
+                  Logger logger = (Logger) getX().get("logger");
+                  if ( logger != null ) logger.error(ioe);
+                }
               }
-            }
-          }).start();
+            },
+            "Accepting Socket Connection"
+          );
         } catch ( Exception e ) {
           Logger logger = (Logger) getX().get("logger");
           if ( logger != null ) logger.error(e);

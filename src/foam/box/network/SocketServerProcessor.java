@@ -18,10 +18,11 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import foam.core.ContextAgent;
 
 public class SocketServerProcessor
   extends Thread
-  implements ContextAware
+  implements ContextAware, ContextAgent
 {
   protected X x_;
   protected Socket socket_;
@@ -37,10 +38,29 @@ public class SocketServerProcessor
     socketRouter_ = new SocketRouter(x);
   }
 
-  //TODO: need threadpool?
   @Override
   public void run()
   {
+    while ( true ) {
+      try {
+        byte[] msgLenByte = new byte[4];
+        in_.read(msgLenByte, 0, 4);
+        int msgLen = ByteBuffer.wrap(msgLenByte).getInt();
+        byte[] msgByte = new byte[msgLen];
+        in_.read(msgByte, 0, msgLen);
+        String requestMsg = new String(msgByte, StandardCharsets.UTF_8);
+
+        socketRouter_.service(requestMsg, socket_);
+      } catch ( IOException ioe ) {
+        Logger logger = (Logger) getX().get("logger");
+        if ( logger != null ) logger.error(ioe);
+      }
+
+    }
+  }
+
+  @Override
+  public void execute(X x) {
     while ( true ) {
       try {
         byte[] msgLenByte = new byte[4];
