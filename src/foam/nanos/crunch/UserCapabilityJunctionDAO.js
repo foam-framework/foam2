@@ -128,11 +128,11 @@ foam.CLASS({
       } 
 
       if ( ucJunction.getStatus() == CapabilityJunctionStatus.PENDING ) {
-        if ( ! requiresReview || ucJunction.getReviewed() ) ucJunction.setStatus(CapabilityJunctionStatus.GRANTED);
+        if ( ! requiresReview ) ucJunction.setStatus(CapabilityJunctionStatus.GRANTED);
       }
 
       if ( ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED ) {
-        if ( requiresData && capability.getDaoKey() != null ) saveDataToDAO(x, capability, ucJunction);
+        if ( requiresData && capability.getDaoKey() != null ) saveDataToDAO(x, capability, ucJunction, true);
         configureJunctionExpiry(x, ucJunction, old, capability);
       }
 
@@ -153,8 +153,13 @@ foam.CLASS({
         {
           name: 'obj',
           type: 'foam.nanos.crunch.UserCapabilityJunction'
+        },
+        {
+          name: 'putObject',
+          type: 'Boolean'
         }
       ],
+      javaType: 'foam.core.FObject',
       documentation: `
       We may or may not want to store the data in its own dao, based on the nature of the data.
       For example, if the data for some UserCapabilityJunction is a businessOnboarding object, we may want to store this object in
@@ -166,10 +171,10 @@ foam.CLASS({
         throw new RuntimeException("UserCapabilityJunction data not submitted for capability: " + obj.getTargetId());
       
       String daoKey = capability.getDaoKey();
-      if ( daoKey == null ) return;
+      if ( daoKey == null ) return null;
 
       DAO dao = (DAO) x.get(daoKey);
-      if ( dao == null ) return;
+      if ( dao == null ) return null;
 
       FObject objectToSave;                                                  // Identify or create data to go into dao.
       String contextDAOFindKey = (String)capability.getContextDAOFindKey();
@@ -204,11 +209,13 @@ foam.CLASS({
       objectToSave = objectToSave.fclone().copyFrom(obj.getData());           // finally copy user inputed data into objectToSave <- typed to the safest possibility from above cases
 
       try {                                                                   // save data to dao
-        dao.put(objectToSave);
+        if ( putObject ) dao.put(objectToSave);
       } catch (Exception e) {
         Logger logger = (Logger) x.get("logger");
         logger.warning("Data cannot be added to " + capability.getDaoKey() + " for UserCapabilityJunction object : " + obj.getId() );
       }
+
+      return objectToSave;
       `
     },
     {
