@@ -113,10 +113,24 @@
       },
       function hideNotificationType(X) {
         var self = X.rowView;
-        self.user = self.user.clone();
-        self.user.disabledTopics.push(self.data.notificationType);
-        self.userDAO.put(self.user).then(_ => {
+
+        if ( self.user.disabledTopics.includes(self.data.notificationType) ){
+          self.ctrl.add(self.NotificationMessage.create({
+            message: "Disabled already exists for this notification something went wrong",
+            type: 'error'
+          }));
+
+          return;
+        }
+
+        var userClone = self.user.clone();
+
+        // check if disabledTopic already exists
+        userClone.disabledTopics.push(self.data.notificationType);
+        self.userDAO.put(userClone).then(user => {
           self.finished.pub();
+          self.user = user;
+          
           if ( self.summaryView && foam.u2.GroupingDAOList.isInstance(self.summaryView) ){
             self.summaryView.update();
           } else {
@@ -160,6 +174,7 @@
       },
       {
         name: 'removeNotification',
+        confirmationRequired: true,
         code: function(X) {
           var self = X.rowView;
           self.notificationDAO.remove(self.data).then(_ => {
