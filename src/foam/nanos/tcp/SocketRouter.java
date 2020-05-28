@@ -62,7 +62,8 @@ public class SocketRouter
     X requestContext  = getX()
       .put(InputStream.class, in)
       .put(OutputStream.class, out)
-      .put("requestMessage", requestMessage);
+      .put("requestMessage", requestMessage)
+      .put("tcpSocket", socket);
 
     FObject result;
     try {
@@ -84,7 +85,6 @@ public class SocketRouter
     WebAgent serv = getWebAgent(spec, service);
     PM pm = new PM(this.getClass(), serviceKey);
 
-
     try {
       if ( serv == null ) {
         System.err.println("No service found for: " + serviceKey);
@@ -92,7 +92,8 @@ public class SocketRouter
       } else {
         requestContext = requestContext
           .put("logger", new PrefixLogger(new Object[] { "[Service]", spec.getName() }, (Logger) getX().get("logger")))
-          .put(NSpec.class, spec);
+          .put(NSpec.class, spec)
+          .put("requestMessage", requestMsg);
 
         serv.execute(requestContext);
       }
@@ -146,9 +147,7 @@ public class SocketRouter
         }
       }
     }
-
     if ( service instanceof WebAgent ) return (WebAgent) service;
-
     Logger logger = (Logger) getX().get("logger");
     logger.error(this.getClass(), spec.getName() + " does not have a WebAgent.");
     return null;

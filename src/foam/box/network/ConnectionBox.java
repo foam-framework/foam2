@@ -102,6 +102,7 @@ public class ConnectionBox
     Long syncBoxId = (Long) msg.getAttributes().get("syncBoxId");
     replayBoxMap.put(syncBoxId, replayBox);
 
+    msg.getAttributes().put("replyBox", new SocketReplyBox());
     try {
       Outputter outputter = new Outputter(getX()).setPropertyPredicate(new foam.lib.NetworkPropertyPredicate());
       String message = outputter.stringify(msg);

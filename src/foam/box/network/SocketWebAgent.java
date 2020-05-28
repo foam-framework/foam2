@@ -31,7 +31,9 @@ public class SocketWebAgent
   public void execute(X x) {
     try {
       Message msg = (Message) x.get("requestMessage");
-      new SessionServerBox(x, skeleton_, authenticate_).send(msg);
+      //TODO: set long-term session before using SessionServerBox.
+      // new SessionServerBox(x, skeleton_, authenticate_).send(msg);
+      skeleton_.send(msg);
     } catch ( Exception e ) {
 
     }

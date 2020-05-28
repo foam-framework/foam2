@@ -575,7 +575,8 @@ var classes = [
   'foam.box.network.SocketClientBox',
   'foam.box.network.TCPSocketMgr',
   'foam.box.network.SocketReplyBox',
-  'foam.box.network.SocketServer'
+  'foam.box.network.SocketServer',
+  'foam.box.network.DemoSocketClientReplyBox'
 ];
 
 var abstractClasses = [
