@@ -53,7 +53,7 @@ public class ConnectionBox
     host_ = host;
     port_ = port;
 
-    TCPSocketMgr.instance().add(this);
+    ((TCPSocketMgr) x.get("SocketMgr")).add(this);
   }
 
   public void setHost(String host) {

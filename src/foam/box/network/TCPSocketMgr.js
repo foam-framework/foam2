@@ -8,6 +8,10 @@ foam.CLASS({
   package: 'foam.box.network',
   name: 'TCPSocketMgr',
 
+  implements: [
+    'foam.nanos.NanoService'
+  ],
+
   javaImports: [
     "java.net.Socket",
     "foam.core.X",
@@ -105,27 +109,14 @@ foam.CLASS({
         }
         return null;
       `
+    },
+    {
+      name: 'start',
+      javaCode: `
+        return;
+      `
     }
   ],
 
-  axioms: [
-    {
-      name: 'javaExtras',
-      buildJavaClass: function(cls) {
-        cls.extras.push(foam.java.Code.create({
-          data:`
-            private static TCPSocketMgr instance__;
-            public static synchronized TCPSocketMgr instance()
-            {
-              if ( instance__ == null ) {
-                instance__ = new TCPSocketMgr();
-              }
-              return instance__;
-            }
-          `
-        }));
-      }
-    }
-  ],
 })
 

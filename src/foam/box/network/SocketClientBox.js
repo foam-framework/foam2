@@ -31,7 +31,7 @@ foam.CLASS({
       name: 'send',
       synchronized: true,
       javaCode: `
-        ConnectionBox conBox = TCPSocketMgr.instance().get(getX(), getHost(), getPort());
+        ConnectionBox conBox = ((TCPSocketMgr) getX().get("SocketMgr")).get(getX(), getHost(), getPort());
         conBox.send(msg);
       `
     }

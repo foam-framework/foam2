@@ -1135,3 +1135,11 @@ p({
     }
   """
 })
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "SocketMgr",
+  "lazy": false,
+  "service": {
+    "class": "foam.box.network.TCPSocketMgr",
+  }
+})
