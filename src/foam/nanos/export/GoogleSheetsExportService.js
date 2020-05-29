@@ -241,6 +241,10 @@ foam.CLASS({
         {
           name: 'spreadsheetId',
           type: 'String'
+        },
+        {
+          name: 'cellsRange',
+          type: 'String'
         }
       ],
       javaThrows: [ 'java.io.IOException', 'java.security.GeneralSecurityException' ],
@@ -250,8 +254,9 @@ foam.CLASS({
           Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, SCOPES))
             .setApplicationName("nanopay")
             .build();
-          Sheets.Spreadsheets.Get request = service.spreadsheets().get(spreadsheetId);
-          Spreadsheet response = request.execute();
+          Sheets.Spreadsheets.Values.Get request =
+          service.spreadsheets().values().get(spreadsheetId, cellsRange);
+          ValueRange response = request.execute();
           System.out.println("done");
       `
     }

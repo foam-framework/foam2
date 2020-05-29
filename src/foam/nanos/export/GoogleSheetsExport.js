@@ -53,6 +53,10 @@ foam.INTERFACE({
         {
           name: 'spreadsheetId',
           type: 'String'
+        },
+        {
+          name: 'cellsRange',
+          type: 'String'
         }
       ],
       javaThrows: [ 'java.io.IOException', 'java.security.GeneralSecurityException' ]
