@@ -13,7 +13,7 @@ foam.ENUM({
 
   values: [
       { 
-        name: 'HOUR',
+        name: 'HOURS',
         conversionFactorMs: 3600000
       },
       {
