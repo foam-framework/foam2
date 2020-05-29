@@ -461,24 +461,16 @@ foam.CLASS({
        *   - Update the look and feel of the app based on the group or user
        *   - Go to a menu based on either the hash or the group
        */
-      if ( ! this.subject.user.emailVerified ) {
-        this.loginSuccess = false;
-        this.stack.push({ class: 'foam.nanos.auth.ResendVerificationEmail' });
-        return;
-      }
+      this.fetchTheme();
 
       var hash = this.window.location.hash;
       if ( hash ) hash = hash.substring(1);
 
       if ( hash ) {
         window.onpopstate();
-      } else if ( this.group ) {
-        this.window.location.hash = this.group.defaultMenu;
+      } else if ( this.theme ) {
+        this.window.location.hash = this.theme.defaultMenu;
       }
-
-      // Update the look and feel now that the user is logged in since there
-      // might be a more specific one to use now.
-      this.fetchTheme();
     },
 
     function menuListener(m) {
