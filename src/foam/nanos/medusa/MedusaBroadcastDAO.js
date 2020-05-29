@@ -86,6 +86,21 @@ foam.CLASS({
       `
     },
     {
+      documentation: 'Determine if broadcasting or delegating. Always broadcast to/from Nodes.',
+      name: 'broadcast',
+      class: 'Boolean',
+      value: 'false',
+      javaFactory: `
+      if ( getType() == MedusaType.NODE ) return true;
+
+      ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
+      ClusterConfig myConfig = support.getConfig(getX(), support.getConfigId());
+      if ( myConfig.getType() == MedusaType.NODE ) return true;
+
+      return false;
+      `
+    },
+    {
       class: 'Object',
       name: 'assemblyLine',
       javaType: 'foam.util.concurrent.AssemblyLine',
@@ -136,16 +151,13 @@ foam.CLASS({
       MedusaEntry old = (MedusaEntry) getDelegate().find_(x, entry.getId());
       entry = (MedusaEntry) getDelegate().put_(x, entry);
 
-      // Standalone
-      if ( support.getMediatorCount() == 1 ) {
+      if ( support.getStandAlone() ) {
         return ((DAO) x.get(getServiceName())).put(entry);
       }
 
-      // REVIEW: move to property - calculate once. 
       // Always broadcast to/from NODE,
       // otherwise only broadcast verified (promoted) entries to other MEDIATORS
-      if ( myConfig.getType() == MedusaType.NODE ||
-           getType() == MedusaType.NODE ||
+      if ( getBroadcast() ||
            ( myConfig.getType() == MedusaType.MEDIATOR &&
                // REVIEW: to avoid broadcast during reply, wait until ONLINE,
                // mediators may miss data between replayComplete and status change to ONLINE.

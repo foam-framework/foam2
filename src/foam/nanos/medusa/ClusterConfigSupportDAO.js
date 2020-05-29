@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'ClusterConfigSupportDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  documentation: `Monitor the ClusterConfig DAO and update appropriate ClusterConfigSupport properties`,
+  documentation: `Monitor the ClusterConfig DAO and resets a selection of ClusterConfigSupport properties when configuration changes.`,
 
   javaImports: [
     'foam.nanos.logger.PrefixLogger',
@@ -47,6 +47,7 @@ foam.CLASS({
       if ( old == null ) {
         ClusterConfigSupport.NODE_COUNT.clear(support);
         ClusterConfigSupport.MEDIATOR_COUNT.clear(support);
+        ClusterConfigSupport.STAND_ALONE.clear(support);
         ClusterConfigSupport.CLIENTS.clear(support);
       }
 

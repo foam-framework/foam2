@@ -155,6 +155,16 @@ foam.CLASS({
       javaCode: `
       return this;
       `
+    },
+    {
+      name: 'toSummary',
+      type: 'String',
+      code: function() {
+        return this.index + ' ' + this.nSpecName;
+      },
+      javaCode: `
+        return getIndex() + " " + getNSpecName();
+      `
     }
   ]
 });

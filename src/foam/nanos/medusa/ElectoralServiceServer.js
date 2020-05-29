@@ -241,7 +241,7 @@ foam.CLASS({
       setElectionTime(System.currentTimeMillis());
       setState(ElectoralServiceState.ELECTION);
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      if ( support.getMediatorCount() == 1 ) {
+      if ( support.getStandAlone() ) {
         setState(ElectoralServiceState.IN_SESSION);
         setElectionTime(0L);
         setCurrentSeq(0L);

@@ -172,6 +172,20 @@ configuration for contacting the primary node.`,
       `
     },
     {
+      documentation: 'A single instance is using the medusa journal. No other clustering features are used.',
+      name: 'standAlone',
+      class: 'Boolean',
+      visibility: 'RO',
+      javaFactory: `
+      if ( getMediatorCount() == 1 ) {
+        ClusterConfig config = getConfig(getX(), getConfigId());
+        return config.getType() == MedusaType.MEDIATOR &&
+               config.getZone() == 0L;
+      }
+      return false;
+      `
+    },
+    {
       name: 'logger',
       class: 'FObjectProperty',
       of: 'foam.nanos.logger.Logger',
@@ -706,6 +720,6 @@ configuration for contacting the primary node.`,
       }
       throw new IllegalArgumentException("MDAO not found: "+serviceName);
       `
-    }
+    },
   ]
 });

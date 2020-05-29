@@ -134,9 +134,8 @@ foam.CLASS({
         config = (ClusterConfig) config.fclone();
         config.setStatus(Status.ONLINE);
         ((DAO) x.get("localClusterConfigDAO")).put(config);
-      } else if ( config.getType() == MedusaType.MEDIATOR &&
-                  config.getStatus() == Status.OFFLINE &&
-                  support.getMediatorCount() == 1 ) {
+      } else if ( support.getStandAlone() &&
+                  config.getStatus() == Status.OFFLINE ) {
         // standalone mode.
         config = (ClusterConfig) config.fclone();
         config.setStatus(Status.ONLINE);
