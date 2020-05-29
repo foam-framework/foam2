@@ -199,10 +199,12 @@ foam.CLASS({
       label: 'next',
       code: function(x) {
         this.data.next().then((isFinished) => {
+          console.log('finished?', isFinished);
           if ( isFinished ) {
             this.onClose(x);
           }
         }).catch(e => {
+          console.error(e);
           x.ctrl.notify(this.ERROR_MSG);
         });
       }

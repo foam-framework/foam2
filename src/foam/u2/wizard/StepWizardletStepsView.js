@@ -10,6 +10,10 @@ foam.CLASS({
     ^item > .circle {
       margin-right: 15px;
     }
+    ^sub-item {
+      padding-left: calc(24px + 15px + 4px);
+      line-height: 40px;
+    }
   `,
 
   imports: [
@@ -17,6 +21,7 @@ foam.CLASS({
   ],
 
   requires: [
+    'foam.u2.detail.AbstractSectionedDetailView',
     'foam.u2.wizard.util.CircleIndicator'
   ],
 
@@ -59,7 +64,23 @@ foam.CLASS({
                 .end()
 
                 // Render title
-                .add(wizardlet.title)
+                .add(wizardlet.title);
+            
+            // Render section labels
+            let sections = null;
+            (() => {
+              let tmpAbstractSDV = this.AbstractSectionedDetailView.create({
+                of: wizardlet.of,
+              });
+              sections = tmpAbstractSDV.sections;
+            })();
+
+            for ( let s = 0 ; s < sections.length ; s++ ) {
+              let section = sections[s];
+              elem = self.renderSectionLabel(elem, section, s+1);
+            }
+
+            elem = elem
               .end();
 
             // Prepare for next item
@@ -69,6 +90,15 @@ foam.CLASS({
 
           return elem;
         }))
+    },
+    function renderSectionLabel(elem, section, index) {
+      let title = section.title;
+      if ( ! title ) title = "Part " + index;
+      return elem
+        .start()
+          .addClass(this.myClass('sub-item'))
+          .add(section.title)
+        .end();
     }
   ]
 });
