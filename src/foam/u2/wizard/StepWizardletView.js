@@ -68,6 +68,7 @@ foam.CLASS({
     }
     ^ .foam-u2-stack-StackView {
       height: auto;
+      margin-bottom: 30px;
     }
     ^fix-grid {
       height: 100%;
@@ -116,14 +117,7 @@ foam.CLASS({
                 })
               .end()
             .end()
-            .tag({
-              class: 'foam.u2.stack.StackView',
-              data$: this.data.subStack$,
-              showActions: false
-            })
-            // This should work!; Worth investigating why Stack
-            //   can't be rendered this way:
-            // .add(this.SUB_STACK)
+            .add(this.data.SUB_STACK)
             .add(this.slot(function (data$isLastWizardlet) {
               return this.E()
                 .startContext({ data: self })
