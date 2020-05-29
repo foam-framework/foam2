@@ -52,7 +52,7 @@ foam.CLASS({
           else  notification.setGroupId(user.getGroup());
 
           notification.setNotificationType("Capability Status Update");
-          notification.setIssuedDate(new Date());
+          notification.setCreated(new Date());
           notification.setBody(sb.toString());
           notificationDAO.put(notification);
         }
