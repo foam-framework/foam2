@@ -61,22 +61,6 @@ foam.INTERFACE({
           type: 'foam.nanos.auth.User'
         }
       ]
-    },
-    {
-      name: 'getCurrentAgent',
-      type: 'foam.nanos.auth.User',
-      async: true,
-      javaThrows: [
-        'foam.nanos.auth.AuthorizationException',
-        'foam.nanos.auth.AuthenticationException'
-      ],
-      swiftThrows: true,
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        }
-      ]
     }
   ]
 });

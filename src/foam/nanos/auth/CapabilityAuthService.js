@@ -27,6 +27,7 @@ foam.CLASS({
     'foam.mlang.predicate.AbstractPredicate',
     'foam.mlang.predicate.Predicate',
     'foam.nanos.auth.Subject',
+    'foam.nanos.crunch.AgentCapabilityJunction',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityRuntimeException',
     'foam.nanos.crunch.CapabilityJunctionStatus',
@@ -143,10 +144,14 @@ foam.CLASS({
         if ( x.get(Session.class) == null ) return false;
         if ( user == null || ! user.getEnabled() ) return false;
         User agent = ((Subject) x.get("subject")).getRealUser();
+        String agentKey = agent.getId() == user.getId() ? 
+          null : 
+          user.getId() + ":" + agent.getId() + permission;
+        String userKey = user.getId() + permission;
         this.initialize(x);
 
-        String key = user.getId() + permission;
-        Boolean result = ( (Map<String, Boolean>) getCache() ).get(key);
+        Boolean result = ( (Map<String, Boolean>) getCache() ).get(userKey);
+        if ( agentKey != null ) result = result == null || ! result ?  ( (Map<String, Boolean>) getCache() ).get(agentKey) : result;
         if ( result != null ) {
           if ( ! result ) maybeIntercept(x, permission);
           return result;
@@ -177,11 +182,20 @@ foam.CLASS({
                 EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
               )) != null ) {
               result = true;
+              // if the user has the permission, store this in the cache and return the result
+              // otherwise, move on to the 2nd part of the check
+              if ( result ) {
+                ((Map<String, Boolean>) getCache()).put(userKey, result);
+                return result;
+              }
             } else if ( cap != null && agent != null && agent.getId() != user.getId() ) {
               // if the agent is in the context and is not the same as user, check 
               // if the agent has capability
-              userPredicate = EQ(UserCapabilityJunction.SOURCE_ID, agent.getId());
-              key = agent.getId() + permission;
+              userPredicate = AND(
+                INSTANCE_OF(AgentCapabilityJunction.class),
+                EQ(UserCapabilityJunction.SOURCE_ID, agent.getId()),
+                EQ(AgentCapabilityJunction.EFFECTIVE_USER, user.getId())
+              );
               if ( userCapabilityJunctionDAO.find(
                 AND(
                   userPredicate,
@@ -190,18 +204,17 @@ foam.CLASS({
                   EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
                 )) != null )
                 result = true;
-            }
-            // if the user has the permission, store this in the cache and return the result
-            // otherwise, move on to the 2nd part of the check
-            if ( result ) {
-              ((Map<String, Boolean>) getCache()).put(key, result);
-              return result;
+                // if the user has the permission, store this in the cache and return the result
+                // otherwise, move on to the 2nd part of the check
+                if ( result ) {
+                  if ( agentKey != null ) ((Map<String, Boolean>) getCache()).put(agentKey, result);
+                  return result;
+                }
             }
           }
 
           // 2. check if the user has a capability that grants the permission
           userPredicate = EQ(UserCapabilityJunction.SOURCE_ID, user.getId());
-          key = user.getId() + permission;
           AbstractPredicate predicate = new AbstractPredicate(x) {
             @Override
             public boolean f(Object obj) {
@@ -219,21 +232,24 @@ foam.CLASS({
           }
           // Add the result to the cache
           if ( result ) {
-            (( Map<String, Boolean> ) getCache()).put(key, result);
+            (( Map<String, Boolean> ) getCache()).put(userKey, result);
             return true;
           }
 
           // 3. check if the agent has a capability that grants the permission
           if ( agent != null ) {
-            userPredicate = EQ(UserCapabilityJunction.SOURCE_ID, agent.getId());
-            key = agent.getId() + permission;
+            userPredicate = AND(
+              INSTANCE_OF(AgentCapabilityJunction.class),
+              EQ(UserCapabilityJunction.SOURCE_ID, agent.getId()),
+              EQ(AgentCapabilityJunction.EFFECTIVE_USER, user.getId())
+            );
             if ( userCapabilityJunctionDAO.find(AND(userPredicate, capabilityScope, predicate)) != null ) {
               result = true;
             }
 
             // Add the result to the cache
             if ( result ) {
-              (( Map<String, Boolean> ) getCache()).put(key, result);
+              if ( agentKey != null ) (( Map<String, Boolean> ) getCache()).put(agentKey, result);
               return true;
             }
           }

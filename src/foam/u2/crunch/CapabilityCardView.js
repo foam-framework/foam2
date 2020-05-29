@@ -55,24 +55,15 @@ foam.CLASS({
             self.EQ(self.UserCapabilityJunction.SOURCE_ID, self.user.id),
             self.EQ(self.UserCapabilityJunction.TARGET_ID, self.data.id),
           )).then(ucj => {
-            if ( ! ucj ) {
-              var badge = self.Element.create();
-              badge
-                .addClass(self.s.myClass('badge'))
-                .addClass(self.s.myClass('badge-info'))
-                .add("available")
-                ;
-              badgeWrapper.add(badge);
+            var statusEnum =  foam.nanos.crunch.CapabilityJunctionStatus.AVAILABLE;
+            if ( ucj ) {
+              statusEnum = ucj.status;
             }
-            else {
-              var badge = self.ReadOnlyEnumView.create({
-                data: ucj.status
-              })
-                .addClass(self.s.myClass('badge'))
-                .style({ 'background-color': ucj.status.background })
-                ;
-              badgeWrapper.add(badge);
-            }
+            var badge = self.ReadOnlyEnumView.create({
+                data: statusEnum
+              }).addClass(self.s.myClass('badge'))
+              .style({ 'background-color': statusEnum.background });
+            badgeWrapper.add(badge);
           });
         })
         .end()

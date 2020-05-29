@@ -59,7 +59,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'browseSubtitle',
-      expression: function(of) { return "View all " + of.model_.plural.toLowerCase() +'.' }
+      expression: function(of) { return 'View all ' + of.model_.plural.toLowerCase() + '.' }
     },
     {
       class: 'String',

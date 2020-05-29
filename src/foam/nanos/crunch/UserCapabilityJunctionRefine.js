@@ -38,11 +38,20 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.nanos.crunch.CapabilityJunctionStatus',
       value: foam.nanos.crunch.CapabilityJunctionStatus.ACTION_REQUIRED
-    },
-    {
-      name: 'reviewed',
-      class: 'Boolean',
-      permissionRequired: true
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.nanos.crunch',
+  name: 'AgentCapabilityJunction',
+  extends: 'foam.nanos.crunch.UserCapabilityJunction',
+
+  properties: [
+    {
+      name: 'effectiveUser',
+      class: 'Reference',
+      of: 'foam.nanos.auth.User'
+    }
+  ]
+})
