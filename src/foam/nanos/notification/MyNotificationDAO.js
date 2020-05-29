@@ -30,7 +30,7 @@ foam.CLASS({
     {
       name: 'select_',
       javaCode: `
-      User user = ((Subject) x.get("subject")).getUser();
+        User user = ((Subject) x.get("subject")).getRealUser();
 
         return getDelegate().where(
             MLang.EQ(Notification.USER_ID, user.getId())
