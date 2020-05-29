@@ -140,9 +140,7 @@ foam.CLASS({
     'foam.nanos.app.AppConfig',
     'foam.util.SafetyUtil',
     'java.util.List',
-    'javax.security.auth.AuthPermission',
-    'javax.servlet.http.HttpServletRequest',
-    'org.eclipse.jetty.server.Request',
+    'javax.security.auth.AuthPermission'
   ],
 
   methods: [
