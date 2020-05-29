@@ -61,10 +61,7 @@ foam.CLASS({
         })
 
         return groupName;
-      },
-      javaCode: `
-        return "test";
-      `
+      }
     }
   ]
 });
