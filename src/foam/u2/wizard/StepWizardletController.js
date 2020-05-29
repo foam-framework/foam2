@@ -136,7 +136,6 @@ foam.CLASS({
 
         let p = Promise.resolve();
         if ( this.screenIndexToSection(previousScreenIndex)[0] !== wizardletIndex ) {
-          console.log('p will save ', this.currentWizardlet.id);
           p = this.currentWizardlet.save();
         }
         return p.then(() => {
@@ -147,15 +146,6 @@ foam.CLASS({
           let sectionIndices = this.screenIndexToSection(screenIndex);
           let wizardletIndex = sectionIndices[0];
           let sectionIndex = sectionIndices[1];
-
-          console.log('DEBUG INFO', {
-            previousScreenIndex: previousScreenIndex,
-            screenIndex: screenIndex,
-            wizardletIndex: wizardletIndex,
-            sectionIndex: sectionIndex,
-            section: this.sections[wizardletIndex][sectionIndex],
-            numberOfScreens: this.numberOfScreens,
-          });
 
           // Section and wizardlet can be obtained with above indices
           let section = this.sections[wizardletIndex][sectionIndex];
