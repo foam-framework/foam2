@@ -42,24 +42,6 @@ foam.INTERFACE({
         }
       ],
       javaThrows: [ 'java.io.IOException', 'java.security.GeneralSecurityException' ]
-    },
-    {//move it to different interface later
-      name: 'getValues',
-      args: [
-        {
-          name: 'x',
-          type: 'Context',
-        },
-        {
-          name: 'spreadsheetId',
-          type: 'String'
-        },
-        {
-          name: 'cellsRange',
-          type: 'String'
-        }
-      ],
-      javaThrows: [ 'java.io.IOException', 'java.security.GeneralSecurityException' ]
     }
   ]
 });

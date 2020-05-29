@@ -233,6 +233,8 @@ foam.CLASS({
     },
     {
       name: 'getValues',
+      type: 'Object',
+      javaType: 'List<List<Object>>',
       args: [
         {
           name: 'x',
@@ -258,6 +260,8 @@ foam.CLASS({
           service.spreadsheets().values().get(spreadsheetId, cellsRange);
           ValueRange response = request.execute();
           System.out.println("done");
+          List<List<Object>> values = response.getValues();
+          return values;
       `
     }
   ]
