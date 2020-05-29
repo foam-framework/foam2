@@ -230,6 +230,30 @@ foam.CLASS({
           l.error(e);
         }
       `
+    },
+    {
+      name: 'getValues',
+      args: [
+        {
+          name: 'x',
+          type: 'Context',
+        },
+        {
+          name: 'spreadsheetId',
+          type: 'String'
+        }
+      ],
+      javaThrows: [ 'java.io.IOException', 'java.security.GeneralSecurityException' ],
+      javaCode: `
+          final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+          GoogleApiAuthService googleApiAuthService = (GoogleApiAuthService)getX().get("googleApiAuthService");
+          Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, SCOPES))
+            .setApplicationName("nanopay")
+            .build();
+          Sheets.Spreadsheets.Get request = service.spreadsheets().get(spreadsheetId);
+          Spreadsheet response = request.execute();
+          System.out.println("done");
+      `
     }
   ]
 });
