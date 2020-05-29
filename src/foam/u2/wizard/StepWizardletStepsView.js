@@ -29,18 +29,19 @@ foam.CLASS({
     function initE() {
       var self = this;
       this
-        .add(this.slot(function (data$wizardlets) {
+        .add(this.slot(function (data$wizardlets, data$subStack$pos) {
           let elem = this.E();
 
           let afterCurrent = false;
-          let displayNumber = 1;
-          data$wizardlets.forEach(wizardlet => {
+
+          for ( let w = 0 ; w < data$wizardlets.length ; w++ ) {
+            let wizardlet = this.data.wizardlets[w];
             let isCurrent = wizardlet === this.data.currentWizardlet;
 
             let baseCircleIndicator = {
               size: 24,
               borderThickness: 2,
-              label: '' + displayNumber,
+              label: '' + (1 + w),
             };
             elem = elem
               .start()
@@ -66,38 +67,41 @@ foam.CLASS({
                 // Render title
                 .add(wizardlet.title);
             
+            // Get section index to highlight current section
+            let indices = this.data.screenIndexToSection(data$subStack$pos);
+            
             // Render section labels
-            let sections = null;
-            (() => {
-              let tmpAbstractSDV = this.AbstractSectionedDetailView.create({
-                of: wizardlet.of,
-              });
-              sections = tmpAbstractSDV.sections;
-            })();
+            let sections = this.data.sections[w];
 
             for ( let s = 0 ; s < sections.length ; s++ ) {
               let section = sections[s];
-              elem = self.renderSectionLabel(elem, section, s+1);
+              elem = self.renderSectionLabel(
+                elem,
+                section, s+1,
+                indices[1] === s && isCurrent
+              );
             }
 
             elem = elem
               .end();
 
-            // Prepare for next item
-            displayNumber++;
             if ( isCurrent ) afterCurrent = true;
-          })
+          }
 
           return elem;
         }))
     },
-    function renderSectionLabel(elem, section, index) {
+    function renderSectionLabel(elem, section, index, highlight) {
       let title = section.title;
-      if ( ! title ) title = "Part " + index;
+      if ( ! title || ! title.trim() ) title = "Part " + index;
       return elem
         .start()
           .addClass(this.myClass('sub-item'))
-          .add(section.title)
+          .style({
+            'color': highlight ? this.theme.primary1 : 'inherit',
+            'font-weight': highlight ? 'bold' : 'inherit'
+          })
+          .add(title)
         .end();
     }
   ]
