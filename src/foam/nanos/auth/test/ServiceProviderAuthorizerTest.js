@@ -25,7 +25,7 @@ foam.CLASS({
         User nonAdminUser = new User();
         DAO bareUserDAO = (DAO) x.get("bareUserDAO");
         DAO serviceProviderDAO = (DAO) x.get("serviceProviderDAO");
-        ServiceProvider serviceProvider = new ServiceProvider();
+        ServiceProvider serviceProvider = new ServiceProvider.Builder(x).setId("test").build();
         boolean threw;
 
         nonAdminUser = (User) bareUserDAO.put(nonAdminUser);

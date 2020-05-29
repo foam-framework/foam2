@@ -37,6 +37,7 @@ foam.CLASS({
     'foam.nanos.auth.Group',
     'foam.nanos.auth.ResendVerificationEmail',
     'foam.nanos.auth.User',
+    'foam.nanos.auth.Subject',
     'foam.nanos.theme.Theme',
     'foam.nanos.theme.Themes',
     'foam.nanos.theme.ThemeDomain',
@@ -287,13 +288,17 @@ foam.CLASS({
         // add user and agent for backward compatibility
         Object.defineProperty(self, 'user', {
           get: function() {
-            console.info("Deprecated use of user. Use Subject to retrieve user")
+            console.info("Deprecated use of user. Use Subject to retrieve user");
             return this.subject.user;
+          },
+          set: function(newValue) {
+            console.warn("Deprecated use of user setter");
+            this.subject.user = newValue;
           }
         });
         Object.defineProperty(self, 'agent', {
           get: function() {
-            console.warn("Deprecated use of agent")
+            console.warn("Deprecated use of agent");
             return this.subject.realUser;
           }
         });
@@ -301,6 +306,7 @@ foam.CLASS({
         // Fetch the group only once the user has logged in. That's why we await
         // the line above before executing this one.
         await self.fetchGroup();
+        await self.fetchTheme();
         self.onUserAgentAndGroupLoaded();
       });
     },

@@ -28,6 +28,7 @@ FOAM_FILES([
   { name: "foam/nanos/app/ClientAppConfigService" },
   { name: "foam/nanos/controller/ApplicationController" },
   { name: "foam/nanos/app/Mode" },
+  { name: "foam/nanos/app/TwilioConfig" },
   { name: 'foam/nanos/alarming/Alarm' },
   { name: 'foam/nanos/alarming/Alarming' },
   { name: 'foam/nanos/alarming/AlarmConfig' },
@@ -262,6 +263,10 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/email/Status' },
   { name: 'foam/nanos/notification/push/PushService' },
   { name: 'foam/nanos/notification/push/FirebasePushService' },
+  { name: 'foam/nanos/notification/sms/SMSMessage' },
+  { name: 'foam/nanos/notification/sms/SMSService' },
+  { name: 'foam/nanos/notification/sms/SMSStatus' },
+  { name: 'foam/nanos/notification/sms/TwilioSMSService' },
   { name: 'foam/nanos/om/OMBox' },
   { name: 'foam/nanos/demo/DemoObject' },
   { name: 'foam/nanos/demo/Demo' },
@@ -291,7 +296,7 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/NotificationNotificationView'},
   { name: 'foam/nanos/notification/NotificationHostnameRuleAction'},
   { name: 'foam/nanos/notification/notifications/ScriptRunNotification'},
-  { name: 'foam/nanos/notification/notifications/ScriptRunNotificationNotificationView'},
+  { name: 'foam/nanos/notification/notifications/ScriptRunNotificationNotificationCitationView'},
   { name: 'foam/nanos/dashboard/Demo' },
 
   // Ticket
