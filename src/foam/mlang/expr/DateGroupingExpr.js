@@ -16,6 +16,13 @@ foam.CLASS({
     Currently works with hours, days, weeks, months, years/
   `,
 
+  javaImports: [
+    'foam.nanos.auth.CreatedAware',
+    'java.util.Arrays',
+    'java.util.Comparator',
+    'java.util.Date'
+  ],
+
   properties: [
     {
       class: 'Enum',
@@ -63,7 +70,34 @@ foam.CLASS({
         return groupName;
       },
       javaCode: `
-        return "test";
+        DateGrouping[] dateGroupsSorted = getDateGroups().clone();
+
+        Arrays.sort(dateGroupsSorted, new Comparator<DateGrouping>() {
+          public int compare(DateGrouping a, DateGrouping b) {
+            return a.getLow() - b.getHigh();
+          }
+        });
+
+        Date today = new Date();
+
+        CreatedAware createdAwareObj = (CreatedAware) obj;
+
+        Double objDiffFromTodayMs = Math.floor(today.getTime()) - Math.floor(createdAwareObj.getCreated().getTime());
+
+        Double objDiffFromTodayConverted = objDiffFromTodayMs / getDateGroupingType().getConversionFactorMs();
+
+        for ( int i = 0; i < dateGroupsSorted.length; i++ ){
+          DateGrouping group = dateGroupsSorted[i];
+
+          if (
+            objDiffFromTodayConverted >= group.getLow() &&
+            objDiffFromTodayConverted < group.getHigh()
+          ) {
+            return group.getName();
+          }
+        }
+
+        return "Unknown Range";
       `
     }
   ]
