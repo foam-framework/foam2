@@ -107,15 +107,20 @@ foam.CLASS({
 
       checkOwnership(x, ucJunction);
 
-      // if the junction is being updated from GRANTED to EXPIRED, put into junctionDAO without checking prereqs and data
-      if ( old != null && old.getStatus() == CapabilityJunctionStatus.GRANTED && ucJunction.getStatus() == CapabilityJunctionStatus.EXPIRED )
-        return getDelegate().put_(x, ucJunction);
+      // if the junction is being updated from GRANTED to EXPIRED, put the updated ucj,
+      // then try to reput the ucj as new ucj
+      if ( old != null && old.getStatus() == CapabilityJunctionStatus.GRANTED && ucJunction.getStatus() == CapabilityJunctionStatus.EXPIRED ) {
+        getDelegate().put_(x, ucJunction);
+        old = null;
+      }
 
       boolean requiresData = capability.getOf() != null;
       boolean requiresReview = capability.getReviewRequired();
 
+      boolean ucjExpiredButCapabilityNot = ucJunction.getStatus() == CapabilityJunctionStatus.EXPIRED && ! capability.isExpired();
+
       // case old == null or status is actionRequired
-      if ( old == null || ucJunction.getStatus() == CapabilityJunctionStatus.ACTION_REQUIRED || ucJunction.getStatus() == CapabilityJunctionStatus.EXPIRED ) {
+      if ( old == null || ucJunction.getStatus() == CapabilityJunctionStatus.ACTION_REQUIRED || ucjExpiredButCapabilityNot ) {
         // if all the prereqs are passed and the data is validated, the status can go to pending
         if ( ( ! requiresData || ( ucJunction.getData() != null && validateData(x, ucJunction) ) ) && checkPrereqs(x, ucJunction) ) {
           // if review is required for this Capability, set the status to pending so that rules can be triggered

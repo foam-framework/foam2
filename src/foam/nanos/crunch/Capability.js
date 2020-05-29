@@ -18,6 +18,7 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.dao.Sink',
     'foam.mlang.sink.Count',
+    'java.util.Date',
     'java.util.List',
     'static foam.mlang.MLang.*'
   ],
@@ -263,6 +264,19 @@ foam.CLASS({
       return ((Count) count).getValue() > 0;
       `
     },
+    {
+      name: 'isExpired',
+      type: 'Boolean',
+      documentation: `check if a given capability is expired.`,
+      javaCode: `
+      if ( getExpiry() == null ) return false;
+
+      Date today = new Date();
+      Date capabilityExpiry = getExpiry();
+
+      return today.after(capabilityExpiry);
+      `
+    }
   ]
 });
 
