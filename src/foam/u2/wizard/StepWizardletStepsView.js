@@ -81,11 +81,18 @@ foam.CLASS({
 
             for ( let s = 0 ; s < sections.length ; s++ ) {
               let section = sections[s];
-              elem = self.renderSectionLabel(
-                elem,
-                section, s+1,
-                indices[1] === s && isCurrent
-              );
+              let slot = section.createIsAvailableFor(
+                wizardlet.data$
+              ).map(function (isAvailable) {
+                let e = self.E('span');
+                if ( isAvailable ) e = self.renderSectionLabel(
+                  e,
+                  section, s+1,
+                  indices[1] === s && isCurrent
+                );
+                return e;
+              })
+              elem.add(slot);
             }
 
             elem = elem

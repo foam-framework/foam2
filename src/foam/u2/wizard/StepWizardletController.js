@@ -37,11 +37,28 @@ foam.CLASS({
         to foam.layout.Section object.
       `,
       expression: function(wizardlets) {
-        return this.wizardlets.map(wizardlet => {
+        return wizardlets.map(wizardlet => {
           return this.AbstractSectionedDetailView.create({
             of: wizardlet.of,
           }).sections;
         });
+      }
+    },
+    {
+      name: 'sectionAvailableSlots',
+      documentation: `
+        Sometimes the slot returned by createIsAvailableFor doesn't
+        return the correct value immediately, so to simplify the
+        logic of the next() method these are created in advance.
+
+        Array format is similar to sections.
+      `,
+      expression: function(sections) {
+        return [...sections.keys()].map(w => sections[w].map(
+          section => section.createIsAvailableFor(
+            this.wizardlets[w].data$
+          )
+        ));
       }
     },
     {
@@ -140,15 +157,29 @@ foam.CLASS({
             numberOfScreens: this.numberOfScreens,
           });
 
+          // Section and wizardlet can be obtained with above indices
+          let section = this.sections[wizardletIndex][sectionIndex];
+          let wizardlet = this.wizardlets[wizardletIndex];
+
           // Set the highestIndex, this way if the user hits back and then save
           // it will still save all the wizardlets they visited.
           this.highestIndex = wizardletIndex;
           this.subStack.push({
             class: 'foam.u2.detail.SectionView',
-            section: this.sections[wizardletIndex][sectionIndex],
-            data$: this.wizardlets[wizardletIndex].data$,
+            section: section,
+            data$: wizardlet.data$,
           })
-          return false; // isFinished
+
+          // Automatically push the next section if this one is
+          // unavailable.
+          let slot = this.sectionAvailableSlots
+            [wizardletIndex][sectionIndex];
+          if ( ! slot.get() ) {
+            return this.next();
+          }
+
+          // Return false for "not finished"
+          return false;
         });
       },
     },
