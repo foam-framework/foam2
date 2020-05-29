@@ -49,7 +49,7 @@ foam.CLASS({
 
                 // Render circle indicator
                 .start(this.CircleIndicator,
-                  wizardlet === this.data.currentWizardlet ? {
+                  isCurrent ? {
                     ...baseCircleIndicator,
                     borderColor: this.theme.primary1
                   } : afterCurrent ? {
@@ -65,7 +65,13 @@ foam.CLASS({
                 .end()
 
                 // Render title
-                .add(wizardlet.title);
+                .start('span')
+                  .add(wizardlet.title)
+                  .style({
+                    'font-weight': isCurrent ? 'bold' : 'normal',
+                    'color': isCurrent ? this.theme.primary1 : 'inherit'
+                  })
+                .end();
             
             // Get section index to highlight current section
             let indices = this.data.screenIndexToSection(data$subStack$pos);

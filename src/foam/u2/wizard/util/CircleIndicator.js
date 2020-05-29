@@ -40,7 +40,7 @@ foam.CLASS({
     {
       name: 'textColor',
       class: 'String',
-      expression: function () { return this.borderColor; }
+      expression: function (stateBorderColor_) { return stateBorderColor_; }
     },
     {
       name: 'backgroundColor',
@@ -90,7 +90,7 @@ foam.CLASS({
           'height': '' + this.size + 'px',
           'line-height': '' + this.size + 'px',
           'font-size': this.size * 0.65,
-          'color': this.textColor,
+          'color': this.textColor$,
           'border': '' + this.borderThickness + 'px solid',
           'cursor': this.ExpressionSlot.create({
             obj: this,
