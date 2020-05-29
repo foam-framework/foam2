@@ -89,20 +89,15 @@ foam.CLASS({
       }
       return this.getCapabilities(capabilityId).then(capabilities => {
         // Map capabilities to CapabilityWizardSection objects
-        return Promise.all(capabilities.map(
+        return Promise.all(capabilities.filter(
+          cap => !! cap.of
+        ).map(
           cap => this.CapabilityWizardlet.create({
             capability: cap
           }).updateUCJ()
         ));
       }).then(sections => {
         return new Promise((wizardResolve) => {
-          var pos = self.stack.pos;
-          self.stack.pos$.sub(sub => {
-            if ( self.stack.pos === pos ) {
-              wizardResolve();
-              sub.detach();
-            }
-          });
           sections = sections.filter(wizardSection =>
             wizardSection.ucj === null || 
             ( 
@@ -115,7 +110,10 @@ foam.CLASS({
             data: foam.u2.wizard.StepWizardletController.create({
               wizardlets: sections
             }),
-            onClose: x => { x.closeDialog(); }
+            onClose: x => {
+              x.closeDialog();
+              wizardResolve();
+            }
           }));
         });
       }).catch(e => { console.log(e); });

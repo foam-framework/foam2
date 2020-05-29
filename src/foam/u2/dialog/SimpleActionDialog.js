@@ -54,27 +54,26 @@ foam.CLASS({
     function initE() {
       var self = this;
       this.SUPER();
-      this
-        .startContext(this.context)
+      this.startContext(this.context)
         .start().addClass(this.myClass())
-        .start().addClass('Container')
-          .start().addClass('headerTitle').add(this.title).end()
-          .start().addClass('content')
-            .add(this.body)
-          .end()
-          .start().addClass('actions')
-            .forEach(this.actions, function (action) {
-              var a = action.clone();
-              a.code = function (...args) {
-                self.closeDialog();
-                return action.code.call(action, ...args);
-              }
-              this.add(a);
-            })
+          .start().addClass('Container')
+            .start().addClass('headerTitle').add(this.title).end()
+            .start().addClass('content')
+              .add(this.body)
+            .end()
+            .start().addClass('actions')
+              .forEach(this.actions, function (action) {
+                var a = action.clone();
+                a.code = function (...args) {
+                  self.closeDialog();
+                  return action.code.call(action, ...args);
+                }
+                this.add(a);
+              })
+            .end()
           .end()
         .end()
-        .end()
-        .end();
+      .end();
     },
   ]
 });

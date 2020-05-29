@@ -55,6 +55,7 @@ foam.CLASS({
 
   methods: [
     function init() {
+      this.stackContext = this.__subContext__.createSubContext();
       this.stackContext.register(
         this.VerticalDetailView,
         'foam.u2.detail.SectionedDetailView'
@@ -85,7 +86,7 @@ foam.CLASS({
             this.subStack.push({
               class: 'foam.u2.detail.VerticalDetailView',
               data$: this.wizardlets[newIndex].data$,
-            }) 
+            })
             return false; // isFinished
           } else {
             return true; // isFinished

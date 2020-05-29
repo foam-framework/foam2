@@ -49,9 +49,6 @@ foam.CLASS({
       position: relative;
       height: auto;
       background-color: %GREY5%;
-
-      /* this view handles its own scrolling */
-      height: 100%;
     }
     ^status {
       background-color: %WHITE%;
@@ -182,10 +179,11 @@ foam.CLASS({
       name: 'close',
       label: 'Save for Later',
       code: function(x) {
-        this.data.save().then(() => {
+        this.data.saveProgress().then(() => {
           this.onClose(x);
         }).catch(e => {
-          x.ctrl.notify(this.ERROR_MSG_DRAFT);
+          console.error(e);
+          x.ctrl.notify(this.ERROR_MSG_DRAFT, 'error');
         });
       }
     },
