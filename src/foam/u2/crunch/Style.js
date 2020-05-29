@@ -192,14 +192,6 @@ foam.CLASS({
   `,
 
   methods: [
-    function addClassTo(subj, cls) {
-      if ( cls ) {
-        subj.addClass(this.myClass(cls));
-      } else {
-        subj.addClass(this.myClass());
-      }
-      return subj;
-    },
     function addBinds(subj) {
       subj.on('mouseover', function() {
         subj.addClass('state-hover');

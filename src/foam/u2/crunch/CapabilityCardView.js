@@ -33,14 +33,14 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
-      // Methods of Style all return the first argument for chaining
-      self.s = self.Style.create();
+      var style = self.Style.create();
+      style.addBinds(self);
       
       self
-        .s.addClassTo(self)
-        .s.addClassTo(self, 'mode-circle')
+        .addClass(style.myClass())
+        .addClass(style.myClass('mode-circle'))
         .start()
-          .addClass(self.s.myClass('icon-circle'))
+          .addClass(style.myClass('icon-circle'))
           .style({
             'background-image': "url('" + self.data.icon + "')",
             'background-size': 'cover',
@@ -68,23 +68,22 @@ foam.CLASS({
         })
         .end()
         .start()
-          .addClass(self.s.myClass('card-title'))
+          .addClass(style.myClass('card-title'))
           .add(( self.data.name != '') ? self.data.name : self.data.id)
         .end()
         .start()
-          .addClass(self.s.myClass('card-subtitle'))
+          .addClass(style.myClass('card-subtitle'))
           .select(self.data.categories.dao
             .where(this.EQ(foam.nanos.crunch.CapabilityCategory.VISIBLE, true)), function (category) {
               return this.E('span')
-                .addClass(self.s.myClass('category'))
+                .addClass(style.myClass('category'))
                 .add(category.name);
           })
         .end()
         .start()
-          .addClass(self.s.myClass('card-description'))
+          .addClass(style.myClass('card-description'))
           .add(self.data.description)
         .end()
-        .s.addBinds(self)
         ;
     }
   ]
