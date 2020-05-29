@@ -247,8 +247,8 @@ foam.CLASS({
         var exportDriver    = foam.lookup(this.exportDriverReg.driverName).create();
         try {
           var url = this.exportData ?
-          await exportDriver.exportDAO(this.__context__, this.exportData) :
-          await exportDriver.exportFObject(this.__context__, this.exportObj);
+            await exportDriver.exportDAO(this.__context__, this.exportData) :
+            await exportDriver.exportFObject(this.__context__, this.exportObj);
         } finally {
           if ( this.exportAllColumns )
             this.filteredTableColumns = filteredColumnsCopy;
