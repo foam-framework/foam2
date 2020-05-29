@@ -45,6 +45,10 @@ foam.CLASS({
     'foam.box.Message',
   ],
 
+  javaImports: [
+    'javax.servlet.http.HttpServletRequest'
+  ],
+
   imports: [
     'creationContext',
     {
@@ -85,6 +89,21 @@ foam.CLASS({
       class: 'String',
       name: 'method',
       value: 'POST'
+    },
+    {
+      documentation: 'Calling http url, used when explicitly making cross site requests.',
+      name: 'origin',
+      class: 'String',
+      factory: function() {
+        return this.window && this.window.location.origin;
+      },
+      javaFactory: `
+      HttpServletRequest req = getX().get(HttpServletRequest.class);
+      if ( req != null ) {
+        return req.getScheme()+"://"+req.getServerName();
+      }
+      return null;
+      `
     },
     {
       class: 'Enum',
@@ -199,10 +218,11 @@ protected class ResponseThread implements Runnable {
 
         var req = this.HTTPRequest.create({
           url:     this.prepareURL(this.url),
-          method:  this.method,
+          method: this.method,
           payload: payload,
           headers: {
-            'Content-Type': 'application/json; charset=utf-8'
+            'Content-Type': 'application/json; charset=utf-8',
+            'Origin': this.origin
           }
         }).send();
 
@@ -296,6 +316,9 @@ task.resume()
       conn.setRequestMethod("POST");
       conn.setRequestProperty("Accept", "application/json");
       conn.setRequestProperty("Content-Type", "application/json");
+      if ( getOrigin() != null ) {
+        conn.setRequestProperty("Origin", getOrigin());
+      }
       if ( getAuthorizationType().equals(HTTPAuthorizationType.BEARER) ) {
         conn.setRequestProperty("Authorization", "BEARER "+getSessionID());
       }
