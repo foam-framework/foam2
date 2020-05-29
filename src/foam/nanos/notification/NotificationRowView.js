@@ -173,24 +173,6 @@
         })
       },
       {
-        name: 'removeNotification',
-        confirmationRequired: true,
-        code: function(X) {
-          var self = X.rowView;
-          self.notificationDAO.remove(self.data).then(_ => {
-            self.finished.pub();
-            if ( self.summaryView && foam.u2.GroupingDAOList.isInstance(self.summaryView) ){
-              self.summaryView.update();
-            } else {
-              self.stack.push({
-                class: 'foam.nanos.notification.NotificationView'
-              });
-            }
-          })
-        },
-        confirmationRequired: true
-      },
-      {
         name: 'markAsRead',
         isAvailable: (read) => {
           return ! read;
@@ -210,8 +192,7 @@
               }
             });
           }
-        },
-        confirmationRequired: true
+        }
       },
       {
         name: 'markAsUnread',
@@ -233,8 +214,7 @@
               }
             })
           }
-        },
-        confirmationRequired: true
+        }
       }
     ]
   });
