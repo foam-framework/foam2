@@ -41,3 +41,17 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.nanos.crunch',
+  name: 'AgentCapabilityJunction',
+  extends: 'foam.nanos.crunch.UserCapabilityJunction',
+
+  properties: [
+    {
+      name: 'effectiveUser',
+      class: 'Reference',
+      of: 'foam.nanos.auth.User'
+    }
+  ]
+})

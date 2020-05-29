@@ -36,7 +36,7 @@ foam.ENUM({
       label: 'action required',
       documentation: `A capability started and requiring user action, should have ucj in this state.`,
       background: '#bf3232'
-    },
+    }
   ]
 });
   
