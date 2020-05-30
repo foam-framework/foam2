@@ -159,8 +159,15 @@ p({
 })
 
 p({
-  "class":"foam.nanos.boot.NSpec", 
-  "name":"twilioConfig",                     
-  "lazy":false,  
+  "class":"foam.nanos.boot.NSpec",
+  "name":"twilioConfig",
+  "lazy":false,
   "service":{"class":"foam.nanos.app.TwilioConfig"}
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"SMTPConfig",
+  "lazy": false,
+  "service":{"class":"foam.nanos.app.SMTPConfig"}
 })

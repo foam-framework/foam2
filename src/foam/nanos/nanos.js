@@ -25,6 +25,7 @@ FOAM_FILES([
   { name: "foam/nanos/app/ContextLookupAppConfigService"},
   { name: "foam/nanos/app/AppConfigService" },
   { name: "foam/nanos/app/EmailConfig" },
+  { name: "foam/nanos/app/SMTPConfig" },
   { name: "foam/nanos/app/ClientAppConfigService" },
   { name: "foam/nanos/controller/ApplicationController" },
   { name: "foam/nanos/app/Mode" },

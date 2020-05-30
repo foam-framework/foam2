@@ -513,6 +513,7 @@ var classes = [
 
   'foam.nanos.app.EmailConfig',
   'foam.nanos.app.TwilioConfig',
+  'foam.nanos.app.SMTPConfig',
 
   'foam.nanos.test.StockSnapshot',
   'foam.nanos.analytics.FoldManagerDAODecorator',
