@@ -35,7 +35,6 @@ foam.CLASS({
   requires: [
     'foam.nanos.client.ClientBuilder',
     'foam.nanos.auth.Group',
-    'foam.nanos.auth.ResendVerificationEmail',
     'foam.nanos.auth.User',
     'foam.nanos.theme.Theme',
     'foam.nanos.theme.Themes',
