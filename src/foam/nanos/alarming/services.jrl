@@ -46,6 +46,7 @@ p({
       .setSeqNo(true)
       .setPm(true)
       .setPipelinePm(true)
+      .setCluster(false)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("alarms")
       .setOrder(new foam.mlang.order.Comparator[] {
@@ -64,6 +65,7 @@ p({
   "serviceScript":`
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.alarming.OMName.getOwnClassInfo())
+      .setCluster(false)
       .build();
     `
   ,"client":"{\"of\":\"foam.nanos.alarming.OMName\"}"
