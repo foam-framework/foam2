@@ -3,22 +3,32 @@ p({
   "name": "OMLogger",
   "serviceClass": "foam.nanos.om.OMLogger"
 })
+
 p({
   "class": "foam.nanos.boot.NSpec",
   "name": "om1minDAO",
   "serve": true,
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
-      .setPm(false)
-      .setPipelinePm(false)
-      .setInnerDAO(new foam.dao.MDAO(foam.nanos.analytics.Candlestick.getOwnClassInfo()))
-      .setOf(foam.nanos.analytics.Candlestick.getOwnClassInfo())
       .setCluster(false)
+      .setPm(true)
+      .setPipelinePm(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("OMMinutely")
+      .setOf(foam.nanos.analytics.Candlestick.getOwnClassInfo())
+      .setDecorator(new foam.nanos.alarming.AlarmingUniqueNameDAO.Builder(x).setDelegate(new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.analytics.Candlestick.getOwnClassInfo()).build()).build())
+      .setCluster(false)
+      .setRuler(false)
       .setWriteOnly(true)
       .build();
   """,
-  "client": "{\"of\":\"foam.nanos.analytics.Candlestick\"}"
+  "client": """
+    {
+      "of":"foam.nanos.analytics.Candlestick"
+    }
+  """
 })
+
 p({
   "class": "foam.nanos.boot.NSpec",
   "name": "omHourlyDAO",
