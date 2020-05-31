@@ -233,8 +233,8 @@ foam.CLASS({
     },
     {
       name: 'getValues',
-      type: 'ValueRange',
-      javaType: 'List<List<Object>>',
+      type: 'Object',
+      javaType: 'ValueRange',
       args: [
         {
           name: 'x',
