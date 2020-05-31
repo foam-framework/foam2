@@ -46,12 +46,17 @@ public class SessionServerBox
   public void send(Message msg) {
     Logger logger = (Logger) getX().get("logger");
     NSpec spec = getX().get(NSpec.class);
+    DAO sessionDAO = (DAO) getX().get("localSessionDAO");
+    Session session = null;
     String sessionID = null;
 
     try {
       HttpServletRequest req = getX().get(HttpServletRequest.class);
       if ( req != null ) {
         String authorization = req.getHeader("Authorization");
+        if ( SafetyUtil.isEmpty(authorization) ) {
+          authorization = req.getHeader("authorization");
+        }
         if ( ! SafetyUtil.isEmpty(authorization) ) {
           StringTokenizer st = new StringTokenizer(authorization);
           if ( st.hasMoreTokens() ) {
@@ -61,12 +66,13 @@ public class SessionServerBox
                 sessionID = st.nextToken();
                 if ( sessionID != null ) {
                   // test and use non-clustered medusa sessions
-                  DAO sessionDAO = (DAO) getX().get("internalSessionDAO");
-                  if ( sessionDAO != null ) {
-                    Session session = (Session) sessionDAO.find(sessionID);
+                  DAO internalSessionDAO = (DAO) getX().get("internalSessionDAO");
+                  if ( internalSessionDAO != null ) {
+                    session = (Session) internalSessionDAO.find(sessionID);
                     if ( session != null ) {
                       logger.debug("Using internalSessionDAO");
                       session.setClusterable(false);
+                      sessionDAO = internalSessionDAO;
                     }
                   }
                 }
@@ -89,18 +95,19 @@ public class SessionServerBox
         }
       }
 
-      if ( sessionID == null ) {
-        sessionID = (String) msg.getAttributes().get("sessionId");
+      if ( session == null ) {
+        if ( sessionID == null ) {
+          sessionID = (String) msg.getAttributes().get("sessionId");
 
+        }
+
+        if ( sessionID == null && authenticate_ ) {
+          msg.replyWithException(new IllegalArgumentException("sessionid required for authenticated services"));
+          return;
+        }
+
+        session = sessionID == null ? null : (Session) sessionDAO.find(sessionID);
       }
-
-      if ( sessionID == null && authenticate_ ) {
-        msg.replyWithException(new IllegalArgumentException("sessionid required for authenticated services"));
-        return;
-      }
-
-      DAO sessionDAO = (DAO) getX().get("localSessionDAO");
-      Session session = sessionID == null ? null : (Session) sessionDAO.find(sessionID);
 
       if ( session == null ) {
         session = new Session((X) getX().get(Boot.ROOT));
@@ -155,7 +162,7 @@ public class SessionServerBox
       logger.error("Error throw in SessionServerBox: " + t, " ,service: " + spec.getName(), t);
       t.printStackTrace();
       msg.replyWithException(t);
-      
+
       AppConfig appConfig = (AppConfig) getX().get("appConfig");
       if ( Mode.TEST == appConfig.getMode() )
         throw t;

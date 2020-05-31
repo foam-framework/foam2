@@ -216,14 +216,20 @@ protected class ResponseThread implements Runnable {
 
         msg.attributes.replyBox = replyBox;
 
+        var headers = {
+          'Content-Type': 'application/json; charset=utf-8',
+          'Origin': this.origin
+        };
+
+        if ( this.authorizationType === foam.box.HTTPAuthorizationType.BEARER ) {
+          headers['Authorization'] = 'BEARER ' + this.sessionID;
+        }
+
         var req = this.HTTPRequest.create({
           url:     this.prepareURL(this.url),
           method: this.method,
           payload: payload,
-          headers: {
-            'Content-Type': 'application/json; charset=utf-8',
-            'Origin': this.origin
-          }
+          headers: headers
         }).send();
 
         req.then(function(resp) {
@@ -319,7 +325,7 @@ task.resume()
       if ( getOrigin() != null ) {
         conn.setRequestProperty("Origin", getOrigin());
       }
-      if ( getAuthorizationType().equals(HTTPAuthorizationType.BEARER) ) {
+      if ( getAuthorizationType() == HTTPAuthorizationType.BEARER ) {
         conn.setRequestProperty("Authorization", "BEARER "+getSessionID());
       }
       conn.setConnectTimeout(getConnectTimeout());
