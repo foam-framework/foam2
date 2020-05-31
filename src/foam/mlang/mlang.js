@@ -3252,6 +3252,7 @@ foam.CLASS({
         return this.arg2.f(this.arg1.f(o));
       },
       javaCode: `
+        StringBuilder sb = new StringBuilder("find");
         PropertyInfo p1 = (PropertyInfo) getArg1();
         FObject obj1;
         if ( p1 instanceof AbstractFObjectPropertyInfo) {
@@ -3266,10 +3267,8 @@ foam.CLASS({
         try {
           obj1 = (FObject)obj.getClass().getMethod(sb.toString(), foam.core.X.class).invoke(obj, ((FObject)obj).getX());
         } catch (Exception e) {
-          sb.setLength(4);
           return null;
         }
-        sb.setLength(4);
         if ( obj1 == null ) return null;
         return getArg2().f(obj1);
       `
@@ -3281,16 +3280,6 @@ foam.CLASS({
          Used by GroupBy
       **/
       return this.arg2.comparePropertyValues(o1, o2);
-    }
-  ],
-  axioms: [
-    {
-      name: 'javaExtras',
-      buildJavaClass: function(cls) {
-        cls.extras.push(`
-          private static StringBuilder sb = new StringBuilder("find");
-        `);
-      }
     }
   ]
 });

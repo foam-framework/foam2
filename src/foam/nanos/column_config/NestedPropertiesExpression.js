@@ -81,7 +81,8 @@ foam.CLASS({
         if ( i == propName.length - 1 ) {
           return p;
         }
-
+        
+        StringBuilder sb = new StringBuilder("find");
         try {
           Class cls;
           if ( p instanceof foam.core.AbstractFObjectPropertyInfo ) {
@@ -126,16 +127,6 @@ foam.CLASS({
       javaCode: `
         return DOT(prop1, prop2);
       `
-    }
-  ],
-  axioms: [
-    {
-      name: 'javaExtras',
-      buildJavaClass: function(cls) {
-        cls.extras.push(`
-          private static StringBuilder sb = new StringBuilder("find");
-        `);
-      }
     }
   ]
 });

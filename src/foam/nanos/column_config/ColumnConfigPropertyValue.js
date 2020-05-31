@@ -69,6 +69,7 @@ foam.CLASS({
         ClassInfo ci = of;
         PropertyInfo p = null;
         String[] props = propName.split("\\\\.");
+        StringBuilder sb = new StringBuilder("find");
 
         for ( int i = 0 ; i < props.length ; i++ ) {
           if ( ( p == null && i != 0 ) || ci == null )
@@ -199,16 +200,6 @@ foam.CLASS({
       return arr;
     },
     
-  ],
-  axioms: [
-    {
-      name: 'javaExtras',
-      buildJavaClass: function(cls) {
-        cls.extras.push(`
-          private static StringBuilder sb = new StringBuilder("find");
-        `);
-      }
-    }
   ]
 });
 
