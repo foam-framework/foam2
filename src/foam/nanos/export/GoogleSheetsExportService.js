@@ -233,7 +233,7 @@ foam.CLASS({
     },
     {
       name: 'getValues',
-      type: 'Object',
+      type: 'ValueRange',
       javaType: 'List<List<Object>>',
       args: [
         {
@@ -251,17 +251,17 @@ foam.CLASS({
       ],
       javaThrows: [ 'java.io.IOException', 'java.security.GeneralSecurityException' ],
       javaCode: `
-          final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-          GoogleApiAuthService googleApiAuthService = (GoogleApiAuthService)getX().get("googleApiAuthService");
-          Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, SCOPES))
-            .setApplicationName("nanopay")
-            .build();
-          Sheets.Spreadsheets.Values.Get request =
-          service.spreadsheets().values().get(spreadsheetId, cellsRange);
-          ValueRange response = request.execute();
-          System.out.println("done");
-          List<List<Object>> values = response.getValues();
-          return values;
+        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+        GoogleApiAuthService googleApiAuthService = (GoogleApiAuthService)getX().get("googleApiAuthService");
+        Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, SCOPES))
+          .setApplicationName("nanopay")
+          .build();
+        Sheets.Spreadsheets.Values.Get request =
+        service.spreadsheets().values().get(spreadsheetId, cellsRange);
+        ValueRange response = request.execute();
+        System.out.println("done");
+  //              List<List<Object>> values = response.getValues();
+        return response;
       `
     }
   ]
