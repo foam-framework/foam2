@@ -37,9 +37,8 @@ foam.CLASS({
             f.dataString = encode(f.dataBlob.blob);
             delete f.dataBlob;
           }
-          self.fileDAO.put(f)));
-        }
-        }
+          self.fileDAO.put(f);
+        }))
       });
 
       return Promise.all(promises).then((values) => {
