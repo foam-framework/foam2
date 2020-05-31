@@ -361,9 +361,9 @@ public class JSONFObjectFormatter
     b_.append('{');
     if ( multiLineOutput_ ) addInnerNewline();
     if ( outputClassNames_ ) {
-      // b_.append(beforeKey_());
+      if ( quoteKeys_ ) b_.append(beforeKey_());
       b_.append("class");
-      // b_.append(afterKey_());
+      if ( quoteKeys_ ) b_.append(afterKey_());
       b_.append(':');
       output(info.getId());
     }
@@ -381,11 +381,9 @@ public class JSONFObjectFormatter
 
   public void output(PropertyInfo prop) {
     b_.append('{');
-    if ( quoteKeys_ ) {
-      b_.append("class");
-    } else {
-      outputRawString("class");
-    }
+    if ( quoteKeys_ ) b_.append(beforeKey_());
+    b_.append("class");
+    if ( quoteKeys_ ) b_.append(afterKey_());
     b_.append(':');
     output("__Property__");
     b_.append(",");

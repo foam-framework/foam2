@@ -37,7 +37,12 @@ try {
   javax.servlet.http.HttpServletResponse response = (javax.servlet.http.HttpServletResponse)getX().get("httpResponse");
   response.setContentType("application/json");
   java.io.PrintWriter writer = response.getWriter();
-  writer.print(new foam.lib.json.Outputter(getX()).setPropertyPredicate(new foam.lib.NetworkPropertyPredicate()).stringify(msg));
+  foam.lib.formatter.JSONFObjectFormatter formatter = new foam.lib.formatter.JSONFObjectFormatter(getX());
+  formatter.setQuoteKeys(true);
+  formatter.setPropertyPredicate(new foam.lib.NetworkPropertyPredicate());
+  String str1 = formatter.stringify(msg);
+  String str2 = new foam.lib.json.Outputter(getX()).setPropertyPredicate(new foam.lib.NetworkPropertyPredicate()).stringify(msg);
+  writer.print(str1);
   writer.flush();
 } catch(java.io.IOException e) {
   throw new RuntimeException(e);
