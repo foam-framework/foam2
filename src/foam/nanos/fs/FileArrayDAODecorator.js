@@ -20,7 +20,7 @@ foam.CLASS({
     },
     {
       class: 'Long',
-      name: 'minBlobSize',
+      name: 'maxStringDataSize',
       value: 1024 * 1024 * 3
     }
   ],
@@ -33,7 +33,7 @@ foam.CLASS({
       var promises = props.map((prop) => {
         var files = prop.f(obj);
         return Promise.all(files.map((f) => {
-          if ( f.size <= this.minBlobSize ){
+          if ( f.size <= this.maxStringDataSize ){
             f.dataString = encode(f.data.blob);
             delete f.data;
           }
