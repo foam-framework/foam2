@@ -13,7 +13,7 @@ foam.CLASS({
 
   documentation: `
     An expr whose value is the name of a date grouping.
-    Currently works with hours, days, weeks, months, years/
+    Currently works with hours, days, weeks, months, and years.
   `,
 
   javaImports: [
