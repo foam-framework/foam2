@@ -23,11 +23,10 @@ foam.CLASS({
       this.setNodeName('span')
         .start('input').attrs({ type: 'file' }).on('change', this.onChange).end()
         .add(this.slot(function(data) {
-            debugger;
           return ! data ? this.E('span') : this.E('a')
             .attrs({
               href: (data.data && data.data.blob) || data.dataString ?
-                URL.createObjectURL(data.getData().blob) :
+                URL.createObjectURL(data.data.blob) :
                 data.address,
               target: '_blank',
               download: true
