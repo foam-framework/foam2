@@ -172,6 +172,7 @@ foam.CLASS({
                 sb.append(arr);
                 obj1 = (FObject)obj1.getClass().getMethod(sb.toString(), foam.core.X.class).invoke(obj1, x);
                 sb.setLength(4);
+                if ( obj1 == null ) return new ColumnPropertyValue.Builder(x).setPropertyValue(null).setObjValue(null).build();
                 cls = obj1.getClass();
               }
               ci = (ClassInfo) cls.getMethod("getOwnClassInfo").invoke(null);
