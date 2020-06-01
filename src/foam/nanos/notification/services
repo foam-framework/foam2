@@ -182,5 +182,5 @@ p({
   "class":"foam.nanos.boot.NSpec", 
   "name":"twilioConfig",                     
   "lazy":false,  
-  "service":{"class":"foam.nanos.app.TwilioConfig"}
+  "service":{"class":"foam.nanos.notification.sms.TwilioConfig"}
 })
