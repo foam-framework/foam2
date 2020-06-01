@@ -68,7 +68,6 @@ p({
 p({
   "class":"foam.nanos.boot.NSpec",
   "name":"userCapabilityJunctionDAO",
-  "lazy":false,
   "serve":true,
   "serviceScript":"""
     dao = new foam.dao.EasyDAO.Builder(x)
