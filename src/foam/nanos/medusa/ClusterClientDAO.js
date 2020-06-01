@@ -141,6 +141,9 @@ foam.CLASS({
           FObject data = cmd.getData();
           getLogger().debug("submit", "dao", dao.getClass().getSimpleName(), dop.getLabel(), data.getClass().getSimpleName(), data.getProperty("id"), "response");
           return data;
+        } catch ( ClusterException e ) {
+          getLogger().debug("submit", e.getMessage());
+          throw e;
         } catch ( Throwable t ) {
           getLogger().debug("submit", t.getMessage());
 //          getLogger().debug("submit", t);

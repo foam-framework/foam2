@@ -91,7 +91,8 @@ foam.CLASS({
       dao = support.getMdao(x, cmd.getServiceName());
       if ( dao == null ) {
         getLogger().error("Service not found", cmd.getServiceName());
-        throw new IllegalArgumentException("Service not found: "+cmd.getServiceName());
+        Throwable cause = new IllegalArgumentException("Service not found: "+cmd.getServiceName());
+        throw new ClusterException(cause.getMessage(), cause);
      }
 
       FObject old = dao.find_(x, nu.getProperty("id"));
@@ -105,7 +106,8 @@ foam.CLASS({
         cmd.setData(dao.remove_(x, nu));
       } else {
         getLogger().warning("Unsupported operation", cmd.getDop().getLabel());
-        throw new UnsupportedOperationException(cmd.getDop().getLabel());
+        Throwable cause = new UnsupportedOperationException(cmd.getDop().getLabel());
+        throw new ClusterException("Unsupported operation: "+cmd.getDop().getLabel(), cause);
       }
       return cmd;
       `

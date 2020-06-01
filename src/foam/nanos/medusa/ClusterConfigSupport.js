@@ -570,14 +570,14 @@ configuration for contacting the primary node.`,
           .setDelegate(new PMBox.Builder(x)
             .setClassType(ClientDAO.getOwnClassInfo())
             .setName(id)
-            .setDelegate(new OMBox.Builder(x)
-              .setName(id)
+//            .setDelegate(new OMBox.Builder(x)
+//              .setName(id)
               .setDelegate(new ClusterHTTPBox.Builder(x)
                 .setAuthorizationType(foam.box.HTTPAuthorizationType.BEARER)
                 .setSessionID(sendClusterConfig.getSessionId())
                 .setUrl(buildURL(x, serviceName, null, null, receiveClusterConfig))
                 .build())
-              .build())
+//              .build())
             .build())
           .build())
         .build();
@@ -691,12 +691,12 @@ configuration for contacting the primary node.`,
       dao = (DAO) x.get(serviceName);
       Object result = dao.cmd(MDAO.GET_MDAO_CMD);
       if ( result != null &&
-           result instanceof MDAO ) {
-        getLogger().debug("mdao", serviceName, "cmd", dao.getOf());
+           result instanceof DAO ) {
+        getLogger().debug("mdao", serviceName, "cmd", dao.getClass().getSimpleName(), dao.getOf());
         dao = (DAO) result;
       } else {
         while ( dao != null ) {
-          getLogger().debug("mdao", serviceName, "while", dao.getOf());
+          getLogger().debug("mdao", serviceName, "while", dao.getClass().getSimpleName(), dao.getOf());
           if ( dao instanceof MDAO ) {
             break;
           }
@@ -715,7 +715,7 @@ configuration for contacting the primary node.`,
       }
       if ( dao != null ) {
         getMdaos().put(serviceName, dao);
-        getLogger().debug("mdao", serviceName, "found", dao.getOf());
+        getLogger().debug("mdao", serviceName, "found", dao.getClass().getSimpleName(), dao.getOf());
         return dao;
       }
       throw new IllegalArgumentException("MDAO not found: "+serviceName);
