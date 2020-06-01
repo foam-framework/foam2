@@ -239,10 +239,12 @@ foam.CLASS({
   refines: 'foam.core.Model',
   package: 'foam.core',
   name: 'ImportExportModelRefine',
+
   requires: [
     'foam.core.Import',
     'foam.core.Export',
   ],
+
   properties: [
     {
       class: 'AxiomArray',
@@ -250,11 +252,16 @@ foam.CLASS({
       name: 'imports',
       adaptArrayElement: function(o) {
         if ( typeof o === 'string' ) {
-          var a        = o.split(' as ');
-          var key      = a[0];
+          // Matches strings in the form [(javatype)] (name[?]) [as (name)]
+          // Where [] is optional and () is a capture group
+          let res = /(?:(?:([\w.$]+)\s+)(?!as))?([\w$?]+)(?:\s+as\s+([\w$]+))?/g.exec(o);
+          let javaType = res[1];
+          let key = res[2];
+          let name = res[3];
+
           var optional = key.endsWith('?');
           if ( optional ) key = key.slice(0, key.length-1);
-          return foam.core.Import.create({name: a[1] || key, key: key, required: ! optional});
+          return foam.core.Import.create({name: name || key, key: key, required: ! optional, javaType: javaType || 'null'});
         }
 
         return foam.core.Import.create(o);

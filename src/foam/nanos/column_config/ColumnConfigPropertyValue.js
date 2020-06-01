@@ -154,6 +154,7 @@ foam.CLASS({
         FObject obj1 = obj;
         PropertyInfo p = null;
         String[] props = propName.split("\\\\.");
+        StringBuilder sb = new StringBuilder("find");
         for ( int i = 0 ; i < props.length ; i++ ) {
           if ( ( p == null && i != 0 ) || ci == null )
             break;

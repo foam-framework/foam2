@@ -174,6 +174,18 @@ var classes = [
   'foam.mlang.sink.Sum',
   'foam.mlang.sink.Average',
   'foam.mlang.sink.Map',
+  'foam.nanos.alarming.Alarm',
+  'foam.nanos.alarming.AlarmConfig',
+  'foam.nanos.alarming.AlarmConfigOMNameDAO',
+  'foam.nanos.alarming.AlarmConfigOMNameSink',
+  'foam.nanos.alarming.AlarmHostnameRuleAction',
+  'foam.nanos.alarming.AlarmReason',
+  'foam.nanos.alarming.AlarmAndMonitoring',
+  'foam.nanos.alarming.Alarming',
+  'foam.nanos.alarming.AlarmingUniqueNameDAO',
+  'foam.nanos.alarming.MonitoringReport',
+  'foam.nanos.alarming.MonitorType',
+  'foam.nanos.alarming.OMName',
   'foam.nanos.actioncommand.ActionCommand',
   'foam.nanos.NanoService',
   'foam.nanos.boot.NSpec',
@@ -329,6 +341,15 @@ var classes = [
   'foam.nanos.notification.email.ClientPOP3EmailService',
   'foam.nanos.notification.push.PushService',
   'foam.nanos.notification.push.FirebasePushService',
+
+  // SMS models, services and interfaces
+  'foam.nanos.notification.sms.NullSMSService',
+  'foam.nanos.notification.sms.ProxySMSService',
+  'foam.nanos.notification.sms.SMSService',
+  'foam.nanos.notification.sms.SMSMessage',
+  'foam.nanos.notification.sms.SMSStatus',
+  'foam.nanos.notification.sms.TwilioSMSService',
+
   'foam.nanos.notification.Notifiable',
   'foam.nanos.notification.Notification',
   'foam.nanos.notification.NotificationExpansionDAO',
@@ -495,6 +516,7 @@ var classes = [
   'foam.nanos.dig.exception.GeneralException',
 
   'foam.nanos.app.EmailConfig',
+  'foam.nanos.app.TwilioConfig',
 
   'foam.nanos.test.StockSnapshot',
   'foam.nanos.analytics.FoldManagerDAODecorator',
@@ -567,6 +589,7 @@ var classes = [
 
   // approval
   'foam.nanos.approval.ApprovalRequest',
+  'foam.nanos.approval.ApprovalRequestNotification',
   'foam.nanos.approval.ApprovalStatus',
   'foam.nanos.approval.Approvable',
   'foam.nanos.approval.ApprovableAwareDAO',
