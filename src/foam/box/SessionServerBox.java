@@ -65,14 +65,17 @@ public class SessionServerBox
               if ( st.hasMoreTokens() ) {
                 sessionID = st.nextToken();
                 if ( sessionID != null ) {
-                  // test and use non-clustered medusa sessions
-                  DAO internalSessionDAO = (DAO) getX().get("internalSessionDAO");
-                  if ( internalSessionDAO != null ) {
-                    session = (Session) internalSessionDAO.find(sessionID);
-                    if ( session != null ) {
-                      logger.debug("Using internalSessionDAO");
-                      session.setClusterable(false);
-                      sessionDAO = internalSessionDAO;
+                  session = (Session) sessionDAO.find(sessionID);
+                  if ( session == null ) {
+                    // test and use non-clustered medusa sessions
+                    DAO internalSessionDAO = (DAO) getX().get("internalSessionDAO");
+                    if ( internalSessionDAO != null ) {
+                      session = (Session) internalSessionDAO.find(sessionID);
+                      if ( session != null ) {
+                        logger.debug("Using internalSessionDAO");
+                        session.setClusterable(false);
+                        sessionDAO = internalSessionDAO;
+                      }
                     }
                   }
                 }
