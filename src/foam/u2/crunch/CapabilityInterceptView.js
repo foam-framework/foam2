@@ -102,7 +102,7 @@ foam.CLASS({
                             }
                             var entry = results.array[0]; // limit 1
                             var status = entry[0]; // first field (status)
-                            switch (status) {
+                            switch ( status ) {
                               case this.CapabilityJunctionStatus.GRANTED:
                                 view.aquire();
                                 break;
