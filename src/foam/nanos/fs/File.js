@@ -82,14 +82,19 @@ foam.CLASS({
         }
         return url;
       }
-    }
-  ],
-
-  methods: [
+    },
     {
-      name: 'getData',
-      type: 'foam.blob.Blob',
-      javaCode:`
+      class: 'Blob',
+      name: 'data',
+      adapt: function(oldObj, newObj) {
+              return newObj;
+            },
+
+      javaSetter: `
+        this.setDataBlob(val);
+      `,
+      javaGetter:`
+        if ( dataIsSet_ ) return data_;
         if ( this.getDataString() != null && this.getDataString() != "" ){
           BlobService blobStore = new foam.blob.BlobStore();
           byte[] decodedBytes = Base64.getDecoder().decode(getDataString());
@@ -100,7 +105,7 @@ foam.CLASS({
           return this.getDataBlob();
         }
       `,
-      code: function() {
+      getter: function(){
         if ( typeof this.dataString != 'undefined' && this.dataString != '' ) {
           let b64Data = this.data.split(',')[1];
           const b64toBlob = (b64Data, contentType=this.mimeType, sliceSize=512) => {
@@ -126,12 +131,16 @@ foam.CLASS({
             blob: b64toBlob(b64Data)
           });
         } else if ( typeof this.dataBlob != 'undefined' && this.dataBlob != '' ) {
-            return this.dataBlob;
+          return this.dataBlob;
+        } else if ( typeof this.data != 'undefined' && this.data != '' ) {
+          return this.data;
         } else {
           return null;
         }
-      }
-    },
+      },
+    }
+  ],
+  methods: [
     {
       name: 'authorizeOnCreate',
       javaCode: `
