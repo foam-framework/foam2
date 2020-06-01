@@ -6,7 +6,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.nanos.notification',
+  package: 'foam.nanos.notification.sms',
   name: 'SMSSetting',
   extends: 'foam.nanos.notification.NotificationSetting',
 

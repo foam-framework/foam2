@@ -345,8 +345,9 @@ var classes = [
   // SMS models, services and interfaces
   'foam.nanos.notification.sms.NullSMSService',
   'foam.nanos.notification.sms.ProxySMSService',
-  'foam.nanos.notification.sms.SMSService',
   'foam.nanos.notification.sms.SMSMessage',
+  'foam.nanos.notification.sms.SMSService',
+  'foam.nanos.notification.sms.SMSSetting',
   'foam.nanos.notification.sms.SMSStatus',
   'foam.nanos.notification.sms.TwilioConfig',
   'foam.nanos.notification.sms.TwilioSMSService',
@@ -359,7 +360,6 @@ var classes = [
   'foam.nanos.notification.EmailSetting',
   'foam.nanos.notification.NotificationSetting',
   'foam.nanos.notification.NotificationHostnameRuleAction',
-  'foam.nanos.notification.SMSSetting',
   'foam.nanos.script.Script',
   'foam.nanos.script.TestRunnerConfig',
   'foam.nanos.script.TestRunnerScript',
