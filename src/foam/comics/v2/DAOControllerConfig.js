@@ -62,6 +62,7 @@ foam.CLASS({
       expression: function(of) { return "View all " + of.model_.plural.toLowerCase() +'.' }
     },
     {
+      // TODO: Make ViewSpecWithJava a refinement to ViewSpec and change below to a ViewSpec
       class: 'foam.u2.ViewSpecWithJava',
       name: 'summaryView',
       expression: function(defaultColumns) {

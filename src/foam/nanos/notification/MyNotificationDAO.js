@@ -11,14 +11,14 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.FObject',
+    'foam.core.X',
     'foam.dao.*',
     'foam.mlang.MLang',
     'foam.mlang.predicate.AbstractPredicate',
     'foam.mlang.predicate.Predicate',
-    'foam.nanos.auth.User',
+    'foam.nanos.notification.Notification',
     'foam.nanos.auth.Subject',
-    'foam.core.X',
-    'foam.nanos.notification.Notification'
+    'foam.nanos.auth.User'
   ],
 
   documentation: `
