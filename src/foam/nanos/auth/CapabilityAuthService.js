@@ -279,7 +279,9 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        DAO capabilityDAO = (getX().get("localCapabilityDAO") == null ) ? (DAO) getX().get("capabilityDAO") : (DAO) getX().get("localCapabilityDAO");
+        DAO capabilityDAO = getX().get("localCapabilityDAO") == null ? 
+          (DAO) getX().get("capabilityDAO") : 
+          (DAO) getX().get("localCapabilityDAO");
 
         // Find intercepting capabilities
         List<Capability> capabilities =
