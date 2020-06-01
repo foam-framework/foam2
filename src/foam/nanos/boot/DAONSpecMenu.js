@@ -4,24 +4,24 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
- foam.CLASS({
-   package: 'foam.nanos.boot',
-   name: 'DAONSpecMenu',
-   extends: 'foam.nanos.menu.SubMenu',
+foam.CLASS({
+  package: 'foam.nanos.boot',
+  name: 'DAONSpecMenu',
+  extends: 'foam.nanos.menu.SubMenu',
 
-   documentation: 'Psedo-menu to display all DAO NSpecs as ',
+  documentation: 'Psedo-menu to display all DAO NSpecs as ',
 
-   properties: [
-   ],
+  properties: [
+  ],
 
-   methods: [
-     function children() {
-       var c = this.SUPER();
+  methods: [
+    function children() {
+      var c = this.SUPER();
 
-       debugger;
+      debugger;
 
-       return c; 
-     }
-   ]
+      return c;
+    }
+  ]
 
- });
+});
