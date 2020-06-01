@@ -8,7 +8,7 @@ foam.CLASS({
   name: 'CapabilityCategory',
 
   documentation: `
-    models a category to which a capability can be associated.
+    This models a category to which a Capability can be associated.
   `,
 
   properties: [
