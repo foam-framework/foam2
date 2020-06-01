@@ -182,7 +182,7 @@ foam.CLASS({
       if ( dao == null ) return null;
 
       FObject objectToSave;                                                  // Identify or create data to go into dao.
-      String contextDAOFindKey = (String)capability.getContextDAOFindKey();
+      String contextDAOFindKey = (String) capability.getContextDAOFindKey();
 
       if ( contextDAOFindKey != null && ! contextDAOFindKey.isEmpty() ) {
         if ( contextDAOFindKey.toLowerCase().contains("subject") ) {         // 1- Case if subject lookup
