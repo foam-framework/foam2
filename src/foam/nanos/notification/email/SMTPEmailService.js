@@ -19,7 +19,7 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.nanos.app.SMTPConfig',
+    'foam.nanos.notification.email.SMTPConfig',
     'foam.nanos.logger.Logger',
     'foam.nanos.om.OMLogger',
     'static foam.mlang.MLang.EQ',

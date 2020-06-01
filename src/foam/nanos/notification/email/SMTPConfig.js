@@ -5,7 +5,7 @@
  */
 
  foam.CLASS({
-  package: 'foam.nanos.app',
+  package: 'foam.nanos.notification.email',
   name: 'SMTPConfig',
 
   properties: [

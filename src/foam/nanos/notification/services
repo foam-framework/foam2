@@ -169,5 +169,5 @@ p({
   "class":"foam.nanos.boot.NSpec",
   "name":"SMTPConfig",
   "lazy": false,
-  "service":{"class":"foam.nanos.app.SMTPConfig"}
+  "service":{"class":"foam.nanos.notification.email.SMTPConfig"}
 })
