@@ -22,7 +22,7 @@ foam.CLASS({
     'foam.core.Property',
     'foam.layout.Section',
     'foam.layout.SectionAxiom',
-    'foam.nanos.crunch.UserCapabilityJunction',
+    'foam.nanos.crunch.UserCapabilityJunction'
   ],
 
   properties: [
