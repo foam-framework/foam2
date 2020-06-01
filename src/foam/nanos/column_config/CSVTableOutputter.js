@@ -5,13 +5,9 @@ foam.CLASS({
     function arrayToCSV(arrayOfValues) {
       var output = [];
       for ( var row of arrayOfValues ) {
-        output.push(row.join(',') + '\n');
+        output.push(row.join(','));
       }
-      var str = '';
-      for ( var val of output) {
-        str += val;
-      }
-      return str;
+      return output.join('\n');
     }
   ]
 });
