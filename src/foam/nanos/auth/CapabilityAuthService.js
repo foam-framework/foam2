@@ -303,7 +303,7 @@ foam.CLASS({
 
         // Add filteredCapabilities to a runtime exception and throw it
         CapabilityRuntimeException ex = new CapabilityRuntimeException(
-          "Permission ["+ permission +"] denied; filteredCapabilities available.");
+          "Permission [" + permission + "] denied. Filtered Capabilities available.");
         for ( Capability cap : filteredCapabilities ) ex.addCapabilityId(cap.getId());
         throw ex;
       `
