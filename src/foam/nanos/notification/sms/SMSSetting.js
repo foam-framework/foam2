@@ -61,7 +61,7 @@ foam.CLASS({
         SMSMessage smsMessage = new SMSMessage.Builder(x)
             .setUser(user.getId())
             .setMessage(notification.getBody())
-            .setPhoneNumber(user.getPhoneNumber())
+            .setPhoneNumber(user.getMobile().getNumber())
             .setStatus(SMSStatus.UNSENT)
             .build();
 
