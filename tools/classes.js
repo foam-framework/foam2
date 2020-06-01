@@ -66,6 +66,9 @@ var classes = [
   'foam.mlang.ArrayConstant',
   'foam.mlang.expr.Dot',
   'foam.mlang.expr.PropertyExpr',
+  'foam.mlang.expr.DateTypes',
+  'foam.mlang.expr.DateGrouping',
+  'foam.mlang.expr.DateGroupingExpr',
   'foam.mlang.PredicatedExpr',
   'foam.mlang.ContextObject',
   'foam.mlang.CurrentTime',
@@ -352,6 +355,7 @@ var classes = [
 
   'foam.nanos.notification.Notifiable',
   'foam.nanos.notification.Notification',
+  'foam.nanos.notification.MyNotificationDAO',
   'foam.nanos.notification.NotificationExpansionDAO',
   'foam.nanos.notification.NotificationTemplateDAO',
   'foam.nanos.notification.notifications.ScriptRunNotification',
