@@ -169,7 +169,7 @@ foam.CLASS({
             var i = 0;
             return this.E()
             // - padding - search height
-              .style({'overflow': 'scroll', 'padding-bottom': '20px', 'max-height': window.innerHeight - 180 > 0 ? window.innerHeight - 180 : window.innerHeight + 'px'})
+              .style({'overflow': 'scroll', 'padding-bottom': '20px', 'max-height': window.innerHeight - 300 > 0 ? window.innerHeight - 300 : window.innerHeight + 'px'})
               .forEach(views, function(view) {
                 view.prop.index = i;
                 this

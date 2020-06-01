@@ -24,7 +24,6 @@ foam.CLASS({
     left:             0; 
     z-index:          100;
     background:       rgba(0, 0, 0, 0.4);
-    padding-bottom:    20px,
   }
   `,
   properties: [
@@ -58,7 +57,7 @@ foam.CLASS({
             'right': '40px',
             'top': '120px',
             'position': 'fixed',
-            'height': 'fix-content',
+            'height': 'fit-content',
             'max-height': window.innerHeight - 100 > 0 ? window.innerHeight - 100 : window.innerHeight + 'px',
             'width': '300px'
           })
