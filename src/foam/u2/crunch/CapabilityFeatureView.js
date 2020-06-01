@@ -18,7 +18,7 @@ foam.CLASS({
   ],
 
   documentation: `
-      A single card in a list of capabilities.
+    A single card in a list of capabilities.
   `,
 
   methods: [
