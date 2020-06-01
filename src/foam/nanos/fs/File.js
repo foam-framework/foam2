@@ -47,20 +47,6 @@ foam.CLASS({
       documentation: 'File mime type'
     },
     {
-      class: 'Blob',
-      name: 'dataBlob',
-      documentation: 'File data as a blob',
-      /**
-       * When we export this as the CSV, we are trying to create a new object if this property is undefined.
-       * But because this 'Blob' is an interface, we can not instantiate it.
-       *
-       * Provide an adapt function will fix that issue.
-       */
-      adapt: function(oldObj, newObj) {
-        return newObj;
-      },
-    },
-    {
       class: 'String',
       name: 'dataString',
       documentation: 'File converted to base64 string',
@@ -89,12 +75,7 @@ foam.CLASS({
       adapt: function(oldObj, newObj) {
               return newObj;
             },
-
-      javaSetter: `
-        this.setDataBlob(val);
-      `,
       javaGetter:`
-        if ( dataIsSet_ ) return data_;
         if ( this.getDataString() != null && this.getDataString() != "" ){
           BlobService blobStore = new foam.blob.BlobStore();
           byte[] decodedBytes = Base64.getDecoder().decode(getDataString());
@@ -102,7 +83,7 @@ foam.CLASS({
           Blob data = blobStore.put(new foam.blob.InputStreamBlob(is, decodedBytes.length));
           return data;
         } else {
-          return this.getDataBlob();
+          return data_;
         }
       `,
       getter: function(){
@@ -130,8 +111,6 @@ foam.CLASS({
           return this.BlobBlob.create({
             blob: b64toBlob(b64Data)
           });
-        } else if ( typeof this.dataBlob != 'undefined' && this.dataBlob != '' ) {
-          return this.dataBlob;
         } else if ( typeof this.data != 'undefined' && this.data != '' ) {
           return this.data;
         } else {

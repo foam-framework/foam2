@@ -34,8 +34,8 @@ foam.CLASS({
         var files = prop.f(obj);
         return Promise.all(files.map((f) => {
           if ( f.size <= this.minBlobSize ){
-            f.dataString = encode(f.dataBlob.blob);
-            delete f.dataBlob;
+            f.dataString = encode(f.data.blob);
+            delete f.data;
           }
           self.fileDAO.put(f);
         }))

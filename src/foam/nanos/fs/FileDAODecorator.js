@@ -20,7 +20,7 @@ foam.CLASS({
     },
     {
       class: 'Long',
-      name: 'minBlobSize',
+      name: 'maxStringDataSize',
       value: 1024 * 1024 * 3
     }
   ],
@@ -40,7 +40,7 @@ foam.CLASS({
 
         if ( ! file ) return a();
 
-        if ( file.size <= this.minBlobSize ){
+        if ( file.size <= this.maxStringDataSize ){
           file.dataString = encode(file.getData().blob);
           delete file.data;
         }
