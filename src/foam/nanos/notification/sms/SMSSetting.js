@@ -57,13 +57,6 @@ foam.CLASS({
         DAO smsMessageDAO = (DAO) x.get("localSmsMessageDAO");
         notification = (Notification) notification.fclone();
 
-        SMSMessage smsMessage = new SMSMessage.Builder(x)
-            .setUser(user.getId())
-            .setMessage(notification.getBody())
-            .setPhoneNumber(user.getMobile().getNumber())
-            .setStatus(SMSStatus.UNSENT)
-            .build();
-
         // Check if the user has disabled sms notifications
         if ( ! getEnabled() || user == null ) {
           return;
@@ -81,6 +74,13 @@ foam.CLASS({
             return;
           }
         }
+
+        SMSMessage smsMessage = new SMSMessage.Builder(x)
+            .setUser(user.getId())
+            .setMessage(notification.getBody())
+            .setPhoneNumber(user.getMobile().getNumber())
+            .setStatus(SMSStatus.UNSENT)
+            .build();
 
         try {
           smsMessageDAO.put(smsMessage);
