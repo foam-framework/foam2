@@ -63,7 +63,7 @@ foam.CLASS({
   methods: [
     function initE() {
       this.capabilityOptions.forEach((c) => {
-        if ( this.capabilityCache.has(c) && this.capabilityCache.get(c) === true ) {
+        if ( this.capabilityCache.has(c) && this.capabilityCache.get(c) ) {
           capabilityAcquired = true;
           this.stack.back();
         }
@@ -81,9 +81,9 @@ foam.CLASS({
               .select().then((result) => {
                 let arr = result.array;
                 let grid = view.Grid.create();
-                for ( let i = 0 ; i < arr.length; i++ ) {
+                for ( let i = 0 ; i < arr.length ; i++ ) {
                   let cap = arr[i];
-                  grid == grid
+                  grid = grid
                     .start(view.GUnit, { columns: 4 })
                       .tag(view.capabilityView, { data: cap })
                       .on('click', () => {

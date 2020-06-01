@@ -28,10 +28,10 @@ foam.CLASS({
   properties: [
     // Properties specific to CapabilityWizardSection
     {
-      name: 'capability',
+      name: 'capability'
     },
     {
-      name: 'ucj',
+      name: 'ucj'
     },
 
     // Properties for WizardSection interface

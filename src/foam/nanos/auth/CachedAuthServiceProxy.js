@@ -32,11 +32,8 @@ foam.CLASS({
         (sub, _on, event, ucj) => {
           if ( event !== 'put' && event !== 'remove' ) return;
           this.capabilityDAO.find(ucj.targetId).then(cap => {
-            var permissions = [
-              ...cap.permissionsGranted,
-              ...cap.permissionsIntercepted,
-            ];
-            permissions.forEach(p => { delete this.cache[p] });
+            cap.permissionsGranted.forEach(p => delete this.cache[p]);
+            cap.permissionsIntercepted.forEach(p => delete this.cache[p]);
           });
         }
       ));

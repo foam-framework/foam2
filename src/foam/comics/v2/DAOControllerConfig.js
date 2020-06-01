@@ -54,7 +54,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'browseTitle',
-      expression: function(of) { return  of.model_.plural }
+      expression: function(of) { return of.model_.plural; }
     },
     {
       class: 'String',

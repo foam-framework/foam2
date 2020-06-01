@@ -81,7 +81,7 @@ foam.CLASS({
       .end()
       .startContext({ data: this })
         .tag(this.EXIT, { size: 'LARGE' })
-        .callIfElse( this.isErrorFree,
+        .callIfElse(this.isErrorFree,
           function() {
             self.tag(this.SAVE, { size: 'LARGE', label: this.ACTION_LABEL });
           },

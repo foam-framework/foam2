@@ -16,12 +16,12 @@ foam.CLASS({
     'foam.u2.crunch.Style',
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.crunch.CapabilityJunctionStatus',
-    'foam.u2.view.ReadOnlyEnumView',
+    'foam.u2.view.ReadOnlyEnumView'
   ],
 
   imports: [
     'user',
-    'userCapabilityJunctionDAO',
+    'userCapabilityJunctionDAO'
   ],
 
   documentation: `
@@ -44,7 +44,7 @@ foam.CLASS({
           .style({
             'background-image': "url('" + self.data.icon + "')",
             'background-size': 'cover',
-            'background-position': '50% 50%',
+            'background-position': '50% 50%'
           })
         .end()
         .start('span')
@@ -83,8 +83,7 @@ foam.CLASS({
         .start()
           .addClass(style.myClass('card-description'))
           .add(self.data.description)
-        .end()
-        ;
+        .end();
     }
   ]
 });
