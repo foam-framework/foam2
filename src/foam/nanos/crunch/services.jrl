@@ -77,7 +77,7 @@ p({
       .setOf(foam.nanos.crunch.UserCapabilityJunction.getOwnClassInfo())
       .build();
     userCap =  new foam.nanos.crunch.UserCapabilityJunctionDAO.Builder(x).setDelegate(dao).build();
-    ruler = new foam.nanos.ruler.RulerDAO(x,userCap, "userCapabilityJunctionDAO");
+    ruler = new foam.nanos.ruler.RulerDAO(x, userCap, "userCapabilityJunctionDAO");
     return ruler;
   """,
   "client":"{\"of\":\"foam.nanos.crunch.UserCapabilityJunction\", \"remoteListenerSupport\": false}"
