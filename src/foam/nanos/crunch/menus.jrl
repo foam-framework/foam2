@@ -1,1 +1,7 @@
-p({"class":"foam.nanos.menu.Menu","id":"admin.capstore","label":"Capability Store","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.u2.crunch.CapabilityStore"}},"parent":"admin"})
+p({
+  "class":"foam.nanos.menu.Menu",
+  "id":"admin.capstore",
+  "label":"Capability Store",
+  "handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.u2.crunch.CapabilityStore"}},
+  "parent":"admin"
+})
