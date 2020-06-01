@@ -47,7 +47,7 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'REJECTED_MSG', message: 'Your choice to bypass this was stored, please refresh page to revert cancel selection.'}
+    { name: 'REJECTED_MSG', message: 'Your choice to bypass this was stored, please refresh page to revert cancel selection.' }
   ],
 
   css: `
