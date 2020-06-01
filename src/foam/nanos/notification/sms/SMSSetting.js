@@ -16,6 +16,7 @@ foam.CLASS({
     'foam.nanos.auth.User',
     'foam.nanos.auth.LifecycleState',
     'foam.nanos.logger.Logger',
+    'foam.nanos.notification.Notification',
     'foam.nanos.notification.sms.SMSMessage',
     'foam.nanos.notification.sms.SMSStatus',
     'java.util.HashSet',
