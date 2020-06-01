@@ -26,10 +26,11 @@ foam.CLASS({
             debugger;
           return ! data ? this.E('span') : this.E('a')
             .attrs({
-              href: (data.dataBlob && data.dataBlob.blob) || data.dataString ?
+              href: (data.data && data.data.blob) || data.dataString ?
                 URL.createObjectURL(data.getData().blob) :
                 data.address,
-              target: '_blank'
+              target: '_blank',
+              download: true
             })
             .add('Download');
         }, this.data$));
@@ -44,7 +45,7 @@ foam.CLASS({
         filename: file.name,
         filesize: file.size,
         mimeType: file.type,
-        dataBlob: this.BlobBlob.create({
+        data: this.BlobBlob.create({
           blob: file
         })
       });
