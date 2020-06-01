@@ -24,6 +24,7 @@ foam.CLASS({
     left:             0; 
     z-index:          100;
     background:       rgba(0, 0, 0, 0.4);
+    padding-bottom:    20px,
   }
   `,
   properties: [
@@ -54,10 +55,9 @@ foam.CLASS({
             'border-radius': '5px',
             'border': '1px solid /*%GREY4%*/ #e7eaec',
             'background-color': '#f9f9f9',
-            'left': self.parentId$.map((v) => v ? ( document.getElementById(v).getBoundingClientRect().x - 250 > 0 ? document.getElementById(v).getBoundingClientRect().x - 250 : document.getElementById(v).getBoundingClientRect().x ) : 0 + 'px'),
+            'right': '40px',
             'top': '120px',
             'position': 'fixed',
-            'margin-bottom': '20px',
             'height': 'fix-content',
             'max-height': window.innerHeight - 100 > 0 ? window.innerHeight - 100 : window.innerHeight + 'px',
             'width': '300px'
