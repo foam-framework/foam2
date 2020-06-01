@@ -80,9 +80,9 @@ foam.CLASS({
       if ( ucj ) {
         var statusGranted = foam.util.equals(ucj.status, self.CapabilityJunctionStatus.GRANTED);
         var statusPending = foam.util.equals(ucj.status, self.CapabilityJunctionStatus.PENDING);
-        if ( ucj && ( statusGranted || statusPending ) ) {
+        if ( statusGranted || statusPending ) {
           var message = statusGranted ? this.CANNOT_OPEN_GRANTED : this.CANNOT_OPEN_PENDING;
-          self.ctrl.add(foam.u2.dialog.NotificationMessage.create({ message: message}))
+          self.ctrl.notify(message);
           return;
         } 
       }
