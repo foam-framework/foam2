@@ -12,7 +12,7 @@
   documentation: `The base model for storing, using and managing currency information.`,
 
   javaImports: [
-    'foam.util.SafetyUtil'
+    'foam.util.SafetyUtil',
   ],
 
   tableColumns: [
@@ -27,7 +27,7 @@
     {
       buildJavaClass: function(cls) {
         cls.extras.push(`
-          public String format(UnitValue amount) {
+          public String format(Long amount) {
             return format(amount, false);
           }
         `);
