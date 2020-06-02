@@ -412,10 +412,15 @@ foam.CLASS({
       }
     },
 
-    function pushMenu(menuId) {
+    function pushMenu(menu) {
+      if ( menu.id ) {
+        menu.launch(this);
+        menu = menu.id;
+      }
+
       /** Use to load a specific menu. **/
-      if ( window.location.hash.substr(1) != menuId ) {
-        window.location.hash = menuId;
+      if ( window.location.hash.substr(1) != menu ) {
+        window.location.hash = menu;
       }
     },
 
