@@ -12,7 +12,7 @@
   documentation: `The base model for storing, using and managing currency information.`,
 
   javaImports: [
-    'foam.util.SafetyUtil',
+    'foam.util.SafetyUtil'
   ],
 
   tableColumns: [
