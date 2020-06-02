@@ -25,6 +25,7 @@ FOAM_FILES([
   { name: "foam/nanos/app/ContextLookupAppConfigService"},
   { name: "foam/nanos/app/AppConfigService" },
   { name: "foam/nanos/app/EmailConfig" },
+  { name: "foam/nanos/notification/email/SMTPConfig" },
   { name: "foam/nanos/app/ClientAppConfigService" },
   { name: "foam/nanos/controller/ApplicationController" },
   { name: "foam/nanos/app/Mode" },
@@ -209,6 +210,12 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/email/Status' },
   { name: 'foam/nanos/notification/push/PushService' },
   { name: 'foam/nanos/notification/push/FirebasePushService' },
+  { name: 'foam/nanos/notification/sms/SMSMessage' },
+  { name: 'foam/nanos/notification/sms/SMSService' },
+  { name: 'foam/nanos/notification/sms/SMSSetting' },
+  { name: 'foam/nanos/notification/sms/SMSStatus' },
+  { name: 'foam/nanos/notification/sms/TwilioConfig' },
+  { name: 'foam/nanos/notification/sms/TwilioSMSService' },
   { name: 'foam/nanos/demo/DemoObject' },
   { name: 'foam/nanos/demo/Demo' },
   { name: 'foam/nanos/http/Format' },
@@ -226,6 +233,7 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/EmailSetting' },
   { name: 'foam/nanos/notification/Notifiable' },
   { name: 'foam/nanos/notification/Notification'},
+  { name: 'foam/nanos/notification/MyNotificationDAO'},
   { name: 'foam/nanos/notification/notifications/ScriptRunNotification'},
   { name: 'foam/nanos/notification/NotificationView'},
   { name: 'foam/nanos/notification/NotificationExpansionDAO'},
@@ -236,7 +244,7 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/NotificationNotificationView'},
   { name: 'foam/nanos/notification/NotificationHostnameRuleAction'},
   { name: 'foam/nanos/notification/notifications/ScriptRunNotification'},
-  { name: 'foam/nanos/notification/notifications/ScriptRunNotificationNotificationView'},
+  { name: 'foam/nanos/notification/notifications/ScriptRunNotificationNotificationCitationView'},
   { name: 'foam/nanos/dashboard/Demo' },
 
   // Ticket
@@ -303,6 +311,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/crunchtest/FakeTestObject" },
   // models
   { name: "foam/nanos/crunch/Capability" },
+  { name: "foam/nanos/crunch/CapabilityCategory" },
   { name: "foam/nanos/crunch/CapabilityJunctionStatus" },
   { name: "foam/nanos/crunch/UserCapabilityJunctionRefine" },
   //daos
