@@ -96,6 +96,7 @@ var classes = [
   'com.google.foam.demos.heroes.Hero',
   'com.google.auth.TokenVerifier',
   'foam.box.RemoteException',
+  'foam.box.CapabilityRequiredRemoteException',
   'foam.box.RPCMessage',
   'foam.box.RPCReturnBox',
   'foam.box.RPCReturnMessage',
@@ -108,7 +109,6 @@ var classes = [
   'foam.box.RawWebSocketBox',
   'foam.box.ReturnBox',
   'foam.box.BoxService',
-  'foam.box.CheckAuthenticationBox',
   'foam.box.SessionReplyBox',
   'foam.box.SessionClientBox',
   'foam.dao.DAO',
@@ -562,8 +562,11 @@ var classes = [
   'foam.nanos.crunch.crunchtest.FakeTestObject',
   //models
   'foam.nanos.crunch.Capability',
+  'foam.nanos.crunch.CapabilityCategory',
+  'foam.nanos.crunch.CapabilityCategoryCapabilityJunction',
   'foam.nanos.crunch.CapabilityJunctionStatus',
   'foam.nanos.crunch.UserCapabilityJunction',
+  'foam.nanos.crunch.AgentCapabilityJunction',
   'foam.nanos.crunch.CapabilityCapabilityJunction',
   //daos
   'foam.nanos.crunch.UserCapabilityJunctionDAO',
