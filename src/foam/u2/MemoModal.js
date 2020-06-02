@@ -29,14 +29,16 @@ foam.CLASS({
       overflow-y: scroll;
       /* The line below accounts for the top nav bar. */
     }
-    ^main {
-      padding: 24px;
+    ^title {
+      padding: 32px 0px;
+      font-size: 1.5em;
+      font-weight: bold;
     }
-    ^main > h2:first-child {
-      margin-top: 0;
+    ^main {
+      padding: 0px 32px;
     }
     ^ .buttons {
-      padding: 24px;
+      padding: 32px;
       box-sizing: border-box;
       display: flex;
       justify-content: flex-end;
@@ -85,7 +87,8 @@ foam.CLASS({
         .addClass(this.myClass())
         .start()
           .addClass(this.myClass('main'))
-          .start('h2')
+          .start()
+            .addClass(this.myClass("title"))
             .add(this.title)
           .end()
           .startContext({ data: this, controllerMode: this.ControllerMode.EDIT })
