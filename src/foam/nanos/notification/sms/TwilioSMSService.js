@@ -18,9 +18,9 @@ foam.CLASS({
     'com.twilio.rest.api.v2010.account.Message',
     'com.twilio.Twilio',
     'com.twilio.type.PhoneNumber',
-    'foam.nanos.app.TwilioConfig',
     'foam.nanos.logger.Logger',
     'foam.nanos.notification.sms.SMSStatus',
+    'foam.nanos.notification.sms.TwilioConfig',
     'foam.nanos.om.OMLogger',
     'foam.util.SafetyUtil'
   ],

@@ -158,13 +158,13 @@ foam.CLASS({
 
       this.addClass(this.myClass()).
       start().
-        style({ 'height': '56px', 'padding-top': '8px'}).
+        style({ 'height': '56px'}).
         start().
           style({ 'font-size': '26px', 'width': 'fit-content', 'float': 'left', 'padding-top': '10px' }).
           add('Data Management').
         end()
         .start()
-          .style({ 'width': 'fit-content', 'float': 'right', 'margin-right': '4%' })
+        .style({ 'width': 'fit-content', 'float': 'right', 'margin-right': '4%', 'margin-top': '6px' })
             .start(this.SEARCH).focus().end()
             .addClass('foam-u2-search-TextSearchView')
             .addClass(this.myClass('foam-u2-search-TextSearchView'))

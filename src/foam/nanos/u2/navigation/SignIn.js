@@ -24,7 +24,9 @@ foam.CLASS({
     { name: 'TITLE', message: 'Welcome!' },
     { name: 'FOOTER_TXT', message: 'Not a user yet?' },
     { name: 'FOOTER_LINK', message: 'Create an account' },
-    { name: 'SUB_FOOTER_LINK', message: 'Forgot password?' }
+    { name: 'SUB_FOOTER_LINK', message: 'Forgot password?' },
+    { name: 'ERROR_MSG', message: 'There was an issue with logging in.' },
+    { name: 'ERROR_MSG2', message: 'Please enter email' }
   ],
 
   properties: [
@@ -124,7 +126,7 @@ foam.CLASS({
                     this.user.copyFrom(updatedUser);
                     this.nextStep();
                   }).catch((err) => {
-                    this.notify(err.message || 'There was an issue with logging in.', 'error');
+                    this.notify(err.message || this.ERROR_MSG, 'error');
                   });
               } else {
                 this.user.copyFrom(logedInUser);
@@ -133,11 +135,11 @@ foam.CLASS({
             }
           ).catch(
             (err) => {
-              this.notify(err.message || 'There was a problem logging in.', 'error');
+              this.notify(err.message || this.ERROR_MSG, 'error');
           });
         } else {
           // TODO: change to 'Please enter email or username' when integrating
-          this.notify('Please enter email', 'error');
+          this.notify(this.ERROR_MSG2, 'error');
         }
       }
     }
