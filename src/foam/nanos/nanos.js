@@ -178,7 +178,6 @@ FOAM_FILES([
   { name: "foam/nanos/export/GoogleDriveService" },
   { name: "foam/nanos/export/GoogleSheetsExport" },
   { name: "foam/nanos/export/GoogleSheetsExportDriver" },
-  { name: "foam/nanos/export/GoogleSheetsExportService" },
   { name: "foam/nanos/export/GoogleSheetsOutputter" },
   { name: "foam/nanos/export/GoogleSheetsPropertyMetadata" },
   { name: "foam/nanos/export/JSONDriver"},
