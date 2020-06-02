@@ -25,6 +25,27 @@ foam.CLASS({
 
   tableColumns: ['id', 'body', 'notificationType', 'broadcasted', 'userId', 'groupId' ],
 
+  axioms: [
+    {
+      class: 'foam.comics.v2.CannedQuery',
+      label: 'Unread',
+      predicateFactory: function(e) {
+        return e.AND(
+          e.EQ(foam.nanos.notification.Notification.READ, false),
+        );
+      }
+    },
+    {
+      class: 'foam.comics.v2.CannedQuery',
+      label: 'Read',
+      predicateFactory: function(e) {
+        return e.AND(
+          e.EQ(foam.nanos.notification.Notification.READ, true),
+        );
+      }
+    }
+  ],
+
   properties: [
     {
       class: 'Boolean',
@@ -72,15 +93,6 @@ foam.CLASS({
       documentation: 'Agent user that created the Notification.',
       readPermissionRequired: true,
       writePermissionRequired: true
-    },
-    {
-      class: 'Date',
-      name: 'issuedDate',
-      factory: function() { return new Date(); },
-      label: 'Notification Date',
-      documentation: 'Date notification was created.',
-      visibility: 'RO',
-      javaFactory: `return new java.util.Date();`
     },
     {
       class: 'Date',

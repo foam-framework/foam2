@@ -18,7 +18,8 @@ foam.CLASS({
   exports: [
     'selection',
     'hoverSelection',
-    'data as dao'
+    'data as dao',
+    'as summaryView'
   ],
 
   imports: [
@@ -28,7 +29,20 @@ foam.CLASS({
 
   css: `
     ^group-title {
-      // TODO
+      font-family: 'IBM Plex Sans';
+      font-size: 35px;
+      font-weight: 600;
+      color: #1e1f21;
+      margin: 40px 0px;
+    }
+    ^ .foam-nanos-notification-NotificationRowView {
+      margin: 16px 0px;
+      background: white;
+      min-height: 50px;
+      border-radius: 3px;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
+      border: solid 1px #e7eaec;
+      background-color: #ffffff;
     }
   `,
 
@@ -42,10 +56,12 @@ foam.CLASS({
       name: 'rowView'
     },
     {
+      class: 'FObjectProperty',
       name: 'groupExpr',
       documentation: 'An expression which returns the group title. Can be a Property.'
     },
     {
+      class: 'FObjectProperty',
       name: 'order',
       documentation: 'Optional order used to sort citations within a group'
     },

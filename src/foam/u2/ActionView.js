@@ -268,7 +268,7 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'confirm', message: 'Confirm' }
+    { name: 'CONFIRM', message: 'Confirm' }
   ],
 
   properties: [
@@ -402,7 +402,7 @@ foam.CLASS({
         } else if ( this.buttonState == this.ButtonState.CONFIRM ) {
           this.buttonState = this.ButtonState.DEBOUNCE;
           this.removeAllChildren();
-          this.add(this.confirm);
+          this.add(this.CONFIRM);
           this.debounce();
         } else if ( this.buttonState == this.ButtonState.ARMED ) {
           this.buttonState = this.ButtonState.CONFIRM;
