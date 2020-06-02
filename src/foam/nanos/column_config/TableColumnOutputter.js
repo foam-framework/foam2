@@ -13,23 +13,24 @@ foam.CLASS({
         if ( val ) {
           if ( foam.core.UnitValue.isInstance(prop) ) {
             return ( val / 100 ).toString() + ' ' + prop.destinationCurrency;
-          } else if ( foam.core.Date.isInstance(prop) ) {
+          }
+          if ( foam.core.Date.isInstance(prop) ) {
             return val.toISOString().substring(0, 10);
-          } else if ( foam.core.DateTime.isInstance(prop) ) {
+          }
+          if ( foam.core.DateTime.isInstance(prop) ) {
             return val.toString().substring(0, 24);
-          } else if ( foam.core.Time.isInstance(prop) ) {
+          }
+          if ( foam.core.Time.isInstance(prop) ) {
             return val.toString().substring(0, 8);
           }
-          else if ( val.toSummary ) {
+          if ( val.toSummary ) {
             if ( val.toSummary() instanceof Promise )
               return await val.toSummary();
-            else
-              return val.toSummary();
-          } else
-            return val.toString();            
+            return val.toSummary();
+          }
+          return val.toString();           
         }
-        else
-          return '';
+        return ''; 
       }
     },
     {

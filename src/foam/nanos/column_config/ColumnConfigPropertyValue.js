@@ -29,7 +29,7 @@ foam.CLASS({
           return props.filter(p => p.networkTransient).map(p => p.name);
         } props = [];
         return propNames.filter(n => { 
-          return allColumnNames.includes(n.split('.')[0]) && !this.returnProperty(of, n).networkTransient;
+          return allColumnNames.includes(n.split('.')[0]) && ! this.returnProperty(of, n).networkTransient;
         });
       }
     },
