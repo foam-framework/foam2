@@ -37,7 +37,6 @@
 
   requires: [
     'foam.dao.AbstractDAO',
-    'foam.u2.MemoModal',
     'foam.u2.dialog.Popup',
     'foam.nanos.approval.ApprovalStatus',
     'foam.u2.dialog.NotificationMessage'
@@ -49,7 +48,7 @@
     'currentMenu',
     'stack',
     'user',
-    'objectSummaryView'
+    'objectSummaryView?'
   ],
 
   tableColumns: [
@@ -584,7 +583,7 @@
       },
       code: function(X) {
         this.objectSummaryView.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
-          class: this.MemoModal,
+          class: "foam.u2.MemoModal",
           onExecute: this.approveWithMemo.bind(this),
           title: "Add a memo to this (optional)"
         }));
@@ -605,7 +604,7 @@
       },
       code: function(X) {
         this.objectSummaryView.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
-          class: this.MemoModal,
+          class: "foam.u2.MemoModal",
           onExecute: this.rejectWithMemo.bind(this),
           isMemoRequired: true,
           title: "Add a memo to this (required)"
