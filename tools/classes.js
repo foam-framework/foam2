@@ -329,6 +329,7 @@ var classes = [
   'foam.nanos.notification.email.EmailPropertyService',
   'foam.nanos.notification.email.Status',
   // Email service Files
+  'foam.nanos.notification.email.SMTPConfig',
   'foam.nanos.notification.email.SMTPEmailService',
   'foam.nanos.notification.email.NullEmailService',
   'foam.nanos.notification.email.ProxyEmailService',
