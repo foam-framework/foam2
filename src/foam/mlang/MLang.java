@@ -189,6 +189,13 @@ public class MLang
     return containsIC;
   }
 
+  public static Predicate CONTAINS(Object o1, Object o2) {
+    Contains contains = new Contains();
+    contains.setArg1(MLang.prepare(o1));
+    contains.setArg2(MLang.prepare(o2));
+    return contains;
+  }
+
   public static Predicate HAS(Object o) {
     Has has = new Has();
     has.setArg1(MLang.prepare(o));

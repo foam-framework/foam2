@@ -256,7 +256,6 @@ public class CapabilityTest extends Test {
     grantCrunch.setTargetId(crunch.getId());
     grantCrunch.setData(data);
     grantCrunch.setExpiry(((new GregorianCalendar(2038, Calendar.JULY, 1)).getTime()));
-    System.out.println(grantCrunch.getExpiry().toString());
     userCapabilityJunctionDAO.put_(x, grantCrunch);
 
     // test that user has permissions before capability junction expires
@@ -265,7 +264,6 @@ public class CapabilityTest extends Test {
 
     // expire the cabability-user junction
     grantCrunch.setExpiry(((new GregorianCalendar(1970, Calendar.JULY, 1)).getTime()));
-    System.out.println(grantCrunch.getExpiry().toString());
     userCapabilityJunctionDAO.put_(x, grantCrunch);
 
     // test that user loses permissions after capability expires

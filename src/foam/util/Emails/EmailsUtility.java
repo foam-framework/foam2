@@ -64,7 +64,7 @@ public class EmailsUtility {
       foam.nanos.auth.Address address = theme.getSupportAddress();
       templateArgs.put("supportAddress", address == null ? "" : address.toSummary());
       templateArgs.put("appName", (theme.getAppName()));
-      templateArgs.put("logo", (appConfig.getUrl() + theme.getLogo()));
+      templateArgs.put("logo", (appConfig.getUrl() + "/" + theme.getLogo()));
       templateArgs.put("appLink", (appConfig.getUrl()));
       emailMessage.setTemplateArguments(templateArgs);
     }

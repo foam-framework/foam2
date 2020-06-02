@@ -54,12 +54,12 @@ foam.CLASS({
     {
       class: 'String',
       name: 'browseTitle',
-      expression: function(of) { return  of.model_.plural }
+      expression: function(of) { return of.model_.plural; }
     },
     {
       class: 'String',
       name: 'browseSubtitle',
-      expression: function(of) { return "View all " + of.model_.plural.toLowerCase() +'.' }
+      expression: function(of) { return 'View all ' + of.model_.plural.toLowerCase() + '.' }
     },
     {
       // TODO: Make ViewSpecWithJava a refinement to ViewSpec and change below to a ViewSpec

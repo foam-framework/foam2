@@ -15,7 +15,7 @@ foam.CLASS({
     'foam.u2.dialog.Popup',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
-    'foam.u2.filter.FilterSearch',
+    'foam.u2.filter.FilterView',
     'foam.u2.view.ScrollTableView',
     'foam.u2.view.SimpleSearch',
     'foam.u2.view.TabChoiceView',
@@ -248,7 +248,7 @@ foam.CLASS({
                         });
                       })
                       .callIf(self.config.searchMode === self.SearchMode.FULL, function() {
-                        this.tag(self.FilterSearch, {
+                        this.tag(self.FilterView, {
                           data$: self.searchPredicate$
                         });
                       })

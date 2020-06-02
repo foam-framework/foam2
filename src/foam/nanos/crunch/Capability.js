@@ -14,17 +14,19 @@ foam.CLASS({
   ],
 
   javaImports: [
-
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.dao.Sink',
     'foam.mlang.sink.Count',
+    'java.util.Date',
     'java.util.List',
     'static foam.mlang.MLang.*'
   ],
 
   implements: [
-    'foam.mlang.Expressions'
+    'foam.mlang.Expressions',
+    'foam.nanos.auth.LastModifiedAware',
+    'foam.nanos.auth.LastModifiedByAware'
   ],
 
   tableColumns: [
@@ -65,7 +67,7 @@ foam.CLASS({
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
       section: 'basicInfo'
-    }, 
+    },
     {
       name: 'name',
       class: 'String',
@@ -88,7 +90,7 @@ foam.CLASS({
       class: 'String',
       view: {
         class: 'foam.u2.tag.TextArea',
-        rows: 12, 
+        rows: 12,
         cols: 120
       }
     },
@@ -139,13 +141,67 @@ foam.CLASS({
       documentation: `List of permissions granted by this capability`
     },
     {
+      name: 'permissionsIntercepted',
+      class: 'StringArray',
+      documentation: `List of permissions intercepted by this capability`
+    },
+    {
       name: 'daoKey',
-      class: 'String'
+      class: 'String',
+      documentation: `
+      daoKey.put() done in UserCapabilityJunctionDAO.
+      Uses contextDAOFindKey to find object to update/put.`
+    },
+    {
+      name: 'contextDAOFindKey',
+      class: 'String',
+      documentation: 'need to find things dynamically, thus have a string here to specify the object in context to look up.'
+    },
+    {
+      class: 'foam.mlang.predicate.PredicateProperty',
+      name: 'interceptIf',
+      javaFactory: `
+      return foam.mlang.MLang.TRUE;
+      `,
+      documentation: 'condition under which the permissions that may be intercepted by this capability will be intercepted.'
+    },
+    {
+      name: 'lastModified',
+      class: 'DateTime',
+      section: '_defaultSection',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO'
+    },
+    {
+      name: 'lastModifiedBy',
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      section: '_defaultSection',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      tableCellFormatter: function(value, obj) {
+        obj.userDAO.find(value).then(function(user) {
+          if ( user ) {
+            this.add(user.legalName);
+          }
+        }.bind(this));
+      }
+    },
+    {
+      name: 'reviewRequired',
+      class: 'Boolean',
+      permissionRequired: true
     }
   ],
 
 
   methods: [
+    {
+      name: 'toSummary',
+      code: function() {
+        return this.name;
+      }
+    },
     {
       name: 'implies',
       type: 'Boolean',
@@ -179,8 +235,8 @@ foam.CLASS({
       name: 'stringImplies',
       type: 'Boolean',
       args: [
-        {name: 's1', type: 'String'},
-        {name: 's2', type: 'String'}
+        { name: 's1', type: 'String' },
+        { name: 's2', type: 'String' }
       ],
       documentation: `check if s1 implies s2 where s1 and s2 are permission or capability strings`,
       javaCode: `
@@ -195,7 +251,7 @@ foam.CLASS({
       name: 'isDeprecated',
       type: 'Boolean',
       args: [
-        {name: 'x', type: 'Context'}
+        { name: 'x', type: 'Context' }
       ],
       documentation: 'check if a given capability is deprecated',
       javaCode: `
@@ -208,6 +264,19 @@ foam.CLASS({
       return ((Count) count).getValue() > 0;
       `
     },
+    {
+      name: 'isExpired',
+      type: 'Boolean',
+      documentation: `check if a given capability is expired.`,
+      javaCode: `
+      if ( getExpiry() == null ) return false;
+
+      Date today = new Date();
+      Date capabilityExpiry = getExpiry();
+
+      return today.after(capabilityExpiry);
+      `
+    }
   ]
 });
 
@@ -232,7 +301,7 @@ foam.CLASS({
 });
 
 foam.RELATIONSHIP({
-  sourceModel: 'foam.nanos.crunch.Capability',  
+  sourceModel: 'foam.nanos.crunch.Capability',
   targetModel: 'foam.nanos.crunch.Capability',
   cardinality: '*:*',
   forwardName: 'deprecated',
@@ -247,7 +316,7 @@ foam.RELATIONSHIP({
 });
 
 foam.RELATIONSHIP({
-  sourceModel: 'foam.nanos.crunch.Capability',  
+  sourceModel: 'foam.nanos.crunch.Capability',
   targetModel: 'foam.nanos.crunch.Capability',
   cardinality: '*:*',
   forwardName: 'prerequisites',

@@ -1,27 +1,61 @@
 /**
  * @license
- * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
   package: 'foam.nanos.boot',
   name: 'DAONSpecMenu',
-  extends: 'foam.nanos.menu.SubMenu',
+  extends: 'foam.nanos.menu.Menu',
 
-  documentation: 'Psedo-menu to display all DAO NSpecs as ',
+  documentation: 'Psedo-menu to display all DAO NSpecs as sub-menus.',
 
-  properties: [
+  implements: [ 'foam.mlang.Expressions' ],
+
+  requires: [
+    'foam.comics.v2.DAOControllerConfig',
+    'foam.dao.ArrayDAO',
+    'foam.dao.PromisedDAO',
+    'foam.nanos.menu.DAOMenu2',
+    'foam.nanos.menu.Menu'
   ],
 
-  methods: [
-    function children() {
-      var c = this.SUPER();
+  imports: [ 'nSpecDAO' ],
 
-      debugger;
+  properties: [
+    {
+      name: 'children_',
+      factory: function() {
+        var aDAO = this.ArrayDAO.create();
+        var pDAO = this.PromisedDAO.create();
 
-      return c;
+        this.nSpecDAO.where(
+          this.AND(
+            this.ENDS_WITH(foam.nanos.boot.NSpec.ID, 'DAO'),
+            this.EQ(foam.nanos.boot.NSpec.SERVE,     true)
+          )).select((spec) => {
+            var menu = this.Menu.create({
+              id:     'dao.' + spec.id,
+              label:  foam.String.labelize(spec.name),
+              parent: this.id,
+              handler: this.DAOMenu2.create({
+                config: this.DAOControllerConfig.create({
+                  daoKey: spec.id
+                })
+              })
+            });
+            aDAO.put(menu);
+        }).then(() => pDAO.promise.resolve(aDAO));
+
+        return pDAO;
+      }
+    },
+    {
+      name: 'children',
+      // Use getter instead of factory to have higher precedence
+      // than than 'children' factory from relationship
+      getter: function() { return this.children_; }
     }
   ]
-
 });

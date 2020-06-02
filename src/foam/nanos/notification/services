@@ -184,3 +184,10 @@ p({
   "lazy":false,  
   "service":{"class":"foam.nanos.notification.sms.TwilioConfig"}
 })
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"SMTPConfig",
+  "lazy": false,
+  "service":{"class":"foam.nanos.notification.email.SMTPConfig"}
+})
