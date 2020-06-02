@@ -458,7 +458,8 @@ foam.CLASS({
       factory: function() {
         return foam.nanos.auth.Address.create({});
       }
-    }, {
+    },
+    {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'personalSupportUser'
