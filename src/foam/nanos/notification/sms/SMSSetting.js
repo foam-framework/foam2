@@ -55,6 +55,7 @@ foam.CLASS({
       name: 'sendNotification',
       javaCode: `
         DAO smsMessageDAO = (DAO) x.get("localSmsMessageDAO");
+        Logger logger = (Logger) x.get("logger");
         notification = (Notification) notification.fclone();
 
         // Check if the user has disabled sms notifications
@@ -64,6 +65,12 @@ foam.CLASS({
 
         // Do not send sms notifications to users that are not yet active
         if ( user.getLifecycleState() != LifecycleState.ACTIVE ) {
+          return;
+        }
+
+        // Check if users mobile phone is set
+        if ( user.getMobile().getNumber() == null ) {
+          logger.warning("User has not set a mobile phone number in notification settings, cannot send sms message.");
           return;
         }
 
