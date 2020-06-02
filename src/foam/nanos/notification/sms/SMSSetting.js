@@ -70,7 +70,7 @@ foam.CLASS({
 
         // Check if users mobile phone is set
         if ( user.getMobile().getNumber() == null ) {
-          logger.warning("User has not set a mobile phone number in notification settings, cannot send sms message.");
+          logger.warning("No mobile number found for user id: " + user.getId() + " unable to send sms message");
           return;
         }
 
@@ -92,7 +92,6 @@ foam.CLASS({
         try {
           smsMessageDAO.put(smsMessage);
         } catch (Throwable t) {
-          Logger logger = (Logger) x.get("logger");
           logger.error("Error creating sms message: " + smsMessage + ". Error: " + t);
         }   
       `
