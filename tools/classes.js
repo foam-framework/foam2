@@ -190,6 +190,7 @@ var classes = [
   'foam.nanos.NanoService',
   'foam.nanos.boot.NSpec',
   'foam.nanos.boot.NSpecAware',
+  'foam.nanos.boot.DAONSpecMenu',
   'foam.nanos.app.Mode',
   'foam.nanos.bench.Benchmark',
   'foam.nanos.auth.Authorizer',
