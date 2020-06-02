@@ -5,12 +5,13 @@
 */
 
 foam.CLASS({
-  package: 'foam.u2.filter',
+  package: 'foam.u2.filter.properties',
   name: 'BooleanFilterView',
   extends: 'foam.u2.Controller',
 
   documentation: `
-    A simple Boolean filter that allows the user to pick between true or false.
+    A Boolean Search View filter that allows the user to pick between true or
+    false.
   `,
 
   implements: [
@@ -59,29 +60,33 @@ foam.CLASS({
   properties: [
     {
       name: 'property',
-      documentation: `The property that this view is filtering by. Should be of
-      type Boolean.`,
+      documentation: `
+        The property that this view is filtering by. Should be of type Boolean.
+      `,
       required: true
     },
     {
       class: 'Boolean',
       name: 'boolT',
       label: 'True',
-      documentation: `Filter property for True`,
+      documentation: 'Filter property for True, mostly for UI/UX purposes',
       value: false
     },
     {
       class: 'Boolean',
       name: 'boolF',
       label: 'False',
-      documentation: `Filter property for False`,
+      documentation: 'Filter property for False, mostly for UI/UX purposes',
       value: false
     },
     {
       name: 'predicate',
-      documentation: `All SearchViews must have a predicate as required by the
-      SearchManager. The SearchManager will read this predicate and use it
-      to filter the dao being displayed in the view.`,
+      documentation: `
+        All Search Views must have a predicate as required by the
+        Filter Controller. When this property changes, the Filter Controller will
+        generate a new main predicate and also reciprocate the changes to the
+        other Search Views.
+      `,
       expression: function(boolT, boolF) {
         if ( ( ! boolT && ! boolF ) || ( boolT && boolF )) return this.TRUE;
 
@@ -90,16 +95,17 @@ foam.CLASS({
     },
     {
       name: 'name',
-      documentation: `Required by SearchManager.`,
-      value: 'Boolean filter view'
+      documentation: 'Required by Filter Controller.',
+      expression: function(property) {
+        return property.name;
+      }
     }
   ],
 
   methods: [
     function initE() {
       var self = this;
-      this
-        .addClass(this.myClass())
+      this.addClass(this.myClass())
         .start().addClass(this.myClass('container'))
           .start({
             class: 'foam.u2.md.CheckBox',
@@ -125,6 +131,16 @@ foam.CLASS({
     function clear() {
       this.boolT = false;
       this.boolF = false;
+    },
+
+    /**
+    * Restores the view based on passed in predicate
+    */
+    function restoreFromPredicate(predicate) {
+      if ( predicate == this.TRUE ) return;
+
+      if ( predicate.arg2.value ) this.boolT = true;
+      if ( ! predicate.arg2.value ) this.boolF = true;
     }
   ]
 });

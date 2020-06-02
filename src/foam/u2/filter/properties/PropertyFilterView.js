@@ -1,23 +1,26 @@
 /**
- * @license
- * Copyright 2019 The FOAM Authors. All Rights Reserved.
- * http://www.apache.org/licenses/LICENSE-2.0
- */
+* @license
+* Copyright 2019 The FOAM Authors. All Rights Reserved.
+* http://www.apache.org/licenses/LICENSE-2.0
+*/
 
 foam.CLASS({
-  package: 'foam.u2.filter',
-  name: 'FilterViewController',
+  package: 'foam.u2.filter.property',
+  name: 'PropertyFilterView',
   extends: 'foam.u2.View',
 
-  documentation: 'Manages the FilterViews',
+  documentation: `
+    Property Filter View is in charge of displaying the correct Search View and
+    restore the view's data if there is an existing predicate for the view that
+    was selected by the user before.
+  `,
 
-  imports: [
-    'searchManager'
+  implements: [
+    'foam.mlang.Expressions'
   ],
 
-  messages: [
-    { name: 'LABEL_PROPERTY_ALL',    message: 'All' },
-    { name: 'LABEL_PROPERTY_FILTER', message: 'Filtering' }
+  imports: [
+    'filterController'
   ],
 
   css: `
@@ -77,20 +80,24 @@ foam.CLASS({
     }
   `,
 
+  messages: [
+    { name: 'LABEL_PROPERTY_ALL',    message: 'All' },
+    { name: 'LABEL_PROPERTY_FILTER', message: 'Filtering' }
+  ],
+
   properties: [
     {
       name: 'searchView',
-      documentation: `The FilterView to wrap. You must set this.`,
+      documentation: 'The FilterView to wrap. You must set this.',
       required: true
     },
     {
       class: 'Boolean',
       name: 'active',
-      documentation: `Tracks whether the property is being used as part of the
-        filter criteria or not.`
-    },
-    {
-      name: 'filterViewElement_'
+      documentation: `
+        Tracks if the property filter is currently being focused on or not. This
+        affects UI and some logic.
+      `
     },
     'container_',
     'property',
@@ -112,6 +119,9 @@ foam.CLASS({
       class: 'String',
       name: 'iconPath',
       value: 'images/expand-more.svg'
+    },
+    {
+      name: 'criteria'
     }
   ],
 
@@ -119,8 +129,7 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       var self = this;
-      this
-        .addClass(this.myClass())
+      this.addClass(this.myClass())
         .start().addClass(this.myClass('container-property'))
           .enableClass(this.myClass('container-property-active'), this.active$)
           .on('click', this.switchActive)
@@ -132,23 +141,24 @@ foam.CLASS({
         .end()
         .add(this.slot(function(active) {
           return active ? self.E().start().addClass(self.myClass('overlay-dismiss'))
-              .on('click', self.switchActive)
-            .end() : self.E();
+          .on('click', self.switchActive)
+          .end() : self.E();
         }))
         .start('div', null, this.container_$).addClass(this.myClass('container-filter'))
           .show(this.active$)
         .end();
-
+      this.isFiltering();
     }
   ],
 
   listeners: [
     function switchActive() {
       this.active = ! this.active;
-      // NOTE: expand-less is off color
       this.iconPath = this.active ? 'images/expand-less.svg' : 'images/expand-more.svg';
 
+      // View is not active. Does not require creation
       if ( ! this.active ) return;
+      // View has been instantiated before. Does not require creation
       if ( ! this.firstTime_ ) return;
 
       this.container_.tag(this.searchView, {
@@ -156,17 +166,34 @@ foam.CLASS({
         dao$: this.dao$
       }, this.view_$);
 
-      this.searchManager.add(this.view_);
+      // Restore the search view using an existing predicate for that view
+      // This requires that every search view implements restoreFromPredicate
+      var existingPredicate = this.filterController.getExistingPredicate(this.criteria, this.property);
+      if ( existingPredicate ) {
+        this.view_.restoreFromPredicate(existingPredicate);
+      }
+
+      // Add the view to be managed by the FilterController
+      // This enables reciprocal search
+      this.filterController.add(this.view_, this.property.name, this.criteria);
+
+      // Prevents rerendering the view.
       this.firstTime_ = false;
 
       this.onDetach(this.view_$.dot('predicate').sub(this.isFiltering));
     },
 
     function isFiltering() {
-      const instance = this.view_.predicate.instance_;
-      this.labelFiltering = instance.arg1 || instance.args ?
-        this.LABEL_PROPERTY_FILTER :
-        this.LABEL_PROPERTY_ALL;
+      // Since the existing predicates are lazy loaded (on opening the view),
+      // check to see if there is an existing predicate to use the correct label
+      if ( this.filterController.getExistingPredicate(this.criteria, this.property) && this.firstTime_ ) {
+        this.labelFiltering = this.LABEL_PROPERTY_FILTER;
+        return;
+      }
+      if ( ! this.view_ ) return;
+      // Displays the correct label depending on situation
+      this.labelFiltering = this.view_.predicate !== this.TRUE ?
+        this.LABEL_PROPERTY_FILTER : this.LABEL_PROPERTY_ALL;
     }
   ]
 });
