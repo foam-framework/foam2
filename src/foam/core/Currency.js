@@ -23,6 +23,18 @@
     'emoji'
   ],
 
+  axioms: [
+    {
+      buildJavaClass: function(cls) {
+        cls.extras.push(`
+          public String format(UnitValue amount) {
+            return format(amount, false);
+          }
+        `);
+      }
+    }
+  ],
+
   properties: [
     {
       class: 'Long',
