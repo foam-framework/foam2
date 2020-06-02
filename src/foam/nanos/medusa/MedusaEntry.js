@@ -28,6 +28,7 @@ foam.CLASS({
     'index1',
     'index2',
     'consensusCount',
+    'verified',
     'lastModified'
   ],
 
@@ -42,7 +43,8 @@ foam.CLASS({
       class: 'String',
       name: 'nSpecName',
       label: 'NSpec Name',
-      visibility: 'RO'
+      visibility: 'RO',
+      tableWidth: 200
     },
     {
       class: 'Enum',
@@ -53,7 +55,8 @@ foam.CLASS({
     {
       name: 'index',
       class: 'Long',
-      visibility: 'RO'
+      visibility: 'RO',
+      tableWidth: 150
     },
     {
       name: 'hash',
@@ -63,7 +66,8 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'index1',
-      visibility: 'RO'
+      visibility: 'RO',
+      tableWidth: 150
     },
     {
       class: 'String',
@@ -74,7 +78,8 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'index2',
-      visibility: 'RO'
+      visibility: 'RO',
+      tableWidth: 150
     },
     {
       class: 'String',
@@ -102,13 +107,15 @@ foam.CLASS({
       name: 'consensusCount',
       class: 'Int',
       visibility: 'RO',
-      transient: true,
+      storageTransient: true,
+      tableWidth: 150
     },
     {
       name: 'verified',
       class: 'Boolean',
       visibility: 'RO',
-      transient: true,
+      storageTransient: true,
+      tableWidth: 100
     },
     {
       documentation: 'Solely for information. Originating Mediator.',

@@ -142,7 +142,7 @@ foam.CLASS({
              if ( getWriteOnly() ) {
                delegate = new foam.dao.WriteOnlyJDAO(getX(), getMdao(), getOf(), getJournalName());
              } else {
-               delegate = new foam.dao.java.JDAO(getX(), getMdao(), getJournalName(), getCluster() /* read-only */);
+               delegate = new foam.dao.java.JDAO(getX(), getMdao(), getJournalName()); //, getCluster() /* read-only */);
              }
           } else {
             setMdao(new foam.dao.MDAO(getOf()));

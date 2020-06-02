@@ -79,27 +79,41 @@ foam.CLASS({
       3. If not mediator, proxy to the next 'server', put result.`,
       name: 'put_',
       javaCode: `
-      getLogger().debug("put", "primary", getConfig().getIsPrimary());
+      // TODO/REVIEW: does Clusterable make sense?
+      if ( obj instanceof Clusterable &&
+           ! ((Clusterable) obj).getClusterable() ) {
+        getLogger().debug("put", "not clusterable", obj.getProperty("id"));
+        return getDelegate().put_(x, obj);
+      }
       if ( getConfig().getIsPrimary() ) {
+        getLogger().debug("put", "primary", obj.getProperty("id"));
         FObject old = getDelegate().find_(x, obj.getProperty("id"));
         FObject nu = getDelegate().put_(x, obj);
         return submit(x, nu, old, DOP.PUT);
       }
+      getLogger().debug("put", "client", obj.getProperty("id"));
       FObject result = getClientDAO().put_(x, obj);
       if ( getConfig().getType() == MedusaType.MEDIATOR ) {
         FObject found = getDelegate().find_(x, obj.getProperty("id"));
-        if ( found == null ||
-            ! found.equals(result) ) {
-          getLogger().error("put", "corrupt", "found != response");
+        if ( found == null) {
+          // FIXME: In Zone 1+, it would appear the client returns before the broadcast finishes.
+          getLogger().error("put", "client", "delegate.find", "NOT FOUND", obj.getProperty("id"));
+          return result;
         }
         return found;
       }
+      getLogger().debug("put", "client", "delegate.put", obj.getProperty("id"));
       return getDelegate().put_(x, result);
       `
     },
     {
       name: 'remove_',
       javaCode: `
+      // TODO/REVIEW: does Clusterable make sense?
+      if ( obj instanceof Clusterable &&
+           ! ((Clusterable) obj).getClusterable() ) {
+        return getDelegate().remove_(x, obj);
+      }
       if ( getConfig().getIsPrimary() ) {
         getDelegate().remove_(x, obj);
         return submit(x, obj, null, DOP.REMOVE);
