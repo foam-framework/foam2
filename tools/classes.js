@@ -387,7 +387,7 @@ var classes = [
   'foam.nanos.export.GoogleApiCredentials',
   'foam.nanos.export.GoogleDriveService',
   'foam.nanos.export.GoogleSheetsExport',
-  'foam.nanos.export.GoogleSheetsExportService',
+  'foam.nanos.export.GoogleSheetsApiService',
   'foam.nanos.export.GoogleSheetsPropertyMetadata',
   'foam.dao.jdbc.ConnectionPool',
   'foam.lib.Outputter',

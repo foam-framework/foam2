@@ -21,7 +21,7 @@ p({
   "serve": true,
   "authenticate": false,
   "boxClass": "foam.nanos.export.GoogleSheetsExportSkeleton",
-  "serviceClass": "foam.nanos.export.GoogleSheetsExportService",
+  "serviceClass": "foam.nanos.export.GoogleSheetsApiService",
   "client":"""
     {
       "class": "foam.nanos.export.ClientGoogleSheetsExportService",
