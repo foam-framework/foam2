@@ -610,8 +610,10 @@ foam.CLASS({
     function parseClassFromString(str, opt_cls, opt_ctx) {
       return this.strict ?
           // JSON.parse() is faster; use it when data format allows.
-          foam.json.parse(JSON.parse(str), opt_cls,
-                          opt_ctx || this.creationContext) :
+          foam.json.parse(
+            JSON.parse(str),
+            opt_cls,
+            opt_ctx || this.creationContext) :
           // Create new parser iff different context was injected; otherwise
           // use same parser bound to "creationContext" each time.
           opt_ctx ? foam.parsers.FON.create({

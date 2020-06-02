@@ -994,6 +994,9 @@ foam.CLASS({
     },
     {
       name: '__subSubContext__',
+      documentation:
+        `Current subContext to use when creating children.
+        Defaults to __subContext__ unless in a nested startContext().`,
       factory: function() { return this.__subContext__; }
     },
     'keyMap_'

@@ -8,12 +8,6 @@ foam.ENUM({
   name: 'CapabilityJunctionStatus',
   values: [
     {
-      name: 'AVAILABLE',
-      label: 'available',
-      documentation: `This status is used when there is no UCJ - thus capability available.`,
-      background: '#604aff'
-    },
-    {
       name: 'PENDING',
       label: 'pending',
       documentation: `This is for capabilities that are waiting approvals. UCJ has sent out an approval.`,
@@ -36,6 +30,12 @@ foam.ENUM({
       label: 'action required',
       documentation: `A capability started and requiring user action, should have ucj in this state.`,
       background: '#bf3232'
+    },
+    {
+      name: 'AVAILABLE',
+      label: 'available',
+      documentation: `This status is used when there is no UCJ - thus capability available.`,
+      background: '#604aff'
     }
   ]
 });
