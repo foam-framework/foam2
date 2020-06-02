@@ -44,6 +44,10 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'isAllColumnOptionEnabled',
+    },
+    {
+      class: 'Boolean',
       name: 'enabled',
       value: true
     }
