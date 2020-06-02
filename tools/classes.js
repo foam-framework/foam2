@@ -329,6 +329,7 @@ var classes = [
   'foam.nanos.notification.email.EmailPropertyService',
   'foam.nanos.notification.email.Status',
   // Email service Files
+  'foam.nanos.notification.email.SMTPConfig',
   'foam.nanos.notification.email.SMTPEmailService',
   'foam.nanos.notification.email.NullEmailService',
   'foam.nanos.notification.email.ProxyEmailService',
@@ -362,7 +363,6 @@ var classes = [
   'foam.nanos.notification.NotificationTemplateDAO',
   'foam.nanos.notification.notifications.ScriptRunNotification',
   'foam.nanos.notification.EmailSetting',
-  'foam.nanos.notification.email.SMTPConfig',
   'foam.nanos.notification.NotificationSetting',
   'foam.nanos.notification.NotificationHostnameRuleAction',
   'foam.nanos.script.Script',
