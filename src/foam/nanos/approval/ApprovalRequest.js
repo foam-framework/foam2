@@ -585,7 +585,8 @@
       code: function(X) {
         this.objectSummaryView.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
           class: this.MemoModal,
-          onExecute: this.approveWithMemo.bind(this)
+          onExecute: this.approveWithMemo.bind(this),
+          title: "Add a memo to this (optional)"
         }));
       }
     },
@@ -606,7 +607,8 @@
         this.objectSummaryView.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
           class: this.MemoModal,
           onExecute: this.rejectWithMemo.bind(this),
-          isMemoRequired: true
+          isMemoRequired: true,
+          title: "Add a memo to this (required)"
         }));
       }
     },

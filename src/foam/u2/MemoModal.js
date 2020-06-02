@@ -57,13 +57,19 @@ foam.CLASS({
     {
       class: 'String',
       name: 'title',
-      value: "Add a memo to this"
+      expression: isMemoRequired => {
+        if (isMemoRequired)
+          return "Add a memo to this (required)";
+        return "Add a memo to this (optoinal)";
+      }
     },
     {
       class: 'String',
       name: 'memo',
-      validateObj: () => {
-        // TODO: Needed here in order for slots to fire off per character type. Actual fix is required
+      view: {
+        class: 'foam.u2.tag.TextArea',
+        rows: '8px',
+        onKey: true
       }
     },
     {
