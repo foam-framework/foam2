@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.nanos.export',
+  package: 'foam.nanos.google_api',
   name: 'GoogleSheetsApiService',
   implements: [
     'foam.nanos.export.GoogleSheetsExport'
@@ -18,8 +18,8 @@ foam.CLASS({
     'com.google.api.services.sheets.v4.Sheets',
     'com.google.api.services.sheets.v4.SheetsScopes',
     'com.google.api.services.sheets.v4.model.*',
+    'foam.nanos.export.GoogleSheetsPropertyMetadata',
     'foam.nanos.logger.Logger',
-
     'java.util.*'
   ],
   constants: [
