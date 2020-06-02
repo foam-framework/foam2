@@ -35,13 +35,14 @@ foam.CLASS({
   requires: [
     'foam.nanos.client.ClientBuilder',
     'foam.nanos.auth.Group',
-    'foam.nanos.auth.ResendVerificationEmail',
     'foam.nanos.auth.User',
+    'foam.nanos.auth.Subject',
     'foam.nanos.theme.Theme',
     'foam.nanos.theme.Themes',
     'foam.nanos.theme.ThemeDomain',
     'foam.nanos.u2.navigation.TopNavigation',
     'foam.nanos.u2.navigation.FooterView',
+    'foam.u2.crunch.CrunchController',
     'foam.u2.stack.Stack',
     'foam.u2.stack.StackView',
     'foam.u2.dialog.NotificationMessage',
@@ -50,6 +51,7 @@ foam.CLASS({
   ],
 
   imports: [
+    'capabilityDAO',
     'installCSS',
     'sessionSuccess',
     'window',
@@ -60,6 +62,8 @@ foam.CLASS({
     'agent',
     'appConfig',
     'as ctrl',
+    'capabilityAcquired',
+    'capabilityCancelled',
     'currentMenu',
     'group',
     'lastMenuLaunched',
@@ -69,14 +73,18 @@ foam.CLASS({
     'menuListener',
     'notify',
     'pushMenu',
+    'requestCapability',
+    'capabilityCache',
     'requestLogin',
     'signUpEnabled',
     'loginVariables',
     'stack',
+    'subject',
     'user',
     'webApp',
     'wrapCSS as installCSS',
-    'sessionTimer'
+    'sessionTimer',
+    'crunchController'
   ],
 
   constants: {
@@ -132,7 +140,6 @@ foam.CLASS({
       margin: 0;
     }
     .stack-wrapper {
-      margin-bottom: -10px;
       min-height: calc(80% - 60px);
     }
     .stack-wrapper:after {
@@ -202,6 +209,12 @@ foam.CLASS({
     },
     {
       class: 'foam.core.FObjectProperty',
+      of: 'foam.nanos.auth.Subject',
+      name: 'subject',
+      factory: function() { return this.Subject.create(); }
+    },
+    {
+      class: 'foam.core.FObjectProperty',
       of: 'foam.nanos.auth.Group',
       name: 'group'
     },
@@ -217,11 +230,38 @@ foam.CLASS({
       name: 'loginSuccess'
     },
     {
+      class: 'Boolean',
+      name: 'capabilityAcquired',
+      documentation: `
+        The purpose of this is to handle the intercept flow for a capability that was granted,
+        via the InterceptView from this.requestCapability(exceptionCapabilityType).
+      `
+    },
+    {
+      class: 'Boolean',
+      name: 'capabilityCancelled'
+    },
+    {
       class: 'FObjectProperty',
       of: 'foam.nanos.session.SessionTimer',
       name: 'sessionTimer',
       factory: function() {
         return this.SessionTimer.create();
+      }
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.u2.crunch.CrunchController',
+      name: 'crunchController',
+      factory: function() {
+        return this.CrunchController.create();
+      }
+    },
+    {
+      class: 'Map',
+      name: 'capabilityCache',
+      factory: function() {
+        return new Map();
       }
     },
     {
@@ -275,12 +315,30 @@ foam.CLASS({
       this.clientPromise.then(async function(client) {
         self.setPrivate_('__subContext__', client.__subContext__);
 
-        await self.fetchAgent();
-        await self.fetchUser();
+        await self.fetchSubject();
+
+        // add user and agent for backward compatibility
+        Object.defineProperty(self, 'user', {
+          get: function() {
+            console.info("Deprecated use of user. Use Subject to retrieve user");
+            return this.subject.user;
+          },
+          set: function(newValue) {
+            console.warn("Deprecated use of user setter");
+            this.subject.user = newValue;
+          }
+        });
+        Object.defineProperty(self, 'agent', {
+          get: function() {
+            console.warn("Deprecated use of agent");
+            return this.subject.realUser;
+          }
+        });
 
         // Fetch the group only once the user has logged in. That's why we await
         // the line above before executing this one.
         await self.fetchGroup();
+        await self.fetchTheme();
         self.onUserAgentAndGroupLoaded();
       });
     },
@@ -294,7 +352,9 @@ foam.CLASS({
           this
             .addClass(this.myClass())
             .start()
-              .tag(this.topNavigation_)
+              .add(this.slot(function (topNavigation_) {
+                return this.E().tag(topNavigation_);
+              }))
             .end()
             .start()
               .addClass('stack-wrapper')
@@ -305,7 +365,9 @@ foam.CLASS({
               })
             .end()
             .start()
-              .tag(this.footerView_)
+              .add(this.slot(function (footerView_) {
+                return this.E().tag(footerView_);
+              }))
             .end();
           });
       });
@@ -322,23 +384,19 @@ foam.CLASS({
       }
     },
 
-    async function fetchUser() {
+    async function fetchSubject() {
       /** Get current user, else show login. */
       try {
-        var result = await this.client.auth.getCurrentUser(null);
-        this.loginSuccess = !! result;
+        var result = await this.client.auth.getCurrentSubject(null);
+        this.loginSuccess = !! result && !! result.user;
 
-        if ( ! result ) throw new Error();
+        if ( ! this.loginSuccess ) throw new Error();
 
-        this.user = result;
+        this.subject = result;
       } catch (err) {
         await this.requestLogin();
-        return await this.fetchUser();
+        return await this.fetchSubject();
       }
-    },
-
-    async function fetchAgent() {
-      this.agent = await this.client.agentAuth.getCurrentAgent();
     },
 
     function expandShortFormMacro(css, m) {
@@ -392,10 +450,15 @@ foam.CLASS({
       }
     },
 
-    function pushMenu(menuId) {
+    function pushMenu(menu) {
+      if ( menu.id ) {
+        menu.launch(this);
+        menu = menu.id;
+      }
+
       /** Use to load a specific menu. **/
-      if ( window.location.hash.substr(1) != menuId ) {
-        window.location.hash = menuId;
+      if ( window.location.hash.substr(1) != menu ) {
+        window.location.hash = menu;
       }
     },
 
@@ -419,6 +482,34 @@ foam.CLASS({
       });
     },
 
+    function requestCapability(capabilityInfo) {
+      var self = this;
+
+      capabilityInfo.capabilityOptions.forEach((c) => {
+        self.capabilityCache.set(c, false);
+      });
+
+      self.capabilityAcquired = false;
+      self.capabilityCancelled = false;
+      return new Promise(function(resolve, reject) {
+        self.stack.push({
+          class: 'foam.u2.crunch.CapabilityInterceptView',
+          capabilityOptions: capabilityInfo.capabilityOptions
+        });
+        var s1, s2;
+        s1 = self.capabilityAcquired$.sub(() => {
+          s1.detach();
+          s2.detach();
+          resolve();
+        });
+        s2 = self.capabilityCancelled$.sub(() => {
+          s1.detach();
+          s2.detach();
+          reject();
+        });
+      });
+    },
+
     function notify(data, type) {
       /** Convenience method to create toast notifications. */
       this.add(this.NotificationMessage.create({
@@ -436,24 +527,16 @@ foam.CLASS({
        *   - Update the look and feel of the app based on the group or user
        *   - Go to a menu based on either the hash or the group
        */
-      if ( ! this.user.emailVerified ) {
-        this.loginSuccess = false;
-        this.stack.push({ class: 'foam.nanos.auth.ResendVerificationEmail' });
-        return;
-      }
+      this.fetchTheme();
 
       var hash = this.window.location.hash;
       if ( hash ) hash = hash.substring(1);
 
       if ( hash ) {
         window.onpopstate();
-      } else if ( this.group ) {
-        this.window.location.hash = this.group.defaultMenu;
+      } else if ( this.theme ) {
+        this.window.location.hash = this.theme.defaultMenu;
       }
-
-      // Update the look and feel now that the user is logged in since there
-      // might be a more specific one to use now.
-      this.fetchTheme();
     },
 
     function menuListener(m) {

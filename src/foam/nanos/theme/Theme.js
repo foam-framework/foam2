@@ -101,6 +101,21 @@ foam.CLASS({
       section: 'infoSection',
     },
     {
+      class: 'Image',
+      name: 'loginImage',
+      displayWidth: 60,
+      view: {
+        class: 'foam.u2.MultiView',
+        views: [
+          {
+            class: 'foam.u2.tag.TextArea',
+            rows: 4, cols: 80
+          },
+          { class: 'foam.u2.view.ImageView' },
+        ]
+      },
+    },
+    {
       name: 'domains',
       class: 'Array',
       of: 'String',
@@ -110,6 +125,25 @@ foam.CLASS({
       javaFactory: 'return new String[] { "localhost" };',
       includeInDigest: true,
       section: 'urlMapping'
+    },
+    {
+      class: 'String',
+      name: 'navigationRootMenu',
+      documentation: 'Specifies the root menu to be used in side navigation.'
+    },
+    {
+      class: 'String',
+      name: 'settingsRootMenu',
+      documentation: 'Specifies the root menu to be used in top navigation settings drop-down.'
+    },
+    {
+      class: 'Boolean',
+      name: 'disableCurrencyChoice',
+      value: false
+    },
+    {
+      class: 'String',
+      name: 'logoRedirect',
     },
     {
       class: 'Reference',
