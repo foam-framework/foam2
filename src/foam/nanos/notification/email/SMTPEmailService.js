@@ -19,15 +19,16 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.nanos.notification.email.SMTPConfig',
+    'foam.nanos.logger.Logger',
+    'foam.nanos.om.OMLogger',
+    'static foam.mlang.MLang.EQ',
     'java.util.Date',
     'java.util.Properties',
     'javax.mail.*',
     'javax.mail.internet.InternetAddress',
     'javax.mail.internet.MimeMessage',
     'org.apache.commons.lang3.StringUtils',
-    'foam.nanos.logger.Logger',
-    'foam.nanos.om.OMLogger',
-    'static foam.mlang.MLang.EQ'
   ],
 
   axioms: [
@@ -63,13 +64,14 @@ foam.CLASS({
       class: 'Object',
       javaFactory:
       `
+        SMTPConfig smtpConfig = (SMTPConfig) getX().get("SMTPConfig");
         Properties props = new Properties();
-        props.setProperty("mail.smtp.auth", getAuthenticate() ? "true" : "false");
-        props.setProperty("mail.smtp.starttls.enable", getStarttls() ? "true" : "false");
-        props.setProperty("mail.smtp.host", getHost());
-        props.setProperty("mail.smtp.port", getPort());
-        if ( getAuthenticate() ) {
-          return Session.getInstance(props, new SMTPAuthenticator(getUsername(), getPassword()));
+        props.setProperty("mail.smtp.auth", smtpConfig.getAuthenticate() ? "true" : "false");
+        props.setProperty("mail.smtp.starttls.enable", smtpConfig.getStarttls() ? "true" : "false");
+        props.setProperty("mail.smtp.host", smtpConfig.getHost());
+        props.setProperty("mail.smtp.port", smtpConfig.getPort());
+        if ( smtpConfig.getAuthenticate() ) {
+          return Session.getInstance(props, new SMTPAuthenticator(smtpConfig.getUsername(), smtpConfig.getPassword()));
         }
         return Session.getInstance(props);
       `
@@ -82,11 +84,12 @@ foam.CLASS({
       `
         Logger logger = (Logger) getX().get("logger");
         OMLogger omLogger = (OMLogger) getX().get("OMLogger");
+        SMTPConfig smtpConfig = (SMTPConfig) getX().get("SMTPConfig");
         Transport transport = null;
         try {
           omLogger.log(this.getClass().getSimpleName(), "transport", "connecting");
           transport = getSession_().getTransport("smtp");
-          transport.connect(getUsername(), getPassword());
+          transport.connect(smtpConfig.getUsername(), smtpConfig.getPassword());
           logger.info("SMTPEmailService connected.");
           omLogger.log(this.getClass().getSimpleName(), "transport", "connected");
         } catch ( Exception e ) {
@@ -95,36 +98,6 @@ foam.CLASS({
         return transport;
       `
     },
-    {
-      class: 'String',
-      name: 'host',
-      value: '127.0.0.1'
-    },
-    {
-      class: 'String',
-      name: 'port',
-      value: '25'
-    },
-    {
-      class: 'Boolean',
-      name: 'authenticate',
-      value: false
-    },
-    {
-      class: 'Boolean',
-      name: 'starttls',
-      value: false
-    },
-    {
-      class: 'String',
-      name: 'username',
-      value: null
-    },
-    {
-      class: 'String',
-      name: 'password',
-      value: null
-    }
   ],
 
   methods: [
@@ -158,7 +131,7 @@ foam.CLASS({
                 message.setFrom(new InternetAddress(emailMessage.getReplyTo()));
               }
           }
-          
+
           if ( emailMessage.isPropertySet("replyTo") )
             message.setReplyTo(InternetAddress.parse(emailMessage.getReplyTo()));
 
@@ -183,7 +156,7 @@ foam.CLASS({
               message.setRecipients(Message.RecipientType.CC, InternetAddress.parse(StringUtils.join(emailMessage.getCc(), ",")));
             }
           }
-          
+
           if ( emailMessage.isPropertySet("bcc") ) {
             if ( emailMessage.getBcc().length == 1 ) {
               message.setRecipient(Message.RecipientType.BCC, new InternetAddress((emailMessage.getBcc())[0], false));
@@ -191,7 +164,7 @@ foam.CLASS({
               message.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(StringUtils.join(emailMessage.getBcc(), ",")));
             }
           }
-          
+
           message.setSentDate(new Date());
           logger.info("SMTPEmailService Created MimeMessage.");
           return message;

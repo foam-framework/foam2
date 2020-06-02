@@ -25,6 +25,7 @@ FOAM_FILES([
   { name: "foam/nanos/app/ContextLookupAppConfigService"},
   { name: "foam/nanos/app/AppConfigService" },
   { name: "foam/nanos/app/EmailConfig" },
+  { name: "foam/nanos/notification/email/SMTPConfig" },
   { name: "foam/nanos/app/ClientAppConfigService" },
   { name: "foam/nanos/controller/ApplicationController" },
   { name: "foam/nanos/app/Mode" },
@@ -310,6 +311,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/crunchtest/FakeTestObject" },
   // models
   { name: "foam/nanos/crunch/Capability" },
+  { name: "foam/nanos/crunch/CapabilityCategory" },
   { name: "foam/nanos/crunch/CapabilityJunctionStatus" },
   { name: "foam/nanos/crunch/UserCapabilityJunctionRefine" },
   //daos

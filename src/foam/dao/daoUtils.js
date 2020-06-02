@@ -197,7 +197,8 @@ foam.CLASS({
       class: 'Promised',
       of: 'foam.dao.DAO',
       methods: [ 'put_', 'remove_', 'find_', 'select_', 'removeAll_', 'listen_', 'cmd_' ],
-      name: 'promise'
+      name: 'promise',
+      factory: function() { return foam.core.Latch.create(); }
     }
   ],
 
