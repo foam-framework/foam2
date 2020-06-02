@@ -21,8 +21,6 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   requires: [
-    'foam.mlang.predicate.True',
-    'foam.mlang.predicate.False',
     'foam.parse.QueryParser',
     'foam.u2.tag.Input'
   ],
@@ -67,7 +65,7 @@ foam.CLASS({
     'property',
     {
       name: 'predicate',
-      factory: function() { return this.True.create(); }
+      factory: function() { return this.TRUE; }
     },
     {
       class: 'foam.u2.ViewSpec',
@@ -85,9 +83,9 @@ foam.CLASS({
     },
     {
       // All search views (in the SearchManager) need a name.
-      // This defaults to 'query'.
+      // This defaults to 'textSearchView'.
       name: 'name',
-      value: 'query'
+      value: 'textSearchView'
     },
     {
       class: 'Boolean',
@@ -102,15 +100,17 @@ foam.CLASS({
         .tag(this.viewSpec, {
           alwaysFloatLabel: true,
           label$: this.label$,
-          onKey: this.onKey
+          onKey: this.onKey,
+          mode$: this.mode$
         }, this.view$);
 
       this.view.data$.sub(this.updateValue);
+      this.updateValue();
     },
 
     function clear() {
       this.view.data = '';
-      this.predicate = this.True.create();
+      this.predicate = this.TRUE;
     }
   ],
 
@@ -125,7 +125,7 @@ foam.CLASS({
           this.True.create() :
           this.richSearch ?
             this.OR(
-              this.queryParser.parseString(value) || this.False.create(),
+              this.queryParser.parseString(value) || this.FALSE,
               this.KEYWORD(value)
             ) :
             this.checkStrictEquality ?
