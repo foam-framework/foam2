@@ -47,7 +47,9 @@ foam.CLASS({
     'foam.u2.stack.StackView',
     'foam.u2.dialog.NotificationMessage',
     'foam.nanos.session.SessionTimer',
-    'foam.u2.dialog.Popup'
+    'foam.u2.dialog.Popup',
+    'foam.i18n.Locale',
+    'foam.i18n.XLIFFTranslationValue',
   ],
 
   imports: [
@@ -84,7 +86,8 @@ foam.CLASS({
     'webApp',
     'wrapCSS as installCSS',
     'sessionTimer',
-    'crunchController'
+    'crunchController',
+    'XLIFFTranslation'
   ],
 
   constants: {
@@ -285,7 +288,28 @@ foam.CLASS({
     },
     'currentMenu',
     'lastMenuLaunched',
-    'webApp'
+    'webApp',
+    {
+      name   : 'XLIFFTranslation',
+      factory: function() {
+        if ( foam.language == 'fr-CA' || foam.language == 'fr' ) {
+          return this.Locale.create({
+            locale:'fr',
+            variant:'CA',
+            locale_variant: 'fr-CA',
+            translationValues:
+              {
+                values:[
+                  this.XLIFFTranslationValue.create(
+                    {id:'net.nanopay.sme.ui.dashboard.TopCardsOnDashboardOne', model_property:'LOWER_LINE_TXT',translated_value: 'Welcome back Fr 1 ' }),
+                  this.XLIFFTranslationValue.create(
+                    {id:'net.nanopay.sme.ui.dashboard.TopCardsOnDashboard', model_property:'LOWER_LINE_TXT',translated_value: 'Welcome back Fr 2 ' }),
+                ]
+              }
+          });
+        }
+      }
+    }
   ],
 
   methods: [
