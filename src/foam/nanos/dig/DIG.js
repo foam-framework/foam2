@@ -93,18 +93,6 @@ foam.CLASS({
       class: 'Long',
       name: 'limit'
     },
-    {
-      class: 'EMail',
-      displayWidth: 100,
-      name: 'email',
-      hidden: true
-    },
-    {
-      class: 'String',
-      displayWidth: 100,
-      name: 'subject',
-      hidden: true
-    },
     'data',
     {
       class: 'foam.nanos.fs.FileProperty',
@@ -123,7 +111,7 @@ foam.CLASS({
       label: 'Snippet',
       documentation: 'show a specific type of request would look like in a given language.',
       view: { class: 'foam.nanos.dig.DigSnippetView' },
-      expression: function(key, data, email, subject, daoKey, cmd, format, q, limit, dataFile) {
+      expression: function(key, data, daoKey, cmd, format, q, limit, dataFile) {
         var query = false;
         var url = "/service/dig";
 
@@ -146,16 +134,6 @@ foam.CLASS({
           url += query ? "&" : "?";
           query = true;
           url += "id=" + key;
-        }
-        if ( email ) {
-          url += query ? "&" : "?";
-          query = true;
-          url += "email=" + email;
-
-          if ( subject ) {
-            url += "&";
-            url += "subject=" + encodeURIComponent(subject);
-          }
         }
         if ( q ) {
           url += query ? "&" : "?";

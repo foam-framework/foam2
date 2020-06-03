@@ -24,9 +24,7 @@ import foam.nanos.dig.exception.*;
 import foam.nanos.http.*;
 import foam.nanos.logger.Logger;
 import foam.nanos.logger.PrefixLogger;
-import foam.nanos.notification.email.EmailMessage;
 import foam.nanos.pm.PM;
-import foam.util.Emails.EmailsUtility;
 import foam.util.SafetyUtil;
 
 import javax.servlet.http.HttpServletResponse;
@@ -61,9 +59,6 @@ public class DigWebAgent
     String              q        = p.getParameter("q");
     String              limit    = p.getParameter("limit");
     DAO                 nSpecDAO = (DAO) x.get("AuthenticatedNSpecDAO");
-    String[]            email    = p.getParameterValues("email");
-    boolean             emailSet = email != null && email.length > 0 && ! SafetyUtil.isEmpty(email[0]);
-    String              subject  = p.getParameter("subject");
     String              fileAddress = p.getParameter("fileaddress");
 
     //
@@ -74,15 +69,10 @@ public class DigWebAgent
     logger = new PrefixLogger(new Object[] { this.getClass().getSimpleName() }, logger);
     try {
       if ( SafetyUtil.isEmpty(daoName) ) {
-        resp.setContentType("text/html");
-
-        // FIXME: Presently the dig UI doesn't have any way to submit/send a request.
-        //   String url = "/#dig";
-        //   try {
-        //     resp.sendRedirect(url);
-        //   } catch ( java.io.IOException e ) {
-        //     logger.error("Failed to redirect to", url, e);
-        //   }
+        DigErrorMessage error = new GeneralException.Builder(x)
+          .setMessage("DAO name is required.")
+          .build();
+        DigUtil.outputException(x, error, format);
         return;
       }
 
@@ -365,22 +355,14 @@ public class DigWebAgent
             outputterJson.output(sink.getArray().toArray());
 
             //resp.setContentType("application/json");
-            if ( emailSet ) {
-              output(x, outputterJson.toString());
-            } else {
-              out.println(outputterJson.toString());
-            }
+            out.println(outputterJson.toString());
           } else if ( Format.XML == format ) {
             foam.lib.xml.Outputter outputterXml = new foam.lib.xml.Outputter(OutputterMode.NETWORK);
             outputterXml.output(sink.getArray().toArray());
 
             resp.setContentType("application/xml");
-            if ( emailSet ) {
-              output(x, "<textarea style=\"width:700;height:400;\" rows=10 cols=120>" + outputterXml.toString() + "</textarea>");
-            } else {
-              String simpleName = cInfo.getObjClass().getSimpleName().toString();
-              out.println("<" + simpleName + "s>"+ outputterXml.toString() + "</" + simpleName + "s>");
-            }
+            String simpleName = cInfo.getObjClass().getSimpleName().toString();
+            out.println("<" + simpleName + "s>"+ outputterXml.toString() + "</" + simpleName + "s>");
           } else if ( Format.CSV == format ) {
             CSVOutputter outputterCsv = new foam.lib.csv.CSVOutputterImpl.Builder(x)
              .setOf(cInfo)
@@ -390,11 +372,7 @@ public class DigWebAgent
               outputterCsv.outputFObject(x, (FObject)o);
             }
 
-            if ( emailSet ) {
-              output(x, outputterCsv.toString());
-            } else {
-              out.println(outputterCsv.toString());
-            }
+            out.println(outputterCsv.toString());
           } else if ( Format.HTML == format ) {
             foam.lib.html.Outputter outputterHtml = new foam.lib.html.Outputter(cInfo, OutputterMode.NETWORK);
 
@@ -411,11 +389,7 @@ public class DigWebAgent
             outputterHtml.outputEndTable();
             outputterHtml.outputEndHtml();
 
-            if ( emailSet ) {
-              output(x, outputterHtml.toString());
-            } else {
-              out.println(outputterHtml.toString());
-            }
+            out.println(outputterHtml.toString());
           } else if ( Format.JSONJ == format ) {
             Outputter outputterJson = new Outputter(x).setPropertyPredicate(new AndPropertyPredicate(new PropertyPredicate[] {new StoragePropertyPredicate(), new PermissionedPropertyPredicate()}));
             List a = sink.getArray();
@@ -425,11 +399,7 @@ public class DigWebAgent
             for ( int i = 0 ; i < a.size() ; i++ )
               outputterJson.outputJSONJFObject((FObject) a.get(i));
 
-            if ( emailSet ) {
-              output(x, dataToString);
-            } else {
-              out.println(outputterJson.toString());
-            }
+            out.println(outputterJson.toString());
           }
         } else {
           if ( Format.XML == format ) {
@@ -489,33 +459,6 @@ public class DigWebAgent
       }
     } finally {
       pm.log(x);
-    }
-  }
-
-  protected void output(X x, String data) {
-    HttpParameters p            = x.get(HttpParameters.class);
-    String         emailParam   = p.getParameter("email");
-    String         subject      = p.getParameter("subject");
-
-    if (  SafetyUtil.isEmpty(emailParam) ) {
-      PrintWriter out = x.get(PrintWriter.class);
-
-      out.print(data);
-    } else {
-      EmailMessage message = new EmailMessage();
-
-      // For multiple receiver
-      String[]  email = emailParam.split(",");
-
-      if ( email.length > 0 ) message.setTo(email);
-
-      message.setSubject(subject);
-
-      String newData = data;
-
-      message.setBody(newData);
-
-      EmailsUtility.sendEmailFromTemplate(x, null, message, null, null);
     }
   }
 
