@@ -65,8 +65,8 @@ public class DigWebAgent
     // FIXME/TODO: ensuring XML and CSV flows return proper response objects and codes has not been completed since the switch to HttpParameters.
     //
     PM pm = new PM(getClass(), command.getName()+'/'+format.getName());
-
     logger = new PrefixLogger(new Object[] { this.getClass().getSimpleName() }, logger);
+
     try {
       if ( SafetyUtil.isEmpty(daoName) ) {
         DigErrorMessage error = new GeneralException.Builder(x)
@@ -77,7 +77,6 @@ public class DigWebAgent
       }
 
       NSpec nspec = (NSpec) nSpecDAO.find(daoName);
-
       if ( nspec == null || ! nspec.getServe() ) {
          DigErrorMessage error = new DAONotFoundException.Builder(x)
                                       .setMessage("DAO not found: " + daoName)
@@ -99,7 +98,6 @@ public class DigWebAgent
       }
 
       DAO dao = (DAO) x.get(daoName);
-
       if ( dao == null ) {
         DigErrorMessage error = new DAONotFoundException.Builder(x)
                                       .setMessage("DAO not found: " + daoName)
@@ -131,9 +129,12 @@ public class DigWebAgent
         if ( Format.JSON == format ) {
           JSONParser jsonParser = new JSONParser();
           jsonParser.setX(x);
+
           Outputter outputterJson = new Outputter(x).setPropertyPredicate(new foam.lib.AndPropertyPredicate(x, new foam.lib.PropertyPredicate[] {new foam.lib.NetworkPropertyPredicate(), new foam.lib.PermissionedPropertyPredicate()}));;
           outputterJson.setOutputDefaultValues(true);
           outputterJson.setOutputClassNames(true);
+          outputterJson.setMultiLine(true);
+          
           // let FObjectArray parse first
           if ( SafetyUtil.isEmpty(data) ) {
               DigErrorMessage error = new EmptyDataException.Builder(x).build();
@@ -158,7 +159,7 @@ public class DigWebAgent
               Object[] objs = (Object[]) o;
               for ( int j = 0 ; j < objs.length ; j++ ) {
                 obj = (FObject) objs[j];
-                daoPut(dao, obj);
+                objs[j] = daoPut(dao, obj);
               }
               outputterJson.output(objs);
             } else {
@@ -285,6 +286,7 @@ public class DigWebAgent
           Outputter outputterJson = new Outputter(x).setPropertyPredicate(new AndPropertyPredicate(x, new PropertyPredicate[] {new NetworkPropertyPredicate(), new PermissionedPropertyPredicate()}));
           outputterJson.setOutputDefaultValues(true);
           outputterJson.setOutputClassNames(true);
+          outputterJson.setMultiLine(true);
           // let FObjectArray parse first
           if ( SafetyUtil.isEmpty(dataJson) ) {
               DigErrorMessage error = new EmptyDataException.Builder(x)
@@ -352,6 +354,7 @@ public class DigWebAgent
             Outputter outputterJson = new Outputter(x).setPropertyPredicate(new AndPropertyPredicate(x, new PropertyPredicate[] {new NetworkPropertyPredicate(), new PermissionedPropertyPredicate()}));
             outputterJson.setOutputDefaultValues(true);
             outputterJson.setOutputClassNames(true);
+            outputterJson.setMultiLine(true);
             outputterJson.output(sink.getArray().toArray());
 
             //resp.setContentType("application/json");
@@ -392,6 +395,7 @@ public class DigWebAgent
             out.println(outputterHtml.toString());
           } else if ( Format.JSONJ == format ) {
             Outputter outputterJson = new Outputter(x).setPropertyPredicate(new AndPropertyPredicate(new PropertyPredicate[] {new StoragePropertyPredicate(), new PermissionedPropertyPredicate()}));
+            outputterJson.setMultiLine(true);
             List a = sink.getArray();
             String dataToString = "";
 
