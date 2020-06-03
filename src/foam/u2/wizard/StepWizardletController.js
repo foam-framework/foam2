@@ -98,6 +98,33 @@ foam.CLASS({
         return sections.reduce(
           (sum, wizardletSections) => sum + wizardletSections.length, 0);
       }
+    },
+    {
+      name: 'canGoBack',
+      class: 'Boolean',
+      documentation: `
+        If the first screen has no available sections, then the back button
+        should be disabled.
+      `,
+      expression: function (subStack$pos) {
+        let indices = this.screenIndexToSection(subStack$pos);
+        let wIndex = indices[0]; // Wizardlet index
+        let sIndex = indices[1]; // Section index
+
+        if ( sIndex > 0 ) {
+          for ( let i = 0 ; i < sIndex ; i++ ) {
+            if ( this.sectionAvailableSlots[wIndex][i].get() ) {
+              return true;
+            }
+          }
+          return false;
+        }
+
+        for ( let i = 0 ; i < wIndex ; i++ ) {
+          if ( this.countAvailableSections(i) > 0 ) return true;
+        }
+        return false;
+      }
     }
   ],
 
@@ -114,6 +141,17 @@ foam.CLASS({
         section: this.sections[0][0],
         data$: this.wizardlets[0].data$,
       });
+
+      // If the first screen has no available sections, move next and repeat.
+      var f;
+      f = () => {
+        var currentWizardletIndex =
+          this.screenIndexToSection(this.subStack.pos)[0];
+        if ( this.countAvailableSections(currentWizardletIndex) < 1 ) {
+          return this.next().then(f);
+        }
+      };
+      f();
     },
     function saveProgress() {
       var p = Promise.resolve();
@@ -178,6 +216,30 @@ foam.CLASS({
         });
       },
     },
+    function countAvailableSections(wizardletIndex) {
+      return this.sectionAvailableSlots[wizardletIndex].reduce(
+        (total, sectionAvailable$) =>
+          sectionAvailable$.get() ? total + 1 : total,
+        0
+      );
+    },
+    function canSkipTo(wizardletIndex) {
+      let currentWizardletIndex =
+        this.screenIndexToSection(this.subStack.pos)[0];
+      for ( let w = currentWizardletIndex ; w <= wizardletIndex ; w++ ) {
+        if ( ! this.wizardlets[w].readyToSubmit() ) return false;
+      }
+      return true;
+    },
+    function skipTo(screenIndex) {
+      var f;
+      f = () => {
+        if ( this.subStack.pos !== screenIndex ) {
+          return this.next().then(f);
+        }
+      };
+      return f();
+    },
     function back() {
       this.subStack.back();
     },
@@ -195,6 +257,15 @@ foam.CLASS({
         i += nSections;
       }
       return null;
+    },
+
+    function sectionToScreenIndex(wizardletIndex, sectionIndex) {
+      let screenIndex = 0;
+      for ( let w = 0 ; w < wizardletIndex ; w++ ) {
+        screenIndex += this.sections[w].length;
+      }
+      screenIndex += sectionIndex;
+      return screenIndex;
     }
   ]
 });

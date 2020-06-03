@@ -40,14 +40,22 @@ foam.CLASS({
 
           let afterCurrent = false;
 
+          // Fixes the sidebar number if a wizardlet is skipped
+          let wSkipped = 0;
+
           for ( let w = 0 ; w < data$wizardlets.length ; w++ ) {
             let wizardlet = this.data.wizardlets[w];
             let isCurrent = wizardlet === this.data.currentWizardlet;
 
+            if ( this.data.countAvailableSections(w) < 1 ) {
+              wSkipped++;
+              continue;
+            }
+
             let baseCircleIndicator = {
               size: 24,
               borderThickness: 2,
-              label: '' + (1 + w),
+              label: '' + (1 + w - wSkipped),
             };
             elem = elem
               .start()
@@ -85,8 +93,12 @@ foam.CLASS({
             // Render section labels
             let sections = this.data.sections[w];
 
+            let afterCurrentSection = false;
             for ( let s = 0 ; s < sections.length ; s++ ) {
               let section = sections[s];
+              let isCurrentSection = isCurrent && indices[1] === s;
+              let onClickSkips = afterCurrent || afterCurrentSection;
+              let allowedToSkip = self.data.canSkipTo(w);
               let slot = section.createIsAvailableFor(
                 wizardlet.data$
               ).map(function (isAvailable) {
@@ -94,10 +106,24 @@ foam.CLASS({
                 if ( isAvailable ) e = self.renderSectionLabel(
                   e,
                   section, s+1,
-                  indices[1] === s && isCurrent
-                );
+                  isCurrentSection,
+                  ! isCurrentSection && ( ! onClickSkips || allowedToSkip )
+                ).on('click', () => {
+                  let targetScreenIndex = self.data.sectionToScreenIndex(w, s);
+                  if ( isCurrentSection ) return;
+                  if ( onClickSkips ) {
+                    if ( allowedToSkip ) {
+                      self.data.skipTo(targetScreenIndex);
+                    }
+                    return;
+                  }
+                  while ( self.data.subStack.pos !== targetScreenIndex ) {
+                    self.data.back();
+                  }
+                });
                 return e;
               })
+              if ( isCurrentSection ) afterCurrentSection = true;
               elem.add(slot);
             }
 
@@ -110,15 +136,19 @@ foam.CLASS({
           return elem;
         }))
     },
-    function renderSectionLabel(elem, section, index, highlight) {
+    function renderSectionLabel(elem, section, index, isCurrent, isClickable, isDebug) {
       let title = section.title;
       if ( ! title || ! title.trim() ) title = "Part " + index;
       return elem
         .start()
           .addClass(this.myClass('sub-item'))
           .style({
-            'color': highlight ? this.theme.primary1 : 'inherit',
-            'font-weight': highlight ? 'bold' : 'inherit'
+            'color': isCurrent
+              ? this.theme.primary1
+              : isClickable
+                ? 'inherit'
+                : this.theme.grey3,
+            'font-weight': isCurrent ? 'bold' : 'inherit'
           })
           .add(title)
         .end();
