@@ -127,7 +127,7 @@ foam.CLASS({
         .end();
       }
 
-      if ( this.label !== '' ) {
+      if ( this.label ) {
         this.add(this.label)
       }
     }
