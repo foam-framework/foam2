@@ -17,13 +17,14 @@ foam.CLASS({
     'foam.core.SimpleSlot',
     'foam.dao.ProxyDAO',
     'foam.nanos.column.ColumnConfigToPropertyConverter',
+    'foam.nanos.column.TableColumnOutputter',
     'foam.u2.md.CheckBox',
     'foam.u2.md.OverlayDropdown',
     'foam.u2.view.OverlayActionListView',
     'foam.u2.view.EditColumnsView',
     'foam.u2.view.ColumnConfig',
     'foam.u2.view.ColumnVisibility',
-    'foam.u2.tag.Image'
+    'foam.u2.tag.Image',
   ],
 
   exports: [
@@ -77,6 +78,10 @@ foam.CLASS({
 
         return selectedColumnNames.map(c => foam.Array.isInstance(c) ? c : [c, null]);
       },
+    },
+    {
+      name: 'values',
+      value: []
     },
     {
       name: 'allColumns',
@@ -247,7 +252,7 @@ foam.CLASS({
       localStorage.setItem(this.of.id, JSON.stringify(this.selectedColumnNames.map(c => foam.String.isInstance(c) ? c : c.name )));
     },
 
-    function initE() {
+    async function initE() {
       var view = this;
       //otherwise on adding new column creating new EditColumnsView, which is closed by default
       if (view.editColumnsEnabled)
@@ -260,7 +265,6 @@ foam.CLASS({
             return foam.String.isInstance(axiomOrColumnName) ? axiomOrColumnName : axiomOrColumnName.name;
           }))));
       }
-
       this.
         addClass(this.myClass()).
         addClass(this.myClass(this.of.id.replace(/\./g, '-'))).
@@ -290,7 +294,7 @@ foam.CLASS({
 
                   if ( checked ) {
                     view.selectedObjects = {};
-                    view.data.select(function(obj) {
+                    view.data.select(function(obj) {//FIX ME
                       view.selectedObjects[obj.id] = obj;
                     });
                   } else {
@@ -368,11 +372,11 @@ foam.CLASS({
             })).
         end().
         callIf(view.editColumnsEnabled, function() {this.add(editColumnView);}).       
-        add(this.rowsFrom(this.data$proxy));
+        add(await this.rowsFrom(this.data$proxy));
     },
     {
       name: 'rowsFrom',
-      code: function(dao) {
+      code: async function(dao) {
         /**
          * Given a DAO, add a tbody containing the data from the DAO to the
          * table and return a reference to the tbody.
@@ -384,35 +388,59 @@ foam.CLASS({
          * as an implementation detail of ScrollTableView at the time of
          * writing.
          */
-        var view = this;
-        return this.slot(function(columns_) {
+          var view = this;
+
+          var outputter = this.TableColumnOutputter.create();
+          //need to retrieve id for dblclick
+          var propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => c));
+          //check if columns_ length 0 mb on line 388
+          var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(this.of, propertyNamesToQuery);
+          var values = await dao.select(expr);
+          var columnConfig = this.__context__.columnConfigToPropertyConverter;
+          if ( ! columnConfig ) columnConfig = this.ColumnConfigToPropertyConverter.create();
+          var props = columnConfig.returnProperties(this.of, propertyNamesToQuery);
+
+          this.values = await  outputter.arrayOfValuesToArrayOfStrings(props, values.array);
+         
+          var columnConfig = this.__context__.columnConfigToPropertyConverter;
+            if ( ! columnConfig ) columnConfig = this.ColumnConfigToPropertyConverter.create();
+          // var props = columnConfig.returnProperties(view.of, propertyNamesToQuery);
+          var proxy = view.ProxyDAO.create({ delegate: dao });
+
+          proxy.select().then(v => console.log(v));
           // Make sure the DAO set here responds to ordering when a user clicks
           // on a table column header to sort by that column.
           if ( this.order ) dao = dao.orderBy(this.order);
-          var proxy = view.ProxyDAO.create({ delegate: dao });
           view.sub('propertyChange', 'order', function(_, __, ___, s) {
             proxy.delegate = dao.orderBy(s.get());
           });
-
+          
           var modelActions = view.of.getAxiomsByClass(foam.core.Action);
           var actions = Array.isArray(view.contextMenuActions)
             ? view.contextMenuActions.concat(modelActions)
             : modelActions;
 
-          return this.
-            E().
-            addClass(this.myClass('tbody')).
-            select(proxy, function(obj) {
-              return this.E().
+          return this.slot(function(values, columns_) {
+            var element = this.
+              E();
+              element.
+              addClass(this.myClass('tbody')).
+              forEach(view.values, function(val) {
+                var element1 = this.E();
+                element1.
                 addClass(view.myClass('tr')).
-                on('mouseover', function() { view.hoverSelection = obj; }).
+                on('mouseover', function() {
+                  dao.find(val[0]).then(v => {
+                    view.hoverSelection = v;
+                  });
+                }).
                 callIf(view.dblclick && ! view.disableUserSelection, function() {
-                  this.on('dblclick', function() {
-                    view.dblclick && view.dblclick(obj);
+                  element1.on('dblclick', function() {
+                    view.dblclick && view.dblclick(val[0]);
                   });
                 }).
                 callIf( ! view.disableUserSelection, function() {
-                  this.on('click', function(evt) {
+                  element1.on('click', function(evt) {
                     // If we're clicking somewhere to close the context menu,
                     // don't do anything.
                     if (
@@ -420,13 +448,15 @@ foam.CLASS({
                       evt.target.classList.contains(view.myClass('vertDots'))
                     ) return;
 
-                    view.selection = obj;
-                    if ( view.importSelection$ ) view.importSelection = obj;
-                    if ( view.editRecord$ ) view.editRecord(obj);
+                    dao.find(val[0]).then(v => {
+                      view.selection = v;
+                      if ( view.importSelection$ ) view.importSelection = v;
+                      if ( view.editRecord$ ) view.editRecord(v);
+                    });
                   });
                 }).
                 addClass(view.slot(function(selection) {
-                  return selection && foam.util.equals(obj.id, selection.id) ?
+                  return selection && foam.util.equals(val[0], selection.id) ?
                       view.myClass('selected') : '';
                 })).
                 addClass(view.myClass('row')).
@@ -436,10 +466,10 @@ foam.CLASS({
                 // Checkbox in the first cell of each row.
                 callIf(view.multiSelectEnabled, function() {
                   var slot = view.SimpleSlot.create();
-                  this
+                  element1
                     .start()
                       .addClass(view.myClass('td'))
-                      .tag(view.CheckBox, { data: view.idsOfObjectsTheUserHasInteractedWith_[obj.id] ? !!view.selectedObjects[obj.id] : view.allCheckBoxesEnabled_ }, slot)
+                      .tag(view.CheckBox, { data: view.idsOfObjectsTheUserHasInteractedWith_[val[0]] ? !!view.selectedObjects[val[0]] : view.allCheckBoxesEnabled_ }, slot)
                     .end();
 
                   // Set up a listener so that when the user checks or unchecks
@@ -469,17 +499,19 @@ foam.CLASS({
                     // use a separate set to remember which checkboxes the user
                     // has interacted with, then we don't need to clutter up
                     // `selectedObjects`.
-                    view.idsOfObjectsTheUserHasInteractedWith_[obj.id] = true;
+                    view.idsOfObjectsTheUserHasInteractedWith_[val[0]] = true;
 
                     var checked = newValueSlot.get();
 
                     if ( checked ) {
                       var modification = {};
-                      modification[obj.id] = obj;
-                      view.selectedObjects = Object.assign({}, view.selectedObjects, modification);
+                      dao.find(val[0]).then(v => {
+                        modification[val[0]] = v;
+                        view.selectedObjects = Object.assign({}, view.selectedObjects, modification);
+                      });
                     } else {
                       var temp = Object.assign({}, view.selectedObjects);
-                      delete temp[obj.id];
+                      delete temp[val[0]];
                       view.selectedObjects = temp;
                     }
                   }));
@@ -488,82 +520,31 @@ foam.CLASS({
                   // to them so we can set the `data` property of them when the
                   // user checks the box to enable or disable all checkboxes.
                   var checkbox = slot.get();
-                  view.checkboxes_[obj.id] = checkbox;
+                  view.checkboxes_[val[0]] = checkbox;
                   checkbox.onDetach(function() {
-                    delete view.checkboxes_[obj.id];
+                    delete view.checkboxes_[val[0]];
                   });
-                }).
-
-                forEach(columns_, function([property, overrides]) {
-                  var column;
-                  var obj1 = obj;
-                  var val = foam.nanos.column.ColumnPropertyValue.create();
-                  if ( foam.String.isInstance(property) ) {
-                    column = view.columns.find(c => c.name === property);
-                    if ( ! column ) {
-                      var columnConfig = this.__context__.columnConfigToPropertyConverter;
-                      if ( ! columnConfig ) columnConfig = this.ColumnConfigToPropertyConverter.create();
-                     
-                      var converted = columnConfig.returnPropertyAndObject(view.of, property, obj1);
-                      converted.then(value => {
-                        val.objValue = value.objValue;
-                        val.propertyValue = value.propertyValue;
-                        obj1 = value.objValue;
-                        column = value.propertyValue;
-                      });
-                    } else {
-                      val.propertyValue = column;
-                      val.objValue = obj1;
-                    }
-                  } else {
-                    val.propertyValue = property;
-                    val.objValue = obj1;
-                  }
-                  
-                  if ( overrides ) column = column.clone().copyFrom(overrides);
-
-                  this
-                    .add(val.propertyValue$.map(v => {
-                      var value;
-                      try {
-                        column = val.propertyValue;
-                        value = val.propertyValue && val.propertyValue.f ? val.propertyValue.f(obj1) : ' - ';
-                        if ( foam.util.isPrimitive(value) ) {
-                        } else value = ' - ';
-                      } catch (err) {
-                        value = ' - ';
-                      }
-                      return this.E()
-                      .addClass(view.myClass('td'))
-                      .callIf((column && column.tableCellFormatter), function() {
-                        this.callOn(column.tableCellFormatter, 'format', [
-                          column.f ? column.f(obj1) : null, obj1, column
-                        ]);
-                      }).
-                      callIf(column && column.f, function() {
-                        try {
-                          var value = column.f(obj1);
-                          if ( foam.util.isPrimitive(value) ) {
-                            this.attr('title', value);
-                          }
-                        } catch (err) {}
-                      }).
-                      style({flex: val.propertyValue && val.propertyValue.tableWidth ? `0 0 ${column.tableWidth}px` : '1 0 0'})
-                    }));
-                }).
-                start().
+                });
+                for ( var  i = 1 ; i < props.length ; i++  ) {
+                  element1.start().addClass(view.myClass('td'))
+                  .add(val[i])
+                  .style({flex: props[i] && props[i].tableWidth  ? `0 0 ${props[i].tableWidth}px` : '1 0 0'}).end();
+                }
+                element1.
                   addClass(view.myClass('td')).
                   attrs({ name: 'contextMenuCell' }).
                   style({ flex: `0 0 ${view.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH}px` }).
                   tag(view.OverlayActionListView, {
                     data: actions,
-                    obj: obj
+                    obj: val[0]//FIX ME
                   }).
                 end();
+                element.add(element1);
+              });
+              return element;
             });
-        });
+        }
       }
-    }
   ],
 
 });
