@@ -21,10 +21,12 @@ foam.CLASS({
   javaImports: [
     'foam.blob.BlobService',
     'foam.blob.Blob',
+    'foam.blob.InputStreamBlob',
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.AuthorizationException',
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
+    'foam.util.SafetyUtil',
     'java.io.*',
     'java.util.Base64',
   ],
@@ -75,11 +77,12 @@ foam.CLASS({
       javaGetter:`
         if ( dataIsSet_ ) return data_;
         if ( ! SafetyUtil.isEmpty(this.getDataString()) ) {
+          String encodedString = this.getDataString().split(",")[1];
           BlobService blobStore = new foam.blob.BlobStore();
-          byte[] decodedBytes = Base64.getDecoder().decode(getDataString());
+          byte[] decodedBytes = Base64.getDecoder().decode(encodedString);
           InputStream is = new ByteArrayInputStream(decodedBytes);
-          Blob data = blobStore.put(new foam.blob.InputStreamBlob(is, decodedBytes.length));
-          return data;
+          InputStreamBlob blob = new foam.blob.InputStreamBlob(is, decodedBytes.length);
+          return blob;
         } else {
           return null;
         }
