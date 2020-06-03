@@ -15,7 +15,7 @@ foam.CLASS({
     'foam.u2.dialog.Popup',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
-    'foam.u2.filter.FilterSearch',
+    'foam.u2.filter.FilterView',
     'foam.u2.view.ScrollTableView',
     'foam.u2.view.SimpleSearch',
     'foam.u2.view.TabChoiceView',
@@ -46,10 +46,11 @@ foam.CLASS({
     ^top-bar {
       border-bottom: solid 1px #e7eaec;
       align-items: center;
+      padding-top: 16px;
     }
 
     ^query-bar {
-      padding: 24px 16px;
+      padding: 40px 16px;
       align-items: center;
       justify-content: flex-end;
     }
@@ -120,15 +121,8 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpec',
       name: 'summaryView',
-      factory: function() {
-        return {
-          class: 'foam.u2.view.ScrollTableView',
-          enableDynamicTableHeight: false,
-          css: {
-            width: '100%',
-            height: '424px'
-          }
-        };
+      expression: function(config$summaryView) {
+        return config$summaryView;
       }
     },
     {
@@ -220,7 +214,7 @@ foam.CLASS({
       this.addClass(this.myClass());
       this.SUPER();
       this
-        .add(this.slot(function(data, config$cannedQueries, config$defaultColumns, searchFilterDAO) {
+        .add(this.slot(function(config$cannedQueries, config$hideQueryBar, searchFilterDAO) {
           return self.E()
             .start(self.Rows)
               .callIf(config$cannedQueries.length >= 1, function() {
@@ -240,34 +234,38 @@ foam.CLASS({
                     .end()
                   .end();
               })
-              .start(self.Cols).addClass(self.myClass('query-bar'))
-                .startContext({
-                  dao: searchFilterDAO,
-                  controllerMode: foam.u2.ControllerMode.EDIT
-                })
-                  .callIf(self.config.searchMode === self.SearchMode.SIMPLE, function() {
-                    this.tag(self.SimpleSearch, {
-                      showCount: false,
-                      data$: self.searchPredicate$
-                    });
-                  })
-                  .callIf(self.config.searchMode === self.SearchMode.FULL, function() {
-                    this.tag(self.FilterSearch, {
-                      data$: self.searchPredicate$
-                    });
-                  })
-                .endContext()
-                .startContext({ data: self })
-                  .start(self.EXPORT, { buttonStyle: 'SECONDARY' })
-                    .addClass(self.myClass('export'))
-                  .end()
-                  .tag(this.REFRESH_TABLE, { buttonStyle: 'SECONDARY' })
-                .endContext()
-              .end()
-              .start(self.summaryView, {
-                data: self.predicatedDAO$proxy,
-                enableDynamicTableHeight: false,
-                columns: config$defaultColumns
+              .callIf( ! config$hideQueryBar, function() {
+                this
+                  .start(self.Cols).addClass(self.myClass('query-bar'))
+                    .startContext({
+                      dao: searchFilterDAO,
+                      controllerMode: foam.u2.ControllerMode.EDIT
+                    })
+                      .callIf(self.config.searchMode === self.SearchMode.SIMPLE, function() {
+                        this.tag(self.SimpleSearch, {
+                          showCount: false,
+                          data$: self.searchPredicate$
+                        });
+                      })
+                      .callIf(self.config.searchMode === self.SearchMode.FULL, function() {
+                        this.tag(self.FilterView, {
+                          dao$: self.searchFilterDAO$,
+                          data$: self.searchPredicate$
+                        });
+                      })
+                    .endContext()
+                    .startContext({ data: self })
+                      .start(self.EXPORT, { buttonStyle: 'SECONDARY' })
+                        .addClass(self.myClass('export'))
+                      .end()
+                      .start(self.REFRESH_TABLE, { buttonStyle: 'SECONDARY' })
+                        .addClass(self.myClass('refresh'))
+                      .end()
+                    .endContext()
+                  .end();
+              })
+              .start(self.summaryView,{
+                data: self.predicatedDAO$proxy
               })
                 .addClass(self.myClass('browse-view-container'))
               .end()

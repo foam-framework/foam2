@@ -5,13 +5,13 @@
 */
 
 foam.CLASS({
-  package: 'foam.u2.filter',
+  package: 'foam.u2.filter.properties',
   name: 'IntegerFilterView',
   extends: 'foam.u2.Controller',
 
   documentation: 'Filter view for integers.',
 
-  imports: [
+  implements: [
     'foam.mlang.Expressions',
   ],
 
@@ -46,14 +46,16 @@ foam.CLASS({
   properties: [
     {
       name: 'property',
-      documentation: `The property that this view is filtering by. Should be of
-      type Int, Short, Long, or Byte.`,
+      documentation: `
+        The property that this view is filtering by. Should be of type Int,
+        Short, Long, or Byte.
+      `,
       required: true
     },
     {
       class: 'String',
       name: 'qualifier',
-      documentation: `Lets the user choose an MLang predicate to filter by.`,
+      documentation: 'Lets the user choose an MLang predicate to filter by.',
       view: {
         class: 'foam.u2.view.ChoiceView',
         choices: [
@@ -73,7 +75,7 @@ foam.CLASS({
     {
       class: 'Float',
       name: 'amount1',
-      documentation: `The number to filter by.`,
+      documentation: 'The number to filter by.',
       view: {
         class: 'foam.u2.FloatView',
         onKey: true,
@@ -83,7 +85,7 @@ foam.CLASS({
     {
       class: 'Float',
       name: 'amount2',
-      documentation: `The number to filter by.`,
+      documentation: 'The number to filter by.',
       view: {
         class: 'foam.u2.FloatView',
         onKey: true,
@@ -92,9 +94,12 @@ foam.CLASS({
     },
     {
       name: 'predicate',
-      documentation: `All SearchViews must have a predicate as required by the
-      SearchManager. The SearchManager will read this predicate and use it
-      to filter the dao being displayed in the view.`,
+      documentation: `
+        All Search Views must have a predicate as required by the
+        Filter Controller. When this property changes, the Filter Controller will
+        generate a new main predicate and also reciprocate the changes to the
+        other Search Views.
+      `,
       expression: function(qualifier, amount1, amount2) {
         if ( ! qualifier ) return this.TRUE;
 
@@ -111,31 +116,31 @@ foam.CLASS({
           pred1 = 'Gte';
           pred2 = 'Lte';
         }
-
         return this.AND(
-            foam.mlang.predicate[pred1].create({
-              arg1: this.property,
-              arg2: amount1
-            }),
-            foam.mlang.predicate[pred2].create({
-              arg1: this.property,
-              arg2: amount2
-            })
+          foam.mlang.predicate[pred1].create({
+            arg1: this.property,
+            arg2: amount1
+          }),
+          foam.mlang.predicate[pred2].create({
+            arg1: this.property,
+            arg2: amount2
+          })
         );
       }
     },
     {
       name: 'name',
-      documentation: `Required by SearchManager.`,
-      value: 'Integer filter view'
+      documentation: 'Required by Filter Controller.',
+      expression: function(property) {
+        return property.name;
+      }
     }
   ],
 
   methods: [
     function initE() {
       var self = this;
-      this
-        .addClass(this.myClass())
+      this.addClass(this.myClass())
         .start(this.QUALIFIER)
         .start('div').addClass(this.myClass('carrot')).end()
         .end()
@@ -145,6 +150,24 @@ foam.CLASS({
             this.E().add(self.AMOUNT1).add(self.AMOUNT2) :
             this.E().add(self.AMOUNT1);
         }));
+    },
+
+    /**
+     * Restores the view based on passed in predicate
+     */
+    function restoreFromPredicate(predicate) {
+      if ( predicate === this.TRUE ) return;
+
+      var qualifier = predicate.cls_.name;
+
+      if ( qualifier == 'And' ) {
+        this.qualifier = predicate.args[0].cls_.name == 'Gte' ? 'Bte' : 'Bt';
+        this.amount1 = predicate.args[0].arg2.value;
+        this.amount2 = predicate.args[1].arg2.value;
+      } else {
+        this.qualifier = qualifier;
+        this.amount1 = predicate.arg2.value;
+      }
     },
 
     /**

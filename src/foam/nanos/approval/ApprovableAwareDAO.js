@@ -61,6 +61,16 @@ foam.CLASS({
     }
   ],
 
+  messages: [
+    { name: 'APPROVER_MSG', message: 'No Approvers exist for the model: ' },
+    { name: 'APPROVER_MSG2_PART_ONE', message: 'The only approver of ' },
+    { name: 'APPROVER_MSG2_PART_TWO', message: ' is the maker of this request!' },
+    { name: 'SYSTEM_UPDATE_MSG', message: 'SYSTEM UPDATE - Not automatically setting LifecycleState from PENDING to ACTIVE for ' },
+    { name: 'ERROR_MSG_MULTI', message: 'Something went wrong! There shouldnt be multiple approvables' },
+    { name: 'ERROR_MSG2', message: 'Something went wrong cannot have multiple approved/rejected requests for the same request!' },
+    { name: 'REQUEST_SEND_MSG', message: 'An approval request has been sent out.' }
+  ],
+
   methods: [
     {
       name: 'sendSingleRequest',
@@ -129,13 +139,13 @@ foam.CLASS({
         List<Long> approverIds = userQueryService.getAllApprovers(x, modelName);
 
         if ( approverIds == null || approverIds.size() <= 0 ) {
-          logger.log("No Approvers exist for the model: " + modelName);
-          throw new RuntimeException("No Approvers exist for the model: " + modelName);
+          logger.log(APPROVER_MSG + modelName);
+          throw new RuntimeException(APPROVER_MSG + modelName);
         }
 
         if ( ! getCanMakerApproveOwnRequest() && approverIds.size() == 1 && approverIds.get(0) == user.getId() ) {
-          logger.log("The only approver of " + modelName + " is the maker of this request!");
-          throw new RuntimeException("The only approver of " + modelName + " is the maker of this request!");
+          logger.log(APPROVER_MSG2_PART_ONE + modelName + APPROVER_MSG2_PART_TWO);
+          throw new RuntimeException(APPROVER_MSG2_PART_ONE + modelName + APPROVER_MSG2_PART_TWO);
         }
 
         return approverIds;
@@ -176,7 +186,7 @@ foam.CLASS({
         else if ( lifecycleObj.getLifecycleState() == LifecycleState.PENDING && user.getId() == User.SYSTEM_USER_ID ) {
           // Adding log message in case this change breaks something unexpected
           Object primaryKey = obj instanceof foam.core.Identifiable ? ((foam.core.Identifiable)obj).getPrimaryKey() : null;
-          logger.warning("SYSTEM UPDATE - Not automatically setting LifecycleState from PENDING to ACTIVE for " + obj.getClass().getSimpleName() + ": " + primaryKey);
+          logger.warning(SYSTEM_UPDATE_MSG + obj.getClass().getSimpleName() + ": " + primaryKey);
         }
         return super.put_(x,obj);
       }
@@ -241,7 +251,7 @@ foam.CLASS({
         }
 
         if ( approvablesPending.size() > 1 ){
-          throw new RuntimeException("Something went wrong! There shouldnt be multiple approvables");
+          throw new RuntimeException(ERROR_MSG_MULTI);
         }
 
         filteredApprovalRequestDAO = (DAO) approvalRequestDAO
@@ -299,8 +309,8 @@ foam.CLASS({
       } 
 
       if ( fulfilledRequests.size() > 1 ) {
-        logger.error("Something went wrong cannot have multiple approved/rejected requests for the same request!");
-        throw new RuntimeException("Something went wrong cannot have multiple approved/rejected requests for the same request!");
+        logger.error(ERROR_MSG2);
+        throw new RuntimeException(ERROR_MSG2);
       }
 
       ApprovalRequest approvalRequest;
@@ -361,7 +371,7 @@ foam.CLASS({
       fullSend(x, approvalRequest, obj, approverIds);
 
       // TODO: the following is a temporary fix will need to create an actual exception and pass feedback as a property
-      throw new RuntimeException("An approval request has been sent out."); // we aren't updating to deleted
+      throw new RuntimeException(REQUEST_SEND_MSG); // we aren't updating to deleted
       `
     }
   ]
