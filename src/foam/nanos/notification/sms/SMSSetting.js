@@ -21,6 +21,7 @@ foam.CLASS({
     'java.util.HashSet',
     'java.util.Iterator',
     'java.util.Map',
+    'foam.util.SafetyUtil',
     'static foam.mlang.MLang.EQ'
   ],
 
@@ -69,7 +70,7 @@ foam.CLASS({
         }
 
         // Check if users mobile phone is set
-        if ( user.getMobile().getNumber() == null ) {
+        if ( user.getMobileNumber() == null || SafetyUtil.isEmpty(user.getMobileNumber()) ) {
           logger.warning("No mobile number found for user id: " + user.getId() + " unable to send sms message");
           return;
         }
@@ -85,7 +86,7 @@ foam.CLASS({
         SMSMessage smsMessage = new SMSMessage.Builder(x)
             .setUser(user.getId())
             .setMessage(notification.getBody())
-            .setPhoneNumber(user.getMobile().getNumber())
+            .setPhoneNumber(user.getMobileNumber())
             .setStatus(SMSStatus.UNSENT)
             .build();
 
