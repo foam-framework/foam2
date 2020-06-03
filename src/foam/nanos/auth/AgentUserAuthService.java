@@ -44,7 +44,7 @@ public class AgentUserAuthService
     act on behalf of others while retaining information on the user.
   */
   public User actAs(X x, User entity) throws AuthenticationException {
-    User agent = (User) x.get("user");
+    User agent = ((Subject) x.get("subject")).getUser();
     User user  = (User) userDAO_.find(entity.getId());
 
     // Check for current context user
@@ -113,26 +113,5 @@ public class AgentUserAuthService
       logger.error("Unable to act as entity: ", t);
       return false;
     }
-  }
-
-
-  /**
-    Retrieves the agent user from the current sessions context.
-  */
-  public User getCurrentAgent(X x) throws AuthorizationException {
-    // Fetch context and check if not null.
-    Session session = x.get(Session.class);
-    if ( session == null ) {
-      throw new AuthenticationException("Not logged in");
-    }
-
-    X sessionContext = session.getContext();
-    // Get agent from session context
-    User agent = (User) sessionContext.get("agent");
-    if ( agent != null ) {
-      agent = (User) userDAO_.find(agent.getId());
-      agent.validateAuth(x);
-    }
-    return agent;
   }
 }

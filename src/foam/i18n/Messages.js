@@ -23,6 +23,7 @@ foam.SCRIPT({
   }
 });
 
+
 foam.CLASS({
   package: 'foam.i18n',
   name: 'MessageAxiom',
@@ -30,7 +31,8 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'name'
+      name: 'name',
+      preSet: function(o, n) { return foam.String.constantize(n); }
     },
     {
       class: 'String',

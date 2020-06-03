@@ -127,13 +127,6 @@ foam.CLASS({
             body: 'return "' + this.propName + '";'
           },
           {
-            name: 'get',
-            visibility: 'public',
-            type: 'Object',
-            args: [{ name: 'o', type: 'Object' }],
-            body: 'return get_(o);'
-          },
-          {
             name: 'get_',
             type: this.propType,
             visibility: 'public',
@@ -155,111 +148,124 @@ foam.CLASS({
             body: '((' + this.sourceCls.name + ') o).' + this.clearName + '();'
           },
           {
-            name: 'cast',
-            type: this.propType,
-            visibility: 'public',
-            args: [{ name: 'o', type: 'Object' }],
-            body: 'return ' + ( this.propType == "Object" ? 'o;' : '( ' + this.propType + ') o;')
-          },
-          {
-            name: 'compare',
-            type: 'int',
-            visibility: 'public',
-            args: [{ name: 'o1', type: 'Object' }, { name: 'o2', type: 'Object' }],
-            body: this.compare,
-          },
-          {
-            name: 'comparePropertyToObject',
-            type: 'int',
-            visibility: 'public',
-            args: [{ name: 'key', type: 'Object' }, { name: 'o', type: 'Object' }],
-            body: this.comparePropertyToObject,
-          },
-          {
-            name: 'comparePropertyToValue',
-            type: 'int',
-            visibility: 'public',
-            args: [{ name: 'key', type: 'Object' }, { name: 'value', type: 'Object' }],
-            body: this.comparePropertyToValue,
-          },
-          {
-            name: 'jsonParser',
-            type: 'foam.lib.parse.Parser',
-            visibility: 'public',
-            body: 'return ' + ( this.jsonParser ? this.jsonParser : null ) + ';'
-          },
-          {
-            name: 'queryParser',
-            type: 'foam.lib.parse.Parser',
-            visibility: 'public',
-            body: 'return ' + ( this.queryParser ? this.queryParser : null ) + ';'
-          },
-          {
-            name: 'csvParser',
-            type: 'foam.lib.parse.Parser',
-            visibility: 'public',
-            body: 'return ' + ( this.csvParser ? this.csvParser : null ) + ';'
-          },
-          {
-            name: 'getValueClass',
-            visibility: 'public',
-            type: 'Class',
-            body: `return ${this.propType}.class;`
-          },
-          {
-            name: 'getSQLType',
-            visibility: 'public',
-            type: 'String',
-            body: 'return "' + this.sqlType + '";'
-          },
-          {
             name: 'isSet',
             visibility: 'public',
             type: 'boolean',
             args: [{ name: 'o', type: 'Object' }],
             body: `return ((${this.sourceCls.name}) o).${this.propName}IsSet_;`
-          },
-          {
+          }
+        ];
+        var primitiveType = ['boolean', 'long', 'byte', 'double','float','short','int'];
+        
+        if ( this.propType == 'java.util.Date' || 
+             ! ( primitiveType.includes(this.propType) || this.propType == 'Object' || this.propType == 'String') ){
+          m.push({
+            name: 'cast',
+            type: this.propType,
+            visibility: 'public',
+            args: [{ name: 'o', type: 'Object' }],
+            body: 'return ' + ( this.propType == "Object" ? 'o;' : '( ' + this.propType + ') o;')
+          });
+        }
+        
+        if ( this.propType == 'java.util.Date' ||
+             this.propType == 'String' ||  
+             ! ( primitiveType.includes(this.propType)|| this.propType == 'Object' || this.extends == 'foam.core.AbstractFObjectPropertyInfo' || this.extends == 'foam.core.AbstractFObjectArrayPropertyInfo') ){
+          m.push({
+            name: 'getSQLType',
+            visibility: 'public',
+            type: 'String',
+            body: 'return "' + this.sqlType + '";'
+          });
+        }
+        
+        if ( this.propType == 'java.util.Date' || 
+             this.propType == 'String' || 
+             this.propType == 'Object' || 
+             ! ( primitiveType.includes(this.propType) ) ){
+          m.push({
+            name: 'get',
+            visibility: 'public',
+            type: 'Object',
+            args: [{ name: 'o', type: 'Object' }],
+            body: 'return get_(o);'
+          });
+  
+          m.push({
+            name: 'jsonParser',
+            type: 'foam.lib.parse.Parser',
+            visibility: 'public',
+            body: 'return ' + ( this.jsonParser ? this.jsonParser : null ) + ';'
+          });
+        }
+
+        if ( ! ( primitiveType.includes(this.propType) || this.propType  == 'java.util.Date' || this.propType == 'String' || this.propType == 'Object' ) ) {
+            //TODO add support for special type.
+//              || this.propType == 'java.util.Map' || this.propType == 'java.util.List'
+            //TODO add support for subtype.
+//            this.propType == 'foam.core.AbstractFObjectPropertyInfo' || this.propType == 'foam.core.AbstractClassPropertyInfo') ||
+//            this.propType == 'foam.core.AbstractObjectPropertyInfo'
+
+          m.push({
+            name: 'getValueClass',
+            visibility: 'public',
+            type: 'Class',
+            body: `return ${this.propType}.class;`
+          });
+
+//          m.push({
+//            name: 'jsonParser',
+//            type: 'foam.lib.parse.Parser',
+//            visibility: 'public',
+//            body: 'return ' + ( this.jsonParser ? this.jsonParser : null ) + ';'
+//          });
+          m.push({
+            name: 'queryParser',
+            type: 'foam.lib.parse.Parser',
+            visibility: 'public',
+            body: 'return ' + ( this.queryParser ? this.queryParser : null ) + ';'
+          });
+          m.push({
+            name: 'csvParser',
+            type: 'foam.lib.parse.Parser',
+            visibility: 'public',
+            body: 'return ' + ( this.csvParser ? this.csvParser : null ) + ';'
+          });
+        }
+
+        if ( ! ( primitiveType.includes(this.propType) || this.propType  == 'java.util.Date' || this.propType == 'String' || this.propType == 'Object' || this.extends == 'foam.core.AbstractFObjectPropertyInfo') ) {  
+          m.push({
+            name: 'compare',
+            type: 'int',
+            visibility: 'public',
+            args: [{ name: 'o1', type: 'Object' }, { name: 'o2', type: 'Object' }],
+            body: this.compare,
+          });
+        }
+        if ( ! ( primitiveType.includes(this.propType) || this.propType  == 'java.util.Date' || this.propType == 'String' || this.propType == 'Object' || this.extends == 'foam.core.AbstractFObjectPropertyInfo' || this.extends == 'foam.core.AbstractFObjectArrayPropertyInfo') ) {
+          m.push({
+            name: 'comparePropertyToObject',
+            type: 'int',
+            visibility: 'public',
+            args: [{ name: 'key', type: 'Object' }, { name: 'o', type: 'Object' }],
+            body: this.comparePropertyToObject,
+          });
+          m.push({
+            name: 'comparePropertyToValue',
+            type: 'int',
+            visibility: 'public',
+            args: [{ name: 'key', type: 'Object' }, { name: 'value', type: 'Object' }],
+            body: this.comparePropertyToValue,
+          });
+          m.push({
             name: 'isDefaultValue',
             visibility: 'public',
             type: 'boolean',
             args: [{ name: 'o', type: 'Object' }],
             /* TODO: revise when/if expression support is added to Java */
             body: `return foam.util.SafetyUtil.compare(get_(o), ${this.propValue}) == 0;`
-          },
-          {
-            name: 'toCSV',
-            visibility: 'public',
-            type: 'void',
-            args: [
-              { name: 'x',          type: 'foam.core.X' },
-              { name: 'obj',        type: 'Object' },
-              { name: 'outputter',  type: 'foam.lib.csv.CSVOutputter' }
-            ],
-            body: this.toCSV
-          },
-          {
-            name: 'toCSVLabel',
-            visibility: 'public',
-            type: 'void',
-            args: [
-              { name: 'x',          type: 'foam.core.X' },
-              { name: 'outputter',  type: 'foam.lib.csv.CSVOutputter' }
-            ],
-            body: this.toCSVLabel
-          },
-          {
-            name: 'fromCSVLabelMapping',
-            visibility: 'public',
-            type: 'void',
-            args: [
-              { name: 'map', type: 'java.util.Map<String, foam.lib.csv.FromCSVSetter>' }
-            ],
-            body: this.fromCSVLabelMapping
-          },
-          // TODO: move to AbstractPropertyInfo class for each type to avoid
-          // generating for each PropertyInfo.
-          {
+          });
+          m.push({
             name: 'format',
             visibility: 'public',
             type: 'void',
@@ -274,8 +280,8 @@ foam.CLASS({
               }
             ],
             body: 'formatter.output(get_(obj));'
-          }
-        ];
+          });
+        }
 
         if ( this.networkTransient ) {
           m.push({

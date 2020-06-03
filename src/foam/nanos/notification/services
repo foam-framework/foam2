@@ -10,10 +10,9 @@ p({
       .setPm(true)
       .setSeqNo(true)
       .setDecorator(
-        new foam.nanos.notification.NotificationTemplateDAO.Builder(x).setDelegate(
-        new foam.nanos.notification.SendNotificationDAO(x,
-        new foam.nanos.notification.SendEmailNotificationDAO(
-        new foam.nanos.notification.SendSlackNotificationDAO(x)))).build())
+        new foam.nanos.notification.NotificationTemplateDAO.Builder(x)
+          .setDelegate(new foam.nanos.notification.NotificationExpansionDAO.Builder(x).build())
+          .build())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("notifications")
       .build();
@@ -41,6 +40,26 @@ p({
 })
 
 p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "myNotificationDAO",
+  "lazy": false,
+  "serve": true,
+  "serviceScript": """
+    import foam.nanos.auth.User;
+    import foam.nanos.auth.Subject;
+    import foam.nanos.notification.Notification;
+
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.notification.Notification.getOwnClassInfo())
+      .setAuthorize(false)
+      .setDecorator( new foam.nanos.notification.MyNotificationDAO.Builder(x).build() )
+      .setInnerDAO((foam.dao.DAO) x.get("notificationDAO"))
+      .build();
+  """,
+  "client": "{\"of\":\"foam.nanos.notification.Notification\"}"
+})
+
+p({
   "class":"foam.nanos.boot.NSpec",
   "name":"notificationTemplateDAO",
   "lazy":false,
@@ -56,6 +75,22 @@ p({
     """,
     "client":"{\"of\":\"foam.nanos.notification.Notification\"}"
 })
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "notificationSettingDefaultsDAO",
+  "serviceScript": """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setAuthorize(false)
+      .setSeqNo(true)
+      .setPm(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("notificationSettingDefaults")
+      .setOf(foam.nanos.notification.NotificationSetting.getOwnClassInfo())
+      .build();
+  """
+})
+
 
 p({
   "class": "foam.nanos.boot.NSpec",
@@ -97,4 +132,62 @@ p({
   "boxClass":"foam.nanos.notification.email.POP3EmailSkeleton",
   "serviceClass":"foam.nanos.notification.email.POP3EmailService",
   "client":"{ \"class\":\"foam.nanos.notification.email.ClientPOP3EmailService\", \"delegate\": { \"class\":\"foam.box.HTTPBox\", \"url\":\"service/pop3\" } }"
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"localSmsMessageDAO",
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.notification.sms.SMSMessage.getOwnClassInfo())
+      .setAuthorize(false)
+      .setSeqNo(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("smsMessages")
+      .setFixedSize(new foam.dao.FixedSizeDAO.Builder(x)
+        .setSize(1000)
+        .build())
+      .build();
+  """
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"smsMessageDAO",
+  "serve":true,
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.notification.sms.SMSMessage.getOwnClassInfo())
+      .setInnerDAO(x.get("localSmsMessageDAO"))
+      .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.notification.sms.SMSMessage\"}"
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"smsService",
+  "serviceScript":"""
+    import foam.nanos.notification.sms.NullSMSService;
+    import foam.nanos.notification.sms.ProxySMSService;
+
+    return new ProxySMSService.Builder(x)
+      .setDelegate(
+        new NullSMSService.Builder(x).build())
+      .build();
+  """
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec", 
+  "name":"twilioConfig",                     
+  "lazy":false,  
+  "service":{"class":"foam.nanos.notification.sms.TwilioConfig"}
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"SMTPConfig",
+  "lazy": false,
+  "service":{"class":"foam.nanos.notification.email.SMTPConfig"}
 })
