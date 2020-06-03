@@ -74,7 +74,7 @@ foam.CLASS({
       name: 'data',
       javaGetter:`
         if ( dataIsSet_ ) return data_;
-        if ( this.getDataString() != null && this.getDataString() != "" ){
+        if ( ! SafetyUtil.isEmpty(this.getDataString()) ) {
           BlobService blobStore = new foam.blob.BlobStore();
           byte[] decodedBytes = Base64.getDecoder().decode(getDataString());
           InputStream is = new ByteArrayInputStream(decodedBytes);
