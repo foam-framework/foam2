@@ -28,12 +28,33 @@ foam.CLASS({
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.crunch.ui.CapabilityWizardlet',
+    'foam.u2.borders.MarginBorder',
+    'foam.u2.crunch.CapabilityInterceptView',
     'foam.u2.dialog.Popup'
   ],
   
   messages: [
     { name: 'CANNOT_OPEN_GRANTED', message: 'This capability has already been granted to you.' },
     { name: 'CANNOT_OPEN_PENDING', message: 'This capability is awaiting approval, updates are not permitted at this time.' }
+  ],
+
+  properties: [
+    {
+      name: 'activeIntercepts',
+      class: 'Array',
+      documentation: `
+        Since permissions may be checked during asynchronous calls,
+        it is possible that the same intercept view will be requested
+        twice in a short period of time. Keeping a a map of active
+        intercept views is done to prevent two intercept views being
+        open for the same permission (as this would be confusing for
+        the user if they happen to choose the "cancel" option).
+
+        This also allows a single intercept view to activate the
+        message retry for multiple permissioned calls made
+        asynchronously.
+      `
+    }
   ],
 
   methods: [
@@ -118,6 +139,45 @@ foam.CLASS({
         });
       }).catch(e => { console.log(e); });
 
+    },
+    function maybeLaunchInterceptView(intercept) {
+      // Clear stale intercepts (ones which have been closed already)
+      this.activeIntercepts = this.activeIntercepts.filter(ic => {
+        return ( ! ic.aquired ) && ( ! ic.cancelled );
+      });
+
+      // Try to find a matching intercept view that's already opened.
+      // NP-1426 explains this is greater detail.
+      for ( let i = 0 ; i < this.activeIntercepts.length ; i++ ) {
+        let activeIntercept = this.activeIntercepts[i];
+        let hasAllOptions = true;
+
+        // All options in the active intercept need to satisfy the
+        // incoming intercept for this to be a match.
+        activeIntercept.capabilityOptions.forEach(capOpt => {
+          if ( ! intercept.capabilityOptions.includes(capOpt) ) {
+            hasAllOptions = false;
+          }
+        })
+        if ( hasAllOptions ) {
+          return activeIntercept.promise;
+        }
+      }
+
+      // Register intercept for later occurances of the check above
+      this.activeIntercepts.push(intercept);
+
+      // Pop up the popup
+      var self = this;
+      self.ctrl.add(self.Popup.create({ closeable: false })
+        .start(self.MarginBorder)
+          .tag(self.CapabilityInterceptView, {
+            data: intercept
+          })
+        .end()
+      );
+
+      return intercept.promise;
     }
   ]
 });

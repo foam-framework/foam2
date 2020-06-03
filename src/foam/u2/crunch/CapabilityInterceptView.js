@@ -20,9 +20,7 @@ foam.CLASS({
   ],
 
   imports: [
-    'capabilityAcquired',
     'capabilityCache',
-    'capabilityCancelled',
     'capabilityDAO',
     'crunchController',
     'notify',
@@ -32,10 +30,6 @@ foam.CLASS({
   ],
 
   properties: [
-    {
-      name: 'capabilityOptions',
-      class: 'StringArray'
-    },
     {
       name: 'capabilityView',
       class: 'foam.u2.ViewSpec',
@@ -67,10 +61,9 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.capabilityOptions.forEach((c) => {
+      this.data.capabilityOptions.forEach((c) => {
         if ( this.capabilityCache.has(c) && this.capabilityCache.get(c) ) {
-          capabilityAcquired = true;
-          this.stack.back();
+          this.aquire();
         }
       });
 
@@ -79,9 +72,9 @@ foam.CLASS({
         .addClass(this.myClass())
         .start(this.Rows)
           .addClass(this.myClass('detail-container'))
-          .add(this.slot(function (capabilityOptions) {
+          .add(this.slot(function (data$capabilityOptions) {
             return this.E().select(this.capabilityDAO.where(
-              self.IN(self.Capability.ID, capabilityOptions)
+              self.IN(self.Capability.ID, data$capabilityOptions)
             ), (cap) => {
               return this.E().tag(self.capabilityView, {
                 data: cap
@@ -125,16 +118,16 @@ foam.CLASS({
     },
     function aquire(x) {
       x = x || this.__subSubContext__;
-      this.capabilityAcquired = true;
-      this.capabilityOptions.forEach((c) => {
+      this.data.aquired = true;
+      this.data.capabilityOptions.forEach((c) => {
         this.capabilityCache.set(c, true);
       });
       this.onClose(x);
     },
     function reject(x) {
       x = x || this.__subSubContext__;
-      this.capabilityCancelled = true;
-      this.capabilityOptions.forEach((c) => {
+      this.data.cancelled = true;
+      this.data.capabilityOptions.forEach((c) => {
         this.capabilityCache.set(c, true);
       });
       this.notify(this.REJECTED_MSG);
