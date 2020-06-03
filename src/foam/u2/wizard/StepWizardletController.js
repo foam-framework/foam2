@@ -168,8 +168,7 @@ foam.CLASS({
 
           // Automatically push the next section if this one is
           // unavailable.
-          let slot = this.sectionAvailableSlots
-            [wizardletIndex][sectionIndex];
+          let slot = this.sectionAvailableSlots[wizardletIndex][sectionIndex];
           if ( ! slot.get() ) {
             return this.next();
           }

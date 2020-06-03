@@ -10,35 +10,22 @@ foam.CLASS({
   extends: 'foam.u2.Element',
 
   documentation: `
-    A border which adds margin to all sides except the bottom.
+    A border which adds equal margin to all sides
   `,
 
   properties: [
     {
       name: 'margin',
-      class: 'Int',
-      value: 24
-    },
-    {
-      name: 'marginUnit',
       class: 'String',
-      value: 'px'
+      value: '24px'
     },
-
-    {
-      name: 'marginExpr',
-      class: 'String',
-      expression: function (margin, marginUnit) {
-        return '' + margin + marginUnit;
-      }
-    }
   ],
 
   methods: [
     function initE() {
       this
         .style({
-          'margin': this.marginExpr$
+          'margin': this.margin$
         })
         ;
     }
