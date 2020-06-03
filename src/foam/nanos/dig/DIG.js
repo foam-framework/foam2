@@ -75,31 +75,50 @@ foam.CLASS({
       name: 'cmd',
       label: 'API Command'
     },
-    'format',
+    {
+      name: 'format',
+      visibility: function(cmd) {
+        return ( cmd == 'SELECT' || cmd == 'PUT' ) ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
+      }
+    },
     {
       class: 'String',
       name: 'key',
-      label: 'Object ID'
+      label: 'Object ID',
+      visibility: function(cmd) {
+        return ( cmd == 'SELECT' || cmd == 'REMOVE' ) ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
+      }
   },
   {
       class: 'String',
       name: 'q',
       label: 'Select Query',
-      isAvailable: function(cmd) {
-        return cmd == 'SELECT';
+      visibility: function(cmd) {
+        return (cmd == 'SELECT') ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
       }
     },
     {
       class: 'Long',
-      name: 'limit'
+      name: 'limit',
+      visibility: function(cmd) {
+        return (cmd == 'SELECT') ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
+      }
     },
-    'data',
+    {
+      name: 'data',
+      visibility: function(cmd) {
+        return (cmd == 'PUT') ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
+      }
+    },
     {
       class: 'foam.nanos.fs.FileProperty',
       name: 'dataFile',
       label: 'DataFile',
-      documentation: 'dig file to put data',
+      documentation: 'File input for put command',
       view: { class: 'foam.nanos.dig.DigFileUploadView', data: this.dataFile$ },
+      visibility: function(cmd) {
+        return (cmd == 'PUT') ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
+      }
     },
     {
       class: 'URL',
