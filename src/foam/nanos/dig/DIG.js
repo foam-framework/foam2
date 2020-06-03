@@ -77,6 +77,7 @@ foam.CLASS({
     },
     {
       name: 'format',
+      label: 'Data Format',
       visibility: function(cmd) {
         return ( cmd == 'SELECT' || cmd == 'PUT' ) ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
       }
