@@ -53,11 +53,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'dataString',
-      documentation: 'File converted to base64 string',
-      javaSetter: `
-        String base64 = Base64.getEncoder().encodeToString(val.getBytes());
-        dataString_ = base64;
-      `
+      documentation: 'File converted to base64 string'
     },
     {
       class: 'String',

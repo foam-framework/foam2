@@ -31,7 +31,7 @@ foam.CLASS({
       var i = 0;
       var props = obj.cls_.getAxiomsByClass(foam.nanos.fs.FileProperty);
 
-      return Promise.resolve().then(function a() {
+      return Promise.resolve().then(async function a() {
         var prop = props[i++];
 
         if ( ! prop ) return obj;
@@ -41,8 +41,8 @@ foam.CLASS({
         if ( ! file ) return a();
 
         if ( file.size <= this.maxStringDataSize ){
-          file.dataString = encode(file.data.blob);
-          delete file.data;
+          file.dataString = await encode(file.data.blob);
+          delete file.instance_.data;
         }
 
         return self.fileDAO.put(file).then(function (b) {
