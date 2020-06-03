@@ -414,7 +414,6 @@ FOAM_FILES([
   { name: "foam/box/RoundRobinBox" },
   { name: "foam/core/async" },
   { name: "foam/dao/ClientSink" },
-  { name: "foam/u2/fixed/FixedSquareView" },
   { name: "foam/u2/ViewFactory", flags: ['web'] },
   { name: "foam/u2/DAOList", flags: ['web'] },
   { name: "foam/u2/GroupingDAOList", flags: ['web'] },
