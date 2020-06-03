@@ -249,6 +249,7 @@ foam.CLASS({
                       })
                       .callIf(self.config.searchMode === self.SearchMode.FULL, function() {
                         this.tag(self.FilterView, {
+                          dao$: self.searchFilterDAO$,
                           data$: self.searchPredicate$
                         });
                       })
