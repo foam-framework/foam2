@@ -514,7 +514,6 @@
     {
       name: 'approveWithMemo',
       code: function(memo){
-        debugger;
         var approvedApprovalRequest = this.clone();
         approvedApprovalRequest.status = this.ApprovalStatus.APPROVED;
         approvedApprovalRequest.memo = memo;
@@ -526,7 +525,7 @@
             message: this.SUCCESS_APPROVED
           }));
 
-          if ( this.currentMenu.id !== this.stack.top[2] ) {
+          if ( this.stack.top.length > 0 ){
             this.stack.back();
           }
         }, e => {
@@ -552,7 +551,7 @@
             message: this.SUCCESS_REJECTED
           }));
 
-          if ( this.currentMenu.id !== X.stack.top[2] ) {
+          if ( this.stack.top.length > 0 ){
             this.stack.back();
           }
         }, e => {
