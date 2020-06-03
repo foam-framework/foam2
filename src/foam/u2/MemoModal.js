@@ -61,8 +61,8 @@ foam.CLASS({
       name: 'title',
       expression: isMemoRequired => {
         if (isMemoRequired)
-          return "Add a memo to this (required)";
-        return "Add a memo to this (optoinal)";
+          return "Please provide a note (required)";
+        return "Please provide a note (optional)";
       }
     },
     {

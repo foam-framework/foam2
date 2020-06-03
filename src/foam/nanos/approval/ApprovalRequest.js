@@ -47,7 +47,6 @@
     'ctrl',
     'currentMenu',
     'stack',
-    'user',
     'objectSummaryView?'
   ],
 
@@ -584,8 +583,7 @@
       code: function(X) {
         this.objectSummaryView.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
           class: "foam.u2.MemoModal",
-          onExecute: this.approveWithMemo.bind(this),
-          title: "Add a memo to this (optional)"
+          onExecute: this.approveWithMemo.bind(this)
         }));
       }
     },
@@ -606,8 +604,7 @@
         this.objectSummaryView.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
           class: "foam.u2.MemoModal",
           onExecute: this.rejectWithMemo.bind(this),
-          isMemoRequired: true,
-          title: "Add a memo to this (required)"
+          isMemoRequired: true
         }));
       }
     },
