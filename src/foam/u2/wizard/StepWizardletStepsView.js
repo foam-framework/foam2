@@ -28,7 +28,7 @@ foam.CLASS({
 
   requires: [
     'foam.u2.detail.AbstractSectionedDetailView',
-    'foam.u2.wizard.util.CircleIndicator'
+    'foam.u2.tag.CircleIndicator'
   ],
 
   methods: [

@@ -27,7 +27,7 @@ foam.CLASS({
     'foam.u2.layout.Grid',
     'foam.u2.layout.GUnit',
     'foam.u2.wizard.StepWizardletStepsView',
-    'foam.u2.wizard.util.CircleIndicator'
+    'foam.u2.tag.CircleIndicator'
   ],
 
   implements: [

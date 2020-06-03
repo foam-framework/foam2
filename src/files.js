@@ -769,7 +769,7 @@ FOAM_FILES([
 
   // Multiple model - crunch - wizard files
   { name: "foam/u2/dialog/SimpleActionDialog" },
-  { name: "foam/u2/wizard/util/CircleIndicator" },
+  { name: "foam/u2/tag/CircleIndicator" },
   { name: "foam/u2/wizard/Wizardlet" },
   { name: "foam/u2/wizard/BaseWizardlet" },
   { name: "foam/u2/wizard/WizardletView" },

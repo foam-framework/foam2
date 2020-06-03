@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.u2.wizard.util',
+  package: 'foam.u2.tag',
   name: 'CircleIndicator',
   extends: 'foam.u2.Element',
   documentation: `
