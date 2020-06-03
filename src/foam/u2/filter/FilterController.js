@@ -93,7 +93,7 @@ foam.CLASS({
 
     function and(predicates) {
       return this.And.create({
-        args: Object.values(predicates).filter(function(predicate) { return predicate !== undefined })
+        args: Object.values(predicates).filter((predicate) => { return predicate !== undefined; })
       }).partialEval();
     },
 
@@ -263,7 +263,7 @@ foam.CLASS({
       // There could be a case where the view's data is for reconstruction
       // Therefore, there won't be a method called clear
       if ( criterias[criteria].views[name].clear ) criterias[criteria].views[name].clear();
-      criterias[criteria].predicates[name] = {};
+      criterias[criteria].predicates[name] = this.TRUE;
       if ( remove ) {
         // There could be a case where the view's data is for reconstruction
         // Therefore, there won't be any subs
