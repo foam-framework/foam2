@@ -28,7 +28,10 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'port',
-      value: 7070
+      javaFactory: `
+        String portStr = System.getProperty("http.port");
+        return Integer.parseInt(portStr) + 2;
+      `
     },
     {
       class: 'Object',

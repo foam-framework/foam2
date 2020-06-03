@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import foam.box.network.SocketReplyBox;
 
 public class SocketRouter
   extends NanoRouter
@@ -85,6 +86,9 @@ public class SocketRouter
     WebAgent serv = getWebAgent(spec, service);
     PM pm = new PM(this.getClass(), serviceKey);
 
+    // Get SyncBox Id.
+    String syncBoxId = (String) getX().get("syncBoxId");
+    ((SocketReplyBox) requestMsg.getAttributes().get("replyBox")).setSyncBoxId(syncBoxId);
     try {
       if ( serv == null ) {
         Logger logger = (Logger) getX().get("logger");

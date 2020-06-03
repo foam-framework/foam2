@@ -21,12 +21,20 @@ foam.CLASS({
     'foam.lib.NetworkPropertyPredicate'
   ],
 
+  properties: [
+    {
+      class: 'String',
+      name: 'syncBoxId'
+    }
+  ],
+
   methods: [
     {
       name: 'send',
       javaCode: `
       try {
         Socket socket = (Socket) getX().get("tcpSocket");
+        msg.getAttributes().put("syncBoxId", getSyncBoxId());
         synchronized (socket) {
           OutputStream os = socket.getOutputStream();
           String responseMsg = new Outputter(getX()).setPropertyPredicate(new NetworkPropertyPredicate()).stringify(msg);
