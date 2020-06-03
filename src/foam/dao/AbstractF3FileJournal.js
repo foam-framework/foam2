@@ -79,7 +79,6 @@ foam.CLASS({
       javaFactory: `
         JSONFObjectFormatter outputter = new JSONFObjectFormatter(getX());
         outputter.setPropertyPredicate(new StoragePropertyPredicate());
-        outputter.setQuoteKeys(true);
         return outputter;
         `
     },
