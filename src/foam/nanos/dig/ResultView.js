@@ -30,7 +30,7 @@ foam.CLASS({
       this.addClass(this.myClass());
 
       this.add(this.data$.map(data => {
-        if ( data.length && data.charAt(0) == '<' ) {
+        if ( data.length && data.substring(0, 6) == '<html>' ) {
           return this.HTMLView.create({data: this.data});
         }
 

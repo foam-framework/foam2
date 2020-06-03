@@ -93,6 +93,7 @@ public abstract class DigOperation extends ContextAwareAgent
         resp.setContentType("text/html");
       }
       out.println("[]");
+      return;
     }
 
     switch (format) {
