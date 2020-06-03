@@ -111,16 +111,6 @@ foam.CLASS({
       }
     },
     {
-      class: 'foam.nanos.fs.FileProperty',
-      name: 'dataFile',
-      label: 'DataFile',
-      documentation: 'File input for put command',
-      view: { class: 'foam.nanos.dig.DigFileUploadView', data: this.dataFile$ },
-      visibility: function(cmd) {
-        return (cmd == 'PUT') ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
-      }
-    },
-    {
       class: 'URL',
       name: 'postURL',
       hidden: true
@@ -130,7 +120,7 @@ foam.CLASS({
       label: 'Snippet',
       documentation: 'show a specific type of request would look like in a given language.',
       view: { class: 'foam.nanos.dig.DigSnippetView' },
-      expression: function(key, data, daoKey, cmd, format, q, limit, dataFile) {
+      expression: function(key, data, daoKey, cmd, format, q, limit) {
         var query = false;
         var url = "/service/dig";
 
@@ -166,11 +156,6 @@ foam.CLASS({
         }
         this.postURL = url;
 
-        if ( dataFile ) {
-          url += query ? "&" : "?";
-          query = true;
-          url += "&fileaddress=" + encodeURIComponent(dataFile.address);
-        }
         if ( data ) {
           if ( data.length + url.length < this.MAX_URL_SIZE ) {
             url += query ? "&" : "?";
