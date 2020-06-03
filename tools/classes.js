@@ -96,6 +96,7 @@ var classes = [
   'com.google.foam.demos.heroes.Hero',
   'com.google.auth.TokenVerifier',
   'foam.box.RemoteException',
+  'foam.box.CapabilityRequiredRemoteException',
   'foam.box.RPCMessage',
   'foam.box.RPCReturnBox',
   'foam.box.RPCReturnMessage',
@@ -108,7 +109,6 @@ var classes = [
   'foam.box.RawWebSocketBox',
   'foam.box.ReturnBox',
   'foam.box.BoxService',
-  'foam.box.CheckAuthenticationBox',
   'foam.box.SessionReplyBox',
   'foam.box.SessionClientBox',
   'foam.dao.DAO',
@@ -193,6 +193,7 @@ var classes = [
   'foam.nanos.NanoService',
   'foam.nanos.boot.NSpec',
   'foam.nanos.boot.NSpecAware',
+  'foam.nanos.boot.DAONSpecMenu',
   'foam.nanos.app.Mode',
   'foam.nanos.bench.Benchmark',
   'foam.nanos.auth.Authorizer',
@@ -329,6 +330,7 @@ var classes = [
   'foam.nanos.notification.email.EmailPropertyService',
   'foam.nanos.notification.email.Status',
   // Email service Files
+  'foam.nanos.notification.email.SMTPConfig',
   'foam.nanos.notification.email.SMTPEmailService',
   'foam.nanos.notification.email.NullEmailService',
   'foam.nanos.notification.email.ProxyEmailService',
@@ -348,9 +350,11 @@ var classes = [
   // SMS models, services and interfaces
   'foam.nanos.notification.sms.NullSMSService',
   'foam.nanos.notification.sms.ProxySMSService',
-  'foam.nanos.notification.sms.SMSService',
   'foam.nanos.notification.sms.SMSMessage',
+  'foam.nanos.notification.sms.SMSService',
+  'foam.nanos.notification.sms.SMSSetting',
   'foam.nanos.notification.sms.SMSStatus',
+  'foam.nanos.notification.sms.TwilioConfig',
   'foam.nanos.notification.sms.TwilioSMSService',
 
   'foam.nanos.notification.Notifiable',
@@ -516,7 +520,6 @@ var classes = [
   'foam.nanos.dig.exception.GeneralException',
 
   'foam.nanos.app.EmailConfig',
-  'foam.nanos.app.TwilioConfig',
 
   'foam.nanos.test.StockSnapshot',
   'foam.nanos.analytics.FoldManagerDAODecorator',
@@ -560,8 +563,11 @@ var classes = [
   'foam.nanos.crunch.crunchtest.FakeTestObject',
   //models
   'foam.nanos.crunch.Capability',
+  'foam.nanos.crunch.CapabilityCategory',
+  'foam.nanos.crunch.CapabilityCategoryCapabilityJunction',
   'foam.nanos.crunch.CapabilityJunctionStatus',
   'foam.nanos.crunch.UserCapabilityJunction',
+  'foam.nanos.crunch.AgentCapabilityJunction',
   'foam.nanos.crunch.CapabilityCapabilityJunction',
   //daos
   'foam.nanos.crunch.UserCapabilityJunctionDAO',
