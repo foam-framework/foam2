@@ -5,7 +5,7 @@ p({
   "schedule":{
     "class":"foam.nanos.cron.CronSchedule",
     "minute":0,
-    "hour":-1,
+    "hour":0,
     "dayOfMonth":-1,
     "month":-1,
     "dayOfWeek":-1,
