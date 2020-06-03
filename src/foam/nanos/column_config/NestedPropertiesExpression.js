@@ -40,7 +40,7 @@ foam.CLASS({
       type: 'Any',
       code: function(obj) {
         var e =  this.returnDotExprForNestedProperty(this.objClass, this.nestedProperty.split('.'), 0);
-        if ( !e ) return null;
+        if ( ! e ) return null;
         return e.f(obj);
       },
       javaCode: `
