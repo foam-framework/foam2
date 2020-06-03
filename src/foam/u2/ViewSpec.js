@@ -59,6 +59,23 @@ foam.CLASS({
               var cls = foam.core.FObject.isSubClass(spec.class) ? spec.class : ctx.lookup(spec.class);
               if ( ! cls ) foam.assert(false, 'ViewSpec specifies unknown class: ', spec.class);
               ret = cls.create(spec, ctx).copyFrom(args || {});
+              // test case
+//              foam.language = 'fr-CA';
+//              foam.language = 'fr-FR';
+//              foam.language = 'fr';
+              if ( ctx.XLIFFTranslation && 
+                   ( foam.language == ctx.XLIFFTranslation.locale_variant || 
+                     foam.language.substring(0, foam.language.indexOf('-')) == ctx.XLIFFTranslation.locale_variant.substring(0, foam.language.indexOf('-'))  ))
+              {
+                let ax   = cls.getOwnAxioms().find( e => e.message_ != null );
+                if ( ax && ctx.XLIFFTranslation.translationValues.values.find(e => e.id == ax.sourceCls_.id) )
+                {
+                  let trsl = ctx.XLIFFTranslation.translationValues.values.find(e => e.model_property == ax.name && e.id == ax.sourceCls_.id);
+                  if ( trsl ) {
+                    cls[ax.name] = trsl.translated_value;
+                  }
+                }
+              }
             }
 
             foam.assert(

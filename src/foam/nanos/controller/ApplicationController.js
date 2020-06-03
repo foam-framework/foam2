@@ -275,6 +275,7 @@ foam.CLASS({
 
         await self.fetchAgent();
         await self.fetchUser();
+//        await self.fetchLanguage();
 
         // Fetch the group only once the user has logged in. That's why we await
         // the line above before executing this one.
@@ -511,6 +512,14 @@ foam.CLASS({
 
       if ( ! lastTheme || lastTheme.id != this.theme.id ) this.useCustomElements();
     },
+
+    //TODO add the option to the user to select a language
+//    async function fetchLanguage() {
+//      /**
+//       * Get the language
+//       */
+//      foam.language = 'fr';
+//    },
 
     function useCustomElements() {
       /** Use custom elements if supplied by the Theme. */
