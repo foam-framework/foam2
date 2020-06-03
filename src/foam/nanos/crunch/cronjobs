@@ -1,15 +1,15 @@
 p({
   "class":"foam.nanos.cron.Cron",
   "id":"Expire User CapabilityJunctions",
-  "description":"Daily check to remove expired UserCapabilityJunctions",
+  "description":"check to remove expired UserCapabilityJunctions that runs once per minute",
   "schedule":{
     "class":"foam.nanos.cron.CronSchedule",
     "minute":-1,
-    "hour":0,
+    "hour":-1,
     "dayOfMonth":-1,
     "month":-1,
     "dayOfWeek":-1,
-    "second":-1
+    "second":0
   },
   "code": """
     cron = new foam.nanos.crunch.ExpireUserCapabilityJunctionsCron();
