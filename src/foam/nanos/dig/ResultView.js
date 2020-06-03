@@ -21,7 +21,6 @@ foam.CLASS({
     ^ {
       margin-bottom: 5px;
       overflow-x: auto;
-      width: 820px;
     }
   `,
 

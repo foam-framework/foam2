@@ -22,7 +22,7 @@ foam.CLASS({
       of: 'foam.nanos.auth.User',
       name: 'owner',
       hidden: true
-      // TODO: set tableCellRenderer
+      // TODO: replace with createdby
     },
     {
       name: 'cmd',
@@ -37,6 +37,7 @@ foam.CLASS({
     },
     {
       name: 'format',
+      label: 'Data Format',
       class: 'Enum',
       of: 'foam.nanos.http.Format',
       value: 'JSON',

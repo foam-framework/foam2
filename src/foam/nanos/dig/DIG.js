@@ -11,14 +11,19 @@ foam.CLASS({
 
   documentation: 'Data Integration Gateway - Perform DAO operations against a web service',
 
-  requires: ['foam.net.web.HTTPRequest'],
+  requires: [
+    'foam.net.web.HTTPRequest'
+  ],
+
+  implements: [
+    'foam.mlang.Expressions',
+  ],
 
   tableColumns: [
     'id',
     'daoKey',
     'cmd',
-    'format',
-    'owner'
+    'format'
   ],
 
   searchColumns: [],
@@ -31,60 +36,74 @@ foam.CLASS({
     }
   ],
 
+  imports: [
+    'nSpecDAO'
+  ],
+
   properties: [
-    'id',
     {
-      class: 'String',
+      name: 'id',
+      label: 'Request Name'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.boot.NSpec',
+      label: 'Data Access Object (DAO)',
       name: 'daoKey',
-      label: 'DAO',
+      documentation: `The DAO in the DIG request.`,
       view: function(_, X) {
         var E = foam.mlang.Expressions.create();
-        return foam.u2.view.ChoiceView.create({
-          dao: X.nSpecDAO
-            .where(E.ENDS_WITH(foam.nanos.boot.NSpec.ID, 'DAO'))
-            .where(E.EQ(foam.nanos.boot.NSpec.SERVE, E.TRUE))
-            .orderBy(foam.nanos.boot.NSpec.ID),
-          objToChoice: function(nspec) {
-            return [nspec.id, nspec.id];
-          }
-        });
+        return {
+          class: 'foam.u2.view.RichChoiceView',
+          search: true,
+          sections: [
+            {
+              heading: 'DAO',
+              dao: X.nSpecDAO
+                .where(E.AND(
+                  E.EQ(foam.nanos.boot.NSpec.SERVE, true),
+                  E.ENDS_WITH(foam.nanos.boot.NSpec.ID, 'DAO')
+                ))
+                .orderBy(foam.nanos.boot.NSpec.ID)
+            }
+          ]
+        };
       },
-      value: 'accountDAO'
+      value: 'userDAO'
     },
-    'cmd',
+    {
+      name: 'cmd',
+      label: 'API Command'
+    },
     'format',
     {
       class: 'String',
-      name: 'dao',
-      hidden: true,
-      transient: true,
-      postSet: function(old, nu) {
-        this.daoKey = nu;
+      name: 'key',
+      label: 'Object ID'
+  },
+  {
+      class: 'String',
+      name: 'q',
+      label: 'Select Query',
+      isAvailable: function(cmd) {
+        return cmd == 'SELECT';
       }
     },
     {
-      class: 'String',
-      name: 'q',
-      label: 'Query'
-    },
-    {
       class: 'Long',
-      name: 'limit',
-      value: Number.MAX_SAFE_INTEGER
-    },
-    {
-        class: 'String',
-        name: 'key'
+      name: 'limit'
     },
     {
       class: 'EMail',
       displayWidth: 100,
-      name: 'email'
+      name: 'email',
+      hidden: true
     },
     {
       class: 'String',
       displayWidth: 100,
-      name: 'subject'
+      name: 'subject',
+      hidden: true
     },
     'data',
     {
@@ -171,7 +190,6 @@ foam.CLASS({
       name: 'result',
       value: 'No Request Sent Yet.',
       view: { class: 'foam.nanos.dig.ResultView' },
-//       view: { class: 'foam.u2.tag.TextArea', rows: 5, cols: 120 },
       visibility: 'RO'
     }
   ],
