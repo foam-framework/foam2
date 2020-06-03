@@ -147,7 +147,7 @@ p({
     "config":{
       "class":"foam.comics.v2.DAOControllerConfig",
       "daoKey":"digDAO",
-      "browseSubtitle": "The Digital Integration Gateway (DIG) is a web endpoint that receives requests for DAO actions and supports all DAO operations."
+      "browseSubtitle": "An API endpoint that supports all DAO operations."
     }
   },
   "parent":"integration"

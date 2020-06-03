@@ -140,7 +140,7 @@ foam.CLASS({
           query = true;
           url += "q=" + encodeURIComponent(q);
         }
-        if ( limit >= 0 && limit != Number.MAX_SAFE_INTEGER ) {
+        if ( limit > 0 && limit != Number.MAX_SAFE_INTEGER ) {
           url += query ? "&" : "?";
           query = true;
           url += "limit=" + limit;

@@ -35,7 +35,7 @@ foam.CLASS({
         }
 
         var rows = data ? Math.min(20, this.data.split('\n').length) : 2;
-        return this.TextArea.create({data: this.data, rows: rows, cols: 120});
+        return this.TextArea.create({data: this.data, rows: 16, cols: 120, escapeTextArea: false});
       }));
     }
   ]
