@@ -70,9 +70,9 @@ foam.CLASS({
                 let ax   = cls.getOwnAxioms().find( e => e.message_ != null );
                 if ( ax && ctx.XLIFFTranslation.translationValues.values.find(e => e.id == ax.sourceCls_.id) )
                 {
-                  let trsl = ctx.XLIFFTranslation.translationValues.values.find(e => e.model_property == ax.name && e.id == ax.sourceCls_.id);
+                  let trsl = ctx.XLIFFTranslation.translationValues.values.find(e => e.source == ax.name && e.id == ax.sourceCls_.id);
                   if ( trsl ) {
-                    cls[ax.name] = trsl.translated_value;
+                    cls[ax.name] = trsl.target;
                   }
                 }
               }

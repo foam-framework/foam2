@@ -12,23 +12,19 @@ foam.CLASS({
     'id',
     {
       class: 'String',
-      name: 'model_property',
+      name: 'source',
       documentation: `Reference to model or view property to be translated. 
-        Ex. (‘FIRST_NAME’, ‘LAST_NAME’, ‘ORGANIZATION’ …etc)`,
-      value: 'en'  
+        Ex. (‘FIRST_NAME’, ‘LAST_NAME’, ‘ORGANIZATION’ …etc)`
     },
     {
       class: 'String',
-      name: 'translated_value',
-      documentation: 'Contains translated string after translation.',
-      value: 'CA'
+      name: 'target',
+      documentation: 'Contains translated string after translation.'
     },
     {
       class: 'String',
-      name: 'hint',
-      documentation: 'Provided hint to translators. Ex. ( if label is `rad` hint: calculator radian.)',
-      //factory: function() { return this.locale + '-' + this.variant ; }
-      //value: 'en-CA'
+      name: 'note',
+      documentation: 'Provided hint to translators. Ex. ( if label is `rad` hint: calculator radian.)'
     }
   ]
 });

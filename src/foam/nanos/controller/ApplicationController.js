@@ -301,9 +301,9 @@ foam.CLASS({
               {
                 values:[
                   this.XLIFFTranslationValue.create(
-                    {id:'net.nanopay.sme.ui.dashboard.TopCardsOnDashboardOne', model_property:'LOWER_LINE_TXT',translated_value: 'Welcome back Fr 1 ' }),
+                    {id:'net.nanopay.sme.ui.dashboard.TopCardsOnDashboardOne', source:'LOWER_LINE_TXT',target: 'Welcome back Fr 1 ' }),
                   this.XLIFFTranslationValue.create(
-                    {id:'net.nanopay.sme.ui.dashboard.TopCardsOnDashboard', model_property:'LOWER_LINE_TXT',translated_value: 'Welcome back Fr 2 ' }),
+                    {id:'net.nanopay.sme.ui.dashboard.TopCardsOnDashboard', source:'LOWER_LINE_TXT',target: 'Welcome back Fr 2 ' }),
                 ]
               }
           });
