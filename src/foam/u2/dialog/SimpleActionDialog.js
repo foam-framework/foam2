@@ -8,6 +8,11 @@ foam.CLASS({
   package: 'foam.u2.dialog',
   name: 'SimpleActionDialog',
   extends: 'foam.u2.Controller',
+  documentation: `
+    This view is intended for use in a popup but could be used anywhere.
+    The specified title and text are displayed as well as the specified list
+    of axioms.
+  `,
 
   imports: [
     'closeDialog'

@@ -8,6 +8,9 @@ foam.CLASS({
   package: 'foam.u2.wizard.util',
   name: 'CircleIndicator',
   extends: 'foam.u2.Element',
+  documentation: `
+    Displays a coloured circle containing a number or icon.
+  `,
 
   requires: [
     'foam.core.ExpressionSlot'
