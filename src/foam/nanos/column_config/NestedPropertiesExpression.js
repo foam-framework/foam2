@@ -47,7 +47,9 @@ foam.CLASS({
         Expr e = returnDotExprForNestedProperty(getObjClass(), getNestedProperty().split("\\\\."), 0);
         if ( e == null )
           return null;
-        return e.f(obj);
+        FObject copy = ((FObject)obj).shallowClone();
+        copy.setX(getX());
+        return e.f(copy);
       `
     },
     {
