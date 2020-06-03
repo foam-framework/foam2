@@ -1,7 +1,7 @@
 p({
   "class":"foam.nanos.cron.Cron",
   "id":"Expire User CapabilityJunctions",
-  "description":"check to remove expired UserCapabilityJunctions that runs once per minute",
+  "description":"Daily check to remove expired UserCapabilityJunctions",
   "schedule":{
     "class":"foam.nanos.cron.CronSchedule",
     "minute":-1,
