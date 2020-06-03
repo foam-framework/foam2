@@ -4,7 +4,7 @@ p({
   "description":"Daily check to remove expired UserCapabilityJunctions",
   "schedule":{
     "class":"foam.nanos.cron.CronSchedule",
-    "minute":-1,
+    "minute":0,
     "hour":-1,
     "dayOfMonth":-1,
     "month":-1,
