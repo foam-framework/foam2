@@ -257,7 +257,9 @@ foam.CLASS({
                       .start(self.EXPORT, { buttonStyle: 'SECONDARY' })
                         .addClass(self.myClass('export'))
                       .end()
-                      .tag(this.REFRESH_TABLE, { buttonStyle: 'SECONDARY' })
+                      .start(self.REFRESH_TABLE, { buttonStyle: 'SECONDARY' })
+                        .addClass(self.myClass('refresh'))
+                      .end()
                     .endContext()
                   .end();
               })
