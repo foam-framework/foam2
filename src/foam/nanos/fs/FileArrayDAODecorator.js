@@ -10,7 +10,10 @@ foam.CLASS({
   extends: 'foam.dao.AbstractDAODecorator',
 
   imports: [
-    'fileDAO'
+    'fileDAO',
+  ],
+  requires: [
+    'foam.nanos.fs.File',
   ],
 
   properties: [
@@ -32,17 +35,21 @@ foam.CLASS({
 
       var promises = props.map((prop) => {
         var files = prop.f(obj);
-        return Promise.all(files.map((f) => {
-          if ( f.size <= this.maxStringDataSize ){
-            f.dataString = encode(f.data.blob);
-            delete f.data;
+        return Promise.all(files.map(async (f) =>{
+          if ( f.filesize <= this.maxStringDataSize ){
+            f.dataString = await this.encode(f.data.blob);
+            delete f.instance_.data;
           }
-          self.fileDAO.put(f);
-        }))
+            a = await self.fileDAO.put(f);
+            debugger;
+          return self.fileDAO.put(f);
+          }
+        ))
       });
 
       return Promise.all(promises).then((values) => {
         props.forEach((prop, i) => {
+        debugger;
           prop.set(obj, values[i]);
         });
         return obj;

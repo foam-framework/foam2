@@ -14,6 +14,10 @@ foam.CLASS({
     'foam.nanos.auth.Authorizable'
   ],
 
+  requires: [
+    'foam.blob.BlobBlob'
+  ],
+
   javaImports: [
     'foam.blob.BlobService',
     'foam.blob.Blob',
@@ -81,12 +85,12 @@ foam.CLASS({
           Blob data = blobStore.put(new foam.blob.InputStreamBlob(is, decodedBytes.length));
           return data;
         } else {
-          return this.getData();
+          return null;
         }
       `,
       getter: function(){
         if ( typeof this.dataString != 'undefined' && this.dataString != '' ) {
-          let b64Data = this.data.split(',')[1];
+          let b64Data = this.dataString.split(',')[1];
           const b64toBlob = (b64Data, contentType=this.mimeType, sliceSize=512) => {
             const byteCharacters = atob(b64Data);
             const byteArrays = [];
