@@ -60,7 +60,8 @@ foam.CLASS({
   ],
 
   exports: [
-    'controllerMode'
+    'controllerMode',
+    'as objectSummaryView'
   ],
 
   properties: [
