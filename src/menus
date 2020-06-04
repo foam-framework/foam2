@@ -146,7 +146,8 @@ p({
     "class":"foam.nanos.menu.DAOMenu2",
     "config":{
       "class":"foam.comics.v2.DAOControllerConfig",
-      "daoKey":"digDAO"
+      "daoKey":"digDAO",
+      "browseSubtitle": "An API endpoint that supports all DAO operations."
     }
   },
   "parent":"integration"
