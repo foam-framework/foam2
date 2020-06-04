@@ -6,14 +6,14 @@
 
 foam.CLASS({
   package: 'foam.u2.util',
-  name: 'LongNumberFormatter',
+  name: 'NumberShortener',
   documentation: `
     A utility class to truncate numbers for displays. This is to allow really
     large values to be displayed nicely on table columns or elements with minimal
     space.
   `,
 
-  methods: [
+  static: [
     /*
     * shortenNumber
     * Takes a number (no floats) and shortens the number for display
@@ -25,7 +25,7 @@ foam.CLASS({
       var num = String(number);
       var shortened = '';
 
-      if ( ! requiresShortening_(num, currency) ) {
+      if ( ! this.requiresShortening_(num, currency) ) {
         return currency ? currency.format(number) : num;
       }
 
