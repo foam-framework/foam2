@@ -17,6 +17,10 @@
 
    properties: [
      {
+       class: 'Long',
+       name: 'id'
+     },
+     {
        class: 'Reference',
        of: 'foam.nanos.auth.User',
        name: 'user'

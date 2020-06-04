@@ -27,7 +27,7 @@ p({
   "serviceScript":"""
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.notification.sms.SMSMessage.getOwnClassInfo())
-      .setInnerDAO(x.get("localSmsMessageDAO"))
+      .setInnerDAO((foam.dao.DAO) x.get("localSmsMessageDAO"))
       .build();
   """,
   "client":"{\"of\":\"foam.nanos.notification.sms.SMSMessage\"}"
