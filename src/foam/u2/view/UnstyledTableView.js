@@ -400,11 +400,8 @@ foam.CLASS({
           if ( ! columnConfig ) columnConfig = this.ColumnConfigToPropertyConverter.create();
           var props = columnConfig.returnProperties(this.of, propertyNamesToQuery);
 
-          this.values = await  outputter.arrayOfValuesToArrayOfStrings(props, values.array);
+          this.values = await outputter.arrayOfValuesToArrayOfStrings(props, values.array);
          
-          var columnConfig = this.__context__.columnConfigToPropertyConverter;
-            if ( ! columnConfig ) columnConfig = this.ColumnConfigToPropertyConverter.create();
-          // var props = columnConfig.returnProperties(view.of, propertyNamesToQuery);
           var proxy = view.ProxyDAO.create({ delegate: dao });
 
           proxy.select().then(v => console.log(v));
@@ -419,8 +416,19 @@ foam.CLASS({
           var actions = Array.isArray(view.contextMenuActions)
             ? view.contextMenuActions.concat(modelActions)
             : modelActions;
+          
+          view.columns_$.sub(async function() {
+            var propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => c));
+            expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(view.of, propertyNamesToQuery);
+            values = await dao.select(expr);
+            props = columnConfig.returnProperties(view.of, propertyNamesToQuery);
 
-          return this.slot(function(values, columns_) {
+            view.values = await outputter.arrayOfValuesToArrayOfStrings(props, values.array);
+          });
+          
+          return await this.slot(async function(columns_, values) {
+            
+
             var element = this.
               E();
               element.
@@ -530,8 +538,9 @@ foam.CLASS({
                   .add(val[i])
                   .style({flex: props[i] && props[i].tableWidth  ? `0 0 ${props[i].tableWidth}px` : '1 0 0'}).end();
                 }
-                element1.
-                  addClass(view.myClass('td')).
+                element1
+                .start()
+                  .addClass(view.myClass('td')).
                   attrs({ name: 'contextMenuCell' }).
                   style({ flex: `0 0 ${view.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH}px` }).
                   tag(view.OverlayActionListView, {
