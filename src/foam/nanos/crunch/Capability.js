@@ -289,7 +289,20 @@ foam.RELATIONSHIP({
   inverseName: 'users',
   sourceProperty: {
     section: 'capabilities',
-    updateVisibility: 'RO'
+    updateVisibility: 'RO',
+    label: 'User',
+    tableWidth: 80
+  },
+  targetProperty: {
+    label: 'capability',
+    tableWidth: 450,
+    tableCellFormatter: function(value, _, _) {
+      this.__subContext__.capabilityDAO
+        .find(value)
+        .then((result) => {
+          this.add(`${result.name} [...${value.substring(value.length-10)}]`);
+        });
+    }
   }
 });
 

@@ -14,6 +14,13 @@ foam.CLASS({
     capability to user.
   `,
 
+  tableColumns: [
+    'sourceId',
+    'targetId',
+    'data',
+    'status'
+  ],
+
   properties: [
     {
       name: 'created',
@@ -31,7 +38,12 @@ foam.CLASS({
       class: 'foam.core.FObjectProperty',
       of: 'foam.core.FObject',
       documentation: `data for capability.of`,
-      view: { class: 'foam.u2.detail.VerticalDetailView' }
+      view: { class: 'foam.u2.detail.VerticalDetailView' },
+      tableCellFormatter: function(value, _, _) {
+        if ( value && value.cls_ ) this.add(value.cls_.model_.label);
+        else this.add(`no data`);
+      },
+      tableWidth: 300
     },
     {
       name: 'status',
