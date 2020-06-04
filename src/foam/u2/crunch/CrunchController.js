@@ -19,6 +19,7 @@ foam.CLASS({
     'ctrl',
     'prerequisiteCapabilityJunctionDAO',
     'stack',
+    'user',
     'userCapabilityJunctionDAO'
   ],
 
@@ -89,14 +90,24 @@ foam.CLASS({
       }
       return this.getCapabilities(capabilityId).then(capabilities => {
         // Map capabilities to CapabilityWizardSection objects
-        return Promise.all(capabilities.filter(
-          cap => !! cap.of
-        ).map(
-          cap => this.CapabilityWizardlet.create({
-            capability: cap
-          }).updateUCJ()
-        ));
-      }).then(sections => {
+        return Promise.all([
+
+          // Continue passing capabilities to next callback
+          Promise.resolve(capabilities),
+
+          // Create capability sections
+          Promise.all(capabilities.filter(
+            cap => !! cap.of
+          ).map(
+            cap => this.CapabilityWizardlet.create({
+              capability: cap
+            }).updateUCJ()
+          ))
+
+        ]);
+      }).then(capabilitiesSectionsTuple => {
+        let capabilities = capabilitiesSectionsTuple[0];
+        let sections = capabilitiesSectionsTuple[1];
         return new Promise((wizardResolve) => {
           sections = sections.filter(wizardSection =>
             wizardSection.ucj === null || 
@@ -112,7 +123,17 @@ foam.CLASS({
             }),
             onClose: x => {
               x.closeDialog();
-              wizardResolve();
+              // Save no-data capabilities (i.e. not displayed in wizard)
+              Promise.all(capabilities.filter(cap => ! cap.of).map(
+                cap => self.userCapabilityJunctionDAO.put(self.UserCapabilityJunction.create({
+                  sourceId: self.user.id,
+                  targetId: cap.id
+                })).then(() => {
+                  console.log('SAVED (no-data cap)', cap.id);
+                })
+              )).then(() => {
+                wizardResolve();
+              });
             }
           }));
         });
