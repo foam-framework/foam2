@@ -30,6 +30,8 @@ import javax.servlet.http.HttpServletResponse;
 
 public abstract class DigFormatDriver extends ContextAwareSupport
 {
+  public static final long MAX_PAGE_SIZE = 1000;
+
   protected Logger logger_;
   protected Format format_;
 
@@ -92,6 +94,7 @@ public abstract class DigFormatDriver extends ContextAwareSupport
     String id = p.getParameter("id");
     String q = p.getParameter("q");
     String limit = p.getParameter("limit");
+    String skip = p.getParameter("skip");
     
     DAO dao = getDAO(x);
     if ( dao == null )
@@ -102,12 +105,21 @@ public abstract class DigFormatDriver extends ContextAwareSupport
     logger_.debug("predicate", pred.getClass(), pred.toString());
     dao = dao.where(pred);
 
-    if ( ! SafetyUtil.isEmpty(limit) ) {
-      long l = Long.valueOf(limit);
-      if ( l != AbstractDAO.MAX_SAFE_INTEGER ) {
-        dao = dao.limit(l);
+    if ( ! SafetyUtil.isEmpty(skip) ) {
+      long s = Long.valueOf(skip);
+      if ( s > 0 && s != AbstractDAO.MAX_SAFE_INTEGER ) {
+        dao = dao.skip(s);
       }
     }
+
+    long pageSize = DigFormatDriver.MAX_PAGE_SIZE;
+    if ( ! SafetyUtil.isEmpty(limit) ) {
+      long l = Long.valueOf(limit);
+      if ( l != AbstractDAO.MAX_SAFE_INTEGER && l < pageSize) {
+        pageSize = l;
+      }
+    }
+    dao = dao.limit(pageSize);
 
     PropertyInfo idProp = (PropertyInfo) cInfo.getAxiomByName("id");
     ArraySink sink = (ArraySink) ( ! SafetyUtil.isEmpty(id) ?

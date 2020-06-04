@@ -103,7 +103,18 @@ foam.CLASS({
       name: 'limit',
       visibility: function(cmd) {
         return (cmd == 'SELECT') ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
-      }
+      },
+      value: 1000,
+      max: 1000,
+      min: 0
+    },
+    {
+      class: 'Long',
+      name: 'skip',
+      visibility: function(cmd) {
+        return (cmd == 'SELECT') ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
+      },
+      min: 0
     },
     {
       name: 'data',
@@ -121,7 +132,7 @@ foam.CLASS({
       label: 'Snippet',
       documentation: 'show a specific type of request would look like in a given language.',
       view: { class: 'foam.nanos.dig.DigSnippetView' },
-      expression: function(key, data, daoKey, cmd, format, q, limit) {
+      expression: function(key, data, daoKey, cmd, format, q, limit, skip) {
         var query = false;
         var url = "/service/dig";
 
@@ -150,10 +161,15 @@ foam.CLASS({
           query = true;
           url += "q=" + encodeURIComponent(q);
         }
-        if ( limit > 0 && limit != Number.MAX_SAFE_INTEGER ) {
+        if ( limit > 0 && limit != Number.MAX_SAFE_INTEGER && limit != 1000 ) {
           url += query ? "&" : "?";
           query = true;
           url += "limit=" + limit;
+        }
+        if ( skip > 0 && skip != Number.MAX_SAFE_INTEGER ) {
+          url += query ? "&" : "?";
+          query = true;
+          url += "skip=" + skip;
         }
         this.postURL = url;
 
