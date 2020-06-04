@@ -22,6 +22,8 @@ foam.CLASS({
 
   implements: [ 'foam.mlang.Expressions' ],
 
+  imports: [ 'warn' ],
+
   documentation: `
     Wraps a tag that represents a singular choice. That is,
     this controller shows the user a fixed, probably small set of
@@ -186,7 +188,8 @@ foam.CLASS({
       documentation: `The size of the select element should never be greater
         than this number.`,
       value: Number.MAX_SAFE_INTEGER
-    }
+    },
+    'prop_'
   ],
 
   methods: [
@@ -260,6 +263,7 @@ foam.CLASS({
 
     function fromProperty(p) {
       this.SUPER(p);
+      this.prop_ = p;
       this.defaultValue = p.value;
     }
   ],
@@ -284,10 +288,22 @@ foam.CLASS({
 
         var of = this.dao.of
         if ( of._CHOICE_TEXT_ ) {
+          console.log('********************************** CHOICE_TEXT');
           this.dao.select(this.PROJECTION(of.ID, of._CHOICE_TEXT_)).then((s) => {
             this.choices = s.array;
           });
           return;
+        } else {
+          this.warn('Inefficient ChoiceView. Consider creating transient _choiceText_ property on ' + of.id + ' DAO, prop: ' + this.prop_);
+          /* Ex.:
+          {
+            class: 'String',
+            name: '_choiceText_',
+            transient: true,
+            javaGetter: 'return getName();',
+            getter: function() { return this.name; }
+          }
+          */
         }
         var p = this.mode === foam.u2.DisplayMode.RW ?
           this.dao.select().then(s => s.array) :

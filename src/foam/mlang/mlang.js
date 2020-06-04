@@ -2608,11 +2608,10 @@ if ( getProcessArrayValuesIndividually() && arg1 instanceof Object[] ) {
 } else {
   putInGroup_(sub, arg1, obj);
 }
-/*
 if ( getGroupLimit() != -1 ) {
   System.err.println("************************************* " + getGroupLimit() + " " + getGroups().size() + " " + sub);
   Thread.dumpStack();
-}*/
+}
 if ( getGroupLimit() == getGroups().size() && sub != null ) sub.detach();
 `
     },

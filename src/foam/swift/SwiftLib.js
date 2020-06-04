@@ -44,7 +44,12 @@ foam.LIB({
       return type != 'Any?' && type != 'Any!'
     },
     function toSwiftType(type, optional) {
+      try {
       return foam.core.type.toType(type).toSwiftType(optional)
+    } catch(x) {
+      console.log(x);
+      return '';
+    }
     },
     function toSwiftName(id) {
       return id.replace(/\./g, '_')
