@@ -32,6 +32,12 @@
        documentation: 'User who created SMSMessage'
      },
      {
+       class: 'Reference',
+       of: 'foam.nanos.auth.User',
+       name: 'createdByAgent',
+       documentation: 'User whocreated SMSMessage'
+     },
+     {
        class: 'String',
        name: 'message'
      },
