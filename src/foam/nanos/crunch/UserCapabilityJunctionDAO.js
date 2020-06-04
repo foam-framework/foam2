@@ -318,7 +318,12 @@ foam.CLASS({
         }
       ],
       type: 'CapabilityJunctionStatus',
-      documentation: `Check if prerequisites of a capability is fulfilled`,
+      documentation: `
+        Check statuses of all preRequist capabilities - returning:
+        GRANTED: if all pre-reqs are in granted status
+        PENDING: if all pre-reqs are either granted or pending status
+        ACTION_REQUIRED: if not any of the above
+      `,
       javaCode: `
         boolean allGranted = true;
         Capability cap;
