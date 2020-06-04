@@ -128,7 +128,6 @@ foam.CLASS({
                     ? { ...btn, label: this.ACTION_LABEL }
                     : btn
                 )
-                .tag(this.DEBUG_NEXT)
                 .endContext();
             }))
           .end()
@@ -208,20 +207,6 @@ foam.CLASS({
           x.ctrl.notify(this.ERROR_MSG);
         });
       }
-    },
-    {
-      name: 'debugNext',
-      label: 'debug next',
-      code: function(x) {
-        this.data.next().then((isFinished) => {
-          if ( isFinished ) {
-            this.onClose(x);
-          }
-        }).catch(e => {
-          console.error(e);
-          x.ctrl.notify(this.ERROR_MSG);
-        });
-      }
-    },
+    }
   ]
 });

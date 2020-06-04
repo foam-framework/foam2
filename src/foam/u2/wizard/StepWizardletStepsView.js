@@ -136,7 +136,7 @@ foam.CLASS({
           return elem;
         }))
     },
-    function renderSectionLabel(elem, section, index, isCurrent, isClickable, isDebug) {
+    function renderSectionLabel(elem, section, index, isCurrent, isClickable) {
       let title = section.title;
       if ( ! title || ! title.trim() ) title = "Part " + index;
       return elem
