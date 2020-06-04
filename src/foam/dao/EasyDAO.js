@@ -137,16 +137,18 @@ foam.CLASS({
         if ( delegate == null ) {
           if ( getNullify() ) {
             delegate = new foam.dao.NullDAO(getX(), getOf());
-          } else if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
-            setMdao(new foam.dao.MDAO(getOf()));
-             if ( getWriteOnly() ) {
-               delegate = new foam.dao.WriteOnlyJDAO(getX(), getMdao(), getOf(), getJournalName());
-             } else {
-               delegate = new foam.dao.java.JDAO(getX(), getMdao(), getJournalName()); //, getCluster() /* read-only */);
-             }
           } else {
-            setMdao(new foam.dao.MDAO(getOf()));
+            if ( getMdao() == null ) {
+              setMdao(new foam.dao.MDAO(getOf()));
+            }
             delegate = getMdao();
+            if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
+              if ( getWriteOnly() ) {
+                delegate = new foam.dao.WriteOnlyJDAO(getX(), getMdao(), getOf(), getJournalName());
+              } else {
+                delegate = new foam.dao.java.JDAO(getX(), getMdao(), getJournalName(), getCluster() /* read-only */);
+              }
+            }
           }
         }
 
@@ -170,10 +172,7 @@ foam.CLASS({
         }
 
         if ( getCluster() &&
-             getMdao() != null /*&&
-             ( ! getNSpec().getServe() ||
-               getNSpec().getServe() &&
-               getInnerDAO() == null )*/ ) {
+             getMdao() != null ) {
           getLogger().debug(getNSpec().getName(), "cluster", "delegate", delegate.getClass().getSimpleName());
           delegate = new foam.nanos.medusa.MedusaAdapterDAO.Builder(getX())
             .setNSpec(getNSpec())
