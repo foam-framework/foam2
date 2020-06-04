@@ -7,9 +7,18 @@ foam.CLASS({
   package: 'foam.nanos.crunch',
   name: 'CapabilityCategory',
 
+  implements: [
+    'foam.nanos.auth.Authorizable'
+  ],
+
   documentation: `
     This models a category to which a Capability can be associated.
   `,
+
+  javaImports: [
+    'foam.nanos.auth.AuthorizationException',
+    'foam.nanos.auth.Authorizer'
+  ],
 
   properties: [
     {
@@ -30,6 +39,74 @@ foam.CLASS({
       class: 'Boolean',
       documentation: 'categories are being used for UI display and also predicate rules on UCJDAO',
       value: true
+    },
+    {
+      name: 'visibilityCondition',
+      class: 'foam.mlang.predicate.PredicateProperty',
+      readVisibility: 'HIDDEN'
+    },
+    {
+      name: 'defaultAuthorizer',
+      class: 'Object',
+      javaType: 'foam.nanos.auth.Authorizer',
+      javaFactory: `
+        return new foam.nanos.auth.StandardAuthorizer(getClass().getSimpleName().toLowerCase());
+      `,
+      readVisibility: true
+    }
+  ],
+  
+  methods: [
+    {
+      name: 'authorizeOnCreate',
+      args: [
+        { name: 'x', type: 'Context' }
+      ],
+      javaThrows: ['AuthorizationException'],
+      javaCode: `
+        ( getDefaultAuthorizer()).authorizeOnCreate(x, this);
+      `
+    },
+    {
+      name: 'authorizeOnRead',
+      args: [
+        { name: 'x', type: 'Context' }
+      ],
+      javaThrows: ['AuthorizationException'],
+      javaCode: `
+        if ( getVisibilityCondition() == null ) {
+          ( getDefaultAuthorizer()).authorizeOnRead(x, this);
+          return;
+        }
+
+        try {
+          if ( getVisibilityCondition().f(x) ) return;
+          throw new AuthorizationException();
+        } catch ( AuthorizationException e ) {
+          throw new AuthorizationException("You do not have permission to view this capabilitycategory");
+        }
+      `
+    },
+    {
+      name: 'authorizeOnUpdate',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'oldObj', type: 'foam.core.FObject' }
+      ],
+      javaThrows: ['AuthorizationException'],
+      javaCode: `
+        ( getDefaultAuthorizer()).authorizeOnUpdate(x, oldObj, this);
+      `
+    },
+    {
+      name: 'authorizeOnDelete',
+      args: [
+        { name: 'x', type: 'Context' }
+      ],
+      javaThrows: ['AuthorizationException'],
+      javaCode: `
+        ( getDefaultAuthorizer()).authorizeOnDelete(x, this);
+      `
     }
   ]
 });
