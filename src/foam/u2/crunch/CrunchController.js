@@ -45,7 +45,7 @@ foam.CLASS({
       documentation: `
         Since permissions may be checked during asynchronous calls,
         it is possible that the same intercept view will be requested
-        twice in a short period of time. Keeping a a map of active
+        twice in a short period of time. Keeping a map of active
         intercept views is done to prevent two intercept views being
         open for the same permission (as this would be confusing for
         the user if they happen to choose the "cancel" option).
