@@ -87,7 +87,7 @@ public class SocketRouter
     PM pm = new PM(this.getClass(), serviceKey);
 
     // Get SyncBox Id.
-    String syncBoxId = (String) getX().get("syncBoxId");
+    Long syncBoxId = (Long) requestMsg.getAttributes().get("syncBoxId");
     ((SocketReplyBox) requestMsg.getAttributes().get("replyBox")).setSyncBoxId(syncBoxId);
     try {
       if ( serv == null ) {
