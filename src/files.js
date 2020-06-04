@@ -394,7 +394,6 @@ FOAM_FILES([
   { name: "foam/box/BoxService" },
   { name: "foam/box/HTTPReplyBox" },
   { name: "foam/box/AuthenticatedBox" },
-  { name: "foam/box/CheckAuthenticationBox" },
   { name: "foam/box/HTTPAuthorizationType" },
   { name: "foam/box/HTTPBox" },
   { name: "foam/box/MessagePortBox" },
