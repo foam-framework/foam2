@@ -635,24 +635,31 @@ configuration for contacting the primary node.`,
         },
       ],
       javaCode: `
-      ClusterConfig config = getConfig(x, getConfigId());
-      if ( config.getType() == MedusaType.MEDIATOR ) {
-        if ( getMediatorCount() == 1 ) {
+      try {
+        ClusterConfig config = getConfig(x, getConfigId());
+        if ( config == null ) {
           return true;
         }
-        if ( config.getIsPrimary() &&
-             config.getStatus() == Status.ONLINE &&
-             config.getZone() == 0L ) {
-          return true;
+        if ( config.getType() == MedusaType.MEDIATOR ) {
+          if ( getMediatorCount() == 1 ) {
+            return true;
+          }
+          if ( config.getIsPrimary() &&
+               config.getStatus() == Status.ONLINE &&
+               config.getZone() == 0L ) {
+            return true;
+          }
+          if ( config.getStatus() == Status.ONLINE &&
+               config.getZone() > 0L ) {
+            return true;
+          }
+          return false;
         }
-        if ( config.getStatus() == Status.ONLINE &&
-             config.getZone() > 0L ) {
-          return true;
+        if ( config.getType() == MedusaType.NODE ) {
+          return false;
         }
-        return false;
-      }
-      if ( config.getType() == MedusaType.NODE ) {
-        return false;
+      } catch (Throwable t) {
+        // ignore, thrown when no config found.
       }
       return true;
      `
@@ -681,7 +688,7 @@ configuration for contacting the primary node.`,
            obj instanceof DAO ) {
         dao = (DAO) obj;
 
-        getLogger().debug("mdao", serviceName, "cache", dao.getOf());
+        getLogger().debug("mdao", "cache", serviceName);
         return dao;
       }
       if ( obj != null &&
@@ -689,14 +696,24 @@ configuration for contacting the primary node.`,
         getLogger().error("getMdao" ,serviceName, "not instance of dao", obj.getClass().getSimpleName());
       }
       dao = (DAO) x.get(serviceName);
+      // look for 'local' version
+      String key = serviceName;
+      if ( ! key.startsWith("local") ) {
+        key = "local" + serviceName.substring(0,1).toUpperCase()+serviceName.substring(1);
+        if ( x.get(key) != null ) {
+          dao = (DAO) x.get(key);
+          getLogger().debug("mdao", "local", serviceName, key);
+        }
+      }
+      try {
       Object result = dao.cmd(MDAO.GET_MDAO_CMD);
       if ( result != null &&
            result instanceof DAO ) {
-        getLogger().debug("mdao", serviceName, "cmd", dao.getClass().getSimpleName(), dao.getOf());
+        getLogger().debug("mdao", "cmd", serviceName, dao.getClass().getSimpleName(), dao.getOf().getId());
         dao = (DAO) result;
       } else {
         while ( dao != null ) {
-          getLogger().debug("mdao", serviceName, "while", dao.getClass().getSimpleName(), dao.getOf());
+          getLogger().debug("mdao", "while", serviceName, dao.getClass().getSimpleName(), dao.getOf().getId());
           if ( dao instanceof MDAO ) {
             break;
           }
@@ -715,8 +732,11 @@ configuration for contacting the primary node.`,
       }
       if ( dao != null ) {
         getMdaos().put(serviceName, dao);
-        getLogger().debug("mdao", serviceName, "found", dao.getClass().getSimpleName(), dao.getOf());
+        getLogger().debug("mdao", "found", serviceName, dao.getClass().getSimpleName(), dao.getOf().getId());
         return dao;
+      }
+      } catch (Throwable t) {
+        getLogger().error("mdao", serviceName, key, t.getMessage(), t);
       }
       throw new IllegalArgumentException("MDAO not found: "+serviceName);
       `
