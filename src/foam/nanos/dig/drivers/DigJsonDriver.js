@@ -40,12 +40,6 @@ foam.CLASS({
   methods: [
     {
       name: 'parseFObjects',
-      type: 'List',
-      args: [ 
-        { name: 'x', type: 'X' },
-        { name: 'dao', type: 'DAO' },
-        { name: 'data', type: 'String' }
-      ],
       javaCode: `
       JSONParser jsonParser = new JSONParser();
       jsonParser.setX(x);
@@ -80,11 +74,6 @@ foam.CLASS({
     },
     {
       name: 'outputFObjects',
-      args: [ 
-        { name: 'x', type: 'X' },
-        { name: 'dao', type: 'DAO' },
-        { name: 'fobjects', type: 'List' }
-      ],
       javaCode: `
       PrintWriter out = x.get(PrintWriter.class);
       ClassInfo cInfo = dao.getOf();

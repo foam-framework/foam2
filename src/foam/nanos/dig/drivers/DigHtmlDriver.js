@@ -37,12 +37,6 @@ foam.CLASS({
   methods: [
     {
       name: 'parseFObjects',
-      type: 'List',
-      args: [ 
-        { name: 'x', type: 'X' },
-        { name: 'dao', type: 'DAO' },
-        { name: 'data', type: 'String' }
-      ],
       javaCode: `
       DigUtil.outputException(x, new UnsupportException.Builder(x).setMessage("HTML put operation is not supported").build(), getFormat());
       return null;
@@ -50,11 +44,6 @@ foam.CLASS({
     },
     {
       name: 'outputFObjects',
-      args: [ 
-        { name: 'x', type: 'X' },
-        { name: 'dao', type: 'DAO' },
-        { name: 'fobjects', type: 'List' }
-      ],
       javaCode: `
       HttpServletResponse resp = x.get(HttpServletResponse.class);
       PrintWriter out = x.get(PrintWriter.class);

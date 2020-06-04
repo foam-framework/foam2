@@ -138,6 +138,9 @@ foam.CLASS({
       ((Logger) x.get("logger")).debug("predicate", pred.getClass(), pred.toString());
       dao = dao.where(pred);
   
+      PropertyInfo idProp = (PropertyInfo) cInfo.getAxiomByName("id");
+      dao = ! SafetyUtil.isEmpty(id) ? dao.where(MLang.EQ(idProp, id)) : dao;
+
       if ( ! SafetyUtil.isEmpty(skip) ) {
         long s = Long.valueOf(skip);
         if ( s > 0 && s != AbstractDAO.MAX_SAFE_INTEGER ) {
@@ -154,12 +157,7 @@ foam.CLASS({
       }
       dao = dao.limit(pageSize);
   
-      PropertyInfo idProp = (PropertyInfo) cInfo.getAxiomByName("id");
-      ArraySink sink = (ArraySink) ( ! SafetyUtil.isEmpty(id) ?
-        dao.where(MLang.EQ(idProp, id)).select(new ArraySink()) :
-        dao.select(new ArraySink()));
-  
-      List fobjects = sink.getArray();
+      List fobjects = ((ArraySink) dao.select(new ArraySink())).getArray();
       ((Logger) x.get("logger")).debug(this.getClass().getSimpleName(), "Number of FObjects selected: " + fobjects.size());
       
       outputFObjects(x, dao, fobjects);
