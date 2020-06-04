@@ -10,7 +10,7 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
 
   implements: [
-    'foam.nanos.boot.NSpecAware',
+//    'foam.nanos.boot.NSpecAware',
   ],
 
   documentation: `Create a medusa entry for argument model.`,
