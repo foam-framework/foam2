@@ -1052,6 +1052,9 @@ model from which to test ServiceProvider ID (spid)`,
         }
       ],
       type: 'Object',
+      code: function cmd_(x, obj) {
+        return this.delegate.cmd_(x, obj);
+      },
       javaCode: `
       if ( foam.dao.MDAO.GET_MDAO_CMD.equals(cmd) ) {
         DAO dao = getMdao();
