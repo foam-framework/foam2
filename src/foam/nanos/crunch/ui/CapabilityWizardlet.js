@@ -98,6 +98,12 @@ foam.CLASS({
           return this;
         });
       }
+    },
+    {
+      name: 'readyToSubmit',
+      code: function () {
+        return true;
+      }
     }
   ]
 });
