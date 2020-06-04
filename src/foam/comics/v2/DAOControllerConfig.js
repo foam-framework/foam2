@@ -62,6 +62,22 @@ foam.CLASS({
       expression: function(of) { return 'View all ' + of.model_.plural.toLowerCase() + '.' }
     },
     {
+      // TODO: Make ViewSpecWithJava a refinement to ViewSpec and change below to a ViewSpec
+      class: 'foam.u2.ViewSpecWithJava',
+      name: 'summaryView',
+      expression: function(defaultColumns) {
+        return {
+          class: 'foam.u2.view.ScrollTableView',
+          enableDynamicTableHeight: false,
+          columns: defaultColumns,
+          css: {
+            width: '100%',
+            height: '424px'
+          }
+        };
+      }
+    },
+    {
       class: 'String',
       name: 'createTitle',
       expression: function(of) { return 'Create a New ' + of.model_.label; }
@@ -165,6 +181,10 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.comics.v2.CRUDEnabledActionsAuth',
       name: 'CRUDEnabledActionsAuth'
+    },
+    {
+      class: 'Boolean',
+      name: 'hideQueryBar'
     }
   ]
 });

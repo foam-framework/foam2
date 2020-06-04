@@ -28,28 +28,14 @@ foam.INTERFACE({
       type: 'FObject',
       swiftThrows: true,
       documentation: 'Inserts a new object or updates an existing one. When the object is stored successfully, the promise resolves with the newly added object.',
-      args: [
-        {
-          name: 'obj',
-          type: 'FObject'
-        }
-      ]
+      args: [ 'FObject obj' ]
     },
     {
       name: 'put_',
       async: true,
       type: 'FObject',
       swiftThrows: true,
-      args: [
-        {
-          name: 'x',
-          type: 'Context',
-        },
-        {
-          name: 'obj',
-          type: 'FObject'
-        }
-      ]
+      args: [ 'Context x', 'FObject obj' ]
     },
     {
       name: 'remove',
@@ -59,28 +45,14 @@ foam.INTERFACE({
       documentation: `Deletes a single object from the DAO.
                       NB: Trying to remove an object which does not exist is not an error. remove() only rejects if it fails to communicate with the backend.
       `,
-      args: [
-        {
-          name: 'obj',
-          type: 'FObject'
-        }
-      ]
+      args: [ 'FObject obj' ]
     },
     {
       name: 'remove_',
       async: true,
       type: 'FObject',
       swiftThrows: true,
-      args: [
-        {
-          name: 'x',
-          type: 'Context',
-        },
-        {
-          name: 'obj',
-          type: 'FObject'
-        }
-      ]
+      args: [ 'Context x', 'FObject obj' ]
     },
     {
       name: 'find',
@@ -91,28 +63,14 @@ foam.INTERFACE({
       If the object is found, the promise resolves with the object.
       If the object is not found, it returns null.
       `,
-      args: [
-        {
-          name: 'id',
-          type: 'Object'
-        }
-      ],
+      args: [ 'Object id' ]
     },
     {
       name: 'find_',
       async: true,
       type: 'FObject',
       swiftThrows: true,
-      args: [
-        {
-          name: 'x',
-          type: 'Context',
-        },
-        {
-          name: 'id',
-          type: 'Object'
-        }
-      ]
+      args: [ 'Context x', 'Object id' ]
     },
     {
       name: 'select',
@@ -121,12 +79,8 @@ foam.INTERFACE({
       swiftThrows: true,
       documentation: `The primary way to read objects from a DAO is select(sink) that will retrieve a collection of results and will send them (callback) to the sink. A simple select(sink) returns all record in the DAO.
         If you don\'t specify a Sink when calling select(), a foam.dao.ArraySink will be created by default and passed to the resolved Promise:
-      `,      args: [
-        {
-          name: 'sink',
-          type: 'foam.dao.Sink',
-        }
-      ]
+      `,
+      args: [ 'foam.dao.Sink sink' ]
     },
     {
       name: 'select_',
@@ -134,14 +88,11 @@ foam.INTERFACE({
       type: 'foam.dao.Sink',
       swiftThrows: true,
       args: [
-        {
-          name: 'x',
-          type: 'Context',
-        },
+        'Context x',
         {
           name: 'sink',
           type: 'foam.dao.Sink',
-          swiftDefaultValue: 'foam_dao_ArraySink()',
+          swiftDefaultValue: 'foam_dao_ArraySink()'
         },
         {
           name: 'skip',
@@ -156,12 +107,12 @@ foam.INTERFACE({
         {
           name: 'order',
           type: 'foam.mlang.order.Comparator',
-          swiftDefaultValue: 'nil',
+          swiftDefaultValue: 'nil'
         },
         {
           name: 'predicate',
           type: 'foam.mlang.predicate.Predicate',
-          swiftDefaultValue: 'nil',
+          swiftDefaultValue: 'nil'
         }
       ]
     },
@@ -171,18 +122,14 @@ foam.INTERFACE({
       swiftThrows: true,
       documentation: `removeAll() is very similar to select(), with the obvious exception that it removes all matching entries from the DAO instead of returning them.
                       Be careful! myDAO.removeAll() without any filtering will delete every entry.
-      `,
-      args: [ ]
+      `
     },
     {
       name: 'removeAll_',
       swiftThrows: true,
       async: true,
       args: [
-        {
-          name: 'x',
-          type: 'Context',
-        },
+        'Context x',
         {
           name: 'skip',
           type: 'Long',
@@ -196,12 +143,12 @@ foam.INTERFACE({
         {
           name: 'order',
           type: 'foam.mlang.order.Comparator',
-          swiftDefaultValue: 'nil',
+          swiftDefaultValue: 'nil'
         },
         {
           name: 'predicate',
           type: 'foam.mlang.predicate.Predicate',
-          swiftDefaultValue: 'nil',
+          swiftDefaultValue: 'nil'
         }
       ]
     },
@@ -220,7 +167,7 @@ foam.INTERFACE({
         {
           name: 'predicate',
           type: 'foam.mlang.predicate.Predicate',
-          swiftDefaultValue: 'nil',
+          swiftDefaultValue: 'nil'
         }
       ]
     },
@@ -231,19 +178,16 @@ foam.INTERFACE({
       async: true,
       swiftThrows: true,
       args: [
-        {
-          name: 'x',
-          type: 'Context',
-        },
+        'Context x',
         {
           name: 'sink',
           type: 'foam.dao.Sink',
-          swiftDefaultValue: 'foam_dao_ArraySink()',
+          swiftDefaultValue: 'foam_dao_ArraySink()'
         },
         {
           name: 'predicate',
           type: 'foam.mlang.predicate.Predicate',
-          swiftDefaultValue: 'nil',
+          swiftDefaultValue: 'nil'
         }
       ]
     },
@@ -251,26 +195,15 @@ foam.INTERFACE({
       name: 'pipe', // TODO: return a promise? don't put pipe and listen here?
       type: 'Void',
       swiftThrows: true,
-      args: [
-        {
-          name: 'sink',
-          type: 'foam.dao.Sink',
-        }
-      ],
+      args: [ 'foam.dao.Sink sink' ]
     },
     {
       name: 'pipe_', // TODO: return a promise? don't put pipe and listen here?
       type: 'Void',
       swiftThrows: true,
       args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'sink',
-          type: 'foam.dao.Sink',
-        },
+        'Context x',
+        'foam.dao.Sink sink',
         {
           name: 'predicate',
           type: 'foam.mlang.predicate.Predicate',
@@ -294,55 +227,30 @@ foam.INTERFACE({
       name: 'orderBy',
       type: 'foam.dao.DAO',
       swiftThrows: true,
-      args: [
-        {
-          name: 'comparator',
-          type: 'foam.mlang.order.Comparator',
-        }
-      ]
+      args: ['foam.mlang.order.Comparator comparator' ]
     },
     {
       name: 'skip',
       type: 'foam.dao.DAO',
       swiftThrows: true,
-      args: [
-        {
-          name: 'count',
-          type: 'Long'
-        }
-      ]
+      args: [ 'Long count' ]
     },
     {
       name: 'limit',
       type: 'foam.dao.DAO',
       swiftThrows: true,
-      args: [
-        {
-          name: 'count',
-          type: 'Long'
-        }
-      ]
+      args: [ 'Long count' ]
     },
     {
       name: 'inX',
       type: 'foam.dao.DAO',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        }
-      ]
+      args: [ 'Context x' ]
     },
     {
       name: 'cmd',
       async: true,
       type: 'Any',
-      args: [
-        {
-          name: 'obj',
-          type: 'Any'
-        }
-      ]
+      args: [ 'Any obj' ]
     },
     {
       name: 'cmd_',
@@ -350,14 +258,8 @@ foam.INTERFACE({
       type: 'Any',
       swiftThrows: true,
       args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'obj',
-          type: 'Any'
-        }
+        'Context x',
+        'Any obj'
       ]
     },
     {

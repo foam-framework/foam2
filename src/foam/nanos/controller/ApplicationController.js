@@ -35,14 +35,16 @@ foam.CLASS({
   requires: [
     'foam.nanos.client.ClientBuilder',
     'foam.nanos.auth.Group',
-    'foam.nanos.auth.ResendVerificationEmail',
     'foam.nanos.auth.User',
+    'foam.nanos.auth.Subject',
     'foam.nanos.theme.Theme',
     'foam.nanos.theme.Themes',
     'foam.nanos.theme.ThemeDomain',
     'foam.nanos.u2.navigation.TopNavigation',
     'foam.nanos.u2.navigation.FooterView',
+    'foam.u2.crunch.CapabilityInterceptView',
     'foam.u2.crunch.CrunchController',
+    'foam.u2.borders.MarginBorder',
     'foam.u2.stack.Stack',
     'foam.u2.stack.StackView',
     'foam.u2.dialog.NotificationMessage',
@@ -140,7 +142,6 @@ foam.CLASS({
       margin: 0;
     }
     .stack-wrapper {
-      margin-bottom: -10px;
       min-height: calc(80% - 60px);
     }
     .stack-wrapper:after {
@@ -451,10 +452,15 @@ foam.CLASS({
       }
     },
 
-    function pushMenu(menuId) {
+    function pushMenu(menu) {
+      if ( menu.id ) {
+        menu.launch(this);
+        menu = menu.id;
+      }
+
       /** Use to load a specific menu. **/
-      if ( window.location.hash.substr(1) != menuId ) {
-        window.location.hash = menuId;
+      if ( window.location.hash.substr(1) != menu ) {
+        window.location.hash = menu;
       }
     },
 
@@ -488,10 +494,13 @@ foam.CLASS({
       self.capabilityAcquired = false;
       self.capabilityCancelled = false;
       return new Promise(function(resolve, reject) {
-        self.stack.push({
-          class: 'foam.u2.crunch.CapabilityInterceptView',
-          capabilityOptions: capabilityInfo.capabilityOptions
-        });
+        self.add(self.Popup.create({ closeable: false })
+          .start(self.MarginBorder)
+            .tag(self.CapabilityInterceptView, {
+              capabilityOptions: capabilityInfo.capabilityOptions
+            })
+          .end()
+        );
         var s1, s2;
         s1 = self.capabilityAcquired$.sub(() => {
           s1.detach();
@@ -523,24 +532,16 @@ foam.CLASS({
        *   - Update the look and feel of the app based on the group or user
        *   - Go to a menu based on either the hash or the group
        */
-      if ( ! this.subject.user.emailVerified ) {
-        this.loginSuccess = false;
-        this.stack.push({ class: 'foam.nanos.auth.ResendVerificationEmail' });
-        return;
-      }
+      this.fetchTheme();
 
       var hash = this.window.location.hash;
       if ( hash ) hash = hash.substring(1);
 
       if ( hash ) {
         window.onpopstate();
-      } else if ( this.group ) {
-        this.window.location.hash = this.group.defaultMenu;
+      } else if ( this.theme ) {
+        this.window.location.hash = this.theme.defaultMenu;
       }
-
-      // Update the look and feel now that the user is logged in since there
-      // might be a more specific one to use now.
-      this.fetchTheme();
     },
 
     function menuListener(m) {
