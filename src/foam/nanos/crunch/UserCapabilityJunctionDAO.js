@@ -128,7 +128,8 @@ foam.CLASS({
             if ( requiresReview ) ucJunction.setStatus(CapabilityJunctionStatus.PENDING);
             else ucJunction.setStatus(CapabilityJunctionStatus.GRANTED);
           } else {
-            ucJunction.setStatus(CapabilityJunctionStatus.ACTION_REQUIRED);
+            if ( checkPrereqsGrantedOrPending(x, ucJunction) ) ucJunction.setStatus(CapabilityJunctionStatus.PENDING);
+            else ucJunction.setStatus(CapabilityJunctionStatus.ACTION_REQUIRED);
           }
         } 
 
@@ -297,6 +298,44 @@ foam.CLASS({
         .getArray();
 
         return ccJunctions;
+      `
+    },
+    {
+      name: 'checkPrereqsGrantedOrPending',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'obj',
+          type: 'foam.core.FObject'
+        }
+      ],
+      type: 'Boolean',
+      documentation: `Check if all prerequisites of this capability is either granted or pending`,
+      javaCode: `
+        boolean prerequisitesFulfilled = true;
+        Capability cap;
+        DAO capDAO = (DAO) x.get("capabilityDAO");
+        List<CapabilityCapabilityJunction> ccJunctions = ( List<CapabilityCapabilityJunction> ) getPrereqs(x, obj);
+
+        UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
+        for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
+          cap = (Capability) capDAO.find((String) ccJunction.getSourceId());
+          if ( ! cap.getEnabled() ) continue;
+          UserCapabilityJunction ucJunction = (UserCapabilityJunction) getDelegate().find(AND(
+            EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId()),
+            EQ(UserCapabilityJunction.TARGET_ID, (String) ccJunction.getTargetId())
+          ));
+          if ( ucJunction == null ||
+            ( ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED &&
+            ucJunction.getStatus() != CapabilityJunctionStatus.PENDING )
+          ) {
+            prerequisitesFulfilled = false;
+          }
+        }
+        return prerequisitesFulfilled;
       `
     },
     {
