@@ -434,6 +434,7 @@ FOAM_FILES([
   { name: "foam/u2/tag/Image", flags: ['web'] },
   { name: "foam/u2/tag/Input", flags: ['web'] },
   { name: "foam/u2/tag/TextArea", flags: ['web'] },
+  { name: "foam/u2/util/LongNumberFormatter", flags: ['web'] },
   { name: "foam/u2/TextField", flags: ['web'] },
   { name: "foam/u2/TextInputCSS", flags: ['web'] },
   { name: "foam/u2/IntView", flags: ['web'] },
