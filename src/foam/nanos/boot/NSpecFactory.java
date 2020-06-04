@@ -57,8 +57,17 @@ public class NSpecFactory
       ns_ = spec_.createService(x_.getX().put(NSpec.class, spec_));
       Object ns = ns_;
       while ( ns != null ) {
-        if ( ns instanceof ContextAware ) ((ContextAware) ns).setX(x_.getX());
-        if ( ns instanceof NSpecAware )   ((NSpecAware) ns).setNSpec(spec_);
+        if ( ns instanceof ContextAware ) {
+          // REVIEW: System is presently dependent on this blind setX call. - Joel
+          // if ( ((ContextAware) ns).getX() == null ) {
+          ((ContextAware) ns).setX(x_.getX());
+          // }
+        }
+        if ( ns instanceof NSpecAware ) {
+          if ( ((NSpecAware) ns).getNSpec() == null ) {
+            ((NSpecAware) ns).setNSpec(spec_);
+          }
+        }
         if ( ns instanceof NanoService )  {
           if ( logger != null ) {
             logger.info("Starting Service", spec_.getName());
