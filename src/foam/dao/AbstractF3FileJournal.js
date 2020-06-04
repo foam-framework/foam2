@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -19,7 +19,6 @@ foam.CLASS({
     'foam.lib.StoragePropertyPredicate',
     'foam.lib.json.ExprParser',
     'foam.lib.json.JSONParser',
-    'foam.lib.json.Outputter',
     'foam.lib.parse.*',
     'foam.nanos.auth.LastModifiedByAware',
     'foam.nanos.auth.Subject',
@@ -48,15 +47,15 @@ foam.CLASS({
         cls.extras.push(`
           protected static Pattern COMMENT = Pattern.compile("(/\\\\*([^*]|[\\\\r\\\\n]|(\\\\*+([^*/]|[\\\\r\\\\n])))*\\\\*+/)|(//.*)");
 
-          protected static ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
+          protected static ThreadLocal<JSONFObjectFormatter> formatter = new ThreadLocal<JSONFObjectFormatter>() {
             @Override
-            protected StringBuilder initialValue() {
-              return new StringBuilder();
+            protected JSONFObjectFormatter initialValue() {
+              return new JSONFObjectFormatter();
             }
             @Override
-            public StringBuilder get() {
-              StringBuilder b = super.get();
-              b.setLength(0);
+            public JSONFObjectFormatter get() {
+              JSONFObjectFormatter b = super.get();
+              b.reset();
               return b;
             }
           };
@@ -71,16 +70,6 @@ foam.CLASS({
       name: 'line',
       javaType: 'foam.util.concurrent.AssemblyLine',
       javaFactory: 'return new foam.util.concurrent.SyncAssemblyLine();'
-    },
-    {
-      class: 'Object',
-      name: 'outputter',
-      javaType: 'foam.lib.formatter.FObjectFormatter',
-      javaFactory: `
-        JSONFObjectFormatter outputter = new JSONFObjectFormatter(getX());
-        outputter.setPropertyPredicate(new StoragePropertyPredicate());
-        return outputter;
-        `
     },
     {
       class: 'Object',
@@ -164,18 +153,13 @@ try {
     {
       name: 'put',
       type: 'FObject',
-      args: [
-        { name: 'x',      type: 'Context' },
-        { name: 'prefix', type: 'String' },
-        { name: 'dao',    type: 'DAO' },
-        { name: 'obj',    type: 'foam.core.FObject' }
-      ],
+      args: [ 'Context x', 'String prefix', 'DAO dao', 'foam.core.FObject obj' ],
       javaCode: `
         final Object id = obj.getProperty("id");
+        JSONFObjectFormatter form = formatter.get();
 
         getLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
           FObject old;
-          String  record_ = null;
 
           public Object[] requestLocks() {
             return new Object[] { id };
@@ -186,25 +170,24 @@ try {
             dao.put_(x, obj);
           }
 
-          public void executeJob() {}
-
-          public void endJob() {
+          public void executeJob() {
             try {
-              record_ = ( old != null ) ?
-                getOutputter().stringifyDelta(old, obj) :
-                getOutputter().stringify(obj);
+              if ( old != null ) form.outputDelta(old, obj);
+              else form.output(obj);
             } catch (Throwable t) {
               getLogger().error("Failed to write put entry to journal", t);
-              record_ = null;
+              form.reset();
             }
+          }
 
-            if ( foam.util.SafetyUtil.isEmpty(record_) ) return;
+          public void endJob() {
+            if ( form.builder().length() == 0 ) return;
 
             try {
               writeComment_(x, obj);
               writePut_(
                 x,
-                record_,
+                form.builder(),
                 getMultiLineOutput() ? "\\n" : "",
                 foam.util.SafetyUtil.isEmpty(prefix) ? "" : prefix + ".");
 
@@ -223,48 +206,24 @@ try {
       javaThrows: [
         'java.io.IOException'
       ],
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'record',
-          type: 'String'
-        },
-        {
-          name: 'c',
-          type: 'String'
-        },
-        {
-          name: 'prefix',
-          type: 'String'
-        }
-      ],
+      args: [ 'Context x', 'CharSequence record', 'String c', 'String prefix' ],
       javaCode: `
-        write_(sb.get()
+        write_(formatter.get().builder()
           .append(prefix)
           .append("p(")
           .append(record)
           .append(")")
-          .append(c)
-          .toString());
+          .append(c));
       `
     },
     {
       name: 'remove',
       type: 'FObject',
-      args: [
-        { name: 'x',      type: 'Context' },
-        { name: 'prefix', type: 'String' },
-        { name: 'dao',    type: 'DAO' },
-        { name: 'obj',    type: 'foam.core.FObject' }
-      ],
+      args: [ 'Context x', 'String prefix', 'DAO dao', 'foam.core.FObject obj' ],
       javaCode: `
       final Object id = obj.getProperty("id");
-
+      JSONFObjectFormatter form = formatter.get();
       getLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
-        String record_ = null;
 
         public Object[] requestLocks() {
           return new Object[] { id };
@@ -281,18 +240,18 @@ try {
             // true properties that ID/MultiPartID maps too.
             FObject toWrite = (FObject) obj.getClassInfo().newInstance();
             toWrite.setProperty("id", obj.getProperty("id"));
-            record_ = getOutputter().stringify(toWrite);
+            form.output(toWrite);
           } catch (Throwable t) {
             getLogger().error("Failed to write put entry to journal", t);
           }
         }
 
         public void endJob() {
-          if ( foam.util.SafetyUtil.isEmpty(record_) ) return;
+          if ( form.builder().length() == 0 ) return;
 
           try {
             writeComment_(x, obj);
-            writeRemove_(x, record_, foam.util.SafetyUtil.isEmpty(prefix) ? "" : prefix + ".");
+            writeRemove_(x, form.builder(), foam.util.SafetyUtil.isEmpty(prefix) ? "" : prefix + ".");
 
             if ( isLast() ) getWriter().flush();
           } catch (Throwable t) {
@@ -309,27 +268,13 @@ try {
       javaThrows: [
         'java.io.IOException'
       ],
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'record',
-          type: 'String'
-        },
-        {
-          name: 'prefix',
-          type: 'String'
-        }
-      ],
+      args: ['Context x', 'CharSequence record', 'String prefix' ],
       javaCode: `
-        write_(sb.get()
+        write_(formatter.get().builder()
           .append(prefix)
           .append("r(")
           .append(record)
-          .append(")")
-          .toString());
+          .append(")"));
       `
     },
     {
@@ -338,15 +283,10 @@ try {
       javaThrows: [
         'java.io.IOException'
       ],
-      args: [
-        {
-          class: 'String',
-          name: 'data'
-        }
-      ],
+      args: ['CharSequence data'],
       javaCode: `
         BufferedWriter writer = getWriter();
-        writer.write(data);
+        writer.append(data);
         writer.newLine();
       `
     },
@@ -356,41 +296,26 @@ try {
       javaThrows: [
         'java.io.IOException'
       ],
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'obj',
-          type: 'foam.core.FObject'
-        }
-      ],
+      args: [ 'Context x', 'foam.core.FObject obj' ],
       javaCode: `
         User user = ((Subject) x.get("subject")).getUser();
         if ( user == null || user.getId() <= 1 ) return;
         if ( obj instanceof LastModifiedByAware && ((LastModifiedByAware) obj).getLastModifiedBy() != 0L ) return;
 
-        write_(sb.get()
+        write_(formatter.get().builder()
           .append("// Modified by ")
           .append(user.toSummary())
           .append(" (")
           .append(user.getId())
           .append(") at ")
-          .append(getTimeStamper().createTimestamp())
-          .toString());
+          .append(getTimeStamper().createTimestamp()));
       `
     },
     {
       name: 'getEntry',
-      documentation: 'retrieves ameaningful unit of text from the journal',
+      documentation: 'retrieves a meaningful unit of text from the journal',
       type: 'String',
-      args: [
-        {
-          name: 'reader',
-          type: 'BufferedReader'
-        }
-      ],
+      args: [ 'BufferedReader reader' ],
       javaCode: `
         try {
           String line = reader.readLine();
@@ -414,12 +339,7 @@ try {
       name: 'getParsingErrorMessage',
       documentation: 'Gets the result of a failed parsing of a journal line',
       type: 'String',
-      args: [
-        {
-          class: 'String',
-          name: 'line'
-        }
-      ],
+      args: [ 'String line' ],
       javaCode: `
         Parser        parser = ExprParser.instance();
         PStream       ps     = new StringPStream();
@@ -437,16 +357,7 @@ try {
       name: 'mergeFObject',
       type: 'foam.core.FObject',
       documentation: 'Add diff property to old property',
-      args: [
-        {
-          name: 'oldFObject',
-          type: 'FObject'
-        },
-        {
-          name: 'diffFObject',
-          type: 'FObject'
-        }
-      ],
+      args: ['FObject oldFObject', 'FObject diffFObject' ],
       javaCode: `
         //get PropertyInfos
         List list = oldFObject.getClassInfo().getAxiomsByClass(PropertyInfo.class);
@@ -461,20 +372,7 @@ try {
     },
     {
       name: 'mergeProperty',
-      args: [
-        {
-          name: 'oldFObject',
-          type: 'FObject'
-        },
-        {
-          name: 'diffFObject',
-          type: 'FObject'
-        },
-        {
-          name: 'prop',
-          javaType: 'foam.core.PropertyInfo'
-        }
-      ],
+      args: [ 'FObject oldFObject', 'FObject diffFObject', 'foam.core.PropertyInfo prop' ],
       javaCode: `
         if ( prop.isSet(diffFObject) ) {
           prop.set(oldFObject, prop.get(diffFObject));

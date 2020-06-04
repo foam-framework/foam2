@@ -63,6 +63,10 @@ public class JSONFObjectFormatter
     super(x);
   }
 
+  public JSONFObjectFormatter() {
+    super();
+  }
+
   protected void outputUndefined() {
   }
 
