@@ -42,7 +42,9 @@ foam.CLASS({
     'foam.nanos.theme.ThemeDomain',
     'foam.nanos.u2.navigation.TopNavigation',
     'foam.nanos.u2.navigation.FooterView',
+    'foam.u2.crunch.CapabilityInterceptView',
     'foam.u2.crunch.CrunchController',
+    'foam.u2.borders.MarginBorder',
     'foam.u2.stack.Stack',
     'foam.u2.stack.StackView',
     'foam.u2.dialog.NotificationMessage',
@@ -492,10 +494,13 @@ foam.CLASS({
       self.capabilityAcquired = false;
       self.capabilityCancelled = false;
       return new Promise(function(resolve, reject) {
-        self.stack.push({
-          class: 'foam.u2.crunch.CapabilityInterceptView',
-          capabilityOptions: capabilityInfo.capabilityOptions
-        });
+        self.add(self.Popup.create({ closeable: false })
+          .start(self.MarginBorder)
+            .tag(self.CapabilityInterceptView, {
+              capabilityOptions: capabilityInfo.capabilityOptions
+            })
+          .end()
+        );
         var s1, s2;
         s1 = self.capabilityAcquired$.sub(() => {
           s1.detach();
