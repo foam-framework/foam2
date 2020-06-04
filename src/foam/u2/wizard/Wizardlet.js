@@ -15,6 +15,10 @@ foam.INTERFACE({
     },
     {
       name: 'data'
+    },
+    {
+      name: 'title',
+      class: 'String'
     }
   ],
 

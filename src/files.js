@@ -194,6 +194,7 @@ FOAM_FILES([
   { name: 'foam/u2/view/StringArrayRowView', flags: ['web'] },
   { name: 'foam/u2/borders/NullBorder', flags: ['web'] },
   { name: 'foam/u2/borders/CardBorder', flags: ['web'] },
+  { name: 'foam/u2/borders/MarginBorder', flags: ['web'] },
   { name: 'foam/u2/borders/SplitScreenBorder', flags: ['web'] },
   { name: 'foam/nanos/u2/navigation/IFrameTopNavigation', flags: ['web']},
   { name: "foam/version/VersionTrait" },
@@ -774,9 +775,14 @@ FOAM_FILES([
   { name: "foam/u2/detail/SectionedDetailPropertyView" },
 
   // Multiple model - crunch - wizard files
+  { name: "foam/u2/dialog/SimpleActionDialog" },
+  { name: "foam/u2/tag/CircleIndicator" },
   { name: "foam/u2/wizard/Wizardlet" },
   { name: "foam/u2/wizard/BaseWizardlet" },
   { name: "foam/u2/wizard/WizardletView" },
+  { name: "foam/u2/wizard/StepWizardletController" },
+  { name: "foam/u2/wizard/StepWizardletStepsView" },
+  { name: "foam/u2/wizard/StepWizardletView" },
   { name: "foam/u2/wizard/ScrollWizardletView" },
   { name: "foam/nanos/crunch/ui/CapabilityWizardlet" },
 
