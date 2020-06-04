@@ -67,8 +67,7 @@ public class EmailsUtility {
       templateArgs.put("personalSupportPhone", psUser == null ? "" : psUser.getPhoneNumber());
       templateArgs.put("personalSupportEmail", psUser == null ? "" : psUser.getEmail());
       templateArgs.put("personalSupportFirstName", psUser == null ? "" : psUser.getFirstName());
-      templateArgs.put("personalSupportFullName",
-        psUser == null ? "" : psUser.getFirstName() + " " + psUser.getLastName());
+      templateArgs.put("personalSupportFullName", psUser == null ? "" : psUser.getLegalName());
 
       foam.nanos.auth.Address address = theme.getSupportAddress();
       templateArgs.put("supportAddress", address == null ? "" : address.toSummary());
