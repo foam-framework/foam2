@@ -119,17 +119,22 @@ foam.CLASS({
 
         boolean ucjExpiredButCapabilityNot = ucJunction.getStatus() == CapabilityJunctionStatus.EXPIRED && ! capability.isExpired();
 
-        // case old == null or status is actionRequired
-        if ( old == null || ucJunction.getStatus() == CapabilityJunctionStatus.ACTION_REQUIRED || ucjExpiredButCapabilityNot ) {
-          // if all the prereqs are passed and the data is validated, the status can go to pending
-          if ( ( ! requiresData || ( ucJunction.getData() != null && validateData(x, ucJunction) ) ) && checkPrereqs(x, ucJunction) ) {
+        // Update current UCJ status
+        if ( old == null
+          || ucJunction.getStatus() == CapabilityJunctionStatus.ACTION_REQUIRED
+          || ucjExpiredButCapabilityNot )
+        {
+          CapabilityJunctionStatus chainedStatus = checkPrereqsChainedStatus(x, ucJunction);
+          if ( ( ! requiresData || ( ucJunction.getData() != null && validateData(x, ucJunction) ) )
+            && chainedStatus != CapabilityJunctionStatus.ACTION_REQUIRED )
+          {
             // if review is required for this Capability, set the status to pending so that rules can be triggered
-            // to call followup actions
-            if ( requiresReview ) ucJunction.setStatus(CapabilityJunctionStatus.PENDING);
-            else ucJunction.setStatus(CapabilityJunctionStatus.GRANTED);
+            if ( requiresReview || chainedStatus == CapabilityJunctionStatus.PENDING )
+              ucJunction.setStatus(CapabilityJunctionStatus.PENDING);
+            else
+              ucJunction.setStatus(CapabilityJunctionStatus.GRANTED);
           } else {
-            if ( checkPrereqsGrantedOrPending(x, ucJunction) ) ucJunction.setStatus(CapabilityJunctionStatus.PENDING);
-            else ucJunction.setStatus(CapabilityJunctionStatus.ACTION_REQUIRED);
+            ucJunction.setStatus(CapabilityJunctionStatus.ACTION_REQUIRED);
           }
         } 
 
@@ -301,7 +306,7 @@ foam.CLASS({
       `
     },
     {
-      name: 'checkPrereqsGrantedOrPending',
+      name: 'checkPrereqsChainedStatus',
       args: [
         {
           name: 'x',
@@ -312,15 +317,15 @@ foam.CLASS({
           type: 'foam.core.FObject'
         }
       ],
-      type: 'Boolean',
-      documentation: `Check if all prerequisites of this capability is either granted or pending`,
+      type: 'CapabilityJunctionStatus',
+      documentation: `Check if prerequisites of a capability is fulfilled`,
       javaCode: `
-        boolean prerequisitesFulfilled = true;
+        boolean allGranted = true;
         Capability cap;
         DAO capDAO = (DAO) x.get("capabilityDAO");
         List<CapabilityCapabilityJunction> ccJunctions = ( List<CapabilityCapabilityJunction> ) getPrereqs(x, obj);
-
         UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
+
         for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
           cap = (Capability) capDAO.find((String) ccJunction.getSourceId());
           if ( ! cap.getEnabled() ) continue;
@@ -328,62 +333,26 @@ foam.CLASS({
             EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId()),
             EQ(UserCapabilityJunction.TARGET_ID, (String) ccJunction.getTargetId())
           ));
-          if ( ucJunction == null ||
-            ( ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED &&
-            ucJunction.getStatus() != CapabilityJunctionStatus.PENDING )
-          ) {
-            prerequisitesFulfilled = false;
+          
+          // CONFIRM ucJunction status with re-put the ucj
+          ucJunction = ucJunction == null ? 
+            new UserCapabilityJunction.Builder(x)
+              .setSourceId(ucj.getSourceId())
+              .setTargetId(ccJunction.getTargetId())
+              .build() :
+            ucJunction;
+          try {
+            ucJunction = (UserCapabilityJunction) ((DAO) x.get("userCapabilityJunctionDAO")).put_(x, ucJunction);
+          } catch ( RuntimeException e ) {
+            return CapabilityJunctionStatus.ACTION_REQUIRED;
           }
-        }
-        return prerequisitesFulfilled;
-      `
-    },
-    {
-      name: 'checkPrereqs',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'obj',
-          type: 'foam.core.FObject'
-        }
-      ],
-      type: 'Boolean',
-      documentation: `Check if prerequisites of a capability is fulfilled`,
-      javaCode: `
-        boolean prerequisitesFulfilled = true;
-        List<CapabilityCapabilityJunction> ccJunctions = ( List<CapabilityCapabilityJunction> ) getPrereqs(x, obj);
 
-        // for each of those junctions, check if the prerequisite is granted, if not, return false
-        UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
-        for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
-          Capability cap = (Capability) ((DAO) x.get("capabilityDAO")).find((String) ccJunction.getSourceId());
-          if ( ! cap.getEnabled() ) continue;
-          UserCapabilityJunction ucJunction = (UserCapabilityJunction) getDelegate().find(AND(
-            EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId()),
-            EQ(UserCapabilityJunction.TARGET_ID, (String) ccJunction.getTargetId())
-          ));
-          if ( ucJunction == null || ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED ) {
-            // if ucJunction is null, create a ucj and put to ucjDAO
-            // if ucJunction exists but is not granted, try to re-put the ucj
-            ucJunction = ucJunction == null ? 
-              new UserCapabilityJunction.Builder(x)
-                .setSourceId(ucj.getSourceId())
-                .setTargetId(ccJunction.getTargetId())
-                .build() :
-              ucJunction;
-            try {
-              ucJunction = (UserCapabilityJunction) ((DAO) x.get("userCapabilityJunctionDAO")).put_(x, ucJunction);
-            } catch ( RuntimeException e ) {
-              prerequisitesFulfilled = false;
-            }
-            if ( ucJunction == null || ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED )
-              prerequisitesFulfilled = false;
-          }
+          if ( ucJunction == null ) return CapabilityJunctionStatus.ACTION_REQUIRED;
+          if ( ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED
+            && ucJunction.getStatus() != CapabilityJunctionStatus.PENDING ) return CapabilityJunctionStatus.ACTION_REQUIRED;
+          if ( ucJunction.getStatus() == CapabilityJunctionStatus.PENDING ) allGranted = false; 
         }
-        return prerequisitesFulfilled;
+        return allGranted ? CapabilityJunctionStatus.GRANTED : CapabilityJunctionStatus.PENDING;
       `
     },
     {
