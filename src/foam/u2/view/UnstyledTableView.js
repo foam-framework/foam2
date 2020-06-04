@@ -240,10 +240,10 @@ foam.CLASS({
   ],
 
   methods: [
-    function sortBy(column) {
-      this.order = this.order === column ?
+    function sortBy(column, propName) {
+      this.order = { order: this.order === column ?
         this.DESC(column) :
-        column;
+        column, propName: propName};
     },
 
     function updateColumns() {
@@ -334,7 +334,7 @@ foam.CLASS({
                     }
                   }).
                   on('click', function(e) {
-                    view.sortBy(column);
+                    view.sortBy(column, property);
                   }).
                   call(column.tableHeaderFormatter, [column]).
                   callIf(column.label != '', function() {
@@ -404,12 +404,11 @@ foam.CLASS({
          
           var proxy = view.ProxyDAO.create({ delegate: dao });
 
-          proxy.select().then(v => console.log(v));
           // Make sure the DAO set here responds to ordering when a user clicks
           // on a table column header to sort by that column.
-          if ( this.order ) dao = dao.orderBy(this.order);
-          view.sub('propertyChange', 'order', function(_, __, ___, s) {
-            proxy.delegate = dao.orderBy(s.get());
+          // if ( this.order ) dao = dao.orderBy(this.order);
+          view.sub('propertyChange', 'order', async function(_, __, ___, s) {
+            console.log('propertyChange');
           });
           
           var modelActions = view.of.getAxiomsByClass(foam.core.Action);
@@ -426,9 +425,17 @@ foam.CLASS({
             view.values = await outputter.arrayOfValuesToArrayOfStrings(props, values.array);
           });
           
-          return await this.slot(async function(columns_, values) {
-            
-
+          return await this.slot(async function(order, columns_, values) {
+            if ( this.order ) {
+              console.log('orderChange');
+              var index = view.columns_.map(([c, o])  => c).indexOf(order.propName);
+              if ( index !== -1 ) {
+                if ( view.Desc.isInstance(order.order) )
+                  view.values.sort(function(a, b) { return a[index] < b[index] ? 1 : -1; });
+                else
+                  view.values.sort(function(a, b) { return a[index] > b[index] ? 1 : -1; });
+              }
+            }
             var element = this.
               E();
               element.
