@@ -294,13 +294,16 @@ foam.RELATIONSHIP({
     tableWidth: 80
   },
   targetProperty: {
-    label: 'capability',
+    label: 'Capability',
     tableWidth: 450,
     tableCellFormatter: function(value, _, _) {
+      const e = foam.mlang.Expressions.create();
       this.__subContext__.capabilityDAO
-        .find(value)
+        .where(e.EQ(foam.nanos.crunch.Capability.ID, value))
+        .select(e.PROJECTION(foam.nanos.crunch.Capability.NAME))
+        .limit(1)
         .then((result) => {
-          this.add(`${result.name} [...${value.substring(value.length-10)}]`);
+          this.add(`${result[0].name} [...${value.substring(value.length-10)}]`);
         });
     }
   }
