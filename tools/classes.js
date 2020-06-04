@@ -473,6 +473,12 @@ var classes = [
   'foam.test.TestObj',
   'foam.core.FObjectTest',
 
+  'foam.nanos.dig.drivers.DigFormatDriver',
+  'foam.nanos.dig.drivers.DigCsvDriver',
+  'foam.nanos.dig.drivers.DigHtmlDriver',
+  'foam.nanos.dig.drivers.DigJsonDriver',
+  'foam.nanos.dig.drivers.DigJsonJDriver',
+  'foam.nanos.dig.drivers.DigXmlDriver',
   'foam.nanos.dig.exception.DigErrorMessage',
   'foam.nanos.dig.exception.DAONotFoundException',
   'foam.nanos.dig.exception.ParsingErrorException',
