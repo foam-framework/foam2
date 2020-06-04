@@ -47,6 +47,7 @@
     'ctrl',
     'currentMenu',
     'stack',
+    'summaryView?',
     'objectSummaryView?'
   ],
 
@@ -580,7 +581,9 @@
         return ! isTrackingRequest;
       },
       code: function(X) {
-        this.objectSummaryView.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
+        var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
+
+        objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
           class: "foam.u2.MemoModal",
           onExecute: this.approveWithMemo.bind(this)
         }));
@@ -600,7 +603,9 @@
         return ! isTrackingRequest;
       },
       code: function(X) {
-        this.objectSummaryView.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
+        var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
+
+        objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
           class: "foam.u2.MemoModal",
           onExecute: this.rejectWithMemo.bind(this),
           isMemoRequired: true
