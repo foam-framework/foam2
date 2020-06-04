@@ -27,15 +27,15 @@ public class DigFormatDriverFactory
   public static DigFormatDriver create(X x, Format format) {
     switch (format) {
       case JSON:
-        return new DigJsonDriver(x);
+        return new DigJsonDriver.Builder(x).setFormat(format).build();
       case JSONJ:
-        return new DigJsonJDriver(x);
+        return new DigJsonJDriver.Builder(x).setFormat(format).build();
       case XML:
-        return new DigXmlDriver(x);
+        return new DigXmlDriver.Builder(x).setFormat(format).build();
       case CSV:
-        return new DigCsvDriver(x);
+        return new DigCsvDriver.Builder(x).setFormat(format).build();
       case HTML:
-        return new DigHtmlDriver(x);
+        return new DigHtmlDriver.Builder(x).setFormat(format).build();
       default:
         return null;
     }
