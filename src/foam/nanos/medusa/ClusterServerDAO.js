@@ -65,7 +65,7 @@ foam.CLASS({
       }
 
       ClusterCommand cmd = (ClusterCommand) obj;
-      getLogger().info("cmd", "ClusterCommand", java.util.Arrays.toString(cmd.getHops()), cmd.getDop().getLabel());
+      getLogger().debug("cmd", "ClusterCommand", java.util.Arrays.toString(cmd.getHops()), cmd.getDop().getLabel());
 
       FObject nu = cmd.getData();
 
