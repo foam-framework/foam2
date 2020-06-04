@@ -150,33 +150,19 @@ foam.CLASS({
           }
         }
 
-        foam.dao.ProxyDAO pxy = null;
-
-        if ( getMdao() == null ) {
-          foam.dao.DAO head = delegate;
-          while( head instanceof foam.dao.ProxyDAO ) {
-            pxy = (foam.dao.ProxyDAO) head;
-            head = ((ProxyDAO) head).getDelegate();
+        if ( getIndex() != null && getIndex().length > 0 ) {
+          if ( getMdao() != null ) {
+            ((foam.dao.MDAO) getMdao()).addIndex(getIndex());
+          } else {
+            getLogger().warning("NSpec.name", (getNSpec() != null ) ? getNSpec().getName() : null, "of_", of_, "addIndex not compatible with innerDAO, indexes not added.");
           }
-          if ( head instanceof foam.dao.MDAO ) {
-            setMdao((foam.dao.MDAO)head);
-          }
-        }
-
-        if ( getMdao() != null &&
-             getIndex() != null && getIndex().length > 0 ) {
-          getMdao().addIndex(getIndex());
         }
 
         if ( getFixedSize() != null ) {
           if ( getMdao() != null ) {
             foam.dao.ProxyDAO fixedSizeDAO = (foam.dao.ProxyDAO) getFixedSize();
             fixedSizeDAO.setDelegate(getMdao());
-            if ( pxy == null ) {
-              delegate = fixedSizeDAO;
-            } else {
-              pxy.setDelegate(fixedSizeDAO);
-            }
+            delegate = fixedSizeDAO;
           } else {
             getLogger().error("NSpec.name", (getNSpec() != null ) ? getNSpec().getName() : null, "of_", of_, "FixedSizeDAO did not find instanceof MDAO");
             System.exit(1);
@@ -184,10 +170,10 @@ foam.CLASS({
         }
 
         if ( getCluster() &&
-             getMdao() != null &&
+             getMdao() != null /*&&
              ( ! getNSpec().getServe() ||
                getNSpec().getServe() &&
-               getInnerDAO() == null ) ) {
+               getInnerDAO() == null )*/ ) {
           getLogger().debug(getNSpec().getName(), "cluster", "delegate", delegate.getClass().getSimpleName());
           delegate = new foam.nanos.medusa.MedusaAdapterDAO.Builder(getX())
             .setNSpec(getNSpec())
@@ -525,8 +511,7 @@ foam.CLASS({
       value: 'foam.dao.IDBDAO'
     },
     {
-      class: 'FObjectProperty',
-      of: 'foam.dao.MDAO',
+      class: 'foam.dao.DAOProperty',
       name: 'mdao'
     },
     {
@@ -592,7 +577,7 @@ foam.CLASS({
       }
     },
     {
-      /** Cluster this DAO */
+      documentation: 'Cluster this DAO',
       name: 'cluster',
       class: 'Boolean',
       javaFactory: `
@@ -600,7 +585,7 @@ foam.CLASS({
       `
     },
     {
-      /** Simpler alternative than providing serverBox. */
+      documentation: 'Simpler alternative than providing serverBox.',
       name: 'serviceName',
       class: 'String',
       generateJava: false
@@ -961,7 +946,7 @@ model from which to test ServiceProvider ID (spid)`,
       },
       javaCode: `
         if ( getMdao() != null ) {
-          getMdao().addIndex(props);
+          ((foam.dao.MDAO) getMdao()).addIndex(props);
         }
         return this;
       `
@@ -984,7 +969,7 @@ model from which to test ServiceProvider ID (spid)`,
       },
       javaCode: `
         if ( getMdao() != null )
-          getMdao().addIndex(index);
+          ((foam.dao.MDAO) getMdao()).addIndex(index);
         return this;
       `
     },
@@ -1050,6 +1035,32 @@ model from which to test ServiceProvider ID (spid)`,
           delegate = ((foam.dao.ProxyDAO) delegate).getDelegate();
         }
         System.out.println(delegate.getClass().getSimpleName());
+      `
+    },
+
+    // ProxyDAO operations
+    {
+      name: 'cmd_',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'cmd',
+          type: 'Object'
+        }
+      ],
+      type: 'Object',
+      javaCode: `
+      if ( foam.dao.MDAO.GET_MDAO_CMD.equals(cmd) ) {
+        DAO dao = getMdao();
+        if ( dao != null ) {
+          getLogger().debug("cmd", "mdao", getName());
+          return dao;
+        }
+      }
+      return getDelegate().cmd_(x, cmd);
       `
     }
   ]
