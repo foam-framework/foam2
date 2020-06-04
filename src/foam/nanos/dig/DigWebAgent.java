@@ -8,6 +8,7 @@ package foam.nanos.dig;
 
 import foam.core.*;
 import foam.nanos.dig.exception.*;
+import foam.nanos.dig.drivers.*;
 import foam.nanos.http.*;
 import foam.nanos.logger.Logger;
 import foam.nanos.logger.PrefixLogger;
@@ -34,29 +35,27 @@ public class DigWebAgent
     try {
 
       // Find the operation
-      DigOperation operation = null;
-      switch ( command ) {
-        case PUT:
-          operation = new DigPutOperation(x);
-          break;
-        case SELECT:
-          operation = new DigSelectOperation(x);
-          break;
-        case REMOVE:
-          operation = new DigRemoveOperation(x);
-          break;
-      }
+      DigFormatDriver driver = DigFormatDriverFactory.create(x, format);
 
-      if ( operation == null ) {
+      if ( driver == null ) {
         DigUtil.outputException(x, new ParsingErrorException.Builder(x)
-          .setMessage("Unsupported method: " + command)
+          .setMessage("Unsupported format: " + format)
           .build(), format);
         return;
       }
 
-      // Execute the operation
-      operation.execute(x);
-
+      // Execute the command
+      switch ( command ) {
+        case PUT:
+          driver.put(x);
+          break;
+        case SELECT:
+          driver.select(x);
+          break;
+        case REMOVE:
+          driver.remove(x);
+          break;
+      }
     } catch (Throwable t) {
       PrintWriter out = x.get(PrintWriter.class);
       out.println("Error " + t.getMessage());
