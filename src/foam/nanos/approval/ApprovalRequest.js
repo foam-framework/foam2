@@ -321,10 +321,8 @@
       view: { class: 'foam.u2.tag.TextArea', rows: 5, cols: 80 },
       documentation: 'Meant to be used for explanation on why request was approved/rejected',
       section: 'supportDetails',
-      visibility: function(memo, status) {
-        if ( status == foam.nanos.approval.ApprovalStatus.REQUESTED ) {
-          return foam.u2.DisplayMode.RW;
-        } else if ( memo ) {
+      visibility: function(memo) {
+        if ( memo ) {
           return foam.u2.DisplayMode.RO;
         } else {
           return foam.u2.DisplayMode.HIDDEN;
