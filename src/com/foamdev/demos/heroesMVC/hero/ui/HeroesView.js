@@ -35,14 +35,7 @@ foam.CLASS({
   `,
 
   properties: [
-    { //TODO try to create an other controller
-      class: 'String',
-      name: 'heroName',
-      view: {
-        class: 'foam.u2.TextField',
-        onKey: true
-      }
-    },
+
   ],
 
   methods: [
@@ -53,6 +46,8 @@ foam.CLASS({
         end().
         start().
           add('Hero name: ', this.data.HERO_NAME, ' ', this.ADD_HERO).
+          // if we build this property in the controller
+          //add('Hero name: ', this.HERO_NAME, ' ', this.ADD_HERO).
         end().
         add(this.data.FILTERED_DAO);
     }

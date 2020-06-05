@@ -79,6 +79,18 @@ foam.CLASS({
   `,
 
   properties: [
+    { //TODO move to an other controller
+      class: 'String',
+      name: 'heroName',
+      view: {
+        class: 'foam.u2.TextField',
+        onKey: true
+      }
+    },
+//     { //we can use Hero.name in a subcontroller
+//       name: 'heroName',
+//       factory: function() { return this.Hero.create().name; }
+//     },
     {
       name   : 'heroesDAO',
       factory: function() { return this.Heroes.create(); }
