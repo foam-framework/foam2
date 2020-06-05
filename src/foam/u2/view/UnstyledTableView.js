@@ -72,7 +72,7 @@ foam.CLASS({
     },
     {
       name: 'columns_',
-      expression: function(columns, of, editColumnsEnabled, selectedColumnNames, isColumnChanged) {
+      expression: function(columns, of, editColumnsEnabled, selectedColumnNames) {
         if ( ! of ) return [];
         if ( ! editColumnsEnabled ) return columns.map(c => foam.Array.isInstance(c) ? c : [c, null]);
 
@@ -236,6 +236,12 @@ foam.CLASS({
       class: 'Boolean', 
       value: false,
       documentation: 'If isColumnChanged is changed, columns_ will be updated'
+    },
+    {
+      name: 'outputter',
+      factory: function() {
+        return this.TableColumnOutputter.create();
+      }
     }
   ],
 
@@ -316,8 +322,8 @@ foam.CLASS({
                 if ( foam.String.isInstance(property) ) {
                  column = view.columns.find(c => c.name === property);
                  if ( ! column ) {
-                  var columnConfig = this.__context__.columnConfigToPropertyConverter;
-                  if ( ! columnConfig ) columnConfig = this.ColumnConfigToPropertyConverter.create();
+                  var columnConfig = view.__context__.columnConfigToPropertyConverter;
+                  if ( ! columnConfig ) columnConfig = view.ColumnConfigToPropertyConverter.create();
                   column = columnConfig.returnProperty(view.of, property);
                  }
                 } else
@@ -389,51 +395,35 @@ foam.CLASS({
          * writing.
          */
           var view = this;
-
-          var outputter = this.TableColumnOutputter.create();
-          //need to retrieve id for dblclick
-          var propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => c));
-          //check if columns_ length 0 mb on line 388
-          var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(this.of, propertyNamesToQuery);
-          var values = await dao.select(expr);
-          var columnConfig = this.__context__.columnConfigToPropertyConverter;
-          if ( ! columnConfig ) columnConfig = this.ColumnConfigToPropertyConverter.create();
-          var props = columnConfig.returnProperties(this.of, propertyNamesToQuery);
-
-          this.values = await outputter.arrayOfValuesToArrayOfStrings(props, values.array);
-         
           var proxy = view.ProxyDAO.create({ delegate: dao });
+
+          var propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => c));
+          var props = view.returnProperties(view, propertyNamesToQuery);
+          await view.updateValuesProperty(view, proxy, propertyNamesToQuery);
 
           // Make sure the DAO set here responds to ordering when a user clicks
           // on a table column header to sort by that column.
           // if ( this.order ) dao = dao.orderBy(this.order);
-          view.sub('propertyChange', 'order', async function(_, __, ___, s) {
-            console.log('propertyChange');
-          });
           
           var modelActions = view.of.getAxiomsByClass(foam.core.Action);
           var actions = Array.isArray(view.contextMenuActions)
             ? view.contextMenuActions.concat(modelActions)
             : modelActions;
           
-          view.columns_$.sub(async function() {
-            var propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => c));
-            expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(view.of, propertyNamesToQuery);
-            values = await dao.select(expr);
-            props = columnConfig.returnProperties(view.of, propertyNamesToQuery);
-
-            view.values = await outputter.arrayOfValuesToArrayOfStrings(props, values.array);
+          view.columns_$.sub(function() {
+            propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => c));
+            props = view.returnProperties(view, propertyNamesToQuery);
+            view.updateValuesProperty(view, proxy, propertyNamesToQuery);
           });
           
-          return await this.slot(async function(order, columns_, values) {
+          return await this.slot(async function(order, values) {
             if ( this.order ) {
-              console.log('orderChange');
               var index = view.columns_.map(([c, o])  => c).indexOf(order.propName);
               if ( index !== -1 ) {
                 if ( view.Desc.isInstance(order.order) )
-                  view.values.sort(function(a, b) { return a[index] < b[index] ? 1 : -1; });
+                  values.sort(function(a, b) { return a[index] < b[index] ? 1 : -1; });
                 else
-                  view.values.sort(function(a, b) { return a[index] > b[index] ? 1 : -1; });
+                  values.sort(function(a, b) { return a[index] > b[index] ? 1 : -1; });
               }
             }
             var element = this.
@@ -542,7 +532,7 @@ foam.CLASS({
                 });
                 for ( var  i = 1 ; i < props.length ; i++  ) {
                   element1.start().addClass(view.myClass('td'))
-                  .add(val[i])
+                  .add(view.outputter.returnStringValueForProperty(props[i], val[i]))
                   .style({flex: props[i] && props[i].tableWidth  ? `0 0 ${props[i].tableWidth}px` : '1 0 0'}).end();
                 }
                 element1
@@ -560,7 +550,21 @@ foam.CLASS({
               return element;
             });
         }
-      }
+      },
+      
+      function updateValuesProperty(obj, dao, propertyNamesToQuery) {
+          //need to retrieve id for dblclick
+          //check if columns_ length 0 mb on line 388
+          var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(obj.of, propertyNamesToQuery);
+          dao.select(expr).then(function(s) {
+            obj.values = s.array;
+          });
+      },
+      function returnProperties(obj, propertyNamesToQuery) {
+        var columnConfig = obj.__context__.columnConfigToPropertyConverter;
+        if ( ! columnConfig ) columnConfig = obj.ColumnConfigToPropertyConverter.create();
+        return columnConfig.returnProperties(obj.of, propertyNamesToQuery);
+      }      
   ],
 
 });
