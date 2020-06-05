@@ -26,6 +26,8 @@ public abstract class AbstractFObjectFormatter
     x_ = x;
   }
 
+  public AbstractFObjectFormatter() { }
+
   public StringBuilder builder() { return b_; }
 
   public void reset() { builder().setLength(0); }
