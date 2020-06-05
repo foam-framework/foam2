@@ -70,7 +70,7 @@ foam.CLASS({
       class: 'String',
       name: 'id',
       includeInDigest: true,
-      tableWidth: 220
+      tableWidth: 300
     },
     {
       class: 'Boolean',
@@ -122,7 +122,8 @@ foam.CLASS({
       documentation: 'Date and time the script ran last.',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      tableWidth: 140
+      tableWidth: 140,
+      storageTransient: true
     },
     {
       class: 'Duration',
@@ -131,7 +132,8 @@ foam.CLASS({
       documentation: 'Date and time the script took to complete.',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      tableWidth: 125
+      tableWidth: 125,
+      storageTransient: true
     },
     /*
     {
@@ -198,7 +200,8 @@ foam.CLASS({
       }
       output_ = val;
       outputIsSet_ = true;
-      `
+      `,
+      storageTransient: true
     },
     {
       class: 'String',
@@ -318,6 +321,7 @@ foam.CLASS({
           setLastDuration(pm.getTime());
           ps.flush();
           setOutput(baos.toString());
+          ((DAO) x.get("scriptEventDAO")).put_(x, this);
         } finally {
           Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
         }

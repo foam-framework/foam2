@@ -72,7 +72,8 @@ foam.CLASS({
       documentation: 'Scheduled time to run Cron script.',
       section: 'scheduling',
       visibility: 'RO',
-      javaFactory: 'return getNextScheduledTime();'
+      javaFactory: 'return getNextScheduledTime();',
+      storageTransient: true
     }
   ],
 
