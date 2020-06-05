@@ -19,7 +19,7 @@ foam.CLASS({
     'com.google.foam.demos.heroesMVC.hero.Hero.ui.DetailHeroView',
     //'com.google.foam.demos.heroesMVC.Search',
     'com.google.foam.demos.heroesMVC.Heroes',
-    
+
     'com.google.foam.demos.heroesMVC.hero.Hero.ui.DashboardCitationView',
     'com.google.foam.demos.heroesMVC.hero.Hero',
     'foam.dao.ArrayDAO',
@@ -79,14 +79,6 @@ foam.CLASS({
   `,
 
   properties: [
-    {//TODO should be moved to HeroesView
-      class: 'String',
-      name: 'heroName',
-      view: {
-        class: 'foam.u2.TextField',
-        onKey: true
-      }
-    },
     {
       name   : 'heroesDAO',
       factory: function() { return this.Heroes.create(); }
@@ -143,7 +135,7 @@ foam.CLASS({
         //start(com.google.foam.demos.heroesMVC.SearchView, {data: this.query}).end().//, {data: this.selection}
         br().
         start(com.google.foam.demos.heroesMVC.NavigationView).end().
-        
+
         add(this.slot(function(selection, mode) {
           return selection       ? this.E().start(com.google.foam.demos.heroesMVC.hero.Hero.ui.DetailHeroView, {data: this.selection}): //this.detailE()    :
             mode === 'dashboard' ? this.E().start(com.google.foam.demos.heroesMVC.hero.Hero.ui.DashboardHeroView, {data: this.STARRED_HERO_DAO}): //this.dashboardE() :

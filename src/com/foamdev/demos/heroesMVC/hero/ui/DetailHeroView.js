@@ -41,7 +41,7 @@ foam.CLASS({
 
   methods: [
     function initE() {
-       this.start('h3')
+       this.start('h3').
          add(this.data.selection.name$, ' details!').
         br().
         add(this.SELECTION, this.BACK)        ;

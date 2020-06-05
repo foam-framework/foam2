@@ -35,7 +35,14 @@ foam.CLASS({
   `,
 
   properties: [
-
+    { //TODO try to create an other controller
+      class: 'String',
+      name: 'heroName',
+      view: {
+        class: 'foam.u2.TextField',
+        onKey: true
+      }
+    },
   ],
 
   methods: [
