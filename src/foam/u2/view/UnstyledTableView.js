@@ -272,7 +272,6 @@ foam.CLASS({
       view.columns_$.sub(function() {
         var propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => c));
         view.props = view.returnProperties(view, propertyNamesToQuery);
-        console.log('properties updated');
         view.updateValuesProperty(view, view.dao, propertyNamesToQuery);
       });
 
@@ -394,11 +393,11 @@ foam.CLASS({
             })).
         end().
         callIf(view.editColumnsEnabled, function() {this.add(editColumnView);}).       
-        add(await this.rowsFrom(this.data$proxy));
+        add(this.rowsFrom(this.data$proxy));
     },
     {
       name: 'rowsFrom',
-      code: async function(dao) {
+      code: function(dao) {
         /**
          * Given a DAO, add a tbody containing the data from the DAO to the
          * table and return a reference to the tbody.
@@ -416,8 +415,7 @@ foam.CLASS({
           view.dao = dao;
           var propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => c));
           view.props = view.returnProperties(view, propertyNamesToQuery);
-          console.log('dao update');
-          await view.updateValuesProperty(view, proxy, propertyNamesToQuery);
+          view.updateValuesProperty(view, proxy, propertyNamesToQuery);
 
           // Make sure the DAO set here responds to ordering when a user clicks
           // on a table column header to sort by that column.
@@ -432,9 +430,7 @@ foam.CLASS({
           //FIX ME
 
           //for now main suspect TTLCachingDAO
-          return await this.slot(async function(order, values, updateValues) {
-            console.log('values slot');
-            console.log(values);
+          return this.slot(function(order, values, updateValues) {
             if ( this.order ) {
               var index = view.columns_.map(([c, o])  => c).indexOf(order.propName);
               if ( index !== -1 ) {
