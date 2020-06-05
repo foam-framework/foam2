@@ -231,6 +231,7 @@ foam.CLASS({
           var errorSlot = prop.validateObj && prop.validationTextVisible ?
             this.data.slot(prop.validateObj) :
             foam.core.ConstantSlot.create({ value: null });
+          // debugger;
 
           return self.E()
             .start(self.Rows)
@@ -249,7 +250,8 @@ foam.CLASS({
                     this.enableClass(self.myClass('error'), errorSlot);
                   })
                 .end()
-                .callIf(prop.help, function() {
+                .callIf(prop.help || ( prop.helpMessage && prop.sourceCls_[prop.helpMessage] ), function() {
+                  var help = prop.helpMessage && prop.sourceCls_[prop.helpMessage] ? prop.sourceCls_[prop.helpMessage] : prop;
                   this.start()
                     .addClass(self.myClass('tooltip'))
                     .start({
@@ -264,7 +266,7 @@ foam.CLASS({
                       .start()
                         .addClass(self.myClass('helper-text'))
                         .start('p').style({ 'padding': '3px' })
-                          .add(prop.help)
+                          .add(help)
                         .end()
                       .end()
                       .start()
