@@ -156,7 +156,7 @@ try {
       args: [ 'Context x', 'String prefix', 'DAO dao', 'foam.core.FObject obj' ],
       javaCode: `
         final Object id = obj.getProperty("id");
-        JSONFObjectFormatter form = formatter.get();
+        JSONFObjectFormatter fmt = formatter.get();
 
         getLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
           FObject old;
@@ -172,22 +172,22 @@ try {
 
           public void executeJob() {
             try {
-              if ( old != null ) form.outputDelta(old, obj);
-              else form.output(obj);
+              if ( old != null ) fmt.outputDelta(old, obj);
+              else fmt.output(obj);
             } catch (Throwable t) {
               getLogger().error("Failed to write put entry to journal", t);
-              form.reset();
+              fmt.reset();
             }
           }
 
           public void endJob() {
-            if ( form.builder().length() == 0 ) return;
+            if ( fmt.builder().length() == 0 ) return;
 
             try {
               writeComment_(x, obj);
               writePut_(
                 x,
-                form.builder(),
+                fmt.builder(),
                 getMultiLineOutput() ? "\\n" : "",
                 foam.util.SafetyUtil.isEmpty(prefix) ? "" : prefix + ".");
 
@@ -222,7 +222,7 @@ try {
       args: [ 'Context x', 'String prefix', 'DAO dao', 'foam.core.FObject obj' ],
       javaCode: `
       final Object id = obj.getProperty("id");
-      JSONFObjectFormatter form = formatter.get();
+      JSONFObjectFormatter fmt = formatter.get();
       getLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
 
         public Object[] requestLocks() {
@@ -240,18 +240,18 @@ try {
             // true properties that ID/MultiPartID maps too.
             FObject toWrite = (FObject) obj.getClassInfo().newInstance();
             toWrite.setProperty("id", obj.getProperty("id"));
-            form.output(toWrite);
+            fmt.output(toWrite);
           } catch (Throwable t) {
             getLogger().error("Failed to write put entry to journal", t);
           }
         }
 
         public void endJob() {
-          if ( form.builder().length() == 0 ) return;
+          if ( fmt.builder().length() == 0 ) return;
 
           try {
             writeComment_(x, obj);
-            writeRemove_(x, form.builder(), foam.util.SafetyUtil.isEmpty(prefix) ? "" : prefix + ".");
+            writeRemove_(x, fmt.builder(), foam.util.SafetyUtil.isEmpty(prefix) ? "" : prefix + ".");
 
             if ( isLast() ) getWriter().flush();
           } catch (Throwable t) {
@@ -314,7 +314,7 @@ try {
     {
       name: 'getEntry',
       documentation: 'retrieves a meaningful unit of text from the journal',
-      type: 'String',
+      type: 'CharSequence',
       args: [ 'BufferedReader reader' ],
       javaCode: `
         try {
@@ -328,7 +328,7 @@ try {
             sb.append("\\n");
             sb.append(line);
           }
-          return sb.toString().trim();
+          return sb;
         } catch (Throwable t) {
           getLogger().error("Failed to read from journal", t);
           return null;
@@ -338,7 +338,7 @@ try {
     {
       name: 'getParsingErrorMessage',
       documentation: 'Gets the result of a failed parsing of a journal line',
-      type: 'String',
+      type: 'CharSequence',
       args: [ 'String line' ],
       javaCode: `
         Parser        parser = ExprParser.instance();

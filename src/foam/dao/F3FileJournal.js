@@ -50,18 +50,18 @@ foam.CLASS({
           if ( reader == null ) {
             return;
           }
-          for ( String entry ; ( entry = getEntry(reader) ) != null ; ) {
-            if ( SafetyUtil.isEmpty(entry)        ) continue;
+          for ( CharSequence entry ; ( entry = getEntry(reader) ) != null ; ) {
+            int length = entry.length();
+            if ( length == 0 ) continue;
             if ( COMMENT.matcher(entry).matches() ) continue;
 
             try {
               char operation = entry.charAt(0);
-              int length = entry.length();
-              entry = entry.substring(2, length - 1);
+              String strEntry = entry.subSequence(2, length - 1).toString();
 
-              FObject obj = parser.parseString(entry);
+              FObject obj = parser.parseString(strEntry);
               if ( obj == null ) {
-                getLogger().error("Parse error", getParsingErrorMessage(entry), "entry:", entry);
+                getLogger().error("Parse error", getParsingErrorMessage(strEntry), "entry:", strEntry);
                 continue;
               }
 
