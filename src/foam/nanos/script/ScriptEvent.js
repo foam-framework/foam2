@@ -28,6 +28,7 @@ foam.CLASS({
       visibility: 'RO'
     },
     {
+      docementation: `Set on event creation to the class name of the Script - Script, Cron, Test, for example.`,
       name: 'type',
       class: 'String',
       visibility: 'RO',
