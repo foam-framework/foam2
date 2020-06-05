@@ -50,6 +50,7 @@ public class DigUtil {
       Outputter outputterJson = new Outputter(x).setPropertyPredicate(new AndPropertyPredicate(x, new PropertyPredicate[] {new NetworkPropertyPredicate(), new PermissionedPropertyPredicate()}));
       outputterJson.setOutputDefaultValues(true);
       outputterJson.setOutputClassNames(true);
+      outputterJson.setMultiLine(true);
       outputterJson.output(object);
       out.println(outputterJson.toString());
 
@@ -90,6 +91,7 @@ public class DigUtil {
       Outputter outputterJson = new Outputter(x).setPropertyPredicate(new AndPropertyPredicate(new PropertyPredicate[] {new StoragePropertyPredicate(), new PermissionedPropertyPredicate()}));
       outputterJson.setOutputDefaultValues(true);
       outputterJson.setOutputClassNames(true);
+      outputterJson.setMultiLine(true);
       outputterJson.outputJSONJFObject(object);
       out.println(outputterJson.toString());
 

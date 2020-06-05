@@ -121,13 +121,13 @@ Later themes:
         while ( group != null ) {
           Theme groupTheme = group.findTheme(x);
           if ( groupTheme != null ) {
-            theme = (Theme) theme.copyFrom(groupTheme);
+            theme = (Theme) theme.fclone().copyFrom(groupTheme);
           }
           group = (Group) groupDAO.find(group.getParent());
         }
         Theme userTheme = user.findTheme(x);
         if ( userTheme != null ) {
-          theme = (Theme) theme.copyFrom(userTheme);
+          theme = (Theme) theme.fclone().copyFrom(userTheme);
         }
       }
       if ( theme != null ) {

@@ -249,6 +249,7 @@ foam.CLASS({
                       })
                       .callIf(self.config.searchMode === self.SearchMode.FULL, function() {
                         this.tag(self.FilterView, {
+                          dao$: self.searchFilterDAO$,
                           data$: self.searchPredicate$
                         });
                       })
@@ -257,7 +258,9 @@ foam.CLASS({
                       .start(self.EXPORT, { buttonStyle: 'SECONDARY' })
                         .addClass(self.myClass('export'))
                       .end()
-                      .tag(this.REFRESH_TABLE, { buttonStyle: 'SECONDARY' })
+                      .start(self.REFRESH_TABLE, { buttonStyle: 'SECONDARY' })
+                        .addClass(self.myClass('refresh'))
+                      .end()
                     .endContext()
                   .end();
               })
