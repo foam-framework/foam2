@@ -30,12 +30,13 @@ foam.CLASS({
       display: flex;
       justify-content: center;
       position: fixed;
-      top: 5px;
+      top: 25px;
       width: 100vw;
       z-index: 15000;
     }
     ^inner {
       width: 90vw;
+      height: 50px;
       max-width: 1024px;
       margin: auto;
       padding: 8px 24px;
@@ -45,12 +46,22 @@ foam.CLASS({
       line-height: 1.33;
       letter-spacing: 0.2px;
       border-radius: 3px;
-      box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.16);
-      background: #f6fff2;
-      border: 1px solid #03cf1f;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
+      background: #e2f2dd;
       display: flex;
       justify-content: space-between;
       align-items: center;
+    }
+    ^banner {
+      background-color: #32bf5e;
+      height: 4px;
+      width: inherit;
+      max-width: 1072px;
+      margin-left: -24px;
+      border-top-left-radius: 3px;
+      border-top-right-radius: 3px;
+      position: absolute;
+      top: 0;
     }
     @keyframes fade {
       0% { opacity: 0; }
@@ -59,20 +70,55 @@ foam.CLASS({
       100% { opacity: 0; }
     }
     ^status-icon {
-      margin-right: 10px;
+      width: 20px;
+      height: 20px;
+      margin-right: 16px;
       vertical-align: middle;
     }
     ^content {
       display: inline-block;
       vertical-align: middle;
+      font-family: IBMPlexSans;
+      font-size: 16px;
+      font-weight: 600;
+      color: #19402e;
+      letter-spacing: normal;
+    }
+    ^description {
+      font-family: IBMPlexSans;
+      font-size: 14px;
+      font-weight: normal;
+      line-height: 1.43;
+      letter-spacing: normal;
+      color: #19402e;
+      margin-left: 36px;
     }
     ^error-background {
       background: #fff6f6;
-      border: 1px solid #f91c1c;
     }
     ^warning-background {
-      background: #f5f4ff;
-      border: 1px solid #604aff;
+      background: #fdf8de;
+    }
+    ^info-background {
+      background: #e5f1fc;
+    }
+    ^error-banner {
+      background: #d9170e;
+    }
+    ^warning-banner {
+      background: #eedc00;
+    }
+    ^info-banner {
+      background: #406dea;
+    }
+    ^error-content {
+      color: #631414;
+    }
+    ^warning-content {
+      color: #816819;
+    }
+    ^info-content {
+      color: #202341;
     }
     ^link-icon {
       display: inline-block;
@@ -83,12 +129,14 @@ foam.CLASS({
       height: 16px;
     }
     ^close-icon {
-      background-image: url("images/ic-cancel.svg");
-      background-size: 16px 16px;
+      background-image: url("images/round-close-icon.svg");
+      background-size: 12px 12px;
       cursor:pointer;
-      height: 16px;
+      height: 12px;
       opacity: 0.5;
-      width: 16px;
+      width: 12px;
+      position: absolute;
+      top: 18;
     }
     ^close-icon:hover {
       opacity: 1;
@@ -100,7 +148,8 @@ foam.CLASS({
       class: 'String',
       name: 'type'
     },
-    'message'
+    'message',
+    'description'
   ],
 
   methods: [
@@ -110,28 +159,48 @@ foam.CLASS({
 
       var img;
       if ( this.type === 'error' ) {
-        img = 'images/inline-error-icon.svg';
+        img = 'images/round-error-red.svg';
       } else if ( this.type === 'warning' ) {
-        img = 'images/information-small-purple.svg';
+        img = 'images/baseline-warning-yellow.svg';
+      } else if ( this.type === 'info' ) {
+        img = 'images/round-error-blue.svg';
       } else {
-        img = 'images/checkmark-small-green.svg';
+        img = 'images/round-check-circle-green.svg';
       }
       this
         .addClass(this.myClass())
         .start().addClass(this.myClass('inner'))
           .enableClass(this.myClass('error-background'), this.type === 'error')
           .enableClass(this.myClass('warning-background'), this.type === 'warning')
+          .enableClass(this.myClass('info-background'), this.type === 'info')
+          .start('div').addClass(this.myClass('banner'))
+            .enableClass(this.myClass('error-banner'), this.type === 'error')
+            .enableClass(this.myClass('warning-banner'), this.type === 'warning')
+            .enableClass(this.myClass('info-banner'), this.type === 'info')
+          .end()
           .start()
             .start('img')
               .addClass(this.myClass('status-icon'))
               .attrs({ src: img })
             .end()
-            .start()
-              .addClass(this.myClass('content'))
+            .start().addClass(this.myClass('content'))
+              .enableClass(this.myClass('error-content'), this.type === 'error')
+              .enableClass(this.myClass('warning-content'), this.type === 'warning')
+              .enableClass(this.myClass('info-content'), this.type === 'info')
               .callIfElse(foam.String.isInstance(this.message), function() {
                 this.add(self.message);
               }, function() {
                 this.tag(self.message);
+              })
+            .end()
+            .start().addClass(this.myClass('description'))
+              .enableClass(this.myClass('error-content'), this.type === 'error')
+              .enableClass(this.myClass('warning-content'), this.type === 'warning')
+              .enableClass(this.myClass('info-content'), this.type === 'info')
+              .callIfElse(foam.String.isInstance(this.description), function() {
+                this.add(self.description);
+              }, function() {
+                this.tag(self.description);
               })
             .end()
           .end()
