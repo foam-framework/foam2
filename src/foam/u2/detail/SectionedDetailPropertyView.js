@@ -231,7 +231,6 @@ foam.CLASS({
           var errorSlot = prop.validateObj && prop.validationTextVisible ?
             this.data.slot(prop.validateObj) :
             foam.core.ConstantSlot.create({ value: null });
-          // debugger;
 
           return self.E()
             .start(self.Rows)
