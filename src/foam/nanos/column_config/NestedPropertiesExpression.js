@@ -36,6 +36,19 @@ foam.CLASS({
   ],
   methods: [
     {
+      name: 'toString',
+      code: function() {
+        var projectionString = this.cls_.name + '('
+          + this.objClass.id
+          + ', '
+          + this.nestedProperty + ')';
+        return projectionString;
+      },
+      javaCode: `
+        return getClassInfo().getId() + "(" + getObjClass().getId() + ", " + getNestedProperty() + ")";
+      `
+    },
+    {
       name: 'f',
       type: 'Any',
       code: function(obj) {
@@ -205,6 +218,6 @@ foam.CLASS({
         Expr[] exprs = returnArrayOfExprForArrayOfProperties(of, propNames);
         return new Projection.Builder(getX()).setExprs(exprs).build();
       `
-    },
+    }
   ]
 });

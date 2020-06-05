@@ -2664,6 +2664,11 @@ foam.CLASS({
   extends: 'foam.dao.AbstractSink',
   implements: [ 'foam.core.Serializable' ],
 
+  javaImports: [
+    'foam.mlang.Expr',
+    'java.util.StringJoiner'
+  ],
+
   properties: [
     {
       class: 'Array',
@@ -2695,6 +2700,30 @@ foam.CLASS({
           a[i] = getExprs()[i].f(obj);
 
         getArray().add(a);
+      `
+    },
+    {
+      name: 'toString',
+      code: function() {
+        var projectionString = this.cls_.name + '(';
+        var exprString = [];
+        for ( var expr of this.exprs ) {
+          exprString.push(expr.toString());
+        }
+        projectionString += exprString.join(', ') + ')';
+        return projectionString;
+      },
+      javaCode: `
+        StringBuilder sb = new StringBuilder(getClassInfo().getId() + "(");
+        StringJoiner joiner = new StringJoiner(", ");
+
+        for ( Expr expr : getExprs() ) {
+          joiner.add(expr.toString());
+        }
+
+        sb.append(joiner.toString());
+        sb.append(")");
+        return sb.toString();
       `
     }
   ]
