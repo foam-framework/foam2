@@ -250,7 +250,7 @@ foam.CLASS({
                   })
                 .end()
                 .callIf(prop.help || ( prop.helpMessage && prop.sourceCls_[prop.helpMessage] ), function() {
-                  var help = prop.helpMessage && prop.sourceCls_[prop.helpMessage] ? prop.sourceCls_[prop.helpMessage] : prop;
+                  var help = prop.helpMessage && prop.sourceCls_[prop.helpMessage] ? prop.sourceCls_[prop.helpMessage] : prop.help;
                   this.start()
                     .addClass(self.myClass('tooltip'))
                     .start({
