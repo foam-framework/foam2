@@ -22,7 +22,7 @@ foam.CLASS({
         event.setLastRun(script.getLastRun());
         event.setLastDuration(script.getLastDuration());
         event.setOutput(script.getOutput());
-        event.setType(script.getClass().getSimpleName());
+        event.setScriptType(script.getClass().getSimpleName());
         return getDelegate().put_(x, event);
       }
       return getDelegate().put_(x, obj);

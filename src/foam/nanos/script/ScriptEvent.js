@@ -15,7 +15,7 @@ foam.CLASS({
   ],
 
   tableColumns: [
-    'type',
+    'scriptType',
     'owner',
     'lastRun',
     'lastDuration'
@@ -29,7 +29,8 @@ foam.CLASS({
     },
     {
       docementation: `Set on event creation to the class name of the Script - Script, Cron, Test, for example.`,
-      name: 'type',
+      name: 'scriptType',
+      label: 'Type',
       class: 'String',
       visibility: 'RO',
       tableWidth: 100,
