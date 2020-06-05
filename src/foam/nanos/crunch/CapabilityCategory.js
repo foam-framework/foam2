@@ -52,7 +52,7 @@ foam.CLASS({
       javaFactory: `
         return new foam.nanos.auth.StandardAuthorizer(getClass().getSimpleName().toLowerCase());
       `,
-      readVisibility: true
+      readVisibility: 'HIDDEN'
     }
   ],
   
