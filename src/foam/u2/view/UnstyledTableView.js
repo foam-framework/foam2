@@ -242,6 +242,14 @@ foam.CLASS({
       factory: function() {
         return this.TableColumnOutputter.create();
       }
+    },
+    'props',
+    'dao',
+    { 
+      name: 'updateValues',
+      class: 'Boolean', 
+      value: false,
+      documentation: 'If isColumnChanged is changed, columns_ will be updated'
     }
   ],
 
@@ -260,6 +268,14 @@ foam.CLASS({
 
     async function initE() {
       var view = this;
+
+      view.columns_$.sub(function() {
+        var propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => c));
+        view.props = view.returnProperties(view, propertyNamesToQuery);
+        console.log('properties updated');
+        view.updateValuesProperty(view, view.dao, propertyNamesToQuery);
+      });
+
       //otherwise on adding new column creating new EditColumnsView, which is closed by default
       if (view.editColumnsEnabled)
         var editColumnView = foam.u2.view.EditColumnsView.create({data:view});
@@ -397,8 +413,10 @@ foam.CLASS({
           var view = this;
           var proxy = view.ProxyDAO.create({ delegate: dao });
 
+          view.dao = dao;
           var propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => c));
-          var props = view.returnProperties(view, propertyNamesToQuery);
+          view.props = view.returnProperties(view, propertyNamesToQuery);
+          console.log('dao update');
           await view.updateValuesProperty(view, proxy, propertyNamesToQuery);
 
           // Make sure the DAO set here responds to ordering when a user clicks
@@ -410,13 +428,13 @@ foam.CLASS({
             ? view.contextMenuActions.concat(modelActions)
             : modelActions;
           
-          view.columns_$.sub(function() {
-            propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => c));
-            props = view.returnProperties(view, propertyNamesToQuery);
-            view.updateValuesProperty(view, proxy, propertyNamesToQuery);
-          });
-          
-          return await this.slot(async function(order, values) {
+          //with this code error created  slot.get cause promise return
+          //FIX ME
+
+          //for now main suspect TTLCachingDAO
+          return await this.slot(async function(order, values, updateValues) {
+            console.log('values slot');
+            console.log(values);
             if ( this.order ) {
               var index = view.columns_.map(([c, o])  => c).indexOf(order.propName);
               if ( index !== -1 ) {
@@ -429,8 +447,8 @@ foam.CLASS({
             var element = this.
               E();
               element.
-              addClass(this.myClass('tbody')).
-              forEach(view.values, function(val) {
+              addClass(view.myClass('tbody')).
+              forEach(values, function(val) {
                 var element1 = this.E();
                 element1.
                 addClass(view.myClass('tr')).
@@ -530,10 +548,10 @@ foam.CLASS({
                     delete view.checkboxes_[val[0]];
                   });
                 });
-                for ( var  i = 1 ; i < props.length ; i++  ) {
+                for ( var  i = 1 ; i < view.props.length ; i++  ) {
                   element1.start().addClass(view.myClass('td'))
-                  .add(view.outputter.returnStringValueForProperty(props[i], val[i]))
-                  .style({flex: props[i] && props[i].tableWidth  ? `0 0 ${props[i].tableWidth}px` : '1 0 0'}).end();
+                  .add(view.outputter.returnStringValueForProperty(view.props[i], val[i]))
+                  .style({flex: view.props[i] && view.props[i].tableWidth  ? `0 0 ${view.props[i].tableWidth}px` : '1 0 0'}).end();
                 }
                 element1
                 .start()
@@ -553,11 +571,10 @@ foam.CLASS({
       },
       
       function updateValuesProperty(obj, dao, propertyNamesToQuery) {
-          //need to retrieve id for dblclick
-          //check if columns_ length 0 mb on line 388
           var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(obj.of, propertyNamesToQuery);
           dao.select(expr).then(function(s) {
             obj.values = s.array;
+            obj.updateValues = !obj.updateValues;
           });
       },
       function returnProperties(obj, propertyNamesToQuery) {
