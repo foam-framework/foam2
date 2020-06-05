@@ -59,10 +59,9 @@ foam.CLASS({
     {
       class: 'String',
       name: 'title',
-      expression: isMemoRequired => {
-        if (isMemoRequired)
-          return "Please provide a note (required)";
-        return "Please provide a note (optional)";
+      expression: function(isMemoRequired) {
+        if ( isMemoRequired ) return 'Please provide a note (required)';
+        return 'Please provide a note (optional)';
       }
     },
     {
@@ -88,7 +87,7 @@ foam.CLASS({
         .start()
           .addClass(this.myClass('main'))
           .start()
-            .addClass(this.myClass("title"))
+            .addClass(this.myClass('title'))
             .add(this.title)
           .end()
           .startContext({ data: this, controllerMode: this.ControllerMode.EDIT })
@@ -110,12 +109,10 @@ foam.CLASS({
       name: 'ok',
       isEnabled: (isMemoRequired, memo) => {
         if ( ! isMemoRequired ) return true;
-
-        return memo != "";
+        return memo != '';
       },
       code: function(X) {
         this.onExecute(this.memo);
-
         X.closeDialog();
       }
     },
