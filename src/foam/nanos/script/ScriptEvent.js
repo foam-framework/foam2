@@ -32,7 +32,6 @@ foam.CLASS({
       name: 'type',
       class: 'String',
       visibility: 'RO',
-      storageTrasient: true,
       tableWidth: 100,
     },
     {
