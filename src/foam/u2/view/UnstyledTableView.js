@@ -255,9 +255,10 @@ foam.CLASS({
 
   methods: [
     function sortBy(column, propName) {
-      this.order = { order: this.order === column ?
-        this.DESC(column) :
-        column, propName: propName};
+      this.order = { desc: this.order && this.order.fullPropName && this.order.fullPropName === propName && !this.order.desc ? true : false,
+        prop: column,
+        fullPropName: propName
+      };
     },
 
     function updateColumns() {
@@ -361,7 +362,7 @@ foam.CLASS({
                   callIf(column.label != '', function() {
                     this.start('img').attr('src', this.slot(function(order) {
                       return column === order ? view.ascIcon :
-                          (view.Desc.isInstance(order) && order.arg1 === column)
+                          ( order && order.desc )
                           ? view.descIcon : view.restingIcon;
                     }, view.order$)).end();
                   }).
@@ -432,12 +433,12 @@ foam.CLASS({
           //for now main suspect TTLCachingDAO
           return this.slot(function(order, values, updateValues) {
             if ( this.order ) {
-              var index = view.columns_.map(([c, o])  => c).indexOf(order.propName);
-              if ( index !== -1 ) {
-                if ( view.Desc.isInstance(order.order) )
-                  values.sort(function(a, b) { return a[index] < b[index] ? 1 : -1; });
+              var index = view.columns_.map(([c, o])  => c).indexOf(order.fullPropName) + 1;
+              if ( index !== 0 ) {
+                if ( order.desc )
+                  values.sort(function(a, b) { return order.prop.comparePropertyValues(b[index], a[index]); });
                 else
-                  values.sort(function(a, b) { return a[index] > b[index] ? 1 : -1; });
+                  values.sort(function(a, b) { return order.prop.comparePropertyValues(a[index], b[index]); });
               }
             }
             var element = this.
