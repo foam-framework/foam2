@@ -201,7 +201,6 @@ FOAM_FILES([
   { name: "foam/nanos/script/ScriptStatus" },
   { name: "foam/nanos/script/Script" },
   { name: "foam/nanos/script/ScriptEvent" },
-  { name: "foam/nanos/script/ScriptEventDAO" },
   { name: "foam/nanos/script/Relationships" },
   { name: "foam/nanos/script/TestRunnerConfig" },
   { name: "foam/nanos/script/TestRunnerScript" },

@@ -42,15 +42,18 @@ foam.CLASS({
   ],
 
   tableColumns: [
-    'id',
-    'server',
     'description',
+    'server',
     'lastDuration',
-    'status',
+    'lastRun',
     'run'
   ],
 
-  searchColumns: ['id', 'description'],
+  searchColumns: [
+    'id',
+    'description',
+    'server'
+  ],
 
   constants: [
     {
@@ -62,6 +65,19 @@ foam.CLASS({
       name: 'MAX_NOTIFICATION_OUTPUT_CHARS',
       type: 'Integer',
       value: 200
+    }
+  ],
+
+  sections: [
+    {
+      name: 'scriptEvents',
+      title: 'Events',
+      order: 2
+    },
+    {
+      name: '_defaultSection',
+      title: 'Info',
+      order: 1
     }
   ],
 
@@ -91,7 +107,12 @@ foam.CLASS({
       name: 'description',
       includeInDigest: false,
       documentation: 'Description of the script.',
-      tableWidth: 200
+      tableWidth: 200,
+      tableCellFormatter: function(value, obj) {
+        this.start()
+          .add( ! obj.description ? obj.id : obj.description )
+          .end();
+      }
     },
     {
       class: 'Int',
@@ -118,7 +139,6 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'lastRun',
-      includeInDigest: false,
       documentation: 'Date and time the script ran last.',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
@@ -128,7 +148,6 @@ foam.CLASS({
     {
       class: 'Duration',
       name: 'lastDuration',
-      includeInDigest: false,
       documentation: 'Date and time the script took to complete.',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
@@ -321,7 +340,16 @@ foam.CLASS({
           setLastDuration(pm.getTime());
           ps.flush();
           setOutput(baos.toString());
-          ((DAO) x.get("scriptEventDAO")).put_(x, this);
+
+          ScriptEvent event = new ScriptEvent(x);
+          event.setLastRun(this.getLastRun());
+          event.setLastDuration(this.getLastDuration());
+          event.setOutput(this.getOutput());
+          event.setScriptType(this.getClass().getSimpleName());
+          event.setOwner(this.getId());
+          event.setScriptId(this.getId());
+          event.setHostname(System.getProperty("hostname", "localhost"));
+          ((DAO) x.get("scriptEventDAO")).put(event);
         } finally {
           Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
         }

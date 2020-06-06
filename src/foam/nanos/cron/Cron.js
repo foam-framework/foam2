@@ -20,16 +20,21 @@ foam.CLASS({
   documentation: 'FOAM class that models a Cron script',
 
   tableColumns: [
-    'id',
-    'enabled',
     'description',
+    'enabled',
     'lastDuration',
+    'lastRun',
     'status',
     'scheduledTime',
     'run'
   ],
 
-  searchColumns: ['id', 'description'],
+  searchColumns: [
+    'id',
+    'description',
+    'enabled',
+    'status'
+  ],
 
   sections: [
     {
@@ -38,7 +43,13 @@ foam.CLASS({
       order: 2
     },
     {
+      name: 'scriptEvents',
+      title: 'Events',
+      order: 3
+    },
+    {
       name: '_defaultSection',
+      title: 'Info',
       order: 1
     }
   ],
