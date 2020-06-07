@@ -32,7 +32,7 @@ foam.CLASS({
       class: 'Boolean' 
     },
     'parentId',
-    'view'
+    'columnConfigPropView'
   ],
   methods: [
     function closeDropDown(e) {
@@ -45,7 +45,7 @@ foam.CLASS({
       this.SUPER();
 
       var self = this;
-      this.view = foam.u2.view.ColumnConfigPropView.create({data:self.data});
+      this.columnConfigPropView = foam.u2.view.ColumnConfigPropView.create({data:self.data});
       this.start()
         .show(this.selectColumnsExpanded$)
         .addClass(this.myClass('drop-down-bg'))
@@ -61,7 +61,7 @@ foam.CLASS({
             'max-height': window.innerHeight - 100 > 0 ? window.innerHeight - 100 : window.innerHeight + 'px',
             'width': '300px'
           })
-          .add(this.view)
+          .add(this.columnConfigPropView)
         .end()
       .on('click', this.closeDropDown.bind(this))
       .end();
