@@ -37,7 +37,7 @@ foam.CLASS({
   methods: [
     function closeDropDown(e) {
       e.stopPropagation();
-      this.view.onClose();
+      this.columnConfigPropView.onClose();
       this.selectColumnsExpanded = ! this.selectColumnsExpanded;
     },
 
