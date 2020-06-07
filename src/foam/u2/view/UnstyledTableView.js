@@ -429,8 +429,6 @@ foam.CLASS({
           
           //with this code error created  slot.get cause promise return
           //FIX ME
-
-          //for now main suspect TTLCachingDAO
           return this.slot(function(order, values, updateValues) {
             if ( this.order ) {
               var index = view.columns_.map(([c, o])  => c).indexOf(order.fullPropName) + 1;
@@ -441,13 +439,13 @@ foam.CLASS({
                   values.sort(function(a, b) { return order.prop.comparePropertyValues(a[index], b[index]); });
               }
             }
-            var element = this.
+            var tbodyElement = this.
               E();
-              element.
+              tbodyElement.
               addClass(view.myClass('tbody')).
               forEach(values, function(val) {
-                var element1 = this.E();
-                element1.
+                var tableRowElement = this.E();
+                tableRowElement.
                 addClass(view.myClass('tr')).
                 on('mouseover', function() {
                   dao.find(val[0]).then(v => {
@@ -455,12 +453,12 @@ foam.CLASS({
                   });
                 }).
                 callIf(view.dblclick && ! view.disableUserSelection, function() {
-                  element1.on('dblclick', function() {
+                  tableRowElement.on('dblclick', function() {
                     view.dblclick && view.dblclick(val[0]);
                   });
                 }).
                 callIf( ! view.disableUserSelection, function() {
-                  element1.on('click', function(evt) {
+                  tableRowElement.on('click', function(evt) {
                     // If we're clicking somewhere to close the context menu,
                     // don't do anything.
                     if (
@@ -486,7 +484,7 @@ foam.CLASS({
                 // Checkbox in the first cell of each row.
                 callIf(view.multiSelectEnabled, function() {
                   var slot = view.SimpleSlot.create();
-                  element1
+                  tableRowElement
                     .start()
                       .addClass(view.myClass('td'))
                       .tag(view.CheckBox, { data: view.idsOfObjectsTheUserHasInteractedWith_[val[0]] ? !!view.selectedObjects[val[0]] : view.allCheckBoxesEnabled_ }, slot)
@@ -546,11 +544,11 @@ foam.CLASS({
                   });
                 });
                 for ( var  i = 1 ; i < view.props.length ; i++  ) {
-                  element1.start().addClass(view.myClass('td'))
+                  tableRowElement.start().addClass(view.myClass('td'))
                   .add(view.outputter.returnStringValueForProperty(view.props[i], val[i]))
                   .style({flex: view.props[i] && view.props[i].tableWidth  ? `0 0 ${view.props[i].tableWidth}px` : '1 0 0'}).end();
                 }
-                element1
+                tableRowElement
                 .start()
                   .addClass(view.myClass('td')).
                   attrs({ name: 'contextMenuCell' }).
@@ -560,9 +558,9 @@ foam.CLASS({
                     obj: val[0]//FIX ME
                   }).
                 end();
-                element.add(element1);
+                tbodyElement.add(tableRowElement);
               });
-              return element;
+              return tbodyElement;
             });
         }
       },
