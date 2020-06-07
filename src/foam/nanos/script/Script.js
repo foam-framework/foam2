@@ -107,7 +107,7 @@ foam.CLASS({
       name: 'description',
       includeInDigest: false,
       documentation: 'Description of the script.',
-      tableWidth: 200,
+      tableWidth: 300,
       tableCellFormatter: function(value, obj) {
         this.start()
           .add( ! obj.description ? obj.id : obj.description )
