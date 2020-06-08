@@ -24,7 +24,7 @@ import net.nanopay.bench.*;
 
 x = x.put("pmLogger", null);
 b = new FileJournalBenchmark();
-builder = new BenchmarkRunner.Builder(x).setInvocationCount(10000).setBenchmark(b);
+builder = new BenchmarkRunner.Builder(x).setInvocationCount(100000).setBenchmark(b);
 runner = builder.build();
 runner.execute(x);
 print("done");
@@ -42,7 +42,7 @@ import net.nanopay.bench.*;
 
 x = x.put("pmLogger", null);
 b = new F3FileJournalBenchmark();
-builder = new BenchmarkRunner.Builder(x).setInvocationCount(10000).setBenchmark(b);
+builder = new BenchmarkRunner.Builder(x).setInvocationCount(100000).setBenchmark(b);
 runner = builder.build();
 runner.execute(x);
 print("done");
@@ -61,7 +61,7 @@ import foam.nanos.pm.PM;
 
 x = x.put("pmLogger", null);
 PMBenchmark b = new PMBenchmark();
-builder = new BenchmarkRunner.Builder(x).setInvocationCount(10000).setBenchmark(b);
+builder = new BenchmarkRunner.Builder(x).setInvocationCount(100000).setBenchmark(b);
 runner = builder.build();
 runner.execute(x);""",
   "lastModifiedBy": 1348
