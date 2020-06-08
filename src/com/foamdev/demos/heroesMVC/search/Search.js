@@ -5,9 +5,9 @@
  */
 
 foam.CLASS({
-  package: 'com.google.foam.demos.heroes.search',
+  package: 'com.foamdev.demos.heroes.search',
   name: 'Search',
-  
+
   properties: [
     {
       class: 'String',
