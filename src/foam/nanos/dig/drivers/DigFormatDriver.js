@@ -123,12 +123,19 @@ foam.CLASS({
       args: [ { name: 'x', type: 'X' } ],
       javaCode: `
       HttpParameters p = x.get(HttpParameters.class);
+      HttpServletResponse resp = x.get(HttpServletResponse.class);
       Command command = (Command) p.get(Command.class);
       String id = p.getParameter("id");
       String q = p.getParameter("q");
       String limit = p.getParameter("limit");
       String skip = p.getParameter("skip");
+      String daoName = p.getParameter("dao");
       
+      if ( SafetyUtil.isEmpty(daoName) ) {
+        resp.setStatus(HttpServletResponse.SC_OK);
+        return;
+      }
+
       DAO dao = getDAO(x);
       if ( dao == null )
         return;
@@ -167,7 +174,6 @@ foam.CLASS({
       out.flush();
       ((Logger) x.get("logger")).debug(this.getClass().getSimpleName(), "success");
       
-      HttpServletResponse resp = x.get(HttpServletResponse.class);
       resp.setStatus(HttpServletResponse.SC_OK);
       `
     },
