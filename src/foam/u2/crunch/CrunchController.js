@@ -19,7 +19,7 @@ foam.CLASS({
     'ctrl',
     'prerequisiteCapabilityJunctionDAO',
     'stack',
-    'user',
+    'subject',
     'userCapabilityJunctionDAO'
   ],
 
@@ -75,7 +75,7 @@ foam.CLASS({
 
       var ucj = await this.userCapabilityJunctionDAO.find(
         this.AND(
-          this.EQ(this.UserCapabilityJunction.SOURCE_ID, this.user ? this.user.id : 0),
+          this.EQ(this.UserCapabilityJunction.SOURCE_ID, this.subject.realUser.id),
           this.EQ(this.UserCapabilityJunction.TARGET_ID, capabilityId)
         ));
 
@@ -106,8 +106,10 @@ foam.CLASS({
 
         ]);
       }).then(capabilitiesSectionsTuple => {
+        // Two values from Promise.all call above
         let capabilities = capabilitiesSectionsTuple[0];
         let sections = capabilitiesSectionsTuple[1];
+
         return new Promise((wizardResolve) => {
           sections = sections.filter(wizardSection =>
             wizardSection.ucj === null || 
@@ -126,7 +128,7 @@ foam.CLASS({
               // Save no-data capabilities (i.e. not displayed in wizard)
               Promise.all(capabilities.filter(cap => ! cap.of).map(
                 cap => self.userCapabilityJunctionDAO.put(self.UserCapabilityJunction.create({
-                  sourceId: self.user.id,
+                  sourceId: self.subject.realUser.id,
                   targetId: cap.id
                 })).then(() => {
                   console.log('SAVED (no-data cap)', cap.id);
