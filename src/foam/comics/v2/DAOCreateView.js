@@ -29,7 +29,7 @@ foam.CLASS({
 
     ^ .foam-u2-ActionView-back {
       display: flex;
-      align-items: center;
+      align-self: flex-start;
     }
 
     ^account-name {
