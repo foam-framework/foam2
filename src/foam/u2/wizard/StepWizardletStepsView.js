@@ -71,7 +71,7 @@ foam.CLASS({
                     borderColor: this.theme.grey2,
                   } : {
                     ...baseCircleIndicator,
-                    borderColor: wizardlet.readyToSubmit()
+                    borderColor: wizardlet.validate()
                       ? this.theme.approval2 : this.theme.warning2
                   }
                 )

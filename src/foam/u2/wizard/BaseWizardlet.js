@@ -12,15 +12,21 @@ foam.CLASS({
     'foam.u2.wizard.Wizardlet'
   ],
 
-  methods: [
+  properties: [
     {
-      name: 'readyToSubmit',
-      code: function () {
-        // Always return true if `of` is falsy; this implies there is no data to validate
-        if ( ! this.of ) return true;
-        if ( ! this.data || this.data.errors_ ) return false;
-        return true;
-      }
+      name: 'mustBeValid',
+      class: 'Boolean'
+    }
+  ],
+
+  methods: [
+    function validate() {
+      var valid = this.SUPER();
+      if ( ! valid ) return false;
+      if ( ! this.mustBeValid ) return true;
+      if ( ! this.of ) return true;
+      if ( ! this.data || this.data.errors_ ) return false;
+      return true;
     }
   ]
 });
