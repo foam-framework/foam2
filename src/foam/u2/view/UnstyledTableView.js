@@ -273,9 +273,8 @@ foam.CLASS({
       view.columns_$.sub(function() {
         var propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => c));
         view.props = view.returnProperties(view, propertyNamesToQuery);
-        view.updateValuesProperty(view, view.dao, propertyNamesToQuery);
+        view.updateValues = !view.updateValues;
       });
-
       //otherwise on adding new column creating new EditColumnsView, which is closed by default
       if (view.editColumnsEnabled)
         var editColumnView = foam.u2.view.EditColumnsView.create({data:view});
@@ -413,13 +412,6 @@ foam.CLASS({
           var view = this;
           var proxy = view.ProxyDAO.create({ delegate: dao });
 
-          var propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => c));
-          view.props = view.returnProperties(view, propertyNamesToQuery);
-          var valPromises = view.returnRecords(proxy, propertyNamesToQuery);
-          // Make sure the DAO set here responds to ordering when a user clicks
-          // on a table column header to sort by that column.
-          // if ( this.order ) dao = dao.orderBy(this.order);
-          
           var modelActions = view.of.getAxiomsByClass(foam.core.Action);
           var actions = Array.isArray(view.contextMenuActions)
             ? view.contextMenuActions.concat(modelActions)
@@ -428,6 +420,13 @@ foam.CLASS({
           //with this code error created  slot.get cause promise return
           //FIX ME
           return this.slot(function(order, updateValues) {
+            var propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => c));
+            view.props = view.returnProperties(view, propertyNamesToQuery);
+            var valPromises = view.returnRecords(proxy, propertyNamesToQuery);
+            // Make sure the DAO set here responds to ordering when a user clicks
+            // on a table column header to sort by that column.
+            // if ( this.order ) dao = dao.orderBy(this.order);
+            
             var tbodyElement = this.
               E();
               tbodyElement.
