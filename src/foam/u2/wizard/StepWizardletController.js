@@ -151,7 +151,7 @@ foam.CLASS({
           return this.next().then(skipEmptyWizardlets);
         }
       };
-      f();
+      skipEmptyWizardlets();
     },
     function saveProgress() {
       var p = Promise.resolve();
