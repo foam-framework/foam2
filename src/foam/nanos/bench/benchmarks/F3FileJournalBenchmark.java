@@ -22,7 +22,7 @@ public class F3FileJournalBenchmark
     dao_ = new NullDAO();
     journal_ = new F3FileJournal.Builder(x)
       .setDao(new MDAO(User.getOwnClassInfo()))
-      .setFilename("journalbenchmark")
+      .setFilename("f3journalbenchmark")
       .setCreateFile(true)
       .build();
   }
