@@ -226,8 +226,7 @@ try {
         .append("p(")
         .append(record)
         .append(")")
-        .append(c)
-        .toString());
+        .append(c));
       `
     },
     {
