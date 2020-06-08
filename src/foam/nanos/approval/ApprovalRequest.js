@@ -47,6 +47,7 @@
     'ctrl',
     'currentMenu',
     'stack',
+    'summaryView?',
     'objectSummaryView?'
   ],
 
@@ -320,10 +321,8 @@
       view: { class: 'foam.u2.tag.TextArea', rows: 5, cols: 80 },
       documentation: 'Meant to be used for explanation on why request was approved/rejected',
       section: 'supportDetails',
-      visibility: function(memo, status) {
-        if ( status == foam.nanos.approval.ApprovalStatus.REQUESTED ) {
-          return foam.u2.DisplayMode.RW;
-        } else if ( memo ) {
+      visibility: function(memo) {
+        if ( memo ) {
           return foam.u2.DisplayMode.RO;
         } else {
           return foam.u2.DisplayMode.HIDDEN;
@@ -580,7 +579,9 @@
         return ! isTrackingRequest;
       },
       code: function(X) {
-        this.objectSummaryView.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
+        var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
+
+        objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
           class: "foam.u2.MemoModal",
           onExecute: this.approveWithMemo.bind(this)
         }));
@@ -600,7 +601,9 @@
         return ! isTrackingRequest;
       },
       code: function(X) {
-        this.objectSummaryView.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
+        var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
+
+        objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
           class: "foam.u2.MemoModal",
           onExecute: this.rejectWithMemo.bind(this),
           isMemoRequired: true

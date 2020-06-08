@@ -5,7 +5,6 @@ p({
   "serve":true,
   "serviceScript":"""
     return new foam.dao.EasyDAO.Builder(x)
-      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("prerequisiteCapabilityJunction"))
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("capabilityCategories")
       .setOf(foam.nanos.crunch.CapabilityCategory.getOwnClassInfo())
@@ -56,7 +55,7 @@ p({
   "description": "DAO responsible for storing capabilities' categories.",
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
-      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("prerequisiteCapabilityJunction"))
+      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("capabilityCategoryCapabilityJunction"))
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("capabilityCategoryCapabilityJunction")
       .setOf(foam.nanos.crunch.CapabilityCategoryCapabilityJunction.getOwnClassInfo())
