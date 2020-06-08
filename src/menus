@@ -156,7 +156,8 @@ p({
       "class":"foam.comics.v2.DAOControllerConfig",
       "daoKey":"digDAO",
       "browseTitle": "DIG API Calls",
-      "browseSubtitle": "An API endpoint that supports all DAO operations."
+      "browseSubtitle": "An API endpoint that supports all DAO operations.",
+      "createTitle": "Create a New API Call"
     }
   },
   "parent":"integration"
@@ -174,7 +175,8 @@ p({
         "class": "foam.mlang.predicate.IsInstanceOf",
         "targetClass": "foam.nanos.dig.DUGRule",
         "browseTitle": "DUG Webhooks",
-        "browseSubtitle": "Webhooks triggered by DAO operations."
+        "browseSubtitle": "Webhooks triggered by DAO operations.",
+        "createTitle": "Create a New Webhook"
       },
       "of": "foam.nanos.dig.DUGRule"
     }
