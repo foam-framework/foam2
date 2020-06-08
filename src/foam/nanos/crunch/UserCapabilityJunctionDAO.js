@@ -107,9 +107,9 @@ foam.CLASS({
 
         checkOwnership(x, ucJunction);
 
-        // if the junction is being updated from GRANTED to EXPIRED, put the updated ucj,
+        // if the junction is being updated from GRANTED to something else, put the updated ucj,
         // then try to reput the ucj as new ucj
-        if ( old != null && old.getStatus() == CapabilityJunctionStatus.GRANTED && ucJunction.getStatus() == CapabilityJunctionStatus.EXPIRED ) {
+        if ( old != null && old.getStatus() == CapabilityJunctionStatus.GRANTED && ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED ) {
           getDelegate().put_(x, ucJunction);
           old = null;
         }
@@ -377,15 +377,13 @@ foam.CLASS({
     {
       name: 'remove_',
       javaCode: `
-        checkOwnership(x, (UserCapabilityJunction) obj);
-        return super.remove_(x, obj);
+        throw new UnsupportedOperationException("UserCapabilityJunctions should be disabled via status change.");
       `
     },
     {
       name: 'removeAll_',
       javaCode: `
-        DAO dao = getFilteredDAO(x);
-        dao.removeAll_(x, skip, limit, order, predicate);
+        throw new UnsupportedOperationException("UserCapabilityJunctions should be disabled via status change.");
       `
     },
     {

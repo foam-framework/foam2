@@ -583,6 +583,7 @@ var classes = [
   'foam.nanos.crunch.SendNotificationOnTopLevelCapabilityStatusUpdate',
   'foam.nanos.crunch.IsUserCapabilityJunctionStatusUpdate',
   'foam.nanos.crunch.RemoveJunctionsOnUserRemoval',
+  'foam.nanos.crunch.InvalidateDependenciesIfPrerequisiteInvalidated',
   //authservice
   'foam.nanos.auth.CapabilityAuthService',
   // userQueryService
