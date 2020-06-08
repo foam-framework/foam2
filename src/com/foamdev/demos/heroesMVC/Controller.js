@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'com.google.foam.demos.heroesMVC',
+  package: 'com.google.foam.demos.heroesMVC',//TODO fix the paackage name changement
   name: 'Controller',
   extends: 'foam.u2.Element',
 

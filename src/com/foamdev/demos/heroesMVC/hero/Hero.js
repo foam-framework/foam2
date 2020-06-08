@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'com.google.foam.demos.heroesMVC.hero',
+  package: 'com.google.foam.demos.heroesMVC.hero',////TODO fix the paackage name changement
   name: 'Hero',
 
   properties: [
