@@ -14,13 +14,13 @@ foam.CLASS({
   ],
 
   requires: [
-    'com.google.foam.demos.heroesMVC.hero.ui.CitationView',
+    'com.foamdev.demos.heroesMVC.hero.ui.CitationView',
 
-    'com.google.foam.demos.heroesMVC.hero.ui.DetailHeroView',
-    //'com.google.foam.demos.heroesMVC.Search',
-    'com.google.foam.demos.heroesMVC.Heroes',
+    'com.foamdev.demos.heroesMVC.hero.ui.DetailHeroView',
+    //'com.foamdev.demos.heroesMVC.Search',
+    'com.foamdev.demos.heroesMVC.Heroes',
 
-    'com.google.foam.demos.heroesMVC.hero.ui.DashboardCitationView',
+    'com.foamdev.demos.heroesMVC.hero.ui.DashboardCitationView',
     'com.google.foam.demos.heroesMVC.hero.Hero',
     'foam.dao.ArrayDAO',
     'foam.dao.EasyDAO',
@@ -116,14 +116,14 @@ foam.CLASS({
       },
       view: {
         class: 'foam.u2.DAOList',
-        rowView: { class: 'com.google.foam.demos.heroesMVC.hero.ui.CitationView' }
+        rowView: { class: 'com.foamdev.demos.heroesMVC.hero.ui.CitationView' }
       }
     },
     {//TODO the same as filteredDAO
       name: 'starredHeroDAO',
       view: {
         class: 'foam.u2.DAOList',
-        rowView: { class: 'com.google.foam.demos.heroesMVC.hero.ui.DashboardCitationView' }
+        rowView: { class: 'com.foamdev.demos.heroesMVC.hero.ui.DashboardCitationView' }
       },
       expression: function(filteredDAO) { return filteredDAO.where(this.EQ(this.Hero.STARRED, true)); }
     },
@@ -144,14 +144,14 @@ foam.CLASS({
         start('h2').add('Tour of Heroes').end().
           // TODO: start(this.HEROES) and set class
         add('Search: ', this.QUERY).
-        //start(com.google.foam.demos.heroesMVC.SearchView, {data: this.query}).end().//, {data: this.selection}
+        //start(com.foamdev.demos.heroesMVC.SearchView, {data: this.query}).end().//, {data: this.selection}
         br().
-        start(com.google.foam.demos.heroesMVC.NavigationView).end().
+        start(com.foamdev.demos.heroesMVC.NavigationView).end().
 
         add(this.slot(function(selection, mode) {
-          return selection       ? this.E().start(com.google.foam.demos.heroesMVC.hero.ui.DetailHeroView, {data: this.selection}): //this.detailE()    :
-            mode === 'dashboard' ? this.E().start(com.google.foam.demos.heroesMVC.hero.ui.DashboardHeroView, {data: this.STARRED_HERO_DAO}): //this.dashboardE() :
-                                   this.E().start(com.google.foam.demos.heroesMVC.hero.ui.HeroesView, {data: this.data}); //this.heroesE()    ;
+          return selection       ? this.E().start(com.foamdev.demos.heroesMVC.hero.ui.DetailHeroView, {data: this.selection}): //this.detailE()    :
+            mode === 'dashboard' ? this.E().start(com.foamdev.demos.heroesMVC.hero.ui.DashboardHeroView, {data: this.STARRED_HERO_DAO}): //this.dashboardE() :
+                                   this.E().start(com.foamdev.demos.heroesMVC.hero.ui.HeroesView, {data: this.data}); //this.heroesE()    ;
         }));
     },
     function editHero(hero) {

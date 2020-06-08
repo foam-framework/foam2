@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'com.google.foam.demos.heroesMVC.hero.ui',
+  package: 'com.foamdev.demos.heroesMVC.hero.ui',
   name: 'DashboardCitationView',
   extends: 'foam.u2.View',
 

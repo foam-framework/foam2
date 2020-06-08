@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'com.google.foam.demos.heroesMVC.hero.ui',
+  package: 'com.foamdev.demos.heroesMVC.hero.ui',
   name: 'DashboardHeroView',
   extends: 'foam.u2.Element',
 
@@ -46,14 +46,14 @@ foam.CLASS({
       },
       view: {
         class: 'foam.u2.DAOList',
-        rowView: { class: 'com.google.foam.demos.heroesMVC.hero.ui.CitationView' }
+        rowView: { class: 'com.foamdev.demos.heroesMVC.hero.ui.CitationView' }
       }
     },
     {
       name: 'starredHeroDAO',
       view: {
         class: 'foam.u2.DAOList',
-        rowView: { class: 'com.google.foam.demos.heroesMVC.hero.ui.DashboardCitationView' }
+        rowView: { class: 'com.foamdev.demos.heroesMVC.hero.ui.DashboardCitationView' }
       },
       expression: function(filteredDAO) { return filteredDAO.where(this.EQ(this.Hero.STARRED, true)); }
     }

@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'com.google.foam.demos.heroesMVC',
+  package: 'com.foamdev.demos.heroesMVC',
   name: 'NavigationView',
   extends: 'foam.u2.Element',
 
@@ -65,7 +65,7 @@ foam.CLASS({
   ],
 
   actions: [
-    {//TODO did we need to import mode? or back? 
+    {//TODO did we need to import mode? or back?
      //(since this is an action, this refer to the controller object; can you confirm???)
       name: 'dashboard',
       isEnabled: function(mode) { return mode != 'dashboard'; },
