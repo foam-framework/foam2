@@ -555,7 +555,8 @@ foam.CLASS({
                     style({ flex: `0 0 ${view.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH}px` }).
                     tag(view.OverlayActionListView, {
                       data: actions,
-                      obj: val[0]//FIX ME
+                      objId: val[0],
+                      dao: dao 
                     }).
                   end();
                   tbodyElement.add(tableRowElement);
