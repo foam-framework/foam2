@@ -143,12 +143,12 @@ foam.CLASS({
       });
 
       // If the first screen has no available sections, move next and repeat.
-      var f;
-      f = () => {
+      var skipEmptyWizardlets;
+      skipEmptyWizardlets = () => {
         var currentWizardletIndex =
           this.screenIndexToSection(this.subStack.pos)[0];
         if ( this.countAvailableSections(currentWizardletIndex) < 1 ) {
-          return this.next().then(f);
+          return this.next().then(skipEmptyWizardlets);
         }
       };
       f();
@@ -232,13 +232,13 @@ foam.CLASS({
       return true;
     },
     function skipTo(screenIndex) {
-      var f;
-      f = () => {
+      var skipToScreenRecur;
+      skipToScreenRecur = () => {
         if ( this.subStack.pos !== screenIndex ) {
-          return this.next().then(f);
+          return this.next().then(skipToScreenRecur);
         }
       };
-      return f();
+      return skipToScreenRecur(); // call recursive function
     },
     function back() {
       this.subStack.back();
@@ -256,7 +256,9 @@ foam.CLASS({
         }
         i += nSections;
       }
-      return null;
+      throw new Error(
+        `Tried to get wizard screen at index ${i} but it doesn't exist`
+      );
     },
 
     function sectionToScreenIndex(wizardletIndex, sectionIndex) {
