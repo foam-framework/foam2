@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'com.google.foam.demos.heroesMVC.hero.Hero.ui',
+  package: 'com.google.foam.demos.heroesMVC.hero.ui',
   name: 'HeroesView',
   extends: 'foam.u2.Element',
 

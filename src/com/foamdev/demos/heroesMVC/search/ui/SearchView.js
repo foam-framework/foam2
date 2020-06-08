@@ -65,14 +65,14 @@ foam.CLASS({
       },
       view: {
         class: 'foam.u2.DAOList',
-        rowView: { class: 'com.google.foam.demos.heroesMVC.hero.Hero.ui.CitationView' }
+        rowView: { class: 'com.google.foam.demos.heroesMVC.hero.ui.CitationView' }
       }
     },
     {
       name: 'starredHeroDAO',
       view: {
         class: 'foam.u2.DAOList',
-        rowView: { class: 'com.google.foam.demos.heroesMVC.hero.Hero.ui.DashboardCitationView' }
+        rowView: { class: 'com.google.foam.demos.heroesMVC.hero.ui.DashboardCitationView' }
       },
       expression: function(filteredDAO) { return filteredDAO.where(this.EQ(this.Hero.STARRED, true)); }
     },*/

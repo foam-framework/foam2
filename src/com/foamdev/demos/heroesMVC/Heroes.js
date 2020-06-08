@@ -35,7 +35,7 @@ foam.CLASS({
     {
       name: 'heroDAO',
       factory: function() {
-        return this.EasyDAO.create({//TypeError: self.log is not a function 
+        return this.EasyDAO.create({//TypeError: self.log is not a function
           //TODO LoggingDAO is a new feature that cause this problem
           of: com.google.foam.demos.heroesMVC.hero.Hero,
           seqNo: true,
@@ -60,7 +60,7 @@ foam.CLASS({
       },
       view: {
         class: 'foam.u2.DAOList',
-        rowView: { class: 'com.google.foam.demos.heroesMVC.hero.Hero.ui.CitationView' }
+        rowView: { class: 'com.google.foam.demos.heroesMVC.hero.ui.CitationView' }
       }
     },
     /*{//TODO should be moved to DAO model
@@ -71,14 +71,14 @@ foam.CLASS({
       },
       view: {
         class: 'foam.u2.DAOList',
-        rowView: { class: 'com.google.foam.demos.heroesMVC.hero.Hero.ui.CitationView' }
+        rowView: { class: 'com.google.foam.demos.heroesMVC.hero.ui.CitationView' }
       }
     },
     {//TODO the same as filteredDAO
       name: 'starredHeroDAO',
       view: {
         class: 'foam.u2.DAOList',
-        rowView: { class: 'com.google.foam.demos.heroesMVC.hero.Hero.ui.DashboardCitationView' }
+        rowView: { class: 'com.google.foam.demos.heroesMVC.hero.ui.DashboardCitationView' }
       },
       expression: function(filteredDAO) { return filteredDAO.where(this.EQ(this.Hero.STARRED, true)); }
     },*/
