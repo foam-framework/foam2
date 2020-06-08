@@ -2,6 +2,10 @@ foam.CLASS({
   package: 'foam.nanos.column',
   name: 'TableColumnOutputter',
 
+  imports: [
+    'currencyDAO',
+  ],
+
   documentation: 'Class for returning 2d-array ( ie table ) for array of values ',
 
   methods: [
@@ -9,10 +13,18 @@ foam.CLASS({
       name: 'returnStringValueForProperty',
       type: 'String',
       documentation: 'Method that converts value to string',
-      code: async function(prop, val) {
+      code: async function(prop, val, unitPropName) {
         if ( val ) {
           if ( foam.core.UnitValue.isInstance(prop) ) {
-            return ( val / 100 ).toString() + ' ' + prop.destinationCurrency;
+            if ( unitPropName ) {
+              if ( prop.unitPropName === "destinationCurrency" ) {
+                var currency = await this.currencyDAO.find(unitPropName);
+                if ( !currency ) return unitPropName + ' ' +( val / 100 ).toString();
+                return currency.format(val);
+              }
+              return unitPropName + ' ' +( val / 100 ).toString();
+            }
+            return ( val / 100 ).toString();
           }
           if ( foam.core.Date.isInstance(prop) ) {
             return val.toISOString().substring(0, 10);

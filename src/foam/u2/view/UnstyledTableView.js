@@ -422,6 +422,13 @@ foam.CLASS({
           return this.slot(function(order, updateValues) {
             var propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => c));
             view.props = view.returnProperties(view, propertyNamesToQuery);
+
+            var unitValueProperties = view.props.filter( p => foam.core.UnitValue.isInstance(p) ); 
+
+            var numberOfColumns = propertyNamesToQuery.length;
+
+            //to retrieve value of unitProp
+            unitValueProperties.forEach(p => propertyNamesToQuery.push(p.unitPropName));
             var valPromises = view.returnRecords(proxy, propertyNamesToQuery);
             // Make sure the DAO set here responds to ordering when a user clicks
             // on a table column header to sort by that column.
@@ -543,9 +550,15 @@ foam.CLASS({
                       delete view.checkboxes_[val[0]];
                     });
                   });
-                  for ( var  i = 1 ; i < view.props.length ; i++  ) {
+                  for ( var  i = 1 ; i < numberOfColumns ; i++  ) {
+                    var stringValue;
+                    if ( foam.core.UnitValue.isInstance(view.props[i]) ) {
+                      var indexOfUnitName = propertyNamesToQuery.indexOf(view.props[i].unitPropName);
+                      stringValue = view.outputter.returnStringValueForProperty(view.props[i], val[i], val[indexOfUnitName]);
+                    } else
+                      stringValue = view.outputter.returnStringValueForProperty(view.props[i], val[i]);
                     tableRowElement.start().addClass(view.myClass('td'))
-                    .add(view.outputter.returnStringValueForProperty(view.props[i], val[i]))
+                    .add(stringValue)
                     .style({flex: view.props[i] && view.props[i].tableWidth  ? `0 0 ${view.props[i].tableWidth}px` : '1 0 0'}).end();
                   }
                   tableRowElement
