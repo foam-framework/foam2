@@ -172,8 +172,11 @@ try {
 
           public void executeJob() {
             try {
-              if ( old != null ) fmt.outputDelta(old, obj);
-              else fmt.output(obj);
+              if ( old != null ) {
+                fmt.outputDelta(old, obj);
+              } else {
+                fmt.output(obj);
+              }
             } catch (Throwable t) {
               getLogger().error("Failed to write put entry to journal", t);
               fmt.reset();
