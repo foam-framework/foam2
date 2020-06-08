@@ -21,8 +21,10 @@ foam.CLASS({
 
   methods: [
     function validate() {
+      /* breaks everything; not sure why
       var valid = this.SUPER();
       if ( ! valid ) return false;
+      */
       if ( ! this.mustBeValid ) return true;
       if ( ! this.of ) return true;
       if ( ! this.data || this.data.errors_ ) return false;

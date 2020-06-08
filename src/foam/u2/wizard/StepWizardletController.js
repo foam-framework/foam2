@@ -227,7 +227,7 @@ foam.CLASS({
       let currentWizardletIndex =
         this.screenIndexToSection(this.subStack.pos)[0];
       for ( let w = currentWizardletIndex ; w <= wizardletIndex ; w++ ) {
-        if ( ! this.wizardlets[w].readyToSubmit() ) return false;
+        if ( ! this.wizardlets[w].validate() ) return false;
       }
       return true;
     },
