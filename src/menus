@@ -137,7 +137,15 @@ p({
 })
 
 // integration
-p({"class":"foam.nanos.menu.Menu","id":"integration","label":"Integration","handler":{"class":"foam.nanos.menu.SubMenu"},"parent":""})
+p({
+  "class":"foam.nanos.menu.Menu",
+  "id":"integration",
+  "label":"Integration",
+  "handler":{
+    "class":"foam.nanos.menu.SubMenu"
+  },
+  "parent":""
+})
 p({
   "class":"foam.nanos.menu.Menu",
   "id":"integration.api-dig",
@@ -147,6 +155,7 @@ p({
     "config":{
       "class":"foam.comics.v2.DAOControllerConfig",
       "daoKey":"digDAO",
+      "browseTitle": "DIG API Calls",
       "browseSubtitle": "An API endpoint that supports all DAO operations."
     }
   },
@@ -163,7 +172,9 @@ p({
       "daoKey": "ruleDAO",
       "predicate": {
         "class": "foam.mlang.predicate.IsInstanceOf",
-        "targetClass": "foam.nanos.dig.DUGRule"
+        "targetClass": "foam.nanos.dig.DUGRule",
+        "browseTitle": "DUG Webhooks",
+        "browseSubtitle": "Webhooks triggered by DAO operations."
       },
       "of": "foam.nanos.dig.DUGRule"
     }
