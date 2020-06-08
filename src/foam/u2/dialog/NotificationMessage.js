@@ -189,8 +189,10 @@ foam.CLASS({
               .enableClass(this.myClass('info-content'), this.type === 'info')
               .callIfElse(foam.String.isInstance(this.message), function() {
                 this.add(self.message);
+                console.log(self.message);
               }, function() {
                 this.tag(self.message);
+                console.log(self.message);
               })
             .end()
             .start().addClass(this.myClass('description'))
@@ -199,8 +201,10 @@ foam.CLASS({
               .enableClass(this.myClass('info-content'), this.type === 'info')
               .callIfElse(foam.String.isInstance(this.description), function() {
                 this.add(self.description);
+                console.log(self.description);
               }, function() {
                 this.tag(self.description);
+                console.log(self.description);
               })
             .end()
           .end()
