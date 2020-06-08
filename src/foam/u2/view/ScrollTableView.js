@@ -246,7 +246,6 @@
           this.table_.add(tbody);
           this.renderedPages_[page] = tbody;
         }
-
       }
     },
     {
