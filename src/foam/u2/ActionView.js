@@ -235,27 +235,15 @@ foam.CLASS({
       padding: 8px 16px;
     }
 
-    // ^small:focus {
-    //   padding: 7px 15px;
-    // }
-
     ^medium {
       font-size: 14px;
       padding: 9px 16px;
     }
 
-    // ^medium:focus {
-    //   padding: 8px 15px;
-    // }
-
     ^large {
       font-size: 16px;
       padding: 13px 16px;
     }
-
-    // ^large:focus {
-    //   padding: 9px 15px;
-    // }
 
     ^tertiary^small,
     ^tertiary^medium,
