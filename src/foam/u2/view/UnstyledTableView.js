@@ -558,21 +558,24 @@ foam.CLASS({
                   });
                   for ( var  i = 1 ; i < numberOfColumns ; i++  ) {
                     //check properties for tableCellFormatter and call it
-                    if ( foam.core.URL.isInstance(view.props[i]) ) {
+                    if ( view.props[i].tableCellFormatter && val[i] ) {
                       var v = this.E().addClass(view.myClass('td')).style({flex: view.props[i] && view.props[i].tableWidth  ? `0 0 ${view.props[i].tableWidth}px` : '1 0 0'});
-                      view.props[i].tableCellFormatter.format(v, val[i], null);
-                      tableRowElement.tag(v);//
-                    } else {
-                      var stringValue;
-                      if ( foam.core.UnitValue.isInstance(view.props[i]) ) {
-                        var indexOfUnitName = propertyNamesToQuery.indexOf(view.props[i].unitPropName);
-                        stringValue = view.outputter.returnStringValueForProperty(view.props[i], val[i], val[indexOfUnitName]);
-                      } else
-                        stringValue = view.outputter.returnStringValueForProperty(view.props[i], val[i]);
-                        tableRowElement.start().addClass(view.myClass('td'))
-                        .add(stringValue)
-                        .style({flex: view.props[i] && view.props[i].tableWidth  ? `0 0 ${view.props[i].tableWidth}px` : '1 0 0'}).end();
+                      try {
+                        view.props[i].tableCellFormatter.format(v, val[i], null);
+                        tableRowElement.tag(v);
+                        continue;
+                      } catch(e) {}
                     }
+                    var stringValue;
+                    if ( foam.core.UnitValue.isInstance(view.props[i]) ) {
+                      var indexOfUnitName = propertyNamesToQuery.indexOf(view.props[i].unitPropName);
+                      stringValue = view.outputter.returnStringValueForProperty(view.props[i], val[i], val[indexOfUnitName]);
+                    } else {
+                      stringValue = view.outputter.returnStringValueForProperty(view.props[i], val[i]);
+                    }
+                    tableRowElement.start().addClass(view.myClass('td'))
+                    .add(stringValue)
+                    .style({flex: view.props[i] && view.props[i].tableWidth  ? `0 0 ${view.props[i].tableWidth}px` : '1 0 0'}).end();  
                   }
                   tableRowElement
                   .start()
