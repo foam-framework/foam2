@@ -339,8 +339,10 @@ foam.CLASS({
                 view.props = view.returnProperties(view, propertyNamesToQuery);
                 view.updateValues = ! view.updateValues;
                 var column;
+                var isFirstLevelProperty = true;
                 if ( ! foam.core.Property.isInstance(property) ) {
                   var propertyNames = property.split('.');
+                  isFirstLevelProperty = propertyNames.length === 1;
                   column = view.props.find(c => c.name === propertyNames[propertyNames.length - 1]);
                 } else
                   column = view.props.find(c => c.name === property.name);
@@ -355,16 +357,18 @@ foam.CLASS({
                       this.style({ flex: '1 0 0' });
                     }
                   }).
-                  on('click', function(e) {
-                    view.sortBy(column, property);
-                  }).
                   call(column.tableHeaderFormatter, [column]).
-                  callIf(column.label !== '', function() {
-                    this.start('img').attr('src', this.slot(function(order) {
-                      return column === order ? view.ascIcon :
-                          ( order && order.desc )
-                          ? view.descIcon : view.restingIcon;
-                    }, view.order$)).end();
+                  callIf(isFirstLevelProperty, function() {
+                    this.on('click', function(e) {
+                      view.sortBy(column, property);
+                      }).
+                      callIf(column.label !== '', function() {
+                        this.start('img').attr('src', this.slot(function(order) {
+                          return column === order ? view.ascIcon :
+                              ( order && order.desc )
+                              ? view.descIcon : view.restingIcon;
+                        }, view.order$)).end();
+                    });
                   }).
                 end();
               }).
