@@ -86,6 +86,7 @@ var classes = [
   'foam.box.SubBoxMessage',
   'foam.box.SubscribeMessage',
   'foam.box.NamedBox',
+  'foam.box.HTTPAuthorizationType',
   'foam.box.HTTPBox',
   'foam.box.HTTPReplyBox',
   'foam.box.AuthServiceClientBox',
@@ -583,6 +584,7 @@ var classes = [
   'foam.nanos.crunch.SendNotificationOnTopLevelCapabilityStatusUpdate',
   'foam.nanos.crunch.IsUserCapabilityJunctionStatusUpdate',
   'foam.nanos.crunch.RemoveJunctionsOnUserRemoval',
+  'foam.nanos.crunch.CascadeInvalidate',
   //authservice
   'foam.nanos.auth.CapabilityAuthService',
   // userQueryService
