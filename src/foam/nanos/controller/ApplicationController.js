@@ -497,11 +497,12 @@ foam.CLASS({
       return self.crunchController.maybeLaunchInterceptView(intercept);
     },
 
-    function notify(data, type) {
+    function notify(data, type, description) {
       /** Convenience method to create toast notifications. */
       this.add(this.NotificationMessage.create({
         message: data,
-        type: type
+        type: type,
+        description: description
       }));
     }
   ],
