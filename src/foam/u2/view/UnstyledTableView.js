@@ -562,7 +562,7 @@ foam.CLASS({
                       var v = this.E().addClass(view.myClass('td')).style({flex: view.props[i] && view.props[i].tableWidth  ? `0 0 ${view.props[i].tableWidth}px` : '1 0 0'});
                       try {
                         view.props[i].tableCellFormatter.format(v, val[i], null);
-                        tableRowElement.tag(v);
+                        tableRowElement.add(v);
                         continue;
                       } catch(e) {}
                     }
