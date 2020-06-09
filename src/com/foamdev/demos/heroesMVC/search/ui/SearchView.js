@@ -56,32 +56,6 @@ foam.CLASS({
     }
   `,
 
-  properties: [
-    /*{//TODO move it to the dao model
-      name: 'filteredDAO',
-      expression: function(heroDAO, query) {
-      // console.log('******************************** query: ', query);
-        return heroDAO.where(this.CONTAINS_IC(this.Hero.NAME, query));
-      },
-      view: {
-        class: 'foam.u2.DAOList',
-        rowView: { class: 'com.foamdev.demos.heroesMVC.hero.ui.CitationView' }
-      }
-    },
-    {
-      name: 'starredHeroDAO',
-      view: {
-        class: 'foam.u2.DAOList',
-        rowView: { class: 'com.foamdev.demos.heroesMVC.hero.ui.DashboardCitationView' }
-      },
-      expression: function(filteredDAO) { return filteredDAO.where(this.EQ(this.Hero.STARRED, true)); }
-    },*/
-    {
-      name: 'selection',
-      view: { class: 'foam.u2.DetailView', title: '' }
-    }
-  ],
-
   methods: [
     function initE() {
       this.add('Search: ', this.data.QUERY);
