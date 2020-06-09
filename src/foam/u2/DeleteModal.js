@@ -121,7 +121,7 @@ foam.CLASS({
           // }
 
           if ( err.message === "An approval request has been sent out."  ){
-            this.notify(err.message, 'info');
+            this.notify(err.message);
 
           } else {
             this.notify(err.message || this.FAIL_MSG, 'error');
