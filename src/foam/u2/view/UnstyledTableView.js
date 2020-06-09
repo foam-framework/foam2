@@ -81,10 +81,6 @@ foam.CLASS({
       },
     },
     {
-      name: 'values',
-      value: []
-    },
-    {
       name: 'allColumns',
       expression: function(of) {
         return ! of ? [] : [].concat(
@@ -251,7 +247,6 @@ foam.CLASS({
         return this.returnProperties(this, propertyNamesToQuery); 
       }
     },
-    'dao',
     { 
       name: 'updateValues',
       class: 'Boolean', 
@@ -586,14 +581,6 @@ foam.CLASS({
               return tbodyElement;
             });
         }
-      },
-      
-      function updateValuesProperty(obj, dao, propertyNamesToQuery) {
-          var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(obj.of, propertyNamesToQuery);
-          dao.select(expr).then(function(s) {
-            obj.values = s.array;
-            obj.updateValues = ! obj.updateValues;
-          });
       },
       function returnRecords(dao, propertyNamesToQuery) {
         var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(dao.of, propertyNamesToQuery);
