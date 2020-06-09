@@ -271,7 +271,7 @@ foam.CLASS({
     function updateColumns() {
       localStorage.removeItem(this.of.id);
       localStorage.setItem(this.of.id, JSON.stringify(this.selectedColumnNames.map(c => foam.String.isInstance(c) ? c : c.name )));
-      this.isColumnChanged = !this.isColumnChanged;
+      this.isColumnChanged = ! this.isColumnChanged;
     },
 
     async function initE() {
@@ -337,9 +337,9 @@ foam.CLASS({
               forEach(columns_, function([property, overrides]) {
                 var propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => c));
                 view.props = view.returnProperties(view, propertyNamesToQuery);
-                view.updateValues = !view.updateValues;
+                view.updateValues = ! view.updateValues;
                 var column;
-                if ( !foam.core.Property.isInstance(property) ) {
+                if ( ! foam.core.Property.isInstance(property) ) {
                   var propertyNames = property.split('.');
                   column = view.props.find(c => c.name === propertyNames[propertyNames.length - 1]);
                 } else
@@ -359,7 +359,7 @@ foam.CLASS({
                     view.sortBy(column, property);
                   }).
                   call(column.tableHeaderFormatter, [column]).
-                  callIf(column.label != '', function() {
+                  callIf(column.label !== '', function() {
                     this.start('img').attr('src', this.slot(function(order) {
                       return column === order ? view.ascIcon :
                           ( order && order.desc )
@@ -381,7 +381,7 @@ foam.CLASS({
                     .on('click', function(e) {
                       editColumnView.parentId = this.id;
                       if ( ! editColumnView.selectColumnsExpanded )
-                        editColumnView.selectColumnsExpanded = !editColumnView.selectColumnsExpanded;
+                        editColumnView.selectColumnsExpanded = ! editColumnView.selectColumnsExpanded;
                     }).
                     tag(view.Image, { data: '/images/Icon_More_Resting.svg' }).
                     addClass(view.myClass('vertDots')).
@@ -421,7 +421,7 @@ foam.CLASS({
           //with this code error created  slot.get cause promise return
           //FIX ME
           return this.slot(function(order, updateValues) {
-            var propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => !foam.core.Property.isInstance(c) ? c : c.name));
+            var propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => ! foam.core.Property.isInstance(c) ? c : c.name));
             view.props = view.returnProperties(view, propertyNamesToQuery);
 
             var unitValueProperties = view.props.filter( p => foam.core.UnitValue.isInstance(p) ); 
@@ -596,7 +596,7 @@ foam.CLASS({
           var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(obj.of, propertyNamesToQuery);
           dao.select(expr).then(function(s) {
             obj.values = s.array;
-            obj.updateValues = !obj.updateValues;
+            obj.updateValues = ! obj.updateValues;
           });
       },
       function returnRecords(dao, propertyNamesToQuery) {
