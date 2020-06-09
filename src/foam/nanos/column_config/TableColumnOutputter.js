@@ -22,7 +22,7 @@ foam.CLASS({
                 if ( !currency ) return unitPropName + ' ' +( val / 100 ).toString();
                 return currency.format(val);
               }
-              return unitPropName + ' ' +( val / 100 ).toString();
+              return unitPropName + ' ' + ( val / 100 ).toString();
             }
             return ( val / 100 ).toString();
           }
