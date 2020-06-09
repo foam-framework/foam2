@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.nanos.crunch',
-  name: 'InvalidateDependenciesIfPrerequisiteInvalidated',
+  name: 'CascadeInvalidate',
 
   documentation: `When a ucj falls out of GRANTED status, also invalidate any ucjs
     that depend on the first one.

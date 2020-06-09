@@ -62,6 +62,6 @@ p({
       }
     ]
   },
-  "action":{"class":"foam.nanos.crunch.InvalidateDependenciesIfPrerequisiteInvalidated"},
+  "action":{"class":"foam.nanos.crunch.CascadeInvalidate"},
   "lifecycleState":1
 })
