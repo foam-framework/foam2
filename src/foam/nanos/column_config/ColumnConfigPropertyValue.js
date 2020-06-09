@@ -26,7 +26,7 @@ foam.CLASS({
         var props = of.getAxiomsByClass(foam.core.Property);
         var allColumnNames = props.map(p => p.name);
         if ( ! propNames ) {
-          return props.filter(p => p.networkTransient).map(p => p.name);
+          return props.filter(p => ! p.networkTransient ).map(p => p.name);
         } props = [];
         return propNames.filter(n => { 
           return allColumnNames.includes(n.split('.')[0]) && ! this.returnProperty(of, n).networkTransient;
