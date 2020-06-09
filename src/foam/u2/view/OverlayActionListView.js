@@ -127,9 +127,10 @@ foam.CLASS({
   `,
 
   methods: [
-    function initE() {
+    async function initE() {
       var self = this;
-
+      if ( ! this.obj ) 
+        this.obj = await this.dao.find(this.objId);
       this.onDetach(this.active_$.follow(this.overlay_.opened$));
       this.onDetach(this.disabled_$.follow(this.ExpressionSlot.create({
         args: this.data.map((action) => action.createIsAvailable$(this.__context__, this.obj)),
