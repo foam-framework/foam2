@@ -554,7 +554,7 @@ foam.CLASS({
                   for ( var  i = 1 ; i < numberOfColumns ; i++  ) {
                     //check properties for tableCellFormatter and call it
                     if ( view.props[i].tableCellFormatter && val[i] ) {
-                      var v = this.E().addClass(view.myClass('td')).style({flex: view.props[i] && view.props[i].tableWidth  ? `0 0 ${view.props[i].tableWidth}px` : '1 0 0'});
+                      var v = this.E().addClass(view.myClass('td')).style({flex: view.props[i] && view.props[i].tableWidth  ? `0 0 ${view.props[i].tableWidth}px` : '1 0 0'});//, 'justify-content': 'center'
                       try {
                         view.props[i].tableCellFormatter.format(v, val[i], null);
                         tableRowElement.add(v);
