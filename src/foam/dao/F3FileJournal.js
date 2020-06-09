@@ -59,7 +59,7 @@ foam.CLASS({
               char operation = entry.charAt(0);
               String strEntry = entry.subSequence(2, length - 1).toString();
 
-              FObject obj = parser.parseString(strEntry);
+              FObject obj = parser.parseString(strEntry, dao.getOf().getObjClass());
               if ( obj == null ) {
                 getLogger().error("Parse error", getParsingErrorMessage(strEntry), "entry:", strEntry);
                 continue;

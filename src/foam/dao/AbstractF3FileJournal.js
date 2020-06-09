@@ -56,6 +56,7 @@ foam.CLASS({
             public JSONFObjectFormatter get() {
               JSONFObjectFormatter b = super.get();
               b.reset();
+              b.setPropertyPredicate(new StoragePropertyPredicate());
               return b;
             }
           };
@@ -185,8 +186,11 @@ try {
 
           public void executeJob() {
             try {
-              if ( old != null ) fmt.outputDelta(old, obj);
-              else fmt.output(obj);
+              if ( old != null ) {
+                fmt.outputDelta(old, obj, dao.getOf());
+              } else {
+                fmt.output(obj, dao.getOf());
+              }
             } catch (Throwable t) {
               getLogger().error("Failed to write put entry to journal", t);
               fmt.reset();
@@ -223,10 +227,13 @@ try {
       javaCode: `
       write_(sb.get()
         .append(prefix)
-        .append("p(")
-        .append(record)
+        .append("p("));
+      write_(sb.get()
+        .append(record));
+      write_(sb.get()
         .append(")")
         .append(c));
+      getWriter().newLine();
       `
     },
     {
@@ -253,7 +260,7 @@ try {
             // true properties that ID/MultiPartID maps too.
             FObject toWrite = (FObject) obj.getClassInfo().newInstance();
             toWrite.setProperty("id", obj.getProperty("id"));
-            fmt.output(toWrite);
+            fmt.output(toWrite, dao.getOf());
           } catch (Throwable t) {
             getLogger().error("Failed to write put entry to journal", t);
           }
@@ -288,6 +295,7 @@ try {
         .append("r(")
         .append(record)
         .append(")"));
+      getWriter().newLine();
       `
     },
     {
@@ -300,7 +308,7 @@ try {
       javaCode: `
         BufferedWriter writer = getWriter();
         writer.append(data);
-        writer.newLine();
+//        writer.newLine();
       `
     },
     {
@@ -322,6 +330,7 @@ try {
           .append(user.getId())
           .append(") at ")
           .append(getTimeStamper().createTimestamp()));
+        getWriter().newLine();
       `
     },
     {
