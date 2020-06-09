@@ -10,7 +10,11 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
 
   javaImports: [
-    'foam.core.*',
+    'foam.core.Detachable',
+    'foam.core.FObject',
+    'foam.core.MethodInfo',
+    'foam.core.PropertyInfo',
+    'foam.core.X',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.dao.ProxySink',
@@ -102,7 +106,7 @@ foam.CLASS({
             logger.warning(
               "Could not load approval requests relationship: " + getRelationshipName()
               , obj, "The default 'approvalRequestDAO' will be used.");
-            dao = x.get("approvalRequestDAO");
+            dao = (DAO) x.get("approvalRequestDAO");
           }
           setApprovalRequestDAO(dao);
         }
