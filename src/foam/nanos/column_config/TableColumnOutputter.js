@@ -26,7 +26,7 @@ foam.CLASS({
             if ( unitPropName ) {
               if ( prop.unitPropName === "destinationCurrency" ) {
                 var currency = await this.currencyDAO.find(unitPropName);
-                if ( !currency ) return unitPropName + ' ' +( val / 100 ).toString();
+                if ( ! currency ) return unitPropName + ' ' + ( val / 100 ).toString();
                 return currency.format(val);
               }
               return unitPropName + ' ' + ( val / 100 ).toString();
@@ -70,7 +70,7 @@ foam.CLASS({
       }
     },
     async function objToArrayOfStringValues(x, of, propNames, obj) {
-      var columnConfig = X.columnConfigToPropertyConverter;
+      var columnConfig = x.columnConfigToPropertyConverter;
       var values = [];
       for ( var propName of  propNames ) {
         values.push(await columnConfig.returnValueForPropertyName(x, of, propName, obj));
