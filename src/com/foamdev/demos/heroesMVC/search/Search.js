@@ -5,13 +5,14 @@
  */
 
 foam.CLASS({
-  package: 'com.foamdev.demos.heroes.search',
+  package: 'com.foamdev.demos.heroesMVC.search',
   name: 'Search',
 
   properties: [
     {
       class: 'String',
       name: 'query',
+      label: 'search M',
       view: {
         class: 'foam.u2.TextField',
         type: 'search',

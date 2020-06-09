@@ -26,7 +26,8 @@ foam.CLASS({
     'foam.dao.EasyDAO',
     'foam.u2.DAOList',
     'foam.u2.DetailView',
-    'foam.u2.CheckBox'
+    'foam.u2.CheckBox',
+    'com.foamdev.demos.heroesMVC.search.ControllerSearch',
   ],
 
   exports: [
@@ -104,6 +105,16 @@ foam.CLASS({
         onKey: true
       }
     },
+    //TODO Add the ControllerSearch
+//      {
+//        class: 'FObjectProperty',
+//        of: 'com.foamdev.demos.heroesMVC.search.ControllerSearch',
+//        name: 'controllerSearch1',
+//        factory: function() {
+//          return this.ControllerSearch.create();
+//        }
+//      },
+
    /* {//TODO delete it if possible
       name   : 'query',
       factory: function() { return this.Search.create(); }
