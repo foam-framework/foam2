@@ -15,6 +15,13 @@ foam.CLASS({
       documentation: 'Method that converts value to string',
       code: async function(prop, val, unitPropName) {
         if ( val ) {
+          if ( foam.Array.isInstance(val) ) {
+            var stringArr = [];
+            for ( var i = 0 ; i < val.length ; i++ ) {
+              stringArr.push(await this.valueToString(val[i]));
+            }
+            return stringArr.join(' ');
+          }
           if ( foam.core.UnitValue.isInstance(prop) ) {
             if ( unitPropName ) {
               if ( prop.unitPropName === "destinationCurrency" ) {
@@ -35,15 +42,18 @@ foam.CLASS({
           if ( foam.core.Time.isInstance(prop) ) {
             return val.toString().substring(0, 8);
           }
-          if ( val.toSummary ) {
-            if ( val.toSummary() instanceof Promise )
-              return await val.toSummary();
-            return val.toSummary();
-          }
-          return val.toString();           
+          return await this.valueToString(val);
         }
         return ''; 
       }
+    },
+    async function valueToString(val) {
+      if ( val.toSummary ) {
+        if ( val.toSummary() instanceof Promise )
+          return await val.toSummary();
+        return val.toSummary();
+      }
+      return val.toString();
     },
     {
       name: 'arrayOfValuesToArrayOfStrings',
