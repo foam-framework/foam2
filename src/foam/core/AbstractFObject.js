@@ -25,73 +25,16 @@ foam.CLASS({
       name: 'javaExtras',
       buildJavaClass: function (cls) {
         cls.extras.push(`
-          public static FObject maybeClone(FObject fo) {
-            return ( fo == null ? null : fo.fclone() );
-          }
+  protected X x_ = EmptyX.instance();
+  protected boolean __frozen__ = false;
 
-          protected X x_ = EmptyX.instance();
-          protected boolean __frozen__ = false;
+  public X getX() {
+    return this.x_;
+  }
 
-          public X getX() {
-            return this.x_;
-          }
-
-          public void setX(X x) {
-            this.x_ = x;
-          }
-
-          // Template method for initializing object after done being built.
-          public void init_() {
-          }
-
-          // convenience hash function
-          public byte[] hash()
-            throws NoSuchAlgorithmException
-          {
-            return this.hash("SHA-256");
-          }
-
-          public byte[] hash(String algorithm)
-            throws NoSuchAlgorithmException
-          {
-            return this.hash(MessageDigest.getInstance(algorithm));
-          }
-
-          // convenience sign method
-          public byte[] sign(PrivateKey key)
-            throws NoSuchAlgorithmException, InvalidKeyException, SignatureException
-          {
-            return this.sign(String.format("SHA256with%s", key.getAlgorithm()), key);
-          }
-
-          public byte[] sign(String algorithm, PrivateKey key)
-            throws NoSuchAlgorithmException, InvalidKeyException, SignatureException
-          {
-            Signature signer = Signature.getInstance(algorithm);
-            signer.initSign(key, SecurityUtil.GetSecureRandom());
-            return this.sign(signer);
-          }
-
-          // convenience verify method
-          public boolean verify(byte[] signature, PublicKey key)
-            throws NoSuchAlgorithmException, InvalidKeyException, SignatureException
-          {
-            return this.verify(signature, String.format("SHA256with%s", key.getAlgorithm()), key);
-          }
-
-          public boolean verify(byte[] signature, String algorithm, PublicKey key)
-            throws NoSuchAlgorithmException, InvalidKeyException, SignatureException
-          {
-            Signature verifier = Signature.getInstance(algorithm);
-            verifier.initVerify(key);
-            return this.verify(signature, verifier);
-          }
-
-          public void assertNotFrozen()
-            throws UnsupportedOperationException
-          {
-            if ( __frozen__ ) throw new UnsupportedOperationException("Object is frozen.");
-          }
+  public void setX(X x) {
+    this.x_ = x;
+  }
         `);
       }
     }

@@ -9,8 +9,9 @@ package foam.core;
 import foam.crypto.hash.Hashable;
 import foam.crypto.sign.Signable;
 import foam.lib.json.Outputter;
+import foam.util.SecurityUtil;
 
-import java.security.SignatureException;
+import java.security.*;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -353,9 +354,9 @@ public interface FObject
     return result;
   }
 
-  FObject freeze();
+  default void beforeFreeze() {
 
-  boolean isFrozen();
+  }
 
   // Return is FObject that contain different fields between two FObjects.
   default FObject hardDiff(FObject obj) {
@@ -446,10 +447,6 @@ public interface FObject
 
   }
 
-  default void beforeFreeze() {
-
-  }
-
   default byte[] hash(java.security.MessageDigest md) {
 
     var props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
@@ -483,6 +480,65 @@ public interface FObject
     Outputter out = new Outputter(getX());
     return out.stringify(this);
 
+  }
+
+  static FObject maybeClone(FObject fo) {
+    return ( fo == null ? null : fo.fclone() );
+  }
+
+  // Template method for initializing object after done being built.
+  default void init_() {
+  }
+
+  // convenience hash function
+  default byte[] hash()
+    throws NoSuchAlgorithmException
+  {
+    return this.hash("SHA-256");
+  }
+
+  default byte[] hash(String algorithm)
+    throws NoSuchAlgorithmException
+  {
+    return this.hash(MessageDigest.getInstance(algorithm));
+  }
+
+  // convenience sign method
+  default byte[] sign(PrivateKey key)
+    throws NoSuchAlgorithmException, InvalidKeyException, SignatureException
+  {
+    return this.sign(String.format("SHA256with%s", key.getAlgorithm()), key);
+  }
+
+  default byte[] sign(String algorithm, PrivateKey key)
+    throws NoSuchAlgorithmException, InvalidKeyException, SignatureException
+  {
+    Signature signer = Signature.getInstance(algorithm);
+    signer.initSign(key, SecurityUtil.GetSecureRandom());
+    return this.sign(signer);
+  }
+
+  // convenience verify method
+  default boolean verify(byte[] signature, PublicKey key)
+    throws NoSuchAlgorithmException, InvalidKeyException, SignatureException
+  {
+    return this.verify(signature, String.format("SHA256with%s", key.getAlgorithm()), key);
+  }
+
+  default boolean verify(byte[] signature, String algorithm, PublicKey key)
+    throws NoSuchAlgorithmException, InvalidKeyException, SignatureException
+  {
+    Signature verifier = Signature.getInstance(algorithm);
+    verifier.initVerify(key);
+    return this.verify(signature, verifier);
+  }
+
+
+
+  default void assertNotFrozen()
+    throws UnsupportedOperationException
+  {
+    if ( isFrozen() ) throw new UnsupportedOperationException("Object is frozen.");
   }
 
 }
