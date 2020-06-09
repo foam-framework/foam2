@@ -375,7 +375,7 @@ public class JSONFObjectFormatter
       output(info.getId());
     }
     boolean  outputComma = outputClassNames_ && outputDefaultClassNames_;
-    
+
     // to output class names for references
     outputDefaultClassNames_ = true;
 
@@ -458,6 +458,11 @@ public class JSONFObjectFormatter
 
   public JSONFObjectFormatter setOutputClassNames(boolean outputClassNames) {
     outputClassNames_ = outputClassNames;
+    return this;
+  }
+
+  public JSONFObjectFormatter setOutputDefaultClassNames(boolean f) {
+    outputDefaultClassNames_ = f;
     return this;
   }
 
