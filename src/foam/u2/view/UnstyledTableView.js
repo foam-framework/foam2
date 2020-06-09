@@ -72,11 +72,12 @@ foam.CLASS({
     },
     {
       name: 'columns_',
-      expression: function(columns, of, editColumnsEnabled, selectedColumnNames) {
+      expression: function(columns, of, editColumnsEnabled, selectedColumnNames, allColumns) {
         if ( ! of ) return [];
-        if ( ! editColumnsEnabled ) return columns.map(c => foam.Array.isInstance(c) ? c : [c, null]);
-
-        return selectedColumnNames.map(c => foam.Array.isInstance(c) ? c : [c, null]);
+        var cols;
+        if ( ! editColumnsEnabled ) cols = columns;
+        else cols = selectedColumnNames;
+        return cols.filter( c => allColumns.includes(foam.String.isInstance(c) ? ( c.indexOf('.') > -1 ? c.split('.')[0] : c ) : columns.name )).map(c => foam.Array.isInstance(c) ? c : [c, null]);
       },
     },
     {
@@ -104,7 +105,7 @@ foam.CLASS({
     },
     {
       name: 'columns',
-      expression: function(of, allColumns) {
+      expression: function(of, allColumns, isColumnChanged) {
         if ( ! of ) return [];
         var tc = of.getAxiomByName('tableColumns');
         return tc ? tc.columns : allColumns;
@@ -243,7 +244,13 @@ foam.CLASS({
         return this.TableColumnOutputter.create();
       }
     },
-    'props',
+    {
+      name: 'props',
+      expression: function(columns_) {
+        var propertyNamesToQuery = columns_.length === 0 ? columns_ : [ 'id' ].concat(columns_.map(([c, overrides]) => foam.core.Property.isInstance(c) ? c.name : c));
+        return this.returnProperties(this, propertyNamesToQuery); 
+      }
+    },
     'dao',
     { 
       name: 'updateValues',
@@ -269,22 +276,7 @@ foam.CLASS({
 
     async function initE() {
       var view = this;
-      //to expressions
-      view.columns_ = view.columns_.filter(([axiomOrColumnName, overrides]) => view.allColumns.includes(foam.String.isInstance(axiomOrColumnName) ? ( axiomOrColumnName.indexOf('.') > -1 ? axiomOrColumnName.split('.')[0] : axiomOrColumnName ) : axiomOrColumnName.name ));
-      var propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => foam.core.Property.isInstance(c) ? c.name : c));
-      view.props = view.returnProperties(view, propertyNamesToQuery);
 
-      view.isColumnChanged$.sub(function() {
-        var ls = JSON.parse(localStorage.getItem(view.of.id));
-        view.selectedColumnNames =  ls ? ls : view.columns;
-        view.columns_ =  view.selectedColumnNames.filter(c => view.allColumns.includes(foam.String.isInstance(c) ? ( c.indexOf('.') > -1 ? c.split('.')[0] : c ) : c.name )).map(c => foam.Array.isInstance(c) ? c : [c, null]);
-      });
-
-      view.columns_$.sub(function() {
-        var propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => c));
-        view.props = view.returnProperties(view, propertyNamesToQuery);
-        view.updateValues = !view.updateValues;
-      });
       //otherwise on adding new column creating new EditColumnsView, which is closed by default
       if (view.editColumnsEnabled)
         var editColumnView = foam.u2.view.EditColumnsView.create({data:view});
@@ -343,6 +335,9 @@ foam.CLASS({
 
               // Render the table headers for the property columns.
               forEach(columns_, function([property, overrides]) {
+                var propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => c));
+                view.props = view.returnProperties(view, propertyNamesToQuery);
+                view.updateValues = !view.updateValues;
                 var column;
                 if ( !foam.core.Property.isInstance(property) ) {
                   var propertyNames = property.split('.');
