@@ -261,11 +261,10 @@ foam.CLASS({
   ],
 
   methods: [
-    function sortBy(column, propName) {
-      this.order = { desc: this.order && this.order.fullPropName && this.order.fullPropName === propName && !this.order.desc ? true : false,
-        prop: column,
-        fullPropName: propName
-      };
+    function sortBy(column) {
+      this.order = this.order === column ?
+        this.DESC(column) :
+        column;
     },
 
     function updateColumns() {
@@ -365,7 +364,7 @@ foam.CLASS({
                       callIf(column.label !== '', function() {
                         this.start('img').attr('src', this.slot(function(order) {
                           return column === order ? view.ascIcon :
-                              ( order && order.desc )
+                              ( view.Desc.isInstance(order) && order.arg1 === column )
                               ? view.descIcon : view.restingIcon;
                         }, view.order$)).end();
                     });
@@ -415,7 +414,6 @@ foam.CLASS({
          * writing.
          */
           var view = this;
-          var proxy = view.ProxyDAO.create({ delegate: dao });
 
           var modelActions = view.of.getAxiomsByClass(foam.core.Action);
           var actions = Array.isArray(view.contextMenuActions)
@@ -432,6 +430,9 @@ foam.CLASS({
 
             var numberOfColumns = propertyNamesToQuery.length;
 
+            if ( this.order ) dao = dao.orderBy(this.order);
+            var proxy = view.ProxyDAO.create({ delegate: dao });
+
             //to retrieve value of unitProp
             unitValueProperties.forEach(p => propertyNamesToQuery.push(p.unitPropName));
             var valPromises = view.returnRecords(proxy, propertyNamesToQuery);
@@ -444,15 +445,6 @@ foam.CLASS({
               tbodyElement.
               addClass(view.myClass('tbody'));
               valPromises.then(function(values) {
-                if ( this.order ) {
-                  var index = view.columns_.map(([c, o])  => c).indexOf(order.fullPropName) + 1;
-                  if ( index !== 0 ) {
-                    if ( order.desc )
-                      values.sort(function(a, b) { return order.prop.comparePropertyValues(b[index], a[index]); });
-                    else
-                      values.sort(function(a, b) { return order.prop.comparePropertyValues(a[index], b[index]); });
-                  }
-                }
                 tbodyElement.forEach(values.array, function(val) {
                   var tableRowElement = this.E();
                   tableRowElement.
@@ -577,16 +569,16 @@ foam.CLASS({
                     .style({flex: view.props[i] && view.props[i].tableWidth  ? `0 0 ${view.props[i].tableWidth}px` : '1 0 0'}).end();  
                   }
                   tableRowElement
-                  .start()
-                    .addClass(view.myClass('td')).
-                    attrs({ name: 'contextMenuCell' }).
-                    style({ flex: `0 0 ${view.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH}px` }).
-                    tag(view.OverlayActionListView, {
-                      data: actions,
-                      objId: val[0],
-                      dao: dao 
-                    }).
-                  end();
+                    .start()
+                      .addClass(view.myClass('td')).
+                      attrs({ name: 'contextMenuCell' }).
+                      style({ flex: `0 0 ${view.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH}px` }).
+                      tag(view.OverlayActionListView, {
+                        data: actions,
+                        objId: val[0],
+                        dao: dao
+                      }).
+                    end();
                   tbodyElement.add(tableRowElement);
                 });
               });
