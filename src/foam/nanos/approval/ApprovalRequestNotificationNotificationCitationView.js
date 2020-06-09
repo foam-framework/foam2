@@ -118,6 +118,7 @@ foam.CLASS({
   css: `
     ^ {
       line-height: 17px;
+      width: 100%;
     }
     ^ .userSummary {
       font-family: IBMPlexSans;

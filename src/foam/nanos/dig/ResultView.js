@@ -21,7 +21,6 @@ foam.CLASS({
     ^ {
       margin-bottom: 5px;
       overflow-x: auto;
-      width: 820px;
     }
   `,
 
@@ -31,12 +30,12 @@ foam.CLASS({
       this.addClass(this.myClass());
 
       this.add(this.data$.map(data => {
-        if ( data.length && data.charAt(0) == '<' ) {
+        if ( data.length && data.substring(0, 6) == '<html>' ) {
           return this.HTMLView.create({data: this.data});
         }
 
         var rows = data ? Math.min(20, this.data.split('\n').length) : 2;
-        return this.TextArea.create({data: this.data, rows: rows, cols: 120});
+        return this.TextArea.create({data: this.data, rows: 16, cols: 120, escapeTextArea: false});
       }));
     }
   ]
