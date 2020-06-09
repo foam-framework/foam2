@@ -62,7 +62,25 @@ foam.CLASS({
       name: 'daoKey',
       label: 'DAO',
       section: 'dugInfo',
-      tableWidth: 100
+      tableWidth: 100,
+      view: function(_, X) {
+        var E = foam.mlang.Expressions.create();
+        return {
+          class: 'foam.u2.view.RichChoiceView',
+          search: true,
+          sections: [
+            {
+              heading: 'DAO',
+              dao: X.AuthenticatedNSpecDAO
+                .where(E.AND(
+                  E.EQ(foam.nanos.boot.NSpec.SERVE, true),
+                  E.ENDS_WITH(foam.nanos.boot.NSpec.ID, 'DAO')
+                ))
+                .orderBy(foam.nanos.boot.NSpec.ID)
+            }
+          ]
+        };
+      }
     },
     {
       name: 'ruleGroup',
