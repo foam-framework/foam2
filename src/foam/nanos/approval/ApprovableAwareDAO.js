@@ -10,10 +10,7 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
 
   javaImports: [
-    'foam.core.Detachable',
-    'foam.core.FObject',
-    'foam.core.PropertyInfo',
-    'foam.core.X',
+    'foam.core.*',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.dao.ProxySink',
@@ -58,6 +55,17 @@ foam.CLASS({
       class: 'String',
       name: 'serviceName',
       javaFactory: `return foam.util.StringUtil.daoize(getOf().getObjClass().getSimpleName());`
+    },
+    {
+      class: 'String',
+      name: 'relationshipName',
+      value: 'approvalRequests'
+    },
+    {
+      class: 'Object',
+      javaType: 'foam.dao.DAO',
+      name: 'approvalRequestDAO',
+      transient: true
     }
   ],
 
@@ -72,6 +80,35 @@ foam.CLASS({
   ],
 
   methods: [
+    {
+      name: 'obtainApprovalRequestDAO',
+      type: 'foam.dao.DAO',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'obj', type: 'FObject' }
+      ],
+      javaCode: `
+        if ( getApprovalRequestDAO() == null ) {
+          var axiomName = "get"
+            + Character.toUpperCase(getRelationshipName().charAt(0))
+            + getRelationshipName().substring(1);
+          var method = (MethodInfo) obj.getClassInfo().getAxiomByName(axiomName);
+          DAO dao = null;
+
+          try {
+            dao = (DAO) method.call(x, obj, new Object[] { x });
+          } catch ( Throwable t ) {
+            Logger logger = (Logger) x.get("logger");
+            logger.warning(
+              "Could not load approval requests relationship: " + getRelationshipName()
+              , obj, "The default 'approvalRequestDAO' will be used.");
+            dao = x.get("approvalRequestDAO");
+          }
+          setApprovalRequestDAO(dao);
+        }
+        return getApprovalRequestDAO();
+      `
+    },
     {
       name: 'sendSingleRequest',
       documentation: `
@@ -88,7 +125,7 @@ foam.CLASS({
         ApprovalRequest request = (ApprovalRequest) req.fclone();
         request.clearId();
         request.setApprover(userId);
-        ((DAO) x.get("approvalRequestDAO")).put_(x, request);
+        getApprovalRequestDAO().inX(x).put(request);
       `
     },
     {
@@ -165,7 +202,7 @@ foam.CLASS({
       ApprovableAware approvableAwareObj = (ApprovableAware) obj;
       LifecycleAware lifecycleObj = (LifecycleAware) obj;
 
-      DAO approvalRequestDAO = (DAO) x.get("approvalRequestDAO");
+      DAO approvalRequestDAO = obtainApprovalRequestDAO(x, obj);
       DAO dao = (DAO) x.get(getDaoKey());
 
       FObject currentObjectInDAO = (FObject) dao.find(String.valueOf(obj.getProperty("id")));
