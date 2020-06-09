@@ -59,6 +59,19 @@ foam.CLASS({
               return b;
             }
           };
+
+          protected static ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
+            @Override
+            protected StringBuilder initialValue() {
+              return new StringBuilder();
+            }
+            @Override
+            public StringBuilder get() {
+              StringBuilder b = super.get();
+              b.setLength(0);
+              return b;
+            }
+          };
         `);
       }
     }
@@ -172,8 +185,11 @@ try {
 
           public void executeJob() {
             try {
-              if ( old != null ) fmt.outputDelta(old, obj);
-              else fmt.output(obj);
+              if ( old != null ) {
+                fmt.outputDelta(old, obj);
+              } else {
+                fmt.output(obj);
+              }
             } catch (Throwable t) {
               getLogger().error("Failed to write put entry to journal", t);
               fmt.reset();
@@ -208,12 +224,12 @@ try {
       ],
       args: [ 'Context x', 'CharSequence record', 'String c', 'String prefix' ],
       javaCode: `
-        write_(formatter.get().builder()
-          .append(prefix)
-          .append("p(")
-          .append(record)
-          .append(")")
-          .append(c));
+      write_(sb.get()
+        .append(prefix)
+        .append("p(")
+        .append(record)
+        .append(")")
+        .append(c));
       `
     },
     {
@@ -270,11 +286,11 @@ try {
       ],
       args: ['Context x', 'CharSequence record', 'String prefix' ],
       javaCode: `
-        write_(formatter.get().builder()
-          .append(prefix)
-          .append("r(")
-          .append(record)
-          .append(")"));
+      write_(sb.get()
+        .append(prefix)
+        .append("r(")
+        .append(record)
+        .append(")"));
       `
     },
     {
@@ -302,7 +318,7 @@ try {
         if ( user == null || user.getId() <= 1 ) return;
         if ( obj instanceof LastModifiedByAware && ((LastModifiedByAware) obj).getLastModifiedBy() != 0L ) return;
 
-        write_(formatter.get().builder()
+        write_(sb.get()
           .append("// Modified by ")
           .append(user.toSummary())
           .append(" (")

@@ -75,7 +75,6 @@ foam.CLASS({
       javaThrows: ['AuthorizationException'],
       javaCode: `
         if ( getVisibilityCondition() == null ) {
-          ( getDefaultAuthorizer()).authorizeOnRead(x, this);
           return;
         }
         try {
