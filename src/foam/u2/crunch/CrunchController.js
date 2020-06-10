@@ -19,6 +19,7 @@ foam.CLASS({
     'ctrl',
     'prerequisiteCapabilityJunctionDAO',
     'stack',
+    'subject',
     'userCapabilityJunctionDAO'
   ],
 
@@ -95,7 +96,7 @@ foam.CLASS({
 
       var ucj = await this.userCapabilityJunctionDAO.find(
         this.AND(
-          this.EQ(this.UserCapabilityJunction.SOURCE_ID, this.user ? this.user.id : 0),
+          this.EQ(this.UserCapabilityJunction.SOURCE_ID, this.subject.realUser.id),
           this.EQ(this.UserCapabilityJunction.TARGET_ID, capabilityId)
         ));
 
@@ -110,14 +111,26 @@ foam.CLASS({
       }
       return this.getCapabilities(capabilityId).then(capabilities => {
         // Map capabilities to CapabilityWizardSection objects
-        return Promise.all(capabilities.filter(
-          cap => !! cap.of
-        ).map(
-          cap => this.CapabilityWizardlet.create({
-            capability: cap
-          }).updateUCJ()
-        ));
-      }).then(sections => {
+        return Promise.all([
+
+          // Continue passing capabilities to next callback
+          Promise.resolve(capabilities),
+
+          // Create capability sections
+          Promise.all(capabilities.filter(
+            cap => !! cap.of
+          ).map(
+            cap => this.CapabilityWizardlet.create({
+              capability: cap
+            }).updateUCJ()
+          ))
+
+        ]);
+      }).then(capabilitiesSectionsTuple => {
+        // Two values from Promise.all call above
+        let capabilities = capabilitiesSectionsTuple[0];
+        let sections = capabilitiesSectionsTuple[1];
+
         return new Promise((wizardResolve) => {
           sections = sections.filter(wizardSection =>
             wizardSection.ucj === null || 
@@ -133,7 +146,17 @@ foam.CLASS({
             }),
             onClose: x => {
               x.closeDialog();
-              wizardResolve();
+              // Save no-data capabilities (i.e. not displayed in wizard)
+              Promise.all(capabilities.filter(cap => ! cap.of).map(
+                cap => self.userCapabilityJunctionDAO.put(self.UserCapabilityJunction.create({
+                  sourceId: self.subject.realUser.id,
+                  targetId: cap.id
+                })).then(() => {
+                  console.log('SAVED (no-data cap)', cap.id);
+                })
+              )).then(() => {
+                wizardResolve();
+              });
             }
           }));
         });
