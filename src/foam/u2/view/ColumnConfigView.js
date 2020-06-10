@@ -512,14 +512,14 @@ foam.CLASS({
     function updateSubColumnsOrder(selctionChanged) {
       //re-order subproperties
       this.data.subColumnSelectConfig.sort((a, b) => a.index > b.index ? 1 : -1);
-      //if selection changed call this
       this.onSelectionChangedParentFunction(this.data.isPropertySelected, this.data.index, selctionChanged);
     },
     function onChildrenDragAndDrop(targetIndex, draggableIndex) {
       this.onDragAndDrop(this.views, targetIndex, draggableIndex);
       this.updateSubColumnsOrder(true);
     },
-    function onChildrenSelectionChanged(isColumnSelected, index, isColumnSelectionHaventChanged) {//isColumnSelectionHaventChanged to be false on either selectionChanged or being undefined
+    function onChildrenSelectionChanged(isColumnSelected, index, isColumnSelectionHaventChanged) {
+      //isColumnSelectionHaventChanged to be false on either selectionChanged or being undefined
       if ( ! isColumnSelectionHaventChanged ) {
         //to change view 
         this.onSelectionChanged(isColumnSelected, index, this.views);

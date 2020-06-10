@@ -51,12 +51,12 @@ foam.CLASS({
         var cls = of;
         var property;
         if ( foam.String.isInstance(propName) ) {
-          var props = propName.split('.');
-          for ( var i = 0 ; i < props.length ; i++ ) {
-            property = foam.String.isInstance(props[i])
-            ? cls.getAxiomByName(props[i])
-            :  foam.Array.isInstance(props[i]) ? 
-            cls.getAxiomByName(props[i]) : props[i];
+          var propNames = propName.split('.');
+          for ( var i = 0 ; i < propNames.length ; i++ ) {
+            property = foam.String.isInstance(propNames[i])
+            ? cls.getAxiomByName(propNames[i])
+            :  foam.Array.isInstance(propNames[i]) ? 
+            cls.getAxiomByName(propNames[i]) : propNames[i];
             if ( ! property )
               break;
             cls = property.of;
@@ -68,14 +68,14 @@ foam.CLASS({
       javaCode: `
         ClassInfo ci = of;
         PropertyInfo p = null;
-        String[] props = propName.split("\\\\.");
+        String[] propNames = propName.split("\\\\.");
         StringBuilder sb = new StringBuilder("find");
 
-        for ( int i = 0 ; i < props.length ; i++ ) {
+        for ( int i = 0 ; i < propNames.length ; i++ ) {
           if ( ( p == null && i != 0 ) || ci == null )
             break;
-          p = (PropertyInfo) ci.getAxiomByName(props[i]);
-          if ( i != props.length - 1 ) {
+          p = (PropertyInfo) ci.getAxiomByName(propNames[i]);
+          if ( i != propNames.length - 1 ) {
             try {
               Class cls;
               if ( p instanceof foam.core.AbstractFObjectPropertyInfo ) {
@@ -127,17 +127,17 @@ foam.CLASS({
         var property;
         var obj1 = obj;
         if ( foam.String.isInstance(propName) ) {
-          var props = propName.split('.');
-          for ( var i = 0; i < props.length; i++ ) {
-            property = foam.String.isInstance(props[i])
-            ? cls.getAxiomByName(props[i])
-            :  foam.Array.isInstance(props[i]) ? 
-            cls.getAxiomByName(props[i]) : props[i];
+          var propNames = propName.split('.');
+          for ( var i = 0 ; i < propNames.length ; i++ ) {
+            property = foam.String.isInstance(propNames[i])
+            ? cls.getAxiomByName(propNames[i])
+            :  foam.Array.isInstance(propNames[i]) ? 
+            cls.getAxiomByName(propNames[i]) : propNames[i];
             if ( ! property )
               break;
             cls = property.of;
 
-            if ( i !== props.length - 1 && obj1 ) {
+            if ( i !== propNames.length - 1 && obj1 ) {
               if ( foam.core.Reference.isInstance(property) ) {
                 obj1 = await obj1[property.name + '$find'];
               } else {
@@ -153,14 +153,14 @@ foam.CLASS({
         ClassInfo ci = of;
         FObject obj1 = obj;
         PropertyInfo p = null;
-        String[] props = propName.split("\\\\.");
+        String[] propNames = propName.split("\\\\.");
         StringBuilder sb = new StringBuilder("find");
-        for ( int i = 0 ; i < props.length ; i++ ) {
+        for ( int i = 0 ; i < propNames.length ; i++ ) {
           if ( ( p == null && i != 0 ) || ci == null )
             break;
-          p = (PropertyInfo) ci.getAxiomByName(props[i]);
+          p = (PropertyInfo) ci.getAxiomByName(propNames[i]);
 
-          if ( i != props.length - 1 ) {
+          if ( i != propNames.length - 1 ) {
             try {
               Class cls;
               if ( p instanceof foam.core.AbstractFObjectPropertyInfo ) {
