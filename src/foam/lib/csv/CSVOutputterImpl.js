@@ -224,7 +224,7 @@ foam.CLASS({
           .map(ColumnPropertyValue::getPropertyValue)
           .toArray(PropertyInfo[]::new);
         if ( getIsFirstRow() ) outputHeader(x, props);
-        for (String propName : getProps()) {
+        for ( String propName : getProps() ) {
           ColumnPropertyValue val = columnConfig.returnPropertyAndObject(x, getOf(), propName, obj);
           if ( val.getPropertyValue() != null && val.getPropertyValue() instanceof PropertyInfo ) ((PropertyInfo)val.getPropertyValue()).toCSV(x, val.getObjValue(), this);
         }

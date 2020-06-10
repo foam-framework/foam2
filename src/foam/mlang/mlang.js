@@ -3285,7 +3285,7 @@ foam.CLASS({
         StringBuilder sb = new StringBuilder("find");
         PropertyInfo p1 = (PropertyInfo) getArg1();
         FObject obj1;
-        if ( p1 instanceof AbstractFObjectPropertyInfo) {
+        if ( p1 instanceof AbstractFObjectPropertyInfo ) {
           Object val = getArg1().f(obj);
           if ( val == null )
             return null;

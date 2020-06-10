@@ -84,9 +84,8 @@ foam.CLASS({
         }
       ],
       code: function (of, propName, i) {
-        if (i === propName.length - 1 ) {
+        if ( i === propName.length - 1 )
           return of.getAxiomByName(propName[i]);
-        }
         var prop = of.getAxiomByName(propName[i]);
         return foam.mlang.Expressions.create().DOT(prop, this.returnPropExpr(prop, this.returnDotExprForNestedProperty(prop.of, propName, ++i)));
       },
