@@ -400,6 +400,9 @@ var classes = [
   'foam.nanos.export.GoogleSheetsExport',
   'foam.nanos.export.GoogleSheetsExportService',
   'foam.nanos.export.GoogleSheetsPropertyMetadata',
+  'foam.nanos.extraconfig.AddOn',
+  'foam.nanos.extraconfig.DataTypeViewConfig',
+  'foam.nanos.extraconfig.ExtraConfigValue',
   'foam.dao.jdbc.ConnectionPool',
   'foam.lib.Outputter',
   'foam.lib.PropertyPredicate',
@@ -613,7 +616,8 @@ var classes = [
   'foam.nanos.approval.ApprovableApprovalRequestsPredicate',
   'foam.nanos.approval.ApprovableApprovalRequestsRule',
   'foam.nanos.approval.FulfilledApprovablePredicate',
-  'foam.nanos.approval.FulfilledApprovableRule'
+  'foam.nanos.approval.FulfilledApprovableRule',
+  'foam.nanos.approval.AuthenticatedApprovalDAOAuthorizer',
 ];
 
 var abstractClasses = [
