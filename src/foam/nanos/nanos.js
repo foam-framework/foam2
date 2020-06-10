@@ -187,7 +187,6 @@ FOAM_FILES([
   { name: "foam/nanos/export/JSONDriver"},
   { name: "foam/nanos/export/JSONJDriver"},
   { name: "foam/nanos/export/XMLDriver"},
-  { name: "foam/nanos/export/CSVDriver"},
   { name: "foam/nanos/export/PDFGoogleSheetsExportDriver" },
   { name: "foam/nanos/auth/Relationships" },
   { name: "foam/nanos/NanoService" },
