@@ -46,3 +46,5 @@ p({
   "lazy": false,
   "service":{"class":"foam.nanos.notification.email.SMTPConfig"}
 })
+
+
