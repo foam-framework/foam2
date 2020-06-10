@@ -92,6 +92,19 @@ foam.CLASS({
         { name: 'x', type: 'Context' },
         { name: 'obj', type: 'FObject' }
       ],
+      documentation: `
+        Overrides approvalRequestDAO being used by ApprovableAwareDAO with the
+        relationshipDAO (for approval requests) found on the "obj".
+
+        Advantage of using the relationshipDAO over the original approvalRequestDAO
+        in the context is that, when performing DAO.put, the assignment of the
+        foreign key field (eg. entityId) on the approval request object is done
+        by the DAO automatically.
+
+        NOTE: resolveApprovalRequestDAO(x, obj) is used as the first call to
+        retrieve the approvalRequestDAO in ApprovableAwareDAO.put_ so that the
+        relationshipDAO will be used in place of approvalRequestDAO.
+      `,
       javaCode: `
         var axiomName = "get"
           + Character.toUpperCase(getRelationshipName().charAt(0))
