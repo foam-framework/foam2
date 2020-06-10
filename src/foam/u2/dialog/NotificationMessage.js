@@ -160,7 +160,11 @@ foam.CLASS({
       if ( this.type === 'error' ) {
         indicator = {
           size: 18,
-          icon: 'images/round-error-red.svg'
+          backgroundColor: this.theme.destructive3,
+          borderColor: this.theme.destructive3,
+          icon: this.theme.glyphs.exclamation.getDataUrl({
+            fill: this.theme.white
+          })
         };
       } else if ( this.type === 'warning' ) {
         indicator = {

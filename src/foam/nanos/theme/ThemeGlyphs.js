@@ -75,6 +75,20 @@ foam.CLASS({
           `
         });
       }
+    },
+    {
+      name: 'exclamation',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.theme.Glyph',
+      factory: function () {
+        return this.Glyph.create({
+          template: `
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <path fill="%FILL%" fill-rule="nonzero" d="M 12 0 z m 0 13.2 c -0.66 0 -1.2 -0.54 -1.2 -1.2 V 7.2 c 0 -0.66 0.54 -1.2 1.2 -1.2 c 0.66 0 1.2 0.54 1.2 1.2 V 12 c 0 0.66 -0.54 1.2 -1.2 1.2 z m 1.2 4.8 h -2.4 v -2.4 h 2.4 V 18 z"/>
+</svg>
+          `
+        });
+      }
     }
   ]
 });
