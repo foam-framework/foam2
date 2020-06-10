@@ -11,22 +11,22 @@ foam.CLASS({
   flags: ['java'],
 
   javaImports: [
+    'foam.core.ClassInfo',
     'foam.core.FObject',
     'foam.core.PropertyInfo',
     'foam.core.ProxyX',
     'foam.lib.formatter.FObjectFormatter',
     'foam.lib.formatter.JSONFObjectFormatter',
-    'foam.lib.StoragePropertyPredicate',
     'foam.lib.json.ExprParser',
     'foam.lib.json.JSONParser',
     'foam.lib.parse.*',
+    'foam.lib.StoragePropertyPredicate',
     'foam.nanos.auth.LastModifiedByAware',
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
     'foam.nanos.logger.Logger',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.StdoutLogger',
-
     'java.io.BufferedReader',
     'java.io.BufferedWriter',
     'java.io.InputStream',
@@ -36,8 +36,8 @@ foam.CLASS({
     'java.util.Calendar',
     'java.util.Iterator',
     'java.util.List',
-    'java.util.TimeZone',
-    'java.util.regex.Pattern'
+    'java.util.regex.Pattern',
+    'java.util.TimeZone'
   ],
 
   axioms: [
@@ -56,6 +56,9 @@ foam.CLASS({
             public JSONFObjectFormatter get() {
               JSONFObjectFormatter b = super.get();
               b.reset();
+              b.setPropertyPredicate(new StoragePropertyPredicate());
+              b.setOutputShortNames(true);
+              b.setOutputDefaultClassNames(false);
               return b;
             }
           };
@@ -159,6 +162,14 @@ try {
   throw new RuntimeException(t);
 }
       `
+    },
+    {
+      class: 'Long',
+      name: 'lastUser'
+    },
+    {
+      class: 'Long',
+      name: 'lastTimestamp'
     }
   ],
 
@@ -168,8 +179,9 @@ try {
       type: 'FObject',
       args: [ 'Context x', 'String prefix', 'DAO dao', 'foam.core.FObject obj' ],
       javaCode: `
-        final Object id = obj.getProperty("id");
-        JSONFObjectFormatter fmt = formatter.get();
+        final Object               id  = obj.getProperty("id");
+        final ClassInfo            of  = dao.getOf();
+        final JSONFObjectFormatter fmt = formatter.get();
 
         getLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
           FObject old;
@@ -186,9 +198,9 @@ try {
           public void executeJob() {
             try {
               if ( old != null ) {
-                fmt.outputDelta(old, obj);
+                fmt.outputDelta(old, obj, of);
               } else {
-                fmt.output(obj);
+                fmt.output(obj, of);
               }
             } catch (Throwable t) {
               getLogger().error("Failed to write put entry to journal", t);
@@ -196,6 +208,7 @@ try {
             }
           }
 
+// TODO: always flush if isLast()
           public void endJob() {
             if ( fmt.builder().length() == 0 ) return;
 
@@ -207,7 +220,7 @@ try {
                 getMultiLineOutput() ? "\\n" : "",
                 foam.util.SafetyUtil.isEmpty(prefix) ? "" : prefix + ".");
 
-                if ( isLast() ) getWriter().flush();
+              if ( isLast() ) getWriter().flush();
             } catch (Throwable t) {
               getLogger().error("Failed to write put entry to journal", t);
             }
@@ -226,10 +239,12 @@ try {
       javaCode: `
       write_(sb.get()
         .append(prefix)
-        .append("p(")
-        .append(record)
+        .append("p("));
+      write_(record);
+      write_(sb.get()
         .append(")")
         .append(c));
+      getWriter().newLine();
       `
     },
     {
@@ -256,7 +271,7 @@ try {
             // true properties that ID/MultiPartID maps too.
             FObject toWrite = (FObject) obj.getClassInfo().newInstance();
             toWrite.setProperty("id", obj.getProperty("id"));
-            fmt.output(toWrite);
+            fmt.output(toWrite, dao.getOf());
           } catch (Throwable t) {
             getLogger().error("Failed to write put entry to journal", t);
           }
@@ -291,6 +306,7 @@ try {
         .append("r(")
         .append(record)
         .append(")"));
+      getWriter().newLine();
       `
     },
     {
@@ -303,7 +319,7 @@ try {
       javaCode: `
         BufferedWriter writer = getWriter();
         writer.append(data);
-        writer.newLine();
+//        writer.newLine();
       `
     },
     {
@@ -317,14 +333,20 @@ try {
         User user = ((Subject) x.get("subject")).getUser();
         if ( user == null || user.getId() <= 1 ) return;
         if ( obj instanceof LastModifiedByAware && ((LastModifiedByAware) obj).getLastModifiedBy() != 0L ) return;
+        long now    = System.currentTimeMillis();
+        long userId = user.getId();
+        if ( now == getLastTimestamp() && userId == getLastUser() ) return;
+        setLastTimestamp(now);
+        setLastUser(userId);
 
         write_(sb.get()
           .append("// Modified by ")
           .append(user.toSummary())
           .append(" (")
-          .append(user.getId())
+          .append(userId)
           .append(") at ")
           .append(getTimeStamper().createTimestamp()));
+        getWriter().newLine();
       `
     },
     {

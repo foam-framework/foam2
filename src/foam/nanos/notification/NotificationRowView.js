@@ -168,7 +168,7 @@
           if ( e.message === 'An approval request has been sent out.' ) {
             self.ctrl.add(self.NotificationMessage.create({
               message: e.message,
-              type: 'success'
+              type: 'info'
             }));
           } else {
             self.ctrl.add(self.NotificationMessage.create({

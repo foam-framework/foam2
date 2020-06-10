@@ -36,6 +36,7 @@ public class AsyncAssemblyLine
     final Assembly previous;
 
     synchronized ( startLock_ ) {
+      if ( q_ != null ) q_.markNotLast();
       previous = q_;
       q_ = job;
       try {

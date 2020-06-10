@@ -377,7 +377,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/SendNotificationOnTopLevelCapabilityStatusUpdate" },
   { name: "foam/nanos/crunch/IsUserCapabilityJunctionStatusUpdate" },
   { name: "foam/nanos/crunch/RemoveJunctionsOnUserRemoval" },
-  { name: "foam/nanos/crunch/InvalidateDependenciesIfPrerequisiteInvalidated" },
+  { name: "foam/nanos/crunch/CascadeInvalidate" },
 
   // approval
   { name: 'foam/nanos/approval/ApprovalRequest' },
