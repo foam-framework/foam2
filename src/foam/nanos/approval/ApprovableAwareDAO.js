@@ -69,7 +69,8 @@ foam.CLASS({
       class: 'Object',
       javaType: 'foam.dao.DAO',
       name: 'approvalRequestDAO',
-      transient: true
+      transient: true,
+      javaFactory: 'return (DAO) getX().get("approvalRequestDAO");'
     }
   ],
 
@@ -85,30 +86,26 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'obtainApprovalRequestDAO',
+      name: 'resolveApprovalRequestDAO',
       type: 'foam.dao.DAO',
       args: [
         { name: 'x', type: 'Context' },
         { name: 'obj', type: 'FObject' }
       ],
       javaCode: `
-        if ( getApprovalRequestDAO() == null ) {
-          var axiomName = "get"
-            + Character.toUpperCase(getRelationshipName().charAt(0))
-            + getRelationshipName().substring(1);
-          var method = (MethodInfo) obj.getClassInfo().getAxiomByName(axiomName);
-          DAO dao = null;
+        var axiomName = "get"
+          + Character.toUpperCase(getRelationshipName().charAt(0))
+          + getRelationshipName().substring(1);
+        var method = (MethodInfo) obj.getClassInfo().getAxiomByName(axiomName);
+        DAO dao = null;
 
-          try {
-            dao = (DAO) method.call(x, obj, new Object[] { x });
-          } catch ( Throwable t ) {
-            Logger logger = (Logger) x.get("logger");
-            logger.warning(
-              "Could not load approval requests relationship: " + getRelationshipName()
-              , obj, "The default 'approvalRequestDAO' will be used.");
-            dao = (DAO) x.get("approvalRequestDAO");
-          }
-          setApprovalRequestDAO(dao);
+        try {
+          setApprovalRequestDAO((DAO) method.call(x, obj, new Object[] { x }));
+        } catch ( Throwable t ) {
+          Logger logger = (Logger) x.get("logger");
+          logger.warning(
+            "Could not load approval requests relationship: " + getRelationshipName()
+            , obj, "The default 'approvalRequestDAO' will be used.");
         }
         return getApprovalRequestDAO();
       `
@@ -206,7 +203,7 @@ foam.CLASS({
       ApprovableAware approvableAwareObj = (ApprovableAware) obj;
       LifecycleAware lifecycleObj = (LifecycleAware) obj;
 
-      DAO approvalRequestDAO = obtainApprovalRequestDAO(x, obj);
+      DAO approvalRequestDAO = resolveApprovalRequestDAO(x, obj);
       DAO dao = (DAO) x.get(getDaoKey());
 
       FObject currentObjectInDAO = (FObject) dao.find(String.valueOf(obj.getProperty("id")));
