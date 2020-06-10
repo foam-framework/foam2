@@ -12,13 +12,17 @@ foam.CLASS({
   documentation: 'Export Modal',
 
   imports: [
+    'extraConfigAddOnDAO',
     'exportDriverRegistryDAO',
     'filteredTableColumns'
   ],
 
   requires: [
+    'foam.u2.layout.Cols',
     'foam.u2.ModalHeader',
-    'foam.u2.layout.Cols'
+    'foam.mlang.predicate.ContainsIC',
+    'foam.nanos.extraconfig.AddOn',
+    'foam.nanos.extraconfig.ConfigView'
   ],
 
   properties: [
@@ -65,6 +69,14 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'isOpenAvailable'
+    },
+    {
+      name: 'exportConfigArray',
+      value: []
+    },
+    {
+      name: 'exportConfigAddOns',
+      value: []
     }
   ],
 
@@ -124,6 +136,9 @@ foam.CLASS({
       });
       
       self.exportDriverReg$.sub(function() {
+        self.extraConfigAddOnDAO.where(self.ContainsIC.create({ arg1: self.AddOn.CONFIG_FOR_CLASS, arg2: self.exportDriverReg.driverName})).select().then(function(v){
+          self.exportConfigAddOns = v.array;
+        });
         self.isConvertAvailable =  self.exportDriverReg.isConvertible;
         self.isDownloadAvailable = self.exportDriverReg.isDownloadable;
         self.isOpenAvailable = self.exportDriverReg.isOpenable;
@@ -139,11 +154,12 @@ foam.CLASS({
         .start()
           .start().addClass('label').add('Data Type').end()
           .start(this.DATA_TYPE).end()
+          .add(self.ConfigView.create({ exportConfigArray$: self.exportConfigArray$, exportConfigAddOns$: self.exportConfigAddOns$ }))
           .start().addClass('label').add('Response').end()
           .start(this.NOTE).addClass('input-box').addClass('note').end()
           .add(
-            self.slot(function(dataType) {
-              if ( dataType == 'CSV' || dataType == 'GoogleSheets' || dataType == 'PDFGoogleSheets' ) {
+            self.slot(function(exportDriverReg$isAllColumnExportSupported) {
+              if ( exportDriverReg$isAllColumnExportSupported ) {
                 return self.E().start().addClass('label').startContext({ data: self }).tag(self.EXPORT_ALL_COLUMNS).endContext().end();
               }
             })
@@ -177,8 +193,8 @@ foam.CLASS({
         var exportDriver = foam.lookup(this.exportDriverReg.driverName).create();
   
         this.note = this.exportData ?
-          await exportDriver.exportDAO(this.__context__, this.exportData) :
-          await exportDriver.exportFObject(this.__context__, this.exportObj);
+          await exportDriver.exportDAO(this.__context__, this.exportData, this.exportConfigArray) :
+          await exportDriver.exportFObject(this.__context__, this.exportObj, this.exportConfigArray);
   
         if ( this.exportAllColumns )
           this.filteredTableColumns = filteredColumnsCopy;
@@ -203,8 +219,8 @@ foam.CLASS({
         var exportDriver    = foam.lookup(this.exportDriverReg.driverName).create();
   
         var p = this.exportData ?
-          exportDriver.exportDAO(this.__context__, this.exportData) :
-          Promise.resolve(exportDriver.exportFObject(this.__context__, this.exportObj));
+          exportDriver.exportDAO(this.__context__, this.exportData, this.exportConfigArray) :
+          Promise.resolve(exportDriver.exportFObject(this.__context__, this.exportObj, this.exportConfigArray));
   
         p.then(result => {
           var link = document.createElement('a');
@@ -244,8 +260,8 @@ foam.CLASS({
 
         var exportDriver    = foam.lookup(this.exportDriverReg.driverName).create();
         var url = this.exportData ?
-          await exportDriver.exportDAO(this.__context__, this.exportData) :
-          await exportDriver.exportFObject(this.__context__, this.exportObj);
+          await exportDriver.exportDAO(this.__context__, this.exportData, this.exportConfigArray) :
+          await exportDriver.exportFObject(this.__context__, this.exportObj, this.exportConfigArray);
         
         if ( this.exportAllColumns )
           this.filteredTableColumns = filteredColumnsCopy;
@@ -255,5 +271,4 @@ foam.CLASS({
       }
     }
   ]
-
 });
