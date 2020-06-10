@@ -328,38 +328,39 @@ foam.CLASS({
               }).
 
               // Render the table headers for the property columns.
-              forEach(columns_, function([property, overrides]) {
+              forEach(columns_, function([col, overrides]) {
                 var propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => c));
                 view.props = view.returnProperties(view, propertyNamesToQuery);
                 view.updateValues = ! view.updateValues;
-                var column;
+                var prop;
                 var isFirstLevelProperty = true;
-                if ( ! foam.core.Property.isInstance(property) ) {
-                  var propertyNames = property.split('.');
+                if ( ! foam.core.Property.isInstance(col) ) {
+                  var propertyNames = col.split('.');
                   isFirstLevelProperty = propertyNames.length === 1;
-                  column = view.props.find(c => c.name === propertyNames[propertyNames.length - 1]);
+                  prop = view.props.find(c => c.name === propertyNames[propertyNames.length - 1]);
                 } else
-                  column = view.props.find(c => c.name === property.name);
+                  prop = view.props.find(c => c.name === col.name);
+                var column = view.columns.find( c => !foam.String.isInstance(c) && c.name === prop.name );
 
                 this.start().
                   addClass(view.myClass('th')).
-                  addClass(view.myClass('th-' + column.name)).
+                  addClass(view.myClass('th-' + prop.name)).
                   call(function() {
-                    if ( column.tableWidth ) {
-                      this.style({ flex: `0 0 ${column.tableWidth}px` });
+                    if ( prop.tableWidth || ( column && column.tableWidth ) ) {
+                      this.style({ flex: `0 0 ${column && column.tableWidth ? column.tableWidth : prop.tableWidth}px` });
                     } else {
                       this.style({ flex: '1 0 0' });
                     }
                   }).
-                  call(column.tableHeaderFormatter, [column]).
+                  call(column && column.tableHeaderFormatter ? column.tableHeaderFormatter : prop.tableHeaderFormatter, [column && column.tableHeaderFormatter ? column : prop]).
                   callIf(isFirstLevelProperty, function() {
                     this.on('click', function(e) {
-                      view.sortBy(column, property);
+                      view.sortBy(prop);
                       }).
-                      callIf(column.label !== '', function() {
+                      callIf(prop.label !== '', function() {
                         this.start('img').attr('src', this.slot(function(order) {
-                          return column === order ? view.ascIcon :
-                              ( view.Desc.isInstance(order) && order.arg1 === column )
+                          return prop === order ? view.ascIcon :
+                              ( view.Desc.isInstance(order) && order.arg1 === prop )
                               ? view.descIcon : view.restingIcon;
                         }, view.order$)).end();
                     });
@@ -425,15 +426,14 @@ foam.CLASS({
 
             var numberOfColumns = propertyNamesToQuery.length;
 
+            // Make sure the DAO set here responds to ordering when a user clicks
+            // on a table column header to sort by that column.
             if ( this.order ) dao = dao.orderBy(this.order);
             var proxy = view.ProxyDAO.create({ delegate: dao });
 
             //to retrieve value of unitProp
             unitValueProperties.forEach(p => propertyNamesToQuery.push(p.unitPropName));
             var valPromises = view.returnRecords(proxy, propertyNamesToQuery);
-            // Make sure the DAO set here responds to ordering when a user clicks
-            // on a table column header to sort by that column.
-            // if ( this.order ) dao = dao.orderBy(this.order);
             
             var tbodyElement = this.
               E();
@@ -543,12 +543,16 @@ foam.CLASS({
                     });
                   });
                   for ( var  i = 1 ; i < numberOfColumns ; i++  ) {
+                    var column = view.columns.find( c => !foam.String.isInstance(c) && c.name === view.props[i].name );
                     //check properties for tableCellFormatter and call it
-                    if ( view.props[i].tableCellFormatter && val[i] ) {
-                      var v = this.E().addClass(view.myClass('td')).style({flex: view.props[i] && view.props[i].tableWidth  ? `0 0 ${view.props[i].tableWidth}px` : '1 0 0'});//, 'justify-content': 'center'
+                    if ( ( view.props[i].tableCellFormatter || ( column && column.tableCellFormatter ) ) && val[i] ) {
+                      var elmt = this.E().addClass(view.myClass('td')).style({flex: column && column.tableWidth ? `0 0 ${column.tableWidth}px` : view.props[i] && view.props[i].tableWidth  ? `0 0 ${view.props[i].tableWidth}px` : '1 0 0'});//, 'justify-content': 'center'
                       try {
-                        view.props[i].tableCellFormatter.format(v, val[i], null);
-                        tableRowElement.add(v);
+                        if ( column && column.tableCellFormatter )
+                          column.tableCellFormatter.format(elmt, val[i], null);
+                        else
+                          view.props[i].tableCellFormatter.format(elmt, val[i], null);
+                        tableRowElement.add(elmt);
                         continue;
                       } catch(e) {}
                     }
@@ -561,7 +565,7 @@ foam.CLASS({
                     }
                     tableRowElement.start().addClass(view.myClass('td'))
                     .add(stringValue)
-                    .style({flex: view.props[i] && view.props[i].tableWidth  ? `0 0 ${view.props[i].tableWidth}px` : '1 0 0'}).end();  
+                    .style({flex: column && column.tableWidth ? `0 0 ${column.tableWidth}px` : view.props[i] && view.props[i].tableWidth  ? `0 0 ${view.props[i].tableWidth}px` : '1 0 0'}).end();  
                   }
                   tableRowElement
                     .start()
