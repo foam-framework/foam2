@@ -11,22 +11,22 @@ foam.CLASS({
   flags: ['java'],
 
   javaImports: [
+    'foam.core.ClassInfo',
     'foam.core.FObject',
     'foam.core.PropertyInfo',
     'foam.core.ProxyX',
     'foam.lib.formatter.FObjectFormatter',
     'foam.lib.formatter.JSONFObjectFormatter',
-    'foam.lib.StoragePropertyPredicate',
     'foam.lib.json.ExprParser',
     'foam.lib.json.JSONParser',
     'foam.lib.parse.*',
+    'foam.lib.StoragePropertyPredicate',
     'foam.nanos.auth.LastModifiedByAware',
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
     'foam.nanos.logger.Logger',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.StdoutLogger',
-
     'java.io.BufferedReader',
     'java.io.BufferedWriter',
     'java.io.InputStream',
@@ -36,8 +36,8 @@ foam.CLASS({
     'java.util.Calendar',
     'java.util.Iterator',
     'java.util.List',
-    'java.util.TimeZone',
-    'java.util.regex.Pattern'
+    'java.util.regex.Pattern',
+    'java.util.TimeZone'
   ],
 
   axioms: [
@@ -57,6 +57,8 @@ foam.CLASS({
               JSONFObjectFormatter b = super.get();
               b.reset();
               b.setPropertyPredicate(new StoragePropertyPredicate());
+              b.setOutputShortNames(true);
+              b.setOutputDefaultClassNames(false);
               return b;
             }
           };
@@ -169,7 +171,9 @@ try {
       type: 'FObject',
       args: [ 'Context x', 'String prefix', 'DAO dao', 'foam.core.FObject obj' ],
       javaCode: `
-        final Object id = obj.getProperty("id");
+        final Object    id = obj.getProperty("id");
+        final ClassInfo of = dao.getOf();
+
         JSONFObjectFormatter fmt = formatter.get();
 
         getLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
@@ -187,9 +191,9 @@ try {
           public void executeJob() {
             try {
               if ( old != null ) {
-                fmt.outputDelta(old, obj, dao.getOf());
+                fmt.outputDelta(old, obj, of);
               } else {
-                fmt.output(obj, dao.getOf());
+                fmt.output(obj, of);
               }
             } catch (Throwable t) {
               getLogger().error("Failed to write put entry to journal", t);
