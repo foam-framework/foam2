@@ -100,7 +100,7 @@ public class LiveScriptBundler
         }
         try {
           // Since each directory has a watcher thread, 1/100ms is sufficiently frequent
-          Thread.sleep(100);
+          Thread.sleep(500);
         } catch (InterruptedException e) {
           return;
         }
