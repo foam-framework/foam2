@@ -440,20 +440,30 @@ foam.CLASS({
               tbodyElement.
               addClass(view.myClass('tbody'));
               valPromises.then(function(values) {
+
                 tbodyElement.forEach(values.array, function(val) {
+                  var thisObjValue;
                   var tableRowElement = this.E();
                   tableRowElement.
                   addClass(view.myClass('tr')).
                   on('mouseover', function() {
-                    dao.find(val[0]).then(v => {
-                      view.hoverSelection = v;
+                    if ( !thisObjValue ) {
+                      dao.find(val[0]).then(v => {
+                      thisObjValue = v;
+                      view.hoverSelection = thisObjValue;
                     });
+                    } else
+                      view.hoverSelection = thisObjValue;
                   }).
                   callIf(view.dblclick && ! view.disableUserSelection, function() {
                     tableRowElement.on('dblclick', function() {
-                      dao.find(val[0]).then(function(val) {
-                        view.dblclick && view.dblclick(val);
-                      });
+                      if ( !thisObjValue ) {
+                        dao.find(val[0]).then(function(v) {
+                          thisObjValue = v;
+                          view.dblclick && view.dblclick(thisObjValue);
+                        });
+                      } else
+                        view.dblclick && view.dblclick(thisObjValue);
                     });
                   }).
                   callIf( ! view.disableUserSelection, function() {
@@ -464,12 +474,17 @@ foam.CLASS({
                         evt.target.nodeName === 'DROPDOWN-OVERLAY' ||
                         evt.target.classList.contains(view.myClass('vertDots'))
                       ) return;
-  
-                      dao.find(val[0]).then(v => {
-                        view.selection = v;
-                        if ( view.importSelection$ ) view.importSelection = v;
-                        if ( view.editRecord$ ) view.editRecord(v);
-                      });
+                      
+                      if  ( !thisObjValue ) {
+                        dao.find(val[0]).then(v => {
+                          view.selection = v;
+                          if ( view.importSelection$ ) view.importSelection = v;
+                          if ( view.editRecord$ ) view.editRecord(v);
+                        });
+                      } else {
+                        if ( view.importSelection$ ) view.importSelection = thisObjValue;
+                        if ( view.editRecord$ ) view.editRecord(thisObjValue);
+                      }
                     });
                   }).
                   addClass(view.slot(function(selection) {
@@ -522,10 +537,16 @@ foam.CLASS({
   
                       if ( checked ) {
                         var modification = {};
-                        dao.find(val[0]).then(v => {
-                          modification[val[0]] = v;
+                        if ( !thisObjValue ) {
+                          dao.find(val[0]).then(v => {
+                            modification[val[0]] = v;
+                            view.selectedObjects = Object.assign({}, view.selectedObjects, modification);
+                          });
+                        } else {
+                          modification[val[0]] = thisObjValue;
                           view.selectedObjects = Object.assign({}, view.selectedObjects, modification);
-                        });
+                        }
+
                       } else {
                         var temp = Object.assign({}, view.selectedObjects);
                         delete temp[val[0]];
@@ -544,7 +565,6 @@ foam.CLASS({
                   });
                   for ( var  i = 1 ; i < numberOfColumns ; i++  ) {
                     var column = view.columns.find( c => !foam.String.isInstance(c) && c.name === view.props[i].name );
-                    //check properties for tableCellFormatter and call it
                     if ( ( view.props[i].tableCellFormatter || ( column && column.tableCellFormatter ) ) && val[i] ) {
                       var elmt = this.E().addClass(view.myClass('td')).style({flex: column && column.tableWidth ? `0 0 ${column.tableWidth}px` : view.props[i] && view.props[i].tableWidth  ? `0 0 ${view.props[i].tableWidth}px` : '1 0 0'});//, 'justify-content': 'center'
                       try {
