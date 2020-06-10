@@ -238,12 +238,12 @@ try {
       args: [ 'Context x', 'CharSequence record', 'String c', 'String prefix' ],
       javaCode: `
       BufferedWriter writer = getWriter();
-     writer.write(prefix);
-     writer.write("p(");
-     writer.append(record);
-     writer.write(')');
-     writer.write(c);
-     writer.newLine();
+      writer.write(prefix);
+      writer.write("p(");
+      writer.append(record);
+      writer.write(')');
+      writer.write(c);
+      writer.newLine();
       `
     },
     {
