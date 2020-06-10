@@ -1,5 +1,13 @@
 p({
   "class": "foam.nanos.boot.NSpec",
+  "name": "mping",
+  "lazy": false,
+  "authenticate": false,
+  "serviceClass": "foam.nanos.medusa.ClusterPingService"
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
   "name": "medusaThreadPool",
   "serviceScript": `
     return new foam.nanos.pool.ThreadPoolAgency.Builder(x)
