@@ -22,13 +22,13 @@ foam.CLASS({
       border-radius: 50%;
       text-align: center;
       display: inline-block;
+      overflow: hidden;
     }
     ^ > img {
       position: absolute;
       top: 0;
-      bottom: 0;
+      left: 0;
       pointer-events: none;
-      z-index: -1;
     }
   `,
 
