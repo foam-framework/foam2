@@ -38,8 +38,6 @@ foam.CLASS({
             return name; 
           });
         var tableColumns = this.data.columns;
-        //current implementation supports either proprety name or property itself
-        //fixing dashboard
         tableColumns = tableColumns.map(c => Array.isArray(c) ? c[0] : c);
         //to keep record of columns that are selected
         var topLevelProps = [];
