@@ -208,6 +208,7 @@ try {
             }
           }
 
+// TODO: always flush if isLast()
           public void endJob() {
             if ( fmt.builder().length() == 0 ) return;
 
@@ -239,8 +240,7 @@ try {
       write_(sb.get()
         .append(prefix)
         .append("p("));
-      write_(sb.get()
-        .append(record));
+      write_(record);
       write_(sb.get()
         .append(")")
         .append(c));
