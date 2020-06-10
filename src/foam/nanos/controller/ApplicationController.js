@@ -42,7 +42,10 @@ foam.CLASS({
     'foam.nanos.theme.ThemeDomain',
     'foam.nanos.u2.navigation.TopNavigation',
     'foam.nanos.u2.navigation.FooterView',
+    'foam.u2.crunch.CapabilityIntercept',
+    'foam.u2.crunch.CapabilityInterceptView',
     'foam.u2.crunch.CrunchController',
+    'foam.u2.borders.MarginBorder',
     'foam.u2.stack.Stack',
     'foam.u2.stack.StackView',
     'foam.u2.dialog.NotificationMessage',
@@ -64,8 +67,6 @@ foam.CLASS({
     'agent',
     'appConfig',
     'as ctrl',
-    'capabilityAcquired',
-    'capabilityCancelled',
     'currentMenu',
     'group',
     'lastMenuLaunched',
@@ -514,32 +515,19 @@ foam.CLASS({
         self.capabilityCache.set(c, false);
       });
 
-      self.capabilityAcquired = false;
-      self.capabilityCancelled = false;
-      return new Promise(function(resolve, reject) {
-        self.stack.push({
-          class: 'foam.u2.crunch.CapabilityInterceptView',
-          capabilityOptions: capabilityInfo.capabilityOptions
-        });
-        var s1, s2;
-        s1 = self.capabilityAcquired$.sub(() => {
-          s1.detach();
-          s2.detach();
-          resolve();
-        });
-        s2 = self.capabilityCancelled$.sub(() => {
-          s1.detach();
-          s2.detach();
-          reject();
-        });
+      let intercept = self.CapabilityIntercept.create({
+        capabilityOptions: capabilityInfo.capabilityOptions
       });
+
+      return self.crunchController.maybeLaunchInterceptView(intercept);
     },
 
-    function notify(data, type) {
+    function notify(data, type, description) {
       /** Convenience method to create toast notifications. */
       this.add(this.NotificationMessage.create({
         message: data,
-        type: type
+        type: type,
+        description: description
       }));
     }
   ],

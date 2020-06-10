@@ -65,6 +65,10 @@
       ^ .msg.fully-visible {
         display: block;
       }
+      ^ .notificationDiv {
+        display: flex;
+        flex-direction: row;
+      }
     `,
 
     properties: [
@@ -77,19 +81,21 @@
       function initE() {
         this
           .addClass(this.myClass())
-          .tag(this.OverlayActionListView, {
-            data: [
-              this.MARK_AS_READ,
-              this.MARK_AS_UNREAD,
-              this.HIDE_NOTIFICATION_TYPE,
-              this.REMOVE_NOTIFICATION
-            ],
-            obj: this.data
-          })
-          .tag(this.NotificationCitationView, {
-            of: this.data.cls_,
-            data: this.data
-          });
+          .start().addClass('notificationDiv')
+            .tag(this.NotificationCitationView, {
+              of: this.data.cls_,
+              data: this.data
+            })
+            .tag(this.OverlayActionListView, {
+              data: [
+                this.MARK_AS_READ,
+                this.MARK_AS_UNREAD,
+                this.HIDE_NOTIFICATION_TYPE,
+                this.REMOVE_NOTIFICATION
+              ],
+              obj: this.data
+            })
+          .end();
       }
     ],
 
@@ -162,7 +168,7 @@
           if ( e.message === 'An approval request has been sent out.' ) {
             self.ctrl.add(self.NotificationMessage.create({
               message: e.message,
-              type: 'success'
+              type: 'info'
             }));
           } else {
             self.ctrl.add(self.NotificationMessage.create({

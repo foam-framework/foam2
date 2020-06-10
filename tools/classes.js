@@ -86,6 +86,7 @@ var classes = [
   'foam.box.SubBoxMessage',
   'foam.box.SubscribeMessage',
   'foam.box.NamedBox',
+  'foam.box.HTTPAuthorizationType',
   'foam.box.HTTPBox',
   'foam.box.HTTPReplyBox',
   'foam.box.AuthServiceClientBox',
@@ -125,7 +126,9 @@ var classes = [
   'foam.dao.AbstractJournal',
   'foam.dao.ProxyJournal',
   'foam.dao.CompositeJournal',
+  'foam.dao.AbstractF3FileJournal',
   'foam.dao.AbstractFileJournal',
+  'foam.dao.F3FileJournal',
   'foam.dao.FileJournal',
   'foam.dao.RoutingJournal',
   'foam.dao.RoutingJournalTest',
@@ -473,6 +476,12 @@ var classes = [
   'foam.test.TestObj',
   'foam.core.FObjectTest',
 
+  'foam.nanos.dig.drivers.DigFormatDriver',
+  'foam.nanos.dig.drivers.DigCsvDriver',
+  'foam.nanos.dig.drivers.DigHtmlDriver',
+  'foam.nanos.dig.drivers.DigJsonDriver',
+  'foam.nanos.dig.drivers.DigJsonJDriver',
+  'foam.nanos.dig.drivers.DigXmlDriver',
   'foam.nanos.dig.exception.DigErrorMessage',
   'foam.nanos.dig.exception.DAONotFoundException',
   'foam.nanos.dig.exception.ParsingErrorException',
@@ -575,6 +584,7 @@ var classes = [
   'foam.nanos.crunch.SendNotificationOnTopLevelCapabilityStatusUpdate',
   'foam.nanos.crunch.IsUserCapabilityJunctionStatusUpdate',
   'foam.nanos.crunch.RemoveJunctionsOnUserRemoval',
+  'foam.nanos.crunch.CascadeInvalidate',
   //authservice
   'foam.nanos.auth.CapabilityAuthService',
   // userQueryService
