@@ -11,6 +11,7 @@ foam.CLASS({
   documentation: 'Ticket Model',
 
   implements: [
+    'foam.nanos.auth.Authorizable',
     'foam.core.Validatable',
     'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.CreatedByAware',
@@ -23,6 +24,10 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.nanos.auth.AuthorizationException',
+    'foam.nanos.auth.AuthService',
+    'foam.nanos.auth.Subject',
+    'foam.nanos.auth.User',
     'java.util.Date'
   ],
 
@@ -254,6 +259,64 @@ foam.CLASS({
       tableCellFormatter: function(value, obj) {
         this.add(obj.title);
       }
+    }
+  ],
+
+  methods: [
+    {
+      name: 'authorizeOnCreate',
+      args: [
+        { name: 'x', type: 'Context' }
+      ],
+      javaThrows: ['AuthorizationException'],
+      javaCode: `
+        // Everyone can create a ticket
+      `
+    },
+    {
+      name: 'authorizeOnRead',
+      args: [
+        { name: 'x', type: 'Context' }
+      ],
+      javaThrows: ['AuthorizationException'],
+      javaCode: `
+        Subject subject = (Subject) x.get("subject");
+        User user = subject.getRealUser();
+
+        if ( user.getId() != this.getCreatedBy() ) {
+          throw new AuthorizationException("You don't have permission to read this ticket.");
+        }
+      `
+    },
+    {
+      name: 'authorizeOnUpdate',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'oldObj', type: 'foam.core.FObject' }
+      ],
+      javaThrows: ['AuthorizationException'],
+      javaCode: `
+        Subject subject = (Subject) x.get("subject");
+        User user = subject.getRealUser();
+
+        if ( user.getId() != this.getCreatedBy() ) {
+          throw new AuthorizationException("You don't have permission to update this ticket.");
+        }
+      `
+    },
+    {
+      name: 'authorizeOnDelete',
+      args: [
+        { name: 'x', type: 'Context' }
+      ],
+      javaThrows: ['AuthorizationException'],
+      javaCode: `
+        AuthService auth = (AuthService) x.get("auth");
+        
+        if ( ! auth.check(x, "ticket.delete") )  {
+          throw new AuthorizationException("Yon don't have permission to delete this ticket");
+        }
+      `
     }
   ],
 
