@@ -100,7 +100,7 @@ foam.CLASS({
       }
     },
     {
-      name: 'readyToSubmit',
+      name: 'validate',
       code: function () {
         return true;
       }
