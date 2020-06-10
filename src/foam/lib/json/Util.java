@@ -21,7 +21,8 @@ public class Util {
   /** Append src string to dst StringBuilder as an escaped JSON string. **/
   public static void escape(String src, StringBuilder dst) {
     int start = 0;
-    for ( int i = 0 ; i < src.length() ; i++ ) {
+    int len   = src.length();
+    for ( int i = 0 ; i < len ; i++ ) {
       char c = src.charAt(i);
 
       switch ( c ) {
@@ -30,19 +31,19 @@ public class Util {
           dst.append("\\t");
           break;
         case '\r':
-        start = copy(start, i, src, dst);
+          start = copy(start, i, src, dst);
           dst.append("\\r");
           break;
         case '\n':
-        start = copy(start, i, src, dst);
+          start = copy(start, i, src, dst);
           dst.append("\\n");
           break;
         case '\\':
-        start = copy(start, i, src, dst);
+          start = copy(start, i, src, dst);
           dst.append("\\\\");
           break;
         case '\"':
-        start = copy(start, i, src, dst);
+          start = copy(start, i, src, dst);
           dst.append("\\\"");
           break;
         default:
@@ -58,7 +59,8 @@ public class Util {
           }
       }
     }
-    copy(start, src.length(), src, dst);
+
+    copy(start, len, src, dst);
   }
 
 }

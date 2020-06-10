@@ -1003,7 +1003,7 @@ p({
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.approval.ApprovalRequest.getOwnClassInfo())
-      .setAuthorize(false)
+      .setAuthorizer(new foam.nanos.approval.AuthenticatedApprovalDAOAuthorizer())
       .setPm(true)
       .setPipelinePm(true)
       .setSeqNo(true)
@@ -1083,6 +1083,49 @@ p({
   """
     {
       "of":"foam.nanos.export.GoogleApiCredentials"
+    }
+  """
+})
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "extraConfigDataTypeViewConfigDAO",
+  "serve": true,
+  "authenticate": false,
+  "serviceScript":
+  """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("extraConfigDataTypeViewConfigs")
+      .setOf(foam.nanos.extraconfig.DataTypeViewConfig.getOwnClassInfo())
+      .build();
+  """,
+  "client":
+  """
+    {
+      "of": "foam.nanos.extraconfig.DataTypeViewConfig"
+    }
+  """
+})
+
+
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "extraConfigAddOnDAO",
+  "serve": true,
+  "authenticate": false,
+  "serviceScript":
+  """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("extraConfigAddOns")
+      .setOf(foam.nanos.extraconfig.AddOn.getOwnClassInfo())
+      .build();
+  """,
+  "client":
+  """
+    {
+      "of": "foam.nanos.extraconfig.AddOn"
     }
   """
 })
