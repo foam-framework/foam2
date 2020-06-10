@@ -493,18 +493,94 @@ foam.LIB({
   flags: ['java'],
   methods: [
     function buildJavaClass(cls) {
+      // TODO Generate getX() and setX() if contextAware
       cls = cls || foam.java.Class.create();
 
       cls.name          = this.model_.name;
       cls.package       = this.model_.package;
       cls.source        = this.model_.source;
-      cls.abstract      = this.model_.abstract;
+      cls.abstract      = (this.model_.abstract ? this.model_.abstract : false);
       cls.documentation = this.model_.documentation;
 
       if ( this.model_.name !== 'AbstractFObject' ) {
         // if not AbstractFObject either extend AbstractFObject or use provided extends property
         cls.extends = this.model_.extends === 'FObject' ?
           'foam.core.AbstractFObject' : this.model_.extends;
+
+        if ( true ) {
+          cls.field({
+            name: "x_",
+            visibility: 'private',
+            static: false,
+            final: false,
+            type: 'foam.core.X',
+            initializer: "foam.core.EmptyX.instance()"
+          });
+  
+          cls.method({
+            name: 'getX',
+            type: 'foam.core.X',
+            visibility: 'public',
+            body: 'return x_;'
+          });
+    
+          cls.method({
+            name: 'setX',
+            type: 'void',
+            visibility: 'public',
+            args: [
+              {
+                name: 'x',
+                type: 'foam.core.X'
+              }
+            ],
+            body: 'x_ = x;'
+          });
+  
+          // console.log(cls.methods);
+          // cls.method({
+          //   name: 'toString',
+          //   type: 'String',
+          //   visibility: 'public',
+          //   body: `
+          //     StringBuilder sb = new StringBuilder();
+          //     append(sb);
+          //     return sb.toString();
+          //   `
+          // })
+  
+          cls.field({
+            name: "freezer_",
+            visibility: 'private',
+            static: false,
+            final: false,
+            type: 'foam.core.Freezer',
+            initializer: "new foam.core.Freezer()"
+          });
+
+          cls.method({
+            name: 'freeze',
+            type: 'foam.core.FObject',
+            visibility: 'public',
+            body: `
+              beforeFreeze();
+              freeze(freezer_);
+              return this;
+            `
+          })
+  
+          cls.method({
+            name: 'isFrozen',
+            type: 'boolean',
+            visibility: 'public',
+            body: `
+              return isFrozen(freezer_);
+            `
+          })
+        } else {
+          console.log(cls);
+        }
+        
       } else {
         // if AbstractFObject we implement FObject
         cls.implements = [ 'foam.core.FObject' ];

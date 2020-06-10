@@ -533,12 +533,20 @@ public interface FObject
     return this.verify(signature, verifier);
   }
 
-
-
   default void assertNotFrozen()
     throws UnsupportedOperationException
   {
     if ( isFrozen() ) throw new UnsupportedOperationException("Object is frozen.");
+  }
+
+  default void freeze(Freezer freezer) {
+    freezer.freeze();
+  }
+
+  default boolean isFrozen(Freezer freezer) {
+    if ( freezer == null )
+      return false;
+    return freezer.isFrozen();
   }
 
 }

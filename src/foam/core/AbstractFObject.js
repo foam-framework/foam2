@@ -20,26 +20,6 @@ foam.CLASS({
     'java.util.Map'
   ],
 
-  axioms: [
-    {
-      name: 'javaExtras',
-      buildJavaClass: function (cls) {
-        cls.extras.push(`
-  protected X x_ = EmptyX.instance();
-  protected boolean __frozen__ = false;
-
-  public X getX() {
-    return this.x_;
-  }
-
-  public void setX(X x) {
-    this.x_ = x;
-  }
-        `);
-      }
-    }
-  ],
-
   methods: [
     {
       name: 'hashCode',
@@ -63,31 +43,6 @@ foam.CLASS({
       args: [ { name: 'o', type: 'Any' } ],
       javaCode: `
         return compareTo(o) == 0;
-      `
-    },
-    {
-      name: 'toString',
-      type: 'String',
-      javaCode: `
-        StringBuilder sb = new StringBuilder();
-        append(sb);
-        return sb.toString();
-      `
-    },
-    {
-      name: 'freeze',
-      type: 'FObject',
-      javaCode: `
-        beforeFreeze();
-        this.__frozen__ = true;
-        return this;
-      `
-    },
-    {
-      name: 'isFrozen',
-      type: 'Boolean',
-      javaCode: `
-        return this.__frozen__;
       `
     }
   ]
