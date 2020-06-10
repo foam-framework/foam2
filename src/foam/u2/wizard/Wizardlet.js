@@ -25,10 +25,6 @@ foam.INTERFACE({
   methods: [
     {
       name: 'save'
-    },
-    {
-      name: 'readyToSubmit',
-      type: 'boolean'
     }
   ]
 });

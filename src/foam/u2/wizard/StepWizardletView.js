@@ -184,6 +184,9 @@ foam.CLASS({
     {
       name: 'goPrev',
       label: 'back',
+      isEnabled: function (data$canGoBack) {
+        return data$canGoBack;
+      },
       code: function() {
         this.data.back();
       }
@@ -191,6 +194,9 @@ foam.CLASS({
     {
       name: 'goNext',
       label: 'next',
+      isEnabled: function (data$isLastWizardlet, data$currentWizardlet) {
+        return data$isLastWizardlet || data$currentWizardlet.validate();
+      },
       code: function(x) {
         this.data.next().then((isFinished) => {
           if ( isFinished ) {
@@ -201,6 +207,6 @@ foam.CLASS({
           x.ctrl.notify(this.ERROR_MSG);
         });
       }
-    },
+    }
   ]
 });

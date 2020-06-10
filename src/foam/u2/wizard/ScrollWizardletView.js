@@ -46,7 +46,7 @@ foam.CLASS({
       expression: function(wizardlets) {
         var check = true;
         wizardlets.forEach(wizardlet => {
-          if ( ! wizardlet.readyToSubmit() ) {
+          if ( ! wizardlet.validate() ) {
             check = false;
           }
         });
