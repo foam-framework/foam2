@@ -62,19 +62,23 @@ foam.CLASS({
                 .addClass(self.myClass('item'))
 
                 // Render circle indicator
-                .start(this.CircleIndicator,
-                  isCurrent ? {
-                    ...baseCircleIndicator,
+                .start(this.CircleIndicator, {
+                  ...baseCircleIndicator,
+                  ...(isCurrent ? {
                     borderColor: this.theme.primary1
                   } : afterCurrent ? {
-                    ...baseCircleIndicator,
                     borderColor: this.theme.grey2,
+                  } : wizardlet.validate() ? {
+                    borderColor: this.theme.approval3,
+                    backgroundColor: this.theme.approval3,
+                    icon: this.theme.glyphs.checkmark.getDataUrl({
+                      fill: this.theme.white
+                    }),
+                    label: ''
                   } : {
-                    ...baseCircleIndicator,
-                    borderColor: wizardlet.validate()
-                      ? this.theme.approval2 : this.theme.warning2
-                  }
-                )
+                    borderColor: this.theme.warning2
+                  })
+                })
                   .addClass('circle')
                 .end()
 
