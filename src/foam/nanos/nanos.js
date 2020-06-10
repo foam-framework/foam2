@@ -25,10 +25,10 @@ FOAM_FILES([
   { name: "foam/nanos/app/ContextLookupAppConfigService"},
   { name: "foam/nanos/app/AppConfigService" },
   { name: "foam/nanos/app/EmailConfig" },
+  { name: "foam/nanos/notification/email/SMTPConfig" },
   { name: "foam/nanos/app/ClientAppConfigService" },
   { name: "foam/nanos/controller/ApplicationController" },
   { name: "foam/nanos/app/Mode" },
-  { name: "foam/nanos/app/TwilioConfig" },
   { name: 'foam/nanos/alarming/Alarm' },
   { name: 'foam/nanos/alarming/Alarming' },
   { name: 'foam/nanos/alarming/AlarmConfig' },
@@ -214,7 +214,9 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/push/FirebasePushService' },
   { name: 'foam/nanos/notification/sms/SMSMessage' },
   { name: 'foam/nanos/notification/sms/SMSService' },
+  { name: 'foam/nanos/notification/sms/SMSSetting' },
   { name: 'foam/nanos/notification/sms/SMSStatus' },
+  { name: 'foam/nanos/notification/sms/TwilioConfig' },
   { name: 'foam/nanos/notification/sms/TwilioSMSService' },
   { name: 'foam/nanos/demo/DemoObject' },
   { name: 'foam/nanos/demo/Demo' },
@@ -233,6 +235,7 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/EmailSetting' },
   { name: 'foam/nanos/notification/Notifiable' },
   { name: 'foam/nanos/notification/Notification'},
+  { name: 'foam/nanos/notification/MyNotificationDAO'},
   { name: 'foam/nanos/notification/notifications/ScriptRunNotification'},
   { name: 'foam/nanos/notification/NotificationView'},
   { name: 'foam/nanos/notification/NotificationExpansionDAO'},
@@ -310,6 +313,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/crunchtest/FakeTestObject" },
   // models
   { name: "foam/nanos/crunch/Capability" },
+  { name: "foam/nanos/crunch/CapabilityCategory" },
   { name: "foam/nanos/crunch/CapabilityJunctionStatus" },
   { name: "foam/nanos/crunch/UserCapabilityJunctionRefine" },
   //daos
@@ -318,6 +322,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/SendNotificationOnTopLevelCapabilityStatusUpdate" },
   { name: "foam/nanos/crunch/IsUserCapabilityJunctionStatusUpdate" },
   { name: "foam/nanos/crunch/RemoveJunctionsOnUserRemoval" },
+  { name: "foam/nanos/crunch/CascadeInvalidate" },
 
   // approval
   { name: 'foam/nanos/approval/ApprovalRequest' },

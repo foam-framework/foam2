@@ -12,6 +12,7 @@ foam.CLASS({
   javaImports: [
     'foam.core.Detachable',
     'foam.core.FObject',
+    'foam.core.MethodInfo',
     'foam.core.PropertyInfo',
     'foam.core.X',
     'foam.dao.ArraySink',
@@ -58,10 +59,70 @@ foam.CLASS({
       class: 'String',
       name: 'serviceName',
       javaFactory: `return foam.util.StringUtil.daoize(getOf().getObjClass().getSimpleName());`
+    },
+    {
+      class: 'String',
+      name: 'relationshipName',
+      value: 'approvalRequests'
+    },
+    {
+      class: 'Object',
+      javaType: 'foam.dao.DAO',
+      name: 'approvalRequestDAO',
+      transient: true,
+      javaFactory: 'return (DAO) getX().get("approvalRequestDAO");'
     }
   ],
 
+  messages: [
+    { name: 'APPROVER_MSG', message: 'No Approvers exist for the model: ' },
+    { name: 'APPROVER_MSG2_PART_ONE', message: 'The only approver of ' },
+    { name: 'APPROVER_MSG2_PART_TWO', message: ' is the maker of this request!' },
+    { name: 'SYSTEM_UPDATE_MSG', message: 'SYSTEM UPDATE - Not automatically setting LifecycleState from PENDING to ACTIVE for ' },
+    { name: 'ERROR_MSG_MULTI', message: 'Something went wrong! There shouldnt be multiple approvables' },
+    { name: 'ERROR_MSG2', message: 'Something went wrong cannot have multiple approved/rejected requests for the same request!' },
+    { name: 'REQUEST_SEND_MSG', message: 'An approval request has been sent out.' }
+  ],
+
   methods: [
+    {
+      name: 'resolveApprovalRequestDAO',
+      type: 'foam.dao.DAO',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'obj', type: 'FObject' }
+      ],
+      documentation: `
+        Overrides approvalRequestDAO being used by ApprovableAwareDAO with the
+        relationshipDAO (for approval requests) found on the "obj".
+
+        Advantage of using the relationshipDAO over the original approvalRequestDAO
+        in the context is that, when performing DAO.put, the assignment of the
+        foreign key field (eg. entityId) on the approval request object is done
+        by the DAO automatically.
+
+        NOTE: resolveApprovalRequestDAO(x, obj) is used as the first call to
+        retrieve the approvalRequestDAO in ApprovableAwareDAO.put_ so that the
+        relationshipDAO will be used in place of approvalRequestDAO.
+      `,
+      javaCode: `
+        var axiomName = "get"
+          + Character.toUpperCase(getRelationshipName().charAt(0))
+          + getRelationshipName().substring(1);
+        var method = (MethodInfo) obj.getClassInfo().getAxiomByName(axiomName);
+        DAO dao = null;
+
+        try {
+          setApprovalRequestDAO((DAO) method.call(x, obj, new Object[] { x }));
+        } catch ( Throwable t ) {
+          Logger logger = (Logger) x.get("logger");
+          logger.warning(
+            "Could not load approval requests relationship: " + getRelationshipName()
+            , obj, "The default 'approvalRequestDAO' will be used.");
+        }
+        return getApprovalRequestDAO();
+      `
+    },
     {
       name: 'sendSingleRequest',
       documentation: `
@@ -78,7 +139,7 @@ foam.CLASS({
         ApprovalRequest request = (ApprovalRequest) req.fclone();
         request.clearId();
         request.setApprover(userId);
-        ((DAO) x.get("approvalRequestDAO")).put_(x, request);
+        getApprovalRequestDAO().inX(x).put(request);
       `
     },
     {
@@ -129,13 +190,13 @@ foam.CLASS({
         List<Long> approverIds = userQueryService.getAllApprovers(x, modelName);
 
         if ( approverIds == null || approverIds.size() <= 0 ) {
-          logger.log("No Approvers exist for the model: " + modelName);
-          throw new RuntimeException("No Approvers exist for the model: " + modelName);
+          logger.log(APPROVER_MSG + modelName);
+          throw new RuntimeException(APPROVER_MSG + modelName);
         }
 
         if ( ! getCanMakerApproveOwnRequest() && approverIds.size() == 1 && approverIds.get(0) == user.getId() ) {
-          logger.log("The only approver of " + modelName + " is the maker of this request!");
-          throw new RuntimeException("The only approver of " + modelName + " is the maker of this request!");
+          logger.log(APPROVER_MSG2_PART_ONE + modelName + APPROVER_MSG2_PART_TWO);
+          throw new RuntimeException(APPROVER_MSG2_PART_ONE + modelName + APPROVER_MSG2_PART_TWO);
         }
 
         return approverIds;
@@ -155,7 +216,7 @@ foam.CLASS({
       ApprovableAware approvableAwareObj = (ApprovableAware) obj;
       LifecycleAware lifecycleObj = (LifecycleAware) obj;
 
-      DAO approvalRequestDAO = (DAO) x.get("approvalRequestDAO");
+      DAO approvalRequestDAO = resolveApprovalRequestDAO(x, obj);
       DAO dao = (DAO) x.get(getDaoKey());
 
       FObject currentObjectInDAO = (FObject) dao.find(String.valueOf(obj.getProperty("id")));
@@ -176,7 +237,7 @@ foam.CLASS({
         else if ( lifecycleObj.getLifecycleState() == LifecycleState.PENDING && user.getId() == User.SYSTEM_USER_ID ) {
           // Adding log message in case this change breaks something unexpected
           Object primaryKey = obj instanceof foam.core.Identifiable ? ((foam.core.Identifiable)obj).getPrimaryKey() : null;
-          logger.warning("SYSTEM UPDATE - Not automatically setting LifecycleState from PENDING to ACTIVE for " + obj.getClass().getSimpleName() + ": " + primaryKey);
+          logger.warning(SYSTEM_UPDATE_MSG + obj.getClass().getSimpleName() + ": " + primaryKey);
         }
         return super.put_(x,obj);
       }
@@ -241,7 +302,7 @@ foam.CLASS({
         }
 
         if ( approvablesPending.size() > 1 ){
-          throw new RuntimeException("Something went wrong! There shouldnt be multiple approvables");
+          throw new RuntimeException(ERROR_MSG_MULTI);
         }
 
         filteredApprovalRequestDAO = (DAO) approvalRequestDAO
@@ -299,8 +360,8 @@ foam.CLASS({
       } 
 
       if ( fulfilledRequests.size() > 1 ) {
-        logger.error("Something went wrong cannot have multiple approved/rejected requests for the same request!");
-        throw new RuntimeException("Something went wrong cannot have multiple approved/rejected requests for the same request!");
+        logger.error(ERROR_MSG2);
+        throw new RuntimeException(ERROR_MSG2);
       }
 
       ApprovalRequest approvalRequest;
@@ -361,7 +422,7 @@ foam.CLASS({
       fullSend(x, approvalRequest, obj, approverIds);
 
       // TODO: the following is a temporary fix will need to create an actual exception and pass feedback as a property
-      throw new RuntimeException("An approval request has been sent out."); // we aren't updating to deleted
+      throw new RuntimeException(REQUEST_SEND_MSG); // we aren't updating to deleted
       `
     }
   ]

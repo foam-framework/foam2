@@ -10,11 +10,36 @@
 
    documentation: 'SMS message',
 
+   implements: [
+     'foam.nanos.auth.CreatedAware',
+     'foam.nanos.auth.CreatedByAware'
+   ],
+
    properties: [
+     {
+       class: 'Long',
+       name: 'id'
+     },
      {
        class: 'Reference',
        of: 'foam.nanos.auth.User',
        name: 'user'
+     },
+     {
+       class: 'DateTime',
+       name: 'created'
+     },
+     {
+       class: 'Reference',
+       of: 'foam.nanos.auth.User',
+       name: 'createdBy',
+       documentation: 'User who created SMSMessage'
+     },
+     {
+       class: 'Reference',
+       of: 'foam.nanos.auth.User',
+       name: 'createdByAgent',
+       documentation: 'User whocreated SMSMessage'
      },
      {
        class: 'String',

@@ -34,6 +34,7 @@ public class ExpireUserCapabilityJunctionsCron implements ContextAgent {
     List<UserCapabilityJunction> activeJunctions = ((ArraySink) userCapabilityJunctionDAO
       .where(AND(
         EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED),
+        NEQ(UserCapabilityJunction.EXPIRY, null),
         LT(UserCapabilityJunction.EXPIRY, today)
       ))
       .select(new ArraySink()))

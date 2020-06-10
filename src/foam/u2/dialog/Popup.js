@@ -60,6 +60,7 @@ foam.CLASS({
     }
     ^inner {
       z-index: 3;
+      max-width: 90vw;
       /* The following line fixes a stacking problem in certain browsers. */
       will-change: opacity;
     }

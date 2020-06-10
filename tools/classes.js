@@ -66,6 +66,9 @@ var classes = [
   'foam.mlang.ArrayConstant',
   'foam.mlang.expr.Dot',
   'foam.mlang.expr.PropertyExpr',
+  'foam.mlang.expr.DateTypes',
+  'foam.mlang.expr.DateGrouping',
+  'foam.mlang.expr.DateGroupingExpr',
   'foam.mlang.PredicatedExpr',
   'foam.mlang.ContextObject',
   'foam.mlang.CurrentTime',
@@ -83,6 +86,7 @@ var classes = [
   'foam.box.SubBoxMessage',
   'foam.box.SubscribeMessage',
   'foam.box.NamedBox',
+  'foam.box.HTTPAuthorizationType',
   'foam.box.HTTPBox',
   'foam.box.HTTPReplyBox',
   'foam.box.AuthServiceClientBox',
@@ -93,6 +97,7 @@ var classes = [
   'com.google.foam.demos.heroes.Hero',
   'com.google.auth.TokenVerifier',
   'foam.box.RemoteException',
+  'foam.box.CapabilityRequiredRemoteException',
   'foam.box.RPCMessage',
   'foam.box.RPCReturnBox',
   'foam.box.RPCReturnMessage',
@@ -105,7 +110,6 @@ var classes = [
   'foam.box.RawWebSocketBox',
   'foam.box.ReturnBox',
   'foam.box.BoxService',
-  'foam.box.CheckAuthenticationBox',
   'foam.box.SessionReplyBox',
   'foam.box.SessionClientBox',
   'foam.dao.DAO',
@@ -122,7 +126,9 @@ var classes = [
   'foam.dao.AbstractJournal',
   'foam.dao.ProxyJournal',
   'foam.dao.CompositeJournal',
+  'foam.dao.AbstractF3FileJournal',
   'foam.dao.AbstractFileJournal',
+  'foam.dao.F3FileJournal',
   'foam.dao.FileJournal',
   'foam.dao.RoutingJournal',
   'foam.dao.RoutingJournalTest',
@@ -190,6 +196,7 @@ var classes = [
   'foam.nanos.NanoService',
   'foam.nanos.boot.NSpec',
   'foam.nanos.boot.NSpecAware',
+  'foam.nanos.boot.DAONSpecMenu',
   'foam.nanos.app.Mode',
   'foam.nanos.bench.Benchmark',
   'foam.nanos.auth.Authorizer',
@@ -326,6 +333,7 @@ var classes = [
   'foam.nanos.notification.email.EmailPropertyService',
   'foam.nanos.notification.email.Status',
   // Email service Files
+  'foam.nanos.notification.email.SMTPConfig',
   'foam.nanos.notification.email.SMTPEmailService',
   'foam.nanos.notification.email.NullEmailService',
   'foam.nanos.notification.email.ProxyEmailService',
@@ -345,13 +353,16 @@ var classes = [
   // SMS models, services and interfaces
   'foam.nanos.notification.sms.NullSMSService',
   'foam.nanos.notification.sms.ProxySMSService',
-  'foam.nanos.notification.sms.SMSService',
   'foam.nanos.notification.sms.SMSMessage',
+  'foam.nanos.notification.sms.SMSService',
+  'foam.nanos.notification.sms.SMSSetting',
   'foam.nanos.notification.sms.SMSStatus',
+  'foam.nanos.notification.sms.TwilioConfig',
   'foam.nanos.notification.sms.TwilioSMSService',
 
   'foam.nanos.notification.Notifiable',
   'foam.nanos.notification.Notification',
+  'foam.nanos.notification.MyNotificationDAO',
   'foam.nanos.notification.NotificationExpansionDAO',
   'foam.nanos.notification.NotificationTemplateDAO',
   'foam.nanos.notification.notifications.ScriptRunNotification',
@@ -469,6 +480,12 @@ var classes = [
   'foam.test.TestObj',
   'foam.core.FObjectTest',
 
+  'foam.nanos.dig.drivers.DigFormatDriver',
+  'foam.nanos.dig.drivers.DigCsvDriver',
+  'foam.nanos.dig.drivers.DigHtmlDriver',
+  'foam.nanos.dig.drivers.DigJsonDriver',
+  'foam.nanos.dig.drivers.DigJsonJDriver',
+  'foam.nanos.dig.drivers.DigXmlDriver',
   'foam.nanos.dig.exception.DigErrorMessage',
   'foam.nanos.dig.exception.DAONotFoundException',
   'foam.nanos.dig.exception.ParsingErrorException',
@@ -516,7 +533,6 @@ var classes = [
   'foam.nanos.dig.exception.GeneralException',
 
   'foam.nanos.app.EmailConfig',
-  'foam.nanos.app.TwilioConfig',
 
   'foam.nanos.test.StockSnapshot',
   'foam.nanos.analytics.FoldManagerDAODecorator',
@@ -560,8 +576,11 @@ var classes = [
   'foam.nanos.crunch.crunchtest.FakeTestObject',
   //models
   'foam.nanos.crunch.Capability',
+  'foam.nanos.crunch.CapabilityCategory',
+  'foam.nanos.crunch.CapabilityCategoryCapabilityJunction',
   'foam.nanos.crunch.CapabilityJunctionStatus',
   'foam.nanos.crunch.UserCapabilityJunction',
+  'foam.nanos.crunch.AgentCapabilityJunction',
   'foam.nanos.crunch.CapabilityCapabilityJunction',
   //daos
   'foam.nanos.crunch.UserCapabilityJunctionDAO',
@@ -569,6 +588,7 @@ var classes = [
   'foam.nanos.crunch.SendNotificationOnTopLevelCapabilityStatusUpdate',
   'foam.nanos.crunch.IsUserCapabilityJunctionStatusUpdate',
   'foam.nanos.crunch.RemoveJunctionsOnUserRemoval',
+  'foam.nanos.crunch.CascadeInvalidate',
   //authservice
   'foam.nanos.auth.CapabilityAuthService',
   // userQueryService
@@ -597,7 +617,8 @@ var classes = [
   'foam.nanos.approval.ApprovableApprovalRequestsPredicate',
   'foam.nanos.approval.ApprovableApprovalRequestsRule',
   'foam.nanos.approval.FulfilledApprovablePredicate',
-  'foam.nanos.approval.FulfilledApprovableRule'
+  'foam.nanos.approval.FulfilledApprovableRule',
+  'foam.nanos.approval.AuthenticatedApprovalDAOAuthorizer',
 ];
 
 var abstractClasses = [
