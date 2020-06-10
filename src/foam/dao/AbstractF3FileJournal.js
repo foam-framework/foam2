@@ -237,14 +237,13 @@ try {
       ],
       args: [ 'Context x', 'CharSequence record', 'String c', 'String prefix' ],
       javaCode: `
-      write_(sb.get()
-        .append(prefix)
-        .append("p("));
-      write_(record);
-      write_(sb.get()
-        .append(")")
-        .append(c));
-      getWriter().newLine();
+      BufferedWriter writer = getWriter();
+      writer.write(prefix);
+      writer.write("p(");
+      writer.append(record);
+      writer.write(')');
+      writer.write(c);
+      writer.newLine();
       `
     },
     {
@@ -311,7 +310,6 @@ try {
     },
     {
       name: 'write_',
-     // synchronized: true,
       javaThrows: [
         'java.io.IOException'
       ],
@@ -319,7 +317,6 @@ try {
       javaCode: `
         BufferedWriter writer = getWriter();
         writer.append(data);
-//        writer.newLine();
       `
     },
     {

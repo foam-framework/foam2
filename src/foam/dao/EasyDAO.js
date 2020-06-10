@@ -211,6 +211,10 @@ foam.CLASS({
           if(approvableAwareServiceNameIsSet_)
             delegateBuilder.setServiceName(getApprovableAwareServiceName());
 
+          if ( approvableAwareRelationshipNameIsSet_ ) {
+            delegateBuilder.setRelationshipName(getApprovableAwareRelationshipName());
+          }
+
           delegate = delegateBuilder.build();
 
           if ( getApprovableAwareEnabled() ) {
@@ -693,6 +697,11 @@ model from which to test ServiceProvider ID (spid)`,
       name: 'approvableAwareServiceName',
       class: 'String',
       documentation: 'If the DAO is approvable aware, this sets the ApprovableAwareDAO ServiceName field'
+    },
+    {
+      name: 'approvableAwareRelationshipName',
+      class: 'String',
+      documentation: 'If the DAO is approvable aware, this sets the ApprovableAwareDAO RelationshipName field'
     }
  ],
 
