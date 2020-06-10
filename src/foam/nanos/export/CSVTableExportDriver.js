@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.nanos.column',
+  package: 'foam.nanos.export',
   name: 'CSVTableExportDriver',
   implements: [ 'foam.nanos.export.ExportDriver' ],
 
