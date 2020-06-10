@@ -80,7 +80,7 @@ foam.CLASS({
     {
       name: 'objectToTable',
       code: async function(x, of, props, obj) {
-        var values = this.objToArrayOfStringValues(x, of, props, obj);
+        var values = await this.objToArrayOfStringValues(x, of, props, obj);
         return this.returnTable(props, values);
       }
     },
