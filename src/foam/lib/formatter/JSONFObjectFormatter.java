@@ -74,9 +74,9 @@ public class JSONFObjectFormatter
       escapeAppend(s);
       b_.append("\"\"\"");
     } else {
-      b_.append("\"");
+      b_.append('"');
       escapeAppend(s);
-      b_.append("\"");
+      b_.append('"');
     }
   }
 
@@ -155,7 +155,7 @@ public class JSONFObjectFormatter
     java.util.Iterator iter = list.iterator();
     while ( iter.hasNext() ) {
       output(iter.next());
-      if ( iter.hasNext() ) b_.append(",");
+      if ( iter.hasNext() ) b_.append(',');
     }
     b_.append(']');
   }
@@ -265,7 +265,6 @@ public class JSONFObjectFormatter
   }
 
   protected Boolean maybeOutputProperty(FObject fo, PropertyInfo prop, boolean includeComma) {
-
     if ( ! outputDefaultValues_ && ! prop.isSet(fo) ) return false;
 
     Object value = prop.get(fo);
@@ -300,9 +299,9 @@ public class JSONFObjectFormatter
             if ( outputClassNames_ && outputDefaultClassNames_ ) {
               //output Class name
               outputKey("class");
-              b_.append(":");
+              b_.append(':');
               output(newInfo.getId());
-              b_.append(",");
+              b_.append(',');
             }
             addInnerNewline();
             PropertyInfo id = (PropertyInfo) newInfo.getAxiomByName("id");
@@ -311,7 +310,7 @@ public class JSONFObjectFormatter
             // to output class names for references
             outputDefaultClassNames_ = true;
           }
-          b_.append(",");
+          b_.append(',');
           addInnerNewline();
           outputProperty(newFObject, prop);
         }
@@ -374,15 +373,15 @@ public class JSONFObjectFormatter
       b_.append(':');
       output(info.getId());
     }
-    boolean  outputComma = outputClassNames_ && outputDefaultClassNames_;
+    boolean outputComma = outputClassNames_ && outputDefaultClassNames_;
 
     // to output class names for references
     outputDefaultClassNames_ = true;
 
-    List     axioms      = getProperties(info);
-    Iterator i           = axioms.iterator();
-    while ( i.hasNext() ) {
-      PropertyInfo prop = (PropertyInfo) i.next();
+    List axioms = getProperties(info);
+    int  size   = axioms.size();
+    for ( int i = 0 ; i < size ; i++ ) {
+      PropertyInfo prop = (PropertyInfo) axioms.get(i);
       outputComma = maybeOutputProperty(o, prop, outputComma) || outputComma;
     }
     addInnerNewline();
@@ -394,7 +393,7 @@ public class JSONFObjectFormatter
     outputKey("class");
     b_.append(':');
     output("__Property__");
-    b_.append(",");
+    b_.append(',');
     outputKey("forClass_");
     b_.append(':');
     output(prop.getClassInfo().getId());
@@ -431,8 +430,9 @@ public class JSONFObjectFormatter
   }
 
   protected void appendQuote() {
-    b_.append("\"");
+    b_.append('"');
   }
+
   public String getPropertyName(PropertyInfo p) {
     return outputShortNames_ && ! SafetyUtil.isEmpty(p.getShortName()) ? p.getShortName() : p.getName();
   }
