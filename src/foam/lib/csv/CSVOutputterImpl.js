@@ -14,9 +14,6 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.*',
-    'foam.nanos.column.ColumnConfigToPropertyConverter',
-    'foam.nanos.column.ColumnPropertyValue',
-    'java.util.Arrays',
     'java.util.List',
     'java.util.Date'
   ],
@@ -143,43 +140,22 @@ foam.CLASS({
     {
       name: 'outputHeader',
       args: [
-        { type: 'Context', name: 'x' },
-        {
-          type: 'PropertyInfo...',
-          name: 'props'
-        }
+        { type: 'Context', name: 'x' }
       ],
-      code: function(x, propValues) {
-        var columnConfig = x.columnConfigToPropertyConverter;
-        if ( ! columnConfig ) columnConfig = this.__context__.lookup('foam.nanos.column.ColumnConfigToPropertyConverter').create();
-        if ( ! propValues ) {
-          propValues = this.props
-          .map((propName) => {
-            var prop = propName;
-            if ( foam.String.isInstance(prop) )
-              prop = columnConfig.returnProperty(this.of, propName);
-            return prop;
-          });
-        }
-        propValues.forEach((p) => {
+      code: function(x) {
+        this.props
+          .map((name) => this.of.getAxiomByName(name))
+          .forEach((p) => {
             if ( foam.core.Property.isInstance(p) ) p.toCSVLabel.call(p, x, this);
           });
         this.newLine_();
         this.isFirstRow = false;
       },
       javaCode: `
-        ColumnConfigToPropertyConverter columnConfig = (ColumnConfigToPropertyConverter)x.get("columnConfigToPropertyConverter");
-        if ( props.length == 0 ) {
-          for ( String prop : getProps() ) {
-            PropertyInfo p = columnConfig.returnProperty(getOf(), prop);
-            if ( p != null && p instanceof PropertyInfo ) ((PropertyInfo)p).toCSVLabel(x, this);
-          }
-        } else {
-          for ( PropertyInfo p : props ) {
-            if ( p != null && p instanceof PropertyInfo ) ((PropertyInfo)p).toCSVLabel(x, this);
-          }
+        for (String name: getProps()) {
+          Object p = getOf().getAxiomByName(name);
+          if ( p != null && p instanceof PropertyInfo ) ((PropertyInfo)p).toCSVLabel(x, this);
         }
-        
         newLine_();
         setIsFirstRow(false);
       `
@@ -187,46 +163,21 @@ foam.CLASS({
     {
       name: 'outputFObject',
       code: function(x, obj) {
-        var self = this;
         if ( ! this.of ) this.of = obj.cls_;
-        var columnPropValues = [];
-        var columnConfig = x.columnConfigToPropertyConverter;
-        var obj1 = obj;
+        if ( this.isFirstRow ) this.outputHeader(x);
         this.props
-          .forEach((propName) => {
-            if ( foam.String.isInstance(propName) ) {
-              var col = columnConfig.returnPropertyAndObject(this.of, propName, obj1);
-              columnPropValues.push(col);
-            }
+          .map((name) => this.of.getAxiomByName(name))
+          .forEach((p) => {
+            if ( foam.core.Property.isInstance(p) ) p.toCSV.call(p, x, obj, this);
           });
-        return Promise.all(columnPropValues).then(values => {
-          if ( this.isFirstRow ) self.outputHeader(x, values.map(c => c.propertyValue));
-          for ( var columnPropValue of values ) {
-            var prop = columnPropValue.propertyValue;
-            if ( foam.core.Property.isInstance(prop) ) prop.toCSV.call(prop, x, obj1, self);
-          }
-          self.newLine_();
-        });
-        
+        this.newLine_();
       },
       javaCode: `
         if ( getOf() == null ) setOf(obj.getClassInfo());
-        ColumnConfigToPropertyConverter columnConfig = (ColumnConfigToPropertyConverter)x.get("columnConfigToPropertyConverter");
-        String[] propNames = getProps();
-        ColumnPropertyValue[] columnPropValues = new ColumnPropertyValue[propNames.length];
-
-        for ( int i = 0 ; i < propNames.length ; i++ ) {
-          ColumnPropertyValue val = columnConfig.returnPropertyAndObject(x, getOf(), propNames[i], obj);
-          columnPropValues[i] = val;
-        }
-
-        PropertyInfo[] props = Arrays.stream(columnPropValues)
-          .map(ColumnPropertyValue::getPropertyValue)
-          .toArray(PropertyInfo[]::new);
-        if ( getIsFirstRow() ) outputHeader(x, props);
-        for ( String propName : getProps() ) {
-          ColumnPropertyValue val = columnConfig.returnPropertyAndObject(x, getOf(), propName, obj);
-          if ( val.getPropertyValue() != null && val.getPropertyValue() instanceof PropertyInfo ) ((PropertyInfo)val.getPropertyValue()).toCSV(x, val.getObjValue(), this);
+        if ( getIsFirstRow() ) outputHeader(x);
+        for (String name : getProps()) {
+          Object p = getOf().getAxiomByName(name);
+          if ( p != null && p instanceof PropertyInfo ) ((PropertyInfo)p).toCSV(x, obj, this);
         }
         newLine_();
       `
