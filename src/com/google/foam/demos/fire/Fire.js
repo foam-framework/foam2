@@ -9,6 +9,11 @@ foam.CLASS({
   name: 'Fire',
   extends: 'foam.graphics.Box',
 
+  // algorithm from: https://nullprogram.com/blog/2020/04/30/
+  // similar:
+  //   https://codepen.io/aecend/details/BGeZpa
+  //   https://codepen.io/ge1doot/pen/aQPqXX
+
   properties: [
     [ 'width',  400 ],
     [ 'height', 400 ],

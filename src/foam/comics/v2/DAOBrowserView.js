@@ -15,7 +15,7 @@ foam.CLASS({
     'foam.u2.dialog.Popup',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
-    'foam.u2.filter.FilterSearch',
+    'foam.u2.filter.FilterView',
     'foam.u2.view.ScrollTableView',
     'foam.u2.view.SimpleSearch',
     'foam.u2.view.TabChoiceView',
@@ -51,7 +51,7 @@ foam.CLASS({
 
     ^query-bar {
       padding: 40px 16px;
-      align-items: center;
+      align-items: flex-start;
       justify-content: flex-end;
     }
 
@@ -248,7 +248,8 @@ foam.CLASS({
                         });
                       })
                       .callIf(self.config.searchMode === self.SearchMode.FULL, function() {
-                        this.tag(self.FilterSearch, {
+                        this.tag(self.FilterView, {
+                          dao$: self.searchFilterDAO$,
                           data$: self.searchPredicate$
                         });
                       })
@@ -257,7 +258,9 @@ foam.CLASS({
                       .start(self.EXPORT, { buttonStyle: 'SECONDARY' })
                         .addClass(self.myClass('export'))
                       .end()
-                      .tag(this.REFRESH_TABLE, { buttonStyle: 'SECONDARY' })
+                      .start(self.REFRESH_TABLE, { buttonStyle: 'SECONDARY' })
+                        .addClass(self.myClass('refresh'))
+                      .end()
                     .endContext()
                   .end();
               })

@@ -16,14 +16,11 @@ foam.CLASS({
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.u2.crunch.CapabilityCardView',
-    'foam.u2.layout.Grid',
-    'foam.u2.layout.GUnit'
+    'foam.u2.layout.Rows'
   ],
 
   imports: [
-    'capabilityAcquired',
     'capabilityCache',
-    'capabilityCancelled',
     'capabilityDAO',
     'crunchController',
     'notify',
@@ -34,14 +31,17 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'capabilityOptions',
-      class: 'StringArray'
-    },
-    {
       name: 'capabilityView',
       class: 'foam.u2.ViewSpec',
       factory: function () {
         return 'foam.u2.crunch.CapabilityCardView';
+      }
+    },
+    {
+      name: 'onClose',
+      class: 'Function',
+      factory: () => (x) => {
+        x.closeDialog();
       }
     }
   ],
@@ -51,93 +51,87 @@ foam.CLASS({
   ],
 
   css: `
-    ^ {
-      width: 1024px;
-      margin: auto;
-    }
     ^detail-container {
-      overflow-x: scroll;
+      overflow-y: scroll;
+    }
+    ^ > *:not(:last-child) {
+      margin-bottom: 24px !important;
     }
   `,
 
   methods: [
     function initE() {
-      this.capabilityOptions.forEach((c) => {
+      this.data.capabilityOptions.forEach((c) => {
         if ( this.capabilityCache.has(c) && this.capabilityCache.get(c) ) {
-          capabilityAcquired = true;
-          this.stack.back();
+          this.aquire();
         }
       });
 
-      var view = this;
+      var self = this;
       this
         .addClass(this.myClass())
-        .start()
+        .start(this.Rows)
           .addClass(this.myClass('detail-container'))
-          .add(this.slot(function (capabilityOptions) {
-            var spot = this.E('span')
-            this.capabilityDAO.where(
-                this.IN(view.Capability.ID, capabilityOptions))
-              .select().then((result) => {
-                let arr = result.array;
-                let grid = view.Grid.create();
-                for ( let i = 0 ; i < arr.length ; i++ ) {
-                  let cap = arr[i];
-                  grid = grid
-                    .start(view.GUnit, { columns: 4 })
-                      .tag(view.capabilityView, { data: cap })
-                      .on('click', () => {
-                        var p = view.crunchController.launchWizard(cap.id);
-                        p.then(() => {
-                          // Query UCJ status
-                          this.userCapabilityJunctionDAO.where(this.AND(
-                            this.EQ(this.UserCapabilityJunction.SOURCE_ID, this.user.id),
-                            this.EQ(this.UserCapabilityJunction.TARGET_ID, cap.id)
-                          )).limit(1).select(this.PROJECTION(
-                            this.UserCapabilityJunction.STATUS
-                          )).then(results => {
-                            if ( results.array.length < 1 ) {
-                              view.reject();
-                              return;
-                            }
-                            var entry = results.array[0]; // limit 1
-                            var status = entry[0]; // first field (status)
-                            switch ( status ) {
-                              case this.CapabilityJunctionStatus.GRANTED:
-                                view.aquire();
-                                break;
-                              default:
-                                view.reject();
-                                break;
-                            }
-                          });
-                        })
-                      })
-                    .end();
-                  spot.add(grid);
-                }
+          .add(this.slot(function (data$capabilityOptions) {
+            return this.E().select(this.capabilityDAO.where(
+              self.IN(self.Capability.ID, data$capabilityOptions)
+            ), (cap) => {
+              return this.E().tag(self.capabilityView, {
+                data: cap
               })
-            return spot;
+                .on('click', () => {
+                  var p = self.crunchController.launchWizard(cap.id);
+                  p.then(() => {
+                    this.checkStatus(cap);
+                  })
+                })
+            })
           }))
         .end()
         .startContext({ data: this })
           .tag(this.CANCEL, { buttonStyle: 'SECONDARY' })
         .endContext();
     },
-    function aquire() {
-      this.capabilityAcquired = true;
-      this.capabilityOptions.forEach((c) => {
+    function checkStatus(cap) {
+      // Query UCJ status
+      this.userCapabilityJunctionDAO.where(this.AND(
+        this.EQ(this.UserCapabilityJunction.SOURCE_ID, this.user.id),
+        this.EQ(this.UserCapabilityJunction.TARGET_ID, cap.id)
+      )).limit(1).select(this.PROJECTION(
+        this.UserCapabilityJunction.STATUS
+      )).then(results => {
+        if ( results.array.length < 1 ) {
+          this.reject();
+          return;
+        }
+        var entry = results.array[0]; // limit 1
+        var status = entry[0]; // first field (status)
+        switch ( status ) {
+          case this.CapabilityJunctionStatus.GRANTED:
+            this.aquire();
+            break;
+          default:
+            this.reject();
+            break;
+        }
+      });
+    },
+    function aquire(x) {
+      x = x || this.__subSubContext__;
+      this.data.aquired = true;
+      this.data.capabilityOptions.forEach((c) => {
         this.capabilityCache.set(c, true);
       });
-      this.stack.back();
+      this.onClose(x);
     },
-    function reject() {
-      this.capabilityCancelled = true;
-      this.capabilityOptions.forEach((c) => {
+    function reject(x) {
+      x = x || this.__subSubContext__;
+      this.data.cancelled = true;
+      this.data.capabilityOptions.forEach((c) => {
         this.capabilityCache.set(c, true);
       });
       this.notify(this.REJECTED_MSG);
-      this.stack.back();
+      this.onClose(x);
     }
   ],
 
@@ -145,8 +139,8 @@ foam.CLASS({
     {
       name: 'cancel',
       label: 'Not interested in adding this functionality',
-      code: function() {
-        this.reject();
+      code: function(x) {
+        this.reject(x);
       }
     }
   ]

@@ -39,3 +39,10 @@ p({
 p({"class":"foam.nanos.boot.NSpec", "name":"emailMessageDAO",                 "serve":true, "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setOf(foam.nanos.notification.email.EmailMessage.getOwnClassInfo()).setInnerDAO((foam.dao.DAO) x.get(\"localEmailMessageDAO\")).build();", "client":"{\"of\":\"foam.nanos.notification.email.EmailMessage\"}"})
 
 p({"class":"foam.nanos.boot.NSpec", "name":"emailPropertyService",             "serviceScript": "import foam.core.FObject;\n import foam.nanos.notification.email.EmailTemplateApplyEmailPropertyService;\n import foam.nanos.notification.email.ChainedPropertyService;\n import foam.nanos.notification.email.EmailConfigEmailPropertyService;\n import foam.nanos.notification.email.EmailPropertyService;\n import foam.nanos.notification.email.GroupEmailTemplateService; \nEmailPropertyService[] eps = new EmailPropertyService[3];\n eps[0] = new EmailTemplateApplyEmailPropertyService.Builder(x).build();\n eps[1] = new GroupEmailTemplateService.Builder(x).build();\n eps[2] = new EmailConfigEmailPropertyService.Builder(x).build(); \nreturn new ChainedPropertyService.Builder(x).setData(eps).build();"}})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"SMTPConfig",
+  "lazy": false,
+  "service":{"class":"foam.nanos.notification.email.SMTPConfig"}
+})

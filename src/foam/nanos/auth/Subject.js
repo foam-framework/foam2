@@ -32,18 +32,17 @@ foam.CLASS({
       javaSetter: `
       if ( val == null ) return;
       if ( getRealUser() == null ) {
-          realUser_ = val;
-          realUserIsSet_ = true;
+        realUser_      = val;
+        realUserIsSet_ = true;
       }
       ArrayList userPath = getUserPath();
       if ( userPath.size() < 2 || val != (User) userPath.get(userPath.size() - 1) ) {
         userPath.add(val);
-      }
-      else {
+      } else {
         userPath.remove(userPath.size());
       }
       userIsSet_ = true;
-      user_ = val;
+      user_      = val;
       `
     },
     {
@@ -62,7 +61,7 @@ foam.CLASS({
       javaCode: `
       String ret = "user path";
       for ( User user : getUserPath() ) {
-          ret += " >> " + user.getFirstName() + " " + user.getLastName();
+        ret += " >> " + user.getFirstName() + " " + user.getLastName();
       }
       return ret;
 `
