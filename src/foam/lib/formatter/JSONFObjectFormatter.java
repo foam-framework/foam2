@@ -286,15 +286,15 @@ public class JSONFObjectFormatter
     boolean   isPropertyDiff = false;
 
     if ( ! oldFObject.equals(newFObject) ) {
-      List     axioms = getProperties(info);
-      Iterator i      = axioms.iterator();
+      List axioms = getProperties(info);
+      int  size   = axioms.size();
 
       b_.append('{');
       addInnerNewline();
-      while ( i.hasNext() ) {
-        PropertyInfo prop = (PropertyInfo) i.next();
+      for ( int i = 0 ; i < size ; i++ ) {
+        PropertyInfo prop = (PropertyInfo) axioms.get(i);
         isPropertyDiff = maybeOutputPropertyDelta(oldFObject, newFObject, prop);
-        if ( isPropertyDiff) {
+        if ( isPropertyDiff ) {
           if ( ! isDiff ) {
             if ( outputClassNames_ && outputDefaultClassNames_ ) {
               //output Class name
