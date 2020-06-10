@@ -162,6 +162,14 @@ try {
   throw new RuntimeException(t);
 }
       `
+    },
+    {
+      class: 'Long',
+      name: 'lastUser'
+    },
+    {
+      class: 'Long',
+      name: 'lastTimestamp'
     }
   ],
 
@@ -325,12 +333,17 @@ try {
         User user = ((Subject) x.get("subject")).getUser();
         if ( user == null || user.getId() <= 1 ) return;
         if ( obj instanceof LastModifiedByAware && ((LastModifiedByAware) obj).getLastModifiedBy() != 0L ) return;
+        long now    = System.currentTimeMillis();
+        long userId = user.getId();
+        if ( now == getLastTimestamp() && userId == getLastUser() ) return;
+        setLastTimestamp(now);
+        setLastUser(userId);
 
         write_(sb.get()
           .append("// Modified by ")
           .append(user.toSummary())
           .append(" (")
-          .append(user.getId())
+          .append(userId)
           .append(") at ")
           .append(getTimeStamper().createTimestamp()));
         getWriter().newLine();
