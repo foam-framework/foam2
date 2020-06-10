@@ -24,7 +24,7 @@ foam.CLASS({
       name: 'firstName',
       label: 'First name',
       gridColumns: 6,
-      validationPredicates: [
+      xxxvalidationPredicates: [
         {
           args: ['firstName'],
           predicateFactory: function(e) {
@@ -42,7 +42,7 @@ foam.CLASS({
       name: 'lastName',
       label: 'Last name',
       gridColumns: 6,
-      validationPredicates: [
+      xxxvalidationPredicates: [
         {
           args: ['lastName'],
           predicateFactory: function(e) {
@@ -92,15 +92,29 @@ foam.CLASS({
           daoType: 'MDAO',
           testData: [
             { id: 'key1', name: 'John',  value: 'value1' },
-            { id: 'key2', name: 'Jane',  value: 'value2' },
+            { id: 'key2', name: 'John',  value: 'value2' },
             { id: 'key3', name: 'Kevin', value: 'value3' },
-            { id: 'key4', name: 'Kim',   value: 'value4' },
+            { id: 'key4', name: 'Kevin', value: 'value4' },
             { id: 'key5', name: 'Larry', value: 'value5' },
             { id: 'key6', name: 'Linda', value: 'value6' }
           ]
         });
       },
       view: {
+        class: 'foam.u2.MultiView',
+        views: [
+          {
+            class: 'foam.u2.DAOList',
+            rowView: { class: 'com.google.foam.demos.heroes.CitationView' }
+          },
+          {
+            class: 'foam.u2.GroupingDAOList',
+            rowView: { class: 'com.google.foam.demos.heroes.CitationView' },
+            groupExpr: {f: function(o) { return o.name; }}
+          }
+        ]
+      },
+      xxxview: {
         class: 'foam.u2.DAOList',
         rowView: { class: 'com.google.foam.demos.heroes.CitationView' }
       }
@@ -151,7 +165,6 @@ foam.CLASS({
         class: 'foam.u2.RangeView'
       }
     },
-    /*
     {
       class: 'Int',
       name: 'intWithTemperatureView',
@@ -159,7 +172,6 @@ foam.CLASS({
         class: 'foam.nanos.pm.TemperatureCView'
       }
     },
-    */
     {
       class: 'Int',
       name: 'intWithProgressView',
@@ -331,7 +343,8 @@ foam.CLASS({
     {
       class: 'FObjectArray',
       name: 'fobjectArray',
-      of: 'com.google.foam.demos.u2.SampleData'
+      of: 'com.google.foam.demos.u2.SampleData',
+      view: { class: 'foam.u2.view.FObjectArrayView', valueView: 'com.google.foam.demos.heroes.CitationView' }
     },
     {
       class: 'FObjectArray',
@@ -340,6 +353,12 @@ foam.CLASS({
       factory: function() {
         return this.sampleDataDAO.testData;
       }
+    },
+    {
+      class: 'FObjectProperty',
+      name: 'xxxxxxx',
+      of: 'com.google.foam.demos.u2.SampleData2',
+      value: com.google.foam.demos.u2.SampleData2.create()
     },
     {
       class: 'FObjectArray',
@@ -489,12 +508,12 @@ foam.CLASS({
       class: 'FObjectProperty',
       name: 'fObjectViewWithChoicesValueSet',
       label: 'FObjectView With Choices (Value Set)',
-      value: foam.core.Property.create(),
+      value: foam.util.Timer.create(),
       view: {
         class: 'foam.u2.view.FObjectView',
         choices: [
-          [ 'foam.util.Timer', 'Timer' ],
           [ 'foam.core.Property', 'Property' ],
+          [ 'foam.util.Timer', 'Timer' ],
           [ 'foam.nanos.menu.DAOMenu',  'DAO'     ],
           [ 'foam.nanos.menu.SubMenu',  'SubMenu' ],
           [ 'foam.nanos.menu.TabsMenu', 'Tabs'    ]

@@ -13,10 +13,13 @@ foam.CLASS({
 
   javaImports: [
     'com.google.common.io.BaseEncoding',
+
     'foam.dao.DAO',
     'foam.nanos.app.EmailConfig',
+    'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
     'foam.nanos.session.Session',
+
     'io.nayuki.qrcodegen.QrCode',
     'java.net.URI'
   ],
@@ -47,9 +50,8 @@ foam.CLASS({
     {
       name: 'generateKeyAndQR',
       javaCode: `
-        User user = (User) (x.get("agent") != null ?
-          x.get("agent") :
-          x.get("user")) ;
+        Subject subject = (Subject) x.get("subject");
+        User user = subject.getRealUser();
         DAO userDAO = (DAO) x.get("localUserDAO");
 
         // fetch from localUserDAO to get updated user before setting TwoFactorSecret
@@ -91,13 +93,10 @@ foam.CLASS({
           return false;
         }
 
-        User user      = (User) (x.get("agent") != null ?
-          x.get("agent") :
-          x.get("user")) ;
-        DAO userDAO    = (DAO) x.get("localUserDAO");
-        DAO sessionDAO = (DAO) x.get("localSessionDAO");
-
-        String sessionUser = (String) ( x.get("agent") != null ? "agent" : "user" );
+        Subject subject = (Subject) x.get("subject");
+        User user       = subject.getRealUser();
+        DAO userDAO     = (DAO) x.get("localUserDAO");
+        DAO sessionDAO  = (DAO) x.get("localSessionDAO");
 
         // fetch from user dao to get secret key
         user = (User) userDAO.find(user.getId());
@@ -109,9 +108,11 @@ foam.CLASS({
             userDAO.put(user);
           }
 
+          Subject sessionSubject = new Subject();
+          sessionSubject.setUser(user);
           // update session with two factor success set to true
           Session session = x.get(Session.class);
-          session.setContext(session.getContext().put(sessionUser, user).put("twoFactorSuccess", true));
+          session.setContext(session.getContext().put("subject", sessionSubject).put("twoFactorSuccess", true));
           sessionDAO.put(session);
           return true;
         }
@@ -123,9 +124,8 @@ foam.CLASS({
       name: 'disable',
       javaCode: `
         if ( verifyToken(x, token) ) {
-          User user   = (User) (x.get("agent") != null ?
-            x.get("agent") :
-            x.get("user")) ;
+          Subject subject = (Subject) x.get("subject");
+          User user = subject.getRealUser();
           DAO userDAO = (DAO) x.get("localUserDAO");
 
           // fetch user from DAO and set two factor secret to null

@@ -1,3 +1,4 @@
+
 /**
  * @license
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
@@ -103,6 +104,10 @@ foam.CLASS({
       name: 'supportEmail'
     },
     {
+      class: 'String',
+      name: 'supportPhone'
+    },
+    {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.PasswordPolicy',
       name: 'passwordPolicy',
@@ -195,66 +200,22 @@ foam.CLASS({
       ],
       javaCode: `
         // Find Group details, by iterating up through group.parent
-        AppConfig config          = (AppConfig) ((AppConfig) x.get("appConfig")).fclone();
-        String configUrl          = "";
-        String configSupportEmail = "";
-        Boolean urlFound          = false;
-        Boolean supportEmailFound = false;
         Group group               = this;
-        String grp                = "";
         DAO groupDAO              = (DAO) x.get("groupDAO");
 
+        String configUrl           = "";
+
+        // Get support info and url off group or parents.
         while ( group != null ) {
-          if ( ! urlFound &&
-               ! SafetyUtil.isEmpty(group.getUrl()) ) {
-            configUrl = group.getUrl();
-          }
-          configSupportEmail = supportEmailFound ? configSupportEmail : group.getSupportEmail();
-      
-          // Once true, stay true
-          urlFound          = urlFound   ? urlFound   : ! SafetyUtil.isEmpty(configUrl);
-          supportEmailFound = supportEmailFound ? supportEmailFound : ! SafetyUtil.isEmpty(configSupportEmail);
+          configUrl = ! SafetyUtil.isEmpty(group.getUrl()) && SafetyUtil.isEmpty(configUrl) ?
+              group.getUrl() : configUrl;
 
-          if ( urlFound && supportEmailFound ) break;
-
-          grp   = group.getParent();
-          group = (Group)groupDAO.find(grp);
+          if ( ! SafetyUtil.isEmpty(group.getUrl()) && ! SafetyUtil.isEmpty(configUrl) ) break;
+          group = (Group) groupDAO.find(group.getParent());
         }
 
-        // FIND URL
-        if ( ! urlFound ) {
-          // populate AppConfig url with request's RootUrl
-          HttpServletRequest req = x.get(HttpServletRequest.class);
-          if ( (req != null) && ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
-            configUrl = ((Request) req).getRootURL().toString();
-          }
-        }
-
-        // FORCE HTTPS IN URL?
-        if ( config.getForceHttps() ) {
-          if ( ! configUrl.startsWith("https://") ) {
-            if ( configUrl.startsWith("http://") ) {
-              configUrl = "https" + configUrl.substring(4);
-            } else {
-              configUrl = "https://" + configUrl;
-            }
-          }
-        }
-
-        // Strip trailing / to simplify other url building components, such as email templates. 
-        if ( configUrl.endsWith("/") ) {
-          configUrl = configUrl.substring(0, configUrl.length()-1);
-        } 
-
-        // SET URL
-        config.setUrl(configUrl);
-
-        // SET SupportEmail
-        if ( supportEmailFound ) {
-          config.setSupportEmail(configSupportEmail);
-        }
-
-        return config;
+        AppConfig config = (AppConfig) x.get("appConfig");
+        return config.configure(x, configUrl);
         `
     },
     {
@@ -393,9 +354,14 @@ foam.CLASS({
     it.
   `,
 
-  imports: ['auth'],
+  imports: [
+    'AuthService auth'
+  ],
 
-  javaImports: ['foam.dao.DAO'],
+  javaImports: [
+    'foam.dao.DAO',
+    'foam.nanos.auth.AuthService'
+  ],
 
   messages: [
     {
@@ -426,4 +392,21 @@ foam.CLASS({
       `
     }
   ]
+});
+
+
+foam.RELATIONSHIP({
+  cardinality: '1:*',
+  sourceModel: 'foam.nanos.theme.Theme',
+  targetModel: 'foam.nanos.auth.Group',
+  forwardName: 'groups',
+  inverseName: 'theme',
+  sourceProperty: {
+    hidden: true
+  },
+  targetProperty: {
+    hidden: false,
+    tableWidth: 120,
+    section: 'administrative'
+  }
 });

@@ -378,7 +378,8 @@ foam.CLASS({
   listeners: [
     {
       name: 'onPredicateChange',
-      isFramed: true,
+      isMerged: true,
+      mergeDelay: 250,
       code: function() {
         this.filteredDAO.select(this.Count.create())
             .then(function(c) { this.count = c.value; }.bind(this));
@@ -386,7 +387,8 @@ foam.CLASS({
     },
     {
       name: 'updateCount',
-      isFramed: true,
+      isMerged: true,
+      mergeDelay: 250,
       code: function() {
         this.data.select(this.Count.create()).then(function(c) {
           this.totalCount = c.value;
@@ -396,7 +398,8 @@ foam.CLASS({
     },
     {
       name: 'updateSearchFields',
-      isFramed: true,
+      isMerged: true,
+      mergeDelay: 250,
       code: function() {
         if ( ! this.loaded_ || ! this.data ) return;
         var fields    = this.searchFields;

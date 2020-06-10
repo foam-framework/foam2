@@ -137,6 +137,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'Time',
@@ -332,7 +333,7 @@ foam.CLASS({
         },
         configurable: true
       });
-    },
+    }
   ]
 });
 

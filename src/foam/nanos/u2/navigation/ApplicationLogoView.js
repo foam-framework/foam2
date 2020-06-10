@@ -28,6 +28,7 @@ foam.CLASS({
     }
     ^ .logo {
       max-height: 40px;
+      height: 27px;
     }
   `,
 

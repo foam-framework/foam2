@@ -11,6 +11,7 @@ import foam.lib.parse.Not;
 import foam.lib.parse.PStream;
 import foam.lib.parse.ParserContext;
 import foam.lib.parse.Seq;
+import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
 
 public class MeParser extends foam.lib.parse.ProxyParser {
@@ -27,7 +28,7 @@ public class MeParser extends foam.lib.parse.ProxyParser {
     if ( ps == null ) return null;
 
     if ( ( (Object[]) ps.value() )[0].equals("me") ) {
-      User user = (User) x.get("user");
+      User user = ((Subject) x.get("subject")).getUser();
         if ( user == null ) {
           System.err.println("User is not logged in");
           return null;

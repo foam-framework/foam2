@@ -1,18 +1,7 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2016 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
@@ -39,6 +28,8 @@ foam.CLASS({
     },
     {
       class: 'Function',
+      // TODO: it isn't normal for JS functions to have a 'js' prefix
+      // TODO: poor choice of name, should be something with 'assert'
       name: 'jsFunc',
       expression: function(predicate, jsErr) {
         return function() {
@@ -48,22 +39,46 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'errorString'
+      name: 'errorMessage',
+      documentation: `
+        Provide feedback to the user via a Message.
+        To use this, provide the name of the Message you wish to add.
+        When both errorString and errorMessage are specified, the errorMessage will be used.
+      `
+    },
+    {
+      class: 'String',
+      name: 'errorString',
+      documentation: `
+        Provide feedback to the user via a String.
+        When both errorString and errorMessage are specified, the errorMessage will be used.
+      `
     },
     {
       class: 'Function',
+      // TODO: it isn't normal for JS functions to have a 'js' prefix
       name: 'jsErr',
-      expression: function(errorString) {
-        return function() { return errorString; };
+      expression: function(errorString, errorMessage) {
+        return function(obj) { 
+          if ( errorMessage && obj ) {
+            if ( obj[errorMessage] ) return obj[errorMessage];
+            console.warn('Error finding message', errorMessage, '. No such message on object.', obj);
+          }
+          return errorString;
+        }
       }
     }
   ],
+
   methods: [
     function createErrorSlotFor(data) {
+      return data.slot(this.jsFunc, this.args);
+      /*
       return this.ExpressionSlot.create({
         args: this.args.map(a => data[a+'$']),
         code: this.jsFunc.bind(data)
       });
+      */
     }
   ]
 });
@@ -97,7 +112,8 @@ foam.CLASS({
           return [args, function() {
             for ( var i = 0 ; i < validationPredicates.length ; i++ ) {
               var vp = validationPredicates[i];
-              if ( vp.jsFunc.bind(this)() ) return vp.jsErr.bind(this)();
+              var self = this;
+              if ( vp.jsFunc.bind(self)() ) return vp.jsErr.bind(self)(self);
             }
             return null;
           }];

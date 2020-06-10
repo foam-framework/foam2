@@ -54,7 +54,28 @@ foam.CLASS({
     {
       class: 'String',
       name: 'browseTitle',
-      expression: function(of) { return foam.String.pluralize(of.model_.label); }
+      expression: function(of) { return of.model_.plural; }
+    },
+    {
+      class: 'String',
+      name: 'browseSubtitle',
+      expression: function(of) { return 'View all ' + of.model_.plural.toLowerCase() + '.' }
+    },
+    {
+      // TODO: Make ViewSpecWithJava a refinement to ViewSpec and change below to a ViewSpec
+      class: 'foam.u2.ViewSpecWithJava',
+      name: 'summaryView',
+      expression: function(defaultColumns) {
+        return {
+          class: 'foam.u2.view.ScrollTableView',
+          enableDynamicTableHeight: false,
+          columns: defaultColumns,
+          css: {
+            width: '100%',
+            height: '424px'
+          }
+        };
+      }
     },
     {
       class: 'String',
@@ -160,6 +181,10 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.comics.v2.CRUDEnabledActionsAuth',
       name: 'CRUDEnabledActionsAuth'
+    },
+    {
+      class: 'Boolean',
+      name: 'hideQueryBar'
     }
   ]
 });

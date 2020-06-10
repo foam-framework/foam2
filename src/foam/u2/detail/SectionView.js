@@ -25,7 +25,7 @@ foam.CLASS({
 
   css: `
     .subtitle {
-      color: /*%GREY2%*/ #8e9090';
+      color: /*%GREY2%*/ #8e9090;
       font-size: 14px;
       line-height: 1.5;
       margin-bottom: 15px;
@@ -67,10 +67,20 @@ foam.CLASS({
           return self.Rows.create()
             .show(section.createIsAvailableFor(self.data$))
             .callIf(showTitle && section$title, function() {
-              this.start('h2').add(section$title).end();
+              var slot$ = foam.Function.isInstance(self.section.title) ?
+                foam.core.ExpressionSlot.create({
+                  obj$: self.data$,
+                  code: section.title
+                }) : section.title$;
+              this.start('h2').add(slot$).end();
             })
             .callIf(section$subTitle, function() {
-              this.start().addClass('subtitle').add(section$subTitle).end();
+              var slot$ = foam.Function.isInstance(self.section.subTitle) ?
+              foam.core.ExpressionSlot.create({
+                obj$: self.data$,
+                code: section.subTitle
+              }) : section.subTitle$;
+              this.start().addClass('subtitle').add(slot$).end();
             })
             .start(self.Grid)
               .forEach(section.properties, function(p, index) {

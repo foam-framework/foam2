@@ -9,9 +9,7 @@ foam.CLASS({
   name: 'DAOSummaryView',
   extends: 'foam.u2.View',
 
-  documentation: `
-    A configurable summary view for a specific instance
-  `,
+  documentation: 'A configurable summary view for a specific instance',
 
   topics: [
     'finished',
@@ -86,11 +84,11 @@ foam.CLASS({
       expression: function(config$of) {
         var allActions = config$of.getAxiomsByClass(foam.core.Action);
         var defaultAction = allActions.filter((a) => a.isDefault);
-        return defaultAction.length >= 1 
-                ? defaultAction[0] 
-                : allActions.length >= 1 
-                  ? allActions[0]
-                  : null;
+        return defaultAction.length >= 1
+          ? defaultAction[0]
+          : allActions.length >= 1
+            ? allActions[0]
+            : null;
       }
     },
     {
@@ -116,7 +114,7 @@ foam.CLASS({
         if ( config.CRUDEnabledActionsAuth && config.CRUDEnabledActionsAuth.isEnabled ) {
           try {
             let permissionString = config.CRUDEnabledActionsAuth.enabledActionsAuth.permissionFactory(foam.nanos.ruler.Operations.UPDATE, data);
-            
+
             return this.auth.check(null, permissionString);
           } catch(e) {
             return false;
@@ -142,12 +140,46 @@ foam.CLASS({
       }
     },
     {
+      name: 'copy',
+      isEnabled: function(config, data) {
+        if ( config.CRUDEnabledActionsAuth && config.CRUDEnabledActionsAuth.isEnabled ) {
+          try {
+            let permissionString = config.CRUDEnabledActionsAuth.enabledActionsAuth.permissionFactory(foam.nanos.ruler.Operations.CREATE, data);
+
+            return this.auth.check(null, permissionString);
+          } catch(e) {
+            return false;
+          }
+        }
+        return true;
+      },
+      isAvailable: function(config) {
+        try {
+          return config.createPredicate.f();
+        } catch(e) {
+          return false;
+        }
+      },
+      code: function() {
+        if ( ! this.stack ) return;
+        let newRecord = this.data.clone();
+        // Clear PK so DAO can generate a new unique one
+        newRecord.id = undefined;
+        this.stack.push({
+          class: 'foam.comics.v2.DAOCreateView',
+          data: newRecord,
+          config: this.config,
+          of: this.config.of
+        }, this.__subContext__);
+      }
+    },
+    {
       name: 'delete',
       isEnabled: function(config, data) {
         if ( config.CRUDEnabledActionsAuth && config.CRUDEnabledActionsAuth.isEnabled ) {
           try {
             let permissionString = config.CRUDEnabledActionsAuth.enabledActionsAuth.permissionFactory(foam.nanos.ruler.Operations.REMOVE, data);
-  
+
             return this.auth.check(null, permissionString);
           } catch(e) {
             return false;
@@ -183,8 +215,8 @@ foam.CLASS({
 
       // Get a fresh copy of the data, especially when we've been returned
       // to this view from the edit view on the stack.
-      this.config.dao.inX(this.__subContext__).find(this.data).then(d => { 
-        if ( d ) self.data = d; 
+      this.config.dao.inX(this.__subContext__).find(this.data).then(d => {
+        if ( d ) self.data = d;
 
         this
           .addClass(this.myClass())
@@ -216,6 +248,10 @@ foam.CLASS({
                       .tag(self.EDIT, {
                         buttonStyle: foam.u2.ButtonStyle.TERTIARY,
                         icon: 'images/edit-icon.svg'
+                      })
+                      .tag(self.COPY, {
+                        buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                        icon: 'images/copy-icon.svg'
                       })
                       .tag(self.DELETE, {
                         buttonStyle: foam.u2.ButtonStyle.TERTIARY,

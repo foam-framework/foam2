@@ -274,7 +274,7 @@ actions: [
       }
       this.userDAO.put(this.user);
       this.stack.push({
-        class: 'foam.nanos.notification.NotificationListView'
+        class: 'foam.nanos.notification.NotificationView'
       });
     }
   },
@@ -299,7 +299,7 @@ actions: [
       }
       this.userDAO.put(this.user);
       this.stack.push({
-        class: 'foam.nanos.notification.NotificationListView'
+        class: 'foam.nanos.notification.NotificationView'
       });
     }
   }

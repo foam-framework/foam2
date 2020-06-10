@@ -27,3 +27,36 @@ p({"class": "foam.nanos.script.TestRunnerScript", "id":"testRunnerScript"})
 p({"class":"foam.nanos.script.Script","id":"Migrate permissions","code":"import foam.dao.ArraySink;\u000aimport foam.nanos.auth.*;\u000a\u000alocalGroupDAO = x.get(\"localGroupDAO\");\u000apermissionDAO = x.get(\"localPermissionDAO\");\u000agroupPermissionJunctionDAO = x.get(\"localGroupPermissionJunctionDAO\");\u000a\u000agroups = ((ArraySink) localGroupDAO.select(new ArraySink())).getArray();\u000a\u000afor ( Group group : groups ) {\u000a  Permission[] permissions = group.getPermissions();\u000a\u000a  for ( Permission permission : permissions ) {\u000a\u000a    // Add to permissionDAO if not already there.\u000a    Permission existing = permissionDAO.find(permission.getId());\u000a\u000a    if ( existing == null ) {\u000a      permissionDAO.put(permission);\u000a      print(\"Added permission \" + permission.getId() + \" to permissionDAO.\");\u000a    }\u000a\u000a    // Add to groupPermissionJunctionDAO if not already there.\u000a    GroupPermissionJunction junction = group.getPermissions2(x).createJunction(permission.getId());\u000a    GroupPermissionJunction existing2 = groupPermissionJunctionDAO.find(junction);\u000a\u000a    if ( existing2 == null ) {\u000a      group.getPermissions2(x).add(permission);\u000a      print(\"Added \" + permission.getId() + \" to group \" + group.getId() + \".\");\u000a    } else {\u000a      print(permission.getId() + \" is already in group \" + group.getId() + \".\");\u000a    }\u000a  }\u000a}\u000a"})
 p({"class":"foam.nanos.script.Script","id":"Sample Threads","description":"Perform statistical thread sampling to discover code hot spots.","lastRun":"2019-06-24T17:30:02.660Z","lastDuration":12626,"status":1,"code":"map     = new HashMap();\n\nfor ( j = 0 ; j < 1000 ; j++ ) {\n\nthreads = Thread.getAllStackTraces().values();\n\nfor ( i = threads.iterator() ; i.hasNext() ; ) {\n  t = i.next();\n  try {\n    l = t[0].toString().trim();\n    if ( l.equals(\"java.lang.Thread.dumpThreads(Native Method)\") ) continue;\n    if ( l.equals(\"sun.misc.Unsafe.park(Native Method)\") ) continue;\n    if ( l.equals(\"java.lang.Thread.sleep(Native Method)\") ) continue;\n    if ( l.equals(\"java.lang.Object.wait(Native Method)\") ) continue;\n    if ( l.equals(\"sun.nio.ch.KQueueArrayWrapper.kevent0(Native Method)\") ) continue;\n    if ( l.equals(\"sun.nio.ch.KQueueArrayWrapper.register0(Native Method)\") ) continue;\n    if ( l.equals(\"sun.nio.ch.ServerSocketChannelImpl.accept0(Native Method)\") ) continue;\n\n    if ( map.containsKey(l) ) {\n      map.put(l, map.get(l) + 1);\n    } else {\n      map.put(l, 1);\n    }\n  } catch (Throwable t) {\n  }\n}\n\nThread.sleep(10);\n}\n\nfor ( i = map.keySet().iterator() ; i.hasNext() ; ) {\n  key = i.next();\n  value = map.get(key);\n  if ( ! String.valueOf(value).equals(\"1\") ) \n    print(String.format(\"%-100s %s\", new Object[] {key, value}));\n}\n\nprint(\"done\");","output":"foam.core.AbstractFObject.compareTo(AbstractFObject.java:31)                                         2\ndone\n"})
 p({"class":"foam.nanos.script.Script","id":"Generate Screenshots","server":false,"status":1,"code":"menuDAO = x.menuDAO;\n\nvar e = foam.u2.Element.create({},x);\ne.write(document);\n\n\nmenuDAO.select(function(m) {\nif ( m.id == 'set-security' ) return;\nif ( m.id.indexOf('sme') != -1 ) return;\ntry {\n  // print(m.id);\n\n   if ( ! m.handler ) return;\n   if ( m.handler == 'foam.nanos.menu.DocumentFileMenu' ) return;\n   if ( m.handler == 'foam.nanos.menu.SubMenu' ) return;\n   if ( m.handler == 'foam.nanos.menu.DAOMenu' ) return;\n   view = m.handler.createView(x, m);\n   e.start(view);\n} catch (t) {\n}\n});\n\nvar dao = foam.nanos.boot.DAOConfigSummaryView.create({}, x).filteredDAO;\n\ndao.limit(100000).select(function(spec) {\n  try {\n  print(spec.id);\n  var dao = x[spec.id];\n  var view1 = foam.comics.BrowserView.create({\n    data: dao\n  }, x);\n  // var view2 = foam.comics.v2.DAOCreateView.create({data: dao.of.create()},x);\n  var view2 = foam.u2.DetailView.create({data: dao.of.create()},x);\n  e.start(view1);\n  e.tag('br');\n  e.start(view2);\n  e.tag('br');\n  e.tag('br');\n  } catch (t) {}\n});\n","output":""})
+
+p({
+  "class":"foam.nanos.script.Script",
+  "id":"addGoogleSheetsAndPDFGoogleSheetsExportDriverRegistry",
+  "description":"Add GoogleSheets and PDFGoogleSheets to exportDriverRegistryDAO.",
+  "server":true,
+  "scheduled":false,
+  "code":
+  """
+    import foam.core.X;
+    import foam.dao.DAO;
+    import foam.nanos.export.ExportDriverRegistry;
+
+    ExportDriverRegistry edr = new ExportDriverRegistry.Builder(x).setId("GoogleSheets").setDriverName("foam.nanos.export.GoogleSheetsExportDriver").setTargetModel("").setIsOpenable(true).setEnabled(true).build();
+    ExportDriverRegistry edr1 = new ExportDriverRegistry.Builder(x).setId("PDFGoogleSheets").setDriverName("foam.nanos.export.PDFGoogleSheetsExportDriver").setExtension("pdf").setMimeType("").setIsDownloadable(true).setEnabled(true).build();
+
+    DAO exportDriverRegistryDAO = (DAO) x.get("exportDriverRegistryDAO");
+    try {
+      exportDriverRegistryDAO.put(edr);
+      print("put: " + edr.getId() + " completed");
+      try {
+        exportDriverRegistryDAO.put(edr1);
+        print("put: " + edr1.getId() + " completed");
+      } catch (Throwable t) {
+        print("❌: Add GoogleSheets and PDFGoogleSheets failed: put " + edr1.getId() + " failed");
+        print(t.getMessage());
+      }
+    } catch (Throwable t) {
+      print("❌: Add GoogleSheets and PDFGoogleSheets failed: put " + edr.getId() + " failed");
+      print(t.getMessage());
+    }
+  """
+});

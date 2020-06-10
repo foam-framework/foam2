@@ -20,8 +20,8 @@ foam.CLASS({
         }
         return this.delegate.find_(x, obj).then(function(result) {
           if ( result == null ) {
-            obj.createdBy = x.user.id;
-            obj.createdByAgent = x.agent != null ? x.agent.id : x.user.id;
+            obj.createdBy = x.subject.user.id;
+            obj.createdByAgent = x.subject.realUser.id;
           }
           return this.delegate.put_(x, obj);
         }.bind(this));
@@ -29,10 +29,11 @@ foam.CLASS({
       javaCode: `
         // only set created by if object does not exist in DAO yet
         if ( obj instanceof CreatedByAware && getDelegate().find_(x, obj) == null ) {
-          User user = (User) x.get("user");
-          User agent = (User) x.get("agent");
+          Subject subject = (Subject) x.get("subject");
+          User user = subject.getUser();
+          User realUser = subject.getRealUser();
           ((CreatedByAware) obj).setCreatedBy(user.getId());
-          ((CreatedByAware) obj).setCreatedByAgent(agent != null ? agent.getId() : user.getId());
+          ((CreatedByAware) obj).setCreatedByAgent(realUser.getId());
         }
         return super.put_(x, obj);
       `

@@ -29,8 +29,8 @@ foam.CLASS({
     'bsh.Interpreter',
     'foam.core.*',
     'foam.dao.*',
-    'foam.nanos.logger.Logger',
     'foam.nanos.auth.*',
+    'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
     'java.io.ByteArrayOutputStream',
     'java.io.PrintStream',
@@ -61,7 +61,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'id',
-      tableWidth: 280
+      tableWidth: 220
     },
     {
       class: 'Boolean',
@@ -81,6 +81,20 @@ foam.CLASS({
       name: 'description',
       documentation: 'Description of the script.',
       tableWidth: 200
+    },
+    {
+      class: 'Int',
+      name: 'priority',
+      value: 5,
+      javaValue: 5,
+      view: {
+        class: 'foam.u2.view.ChoiceView',
+        choices: [
+          [ 4, 'Low'    ],
+          [ 5, 'Medium' ],
+          [ 6, 'High'   ]
+        ]
+      }
     },
     {
       class: 'DateTime',
@@ -112,6 +126,11 @@ foam.CLASS({
       class: 'Boolean',
       name: 'server',
       documentation: 'Runs on server side if enabled.',
+      tableCellFormatter: function(value) {
+        this.start()
+          .add(value ? 'Y' : 'N')
+        .end();
+      },
       value: true,
       tableWidth: 80
     },
@@ -172,6 +191,7 @@ foam.CLASS({
       class: 'String',
       name: 'daoKey',
       value: 'scriptDAO',
+      transient: true,
       visibility: 'HIDDEN',
       documentation: `Name of dao which journal will be used to store script run logs. To set from inheritor
       just change property value`
@@ -192,8 +212,8 @@ foam.CLASS({
           shell.set("currentScript", this);
           shell.set("x", x);
           shell.eval("runScript(String name) { script = x.get(\\"scriptDAO\\").find(name); if ( script != null ) eval(script.code); }");
-          shell.eval("foam.core.X sudo(String user) { foam.util.Auth.sudo(x, (String) user); }");
-          shell.eval("foam.core.X sudo(Object id) { foam.util.Auth.sudo(x, id); }");
+          shell.eval("foam.core.X sudo(String user) { return foam.util.Auth.sudo(x, (String) user); }");
+          shell.eval("foam.core.X sudo(Object id) { return foam.util.Auth.sudo(x, id); }");
         } catch (EvalError e) {}
 
         return shell;
@@ -219,29 +239,34 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        ByteArrayOutputStream baos  = new ByteArrayOutputStream();
-        PrintStream           ps    = new PrintStream(baos);
-        Interpreter           shell = createInterpreter(x);
-        PM                    pm    = new PM.Builder(x).setClassType(Script.getOwnClassInfo()).setName(getId()).build();
-
-        // TODO: import common packages like foam.core.*, foam.dao.*, etc.
+        Thread.currentThread().setPriority(getPriority());
         try {
-          setOutput("");
-          shell.setOut(ps);
-          shell.eval(getCode());
-        } catch (Throwable e) {
-          ps.println();
-          e.printStackTrace(ps);
-          Logger logger = (Logger) x.get("logger");
-          logger.error(e);
-        } finally {
-          pm.log(x);
-        }
+          ByteArrayOutputStream baos  = new ByteArrayOutputStream();
+          PrintStream           ps    = new PrintStream(baos);
+          Interpreter           shell = createInterpreter(x);
+          PM                    pm    = new PM.Builder(x).setClassType(Script.getOwnClassInfo()).setName(getId()).build();
 
-        setLastRun(new Date());
-        setLastDuration(pm.getTime());
-        ps.flush();
-        setOutput(baos.toString());
+          // TODO: import common packages like foam.core.*, foam.dao.*, etc.
+          try {
+            setOutput("");
+            shell.setOut(ps);
+            shell.eval(getCode());
+          } catch (Throwable e) {
+            ps.println();
+            e.printStackTrace(ps);
+            Logger logger = (Logger) x.get("logger");
+            logger.error(e);
+          } finally {
+            pm.log(x);
+          }
+
+          setLastRun(new Date());
+          setLastDuration(pm.getTime());
+          ps.flush();
+          setOutput(baos.toString());
+        } finally {
+          Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
+        }
     `
     },
     {
@@ -260,16 +285,16 @@ foam.CLASS({
                   scriptId: script.id,
                   notificationType: 'Script Execution',
                   body: `Status: ${script.status}
-                        Script Output: ${script.length > self.MAX_NOTIFICATION_OUTPUT_CHARS ?
-                          script.output.substring(0, self.MAX_NOTIFICATION_OUTPUT_CHARS) + '...' :
-                          script.output }
-                        LastDuration: ${script.lastDuration}`
+                    Script Output: ${script.length > self.MAX_NOTIFICATION_OUTPUT_CHARS ?
+                      script.output.substring(0, self.MAX_NOTIFICATION_OUTPUT_CHARS) + '...' :
+                      script.output }
+                    LastDuration: ${script.lastDuration}`
                 });
                 self.notificationDAO.put(notification);
               }
             }).catch(function() {
-               clearInterval(interval);
-              });
+              clearInterval(interval);
+            });
         }, 2000);
       }
     }
@@ -278,7 +303,7 @@ foam.CLASS({
   actions: [
     {
       name: 'run',
-      tableWidth: 70,
+      tableWidth: 90,
       confirmationRequired: true,
       code: function() {
         var self = this;
@@ -286,21 +311,25 @@ foam.CLASS({
         this.status = this.ScriptStatus.SCHEDULED;
         if ( this.server ) {
           this.__context__[this.daoKey].put(this).then(function(script) {
-              self.copyFrom(script);
-              if ( script.status === self.ScriptStatus.RUNNING ) {
-                self.poll();
-              }
+            self.copyFrom(script);
+            if ( script.status === self.ScriptStatus.RUNNING ) {
+              self.poll();
+            }
           });
         } else {
           this.status = this.ScriptStatus.RUNNING;
-          this.runScript().then(() => {
-            this.status = this.ScriptStatus.UNSCHEDULED;
-            this.__context__[this.daoKey].put(this);
-          }).catch((err) => {
-            console.log(err);
-            this.status = this.ScriptStatus.ERROR;
-            this.__context__[this.daoKey].put(this);
-          });
+          this.runScript().then(
+            () => {
+              this.status = this.ScriptStatus.UNSCHEDULED;
+              this.__context__[this.daoKey].put(this);
+            },
+            (err) => {
+              this.output += '\n' + err.stack;
+              console.log(err);
+              this.status = this.ScriptStatus.ERROR;
+              this.__context__[this.daoKey].put(this);
+            }
+          );
         }
       }
     }

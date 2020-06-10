@@ -23,6 +23,7 @@ foam.SCRIPT({
   }
 });
 
+
 foam.CLASS({
   package: 'foam.i18n',
   name: 'MessageAxiom',
@@ -30,7 +31,8 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'name'
+      name: 'name',
+      preSet: function(o, n) { return foam.String.constantize(n); }
     },
     {
       class: 'String',
@@ -56,6 +58,8 @@ foam.CLASS({
 
   methods: [
     function installInClass(cls) {
+      cls[this.name] = this.message;
+      /*
       Object.defineProperty(
         cls,
         this.name,
@@ -63,10 +67,18 @@ foam.CLASS({
           value: this.message,
           configurable: false
         });
+        */
     },
 
     function installInProto(proto) {
-      this.installInClass(proto);
+      var name = this.name;
+      Object.defineProperty(
+        proto,
+        this.name,
+        {
+          get: function() { return this.cls_[name] },
+          configurable: false
+        });
     }
   ]
 });

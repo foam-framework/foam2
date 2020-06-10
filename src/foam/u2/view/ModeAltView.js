@@ -25,6 +25,7 @@ foam.CLASS({
 
 
   properties: [
+    [ 'nodeName', 'span' ],
     {
       class: 'foam.u2.ViewSpec',
       name: 'readView',
@@ -51,25 +52,24 @@ foam.CLASS({
       };
       this.SUPER();
       this.addClass(this.myClass());
+      // TODO:
       this.add(this.slot(function(mode) {
         switch ( mode ) {
           case self.DisplayMode.RW:
           case self.DisplayMode.DISABLED:
-            return self.E()
-              .start(self.writeView, {
+            return self.createChild_(
+              self.writeView,
+              {
                 data$: self.data$,
                 mode: mode
-              })
-                .call(callFromProperty)
-              .end();
+              }).call(callFromProperty);
           case self.DisplayMode.RO:
-            return self.E()
-              .start(self.readView, {
+            return self.createChild_(
+              self.readView,
+              {
                 data$: self.data$,
                 mode: mode
-              })
-                .call(callFromProperty)
-              .end();
+              }).call(callFromProperty);
           case self.DisplayMode.HIDDEN:
             break;
           default:

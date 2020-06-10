@@ -103,6 +103,7 @@ foam.CLASS({
       this.x = x;
       this.y = y;
       this.opened = true;
+      window.addEventListener('resize', this.onResize);
     },
 
     function close() {
@@ -161,6 +162,11 @@ foam.CLASS({
      */
     function onClick(e) {
       e.stopPropagation();
+    },
+
+    function onResize() {
+      this.close();
+      window.removeEventListener("resize", onResize);
     }
   ]
 });

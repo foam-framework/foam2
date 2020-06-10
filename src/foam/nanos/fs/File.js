@@ -10,6 +10,17 @@ foam.CLASS({
 
   documentation: 'Represents a file',
 
+  implements: [
+    'foam.nanos.auth.Authorizable'
+  ],
+
+  javaImports: [
+    'foam.nanos.auth.AuthService',
+    'foam.nanos.auth.AuthorizationException',
+    'foam.nanos.auth.Subject',
+    'foam.nanos.auth.User'
+  ],
+
   properties: [
     {
       class: 'String',
@@ -58,6 +69,44 @@ foam.CLASS({
         }
         return url;
       }
+    }
+  ],
+
+  methods: [
+    {
+      name: 'authorizeOnCreate',
+      javaCode: `
+        AuthService auth = (AuthService) x.get("auth");
+        if ( ! auth.check(x, "file.create") ) {
+          throw new AuthorizationException();
+        }
+      `
+    },
+    {
+      name: 'authorizeOnRead',
+      javaCode: `
+      `
+    },
+    {
+      name: 'authorizeOnUpdate',
+      javaCode: `
+        User user = ((Subject) x.get("subject")).getUser();
+        if ( user != null && user.getId() == getOwner() ) return;
+
+        AuthService auth = (AuthService) x.get("auth");
+        if ( ! auth.check(x, "file.update." + getId()) ) {
+          throw new AuthorizationException();
+        }
+      `
+    },
+    {
+      name: 'authorizeOnDelete',
+      javaCode: `
+        AuthService auth = (AuthService) x.get("auth");
+        if ( ! auth.check(x, "file.delete." + getId()) ) {
+          throw new AuthorizationException();
+        }
+      `
     }
   ]
 });
