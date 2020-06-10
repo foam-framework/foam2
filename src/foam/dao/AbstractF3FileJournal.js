@@ -171,10 +171,9 @@ try {
       type: 'FObject',
       args: [ 'Context x', 'String prefix', 'DAO dao', 'foam.core.FObject obj' ],
       javaCode: `
-        final Object    id = obj.getProperty("id");
-        final ClassInfo of = dao.getOf();
-
-        JSONFObjectFormatter fmt = formatter.get();
+        final Object               id  = obj.getProperty("id");
+        final ClassInfo            of  = dao.getOf();
+        final JSONFObjectFormatter fmt = formatter.get();
 
         getLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
           FObject old;
@@ -212,7 +211,7 @@ try {
                 getMultiLineOutput() ? "\\n" : "",
                 foam.util.SafetyUtil.isEmpty(prefix) ? "" : prefix + ".");
 
-                if ( isLast() ) getWriter().flush();
+              if ( isLast() ) getWriter().flush();
             } catch (Throwable t) {
               getLogger().error("Failed to write put entry to journal", t);
             }
