@@ -13,7 +13,12 @@ foam.CLASS({
   documentation: 'Abstract time-based one-time password auth service',
 
   javaImports: [
-    'java.util.Date'
+    'java.util.Date',
+
+    // todo: remove after fixing NP-1278
+    'foam.nanos.logger.Logger',
+    'java.util.Arrays'
+
   ],
 
   methods: [
@@ -39,18 +44,37 @@ foam.CLASS({
         }
       ],
       javaCode:
-`try {
+      
+`
+// todo: remove all the loggers after fixing NP-1278
+Logger logger = (Logger) getX().get("logger");
+
+try {
+
   long t = new Date().getTime() / stepsize;
+
+  StringBuilder sb = new StringBuilder();
+  sb.append(String.format("---[NP-1278]---%n"));
+  sb.append(String.format("---in checkCode, AbstractTOTPAuthService---%n"));
+  sb.append(String.format("key = %s%n", Arrays.toString(key)));
+  sb.append(String.format("token = %d%n", code));
+  sb.append(String.format("stepsize = %d%n", stepsize));
+  sb.append(String.format("window = %d%n", window));
+  sb.append(String.format("time = %d%n", new Date().getTime()));
+  sb.append(String.format("t = %d%n", t));
 
   for (int i = -window; i <= window; ++i) {
     long hash = calculateCode(key, t + i);
+    sb.append(String.format("i = %d, hash = %d%n", i, hash));
     if (hash == code) {
+      logger.debug(sb.toString());
       return true;
     }
   }
-
+  logger.debug(sb.toString());
   return false;
 } catch (Throwable t) {
+  logger.error("[NP-1278] exception caught in checkCode: ", t);
   return false;
 }`
     }
