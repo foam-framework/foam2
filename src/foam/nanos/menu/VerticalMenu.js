@@ -19,8 +19,7 @@ foam.CLASS({
     'menuListener',
     'loginSuccess',
     'menuDAO',
-    'pushMenu',
-    'userLoggedIn'
+    'pushMenu'
   ],
 
   requires: [
@@ -93,10 +92,8 @@ foam.CLASS({
   ],
 
   methods: [
-    async function initE() {
+    function initE() {
       var self = this;
-      // Wait for latest theme to get fetched
-      await this.userLoggedIn;
       this
       .addClass(this.myClass())
       .start()
