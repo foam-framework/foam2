@@ -26,8 +26,7 @@ public class LiveScriptBundler
 
   // Filesystem
   protected String path_;
-  protected WatchService watcher_;
-  protected LinkedBlockingQueue<String> fileNames_;
+  protected Set<String> fileNames_;
 
   // Caching
   protected String javascriptBuffer_;
@@ -48,13 +47,13 @@ public class LiveScriptBundler
     x_ = x;
   }
 
-  private class WatcherThread implements Runnable {
+  private class WatchWrapper {
     protected Path               realDir_;
     protected String             foamDir_;
     protected WatchService       watcher_;
     protected FileUpdateListener listener_;
 
-    public WatcherThread(
+    public WatchWrapper(
       WatchService watcher, Path realDir, String foamDir,
       FileUpdateListener listener
     ) {
@@ -64,42 +63,59 @@ public class LiveScriptBundler
       listener_ = listener;
     }
 
+    public void tick() {
+      WatchKey key = watcher_.poll();
+      if ( key == null ) return;
+
+      for ( WatchEvent<?> event : key.pollEvents() ) {
+        WatchEvent.Kind<?> kind = event.kind();
+        if ( kind == OVERFLOW ) {
+          log_("ERROR", "File watch buffer overflowed!");
+          continue;
+        }
+
+        WatchEvent<Path> ev = (WatchEvent<Path>) event;
+        Path filename = ev.context();
+
+        // Ex: foamPath="foam/core/Property.js"
+        String foamPath = foamDir_ + "/" + filename.toString();
+
+        if ( fileNames_.contains(foamPath) ) {
+          log_("UPDATE", foamPath);
+
+          // Run the javascript builder
+          listener_.onFileUpdate(foamPath, realDir_.resolve(filename));
+
+        } else {
+          log_("IGNORE", foamPath);
+        }
+
+        if ( ! key.reset() ) break;
+      }
+    }
+  }
+
+  private class WatcherThread implements Runnable {
+    protected List<WatchWrapper> watchers_;
+
+    public WatcherThread(
+      List<WatchWrapper> watchers
+    ) {
+      watchers_  = watchers;
+    }
+
     // Standard WatchService loop
     public void run() {
       for ( ; ; ) {
-        WatchKey key;
-        try {
-          key = watcher_.take();
-        } catch (InterruptedException x) {
-          return;
-        }
-        for ( WatchEvent<?> event : key.pollEvents() ) {
-          WatchEvent.Kind<?> kind = event.kind();
-          if ( kind == OVERFLOW ) {
-            log_("ERROR", "File watch buffer overflowed!");
-            continue;
+        for ( WatchWrapper watcher : watchers_ ) {
+          watcher.tick();
+          try {
+            Thread.sleep(2);
+          } catch (InterruptedException e) {
+            return;
           }
-
-          WatchEvent<Path> ev = (WatchEvent<Path>) event;
-          Path filename = ev.context();
-
-          // Ex: foamPath="foam/core/Property.js"
-          String foamPath = foamDir_ + "/" + filename.toString();
-
-          if ( fileNames_.contains(foamPath) ) {
-            log_("UPDATE", foamPath);
-
-            // Run the javascript builder
-            listener_.onFileUpdate(foamPath, realDir_.resolve(filename));
-
-          } else {
-            log_("IGNORE", foamPath);
-          }
-
-          if ( ! key.reset() ) break;
         }
         try {
-          // Since each directory has a watcher thread, 1/100ms is sufficiently frequent
           Thread.sleep(500);
         } catch (InterruptedException e) {
           return;
@@ -113,7 +129,7 @@ public class LiveScriptBundler
   }
 
   public LiveScriptBundler(String path) {
-    fileNames_ = new LinkedBlockingQueue<>();
+    fileNames_ = new HashSet<>();
     path_ = path;
 
     try {
@@ -160,7 +176,7 @@ public class LiveScriptBundler
 
       doRebuildJavascript(null, null);
 
-      watcher_ = FileSystems.getDefault().newWatchService();
+      List<WatchWrapper> watchers = new ArrayList<WatchWrapper>();
 
       // Read each files.js file
       for ( Pair<String,String> currentFilesPath : filesPaths ) {
@@ -190,16 +206,22 @@ public class LiveScriptBundler
           // Find relative path from `src` folder to get foam path
           Path relative = Paths.get(path_, currentFilesPath.getKey())
             .relativize(d.toAbsolutePath()).normalize();
-
-          Thread watcherThread = new Thread(new WatcherThread(
+          
+          WatchWrapper watchWrapper = new WatchWrapper(
             watcher,
             d,
             relative.toString(),
             this::doRebuildJavascript
-          ));
-          watcherThread.start();
+          );
+          watchers.add(watchWrapper);
         }
       }
+
+      Thread watcherThread = new Thread(new WatcherThread(
+        watchers
+      ));
+      watcherThread.start();
+
     } catch ( Throwable t ) {
       t.printStackTrace();
       System.err.println("Failed to initialize filesystem watcher! :(");
