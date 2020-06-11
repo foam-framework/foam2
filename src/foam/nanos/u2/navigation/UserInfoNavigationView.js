@@ -75,7 +75,7 @@ foam.CLASS({
                     .add(this.subject.user.toSummary())
                   .end();
             }))
-            .add(this.slot((subject$user) => {
+            .add(this.slot((subject$realUser) => {
               if ( ! this.subject.realUser ) return;
               return this.E().addClass('name-container')
                   .start('span').addClass(this.myClass('agentName'))
