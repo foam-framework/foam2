@@ -20,11 +20,13 @@ foam.CLASS({
     'org.eclipse.jetty.websocket.servlet.WebSocketCreator',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
+    'foam.nanos.jetty.JettyThreadPoolConfig',
     'java.util.Set',
     'java.util.HashSet',
     'java.util.Arrays',
     'org.eclipse.jetty.server.*',
     'org.eclipse.jetty.util.ssl.SslContextFactory',
+    'org.eclipse.jetty.util.thread.QueuedThreadPool',
     'java.io.FileInputStream',
     'java.security.KeyStore',
     'org.apache.commons.io.IOUtils'
@@ -114,8 +116,18 @@ foam.CLASS({
         }
         getLogger().info("Starting Jetty http server. port", port);
 
+        JettyThreadPoolConfig jettyThreadPoolConfig = (JettyThreadPoolConfig) getX().get("jettyThreadPoolConfig");
+        QueuedThreadPool threadPool = new QueuedThreadPool();
+        threadPool.setDaemon(true);
+        threadPool.setMaxThreads(jettyThreadPoolConfig.getMaxThreads());
+        threadPool.setMinThreads(jettyThreadPoolConfig.getMinThreads());
+        threadPool.	setIdleTimeout(jettyThreadPoolConfig.getIdleTimeout());
+
         org.eclipse.jetty.server.Server server =
-          new org.eclipse.jetty.server.Server(port);
+          new org.eclipse.jetty.server.Server(threadPool);
+        ServerConnector connector = new ServerConnector(server);
+        connector.setPort(port);
+        server.addConnector(connector);
 
         /*
           The following for loop will accomplish the following:
@@ -267,14 +279,14 @@ foam.CLASS({
       foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
 
       if ( this.getEnableHttps() ) {
-  
+
         FileInputStream is = null;
         try {
           // 1. load the keystore to verify the keystore path and password.
           KeyStore keyStore = KeyStore.getInstance("JKS");
           is = new FileInputStream(this.getKeystorePath());
           keyStore.load(is, this.getKeystorePassword().toCharArray());
-  
+
           // 2. enable https
           HttpConfiguration https = new HttpConfiguration();
           https.addCustomizer(new SecureRequestCustomizer());
