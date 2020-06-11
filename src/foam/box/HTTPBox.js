@@ -46,6 +46,7 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.core.X',
     'javax.servlet.http.HttpServletRequest'
   ],
 
@@ -174,6 +175,11 @@ protected class Outputter extends foam.lib.json.Outputter {
     super.outputFObject(o);
   }
 }
+  protected foam.lib.formatter.JSONFObjectFormatter getFormatter(X x) {
+      foam.lib.formatter.JSONFObjectFormatter formatter = new foam.lib.formatter.JSONFObjectFormatter(x);
+      formatter.setPropertyPredicate(new foam.lib.AndPropertyPredicate(x, new foam.lib.PropertyPredicate[] {new foam.lib.NetworkPropertyPredicate(), new foam.lib.PermissionedPropertyPredicate()}));
+      formatter.setQuoteKeys(true);
+  }
 
 protected class ResponseThread implements Runnable {
   protected java.net.URLConnection conn_;
@@ -284,7 +290,9 @@ task.resume()
         // TODO: Clone message or something when it clones safely.
         msg.getAttributes().put("replyBox", getReplyBox());
 
-        output.write(new Outputter(getX()).stringify(msg));
+        foam.lib.formatter.JSONFObjectFormatter formatter = getFormatter(getX());
+        formatter.output(msg);
+        output.write(formatter.builder().toString());
 
         msg.getAttributes().put("replyBox", replyBox);
         output.close();

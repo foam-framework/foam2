@@ -25,6 +25,25 @@ foam.CLASS({
     //    'httpResponse'
   ],
 
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(foam.java.Code.create({
+          data: `
+  protected foam.lib.formatter.JSONFObjectFormatter getFormatter(X x) {
+    foam.lib.formatter.JSONFObjectFormatter formatter = new foam.lib.formatter.JSONFObjectFormatter(x);
+    formatter.setPropertyPredicate(new foam.lib.AndPropertyPredicate(x, new foam.lib.PropertyPredicate[] {new foam.lib.NetworkPropertyPredicate(), new foam.lib.PermissionedPropertyPredicate()}));
+    formatter.setQuoteKeys(true);
+    return formatter;
+  }
+          `
+        })
+                       );
+      }
+    }
+  ],
+
   methods: [
     {
       name: 'send',
@@ -37,9 +56,7 @@ try {
   javax.servlet.http.HttpServletResponse response = (javax.servlet.http.HttpServletResponse)getX().get("httpResponse");
   response.setContentType("application/json");
   java.io.PrintWriter writer = response.getWriter();
-  foam.lib.formatter.JSONFObjectFormatter formatter = new foam.lib.formatter.JSONFObjectFormatter(getX());
-  formatter.setPropertyPredicate(new foam.lib.NetworkPropertyPredicate());
-  formatter.setQuoteKeys(true);
+  foam.lib.formatter.JSONFObjectFormatter formatter = getFormatter(getX());
   formatter.output(msg);
   writer.append(formatter.builder());
   writer.flush();
