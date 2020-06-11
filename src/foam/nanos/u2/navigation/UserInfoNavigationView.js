@@ -16,9 +16,8 @@ foam.CLASS({
   ],
 
   imports: [
-    'agent',
-    'user',
-    'theme'
+    'theme',
+    'subject'
   ],
 
   css: `
@@ -69,17 +68,18 @@ foam.CLASS({
             }));
           })
           .start()
-             .add(this.slot((user) => {
+             .add(this.slot((subject$user) => {
+              if ( ! this.subject.user ) return;
               return this.E().addClass('name-container')
                   .start('span').addClass(this.myClass('userName'))
-                    .add(user.toSummary())
+                    .add(this.subject.user.toSummary())
                   .end();
             }))
-            .add(this.slot((agent) => {
-              if ( ! agent ) return;
+            .add(this.slot((subject$realUser) => {
+              if ( ! this.subject.realUser ) return;
               return this.E().addClass('name-container')
                   .start('span').addClass(this.myClass('agentName'))
-                    .add( agent.toSummary() )
+                    .add( this.subject.realUser.toSummary() )
                   .end();
             }))
           .end()
