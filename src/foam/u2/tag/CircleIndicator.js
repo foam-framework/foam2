@@ -12,6 +12,8 @@ foam.CLASS({
     Displays a coloured circle containing a number or icon.
   `,
 
+  flags: ['web'],
+
   requires: [
     'foam.core.ExpressionSlot'
   ],
