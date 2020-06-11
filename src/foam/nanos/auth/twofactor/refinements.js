@@ -20,7 +20,7 @@ foam.CLASS({
       class: 'String',
       name: 'twoFactorSecret',
       documentation: 'Two factor secret',
-      networkTransient: false, // todo: change it back to true after fixing NP-1278
+      networkTransient: true,
       section: 'administrative'
     }
   ]
