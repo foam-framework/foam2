@@ -47,6 +47,8 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.X',
+    'foam.lib.formatter.FObjectFormatter',
+    'foam.lib.formatter.JSONFObjectFormatter',
     'javax.servlet.http.HttpServletRequest'
   ],
 
@@ -162,24 +164,7 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-protected class Outputter extends foam.lib.json.Outputter {
-  public Outputter(foam.core.X x) {
-    super(x);
-    setPropertyPredicate(new foam.lib.AndPropertyPredicate(x, new foam.lib.PropertyPredicate[] {new foam.lib.NetworkPropertyPredicate(), new foam.lib.PermissionedPropertyPredicate()}));
-  }
-
-  protected void outputFObject(foam.core.FObject o) {
-    if ( o == getMe() ) {
-      o = getX().create(foam.box.HTTPReplyBox.class);
-    }
-    super.outputFObject(o);
-  }
-}
-  protected foam.lib.formatter.JSONFObjectFormatter getFormatter(X x) {
-      foam.lib.formatter.JSONFObjectFormatter formatter = new foam.lib.formatter.JSONFObjectFormatter(x);
-      formatter.setPropertyPredicate(new foam.lib.AndPropertyPredicate(x, new foam.lib.PropertyPredicate[] {new foam.lib.NetworkPropertyPredicate(), new foam.lib.PermissionedPropertyPredicate()}));
-      formatter.setQuoteKeys(true);
-  }
+  protected ThreadLocal<FObjectFormatter> formatter_ = JSONFObjectFormatter.getThreadLocal(getX(), true, true, new foam.lib.AndPropertyPredicate(getX(), new foam.lib.PropertyPredicate[] {new foam.lib.NetworkPropertyPredicate(), new foam.lib.PermissionedPropertyPredicate()}));
 
 protected class ResponseThread implements Runnable {
   protected java.net.URLConnection conn_;
@@ -290,7 +275,7 @@ task.resume()
         // TODO: Clone message or something when it clones safely.
         msg.getAttributes().put("replyBox", getReplyBox());
 
-        foam.lib.formatter.JSONFObjectFormatter formatter = getFormatter(getX());
+        FObjectFormatter formatter = formatter_.get();
         formatter.output(msg);
         output.write(formatter.builder().toString());
 

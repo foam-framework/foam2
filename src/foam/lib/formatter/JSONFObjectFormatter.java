@@ -11,6 +11,7 @@ import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.core.X;
 import foam.lib.json.OutputJSON;
+import foam.lib.PropertyPredicate;
 import foam.util.SafetyUtil;
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
@@ -53,6 +54,18 @@ public class JSONFObjectFormatter
   protected boolean outputReadableDates_ = true;
   protected boolean outputDefaultClassNames_ = true;
 
+  public static ThreadLocal<FObjectFormatter> getThreadLocal(X x, Boolean quoteKeys, Boolean outputClassNames, PropertyPredicate predicate) {
+    return new ThreadLocal<FObjectFormatter>() {
+        @Override
+        protected JSONFObjectFormatter initialValue() {
+          foam.lib.formatter.JSONFObjectFormatter formatter = new foam.lib.formatter.JSONFObjectFormatter(x);
+          formatter.setQuoteKeys(quoteKeys);
+          formatter.setOutputClassNames(outputClassNames);
+          formatter.setPropertyPredicate(predicate);
+          return formatter;
+        }
+    };
+  }
 
   public JSONFObjectFormatter(X x) {
     super(x);
