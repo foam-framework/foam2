@@ -3258,7 +3258,8 @@ foam.CLASS({
     'foam.core.AbstractFObjectPropertyInfo',
     'foam.core.FObject',
     'foam.core.PropertyInfo',
-    'foam.nanos.logger.Logger'
+    'foam.nanos.logger.Logger',
+    'foam.nanos.logger.StdoutLogger'
   ],
 
   properties: [
@@ -3303,8 +3304,11 @@ foam.CLASS({
         try {
           return getArg2().f(obj1);
         } catch( Exception e ) {
-          Logger l = (Logger) getX().get("logger");
-          l.error(e);
+          Logger logger = (Logger) getX().get("logger");
+          if ( logger == null ) {
+            logger = new StdoutLogger();
+          }
+          logger.error(e);
           return null;
         }
       `
