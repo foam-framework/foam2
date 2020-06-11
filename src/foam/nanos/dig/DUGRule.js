@@ -56,13 +56,13 @@ foam.CLASS({
       class: 'String',
       name: 'name',
       section: 'dugInfo',
-      tableWidth: 100
+      tableWidth: 250
     },
     {
       name: 'daoKey',
       label: 'DAO',
       section: 'dugInfo',
-      tableWidth: 100,
+      tableWidth: 150,
       view: function(_, X) {
         var E = foam.mlang.Expressions.create();
         return {

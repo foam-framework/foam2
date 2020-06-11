@@ -171,12 +171,12 @@ p({
     "config": {
       "class": "foam.comics.v2.DAOControllerConfig",
       "daoKey": "ruleDAO",
+      "browseTitle": "DUG Webhooks",
+      "browseSubtitle": "Webhooks triggered by DAO operations.",
+      "createTitle": "Create a New Webhook",
       "predicate": {
         "class": "foam.mlang.predicate.IsInstanceOf",
-        "targetClass": "foam.nanos.dig.DUGRule",
-        "browseTitle": "DUG Webhooks",
-        "browseSubtitle": "Webhooks triggered by DAO operations.",
-        "createTitle": "Create a New Webhook"
+        "targetClass": "foam.nanos.dig.DUGRule"
       },
       "of": "foam.nanos.dig.DUGRule"
     }
