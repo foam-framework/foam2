@@ -32,6 +32,10 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'isAllColumnExportSupported'
+    },
+    {
+      class: 'Boolean',
       name: 'isConvertible'
     },
     {

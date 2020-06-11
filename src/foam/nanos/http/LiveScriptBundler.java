@@ -98,6 +98,12 @@ public class LiveScriptBundler
 
           if ( ! key.reset() ) break;
         }
+        try {
+          // Since each directory has a watcher thread, 1/100ms is sufficiently frequent
+          Thread.sleep(500);
+        } catch (InterruptedException e) {
+          return;
+        }
       }
     }
   }

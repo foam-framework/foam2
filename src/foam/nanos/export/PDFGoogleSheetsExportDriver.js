@@ -30,7 +30,7 @@ foam.CLASS({
     }
   ],
   methods: [
-    async function exportFObject(X, obj) {
+    async function exportFObject(X, obj, config) {
         var self = this;
         
         var sheetId  = '';
@@ -41,14 +41,14 @@ foam.CLASS({
         var values = await  self.outputter.outputArray([ obj ], metadata);
         stringArray = stringArray.concat(values);
 
-        sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata);
+        sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata, config);
         if ( ! sheetId || sheetId.length == 0)
           return '';
         var url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?exportFormat=pdf&format=pdf&scale=3`;
         X.googleSheetsDataExport.deleteSheet(X, sheetId);
         return url;
     },
-    async function exportDAO(X, dao) {
+    async function exportDAO(X, dao, config) {
       var self = this;
       
       var sink = await dao.select();
@@ -60,7 +60,7 @@ foam.CLASS({
       var values = await self.outputter.outputArray(sink.array, metadata);
       stringArray = stringArray.concat(values);
 
-      sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata);
+      sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata, config);
       if ( ! sheetId || sheetId.length == 0)
         return '';
       var url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?exportFormat=pdf&format=pdf&scale=3`;
