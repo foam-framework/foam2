@@ -284,42 +284,39 @@ public class JSONFObjectFormatter
     boolean   outputComma    = true;
     boolean   isDiff         = false;
     boolean   isPropertyDiff = false;
+    List      axioms         = getProperties(info);
+    int       size           = axioms.size();
 
-    if ( ! oldFObject.equals(newFObject) ) {
-      List axioms = getProperties(info);
-      int  size   = axioms.size();
-
-      b_.append('{');
-      addInnerNewline();
-      for ( int i = 0 ; i < size ; i++ ) {
-        PropertyInfo prop = (PropertyInfo) axioms.get(i);
-        isPropertyDiff = maybeOutputPropertyDelta(oldFObject, newFObject, prop);
-        if ( isPropertyDiff ) {
-          if ( ! isDiff ) {
-            if ( outputClassNames_ && outputDefaultClassNames_ ) {
-              //output Class name
-              outputKey("class");
-              b_.append(':');
-              output(newInfo.getId());
-              b_.append(',');
-            }
-            addInnerNewline();
-            PropertyInfo id = (PropertyInfo) newInfo.getAxiomByName("id");
-            outputProperty(newFObject, id);
-            isDiff = true;
-            // to output class names for references
-            outputDefaultClassNames_ = true;
-          }
-          b_.append(',');
+    for ( int i = 0 ; i < size ; i++ ) {
+      PropertyInfo prop = (PropertyInfo) axioms.get(i);
+      isPropertyDiff = maybeOutputPropertyDelta(oldFObject, newFObject, prop);
+      if ( isPropertyDiff ) {
+        if ( ! isDiff ) {
+          b_.append('{');
           addInnerNewline();
-          outputProperty(newFObject, prop);
+          if ( outputClassNames_ && outputDefaultClassNames_ ) {
+            //output Class name
+            outputKey("class");
+            b_.append(':');
+            output(newInfo.getId());
+            b_.append(',');
+          }
+          addInnerNewline();
+          PropertyInfo id = (PropertyInfo) newInfo.getAxiomByName("id");
+          outputProperty(newFObject, id);
+          isDiff = true;
+          // to output class names for references
+          outputDefaultClassNames_ = true;
         }
-      }
-
-      if ( isDiff ) {
+        b_.append(',');
         addInnerNewline();
-        b_.append('}');
+        outputProperty(newFObject, prop);
       }
+    }
+
+    if ( isDiff ) {
+      addInnerNewline();
+      b_.append('}');
     }
   }
 
