@@ -42,7 +42,7 @@ foam.CLASS({
             return name; 
           });
         var tableColumns = this.data.columns;
-        tableColumns = tableColumns.map(c => Array.isArray(c) ? c[0] : c);
+        tableColumns = tableColumns.map(c => Array.isArray(c) ? c[0] : c).filter( c => foam.String.isInstance(c) ? data.allColumns.includes(c) : data.allColumns.includes(c.name) );
         //to keep record of columns that are selected
         var topLevelProps = [];
         for ( var i = 0 ; i < data.selectedColumnNames.length ; i++ ) {
