@@ -18,7 +18,10 @@ foam.CLASS({
   javaImports: [
     'foam.util.SecurityUtil',
     'javax.crypto.Mac',
-    'javax.crypto.spec.SecretKeySpec'
+    'javax.crypto.spec.SecretKeySpec',
+
+    'foam.nanos.logger.Logger',
+    'java.util.Arrays'
   ],
 
   properties: [
@@ -71,6 +74,16 @@ return bytes;`
         Mac mac = Mac.getInstance("Hmac" + getAlgorithm());
         mac.init(signKey);
         byte[] hash = mac.doFinal(data);
+
+        Logger logger = (Logger) getX().get("logger");
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("---[NP-1278]---%n"));
+        sb.append(String.format("---in calculateCode, AbstractOTPAuthService---%n"));
+        sb.append(String.format("key = %s%n", Arrays.toString(key)));
+        sb.append(String.format("interval = %d%n", interval));
+        sb.append(String.format("data = %s%n", Arrays.toString(data)));
+        sb.append(String.format("hash = %s%n", Arrays.toString(hash)));
+        logger.debug(sb.toString());
 
         int offset = hash[20 - 1] & 0xF;
 
