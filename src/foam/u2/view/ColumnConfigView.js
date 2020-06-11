@@ -164,7 +164,6 @@ foam.CLASS({
           .add(this.slot(function(views) {
             var i = 0;
             return this.E()
-            // - padding - search height
               .style({'overflow': 'scroll', 'padding-bottom': '20px', 'max-height': window.innerHeight - 300 > 0 ? window.innerHeight - 300 : window.innerHeight + 'px'})
               .forEach(views, function(view) {
                 view.prop.index = i;
@@ -565,7 +564,6 @@ foam.CLASS({
         if ( ! this.of || ! this.of.getAxiomByName )
           return [];
         var r = this.of.getAxiomByName(foam.Array.isInstance(rootProperty) ? this.rootProperty[0] : rootProperty.name);
-        //// uncomment
         if ( r && r.cls_ && ( foam.core.FObjectProperty.isInstance(r) || foam.core.Reference.isInstance(r) ) )
           return r.of.getAxiomsByClass(foam.core.Property).map(p => [p.name, p.label ? p.label : p.name]);
         return [];
