@@ -21,7 +21,7 @@ foam.CLASS({
   methods: [
     {
       name: 'filterExportedProps',
-      documentation: 'returns propNames that are properties of the class and are networkTransient',
+      documentation: 'returns propNames that are properties of the class and aren\'t networkTransient',
       code: function(of, propNames) {
         var props = of.getAxiomsByClass(foam.core.Property);
         var allColumnNames = props.map(p => p.name);
