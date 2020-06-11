@@ -45,22 +45,32 @@ foam.CLASS({
         tableColumns = tableColumns.map(c => Array.isArray(c) ? c[0] : c).filter( c => foam.String.isInstance(c) ? data.allColumns.includes(c) : data.allColumns.includes(c.name) );
         //to keep record of columns that are selected
         var topLevelProps = [];
+        //to remove properties that are FObjectProperty or Reference and are not nested
+        //or some kind of outputter might be used to convert property to number of nested properties eg 'address' to [ 'address.city', 'address.region', ... ]
+        var columnThatShouldBeDeleted = [];
+
         for ( var i = 0 ; i < data.selectedColumnNames.length ; i++ ) {
           var rootProperty;
           if ( foam.String.isInstance(data.selectedColumnNames[i]) ) {
             var axiom;
-            if (data.selectedColumnNames[i].includes('.'))
+            if ( data.selectedColumnNames[i].includes('.') )
               axiom = data.of.getAxiomByName(data.selectedColumnNames[i].split('.')[0]);
             else {
               axiom = tableColumns.find(c => c.name === data.selectedColumnNames[i]);
               if ( ! axiom )
                 axiom = data.of.getAxiomByName(data.selectedColumnNames[i]);
+              if ( foam.core.FObjectProperty.isInstance(axiom) || foam.core.Reference.isInstance(axiom) ) {
+                columnThatShouldBeDeleted.push(data.selectedColumnNames[i]);
+                continue;
+              }
             }
-            if ( ! axiom || axiom.networkTransient )
+            if ( ! axiom || axiom.networkTransient ) {
               continue;
+            }
             rootProperty = [ axiom.name, axiom.label ? axiom.label : axiom.name ];
           } else 
             rootProperty = data.selectedColumnNames[i];
+
           if ( ! topLevelProps.includes(foam.Array.isInstance(rootProperty) ? rootProperty[0] : rootProperty.name) ) {
             arr.push(foam.u2.view.SubColumnSelectConfig.create({ 
               index:i, 
@@ -72,6 +82,11 @@ foam.CLASS({
             topLevelProps.push(foam.Array.isInstance(rootProperty) ? rootProperty[0] : rootProperty.name);
           }
         }
+
+        for ( var colToDelete of columnThatShouldBeDeleted) {
+          data.selectedColumnNames.splice(data.selectedColumnNames.indexOf(colToDelete), 1);
+        }
+        
         var notSelectedColumns = data.allColumns.filter(c => {
           return ! topLevelProps.includes(c);
         });
