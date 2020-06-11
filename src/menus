@@ -186,12 +186,15 @@ p({
 p({
   "class":"foam.nanos.menu.Menu",
   "id":"integration.api-sugar",
-  "label":"SUGAR",
+  "label":"SUGAR - Service API",
   "handler":{
     "class":"foam.nanos.menu.DAOMenu2",
     "config":{
       "class":"foam.comics.v2.DAOControllerConfig",
-      "daoKey":"sugarDAO"
+      "daoKey":"sugarDAO",
+      "browseTitle": "SUGAR API Calls",
+      "browseSubtitle": "API calls for services.",
+      "createTitle": "Create a Service API Call"
     }
   },
   "parent":"integration"
