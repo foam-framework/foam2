@@ -146,6 +146,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'firstName',
+      shortName: 'fn',
       documentation: 'The first name of the User.',
       gridColumns: 4,
       section: 'personal',
@@ -162,6 +163,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'lastName',
+      shortName: 'ln',
       documentation: 'The last name of the User.',
       gridColumns: 4,
       section: 'personal',
