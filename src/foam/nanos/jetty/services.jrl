@@ -1,6 +1,6 @@
 p({
   "class":"foam.nanos.boot.NSpec",
-  "name":"jettyThreadpoolConfig",
+  "name":"jettyThreadPoolConfig",
   "lazy": false,
-  "service":{"class":"foam.nanos.jetty.ThreadpoolConfig"}
+  "service":{"class":"foam.nanos.jetty.JettyThreadPoolConfig"}
 })

@@ -5,7 +5,7 @@
 */
 foam.CLASS({
   package: 'foam.nanos.jetty',
-  name: 'ThreadpoolConfig',
+  name: 'JettyThreadPoolConfig',
   documentation: 'model of org.eclipse.jetty.server.ThreadPool',
   properties: [
     {

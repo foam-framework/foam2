@@ -293,7 +293,7 @@ var classes = [
   'foam.nanos.om.OMLogger',
   'foam.nanos.pool.AbstractFixedThreadPool',
   'foam.nanos.pool.ThreadPoolAgency',
-  'foam.nanos.jetty.ThreadpoolConfig',
+  'foam.nanos.jetty.JettyThreadPoolConfig',
   'foam.nanos.pm.NullPM',
   'foam.nanos.pm.PM',
   'foam.nanos.pm.PMBox',
