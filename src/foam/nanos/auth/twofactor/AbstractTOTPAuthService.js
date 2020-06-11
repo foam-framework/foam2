@@ -51,7 +51,8 @@ Logger logger = (Logger) getX().get("logger");
 
 try {
 
-  long t = new Date().getTime() / stepsize;
+  Date date = new Date();
+  long t = date.getTime() / stepsize;
 
   StringBuilder sb = new StringBuilder();
   sb.append(String.format("---[NP-1278]---%n"));
@@ -60,7 +61,8 @@ try {
   sb.append(String.format("token = %d%n", code));
   sb.append(String.format("stepsize = %d%n", stepsize));
   sb.append(String.format("window = %d%n", window));
-  sb.append(String.format("time = %d%n", new Date().getTime()));
+  sb.append(String.format("date = %s%n", date.toString()));
+  sb.append(String.format("time = %d%n", date.getTime()));
   sb.append(String.format("t = %d%n", t));
 
   for (int i = -window; i <= window; ++i) {
