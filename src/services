@@ -1086,10 +1086,3 @@ p({
     }
   """
 })
-
-p({
-  "class":"foam.nanos.boot.NSpec",
-  "name":"ThreadPool",
-  "lazy": false,
-  "service":{"class":"foam.nanos.jetty.ThreadPool"}
-})

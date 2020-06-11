@@ -257,7 +257,7 @@ FOAM_FILES([
   { name: "foam/nanos/pm/PMTableView", flags:['web'] },
   { name: "foam/nanos/pm/TemperatureCView" },
   { name: "foam/nanos/pool/ThreadPoolAgency" },
-  { name: "foam/nanos/Threadpool" },
+  { name: "foam/nanos/jetty/ThreadpoolConfig" },
   { name: "foam/nanos/auth/PMAuthService" },
   { name: 'foam/nanos/notification/email/EmailMessage' },
   { name: 'foam/nanos/notification/email/EmailService' },

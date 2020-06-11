@@ -20,7 +20,7 @@ foam.CLASS({
     'org.eclipse.jetty.websocket.servlet.WebSocketCreator',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
-    'foam.nanos.jetty.ThreadPool',
+    'foam.nanos.jetty.ThreadpoolConfig',
     'java.util.Set',
     'java.util.HashSet',
     'java.util.Arrays',
@@ -116,12 +116,12 @@ foam.CLASS({
         }
         getLogger().info("Starting Jetty http server. port", port);
 
-        ThreadPool threadPoolSetting = new ThreadPool();
+        ThreadpoolConfig threadpoolConfig = (ThreadpoolConfig) getX().get("jettyThreadpoolConfig");
         QueuedThreadPool threadPool = new QueuedThreadPool();
         threadPool.setDaemon(true);
-        threadPool.setMaxThreads(threadPoolSetting.getMaxThreads());
-        threadPool.setMinThreads(threadPoolSetting.getMinThreads());
-        threadPool.	setIdleTimeout(threadPoolSetting.getIdleTimeout());
+        threadPool.setMaxThreads(threadpoolConfig.getMaxThreads());
+        threadPool.setMinThreads(threadpoolConfig.getMinThreads());
+        threadPool.	setIdleTimeout(threadpoolConfig.getIdleTimeout());
 
         org.eclipse.jetty.server.Server server =
           new org.eclipse.jetty.server.Server(threadPool);
