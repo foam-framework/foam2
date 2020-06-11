@@ -339,20 +339,18 @@ foam.CLASS({
       this.SUPER();
 
       this
-        .add(this.slot(function(prop$isPropertySelected) {
-          this
-          .attrs({ draggable: prop$isPropertySelected ? 'true' : 'false' })
-          .callIf(prop$isPropertySelected, function() {
+      
+        .add(self.slot(function(prop) {
+          return self.E()
+          .attrs({ draggable: prop.isPropertySelected ? 'true' : 'false' })
+          .callIf(prop.isPropertySelected, function() {
             this.on('dragstart',   self.onDragStart.bind(self)).
               on('dragenter',   self.onDragOver.bind(self)).
               on('dragover',    self.onDragOver.bind(self)).
               on('dragleave',   self.onDragLeave.bind(self)).
               on('drop',        self.onDrop.bind(self));
           })
-          .style({'cursor':   self.prop.isPropertySelected ? 'pointer' : 'default'});
-        }))
-        .add(self.slot(function(prop) {
-          return self.E()
+          .style({'cursor': prop.isPropertySelected ? 'pointer' : 'default'})
           .show(self.prop.showOnSearch$)
           .start()
             .add(foam.u2.ViewSpec.createView(self.head, {data$:self.prop$, onSelectionChangedParentFunction:self.onSelectionChangedParentFunction},  self, self.__subSubContext__))
