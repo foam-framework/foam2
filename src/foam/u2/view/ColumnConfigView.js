@@ -30,7 +30,7 @@ foam.CLASS({
       expression: function(data) {
         var arr = [];
         var notSelectedColumns = [];
-        //selectedColumnNames misleading name cause can contain objects
+        //selectedColumnNames misleading name cause it may contain objects
         data.selectedColumnNames = data.selectedColumnNames.map(c => 
           {
             var name = foam.Array.isInstance(c) ? c[0] : c;
@@ -120,7 +120,7 @@ foam.CLASS({
             onDragAndDropParentFunction:this.onTopLevelPropertiesDragAndDrop.bind(this),
             onSelectionChangedParentFunction: this.onTopPropertiesSelectionChange.bind(this),
             onDragAndDrop: this.onDragAndDrop.bind(this),//for parent to call on its views on child drag and drop
-            onSelectionChanged: this.onSelectionChanged.bind(this),//for parent to call on its  views on child selectionChanged
+            onSelectionChanged: this.onSelectionChanged.bind(this),//for parent to call on its views on child selectionChanged
           }));
         }
         return arr;
