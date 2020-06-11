@@ -499,12 +499,14 @@ foam.CLASS({
       this
         .start()
         .show(self.data.expanded$)
-            .forEach(this.views, function(v) {
+        .add(this.slot(function(views) {
+          return this.E().forEach(this.views, function(v) {
             self
               .show(self.data.expanded$)
               .add(v);
-          })
-        .end();
+        });
+      }))
+      .end();
     },
     function updateSubColumnsOrder(selctionChanged) {
       //re-order subproperties
