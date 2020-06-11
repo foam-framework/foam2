@@ -122,6 +122,8 @@ p({
   },
   "parent":"admin"
 })
+p({"class":"foam.nanos.menu.Menu","id":"admin.extraConfigType","label":"Extra Config Types","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"extraConfigDataTypeViewConfigDAO"},"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.extraConfigAddOns","label":"Extra Config Add Ons","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"extraConfigAddOnDAO"},"parent":"admin"})
 p({
   "class":"foam.nanos.menu.Menu",
   "id":"admin.googleApiCredentials",
@@ -146,7 +148,8 @@ p({
     "class":"foam.nanos.menu.DAOMenu2",
     "config":{
       "class":"foam.comics.v2.DAOControllerConfig",
-      "daoKey":"digDAO"
+      "daoKey":"digDAO",
+      "browseSubtitle": "An API endpoint that supports all DAO operations."
     }
   },
   "parent":"integration"

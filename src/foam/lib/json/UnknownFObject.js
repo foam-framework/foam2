@@ -29,6 +29,16 @@ foam.CLASS({
         }
       ],
       javaCode: 'outputter.outputRawString(getJson());'
+    },
+    {
+      name: 'formatJSON',
+      args: [
+        {
+          name: 'formatter',
+          javaType: 'foam.lib.formatter.JSONFObjectFormatter'
+        }
+      ],
+      javaCode: 'formatter.outputJson(getJson());'
     }
   ]
 });

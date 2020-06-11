@@ -15,16 +15,16 @@ foam.INTERFACE({
     },
     {
       name: 'data'
+    },
+    {
+      name: 'title',
+      class: 'String'
     }
   ],
 
   methods: [
     {
       name: 'save'
-    },
-    {
-      name: 'readyToSubmit',
-      type: 'boolean'
     }
   ]
 });
