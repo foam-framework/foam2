@@ -126,10 +126,10 @@ foam.CLASS({
         {
           CapabilityJunctionStatus chainedStatus = checkPrereqsChainedStatus(x, ucJunction);
           if ( ( ! requiresData || ( ucJunction.getData() != null && validateData(x, ucJunction) ) )
-            && chainedStatus != CapabilityJunctionStatus.ACTION_REQUIRED )
+            && chainedStatus == CapabilityJunctionStatus.GRANTED )
           {
             // if review is required for this Capability, set the status to pending so that rules can be triggered
-            if ( requiresReview || chainedStatus == CapabilityJunctionStatus.PENDING )
+            if ( requiresReview )
               ucJunction.setStatus(CapabilityJunctionStatus.PENDING);
             else
               ucJunction.setStatus(CapabilityJunctionStatus.GRANTED);
