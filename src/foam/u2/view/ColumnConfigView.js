@@ -22,6 +22,10 @@ foam.CLASS({
       margin: 5px;
       margin-bottom: 8px;
     }
+
+    input[type="search"] {
+      width: 290px;
+    }
   `,
   properties: [
     'data',

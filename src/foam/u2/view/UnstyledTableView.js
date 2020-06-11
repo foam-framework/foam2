@@ -290,6 +290,10 @@ foam.CLASS({
           style({ 'min-width': this.tableWidth_$ }).
           show(this.showHeader$).
           add(this.slot(function(columns_) {
+            var propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => c));
+            view.props = view.returnProperties(view, propertyNamesToQuery);
+            view.updateValues = ! view.updateValues;
+            
             return this.E().
               addClass(view.myClass('tr')).
 
@@ -329,9 +333,6 @@ foam.CLASS({
 
               // Render the table headers for the property columns.
               forEach(columns_, function([col, overrides]) {
-                var propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => c));
-                view.props = view.returnProperties(view, propertyNamesToQuery);
-                view.updateValues = ! view.updateValues;
                 var prop;
                 var isFirstLevelProperty = true;
                 if ( ! foam.core.Property.isInstance(col) ) {
