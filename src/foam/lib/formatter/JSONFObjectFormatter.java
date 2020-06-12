@@ -289,7 +289,8 @@ public class JSONFObjectFormatter
 
     for ( int i = 0 ; i < size ; i++ ) {
       PropertyInfo prop = (PropertyInfo) axioms.get(i);
-      isPropertyDiff = maybeOutputPropertyDelta(oldFObject, newFObject, prop);
+
+      isPropertyDiff = prop.compare(oldFObject, newFObject) != 0;
       if ( isPropertyDiff ) {
         if ( ! isDiff ) {
           b_.append('{');
@@ -331,10 +332,6 @@ public class JSONFObjectFormatter
     if ( multiLineOutput_ ) {
       b_.append('\n');
     }
-  }
-
-  protected boolean maybeOutputPropertyDelta(FObject oldFObject, FObject newFObject, PropertyInfo prop) {
-    return prop.compare(oldFObject, newFObject) != 0;
   }
 
 /*
