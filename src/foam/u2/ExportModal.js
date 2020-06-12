@@ -123,12 +123,6 @@ foam.CLASS({
       var self = this;
       this.SUPER();
 
-      self.exportDriverRegistryDAO.where(self.predicate).select().then(function(val) {
-        self.exportDriverRegistryDAO.find(val.array[0].id).then(function(val) {
-          self.exportDriverReg = val;
-        });
-      });
-
       self.dataType$.sub(function() {
         self.exportDriverRegistryDAO.find(self.dataType).then(function(val) {
           self.exportDriverReg = val;
@@ -143,7 +137,12 @@ foam.CLASS({
         self.isDownloadAvailable = self.exportDriverReg.isDownloadable;
         self.isOpenAvailable = self.exportDriverReg.isOpenable;
       });
-      
+
+      self.exportDriverRegistryDAO.where(self.predicate).select().then(function(val) {
+        self.exportDriverRegistryDAO.find(val.array[0].id).then(function(val) {
+          self.exportDriverReg = val;
+        });
+      });
 
       this
       .tag(this.ModalHeader.create({
