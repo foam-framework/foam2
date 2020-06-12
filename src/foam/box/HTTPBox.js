@@ -46,9 +46,6 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.core.X',
-    'foam.lib.formatter.FObjectFormatter',
-    'foam.lib.formatter.JSONFObjectFormatter',
     'javax.servlet.http.HttpServletRequest'
   ],
 
@@ -141,10 +138,7 @@ foam.CLASS({
       swiftFactory: 'return SwiftOutputter_create()',
       factory: function() {
         return this.Outputter.create().copyFrom(foam.json.Network);
-      },
-      // javaFactory: `
-      // return foam.lib.json.Outputter outputter = new Outputter(getX());
-      // `
+      }
     },
     {
       class: 'Int',
@@ -164,7 +158,15 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-  protected ThreadLocal<FObjectFormatter> formatter_ = JSONFObjectFormatter.getThreadLocal(getX(), true, true, new foam.lib.AndPropertyPredicate(getX(), new foam.lib.PropertyPredicate[] {new foam.lib.NetworkPropertyPredicate(), new foam.lib.PermissionedPropertyPredicate()}));
+  protected static final ThreadLocal<foam.lib.formatter.FObjectFormatter> formatter_ = new ThreadLocal<foam.lib.formatter.FObjectFormatter>() {
+        @Override
+        protected foam.lib.formatter.JSONFObjectFormatter initialValue() {
+          foam.lib.formatter.JSONFObjectFormatter formatter = new foam.lib.formatter.JSONFObjectFormatter();
+          formatter.setQuoteKeys(true);
+          formatter.setPropertyPredicate(new foam.lib.AndPropertyPredicate(new foam.lib.PropertyPredicate[] {new foam.lib.NetworkPropertyPredicate(), new foam.lib.PermissionedPropertyPredicate()}));
+          return formatter;
+        }
+    };
 
 protected class ResponseThread implements Runnable {
   protected java.net.URLConnection conn_;
@@ -275,7 +277,7 @@ task.resume()
         // TODO: Clone message or something when it clones safely.
         msg.getAttributes().put("replyBox", getReplyBox());
 
-        FObjectFormatter formatter = formatter_.get();
+        foam.lib.formatter.FObjectFormatter formatter = formatter_.get();
         formatter.output(msg);
         output.write(formatter.builder().toString());
 

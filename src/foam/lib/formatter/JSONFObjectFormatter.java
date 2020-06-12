@@ -32,6 +32,22 @@ import java.util.*;
 
 */
 
+/* Example use:
+  protected static final ThreadLocal<foam.lib.formatter.FObjectFormatter> formatter_ = new ThreadLocal<foam.lib.formatter.FObjectFormatter>() {
+        @Override
+        protected foam.lib.formatter.JSONFObjectFormatter initialValue() {
+          foam.lib.formatter.JSONFObjectFormatter formatter = new foam.lib.formatter.JSONFObjectFormatter();
+          formatter.setQuoteKeys(true);
+          formatter.setPropertyPredicate(new foam.lib.AndPropertyPredicate(new foam.lib.PropertyPredicate[] {new foam.lib.NetworkPropertyPredicate(), new foam.lib.PermissionedPropertyPredicate()}));
+          return formatter;
+        }
+    };
+  ...
+  foam.lib.formatter.FObjectFormatter formatter = formatter_.get();
+  formatter.output(fObj);
+  writer.append(formatter.builder());
+*/
+
 public class JSONFObjectFormatter
   extends AbstractFObjectFormatter
 {
@@ -53,24 +69,6 @@ public class JSONFObjectFormatter
   protected boolean outputClassNames_    = true;
   protected boolean outputReadableDates_ = true;
   protected boolean outputDefaultClassNames_ = true;
-
-  public static ThreadLocal<FObjectFormatter> getThreadLocal(X x, Boolean quoteKeys, Boolean outputClassNames, PropertyPredicate predicate) {
-    return getThreadLocal(x, quoteKeys, outputClassNames, false, predicate);
-  }
-
-  public static ThreadLocal<FObjectFormatter> getThreadLocal(X x, Boolean quoteKeys, Boolean outputClassNames, Boolean outputDefaultClassNames, PropertyPredicate predicate) {
-    return new ThreadLocal<FObjectFormatter>() {
-        @Override
-        protected JSONFObjectFormatter initialValue() {
-          foam.lib.formatter.JSONFObjectFormatter formatter = new foam.lib.formatter.JSONFObjectFormatter(x);
-          formatter.setQuoteKeys(quoteKeys);
-          formatter.setOutputClassNames(outputClassNames);
-          formatter.setOutputDefaultClassNames(outputDefaultClassNames);
-          formatter.setPropertyPredicate(predicate);
-          return formatter;
-        }
-    };
-  }
 
   public JSONFObjectFormatter(X x) {
     super(x);
