@@ -1067,10 +1067,12 @@ p({
   "class": "foam.nanos.boot.NSpec",
   "name": "extraConfigDataTypeViewConfigDAO",
   "serve": true,
-  "authenticate": false,
+  "authenticate": true,
   "serviceScript":
   """
     return new foam.dao.EasyDAO.Builder(x)
+      .setAuthorize(true)
+      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("extraConfigDataTypeViewConfigDAO"))
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("extraConfigDataTypeViewConfigs")
       .setOf(foam.nanos.extraconfig.DataTypeViewConfig.getOwnClassInfo())
@@ -1090,10 +1092,12 @@ p({
   "class": "foam.nanos.boot.NSpec",
   "name": "extraConfigAddOnDAO",
   "serve": true,
-  "authenticate": false,
+  "authenticate": true,
   "serviceScript":
   """
     return new foam.dao.EasyDAO.Builder(x)
+      .setAuthorize(true)
+      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("extraConfigAddOnDAO"))
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("extraConfigAddOns")
       .setOf(foam.nanos.extraconfig.AddOn.getOwnClassInfo())
