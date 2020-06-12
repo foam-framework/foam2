@@ -132,8 +132,7 @@ foam.CLASS({
 
           if ( e.message === "An approval request has been sent out." ){
             this.ctrl.add(this.NotificationMessage.create({
-              message: e.message,
-              type: 'info'
+              message: e.message
             }));
 
             this.stack.back();

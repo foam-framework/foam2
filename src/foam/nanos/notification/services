@@ -141,7 +141,24 @@ p({
         .build())
       .build();
   """,
-  "client": "{\"of\":\"foam.nanos.notification.Notification\"}"
+  "client": """
+    {
+      "of": "foam.nanos.notification.Notification", 
+      "remoteListenerSupport": true, 
+      "serverBox": { 
+        "class": "foam.box.SessionClientBox", 
+        "url": "service/userNotificationDAO", 
+        "delegate": { 
+          "class": "foam.box.TimeoutBox", 
+          "timeout": 25000,
+          "delegate": {
+            "class": "foam.box.HTTPBox", 
+            "url": "service/userNotificationDAO"
+          }
+        }
+      }
+    }
+  """
 })
 
 p({
