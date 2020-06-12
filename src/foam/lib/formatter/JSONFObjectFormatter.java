@@ -482,6 +482,11 @@ public class JSONFObjectFormatter
     return this;
   }
 
+  public JSONFObjectFormatter setOutputReadableDates(boolean f) {
+    outputReadableDates_ = f;
+    return this;
+  }
+
   public JSONFObjectFormatter setMultiLine(boolean ml) {
     multiLineOutput_ = ml;
     return this;
