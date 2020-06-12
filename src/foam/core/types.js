@@ -46,6 +46,14 @@ foam.CLASS({
     {
       name: 'adapt',
       value: function(_, a, p) {
+        if ( foam.Object.isInstance(a) )
+        {
+          if ( a[foam.language] !== undefined )
+            return a[foam.language];
+          if ( a[foam.language.substring(0, foam.language.indexOf('-'))] !== undefined )
+            return a[foam.language];
+          return a['en'];// default language.
+        }
         var s = typeof a === 'function' ? foam.String.multiline(a) :
                 typeof a === 'number'   ? String(a)                :
                 a && a.toString         ? a.toString()             :
