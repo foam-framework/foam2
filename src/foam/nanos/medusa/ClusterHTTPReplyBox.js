@@ -7,29 +7,36 @@
 foam.CLASS({
   package: 'foam.nanos.medusa',
   name: 'ClusterHTTPReplyBox',
-  implements: ['foam.box.Box'],
+  extends: 'foam.box.HTTPReplyBox',
 
   documentation: 'Reply Box specific to clustering whereby clusterTransient properties are not marshalled.',
 
-  methods: [
+  axioms: [
     {
-      name: 'send',
-      code: function(m) {
-        throw 'unimplemented';
-      },
-      swiftCode: 'throw FoamError("unimplemented")',
-      javaCode: `
-      try {
-        javax.servlet.http.HttpServletResponse response =
-         (javax.servlet.http.HttpServletResponse) getX().get("httpResponse");
-        response.setContentType("application/json");
-        java.io.PrintWriter writer = response.getWriter();
-        writer.print(new foam.lib.json.Outputter(getX()).setPropertyPredicate(new foam.lib.ClusterPropertyPredicate()).stringify(msg));
-        writer.flush();
-      } catch(java.io.IOException e) {
-        throw new RuntimeException(e);
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(foam.java.Code.create({
+          data: `
+  protected static final ThreadLocal<foam.lib.formatter.FObjectFormatter> formatter_ = new ThreadLocal<foam.lib.formatter.FObjectFormatter>() {
+    @Override
+    protected foam.lib.formatter.JSONFObjectFormatter initialValue() {
+      foam.lib.formatter.JSONFObjectFormatter formatter = new foam.lib.formatter.JSONFObjectFormatter();
+      formatter.setQuoteKeys(true);
+      formatter.setPropertyPredicate(new foam.lib.ClusterPropertyPredicate());
+      return formatter;
+    }
+
+    @Override
+    public foam.lib.formatter.FObjectFormatter get() {
+      foam.lib.formatter.FObjectFormatter formatter = super.get();
+      formatter.reset();
+      return formatter;
+    }
+  };
+          `
+        })
+                       );
       }
-      `
     }
   ]
 });

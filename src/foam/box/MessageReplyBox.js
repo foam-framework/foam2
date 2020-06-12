@@ -24,7 +24,7 @@ foam.CLASS({
     {
       name: 'send',
       code: function(m) {
-        throw 'unimplemented';
+        this.message = m;
       },
       swiftCode: 'throw FoamError("unimplemented")',
       javaCode: `

@@ -135,7 +135,7 @@ foam.CLASS({
             throw new UnsupportedOperationException("Unknown operation: "+op);
           }
         } catch ( Throwable t ) {
-          getLogger().error(t.getMessage());
+          getLogger().error(t.getMessage(), t);
 
           if ( getMaxRetryAttempts() > -1 &&
                retryAttempt >= getMaxRetryAttempts() ) {

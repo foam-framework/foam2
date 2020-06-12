@@ -71,6 +71,35 @@ foam.CLASS({
     }
   ],
 
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(foam.java.Code.create({
+          data: `
+  protected static final ThreadLocal<foam.lib.formatter.FObjectFormatter> formatter_ = new ThreadLocal<foam.lib.formatter.FObjectFormatter>() {
+    @Override
+    protected foam.lib.formatter.JSONFObjectFormatter initialValue() {
+      foam.lib.formatter.JSONFObjectFormatter formatter = new foam.lib.formatter.JSONFObjectFormatter();
+      formatter.setQuoteKeys(true);
+      formatter.setOutputReadableDates(false);
+      formatter.setPropertyPredicate(new foam.lib.StoragePropertyPredicate());
+      return formatter;
+    }
+
+    @Override
+    public foam.lib.formatter.FObjectFormatter get() {
+      foam.lib.formatter.FObjectFormatter formatter = super.get();
+      formatter.reset();
+      return formatter;
+    }
+  };
+          `
+        }));
+      }
+    }
+  ],
+
   methods: [
     {
       documentation: `
@@ -189,12 +218,14 @@ foam.CLASS({
       entry.setNSpecName(getNSpec().getName());
       entry.setDop(dop);
 
-      foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(x).setPropertyPredicate(new foam.lib.StoragePropertyPredicate());
-      String data = ( old != null ) ?
-        outputter.stringifyDelta(old, obj) :
-        outputter.stringify(obj);
-      entry.setData(data);
-      getLogger().debug("submit", entry.getIndex(), obj.getClass().getSimpleName(), "stringify", data);
+      foam.lib.formatter.FObjectFormatter formatter = formatter_.get();
+      if ( old != null ) {
+        formatter.outputDelta(old, obj);
+      } else {
+        formatter.output(obj);
+      }
+      entry.setData(formatter.builder().toString());
+      getLogger().debug("submit", entry.getIndex(), obj.getClass().getSimpleName(), "stringify", entry.getData());
 
       try {
         getMedusaEntryDAO().put_(x, entry);

@@ -13,6 +13,7 @@ foam.CLASS({
 
   javaImports: [
     'foam.dao.DAO',
+    'foam.nanos.http.Ping',
     'foam.nanos.http.PingService',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger'
@@ -72,9 +73,11 @@ foam.CLASS({
       ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
       ClusterConfig myConfig = support.getConfig(getX(), support.getConfigId());
       ClusterConfig config = (ClusterConfig) obj;
-      PingService ping = (PingService) getX().get("mping");
+      ClusterPingService pingService = (ClusterPingService) getX().get("mping");
       try {
-        Long latency = ping.ping(getX(), config.getId(), config.getPort(), getTimeout(), config.getUseHttps());
+//        Long latency = pingService.ping(getX(), config.getId(), config.getPort(), getTimeout(), config.getUseHttps());
+        Ping ping = pingService.ping(getX(), config.getId(), config.getPort(), getTimeout(), config.getUseHttps());
+        Long latency = ping.getLatency();
         config = (ClusterConfig) support.getConfig(getX(), config.getId()).fclone();
         config.setPingLatency(latency);
         if ( config.getStatus() != Status.ONLINE) {
