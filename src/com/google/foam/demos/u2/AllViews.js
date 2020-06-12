@@ -110,7 +110,7 @@ foam.CLASS({
           {
             class: 'foam.u2.GroupingDAOList',
             rowView: { class: 'com.google.foam.demos.heroes.CitationView' },
-            groupExpr: {f: function(o) { return o.name; }}
+            groupExpr: com.google.foam.demos.u2.SampleData.NAME
           }
         ]
       },
