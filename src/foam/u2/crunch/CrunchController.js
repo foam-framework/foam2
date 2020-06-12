@@ -96,7 +96,7 @@ foam.CLASS({
 
       var ucj = await this.userCapabilityJunctionDAO.find(
         this.AND(
-          this.EQ(this.UserCapabilityJunction.SOURCE_ID, this.subject.realUser.id),
+          this.EQ(this.UserCapabilityJunction.SOURCE_ID, this.subject.user.id),
           this.EQ(this.UserCapabilityJunction.TARGET_ID, capabilityId)
         ));
 
@@ -149,7 +149,7 @@ foam.CLASS({
               // Save no-data capabilities (i.e. not displayed in wizard)
               Promise.all(capabilities.filter(cap => ! cap.of).map(
                 cap => self.userCapabilityJunctionDAO.put(self.UserCapabilityJunction.create({
-                  sourceId: self.subject.realUser.id,
+                  sourceId: self.subject.user.id,
                   targetId: cap.id
                 })).then(() => {
                   console.log('SAVED (no-data cap)', cap.id);

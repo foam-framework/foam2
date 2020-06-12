@@ -11,6 +11,7 @@ import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.core.X;
 import foam.lib.json.OutputJSON;
+import foam.lib.PropertyPredicate;
 import foam.util.SafetyUtil;
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
@@ -29,6 +30,30 @@ import java.util.*;
    to String.
 8. Use Fast TimeStamper or similar
 
+*/
+
+/* Example use:
+  protected static final ThreadLocal<foam.lib.formatter.FObjectFormatter> formatter_ = new ThreadLocal<foam.lib.formatter.FObjectFormatter>() {
+        @Override
+        protected foam.lib.formatter.JSONFObjectFormatter initialValue() {
+          foam.lib.formatter.JSONFObjectFormatter formatter = new foam.lib.formatter.JSONFObjectFormatter();
+          formatter.setQuoteKeys(true);
+          formatter.setPropertyPredicate(new foam.lib.AndPropertyPredicate(new foam.lib.PropertyPredicate[] {new foam.lib.NetworkPropertyPredicate(), new foam.lib.PermissionedPropertyPredicate()}));
+          return formatter;
+        }
+
+       @Override
+       public FObjectFormatter get() {
+         FObjectFormatter formatter = super.get();
+         formatter.setX(getX());
+         formatter.reset();
+         return formatter;
+       }
+    };
+  ...
+  foam.lib.formatter.FObjectFormatter formatter = formatter_.get();
+  formatter.output(fObj);
+  writer.append(formatter.builder());
 */
 
 public class JSONFObjectFormatter
@@ -52,7 +77,6 @@ public class JSONFObjectFormatter
   protected boolean outputClassNames_    = true;
   protected boolean outputReadableDates_ = true;
   protected boolean outputDefaultClassNames_ = true;
-
 
   public JSONFObjectFormatter(X x) {
     super(x);
@@ -457,6 +481,11 @@ public class JSONFObjectFormatter
 
   public JSONFObjectFormatter setOutputDefaultClassNames(boolean f) {
     outputDefaultClassNames_ = f;
+    return this;
+  }
+
+  public JSONFObjectFormatter setOutputReadableDates(boolean f) {
+    outputReadableDates_ = f;
     return this;
   }
 
