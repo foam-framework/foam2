@@ -31,10 +31,10 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-  protected final ThreadLocal<foam.lib.formatter.FObjectFormatter> formatter_ = new ThreadLocal<foam.lib.formatter.FObjectFormatter>() {
+  protected static final ThreadLocal<foam.lib.formatter.FObjectFormatter> formatter_ = new ThreadLocal<foam.lib.formatter.FObjectFormatter>() {
     @Override
     protected foam.lib.formatter.JSONFObjectFormatter initialValue() {
-      foam.lib.formatter.JSONFObjectFormatter formatter = new foam.lib.formatter.JSONFObjectFormatter(getX());
+      foam.lib.formatter.JSONFObjectFormatter formatter = new foam.lib.formatter.JSONFObjectFormatter();
       formatter.setQuoteKeys(true);
       formatter.setPropertyPredicate(new foam.lib.AndPropertyPredicate(new foam.lib.PropertyPredicate[] {new foam.lib.NetworkPropertyPredicate(), new foam.lib.PermissionedPropertyPredicate()}));
       return formatter;
@@ -67,6 +67,7 @@ try {
   response.setContentType("application/json");
   java.io.PrintWriter writer = response.getWriter();
   foam.lib.formatter.FObjectFormatter formatter = formatter_.get();
+  formatter.setX(getX());
   formatter.output(msg);
   writer.append(formatter.builder());
   writer.flush();
