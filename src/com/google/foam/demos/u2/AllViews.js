@@ -152,6 +152,15 @@ foam.CLASS({
     },
     {
       class: 'Int',
+      name: 'intWithIntView',
+      view: {
+        class: 'foam.u2.view.IntView',
+        onKey: true,
+        displayWidth: 50
+      }
+    },
+    {
+      class: 'Int',
       name: 'intWithMinAndMax',
       min: 1,
       max: 5,
@@ -194,7 +203,7 @@ foam.CLASS({
       view: {
         class: 'foam.u2.MultiView',
         horizontal: false,
-        views: [ 'foam.u2.RangeView', 'foam.u2.IntView' ]
+        views: [ 'foam.u2.RangeView', { class: 'foam.u2.view.IntView', onKey: true } ]
       }
     },
     {
