@@ -55,12 +55,17 @@ public class JSONFObjectFormatter
   protected boolean outputDefaultClassNames_ = true;
 
   public static ThreadLocal<FObjectFormatter> getThreadLocal(X x, Boolean quoteKeys, Boolean outputClassNames, PropertyPredicate predicate) {
+    return getThreadLocal(x, quoteKeys, outputClassNames, false, predicate);
+  }
+
+  public static ThreadLocal<FObjectFormatter> getThreadLocal(X x, Boolean quoteKeys, Boolean outputClassNames, Boolean outputDefaultClassNames, PropertyPredicate predicate) {
     return new ThreadLocal<FObjectFormatter>() {
         @Override
         protected JSONFObjectFormatter initialValue() {
           foam.lib.formatter.JSONFObjectFormatter formatter = new foam.lib.formatter.JSONFObjectFormatter(x);
           formatter.setQuoteKeys(quoteKeys);
           formatter.setOutputClassNames(outputClassNames);
+          formatter.setOutputDefaultClassNames(outputDefaultClassNames);
           formatter.setPropertyPredicate(predicate);
           return formatter;
         }
