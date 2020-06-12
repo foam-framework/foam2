@@ -16,9 +16,9 @@ foam.CLASS({
     'max',
     [ 'type', 'Integer' ],
     [ 'adapt', function adaptInt(_, v) {
-        return typeof v === 'number' ? Math.trunc(v) :
-          v ? parseInt(v) :
-          0 ;
+      return typeof v === 'number' ? Math.trunc(v) :
+        v ? parseInt(v) :
+        0 ;
       }
     ],
     [ 'fromString', function intFromString(str) {
@@ -102,7 +102,7 @@ foam.CLASS({
 
           if ( isNaN(ret.getTime()) ) {
             ret = new Date((Number.MAX_SAFE_INTEGER || Number.MAX_VALUE) * 0.9);
-            console.warn("Invalid date: " + d + "; assuming "+ret.toISOString()+".");
+            console.warn("Invalid date: " + d + "; assuming " + ret.toISOString() + ".");
           }
 
           return ret;
@@ -389,10 +389,11 @@ foam.CLASS({
         if ( v === null ) return;
 
         foam.assert(Array.isArray(v),
-            prop.name, 'Tried to set StringArray to non-array type.');
+          prop.name, 'Tried to set StringArray to non-array type.');
         for ( var i = 0 ; i < v.length ; i++ ) {
-          foam.assert(typeof v[i] === 'string',
-              prop.name, 'Element', i, 'is not a string', v[i]);
+          foam.assert(
+            typeof v[i] === 'string',
+            prop.name, 'Element', i, 'is not a string', v[i]);
         }
       }
     ]
