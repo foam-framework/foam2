@@ -23,10 +23,18 @@ public abstract class AbstractFObjectFormatter
   protected Map<String, List<PropertyInfo>> propertyMap_ = new HashMap<>();
 
   public AbstractFObjectFormatter(X x) {
-    x_ = x;
+    setX(x);
   }
 
   public AbstractFObjectFormatter() { }
+
+  public void setX(X x) {
+    x_ = x;
+  }
+
+  public X getX() {
+    return x_;
+  }
 
   public StringBuilder builder() { return b_; }
 

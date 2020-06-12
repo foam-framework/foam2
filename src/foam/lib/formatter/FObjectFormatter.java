@@ -7,6 +7,7 @@
  package foam.lib.formatter;
 
 import foam.core.ClassInfo;
+import foam.core.ContextAware;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.core.X;
@@ -14,7 +15,11 @@ import foam.lib.PropertyPredicate;
 import java.util.*;
 
 public interface FObjectFormatter
+  extends ContextAware
 {
+  public void setX(X x);
+
+  public X getX();
 
   public StringBuilder builder();
 
