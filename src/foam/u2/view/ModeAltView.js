@@ -28,13 +28,14 @@ foam.CLASS({
     [ 'nodeName', 'span' ],
     {
       class: 'foam.u2.ViewSpec',
-      name: 'readView',
+      name: 'readView'
     },
     {
       class: 'foam.u2.ViewSpec',
-      name: 'writeView',
+      name: 'writeView'
     },
     'prop',
+    'args',
     {
       name: 'contextData',
       documentation: "See the comment in 'exports' above as to why this is necessary.",
@@ -45,6 +46,14 @@ foam.CLASS({
   ],
 
   methods: [
+    function initArgs(args) {
+      if ( args ) {
+        this.args = foam.util.clone(args);
+        this.args.class = undefined;
+      } else {
+        this.args = {};
+      }
+    },
     function initE() {
       var self = this;
       var callFromProperty = function() {
@@ -60,6 +69,7 @@ foam.CLASS({
             return self.createChild_(
               self.writeView,
               {
+                ...this.args,
                 data$: self.data$,
                 mode: mode
               }).call(callFromProperty);
@@ -67,6 +77,7 @@ foam.CLASS({
             return self.createChild_(
               self.readView,
               {
+                ...this.args,
                 data$: self.data$,
                 mode: mode
               }).call(callFromProperty);
