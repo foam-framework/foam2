@@ -138,10 +138,7 @@ foam.CLASS({
       swiftFactory: 'return SwiftOutputter_create()',
       factory: function() {
         return this.Outputter.create().copyFrom(foam.json.Network);
-      },
-      // javaFactory: `
-      // return foam.lib.json.Outputter outputter = new Outputter(getX());
-      // `
+      }
     },
     {
       class: 'Int',
@@ -161,19 +158,22 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-protected class Outputter extends foam.lib.json.Outputter {
-  public Outputter(foam.core.X x) {
-    super(x);
-    setPropertyPredicate(new foam.lib.AndPropertyPredicate(x, new foam.lib.PropertyPredicate[] {new foam.lib.NetworkPropertyPredicate(), new foam.lib.PermissionedPropertyPredicate()}));
-  }
-
-  protected void outputFObject(foam.core.FObject o) {
-    if ( o == getMe() ) {
-      o = getX().create(foam.box.HTTPReplyBox.class);
+  protected static final ThreadLocal<foam.lib.formatter.FObjectFormatter> formatter_ = new ThreadLocal<foam.lib.formatter.FObjectFormatter>() {
+    @Override
+    protected foam.lib.formatter.JSONFObjectFormatter initialValue() {
+      foam.lib.formatter.JSONFObjectFormatter formatter = new foam.lib.formatter.JSONFObjectFormatter();
+      formatter.setQuoteKeys(true);
+      formatter.setPropertyPredicate(new foam.lib.AndPropertyPredicate(new foam.lib.PropertyPredicate[] {new foam.lib.NetworkPropertyPredicate(), new foam.lib.PermissionedPropertyPredicate()}));
+      return formatter;
     }
-    super.outputFObject(o);
-  }
-}
+
+    @Override
+    public foam.lib.formatter.FObjectFormatter get() {
+      foam.lib.formatter.FObjectFormatter formatter = super.get();
+      formatter.reset();
+      return formatter;
+    }
+  };
 
 protected class ResponseThread implements Runnable {
   protected java.net.URLConnection conn_;
@@ -284,7 +284,10 @@ task.resume()
         // TODO: Clone message or something when it clones safely.
         msg.getAttributes().put("replyBox", getReplyBox());
 
-        output.write(new Outputter(getX()).stringify(msg));
+        foam.lib.formatter.FObjectFormatter formatter = formatter_.get();
+        formatter.setX(getX());
+        formatter.output(msg);
+        output.write(formatter.builder().toString());
 
         msg.getAttributes().put("replyBox", replyBox);
         output.close();
