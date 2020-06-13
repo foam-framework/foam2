@@ -45,13 +45,13 @@ import java.util.*;
        @Override
        public FObjectFormatter get() {
          FObjectFormatter formatter = super.get();
+         formatter.setX(getX());
          formatter.reset();
          return formatter;
        }
     };
   ...
   foam.lib.formatter.FObjectFormatter formatter = formatter_.get();
-  formatter.setX(getX());
   formatter.output(fObj);
   writer.append(formatter.builder());
 */
@@ -308,6 +308,8 @@ public class JSONFObjectFormatter
     boolean   outputComma    = true;
     boolean   isDiff         = false;
     boolean   isPropertyDiff = false;
+    List      axioms         = getProperties(info);
+    int       size           = axioms.size();
 
     for ( int i = 0 ; i < size ; i++ ) {
       PropertyInfo prop = (PropertyInfo) axioms.get(i);
@@ -324,16 +326,22 @@ public class JSONFObjectFormatter
             output(newInfo.getId());
             b_.append(',');
           }
-          b_.append(',');
           addInnerNewline();
-          outputProperty(newFObject, prop);
+          PropertyInfo id = (PropertyInfo) newInfo.getAxiomByName("id");
+          outputProperty(newFObject, id);
+          isDiff = true;
+          // to output class names for references
+          outputDefaultClassNames_ = true;
         }
-      }
-
-      if ( isDiff ) {
+        b_.append(',');
         addInnerNewline();
-        b_.append('}');
+        outputProperty(newFObject, prop);
       }
+    }
+
+    if ( isDiff ) {
+      addInnerNewline();
+      b_.append('}');
     }
   }
 
