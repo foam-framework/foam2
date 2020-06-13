@@ -25,6 +25,10 @@ foam.CLASS({
     'static foam.mlang.MLang.*'
   ],
 
+  messages: [
+    { name: 'ERROR_MSG', message: 'Error on UserCapabilityJunction checkOwnership create UCJ denied to user ' }
+  ],
+
   methods: [
     {
       name: 'getUser',
@@ -59,7 +63,7 @@ foam.CLASS({
         User agent = ((Subject) x.get("subject")).getRealUser();
         AuthService auth = (AuthService) x.get("auth");
         boolean isOwner = obj.getSourceId() == user.getId() || ( agent != null && obj.getSourceId() == agent.getId() );
-        if ( ! isOwner && ! auth.check(x, "*") ) throw new AuthorizationException();
+        if ( ! isOwner && ! auth.check(x, "ucj.addPermission") ) throw new AuthorizationException(ERROR_MSG + agent.getId()+":"+user.getId());
       `
     },
     {

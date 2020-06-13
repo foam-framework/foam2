@@ -964,7 +964,10 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'focused'
+      name: 'focused',
+      postSet: function(o, n) {
+        if ( n ) this.onFocus();
+      }
     },
     {
       name: 'outerHTML',
@@ -1184,7 +1187,6 @@ foam.CLASS({
 
     function focus() {
       this.focused = true;
-      this.onFocus();
       return this;
     },
 

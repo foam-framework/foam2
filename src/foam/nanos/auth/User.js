@@ -231,7 +231,10 @@ foam.CLASS({
     {
       class: 'EMail',
       name: 'email',
-      label: 'Email Address',
+      label: {
+        'en' :'Email Address',
+        'fr' :'Adresse e-mail'
+      },
       includeInDigest: true,
       documentation: 'The email address of the User.',
       displayWidth: 80,
