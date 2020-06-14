@@ -11,6 +11,7 @@ import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.core.X;
 import foam.lib.PropertyPredicate;
+import foam.lib.StorageOptionalPropertyPredicate;
 import java.util.*;
 
 public abstract class AbstractFObjectFormatter
@@ -20,6 +21,7 @@ public abstract class AbstractFObjectFormatter
   protected X                 x_;
   protected StringBuilder     b_                         = new StringBuilder();
   protected PropertyPredicate propertyPredicate_;
+  protected PropertyPredicate optionalPredicate_ = new StorageOptionalPropertyPredicate();
   protected Map<String, List<PropertyInfo>> propertyMap_ = new HashMap<>();
 
   public AbstractFObjectFormatter(X x) {
@@ -114,6 +116,32 @@ public abstract class AbstractFObjectFormatter
       return filteredAxioms;
     }
     return propertyMap_.get(of);
+  }
+
+  protected synchronized List getDelta(FObject oldFObject, FObject newFObject) {
+    ClassInfo info           = oldFObject.getClassInfo();
+    String    of             = info.getObjClass().getSimpleName();
+    List      axioms         = getProperties(info);
+    int       size           = axioms.size();
+    int       optional       = 0;
+
+    List<PropertyInfo> delta = new ArrayList<>();
+
+    for ( int i = 0 ; i < size ; i++ ) {
+      PropertyInfo prop = (PropertyInfo) axioms.get(i);
+
+      if ( prop.compare(oldFObject, newFObject) != 0 ) {
+        delta.add(prop);
+        if ( optionalPredicate_.propertyPredicateCheck(getX(), of.toLowerCase(), prop) ) {
+          optional += 1;
+        }
+      }
+    }
+    if ( optional > 0 &&
+         delta.size() == optional ) {
+      delta = new ArrayList<>();
+    }
+    return delta;
   }
 
   public void setPropertyPredicate(PropertyPredicate p) {
