@@ -97,7 +97,7 @@ public abstract class AbstractFObjectFormatter
   */
 
   protected synchronized List getProperties(ClassInfo info) {
-    String of = info.getObjClass().getSimpleName();
+    String of = info.getObjClass().getSimpleName().toLowerCase();
 
     if ( propertyMap_.containsKey(of) && propertyMap_.get(of).isEmpty() ) {
       propertyMap_.remove(of);
@@ -108,7 +108,7 @@ public abstract class AbstractFObjectFormatter
       Iterator e = info.getAxiomsByClass(PropertyInfo.class).iterator();
       while ( e.hasNext() ) {
         PropertyInfo prop = (PropertyInfo) e.next();
-        if ( propertyPredicate_ == null || propertyPredicate_.propertyPredicateCheck(this.x_, of.toLowerCase(), prop) ) {
+        if ( propertyPredicate_ == null || propertyPredicate_.propertyPredicateCheck(this.x_, of, prop) ) {
           filteredAxioms.add(prop);
         }
       }
@@ -118,9 +118,9 @@ public abstract class AbstractFObjectFormatter
     return propertyMap_.get(of);
   }
 
-  protected synchronized List getDelta(FObject oldFObject, FObject newFObject) {
+  protected List getDelta(FObject oldFObject, FObject newFObject) {
     ClassInfo info           = oldFObject.getClassInfo();
-    String    of             = info.getObjClass().getSimpleName();
+    String    of             = info.getObjClass().getSimpleName().toLowerCase();
     List      axioms         = getProperties(info);
     int       size           = axioms.size();
     int       optional       = 0;
@@ -132,7 +132,7 @@ public abstract class AbstractFObjectFormatter
 
       if ( prop.compare(oldFObject, newFObject) != 0 ) {
         delta.add(prop);
-        if ( optionalPredicate_.propertyPredicateCheck(getX(), of.toLowerCase(), prop) ) {
+        if ( optionalPredicate_.propertyPredicateCheck(getX(), of, prop) ) {
           optional += 1;
         }
       }
