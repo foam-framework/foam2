@@ -47,9 +47,12 @@ foam.CLASS({
 
   methods: [
     function initArgs(args) {
+      this.SUPER.apply(this, arguments);
       if ( args ) {
         this.args = foam.util.clone(args);
-        this.args.class = undefined;
+        delete this.args['class'];
+        delete this.args['readView'];
+        delete this.args['writeView'];
       } else {
         this.args = {};
       }
