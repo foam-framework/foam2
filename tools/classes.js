@@ -164,6 +164,7 @@ var classes = [
   'foam.dao.index.PersistedIndexTest',
   'foam.dao.SequenceNumberDAO',
   'foam.dao.SequenceNumberDAOTest',
+  'foam.dao.StorageOptionalDAO',
   'foam.dao.PipelinePMDAO',
   'foam.dao.PMDAO',
   'foam.nanos.pm.PMInfo',
