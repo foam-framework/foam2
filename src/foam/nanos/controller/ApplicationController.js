@@ -499,12 +499,6 @@ foam.CLASS({
     },
 
     function notify(notification) {
-      /** Convenience method to create toast notifications. */
-      this.add(this.NotificationMessage.create({
-        message: notification.toastMessage,
-        type: notification.severity,
-        description: notification.toastSubMessage
-      }));
       this.notificationDAO.put(notification);
     }
   ],
