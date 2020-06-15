@@ -16,6 +16,7 @@ foam.CLASS({
     'foam.core.FObject',
     'foam.core.X',
     'foam.dao.DAO',
+    'foam.dao.DOP',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger'
   ],
@@ -83,7 +84,7 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      return (FObject) submit(x, obj, "put");
+      return (FObject) submit(x, obj, DOP.PUT);
       `
     },
     {
@@ -99,7 +100,7 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      return submit(x, obj, "cmd");
+      return submit(x, obj, DOP.CMD);
       `
     },
     {
@@ -114,8 +115,8 @@ foam.CLASS({
           type: 'Object'
         },
         {
-          name: 'op',
-          type: 'String'
+          name: 'dop',
+          type: 'foam.dao.DOP'
         }
       ],
       javaType: 'Object',
@@ -123,16 +124,16 @@ foam.CLASS({
       int retryAttempt = 0;
       int retryDelay = 10;
 
-      getLogger().debug("submit", op);
+      getLogger().debug("submit", dop);
 
       while ( true ) {
         try {
-          if ( "put".equals(op) ) {
+          if ( DOP.PUT == dop ) {
             return getDelegate().put_(getX(), (FObject)obj);
-          } else if ( "cmd".equals(op) ) {
+          } else if ( DOP.CMD == dop ) {
             return getDelegate().cmd_(getX(), obj);
           } else {
-            throw new UnsupportedOperationException("Unknown operation: "+op);
+            throw new UnsupportedOperationException("Unknown operation: "+dop);
           }
         } catch ( Throwable t ) {
           getLogger().error(t.getMessage(), t);
@@ -178,7 +179,7 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      submit(getX(), obj, "put");
+      submit(getX(), obj, DOP.PUT);
       `
     },
     {
