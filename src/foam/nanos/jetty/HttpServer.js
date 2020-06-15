@@ -30,7 +30,7 @@ foam.CLASS({
     'org.eclipse.jetty.util.thread.QueuedThreadPool',
     'java.io.FileInputStream',
     'java.security.KeyStore',
-    'org.apache.commons.io.IOUtils',
+    'org.apache.commons.io.IOUtils'
   ],
 
   properties: [
