@@ -108,8 +108,10 @@ foam.CLASS({
       javaFactory: `
       if ( getNSpec() != null ) {
         return getNSpec().getName();
+      } else if ( this.getOf() != null ) {
+        return this.getOf().getId();
       }
-      return this.getOf().getId();
+      return "";
      `
     },
     {
@@ -123,9 +125,13 @@ foam.CLASS({
       of: 'foam.nanos.logger.Logger',
       visibility: 'HIDDEN',
       javaFactory: `
+        Logger logger = (Logger) getX().get("logger");
+        if ( logger == null ) {
+          logger = new foam.nanos.logger.StdoutLogger();
+        }
         return new PrefixLogger(new Object[] {
           this.getClass().getSimpleName()
-        }, (Logger) getX().get("logger"));
+        }, logger);
       `
     },
     {
@@ -146,7 +152,7 @@ foam.CLASS({
               if ( getWriteOnly() ) {
                 delegate = new foam.dao.WriteOnlyJDAO(getX(), getMdao(), getOf(), getJournalName());
               } else {
-                delegate = new foam.dao.java.JDAO(getX(), getMdao(), getJournalName(), getCluster() /* read-only */);
+                delegate = new foam.dao.java.JDAO(getX(), getMdao(), getJournalName(), getCluster());
               }
             }
           }
@@ -173,9 +179,15 @@ foam.CLASS({
 
         if ( getCluster() &&
              getMdao() != null ) {
-          getLogger().debug(getNSpec().getName(), "cluster", "delegate", delegate.getClass().getSimpleName());
+          getLogger().debug(getName(), "cluster", "delegate", delegate.getClass().getSimpleName());
           delegate = new foam.nanos.medusa.MedusaAdapterDAO.Builder(getX())
             .setNSpec(getNSpec())
+            .setDelegate(delegate)
+            .build();
+        }
+
+        if ( getStorageOptionalEnabled() ) {
+          delegate = new foam.dao.StorageOptionalDAO.Builder(getX())
             .setDelegate(delegate)
             .build();
         }
@@ -267,7 +279,6 @@ foam.CLASS({
           delegate = new foam.nanos.ruler.RulerDAO(getX(), delegate, name);
         }
 
-
         if ( getCreatedAware() )
           delegate = new foam.nanos.auth.CreatedAwareDAO.Builder(getX()).setDelegate(delegate).build();
 
@@ -321,6 +332,9 @@ foam.CLASS({
           */
         if ( getPm() )
           delegate = new foam.dao.PMDAO.Builder(getX()).setNSpec(getNSpec()).setDelegate(delegate).build();
+
+        // reset logger
+        EasyDAO.LOGGER.clear(this);
 
         // see comments above regarding DAOs with init_
         ((ProxyDAO)delegate_).setDelegate(delegate);
@@ -702,6 +716,12 @@ model from which to test ServiceProvider ID (spid)`,
       name: 'approvableAwareRelationshipName',
       class: 'String',
       documentation: 'If the DAO is approvable aware, this sets the ApprovableAwareDAO RelationshipName field'
+    },
+    {
+      name: 'storageOptionalEnabled',
+      class: 'Boolean',
+      documentation: 'Discard DAO updates which result in only storageOptional properties changing, like LastModified, for example.',
+      javaFactory: 'return true;'
     }
  ],
 
@@ -1034,15 +1054,19 @@ model from which to test ServiceProvider ID (spid)`,
       `
     },
     {
-      name: 'printDecorators',
+      name: 'getDecorators',
       documentation: 'Useful for debugging and checking if EasyDAO is being used to correctly set up a decorator chain',
+      type: 'String',
       javaCode: `
+        StringBuilder sb = new StringBuilder();
         foam.dao.DAO delegate = this;
-        while ( delegate instanceof foam.dao.ProxyDAO) {
-          System.out.println(delegate.getClass().getSimpleName());
+        while ( delegate != null &&
+                delegate instanceof foam.dao.ProxyDAO) {
+          sb.append(delegate.getClass().getSimpleName());
+          sb.append(":");
           delegate = ((foam.dao.ProxyDAO) delegate).getDelegate();
         }
-        System.out.println(delegate.getClass().getSimpleName());
+        return sb.toString();
       `
     },
 
@@ -1055,7 +1079,7 @@ model from which to test ServiceProvider ID (spid)`,
           type: 'Context'
         },
         {
-          name: 'cmd',
+          name: 'obj',
           type: 'Object'
         }
       ],
@@ -1064,14 +1088,15 @@ model from which to test ServiceProvider ID (spid)`,
         return this.delegate.cmd_(x, obj);
       },
       javaCode: `
-      if ( foam.dao.MDAO.GET_MDAO_CMD.equals(cmd) ) {
+      // getLogger().debug("cmd", getDecorators());
+      if ( foam.dao.MDAO.GET_MDAO_CMD.equals(obj) ) {
         DAO dao = getMdao();
         if ( dao != null ) {
           getLogger().debug("cmd", "mdao", getName());
           return dao;
         }
       }
-      return getDelegate().cmd_(x, cmd);
+      return getDelegate().cmd_(x, obj);
       `
     }
   ]

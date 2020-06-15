@@ -295,6 +295,7 @@ foam.CLASS({
         readPermissionRequired:  this.readPermissionRequired,
         writePermissionRequired: this.writePermissionRequired,
         storageTransient:        this.storageTransient,
+        storageOptional:         this.storageOptional,
         clusterTransient:        this.clusterTransient,
         xmlAttribute:            this.xmlAttribute,
         xmlTextNode:             this.xmlTextNode,

@@ -93,7 +93,7 @@ foam.CLASS({
       } catch (NullPointerException t) {
         getLogger().error(t);
       } catch (RuntimeException | java.io.IOException t) {
-        getLogger().debug("ping", config.getId(), t.getMessage());
+        getLogger().debug("ping", config.getId(), t.getClass().getSimpleName(), t.getMessage());
         if ( config.getStatus() != Status.OFFLINE ) {
           config = (ClusterConfig) config.fclone();
           config.setPingInfo(t.getMessage());

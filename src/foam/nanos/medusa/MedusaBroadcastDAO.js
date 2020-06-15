@@ -32,7 +32,7 @@ foam.CLASS({
   properties: [
     {
       documentation: 'broadcast to this instance type',
-      name: 'type',
+      name: 'broadcastToType',
       class: 'Enum',
       of: 'foam.nanos.medusa.MedusaType',
       value: 'MEDIATOR'
@@ -41,7 +41,7 @@ foam.CLASS({
       name: 'serviceName',
       class: 'String',
       javaFactory: `
-      if ( getType() == MedusaType.NODE ) {
+      if ( getBroadcastToType() == MedusaType.NODE ) {
         return "medusaNodeDAO";
       }
       return "medusaMediatorDAO";
@@ -54,7 +54,7 @@ foam.CLASS({
       javaFactory: `
       ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
       ClusterConfig myConfig = support.getConfig(getX(), support.getConfigId());
-      if ( getType() == MedusaType.NODE ) {
+      if ( getBroadcastToType() == MedusaType.NODE ) {
         return
           AND(
             EQ(ClusterConfig.ENABLED, true),
@@ -91,7 +91,7 @@ foam.CLASS({
       class: 'Boolean',
       value: 'false',
       javaFactory: `
-      if ( getType() == MedusaType.NODE ) return true;
+      if ( getBroadcastToType() == MedusaType.NODE ) return true;
 
       ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
       ClusterConfig myConfig = support.getConfig(getX(), support.getConfigId());
@@ -158,11 +158,11 @@ foam.CLASS({
       // Always broadcast to/from NODE,
       // otherwise only broadcast verified (promoted) entries to other MEDIATORS
       if ( getBroadcast() ||
+           getBroadcastToType() == MedusaType.MEDIATOR &&
            ( myConfig.getType() == MedusaType.MEDIATOR &&
                // REVIEW: to avoid broadcast during reply, wait until ONLINE,
                // mediators may miss data between replayComplete and status change to ONLINE.
              myConfig.getStatus() == Status.ONLINE &&
-             getType() == MedusaType.MEDIATOR &&
              ( entry.getVerified() &&
                ( old == null ||
                  ! old.getVerified() ) ) ) ) {
@@ -231,10 +231,10 @@ foam.CLASS({
 
               if ( DOP.PUT == dop ) {
                 MedusaEntry entry = (MedusaEntry) obj;
-                getLogger().debug("submit", dop.getLabel(), entry.getIndex(), config.getName(), "data", (entry.getData() != null) ? entry.getData().getClass().getSimpleName():"null");
+                getLogger().debug("submit", "job", dop.getLabel(), entry.getIndex(), config.getName(), "data", (entry.getData() != null) ? entry.getData().getClass().getSimpleName():"null");
                 dao.put_(x, entry);
               } else if ( DOP.CMD == dop ) {
-                getLogger().debug("submit", dop.getLabel(), obj.getClass().getSimpleName(), config.getName());
+                getLogger().debug("submit", "job", dop.getLabel(), obj.getClass().getSimpleName(), config.getName());
                 dao.cmd_(x, obj);
               }
             } catch ( Throwable t ) {

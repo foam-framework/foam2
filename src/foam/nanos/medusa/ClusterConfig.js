@@ -194,7 +194,7 @@ foam.CLASS({
       name: 'lastModified',
       class: 'DateTime',
       visibility: 'RO',
-//      storageTransient: true /* only thing being written out */
+      storageOptional: true
     },
     {
       documentation: `The id of the user who created the transaction.`,
@@ -202,6 +202,7 @@ foam.CLASS({
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       visibility: 'RO',
+      storageOptional: true,
       tableCellFormatter: function(value, obj) {
         obj.userDAO.find(value).then(function(user) {
           if ( user ) {

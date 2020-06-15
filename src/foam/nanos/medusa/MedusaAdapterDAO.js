@@ -18,6 +18,8 @@ foam.CLASS({
   javaImports: [
     'foam.core.FObject',
     'foam.dao.DOP',
+    'foam.lib.formatter.FObjectFormatter',
+    'foam.lib.formatter.JSONFObjectFormatter',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
@@ -77,19 +79,23 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-  protected static final ThreadLocal<foam.lib.formatter.FObjectFormatter> formatter_ = new ThreadLocal<foam.lib.formatter.FObjectFormatter>() {
+  protected static final ThreadLocal<FObjectFormatter> formatter_ = new ThreadLocal<FObjectFormatter>() {
     @Override
-    protected foam.lib.formatter.JSONFObjectFormatter initialValue() {
-      foam.lib.formatter.JSONFObjectFormatter formatter = new foam.lib.formatter.JSONFObjectFormatter();
-      formatter.setQuoteKeys(true);
+    protected JSONFObjectFormatter initialValue() {
+      JSONFObjectFormatter formatter = new JSONFObjectFormatter();
+      formatter.setQuoteKeys(false); // default
+      formatter.setOutputShortNames(true); // default
+      formatter.setOutputDefaultValues(true);
+      formatter.setOutputClassNames(true); // default
+      formatter.setOutputDefaultClassNames(true); // default
       formatter.setOutputReadableDates(false);
       formatter.setPropertyPredicate(new foam.lib.StoragePropertyPredicate());
       return formatter;
     }
 
     @Override
-    public foam.lib.formatter.FObjectFormatter get() {
-      foam.lib.formatter.FObjectFormatter formatter = super.get();
+    public FObjectFormatter get() {
+      FObjectFormatter formatter = super.get();
       formatter.reset();
       return formatter;
     }
@@ -157,9 +163,13 @@ foam.CLASS({
     {
       name: 'cmd_',
       javaCode: `
+      getLogger().debug("cmd");
+       if ( foam.dao.MDAO.GET_MDAO_CMD.equals(obj) ) {
+        return getDelegate().cmd_(x, obj);
+      }
       if ( getConfig().getIsPrimary() ) {
         if ( ClusterServerDAO.GET_CLIENT_CMD.equals(obj) ) {
-          getLogger().debug("cmd", "GET_CLIENT_CMD");
+          getLogger().debug("cmd", "GET_CLIENT_CMD", "this");
           return this;
         }
         if ( obj instanceof ClusterCommand ) {
@@ -177,9 +187,7 @@ foam.CLASS({
           return cmd;
         }
       }
-      if ( foam.dao.MDAO.GET_MDAO_CMD.equals(obj) ) {
-        return getDelegate().cmd_(x, obj);
-      }
+      getLogger().debug("cmd", "getClientDAO");
       return getClientDAO().cmd_(x, obj);
       `
     },
@@ -212,23 +220,24 @@ foam.CLASS({
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       ClusterConfig config = support.getConfig(x, support.getConfigId());
 
-      MedusaEntry entry = x.create(MedusaEntry.class);
-      entry = dagger.link(x, entry);
-      entry.setMediator(config.getName());
-      entry.setNSpecName(getNSpec().getName());
-      entry.setDop(dop);
-
-      foam.lib.formatter.FObjectFormatter formatter = formatter_.get();
+      FObjectFormatter formatter = formatter_.get();
       if ( old != null ) {
         formatter.outputDelta(old, obj);
       } else {
         formatter.output(obj);
       }
-      entry.setData(formatter.builder().toString());
+
+      MedusaEntry entry = x.create(MedusaEntry.class);
+      entry = dagger.link(x, entry);
+      entry.setMediator(config.getName());
+      entry.setNSpecName(getNSpec().getName());
+      entry.setDop(dop);
+      entry.setData(formatter.builder().toString().trim());
+
       getLogger().debug("submit", entry.getIndex(), obj.getClass().getSimpleName(), "stringify", entry.getData());
 
       try {
-        getMedusaEntryDAO().put_(x, entry);
+        FObject result = getMedusaEntryDAO().put_(x, entry); // blocking
         FObject nu = getDelegate().find_(x, obj.getProperty("id"));
         if ( nu == null ) {
           getLogger().error("submit", entry.getIndex(), "delegate", "find", obj.getProperty("id"), "not found");
