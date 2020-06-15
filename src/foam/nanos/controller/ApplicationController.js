@@ -56,8 +56,9 @@ foam.CLASS({
   imports: [
     'capabilityDAO',
     'installCSS',
+    'notificationDAO',
     'sessionSuccess',
-    'window',
+    'window'
   ],
 
   exports: [
@@ -497,13 +498,14 @@ foam.CLASS({
       return self.crunchController.maybeLaunchInterceptView(intercept);
     },
 
-    function notify(data, type, description) {
+    function notify(notification) {
       /** Convenience method to create toast notifications. */
       this.add(this.NotificationMessage.create({
-        message: data,
-        type: type,
-        description: description
+        message: notification.toastMessage,
+        type: notification.severity,
+        description: notification.toastSubMessage
       }));
+      this.notificationDAO.put(notification);
     }
   ],
 
