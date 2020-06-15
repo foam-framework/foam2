@@ -340,6 +340,7 @@ FOAM_FILES([
   { name: 'foam/nanos/approval/ApprovableApprovalRequestsRule' },
   { name: 'foam/nanos/approval/FulfilledApprovablePredicate' },
   { name: 'foam/nanos/approval/FulfilledApprovableRule' },
+  { name: 'foam/nanos/approval/PopulateApprovalRequestsDAO' },
 
   //authservice
   { name: "foam/nanos/auth/CapabilityAuthService" },
