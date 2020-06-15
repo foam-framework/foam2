@@ -25,11 +25,12 @@ foam.CLASS({
     'java.util.HashSet',
     'java.util.Arrays',
     'org.eclipse.jetty.server.*',
+    'org.eclipse.jetty.server.handler.StatisticsHandler',
     'org.eclipse.jetty.util.ssl.SslContextFactory',
     'org.eclipse.jetty.util.thread.QueuedThreadPool',
     'java.io.FileInputStream',
     'java.security.KeyStore',
-    'org.apache.commons.io.IOUtils'
+    'org.apache.commons.io.IOUtils',
   ],
 
   properties: [
@@ -123,11 +124,16 @@ foam.CLASS({
         threadPool.setMinThreads(jettyThreadPoolConfig.getMinThreads());
         threadPool.	setIdleTimeout(jettyThreadPoolConfig.getIdleTimeout());
 
+        ConnectorStatistics stats = new ConnectorStatistics();
         org.eclipse.jetty.server.Server server =
           new org.eclipse.jetty.server.Server(threadPool);
         ServerConnector connector = new ServerConnector(server);
         connector.setPort(port);
+        connector.addBean(stats);
         server.addConnector(connector);
+
+        StatisticsHandler statisticsHandler = new StatisticsHandler();
+        statisticsHandler.setServer(server);
 
         /*
           The following for loop will accomplish the following:
