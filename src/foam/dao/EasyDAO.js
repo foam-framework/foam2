@@ -180,16 +180,18 @@ foam.CLASS({
         if ( getCluster() &&
              getMdao() != null ) {
           getLogger().debug(getName(), "cluster", "delegate", delegate.getClass().getSimpleName());
-          delegate = new foam.nanos.medusa.MedusaAdapterDAO.Builder(getX())
-            .setNSpec(getNSpec())
-            .setDelegate(delegate)
-            .build();
-        }
-
-        if ( getStorageOptionalEnabled() ) {
           delegate = new foam.dao.StorageOptionalDAO.Builder(getX())
-            .setDelegate(delegate)
+            .setDelegate(new foam.nanos.medusa.MedusaAdapterDAO.Builder(getX())
+              .setNSpec(getNSpec())
+              .setDelegate(delegate)
+              .build())
             .build();
+        } else {
+          if ( getStorageOptionalEnabled() ) {
+            delegate = new foam.dao.StorageOptionalDAO.Builder(getX())
+              .setDelegate(delegate)
+             .build();
+          }
         }
 
         delegate = getOuterDAO(delegate);
@@ -721,7 +723,7 @@ model from which to test ServiceProvider ID (spid)`,
       name: 'storageOptionalEnabled',
       class: 'Boolean',
       documentation: 'Discard DAO updates which result in only storageOptional properties changing, like LastModified, for example.',
-      javaFactory: 'return true;'
+      javaFactory: 'return false;'
     }
  ],
 
