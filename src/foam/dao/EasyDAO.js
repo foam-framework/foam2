@@ -687,7 +687,7 @@ model from which to test ServiceProvider ID (spid)`,
       name: 'storageOptionalEnabled',
       class: 'Boolean',
       documentation: 'Discard DAO updates which result in only storageOptional properties changing, like LastModified, for example.',
-      javaFactory: 'return true;'
+      javaFactory: 'return false;'
     }
   ],
 
