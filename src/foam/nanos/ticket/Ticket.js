@@ -11,8 +11,8 @@ foam.CLASS({
   documentation: 'Ticket Model',
 
   implements: [
-    'foam.nanos.auth.Authorizable',
     'foam.core.Validatable',
+    'foam.nanos.auth.Authorizable',
     'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.CreatedByAware',
     'foam.nanos.auth.LastModifiedAware',
@@ -296,10 +296,11 @@ foam.CLASS({
       ],
       javaThrows: ['AuthorizationException'],
       javaCode: `
+        AuthService auth = (AuthService) x.get("auth");
         Subject subject = (Subject) x.get("subject");
         User user = subject.getRealUser();
 
-        if ( user.getId() != this.getCreatedBy() ) {
+        if ( user.getId() != this.getCreatedBy() && ! auth.check(x, "ticket.update." + this.getId()) ) {
           throw new AuthorizationException("You don't have permission to update this ticket.");
         }
       `
@@ -311,11 +312,7 @@ foam.CLASS({
       ],
       javaThrows: ['AuthorizationException'],
       javaCode: `
-        AuthService auth = (AuthService) x.get("auth");
-        
-        if ( ! auth.check(x, "ticket.delete") )  {
-          throw new AuthorizationException("Yon don't have permission to delete this ticket");
-        }
+        // The checkGlobalRemove has checked the permission for deleting the ticket already.
       `
     }
   ],
