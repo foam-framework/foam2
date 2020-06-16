@@ -366,6 +366,7 @@ var classes = [
   'foam.nanos.medusa.MedusaAdapterDAO',
   'foam.nanos.medusa.MedusaBlockingDAO',
   'foam.nanos.medusa.MedusaBroadcastDAO',
+  'foam.nanos.medusa.MedusaBroadcast2NodesDAO',
   'foam.nanos.medusa.MedusaConsensusDAO',
   'foam.nanos.medusa.MedusaDistributionDAO',
   'foam.nanos.medusa.MedusaHashingDAO',

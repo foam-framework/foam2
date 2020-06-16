@@ -14,14 +14,14 @@ foam.CLASS({
 
   javaImports: [
     'foam.box.Box',
+    'foam.core.Agency',
+    'foam.core.ContextAgent',
     'foam.core.X',
-    'foam.core.ContextAware',
+    'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
+    'java.io.IOException',
     'java.net.ServerSocket',
     'java.net.Socket',
-    'java.io.IOException',
-    'foam.nanos.pool.ThreadPoolAgency',
-    'foam.core.ContextAgent'
   ],
 
   properties: [
@@ -34,10 +34,19 @@ foam.CLASS({
       `
     },
     {
-      class: 'Object',
-      name: 'threadPoolAgency',
-      javaFactory:`
-        return new ThreadPoolAgency();
+      class: 'String',
+      name: 'threadPoolName',
+      value: 'threadPool'
+    },
+    {
+      name: 'logger',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.logger.Logger',
+      visibility: 'HIDDEN',
+      javaFactory: `
+        return new PrefixLogger(new Object[] {
+          this.getClass().getSimpleName()
+        }, (Logger) getX().get("logger"));
       `
     }
   ],
@@ -47,34 +56,31 @@ foam.CLASS({
       name: 'start',
       javaCode: `
         try {
-          Logger logger = (Logger) getX().get("logger");
-          logger.info("Starting TCP Server on port: " + getPort());
+          getLogger().info("Starting TCP Server on port", getPort());
           ServerSocket serverSocket = new ServerSocket(getPort());
 
-          ThreadPoolAgency poolAgency = (ThreadPoolAgency) getThreadPoolAgency();
-          poolAgency.submit(
+          Agency agency = (Agency) getX().get(getThreadPoolName());
+          agency.submit(
             getX(),
             new ContextAgent() {
               @Override
               public void execute(X x) {
                 try {
                   Socket client = serverSocket.accept();
-                  poolAgency.submit(
-                    getX(),
+                  agency.submit(
+                    x,
                     new SocketServerProcessor(getX(), client),
                     "socket, processor"
                   );
                 } catch ( IOException ioe ) {
-                  Logger logger = (Logger) getX().get("logger");
-                  if ( logger != null ) logger.error(ioe);
+                  getLogger().error(ioe);
                 }
               }
             },
             "Accepting Socket Connection"
           );
         } catch ( Exception e ) {
-          Logger logger = (Logger) getX().get("logger");
-          if ( logger != null ) logger.error(e);
+          getLogger().error(e);
         }
       `
     }

@@ -82,7 +82,7 @@ foam.CLASS({
             }
           }
         } else if ( nu.getType() == MedusaType.NODE ) {
-          // rebucket nodes.
+          bucketNodes(x);
         }
       }
       return nu;
@@ -101,14 +101,18 @@ foam.CLASS({
       javaCode: `
       getLogger().debug("bucketNodes");
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
+
       int groups = support.getNodeGroups();
       List nodes = ((ArraySink)((DAO) getX().get("localClusterConfigDAO"))
         .where(
           AND(
-            EQ(ClusterConfig.ZONE, 0),
-            EQ(ClusterConfig.TYPE, MedusaType.NODE),
             EQ(ClusterConfig.ENABLED, true),
-            EQ(ClusterConfig.STATUS, Status.ONLINE)
+            EQ(ClusterConfig.STATUS, Status.ONLINE),
+            EQ(ClusterConfig.TYPE, MedusaType.NODE),
+            EQ(ClusterConfig.ZONE, 0L),
+            EQ(ClusterConfig.REGION, myConfig.getRegion()),
+            EQ(ClusterConfig.REALM, myConfig.getRealm())
           ))
         .select(new ArraySink())).getArray();
       Map<Integer, List> buckets = new HashMap();

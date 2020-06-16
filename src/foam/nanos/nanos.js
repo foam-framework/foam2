@@ -169,6 +169,7 @@ FOAM_FILES([
   { name: "foam/nanos/medusa/MedusaAdapterDAO" },
   { name: "foam/nanos/medusa/MedusaBlockingDAO" },
   { name: "foam/nanos/medusa/MedusaBroadcastDAO" },
+  { name: "foam/nanos/medusa/MedusaBroadcast2NodesDAO" },
   { name: "foam/nanos/medusa/MedusaConsensusDAO" },
   { name: "foam/nanos/medusa/MedusaDistributionDAO" },
   { name: "foam/nanos/medusa/MedusaHashingDAO" },
