@@ -3285,18 +3285,18 @@ foam.CLASS({
         }
         try {
           obj1 = (FObject)obj.getClass().getMethod(StringUtil.capitalize(p1.getName()), foam.core.X.class).invoke(obj, ((FObject)obj).getX());
-        } catch (Exception e) {
+        } catch ( Throwable t) {
           return null;
         }
         if ( obj1 == null ) return null;
         try {
           return getArg2().f(obj1);
-        } catch( Exception e ) {
+        } catch ( Throwable t ) {
           Logger logger = (Logger) getX().get("logger");
           if ( logger == null ) {
             logger = new StdoutLogger();
           }
-          logger.error(e);
+          logger.error(t);
           return null;
         }
       `
