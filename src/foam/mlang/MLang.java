@@ -9,13 +9,15 @@ package foam.mlang;
 import foam.core.ClassInfo;
 import foam.core.X;
 import foam.dao.Sink;
-import foam.mlang.expr.Dot;
+import foam.mlang.expr.*;
 import foam.mlang.order.Comparator;
 import foam.mlang.order.Desc;
 import foam.mlang.predicate.*;
 import foam.mlang.sink.*;
 import foam.nanos.auth.Authorizer;
+
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 
 /**
  * Static helper functions for creating MLangs.
@@ -227,5 +229,49 @@ public class MLang
     dotF.setArg1(MLang.prepare(o1));
     dotF.setArg2(MLang.prepare(o2));
     return dotF;
+  }
+
+  public static Expr[] toExprArray(Object... args) {
+    return Arrays.stream(args).map(MLang::prepare).toArray(Expr[]::new);
+  }
+
+  public static Expr ADD(Object arg1, Object arg2) {
+    return ADD(new Object[] { arg1, arg2 });
+  }
+
+  public static Expr SUB(Object arg1, Object arg2) {
+    return SUB(new Object[] { arg1, arg2 });
+  }
+
+  public static Expr MUL(Object arg1, Object arg2) {
+    return MUL(new Object[] { arg1, arg2 });
+  }
+
+  public static Expr DIV(Object arg1, Object arg2) {
+    return DIV(new Object[] { arg1, arg2 });
+  }
+
+  public static Expr ADD(Object... args) {
+    Add add = new Add();
+    add.setArgs(toExprArray(args));
+    return add;
+  }
+
+  public static Expr SUB(Object... args) {
+    Subtract sub = new Subtract();
+    sub.setArgs(toExprArray(args));
+    return sub;
+  }
+
+  public static Expr MUL(Object... args) {
+    Multiply mul = new Multiply();
+    mul.setArgs(toExprArray(args));
+    return mul;
+  }
+
+  public static Expr DIV(Object... args) {
+    Divide div = new Divide();
+    div.setArgs(toExprArray(args));
+    return div;
   }
 }
