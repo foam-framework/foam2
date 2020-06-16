@@ -306,43 +306,38 @@ public class JSONFObjectFormatter
     ClassInfo info           = oldFObject.getClassInfo();
     ClassInfo newInfo        = newFObject.getClassInfo();
     boolean   outputComma    = true;
-    boolean   isDiff         = false;
-    boolean   isPropertyDiff = false;
-    List      axioms         = getProperties(info);
-    int       size           = axioms.size();
+    List      delta          = getDelta(oldFObject, newFObject);
+    int       size           = delta.size();
+
+    if ( size == 0 ) {
+      return;
+    }
+
+    b_.append('{');
+    addInnerNewline();
+    if ( outputClassNames_ && outputDefaultClassNames_ ) {
+      //output Class name
+      outputKey("class");
+      b_.append(':');
+      output(newInfo.getId());
+      b_.append(',');
+    }
+    addInnerNewline();
+    PropertyInfo id = (PropertyInfo) newInfo.getAxiomByName("id");
+    outputProperty(newFObject, id);
+
+    // to output class names for references
+    outputDefaultClassNames_ = true;
 
     for ( int i = 0 ; i < size ; i++ ) {
-      PropertyInfo prop = (PropertyInfo) axioms.get(i);
-
-      isPropertyDiff = prop.compare(oldFObject, newFObject) != 0;
-      if ( isPropertyDiff ) {
-        if ( ! isDiff ) {
-          b_.append('{');
-          addInnerNewline();
-          if ( outputClassNames_ && outputDefaultClassNames_ ) {
-            //output Class name
-            outputKey("class");
-            b_.append(':');
-            output(newInfo.getId());
-            b_.append(',');
-          }
-          addInnerNewline();
-          PropertyInfo id = (PropertyInfo) newInfo.getAxiomByName("id");
-          outputProperty(newFObject, id);
-          isDiff = true;
-          // to output class names for references
-          outputDefaultClassNames_ = true;
-        }
-        b_.append(',');
-        addInnerNewline();
-        outputProperty(newFObject, prop);
-      }
-    }
-
-    if ( isDiff ) {
+      b_.append(',');
       addInnerNewline();
-      b_.append('}');
+      PropertyInfo prop = (PropertyInfo) delta.get(i);
+      outputProperty(newFObject, prop);
     }
+
+    addInnerNewline();
+    b_.append('}');
   }
 
   public void outputDelta(FObject oldFObject, FObject newFObject, ClassInfo defaultClass) {
@@ -351,7 +346,6 @@ public class JSONFObjectFormatter
     if ( info == defaultClass ) outputDefaultClassNames_ = false;
     outputDelta(oldFObject, newFObject);
   }
-
   protected void addInnerNewline() {
     if ( multiLineOutput_ ) {
       b_.append('\n');
