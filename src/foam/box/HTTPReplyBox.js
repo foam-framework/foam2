@@ -36,6 +36,7 @@ foam.CLASS({
     protected foam.lib.formatter.JSONFObjectFormatter initialValue() {
       foam.lib.formatter.JSONFObjectFormatter formatter = new foam.lib.formatter.JSONFObjectFormatter();
       formatter.setQuoteKeys(true);
+      formatter.setOutputShortNames(false);
       formatter.setPropertyPredicate(new foam.lib.AndPropertyPredicate(new foam.lib.PropertyPredicate[] {new foam.lib.NetworkPropertyPredicate(), new foam.lib.PermissionedPropertyPredicate()}));
       return formatter;
     }
