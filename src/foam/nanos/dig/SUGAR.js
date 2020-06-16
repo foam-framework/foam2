@@ -48,15 +48,21 @@ foam.CLASS({
       documentation: 'non DAOs list as service',
       view: function(_, X) {
         var E = foam.mlang.Expressions.create();
-        return foam.u2.view.ChoiceView.create({
-          dao: X.nSpecDAO
-            .where(E.AND(E.EQ(E.ENDS_WITH(foam.nanos.boot.NSpec.ID, 'DAO'), false), E.EQ(foam.nanos.boot.NSpec.SERVE, true)))
-            .orderBy(foam.nanos.boot.NSpec.ID),
-          objToChoice: function(nspec) {
-            return [nspec.id, nspec.id];
-          },
-          placeholder: 'Please select a service'
-        });
+        return {
+          class: 'foam.u2.view.RichChoiceView',
+          search: true,
+          sections: [
+            {
+              heading: 'Service',
+              dao: X.AuthenticatedNSpecDAO
+                .where(E.AND(
+                  E.EQ(foam.nanos.boot.NSpec.SERVE, true),
+                  E.NOT(E.ENDS_WITH(foam.nanos.boot.NSpec.ID, 'DAO'))
+                ))
+                .orderBy(foam.nanos.boot.NSpec.ID)
+            }
+          ]
+        };
       },
       postSet: function() {
         var service = this.__context__[this.serviceKey];
