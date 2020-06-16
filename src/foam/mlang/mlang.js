@@ -3285,7 +3285,7 @@ foam.CLASS({
         }
         try {
           obj1 = (FObject)obj.getClass().getMethod(StringUtil.capitalize(p1.getName()), foam.core.X.class).invoke(obj, ((FObject)obj).getX());
-        } catch ( Throwable t) {
+        } catch ( Throwable t ) {
           return null;
         }
         if ( obj1 == null ) return null;
