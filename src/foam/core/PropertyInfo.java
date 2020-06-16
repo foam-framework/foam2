@@ -25,6 +25,8 @@ public interface PropertyInfo
   public boolean getReadPermissionRequired();
   public boolean getWritePermissionRequired();
   public boolean getStorageTransient();
+  public boolean getStorageOptional();
+  public boolean getClusterTransient();
   public boolean getXMLAttribute();
   public boolean getXMLTextNode();
   public boolean getRequired();

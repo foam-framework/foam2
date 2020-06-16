@@ -54,24 +54,6 @@ public class ServiceWebAgent
     authenticate_ = authenticate;
   }
 
-/*
-  public X    getX() { return x_; }
-  public void setX(X x) {
-    x_ = x;
-    if ( skeleton_ instanceof ContextAware )
-      ((ContextAware) skeleton_).setX(x);
-  }
-*/
-
-/*
-  @Override
-  public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    resp.setHeader("Access-Control-Allow-Origin", "*");
-    resp.setStatus(resp.SC_OK);
-    resp.flushBuffer();
-  }
-*/
-
   public void execute(X x) {
     try {
       HttpServletRequest  req            = x.get(HttpServletRequest.class);
@@ -84,10 +66,19 @@ public class ServiceWebAgent
 
       if ( ((AppConfig) x.get("appConfig")).getMode() != Mode.PRODUCTION ) {
         resp.setHeader("Access-Control-Allow-Origin", "*");
-      } else if ( ! req.getHeader("Origin").equals("null") ){
+      } else if ( ! foam.util.SafetyUtil.isEmpty(req.getHeader("Origin")) &&
+                  ! "null".equals(req.getHeader("Origin")) ) {
         URL url = new URL(req.getHeader("Origin"));
         if ( ((VirtualHostRoutingServlet) http.getServletMappings()[0].getServletObject()).getHostMapping().containsKey(url.getHost()) )
           resp.setHeader("Access-Control-Allow-Origin", req.getHeader("Origin"));
+      }
+
+      if ( req.getMethod() == "OPTIONS" ) {
+        resp.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS, POST, PUT");
+        resp.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, Cache-Control, Origin, Pragma");
+        resp.setStatus(resp.SC_OK);
+        out.flush();
+        return;
       }
 
       int read   = 0;
@@ -149,15 +140,4 @@ public class ServiceWebAgent
     ps = eps.apply(parser, psx);
     return eps.getMessage();
   }
-
-/*
-  public void doOptions(HttpServletRequest req, HttpServletResponse resp)
-    throws IOException, ServletException
-  {
-    resp.setHeader("Access-Control-Allow-Origins", "*");
-    resp.setHeader("Access-Control-Allow-Methods", "GET POST");
-    resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
-    super.doOptions(req, resp);
-  }
-  */
 }

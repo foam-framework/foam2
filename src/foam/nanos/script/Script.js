@@ -10,7 +10,8 @@ foam.CLASS({
 
   implements: [
     'foam.nanos.auth.EnabledAware',
-    'foam.nanos.auth.LastModifiedByAware'
+    'foam.nanos.auth.LastModifiedByAware',
+    'foam.nanos.medusa.Clusterable'
   ],
 
   requires: [
@@ -29,20 +30,30 @@ foam.CLASS({
     'bsh.Interpreter',
     'foam.core.*',
     'foam.dao.*',
+    'static foam.mlang.MLang.*',
+    'foam.nanos.auth.*',
+    'foam.nanos.logger.PrefixLogger',
     'foam.nanos.auth.*',
     'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
     'java.io.ByteArrayOutputStream',
     'java.io.PrintStream',
     'java.util.Date',
-    'static foam.mlang.MLang.*',
   ],
 
   tableColumns: [
-    'id', 'server', 'description', 'lastDuration', 'status', 'run'
+    'description',
+    'server',
+    'lastDuration',
+    'lastRun',
+    'run'
   ],
 
-  searchColumns: ['id', 'description'],
+  searchColumns: [
+    'id',
+    'description',
+    'server'
+  ],
 
   constants: [
     {
@@ -57,15 +68,30 @@ foam.CLASS({
     }
   ],
 
+  sections: [
+    {
+      name: 'scriptEvents',
+      title: 'Events',
+      order: 2
+    },
+    {
+      name: '_defaultSection',
+      title: 'Info',
+      order: 1
+    }
+  ],
+
   properties: [
     {
       class: 'String',
       name: 'id',
-      tableWidth: 220
+      includeInDigest: true,
+      tableWidth: 300
     },
     {
       class: 'Boolean',
       name: 'enabled',
+      includeInDigest: true,
       documentation: 'Enables script.',
       tableCellFormatter: function(value) {
         this.start()
@@ -79,14 +105,21 @@ foam.CLASS({
     {
       class: 'String',
       name: 'description',
+      includeInDigest: false,
       documentation: 'Description of the script.',
-      tableWidth: 200
+      tableWidth: 300,
+      tableCellFormatter: function(value, obj) {
+        this.start()
+          .add( ! obj.description ? obj.id : obj.description )
+          .end();
+      }
     },
     {
       class: 'Int',
       name: 'priority',
       value: 5,
       javaValue: 5,
+      includeInDigest: false,
       view: {
         class: 'foam.u2.view.ChoiceView',
         choices: [
@@ -97,12 +130,20 @@ foam.CLASS({
       }
     },
     {
+      documentation: 'A non-clusterable script can run on all instances, and any run info will be stored locally',
+      name: 'clusterable',
+      class: 'Boolean',
+      value: true,
+      includeInDigest: false,
+    },
+    {
       class: 'DateTime',
       name: 'lastRun',
       documentation: 'Date and time the script ran last.',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      tableWidth: 140
+      tableWidth: 140,
+      storageTransient: true
     },
     {
       class: 'Duration',
@@ -110,7 +151,8 @@ foam.CLASS({
       documentation: 'Date and time the script took to complete.',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      tableWidth: 125
+      tableWidth: 125,
+      storageTransient: true
     },
     /*
     {
@@ -125,6 +167,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'server',
+      includeInDigest: false,
       documentation: 'Runs on server side if enabled.',
       tableCellFormatter: function(value) {
         this.start()
@@ -149,11 +192,13 @@ foam.CLASS({
     {
       class: 'Code',
       name: 'code',
+      includeInDigest: true,
       writePermissionRequired: true
     },
     {
       class: 'String',
       name: 'output',
+      includeInDigest: false,
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
       view: {
@@ -174,17 +219,20 @@ foam.CLASS({
       }
       output_ = val;
       outputIsSet_ = true;
-      `
+      `,
+      storageTransient: true
     },
     {
       class: 'String',
       name: 'notes',
+      includeInDigest: false,
       view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 144 }
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'lastModifiedBy',
+      includeInDigest: true,
       documentation: 'User who last modified script'
     },
     {
@@ -195,6 +243,18 @@ foam.CLASS({
       visibility: 'HIDDEN',
       documentation: `Name of dao which journal will be used to store script run logs. To set from inheritor
       just change property value`
+    },
+    {
+      name: 'logger',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.logger.Logger',
+      visibility: 'HIDDEN',
+      transient: true,
+      javaFactory: `
+        return new PrefixLogger(new Object[] {
+          this.getClass().getSimpleName()
+        }, (Logger) getX().get("logger"));
+      `
     }
   ],
 
@@ -239,6 +299,22 @@ foam.CLASS({
         }
       ],
       javaCode: `
+        String startScript = System.getProperty("foam.main", "main");
+        // Run on all instances if:
+        // - startup "main" script, or
+        // - not-clusterable, or
+        // - a suitable cluster configuration
+
+        if ( ! getId().equals(startScript) &&
+             getClusterable() ) {
+          foam.nanos.medusa.ClusterConfigSupport support = (foam.nanos.medusa.ClusterConfigSupport) x.get("clusterConfigSupport");
+          if ( support != null &&
+               ! support.cronEnabled(x) ) {
+            ((Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "Script execution disabled", getId(), getDescription());
+            return;
+          }
+        }
+
         Thread.currentThread().setPriority(getPriority());
         try {
           ByteArrayOutputStream baos  = new ByteArrayOutputStream();
@@ -264,6 +340,16 @@ foam.CLASS({
           setLastDuration(pm.getTime());
           ps.flush();
           setOutput(baos.toString());
+
+          ScriptEvent event = new ScriptEvent(x);
+          event.setLastRun(this.getLastRun());
+          event.setLastDuration(this.getLastDuration());
+          event.setOutput(this.getOutput());
+          event.setScriptType(this.getClass().getSimpleName());
+          event.setOwner(this.getId());
+          event.setScriptId(this.getId());
+          event.setHostname(System.getProperty("hostname", "localhost"));
+          ((DAO) x.get("scriptEventDAO")).put(event);
         } finally {
           Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
         }

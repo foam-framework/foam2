@@ -49,6 +49,14 @@ public abstract class AbstractPropertyInfo
     return false;
   }
 
+  public boolean getStorageOptional() {
+    return false;
+  }
+
+  public boolean getClusterTransient() {
+    return false;
+  }
+
   public boolean getReadPermissionRequired() {
     return false;
   }
@@ -189,7 +197,9 @@ public abstract class AbstractPropertyInfo
 
   @Override
   public boolean includeInDigest() {
-    return true;
+    return false;
+    // return ! ( getStorageTransient() ||
+    //            getClusterTransient() );
   }
 
   @Override
@@ -199,7 +209,7 @@ public abstract class AbstractPropertyInfo
 
   @Override
   public boolean includeInSignature() {
-    return true;
+    return includeInDigest();
   }
 
   @Override

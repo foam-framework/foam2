@@ -235,9 +235,9 @@ foam.CLASS({
         } catch (EvalError e) {
           foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
           if ( logger != null ) {
-            logger.error("NSpec serviceScript error", getServiceScript(), e);
+            logger.error("NSpec", getName(), "serviceScript", getServiceScript(), "error", e.getMessage(), e);
           } else {
-            System.err.println("NSpec serviceScript error: " + getServiceScript());
+            System.err.println("ERROR - NSpec: " + getName() + " serviceScript: " + getServiceScript());
             e.printStackTrace();
           }
         }

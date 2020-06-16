@@ -13,6 +13,7 @@ import foam.core.X;
 import foam.core.XFactory;
 import foam.dao.AbstractSink;
 import foam.dao.DAO;
+import foam.dao.ProxyDAO;
 import foam.dao.SessionDAOSkeleton;
 import foam.nanos.NanoService;
 import foam.nanos.boot.NSpec;
@@ -122,16 +123,17 @@ public class NanoRouter
   protected WebAgent getWebAgent(NSpec spec, Object service) {
     if ( spec == null ) return null;
 
-    if ( ! handlerMap_.containsKey(spec.getName()) ) {
-      handlerMap_.put(spec.getName(), createWebAgent(spec, service));
+    synchronized (spec.getName().intern()) {
+      if ( ! handlerMap_.containsKey(spec.getName()) ) {
+        handlerMap_.put(spec.getName(), createWebAgent(spec, service));
+      }
     }
-
     return handlerMap_.get(spec.getName());
   }
 
   protected WebAgent createWebAgent(NSpec spec, Object service) {
-    informService(service, spec);
-
+    Logger logger = (Logger) getX().get("logger");
+    logger.debug(this.getClass().getSimpleName(), "createWebAgent", spec.getName());
     if ( spec.getServe() ) {
       try {
         Class cls = spec.getBoxClass() != null && spec.getBoxClass().length() > 0 ?
@@ -142,12 +144,11 @@ public class NanoRouter
         // TODO: create using Context, which should do this automatically
         if ( skeleton instanceof ContextAware ) ((ContextAware) skeleton).setX(getX());
 
-        informService(skeleton, spec);
-
         skeleton.setDelegateObject(service);
 
         service = new ServiceWebAgent(skeleton, spec.getAuthenticate());
-        informService(service, spec);
+
+        logger.debug(this.getClass().getSimpleName(), "createWebAgent.serve", spec.getName(), "service");
       } catch (IllegalAccessException | InstantiationException | ClassNotFoundException ex) {
         ex.printStackTrace();
         ((Logger) getX().get("logger")).error("Unable to create NSPec servlet: " + spec.getName());
@@ -170,18 +171,36 @@ public class NanoRouter
           service = new AuthWebAgent("service.run." + spec.getName(), (WebAgent) service);
         }
       }
-    }
+
+      //
+      // NOTE: Authentication must be last as HttpParametersWebAgent will consume the authentication parameters.
+      //
+      if (spec.getAuthenticate() ) {
+        service = new AuthWebAgent("service.run." + spec.getName(), (WebAgent) service);
+      }
+
+      logger.debug(this.getClass().getSimpleName(), "createWebAgent.WebAgent", spec.getName(), "webAgent"/*, service*/);
+   }
 
     if ( service instanceof WebAgent ) return (WebAgent) service;
 
-    Logger logger = (Logger) getX().get("logger");
     logger.error(this.getClass(), spec.getName() + " does not have a WebAgent.");
     return null;
   }
 
   protected void informService(Object service, NSpec spec) {
-    if ( service instanceof ContextAware ) ((ContextAware) service).setX(getX());
-    if ( service instanceof NSpecAware   ) ((NSpecAware) service).setNSpec(spec);
+    Object obj = service;
+    while ( obj != null ) {
+      if ( obj instanceof ContextAware ) ((ContextAware) obj).setX(getX());
+      if ( obj instanceof NSpecAware   ) ((NSpecAware) obj).setNSpec(spec);
+      if ( obj instanceof ProxyDAO ) {
+        obj = ((ProxyDAO) obj).getDelegate();
+      } else if ( obj instanceof ProxyWebAgent ) {
+        obj = ((ProxyWebAgent) obj).getDelegate();
+      } else {
+        obj = null;
+      }
+    }
   }
 
   @Override

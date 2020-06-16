@@ -224,11 +224,6 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'includeInDigest',
-      value: false
-    },
-    {
-      class: 'Boolean',
       name: 'synchronized',
       value: false
     },
@@ -300,6 +295,8 @@ foam.CLASS({
         readPermissionRequired:  this.readPermissionRequired,
         writePermissionRequired: this.writePermissionRequired,
         storageTransient:        this.storageTransient,
+        storageOptional:         this.storageOptional,
+        clusterTransient:        this.clusterTransient,
         xmlAttribute:            this.xmlAttribute,
         xmlTextNode:             this.xmlTextNode,
         sqlType:                 this.sqlType,

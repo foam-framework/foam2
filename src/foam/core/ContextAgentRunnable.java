@@ -9,9 +9,9 @@ package foam.core;
 public class ContextAgentRunnable
   implements Runnable
 {
-  final X            x_;
-  final ContextAgent agent_;
-  final String description_;
+  final protected X            x_;
+  final protected ContextAgent agent_;
+  final protected String description_;
 
   public ContextAgentRunnable(X x, ContextAgent agent, String description) {
     x_     = x;

@@ -23,12 +23,21 @@ foam.CLASS({
   ],
 
   tableColumns: [
-    'id', 'enabled', /*'description',*/ 'server',
-    'passed', 'failed', 'lastRun', 'lastDuration',
-    /*'status',*/ 'run'
+    'description',
+    'enabled',
+    'server',
+    'passed',
+    'failed',
+    'lastDuration',
+    'lastRun',
+    'run'
   ],
 
-  searchColumns: ['id', 'description', 'server'],
+  searchColumns: [
+    'id',
+    'description',
+    'server'
+  ],
 
   documentation: `
     A scriptable Unit Test.

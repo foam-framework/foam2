@@ -82,6 +82,12 @@ foam.CLASS({
       name: 'defaultSpid'
     },
     {
+      class: 'Boolean',
+      name: 'cluster',
+      visibility: 'RO',
+      storageTransient: true
+    },
+    {
       class: 'String',
       name: 'externalUrl'
     }

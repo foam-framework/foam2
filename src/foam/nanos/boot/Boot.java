@@ -44,13 +44,13 @@ public class Boot {
 
   public Boot(String datadir) {
     Logger logger = new ProxyLogger(new StdoutLogger());
-    root_.put("logger", logger);
+    root_ = root_.put("logger", logger);
 
     if ( SafetyUtil.isEmpty(datadir) ) {
       datadir = System.getProperty("JOURNAL_HOME");
     }
 
-    root_.put(foam.nanos.fs.Storage.class,
+    root_ = root_.put(foam.nanos.fs.Storage.class,
         new foam.nanos.fs.FileSystemStorage(datadir));
 
     // Used for all the services that will be required when Booting
@@ -68,7 +68,7 @@ public class Boot {
       NSpecFactory factory = new NSpecFactory((ProxyX) root_, sp);
       factories_.put(sp.getName(), factory);
       logger.info("Registering:", sp.getName());
-      root_.putFactory(sp.getName(), factory);
+      root_ = root_.putFactory(sp.getName(), factory);
     }
 
     serviceDAO_.listen(new AbstractSink() {
@@ -76,7 +76,7 @@ public class Boot {
       public void put(Object obj, Detachable sub) {
         NSpec sp = (NSpec) obj;
 
-        logger.info("Reload service:", sp.getName());
+        logger.info("Reloading Service", sp.getName());
         factories_.get(sp.getName()).invalidate(sp);
       }
     }, null);
@@ -114,8 +114,6 @@ public class Boot {
 
     // Revert root_ to non ProxyX to avoid letting children add new bindings.
     root_ = ((ProxyX) root_).getX();
-
-    // Export the ServiceDAO
     ((ProxyDAO) root_.get("nSpecDAO")).setDelegate(
       new foam.nanos.auth.AuthorizationDAO(getX(), serviceDAO_, new foam.nanos.auth.GlobalReadAuthorizer("service")));
 
@@ -124,17 +122,30 @@ public class Boot {
       public void put(Object obj, Detachable sub) {
         NSpec sp = (NSpec) obj;
 
-        logger.info("Starting:", sp.getName());
+        logger.info("Invoking Service", sp.getName());
         root_.get(sp.getName());
       }
     });
 
     String startScript = System.getProperty("foam.main", "main");
     if ( startScript != null ) {
-      DAO    scriptDAO = (DAO) root_.get("scriptDAO");
+      DAO    scriptDAO = (DAO) root_.get("bootScriptDAO");
+      if ( scriptDAO == null ) {
+        logger.warning("DAO Not Found: bootScriptDAO. Falling back to scriptDAO");
+        scriptDAO = (DAO) root_.get("scriptDAO");
+      }
       Script script    = (Script) scriptDAO.find(startScript);
       if ( script != null ) {
-        ((Script) script.fclone()).runScript(root_);
+        logger.info("Boot,script", startScript);
+        script = (Script) script.fclone();
+        try {
+          // NOTE: is read-only and will throw exception when it updates rundate.
+          ((Script)script.fclone()).runScript(new foam.core.ReadOnlyDAOContext(root_));
+        } catch (UnsupportedOperationException e) {
+          // ignore
+        }
+      } else {
+        logger.warning("Boot, Script not found", startScript);
       }
     }
   }

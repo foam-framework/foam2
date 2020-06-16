@@ -1,0 +1,33 @@
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"localSessionDAO",
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.session.Session.getOwnClassInfo())
+      .setGuid(true)
+      .setCreatedAware(true)
+      .setCreatedByAware(true)
+      .setJournalName("sessions")
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setAuthorize(false)
+      .setDecorator(new foam.dao.ValidatingDAO(x, null))
+      .build();
+  """
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "sessionDAO",
+  "serve": true,
+  "serviceScript": """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.session.Session.getOwnClassInfo())
+      .setPm(true)
+      .setAuthorize(false)
+      .setInnerDAO(((foam.dao.DAO) x.get("localSessionDAO")))
+      .setEnableInterfaceDecorators(false)
+      .build();
+  """,
+  "client": "{\"of\":\"foam.nanos.session.Session\"}",
+  "authNotes": "Users must have the 'service.sessionDAO' permission to access this service. Due to the highly sensitive nature of sessions, only superadmins should have permission to access this service."
+})

@@ -136,13 +136,11 @@ foam.CLASS({
   javaImports: [
     'foam.dao.ArraySink',
     'foam.dao.DAO',
+    'static foam.mlang.MLang.EQ',
     'foam.nanos.app.AppConfig',
     'foam.util.SafetyUtil',
-    'org.eclipse.jetty.server.Request',
-    'javax.security.auth.AuthPermission',
-    'javax.servlet.http.HttpServletRequest',
     'java.util.List',
-    'static foam.mlang.MLang.EQ'
+    'javax.security.auth.AuthPermission'
   ],
 
   methods: [

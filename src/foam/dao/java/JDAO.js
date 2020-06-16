@@ -22,20 +22,28 @@ foam.CLASS({
         cls.extras.push(`
           // TODO: These convenience constructors should be removed and done using the facade pattern.
           public JDAO(X x, foam.core.ClassInfo classInfo, String filename) {
-            this(x, new foam.dao.MDAO(classInfo), filename);
+            this(x, new foam.dao.MDAO(classInfo), filename, false);
           }
 
           public JDAO(X x, foam.dao.DAO delegate, String filename) {
+            this(x, delegate, filename, false);
+          }
+
+          public JDAO(X x, foam.dao.DAO delegate, String filename, Boolean cluster) {
             setX(x);
             setOf(delegate.getOf());
             setDelegate(delegate);
 
             // create journal
-            setJournal(new foam.dao.F3FileJournal.Builder(x)
-              .setDao(delegate)
-              .setFilename(filename)
-              .setCreateFile(true)
-              .build());
+            if ( cluster ) {
+              setJournal(new foam.dao.NullJournal.Builder(x).build());
+            } else {
+              setJournal(new foam.dao.F3FileJournal.Builder(x)
+                .setDao(delegate)
+                .setFilename(filename)
+                .setCreateFile(false)
+                .build());
+            }
 
             /* Create a composite journal of repo journal and runtime journal
               and load them all.*/
@@ -45,16 +53,24 @@ foam.CLASS({
                   new ResourceStorage(System.getProperty("resource.journals.dir")));
             }
 
-            new foam.dao.CompositeJournal.Builder(x)
-              .setDelegates(new foam.dao.Journal[]{
-                new foam.dao.F3FileJournal.Builder(resourceStorageX)
-                  .setFilename(filename + ".0")
-                  .build(),
-                new foam.dao.F3FileJournal.Builder(x)
-                  .setFilename(filename)
-                  .build()
-              })
-              .build().replay(x, delegate);
+            if ( cluster ) {
+              new foam.dao.F3FileJournal.Builder(resourceStorageX)
+                .setFilename(filename + ".0")
+                .build()
+                .replay(x, delegate);
+            } else {
+              new foam.dao.CompositeJournal.Builder(x)
+                .setDelegates(new foam.dao.Journal[]{
+                  new foam.dao.F3FileJournal.Builder(resourceStorageX)
+                    .setFilename(filename + ".0")
+                    .build(),
+                  new foam.dao.F3FileJournal.Builder(x)
+                    .setFilename(filename)
+                    .build()
+                })
+                .build()
+                .replay(x, delegate);
+            }
           }
         `);
       }
