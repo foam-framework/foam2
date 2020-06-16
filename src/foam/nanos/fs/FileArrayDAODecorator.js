@@ -10,10 +10,10 @@ foam.CLASS({
   extends: 'foam.dao.AbstractDAODecorator',
 
   imports: [
-    'fileDAO',
+    'fileDAO'
   ],
   requires: [
-    'foam.nanos.fs.File',
+    'foam.nanos.fs.File'
   ],
 
   properties: [
@@ -41,7 +41,6 @@ foam.CLASS({
             delete f.instance_.data;
           }
             a = await self.fileDAO.put(f);
-            debugger;
           return self.fileDAO.put(f);
           }
         ))
@@ -49,7 +48,6 @@ foam.CLASS({
 
       return Promise.all(promises).then((values) => {
         props.forEach((prop, i) => {
-        debugger;
           prop.set(obj, values[i]);
         });
         return obj;
@@ -64,6 +62,6 @@ foam.CLASS({
           reader.onerror = error => reject(error);
       });
       return await toBase64(file);
-    },
+    }
   ]
 });

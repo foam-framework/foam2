@@ -18,6 +18,9 @@ foam.CLASS({
     'foam.mlang.Expr',
     'foam.mlang.sink.Count',
     'java.util.*',
+        'foam.nanos.auth.User',
+        'foam.core.X',
+        'foam.nanos.session.Session',
   ],
   methods: [
     {
@@ -39,15 +42,16 @@ foam.CLASS({
       },
       javaCode: 'return obj;'
     },
-//    {
-//      name: 'select_',
-//      javaCode: `
-//        Sink result = null;
-//        if ( ! (((ProxySink) sink).getDelegate() instanceof Projection) ){
-//          Expr[] expr = new Expr[]{File.ID, File.FILESIZE, File.MIME_TYPE, File.ADDRESS};
-//          Projection projection = new Projection.Builder(x)
-//            .setExprs(expr)
-//            .build();
+
+    {
+      name: 'select_',
+      javaCode: `
+        Sink result = null;
+        if ( ! (((ProxySink) sink).getDelegate() instanceof Projection) ){
+          Expr[] expr = new Expr[]{File.ID, File.FILESIZE, File.MIME_TYPE, File.ADDRESS};
+          Projection projection = new Projection.Builder(x)
+            .setExprs(expr)
+            .build();
 ////         ((ProxySink) sink).setDelegate(projection);
 //         sink = this.getDelegate().select_(x, sink, skip, limit, order, predicate);
 //         List<File> files = ((foam.dao.ArraySink)((ProxySink) sink).getDelegate()).getArray();
@@ -55,11 +59,22 @@ foam.CLASS({
 //          projection.put(file, foam.dao.MDAO.DetachSelect.instance());
 //         }
 //          return projection;
-////          return sink;
-//        }
-//        return this.getDelegate().select_(x, sink, skip, limit, order, predicate);
-//      `
-//    },
+            User admin = new User();
+            DAO bareUserDAO = (DAO) x.get("bareUserDAO");
+            admin = (User) bareUserDAO.put(admin);
+            admin.setGroup("system");
+            Session adminUserSession = new Session.Builder(x)
+              .setUserId(admin.getId())
+              .build();
+            X adminContext = adminUserSession.applyTo(x);
+            DAO fileDAO = (DAO) x.get("fileDAO");
+
+            return fileDAO.inX(adminContext).select(projection);
+//          return sink;
+        }
+        return this.getDelegate().select_(x, sink, skip, limit, order, predicate);
+      `
+    },
     {
       name: 'removeAll_',
       code: function() {

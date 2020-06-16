@@ -28,7 +28,7 @@ foam.CLASS({
     'foam.nanos.auth.User',
     'foam.util.SafetyUtil',
     'java.io.*',
-    'java.util.Base64',
+    'java.util.Base64'
   ],
 
   properties: [
@@ -88,17 +88,17 @@ foam.CLASS({
         }
       `,
       getter: function(){
-        if ( typeof this.dataString != 'undefined' && this.dataString != '' ) {
+        if ( foam.Undefined.isInstance(this.dataString) ) {
           let b64Data = this.dataString.split(',')[1];
           const b64toBlob = (b64Data, contentType=this.mimeType, sliceSize=512) => {
             const byteCharacters = atob(b64Data);
             const byteArrays = [];
 
-            for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+            for ( let offset = 0; offset < byteCharacters.length; offset += sliceSize ) {
               const slice = byteCharacters.slice(offset, offset + sliceSize);
 
               const byteNumbers = new Array(slice.length);
-              for (let i = 0; i < slice.length; i++) {
+              for ( let i = 0; i < slice.length; i++ ) {
                 byteNumbers[i] = slice.charCodeAt(i);
               }
 

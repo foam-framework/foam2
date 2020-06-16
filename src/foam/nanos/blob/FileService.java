@@ -49,7 +49,7 @@ public class FileService
 
       // find file from file dao
       File file = (File) fileDAO_.find_(x, id);
-      if (file == null || file.getData() == null) {
+      if ( file == null || file.getData() == null ) {
         resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         return;
       }
@@ -68,7 +68,7 @@ public class FileService
       } else {
         blob = file.getData();
       }
-        long size = blob.getSize();
+      long size = blob.getSize();
 
       // set response status, content type, content length
       resp.setStatus(HttpServletResponse.SC_OK);

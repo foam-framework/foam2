@@ -25,7 +25,7 @@ foam.CLASS({
         .add(this.slot(function(data) {
           return ! data ? this.E('span') : this.E('a')
             .attrs({
-              href: (data.data && data.data.blob) || data.dataString ?
+              href: data.data && data.data.blob ?
                 URL.createObjectURL(data.data.blob) :
                 data.address,
               target: '_blank',
