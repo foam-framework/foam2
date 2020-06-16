@@ -2705,12 +2705,7 @@ foam.CLASS({
     {
       name: 'toString',
       code: function() {
-        var projectionString = this.cls_.name + '(';
-        var exprString = [];
-        for ( var expr of this.exprs ) {
-          exprString.push(expr.toString());
-        }
-        projectionString += exprString.join(', ') + ')';
+        var projectionString = this.cls_.name + '(' + this.exprs.join(',') + ')';
         return projectionString;
       },
       javaCode: `
@@ -3259,7 +3254,8 @@ foam.CLASS({
     'foam.core.FObject',
     'foam.core.PropertyInfo',
     'foam.nanos.logger.Logger',
-    'foam.nanos.logger.StdoutLogger'
+    'foam.nanos.logger.StdoutLogger',
+    'foam.util.StringUtil'
   ],
 
   properties: [
@@ -3288,15 +3284,10 @@ foam.CLASS({
         FObject obj1;
         if ( p1 instanceof AbstractFObjectPropertyInfo ) {
           Object val = getArg1().f(obj);
-          if ( val == null )
-            return null;
-          return getArg2().f(val);
+          return val == null ? null : getArg2().f(val);
         }
-        char[] arr = p1.getName().toCharArray();
-        arr[0] = Character.toUpperCase(arr[0]);
-        sb.append(arr);
         try {
-          obj1 = (FObject)obj.getClass().getMethod(sb.toString(), foam.core.X.class).invoke(obj, ((FObject)obj).getX());
+          obj1 = (FObject)obj.getClass().getMethod(StringUtil.capitalize(p1.getName()), foam.core.X.class).invoke(obj, ((FObject)obj).getX());
         } catch (Exception e) {
           return null;
         }

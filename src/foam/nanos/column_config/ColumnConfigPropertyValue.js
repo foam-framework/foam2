@@ -16,6 +16,7 @@ foam.CLASS({
     'foam.core.X',
     'foam.mlang.Expr',
     'foam.nanos.logger.Logger',
+    'foam.util.StringUtil',
     'java.lang.reflect.Method'
   ],
   methods: [
@@ -81,11 +82,7 @@ foam.CLASS({
               if ( p instanceof foam.core.AbstractFObjectPropertyInfo ) {
                 cls = p.getValueClass();
               } else {
-                char[] arr = p.getName().toCharArray();
-                arr[0] = Character.toUpperCase(arr[0]);
-                sb.append(arr);
-                String s = sb.toString();
-                Method m = ci.getObjClass().getMethod(s, foam.core.X.class);
+                Method m = ci.getObjClass().getMethod(StringUtil.capitalize(p.getName()), foam.core.X.class);
                 cls = m.getReturnType();
                 sb.setLength(4);
               }
@@ -103,7 +100,7 @@ foam.CLASS({
     {
       name: 'returnPropertyAndObject',
       type: 'foam.nanos.column.ColumnPropertyValue',
-      documentation: `returns property and object on which such property's functions as f or toCSV can be called`,
+      documentation: 'returns property and object on which such property\'s functions as f or toCSV can be called',
       args: [
         {
           name: 'x',
@@ -167,10 +164,7 @@ foam.CLASS({
                 obj1 = (FObject) p.f(obj1);
                 cls = p.getValueClass();
               } else {
-                char[] arr = p.getName().toCharArray();
-                arr[0] = Character.toUpperCase(arr[0]);
-                sb.append(arr);
-                obj1 = (FObject)obj1.getClass().getMethod(sb.toString(), foam.core.X.class).invoke(obj1, x);
+                obj1 = (FObject)obj1.getClass().getMethod(StringUtil.capitalize(p.getName()), foam.core.X.class).invoke(obj1, x);
                 sb.setLength(4);
                 if ( obj1 == null ) return new ColumnPropertyValue.Builder(x).setPropertyValue(null).setObjValue(null).build();
                 cls = obj1.getClass();

@@ -20,6 +20,7 @@ foam.CLASS({
     'foam.core.X',
     'foam.mlang.Expr',
     'foam.nanos.logger.Logger',
+    'foam.util.StringUtil',
     'java.lang.reflect.Method',
     'static foam.mlang.MLang.*',
   ],
@@ -102,12 +103,8 @@ foam.CLASS({
           if ( p instanceof foam.core.AbstractFObjectPropertyInfo ) {
             cls = p.getValueClass();
           } else {
-            char[] arr = p.getName().toCharArray();
-            arr[0] = Character.toUpperCase(arr[0]);
-            sb.append(arr);
-            String s = sb.toString();
             sb.setLength(4);
-            Method m = ci.getObjClass().getMethod(s, foam.core.X.class);
+            Method m = ci.getObjClass().getMethod(StringUtil.capitalize(p.getName()), foam.core.X.class);
             cls = m.getReturnType();
           }
           ci = (ClassInfo) cls.getMethod("getOwnClassInfo").invoke(null);
