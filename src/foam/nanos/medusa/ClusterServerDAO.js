@@ -110,7 +110,7 @@ foam.CLASS({
 
       DAO dao = getClientDAO(x, cmd);
       if ( dao != null ) {
-        return dao.put_(x, cmd.getData());
+        return dao.put_(x, cmd);
       }
       dao = getMDAO(x, cmd);
 
@@ -129,9 +129,10 @@ foam.CLASS({
       getLogger().debug("remove_", "ClusterCommand", java.util.Arrays.toString(cmd.getHops()));
 
       DAO dao = getClientDAO(x, cmd);
-      if ( dao == null ) {
-        dao = getMDAO(x, cmd);
+      if ( dao != null ) {
+        return dao.remove_(x, cmd);
       }
+      dao = getMDAO(x, cmd);
       return dao.remove_(x, cmd.getData());
       `
     },
@@ -147,11 +148,16 @@ foam.CLASS({
       }
 
       ClusterCommand cmd = (ClusterCommand) obj;
+      DAO dao = getClientDAO(x, cmd);
+      if ( dao != null ) {
+        return dao.cmd_(x, cmd);
+      }
+      dao = getMDAO(x, cmd);
 
       if ( DOP.PUT == cmd.getDop() ) {
-        return this.put_(x, cmd);
+        return dao.put_(x, cmd.getData());
       } else if ( DOP.REMOVE == cmd.getDop() ) {
-        return this.remove_(x, cmd);
+        return dao.remove_(x, cmd.getData());
       } else {
         getLogger().warning("Unsupported operation", cmd.getDop().getLabel());
         throw new ClusterException("Unsupported operation: "+cmd.getDop().getLabel(), new UnsupportedOperationException(cmd.getDop().getLabel()));

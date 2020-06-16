@@ -91,7 +91,7 @@ foam.CLASS({
     {
       documentation: 'Assign nodes to buckets.',
       name: 'bucketNodes',
-      synchronized: true,
+      //synchronized: true,
       args: [
         {
           name: 'x',
