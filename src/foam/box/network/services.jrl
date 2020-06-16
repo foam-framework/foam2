@@ -6,6 +6,7 @@ p({
     "class": "foam.box.network.TCPSocketMgr",
   }
 })
+
 p({
   "class": "foam.nanos.boot.NSpec",
   "name": "tcp",
@@ -13,4 +14,4 @@ p({
   "service": {
     "class": "foam.box.network.SocketServer"
   }
-}
+})
