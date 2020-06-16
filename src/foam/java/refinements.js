@@ -499,44 +499,13 @@ foam.LIB({
       cls.name          = this.model_.name;
       cls.package       = this.model_.package;
       cls.source        = this.model_.source;
-      cls.abstract      = (this.model_.abstract ? this.model_.abstract : false);
+      cls.abstract      = this.model_.abstract;
       cls.documentation = this.model_.documentation;
 
+      // javaExtends - extends only for java
+      // TODO Generate getX() setX() ... for classes with no extends
       if ( this.model_.name !== 'AbstractFObject' ) {
-        // if not AbstractFObject either extend AbstractFObject or use provided extends property
-        cls.extends = this.model_.extends === 'FObject' ?
-          'foam.core.AbstractFObject' : this.model_.extends;
 
-        if ( true ) {
-          cls.field({
-            name: "x_",
-            visibility: 'private',
-            static: false,
-            final: false,
-            type: 'foam.core.X',
-            initializer: "foam.core.EmptyX.instance()"
-          });
-  
-          cls.method({
-            name: 'getX',
-            type: 'foam.core.X',
-            visibility: 'public',
-            body: 'return x_;'
-          });
-    
-          cls.method({
-            name: 'setX',
-            type: 'void',
-            visibility: 'public',
-            args: [
-              {
-                name: 'x',
-                type: 'foam.core.X'
-              }
-            ],
-            body: 'x_ = x;'
-          });
-  
           // console.log(cls.methods);
           // cls.method({
           //   name: 'toString',
@@ -548,43 +517,14 @@ foam.LIB({
           //     return sb.toString();
           //   `
           // })
-  
-          cls.field({
-            name: "freezer_",
-            visibility: 'private',
-            static: false,
-            final: false,
-            type: 'foam.core.Freezer',
-            initializer: "new foam.core.Freezer()"
-          });
-
-          cls.method({
-            name: 'freeze',
-            type: 'foam.core.FObject',
-            visibility: 'public',
-            body: `
-              beforeFreeze();
-              freeze(freezer_);
-              return this;
-            `
-          })
-  
-          cls.method({
-            name: 'isFrozen',
-            type: 'boolean',
-            visibility: 'public',
-            body: `
-              return isFrozen(freezer_);
-            `
-          })
-        } else {
-          console.log(cls);
-        }
-        
+        cls.extends = 'foam.core.AbstractFObject';
       } else {
         // if AbstractFObject we implement FObject
         cls.implements = [ 'foam.core.FObject' ];
       }
+
+      if ( this.model_.javaExtends )
+        cls.extends = this.model_.javaExtends;
 
       cls.fields.push(foam.java.ClassInfo.create({ id: this.id }));
 
@@ -625,20 +565,88 @@ foam.LIB({
 
       if ( this.model_.name !== 'AbstractFObject' ) {
         // if not AbstractFObject add beforeFreeze method
-        var properties = this.getAxiomsByClass(foam.core.Property).
-        filter(flagFilter).
-        filter(function(p) { return !! p.javaType && p.javaInfoType && p.generateJava; }).
-        filter(function(p) { return p.javaFactory; });
-        if ( properties.length > 0 ) {
+        var properties = this.getAxiomsByClass(foam.core.Property)
+          .filter(flagFilter)
+          .filter(p => !! p.javaType && p.javaInfoType && p.generateJava)
+          .filter(p => p.javaFactory);
+        
+          if ( properties.length > 0 ) {
           cls.method({
             visibility: 'public',
             type: 'void',
             name: 'beforeFreeze',
-            body: 'super.beforeFreeze();\n' + properties.
-              map(function(p) {
-                return `get${foam.String.capitalize(p.name)}();`
-              }).join('\n')
+            body: 'super.beforeFreeze();\n' + 
+              properties.map(p => `get${foam.String.capitalize(p.name)}();`)
+                .join('\n')
           });
+        }
+
+        // If model doesn't explicitly extend anything, inject old AbstractFObject methods
+        if ( this.model_.extends === 'FObject' ) {
+          cls.field({
+            name: "x_",
+            visibility: 'private',
+            static: false,
+            final: false,
+            type: 'foam.core.X',
+            initializer: "foam.core.EmptyX.instance()"
+          });
+  
+          cls.method({
+            name: 'getX',
+            type: 'foam.core.X',
+            visibility: 'public',
+            body: 'return x_;'
+          });
+    
+          cls.method({
+            name: 'setX',
+            type: 'void',
+            visibility: 'public',
+            args: [
+              {
+                name: 'x',
+                type: 'foam.core.X'
+              }
+            ],
+            body: 'x_ = x;'
+          });
+  
+          // Generate Freeze
+          cls.field({
+            name: "freezer_",
+            visibility: 'protected',
+            static: false,
+            final: false,
+            type: 'foam.core.Freezer',
+            initializer: "new foam.core.Freezer()"
+          });
+  
+          cls.method({
+            name: 'freeze',
+            type: 'foam.core.FObject',
+            visibility: 'public',
+            body: `
+              beforeFreeze();
+              freeze(freezer_);
+              return this;
+            `
+          })
+  
+          cls.method({
+            name: 'isFrozen',
+            type: 'boolean',
+            visibility: 'public',
+            body: `
+              return isFrozen(freezer_);
+            `
+          })
+
+          // If model doesn't already implement FObject, implement it
+          if ( ! cls.implements )
+            cls.implements = [ 'foam.core.FObject' ];
+          else if ( ! ( cls.implements.includes('foam.core.FObject') || cls.implements.includes('foam.core.FObject') ) )
+            cls.implements.push('foam.core.FObject');
         }
       }
 

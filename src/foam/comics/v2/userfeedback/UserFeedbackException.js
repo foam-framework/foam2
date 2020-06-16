@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.comics.v2.userfeedback',
   name: 'UserFeedbackException',
+  javaExtends: 'java.lang.RuntimeException',
   implements: ['foam.core.Exception'],
   documentation: `
     In cases where the object is not returned to client user after a request,
