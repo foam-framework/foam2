@@ -50,7 +50,7 @@ foam.CLASS({
 
   .foam-u2-search-TextSearchView {
     text-align: center;
-    margin: 4px 0;
+    margin: 14px 0 0;
   }
 
   ^ .foam-u2-view-TreeViewRow-label {
@@ -94,7 +94,6 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
-
       this
       .addClass(this.myClass())
       .start()
@@ -124,8 +123,8 @@ foam.CLASS({
     },
 
     function openMenu(menu) {
-      if ( Object.keys(menu.handler.instance_).length > 0 ) {
-        this.pushMenu(menu.id);
+      if ( menu.handler ) {
+        this.pushMenu(menu);
         this.menuListener(menu);
       }
     }

@@ -18,7 +18,16 @@ foam.CLASS({
     {
       class: 'String',
       name: 'id',
-      documentation: 'Service provider name'
+      documentation: 'Service provider name',
+      validationPredicates: [
+        {
+          args: ['id'],
+          predicateFactory: function(e) {
+            return e.REG_EXP(foam.nanos.auth.ServiceProvider.ID, /^[a-z0-9]+$/);
+          },
+          errorString: 'Invalid character(s) in id.'
+        }
+      ]
     },
     {
       class: 'Boolean',

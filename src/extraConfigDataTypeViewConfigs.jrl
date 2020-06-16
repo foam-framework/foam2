@@ -1,0 +1,6 @@
+p({"class": "foam.nanos.extraconfig.DataTypeViewConfig", "id": "Array", "viewClass": "foam.u2.view.ChoiceView"})
+p({"class": "foam.nanos.extraconfig.DataTypeViewConfig", "id": "DAO", "viewClass": "foam.u2.view.ChoiceView"})
+p({"class": "foam.nanos.extraconfig.DataTypeViewConfig", "id": "String", "viewClass": "foam.u2.TextField"})
+p({"class": "foam.nanos.extraconfig.DataTypeViewConfig", "id": "Boolean", "viewClass": "foam.u2.CheckBox"})
+p({"class": "foam.nanos.extraconfig.DataTypeViewConfig", "id": "Integer", "viewClass": "foam.u2.TextField"})
+p({"class": "foam.nanos.extraconfig.DataTypeViewConfig", "id": "Float", "viewClass": "foam.u2.TextField"})

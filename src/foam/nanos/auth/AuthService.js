@@ -30,9 +30,9 @@ foam.INTERFACE({
   methods: [
     // TODO: Decide if we want to keep this method and if we do, document it.
     {
-      name: 'getCurrentUser',
+      name: 'getCurrentSubject',
       async: true,
-      type: 'foam.nanos.auth.User',
+      type: 'foam.nanos.auth.Subject',
       javaThrows: ['foam.nanos.auth.AuthenticationException'],
       swiftThrows: true,
       args: [
@@ -113,7 +113,7 @@ foam.INTERFACE({
     // parameter? Something like:
     //
     //   Boolean check(X x, String permission) {
-    //     User user = (User) x.get("user"); // Or use `getCurrentUser`
+    //     User user = (User) ((Subject)x.get("subject")).getUser(); // Or use `getCurrentUser`
     //     return check(x, user, permission);
     //   }
     //

@@ -26,9 +26,9 @@ foam.CLASS({
   ],
 
   imports: [
-    'localGroupDAO',
-    'localSessionDAO',
-    'localUserDAO'
+    'DAO localGroupDAO',
+    'DAO localSessionDAO',
+    'DAO localUserDAO'
   ],
 
   javaImports: [
@@ -67,27 +67,23 @@ foam.CLASS({
       javaCode: '// nothing here'
     },
     {
-      name: 'getCurrentUser',
+      name: 'getCurrentSubject',
       javaCode: `
         Session session = x.get(Session.class);
-
         // fetch context and check if not null or user id is 0
         if ( session == null || session.getUserId() == 0 ) {
           throw new AuthenticationException("Not logged in");
         }
-
         // get user from session id
         User user = (User) ((DAO) getLocalUserDAO()).find(session.getUserId());
-
         user.validateAuth(x);
-
         // check if group enabled
         Group group = getCurrentGroup(x);
         if ( group != null && ! group.getEnabled() ) {
           throw new AuthenticationException("Group disabled");
         }
-
-        return user;
+        Subject subject = (Subject) x.get("subject");
+        return subject;
       `
     },
     {

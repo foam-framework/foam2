@@ -23,6 +23,10 @@ foam.CLASS({
 //    'foam.nanos.auth.LastModifiedByAware'
   ],
 
+  requires: [
+    'foam.nanos.theme.ThemeGlyphs'
+  ],
+
   tableColumns: [
     'enabled',
     'name',
@@ -101,6 +105,21 @@ foam.CLASS({
       section: 'infoSection',
     },
     {
+      class: 'Image',
+      name: 'loginImage',
+      displayWidth: 60,
+      view: {
+        class: 'foam.u2.MultiView',
+        views: [
+          {
+            class: 'foam.u2.tag.TextArea',
+            rows: 4, cols: 80
+          },
+          { class: 'foam.u2.view.ImageView' },
+        ]
+      },
+    },
+    {
       name: 'domains',
       class: 'Array',
       of: 'String',
@@ -114,7 +133,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'navigationRootMenu',
-      documentation: 'Specifies the root menu to be used in top navigation settings drop-down.'
+      documentation: 'Specifies the root menu to be used in side navigation.'
     },
     {
       class: 'String',
@@ -183,6 +202,18 @@ foam.CLASS({
       name: 'logoBackgroundColour',
       documentation: 'The logo background colour to display in the application.',
       section: 'images'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.nanos.theme.ThemeGlyphs',
+      name: 'glyphs',
+      documentation: `
+        Glyphs are simple vectors which can be used as menu items
+        or indicators.
+      `.replace('\n',' ').trim(),
+      factory: function () {
+        return this.ThemeGlyphs.create();
+      }
     },
     {
       class: 'String',
@@ -442,7 +473,12 @@ foam.CLASS({
       name: 'supportAddress',
       factory: function() {
         return foam.nanos.auth.Address.create({});
-      },
+      }
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'personalSupportUser'
     }
   ],
 

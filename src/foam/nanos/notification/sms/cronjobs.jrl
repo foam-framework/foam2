@@ -1,0 +1,27 @@
+p({
+  "class":"foam.nanos.cron.Cron",
+  "enabled": false,
+  "scheduledTime": "2020-05-28T00:00.000Z",
+  "schedule": {"class":"foam.nanos.cron.CronSchedule","minute":0,"second":0},
+  "id": "Send sms messages",
+  "description": "Send sms messages stored in smsMessageDAO every minute through twilio service",
+  "code": """
+    import foam.dao.ArraySink;
+    import foam.nanos.notification.sms.SMSMessage;
+    import foam.nanos.notification.sms.SMSStatus;
+    import foam.mlang.MLang;
+
+    smsMessageDAO = x.get("localSmsMessageDAO");
+    smsService = x.get("smsService");
+
+    ArraySink sink = (ArraySink) smsMessageDAO.where(
+      MLang.EQ(SMSMessage.STATUS, SMSStatus.UNSENT)
+    ).select(new ArraySink());
+
+    for ( int i = 0; i < sink.getArray().size(); i++ ) {
+      SMSMessage sms = (SMSMessage) sink.getArray().get(i);
+      smsService.send(x, sms);
+    }
+    print("done");
+  """
+})

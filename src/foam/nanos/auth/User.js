@@ -115,8 +115,10 @@ foam.CLASS({
       includeInDigest: true
     },
     {
+      class: 'Reference',
+      of: 'foam.nanos.auth.ServiceProvider',
       name: 'spid',
-      class: 'String'
+      documentation: 'Service Provider Id of the user.'
     },
     {
       class: 'Boolean',
@@ -144,6 +146,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'firstName',
+      shortName: 'fn',
       documentation: 'The first name of the User.',
       gridColumns: 4,
       section: 'personal',
@@ -160,6 +163,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'lastName',
+      shortName: 'ln',
       documentation: 'The last name of the User.',
       gridColumns: 4,
       section: 'personal',
@@ -218,7 +222,10 @@ foam.CLASS({
     {
       class: 'EMail',
       name: 'email',
-      label: 'Email Address',
+      label: {
+        'en' :'Email Address',
+        'fr' :'Adresse e-mail'
+      },
       documentation: 'The email address of the User.',
       displayWidth: 80,
       width: 100,

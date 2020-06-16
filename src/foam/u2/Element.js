@@ -964,7 +964,10 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'focused'
+      name: 'focused',
+      postSet: function(o, n) {
+        if ( n ) this.onFocus();
+      }
     },
     {
       name: 'outerHTML',
@@ -994,6 +997,9 @@ foam.CLASS({
     },
     {
       name: '__subSubContext__',
+      documentation:
+        `Current subContext to use when creating children.
+        Defaults to __subContext__ unless in a nested startContext().`,
       factory: function() { return this.__subContext__; }
     },
     'keyMap_'
@@ -1181,7 +1187,6 @@ foam.CLASS({
 
     function focus() {
       this.focused = true;
-      this.onFocus();
       return this;
     },
 
@@ -2318,7 +2323,11 @@ foam.CLASS({
           if ( foam.Function.isInstance(value) ) {
             return foam.core.ExpressionSlot.create({
               obj$: data$,
-              code: value
+              // Disallow RW DisplayMode when in View Controller Mode
+              code: function() {
+                var ret = value.apply(this, arguments);
+                return controllerMode == foam.u2.ControllerMode.VIEW && ret == DisplayMode.RW ? DisplayMode.RO : ret;
+              }
             });
           }
 

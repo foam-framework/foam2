@@ -971,6 +971,7 @@ foam.CLASS({
 
   methods: [
     function buildJavaClass(cls) {
+      if ( this.javaType == 'null' ) return;
       cls.method({
         type: this.javaType,
         name: 'get' + foam.String.capitalize(this.name),
