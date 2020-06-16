@@ -13,7 +13,6 @@ import foam.util.SecurityUtil;
 
 import java.security.*;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +26,7 @@ public interface FObject
     }
     @Override
     public Object call(foam.core.X x, Object receiver, Object[] args){
-      ((AbstractFObject)receiver).append((java.lang.StringBuilder)(args[0]));
+      ((FObject)receiver).append((java.lang.StringBuilder)(args[0]));
       return null;}
   };
 
@@ -148,7 +147,7 @@ public interface FObject
     }
     @Override
     public Object call(foam.core.X x, Object receiver, Object[] args){
-      return     ((AbstractFObject)receiver).compareTo(args[0]);
+      return     ((FObject)receiver).compareTo(args[0]);
     }
   };
 
@@ -159,7 +158,7 @@ public interface FObject
     }
     @Override
     public Object call(foam.core.X x, Object receiver, Object[] args){
-      ((AbstractFObject)receiver).validate((foam.core.X)(args[0]));
+      ((FObject)receiver).validate((foam.core.X)(args[0]));
       return null;}
   };
 
@@ -171,7 +170,7 @@ public interface FObject
     @Override
     public Object call(foam.core.X x, Object receiver, Object[] args){
       try {
-        return     ((AbstractFObject)receiver).verify((byte[])(args[0]), (java.security.Signature)(args[1]));
+        return     ((FObject)receiver).verify((byte[])(args[0]), (java.security.Signature)(args[1]));
       }
       catch (Throwable t) {
         foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
@@ -188,7 +187,7 @@ public interface FObject
     }
     @Override
     public Object call(foam.core.X x, Object receiver, Object[] args){
-      ((AbstractFObject)receiver).beforeFreeze();
+      ((FObject)receiver).beforeFreeze();
       return null;}
   };
 
@@ -199,7 +198,7 @@ public interface FObject
     }
     @Override
     public Object call(foam.core.X x, Object receiver, Object[] args){
-      return     ((AbstractFObject)receiver).hash((java.security.MessageDigest)(args[0]));
+      return     ((FObject)receiver).hash((java.security.MessageDigest)(args[0]));
     }
   };
 
@@ -211,7 +210,7 @@ public interface FObject
     @Override
     public Object call(foam.core.X x, Object receiver, Object[] args){
       try {
-        return     ((AbstractFObject)receiver).sign((java.security.Signature)(args[0]));
+        return     ((FObject)receiver).sign((java.security.Signature)(args[0]));
       }
       catch (Throwable t) {
         foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
@@ -228,7 +227,7 @@ public interface FObject
     }
     @Override
     public Object call(foam.core.X x, Object receiver, Object[] args){
-      return     ((AbstractFObject)receiver).toJSON();
+      return ((FObject)receiver).toJSON();
     }
   };
 
