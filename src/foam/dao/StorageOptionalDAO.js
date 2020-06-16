@@ -9,11 +9,7 @@ foam.CLASS({
   name: 'StorageOptionalDAO',
   extends: 'foam.dao.ProxyDAO',
 
-<<<<<<< HEAD
   documentation: `Discard DAO updates which result in only storageOptional properties changes.`,
-=======
-  documentation: `Discard DAO updates which result in only storageOptional property changes.`,
->>>>>>> 255bb5517bc821058cdba09a993ca08c3024ed9f
 
   javaImports: [
     'foam.core.FObject',
