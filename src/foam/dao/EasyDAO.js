@@ -177,10 +177,6 @@ foam.CLASS({
           if(approvableAwareServiceNameIsSet_)
             delegateBuilder.setServiceName(getApprovableAwareServiceName());
 
-          if ( approvableAwareRelationshipNameIsSet_ ) {
-            delegateBuilder.setRelationshipName(getApprovableAwareRelationshipName());
-          }
-
           delegate = delegateBuilder.build();
 
           if ( getApprovableAwareEnabled() ) {

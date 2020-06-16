@@ -47,8 +47,11 @@ public class SyncAssemblyLine
       job.executeJob();
       if ( previous != null ) previous.waitToComplete();
       synchronized ( endLock_ ) {
-        job.endJob();
-        job.complete();
+        try {
+          job.endJob();
+        } finally {
+          job.complete();
+        }
       }
     } finally {
       // Isn't required, but helps GC last entry.
