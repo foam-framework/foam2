@@ -741,8 +741,18 @@ foam.LIB({
             // https://github.com/foam-framework/foam2/issues/613 is fixed.
             if ( c.PARSE_JSON ) return c.PARSE_JSON(json, opt_class, opt_ctx);
 
+            var pMap = c.model_.getPrivate_('axiomsByNameOrShortnameMap');
+
+            if ( ! pMap ) {
+              pMap = c.model_.setPrivate_('axiomsByNameOrShortnameMap', {});
+              c.getAxiomsByClass(foam.core.Property).forEach(function(p) {
+                pMap[p.name] = p;
+                if ( p.shortName ) pMap[p.shortName] = p;
+              });
+            }
+
             for ( var key in json ) {
-              var prop = c.getAxiomByName(key);
+              var prop = pMap[key];
               if ( prop ) {
                 var js = prop.fromJSON(json[key], opt_ctx, prop, this);
                 if ( js == null && json[key] != 'null' ) {
