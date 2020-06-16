@@ -137,7 +137,7 @@ foam.CLASS({
           }
           found.setConsensusCount(found.getConsensusCount() + 1);
           entry = (MedusaEntry) getDelegate().put_(x, found);
-          if ( entry.getConsensusCount() >= support.getNodeQuorum(x) ) {
+          if ( entry.getConsensusCount() >= support.getNodeQuorum() ) {
             if ( entry.getIndex() == getIndex() + 1 ) {
               promote(x, entry);
             } else {
@@ -176,8 +176,8 @@ foam.CLASS({
       }
 
       // if no replay data, then replay complete.
-      getLogger().debug("cmd", "replayNodes", getReplayNodes().size(), "node quorum", support.getNodeQuorum(x), "replayIndex", getReplayIndex(), "index", getIndex());
-      if ( getReplayNodes().size() >= support.getNodeQuorum(x) &&
+      getLogger().debug("cmd", "replayNodes", getReplayNodes().size(), "node quorum", support.getNodeQuorum(), "replayIndex", getReplayIndex(), "index", getIndex());
+      if ( getReplayNodes().size() >= support.getNodeQuorum() &&
            getReplayIndex() <= getIndex() ) {
         getLogger().debug("cmd", "replayComplete");
         replayComplete(x);
@@ -263,7 +263,7 @@ foam.CLASS({
             .where(
               AND(
                 EQ(MedusaEntry.INDEX, getIndex() + 1),
-                GTE(MedusaEntry.CONSENSUS_COUNT, support.getNodeQuorum(x))
+                GTE(MedusaEntry.CONSENSUS_COUNT, support.getNodeQuorum())
               ))
             .limit(1)
             .select(new ArraySink())).getArray();

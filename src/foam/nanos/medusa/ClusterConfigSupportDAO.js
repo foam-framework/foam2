@@ -44,10 +44,12 @@ foam.CLASS({
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
 
       // new entry
-      if ( old == null ) {
+      if ( old == null ||
+           old.getEnabled() != nu.getEnabled() ||
+           old.getStatus() != nu.getStatus() ) {
         ClusterConfigSupport.NODE_COUNT.clear(support);
         ClusterConfigSupport.NODE_GROUPS.clear(support);
-//        ClusterConfigSupport.NODE_QUORUM.clear(support);
+        ClusterConfigSupport.NODE_QUORUM.clear(support);
         ClusterConfigSupport.MEDIATOR_COUNT.clear(support);
         ClusterConfigSupport.STAND_ALONE.clear(support);
         ClusterConfigSupport.CLIENTS.clear(support);

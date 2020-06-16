@@ -11,7 +11,6 @@ import foam.core.FObject;
 import foam.core.ContextAware;
 import foam.box.Box;
 import foam.box.Message;
-import foam.lib.json.Outputter;
 import foam.lib.json.JSONParser;
 
 import java.net.Socket;
@@ -80,6 +79,23 @@ public class ConnectionBox
     return x_;
   }
 
+  protected static final ThreadLocal<foam.lib.formatter.FObjectFormatter> formatter_ = new ThreadLocal<foam.lib.formatter.FObjectFormatter>() {
+      @Override
+      protected foam.lib.formatter.JSONFObjectFormatter initialValue() {
+        foam.lib.formatter.JSONFObjectFormatter formatter = new foam.lib.formatter.JSONFObjectFormatter();
+        formatter.setQuoteKeys(true);
+        formatter.setPropertyPredicate(new foam.lib.AndPropertyPredicate(new foam.lib.PropertyPredicate[] {new foam.lib.NetworkPropertyPredicate(), new foam.lib.PermissionedPropertyPredicate()}));
+        return formatter;
+      }
+
+      @Override
+      public foam.lib.formatter.FObjectFormatter get() {
+        foam.lib.formatter.FObjectFormatter formatter = super.get();
+        formatter.reset();
+        return formatter;
+      }
+    };
+
   @Override
   public void run()
   {
@@ -112,8 +128,10 @@ public class ConnectionBox
 
     msg.getAttributes().put("replyBox", new SocketReplyBox());
     try {
-      Outputter outputter = new Outputter(getX()).setPropertyPredicate(new foam.lib.NetworkPropertyPredicate());
-      String message = outputter.stringify(msg);
+      foam.lib.formatter.FObjectFormatter formatter = formatter_.get();
+      formatter.setX(getX());
+      formatter.output(msg);
+      String message = formatter.builder().toString();
       byte[] messageBytes = message.getBytes(StandardCharsets.UTF_8);
       int messageSize = messageBytes.length;
       ByteBuffer requestBuffer = ByteBuffer.allocate(4+messageSize);

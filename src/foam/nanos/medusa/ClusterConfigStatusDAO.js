@@ -12,8 +12,15 @@ foam.CLASS({
   documentation: `Monitor the ClusterConfig status and call election when quorum changes`,
 
   javaImports: [
+    'foam.dao.ArraySink',
+    'foam.dao.DAO',
+    'static foam.mlang.MLang.*',
     'foam.nanos.logger.PrefixLogger',
-    'foam.nanos.logger.Logger'
+    'foam.nanos.logger.Logger',
+    'java.util.ArrayList',
+    'java.util.List',
+    'java.util.HashMap',
+    'java.util.Map'
   ],
 
   properties: [
@@ -54,27 +61,69 @@ foam.CLASS({
           support.setStatus(nu.getStatus());
         }
 
-        ElectoralService electoralService = (ElectoralService) x.get("electoralService");
-        if ( electoralService != null ) {
-          ClusterConfig config = support.getConfig(x, support.getConfigId());
-          if ( support.canVote(x, nu) &&
-               support.canVote(x, config) ) {
-            Boolean hasQuorum = support.hasQuorum(x);
-            if ( electoralService.getState() == ElectoralServiceState.IN_SESSION ||
-                 electoralService.getState() == ElectoralServiceState.ADJOURNED) {
-              if ( hadQuorum && ! hasQuorum) {
-                getLogger().warning(this.getClass().getSimpleName(), "mediator quorum lost");
-              } else if ( ! hadQuorum && hasQuorum) {
-                getLogger().warning(this.getClass().getSimpleName(), "mediator quorum acquired");
-              } else {
-                getLogger().info(this.getClass().getSimpleName(), "mediator quorum membership change");
+        if ( nu.getType() == MedusaType.MEDIATOR ) {
+          ElectoralService electoralService = (ElectoralService) x.get("electoralService");
+          if ( electoralService != null ) {
+            ClusterConfig config = support.getConfig(x, support.getConfigId());
+            if ( support.canVote(x, nu) &&
+                 support.canVote(x, config) ) {
+              Boolean hasQuorum = support.hasQuorum(x);
+              if ( electoralService.getState() == ElectoralServiceState.IN_SESSION ||
+                   electoralService.getState() == ElectoralServiceState.ADJOURNED) {
+                if ( hadQuorum && ! hasQuorum) {
+                  getLogger().warning(this.getClass().getSimpleName(), "mediator quorum lost");
+                } else if ( ! hadQuorum && hasQuorum) {
+                  getLogger().warning(this.getClass().getSimpleName(), "mediator quorum acquired");
+                } else {
+                  getLogger().info(this.getClass().getSimpleName(), "mediator quorum membership change");
+                }
+                electoralService.dissolve(x);
               }
-              electoralService.dissolve(x);
             }
           }
+        } else if ( nu.getType() == MedusaType.NODE ) {
+          // rebucket nodes.
         }
       }
       return nu;
+      `
+    },
+    {
+      documentation: 'Assign nodes to buckets.',
+      name: 'bucketNodes',
+      synchronized: true,
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      javaCode: `
+      getLogger().debug("bucketNodes");
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      int groups = support.getNodeGroups();
+      List nodes = ((ArraySink)((DAO) getX().get("localClusterConfigDAO"))
+        .where(
+          AND(
+            EQ(ClusterConfig.ZONE, 0),
+            EQ(ClusterConfig.TYPE, MedusaType.NODE),
+            EQ(ClusterConfig.ENABLED, true),
+            EQ(ClusterConfig.STATUS, Status.ONLINE)
+          ))
+        .select(new ArraySink())).getArray();
+      Map<Integer, List> buckets = new HashMap();
+      for ( int i = 0; i < nodes.size(); i++ ) {
+        ClusterConfig node = (ClusterConfig) nodes.get(i);
+        int index = i % groups;
+        List bucket = (List) buckets.get(index);
+        if ( bucket == null ) {
+          bucket = new ArrayList<String>();
+          buckets.put(index, bucket);
+        }
+        bucket.add(node);
+        getLogger().debug("bucketNodes", "bucket", index, "node", node.getId());
+      }
+      support.setNodeBuckets(buckets);
       `
     }
   ]

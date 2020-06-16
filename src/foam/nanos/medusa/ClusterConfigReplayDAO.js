@@ -79,7 +79,7 @@ foam.CLASS({
             }
             // NOTE: using internalMedusaDAO else we'll block on ReplayingDAO.
             DAO dao = (DAO) getX().get("internalMedusaDAO");
-            dao = dao.where(GTE(MedusaEntry.CONSENSUS_COUNT, support.getNodeQuorum(x)));
+            dao = dao.where(GTE(MedusaEntry.CONSENSUS_COUNT, support.getNodeQuorum()));
             // REVIEW: not sure we want our own max, could have wholes.
             Max max = (Max) dao.select(MAX(MedusaEntry.INDEX));
 

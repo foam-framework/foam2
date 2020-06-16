@@ -1,0 +1,16 @@
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "SocketMgr",
+  "lazy": false,
+  "service": {
+    "class": "foam.box.network.TCPSocketMgr",
+  }
+})
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "tcp",
+  "lazy": false,
+  "service": {
+    "class": "foam.box.network.SocketServer"
+  }
+}

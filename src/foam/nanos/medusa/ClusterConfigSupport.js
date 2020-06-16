@@ -155,18 +155,26 @@ configuration for contacting the primary node.`,
       `
     },
     {
-      documentation: 'Node writes are split across node groups of size minNodeQuorumSize+1.',
-      name: 'minNodeQuorumSize',
+      documentation: 'Enable and Online nodes in each bucket to achieve quorum',
+      name: 'nodeQuorum',
       class: 'Int',
-      value: 1
+      value: 2
+    },
+    {
+      documentation: 'Additional node redundancy in each bucket.',
+      name: 'nodeRedundancy',
+      class: 'Int',
+      value: 0,
     },
     {
       name: 'nodeGroups',
       class: 'Int',
+      expression: function(nodeQuorum, nodeRedundancy) {
+        return this.nodeCount / (nodeQuorum + nodeRedundancy);
+      },
       javaFactory: `
-      return getNodeCount() / getMinNodeQuorumSize() + 1;
-     `,
-      visibility: 'RO'
+      return getNodeCount() / (getNodeQuorum() + getNodeRedundancy());
+      `
     },
     {
       documentation: 'see ClusterConfigSupportDAO',
@@ -184,6 +192,14 @@ configuration for contacting the primary node.`,
         .select(COUNT());
       return ((Long)count.getValue()).intValue();
       `
+    },
+    {
+      name: 'nodeBuckets',
+      class: 'Map',
+      javaFactory: `
+      return new HashMap();
+     `,
+      visibility: 'HIDDEN'
     },
 //     {
 //       name: 'nodeQuorum',
@@ -222,19 +238,19 @@ configuration for contacting the primary node.`,
   ],
 
   methods: [
-    {
-      name: 'getNodeQuorum',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        }
-      ],
-      type: 'Integer',
-      javaCode: `
-      return getNodeCount() / 2 + 1;
-      `
-    },
+    // {
+    //   name: 'getNodeQuorum',
+    //   args: [
+    //     {
+    //       name: 'x',
+    //       type: 'Context'
+    //     }
+    //   ],
+    //   type: 'Integer',
+    //   javaCode: `
+    //   return getNodeCount() / 2 + 1;
+    //   `
+    // },
     {
       name: 'buildURL',
       type: 'String',
@@ -526,6 +542,9 @@ configuration for contacting the primary node.`,
       `
     },
     {
+      /**
+         each bucket must have at least nodeQuorum enabled/onlined nodes.
+       */
       documentation: 'Are at least half+1 of the expected nodes online?',
       name: 'hasNodeQuorum',
       args: [
@@ -545,7 +564,7 @@ configuration for contacting the primary node.`,
             EQ(ClusterConfig.ENABLED, true)
           ))
         .select(COUNT());
-      return ((Long)count.getValue()).intValue() >= getNodeQuorum(x);
+      return ((Long)count.getValue()).intValue() >= getNodeQuorum();
       `
     },
     {
@@ -592,14 +611,11 @@ configuration for contacting the primary node.`,
           .setDelegate(new PMBox.Builder(x)
             .setClassType(ClientDAO.getOwnClassInfo())
             .setName(id)
-//            .setDelegate(new OMBox.Builder(x)
-//              .setName(id)
               .setDelegate(new ClusterHTTPBox.Builder(x)
                 .setAuthorizationType(foam.box.HTTPAuthorizationType.BEARER)
                 .setSessionID(sendClusterConfig.getSessionId())
                 .setUrl(buildURL(x, serviceName, null, null, receiveClusterConfig))
                 .build())
-//              .build())
             .build())
           .build())
         .build();
