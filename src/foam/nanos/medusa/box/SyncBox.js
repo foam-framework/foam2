@@ -25,7 +25,7 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-            private AtomicLong nextBoxId_ = new AtomicLong(0);
+            private static AtomicLong nextBoxId_ = new AtomicLong(0);
           `
         }));
       }

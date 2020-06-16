@@ -44,7 +44,8 @@ configuration for contacting the primary node.`,
     'java.util.ArrayList',
     'java.util.HashMap',
     'java.util.List',
-    'java.util.Map'
+    'java.util.Map',
+    'foam.nanos.medusa.box.SyncBox'
   ],
 
   properties: [
@@ -368,7 +369,10 @@ configuration for contacting the primary node.`,
       ],
       javaCode: `
         if ( usingTCP == true ) {
-          return getSocketClientBox(x, serviceName, sendClusterConfig, receiveClusterConfig);
+          return new SyncBox.Builder(x)
+                  .setDelegate(
+                    getSocketClientBox(x, serviceName, sendClusterConfig, receiveClusterConfig)
+                  ).build();
         } else {
           return new ClusterHTTPBox.Builder(x)
                   .setAuthorizationType(foam.box.HTTPAuthorizationType.BEARER)
@@ -686,7 +690,7 @@ configuration for contacting the primary node.`,
           .setDelegate(new PMBox.Builder(x)
             .setClassType(ClientDAO.getOwnClassInfo())
             .setName(id)
-              .setDelegate(getTransportlayerBox(x, serviceName, sendClusterConfig, receiveClusterConfig, false))
+              .setDelegate(getTransportlayerBox(x, serviceName, sendClusterConfig, receiveClusterConfig, true))
             .build())
           .build())
         .build();
