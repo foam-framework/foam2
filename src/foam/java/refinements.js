@@ -505,19 +505,8 @@ foam.LIB({
       // javaExtends - extends only for java
       // TODO Generate getX() setX() ... for classes with no extends
       if ( this.model_.name !== 'AbstractFObject' ) {
-
-          // console.log(cls.methods);
-          // cls.method({
-          //   name: 'toString',
-          //   type: 'String',
-          //   visibility: 'public',
-          //   body: `
-          //     StringBuilder sb = new StringBuilder();
-          //     append(sb);
-          //     return sb.toString();
-          //   `
-          // })
-        cls.extends = 'foam.core.AbstractFObject';
+          cls.extends = this.model_.extends === 'FObject' ?
+            'foam.core.AbstractFObject' : this.model_.extends;
       } else {
         // if AbstractFObject we implement FObject
         cls.implements = [ 'foam.core.FObject' ];
@@ -641,6 +630,54 @@ foam.LIB({
               return isFrozen(freezer_);
             `
           })
+
+          // Generate Extras if they don't exist in the model
+          if ( cls.name == "UserFeedbackException" ) {
+            console.log("NPTAG", cls.methods);
+          }
+
+          if ( ! cls.methods.reduce((acc, method) => acc || method.instance_.name == 'toString'), false ) {
+            cls.method({
+              name: 'toString',
+              type: 'String',
+              visibility: 'public',
+              body: `
+                StringBuilder sb = new StringBuilder();
+                append(sb);
+                return sb.toString();
+              `
+            });
+          }
+
+          if ( ! cls.methods.reduce((acc, method) => acc || method.instance_.name == 'hashCode'), false ) {
+            cls.method({
+              name: 'hashCode',
+              type: 'Integer',
+              body: `
+                int hashCode = 1;
+                List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
+                Iterator i = props.iterator();
+        
+                while ( i.hasNext() ) {
+                  PropertyInfo pi = (PropertyInfo) i.next();
+                  hashCode = 31 * hashCode + java.util.Objects.hash(pi.get(this));
+                }
+        
+                return hashCode;
+              `
+            });
+          }
+
+          if ( ! cls.methods.reduce((acc, method) => acc || method.instance_.name == 'equals'), false ) {
+            cls.method({
+              name: 'equals',
+              type: 'Boolean',
+              args: [ { name: 'o', type: 'Any' } ],
+              javaCode: `
+                return compareTo(o) == 0;
+              `
+            });
+          }
 
           // If model doesn't already implement FObject, implement it
           if ( ! cls.implements )
