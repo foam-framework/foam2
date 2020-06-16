@@ -386,6 +386,8 @@ var classes = [
   'foam.nanos.medusa.RetryClientSinkDAO',
   'foam.nanos.medusa.Status',
   'foam.nanos.medusa.MedusaMessage',
+  'foam.nanos.medusa.box.SyncBox',
+  'foam.nanos.medusa.box.SyncReplyBox',
   'foam.box.BackoffBox',
 
   'foam.comics.v2.EnabledActionsAuth',
