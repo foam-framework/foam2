@@ -2709,16 +2709,13 @@ foam.CLASS({
         return projectionString;
       },
       javaCode: `
-        StringBuilder sb = new StringBuilder(getClassInfo().getId() + "(");
-        StringJoiner joiner = new StringJoiner(", ");
+        StringJoiner joiner = new StringJoiner(", ", getClassInfo().getId() + "(", ")");
 
         for ( Expr expr : getExprs() ) {
           joiner.add(expr.toString());
         }
 
-        sb.append(joiner.toString());
-        sb.append(")");
-        return sb.toString();
+        return joiner.toString();
       `
     }
   ]
