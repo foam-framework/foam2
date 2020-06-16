@@ -46,6 +46,8 @@ foam.CLASS({
       // new entry
       if ( old == null ) {
         ClusterConfigSupport.NODE_COUNT.clear(support);
+        ClusterConfigSupport.NODE_GROUPS.clear(support);
+//        ClusterConfigSupport.NODE_QUORUM.clear(support);
         ClusterConfigSupport.MEDIATOR_COUNT.clear(support);
         ClusterConfigSupport.STAND_ALONE.clear(support);
         ClusterConfigSupport.CLIENTS.clear(support);

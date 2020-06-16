@@ -155,6 +155,20 @@ configuration for contacting the primary node.`,
       `
     },
     {
+      documentation: 'Node writes are split across node groups of size minNodeQuorumSize+1.',
+      name: 'minNodeQuorumSize',
+      class: 'Int',
+      value: 1
+    },
+    {
+      name: 'nodeGroups',
+      class: 'Int',
+      javaFactory: `
+      return getNodeCount() / getMinNodeQuorumSize() + 1;
+     `,
+      visibility: 'RO'
+    },
+    {
       documentation: 'see ClusterConfigSupportDAO',
       name: 'nodeCount',
       class: 'Int',
@@ -171,6 +185,14 @@ configuration for contacting the primary node.`,
       return ((Long)count.getValue()).intValue();
       `
     },
+//     {
+//       name: 'nodeQuorum',
+//       class: 'Int',
+//       javaFactory: `
+//       return getMinNodeQuorumSize() + 1;
+// //      return getNodeCount() / 2 + 1;
+//       `
+//     },
     {
       documentation: 'A single instance is using the medusa journal. No other clustering features are used.',
       name: 'standAlone',
@@ -200,6 +222,19 @@ configuration for contacting the primary node.`,
   ],
 
   methods: [
+    {
+      name: 'getNodeQuorum',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      type: 'Integer',
+      javaCode: `
+      return getNodeCount() / 2 + 1;
+      `
+    },
     {
       name: 'buildURL',
       type: 'String',
@@ -488,19 +523,6 @@ configuration for contacting the primary node.`,
       type: 'Boolean',
       javaCode: `
       return getVoters(x).size() >= getMediatorQuorum(x);
-      `
-    },
-    {
-      name: 'getNodeQuorum',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        }
-      ],
-      type: 'Integer',
-      javaCode: `
-      return getNodeCount() / 2 + 1;
       `
     },
     {

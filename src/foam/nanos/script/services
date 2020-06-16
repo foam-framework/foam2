@@ -29,7 +29,7 @@ p({
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.script.ScriptEvent.getOwnClassInfo())
       .setMdao(mdao)
-      .setInnerDAO(new foam.dao.java.JDAO(x, mdao, "scriptEvents", true /*read-only*/))
+      .setInnerDAO(new foam.dao.java.JDAO(x, mdao, "scriptEvents", true))
       .setGuid(true)
       .setFixedSize(new foam.dao.FixedSizeDAO.Builder(x)
         .setComparator(foam.mlang.MLang.DESC(foam.nanos.script.ScriptEvent.LAST_RUN))
@@ -42,10 +42,3 @@ p({
   """,
   "client":"{\"of\":\"foam.nanos.script.ScriptEvent\"}"
 })
-/*
-      .setDecorator(new foam.nanos.script.ScriptEventDAO.Builder(x)
-        .setDelegate(new foam.dao.GUIDDAO.Builder(x)
-        .setDelegate(new foam.dao.NullDAO(x, foam.nanos.script.ScriptEvent.getOwnClassInfo()))
-        .build())
-        .build())
-*/

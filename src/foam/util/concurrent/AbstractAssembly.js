@@ -98,7 +98,7 @@ foam.CLASS({
       javaCode: `
          while ( ! getIsCompleted() ) {
            try {
-             wait();
+             wait(1000);
            } catch (InterruptedException e) {
              // NOP
              Thread.currentThread().interrupt();

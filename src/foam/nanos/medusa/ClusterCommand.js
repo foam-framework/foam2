@@ -52,6 +52,10 @@ foam.CLASS({
     {
       name: 'hops',
       class: 'Array'
+    },
+    {
+      name: 'exception',
+      class: 'Object'
     }
   ],
 

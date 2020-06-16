@@ -99,9 +99,7 @@ foam.CLASS({
         getLogger().debug("cmd", "ClusterCommand");
 
         cmd.addHop(x);
-        ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
-        ClusterConfig serverConfig = support.getNextServerConfig(getX());
-        return support.getClientDAO(x, getServiceName(), getConfig(), serverConfig).cmd_(x, cmd);
+        return submit(x, DOP.CMD, cmd);
       }
       return getDelegate().cmd_(x, obj);
       `
@@ -128,7 +126,12 @@ foam.CLASS({
 
      // REVIEW: set context to null after init so it's not marshalled across network. Periodically have contexts being marshalled
       ((ContextAware) obj).setX(null);
-      ClusterCommand cmd = new ClusterCommand(x, getNSpec().getName(), dop, obj);
+      ClusterCommand cmd = null;
+      if ( obj instanceof ClusterCommand ) {
+        cmd = (ClusterCommand) obj;
+      } else {
+        cmd = new ClusterCommand(x, getNSpec().getName(), dop, obj);
+      }
       cmd.setX(null);
 
       int retryDelay = 10;
@@ -136,12 +139,36 @@ foam.CLASS({
         try {
           ClusterConfig serverConfig = support.getNextServerConfig(getX());
           DAO dao = support.getClientDAO(getX(), getServiceName(), getConfig(), serverConfig);
-          getLogger().debug("submit", "dao", dao.getClass().getSimpleName(), dop.getLabel(), obj.getClass().getSimpleName(), obj.getProperty("id"), "request");
-          cmd = (ClusterCommand) dao.cmd_(x, cmd);
-          FObject data = cmd.getData();
-          getLogger().debug("submit", "dao", dao.getClass().getSimpleName(), dop.getLabel(), data.getClass().getSimpleName(), data.getProperty("id"), "response");
+          getLogger().debug("submit", "request", "dao", dao.getClass().getSimpleName(), dop.getLabel(), obj.getClass().getSimpleName(), obj.getProperty("id"));
+
+          FObject data = null;
+          Object result = null;
+          if ( DOP.PUT == cmd.getDop() ) {
+            result = dao.put_(x, cmd);
+          } else if ( DOP.REMOVE == cmd.getDop() ) {
+            result = dao.remove_(x, cmd);
+          } else if ( DOP.CMD == cmd.getDop() ) {
+            result = dao.cmd_(x, cmd);
+            cmd = (ClusterCommand) dao.cmd_(x, cmd);
+            data = cmd.getData();
+          }
+          if ( result != null ) {
+            if ( result instanceof FObject ) {
+              data = (FObject) result;
+            } else if ( result instanceof ClusterCommand ) {
+              data = ((ClusterCommand) result).getData();
+            }
+            getLogger().debug("submit", "response", "dao", dao.getClass().getSimpleName(), dop.getLabel(), data.getClass().getSimpleName(), data.getProperty("id"));
+          } else {
+            getLogger().debug("submit", "response", "dao", dao.getClass().getSimpleName(), dop.getLabel(), "null");
+
+          }
+
           return data;
         } catch ( ClusterException e ) {
+          getLogger().debug("submit", e.getMessage());
+          throw e;
+        } catch ( RuntimeException e ) {
           getLogger().debug("submit", e.getMessage());
           throw e;
         } catch ( Throwable t ) {
@@ -170,6 +197,24 @@ foam.CLASS({
           }
         }
       }
+      `
+    },
+    {
+      name: 'find_',
+      javaCode: `
+      throw new ClusterException("Unsupported operation: "+DOP.FIND.getLabel(), new UnsupportedOperationException(DOP.FIND.getLabel()));
+      `
+    },
+    {
+      name: 'select_',
+      javaCode: `
+      throw new ClusterException("Unsupported operation: "+DOP.SELECT.getLabel(), new UnsupportedOperationException(DOP.SELECT.getLabel()));
+      `
+    },
+    {
+      name: 'removeAll_',
+      javaCode: `
+      throw new ClusterException("Unsupported operation: "+DOP.REMOVE_ALL.getLabel(), new UnsupportedOperationException(DOP.REMOVE_ALL.getLabel()));
       `
     },
   ]
