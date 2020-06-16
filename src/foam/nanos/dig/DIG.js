@@ -9,13 +9,14 @@ foam.CLASS({
   name: 'DIG',
   extends: 'foam.nanos.http.DefaultHttpParameters',
 
-  implements: [ 'foam.mlang.Expressions' ],
-
   documentation: 'Data Integration Gateway - Perform DAO operations against a web service',
 
   requires: [
-    'foam.nanos.extraconfig.AddOn',
     'foam.net.web.HTTPRequest'
+  ],
+
+  implements: [
+    'foam.mlang.Expressions',
   ],
 
   tableColumns: [
@@ -189,26 +190,6 @@ foam.CLASS({
       value: 'No Request Sent Yet.',
       view: { class: 'foam.nanos.dig.ResultView' },
       visibility: 'RO'
-    },
-    {
-      name: 'exportConfigArray',
-      value: [],
-      hidden: true
-    },
-    {
-      name: 'exportConfigAddOns',
-      factory: function() {
-        this.__context__.extraConfigAddOnDAO.where(this.CONTAINS_IC(this.AddOn.CONFIG_FOR_CLASS, this.cls_.id)).select().then((v) => {
-          this.exportConfigAddOns = v.array;
-        });
-        return [];
-      },
-      view: function(_, X) {
-        var view  = foam.nanos.extraconfig.ConfigView.create();
-        view.exportConfigArray$  = X.data.exportConfigArray$;
-        view.exportConfigAddOns$ = X.data.exportConfigAddOns$;
-        return view;
-      }
     }
   ],
 

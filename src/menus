@@ -122,8 +122,6 @@ p({
   },
   "parent":"admin"
 })
-p({"class":"foam.nanos.menu.Menu","id":"admin.extraConfigType","label":"Extra Config Types","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"extraConfigDataTypeViewConfigDAO"},"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.extraConfigAddOns","label":"Extra Config Add Ons","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"extraConfigAddOnDAO"},"parent":"admin"})
 p({
   "class":"foam.nanos.menu.Menu",
   "id":"admin.googleApiCredentials",
