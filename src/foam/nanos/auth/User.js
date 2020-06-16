@@ -646,6 +646,8 @@ foam.CLASS({
     {
       name: 'doNotify',
       javaCode: `
+        Thread.dumpStack();
+        System.out.println("doNotify method is triggered");
         // Get the default settings for the user if none are already defined
         List<NotificationSetting> settingDefaults = ((ArraySink) ((DAO) x.get("notificationSettingDefaultsDAO")).select(new ArraySink())).getArray();
         HashMap<String, NotificationSetting> settingsMap = new HashMap<String, NotificationSetting>();
