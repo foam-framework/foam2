@@ -670,6 +670,7 @@ FOAM_FILES([
   { name: "foam/lib/PropertyPredicate" },
   { name: "foam/lib/PermissionedPropertyPredicate" },
   { name: "foam/lib/NetworkPropertyPredicate" },
+  { name: "foam/lib/StorageOptionalPropertyPredicate" },
   { name: "foam/lib/StoragePropertyPredicate" },
   { name: "foam/lib/AndPropertyPredicate" },
   { name: "foam/lib/json/OutputterMode" },

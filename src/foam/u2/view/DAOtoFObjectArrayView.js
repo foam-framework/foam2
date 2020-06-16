@@ -18,6 +18,12 @@ foam.CLASS({
 
   exports: [ 'stack' ],
 
+  css: `
+    ^ .foam-u2-stack-StackView {
+      height: auto;
+    }
+  `,
+
   properties: [
     {
       name: 'stack',
@@ -51,7 +57,7 @@ foam.CLASS({
 
       // I'm not sure why we need to add a Stack. Shouldn't InlineBrowserView
       // do that itself? -- KGR
-      this.tag(this.STACK);
+      this.addClass(this.myClass()).tag(this.STACK);
 
       this.stack.push({class: 'foam.comics.InlineBrowserView', data: this.dao }, this);
     }
