@@ -14,13 +14,13 @@ foam.INTERFACE({
     {
       name: 'exportFObject',
       type: 'String',
-      args: ['X', 'obj', 'config'],
+      args: ['X', 'obj'],
       documentation: 'Exports an FObject'
     },
     {
       name: 'exportDAO',
       type: 'Promise',
-      args: ['X', 'dao', 'config'],
+      args: ['X', 'dao'],
       documentation: 'Exports data in a DAO'
     }
   ]

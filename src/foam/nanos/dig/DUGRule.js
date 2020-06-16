@@ -15,9 +15,9 @@ foam.CLASS({
 
   tableColumns: [
     'name',
-    'format',
+    'url',
     'daoKey',
-    'url'
+    'format'
   ],
 
   searchColumns: [
@@ -26,6 +26,21 @@ foam.CLASS({
     'enabled',
     'daoKey',
     'operation',
+  ],
+
+  sections: [
+    {
+      name: 'basicInfo',
+      permissionRequired: true
+    },
+    {
+      name: '_defaultSection',
+      permissionRequired: true
+    },
+    {
+      name: 'dugInfo',
+      order: 10
+    }
   ],
 
   properties: [
@@ -40,12 +55,32 @@ foam.CLASS({
     {
       class: 'String',
       name: 'name',
-      section: 'basicInfo'
+      section: 'dugInfo',
+      tableWidth: 250
     },
     {
       name: 'daoKey',
       label: 'DAO',
-      section: 'basicInfo'
+      section: 'dugInfo',
+      tableWidth: 150,
+      view: function(_, X) {
+        var E = foam.mlang.Expressions.create();
+        return {
+          class: 'foam.u2.view.RichChoiceView',
+          search: true,
+          sections: [
+            {
+              heading: 'DAO',
+              dao: X.AuthenticatedNSpecDAO
+                .where(E.AND(
+                  E.EQ(foam.nanos.boot.NSpec.SERVE, true),
+                  E.ENDS_WITH(foam.nanos.boot.NSpec.ID, 'DAO')
+                ))
+                .orderBy(foam.nanos.boot.NSpec.ID)
+            }
+          ]
+        };
+      }
     },
     {
       name: 'ruleGroup',
@@ -60,25 +95,25 @@ foam.CLASS({
       class: 'URL',
       name: 'url',
       label: 'URL',
-      section: 'basicInfo'
+      section: 'dugInfo'
     },
     {
       class: 'String',
       name: 'bearerToken',
-      section: 'basicInfo'
+      section: 'dugInfo'
     },
     {
       class: 'foam.core.Enum',
       of: 'foam.nanos.http.Format',
       name: 'format',
       value: foam.nanos.http.Format.JSON,
-      required: true,
-      section: 'basicInfo',
+      tableWidth: 100,
+      section: 'dugInfo',
       view: {
         class: 'foam.u2.view.ChoiceView',
         choices: [
-          [2, 'JSON'],
-          [4, 'XML'],
+          ['JSON', 'JSON'],
+          ['XML', 'XML'],
         ],
         placeholder: '--',
       },
@@ -96,7 +131,7 @@ foam.CLASS({
     },
     {
       name: 'asyncAction',
-      section: 'basicInfo',
+      section: 'dugInfo',
       view: { class: 'foam.u2.tag.TextArea' },
       javaGetter: `
         DUGRuleAction action = new DUGRuleAction();
@@ -131,6 +166,18 @@ foam.CLASS({
       name: 'operation',
       hidden: true,
       value: 'CREATE_OR_UPDATE'
+    },
+    {
+      name: 'debug',
+      hidden: true
+    },
+    {
+      name: 'lifecycleState',
+      hidden: true
+    },
+    {
+      name: 'createdByAgent',
+      hidden: true
     }
   ],
 

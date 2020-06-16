@@ -174,10 +174,6 @@ FOAM_FILES([
   { name: "foam/nanos/export/ClientGoogleSheetsExportService" },
   { name: "foam/nanos/export/ExportDriverRegistry" },
   { name: "foam/nanos/export/ExportDriver" },
-  { name: "foam/nanos/extraconfig/AddOn" },
-  { name: "foam/nanos/extraconfig/Config" },
-  { name: "foam/nanos/extraconfig/ConfigView" },
-  { name: "foam/nanos/extraconfig/DataTypeViewConfig" },
   { name: "foam/nanos/export/GoogleApiAuthService" },
   { name: "foam/nanos/export/GoogleApiCredentials" },
   { name: "foam/nanos/export/GoogleDriveService" },
@@ -340,6 +336,7 @@ FOAM_FILES([
   { name: 'foam/nanos/approval/ApprovableApprovalRequestsRule' },
   { name: 'foam/nanos/approval/FulfilledApprovablePredicate' },
   { name: 'foam/nanos/approval/FulfilledApprovableRule' },
+  { name: 'foam/nanos/approval/PopulateApprovalRequestsDAO' },
 
   //authservice
   { name: "foam/nanos/auth/CapabilityAuthService" },
