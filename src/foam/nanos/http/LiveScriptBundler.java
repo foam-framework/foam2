@@ -6,7 +6,6 @@
 
 package foam.nanos.http;
 
-import com.sun.nio.file.SensitivityWatchEventModifier;
 import foam.core.ContextAware;
 import foam.core.X;
 import foam.nanos.logger.Logger;
@@ -17,7 +16,7 @@ import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import javax.servlet.http.HttpServletResponse;
 import static java.nio.file.FileVisitResult.CONTINUE;
-import static java.nio.file.StandardWatchEventKinds.*;
+import io.methvin.watcher.DirectoryWatcher;
 
 public class LiveScriptBundler
   implements WebAgent, ContextAware
@@ -36,7 +35,7 @@ public class LiveScriptBundler
   protected static final String JS_BUILD_PATH = "./tools/js_build/build.js";
 
   private interface FileUpdateListener {
-    public void onFileUpdate(String foamName, Path realPath);
+    public void onFileUpdate();
   }
 
   public X getX() {
@@ -45,83 +44,6 @@ public class LiveScriptBundler
 
   public void setX(X x) {
     x_ = x;
-  }
-
-  private class WatchWrapper {
-    protected Path               realDir_;
-    protected String             foamDir_;
-    protected WatchService       watcher_;
-    protected FileUpdateListener listener_;
-
-    public WatchWrapper(
-      WatchService watcher, Path realDir, String foamDir,
-      FileUpdateListener listener
-    ) {
-      watcher_  = watcher;
-      realDir_  = realDir;
-      foamDir_  = foamDir;
-      listener_ = listener;
-    }
-
-    public void tick() {
-      WatchKey key = watcher_.poll();
-      if ( key == null ) return;
-
-      for ( WatchEvent<?> event : key.pollEvents() ) {
-        WatchEvent.Kind<?> kind = event.kind();
-        if ( kind == OVERFLOW ) {
-          log_("ERROR", "File watch buffer overflowed!");
-          continue;
-        }
-
-        WatchEvent<Path> ev = (WatchEvent<Path>) event;
-        Path filename = ev.context();
-
-        // Ex: foamPath="foam/core/Property.js"
-        String foamPath = foamDir_ + "/" + filename.toString();
-
-        if ( fileNames_.contains(foamPath) ) {
-          log_("UPDATE", foamPath);
-
-          // Run the javascript builder
-          listener_.onFileUpdate(foamPath, realDir_.resolve(filename));
-
-        } else {
-          log_("IGNORE", foamPath);
-        }
-
-        if ( ! key.reset() ) break;
-      }
-    }
-  }
-
-  private class WatcherThread implements Runnable {
-    protected List<WatchWrapper> watchers_;
-
-    public WatcherThread(
-      List<WatchWrapper> watchers
-    ) {
-      watchers_  = watchers;
-    }
-
-    // Standard WatchService loop
-    public void run() {
-      for ( ; ; ) {
-        for ( WatchWrapper watcher : watchers_ ) {
-          watcher.tick();
-          try {
-            Thread.sleep(2);
-          } catch (InterruptedException e) {
-            return;
-          }
-        }
-        try {
-          Thread.sleep(500);
-        } catch (InterruptedException e) {
-          return;
-        }
-      }
-    }
   }
 
   public LiveScriptBundler() {
@@ -174,54 +96,19 @@ public class LiveScriptBundler
         }
       });
 
-      doRebuildJavascript(null, null);
-
-      List<WatchWrapper> watchers = new ArrayList<WatchWrapper>();
+      doRebuildJavascript();
 
       // Read each files.js file
       for ( Pair<String,String> currentFilesPath : filesPaths ) {
-        BufferedReader filesJsReader = new BufferedReader(
-          new FileReader(Paths.get(currentFilesPath.getValue()).toString()));
-        List<String>   paths         = parseFilesjs(filesJsReader);
-        Set<Path>      directories   = new LinkedHashSet<>();
-
-        for ( String foamName : paths ) {
-          Path f = Paths.get(path_, currentFilesPath.getKey(), foamName);
-
-          // Add containing folder to a set for registering watchers
-          directories.add(f.getParent());
-
-          fileNames_.add(foamName);
-        }
-
-        // Register a separate thread to watch each directory.
-        // (this is necessary with WatchService)
-        for ( Path d : directories ) {
-          WatchService watcher = FileSystems.getDefault().newWatchService();
-          d.register(watcher,
-            new WatchEvent.Kind[]{ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY},
-            SensitivityWatchEventModifier.HIGH
-          );
-
-          // Find relative path from `src` folder to get foam path
-          Path relative = Paths.get(path_, currentFilesPath.getKey())
-            .relativize(d.toAbsolutePath()).normalize();
-          
-          WatchWrapper watchWrapper = new WatchWrapper(
-            watcher,
-            d,
-            relative.toString(),
-            this::doRebuildJavascript
-          );
-          watchers.add(watchWrapper);
-        }
+        DirectoryWatcher.builder()
+          .path(Paths.get(path_, currentFilesPath.getKey()))
+          .listener(event -> {
+            if ( event.path().getFileName().toString().endsWith(".js") ) {
+              this.doRebuildJavascript();
+            }
+          })
+          .build().watchAsync();
       }
-
-      Thread watcherThread = new Thread(new WatcherThread(
-        watchers
-      ));
-      watcherThread.start();
-
     } catch ( Throwable t ) {
       t.printStackTrace();
       System.err.println("Failed to initialize filesystem watcher! :(");
@@ -229,7 +116,7 @@ public class LiveScriptBundler
     }
   }
 
-  private synchronized void doRebuildJavascript(String foamName, Path realPath) {
+  private synchronized void doRebuildJavascript() {
     try {
       log_("START", "Building javascript... (JS)");
 
@@ -256,128 +143,6 @@ public class LiveScriptBundler
 
     synchronized (this) { /* Wait for build to finish before serving */ } 
     pw.println(javascriptBuffer_);
-  }
-
-  // Proof-of-concept parser, to be replaced with a foam.lib.parse.Parser soon
-  private List<String> parseFilesjs(BufferedReader reader)
-    throws IOException
-  {
-    // This is what we want to get
-    List<String> paths = new ArrayList<>();
-
-    // For one specific line in iso20022 files.js
-    boolean lineException = false;
-
-    for ( String line = reader.readLine() ; line != null ; line = reader.readLine() ) {
-      line = line.trim();
-      if ( line.length() < 1 ) continue;
-      if ( lineException ) {
-        line = "{" + line + "}";
-        lineException = false;
-      } else if ( line.charAt(0) != '{' ) {
-        continue;
-      }
-      if ( line.length() < 3 ) {
-        lineException = true;
-        continue;
-      }
-
-      String name  = "";
-      String flags = "";
-      int    pos   = 1;
-
-      final int STATE_FIND_NAME          = 1;
-      final int STATE_EAT_NAME           = 2;
-      final int STATE_EAT_NAME_2         = 0x12;
-      final int STATE_SKIP_COMMA         = 3;
-      final int STATE_SKIP_COMMA_2       = 0x13;
-      final int STATE_FIND_FLAGS_OR_TERM = 4;
-      final int STATE_SKIP_WS            = 5;
-
-      int state         = STATE_FIND_NAME;
-      int stateStack[]  = {0, 0, 0}; // nested control flow makes it fun
-      int stateStackPtr = 0;
-
-      for ( boolean done = false; !done; ) {
-        switch (state) {
-          case STATE_SKIP_WS:
-            if (
-              line.charAt(pos) == ' '  ||
-              line.charAt(pos) == '\t' ||
-              line.charAt(pos) == '\r' // unlikely, but just to be safe
-              // '\n' is not possible here
-            ) {
-              pos++;
-            } else {
-              // Go to the next state which the previous state
-              // wanted us to go to.
-              state = stateStack[--stateStackPtr];
-            }
-            break;
-          case STATE_FIND_NAME:
-            if ( line.substring(pos).startsWith("name:") ) {
-              pos += 5;
-              state = STATE_EAT_NAME;
-            } else if ( line.substring(pos).startsWith("\"name\":") ) {
-              pos += 7;
-              state = STATE_EAT_NAME;
-            } else {
-              pos++;
-            }
-            break;
-          case STATE_EAT_NAME:
-            // Remember where we were after skipping whitespace
-            stateStack[stateStackPtr++] = STATE_EAT_NAME_2;
-            state = STATE_SKIP_WS;
-            break;
-          case STATE_EAT_NAME_2:
-            char term = line.charAt(pos);
-            pos++;
-            int nameStart = pos;
-            boolean inEscape = false;
-            for ( ;;pos++ ) {
-              char thisChar = line.charAt(pos);
-              if ( inEscape ) {
-                inEscape = false;
-              } else {
-                if ( thisChar == '\\' ) {
-                  inEscape = true;
-                } else if (thisChar == term) {
-                  break;
-                }
-              }
-            }
-            name = line.substring(nameStart, pos);
-            pos++;
-            // Remember where we were after skipping a comma
-            stateStack[stateStackPtr++] = STATE_FIND_FLAGS_OR_TERM;
-            state = STATE_SKIP_COMMA;
-            break;
-          case STATE_SKIP_COMMA:
-            // Remember where we were after skipping whitespace
-            stateStack[stateStackPtr++] = STATE_SKIP_COMMA_2;
-            state = STATE_SKIP_WS;
-            break;
-          case STATE_SKIP_COMMA_2:
-            if ( line.charAt(pos) == ',' ) {
-              pos++;
-            }
-            state = stateStack[--stateStackPtr];
-            break;
-          case STATE_FIND_FLAGS_OR_TERM:
-            // For now, don't actually "find" the flags;
-            // instead, take the whole line after the file name
-            // to later see if it contains "web" anywhere.
-            flags = line.substring(pos);
-            done = true;
-        }
-      }
-
-      name += ".js";
-      paths.add(name);
-    }
-
-    return paths;
   }
 
   private void log_(String evt, String msg) {
