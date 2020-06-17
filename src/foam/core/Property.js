@@ -290,7 +290,7 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'isSortable',
+      name: 'sortable',
       value: true
     },
   ],
