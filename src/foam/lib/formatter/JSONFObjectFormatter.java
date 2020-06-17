@@ -11,7 +11,6 @@ import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.core.X;
 import foam.lib.json.OutputJSON;
-import foam.lib.PropertyPredicate;
 import foam.util.SafetyUtil;
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
@@ -74,7 +73,6 @@ public class JSONFObjectFormatter
   protected boolean outputShortNames_    = true;
   protected boolean outputDefaultValues_ = false;
   protected boolean multiLineOutput_     = false;
-//  protected boolean outputClassNames_    = true;
   protected boolean outputReadableDates_ = true;
   protected boolean outputDefaultClassNames_ = true;
 
@@ -86,7 +84,7 @@ public class JSONFObjectFormatter
     super();
   }
 
-  protected void outpvutUndefined() {
+  protected void outputUndefined() {
   }
 
   protected void outputNull() {
@@ -335,8 +333,6 @@ public class JSONFObjectFormatter
     PropertyInfo id = (PropertyInfo) newInfo.getAxiomByName("id");
     outputProperty(newFObject, id);
 
-    // to output class names for references
-//    outputDefaultClassNames_ = true;
 
     for ( int i = 0 ; i < size ; i++ ) {
       b_.append(',');
@@ -470,11 +466,6 @@ public class JSONFObjectFormatter
     outputDefaultValues_ = outputDefaultValues;
     return this;
   }
-
-//  public JSONFObjectFormatter setOutputClassNames(boolean outputClassNames) {
-//    outputClassNames_ = outputClassNames;
-//    return this;
-//  }
 
   public JSONFObjectFormatter setOutputDefaultClassNames(boolean f) {
     outputDefaultClassNames_ = f;
