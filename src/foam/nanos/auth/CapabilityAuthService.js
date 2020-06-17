@@ -180,18 +180,18 @@ foam.CLASS({
             }
           };
 
-          // 1. check if the user has a capability that grants the permission
+          // Check if the user has a capability that grants the permission
           Predicate userPredicate = EQ(UserCapabilityJunction.SOURCE_ID, user.getId());
           if ( userCapabilityJunctionDAO.find(AND(userPredicate, capabilityScope, predicate)) != null ) {
             result = true;
           }
-          // Add the result to the cache
+
           (( Map<String, Boolean> ) getCache()).put(userKey, result);
           if ( result ) {
             return true;
           }
 
-          // 2. check if the agent has a capability that grants the permission
+          // Check if a ucj implies the subject.realUser(agent) has this permission
           if ( agent != null && agentKey != null ) {
             userPredicate = AND(
               INSTANCE_OF(AgentCapabilityJunction.class),
@@ -202,7 +202,6 @@ foam.CLASS({
               result = true;
             }
 
-            // Add the result to the cache
             (( Map<String, Boolean> ) getCache()).put(agentKey, result);
             if ( result ) {
               return true;
@@ -210,7 +209,7 @@ foam.CLASS({
           }
         } catch ( Exception e ) {
           Logger logger = (Logger) x.get("logger");
-          logger.error("check", permission, e);
+          logger.error("capabilityCheck", permission, e);
         }
 
         maybeIntercept(x, permission);
