@@ -73,7 +73,7 @@ public class CachingAuthService
       return new ConcurrentHashMap<String,Boolean>();
     }
 
-    Map<String,Boolean> map =     (Map) session.getContext().get(CACHE_KEY);
+    Map<String,Boolean> map     = (Map) session.getContext().get(CACHE_KEY);
 
     if ( map == null ) {
       Sink purgeSink = new Sink() {
