@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.nanos.google_api',
+  package: 'foam.nanos.google.api.sheets',
   name: 'GoogleSheetsApiService',
   implements: [
     'foam.nanos.export.GoogleSheetsExport'
