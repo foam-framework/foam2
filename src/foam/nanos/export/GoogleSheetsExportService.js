@@ -19,6 +19,7 @@ foam.CLASS({
     'com.google.api.services.sheets.v4.SheetsScopes',
     'com.google.api.services.sheets.v4.model.*',
     'foam.nanos.logger.Logger',
+    'foam.util.SafetyUtil',
 
     'java.util.*'
   ],
@@ -64,7 +65,13 @@ foam.CLASS({
         },
         {
           name: 'metadataObj',
+          type: 'foam.nanos.export.GoogleSheetsPropertyMetadata[]',
           javaType: 'Object'
+        },
+        {
+          name: 'extraConfig',
+          type: 'Object',
+          javaType: 'foam.nanos.export.GoogleSheetsServiceConfig'
         }
       ],
       javaCode: `
@@ -89,8 +96,8 @@ foam.CLASS({
             .build();
     
           Spreadsheet st = new Spreadsheet().setProperties(
-            new SpreadsheetProperties().setTitle("NanopayExport" + new Date()));
-    
+            new SpreadsheetProperties().setTitle( extraConfig == null || SafetyUtil.isEmpty(extraConfig.getTitle()) ? ("NanopayExport" + new Date()) : extraConfig.getTitle()));
+  
     
           List<ValueRange> data = new ArrayList<>();
           data.add(new ValueRange()
