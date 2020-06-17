@@ -566,7 +566,7 @@ foam.LIB({
       if ( this.model_.extends === 'FObject' ) {
         cls.field({
           name: "x_",
-          visibility: 'private',
+          visibility: 'protected',
           static: false,
           final: false,
           type: 'foam.core.X',
