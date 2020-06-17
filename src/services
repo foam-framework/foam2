@@ -1028,11 +1028,7 @@ p({
   "name":"googleDriveService",
   "lazy":false,
   "service": {
-<<<<<<< HEAD
-    "class":"foam.nanos.google_api.GoogleDriveService"
-=======
     "class":"foam.nanos.google.api.drive.GoogleDriveService"
->>>>>>> master
   },
   "documentation": "googleDriveService is used for making calls to Google Drive API"
 })
@@ -1042,11 +1038,7 @@ p({
   "name":"googleApiAuthService",
   "lazy":false,
   "service": {
-<<<<<<< HEAD
-    "class":"foam.nanos.google_api.GoogleApiAuthService"
-=======
     "class":"foam.nanos.google.api.auth.GoogleApiAuthService"
->>>>>>> master
   },
   "documentation": "googleApiAuthService configures authoriziation (sets scope of permissions which are needed to be granted by user, sets port which will be listening to response and sets folder in which tokens will be stored) and authorize Google API calls"
 })
@@ -1059,11 +1051,7 @@ p({
   "serviceScript":
   """
     return new foam.dao.EasyDAO.Builder(x)
-<<<<<<< HEAD
-      .setOf(foam.nanos.google_api.GoogleApiCredentials.getOwnClassInfo())
-=======
       .setOf(foam.nanos.google.api.auth.GoogleApiCredentials.getOwnClassInfo())
->>>>>>> master
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("googleCredentials")
       .build();
@@ -1071,11 +1059,7 @@ p({
   "client":
   """
     {
-<<<<<<< HEAD
-      "of":"foam.nanos.google_api.GoogleApiCredentials"
-=======
       "of":"foam.nanos.google.api.auth.GoogleApiCredentials"
->>>>>>> master
     }
   """
 })
