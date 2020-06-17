@@ -770,7 +770,7 @@ foam.LIB({
                 if ( js == null && json[key] != 'null' ) {
                   console.warn('Unable to parse property "' + key + '"', 'in', json);
                 } else {
-                  json[key] = js;
+                  json[prop.name] = js;
                 }
               }
             }
