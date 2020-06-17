@@ -38,7 +38,8 @@ foam.CLASS({
     'java.util.concurrent.TimeUnit',
     'java.util.concurrent.atomic.AtomicInteger',
     'java.util.Date',
-    'java.util.List'
+    'java.util.List',
+    'java.util.Map'
   ],
 
   axioms: [
@@ -299,13 +300,29 @@ foam.CLASS({
       ClusterConfig config = support.getConfig(x, support.getConfigId());
       List voters = support.getVoters(x);
 
-      int mediatorQuorum = support.getMediatorQuorum(x);
-      if ( voters.size() < mediatorQuorum ) {
-        // nothing to do.
-        getLogger().warning("callVote", getState().getLabel(), "waiting for mediator quorum", voters.size(), mediatorQuorum);
+      if ( ! support.getHasQuorum() ) {
+        if ( ! support.getHasNodeQuorum() ) {
+          getLogger().warning("callVote", getState().getLabel(), "waiting for node quorum", "voters/quorum", voters.size(), support.getMediatorQuorum(), support.getHasNodeQuorum());
+
+        Map<Integer, List> buckets = support.getNodeBuckets();
+        for ( int i = 0; i < buckets.size(); i++ ) {
+          List bucket = (List) buckets.get(i);
+          for ( int j = 0; j < bucket.size(); j++ ) {
+            String id = (String) bucket.get(j);
+            ClusterConfig node = support.getConfig(getX(), id);
+            getLogger().debug("buckets", buckets.size(), "bucket", i, id, node.getStatus());
+          }
+        }
+
+        } else {
+      // int mediatorQuorum = support.getMediatorQuorum(x);
+      // if ( voters.size() < mediatorQuorum ) {
+      //   // nothing to do.
+        getLogger().warning("callVote", getState().getLabel(), "waiting for mediator quorum", "voters/quorum", voters.size(), support.getMediatorQuorum(), support.getHasNodeQuorum());
+        }
         return;
       }
-      getLogger().debug("callVote", getState().getLabel(), "achieved mediator quorum", voters.size(), mediatorQuorum);
+      getLogger().debug("callVote", getState().getLabel(), "achieved mediator and node quorum", "voters/quorum", voters.size(), support.getMediatorQuorum());
  
       ThreadPoolExecutor pool = pool_;
       List<Callable<Long>> voteCallables = new ArrayList<>();

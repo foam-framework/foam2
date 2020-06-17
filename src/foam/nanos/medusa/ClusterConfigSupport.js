@@ -155,6 +155,22 @@ configuration for contacting the primary node.`,
       `
     },
     {
+      name: 'mediatorQuorum',
+      class: 'Int',
+      javaFactory: `
+      return getMediatorCount() / 2 + 1;
+      `
+    },
+    {
+      documentation: 'Are at least half+1 of the expected instances online?',
+      name: 'hasQuorum',
+      class: 'Boolean',
+      javaFactory: `
+      return getHasNodeQuorum() &&
+             getVoters(getX()).size() >= getMediatorQuorum();
+      `
+    },
+    {
       documentation: 'Enable and Online nodes in each bucket to achieve quorum',
       name: 'nodeQuorum',
       class: 'Int',
@@ -199,16 +215,42 @@ configuration for contacting the primary node.`,
       javaFactory: `
       return new HashMap();
      `,
-      visibility: 'HIDDEN'
+      visibility: 'RO'
     },
-//     {
-//       name: 'nodeQuorum',
-//       class: 'Int',
-//       javaFactory: `
-//       return getMinNodeQuorumSize() + 1;
-// //      return getNodeCount() / 2 + 1;
-//       `
-//     },
+    {
+      documentation: 'Are at least half+1 of the expected nodes online?',
+      name: 'hasNodeQuorum',
+      class: 'Boolean',
+      visibility: 'RO',
+      javaFactory: `
+      int quorumCount = getNodeQuorum();
+      Map buckets = getNodeBuckets();
+      if ( buckets.size() < getNodeGroups() ) {
+        getLogger().warning("hasNodeQuorum", "false", "insufficient buckets", buckets.size(), "threshold", getNodeGroups());
+        return false;
+      }
+      for ( int i = 0; i < buckets.size(); i++ ) {
+        List bucket = (List) buckets.get(i);
+        if ( bucket.size() < quorumCount ) {
+          getLogger().warning("hasNodeQuorum", "false", "insufficient nodes in bucket", "buckets", bucket.size(), "threshold", quorumCount);
+          return false;
+        }
+        int count = 0;
+        for ( int j = 0; j < bucket.size(); j++ ) {
+          ClusterConfig config = getConfig(getX(), (String) bucket.get(j));
+          if ( config.getStatus() == Status.ONLINE ) {
+            count += 1;
+          }
+        }
+        if ( count < quorumCount ) {
+           getLogger().warning("hasNodeQuorum", "false", "insufficient ONLINE nodes in bucket", "bucket", i, "count", count, "threshold", quorumCount);
+          return false;
+        }
+      }
+      getLogger().debug("hasNodeQuorum", "true");
+      return true;
+      `
+    },
     {
       documentation: 'A single instance is using the medusa journal. No other clustering features are used.',
       name: 'standAlone',
@@ -238,19 +280,6 @@ configuration for contacting the primary node.`,
   ],
 
   methods: [
-    // {
-    //   name: 'getNodeQuorum',
-    //   args: [
-    //     {
-    //       name: 'x',
-    //       type: 'Context'
-    //     }
-    //   ],
-    //   type: 'Integer',
-    //   javaCode: `
-    //   return getNodeCount() / 2 + 1;
-    //   `
-    // },
     {
       name: 'buildURL',
       type: 'String',
@@ -512,59 +541,6 @@ configuration for contacting the primary node.`,
         config.getEnabled() &&
         config.getType() == MedusaType.MEDIATOR &&
         config.getZone() == 0L;
-      `
-    },
-    {
-      name: 'getMediatorQuorum',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        }
-      ],
-      type: 'Integer',
-      javaCode: `
-      return getMediatorCount() / 2 + 1;
-      `
-    },
-    {
-      documentation: 'Are at least half+1 of the expected instances online?',
-      name: 'hasQuorum',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-      ],
-      type: 'Boolean',
-      javaCode: `
-      return getVoters(x).size() >= getMediatorQuorum(x);
-      `
-    },
-    {
-      /**
-         each bucket must have at least nodeQuorum enabled/onlined nodes.
-       */
-      documentation: 'Are at least half+1 of the expected nodes online?',
-      name: 'hasNodeQuorum',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-      ],
-      type: 'Boolean',
-      javaCode: `
-       Count count = (Count) ((DAO) x.get("localClusterConfigDAO"))
-        .where(
-          AND(
-            EQ(ClusterConfig.ZONE, 0),
-            EQ(ClusterConfig.TYPE, MedusaType.NODE),
-            EQ(ClusterConfig.STATUS, Status.ONLINE),
-            EQ(ClusterConfig.ENABLED, true)
-          ))
-        .select(COUNT());
-      return ((Long)count.getValue()).intValue() >= getNodeQuorum();
       `
     },
     {

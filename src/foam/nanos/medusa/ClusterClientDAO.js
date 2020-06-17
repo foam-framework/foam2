@@ -77,13 +77,13 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-      return submit(x, DOP.PUT, obj);
+      return (FObject) submit(x, DOP.PUT, obj);
       `
     },
     {
       name: 'remove_',
       javaCode: `
-      return submit(x, DOP.REMOVE, obj);
+      return (FObject) submit(x, DOP.REMOVE, obj);
       `
     },
     {
@@ -95,11 +95,7 @@ foam.CLASS({
         return this;
       }
       if ( obj instanceof ClusterCommand ) {
-        ClusterCommand cmd = (ClusterCommand) obj;
-        getLogger().debug("cmd", "ClusterCommand");
-
-        cmd.addHop(x);
-        return submit(x, DOP.CMD, cmd);
+        return submit(x, DOP.CMD, obj);
       }
       return getDelegate().cmd_(x, obj);
       `
@@ -117,20 +113,24 @@ foam.CLASS({
         },
         {
           name: 'obj',
-          type: 'FObject'
+          type: 'Object'
         }
       ],
-      type: 'FObject',
+      type: 'Object',
       javaCode: `
        ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
 
      // REVIEW: set context to null after init so it's not marshalled across network. Periodically have contexts being marshalled
-      ((ContextAware) obj).setX(null);
+      FObject fobj = null;
       ClusterCommand cmd = null;
       if ( obj instanceof ClusterCommand ) {
         cmd = (ClusterCommand) obj;
+        fobj = cmd;
+        cmd.addHop(x);
       } else {
-        cmd = new ClusterCommand(x, getNSpec().getName(), dop, obj);
+        fobj = (FObject) obj;
+        ((ContextAware) fobj).setX(null);
+        cmd = new ClusterCommand(x, getNSpec().getName(), dop, fobj);
       }
       cmd.setX(null);
 
@@ -139,7 +139,7 @@ foam.CLASS({
         try {
           ClusterConfig serverConfig = support.getNextServerConfig(getX());
           DAO dao = support.getClientDAO(getX(), getServiceName(), getConfig(), serverConfig);
-          getLogger().debug("submit", "request", "dao", dao.getClass().getSimpleName(), dop.getLabel(), obj.getClass().getSimpleName(), obj.getProperty("id"));
+          getLogger().debug("submit", "request", "dao", dao.getClass().getSimpleName(), dop.getLabel(), obj.getClass().getSimpleName(), fobj.getProperty("id"));
 
           FObject data = null;
           Object result = null;

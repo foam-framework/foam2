@@ -48,7 +48,7 @@ foam.CLASS({
       ClusterConfig old = (ClusterConfig) find_(x, nu.getId());
 
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      Boolean hadQuorum = support.hasQuorum(x);
+      Boolean hadQuorum = support.getHasQuorum();
 
       nu = (ClusterConfig) getDelegate().put_(x, nu);
 
@@ -67,7 +67,7 @@ foam.CLASS({
             ClusterConfig config = support.getConfig(x, support.getConfigId());
             if ( support.canVote(x, nu) &&
                  support.canVote(x, config) ) {
-              Boolean hasQuorum = support.hasQuorum(x);
+              Boolean hasQuorum = support.getHasQuorum();
               if ( electoralService.getState() == ElectoralServiceState.IN_SESSION ||
                    electoralService.getState() == ElectoralServiceState.ADJOURNED) {
                 if ( hadQuorum && ! hasQuorum) {
@@ -124,7 +124,7 @@ foam.CLASS({
           bucket = new ArrayList<String>();
           buckets.put(index, bucket);
         }
-        bucket.add(node);
+        bucket.add(node.getId());
         getLogger().debug("bucketNodes", "bucket", index, "node", node.getId());
       }
       support.setNodeBuckets(buckets);

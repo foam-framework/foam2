@@ -90,6 +90,10 @@ foam.CLASS({
       visibility: 'HIDDEN',
     },
     {
+      name: 'startTime',
+      class: 'Long',
+    },
+    {
       name: 'logger',
       class: 'FObjectProperty',
       of: 'foam.nanos.logger.Logger',
@@ -243,6 +247,7 @@ foam.CLASS({
       getLogger().debug("start");
       ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
       ((Agency) getX().get(support.getThreadPoolName())).submit(getX(), this, "Consensus Promoter");
+      setStartTime(System.currentTimeMillis());
       `
     },
     {
@@ -356,7 +361,7 @@ foam.CLASS({
       ],
       javaCode: `
       PM pm = createPM(x, "replayComplete");
-      getLogger().debug("replayComplete");
+      getLogger().info("replayComplete", "duration", (System.currentTimeMillis() - getStartTime())/ 1000, "s");
       setReplaying(false);
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
 

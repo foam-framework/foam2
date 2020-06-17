@@ -89,7 +89,7 @@ foam.CLASS({
         List bucket = (List) buckets.get(index);
 
         for ( int i = 0; i < bucket.size(); i++ ) {
-          ClusterConfig config = (ClusterConfig) bucket.get(i);
+          ClusterConfig config = support.getConfig(x, (String) bucket.get(i));
           getAssemblyLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
             public void executeJob() {
               try {

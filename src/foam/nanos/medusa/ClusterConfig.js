@@ -45,13 +45,14 @@ foam.CLASS({
       class: 'String',
       label: 'Hostname',
       required: true,
-      tableWidth: 200,
+      tableWidth: 150,
     },
     {
       documentation: 'External DNS name, or name instance is known by. Used in log messages.',
       name: 'name',
       class: 'String',
-      required: true
+      required: true,
+      tableWidth: 150,
     },
     {
       class: 'Boolean',
@@ -141,7 +142,9 @@ foam.CLASS({
       documentation: 'Ping delay greater than this value will trigger alarms.',
       name: 'maxPingLatency',
       class: 'Long',
-      value: 500
+      value: 500,
+      visibility: 'RO',
+      storageTransient: true
     },
     {
       name: 'sessionId',
@@ -149,13 +152,16 @@ foam.CLASS({
     },
     {
       name: 'replayIndex',
-      class: 'Long'
+      class: 'Long',
+      visibility: 'RO',
+      storageTransient: true
     },
     {
       documentation: 'Creation date.',
       name: 'created',
       class: 'DateTime',
       visibility: 'RO',
+      storageOptional: true
     },
     {
       documentation: `The id of the user who created the transaction.`,
@@ -163,6 +169,7 @@ foam.CLASS({
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       visibility: 'RO',
+      storageOptional: true,
       tableCellFormatter: function(value, obj) {
         obj.userDAO.find(value).then(function(user) {
           if ( user ) {
@@ -179,6 +186,7 @@ foam.CLASS({
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       visibility: 'RO',
+      storageOptional: true,
       tableCellFormatter: function(value, obj) {
         obj.userDAO.find(value).then(function(user) {
           if ( user ) {
