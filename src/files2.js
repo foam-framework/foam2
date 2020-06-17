@@ -86,7 +86,6 @@ FOAM_FILES([
   { name: "foam/core/Serializable" },
   { name: "foam/core/Freezable" },
   { name: "foam/core/Detachable" },
-  { name: "foam/core/AbstractFObject" },
   { name: "foam/core/ContextAgent" },
   { name: "foam/core/Agency" },
   { name: "foam/i18n/TranslationFormatStringParser", flags: ['swift'] },
