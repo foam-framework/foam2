@@ -1051,7 +1051,7 @@ p({
   "serviceScript":
   """
     return new foam.dao.EasyDAO.Builder(x)
-      .setOf(foam.nanos.google.api.auth.GoogleDriveService.getOwnClassInfo())
+      .setOf(foam.nanos.google.api.auth.GoogleApiCredentials.getOwnClassInfo())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("googleCredentials")
       .build();
@@ -1059,7 +1059,7 @@ p({
   "client":
   """
     {
-      "of":"foam.nanos.google.api.auth.GoogleDriveService"
+      "of":"foam.nanos.google.api.auth.GoogleApiCredentials"
     }
   """
 })

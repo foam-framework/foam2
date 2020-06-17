@@ -398,7 +398,7 @@ var classes = [
   'foam.nanos.export.GoogleSheetsExport',
   'foam.nanos.export.GoogleSheetsPropertyMetadata',
   'foam.nanos.google.api.auth.GoogleApiAuthService',
-  'foam.nanos.google.api.auth.GoogleDriveService',
+  'foam.nanos.google.api.auth.GoogleApiCredentials',
   'foam.nanos.google.api.drive.GoogleDriveService',
   'foam.nanos.google.api.sheets.GoogleSheetsApiService',
   'foam.dao.jdbc.ConnectionPool',
