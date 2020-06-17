@@ -25,6 +25,14 @@ foam.CLASS({
     feedback. Notification messages are only visible for a few seconds.
   `,
 
+  requires: [
+    'foam.u2.tag.CircleIndicator'
+  ],
+
+  imports: [
+    'theme'
+  ],
+
   css: `
     ^ {
       display: flex;
@@ -148,13 +156,30 @@ foam.CLASS({
     function initE() {
       var self = this;
 
-      var img;
+      var indicator;
       if ( this.type === 'error' ) {
-        img = 'images/round-error-red.svg';
+        indicator = {
+          size: 18,
+          backgroundColor: this.theme.destructive3,
+          borderColor: this.theme.destructive3,
+          icon: this.theme.glyphs.exclamation.getDataUrl({
+            fill: this.theme.white
+          })
+        };
       } else if ( this.type === 'warning' ) {
-        img = 'images/baseline-warning-yellow.svg';
+        indicator = {
+          size: 18,
+          icon: 'images/baseline-warning-yellow.svg'
+        };
       } else {
-        img = 'images/round-check-circle-green.svg';
+        indicator = {
+          size: 18,
+          backgroundColor: this.theme.approval3,
+          borderColor: this.theme.approval3,
+          icon: this.theme.glyphs.checkmark.getDataUrl({
+            fill: this.theme.white
+          })
+        };
       }
       this
         .addClass(this.myClass())
@@ -166,9 +191,8 @@ foam.CLASS({
             .enableClass(this.myClass('warning-banner'), this.type === 'warning')
           .end()
           .start()
-            .start('img')
+            .start(this.CircleIndicator, indicator)
               .addClass(this.myClass('status-icon'))
-              .attrs({ src: img })
             .end()
             .start().addClass(this.myClass('content'))
               .enableClass(this.myClass('error-content'), this.type === 'error')

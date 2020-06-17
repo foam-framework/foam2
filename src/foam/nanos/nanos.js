@@ -106,6 +106,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/UserQueryService" },
   { name: "foam/nanos/auth/SimpleUserQueryService" },
   { name: "foam/nanos/theme/Theme" },
+  { name: "foam/nanos/theme/ThemeGlyphs" },
   { name: "foam/nanos/theme/ThemeDomain" },
   { name: "foam/nanos/theme/ThemeDomainsDAO" },
   { name: "foam/nanos/theme/Themes" },
@@ -176,10 +177,6 @@ FOAM_FILES([
   { name: "foam/nanos/export/CSVTableExportDriver"},
   { name: "foam/nanos/export/ExportDriverRegistry"},
   { name: "foam/nanos/export/ExportDriver" },
-  { name: "foam/nanos/extraconfig/AddOn" },
-  { name: "foam/nanos/extraconfig/Config" },
-  { name: "foam/nanos/extraconfig/ConfigView" },
-  { name: "foam/nanos/extraconfig/DataTypeViewConfig" },
   { name: "foam/nanos/export/GoogleApiAuthService" },
   { name: "foam/nanos/export/GoogleApiCredentials" },
   { name: "foam/nanos/export/GoogleDriveService" },
@@ -341,6 +338,7 @@ FOAM_FILES([
   { name: 'foam/nanos/approval/ApprovableApprovalRequestsRule' },
   { name: 'foam/nanos/approval/FulfilledApprovablePredicate' },
   { name: 'foam/nanos/approval/FulfilledApprovableRule' },
+  { name: 'foam/nanos/approval/PopulateApprovalRequestsDAO' },
 
   //authservice
   { name: "foam/nanos/auth/CapabilityAuthService" },

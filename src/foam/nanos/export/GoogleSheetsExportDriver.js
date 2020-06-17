@@ -29,7 +29,7 @@ foam.CLASS({
   ],
 
   methods: [
-    async function exportFObject(X, obj, config) {
+    async function exportFObject(X, obj) {
       var self = this;
       
       var sheetId  = '';
@@ -45,13 +45,13 @@ foam.CLASS({
       var values = [ await this.outputter.objToArrayOfStringValues(X, obj.cls_, [ obj ], metadata.map(p => p.propName)) ];
       stringArray = stringArray.concat(values);
 
-      sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata, config);
+      sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata);
       if ( ! sheetId || sheetId.length === 0)
         return '';
       var url = `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`;
       return url;
     },
-    async function exportDAO(X, dao, config) {
+    async function exportDAO(X, dao) {
       var self = this;
 
       var columnConfig = X.columnConfigToPropertyConverter;
@@ -59,7 +59,7 @@ foam.CLASS({
       var props = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(dao.of);
       props = columnConfig.filterExportedProps(dao.of, props);
 
-      var metadata = await self.outputter.getColumnMethadata(X, dao.of, props);
+      var metadata = await self.outputter.getColumnMethadata(X, dao.of);
 
       var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(dao.of, props);
       var sink = await dao.select(expr);
@@ -67,7 +67,7 @@ foam.CLASS({
       var sheetId  = '';
       var stringArray = await self.outputter.outputTable(X, dao.of, sink.array, metadata);
 
-      sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata, config);
+      sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata);
       if ( ! sheetId || sheetId.length == 0)
         return '';
       var url = `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`;

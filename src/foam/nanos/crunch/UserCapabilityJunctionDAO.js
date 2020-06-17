@@ -25,6 +25,10 @@ foam.CLASS({
     'static foam.mlang.MLang.*'
   ],
 
+  messages: [
+    { name: 'ERROR_MSG', message: 'Error on UserCapabilityJunction checkOwnership create UCJ denied to user ' }
+  ],
+
   methods: [
     {
       name: 'getUser',
@@ -59,7 +63,7 @@ foam.CLASS({
         User agent = ((Subject) x.get("subject")).getRealUser();
         AuthService auth = (AuthService) x.get("auth");
         boolean isOwner = obj.getSourceId() == user.getId() || ( agent != null && obj.getSourceId() == agent.getId() );
-        if ( ! isOwner && ! auth.check(x, "*") ) throw new AuthorizationException();
+        if ( ! isOwner && ! auth.check(x, "ucj.addPermission") ) throw new AuthorizationException(ERROR_MSG + agent.getId()+":"+user.getId());
       `
     },
     {
@@ -126,10 +130,10 @@ foam.CLASS({
         {
           CapabilityJunctionStatus chainedStatus = checkPrereqsChainedStatus(x, ucJunction);
           if ( ( ! requiresData || ( ucJunction.getData() != null && validateData(x, ucJunction) ) )
-            && chainedStatus != CapabilityJunctionStatus.ACTION_REQUIRED )
+            && chainedStatus == CapabilityJunctionStatus.GRANTED )
           {
             // if review is required for this Capability, set the status to pending so that rules can be triggered
-            if ( requiresReview || chainedStatus == CapabilityJunctionStatus.PENDING )
+            if ( requiresReview )
               ucJunction.setStatus(CapabilityJunctionStatus.PENDING);
             else
               ucJunction.setStatus(CapabilityJunctionStatus.GRANTED);

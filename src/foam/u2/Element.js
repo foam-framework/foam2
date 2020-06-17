@@ -964,7 +964,10 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'focused'
+      name: 'focused',
+      postSet: function(o, n) {
+        if ( n ) this.onFocus();
+      }
     },
     {
       name: 'outerHTML',
@@ -1184,7 +1187,6 @@ foam.CLASS({
 
     function focus() {
       this.focused = true;
-      this.onFocus();
       return this;
     },
 
@@ -2319,10 +2321,20 @@ foam.CLASS({
           }
 
           if ( foam.Function.isInstance(value) ) {
-            return foam.core.ExpressionSlot.create({
+            var slot = foam.core.ExpressionSlot.create({
               obj$: data$,
+              // Disallow RW DisplayMode when in View Controller Mode
               code: value
             });
+
+            slot.args;
+
+            slot.code = function() {
+              var ret = value.apply(this, arguments);
+              return controllerMode == foam.u2.ControllerMode.VIEW && ret == DisplayMode.RW ? DisplayMode.RO : ret;
+            };
+
+            return slot;
           }
 
           if ( foam.core.Slot.isInstance(value) ) {
