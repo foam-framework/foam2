@@ -64,7 +64,6 @@ public class CachingAuthService
     Map<String,Boolean> map = session.getUserId() == ((User) x.get("user")).getId() ? 
       (Map) session.getContext().get(CACHE_KEY) :
       null;
-    
 
     if ( map == null ) {
       Sink purgeSink = new Sink() {
