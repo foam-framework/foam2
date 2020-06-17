@@ -49,10 +49,14 @@ foam.CLASS({
       position: relative;
       height: auto;
       background-color: %GREY5%;
+      max-height: 95vh;
     }
     ^status {
       background-color: %WHITE%;
       padding: 50px;
+      overflow-y: scroll;
+      display: flex;
+      flex-direction: column;
     }
     ^entry {
       background-color: %GREY5%;
@@ -60,7 +64,7 @@ foam.CLASS({
       overflow-y: scroll;
     }
     ^entry ^top-buttons {
-      float: right;
+      text-align: right;
       margin-bottom: 15px;
     }
     ^buttons {
@@ -117,19 +121,21 @@ foam.CLASS({
                 })
               .end()
             .end()
-            .add(this.data.SUB_STACK)
-            .add(this.slot(function (data$isLastWizardlet) {
-              return this.E()
-                .startContext({ data: self })
-                .addClass(self.myClass('buttons'))
-                .tag(this.GO_PREV, btn)
-                .tag(this.GO_NEXT,
-                  data$isLastWizardlet
-                    ? { ...btn, label: this.ACTION_LABEL }
-                    : btn
-                )
-                .endContext();
-            }))
+            .start()
+              .add(this.data.SUB_STACK)
+              .add(this.slot(function (data$isLastWizardlet) {
+                return this.E()
+                  .startContext({ data: self })
+                  .addClass(self.myClass('buttons'))
+                  .tag(this.GO_PREV, btn)
+                  .tag(this.GO_NEXT,
+                    data$isLastWizardlet
+                      ? { ...btn, label: this.ACTION_LABEL }
+                      : btn
+                  )
+                  .endContext();
+              }))
+            .end()
           .end()
         .end()
         ;
