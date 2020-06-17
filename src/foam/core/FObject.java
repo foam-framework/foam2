@@ -537,15 +537,4 @@ public interface FObject
   {
     if ( isFrozen() ) throw new UnsupportedOperationException("Object is frozen.");
   }
-
-  default void freeze(Freezer freezer) {
-    freezer.freeze();
-  }
-
-  default boolean isFrozen(Freezer freezer) {
-    if ( freezer == null )
-      return false;
-    return freezer.isFrozen();
-  }
-
 }

@@ -595,33 +595,37 @@ foam.LIB({
 
         // Generate Freeze
         cls.field({
-          name: "freezer_",
+          name: "__frozen__",
           visibility: 'protected',
           static: false,
           final: false,
-          type: 'foam.core.Freezer',
-          initializer: "new foam.core.Freezer()"
+          type: 'boolean',
+          initializer: "false"
         });
 
-        cls.method({
-          name: 'freeze',
-          type: 'foam.core.FObject',
-          visibility: 'public',
-          body: `
-            beforeFreeze();
-            freeze(freezer_);
-            return this;
-          `
-        })
+        if ( ! this.hasOwnAxiom('freeze') ) {
+          cls.method({
+            name: 'freeze',
+            type: 'foam.core.FObject',
+            visibility: 'public',
+            body: `
+              beforeFreeze();
+              __frozen__ = true;
+              return this;
+            `
+          });
+        }
 
-        cls.method({
-          name: 'isFrozen',
-          type: 'boolean',
-          visibility: 'public',
-          body: `
-            return isFrozen(freezer_);
-          `
-        })
+        if ( ! this.hasOwnAxiom('isFrozen') ) {
+          cls.method({
+            name: 'isFrozen',
+            type: 'boolean',
+            visibility: 'public',
+            body: `
+              return __frozen__;
+            `
+          });
+        }
 
         // Generate Extras if they don't exist in the model
         if ( ! this.hasOwnAxiom('toString') ) {
