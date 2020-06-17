@@ -143,7 +143,7 @@ foam.CLASS({
               .add(this.data.cls_.getAxiomsByClass(foam.core.Action))
             .end()
             .start()
-              .show(this.mode$.map((m) => m === this.DisplayMode.RW))
+              .show(this.mode$.map((m) => m === this.DisplayMode.RO))
               .startContext({ data: this })
                 .add(this.EDIT)
               .endContext()
