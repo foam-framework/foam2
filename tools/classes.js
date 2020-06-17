@@ -74,6 +74,8 @@ var classes = [
   'foam.mlang.expr.Subtract',
   'foam.mlang.expr.Multiply',
   'foam.mlang.expr.Divide',
+  'foam.mlang.expr.MinFunc',
+  'foam.mlang.expr.MaxFunc',
   'foam.mlang.PredicatedExpr',
   'foam.mlang.ContextObject',
   'foam.mlang.CurrentTime',

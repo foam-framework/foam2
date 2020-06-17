@@ -251,6 +251,14 @@ public class MLang
     return DIV(new Object[] { arg1, arg2 });
   }
 
+  public static Expr MIN_FUNC(Object arg1, Object arg2) {
+    return MIN_FUNC(new Object[] { arg1, arg2 });
+  }
+
+  public static Expr MAX_FUNC(Object arg1, Object arg2) {
+    return MAX_FUNC(new Object[] { arg1, arg2 });
+  }
+
   public static Expr ADD(Object... args) {
     Add add = new Add();
     add.setArgs(toExprArray(args));
@@ -273,5 +281,17 @@ public class MLang
     Divide div = new Divide();
     div.setArgs(toExprArray(args));
     return div;
+  }
+
+  public static Expr MIN_FUNC(Object... args) {
+    MinFunc min = new MinFunc();
+    min.setArgs(toExprArray(args));
+    return min;
+  }
+
+  public static Expr MAX_FUNC(Object... args) {
+    MaxFunc max = new MaxFunc();
+    max.setArgs(toExprArray(args));
+    return max;
   }
 }

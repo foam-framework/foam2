@@ -3877,6 +3877,36 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.mlang.expr',
+  name: 'MinFunc',
+  extends: 'foam.mlang.Formula',
+  implements: [ 'foam.core.Serializable' ],
+
+  methods: [
+    {
+      name: 'computeStep',
+      abstract: false,
+      javaCode: 'return arg1 <= arg2 ? arg1 : arg2;'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.expr',
+  name: 'MaxFunc',
+  extends: 'foam.mlang.Formula',
+  implements: [ 'foam.core.Serializable' ],
+
+  methods: [
+    {
+      name: 'computeStep',
+      abstract: false,
+      javaCode: 'return arg1 >= arg2 ? arg1 : arg2;'
+    }
+  ]
+});
+
 // TODO(braden): We removed Expr.pipe(). That may still be useful to bring back,
 // probably with a different name. It doesn't mean the same as DAO.pipe().
 // remove eof()
