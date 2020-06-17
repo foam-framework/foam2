@@ -480,6 +480,11 @@ public class JSONFObjectFormatter
     return this;
   }
 
+  public JSONFObjectFormatter setOutputClassNames(boolean outputClassNames) {
+    outputClassNames_ = outputClassNames;
+    return this;
+  }
+
   protected void outputKey(String val) {
     if ( quoteKeys_ ) appendQuote();
     b_.append(val);
