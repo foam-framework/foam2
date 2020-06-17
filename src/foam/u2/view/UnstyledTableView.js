@@ -354,7 +354,7 @@ foam.CLASS({
                     }
                   }).
                   call(column && column.tableHeaderFormatter ? column.tableHeaderFormatter : prop.tableHeaderFormatter, [column && column.tableHeaderFormatter ? column : prop]).
-                  callIf(isFirstLevelProperty, function() {
+                  callIf(isFirstLevelProperty && prop.isSortable, function() {
                     this.on('click', function(e) {
                       view.sortBy(prop);
                       }).
