@@ -61,9 +61,19 @@ public class CachingAuthService
 
   protected static Map<String,Boolean> getPermissionMap(final X x) {
     Session             session = x.get(Session.class);
-    Map<String,Boolean> map = session.getUserId() == ((User) x.get("user")).getId() ? 
-      (Map) session.getContext().get(CACHE_KEY) :
-      null;
+    Subject subject   = (Subject) x.get("subject");
+    User user         = subject.getUser();
+
+    // If the user in the context does not match the session user, do not use the 
+    // cache permission map, which belong to session user
+    Long contextUserId = user.getId();
+    Long sessionUserId = session.getUserId();
+
+    if ( ! contextUserId.equals(sessionUserId) ) {
+      return new ConcurrentHashMap<String,Boolean>();
+    }
+
+    Map<String,Boolean> map =     (Map) session.getContext().get(CACHE_KEY);
 
     if ( map == null ) {
       Sink purgeSink = new Sink() {
@@ -86,8 +96,6 @@ public class CachingAuthService
       DAO userDAO       = (DAO) x.get("localUserDAO");
       DAO groupDAO      = (DAO) x.get("localGroupDAO");
       DAO groupPermissionJunctionDAO = (DAO) x.get("groupPermissionJunctionDAO");
-      Subject subject   = (Subject) x.get("subject");
-      User user         = subject.getUser();
       User agent        = subject.getRealUser();
       Predicate predicate = EQ(User.ID, user.getId());
 
