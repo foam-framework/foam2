@@ -1,24 +1,28 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.nanos.bench.benchmarks;
 
-import java.util.Map;
 import foam.core.X;
 import foam.nanos.bench.Benchmark;
 import foam.nanos.bench.BenchmarkRunner;
 import foam.nanos.bench.BenchmarkRunner.Builder;
 import foam.nanos.pm.PM;
+import java.util.Map;
 
-public class PMBenchmark implements Benchmark {
+public class PMBenchmark
+  implements Benchmark
+{
 
   @Override
   public void setup(X x) {
-    // TODO Auto-generated method stub
-
   }
 
   @Override
   public void teardown(X x, Map stats) {
-    // TODO Auto-generated method stub
-
   }
 
   @Override

@@ -147,7 +147,7 @@ foam.CLASS({
       if ( self.showRootOnSearch )
         self.showRootOnSearch.set(self.showRootOnSearch.get() || self.doesThisIncludeSearch);
 
-      this.data[self.relationship.forwardName].select().then(function(val){
+      this.data[self.relationship.forwardName].select().then(function(val) {
         self.hasChildren = val.array.length > 0;
         self.subMenus    = val.array;
       });

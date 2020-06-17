@@ -44,6 +44,14 @@ foam.INTERFACE({
       `
     },
     {
+      name: 'markNotLast',
+      synchronized: true,
+      type: 'void',
+      documentation: `
+        Inform the Assembly that it isn't the last in the line.
+      `
+    },
+    {
       name: 'isLast',
       synchronized: true,
       type: 'Boolean',

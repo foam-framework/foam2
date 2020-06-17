@@ -27,8 +27,7 @@ foam.CLASS({
 
     ^ .foam-u2-ActionView-back {
       display: flex;
-      align-items: center;
-      width: 30%;
+      align-self: flex-start;
     }
 
     ^account-name {
@@ -60,7 +59,8 @@ foam.CLASS({
   ],
 
   exports: [
-    'controllerMode'
+    'controllerMode',
+    'as objectSummaryView'
   ],
 
   properties: [

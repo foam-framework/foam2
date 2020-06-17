@@ -610,8 +610,10 @@ foam.CLASS({
     function parseClassFromString(str, opt_cls, opt_ctx) {
       return this.strict ?
           // JSON.parse() is faster; use it when data format allows.
-          foam.json.parse(JSON.parse(str), opt_cls,
-                          opt_ctx || this.creationContext) :
+          foam.json.parse(
+            JSON.parse(str),
+            opt_cls,
+            opt_ctx || this.creationContext) :
           // Create new parser iff different context was injected; otherwise
           // use same parser bound to "creationContext" each time.
           opt_ctx ? foam.parsers.FON.create({
@@ -739,14 +741,24 @@ foam.LIB({
             // https://github.com/foam-framework/foam2/issues/613 is fixed.
             if ( c.PARSE_JSON ) return c.PARSE_JSON(json, opt_class, opt_ctx);
 
+            var pMap = c.model_.getPrivate_('axiomsByNameOrShortnameMap');
+
+            if ( ! pMap ) {
+              pMap = c.model_.setPrivate_('axiomsByNameOrShortnameMap', {});
+              c.getAxiomsByClass(foam.core.Property).forEach(function(p) {
+                pMap[p.name] = p;
+                if ( p.shortName ) pMap[p.shortName] = p;
+              });
+            }
+
             for ( var key in json ) {
-              var prop = c.getAxiomByName(key);
+              var prop = pMap[key];
               if ( prop ) {
                 var js = prop.fromJSON(json[key], opt_ctx, prop, this);
                 if ( js == null && json[key] != 'null' ) {
                   console.warn('Unable to parse property "' + key + '"', 'in', json);
                 } else {
-                  json[key] = js;
+                  json[prop.name] = js;
                 }
               }
             }

@@ -36,7 +36,11 @@ foam.CLASS({
 
   methods: [
     {
-      documentation: `Acquire theme through users spid.`,
+      documentation: `Acquire theme through users spid.
+Later themes:
+1. domain
+2. group
+3. user`,
       name: 'findTheme',
       type: 'foam.nanos.theme.Theme',
       args: [
@@ -47,18 +51,6 @@ foam.CLASS({
       ],
       code: async function(x) {
         var theme;
-        var user = x.user;
-        var group = x.group;
-        if ( user && group ) { // non-null when logged in.
-          theme = await user.theme$find;
-          if ( theme ) return theme;
-          var group = await user.group$find;
-          while ( group ) {
-            theme = await group.theme$find;
-            if ( theme ) return theme;
-            group = await group.parent$find;
-          }
-        }
         var domain = window && window.location.hostname || 'localhost';
         if ( domain ) {
           var themeDomain = await this.themeDomainDAO.find(domain);
@@ -72,27 +64,35 @@ foam.CLASS({
               this.EQ(foam.nanos.theme.Theme.ENABLED, true)
             );
             theme = await this.themeDAO.find(predicate);
-            if ( theme ) return theme;
           }
         }
-        console && console.warn('Theme not found: '+domain);
+        if ( ! theme ) {
+          console && console.warn('Theme not found: '+domain);
+        }
+
+        var user = x.user;
+        var group = x.group;
+        if ( user && group ) { // non-null when logged in.
+          var group = await user.group$find;
+          while ( group ) {
+            var groupTheme = await group.theme$find;
+            if ( groupTheme ) {
+              theme = theme && theme.copyFrom(groupTheme) || theme;
+            }
+            group = await group.parent$find;
+          }
+          var userTheme = await user.theme$find;
+          if ( userTheme ) {
+            theme = theme && theme.copyFrom(userTheme) || theme;
+          }
+        }
+        if ( theme ) {
+          return theme;
+        }
         return foam.nanos.theme.Theme.create({ 'name': 'foam', 'appName': 'FOAM' });
       },
       javaCode: `
-      DAO groupDAO = (DAO) x.get("groupDAO");
-      Theme theme = (Theme) x.get("theme");
-      if ( theme != null ) return theme;
-      User user = ((Subject) x.get("subject")).getUser();
-      if ( user != null ) {
-        theme = user.findTheme(x);
-        if ( theme != null ) return theme;
-        Group group = user.findGroup(x);
-        while ( group != null ) {
-          theme = group.findTheme(x);
-          if ( theme != null ) return theme;
-          group = (Group) groupDAO.find(group.getParent());
-        }
-      }
+      Theme theme = null;
       String domain = "localhost";
       HttpServletRequest req = x.get(HttpServletRequest.class);
       if ( req != null ) {
@@ -109,9 +109,31 @@ foam.CLASS({
             foam.mlang.MLang.EQ(Theme.ID, td.getTheme()),
             foam.mlang.MLang.EQ(Theme.ENABLED, true)
           ));
-        if ( theme != null ) return theme;
       }
-      ((foam.nanos.logger.Logger) x.get("logger")).warning("Theme not found.", req.getServerName());
+      if ( theme == null ) {
+        ((foam.nanos.logger.Logger) x.get("logger")).warning("Theme not found.", req != null ? req.getServerName() : "");
+      }
+
+      DAO groupDAO = (DAO) x.get("groupDAO");
+      User user = ((Subject) x.get("subject")).getUser();
+      if ( user != null ) {
+        Group group = user.findGroup(x);
+        while ( group != null ) {
+          Theme groupTheme = group.findTheme(x);
+          if ( groupTheme != null ) {
+            theme = (Theme) theme.fclone().copyFrom(groupTheme);
+          }
+          group = (Group) groupDAO.find(group.getParent());
+        }
+        Theme userTheme = user.findTheme(x);
+        if ( userTheme != null ) {
+          theme = (Theme) theme.fclone().copyFrom(userTheme);
+        }
+      }
+      if ( theme != null ) {
+        return theme;
+      }
+
       return new Theme.Builder(x).setName("foam").setAppName("FOAM").build();
       `
     }
