@@ -73,9 +73,10 @@ foam.CLASS({
               return null;
             }
           }
+          return dao;
         }
       }
-      return dao;
+      return null;
       `
     },
     {
@@ -115,6 +116,7 @@ foam.CLASS({
       dao = getMDAO(x, cmd);
 
       FObject nu = cmd.getData();
+      getLogger().debug("put_", "find_", nu.getClass().getSimpleName(), nu.getProperty("id"));
       FObject old = dao.find_(x, nu.getProperty("id"));
       if (  old != null ) {
          nu = old.fclone().copyFrom(nu);
@@ -148,6 +150,7 @@ foam.CLASS({
       }
 
       ClusterCommand cmd = (ClusterCommand) obj;
+      getLogger().debug("cmd_", "ClusterCommand", java.util.Arrays.toString(cmd.getHops()));
       DAO dao = getClientDAO(x, cmd);
       if ( dao != null ) {
         return dao.cmd_(x, cmd);

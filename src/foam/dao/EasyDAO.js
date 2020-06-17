@@ -180,11 +180,9 @@ foam.CLASS({
         if ( getCluster() &&
              getMdao() != null ) {
           getLogger().debug(getName(), "cluster", "delegate", delegate.getClass().getSimpleName());
-          delegate = new foam.dao.StorageOptionalDAO.Builder(getX())
-            .setDelegate(new foam.nanos.medusa.MedusaAdapterDAO.Builder(getX())
-              .setNSpec(getNSpec())
-              .setDelegate(delegate)
-              .build())
+          delegate = new foam.nanos.medusa.MedusaAdapterDAO.Builder(getX())
+            .setNSpec(getNSpec())
+            .setDelegate(delegate)
             .build();
         } else {
           if ( getStorageOptionalEnabled() ) {

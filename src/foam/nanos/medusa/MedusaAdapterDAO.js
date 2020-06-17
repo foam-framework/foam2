@@ -114,18 +114,29 @@ foam.CLASS({
       3. If not mediator, proxy to the next 'server', put result.`,
       name: 'put_',
       javaCode: `
-      // TODO/REVIEW: does Clusterable make sense?
+       // TODO/REVIEW: does Clusterable make sense?
       if ( obj instanceof Clusterable &&
            ! ((Clusterable) obj).getClusterable() ) {
         getLogger().debug("put", "not clusterable", obj.getProperty("id"));
         return getDelegate().put_(x, obj);
       }
+
+      if ( obj instanceof ClusterCommand ) {
+        // See ClusterServerDAO which searches the DAO stack for a
+        // Client. This DAO will return itself as the Client when isPrimary.
+        // ClusterServerDAO will then pass the cmd to the Client.
+        obj = ((ClusterCommand) obj).getData();
+      }
+
+      // Primary instance - put to MDAO (delegate)
       if ( getConfig().getIsPrimary() ) {
-        getLogger().debug("put", "primary", obj.getProperty("id"));
+        getLogger().debug("put", "primary", obj.getClass().getSimpleName(), obj.getProperty("id"));
         FObject old = getDelegate().find_(x, obj.getProperty("id"));
         FObject nu = getDelegate().put_(x, obj);
         return submit(x, nu, old, DOP.PUT);
       }
+
+      // Not primary - pass on to next Mediator.
       getLogger().debug("put", "client", obj.getProperty("id"));
       FObject result = getClientDAO().put_(x, obj);
       if ( getConfig().getType() == MedusaType.MEDIATOR ) {
@@ -137,6 +148,7 @@ foam.CLASS({
         }
         return found;
       }
+      // Fall through when not Mediator and update local MDAO (delegate).
       getLogger().debug("put", "client", "delegate.put", obj.getProperty("id"));
       return getDelegate().put_(x, result);
       `
@@ -149,10 +161,16 @@ foam.CLASS({
            ! ((Clusterable) obj).getClusterable() ) {
         return getDelegate().remove_(x, obj);
       }
+
+      if ( obj instanceof ClusterCommand ) {
+        obj = ((ClusterCommand) obj).getData();
+      }
+
       if ( getConfig().getIsPrimary() ) {
         getDelegate().remove_(x, obj);
         return submit(x, obj, null, DOP.REMOVE);
       }
+
       FObject result = getClientDAO().remove_(x, obj);
       if ( getConfig().getType() == MedusaType.MEDIATOR ) {
         return result;
