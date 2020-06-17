@@ -14,7 +14,6 @@ var classes = [
   'foam.core.ContextAgent',
   'foam.core.CompoundContextAgency',
   'foam.core.Identifiable',
-  'foam.core.AbstractFObject',
   'foam.core.Validatable',
   'foam.core.Agency',
   'foam.core.CoreTypesValidationTest',
