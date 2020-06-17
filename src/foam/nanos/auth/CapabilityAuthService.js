@@ -180,7 +180,7 @@ foam.CLASS({
             }
           };
 
-          // Check if the user has a capability that grants the permission
+          // Check if a ucj implies the subject.user(business) has this permission
           Predicate userPredicate = EQ(UserCapabilityJunction.SOURCE_ID, user.getId());
           if ( userCapabilityJunctionDAO.find(AND(userPredicate, capabilityScope, predicate)) != null ) {
             result = true;
