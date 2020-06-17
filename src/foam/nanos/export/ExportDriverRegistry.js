@@ -45,6 +45,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'isAllColumnOptionEnabled',
+      documentation: 'isAllColumnOptionEnabled should be set to true for export drivers, which handle both selected column export and export of all available columns'
     },
     {
       class: 'Boolean',
