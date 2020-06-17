@@ -127,6 +127,11 @@
             <artifactId>bcprov-jdk15on</artifactId>
             <version>1.57</version>
         </dependency>
+        <dependency>
+            <groupId>com.twilio.sdk</groupId>
+            <artifactId>twilio</artifactId>
+            <version>7.50.1</version>
+        </dependency>
 
         <!-- Test Dependencies -->
         <dependency>

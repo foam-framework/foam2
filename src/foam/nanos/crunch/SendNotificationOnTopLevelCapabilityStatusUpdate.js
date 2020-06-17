@@ -46,9 +46,9 @@ foam.CLASS({
 
           Notification notification = new Notification();
 
-          // if the UserCapabilityJunction belongs to an actual user and not a business, send the notification to the user.
-          // otherwise, send the UserCapabilityJunction to the group of admin users of business
-          if ( ! ( user instanceof net.nanopay.model.Business ) ) notification.setUserId(user.getId());
+          // if the UserCapabilityJunction belongs to an actual user, send the notification to the user.
+          // otherwise, send the notification to the group the user is under
+          if ( user.getClass().equals(User.class) ) notification.setUserId(user.getId());
           else  notification.setGroupId(user.getGroup());
 
           notification.setNotificationType("Capability Status Update");
