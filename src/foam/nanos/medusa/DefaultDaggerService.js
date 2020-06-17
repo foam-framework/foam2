@@ -134,6 +134,7 @@ foam.CLASS({
       entry.setIndex2(-1L);
       entry.setHash2("9232622261b1df4dff84067b2df22ecae387162742626326216bf9b4d0d29a3f");
       entry.setHash(hash(getX(), entry));
+      entry.setVerified(true);
       entry = (MedusaEntry) dao.put_(getX(), entry);
       updateLinks(getX(), entry);
 
@@ -145,6 +146,7 @@ foam.CLASS({
       entry.setIndex2(-1L);
       entry.setHash2("50c1071e836bdd4f2d4b5907bb6090fae6891d6cacdb70dcd72770bfd43dc814");
       entry.setHash(hash(getX(), entry));
+      entry.setVerified(true);
       entry = (MedusaEntry) dao.put_(getX(), entry);
       updateLinks(getX(), entry);
      `

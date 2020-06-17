@@ -13,10 +13,15 @@ foam.CLASS({
 
   javaImports: [
     'foam.dao.DAO',
+    'static foam.mlang.MLang.AND',
     'static foam.mlang.MLang.EQ',
     'static foam.mlang.MLang.GTE',
+    'static foam.mlang.MLang.LT',
     'static foam.mlang.MLang.MAX',
+    'static foam.mlang.MLang.MIN',
+    'static foam.mlang.MLang.OR',
     'foam.mlang.sink.Max',
+    'foam.mlang.sink.Min',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger'
   ],
@@ -79,17 +84,15 @@ foam.CLASS({
             }
             // NOTE: using internalMedusaDAO else we'll block on ReplayingDAO.
             DAO dao = (DAO) getX().get("internalMedusaDAO");
-            dao = dao.where(GTE(MedusaEntry.CONSENSUS_COUNT, support.getNodeQuorum()));
-            // REVIEW: not sure we want our own max, could have wholes.
-            Max max = (Max) dao.select(MAX(MedusaEntry.INDEX));
+            dao = dao.where(EQ(MedusaEntry.VERIFIED, false));
+            Min min = (Min) dao.select(MIN(MedusaEntry.INDEX));
 
             ReplayDetailsCmd details = new ReplayDetailsCmd();
             details.setRequester(myConfig.getId());
             details.setResponder(config.getId());
-            if ( max != null &&
-                 max.getValue() != null ) {
-              //cmd.setFromIndex((Long) max.getValue());
-              details.setMinIndex((Long) max.getValue());
+            if ( min != null &&
+                 min.getValue() != null ) {
+              details.setMinIndex((Long) min.getValue());
             }
             getLogger().debug(myConfig.getId(), "ReplayDetailsCmd to", config.getId());
             details = (ReplayDetailsCmd) clientDAO.cmd_(getX(), details);
