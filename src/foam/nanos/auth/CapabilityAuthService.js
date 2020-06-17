@@ -143,15 +143,15 @@ foam.CLASS({
         if ( x == null || permission == null ) return false;
         if ( x.get(Session.class) == null ) return false;
         if ( user == null || ! user.getEnabled() ) return false;
-        User agent = ((Subject) x.get("subject")).getRealUser();
-        String agentKey = agent.getId() == user.getId() ?
+        User realUser = ((Subject) x.get("subject")).getRealUser();
+        String realUserKey = realUser.getId() == user.getId() ?
           null :
-          user.getId() + ":" + agent.getId() + permission;
+          user.getId() + ":" + realUser.getId() + permission;
         String userKey = user.getId() + permission;
         this.initialize(x);
 
         Boolean result = ( (Map<String, Boolean>) getCache() ).get(userKey);
-        if ( agentKey != null ) result = result == null || ! result ?  ( (Map<String, Boolean>) getCache() ).get(agentKey) : result;
+        if ( realUserKey != null ) result = result == null || ! result ?  ( (Map<String, Boolean>) getCache() ).get(realUserKey) : result;
         if ( result != null ) {
           if ( ! result ) maybeIntercept(x, permission);
           return result;
@@ -192,17 +192,17 @@ foam.CLASS({
           }
 
           // Check if a ucj implies the subject.realUser(agent) has this permission
-          if ( agent != null && agentKey != null ) {
+          if ( realUser != null && realUserKey != null ) {
             userPredicate = AND(
               INSTANCE_OF(AgentCapabilityJunction.class),
-              EQ(UserCapabilityJunction.SOURCE_ID, agent.getId()),
+              EQ(UserCapabilityJunction.SOURCE_ID, realUser.getId()),
               EQ(AgentCapabilityJunction.EFFECTIVE_USER, user.getId())
             );
             if ( userCapabilityJunctionDAO.find(AND(userPredicate, capabilityScope, predicate)) != null ) {
               result = true;
             }
 
-            (( Map<String, Boolean> ) getCache()).put(agentKey, result);
+            (( Map<String, Boolean> ) getCache()).put(realUserKey, result);
             if ( result ) {
               return true;
             }
