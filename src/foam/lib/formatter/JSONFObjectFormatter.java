@@ -74,7 +74,7 @@ public class JSONFObjectFormatter
   protected boolean outputShortNames_    = true;
   protected boolean outputDefaultValues_ = false;
   protected boolean multiLineOutput_     = false;
-  protected boolean outputClassNames_    = true;
+//  protected boolean outputClassNames_    = true;
   protected boolean outputReadableDates_ = true;
   protected boolean outputDefaultClassNames_ = true;
 
@@ -86,7 +86,7 @@ public class JSONFObjectFormatter
     super();
   }
 
-  protected void outputUndefined() {
+  protected void outpvutUndefined() {
   }
 
   protected void outputNull() {
@@ -303,7 +303,16 @@ public class JSONFObjectFormatter
   }
 
   public void outputDelta(FObject oldFObject, FObject newFObject) {
-    ClassInfo info           = oldFObject.getClassInfo();
+    outputDelta(oldFObject, newFObject, null);
+  }
+
+  public void outputDelta(FObject oldFObject, FObject newFObject, ClassInfo defaultClass) {
+    ClassInfo info = newFObject.getClassInfo();
+
+    boolean outputClassName = false;
+
+    if ( info != defaultClass || outputDefaultClassNames_ ) outputClassName = true;
+
     ClassInfo newInfo        = newFObject.getClassInfo();
     boolean   outputComma    = true;
     List      delta          = getDelta(oldFObject, newFObject);
@@ -315,7 +324,7 @@ public class JSONFObjectFormatter
 
     b_.append('{');
     addInnerNewline();
-    if ( outputClassNames_ && outputDefaultClassNames_ ) {
+    if ( outputClassName ) {
       //output Class name
       outputKey("class");
       b_.append(':');
@@ -327,7 +336,7 @@ public class JSONFObjectFormatter
     outputProperty(newFObject, id);
 
     // to output class names for references
-    outputDefaultClassNames_ = true;
+//    outputDefaultClassNames_ = true;
 
     for ( int i = 0 ; i < size ; i++ ) {
       b_.append(',');
@@ -340,12 +349,6 @@ public class JSONFObjectFormatter
     b_.append('}');
   }
 
-  public void outputDelta(FObject oldFObject, FObject newFObject, ClassInfo defaultClass) {
-    ClassInfo info = newFObject.getClassInfo();
-
-    if ( info == defaultClass ) outputDefaultClassNames_ = false;
-    outputDelta(oldFObject, newFObject);
-  }
   protected void addInnerNewline() {
     if ( multiLineOutput_ ) {
       b_.append('\n');
@@ -370,22 +373,18 @@ public class JSONFObjectFormatter
   public void output(FObject o, ClassInfo defaultClass) {
     ClassInfo info = o.getClassInfo();
 
-    if ( info == defaultClass ) outputDefaultClassNames_ = false;
+    boolean outputClassName = false;
 
-    output(o);
-  }
-
-  public void output(FObject o) {
-    ClassInfo info = o.getClassInfo();
+    if ( info != defaultClass || outputDefaultClassNames_ ) outputClassName = true;
 
     b_.append('{');
     addInnerNewline();
-    if ( outputClassNames_ && outputDefaultClassNames_ ) {
+    if ( outputClassName ) {
       outputKey("class");
       b_.append(':');
       output(info.getId());
     }
-    boolean outputComma = outputClassNames_ && outputDefaultClassNames_;
+    boolean outputComma = outputClassName && outputDefaultClassNames_;
 
     // to output class names for references
     outputDefaultClassNames_ = true;
@@ -398,6 +397,10 @@ public class JSONFObjectFormatter
     }
     addInnerNewline();
     b_.append('}');
+  }
+
+  public void output(FObject o) {
+    output(o, null);
   }
 
   public void output(PropertyInfo prop) {
@@ -468,10 +471,10 @@ public class JSONFObjectFormatter
     return this;
   }
 
-  public JSONFObjectFormatter setOutputClassNames(boolean outputClassNames) {
-    outputClassNames_ = outputClassNames;
-    return this;
-  }
+//  public JSONFObjectFormatter setOutputClassNames(boolean outputClassNames) {
+//    outputClassNames_ = outputClassNames;
+//    return this;
+//  }
 
   public JSONFObjectFormatter setOutputDefaultClassNames(boolean f) {
     outputDefaultClassNames_ = f;
