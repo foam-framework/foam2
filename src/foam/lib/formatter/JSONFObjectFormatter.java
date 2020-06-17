@@ -74,7 +74,8 @@ public class JSONFObjectFormatter
   protected boolean outputDefaultValues_ = false;
   protected boolean multiLineOutput_     = false;
   protected boolean outputReadableDates_ = true;
-  protected boolean outputDefaultClassNames_ = true;
+  protected boolean outputDefaultClassNames_ = false;
+  protected boolean outputClassNames_    = true;
 
   public JSONFObjectFormatter(X x) {
     super(x);
@@ -307,9 +308,9 @@ public class JSONFObjectFormatter
   public void outputDelta(FObject oldFObject, FObject newFObject, ClassInfo defaultClass) {
     ClassInfo info = newFObject.getClassInfo();
 
-    boolean outputClassName = false;
+    boolean outputClass = false;
 
-    if ( info != defaultClass || outputDefaultClassNames_ ) outputClassName = true;
+    if ( outputClassNames_ && ( info != defaultClass || outputDefaultClassNames_ ) ) outputClass = true;
 
     ClassInfo newInfo        = newFObject.getClassInfo();
     boolean   outputComma    = true;
@@ -322,7 +323,7 @@ public class JSONFObjectFormatter
 
     b_.append('{');
     addInnerNewline();
-    if ( outputClassName ) {
+    if ( outputClass ) {
       //output Class name
       outputKey("class");
       b_.append(':');
@@ -369,21 +370,18 @@ public class JSONFObjectFormatter
   public void output(FObject o, ClassInfo defaultClass) {
     ClassInfo info = o.getClassInfo();
 
-    boolean outputClassName = false;
+    boolean outputClass = false;
 
-    if ( info != defaultClass || outputDefaultClassNames_ ) outputClassName = true;
+    if ( outputClassNames_ && ( info != defaultClass || outputDefaultClassNames_ ) ) outputClass = true;
 
     b_.append('{');
     addInnerNewline();
-    if ( outputClassName ) {
+    if ( outputClass ) {
       outputKey("class");
       b_.append(':');
       output(info.getId());
     }
-    boolean outputComma = outputClassName && outputDefaultClassNames_;
-
-    // to output class names for references
-    outputDefaultClassNames_ = true;
+    boolean outputComma = outputClass;
 
     List axioms = getProperties(info);
     int  size   = axioms.size();
