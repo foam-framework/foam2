@@ -132,6 +132,11 @@
             <artifactId>twilio</artifactId>
             <version>7.50.1</version>
         </dependency>
+        <dependency>
+            <groupId>io.methvin</groupId>
+            <artifactId>directory-watcher</artifactId>
+            <version>0.9.10</version>
+        </dependency>
 
         <!-- Test Dependencies -->
         <dependency>
