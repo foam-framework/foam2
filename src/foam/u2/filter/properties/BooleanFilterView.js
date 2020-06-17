@@ -19,7 +19,7 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.u2.CheckBox'
+    'foam.u2.tag.TernarySwitch'
   ],
 
   css: `
@@ -42,20 +42,15 @@ foam.CLASS({
       margin-bottom: 20px;
     }
 
-    ^container .foam-u2-md-CheckBox-label {
-      position: relative;
-      margin-top: 0;
-    }
-
-    ^container .foam-u2-md-CheckBox {
-      border-color: #9ba1a6;
-    }
-
-    ^container .foam-u2-md-CheckBox:checked {
-      background-color: #406dea;
-      border-color: #406dea;
+    ^container .foam-u2-tag-TernarySwitch {
+      flex-grow: 1;
+      text-align: center;
     }
   `,
+
+  messages: [
+    { name: 'help', message: 'Click the switch to modify the filter.' }
+  ],
 
   properties: [
     {
@@ -66,18 +61,9 @@ foam.CLASS({
       required: true
     },
     {
-      class: 'Boolean',
-      name: 'boolT',
-      label: 'True',
-      documentation: 'Filter property for True, mostly for UI/UX purposes',
-      value: false
-    },
-    {
-      class: 'Boolean',
-      name: 'boolF',
-      label: 'False',
-      documentation: 'Filter property for False, mostly for UI/UX purposes',
-      value: false
+      class: 'Int',
+      name: 'ternaryState',
+      value: 2 // 2 is neutral
     },
     {
       name: 'predicate',
@@ -87,10 +73,10 @@ foam.CLASS({
         generate a new main predicate and also reciprocate the changes to the
         other Search Views.
       `,
-      expression: function(boolT, boolF) {
-        if ( ( ! boolT && ! boolF ) || ( boolT && boolF )) return this.TRUE;
+      expression: function(ternaryState) {
+        if ( ternaryState === 2 ) return this.TRUE;
 
-        return this.EQ(this.property, boolT);
+        return this.EQ(this.property, ternaryState === 1);
       }
     },
     {
@@ -104,24 +90,12 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      var self = this;
       this.addClass(this.myClass())
         .start().addClass(this.myClass('container'))
-          .start({
-            class: 'foam.u2.md.CheckBox',
-            data$: this.boolT$,
-            showLabel: true,
-            label: this.BOOL_T.label
-          }).end()
+          .tag(this.TernarySwitch, {
+            ternaryState$: this.ternaryState$
+          })
         .end()
-        .start().addClass(this.myClass('container'))
-          .start({
-            class: 'foam.u2.md.CheckBox',
-            data$: this.boolF$,
-            showLabel: true,
-            label: this.BOOL_F.label
-          }).end()
-        .end();
     },
 
     /**
@@ -129,8 +103,7 @@ foam.CLASS({
     * Required on all SearchViews. Called by ReciprocalSearch.
     */
     function clear() {
-      this.boolT = false;
-      this.boolF = false;
+      this.ternaryState = 2;
     },
 
     /**
@@ -139,8 +112,8 @@ foam.CLASS({
     function restoreFromPredicate(predicate) {
       if ( predicate == this.TRUE ) return;
 
-      if ( predicate.arg2.value ) this.boolT = true;
-      if ( ! predicate.arg2.value ) this.boolF = true;
+      if ( predicate.arg2.value ) this.ternaryState = 1;
+      if ( ! predicate.arg2.value ) this.ternaryState = 0;
     }
   ]
 });
