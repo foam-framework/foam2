@@ -29,7 +29,7 @@ foam.CLASS({
 
     ^ .foam-u2-ActionView-back {
       display: flex;
-      align-items: center;
+      align-self: flex-start;
     }
 
     ^account-name {
@@ -133,8 +133,10 @@ foam.CLASS({
           if ( e.message === "An approval request has been sent out." ){
             this.ctrl.add(this.NotificationMessage.create({
               message: e.message,
-              type: 'success'
+              type: 'info'
             }));
+
+            this.stack.back();
           } else {
             this.ctrl.add(this.NotificationMessage.create({
               message: e.message,

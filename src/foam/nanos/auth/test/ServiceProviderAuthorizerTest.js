@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.nanos.auth.test',
   name: 'ServiceProviderAuthorizerTest',
@@ -19,7 +25,7 @@ foam.CLASS({
         User nonAdminUser = new User();
         DAO bareUserDAO = (DAO) x.get("bareUserDAO");
         DAO serviceProviderDAO = (DAO) x.get("serviceProviderDAO");
-        ServiceProvider serviceProvider = new ServiceProvider();
+        ServiceProvider serviceProvider = new ServiceProvider.Builder(x).setId("test").build();
         boolean threw;
 
         nonAdminUser = (User) bareUserDAO.put(nonAdminUser);

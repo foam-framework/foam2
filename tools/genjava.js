@@ -113,7 +113,6 @@ logger.debug('fileWhitelist', fileWhitelist);
   'foam.dao.FlowControl',
   'foam.dao.sync.SyncRecord',
   'foam.dao.sync.VersionedSyncRecord',
-  'foam.mlang.order.ThenBy',
   'foam.mlang.Expressions',
   'foam.nanos.menu.MenuBar',
 
@@ -306,10 +305,18 @@ var addDepsToClasses = function() {
     function collectDeps() {
       var classMap = {};
       var classQueue = classes.slice(0);
+      const PRINT_LIMIT = 25;
+      let printCounter = 0;
       while ( classQueue.length ) {
         var cls = classQueue.pop();
         if ( ! classMap[cls] && ! blacklist[cls] ) {
-          console.log('generating', cls);
+          if ( printCounter < PRINT_LIMIT ) {
+            console.log('generating', cls);
+            printCounter = printCounter + 1;
+          } else if ( printCounter == PRINT_LIMIT ) {
+            console.log('generating ...');
+            printCounter = printCounter + 1;
+          }
           cls = foam.lookup(cls);
           if ( ! checkFlags(cls.model_) ) continue;
           classMap[cls.id] = true;

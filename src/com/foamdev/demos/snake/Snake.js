@@ -33,10 +33,11 @@ foam.CLASS({
       this.Animation.create({
         duration: 2000,
         f: () => {
-          this.x += Math.random()*4000-2000;
-          this.y += Math.random()*4000-2000;
+          this.x += Math.random()*1200-600;
+          this.y += Math.random()*1200-600;
         },
-        objs: [ this ]
+        objs: [ this ],
+        interp: Math.sqrt
       }).start();
     }
   ],
@@ -337,9 +338,9 @@ foam.CLASS({
         if ( this.Mushroom.isInstance(o) ) {
           // Only die from fully grown mushrooms
           if ( o.scaleX == 1 ) {
+            this.gameOver();
             this.snake.explode();
             o.explode();
-            this.gameOver();
           } else {
             o.detach();
           }
@@ -361,6 +362,7 @@ foam.CLASS({
     },
 
     function gameOver() {
+      if ( ! this.timer.isStarted ) return;
       this.timer.stop();
       this.collider.stop();
 

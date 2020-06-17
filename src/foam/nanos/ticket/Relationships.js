@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.RELATIONSHIP({
   sourceModel: 'foam.nanos.auth.User',
   targetModel: 'foam.nanos.ticket.Ticket',
@@ -10,7 +16,7 @@ foam.RELATIONSHIP({
   unauthorizedTargetDAOKey: 'localTicketDAO',
   // REVIEW: unable to get owner to display in any section on Ticket.
   targetProperty: {
-    readVisibility: 'RO',
+    visibility: 'RO',
     section: 'infoSection',
     tableCellFormatter: function(value) {
       this.add(this.__subSubContext__.userDAO.find(value)

@@ -150,7 +150,7 @@ foam.CLASS({
             .end()
           .end()
         .end()
-        
+
         // Container for the detailview
         .start('div', [], this.container_$)
           .addClass(this.myClass('detail-container'))

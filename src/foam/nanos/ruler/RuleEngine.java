@@ -74,16 +74,22 @@ public class RuleEngine extends ContextAwareSupport {
         applyRule(rule, obj, oldObj, agency);
         pm.log(x_);
         agency.submit(x_, x -> saveHistory(rule, obj), "Save history. Rule id:" + rule.getId());
-      } catch ( Exception e ) {
-        // logger.debug(this.getClass().getSimpleName(), "id", rule.getId(), "\\nrule", rule, "\\nobj", obj, "\\nold", oldObj, "\\n", e);
-        logger.error(this.getClass().getSimpleName(), "id", rule.getId(), e);
+      } catch (Exception e) {
+        // To be expected if a rule blocks an operation. Not an error.
+        logger.debug(this.getClass().getSimpleName(), "id", rule.getId(), "\\nrule", rule, "\\nobj", obj, "\\nold", oldObj, "\\n", e);
         throw e;
       }
     }
     try {
       compoundAgency.execute(x_);
     } catch (Exception e) {
-      logger.error(e.getMessage(), e);
+      // This should never happen.
+      // It means there's a bug in a Rule agent and it should be fixed.
+      var message = "CRITICAL UNEXPECTED EXCEPTION EXECUTING RULE";
+
+      logger.error(message, e);
+      // TODO: this breaks CI, enable when all test cases passing
+      // throw new RuntimeException(message, e);
     }
 
     asyncApplyRules(rules, obj, oldObj);

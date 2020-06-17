@@ -740,6 +740,7 @@ foam.CLASS({
        * different.
        */
       if ( Object.is(oldValue, newValue) ) return;
+      if ( foam.Date.isInstance(newValue) && foam.Date.equals(newValue, oldValue) ) return;
       if ( ! this.hasListeners('propertyChange', prop.name) ) return;
 
       var slot = prop.toSlot(this);

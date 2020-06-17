@@ -29,8 +29,8 @@ foam.CLASS({
     'bsh.Interpreter',
     'foam.core.*',
     'foam.dao.*',
-    'foam.nanos.logger.Logger',
     'foam.nanos.auth.*',
+    'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
     'java.io.ByteArrayOutputStream',
     'java.io.PrintStream',
@@ -212,8 +212,8 @@ foam.CLASS({
           shell.set("currentScript", this);
           shell.set("x", x);
           shell.eval("runScript(String name) { script = x.get(\\"scriptDAO\\").find(name); if ( script != null ) eval(script.code); }");
-          shell.eval("foam.core.X sudo(String user) { foam.util.Auth.sudo(x, (String) user); }");
-          shell.eval("foam.core.X sudo(Object id) { foam.util.Auth.sudo(x, id); }");
+          shell.eval("foam.core.X sudo(String user) { return foam.util.Auth.sudo(x, (String) user); }");
+          shell.eval("foam.core.X sudo(Object id) { return foam.util.Auth.sudo(x, id); }");
         } catch (EvalError e) {}
 
         return shell;
@@ -285,16 +285,16 @@ foam.CLASS({
                   scriptId: script.id,
                   notificationType: 'Script Execution',
                   body: `Status: ${script.status}
-                        Script Output: ${script.length > self.MAX_NOTIFICATION_OUTPUT_CHARS ?
-                          script.output.substring(0, self.MAX_NOTIFICATION_OUTPUT_CHARS) + '...' :
-                          script.output }
-                        LastDuration: ${script.lastDuration}`
+                    Script Output: ${script.length > self.MAX_NOTIFICATION_OUTPUT_CHARS ?
+                      script.output.substring(0, self.MAX_NOTIFICATION_OUTPUT_CHARS) + '...' :
+                      script.output }
+                    LastDuration: ${script.lastDuration}`
                 });
                 self.notificationDAO.put(notification);
               }
             }).catch(function() {
-               clearInterval(interval);
-              });
+              clearInterval(interval);
+            });
         }, 2000);
       }
     }
@@ -311,21 +311,25 @@ foam.CLASS({
         this.status = this.ScriptStatus.SCHEDULED;
         if ( this.server ) {
           this.__context__[this.daoKey].put(this).then(function(script) {
-              self.copyFrom(script);
-              if ( script.status === self.ScriptStatus.RUNNING ) {
-                self.poll();
-              }
+            self.copyFrom(script);
+            if ( script.status === self.ScriptStatus.RUNNING ) {
+              self.poll();
+            }
           });
         } else {
           this.status = this.ScriptStatus.RUNNING;
-          this.runScript().then(() => {
-            this.status = this.ScriptStatus.UNSCHEDULED;
-            this.__context__[this.daoKey].put(this);
-          }).catch((err) => {
-            console.log(err);
-            this.status = this.ScriptStatus.ERROR;
-            this.__context__[this.daoKey].put(this);
-          });
+          this.runScript().then(
+            () => {
+              this.status = this.ScriptStatus.UNSCHEDULED;
+              this.__context__[this.daoKey].put(this);
+            },
+            (err) => {
+              this.output += '\n' + err.stack;
+              console.log(err);
+              this.status = this.ScriptStatus.ERROR;
+              this.__context__[this.daoKey].put(this);
+            }
+          );
         }
       }
     }

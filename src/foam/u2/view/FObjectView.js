@@ -7,12 +7,13 @@
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'FObjectView',
-  extends: 'foam.u2.View',
+  extends: 'foam.u2.Controller',
 
   documentation: 'View for editing FObjects.',
 
   imports: [
-    'strategizer'
+    'setTimeout',
+    'strategizer?'
   ],
 
   properties: [
@@ -20,47 +21,30 @@ foam.CLASS({
       class: 'String',
       name: 'objectClass',
       label: '',
-      visibility: function(choices) {
-        return choices.length > 1 ?
+      visibility: function(allowCustom, choices) {
+        return allowCustom || choices.length > 1 ?
           foam.u2.DisplayMode.RW :
           foam.u2.DisplayMode.HIDDEN;
       },
       view: function(args, X) {
         return {
-          class: 'foam.u2.view.ChoiceView',
-          choices$: X.data.choices$,
-          defaultValue$: X.data.choices$.map((choices) => {
-            return Array.isArray(choices) && choices.length > 0 ? choices[0][0] : '';
-          })
+          class: X.data.allowCustom ? 'foam.u2.TextField' : 'foam.u2.view.ChoiceView',
+          choices$: X.data.choices$
         };
-      },
-      postSet: function(oldValue, newValue) {
-        if ( newValue !== oldValue && oldValue !== '') {
-          if ( this.data && this.data.cls_.name === newValue ) return;
-          var m = this.__context__.lookup(newValue, true);
-          if ( m ) {
-            this.data = m.create(null, this);
-          }
-        }
       }
     },
     {
       class: 'FObjectProperty',
       name: 'data',
       label: '',
-      postSet: function(_, data) {
-        if ( ! data ) {
-          this.objectClass = undefined;
-        } else if ( data.cls_.id != this.objectClass ) {
-          this.objectClass = data.cls_.id;
-        }
-      },
       // We need to override the default view, otherwise we end up with a
       // circular definition where FObjectView has an FObjectProperty which gets
       // rendered as an FObjectView, which leads to infinite recursion.
-      view: function(args, X) {
-        return X.data.dataView || { class: 'foam.u2.detail.SectionedDetailView' }
-      }
+      preSet: function(o, n) {
+        return n || o;
+      },
+      view: 'foam.u2.DetailView',
+      xview: 'foam.u2.detail.SectionedDetailView'
     },
     {
       class: 'foam.u2.ViewSpec',
@@ -70,6 +54,13 @@ foam.CLASS({
     {
       class: 'Class',
       name: 'of'
+    },
+    {
+      class: 'Boolean',
+      name: 'allowCustom',
+      factory: function() {
+        return this.choices.length == 0;
+      }
     },
     {
       class: 'Array',
@@ -83,22 +74,12 @@ foam.CLASS({
   ],
 
   methods: [
-    function init() {
-      this.onDetach(this.of$.sub(this.updateChoices));
-      this.updateChoices();
-    },
-
     function updateChoices() {
       if ( this.of == null ) {
         this.choices = [];
         return;
       }
 
-      // 'found' is set to true if the current data's objectClass is one
-      // of the valid choices. If it isn't, then the objectClass is set
-      // to the first choice to cause a new 'data' to be created.
-      var found = false;
-      var data  = this.data;
       // If this view is being used in a nanos application, then use the
       // strategizer service to populate the list of choices. Otherwise
       // populate the list of choices using models related to 'of' via the
@@ -107,7 +88,6 @@ foam.CLASS({
         this.strategizer.query(null, this.of.id).then((strategyReferences) => {
           if ( ! Array.isArray(strategyReferences) || strategyReferences.length === 0 ) {
             this.choices = [[this.of.id, this.of.model_.label]];
-            found = data && data.cls_.name == this.of.id;
             return;
           }
 
@@ -118,15 +98,12 @@ foam.CLASS({
                 return arr;
               }
 
-              if ( data && data.cls_.name === sr.strategy.id ) found = true;
-              return arr.concat([[sr.strategy.id, sr.label || sr.strategy.model_.label]]);
+              return arr.concat([[sr.strategy.id, sr.strategy.model_.label]]);
             }, [])
             .filter(x => x);
 
           // Sort choices alphabetically by label.
           choices.sort((a, b) => a[1] > b[1] ? 1 : -1);
-
-          if ( ! found && choices.length ) this.objectClass = choices[0][0];
 
           this.choices = choices;
         }).catch(err => console.warn(err));
@@ -137,13 +114,33 @@ foam.CLASS({
 
     function initE() {
       this.SUPER();
-      this
-        .tag(foam.u2.detail.VerticalDetailView, {
-          data: this,
-          sections: [{
-            properties: [this.OBJECT_CLASS, this.DATA]
-          }]
-        });
+
+      if ( ! this.choices.length ) {
+        this.onDetach(this.of$.sub(this.updateChoices));
+        this.updateChoices();
+      }
+
+      function dataToClass(d) {
+        return d ? d.cls_.id : '';
+      }
+
+      var classToData = function(c) {
+        var m = c && this.__context__.lookup(c, true);
+        return m ? m.create(null, this) : null;
+      }.bind(this);
+
+      this.data$.relateTo(
+        this.objectClass$,
+        dataToClass,
+        classToData
+      );
+      if ( this.data ) { this.objectClass = dataToClass(this.data); }
+      if ( ! this.data && ! this.objectClass && this.choices.length ) this.objectClass = this.choices[0][0];
+
+      this.
+        tag(this.OBJECT_CLASS).
+        tag(foam.u2.DetailView, {data$: this.data$});
+            
     },
 
     function choicesFallback(of) {

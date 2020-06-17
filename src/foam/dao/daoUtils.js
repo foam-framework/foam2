@@ -94,15 +94,13 @@ return listener
       buildJavaClass: function(cls) {
         cls.extras.push(`
 public ProxyDAO(foam.core.X x, foam.dao.DAO delegate) {
-  foam.nanos.logger.Logger log = (foam.nanos.logger.Logger)x.get("logger");
-  log.warning("Direct constructor use is deprecated. Use Builder instead.", ((delegate != null && delegate.getOf() != null) ? delegate.getOf().getId() : ""));
   setX(x);
   setDelegate(delegate);
 }
         `);
-      },
-    },
-  ],
+      }
+    }
+  ]
 });
 
 
@@ -199,10 +197,11 @@ foam.CLASS({
       class: 'Promised',
       of: 'foam.dao.DAO',
       methods: [ 'put_', 'remove_', 'find_', 'select_', 'removeAll_', 'listen_', 'cmd_' ],
-      name: 'promise'
+      name: 'promise',
+      factory: function() { return foam.core.Latch.create(); }
     }
   ],
-  
+
   methods: [
     {
       name: 'listen_',

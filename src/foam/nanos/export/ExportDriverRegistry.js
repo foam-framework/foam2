@@ -7,6 +7,9 @@
 foam.CLASS({
   package: 'foam.nanos.export',
   name: 'ExportDriverRegistry',
+  implements: [
+    'foam.nanos.auth.EnabledAware'
+  ],
 
   documentation: 'Export driver registry model',
 
@@ -38,6 +41,16 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'isOpenable'
+    },
+    {
+      class: 'Boolean',
+      name: 'exportAllColumns',
+      documentation: 'exportAllColumns should be set to true for export drivers, which handle both selected column export and export of all available columns'
+    },
+    {
+      class: 'Boolean',
+      name: 'enabled',
+      value: true
     }
   ]
 });

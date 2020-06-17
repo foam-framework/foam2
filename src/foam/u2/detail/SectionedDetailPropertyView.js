@@ -192,6 +192,12 @@ foam.CLASS({
     ^ .foam-u2-view-RadioView label {
       margin-left: 12px;
     }
+    
+    ^ .foam-u2-layout-Cols { 
+      padding-bottom: 4px;
+      display: flex;
+      align-items: center;
+    }
   `,
 
   requires: [
@@ -225,6 +231,7 @@ foam.CLASS({
 
       this
         .addClass(this.myClass())
+        .addClass(`sectioned-detail-property-${this.prop.name}`)
         .add(this.slot(function(mode, prop, prop$label) {
 
           var errorSlot = prop.validateObj && prop.validationTextVisible ?

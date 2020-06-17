@@ -92,15 +92,29 @@ foam.CLASS({
           daoType: 'MDAO',
           testData: [
             { id: 'key1', name: 'John',  value: 'value1' },
-            { id: 'key2', name: 'Jane',  value: 'value2' },
+            { id: 'key2', name: 'John',  value: 'value2' },
             { id: 'key3', name: 'Kevin', value: 'value3' },
-            { id: 'key4', name: 'Kim',   value: 'value4' },
+            { id: 'key4', name: 'Kevin', value: 'value4' },
             { id: 'key5', name: 'Larry', value: 'value5' },
             { id: 'key6', name: 'Linda', value: 'value6' }
           ]
         });
       },
       view: {
+        class: 'foam.u2.MultiView',
+        views: [
+          {
+            class: 'foam.u2.DAOList',
+            rowView: { class: 'com.google.foam.demos.heroes.CitationView' }
+          },
+          {
+            class: 'foam.u2.GroupingDAOList',
+            rowView: { class: 'com.google.foam.demos.heroes.CitationView' },
+            groupExpr: com.google.foam.demos.u2.SampleData.NAME
+          }
+        ]
+      },
+      xxxview: {
         class: 'foam.u2.DAOList',
         rowView: { class: 'com.google.foam.demos.heroes.CitationView' }
       }
@@ -135,6 +149,15 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'defaultInt'
+    },
+    {
+      class: 'Int',
+      name: 'intWithIntView',
+      view: {
+        class: 'foam.u2.view.IntView',
+        onKey: true,
+        displayWidth: 50
+      }
     },
     {
       class: 'Int',
@@ -180,7 +203,7 @@ foam.CLASS({
       view: {
         class: 'foam.u2.MultiView',
         horizontal: false,
-        views: [ 'foam.u2.RangeView', 'foam.u2.IntView' ]
+        views: [ 'foam.u2.RangeView', { class: 'foam.u2.view.IntView', onKey: true } ]
       }
     },
     {

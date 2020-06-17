@@ -9,7 +9,9 @@ foam.CLASS({
   name: 'Notification',
 
   implements: [
-    'foam.nanos.auth.Authorizable'
+    'foam.nanos.auth.Authorizable',
+    'foam.nanos.auth.CreatedAware',
+    'foam.nanos.auth.CreatedByAware'
   ],
 
   documentation: 'Notification model responsible for system and integrated messaging notifications.',
@@ -17,10 +19,32 @@ foam.CLASS({
   javaImports: [
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.AuthorizationException',
+    'foam.nanos.auth.Subject',
     'foam.nanos.auth.User'
   ],
 
   tableColumns: ['id', 'body', 'notificationType', 'broadcasted', 'userId', 'groupId' ],
+
+  axioms: [
+    {
+      class: 'foam.comics.v2.CannedQuery',
+      label: 'Unread',
+      predicateFactory: function(e) {
+        return e.AND(
+          e.EQ(foam.nanos.notification.Notification.READ, false),
+        );
+      }
+    },
+    {
+      class: 'foam.comics.v2.CannedQuery',
+      label: 'Read',
+      predicateFactory: function(e) {
+        return e.AND(
+          e.EQ(foam.nanos.notification.Notification.READ, true),
+        );
+      }
+    }
+  ],
 
   properties: [
     {
@@ -52,13 +76,23 @@ foam.CLASS({
       value: 'General'
     },
     {
-      class: 'Date',
-      name: 'issuedDate',
-      factory: function() { return new Date(); },
-      label: 'Notification Date',
-      documentation: 'Date notification was created.',
-      visibility: 'RO',
-      javaFactory: `return new java.util.Date();`
+      class: 'DateTime',
+      name: 'created',
+      documentation: 'Creation date.'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdBy',
+      documentation: 'User that created the Notification.'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdByAgent',
+      documentation: 'Agent user that created the Notification.',
+      readPermissionRequired: true,
+      writePermissionRequired: true
     },
     {
       class: 'Date',
@@ -108,16 +142,6 @@ foam.CLASS({
       documentation: 'Email template name.'
     },
     {
-      class: 'Boolean',
-      name: 'emailIsEnabled',
-      documentation: 'Determines an email is sent to user.'
-    },
-    {
-      class: 'Boolean',
-      name: 'sendSlackMessage',
-      documentation: 'Sends notification as a Slack message.'
-    },
-    {
       class: 'String',
       name: 'slackWebhook',
       documentation: 'Webhook associated to Slack.'
@@ -125,7 +149,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'slackMessage',
-      documentation: 'Message to be sent to Slack if sendSlackMessage is enabled.'
+      documentation: 'Message to be sent to Slack.'
     }
   ],
 
@@ -137,7 +161,7 @@ foam.CLASS({
       ],
       type: 'Boolean',
       javaCode: `
-        User user = (User) x.get("user");
+        User user = ((Subject) x.get("subject")).getUser();
         return user != null && getUserId() == user.getId();
       `
     },

@@ -11,6 +11,7 @@ import foam.core.PropertyInfo;
 import foam.core.X;
 import foam.dao.ProxyDAO;
 import foam.lib.json.Outputter;
+import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ public class AuditDAO
 
   @Override
   public FObject put_(X x, FObject obj) {
-    User    user     = (User) x.get("user");
+    User    user     = ((Subject) x.get("subject")).getUser();
     Logger  logger   = (Logger) x.get("logger");
     FObject current  = this.find_(x, obj);
     Object  objectId = obj.getProperty("id");
@@ -58,7 +59,7 @@ public class AuditDAO
 
   @Override
   public FObject remove_(X x, FObject obj) {
-    User   user     = (User) x.get("user");
+    User   user     = ((Subject) x.get("subject")).getUser();
     Logger logger   = (Logger) x.get("logger");
     Object objectId = obj.getProperty("id");
 

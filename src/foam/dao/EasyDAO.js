@@ -146,6 +146,12 @@ foam.CLASS({
           }
         }
 
+        if ( getStorageOptionalEnabled() ) {
+          delegate = new foam.dao.StorageOptionalDAO.Builder(getX())
+            .setDelegate(delegate)
+            .build();
+        }
+
         delegate = getOuterDAO(delegate);
 
         if ( getDecorator() != null ) {
@@ -163,13 +169,19 @@ foam.CLASS({
         }
 
         if ( getApprovableAware() ) {
-          delegate = new foam.nanos.approval.ApprovableAwareDAO
-          .Builder(getX())
-          .setDaoKey(getName())
-          .setOf(getOf())
-          .setDelegate(delegate)
-          .setIsEnabled(getApprovableAwareEnabled())
-          .build();
+          var delegateBuilder = new foam.nanos.approval.ApprovableAwareDAO
+            .Builder(getX())
+            .setDaoKey(getName())
+            .setOf(getOf())
+            .setDelegate(delegate);
+          if(approvableAwareServiceNameIsSet_)
+            delegateBuilder.setServiceName(getApprovableAwareServiceName());
+
+          delegate = delegateBuilder.build();
+
+          if ( getApprovableAwareEnabled() ) {
+            logger.warning("DEPRECATED: EasyDAO", getName(), "'approvableAwareEnabled' is deprecated. Please remove it from the nspec.");
+          }
         }
 
         if ( getGuid() && getSeqNo() )
@@ -182,7 +194,7 @@ foam.CLASS({
           setStartingValue(getSeqStartingValue()).
           build();
         }
-        
+
         if ( getGuid() )
           delegate = new foam.dao.GUIDDAO.Builder(getX()).setDelegate(delegate).build();
 
@@ -542,7 +554,7 @@ foam.CLASS({
           delegate: this.remoteListenerSupport ?
             this.WebSocketBox.create({ uri: this.serviceName }) :
             this.HTTPBox.create({ url: this.serviceName })
-        })
+        });
         if ( this.retryBoxMaxAttempts != 0 ) {
           box = this.RetryBox.create({
             maxAttempts: this.retryBoxMaxAttempts,
@@ -632,9 +644,12 @@ model from which to test ServiceProvider ID (spid)`,
       class: 'Boolean',
       documentation: `
         Denotes if a model is approvable aware, and if so it should ALWAYS have this decorator on,
-        if an object is approvableAware but the user does not want the approval requests turned on,
-        they should set the approvableAwareEnabled property to false instead of setting the 
-        approvableAware property to false
+        if an object is ApprovableAware but the user want the object to skip the checker/approval
+        phase, they should set the object checkerPredicate such that it is evaluated to false.
+
+        Setting easyDAO.approvableAware to false, on the other hand, would opt-out the decorator
+        (ie. ApprovableAwareDAO) completely and since ApprovableAware interface implements
+        LifecycleAware the lifecycleState property on the object will not be changed to ACTIVE.
       `,
       javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.approval.ApprovableAware.class.isAssignableFrom(getOf().getObjClass());'
     },
@@ -642,21 +657,35 @@ model from which to test ServiceProvider ID (spid)`,
       name: 'approvableAwareEnabled',
       class: 'Boolean',
       documentation: `
-        Handles the approval process set to true, otherwise if set to false it will automatically
-        bypass the approval system
-
+        DEPRECATING: Will be removed after services migration. Please use 'approvableAware' instead.
       `,
-      javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.approval.ApprovableAware.class.isAssignableFrom(getOf().getObjClass());'
+      javaFactory: 'return false;'
     },
-    {	
-      name: 'deletedAware',	
-      class: 'Boolean',	
+    {
+      name: 'deletedAware',
+      class: 'Boolean',
       documentation: `
         DEPRECATING: Completely removing until services migration journal script is in
       `,
-      javaFactory: 'return false;'	
+      javaFactory: 'return false;'
     },
- ],
+    {
+      name: 'approvableAwareServiceName',
+      class: 'String',
+      documentation: 'If the DAO is approvable aware, this sets the ApprovableAwareDAO ServiceName field'
+    },
+    {
+      name: 'approvableAwareRelationshipName',
+      class: 'String',
+      documentation: 'If the DAO is approvable aware, this sets the ApprovableAwareDAO RelationshipName field'
+    },
+    {
+      name: 'storageOptionalEnabled',
+      class: 'Boolean',
+      documentation: 'Discard DAO updates which result in only storageOptional properties changing, like LastModified, for example.',
+      javaFactory: 'return false;'
+    }
+  ],
 
   methods: [
     {

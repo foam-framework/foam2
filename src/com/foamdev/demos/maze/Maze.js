@@ -371,9 +371,10 @@ foam.CLASS({
     function open() {
       this.isClosed = false;
       this.Animation.create({
-        duration: 300,
+        duration: 1000,
         f:        () => this.rotation = Math.PI / 4,
-        objs:     [ this ]
+        objs:     [ this ],
+        interp: foam.animation.Interp.oscillate(0.8, 0.3)
       }).start();
     },
 

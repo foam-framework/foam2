@@ -27,8 +27,7 @@ foam.CLASS({
 
     ^ .foam-u2-ActionView-back {
       display: flex;
-      align-items: center;
-      width: 30%;
+      align-self: flex-start;
     }
 
     ^account-name {
@@ -60,7 +59,8 @@ foam.CLASS({
   ],
 
   exports: [
-    'controllerMode'
+    'controllerMode',
+    'as objectSummaryView'
   ],
 
   properties: [
@@ -134,6 +134,40 @@ foam.CLASS({
         this.stack.push({
           class: 'foam.comics.v2.DAOUpdateView',
           data: this.data,
+          config: this.config,
+          of: this.config.of
+        }, this.__subContext__);
+      }
+    },
+    {
+      name: 'copy',
+      isEnabled: function(config, data) {
+        if ( config.CRUDEnabledActionsAuth && config.CRUDEnabledActionsAuth.isEnabled ) {
+          try {
+            let permissionString = config.CRUDEnabledActionsAuth.enabledActionsAuth.permissionFactory(foam.nanos.ruler.Operations.CREATE, data);
+
+            return this.auth.check(null, permissionString);
+          } catch(e) {
+            return false;
+          }
+        }
+        return true;
+      },
+      isAvailable: function(config) {
+        try {
+          return config.createPredicate.f();
+        } catch(e) {
+          return false;
+        }
+      },
+      code: function() {
+        if ( ! this.stack ) return;
+        let newRecord = this.data.clone();
+        // Clear PK so DAO can generate a new unique one
+        newRecord.id = undefined;
+        this.stack.push({
+          class: 'foam.comics.v2.DAOCreateView',
+          data: newRecord,
           config: this.config,
           of: this.config.of
         }, this.__subContext__);
@@ -214,6 +248,10 @@ foam.CLASS({
                       .tag(self.EDIT, {
                         buttonStyle: foam.u2.ButtonStyle.TERTIARY,
                         icon: 'images/edit-icon.svg'
+                      })
+                      .tag(self.COPY, {
+                        buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                        icon: 'images/copy-icon.svg'
                       })
                       .tag(self.DELETE, {
                         buttonStyle: foam.u2.ButtonStyle.TERTIARY,
