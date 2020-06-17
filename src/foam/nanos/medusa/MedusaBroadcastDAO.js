@@ -210,6 +210,7 @@ foam.CLASS({
         .select(new ArraySink())).getArray();
 
       for ( ClusterConfig config : arr ) {
+        getLogger().debug("submit", "job", dop.getLabel(), config.getId());
         getAssemblyLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
           public void executeJob() {
             try {
@@ -229,12 +230,13 @@ foam.CLASS({
               }
               getClients().put(config.getId(), dao);
 
+
               if ( DOP.PUT == dop ) {
                 MedusaEntry entry = (MedusaEntry) obj;
-                getLogger().debug("submit", "job", dop.getLabel(), entry.getIndex(), config.getName(), "data", (entry.getData() != null) ? entry.getData().getClass().getSimpleName():"null");
+                getLogger().debug("submit", "executeJob", dop.getLabel(), config.getName(), entry.getIndex());
                 dao.put_(x, entry);
               } else if ( DOP.CMD == dop ) {
-                getLogger().debug("submit", "job", dop.getLabel(), obj.getClass().getSimpleName(), config.getName());
+                getLogger().debug("submit", "executeJob", dop.getLabel(), config.getName(), obj.getClass().getSimpleName());
                 dao.cmd_(x, obj);
               }
             } catch ( Throwable t ) {
