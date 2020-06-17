@@ -94,7 +94,6 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
-
       this
       .addClass(this.myClass())
       .start()
@@ -124,8 +123,8 @@ foam.CLASS({
     },
 
     function openMenu(menu) {
-      if ( Object.keys(menu.handler.instance_).length > 0 ) {
-        this.pushMenu(menu.id);
+      if ( menu.handler ) {
+        this.pushMenu(menu);
         this.menuListener(menu);
       }
     }

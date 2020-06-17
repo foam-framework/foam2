@@ -49,6 +49,10 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'storageOptional'
+    },
+    {
+      class: 'Boolean',
       name: 'readPermissionRequired'
     },
     {
@@ -298,6 +302,15 @@ foam.CLASS({
             type: 'boolean',
             visibility: 'public',
             body: 'return ' + this.storageTransient + ';'
+          });
+        }
+
+        if ( this.storageOptional ) {
+          m.push({
+            name: 'getStorageOptional',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.storageOptional + ';'
           });
         }
 

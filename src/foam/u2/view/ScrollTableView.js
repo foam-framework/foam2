@@ -9,6 +9,10 @@
   name: 'ScrollTableView',
   extends: 'foam.u2.Element',
 
+  exports: [
+    'as summaryView'
+  ],
+
   requires: [
     'foam.dao.FnSink',
     'foam.mlang.sink.Count',

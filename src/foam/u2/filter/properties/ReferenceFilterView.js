@@ -3,28 +3,35 @@
 * Copyright 2019 The FOAM Authors. All Rights Reserved.
 * http://www.apache.org/licenses/LICENSE-2.0
 */
+
 foam.CLASS({
-  package: 'foam.u2.filter',
+  package: 'foam.u2.filter.properties',
   name: 'ReferenceFilterView',
   extends: 'foam.u2.Controller',
   documentation: `
-    Enables string filtering on Reference properties of a model.
-    An example might be - enables search by name rather than id of owner on a model where owner is a reference to users.
+    Enables easier filtering on Reference properties of a model. Since references
+    and relationships use ids, we needed a way to filter them with human readable
+    values.
   `,
+
   implements: [
     'foam.mlang.Expressions'
   ],
+
   requires: [
     'foam.u2.CheckBox'
   ],
+
   css: `
     ^ {
       position: relative;
     }
+
     ^container-search {
       padding: 24px 16px;
       border-bottom: solid 1px #cbcfd4;
     }
+
     ^ .foam-u2-TextField {
       width: 100%;
       height: 36px;
@@ -37,11 +44,18 @@ foam.CLASS({
       background-position: 8px;
       padding: 0 21px 0 38px;
     }
+
+    ^label-limit {
+      margin-top: 8px;
+      margin-bottom: 0;
+    }
+
     ^container-filter {
       max-height: 320px;
       overflow: scroll;
       padding-bottom: 24px;
     }
+
     ^label-section {
       padding: 0 16px;
       font-size: 12px;
@@ -50,6 +64,7 @@ foam.CLASS({
       letter-spacing: normal;
       color: #1e1f21;
     }
+
     ^label-loading {
       padding: 0 16px;
       font-size: 12px;
@@ -59,37 +74,57 @@ foam.CLASS({
       color: #1e1f21;
       text-align: center;
     }
+
     ^container-option {
       display: flex;
       align-items: center;
       padding: 4px 16px;
     }
+
     ^container-option:hover {
       cursor: pointer;
       background-color: #f5f7fa;
     }
+
     ^container-option .foam-u2-md-CheckBox-label {
       position: relative;
       margin-top: 0;
     }
+
     ^container-option .foam-u2-md-CheckBox {
       border-color: #9ba1a6;
     }
+
     ^container-option .foam-u2-md-CheckBox:checked {
       background-color: #406dea;
       border-color: #406dea;
     }
   `,
+
+  messages: [
+    { name: 'LABEL_PLACEHOLDER', message: 'Search' },
+    { name: 'LABEL_LIMIT_REACHED', message: 'Please refine your search to view more options' },
+    { name: 'LABEL_LOADING', message: '- LOADING OPTIONS -' },
+    { name: 'LABEL_NO_OPTIONS', message: '- NO OPTIONS AVAILABLE -' },
+    { name: 'LABEL_SELECTED', message: 'SELECTED OPTIONS' },
+    { name: 'LABEL_FILTERED', message: 'OPTIONS' }
+  ],
+
   properties: [
     {
       name: 'property',
-      documentation: `The referenced property on which this view is providing string search.`,
+      documentation: `
+        The referenced property on which this view is providing string search.
+      `,
       required: true
     },
     {
       name: 'targetDAOName',
-      documentation: `The name of the DAO that contains the reference property - the userDAO in the case
-      where a reference to owner is intended to be filtered by name rather than id.`,
+      documentation: `
+        The name of the DAO that contains the reference property - the userDAO
+        in the case where a reference to owner is intended to be filtered by
+        name rather than id.
+      `,
       expression: function(property) {
         return property.targetDAOKey;
       }
@@ -101,18 +136,19 @@ foam.CLASS({
     },
     {
       name: 'referenceObjectsArray',
+      documentation: 'The array containing the actual result of the reference',
       factory: function() {
         return [];
       }
     },
     {
       name: 'idToStringDisplayMap',
-      documentation: 'map that contains ids as keys and strings as values',
-      expression: function(referenceObjectsArray, setOfReferenceIds) {
-        if ( referenceObjectsArray.length === 0 || ! setOfReferenceIds ) return {};
+      documentation: 'Map that contains the ids as keys and strings as values',
+      expression: function(referenceObjectsArray, daoContents) {
+        if ( referenceObjectsArray.length === 0 || ! daoContents ) return {};
         var result = {};
         for ( i = 0; i < referenceObjectsArray.length; i++ ) {
-          if ( setOfReferenceIds.has(referenceObjectsArray[i].id) ) {
+          if ( daoContents.groupKeys.includes(referenceObjectsArray[i].id) ) {
             var objectId = referenceObjectsArray[i].id;
             var summary = referenceObjectsArray[i].toSummary();
             if ( summary ) {
@@ -126,18 +162,7 @@ foam.CLASS({
       }
     },
     {
-      name: 'daoContents',
-      factory: function() {
-        return [];
-      }
-    },
-    {
-      name: 'setOfReferenceIds',
-      documentation: 'an array of unique reference ids',
-      expression: function(daoContents) {
-        if ( ! daoContents ) return;
-        return new Set(daoContents);
-      }
+      name: 'daoContents'
     },
     {
       name: 'selectedOptions',
@@ -153,7 +178,7 @@ foam.CLASS({
     {
       name: 'filteredOptions',
       expression: function(property, daoContents, idToStringDisplayMap, search, selectedOptions) {
-        if ( ! daoContents || daoContents.length === 0 || ! idToStringDisplayMap ) return [];
+        if ( ! daoContents || ! idToStringDisplayMap ) return [];
 
         var options = Object.values(idToStringDisplayMap);
         // Filter out search
@@ -174,27 +199,34 @@ foam.CLASS({
       }
     },
     {
-      name: 'name',
-      documentation: `Required by SearchManager.`,
-      value: 'Reference filter view'
+      class: 'Boolean',
+      name: 'isLoading',
+      documentation: 'Boolean tracking that we are still loading info from DAO',
+      value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'isOverLimit'
     },
     {
       name: 'predicate',
-      documentation: ``,
+      documentation: `
+        All Search Views must have a predicate as required by the
+        Filter Controller. When this property changes, the Filter Controller will
+        generate a new main predicate and also reciprocate the changes to the
+        other Search Views.
+      `,
       expression: function(selectedOptions, idToStringDisplayMap) {
-        function getKeyByValue_(object, value) {
-          return Object.keys(object).find( (key) => object[key] === value );
-        }
-        if ( selectedOptions.length <= 0 ) {
+        if ( selectedOptions.length <= 0 || Object.keys(idToStringDisplayMap).length === 0 ) {
           return this.TRUE;
         }
         if ( selectedOptions.length === 1 ) {
-          var key = getKeyByValue_(idToStringDisplayMap, selectedOptions[0]);
+          var key = this.getKeyByValue(selectedOptions[0]);
           key = parseInt(key) ? parseInt(key) : key;
           return this.EQ(this.property, key);
         }
         var keys = selectedOptions.map( (label) => {
-          var key = getKeyByValue_(idToStringDisplayMap, label);
+          var key = this.getKeyByValue(label);
           key = parseInt(key) ? parseInt(key) : key;
           return key;
         });
@@ -202,19 +234,14 @@ foam.CLASS({
       }
     },
     {
-      class: 'Boolean',
-      name: 'isLoading',
-      documentation: 'boolean tracking we are still loading info from DAO',
-      value: true
+      name: 'name',
+      documentation: 'Required by Filter Controller.',
+      expression: function(property) {
+        return property.name;
+      }
     }
   ],
-  messages: [
-    { name: 'LABEL_PLACEHOLDER', message: 'Search' },
-    { name: 'LABEL_LOADING', message: '- LOADING OPTIONS -' },
-    { name: 'LABEL_NO_OPTIONS', message: '- NO OPTIONS AVAILABLE -' },
-    { name: 'LABEL_SELECTED', message: 'SELECTED OPTIONS' },
-    { name: 'LABEL_FILTERED', message: 'OPTIONS' }
-  ],
+
   methods: [
     function initE() {
       var self = this;
@@ -222,20 +249,25 @@ foam.CLASS({
         console.error('Please specify a targetDAOKey on the reference.');
         return;
       }
-      this.onDetach(this.setOfReferenceIds$.sub(this.updateReferenceObjectsArray));
+
+      this.onDetach(this.daoContents$.sub(this.updateReferenceObjectsArray));
       this.onDetach(this.dao$.sub(this.daoUpdate));
       this.daoUpdate();
-      this
-        .addClass(this.myClass())
-          .start().addClass(this.myClass('container-search'))
-            .start({
-              class: 'foam.u2.TextField',
-              data$: this.search$,
-              placeholder: this.LABEL_PLACEHOLDER,
-              onKey: true
-            })
-            .end()
+      this.addClass(this.myClass())
+        .start().addClass(this.myClass('container-search'))
+          .start({
+            class: 'foam.u2.TextField',
+            data$: this.search$,
+            placeholder: this.LABEL_PLACEHOLDER,
+            onKey: true
+          })
           .end()
+          .start('p')
+            .addClass(this.myClass('label-limit'))
+            .show(this.isOverLimit$)
+            .add(this.LABEL_LIMIT_REACHED)
+          .end()
+        .end()
         .start().addClass(self.myClass('container-filter'))
         .add(this.slot(function(property, selectedOptions, isLoading) {
           var element = this.E();
@@ -253,7 +285,7 @@ foam.CLASS({
                   class: 'foam.u2.md.CheckBox',
                   data: true,
                   showLabel: true,
-                  label: option ? option : self.LABEL_EMPTY
+                  label: option ? self.getLabelWithCount(option) : self.LABEL_EMPTY
                 }).end()
               .end();
             });
@@ -286,7 +318,7 @@ foam.CLASS({
                   class: 'foam.u2.md.CheckBox',
                   data: false,
                   showLabel: true,
-                  label: option ? option : self.LABEL_EMPTY
+                  label: option ? self.getLabelWithCount(option) : self.LABEL_EMPTY
                 }).end()
               .end();
             });
@@ -294,6 +326,34 @@ foam.CLASS({
         }))
       .end();
     },
+
+    function getKeyByValue(value) {
+      return Object.keys(this.idToStringDisplayMap).find( (key) => this.idToStringDisplayMap[key] === value );
+    },
+
+    function getLabelWithCount(option) {
+      var referenceKey = this.getKeyByValue(option);
+      var countForKey = this.daoContents.groups[referenceKey].value;
+      return countForKey > 1 ? `[${countForKey}] ${option}` : option;
+    },
+
+    /**
+     * Restores the view based on passed in predicate
+     */
+    function restoreFromPredicate(predicate) {
+      if ( predicate === this.TRUE ) return;
+
+      var selections = Array.isArray(predicate.arg2.value) ? predicate.arg2.value : [predicate.arg2.value];
+      // wait for idToStringDisplayMap to populate
+      this.idToStringDisplayMap$.sub(() => {
+        var options = [];
+        selections.forEach((selection) => {
+          options.push(this.idToStringDisplayMap[selection]);
+        });
+        this.selectedOptions = options;
+      })
+    },
+
     /**
     * Clears the fields to their default values.
     * Required on all SearchViews. Called by ReciprocalSearch.
@@ -302,14 +362,17 @@ foam.CLASS({
       this.selectedOptions = [];
     }
   ],
+
   listeners: [
     {
       name: 'daoUpdate',
       code: function() {
+        this.isOverLimit = false;
         this.isLoading = true;
-        this.dao.select(this.GROUP_BY(this.property, this.COUNT())).then(function(result) {
-          self.daoContents = result.groupKeys; //  gets contents from the source dao
-          self.isLoading = false;
+        this.dao.select(this.GROUP_BY(this.property, null, 101)).then((results) => {
+          this.daoContents = results; // gets contents from the source dao
+          if ( Object.keys(results.groups).length > 100 ) this.isOverLimit = true;
+          this.isLoading = false;
         });
       }
     },
@@ -330,10 +393,9 @@ foam.CLASS({
     {
       name: 'updateReferenceObjectsArray',
       code: function() {
-        if ( ! this.daoContents || this.daoContents.length === 0 ) return;
-        var self = this;
-        this.__subContext__[this.targetDAOName].where(this.IN(this.property.of.ID, this.daoContents)).select().then(function(result) {
-          self.referenceObjectsArray = result.array;
+        if ( ! this.daoContents || this.daoContents.groupKeys.length === 0 ) return;
+        this.__subContext__[this.targetDAOName].where(this.IN(this.property.of.ID, this.daoContents.groupKeys)).select().then((results) => {
+          this.referenceObjectsArray = results.array;
         });
       }
     }

@@ -38,6 +38,7 @@ public class SyncAssemblyLine
 
     try {
       synchronized ( startLock_ ) {
+        if ( q_ != null ) q_.markNotLast();
         previous = q_;
         q_ = job;
         job.executeUnderLock();
@@ -46,8 +47,11 @@ public class SyncAssemblyLine
       job.executeJob();
       if ( previous != null ) previous.waitToComplete();
       synchronized ( endLock_ ) {
-        job.endJob();
-        job.complete();
+        try {
+          job.endJob();
+        } finally {
+          job.complete();
+        }
       }
     } finally {
       // Isn't required, but helps GC last entry.

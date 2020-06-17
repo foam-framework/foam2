@@ -39,14 +39,33 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'errorString'
+      name: 'errorMessage',
+      documentation: `
+        Provide feedback to the user via a Message.
+        To use this, provide the name of the Message you wish to add.
+        When both errorString and errorMessage are specified, the errorMessage will be used.
+      `
+    },
+    {
+      class: 'String',
+      name: 'errorString',
+      documentation: `
+        Provide feedback to the user via a String.
+        When both errorString and errorMessage are specified, the errorMessage will be used.
+      `
     },
     {
       class: 'Function',
       // TODO: it isn't normal for JS functions to have a 'js' prefix
       name: 'jsErr',
-      expression: function(errorString) {
-        return function() { return errorString; };
+      expression: function(errorString, errorMessage) {
+        return function(obj) { 
+          if ( errorMessage && obj ) {
+            if ( obj[errorMessage] ) return obj[errorMessage];
+            console.warn('Error finding message', errorMessage, '. No such message on object.', obj);
+          }
+          return errorString;
+        }
       }
     }
   ],
@@ -93,7 +112,8 @@ foam.CLASS({
           return [args, function() {
             for ( var i = 0 ; i < validationPredicates.length ; i++ ) {
               var vp = validationPredicates[i];
-              if ( vp.jsFunc.bind(this)() ) return vp.jsErr.bind(this)();
+              var self = this;
+              if ( vp.jsFunc.bind(self)() ) return vp.jsErr.bind(self)(self);
             }
             return null;
           }];

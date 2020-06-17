@@ -37,6 +37,7 @@
 
   requires: [
     'foam.dao.AbstractDAO',
+    'foam.u2.dialog.Popup',
     'foam.nanos.approval.ApprovalStatus',
     'foam.u2.dialog.NotificationMessage'
   ],
@@ -46,7 +47,8 @@
     'ctrl',
     'currentMenu',
     'stack',
-    'user'
+    'summaryView?',
+    'objectSummaryView?'
   ],
 
   tableColumns: [
@@ -319,11 +321,9 @@
       view: { class: 'foam.u2.tag.TextArea', rows: 5, cols: 80 },
       documentation: 'Meant to be used for explanation on why request was approved/rejected',
       section: 'supportDetails',
-      visibility: function(memo, status) {
-        if ( status == foam.nanos.approval.ApprovalStatus.REQUESTED ) {
-          return foam.u2.DisplayMode.RW;
-        } else if ( memo ) {
-          return foam.u2.DisplayMode.R0;
+      visibility: function(memo) {
+        if ( memo ) {
+          return foam.u2.DisplayMode.RO;
         } else {
           return foam.u2.DisplayMode.HIDDEN;
         }
@@ -509,6 +509,58 @@
       code: function() {
         return `(${this.classification}) ${this.operation}`;
       }
+    },
+    {
+      name: 'approveWithMemo',
+      code: function(memo){
+        var approvedApprovalRequest = this.clone();
+        approvedApprovalRequest.status = this.ApprovalStatus.APPROVED;
+        approvedApprovalRequest.memo = memo;
+
+        this.approvalRequestDAO.put(approvedApprovalRequest).then(req => {
+          this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
+          this.finished.pub();
+          this.ctrl.add(this.NotificationMessage.create({
+            message: this.SUCCESS_APPROVED
+          }));
+
+          if ( this.stack.top.length > 0 ){
+            this.stack.back();
+          }
+        }, e => {
+          this.throwError.pub(e);
+          this.ctrl.add(this.NotificationMessage.create({
+            message: e.message,
+            type: 'error'
+          }));
+        });
+      }
+    },
+    {
+      name: 'rejectWithMemo',
+      code: function(memo){
+        var rejectedApprovalRequest = this.clone();
+        rejectedApprovalRequest.status = this.ApprovalStatus.REJECTED;
+        rejectedApprovalRequest.memo = memo;
+
+        this.approvalRequestDAO.put(rejectedApprovalRequest).then(o => {
+          this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
+          this.finished.pub();
+          this.ctrl.add(this.NotificationMessage.create({
+            message: this.SUCCESS_REJECTED
+          }));
+
+          if ( this.stack.top.length > 0 ){
+            this.stack.back();
+          }
+        }, e => {
+          this.throwError.pub(e);
+          this.ctrl.add(this.NotificationMessage.create({
+            message: e.message,
+            type: 'error'
+          }));
+        });
+      }
     }
   ],
 
@@ -527,26 +579,12 @@
         return ! isTrackingRequest;
       },
       code: function(X) {
-        var approvedApprovalRequest = this.clone();
-        approvedApprovalRequest.status = this.ApprovalStatus.APPROVED;
+        var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
 
-        X.approvalRequestDAO.put(approvedApprovalRequest).then(o => {
-          X.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
-          this.finished.pub();
-          X.ctrl.add(this.NotificationMessage.create({
-            message: this.SUCCESS_APPROVED
-          }));
-
-          if ( X.currentMenu.id !== X.stack.top[2] ) {
-            X.stack.back();
-          }
-        }, e => {
-          this.throwError.pub(e);
-          X.ctrl.add(this.NotificationMessage.create({
-            message: e.message,
-            type: 'error'
-          }));
-        });
+        objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
+          class: "foam.u2.MemoModal",
+          onExecute: this.approveWithMemo.bind(this)
+        }));
       }
     },
     {
@@ -563,26 +601,13 @@
         return ! isTrackingRequest;
       },
       code: function(X) {
-        var rejectedApprovalRequest = this.clone();
-        rejectedApprovalRequest.status = this.ApprovalStatus.REJECTED;
+        var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
 
-        X.approvalRequestDAO.put(rejectedApprovalRequest).then(o => {
-          X.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
-          this.finished.pub();
-          X.ctrl.add(this.NotificationMessage.create({
-            message: this.SUCCESS_REJECTED
-          }));
-
-          if ( X.currentMenu.id !== X.stack.top[2] ) {
-            X.stack.back();
-          }
-        }, e => {
-          this.throwError.pub(e);
-          X.ctrl.add(this.NotificationMessage.create({
-            message: e.message,
-            type: 'error'
-          }));
-        });
+        objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
+          class: "foam.u2.MemoModal",
+          onExecute: this.rejectWithMemo.bind(this),
+          isMemoRequired: true
+        }));
       }
     },
     {
