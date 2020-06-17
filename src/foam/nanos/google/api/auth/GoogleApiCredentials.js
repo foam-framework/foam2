@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.nanos.export',
+  package: 'foam.nanos.google.api.auth',
   name: 'GoogleApiCredentials',
 
   properties: [
