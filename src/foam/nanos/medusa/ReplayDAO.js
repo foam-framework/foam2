@@ -59,7 +59,7 @@ foam.CLASS({
           .build();
 
         getDelegate()
-          .where(GT(MedusaEntry.INDEX, details.getMinIndex()))
+          .where(GTE(MedusaEntry.INDEX, details.getMinIndex()))
           .select(seq);
 
         if ( count != null &&
