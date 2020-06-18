@@ -39,7 +39,6 @@ foam.CLASS({
       ],
       javaCode: `
         // count number of entries successfully read
-        int successReading = 0;
         JSONParser parser = getParser();
 
         // NOTE: explicitly calling PM constructor as create only creates
@@ -50,44 +49,58 @@ foam.CLASS({
           if ( reader == null ) {
             return;
           }
-          for ( CharSequence entry ; ( entry = getEntry(reader) ) != null ; ) {
+          for (  CharSequence entry ; ( entry = getEntry(reader) ) != null ; ) {
             int length = entry.length();
             if ( length == 0 ) continue;
             if ( COMMENT.matcher(entry).matches() ) continue;
+            final char operation = entry.charAt(0);
+            final String strEntry = entry.subSequence(2, length - 1).toString();
 
-            try {
-              char operation = entry.charAt(0);
-              String strEntry = entry.subSequence(2, length - 1).toString();
+            getLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
 
-              FObject obj = parser.parseString(strEntry, dao.getOf().getObjClass());
-              if ( obj == null ) {
-                getLogger().error("Parse error", getParsingErrorMessage(strEntry), "entry:", strEntry);
-                continue;
+              FObject obj;
+
+              public void executeJob() {
+                obj = parser.parseString(strEntry, dao.getOf().getObjClass());
               }
 
-              switch ( operation ) {
-                case 'p':
-                  foam.core.FObject old = dao.find(obj.getProperty("id"));
-                  dao.put(old != null ? mergeFObject(old.fclone(), obj) : obj);
-                  break;
+              public void endJob() {
+                if ( obj == null ) {
+                  getLogger().error("Parse error", getParsingErrorMessage(strEntry), "entry:", strEntry);
+                  return;
+                }
+                switch ( operation ) {
+                  case 'p':
+                    foam.core.FObject old = dao.find(obj.getProperty("id"));
+                    dao.put(old != null ? mergeFObject(old.fclone(), obj) : obj);
+                    break;
 
-                case 'r':
-                  dao.remove(obj);
-                  break;
+                  case 'r':
+                    dao.remove(obj);
+                    break;
+                }
+                successReading++;
               }
-
-              successReading++;
-            } catch ( Throwable t ) {
-              getLogger().error("Error replaying journal entry:", entry, t);
-            }
+            });
           }
         } catch ( Throwable t) {
           getLogger().error("Failed to read from journal", t);
         } finally {
           pm.log(x);
-          getLogger().log("Successfully read " + successReading + " entries from file: " + getFilename() +" in: "+pm.getTime()+"(ms)");
+          getLogger().log("Successfully read " + successReading + " entries from file: " + getFilename() + " in: " + pm.getTime() + "(ms)");
         }
       `
+    }
+  ],
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(`
+          private int successReading = 0;
+        `
+         );
+      }
     }
   ]
 });
