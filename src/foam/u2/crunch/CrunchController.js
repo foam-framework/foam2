@@ -66,10 +66,12 @@ foam.CLASS({
       // Pre-Order Traversial of Capability Dependancies.
       // Using Pre-Order here will cause the wizard to display
       // dependancies in a logical order.
-      tcRecurse = (sourceId) => {
-        return this.prerequisiteCapabilityJunctionDAO.where(
-          this.EQ(this.CapabilityCapabilityJunction.SOURCE_ID, sourceId)
-        ).select().then((result) => {
+      tcRecurse = (sourceId, seen) => {
+        seen = seen ? seen.map((pcj) => pcj.targetId) : [];
+        return this.prerequisiteCapabilityJunctionDAO.where(this.AND(
+          this.EQ(this.CapabilityCapabilityJunction.SOURCE_ID, sourceId),
+          this.NOT(this.IN(this.CapabilityCapabilityJunction.TARGET_ID, seen))
+        )).select().then((result) => {
           var arry = result.array;
 
           if ( arry.length == 0 ) {
@@ -78,13 +80,13 @@ foam.CLASS({
           }
 
           return arry.reduce(
-            (p, pcj) => p.then(() => tcRecurse(pcj.targetId)),
+            (p, pcj) => p.then(() => tcRecurse(pcj.targetId, arry)),
             Promise.resolve()
           ).then(() => tcList.push(sourceId));
         });
       };
 
-      return tcRecurse(capabilityId).then(() => [...new Set(tcList)]);
+      return tcRecurse(capabilityId, []).then(() => tcList);
     },
     function getCapabilities(capabilityId) {
       return this.getTC(capabilityId).then(
