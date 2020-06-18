@@ -241,21 +241,19 @@ foam.CLASS({
 
         if ( capabilities.size() < 1 ) return;
 
-        List<Capability> filteredCapabilities = new java.util.ArrayList<Capability>(capabilities);
-
         for ( Capability c : capabilities ) {
           if ( ! c.getInterceptIf().f(x) ) {
-            filteredCapabilities.remove(c);
+            capabilities.remove(c);
           }
         }
 
         // Do not throw runtime exception if there are no intercepts
-        if ( filteredCapabilities.size() < 1 ) return;
+        if ( capabilities.size() < 1 ) return;
 
         // Add filteredCapabilities to a runtime exception and throw it
         CapabilityRuntimeException ex = new CapabilityRuntimeException(
           "Permission [" + permission + "] denied. Filtered Capabilities available.");
-        for ( Capability cap : filteredCapabilities ) ex.addCapabilityId(cap.getId());
+        for ( Capability cap : capabilities ) ex.addCapabilityId(cap.getId());
         throw ex;
       `
     }
