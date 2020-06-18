@@ -46,7 +46,7 @@ foam.CLASS({
         var columnConfig = x.columnConfigToPropertyConverter;
 
         var props = columnConfig.returnProperties(cls, columnMetadata.map(m => m.propName));
-        values.push(await this.arrayOfValuesToArrayOfStrings(obj, props));
+        values.push(await this.arrayOfValuesToArrayOfStrings(x, obj, props));
         return values;
       }
     },
@@ -86,7 +86,7 @@ foam.CLASS({
 
         var props = columnConfig.returnProperties(cls, columnsMetadata.map(m => m.propName));
 
-        return await this.returnTable(props, arr);
+        return await this.returnTable(x, props, arr);
       }
     }
   ]

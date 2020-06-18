@@ -8,9 +8,6 @@
   package: 'foam.nanos.column',
   name: 'TableColumnOutputter',
 
-  imports: [
-    'currencyDAO',
-  ],
 
   documentation: 'Class for returning 2d-array ( ie table ) for array of values ',
 
@@ -19,7 +16,7 @@
       name: 'returnStringValueForProperty',
       type: 'String',
       documentation: 'Method that converts value to string',
-      code: async function(prop, val, unitPropName) {
+      code: async function(x, prop, val, unitPropName) {
         if ( val ) {
           if ( foam.Array.isInstance(val) ) {
             var stringArr = [];
@@ -30,16 +27,14 @@
           }
           if ( foam.core.UnitValue.isInstance(prop) ) {
             if ( unitPropName ) {
-              if ( prop.unitPropName === "destinationCurrency" ) {
-                var currency = await this.currencyDAO.find(unitPropName);
-                if ( ! currency ) return unitPropName + ' ' + ( val / 100 ).toString();
-                return currency.format(val);
+              if ( prop.valueToString) {
+                return await prop.valueToString(x, val, unitPropName);
               }
               return unitPropName + ' ' + ( val / 100 ).toString();
             }
             return ( val / 100 ).toString();
           }
-          if ( foam.core.Date.isInstance(prop) ) {
+          if ( foam.core.Date.isInstance(prop) && val.toISOString ) {
             return val.toISOString().substring(0, 10);
           }
           if ( foam.core.DateTime.isInstance(prop) ) {
@@ -63,12 +58,12 @@
     },
     {
       name: 'arrayOfValuesToArrayOfStrings',
-      code: async function(props, values) {
+      code: async function(x, props, values) {
         var stringValues = [];
         for ( var value of values ) {
           var stringArrayForValue = [];
           for ( var i = 0 ; i < value.length ; i++ ) {
-            stringArrayForValue.push(await this.returnStringValueForProperty(props[i], value[i]));
+            stringArrayForValue.push(await this.returnStringValueForProperty(x, props[i], value[i]));
           }
           stringValues.push(stringArrayForValue);
         }
@@ -87,14 +82,14 @@
       name: 'objectToTable',
       code: async function(x, of, props, obj) {
         var values = await this.objToArrayOfStringValues(x, of, props, obj);
-        return this.returnTable(props, values);
+        return this.returnTable(x, props, values);
       }
     },
     {
       name: 'returnTable',
-      code: async function(props, values) {
+      code: async function(x, props, values) {
         var table =  [ props.map( p => p.label ) ];
-        var values = await this.arrayOfValuesToArrayOfStrings(props, values);
+        var values = await this.arrayOfValuesToArrayOfStrings(x, props, values);
         table = table.concat(values);
         return table;
       }

@@ -580,9 +580,9 @@ foam.CLASS({
                     var stringValue;
                     if ( foam.core.UnitValue.isInstance(view.props[i]) ) {
                       var indexOfUnitName = propertyNamesToQuery.indexOf(view.props[i].unitPropName);
-                      stringValue = view.outputter.returnStringValueForProperty(view.props[i], val[i], val[indexOfUnitName]);
+                      stringValue = view.outputter.returnStringValueForProperty(view.__context__, view.props[i], val[i], val[indexOfUnitName]);
                     } else {
-                      stringValue = view.outputter.returnStringValueForProperty(view.props[i], val[i]);
+                      stringValue = view.outputter.returnStringValueForProperty(view.__context__, view.props[i], val[i]);
                     }
                     tableRowElement.start().addClass(view.myClass('td'))
                     .add(stringValue)
