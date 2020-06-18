@@ -3587,6 +3587,7 @@ foam.CLASS({
   name: 'CurrentTime',
   extends: 'foam.mlang.AbstractExpr',
   axioms: [
+    // TODO (michal): remove singleton if all calls to foam.mlang.CurrentTime.create() returns the same instance.
     { class: 'foam.pattern.Singleton' }
   ],
   methods: [
@@ -3799,14 +3800,14 @@ foam.CLASS({
           var current = getArgs()[i].f(obj);
           if ( current instanceof Number ) {
             var value = ((Number) current).doubleValue();
-            result = result == 0.0 ? value : computeStep(result, value);
+            result = result == 0.0 ? value : reduce(result, value);
           }
         }
         return result;
       `
     },
     {
-      name: 'computeStep',
+      name: 'reduce',
       type: 'Double',
       abstract: true,
       args: [
@@ -3825,7 +3826,7 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'computeStep',
+      name: 'reduce',
       abstract: false,
       javaCode: 'return arg1 + arg2;'
     }
@@ -3840,7 +3841,7 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'computeStep',
+      name: 'reduce',
       abstract: false,
       javaCode: 'return arg1 - arg2;'
     }
@@ -3855,7 +3856,7 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'computeStep',
+      name: 'reduce',
       abstract: false,
       javaCode: 'return arg1 * arg2;'
     }
@@ -3870,7 +3871,7 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'computeStep',
+      name: 'reduce',
       abstract: false,
       javaCode: 'return arg1 / arg2;'
     }
@@ -3885,7 +3886,7 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'computeStep',
+      name: 'reduce',
       abstract: false,
       javaCode: 'return arg1 <= arg2 ? arg1 : arg2;'
     }
@@ -3900,7 +3901,7 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'computeStep',
+      name: 'reduce',
       abstract: false,
       javaCode: 'return arg1 >= arg2 ? arg1 : arg2;'
     }
