@@ -128,20 +128,6 @@ foam.CLASS({
               type: 'error'
             }));
           }
-
-          if ( e.message === "An approval request has been sent out." ){
-            this.ctrl.add(this.NotificationMessage.create({
-              message: e.message,
-              type: 'info'
-            }));
-
-            this.stack.back();
-          } else {
-            this.ctrl.add(this.NotificationMessage.create({
-              message: e.message,
-              type: 'error'
-            }));
-          }
         });
       }
     },

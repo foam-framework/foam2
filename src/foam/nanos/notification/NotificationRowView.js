@@ -163,18 +163,6 @@
               type: 'error'
             }));
           }
-
-          if ( e.message === 'An approval request has been sent out.' ) {
-            self.ctrl.add(self.NotificationMessage.create({
-              message: e.message,
-              type: 'info'
-            }));
-          } else {
-            self.ctrl.add(self.NotificationMessage.create({
-              message: e.message,
-              type: 'error'
-            }));
-          }
         })
       },
       {
