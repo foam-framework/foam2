@@ -120,6 +120,11 @@ foam.CLASS({
       },
     },
     {
+      name: 'acceptanceDocumentsCapability',
+      class: 'Reference',
+      of: 'foam.nanos.crunch.Capability'
+    },
+    {
       name: 'domains',
       class: 'Array',
       of: 'String',
