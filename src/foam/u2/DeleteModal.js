@@ -108,7 +108,7 @@ foam.CLASS({
           }
           this.onDelete();
         }).catch((err) => {
-          if ( err.exception && err.exception.userFeedback  ){
+          if ( err.exception && err.exception.userFeedback  ) {
             var currentFeedback = err.exception.userFeedback;
             while ( currentFeedback ) {
               this.notify(currentFeedback.message);
