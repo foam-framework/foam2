@@ -108,9 +108,9 @@ foam.CLASS({
           }
           this.onDelete();
         }).catch((err) => {
-          if ( err.foamException && foam.comics.v2.userfeedback.UserFeedbackException.isInstance(err.foamException) && err.FoamException.userFeedback  ){
+          if ( err.foamException && err.FoamException.userFeedback  ){
             var currentFeedback = err.foamException.userFeedback;
-            while ( currentFeedback ){
+            while ( currentFeedback ) {
               this.notify(currentFeedback.message);
 
               currentFeedback = currentFeedback.next;
