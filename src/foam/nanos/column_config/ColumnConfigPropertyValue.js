@@ -84,6 +84,7 @@ foam.CLASS({
               } else {
                 Method m = ci.getObjClass().getMethod(StringUtil.capitalize(p.getName()), foam.core.X.class);
                 cls = m.getReturnType();
+                //cleaning up StringBuilder by setting it to "find" for another property to use
                 sb.setLength(4);
               }
               ci = (ClassInfo) cls.getMethod("getOwnClassInfo").invoke(null);
