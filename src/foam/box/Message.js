@@ -58,7 +58,7 @@ foam.CLASS({
         wrapper.setMessage(t.getMessage());
         if ( t instanceof foam.core.Exception ) {
           var fe = (foam.core.Exception) t;
-          wrapper.setFoamException(t);
+          wrapper.setException(t);
         }
         
         // Special case for CapabilityRuntimeException
