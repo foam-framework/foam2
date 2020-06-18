@@ -3795,12 +3795,19 @@ foam.CLASS({
     {
       name: 'f',
       javaCode: `
-        var result = 0.0;
+        Double result = null;
         for ( int i = 0; i < getArgs().length; i++) {
           var current = getArgs()[i].f(obj);
           if ( current instanceof Number ) {
+            var oldResult = result;
             var value = ((Number) current).doubleValue();
-            result = result == 0.0 ? value : reduce(result, value);
+            result = result == null ? value : reduce(result, value);
+
+            if ( ! Double.isFinite(result) ) {
+              var formula = getClass().getSimpleName() + "(" + oldResult + ", " + value + ")";
+              throw new RuntimeException("Failed to evaluate formula:" +
+                formula + ", result:" + result);
+            }
           }
         }
         return result;
