@@ -19,10 +19,10 @@ foam.CLASS({
       display: inline-block;
       width: 60pt;
       height: 20pt;
-      background-color: rgba(50,50,50,0.7);
-      border: 1px solid rgba(100,100,100,0.5);
+      border: 1px solid %GREY3%;
       border-radius: 5px;
       overflow: hidden;
+      box-shadow: inset 0 1px 2px 0 rgba(116, 122, 130, 0.21);
     }
     ^ .segment {
       position: absolute;
@@ -55,9 +55,10 @@ foam.CLASS({
       border-radius: 5px;
       top: 0; height: 100%; width: 10pt;
       left: calc(50% - 5pt);
-      background-color: rgba(200,200,200,0.8);
-      border: 1px solid rgba(255,255,255,1);
+      border: 1px solid black;
       transition: all 100ms ease-in-out;
+      background-image: linear-gradient(to bottom, #ffffff, #e7eaec);
+      border: 1px solid %GREY4%;
     }
   `,
 
@@ -74,6 +75,21 @@ foam.CLASS({
     {
       name: 'labelFalse',
       value: 'False'
+    },
+    {
+      name: 'width',
+      class: 'String',
+      value: '60pt'
+    },
+    {
+      name: 'height',
+      class: 'String',
+      value: '20pt'
+    },
+    {
+      name: 'markerWidth',
+      class: 'String',
+      value: '10pt'
     }
   ],
 
@@ -91,9 +107,14 @@ foam.CLASS({
         .addClass(this.myClass())
         .start()
           .addClass('outer')
+          .style({
+            width: this.width$,
+            height: this.height$,
+          })
           .start()
             .addClass('segment')
             .addClass('true')
+            .style({ 'line-height': this.height$ })
             .add(this.labelTrue)
             .style({
               width: this.ternaryState$.map(state =>
@@ -102,7 +123,7 @@ foam.CLASS({
                 '0%'
                 ),
               'background-color': this.ternaryState$.map(state =>
-                state == 2 ? this.theme.grey2 :
+                state == 2 ? 'rgba(0,0,0,0)' :
                   this.theme.approval4),
               'color': this.ternaryState$.map(state =>
                 state == 2 ? 'rgba(0,0,0,0)' : 'inherit')
@@ -111,6 +132,7 @@ foam.CLASS({
           .start()
             .addClass('segment')
             .addClass('false')
+            .style({ 'line-height': this.height$ })
             .add(this.labelFalse)
             .style({
               width: this.ternaryState$.map(state =>
@@ -119,7 +141,7 @@ foam.CLASS({
                 '0%'
                 ),
               'background-color': this.ternaryState$.map(state =>
-                state == 2 ? this.theme.grey2 :
+                state == 2 ? 'rgba(0,0,0,0)' :
                   this.theme.destructive4),
               'color': this.ternaryState$.map(state =>
                 state == 2 ? 'rgba(0,0,0,0)' : 'inherit')
@@ -128,11 +150,13 @@ foam.CLASS({
           .start()
             .addClass('marker')
             .style({
+              width: this.markerWidth$,
               left: this.ternaryState$.map(state =>
-                state === 2 ? 'calc(50% - 5pt)' :
+                state === 2 ? `calc(50% - 0.5*${this.markerWidth})` :
                 state === 0 ? '0%' :
-                'calc(100% - 10pt)'
-              )
+                `calc(100% - ${this.markerWidth})`),
+              'border-color': this.ternaryState$.map(state =>
+                state === 2 ? this.theme.grey4 : this.theme.white)
             })
           .end()
         .end()

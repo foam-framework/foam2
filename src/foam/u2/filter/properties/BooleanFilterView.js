@@ -93,7 +93,10 @@ foam.CLASS({
       this.addClass(this.myClass())
         .start().addClass(this.myClass('container'))
           .tag(this.TernarySwitch, {
-            ternaryState$: this.ternaryState$
+            ternaryState$: this.ternaryState$,
+            width: '100%',
+            height: '30pt',
+            markerWidth: '30pt',
           })
         .end()
     },
