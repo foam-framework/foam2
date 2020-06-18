@@ -236,62 +236,31 @@ public class MLang
   }
 
   public static Expr ADD(Object arg1, Object arg2) {
-    return ADD(new Object[] { arg1, arg2 });
+    return prepareFormula(new Add(), arg1, arg2);
   }
 
   public static Expr SUB(Object arg1, Object arg2) {
-    return SUB(new Object[] { arg1, arg2 });
+    return prepareFormula(new Subtract(), arg1, arg2);
   }
 
   public static Expr MUL(Object arg1, Object arg2) {
-    return MUL(new Object[] { arg1, arg2 });
+    return prepareFormula(new Multiply(), arg1, arg2);
   }
 
   public static Expr DIV(Object arg1, Object arg2) {
-    return DIV(new Object[] { arg1, arg2 });
+    return prepareFormula(new Divide(), arg1, arg2);
   }
 
   public static Expr MIN_FUNC(Object arg1, Object arg2) {
-    return MIN_FUNC(new Object[] { arg1, arg2 });
+    return prepareFormula(new MinFunc(), arg1, arg2);
   }
 
   public static Expr MAX_FUNC(Object arg1, Object arg2) {
-    return MAX_FUNC(new Object[] { arg1, arg2 });
+    return prepareFormula(new MaxFunc(), arg1, arg2);
   }
 
-  public static Expr ADD(Object... args) {
-    Add add = new Add();
-    add.setArgs(toExprArray(args));
-    return add;
-  }
-
-  public static Expr SUB(Object... args) {
-    Subtract sub = new Subtract();
-    sub.setArgs(toExprArray(args));
-    return sub;
-  }
-
-  public static Expr MUL(Object... args) {
-    Multiply mul = new Multiply();
-    mul.setArgs(toExprArray(args));
-    return mul;
-  }
-
-  public static Expr DIV(Object... args) {
-    Divide div = new Divide();
-    div.setArgs(toExprArray(args));
-    return div;
-  }
-
-  public static Expr MIN_FUNC(Object... args) {
-    MinFunc min = new MinFunc();
-    min.setArgs(toExprArray(args));
-    return min;
-  }
-
-  public static Expr MAX_FUNC(Object... args) {
-    MaxFunc max = new MaxFunc();
-    max.setArgs(toExprArray(args));
-    return max;
+  public static Expr prepareFormula(Formula formula, Object... args) {
+    formula.setArgs(toExprArray(args));
+    return formula;
   }
 }
