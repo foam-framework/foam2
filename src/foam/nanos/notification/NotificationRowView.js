@@ -147,7 +147,7 @@
         }).catch(e => {
           self.throwError.pub(e);
 
-          if ( e.exception && e.exception.userFeedback  ){
+          if ( e.exception && e.exception.userFeedback  ) {
             var currentFeedback = e.exception.userFeedback;
             while ( currentFeedback ) {
               this.ctrl.add(this.NotificationMessage.create({
