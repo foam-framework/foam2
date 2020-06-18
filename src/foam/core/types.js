@@ -641,6 +641,70 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.core',
+  name: 'Set',
+  extends: 'Map',
+
+  // TODO: Remove need for sorting
+  properties: [
+    {
+      name: 'adapt',
+      value: function(_, v) {
+        // All FObjects may be null.
+        if ( v === null ) return {};
+
+        if ( typeof v === 'object' && Array.isArray(v) ) {
+          let o = {};
+          v.forEach(item => { o[item] = true; })
+          return o;
+        }
+
+        return v;
+      }
+    }
+  ],
+
+  methods: [
+    function installInProto(proto) {
+      this.SUPER(proto);
+      var self = this;
+      Object.defineProperty(proto, self.name + '$contains', {
+        get: function setContains() {
+          return function (v) {
+            return this[self.name].hasOwnProperty(v);
+          }
+        },
+        configurable: true
+      });
+      Object.defineProperty(proto, self.name + '$add', {
+        get: function setAdd() {
+          return function (v) {
+            // Add value to set
+            this[self.name][v] = true;
+            // Force property update
+            this.propertyChange.pub(self.name, this.slot(self.name));
+          }
+        },
+        configurable: true
+      })
+      Object.defineProperty(proto, self.name + '$remove', {
+        // TODO: mlang expression support
+        get: function setRemove() {
+          return function (v) {
+            // Remove value from map
+            delete this[self.name][v];
+            // Force property update
+            this.propertyChange.pub(self.name, this.slot(self.name));
+          }
+        },
+        configurable: true
+      })
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
   name: 'FObjectProperty',
   extends: 'Property',
 
