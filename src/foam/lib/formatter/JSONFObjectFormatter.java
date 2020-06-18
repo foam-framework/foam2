@@ -308,9 +308,7 @@ public class JSONFObjectFormatter
   public void outputDelta(FObject oldFObject, FObject newFObject, ClassInfo defaultClass) {
     ClassInfo info = newFObject.getClassInfo();
 
-    boolean outputClass = false;
-
-    if ( outputClassNames_ && ( info != defaultClass || outputDefaultClassNames_ ) ) outputClass = true;
+    boolean outputClass = outputClassNames_ && ( info != defaultClass || outputDefaultClassNames_ );
 
     ClassInfo newInfo        = newFObject.getClassInfo();
     boolean   outputComma    = true;
@@ -370,9 +368,7 @@ public class JSONFObjectFormatter
   public void output(FObject o, ClassInfo defaultClass) {
     ClassInfo info = o.getClassInfo();
 
-    boolean outputClass = false;
-
-    if ( outputClassNames_ && ( info != defaultClass || outputDefaultClassNames_ ) ) outputClass = true;
+    boolean outputClass = outputClassNames_ && ( info != defaultClass || outputDefaultClassNames_ );
 
     b_.append('{');
     addInnerNewline();
