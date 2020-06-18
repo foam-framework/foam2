@@ -6,6 +6,8 @@
 
 package foam.core;
 
+import foam.lib.json.OutputJSON;
+import foam.lib.json.UnknownFObject;
 import foam.nanos.logger.Logger;
 import foam.util.SafetyUtil;
 import org.w3c.dom.Document;
@@ -127,7 +129,13 @@ public abstract class AbstractFObjectPropertyInfo
   }
   
   public void format(foam.lib.formatter.FObjectFormatter formatter, foam.core.FObject obj) {
-    formatter.output(get_(obj));
+    Object propObj = get_(obj);
+    if ( propObj instanceof FObject && ! (propObj instanceof OutputJSON) ) {
+      formatter.output((FObject) propObj, of());
+    }
+    else {
+      formatter.output(propObj);
+    }
   }
   
   public int compare(Object o1, Object o2) {
