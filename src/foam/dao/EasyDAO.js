@@ -146,6 +146,12 @@ foam.CLASS({
           }
         }
 
+        if ( getStorageOptionalEnabled() ) {
+          delegate = new foam.dao.StorageOptionalDAO.Builder(getX())
+            .setDelegate(delegate)
+            .build();
+        }
+
         delegate = getOuterDAO(delegate);
 
         if ( getDecorator() != null ) {
@@ -667,8 +673,19 @@ model from which to test ServiceProvider ID (spid)`,
       name: 'approvableAwareServiceName',
       class: 'String',
       documentation: 'If the DAO is approvable aware, this sets the ApprovableAwareDAO ServiceName field'
+    },
+    {
+      name: 'approvableAwareRelationshipName',
+      class: 'String',
+      documentation: 'If the DAO is approvable aware, this sets the ApprovableAwareDAO RelationshipName field'
+    },
+    {
+      name: 'storageOptionalEnabled',
+      class: 'Boolean',
+      documentation: 'Discard DAO updates which result in only storageOptional properties changing, like LastModified, for example.',
+      javaFactory: 'return false;'
     }
- ],
+  ],
 
   methods: [
     {

@@ -27,7 +27,6 @@ foam.CLASS({
   ],
 
   imports: [
-    'dao',
     'searchColumns'
   ],
 
@@ -169,6 +168,9 @@ foam.CLASS({
     {
       class: 'Class',
       name: 'of'
+    },
+    {
+      name: 'dao'
     },
     {
       name: 'data'

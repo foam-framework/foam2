@@ -56,14 +56,26 @@ foam.CLASS({
           'keystroke, rather than on blur.',
     },
     'placeholder',
+    {
+      class: 'String',
+      name: 'wrap',
+      value: 'soft'
+    },
+    {
+      class: 'Boolean',
+      name: 'escapeTextArea',
+      value: true
+    }
   ],
 
   methods: [
     function initE() {
       this.SUPER();
       this.addClass(this.myClass());
-      this.style({'white-space': 'pre'});
-      this.attrs({rows: this.rows, cols: this.cols, placeholder: this.placeholder$});
+      if ( this.escapeTextArea ) {
+        this.style({'white-space': 'pre'});
+      }
+      this.attrs({rows: this.rows, cols: this.cols, placeholder: this.placeholder$, wrap: this.wrap});
 
       // This is required because textarea accepts setting the 'value'
       // after it's output, but before requires output to be between

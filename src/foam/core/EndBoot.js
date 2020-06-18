@@ -189,6 +189,10 @@ foam.boot.end();
 
   A storageTransient field is not stored to persistent storage.
   foam.json.Storage does not encode storageTransient fields.
+
+  A storageOptional field is not stored to persistent storage if
+  if it is the only field to be persisted, or the only fields to
+  be persisted are all storageOptional.
  */
 foam.CLASS({
   refines: 'foam.core.Property',
@@ -211,6 +215,10 @@ foam.CLASS({
       expression: function(transient) {
         return transient;
       }
+    },
+    {
+      class: 'Boolean',
+      name: 'storageOptional'
     }
   ]
 });

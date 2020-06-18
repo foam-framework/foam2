@@ -12,6 +12,7 @@ foam.CLASS({
   javaImports: [
     'foam.core.Detachable',
     'foam.core.FObject',
+    'foam.core.MethodInfo',
     'foam.core.PropertyInfo',
     'foam.core.X',
     'foam.dao.ArraySink',
@@ -33,6 +34,10 @@ foam.CLASS({
     'java.util.Iterator',
     'java.util.List',
     'java.util.Map'
+  ],
+
+  imports: [
+    'DAO approvalRequestDAO'
   ],
 
   properties: [
@@ -88,7 +93,7 @@ foam.CLASS({
         ApprovalRequest request = (ApprovalRequest) req.fclone();
         request.clearId();
         request.setApprover(userId);
-        ((DAO) x.get("approvalRequestDAO")).put_(x, request);
+        getApprovalRequestDAO().inX(x).put(request);
       `
     },
     {
@@ -165,7 +170,7 @@ foam.CLASS({
       ApprovableAware approvableAwareObj = (ApprovableAware) obj;
       LifecycleAware lifecycleObj = (LifecycleAware) obj;
 
-      DAO approvalRequestDAO = (DAO) x.get("approvalRequestDAO");
+      DAO approvalRequestDAO = getApprovalRequestDAO();
       DAO dao = (DAO) x.get(getDaoKey());
 
       FObject currentObjectInDAO = (FObject) dao.find(String.valueOf(obj.getProperty("id")));

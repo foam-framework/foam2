@@ -102,15 +102,21 @@ foam.CLASS({
 
       var self = this;
       this.approvalRequestDAO.find(this.data.approvalRequest).then(function(approval) {
-        self.created = approval.created.toUTCString();
-        self.classification = approval.classification;
-        self.showClassification = !! self.classification;
-        self.status = approval.status;
+        if ( approval ) {
+          self.created = approval.created.toUTCString();
+          self.classification = approval.classification;
+          self.showClassification = !! self.classification;
+          self.status = approval.status;
 
-        self.userDAO.find(approval.createdBy).then(function(user) {
-          self.userSummary = user.toSummary();
-          // self.monogram = user.monogram;
-        });
+          self.userDAO.find(approval.createdBy).then(function(user) {
+            self.userSummary = user.toSummary();
+            // self.monogram = user.monogram;
+          });
+        } else {
+          self.created = self.data.created.toUTCString();
+          self.showClassification = false;
+          self.hideStatus = true;
+        }
       });
     }
   ],
@@ -118,6 +124,7 @@ foam.CLASS({
   css: `
     ^ {
       line-height: 17px;
+      width: 100%;
     }
     ^ .userSummary {
       font-family: IBMPlexSans;
