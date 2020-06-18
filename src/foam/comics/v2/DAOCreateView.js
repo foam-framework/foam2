@@ -112,7 +112,6 @@ foam.CLASS({
         }, (e) => {
           this.throwError.pub(e);
           
-          // TODO: uncomment this once turn UserFeedbackException into a throwable
           if ( e.foamException && foam.comics.v2.userfeedback.UserFeedbackException.isInstance(e.foamException) && e.foamException.userFeedback  ){
             var currentFeedback = e.foamException.userFeedback;
             while ( currentFeedback ){
