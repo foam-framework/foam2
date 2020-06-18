@@ -84,7 +84,7 @@ foam.CLASS({
         });
       };
 
-      return tcRecurse(capabilityId).then(() => tcList);
+      return tcRecurse(capabilityId).then(() => [...new Set(tcList)]);
     },
     function getCapabilities(capabilityId) {
       return this.getTC(capabilityId).then(
