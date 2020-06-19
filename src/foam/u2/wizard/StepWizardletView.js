@@ -173,7 +173,7 @@ foam.CLASS({
         body: 'You are closing this wizard. How do you wish to proceed?',
         actions: [
           actionWrap(this.DISCARD),
-          actionWrap(this.CLOSE),
+          actionWrap(this.SAVE_AND_CLOSE),
           this.Action.create({
             name: 'cancel',
             label: 'Cancel',
@@ -197,7 +197,7 @@ foam.CLASS({
       }
     },
     {
-      name: 'close',
+      name: 'saveAndClose',
       label: 'Save for Later',
       code: function(x) {
         this.data.saveProgress().then(() => {
