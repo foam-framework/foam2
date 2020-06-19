@@ -43,8 +43,7 @@ foam.CLASS({
       preSet: function(o, n) {
         return n || o;
       },
-      view: 'foam.u2.DetailView',
-      xview: 'foam.u2.detail.SectionedDetailView'
+      view: 'foam.u2.detail.SectionedDetailView'
     },
     {
       class: 'foam.u2.ViewSpec',
@@ -138,8 +137,9 @@ foam.CLASS({
       if ( ! this.data && ! this.objectClass && this.choices.length ) this.objectClass = this.choices[0][0];
 
       this.
-        tag(this.OBJECT_CLASS).
-        tag(foam.u2.DetailView, {data$: this.data$});
+        tag(foam.u2.detail.VerticalDetailView, {
+          data$: this.data$
+        });
             
     },
 
