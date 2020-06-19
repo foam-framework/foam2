@@ -2408,9 +2408,16 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'DateViewRefinement',
   refines: 'foam.core.Date',
-  requires: [ 'foam.u2.view.DateView' ],
+  requires: [ 'foam.u2.view.DateView', 'foam.u2.view.date.DateTimePicker' ],
   properties: [
-    [ 'view', { class: 'foam.u2.view.DateView' } ]
+    [ 'view', function() {
+      let e = document.createElement('input');
+      e.setAttribute('type', 'date');
+      if ( e.type !== 'text' ) {
+        return { class: 'foam.u2.view.DateView' };
+      }
+      return { class: 'foam.u2.view.date.DateTimePicker' };
+    } ]
   ]
 });
 
