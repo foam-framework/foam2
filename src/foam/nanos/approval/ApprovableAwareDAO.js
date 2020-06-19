@@ -33,7 +33,10 @@ foam.CLASS({
     'java.util.ArrayList',
     'java.util.Iterator',
     'java.util.List',
-    'java.util.Map'
+    'java.util.Map',
+    'foam.comics.v2.userfeedback.UserFeedback',
+    'foam.comics.v2.userfeedback.UserFeedbackException',
+    'foam.comics.v2.userfeedback.UserFeedbackStatus'
   ],
 
   imports: [
@@ -376,7 +379,13 @@ foam.CLASS({
       fullSend(x, approvalRequest, obj, approverIds);
 
       // TODO: the following is a temporary fix will need to create an actual exception and pass feedback as a property
-      throw new RuntimeException(REQUEST_SEND_MSG); // we aren't updating to deleted
+      // throw new RuntimeException(REQUEST_SEND_MSG); // we aren't updating to deleted
+      throw new UserFeedbackException.Builder(x)
+        .setUserFeedback(new UserFeedback.Builder(x)
+          .setStatus(UserFeedbackStatus.SUCCESS)
+          .setMessage(REQUEST_SEND_MSG)
+          .build()
+        ).build();
       `
     }
   ]
