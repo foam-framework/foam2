@@ -3821,6 +3821,20 @@ foam.CLASS({
         { name: 'arg1', type: 'Double' },
         { name: 'arg2', type: 'Double' }
       ]
+    },
+    {
+      name: 'toString',
+      type: 'String',
+      javaCode: `
+        StringBuilder sb = new StringBuilder();
+        sb.append(getClass().getSimpleName()).append('(');
+        for ( int i = 0; i < getArgs().length; i++ ) {
+          if ( i > 0 ) sb.append(", ");
+          sb.append(getArgs()[i].toString());
+        }
+        sb.append(')');
+        return sb.toString();
+      `
     }
   ]
 })
