@@ -183,6 +183,16 @@ public class JSONFObjectFormatter
     b_.append(']');
   }
 
+  public void output(Set set) {
+    b_.append('[');
+    java.util.Iterator iter = set.iterator();
+    while ( iter.hasNext() ) {
+      output(iter.next());
+      if ( iter.hasNext() ) b_.append(',');
+    }
+    b_.append(']');
+  }
+
   protected void outputProperty(FObject o, PropertyInfo p) {
     outputKey(getPropertyName(p));
     b_.append(':');

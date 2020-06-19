@@ -70,7 +70,12 @@ ${Object.keys(o).map(function(k, i, a) {
           var n = d.getTime();
           return `new java.util.Date(` + n +
             (n > Math.pow(2, 31) || n < -Math.pow(2,31) ? 'L' : '') + `)`
-        }
+        },
+        Set: function(a, prop) {
+          return `new java.util.HashSet<>(Arrays.asList(${
+            a.map(foam.java.asJavaValue).join(',')
+          }))`
+        },
       })
     },
     {
