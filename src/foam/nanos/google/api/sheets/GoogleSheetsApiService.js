@@ -261,6 +261,16 @@ foam.CLASS({
         Sheets.Spreadsheets.Values.Get request =
         service.spreadsheets().values().get(spreadsheetId, cellsRange);
         ValueRange response = request.execute();
+
+        //in case we need to retrieve formatting data
+        //eg when we export 1220.1 CAD we can read currecy from the pattern 
+        // Sheets.Spreadsheets.Get request1 = service.spreadsheets().get(spreadsheetId);
+        // List<String> ranges = new ArrayList<>(); // TODO: Update placeholder value.
+        // request1.setRanges(ranges);
+        // request1.setIncludeGridData(true);//response1.getSheets().get(0).getData().get(0).rowData.get(1).getValues().get(1).getUserEnteredFormat().getNumberFormat()
+        // Spreadsheet response1 = request1.execute();
+
+
         System.out.println("done");
   //              List<List<Object>> values = response.getValues();
         return response;
