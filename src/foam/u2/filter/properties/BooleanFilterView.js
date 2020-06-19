@@ -46,6 +46,10 @@ foam.CLASS({
       flex-grow: 1;
       text-align: center;
     }
+
+    ^switch .outer {
+      width: 100%;
+    }
   `,
 
   messages: [
@@ -92,12 +96,13 @@ foam.CLASS({
     function initE() {
       this.addClass(this.myClass())
         .start().addClass(this.myClass('container'))
-          .tag(this.TernarySwitch, {
+          .start(this.TernarySwitch, {
             ternaryState$: this.ternaryState$,
-            width: '100%',
             height: '30pt',
             markerWidth: '30pt',
           })
+            .addClass(this.myClass('switch'))
+          .end()
         .end()
     },
 

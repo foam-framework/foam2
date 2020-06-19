@@ -17,7 +17,7 @@ foam.CLASS({
     ^ .outer {
       position: relative;
       display: inline-block;
-      width: 60pt;
+      min-width: 100pt;
       height: 20pt;
       border: 1px solid %GREY3%;
       border-radius: 5px;
@@ -131,7 +131,6 @@ foam.CLASS({
         .start()
           .addClass('outer')
           .style({
-            width: this.width$,
             height: this.height$,
           })
           .start()
