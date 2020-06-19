@@ -143,7 +143,9 @@ foam.CLASS({
             .addClass('segment')
             .addClass('true')
             .style({ 'line-height': this.height$ })
-            .add(this.labelTrue)
+            .add(this.slot(function (ternaryState) {
+              return ( ternaryState === 2 ) ? this.labelFalse : this.labelTrue;
+            }))
             .style({
               width: this.ternaryState$.map(state =>
                 state === 2 ? '50%' :
@@ -163,7 +165,9 @@ foam.CLASS({
             .addClass('segment')
             .addClass('false')
             .style({ 'line-height': this.height$ })
-            .add(this.labelFalse)
+            .add(this.slot(function (ternaryState) {
+              return ( ternaryState === 2 ) ? this.labelTrue : this.labelFalse;
+            }))
             .style({
               width: this.ternaryState$.map(state =>
                 state === 2 ? '50%' :
