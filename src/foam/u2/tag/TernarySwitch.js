@@ -26,6 +26,7 @@ foam.CLASS({
     }
     ^ .segment {
       position: absolute;
+      box-sizing: border-box;
       overflow: hidden;
       text-align: center;
       top: 0; height: 100%;
@@ -49,6 +50,22 @@ foam.CLASS({
       width: 50%;
       background-color: %DESTRUCTIVE4%;
     }
+    ^ .clickable {
+      position: absolute;
+      top: 0; height: 100%;
+      transition: all 100ms ease-in-out;
+      width: 50%;
+      background-color: rgba(0,0,0,0);
+    }
+    ^ .clickable:hover {
+      background-color: rgba(0,0,0,0.03);
+    }
+    ^ .clickleft {
+      left: 0;
+    }
+    ^ .clickright {
+      left: 50%;
+    }
     ^ .marker {
       position: absolute;
       box-sizing: border-box;
@@ -59,6 +76,19 @@ foam.CLASS({
       transition: all 100ms ease-in-out;
       background-image: linear-gradient(to bottom, #ffffff, #e7eaec);
       border: 1px solid %GREY4%;
+    }
+    ^ .ghost {
+      pointer-events: none;
+      opacity: 0;
+      position: absolute;
+      box-sizing: border-box;
+      border-radius: 50%;
+      background-color: %PRIMARY2%;
+      top: 3pt;
+      transition: all 50ms ease-in-out;
+    }
+    ^ .clickable:hover .ghost {
+      opacity: 0.3;
     }
   `,
 
@@ -97,13 +127,6 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this
-        .on('click', () => {
-          if ( this.ternaryState === 2 ) this.ternaryState = 1;
-          else
-          if ( this.ternaryState === 1 ) this.ternaryState = 0;
-          else
-          if ( this.ternaryState === 0 ) this.ternaryState = 2;
-        })
         .addClass(this.myClass())
         .start()
           .addClass('outer')
@@ -126,7 +149,9 @@ foam.CLASS({
                 state == 2 ? 'rgba(0,0,0,0)' :
                   this.theme.approval4),
               'color': this.ternaryState$.map(state =>
-                state == 2 ? 'rgba(0,0,0,0)' : 'inherit')
+                state == 2 ? 'rgba(0,0,0,0.5)' : 'inherit'),
+              'padding-right': this.ternaryState$.map(state =>
+                state == 2 ? `calc( 0.5 * ${this.markerWidth} )` : '0'),
             })
           .end()
           .start()
@@ -144,7 +169,9 @@ foam.CLASS({
                 state == 2 ? 'rgba(0,0,0,0)' :
                   this.theme.destructive4),
               'color': this.ternaryState$.map(state =>
-                state == 2 ? 'rgba(0,0,0,0)' : 'inherit')
+                state == 2 ? 'rgba(0,0,0,0.5)' : 'inherit'),
+              'padding-left': this.ternaryState$.map(state =>
+                state == 2 ? `calc( 0.5 * ${this.markerWidth} )` : '0'),
             })
           .end()
           .start()
@@ -157,6 +184,52 @@ foam.CLASS({
                 `calc(100% - ${this.markerWidth})`),
               'border-color': this.ternaryState$.map(state =>
                 state === 2 ? this.theme.grey4 : this.theme.white)
+            })
+          .end()
+          .start()
+            .addClass('clickable')
+            .addClass('clickleft')
+            .start()
+              .addClass('ghost')
+              .style({
+                width: this.markerWidth$.map(w => `calc(${w} - 6pt)`),
+                height: this.markerWidth$.map(w => `calc(${w} - 6pt)`),
+                'background-color': this.ternaryState$.map(s => s === 2 ?
+                  this.theme.primary2 : this.theme.black),
+                left: this.ternaryState$.map(state =>
+                  ( state === 1 || state === 2 ) ? '3pt' :
+                    `calc(100% - 0.5*${this.markerWidth})`)
+              })
+            .end()
+            .on('click', () => {
+              if ( this.ternaryState === 2 ) this.ternaryState = 0;
+              else
+              if ( this.ternaryState === 1 ) this.ternaryState = 0;
+              else
+              if ( this.ternaryState === 0 ) this.ternaryState = 2;
+            })
+          .end()
+          .start()
+            .addClass('clickable')
+            .addClass('clickright')
+            .start()
+              .addClass('ghost')
+              .style({
+                width: this.markerWidth$.map(w => `calc(${w} - 6pt)`),
+                height: this.markerWidth$.map(w => `calc(${w} - 6pt)`),
+                'background-color': this.ternaryState$.map(s => s === 2 ?
+                  this.theme.primary2 : this.theme.black),
+                right: this.ternaryState$.map(state =>
+                  ( state === 0 || state === 2 ) ? '3pt' :
+                    `calc(100% - 0.5*${this.markerWidth})`)
+              })
+            .end()
+            .on('click', () => {
+              if ( this.ternaryState === 2 ) this.ternaryState = 1;
+              else
+              if ( this.ternaryState === 1 ) this.ternaryState = 2;
+              else
+              if ( this.ternaryState === 0 ) this.ternaryState = 1;
             })
           .end()
         .end()
