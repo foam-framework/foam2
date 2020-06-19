@@ -9,6 +9,10 @@ foam.CLASS({
   name: 'DateTimePicker',
   extends: 'foam.u2.view.date.AbstractDateView',
 
+  documentation: `
+  This is a simple date time picker for browsers that do not have their own implementation.
+  The date picker will automatically be used if it a browser does not support date, see Element.js`,
+
   requires: [
     'foam.u2.view.date.CalendarDatePicker',
     'foam.u2.view.date.Month',

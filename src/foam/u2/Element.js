@@ -2411,8 +2411,11 @@ foam.CLASS({
   requires: [ 'foam.u2.view.DateView', 'foam.u2.view.date.DateTimePicker' ],
   properties: [
     [ 'view', function() {
+      // Detect if the browser has date support. If it does use the browsers default
+      // date picker, otherwise use the foam date picker.
       let e = document.createElement('input');
       e.setAttribute('type', 'date');
+      // If a browser doesn't support date, the type  will default to text
       if ( e.type !== 'text' ) {
         return { class: 'foam.u2.view.DateView' };
       }
