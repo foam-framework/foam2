@@ -70,12 +70,12 @@ public class JSONFObjectFormatter
     }
   };
 
-  protected boolean quoteKeys_           = false;
-  protected boolean outputShortNames_    = true;
-  protected boolean outputDefaultValues_ = false;
-  protected boolean multiLineOutput_     = false;
-  protected boolean outputClassNames_    = true;
-  protected boolean outputReadableDates_ = true;
+  protected boolean quoteKeys_               = false;
+  protected boolean outputShortNames_        = true;
+  protected boolean outputDefaultValues_     = false;
+  protected boolean multiLineOutput_         = false;
+  protected boolean outputClassNames_        = true;
+  protected boolean outputReadableDates_     = false;
   protected boolean outputDefaultClassNames_ = true;
 
   public JSONFObjectFormatter(X x) {
@@ -254,7 +254,7 @@ public class JSONFObjectFormatter
     } else if ( value instanceof Boolean ) {
       outputBoolean((Boolean) value);
     } else if ( value instanceof Date ) {
-      output((Date) value);
+      outputDateValue((Date) value);
     } else if ( value instanceof Map ) {
       output((Map) value);
     } else if ( value instanceof List ) {
@@ -272,20 +272,19 @@ public class JSONFObjectFormatter
       value.getClass().isArray();
   }
 
+  /** Called when outputting a Date from an Object field so that the type is know. **/
   public void outputDateValue(Date date) {
-    if ( outputReadableDates_ )
+    b_.append("{\"class\":\"__Timestamp__\",\"value\":");
+    if ( outputReadableDates_ ) {
       output(sdf.get().format(date));
-    else
+    } else {
       outputNumber(date.getTime());
+    }
+    b_.append('}');
   }
 
   public void output(Date date) {
     output(date.getTime());
-    /*
-    b_.append("{\"class\":\"__Timestamp__\",\"value\":");
-    outputDateValue(date);
-    b_.append('}');
-    */
   }
 
   protected Boolean maybeOutputProperty(FObject fo, PropertyInfo prop, boolean includeComma) {
@@ -365,6 +364,7 @@ public class JSONFObjectFormatter
   }
 
   public void output(FObject[] arr) {
+    // TODO:
   }
 
   public void output(FObject o, ClassInfo defaultClass) {
