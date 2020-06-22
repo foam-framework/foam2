@@ -625,7 +625,6 @@ var classes = [
   'foam.nanos.approval.AuthenticatedApprovalDAOAuthorizer',
   'foam.nanos.approval.PopulateApprovalRequestsDAO',
 
-  // holders
   'foam.core.NumberSet'
 ];
 

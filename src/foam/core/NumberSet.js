@@ -2,8 +2,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'NumberSet',
 
-  documentation: 'An array of String values.',
-  label: 'List of text strings',
+  documentation: 'A set of Long values.',
 
   javaImports: [
     'java.util.ArrayList',
