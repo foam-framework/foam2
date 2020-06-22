@@ -4,6 +4,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+// TODO: Rebase onto FormattedTextField
+
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'CurrencyInputView',
