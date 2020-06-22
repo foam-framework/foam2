@@ -16,7 +16,20 @@ foam.CLASS({
     'strategizer?'
   ],
 
+  requires: [
+    'foam.core.Latch'
+  ],
+
   properties: [
+    {
+      class: 'foam.core.FObjectProperty',
+      of: 'foam.core.Latch',
+      name: 'choicesLoaded',
+      documentation: 'A latch used to wait on choices loaded.',
+      factory: function() {
+        return this.Latch.create();
+      }
+    },
     {
       class: 'String',
       name: 'objectClass',
@@ -57,8 +70,8 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'allowCustom',
-      factory: function() {
-        return this.choices.length == 0;
+      expression: function(choices) {
+        return choices.length == 0;
       }
     },
     {
@@ -87,6 +100,7 @@ foam.CLASS({
         this.strategizer.query(null, this.of.id).then((strategyReferences) => {
           if ( ! Array.isArray(strategyReferences) || strategyReferences.length === 0 ) {
             this.choices = [[this.of.id, this.of.model_.label]];
+            this.choicesLoaded.resolve();
             return;
           }
 
@@ -105,18 +119,20 @@ foam.CLASS({
           choices.sort((a, b) => a[1] > b[1] ? 1 : -1);
 
           this.choices = choices;
+          this.choicesLoaded.resolve();
         }).catch(err => console.warn(err));
       } else {
         this.choices = this.choicesFallback(this.of);
       }
     },
 
-    function initE() {
+    async function initE() {
       this.SUPER();
 
       if ( ! this.choices.length ) {
         this.onDetach(this.of$.sub(this.updateChoices));
         this.updateChoices();
+        await this.choicesLoaded;
       }
 
       function dataToClass(d) {
@@ -135,8 +151,9 @@ foam.CLASS({
       );
       if ( this.data ) { this.objectClass = dataToClass(this.data); }
       if ( ! this.data && ! this.objectClass && this.choices.length ) this.objectClass = this.choices[0][0];
-
+      
       this.
+        tag(this.OBJECT_CLASS).
         tag(foam.u2.detail.VerticalDetailView, {
           data$: this.data$
         });
