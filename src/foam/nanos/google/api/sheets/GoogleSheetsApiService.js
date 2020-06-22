@@ -259,7 +259,7 @@ foam.CLASS({
           .setApplicationName("nanopay")
           .build();
         Sheets.Spreadsheets.Values.Get request =
-        service.spreadsheets().values().get(spreadsheetId, cellsRange);
+        service.spreadsheets().values().get(spreadsheetId, cellsRange).setValueRenderOption("UNFORMATTED_VALUE");
         ValueRange response = request.execute();
 
         //in case we need to retrieve formatting data
