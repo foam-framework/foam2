@@ -52,7 +52,7 @@ foam.CLASS({
     }
   ],
   methods: [
-    {
+    {//rename it to createExportSheet or something
       name: 'createSheet',
       javaType: 'String',
       args: [
@@ -274,6 +274,60 @@ foam.CLASS({
         System.out.println("done");
   //              List<List<Object>> values = response.getValues();
         return response;
+      `
+    },
+    {
+      name: 'updateValues',
+      javaType: 'String',
+      args: [
+        {
+          name: 'x',
+          type: 'Context',
+        },
+        {
+          name: 'sheetId',
+          javaType: 'String'
+        },
+        {
+          name: 'obj',
+          javaType: 'Object'
+        },
+        {
+          name: 'startRange',
+          javaType: 'String'
+        }
+      ],
+      javaCode: `
+        List<List<Object>> listOfValues = new ArrayList<>();
+
+        Object[] arr = (Object[]) obj;
+        for ( Object v : arr ) {
+          listOfValues.add(Arrays.asList((Object[])v));
+        }
+
+        final NetHttpTransport HTTP_TRANSPORT;
+        try {
+          HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+          GoogleApiAuthService googleApiAuthService = (GoogleApiAuthService)getX().get("googleApiAuthService");
+          Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, SCOPES))
+            .setApplicationName("nanopay")
+            .build();
+          List<ValueRange> data = new ArrayList<>();
+          data.add(new ValueRange()
+            .setRange(startRange)
+            .setValues(listOfValues));
+
+          BatchUpdateValuesRequest batchBody = new BatchUpdateValuesRequest()
+            .setValueInputOption("USER_ENTERED")
+            .setData(data);
+
+          BatchUpdateValuesResponse batchResult = service.spreadsheets().values()
+            .batchUpdate(sheetId, batchBody)
+            .execute();
+          return batchResult.getSpreadsheetId();
+        } catch (Throwable t) {
+          return "";
+        }
       `
     }
   ]
