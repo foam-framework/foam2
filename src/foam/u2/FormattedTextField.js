@@ -64,7 +64,15 @@ foam.CLASS({
       factory: function() {
         return this.data || '';
       },
-      preSet: function(_, v) {
+      preSet: function(old, v) {
+        // Determine if this is a deletion, and remove meaningful
+        //   input characters rather than format characters
+        var deletion = this.checkDeletion(old, v);
+
+        if ( deletion !== null ) {
+          v = this.smartDelete(old, deletion);
+        }
+
         var sanitized = this.sanitizeString(v);
         this.data = sanitized;
         var formatted = this.prop.tableCellFormatter.f(
@@ -101,6 +109,67 @@ foam.CLASS({
     // TODO: move this to property of foam.core.String
     function sanitizeString(s) {
       return s.replace(/[\s\._\-\/]+/g, "");
+    },
+    // Check if a change represents a contiguous deletion,
+    // returning an array of [ start, amount ] going backward,
+    // or null if the change is not recognized as a deletion.
+    function checkDeletion(old, v) {
+      if ( ! old ) return null;
+      if ( v.length > old.length ) return null;
+      var formattedDeletionIndex = -1;
+      var formattedDeletionAmount = 0;
+
+      var firstInequal = 0;
+      while (
+        firstInequal < v.length &&
+        v[firstInequal] == old[firstInequal]
+      ) firstInequal++;
+
+      // If the remaining chars in 'v' match the end of 'old'
+      // then this is a contiguous deletion
+      var ending = v.substr(firstInequal, v.length);
+      if ( ending == old.substr(old.length - ending.length ) ) {
+        formattedDeletionAmount =
+          old.length - ending.length - firstInequal;
+        formattedDeletionIndex =
+          firstInequal + formattedDeletionAmount;
+      }
+
+      if ( formattedDeletionIndex !== -1 ) {
+        return [formattedDeletionIndex, formattedDeletionAmount];
+      }
+      return null;
+    },
+    function smartDelete(str, deletion) {
+      var from = deletion[0];
+      var amount = deletion[1];
+      var keep = str.slice(from);
+      var modify = str.slice(0, from);
+
+      // Delete #amount characters
+      for ( let i = 0 ; i < amount ; i++ ) {
+        // Delete a single meaningful character
+        let somethingDeleted = false;
+        while ( modify.length > 0 && ! somethingDeleted ) {
+          deletionModify = modify.slice(0, modify.length - 1);
+          if ( ! this.formattedEqual(deletionModify, modify) ) {
+            somethingDeleted = true;
+          }
+          modify = deletionModify;
+        }
+      }
+
+      return modify + keep;
+    },
+    // Check if two inputs are the same when re-sanitized and
+    // re-formatted. Answers the question "was there a meaninful
+    // change to the string?"
+    function formattedEqual(deletion, subject) {
+      var formattedDeletion = this.prop.tableCellFormatter.f(
+        this.sanitizeString(deletion), this.prop)
+      var formattedSubject = this.prop.tableCellFormatter.f(
+        this.sanitizeString(subject), this.prop)
+      return formattedDeletion == formattedSubject;
     }
   ],
 })
