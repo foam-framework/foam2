@@ -43,6 +43,16 @@ foam.CLASS({
       class: 'Function',
       name: 'isAvailable',
       value: function() { return true; }
+    },
+    {
+      class: 'String',
+      name: 'section',
+      getter: function() { return this.section_ ; },
+      setter: function(m) { this.section_ = m; }
+    },
+    {
+      class: 'Simple',
+      name: 'section_'
     }
   ],
 
@@ -71,7 +81,32 @@ foam.CLASS({
         });
       }
       return slot;
-    }
+    },
+
+    function installInClass(cls) {
+      cls['SECTION_'+foam.String.constantize(this.name)] = this; //cls[this.name] = this.name;
+      //foam.String.constantize('fooBar')
+
+      // Object.defineProperty(
+      //   cls,
+      //   'sections22',//this.name,
+      //   {
+      //     value: this.sections,
+      //     configurable: false
+      //   });
+       /* */
+    },
+
+//     function installInProto(proto) {
+//       var name = this.name;
+//       Object.defineProperty(
+//         proto,
+//         this.name,
+//         {
+//           get: function() { return this.cls_[name] },
+//           configurable: false
+//         });
+//     },
   ]
 });
 
