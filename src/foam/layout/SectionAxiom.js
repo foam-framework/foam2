@@ -101,7 +101,7 @@ foam.CLASS({
       return foam.core.ArraySlot.create({slots: availabilitySlots}).map(arr => {
         return arr.every(b => b);
       });
-    }
+    },
 
     function installInClass(cls) {
       cls['SECTION_'+foam.String.constantize(this.name)] = this; //cls[this.name] = this.name;
