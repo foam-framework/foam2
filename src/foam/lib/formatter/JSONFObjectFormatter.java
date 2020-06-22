@@ -208,6 +208,20 @@ public class JSONFObjectFormatter
   }
   */
 
+
+  public void outputEnumValue(Enum<?> value) {
+    b_.append('{');
+    outputKey("class");
+    b_.append(':');
+    output(value.getClass().getName());
+    b_.append(',');
+    outputKey("ordinal");
+    b_.append(':');
+    outputNumber(value.ordinal());
+    b_.append('}');
+  }
+
+
   public void output(Enum<?> value) {
     output(value.ordinal());
 
@@ -259,7 +273,7 @@ public class JSONFObjectFormatter
     } else if ( value instanceof List ) {
       output((List) value);
     } else if ( value instanceof Enum<?> ) {
-      output((Enum<?>) value);
+      outputEnumValue((Enum<?>) value);
     } else /*if ( value == null )*/ {
       b_.append("null");
     }
