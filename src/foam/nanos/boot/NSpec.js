@@ -118,9 +118,7 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       name: 'service',
-      view: {
-        class: 'foam.u2.view.FObjectView'
-      },
+      view: 'foam.u2.view.FObjectView',
       readPermissionRequired: true,
       writePermissionRequired: true
     },
