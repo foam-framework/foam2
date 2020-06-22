@@ -147,31 +147,18 @@
         }).catch(e => {
           self.throwError.pub(e);
 
-          // TODO: uncomment this once we wire up a proper exception
-          // if ( foam.comics.v2.userfeedback.UserFeedbackException.isInstance(e) && e.userFeedback  ){
-          //   var currentFeedback = e.userFeedback;
-          //   while ( currentFeedback ){
-          //     self.ctrl.add(self.NotificationMessage.create({
-          //       message: currentFeedback.message,
-          //       type: currentFeedback.status.name.toLowerCase()
-          //     }));
+          if ( e.exception && e.exception.userFeedback  ) {
+            var currentFeedback = e.exception.userFeedback;
+            while ( currentFeedback ) {
+              this.ctrl.add(this.NotificationMessage.create({
+                message: currentFeedback.message,
+                type: currentFeedback.status.name.toLowerCase()
+              }));
 
-          //     currentFeedback = currentFeedback.next;
-          //   }
-          // } else {
-          //   self.ctrl.add(self.NotificationMessage.create({
-          //     message: e.message,
-          //     type: 'error'
-          //   }));
-          // }
-
-          if ( e.message === 'An approval request has been sent out.' ) {
-            self.ctrl.add(self.NotificationMessage.create({
-              message: e.message,
-              type: 'info'
-            }));
+              currentFeedback = currentFeedback.next;
+            }
           } else {
-            self.ctrl.add(self.NotificationMessage.create({
+            this.ctrl.add(this.NotificationMessage.create({
               message: e.message,
               type: 'error'
             }));

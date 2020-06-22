@@ -131,7 +131,6 @@ foam.CLASS({
           // fetch user from DAO and set two factor secret to null
           user = (User) userDAO.find(user.getId()).fclone();
           user.setTwoFactorEnabled(false);
-          user.setTwoFactorSecret(null);
           userDAO.put_(x, user);
 
           return true;
