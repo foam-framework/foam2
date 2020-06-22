@@ -100,7 +100,7 @@ foam.CLASS({
     },
     // TODO: move this to property of foam.core.String
     function sanitizeString(s) {
-      return s.replace(/[\D\s\._\-\/]+/g, "");
+      return s.replace(/[\s\._\-\/]+/g, "");
     }
   ],
 })
