@@ -7,6 +7,7 @@
 package foam.util.concurrent;
 
 import java.util.Arrays;
+import foam.core.X;
 
 /**
  * A Synchronous blocking implementation of the AssemblyLine interface.
@@ -19,6 +20,14 @@ public class SyncAssemblyLine
   protected Assembly q_         = null;
   protected Object   startLock_ = new Object();
   protected Object   endLock_   = new Object();
+  protected X      x_;
+
+  public SyncAssemblyLine() {
+  }
+
+  public SyncAssemblyLine(X x) {
+    x_ = x;
+  }
 
   /*
     public void enqueue(Assembly job) {
@@ -38,6 +47,7 @@ public class SyncAssemblyLine
 
     try {
       synchronized ( startLock_ ) {
+        if ( q_ != null ) q_.markNotLast();
         previous = q_;
         q_ = job;
         job.executeUnderLock();
@@ -46,8 +56,19 @@ public class SyncAssemblyLine
       job.executeJob();
       if ( previous != null ) previous.waitToComplete();
       synchronized ( endLock_ ) {
-        job.endJob();
-        job.complete();
+        try {
+          job.endJob();
+        } catch (Throwable t) {
+          foam.nanos.logger.Logger logger;
+          if ( x_ != null ) {
+            logger = (foam.nanos.logger.Logger) x_.get("logger");
+          } else {
+            logger = new foam.nanos.logger.StdoutLogger();
+          }
+          logger.error(this.getClass().getSimpleName(), t.getMessage(), t);
+        } finally {
+          job.complete();
+        }
       }
     } finally {
       // Isn't required, but helps GC last entry.

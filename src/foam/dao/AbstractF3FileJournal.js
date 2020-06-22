@@ -58,7 +58,6 @@ foam.CLASS({
               b.reset();
               b.setPropertyPredicate(new StoragePropertyPredicate());
               b.setOutputShortNames(true);
-              b.setOutputDefaultClassNames(false);
               return b;
             }
           };
@@ -162,6 +161,14 @@ try {
   throw new RuntimeException(t);
 }
       `
+    },
+    {
+      class: 'Long',
+      name: 'lastUser'
+    },
+    {
+      class: 'Long',
+      name: 'lastTimestamp'
     }
   ],
 
@@ -171,10 +178,9 @@ try {
       type: 'FObject',
       args: [ 'Context x', 'String prefix', 'DAO dao', 'foam.core.FObject obj' ],
       javaCode: `
-        final Object    id = obj.getProperty("id");
-        final ClassInfo of = dao.getOf();
-
-        JSONFObjectFormatter fmt = formatter.get();
+        final Object               id  = obj.getProperty("id");
+        final ClassInfo            of  = dao.getOf();
+        final JSONFObjectFormatter fmt = formatter.get();
 
         getLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
           FObject old;
@@ -201,6 +207,7 @@ try {
             }
           }
 
+// TODO: always flush if isLast()
           public void endJob() {
             if ( fmt.builder().length() == 0 ) return;
 
@@ -212,7 +219,7 @@ try {
                 getMultiLineOutput() ? "\\n" : "",
                 foam.util.SafetyUtil.isEmpty(prefix) ? "" : prefix + ".");
 
-                if ( isLast() ) getWriter().flush();
+              if ( isLast() ) getWriter().flush();
             } catch (Throwable t) {
               getLogger().error("Failed to write put entry to journal", t);
             }
@@ -229,15 +236,13 @@ try {
       ],
       args: [ 'Context x', 'CharSequence record', 'String c', 'String prefix' ],
       javaCode: `
-      write_(sb.get()
-        .append(prefix)
-        .append("p("));
-      write_(sb.get()
-        .append(record));
-      write_(sb.get()
-        .append(")")
-        .append(c));
-      getWriter().newLine();
+      BufferedWriter writer = getWriter();
+      writer.write(prefix);
+      writer.write("p(");
+      writer.append(record);
+      writer.write(')');
+      writer.write(c);
+      writer.newLine();
       `
     },
     {
@@ -304,7 +309,6 @@ try {
     },
     {
       name: 'write_',
-     // synchronized: true,
       javaThrows: [
         'java.io.IOException'
       ],
@@ -312,7 +316,6 @@ try {
       javaCode: `
         BufferedWriter writer = getWriter();
         writer.append(data);
-//        writer.newLine();
       `
     },
     {
@@ -326,12 +329,17 @@ try {
         User user = ((Subject) x.get("subject")).getUser();
         if ( user == null || user.getId() <= 1 ) return;
         if ( obj instanceof LastModifiedByAware && ((LastModifiedByAware) obj).getLastModifiedBy() != 0L ) return;
+        long now    = System.currentTimeMillis();
+        long userId = user.getId();
+        if ( now == getLastTimestamp() && userId == getLastUser() ) return;
+        setLastTimestamp(now);
+        setLastUser(userId);
 
         write_(sb.get()
           .append("// Modified by ")
           .append(user.toSummary())
           .append(" (")
-          .append(user.getId())
+          .append(userId)
           .append(") at ")
           .append(getTimeStamper().createTimestamp()));
         getWriter().newLine();

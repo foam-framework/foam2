@@ -51,7 +51,7 @@ foam.CLASS({
 
     ^query-bar {
       padding: 40px 16px;
-      align-items: center;
+      align-items: flex-start;
       justify-content: flex-end;
     }
 

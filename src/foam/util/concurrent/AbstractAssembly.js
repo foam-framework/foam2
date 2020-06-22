@@ -33,7 +33,7 @@ foam.CLASS({
       synchronized: true,
       value: true,
       documentation: 'True if no new Assembly is waiting for this task to complete.'
-    },
+    }
   ],
 
   methods: [
@@ -70,10 +70,18 @@ foam.CLASS({
     },
     {
       name: 'isLast',
-      type: 'boolean',
+      type: 'Boolean',
       synchronized: true,
       javaCode: `
         return getLast();
+      `
+    },
+    {
+      name: 'markNotLast',
+      type: 'void',
+      synchronized: true,
+      javaCode: `
+        setLast(false);
       `
     },
     {
@@ -99,5 +107,4 @@ foam.CLASS({
       `
     }
   ]
-
-})
+});

@@ -14410,9 +14410,8 @@ this.XLIFFTranslationValue.create(
       /** Get current user, else show login. */
       try {
         var result = await this.client.auth.getCurrentSubject(null);
-        this.loginSuccess = !! result && !! result.user;
 
-        if ( ! this.loginSuccess ) throw new Error();
+        if ( ! result || ! result.user) throw new Error();
 
         this.subject = result;
       } catch (err) {

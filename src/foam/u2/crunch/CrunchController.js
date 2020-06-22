@@ -19,6 +19,7 @@ foam.CLASS({
     'ctrl',
     'prerequisiteCapabilityJunctionDAO',
     'stack',
+    'subject',
     'userCapabilityJunctionDAO'
   ],
 
@@ -65,10 +66,12 @@ foam.CLASS({
       // Pre-Order Traversial of Capability Dependancies.
       // Using Pre-Order here will cause the wizard to display
       // dependancies in a logical order.
-      tcRecurse = (sourceId) => {
-        return this.prerequisiteCapabilityJunctionDAO.where(
-          this.EQ(this.CapabilityCapabilityJunction.SOURCE_ID, sourceId)
-        ).select().then((result) => {
+      tcRecurse = (sourceId, seen) => {
+        if ( ! seen ) seen = [];
+        return this.prerequisiteCapabilityJunctionDAO.where(this.AND(
+          this.EQ(this.CapabilityCapabilityJunction.SOURCE_ID, sourceId),
+          this.NOT(this.IN(this.CapabilityCapabilityJunction.TARGET_ID, seen))
+        )).select().then((result) => {
           var arry = result.array;
 
           if ( arry.length == 0 ) {
@@ -77,13 +80,13 @@ foam.CLASS({
           }
 
           return arry.reduce(
-            (p, pcj) => p.then(() => tcRecurse(pcj.targetId)),
+            (p, pcj) => p.then(() => tcRecurse(pcj.targetId, seen.concat(arry.map((pcj) => pcj.targetId)))),
             Promise.resolve()
           ).then(() => tcList.push(sourceId));
         });
       };
 
-      return tcRecurse(capabilityId).then(() => tcList);
+      return tcRecurse(capabilityId, []).then(() => [...new Set(tcList)]);
     },
     function getCapabilities(capabilityId) {
       return this.getTC(capabilityId).then(
@@ -95,7 +98,7 @@ foam.CLASS({
 
       var ucj = await this.userCapabilityJunctionDAO.find(
         this.AND(
-          this.EQ(this.UserCapabilityJunction.SOURCE_ID, this.user ? this.user.id : 0),
+          this.EQ(this.UserCapabilityJunction.SOURCE_ID, this.subject.user.id),
           this.EQ(this.UserCapabilityJunction.TARGET_ID, capabilityId)
         ));
 
@@ -110,14 +113,26 @@ foam.CLASS({
       }
       return this.getCapabilities(capabilityId).then(capabilities => {
         // Map capabilities to CapabilityWizardSection objects
-        return Promise.all(capabilities.filter(
-          cap => !! cap.of
-        ).map(
-          cap => this.CapabilityWizardlet.create({
-            capability: cap
-          }).updateUCJ()
-        ));
-      }).then(sections => {
+        return Promise.all([
+
+          // Continue passing capabilities to next callback
+          Promise.resolve(capabilities),
+
+          // Create capability sections
+          Promise.all(capabilities.filter(
+            cap => !! cap.of
+          ).map(
+            cap => this.CapabilityWizardlet.create({
+              capability: cap
+            }).updateUCJ()
+          ))
+
+        ]);
+      }).then(capabilitiesSectionsTuple => {
+        // Two values from Promise.all call above
+        let capabilities = capabilitiesSectionsTuple[0];
+        let sections = capabilitiesSectionsTuple[1];
+
         return new Promise((wizardResolve) => {
           sections = sections.filter(wizardSection =>
             wizardSection.ucj === null || 
@@ -133,7 +148,17 @@ foam.CLASS({
             }),
             onClose: x => {
               x.closeDialog();
-              wizardResolve();
+              // Save no-data capabilities (i.e. not displayed in wizard)
+              Promise.all(capabilities.filter(cap => ! cap.of).map(
+                cap => self.userCapabilityJunctionDAO.put(self.UserCapabilityJunction.create({
+                  sourceId: self.subject.user.id,
+                  targetId: cap.id
+                })).then(() => {
+                  console.log('SAVED (no-data cap)', cap.id);
+                })
+              )).then(() => {
+                wizardResolve();
+              });
             }
           }));
         });

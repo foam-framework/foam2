@@ -98,6 +98,29 @@ foam.CLASS({
         return sections.reduce(
           (sum, wizardletSections) => sum + wizardletSections.length, 0);
       }
+    },
+    {
+      name: 'canGoBack',
+      class: 'Boolean',
+      documentation: `
+        If the first screen has no available sections, then the back button
+        should be disabled.
+      `,
+      expression: function (subStack$pos) {
+        let previousScreenPos = subStack$pos - 1;
+        if ( previousScreenPos < 0 ) return false;
+
+        for ( let i = previousScreenPos ; i >= 0 ; i-- ) {
+          let indices = this.screenIndexToSection(i);
+          let wIndex = indices[0]; // Wizardlet index
+          let sIndex = indices[1]; // Section index
+
+          if ( this.sectionAvailableSlots[wIndex][sIndex].get() ) {
+            return true;
+          }
+        }
+        return false;
+      }
     }
   ],
 
@@ -114,6 +137,17 @@ foam.CLASS({
         section: this.sections[0][0],
         data$: this.wizardlets[0].data$,
       });
+
+      // If the first screen has no available sections, move next and repeat.
+      var skipEmptyWizardlets;
+      skipEmptyWizardlets = () => {
+        var currentWizardletIndex =
+          this.screenIndexToSection(this.subStack.pos)[0];
+        if ( this.countAvailableSections(currentWizardletIndex) < 1 ) {
+          return this.next().then(skipEmptyWizardlets);
+        }
+      };
+      skipEmptyWizardlets();
     },
     function saveProgress() {
       var p = Promise.resolve();
@@ -178,8 +212,41 @@ foam.CLASS({
         });
       },
     },
+    function countAvailableSections(wizardletIndex) {
+      return this.sectionAvailableSlots[wizardletIndex].reduce(
+        (total, sectionAvailable$) =>
+          sectionAvailable$.get() ? total + 1 : total,
+        0
+      );
+    },
+    function canSkipTo(wizardletIndex) {
+      let currentWizardletIndex =
+        this.screenIndexToSection(this.subStack.pos)[0];
+      for ( let w = currentWizardletIndex ; w <= wizardletIndex ; w++ ) {
+        if ( ! this.wizardlets[w].validate() ) return false;
+      }
+      return true;
+    },
+    function skipTo(screenIndex) {
+      var skipToScreenRecur;
+      skipToScreenRecur = () => {
+        if ( this.subStack.pos !== screenIndex ) {
+          return this.next().then(skipToScreenRecur);
+        }
+      };
+      return skipToScreenRecur(); // call recursive function
+    },
     function back() {
       this.subStack.back();
+
+      // Call back again if this section is unavailable
+      let sectionIndices = this.screenIndexToSection(this.subStack.pos);
+      let wizardletIndex = sectionIndices[0];
+      let sectionIndex = sectionIndices[1];
+      let slot = this.sectionAvailableSlots[wizardletIndex][sectionIndex];
+      if ( ! slot.get() ) {
+        return this.back();
+      }
     },
     // Returns a tuple of two indices, 0: index corresponding to the wizardlet;
     // and 1: index corresponding to the section under that wizardlet.
@@ -194,7 +261,18 @@ foam.CLASS({
         }
         i += nSections;
       }
-      return null;
+      throw new Error(
+        `Tried to get wizard screen at index ${i} but it doesn't exist`
+      );
+    },
+
+    function sectionToScreenIndex(wizardletIndex, sectionIndex) {
+      let screenIndex = 0;
+      for ( let w = 0 ; w < wizardletIndex ; w++ ) {
+        screenIndex += this.sections[w].length;
+      }
+      screenIndex += sectionIndex;
+      return screenIndex;
     }
   ]
 });
