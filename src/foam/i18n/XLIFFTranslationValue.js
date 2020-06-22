@@ -9,10 +9,13 @@ foam.CLASS({
   name: 'XLIFFTranslationValue',
 
   properties: [
-    'id',
     {
       class: 'String',
-      name: 'source',
+      name: 'id',//id+source
+    },
+    {
+      class: 'String',
+      name: 'source',//path+property+propertyproperty
       documentation: `Reference to model or view property to be translated. 
         Ex. (‘FIRST_NAME’, ‘LAST_NAME’, ‘ORGANIZATION’ …etc)`
     },

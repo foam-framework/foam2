@@ -62,19 +62,62 @@ foam.CLASS({
               // test case
 //              foam.language = 'fr-CA';
 //              foam.language = 'fr-FR';
-//              foam.language = 'fr';
-              if ( ctx.XLIFFTranslation && 
-                   ( foam.language == ctx.XLIFFTranslation.locale_variant || 
+             foam.language = 'fr';// for test
+              if ( ctx.XLIFFTranslation &&
+                   ( foam.language == ctx.XLIFFTranslation.locale_variant ||
                      foam.language.substring(0, foam.language.indexOf('-')) == ctx.XLIFFTranslation.locale_variant.substring(0, foam.language.indexOf('-'))  ))
               {
-                let ax   = cls.getOwnAxioms().find( e => e.message_ != null );
-                if ( ax && ctx.XLIFFTranslation.translationValues.values.find(e => e.id == ax.sourceCls_.id) )
-                {
-                  let trsl = ctx.XLIFFTranslation.translationValues.values.find(e => e.source == ax.name && e.id == ax.sourceCls_.id);
+                //what is the different between the source and the id
+                let axM   = cls.getOwnAxioms().filter( e => e.message_ != null );//just for MESSAGES
+                !!axM.length && axM.forEach(ele => {
+                  let trsl = ctx.XLIFFTranslation.translationValues.values.find(e => e.source == (ele.sourceCls_.id + '.' + ele.name))//ctx.XLIFFTranslation.translationValues.values.find(e => e.source == ele.private_.contextParent.id+'.'+ele.name );
                   if ( trsl ) {
-                    cls[ax.name] = trsl.target;
+                    cls[ele.name] = trsl.target;
                   }
-                }
+                });
+
+                // example foam.nanos.auth.Address.COUNTRY_ID.label = target;
+                let axS   = cls.getOwnAxioms().filter( e => e.path != null );//just for slot properties
+                !!axS.length && axS.forEach(ele => {
+                  eval(ele.path).getOwnAxioms().forEach (prop => {
+                    if ( !!prop.name ) {
+                      let trsl = ctx.XLIFFTranslation.translationValues.values.find(e => {
+                        return e.source.substring(0,e.source.lastIndexOf('.')) == (ele.path + '.' + foam.String.constantize(prop.name))
+                      })
+                      if ( trsl ) {
+                        prop[trsl.source.substring(trsl.source.lastIndexOf('.')+1)] = trsl.target;
+                      }
+                    }
+                  })
+                });
+
+                //example net.nanopay.sme.onboarding.BusinessOnboarding.axiomMap_
+                //[net.nanopay.sme.onboarding.BusinessOnboarding.BUSINESS_ADDRESS.section].title
+                let axP   = cls.getOwnAxioms();//just for slot properties
+                !!axP.length && axP.forEach(prop => {
+                  if ( prop.name && !!prop.sourceCls_ ) {
+                    let res = ctx.XLIFFTranslation.translationValues.values.find(e => {
+                      return e.source.substring(0,e.source.lastIndexOf('.')) == (prop.sourceCls_.id + '.' + foam.String.constantize(prop.name)) 
+                    })
+                    if ( !!res ) { prop[res.source.substring(res.source.lastIndexOf('.')+1)] = res.target; console.log('++++'+res.target)}
+                  }
+                });
+
+
+                let axSect   = cls.getOwnAxioms().filter( e => e.path != null );//just for section
+                !!axSect.length && axSect.forEach(ele => {
+                  eval(ele.path).getOwnAxioms().forEach (prop => {
+                    if ( !!prop.name ) {
+                      let trsl = ctx.XLIFFTranslation.translationValues.values.find(e => {
+                        return e.source.substring(0,e.source.lastIndexOf('.')) == (ele.path + '.SECTION_' + foam.String.constantize(prop.name))
+                      })
+                      
+                      if ( trsl ) {
+                        prop[trsl.source.substring(trsl.source.lastIndexOf('.')+1)] = trsl.target;
+                      }
+                    }
+                  })
+                });
               }
             }
 

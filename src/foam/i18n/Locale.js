@@ -10,6 +10,10 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Long',
+      name: 'id',
+    },
+    {
       class: 'String',
       name: 'locale',
       documentation: 'Determines locale type (en, fr, es …etc)',

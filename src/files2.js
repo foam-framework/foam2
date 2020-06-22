@@ -586,4 +586,8 @@ FOAM_FILES([
 
   { name: "foam/core/CoreTypesValidationTest" },
   { name: "foam/core/CoreTypesValidationTestModel" }
+
+  // Translation Support
+  { name: "foam/i18n/XLIFFTranslationValue" },
+  { name: "foam/i18n/Locale" },
 ]);
