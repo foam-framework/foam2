@@ -19,7 +19,9 @@ foam.CLASS({
     'foam.lib.json.JSONParser',
     'foam.nanos.pm.PM',
     'foam.util.SafetyUtil',
-    'java.io.BufferedReader'
+    'java.io.BufferedReader',
+    'foam.util.concurrent.AssemblyLine',
+    'java.util.concurrent.atomic.AtomicInteger'
   ],
 
   properties: [
@@ -39,11 +41,13 @@ foam.CLASS({
       ],
       javaCode: `
         // count number of entries successfully read
-        JSONParser parser = getParser();
 
         // NOTE: explicitly calling PM constructor as create only creates
         // a percentage of PMs, but we want all replay statistics
         PM pm = new PM(((foam.dao.AbstractDAO)dao).getOf(), "replay."+getFilename());
+        AssemblyLine assemblyLine = x.get("threadPool") == null ? new foam.util.concurrent.SyncAssemblyLine()
+          : new foam.util.concurrent.AsyncAssemblyLine(x);
+        AtomicInteger successReading = new AtomicInteger();
 
         try ( BufferedReader reader = getReader() ) {
           if ( reader == null ) {
@@ -56,12 +60,13 @@ foam.CLASS({
             final char operation = entry.charAt(0);
             final String strEntry = entry.subSequence(2, length - 1).toString();
 
-            getLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
+            assemblyLine.enqueue(new foam.util.concurrent.AbstractAssembly() {
 
               FObject obj;
+              PM pm = new PM(((foam.dao.AbstractDAO)dao).getOf(), "replay."+getFilename());
 
               public void executeJob() {
-                obj = parser.parseString(strEntry, dao.getOf().getObjClass());
+                obj = jsonParser.get().parseString(strEntry, dao.getOf().getObjClass());
               }
 
               public void endJob() {
@@ -79,15 +84,22 @@ foam.CLASS({
                     dao.remove(obj);
                     break;
                 }
-                successReading++;
+                successReading.incrementAndGet();
               }
+
+//              @Override
+//              public synchronized void complete() {
+//                super.complete();
+//                pm.log(x);
+//                getLogger().log("Successfully read " + successReading + " entries from file: " + getFilename() + " in: " + pm.getTime() + "(ms)");
+//              }
             });
           }
         } catch ( Throwable t) {
           getLogger().error("Failed to read from journal", t);
         } finally {
           pm.log(x);
-          getLogger().log("Successfully read " + successReading + " entries from file: " + getFilename() + " in: " + pm.getTime() + "(ms)");
+          getLogger().log("Successfully read " + successReading.get() + " entries from file: " + getFilename() + " in: " + pm.getTime() + "(ms)");
         }
       `
     }
@@ -97,7 +109,7 @@ foam.CLASS({
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(`
-          private int successReading = 0;
+//          private int successRead = 0;
         `
          );
       }
