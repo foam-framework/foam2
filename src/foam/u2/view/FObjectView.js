@@ -151,6 +151,7 @@ foam.CLASS({
       );
       if ( this.data ) { this.objectClass = dataToClass(this.data); }
       if ( ! this.data && ! this.objectClass && this.choices.length ) this.objectClass = this.choices[0][0];
+
       this.
         tag(this.OBJECT_CLASS).
         tag(foam.u2.detail.VerticalDetailView, {
