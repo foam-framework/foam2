@@ -623,7 +623,9 @@ var classes = [
   'foam.nanos.approval.FulfilledApprovablePredicate',
   'foam.nanos.approval.FulfilledApprovableRule',
   'foam.nanos.approval.AuthenticatedApprovalDAOAuthorizer',
-  'foam.nanos.approval.PopulateApprovalRequestsDAO'
+  'foam.nanos.approval.PopulateApprovalRequestsDAO',
+
+  'foam.core.NumberSet'
 ];
 
 var abstractClasses = [
