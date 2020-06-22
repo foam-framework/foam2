@@ -11,7 +11,6 @@ import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.core.X;
 import foam.lib.json.OutputJSON;
-import foam.lib.PropertyPredicate;
 import foam.util.SafetyUtil;
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
@@ -302,7 +301,14 @@ public class JSONFObjectFormatter
   }
 
   public void outputDelta(FObject oldFObject, FObject newFObject) {
-    ClassInfo info           = oldFObject.getClassInfo();
+    outputDelta(oldFObject, newFObject, null);
+  }
+
+  public void outputDelta(FObject oldFObject, FObject newFObject, ClassInfo defaultClass) {
+    ClassInfo info = newFObject.getClassInfo();
+
+    boolean outputClass = outputClassNames_ && ( info != defaultClass || outputDefaultClassNames_ );
+
     ClassInfo newInfo        = newFObject.getClassInfo();
     boolean   outputComma    = true;
     List      delta          = getDelta(oldFObject, newFObject);
@@ -314,7 +320,7 @@ public class JSONFObjectFormatter
 
     b_.append('{');
     addInnerNewline();
-    if ( outputClassNames_ && outputDefaultClassNames_ ) {
+    if ( outputClass ) {
       //output Class name
       outputKey("class");
       b_.append(':');
@@ -325,8 +331,6 @@ public class JSONFObjectFormatter
     PropertyInfo id = (PropertyInfo) newInfo.getAxiomByName("id");
     outputProperty(newFObject, id);
 
-    // to output class names for references
-    outputDefaultClassNames_ = true;
 
     for ( int i = 0 ; i < size ; i++ ) {
       b_.append(',');
@@ -339,12 +343,6 @@ public class JSONFObjectFormatter
     b_.append('}');
   }
 
-  public void outputDelta(FObject oldFObject, FObject newFObject, ClassInfo defaultClass) {
-    ClassInfo info = newFObject.getClassInfo();
-
-    if ( info == defaultClass ) outputDefaultClassNames_ = false;
-    outputDelta(oldFObject, newFObject);
-  }
   protected void addInnerNewline() {
     if ( multiLineOutput_ ) {
       b_.append('\n');
@@ -370,25 +368,16 @@ public class JSONFObjectFormatter
   public void output(FObject o, ClassInfo defaultClass) {
     ClassInfo info = o.getClassInfo();
 
-    if ( info == defaultClass ) outputDefaultClassNames_ = false;
-
-    output(o);
-  }
-
-  public void output(FObject o) {
-    ClassInfo info = o.getClassInfo();
+    boolean outputClass = outputClassNames_ && ( info != defaultClass || outputDefaultClassNames_ );
 
     b_.append('{');
     addInnerNewline();
-    if ( outputClassNames_ && outputDefaultClassNames_ ) {
+    if ( outputClass ) {
       outputKey("class");
       b_.append(':');
       output(info.getId());
     }
-    boolean outputComma = outputClassNames_ && outputDefaultClassNames_;
-
-    // to output class names for references
-    outputDefaultClassNames_ = true;
+    boolean outputComma = outputClass;
 
     List axioms = getProperties(info);
     int  size   = axioms.size();
@@ -398,6 +387,10 @@ public class JSONFObjectFormatter
     }
     addInnerNewline();
     b_.append('}');
+  }
+
+  public void output(FObject o) {
+    output(o, null);
   }
 
   public void output(PropertyInfo prop) {
@@ -468,11 +461,6 @@ public class JSONFObjectFormatter
     return this;
   }
 
-  public JSONFObjectFormatter setOutputClassNames(boolean outputClassNames) {
-    outputClassNames_ = outputClassNames;
-    return this;
-  }
-
   public JSONFObjectFormatter setOutputDefaultClassNames(boolean f) {
     outputDefaultClassNames_ = f;
     return this;
@@ -485,6 +473,11 @@ public class JSONFObjectFormatter
 
   public JSONFObjectFormatter setMultiLine(boolean ml) {
     multiLineOutput_ = ml;
+    return this;
+  }
+
+  public JSONFObjectFormatter setOutputClassNames(boolean outputClassNames) {
+    outputClassNames_ = outputClassNames;
     return this;
   }
 

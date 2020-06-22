@@ -14,7 +14,6 @@ var classes = [
   'foam.core.ContextAgent',
   'foam.core.CompoundContextAgency',
   'foam.core.Identifiable',
-  'foam.core.AbstractFObject',
   'foam.core.Validatable',
   'foam.core.Agency',
   'foam.core.CoreTypesValidationTest',
@@ -69,6 +68,13 @@ var classes = [
   'foam.mlang.expr.DateTypes',
   'foam.mlang.expr.DateGrouping',
   'foam.mlang.expr.DateGroupingExpr',
+  'foam.mlang.Formula',
+  'foam.mlang.expr.Add',
+  'foam.mlang.expr.Subtract',
+  'foam.mlang.expr.Multiply',
+  'foam.mlang.expr.Divide',
+  'foam.mlang.expr.MinFunc',
+  'foam.mlang.expr.MaxFunc',
   'foam.mlang.PredicatedExpr',
   'foam.mlang.ContextObject',
   'foam.mlang.CurrentTime',
@@ -395,12 +401,12 @@ var classes = [
   'foam.u2.DisplayMode',
   'foam.nanos.export.ClientGoogleSheetsExportService',
   'foam.nanos.export.ExportDriverRegistry',
-  'foam.nanos.export.GoogleApiAuthService',
-  'foam.nanos.export.GoogleApiCredentials',
-  'foam.nanos.export.GoogleDriveService',
   'foam.nanos.export.GoogleSheetsExport',
-  'foam.nanos.export.GoogleSheetsExportService',
   'foam.nanos.export.GoogleSheetsPropertyMetadata',
+  'foam.nanos.google.api.auth.GoogleApiAuthService',
+  'foam.nanos.google.api.auth.GoogleApiCredentials',
+  'foam.nanos.google.api.drive.GoogleDriveService',
+  'foam.nanos.google.api.sheets.GoogleSheetsApiService',
   'foam.dao.jdbc.ConnectionPool',
   'foam.lib.Outputter',
   'foam.lib.PropertyPredicate',
@@ -617,7 +623,9 @@ var classes = [
   'foam.nanos.approval.FulfilledApprovablePredicate',
   'foam.nanos.approval.FulfilledApprovableRule',
   'foam.nanos.approval.AuthenticatedApprovalDAOAuthorizer',
-  'foam.nanos.approval.PopulateApprovalRequestsDAO'
+  'foam.nanos.approval.PopulateApprovalRequestsDAO',
+
+  'foam.core.NumberSet'
 ];
 
 var abstractClasses = [

@@ -494,6 +494,7 @@ foam.LIB({
   flags: ['java'],
   methods: [
     function buildJavaClass(cls) {
+      // TODO Generate getX() and setX() if contextAware
       cls = cls || foam.java.Class.create();
 
       cls.name          = this.model_.name;
@@ -502,14 +503,12 @@ foam.LIB({
       cls.abstract      = this.model_.abstract;
       cls.documentation = this.model_.documentation;
 
-      if ( this.model_.name !== 'AbstractFObject' ) {
-        // if not AbstractFObject either extend AbstractFObject or use provided extends property
-        cls.extends = this.model_.extends === 'FObject' ?
-          'foam.core.AbstractFObject' : this.model_.extends;
-      } else {
-        // if AbstractFObject we implement FObject
-        cls.implements = [ 'foam.core.FObject' ];
-      }
+      // javaExtends - extends only for java
+      cls.extends = this.model_.extends === 'FObject' ?
+        undefined : this.model_.extends;
+
+      if ( this.model_.javaExtends )
+        cls.extends = this.model_.javaExtends;
 
       cls.fields.push(foam.java.ClassInfo.create({ id: this.id }));
 
@@ -548,23 +547,123 @@ foam.LIB({
           return foam.java.Field.create({ name: p.name, type: p.javaType });
         });
 
-      if ( this.model_.name !== 'AbstractFObject' ) {
-        // if not AbstractFObject add beforeFreeze method
-        var properties = this.getAxiomsByClass(foam.core.Property).
-        filter(flagFilter).
-        filter(function(p) { return !! p.javaType && p.javaInfoType && p.generateJava; }).
-        filter(function(p) { return p.javaFactory; });
-        if ( properties.length > 0 ) {
+      var properties = this.getAxiomsByClass(foam.core.Property)
+        .filter(flagFilter)
+        .filter(p => !! p.javaType && p.javaInfoType && p.generateJava)
+        .filter(p => p.javaFactory);
+      
+      if ( properties.length > 0 ) {
+        cls.method({
+          visibility: 'public',
+          type: 'void',
+          name: 'beforeFreeze',
+          body: (this.model_.extends === 'FObject' ? '' : 'super.beforeFreeze();\n') + 
+            properties.map(p => `get${foam.String.capitalize(p.name)}();`)
+              .join('\n')
+        });
+      }
+
+      // If model doesn't explicitly extend anything, inject old AbstractFObject methods
+      if ( this.model_.extends === 'FObject' ) {
+        cls.field({
+          name: "x_",
+          visibility: 'protected',
+          static: false,
+          final: false,
+          type: 'foam.core.X',
+          initializer: "foam.core.EmptyX.instance()"
+        });
+
+        cls.method({
+          name: 'getX',
+          type: 'foam.core.X',
+          visibility: 'public',
+          body: 'return x_;'
+        });
+  
+        cls.method({
+          name: 'setX',
+          type: 'void',
+          visibility: 'public',
+          args: [
+            {
+              name: 'x',
+              type: 'foam.core.X'
+            }
+          ],
+          body: 'x_ = x;'
+        });
+
+        // Generate Freeze
+        cls.field({
+          name: "__frozen__",
+          visibility: 'protected',
+          static: false,
+          final: false,
+          type: 'boolean',
+          initializer: "false"
+        });
+
+        if ( ! this.hasOwnAxiom('freeze') ) {
           cls.method({
+            name: 'freeze',
+            type: 'foam.core.FObject',
             visibility: 'public',
-            type: 'void',
-            name: 'beforeFreeze',
-            body: 'super.beforeFreeze();\n' + properties.
-              map(function(p) {
-                return `get${foam.String.capitalize(p.name)}();`
-              }).join('\n')
+            body: `
+              beforeFreeze();
+              __frozen__ = true;
+              return this;
+            `
           });
         }
+
+        if ( ! this.hasOwnAxiom('isFrozen') ) {
+          cls.method({
+            name: 'isFrozen',
+            type: 'boolean',
+            visibility: 'public',
+            body: `
+              return __frozen__;
+            `
+          });
+        }
+
+        // Generate Extras if they don't exist in the model
+        if ( ! this.hasOwnAxiom('toString') ) {
+          cls.method({
+            name: 'toString',
+            type: 'String',
+            visibility: 'public',
+            body: `
+              StringBuilder sb = new StringBuilder();
+              append(sb);
+              return sb.toString();
+            `
+          });
+        }
+
+        if ( ! this.hasOwnAxiom('equals') ) {
+          cls.method({
+            name: 'equals',
+            type: 'boolean',
+            visibility: 'public',
+            args: [
+              {
+                name: 'o',
+                type: 'Object'
+              }
+            ],
+            body: `
+              return compareTo(o) == 0;
+            `
+          });
+        }
+
+        // If model doesn't already implement FObject, implement it
+        if ( ! cls.implements )
+          cls.implements = [ 'foam.core.FObject' ];
+        else if ( ! ( cls.implements.includes('foam.core.FObject') || cls.implements.includes('foam.core.FObject') ) )
+          cls.implements.push('foam.core.FObject');
       }
 
       if ( this.hasOwnAxiom('id') ) {
@@ -597,21 +696,18 @@ foam.LIB({
           body: 'setX(x);'
         });
 
-        if ( cls.name != 'AbstractFObject' ) {
-          cls.method({
-            visibility: 'public',
-            name: 'hashCode',
-            type: 'int',
-            body: 
-              ['int hash = 1'].concat(props.map(function(f) {
-                return 'hash += hash * 31 + foam.util.SafetyUtil.hashCode('+f.name+ '_' +')';
-              })).join(';\n') + ';\n'
-              +'return hash;\n'
-          });
-        }
+        cls.method({
+          visibility: 'public',
+          name: 'hashCode',
+          type: 'int',
+          body: 
+            ['int hash = 1'].concat(props.map(function(f) {
+              return 'hash += hash * 31 + foam.util.SafetyUtil.hashCode('+f.name+ '_' +')';
+            })).join(';\n') + ';\n'
+            +'return hash;\n'
+        });
 
-        if ( cls.name != 'AbstractFObject' &&
-             ! this.hasOwnAxiom('compareTo') ) {
+        if ( ! this.hasOwnAxiom('compareTo') ) {
           cls.method({
             visibility: 'public',
             name: 'compareTo',

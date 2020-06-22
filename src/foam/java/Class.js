@@ -119,12 +119,11 @@ foam.CLASS({
       this.package  = model.package;
       this.abstract = model.abstract;
 
-      if ( model.name != 'AbstractFObject' ) {
-        this.extends = model.extends  === 'FObject' ?
-          'foam.core.AbstractFObject' : model.extends;
-      } else {
-        this.implements = [ 'foam.core.FObject' ]
-      }
+      cls.extends = this.model_.extends === 'FObject' ?
+        undefined : this.model_.extends;
+
+      if ( this.model_.javaExtends )
+        cls.extends = this.model_.javaExtends;
     },
 
     function getField(name) {
