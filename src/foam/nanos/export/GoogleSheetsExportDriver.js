@@ -29,7 +29,7 @@ foam.CLASS({
   ],
 
   methods: [
-    async function exportFObject(X, obj, config) {
+    async function exportFObject(X, obj) {
         var self = this;
         
         var sheetId  = '';
@@ -40,13 +40,13 @@ foam.CLASS({
         var values = await self.outputter.outputArray([ obj ], metadata);
         stringArray = stringArray.concat(values);
 
-        sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata, config);
+        sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata);
         if ( ! sheetId || sheetId.length == 0)
           return '';
         var url = `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`;
         return url;
     },
-    async function exportDAO(X, dao, config) {
+    async function exportDAO(X, dao) {
       var self = this;
       
       var sink = await dao.select();
@@ -58,7 +58,7 @@ foam.CLASS({
       var values = await self.outputter.outputArray(sink.array, metadata);
       stringArray = stringArray.concat(values);
 
-      sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata, config);
+      sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata);
       if ( ! sheetId || sheetId.length == 0)
         return '';
       var url = `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`;

@@ -157,7 +157,7 @@
           if ( data.status != foam.nanos.approval.ApprovalStatus.REQUESTED ) {
             slot.set(user ? user.toSummary() : `User #${approver}`);	
           } else if ( user ) {
-            if ( X.user.id == user.id ) {
+            if ( X.user.id != user.id ) {
               slot.set(user.toSummary());
             } else {
               slot.set(user.group);
@@ -178,7 +178,7 @@
           if ( data.status != foam.nanos.approval.ApprovalStatus.REQUESTED ) {
             self.add(user ? user.toSummary() : `User #${approver}`);
           } else if ( user ) {
-            if ( self.__subSubContext__.user.id == user.id ) {
+            if ( self.__subSubContext__.user.id != user.id ) {
               self.add(user.toSummary());
             } else {
               self.add(user.group);

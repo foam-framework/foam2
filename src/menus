@@ -122,8 +122,6 @@ p({
   },
   "parent":"admin"
 })
-p({"class":"foam.nanos.menu.Menu","id":"admin.extraConfigType","label":"Extra Config Types","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"extraConfigDataTypeViewConfigDAO"},"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.extraConfigAddOns","label":"Extra Config Add Ons","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"extraConfigAddOnDAO"},"parent":"admin"})
 p({
   "class":"foam.nanos.menu.Menu",
   "id":"admin.googleApiCredentials",
@@ -139,7 +137,15 @@ p({
 })
 
 // integration
-p({"class":"foam.nanos.menu.Menu","id":"integration","label":"Integration","handler":{"class":"foam.nanos.menu.SubMenu"},"parent":""})
+p({
+  "class":"foam.nanos.menu.Menu",
+  "id":"integration",
+  "label":"Integration",
+  "handler":{
+    "class":"foam.nanos.menu.SubMenu"
+  },
+  "parent":""
+})
 p({
   "class":"foam.nanos.menu.Menu",
   "id":"integration.api-dig",
@@ -149,7 +155,9 @@ p({
     "config":{
       "class":"foam.comics.v2.DAOControllerConfig",
       "daoKey":"digDAO",
-      "browseSubtitle": "An API endpoint that supports all DAO operations."
+      "browseTitle": "DIG API Calls",
+      "browseSubtitle": "An API endpoint that supports all DAO operations.",
+      "createTitle": "Create a New API Call"
     }
   },
   "parent":"integration"
@@ -163,6 +171,9 @@ p({
     "config": {
       "class": "foam.comics.v2.DAOControllerConfig",
       "daoKey": "ruleDAO",
+      "browseTitle": "DUG Webhooks",
+      "browseSubtitle": "Webhooks triggered by DAO operations.",
+      "createTitle": "Create a New Webhook",
       "predicate": {
         "class": "foam.mlang.predicate.IsInstanceOf",
         "targetClass": "foam.nanos.dig.DUGRule"
@@ -175,12 +186,15 @@ p({
 p({
   "class":"foam.nanos.menu.Menu",
   "id":"integration.api-sugar",
-  "label":"SUGAR",
+  "label":"SUGAR - Service API",
   "handler":{
     "class":"foam.nanos.menu.DAOMenu2",
     "config":{
       "class":"foam.comics.v2.DAOControllerConfig",
-      "daoKey":"sugarDAO"
+      "daoKey":"sugarDAO",
+      "browseTitle": "SUGAR API Calls",
+      "browseSubtitle": "API calls for services.",
+      "createTitle": "Create a Service API Call"
     }
   },
   "parent":"integration"

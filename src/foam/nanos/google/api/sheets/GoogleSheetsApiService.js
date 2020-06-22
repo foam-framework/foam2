@@ -5,8 +5,8 @@
  */
 
 foam.CLASS({
-  package: 'foam.nanos.export',
-  name: 'GoogleSheetsExportService',
+  package: 'foam.nanos.google.api.sheets',
+  name: 'GoogleSheetsApiService',
   implements: [
     'foam.nanos.export.GoogleSheetsExport'
   ],
@@ -18,9 +18,10 @@ foam.CLASS({
     'com.google.api.services.sheets.v4.Sheets',
     'com.google.api.services.sheets.v4.SheetsScopes',
     'com.google.api.services.sheets.v4.model.*',
-    'foam.nanos.extraconfig.ExtraConfigValue',
+    'foam.nanos.export.GoogleSheetsPropertyMetadata',
+    'foam.nanos.google.api.auth.GoogleApiAuthService',
+    'foam.nanos.google.api.drive.GoogleDriveService',
     'foam.nanos.logger.Logger',
-
     'java.util.*'
   ],
   constants: [
@@ -66,23 +67,10 @@ foam.CLASS({
         {
           name: 'metadataObj',
           javaType: 'Object'
-        },
-        {
-          name: 'config',
-          javaType: 'Object'
         }
       ],
       javaCode: `
         try {
-          Map<String, ExtraConfigValue> map = new HashMap<>();
-
-          Object[] configObjArray = (Object[])config;
-          if ( configObjArray != null ) {
-            for ( int i = 0 ; i < configObjArray.length ; i++ ) {
-              map.put(((ExtraConfigValue)configObjArray[i]).getExportMetadata().getId(), (ExtraConfigValue)configObjArray[i]);
-            }
-          }
-
           List<List<Object>> listOfValues = new ArrayList<>();
           Object[] metadataArr = (Object[])metadataObj;
           GoogleSheetsPropertyMetadata[] metadata = new GoogleSheetsPropertyMetadata[metadataArr.length];
@@ -103,7 +91,7 @@ foam.CLASS({
             .build();
     
           Spreadsheet st = new Spreadsheet().setProperties(
-            new SpreadsheetProperties().setTitle(map.get("docTitle") == null || map.get("docTitle").getConfigValueString().length() == 0 ? ("NanopayExport" + new Date()) : map.get("docTitle").getConfigValueString()));      
+            new SpreadsheetProperties().setTitle("NanopayExport" + new Date()));
     
     
           List<ValueRange> data = new ArrayList<>();

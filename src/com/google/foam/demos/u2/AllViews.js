@@ -110,7 +110,7 @@ foam.CLASS({
           {
             class: 'foam.u2.GroupingDAOList',
             rowView: { class: 'com.google.foam.demos.heroes.CitationView' },
-            groupExpr: {f: function(o) { return o.name; }}
+            groupExpr: com.google.foam.demos.u2.SampleData.NAME
           }
         ]
       },
@@ -149,6 +149,15 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'defaultInt'
+    },
+    {
+      class: 'Int',
+      name: 'intWithIntView',
+      view: {
+        class: 'foam.u2.view.IntView',
+        onKey: true,
+        displayWidth: 50
+      }
     },
     {
       class: 'Int',
@@ -194,7 +203,7 @@ foam.CLASS({
       view: {
         class: 'foam.u2.MultiView',
         horizontal: false,
-        views: [ 'foam.u2.RangeView', 'foam.u2.IntView' ]
+        views: [ 'foam.u2.RangeView', { class: 'foam.u2.view.IntView', onKey: true } ]
       }
     },
     {

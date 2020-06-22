@@ -47,6 +47,7 @@ foam.CLASS({
     },
     [ 'extends', 'FObject' ],
     'refines',
+    'javaExtends',
     'order',
     { name: 'documentation', adapt: function(_, d) { return typeof d === 'function' ? foam.String.multiline(d).trim() : d; } },
     {

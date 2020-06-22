@@ -18,11 +18,16 @@ public class AsyncAssemblyLine
   extends SyncAssemblyLine
 {
   protected Agency pool_;
-  protected X      x_;
+  protected String agencyName_ = "AsyncAssemblyLine";
 
   public AsyncAssemblyLine(X x) {
-    x_    = x;
-    pool_ = (Agency) x.get("threadPool");
+    this(x, "threadPool");
+  }
+
+  public AsyncAssemblyLine(X x, String agencyName) {
+    super(x);
+    pool_  = (Agency) x.get("threadPool");
+    agencyName_ += ":" + agencyName;
   }
 
   public void enqueue(Assembly job) {
@@ -48,8 +53,13 @@ public class AsyncAssemblyLine
         if ( previous != null ) previous.waitToComplete();
 
         synchronized ( endLock_ ) {
-          job.endJob();
-          job.complete();
+          try {
+            job.endJob();
+          } catch (Throwable t) {
+            ((foam.nanos.logger.Logger) x.get("logger")).error(this.getClass().getSimpleName(), agencyName_, t);
+          } finally {
+            job.complete();
+          }
         }
       } finally {
         // Isn't required, but helps GC last entry.
@@ -58,6 +68,6 @@ public class AsyncAssemblyLine
           if ( q_ == job ) q_ = null;
         }
       }
-    }}, "SyncAssemblyLine");
+    }}, agencyName_);
   }
 }
