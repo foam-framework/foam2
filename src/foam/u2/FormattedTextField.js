@@ -54,9 +54,8 @@ foam.CLASS({
   `,
 
   properties: [
-    {
-      name: 'prop'
-    },
+    'prop',
+    'inputElem',
     {
       class: 'String',
       name: 'valueString',
@@ -69,7 +68,12 @@ foam.CLASS({
         //   input characters rather than format characters
         var deletion = this.checkDeletion(old, v);
 
-        if ( deletion !== null ) {
+        if (
+          deletion !== null
+          // only act on one-character deletions; multiple
+          // characters is likely a selection delete
+          && deletion[1] == 1
+        ) {
           v = this.smartDelete(old, deletion);
         }
 
@@ -77,7 +81,30 @@ foam.CLASS({
         this.data = sanitized;
         var formatted = this.prop.tableCellFormatter.f(
           sanitized, this.prop);
+
         return formatted;
+      },
+      postSet: function (old, v) {
+        if ( ! old || ! v ) return;
+
+        var deletion = this.checkDeletion(
+          this.sanitizeString(old), this.sanitizeString(v));
+        console.log(old, v, deletion);
+
+        var firstInequal = 0;
+
+        while (
+          firstInequal < v.length &&
+          v[firstInequal] == old[firstInequal]
+        ) firstInequal++;
+
+        if ( deletion == null ) firstInequal++;
+
+        if ( this.inputElem && this.inputElem.el() ) {
+          console.log('el', this.inputElem.el(), firstInequal);
+          this.inputElem.el().setSelectionRange(
+            firstInequal, firstInequal);
+        }
       },
       view: {
         class: 'foam.u2.tag.Input',
@@ -93,12 +120,17 @@ foam.CLASS({
       this.addClass(this.myClass())
         .add(this.slot(function(mode) {
           if ( mode === foam.u2.DisplayMode.RW ) {
-            return this.E().style({ 'display': 'flex' })
+            var e = this.E().style({ 'display': 'flex' })
             .startContext({ data: self })
               .start(self.VALUE_STRING).addClass(self.myClass('container-input'))
+              ;
+            // Needed for caret repositioning
+            self.inputElem = e;
+            e = e
               .end()
             .endContext();
           }
+          return e;
         }));
     },
     function fromProperty(prop) {
@@ -140,6 +172,7 @@ foam.CLASS({
       }
       return null;
     },
+    // Delete a number of meaningful characters
     function smartDelete(str, deletion) {
       var from = deletion[0];
       var amount = deletion[1];
