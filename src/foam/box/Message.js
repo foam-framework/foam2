@@ -56,6 +56,10 @@ foam.CLASS({
         RemoteException wrapper = new RemoteException();
         wrapper.setId(t.getClass().getName());
         wrapper.setMessage(t.getMessage());
+        if ( t instanceof foam.core.Exception ) {
+          var fe = (foam.core.Exception) t;
+          wrapper.setException(t);
+        }
         
         // Special case for CapabilityRuntimeException
         if (

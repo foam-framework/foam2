@@ -68,6 +68,13 @@ var classes = [
   'foam.mlang.expr.DateTypes',
   'foam.mlang.expr.DateGrouping',
   'foam.mlang.expr.DateGroupingExpr',
+  'foam.mlang.Formula',
+  'foam.mlang.expr.Add',
+  'foam.mlang.expr.Subtract',
+  'foam.mlang.expr.Multiply',
+  'foam.mlang.expr.Divide',
+  'foam.mlang.expr.MinFunc',
+  'foam.mlang.expr.MaxFunc',
   'foam.mlang.PredicatedExpr',
   'foam.mlang.ContextObject',
   'foam.mlang.CurrentTime',
@@ -616,7 +623,9 @@ var classes = [
   'foam.nanos.approval.FulfilledApprovablePredicate',
   'foam.nanos.approval.FulfilledApprovableRule',
   'foam.nanos.approval.AuthenticatedApprovalDAOAuthorizer',
-  'foam.nanos.approval.PopulateApprovalRequestsDAO'
+  'foam.nanos.approval.PopulateApprovalRequestsDAO',
+
+  'foam.core.NumberSet'
 ];
 
 var abstractClasses = [
