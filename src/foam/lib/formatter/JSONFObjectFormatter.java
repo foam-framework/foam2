@@ -248,6 +248,8 @@ public class JSONFObjectFormatter
       ((OutputJSON) value).formatJSON(this);
     } else if ( value instanceof String ) {
       output((String) value);
+    } else if ( value instanceof Enum<?> ) {
+      outputEnumValue((Enum<?>) value);
     } else if ( value instanceof FObject ) {
       output((FObject) value);
     } else if ( value instanceof PropertyInfo) {
@@ -272,8 +274,6 @@ public class JSONFObjectFormatter
       output((Map) value);
     } else if ( value instanceof List ) {
       output((List) value);
-    } else if ( value instanceof Enum<?> ) {
-      outputEnumValue((Enum<?>) value);
     } else /*if ( value == null )*/ {
       b_.append("null");
     }

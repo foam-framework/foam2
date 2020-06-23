@@ -9,6 +9,7 @@ package foam.util.concurrent;
 import foam.core.Agency;
 import foam.core.ContextAgent;
 import foam.core.X;
+import java.util.concurrent.Semaphore;
 
 /**
 * An Aynchronous implementation of the AssemblyLine interface.
@@ -17,8 +18,9 @@ import foam.core.X;
 public class AsyncAssemblyLine
   extends SyncAssemblyLine
 {
-  protected Agency pool_;
-  protected String agencyName_ = "AsyncAssemblyLine";
+  protected Agency   pool_;
+  protected String   agencyName_ = "AsyncAssemblyLine";
+  protected boolean  shutdown_  = false;
 
   public AsyncAssemblyLine(X x) {
     this(x, "threadPool");
@@ -31,6 +33,8 @@ public class AsyncAssemblyLine
   }
 
   public void enqueue(Assembly job) {
+    if ( shutdown_ ) throw new IllegalStateException("Can't enqueue into a shutdown AssemblyLine.");
+
     final Assembly previous;
 
     synchronized ( startLock_ ) {
@@ -69,5 +73,22 @@ public class AsyncAssemblyLine
         }
       }
     }}, agencyName_);
+  }
+
+  public void shutdown() {
+    shutdown_ = true;
+
+    try {
+      Semaphore s = new Semaphore(1);
+      s.acquire();
+
+      enqueue(new AbstractAssembly() {
+        public void endJob() {
+          s.release();
+        }
+      });
+      s.acquire();
+    } catch (InterruptedException e) {
+    }
   }
 }
