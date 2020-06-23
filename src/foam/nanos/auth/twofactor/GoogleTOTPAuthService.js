@@ -64,7 +64,7 @@ foam.CLASS({
         // update user with secret key
         user = (User) user.fclone();
         user.setTwoFactorSecret(key);
-        userDAO.put_(x, user);
+        userDAO.put_(getX(), user);
 
         try {
           EmailConfig service = (EmailConfig) x.get("emailConfig");
