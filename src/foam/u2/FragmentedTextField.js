@@ -20,7 +20,6 @@ foam.CLASS({
       margin-left: -1px;
       margin-right: -1px;
       line-height: 100%;
-      z-index: -1;
 
       /* TODO: get from theme when available */
       padding-left: 8px;
