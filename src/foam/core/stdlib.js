@@ -649,13 +649,13 @@ foam.LIB({
         return map[val] || (map[val] = val.toString());
       };
     })(),
-    function applyMask(string, mask, placeholder, escapeChar) {
+    function applyFormat(string, formatString, placeholder, escapeChar) {
       placeholder = placeholder || 'x';
       escapeChar = escapeChar || '\\';
       var newString = '';
       var escaping = false;
       var safe = true;
-      mask.split('').forEach(chr => {
+      formatString.split('').forEach(chr => {
         if ( escaping ) {
           newString += chr;
           escaping = false;
