@@ -589,6 +589,7 @@ var classes = [
   'foam.nanos.crunch.AgentCapabilityJunction',
   'foam.nanos.crunch.CapabilityCapabilityJunction',
   //daos
+  'foam.nanos.audit.AuditDAO',
   'foam.nanos.crunch.UserCapabilityJunctionDAO',
   //rules
   'foam.nanos.crunch.SendNotificationOnTopLevelCapabilityStatusUpdate',
