@@ -83,8 +83,11 @@ public class SyncAssemblyLine
   }
 
   public void shutdown() {
-    shutdown_ = true;
-    enqueue(new AbstractAssembly());
+    enqueue(new AbstractAssembly() {
+      public void startJob() {
+        shutdown_ = true;
+      }
+    });
   }
 
   public void acquireLocksThenEnqueue(Object[] locks, Assembly job, int lockIndex) {
