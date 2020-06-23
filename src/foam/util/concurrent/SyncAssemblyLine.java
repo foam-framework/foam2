@@ -20,7 +20,8 @@ public class SyncAssemblyLine
   protected Assembly q_         = null;
   protected Object   startLock_ = new Object();
   protected Object   endLock_   = new Object();
-  protected X      x_;
+  protected X        x_;
+  protected boolean  shutdown_  = false;
 
   public SyncAssemblyLine() {
   }
@@ -43,6 +44,8 @@ public class SyncAssemblyLine
   */
 
   public void enqueue(Assembly job) {
+    if ( shutdown_ ) throw new IllegalStateException("Can't enqueue into a shutdown AssemblyLine.");
+
     Assembly previous = null;
 
     try {
@@ -77,6 +80,11 @@ public class SyncAssemblyLine
         if ( q_ == job ) q_ = null;
       }
     }
+  }
+
+  public void shutdown() {
+    shutdown_ = true;
+    enqueue(new AbstractAssembly());
   }
 
   public void acquireLocksThenEnqueue(Object[] locks, Assembly job, int lockIndex) {
