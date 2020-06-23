@@ -376,7 +376,14 @@ public class JSONFObjectFormatter
   }
 
   public void output(FObject[] arr) {
-    // TODO:
+
+    b_.append('[');
+    for ( int i = 0 ; i < arr.length ; i++ ) {
+      output(arr[i]);
+      if ( i < arr.length - 1 ) b_.append(',');
+    }
+    b_.append(']');
+
   }
 
   public void output(FObject o, ClassInfo defaultClass) {

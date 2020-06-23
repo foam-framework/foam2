@@ -58,8 +58,6 @@ foam.CLASS({
               b.reset();
               b.setPropertyPredicate(new StoragePropertyPredicate());
               b.setOutputShortNames(true);
-              b.setOutputDefaultClassNames(true);
-              b.setQuoteKeys(true);
               return b;
             }
           };

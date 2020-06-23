@@ -41,13 +41,13 @@ foam.CLASS({
       ],
       javaCode: `
         // count number of entries successfully read
+        AtomicInteger successReading = new AtomicInteger();
 
         // NOTE: explicitly calling PM constructor as create only creates
         // a percentage of PMs, but we want all replay statistics
         PM pm = new PM(((foam.dao.AbstractDAO)dao).getOf(), "replay."+getFilename());
         AssemblyLine assemblyLine = x.get("threadPool") == null ? new foam.util.concurrent.SyncAssemblyLine()
           : new foam.util.concurrent.AsyncAssemblyLine(x);
-        AtomicInteger successReading = new AtomicInteger();
 
         try ( BufferedReader reader = getReader() ) {
           if ( reader == null ) {
@@ -88,25 +88,15 @@ foam.CLASS({
               }
             });
           }
+          assemblyLine.shutdown();
         } catch ( Throwable t) {
           getLogger().error("Failed to read from journal", t);
         } finally {
-        // assmblyLine.shutDown();
+          assemblyLine.shutdown();
           pm.log(x);
           getLogger().log("Successfully read " + successReading.get() + " entries from file: " + getFilename() + " in: " + pm.getTime() + "(ms)");
         }
       `
-    }
-  ],
-  axioms: [
-    {
-      name: 'javaExtras',
-      buildJavaClass: function(cls) {
-        cls.extras.push(`
-//          private int successRead = 0;
-        `
-         );
-      }
     }
   ]
 });
