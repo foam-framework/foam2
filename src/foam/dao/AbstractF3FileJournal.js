@@ -75,7 +75,8 @@ foam.CLASS({
             }
           };
 
-          protected StringBuilder strb = new StringBuilder();
+          // used for reading, and is shared across threads
+          protected StringBuilder stringBuilder = new StringBuilder();
 
           protected static ThreadLocal<foam.lib.json.JSONParser> jsonParser = new ThreadLocal<foam.lib.json.JSONParser>() {
             @Override
@@ -363,17 +364,17 @@ try {
           String line = reader.readLine();
           if ( line == null ) return null;
           if ( ! line.equals("p({") && ! line.equals("r({") ) return line;
-          strb.setLength(0);
-          strb.append(line);
+          stringBuilder.setLength(0);
+          stringBuilder.append(line);
           while( ! line.equals("})") ) {
             if ( (line = reader.readLine()) == null ) break;
             if ( line.equals("p({") ) {
-              getLogger().error("Entry is not properly closed: " + strb.toString());
+              getLogger().error("Entry is not properly closed: " + stringBuilder.toString());
             }
-            strb.append("\\n");
-            strb.append(line);
+            stringBuilder.append("\\n");
+            stringBuilder.append(line);
           }
-          return strb;
+          return stringBuilder;
         } catch (Throwable t) {
           getLogger().error("Failed to read from journal", t);
           return null;
