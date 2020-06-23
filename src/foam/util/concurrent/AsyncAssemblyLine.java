@@ -76,13 +76,14 @@ public class AsyncAssemblyLine
   }
 
   public void shutdown() {
-    shutdown_ = true;
-
     try {
       Semaphore s = new Semaphore(1);
       s.acquire();
 
       enqueue(new AbstractAssembly() {
+        public void startJob() {
+          shutdown_ = true;
+        }
         public void endJob() {
           s.release();
         }
