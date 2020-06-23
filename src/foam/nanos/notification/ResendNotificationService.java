@@ -13,13 +13,13 @@ public class ResendNotificationService extends ContextAwareSupport implements Re
 
   @Override
   public void resend(X x, long userId, Notification notification) {
+    DAO userDAO = (DAO) x.get("userDAO");
     User user = (User) userDAO.find(userId);
     user.doNotify(x, notification);
   }
 
   @Override
   public void start() {
-      userDAO = (DAO) getX().get("userDAO");
   }
 
 }
