@@ -107,27 +107,13 @@ foam.CLASS({
         }, (e) => {
           this.throwError.pub(e);
           
-          // TODO: uncomment this once turn UserFeedbackException into a throwable
-          // if ( foam.comics.v2.userfeedback.UserFeedbackException.isInstance(e) && e.userFeedback  ){
-          //   var currentFeedback = e.userFeedback;
-          //   while ( currentFeedback ){
-          //     this.ctrl.add(this.NotificationMessage.create({
-          //       message: currentFeedback.message,
-          //       type: currentFeedback.status.name.toLowerCase()
-          //     }));
+          if ( e.exception && e.exception.userFeedback  ) {
+            var currentFeedback = e.exception.userFeedback;
+            while ( currentFeedback ) {
+              this.ctrl.notify(currentFeedback.message, '', this.LogLevel.INFO, true);
 
-          //     currentFeedback = currentFeedback.next;
-          //   }
-          // } else {
-          //   this.ctrl.add(this.NotificationMessage.create({
-          //     message: e.message,
-          //     type: 'error'
-          //   }));
-          // }
-
-          if ( e.message === "An approval request has been sent out." ) {
-            this.ctrl.notify(e.message, '', this.LogLevel.INFO, true);
-            this.stack.back();
+              currentFeedback = currentFeedback.next;
+            }
           } else {
             this.ctrl.notify(e.message, '', this.LogLevel.ERROR, true);
           }

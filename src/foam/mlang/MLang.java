@@ -9,13 +9,15 @@ package foam.mlang;
 import foam.core.ClassInfo;
 import foam.core.X;
 import foam.dao.Sink;
-import foam.mlang.expr.Dot;
+import foam.mlang.expr.*;
 import foam.mlang.order.Comparator;
 import foam.mlang.order.Desc;
 import foam.mlang.predicate.*;
 import foam.mlang.sink.*;
 import foam.nanos.auth.Authorizer;
+
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 
 /**
  * Static helper functions for creating MLangs.
@@ -227,5 +229,38 @@ public class MLang
     dotF.setArg1(MLang.prepare(o1));
     dotF.setArg2(MLang.prepare(o2));
     return dotF;
+  }
+
+  public static Expr[] toExprArray(Object... args) {
+    return Arrays.stream(args).map(MLang::prepare).toArray(Expr[]::new);
+  }
+
+  public static Expr ADD(Object arg1, Object arg2) {
+    return prepareFormula(new Add(), arg1, arg2);
+  }
+
+  public static Expr SUB(Object arg1, Object arg2) {
+    return prepareFormula(new Subtract(), arg1, arg2);
+  }
+
+  public static Expr MUL(Object arg1, Object arg2) {
+    return prepareFormula(new Multiply(), arg1, arg2);
+  }
+
+  public static Expr DIV(Object arg1, Object arg2) {
+    return prepareFormula(new Divide(), arg1, arg2);
+  }
+
+  public static Expr MIN_FUNC(Object arg1, Object arg2) {
+    return prepareFormula(new MinFunc(), arg1, arg2);
+  }
+
+  public static Expr MAX_FUNC(Object arg1, Object arg2) {
+    return prepareFormula(new MaxFunc(), arg1, arg2);
+  }
+
+  public static Expr prepareFormula(Formula formula, Object... args) {
+    formula.setArgs(toExprArray(args));
+    return formula;
   }
 }

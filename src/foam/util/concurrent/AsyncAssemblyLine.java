@@ -9,6 +9,7 @@ package foam.util.concurrent;
 import foam.core.Agency;
 import foam.core.ContextAgent;
 import foam.core.X;
+import java.util.concurrent.Semaphore;
 
 /**
 * An Aynchronous implementation of the AssemblyLine interface.
@@ -17,15 +18,23 @@ import foam.core.X;
 public class AsyncAssemblyLine
   extends SyncAssemblyLine
 {
-  protected Agency pool_;
-  protected X      x_;
+  protected Agency   pool_;
+  protected String   agencyName_ = "AsyncAssemblyLine";
+  protected boolean  shutdown_  = false;
 
   public AsyncAssemblyLine(X x) {
-    x_    = x;
-    pool_ = (Agency) x.get("threadPool");
+    this(x, "threadPool");
+  }
+
+  public AsyncAssemblyLine(X x, String agencyName) {
+    super(x);
+    pool_  = (Agency) x.get("threadPool");
+    agencyName_ += ":" + agencyName;
   }
 
   public void enqueue(Assembly job) {
+    if ( shutdown_ ) throw new IllegalStateException("Can't enqueue into a shutdown AssemblyLine.");
+
     final Assembly previous;
 
     synchronized ( startLock_ ) {
@@ -48,8 +57,13 @@ public class AsyncAssemblyLine
         if ( previous != null ) previous.waitToComplete();
 
         synchronized ( endLock_ ) {
-          job.endJob();
-          job.complete();
+          try {
+            job.endJob();
+          } catch (Throwable t) {
+            ((foam.nanos.logger.Logger) x.get("logger")).error(this.getClass().getSimpleName(), agencyName_, t);
+          } finally {
+            job.complete();
+          }
         }
       } finally {
         // Isn't required, but helps GC last entry.
@@ -58,6 +72,24 @@ public class AsyncAssemblyLine
           if ( q_ == job ) q_ = null;
         }
       }
-    }}, "SyncAssemblyLine");
+    }}, agencyName_);
+  }
+
+  public void shutdown() {
+    try {
+      Semaphore s = new Semaphore(1);
+      s.acquire();
+
+      enqueue(new AbstractAssembly() {
+        public void startJob() {
+          shutdown_ = true;
+        }
+        public void endJob() {
+          s.release();
+        }
+      });
+      s.acquire();
+    } catch (InterruptedException e) {
+    }
   }
 }

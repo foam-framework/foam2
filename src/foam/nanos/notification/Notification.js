@@ -23,6 +23,10 @@ foam.CLASS({
     'foam.nanos.auth.User'
   ],
 
+  import: [
+    'resendNotificationService'
+  ],
+
   tableColumns: ['id', 'body', 'notificationType', 'broadcasted', 'userId', 'groupId' ],
 
   axioms: [
@@ -227,6 +231,21 @@ foam.CLASS({
       javaCode: `
         return "notification." + operation + "." + getId();
       `
+    }
+  ],
+  actions: [
+    {
+      name: 'resendNotification',
+      label: 'Resend Notification',
+      availablePermissions:['notification.notify'],
+      code: function(X) {
+        try {
+         X.resendNotificationService.resend(X, this.userId, this);
+        } catch(e) {
+          console.error('error',e)
+        }
+
+      }
     }
   ]
 });

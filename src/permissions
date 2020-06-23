@@ -29,3 +29,5 @@ p({"class":"foam.nanos.auth.Permission","id":"user.rw.compliance","description":
 p({"class":"foam.nanos.auth.Permission","id":"user.rw.deleted","description":""})
 p({"class":"foam.nanos.auth.Permission","id":"user.rw.emailverified","description":""})
 p({"class":"foam.nanos.auth.Permission","id":"user.rw.onboarded","description":""})
+p({"class":"foam.nanos.auth.Permission","id":"service.userCapabilityJunctionDAO","description":""})
+p({"class":"foam.nanos.auth.Permission","id":"ucj.addPermission","description":"Permission to add a UCJ, if not UCJ owner."})

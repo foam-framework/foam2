@@ -37,7 +37,7 @@ foam.CLASS({
   ],
 
   imports: [
-    'nSpecDAO'
+    'AuthenticatedNSpecDAO'
   ],
 
   properties: [
@@ -59,7 +59,7 @@ foam.CLASS({
           sections: [
             {
               heading: 'DAO',
-              dao: X.nSpecDAO
+              dao: X.AuthenticatedNSpecDAO
                 .where(E.AND(
                   E.EQ(foam.nanos.boot.NSpec.SERVE, true),
                   E.ENDS_WITH(foam.nanos.boot.NSpec.ID, 'DAO')

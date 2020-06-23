@@ -3587,6 +3587,7 @@ foam.CLASS({
   name: 'CurrentTime',
   extends: 'foam.mlang.AbstractExpr',
   axioms: [
+    // TODO (michal): remove singleton if all calls to foam.mlang.CurrentTime.create() returns the same instance.
     { class: 'foam.pattern.Singleton' }
   ],
   methods: [
@@ -3775,6 +3776,158 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.mlang',
+  name: 'Formula',
+  extends: 'foam.mlang.AbstractExpr',
+  abstract: true,
+
+  documentation: 'Formula base-class',
+
+  properties: [
+    {
+      class: 'foam.mlang.ExprArrayProperty',
+      name: 'args'
+    }
+  ],
+
+  methods: [
+    {
+      name: 'f',
+      javaCode: `
+        Double result = null;
+        for ( int i = 0; i < getArgs().length; i++) {
+          var current = getArgs()[i].f(obj);
+          if ( current instanceof Number ) {
+            var oldResult = result;
+            var value = ((Number) current).doubleValue();
+            result = result == null ? value : reduce(result, value);
+
+            if ( ! Double.isFinite(result) ) {
+              var formula = getClass().getSimpleName() + "(" + oldResult + ", " + value + ")";
+              throw new RuntimeException("Failed to evaluate formula:" +
+                formula + ", result:" + result);
+            }
+          }
+        }
+        return result;
+      `
+    },
+    {
+      name: 'reduce',
+      type: 'Double',
+      abstract: true,
+      args: [
+        { name: 'arg1', type: 'Double' },
+        { name: 'arg2', type: 'Double' }
+      ]
+    },
+    {
+      name: 'toString',
+      type: 'String',
+      javaCode: `
+        StringBuilder sb = new StringBuilder();
+        sb.append(getClass().getSimpleName()).append('(');
+        for ( int i = 0; i < getArgs().length; i++ ) {
+          if ( i > 0 ) sb.append(", ");
+          sb.append(getArgs()[i].toString());
+        }
+        sb.append(')');
+        return sb.toString();
+      `
+    }
+  ]
+})
+
+foam.CLASS({
+  package: 'foam.mlang.expr',
+  name: 'Add',
+  extends: 'foam.mlang.Formula',
+  implements: [ 'foam.core.Serializable' ],
+
+  methods: [
+    {
+      name: 'reduce',
+      abstract: false,
+      javaCode: 'return arg1 + arg2;'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.expr',
+  name: 'Subtract',
+  extends: 'foam.mlang.Formula',
+  implements: [ 'foam.core.Serializable' ],
+
+  methods: [
+    {
+      name: 'reduce',
+      abstract: false,
+      javaCode: 'return arg1 - arg2;'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.expr',
+  name: 'Multiply',
+  extends: 'foam.mlang.Formula',
+  implements: [ 'foam.core.Serializable' ],
+
+  methods: [
+    {
+      name: 'reduce',
+      abstract: false,
+      javaCode: 'return arg1 * arg2;'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.expr',
+  name: 'Divide',
+  extends: 'foam.mlang.Formula',
+  implements: [ 'foam.core.Serializable' ],
+
+  methods: [
+    {
+      name: 'reduce',
+      abstract: false,
+      javaCode: 'return arg1 / arg2;'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.expr',
+  name: 'MinFunc',
+  extends: 'foam.mlang.Formula',
+  implements: [ 'foam.core.Serializable' ],
+
+  methods: [
+    {
+      name: 'reduce',
+      abstract: false,
+      javaCode: 'return arg1 <= arg2 ? arg1 : arg2;'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.expr',
+  name: 'MaxFunc',
+  extends: 'foam.mlang.Formula',
+  implements: [ 'foam.core.Serializable' ],
+
+  methods: [
+    {
+      name: 'reduce',
+      abstract: false,
+      javaCode: 'return arg1 >= arg2 ? arg1 : arg2;'
+    }
+  ]
+});
 
 // TODO(braden): We removed Expr.pipe(). That may still be useful to bring back,
 // probably with a different name. It doesn't mean the same as DAO.pipe().

@@ -93,7 +93,6 @@ FOAM_FILES([
   { name: "foam/core/Serializable" },
   { name: "foam/core/Freezable" },
   { name: "foam/core/Detachable" },
-  { name: "foam/core/AbstractFObject" },
   { name: "foam/core/ContextAgent" },
   { name: "foam/core/CompoundContextAgency" },
   { name: "foam/core/Validatable" },
@@ -269,6 +268,9 @@ FOAM_FILES([
   { name: "foam/dao/VersionNoDAO" },
   { name: "foam/dao/sync/SyncRecord" },
   { name: "foam/dao/SyncDAO" },
+
+  { name: 'foam/nanos/approval/AuthenticatedApprovalDAOAuthorizer' },
+
   { name: "foam/nanos/approval/ApprovalRequestNotificationNotificationCitationView", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/SignUp" },
   { name: "foam/nanos/u2/navigation/SignIn" },
@@ -667,6 +669,7 @@ FOAM_FILES([
   { name: "foam/lib/PropertyPredicate" },
   { name: "foam/lib/PermissionedPropertyPredicate" },
   { name: "foam/lib/NetworkPropertyPredicate" },
+  { name: "foam/lib/StorageOptionalPropertyPredicate" },
   { name: "foam/lib/StoragePropertyPredicate" },
   { name: "foam/lib/AndPropertyPredicate" },
   { name: "foam/lib/json/OutputterMode" },
@@ -799,6 +802,7 @@ FOAM_FILES([
 
   { name: "foam/core/Unit" },
   { name: "foam/core/Currency" },
+  { name: "foam/core/NumberSet" },
 
   { name: "foam/util/concurrent/AbstractAssembly"},
   { name: "foam/util/concurrent/Assembly"},

@@ -23,6 +23,10 @@ foam.CLASS({
 //    'foam.nanos.auth.LastModifiedByAware'
   ],
 
+  requires: [
+    'foam.nanos.theme.ThemeGlyphs'
+  ],
+
   tableColumns: [
     'enabled',
     'name',
@@ -198,6 +202,18 @@ foam.CLASS({
       name: 'logoBackgroundColour',
       documentation: 'The logo background colour to display in the application.',
       section: 'images'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.nanos.theme.ThemeGlyphs',
+      name: 'glyphs',
+      documentation: `
+        Glyphs are simple vectors which can be used as menu items
+        or indicators.
+      `.replace('\n',' ').trim(),
+      factory: function () {
+        return this.ThemeGlyphs.create();
+      }
     },
     {
       class: 'String',

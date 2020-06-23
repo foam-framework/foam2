@@ -58,7 +58,6 @@ foam.CLASS({
               b.reset();
               b.setPropertyPredicate(new StoragePropertyPredicate());
               b.setOutputShortNames(true);
-              b.setOutputDefaultClassNames(false);
               return b;
             }
           };
@@ -75,6 +74,21 @@ foam.CLASS({
               return b;
             }
           };
+
+          // used for reading, and is shared across threads
+          protected StringBuilder stringBuilder = new StringBuilder();
+
+          protected static ThreadLocal<foam.lib.json.JSONParser> jsonParser = new ThreadLocal<foam.lib.json.JSONParser>() {
+            @Override
+            protected foam.lib.json.JSONParser initialValue() {
+              return new JSONParser();
+            }
+            @Override
+            public JSONParser get() {
+              JSONParser parser = super.get();
+              return parser;
+            }
+          };
         `);
       }
     }
@@ -86,12 +100,6 @@ foam.CLASS({
       name: 'line',
       javaType: 'foam.util.concurrent.AssemblyLine',
       javaFactory: 'return new foam.util.concurrent.SyncAssemblyLine();'
-    },
-    {
-      class: 'Object',
-      name: 'parser',
-      javaType: 'foam.lib.json.JSONParser',
-      javaFactory: `return getX().create(JSONParser.class);`
     },
     {
       class: 'Object',
@@ -356,14 +364,17 @@ try {
           String line = reader.readLine();
           if ( line == null ) return null;
           if ( ! line.equals("p({") && ! line.equals("r({") ) return line;
-          StringBuilder sb = new StringBuilder();
-          sb.append(line);
+          stringBuilder.setLength(0);
+          stringBuilder.append(line);
           while( ! line.equals("})") ) {
             if ( (line = reader.readLine()) == null ) break;
-            sb.append("\\n");
-            sb.append(line);
+            if ( line.equals("p({") ) {
+              getLogger().error("Entry is not properly closed: " + stringBuilder.toString());
+            }
+            stringBuilder.append("\\n");
+            stringBuilder.append(line);
           }
-          return sb;
+          return stringBuilder;
         } catch (Throwable t) {
           getLogger().error("Failed to read from journal", t);
           return null;
