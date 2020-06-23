@@ -61,10 +61,8 @@ foam.CLASS({
             final String strEntry = entry.subSequence(2, length - 1).toString();
 
             assemblyLine.enqueue(new foam.util.concurrent.AbstractAssembly() {
-
               FObject obj;
-              PM pm = new PM(((foam.dao.AbstractDAO)dao).getOf(), "replay."+getFilename());
-
+              
               public void executeJob() {
                 obj = jsonParser.get().parseString(strEntry, dao.getOf().getObjClass());
               }
