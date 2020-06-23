@@ -24,7 +24,8 @@ public class JSONParser
   }
 
   public FObject parseString(String data, Class defaultClass) {
-    StringPStream ps = stringps;
+    //StringPStream ps = stringps;
+    StringPStream ps = new StringPStream();
 
     ps.setString(data);
     ParserContext x = new ParserContextImpl();
@@ -35,7 +36,8 @@ public class JSONParser
   }
 
   public Object[] parseStringForArray(String data, Class defaultClass) {
-    StringPStream ps = stringps;
+//    StringPStream ps = stringps;
+    StringPStream ps = new StringPStream();
     ps.setString(data);
     ParserContext x = new ParserContextImpl();
     x.set("X", getX());
