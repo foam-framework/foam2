@@ -19,6 +19,10 @@ foam.CLASS({
     'foam.mlang.Expressions'
   ],
 
+  requires: [
+    'foam.u2.util.NumberShortener'
+  ],
+
   imports: [
     'ctrl',
     'currencyDAO',
@@ -87,6 +91,10 @@ foam.CLASS({
       documentation: 'The actual currency object that can format the value'
     },
     {
+      name: 'shortenToPrecision',
+      documentation: 'Expects an integer as value. Used for RO mode'
+    },
+    {
       class: 'String',
       name: 'valueString',
       documentation: 'This is the front facing formatted value',
@@ -139,9 +147,20 @@ foam.CLASS({
             .endContext();
           }
           return self.E().start('p').addClass(self.myClass('label-currency'))
-            .add(currency ? currency.format(self.data) : self.data)
+            .add(self.getDisplayValue())
             .end();
         }));
+    },
+
+    function getDisplayValue() {
+      if ( this.currency ) {
+        return Number.isInteger(this.shortenToPrecision) ?
+          this.NumberShortener.shortenNumber(this.data, this.shortenToPrecision, this.currency) :
+          this.currency.format(this.data);
+      }
+      return Number.isInteger(this.shortenToPrecision) ?
+        this.NumberShortener.shortenNumber(this.data, this.shortenToPrecision) :
+        this.data;
     },
 
     function sanitizeString(s) {
