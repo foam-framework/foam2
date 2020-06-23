@@ -342,6 +342,8 @@ foam.CLASS({
             EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId()),
             EQ(UserCapabilityJunction.TARGET_ID, (String) ccJunction.getTargetId())
           ));
+
+          if ( ucJunction != null && ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED ) continue;
           
           // CONFIRM ucJunction status with re-put the ucj
           ucJunction = ucJunction == null ? 
