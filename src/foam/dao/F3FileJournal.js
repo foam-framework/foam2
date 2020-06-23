@@ -86,18 +86,12 @@ foam.CLASS({
                 }
                 successReading.incrementAndGet();
               }
-
-//              @Override
-//              public synchronized void complete() {
-//                super.complete();
-//                pm.log(x);
-//                getLogger().log("Successfully read " + successReading + " entries from file: " + getFilename() + " in: " + pm.getTime() + "(ms)");
-//              }
             });
           }
         } catch ( Throwable t) {
           getLogger().error("Failed to read from journal", t);
         } finally {
+        // assmblyLine.shutDown();
           pm.log(x);
           getLogger().log("Successfully read " + successReading.get() + " entries from file: " + getFilename() + " in: " + pm.getTime() + "(ms)");
         }
