@@ -46,3 +46,26 @@ p({
   "lazy": false,
   "service":{"class":"foam.nanos.notification.email.SMTPConfig"}
 })
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "resendNotificationService",
+  "serve": true,
+  "authenticate": true,
+  "boxClass":"net.nanopay.notification.ResendNotificationServiceInterfaceSkeleton",
+  "serviceClass": "net.nanopay.notification.ResendNotificationService",
+  "client":
+    """
+      {
+        "class":"net.nanopay.notification.client.ClientResendNotificationService",
+        "delegate": {
+          "class":"foam.box.SessionClientBox",
+          "delegate": {
+            "class":"foam.box.HTTPBox",
+            "url":
+            "service/resendNotificationService"
+          }
+        }
+      }
+    """
+})
