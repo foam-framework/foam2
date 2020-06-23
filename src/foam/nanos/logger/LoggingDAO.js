@@ -52,10 +52,13 @@ foam.CLASS({
         }
         logger = (Logger) getX().get("logger");
         if ( logger != null ) {
-          logger = new PrefixLogger(new Object[] {this.getNSpec().getName()}, logger);
+          logger = new PrefixLogger(new Object[] {
+            this.getClass().getSimpleName(),
+            this.getNSpec().getName()
+          }, logger);
           this.setMyLogger(logger);
         } else {
-          return NullLogger.instance();
+          return new StdoutLogger();
         }
         return logger;
       `

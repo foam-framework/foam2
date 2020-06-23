@@ -24,7 +24,10 @@ foam.CLASS({
       class: 'Object',
       name: 'line',
       javaType: 'foam.util.concurrent.AssemblyLine',
-      javaFactory: 'return new foam.util.concurrent.AsyncAssemblyLine(getX());'
+      javaFactory: `
+      return new foam.util.concurrent.AsyncAssemblyLine(getX(), this.getClass().getSimpleName());
+//      return new foam.util.concurrent.SyncAssemblyLine(getX());
+      `
     },
     {
       name: 'logger',
@@ -41,6 +44,17 @@ foam.CLASS({
 
   methods: [
     {
+      // TODO: remove - temporary - just for development troubleshooting
+      name: 'put_',
+      javaCode: `
+      if ( obj instanceof MedusaEntry ) {
+        MedusaEntry entry = (MedusaEntry) obj;
+        getLogger().debug("put_", entry.getIndex(), entry.getNode());
+      }
+      return getDelegate().put_(x, obj);
+      `
+    },
+    {
       name: 'cmd_',
       javaCode: `
       if ( obj instanceof BatchCmd ) {
@@ -53,6 +67,8 @@ foam.CLASS({
             getLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
               public void executeJob() {
                 try {
+                  FObject o = (FObject) entry.getValue();
+        getLogger().debug("cmd", "BatchCmd", cmd.getHostname(), o.toString());
                   getDelegate().put_(x, (FObject) entry.getValue());
                 } catch ( Throwable t ) {
                   getLogger().error(t);

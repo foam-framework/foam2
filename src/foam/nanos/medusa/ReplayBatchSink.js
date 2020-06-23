@@ -11,18 +11,13 @@ foam.CLASS({
 
   documentation: 'Batch replies in some time window into a single (HTTP) send operation.',
 
-  implements: [
-    'foam.core.ContextAgent'
-  ],
-
   javaImports: [
-    'foam.core.Agency',
     'foam.dao.DAO',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
     'java.util.HashMap',
-    'java.util.Map'
+    'java.util.Map',
   ],
 
   axioms: [
@@ -74,9 +69,14 @@ foam.CLASS({
       value: 1000
     },
     {
-      name: 'complete',
+      name: 'batcherRunning',
       class: 'Boolean',
       value: false
+    },
+    {
+      name: 'timer',
+      class: 'Object',
+      visibility: 'HIDDEN'
     },
     {
       name: 'logger',
@@ -93,15 +93,6 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'init_',
-      javaCode: `
-      ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
-      setBatchTimerInterval(support.getBatchTimerInterval());
-      setMaxBatchSize(support.getMaxBatchSize());
-     ((Agency) getX().get(support.getThreadPoolName())).submit(getX(), this, this.getClass().getSimpleName());
-     `
-    },
-    {
       name: 'put',
       args: [
         {
@@ -115,29 +106,21 @@ foam.CLASS({
       ],
       javaCode: `
       synchronized ( batchLock_ ) {
-        while ( getBatch().size() >= getMaxBatchSize() ) {
-          try {
-            getLogger().debug("put", "wait");
-            batchLock_.wait(100);
-          } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-          }
+        if ( getBatch().size() >= getMaxBatchSize() ) {
+          send(getX());
         }
         MedusaEntry entry = (MedusaEntry) obj;
+        entry.setNode(System.getProperty("hostname"));
+        getLogger().debug("put", entry.getIndex(), getDetails().getRequester());
         getBatch().put(entry.getIndex(), entry);
-      }
-      if ( getBatch().size() >= getMaxBatchSize() ) {
-        synchronized ( executeLock_ ) {
-          executeLock_.notify();
-        }
       }
       `
     },
     {
       name: 'eof',
       javaCode: `
-      setComplete(true);
       getLogger().debug("eof");
+      send(getX());
       `
     },
     {
@@ -149,20 +132,26 @@ foam.CLASS({
         }
       ],
       javaCode: `
+     // nop
+     `
+    },
+    {
+      name: 'send',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      javaCode: `
     String pmName = getDetails().getResponder()+":"+getDetails().getRequester();
     try {
-      while ( ! getComplete() ||
-              getCount() < getDetails().getCount() ||
-              getBatch().size() > 0 ) {
         Map batch;
         synchronized ( batchLock_ ) {
           batch = getBatch();
           ReplayBatchSink.BATCH.clear(this);
-          batchLock_.notifyAll();
+          setCount(getCount() + batch.size());
         }
-        setCount(getCount() + batch.size());
-        long startTime = System.currentTimeMillis();
-
         getLogger().debug("execute", "count", getCount(), "details", getDetails());
 
         if ( batch.size() > 0 ) {
@@ -174,18 +163,7 @@ foam.CLASS({
           getDao().cmd_(x, cmd);
           pm.log(x);
         }
-
-        long delay = getBatchTimerInterval() - (System.currentTimeMillis() - startTime);
-        if ( delay > 0 ) {
-          synchronized ( executeLock_ ) {
-            getLogger().debug("execute", "wait", delay);
-            executeLock_.wait(delay);
-          }
-        }
-      }
-      getLogger().debug("execute", "exit", "count", getCount(), "details", getDetails());
-    } catch (InterruptedException e) {
-      // nop
+        getLogger().debug("execute", "exit", "count", getCount(), "details", getDetails());
     } catch ( Throwable t ) {
       getLogger().error(t);
     }

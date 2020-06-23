@@ -50,14 +50,6 @@ DAO stacks both end at x.get("internalMedusaEntryDAO").`,
       getLogger().debug("put", entry.getIndex(), "id", entry.getId(), "hash", entry.getHash());
       return getDao().put_(x, entry);
       `
-    },
-    {
-      name: 'remove_',
-      javaCode: `
-      MedusaEntry entry = (MedusaEntry) getDao().remove_(x, obj);
-      getLogger().debug("remove", entry.getIndex(), "id", entry.getId(), "hash", entry.getHash());
-      return entry;
-    `
     }
   ]
 });

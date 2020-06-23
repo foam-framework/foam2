@@ -32,12 +32,6 @@ foam.CLASS({
   
   properties: [
     {
-      name: 'replaying',
-      class: 'Boolean',
-      value: true,
-      visibility: 'RO'
-    },
-    {
       name: 'logger',
       class: 'FObjectProperty',
       of: 'foam.nanos.logger.Logger',
@@ -55,7 +49,7 @@ foam.CLASS({
       name: 'find_',
       javaCode: `
       getLogger().debug("find");
-      blockOnReplay();
+      blockOnReplay(x);
       return getDelegate().find_(x, id);
       `
     },
@@ -63,7 +57,7 @@ foam.CLASS({
       name: 'select_',
       javaCode: `
       getLogger().debug("select");
-      blockOnReplay();
+      blockOnReplay(x);
       return getDelegate().select_(x, sink, skip, limit, order, predicate);
       `
     },
@@ -71,7 +65,7 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       getLogger().debug("put");
-      blockOnReplay();
+      blockOnReplay(x);
       return getDelegate().put_(x, obj);
       `
     },
@@ -79,7 +73,7 @@ foam.CLASS({
       name: 'remove_',
       javaCode: `
       getLogger().debug("remove");
-      blockOnReplay();
+      blockOnReplay(x);
       return getDelegate().remove_(x, obj);
       `
     },
@@ -87,7 +81,7 @@ foam.CLASS({
       name: 'removeAll_',
       javaCode: `
       getLogger().debug("removeAll");
-      blockOnReplay();
+      blockOnReplay(x);
       getDelegate().removeAll_(x, skip, limit, order, predicate);
       `
     },
@@ -97,7 +91,6 @@ foam.CLASS({
       if ( obj instanceof ReplayCompleteCmd ) {
         getLogger().info("replay complete");
         synchronized ( replayingLock_ ) {
-          setReplaying(false);
           getLogger().debug("notifyAll");
           replayingLock_.notifyAll();
         }
@@ -108,12 +101,21 @@ foam.CLASS({
     },
     {
       name: 'blockOnReplay',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
       javaCode: `
-      if ( ! getReplaying() ) {
+      ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
+
+      if ( ! replaying.getReplaying() ) {
         return;
       }
+
       synchronized ( replayingLock_ ) {
-        if ( getReplaying() ) {
+        if ( replaying.getReplaying() ) {
           try {
             getLogger().debug("wait");
             replayingLock_.wait();

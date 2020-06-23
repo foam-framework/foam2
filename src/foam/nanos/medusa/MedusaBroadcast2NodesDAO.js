@@ -41,18 +41,17 @@ foam.CLASS({
       class: 'Object',
       name: 'assemblyLine',
       javaType: 'foam.util.concurrent.AssemblyLine',
-      javaFactory: 'return new foam.util.concurrent.AsyncAssemblyLine(getX(), this.getClass().getSimpleName()+":"+getServiceName());'
+      javaFactory: `
+      ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
+      return new foam.util.concurrent.AsyncAssemblyLine(getX(), this.getClass().getSimpleName()+":"+getServiceName(), support.getThreadPoolName());
+//      return new foam.util.concurrent.SyncAssemblyLine(getX());
+      `
     },
     {
       // TODO: clear on ClusterConfig DAO updates
       name: 'clients',
       class: 'Map',
       javaFactory: 'return new HashMap();'
-    },
-    {
-      name: 'threadPoolName',
-      class: 'String',
-      value: 'medusaThreadPool'
     },
     {
       class: 'FObjectProperty',

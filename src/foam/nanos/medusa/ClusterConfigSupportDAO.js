@@ -52,7 +52,8 @@ foam.CLASS({
         ClusterConfigSupport.NODE_QUORUM.clear(support);
         ClusterConfigSupport.HAS_NODE_QUORUM.clear(support);
         ClusterConfigSupport.MEDIATOR_COUNT.clear(support);
-        ClusterConfigSupport.HAS_QUORUM.clear(support);
+        ClusterConfigSupport.HAS_MEDIATOR_QUORUM.clear(support);
+//        ClusterConfigSupport.HAS_QUORUM.clear(support);
         ClusterConfigSupport.STAND_ALONE.clear(support);
         ClusterConfigSupport.CLIENTS.clear(support);
       }

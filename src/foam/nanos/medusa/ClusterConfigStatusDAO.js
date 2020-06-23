@@ -48,7 +48,7 @@ foam.CLASS({
       ClusterConfig old = (ClusterConfig) find_(x, nu.getId());
 
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      Boolean hadQuorum = support.getHasQuorum();
+      Boolean hadQuorum = support.hasQuorum(x);
 
       nu = (ClusterConfig) getDelegate().put_(x, nu);
 
@@ -67,7 +67,7 @@ foam.CLASS({
             ClusterConfig config = support.getConfig(x, support.getConfigId());
             if ( support.canVote(x, nu) &&
                  support.canVote(x, config) ) {
-              Boolean hasQuorum = support.getHasQuorum();
+              Boolean hasQuorum = support.hasQuorum(x);
               if ( electoralService.getState() == ElectoralServiceState.IN_SESSION ||
                    electoralService.getState() == ElectoralServiceState.ADJOURNED) {
                 if ( hadQuorum && ! hasQuorum) {

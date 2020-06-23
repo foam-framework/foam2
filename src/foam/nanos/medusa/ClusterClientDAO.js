@@ -166,7 +166,7 @@ foam.CLASS({
 
           return data;
         } catch ( ClusterException e ) {
-          getLogger().debug("submit", e.getMessage());
+          getLogger().debug("submit", e.getClass().getSimpleName(), e.getMessage());
           throw e;
         } catch ( RuntimeException e ) {
           getLogger().debug("submit", e.getMessage());

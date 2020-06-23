@@ -84,7 +84,7 @@ foam.CLASS({
             }
             // NOTE: using internalMedusaDAO else we'll block on ReplayingDAO.
             DAO dao = (DAO) getX().get("internalMedusaDAO");
-            dao = dao.where(EQ(MedusaEntry.VERIFIED, false));
+            dao = dao.where(EQ(MedusaEntry.PROMOTED, false));
             Min min = (Min) dao.select(MIN(MedusaEntry.INDEX));
 
             ReplayDetailsCmd details = new ReplayDetailsCmd();
@@ -98,11 +98,19 @@ foam.CLASS({
             details = (ReplayDetailsCmd) clientDAO.cmd_(getX(), details);
             getLogger().debug(myConfig.getId(), "ReplayDetailsCmd from", config.getId(), details);
 
-            DaggerService dagger = (DaggerService) x.get("daggerService");
-            dagger.setGlobalIndex(getX(), details.getMaxIndex());
+            synchronized ( this ) {
+              ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
 
-            // Send to Consensus DAO to prepare for Replay
-            ((DAO) getX().get("medusaMediatorDAO")).cmd(details);
+              DaggerService dagger = (DaggerService) x.get("daggerService");
+              if ( details.getMaxIndex() > dagger.getGlobalIndex(getX())) {
+                dagger.setGlobalIndex(getX(), details.getMaxIndex());
+              }
+
+              if ( details.getMaxIndex() > replaying.getReplayIndex() ) {
+                replaying.setReplayIndex(details.getMaxIndex());
+              }
+              replaying.getReplayNodes().put(details.getResponder(), details);
+            }
 
             ReplayCmd cmd = new ReplayCmd();
             cmd.setDetails(details);

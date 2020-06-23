@@ -16,10 +16,13 @@ configuration for contacting the primary node.`,
     foam.pattern.Singleton.create()
   ],
 
+  implements: [
+    'foam.nanos.NanoService'
+  ],
+
   javaImports: [
     'foam.box.Box',
     'foam.box.SessionClientBox',
-    'foam.core.Agency',
     'foam.core.FObject',
     'foam.core.X',
     'foam.dao.ArraySink',
@@ -71,12 +74,6 @@ configuration for contacting the primary node.`,
       visibility: 'RO'
     },
     {
-      name: 'primaryConfigId',
-      label: 'Primary',
-      class: 'String',
-      visibility: 'RO'
-    },
-    {
       name: 'isPrimary',
       class: 'Boolean',
       value: false,
@@ -88,12 +85,6 @@ configuration for contacting the primary node.`,
       class: 'Enum',
       of: 'foam.nanos.medusa.Status',
       value: 'OFFLINE',
-      visibility: 'RO'
-    },
-    {
-      name: 'isReplaying',
-      class: 'Boolean',
-      value: true,
       visibility: 'RO'
     },
     {
@@ -110,12 +101,13 @@ configuration for contacting the primary node.`,
     {
       name: 'threadPoolName',
       class: 'String',
-      value: 'medusaThreadPool'
+      value: 'threadPool'
+//      value: 'medusaThreadPool'
     },
     {
       name: 'batchTimerInterval',
       class: 'Long',
-      value: 1
+      value: 10
     },
     {
       name: 'maxBatchSize',
@@ -162,12 +154,24 @@ configuration for contacting the primary node.`,
       `
     },
     {
-      documentation: 'Are at least half+1 of the expected instances online?',
-      name: 'hasQuorum',
+      documentation: 'Are at least half+1 of the expected nodes online?',
+      name: 'hasMediatorQuorum',
       class: 'Boolean',
+      visibility: 'RO',
       javaFactory: `
-      return getHasNodeQuorum() &&
-             getVoters(getX()).size() >= getMediatorQuorum();
+      ClusterConfig config = getConfig(getX(), getConfigId());
+      Count count = (Count) ((DAO) getX().get("localClusterConfigDAO"))
+        .where(
+          AND(
+            EQ(ClusterConfig.ZONE, 0L), //Math.max(0, config.getZone() -1)),
+            EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
+            EQ(ClusterConfig.ENABLED, true),
+            EQ(ClusterConfig.STATUS, Status.ONLINE),
+            EQ(ClusterConfig.REALM, config.getRealm()),
+            EQ(ClusterConfig.REGION, config.getRegion())
+          ))
+        .select(COUNT());
+      return ((Long)count.getValue()).intValue() >= getMediatorQuorum();
       `
     },
     {
@@ -281,6 +285,17 @@ configuration for contacting the primary node.`,
 
   methods: [
     {
+      documentation: 'Start as a NanoService',
+      name: 'start',
+      javaCode: `
+      ReplayingInfo replaying = (ReplayingInfo) getX().get("replayingInfo");
+      DAO dao = (DAO) getX().get("localClusterConfigDAO");
+      ClusterConfig myConfig = (ClusterConfig) dao.find(getConfigId()).fclone();
+      myConfig.setReplayingInfo(replaying);
+      dao.put(myConfig);
+      `
+    },
+    {
       name: 'buildURL',
       type: 'String',
       args: [
@@ -330,23 +345,6 @@ configuration for contacting the primary node.`,
         getLogger().error(e);
         throw new RuntimeException(e);
       }
-      `
-    },
-    {
-      name: 'getPrimaryDAO',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'serviceName',
-          type: 'String'
-        }
-      ],
-      type: 'foam.dao.DAO',
-      javaCode: `
-      return getClientDAO(x, serviceName, getConfig(x, getConfigId()), getPrimary(x));
       `
     },
     {
@@ -483,24 +481,6 @@ configuration for contacting the primary node.`,
       `
     },
     {
-      name: 'getVoterPredicate',
-      type: 'foam.mlang.predicate.Predicate',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        }
-      ],
-      javaCode: `
-      return AND(
-              EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
-              EQ(ClusterConfig.ZONE, 0L),
-              EQ(ClusterConfig.STATUS, Status.ONLINE),
-              EQ(ClusterConfig.ENABLED, true)
-           );
-      `
-    },
-    {
       name: 'getVoters',
       args: [
         {
@@ -514,7 +494,10 @@ configuration for contacting the primary node.`,
       List arr = (ArrayList) ((ArraySink) ((DAO) x.get("localClusterConfigDAO"))
         .where(
           AND(
-            getVoterPredicate(x),
+            EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
+            EQ(ClusterConfig.ZONE, 0L),
+            EQ(ClusterConfig.STATUS, Status.ONLINE),
+            EQ(ClusterConfig.ENABLED, true),
             EQ(ClusterConfig.REALM, config.getRealm()),
             EQ(ClusterConfig.REGION, config.getRegion())
           )
@@ -541,6 +524,22 @@ configuration for contacting the primary node.`,
         config.getEnabled() &&
         config.getType() == MedusaType.MEDIATOR &&
         config.getZone() == 0L;
+      `
+    },
+    {
+      documentation: 'Are at least half+1 of the expected instances online?',
+      name: 'hasQuorum',
+      type: 'Boolean',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      javaCode: `
+      return getHasNodeQuorum() &&
+             getHasMediatorQuorum() &&
+             ! ((ReplayingInfo) x.get("replayingInfo")).getReplaying();
       `
     },
     {
@@ -576,11 +575,11 @@ configuration for contacting the primary node.`,
       if ( client != null ) {
         return client;
       }
-      if ( sendClusterConfig.getId().equals(receiveClusterConfig.getId()) ) {
-        // short circuit
-        getLogger().debug("getClientDAO", "short circuit", sendClusterConfig.getId(), receiveClusterConfig.getId());
-        client = new ClusterServerDAO(x);
-      } else {
+      // if ( sendClusterConfig.getId().equals(receiveClusterConfig.getId()) ) {
+      //   // short circuit
+      //   getLogger().debug("getClientDAO", "short circuit", sendClusterConfig.getId(), receiveClusterConfig.getId());
+      //   client = new ClusterServerDAO(x);
+      // } else {
         client = new ClientDAO.Builder(x)
         .setDelegate(new SessionClientBox.Builder(x)
           .setSessionID(sendClusterConfig.getSessionId())
@@ -595,7 +594,7 @@ configuration for contacting the primary node.`,
             .build())
           .build())
         .build();
-      }
+      // }
       getClients().put(id, client);
       return client;
       `

@@ -18,18 +18,25 @@ import java.util.concurrent.Semaphore;
 public class AsyncAssemblyLine
   extends SyncAssemblyLine
 {
-  protected Agency   pool_;
-  protected String   agencyName_ = "AsyncAssemblyLine";
+  protected Agency pool_;
+  protected String agencyName_ = null;
   protected boolean  shutdown_  = false;
 
   public AsyncAssemblyLine(X x) {
-    this(x, "threadPool");
+    this(x, null);
   }
 
   public AsyncAssemblyLine(X x, String agencyName) {
+    this(x, agencyName, "threadPool");
+  }
+
+  public AsyncAssemblyLine(X x, String agencyName, String threadPool) {
     super(x);
-    pool_  = (Agency) x.get("threadPool");
-    agencyName_ += ":" + agencyName;
+    pool_  = (Agency) x.get(threadPool);
+    agencyName_ = "AsyncAssemblyLine:";
+    if ( agencyName != null ) {
+      agencyName_ += agencyName;
+    }
   }
 
   public void enqueue(Assembly job) {
@@ -48,8 +55,8 @@ public class AsyncAssemblyLine
         q_ = previous;
         throw t;
       }
-    }
 
+    }
     pool_.submit(x_, new ContextAgent() { public void execute(X x) {
       try {
         job.executeJob();

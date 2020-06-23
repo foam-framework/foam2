@@ -45,7 +45,7 @@ foam.CLASS({
       ).select(COUNT());
       if ( count.getValue() > 0 ) {
         getLogger().error("put", "duplicate index", entry);
-        throw new RuntimeException("Duplicate index: "+entry.getIndex());
+        throw new DaggerException("Duplicate index: "+entry.getIndex());
       }
       return getDelegate().put_(x, obj);
       `

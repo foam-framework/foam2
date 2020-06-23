@@ -28,7 +28,7 @@ foam.CLASS({
     'index1',
     'index2',
     'consensusCount',
-    'verified',
+    'promoted',
     'lastModified'
   ],
 
@@ -115,7 +115,12 @@ foam.CLASS({
       class: 'Boolean',
       visibility: 'RO',
       storageTransient: true,
-      tableWidth: 100
+    },
+    {
+      name: 'promoted',
+      class: 'Boolean',
+      visibility: 'RO',
+      storageTransient: true,
     },
     {
       documentation: 'Solely for information. Originating Mediator.',
@@ -172,6 +177,11 @@ foam.CLASS({
       javaCode: `
         return getIndex() + " " + getNSpecName();
       `
+    },
+    {
+      name: 'toString',
+      type: 'String',
+      javaCode: `return toSummary();`
     }
   ]
 });

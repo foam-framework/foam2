@@ -16,7 +16,8 @@ foam.CLASS({
 
   implements: [
     'foam.core.ContextAgent',
-    'foam.nanos.NanoService'
+    'foam.nanos.NanoService',
+    'foam.nanos.auth.EnabledAware'
   ],
 
   javaImports: [
@@ -39,6 +40,11 @@ foam.CLASS({
   ],
 
   properties: [
+    {
+      name: 'enabled',
+      class: 'Boolean',
+      value: true
+    },
     {
       name: 'timerInterval',
       class: 'Long',
@@ -102,85 +108,83 @@ foam.CLASS({
         }
       ],
       javaCode: `
-    try {
-      synchronized ( this ) {
-        if ( getIsRunning() ) {
-          getLogger().debug("already running");
-          return;
-        }
-        setIsRunning(true);
+      if ( ! getEnabled() ) {
+        return;
       }
+      try {
+        synchronized ( this ) {
+          if ( getIsRunning() ) {
+            getLogger().debug("already running");
+            return;
+          }
+          setIsRunning(true);
+        }
 
-      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      ClusterConfig config = support.getConfig(x, support.getConfigId());
-      // getLogger().debug("execute", config.getId(), config.getType().getLabel(), config.getStatus().getLabel());
-      if ( config.getType() == MedusaType.NODE ) {
-         if ( config.getEnabled() &&
-              config.getStatus() == Status.OFFLINE ) {
+        ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+        ClusterConfig config = support.getConfig(x, support.getConfigId());
+        // getLogger().debug("execute", config.getId(), config.getType().getLabel(), config.getStatus().getLabel());
+        if ( config.getType() == MedusaType.NODE ) {
+           if ( config.getEnabled() &&
+                config.getStatus() == Status.OFFLINE ) {
 
-          // // Wait for own replay to complete,
-          // // then set node ONLINE.
-          DAO dao = ((DAO) x.get("medusaNodeDAO"));
+            // // Wait for own replay to complete,
+            // // then set node ONLINE.
+            DAO dao = ((DAO) x.get("medusaNodeDAO"));
 
-          // TODO: deal with digest failures - and Node taking self OFFLINE.
-          // this timer will continually set it back to ONLINE.
+            // TODO: deal with digest failures - and Node taking self OFFLINE.
+            // this timer will continually set it back to ONLINE.
 
+            config = (ClusterConfig) config.fclone();
+            config.setStatus(Status.ONLINE);
+            ((DAO) x.get("localClusterConfigDAO")).put(config);
+          }
+        } else if ( config.getType() != MedusaType.MEDIATOR &&
+                    config.getStatus() == Status.OFFLINE ) {
           config = (ClusterConfig) config.fclone();
           config.setStatus(Status.ONLINE);
           ((DAO) x.get("localClusterConfigDAO")).put(config);
+        } else if ( support.getStandAlone() ) {
+          // standalone mode.
+          config = (ClusterConfig) config.fclone();
+          config.setStatus(Status.ONLINE);
+          config.setIsPrimary(true);
+          ((DAO) x.get("localClusterConfigDAO")).put(config);
+
+          DAO dao = (DAO) x.get("localClusterConfigDAO");
+          List<ClusterConfig> nodes = (ArrayList) ((ArraySink) dao.where(
+            AND(
+              EQ(ClusterConfig.ZONE, 0),
+              EQ(ClusterConfig.TYPE, MedusaType.NODE),
+              EQ(ClusterConfig.ENABLED, true),
+              EQ(ClusterConfig.STATUS, Status.OFFLINE)
+            ))
+          .select(new ArraySink())).getArray();
+          for ( ClusterConfig node : nodes ) {
+            node = (ClusterConfig) node.fclone();
+            node.setStatus(Status.ONLINE);
+            dao.put_(x, node);
+          }
+          // no need for ping timer in standalone mode.
+          ((Timer)getTimer()).cancel();
+          ((Timer)getTimer()).purge();
+          return;
         }
-      } else if ( config.getType() != MedusaType.MEDIATOR &&
-                  config.getStatus() == Status.OFFLINE ) {
-        config = (ClusterConfig) config.fclone();
-        config.setStatus(Status.ONLINE);
-        ((DAO) x.get("localClusterConfigDAO")).put(config);
-      } else if ( support.getStandAlone() &&
-                  config.getStatus() == Status.OFFLINE ) {
-        // standalone mode.
-        config = (ClusterConfig) config.fclone();
-        config.setStatus(Status.ONLINE);
-        config.setIsPrimary(true);
-        ((DAO) x.get("localClusterConfigDAO")).put(config);
+
+        // TODO: Non-Mediators don't need to ping anything, just useful for reporting and network graph - the ping time could be reduced - see mn/services.jrl
 
         DAO dao = (DAO) x.get("localClusterConfigDAO");
-        List<ClusterConfig> nodes = (ArrayList) ((ArraySink) dao.where(
+        dao = dao.where(
           AND(
-            EQ(ClusterConfig.ZONE, 0),
-            EQ(ClusterConfig.TYPE, MedusaType.NODE),
             EQ(ClusterConfig.ENABLED, true),
-            EQ(ClusterConfig.STATUS, Status.OFFLINE)
-          ))
-        .select(new ArraySink())).getArray();
-        for ( ClusterConfig node : nodes ) {
-          node = (ClusterConfig) node.fclone();
-          node.setStatus(Status.ONLINE);
-          dao.put_(x, node);
-        }
+            NOT(EQ(ClusterConfig.ID, support.getConfigId())),
+            EQ(ClusterConfig.REALM, config.getRealm())
+          ));
+        dao.select(new ClusterConfigPingSink(x, dao, getPingTimeout()));
+      } finally {
+        setIsRunning(false);
       }
 
-      // no need for ping timer in standalone mode.
-      if ( config.getType() == MedusaType.MEDIATOR &&
-                  support.getMediatorCount() == 1 ) {
-        ((Timer)getTimer()).cancel();
-        ((Timer)getTimer()).purge();
-        return;
-      }
-
-// TODO: Non-Mediators don't need to ping anything, just useful for reporting and network graph - the ping time could be reduced - see mn/services.jrl
-
-      DAO dao = (DAO) x.get("localClusterConfigDAO");
-      dao = dao.where(
-        AND(
-          EQ(ClusterConfig.ENABLED, true),
-          NOT(EQ(ClusterConfig.ID, support.getConfigId())),
-          EQ(ClusterConfig.REALM, config.getRealm())
-        ));
-      dao.select(new ClusterConfigPingSink(x, dao, getPingTimeout()));
-    } finally {
-      setIsRunning(false);
-    }
-
-// See ConsensusDAO for Mediators - they transition to ONLINE when replay complete.
+     // See ConsensusDAO for Mediators - they transition to ONLINE when replay complete.
       `
     }
   ]

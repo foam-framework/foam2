@@ -15,13 +15,9 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
-    'foam.util.SafetyUtil',
     'java.util.concurrent.CountDownLatch',
-    'java.util.concurrent.ThreadLocalRandom',
     'java.util.HashMap',
-    'java.util.Map',
-    'java.util.Random',
-    'java.util.UUID'
+    'java.util.Map'
   ],
 
   properties: [

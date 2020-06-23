@@ -19,6 +19,7 @@ NOTE: override cmd_ in child class to control delegate call`,
 
   javaImports: [
     'foam.core.Agency',
+    'foam.core.AgencyTimerTask',
     'foam.core.ContextAware',
     'foam.core.FObject',
     'foam.dao.DAO',
@@ -26,7 +27,8 @@ NOTE: override cmd_ in child class to control delegate call`,
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'java.util.HashMap',
-    'java.util.Map'
+    'java.util.Map',
+    'java.util.Timer'
   ],
 
   axioms: [
@@ -77,6 +79,11 @@ NOTE: override cmd_ in child class to control delegate call`,
       visibility: 'HIDDEN'
     },
     {
+      name: 'timer',
+      class: 'Object',
+      visibility: 'HIDDEN'
+    },
+    {
       name: 'logger',
       class: 'FObjectProperty',
       of: 'foam.nanos.logger.Logger',
@@ -106,9 +113,9 @@ NOTE: override cmd_ in child class to control delegate call`,
             throw new RuntimeException(e);
           }
         }
-        getLogger().debug("put", "puts");
+        getLogger().debug("put", "puts", obj.toString());
         getPuts().put(obj.getProperty("id"), obj);
-        send(x);
+//        send(x);
       }
       return obj;
       `
@@ -130,7 +137,7 @@ NOTE: override cmd_ in child class to control delegate call`,
           }
         }
         getRemoves().put(obj.getProperty("id"), obj);
-        send(x);
+//        send(x);
       }
       return obj;
       `
@@ -144,21 +151,21 @@ NOTE: override cmd_ in child class to control delegate call`,
         }
       ],
       javaCode: `
-      synchronized ( executeLock_ ) {
        getLogger().debug("send");
        if ( getAgent() != null ) {
           if ( getPuts().size() >= getMaxBatchSize(x) ||
                getRemoves().size() >= getMaxBatchSize(x) ||
                System.currentTimeMillis() - getLastSend() > getBatchTimerInterval(x) ) {
             getLogger().debug("send", "notify");
+      synchronized ( executeLock_ ) {
             executeLock_.notify();
+      }
           }
         } else {
           getLogger().debug("send", "agency");
           setAgent(this);
           ((Agency) x.get(getThreadPoolName())).submit(x, this, "client");
         }
-      }
       `
     },
     {

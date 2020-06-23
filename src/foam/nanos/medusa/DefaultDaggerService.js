@@ -134,7 +134,7 @@ foam.CLASS({
       entry.setIndex2(-1L);
       entry.setHash2("9232622261b1df4dff84067b2df22ecae387162742626326216bf9b4d0d29a3f");
       entry.setHash(hash(getX(), entry));
-      entry.setVerified(true);
+      entry.setPromoted(true);
       entry = (MedusaEntry) dao.put_(getX(), entry);
       updateLinks(getX(), entry);
 
@@ -146,7 +146,7 @@ foam.CLASS({
       entry.setIndex2(-1L);
       entry.setHash2("50c1071e836bdd4f2d4b5907bb6090fae6891d6cacdb70dcd72770bfd43dc814");
       entry.setHash(hash(getX(), entry));
-      entry.setVerified(true);
+      entry.setPromoted(true);
       entry = (MedusaEntry) dao.put_(getX(), entry);
       updateLinks(getX(), entry);
      `
@@ -215,12 +215,13 @@ foam.CLASS({
         MedusaEntry parent1 = (MedusaEntry) dao.find(EQ(MedusaEntry.INDEX, entry.getIndex1()));
         if ( parent1 == null ) {
           getLogger().error("verify", entry.getIndex(), "parent not found", entry.getIndex1(), "entry", entry.getId());
-          throw new RuntimeException("Hash Verification Failed");
+          throw new DaggerException("Hash Verification Failed on: "+entry.getId());
         }
         MedusaEntry parent2 = (MedusaEntry) dao.find(EQ(MedusaEntry.INDEX, entry.getIndex2()));
         if ( parent2 == null ) {
           getLogger().error("verify", entry.getIndex(), "parent not found", entry.getIndex2(), "entry", entry.getId());
-          throw new RuntimeException("Hash Verification Failed");
+// TODO: Add Index to exception.
+          throw new DaggerException("Hash Verification Failed on: "+entry.getId());
         }
 
         try {
@@ -242,11 +243,11 @@ foam.CLASS({
           }
           if ( ! calculatedHash.equals(entry.getHash()) ) {
             getLogger().error("verify", entry.getIndex(), "hash", "fail", entry.getId());
-//            throw new RuntimeException("Hash verification failed.");
+//            throw new DaggerException("Hash verification failed on: "+entry.Id());
           }
         } catch ( java.security.NoSuchAlgorithmException e ) {
           getLogger().error(e);
-          throw new RuntimeException(e);
+          throw new DaggerException(e);
         }
       } finally {
         pm.log(x);

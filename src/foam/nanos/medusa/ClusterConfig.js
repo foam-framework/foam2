@@ -151,9 +151,9 @@ foam.CLASS({
       class: 'String'
     },
     {
-      name: 'replayIndex',
-      class: 'Long',
-      visibility: 'RO',
+      name: 'replayingInfo',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.medusa.ReplayingInfo',
       storageTransient: true
     },
     {

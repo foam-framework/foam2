@@ -31,7 +31,7 @@ p({
       .setDecorator(new foam.nanos.medusa.ClusterConfigReplayDAO.Builder(x)
       .setDelegate(new foam.nanos.medusa.ClusterConfigStatusDAO.Builder(x)
       .setDelegate(new foam.nanos.medusa.ClusterConfigSupportDAO.Builder(x)
-        .setDelegate(new foam.dao.NullDAO(x, foam.nanos.medusa.ClusterConfig.getOwnClassInfo()))
+      .setDelegate(new foam.dao.NullDAO(x, foam.nanos.medusa.ClusterConfig.getOwnClassInfo()))
       .build())
       .build())
       .build())
@@ -44,6 +44,7 @@ p({
       foam.nanos.medusa.ClusterConfig.TYPE,
       foam.nanos.medusa.ClusterConfig.ZONE,
     });
+    return dao;
    """
 })
 
@@ -55,6 +56,7 @@ p({
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.medusa.ClusterConfig.getOwnClassInfo())
       .setInnerDAO((foam.dao.DAO) x.get("localClusterConfigDAO"))
+      .setDecorator(new foam.nanos.medusa.ClusterConfigReplayingInfoDAO.Builder(x).build())
       .setCluster(false)
       .setRuler(false)
       .setEnableInterfaceDecorators(false)

@@ -10,7 +10,7 @@ p({
 
 p({
   "class":"foam.nanos.menu.Menu",
-  "id":"admin.clusterConfig",
+  "id":"medusa.clusterConfig",
   "label":"Cluster Config",
   "handler":{
     "class":"foam.nanos.menu.DAOMenu2",
@@ -31,7 +31,7 @@ p({
 
 p({
   "class":"foam.nanos.menu.Menu",
-  "id":"admin.medusaEntry",
+  "id":"medusa.medusaEntry",
   "label":"Medusa Entry",
   "handler":{
     "class":"foam.nanos.menu.DAOMenu2",
