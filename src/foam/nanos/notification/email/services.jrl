@@ -52,12 +52,12 @@ p({
   "name": "resendNotificationService",
   "serve": true,
   "authenticate": true,
-  "boxClass":"net.nanopay.notification.ResendNotificationServiceInterfaceSkeleton",
-  "serviceClass": "net.nanopay.notification.ResendNotificationService",
+  "boxClass":"foam.nanos.notification.ResendNotificationServiceInterfaceSkeleton",
+  "serviceClass": "foam.nanos.notification.ResendNotificationService",
   "client":
     """
       {
-        "class":"net.nanopay.notification.client.ClientResendNotificationService",
+        "class":"foam.nanos.notification.ClientResendNotificationService",
         "delegate": {
           "class":"foam.box.SessionClientBox",
           "delegate": {
