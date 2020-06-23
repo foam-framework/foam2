@@ -10,12 +10,9 @@ import foam.core.X;
 import foam.dao.DAO;
 import foam.nanos.auth.User;
 import foam.nanos.notification.ResendNotificationServiceInterface;
-import foam.nanos.NanoService;
 import foam.nanos.notification.Notification;
 
-public class ResendNotificationService extends ContextAwareSupport implements ResendNotificationServiceInterface, NanoService {
-
-  protected DAO userDAO;
+public class ResendNotificationService extends ContextAwareSupport implements ResendNotificationServiceInterface {
 
   @Override
   public void resend(X x, long userId, Notification notification) {
@@ -23,9 +20,4 @@ public class ResendNotificationService extends ContextAwareSupport implements Re
     User user = (User) userDAO.find(userId);
     user.doNotify(x, notification);
   }
-
-  @Override
-  public void start() {
-  }
-
 }
