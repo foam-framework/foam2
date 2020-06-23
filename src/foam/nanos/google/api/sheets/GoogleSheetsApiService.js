@@ -297,6 +297,7 @@ foam.CLASS({
           javaType: 'String'
         }
       ],
+      javaThrows: [ 'java.io.IOException', 'java.security.GeneralSecurityException' ],
       javaCode: `
         List<List<Object>> listOfValues = new ArrayList<>();
 
@@ -305,29 +306,24 @@ foam.CLASS({
           listOfValues.add(Arrays.asList((Object[])v));
         }
 
-        final NetHttpTransport HTTP_TRANSPORT;
-        try {
-          HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-          GoogleApiAuthService googleApiAuthService = (GoogleApiAuthService)getX().get("googleApiAuthService");
-          Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, SCOPES))
-            .setApplicationName("nanopay")
-            .build();
-          List<ValueRange> data = new ArrayList<>();
-          data.add(new ValueRange()
-            .setRange(startRange)
-            .setValues(listOfValues));
+        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+        GoogleApiAuthService googleApiAuthService = (GoogleApiAuthService)getX().get("googleApiAuthService");
+        Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, SCOPES))
+          .setApplicationName("nanopay")
+          .build();
+        List<ValueRange> data = new ArrayList<>();
+        data.add(new ValueRange()
+          .setRange(startRange)
+          .setValues(listOfValues));
 
-          BatchUpdateValuesRequest batchBody = new BatchUpdateValuesRequest()
-            .setValueInputOption("USER_ENTERED")
-            .setData(data);
+        BatchUpdateValuesRequest batchBody = new BatchUpdateValuesRequest()
+          .setValueInputOption("USER_ENTERED")
+          .setData(data);
 
-          BatchUpdateValuesResponse batchResult = service.spreadsheets().values()
-            .batchUpdate(sheetId, batchBody)
-            .execute();
-          return batchResult.getSpreadsheetId();
-        } catch (Throwable t) {
-          return "";
-        }
+        BatchUpdateValuesResponse batchResult = service.spreadsheets().values()
+          .batchUpdate(sheetId, batchBody)
+          .execute();
+        return batchResult.getSpreadsheetId();
       `
     }
   ]
