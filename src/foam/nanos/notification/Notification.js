@@ -211,7 +211,7 @@ foam.CLASS({
   actions: [
     {
       name: 'resendNotification',
-      label: 'Resend Email',
+      label: 'Resend Notification',
       availablePermissions:['notification.notify'],
       code: function(X) {
         try {
