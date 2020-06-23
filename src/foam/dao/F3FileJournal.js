@@ -88,7 +88,6 @@ foam.CLASS({
               }
             });
           }
-          assemblyLine.shutdown();
         } catch ( Throwable t) {
           getLogger().error("Failed to read from journal", t);
         } finally {

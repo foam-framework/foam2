@@ -100,12 +100,6 @@ foam.CLASS({
       javaType: 'foam.util.concurrent.AssemblyLine',
       javaFactory: 'return new foam.util.concurrent.SyncAssemblyLine();'
     },
-//    {
-//      class: 'Object',
-//      name: 'parser',
-//      javaType: 'foam.lib.json.JSONParser',
-//      javaFactory: `return getX().create(JSONParser.class);`
-//    },
     {
       class: 'Object',
       name: 'timeStamper',
@@ -373,6 +367,9 @@ try {
           strb.append(line);
           while( ! line.equals("})") ) {
             if ( (line = reader.readLine()) == null ) break;
+            if ( line.equals("p({") ) {
+              getLogger().error("Entry is not properly closed: " + strb.toString());
+            }
             strb.append("\\n");
             strb.append(line);
           }
