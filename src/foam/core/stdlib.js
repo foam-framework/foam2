@@ -661,11 +661,11 @@ foam.LIB({
           escaping = false;
           return;
         }
-        if ( chr == '\\' ) {
+        if ( chr == escapeChar ) {
           escaping = true;
           return;
         }
-        if ( chr == 'x' ) {
+        if ( chr == placeholder ) {
           if ( string.length < 1 ) {
             safe = false;
             return;
