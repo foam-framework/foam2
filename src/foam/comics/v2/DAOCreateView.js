@@ -8,12 +8,12 @@ foam.CLASS({
   package: 'foam.comics.v2',
   name: 'DAOCreateView',
   extends: 'foam.u2.View',
-  
+
   topics: [
     'finished',
     'throwError'
   ],
-  
+
   documentation: `
     A configurable view to create an instance of a specified model
   `,
@@ -43,6 +43,7 @@ foam.CLASS({
   `,
 
   requires: [
+    'foam.log.LogLevel',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
     'foam.u2.ControllerMode',
@@ -92,20 +93,14 @@ foam.CLASS({
           this.data = o;
           this.finished.pub();
 
-          if ( foam.comics.v2.userfeedback.UserFeedbackAware.isInstance(o) && o.userFeedback ){
+          if ( foam.comics.v2.userfeedback.UserFeedbackAware.isInstance(o) && o.userFeedback ) {
             var currentFeedback = o.userFeedback;
-            while ( currentFeedback ){
-              this.ctrl.add(this.NotificationMessage.create({
-                message: currentFeedback.message,
-                type: currentFeedback.status.name.toLowerCase()
-              }));
-
+            while ( currentFeedback ) {
+              this.ctrl.notify(currentFeedback.message, '', this.LogLevel.INFO, true);
               currentFeedback = currentFeedback.next;
             }
           } else {
-            this.ctrl.add(this.NotificationMessage.create({
-              message: `${this.data.model_.label} created.`
-            }));
+            this.ctrl.notify(`${this.data.model_.label} created.`, '', this.LogLevel.INFO, true);
           }
 
           this.stack.back();
@@ -130,17 +125,11 @@ foam.CLASS({
           //   }));
           // }
 
-          if ( e.message === "An approval request has been sent out." ){
-            this.ctrl.add(this.NotificationMessage.create({
-              message: e.message
-            }));
-
+          if ( e.message === "An approval request has been sent out." ) {
+            this.ctrl.notify(e.message, '', this.LogLevel.INFO, true);
             this.stack.back();
           } else {
-            this.ctrl.add(this.NotificationMessage.create({
-              message: e.message,
-              type: 'error'
-            }));
+            this.ctrl.notify(e.message, '', this.LogLevel.ERROR, true);
           }
         });
       }

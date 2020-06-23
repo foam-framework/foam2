@@ -134,6 +134,10 @@ foam.CLASS({
     }
   `,
 
+  requires: [
+    'foam.log.LogLevel'
+  ],
+
   properties: [
     {
       class: 'String',
@@ -149,9 +153,9 @@ foam.CLASS({
       var self = this;
 
       var img;
-      if ( this.type === 'error' ) {
+      if ( this.type == this.LogLevel.ERROR ) {
         img = 'images/round-error-red.svg';
-      } else if ( this.type === 'warning' ) {
+      } else if ( this.type == this.LogLevel.WARN ) {
         img = 'images/baseline-warning-yellow.svg';
       } else {
         img = 'images/round-check-circle-green.svg';
@@ -159,11 +163,11 @@ foam.CLASS({
       this
         .addClass(this.myClass())
         .start().addClass(this.myClass('inner'))
-          .enableClass(this.myClass('error-background'), this.type === 'error')
-          .enableClass(this.myClass('warning-background'), this.type === 'warning')
+          .enableClass(this.myClass('error-background'), this.type == this.LogLevel.ERROR)
+          .enableClass(this.myClass('warning-background'), this.type == this.LogLevel.WARN)
           .start('div').addClass(this.myClass('banner'))
-            .enableClass(this.myClass('error-banner'), this.type === 'error')
-            .enableClass(this.myClass('warning-banner'), this.type === 'warning')
+            .enableClass(this.myClass('error-banner'), this.type == this.LogLevel.ERROR)
+            .enableClass(this.myClass('warning-banner'), this.type == this.LogLevel.WARN)
           .end()
           .start()
             .start('img')
@@ -171,8 +175,8 @@ foam.CLASS({
               .attrs({ src: img })
             .end()
             .start().addClass(this.myClass('content'))
-              .enableClass(this.myClass('error-content'), this.type === 'error')
-              .enableClass(this.myClass('warning-content'), this.type === 'warning')
+              .enableClass(this.myClass('error-content'), this.type == this.LogLevel.ERROR)
+              .enableClass(this.myClass('warning-content'), this.type == this.LogLevel.WARN)
               .callIfElse(foam.String.isInstance(this.message), function() {
                 this.add(self.message);
                 console.log(self.message);
@@ -182,8 +186,8 @@ foam.CLASS({
               })
             .end()
             .start().addClass(this.myClass('description'))
-              .enableClass(this.myClass('error-content'), this.type === 'error')
-              .enableClass(this.myClass('warning-content'), this.type === 'warning')
+              .enableClass(this.myClass('error-content'), this.type == this.LogLevel.ERROR)
+              .enableClass(this.myClass('warning-content'), this.type == this.LogLevel.WARN)
               .callIfElse(foam.String.isInstance(this.description), function() {
                 this.add(self.description);
                 console.log(self.description);

@@ -127,16 +127,17 @@ p({
 p({
   "class":"foam.nanos.boot.NSpec",
   "name":"userNotificationDAO",
+  "lazy":false,
   "serve": true,
   "description": "filtered notificationDAO for user notifications",
   "serviceScript": """
-    foam.nanos.auth.User user = ((foam.nanos.auth.Subject) x.get("subject")).getUser();
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.notification.Notification.getOwnClassInfo())
-      .setInnerDAO(x.get("notificationDAO"))
+      .setInnerDAO((foam.dao.DAO) x.get("notificationDAO"))
+      .setAuthorize(true)
       .setDecorator(
         new foam.dao.FilteredDAO.Builder(x)
-          .setPredicate(foam.mlang.MLang.EQ(foam.nanos.notification.Notification.USER_ID, user.getId()))
+          .setPredicate(foam.mlang.MLang.EQ(foam.nanos.notification.Notification.USER_ID, ((foam.nanos.auth.Subject) x.get("subject")).getUser().getId()))
           .setDelegate(new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.notification.Notification.getOwnClassInfo()).build())
         .build())
       .build();
@@ -144,19 +145,7 @@ p({
   "client": """
     {
       "of": "foam.nanos.notification.Notification", 
-      "remoteListenerSupport": true, 
-      "serverBox": { 
-        "class": "foam.box.SessionClientBox", 
-        "url": "service/userNotificationDAO", 
-        "delegate": { 
-          "class": "foam.box.TimeoutBox", 
-          "timeout": 25000,
-          "delegate": {
-            "class": "foam.box.HTTPBox", 
-            "url": "service/userNotificationDAO"
-          }
-        }
-      }
+      "remoteListenerSupport": true
     }
   """
 })

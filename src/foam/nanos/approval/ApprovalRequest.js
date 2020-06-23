@@ -38,14 +38,15 @@
   requires: [
     'foam.dao.AbstractDAO',
     'foam.u2.dialog.Popup',
-    'foam.nanos.approval.ApprovalStatus',
-    'foam.u2.dialog.NotificationMessage'
+    'foam.log.LogLevel',
+    'foam.nanos.approval.ApprovalStatus'
   ],
 
   imports: [
     'DAO approvalRequestDAO',
     'ctrl',
     'currentMenu',
+    'notify',
     'stack',
     'summaryView?',
     'objectSummaryView?'
@@ -512,53 +513,43 @@
     },
     {
       name: 'approveWithMemo',
-      code: function(memo){
+      code: function(memo) {
         var approvedApprovalRequest = this.clone();
         approvedApprovalRequest.status = this.ApprovalStatus.APPROVED;
         approvedApprovalRequest.memo = memo;
 
-        this.approvalRequestDAO.put(approvedApprovalRequest).then(req => {
+        this.approvalRequestDAO.put(approvedApprovalRequest).then((req) => {
           this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
           this.finished.pub();
-          this.ctrl.add(this.NotificationMessage.create({
-            message: this.SUCCESS_APPROVED
-          }));
+          this.notify(this.SUCCESS_APPROVED, '', this.LogLevel.INFO, true);
 
-          if ( this.stack.top.length > 0 ){
+          if ( this.stack.top.length > 0 ) {
             this.stack.back();
           }
-        }, e => {
+        }, (e) => {
           this.throwError.pub(e);
-          this.ctrl.add(this.NotificationMessage.create({
-            message: e.message,
-            type: 'error'
-          }));
+          this.notify(e.message, '', this.LogLevel.ERROR, true);
         });
       }
     },
     {
       name: 'rejectWithMemo',
-      code: function(memo){
+      code: function(memo) {
         var rejectedApprovalRequest = this.clone();
         rejectedApprovalRequest.status = this.ApprovalStatus.REJECTED;
         rejectedApprovalRequest.memo = memo;
 
-        this.approvalRequestDAO.put(rejectedApprovalRequest).then(o => {
+        this.approvalRequestDAO.put(rejectedApprovalRequest).then((o) => {
           this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
           this.finished.pub();
-          this.ctrl.add(this.NotificationMessage.create({
-            message: this.SUCCESS_REJECTED
-          }));
+          this.notify(this.SUCCESS_REJECTED, '', this.LogLevel.INFO, true);
 
-          if ( this.stack.top.length > 0 ){
+          if ( this.stack.top.length > 0 ) {
             this.stack.back();
           }
-        }, e => {
+        }, (e) => {
           this.throwError.pub(e);
-          this.ctrl.add(this.NotificationMessage.create({
-            message: e.message,
-            type: 'error'
-          }));
+          this.notify(e.message, '', this.LogLevel.ERROR, true);
         });
       }
     }
@@ -627,22 +618,18 @@
         var cancelledApprovalRequest = this.clone();
         cancelledApprovalRequest.status = this.ApprovalStatus.CANCELLED;
 
-        X.approvalRequestDAO.put(cancelledApprovalRequest).then(o => {
+        X.approvalRequestDAO.put(cancelledApprovalRequest).then((o) => {
           X.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
           this.finished.pub();
-          X.ctrl.add(this.NotificationMessage.create({
-            message: this.SUCCESS_CANCELLED
-          }));
+
+          X.notify(this.SUCCESS_CANCELLED, '', this.LogLevel.INFO, true);
 
           if ( X.currentMenu.id !== X.stack.top[2] ) {
             X.stack.back();
           }
-        }, e => {
+        }, (e) => {
           this.throwError.pub(e);
-          X.ctrl.add(this.NotificationMessage.create({
-            message: e.message,
-            type: 'error'
-          }));
+          X.notify(e.message, '', this.LogLevel.ERROR, true);
         });
       }
     },
