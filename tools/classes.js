@@ -624,6 +624,7 @@ var classes = [
   'foam.nanos.approval.ApprovableApprovalRequestsRule',
   'foam.nanos.approval.FulfilledApprovablePredicate',
   'foam.nanos.approval.FulfilledApprovableRule',
+  'foam.nanos.approval.ApprovalDAO',
   'foam.nanos.approval.AuthenticatedApprovalDAOAuthorizer',
   'foam.nanos.approval.PopulateApprovalRequestsDAO',
 
@@ -648,7 +649,6 @@ var skeletons = [
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.email.POP3Email',
   'foam.nanos.notification.push.PushService',
-  'foam.nanos.notification.ResendNotificationServiceInterface',
   'foam.nanos.session.SessionService',
   'foam.nanos.test.EchoService',
   'foam.strategy.StrategizerService',
