@@ -399,7 +399,6 @@ var classes = [
   'foam.u2.ElementState',
   'foam.u2.DefaultValidator',
   'foam.u2.DisplayMode',
-  'foam.nanos.export.ClientGoogleSheetsExportService',
   'foam.nanos.export.ExportDriverRegistry',
   'foam.nanos.export.GoogleSheetsExport',
   'foam.nanos.export.GoogleSheetsPropertyMetadata',
@@ -407,6 +406,11 @@ var classes = [
   'foam.nanos.google.api.auth.GoogleApiCredentials',
   'foam.nanos.google.api.drive.GoogleDriveService',
   'foam.nanos.google.api.sheets.GoogleSheetsApiService',
+  'foam.nanos.google.api.sheets.ColumnPropertyMapping',
+  'foam.nanos.google.api.sheets.ColumnToPropertyMapper',
+  'foam.nanos.google.api.sheets.GoogleSheetsImportConfig',
+  'foam.nanos.google.api.sheets.GoogleSheetsDataImportService',
+  'foam.nanos.google.api.sheets.GoogleSheetsDataImportServiceImpl',
   'foam.dao.jdbc.ConnectionPool',
   'foam.lib.Outputter',
   'foam.lib.PropertyPredicate',
@@ -650,7 +654,8 @@ var skeletons = [
   'foam.nanos.test.EchoService',
   'foam.strategy.StrategizerService',
   'foam.nanos.auth.UserQueryService',
-  'foam.nanos.export.GoogleSheetsExport'
+  'foam.nanos.export.GoogleSheetsExport',
+  'foam.nanos.google.api.sheets.GoogleSheetsDataImportService'
 ];
 
 var proxies = [

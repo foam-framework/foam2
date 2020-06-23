@@ -16,25 +16,6 @@ p({
 })
 
 p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "googleSheetsDataExport",
-  "serve": true,
-  "authenticate": false,
-  "boxClass": "foam.nanos.export.GoogleSheetsExportSkeleton",
-  "serviceClass": "foam.nanos.google.api.sheets.GoogleSheetsApiService",
-  "client":"""
-    {
-      "class": "foam.nanos.export.ClientGoogleSheetsExportService",
-      "delegate":
-        {
-          "class": "foam.box.HTTPBox",
-          "url": "service/googleSheetsDataExport"
-        }
-    }
-  """
-})
-
-p({
   "class":"foam.nanos.boot.NSpec",
   "name":"AuthenticatedNSpecDAO",
   "serve":true,
@@ -1060,6 +1041,44 @@ p({
   """
     {
       "of":"foam.nanos.google.api.auth.GoogleApiCredentials"
+    }
+  """
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "googleSheetsDataExport",
+  "serve": true,
+  "authenticate": false,
+  "boxClass": "foam.nanos.export.GoogleSheetsExportSkeleton",
+  "serviceClass": "foam.nanos.google.api.sheets.GoogleSheetsApiService",
+  "client":"""
+    {
+      "class": "foam.nanos.export.ClientGoogleSheetsExportService",
+      "delegate":
+        {
+          "class": "foam.box.HTTPBox",
+          "url": "service/googleSheetsDataExport"
+        }
+    }
+  """
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "googleSheetsDataImport",
+  "serve": true,
+  "authenticate": false,
+  "boxClass": "foam.nanos.google.api.sheets.GoogleSheetsDataImportServiceSkeleton",
+  "serviceClass": "foam.nanos.google.api.sheets.GoogleSheetsDataImportServiceImpl",
+  "client":"""
+    {
+      "class": "foam.nanos.google.api.sheets.ClientGoogleSheetsDataImportService",
+      "delegate":
+        {
+          "class": "foam.box.HTTPBox",
+          "url": "service/googleSheetsDataImport"
+        }
     }
   """
 })

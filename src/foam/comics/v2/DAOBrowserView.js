@@ -191,7 +191,18 @@ foam.CLASS({
           message: this.REFRESH_MSG
         }));
       }
-    }
+    },
+    {
+      name: 'import',
+      label: '',
+      toolTip: 'Import From Google Sheet',
+      icon: 'images/export-arrow-icon.svg',//need find out where we're getting the icons
+      code: function() {
+        this.add(this.Popup.create().tag({
+          class: 'foam.nanos.google.api.sheets.ImportFromGoogleSheetsModal'
+        }));
+      }
+    },
   ],
   methods: [
     function init() {
@@ -256,6 +267,9 @@ foam.CLASS({
                     .endContext()
                     .startContext({ data: self })
                       .start(self.EXPORT, { buttonStyle: 'SECONDARY' })
+                        .addClass(self.myClass('export'))
+                      .end()
+                      .start(self.IMPORT, { buttonStyle: 'SECONDARY' })
                         .addClass(self.myClass('export'))
                       .end()
                       .start(self.REFRESH_TABLE, { buttonStyle: 'SECONDARY' })
