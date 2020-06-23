@@ -64,7 +64,9 @@ foam.CLASS({
               FObject obj;
               
               public void executeJob() {
-                obj = jsonParser.get().parseString(strEntry, dao.getOf().getObjClass());
+                JSONParser parser = jsonParser.get();
+                parser.setX(x);
+                obj = parser.parseString(strEntry, dao.getOf().getObjClass());
               }
 
               public void endJob() {
