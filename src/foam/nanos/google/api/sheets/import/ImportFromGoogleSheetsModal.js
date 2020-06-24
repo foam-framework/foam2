@@ -103,25 +103,21 @@ foam.CLASS({
       class: 'String',
       postSet: function() {
         this.findPropertyName();
-        console.log();
       }
     },
     {
-      name: 'propertyName',
+      name: 'propertiesOptions',
       // class: 'StringArray',
       hidden: true,
     },
     {
       name: 'selectedProp',
+      class: 'StringArray',
       view: function(_, X) {
-        return X.data.slot(function(propertyName) {
-          return foam.u2.view.ChoiceView.create({choices: propertyName, data$: this.selectedProp$});
+        return X.data.slot(function(propertiesOptions) {
+          return foam.u2.view.ChoiceView.create({choices: propertiesOptions, data$: this.selectedProp$});
         });
       }
-    },
-    {
-      name: 'propertyLabel',
-      class: 'String'
     }
   ],
   methods: [
@@ -137,7 +133,7 @@ foam.CLASS({
       for ( prop of props ) {
         this.findPropOptions(prop, '', '', i, checkedClsIds, resultSoFar);
       }
-      this.propertyName = resultSoFar;
+      this.propertiesOptions = resultSoFar;
       console.log(resultSoFar);
     },
     function findPropOptions(prop, propNameSoFar, labelSoFar, i, checkedClsIds, resultSoFar) {
