@@ -7,6 +7,7 @@
 package foam.lib.formatter;
 
 import foam.core.ClassInfo;
+import foam.core.FEnum;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.core.X;
@@ -53,48 +54,6 @@ public abstract class AbstractFObjectFormatter
     outputDelta(oldFObject, newFObject);
     return b_.toString();
   }
-
-/*
-  public void output(String val);
-
-  public void output(short val);
-
-  public void output(int val);
-
-  public void output(long val);
-
-  public void output(float val);
-
-  public void output(double val);
-
-  public void output(boolean val);
-
-  public void output(FObject[] arr, ClassInfo defaultClass);
-
-  public void output(FObject[] arr);
-
-  public void output(Object[] arr);
-
-  public void output(byte[] arr);
-
-  public void output(Map map);
-
-  public void output(List list);
-
-  public void output(Enum<?> val);
-
-  public void output(Object val);
-
-  public void output(FObject val);
-
-  public void output(FObject val, ClassInfo defaultClass);
-
-  public void output(Date val);
-
-  public void output(ClassInfo val);
-
-  public void output(PropertyInfo val);
-  */
 
   protected synchronized List getProperties(ClassInfo info) {
     String of = info.getObjClass().getSimpleName().toLowerCase();
