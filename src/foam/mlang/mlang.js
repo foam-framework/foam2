@@ -3370,7 +3370,13 @@ foam.CLASS({
 
   requires: [
     'foam.mlang.Constant',
+    'foam.mlang.expr.Add',
+    'foam.mlang.expr.Divide',
     'foam.mlang.expr.Dot',
+    'foam.mlang.expr.MaxFunc',
+    'foam.mlang.expr.MinFunc',
+    'foam.mlang.expr.Multiply',
+    'foam.mlang.expr.Subtract',
     'foam.mlang.order.Desc',
     'foam.mlang.order.ThenBy',
     'foam.mlang.predicate.And',
@@ -3457,6 +3463,13 @@ foam.CLASS({
     function ENDS_WITH(a, b) { return this._binary_("EndsWith", a, b); },
     function FUNC(fn) { return this.Func.create({ fn: fn }); },
     function DOT(a, b) { return this._binary_("Dot", a, b); },
+    function DOT_F(a, b) { return this._binary_("DotF", a, b); },
+    function ADD() { return this._nary_("Add", arguments); },
+    function SUB() { return this._nary_("Subtract", arguments); },
+    function MUL() { return this._nary_("Multiply", arguments); },
+    function DIV() { return this._nary_("Divide", arguments); },
+    function MIN_FUNC() { return this._nary_("MinFunc", arguments); },
+    function MAX_FUNC() { return this._nary_("MaxFunc", arguments); },
 
     function UNIQUE(expr, sink) { return this.Unique.create({ expr: expr, delegate: sink }); },
     function GROUP_BY(expr, opt_sinkProto, opt_limit) { return this.GroupBy.create({ arg1: expr, arg2: opt_sinkProto || this.COUNT(), groupLimit: opt_limit || -1 }); },
@@ -3798,15 +3811,31 @@ foam.CLASS({
           }
         }
         return result;
-      `
+      `,
+      code: function(o) {
+        var result = null;
+        for ( var i = 0; i < this.args.length; i++ ) {
+          var current = this.args[i].f(o);
+          if ( typeof current === 'number' ) {
+            var oldResult = result;
+            result = result === null ? current : this.reduce(result, current);
+
+            if ( ! isFinite(result) ) {
+              var formula = this.cls_.name + '(' + oldResult + ', ' + current + ')';
+              throw new Error('Failed to evaluate formula:' + formula + ', result: ' + result);
+            }
+          }
+        }
+        return result;
+      }
     },
     {
       name: 'reduce',
       type: 'Double',
       abstract: true,
       args: [
-        { name: 'arg1', type: 'Double' },
-        { name: 'arg2', type: 'Double' }
+        { name: 'accumulator', type: 'Double' },
+        { name: 'currentValue', type: 'Double' }
       ]
     },
     {
@@ -3839,7 +3868,8 @@ foam.CLASS({
     {
       name: 'reduce',
       abstract: false,
-      javaCode: 'return arg1 + arg2;'
+      javaCode: 'return accumulator + currentValue;',
+      code: (accumulator, currentValue) => accumulator + currentValue
     }
   ]
 });
@@ -3854,7 +3884,8 @@ foam.CLASS({
     {
       name: 'reduce',
       abstract: false,
-      javaCode: 'return arg1 - arg2;'
+      javaCode: 'return accumulator - currentValue;',
+      code: (accumulator, currentValue) => accumulator - currentValue
     }
   ]
 });
@@ -3869,7 +3900,8 @@ foam.CLASS({
     {
       name: 'reduce',
       abstract: false,
-      javaCode: 'return arg1 * arg2;'
+      javaCode: 'return accumulator * currentValue;',
+      code: (accumulator, currentValue) => accumulator * currentValue
     }
   ]
 });
@@ -3884,7 +3916,8 @@ foam.CLASS({
     {
       name: 'reduce',
       abstract: false,
-      javaCode: 'return arg1 / arg2;'
+      javaCode: 'return accumulator / currentValue;',
+      code: (accumulator, currentValue) => accumulator / currentValue
     }
   ]
 });
@@ -3899,7 +3932,8 @@ foam.CLASS({
     {
       name: 'reduce',
       abstract: false,
-      javaCode: 'return arg1 <= arg2 ? arg1 : arg2;'
+      javaCode: 'return accumulator <= currentValue ? accumulator : currentValue;',
+      code: (accumulator, currentValue) => Math.min(accumulator, currentValue)
     }
   ]
 });
@@ -3914,7 +3948,8 @@ foam.CLASS({
     {
       name: 'reduce',
       abstract: false,
-      javaCode: 'return arg1 >= arg2 ? arg1 : arg2;'
+      javaCode: 'return accumulator >= currentValue ? accumulator : currentValue;',
+      code: (accumulator, currentValue) => Math.max(accumulator, currentValue)
     }
   ]
 });
