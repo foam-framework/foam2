@@ -530,12 +530,19 @@ var classes = [
   'foam.nanos.ruler.action.AbstractCheckDAOforMatching',
   'foam.comics.SearchMode',
 
-  // DAO Decorators
+  // DAO decorators
+  'foam.nanos.actioncommand.ActionCommandDAO',
   'foam.nanos.approval.ApprovalDAO',
   'foam.nanos.audit.AuditDAO',
   'foam.nanos.auth.email.EmailVerificationDAO',
   'foam.dao.FreezingDAO',
   'foam.nanos.geocode.GoogleMapsGeocodingDAO',
+  'foam.dao.history.HistoryDAO',
+  'foam.nanos.script.ScriptRunnerDAO',
+  'foam.nanos.approval.SendGroupRequestApprovalDAO',
+  'foam.dao.UnreliableDAO',
+  'foam.nanos.auth.UserPasswordHashingDAO',
+  'foam.dao.ValidatingDAO',
 
   // Support Files
   'foam.support.model.TicketMessage',
