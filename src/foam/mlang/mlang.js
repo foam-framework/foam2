@@ -1695,7 +1695,7 @@ foam.CLASS({
       return typeof x === 'number' ? '' + x :
         typeof x === 'string' ? '"' + x + '"' :
         Array.isArray(x) ? '[' + x.map(this.toString_.bind(this)).join(', ') + ']' :
-        x.toString ? x.toString() :
+        (x && x.toString) ? x.toString() :
         x;
     },
 
@@ -3437,10 +3437,13 @@ foam.CLASS({
     },
 
     function _unary_(name, arg) {
+      foam.assert(arg !== undefined, 'arg is required.');
       return this[name].create({ arg1: arg });
     },
 
     function _binary_(name, arg1, arg2) {
+      foam.assert(arg1 !== undefined, 'arg1 is required.');
+      foam.assert(arg2 !== undefined, 'arg2 is required.');
       return this[name].create({ arg1: arg1, arg2: arg2 });
     },
 
