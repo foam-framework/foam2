@@ -534,6 +534,7 @@ var classes = [
   'foam.nanos.approval.ApprovalDAO',
   'foam.nanos.audit.AuditDAO',
   'foam.nanos.auth.email.EmailVerificationDAO',
+  'foam.dao.FreezingDAO'
 
   // Support Files
   'foam.support.model.TicketMessage',
