@@ -235,7 +235,7 @@ foam.CLASS({
     },
     {
       name: 'getValues',
-      type: 'Object',
+      type: 'Object',//return list of values not value range?? // though for currency parsing we might use it
       javaType: 'ValueRange',
       args: [
         {

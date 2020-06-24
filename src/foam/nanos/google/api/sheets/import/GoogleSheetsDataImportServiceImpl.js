@@ -53,7 +53,7 @@ foam.CLASS({
         String startRow = rangeLimits[0].substring(indexOfFirstRowInRange);
         m = digitAppearenceRegex.matcher(rangeLimits[1]);
         if ( !m.find() ) return null;
-        String endColumn = rangeLimits[1].substring(1, m.start());
+        String endColumn = rangeLimits[1].substring(0, m.start());
         StringBuilder sb = new StringBuilder();
         sb.append(startColumn);
         sb.append(startRow);
@@ -62,10 +62,10 @@ foam.CLASS({
         sb.append(startRow);
 
         values = googleSheetsAPIEnabler.getValues(x, importConfig.getGoogleSpreadsheetId(), sb.toString());
-        List<List<Object>> data = values.getValues();
-        String[] columnNames = new String[data.size()];
-        for ( int i = 0 ; i < data.size() ; i++ ) {
-          columnNames[i] = String.valueOf(data.get(i).get(0));
+        List<Object> firstRow = values.getValues().get(0);
+        String[] columnNames = new String[firstRow.size()];
+        for ( int i = 0 ; i < firstRow.size() ; i++ ) {
+          columnNames[i] = String.valueOf(firstRow.get(i));
         }
         return columnNames; 
       } catch( Throwable t ) {

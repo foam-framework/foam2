@@ -4,7 +4,7 @@ foam.CLASS({
   documentation: 'GoogleSheetsImportConfig contains info about import',
   properties: [
     {
-      class: 'String',
+     // class: 'String',//change to classInfo?
       name: 'of'
     },
     {
@@ -78,7 +78,12 @@ foam.CLASS({
     //     return val;
     //   }
     // }
-  ]
+  ],
+  constants: {
+    //info retrieved from https://developers.google.com/sheets/api/guides/concepts
+    SPREADSHEET_ID_REGEX: '/spreadsheets/d/([a-zA-Z0-9-_]+)',
+    SHEET_ID_REGEX: '[#&]gid=([0-9]+)'
+  },
 });
 
 foam.CLASS({
