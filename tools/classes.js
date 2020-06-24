@@ -534,7 +534,8 @@ var classes = [
   'foam.nanos.approval.ApprovalDAO',
   'foam.nanos.audit.AuditDAO',
   'foam.nanos.auth.email.EmailVerificationDAO',
-  'foam.dao.FreezingDAO'
+  'foam.dao.FreezingDAO',
+  'foam.nanos.geocode.GoogleMapsGeocodingDAO',
 
   // Support Files
   'foam.support.model.TicketMessage',
