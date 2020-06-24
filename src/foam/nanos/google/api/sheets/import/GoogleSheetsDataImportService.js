@@ -15,6 +15,20 @@ foam.INTERFACE({
           type: 'foam.nanos.google.api.sheets.GoogleSheetsImportConfig'
         }
       ]
+    },
+    {
+      name: 'importData',
+      type: 'Boolean',
+      args: [
+        {
+          name: 'x',
+          type: 'Context',
+        },
+        {
+          name: 'importConfig',
+          type: 'foam.nanos.google.api.sheets.GoogleSheetsImportConfig'
+        }
+      ]
     }
   ]
 });

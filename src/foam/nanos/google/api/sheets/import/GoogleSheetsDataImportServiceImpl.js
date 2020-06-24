@@ -8,6 +8,7 @@ foam.CLASS({
     'com.google.api.services.sheets.v4.model.ValueRange',
 
     'java.lang.Throwable',
+    'java.util.ArrayList',
     'java.util.List',
     'java.util.regex.Matcher',
     'java.util.regex.Pattern',
@@ -20,6 +21,56 @@ foam.CLASS({
         cls.extras.push(foam.java.Code.create({
           data: `
           public static Pattern digitAppearenceRegex = Pattern.compile("(\\\\d){1}");
+
+          public static List<String> alphabet = java.util.Arrays.asList(new String[] {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"});
+          //so to calculate column in index that you need
+          // eg "A", "CA", "B"
+          public int findAndValidateIndexOfColumnInArrayOfValues (List<List<String>> base, int startColumnIndex, int endColumnIndex, String col) {
+            int colIndex = findColumnIndex(col, base);
+            return colIndex > endColumnIndex ?  -1 : colIndex < startColumnIndex ? -1 : colIndex;
+          }      
+          // public int[] generateColumnRange(String startColumn, String endColumn, List<List<String>> base) {
+      
+          // // List<List<String>> base = generateBase(endColumn.length());
+          //   return new int[] { findColumnIndex(startColumn, base), findColumnIndex(endColumn, base) };
+          // }
+
+          //index which is length of column "name"/"title"
+          public int findColumnIndex(String col, List<List<String>> base) {
+      
+            // List<List<String>> base = generateBase(endColumn.length());
+            int i = 0;
+            int preIndex = 0;
+            while ( i < col.length() - 1 ) {
+              preIndex = base.get(i).size();
+              i++;
+            }
+            int startIndex = preIndex + base.get(col.length() - 1).indexOf(col);
+            return startIndex;
+          }
+          
+          
+          public List<List<String>> generateBase(int endColumnLength) {
+      
+            List<List<String>> base = new ArrayList<>();
+      
+            List<String> level = new ArrayList<>();
+            for ( int i = 0 ; i < alphabet.size() ; i++ ) {
+              level.add(alphabet.get(i));
+            }
+            base.add(level);
+      
+            while ( base.size() != endColumnLength ) {
+              level = new ArrayList<>();
+              for ( int i = 0 ; i < base.get(base.size() - 1).size() ; i++ ) {
+                for ( int j = 0 ; j < alphabet.size() ; j++ ) {
+                  level.add(base.get(base.size() - 1).get(i) + alphabet.get(j));
+                }
+              }
+              base.add(level);
+            }
+            return base;
+          }
           `
         }));
       }
@@ -73,6 +124,31 @@ foam.CLASS({
       }
       return null;
       `
-    }
+    },
+    {
+      name: 'importData',
+      type: 'Boolean',
+      args: [
+        {
+          name: 'x',
+          type: 'Context',
+        },
+        {
+          name: 'importConfig',
+          type: 'foam.nanos.google.api.sheets.GoogleSheetsImportConfig'
+        }
+      ],
+      javaCode: `
+        GoogleSheetsApiService googleSheetsAPIEnabler = (GoogleSheetsApiService)x.get("googleSheetsDataExport");
+        ValueRange values;
+        try {
+          values = googleSheetsAPIEnabler.getValues(x, importConfig.getGoogleSpreadsheetId(), importConfig.getCellsRange());
+        } catch(Exception e) {
+          System.out.println(e);
+          return false;
+        }
+        return true;
+      `
+  }
   ]
 });

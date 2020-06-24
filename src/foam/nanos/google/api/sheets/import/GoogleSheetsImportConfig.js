@@ -6,6 +6,8 @@ foam.CLASS({
     {
      // class: 'String',//change to classInfo?
       name: 'importClassInfo',
+      class: 'Class',
+      javaType: 'foam.core.ClassInfo',
       hidden: true,
     },
     {
@@ -66,6 +68,11 @@ foam.CLASS({
         return  findMatch ? findMatch[1] : findMatch;
       }
     },
+    {
+      name: 'columnHeaderPropertyMappings',
+      class: 'FObjectArray',
+      of: 'foam.nanos.google.api.sheets.ColumnHeaderToPropertyName'
+    }
     // {
     //   name: 'statusUpdateColumn',
     //   class: 'String',
