@@ -18,6 +18,8 @@ foam.CLASS({
     'foam.box.HTTPBox',
     'foam.core.Agency',
     'foam.core.ContextAgent',
+    'foam.core.FObject',
+    'foam.core.X',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'static foam.mlang.MLang.*',
@@ -25,8 +27,6 @@ foam.CLASS({
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'foam.util.SafetyUtil',
-    'foam.util.concurrent.AssemblyLine',
-    'foam.util.concurrent.AsyncAssemblyLine',
     'java.util.ArrayList',
     'java.util.concurrent.*',
     'java.util.concurrent.Callable',
@@ -90,16 +90,6 @@ foam.CLASS({
       name: 'winner',
       class: 'String',
       visibility: 'RO'
-    },
-    {
-      class: 'Object',
-      name: 'assemblyLine',
-      javaType: 'foam.util.concurrent.AssemblyLine',
-      javaFactory: `
-      ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
-      return new foam.util.concurrent.AsyncAssemblyLine(getX(), this.getClass().getSimpleName(), support.getThreadPoolName());
-//      return new foam.util.concurrent.SyncAssemblyLine(getX());
-      `
     },
     {
       name: 'logger',
@@ -309,19 +299,17 @@ foam.CLASS({
         // record own vote
         recordResult(x, generateVote(x), config);
 
+        Agency agency = (Agency) x.get("threadPool");
+
         // request votes from others
         for (int i = 0; i < voters.size(); i++) {
           ClusterConfig clientConfig = (ClusterConfig) voters.get(i);
           if ( clientConfig.getId().equals(config.getId())) {
             continue;
           }
-          getAssemblyLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
+          agency.submit(x, new ContextAgent() {
             long result = -1L;
-            public void startJob() {
-              getLogger().debug("callVote", "startJob", config.getId());
-            }
-
-            public void executeJob() {
+            public void execute(X x) {
               getLogger().debug("callVote", "executeJob", config.getId(), "voter", clientConfig.getId());
               ClientElectoralService electoralService =
                 new ClientElectoralService.Builder(x)
@@ -349,7 +337,7 @@ foam.CLASS({
             //   recordResult(x, result, clientConfig);
             //   callReport(x);
             // }
-          });
+          }, this.getClass().getSimpleName()+":callVote");
         }
       } catch ( Exception e) {
         getLogger().error(e);
@@ -444,19 +432,15 @@ foam.CLASS({
         }
 
         report(getWinner());
-
+        Agency agency = (Agency) x.get("threadPool");
  
         for (int j = 0; j < voters.size(); j++) {
           ClusterConfig clientConfig2 = (ClusterConfig) voters.get(j);
           if ( clientConfig2.getId().equals(config.getId())) {
             continue;
           }
-          getAssemblyLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
-            // public void startJob() {
-            //   getLogger().debug("callReport", "startJob", clientConfig2.getId());
-            // }
-
-            public void executeJob() {
+          agency.submit(x, new ContextAgent() {
+            public void execute(X x) {
               ClientElectoralService electoralService2 =
                 new ClientElectoralService.Builder(getX())
                  .setDelegate(new HTTPBox.Builder(getX())
@@ -475,7 +459,7 @@ foam.CLASS({
                 getLogger().debug(clientConfig2.getId(), "report", e.getMessage());
               }
             }
-          });
+          }, this.getClass().getSimpleName()+":callReport");
         }
       } catch ( Exception e) {
         getLogger().error(e);

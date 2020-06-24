@@ -12,7 +12,10 @@ foam.CLASS({
   documentation: `Broadcast MedusaEntry to Nodes. Each entry is distributed to set of nodes for redundancy and consensus.`,
 
   javaImports: [
+    'foam.core.Agency',
+    'foam.core.ContextAgent',
     'foam.core.FObject',
+    'foam.core.X',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.dao.DOP',
@@ -35,16 +38,6 @@ foam.CLASS({
       class: 'String',
       javaFactory: `
       return "medusaNodeDAO";
-      `
-    },
-    {
-      class: 'Object',
-      name: 'assemblyLine',
-      javaType: 'foam.util.concurrent.AssemblyLine',
-      javaFactory: `
-      ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
-      return new foam.util.concurrent.AsyncAssemblyLine(getX(), this.getClass().getSimpleName()+":"+getServiceName(), support.getThreadPoolName());
-//      return new foam.util.concurrent.SyncAssemblyLine(getX());
       `
     },
     {
@@ -86,11 +79,12 @@ foam.CLASS({
         Map buckets = support.getNodeBuckets();
         int index = (int) (entry.getIndex() % groups);
         List bucket = (List) buckets.get(index);
+        Agency agency = (Agency) x.get("threadPool");
 
         for ( int i = 0; i < bucket.size(); i++ ) {
           ClusterConfig config = support.getConfig(x, (String) bucket.get(i));
-          getAssemblyLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
-            public void executeJob() {
+          agency.submit(x, new ContextAgent() {
+            public void execute(X x) {
               try {
                 DAO dao = (DAO) getClients().get(config.getId());
                 if ( dao == null ) {
@@ -114,7 +108,7 @@ foam.CLASS({
                 getLogger().error(t);
               }
             }
-          });
+          }, this.getClass().getSimpleName());
         }
         return obj;
       } finally {

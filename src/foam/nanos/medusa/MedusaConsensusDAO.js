@@ -194,29 +194,13 @@ foam.CLASS({
         dagger.verify(x, entry);
 
         synchronized ( indexLock_ ) {
-          // if ( entry.getIndex() > getIndex() ) {
           if ( entry.getIndex() == getIndex() + 1 ) {
             setIndex(entry.getIndex());
-            if ( replaying.getReplaying() ) {
-              replaying.setIndex(getIndex());
-
-              if ( getIndex() >= replaying.getReplayIndex() ) {
-                getLogger().debug("promote", "replayComplete", "index");
-                replayComplete(x);
-              // } else {
-              //   Min min = (Min) getDelegate()
-              //     .where(
-              //       AND(
-              //         GT(MedusaEntry.INDEX, 2L ), // TODO - how filter out bootstrap entries?
-              //         GTE(MedusaEntry.CONSENSUS_COUNT, support.getNodeQuorum())
-              //       ))
-              //     .select(MIN(MedusaEntry.INDEX));
-              //   fi ( min.getValue() != null &&
-              //     ((Long) min.getValue()) >= replaying.getReplayIndex() ) {
-              //     getLogger().debug("promote", "replayComplete", "consensus");
-              //     replayComplete(x);
-              //   }
-              }
+            replaying.setIndex(getIndex());
+            if ( replaying.getReplaying() &&
+                 getIndex() >= replaying.getReplayIndex() ) {
+              getLogger().debug("promote", "replayComplete", "index");
+              replayComplete(x);
             }
           }
         }

@@ -12,7 +12,10 @@ foam.CLASS({
   documentation: `Broadcast MedusaEntries.`,
 
   javaImports: [
+    'foam.core.Agency',
+    'foam.core.ContextAgent',
     'foam.core.FObject',
+    'foam.core.X',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.dao.DOP',
@@ -23,8 +26,6 @@ foam.CLASS({
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
-    'foam.util.concurrent.AssemblyLine',
-    'foam.util.concurrent.AsyncAssemblyLine',
     'java.util.ArrayList',
     'java.util.HashMap',
     'java.util.List',
@@ -63,16 +64,6 @@ foam.CLASS({
             EQ(ClusterConfig.REGION, myConfig.getRegion()),
             EQ(ClusterConfig.REALM, myConfig.getRealm())
           );
-      `
-    },
-    {
-      class: 'Object',
-      name: 'assemblyLine',
-      javaType: 'foam.util.concurrent.AssemblyLine',
-      javaFactory: `
-      ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
-      return new foam.util.concurrent.AsyncAssemblyLine(getX(), this.getClass().getSimpleName()+":"+getServiceName(), support.getThreadPoolName());
-//      return new foam.util.concurrent.SyncAssemblyLine(getX());
       `
     },
     {
@@ -177,24 +168,18 @@ foam.CLASS({
       List<ClusterConfig> arr = (ArrayList) ((ArraySink) ((DAO) x.get("localClusterConfigDAO"))
         .where(getPredicate())
         .select(new ArraySink())).getArray();
+      Agency agency = (Agency) x.get("threadPool");
       for ( ClusterConfig config : arr ) {
         getLogger().debug("submit", "job", config.getId(), dop.getLabel(), "assembly");
-        getAssemblyLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
-          // public void startJob() {
-          //   getLogger().debug("assembly", "startJob", config.getId());
-          // }
-          // public void endJob() {
-          //   getLogger().debug("assembly", "endJob", config.getId());
-          // }
-
-          public void executeJob() {
-            getLogger().debug("assembly", "executeJob", config.getId());
+        agency.submit(x, new ContextAgent() {
+          public void execute(X x) {
+            getLogger().debug("agency", "execute", config.getId());
              try {
               DAO dao = (DAO) getClients().get(config.getId());
               if ( dao == null ) {
                 dao = (DAO) x.get(getServiceName());
                 if ( dao != null ) {
-                  getLogger().debug("assembly", "executeJob", "short circuit", getServiceName());
+                  getLogger().debug("agency", "execute", "short circuit", getServiceName());
                 } else {
                   dao = support.getClientDAO(x, getServiceName(), myConfig, config);
                   dao = new RetryClientSinkDAO.Builder(x)
@@ -208,17 +193,17 @@ foam.CLASS({
 
               if ( DOP.PUT == dop ) {
                 MedusaEntry entry = (MedusaEntry) obj;
-                getLogger().debug("assembly", "executeJob", config.getId(), dop.getLabel(), entry.getIndex());
+                getLogger().debug("agency", "execute", config.getId(), dop.getLabel(), entry.getIndex());
                 dao.put_(x, entry);
               } else if ( DOP.CMD == dop ) {
-                getLogger().debug("assembly", "executeJob", config.getId(), dop.getLabel(), obj.getClass().getSimpleName());
+                getLogger().debug("agency", "execute", config.getId(), dop.getLabel(), obj.getClass().getSimpleName());
                 dao.cmd_(x, obj);
               }
             } catch ( Throwable t ) {
-              getLogger().error("assembly", "executeJob", config.getId(), t);
+              getLogger().error("agency", "execute", config.getId(), t);
             }
           }
-        });
+        }, this.getClass().getSimpleName());
       }
       return obj;
       } catch (Throwable t) {

@@ -38,11 +38,11 @@ foam.CLASS({
     },
     {
       name: 'width',
-      value: '800'
+      value: '700'
     },
     {
       name: 'height',
-      value: '800'
+      value: '700'
     },
     {
       name: 'regions',
@@ -216,7 +216,7 @@ foam.CLASS({
       code: function(cc) {
         var radius = this.nodeK;
         if ( cc.type == this.MedusaType.MEDIATOR ) {
-          cv.radius = radius * 1.5;
+          radius = radius * 1.5;
         }
 
         var color  = 'blue';
@@ -238,9 +238,10 @@ foam.CLASS({
     {
       name: 'refreshNode',
       code: function(cc) {
-        this.updateReplaying(cc);
         this.updateStatus(cc);
         this.updatePrimary(cc);
+        this.updateReplaying(cc);
+        this.updateInfo(cc);
       }
     },
     {
@@ -248,10 +249,40 @@ foam.CLASS({
       code: function(cc) {
         var cv = this.nodes.get(cc.id);
         if ( cc.type == this.MedusaType.MEDIATOR ) {
-          if ( cc.replayingInfo && cc.replayingInfo.replaying ) {
-            cv.color = 'yellow';
-          } else {
-            cv.color = '';
+          var replayCircle = cv.replayCircle;
+          if ( ! replayCircle ) {
+            replayCircle = this.Circle.create({
+              radius$: cv.radius$.map(function(r) {return r - cv.arcWidth;}),
+              color: '',
+              border: '',
+              arcWidth: 1,
+              alpha: 0.5
+            });
+            replayCircle.border$ = replayCircle.color$;
+            cv.replayCircle = replayCircle;
+            cv.add(replayCircle);
+          }
+          var replayLabel = cv.replayLabel;
+          if ( ! replayLabel ) {
+            replayLabel = this.Label.create({
+              align: 'center',
+              y: +5
+            });
+            cv.replayLabel = replayLabel;
+            replayCircle.add(replayLabel);
+          }
+          if ( cc.replayingInfo ) {
+            if ( cc.replayingInfo.replaying &&
+                 cc.replayingInfo.replayIndex > 0 )  {
+              replayCircle.color = 'grey';
+              p = cc.replayingInfo.index / cc.replayingInfo.replayIndex;
+              replayCircle.start = (1 - p) * (2 * Math.PI);
+              // p = parseInt(p * 100);
+              // replayLabel.text = p+'%';
+            } else {
+              replayCircle.color = '';
+              replayLabel.text = cc.replayingInfo.index;
+            }
           }
         }
       }
@@ -278,6 +309,19 @@ foam.CLASS({
             cv.arcWidth = 3;
           }
         }
+      }
+    },
+    {
+      name: 'updateInfo',
+      code: function(cc) {
+        var cv = this.nodes.get(cc.id);
+        // if ( cc.errorMessage ) {
+        //   cv.color = 'yellow';
+        //   cv.alhpa = 0.5;
+        // } else {
+        //   cv.color = '';
+        //   cv.alpha = 1;
+        // }
       }
     },
     {

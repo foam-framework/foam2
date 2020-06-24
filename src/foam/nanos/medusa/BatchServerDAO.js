@@ -12,7 +12,10 @@ foam.CLASS({
   documentation: 'Unpack BatchCmd List and issue individual dao operations',
 
   javaImports: [
+    'foam.core.Agency',
+    'foam.core.ContextAgent',
     'foam.core.FObject',
+    'foam.core.X',
     'foam.dao.DOP',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
@@ -20,15 +23,6 @@ foam.CLASS({
   ],
 
   properties: [
-    {
-      class: 'Object',
-      name: 'line',
-      javaType: 'foam.util.concurrent.AssemblyLine',
-      javaFactory: `
-      return new foam.util.concurrent.AsyncAssemblyLine(getX(), this.getClass().getSimpleName());
-//      return new foam.util.concurrent.SyncAssemblyLine(getX());
-      `
-    },
     {
       name: 'logger',
       class: 'FObjectProperty',
@@ -63,9 +57,10 @@ foam.CLASS({
 
         if ( DOP.PUT == cmd.getDop() ) {
           Map<Object, Object> map = cmd.getBatch();
+          Agency agency = (Agency) x.get("threadPool");
           for (Map.Entry<Object, Object> entry : map.entrySet()) {
-            getLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
-              public void executeJob() {
+            agency.submit(x, new ContextAgent() {
+              public void execute(X x) {
                 try {
                   FObject o = (FObject) entry.getValue();
         getLogger().debug("cmd", "BatchCmd", cmd.getHostname(), o.toString());
@@ -74,23 +69,24 @@ foam.CLASS({
                   getLogger().error(t);
                 }
               }
-            });
+            }, this.getClass().getSimpleName());
           }
           BatchCmd.BATCH.clear(cmd);
           return cmd;
         }
         if ( DOP.REMOVE == cmd.getDop() ) {
           Map<Object, Object> map = cmd.getBatch();
+          Agency agency = (Agency) x.get("threadPool");
           for (Map.Entry<Object, Object> entry : map.entrySet()) {
-            getLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
-              public void executeJob() {
+            agency.submit(x, new ContextAgent() {
+              public void execute(X x) {
                 try {
                   getDelegate().remove_(x, (FObject) entry.getValue());
                 } catch (Throwable t ) {
                   getLogger().error(t);
                 }
               }
-            });
+            }, this.getClass().getSimpleName());
           }
           BatchCmd.BATCH.clear(cmd);
           return cmd;
