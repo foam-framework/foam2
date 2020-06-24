@@ -34,6 +34,7 @@ p({
       .setOf(foam.nanos.notification.Notification.getOwnClassInfo())
       .setAuthorize(true)
       .setInnerDAO((foam.dao.DAO) x.get("localNotificationDAO"))
+      .setDecorator(new foam.nanos.notification.ToastNotificationDAO.Builder(x).build())
       .build();
   """,
   "client": "{\"of\":\"foam.nanos.notification.Notification\"}"

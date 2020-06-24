@@ -26,6 +26,7 @@ foam.CLASS({
   `,
 
   requires: [
+    'foam.log.LogLevel',
     'foam.u2.tag.CircleIndicator'
   ],
 
@@ -141,10 +142,6 @@ foam.CLASS({
       opacity: 1;
     }
   `,
-
-  requires: [
-    'foam.log.LogLevel'
-  ],
 
   properties: [
     {
