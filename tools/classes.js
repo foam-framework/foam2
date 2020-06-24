@@ -530,6 +530,11 @@ var classes = [
   'foam.nanos.ruler.action.AbstractCheckDAOforMatching',
   'foam.comics.SearchMode',
 
+  // DAO Decorators
+  'foam.nanos.approval.ApprovalDAO',
+  'foam.nanos.audit.AuditDAO',
+  'foam.nanos.auth.email.EmailVerificationDAO',
+
   // Support Files
   'foam.support.model.TicketMessage',
   'foam.support.model.SupportEmail',
@@ -589,7 +594,6 @@ var classes = [
   'foam.nanos.crunch.AgentCapabilityJunction',
   'foam.nanos.crunch.CapabilityCapabilityJunction',
   //daos
-  'foam.nanos.audit.AuditDAO',
   'foam.nanos.crunch.UserCapabilityJunctionDAO',
   //rules
   'foam.nanos.crunch.SendNotificationOnTopLevelCapabilityStatusUpdate',
