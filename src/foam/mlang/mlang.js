@@ -3834,7 +3834,10 @@ foam.CLASS({
         }
         sb.append(')');
         return sb.toString();
-      `
+      `,
+      code: function() {
+        return this.cls_.name + '(' + this.args.map(a => a.toString()) + ')';
+      }
     }
   ]
 })

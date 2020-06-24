@@ -547,13 +547,13 @@ foam.LIB({
         .filter(flagFilter)
         .filter(p => !! p.javaType && p.javaInfoType && p.generateJava)
         .filter(p => p.javaFactory);
-      
+
       if ( properties.length > 0 ) {
         cls.method({
           visibility: 'public',
           type: 'void',
           name: 'beforeFreeze',
-          body: (this.model_.extends === 'FObject' ? '' : 'super.beforeFreeze();\n') + 
+          body: (this.model_.extends === 'FObject' ? '' : 'super.beforeFreeze();\n') +
             properties.map(p => `get${foam.String.capitalize(p.name)}();`)
               .join('\n')
         });
@@ -576,7 +576,7 @@ foam.LIB({
           visibility: 'public',
           body: 'return x_;'
         });
-  
+
         cls.method({
           name: 'setX',
           type: 'void',
@@ -696,7 +696,7 @@ foam.LIB({
           visibility: 'public',
           name: 'hashCode',
           type: 'int',
-          body: 
+          body:
             ['int hash = 1'].concat(props.map(function(f) {
               return 'hash += hash * 31 + foam.util.SafetyUtil.hashCode('+f.name+ '_' +')';
             })).join(';\n') + ';\n'
@@ -1366,7 +1366,7 @@ foam.CLASS({
 
           cls.declarations = this.VALUES.map(function(v) {
             return `${v.name}(${properties.map(p => foam.java.asJavaValue(v[p])).join(', ')})`;
-          }).join(', ');
+          }).join(',\n  ');
 
           cls.method({
             name: 'labels',
@@ -1389,7 +1389,7 @@ return new String[] {
             body: `
 switch (ordinal) {
 ${this.VALUES.map(v => `\tcase ${v.ordinal}: return ${cls.name}.${v.name};`).join('\n')}
-    default: return null;
+  default: return null;
 }`
           });
 
@@ -1402,7 +1402,7 @@ ${this.VALUES.map(v => `\tcase ${v.ordinal}: return ${cls.name}.${v.name};`).joi
             body: `
 switch (label) {
 ${this.VALUES.map(v => `\tcase "${v.label}": return ${cls.name}.${v.name};`).join('\n')}
-    default: return null;
+  default: return null;
 }`
           });
 

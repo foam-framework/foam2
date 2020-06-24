@@ -42,17 +42,17 @@ public class AsyncAssemblyLine
   public void enqueue(Assembly job) {
     if ( shutdown_ ) throw new IllegalStateException("Can't enqueue into a shutdown AssemblyLine.");
 
-    final Assembly previous;
+    final Assembly[] previous = new Assembly[1];
 
     synchronized ( startLock_ ) {
       if ( q_ != null ) q_.markNotLast();
-      previous = q_;
+      previous[0] = q_;
       q_ = job;
       try {
         job.executeUnderLock();
         job.startJob();
       } catch (Throwable t) {
-        q_ = previous;
+        q_ = previous[0];
         throw t;
       }
 
@@ -61,7 +61,8 @@ public class AsyncAssemblyLine
       try {
         job.executeJob();
 
-        if ( previous != null ) previous.waitToComplete();
+        if ( previous[0] != null ) previous[0].waitToComplete();
+        previous[0] = null;
 
         synchronized ( endLock_ ) {
           try {
