@@ -31,7 +31,7 @@ foam.CLASS({
             setX(x);
             setDao(dao);
             setDetails(details);
-            init_();
+//            init_();
           }
 
         `);
@@ -57,11 +57,6 @@ foam.CLASS({
     {
       name: 'count',
       class: 'Long'
-    },
-    {
-      name: 'batchTimerInterval',
-      class: 'Long',
-      value: 5
     },
     {
       name: 'maxBatchSize',

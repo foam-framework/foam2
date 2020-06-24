@@ -92,14 +92,6 @@ foam.CLASS({
       value: 'MEDIATOR'
     },
     {
-      documentation: 'True when this instance is the Primary.',
-      name: 'isPrimary',
-      class: 'Boolean',
-      value: false,
-      visibility: 'RO',
-      storageTransient: true
-    },
-    {
       documentation: 'Status of a node',
       name: 'status',
       class: 'Enum',
@@ -108,6 +100,7 @@ foam.CLASS({
       storageTransient: true
     },
     {
+      // TODO: not presently used. 
       name: 'accessMode',
       class: 'Enum',
       of: 'foam.nanos.medusa.AccessMode',
@@ -122,6 +115,18 @@ foam.CLASS({
       name: 'useHttps',
       class: 'Boolean',
       value: false
+    },
+    {
+      name: 'sessionId',
+      class: 'String'
+    },
+    {
+      documentation: 'True when this instance is the Primary.',
+      name: 'isPrimary',
+      class: 'Boolean',
+      value: false,
+      visibility: 'RO',
+      storageTransient: true
     },
     {
       documentation: 'Ping delay greater than this value will trigger alarms.',
@@ -147,13 +152,16 @@ foam.CLASS({
       storageTransient: true
     },
     {
-      name: 'sessionId',
-      class: 'String'
+      name: 'errorMessage',
+      class: 'String',
+      visibility: 'RO',
+      storageTransient: true
     },
     {
       name: 'replayingInfo',
       class: 'FObjectProperty',
       of: 'foam.nanos.medusa.ReplayingInfo',
+      visibility: 'RO',
       storageTransient: true
     },
     {
