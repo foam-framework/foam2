@@ -16,7 +16,7 @@ foam.CLASS({
   properties: [
     {
       class: 'FObjectProperty',
-      of: 'foam.core.Validator',
+      of: 'Validator',
       name: 'validator_'
     }
   ],

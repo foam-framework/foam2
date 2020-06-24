@@ -14,18 +14,24 @@ foam.CLASS({
     'foam.nanos.auth.User'
   ],
 
+  properties: [
+    {
+      class: 'FObjectProperty',
+      of: 'foam.nanos.auth.email.EmailTokenService',
+      name: 'emailToken'
+    }
+  ],
+
   axioms: [
     {
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(
           `
-            EmailTokenService emailToken;
-
             public EmailVerificationDAO(X x, DAO delegate) {
               setX(x);
               setDelegate(delegate);
-              emailToken = (EmailTokenService) x.get("emailToken");
+              setEmailToken((EmailTokenService) x.get("emailToken"));
             }
           `
         );
@@ -42,7 +48,7 @@ foam.CLASS({
         // send email verification if new user
         User result = (User) super.put_(x, obj);
         if ( result != null && newUser && ! result.getEmailVerified() ) {
-          emailToken.generateToken(x, result);
+          getEmailToken().generateToken(x, result);
         }
     
         return result;

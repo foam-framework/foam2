@@ -34,13 +34,13 @@ foam.CLASS({
 
   methods: [
     {
-      documentation: 'Creates a format message containing the list of properties that have changed',
       name: 'formatMessage',
       type: 'String',
       args: [
         { type: 'FObject', name: 'currentValue' },
         { type: 'FObject', name: 'newValue' }
       ],
+      documentation: 'Creates a format message containing the list of properties that have changed',
       javaCode: `
         Map          diff   = currentValue.diff(newValue);
         Iterator     i      = diff.keySet().iterator();
