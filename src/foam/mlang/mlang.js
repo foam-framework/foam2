@@ -3257,7 +3257,14 @@ foam.CLASS({
           return ((Predicate) predicate).f(getArg2().f(obj));
         }
         return false;
-      `
+      `,
+      code: function(o) {
+        const predicate = this.arg1.f(o);
+        if ( foam.mlang.predicate.Predicate.isInstance(predicate) ) {
+          return predicate.f(this.arg2.f(o));
+        }
+        return false;
+      }
     }
   ]
 });
@@ -3369,6 +3376,7 @@ foam.CLASS({
     'foam.mlang.predicate.And',
     'foam.mlang.predicate.Contains',
     'foam.mlang.predicate.ContainsIC',
+    'foam.mlang.predicate.DotF',
     'foam.mlang.predicate.Eq',
     'foam.mlang.predicate.False',
     'foam.mlang.predicate.Func',
