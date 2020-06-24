@@ -1323,10 +1323,11 @@ foam.CLASS({
         cls.buildJavaClass = function(cls) {
           cls = cls || foam.java.Enum.create();
 
-          cls.name    = this.name;
-          cls.package = this.package;
-          cls.extends = this.extends;
-          cls.values  = this.VALUES;
+          cls.name       = this.name;
+          cls.package    = this.package;
+          cls.extends    = this.extends;
+          cls.values     = this.VALUES;
+          cls.implements = [ 'foam.core.FEnum' ];
 
           // TODO: needed for now because Enums don't extend FObject
           // but a better solution would be to remove setters from
