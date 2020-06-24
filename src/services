@@ -236,7 +236,8 @@ p({
       .setOf(foam.nanos.auth.User.getOwnClassInfo())
       .setDecorator(
         new foam.dao.ValidatingDAO(x,
-          new foam.nanos.auth.UserPasswordHashingDAO(x, new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.auth.User.getOwnClassInfo()).build()),
+          new foam.nanos.auth.UserPasswordHashingDAO.Builder(x).setDelegate(
+            new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.auth.User.getOwnClassInfo()).build()).build(),
           new foam.nanos.auth.validators.UserGroupAndSpidValidator()
         )
       )
