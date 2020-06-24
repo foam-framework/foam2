@@ -1695,8 +1695,7 @@ foam.CLASS({
       return typeof x === 'number' ? '' + x :
         typeof x === 'string' ? '"' + x + '"' :
         Array.isArray(x) ? '[' + x.map(this.toString_.bind(this)).join(', ') + ']' :
-        (x && x.toString) ? x.toString() :
-        x;
+        x && (x).toString();
     },
 
     function toString() { return this.toString_(this.value); },
