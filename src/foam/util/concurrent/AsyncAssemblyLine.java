@@ -18,9 +18,9 @@ import java.util.concurrent.Semaphore;
 public class AsyncAssemblyLine
   extends SyncAssemblyLine
 {
-  protected Agency   pool_;
-  protected String   agencyName_ = "AsyncAssemblyLine";
-  protected boolean  shutdown_   = false;
+  protected Agency  pool_;
+  protected String  agencyName_ = "AsyncAssemblyLine";
+  protected boolean shutdown_   = false;
 
   public AsyncAssemblyLine(X x) {
     this(x, "threadPool");
@@ -62,11 +62,11 @@ public class AsyncAssemblyLine
             job.endJob();
           } catch (Throwable t) {
             ((foam.nanos.logger.Logger) x.get("logger")).error(this.getClass().getSimpleName(), agencyName_, t);
-          } finally {
-            job.complete();
           }
         }
       } finally {
+        job.complete();
+
         // Isn't required, but helps GC last entry.
         synchronized ( startLock_ ) {
           // If I'm still the only job in the queue, then remove me

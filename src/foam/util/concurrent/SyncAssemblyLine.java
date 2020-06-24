@@ -75,11 +75,11 @@ public class SyncAssemblyLine
             logger = new foam.nanos.logger.StdoutLogger();
           }
           logger.error(this.getClass().getSimpleName(), t.getMessage(), t);
-        } finally {
-          job.complete();
         }
       }
     } finally {
+      job.complete();
+
       // Isn't required, but helps GC last entry.
       synchronized ( startLock_ ) {
         // If I'm still the only job in the queue, then remove me
