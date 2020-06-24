@@ -23,6 +23,10 @@ foam.CLASS({
     'static foam.mlang.MLang.EQ'
   ],
 
+  messages: [
+    { name: 'CREATE_ERROR_MSG', message: 'Unexpected error creating history record for' }
+  ],
+
   axioms: [
     {
       name: 'javaExtras',
@@ -106,7 +110,7 @@ foam.CLASS({
           historyDAO_.put_(x, historyRecord);
         } catch (Throwable t) {
           Logger l = (Logger) x.get("logger");
-          l.error("Unexpected error creating history record for", obj.getClassInfo().getId(), t);
+          l.error(CREATE_ERROR_MSG, obj.getClassInfo().getId(), t);
         }
     
         return super.put_(x, obj);
