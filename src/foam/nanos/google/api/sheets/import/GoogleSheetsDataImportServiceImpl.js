@@ -69,6 +69,7 @@ foam.CLASS({
         }
         return columnNames; 
       } catch( Throwable t ) {
+        System.out.println(t);
       }
       return null;
       `

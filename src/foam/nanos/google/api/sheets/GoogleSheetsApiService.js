@@ -36,6 +36,11 @@ foam.CLASS({
       javaValue: `Collections.singletonList(SheetsScopes.DRIVE_FILE)`
     },
     {
+      name: 'READ_SCOPES',
+      javaType: 'List<String>',
+      javaValue: `Collections.singletonList(SheetsScopes.DRIVE)`
+    },
+    {
       name: 'COLUMN_TITLES_ROW_INDEX',
       javaType: 'int',
       javaValue: `1`
@@ -255,7 +260,7 @@ foam.CLASS({
       javaCode: `
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         GoogleApiAuthService googleApiAuthService = (GoogleApiAuthService)getX().get("googleApiAuthService");
-        Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, SCOPES))
+        Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, READ_SCOPES))
           .setApplicationName("nanopay")
           .build();
         Sheets.Spreadsheets.Values.Get request =
@@ -308,7 +313,7 @@ foam.CLASS({
 
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         GoogleApiAuthService googleApiAuthService = (GoogleApiAuthService)getX().get("googleApiAuthService");
-        Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, SCOPES))
+        Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, READ_SCOPES))
           .setApplicationName("nanopay")
           .build();
         List<ValueRange> data = new ArrayList<>();

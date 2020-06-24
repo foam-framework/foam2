@@ -5,7 +5,8 @@ foam.CLASS({
   properties: [
     {
      // class: 'String',//change to classInfo?
-      name: 'of'
+      name: 'importClassInfo',
+      hidden: true,
     },
     {
       class: 'FObjectArray',
