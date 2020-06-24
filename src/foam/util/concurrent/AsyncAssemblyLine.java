@@ -18,9 +18,8 @@ import java.util.concurrent.Semaphore;
 public class AsyncAssemblyLine
   extends SyncAssemblyLine
 {
-  protected Agency  pool_;
-  protected String  agencyName_ = "AsyncAssemblyLine";
-  protected boolean shutdown_   = false;
+  protected Agency pool_;
+  protected String agencyName_ = "AsyncAssemblyLine";
 
   public AsyncAssemblyLine(X x) {
     this(x, "threadPool");
@@ -38,14 +37,17 @@ public class AsyncAssemblyLine
     final Assembly[] previous = new Assembly[1];
 
     synchronized ( startLock_ ) {
-      if ( q_ != null ) q_.markNotLast();
-      previous[0] = q_;
-      q_ = job;
+      synchronized ( qLock_ ) {
+        previous[0] = q_;
+        q_ = job;
+      }
       try {
         job.executeUnderLock();
         job.startJob();
       } catch (Throwable t) {
-        q_ = previous[0];
+        synchronized ( qLock_ ) {
+          q_ = previous[0];
+        }
         throw t;
       }
     }
@@ -57,21 +59,24 @@ public class AsyncAssemblyLine
         if ( previous[0] != null ) previous[0].waitToComplete();
         previous[0] = null;
 
+        boolean isLast = false;
+        synchronized ( qLock_ ) {
+          // If I'm still the only job in the queue, then remove me
+          if ( q_ == job ) {
+            q_ = null;
+            isLast = true;
+          }
+        }
+
         synchronized ( endLock_ ) {
           try {
-            job.endJob();
+            job.endJob(isLast);
           } catch (Throwable t) {
             ((foam.nanos.logger.Logger) x.get("logger")).error(this.getClass().getSimpleName(), agencyName_, t);
           }
         }
       } finally {
         job.complete();
-
-        // Isn't required, but helps GC last entry.
-        synchronized ( startLock_ ) {
-          // If I'm still the only job in the queue, then remove me
-          if ( q_ == job ) q_ = null;
-        }
       }
     }}, agencyName_);
   }

@@ -46,8 +46,8 @@ foam.CLASS({
         // NOTE: explicitly calling PM constructor as create only creates
         // a percentage of PMs, but we want all replay statistics
         PM pm = new PM(((foam.dao.AbstractDAO)dao).getOf(), "replay."+getFilename());
-        AssemblyLine assemblyLine = x.get("threadPool") == null ? new foam.util.concurrent.SyncAssemblyLine()
-          : new foam.util.concurrent.AsyncAssemblyLine(x);
+        AssemblyLine assemblyLine = /*x.get("threadPool") == null ?*/ new foam.util.concurrent.SyncAssemblyLine()
+        /*  : new foam.util.concurrent.AsyncAssemblyLine(x)*/;
 
         try ( BufferedReader reader = getReader() ) {
           if ( reader == null ) {
@@ -57,7 +57,6 @@ foam.CLASS({
             int length = entry.length();
             if ( length == 0 ) continue;
             if ( COMMENT.matcher(entry).matches() ) continue;
-
             try {
               final char operation = entry.charAt(0);
               final String strEntry = entry.subSequence(2, length - 1).toString();
@@ -70,7 +69,7 @@ foam.CLASS({
                   obj = parser.parseString(strEntry, dao.getOf().getObjClass());
                 }
 
-                public void endJob() {
+                public void endJob(boolean isLast) {
                   if ( obj == null ) {
                     getLogger().error("Parse error", getParsingErrorMessage(strEntry), "entry:", strEntry);
                     return;
