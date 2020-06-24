@@ -2448,25 +2448,6 @@ foam.CLASS({
   ]
 });
 
-
-foam.CLASS({
-  package: 'foam.mlang.expr',
-  name: 'Mul',
-
-  extends: 'foam.mlang.predicate.Binary',
-
-  implements: [
-    'foam.core.Serializable'
-  ],
-
-  documentation: 'Multiplication Binary Expression.',
-
-  methods: [
-    function f(o) { return this.arg1.f(o) * this.arg2.f(o); }
-  ]
-});
-
-
 foam.CLASS({
   package: 'foam.mlang.sink',
   name: 'GroupBy',
@@ -3383,7 +3364,6 @@ foam.CLASS({
   requires: [
     'foam.mlang.Constant',
     'foam.mlang.expr.Dot',
-    'foam.mlang.expr.Mul',
     'foam.mlang.order.Desc',
     'foam.mlang.order.ThenBy',
     'foam.mlang.predicate.And',
@@ -3469,7 +3449,6 @@ foam.CLASS({
     function ENDS_WITH(a, b) { return this._binary_("EndsWith", a, b); },
     function FUNC(fn) { return this.Func.create({ fn: fn }); },
     function DOT(a, b) { return this._binary_("Dot", a, b); },
-    function MUL(a, b) { return this._binary_("Mul", a, b); },
 
     function UNIQUE(expr, sink) { return this.Unique.create({ expr: expr, delegate: sink }); },
     function GROUP_BY(expr, opt_sinkProto, opt_limit) { return this.GroupBy.create({ arg1: expr, arg2: opt_sinkProto || this.COUNT(), groupLimit: opt_limit || -1 }); },

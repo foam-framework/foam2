@@ -675,7 +675,6 @@ var proxies = [
 
 var blacklist = [
   'foam.core.Property',
-  'foam.mlang.expr.Mul',
   'foam.mlang.predicate.Func',
   'foam.u2.AttrSlot',
   'foam.u2.RenderSink',
