@@ -46,18 +46,24 @@ public class SyncAssemblyLine
   public void enqueue(Assembly job) {
     if ( shutdown_ ) throw new IllegalStateException("Can't enqueue into a shutdown AssemblyLine.");
 
-    Assembly previous = null;
+    final Assembly[] previous = new Assembly[1];
 
     try {
       synchronized ( startLock_ ) {
         if ( q_ != null ) q_.markNotLast();
-        previous = q_;
+        previous[0] = q_;
         q_ = job;
-        job.executeUnderLock();
-        job.startJob();
+        try {
+          job.executeUnderLock();
+          job.startJob();
+        } catch (Throwable t) {
+          q_ = previous[0];
+          throw t;
+        }
       }
       job.executeJob();
-      if ( previous != null ) previous.waitToComplete();
+      if ( previous[0] != null ) previous[0].waitToComplete();
+      previous[0] = null;
       synchronized ( endLock_ ) {
         try {
           job.endJob();

@@ -8,6 +8,7 @@
 
 import foam.core.ClassInfo;
 import foam.core.ContextAware;
+import foam.core.FEnum;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.core.X;
@@ -59,7 +60,7 @@ public interface FObjectFormatter
 
   public void output(List list);
 
-  public void output(Enum<?> val);
+  public void outputEnum(FEnum val);
 
   public void output(Object val);
 
