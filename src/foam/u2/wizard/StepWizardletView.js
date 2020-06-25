@@ -49,22 +49,38 @@ foam.CLASS({
       position: relative;
       height: auto;
       background-color: %GREY5%;
+      max-height: 95vh;
+      height: 100%;
     }
     ^status {
       background-color: %WHITE%;
       padding: 50px;
-    }
-    ^entry {
-      background-color: %GREY5%;
-      padding: 50px;
       overflow-y: scroll;
+      display: flex;
+      flex-direction: column;
     }
-    ^entry ^top-buttons {
-      float: right;
+    ^rightside {
+      display: flex;
+      flex-direction: column;
+      background-color: %GREY5%;
+      overflow-y: hidden;
+    }
+    ^rightside ^entry {
+      flex-grow: 1;
+      -webkit-mask-image: -webkit-gradient(linear, left 15, left top, from(rgba(0,0,0,1)), to(rgba(0,0,0,0)));
+      overflow-y: scroll;
+      padding: 0 50px;
+    }
+    ^rightside ^top-buttons {
+      text-align: right;
       margin-bottom: 15px;
+      padding: 50px;
+      padding-bottom: 0;
     }
-    ^buttons {
-      height: 50px;
+    ^rightside ^bottom-buttons {
+      background-color: %GREY6%;
+      padding: 25px 50px;
+      text-align: right;
     }
     ^ .foam-u2-stack-StackView {
       height: auto;
@@ -72,6 +88,9 @@ foam.CLASS({
     }
     ^fix-grid {
       height: 100%;
+    }
+    ^fix-grid.foam-u2-layout-Grid {
+      grid-gap: 0;
     }
   `,
 
@@ -103,7 +122,7 @@ foam.CLASS({
             )
           .end()
           .start(this.GUnit, { columns: 8 })
-            .addClass(this.myClass('entry'))
+            .addClass(this.myClass('rightside'))
             .start().addClass(this.myClass('top-buttons'))
               .start(this.CircleIndicator, {
                 label: 'X',
@@ -117,19 +136,27 @@ foam.CLASS({
                 })
               .end()
             .end()
-            .add(this.data.SUB_STACK)
-            .add(this.slot(function (data$isLastWizardlet) {
-              return this.E()
-                .startContext({ data: self })
-                .addClass(self.myClass('buttons'))
-                .tag(this.GO_PREV, btn)
-                .tag(this.GO_NEXT,
-                  data$isLastWizardlet
-                    ? { ...btn, label: this.ACTION_LABEL }
-                    : btn
-                )
-                .endContext();
-            }))
+            .start()
+              .addClass(this.myClass('entry'))
+              .start()
+                .add(this.data.SUB_STACK)
+              .end()
+            .end()
+            .start()
+              .addClass(this.myClass('bottom-buttons'))
+              .add(this.slot(function (data$isLastWizardlet) {
+                return this.E()
+                  .startContext({ data: self })
+                  .addClass(self.myClass('buttons'))
+                  .tag(this.GO_PREV, btn)
+                  .tag(this.GO_NEXT,
+                    data$isLastWizardlet
+                      ? { ...btn, label: this.ACTION_LABEL }
+                      : btn
+                  )
+                  .endContext();
+              }))
+            .end()
           .end()
         .end()
         ;
@@ -146,7 +173,7 @@ foam.CLASS({
         body: 'You are closing this wizard. How do you wish to proceed?',
         actions: [
           actionWrap(this.DISCARD),
-          actionWrap(this.CLOSE),
+          actionWrap(this.SAVE_AND_CLOSE),
           this.Action.create({
             name: 'cancel',
             label: 'Cancel',
@@ -170,7 +197,7 @@ foam.CLASS({
       }
     },
     {
-      name: 'close',
+      name: 'saveAndClose',
       label: 'Save for Later',
       code: function(x) {
         this.data.saveProgress().then(() => {

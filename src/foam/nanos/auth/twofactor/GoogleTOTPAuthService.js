@@ -19,7 +19,6 @@ foam.CLASS({
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
     'foam.nanos.session.Session',
-    'foam.nanos.logger.Logger', // todo: remove after fixing NP-1278
 
     'io.nayuki.qrcodegen.QrCode',
     'java.net.URI'
@@ -65,11 +64,7 @@ foam.CLASS({
         // update user with secret key
         user = (User) user.fclone();
         user.setTwoFactorSecret(key);
-        userDAO.put_(x, user);
-
-        // todo: remove after fixing NP-1278
-        Logger logger = (Logger) getX().get("logger");
-        logger.debug(String.format("[NP-1278] Generated two factor secret key = %s", user.getTwoFactorSecret()));
+        userDAO.put_(getX(), user);
 
         try {
           EmailConfig service = (EmailConfig) x.get("emailConfig");
@@ -106,15 +101,6 @@ foam.CLASS({
         // fetch from user dao to get secret key
         user = (User) userDAO.find(user.getId());
 
-        // todo: remove after fixing NP-1278
-        Logger logger = (Logger) getX().get("logger");
-        logger.debug(String.format("[NP-1278] Two factor secret key used to authenticate = %s", user.getTwoFactorSecret()));
-        if ( checkCode(BaseEncoding.base32().decode(user.getTwoFactorSecret()), code, STEP_SIZE, WINDOW) ) {
-          logger.debug(String.format("[NP-1278] 2fa verification passes for %s with key = %s, token = %s", user.getLegalName(), user.getTwoFactorSecret(), token));
-        } else {
-          logger.debug(String.format("[NP-1278] 2fa verification fails for %s with key = %s, token = %s", user.getLegalName(), user.getTwoFactorSecret(), token));
-        }
-
         if ( checkCode(BaseEncoding.base32().decode(user.getTwoFactorSecret()), code, STEP_SIZE, WINDOW) ) {
           if ( ! user.getTwoFactorEnabled() ) {
             user = (User) user.fclone();
@@ -145,7 +131,6 @@ foam.CLASS({
           // fetch user from DAO and set two factor secret to null
           user = (User) userDAO.find(user.getId()).fclone();
           user.setTwoFactorEnabled(false);
-          user.setTwoFactorSecret(null);
           userDAO.put_(x, user);
 
           return true;

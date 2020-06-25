@@ -6,6 +6,7 @@
 
 package foam.core;
 
+import foam.core.FEnum;
 import foam.nanos.logger.Logger;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
@@ -34,9 +35,9 @@ public abstract class AbstractEnumPropertyInfo
     }
   };
 
-  public abstract int getOrdinal(Object o);
+  public abstract int            getOrdinal(Object o);
   public abstract java.lang.Enum forOrdinal(int ordinal);
-  public abstract void toJSON(foam.lib.json.Outputter outputter, Object value);
+  public abstract void           toJSON(foam.lib.json.Outputter outputter, Object value);
 
   @Override
   public Object fromXML(X x, XMLStreamReader reader) {
@@ -78,5 +79,9 @@ public abstract class AbstractEnumPropertyInfo
     if ( ! includeInSignature() ) return;
     int val = getOrdinal(get(obj));
     sig.update((ByteBuffer) bb.get().putInt(val).flip());
+  }
+
+  public void format(foam.lib.formatter.FObjectFormatter formatter, foam.core.FObject obj) {
+    formatter.outputEnum((FEnum) get_(obj));
   }
 }

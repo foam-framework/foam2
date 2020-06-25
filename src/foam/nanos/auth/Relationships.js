@@ -54,30 +54,3 @@ foam.RELATIONSHIP({
   targetDAOKey: 'notificationSettingDAO',
   unauthorizedTargetDAOKey: 'localNotificationSettingDAO'
 });
-
-foam.RELATIONSHIP({
-  sourceModel: 'foam.nanos.auth.User',
-  targetModel: 'foam.nanos.approval.ApprovalRequest',
-  forwardName: 'approvalRequests',
-  inverseName: 'entityId',
-  cardinality: '1:*',
-  sourceDAOKey: 'userDAO',
-  unauthorizedSourceDAOKey: 'localUserDAO',
-  targetDAOKey: 'approvalRequestDAO',
-  targetProperty: {
-    visibility: function(entityId) {
-      return entityId ?
-        foam.u2.DisplayMode.RO :
-        foam.u2.DisplayMode.HIDDEN;
-    }
-  },
-  sourceProperty: {
-    readPermissionRequired: true,
-    section: 'administrative',
-    visibility: function(approvalRequests) {
-      return approvalRequests ?
-        foam.u2.DisplayMode.RO :
-        foam.u2.DisplayMode.HIDDEN;
-    }
-  }
-});

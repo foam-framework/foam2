@@ -192,6 +192,12 @@ foam.CLASS({
     ^ .foam-u2-view-RadioView label {
       margin-left: 12px;
     }
+    
+    ^ .foam-u2-layout-Cols { 
+      padding-bottom: 4px;
+      display: flex;
+      align-items: center;
+    }
   `,
 
   requires: [
