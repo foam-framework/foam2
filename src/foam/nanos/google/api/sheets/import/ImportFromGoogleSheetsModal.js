@@ -33,20 +33,26 @@ foam.CLASS({
       this
       .startContext({ data: this })
         .tag(this.importConfig)
-        // .add(this.slot(function(importConfig$columnHeaderPropertyMappings){
-        //   return this.E().forEach(importConfig$columnHeaderPropertyMappings, function(c) {
-        //     this.start()
-        //       .start({class: 'foam.u2.TextField',
-        //         data: c.columnHeader
-        //       })
-        //         .style({ 'background-color': c.prop ? 'none' : '#fbedec',
-        //                  'color': c.prop ? 'none' : '#a61414' })
-        //         .setAttribute('readonly', true)
-        //       .end()
-        //     .end();
-        //     //if c.prop.label doesn't exist add error message
-        //   });
-        // }))
+        .add(this.slot(function(importConfig$columnHeaderPropertyMappings){
+          return this.E()
+          .callIf(importConfig$columnHeaderPropertyMappings && importConfig$columnHeaderPropertyMappings.length > 0, function() {
+            this.start('h4').style({ 'padding-left': '16px' }).add('Column headers').end();
+          })
+          .forEach(importConfig$columnHeaderPropertyMappings, function(c) {
+            this.start()
+            .style({ 'padding-left': '16px' })
+              .start({class: 'foam.u2.TextField',
+                data: c.columnHeader
+              })
+                .style({ 'background-color': c.prop ? 'none' : '#fbedec',
+                         'color': c.prop ? 'none' : '#a61414' })
+                .setAttribute('readonly', true)
+              .end()
+            .end()
+            .br();
+            //if c.prop.label doesn't exist add error message
+          });
+        }))
         .start().show(this.showAction$).addClass(this.myClass('btn-box'))
           .tag(this.CANCEL, {
             buttonStyle: 'SECONDARY',
@@ -98,7 +104,7 @@ foam.CLASS({
       name: 'importData',
       label: 'Import',
       isEnabled: function(importConfig$columnHeaderPropertyMappings) {
-        return ! importConfig$columnHeaderPropertyMappings.some(c => ! ( c && c.prop ) );
+        return importConfig$columnHeaderPropertyMappings.some(c => c && c.prop );
       },
       code: function(X) {
         X.googleSheetsDataImport.importData(X, this.importConfig).then(r => {

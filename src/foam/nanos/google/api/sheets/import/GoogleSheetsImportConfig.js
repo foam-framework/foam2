@@ -72,7 +72,8 @@ foam.CLASS({
       name: 'columnHeaderPropertyMappings',
       class: 'FObjectArray',
       of: 'foam.nanos.google.api.sheets.ColumnHeaderToPropertyName',
-      visibility: 'RO'
+      visibility: 'RO',
+      hidden: true
     }
     // {
     //   name: 'statusUpdateColumn',

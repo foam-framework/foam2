@@ -164,6 +164,7 @@ foam.CLASS({
           for ( int i = 1 ; i < data.size() ; i++ ) {
             Object obj = importConfig.getImportClassInfo().newInstance();
             for ( int j = 0 ; j < importConfig.getColumnHeaderPropertyMappings().length ; j ++ ) {
+              if ( importConfig.getColumnHeaderPropertyMappings()[j].getProp() == null ) continue;
               int columnIndex = columnHeaders.indexOf(importConfig.getColumnHeaderPropertyMappings()[j].getColumnHeader());
               ((PropertyInfo)importConfig.getColumnHeaderPropertyMappings()[j].getProp()).set(obj, data.get(i).get(columnIndex));
             }
