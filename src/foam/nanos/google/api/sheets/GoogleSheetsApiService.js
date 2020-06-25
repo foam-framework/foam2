@@ -22,6 +22,8 @@ foam.CLASS({
     'foam.nanos.google.api.auth.GoogleApiAuthService',
     'foam.nanos.google.api.drive.GoogleDriveService',
     'foam.nanos.logger.Logger',
+    'foam.util.SafetyUtil',
+
     'java.util.*'
   ],
   constants: [
@@ -66,7 +68,13 @@ foam.CLASS({
         },
         {
           name: 'metadataObj',
+          type: 'foam.nanos.export.GoogleSheetsPropertyMetadata[]',
           javaType: 'Object'
+        },
+        {
+          name: 'extraConfig',
+          type: 'Object',
+          javaType: 'foam.nanos.export.GoogleSheetsServiceConfig'
         }
       ],
       javaCode: `
@@ -91,8 +99,8 @@ foam.CLASS({
             .build();
     
           Spreadsheet st = new Spreadsheet().setProperties(
-            new SpreadsheetProperties().setTitle("NanopayExport" + new Date()));
-    
+            new SpreadsheetProperties().setTitle( extraConfig == null || SafetyUtil.isEmpty(extraConfig.getTitle()) ? ("NanopayExport" + new Date()) : extraConfig.getTitle()));
+  
     
           List<ValueRange> data = new ArrayList<>();
           data.add(new ValueRange()
