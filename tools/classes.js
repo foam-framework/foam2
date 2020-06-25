@@ -290,6 +290,7 @@ var classes = [
   'foam.nanos.session.SessionService',
   'foam.nanos.session.SimpleSessionService',
   'foam.nanos.pool.AbstractFixedThreadPool',
+  'foam.nanos.pool.ThreadPoolAgency',
   'foam.nanos.om.OMLogger',
   'foam.nanos.pm.NullPM',
   'foam.nanos.pm.PM',
