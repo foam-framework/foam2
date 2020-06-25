@@ -280,10 +280,11 @@ foam.CLASS({
       ],
       javaThrows: ['AuthorizationException'],
       javaCode: `
+        AuthService auth = (AuthService) x.get("auth");
         Subject subject = (Subject) x.get("subject");
         User user = subject.getRealUser();
 
-        if ( user.getId() != this.getCreatedBy() ) {
+        if ( user.getId() != this.getCreatedBy() && ! auth.check(x, "ticket.read." + this.getId()) ) {
           throw new AuthorizationException("You don't have permission to read this ticket.");
         }
       `
