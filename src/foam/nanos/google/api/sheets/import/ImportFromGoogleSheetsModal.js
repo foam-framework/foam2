@@ -36,22 +36,33 @@ foam.CLASS({
         .add(this.slot(function(importConfig$columnHeaderPropertyMappings){
           return this.E()
           .callIf(importConfig$columnHeaderPropertyMappings && importConfig$columnHeaderPropertyMappings.length > 0, function() {
-            this.start('h4').style({ 'padding-left': '16px' }).add('Column headers').end();
-          })
-          .forEach(importConfig$columnHeaderPropertyMappings, function(c) {
-            this.start()
-            .style({ 'padding-left': '16px' })
-              .start({class: 'foam.u2.TextField',
-                data: c.columnHeader
-              })
-                .style({ 'background-color': c.prop ? 'none' : '#fbedec',
-                         'color': c.prop ? 'none' : '#a61414' })
-                .setAttribute('readonly', true)
+            this.start('h4').style({ 'padding-left': '16px' }).add('Column headers').end().forEach(importConfig$columnHeaderPropertyMappings, function(c) {
+              this.start()
+              .style({ 'padding-left': '16px' })
+                .start({class: 'foam.u2.TextField',
+                  data: c.columnHeader
+                })
+                  .style({ 'background-color': c.prop ? 'none' : '#fbedec',
+                           'color': c.prop ? 'none' : '#a61414' })
+                  .setAttribute('readonly', true)
+                .end()
+                .callIf(! c.prop, function() {
+                  this.start()
+                    .style({ 'color': 'red' })
+                    .add('Data for column with header "' + c.columnHeader + '" cannot be imported. You can still import your data but this column data will be ignored')
+                  .end();
+                })
               .end()
-            .end()
-            .br();
-            //if c.prop.label doesn't exist add error message
+              .br();
+              //if c.prop.label doesn't exist add error message
+            });
           });
+          // .callIf( importConfig$columnHeaderPropertyMappings && importConfig$columnHeaderPropertyMappings.length === 0, function() {
+          //   this.start().add(
+          //     'it looks like there is not data we can import to current page. please make sure that link to gooogle sheet you\'ve provided is correct'
+          //   ).end();
+          // });
+          
         }))
         .start().show(this.showAction$).addClass(this.myClass('btn-box'))
           .tag(this.CANCEL, {
