@@ -46,9 +46,8 @@ foam.CLASS({
         // NOTE: explicitly calling PM constructor as create only creates
         // a percentage of PMs, but we want all replay statistics
         PM pm = new PM(((foam.dao.AbstractDAO)dao).getOf(), "replay."+getFilename());
-        AssemblyLine assemblyLine = x.get("threadPool") == null ?
-          new foam.util.concurrent.SyncAssemblyLine()   :
-          new foam.util.concurrent.AsyncAssemblyLine(x) ;
+        AssemblyLine assemblyLine = /*x.get("threadPool") == null ?*/ new foam.util.concurrent.SyncAssemblyLine()
+        /*  : new foam.util.concurrent.AsyncAssemblyLine(x)*/;
 
         try ( BufferedReader reader = getReader() ) {
           if ( reader == null ) {
