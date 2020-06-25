@@ -82,8 +82,7 @@ foam.CLASS({
   properties: [
     {
       name: 'onClose',
-      class: 'Function',
-      factory: () => () => {}
+      class: 'Function'
     }
   ],
 
