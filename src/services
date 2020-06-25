@@ -1068,7 +1068,7 @@ p({
   "class": "foam.nanos.boot.NSpec",
   "name": "googleSheetsDataImport",
   "serve": true,
-  "authenticate": false,
+  "authenticate": true,
   "boxClass": "foam.nanos.google.api.sheets.GoogleSheetsDataImportServiceSkeleton",
   "serviceClass": "foam.nanos.google.api.sheets.GoogleSheetsDataImportServiceImpl",
   "client":"""

@@ -2,6 +2,12 @@ foam.CLASS({
   package: 'foam.nanos.google.api.sheets',
   name: 'ImportFromGoogleSheetsModal',
   extends: 'foam.u2.View',
+  requires: [
+    'foam.u2.dialog.NotificationMessage'
+  ],
+  imports: [
+    'ctrl'
+  ],
   properties: [
     {
       name: 'importConfig',
@@ -95,9 +101,16 @@ foam.CLASS({
         return ! importConfig$columnHeaderPropertyMappings.some(c => ! ( c && c.prop ) );
       },
       code: function(X) {
-        X.googleSheetsDataImport.importData(X, this.importConfig).then(r => 
-        console.log(r)  
-        );
+        X.googleSheetsDataImport.importData(X, this.importConfig).then(r => {
+          X.closeDialog();
+          var message = this.NotificationMessage.create();
+          if ( r ) message.message = 'success!';
+          else {
+            message.message = 'failure!';
+            message.type = 'error';
+          }
+          this.ctrl.add(message);
+        });
       }
     },
   ]
