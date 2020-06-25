@@ -530,6 +530,20 @@ var classes = [
   'foam.nanos.ruler.action.AbstractCheckDAOforMatching',
   'foam.comics.SearchMode',
 
+  // DAO decorators
+  'foam.nanos.actioncommand.ActionCommandDAO',
+  'foam.nanos.approval.ApprovalDAO',
+  'foam.nanos.audit.AuditDAO',
+  'foam.nanos.auth.email.EmailVerificationDAO',
+  'foam.dao.FreezingDAO',
+  'foam.nanos.geocode.GoogleMapsGeocodingDAO',
+  'foam.dao.history.HistoryDAO',
+  'foam.nanos.script.ScriptRunnerDAO',
+  'foam.nanos.approval.SendGroupRequestApprovalDAO',
+  'foam.dao.UnreliableDAO',
+  'foam.nanos.auth.UserPasswordHashingDAO',
+  'foam.dao.ValidatingDAO',
+
   // Support Files
   'foam.support.model.TicketMessage',
   'foam.support.model.SupportEmail',
@@ -624,6 +638,7 @@ var classes = [
   'foam.nanos.approval.ApprovableApprovalRequestsRule',
   'foam.nanos.approval.FulfilledApprovablePredicate',
   'foam.nanos.approval.FulfilledApprovableRule',
+  'foam.nanos.approval.ApprovalDAO',
   'foam.nanos.approval.AuthenticatedApprovalDAOAuthorizer',
   'foam.nanos.approval.PopulateApprovalRequestsDAO',
 
@@ -648,7 +663,6 @@ var skeletons = [
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.email.POP3Email',
   'foam.nanos.notification.push.PushService',
-  'foam.nanos.notification.ResendNotificationServiceInterface',
   'foam.nanos.session.SessionService',
   'foam.nanos.test.EchoService',
   'foam.strategy.StrategizerService',
