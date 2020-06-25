@@ -126,15 +126,10 @@ foam.CLASS({
     },
 
     function generateSections(generatedWizardlets) {
-      // return Promise.resolve(
-      return Promise.all([
-          generatedWizardlets.map((wizardlet) => {
-            this.AbstractSectionedDetailView.create({
-              of: wizardlet.of,
-            }).sections;
-          })
-        ]);
-      // );
+      return generatedWizardlets.map(wizardlet =>
+        this.AbstractSectionedDetailView.create({
+          of: wizardlet.of,
+        }).sections);
     },
 
     function callWizard(capabilityId) {
