@@ -32,11 +32,11 @@ public class AsyncAssemblyLine
   }
 
   public void enqueue(Assembly job) {
-    if ( shutdown_ ) throw new IllegalStateException("Can't enqueue into a shutdown AssemblyLine.");
-
     final Assembly[] previous = new Assembly[1];
 
     synchronized ( startLock_ ) {
+      if ( shutdown_ ) throw new IllegalStateException("Can't enqueue into a shutdown AssemblyLine.");
+
       synchronized ( qLock_ ) {
         previous[0] = q_;
         q_ = job;
@@ -90,12 +90,14 @@ public class AsyncAssemblyLine
         public void startJob() {
           shutdown_ = true;
         }
-        public void endJob() {
+        public void endJob(boolean isLast) {
           s.release();
         }
       });
       s.acquire();
     } catch (InterruptedException e) {
+    } catch (IllegalStateException e) {
+      // Line is already shutdown, so no problem
     }
   }
 }
