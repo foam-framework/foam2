@@ -111,13 +111,11 @@ foam.CLASS({
             return {
               caps: capAndSections[0],
               wizCaps: capAndSections[1]
-                .filter(wizardSection =>
+                .filter((wizardSection) =>
                   wizardSection.ucj === null ||
                   (
-                    ! foam.util.equals(wizardSection.ucj.status,
-                      this.CapabilityJunctionStatus.GRANTED ) &&
-                    ! foam.util.equals(wizardSection.ucj.status,
-                      this.CapabilityJunctionStatus.PENDING )
+                    ! wizardSection.ucj.status === this.CapabilityJunctionStatus.GRANTED &&
+                    ! wizardSection.ucj.status === this.CapabilityJunctionStatus.PENDING
                   )
                 )
             };
@@ -128,7 +126,7 @@ foam.CLASS({
     function generateSections(generatedWizardlets) {
       return generatedWizardlets.map(wizardlet =>
         this.AbstractSectionedDetailView.create({
-          of: wizardlet.of,
+          of: wizardlet.of
         }).sections);
     },
 
