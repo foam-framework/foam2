@@ -110,7 +110,7 @@ foam.CLASS({
           ]).then((capAndSections) => {
             return {
               caps: capAndSections[0],
-              wizSec: capAndSections[1]
+              wizCaps: capAndSections[1]
                 .filter(wizardSection =>
                   wizardSection.ucj === null ||
                   (
@@ -138,7 +138,7 @@ foam.CLASS({
           return ctrl.add(this.Popup.create({ closeable: false }).tag({
             class: 'foam.u2.wizard.StepWizardletView',
             data: foam.u2.wizard.StepWizardletController.create({
-              wizardlets: capabilitiesSections.wizSec
+              wizardlets: capabilitiesSections.wizCaps
             }),
             onClose: (x) => {
               this.finalOnClose(x, capabilitiesSections.caps);
