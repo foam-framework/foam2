@@ -99,6 +99,11 @@ foam.CLASS({
       name: 'onClose',
       class: 'Function',
       factory: () => () => {}
+    },
+    {
+      name: 'showDiscardOption',
+      class: 'Boolean',
+      value: false
     }
   ],
 
@@ -191,6 +196,9 @@ foam.CLASS({
     {
       name: 'discard',
       label: 'Discard Changes',
+      isAvailable: function () {
+        return this.showDiscardOption;
+      },
       confirmationRequired: true,
       code: function(x) {
         this.onClose(x);
