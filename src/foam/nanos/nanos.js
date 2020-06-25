@@ -112,8 +112,6 @@ FOAM_FILES([
   { name: "foam/nanos/theme/Themes" },
   { name: "foam/nanos/bench/Benchmark" },
   { name: "foam/nanos/boot/DAOConfigSummaryView", flags: ['web'] },
-  { name: "foam/nanos/column_config/ColumnConfigPropertyValue"},
-  { name: "foam/nanos/column_config/CSVTableOutputter"},
   { name: "foam/nanos/boot/DAONSpecMenu" },
   { name: "foam/nanos/session/Session" },
   { name: "foam/nanos/session/SessionTimer" },
