@@ -107,21 +107,17 @@ foam.CLASS({
         should be disabled.
       `,
       expression: function (subStack$pos) {
-        let indices = this.screenIndexToSection(subStack$pos);
-        let wIndex = indices[0]; // Wizardlet index
-        let sIndex = indices[1]; // Section index
+        let previousScreenPos = subStack$pos - 1;
+        if ( previousScreenPos < 0 ) return false;
 
-        if ( sIndex > 0 ) {
-          for ( let i = 0 ; i < sIndex ; i++ ) {
-            if ( this.sectionAvailableSlots[wIndex][i].get() ) {
-              return true;
-            }
+        for ( let i = previousScreenPos ; i >= 0 ; i-- ) {
+          let indices = this.screenIndexToSection(i);
+          let wIndex = indices[0]; // Wizardlet index
+          let sIndex = indices[1]; // Section index
+
+          if ( this.sectionAvailableSlots[wIndex][sIndex].get() ) {
+            return true;
           }
-          return false;
-        }
-
-        for ( let i = 0 ; i < wIndex ; i++ ) {
-          if ( this.countAvailableSections(i) > 0 ) return true;
         }
         return false;
       }
@@ -242,6 +238,15 @@ foam.CLASS({
     },
     function back() {
       this.subStack.back();
+
+      // Call back again if this section is unavailable
+      let sectionIndices = this.screenIndexToSection(this.subStack.pos);
+      let wizardletIndex = sectionIndices[0];
+      let sectionIndex = sectionIndices[1];
+      let slot = this.sectionAvailableSlots[wizardletIndex][sectionIndex];
+      if ( ! slot.get() ) {
+        return this.back();
+      }
     },
     // Returns a tuple of two indices, 0: index corresponding to the wizardlet;
     // and 1: index corresponding to the section under that wizardlet.

@@ -93,7 +93,6 @@ FOAM_FILES([
   { name: "foam/core/Serializable" },
   { name: "foam/core/Freezable" },
   { name: "foam/core/Detachable" },
-  { name: "foam/core/AbstractFObject" },
   { name: "foam/core/ContextAgent" },
   { name: "foam/core/CompoundContextAgency" },
   { name: "foam/core/Validatable" },
@@ -803,6 +802,7 @@ FOAM_FILES([
 
   { name: "foam/core/Unit" },
   { name: "foam/core/Currency" },
+  { name: "foam/core/NumberSet" },
 
   { name: "foam/util/concurrent/AbstractAssembly"},
   { name: "foam/util/concurrent/Assembly"},

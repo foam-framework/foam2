@@ -148,8 +148,8 @@ foam.CLASS({
           .start().addClass('label').add('Response').end()
           .start(this.NOTE).addClass('input-box').addClass('note').end()
           .add(
-            self.slot(function(dataType) {
-              if ( dataType == 'CSV' || dataType == 'GoogleSheets' || dataType == 'PDFGoogleSheets' ) {
+            self.slot(function(exportDriverReg$exportAllColumns) {
+              if ( exportDriverReg$exportAllColumns ) {
                 return self.E().start().addClass('label').startContext({ data: self }).tag(self.EXPORT_ALL_COLUMNS).endContext().end();
               }
             })
@@ -180,12 +180,14 @@ foam.CLASS({
         if ( this.exportAllColumns )
           this.filteredTableColumns = null;
     
-        this.note = this.exportData ?
-          await this.exportDriver.exportDAO(this.__context__, this.exportData) :
-          await this.exportDriver.exportFObject(this.__context__, this.exportObj);
-  
-        if ( this.exportAllColumns )
-          this.filteredTableColumns = filteredColumnsCopy;
+        try {
+          this.note = this.exportData ?
+            await this.exportDriver.exportDAO(this.__context__, this.exportData) :
+            await this.exportDriver.exportFObject(this.__context__, this.exportObj);
+        } finally {
+          if ( this.exportAllColumns )
+            this.filteredTableColumns = filteredColumnsCopy;
+        }
       }
     },
     {
@@ -227,9 +229,9 @@ foam.CLASS({
             document.body.appendChild(link);
             link.click();
           }
-
+        }).finally(() => {
           if ( this.exportAllColumns )
-          this.filteredTableColumns = filteredColumnsCopy;
+            this.filteredTableColumns = filteredColumnsCopy;
         });
       }
     },
@@ -243,14 +245,16 @@ foam.CLASS({
         var filteredColumnsCopy = this.filteredTableColumns;
         if ( this.exportAllColumns )
           this.filteredTableColumns = null;
-
-        var url = this.exportData ?
-          await this.exportDriver.exportDAO(this.__context__, this.exportData) :
-          await this.exportDriver.exportFObject(this.__context__, this.exportObj);
-        
-        if ( this.exportAllColumns )
-          this.filteredTableColumns = filteredColumnsCopy;
-
+          
+        var url;
+        try {
+          url = this.exportData ?
+            await this.exportDriver.exportDAO(this.__context__, this.exportData) :
+            await this.exportDriver.exportFObject(this.__context__, this.exportObj);
+        } finally {
+          if ( this.exportAllColumns )
+            this.filteredTableColumns = filteredColumnsCopy;
+        }
         if ( url && url.length > 0 )
           window.location.replace(url);
       }
