@@ -10,34 +10,37 @@ foam.CLASS({
       factory: function() {
         return foam.nanos.google.api.sheets.GoogleSheetsImportConfig.create({importClassInfo: this.__context__.data.of});
       }
-    },
-    {
-      name: 'columns',
-      class: 'FObjectArray',
-      of: 'foam.nanos.google.api.sheets.ColumnHeaderToPropertyName'
-    }
+    }//,
+    // {
+    //   name: 'columns',
+    //   class: 'FObjectArray',
+    //   of: 'foam.nanos.google.api.sheets.ColumnHeaderToPropertyName'
+    // }
   ],
   methods: [
     function initE() {
       var self = this;
+      //!!! on Column header not being mapped show warning which says: 
+      //Data for column with header ______ cannot be imported. 
+      //You can import your data but this column will be ignored
       this.SUPER();
       this
       .startContext({ data: this })
         .tag(this.importConfig)
-        .add(this.slot(function(columns){
-          return this.E().forEach(columns, function(c) {
-            this.start()
-              .start({class: 'foam.u2.TextField',
-                data: c.columnHeader
-              })
-                .style({ 'background-color': c.prop ? 'none' : '#fbedec',
-                         'color': c.prop ? 'none' : '#a61414' })
-                .setAttribute('readonly', true)
-              .end()
-            .end();
-            //if c.prop.label doesn't exist add error message
-          });
-        }))
+        // .add(this.slot(function(importConfig$columnHeaderPropertyMappings){
+        //   return this.E().forEach(importConfig$columnHeaderPropertyMappings, function(c) {
+        //     this.start()
+        //       .start({class: 'foam.u2.TextField',
+        //         data: c.columnHeader
+        //       })
+        //         .style({ 'background-color': c.prop ? 'none' : '#fbedec',
+        //                  'color': c.prop ? 'none' : '#a61414' })
+        //         .setAttribute('readonly', true)
+        //       .end()
+        //     .end();
+        //     //if c.prop.label doesn't exist add error message
+        //   });
+        // }))
         .start().show(this.showAction$).addClass(this.myClass('btn-box'))
           .tag(this.CANCEL, {
             buttonStyle: 'SECONDARY',
@@ -78,10 +81,9 @@ foam.CLASS({
           if ( columnHeaders ) {
             var arr = [];
             for ( var columnHeader of columnHeaders ) {
-              arr.push(foam.nanos.google.api.sheets.ColumnHeaderToPropertyName.create({ of: this.importConfig.importClassInfo, columnHeader: columnHeader }));
+              arr.push(foam.nanos.google.api.sheets.ColumnHeaderToPropertyName.create({ of: this.importConfig.importClassInfo, columnHeader: columnHeader, prop: this.importConfig.importClassInfo.getAxiomsByClass(foam.core.Property).find(p => ! p.networkTransient && ! foam.core.FObjectProperty.isInstance(p) && p.label === columnHeader) }));
             }
-            this.columns = arr;
-            importConfig.columnHeaderPropertyMappings = this.columns;
+            this.importConfig.columnHeaderPropertyMappings = arr;
           }          
         });
       }
@@ -89,8 +91,8 @@ foam.CLASS({
     {
       name: 'importData',
       label: 'Import',
-      isEnabled: function(columns) {
-        return ! columns.some(c => ! ( c && c.prop ) );
+      isEnabled: function(importConfig$columnHeaderPropertyMappings) {
+        return ! importConfig$columnHeaderPropertyMappings.some(c => ! ( c && c.prop ) );
       },
       code: function(X) {
         X.googleSheetsDataImport.importData(X, this.importConfig).then(r => 
@@ -113,20 +115,19 @@ foam.CLASS({
     {
       name: 'columnHeader',
       class: 'String',
-      postSet: function() {
-        this.prop = this.of.getAxiomsByClass(foam.core.Property).find(p => ! p.networkTransient && ! foam.core.FObjectProperty.isInstance(p) && p.label === this.columnHeader);
-      },
       visibility: 'RO'
     },
     {
       name: 'prop',
-      class: 'Object',
-      javaType: 'foam.core.PropertyInfo',
+      class: 'foam.mlang.ExprProperty',
+      //javaType: 'foam.core.PropertyInfo',
       visibility: 'RO',
-      view: {
-        class: 'foam.u2.TextField',
-        data: this.prop$label
-      },
+      hidden: true,
+      javaJSONParser: 'foam.lib.json.ExprParser.instance()',
+      // view: {
+      //   class: 'foam.u2.TextField',
+      //   data: this.prop$label
+      // },
     }
   ]
 });

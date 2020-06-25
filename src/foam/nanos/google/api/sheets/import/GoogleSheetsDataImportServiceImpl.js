@@ -7,11 +7,21 @@ foam.CLASS({
   javaImports: [
     'com.google.api.services.sheets.v4.model.ValueRange',
 
+    'foam.core.FObject',
+    'foam.core.PropertyInfo',
+
     'java.lang.Throwable',
     'java.util.ArrayList',
     'java.util.List',
     'java.util.regex.Matcher',
     'java.util.regex.Pattern',
+
+    'foam.dao.DAO',
+    'foam.nanos.boot.NSpec', 
+
+    'static foam.mlang.MLang.AND',
+    'static foam.mlang.MLang.CONTAINS_IC',
+    'static foam.mlang.MLang.EQ'
   ],
   axioms: [
     {
@@ -94,7 +104,6 @@ foam.CLASS({
       GoogleSheetsApiService googleSheetsAPIEnabler = (GoogleSheetsApiService)x.get("googleSheetsDataExport");
       ValueRange values;
       try {
-
         //to calculate column headers row
         String[] rangeLimits = importConfig.getCellsRange().split(":");
         Matcher m = digitAppearenceRegex.matcher(rangeLimits[0]);
@@ -143,6 +152,31 @@ foam.CLASS({
         ValueRange values;
         try {
           values = googleSheetsAPIEnabler.getValues(x, importConfig.getGoogleSpreadsheetId(), importConfig.getCellsRange());
+          List<List<Object>> data = values.getValues();
+          List<String> columnHeaders = new ArrayList<>();
+
+          for ( int i = 0 ; i <  data.get(0).size() ; i++ ) {
+            columnHeaders.add(data.get(0).get(i).toString());
+          }
+
+          List<FObject> objs = new ArrayList<>();
+    
+          for ( int i = 1 ; i < data.size() ; i++ ) {
+            Object obj = importConfig.getImportClassInfo().newInstance();
+            for ( int j = 0 ; j < importConfig.getColumnHeaderPropertyMappings().length ; j ++ ) {
+              int columnIndex = columnHeaders.indexOf(importConfig.getColumnHeaderPropertyMappings()[j].getColumnHeader());
+              ((PropertyInfo)importConfig.getColumnHeaderPropertyMappings()[j].getProp()).set(obj, data.get(i).get(columnIndex));
+            }
+            objs.add((FObject)obj);
+          }
+
+          DAO nspecDAO = (DAO) x.get("nSpecDAO");
+          NSpec nsp = (NSpec) nspecDAO.find(AND(CONTAINS_IC(NSpec.ID, "DAO"), CONTAINS_IC(NSpec.CLIENT, importConfig.getImportClassInfo().getId())));
+          if ( nsp == null ) return false;
+          DAO dao  = (DAO)x.get(nsp.getId());
+          for ( FObject obj: objs) {
+            dao.put(obj);
+          }
         } catch(Exception e) {
           System.out.println(e);
           return false;

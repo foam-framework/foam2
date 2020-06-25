@@ -10,12 +10,12 @@ foam.CLASS({
       javaType: 'foam.core.ClassInfo',
       hidden: true,
     },
-    {
-      class: 'FObjectArray',
-      of: 'foam.nanos.google.api.sheets.ColumnPropertyMapping',
-      name: 'columnToPropertyNameMapping',
-      documentation: 'not much use for this prop for not nested columns. but nexted columns will contain mapping eg "column: city, property: address.city"'
-    },
+    // {
+    //   class: 'FObjectArray',
+    //   of: 'foam.nanos.google.api.sheets.ColumnPropertyMapping',
+    //   name: 'columnToPropertyNameMapping',
+    //   documentation: 'not much use for this prop for not nested columns. but nexted columns will contain mapping eg "column: city, property: address.city"'
+    // },
     {
       name: 'googleSheetLink',
       class: 'String',
@@ -71,7 +71,8 @@ foam.CLASS({
     {
       name: 'columnHeaderPropertyMappings',
       class: 'FObjectArray',
-      of: 'foam.nanos.google.api.sheets.ColumnHeaderToPropertyName'
+      of: 'foam.nanos.google.api.sheets.ColumnHeaderToPropertyName',
+      visibility: 'RO'
     }
     // {
     //   name: 'statusUpdateColumn',
