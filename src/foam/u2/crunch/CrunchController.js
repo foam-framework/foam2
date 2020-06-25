@@ -126,20 +126,19 @@ foam.CLASS({
     },
 
     function generateSections(generatedWizardlets) {
-      // return Promise.resolve(
-      return Promise.all([
-          generatedWizardlets.map((wizardlet) => {
-            this.AbstractSectionedDetailView.create({
-              of: wizardlet.of,
-            }).sections;
-          })
-        ]);
-      // );
+      return generatedWizardlets.map(wizardlet =>
+        this.AbstractSectionedDetailView.create({
+          of: wizardlet.of,
+        }).sections);
     },
 
-    function callWizard(capabilityId) {
+    async function callWizard(capabilityId) {
       return this.getCapsAndWizardlets(capabilityId)
         .then((capabilitiesSections) => {
+          // generate and popUp summary view (CapabilityRequirmentView) before wizard
+          var sectionList = this.generateSections(capabilitiesSections.wizSec);
+          this.onStartShowPopRequirements(sectionList);
+          // call wizard
           return ctrl.add(this.Popup.create({ closeable: false }).tag({
             class: 'foam.u2.wizard.StepWizardletView',
             data: foam.u2.wizard.StepWizardletController.create({
@@ -221,6 +220,13 @@ foam.CLASS({
         .end()
       );
       return intercept.promise;
-    }
+    },
+
+    function onStartShowPopRequirements(sectionsList) {
+      var arrOfRequiredCapabilities = sectionsList.flat()
+        .filter(eachSection => eachSection && eachSection.help)
+        .map(eachSection => eachSection.help);
+      return self.ctrl.start().add(foam.u2.dialog.Popup.create().tag({ class: 'foam.u2.crunch.CapabilityRequirementView', arrayRequirement: arrOfRequiredCapabilities })).end();
+    },
   ]
 });
