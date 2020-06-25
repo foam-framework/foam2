@@ -27,21 +27,27 @@ foam.CLASS({
     { name: 'CREATE_ERROR_MSG', message: 'Unexpected error creating history record for' }
   ],
 
+  properties: [
+    {
+      class: 'FObjectProperty',
+      of: 'foam.dao.DAO',
+      name: 'historyDAO_'
+    }
+  ],
+
   axioms: [
     {
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(
           `
-            protected DAO historyDAO_;
-
             public HistoryDAO(X x, String historyDAO, DAO delegate) {
               this(x, (DAO) x.get(historyDAO), delegate);
             }
           
             public HistoryDAO(X x, DAO historyDAO, DAO delegate) {
               super(x, delegate);
-              historyDAO_ = historyDAO;
+              setHistoryDAO_(historyDAO);
             } 
           `
         );
@@ -107,7 +113,7 @@ foam.CLASS({
             historyRecord.setUpdates(getUpdatedProperties(current, obj));
           }
     
-          historyDAO_.put_(x, historyRecord);
+          getHistoryDAO_().put_(x, historyRecord);
         } catch (Throwable t) {
           Logger l = (Logger) x.get("logger");
           l.error(CREATE_ERROR_MSG, obj.getClassInfo().getId(), t);
@@ -120,7 +126,7 @@ foam.CLASS({
       name: 'remove_',
       javaCode: `
         Object objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
-        historyDAO_.where(EQ(HistoryRecord.OBJECT_ID, objectId)).removeAll();
+        getHistoryDAO_().where(EQ(HistoryRecord.OBJECT_ID, objectId)).removeAll();
         return super.remove_(x, obj);
       `
     }

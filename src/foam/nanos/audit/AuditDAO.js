@@ -23,12 +23,14 @@ foam.CLASS({
     'java.util.Map'
   ],
 
-  axioms: [
+  properties: [
     {
-      name: 'javaExtras',
-      buildJavaClass: function(cls) {
-        cls.extras.push(`protected final Outputter outputter = new Outputter(getX());`);
-      }
+      class: 'Object',
+      name: 'outputter',
+      javaType: 'foam.lib.json.Outputter',
+      javaFactory: `
+        return new Outputter(getX());
+      `
     }
   ],
 
@@ -74,8 +76,8 @@ foam.CLASS({
         Logger logger   = (Logger) x.get("logger");
         Object objectId = obj.getProperty("id");
 
-        outputter.output(obj);
-        logger.info("REMOVE", objectId, user.getId(), outputter.toString());
+        getOutputter().output(obj);
+        logger.info("REMOVE", objectId, user.getId(), getOutputter().toString());
 
         return super.remove_(x, obj);
       `
