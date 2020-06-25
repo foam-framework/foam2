@@ -88,7 +88,8 @@ foam.CLASS({
         }
       `,
       getter: function(){
-        if ( foam.Undefined.isInstance(this.dataString) ) {
+      debugger;
+        if ( this.dataString ) {
           let b64Data = this.dataString.split(',')[1];
           const b64toBlob = (b64Data, contentType=this.mimeType, sliceSize=512) => {
             const byteCharacters = atob(b64Data);
