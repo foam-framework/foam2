@@ -169,7 +169,7 @@ foam.CLASS({
           this.EQ(this.UserCapabilityJunction.TARGET_ID, capabilityId)
         ));
       if ( ucj ) {
-        var statusGranted = foam.util.equals(ucj.status, this.CapabilityJunctionStatus.GRANTED);
+        var statusGranted = ucj.status === this.CapabilityJunctionStatus.GRANTED;
         var statusPending = foam.util.equals(ucj.status, this.CapabilityJunctionStatus.PENDING);
         if ( statusGranted || statusPending ) {
           var message = statusGranted ? this.CANNOT_OPEN_GRANTED : this.CANNOT_OPEN_PENDING;
