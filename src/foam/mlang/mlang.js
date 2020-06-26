@@ -3956,6 +3956,39 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.mlang.predicate',
+  name: 'ContextAwarePredicate',
+  extends: 'foam.mlang.predicate.AbstractPredicate',
+  implements: [ 'foam.core.Serializable' ],
+
+  documentation: 'Predicate which provides obj context to f_().',
+
+  javaImports: [
+    'foam.core.ContextAware'
+  ],
+
+  methods: [
+    {
+      name: 'f',
+      code: function(obj) { return this.f_(this.__context__, obj); },
+      javaCode: `
+        var x = obj instanceof ContextAware ? ((ContextAware) obj).getX() : getX();
+        return f_(x, obj);
+      `
+    },
+    {
+      name: 'f_',
+      type: 'Boolean',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'obj', type: 'Any' }
+      ],
+      javaCode: 'throw new RuntimeException("Unimplemented f_() method.");'
+    }
+  ]
+});
+
 // TODO(braden): We removed Expr.pipe(). That may still be useful to bring back,
 // probably with a different name. It doesn't mean the same as DAO.pipe().
 // remove eof()
