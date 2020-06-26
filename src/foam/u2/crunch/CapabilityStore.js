@@ -191,11 +191,12 @@ foam.CLASS({
       var sectionElement = this.E();
 
       // Promise 'p' reports capability IDs that are in this category
-      var p = self.getCategoryDAO_(category.id)
-        .select().then(arraySink => arraySink.array.map(x => x.targetId) );
+      var p = self.getCategoryDAO_(category.id).select(self.PROJECTION(self.CapabilityCategoryCapabilityJunction.TARGET_ID));
+      
 
       // When 'p' resolves, query all matching capabilities
-      p.then(capabilityIds => {
+      p.then(arraySink => {
+        capabilityIds = arraySink.array;
         self.visibleCapabilityDAO.where(
           self.IN(self.Capability.ID, capabilityIds)
         ).select().then((result) => {

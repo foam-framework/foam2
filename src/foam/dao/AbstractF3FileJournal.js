@@ -216,8 +216,7 @@ try {
             }
           }
 
-// TODO: always flush if isLast()
-          public void endJob() {
+          public void endJob(boolean isLast) {
             if ( fmt.builder().length() == 0 ) return;
 
             try {
@@ -228,7 +227,7 @@ try {
                 getMultiLineOutput() ? "\\n" : "",
                 foam.util.SafetyUtil.isEmpty(prefix) ? "" : prefix + ".");
 
-              if ( isLast() ) getWriter().flush();
+              if ( isLast ) getWriter().flush();
             } catch (Throwable t) {
               getLogger().error("Failed to write put entry to journal", t);
             }
@@ -284,14 +283,14 @@ try {
           }
         }
 
-        public void endJob() {
+        public void endJob(boolean isLast) {
           if ( fmt.builder().length() == 0 ) return;
 
           try {
             writeComment_(x, obj);
             writeRemove_(x, fmt.builder(), foam.util.SafetyUtil.isEmpty(prefix) ? "" : prefix + ".");
 
-            if ( isLast() ) getWriter().flush();
+            if ( isLast ) getWriter().flush();
           } catch (Throwable t) {
             getLogger().error("Failed to write put entry to journal", t);
           }

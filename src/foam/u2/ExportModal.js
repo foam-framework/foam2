@@ -65,7 +65,8 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'isOpenAvailable'
-    }
+    },
+    'exportDriver'
   ],
 
   css: `
@@ -114,12 +115,14 @@ foam.CLASS({
       self.exportDriverRegistryDAO.where(self.predicate).select().then(function(val) {
         self.exportDriverRegistryDAO.find(val.array[0].id).then(function(val) {
           self.exportDriverReg = val;
+          self.exportDriver = foam.lookup(self.exportDriverReg.driverName).create();
         });
       });
 
       self.dataType$.sub(function() {
         self.exportDriverRegistryDAO.find(self.dataType).then(function(val) {
           self.exportDriverReg = val;
+          self.exportDriver = foam.lookup(self.exportDriverReg.driverName).create();
         });
       });
       
@@ -139,6 +142,9 @@ foam.CLASS({
         .start()
           .start().addClass('label').add('Data Type').end()
           .start(this.DATA_TYPE).end()
+          .add(this.slot(function (exportDriver) {
+            return this.E().add(exportDriver);
+          }))
           .start().addClass('label').add('Response').end()
           .start(this.NOTE).addClass('input-box').addClass('note').end()
           .add(
@@ -173,13 +179,11 @@ foam.CLASS({
         var filteredColumnsCopy = this.filteredTableColumns;
         if ( this.exportAllColumns )
           this.filteredTableColumns = null;
-  
-        var exportDriver = foam.lookup(this.exportDriverReg.driverName).create();
-  
+    
         try {
           this.note = this.exportData ?
-            await exportDriver.exportDAO(this.__context__, this.exportData) :
-            await exportDriver.exportFObject(this.__context__, this.exportObj);
+            await this.exportDriver.exportDAO(this.__context__, this.exportData) :
+            await this.exportDriver.exportFObject(this.__context__, this.exportObj);
         } finally {
           if ( this.exportAllColumns )
             this.filteredTableColumns = filteredColumnsCopy;
@@ -201,12 +205,10 @@ foam.CLASS({
         var filteredColumnsCopy = this.filteredTableColumns;
         if ( this.exportAllColumns )
           this.filteredTableColumns = null;
-  
-        var exportDriver    = foam.lookup(this.exportDriverReg.driverName).create();
-  
+    
         var p = this.exportData ?
-          exportDriver.exportDAO(this.__context__, this.exportData) :
-          Promise.resolve(exportDriver.exportFObject(this.__context__, this.exportObj));
+          this.exportDriver.exportDAO(this.__context__, this.exportData) :
+          Promise.resolve(this.exportDriver.exportFObject(this.__context__, this.exportObj));
   
         p.then(result => {
           var link = document.createElement('a');
@@ -243,12 +245,12 @@ foam.CLASS({
         var filteredColumnsCopy = this.filteredTableColumns;
         if ( this.exportAllColumns )
           this.filteredTableColumns = null;
-
-        var exportDriver    = foam.lookup(this.exportDriverReg.driverName).create();
+          
+        var url;
         try {
-          var url = this.exportData ?
-            await exportDriver.exportDAO(this.__context__, this.exportData) :
-            await exportDriver.exportFObject(this.__context__, this.exportObj);
+          url = this.exportData ?
+            await this.exportDriver.exportDAO(this.__context__, this.exportData) :
+            await this.exportDriver.exportFObject(this.__context__, this.exportObj);
         } finally {
           if ( this.exportAllColumns )
             this.filteredTableColumns = filteredColumnsCopy;
