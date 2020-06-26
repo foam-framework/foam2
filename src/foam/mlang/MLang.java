@@ -7,6 +7,8 @@
 package foam.mlang;
 
 import foam.core.ClassInfo;
+import foam.core.ContextAware;
+import foam.core.EmptyX;
 import foam.core.X;
 import foam.dao.Sink;
 import foam.mlang.expr.*;
@@ -37,9 +39,19 @@ public class MLang
   }
 
   public static Expr prepare(Object o) {
-    return o instanceof Expr ? (Expr) o :
+    var expr = o instanceof Expr ? (Expr) o :
         o instanceof Object[] ? new ArrayConstant((Object[]) o) :
         new Constant(o);
+    return maybeContextualize(getX(o), expr);
+  }
+
+  private static Expr maybeContextualize(X x, Expr expr) {
+    return x != EmptyX.instance() ? new ContextualizingExpr(x, expr) : expr;
+  }
+
+  private static X getX(Object o) {
+    return o instanceof ContextAware ? ((ContextAware) o).getX() :
+      EmptyX.instance();
   }
 
   public static Predicate LT(Object o1, Object o2) {
