@@ -18,7 +18,6 @@ foam.CLASS({
       javaCode: `
         Notification notification = (Notification) obj;
         if ( notification.getTransient() == true ) {
-          System.out.println("TRANSIENT");
           return notification;
         }
         return getDelegate().put_(x, notification);
