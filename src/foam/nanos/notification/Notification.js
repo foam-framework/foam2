@@ -134,8 +134,7 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'transient',
-      transient: true
+      name: 'transient'
     },
     {
       class: 'Boolean',

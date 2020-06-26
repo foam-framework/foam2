@@ -127,32 +127,6 @@ p({
 
 p({
   "class":"foam.nanos.boot.NSpec",
-  "name":"userNotificationDAO",
-  "lazy":false,
-  "serve": true,
-  "description": "filtered notificationDAO for user notifications",
-  "serviceScript": """
-    return new foam.dao.EasyDAO.Builder(x)
-      .setOf(foam.nanos.notification.Notification.getOwnClassInfo())
-      .setInnerDAO((foam.dao.DAO) x.get("notificationDAO"))
-      .setAuthorize(true)
-      .setDecorator(
-        new foam.dao.FilteredDAO.Builder(x)
-          .setPredicate(foam.mlang.MLang.EQ(foam.nanos.notification.Notification.USER_ID, ((foam.nanos.auth.Subject) x.get("subject")).getUser().getId()))
-          .setDelegate(new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.notification.Notification.getOwnClassInfo()).build())
-        .build())
-      .build();
-  """,
-  "client": """
-    {
-      "of": "foam.nanos.notification.Notification", 
-      "remoteListenerSupport": true
-    }
-  """
-})
-
-p({
-  "class":"foam.nanos.boot.NSpec",
   "name":"pop3",
   "lazy":true,
   "serve":true,
