@@ -41,10 +41,12 @@ foam.CLASS({
       value: 'foam.u2.DetailView'
     },
     {
+      name: 'factory',
+      factory: function() { return this.dao ? this.dao.of : () => null; }
+    },
+    {
       name: 'data',
-      factory: function() {
-        return this.dao ? this.dao.of.create({}, this) : null;
-      }
+      factory: function() { return this.factory.create({}, this); }
     }
   ],
 

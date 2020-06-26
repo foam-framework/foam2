@@ -111,14 +111,12 @@ foam.CLASS({
           ]).then((capAndSections) => {
             return {
               caps: capAndSections[0],
-              wizSec: capAndSections[1]
-                .filter(wizardSection =>
+              wizCaps: capAndSections[1]
+                .filter((wizardSection) =>
                   wizardSection.ucj === null ||
                   (
-                    ! foam.util.equals(wizardSection.ucj.status,
-                      this.CapabilityJunctionStatus.GRANTED ) &&
-                    ! foam.util.equals(wizardSection.ucj.status,
-                      this.CapabilityJunctionStatus.PENDING )
+                    ! wizardSection.ucj.status === this.CapabilityJunctionStatus.GRANTED &&
+                    ! wizardSection.ucj.status === this.CapabilityJunctionStatus.PENDING
                   )
                 )
             };

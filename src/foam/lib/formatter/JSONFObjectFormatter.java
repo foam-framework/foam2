@@ -7,6 +7,7 @@
 package foam.lib.formatter;
 
 import foam.core.ClassInfo;
+import foam.core.FEnum;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.core.X;
@@ -69,13 +70,13 @@ public class JSONFObjectFormatter
     }
   };
 
-  protected boolean quoteKeys_           = false;
-  protected boolean outputShortNames_    = true;
-  protected boolean outputDefaultValues_ = false;
-  protected boolean multiLineOutput_     = false;
-  protected boolean outputReadableDates_ = true;
-  protected boolean outputDefaultClassNames_ = false;
-  protected boolean outputClassNames_    = true;
+  protected boolean quoteKeys_               = false;
+  protected boolean outputShortNames_        = true;
+  protected boolean outputDefaultValues_     = false;
+  protected boolean multiLineOutput_         = false;
+  protected boolean outputClassNames_        = true;
+  protected boolean outputReadableDates_     = false;
+  protected boolean outputDefaultClassNames_ = true;
 
   public JSONFObjectFormatter(X x) {
     super(x);
@@ -208,25 +209,21 @@ public class JSONFObjectFormatter
   }
   */
 
-  public void output(Enum<?> value) {
-    output(value.ordinal());
 
-//    outputNumber(value.ordinal());
-/*
+  public void outputEnumValue(FEnum value) {
     b_.append('{');
-      b_.append(beforeKey_());
-      b_.append("class");
-      b_.append(afterKey_());
-      b_.append(':');
-      output(value.getClass().getName());
-      b_.append(",");
-      b_.append(beforeKey_());
-      b_.append("ordinal");
-      b_.append(afterKey_());
-      b_.append(':');
-      outputNumber(value.ordinal());
+    outputKey("class");
+    b_.append(':');
+    output(value.getClass().getName());
+    b_.append(',');
+    outputKey("ordinal");
+    b_.append(':');
+    outputNumber(value.getOrdinal());
     b_.append('}');
-    */
+  }
+
+  public void outputEnum(FEnum value) {
+    output(value.getOrdinal());
   }
 
   public void output(Object value) {
@@ -234,6 +231,8 @@ public class JSONFObjectFormatter
       ((OutputJSON) value).formatJSON(this);
     } else if ( value instanceof String ) {
       output((String) value);
+    } else if ( value instanceof FEnum ) {
+      outputEnumValue((FEnum) value);
     } else if ( value instanceof FObject ) {
       output((FObject) value);
     } else if ( value instanceof PropertyInfo) {
@@ -253,13 +252,11 @@ public class JSONFObjectFormatter
     } else if ( value instanceof Boolean ) {
       outputBoolean((Boolean) value);
     } else if ( value instanceof Date ) {
-      output((Date) value);
+      outputDateValue((Date) value);
     } else if ( value instanceof Map ) {
       output((Map) value);
     } else if ( value instanceof List ) {
       output((List) value);
-    } else if ( value instanceof Enum<?> ) {
-      output((Enum<?>) value);
     } else /*if ( value == null )*/ {
       b_.append("null");
     }
@@ -271,20 +268,19 @@ public class JSONFObjectFormatter
       value.getClass().isArray();
   }
 
+  /** Called when outputting a Date from an Object field so that the type is know. **/
   public void outputDateValue(Date date) {
-    if ( outputReadableDates_ )
+    b_.append("{\"class\":\"__Timestamp__\",\"value\":");
+    if ( outputReadableDates_ ) {
       output(sdf.get().format(date));
-    else
+    } else {
       outputNumber(date.getTime());
+    }
+    b_.append('}');
   }
 
   public void output(Date date) {
     output(date.getTime());
-    /*
-    b_.append("{\"class\":\"__Timestamp__\",\"value\":");
-    outputDateValue(date);
-    b_.append('}');
-    */
   }
 
   protected Boolean maybeOutputProperty(FObject fo, PropertyInfo prop, boolean includeComma) {
@@ -363,6 +359,14 @@ public class JSONFObjectFormatter
   }
 
   public void output(FObject[] arr) {
+
+    b_.append('[');
+    for ( int i = 0 ; i < arr.length ; i++ ) {
+      output(arr[i]);
+      if ( i < arr.length - 1 ) b_.append(',');
+    }
+    b_.append(']');
+
   }
 
   public void output(FObject o, ClassInfo defaultClass) {
@@ -481,7 +485,7 @@ public class JSONFObjectFormatter
     return this;
   }
 
-  protected void outputKey(String val) {
+  public void outputKey(String val) {
     if ( quoteKeys_ ) appendQuote();
     b_.append(val);
     if ( quoteKeys_ ) appendQuote();

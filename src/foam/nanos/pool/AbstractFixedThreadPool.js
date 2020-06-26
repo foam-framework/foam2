@@ -11,9 +11,21 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'String',
+      name: 'prefix',
+      value: 'nanos'
+    },
+    {
+      name: 'threadsPerCore',
+      class: 'Int',
+      value: 8
+    },
+    {
       class: 'Int',
       name: 'numberOfThreads',
-      javaFactory: 'return Runtime.getRuntime().availableProcessors();'
+      javaFactory: `
+      return getThreadsPerCore() * Runtime.getRuntime().availableProcessors();
+      `
     },
     {
       class: 'Long',
