@@ -9,8 +9,10 @@ foam.CLASS({
 
     'foam.core.FObject',
     'foam.core.PropertyInfo',
+    'foam.core.AbstractEnumPropertyInfo',
 
     'java.lang.Throwable',
+    'java.math.BigDecimal',
     'java.util.ArrayList',
     'java.util.List',
     'java.util.regex.Matcher',
@@ -166,7 +168,28 @@ foam.CLASS({
             for ( int j = 0 ; j < importConfig.getColumnHeaderPropertyMappings().length ; j ++ ) {
               if ( importConfig.getColumnHeaderPropertyMappings()[j].getProp() == null ) continue;
               int columnIndex = columnHeaders.indexOf(importConfig.getColumnHeaderPropertyMappings()[j].getColumnHeader());
-              ((PropertyInfo)importConfig.getColumnHeaderPropertyMappings()[j].getProp()).set(obj, data.get(i).get(columnIndex));
+              Object val = data.get(i).get(columnIndex);
+              PropertyInfo prop = ((PropertyInfo)importConfig.getColumnHeaderPropertyMappings()[j].getProp());
+              if ( val instanceof BigDecimal ) {
+                switch (prop.getValueClass().getName()) {
+                  case "long":
+                    if ( prop.getName().equals("amount") ) prop.set(obj, Math.round(((BigDecimal) data.get(i).get(columnIndex)).doubleValue() * 100));
+                    else prop.set(obj, (long)(((BigDecimal) data.get(i).get(columnIndex)).doubleValue()));
+                    break;
+                  case "double":
+                    prop.set(obj, ((BigDecimal) data.get(i).get(columnIndex)).doubleValue());
+                    break;
+                  default:
+                    prop.set(obj, data.get(i).get(columnIndex));
+                    break;
+                }
+              }  else if ( prop instanceof AbstractEnumPropertyInfo)
+                prop.set(obj, ((AbstractEnumPropertyInfo)prop).getValueClass().getMethod("forLabel", String.class).invoke(null, data.get(i).get(columnIndex).toString()));
+              else if ( prop.getValueClass().getName().equals("java.util.Date") ) {
+                prop.set(obj, new java.util.Date(data.get(i).get(columnIndex).toString()));
+              }
+              else
+                prop.set(obj, data.get(i).get(columnIndex));
             }
             objs.add((FObject)obj);
           }
