@@ -3960,6 +3960,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'ContextAwarePredicate',
   extends: 'foam.mlang.predicate.AbstractPredicate',
+  abstract: true,
   implements: [ 'foam.core.Serializable' ],
 
   documentation: 'Predicate which provides obj context to f_().',
@@ -3980,11 +3981,45 @@ foam.CLASS({
     {
       name: 'f_',
       type: 'Boolean',
+      abstract: true,
       args: [
         { name: 'x', type: 'Context' },
         { name: 'obj', type: 'Any' }
-      ],
-      javaCode: 'throw new RuntimeException("Unimplemented f_() method.");'
+      ]
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang',
+  name: 'ContextAwareExpr',
+  extends: 'foam.mlang.AbstractExpr',
+  abstract: true,
+  implements: [ 'foam.core.Serializable' ],
+
+  documentation: 'Expression which provides obj context to f_().',
+
+  javaImports: [
+    'foam.core.ContextAware'
+  ],
+
+  methods: [
+    {
+      name: 'f',
+      code: function(obj) { return this.f_(this.__context__, obj); },
+      javaCode: `
+        var x = obj instanceof ContextAware ? ((ContextAware) obj).getX() : getX();
+        return f_(x, obj);
+      `
+    },
+    {
+      name: 'f_',
+      type: 'Object',
+      abstract: true,
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'obj', type: 'Any' }
+      ]
     }
   ]
 });
