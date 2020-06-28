@@ -14,23 +14,28 @@ foam.ENUM({
   values: [
     {
       name: 'MEDIATOR',
-      label: 'Mediator'
+      label: 'Mediator',
+      ordinal: 0
     },
     {
       name: 'NODE',
-      label: 'Node'
+      label: 'Node',
+      ordinal: 1
     },
     {
       name: 'NERF',
-      label: 'NERF'
+      label: 'NERF',
+      ordinal: 2
     },
     {
       name: 'ARCHIVE',
-      label: 'Archive'
+      label: 'Archive',
+      ordinal: 3
     },
     {
       name: 'OTHER',
-      label: 'Other'
+      label: 'Other',
+      ordinal: 4
     }
   ]
 });

@@ -36,7 +36,6 @@ p({
         .setSize(1000)
         .build())
       .setOrder(new foam.mlang.order.Comparator[] { new foam.mlang.order.Desc.Builder(x).setArg1(foam.nanos.script.ScriptEvent.LAST_RUN).build() })
-      .setCluster(false)
       .setRuler(false)
       .build();
   """,

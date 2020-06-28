@@ -349,6 +349,7 @@ foam.CLASS({
           event.setOwner(this.getId());
           event.setScriptId(this.getId());
           event.setHostname(System.getProperty("hostname", "localhost"));
+          event.setClusterable(this.getClusterable());
           ((DAO) x.get("scriptEventDAO")).put(event);
         } finally {
           Thread.currentThread().setPriority(Thread.NORM_PRIORITY);

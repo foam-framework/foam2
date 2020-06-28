@@ -15,19 +15,23 @@ foam.ENUM({
   values: [
     {
       name: 'ADJOURNED',
-      label: 'Adjourned'
+      label: 'Adjourned',
+      ordinal: 0
     },
     {
       name: 'ELECTION',
-      label: 'Election'
+      label: 'Election',
+      ordinal: 1
     },
     {
       name: 'VOTING',
-      label: 'Voting'
+      label: 'Voting',
+      ordinal: 2
     },
     {
       name: 'IN_SESSION',
-      label: 'In session'
+      label: 'In session',
+      ordinal: 3
     }
   ]
 });

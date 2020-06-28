@@ -16,11 +16,13 @@ foam.ENUM({
     {
       name: 'ONLINE',
       label: 'Online',
+      ordinal: 0,
       documentation: 'Active node'
     },
     {
       name: 'OFFLINE',
       label: 'Offline',
+      ordinal: 1,
       documentation: 'Removed from cluster considerations: failed, maintenance, etc '
     }
   ]
