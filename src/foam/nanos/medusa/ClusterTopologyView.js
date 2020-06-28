@@ -12,6 +12,7 @@ foam.CLASS({
   documentation: ``,
 
   requires: [
+    'foam.core.Duration',
     'foam.graphics.Arc',
     'foam.graphics.Box',
     'foam.graphics.Circle',
@@ -238,6 +239,7 @@ foam.CLASS({
     {
       name: 'refreshNode',
       code: function(cc) {
+        this.updateType(cc);
         this.updateStatus(cc);
         this.updatePrimary(cc);
         this.updateReplaying(cc);
@@ -271,19 +273,67 @@ foam.CLASS({
             cv.replayLabel = replayLabel;
             replayCircle.add(replayLabel);
           }
+          var etaLabel = cv.etaLabel;
+          if ( ! etaLabel ) {
+            etaLabel = this.Label.create({
+              align: 'center',
+              y: -15
+            });
+            cv.etaLabel = etaLabel;
+            replayCircle.add(etaLabel);
+          }
+          var statsLabel = cv.statsLabel;
+          if ( ! statsLabel ) {
+            statsLabel = this.Label.create({
+              align: 'center',
+              y: -15
+            });
+            cv.statsLabel = statsLabel;
+            //            replayCircle.add(statsLabel);
+            cv.findFirstChildAt = function(p) {
+              let c = cv.super.findFirstChildAt(p);
+              if ( c ) {
+                cv.add(cv.statsLabel);
+              } else {
+                cv.remove(cv.statsLabel);
+              }
+            };
+          }
           if ( cc.replayingInfo ) {
             if ( cc.replayingInfo.replaying &&
                  cc.replayingInfo.replayIndex > 0 )  {
               replayCircle.color = 'grey';
-              p = cc.replayingInfo.index / cc.replayingInfo.replayIndex;
-              replayCircle.start = (1 - p) * (2 * Math.PI);
+//              p = cc.replayingInfo.index / cc.replayingInfo.replayIndex;
+              replayCircle.start = (1 - cc.replayingInfo.percentComplete ) * (2 * Math.PI);
               // p = parseInt(p * 100);
               // replayLabel.text = p+'%';
+
+              // calculate ETA
+              // let delta = Date.now() - cc.replayingInfo.startTime.getTime();
+              // let rate = cc.replayingInfo.index / delta;
+              // let t = rate * (cc.replayingInfo.replayIndex - cc.replayingInfo.index); // ms
+              // let eta = this.Duration.create().format(t);
+              etaLabel.text = cc.percentComplete;
             } else {
               replayCircle.color = '';
-              replayLabel.text = cc.replayingInfo.index;
+              // let delta = cc.replayingInfo.endTime.getTime() - cc.replayingInfo.startTime.getTime();
+              // let eta = this.Duration.create().format(delta);
+              etaLabel.text = cc.eta;
             }
+            replayLabel.text = cc.replayingInfo.index;
+            statsLabel.text = cc.replayingInfo.index + '\n' + cc.replayingInfo.replayIndex;
           }
+        }
+      }
+    },
+    {
+      name: 'updateType',
+      code: function(cc) {
+        var cv = this.nodes.get(cc.id);
+        if ( cc.type == this.MedusaType.MEDIATOR ) {
+          cv.radius = this.nodeK * 1.5;
+        } else {
+          cv.radius = this.nodeK;
         }
       }
     },
@@ -292,7 +342,11 @@ foam.CLASS({
       code: function(cc) {
         var cv = this.nodes.get(cc.id);
         if ( cc.status == this.Status.OFFLINE ) {
-          cv.border = 'red';
+          if ( cc.errorMessage ) {
+            cv.border = 'red';
+          } else {
+            cv.border = 'orange';
+          }
         } else if ( cc.status == this.Status.ONLINE ) {
           cv.border = 'green';
         }
