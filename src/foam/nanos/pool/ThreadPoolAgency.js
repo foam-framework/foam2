@@ -58,6 +58,7 @@ foam.CLASS({
 
     public void run() {
       incrExecuting(1);
+      incrQueued(-1);
 
       Logger logger = (Logger) x_.get("logger");
       PM     pm     = new PM(this.getClass(), agent_.getClass().getSimpleName()+":"+description_);
@@ -133,9 +134,15 @@ foam.CLASS({
     },
     {
       name: 'incrQueued',
+      args: [
+        {
+          name: 'd',
+          type: 'int'
+        }
+      ],
       javaCode: `
     synchronized ( queuedLock_ ) {
-      setQueued(getQueued() + 1);
+      setQueued(getQueued() + d);
     }
       `
     },
@@ -163,7 +170,7 @@ foam.CLASS({
         }
       ],
       javaCode: `
-    incrQueued();
+    incrQueued(1);
     getPool().submit(new ContextAgentRunnable(x, agent, description));
      `
     }
