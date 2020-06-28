@@ -6,8 +6,9 @@
 
 package foam.mlang;
 
-import foam.core.ContextAware;
 import foam.core.X;
+
+import static foam.core.ContextAware.maybeContextualize;
 
 public class ContextualizingExpr extends ProxyExpr {
   private final X x_;
@@ -23,8 +24,6 @@ public class ContextualizingExpr extends ProxyExpr {
 
   @Override
   public Object f(Object obj) {
-    var result = super.f(obj);
-    if ( result instanceof ContextAware ) ((ContextAware) result).setX(getX());
-    return result;
+    return maybeContextualize(getX(), super.f(obj));
   }
 }
