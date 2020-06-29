@@ -33,6 +33,8 @@ foam.CLASS({
         cls.extras.push(foam.java.Code.create({
           data: `
           public static Pattern digitAppearenceRegex = Pattern.compile("(\\\\d){1}");
+          public static Pattern numbersRegex = Pattern.compile("\\\\d+(\\\\.\\\\d{1,2})?");
+          public static Pattern alphabeticalCharsRegex = Pattern.compile("[a-zA-Z]{1,}");
 
           public static List<String> alphabet = java.util.Arrays.asList(new String[] {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"});
           //so to calculate column in index that you need
@@ -170,26 +172,35 @@ foam.CLASS({
               int columnIndex = columnHeaders.indexOf(importConfig.getColumnHeaderPropertyMappings()[j].getColumnHeader());
               Object val = data.get(i).get(columnIndex);
               PropertyInfo prop = ((PropertyInfo)importConfig.getColumnHeaderPropertyMappings()[j].getProp());
-              if ( val instanceof BigDecimal ) {
-                switch (prop.getValueClass().getName()) {
-                  case "long":
-                    if ( prop.getName().equals("amount") ) prop.set(obj, Math.round(((BigDecimal) data.get(i).get(columnIndex)).doubleValue() * 100));
-                    else prop.set(obj, (long)(((BigDecimal) data.get(i).get(columnIndex)).doubleValue()));
-                    break;
-                  case "double":
-                    prop.set(obj, ((BigDecimal) data.get(i).get(columnIndex)).doubleValue());
-                    break;
-                  default:
+              switch (prop.getValueClass().getName()) {
+                case "long":
+                  if ( prop.getName().equals("amount") ) {
+                    String finVal = data.get(i).get(columnIndex).toString();
+                    Matcher numMatcher = numbersRegex.matcher(finVal);
+                    Matcher currencyMatcher = alphabeticalCharsRegex.matcher(finVal);
+                    if ( ! numMatcher.find() ) {
+                      continue;
+                    }
+                    String number = finVal.substring(numMatcher.start(), numMatcher.end());
+                    currencyMatcher.find();
+                    String currency = finVal.substring(currencyMatcher.start(), currencyMatcher.end());
+                    prop.set(obj, Math.round( Double.parseDouble(number) * 100));
+                    obj.getClass().getMethod("setSourceCurrency", String.class).invoke(obj, currency);
+                  } else prop.set(obj, Long.parseLong(data.get(i).get(columnIndex).toString()));
+                  break;
+                case "double":
+                  prop.set(obj, Double.parseDouble(data.get(i).get(columnIndex).toString()));
+                  break;
+                default:
+                  if ( prop instanceof AbstractEnumPropertyInfo)
+                    prop.set(obj, ((AbstractEnumPropertyInfo)prop).getValueClass().getMethod("forLabel", String.class).invoke(null, data.get(i).get(columnIndex).toString()));
+                  else if ( prop.getValueClass().getName().equals("java.util.Date") ) {
+                    prop.set(obj, new java.util.Date(data.get(i).get(columnIndex).toString()));
+                  }
+                  else
                     prop.set(obj, data.get(i).get(columnIndex));
-                    break;
-                }
-              }  else if ( prop instanceof AbstractEnumPropertyInfo)
-                prop.set(obj, ((AbstractEnumPropertyInfo)prop).getValueClass().getMethod("forLabel", String.class).invoke(null, data.get(i).get(columnIndex).toString()));
-              else if ( prop.getValueClass().getName().equals("java.util.Date") ) {
-                prop.set(obj, new java.util.Date(data.get(i).get(columnIndex).toString()));
+                  break;
               }
-              else
-                prop.set(obj, data.get(i).get(columnIndex));
             }
             objs.add((FObject)obj);
           }
