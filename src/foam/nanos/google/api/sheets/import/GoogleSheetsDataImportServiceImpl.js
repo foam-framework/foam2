@@ -157,7 +157,7 @@ foam.CLASS({
         try {
           values = googleSheetsAPIEnabler.getValues(x, importConfig.getGoogleSpreadsheetId(), importConfig.getCellsRange());
           List<List<Object>> data = values.getValues();
-          List<FObject> parsedObjs = valueRangeValuesToFobjectsArray(importConfig, data);
+          List<FObject> parsedObjs = valueRangeValuesToFobjectsArray(x, importConfig, data);
           return addRecordsToDAO(x, importConfig.getImportClassInfo(), parsedObjs);
         } catch ( Throwable t ) {
           System.out.println(t);
@@ -208,6 +208,10 @@ foam.CLASS({
       'java.lang.reflect.InvocationTargetException'
     ],
     args: [
+      {
+        name: 'x',
+        type: 'Context',
+      },
       {
         name: 'importConfig',
         type: 'foam.nanos.google.api.sheets.GoogleSheetsImportConfig'
@@ -268,15 +272,16 @@ foam.CLASS({
           if ( prop.getName().equals("amount") ) {
             String finVal = val.toString();
             Matcher numMatcher = numbersRegex.matcher(finVal);
-            Matcher currencyMatcher = alphabeticalCharsRegex.matcher(finVal);
             if ( ! numMatcher.find() ) {
               return false;
             }
             String number = finVal.substring(numMatcher.start(), numMatcher.end());
-            currencyMatcher.find();
-            String currency = finVal.substring(currencyMatcher.start(), currencyMatcher.end());
             prop.set(obj, Math.round( Double.parseDouble(number) * 100));
-            obj.getClass().getMethod("setSourceCurrency", String.class).invoke(obj, currency);
+            Matcher currencyMatcher = alphabeticalCharsRegex.matcher(finVal);
+            if ( currencyMatcher.find() ) {
+              String currency = finVal.substring(currencyMatcher.start(), currencyMatcher.end());
+              obj.getClass().getMethod("setSourceCurrency", String.class).invoke(obj, currency);
+            }
           } else prop.set(obj, Long.parseLong(val.toString()));
           break;
         case "double":
