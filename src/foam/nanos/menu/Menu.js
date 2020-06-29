@@ -53,6 +53,7 @@
       documentation: 'View initialized when menu is launched.',
       view: {
         class: 'foam.u2.view.FObjectView',
+        allowCustom: true,
         choices: [
           [ 'foam.nanos.menu.DAOMenu',          'DAO' ],
           [ 'foam.nanos.menu.DAOMenu2',         'DAO2' ],
