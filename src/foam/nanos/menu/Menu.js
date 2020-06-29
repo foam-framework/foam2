@@ -66,22 +66,6 @@
           [ 'foam.nanos.menu.ViewMenu',         'View' ]
         ]
       }
-/*
-      view: {
-        class: 'foam.u2.view.FObjectView',
-        choices: [
-          [ 'foam.nanos.menu.DAOMenu',      'DAO' ],
-          [ 'foam.nanos.menu.DAOMenu2',     'DAO2' ],
-          [ 'foam.nanos.menu.DocumentMenu', 'Document' ],
-          [ 'foam.nanos.menu.DocumentFileMenu', 'External Document' ],
-          [ 'foam.nanos.menu.LinkMenu',     'Link' ],
-          [ 'foam.nanos.menu.ListMenu',     'List' ],
-          [ 'foam.nanos.menu.SubMenu',      'Submenu' ],
-          [ 'foam.nanos.menu.TabsMenu',     'Tabs' ],
-          [ 'foam.nanos.menu.ViewMenu',     'View' ]
-        ]
-      }
-      */
     },
     {
       class: 'Int',
