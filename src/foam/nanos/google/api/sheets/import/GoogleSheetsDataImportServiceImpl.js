@@ -157,67 +157,143 @@ foam.CLASS({
         try {
           values = googleSheetsAPIEnabler.getValues(x, importConfig.getGoogleSpreadsheetId(), importConfig.getCellsRange());
           List<List<Object>> data = values.getValues();
-          List<String> columnHeaders = new ArrayList<>();
-
-          for ( int i = 0 ; i <  data.get(0).size() ; i++ ) {
-            columnHeaders.add(data.get(0).get(i).toString());
-          }
-
-          List<FObject> objs = new ArrayList<>();
-    
-          for ( int i = 1 ; i < data.size() ; i++ ) {
-            Object obj = importConfig.getImportClassInfo().newInstance();
-            for ( int j = 0 ; j < importConfig.getColumnHeaderPropertyMappings().length ; j ++ ) {
-              if ( importConfig.getColumnHeaderPropertyMappings()[j].getProp() == null ) continue;
-              int columnIndex = columnHeaders.indexOf(importConfig.getColumnHeaderPropertyMappings()[j].getColumnHeader());
-              Object val = data.get(i).get(columnIndex);
-              PropertyInfo prop = ((PropertyInfo)importConfig.getColumnHeaderPropertyMappings()[j].getProp());
-              switch (prop.getValueClass().getName()) {
-                case "long":
-                  if ( prop.getName().equals("amount") ) {
-                    String finVal = data.get(i).get(columnIndex).toString();
-                    Matcher numMatcher = numbersRegex.matcher(finVal);
-                    Matcher currencyMatcher = alphabeticalCharsRegex.matcher(finVal);
-                    if ( ! numMatcher.find() ) {
-                      continue;
-                    }
-                    String number = finVal.substring(numMatcher.start(), numMatcher.end());
-                    currencyMatcher.find();
-                    String currency = finVal.substring(currencyMatcher.start(), currencyMatcher.end());
-                    prop.set(obj, Math.round( Double.parseDouble(number) * 100));
-                    obj.getClass().getMethod("setSourceCurrency", String.class).invoke(obj, currency);
-                  } else prop.set(obj, Long.parseLong(data.get(i).get(columnIndex).toString()));
-                  break;
-                case "double":
-                  prop.set(obj, Double.parseDouble(data.get(i).get(columnIndex).toString()));
-                  break;
-                default:
-                  if ( prop instanceof AbstractEnumPropertyInfo)
-                    prop.set(obj, ((AbstractEnumPropertyInfo)prop).getValueClass().getMethod("forLabel", String.class).invoke(null, data.get(i).get(columnIndex).toString()));
-                  else if ( prop.getValueClass().getName().equals("java.util.Date") ) {
-                    prop.set(obj, new java.util.Date(data.get(i).get(columnIndex).toString()));
-                  }
-                  else
-                    prop.set(obj, data.get(i).get(columnIndex));
-                  break;
-              }
-            }
-            objs.add((FObject)obj);
-          }
-
-          DAO nspecDAO = (DAO) x.get("nSpecDAO");
-          NSpec nsp = (NSpec) nspecDAO.find(AND(CONTAINS_IC(NSpec.ID, "DAO"), CONTAINS_IC(NSpec.CLIENT, importConfig.getImportClassInfo().getId())));
-          if ( nsp == null ) return false;
-          DAO dao  = (DAO)x.get(nsp.getId());
-          for ( FObject obj: objs) {
-            dao.put(obj);
-          }
-        } catch(Exception e) {
-          System.out.println(e);
-          return false;
+          List<FObject> parsedObjs = valueRangeValuesToFobjectsArray(importConfig, data);
+          return addRecordsToDAO(x, importConfig.getImportClassInfo(), parsedObjs);
+        } catch ( Throwable t ) {
+          System.out.println(t);
+        }
+        return false;
+      `
+  },
+  {
+    name: 'addRecordsToDAO',
+    type: 'Boolean',
+    args: [
+      {
+        name: 'x',
+        type: 'Context',
+      },
+      {
+        name: 'daoClass',
+        javaType: 'foam.core.ClassInfo'
+      },
+      {
+        name: 'objs',
+        javaType: 'List<foam.core.FObject>'
+      }
+    ],
+    javaCode: `
+      DAO nspecDAO = (DAO) x.get("nSpecDAO");
+      NSpec nsp = (NSpec) nspecDAO.find(AND(CONTAINS_IC(NSpec.ID, "DAO"), CONTAINS_IC(NSpec.CLIENT, daoClass.getId())));
+      if ( nsp == null ) return false;
+      DAO dao  = (DAO)x.get(nsp.getId());
+      if ( dao == null ) return false;
+      try {
+        for ( FObject obj: objs) {
+          dao.put(obj);
         }
         return true;
-      `
+      } catch(Throwable t) {
+        return false;
+      }
+    `
+  },
+  {
+    name: 'valueRangeValuesToFobjectsArray',
+    javaType: 'List<foam.core.FObject>',
+    javaThrows: [
+      'InstantiationException',
+      'IllegalAccessException',
+      'NoSuchMethodException',
+      'java.lang.reflect.InvocationTargetException'
+    ],
+    args: [
+      {
+        name: 'importConfig',
+        type: 'foam.nanos.google.api.sheets.GoogleSheetsImportConfig'
+      },
+      {
+        name: 'data',
+        javaType: 'List<List<Object>>'
+      },
+    ],
+    javaCode: `
+      List<String> columnHeaders = new ArrayList<>();
+
+      for ( int i = 0 ; i <  data.get(0).size() ; i++ ) {
+        columnHeaders.add(data.get(0).get(i).toString());
+      }
+      List<FObject> objs = new ArrayList<>();
+      
+      for ( int i = 1 ; i < data.size() ; i++ ) {
+        Object obj = importConfig.getImportClassInfo().newInstance();
+        for ( int j = 0 ; j < importConfig.getColumnHeaderPropertyMappings().length ; j ++ ) {
+          if ( importConfig.getColumnHeaderPropertyMappings()[j].getProp() == null ) continue;
+          int columnIndex = columnHeaders.indexOf(importConfig.getColumnHeaderPropertyMappings()[j].getColumnHeader());
+          Object val = data.get(i).get(columnIndex);
+          PropertyInfo prop = ((PropertyInfo)importConfig.getColumnHeaderPropertyMappings()[j].getProp());
+          if ( ! setValue(obj, prop, data.get(i).get(columnIndex)) ) 
+            continue;
+        }
+        objs.add((FObject)obj);
+      }
+      return objs;
+    `
+  },
+  {
+    name: 'setValue',
+    type: 'Boolean',
+    javaThrows: [
+      'NoSuchMethodException',
+      'java.lang.reflect.InvocationTargetException',
+      'IllegalAccessException'
+    ],
+    args: [
+      {
+        name: 'obj',
+        type: 'Object'
+      },
+      {
+        name: 'prop',
+        javaType: 'foam.core.PropertyInfo'
+      },
+      {
+        name: 'val',
+        type: 'Object'
+      }
+    ],
+    javaCode: `
+      switch (prop.getValueClass().getName()) {
+        case "long":
+          if ( prop.getName().equals("amount") ) {
+            String finVal = val.toString();
+            Matcher numMatcher = numbersRegex.matcher(finVal);
+            Matcher currencyMatcher = alphabeticalCharsRegex.matcher(finVal);
+            if ( ! numMatcher.find() ) {
+              return false;
+            }
+            String number = finVal.substring(numMatcher.start(), numMatcher.end());
+            currencyMatcher.find();
+            String currency = finVal.substring(currencyMatcher.start(), currencyMatcher.end());
+            prop.set(obj, Math.round( Double.parseDouble(number) * 100));
+            obj.getClass().getMethod("setSourceCurrency", String.class).invoke(obj, currency);
+          } else prop.set(obj, Long.parseLong(val.toString()));
+          break;
+        case "double":
+          prop.set(obj, Double.parseDouble(val.toString()));
+          break;
+        default:
+          if ( prop instanceof AbstractEnumPropertyInfo)
+            prop.set(obj, ((AbstractEnumPropertyInfo)prop).getValueClass().getMethod("forLabel", String.class).invoke(null, val.toString()));
+          else if ( prop.getValueClass().getName().equals("java.util.Date") ) {
+            prop.set(obj, new java.util.Date(val.toString()));
+          }
+          else
+            prop.set(obj, val);
+          break;
+      }
+      return true;
+    `
   }
-  ]
+],
 });
