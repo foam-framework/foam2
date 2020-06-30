@@ -113,10 +113,10 @@ foam.CLASS({
               caps: capAndSections[0],
               wizCaps: capAndSections[1]
               .filter((wizardSection) =>
-                wizardSection.ucj === null ||
+                wizardSection.ucj ||
                 (
-                  ! foam.util.equals(wizardSection.ucj.status, this.CapabilityJunctionStatus.GRANTED ) &&
-                  ! foam.util.equals(wizardSection.ucj.status, this.CapabilityJunctionStatus.PENDING )
+                  ! wizardSection.ucj.status === this.CapabilityJunctionStatus.GRANTED &&
+                  ! wizardSection.ucj.status === this.CapabilityJunctionStatus.PENDING
                 )
               )
             };
@@ -176,8 +176,8 @@ foam.CLASS({
           this.EQ(this.UserCapabilityJunction.TARGET_ID, capabilityId)
         ));
       if ( ucj ) {
-        var statusGranted = foam.util.equals(ucj.status, this.CapabilityJunctionStatus.GRANTED);
-        var statusPending = foam.util.equals(ucj.status, this.CapabilityJunctionStatus.PENDING);
+        var statusGranted = ucj.status === this.CapabilityJunctionStatus.GRANTED;
+        var statusPending = ucj.status === this.CapabilityJunctionStatus.PENDING;
         if ( statusGranted || statusPending ) {
           var message = statusGranted ? this.CANNOT_OPEN_GRANTED : this.CANNOT_OPEN_PENDING;
           this.ctrl.notify(message);
