@@ -13,15 +13,16 @@ foam.CLASS({
       name: 'importConfig',
       class: 'FObjectProperty',
       of: 'foam.nanos.google.api.sheets.GoogleSheetsImportConfig',
-      factory: function() {
-        return foam.nanos.google.api.sheets.GoogleSheetsImportConfig.create({importClassInfo: this.__context__.data.of});
+      expression: function(of) {
+        return foam.nanos.google.api.sheets.GoogleSheetsImportConfig.create({importClassInfo: of});
       }
-    }//,
-    // {
-    //   name: 'columns',
-    //   class: 'FObjectArray',
-    //   of: 'foam.nanos.google.api.sheets.ColumnHeaderToPropertyName'
-    // }
+    },
+    {
+      name: 'importServiceName',
+      class: 'String',
+      value: 'googleSheetsDataImport'
+    },
+    'of'
   ],
   methods: [
     function initE() {
@@ -104,7 +105,7 @@ foam.CLASS({
           if ( columnHeaders ) {
             var arr = [];
             for ( var columnHeader of columnHeaders ) {
-              arr.push(foam.nanos.google.api.sheets.ColumnHeaderToPropertyName.create({ of: this.importConfig.importClassInfo, columnHeader: columnHeader, prop: this.importConfig.importClassInfo.getAxiomsByClass(foam.core.Property).find(p => ! p.networkTransient && ! foam.core.FObjectProperty.isInstance(p) && p.label === columnHeader) }));
+              arr.push(foam.nanos.google.api.sheets.ColumnHeaderToPropertyName.create({ of: this.importConfig.importClassInfo, columnHeader: columnHeader, prop: this.importConfig.importClassInfo.getAxiomsByClass(foam.core.Property).find(p => ! p.networkTransient && ( this.importServiceName !== 'googleSheetsDataImport' || ! foam.core.FObjectProperty.isInstance(p) ) && p.label === columnHeader) }));
             }
             this.importConfig.columnHeaderPropertyMappings = arr;
           }          
@@ -118,7 +119,7 @@ foam.CLASS({
         return importConfig$columnHeaderPropertyMappings.some(c => c && c.prop );
       },
       code: function(X) {
-        X.googleSheetsDataImport.importData(X, this.importConfig).then(r => {
+        X[this.importServiceName].importData(X, this.importConfig).then(r => {
           X.closeDialog();
           var message = this.NotificationMessage.create();
           if ( r ) message.message = 'success!';

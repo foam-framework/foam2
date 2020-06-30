@@ -199,7 +199,8 @@ foam.CLASS({
       // icon: 'images/export-arrow-icon.svg',//need find out where we're getting the icons
       code: function() {
         this.add(this.Popup.create().tag({
-          class: 'foam.nanos.google.api.sheets.ImportFromGoogleSheetsModal'
+          class: 'foam.nanos.google.api.sheets.ImportFromGoogleSheetsModal',
+          of: this.config.of
         }));
       }
     },
