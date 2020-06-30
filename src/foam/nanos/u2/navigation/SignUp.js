@@ -64,132 +64,107 @@ foam.CLASS({
       documentation: `Set this to true to disable the email input field.`,
       hidden: true
     },
-    {
-      class: 'Boolean',
-      name: 'disableCompanyName_',
-      documentation: `Set this to true to disable the Company Name input field.`,
-      hidden: true
-    },
-    {
-      class: 'StringArray',
-      name: 'countryChoices_',
-      documentation: `Set this to the list of countries (Country.NAME) we want our signing up user to be able to select.`,
-      hidden: true
-    },
-    {
-      class: 'String',
-      name: 'firstName',
-      gridColumns: 6,
-      view: {
-        class: 'foam.u2.TextField',
-        placeholder: 'Jane'
-      },
-      required: true
-    },
-    {
-      class: 'String',
-      name: 'lastName',
-      gridColumns: 6,
-      view: {
-        class: 'foam.u2.TextField',
-        placeholder: 'Doe'
-      },
-      required: true
-    },
-    {
-      class: 'String',
-      name: 'jobTitle',
-      view: function(args, X) {
-        return {
-          class: 'foam.u2.view.ChoiceWithOtherView',
-          otherKey: 'Other',
-          choiceView: {
-            class: 'foam.u2.view.ChoiceView',
-            placeholder: X.data.SELECTION,
-            dao: X.jobTitleDAO,
-            objToChoice: function(a) {
-              return [a.name, a.label];
-            }
-          }
-        };
-      },
-      validationPredicates: [
-        {
-          args: ['jobTitle'],
-          predicateFactory: function(e) {
-            return e.NEQ(foam.nanos.u2.navigation.SignUp.JOB_TITLE, '');
-          },
-          errorMessage: 'VALIDATION_ERR_TEXT'
-        }
-      ],
-      required: true
-    },
-    {
-      class: 'PhoneNumber',
-      name: 'phone',
-      required: true
-    },
-    {
-      class: 'String',
-      name: 'organization',
-      label: 'Company Name',
-      view: {
-        class: 'foam.u2.TextField',
-        placeholder: 'ABC Company'
-      },
-      visibility: function(disableCompanyName_) {
-        return disableCompanyName_ ? foam.u2.DisplayMode.DISABLED : foam.u2.DisplayMode.RW;
-      },
-      required: true
-    },
-    {
-      class: 'Reference',
-      targetDAOKey: 'countryDAO',
-      name: 'countryId',
-      label: 'Country',
-      of: 'foam.nanos.auth.Country',
-      documentation: 'Country address.',
-      view: function(_, X) {
-        var E = foam.mlang.Expressions.create();
-        choices = X.data.slot(function(countryChoices_) {
-          if ( ! countryChoices_ || countryChoices_.length == 0 ) return X.countryDAO;
-          return X.countryDAO.where(E.IN(X.data.Country.ID, countryChoices_));
-        });
-        return foam.u2.view.ChoiceView.create({
-          placeholder: X.data.SELECTION_TEXT,
-          objToChoice: function(a) {
-            return [a.id, a.name];
-          },
-          dao$: choices
-        }, X);
-      },
-      required: true,
-    },
-    {
-      class: 'String',
-      name: 'userName',
-      label: 'Username',
-      view: {
-        class: 'foam.u2.TextField',
-        placeholder: 'example123'
-      },
-      //TODO: uncomment when integrating
-      // validationPredicates: [
-      //   {
-      //     args: ['userName'],
-      //     predicateFactory: function(e) {
-      //       return e.REG_EXP(
-      //         foam.nanos.u2.navigation.SignUp.USER_NAME,
-      //         /^[^\s\/]+$/);
-      //     },
-      //     errorString: 'Please enter username'
-      //   }
-      // ],
-      //TODO: set to true when integrating
-      required: false,
-      //TODO: set to false when integrating
-      hidden: true
-    },
+    // {
+    //   class: 'Boolean',
+    //   name: 'disableCompanyName_',
+    //   documentation: `Set this to true to disable the Company Name input field.`,
+    //   hidden: true
+    // },
+    // {
+    //   class: 'StringArray',
+    //   name: 'countryChoices_',
+    //   documentation: `Set this to the list of countries (Country.NAME) we want our signing up user to be able to select.`,
+    //   hidden: true
+    // },
+    // {
+    //   class: 'String',
+    //   name: 'firstName',
+    //   gridColumns: 6,
+    //   view: {
+    //     class: 'foam.u2.TextField',
+    //     placeholder: 'Jane'
+    //   },
+    //   required: true
+    // },
+    // {
+    //   class: 'String',
+    //   name: 'lastName',
+    //   gridColumns: 6,
+    //   view: {
+    //     class: 'foam.u2.TextField',
+    //     placeholder: 'Doe'
+    //   },
+    //   required: true
+    // },
+    // {
+    //   class: 'String',
+    //   name: 'jobTitle',
+    //   view: function(args, X) {
+    //     return {
+    //       class: 'foam.u2.view.ChoiceWithOtherView',
+    //       otherKey: 'Other',
+    //       choiceView: {
+    //         class: 'foam.u2.view.ChoiceView',
+    //         placeholder: X.data.SELECTION,
+    //         dao: X.jobTitleDAO,
+    //         objToChoice: function(a) {
+    //           return [a.name, a.label];
+    //         }
+    //       }
+    //     };
+    //   },
+    //   validationPredicates: [
+    //     {
+    //       args: ['jobTitle'],
+    //       predicateFactory: function(e) {
+    //         return e.NEQ(foam.nanos.u2.navigation.SignUp.JOB_TITLE, '');
+    //       },
+    //       errorMessage: 'VALIDATION_ERR_TEXT'
+    //     }
+    //   ],
+    //   required: true
+    // },
+    // {
+    //   class: 'PhoneNumber',
+    //   name: 'phone',
+    //   required: true
+    // },
+    // {
+    //   class: 'String',
+    //   name: 'organization',
+    //   label: 'Company Name',
+    //   view: {
+    //     class: 'foam.u2.TextField',
+    //     placeholder: 'ABC Company'
+    //   },
+    //   visibility: function(disableCompanyName_) {
+    //     return disableCompanyName_ ? foam.u2.DisplayMode.DISABLED : foam.u2.DisplayMode.RW;
+    //   },
+    //   required: true
+    // },
+    // {
+    //   class: 'Reference',
+    //   targetDAOKey: 'countryDAO',
+    //   name: 'countryId',
+    //   label: 'Country',
+    //   of: 'foam.nanos.auth.Country',
+    //   documentation: 'Country address.',
+    //   view: function(_, X) {
+    //     var E = foam.mlang.Expressions.create();
+    //     choices = X.data.slot(function(countryChoices_) {
+    //       if ( ! countryChoices_ || countryChoices_.length == 0 ) return X.countryDAO;
+    //       return X.countryDAO.where(E.IN(X.data.Country.ID, countryChoices_));
+    //     });
+    //     return foam.u2.view.ChoiceView.create({
+    //       placeholder: X.data.SELECTION_TEXT,
+    //       objToChoice: function(a) {
+    //         return [a.id, a.name];
+    //       },
+    //       dao$: choices
+    //     }, X);
+    //   },
+    //   required: true,
+    // },
     {
       class: 'EMail',
       name: 'email',
@@ -202,6 +177,31 @@ foam.CLASS({
           foam.u2.DisplayMode.DISABLED : foam.u2.DisplayMode.RW;
       },
       required: true
+    },
+    {
+      class: 'String',
+      name: 'userName',
+      label: 'Username',
+      view: {
+        class: 'foam.u2.TextField',
+        placeholder: 'example123'
+      },
+      //TODO: uncomment when integrating
+      validationPredicates: [
+        {
+          args: ['userName'],
+          predicateFactory: function(e) {
+            return e.REG_EXP(
+              foam.nanos.u2.navigation.SignUp.USER_NAME,
+              /^[^\s\/]+$/);
+          },
+          errorString: 'Please enter username'
+        }
+      ],
+      //TODO: set to true when integrating
+      required: true,
+      //TODO: set to false when integrating
+      hidden: false
     },
     {
       class: 'Password',
@@ -263,23 +263,25 @@ foam.CLASS({
         this.isLoading_ = true;
         this.dao_
           .put(this.User.create({
-            firstName: this.firstName,
-            lastName: this.lastName,
-            organization: this.organization,
+            // firstName: this.firstName,
+            // lastName: this.lastName,
+            organization: this.userName,
             userName: this.userName,
             email: this.email,
             desiredPassword: this.desiredPassword,
             signUpToken: this.token_,
-            address: this.Address.create({ countryId: this.countryId }),
+            // address: this.Address.create({ countryId: this.countryId }),
             welcomeEmailSent: true,
-            jobTitle: this.jobTitle,
-            phoneNumber: this.phone,
+            // jobTitle: this.jobTitle,
+            // phoneNumber: this.phone,
             group: this.group_
           }))
           .then((user) => {
+            debugger;
             this.user.copyFrom(user);
             this.updateUser(x);
           }).catch((err) => {
+            debugger;
             this.notify(err.message || this.ERROR_MSG, 'error');
           })
           .finally(() => {
