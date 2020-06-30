@@ -120,7 +120,7 @@ foam.CLASS({
       },
       code: function(X) {
         X[this.importServiceName].importData(X, this.importConfig).then(r => {
-          X.closeDialog();
+          // X.closeDialog();
           var message = this.NotificationMessage.create();
           if ( r ) message.message = 'success!';
           else {

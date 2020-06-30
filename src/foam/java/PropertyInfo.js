@@ -121,6 +121,11 @@ foam.CLASS({
     'toCSVLabel',
     'fromCSVLabelMapping',
     {
+      class: 'Boolean',
+      name: 'sheetsOutput',
+      documentation: 'the sheetsOutput specifies either property shoud be written to Google Sheet on import. eg on Transaction import in case there is Status column transaction\'s status will be written there'
+    },
+    {
       name: 'methods',
       factory: function() {
         var m = [
@@ -451,6 +456,15 @@ foam.CLASS({
             visibility: 'public',
             type:       'boolean',
             body:       `return ${this.containsDeletablePII};`
+          });
+        }
+
+        if ( this.sheetsOutput ) {
+          m.push({
+            name: 'getSheetsOutput',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.sheetsOutput + ';'
           });
         }
 

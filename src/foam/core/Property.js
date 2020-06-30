@@ -293,6 +293,11 @@ foam.CLASS({
       name: 'sortable',
       value: true
     },
+    {
+      class: 'Boolean',
+      name: 'sheetsOutput',
+      value: false
+    }
   ],
 
   methods: [

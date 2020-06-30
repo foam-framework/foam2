@@ -63,7 +63,6 @@ foam.CLASS({
             return startIndex;
           }
           
-          
           public List<List<String>> generateBase(int endColumnLength) {
       
             List<List<String>> base = new ArrayList<>();
@@ -84,6 +83,15 @@ foam.CLASS({
               base.add(level);
             }
             return base;
+          }
+
+          public String findColumn(List<List<String>> base, String startCol, int startColCurrColDiff) {
+            int startColIndex = base.get(startCol.length() - 1).indexOf(startCol);
+            int currColumnIndex = startColIndex + startColCurrColDiff;
+            if ( currColumnIndex > base.get(startCol.length() - 1).size() ) {
+              return base.get(startCol.length()).get(currColumnIndex - base.get(startCol.length() - 1).size() - 1);
+            }
+            return base.get(startCol.length() - 1).get(currColumnIndex);
           }
           `
         }));
@@ -158,7 +166,13 @@ foam.CLASS({
           values = googleSheetsAPIEnabler.getValues(x, importConfig.getGoogleSpreadsheetId(), importConfig.getCellsRange());
           List<List<Object>> data = values.getValues();
           List<FObject> parsedObjs = valueRangeValuesToFobjectsArray(x, importConfig, data);
-          return addRecordsToDAO(x, importConfig.getImportClassInfo(), parsedObjs);
+          //if there was a problem with adding records we still might want to update user's google sheet with ids or status
+          addRecordsToDAO(x, importConfig.getImportClassInfo(), parsedObjs);
+          List<String> columnHeaders = new ArrayList<>();
+          for ( Object header : data.get(0) ) {
+            columnHeaders.add(header.toString());
+          }
+          return updateSheet(x, importConfig, parsedObjs, columnHeaders);
         } catch ( Throwable t ) {
           System.out.println(t);
         }
@@ -184,7 +198,7 @@ foam.CLASS({
     ],
     javaCode: `
       DAO nspecDAO = (DAO) x.get("nSpecDAO");
-      NSpec nsp = (NSpec) nspecDAO.find(AND(CONTAINS_IC(NSpec.ID, "DAO"), CONTAINS_IC(NSpec.CLIENT, daoClass.getId())));
+      NSpec nsp = (NSpec) nspecDAO.find(AND(CONTAINS_IC(NSpec.ID, "DAO"), CONTAINS_IC(NSpec.ID, "local"), CONTAINS_IC(NSpec.CLIENT, daoClass.getId())));
       if ( nsp == null ) return false;
       DAO dao  = (DAO)x.get(nsp.getId());
       if ( dao == null ) return false;
@@ -231,7 +245,7 @@ foam.CLASS({
       
       for ( int i = 1 ; i < data.size() ; i++ ) {
         Object obj = importConfig.getImportClassInfo().newInstance();
-        for ( int j = 0 ; j < importConfig.getColumnHeaderPropertyMappings().length ; j ++ ) {
+        for ( int j = 0 ; j < Math.min(importConfig.getColumnHeaderPropertyMappings().length, data.get(i).size()) ; j ++ ) {
           if ( importConfig.getColumnHeaderPropertyMappings()[j].getProp() == null ) continue;
           int columnIndex = columnHeaders.indexOf(importConfig.getColumnHeaderPropertyMappings()[j].getColumnHeader());
           Object val = data.get(i).get(columnIndex);
@@ -297,6 +311,83 @@ foam.CLASS({
             prop.set(obj, val);
           break;
       }
+      return true;
+    `
+  },
+  {
+    name: 'updateSheet',
+    type: 'Boolean',
+    args: [
+      {
+        name: 'x',
+        type: 'Context',
+      },
+      {
+        name: 'importConfig',
+        type: 'foam.nanos.google.api.sheets.GoogleSheetsImportConfig'
+      },
+      {
+        name: 'objs',
+        javaType: 'List<foam.core.FObject>'
+      },
+      {
+        name: 'columnHeaders',
+        javaType: 'List<String>'
+      }
+    ],
+    javaCode: `
+      GoogleSheetsApiService googleSheetsAPIEnabler = (GoogleSheetsApiService)x.get("googleSheetsDataExport");
+      List<String[]> values = new ArrayList<>();
+
+      //to calculate cells ranges
+      List<String> cellsRange = new ArrayList<>();
+
+      //to calculate column headers row
+      String[] rangeLimits = importConfig.getCellsRange().split(":");
+      Matcher m = digitAppearenceRegex.matcher(rangeLimits[0]);
+
+      if ( !m.find() ) return false;
+      int indexOfFirstRowInRange = m.start();
+      String startColumn = rangeLimits[0].substring(0, indexOfFirstRowInRange);
+      String startRow = rangeLimits[0].substring(indexOfFirstRowInRange);
+      m = digitAppearenceRegex.matcher(rangeLimits[1]);
+
+      if ( ! m.find() ) return false;
+      int indexOfEndRowInRange = m.start();
+      String endColumn = rangeLimits[1].substring(0,indexOfEndRowInRange);
+      String endRow = rangeLimits[1].substring(indexOfEndRowInRange);
+      List<List<String>> base = generateBase(endColumn.length());
+
+      for ( ColumnHeaderToPropertyName c : importConfig.getColumnHeaderPropertyMappings() ) {
+        if ( ((PropertyInfo)c.getProp()).getSheetsOutput() ) {
+          StringBuilder sb = new StringBuilder();
+          int currColumnIndexRelativeToFirstColumn = columnHeaders.indexOf(c.getColumnHeader());
+          String startColumnForCurrenctHeader = findColumn(base, startColumn, currColumnIndexRelativeToFirstColumn);
+          sb.append(startColumnForCurrenctHeader);
+          sb.append(startRow);
+          sb.append(":");
+          // sb.append(findColumn(base, startColumn, currColumnIndexRelativeToFirstColumn + 1));
+          sb.append(startColumnForCurrenctHeader);
+          sb.append(endRow);
+          
+          cellsRange.add(sb.toString());
+
+          String[] updatedValues = new String[objs.size()];
+          for ( int i = 0 ; i < objs.size() ; i ++ ) {
+            updatedValues[i] = ((PropertyInfo)c.getProp()).get((Object)objs.get(i)).toString();
+          }
+          values.add(updatedValues);
+        }
+      }
+      if ( values.size() == 0 ) {
+        return true;
+      }
+      String[][] columnValues = new String[values.size()][objs.size()];
+      for (int  i = 0 ; i < values.size() ; i ++ ) {
+        columnValues[i] = values.get(i);
+      }
+      // googleSheetsAPIEnabler.updateValues(x, importConfig.getGoogleSpreadsheetId(), columnValues, )
+
       return true;
     `
   }
