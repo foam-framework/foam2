@@ -85,6 +85,7 @@ foam.CLASS({
     },
     {
       name: 'rePutObject',
+      visibility: 'private',
       type: 'Void',
       args: [
         { type: 'Context', name: 'x' },
@@ -109,6 +110,7 @@ foam.CLASS({
     },
     {
       name: 'removeUnusedRequests',
+      visibility: 'private',
       type: 'Void',
       args: [
         { type: 'DAO', name: 'dao' }
@@ -119,6 +121,7 @@ foam.CLASS({
     },
     {
       name: 'getCurrentPoints',
+      visibility: 'private',
       type: 'Long',
       args: [
         {
@@ -135,6 +138,7 @@ foam.CLASS({
     },
     {
       name: 'getCurrentRejectedPoints',
+      visibility: 'private',
       type: 'Long',
       args: [
         { type: 'DAO', name: 'dao' }
