@@ -114,6 +114,8 @@ foam.CLASS({
 
               currentFeedback = currentFeedback.next;
             }
+
+            this.stack.back();
           } else {
             this.ctrl.notify(e.message, '', this.LogLevel.ERROR, true);
           }
