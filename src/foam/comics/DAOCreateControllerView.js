@@ -22,12 +22,15 @@ foam.CLASS({
 
   requires: [
     'foam.comics.DAOCreateController',
-    'foam.u2.dialog.NotificationMessage',
+    'foam.log.LogLevel',
+    'foam.nanos.notification.Notification',
+    'foam.nanos.notification.ToastState',
     'foam.u2.DisplayMode'
   ],
 
   imports: [
     'dao',
+    'notify',
     'stack'
   ],
 
@@ -133,10 +136,7 @@ foam.CLASS({
     },
     function onThrowError() {
       var self = this;
-      this.add(this.NotificationMessage.create({
-         message: self.data.exception.message,
-         type: 'error'
-      }));
+      self.notify(self.data.exception.message, '', self.ToastState.REQUESTED, self.LogLevel.ERROR, true);
     }
   ]
 });

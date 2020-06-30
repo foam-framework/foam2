@@ -11,6 +11,10 @@ foam.CLASS({
 
   documentation: 'View for deleting any object',
 
+  requires: [
+    'foam.log.LogLevel'
+  ],
+
   imports: [
     'notify'
   ],
@@ -99,24 +103,24 @@ foam.CLASS({
             var currentFeedback = o.userFeedback;
             while ( currentFeedback ){
 
-              this.notify(currentFeedback.message);
+              this.notify(currentFeedback.message, '', this.LogLevel.INFO, true);
 
               currentFeedback = currentFeedback.next;
             }
           } else {
-            this.notify(this.data.model_.label + this.SUCCESS_MSG);
+            this.notify(this.data.model_.label + this.SUCCESS_MSG, '', this.LogLevel.INFO, true);
           }
           this.onDelete();
         }).catch((err) => {
           if ( err.exception && err.exception.userFeedback  ) {
             var currentFeedback = err.exception.userFeedback;
             while ( currentFeedback ) {
-              this.notify(currentFeedback.message);
+              this.notify(currentFeedback.message, '', this.LogLevel.INFO, true);
 
               currentFeedback = currentFeedback.next;
             }
           } else {
-            this.notify(err.message || this.FAIL_MSG, 'error');
+            this.notify(err.message || this.FAIL_MSG, '', this.LogLevel.ERROR, true);
           }
         });
         X.closeDialog();

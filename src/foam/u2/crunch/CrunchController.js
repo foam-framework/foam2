@@ -24,6 +24,7 @@ foam.CLASS({
   ],
 
   requires: [
+    'foam.log.LogLevel',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityCapabilityJunction',
     'foam.nanos.crunch.CapabilityJunctionStatus',
@@ -173,7 +174,7 @@ foam.CLASS({
         var statusPending = foam.util.equals(ucj.status, this.CapabilityJunctionStatus.PENDING);
         if ( statusGranted || statusPending ) {
           var message = statusGranted ? this.CANNOT_OPEN_GRANTED : this.CANNOT_OPEN_PENDING;
-          this.ctrl.notify(message);
+          this.ctrl.notify(message, '', this.LogLevel.INFO, true);
           return;
         }
       }
