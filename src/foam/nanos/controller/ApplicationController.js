@@ -351,8 +351,11 @@ foam.CLASS({
       window.addEventListener('resize', this.updateDisplayWidth);
       this.updateDisplayWidth();
 
+      var userNotificationQueryId = this.subject && this.subject.realUser ?
+      this.subject.realUser.id : this.user.id;
+
       this.__subSubContext__.notificationDAO.where(
-        this.EQ(this.Notification.USER_ID, this.subject.realUser.id)
+        this.EQ(this.Notification.USER_ID, userNotificationQueryId)
       ).on.put.sub((sub, on, put, obj) => {
         if ( obj.toastState == this.ToastState.REQUESTED ) {
           this.add(this.NotificationMessage.create({
@@ -516,7 +519,8 @@ foam.CLASS({
 
     function notify(toastMessage, toastSubMessage, severity, transient) {
       var notification = this.Notification.create();
-      notification.userId = this.user.id;
+      notification.userId = this.subject && this.subject.realUser ?
+        this.subject.realUser.id : this.user.id;
       notification.toastMessage = toastMessage;
       notification.toastSubMessage = toastSubMessage;
       notification.toastState = this.ToastState.REQUESTED;
