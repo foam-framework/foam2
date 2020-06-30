@@ -352,7 +352,7 @@ foam.CLASS({
       this.updateDisplayWidth();
 
       this.__subSubContext__.notificationDAO.where(
-        this.EQ(this.Notification.USER_ID, this.subject.user.id)
+        this.EQ(this.Notification.USER_ID, this.subject.realUser.id)
       ).on.put.sub((sub, on, put, obj) => {
         if ( obj.toastState == this.ToastState.REQUESTED ) {
           this.add(this.NotificationMessage.create({
