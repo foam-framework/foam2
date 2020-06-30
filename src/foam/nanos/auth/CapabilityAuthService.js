@@ -245,7 +245,7 @@ foam.CLASS({
         CapabilityRuntimeException ex = new CapabilityRuntimeException(
           "Permission [" + permission + "] denied. Filtered Capabilities available.");
         for ( Capability cap : capabilities ) {
-          if ( ! cap.getInterceptIf().f(x) ) ex.addCapabilityId(cap.getId());
+          if ( cap.getInterceptIf().f(x) ) ex.addCapabilityId(cap.getId());
         }
 
         if ( ex.getCapabilities().length > 0 ) throw ex;

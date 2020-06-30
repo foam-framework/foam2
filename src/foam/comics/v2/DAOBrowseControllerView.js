@@ -108,7 +108,7 @@ foam.CLASS({
         if ( ! this.stack ) return;
         this.stack.push({
           class: 'foam.comics.v2.DAOCreateView',
-          data: this.data.of.create({ mode: 'create' }, this),
+          data: ((this.config.factory && this.config.factory$cls) ||  this.data.of).create({ mode: 'create'}, this),
           config$: this.config$,
           of: this.data.of
         }, this.__subContext__);

@@ -12,6 +12,7 @@ foam.CLASS({
   implements: [ 'foam.mlang.Expressions' ],
 
   requires: [
+    'foam.log.LogLevel',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction',
@@ -130,7 +131,7 @@ foam.CLASS({
       this.data.capabilityOptions.forEach((c) => {
         this.capabilityCache.set(c, true);
       });
-      this.notify(this.REJECTED_MSG);
+      this.notify(this.REJECTED_MSG, '', this.LogLevel.INFO, true);
       this.onClose(x);
     }
   ],

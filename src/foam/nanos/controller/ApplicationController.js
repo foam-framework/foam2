@@ -37,6 +37,8 @@ foam.CLASS({
     'foam.nanos.auth.Group',
     'foam.nanos.auth.User',
     'foam.nanos.auth.Subject',
+    'foam.nanos.notification.Notification',
+    'foam.nanos.notification.ToastState',
     'foam.nanos.theme.Theme',
     'foam.nanos.theme.Themes',
     'foam.nanos.theme.ThemeDomain',
@@ -56,8 +58,9 @@ foam.CLASS({
   imports: [
     'capabilityDAO',
     'installCSS',
+    'notificationDAO',
     'sessionSuccess',
-    'window',
+    'window'
   ],
 
   exports: [
@@ -348,6 +351,24 @@ foam.CLASS({
       window.addEventListener('resize', this.updateDisplayWidth);
       this.updateDisplayWidth();
 
+      var userNotificationQueryId = this.subject && this.subject.realUser ?
+      this.subject.realUser.id : this.user.id;
+
+      this.__subSubContext__.notificationDAO.where(
+        this.EQ(this.Notification.USER_ID, userNotificationQueryId)
+      ).on.put.sub((sub, on, put, obj) => {
+        if ( obj.toastState == this.ToastState.REQUESTED ) {
+          this.add(this.NotificationMessage.create({
+            message: obj.toastMessage,
+            type: obj.severity,
+            description: obj.toastSubMessage
+          }));
+          var clonedNotification = obj.clone();
+          clonedNotification.toastState = this.ToastState.DISPLAYED;
+          this.__subSubContext__.notificationDAO.put(clonedNotification);
+        }
+      });
+
       this.clientPromise.then(() => {
         this.fetchTheme().then(() => {
           this
@@ -380,7 +401,7 @@ foam.CLASS({
         if ( group == null ) throw new Error(this.GROUP_NULL_ERR);
         this.group = group;
       } catch (err) {
-        this.notify(this.GROUP_FETCH_ERR, 'error');
+        this.notify(this.GROUP_FETCH_ERR, '', this.LogLevel.ERROR, true);
         console.error(err.message || this.GROUP_FETCH_ERR);
       }
     },
@@ -496,13 +517,16 @@ foam.CLASS({
       return self.crunchController.maybeLaunchInterceptView(intercept);
     },
 
-    function notify(data, type, description) {
-      /** Convenience method to create toast notifications. */
-      this.add(this.NotificationMessage.create({
-        message: data,
-        type: type,
-        description: description
-      }));
+    function notify(toastMessage, toastSubMessage, severity, transient) {
+      var notification = this.Notification.create();
+      notification.userId = this.subject && this.subject.realUser ?
+        this.subject.realUser.id : this.user.id;
+      notification.toastMessage = toastMessage;
+      notification.toastSubMessage = toastSubMessage;
+      notification.toastState = this.ToastState.REQUESTED;
+      notification.severity = severity;
+      notification.transient = transient;
+      this.__subContext__.notificationDAO.put(notification);
     }
   ],
 
@@ -551,7 +575,7 @@ foam.CLASS({
       try {
         this.theme = await this.Themes.create().findTheme(this);
       } catch (err) {
-        this.notify(this.LOOK_AND_FEEL_NOT_FOUND, 'error');
+        this.notify(this.LOOK_AND_FEEL_NOT_FOUND, '', this.LogLevel.ERROR, true);
         console.error(err);
         return;
       }

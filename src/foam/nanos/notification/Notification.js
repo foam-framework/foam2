@@ -113,6 +113,30 @@ foam.CLASS({
       documentation: 'Notification body'
     },
     {
+      class: 'String',
+      name: 'toastMessage',
+      documentation: 'Toast notification message'
+    },
+    {
+      class: 'String',
+      name: 'toastSubMessage',
+      documentation: 'Toast notification description'
+    },
+    {
+      class: 'Enum',
+      name: 'toastState',
+      of: 'foam.nanos.notification.ToastState'
+    },
+    {
+      class: 'Enum',
+      name: 'severity',
+      of: 'foam.log.LogLevel'
+    },
+    {
+      class: 'Boolean',
+      name: 'transient'
+    },
+    {
       class: 'Boolean',
       name: 'broadcasted',
       documentation: 'Determines if notification is sent to all users in a group or system.'

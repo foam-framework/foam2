@@ -40,6 +40,17 @@ p({
             new foam.nanos.ticket.TicketOwnerDAO.Builder(x).setDelegate(
               new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.ticket.Ticket.getOwnClassInfo()).build()).build()).build())
       )
+      .setServiceProviderAware(true)
+      .setServiceProviderAwarePropertyInfos(
+        new java.util.HashMap() {{
+          put(
+            foam.nanos.ticket.Ticket.class.getName(),
+            new foam.core.PropertyInfo[] {
+              foam.nanos.ticket.Ticket.OWNER
+            }
+          );
+        }}
+      )
       .build();
   """
 })

@@ -19,6 +19,7 @@ foam.CLASS({
 
   requires: [
     'foam.core.Action',
+    'foam.log.LogLevel',
     'foam.u2.dialog.Popup',
     'foam.u2.dialog.SimpleActionDialog',
     'foam.u2.stack.Stack',
@@ -99,6 +100,11 @@ foam.CLASS({
       name: 'onClose',
       class: 'Function',
       factory: () => () => {}
+    },
+    {
+      name: 'showDiscardOption',
+      class: 'Boolean',
+      value: false
     }
   ],
 
@@ -191,6 +197,9 @@ foam.CLASS({
     {
       name: 'discard',
       label: 'Discard Changes',
+      isAvailable: function () {
+        return this.showDiscardOption;
+      },
       confirmationRequired: true,
       code: function(x) {
         this.onClose(x);
@@ -204,7 +213,7 @@ foam.CLASS({
           this.onClose(x);
         }).catch(e => {
           console.error(e);
-          x.ctrl.notify(this.ERROR_MSG_DRAFT, 'error');
+          x.ctrl.notify(this.ERROR_MSG_DRAFT, '', this.LogLevel.ERROR, true);
         });
       }
     },
@@ -231,7 +240,7 @@ foam.CLASS({
           }
         }).catch(e => {
           console.error(e);
-          x.ctrl.notify(this.ERROR_MSG);
+          x.ctrl.notify(this.ERROR_MSG, '', this.LogLevel.ERROR, true);
         });
       }
     }
