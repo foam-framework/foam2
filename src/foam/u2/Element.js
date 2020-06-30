@@ -2242,19 +2242,25 @@ foam.CLASS({
       documentation: 'Exists for backwards compatability. You should set createVisibility, updateVisibility, or readVisibility instead. If this property is set, it will override the other three.'
     },
     {
+      class: 'Enum',
+      of: 'foam.u2.DisplayMode',
       name: 'createVisibility',
       documentation: 'The display mode for this property when the controller mode is CREATE.',
-      value: 'RW'
+      value: foam.u2.DisplayMode.RW
     },
     {
+      class: 'Enum',
+      of: 'foam.u2.DisplayMode',
       name: 'readVisibility',
       documentation: 'The display mode for this property when the controller mode is VIEW.',
-      value: 'RO'
+      value: foam.u2.DisplayMode.RO
     },
     {
+      class: 'Enum',
+      of: 'foam.u2.DisplayMode',
       name: 'updateVisibility',
       documentation: 'The display mode for this property when the controller mode is EDIT.',
-      value: 'RW'
+      value: foam.u2.DisplayMode.RW
     },
     {
       class: 'Boolean',
