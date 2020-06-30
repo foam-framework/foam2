@@ -125,7 +125,7 @@ foam.CLASS({
       width: auto;
       height: auto;
     }
-    
+
     ^icon-circle {
       display: inline-block;
       margin-right: 15px;
