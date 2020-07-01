@@ -11,6 +11,10 @@ foam.CLASS({
 
   documentation: `Simply displays wizardlets consecutively.`,
 
+  requires: [
+    'foam.log.LogLevel'
+  ],
+
   imports: [
     'notify',
     'stack'
@@ -108,12 +112,12 @@ foam.CLASS({
         this.wizardlets.reduce(
           (p, wizardlet) => p.then(() => wizardlet.save()), p
         ).then(() => {
-          x.ctrl.notify(this.isErrorFree ? this.SUCCESS_MSG : this.SUCCESS_MSG_DRAFT);
+          x.ctrl.notify(this.isErrorFree ? this.SUCCESS_MSG : this.SUCCESS_MSG_DRAFT, '', this.LogLevel.INFO, true);
           x.stack.back();
         }).catch(e => {
           x.ctrl.notify(
             (this.isErrorFree ? this.ERROR_MSG : this.ERROR_MSG_DRAFT)
-            + ': ' + e
+            + ': ' + e, '', this.LogLevel.INFO, true
           );
         });
       }

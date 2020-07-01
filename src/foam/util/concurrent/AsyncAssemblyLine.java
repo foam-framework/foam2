@@ -19,24 +19,32 @@ public class AsyncAssemblyLine
   extends SyncAssemblyLine
 {
   protected Agency pool_;
-  protected String agencyName_ = "AsyncAssemblyLine";
+  protected String agencyName_ = null;
+  protected boolean  shutdown_  = false;
 
   public AsyncAssemblyLine(X x) {
-    this(x, "threadPool");
+    this(x, null);
   }
 
   public AsyncAssemblyLine(X x, String agencyName) {
+    this(x, agencyName, "threadPool");
+  }
+
+  public AsyncAssemblyLine(X x, String agencyName, String threadPool) {
     super(x);
-    pool_ = (Agency) x.get("threadPool");
-    agencyName_ += ":" + agencyName;
+    pool_  = (Agency) x.get(threadPool);
+    agencyName_ = "AsyncAssemblyLine:";
+    if ( agencyName != null ) {
+      agencyName_ += agencyName;
+    }
   }
 
   public void enqueue(Assembly job) {
-    if ( shutdown_ ) throw new IllegalStateException("Can't enqueue into a shutdown AssemblyLine.");
-
     final Assembly[] previous = new Assembly[1];
 
     synchronized ( startLock_ ) {
+      if ( shutdown_ ) throw new IllegalStateException("Can't enqueue into a shutdown AssemblyLine.");
+
       synchronized ( qLock_ ) {
         previous[0] = q_;
         q_ = job;
@@ -90,12 +98,14 @@ public class AsyncAssemblyLine
         public void startJob() {
           shutdown_ = true;
         }
-        public void endJob() {
+        public void endJob(boolean isLast) {
           s.release();
         }
       });
       s.acquire();
     } catch (InterruptedException e) {
+    } catch (IllegalStateException e) {
+      // Line is already shutdown, so no problem
     }
   }
 }

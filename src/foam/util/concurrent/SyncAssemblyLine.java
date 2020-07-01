@@ -45,12 +45,12 @@ public class SyncAssemblyLine
   */
 
   public void enqueue(Assembly job) {
-    if ( shutdown_ ) throw new IllegalStateException("Can't enqueue into a shutdown AssemblyLine.");
-
     Assembly previous;
 
     try {
       synchronized ( startLock_ ) {
+        if ( shutdown_ ) throw new IllegalStateException("Can't enqueue into a shutdown AssemblyLine.");
+
         synchronized ( qLock_ ) {
           previous = q_;
           q_ = job;
