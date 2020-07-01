@@ -249,8 +249,8 @@ foam.CLASS({
           if ( importConfig.getColumnHeaderPropertyMappings()[j].getProp() == null ) continue;
           int columnIndex = columnHeaders.indexOf(importConfig.getColumnHeaderPropertyMappings()[j].getColumnHeader());
           Object val = data.get(i).get(columnIndex);
-          PropertyInfo prop = ((PropertyInfo)importConfig.getColumnHeaderPropertyMappings()[j].getProp());
-          if ( ! setValue(obj, prop, data.get(i).get(columnIndex)) ) 
+          // PropertyInfo prop = ((PropertyInfo)importConfig.getColumnHeaderPropertyMappings()[j].getProp());
+          if ( ! setValue(obj, importConfig.getColumnHeaderPropertyMappings()[j], data.get(i).get(columnIndex)) ) 
             continue;
         }
         objs.add((FObject)obj);
@@ -272,8 +272,8 @@ foam.CLASS({
         type: 'Object'
       },
       {
-        name: 'prop',
-        javaType: 'foam.core.PropertyInfo'
+        name: 'columnHeaderToPropertyName',
+        javaType: 'foam.nanos.google.api.sheets.ColumnHeaderToPropertyName'
       },
       {
         name: 'val',
@@ -281,20 +281,21 @@ foam.CLASS({
       }
     ],
     javaCode: `
+      PropertyInfo prop  = (PropertyInfo)columnHeaderToPropertyName.getProp();
       switch (prop.getValueClass().getName()) {
         case "long":
-          if ( prop.getName().equals("amount") ) {
-            String finVal = val.toString();
-            Matcher numMatcher = numbersRegex.matcher(finVal);
+          if ( columnHeaderToPropertyName.getUnitProperty() != null ) {
+            String unitValue = val.toString();
+            Matcher numMatcher = numbersRegex.matcher(unitValue);
             if ( ! numMatcher.find() ) {
               return false;
             }
-            String number = finVal.substring(numMatcher.start(), numMatcher.end());
-            prop.set(obj, Math.round( Double.parseDouble(number) * 100));
-            Matcher currencyMatcher = alphabeticalCharsRegex.matcher(finVal);
-            if ( currencyMatcher.find() ) {
-              String currency = finVal.substring(currencyMatcher.start(), currencyMatcher.end());
-              obj.getClass().getMethod("setSourceCurrency", String.class).invoke(obj, currency);
+            String number = unitValue.substring(numMatcher.start(), numMatcher.end());
+            prop.set(obj, Math.round( Double.parseDouble(number) * 100));//might not be the case for all of the unitValues
+            Matcher alphabeticalCharsMatcher = alphabeticalCharsRegex.matcher(unitValue);
+            if ( alphabeticalCharsMatcher.find() ) {
+              String unit = unitValue.substring(alphabeticalCharsMatcher.start(), alphabeticalCharsMatcher.end());
+              ((PropertyInfo)columnHeaderToPropertyName.getUnitProperty()).set(obj, unit);
             }
           } else prop.set(obj, Long.parseLong(val.toString()));
           break;

@@ -105,7 +105,14 @@ foam.CLASS({
           if ( columnHeaders ) {
             var arr = [];
             for ( var columnHeader of columnHeaders ) {
-              arr.push(foam.nanos.google.api.sheets.ColumnHeaderToPropertyName.create({ of: this.importConfig.importClassInfo, columnHeader: columnHeader, prop: this.importConfig.importClassInfo.getAxiomsByClass(foam.core.Property).find(p => ! p.networkTransient && ( this.importServiceName !== 'googleSheetsDataImport' || ! foam.core.FObjectProperty.isInstance(p) ) && p.label === columnHeader) }));
+              var prop = this.importConfig.importClassInfo.getAxiomsByClass(foam.core.Property).find(p => ! p.networkTransient && ! foam.core.FObjectProperty.isInstance(p) && p.label === columnHeader);
+              var colHeaderConfig = foam.nanos.google.api.sheets.ColumnHeaderToPropertyName.create({ of: this.importConfig.importClassInfo, columnHeader: columnHeader, prop: prop });
+
+              if ( prop && prop.cls_.id === "foam.core.UnitValue" && prop.unitPropName ) {
+                colHeaderConfig.unitProperty = this.importConfig.importClassInfo.getAxiomByName(prop.unitPropName);
+              }
+
+              arr.push(colHeaderConfig);
             }
             this.importConfig.columnHeaderPropertyMappings = arr;
           }          
@@ -159,6 +166,13 @@ foam.CLASS({
       //   class: 'foam.u2.TextField',
       //   data: this.prop$label
       // },
+    },
+    {
+      name: 'unitProperty',
+      class: 'foam.mlang.ExprProperty',
+      visibility: 'RO',
+      hidden: true,
+      javaJSONParser: 'foam.lib.json.ExprParser.instance()',
     }
   ]
 });
