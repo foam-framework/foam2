@@ -350,7 +350,7 @@ foam.CLASS({
       if ( !m.find() ) return false;
       int indexOfFirstRowInRange = m.start();
       String startColumn = rangeLimits[0].substring(0, indexOfFirstRowInRange);
-      String startRow = Integer.parseInt(rangeLimits[0].substring(indexOfFirstRowInRange)) + 1;
+      String startRow = Integer.toString( Integer.parseInt(rangeLimits[0].substring(indexOfFirstRowInRange)) + 1 );
       m = digitAppearenceRegex.matcher(rangeLimits[1]);
 
       if ( ! m.find() ) return false;
