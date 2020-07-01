@@ -335,9 +335,10 @@ foam.CLASS({
         javaType: 'List<String>'
       }
     ],
+    javaThrows: [ 'java.io.IOException', 'java.security.GeneralSecurityException' ],
     javaCode: `
       GoogleSheetsApiService googleSheetsAPIEnabler = (GoogleSheetsApiService)x.get("googleSheetsDataExport");
-      List<String[]> values = new ArrayList<>();
+      List<List<List<Object>>> values = new ArrayList<>();
 
       //to calculate cells ranges
       List<String> cellsRange = new ArrayList<>();
@@ -349,7 +350,7 @@ foam.CLASS({
       if ( !m.find() ) return false;
       int indexOfFirstRowInRange = m.start();
       String startColumn = rangeLimits[0].substring(0, indexOfFirstRowInRange);
-      String startRow = rangeLimits[0].substring(indexOfFirstRowInRange);
+      String startRow = Integer.parseInt(rangeLimits[0].substring(indexOfFirstRowInRange)) + 1;
       m = digitAppearenceRegex.matcher(rangeLimits[1]);
 
       if ( ! m.find() ) return false;
@@ -372,9 +373,10 @@ foam.CLASS({
           
           cellsRange.add(sb.toString());
 
-          String[] updatedValues = new String[objs.size()];
+          List<List<Object>> updatedValues = new ArrayList<>();
           for ( int i = 0 ; i < objs.size() ; i ++ ) {
-            updatedValues[i] = ((PropertyInfo)c.getProp()).get((Object)objs.get(i)).toString();
+            int finalI = i;
+            updatedValues.add(new ArrayList<Object>() {{ add(((PropertyInfo)c.getProp()).get((Object)objs.get(finalI)).toString()); }});
           }
           values.add(updatedValues);
         }
@@ -382,13 +384,7 @@ foam.CLASS({
       if ( values.size() == 0 ) {
         return true;
       }
-      String[][] columnValues = new String[values.size()][objs.size()];
-      for (int  i = 0 ; i < values.size() ; i ++ ) {
-        columnValues[i] = values.get(i);
-      }
-      // googleSheetsAPIEnabler.updateValues(x, importConfig.getGoogleSpreadsheetId(), columnValues, )
-
-      return true;
+      return googleSheetsAPIEnabler.batchUpdate(x, importConfig.getGoogleSpreadsheetId(), values, cellsRange);
     `
   }
 ],

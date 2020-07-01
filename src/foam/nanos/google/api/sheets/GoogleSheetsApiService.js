@@ -330,6 +330,52 @@ foam.CLASS({
           .execute();
         return batchResult.getSpreadsheetId();
       `
+    },
+    {
+      name: 'batchUpdate',
+      javaType: 'Boolean',
+      args: [
+        {
+          name: 'x',
+          type: 'Context',
+        },
+        {
+          name: 'sheetId',
+          javaType: 'String'
+        },
+        {
+          name: 'values',
+          javaType: 'List<List<List<Object>>>'
+        },
+        {
+          name: 'cellsRanges',
+          javaType: 'List<String>'
+        }
+      ],
+      javaThrows: [ 'java.io.IOException', 'java.security.GeneralSecurityException' ],
+      javaCode: `
+        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+        GoogleApiAuthService googleApiAuthService = (GoogleApiAuthService)getX().get("googleApiAuthService");
+        Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, READ_SCOPES))
+          .setApplicationName("nanopay")
+          .build();
+
+        List<ValueRange> data = new ArrayList<>();
+        for ( int i = 0 ; i < cellsRanges.size() ; i++ ) {
+          data.add(new ValueRange()
+          .setRange(cellsRanges.get(i))
+          .setValues(values.get(i)));
+        }
+        
+        BatchUpdateValuesRequest batchBody = new BatchUpdateValuesRequest()
+          .setValueInputOption("USER_ENTERED")
+          .setData(data);
+  
+        BatchUpdateValuesResponse batchResult = service.spreadsheets().values()
+          .batchUpdate(sheetId, batchBody)
+          .execute();
+        return true;
+      `
     }
   ]
 });
