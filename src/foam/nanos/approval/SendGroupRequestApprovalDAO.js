@@ -90,7 +90,7 @@ foam.CLASS({
     },
     {
       name: 'sendSingleRequest',
-      visibility: 'private',
+      visibility: 'protected',
       type: 'void',
       args: [
         { type: 'Context', name: 'x' },
@@ -106,7 +106,7 @@ foam.CLASS({
     },
     {
       name: 'findUserPoints',
-      visibility: 'private',
+      visibility: 'protected',
       type: 'int',
       args: [
         { type: 'User', name: 'user' }
