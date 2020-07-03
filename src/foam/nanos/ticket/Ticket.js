@@ -12,6 +12,7 @@ foam.CLASS({
 
   implements: [
     'foam.core.Validatable',
+    'foam.nanos.auth.Authorizable',
     'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.CreatedByAware',
     'foam.nanos.auth.LastModifiedAware',
@@ -23,6 +24,10 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.nanos.auth.AuthorizationException',
+    'foam.nanos.auth.AuthService',
+    'foam.nanos.auth.Subject',
+    'foam.nanos.auth.User',
     'java.util.Date'
   ],
 
@@ -254,6 +259,62 @@ foam.CLASS({
       tableCellFormatter: function(value, obj) {
         this.add(obj.title);
       }
+    }
+  ],
+
+  methods: [
+    {
+      name: 'authorizeOnCreate',
+      args: [
+        { name: 'x', type: 'Context' }
+      ],
+      javaThrows: ['AuthorizationException'],
+      javaCode: `
+        // Everyone can create a ticket
+      `
+    },
+    {
+      name: 'authorizeOnRead',
+      args: [
+        { name: 'x', type: 'Context' }
+      ],
+      javaThrows: ['AuthorizationException'],
+      javaCode: `
+        AuthService auth = (AuthService) x.get("auth");
+        Subject subject = (Subject) x.get("subject");
+        User user = subject.getRealUser();
+
+        if ( user.getId() != this.getCreatedBy() && ! auth.check(x, "ticket.read." + this.getId()) ) {
+          throw new AuthorizationException("You don't have permission to read this ticket.");
+        }
+      `
+    },
+    {
+      name: 'authorizeOnUpdate',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'oldObj', type: 'foam.core.FObject' }
+      ],
+      javaThrows: ['AuthorizationException'],
+      javaCode: `
+        AuthService auth = (AuthService) x.get("auth");
+        Subject subject = (Subject) x.get("subject");
+        User user = subject.getRealUser();
+
+        if ( user.getId() != this.getCreatedBy() && ! auth.check(x, "ticket.update." + this.getId()) ) {
+          throw new AuthorizationException("You don't have permission to update this ticket.");
+        }
+      `
+    },
+    {
+      name: 'authorizeOnDelete',
+      args: [
+        { name: 'x', type: 'Context' }
+      ],
+      javaThrows: ['AuthorizationException'],
+      javaCode: `
+        // The checkGlobalRemove has checked the permission for deleting the ticket already.
+      `
     }
   ],
 

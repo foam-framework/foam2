@@ -792,6 +792,7 @@ foam.CLASS({
       name: 'abstract',
       value: false
     },
+    { class: 'String', name: 'visibility', value: 'public' },
     {
       class: 'StringArray',
       name: 'javaThrows'
@@ -868,7 +869,7 @@ foam.CLASS({
       cls.method({
         name: this.name,
         type: this.javaType || 'void',
-        visibility: 'public',
+        visibility: this.visibility,
         static: this.isStatic(),
         abstract: this.abstract,
         final: this.final,
@@ -1334,7 +1335,6 @@ foam.CLASS({
             type: 'void',
             body: `/* nop */`
           });
-
 
           var flagFilter = foam.util.flagFilter(['java']);
           var axioms = this.getAxioms().filter(flagFilter);

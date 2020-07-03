@@ -454,6 +454,8 @@ var classes = [
   'foam.nanos.notification.EmailSetting',
   'foam.nanos.notification.NotificationSetting',
   'foam.nanos.notification.NotificationHostnameRuleAction',
+  'foam.nanos.notification.ToastNotificationDAO',
+  'foam.nanos.notification.ToastState',
   'foam.nanos.notification.ResendNotificationServiceInterface',
   'foam.nanos.notification.ClientResendNotificationService',
   'foam.nanos.script.Script',

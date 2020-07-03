@@ -26,6 +26,7 @@ foam.CLASS({
   `,
 
   requires: [
+    'foam.log.LogLevel',
     'foam.u2.tag.CircleIndicator'
   ],
 
@@ -157,7 +158,7 @@ foam.CLASS({
       var self = this;
 
       var indicator;
-      if ( this.type === 'error' ) {
+      if ( this.type == this.LogLevel.ERROR ) {
         indicator = {
           size: 18,
           backgroundColor: this.theme.destructive3,
@@ -166,7 +167,7 @@ foam.CLASS({
             fill: this.theme.white
           })
         };
-      } else if ( this.type === 'warning' ) {
+      } else if ( this.type == this.LogLevel.WARN ) {
         indicator = {
           size: 18,
           icon: 'images/baseline-warning-yellow.svg'
@@ -184,19 +185,19 @@ foam.CLASS({
       this
         .addClass(this.myClass())
         .start().addClass(this.myClass('inner'))
-          .enableClass(this.myClass('error-background'), this.type === 'error')
-          .enableClass(this.myClass('warning-background'), this.type === 'warning')
+          .enableClass(this.myClass('error-background'), this.type == this.LogLevel.ERROR)
+          .enableClass(this.myClass('warning-background'), this.type == this.LogLevel.WARN)
           .start('div').addClass(this.myClass('banner'))
-            .enableClass(this.myClass('error-banner'), this.type === 'error')
-            .enableClass(this.myClass('warning-banner'), this.type === 'warning')
+            .enableClass(this.myClass('error-banner'), this.type == this.LogLevel.ERROR)
+            .enableClass(this.myClass('warning-banner'), this.type == this.LogLevel.WARN)
           .end()
           .start()
             .start(this.CircleIndicator, indicator)
               .addClass(this.myClass('status-icon'))
             .end()
             .start().addClass(this.myClass('content'))
-              .enableClass(this.myClass('error-content'), this.type === 'error')
-              .enableClass(this.myClass('warning-content'), this.type === 'warning')
+              .enableClass(this.myClass('error-content'), this.type == this.LogLevel.ERROR)
+              .enableClass(this.myClass('warning-content'), this.type == this.LogLevel.WARN)
               .callIfElse(foam.String.isInstance(this.message), function() {
                 this.add(self.message);
                 console.log(self.message);
@@ -206,8 +207,8 @@ foam.CLASS({
               })
             .end()
             .start().addClass(this.myClass('description'))
-              .enableClass(this.myClass('error-content'), this.type === 'error')
-              .enableClass(this.myClass('warning-content'), this.type === 'warning')
+              .enableClass(this.myClass('error-content'), this.type == this.LogLevel.ERROR)
+              .enableClass(this.myClass('warning-content'), this.type == this.LogLevel.WARN)
               .callIfElse(foam.String.isInstance(this.description), function() {
                 this.add(self.description);
                 console.log(self.description);

@@ -31,7 +31,7 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'foam.dao.DAO',
-      name: 'historyDAO_'
+      name: 'historyDAO'
     }
   ],
 
@@ -47,7 +47,7 @@ foam.CLASS({
           
             public HistoryDAO(X x, DAO historyDAO, DAO delegate) {
               super(x, delegate);
-              setHistoryDAO_(historyDAO);
+              setHistoryDAO(historyDAO);
             } 
           `
         );
@@ -58,9 +58,10 @@ foam.CLASS({
   methods: [
     {
       name: 'formatUserName',
+      visibility: 'private',
       type: 'String',
       args: [
-        { type: 'User', name: 'user '}
+        { type: 'User', name: 'user ' }
       ],
       documentation: 'Formats a User record to the following string: LastName, FirstName (ID)',
       javaCode: `
@@ -72,6 +73,7 @@ foam.CLASS({
     },
     {
       name: 'getUpdatedProperties',
+      visibility: 'private',
       type: 'PropertyUpdate[]',
       args: [
         { type: 'FObject', name: 'currentValue' },
@@ -113,7 +115,7 @@ foam.CLASS({
             historyRecord.setUpdates(getUpdatedProperties(current, obj));
           }
     
-          getHistoryDAO_().put_(x, historyRecord);
+          getHistoryDAO().put_(x, historyRecord);
         } catch (Throwable t) {
           Logger l = (Logger) x.get("logger");
           l.error(CREATE_ERROR_MSG, obj.getClassInfo().getId(), t);
@@ -126,7 +128,7 @@ foam.CLASS({
       name: 'remove_',
       javaCode: `
         Object objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
-        getHistoryDAO_().where(EQ(HistoryRecord.OBJECT_ID, objectId)).removeAll();
+        getHistoryDAO().where(EQ(HistoryRecord.OBJECT_ID, objectId)).removeAll();
         return super.remove_(x, obj);
       `
     }

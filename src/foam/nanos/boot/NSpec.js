@@ -120,9 +120,7 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       name: 'service',
-      view: 'foam.u2.DetailView',
-      // Why was this set to be a SectionedDetailView? Put back to DetailView. KGR
-      //      view: { class: 'foam.u2.detail.SectionedDetailView' },
+      view: 'foam.u2.view.FObjectView',
       readPermissionRequired: true,
       writePermissionRequired: true
     },

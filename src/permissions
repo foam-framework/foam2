@@ -8,6 +8,7 @@ p({"class":"foam.nanos.auth.Permission","id":"smsmessage.read.*","description":"
 p({"class":"foam.nanos.auth.Permission","id":"menu.read.admin","description":"Ability to use the 'admin' menu."})
 p({"class":"foam.nanos.auth.Permission","id":"menu.read.admin.groups","description":""})
 p({"class":"foam.nanos.auth.Permission","id":"menu.read.admin.regions","description":""})
+p({"class":"foam.nanos.auth.Permission","id":"menu.read.admin.tickets","description":""})
 p({"class":"foam.nanos.auth.Permission","id":"menu.read.integration","description":""})
 p({"class":"foam.nanos.auth.Permission","id":"menu.read.integration.api-dig","description":""})
 p({"class":"foam.nanos.auth.Permission","id":"menu.read.integration.api-dug","description":""})
