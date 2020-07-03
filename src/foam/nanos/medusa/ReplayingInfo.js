@@ -13,6 +13,10 @@ foam.CLASS({
     'java.util.Map'
   ],
 
+  requires: [
+    // 'foam.core.Duration', -- don't require, triggers Java compilation.
+  ],
+
   properties: [
     {
       name: 'id',
@@ -49,33 +53,41 @@ foam.CLASS({
       class: 'Date',
       visibility: 'HIDDEN'
     },
-    // uptime, ...
     {
-      name: 'duration',
+      name: 'timeElapsed',
+      class: 'String',
+      label: 'Elapsed',
       expression: function(index, replayIndex, startTime, endTime) {
         let time = endTime || new Date();
         let delta = time.getTime() - startTime.getTime();
-        let eta = this.Duration.create().format(delta);
+        let eta = foam.core.Duration.create({value: delta}).formatted();
         return eta;
       },
       visibility: 'RO'
     },
     {
       name: 'percentComplete',
-      label: 'PC',
+      label: '% Complete',
+      class: 'Float',
       expression: function(index, replayIndex) {
-        return replayIndex ? index / replayIndex : 0;
+        if ( replayIndex > index ) {
+          return ((index / replayIndex) * 100).toFixed(2);
+        } else if ( replayIndex > 0 ) {
+          return '100';
+        }
+        return '0';
       },
       visibility: 'RO'
     },
     {
-      name: 'eta',
-      label: 'ETA',
+      name: 'timeRemaining',
+      class: 'String',
+      label: 'Remaining',
       expression: function(index, replayIndex, startTime) {
         let delta = Date.now() - startTime.getTime();
         let rate = index / delta;
         let t = rate * (replayIndex - index); // ms
-        let eta = this.Duration.create().format(t);
+        let eta = foam.core.Duration.create({value: t}).formatted();
         return eta;
       },
       visibility: 'RO'

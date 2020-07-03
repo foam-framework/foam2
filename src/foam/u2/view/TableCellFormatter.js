@@ -262,8 +262,9 @@ foam.CLASS({
     {
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
-      value: function(value) {
-        let formatted = foam.core.Duration.create().format(value);
+      factory: function(value) {
+        // REVIEW: how to call format directly.
+        let formatted = foam.core.Duration.create({value: value}).formatted();
         this.add(formatted || '0ms');
       }
     }

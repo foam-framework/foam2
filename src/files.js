@@ -42,6 +42,7 @@ FOAM_FILES([
   { name: "foam/core/Script" },
   { name: "foam/pattern/Faceted" },
   { name: "foam/core/types" },
+  { name: "foam/core/Duration" },
   { name: "foam/core/FObjectArray" },
   { name: "foam/core/Constant" },
   { name: "foam/core/Validation" },

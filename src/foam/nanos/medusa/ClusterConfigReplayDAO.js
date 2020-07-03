@@ -59,7 +59,10 @@ foam.CLASS({
         ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
         ClusterConfig myConfig = support.getConfig(getX(), support.getConfigId());
         // If a Node comming online, begin replay from it.
-        if ( myConfig.getType() == MedusaType.MEDIATOR &&
+getLogger().debug("myConfig", myConfig);
+getLogger().debug("Config", config);
+        if ( ( myConfig.getType() == MedusaType.MEDIATOR ||
+               myConfig.getType() == MedusaType.NERF ) &&
                ( ( myConfig.getZone() == 0L &&
                    config.getType() == MedusaType.NODE &&
                    config.getZone() == 0L ) ||
@@ -119,7 +122,11 @@ foam.CLASS({
             getLogger().debug(myConfig.getId(), "ReplayCmd to", config.getId());
             cmd = (ReplayCmd) clientDAO.cmd_(getX(), cmd);
             getLogger().debug(myConfig.getId(), "ReplayCmd from", config.getId(), cmd);
+          } else {
+            getLogger().debug("no match");
           }
+      } else {
+        getLogger().debug("not online");
       }
       return nu;
       `
