@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Collections;
 import foam.nanos.logger.Logger;
+import java.util.Random;
 
 public class ConnectionBox
   extends Thread
@@ -39,6 +40,7 @@ public class ConnectionBox
   protected String host_;
   protected int port_;
   protected Map<Long, Box> replayBoxMap = Collections.synchronizedMap(new HashMap<Long, Box>());
+  protected Random random = new Random();
 
   public ConnectionBox(X x, Socket socket, String host, int port)
     throws IOException
@@ -123,7 +125,8 @@ public class ConnectionBox
   public synchronized void send(Message msg) {
 
     Box replayBox = (Box) msg.getAttributes().get("replyBox");
-    Long syncBoxId = (Long) msg.getAttributes().get("syncBoxId");
+    Long syncBoxId = (Long) msg.getAttributes().getOrDefault("syncBoxId", random.nextLong());
+
     replayBoxMap.put(syncBoxId, replayBox);
 
     msg.getAttributes().put("replyBox", new SocketReplyBox());

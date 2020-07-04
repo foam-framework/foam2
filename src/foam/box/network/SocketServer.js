@@ -66,12 +66,14 @@ foam.CLASS({
               @Override
               public void execute(X x) {
                 try {
-                  Socket client = serverSocket.accept();
-                  agency.submit(
-                    x,
-                    new SocketServerProcessor(getX(), client),
-                    "socket, processor"
-                  );
+                  while ( true ) {
+                    Socket client = serverSocket.accept();
+                    agency.submit(
+                      x,
+                      new SocketServerProcessor(getX(), client),
+                      "socket, processor"
+                    );
+                  }
                 } catch ( IOException ioe ) {
                   getLogger().error(ioe);
                 }

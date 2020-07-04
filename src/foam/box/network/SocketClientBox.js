@@ -23,6 +23,10 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'port'
+    },
+    {
+      class: 'String',
+      name: 'serviceName'
     }
   ],
 
@@ -31,6 +35,7 @@ foam.CLASS({
       name: 'send',
       synchronized: true,
       javaCode: `
+        msg.getAttributes().put("serviceKey", getServiceName());
         ConnectionBox conBox = ((TCPSocketMgr) getX().get("SocketMgr")).get(getX(), getHost(), getPort());
         conBox.send(msg);
       `

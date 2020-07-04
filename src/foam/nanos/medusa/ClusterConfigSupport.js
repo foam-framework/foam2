@@ -31,6 +31,7 @@ configuration for contacting the primary node.`,
     'foam.dao.EasyDAO',
     'foam.dao.MDAO',
     'foam.dao.ProxyDAO',
+    'foam.box.network.SocketClientBox',
     'static foam.mlang.MLang.*',
     'static foam.mlang.MLang.COUNT',
     'foam.mlang.sink.Count',
@@ -46,7 +47,8 @@ configuration for contacting the primary node.`,
     'java.util.ArrayList',
     'java.util.HashMap',
     'java.util.List',
-    'java.util.Map'
+    'java.util.Map',
+    'foam.nanos.medusa.box.SyncBox'
   ],
 
   properties: [
@@ -348,6 +350,101 @@ configuration for contacting the primary node.`,
       `
     },
     {
+      name: 'getSocketClientBox',
+      type: 'SocketClientBox',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'serviceName',
+          type: 'String'
+        },
+        {
+          name: 'sendClusterConfig',
+          type: 'ClusterConfig'
+        },
+        {
+          name: 'receiveClusterConfig',
+          type: 'foam.nanos.medusa.ClusterConfig'
+        },
+      ],
+      javaCode: `
+        String address = receiveClusterConfig.getId();
+        DAO hostDAO = (DAO) x.get("hostDAO");
+        Host host = (Host) hostDAO.find(receiveClusterConfig.getId());
+        if ( host != null ) {
+          address = host.getAddress();
+        }
+
+        SocketClientBox clientBox = new SocketClientBox();
+        clientBox.setX(x);
+        clientBox.setHost(address);
+        clientBox.setPort(receiveClusterConfig.getPort() + 2);
+        clientBox.setServiceName(serviceName);
+        return clientBox;
+      `
+    },
+    {
+      name: 'getTransportlayerBox',
+      type: 'Box',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'serviceName',
+          type: 'String'
+        },
+        {
+          name: 'sendClusterConfig',
+          type: 'ClusterConfig'
+        },
+        {
+          name: 'receiveClusterConfig',
+          type: 'ClusterConfig'
+        },
+        {
+          name: 'usingTCP',
+          type: 'Boolean',
+          value: true
+        }
+      ],
+      javaCode: `
+        if ( usingTCP == true ) {
+          return new SyncBox.Builder(x)
+                  .setDelegate(
+                    getSocketClientBox(x, serviceName, sendClusterConfig, receiveClusterConfig)
+                  ).build();
+        } else {
+          return new ClusterHTTPBox.Builder(x)
+                  .setAuthorizationType(foam.box.HTTPAuthorizationType.BEARER)
+                  .setSessionID(sendClusterConfig.getSessionId())
+                  .setUrl(buildURL(x, serviceName, null, null, receiveClusterConfig))
+                  .build();
+        }
+      `
+    },
+    {
+      name: 'getPrimaryDAO',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'serviceName',
+          type: 'String'
+        }
+      ],
+      type: 'foam.dao.DAO',
+      javaCode: `
+      return getClientDAO(x, serviceName, getConfig(x, getConfigId()), getPrimary(x));
+      `
+    },
+    {
       name: 'getPrimary',
       args: [
         {
@@ -586,11 +683,7 @@ configuration for contacting the primary node.`,
           .setDelegate(new PMBox.Builder(x)
             .setClassType(ClientDAO.getOwnClassInfo())
             .setName(id)
-              .setDelegate(new ClusterHTTPBox.Builder(x)
-                .setAuthorizationType(foam.box.HTTPAuthorizationType.BEARER)
-                .setSessionID(sendClusterConfig.getSessionId())
-                .setUrl(buildURL(x, serviceName, null, null, receiveClusterConfig))
-                .build())
+              .setDelegate(getTransportlayerBox(x, serviceName, sendClusterConfig, receiveClusterConfig, true))
             .build())
           .build())
         .build();
