@@ -19,7 +19,7 @@ p({
   "class": "foam.nanos.boot.NSpec",
   "name": "googleSheetsDataExport",
   "serve": true,
-  "authenticate": false,
+  "authenticate": true,
   "boxClass": "foam.nanos.export.GoogleSheetsExportSkeleton",
   "serviceClass": "foam.nanos.google.api.sheets.GoogleSheetsApiService",
   "client":"""
@@ -1026,7 +1026,6 @@ p({
 p({
   "class":"foam.nanos.boot.NSpec",
   "name":"googleDriveService",
-  "lazy":false,
   "service": {
     "class":"foam.nanos.google.api.drive.GoogleDriveService"
   },
@@ -1036,7 +1035,6 @@ p({
 p({
   "class":"foam.nanos.boot.NSpec",
   "name":"googleApiAuthService",
-  "lazy":false,
   "service": {
     "class":"foam.nanos.google.api.auth.GoogleApiAuthService"
   },
@@ -1046,7 +1044,6 @@ p({
 p({
   "class":"foam.nanos.boot.NSpec",
   "name":"googleApiCredentialsDAO",
-  "lazy":false,
   "serve":true,
   "serviceScript":
   """
