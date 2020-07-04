@@ -22,9 +22,6 @@ foam.CLASS({
     'foam.graphics.Point',
     'foam.graphics.ScrollCView',
     'foam.nanos.medusa.ClusterConfig',
-    'foam.nanos.medusa.MedusaType',
-    'foam.nanos.medusa.Status',
-    'foam.nanos.medusa.ElectoralServiceState',
     'foam.nanos.medusa.ReplayingInfoDetailCView',
     'foam.u2.DetailView',
     'foam.u2.PopupView'
@@ -94,7 +91,7 @@ foam.CLASS({
         if ( this.config.replayingInfo ) {
           if ( this.config.replayingInfo.replaying &&
                this.config.replayingInfo.replayIndex > 0 ) {
-            this.color = 'gray';
+            this.color = 'cyan';
             this.start = (1 - this.config.replayingInfo.percentComplete ) * (2 * Math.PI);
             this.etaLabel.text = this.config.replayingInfo.timeRemaining;
             this.indexLabel.text = this.config.replayingInfo.index +

@@ -28,12 +28,14 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.dao.Sink',
     'foam.dao.ArraySink',
-    'foam.nanos.logger.PrefixLogger',
-    'foam.nanos.logger.Logger',
     'static foam.mlang.MLang.AND',
     'static foam.mlang.MLang.EQ',
+    'static foam.mlang.MLang.MAX',
     'static foam.mlang.MLang.NEQ',
     'static foam.mlang.MLang.NOT',
+    'foam.mlang.sink.Max',
+    'foam.nanos.logger.PrefixLogger',
+    'foam.nanos.logger.Logger',
     'java.util.ArrayList',
     'java.util.List',
     'java.util.Timer'
@@ -129,7 +131,18 @@ foam.CLASS({
 
             // // Wait for own replay to complete,
             // // then set node ONLINE.
+            ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
+            if ( replaying.getStartTime() == null ) {
+              replaying.setStartTime(new java.util.Date());
+            }
             DAO dao = ((DAO) x.get("medusaNodeDAO"));
+            if ( replaying.getEndTime() == null ) {
+              replaying.setEndTime(new java.util.Date());
+              Max max = (Max) dao.select(MAX(MedusaEntry.INDEX));
+              replaying.setReplaying(false);
+              replaying.setIndex((Long)max.getValue());
+              replaying.setReplayIndex((Long)max.getValue());
+            }
 
             // TODO: deal with digest failures - and Node taking self OFFLINE.
             // this timer will continually set it back to ONLINE.

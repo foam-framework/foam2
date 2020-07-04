@@ -86,8 +86,8 @@ foam.CLASS({
       });
       this.add(label);
 
-      if ( this.config.type == this.MedusaType.MEDIATOR ||
-           this.config.type == this.MedusaType.NERF ) {
+      // if ( this.config.type == this.MedusaType.MEDIATOR ||
+      //      this.config.type == this.MedusaType.NERF ) {
         var replay = this.ReplayingInfoCView.create({
           config: this.config,
           radius: this.radius - this.arcWidth
@@ -96,7 +96,7 @@ foam.CLASS({
           // }),
         });
         this.add(replay);
-      }
+      // }
       this.refresh();
     },
     {

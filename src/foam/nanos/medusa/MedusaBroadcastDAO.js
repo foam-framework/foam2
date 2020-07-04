@@ -32,6 +32,19 @@ foam.CLASS({
     'java.util.Map'
   ],
   
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(foam.java.Code.create({
+          data: `
+  protected Object indexLock_ = new Object();
+          `
+        }));
+      }
+    }
+  ],
+
   properties: [
     {
       name: 'serviceName',
@@ -39,6 +52,11 @@ foam.CLASS({
       javaFactory: `
       return "medusaMediatorDAO";
       `
+    },
+    {
+      name: 'batchEnabled',
+      class: 'Boolean',
+      value: false
     },
     {
       name: 'predicate',
@@ -115,9 +133,19 @@ foam.CLASS({
 
       if ( myConfig.getType() == MedusaType.NODE ) {
         // Always broadcast to/from NODE and
-        // queue for broadcast
-//        return super.put_(x, entry);
-        submit(x, entry, DOP.PUT);
+        ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
+        synchronized ( indexLock_ ) {
+          if ( entry.getIndex() > replaying.getIndex() ) {
+            replaying.setIndex(entry.getIndex());
+          }
+        }
+
+        if ( getBatchEnabled() ) {
+          // queue for broadcast
+          return super.put_(x, entry);
+        } else {
+          submit(x, entry, DOP.PUT);
+        }
       } else if ( myConfig.getType() == MedusaType.MEDIATOR &&
         // Broadcast promoted entries to other MEDIATORS
         // REVIEW: to avoid broadcast during reply, wait until ONLINE,
@@ -126,9 +154,12 @@ foam.CLASS({
                   ( entry.getPromoted() &&
                     ( old == null ||
                       ! old.getPromoted() ) ) ) {
-        // queue for broadcast
-//        return super.put_(x, entry);
-        submit(x, entry, DOP.PUT);
+        if ( getBatchEnabled() ) {
+          // queue for broadcast
+          return super.put_(x, entry);
+        } else {
+          submit(x, entry, DOP.PUT);
+        }
       }
       return entry;
       `

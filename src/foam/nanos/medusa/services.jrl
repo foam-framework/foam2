@@ -109,4 +109,76 @@ p({
   """
 })
 
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "replayingInfo",
+  "description": "Medusa replay info for this instance",
+  "serviceScript": """
+     return new foam.nanos.medusa.ReplayingInfo();
+  """
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "replayingInfoDAO",
+  "serve": true,
+  "description": "DAO with only one entry, the ReplayingInfo for this instance.  Provided for simplification of retrieval from monitoring nodes.",
+  "serviceScript": """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.medusa.ReplayingInfo.getOwnClassInfo())
+      .setNullify(true)
+      .setReadOnly(true)
+      .setCluster(false)
+      .setRuler(false)
+      .setEnableInterfaceDecorators(false)
+      .build();
+  """,
+  "client": "{\"of\":\"foam.nanos.medusa.ReplayingInfo\"}"
+})
+
+// p({
+//   "class":"foam.nanos.boot.NSpec",
+//   "name":"clusterTopologyMonitor",
+//   "lazy": false,
+//   "serviceClass":"foam.nanos.medusa.ClusterTopologyMonitor"
+// })
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "localClusterTopologyDAO",
+  "serviceScript": """
+    dao = new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.medusa.ClusterConfig.getOwnClassInfo())
+      .setCluster(false)
+      .setRuler(false)
+      .setAuthorize(false)
+      .setPm(true)
+      .build();
+    return dao;
+   """
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "clusterTopologyDAO",
+  "serve": true,
+  "serviceScript": """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.medusa.ClusterConfig.getOwnClassInfo())
+      .setInnerDAO((foam.dao.DAO) x.get("localClusterTopologyDAO"))
+      .setCluster(false)
+      .setRuler(false)
+      .setEnableInterfaceDecorators(false)
+      .build();
+  """,
+  "client":"""
+  {
+    "of":"foam.nanos.medusa.ClusterConfig",
+    "cache": false,
+    "ttlPurgeTime": 0,
+    "ttlSelectPurgeTime": 0
+  }
+  """
+})
+
 // See deployment/mm and mn for type specific setup

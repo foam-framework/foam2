@@ -59,8 +59,6 @@ foam.CLASS({
         ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
         ClusterConfig myConfig = support.getConfig(getX(), support.getConfigId());
         // If a Node comming online, begin replay from it.
-getLogger().debug("myConfig", myConfig);
-getLogger().debug("Config", config);
         if ( ( myConfig.getType() == MedusaType.MEDIATOR ||
                myConfig.getType() == MedusaType.NERF ) &&
                ( ( myConfig.getZone() == 0L &&

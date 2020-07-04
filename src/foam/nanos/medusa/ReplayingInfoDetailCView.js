@@ -9,6 +9,12 @@ foam.CLASS({
   name: 'ReplayingInfoDetailCView',
   extends: 'foam.graphics.Box',
 
+  implements: [ 'foam.mlang.Expressions' ],
+
+  imports: [
+    'DAO clusterTopologyDAO as dao'
+  ],
+
   requires: [
     'foam.graphics.Label',
     'foam.graphics.Circle',
@@ -22,36 +28,12 @@ foam.CLASS({
     },
     {
       name: 'fontSize',
-      value: 10
+      value: 15
     },
     {
       name: 'labelOffset',
-      value: 10
-    },
-
-    {
-      name: 'uptime',
-      class: 'String',
-      expression: function(config) {
-        let info = config.replayingInfo;
-        let delta = new Date().getTime() - info.startTime.getTime();
-        let up = foam.core.Duration.create({value: delta}).formatted();
-        return up;
-      }
-    },
-    {
-      name: 'duration',
-      class: 'String',
-      label: 'Time Replaying',
-      expression: function(config) {
-        let info = config.replayingInfo;
-        let time = info.endTime || new Date();
-        let delta = time.getTime() - info.startTime.getTime();
-        let eta = foam.core.Duration.create({value: delta}).formatted();
-        return eta;
-      }
-    },
-
+      value: 15
+    }
   ],
 
   methods: [
@@ -64,15 +46,13 @@ foam.CLASS({
       this.borderWidth = 3;
       this.border = 'gray';
       this.color = 'white';
-//      this.shadowColor = 'slategray';
-//      this.shadowBlur = 3;
 
       var label = this.makeLabel();
       label.text = this.config.name;
       this.add(label);
 
       label = this.makeLabel();
-      label.text$ = this.uptime$.map(function(u) { return 'Uptime: '+u; });
+      label.text$ = this.config.replayingInfo.uptime$.map(function(u) { return 'Uptime: '+u; });
       this.add(label);
 
       label = this.makeLabel();
@@ -88,11 +68,19 @@ foam.CLASS({
       this.add(label);
 
       label = this.makeLabel();
+      label.text$ = this.config.replayingInfo.percentComplete$.map(function(u) { return '%: '+(u * 100).toFixedTo(2); });
+      this.add(label);
+
+      label = this.makeLabel();
       label.text$ = this.config.replayingInfo.timeRemaining$.map(function(u) { return 'Remaining: '+u; });
       this.add(label);
 
       label = this.makeLabel();
-      label.text$ = this.config.replayingInfo.percentComplete$.map(function(u) { return '%: '+u; });
+      label.text$ = this.config.replayingInfo.replayTps$.map(function(u) { return 'Replay TPS: '+u; });
+      this.add(label);
+
+      label = this.makeLabel();
+      label.text$ = this.config.replayingInfo.tps$.map(function(u) { return 'TPS: '+u; });
       this.add(label);
 
       label = this.makeLabel();
@@ -104,6 +92,7 @@ foam.CLASS({
       code: async function(self = this) {
         // console.log('ReplayingInfoDetailCView.refresh');
         if ( self.config ) {
+          self.config = await self.dao.find(self.config.id);
           for ( var i = 0; i < self.children.length; i++ ) {
             let child = self.children[i];
             child.refresh && child.refresh(child);

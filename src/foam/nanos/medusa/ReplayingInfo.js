@@ -54,14 +54,23 @@ foam.CLASS({
       visibility: 'HIDDEN'
     },
     {
+      name: 'uptime',
+      class: 'String',
+      expression: function(startTime, endTime) {
+        let delta = new Date().getTime() - startTime.getTime();
+        let duration = foam.core.Duration.create({value: delta}).formatted();
+        return duration;
+      }
+    },
+    {
       name: 'timeElapsed',
       class: 'String',
       label: 'Elapsed',
       expression: function(index, replayIndex, startTime, endTime) {
-        let time = endTime || new Date();
-        let delta = time.getTime() - startTime.getTime();
-        let eta = foam.core.Duration.create({value: delta}).formatted();
-        return eta;
+        let end = endTime || new Date();
+        let delta = end.getTime() - startTime.getTime();
+        let duration = foam.core.Duration.create({value: delta}).formatted();
+        return duration;
       },
       visibility: 'RO'
     },
@@ -71,11 +80,11 @@ foam.CLASS({
       class: 'Float',
       expression: function(index, replayIndex) {
         if ( replayIndex > index ) {
-          return ((index / replayIndex) * 100).toFixed(2);
+          return index / replayIndex;
         } else if ( replayIndex > 0 ) {
-          return '100';
+          return 1;
         }
-        return '0';
+        return 0;
       },
       visibility: 'RO'
     },
@@ -84,13 +93,35 @@ foam.CLASS({
       class: 'String',
       label: 'Remaining',
       expression: function(index, replayIndex, startTime) {
-        let delta = Date.now() - startTime.getTime();
-        let rate = index / delta;
+        // let delta = Date.now() - startTime.getTime();
+        // let rate = index / delta;
+        let rate = this.replayTps;
         let t = rate * (replayIndex - index); // ms
-        let eta = foam.core.Duration.create({value: t}).formatted();
-        return eta;
+        let duration = foam.core.Duration.create({value: t}).formatted();
+        return duration;
       },
       visibility: 'RO'
+    },
+    {
+      name: 'replayTps',
+      class: 'String',
+      expression: function(index, startTime, endTime) {
+        let end = endTime || new Date();
+        let delta = (end.getTime() - startTime.getTime()) / 1000; // seconds
+        let rate = index / delta;
+        return Math.round(rate);
+      }
+    },
+    {
+      name: 'tps',
+      class: 'String',
+      expression: function(index, replayIndex, endTime) {
+        let now = new Date();
+        let end = endTime || new Date();
+        let delta = (now.getTime() - end.getTime()) / 1000; // seconds
+        let rate = (index - replayIndex) / delta;
+        return Math.round(rate);
+      }
     },
     {
       name: 'replayNodes',
