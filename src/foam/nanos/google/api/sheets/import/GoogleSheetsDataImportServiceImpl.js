@@ -117,6 +117,9 @@ foam.CLASS({
       ValueRange values;
       try {
         //to calculate column headers row
+        
+
+        //fix me
         String[] rangeLimits = importConfig.getCellsRange().split(":");
         Matcher m = digitAppearenceRegex.matcher(rangeLimits[0]);
         if ( !m.find() ) return null;

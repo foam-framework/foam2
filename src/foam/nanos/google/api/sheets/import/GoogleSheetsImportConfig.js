@@ -28,7 +28,7 @@ foam.CLASS({
        this.googleSpreadsheetId = findMatch ? findMatch[1]: findMatch;
       }
     },
-    {
+    {//fix me
       name: 'cellsRange',
       class: 'String',
       view: {
