@@ -22,6 +22,11 @@ foam.INTERFACE({
       type: 'Promise',
       args: ['X', 'dao'],
       documentation: 'Exports data in a DAO'
+    },
+    {
+      name: 'cleanup',
+      type: 'String',
+      args: ['X', 'obj'],
     }
   ]
 });
