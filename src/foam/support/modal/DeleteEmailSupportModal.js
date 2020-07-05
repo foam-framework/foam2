@@ -12,14 +12,15 @@ foam.CLASS({
   documentation:'EMAIL DELETE MODAL',
 
   requires: [
+    'foam.log.LogLevel',
+    'foam.u2.dialog.Popup',
     'foam.u2.ModalHeader',
     'foam.support.model.SupportEmail',
-    'foam.u2.dialog.Popup',
-    'foam.u2.dialog.NotificationMessage'
   ],
 
   imports: [
     'closeDialog',
+    'notify',
     'user',
     'supportEmailDAO'
   ],
@@ -137,15 +138,15 @@ foam.CLASS({
         code: function(X) {
           this.data.status = "Disabled"
           this.supportEmailDAO.put(this.data);
-          this.add(this.NotificationMessage.create({ message: 'Your email address is disabled and you need to update it ' })); 
-          X.closeDialog()
+          this.notify('Your email address is disabled and you need to update it.', '', this.LogLevel.WARN, true);
+          X.closeDialog();
         }
       },
       {
         name: 'closeModal',
         label: 'Close',
-        code: function(X){
-          X.closeDialog()
+        code: function(X) {
+          X.closeDialog();
         }
       }
     ]

@@ -7,6 +7,7 @@
 package foam.lib.formatter;
 
 import foam.core.ClassInfo;
+import foam.core.FEnum;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.core.X;
@@ -208,25 +209,21 @@ public class JSONFObjectFormatter
   }
   */
 
-  public void output(Enum<?> value) {
-    output(value.ordinal());
 
-//    outputNumber(value.ordinal());
-/*
+  public void outputEnumValue(FEnum value) {
     b_.append('{');
-      b_.append(beforeKey_());
-      b_.append("class");
-      b_.append(afterKey_());
-      b_.append(':');
-      output(value.getClass().getName());
-      b_.append(",");
-      b_.append(beforeKey_());
-      b_.append("ordinal");
-      b_.append(afterKey_());
-      b_.append(':');
-      outputNumber(value.ordinal());
+    outputKey("class");
+    b_.append(':');
+    output(value.getClass().getName());
+    b_.append(',');
+    outputKey("ordinal");
+    b_.append(':');
+    outputNumber(value.getOrdinal());
     b_.append('}');
-    */
+  }
+
+  public void outputEnum(FEnum value) {
+    output(value.getOrdinal());
   }
 
   public void output(Object value) {
@@ -234,6 +231,8 @@ public class JSONFObjectFormatter
       ((OutputJSON) value).formatJSON(this);
     } else if ( value instanceof String ) {
       output((String) value);
+    } else if ( value instanceof FEnum ) {
+      outputEnumValue((FEnum) value);
     } else if ( value instanceof FObject ) {
       output((FObject) value);
     } else if ( value instanceof PropertyInfo) {
@@ -258,8 +257,6 @@ public class JSONFObjectFormatter
       output((Map) value);
     } else if ( value instanceof List ) {
       output((List) value);
-    } else if ( value instanceof Enum<?> ) {
-      output((Enum<?>) value);
     } else /*if ( value == null )*/ {
       b_.append("null");
     }
@@ -362,7 +359,14 @@ public class JSONFObjectFormatter
   }
 
   public void output(FObject[] arr) {
-    // TODO:
+
+    b_.append('[');
+    for ( int i = 0 ; i < arr.length ; i++ ) {
+      output(arr[i]);
+      if ( i < arr.length - 1 ) b_.append(',');
+    }
+    b_.append(']');
+
   }
 
   public void output(FObject o, ClassInfo defaultClass) {
@@ -481,7 +485,7 @@ public class JSONFObjectFormatter
     return this;
   }
 
-  protected void outputKey(String val) {
+  public void outputKey(String val) {
     if ( quoteKeys_ ) appendQuote();
     b_.append(val);
     if ( quoteKeys_ ) appendQuote();

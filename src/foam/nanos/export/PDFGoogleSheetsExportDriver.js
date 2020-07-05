@@ -8,10 +8,9 @@ foam.CLASS({
   package: 'foam.nanos.export',
   name: 'PDFGoogleSheetsExportDriver',
 
-  implements: [ 'foam.nanos.export.ExportDriver' ],
-
-  requires: [
-    'foam.nanos.export.GoogleSheetsOutputter'
+  implements: [ 
+    'foam.nanos.export.ExportDriver',
+    'foam.nanos.export.GoogleSheetsServiceConfig'
   ],
 
   documentation: `
@@ -25,8 +24,13 @@ foam.CLASS({
     {
       name: 'outputter',
       factory: function() {
-        return this.GoogleSheetsOutputter.create();
-      }
+        return foam.nanos.export.GoogleSheetsOutputter.create();
+      },
+      hidden: true
+    },
+    {
+      class: 'String',
+      name: 'title'
     }
   ],
   methods: [
@@ -41,7 +45,7 @@ foam.CLASS({
         var values = await  self.outputter.outputArray([ obj ], metadata);
         stringArray = stringArray.concat(values);
 
-        sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata);
+        sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata, this);
         if ( ! sheetId || sheetId.length == 0)
           return '';
         var url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?exportFormat=pdf&format=pdf&scale=3`;
@@ -59,7 +63,7 @@ foam.CLASS({
       var values = await self.outputter.outputArray(sink.array, metadata);
       stringArray = stringArray.concat(values);
 
-      sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata);
+      sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata, this);
       if ( ! sheetId || sheetId.length == 0)
         return '';
       var url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?exportFormat=pdf&format=pdf&scale=3`;

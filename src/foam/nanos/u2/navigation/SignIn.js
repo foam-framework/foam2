@@ -13,11 +13,16 @@ foam.CLASS({
 
   imports: [
     'auth',
+    'ctrl',
     'loginSuccess',
-    'notify',
     'stack',
     'user',
     'menuDAO'
+  ],
+
+  requires: [
+    'foam.log.LogLevel',
+    'foam.u2.dialog.NotificationMessage'
   ],
 
   messages: [
@@ -126,7 +131,10 @@ foam.CLASS({
                     this.user.copyFrom(updatedUser);
                     this.nextStep();
                   }).catch((err) => {
-                    this.notify(err.message || this.ERROR_MSG, 'error');
+                    this.ctrl.add(this.NotificationMessage.create({
+                      message: err.message || this.ERROR_MSG,
+                      type: this.LogLevel.ERROR
+                    }));
                   });
               } else {
                 this.user.copyFrom(logedInUser);
@@ -135,11 +143,17 @@ foam.CLASS({
             }
           ).catch(
             (err) => {
-              this.notify(err.message || this.ERROR_MSG, 'error');
+              this.ctrl.add(this.NotificationMessage.create({
+                message: err.message || this.ERROR_MSG,
+                type: this.LogLevel.ERROR
+              }));
           });
         } else {
           // TODO: change to 'Please enter email or username' when integrating
-          this.notify(this.ERROR_MSG2, 'error');
+          this.ctrl.add(this.NotificationMessage.create({
+            message: this.ERROR_MSG2,
+            type: this.LogLevel.ERROR
+          }));
         }
       }
     }
