@@ -115,10 +115,9 @@ foam.CLASS({
                 .filter((wizardSection) =>
                   wizardSection.ucj === null ||
                   (
-                    ! wizardSection.ucj.status === this.CapabilityJunctionStatus.GRANTED &&
-                    ! wizardSection.ucj.status === this.CapabilityJunctionStatus.PENDING
-                  )
-                )
+                    wizardSection.ucj.status != this.CapabilityJunctionStatus.GRANTED &&
+                    wizardSection.ucj.status != this.CapabilityJunctionStatus.PENDING
+                  ))
             };
           });
       });
