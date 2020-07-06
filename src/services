@@ -1082,3 +1082,22 @@ p({
     }
   """
 })
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "googleSheetsTransactionsDataImport",
+  "serve": true,
+  "authenticate": true,
+  "boxClass": "foam.nanos.google.api.sheets.GoogleSheetsDataImportServiceSkeleton",
+  "serviceClass": "foam.nanos.google.api.sheets.GoogleSheetsTransactionsDataImportServiceImpl",
+  "client":"""
+    {
+      "class": "foam.nanos.google.api.sheets.ClientGoogleSheetsDataImportService",
+      "delegate":
+        {
+          "class": "foam.box.HTTPBox",
+          "url": "service/googleSheetsTransactionsDataImport"
+        }
+    }
+  """
+})

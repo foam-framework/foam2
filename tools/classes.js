@@ -411,6 +411,7 @@ var classes = [
   'foam.nanos.google.api.sheets.GoogleSheetsImportConfig',
   'foam.nanos.google.api.sheets.GoogleSheetsDataImportService',
   'foam.nanos.google.api.sheets.GoogleSheetsDataImportServiceImpl',
+  'foam.nanos.google.api.sheets.GoogleSheetsTransactionsDataImportServiceImpl',
   'foam.dao.jdbc.ConnectionPool',
   'foam.lib.Outputter',
   'foam.lib.PropertyPredicate',

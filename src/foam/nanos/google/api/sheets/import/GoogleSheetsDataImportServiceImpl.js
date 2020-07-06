@@ -251,12 +251,30 @@ foam.CLASS({
           if ( ! setValue(obj, importConfig.getColumnHeaderPropertyMappings()[j], data.get(i).get(columnIndex)) ) //problem with statuses for example or id which won't be written in correct order
             continue;
         }
+        postSetValues(x, obj);
         objs.add((FObject)obj);
       }
       return objs;
     `
   },
   {
+    name: 'postSetValues',
+    type: 'Boolean',
+    args: [
+      {
+        name: 'x',
+        type: 'Context',
+      },
+      {
+        name: 'obj',
+        javaType: 'Object'
+      },
+    ],
+    javaCode: `
+      return true;
+    `
+  },
+  {//maybe all of it to static will save memory
     name: 'setValue',
     type: 'Boolean',
     javaThrows: [
