@@ -44,7 +44,8 @@ foam.CLASS({
           .style({
             'background-image': "url('" + self.data.icon + "')",
             'background-size': 'cover',
-            'background-position': '50% 50%'
+            'background-position': '50% 50%',
+            'float': 'left'
           })
         .end()
         .start('span')
