@@ -32,6 +32,7 @@ foam.CLASS({
       //You can import your data but this column will be ignored
       this.SUPER();
       this
+      .start('h2').style({'padding-left': '16px'}).add('Google Sheets Data Import').end()
       .startContext({ data: this })
         .tag(this.importConfig)
         .add(this.slot(function(importConfig$columnHeaderPropertyMappings){
