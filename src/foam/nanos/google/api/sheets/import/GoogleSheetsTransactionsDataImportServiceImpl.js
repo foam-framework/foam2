@@ -35,13 +35,14 @@ foam.CLASS({
 
         Transaction t = (Transaction)obj;
 
-        //re-use
+        //re-use?
         User payer = ((Subject) x.get("subject")).getUser();
         if ( payer == null )
           return false;
         
         t.setPayerId(payer.getId());
 
+        //re-use?
         String baseCurrency = ((Business)payer).getSuggestedUserTransactionInfo().getBaseCurrency();
 
         if ( t.getSourceCurrency() == null ) {
