@@ -248,7 +248,7 @@ foam.CLASS({
           int columnIndex = columnHeaders.indexOf(importConfig.getColumnHeaderPropertyMappings()[j].getColumnHeader());
           Object val = data.get(i).get(columnIndex);
           // PropertyInfo prop = ((PropertyInfo)importConfig.getColumnHeaderPropertyMappings()[j].getProp());
-          if ( ! setValue(obj, importConfig.getColumnHeaderPropertyMappings()[j], data.get(i).get(columnIndex)) ) //problem with statuses for example or id which won't be written in correct order
+          if ( ! setValue(obj, importConfig.getColumnHeaderPropertyMappings()[j], data.get(i).get(columnIndex)) )
             continue;
         }
         postSetValues(x, obj);
