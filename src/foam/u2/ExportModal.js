@@ -210,7 +210,9 @@ foam.CLASS({
           this.exportDriver.exportDAO(this.__context__, this.exportData) :
           Promise.resolve(this.exportDriver.exportFObject(this.__context__, this.exportObj));
   
+        var exportDataResult;
         p.then(result => {
+          exportDataResult = result;
           var link = document.createElement('a');
           var href = '';
           if ( self.exportDriverReg.mimeType && self.exportDriverReg.mimeType.length != 0 ) {
@@ -232,6 +234,8 @@ foam.CLASS({
         }).finally(() => {
           if ( this.exportAllColumns )
             this.filteredTableColumns = filteredColumnsCopy;
+          if ( this.exportDriver.tearDown )
+            this.exportDriver.tearDown(self.__context__, exportDataResult);
         });
       }
     },
