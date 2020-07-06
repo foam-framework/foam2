@@ -43,7 +43,7 @@ foam.CLASS({
             a = await self.fileDAO.put(f);
           return self.fileDAO.put(f);
           }
-        ))
+        }))
       });
 
       return Promise.all(promises).then((values) => {
