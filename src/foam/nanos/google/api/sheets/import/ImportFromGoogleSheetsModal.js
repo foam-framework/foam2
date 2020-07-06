@@ -126,34 +126,3 @@ foam.CLASS({
     },
   ]
 });
-
-
-foam.CLASS({
-  package: 'foam.nanos.google.api.sheets',
-  name: 'ColumnHeaderToPropertyMapping',
-  properties: [
-    {
-      name: 'of',
-      hidden: true
-    },
-    {
-      name: 'columnHeader',
-      class: 'String',
-      visibility: 'RO'
-    },
-    {
-      name: 'prop',
-      class: 'foam.mlang.ExprProperty',
-      visibility: 'RO',
-      hidden: true,
-      javaJSONParser: 'foam.lib.json.ExprParser.instance()',
-    },
-    {
-      name: 'unitProperty',
-      class: 'foam.mlang.ExprProperty',
-      visibility: 'RO',
-      hidden: true,
-      javaJSONParser: 'foam.lib.json.ExprParser.instance()',
-    }
-  ]
-});

@@ -67,3 +67,33 @@ foam.CLASS({
     // SHEET_ID_REGEX: '[#&]gid=([0-9]+)'//not usefull info unless we want to use gridRange which is probably too much
   },
 });
+
+foam.CLASS({
+  package: 'foam.nanos.google.api.sheets',
+  name: 'ColumnHeaderToPropertyMapping',
+  properties: [
+    {
+      name: 'of',
+      hidden: true
+    },
+    {
+      name: 'columnHeader',
+      class: 'String',
+      visibility: 'RO'
+    },
+    {
+      name: 'prop',
+      class: 'foam.mlang.ExprProperty',
+      visibility: 'RO',
+      hidden: true,
+      javaJSONParser: 'foam.lib.json.ExprParser.instance()',
+    },
+    {
+      name: 'unitProperty',
+      class: 'foam.mlang.ExprProperty',
+      visibility: 'RO',
+      hidden: true,
+      javaJSONParser: 'foam.lib.json.ExprParser.instance()',
+    }
+  ]
+});
