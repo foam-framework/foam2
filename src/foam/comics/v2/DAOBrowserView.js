@@ -200,7 +200,8 @@ foam.CLASS({
       code: function() {
         this.add(this.Popup.create().tag({
           class: 'foam.nanos.google.api.sheets.ImportFromGoogleSheetsModal',
-          of: this.config.of
+          of: this.config.of,
+          dao: this.config.daoKey
         }));
       }
     },

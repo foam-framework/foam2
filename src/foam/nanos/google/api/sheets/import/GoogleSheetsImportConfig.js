@@ -59,6 +59,11 @@ foam.CLASS({
       of: 'foam.nanos.google.api.sheets.ColumnHeaderToPropertyMapping',
       visibility: 'RO',
       hidden: true
+    },
+    {
+      name: 'DAO',
+      class: 'String',
+      hidden: true,
     }
   ],
   constants: {
@@ -83,8 +88,8 @@ foam.CLASS({
     },
     {
       name: 'prop',
-      class: 'foam.mlang.ExprProperty',
-      visibility: 'RO',
+      javaType: 'foam.core.PropertyInfo',
+      javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
       hidden: true,
       javaJSONParser: 'foam.lib.json.ExprParser.instance()',
     },

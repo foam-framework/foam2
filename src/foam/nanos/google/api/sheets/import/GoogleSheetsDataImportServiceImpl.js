@@ -19,7 +19,6 @@ foam.CLASS({
     'java.util.regex.Pattern',
 
     'foam.dao.DAO',
-    'foam.nanos.boot.NSpec', 
 
     'static foam.mlang.MLang.AND',
     'static foam.mlang.MLang.CONTAINS_IC',
@@ -169,7 +168,7 @@ foam.CLASS({
           List<List<Object>> data = values.getValues();
           List<FObject> parsedObjs = valueRangeValuesToFobjectsArray(x, importConfig, data);
           //if there was a problem with adding records we still might want to update user's google sheet with ids or status
-          addRecordsToDAO(x, importConfig.getImportClassInfo(), parsedObjs);
+          addRecordsToDAO(x, importConfig.getDAO(), parsedObjs);
           List<String> columnHeaders = new ArrayList<>();
           for ( Object header : data.get(0) ) {
             columnHeaders.add(header.toString());
@@ -190,8 +189,8 @@ foam.CLASS({
         type: 'Context',
       },
       {
-        name: 'daoClass',
-        javaType: 'foam.core.ClassInfo'
+        name: 'daoId',
+        type: 'String'
       },
       {
         name: 'objs',
@@ -199,10 +198,7 @@ foam.CLASS({
       }
     ],
     javaCode: `
-      DAO nspecDAO = (DAO) x.get("nSpecDAO");
-      NSpec nsp = (NSpec) nspecDAO.find(AND(CONTAINS_IC(NSpec.ID, "DAO"), CONTAINS_IC(NSpec.ID, "local"), CONTAINS_IC(NSpec.CLIENT, daoClass.getId())));
-      if ( nsp == null ) return false;
-      DAO dao  = (DAO)x.get(nsp.getId());
+      DAO dao  = (DAO)x.get(daoId);
       if ( dao == null ) return false;
       try {
         for ( FObject obj: objs) {

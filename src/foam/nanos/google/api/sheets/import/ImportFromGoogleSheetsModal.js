@@ -13,8 +13,8 @@ foam.CLASS({
       name: 'importConfig',
       class: 'FObjectProperty',
       of: 'foam.nanos.google.api.sheets.GoogleSheetsImportConfig',
-      expression: function(of) {
-        return foam.nanos.google.api.sheets.GoogleSheetsImportConfig.create({importClassInfo: of});
+      expression: function(of, dao) {
+        return foam.nanos.google.api.sheets.GoogleSheetsImportConfig.create({importClassInfo: of, DAO: dao});
       }
     },
     {
@@ -22,7 +22,8 @@ foam.CLASS({
       class: 'String',
       value: 'googleSheetsDataImport'
     },
-    'of'
+    'of',
+    'dao'
   ],
   methods: [
     function initE() {
