@@ -22,13 +22,6 @@ foam.CLASS({
     function initE() {
       this.SUPER();
 
-  var myAudio = new Audio('tetris.wav'); 
-  myAudio.addEventListener('ended', function() {
-      this.currentTime = 0;
-      this.play();
-  }, false);
-  myAudio.play();
-
 let startPiece = null;
 let pkg = foam.demos.tetrominos;
 let tfac = pkg.TetrominoLayerFactory.create();
@@ -119,5 +112,18 @@ game.start();
         this.down.pub();
       }
     },
+    {
+      name: 'playAudio',
+      code: function() {
+        var myAudio = new Audio('tetris.wav'); 
+        myAudio.addEventListener('ended', function() {
+            this.currentTime = 0;
+            var p = this.play();
+            if ( p ) p.catch(err => { console.error(err) });
+        }, false);
+        var p = myAudio.play();
+        if ( p ) p.catch(err => { console.error(err) });
+      }
+    }
   ]
 })
