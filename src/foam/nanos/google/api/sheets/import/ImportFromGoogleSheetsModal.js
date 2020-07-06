@@ -159,14 +159,9 @@ foam.CLASS({
     {
       name: 'prop',
       class: 'foam.mlang.ExprProperty',
-      //javaType: 'foam.core.PropertyInfo',
       visibility: 'RO',
       hidden: true,
       javaJSONParser: 'foam.lib.json.ExprParser.instance()',
-      // view: {
-      //   class: 'foam.u2.TextField',
-      //   data: this.prop$label
-      // },
     },
     {
       name: 'unitProperty',
@@ -177,82 +172,3 @@ foam.CLASS({
     }
   ]
 });
-
-//overkill
-// foam.CLASS({
-//   package: 'foam.nanos.google.api.sheets',
-//   name: 'ColumnHeaderToPropertyName',
-//   properties: [
-//     {
-//       name: 'maxDepth',
-//       class: 'Int',
-//       value: 5,
-//       hidden: true
-//     },
-//     {
-//       name: 'of',
-//       hidden: true
-//     },
-//     {
-//       name: 'columnHeader',
-//       class: 'String',
-//       postSet: function() {
-//         this.findPropertyName();
-//       }
-//     },
-//     {
-//       name: 'propertiesOptions',
-//       // class: 'StringArray',
-//       hidden: true,
-//     },
-//     {
-//       name: 'selectedProp',
-//       class: 'StringArray',
-//       view: function(_, X) {
-//         return X.data.slot(function(propertiesOptions) {
-//           return foam.u2.view.ChoiceView.create({choices: propertiesOptions, data$: this.selectedProp$});
-//         });
-//       }
-//     }
-//   ],
-//   methods: [
-//     function findPropertyName() {
-//       var prop = this.of.getAxiomByName(this.columnHeader);
-//       if ( prop ) {
-//         this.propertyLabel = prop.label;
-//       }
-//       var props =  this.of.getAxiomsByClass(foam.core.Property).filter(p => ! p.networkTransient );
-//       var resultSoFar = [];
-//       var checkedClsIds = [ this.of.id ];
-//       var  i = 0;
-//       for ( prop of props ) {
-//         this.findPropOptions(prop, '', '', i, checkedClsIds, resultSoFar);
-//       }
-//       this.propertiesOptions = resultSoFar;
-//       console.log(resultSoFar);
-//     },
-//     function findPropOptions(prop, propNameSoFar, labelSoFar, i, checkedClsIds, resultSoFar) {
-
-//       propNameSoFar += propNameSoFar ? '.' + prop.name : prop.name;
-//       labelSoFar += labelSoFar ? ' -> ' + prop.label : prop.label;
-
-//       if ( /** foam.core.FObjectProperty.isInstance(prop) || **/ foam.core.Reference.isInstance(prop) ) {
-//         checkedClsIds.push(prop.of.id);
-//       } else {
-//         if ( prop && prop.label === this.columnHeader ) {
-//           resultSoFar.push([propNameSoFar, labelSoFar]);
-//         }
-//         return;
-//       }
-
-//       var propChildren =  prop.of.getAxiomsByClass(foam.core.Property).filter(p => ! p.networkTransient &&  ( /** foam.core.FObjectProperty.isInstance(p) ||  **/ foam.core.Reference.isInstance(p)  ? ! checkedClsIds.includes(p.of.id) : true ) );
-      
-//       if ( ++i >= this.maxDepth ) return;
-
-//       for ( var p of propChildren ) {
-//         this.findPropOptions(p, propNameSoFar, labelSoFar, i, checkedClsIds, resultSoFar);
-//       }
-//       return;
-//     }
-//   ]
-// });
