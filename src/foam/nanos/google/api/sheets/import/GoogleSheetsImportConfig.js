@@ -4,18 +4,11 @@ foam.CLASS({
   documentation: 'GoogleSheetsImportConfig contains info about import',
   properties: [
     {
-     // class: 'String',//change to classInfo?
       name: 'importClassInfo',
       class: 'Class',
       javaType: 'foam.core.ClassInfo',
       hidden: true,
     },
-    // {
-    //   class: 'FObjectArray',
-    //   of: 'foam.nanos.google.api.sheets.ColumnPropertyMapping',
-    //   name: 'columnToPropertyNameMapping',
-    //   documentation: 'not much use for this prop for not nested columns. but nexted columns will contain mapping eg "column: city, property: address.city"'
-    // },
     {
       name: 'googleSheetLink',
       class: 'String',
@@ -67,38 +60,10 @@ foam.CLASS({
       visibility: 'RO',
       hidden: true
     }
-    // {
-    //   name: 'statusUpdateColumn',
-    //   class: 'String',
-    //   view: {
-    //     class: 'foam.u2.TextField',
-    //   },
-    //   label: 'Column for storing status of data import',
-    //   adapt: function(_, val) {
-    //     if ( val )
-    //       return val.toUpperCase();
-    //     return val;
-    //   }
-    // }
   ],
   constants: {
     //info retrieved from https://developers.google.com/sheets/api/guides/concepts
     SPREADSHEET_ID_REGEX: '/spreadsheets/d/([a-zA-Z0-9-_]+)',
-    SHEET_ID_REGEX: '[#&]gid=([0-9]+)'
+    // SHEET_ID_REGEX: '[#&]gid=([0-9]+)'//not usefull info unless we want to use gridRange which is probably too much
   },
-});
-
-foam.CLASS({
-  package: 'foam.nanos.google.api.sheets',
-  name: 'ColumnPropertyMapping',
-  properties: [
-    {
-      name: 'columnHeader',
-      class: 'String'
-    },
-    {
-      name: 'propertyName',
-      class: 'String'
-    }
-  ]
 });

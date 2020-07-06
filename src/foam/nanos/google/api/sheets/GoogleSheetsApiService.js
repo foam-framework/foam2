@@ -274,6 +274,7 @@ foam.CLASS({
         // request1.setRanges(ranges);
         // request1.setIncludeGridData(true);//response1.getSheets().get(0).getData().get(0).rowData.get(1).getValues().get(1).getUserEnteredFormat().getNumberFormat()
         // Spreadsheet response1 = request1.execute();
+        //response1.getSheets().get(sheetId);if sheetId is number 
 
 
         System.out.println("done");
