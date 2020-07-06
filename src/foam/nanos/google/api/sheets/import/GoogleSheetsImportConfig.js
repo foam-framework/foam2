@@ -28,19 +28,10 @@ foam.CLASS({
        this.googleSpreadsheetId = findMatch ? findMatch[1]: findMatch;
       }
     },
-    {//fix me
+    {
       name: 'cellsRange',
       class: 'String',
-      view: {
-        class: 'foam.u2.TextField',
-        placeholder: 'A1:B2'
-      },
-      label: 'Table range',
-      adapt: function(_, val) {
-        if ( val )
-          return val.toUpperCase();
-        return val;
-      }
+      hidden: true
     },
     {
       name: 'googleSpreadsheetId',
@@ -63,10 +54,11 @@ foam.CLASS({
       },
       label: 'Google Sheets Id',
       hidden: true,
-      expression: function(googleSheetLink) {
-        var findMatch = googleSheetLink.match(this.SHEET_ID_REGEX);
-        return  findMatch ? findMatch[1] : findMatch;
-      }
+      // expression: function(googleSheetLink) {
+      //   var findMatch = googleSheetLink.match(this.SHEET_ID_REGEX);
+      //   return  findMatch ? findMatch[1] : findMatch;
+      // },
+      value: 'Sheet1'
     },
     {
       name: 'columnHeaderPropertyMappings',

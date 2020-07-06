@@ -97,8 +97,8 @@ foam.CLASS({
     {
       name: 'getColumns',
       label: 'Get columns',
-      isEnabled: function(importConfig$googleSpreadsheetId, importConfig$cellsRange) {
-        return importConfig$googleSpreadsheetId && importConfig$cellsRange;
+      isEnabled: function(importConfig$googleSpreadsheetId) {
+        return importConfig$googleSpreadsheetId;
       },
       code: function(X) {
         X.googleSheetsDataImport.getColumns(X, this.importConfig).then(columnHeaders => {

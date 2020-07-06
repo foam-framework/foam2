@@ -252,7 +252,7 @@ foam.CLASS({
           type: 'String'
         },
         {
-          name: 'cellsRange',
+          name: 'range',
           type: 'String'
         }
       ],
@@ -264,7 +264,7 @@ foam.CLASS({
           .setApplicationName("nanopay")
           .build();
         Sheets.Spreadsheets.Values.Get request =
-        service.spreadsheets().values().get(spreadsheetId, "Sheet1").setValueRenderOption("FORMATTED_VALUE").setDateTimeRenderOption("FORMATTED_STRING");
+        service.spreadsheets().values().get(spreadsheetId, range).setValueRenderOption("FORMATTED_VALUE").setDateTimeRenderOption("FORMATTED_STRING");
         ValueRange response = request.execute();
 
         //in case we need to retrieve formatting data

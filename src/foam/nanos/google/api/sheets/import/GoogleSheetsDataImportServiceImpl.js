@@ -116,27 +116,25 @@ foam.CLASS({
       GoogleSheetsApiService googleSheetsAPIEnabler = (GoogleSheetsApiService)x.get("googleSheetsDataExport");
       ValueRange values;
       try {
-        //to calculate column headers row
-        
+        // //to calculate column headers row
+        // //fix me
+        // String[] rangeLimits = importConfig.getCellsRange().split(":");
+        // Matcher m = digitAppearenceRegex.matcher(rangeLimits[0]);
+        // if ( !m.find() ) return null;
+        // int indexOfFirstRowInRange = m.start();
+        // String startColumn = rangeLimits[0].substring(0, indexOfFirstRowInRange);
+        // String startRow = rangeLimits[0].substring(indexOfFirstRowInRange);
+        // m = digitAppearenceRegex.matcher(rangeLimits[1]);
+        // if ( !m.find() ) return null;
+        // String endColumn = rangeLimits[1].substring(0, m.start());
+        // StringBuilder sb = new StringBuilder();
+        // sb.append(startColumn);
+        // sb.append(startRow);
+        // sb.append(":");
+        // sb.append(endColumn);
+        // sb.append(startRow);
 
-        //fix me
-        String[] rangeLimits = importConfig.getCellsRange().split(":");
-        Matcher m = digitAppearenceRegex.matcher(rangeLimits[0]);
-        if ( !m.find() ) return null;
-        int indexOfFirstRowInRange = m.start();
-        String startColumn = rangeLimits[0].substring(0, indexOfFirstRowInRange);
-        String startRow = rangeLimits[0].substring(indexOfFirstRowInRange);
-        m = digitAppearenceRegex.matcher(rangeLimits[1]);
-        if ( !m.find() ) return null;
-        String endColumn = rangeLimits[1].substring(0, m.start());
-        StringBuilder sb = new StringBuilder();
-        sb.append(startColumn);
-        sb.append(startRow);
-        sb.append(":");
-        sb.append(endColumn);
-        sb.append(startRow);
-
-        values = googleSheetsAPIEnabler.getValues(x, importConfig.getGoogleSpreadsheetId(), sb.toString());
+        values = googleSheetsAPIEnabler.getValues(x, importConfig.getGoogleSpreadsheetId(), importConfig.getGoogleSheetId());//sb.toString()
         List<Object> firstRow = values.getValues().get(0);
         String[] columnNames = new String[firstRow.size()];
         for ( int i = 0 ; i < firstRow.size() ; i++ ) {
@@ -166,7 +164,8 @@ foam.CLASS({
         GoogleSheetsApiService googleSheetsAPIEnabler = (GoogleSheetsApiService)x.get("googleSheetsDataExport");
         ValueRange values;
         try {
-          values = googleSheetsAPIEnabler.getValues(x, importConfig.getGoogleSpreadsheetId(), importConfig.getCellsRange());
+          values = googleSheetsAPIEnabler.getValues(x, importConfig.getGoogleSpreadsheetId(), importConfig.getGoogleSheetId());
+          importConfig.setCellsRange(values.getRange().split("!")[1]);
           List<List<Object>> data = values.getValues();
           List<FObject> parsedObjs = valueRangeValuesToFobjectsArray(x, importConfig, data);
           //if there was a problem with adding records we still might want to update user's google sheet with ids or status
