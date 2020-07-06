@@ -17,11 +17,12 @@ foam.CLASS({
     'foam.support.model.Ticket',
     'foam.support.model.TicketMessage',
     'foam.u2.PopupView',
-    'foam.u2.dialog.NotificationMessage'
+    'foam.log.LogLevel'
   ],
 
-  imports:[
+  imports: [
     'ctrl',
+    'notify',
     'ticketDAO',
     'user',
     'hideSummary',
@@ -274,7 +275,7 @@ foam.CLASS({
           status: this.status
         });
 
-        this.dao.put(ticket).then(function(ticket){
+        this.dao.put(ticket).then(function(ticket) {
           if (self.message == "") return;
           var message = self.TicketMessage.create({
             senderId: self.user.id,
@@ -282,8 +283,8 @@ foam.CLASS({
             message: self.message,
             type: 'Internal'
           });
-          ticket.messages.put(message).then(function(a){
-            ctrl.add(self.NotificationMessage.create({ message: 'Ticket Created!' }));
+          ticket.messages.put(message).then(function(a) {
+            self.notify('Ticket Created!', '', self.LogLevel.INFO, true);
           });
         });
         this.stack.push({ class: 'foam.support.view.TicketView' });

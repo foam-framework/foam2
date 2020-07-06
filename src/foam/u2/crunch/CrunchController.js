@@ -24,6 +24,7 @@ foam.CLASS({
   ],
 
   requires: [
+    'foam.log.LogLevel',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityCapabilityJunction',
     'foam.nanos.crunch.CapabilityJunctionStatus',
@@ -112,13 +113,12 @@ foam.CLASS({
             return {
               caps: capAndSections[0],
               wizCaps: capAndSections[1]
-              .filter((wizardSection) =>
-                wizardSection.ucj ||
-                (
-                  ! wizardSection.ucj.status === this.CapabilityJunctionStatus.GRANTED &&
-                  ! wizardSection.ucj.status === this.CapabilityJunctionStatus.PENDING
-                )
-              )
+                .filter((wizardSection) =>
+                  wizardSection.ucj === null ||
+                  (
+                    wizardSection.ucj.status != this.CapabilityJunctionStatus.GRANTED &&
+                    wizardSection.ucj.status != this.CapabilityJunctionStatus.PENDING
+                  ))
             };
           });
       });
@@ -180,7 +180,7 @@ foam.CLASS({
         var statusPending = ucj.status === this.CapabilityJunctionStatus.PENDING;
         if ( statusGranted || statusPending ) {
           var message = statusGranted ? this.CANNOT_OPEN_GRANTED : this.CANNOT_OPEN_PENDING;
-          this.ctrl.notify(message);
+          this.ctrl.notify(message, '', this.LogLevel.INFO, true);
           return;
         }
         var nothingTodo = ucj.status === this.CapabilityJunctionStatus.ACTION_REQUIRED;

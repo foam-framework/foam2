@@ -19,6 +19,7 @@ foam.CLASS({
 
   requires: [
     'foam.core.Action',
+    'foam.log.LogLevel',
     'foam.u2.dialog.Popup',
     'foam.u2.dialog.SimpleActionDialog',
     'foam.u2.stack.Stack',
@@ -210,7 +211,7 @@ foam.CLASS({
           this.onClose(x);
         }).catch(e => {
           console.error(e);
-          x.ctrl.notify(this.ERROR_MSG_DRAFT, 'error');
+          x.ctrl.notify(this.ERROR_MSG_DRAFT, '', this.LogLevel.ERROR, true);
         });
       }
     },
@@ -237,7 +238,7 @@ foam.CLASS({
           }
         }).catch(e => {
           console.error(e);
-          x.ctrl.notify(this.ERROR_MSG);
+          x.ctrl.notify(this.ERROR_MSG, '', this.LogLevel.ERROR, true);
         });
       }
     }
