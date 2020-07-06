@@ -69,7 +69,7 @@ foam.CLASS({
       var url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?exportFormat=pdf&format=pdf&scale=3`;
       return url;
     },
-    async function cleanup(X, obj) {
+    async function tearDown(X, obj) {
       var findMatch = obj.match(this.SPREADSHEET_ID_REGEX);
       console.log(findMatch[1]);
       if ( findMatch ) X.googleSheetsDataExport.deleteSheet(X, findMatch[1]);

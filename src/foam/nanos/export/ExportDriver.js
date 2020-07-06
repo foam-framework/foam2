@@ -26,7 +26,7 @@ foam.INTERFACE({
       flags: ['js']
     },
     {
-      name: 'cleanup',
+      name: 'tearDown',
       type: 'String',
       args: ['X', 'obj'],
       flags: ['js']
