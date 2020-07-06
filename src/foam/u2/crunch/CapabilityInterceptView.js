@@ -13,6 +13,8 @@ foam.CLASS({
 
   requires: [
     'foam.log.LogLevel',
+    'foam.nanos.crunch.AgentCapabilityJunction',
+    'foam.nanos.crunch.AssociationCapability',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction',
@@ -26,7 +28,7 @@ foam.CLASS({
     'crunchController',
     'notify',
     'stack',
-    'user',
+    'subject',
     'userCapabilityJunctionDAO'
   ],
 
@@ -81,7 +83,7 @@ foam.CLASS({
                 data: cap
               })
                 .on('click', () => {
-                  var p = self.crunchController.launchWizard(cap.id);
+                  var p = self.crunchController.launchWizard(cap);
                   p.then(() => {
                     this.checkStatus(cap);
                   })
@@ -95,10 +97,25 @@ foam.CLASS({
     },
     function checkStatus(cap) {
       // Query UCJ status
-      this.userCapabilityJunctionDAO.where(this.AND(
-        this.EQ(this.UserCapabilityJunction.SOURCE_ID, this.user.id),
-        this.EQ(this.UserCapabilityJunction.TARGET_ID, cap.id)
-      )).limit(1).select(this.PROJECTION(
+      var isAssociationCapability = this.AssociationCapability.isInstance(cap);
+      var associatedEntity = isAssociationCapability ? this.subject.realUser : 
+        cap.associatedEntity === 'user' ? this.subject.user : this.subject.realUser;
+      this.userCapabilityJunctionDAO.where(
+        this.AND(
+          this.OR(
+            this.AND(
+              this.NOT(this.INSTANCE_OF(this.AgentCapabilityJunction)),
+              this.EQ(this.UserCapabilityJunction.SOURCE_ID, associatedEntity.id)
+            ),
+            this.AND(
+              this.INSTANCE_OF(this.AgentCapabilityJunction),
+              this.EQ(this.UserCapabilityJunction.SOURCE_ID, associatedEntity.id),
+              this.EQ(this.AgentCapabilityJunction.EFFECTIVE_USER, this.subject.user.id)
+            )
+          ),
+          this.EQ(this.UserCapabilityJunction.TARGET_ID, cap.id)
+        )
+      ).limit(1).select(this.PROJECTION(
         this.UserCapabilityJunction.STATUS
       )).then(results => {
         if ( results.array.length < 1 ) {

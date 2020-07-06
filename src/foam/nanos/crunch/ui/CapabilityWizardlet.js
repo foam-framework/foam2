@@ -13,7 +13,8 @@ foam.CLASS({
   ],
 
   imports: [
-    'user',
+    'crunchController',
+    'subject',
     'userCapabilityJunctionDAO'
   ],
 
@@ -22,6 +23,7 @@ foam.CLASS({
     'foam.core.Property',
     'foam.layout.Section',
     'foam.layout.SectionAxiom',
+    'foam.nanos.crunch.AgentCapabilityJunction',
     'foam.nanos.crunch.UserCapabilityJunction'
   ],
 
@@ -66,13 +68,23 @@ foam.CLASS({
     {
       name: 'save',
       code: function() {
-        return this.updateUCJ().then(() => {
+        var isAssociationCapability = foam.nanos.crunch.AssociationCapability.isInstance(this.capability);
+        var associatedEntity = isAssociationCapability ? this.subject.realUser : 
+          this.capability.associatedEntity === 'user' ? this.subject.user : this.subject.realUser;
+
+        return this.updateUCJ(associatedEntity).then(() => {
           var ucj = this.ucj;
           if ( ucj === null ) {
-            ucj = this.UserCapabilityJunction.create({
-              sourceId: this.user.id,
-              targetId: this.capability.id
-            })
+            ucj = isAssociationCapability ? 
+              this.AgentCapabilityJunction.create({
+                sourceId: associatedEntity.id,
+                targetId: this.capability.id,
+                effectiveUser: this.subject.user.id
+              })
+              : this.UserCapabilityJunction.create({
+                sourceId: associatedEntity.id,
+                targetId: this.capability.id
+              })
           }
           if ( this.of ) ucj.data = this.data;
           return this.userCapabilityJunctionDAO.put(ucj);
@@ -84,15 +96,22 @@ foam.CLASS({
       // iff property expressions unwrap promises.
       name: 'updateUCJ',
       async: true,
-      code: function () {
+      code: function (associatedEntity) {
         return this.userCapabilityJunctionDAO.find(
           this.AND(
-            this.EQ(
-              this.UserCapabilityJunction.SOURCE_ID,
-              this.user.id),
-            this.EQ(
-              this.UserCapabilityJunction.TARGET_ID,
-              this.capability.id))
+            this.OR(
+              this.AND(
+                this.NOT(this.INSTANCE_OF(this.AgentCapabilityJunction)),
+                this.EQ(this.UserCapabilityJunction.SOURCE_ID, associatedEntity.id)
+              ),
+              this.AND(
+                this.INSTANCE_OF(this.AgentCapabilityJunction),
+                this.EQ(this.UserCapabilityJunction.SOURCE_ID, associatedEntity.id),
+                this.EQ(this.AgentCapabilityJunction.EFFECTIVE_USER, this.subject.user.id)
+              )
+            ),
+            this.EQ(this.UserCapabilityJunction.TARGET_ID, this.capability.id)
+          )
         ).then(ucj => {
           this.ucj = ucj;
           return this;

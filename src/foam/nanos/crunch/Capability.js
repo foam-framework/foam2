@@ -197,6 +197,21 @@ foam.CLASS({
       name: 'reviewRequired',
       class: 'Boolean',
       permissionRequired: true
+    },
+    {
+      name: 'associatedEntity',
+      class: 'String',
+      hidden: true,
+      permissionRequired: true,
+      documentation: `
+        Denotes which entity in the context subject the capability should be saved to when there are mutiple.
+      `,
+      factory: () => {
+        return 'user';
+      },
+      javaFactory: `
+        return "user";
+      `
     }
   ],
 

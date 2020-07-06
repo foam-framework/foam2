@@ -28,6 +28,7 @@ foam.CLASS({
     'foam.mlang.predicate.Predicate',
     'foam.nanos.auth.Subject',
     'foam.nanos.crunch.AgentCapabilityJunction',
+    'foam.nanos.crunch.AssociationCapability',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityRuntimeException',
     'foam.nanos.crunch.CapabilityJunctionStatus',
@@ -144,14 +145,16 @@ foam.CLASS({
         if ( x.get(Session.class) == null ) return false;
         if ( user == null || ! user.getEnabled() ) return false;
         User realUser = ((Subject) x.get("subject")).getRealUser();
-        String realUserKey = realUser.getId() == user.getId() ?
+        String associationKey = realUser.getId() == user.getId() ?
           null :
           user.getId() + ":" + realUser.getId() + permission;
         String userKey = user.getId() + permission;
+        String realUserKey = realUser.getId() == user.getId() ? null : realUser.getId() + permission;
         this.initialize(x);
 
         Boolean result = ( (Map<String, Boolean>) getCache() ).get(userKey);
         if ( realUserKey != null ) result = result == null || ! result ?  ( (Map<String, Boolean>) getCache() ).get(realUserKey) : result;
+        if ( associationKey != null ) result = result == null || ! result ?  ( (Map<String, Boolean>) getCache() ).get(associationKey) : result;
         if ( result != null ) {
           if ( ! result ) maybeIntercept(x, permission);
           return result;
@@ -181,7 +184,10 @@ foam.CLASS({
           };
 
           // Check if a ucj implies the subject.user(business) has this permission
-          Predicate userPredicate = EQ(UserCapabilityJunction.SOURCE_ID, user.getId());
+          Predicate userPredicate = AND(
+            NOT(INSTANCE_OF(AgentCapabilityJunction.class)),
+            EQ(UserCapabilityJunction.SOURCE_ID, user.getId())
+          );
           if ( userCapabilityJunctionDAO.find(AND(userPredicate, capabilityScope, predicate)) != null ) {
             result = true;
           }
@@ -191,8 +197,24 @@ foam.CLASS({
             return true;
           }
 
-          // Check if a ucj implies the subject.realUser(agent) has this permission
+          // Check if a ucj implies the subject.realUser has this permission
           if ( realUser != null && realUserKey != null ) {
+            userPredicate = AND(
+              NOT(INSTANCE_OF(AgentCapabilityJunction.class)),
+              EQ(UserCapabilityJunction.SOURCE_ID, realUser.getId())
+            );
+            if ( userCapabilityJunctionDAO.find(AND(userPredicate, capabilityScope, predicate)) != null ) {
+              result = true;
+            }
+
+            (( Map<String, Boolean> ) getCache()).put(realUserKey, result);
+            if ( result ) {
+              return true;
+            }
+          }
+
+          // Check if a ucj implies the subject.realUser has this permission in relation to the user
+          if ( realUser != null && associationKey != null ) {
             userPredicate = AND(
               INSTANCE_OF(AgentCapabilityJunction.class),
               EQ(UserCapabilityJunction.SOURCE_ID, realUser.getId()),
@@ -202,7 +224,7 @@ foam.CLASS({
               result = true;
             }
 
-            (( Map<String, Boolean> ) getCache()).put(realUserKey, result);
+            (( Map<String, Boolean> ) getCache()).put(associationKey, result);
             if ( result ) {
               return true;
             }

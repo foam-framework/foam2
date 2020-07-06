@@ -145,7 +145,7 @@ foam.CLASS({
                     })
                   .end()
                   .on('click', () => {
-                    self.crunchController.launchWizard(cap.id);
+                    self.crunchController.launchWizard(cap);
                   })
                 .end();
             }
@@ -176,7 +176,7 @@ foam.CLASS({
                   .start(self.GUnit, { columns: 4 })
                     .tag(self.CapabilityCardView, { data: cap })
                     .on('click', () => {
-                      self.crunchController.launchWizard(cap.id);
+                      self.crunchController.launchWizard(cap);
                     })
                   .end();
               }
@@ -208,7 +208,7 @@ foam.CLASS({
               .start(self.GUnit, { columns: 4 })
                 .tag(self.CapabilityCardView, { data: cap })
                 .on('click', () => {
-                  self.crunchController.launchWizard(cap.id);
+                  self.crunchController.launchWizard(cap);
                 })
               .end();
           }

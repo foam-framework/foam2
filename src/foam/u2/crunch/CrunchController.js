@@ -25,11 +25,13 @@ foam.CLASS({
 
   requires: [
     'foam.log.LogLevel',
+    'foam.nanos.crunch.AgentCapabilityJunction',
+    'foam.nanos.crunch.AssociationCapability',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityCapabilityJunction',
     'foam.nanos.crunch.CapabilityJunctionStatus',
-    'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.crunch.ui.CapabilityWizardlet',
+    'foam.nanos.crunch.UserCapabilityJunction',
     'foam.u2.borders.MarginBorder',
     'foam.u2.crunch.CapabilityInterceptView',
     'foam.u2.detail.AbstractSectionedDetailView',
@@ -105,8 +107,12 @@ foam.CLASS({
           Promise.resolve(capabilities),
           Promise.all(capabilities
             .filter(cap => !! cap.of )
-            .map(cap =>
-              this.CapabilityWizardlet.create({ capability: cap }).updateUCJ())
+            .map(cap => {
+                var isAssociationCapability = this.AssociationCapability.isInstance(cap);
+                var associatedEntity = isAssociationCapability ? this.subject.realUser : 
+                  cap.associatedEntity === 'user' ? this.subject.user : this.subject.realUser;
+                return this.CapabilityWizardlet.create({ capability: cap }).updateUCJ(associatedEntity);
+              })
             )
           ]).then((capAndSections) => {
             return {
@@ -163,12 +169,26 @@ foam.CLASS({
       });
     },
 
-    async function launchWizard(capabilityId) {
+    async function launchWizard(capability) {
+      var isAssociationCapability = this.AssociationCapability.isInstance(capability);
+      var associatedEntity = isAssociationCapability ? this.subject.realUser : 
+        capability.associatedEntity === 'user' ? this.subject.user : this.subject.realUser;
       var ucj = await this.userCapabilityJunctionDAO.find(
         this.AND(
-          this.EQ(this.UserCapabilityJunction.SOURCE_ID, this.subject.user.id),
-          this.EQ(this.UserCapabilityJunction.TARGET_ID, capabilityId)
-        ));
+          this.OR(
+            this.AND(
+              this.NOT(this.INSTANCE_OF(this.AgentCapabilityJunction)),
+              this.EQ(this.UserCapabilityJunction.SOURCE_ID, associatedEntity.id)
+            ),
+            this.AND(
+              this.INSTANCE_OF(this.AgentCapabilityJunction),
+              this.EQ(this.UserCapabilityJunction.SOURCE_ID, associatedEntity.id),
+              this.EQ(this.AgentCapabilityJunction.EFFECTIVE_USER, this.subject.user.id)
+            )
+          ),
+          this.EQ(this.UserCapabilityJunction.TARGET_ID, capability.id)
+        )
+      );
       if ( ucj ) {
         var statusGranted = ucj.status === this.CapabilityJunctionStatus.GRANTED;
         var statusPending = foam.util.equals(ucj.status, this.CapabilityJunctionStatus.PENDING);
@@ -178,7 +198,7 @@ foam.CLASS({
           return;
         }
       }
-      return this.callWizard(capabilityId);
+      return this.callWizard(capability.id);
     },
 
     function maybeLaunchInterceptView(intercept) {
