@@ -71,7 +71,6 @@ foam.CLASS({
     },
     async function tearDown(X, obj) {
       var findMatch = obj.match(this.SPREADSHEET_ID_REGEX);
-      console.log(findMatch[1]);
       if ( findMatch ) X.googleSheetsDataExport.deleteSheet(X, findMatch[1]);
     }
   ],
