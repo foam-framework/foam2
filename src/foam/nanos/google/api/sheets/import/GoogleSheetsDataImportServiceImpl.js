@@ -274,8 +274,8 @@ foam.CLASS({
         type: 'Object'
       },
       {
-        name: 'columnHeaderToPropertyName',
-        javaType: 'foam.nanos.google.api.sheets.ColumnHeaderToPropertyName'
+        name: 'columnHeaderToPropertyMapping',
+        javaType: 'foam.nanos.google.api.sheets.ColumnHeaderToPropertyMapping'
       },
       {
         name: 'val',
@@ -283,10 +283,10 @@ foam.CLASS({
       }
     ],
     javaCode: `
-      PropertyInfo prop  = (PropertyInfo)columnHeaderToPropertyName.getProp();
+      PropertyInfo prop  = (PropertyInfo)columnHeaderToPropertyMapping.getProp();
       switch (prop.getValueClass().getName()) {
         case "long":
-          if ( columnHeaderToPropertyName.getUnitProperty() != null ) {
+          if ( columnHeaderToPropertyMapping.getUnitProperty() != null ) {
             String unitValue = val.toString();
             Matcher numMatcher = numbersRegex.matcher(unitValue);
             if ( ! numMatcher.find() ) {
@@ -297,7 +297,7 @@ foam.CLASS({
             Matcher alphabeticalCharsMatcher = alphabeticalCharsRegex.matcher(unitValue);
             if ( alphabeticalCharsMatcher.find() ) {
               String unit = unitValue.substring(alphabeticalCharsMatcher.start(), alphabeticalCharsMatcher.end());
-              ((PropertyInfo)columnHeaderToPropertyName.getUnitProperty()).set(obj, unit);
+              ((PropertyInfo)columnHeaderToPropertyMapping.getUnitProperty()).set(obj, unit);
             }
           } else prop.set(obj, Long.parseLong(val.toString()));
           break;
@@ -362,7 +362,7 @@ foam.CLASS({
       String endRow = rangeLimits[1].substring(indexOfEndRowInRange);
       List<List<String>> base = generateBase(endColumn.length());
 
-      for ( ColumnHeaderToPropertyName c : importConfig.getColumnHeaderPropertyMappings() ) {
+      for ( ColumnHeaderToPropertyMapping c : importConfig.getColumnHeaderPropertyMappings() ) {
         if ( ((PropertyInfo)c.getProp()).getSheetsOutput() ) {
           StringBuilder sb = new StringBuilder();
           int currColumnIndexRelativeToFirstColumn = columnHeaders.indexOf(c.getColumnHeader());

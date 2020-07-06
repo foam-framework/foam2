@@ -63,7 +63,7 @@ foam.CLASS({
     {
       name: 'columnHeaderPropertyMappings',
       class: 'FObjectArray',
-      of: 'foam.nanos.google.api.sheets.ColumnHeaderToPropertyName',
+      of: 'foam.nanos.google.api.sheets.ColumnHeaderToPropertyMapping',
       visibility: 'RO',
       hidden: true
     }
