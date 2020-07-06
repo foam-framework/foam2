@@ -35,15 +35,14 @@ foam.CLASS({
 
       var promises = props.map((prop) => {
         var files = prop.f(obj);
-        return Promise.all(files.map(async (f) =>{
-          if ( f.filesize <= this.maxStringDataSize ){
+        return Promise.all(files.map(async f => {
+          if ( f.filesize <= this.maxStringDataSize ) {
             f.dataString = await this.encode(f.data.blob);
             delete f.instance_.data;
           }
-            a = await self.fileDAO.put(f);
+          a = await self.fileDAO.put(f);
           return self.fileDAO.put(f);
-          }
-        ))
+        }))
       });
 
       return Promise.all(promises).then((values) => {

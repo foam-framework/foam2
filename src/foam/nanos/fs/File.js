@@ -87,8 +87,7 @@ foam.CLASS({
           return null;
         }
       `,
-      getter: function(){
-      debugger;
+      getter: function() {
         if ( this.dataString ) {
           let b64Data = this.dataString.split(',')[1];
           const b64toBlob = (b64Data, contentType=this.mimeType, sliceSize=512) => {
@@ -126,7 +125,7 @@ foam.CLASS({
        */
       adapt: function(oldObj, newObj) {
         return newObj;
-      },
+      }
     }
   ],
   methods: [

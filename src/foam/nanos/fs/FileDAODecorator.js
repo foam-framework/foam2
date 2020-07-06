@@ -40,7 +40,7 @@ foam.CLASS({
 
         if ( ! file ) return a();
 
-        if ( file.size <= this.maxStringDataSize ){
+        if ( file.size <= this.maxStringDataSize ) {
           file.dataString = await encode(file.data.blob);
           delete file.instance_.data;
         }
