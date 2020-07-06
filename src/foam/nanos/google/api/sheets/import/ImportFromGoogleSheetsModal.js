@@ -27,9 +27,6 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
-      //!!! on Column header not being mapped show warning which says: 
-      //Data for column with header ______ cannot be imported. 
-      //You can import your data but this column will be ignored
       this.SUPER();
       this
       .start('h2').style({'padding-left': '16px'}).add('Google Sheets Data Import').end()
@@ -56,15 +53,8 @@ foam.CLASS({
                 })
               .end()
               .br();
-              //if c.prop.label doesn't exist add error message
             });
           });
-          // .callIf( importConfig$columnHeaderPropertyMappings && importConfig$columnHeaderPropertyMappings.length === 0, function() {
-          //   this.start().add(
-          //     'it looks like there is not data we can import to current page. please make sure that link to gooogle sheet you\'ve provided is correct'
-          //   ).end();
-          // });
-          
         }))
         .start().show(this.showAction$).addClass(this.myClass('btn-box'))
           .tag(this.CANCEL, {
@@ -81,11 +71,6 @@ foam.CLASS({
           })
         .end()
       .endContext();
-        // .tag({
-        //   class: 'net.nanopay.sme.ui.wizardModal.WizardModalNavigationBar',
-        //   back: this.CANCEL,
-        //   next: this.IMPORT_DATA
-        // })
     }
   ],
   actions: [
@@ -128,7 +113,7 @@ foam.CLASS({
       },
       code: function(X) {
         X[this.importServiceName].importData(X, this.importConfig).then(r => {
-          // X.closeDialog();
+          X.closeDialog();
           var message = this.NotificationMessage.create();
           if ( r ) message.message = 'success!';
           else {
