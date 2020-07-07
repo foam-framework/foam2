@@ -28,6 +28,7 @@ foam.CLASS({
 
   imports: [
     'auth',
+    'ctrl',
     'capabilityCategoryCapabilityJunctionDAO',
     'capabilityCategoryDAO',
     'capabilityDAO',
@@ -224,7 +225,7 @@ foam.CLASS({
           categoryId));
     },
     function signingOfficerQuestion() {
-      return this.auth.check(this.__subContext__, "businessHasSigningOfficer");
+      return this.auth.check(this.ctrl.__subContext__, 'businessHasSigningOfficer');
     }
   ]
 });
