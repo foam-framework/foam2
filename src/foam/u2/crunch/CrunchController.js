@@ -236,13 +236,18 @@ foam.CLASS({
       var arrOfRequiredCapabilities = sectionsList.flat()
         .filter(eachSection => eachSection && eachSection.help)
         .map(eachSection => eachSection.help);
-      return ctrl.add(
-        this.Popup.create({ closeable: false }, ctrl.__subContext__).tag({
-          class: 'foam.u2.crunch.CapabilityRequirementView',
-          arrayRequirement: arrOfRequiredCapabilities,
-          functionData: capabilitiesSections,
-          capabilityId: capabilityId
-        })).end();
+      if ( arrOfRequiredCapabilities.length < 1 ) {
+        // if nothing to show don't open this dialog - push directly to wizard
+        this.generateAndDisplayWizard(capabilitiesSections);
+      } else {
+        return this.ctrl.add(
+          this.Popup.create({ closeable: false }, this.ctrl.__subContext__).tag({
+            class: 'foam.u2.crunch.CapabilityRequirementView',
+            arrayRequirement: arrOfRequiredCapabilities,
+            functionData: capabilitiesSections,
+            capabilityId: capabilityId
+          })).end();
+      }
     }
   ]
 });
