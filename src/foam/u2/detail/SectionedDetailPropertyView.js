@@ -279,8 +279,8 @@ foam.CLASS({
                     .end()
                   .end();
                 })
-              .end()
-              .callIf(prop.validationTextVisible && mode === self.DisplayMode.RW, function() {
+              .end()//is there any chance we could do such a change
+              .callIf(prop.validationTextVisible && ( mode === self.DisplayMode.RW || mode === self.DisplayMode.DISABLED ), function() {
                 this
                   .start()
                     .style({ 'align-items': 'center' })

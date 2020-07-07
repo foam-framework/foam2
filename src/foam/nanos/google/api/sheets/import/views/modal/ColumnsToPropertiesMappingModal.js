@@ -26,19 +26,7 @@ foam.CLASS({
 
         this.start('h4').style({ 'padding-left': '16px' }).add('Column headers').end().forEach(this.importConfig.columnHeaderPropertyMappings, function(c) {
           this.start()
-            .style({ 'padding-left': '16px' })
-              // .start()
-              //   .add(c.columnHeader)
-              //   .style({ 'background-color': c.prop ? 'none' : '#fbedec',
-              //           'color': c.prop ? 'none' : '#a61414' })
-              // .end()
-              // .callIf(! c.prop, function() {
-              //   this.start()
-              //     .addClass(self.myClass('error'))
-              //     .add('Data for column with header  "' + c.columnHeader + '" cannot be imported. You can still import your data but this column data will be ignored')
-              //   .end();
-              // })
-              // .start().addClass(self.myClass('error')).add(this.slot(c.PROP.validateObj)).end()
+              .style({ 'padding-left': '16px' })
             .end()
             .tag(this.SectionedDetailPropertyView, {
               data: c,
