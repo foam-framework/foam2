@@ -29,8 +29,7 @@ foam.CLASS({
       // var self = this;
       this.views = {
         'googleSheetLink'        : { view: { class: 'foam.nanos.google.api.sheets.GoogleSheetImportModal' }, startPoint: true },
-        'columnsMapping'         : { view: { class: 'foam.nanos.google.api.sheets.ColumnsToPropertiesMappingModal' } },
-        // 'importData'             : { view: { class: 'foam.nanos.google.api.sheets.ImportDataModal' } },
+        'columnsMapping'         : { view: { class: 'foam.nanos.google.api.sheets.ColumnsToPropertiesMappingModal' } }
       };
     },
 

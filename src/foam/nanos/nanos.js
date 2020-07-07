@@ -192,7 +192,6 @@ FOAM_FILES([
   { name: "foam/nanos/google/api/sheets/import/ImportFromGoogleSheetsModal"},
   { name: "foam/nanos/google/api/sheets/import/views/modal/ColumnsToPropertiesMappingModal" },
   { name: "foam/nanos/google/api/sheets/import/views/modal/GoogleSheetImportModal" },
-  { name: "foam/nanos/google/api/sheets/import/views/modal/ImportDataModal" },
   { name: "foam/nanos/google/api/sheets/import/views/modal/ImportFromGoogleSheetsForm"},
   { name: "foam/nanos/auth/Relationships" },
   { name: "foam/nanos/NanoService" },
