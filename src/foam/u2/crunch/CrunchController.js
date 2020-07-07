@@ -112,7 +112,8 @@ foam.CLASS({
                 var isAssociationCapability = this.AssociationCapability.isInstance(cap);
                 var associatedEntity = isAssociationCapability ? this.subject.realUser : 
                   cap.associatedEntity === 'user' ? this.subject.user : this.subject.realUser;
-                return this.CapabilityWizardlet.create({ capability: cap }).updateUCJ(associatedEntity);
+                var wizardlet = this.CapabilityWizardlet.create({ capability: cap });
+                return this.updateUCJ(wizardlet, associatedEntity);
               })
             )
           ]).then((capAndSections) => {
@@ -263,6 +264,51 @@ foam.CLASS({
           functionData: capabilitiesSections,
           capabilityId: capabilityId
         })).end();
+    },
+    function save(wizardlet) {
+      var self = wizardlet;
+      var isAssociationCapability = foam.nanos.crunch.AssociationCapability.isInstance(self.capability);
+      var associatedEntity = isAssociationCapability ? self.subject.realUser : 
+        self.capability.associatedEntity === 'user' ? self.subject.user : self.subject.realUser;
+
+      return this.updateUCJ(self, associatedEntity).then(() => {
+        var ucj = self.ucj;
+        if ( ucj === null ) {
+          ucj = isAssociationCapability ? 
+          self.AgentCapabilityJunction.create({
+              sourceId: associatedEntity.id,
+              targetId: self.capability.id,
+              effectiveUser: self.subject.user.id
+            })
+            : self.UserCapabilityJunction.create({
+              sourceId: associatedEntity.id,
+              targetId: self.capability.id
+            })
+        }
+        if ( self.of ) ucj.data = self.data;
+        return self.userCapabilityJunctionDAO.put(ucj);
+      });
+    }, 
+    async function updateUCJ(self, associatedEntity) {
+      return self.userCapabilityJunctionDAO.find(
+        self.AND(
+          self.OR(
+            self.AND(
+              self.NOT(self.INSTANCE_OF(self.AgentCapabilityJunction)),
+              self.EQ(self.UserCapabilityJunction.SOURCE_ID, associatedEntity.id)
+            ),
+            self.AND(
+              self.INSTANCE_OF(self.AgentCapabilityJunction),
+              self.EQ(self.UserCapabilityJunction.SOURCE_ID, associatedEntity.id),
+              self.EQ(self.AgentCapabilityJunction.EFFECTIVE_USER, self.subject.user.id)
+            )
+          ),
+          self.EQ(self.UserCapabilityJunction.TARGET_ID, self.capability.id)
+        )
+      ).then(ucj => {
+        self.ucj = ucj;
+        return self;
+      });
     }
   ]
 });

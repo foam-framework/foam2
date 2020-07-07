@@ -68,54 +68,7 @@ foam.CLASS({
     {
       name: 'save',
       code: function() {
-        var isAssociationCapability = foam.nanos.crunch.AssociationCapability.isInstance(this.capability);
-        var associatedEntity = isAssociationCapability ? this.subject.realUser : 
-          this.capability.associatedEntity === 'user' ? this.subject.user : this.subject.realUser;
-
-        return this.updateUCJ(associatedEntity).then(() => {
-          var ucj = this.ucj;
-          if ( ucj === null ) {
-            ucj = isAssociationCapability ? 
-              this.AgentCapabilityJunction.create({
-                sourceId: associatedEntity.id,
-                targetId: this.capability.id,
-                effectiveUser: this.subject.user.id
-              })
-              : this.UserCapabilityJunction.create({
-                sourceId: associatedEntity.id,
-                targetId: this.capability.id
-              })
-          }
-          if ( this.of ) ucj.data = this.data;
-          return this.userCapabilityJunctionDAO.put(ucj);
-        });
-      }
-    },
-    {
-      // This can be moved to an expression on the 'data' property
-      // iff property expressions unwrap promises.
-      name: 'updateUCJ',
-      async: true,
-      code: function (associatedEntity) {
-        return this.userCapabilityJunctionDAO.find(
-          this.AND(
-            this.OR(
-              this.AND(
-                this.NOT(this.INSTANCE_OF(this.AgentCapabilityJunction)),
-                this.EQ(this.UserCapabilityJunction.SOURCE_ID, associatedEntity.id)
-              ),
-              this.AND(
-                this.INSTANCE_OF(this.AgentCapabilityJunction),
-                this.EQ(this.UserCapabilityJunction.SOURCE_ID, associatedEntity.id),
-                this.EQ(this.AgentCapabilityJunction.EFFECTIVE_USER, this.subject.user.id)
-              )
-            ),
-            this.EQ(this.UserCapabilityJunction.TARGET_ID, this.capability.id)
-          )
-        ).then(ucj => {
-          this.ucj = ucj;
-          return this;
-        });
+        return this.crunchController.save(this);
       }
     }
   ]
