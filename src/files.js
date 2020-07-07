@@ -99,6 +99,8 @@ FOAM_FILES([
   { name: "foam/core/AxiomCloner" },
   { name: "foam/nanos/auth/Authorizable" },
   { name: "foam/i18n/TranslationFormatStringParser", flags: ['swift'] },
+  { name: "foam/i18n/XLIFFTranslationValue" },
+  { name: "foam/i18n/Locale" },
   { name: "foam/swift/SwiftLib", flags: ['swift'] },
   { name: "foam/swift/SwiftClass", flags: ['swift'] },
   { name: "foam/swift/Outputter", flags: ['swift'] },
@@ -813,4 +815,8 @@ FOAM_FILES([
   { name: "foam/foamlink/FoamlinkExec" },
   { name: "foam/foamlink/lib" },
   { name: "foam/util/filesystem/FileWalker" },
+
+  // Translation Support
+  { name: 'foam/i18n/XLIFFTranslationValue' },
+  { name: 'foam/i18n/Locale' },  
 ]);

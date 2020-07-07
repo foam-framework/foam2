@@ -89,6 +89,8 @@ FOAM_FILES([
   { name: "foam/core/ContextAgent" },
   { name: "foam/core/Agency" },
   { name: "foam/i18n/TranslationFormatStringParser", flags: ['swift'] },
+  { name: "foam/i18n/XLIFFTranslationValue" },
+  { name: "foam/i18n/Locale" },
   { name: "foam/swift/SwiftLib", flags: ['swift'] },
   { name: "foam/swift/SwiftClass", flags: ['swift'] },
   { name: "foam/swift/Outputter", flags: ['swift'] },
@@ -583,4 +585,8 @@ FOAM_FILES([
 
   { name: "foam/core/CoreTypesValidationTest" },
   { name: "foam/core/CoreTypesValidationTestModel" }
+
+  // Translation Support
+  { name: "foam/i18n/XLIFFTranslationValue" },
+  { name: "foam/i18n/Locale" },
 ]);
