@@ -53,6 +53,7 @@ foam.CLASS({
         if ( ! sheetId || sheetId.length == 0)
           return '';
         var url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?exportFormat=pdf&format=pdf&scale=3`;
+        X.googleSheetsDataExport.deleteSheet(X, sheetId);
         return url;
     },
     async function exportDAO(X, dao) {
@@ -75,14 +76,8 @@ foam.CLASS({
       if ( ! sheetId || sheetId.length == 0)
         return '';
       var url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?exportFormat=pdf&format=pdf&scale=3`;
+      X.googleSheetsDataExport.deleteSheet(X, sheetId);
       return url;
-    },
-    async function tearDown(X, obj) {
-      var findMatch = obj.match(this.SPREADSHEET_ID_REGEX);
-      if ( findMatch ) X.googleSheetsDataExport.deleteSheet(X, findMatch[1]);
     }
-  ],
-  constants: {
-    SPREADSHEET_ID_REGEX: '/spreadsheets/d/([a-zA-Z0-9-_]+)',
-  }
+  ]
 });
