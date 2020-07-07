@@ -1,4 +1,10 @@
-foam.CLASS({
+/**
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+ foam.CLASS({
   package: 'foam.nanos.google.api.sheets',
   name: 'GoogleSheetsDataImportServiceImpl',
   implements: [
@@ -168,6 +174,7 @@ foam.CLASS({
           List<List<Object>> data = values.getValues();
           List<FObject> parsedObjs = valueRangeValuesToFobjectsArray(x, importConfig, data);
           //if there was a problem with adding records we still might want to update user's google sheet with ids or status
+          if ( parsedObjs == null ) return false;
           addRecordsToDAO(x, importConfig.getDAO(), parsedObjs);
           List<String> columnHeaders = new ArrayList<>();
           for ( Object header : data.get(0) ) {
@@ -200,12 +207,12 @@ foam.CLASS({
     javaCode: `
       DAO dao  = (DAO)x.get(daoId);
       if ( dao == null ) return false;
-        for ( FObject obj: objs) {
-          try {
-            dao.put(obj);
-          } catch(Throwable t) {
-          }
+      for ( FObject obj: objs) {
+        try {
+          dao.put(obj);
+        } catch(Throwable t) {
         }
+      }
       return true;
     `
   },
@@ -248,7 +255,7 @@ foam.CLASS({
           Object val = data.get(i).get(columnIndex);
           // PropertyInfo prop = ((PropertyInfo)importConfig.getColumnHeaderPropertyMappings()[j].getProp());
           if ( ! setValue(obj, importConfig.getColumnHeaderPropertyMappings()[j], data.get(i).get(columnIndex)) )
-            continue;
+            return null;
         }
         postSetValues(x, obj);
         objs.add((FObject)obj);
@@ -328,7 +335,7 @@ foam.CLASS({
             prop.set(obj, new java.util.Date(valueString));
           }
           else
-          prop.set(obj, val);
+            prop.set(obj, val);
           break;
       }
       return true;

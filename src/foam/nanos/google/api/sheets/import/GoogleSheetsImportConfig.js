@@ -1,4 +1,10 @@
-foam.CLASS({
+/**
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+ foam.CLASS({
   package: 'foam.nanos.google.api.sheets',
   name: 'GoogleSheetsImportConfig',
   documentation: 'GoogleSheetsImportConfig contains info about import',
@@ -12,9 +18,6 @@ foam.CLASS({
     {
       name: 'googleSheetLink',
       class: 'String',
-      view: {
-        class: 'foam.u2.TextField',
-      },
       label: 'Google Sheets Link',
       postSet: function() {
         var findMatch = this.googleSheetLink.match(this.SPREADSHEET_ID_REGEX);
@@ -30,9 +33,6 @@ foam.CLASS({
     {
       name: 'googleSpreadsheetId',
       class: 'String',
-      view: {
-        class: 'foam.u2.TextField',
-      },
       label: 'Google Spreadsheet Id',
       hidden: true,
       expression: function(googleSheetLink) {
@@ -43,9 +43,6 @@ foam.CLASS({
     {
       name: 'googleSheetId',
       class: 'String',
-      view: {
-        class: 'foam.u2.TextField',
-      },
       label: 'Google Sheets Id',
       hidden: true,
       // expression: function(googleSheetLink) {
