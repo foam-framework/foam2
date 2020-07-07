@@ -8,6 +8,13 @@ foam.CLASS({
   imports: [
     'ctrl'
   ],
+  css: `
+  ^footer{
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+  }
+  `,
   properties: [
     {
       name: 'importConfig',

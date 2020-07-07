@@ -10,7 +10,7 @@ foam.CLASS({
   ^ {
     width: 500px;
     height: 500px;
-    padding: 16px;
+    // padding: 16px;
     overflow-x: scroll;
   }
   `,

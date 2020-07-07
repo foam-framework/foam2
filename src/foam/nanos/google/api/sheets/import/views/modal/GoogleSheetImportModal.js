@@ -6,13 +6,20 @@ foam.CLASS({
     'importConfig',
     'importServiceName',
   ],
+  css: `
+  ^footer {
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+  }
+  `,
   methods: [
     function initE() {
       this.SUPER();
       this.start()
         .tag(this.importConfig)
       .end();
-      this.start({ class: 'net.nanopay.sme.ui.wizardModal.WizardModalNavigationBar', back: this.BACK, next: this.NEXT }).end();
+      this.start({ class: 'net.nanopay.sme.ui.wizardModal.WizardModalNavigationBar', back: this.BACK, next: this.NEXT }).addClass(this.myClass('footer')).end();
     }
   ],
   actions: [

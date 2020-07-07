@@ -13,20 +13,45 @@ foam.CLASS({
     'ctrl',
     'notify'
   ],
+  css: `
+  ^{
+    // padding: 16px;
+  }
+  ^footer {
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    padding: 0;
+  }
+  `,
   methods: [
     function initE() {
       this.SUPER();
       var self = this;
 
-        this.start('h3').add('Exported Columns:').end().forEach(this.importConfig.columnHeaderPropertyMappings, function(c) {
-          this
-            .tag(this.SectionedDetailPropertyView, {
-              data: c,
-              prop: this.ColumnHeaderToPropertyMapping.COLUMN_HEADER
+        this
+          .start()
+            .addClass(this.myClass())
+            .start('h2')
+              .style({'padding-left': '8px'})
+              .add('Exported Columns:')
+            .end()
+            .forEach(self.importConfig.columnHeaderPropertyMappings, function(c) {
+              self
+              .start()
+                .style({'padding': '0 8px'})
+                .tag(self.SectionedDetailPropertyView, {
+                  data: c,
+                  prop: self.ColumnHeaderToPropertyMapping.COLUMN_HEADER
+                })
+              .end()
+              .br();
             })
-          .br();
-        })
-      .start({ class: 'net.nanopay.sme.ui.wizardModal.WizardModalNavigationBar', back: this.BACK, next: this.NEXT }).end();
+          .end()
+          .start()
+            .style({ 'padding-bottom': '120px' })
+          .end()
+          .start({ class: 'net.nanopay.sme.ui.wizardModal.WizardModalNavigationBar', back: this.BACK, next: this.NEXT }).addClass(this.myClass('footer')).end();
     }
   ],
   actions: [
