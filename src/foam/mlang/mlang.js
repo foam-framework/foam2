@@ -2705,8 +2705,7 @@ foam.CLASS({
     {
       name: 'toString',
       code: function() {
-        var projectionString = this.cls_.name + '(' + this.exprs.join(',') + ')';
-        return projectionString;
+        return this.cls_.name + '(' + this.exprs.join(',') + ')';
       },
       javaCode: `
         StringJoiner joiner = new StringJoiner(", ", getClassInfo().getId() + "(", ")");

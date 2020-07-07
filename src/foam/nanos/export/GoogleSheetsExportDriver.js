@@ -48,8 +48,7 @@ foam.CLASS({
       sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata);
       if ( ! sheetId || sheetId.length === 0)
         return '';
-      var url = `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`;
-      return url;
+      return `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`;
     },
     async function exportDAO(X, dao) {
       var self = this;
@@ -70,8 +69,7 @@ foam.CLASS({
       sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata);
       if ( ! sheetId || sheetId.length == 0)
         return '';
-      var url = `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`;
-      return url;
+      return `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`;
     }
   ]
 });

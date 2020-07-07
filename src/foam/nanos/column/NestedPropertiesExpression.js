@@ -39,11 +39,10 @@ foam.CLASS({
     {
       name: 'toString',
       code: function() {
-        var projectionString = this.cls_.name + '('
+        return this.cls_.name + '('
           + this.objClass.id
           + ', '
           + this.nestedProperty + ')';
-        return projectionString;
       },
       javaCode: `
         return getClassInfo().getId() + "(" + getObjClass().getId() + ", " + getNestedProperty() + ")";
