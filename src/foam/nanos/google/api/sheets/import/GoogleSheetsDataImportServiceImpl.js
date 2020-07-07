@@ -182,7 +182,7 @@ foam.CLASS({
   },
   {
     name: 'addRecordsToDAO',
-    type: 'Boolean',
+    type: 'Boolean',//change to int
     args: [
       {
         name: 'x',
