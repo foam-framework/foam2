@@ -71,6 +71,7 @@ public class CapabilityTest extends Test {
     testDeprecatedCapabiltiyJunctionRules(x);
     testCapabilityJunctions(x);
     testCapability(x);
+    testCapabilityHasPrerequisitesSatisfied(x);
   }
 
   // TODO: Actually test something here.
@@ -432,6 +433,89 @@ public class CapabilityTest extends Test {
     c1.setEnabled(true);
     c1 = (Capability) capabilityDAO.put(c1);
     test(c1.implies(x, p1) && c1.implies(x, p2), "c2 re-enabled implies p1 and p2");
+  }
+
+  public void testCapabilityHasPrerequisitesSatisfied(X x) {
+    CapabilityJunctionStatus[][] testCases = {
+      // Test for all granted
+      new CapabilityJunctionStatus[] {
+        CapabilityJunctionStatus.GRANTED,
+        CapabilityJunctionStatus.GRANTED,
+        CapabilityJunctionStatus.GRANTED,
+      },
+      // Test for two granted
+      new CapabilityJunctionStatus[] {
+        CapabilityJunctionStatus.GRANTED,
+        CapabilityJunctionStatus.GRANTED,
+        CapabilityJunctionStatus.EXPIRED,
+      },
+      // Test for mixed non-granted stati
+      new CapabilityJunctionStatus[] {
+        CapabilityJunctionStatus.PENDING,
+        CapabilityJunctionStatus.EXPIRED,
+        CapabilityJunctionStatus.ACTION_REQUIRED,
+        CapabilityJunctionStatus.AVAILABLE,
+      }
+    };
+
+    // Run tests on base Capability class
+    boolean[] expectedResults = { true, false, false };
+    for ( int i = 0 ; i < testCases.length ; i++ ) {
+      // Test base Capability class
+      Capability base = new Capability();
+      base.setId(String.format("base.%d", i));
+      capabilityDAO.put_(x, base);
+
+      CapabilityJunctionStatus[] tc = testCases[i];
+      for ( int j = 0 ; j < tc.length ; j++ ) {
+        CapabilityJunctionStatus status = tc[j];
+        Capability prereq = new Capability();
+        prereq.setId(String.format("prereq.%d.%d", i, j));
+        // Using TimeHMS as an arbitrary data model since it only
+        // has a few properties
+        prereq.setOf(foam.nanos.cron.TimeHMS.getOwnClassInfo());
+        capabilityDAO.put_(x, prereq);
+
+        // Add prerequisite junction
+        CapabilityCapabilityJunction prereqJunction =
+          new CapabilityCapabilityJunction();
+        prereqJunction.setSourceId(base.getId());
+        prereqJunction.setTargetId(prereq.getId());
+        prerequisiteCapabilityJunctionDAO.put_(x, prereqJunction);
+
+        // Add user junction
+        UserCapabilityJunction userJunction =
+          new UserCapabilityJunction();
+        userJunction.setSourceId(u1.getId());
+        userJunction.setTargetId(prereq.getId());
+        userJunction.setStatus(status);
+        // Need to set UCJ data for granted status or it will revert
+        // to ACTION_REQUIRED, which is undesirable for this test
+        if ( status == CapabilityJunctionStatus.GRANTED ) {
+          userJunction.setData(
+            new foam.nanos.cron.TimeHMS.Builder(x)
+              .setHour(1).setMinute(1).setSecond(1)
+              .build()
+          );
+        }
+        userCapabilityJunctionDAO.put_(x, userJunction);
+      }
+
+      boolean check = base.hasPrerequisitesSatisfied(
+        x,
+        "userCapabilityJunctionDAO",
+        EQ(
+          UserCapabilityJunction.SOURCE_ID,
+          u1.getId()
+        )
+      );
+
+      test(check == expectedResults[i],
+        String.format(
+          "base.%d.hasPrerequisitesSatisfied reports expected value", i)
+      );
+    }
+
   }
  
 }

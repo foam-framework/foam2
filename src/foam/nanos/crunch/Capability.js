@@ -17,7 +17,9 @@ foam.CLASS({
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.dao.Sink',
+    'foam.mlang.predicate.Predicate',
     'foam.mlang.sink.Count',
+    'java.util.ArrayList',
     'java.util.Date',
     'java.util.List',
     'static foam.mlang.MLang.*'
@@ -282,6 +284,94 @@ foam.CLASS({
 
       return today.after(capabilityExpiry);
       `
+    },
+    {
+      name: 'hasPrerequisitesSatisfied',
+      type: 'Boolean',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'ucjDaoKey', type: 'String' },
+        { name: 'ucjUserPredicate', type: 'Predicate' },
+      ],
+      documentation: `
+        Check if this capability is satisfied with its prerequisites.
+        Default implementation requires all prerequisites.
+      `,
+      javaCode: `
+        // Get a list of prerequisite capabilities
+        List<String> myPrerequisites = new ArrayList<String>();
+        {
+          DAO myPrerequisitesDAO = ((DAO)
+            x.get("prerequisiteCapabilityJunctionDAO"))
+              .where(
+                EQ(CapabilityCapabilityJunction.SOURCE_ID, getId()));
+
+          List<CapabilityCapabilityJunction> prerequisiteJunctions =
+            ((ArraySink) myPrerequisitesDAO.select(new ArraySink()))
+            .getArray();
+
+          for ( CapabilityCapabilityJunction pj : prerequisiteJunctions ) {
+            Capability c = (Capability)
+              ((DAO) x.get("capabilityDAO"))
+              .find(pj.getTargetId());
+            myPrerequisites.add(c.getId());
+          }
+        }
+
+        System.out.println(String.format("prereqs len %d", myPrerequisites.size()));
+        for ( String prereqid : myPrerequisites ) {
+          System.out.println(String.format("-- %s", prereqid));
+        }
+
+        // Get prerequisite UCJs
+        List<UserCapabilityJunction> myPrerequisiteUCJs = null;
+        {
+          DAO ucjDAO = (DAO) x.get(ucjDaoKey);
+          myPrerequisiteUCJs = ((ArraySink) ucjDAO
+            .where(
+              AND(
+                ucjUserPredicate,
+                IN(
+                  UserCapabilityJunction.TARGET_ID,
+                  myPrerequisites))
+            )
+            .select(new ArraySink())
+          ).getArray();
+
+          List<UserCapabilityJunction> uuu =
+            ((ArraySink) ucjDAO
+              .where(
+                AND(
+                  ucjUserPredicate
+                )
+              )
+              .select(new ArraySink())
+            ).getArray()
+            ;
+          for (
+            UserCapabilityJunction ucj
+            : uuu
+          ) {
+            System.out.println(String.format(
+              "prereq ucj unfiltered %s:%s",
+              ucj.getSourceId(),
+              ucj.getTargetId()
+            ));
+          }
+        }
+
+        System.out.println(String.format("prereq ucjs len %d", myPrerequisiteUCJs.size()));
+
+        // Iterate over prerequisite UCJs to check status
+        for ( UserCapabilityJunction ucj : myPrerequisiteUCJs ) {
+          System.out.println(String.format("UCJ %s => %s", ucj.getTargetId(), ucj.getStatus()));
+          if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED ) {
+            return false;
+          }
+        }
+
+        return true;
+      `,
     }
   ]
 });
