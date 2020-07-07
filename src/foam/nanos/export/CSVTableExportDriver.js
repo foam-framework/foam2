@@ -16,6 +16,7 @@ foam.CLASS({
   properties: [
     {
       name: 'outputter',
+      hidden: true,
       factory: function() {
         return this.TableColumnOutputter.create();
       }
