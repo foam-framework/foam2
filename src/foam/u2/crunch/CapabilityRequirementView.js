@@ -105,20 +105,12 @@ foam.CLASS({
   ],
 
   methods: [
-    function init() {
-      if ( this.arrayRequirement.length < 1 ) {
-        // if nothing to show don't open this dialog - push directly to wizard
-        var x = this.ctrl.__subContext__;
-        x.crunchController.generateAndDisplayWizard(this.functionData);
-        x.closeDialog();
-      }
-    },
     function initE() {
       var style = this.Style.create();
       style.addBinds(this);
       var mainCapability = this.functionData ?
         this.functionData.caps.filter(
-          (capability) =>
+          capability =>
             capability.id == this.capabilityId
         ) :
         undefined;
@@ -144,9 +136,9 @@ foam.CLASS({
         .end()
         .start()
           .add(this.slot(
-            (arrayRequirement) => {
+            arrayRequirement => {
               return this.E().forEach(arrayRequirement,
-                (helpString) => {
+                helpString => {
                   return this.start().addClass('list-position')
                     .start('img').addClass('img-position').attrs({ src: 'images/checkmark-small-green.svg' }).end()
                     .start()
