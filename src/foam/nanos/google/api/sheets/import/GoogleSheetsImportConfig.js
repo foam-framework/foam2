@@ -18,7 +18,6 @@
     {
       name: 'googleSheetLink',
       class: 'String',
-      label: 'Google Sheets Link',
       postSet: function() {
         var findMatch = this.googleSheetLink.match(this.SPREADSHEET_ID_REGEX);
        this.googleSpreadsheetId = findMatch ? findMatch[1]: findMatch;
@@ -33,7 +32,6 @@
     {
       name: 'googleSpreadsheetId',
       class: 'String',
-      label: 'Google Spreadsheet Id',
       hidden: true,
       expression: function(googleSheetLink) {
         var findMatch = googleSheetLink.match(this.SPREADSHEET_ID_REGEX);
@@ -43,7 +41,6 @@
     {
       name: 'googleSheetId',
       class: 'String',
-      label: 'Google Sheets Id',
       hidden: true,
       // expression: function(googleSheetLink) {
       //   var findMatch = googleSheetLink.match(this.SHEET_ID_REGEX);
