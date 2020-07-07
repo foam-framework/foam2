@@ -318,11 +318,6 @@ foam.CLASS({
           }
         }
 
-        System.out.println(String.format("prereqs len %d", myPrerequisites.size()));
-        for ( String prereqid : myPrerequisites ) {
-          System.out.println(String.format("-- %s", prereqid));
-        }
-
         // Get prerequisite UCJs
         List<UserCapabilityJunction> myPrerequisiteUCJs = null;
         {
@@ -337,34 +332,10 @@ foam.CLASS({
             )
             .select(new ArraySink())
           ).getArray();
-
-          List<UserCapabilityJunction> uuu =
-            ((ArraySink) ucjDAO
-              .where(
-                AND(
-                  ucjUserPredicate
-                )
-              )
-              .select(new ArraySink())
-            ).getArray()
-            ;
-          for (
-            UserCapabilityJunction ucj
-            : uuu
-          ) {
-            System.out.println(String.format(
-              "prereq ucj unfiltered %s:%s",
-              ucj.getSourceId(),
-              ucj.getTargetId()
-            ));
-          }
         }
-
-        System.out.println(String.format("prereq ucjs len %d", myPrerequisiteUCJs.size()));
 
         // Iterate over prerequisite UCJs to check status
         for ( UserCapabilityJunction ucj : myPrerequisiteUCJs ) {
-          System.out.println(String.format("UCJ %s => %s", ucj.getTargetId(), ucj.getStatus()));
           if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED ) {
             return false;
           }
