@@ -13,21 +13,13 @@ foam.CLASS({
     'ctrl',
     'notify'
   ],
-  css: `
-  ^error {
-    border-color: #f91c1c;
-    background-color: #fff6f6;
-  }
-  `,
   methods: [
     function initE() {
       this.SUPER();
       var self = this;
 
-        this.start('h4').style({ 'padding-left': '16px' }).add('Column headers').end().forEach(this.importConfig.columnHeaderPropertyMappings, function(c) {
-          this.start()
-              .style({ 'padding-left': '16px' })
-            .end()
+        this.start('h3').add('Exported Columns:').end().forEach(this.importConfig.columnHeaderPropertyMappings, function(c) {
+          this
             .tag(this.SectionedDetailPropertyView, {
               data: c,
               prop: this.ColumnHeaderToPropertyMapping.COLUMN_HEADER

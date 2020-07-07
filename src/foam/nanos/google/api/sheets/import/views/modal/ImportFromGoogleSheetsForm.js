@@ -6,6 +6,14 @@ foam.CLASS({
     'importConfig',
     'importServiceName'
   ],
+  css: `
+  ^ {
+    width: 500px;
+    height: 500px;
+    padding: 16px;
+    overflow-x: scroll;
+  }
+  `,
   properties: [
     {
       name: 'importConfig',

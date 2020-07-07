@@ -200,14 +200,13 @@ foam.CLASS({
     javaCode: `
       DAO dao  = (DAO)x.get(daoId);
       if ( dao == null ) return false;
-      try {
         for ( FObject obj: objs) {
-          dao.put(obj);
+          try {
+            dao.put(obj);
+          } catch(Throwable t) {
+          }
         }
-        return true;
-      } catch(Throwable t) {
-        return false;
-      }
+      return true;
     `
   },
   {
@@ -244,7 +243,7 @@ foam.CLASS({
       for ( int i = 1 ; i < data.size() ; i++ ) {
         Object obj = importConfig.getImportClassInfo().newInstance();
         for ( int j = 0 ; j < Math.min(importConfig.getColumnHeaderPropertyMappings().length, data.get(i).size()) ; j ++ ) {
-          if ( importConfig.getColumnHeaderPropertyMappings()[j].getProp() == null ) continue;
+          if ( importConfig.getColumnHeaderPropertyMappings()[j].getProp() == null || importConfig.getColumnHeaderPropertyMappings()[j].getProp().getSheetsOutput() ) continue;
           int columnIndex = columnHeaders.indexOf(importConfig.getColumnHeaderPropertyMappings()[j].getColumnHeader());
           Object val = data.get(i).get(columnIndex);
           // PropertyInfo prop = ((PropertyInfo)importConfig.getColumnHeaderPropertyMappings()[j].getProp());
@@ -298,10 +297,14 @@ foam.CLASS({
     ],
     javaCode: `
       PropertyInfo prop  = (PropertyInfo)columnHeaderToPropertyMapping.getProp();
+
+      String valueString = val.toString();
+      if ( valueString.length() == 0 ) return true;
+      
       switch (prop.getValueClass().getName()) {
         case "long":
           if ( columnHeaderToPropertyMapping.getUnitProperty() != null ) {
-            String unitValue = val.toString();
+            String unitValue = valueString;
             Matcher numMatcher = numbersRegex.matcher(unitValue);
             if ( ! numMatcher.find() ) {
               return false;
@@ -313,19 +316,19 @@ foam.CLASS({
               String unit = unitValue.substring(alphabeticalCharsMatcher.start(), alphabeticalCharsMatcher.end());
               ((PropertyInfo)columnHeaderToPropertyMapping.getUnitProperty()).set(obj, unit);
             }
-          } else prop.set(obj, Long.parseLong(val.toString()));
+          } else prop.set(obj, Long.parseLong(valueString));
           break;
         case "double":
-          prop.set(obj, Double.parseDouble(val.toString()));
+          prop.set(obj, Double.parseDouble(valueString));
           break;
         default:
           if ( prop instanceof AbstractEnumPropertyInfo)
-            prop.set(obj, ((AbstractEnumPropertyInfo)prop).getValueClass().getMethod("forLabel", String.class).invoke(null, val.toString()));
+            prop.set(obj, ((AbstractEnumPropertyInfo)prop).getValueClass().getMethod("forLabel", String.class).invoke(null, valueString));
           else if ( prop.getValueClass().getName().equals("java.util.Date") ) {
-            prop.set(obj, new java.util.Date(val.toString()));
+            prop.set(obj, new java.util.Date(valueString));
           }
           else
-            prop.set(obj, val);
+          prop.set(obj, val);
           break;
       }
       return true;
