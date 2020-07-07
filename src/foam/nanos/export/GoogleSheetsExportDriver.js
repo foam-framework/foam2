@@ -7,10 +7,9 @@
 foam.CLASS({
   package: 'foam.nanos.export',
   name: 'GoogleSheetsExportDriver',
-  implements: [ 'foam.nanos.export.ExportDriver' ],
-
-  requires: [
-    'foam.nanos.export.GoogleSheetsOutputter'
+  implements: [ 
+    'foam.nanos.export.ExportDriver',
+    'foam.nanos.export.GoogleSheetsServiceConfig'
   ],
 
   documentation: `
@@ -23,8 +22,14 @@ foam.CLASS({
     {
       name: 'outputter',
       factory: function() {
-        return this.GoogleSheetsOutputter.create();
-      }
+        return foam.nanos.export.GoogleSheetsOutputter.create();
+      },
+      hidden: true,
+      flags: ['js']
+    },
+    {
+      class: 'String',
+      name: 'title'
     }
   ],
 
@@ -45,7 +50,7 @@ foam.CLASS({
       var values = [ await this.outputter.objToArrayOfStringValues(X, obj.cls_, [ obj ], metadata.map(p => p.propName)) ];
       stringArray = stringArray.concat(values);
 
-      sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata);
+      sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata, this);
       if ( ! sheetId || sheetId.length === 0)
         return '';
       return `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`;
@@ -66,7 +71,7 @@ foam.CLASS({
       var sheetId  = '';
       var stringArray = await self.outputter.outputTable(X, dao.of, sink.array, metadata);
 
-      sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata);
+      sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata, this);
       if ( ! sheetId || sheetId.length == 0)
         return '';
       return `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`;

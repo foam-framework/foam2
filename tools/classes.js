@@ -290,6 +290,7 @@ var classes = [
   'foam.nanos.session.SessionService',
   'foam.nanos.session.SimpleSessionService',
   'foam.nanos.pool.AbstractFixedThreadPool',
+  'foam.nanos.pool.ThreadPoolAgency',
   'foam.nanos.om.OMLogger',
   'foam.nanos.pm.NullPM',
   'foam.nanos.pm.PM',
@@ -376,6 +377,10 @@ var classes = [
   'foam.nanos.notification.EmailSetting',
   'foam.nanos.notification.NotificationSetting',
   'foam.nanos.notification.NotificationHostnameRuleAction',
+  'foam.nanos.notification.ToastNotificationDAO',
+  'foam.nanos.notification.ToastState',
+  'foam.nanos.notification.ResendNotificationServiceInterface',
+  'foam.nanos.notification.ClientResendNotificationService',
   'foam.nanos.script.Script',
   'foam.nanos.script.TestRunnerConfig',
   'foam.nanos.script.TestRunnerScript',
@@ -406,7 +411,10 @@ var classes = [
   'foam.nanos.export.ClientGoogleSheetsExportService',
   'foam.nanos.export.ExportDriverRegistry',
   'foam.nanos.export.GoogleSheetsExport',
+  'foam.nanos.export.GoogleSheetsExportDriver',
+  'foam.nanos.export.GoogleSheetsServiceConfig',
   'foam.nanos.export.GoogleSheetsPropertyMetadata',
+  'foam.nanos.export.PDFGoogleSheetsExportDriver',
   'foam.nanos.google.api.auth.GoogleApiAuthService',
   'foam.nanos.google.api.auth.GoogleApiCredentials',
   'foam.nanos.google.api.drive.GoogleDriveService',
@@ -532,6 +540,20 @@ var classes = [
   'foam.nanos.ruler.action.AbstractCheckDAOforMatching',
   'foam.comics.SearchMode',
 
+  // DAO decorators
+  'foam.nanos.actioncommand.ActionCommandDAO',
+  'foam.nanos.approval.ApprovalDAO',
+  'foam.nanos.audit.AuditDAO',
+  'foam.nanos.auth.email.EmailVerificationDAO',
+  'foam.dao.FreezingDAO',
+  'foam.nanos.geocode.GoogleMapsGeocodingDAO',
+  'foam.dao.history.HistoryDAO',
+  'foam.nanos.script.ScriptRunnerDAO',
+  'foam.nanos.approval.SendGroupRequestApprovalDAO',
+  'foam.dao.UnreliableDAO',
+  'foam.nanos.auth.UserPasswordHashingDAO',
+  'foam.dao.ValidatingDAO',
+
   // Support Files
   'foam.support.model.TicketMessage',
   'foam.support.model.SupportEmail',
@@ -626,6 +648,7 @@ var classes = [
   'foam.nanos.approval.ApprovableApprovalRequestsRule',
   'foam.nanos.approval.FulfilledApprovablePredicate',
   'foam.nanos.approval.FulfilledApprovableRule',
+  'foam.nanos.approval.ApprovalDAO',
   'foam.nanos.approval.AuthenticatedApprovalDAOAuthorizer',
   'foam.nanos.approval.PopulateApprovalRequestsDAO',
 
@@ -676,7 +699,6 @@ var proxies = [
 
 var blacklist = [
   'foam.core.Property',
-  'foam.mlang.expr.Mul',
   'foam.mlang.predicate.Func',
   'foam.u2.AttrSlot',
   'foam.u2.RenderSink',

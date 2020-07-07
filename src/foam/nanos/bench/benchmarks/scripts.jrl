@@ -34,6 +34,42 @@ print(runner.getResult());""",
 
 p({
 	"class": "foam.nanos.script.Script",
+	"id": "benchmarkF3FileJournalReplay",
+	"description": "Benchmark replaying F3FileJournal",
+	"code": """import foam.nanos.bench.*;
+import foam.nanos.bench.benchmarks.*;
+import net.nanopay.bench.*;
+
+// x = x.put("pmLogger", null);
+b = new F3JournalReplayBenchmark(1000);
+builder = new BenchmarkRunner.Builder(x).setInvocationCount(1).setBenchmark(b);
+runner = builder.build();
+runner.execute(x);
+print("done");
+print(runner.getResult());""",
+	"lastModifiedBy": 1348
+})
+
+p({
+	"class": "foam.nanos.script.Script",
+	"id": "benchmarkFileJournalReplay",
+	"description": "Benchmark replaying Journal",
+	"code": """import foam.nanos.bench.*;
+import foam.nanos.bench.benchmarks.*;
+import net.nanopay.bench.*;
+
+// x = x.put("pmLogger", null);
+b = new JournalReplayBenchmark(1000);
+builder = new BenchmarkRunner.Builder(x).setInvocationCount(1).setBenchmark(b);
+runner = builder.build();
+runner.execute(x);
+print("done");
+print(runner.getResult());""",
+	"lastModifiedBy": 1348
+})
+
+p({
+	"class": "foam.nanos.script.Script",
 	"id": "benchmarkF3FileJournal",
 	"description": "Benchmark Writing to F3 File Journal",
 	"code": """import foam.nanos.bench.*;

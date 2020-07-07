@@ -19,13 +19,14 @@ foam.CLASS({
     'foam.support.model.SupportEmail',
     'foam.support.modal.NewEmailSupportConfirmationModal',
     'foam.u2.ModalHeader',
-    'foam.u2.dialog.NotificationMessage',
+    'foam.log.LogLevel',
     'foam.u2.dialog.Popup'
   ],
 
   imports: [
     'closeDialog',
     'ctrl',
+    'notify',
     'supportEmailDAO',
     'user',
   ],
@@ -161,7 +162,7 @@ foam.CLASS({
           if(!this.email) return;
           var self = this;
           if (!this.emailRegex.test(this.email)) {
-            this.add(this.NotificationMessage.create({ message: this.emailInvalid, type: 'error' })); 
+            this.notify(this.emailInvalid, '', this.LogLevel.ERROR, true);
             return;
           }
 
@@ -178,7 +179,7 @@ foam.CLASS({
                 self.ctrl.add(foam.u2.dialog.Popup.create().tag({ class: 'foam.support.modal.NewEmailSupportConfirmationModal' }));
                 X.closeDialog();
               } else {
-                self.add(self.NotificationMessage.create({ message: this.emailExists, type: 'error' }));
+                this.notify(this.emailExists, '', this.LogLevel.ERROR, true);
               }
             }
           );

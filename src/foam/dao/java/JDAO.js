@@ -46,7 +46,7 @@ foam.CLASS({
             }
 
             new foam.dao.CompositeJournal.Builder(x)
-              .setDelegates(new foam.dao.Journal[]{
+              .setDelegates(new foam.dao.Journal[] {
                 new foam.dao.F3FileJournal.Builder(resourceStorageX)
                   .setFilename(filename + ".0")
                   .build(),

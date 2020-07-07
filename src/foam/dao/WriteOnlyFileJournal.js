@@ -41,7 +41,7 @@ foam.CLASS({
             }
           }
 
-          public void endJob() {
+          public void endJob(boolean isLast) {
             if ( foam.util.SafetyUtil.isEmpty(record_) ) return;
 
             try {
@@ -52,7 +52,7 @@ foam.CLASS({
                 getMultiLineOutput() ? "\\n" : "",
                 "");
 
-                if ( isLast() ) getWriter().flush();
+                if ( isLast ) getWriter().flush();
             } catch (Throwable t) {
               getLogger().error("Failed to write put entry to journal", t);
             }
