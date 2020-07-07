@@ -2644,6 +2644,11 @@ foam.CLASS({
   extends: 'foam.dao.AbstractSink',
   implements: [ 'foam.core.Serializable' ],
 
+  javaImports: [
+    'foam.mlang.Expr',
+    'java.util.StringJoiner'
+  ],
+
   properties: [
     {
       class: 'Array',
@@ -2675,6 +2680,21 @@ foam.CLASS({
           a[i] = getExprs()[i].f(obj);
 
         getArray().add(a);
+      `
+    },
+    {
+      name: 'toString',
+      code: function() {
+        return this.cls_.name + '(' + this.exprs.join(',') + ')';
+      },
+      javaCode: `
+        StringJoiner joiner = new StringJoiner(", ", getClassInfo().getId() + "(", ")");
+
+        for ( Expr expr : getExprs() ) {
+          joiner.add(expr.toString());
+        }
+
+        return joiner.toString();
       `
     }
   ]
@@ -3205,6 +3225,15 @@ foam.CLASS({
 
   documentation: 'A Binary Predicate which applies arg2.f() to arg1.f().',
 
+  javaImports: [
+    'foam.core.AbstractFObjectPropertyInfo',
+    'foam.core.FObject',
+    'foam.core.PropertyInfo',
+    'foam.nanos.logger.Logger',
+    'foam.nanos.logger.StdoutLogger',
+    'foam.util.StringUtil'
+  ],
+
   properties: [
     {
       class: 'foam.mlang.ExprProperty',
@@ -3220,10 +3249,35 @@ foam.CLASS({
     {
       name: 'f',
       code: function(o) {
+        if ( foam.core.Reference.isInstance(this.arg1) ) {
+          return o[property.name + '$find'].then(val => this.arg2.f(val));
+        }
         return this.arg2.f(this.arg1.f(o));
       },
       javaCode: `
-        return getArg2().f(getArg1().f(obj));
+        StringBuilder sb = new StringBuilder("find");
+        PropertyInfo p1 = (PropertyInfo) getArg1();
+        FObject obj1;
+        if ( p1 instanceof AbstractFObjectPropertyInfo ) {
+          Object val = getArg1().f(obj);
+          return val == null ? null : getArg2().f(val);
+        }
+        try {
+          obj1 = (FObject)obj.getClass().getMethod(StringUtil.capitalize(p1.getName()), foam.core.X.class).invoke(obj, ((FObject)obj).getX());
+        } catch ( Throwable t ) {
+          return null;
+        }
+        if ( obj1 == null ) return null;
+        try {
+          return getArg2().f(obj1);
+        } catch ( Throwable t ) {
+          Logger logger = (Logger) getX().get("logger");
+          if ( logger == null ) {
+            logger = new StdoutLogger();
+          }
+          logger.error(t);
+          return null;
+        }
       `
     },
 
