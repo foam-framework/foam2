@@ -3,7 +3,9 @@ foam.CLASS({
   name: 'ColumnsToPropertiesMappingModal',
   extends: 'net.nanopay.ui.wizardModal.WizardModalSubView',
   requires: [
-    'foam.u2.dialog.NotificationMessage'
+    'foam.u2.dialog.NotificationMessage',
+    'foam.nanos.google.api.sheets.ColumnHeaderToPropertyMapping',
+    'foam.u2.detail.SectionedDetailPropertyView'
   ],
   imports: [
     'importConfig',
@@ -11,28 +13,37 @@ foam.CLASS({
     'ctrl',
     'notify'
   ],
+  css: `
+  ^error {
+    border-color: #f91c1c;
+    background-color: #fff6f6;
+  }
+  `,
   methods: [
     function initE() {
       this.SUPER();
-
+      var self = this;
 
         this.start('h4').style({ 'padding-left': '16px' }).add('Column headers').end().forEach(this.importConfig.columnHeaderPropertyMappings, function(c) {
           this.start()
-          .style({ 'padding-left': '16px' })
-            .start({class: 'foam.u2.TextField',
-              data: c.columnHeader
-            })
-              .style({ 'background-color': c.prop ? 'none' : '#fbedec',
-                       'color': c.prop ? 'none' : '#a61414' })
-              .setAttribute('readonly', true)
+            .style({ 'padding-left': '16px' })
+              // .start()
+              //   .add(c.columnHeader)
+              //   .style({ 'background-color': c.prop ? 'none' : '#fbedec',
+              //           'color': c.prop ? 'none' : '#a61414' })
+              // .end()
+              // .callIf(! c.prop, function() {
+              //   this.start()
+              //     .addClass(self.myClass('error'))
+              //     .add('Data for column with header  "' + c.columnHeader + '" cannot be imported. You can still import your data but this column data will be ignored')
+              //   .end();
+              // })
+              // .start().addClass(self.myClass('error')).add(this.slot(c.PROP.validateObj)).end()
             .end()
-            .callIf(! c.prop, function() {
-              this.start()
-                .style({ 'color': 'red' })
-                .add('Data for column with header "' + c.columnHeader + '" cannot be imported. You can still import your data but this column data will be ignored')
-              .end();
+            .tag(this.SectionedDetailPropertyView, {
+              data: c,
+              prop: this.ColumnHeaderToPropertyMapping.COLUMN_HEADER
             })
-          .end()
           .br();
         })
       .start({ class: 'net.nanopay.sme.ui.wizardModal.WizardModalNavigationBar', back: this.BACK, next: this.NEXT }).end();

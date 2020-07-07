@@ -85,7 +85,11 @@ foam.CLASS({
     {
       name: 'columnHeader',
       class: 'String',
-      visibility: 'RO'
+      // visibility: 'RO',
+      validateObj: function() {
+        if ( this.prop ) return;
+        return 'Data for column with header  "' + this.columnHeader + '" cannot be imported. You can still import your data but this column data will be ignored';
+      }
     },
     {
       name: 'prop',
@@ -97,7 +101,6 @@ foam.CLASS({
     {
       name: 'unitProperty',
       class: 'foam.mlang.ExprProperty',
-      visibility: 'RO',
       hidden: true,
       javaJSONParser: 'foam.lib.json.ExprParser.instance()',
     }
