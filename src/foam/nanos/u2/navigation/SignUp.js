@@ -157,10 +157,10 @@ foam.CLASS({
         return ! errors_ && ! isLoading_;
       },
       code: function(x) {
-        debugger;
         this.isLoading_ = true;
         this.dao_
           .put(this.User.create({
+            // organization needs to be overwritten by crunch when registering business
             organization: this.userName,
             userName: this.userName,
             email: this.email,
@@ -170,11 +170,9 @@ foam.CLASS({
             group: this.group_
           }))
           .then((user) => {
-            debugger;
             this.user.copyFrom(user);
             this.updateUser(x);
           }).catch((err) => {
-            debugger;
             this.notify(err.message || this.ERROR_MSG, 'error');
           })
           .finally(() => {
