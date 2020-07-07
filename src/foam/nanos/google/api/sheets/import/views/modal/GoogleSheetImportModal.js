@@ -22,7 +22,11 @@
   methods: [
     function initE() {
       this.SUPER();
-      this.start()
+      this
+      .start('h2')
+        .add('Link to Document')
+      .end()
+      .start()
         .tag(this.importConfig)
       .end();
       this.start({ class: 'net.nanopay.sme.ui.wizardModal.WizardModalNavigationBar', back: this.BACK, next: this.NEXT }).addClass(this.myClass('footer')).end();
