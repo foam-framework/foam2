@@ -4,7 +4,7 @@ foam.CLASS({
   extends: 'net.nanopay.ui.wizardModal.WizardModalSubView',
   imports: [
     'importConfig',
-    'importServiceName'
+    'importServiceName',
   ],
   methods: [
     function initE() {
@@ -26,10 +26,10 @@ foam.CLASS({
     {
       name: 'next',
       label: 'Continue',
-      isEnabled: function(importConfig$googleSpreadsheetId) {
-        return importConfig$googleSpreadsheetId;
-      },
       code: async function(X) {
+        if ( ! this.importConfig.googleSpreadsheetId ) {
+          return;
+        }
         await X.googleSheetsDataImport.getColumns(X, this.importConfig).then(columnHeaders => {
           if ( columnHeaders ) {
             var arr = [];
@@ -44,7 +44,7 @@ foam.CLASS({
               arr.push(colHeaderConfig);
             }
             this.importConfig.columnHeaderPropertyMappings = arr;
-          }          
+          }
         });
         this.pushToId('columnsMapping');
       }

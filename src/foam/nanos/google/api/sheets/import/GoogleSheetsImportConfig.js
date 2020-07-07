@@ -19,7 +19,8 @@ foam.CLASS({
       postSet: function() {
         var findMatch = this.googleSheetLink.match(this.SPREADSHEET_ID_REGEX);
        this.googleSpreadsheetId = findMatch ? findMatch[1]: findMatch;
-      }
+      },
+      required: true
     },
     {
       name: 'cellsRange',

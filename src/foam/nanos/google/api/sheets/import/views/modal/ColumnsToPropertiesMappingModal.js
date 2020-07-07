@@ -8,7 +8,8 @@ foam.CLASS({
   imports: [
     'importConfig',
     'importServiceName',
-    'ctrl'
+    'ctrl',
+    'notify'
   ],
   methods: [
     function initE() {
@@ -49,6 +50,11 @@ foam.CLASS({
       name: 'next',
       label: 'Continue',
       code: async function(X) {
+        if ( ! this.importConfig.columnHeaderPropertyMappings.some(m => m.prop) ) {
+          this.notify('It looks like data you\'re trying to import do not match out records. Please make sure that google sheet you\'re trying to import and data on the current page match', 'error');
+          return;
+        }
+
         await X[this.importServiceName].importData(X, this.importConfig).then(r => {
           var message = this.NotificationMessage.create();
           if ( r ) message.message = 'success!';
