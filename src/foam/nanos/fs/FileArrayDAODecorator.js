@@ -12,11 +12,19 @@ foam.CLASS({
   imports: [
     'fileDAO'
   ],
+  requires: [
+    'foam.nanos.fs.File'
+  ],
 
   properties: [
     {
       class: 'Class',
       name: 'of'
+    },
+    {
+      class: 'Long',
+      name: 'maxStringDataSize',
+      value: 1024 * 1024 * 3
     }
   ],
 
@@ -27,7 +35,14 @@ foam.CLASS({
 
       var promises = props.map((prop) => {
         var files = prop.f(obj);
-        return Promise.all(files.map((f) => self.fileDAO.put(f)));
+        return Promise.all(files.map(async f => {
+          if ( f.filesize <= this.maxStringDataSize ) {
+            f.dataString = await this.encode(f.data.blob);
+            delete f.instance_.data;
+          }
+          a = await self.fileDAO.put(f);
+          return self.fileDAO.put(f);
+        }))
       });
 
       return Promise.all(promises).then((values) => {
@@ -36,6 +51,16 @@ foam.CLASS({
         });
         return obj;
       });
+    },
+
+    async function encode(file) {
+      const toBase64 = file => new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = error => reject(error);
+      });
+      return await toBase64(file);
     }
   ]
 });
