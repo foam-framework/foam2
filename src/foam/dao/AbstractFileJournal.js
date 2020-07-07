@@ -186,7 +186,7 @@ try {
 
           public void executeJob() {}
 
-          public void endJob() {
+          public void endJob(boolean isLast) {
             try {
               record_ = ( old != null ) ?
                 getOutputter().stringifyDelta(old, obj) :
@@ -206,7 +206,7 @@ try {
                 getMultiLineOutput() ? "\\n" : "",
                 foam.util.SafetyUtil.isEmpty(prefix) ? "" : prefix + ".");
 
-                if ( isLast() ) getWriter().flush();
+                if ( isLast ) getWriter().flush();
             } catch (Throwable t) {
               getLogger().error("Failed to write put entry to journal", t);
             }
@@ -285,14 +285,14 @@ try {
           }
         }
 
-        public void endJob() {
+        public void endJob(boolean isLast) {
           if ( foam.util.SafetyUtil.isEmpty(record_) ) return;
 
           try {
             writeComment_(x, obj);
             writeRemove_(x, record_, foam.util.SafetyUtil.isEmpty(prefix) ? "" : prefix + ".");
 
-            if ( isLast() ) getWriter().flush();
+            if ( isLast ) getWriter().flush();
           } catch (Throwable t) {
             getLogger().error("Failed to write put entry to journal", t);
           }

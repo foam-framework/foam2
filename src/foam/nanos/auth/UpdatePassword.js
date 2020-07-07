@@ -17,6 +17,10 @@ foam.CLASS({
     'user'
   ],
 
+  requires: [
+    'foam.log.LogLevel'
+  ],
+
   messages: [
     { name: 'SUCCESS_MSG', message: 'Your password was successfully updated.' }
   ],
@@ -117,10 +121,10 @@ foam.CLASS({
         .then((result) => {
           this.user.copyFrom(result);
           this.reset_();
-          this.notify(this.SUCCESS_MSG);
+          this.notify(this.SUCCESS_MSG, '', this.LogLevel.INFO, true);
         })
         .catch((err) => {
-          this.notify(err.message, 'error');
+          this.notify(err.message, '', this.LogLevel.ERROR, true);
         });
       }
     }

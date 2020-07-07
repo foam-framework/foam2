@@ -10,16 +10,17 @@
     extends: 'foam.u2.View',
 
     requires: [
+      'foam.log.LogLevel',
       'foam.nanos.auth.User',
       'foam.nanos.notification.NotificationCitationView',
-      'foam.u2.view.OverlayActionListView',
-      'foam.u2.dialog.NotificationMessage'
+      'foam.u2.view.OverlayActionListView'
     ],
 
     imports: [
       'summaryView?',
       'invoiceDAO',
       'notificationDAO',
+      'notify',
       'stack',
       'user',
       'userDAO',
@@ -120,12 +121,8 @@
       function hideNotificationType(X) {
         var self = X.rowView;
 
-        if ( self.user.disabledTopics.includes(self.data.notificationType) ){
-          self.ctrl.add(self.NotificationMessage.create({
-            message: "Disabled already exists for this notification something went wrong",
-            type: 'error'
-          }));
-
+        if ( self.user.disabledTopics.includes(self.data.notificationType) ) {
+          self.notify('Disabled already exists for this notification something went wrong.', '', self.LogLevel.ERROR, true);
           return;
         }
 
@@ -150,18 +147,11 @@
           if ( e.exception && e.exception.userFeedback  ) {
             var currentFeedback = e.exception.userFeedback;
             while ( currentFeedback ) {
-              this.ctrl.add(this.NotificationMessage.create({
-                message: currentFeedback.message,
-                type: currentFeedback.status.name.toLowerCase()
-              }));
-
+              this.ctrl.notify(currentFeedback.message, '', this.LogLevel.INFO, true);
               currentFeedback = currentFeedback.next;
             }
           } else {
-            this.ctrl.add(this.NotificationMessage.create({
-              message: e.message,
-              type: 'error'
-            }));
+            this.ctrl.notify(e.message, '', this.LogLevel.ERROR, true);
           }
         })
       },

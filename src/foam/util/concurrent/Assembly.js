@@ -38,26 +38,10 @@ foam.INTERFACE({
     },
     {
       name: 'endJob',
+      args: [ 'boolean isLast' ],
       documentation: `
         Execute serial part of the job once it leaves the queue.
         @param lastJob true iff there are no more jobs in the queue.
-      `
-    },
-    {
-      name: 'markNotLast',
-      synchronized: true,
-      type: 'void',
-      documentation: `
-        Inform the Assembly that it isn't the last in the line.
-      `
-    },
-    {
-      name: 'isLast',
-      synchronized: true,
-      type: 'Boolean',
-      documentation: `
-        return true iff this is the last Assembly currently in the queue.
-        Determined if waitToComplete() has been called.
       `
     },
     {

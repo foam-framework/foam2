@@ -18,34 +18,44 @@ import java.util.concurrent.Semaphore;
 public class AsyncAssemblyLine
   extends SyncAssemblyLine
 {
-  protected Agency   pool_;
-  protected String   agencyName_ = "AsyncAssemblyLine";
+  protected Agency pool_;
+  protected String agencyName_ = null;
   protected boolean  shutdown_  = false;
 
   public AsyncAssemblyLine(X x) {
-    this(x, "threadPool");
+    this(x, null);
   }
 
   public AsyncAssemblyLine(X x, String agencyName) {
+    this(x, agencyName, "threadPool");
+  }
+
+  public AsyncAssemblyLine(X x, String agencyName, String threadPool) {
     super(x);
-    pool_  = (Agency) x.get("threadPool");
-    agencyName_ += ":" + agencyName;
+    pool_  = (Agency) x.get(threadPool);
+    agencyName_ = "AsyncAssemblyLine:";
+    if ( agencyName != null ) {
+      agencyName_ += agencyName;
+    }
   }
 
   public void enqueue(Assembly job) {
-    if ( shutdown_ ) throw new IllegalStateException("Can't enqueue into a shutdown AssemblyLine.");
-
-    final Assembly previous;
+    final Assembly[] previous = new Assembly[1];
 
     synchronized ( startLock_ ) {
-      if ( q_ != null ) q_.markNotLast();
-      previous = q_;
-      q_ = job;
+      if ( shutdown_ ) throw new IllegalStateException("Can't enqueue into a shutdown AssemblyLine.");
+
+      synchronized ( qLock_ ) {
+        previous[0] = q_;
+        q_ = job;
+      }
       try {
         job.executeUnderLock();
         job.startJob();
       } catch (Throwable t) {
-        q_ = previous;
+        synchronized ( qLock_ ) {
+          q_ = previous[0];
+        }
         throw t;
       }
     }
@@ -54,23 +64,27 @@ public class AsyncAssemblyLine
       try {
         job.executeJob();
 
-        if ( previous != null ) previous.waitToComplete();
+        if ( previous[0] != null ) previous[0].waitToComplete();
+        previous[0] = null;
+
+        boolean isLast = false;
+        synchronized ( qLock_ ) {
+          // If I'm still the only job in the queue, then remove me
+          if ( q_ == job ) {
+            q_ = null;
+            isLast = true;
+          }
+        }
 
         synchronized ( endLock_ ) {
           try {
-            job.endJob();
+            job.endJob(isLast);
           } catch (Throwable t) {
             ((foam.nanos.logger.Logger) x.get("logger")).error(this.getClass().getSimpleName(), agencyName_, t);
-          } finally {
-            job.complete();
           }
         }
       } finally {
-        // Isn't required, but helps GC last entry.
-        synchronized ( startLock_ ) {
-          // If I'm still the only job in the queue, then remove me
-          if ( q_ == job ) q_ = null;
-        }
+        job.complete();
       }
     }}, agencyName_);
   }
@@ -84,12 +98,14 @@ public class AsyncAssemblyLine
         public void startJob() {
           shutdown_ = true;
         }
-        public void endJob() {
+        public void endJob(boolean isLast) {
           s.release();
         }
       });
       s.acquire();
     } catch (InterruptedException e) {
+    } catch (IllegalStateException e) {
+      // Line is already shutdown, so no problem
     }
   }
 }
