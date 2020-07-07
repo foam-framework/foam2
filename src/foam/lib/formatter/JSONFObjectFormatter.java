@@ -7,11 +7,11 @@
 package foam.lib.formatter;
 
 import foam.core.ClassInfo;
+import foam.core.FEnum;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.core.X;
 import foam.lib.json.OutputJSON;
-import foam.lib.PropertyPredicate;
 import foam.util.SafetyUtil;
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
@@ -70,12 +70,12 @@ public class JSONFObjectFormatter
     }
   };
 
-  protected boolean quoteKeys_           = false;
-  protected boolean outputShortNames_    = true;
-  protected boolean outputDefaultValues_ = false;
-  protected boolean multiLineOutput_     = false;
-  protected boolean outputClassNames_    = true;
-  protected boolean outputReadableDates_ = true;
+  protected boolean quoteKeys_               = false;
+  protected boolean outputShortNames_        = true;
+  protected boolean outputDefaultValues_     = false;
+  protected boolean multiLineOutput_         = false;
+  protected boolean outputClassNames_        = true;
+  protected boolean outputReadableDates_     = false;
   protected boolean outputDefaultClassNames_ = true;
 
   public JSONFObjectFormatter(X x) {
@@ -209,25 +209,21 @@ public class JSONFObjectFormatter
   }
   */
 
-  public void output(Enum<?> value) {
-    output(value.ordinal());
 
-//    outputNumber(value.ordinal());
-/*
+  public void outputEnumValue(FEnum value) {
     b_.append('{');
-      b_.append(beforeKey_());
-      b_.append("class");
-      b_.append(afterKey_());
-      b_.append(':');
-      output(value.getClass().getName());
-      b_.append(",");
-      b_.append(beforeKey_());
-      b_.append("ordinal");
-      b_.append(afterKey_());
-      b_.append(':');
-      outputNumber(value.ordinal());
+    outputKey("class");
+    b_.append(':');
+    output(value.getClass().getName());
+    b_.append(',');
+    outputKey("ordinal");
+    b_.append(':');
+    outputNumber(value.getOrdinal());
     b_.append('}');
-    */
+  }
+
+  public void outputEnum(FEnum value) {
+    output(value.getOrdinal());
   }
 
   public void output(Object value) {
@@ -235,6 +231,8 @@ public class JSONFObjectFormatter
       ((OutputJSON) value).formatJSON(this);
     } else if ( value instanceof String ) {
       output((String) value);
+    } else if ( value instanceof FEnum ) {
+      outputEnumValue((FEnum) value);
     } else if ( value instanceof FObject ) {
       output((FObject) value);
     } else if ( value instanceof PropertyInfo) {
@@ -254,13 +252,11 @@ public class JSONFObjectFormatter
     } else if ( value instanceof Boolean ) {
       outputBoolean((Boolean) value);
     } else if ( value instanceof Date ) {
-      output((Date) value);
+      outputDateValue((Date) value);
     } else if ( value instanceof Map ) {
       output((Map) value);
     } else if ( value instanceof List ) {
       output((List) value);
-    } else if ( value instanceof Enum<?> ) {
-      output((Enum<?>) value);
     } else /*if ( value == null )*/ {
       b_.append("null");
     }
@@ -272,20 +268,19 @@ public class JSONFObjectFormatter
       value.getClass().isArray();
   }
 
+  /** Called when outputting a Date from an Object field so that the type is know. **/
   public void outputDateValue(Date date) {
-    if ( outputReadableDates_ )
+    b_.append("{\"class\":\"__Timestamp__\",\"value\":");
+    if ( outputReadableDates_ ) {
       output(sdf.get().format(date));
-    else
+    } else {
       outputNumber(date.getTime());
+    }
+    b_.append('}');
   }
 
   public void output(Date date) {
     output(date.getTime());
-    /*
-    b_.append("{\"class\":\"__Timestamp__\",\"value\":");
-    outputDateValue(date);
-    b_.append('}');
-    */
   }
 
   protected Boolean maybeOutputProperty(FObject fo, PropertyInfo prop, boolean includeComma) {
@@ -303,7 +298,14 @@ public class JSONFObjectFormatter
   }
 
   public void outputDelta(FObject oldFObject, FObject newFObject) {
-    ClassInfo info           = oldFObject.getClassInfo();
+    outputDelta(oldFObject, newFObject, null);
+  }
+
+  public void outputDelta(FObject oldFObject, FObject newFObject, ClassInfo defaultClass) {
+    ClassInfo info = newFObject.getClassInfo();
+
+    boolean outputClass = outputClassNames_ && ( info != defaultClass || outputDefaultClassNames_ );
+
     ClassInfo newInfo        = newFObject.getClassInfo();
     boolean   outputComma    = true;
     List      delta          = getDelta(oldFObject, newFObject);
@@ -315,7 +317,7 @@ public class JSONFObjectFormatter
 
     b_.append('{');
     addInnerNewline();
-    if ( outputClassNames_ && outputDefaultClassNames_ ) {
+    if ( outputClass ) {
       //output Class name
       outputKey("class");
       b_.append(':');
@@ -326,8 +328,6 @@ public class JSONFObjectFormatter
     PropertyInfo id = (PropertyInfo) newInfo.getAxiomByName("id");
     outputProperty(newFObject, id);
 
-    // to output class names for references
-    outputDefaultClassNames_ = true;
 
     for ( int i = 0 ; i < size ; i++ ) {
       b_.append(',');
@@ -340,12 +340,6 @@ public class JSONFObjectFormatter
     b_.append('}');
   }
 
-  public void outputDelta(FObject oldFObject, FObject newFObject, ClassInfo defaultClass) {
-    ClassInfo info = newFObject.getClassInfo();
-
-    if ( info == defaultClass ) outputDefaultClassNames_ = false;
-    outputDelta(oldFObject, newFObject);
-  }
   protected void addInnerNewline() {
     if ( multiLineOutput_ ) {
       b_.append('\n');
@@ -365,30 +359,29 @@ public class JSONFObjectFormatter
   }
 
   public void output(FObject[] arr) {
+
+    b_.append('[');
+    for ( int i = 0 ; i < arr.length ; i++ ) {
+      output(arr[i]);
+      if ( i < arr.length - 1 ) b_.append(',');
+    }
+    b_.append(']');
+
   }
 
   public void output(FObject o, ClassInfo defaultClass) {
     ClassInfo info = o.getClassInfo();
 
-    if ( info == defaultClass ) outputDefaultClassNames_ = false;
-
-    output(o);
-  }
-
-  public void output(FObject o) {
-    ClassInfo info = o.getClassInfo();
+    boolean outputClass = outputClassNames_ && ( info != defaultClass || outputDefaultClassNames_ );
 
     b_.append('{');
     addInnerNewline();
-    if ( outputClassNames_ && outputDefaultClassNames_ ) {
+    if ( outputClass ) {
       outputKey("class");
       b_.append(':');
       output(info.getId());
     }
-    boolean outputComma = outputClassNames_ && outputDefaultClassNames_;
-
-    // to output class names for references
-    outputDefaultClassNames_ = true;
+    boolean outputComma = outputClass;
 
     List axioms = getProperties(info);
     int  size   = axioms.size();
@@ -398,6 +391,10 @@ public class JSONFObjectFormatter
     }
     addInnerNewline();
     b_.append('}');
+  }
+
+  public void output(FObject o) {
+    output(o, null);
   }
 
   public void output(PropertyInfo prop) {
@@ -468,11 +465,6 @@ public class JSONFObjectFormatter
     return this;
   }
 
-  public JSONFObjectFormatter setOutputClassNames(boolean outputClassNames) {
-    outputClassNames_ = outputClassNames;
-    return this;
-  }
-
   public JSONFObjectFormatter setOutputDefaultClassNames(boolean f) {
     outputDefaultClassNames_ = f;
     return this;
@@ -488,7 +480,12 @@ public class JSONFObjectFormatter
     return this;
   }
 
-  protected void outputKey(String val) {
+  public JSONFObjectFormatter setOutputClassNames(boolean outputClassNames) {
+    outputClassNames_ = outputClassNames;
+    return this;
+  }
+
+  public void outputKey(String val) {
     if ( quoteKeys_ ) appendQuote();
     b_.append(val);
     if ( quoteKeys_ ) appendQuote();

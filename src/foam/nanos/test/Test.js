@@ -152,7 +152,7 @@ foam.CLASS({
             };
 
             with ( { log: log, print: log, x: this.__context__, test: test } ) {
-              new Promise.resolve(eval(this.code)).then(() => {
+              Promise.resolve(eval(this.code)).then(() => {
                 updateStats();
                 resolve();
                 //          this.scriptDAO.put(this);

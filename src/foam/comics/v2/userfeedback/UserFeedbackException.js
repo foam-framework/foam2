@@ -9,6 +9,11 @@ foam.CLASS({
   name: 'UserFeedbackException',
 
   implements: ['foam.core.Exception'],
+
+  javaExtends: [
+    'java.lang.RuntimeException'
+  ],
+
   documentation: `
     In cases where the object is not returned to client user after a request,
     a UserFeedbackException will be thrown which will chain the message at the time

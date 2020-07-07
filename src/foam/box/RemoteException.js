@@ -16,6 +16,10 @@ foam.CLASS({
     {
       class: 'String',
       name: 'message'
+    },
+    {
+      class: 'Object',
+      name: 'exception'
     }
   ],
 

@@ -12,11 +12,12 @@ foam.CLASS({
   documentation: 'Forgot Password Success View',
 
   imports: [
+    'notify',
     'stack'
   ],
 
   requires: [
-    'foam.u2.dialog.NotificationMessage'
+    'foam.log.LogLevel'
   ],
 
   css: `
@@ -106,7 +107,7 @@ foam.CLASS({
           .end()
         .end();
 
-      this.add(self.NotificationMessage.create({ message: this.Instructions }));
+      this.notify(this.Instructions, '', this.LogLevel.INFO, true);
     }
   ]
 });

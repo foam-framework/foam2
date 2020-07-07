@@ -22,13 +22,15 @@ foam.CLASS({
 
   requires: [
     'foam.comics.DAOUpdateController',
+    'foam.log.LogLevel',
     'foam.u2.ControllerMode',
-    'foam.u2.DisplayMode',
-    'foam.u2.dialog.NotificationMessage'
+    'foam.u2.DisplayMode'
+    
   ],
 
   imports: [
     'stack',
+    'notify',
     'dao? as importedDAO'
   ],
 
@@ -143,7 +145,7 @@ foam.CLASS({
               .add(this.data.cls_.getAxiomsByClass(foam.core.Action))
             .end()
             .start()
-              .show(this.mode$.map((m) => m === this.DisplayMode.RW))
+              .show(this.mode$.map((m) => m === this.DisplayMode.RO))
               .startContext({ data: this })
                 .add(this.EDIT)
               .endContext()
@@ -194,10 +196,7 @@ foam.CLASS({
     },
     function onThrowError() {
       var self = this;
-      this.add(this.NotificationMessage.create({
-        message: self.data.exception.message,
-        type: 'error'
-     }));
+      self.notify(self.data.exception.message, '', self.LogLevel.ERROR, true);
     }
   ]
 });

@@ -14,15 +14,17 @@ foam.CLASS({
   imports: [
     'appConfig',
     'auth',
-    'notify',
+    'ctrl',
     'stack',
     'user'
   ],
 
   requires: [
+    'foam.log.LogLevel',
     'foam.nanos.auth.Address',
     'foam.nanos.auth.Country',
-    'foam.nanos.auth.User'
+    'foam.nanos.auth.User',
+    'foam.u2.dialog.NotificationMessage'
   ],
 
   messages: [
@@ -173,7 +175,10 @@ foam.CLASS({
             this.user.copyFrom(user);
             this.updateUser(x);
           }).catch((err) => {
-            this.notify(err.message || this.ERROR_MSG, 'error');
+            this.ctrl.add(this.NotificationMessage.create({
+              message: err.message || this.ERROR_MSG,
+              type: this.LogLevel.ERROR
+            }));
           })
           .finally(() => {
             this.isLoading_ = false;

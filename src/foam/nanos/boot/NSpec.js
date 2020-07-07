@@ -41,6 +41,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'description',
+      shortName: 'd',
       width: 120
     },
     {
@@ -76,6 +77,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'authenticate',
+      shortName: 'a',
       value: true,
       tableCellFormatter: function(value, obj, property) {
         this
@@ -118,15 +120,14 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       name: 'service',
-      view: 'foam.u2.DetailView',
-      // Why was this set to be a SectionedDetailView? Put back to DetailView. KGR
-      //      view: { class: 'foam.u2.detail.SectionedDetailView' },
+      view: 'foam.u2.view.FObjectView',
       readPermissionRequired: true,
       writePermissionRequired: true
     },
     {
       class: 'String',
       name: 'serviceClass',
+      shortName: 'sc',
       displayWidth: 80,
       readPermissionRequired: true,
       writePermissionRequired: true
@@ -134,6 +135,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'boxClass',
+      shortName: 'bc',
       displayWidth: 80,
       readPermissionRequired: true,
       writePermissionRequired: true
@@ -141,17 +143,20 @@ foam.CLASS({
     {
       class: 'Code',
       name: 'serviceScript',
+      shortName: 'ss',
       readPermissionRequired: true,
       writePermissionRequired: true
     },
     {
       class: 'Code',
       name: 'client',
+      shortName: 'c',
       value: '{}'
     },
     {
       class: 'String',
       name: 'documentation',
+      shortName: 'doc',
       view: {
         class: 'foam.u2.view.ModeAltView',
         writeView: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 140 },
@@ -179,8 +184,9 @@ foam.CLASS({
       writePermissionRequired: true
     },
     {
-          class: 'StringArray',
-          name: 'keywords'
+      class: 'StringArray',
+      name: 'keywords',
+      shortName: 'ks'
     },
     {
       class: 'String',

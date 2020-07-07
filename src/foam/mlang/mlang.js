@@ -1695,8 +1695,7 @@ foam.CLASS({
       return typeof x === 'number' ? '' + x :
         typeof x === 'string' ? '"' + x + '"' :
         Array.isArray(x) ? '[' + x.map(this.toString_.bind(this)).join(', ') + ']' :
-        x.toString ? x.toString() :
-        x;
+        x && (x).toString();
     },
 
     function toString() { return this.toString_(this.value); },
@@ -2447,25 +2446,6 @@ foam.CLASS({
     }
   ]
 });
-
-
-foam.CLASS({
-  package: 'foam.mlang.expr',
-  name: 'Mul',
-
-  extends: 'foam.mlang.predicate.Binary',
-
-  implements: [
-    'foam.core.Serializable'
-  ],
-
-  documentation: 'Multiplication Binary Expression.',
-
-  methods: [
-    function f(o) { return this.arg1.f(o) * this.arg2.f(o); }
-  ]
-});
-
 
 foam.CLASS({
   package: 'foam.mlang.sink',
@@ -3276,7 +3256,14 @@ foam.CLASS({
           return ((Predicate) predicate).f(getArg2().f(obj));
         }
         return false;
-      `
+      `,
+      code: function(o) {
+        const predicate = this.arg1.f(o);
+        if ( foam.mlang.predicate.Predicate.isInstance(predicate) ) {
+          return predicate.f(this.arg2.f(o));
+        }
+        return false;
+      }
     }
   ]
 });
@@ -3382,13 +3369,19 @@ foam.CLASS({
 
   requires: [
     'foam.mlang.Constant',
+    'foam.mlang.expr.Add',
+    'foam.mlang.expr.Divide',
     'foam.mlang.expr.Dot',
-    'foam.mlang.expr.Mul',
+    'foam.mlang.expr.MaxFunc',
+    'foam.mlang.expr.MinFunc',
+    'foam.mlang.expr.Multiply',
+    'foam.mlang.expr.Subtract',
     'foam.mlang.order.Desc',
     'foam.mlang.order.ThenBy',
     'foam.mlang.predicate.And',
     'foam.mlang.predicate.Contains',
     'foam.mlang.predicate.ContainsIC',
+    'foam.mlang.predicate.DotF',
     'foam.mlang.predicate.Eq',
     'foam.mlang.predicate.False',
     'foam.mlang.predicate.Func',
@@ -3443,10 +3436,13 @@ foam.CLASS({
     },
 
     function _unary_(name, arg) {
+      foam.assert(arg !== undefined, 'arg is required.');
       return this[name].create({ arg1: arg });
     },
 
     function _binary_(name, arg1, arg2) {
+      foam.assert(arg1 !== undefined, 'arg1 is required.');
+      foam.assert(arg2 !== undefined, 'arg2 is required.');
       return this[name].create({ arg1: arg1, arg2: arg2 });
     },
 
@@ -3469,7 +3465,13 @@ foam.CLASS({
     function ENDS_WITH(a, b) { return this._binary_("EndsWith", a, b); },
     function FUNC(fn) { return this.Func.create({ fn: fn }); },
     function DOT(a, b) { return this._binary_("Dot", a, b); },
-    function MUL(a, b) { return this._binary_("Mul", a, b); },
+    function DOT_F(a, b) { return this._binary_("DotF", a, b); },
+    function ADD() { return this._nary_("Add", arguments); },
+    function SUB() { return this._nary_("Subtract", arguments); },
+    function MUL() { return this._nary_("Multiply", arguments); },
+    function DIV() { return this._nary_("Divide", arguments); },
+    function MIN_FUNC() { return this._nary_("MinFunc", arguments); },
+    function MAX_FUNC() { return this._nary_("MaxFunc", arguments); },
 
     function UNIQUE(expr, sink) { return this.Unique.create({ expr: expr, delegate: sink }); },
     function GROUP_BY(expr, opt_sinkProto, opt_limit) { return this.GroupBy.create({ arg1: expr, arg2: opt_sinkProto || this.COUNT(), groupLimit: opt_limit || -1 }); },
@@ -3587,6 +3589,7 @@ foam.CLASS({
   name: 'CurrentTime',
   extends: 'foam.mlang.AbstractExpr',
   axioms: [
+    // TODO (michal): remove singleton if all calls to foam.mlang.CurrentTime.create() returns the same instance.
     { class: 'foam.pattern.Singleton' }
   ],
   methods: [
@@ -3775,6 +3778,183 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.mlang',
+  name: 'Formula',
+  extends: 'foam.mlang.AbstractExpr',
+  abstract: true,
+
+  documentation: 'Formula base-class',
+
+  properties: [
+    {
+      class: 'foam.mlang.ExprArrayProperty',
+      name: 'args'
+    }
+  ],
+
+  methods: [
+    {
+      name: 'f',
+      javaCode: `
+        Double result = null;
+        for ( int i = 0; i < getArgs().length; i++) {
+          var current = getArgs()[i].f(obj);
+          if ( current instanceof Number ) {
+            var oldResult = result;
+            var value = ((Number) current).doubleValue();
+            result = result == null ? value : reduce(result, value);
+
+            if ( ! Double.isFinite(result) ) {
+              var formula = getClass().getSimpleName() + "(" + oldResult + ", " + value + ")";
+              throw new RuntimeException("Failed to evaluate formula:" +
+                formula + ", result:" + result);
+            }
+          }
+        }
+        return result;
+      `,
+      code: function(o) {
+        var result = null;
+        for ( var i = 0; i < this.args.length; i++ ) {
+          var current = this.args[i].f(o);
+          if ( typeof current === 'number' ) {
+            var oldResult = result;
+            result = result === null ? current : this.reduce(result, current);
+
+            if ( ! isFinite(result) ) {
+              var formula = this.cls_.name + '(' + oldResult + ', ' + current + ')';
+              throw new Error('Failed to evaluate formula:' + formula + ', result: ' + result);
+            }
+          }
+        }
+        return result;
+      }
+    },
+    {
+      name: 'reduce',
+      type: 'Double',
+      abstract: true,
+      args: [
+        { name: 'accumulator', type: 'Double' },
+        { name: 'currentValue', type: 'Double' }
+      ]
+    },
+    {
+      name: 'toString',
+      type: 'String',
+      javaCode: `
+        StringBuilder sb = new StringBuilder();
+        sb.append(getClass().getSimpleName()).append('(');
+        for ( int i = 0; i < getArgs().length; i++ ) {
+          if ( i > 0 ) sb.append(", ");
+          sb.append(getArgs()[i].toString());
+        }
+        sb.append(')');
+        return sb.toString();
+      `,
+      code: function() {
+        return this.cls_.name + '(' + this.args.map(a => a.toString()) + ')';
+      }
+    }
+  ]
+})
+
+foam.CLASS({
+  package: 'foam.mlang.expr',
+  name: 'Add',
+  extends: 'foam.mlang.Formula',
+  implements: [ 'foam.core.Serializable' ],
+
+  methods: [
+    {
+      name: 'reduce',
+      abstract: false,
+      javaCode: 'return accumulator + currentValue;',
+      code: (accumulator, currentValue) => accumulator + currentValue
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.expr',
+  name: 'Subtract',
+  extends: 'foam.mlang.Formula',
+  implements: [ 'foam.core.Serializable' ],
+
+  methods: [
+    {
+      name: 'reduce',
+      abstract: false,
+      javaCode: 'return accumulator - currentValue;',
+      code: (accumulator, currentValue) => accumulator - currentValue
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.expr',
+  name: 'Multiply',
+  extends: 'foam.mlang.Formula',
+  implements: [ 'foam.core.Serializable' ],
+
+  methods: [
+    {
+      name: 'reduce',
+      abstract: false,
+      javaCode: 'return accumulator * currentValue;',
+      code: (accumulator, currentValue) => accumulator * currentValue
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.expr',
+  name: 'Divide',
+  extends: 'foam.mlang.Formula',
+  implements: [ 'foam.core.Serializable' ],
+
+  methods: [
+    {
+      name: 'reduce',
+      abstract: false,
+      javaCode: 'return accumulator / currentValue;',
+      code: (accumulator, currentValue) => accumulator / currentValue
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.expr',
+  name: 'MinFunc',
+  extends: 'foam.mlang.Formula',
+  implements: [ 'foam.core.Serializable' ],
+
+  methods: [
+    {
+      name: 'reduce',
+      abstract: false,
+      javaCode: 'return accumulator <= currentValue ? accumulator : currentValue;',
+      code: (accumulator, currentValue) => Math.min(accumulator, currentValue)
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.expr',
+  name: 'MaxFunc',
+  extends: 'foam.mlang.Formula',
+  implements: [ 'foam.core.Serializable' ],
+
+  methods: [
+    {
+      name: 'reduce',
+      abstract: false,
+      javaCode: 'return accumulator >= currentValue ? accumulator : currentValue;',
+      code: (accumulator, currentValue) => Math.max(accumulator, currentValue)
+    }
+  ]
+});
 
 // TODO(braden): We removed Expr.pipe(). That may still be useful to bring back,
 // probably with a different name. It doesn't mean the same as DAO.pipe().
