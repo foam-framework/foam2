@@ -33,7 +33,7 @@ foam.CLASS({
       .start('h2').style({'padding-left': '16px'}).add('Google Sheets Data Import').end()
       .startContext({ data: this })
         .tag(this.importConfig)
-        .add(this.slot(function(importConfig$columnHeaderPropertyMappings){
+        .add(this.slot(function(importConfig$columnHeaderPropertyMappings) {
           return this.E()
           .callIf(importConfig$columnHeaderPropertyMappings && importConfig$columnHeaderPropertyMappings.length > 0, function() {
             this.start('h4').style({ 'padding-left': '16px' }).add('Column headers').end().forEach(importConfig$columnHeaderPropertyMappings, function(c) {
