@@ -1,0 +1,14 @@
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"01-68afcf0c-d829-98f8-0841-75e97a3ad16d63",
+  "name":"DIG Owner",
+  "ruleGroup":"am",
+  "documentation":"Sets the owner on creation of a new DIG",
+  "daoKey":"digDAO",
+  "operation":0,
+  "after":false,
+  "action":{"class":"foam.nanos.dig.DIGOwnerRuleAction"},
+  "enabled":true,
+  "saveHistory":false,
+  "lifecycleState":1
+})

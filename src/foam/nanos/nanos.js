@@ -265,6 +265,7 @@ FOAM_FILES([
   { name: 'foam/nanos/dig/Argument'},
   { name: 'foam/nanos/dig/ResultView' },
   { name: 'foam/nanos/dig/DIG' },
+  { name: 'foam/nanos/dig/DIGOwnerRuleAction' },
   { name: 'foam/nanos/dig/DUGRule' },
   { name: 'foam/nanos/dig/DUGRuleAction' },
   { name: 'foam/nanos/dig/DigFileUploadView' },
