@@ -27,6 +27,14 @@ foam.CLASS({
       of: 'foam.nanos.medusa.ClusterConfig'
     },
     {
+      name: 'width',
+      value: 200
+    },
+    {
+      name: 'height',
+      value: 200
+    },
+    {
       name: 'fontSize',
       value: 15
     },
@@ -40,9 +48,6 @@ foam.CLASS({
     function initCView() {
       this.SUPER();
 
-      this.width = 200;
-      this.height = 200;
-      this.y = -1 * this.height / 2;
       this.borderWidth = 3;
       this.border = 'gray';
       this.color = 'white';
@@ -124,7 +129,9 @@ foam.CLASS({
     {
       name: 'handleClick',
       code: function(evt, element) {
-        this.parent.remove(this);
+        console.log('ReplayingInfoDetailCView.handleClick');
+        //this.parent.remove(this);
+        element.canvas.remove(this);
       }
     }
   ]

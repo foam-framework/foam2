@@ -54,6 +54,11 @@ foam.CLASS({
           y: -15
         });
       }
+    },
+    {
+      name: 'infoView',
+      class: 'FObjectProperty',
+      of: 'foam.graphics.CView'
     }
   ],
 
@@ -108,7 +113,7 @@ foam.CLASS({
     {
       name: 'handleClick',
       code: function(evt, element) {
-        // console.log(this.cls_.id+'.handleClick');
+        console.log('ReplayingInfoCView.handleClick');
         if ( this.config.replayingInfo ) {
           for ( var i = 0 ; i < this.children.length ; i++ ) {
             let child = this.children[i];
@@ -117,13 +122,21 @@ foam.CLASS({
             }
           }
 
-          var r = this.ReplayingInfoDetailCView.create({
-            config: this.config,
-            alpha: 1,
-            globalAlpha: 1
-          });
-
-          this.canvas.add(r);
+          if ( this.infoView ) {
+            element.canvas.remove(this.infoView);
+            this.infoView = undefined;
+          } else {
+            var r = this.ReplayingInfoDetailCView.create({
+              config: this.config,
+              alpha: 1,
+              globalAlpha: 1,
+              x: evt.offsetX,
+              y: evt.offsetY
+            });
+            r.y = r.y - r.height/2;
+            this.infoView = r;
+            element.canvas.add(r);
+          }
         }
       }
     },
