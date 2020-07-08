@@ -11,6 +11,7 @@
   documentation: 'Rule model represents rules(actions) that need to be applied in case passed object satisfies provided predicate.',
 
   implements: [
+    'foam.nanos.auth.Authorizable',
     'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.CreatedByAware',
     'foam.nanos.auth.LastModifiedAware',
@@ -25,6 +26,8 @@
 
   javaImports: [
     'foam.core.DirectAgency',
+    'foam.nanos.auth.AuthorizationException',
+    'foam.nanos.auth.AuthService',
     'foam.nanos.logger.Logger',
     'java.util.Collection'
   ],
@@ -418,6 +421,50 @@
       code: function() {
         return this.name || this.id;
       }
+    },
+    {
+      name: 'authorizeOnCreate',
+      javaCode: `
+        var auth = (AuthService) x.get("auth");
+        if ( ! auth.check(x, "rule.create")
+          || ! auth.check(x, "spid.read." + getSpid())
+        ) {
+          throw new AuthorizationException("You do not have permission to create the rule.");
+        }
+      `
+    },
+    {
+      name: 'authorizeOnRead',
+      javaCode: `
+        var auth = (AuthService) x.get("auth");
+        if ( ! auth.check(x, "rule.read.*")
+          || ! auth.check(x, "spid.read." + getSpid())
+        ) {
+          throw new AuthorizationException("You do not have permission to read the rule.");
+        }
+      `
+    },
+    {
+      name: 'authorizeOnUpdate',
+      javaCode: `
+        var auth = (AuthService) x.get("auth");
+        if ( ! auth.check(x, "rule.update.*")
+          || ! auth.check(x, "spid.read." + getSpid())
+        ) {
+          throw new AuthorizationException("You do not have permission to update the rule.");
+        }
+      `
+    },
+    {
+      name: 'authorizeOnDelete',
+      javaCode: `
+        var auth = (AuthService) x.get("auth");
+        if ( ! auth.check(x, "rule.remove." + getId())
+          || ! auth.check(x, "spid.read." + getSpid())
+        ) {
+          throw new AuthorizationException("You do not have permission to delete the rule.");
+        }
+      `
     }
   ],
 
