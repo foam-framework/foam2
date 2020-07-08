@@ -14,7 +14,7 @@ foam.CLASS({
     'foam.nanos.auth.EnabledAware'
   ],
 
-  requires: [ 
+  requires: [
     'foam.nanos.app.AppConfig',
     'foam.nanos.auth.PasswordPolicy'
   ],
@@ -122,7 +122,7 @@ foam.CLASS({
         class: 'foam.u2.view.FObjectPropertyView',
         readView: { class: 'foam.u2.detail.VerticalDetailView' }
       }
-    }
+    },
     /*
       FUTURE
     {
@@ -131,6 +131,19 @@ foam.CLASS({
       documentation: 'Custom authentication settings for this group.'
     }
     */
+    {
+      class: 'Boolean',
+      name: 'flag',
+      documentation: 'flag to filter sme specific groups'
+    },
+    {
+      class: 'String',
+      name: 'label',
+      documentation: 'Display name of the Group, if required.',
+      factory: function() {
+        return this.id;
+      }
+    }
   ],
 
   javaImports: [
