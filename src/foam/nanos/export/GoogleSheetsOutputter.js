@@ -7,113 +7,86 @@
 foam.CLASS({
   package: 'foam.nanos.export',
   name: 'GoogleSheetsOutputter',
+  extends: 'foam.nanos.column.TableColumnOutputter',
   requires: [
-    'foam.nanos.export.GoogleSheetsPropertyMetadata'
+    'foam.nanos.column.ColumnConfigToPropertyConverter',
+    'foam.nanos.export.GoogleSheetsPropertyMetadata',
   ],
   methods: [
     {
       name: 'getColumnMethadata',
       type: 'foam.nanos.export.GoogleSheetsPropertyMetadata[]',
-      code: function(cls, propsName) {
+      code: async function(x, cls, propNames) {
         var metadata = [];
         var props = [];
-        if ( ! propsName ) {
+        if ( ! propNames ) {
           props = cls.getAxiomsByClass(foam.core.Property);
+          propNames = props.map(p => p.name);
         } else {
-          for ( var i = 0; i < propsName.length ; i++ ) {
-            props.push(cls.getAxiomByName(propsName[i]));
+          var columnConfig = x.columnConfigToPropertyConverter;
+          for ( var i = 0 ; i < propNames.length ; i++ ) {
+            props.push(await columnConfig.returnProperty(cls, propNames[i]));
           }
         }
         
         for ( var i = 0 ; i < props.length ; i++ ) {
-          if ( props[i].networkTransient )
-            continue;
           if ( props[i].cls_.id === "foam.core.Action" )
             continue;
-          var cellType = 'STRING';
-          var pattern = '';
-          if ( props[i].cls_.id === "foam.core.UnitValue" ) {
-            cellType = 'CURRENCY';
-            pattern = '\"$\"#0.00\" CAD\"';
-          } else if ( props[i].cls_.id === 'foam.core.Date' ) {
-            cellType = 'DATE';
-            pattern = 'yyyy-mm-dd';
-          } else if ( props[i].cls_.id === 'foam.core.DateTime' ) {
-            cellType = 'DATE_TIME';
-          } else if ( props[i].cls_.id === 'foam.core.Time' ) {
-            cellType = 'TIME';
-          }
-
-          var m = this.GoogleSheetsPropertyMetadata.create({
-            columnName: props[i].name,
-            columnLabel: props[i].label,
-            columnWidth: props[i].tableWidth ? props[i].tableWidth : 0,
-            cellType: cellType,
-            pattern: pattern
-          });
           
-          metadata.push(m);
+          metadata.push(this.returnMetadataForProperty(props[i], propNames[i]));
         }
         return metadata;
       }
     },
     {
-      name: 'getAllPropertyNames',
+      name: 'outputStringForProperties',
       type: 'StringArray',
-      code: function(cls) {
-        var props = cls.getAxiomsByClass(foam.core.Property);
-        var propNames = [];
-        for ( var i = 0 ; i < props.length ; i++ ) {
-          if ( ! props[i].networkTransient )
-            propNames.push(props[i].name);
-        }
-        return propNames;
+      code: async function(x, cls, obj, columnMetadata) {
+        var values = [];
+        var columnConfig = x.columnConfigToPropertyConverter;
+
+        var props = columnConfig.returnProperties(cls, columnMetadata.map(m => m.propName));
+        values.push(await this.arrayOfValuesToArrayOfStrings(x, obj, props));
+        return values;
       }
     },
     {
-      name: 'outputObjectForProperties',
-      type: 'StringArray',
-      code: async function(obj, columnMethadata) {
-        var propValues = [];
-        for (var i = 0 ; i < columnMethadata.length ; i++ ) {
-          if ( obj[columnMethadata[i].columnName] ) {
-            if ( columnMethadata[i].cellType === 'CURRENCY' ) {
-              propValues.push(( obj[columnMethadata[i].columnName] / 100 ).toString());
-              columnMethadata[i].perValuePatternSpecificValues.push(obj.destinationCurrency);
-            }
-            else if ( columnMethadata[i].cellType === 'DATE' )
-              propValues.push(obj[columnMethadata[i].columnName].toISOString().substring(0, 10));
-            else if ( columnMethadata[i].cellType === 'DATE_TIME' ) {
-              propValues.push(obj[columnMethadata[i].columnName].toString().substring(0, 24));
-              columnMethadata[i].perValuePatternSpecificValues.push(obj[columnMethadata[i].columnName].toString().substring(24));
-            }
-            else if ( columnMethadata[i].cellType === 'TIME' ) {
-              propValues.push(obj[columnMethadata[i].columnName].toString().substring(0, 8));
-              columnMethadata[i].perValuePatternSpecificValues.push(obj[columnMethadata[i].columnName].toString().substring(8));
-            }
-            else if ( obj[columnMethadata[i].columnName].toSummary ) {
-              if ( obj[columnMethadata[i].columnName].toSummary() instanceof Promise )
-                propValues.push(await obj[columnMethadata[i].columnName].toSummary());
-              else
-                propValues.push(obj[columnMethadata[i].columnName].toSummary());
-            } else
-              propValues.push(obj[columnMethadata[i].columnName].toString());            
+      name: 'returnMetadataForProperty',
+      code: function(prop, propName) {
+          //to constants?
+          var cellType = 'STRING';
+          var pattern = '';
+          if ( foam.core.UnitValue.isInstance(prop) ) {
+            cellType = 'CURRENCY';
+            pattern = '\"$\"#0.00\" CAD\"';
+          } else if ( foam.core.Date.isInstance(prop) ) {
+            cellType = 'DATE';
+            pattern = 'yyyy-mm-dd';
+          } else if ( foam.core.DateTime.isInstance(prop) ) {
+            cellType = 'DATE_TIME';
+          } else if ( foam.core.Time.isInstance(prop) ) {
+            cellType = 'TIME';
           }
-          else
-            propValues.push('');
-        }
-        return propValues;
+
+          return this.GoogleSheetsPropertyMetadata.create({
+            columnName: prop.name,
+            columnLabel: prop.label,
+            columnWidth: prop.tableWidth ? prop.tableWidth : 0,
+            cellType: cellType,
+            pattern: pattern,
+            propName: propName
+          });
       }
     },
     {
-      name: 'outputArray',
-      type: 'Array',
-      code: async function(arr, props) {
-        var valuesArray = [];
-        for ( var i = 0 ; i < arr.length ; i++ ) {
-          valuesArray.push(await this.outputObjectForProperties(arr[i], props));
-        }
-        return valuesArray;
+      name: 'outputTable',
+      code: async function(x, cls, arr, columnsMetadata) {
+        var columnConfig = x.columnConfigToPropertyConverter;
+        columnConfig = columnConfig || this.ColumnConfigToPropertyConverter.create();
+
+        var props = columnConfig.returnProperties(cls, columnsMetadata.map(m => m.propName));
+
+        return await this.returnTable(x, props, arr);
       }
     }
   ]
