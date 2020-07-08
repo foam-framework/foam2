@@ -14,10 +14,8 @@ foam.CLASS({
   implements: [ 'foam.mlang.Expressions' ],
 
   requires: [
-    'foam.core.Duration',
     'foam.graphics.Label',
     'foam.graphics.Box',
-    'foam.physics.PhysicsEngine',
     'foam.nanos.medusa.ClusterConfig',
     'foam.nanos.medusa.RegionCView',
     'foam.util.Timer',
@@ -54,6 +52,11 @@ foam.CLASS({
       value: 'nanopay'
     },
     {
+      documentation: 'seconds between refreshes.',
+      name: 'refreshRate',
+      value: 10
+    },
+    {
       name: 'canvas',
       factory: function() {
         return this.Box.create({
@@ -68,19 +71,19 @@ foam.CLASS({
       name: 'seconds',
       postSet: function() {
         this.refresh();
-      }
+      },
+      hidden: true,
     },
     {
       class: 'FObjectProperty',
       of: 'foam.util.Timer',
       name: 'timer',
-      required: true,
       hidden: true,
       factory: function() {
         var t = this.Timer.create();
-        this.seconds$ = t.time$.map(function(t) {
-          return Math.floor(t / 10000);
-        });
+        this.seconds$ = t.second$.map(function(s) {
+          return Math.floor(s / this.refreshRate);
+        }.bind(this));
         return t;
       }
     }
@@ -111,7 +114,6 @@ foam.CLASS({
         addClass(this.myClass()).
         start('center').
         add('Cluster Topology').
-        start(this.SWITCH_TIMER, { label$: this.timer.isStarted$.map(function(on) { return on ? 'STOP' : 'START' }) }).end().
         tag('br').
         start(this.canvas).
         on('click', this.onClick).
@@ -121,42 +123,25 @@ foam.CLASS({
         end();
 
       this.timer.start();
-//      this.switchTimer.bind(this);
+      this.canvas.canvas.onDetach(this.stopTimer);
     },
     {
       name: 'refresh',
       code: function() {
-        // console.log('ClusterToplogyView.refresh');
+        console.log('ClusterToplogyView.refresh '+this.canvas.children.length);
         for ( var i = 0; i < this.canvas.children.length; i++ ) {
           let child = this.canvas.children[i];
           child.refresh && child.refresh(child);
         }
-      }
-    }
-  ],
-
-  actions: [
-    {
-      name: 'switchTimer',
-      label: 'Switch',
-      code: function(data, x, self) {
-        console.log('timer: click');
-        if ( this.timer ) {
-          if ( this.timer.isStarted ) {
-            this.timer.stop;
-            console.log('timer: stopped');
-          } else {
-            this.timer.start;
-            console.log('timer: started');
-          }
-        }
+        this.canvas.invalidate();
       }
     }
   ],
 
   listeners: [
     function onMouseMove(evt) {
-      var x = evt.offsetX, y = evt.offsetY;
+      let x = evt.offsetX;
+      let y = evt.offsetY;
       console.log('onMouseMove '+x+' '+y);
 
       var c = this.canvas.findFirstChildAt(x, y);
@@ -167,7 +152,8 @@ foam.CLASS({
     },
 
     function onClick(evt) {
-      var x = evt.offsetX, y = evt.offsetY;
+      let x = evt.offsetX;
+      let y = evt.offsetY;
       console.log('onClick '+x+' '+y);
 
       var c = this.canvas.findFirstChildAt(x, y);
@@ -179,7 +165,8 @@ foam.CLASS({
 
     function onRightClick(evt) {
       evt.preventDefault();
-      var x = evt.offsetX, y = evt.offsetY;
+      let x = evt.offsetX;
+      let y = evt.offsetY;
 
       console.log('onRightClick '+x+' '+y);
 
@@ -188,6 +175,11 @@ foam.CLASS({
       if ( c && c !== this.canvas ) {
         c.handleRightClick && c.handleRightClick(evt, this);
       }
+    },
+
+    function stopTimer() {
+      console.log('stopTimer');
+      this.timer.stop();
     }
   ]
 });

@@ -58,7 +58,7 @@ foam.CLASS({
       class: 'String',
       expression: function(startTime, endTime) {
         let delta = new Date().getTime() - startTime.getTime();
-        let duration = foam.core.Duration.create({value: delta}).formatted();
+        let duration = foam.core.Duration.duration(delta);
         return duration;
       }
     },
@@ -69,7 +69,7 @@ foam.CLASS({
       expression: function(index, replayIndex, startTime, endTime) {
         let end = endTime || new Date();
         let delta = end.getTime() - startTime.getTime();
-        let duration = foam.core.Duration.create({value: delta}).formatted();
+        let duration = foam.core.Duration.duration(delta);
         return duration;
       },
       visibility: 'RO'
@@ -93,11 +93,9 @@ foam.CLASS({
       class: 'String',
       label: 'Remaining',
       expression: function(index, replayIndex, startTime) {
-        // let delta = Date.now() - startTime.getTime();
-        // let rate = index / delta;
         let rate = this.replayTps;
         let t = rate * (replayIndex - index); // ms
-        let duration = foam.core.Duration.create({value: t}).formatted();
+        let duration = foam.core.Duration.duration(t);
         return duration;
       },
       visibility: 'RO'

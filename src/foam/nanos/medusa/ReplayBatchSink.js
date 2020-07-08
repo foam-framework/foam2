@@ -105,7 +105,8 @@ foam.CLASS({
           send(getX());
         }
         MedusaEntry entry = (MedusaEntry) obj;
-        entry.setNode(System.getProperty("hostname"));
+        ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
+        entry.setNode(support.getConfigId());
         getLogger().debug("put", entry.getIndex(), getDetails().getRequester());
         getBatch().put(entry.getIndex(), entry);
       }

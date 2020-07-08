@@ -73,7 +73,7 @@ public class NanoRouter
     String   serviceKey = urlParams[2];
     Object   service    = getX().get(serviceKey);
     NSpec    spec       = (NSpec) nSpecDAO_.find(serviceKey);
-    WebAgent serv       = getWebAgent(spec, service);
+    WebAgent agent     = getWebAgent(spec, service);
     PM       pm         = new PM(this.getClass(), serviceKey);
 
     resp.setContentType("text/html");
@@ -90,7 +90,7 @@ public class NanoRouter
     resp.setHeader("X-Frame-Options", "deny");
 
     try {
-      if ( serv == null ) {
+      if ( agent == null ) {
         System.err.println("No service found for: " + serviceKey);
         resp.sendError(resp.SC_NOT_FOUND, "No service found for: "+serviceKey);
       } else {
@@ -109,7 +109,7 @@ public class NanoRouter
           })
           .put("logger", new PrefixLogger(new Object[] { "[Service]", spec.getName() }, (Logger) getX().get("logger")))
           .put(NSpec.class, spec);
-        serv.execute(requestContext);
+        agent.execute(requestContext);
       }
     } catch (Throwable t) {
       System.err.println("Error serving " + serviceKey + " " + path);
@@ -146,7 +146,7 @@ public class NanoRouter
 
         skeleton.setDelegateObject(service);
 
-        service = new ServiceWebAgent(skeleton, spec.getAuthenticate());
+        service = getAgent(skeleton, spec);
 
         logger.debug(this.getClass().getSimpleName(), "createWebAgent.serve", spec.getName(), "service");
       } catch (IllegalAccessException | InstantiationException | ClassNotFoundException ex) {
@@ -186,6 +186,10 @@ public class NanoRouter
 
     logger.error(this.getClass(), spec.getName() + " does not have a WebAgent.");
     return null;
+  }
+
+  protected WebAgent getAgent(Skeleton skeleton, NSpec spec) {
+    return new ServiceWebAgent(skeleton, spec.getAuthenticate());
   }
 
   protected void informService(Object service, NSpec spec) {

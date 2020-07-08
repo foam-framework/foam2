@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.nanos.medusa',
   name: 'MedusaBroadcastDAO',
-  extends: 'foam.nanos.medusa.BatchClientDAO',
+  extends: 'foam.dao.ProxyDAO',
 
   documentation: `Broadcast MedusaEntries.`,
 
@@ -53,11 +53,11 @@ foam.CLASS({
       return "medusaMediatorDAO";
       `
     },
-    {
-      name: 'batchEnabled',
-      class: 'Boolean',
-      value: false
-    },
+    // {
+    //   name: 'batchEnabled',
+    //   class: 'Boolean',
+    //   value: false
+    // },
     {
       name: 'predicate',
       class: 'foam.mlang.predicate.PredicateProperty',
@@ -129,7 +129,7 @@ foam.CLASS({
       }
 
       // Purely for human monitoring and troubleshooting.
-      entry.setNode(System.getProperty("hostname"));
+      entry.setNode(myConfig.getId());
 
       if ( myConfig.getType() == MedusaType.NODE ) {
         // Always broadcast to/from NODE and
@@ -140,12 +140,12 @@ foam.CLASS({
           }
         }
 
-        if ( getBatchEnabled() ) {
-          // queue for broadcast
-          return super.put_(x, entry);
-        } else {
+        // if ( getBatchEnabled() ) {
+        //   // queue for broadcast
+        //   return super.put_(x, entry);
+        // } else {
           submit(x, entry, DOP.PUT);
-        }
+        // }
       } else if ( myConfig.getType() == MedusaType.MEDIATOR &&
         // Broadcast promoted entries to other MEDIATORS
         // REVIEW: to avoid broadcast during reply, wait until ONLINE,
@@ -154,12 +154,12 @@ foam.CLASS({
                   ( entry.getPromoted() &&
                     ( old == null ||
                       ! old.getPromoted() ) ) ) {
-        if ( getBatchEnabled() ) {
-          // queue for broadcast
-          return super.put_(x, entry);
-        } else {
+        // if ( getBatchEnabled() ) {
+        //   // queue for broadcast
+        //   return super.put_(x, entry);
+        // } else {
           submit(x, entry, DOP.PUT);
-        }
+        // }
       }
       return entry;
       `
@@ -262,33 +262,33 @@ foam.CLASS({
       return PM.create(x, this.getOwnClassInfo(), getServiceName()+":"+name);
       `
     },
-    {
-      name: 'getBatchTimerInterval',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-      ],
-      type: 'Long',
-      javaCode: `
-      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      return support.getBatchTimerInterval();
-      `
-    },
-    {
-      name: 'getMaxBatchSize',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-      ],
-      type: 'Long',
-      javaCode: `
-      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      return support.getMaxBatchSize();
-      `
-    }
+    // {
+    //   name: 'getBatchTimerInterval',
+    //   args: [
+    //     {
+    //       name: 'x',
+    //       type: 'Context'
+    //     },
+    //   ],
+    //   type: 'Long',
+    //   javaCode: `
+    //   ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+    //   return support.getBatchTimerInterval();
+    //   `
+    // },
+    // {
+    //   name: 'getMaxBatchSize',
+    //   args: [
+    //     {
+    //       name: 'x',
+    //       type: 'Context'
+    //     },
+    //   ],
+    //   type: 'Long',
+    //   javaCode: `
+    //   ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+    //   return support.getMaxBatchSize();
+    //   `
+    // }
    ]
 });

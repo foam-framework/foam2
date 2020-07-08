@@ -23,6 +23,8 @@ configuration for contacting the primary node.`,
   javaImports: [
     'foam.box.Box',
     'foam.box.SessionClientBox',
+    'foam.box.socket.SocketClientBox',
+    'foam.box.socket.SocketServer',
     'foam.core.FObject',
     'foam.core.X',
     'foam.dao.ArraySink',
@@ -31,7 +33,6 @@ configuration for contacting the primary node.`,
     'foam.dao.EasyDAO',
     'foam.dao.MDAO',
     'foam.dao.ProxyDAO',
-    'foam.box.network.SocketClientBox',
     'static foam.mlang.MLang.*',
     'static foam.mlang.MLang.COUNT',
     'foam.mlang.sink.Count',
@@ -47,8 +48,7 @@ configuration for contacting the primary node.`,
     'java.util.ArrayList',
     'java.util.HashMap',
     'java.util.List',
-    'java.util.Map',
-    'foam.nanos.medusa.box.SyncBox'
+    'java.util.Map'
   ],
 
   properties: [
@@ -373,15 +373,15 @@ configuration for contacting the primary node.`,
       javaCode: `
         String address = receiveClusterConfig.getId();
         DAO hostDAO = (DAO) x.get("hostDAO");
-        Host host = (Host) hostDAO.find(receiveClusterConfig.getId());
+        Host host = (Host) hostDAO.find(address);
         if ( host != null ) {
           address = host.getAddress();
         }
-
+        getLogger().debug("getSocketClientBox", serviceName, address, host, receiveClusterConfig.getPort());
         SocketClientBox clientBox = new SocketClientBox();
         clientBox.setX(x);
         clientBox.setHost(address);
-        clientBox.setPort(receiveClusterConfig.getPort() + 2);
+        clientBox.setPort(receiveClusterConfig.getPort() + SocketServer.PORT_OFFSET);
         clientBox.setServiceName(serviceName);
         return clientBox;
       `
@@ -407,17 +407,14 @@ configuration for contacting the primary node.`,
           type: 'ClusterConfig'
         },
         {
-          name: 'usingTCP',
+          name: 'useTCP',
           type: 'Boolean',
           value: true
         }
       ],
       javaCode: `
-        if ( usingTCP == true ) {
-          return new SyncBox.Builder(x)
-                  .setDelegate(
-                    getSocketClientBox(x, serviceName, sendClusterConfig, receiveClusterConfig)
-                  ).build();
+        if ( useTCP == true ) {
+          return getSocketClientBox(x, serviceName, sendClusterConfig, receiveClusterConfig);
         } else {
           return new ClusterHTTPBox.Builder(x)
                   .setAuthorizationType(foam.box.HTTPAuthorizationType.BEARER)
@@ -683,7 +680,7 @@ configuration for contacting the primary node.`,
           .setDelegate(new PMBox.Builder(x)
             .setClassType(ClientDAO.getOwnClassInfo())
             .setName(id)
-              .setDelegate(getTransportlayerBox(x, serviceName, sendClusterConfig, receiveClusterConfig, true))
+            .setDelegate(getTransportlayerBox(x, serviceName, sendClusterConfig, receiveClusterConfig, true))
             .build())
           .build())
         .build();

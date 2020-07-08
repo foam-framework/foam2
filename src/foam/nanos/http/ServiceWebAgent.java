@@ -28,7 +28,7 @@ import java.net.URL;
 
 @SuppressWarnings("serial")
 public class ServiceWebAgent
-    implements WebAgent
+  implements WebAgent
 {
   public static final int BUFFER_SIZE = 4096;
 
@@ -52,6 +52,14 @@ public class ServiceWebAgent
   public ServiceWebAgent(Box skeleton, boolean authenticate) {
     skeleton_     = skeleton;
     authenticate_ = authenticate;
+  }
+
+  public Box getSkeletonBox() {
+    return skeleton_;
+  }
+
+  public Boolean getAuthenticate() {
+    return authenticate_;
   }
 
   public void execute(X x) {

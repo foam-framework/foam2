@@ -5,25 +5,15 @@
  */
 
 foam.CLASS({
-  package: 'foam.box.network',
-  name: 'SocketReplyBox',
+  package: 'foam.box.socket',
+  name: 'DemoSocketClientReplyBox',
   implements: [
     'foam.box.Box'
   ],
 
   javaImports: [
-    'java.io.IOException',
-    'java.net.Socket',
-    'java.nio.ByteBuffer',
-    'java.nio.charset.StandardCharsets',
-    'java.io.OutputStream',
-  ],
-
-  properties: [
-    {
-      class: 'Long',
-      name: 'syncBoxId'
-    }
+    'foam.lib.json.Outputter',
+    'foam.lib.NetworkPropertyPredicate'
   ],
 
   axioms: [
@@ -58,26 +48,14 @@ foam.CLASS({
     {
       name: 'send',
       javaCode: `
-      try {
-        Socket socket = (Socket) getX().get("tcpSocket");
-        msg.getAttributes().put("syncBoxId", getSyncBoxId());
-        synchronized (socket) {
-          foam.lib.formatter.FObjectFormatter formatter = formatter_.get();
-          formatter.setX(getX());
-          formatter.output(msg);
-          String responseMsg = formatter.builder().toString();
-          byte[] messageBytes = responseMsg.getBytes(StandardCharsets.UTF_8);
-          int messageSize = messageBytes.length;
-          ByteBuffer responseBuffer = ByteBuffer.allocate(4+messageSize);
-          responseBuffer.putInt(messageSize).put(messageBytes);
-          OutputStream os = socket.getOutputStream();
-          os.write(responseBuffer.array(), 0, 4+messageSize);
-          os.flush();
-        }
-      } catch ( IOException ioe ) {
-        throw new RuntimeException(ioe);
-      }
+        System.out.println("---Socket Reply----");
+        foam.lib.formatter.FObjectFormatter formatter = formatter_.get();
+        formatter.setX(getX());
+        formatter.output(msg);
+        String message = formatter.builder().toString();
+        System.out.println(message);
       `
     }
   ]
-})
+});
+

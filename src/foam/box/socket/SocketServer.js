@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.box.network',
+  package: 'foam.box.socket',
   name: 'SocketServer',
 
   implements: [
@@ -24,19 +24,33 @@ foam.CLASS({
     'java.net.Socket',
   ],
 
+  constants: [
+    {
+      name: 'PORT_OFFSET',
+      value: 3,
+      type: 'Integer'
+    }
+  ],
+
   properties: [
     {
       class: 'Int',
       name: 'port',
       javaFactory: `
         String portStr = System.getProperty("http.port");
-        return Integer.parseInt(portStr) + 2;
+        return Integer.parseInt(portStr) + PORT_OFFSET;
       `
     },
     {
       class: 'String',
       name: 'threadPoolName',
       value: 'threadPool'
+    },
+    {
+      documentation: 'So not to block server shutdown, have sockets timeout. Catch and continue on SocketTimeoutException.',
+      class: 'Int',
+      name: 'soTimeout',
+      value: 60000
     },
     {
       name: 'logger',
@@ -56,7 +70,7 @@ foam.CLASS({
       name: 'start',
       javaCode: `
         try {
-          getLogger().info("Starting TCP Server on port", getPort());
+          getLogger().info("Starting,port", getPort());
           ServerSocket serverSocket = new ServerSocket(getPort());
 
           Agency agency = (Agency) getX().get(getThreadPoolName());
@@ -68,10 +82,11 @@ foam.CLASS({
                 try {
                   while ( true ) {
                     Socket client = serverSocket.accept();
+                    client.setSoTimeout(getSoTimeout());
                     agency.submit(
                       x,
                       new SocketServerProcessor(getX(), client),
-                      "socket, processor"
+                      "SocketServerProcessor-"+client.getRemoteSocketAddress()
                     );
                   }
                 } catch ( IOException ioe ) {
@@ -79,12 +94,16 @@ foam.CLASS({
                 }
               }
             },
-            "Accepting Socket Connection"
+            "SocketServer.accept-"+getPort()
           );
+
+        } catch (java.net.BindException e) {
+          getLogger().error(e.getMessage(), e);
+          System.exit(1);
         } catch ( Exception e ) {
           getLogger().error(e);
         }
       `
     }
   ]
-})
+});

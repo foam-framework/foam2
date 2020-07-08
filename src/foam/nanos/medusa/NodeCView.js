@@ -17,7 +17,6 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.core.Duration',
     'foam.graphics.Arc',
     'foam.graphics.Circle',
     'foam.graphics.Label',
@@ -102,7 +101,7 @@ foam.CLASS({
     {
       name: 'refresh',
       code: async function(self = this) {
-        // console.log('NodeCView.refresh');
+        console.log('NodeCView.refresh '+self.children.length);
         if ( self.config ) {
           self.config = await self.dao.find(self.config.id);
           self.updateStatus();
@@ -111,6 +110,7 @@ foam.CLASS({
             let child = self.children[i];
             child.refresh && child.refresh(child);
           }
+          self.invalidate();
         }
       }
     },

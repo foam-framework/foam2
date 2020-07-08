@@ -4,7 +4,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-package foam.box.network;
+package foam.nanos.network;
 
 import foam.core.X;
 import foam.core.FObject;
@@ -22,7 +22,6 @@ import java.nio.charset.StandardCharsets;
 public class SocketWebAgent
   extends ServiceWebAgent
 {
-
   public SocketWebAgent(Box skeleton, boolean authenticate) {
     super(skeleton, authenticate);
   }
@@ -31,12 +30,9 @@ public class SocketWebAgent
   public void execute(X x) {
     try {
       Message msg = (Message) x.get("requestMessage");
-      //TODO: set long-term session before using SessionServerBox.
-      // new SessionServerBox(x, skeleton_, authenticate_).send(msg);
-      skeleton_.send(msg);
-    } catch ( Exception e ) {
-      Logger logger = (Logger) x.get("logger");
-      if ( logger != null ) logger.error(e);
+      new SessionServerBox(x, skeleton_, authenticate_).send(msg);
+    } catch ( Throwable t ) {
+      throw new RuntimeException(t.getMessage());
     }
   }
 }

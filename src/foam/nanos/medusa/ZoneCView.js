@@ -96,13 +96,14 @@ foam.CLASS({
     {
       name: 'refresh',
       code: async function(self) {
-        // console.log('ZoneCView.refresh');
+        console.log('ZoneCView.refresh '+self.children.length);
         if ( self.config ) {
           self.config = await self.dao.find(self.config.id);
           for ( var i = 0; i < self.children.length; i++ ) {
             let child = self.children[i];
             child.refresh && child.refresh(child);
           }
+          self.invalidate();
         }
       }
     },

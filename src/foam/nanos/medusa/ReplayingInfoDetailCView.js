@@ -52,51 +52,62 @@ foam.CLASS({
       this.add(label);
 
       label = this.makeLabel();
-      label.text$ = this.config.replayingInfo.uptime$.map(function(u) { return 'Uptime: '+u; });
+      label.text$ = this.config$.map(function(c) {
+        let delta = new Date().getTime() - c.replayingInfo.startTime.getTime();
+        let duration = foam.core.Duration.duration(delta);
+        return 'Uptime: '+duration;
+      });
       this.add(label);
 
       label = this.makeLabel();
-      label.text$ = this.config.replayingInfo.index$.map(function(u) { return 'Index: '+u; });
+      label.text$ = this.config$.map(function(c) { return 'Index: '+c.replayingInfo.index; });
       this.add(label);
 
       label = this.makeLabel();
-      label.text$ = this.config.replayingInfo.replayIndex$.map(function(u) { return 'Replay: '+u; });
+      label.text$ = this.config$.map(function(c) { return 'Replay: '+c.replayingInfo.replayIndex; });
       this.add(label);
 
       label = this.makeLabel();
-      label.text$ = this.config.replayingInfo.timeElapsed$.map(function(u) { return 'Elapsed: '+u; });
+      label.text$ = this.config$.map(function(c) {
+        let end = c.replayingInfo.endTime || new Date();
+        let delta = end.getTime() - c.replayingInfo.startTime.getTime();
+//        let duration = foam.core.Duration.create({value: delta}).formatted();
+        let duration = foam.core.Duration.duration(delta);
+        return 'Elapsed: '+duration;
+      });
       this.add(label);
 
       label = this.makeLabel();
-      label.text$ = this.config.replayingInfo.percentComplete$.map(function(u) { return '%: '+(u * 100).toFixedTo(2); });
+      label.text$ = this.config$.map(function(c) { let f = (c.replayingInfo.percentComplete * 100).toFixed(2); return '%: '+f; });
       this.add(label);
 
       label = this.makeLabel();
-      label.text$ = this.config.replayingInfo.timeRemaining$.map(function(u) { return 'Remaining: '+u; });
+      label.text$ = this.config$.map(function(c) { return 'Remaining: '+c.replayingInfo.timeRemaining; });
       this.add(label);
 
       label = this.makeLabel();
-      label.text$ = this.config.replayingInfo.replayTps$.map(function(u) { return 'Replay TPS: '+u; });
+      label.text$ = this.config$.map(function(c) { return 'Replay TPS: '+c.replayingInfo.replayTps; });
       this.add(label);
 
       label = this.makeLabel();
-      label.text$ = this.config.replayingInfo.tps$.map(function(u) { return 'TPS: '+u; });
+      label.text$ = this.config$.map(function(c) { return 'TPS: '+c.replayingInfo.tps; });
       this.add(label);
 
       label = this.makeLabel();
-      label.text$ = this.config.errorMessage$.map(function(u) { return 'Last Error: '+u; });
+      label.text$ = this.config$.map(function(c) { return 'Last Error: '+c.errorMessage; });
       this.add(label);
     },
     {
       name: 'refresh',
       code: async function(self = this) {
-        // console.log('ReplayingInfoDetailCView.refresh');
+        console.log('ReplayingInfoDetailCView.refresh '+self.children.length);
         if ( self.config ) {
           self.config = await self.dao.find(self.config.id);
           for ( var i = 0; i < self.children.length; i++ ) {
             let child = self.children[i];
             child.refresh && child.refresh(child);
           }
+          self.invalidate();
         }
       }
     },

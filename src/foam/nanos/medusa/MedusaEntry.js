@@ -29,6 +29,7 @@ foam.CLASS({
     'index2',
     'consensusCount',
     'promoted',
+    'consensusNodes',
     'lastModified'
   ],
 
@@ -107,6 +108,15 @@ foam.CLASS({
       name: 'consensusCount',
       class: 'Int',
       visibility: 'RO',
+      storageTransient: true,
+      tableWidth: 150
+    },
+    {
+      name: 'consensusNodes',
+      class: 'List',
+      visibility: 'RO',
+      factory: function() { return []; },
+      javaFactory: 'return new java.util.ArrayList();',
       storageTransient: true,
       tableWidth: 150
     },

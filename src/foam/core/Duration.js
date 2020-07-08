@@ -8,18 +8,11 @@ foam.CLASS({
     to make values human-readable when displayed in tables.
   `,
 
-  properties: [
+  static: [
     {
-      name: 'units',
-      value: 'ms'
-    }
-  ],
-
-  methods: [
-    {
-      name: 'formatted',
-      code: function() {
-        var value = this.value;
+      name: 'duration',
+      code: function(value) {
+//        var value = this.value;
         value = Math.round(value);
         var days = Math.floor(value / 86400000);
         value -= days * 86400000;

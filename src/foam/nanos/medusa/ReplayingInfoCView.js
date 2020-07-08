@@ -74,7 +74,7 @@ foam.CLASS({
     {
       name: 'refresh',
       code: async function(self = this) {
-        // console.log('ReplayingInfoCView.refresh');
+        console.log('ReplayingInfoCView.refresh '+self.children.length);
         if ( self.config ) {
           self.config = await self.dao.find(self.config.id);
           self.updateReplaying();
@@ -82,6 +82,7 @@ foam.CLASS({
             let child = self.children[i];
             child.refresh && child.refresh(child);
           }
+          self.invalidate();
         }
       }
     },
@@ -122,7 +123,7 @@ foam.CLASS({
             globalAlpha: 1
           });
 
-          this.add(r);
+          this.canvas.add(r);
         }
       }
     },

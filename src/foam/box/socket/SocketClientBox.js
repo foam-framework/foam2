@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.box.network',
+  package: 'foam.box.socket',
   name: 'SocketClientBox',
 
   implements: [
@@ -13,6 +13,7 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'java.util.concurrent.atomic.AtomicLong',
   ],
 
   properties: [
@@ -33,13 +34,11 @@ foam.CLASS({
   methods: [
     {
       name: 'send',
-      synchronized: true,
       javaCode: `
         msg.getAttributes().put("serviceKey", getServiceName());
-        ConnectionBox conBox = ((TCPSocketMgr) getX().get("SocketMgr")).get(getX(), getHost(), getPort());
-        conBox.send(msg);
+        foam.box.Box box = ((SocketConnectionBoxManager) getX().get("socketConnectionBoxManager")).get(getX(), getHost(), getPort());
+        box.send(msg);
       `
     }
   ]
-
-})
+});
