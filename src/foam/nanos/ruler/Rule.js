@@ -15,7 +15,8 @@
     'foam.nanos.auth.CreatedByAware',
     'foam.nanos.auth.LastModifiedAware',
     'foam.nanos.auth.LastModifiedByAware',
-    'foam.nanos.approval.ApprovableAware'
+    'foam.nanos.approval.ApprovableAware',
+    'foam.nanos.auth.ServiceProviderAware'
   ],
 
   imports: [
@@ -291,6 +292,13 @@
     {
       name: 'checkerPredicate',
       javaFactory: 'return foam.mlang.MLang.FALSE;'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.ServiceProvider',
+      name: 'spid',
+      value: foam.nanos.auth.ServiceProviderAware.GLOBAL_SPID,
+      documentation: 'Service Provider Id of the rule. Default to "_GLOBAL_" for rule applicable to all service providers.'
     }
   ],
 
@@ -313,11 +321,10 @@
         }
       ],
       javaCode: `
+        if ( ! getEnabled() ) return false;
+
         try {
-          return getEnabled()
-            && getPredicate().f(
-              x.put("NEW", obj).put("OLD", oldObj)
-            );
+          return getPredicate().f(x.put("NEW", obj).put("OLD", oldObj));
         } catch ( Throwable t ) {
           try {
             return getPredicate().f(obj);
