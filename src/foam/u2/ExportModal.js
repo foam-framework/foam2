@@ -209,12 +209,7 @@ foam.CLASS({
         var p = this.exportData ?
           this.exportDriver.exportDAO(this.__context__, this.exportData) :
           Promise.resolve(this.exportDriver.exportFObject(this.__context__, this.exportObj));
-<<<<<<< HEAD
-
         var exportDataResult;
-=======
-  
->>>>>>> f955a39eeade335e38ee50d6722b8a182de6bfd7
         p.then(result => {
           var link = document.createElement('a');
           var href = '';
