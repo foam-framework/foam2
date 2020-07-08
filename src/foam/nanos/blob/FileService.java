@@ -14,6 +14,7 @@ import foam.dao.DAO;
 import foam.nanos.auth.AuthService;
 import foam.nanos.auth.User;
 import foam.nanos.fs.File;
+import foam.util.SafetyUtil;
 import org.apache.commons.io.IOUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -61,8 +62,12 @@ public class FileService
 
       // get blob and blob size
       // TODO: figure out why delegate is not being set for IdentifiedBlob
-      String blobId = ((IdentifiedBlob) file.getData()).getId();
-      blob = getDelegate().find_(x, blobId);
+      if ( SafetyUtil.isEmpty(file.getDataString()) ) {
+        String blobId = ((IdentifiedBlob) file.getData()).getId();
+        blob = getDelegate().find_(x, blobId);
+      } else {
+        blob = file.getData();
+      }
       long size = blob.getSize();
 
       // set response status, content type, content length

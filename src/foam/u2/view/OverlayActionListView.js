@@ -87,7 +87,9 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'overlayInitialized_'
-    }
+    },
+    'objId',
+    'dao'
   ],
 
   css: `
@@ -125,9 +127,10 @@ foam.CLASS({
   `,
 
   methods: [
-    function initE() {
+    async function initE() {
       var self = this;
-
+      if ( ! this.obj ) 
+        this.obj = await this.dao.find(this.objId);
       this.onDetach(this.active_$.follow(this.overlay_.opened$));
       this.onDetach(this.disabled_$.follow(this.ExpressionSlot.create({
         args: this.data.map((action) => action.createIsAvailable$(this.__context__, this.obj)),
@@ -157,23 +160,30 @@ foam.CLASS({
 
     function initializeOverlay() {
       var self = this;
-      this.overlay_.forEach(this.data, function(action) {
-        this.
-          start().
-            show(action.createIsAvailable$(self.__context__, self.obj)).
-            addClass(self.myClass('action')).
-            add(action.label).
-            on('click', function(evt) {
-              self.overlay_.close();
-              action.maybeCall(self.__subContext__, self.obj);
-            }).
-            attrs({
-              disabled: action.createIsEnabled$(self.__context__, self.obj).map(function(e) {
-                return e ? false : 'disabled';
-              })
-            }).
-          end();
+
+      this.dao.find(this.objId).then(function(val) {
+        self.obj = val;
       });
+
+      this.overlay_.add(this.slot(function() {
+        return this.E().forEach(this.data, function(action) {
+          this.
+            start().
+              show(action.createIsAvailable$(self.__context__, self.obj)).
+              addClass(self.myClass('action')).
+              add(action.label).
+              on('click', function(evt) {
+                self.overlay_.close();
+                action.maybeCall(self.__subContext__, self.obj);
+              }).
+              attrs({
+                disabled: action.createIsEnabled$(self.__context__, self.obj).map(function(e) {
+                  return e ? false : 'disabled';
+                })
+              }).
+            end();
+        });
+      }));
 
       // Add the overlay to the controller so if the table is inside a container
       // with `overflow: hidden` then this overlay won't be cut off.

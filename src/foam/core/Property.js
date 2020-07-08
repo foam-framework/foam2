@@ -293,6 +293,7 @@ foam.CLASS({
       name: 'sortable',
       value: true
     },
+    'valueToString'
   ],
 
   methods: [
