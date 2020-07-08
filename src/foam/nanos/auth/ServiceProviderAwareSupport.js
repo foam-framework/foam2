@@ -34,6 +34,7 @@ Use: see ServiceProviderAwareTest
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
     'foam.nanos.logger.Logger',
+    'foam.util.SafetyUtil',
 
     'java.lang.reflect.Method',
     'java.util.HashMap',
@@ -53,13 +54,17 @@ Use: see ServiceProviderAwareTest
       class: 'Map',
       visibility: 'HIDDEN',
       javaFactory: 'return new HashMap();'
+    },
+    {
+      class: 'String',
+      name: 'spid'
     }
   ],
 
   methods: [
     {
       documentation: `Using Relationship findFoo(x), traverse relationships,
-returning true if the context users spid matches the current object.`,
+returning true if the spid or context users spid matches the current object.`,
       name: 'match',
       args: [
         {
@@ -77,16 +82,20 @@ returning true if the context users spid matches the current object.`,
       ],
       type: 'Boolean',
       javaCode: `
-      User user = ((Subject) x.get("subject")).getUser();
-      if ( user == null ) {
-        // TODO/REVIEW: occurs during login. See AuthenticationApiTest
-        return true;
+      var spid = getSpid();
+      if ( SafetyUtil.isEmpty(spid) ) {
+        var user = ((Subject) x.get("subject")).getUser();
+        if ( user == null ) {
+          // TODO/REVIEW: occurs during login. See AuthenticationApiTest
+          return true;
+        }
+        spid = user.getSpid();
       }
 
       if ( obj != null &&
            obj instanceof ServiceProviderAware ) {
         ServiceProviderAware sp = (ServiceProviderAware) obj;
-        return user.getSpid().equals(sp.getSpid()) ||
+        return spid.equals(sp.getSpid()) ||
           ((AuthService) x.get("auth")).check(x, "spid.read." + sp.getSpid());
       }
 
@@ -108,7 +117,7 @@ returning true if the context users spid matches the current object.`,
             if ( result != null &&
                  result instanceof ServiceProviderAware ) {
               ServiceProviderAware sp = (ServiceProviderAware) result;
-              if ( user.getSpid().equals(sp.getSpid()) ||
+              if ( spid.equals(sp.getSpid()) ||
                   ((AuthService) x.get("auth")).check(x, "spid.read." + sp.getSpid()) ) {
                 return true;
               }
