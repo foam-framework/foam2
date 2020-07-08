@@ -31,8 +31,6 @@ foam.CLASS({
                 if ( obj instanceof DIG) {
                     var dig = (DIG) obj;
                     dig.setOwner(((Subject)x.get("subject")).getRealUser().getId());
-                } else {
-                    return;
                 }
             }
           }, "DIG owner");
