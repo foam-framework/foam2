@@ -29,8 +29,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'FObjectProperty',
-      of: 'foam.dao.DAO',
+      class: 'foam.dao.DAOProperty',
       name: 'historyDAO'
     }
   ],
@@ -58,7 +57,7 @@ foam.CLASS({
   methods: [
     {
       name: 'formatUserName',
-      visibility: 'private',
+      visibility: 'protected',
       type: 'String',
       args: [
         { type: 'User', name: 'user ' }
@@ -73,7 +72,7 @@ foam.CLASS({
     },
     {
       name: 'getUpdatedProperties',
-      visibility: 'private',
+      visibility: 'protected',
       type: 'PropertyUpdate[]',
       args: [
         { type: 'FObject', name: 'currentValue' },

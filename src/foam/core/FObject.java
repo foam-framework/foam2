@@ -10,7 +10,6 @@ import foam.crypto.hash.Hashable;
 import foam.crypto.sign.Signable;
 import foam.lib.json.Outputter;
 import foam.util.SecurityUtil;
-
 import java.security.*;
 import java.util.HashMap;
 import java.util.List;

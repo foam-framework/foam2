@@ -558,6 +558,7 @@ FOAM_FILES([
   { name: "foam/u2/stack/StackView", flags: ['web'] },
   { name: "foam/u2/crunch/Style", flags: ['web'] },
   { name: "foam/u2/crunch/CrunchController", flags: ['web'] },
+  { name: "foam/u2/crunch/CapabilityRequirementView", flags: ['web'] },
   { name: "foam/u2/crunch/CapabilityCardView", flags: ['web'] },
   { name: "foam/u2/crunch/CapabilityFeatureView", flags: ['web'] },
   { name: "foam/u2/crunch/CapabilityStore", flags: ['web'] },
@@ -813,4 +814,10 @@ FOAM_FILES([
   { name: "foam/foamlink/FoamlinkExec" },
   { name: "foam/foamlink/lib" },
   { name: "foam/util/filesystem/FileWalker" },
+
+  //Column config
+  { name: "foam/nanos/column/ColumnConfigPropertyValue" },
+  { name: "foam/nanos/column/CSVTableOutputter"},
+  { name: "foam/nanos/column/NestedPropertiesExpression" },
+  { name: "foam/nanos/column/TableColumnOutputter" }
 ]);
