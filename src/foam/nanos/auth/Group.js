@@ -133,8 +133,8 @@ foam.CLASS({
     */
     {
       class: 'Boolean',
-      name: 'flag',
-      documentation: 'flag to filter sme specific groups'
+      name: 'template',
+      documentation: 'Used to specify that the group is used as a reference for the creation of other groups.'
     },
     {
       class: 'String',
@@ -352,6 +352,16 @@ foam.CLASS({
 
         return ancestor;
       `
+    },
+    {
+      name: 'toSummary',
+      documentation: `When using a reference to the roleDAO, the labels associated
+        to it will show a chosen property rather than the first alphabetical string
+        property. In this case, we are using the name.
+      `,
+      code: function(x) {
+        return this.name || this.id;
+      }
     }
   ]
 });
