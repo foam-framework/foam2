@@ -52,8 +52,6 @@ foam.CLASS({
           }
         }
 
-        System.out.println(String.format("prereqs len %d", myPrerequisites.size()));
-
         // Get prerequisite UCJs
         List<UserCapabilityJunction> myPrerequisiteUCJs = null;
         {
