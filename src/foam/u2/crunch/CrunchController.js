@@ -266,48 +266,47 @@ foam.CLASS({
         })).end();
     },
     function save(wizardlet) {
-      var self = wizardlet;
-      var isAssociationCapability = foam.nanos.crunch.AssociationCapability.isInstance(self.capability);
-      var associatedEntity = isAssociationCapability ? self.subject.realUser : 
-        self.capability.associatedEntity === 'user' ? self.subject.user : self.subject.realUser;
+      var isAssociationCapability = foam.nanos.crunch.AssociationCapability.isInstance(wizardlet.capability);
+      var associatedEntity = isAssociationCapability ? this.subject.realUser : 
+      wizardlet.capability.associatedEntity === 'user' ? this.subject.user : this.subject.realUser;
 
-      return this.updateUCJ(self, associatedEntity).then(() => {
-        var ucj = self.ucj;
+      return this.updateUCJ(wizardlet, associatedEntity).then(() => {
+        var ucj = wizardlet.ucj;
         if ( ucj === null ) {
           ucj = isAssociationCapability ? 
-          self.AgentCapabilityJunction.create({
+          this.AgentCapabilityJunction.create({
               sourceId: associatedEntity.id,
-              targetId: self.capability.id,
-              effectiveUser: self.subject.user.id
+              targetId: wizardlet.capability.id,
+              effectiveUser: this.subject.user.id
             })
-            : self.UserCapabilityJunction.create({
+            : this.UserCapabilityJunction.create({
               sourceId: associatedEntity.id,
-              targetId: self.capability.id
+              targetId: wizardlet.capability.id
             })
         }
-        if ( self.of ) ucj.data = self.data;
-        return self.userCapabilityJunctionDAO.put(ucj);
+        if ( wizardlet.of ) ucj.data = wizardlet.data;
+        return this.userCapabilityJunctionDAO.put(ucj);
       });
     }, 
-    async function updateUCJ(self, associatedEntity) {
-      return self.userCapabilityJunctionDAO.find(
-        self.AND(
-          self.OR(
-            self.AND(
-              self.NOT(self.INSTANCE_OF(self.AgentCapabilityJunction)),
-              self.EQ(self.UserCapabilityJunction.SOURCE_ID, associatedEntity.id)
+    async function updateUCJ(wizardlet, associatedEntity) {
+      return this.userCapabilityJunctionDAO.find(
+        this.AND(
+          this.OR(
+            this.AND(
+              this.NOT(this.INSTANCE_OF(this.AgentCapabilityJunction)),
+              this.EQ(this.UserCapabilityJunction.SOURCE_ID, associatedEntity.id)
             ),
-            self.AND(
-              self.INSTANCE_OF(self.AgentCapabilityJunction),
-              self.EQ(self.UserCapabilityJunction.SOURCE_ID, associatedEntity.id),
-              self.EQ(self.AgentCapabilityJunction.EFFECTIVE_USER, self.subject.user.id)
+            this.AND(
+              this.INSTANCE_OF(this.AgentCapabilityJunction),
+              this.EQ(this.UserCapabilityJunction.SOURCE_ID, associatedEntity.id),
+              this.EQ(this.AgentCapabilityJunction.EFFECTIVE_USER, this.subject.user.id)
             )
           ),
-          self.EQ(self.UserCapabilityJunction.TARGET_ID, self.capability.id)
+          this.EQ(this.UserCapabilityJunction.TARGET_ID, wizardlet.capability.id)
         )
       ).then(ucj => {
-        self.ucj = ucj;
-        return self;
+        wizardlet.ucj = ucj;
+        return wizardlet;
       });
     }
   ]

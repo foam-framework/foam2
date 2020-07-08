@@ -8,23 +8,15 @@ foam.CLASS({
   name: 'CapabilityWizardlet',
   extends: 'foam.u2.wizard.BaseWizardlet',
 
-  implements: [
-    'foam.mlang.Expressions'
-  ],
-
   imports: [
-    'crunchController',
-    'subject',
-    'userCapabilityJunctionDAO'
+    'crunchController'
   ],
 
   requires: [
     'foam.core.Action',
     'foam.core.Property',
     'foam.layout.Section',
-    'foam.layout.SectionAxiom',
-    'foam.nanos.crunch.AgentCapabilityJunction',
-    'foam.nanos.crunch.UserCapabilityJunction'
+    'foam.layout.SectionAxiom'
   ],
 
   properties: [
