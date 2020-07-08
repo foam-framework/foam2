@@ -75,7 +75,7 @@ foam.CLASS({
       margin: auto;
     }
     ^ .foam-u2-tag-Select {
-      width: 125px;
+      width: 190px;
       height: 40px;
       border-radius: 0;
       margin-left: 25px;
@@ -125,13 +125,13 @@ foam.CLASS({
           self.exportDriver = foam.lookup(self.exportDriverReg.driverName).create();
         });
       });
-      
+
       self.exportDriverReg$.sub(function() {
         self.isConvertAvailable =  self.exportDriverReg.isConvertible;
         self.isDownloadAvailable = self.exportDriverReg.isDownloadable;
         self.isOpenAvailable = self.exportDriverReg.isOpenable;
       });
-      
+
 
       this
       .tag(this.ModalHeader.create({
@@ -167,19 +167,19 @@ foam.CLASS({
   actions: [
     {
       name: 'convert',
-      isAvailable: function(isConvertAvailable) { 
-        return isConvertAvailable; 
+      isAvailable: function(isConvertAvailable) {
+        return isConvertAvailable;
       },
       code: async function() {
         if ( ! this.exportData && ! this.exportObj ) {
           console.log('Neither exportData nor exportObj exist');
           return;
         }
-  
+
         var filteredColumnsCopy = this.filteredTableColumns;
         if ( this.exportAllColumns )
           this.filteredTableColumns = null;
-    
+
         try {
           this.note = this.exportData ?
             await this.exportDriver.exportDAO(this.__context__, this.exportData) :
@@ -192,8 +192,8 @@ foam.CLASS({
     },
     {
       name: 'download',
-      isAvailable: function(isDownloadAvailable) { 
-        return isDownloadAvailable; 
+      isAvailable: function(isDownloadAvailable) {
+        return isDownloadAvailable;
       },
       code: async function download() {
         var self = this;
@@ -201,15 +201,20 @@ foam.CLASS({
           console.log('Neither exportData nor exportObj exist');
           return;
         }
-  
+
         var filteredColumnsCopy = this.filteredTableColumns;
         if ( this.exportAllColumns )
           this.filteredTableColumns = null;
-    
+
         var p = this.exportData ?
           this.exportDriver.exportDAO(this.__context__, this.exportData) :
           Promise.resolve(this.exportDriver.exportFObject(this.__context__, this.exportObj));
+<<<<<<< HEAD
+
+        var exportDataResult;
+=======
   
+>>>>>>> f955a39eeade335e38ee50d6722b8a182de6bfd7
         p.then(result => {
           var link = document.createElement('a');
           var href = '';
@@ -219,7 +224,7 @@ foam.CLASS({
           } else {
             href = result;
           }
-          
+
           if ( href.length > 524288 ) {
             self.note = result;
             alert('Results exceed maximum download size.\nPlease cut and paste response data.');
@@ -237,15 +242,15 @@ foam.CLASS({
     },
     {
       name: 'open',
-      isAvailable: function(isOpenAvailable) { 
-        return isOpenAvailable; 
+      isAvailable: function(isOpenAvailable) {
+        return isOpenAvailable;
       },
       code: async function() {
-        
+
         var filteredColumnsCopy = this.filteredTableColumns;
         if ( this.exportAllColumns )
           this.filteredTableColumns = null;
-          
+
         var url;
         try {
           url = this.exportData ?
