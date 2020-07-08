@@ -29,19 +29,47 @@ foam.CLASS({
     {
       name: 'getPlan',
       code: function getPlan() {
-        var plan = this.PredeterminedGridPlacementPlan.create({
-          shape: [0, 0]
-        });
+        var columns = [];
+        var intermediatePlan = [];
+
+        let addCol = index => {
+          var col = { position: index };
+          if ( index >= columns.length ) {
+            columns.push(col)
+            return col;
+          }
+          columns.splice(index, 0, col);
+          for ( let i = index + 1 ; i < columns.length ; i++ ) {
+            col.position++;
+          }
+          return col;
+        }
 
         let add;
-        add = obj => {
+        add = (obj, row, col) => {
           // plan.addAssociation(obj, [0, 0]);
+          intermediatePlan.push({
+            row: { position: row },
+            col: addCol(col),
+            obj: obj,
+          });
           return obj[this.relationshipPropertyName].dao
-            .select().then(r => {
-              // TODO: write the hard part
-            })
+            .select().then(r => Promise.all(r.array.map((o, i) =>
+              add(o, row + 1, col + i))));
         };
-        return add(this.rootObject);
+        return add(this.rootObject, 0, 0).then(() => {
+          var plan = this.PredeterminedGridPlacementPlan.create({
+            shape: [0, 0]
+          });
+
+          intermediatePlan.forEach(entry => {
+            plan.addAssociation_(entry.obj.id, [
+              entry.row.position, entry.col.position,
+            ])
+          });
+
+          return plan;
+        });
       }
     }
   ],
