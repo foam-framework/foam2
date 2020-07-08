@@ -16,14 +16,20 @@ foam.CLASS({
     }
   ],
 
+  properties: [
+    {
+      class: 'Double',
+      name: 'errorRate',
+      value: 0.5
+    }
+  ],
+
   axioms: [
     {
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(
           `
-            private double errorRate_ = 0.5;
-
             public UnreliableDAO(DAO delegate) {
               super();
               setDelegate(delegate);
@@ -34,7 +40,7 @@ foam.CLASS({
           
             public UnreliableDAO(double errorRate, DAO delegate) {
               this(delegate);
-              errorRate_ = errorRate;
+              setErrorRate(errorRate);
             }
           
             public UnreliableDAO(foam.core.X x, double errorRate, DAO delegate) {
@@ -51,7 +57,7 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-        if ( Math.random() < errorRate_ ) {
+        if ( Math.random() < getErrorRate() ) {
           throw new RuntimeException(CANNOT_PERFORM_ERROR_MSG);
         }
     
@@ -61,7 +67,7 @@ foam.CLASS({
     {
       name: 'remove_',
       javaCode: `
-        if ( Math.random() < errorRate_ ) {
+        if ( Math.random() < getErrorRate() ) {
           throw new RuntimeException(CANNOT_PERFORM_ERROR_MSG);
         }
     
@@ -71,7 +77,7 @@ foam.CLASS({
     {
       name: 'select_',
       javaCode: `
-        if ( Math.random() < errorRate_ ) {
+        if ( Math.random() < getErrorRate() ) {
           throw new RuntimeException(CANNOT_PERFORM_ERROR_MSG);
         }
     
@@ -81,7 +87,7 @@ foam.CLASS({
     {
       name: 'removeAll_',
       javaCode: `
-        if ( Math.random() < errorRate_ ) {
+        if ( Math.random() < getErrorRate() ) {
           throw new RuntimeException(CANNOT_PERFORM_ERROR_MSG);
         }
     
