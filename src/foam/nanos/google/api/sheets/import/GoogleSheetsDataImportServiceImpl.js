@@ -28,7 +28,13 @@
 
     'static foam.mlang.MLang.AND',
     'static foam.mlang.MLang.CONTAINS_IC',
-    'static foam.mlang.MLang.EQ'
+    'static foam.mlang.MLang.EQ',
+    'java.text.SimpleDateFormat',
+    'java.time.LocalDateTime',
+    'java.time.format.DateTimeFormatter',
+    'java.util.Date',
+    'java.text.ParseException',
+    'java.util.Locale'
   ],
   axioms: [
     {
@@ -223,7 +229,8 @@
       'InstantiationException',
       'IllegalAccessException',
       'NoSuchMethodException',
-      'java.lang.reflect.InvocationTargetException'
+      'java.lang.reflect.InvocationTargetException',
+      'java.text.ParseException'
     ],
     args: [
       {
@@ -286,7 +293,7 @@
     javaThrows: [
       'NoSuchMethodException',
       'java.lang.reflect.InvocationTargetException',
-      'IllegalAccessException'
+      'IllegalAccessException',
     ],
     args: [
       {
@@ -332,7 +339,15 @@
           if ( prop instanceof AbstractEnumPropertyInfo)
             prop.set(obj, ((AbstractEnumPropertyInfo)prop).getValueClass().getMethod("forLabel", String.class).invoke(null, valueString));
           else if ( prop.getValueClass().getName().equals("java.util.Date") ) {
-            prop.set(obj, new java.util.Date(valueString));
+            try {
+              prop.set(obj, new SimpleDateFormat("EEE MMM d yyyy HH/mm/ss zZ (zzzz)", Locale.US).parse(valueString));
+            } catch (ParseException e) {
+              prop.set(obj, new java.util.Date(valueString));
+            }
+          }
+          else if ( prop.getValueClass().getName().equals("java.util.DateTime") ) {
+            DateTimeFormatter f = DateTimeFormatter.ofPattern("EEE MMM d yyyy HH/mm/ss zZ (zzzz)", Locale.US);
+            LocalDateTime temp = LocalDateTime.parse(valueString, f);
           }
           else
             prop.set(obj, val);
