@@ -42,6 +42,12 @@ foam.CLASS({
       displayWidth: 40
     },
     {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'owner',
+      hidden: true
+    },
+    {
       class: 'String',
       name: 'serviceKey',
       label: 'Service',

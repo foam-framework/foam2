@@ -755,6 +755,16 @@ p({
       .setOf(foam.nanos.dig.SUGAR.getOwnClassInfo())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName(\"sugars\")
+      .setRuler(true)
+      .setServiceProviderAware(true)
+      .setServiceProviderAwarePropertyInfos(
+        foam.util.Arrays.asMap(new Object[]
+          {
+            foam.nanos.dig.SUGAR.class.getName(),
+            new foam.core.PropertyInfo[] { foam.nanos.dig.SUGAR.OWNER }
+          }
+        )
+      )
       .build();
   """,
   "client":"{\"of\":\"foam.nanos.dig.SUGAR\"}"

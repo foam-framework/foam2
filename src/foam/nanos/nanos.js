@@ -272,6 +272,7 @@ FOAM_FILES([
   { name: 'foam/nanos/dig/DigSnippetView' },
   { name: 'foam/nanos/dig/LinkView' },
   { name: 'foam/nanos/dig/SUGAR' },
+  { name: 'foam/nanos/dig/SUGAROwnerRuleAction' },
 
   { name: 'foam/nanos/notification/email/ClientPOP3EmailService'},
   { name: 'foam/nanos/notification/email/POP3Email'},
