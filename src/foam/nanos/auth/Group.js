@@ -14,7 +14,7 @@ foam.CLASS({
     'foam.nanos.auth.EnabledAware'
   ],
 
-  requires: [ 
+  requires: [
     'foam.nanos.app.AppConfig',
     'foam.nanos.auth.PasswordPolicy'
   ],
@@ -121,6 +121,19 @@ foam.CLASS({
       view: {
         class: 'foam.u2.view.FObjectPropertyView',
         readView: { class: 'foam.u2.detail.VerticalDetailView' }
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'template',
+      documentation: 'Used to specify that the group is used as a reference for the creation of other groups.'
+    },
+    {
+      class: 'String',
+      name: 'label',
+      documentation: 'Display name of the Group, if required.',
+      factory: function() {
+        return this.id;
       }
     }
     /*
