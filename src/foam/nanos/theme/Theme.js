@@ -120,7 +120,7 @@ foam.CLASS({
       },
     },
     {
-      name: 'acceptanceDocumentsCapability',
+      name: 'userRegistrationCapability',
       class: 'Reference',
       of: 'foam.nanos.crunch.Capability'
     },

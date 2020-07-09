@@ -32,10 +32,7 @@ foam.CLASS({
     { name: 'FOOTER_TXT', message: 'Already have an account?' },
     { name: 'FOOTER_LINK', message: 'Sign in' },
     { name: 'ERROR_MSG', message: 'There was a problem creating your account.' },
-    { name: 'SELECTION_TEXT', message: 'Select your country' },
-    { name: 'SELECTION', message: 'Please select...' },
-    { name: 'VALIDATION_ERR_TEXT', message: 'Please enter job title'},
-    { name: 'DISCLAIMER', message: '*Ablii does not currently support businesses in Quebec. We are working hard to change this! If you are based in Quebec, check back for updates.' }
+    { name: 'VALIDATION_ERR_TEXT', message: 'Please enter username' }
   ],
 
   properties: [
@@ -96,18 +93,17 @@ foam.CLASS({
               foam.nanos.u2.navigation.SignUp.USER_NAME,
               /^[^\s\/]+$/);
           },
-          errorString: 'Please enter username'
+          errorMessage: 'VALIDATION_ERR_TEXT'
         }
       ],
-      required: true,
-      hidden: false
+      required: true
     },
     {
       class: 'Password',
       name: 'desiredPassword',
       label: 'Password',
       view: {
-        class: 'net.nanopay.ui.NewPasswordView',
+        class: 'foam.u2.view.PasswordView',
         passwordIcon: true
       },
       minLength: 6
@@ -154,7 +150,7 @@ foam.CLASS({
   actions: [
     {
       name: 'login',
-      label: 'Create account',
+      label: 'Get Started',
       isEnabled: function(errors_, isLoading_) {
         return ! errors_ && ! isLoading_;
       },
@@ -168,7 +164,6 @@ foam.CLASS({
             email: this.email,
             desiredPassword: this.desiredPassword,
             signUpToken: this.token_,
-            welcomeEmailSent: true,
             group: this.group_
           }))
           .then((user) => {
