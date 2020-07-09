@@ -352,16 +352,6 @@ foam.CLASS({
 
         return ancestor;
       `
-    },
-    {
-      name: 'toSummary',
-      documentation: `When using a reference to the roleDAO, the labels associated
-        to it will show a chosen property rather than the first alphabetical string
-        property. In this case, we are using the name.
-      `,
-      code: function(x) {
-        return this.name || this.id;
-      }
     }
   ]
 });
