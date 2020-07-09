@@ -79,9 +79,9 @@
 
         await X[this.importServiceName].importData(X, this.importConfig).then(r => {
           var message = this.NotificationMessage.create();
-          if ( r ) message.message = 'success!';
+          if ( r.success ) message.message = `Number of records inserted: ${r.result}`;
           else {
-            message.message = 'failure!';
+            message.message = 'Something went wrong!';
             message.type = 'error';
           }
           this.ctrl.add(message);
