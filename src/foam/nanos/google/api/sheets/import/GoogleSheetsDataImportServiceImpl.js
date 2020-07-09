@@ -188,7 +188,7 @@
           }
           int recordsAdded = addRecordsToDAO(x, importConfig.getDAO(), parsedObjs);
 
-          if ( recordsAdded != -1 ) {
+          if ( recordsAdded == -1 ) {
             result.setResult(0);
             result.setSuccess(false);
           } else
@@ -311,6 +311,7 @@
       'NoSuchMethodException',
       'java.lang.reflect.InvocationTargetException',
       'IllegalAccessException',
+      'ParseException'
     ],
     args: [
       {
@@ -356,11 +357,11 @@
           if ( prop instanceof AbstractEnumPropertyInfo)
             prop.set(obj, ((AbstractEnumPropertyInfo)prop).getValueClass().getMethod("forLabel", String.class).invoke(null, valueString));
           else if ( prop.getValueClass().getName().equals("java.util.Date") ) {
-            prop.set(obj, new java.util.Date(valueString));
-          }
-          else if ( prop.getValueClass().getName().equals("java.util.DateTime") ) {
-            DateTimeFormatter f = DateTimeFormatter.ofPattern("EEE MMM d yyyy HH/mm/ss zZ (zzzz)", Locale.US);
-            LocalDateTime temp = LocalDateTime.parse(valueString, f);
+            try {
+              prop.set(obj, new java.util.Date(valueString));
+            } catch ( Throwable t ) {
+              prop.set(obj, new SimpleDateFormat("EEE MMM d yyyy HH/mm/ss zZ (zzzz)", Locale.US).parse(valueString));
+            }
           }
           else
             prop.set(obj, val);

@@ -63,9 +63,9 @@
   actions: [
     {
       name: 'back',
-      label: 'Cancel',
+      label: 'Back',
       code: function(X) {
-        X.closeDialog();
+        this.pushToId('googleSheetLink');
       }
     },
     {
