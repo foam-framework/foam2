@@ -339,11 +339,7 @@
           if ( prop instanceof AbstractEnumPropertyInfo)
             prop.set(obj, ((AbstractEnumPropertyInfo)prop).getValueClass().getMethod("forLabel", String.class).invoke(null, valueString));
           else if ( prop.getValueClass().getName().equals("java.util.Date") ) {
-            try {
-              prop.set(obj, new SimpleDateFormat("EEE MMM d yyyy HH/mm/ss zZ (zzzz)", Locale.US).parse(valueString));
-            } catch (ParseException e) {
-              prop.set(obj, new java.util.Date(valueString));
-            }
+            prop.set(obj, new java.util.Date(valueString));
           }
           else if ( prop.getValueClass().getName().equals("java.util.DateTime") ) {
             DateTimeFormatter f = DateTimeFormatter.ofPattern("EEE MMM d yyyy HH/mm/ss zZ (zzzz)", Locale.US);
