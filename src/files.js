@@ -459,6 +459,7 @@ FOAM_FILES([
   { name: "foam/u2/TimeView", flags: ['web'] },
   { name: "foam/u2/history/HistoryItemView", flags: ['web'] },
   { name: "foam/u2/history/HistoryView", flags: ['web'] },
+  { name: "foam/graph/graph" },
   { name: "foam/u2/svg/graph/RelationshipGridPlacementStrategy", flags: ['web'] },
   { name: "foam/u2/svg/graph/GridPlacementStrategy", flags: ['web'] },
   { name: "foam/u2/svg/graph/GridPlacementPlan", flags: ['web'] },
