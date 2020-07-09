@@ -127,14 +127,6 @@ foam.CLASS({
       class: 'Boolean',
       name: 'template',
       documentation: 'Used to specify that the group is used as a reference for the creation of other groups.'
-    },
-    {
-      class: 'String',
-      name: 'label',
-      documentation: 'Display name of the Group, if required.',
-      factory: function() {
-        return this.id;
-      }
     }
     /*
       FUTURE
