@@ -34,15 +34,30 @@ foam.CLASS({
       of: 'foam.nanos.medusa.ClusterConfig'
     },
     {
-      name: 'indexLabel',
+      name: 'complete',
+      class: 'String'
+    },
+    {
+      name: 'completeLabel',
       class: 'FObjectProperty',
       of: 'foam.graphics.Label',
       factory: function() {
         return this.Label.create({
           align: 'center',
-          y: +5
+          y: -25,
+          text$: this.complete$.map(function(i) {
+            if ( i > 0 && i < 1 ) {
+              let f = (i * 100).toFixed(2);
+              return f+'%';
+            }
+            return '';
+          })
         });
       }
+    },
+    {
+      name: 'eta',
+      class: 'String'
     },
     {
       name: 'etaLabel',
@@ -51,7 +66,40 @@ foam.CLASS({
       factory: function() {
         return this.Label.create({
           align: 'center',
-          y: -15
+          y: -15,
+          text$: this.eta$.map(function(i) { return i; })
+        });
+      }
+    },
+    {
+      name: 'index',
+      class: 'String'
+    },
+    {
+      name: 'indexLabel',
+      class: 'FObjectProperty',
+      of: 'foam.graphics.Label',
+      factory: function() {
+        return this.Label.create({
+          align: 'center',
+          y: +5,
+          text$: this.index$.map(function(i) { return i; })
+        });
+      }
+    },
+    {
+      name: 'replayIndex',
+      class: 'String'
+    },
+    {
+      name: 'replayIndexLabel',
+      class: 'FObjectProperty',
+      of: 'foam.graphics.Label',
+      factory: function() {
+        return this.Label.create({
+          align: 'center',
+          y: +15,
+          text$: this.replayIndex$.map(function(i) { return i; })
         });
       }
     },
@@ -71,8 +119,10 @@ foam.CLASS({
       this.arcWidth = 1;
       this.alpha = 0.5;
 
-      this.add(this.indexLabel);
+      this.add(this.completeLabel);
       this.add(this.etaLabel);
+      this.add(this.indexLabel);
+      this.add(this.replayIndexLabel);
 
       this.refresh();
     },
@@ -99,13 +149,16 @@ foam.CLASS({
                this.config.replayingInfo.replayIndex > 0 ) {
             this.color = 'cyan';
             this.start = (1 - this.config.replayingInfo.percentComplete ) * (2 * Math.PI);
-            this.etaLabel.text = this.config.replayingInfo.timeRemaining;
-            this.indexLabel.text = this.config.replayingInfo.index +
-              '/ ' + this.config.replayingInfo.replayIndex;
+            this.complete = this.config.replayingInfo.percentComplete;
+            this.eta = this.config.replayingInfo.timeRemaining;
+            this.index = this.config.replayingInfo.index;
+            this.replayIndex = this.config.replayingInfo.replayIndex;
           } else {
             this.color = '';
-            this.etaLabel.text = '';
-            this.indexLabel.text = this.config.replayingInfo.index;
+            this.complete = '';
+            this.eta == this.config.replayingInfo.tps;
+            this.index = this.config.replayingInfo.index;
+            this.replayIndex = '';
           }
         }
       }
@@ -128,8 +181,7 @@ foam.CLASS({
           } else {
             var r = this.ReplayingInfoDetailCView.create({
               config: this.config,
-              alpha: 1,
-              globalAlpha: 1,
+              alpha: 0.8,
               x: evt.offsetX,
               y: evt.offsetY
             });

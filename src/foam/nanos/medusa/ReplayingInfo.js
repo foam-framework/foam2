@@ -92,10 +92,12 @@ foam.CLASS({
       name: 'timeRemaining',
       class: 'String',
       label: 'Remaining',
-      expression: function(index, replayIndex, startTime) {
-        let rate = this.replayTps;
-        let t = rate * (replayIndex - index); // ms
-        let duration = foam.core.Duration.duration(t);
+      expression: function(index, replayIndex, startTime, endTime) {
+        let end = endTime || new Date();
+        let tm = end.getTime() - startTime.getTime();
+        let tpm = replayIndex / tm;
+        let m = (replayIndex - index) / tpm;
+        let duration = foam.core.Duration.duration(m);
         return duration;
       },
       visibility: 'RO'
@@ -103,22 +105,25 @@ foam.CLASS({
     {
       name: 'replayTps',
       class: 'String',
-      expression: function(index, startTime, endTime) {
+      expression: function(index, replayIndex, startTime, endTime) {
         let end = endTime || new Date();
-        let delta = (end.getTime() - startTime.getTime()) / 1000; // seconds
-        let rate = index / delta;
-        return Math.round(rate);
+        let tm = (end.getTime() - startTime.getTime()) / 1000;
+        let tps = replayIndex / tm;
+        return Math.round(tps);
       }
     },
     {
       name: 'tps',
       class: 'String',
       expression: function(index, replayIndex, endTime) {
-        let now = new Date();
-        let end = endTime || new Date();
-        let delta = (now.getTime() - end.getTime()) / 1000; // seconds
-        let rate = (index - replayIndex) / delta;
-        return Math.round(rate);
+        var tps = 0;
+        if ( endTime ) {
+          let now = new Date();
+          let end = endTime || new Date();
+          let tm = (now.getTime() - end.getTime()) / 1000;
+          tps = (index - replayIndex) / tm;
+        }
+        return Math.round(tps);
       }
     },
     {

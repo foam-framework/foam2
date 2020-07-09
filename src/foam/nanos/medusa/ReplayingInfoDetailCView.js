@@ -48,8 +48,8 @@ foam.CLASS({
     function initCView() {
       this.SUPER();
 
-      this.borderWidth = 3;
-      this.border = 'gray';
+      this.borderWidth = 5;
+      this.border = 'blue';
       this.color = 'white';
 
       var label = this.makeLabel();
@@ -76,14 +76,13 @@ foam.CLASS({
       label.text$ = this.config$.map(function(c) {
         let end = c.replayingInfo.endTime || new Date();
         let delta = end.getTime() - c.replayingInfo.startTime.getTime();
-//        let duration = foam.core.Duration.create({value: delta}).formatted();
         let duration = foam.core.Duration.duration(delta);
         return 'Elapsed: '+duration;
       });
       this.add(label);
 
       label = this.makeLabel();
-      label.text$ = this.config$.map(function(c) { let f = (c.replayingInfo.percentComplete * 100).toFixed(2); return '%: '+f; });
+      label.text$ = this.config$.map(function(c) { let f = (c.replayingInfo.percentComplete * 100).toFixed(2); return 'Complete: '+f+'%'; });
       this.add(label);
 
       label = this.makeLabel();
