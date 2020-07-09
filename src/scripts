@@ -61,4 +61,161 @@ p({
   """
 })
 
-p({class:"foam.nanos.script.Script",id:"ExtractStringAxiom",description:"get all String axiom to translate them",server:false,code:"let used = Object.values(foam.USED)\nlet objs = used.concat(Object.values(foam.UNUSED))\n\n\nobjs.forEach(o => {\n  !!o.messages && o.messages.forEach(m => {\n    let xl = foam.i18n.Locale.create({\n      \"id\": o.id+'.'+foam.String.constantize(m.name),\n      \"locale\": 'fr',\n      \"variant\": 'CA',\n      \"locale_variant\": 'fr-CA',\n      \"source\": o.id+'.'+foam.String.constantize(m.name),\n      \"target\": m.message+' fr',\n    })\n    x.LocaleDAO.put(xl);\n  })\n\n  !!o.properties && o.properties.forEach(p => {\n    if ( !!p.label && typeof p.label != \"object\" ) {\n      let xl = foam.i18n.Locale.create({\n        \"id\": o.id+'.'+foam.String.constantize(p.name)+'.label',\n        \"locale\": 'fr',\n        \"variant\": 'CA',\n        \"locale_variant\": 'fr-CA',\n        \"source\": o.id+'.'+foam.String.constantize(p.name)+'.label',\n        \"target\": p.label+' fr',\n      })\n      x.LocaleDAO.put(xl);\n    }\n\n    if ( !!!p.label && !!p.name && ( p.class != \"foam.core.Enum\" && p.class != \"Enum\") ) {\n      let xl = foam.i18n.Locale.create({\n        \"id\": o.id+'.'+foam.String.constantize(p.name)+'.label',\n        \"locale\": 'fr',\n        \"variant\": 'CA',\n        \"locale_variant\": 'fr-CA',\n        \"source\": o.id+'.'+foam.String.constantize(p.name)+'.label',\n        \"target\": p.name+' fr',\n      })\n      x.LocaleDAO.put(xl);\n    }\n    if ( !!p.value && typeof p.value !== 'function' && p.name !== 'slashReplacement' && p.name !== 'code' && typeof p.value !== 'object' && ( p.class != \"foam.core.Enum\" && p.class != \"Enum\")  ) { //not for object\n      let xl = foam.i18n.Locale.create({\n        \"id\": o.id+'.'+foam.String.constantize(p.name)+'.value',\n        \"locale\": 'fr',\n        \"variant\": 'CA',\n        \"locale_variant\": 'fr-CA',\n        \"source\": o.id+'.'+foam.String.constantize(p.name)+'.value',\n        \"target\": p.value+' fr',\n      })\n      x.LocaleDAO.put(xl);\n    }\n    if ( !!p.documentation ) {\n      let xl = foam.i18n.Locale.create({\n        \"id\": o.id+'.'+foam.String.constantize(p.name)+'.documentation',\n        \"locale\": 'fr',\n        \"variant\": 'CA',\n        \"locale_variant\": 'fr-CA',\n        \"source\": o.id+'.'+foam.String.constantize(p.name)+'.documentation',\n        \"target\": p.documentation+' fr',\n      })\n      x.LocaleDAO.put(xl);\n    }\n    if ( !!p.placeholder ) {\n      let xl = foam.i18n.Locale.create({\n        \"id\": o.id+'.'+foam.String.constantize(p.name)+'.placeholder',\n        \"locale\": 'fr',\n        \"variant\": 'CA',\n        \"locale_variant\": 'fr-CA',\n        \"source\": o.id+'.'+foam.String.constantize(p.name)+'.placeholder',\n        \"target\": p.placeholder+' fr',\n      })\n      x.LocaleDAO.put(xl);\n    }\n\n    if ( !!p.view && !!p.view.placeholder  ) {\n      let xl = foam.i18n.Locale.create({\n        \"id\": o.id+'.'+foam.String.constantize(p.name)+'.view.placeholder',\n        \"locale\": 'fr',\n        \"variant\": 'CA',\n        \"locale_variant\": 'fr-CA',\n        \"source\": o.id+'.'+foam.String.constantize(p.name)+'.view.placeholder',\n        \"target\": p.view.placeholder+' fr',\n      })\n      x.LocaleDAO.put(xl);\n    }\n    if ( !!p.view && !!p.view.label ) {\n      let xl = foam.i18n.Locale.create({\n        \"id\": o.id+'.'+foam.String.constantize(p.name)+'.view.label',\n        \"locale\": 'fr',\n        \"variant\": 'CA',\n        \"locale_variant\": 'fr-CA',\n        \"source\": o.id+'.'+foam.String.constantize(p.name)+'.view.label',\n        \"target\": p.view.label+' fr',\n      })\n      x.LocaleDAO.put(xl);\n    }\n  })\n\n  !!o.sections && !!o.sections.forEach(m => {\n    if ( !!m.title ) {\n      let xl = foam.i18n.Locale.create({\n        \"id\": o.id+'.SECTION_'+foam.String.constantize(m.name)+'.title',\n        \"locale\": 'fr',\n        \"variant\": 'CA',\n        \"locale_variant\": 'fr-CA',\n        \"source\": o.id+'.SECTION_'+foam.String.constantize(m.name)+'.title',\n        \"target\": m.title+' fr',\n      })\n      x.LocaleDAO.put(xl);\n    }\n    if ( !!m.subTitle ) {\n      let xl = foam.i18n.Locale.create({\n        \"id\": o.id+'.SECTION_'+foam.String.constantize(m.name)+'.subTitle',\n        \"locale\": 'fr',\n        \"variant\": 'CA',\n        \"locale_variant\": 'fr-CA',\n        \"source\": o.id+'.SECTION_'+foam.String.constantize(m.name)+'.subTitle',\n        \"target\": m.subTitle+' fr',\n      })\n      x.LocaleDAO.put(xl);\n    }\n  })\n\n  !!o.actions && o.actions.forEach(p => {\n    if ( !!p.label ) {\n      let xl = foam.i18n.Locale.create({\n        \"id\": o.id+'.'+foam.String.constantize(p.name)+'.label',\n        \"locale\": 'fr',\n        \"variant\": 'CA',\n        \"locale_variant\": 'fr-CA',\n        \"source\": o.id+'.'+foam.String.constantize(p.name)+'.label',\n        \"target\": p.label+' fr',\n      })\n      x.LocaleDAO.put(xl);\n    }\n\n    if ( !!!p.label && !!p.name ) {\n      let xl = foam.i18n.Locale.create({\n        \"id\": o.id+'.'+foam.String.constantize(p.name)+'.label',\n        \"locale\": 'fr',\n        \"variant\": 'CA',\n        \"locale_variant\": 'fr-CA',\n        \"source\": o.id+'.'+foam.String.constantize(p.name)+'.label',\n        \"target\": p.name+' fr',\n      })\n      x.LocaleDAO.put(xl);\n    }\n  })\n})\n\n"})
+p({
+  "class": "foam.nanos.script.Script",
+  "id": "ExtractStringAxiom",
+  "description": "get all String axiom to translate them",
+  "server": false,
+  "code": """
+  let used = Object.values(foam.USED)
+  let objs = used.concat(Object.values(foam.UNUSED))
+
+
+  objs.forEach(o => {
+    !!o.messages && o.messages.forEach(m => {
+      let xl = foam.i18n.Locale.create({
+        "id": o.id+'.'+foam.String.constantize(m.name),
+        "locale": 'fr',
+        "variant": 'CA',
+        "locale_variant": 'fr-CA',
+        "source": o.id+'.'+foam.String.constantize(m.name),
+        "target": m.message+' fr',
+      })
+      x.LocaleDAO.put(xl);
+    })
+
+    !!o.properties && o.properties.forEach(p => {
+      if ( !!p.label && typeof p.label != "object" ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "locale": 'fr',
+          "variant": 'CA',
+          "locale_variant": 'fr-CA',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "target": p.label+' fr',
+        })
+        x.LocaleDAO.put(xl);
+      }
+
+      if ( !!!p.label && !!p.name && ( p.class != "foam.core.Enum" && p.class != "Enum") ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "locale": 'fr',
+          "variant": 'CA',
+          "locale_variant": 'fr-CA',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "target": p.name+' fr',
+        })
+        x.LocaleDAO.put(xl);
+      }
+      if ( !!p.value && typeof p.value !== 'function' && p.name !== 'slashReplacement' && p.name !== 'code' && typeof p.value !== 'object' && ( p.class != "foam.core.Enum" && p.class != "Enum")  ) { //not for object
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.value',
+          "locale": 'fr',
+          "variant": 'CA',
+          "locale_variant": 'fr-CA',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.value',
+          "target": p.value+' fr',
+        })
+        x.LocaleDAO.put(xl);
+      }
+      if ( !!p.documentation ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.documentation',
+          "locale": 'fr',
+          "variant": 'CA',
+          "locale_variant": 'fr-CA',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.documentation',
+          "target": p.documentation+' fr',
+        })
+        x.LocaleDAO.put(xl);
+      }
+      if ( !!p.placeholder ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.placeholder',
+          "locale": 'fr',
+          "variant": 'CA',
+          "locale_variant": 'fr-CA',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.placeholder',
+          "target": p.placeholder+' fr',
+        })
+        x.LocaleDAO.put(xl);
+      }
+
+      if ( !!p.view && !!p.view.placeholder  ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.view.placeholder',
+          "locale": 'fr',
+          "variant": 'CA',
+          "locale_variant": 'fr-CA',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.view.placeholder',
+          "target": p.view.placeholder+' fr',
+        })
+        x.LocaleDAO.put(xl);
+      }
+      if ( !!p.view && !!p.view.label ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.view.label',
+          "locale": 'fr',
+          "variant": 'CA',
+          "locale_variant": 'fr-CA',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.view.label',
+          "target": p.view.label+' fr',
+        })
+        x.LocaleDAO.put(xl);
+      }
+    })
+
+    !!o.sections && !!o.sections.forEach(m => {
+      if ( !!m.title ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.SECTION_'+foam.String.constantize(m.name)+'.title',
+          "locale": 'fr',
+          "variant": 'CA',
+          "locale_variant": 'fr-CA',
+          "source": o.id+'.SECTION_'+foam.String.constantize(m.name)+'.title',
+          "target": m.title+' fr',
+        })
+        x.LocaleDAO.put(xl);
+      }
+      if ( !!m.subTitle ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.SECTION_'+foam.String.constantize(m.name)+'.subTitle',
+          "locale": 'fr',
+          "variant": 'CA',
+          "locale_variant": 'fr-CA',
+          "source": o.id+'.SECTION_'+foam.String.constantize(m.name)+'.subTitle',
+          "target": m.subTitle+' fr',
+        })
+        x.LocaleDAO.put(xl);
+      }
+    })
+
+    !!o.actions && o.actions.forEach(p => {
+      if ( !!p.label ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "locale": 'fr',
+          "variant": 'CA',
+          "locale_variant": 'fr-CA',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "target": p.label+' fr',
+        })
+        x.LocaleDAO.put(xl);
+      }
+
+      if ( !!!p.label && !!p.name ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "locale": 'fr',
+          "variant": 'CA',
+          "locale_variant": 'fr-CA',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "target": p.name+' fr',
+        })
+        x.LocaleDAO.put(xl);
+      }
+    })
+  })
+  """
+})
