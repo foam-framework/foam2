@@ -3,8 +3,12 @@ foam.CLASS({
   name: 'ImportDataMessage',
   properties: [
     {
+      name: 'success',
+      class: 'Boolean'
+    },
+    {
       name: 'result',
-      class: 'Int'//-1 for error/ > 0 for num of records inserted
+      class: 'Int'
     }
   ]
 });

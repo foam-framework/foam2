@@ -16,6 +16,7 @@
     'foam.core.FObject',
     'foam.core.PropertyInfo',
     'foam.core.AbstractEnumPropertyInfo',
+    'foam.nanos.google.api.sheets.ImportDataMessage',
 
     'java.lang.Throwable',
     'java.math.BigDecimal',
@@ -160,7 +161,7 @@
     },
     {
       name: 'importData',
-      type: 'Boolean',
+      type: 'foam.nanos.google.api.sheets.ImportDataMessage',
       args: [
         {
           name: 'x',
@@ -174,28 +175,42 @@
       javaCode: `
         GoogleSheetsApiService googleSheetsAPIEnabler = (GoogleSheetsApiService)x.get("googleSheetsDataExport");
         ValueRange values;
+        ImportDataMessage result = new ImportDataMessage();
         try {
           values = googleSheetsAPIEnabler.getValues(x, importConfig.getGoogleSpreadsheetId(), importConfig.getGoogleSheetId());
           importConfig.setCellsRange(values.getRange().split("!")[1]);
           List<List<Object>> data = values.getValues();
           List<FObject> parsedObjs = valueRangeValuesToFobjectsArray(x, importConfig, data);
           //if there was a problem with adding records we still might want to update user's google sheet with ids or status
-          if ( parsedObjs == null ) return false;
-          addRecordsToDAO(x, importConfig.getDAO(), parsedObjs);
+          if ( parsedObjs == null ) {
+            result.setResult(0);
+            result.setSuccess(false);
+          }
+          int recordsAdded = addRecordsToDAO(x, importConfig.getDAO(), parsedObjs);
+
+          if ( recordsAdded != -1 ) {
+            result.setResult(0);
+            result.setSuccess(false);
+          } else
+            result.setResult(recordsAdded);
+            
           List<String> columnHeaders = new ArrayList<>();
           for ( Object header : data.get(0) ) {
             columnHeaders.add(header.toString());
           }
-          return updateSheet(x, importConfig, parsedObjs, columnHeaders);
+          updateSheet(x, importConfig, parsedObjs, columnHeaders);
+          result.setSuccess(true);
+          return result;
         } catch ( Throwable t ) {
           System.out.println(t);
+          result.setSuccess(false);
         }
-        return false;
+        return result;
       `
   },
   {
     name: 'addRecordsToDAO',
-    type: 'Boolean',//change to int
+    type: 'Integer',//change to int
     args: [
       {
         name: 'x',
@@ -212,14 +227,16 @@
     ],
     javaCode: `
       DAO dao  = (DAO)x.get(daoId);
-      if ( dao == null ) return false;
+      if ( dao == null ) return -1;
+      int recordsInserted = 0;
       for ( FObject obj: objs) {
         try {
           dao.put(obj);
+          recordsInserted++;
         } catch(Throwable t) {
         }
       }
-      return true;
+      return recordsInserted;
     `
   },
   {

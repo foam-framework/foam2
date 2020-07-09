@@ -24,7 +24,7 @@
     },
     {
       name: 'importData',
-      type: 'Boolean',
+      type: 'foam.nanos.google.api.sheets.ImportDataMessage',
       args: [
         {
           name: 'x',
