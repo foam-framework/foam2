@@ -17,7 +17,7 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'Validator',
-      name: 'validator_'
+      name: 'validator'
     }
   ],
 
@@ -34,7 +34,7 @@ foam.CLASS({
             public ValidatingDAO(X x, DAO delegate, Validator validator) {
               setX(x);
               setDelegate(delegate);
-              setValidator_(validator);
+              setValidator(validator);
             }
           `
         );
@@ -49,7 +49,7 @@ foam.CLASS({
         'IllegalStateException'
       ],
       javaCode: `
-        getValidator_().validate(x, obj);
+        getValidator().validate(x, obj);
         return super.put_(x, obj);
       `
     }

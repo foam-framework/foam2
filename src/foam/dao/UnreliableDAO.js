@@ -1,10 +1,16 @@
+/**
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'UnreliableDAO',
   extends: 'foam.dao.ProxyDAO',
 
   messages: [
-    { 
+    {
       name: 'CANNOT_PERFORM_ERROR_MSG',
       message: 'UnreliableDAO decided you are unlucky.'
     }
@@ -13,7 +19,7 @@ foam.CLASS({
   properties: [
     {
       class: 'Double',
-      name: 'errorRate_',
+      name: 'errorRate',
       value: 0.5
     }
   ],
@@ -34,7 +40,7 @@ foam.CLASS({
           
             public UnreliableDAO(double errorRate, DAO delegate) {
               this(delegate);
-              setErrorRate_(errorRate);
+              setErrorRate(errorRate);
             }
           
             public UnreliableDAO(foam.core.X x, double errorRate, DAO delegate) {
@@ -51,7 +57,7 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-        if ( Math.random() < getErrorRate_() ) {
+        if ( Math.random() < getErrorRate() ) {
           throw new RuntimeException(CANNOT_PERFORM_ERROR_MSG);
         }
     
@@ -61,7 +67,7 @@ foam.CLASS({
     {
       name: 'remove_',
       javaCode: `
-        if ( Math.random() < getErrorRate_() ) {
+        if ( Math.random() < getErrorRate() ) {
           throw new RuntimeException(CANNOT_PERFORM_ERROR_MSG);
         }
     
@@ -71,7 +77,7 @@ foam.CLASS({
     {
       name: 'select_',
       javaCode: `
-        if ( Math.random() < getErrorRate_() ) {
+        if ( Math.random() < getErrorRate() ) {
           throw new RuntimeException(CANNOT_PERFORM_ERROR_MSG);
         }
     
@@ -81,7 +87,7 @@ foam.CLASS({
     {
       name: 'removeAll_',
       javaCode: `
-        if ( Math.random() < getErrorRate_() ) {
+        if ( Math.random() < getErrorRate() ) {
           throw new RuntimeException(CANNOT_PERFORM_ERROR_MSG);
         }
     
