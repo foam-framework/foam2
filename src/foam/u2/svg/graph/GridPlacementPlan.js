@@ -1,4 +1,4 @@
-foam.CLASS({
+foam.INTERFACE({
   package: 'foam.u2.svg.graph',
   name: 'GridPlacementPlan',
 

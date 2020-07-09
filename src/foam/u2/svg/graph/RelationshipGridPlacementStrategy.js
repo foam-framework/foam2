@@ -31,6 +31,7 @@ foam.CLASS({
       code: function getPlan() {
         var columns = [];
         var intermediatePlan = [];
+        var alreadyAdded = {};
 
         let addCol = index => {
           var col = { position: index };
@@ -45,26 +46,51 @@ foam.CLASS({
           return col;
         }
 
+        let addingQueue = [];
+
         let add;
-        add = (obj, row, col) => {
+        add = (obj, row, col, pushCols) => {
+          console.log('ADD ' + obj.id);
+          if ( alreadyAdded[obj.id] ) return Promise.resolve();
+          alreadyAdded[obj.id] = true;
+
           // plan.addAssociation(obj, [0, 0]);
-          intermediatePlan.push({
+          var entry = {
             row: { position: row },
-            col: addCol(col),
+            col: pushCols ? addCol(col) : columns[col],
             obj: obj,
-          });
-          return obj[this.relationshipPropertyName].dao
-            .select().then(r => Promise.all(r.array.map((o, i) =>
-              add(o, row + 1, col + i))));
+          };
+          intermediatePlan.push(entry);
+
+          return entry.obj[this.relationshipPropertyName].dao
+            .select().then(r => r.array.forEach((o, i) => {
+              console.log('adding ' + o.id + ' to queue');
+              addingQueue.push({
+                parent: entry,
+                obj: o,
+                index: i
+              });
+            }));
         };
-        return add(this.rootObject, 0, 0).then(() => {
+        let maybeAddMore
+        maybeAddMore = () => {
+          if ( addingQueue.length < 1 ) return;
+          let next = addingQueue.shift();
+          return add(
+            next.obj,
+            next.parent.row.position + 1,
+            next.parent.col.position + next.index,
+            next.index != 0
+          ).then(maybeAddMore);
+        };
+        return add(this.rootObject, 0, 0, true).then(maybeAddMore).then(() => {
           var plan = this.PredeterminedGridPlacementPlan.create({
             shape: [0, 0]
           });
 
           intermediatePlan.forEach(entry => {
             plan.addAssociation_(entry.obj.id, [
-              entry.row.position, entry.col.position,
+              entry.col.position, entry.row.position,
             ])
           });
 

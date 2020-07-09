@@ -24,7 +24,7 @@ foam.CLASS({
     function addAssociation_(id, coords) {
       this.coords[id] = coords;
       for ( let i = 0 ; i < coords.length ; i++ ) {
-        this.coords[i] = Math.max(coords[i] + 1, this.coords[i]);
+        this.shape[i] = Math.max(coords[i] + 1, this.shape[i]);
       }
     }
   ]
