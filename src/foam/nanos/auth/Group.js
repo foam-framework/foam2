@@ -14,7 +14,7 @@ foam.CLASS({
     'foam.nanos.auth.EnabledAware'
   ],
 
-  requires: [ 
+  requires: [
     'foam.nanos.app.AppConfig',
     'foam.nanos.auth.PasswordPolicy'
   ],
@@ -122,7 +122,7 @@ foam.CLASS({
         class: 'foam.u2.view.FObjectPropertyView',
         readView: { class: 'foam.u2.detail.VerticalDetailView' }
       }
-    }
+    },
     /*
       FUTURE
     {
@@ -131,6 +131,19 @@ foam.CLASS({
       documentation: 'Custom authentication settings for this group.'
     }
     */
+    {
+      class: 'Boolean',
+      name: 'template',
+      documentation: 'Used to specify that the group is used as a reference for the creation of other groups.'
+    },
+    {
+      class: 'String',
+      name: 'label',
+      documentation: 'Display name of the Group, if required.',
+      factory: function() {
+        return this.id;
+      }
+    }
   ],
 
   javaImports: [
@@ -339,6 +352,16 @@ foam.CLASS({
 
         return ancestor;
       `
+    },
+    {
+      name: 'toSummary',
+      documentation: `When using a reference to the roleDAO, the labels associated
+        to it will show a chosen property rather than the first alphabetical string
+        property. In this case, we are using the name.
+      `,
+      code: function(x) {
+        return this.name || this.id;
+      }
     }
   ]
 });
