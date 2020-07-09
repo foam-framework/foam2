@@ -2246,21 +2246,21 @@ foam.CLASS({
       name: 'createVisibility',
       of: 'foam.u2.DisplayMode',
       documentation: 'The display mode for this property when the controller mode is CREATE.',
-      value: foam.u2.DisplayMode.RW//'RW'
+      value: foam.u2.DisplayMode.RW
     },
     {
-      // class: 'Enum',
-      // of: 'foam.u2.DisplayMode',
+      class: 'Enum',
+      of: 'foam.u2.DisplayMode',
       name: 'readVisibility',
       documentation: 'The display mode for this property when the controller mode is VIEW.',
-      value: 'RO'//foam.u2.DisplayMode.RO//
+      value: foam.u2.DisplayMode.RO
     },
     {
       class: 'Enum',
       of: 'foam.u2.DisplayMode',
       name: 'updateVisibility',
       documentation: 'The display mode for this property when the controller mode is EDIT.',
-      value: foam.u2.DisplayMode.RW//'RW'//foam.u2.DisplayMode.RW
+      value: foam.u2.DisplayMode.RW
     },
     {
       class: 'Boolean',
