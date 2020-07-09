@@ -74,7 +74,7 @@ foam.CLASS({
       sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata, this);
       if ( ! sheetId || sheetId.length == 0)
         return '';
-      var url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?exportFormat=pdf&format=pdf&scale=3`;
+      var url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?exportFormat=pdf&format=pdf&scale=1`;
       return url;
     },
     async function tearDown(X, obj) {
