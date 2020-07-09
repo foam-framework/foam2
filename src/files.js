@@ -812,4 +812,8 @@ FOAM_FILES([
   { name: "foam/foamlink/FoamlinkExec" },
   { name: "foam/foamlink/lib" },
   { name: "foam/util/filesystem/FileWalker" },
+
+  // Translation Support
+  { name: 'foam/i18n/XLIFFTranslationValue' },
+  { name: 'foam/i18n/Locale' },
 ]);

@@ -343,6 +343,7 @@ foam.CLASS({
         // the line above before executing this one.
         await self.fetchGroup();
         await self.fetchTheme();
+        await self.fetchLanguage();
         self.onUserAgentAndGroupLoaded();
       });
     },
@@ -394,6 +395,41 @@ foam.CLASS({
           });
       });
     },
+
+    async function fetchLanguage() {
+      try {
+        let ctx = this.__subContext__;
+        let d = await  this.__subContext__.LocaleDAO;
+        d.select().then(e => {
+          console.log( e )
+          let arr = e.array;
+          arr.forEach(ea =>
+            {
+              let s = null;
+              try {
+                let i, obj;
+                do {
+                  i = ea.source.indexOf('.',++i);
+                  if (i != -1) {
+                    s = eval(ea.source.substring(0,i))
+                  }
+                } while (i > 0 && !!s);
+              }
+              catch(err) {
+                console.log(ea.source)
+                console.log(err)
+              }
+              if (!!s) {
+                s[ea.source.substring(ea.source.lastIndexOf('.')+1)] = ea.target;
+              }
+            })
+        })
+      } catch (err) {//TODO
+        this.notify(this.GROUP_FETCH_ERR, 'error');
+        console.error(err.message || this.GROUP_FETCH_ERR);
+      }
+    },
+
 
     async function fetchGroup() {
       try {
