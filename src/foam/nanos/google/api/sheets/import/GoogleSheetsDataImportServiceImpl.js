@@ -429,7 +429,7 @@
           List<List<Object>> updatedValues = new ArrayList<>();
           for ( int i = 0 ; i < objs.size() ; i ++ ) {
             int finalI = i;
-            updatedValues.add(new ArrayList<Object>() {{ add(((PropertyInfo)c.getProp()).get((Object)objs.get(finalI)).toString()); }});
+            updatedValues.add(new ArrayList<Object>() {{ add(getStringValueByProperty(x, (PropertyInfo)c.getProp(), (Object)objs.get(finalI))); }});
           }
           values.add(updatedValues);
         }
@@ -438,6 +438,27 @@
         return true;
       }
       return googleSheetsAPIEnabler.createAndExecuteBatchUpdateWithListOfValuesForCellsRange(x, importConfig.getGoogleSpreadsheetId(), values, cellsRange);
+    `
+  },
+  {
+    name: 'getStringValueByProperty',
+    type: 'String',
+    args: [
+      {
+        name: 'x',
+        type: 'Context'
+      },
+      {
+        name: 'prop',
+        type: 'PropertyInfo'
+      },
+      {
+        name: 'obj',
+        type: 'Object'
+      }
+    ],
+    javaCode: `
+      return prop.get(obj).toString();
     `
   }
 ],

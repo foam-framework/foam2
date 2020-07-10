@@ -12,6 +12,7 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
+    'foam.core.PropertyInfo',
     'net.nanopay.bank.BankAccount',
     'net.nanopay.model.Business',
     'net.nanopay.tx.model.Transaction',
@@ -19,9 +20,6 @@ foam.CLASS({
     'static foam.mlang.MLang.EQ',
     'static foam.mlang.MLang.INSTANCE_OF'
   ],
-  // implements: [
-  //   'foam.nanos.google.api.sheets.GoogleSheetsDataImportService'
-  // ],
   methods: [
     {
       name: 'postSetValues',
@@ -69,5 +67,28 @@ foam.CLASS({
         return true;
       `
     },
+    {
+      name: 'getStringValueByProperty',
+      type: 'String',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'prop',
+          javaType: 'PropertyInfo'
+        },
+        {
+          name: 'obj',
+          type: 'Object'
+        }
+      ],
+      javaCode: `
+        if ( prop.getName().equals("Status") )
+          return ((Transaction)obj).getState(x).toString();
+        return super.getStringValueByProperty(x, prop, obj);
+      `
+    }
   ]
 });
