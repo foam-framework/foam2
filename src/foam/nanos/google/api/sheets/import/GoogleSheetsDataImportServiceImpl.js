@@ -42,7 +42,7 @@
     {
       name: 'javaExtras',
       buildJavaClass: function(cls) {
-        //move all this to helper class
+        //move all this to helper class?
         cls.extras.push(foam.java.Code.create({
           data: `
           public static Pattern digitAppearenceRegex = Pattern.compile("(\\\\d){1}");
@@ -56,13 +56,7 @@
             int colIndex = findColumnIndex(col, base);
             return colIndex > endColumnIndex ?  -1 : colIndex < startColumnIndex ? -1 : colIndex;
           }      
-          // public int[] generateColumnRange(String startColumn, String endColumn, List<List<String>> base) {
-      
-          // // List<List<String>> base = generateBase(endColumn.length());
-          //   return new int[] { findColumnIndex(startColumn, base), findColumnIndex(endColumn, base) };
-          // }
 
-          //index which is length of column "name"/"title"
           public int findColumnIndex(String col, List<List<String>> base) {
       
             // List<List<String>> base = generateBase(endColumn.length());
@@ -79,7 +73,6 @@
           public List<List<String>> generateBase(int endColumnLength) {
       
             List<List<String>> base = new ArrayList<>();
-      
             List<String> level = new ArrayList<>();
             for ( int i = 0 ; i < alphabet.size() ; i++ ) {
               level.add(alphabet.get(i));
@@ -126,42 +119,24 @@
         }
       ],
       javaCode:`
-      GoogleSheetsApiService googleSheetsAPIEnabler = (GoogleSheetsApiService)x.get("googleSheetsDataExport");
-      ValueRange values;
-      try {
-        // //to calculate column headers row
-        // //fix me
-        // String[] rangeLimits = importConfig.getCellsRange().split(":");
-        // Matcher m = digitAppearenceRegex.matcher(rangeLimits[0]);
-        // if ( !m.find() ) return null;
-        // int indexOfFirstRowInRange = m.start();
-        // String startColumn = rangeLimits[0].substring(0, indexOfFirstRowInRange);
-        // String startRow = rangeLimits[0].substring(indexOfFirstRowInRange);
-        // m = digitAppearenceRegex.matcher(rangeLimits[1]);
-        // if ( !m.find() ) return null;
-        // String endColumn = rangeLimits[1].substring(0, m.start());
-        // StringBuilder sb = new StringBuilder();
-        // sb.append(startColumn);
-        // sb.append(startRow);
-        // sb.append(":");
-        // sb.append(endColumn);
-        // sb.append(startRow);
-
-        values = googleSheetsAPIEnabler.getValues(x, importConfig.getGoogleSpreadsheetId(), importConfig.getGoogleSheetId());//sb.toString()
-        List<Object> firstRow = values.getValues().get(0);
-        String[] columnNames = new String[firstRow.size()];
-        for ( int i = 0 ; i < firstRow.size() ; i++ ) {
-          columnNames[i] = String.valueOf(firstRow.get(i));
+        GoogleSheetsApiService googleSheetsAPIEnabler = (GoogleSheetsApiService)x.get("googleSheetsDataExport");
+        ValueRange values;
+        try {
+          values = googleSheetsAPIEnabler.getValues(x, importConfig.getGoogleSpreadsheetId(), importConfig.getGoogleSheetId());//sb.toString()
+          List<Object> firstRow = values.getValues().get(0);
+          String[] columnNames = new String[firstRow.size()];
+          for ( int i = 0 ; i < firstRow.size() ; i++ ) {
+            columnNames[i] = String.valueOf(firstRow.get(i));
+          }
+          return columnNames;
+        } catch ( Throwable t ) {
+          Logger logger = (Logger) x.get("logger");
+          if ( logger == null ) {
+            logger = new StdoutLogger();
+          }
+          logger.error(t);
+          return null;
         }
-        return columnNames; 
-      } catch ( Throwable t ) {
-        Logger logger = (Logger) x.get("logger");
-        if ( logger == null ) {
-          logger = new StdoutLogger();
-        }
-        logger.error(t);
-        return null;
-      }
       `
     },
     {
@@ -183,10 +158,11 @@
         ImportDataMessage result = new ImportDataMessage();
         try {
           values = googleSheetsAPIEnabler.getValues(x, importConfig.getGoogleSpreadsheetId(), importConfig.getGoogleSheetId());
-          importConfig.setCellsRange(values.getRange().split("!")[1]);
+
           List<List<Object>> data = values.getValues();
           List<FObject> parsedObjs = valueRangeValuesToFobjectsArray(x, importConfig, data);
           //if there was a problem with adding records we still might want to update user's google sheet with ids or status
+          //so we might need extra logic for adding status that might be too much thought
           if ( parsedObjs == null ) {
             result.setResult(0);
             result.setSuccess(false);
@@ -218,7 +194,7 @@
   },
   {
     name: 'addRecordsToDAO',
-    type: 'Integer',//change to int
+    type: 'Integer',
     args: [
       {
         name: 'x',
@@ -290,8 +266,7 @@
           if ( importConfig.getColumnHeaderPropertyMappings()[j].getProp() == null || importConfig.getColumnHeaderPropertyMappings()[j].getProp().getSheetsOutput() ) continue;
           int columnIndex = columnHeaders.indexOf(importConfig.getColumnHeaderPropertyMappings()[j].getColumnHeader());
           Object val = data.get(i).get(columnIndex);
-          // PropertyInfo prop = ((PropertyInfo)importConfig.getColumnHeaderPropertyMappings()[j].getProp());
-          if ( ! setValue(x, obj, importConfig.getColumnHeaderPropertyMappings()[j], data.get(i).get(columnIndex)) )
+          if ( ! pasreAndSetValue(x, obj, importConfig.getColumnHeaderPropertyMappings()[j], data.get(i).get(columnIndex)) )
             continue;
         }
         postSetValues(x, obj);
@@ -318,14 +293,8 @@
     `
   },
   {//maybe all of it to static will save memory
-    name: 'setValue',
-    type: 'Boolean',//if return boolean than handle the exception!
-    // javaThrows: [
-    //   'NoSuchMethodException',
-    //   'java.lang.reflect.InvocationTargetException',
-    //   'IllegalAccessException',
-    //   'ParseException'
-    // ],
+    name: 'pasreAndSetValue',
+    type: 'Boolean',
     args: [
       {
         name: 'x',
@@ -421,7 +390,7 @@
       GoogleSheetsApiService googleSheetsAPIEnabler = (GoogleSheetsApiService)x.get("googleSheetsDataExport");
       List<List<List<Object>>> values = new ArrayList<>();
 
-      //to calculate cells ranges
+      //to save cells ranges for columns that must be updated
       List<String> cellsRange = new ArrayList<>();
 
       //to calculate column headers row
@@ -442,13 +411,13 @@
 
       for ( ColumnHeaderToPropertyMapping c : importConfig.getColumnHeaderPropertyMappings() ) {
         if ( ((PropertyInfo)c.getProp()).getSheetsOutput() ) {
+          //to calculate cells ranges
           StringBuilder sb = new StringBuilder();
           int currColumnIndexRelativeToFirstColumn = columnHeaders.indexOf(c.getColumnHeader());
           String startColumnForCurrenctHeader = findColumn(base, startColumn, currColumnIndexRelativeToFirstColumn);
           sb.append(startColumnForCurrenctHeader);
           sb.append(startRow);
           sb.append(":");
-          // sb.append(findColumn(base, startColumn, currColumnIndexRelativeToFirstColumn + 1));
           sb.append(startColumnForCurrenctHeader);
           sb.append(endRow);
           
