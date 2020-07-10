@@ -131,7 +131,8 @@ foam.CLASS({
   messages: [
     { name: 'GROUP_FETCH_ERR', message: 'Error fetching group' },
     { name: 'GROUP_NULL_ERR', message: 'Group was null' },
-    { name: 'LOOK_AND_FEEL_NOT_FOUND', message: 'Could not fetch look and feel object.' }
+    { name: 'LOOK_AND_FEEL_NOT_FOUND', message: 'Could not fetch look and feel object.' },
+    { name: 'LANGUAGE_FETCH_ERR', message: 'Error fetching language' },
   ],
 
   css: `
@@ -425,8 +426,8 @@ foam.CLASS({
             })
         })
       } catch (err) {//TODO
-        this.notify(this.GROUP_FETCH_ERR, 'error');
-        console.error(err.message || this.GROUP_FETCH_ERR);
+        this.notify(this.LANGUAGE_FETCH_ERR, 'error');
+        console.error(err.message || this.LANGUAGE_FETCH_ERR);
       }
     },
 
