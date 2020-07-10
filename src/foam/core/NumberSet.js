@@ -86,6 +86,26 @@ foam.CLASS({
       `
     },
     {
+      name: 'contains',
+      type: 'Boolean',
+      args: [
+        { name: 'element', type: 'Long' },
+      ],
+      code: function(element) {
+        if ( ! Number.isInteger(element) ) {
+          console.error("Element is not an integer");
+          return false;
+        }
+
+        return this.pseudoSet.includes(element);
+      },
+      javaCode: `
+        List<Long> currentPseudoSet = (ArrayList<Long>) getPseudoSet();
+
+        return currentPseudoSet.contains(element);
+      `
+    },
+    {
       name: 'getAsRealSet',
       javaType: `Set<Long>`,
       javaCode: `

@@ -165,8 +165,8 @@ foam.CLASS({
           }
         ];
         var primitiveType = ['boolean', 'long', 'byte', 'double','float','short','int'];
-        
-        if ( this.propType == 'java.util.Date' || 
+
+        if ( this.propType == 'java.util.Date' ||
              ! ( primitiveType.includes(this.propType) || this.propType == 'Object' || this.propType == 'String') ){
           m.push({
             name: 'cast',
@@ -176,9 +176,9 @@ foam.CLASS({
             body: 'return ' + ( this.propType == "Object" ? 'o;' : '( ' + this.propType + ') o;')
           });
         }
-        
+
         if ( this.propType == 'java.util.Date' ||
-             this.propType == 'String' ||  
+             this.propType == 'String' ||
              ! ( primitiveType.includes(this.propType)|| this.propType == 'Object' || this.extends == 'foam.core.AbstractFObjectPropertyInfo' || this.extends == 'foam.core.AbstractFObjectArrayPropertyInfo') ){
           m.push({
             name: 'getSQLType',
@@ -187,10 +187,10 @@ foam.CLASS({
             body: 'return "' + this.sqlType + '";'
           });
         }
-        
-        if ( this.propType == 'java.util.Date' || 
-             this.propType == 'String' || 
-             this.propType == 'Object' || 
+
+        if ( this.propType == 'java.util.Date' ||
+             this.propType == 'String' ||
+             this.propType == 'Object' ||
              ! ( primitiveType.includes(this.propType) ) ){
           m.push({
             name: 'get',
@@ -199,7 +199,7 @@ foam.CLASS({
             args: [{ name: 'o', type: 'Object' }],
             body: 'return get_(o);'
           });
-  
+
           m.push({
             name: 'jsonParser',
             type: 'foam.lib.parse.Parser',
@@ -242,7 +242,7 @@ foam.CLASS({
           });
         }
 
-        if ( ! ( primitiveType.includes(this.propType) || this.propType  == 'java.util.Date' || this.propType == 'String' || this.propType == 'Object' || this.extends == 'foam.core.AbstractFObjectPropertyInfo') ) {  
+        if ( ! ( primitiveType.includes(this.propType) || this.propType  == 'java.util.Date' || this.propType == 'String' || this.propType == 'Object' || this.extends == 'foam.core.AbstractFObjectPropertyInfo') ) {
           m.push({
             name: 'compare',
             type: 'int',
@@ -274,22 +274,25 @@ foam.CLASS({
             /* TODO: revise when/if expression support is added to Java */
             body: `return foam.util.SafetyUtil.compare(get_(o), ${this.propValue}) == 0;`
           });
-          m.push({
-            name: 'format',
-            visibility: 'public',
-            type: 'void',
-            args: [
-              {
-                name: 'formatter',
-                type: 'foam.lib.formatter.FObjectFormatter'
-              },
-              {
-                name: 'obj',
-                type: 'foam.core.FObject'
-              }
-            ],
-            body: 'formatter.output(get_(obj));'
-          });
+          // TODO: We could reduce the amount a Enum PropertyInfo code we output
+          if ( this.extends != 'foam.core.AbstractEnumPropertyInfo' ) {
+            m.push({
+              name: 'format',
+              visibility: 'public',
+              type: 'void',
+              args: [
+                {
+                  name: 'formatter',
+                  type: 'foam.lib.formatter.FObjectFormatter'
+                },
+                {
+                  name: 'obj',
+                  type: 'foam.core.FObject'
+                }
+              ],
+              body: 'formatter.output(get_(obj));'
+            });
+          }
         }
 
         if ( this.networkTransient ) {

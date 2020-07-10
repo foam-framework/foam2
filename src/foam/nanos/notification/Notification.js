@@ -23,6 +23,10 @@ foam.CLASS({
     'foam.nanos.auth.User'
   ],
 
+  import: [
+    'resendNotificationService'
+  ],
+
   tableColumns: ['id', 'body', 'notificationType', 'broadcasted', 'userId', 'groupId' ],
 
   axioms: [
@@ -109,6 +113,30 @@ foam.CLASS({
       documentation: 'Notification body'
     },
     {
+      class: 'String',
+      name: 'toastMessage',
+      documentation: 'Toast notification message'
+    },
+    {
+      class: 'String',
+      name: 'toastSubMessage',
+      documentation: 'Toast notification description'
+    },
+    {
+      class: 'Enum',
+      name: 'toastState',
+      of: 'foam.nanos.notification.ToastState'
+    },
+    {
+      class: 'Enum',
+      name: 'severity',
+      of: 'foam.log.LogLevel'
+    },
+    {
+      class: 'Boolean',
+      name: 'transient'
+    },
+    {
       class: 'Boolean',
       name: 'broadcasted',
       documentation: 'Determines if notification is sent to all users in a group or system.'
@@ -169,14 +197,14 @@ foam.CLASS({
       name: 'authorizeOnCreate',
       javaCode: `
       AuthService auth = (AuthService) x.get("auth");
-      if ( ! checkOwnership(x) && ! auth.check(x, createPermission("create")) ) throw new AuthorizationException("You don't have permission to create this notification.");
+      if ( ! checkOwnership(x) && ! auth.check(x, createPermission("create")) && ! getTransient() ) throw new AuthorizationException("You don't have permission to create this notification.");
       `
     },
     {
       name: 'authorizeOnUpdate',
       javaCode: `
       AuthService auth = (AuthService) x.get("auth");
-      if ( ! checkOwnership(x) && ! auth.check(x, createPermission("update")) ) throw new AuthorizationException("You don't have permission to update notifications you do not own.");
+      if ( ! checkOwnership(x) && ! auth.check(x, createPermission("update")) && ! getTransient() ) throw new AuthorizationException("You don't have permission to update notifications you do not own.");
       `
     },
     {
@@ -202,6 +230,21 @@ foam.CLASS({
       javaCode: `
         return "notification." + operation + "." + getId();
       `
+    }
+  ],
+  actions: [
+    {
+      name: 'resendNotification',
+      label: 'Resend Notification',
+      availablePermissions:['notification.notify'],
+      code: function(X) {
+        try {
+         X.resendNotificationService.resend(X, this.userId, this);
+        } catch(e) {
+          console.error('error',e)
+        }
+
+      }
     }
   ]
 });

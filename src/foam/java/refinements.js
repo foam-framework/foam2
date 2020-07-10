@@ -552,13 +552,13 @@ foam.LIB({
         .filter(flagFilter)
         .filter(p => !! p.javaType && p.javaInfoType && p.generateJava)
         .filter(p => p.javaFactory);
-      
+
       if ( properties.length > 0 ) {
         cls.method({
           visibility: 'public',
           type: 'void',
           name: 'beforeFreeze',
-          body: (this.model_.extends === 'FObject' ? '' : 'super.beforeFreeze();\n') + 
+          body: (this.model_.extends === 'FObject' ? '' : 'super.beforeFreeze();\n') +
             properties.map(p => `get${foam.String.capitalize(p.name)}();`)
               .join('\n')
         });
@@ -581,7 +581,7 @@ foam.LIB({
           visibility: 'public',
           body: 'return x_;'
         });
-  
+
         cls.method({
           name: 'setX',
           type: 'void',
@@ -701,7 +701,7 @@ foam.LIB({
           visibility: 'public',
           name: 'hashCode',
           type: 'int',
-          body: 
+          body:
             ['int hash = 1'].concat(props.map(function(f) {
               return 'hash += hash * 31 + foam.util.SafetyUtil.hashCode('+f.name+ '_' +')';
             })).join(';\n') + ';\n'
@@ -797,6 +797,7 @@ foam.CLASS({
       name: 'abstract',
       value: false
     },
+    { class: 'String', name: 'visibility', value: 'public' },
     {
       class: 'StringArray',
       name: 'javaThrows'
@@ -873,7 +874,7 @@ foam.CLASS({
       cls.method({
         name: this.name,
         type: this.javaType || 'void',
-        visibility: 'public',
+        visibility: this.visibility,
         static: this.isStatic(),
         abstract: this.abstract,
         final: this.final,
@@ -1324,10 +1325,11 @@ foam.CLASS({
         cls.buildJavaClass = function(cls) {
           cls = cls || foam.java.Enum.create();
 
-          cls.name    = this.name;
-          cls.package = this.package;
-          cls.extends = this.extends;
-          cls.values  = this.VALUES;
+          cls.name       = this.name;
+          cls.package    = this.package;
+          cls.extends    = this.extends;
+          cls.values     = this.VALUES;
+          cls.implements = [ 'foam.core.FEnum' ];
 
           // TODO: needed for now because Enums don't extend FObject
           // but a better solution would be to remove setters from
@@ -1338,7 +1340,6 @@ foam.CLASS({
             type: 'void',
             body: `/* nop */`
           });
-
 
           var flagFilter = foam.util.flagFilter(['java']);
           var axioms = this.getAxioms().filter(flagFilter);
@@ -1371,7 +1372,7 @@ foam.CLASS({
 
           cls.declarations = this.VALUES.map(function(v) {
             return `${v.name}(${properties.map(p => foam.java.asJavaValue(v[p])).join(', ')})`;
-          }).join(', ');
+          }).join(',\n  ');
 
           cls.method({
             name: 'labels',
@@ -1394,7 +1395,7 @@ return new String[] {
             body: `
 switch (ordinal) {
 ${this.VALUES.map(v => `\tcase ${v.ordinal}: return ${cls.name}.${v.name};`).join('\n')}
-    default: return null;
+  default: return null;
 }`
           });
 
@@ -1407,7 +1408,7 @@ ${this.VALUES.map(v => `\tcase ${v.ordinal}: return ${cls.name}.${v.name};`).joi
             body: `
 switch (label) {
 ${this.VALUES.map(v => `\tcase "${v.label}": return ${cls.name}.${v.name};`).join('\n')}
-    default: return null;
+  default: return null;
 }`
           });
 

@@ -23,6 +23,10 @@ foam.CLASS({
       name: 'daoKey'
     },
     {
+      class: 'Class',
+      name: 'factory'
+    },
+    {
       class: 'FObjectProperty',
       of: 'foam.mlang.predicate.Predicate',
       name: 'predicate',

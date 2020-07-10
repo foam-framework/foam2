@@ -11,6 +11,7 @@ foam.CLASS({
   requires: [
     'foam.comics.SearchMode',
     'foam.comics.v2.DAOControllerConfig',
+    'foam.log.LogLevel',
     'foam.u2.ActionView',
     'foam.u2.dialog.Popup',
     'foam.u2.layout.Cols',
@@ -93,7 +94,8 @@ foam.CLASS({
   ],
 
   imports: [
-    'stack?'
+    'stack?',
+    'ctrl'
   ],
 
   exports: [
@@ -187,9 +189,7 @@ foam.CLASS({
       code: function(X) {
         this.config.dao.cmd_(X, foam.dao.CachingDAO.PURGE);
         this.config.dao.cmd_(X, foam.dao.AbstractDAO.RESET_CMD);
-        this.add(foam.u2.dialog.NotificationMessage.create({
-          message: this.REFRESH_MSG
-        }));
+        this.ctrl.notify(this.REFRESH_MSG, '', this.LogLevel.INFO, true);
       }
     },
     {

@@ -7,10 +7,9 @@
 foam.CLASS({
   package: 'foam.nanos.export',
   name: 'GoogleSheetsExportDriver',
-  implements: [ 'foam.nanos.export.ExportDriver' ],
-
-  requires: [
-    'foam.nanos.export.GoogleSheetsOutputter'
+  implements: [ 
+    'foam.nanos.export.ExportDriver',
+    'foam.nanos.export.GoogleSheetsServiceConfig'
   ],
 
   documentation: `
@@ -23,46 +22,59 @@ foam.CLASS({
     {
       name: 'outputter',
       factory: function() {
-        return this.GoogleSheetsOutputter.create();
-      }
+        return foam.nanos.export.GoogleSheetsOutputter.create();
+      },
+      hidden: true,
+      flags: ['js']
+    },
+    {
+      class: 'String',
+      name: 'title'
     }
   ],
 
   methods: [
     async function exportFObject(X, obj) {
-        var self = this;
-        
-        var sheetId  = '';
-        var stringArray = [];
-        var props = X.filteredTableColumns ? X.filteredTableColumns : self.outputter.getAllPropertyNames(dao.of);
-        var metadata = self.outputter.getColumnMethadata(dao.of, props);
-        stringArray.push(metadata.map(m => m.columnLabel));
-        var values = await self.outputter.outputArray([ obj ], metadata);
-        stringArray = stringArray.concat(values);
+      var self = this;
+      
+      var sheetId  = '';
+      var stringArray = [];
+      var columnConfig = X.columnConfigToPropertyConverter;
 
-        sheetId = await X.googleSheetsDataExport.createGoogleSheetAndPopulateWithData(X, stringArray, metadata);
-        if ( ! sheetId || sheetId.length == 0)
-          return '';
-        var url = `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`;
-        return url;
+      var props = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(obj.cls);
+      props = columnConfig.filterExportedProps(X, obj.cls_, props);
+      
+      var metadata = await self.outputter.getColumnMethadata(X, obj.cls_, props);
+      stringArray.push(metadata.map(m => m.columnLabel));
+      
+      var values = [ await this.outputter.objToArrayOfStringValues(X, obj.cls_, [ obj ], metadata.map(p => p.propName)) ];
+      stringArray = stringArray.concat(values);
+
+      sheetId = await X.googleSheetsDataExport.createGoogleSheetAndPopulateWithData(X, stringArray, metadata, this);
+      if ( ! sheetId || sheetId.length === 0)
+        return '';
+      return `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`;
     },
     async function exportDAO(X, dao) {
       var self = this;
-      
-      var sink = await dao.select();
-      var sheetId  = '';
-      var stringArray = [];
-      var props = X.filteredTableColumns ? X.filteredTableColumns : self.outputter.getAllPropertyNames(dao.of);
-      var metadata = self.outputter.getColumnMethadata(dao.of, props);
-      stringArray.push(metadata.map(m => m.columnLabel));
-      var values = await self.outputter.outputArray(sink.array, metadata);
-      stringArray = stringArray.concat(values);
 
-      sheetId = await X.googleSheetsDataExport.createGoogleSheetAndPopulateWithData(X, stringArray, metadata);
+      var columnConfig = X.columnConfigToPropertyConverter;
+
+      var props = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(dao.of);
+      props = columnConfig.filterExportedProps(dao.of, props);
+
+      var metadata = await self.outputter.getColumnMethadata(X, dao.of);
+
+      var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(dao.of, props);
+      var sink = await dao.select(expr);
+      
+      var sheetId  = '';
+      var stringArray = await self.outputter.outputTable(X, dao.of, sink.array, metadata);
+
+      sheetId = await X.googleSheetsDataExport.createGoogleSheetAndPopulateWithData(X, stringArray, metadata, this);
       if ( ! sheetId || sheetId.length == 0)
         return '';
-      var url = `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`;
-      return url;
+      return `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`;
     }
   ]
 });

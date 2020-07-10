@@ -70,8 +70,12 @@ p({
     ProxyLogger logLevelFilterLogger = (ProxyLogger) x.get("logLevelFilterLogger");
     logLevelFilterLogger.setX(x);
     AppConfig app = (AppConfig) x.get("appConfig");
+    if ( app.getMode() == Mode.TEST ) {
+      logLevelFilterLogger.setLogDebug(false);
+    }
     if ( app.getMode() == Mode.PRODUCTION ) {
       logLevelFilterLogger.setLogDebug(false);
+      logLevelFilterLogger.setLogInfo(false);
     }
     DAOLogger daoLogger = new DAOLogger(x);
     daoLogger.setDelegate((foam.dao.DAO) x.get("localLogMessageDAO"));
