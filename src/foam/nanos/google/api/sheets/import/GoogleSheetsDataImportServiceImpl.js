@@ -118,11 +118,12 @@
             result.setSuccess(false);
           }
           int recordsAdded = addRecordsToDAO(x, importConfig.getDAO(), parsedObjs);
+          result.setResult(recordsAdded);
 
           if ( recordsAdded <= 0 ) {
             result.setSuccess(false);
-          } else
-            result.setResult(recordsAdded);
+            return result;
+          }
             
           List<String> columnHeaders = new ArrayList<>();
           for ( Object header : data.get(0) ) {
