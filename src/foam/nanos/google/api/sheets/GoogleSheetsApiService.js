@@ -57,8 +57,8 @@ foam.CLASS({
     }
   ],
   methods: [
-    {//rename it to createExportSheet or something
-      name: 'createSheet',
+    {
+      name: 'createGoogleSheetAndPopulateWithData',
       javaType: 'String',
       args: [
         {
@@ -150,7 +150,7 @@ foam.CLASS({
           for ( int i = 0 ; i < metadata.length ; i++ ) {
             if ( metadata[i].getColumnWidth() > 0 )
               requests.add(new Request().setUpdateDimensionProperties(new UpdateDimensionPropertiesRequest().setRange(new DimensionRange().setSheetId(0).setDimension("COLUMNS").setStartIndex(i).setEndIndex(i+1)).setProperties(new DimensionProperties().setPixelSize(metadata[i].getColumnWidth())).setFields("pixelSize")));
-            if ( metadata[i].getCellType().equals("STRING") )
+            if ( metadata[i].getCellType().equals("STRING") )//to enum??
               continue;
     
             if ( metadata[i].getCellType().equals("DATE_TIME") ) {
@@ -239,8 +239,8 @@ foam.CLASS({
       `
     },
     {
-      name: 'getValues',
-      type: 'Object',//return list of values not value range?? // though for currency parsing we might use it
+      name: 'getFormatedValues',
+      type: 'Object',
       javaType: 'ValueRange',
       args: [
         {
@@ -263,77 +263,18 @@ foam.CLASS({
         Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, READ_SCOPES))
           .setApplicationName("nanopay")
           .build();
-        Sheets.Spreadsheets.Values.Get request =
-        service.spreadsheets().values().get(spreadsheetId, range).setValueRenderOption("FORMATTED_VALUE").setDateTimeRenderOption("FORMATTED_STRING");
+        Sheets.Spreadsheets.Values.Get request = service.spreadsheets().values()
+          .get(spreadsheetId, range)
+          .setValueRenderOption("FORMATTED_VALUE")
+          .setDateTimeRenderOption("FORMATTED_STRING");
+
         ValueRange response = request.execute();
 
-        //in case we need to retrieve formatting data
-        //eg when we export 1220.1 CAD we can read currecy from the pattern 
-        // Sheets.Spreadsheets.Get request1 = service.spreadsheets().get(spreadsheetId);
-        // List<String> ranges = new ArrayList<>(); // TODO: Update placeholder value.
-        // request1.setRanges(ranges);
-        // request1.setIncludeGridData(true);//response1.getSheets().get(0).getData().get(0).rowData.get(1).getValues().get(1).getUserEnteredFormat().getNumberFormat()
-        // Spreadsheet response1 = request1.execute();
-        //response1.getSheets().get(sheetId);if sheetId is number 
-
-
-        // System.out.println("done");
-  //              List<List<Object>> values = response.getValues();
         return response;
       `
     },
     {
-      name: 'updateValues',
-      javaType: 'String',
-      args: [
-        {
-          name: 'x',
-          type: 'Context',
-        },
-        {
-          name: 'sheetId',
-          javaType: 'String'
-        },
-        {
-          name: 'obj',
-          javaType: 'Object'
-        },
-        {
-          name: 'startRange',
-          javaType: 'String'
-        }
-      ],
-      javaThrows: [ 'java.io.IOException', 'java.security.GeneralSecurityException' ],
-      javaCode: `
-        List<List<Object>> listOfValues = new ArrayList<>();
-
-        Object[] arr = (Object[]) obj;
-        for ( Object v : arr ) {
-          listOfValues.add(Arrays.asList((Object[])v));
-        }
-
-        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-        GoogleApiAuthService googleApiAuthService = (GoogleApiAuthService)getX().get("googleApiAuthService");
-        Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, READ_SCOPES))
-          .setApplicationName("nanopay")
-          .build();
-        List<ValueRange> data = new ArrayList<>();
-        data.add(new ValueRange()
-          .setRange(startRange)
-          .setValues(listOfValues));
-
-        BatchUpdateValuesRequest batchBody = new BatchUpdateValuesRequest()
-          .setValueInputOption("USER_ENTERED")
-          .setData(data);
-
-        BatchUpdateValuesResponse batchResult = service.spreadsheets().values()
-          .batchUpdate(sheetId, batchBody)
-          .execute();
-        return batchResult.getSpreadsheetId();
-      `
-    },
-    {
-      name: 'batchUpdate',
+      name: 'createAndExecuteBatchUpdateWithListOfValuesForCellsRange',
       javaType: 'Boolean',
       args: [
         {
@@ -364,8 +305,8 @@ foam.CLASS({
         List<ValueRange> data = new ArrayList<>();
         for ( int i = 0 ; i < cellsRanges.size() ; i++ ) {
           data.add(new ValueRange()
-          .setRange(cellsRanges.get(i))
-          .setValues(values.get(i)));
+            .setRange(cellsRanges.get(i))
+            .setValues(values.get(i)));
         }
         
         BatchUpdateValuesRequest batchBody = new BatchUpdateValuesRequest()

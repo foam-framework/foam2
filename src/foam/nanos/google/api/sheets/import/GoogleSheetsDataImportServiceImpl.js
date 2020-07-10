@@ -50,8 +50,6 @@
           public static Pattern alphabeticalCharsRegex = Pattern.compile("[a-zA-Z]{1,}");
 
           public static List<String> alphabet = java.util.Arrays.asList(new String[] {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"});
-          //so to calculate column in index that you need
-          // eg "A", "CA", "B"
           public int findAndValidateIndexOfColumnInArrayOfValues (List<List<String>> base, int startColumnIndex, int endColumnIndex, String col) {
             int colIndex = findColumnIndex(col, base);
             return colIndex > endColumnIndex ?  -1 : colIndex < startColumnIndex ? -1 : colIndex;
@@ -122,7 +120,7 @@
         GoogleSheetsApiService googleSheetsAPIEnabler = (GoogleSheetsApiService)x.get("googleSheetsDataExport");
         ValueRange values;
         try {
-          values = googleSheetsAPIEnabler.getValues(x, importConfig.getGoogleSpreadsheetId(), importConfig.getGoogleSheetId());//sb.toString()
+          values = googleSheetsAPIEnabler.getFormatedValues(x, importConfig.getGoogleSpreadsheetId(), importConfig.getGoogleSheetId());//sb.toString()
           List<Object> firstRow = values.getValues().get(0);
           String[] columnNames = new String[firstRow.size()];
           for ( int i = 0 ; i < firstRow.size() ; i++ ) {
@@ -157,7 +155,9 @@
         ValueRange values;
         ImportDataMessage result = new ImportDataMessage();
         try {
-          values = googleSheetsAPIEnabler.getValues(x, importConfig.getGoogleSpreadsheetId(), importConfig.getGoogleSheetId());
+          values = googleSheetsAPIEnabler.getFormatedValues(x, importConfig.getGoogleSpreadsheetId(), importConfig.getGoogleSheetId());
+          
+          importConfig.setCellsRange(values.getRange().split("!")[1]);
 
           List<List<Object>> data = values.getValues();
           List<FObject> parsedObjs = valueRangeValuesToFobjectsArray(x, importConfig, data);
@@ -343,8 +343,10 @@
             if ( prop instanceof AbstractEnumPropertyInfo )
               prop.set(obj, ((AbstractEnumPropertyInfo)prop).getValueClass().getMethod("forLabel", String.class).invoke(null, valueString));
             else if ( prop.getValueClass().getName().equals("java.util.Date") ) {
-              if ( valueString.indexOf("////") > 2 ) {
+              if ( valueString.indexOf("/") > 2 ) {
                 prop.set(obj, new SimpleDateFormat("EEE MMM d yyyy HH/mm/ss zZ (zzzz)", Locale.US).parse(valueString));
+              } else if ( valueString.indexOf("-") > -1 ) {
+                prop.set(obj, new SimpleDateFormat("yyyy-MM-dd").parse(valueString));
               } else {
                 prop.set(obj, new java.util.Date(valueString));
               }
@@ -390,7 +392,7 @@
       GoogleSheetsApiService googleSheetsAPIEnabler = (GoogleSheetsApiService)x.get("googleSheetsDataExport");
       List<List<List<Object>>> values = new ArrayList<>();
 
-      //to save cells ranges for columns that must be updated
+      //to store cells ranges for columns that must be updated
       List<String> cellsRange = new ArrayList<>();
 
       //to calculate column headers row
@@ -434,7 +436,7 @@
       if ( values.size() == 0 ) {
         return true;
       }
-      return googleSheetsAPIEnabler.batchUpdate(x, importConfig.getGoogleSpreadsheetId(), values, cellsRange);
+      return googleSheetsAPIEnabler.createAndExecuteBatchUpdateWithListOfValuesForCellsRange(x, importConfig.getGoogleSpreadsheetId(), values, cellsRange);
     `
   }
 ],
