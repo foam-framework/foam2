@@ -82,7 +82,9 @@ returning true if the spid or context users spid matches the current object.`,
       ],
       type: 'Boolean',
       javaCode: `
+      var isUserSpid = false;
       var spid = getSpid();
+
       if ( SafetyUtil.isEmpty(spid) ) {
         var user = ((Subject) x.get("subject")).getUser();
         if ( user == null ) {
@@ -90,6 +92,7 @@ returning true if the spid or context users spid matches the current object.`,
           return true;
         }
         spid = user.getSpid();
+        isUserSpid = true;
       }
 
       var auth = (AuthService) x.get("auth");
@@ -98,8 +101,7 @@ returning true if the spid or context users spid matches the current object.`,
            obj instanceof ServiceProviderAware ) {
         ServiceProviderAware sp = (ServiceProviderAware) obj;
         return spid.equals(sp.getSpid()) ||
-          (auth.check(x, "spid.read." + sp.getSpid()) &&
-           auth.check(x, "spid.read." + spid));
+                 isUserSpid && auth.check(x, "spid.read." + sp.getSpid());
       }
 
       Object result = obj;
@@ -121,8 +123,7 @@ returning true if the spid or context users spid matches the current object.`,
                  result instanceof ServiceProviderAware ) {
               ServiceProviderAware sp = (ServiceProviderAware) result;
               return spid.equals(sp.getSpid()) ||
-                (auth.check(x, "spid.read." + sp.getSpid()) &&
-                 auth.check(x, "spid.read." + spid));
+                       isUserSpid && auth.check(x, "spid.read." + sp.getSpid());
             } else {
               break;
             }
