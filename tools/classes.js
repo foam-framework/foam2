@@ -407,7 +407,6 @@ var classes = [
   'foam.nanos.google.api.drive.GoogleDriveService',
   'foam.nanos.google.api.sheets.GoogleSheetsApiService',
   'foam.nanos.google.api.sheets.ColumnHeaderToPropertyMapping',
-  'foam.nanos.google.api.sheets.ColumnToPropertyMapper',
   'foam.nanos.google.api.sheets.GoogleSheetsImportConfig',
   'foam.nanos.google.api.sheets.GoogleSheetsDataImportService',
   'foam.nanos.google.api.sheets.GoogleSheetsDataImportServiceImpl',

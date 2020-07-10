@@ -20,9 +20,6 @@
     'notify'
   ],
   css: `
-  ^{
-    // padding: 16px;
-  }
   ^footer {
     width: 100%;
     position: absolute;
