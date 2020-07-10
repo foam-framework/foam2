@@ -36,13 +36,13 @@
           .start()
             .addClass(this.myClass())
             .start('h2')
-              .style({'padding-left': '8px'})
+              .style({'padding-left': '16px'})
               .add('Exported Columns:')
             .end()
             .forEach(self.importConfig.columnHeaderPropertyMappings, function(c) {
               self
               .start()
-                .style({'padding': '0 8px'})
+                .style({'padding': '0 16px'})
                 .tag(self.SectionedDetailPropertyView, {
                   data: c,
                   prop: self.ColumnHeaderToPropertyMapping.COLUMN_HEADER
@@ -69,7 +69,7 @@
       name: 'next',
       label: 'Continue',
       code: async function(X) {
-        if ( ! this.importConfig.columnHeaderPropertyMappings.some(m => m.prop) ) {
+        if ( ! this.importConfig.columnHeaderPropertyMappings.some(m => m.prop && ! m.prop.sheetsOutput) ) {
           this.notify('It looks like data you\'re trying to import do not match out records. Please make sure that google sheet you\'re trying to import and data on the current page match', 'error');
           return;
         }

@@ -169,8 +169,7 @@
           }
           int recordsAdded = addRecordsToDAO(x, importConfig.getDAO(), parsedObjs);
 
-          if ( recordsAdded == -1 ) {
-            result.setResult(0);
+          if ( recordsAdded <= 0 ) {
             result.setSuccess(false);
           } else
             result.setResult(recordsAdded);
