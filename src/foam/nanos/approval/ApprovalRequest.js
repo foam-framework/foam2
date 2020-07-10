@@ -160,7 +160,7 @@
           } else if ( data.isTrackingRequest ) {
             slot.set(data.TRACKING);
           } else if ( user ) {
-            if ( X.user.id != user.id  ) {
+            if ( X.user.id != user.id ) {
               slot.set(user.toSummary());
             } else {
               slot.set(data.PENDING);
