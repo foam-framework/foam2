@@ -41,13 +41,15 @@ foam.CLASS({
       if ( order ) {
         let i = 0;
         let idsBehind = {};
+        let swappedFrom = {};
         while ( i < childNodes.length ) {
+          console.log(i);
           let node = childNodes[i];
 
           // Determine if/what this node should be swapped with
           let needToSwap = false;
-          for ( let j = 0 ; j < node.inverseLinks.length ; j ++ ) {
-            let link = node.inverseLinks[j];
+          for ( let j = 0 ; j < node.forwardLinks.length ; j ++ ) {
+            let link = node.forwardLinks[j];
             if ( link == parentNode.data.id ) continue;
             if ( ! idsBehind[link] ) {
               needToSwap = link;
@@ -57,6 +59,17 @@ foam.CLASS({
 
           // Find prerequisite to swap with
           if ( needToSwap ) {
+            if ( swappedFrom[node.data.id] ) {
+              swappedFrom = {};
+              idsBehind[node.data.id] = true;
+              console.warn(
+                'circular relation detected',
+                swappedFrom, node, needToSwap, idsBehind
+              );
+              i++;
+            }
+            swappedFrom[node.data.id] = true;
+
             for ( let ii = i+1; ii < childNodes.length; ii++ ) {
               if ( childNodes[ii].data.id == needToSwap ) {
                 let tmp = childNodes[ii];
@@ -68,7 +81,9 @@ foam.CLASS({
             // Don't increment `i` if a swap was done
             continue;
           }
-          idsBehind[node.data.id] = true;
+          
+          swappedFrom = {};
+          idsBehind[childNodes[i].data.id] = true;
           i++;
         }
       }
@@ -91,11 +106,16 @@ foam.CLASS({
     {
       name: 'data',
       class: 'Map'
+    },
+    {
+      name: 'roots',
+      class: 'Array'
     }
   ],
 
   methods: [
     function fromRelationship(rootObject, relationshipKey) {
+      this.roots.push(rootObject);
       // Add graph node (with no relations yet)
       if ( ! this.data[rootObject.id] ) {
         this.data[rootObject.id] = this.GraphNode.create({
@@ -117,7 +137,9 @@ foam.CLASS({
         })));
     },
     function build() {
-      return this.Graph.create({ data: this.data });
+      let graph = this.Graph.create({ data: this.data });
+      graph.roots = this.roots;
+      return graph;
     }
   ],
 });
