@@ -9,7 +9,7 @@ foam.INTERFACE({
   name: 'ServiceProviderAware',
 
   constants: {
-    GLOBAL_SPID: '_GLOBAL_SPID_'
+    GLOBAL_SPID: '*'
   },
 
   properties: [

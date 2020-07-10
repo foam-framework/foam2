@@ -301,7 +301,7 @@
       of: 'foam.nanos.auth.ServiceProvider',
       name: 'spid',
       value: foam.nanos.auth.ServiceProviderAware.GLOBAL_SPID,
-      documentation: 'Service Provider Id of the rule. Default to "_GLOBAL_" for rule applicable to all service providers.'
+      documentation: 'Service Provider Id of the rule. Default to ServiceProviderAware.GLOBAL_SPID for rule applicable to all service providers.'
     }
   ],
 
