@@ -107,9 +107,9 @@ foam.CLASS({
             cls = m.getReturnType();
           }
           ci = (ClassInfo) cls.getMethod("getOwnClassInfo").invoke(null);
-        } catch (Exception e) {
+        } catch ( Throwable t ) {
           Logger logger = (Logger) getX().get("logger");
-          logger.error(e);
+          logger.error(t);
           return null;
         }
 
