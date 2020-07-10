@@ -263,24 +263,6 @@ foam.CLASS({
 });
 
 
-foam.CLASS({
-  package: 'foam.core',
-  name: 'Duration',
-  extends: 'Long',
-
-  documentation: `
-    A length of time in milliseconds. Further refined in TableCellFormatter.js
-    to make values human-readable when displayed in tables.
-  `,
-
-  properties: [
-    {
-      name: 'units',
-      value: 'ms'
-    }
-  ]
-});
-
 
 foam.CLASS({
   package: 'foam.core',
