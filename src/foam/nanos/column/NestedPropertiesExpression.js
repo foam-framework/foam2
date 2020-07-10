@@ -57,10 +57,7 @@ foam.CLASS({
         return e.f(obj);
       },
       javaCode: `
-        Expr e = null;
-        try {
-          e = returnDotExprForNestedProperty(getObjClass(), getNestedProperty().split("\\\\."), 0, null);
-        } catch(Throwable t) {}
+        Expr e = returnDotExprForNestedProperty(getObjClass(), getNestedProperty().split("\\\\."), 0, null);
         if ( e == null )
           return null;
         FObject copy = ((FObject)obj).shallowClone();
@@ -71,11 +68,6 @@ foam.CLASS({
     {
       name: 'returnDotExprForNestedProperty',
       javaType: 'foam.mlang.Expr',
-      javaThrows: [
-        'java.lang.NoSuchMethodException',
-        'java.lang.IllegalAccessException',
-        'java.lang.reflect.InvocationTargetException',
-      ],
       args: [
         {
           name: 'of',
@@ -118,18 +110,22 @@ foam.CLASS({
         if ( i == propName.length - 1 ) {
           return expr;
         }
-
-        StringBuilder sb = new StringBuilder("find");
-        Class cls;
-        if ( p instanceof foam.core.AbstractFObjectPropertyInfo ) {
-          cls = p.getValueClass();
-        } else {
-          sb.setLength(4);
-          sb.append(StringUtil.capitalize(p.getName()));
-          Method m = ci.getObjClass().getMethod(sb.toString(), foam.core.X.class);
-          cls = m.getReturnType();
+        try {
+          StringBuilder sb = new StringBuilder("find");
+          Class cls;
+          if ( p instanceof foam.core.AbstractFObjectPropertyInfo ) {
+            cls = p.getValueClass();
+          } else {
+            sb.setLength(4);
+            sb.append(StringUtil.capitalize(p.getName()));
+            Method m = ci.getObjClass().getMethod(sb.toString(), foam.core.X.class);
+            cls = m.getReturnType();
+          }
+          ci = (ClassInfo) cls.getMethod("getOwnClassInfo").invoke(null);
+        } catch( Throwable t ) {
+          return null;
         }
-        ci = (ClassInfo) cls.getMethod("getOwnClassInfo").invoke(null);
+        
         return returnDotExprForNestedProperty(ci, propName, ++i, expr);
       `
     }
