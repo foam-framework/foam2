@@ -3280,7 +3280,9 @@ foam.CLASS({
             return null;
           }
         }
-        return getArg2().f(getArg1().f(obj));
+        Object val = getArg1().f(obj);
+        if ( val == null ) return null;
+        return getArg2().f(val);
       `
     },
 

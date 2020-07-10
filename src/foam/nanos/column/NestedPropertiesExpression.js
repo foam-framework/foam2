@@ -57,7 +57,10 @@ foam.CLASS({
         return e.f(obj);
       },
       javaCode: `
-        Expr e = returnDotExprForNestedProperty(getObjClass(), getNestedProperty().split("\\\\."), 0);
+        Expr e = null;
+        try {
+          e = returnDotExprForNestedProperty(getObjClass(), getNestedProperty().split("\\\\."), 0, null);
+        } catch(Throwable t) {}
         if ( e == null )
           return null;
         FObject copy = ((FObject)obj).shallowClone();
@@ -68,6 +71,11 @@ foam.CLASS({
     {
       name: 'returnDotExprForNestedProperty',
       javaType: 'foam.mlang.Expr',
+      javaThrows: [
+        'java.lang.NoSuchMethodException',
+        'java.lang.IllegalAccessException',
+        'java.lang.reflect.InvocationTargetException',
+      ],
       args: [
         {
           name: 'of',
@@ -81,61 +89,48 @@ foam.CLASS({
         {
           name: 'i',
           class: 'Int'
+        },
+        {
+          name: 'expr',
+          javaType: 'foam.mlang.Expr'
         }
       ],
-      code: function (of, propName, i) {
-        if ( i === propName.length - 1 )
-          return of.getAxiomByName(propName[i]);
+      code: function (of, propName, i, expr) {
         var prop = of.getAxiomByName(propName[i]);
-        return foam.mlang.Expressions.create().DOT(prop, this.returnPropExpr(prop, this.returnDotExprForNestedProperty(prop.of, propName, ++i)));
+
+        if ( ! expr ) expr = prop;
+        else foam.mlang.Expressions.create().DOT(expr, prop);
+
+        if ( i === propName.length - 1 )
+          return expr;
+
+        return this.returnDotExprForNestedProperty(prop.of, propName, ++i, expr);
       },
       javaCode: `
         ClassInfo ci = of;
         PropertyInfo p = (PropertyInfo) ci.getAxiomByName(propName[i]);
+
+        if ( p == null ) return null; 
+
+        if ( expr == null ) expr = p;
+        else expr = DOT(expr, p);
+
         if ( i == propName.length - 1 ) {
-          return p;
-        }
-        
-        StringBuilder sb = new StringBuilder("find");
-        try {
-          Class cls;
-          if ( p instanceof foam.core.AbstractFObjectPropertyInfo ) {
-            cls = p.getValueClass();
-          } else {
-            sb.setLength(4);
-            Method m = ci.getObjClass().getMethod(StringUtil.capitalize(p.getName()), foam.core.X.class);
-            cls = m.getReturnType();
-          }
-          ci = (ClassInfo) cls.getMethod("getOwnClassInfo").invoke(null);
-        } catch (Exception e) {
-          Logger logger = (Logger) getX().get("logger");
-          logger.error(e);
-          return null;
+          return expr;
         }
 
-        return returnPropExpr(p, returnDotExprForNestedProperty(ci, propName, ++i));
-      `
-    },
-    {
-      name: 'returnPropExpr',
-      javaType: 'foam.mlang.Expr',
-      args: [
-        {
-          name: 'prop1',
-          class: 'Object',
-          javaType: 'foam.mlang.Expr'
-        },
-        {
-          name: 'prop2',
-          class: 'Object',
-          javaType: 'foam.mlang.Expr'
+        StringBuilder sb = new StringBuilder("find");
+        Class cls;
+        if ( p instanceof foam.core.AbstractFObjectPropertyInfo ) {
+          cls = p.getValueClass();
+        } else {
+          sb.setLength(4);
+          sb.append(StringUtil.capitalize(p.getName()));
+          Method m = ci.getObjClass().getMethod(sb.toString(), foam.core.X.class);
+          cls = m.getReturnType();
         }
-      ],
-      code: function (prop1, prop2) {
-        return foam.mlang.Expressions.create().DOT(prop1, prop2);
-      },
-      javaCode: `
-        return DOT(prop1, prop2);
+        ci = (ClassInfo) cls.getMethod("getOwnClassInfo").invoke(null);
+        return returnDotExprForNestedProperty(ci, propName, ++i, expr);
       `
     }
   ]
