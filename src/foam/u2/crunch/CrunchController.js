@@ -38,7 +38,8 @@ foam.CLASS({
 
   messages: [
     { name: 'CANNOT_OPEN_GRANTED', message: 'This capability has already been granted to you.' },
-    { name: 'CANNOT_OPEN_PENDING', message: 'This capability is awaiting approval, updates are not permitted at this time.' }
+    { name: 'CANNOT_OPEN_PENDING', message: 'This capability is awaiting approval, updates are not permitted at this time.' },
+    { name: 'CANNOT_OPEN_ACTION_PENDING', message: 'This capability is awaiting review, updates are not permitted at this time.' }
   ],
 
   properties: [
@@ -115,10 +116,9 @@ foam.CLASS({
                 .filter((wizardSection) =>
                   wizardSection.ucj === null ||
                   (
-                    ! wizardSection.ucj.status === this.CapabilityJunctionStatus.GRANTED &&
-                    ! wizardSection.ucj.status === this.CapabilityJunctionStatus.PENDING
-                  )
-                )
+                    wizardSection.ucj.status != this.CapabilityJunctionStatus.GRANTED &&
+                    wizardSection.ucj.status != this.CapabilityJunctionStatus.PENDING
+                  ))
             };
           });
       });
@@ -131,18 +131,24 @@ foam.CLASS({
         }).sections);
     },
 
-    function callWizard(capabilityId) {
+    function generateAndDisplayWizard(capabilitiesSections) {
+      // called in CapabilityRequirementView
+      return ctrl.add(this.Popup.create({ closeable: false }).tag({
+        class: 'foam.u2.wizard.StepWizardletView',
+        data: foam.u2.wizard.StepWizardletController.create({
+          wizardlets: capabilitiesSections.wizCaps
+        }),
+        onClose: (x) => {
+          this.finalOnClose(x, capabilitiesSections.caps);
+        }
+      }));
+    },
+
+    async function startWizardFlow(capabilityId, toLaunchOrNot) {
       return this.getCapsAndWizardlets(capabilityId)
         .then((capabilitiesSections) => {
-          return ctrl.add(this.Popup.create({ closeable: false }).tag({
-            class: 'foam.u2.wizard.StepWizardletView',
-            data: foam.u2.wizard.StepWizardletController.create({
-              wizardlets: capabilitiesSections.wizCaps
-            }),
-            onClose: (x) => {
-              this.finalOnClose(x, capabilitiesSections.caps);
-            }
-          }));
+          // generate and popUp summary view (CapabilityRequirmentView) before wizard
+          return this.onStartShowPopRequirements(capabilityId, capabilitiesSections, toLaunchOrNot);
         });
     },
 
@@ -171,14 +177,16 @@ foam.CLASS({
         ));
       if ( ucj ) {
         var statusGranted = ucj.status === this.CapabilityJunctionStatus.GRANTED;
-        var statusPending = foam.util.equals(ucj.status, this.CapabilityJunctionStatus.PENDING);
+        var statusPending = ucj.status === this.CapabilityJunctionStatus.PENDING;
         if ( statusGranted || statusPending ) {
           var message = statusGranted ? this.CANNOT_OPEN_GRANTED : this.CANNOT_OPEN_PENDING;
           this.ctrl.notify(message, '', this.LogLevel.INFO, true);
           return;
         }
+        var nothingTodo = ucj.status === this.CapabilityJunctionStatus.ACTION_REQUIRED;
+        return this.startWizardFlow(capabilityId, nothingTodo);
       }
-      return this.callWizard(capabilityId);
+      return this.startWizardFlow(capabilityId, false);
     },
 
     function maybeLaunchInterceptView(intercept) {
@@ -215,6 +223,31 @@ foam.CLASS({
         .end()
       );
       return intercept.promise;
+    },
+
+    function onStartShowPopRequirements(capabilityId, capabilitiesSections, toLaunchOrNot) {
+      // toLaunchOrNot is true if ucj or capabilityId is in ActionRequired
+      if ( toLaunchOrNot && capabilitiesSections.caps.length < 1 ) {
+        // This is here because of a CertifyDataReviewed capability.
+        this.ctrl.notify(this.CANNOT_OPEN_ACTION_PENDING);
+        return;
+      }
+      var sectionsList = this.generateSections(capabilitiesSections.wizCaps);
+      var arrOfRequiredCapabilities = sectionsList.flat()
+        .filter(eachSection => eachSection && eachSection.help)
+        .map(eachSection => eachSection.help);
+      if ( arrOfRequiredCapabilities.length < 1 ) {
+        // if nothing to show don't open this dialog - push directly to wizard
+        this.generateAndDisplayWizard(capabilitiesSections);
+      } else {
+        return this.ctrl.add(
+          this.Popup.create({ closeable: false }, this.ctrl.__subContext__).tag({
+            class: 'foam.u2.crunch.CapabilityRequirementView',
+            arrayRequirement: arrOfRequiredCapabilities,
+            functionData: capabilitiesSections,
+            capabilityId: capabilityId
+          })).end();
+      }
     }
   ]
 });

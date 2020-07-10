@@ -40,11 +40,11 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'apiKey_'
+      name: 'apiKey'
     },
     {
       class: 'Object',
-      name: 'prop_',
+      name: 'prop',
       javaType: 'PropertyInfo'
     }
   ],
@@ -72,8 +72,8 @@ foam.CLASS({
             public GoogleMapsGeocodingDAO(X x, String apiKey, PropertyInfo prop, DAO delegate) {
               setX(x);
               setDelegate(delegate);
-              setApiKey_(apiKey);
-              setProp_(prop);
+              setApiKey(apiKey);
+              setProp(prop);
             }
           `
         );
@@ -96,7 +96,7 @@ foam.CLASS({
     
             // don't geocode if no address property
             FObject cloned = result.fclone();
-            Address address = (Address) getProp_().get(cloned);
+            Address address = (Address) getProp().get(cloned);
             if ( address == null ) {
               return;
             }
@@ -104,8 +104,8 @@ foam.CLASS({
             // check if address updated
             if ( address.getLatitude() != 0 && address.getLongitude() != 0 ) {
               FObject stored = getDelegate().find(cloned.getProperty("id"));
-              if (stored != null && getProp_().get(cloned) != null ) {
-                Address storedAddress = (Address) getProp_().get(cloned);
+              if (stored != null && getProp().get(cloned) != null ) {
+                Address storedAddress = (Address) getProp().get(cloned);
                 // compare fields that are used to populate Google maps query
                 if ( SafetyUtil.compare(address.getAddress(), storedAddress.getAddress()) == 0 &&
                     SafetyUtil.compare(address.getCity(), storedAddress.getCity()) == 0 &&
@@ -144,7 +144,7 @@ foam.CLASS({
             }
     
             // append api key
-            builder.append("&key=").append(getApiKey_());
+            builder.append("&key=").append(getApiKey());
     
             String line = null;
             HttpURLConnection conn = null;
@@ -191,7 +191,7 @@ foam.CLASS({
               // set latitude and longitude
               address.setLatitude(coords.getLat());
               address.setLongitude(coords.getLng());
-              getProp_().set(cloned, address);
+              getProp().set(cloned, address);
               GoogleMapsGeocodingDAO.super.put_(x, cloned);
             } catch (Throwable ignored) {
             } finally {

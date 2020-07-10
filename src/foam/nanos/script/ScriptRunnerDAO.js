@@ -19,7 +19,7 @@ foam.CLASS({
 
   constants: [
     {
-      type: 'Integer',
+      type: 'int',
       name: 'DEFAULT_WAIT_TIME',
       value: 2000
     }
@@ -117,6 +117,7 @@ foam.CLASS({
     },
     {
       name: 'estimateWaitTime',
+      visibility: '', // passing empty string to make method package scoped
       type: 'Long',
       args: [
         { type: 'foam.nanos.script.Script', name: 'script' }
