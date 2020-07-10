@@ -91,6 +91,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/User" },
   { name: "foam/nanos/auth/PriorPassword" },
   { name: "foam/nanos/auth/ruler/AddPasswordHistoryAction" },
+  { name: "foam/nanos/auth/ruler/PreventDuplicateUsernameAction" },
   { name: "foam/nanos/auth/test/PasswordPolicyTest" },
   { name: "foam/nanos/auth/LastModifiedByAware" },
   { name: "foam/nanos/auth/LastModifiedByAwareDAO" },
