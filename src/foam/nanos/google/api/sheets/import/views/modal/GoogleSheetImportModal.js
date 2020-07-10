@@ -8,9 +8,13 @@
   package: 'foam.nanos.google.api.sheets',
   name: 'GoogleSheetImportModal',
   extends: 'net.nanopay.ui.wizardModal.WizardModalSubView',
+  requires: [
+    'foam.u2.dialog.NotificationMessage',
+  ],
   imports: [
     'importConfig',
-    'importServiceName'
+    'importServiceName',
+    'ctrl'
   ],
   css: `
   ^footer {
@@ -62,9 +66,12 @@
               arr.push(colHeaderConfig);
             }
             this.importConfig.columnHeaderPropertyMappings = arr;
+            this.pushToId('columnsMapping');
+          } else {
+            this.ctrl.add(this.NotificationMessage.create({ message: 'Something went wrong! Please contact support', type: 'error' }));
+            X.closeDialog();
           }
         });
-        this.pushToId('columnsMapping');
       }
     }
   ]
