@@ -57,7 +57,8 @@ Use: see ServiceProviderAwareTest
     },
     {
       class: 'String',
-      name: 'spid'
+      name: 'spid',
+      documentation: 'The spid to be matched against. If not set context user spid will be used.'
     }
   ],
 

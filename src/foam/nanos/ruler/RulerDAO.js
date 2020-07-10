@@ -199,6 +199,7 @@ for ( Object key : sink.getGroupKeys() ) {
         { name: 'rule', type: 'Rule' },
         { name: 'obj', type: 'FObject' }
       ],
+      documentation: 'Send a ServiceProviderAwareSupport action command to the DAO for spid matching test.',
       javaCode: `
         var result = getDelegate().cmd_(x.put("OBJ", obj),
           new ServiceProviderAwareSupport.Builder(x)
