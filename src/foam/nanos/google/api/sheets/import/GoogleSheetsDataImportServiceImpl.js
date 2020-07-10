@@ -13,29 +13,30 @@
   javaImports: [
     'com.google.api.services.sheets.v4.model.ValueRange',
 
+    'foam.dao.DAO',
     'foam.core.FObject',
     'foam.core.PropertyInfo',
     'foam.core.AbstractEnumPropertyInfo',
     'foam.nanos.google.api.sheets.ImportDataMessage',
+    'foam.nanos.logger.Logger',
+    'foam.nanos.logger.StdoutLogger',
 
     'java.lang.Throwable',
     'java.math.BigDecimal',
-    'java.util.ArrayList',
-    'java.util.List',
-    'java.util.regex.Matcher',
-    'java.util.regex.Pattern',
-
-    'foam.dao.DAO',
-
-    'static foam.mlang.MLang.AND',
-    'static foam.mlang.MLang.CONTAINS_IC',
-    'static foam.mlang.MLang.EQ',
+    'java.text.ParseException',
     'java.text.SimpleDateFormat',
     'java.time.LocalDateTime',
     'java.time.format.DateTimeFormatter',
+    'java.util.ArrayList',
     'java.util.Date',
-    'java.text.ParseException',
-    'java.util.Locale'
+    'java.util.List',
+    'java.util.Locale',
+    'java.util.regex.Matcher',
+    'java.util.regex.Pattern',
+
+    'static foam.mlang.MLang.AND',
+    'static foam.mlang.MLang.CONTAINS_IC',
+    'static foam.mlang.MLang.EQ'
   ],
   axioms: [
     {
@@ -153,10 +154,14 @@
           columnNames[i] = String.valueOf(firstRow.get(i));
         }
         return columnNames; 
-      } catch( Throwable t ) {
-        System.out.println(t);
+      } catch ( Throwable t ) {
+        Logger logger = (Logger) x.get("logger");
+        if ( logger == null ) {
+          logger = new StdoutLogger();
+        }
+        logger.error(t);
+        return null;
       }
-      return null;
       `
     },
     {
@@ -200,9 +205,12 @@
           }
           updateSheet(x, importConfig, parsedObjs, columnHeaders);
           result.setSuccess(true);
-          return result;
         } catch ( Throwable t ) {
-          System.out.println(t);
+          Logger logger = (Logger) x.get("logger");
+          if ( logger == null ) {
+            logger = new StdoutLogger();
+          }
+          logger.error(t);
           result.setSuccess(false);
         }
         return result;
@@ -229,11 +237,16 @@
       DAO dao  = (DAO)x.get(daoId);
       if ( dao == null ) return -1;
       int recordsInserted = 0;
-      for ( FObject obj: objs) {
+      for ( FObject obj: objs ) {
         try {
           dao.put(obj);
           recordsInserted++;
-        } catch(Throwable t) {
+        } catch ( Throwable t ) {
+          Logger logger = (Logger) x.get("logger");
+          if ( logger == null ) {
+            logger = new StdoutLogger();
+          }
+          logger.error(t);
         }
       }
       return recordsInserted;
@@ -266,20 +279,20 @@
     javaCode: `
       List<String> columnHeaders = new ArrayList<>();
 
-      for ( int i = 0 ; i <  data.get(0).size() ; i++ ) {
+      for ( int i = 0 ; i < data.get(0).size() ; i++ ) {
         columnHeaders.add(data.get(0).get(i).toString());
       }
       List<FObject> objs = new ArrayList<>();
       
       for ( int i = 1 ; i < data.size() ; i++ ) {
         Object obj = importConfig.getImportClassInfo().newInstance();
-        for ( int j = 0 ; j < Math.min(importConfig.getColumnHeaderPropertyMappings().length, data.get(i).size()) ; j ++ ) {
+        for ( int j = 0 ; j < Math.min(importConfig.getColumnHeaderPropertyMappings().length, data.get(i).size()) ; j++ ) {
           if ( importConfig.getColumnHeaderPropertyMappings()[j].getProp() == null || importConfig.getColumnHeaderPropertyMappings()[j].getProp().getSheetsOutput() ) continue;
           int columnIndex = columnHeaders.indexOf(importConfig.getColumnHeaderPropertyMappings()[j].getColumnHeader());
           Object val = data.get(i).get(columnIndex);
           // PropertyInfo prop = ((PropertyInfo)importConfig.getColumnHeaderPropertyMappings()[j].getProp());
-          if ( ! setValue(obj, importConfig.getColumnHeaderPropertyMappings()[j], data.get(i).get(columnIndex)) )
-            return null;
+          if ( ! setValue(x, obj, importConfig.getColumnHeaderPropertyMappings()[j], data.get(i).get(columnIndex)) )
+            continue;
         }
         postSetValues(x, obj);
         objs.add((FObject)obj);
@@ -306,14 +319,18 @@
   },
   {//maybe all of it to static will save memory
     name: 'setValue',
-    type: 'Boolean',
-    javaThrows: [
-      'NoSuchMethodException',
-      'java.lang.reflect.InvocationTargetException',
-      'IllegalAccessException',
-      'ParseException'
-    ],
+    type: 'Boolean',//if return boolean than handle the exception!
+    // javaThrows: [
+    //   'NoSuchMethodException',
+    //   'java.lang.reflect.InvocationTargetException',
+    //   'IllegalAccessException',
+    //   'ParseException'
+    // ],
     args: [
+      {
+        name: 'x',
+        type: 'Context',
+      },
       {
         name: 'obj',
         type: 'Object'
@@ -332,40 +349,48 @@
 
       String valueString = val.toString();
       if ( valueString.length() == 0 ) return true;
-      
-      switch (prop.getValueClass().getName()) {
-        case "long":
-          if ( columnHeaderToPropertyMapping.getUnitProperty() != null ) {
-            String unitValue = valueString;
-            Matcher numMatcher = numbersRegex.matcher(unitValue);
-            if ( ! numMatcher.find() ) {
-              return false;
+      try {
+        switch (prop.getValueClass().getName()) {
+          case "long":
+            if ( columnHeaderToPropertyMapping.getUnitProperty() != null ) {
+              String unitValue = valueString;
+              Matcher numMatcher = numbersRegex.matcher(unitValue);
+              if ( ! numMatcher.find() ) {
+                return false;
+              }
+              String number = unitValue.substring(numMatcher.start(), numMatcher.end());
+              prop.set(obj, Math.round( Double.parseDouble(number) * 100));//might not be the case for all of the unitValues
+              Matcher alphabeticalCharsMatcher = alphabeticalCharsRegex.matcher(unitValue);
+              if ( alphabeticalCharsMatcher.find() ) {
+                String unit = unitValue.substring(alphabeticalCharsMatcher.start(), alphabeticalCharsMatcher.end());
+                ((PropertyInfo)columnHeaderToPropertyMapping.getUnitProperty()).set(obj, unit);
+              }
+            } else prop.set(obj, Long.parseLong(valueString));
+            break;
+          case "double":
+            prop.set(obj, Double.parseDouble(valueString));
+            break;
+          default:
+            if ( prop instanceof AbstractEnumPropertyInfo )
+              prop.set(obj, ((AbstractEnumPropertyInfo)prop).getValueClass().getMethod("forLabel", String.class).invoke(null, valueString));
+            else if ( prop.getValueClass().getName().equals("java.util.Date") ) {
+              if ( valueString.indexOf("////") > 2 ) {
+                prop.set(obj, new SimpleDateFormat("EEE MMM d yyyy HH/mm/ss zZ (zzzz)", Locale.US).parse(valueString));
+              } else {
+                prop.set(obj, new java.util.Date(valueString));
+              }
             }
-            String number = unitValue.substring(numMatcher.start(), numMatcher.end());
-            prop.set(obj, Math.round( Double.parseDouble(number) * 100));//might not be the case for all of the unitValues
-            Matcher alphabeticalCharsMatcher = alphabeticalCharsRegex.matcher(unitValue);
-            if ( alphabeticalCharsMatcher.find() ) {
-              String unit = unitValue.substring(alphabeticalCharsMatcher.start(), alphabeticalCharsMatcher.end());
-              ((PropertyInfo)columnHeaderToPropertyMapping.getUnitProperty()).set(obj, unit);
-            }
-          } else prop.set(obj, Long.parseLong(valueString));
-          break;
-        case "double":
-          prop.set(obj, Double.parseDouble(valueString));
-          break;
-        default:
-          if ( prop instanceof AbstractEnumPropertyInfo)
-            prop.set(obj, ((AbstractEnumPropertyInfo)prop).getValueClass().getMethod("forLabel", String.class).invoke(null, valueString));
-          else if ( prop.getValueClass().getName().equals("java.util.Date") ) {
-            try {
-              prop.set(obj, new java.util.Date(valueString));
-            } catch ( Throwable t ) {
-              prop.set(obj, new SimpleDateFormat("EEE MMM d yyyy HH/mm/ss zZ (zzzz)", Locale.US).parse(valueString));
-            }
-          }
-          else
-            prop.set(obj, val);
-          break;
+            else
+              prop.set(obj, val);
+            break;
+        }
+      } catch ( Throwable t ) {
+        Logger logger = (Logger) x.get("logger");
+        if ( logger == null ) {
+          logger = new StdoutLogger();
+        }
+        logger.error(t);
+        return false;
       }
       return true;
     `

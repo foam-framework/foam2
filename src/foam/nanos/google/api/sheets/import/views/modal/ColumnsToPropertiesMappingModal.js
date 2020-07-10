@@ -9,8 +9,8 @@
   name: 'ColumnsToPropertiesMappingModal',
   extends: 'net.nanopay.ui.wizardModal.WizardModalSubView',
   requires: [
-    'foam.u2.dialog.NotificationMessage',
     'foam.nanos.google.api.sheets.ColumnHeaderToPropertyMapping',
+    'foam.u2.dialog.NotificationMessage',
     'foam.u2.detail.SectionedDetailPropertyView'
   ],
   imports: [

@@ -24,7 +24,7 @@
       this.SUPER();
       this
       .start('h2')
-        .style({'padding-left': '16px'})
+        .style({'padding-left': '8px'})
         .add('Link to Document')
       .end()
       .start()
