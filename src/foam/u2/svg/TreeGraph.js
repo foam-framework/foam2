@@ -5,6 +5,7 @@ foam.CLASS({
 
   requires: [
     'foam.u2.svg.arrow.VHVArrowLine',
+    'foam.u2.svg.arrow.SimpleArrowHead',
   ],
 
   css: `
@@ -119,6 +120,15 @@ foam.CLASS({
                 (coords[0]*(size + gap) + gap + 0.5*size),
                 (coords[1]*(size + gap) + gap),
               ]
+            })
+            .tag(self.SimpleArrowHead, {
+              originPos: [
+                // same as end position of line
+                (coords[0]*(size + gap) + gap + 0.5*size),
+                (coords[1]*(size + gap) + gap),
+              ],
+              angle: 0,
+              size: 5
             })
         })
       
