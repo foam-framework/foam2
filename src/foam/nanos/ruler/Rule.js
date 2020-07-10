@@ -437,7 +437,7 @@
       name: 'authorizeOnRead',
       javaCode: `
         var auth = (AuthService) x.get("auth");
-        if ( ! auth.check(x, "rule.read.*")
+        if ( ! auth.check(x, "rule.read." + getId())
           || ! auth.check(x, "spid.read." + getSpid())
         ) {
           throw new AuthorizationException("You do not have permission to read the rule.");
@@ -448,7 +448,7 @@
       name: 'authorizeOnUpdate',
       javaCode: `
         var auth = (AuthService) x.get("auth");
-        if ( ! auth.check(x, "rule.update.*")
+        if ( ! auth.check(x, "rule.update." + getId())
           || ! auth.check(x, "spid.read." + getSpid())
         ) {
           throw new AuthorizationException("You do not have permission to update the rule.");
