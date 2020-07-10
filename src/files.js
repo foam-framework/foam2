@@ -818,7 +818,7 @@ FOAM_FILES([
   { name: "foam/nanos/column/ColumnConfigPropertyValue" },
   { name: "foam/nanos/column/CSVTableOutputter"},
   { name: "foam/nanos/column/NestedPropertiesExpression" },
-  { name: "foam/nanos/column/TableColumnOutputter" }
+  { name: "foam/nanos/column/TableColumnOutputter" },
 
   // Translation Support
   { name: 'foam/i18n/XLIFFTranslationValue' },
