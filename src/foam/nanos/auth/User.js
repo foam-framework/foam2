@@ -112,7 +112,8 @@ foam.CLASS({
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
       section: 'administrative',
-      includeInDigest: true
+      includeInDigest: true,
+      sheetsOutput: true
     },
     {
       class: 'Reference',

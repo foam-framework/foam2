@@ -315,6 +315,7 @@
     ],
     javaCode: `
       PropertyInfo prop  = (PropertyInfo)columnHeaderToPropertyMapping.getProp();
+      if ( prop == null ) return false;
 
       String valueString = val.toString();
       if ( valueString.length() == 0 ) return true;
@@ -412,6 +413,7 @@
       List<List<String>> base = generateBase(endColumn.length());
 
       for ( ColumnHeaderToPropertyMapping c : importConfig.getColumnHeaderPropertyMappings() ) {
+        if ( c.getProp() == null ) continue;
         if ( ((PropertyInfo)c.getProp()).getSheetsOutput() ) {
           //to calculate cells ranges
           StringBuilder sb = new StringBuilder();
