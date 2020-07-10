@@ -11,8 +11,6 @@ public class GoogleSheetsParsingHelper {
   }      
 
   public static int findColumnIndex(String col, List<List<String>> base) {
-
-    // List<List<String>> base = generateBase(endColumn.length());
     int i = 0;
     int preIndex = 0;
     while ( i < col.length() - 1 ) {

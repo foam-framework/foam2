@@ -42,7 +42,6 @@
     {
       name: 'javaExtras',
       buildJavaClass: function(cls) {
-        //move all this to helper class?
         cls.extras.push(foam.java.Code.create({
           data: `
             public static Pattern digitAppearenceRegex = Pattern.compile("(\\\\d){1}");
