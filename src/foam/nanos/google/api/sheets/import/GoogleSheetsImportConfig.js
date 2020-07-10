@@ -41,8 +41,8 @@
     {
       name: 'googleSheetId',
       class: 'String',
-      hidden: true,
-      // expression: function(googleSheetLink) {
+      // hidden: true,
+      // expression: function(googleSheetLink) {//this will only parse id. we could use but it would be MUCH MORE easy to let user provided cause otherwise we need to use Sheets.Spreadsheets.Get, which is a lot of data
       //   var findMatch = googleSheetLink.match(this.SHEET_ID_REGEX);
       //   return  findMatch ? findMatch[1] : findMatch;
       // },
