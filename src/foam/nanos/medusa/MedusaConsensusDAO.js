@@ -108,7 +108,7 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-      PM pm = createPM(x, "put");
+      PM pm = PM.create(x, this.getOwnClassInfo(), "put");
       MedusaEntry entry = (MedusaEntry) obj;
       ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
       getLogger().debug("put", getIndex(), replaying.getReplayIndex(), entry.getIndex(), entry.getNode());
@@ -192,7 +192,7 @@ foam.CLASS({
       ],
       type: 'foam.nanos.medusa.MedusaEntry',
       javaCode: `
-      PM pm = createPM(x, "promote");
+      PM pm = PM.create(x, this.getOwnClassInfo(), "promote");
       ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
       getLogger().debug("promote", entry.getIndex(), getIndex(), replaying.getReplayIndex(), replaying.getReplaying());
       try {
@@ -207,7 +207,8 @@ foam.CLASS({
             if ( replaying.getReplaying() &&
                  getIndex() >= replaying.getReplayIndex() ) {
               getLogger().debug("promote", "replayComplete", "index");
-              replayComplete(x);
+              ((DAO) x.get("localMedusaEntryDAO")).cmd(new ReplayCompleteCmd());
+              // replayComplete(x);
             }
           }
         }
@@ -232,10 +233,12 @@ foam.CLASS({
       javaCode: `
       getLogger().debug("start");
       ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
-      ReplayingInfo replaying = (ReplayingInfo) getX().get("replayingInfo");
-      replaying.setStartTime(new java.util.Date());
+      // ReplayingInfo replaying = (ReplayingInfo) getX().get("replayingInfo");
+      // if ( replaying.getStartTime() == null ) {
+      //   replaying.setStartTime(new java.util.Date());
+      // }
 
-//      ((Agency) getX().get(support.getThreadPoolName())).submit(getX(), this, "Consensus Promoter");
+      // ((Agency) getX().get(support.getThreadPoolName())).submit(getX(), this, "Consensus Promoter");
 
       Timer timer = new Timer(this.getClass().getSimpleName());
       timer.scheduleAtFixedRate(
@@ -341,7 +344,7 @@ foam.CLASS({
       ],
       type: 'foam.nanos.medusa.MedusaEntry',
       javaCode: `
-      PM pm = createPM(x, "mdao");
+      PM pm = PM.create(x, this.getOwnClassInfo(), "mdao");
       getLogger().debug("mdao", entry.getIndex());
 
       try {
@@ -398,47 +401,28 @@ foam.CLASS({
       }
       `
     },
-    {
-      name: 'replayComplete',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        }
-      ],
-      javaCode: `
-      PM pm = createPM(x, "replayComplete");
-      ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
-      replaying.setReplaying(false);
-      replaying.setEndTime(new java.util.Date());
-      getLogger().info("replayComplete", "duration", (replaying.getEndTime().getTime() - replaying.getStartTime().getTime())/ 1000, "s");
-      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+    // {
+    //   name: 'replayComplete',
+    //   args: [
+    //     {
+    //       name: 'x',
+    //       type: 'Context'
+    //     }
+    //   ],
+    //   javaCode: `
+    //   // ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
+    //   // replaying.setReplaying(false);
+    //   // replaying.setEndTime(new java.util.Date());
+    //   // getLogger().info("replayComplete", "duration", (replaying.getEndTime().getTime() - replaying.getStartTime().getTime())/ 1000, "s");
+    //   // ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
 
-      DAO dao = (DAO) x.get("localClusterConfigDAO");
-      ClusterConfig config = (ClusterConfig) dao.find(support.getConfigId()).fclone();
-      config.setStatus(Status.ONLINE);
-      dao.put(config);
+    //   // DAO dao = (DAO) x.get("localClusterConfigDAO");
+    //   // ClusterConfig config = (ClusterConfig) dao.find(support.getConfigId()).fclone();
+    //   // config.setStatus(Status.ONLINE);
+    //   // dao.put(config);
 
-      ((DAO) x.get("localMedusaEntryDAO")).cmd(new ReplayCompleteCmd());
-      pm.log(x);
-      `
-    },
-    {
-      name: 'createPM',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'name',
-          type: 'String'
-        }
-      ],
-      javaType: 'PM',
-      javaCode: `
-      return PM.create(x, this.getOwnClassInfo(), name);
-      `
-    }
+    //   ((DAO) x.get("localMedusaEntryDAO")).cmd(new ReplayCompleteCmd());
+    //   `
+    // }
   ]
 });

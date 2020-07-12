@@ -101,7 +101,9 @@ foam.CLASS({
 
             synchronized ( this ) {
               ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
-
+              if ( replaying.getStartTime() == null ) {
+                replaying.setStartTime(new java.util.Date());
+              }
               DaggerService dagger = (DaggerService) x.get("daggerService");
               if ( details.getMaxIndex() > dagger.getGlobalIndex(getX())) {
                 dagger.setGlobalIndex(getX(), details.getMaxIndex());
@@ -111,15 +113,25 @@ foam.CLASS({
                 replaying.setReplayIndex(details.getMaxIndex());
               }
               replaying.getReplayNodes().put(details.getResponder(), details);
+
+            getLogger().debug(myConfig.getId(), "replaying", replaying.getReplaying(), "replayIndex", replaying.getReplayIndex(), "node quorum", support.getHasNodeQuorum());
+
+            if ( replaying.getReplayIndex() == 0 &&
+                 support.getHasNodeQuorum() ) {
+              // special intial case - no data.
+              ((DAO) x.get("localMedusaEntryDAO")).cmd(new ReplayCompleteCmd());
+            }
             }
 
-            ReplayCmd cmd = new ReplayCmd();
-            cmd.setDetails(details);
-            cmd.setServiceName("medusaMediatorDAO"); // TODO: configuration
+            if ( details.getMaxIndex() > 0 ) {
+              ReplayCmd cmd = new ReplayCmd();
+              cmd.setDetails(details);
+              cmd.setServiceName("medusaMediatorDAO"); // TODO: configuration
 
-            getLogger().debug(myConfig.getId(), "ReplayCmd to", config.getId());
-            cmd = (ReplayCmd) clientDAO.cmd_(getX(), cmd);
-            getLogger().debug(myConfig.getId(), "ReplayCmd from", config.getId(), cmd);
+              getLogger().debug(myConfig.getId(), "ReplayCmd to", config.getId());
+              cmd = (ReplayCmd) clientDAO.cmd_(getX(), cmd);
+              getLogger().debug(myConfig.getId(), "ReplayCmd from", config.getId(), cmd);
+            }
           } else {
             getLogger().debug("no match");
           }

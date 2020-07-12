@@ -70,11 +70,11 @@ foam.CLASS({
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
       getLogger().debug("put", entry.getIndex());
-      PM pm = createPM(x, "put");
+      PM pm = PM.create(x, this.getOwnClassInfo(), "put");
       try {
         ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
         ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
-        entry.setNode(myConfig.getId());
+        entry.setNode(support.getConfigId());
 
         int groups = support.getNodeGroups();
         Map buckets = support.getNodeBuckets();
@@ -116,23 +116,6 @@ foam.CLASS({
         pm.log(x);
       }
       `
-    },
-    {
-      name: 'createPM',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'name',
-          type: 'String'
-        }
-      ],
-      javaType: 'PM',
-      javaCode: `
-      return PM.create(x, this.getOwnClassInfo(), getServiceName()+":"+name);
-      `
-    },
+    }
   ]
 });

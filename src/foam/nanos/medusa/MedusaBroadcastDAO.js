@@ -128,6 +128,7 @@ foam.CLASS({
         return ((DAO) x.get(getServiceName())).put(entry);
       }
 
+      entry.setNode(support.getConfigId());
 
       if ( myConfig.getType() == MedusaType.NODE ) {
         // Always broadcast to/from NODE and
@@ -138,11 +139,7 @@ foam.CLASS({
           }
         }
 
-        // Handle older entries. 
-        if ( foam.util.SafetyUtil.isEmpty(entry.getNode()) ) {
-          entry.setNode(myConfig.getId());
-        }
-
+ 
         // if ( getBatchEnabled() ) {
         //   // queue for broadcast
         //   return super.put_(x, entry);

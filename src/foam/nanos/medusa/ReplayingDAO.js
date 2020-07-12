@@ -13,6 +13,7 @@ foam.CLASS({
   documentation: `All DAO operations will block until Replay is complete.`,
 
   javaImports: [
+    'foam.dao.DAO',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
   ],
@@ -91,6 +92,18 @@ foam.CLASS({
       if ( obj instanceof ReplayCompleteCmd ) {
         getLogger().info("replay complete");
         synchronized ( replayingLock_ ) {
+
+          ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
+          replaying.setReplaying(false);
+          replaying.setEndTime(new java.util.Date());
+          getLogger().info("replayComplete", "duration", (replaying.getEndTime().getTime() - replaying.getStartTime().getTime())/ 1000, "s");
+          ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+
+          DAO dao = (DAO) x.get("localClusterConfigDAO");
+          ClusterConfig config = (ClusterConfig) dao.find(support.getConfigId()).fclone();
+          config.setStatus(Status.ONLINE);
+          dao.put(config);
+
           getLogger().debug("notifyAll");
           replayingLock_.notifyAll();
         }
