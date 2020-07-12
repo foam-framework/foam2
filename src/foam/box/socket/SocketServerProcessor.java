@@ -96,7 +96,7 @@ public class SocketServerProcessor
         }
         Message msg = (Message) x.create(JSONParser.class).parseString(message);
         if ( msg == null ) {
-          int chunk = Math.max(0, Math.min(length, 100) - 1);
+          int chunk = Math.max(0, Math.min(length, 200) - 1);
           String start = new String(java.util.Arrays.copyOfRange(bytes, 0, chunk), StandardCharsets.UTF_8);
           String end = new String(java.util.Arrays.copyOfRange(bytes, length-chunk, length-1), StandardCharsets.UTF_8);
           logger_.debug("bytes", socket_.getRemoteSocketAddress(), length, start, "...", end);

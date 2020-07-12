@@ -170,7 +170,7 @@ foam.CLASS({
       } catch ( Exception e ) {
         if ( message != null ) {
           int length = message.length();
-          int chunk = Math.max(0, Math.min(length, 100) - 1);
+          int chunk = Math.max(0, Math.min(length, 200) - 1);
           getLogger().info("send", length, message.substring(0, chunk), "...", message.substring(length-chunk));
         }
         getLogger().error(e);

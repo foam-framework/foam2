@@ -106,7 +106,7 @@ foam.CLASS({
         String message = formatter.builder().toString();
 
         int length = message.length();
-        int chunk = Math.max(0, Math.min(length, 100) - 1);
+        int chunk = Math.max(0, Math.min(length, 200) - 1);
         getLogger().debug("send", length, message.substring(0, chunk), "...", message.substring(length-chunk));
 
         byte[] messageBytes = message.getBytes(StandardCharsets.UTF_8);
