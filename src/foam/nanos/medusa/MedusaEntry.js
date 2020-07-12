@@ -119,7 +119,10 @@ foam.CLASS({
       factory: function() { return new []; },
       javaFactory: 'return new java.util.ArrayList();',
       storageTransient: true,
-      tableWidth: 150
+      tableWidth: 150,
+      tableCellFormatter: function(value) {
+        this.add(value && value.join());
+      }
     },
     {
       name: 'verified',

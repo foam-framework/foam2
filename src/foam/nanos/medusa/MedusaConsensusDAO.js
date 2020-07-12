@@ -199,7 +199,7 @@ foam.CLASS({
 
         DaggerService dagger = (DaggerService) x.get("daggerService");
         dagger.verify(x, entry);
-
+        entry.setVerified(true);
         synchronized ( indexLock_ ) {
           if ( entry.getIndex() == getIndex() + 1 ) {
             setIndex(entry.getIndex());
@@ -220,7 +220,6 @@ foam.CLASS({
 
         // Notify any blocked Primary puts
         ((DAO) x.get("localMedusaEntryDAO")).cmd_(x, entry);
-
       } finally {
         pm.log(x);
       }
@@ -278,37 +277,37 @@ foam.CLASS({
             }
           } else {
             getLogger().warning("promoter", next, "not found");
-            // Possible holes, find next minimum index.
-            Min min = (Min) getDelegate()
-              .where(
-                AND(
-                  GT(MedusaEntry.INDEX, getIndex()),
-                  EQ(MedusaEntry.PROMOTED, false),
-                  GTE(MedusaEntry.CONSENSUS_COUNT, support.getNodeQuorum())
-                ))
-              .select(MIN(MedusaEntry.INDEX));
-            if ( min.getValue() != null &&
-                ((Long) min.getValue()) > getIndex() ) {
-              entry = (MedusaEntry) getDelegate().find((long) min.getValue());
-              if ( entry != null ) {
-                // Verify without failing - This entry may have consensus but
-                // dependent on yet to arrive indexes.
-                DaggerService dagger = (DaggerService) x.get("daggerService");
-                try {
-                  dagger.verify(x, entry);
-                  getLogger().debug("promoter", getIndex(), entry.getIndex(),  "found,verified", "replayIndex", replaying.getReplayIndex());
-                  // ignore while testing this.
-                  entry = null;
-                } catch (DaggerException e) {
-                  getLogger().debug("promoter", getIndex(), entry.getIndex(),  "found,NOT verified", "replayIndex", replaying.getReplayIndex());
-                  // ignore.
-                  entry = null;
-                }
-              }
-            } else {
-              getLogger().debug("promoter", getIndex(), "> not found", "replayIndex", replaying.getReplayIndex());
-            }
-          }
+            // // Possible holes, find next minimum index.
+            // Min min = (Min) getDelegate()
+            //   .where(
+            //     AND(
+            //       GT(MedusaEntry.INDEX, getIndex()),
+            //       EQ(MedusaEntry.PROMOTED, false),
+            //       GTE(MedusaEntry.CONSENSUS_COUNT, support.getNodeQuorum())
+            //     ))
+            //   .select(MIN(MedusaEntry.INDEX));
+            // if ( min.getValue() != null &&
+            //     ((Long) min.getValue()) > getIndex() ) {
+            //   entry = (MedusaEntry) getDelegate().find((long) min.getValue());
+            //   if ( entry != null ) {
+            //     // Verify without failing - This entry may have consensus but
+            //     // dependent on yet to arrive indexes.
+            //     DaggerService dagger = (DaggerService) x.get("daggerService");
+            //     try {
+            //       dagger.verify(x, entry);
+            //       getLogger().debug("promoter", getIndex(), entry.getIndex(),  "found,verified", "replayIndex", replaying.getReplayIndex());
+            //       // ignore while testing this.
+            //       entry = null;
+            //     } catch (DaggerException e) {
+            //       getLogger().debug("promoter", getIndex(), entry.getIndex(),  "found,NOT verified", "replayIndex", replaying.getReplayIndex());
+            //       // ignore.
+            //       entry = null;
+            //     }
+            //   }
+            // } else {
+            //   getLogger().debug("promoter", getIndex(), "> not found", "replayIndex", replaying.getReplayIndex());
+            // }
+         }
           if ( entry != null ) {
             getLogger().debug("promoter", next, "found", "promoting");
             promote(x, entry);
@@ -387,7 +386,8 @@ foam.CLASS({
         }
 
         entry.setPromoted(true);
-        MedusaEntry.DATA.clear(entry);
+        // Why am I clearing data? - Joel
+        // MedusaEntry.DATA.clear(entry);
         return entry;
       } catch (Throwable t) {
         getLogger().error(t);
