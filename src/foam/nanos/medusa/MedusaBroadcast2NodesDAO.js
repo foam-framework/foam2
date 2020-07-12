@@ -74,6 +74,7 @@ foam.CLASS({
       try {
         ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
         ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
+        entry.setNode(myConfig.getId());
 
         int groups = support.getNodeGroups();
         Map buckets = support.getNodeBuckets();

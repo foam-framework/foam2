@@ -104,9 +104,12 @@ foam.CLASS({
         if ( getBatch().size() >= getMaxBatchSize() ) {
           send(getX());
         }
-        MedusaEntry entry = (MedusaEntry) obj;
         ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
-//        entry.setNode(support.getConfigId());
+        MedusaEntry entry = (MedusaEntry) obj;
+        // Handle older entries.
+//        if ( foam.util.SafetyUtil.isEmpty(entry.getNode()) ) {
+        entry.setNode(support.getConfigId());
+//        }
         getLogger().debug("put", entry.getIndex(), getDetails().getRequester());
         getBatch().put(entry.getIndex(), entry);
       }
