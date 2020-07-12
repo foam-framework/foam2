@@ -128,7 +128,10 @@ foam.CLASS({
         return ((DAO) x.get(getServiceName())).put(entry);
       }
 
-      //entry.setNode(myConfig.getId());
+      // Handle older entries. 
+      if ( foam.util.SafetyUtil.isEmpty(entry.getNode()) ) {
+        entry.setNode(myConfig.getId());
+      }
 
       if ( myConfig.getType() == MedusaType.NODE ) {
         // Always broadcast to/from NODE and
