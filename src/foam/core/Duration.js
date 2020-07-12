@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2016 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.core',
   name: 'Duration',
@@ -12,7 +18,6 @@ foam.CLASS({
     {
       name: 'duration',
       code: function(value) {
-//        var value = this.value;
         value = Math.round(value);
         var days = Math.floor(value / 86400000);
         value -= days * 86400000;

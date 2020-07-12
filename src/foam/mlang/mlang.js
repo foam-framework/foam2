@@ -3255,29 +3255,32 @@ foam.CLASS({
         return this.arg2.f(this.arg1.f(o));
       },
       javaCode: `
-        StringBuilder sb = new StringBuilder("find");
-        PropertyInfo p1 = (PropertyInfo) getArg1();
-        FObject obj1;
-        if ( p1 instanceof AbstractFObjectPropertyInfo ) {
-          Object val = getArg1().f(obj);
-          return val == null ? null : getArg2().f(val);
-        }
-        try {
-          obj1 = (FObject)obj.getClass().getMethod(StringUtil.capitalize(p1.getName()), foam.core.X.class).invoke(obj, ((FObject)obj).getX());
-        } catch ( Throwable t ) {
-          return null;
-        }
-        if ( obj1 == null ) return null;
-        try {
-          return getArg2().f(obj1);
-        } catch ( Throwable t ) {
-          Logger logger = (Logger) getX().get("logger");
-          if ( logger == null ) {
-            logger = new StdoutLogger();
+        if ( getArg1() instanceof PropertyInfo && getArg2() instanceof PropertyInfo ) {
+          StringBuilder sb = new StringBuilder("find");
+          PropertyInfo p1 = (PropertyInfo) getArg1();
+          FObject obj1;
+          if ( p1 instanceof AbstractFObjectPropertyInfo ) {
+            Object val = getArg1().f(obj);
+            return val == null ? null : getArg2().f(val);
           }
-          logger.error(t);
-          return null;
+          try {
+            obj1 = (FObject)obj.getClass().getMethod(StringUtil.capitalize(p1.getName()), foam.core.X.class).invoke(obj, ((FObject)obj).getX());
+          } catch ( Throwable t ) {
+            return null;
+          }
+          if ( obj1 == null ) return null;
+          try {
+            return getArg2().f(obj1);
+          } catch ( Throwable t ) {
+            Logger logger = (Logger) getX().get("logger");
+            if ( logger == null ) {
+              logger = new StdoutLogger();
+            }
+            logger.error(t);
+            return null;
+          }
         }
+        return getArg2().f(getArg1().f(obj));
       `
     },
 
