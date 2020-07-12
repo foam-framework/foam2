@@ -112,10 +112,11 @@ foam.CLASS({
       tableWidth: 150
     },
     {
+      documentation: `Track Entries and Nodes - as we need consensus based on unique Entry.  If a node startup, stopped, started, the mediators would get the entry twice and if not distiguishing would assume two same hash copies, for example.`,
       name: 'consensusNodes',
       class: 'List',
       visibility: 'RO',
-      factory: function() { return []; },
+      factory: function() { return new []; },
       javaFactory: 'return new java.util.ArrayList();',
       storageTransient: true,
       tableWidth: 150
@@ -140,11 +141,11 @@ foam.CLASS({
       storageTransient: true
     },
     {
-      documentation: 'Solely for information. Broadcasting Node',
+      documentation: 'Set when journal on the Node. Used to distinguish unique entries during consensus determination.',
       name: 'node',
       class: 'String',
-      visibility: 'HIDDEN',
-      storageTransient: true
+      visibility: 'RO'
+      // storageTransient: true
     },
     {
       name: 'created',

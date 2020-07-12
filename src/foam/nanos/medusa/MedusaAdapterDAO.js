@@ -231,30 +231,41 @@ foam.CLASS({
       ],
       type: 'FObject',
       javaCode: `
-      PM pm = createPM(x, dop);
       getLogger().debug("submit", dop.getLabel(), obj.getClass().getName());
 
       DaggerService dagger = (DaggerService) x.get("daggerService");
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       ClusterConfig config = support.getConfig(x, support.getConfigId());
 
-      FObjectFormatter formatter = formatter_.get();
-      if ( old != null ) {
-        formatter.outputDelta(old, obj);
-      } else {
-        formatter.output(obj);
+      PM pm = PM.create(x, this.getOwnClassInfo(), "formatter");
+      String data = null;
+      try {
+        FObjectFormatter formatter = formatter_.get();
+        if ( old != null ) {
+          formatter.outputDelta(old, obj);
+        } else {
+          formatter.output(obj);
+        }
+        data = formatter.builder().toString();
+        if ( SafetyUtil.isEmpty(data) ) {
+          getLogger().info("submit", obj.getClass().getSimpleName(), "data,empty");
+          return obj;
+        }
+      } finally {
+        pm.log(x);
       }
 
+      pm = PM.create(x, this.getOwnClassInfo(), dop.getLabel());
       MedusaEntry entry = x.create(MedusaEntry.class);
-      entry = dagger.link(x, entry);
-      entry.setMediator(config.getName());
-      entry.setNSpecName(getNSpec().getName());
-      entry.setDop(dop);
-      entry.setData(formatter.builder().toString().trim());
-
-      getLogger().debug("submit", entry.getIndex(), obj.getClass().getSimpleName(), "stringify", entry.getData());
-
       try {
+        entry = dagger.link(x, entry);
+        entry.setMediator(config.getName());
+        entry.setNSpecName(getNSpec().getName());
+        entry.setDop(dop);
+        entry.setData(data);
+
+        getLogger().debug("submit", entry.getIndex(), obj.getClass().getSimpleName(), "stringify", entry.getData());
+
         FObject result = getMedusaEntryDAO().put_(x, entry); // blocking
         FObject nu = getDelegate().find_(x, obj.getProperty("id"));
         if ( nu == null ) {
@@ -268,23 +279,6 @@ foam.CLASS({
       } finally {
         pm.log(x);
       }
-      `
-    },
-    {
-      name: 'createPM',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'dop',
-          type: 'foam.dao.DOP'
-        }
-      ],
-      javaType: 'PM',
-      javaCode: `
-      return PM.create(x, this.getOwnClassInfo(), dop.getLabel());
       `
     }
   ]

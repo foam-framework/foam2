@@ -76,6 +76,13 @@ configuration for contacting the primary node.`,
       visibility: 'RO'
     },
     {
+      name: 'configName',
+      label: 'Self',
+      class: 'String',
+      javaFactory: 'return getConfig(getX(), getConfigId()).getName();',
+      visibility: 'RO'
+    },
+    {
       name: 'isPrimary',
       class: 'Boolean',
       value: false,

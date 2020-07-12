@@ -156,8 +156,13 @@ foam.CLASS({
           } else {
             existing = entry;
           }
-          existing.setConsensusCount(existing.getConsensusCount() + 1);
-          existing.getConsensusNodes().add(entry.getNode());
+
+          List nodes = existing.getConsensusNodes();
+          if ( ! nodes.contains(entry.getNode()) ) {
+            nodes.add(entry.getNode());
+          }
+          existing.setConsensusCount(nodes.size());
+          // existing.setConsensusCount(existing.getConsensusCount() + 1);
           entry = (MedusaEntry) getDelegate().put_(x, existing);
           ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
           if ( entry.getConsensusCount() >= support.getNodeQuorum() &&

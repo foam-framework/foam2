@@ -47,7 +47,9 @@ foam.CLASS({
         getLogger().error("put", "duplicate index", entry);
         throw new DaggerException("Duplicate index: "+entry.getIndex());
       }
-      return getDelegate().put_(x, obj);
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      entry.setNode(support.getConfigId());
+      return getDelegate().put_(x, entry);
       `
     }
   ]

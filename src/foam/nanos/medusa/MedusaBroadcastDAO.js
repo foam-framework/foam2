@@ -128,8 +128,7 @@ foam.CLASS({
         return ((DAO) x.get(getServiceName())).put(entry);
       }
 
-      // Purely for human monitoring and troubleshooting.
-      entry.setNode(myConfig.getId());
+      //entry.setNode(myConfig.getId());
 
       if ( myConfig.getType() == MedusaType.NODE ) {
         // Always broadcast to/from NODE and
