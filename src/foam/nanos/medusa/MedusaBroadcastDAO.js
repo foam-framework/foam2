@@ -128,10 +128,6 @@ foam.CLASS({
         return ((DAO) x.get(getServiceName())).put(entry);
       }
 
-      // Handle older entries. 
-      if ( foam.util.SafetyUtil.isEmpty(entry.getNode()) ) {
-        entry.setNode(myConfig.getId());
-      }
 
       if ( myConfig.getType() == MedusaType.NODE ) {
         // Always broadcast to/from NODE and
@@ -140,6 +136,11 @@ foam.CLASS({
           if ( entry.getIndex() > replaying.getIndex() ) {
             replaying.setIndex(entry.getIndex());
           }
+        }
+
+        // Handle older entries. 
+        if ( foam.util.SafetyUtil.isEmpty(entry.getNode()) ) {
+          entry.setNode(myConfig.getId());
         }
 
         // if ( getBatchEnabled() ) {

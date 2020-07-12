@@ -160,6 +160,7 @@ foam.CLASS({
           List nodes = existing.getConsensusNodes();
           if ( ! nodes.contains(entry.getNode()) ) {
             nodes.add(entry.getNode());
+            existing.setConsensusNodes(nodes);
           }
           existing.setConsensusCount(nodes.size());
           // existing.setConsensusCount(existing.getConsensusCount() + 1);
