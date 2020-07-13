@@ -30,7 +30,8 @@
   `,
   messages: [
     { name: 'ERROR_MSG', message: 'Something went wrong! Please contact support'},
-    { name: 'SUCCESS_MSG', message: 'Number of records inserted: '}
+    { name: 'SUCCESS_MSG', message: 'Number of records inserted: '},
+    { name: 'NO_COLUMN_MATCHES_MSG', message: 'It looks like data you\'re trying to import do not match out records. Please make sure that google sheet you\'re trying to import and data on the current page match' }
   ],
   methods: [
     function initE() {
@@ -75,13 +76,13 @@
       label: 'Continue',
       code: async function(X) {
         if ( ! this.importConfig.columnHeaderPropertyMappings.some(m => m.prop && ! m.prop.sheetsOutput) ) {
-          this.notify('It looks like data you\'re trying to import do not match out records. Please make sure that google sheet you\'re trying to import and data on the current page match', 'error');
+          this.notify(this.NO_COLUMN_MATCHES_MSG, '', this.LogLevel.ERROR, true);
           return;
         }
 
         await X[this.importServiceName].importData(X, this.importConfig).then(r => {
           var message = this.NotificationMessage.create();
-          if ( r.success ) message.message = `Number of records inserted: ${r.result}`;
+          if ( r.success ) message.message = this.SUCCESS_MSG + r.result;
           else {
             message.message = this.ERROR_MSG;
             message.type = this.LogLevel.ERROR;
