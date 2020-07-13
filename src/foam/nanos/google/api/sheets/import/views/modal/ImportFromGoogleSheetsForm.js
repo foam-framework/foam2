@@ -16,7 +16,6 @@
   ^ {
     width: 500px;
     height: 500px;
-    // padding: 16px;
     overflow-x: scroll;
   }
   `,
@@ -40,7 +39,6 @@
   methods: [
     function init() {
       this.SUPER();
-      // var self = this;
       this.views = {
         'googleSheetLink'        : { view: { class: 'foam.nanos.google.api.sheets.GoogleSheetImportModal' }, startPoint: true },
         'columnsMapping'         : { view: { class: 'foam.nanos.google.api.sheets.ColumnsToPropertiesMappingModal' } }

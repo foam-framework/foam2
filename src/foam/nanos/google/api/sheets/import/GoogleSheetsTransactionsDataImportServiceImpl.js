@@ -51,15 +51,18 @@ foam.CLASS({
           t.setSourceCurrency(baseCurrency);
 
         BankAccount payerBankAccount = BankAccount.findDefault(x, payer, t.getSourceCurrency());
-        if ( payerBankAccount == null ) return false;
+        if ( payerBankAccount == null )
+          return false;
         t.setSourceAccount(payerBankAccount.getId());
 
         User payee = (User)userDAO.find(AND(INSTANCE_OF(Business.getOwnClassInfo()), EQ(Business.ID, t.getPayeeId())));
-        if ( payee == null ) return false;
+        if ( payee == null )
+          return false;
 
         BankAccount payeeBankAccount = BankAccount.findDefault(x, payee, t.getSourceCurrency());
         t.setDestinationAccount(payeeBankAccount.getId());
-        if ( payeeBankAccount == null ) return false;
+        if ( payeeBankAccount == null )
+          return false;
 
         return true;
       `
