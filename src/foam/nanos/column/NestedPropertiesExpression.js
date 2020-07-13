@@ -157,9 +157,6 @@ foam.CLASS({
           javaInfoType: 'foam.core.AbstractObjectPropertyInfo'
         },
       ],
-      code: function (of, propName, i, expr) {
-        return false;
-      },
       javaCode: `
 
         if ( prop instanceof foam.core.AbstractFObjectPropertyInfo )
