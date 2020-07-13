@@ -3225,15 +3225,6 @@ foam.CLASS({
 
   documentation: 'A Binary Predicate which applies arg2.f() to arg1.f().',
 
-  javaImports: [
-    'foam.core.AbstractFObjectPropertyInfo',
-    'foam.core.FObject',
-    'foam.core.PropertyInfo',
-    'foam.nanos.logger.Logger',
-    'foam.nanos.logger.StdoutLogger',
-    'foam.util.StringUtil'
-  ],
-
   properties: [
     {
       class: 'foam.mlang.ExprProperty',
@@ -3249,38 +3240,74 @@ foam.CLASS({
     {
       name: 'f',
       code: function(o) {
-        if ( foam.core.Reference.isInstance(this.arg1) ) {
-          return o[property.name + '$find'].then(val => this.arg2.f(val));
-        }
         return this.arg2.f(this.arg1.f(o));
       },
       javaCode: `
-        if ( getArg1() instanceof PropertyInfo && getArg2() instanceof PropertyInfo ) {
-          StringBuilder sb = new StringBuilder("find");
-          PropertyInfo p1 = (PropertyInfo) getArg1();
-          FObject obj1;
-          if ( p1 instanceof AbstractFObjectPropertyInfo ) {
-            Object val = getArg1().f(obj);
-            return val == null ? null : getArg2().f(val);
-          }
-          try {
-            obj1 = (FObject)obj.getClass().getMethod(StringUtil.capitalize(p1.getName()), foam.core.X.class).invoke(obj, ((FObject)obj).getX());
-          } catch ( Throwable t ) {
-            return null;
-          }
-          if ( obj1 == null ) return null;
-          try {
-            return getArg2().f(obj1);
-          } catch ( Throwable t ) {
-            Logger logger = (Logger) getX().get("logger");
-            if ( logger == null ) {
-              logger = new StdoutLogger();
-            }
-            logger.error(t);
-            return null;
-          }
-        }
         return getArg2().f(getArg1().f(obj));
+      `
+    },
+
+    function comparePropertyValues(o1, o2) {
+      /**
+         Compare property values using arg2's property value comparator.
+         Used by GroupBy
+      **/
+      return this.arg2.comparePropertyValues(o1, o2);
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.mlang.expr',
+  name: 'Ref',
+  extends: 'foam.mlang.AbstractExpr',
+  implements: [ 'foam.core.Serializable' ],
+
+  documentation: 'A Binary Predicate which applies arg2.f() to arg1.f().',
+
+  javaImports: [
+    'foam.core.AbstractFObjectPropertyInfo',
+    'foam.core.FObject',
+    'foam.core.PropertyInfo',
+    'foam.nanos.logger.Logger',
+    'foam.nanos.logger.StdoutLogger',
+    'foam.util.StringUtil'
+  ],
+
+  properties: [
+    {
+      class: 'Class',
+      javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
+      javaType: 'foam.core.ClassInfo',
+      name: 'arg1'
+    },
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: 'arg2'
+    }
+  ],
+
+  methods: [
+    {
+      name: 'f',
+      code: async function(o) {
+        return o[arg2.name + '$find'];
+      },
+      javaCode: `
+        StringBuilder sb = new StringBuilder("find");
+        PropertyInfo p1 = (PropertyInfo) getArg2();
+        FObject refObj = null;
+        try {
+          refObj = (FObject)getArg1().getClass().getMethod("find" + StringUtil.capitalize(p1.getName()), foam.core.X.class).invoke(obj, ((FObject)obj).getX());
+        } catch ( Throwable t ) {
+          Logger logger = (Logger) getX().get("logger");
+          if ( logger == null ) {
+            logger = new StdoutLogger();
+          }
+          logger.error(t);
+        }
+        return refObj;
       `
     },
 
@@ -3429,6 +3456,7 @@ foam.CLASS({
     'foam.mlang.expr.Add',
     'foam.mlang.expr.Divide',
     'foam.mlang.expr.Dot',
+    'foam.mlang.expr.Ref',
     'foam.mlang.expr.MaxFunc',
     'foam.mlang.expr.MinFunc',
     'foam.mlang.expr.Multiply',
@@ -3522,6 +3550,7 @@ foam.CLASS({
     function ENDS_WITH(a, b) { return this._binary_("EndsWith", a, b); },
     function FUNC(fn) { return this.Func.create({ fn: fn }); },
     function DOT(a, b) { return this._binary_("Dot", a, b); },
+    function REF(a, b) { return this._binary_("Ref", a, b); },
     function DOT_F(a, b) { return this._binary_("DotF", a, b); },
     function ADD() { return this._nary_("Add", arguments); },
     function SUB() { return this._nary_("Subtract", arguments); },
