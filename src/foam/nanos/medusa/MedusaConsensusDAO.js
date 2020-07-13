@@ -217,6 +217,7 @@ foam.CLASS({
 
         entry = mdao(x, entry);
 
+        entry.setPromoted(true);
         entry = (MedusaEntry) getDelegate().put_(x, entry);
 
         // Notify any blocked Primary puts
@@ -233,13 +234,6 @@ foam.CLASS({
       javaCode: `
       getLogger().debug("start");
       ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
-      // ReplayingInfo replaying = (ReplayingInfo) getX().get("replayingInfo");
-      // if ( replaying.getStartTime() == null ) {
-      //   replaying.setStartTime(new java.util.Date());
-      // }
-
-      // ((Agency) getX().get(support.getThreadPoolName())).submit(getX(), this, "Consensus Promoter");
-
       Timer timer = new Timer(this.getClass().getSimpleName());
       timer.scheduleAtFixedRate(
         new AgencyTimerTask(getX(), support.getThreadPoolName(), this),
@@ -388,9 +382,9 @@ foam.CLASS({
           }
         }
 
-        entry.setPromoted(true);
-        // Why am I clearing data? - Joel
-        // MedusaEntry.DATA.clear(entry);
+        // entry.setPromoted(true);
+        // // Why am I clearing data? - Joel
+        // // MedusaEntry.DATA.clear(entry);
         return entry;
       } catch (Throwable t) {
         getLogger().error(t);

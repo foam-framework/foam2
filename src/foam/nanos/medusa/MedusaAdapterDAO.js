@@ -264,7 +264,7 @@ foam.CLASS({
         entry.setDop(dop);
         entry.setData(data);
 
-        getLogger().debug("submit", entry.getIndex(), obj.getClass().getSimpleName(), "stringify", entry.getData());
+        getLogger().debug("submit", entry.getIndex(), obj.getClass().getSimpleName()); //, "stringify", entry.getData());
 
         FObject result = getMedusaEntryDAO().put_(x, entry); // blocking
         FObject nu = getDelegate().find_(x, obj.getProperty("id"));

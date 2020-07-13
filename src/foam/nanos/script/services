@@ -31,6 +31,7 @@ p({
       .setMdao(mdao)
       .setInnerDAO(new foam.dao.java.JDAO(x, mdao, "scriptEvents", true))
       .setGuid(true)
+      .setCluster(false)
       .setFixedSize(new foam.dao.FixedSizeDAO.Builder(x)
         .setComparator(foam.mlang.MLang.DESC(foam.nanos.script.ScriptEvent.LAST_RUN))
         .setSize(1000)

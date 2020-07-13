@@ -21,6 +21,7 @@ foam.CLASS({
     'foam.dao.DOP',
     'static foam.mlang.MLang.AND',
     'static foam.mlang.MLang.EQ',
+    'static foam.mlang.MLang.FALSE',
     'static foam.mlang.MLang.OR',
     'foam.mlang.predicate.Predicate',
     'foam.nanos.logger.PrefixLogger',
@@ -53,11 +54,6 @@ foam.CLASS({
       return "medusaMediatorDAO";
       `
     },
-    // {
-    //   name: 'batchEnabled',
-    //   class: 'Boolean',
-    //   value: false
-    // },
     {
       name: 'predicate',
       class: 'foam.mlang.predicate.PredicateProperty',
@@ -65,13 +61,10 @@ foam.CLASS({
       javaFactory: `
       ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
       ClusterConfig myConfig = support.getConfig(getX(), support.getConfigId());
+
       Predicate zones = EQ(ClusterConfig.ZONE, myConfig.getZone() + 1);
-      if ( myConfig.getZone() == 0L ) {
-        zones =
-          OR(
-            EQ(ClusterConfig.ZONE, myConfig.getZone()),
-            zones
-          );
+      if ( myConfig.getType() == MedusaType.NODE ) {
+        zones = EQ(ClusterConfig.ZONE, myConfig.getZone());
       }
       return
           AND(
@@ -106,13 +99,6 @@ foam.CLASS({
   
   methods: [
     {
-      name: 'init_',
-      javaCode: `
-      // TODO 
-      // listen on ClusterConfigDAO updates.
-      `
-    },
-    {
       name: 'put_',
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
@@ -131,7 +117,6 @@ foam.CLASS({
       entry.setNode(support.getConfigId());
 
       if ( myConfig.getType() == MedusaType.NODE ) {
-        // Always broadcast to/from NODE and
         ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
         synchronized ( indexLock_ ) {
           if ( entry.getIndex() > replaying.getIndex() ) {
@@ -139,13 +124,7 @@ foam.CLASS({
           }
         }
 
- 
-        // if ( getBatchEnabled() ) {
-        //   // queue for broadcast
-        //   return super.put_(x, entry);
-        // } else {
-          submit(x, entry, DOP.PUT);
-        // }
+        submit(x, entry, DOP.PUT);
       } else if ( myConfig.getType() == MedusaType.MEDIATOR &&
         // Broadcast promoted entries to other MEDIATORS
         // REVIEW: to avoid broadcast during reply, wait until ONLINE,
@@ -154,12 +133,7 @@ foam.CLASS({
                   ( entry.getPromoted() &&
                     ( old == null ||
                       ! old.getPromoted() ) ) ) {
-        // if ( getBatchEnabled() ) {
-        //   // queue for broadcast
-        //   return super.put_(x, entry);
-        // } else {
-          submit(x, entry, DOP.PUT);
-        // }
+        submit(x, entry, DOP.PUT);
       }
       return entry;
       `
@@ -190,7 +164,7 @@ foam.CLASS({
       ],
       type: 'Object',
       javaCode: `
-      PM pm = createPM(x, dop.getLabel());
+      PM pm = PM.create(x, this.getOwnClassInfo(), getServiceName()+":"+dop.getLabel());
       try {
       getLogger().debug("submit", dop.getLabel(), obj.getClass().getSimpleName());
 
@@ -244,51 +218,6 @@ foam.CLASS({
         pm.log(x);
       }
       `
-    },
-    {
-      name: 'createPM',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'name',
-          type: 'String'
-        }
-      ],
-      javaType: 'PM',
-      javaCode: `
-      return PM.create(x, this.getOwnClassInfo(), getServiceName()+":"+name);
-      `
-    },
-    // {
-    //   name: 'getBatchTimerInterval',
-    //   args: [
-    //     {
-    //       name: 'x',
-    //       type: 'Context'
-    //     },
-    //   ],
-    //   type: 'Long',
-    //   javaCode: `
-    //   ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-    //   return support.getBatchTimerInterval();
-    //   `
-    // },
-    // {
-    //   name: 'getMaxBatchSize',
-    //   args: [
-    //     {
-    //       name: 'x',
-    //       type: 'Context'
-    //     },
-    //   ],
-    //   type: 'Long',
-    //   javaCode: `
-    //   ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-    //   return support.getMaxBatchSize();
-    //   `
-    // }
+    }
    ]
 });

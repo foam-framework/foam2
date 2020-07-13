@@ -113,7 +113,7 @@ foam.CLASS({
       synchronized ( String.valueOf(id).intern() ) {
         latch = (CountDownLatch) getLatches().get(id);
         if ( latch == null ) {
-          latch = new CountDownLatch(0);
+          latch = new CountDownLatch(1);
           getLatches().put(id, latch);
         }
       }
