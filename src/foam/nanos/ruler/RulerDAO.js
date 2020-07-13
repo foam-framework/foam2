@@ -202,9 +202,7 @@ for ( Object key : sink.getGroupKeys() ) {
       documentation: 'Send a ServiceProviderAwareSupport action command to the DAO for spid matching test.',
       javaCode: `
         var result = getDelegate().cmd_(x.put("OBJ", obj),
-          new ServiceProviderAwareSupport.Builder(x)
-            .setSpid(rule.getSpid())
-            .build());
+          new ServiceProviderAwareSupport(rule.getSpid()));
         return result instanceof Boolean ? (boolean) result : true;
       `
     },

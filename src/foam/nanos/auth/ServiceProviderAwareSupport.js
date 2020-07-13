@@ -58,7 +58,7 @@ Use: see ServiceProviderAwareTest
     {
       class: 'String',
       name: 'spid',
-      documentation: 'The spid to be matched against. If not set context user spid will be used.'
+      documentation: 'The spid to be matched against. If not set, the context user spid will be used.'
     }
   ],
 
@@ -244,6 +244,19 @@ store the result for subsequent lookups. `,
         }
         return null;
       `
+    }
+  ],
+
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(`
+          public ServiceProviderAwareSupport(String spid) {
+            setSpid(spid);
+          }
+        `);
+      }
     }
   ]
 });
