@@ -526,7 +526,6 @@ p({
     .setPm(true)
     .setGuid(true)
     .setOf(foam.nanos.dig.DIG.getOwnClassInfo())
-    .setCreatedByAware(true)
     .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
     .setJournalName("digs")
     .setServiceProviderAware(true)
@@ -742,7 +741,6 @@ p({
       .setOf(foam.nanos.dig.SUGAR.getOwnClassInfo())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("sugars")
-      .setCreatedByAware(true)
       .setServiceProviderAware(true)
       .setServiceProviderAwarePropertyInfos(
         foam.util.Arrays.asMap(new Object[]
