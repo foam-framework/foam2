@@ -3266,7 +3266,7 @@ foam.CLASS({
   extends: 'foam.mlang.AbstractExpr',
   implements: [ 'foam.core.Serializable' ],
 
-  documentation: 'A Binary Predicate which applies arg2.f() to arg1.f().',
+  documentation: 'A Binary Predicate which returns reference property object',
 
   javaImports: [
     'foam.core.AbstractFObjectPropertyInfo',
