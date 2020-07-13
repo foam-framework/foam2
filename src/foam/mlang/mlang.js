@@ -3488,7 +3488,7 @@ foam.CLASS({
     function ENDS_WITH(a, b) { return this._binary_("EndsWith", a, b); },
     function FUNC(fn) { return this.Func.create({ fn: fn }); },
     function DOT(a, b) { return this._binary_("Dot", a, b); },
-    function REF(a, b) { return this._binary_("Ref", a, b); },
+    function REF(a) { return this._unary_("Ref", a); },
     function DOT_F(a, b) { return this._binary_("DotF", a, b); },
     function ADD() { return this._nary_("Add", arguments); },
     function SUB() { return this._nary_("Subtract", arguments); },
