@@ -105,7 +105,7 @@ foam.CLASS({
         if ( p == null ) return null; 
 
         Boolean isPropAReference = isPropertyAReference(ci, p);
-        
+
         Expr thisPropExpr = null;
         if ( isPropAReference )
           thisPropExpr = REF(of, p);
@@ -163,9 +163,7 @@ foam.CLASS({
         try {
           Method m = ci.getObjClass().getMethod("find" + StringUtil.capitalize(prop.getName()), foam.core.X.class);
           return true;
-        } catch( Throwable t ) {
-          //logger
-        }
+        } catch( Throwable t ) {}
         return false;
       `
     }
