@@ -1055,7 +1055,7 @@ p({
   "class": "foam.nanos.boot.NSpec",
   "name": "googleSheetsDataExport",
   "serve": true,
-  "authenticate": false,
+  "authenticate": true,
   "boxClass": "foam.nanos.export.GoogleSheetsExportSkeleton",
   "serviceClass": "foam.nanos.google.api.sheets.GoogleSheetsApiService",
   "client":"""
