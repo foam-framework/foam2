@@ -17,9 +17,10 @@ foam.CLASS({
 
   implements: [
     'foam.mlang.Expressions',
-    'foam.nanos.auth.CreatedByAware',
     'foam.nanos.auth.CreatedAware',
-    'foam.nanos.auth.LastModifiedAware'
+    'foam.nanos.auth.CreatedByAware',
+    'foam.nanos.auth.LastModifiedAware',
+    'foam.nanos.auth.LastModifiedByAware'
   ],
 
   tableColumns: [
@@ -43,20 +44,38 @@ foam.CLASS({
     'AuthenticatedNSpecDAO'
   ],
 
+  sections: [
+    {
+      name: 'details'
+    },
+    {
+      name: 'supportDetails'
+    },
+    {
+      name: '_defaultSection',
+      permissionRequired: true
+    }
+  ],
+
   properties: [
     {
       name: 'id',
-      label: 'Request Name'
+      label: 'Request Name',
+      section: 'details'
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdBy',
+      storageOptional: true,
+      section: 'supportDetails'
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
-      name: 'createdByAgent'
+      name: 'createdByAgent',
+      storageOptional: true,
+      section: 'supportDetails'
     },
     {
       class: 'DateTime',
@@ -64,8 +83,9 @@ foam.CLASS({
       documentation: 'The date and time of when the User was created in the system.',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'administrative',
-      includeInDigest: true
+      section: 'supportDetails',
+      includeInDigest: true,
+      storageOptional: true
     },
     {
       class: 'DateTime',
@@ -73,7 +93,17 @@ foam.CLASS({
       documentation: 'The date and time the User was last modified.',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'administrative'
+      section: 'supportDetails',
+      storageOptional: true
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'lastModifiedBy',
+      section: 'supportDetails',
+      readPermissionRequired: true,
+      writePermissionRequired: true,
+      storageOptional: true
     },
     {
       class: 'Reference',
@@ -99,15 +129,18 @@ foam.CLASS({
           ]
         };
       },
-      value: 'userDAO'
+      value: 'userDAO',
+      section: 'details'
     },
     {
       name: 'cmd',
-      label: 'API Command'
+      label: 'API Command',
+      section: 'details'
     },
     {
       name: 'format',
       label: 'Data Format',
+      section: 'details',
       visibility: function(cmd) {
         return ( cmd == 'SELECT' || cmd == 'PUT' ) ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
       }
@@ -116,6 +149,7 @@ foam.CLASS({
       class: 'String',
       name: 'key',
       label: 'Object ID',
+      section: 'details',
       visibility: function(cmd) {
         return ( cmd == 'SELECT' || cmd == 'REMOVE' ) ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
       }
@@ -124,6 +158,7 @@ foam.CLASS({
       class: 'String',
       name: 'q',
       label: 'Select Query',
+      section: 'details',
       visibility: function(cmd) {
         return (cmd == 'SELECT') ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
       }
@@ -131,6 +166,7 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'limit',
+      section: 'details',
       visibility: function(cmd) {
         return (cmd == 'SELECT') ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
       },
@@ -141,6 +177,7 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'skip',
+      section: 'details',
       visibility: function(cmd) {
         return (cmd == 'SELECT') ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
       },
@@ -161,6 +198,7 @@ foam.CLASS({
       name: 'snippet',
       label: 'Snippet',
       documentation: 'show a specific type of request would look like in a given language.',
+      section: 'details',
       view: { class: 'foam.nanos.dig.DigSnippetView' },
       expression: function(key, data, daoKey, cmd, format, q, limit, skip) {
         var query = false;
@@ -219,6 +257,7 @@ foam.CLASS({
       name: 'result',
       value: 'No Request Sent Yet.',
       view: { class: 'foam.nanos.dig.ResultView' },
+      section: 'details',
       visibility: 'RO'
     }
   ],
