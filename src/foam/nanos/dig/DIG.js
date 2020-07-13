@@ -17,6 +17,7 @@ foam.CLASS({
 
   implements: [
     'foam.mlang.Expressions',
+    'foam.nanos.auth.CreatedByAware'
   ],
 
   tableColumns: [
@@ -44,6 +45,16 @@ foam.CLASS({
     {
       name: 'id',
       label: 'Request Name'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdBy',
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdByAgent'
     },
     {
       class: 'Reference',

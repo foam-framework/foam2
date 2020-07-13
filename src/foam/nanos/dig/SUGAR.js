@@ -10,6 +10,10 @@ foam.CLASS({
 
   documentation: 'SUGAR : Service Unified GAteway Relay - Perform non-DAO operations against a web service',
 
+  implements: [
+    'foam.nanos.auth.CreatedByAware'
+  ],
+
   tableColumns: [
     'id',
     'serviceKey',
@@ -44,8 +48,12 @@ foam.CLASS({
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
-      name: 'owner',
-      hidden: true
+      name: 'createdBy',
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdByAgent'
     },
     {
       class: 'String',
