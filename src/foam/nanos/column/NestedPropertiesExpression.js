@@ -89,9 +89,14 @@ foam.CLASS({
       ],
       code: function (of, propName, i, expr) {
         var prop = of.getAxiomByName(propName[i]);
+        if ( ! prop ) return null;
 
-        if ( ! expr ) expr = prop;
-        else foam.mlang.Expressions.create().DOT(expr, prop);
+        var thisPropExpr; 
+        if ( foam.core.Reference.isInstance(prop) ) thisPropExpr = foam.mlang.Expressions.create().REF(of, prop);
+        else thisPropExpr = prop;
+
+        if ( ! expr ) expr = thisPropExpr;
+        else foam.mlang.Expressions.create().DOT(expr, thisPropExpr);
 
         if ( i === propName.length - 1 )
           return expr;
@@ -100,17 +105,17 @@ foam.CLASS({
       },
       javaCode: `
         ClassInfo ci = of;
-        PropertyInfo p = (PropertyInfo) ci.getAxiomByName(propName[i]);
+        PropertyInfo prop = (PropertyInfo) ci.getAxiomByName(propName[i]);
 
-        if ( p == null ) return null; 
+        if ( prop == null ) return null; 
 
-        Boolean isPropAReference = isPropertyAReference(ci, p);
+        Boolean isPropAReference = isPropertyAReference(ci, prop);
 
         Expr thisPropExpr = null;
         if ( isPropAReference )
-          thisPropExpr = REF(of, p);
+          thisPropExpr = REF(of, prop);
         else
-          thisPropExpr = p;
+          thisPropExpr = prop;
         if ( expr == null) expr = thisPropExpr;
         else expr = DOT(expr, thisPropExpr);
 
@@ -121,11 +126,11 @@ foam.CLASS({
         try {
           StringBuilder sb = new StringBuilder("find");
           Class cls;
-          if ( p instanceof foam.core.AbstractFObjectPropertyInfo ) {
-            cls = p.getValueClass();
+          if ( prop instanceof foam.core.AbstractFObjectPropertyInfo ) {
+            cls = prop.getValueClass();
           } else {
             sb.setLength(4);
-            sb.append(StringUtil.capitalize(p.getName()));
+            sb.append(StringUtil.capitalize(prop.getName()));
             Method m = ci.getObjClass().getMethod(sb.toString(), foam.core.X.class);
             cls = m.getReturnType();
           }
