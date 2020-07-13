@@ -3299,7 +3299,7 @@ foam.CLASS({
         PropertyInfo p1 = (PropertyInfo) getArg2();
         FObject refObj = null;
         try {
-          refObj = (FObject)getArg1().getClass().getMethod("find" + StringUtil.capitalize(p1.getName()), foam.core.X.class).invoke(obj, ((FObject)obj).getX());
+          refObj = (FObject)getArg1().getObjClass().getMethod("find" + StringUtil.capitalize(p1.getName()), foam.core.X.class).invoke(obj, ((FObject)obj).getX());
         } catch ( Throwable t ) {
           Logger logger = (Logger) getX().get("logger");
           if ( logger == null ) {
