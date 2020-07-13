@@ -34,6 +34,7 @@ Use: see ServiceProviderAwareTest
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
     'foam.nanos.logger.Logger',
+    'foam.util.SafetyUtil',
 
     'java.lang.reflect.Method',
     'java.util.HashMap',
@@ -53,13 +54,18 @@ Use: see ServiceProviderAwareTest
       class: 'Map',
       visibility: 'HIDDEN',
       javaFactory: 'return new HashMap();'
+    },
+    {
+      class: 'String',
+      name: 'spid',
+      documentation: 'The spid to be matched against. If not set, the context user spid will be used.'
     }
   ],
 
   methods: [
     {
       documentation: `Using Relationship findFoo(x), traverse relationships,
-returning true if the context users spid matches the current object.`,
+returning true if the spid or context users spid matches the current object.`,
       name: 'match',
       args: [
         {
@@ -77,17 +83,26 @@ returning true if the context users spid matches the current object.`,
       ],
       type: 'Boolean',
       javaCode: `
-      User user = ((Subject) x.get("subject")).getUser();
-      if ( user == null ) {
-        // TODO/REVIEW: occurs during login. See AuthenticationApiTest
-        return true;
+      var isUserSpid = false;
+      var spid = getSpid();
+
+      if ( SafetyUtil.isEmpty(spid) ) {
+        var user = ((Subject) x.get("subject")).getUser();
+        if ( user == null ) {
+          // TODO/REVIEW: occurs during login. See AuthenticationApiTest
+          return true;
+        }
+        spid = user.getSpid();
+        isUserSpid = true;
       }
+
+      var auth = (AuthService) x.get("auth");
 
       if ( obj != null &&
            obj instanceof ServiceProviderAware ) {
         ServiceProviderAware sp = (ServiceProviderAware) obj;
-        return user.getSpid().equals(sp.getSpid()) ||
-          ((AuthService) x.get("auth")).check(x, "spid.read." + sp.getSpid());
+        return spid.equals(sp.getSpid()) ||
+                 isUserSpid && auth.check(x, "spid.read." + sp.getSpid());
       }
 
       Object result = obj;
@@ -108,10 +123,8 @@ returning true if the context users spid matches the current object.`,
             if ( result != null &&
                  result instanceof ServiceProviderAware ) {
               ServiceProviderAware sp = (ServiceProviderAware) result;
-              if ( user.getSpid().equals(sp.getSpid()) ||
-                  ((AuthService) x.get("auth")).check(x, "spid.read." + sp.getSpid()) ) {
-                return true;
-              }
+              return spid.equals(sp.getSpid()) ||
+                       isUserSpid && auth.check(x, "spid.read." + sp.getSpid());
             } else {
               break;
             }
@@ -231,6 +244,19 @@ store the result for subsequent lookups. `,
         }
         return null;
       `
+    }
+  ],
+
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(`
+          public ServiceProviderAwareSupport(String spid) {
+            setSpid(spid);
+          }
+        `);
+      }
     }
   ]
 });
