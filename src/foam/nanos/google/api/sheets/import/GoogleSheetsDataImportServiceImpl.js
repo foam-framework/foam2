@@ -44,11 +44,11 @@
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-            public static Pattern digitAppearenceRegex = Pattern.compile("(\\\\d){1}");
-            public static Pattern twoDecimalPointsNumberRegex = Pattern.compile("\\\\d+(\\\\.\\\\d{1,2})?");
             public static Pattern alphabeticalCharsRegex = Pattern.compile("[a-zA-Z]{1,}");
             public static String dateTimeFormat = "EEE MMM d yyyy HH/mm/ss zZ (zzzz)";
             public static String dateFormat  = "yyyy-MM-dd";
+            public static Pattern digitAppearenceRegex = Pattern.compile("(\\\\d){1}");
+            public static Pattern twoDecimalPointsNumberRegex = Pattern.compile("\\\\d+(\\\\.\\\\d{1,2})?");
           `
         }));
       }
@@ -72,7 +72,7 @@
         GoogleSheetsApiService googleSheetsAPIEnabler = (GoogleSheetsApiService)x.get("googleSheetsDataExport");
         ValueRange values;
         try {
-          values = googleSheetsAPIEnabler.getFormatedValues(x, importConfig.getGoogleSpreadsheetId(), importConfig.getGoogleSheetId());//sb.toString()
+          values = googleSheetsAPIEnabler.getFormatedValues(x, importConfig.getGoogleSpreadsheetId(), importConfig.getGoogleSheetId());
           List<Object> firstRow = values.getValues().get(0);
           String[] columnNames = new String[firstRow.size()];
           for ( int i = 0 ; i < firstRow.size() ; i++ ) {
@@ -118,6 +118,7 @@
             result.setResult(0);
             result.setSuccess(false);
           }
+          
           int recordsAdded = addRecordsToDAO(x, importConfig.getDAO(), parsedObjs);
           result.setResult(recordsAdded);
 

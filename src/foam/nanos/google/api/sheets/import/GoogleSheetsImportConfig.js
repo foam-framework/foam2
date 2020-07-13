@@ -41,7 +41,8 @@
     {
       name: 'googleSheetId',
       class: 'String',
-      value: 'Sheet1'
+      value: 'Sheet1',
+      required: true
     },
     {
       name: 'columnHeaderPropertyMappings',
