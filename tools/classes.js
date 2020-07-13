@@ -469,9 +469,7 @@ var classes = [
   'foam.nanos.http.DefaultHttpParameters',
   'foam.nanos.http.HttpParameters',
   'foam.nanos.dig.DIG',
-  'foam.nanos.dig.DIGOwnerRuleAction',
   'foam.nanos.dig.SUGAR',
-  'foam.nanos.dig.SUGAROwnerRuleAction',
   'foam.nanos.dig.DUGRule',
   'foam.nanos.dig.DUGRuleAction',
 
