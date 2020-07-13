@@ -408,7 +408,9 @@
     {
       name: 'toSummary',
       type: 'String',
-      code: () => { return this.name || this.id; }
+      code: function() {
+        return this.name || this.id;
+      }
     }
   ],
 
