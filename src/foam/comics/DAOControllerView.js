@@ -38,7 +38,7 @@ foam.CLASS({
 
   css: `
     ^ {
-      width: intrinsic;
+      width: max-content;
       margin: 24px auto 0 auto;
     }
 
@@ -59,7 +59,7 @@ foam.CLASS({
 
     ^container {
       display: flex;
-      justify-content: space-between;
+      justify-content: space-around;
     }
 
     ^ .actions {
@@ -73,6 +73,7 @@ foam.CLASS({
 
     ^full-search-container {
       flex: 0 0 250px;
+      padding-right: 18px;
     }
 
     ^ .foam-u2-view-TableView {
