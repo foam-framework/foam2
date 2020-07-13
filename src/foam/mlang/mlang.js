@@ -3243,7 +3243,9 @@ foam.CLASS({
         return this.arg2.f(this.arg1.f(o));
       },
       javaCode: `
-        return getArg2().f(getArg1().f(obj));
+        Object e1 = getArg1().f(obj);
+        if ( e1 == null ) return e1;
+        return getArg2().f(e1);
       `
     },
 

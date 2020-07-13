@@ -104,12 +104,20 @@ foam.CLASS({
 
         if ( p == null ) return null; 
 
-        if ( expr == null ) expr = p;
-        else expr = DOT(expr, p);
+        Boolean isPropAReference = isPropertyAReference(ci, p);
+        
+        Expr thisPropExpr = null;
+        if ( isPropAReference )
+          thisPropExpr = REF(of, p);
+        else
+          thisPropExpr = p;
+        if ( expr == null) expr = thisPropExpr;
+        else expr = DOT(expr, thisPropExpr);
 
         if ( i == propName.length - 1 ) {
           return expr;
         }
+        
         try {
           StringBuilder sb = new StringBuilder("find");
           Class cls;
@@ -127,6 +135,38 @@ foam.CLASS({
         }
         
         return returnDotExprForNestedProperty(ci, propName, ++i, expr);
+      `
+    },
+    {
+      name: 'isPropertyAReference',
+      javaType: 'Boolean',
+      args: [
+        {
+          name: 'ci',
+          type: 'Object',
+          javaType: 'foam.core.ClassInfo'
+        },
+        {
+          name: 'prop',
+          javaType: 'foam.core.PropertyInfo',
+          javaInfoType: 'foam.core.AbstractObjectPropertyInfo'
+        },
+      ],
+      code: function (of, propName, i, expr) {
+        return false;
+      },
+      javaCode: `
+
+        if ( prop instanceof foam.core.AbstractFObjectPropertyInfo )
+          return false;
+
+        try {
+          Method m = ci.getObjClass().getMethod("find" + StringUtil.capitalize(prop.getName()), foam.core.X.class);
+          return true;
+        } catch( Throwable t ) {
+          //logger
+        }
+        return false;
       `
     }
   ]

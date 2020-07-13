@@ -172,6 +172,13 @@ public class MLang
     return dot;
   }
 
+  public static Expr REF(foam.core.ClassInfo o1, Expr o2) {
+    Ref ref = new Ref();
+    ref.setArg1(o1);
+    ref.setArg2(o2);
+    return ref;
+  }
+
   public static Predicate CLASS_OF(ClassInfo info) {
     return new IsClassOf(info);
   }
