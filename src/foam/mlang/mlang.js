@@ -3304,12 +3304,17 @@ foam.CLASS({
   documentation: `A binary predicate that evaluates arg1 as a predicate with
     arg2 as its argument.`,
 
+  javaImports: [
+    'static foam.core.ContextAware.maybeContextualize'
+  ],
+
   methods: [
     {
       name: 'f',
       javaCode: `
         Object predicate = getArg1().f(obj);
         if ( predicate instanceof Predicate ) {
+          maybeContextualize(getX(), predicate);
           return ((Predicate) predicate).f(getArg2().f(obj));
         }
         return false;
@@ -3321,6 +3326,11 @@ foam.CLASS({
         }
         return false;
       }
+    },
+    {
+      name: 'deepClone',
+      type: 'FObject',
+      javaCode: 'return this;'
     }
   ]
 });
