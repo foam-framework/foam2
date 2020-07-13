@@ -41,11 +41,6 @@
     {
       name: 'googleSheetId',
       class: 'String',
-      // hidden: true,
-      // expression: function(googleSheetLink) {//this will only parse id. we could use but it would be MUCH MORE easy to let user provided cause otherwise we need to use Sheets.Spreadsheets.Get, which is a lot of data
-      //   var findMatch = googleSheetLink.match(this.SHEET_ID_REGEX);
-      //   return  findMatch ? findMatch[1] : findMatch;
-      // },
       value: 'Sheet1'
     },
     {
@@ -63,8 +58,7 @@
   ],
   constants: {
     //info retrieved from https://developers.google.com/sheets/api/guides/concepts
-    SPREADSHEET_ID_REGEX: '/spreadsheets/d/([a-zA-Z0-9-_]+)',
-    // SHEET_ID_REGEX: '[#&]gid=([0-9]+)'//not usefull info unless we want to use gridRange which is probably too much
+    SPREADSHEET_ID_REGEX: '/spreadsheets/d/([a-zA-Z0-9-_]+)'
   },
 });
 
@@ -79,7 +73,6 @@ foam.CLASS({
     {
       name: 'columnHeader',
       class: 'String',
-      // visibility: 'RO',
       visibility: 'DISABLED',
       validationTextVisible: true,
       validateObj: function() {
