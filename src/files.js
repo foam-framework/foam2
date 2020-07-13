@@ -221,6 +221,7 @@ FOAM_FILES([
   { name: "foam/mlang/expr/DateTypes" },
   { name: "foam/mlang/expr/DateGrouping" },
   { name: "foam/mlang/expr/DateGroupingExpr" },
+  { name: "foam/mlang/expr/Ref" },
   { name: "foam/swift/refines/MLang", flags: ['swift'] },
   { name: "foam/swift/refines/Predicate", flags: ['swift'] },
   { name: "foam/swift/refines/AbstractDAO", flags: ['swift'] },
