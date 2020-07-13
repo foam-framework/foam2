@@ -3297,7 +3297,6 @@ foam.CLASS({
         return o[arg2.name + '$find'];
       },
       javaCode: `
-        StringBuilder sb = new StringBuilder("find");
         PropertyInfo p1 = (PropertyInfo) getArg2();
         FObject refObj = null;
         try {

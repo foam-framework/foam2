@@ -81,7 +81,8 @@ foam.CLASS({
               if ( p instanceof foam.core.AbstractFObjectPropertyInfo ) {
                 cls = p.getValueClass();
               } else {
-                Method m = ci.getObjClass().getMethod(StringUtil.capitalize(p.getName()), foam.core.X.class);
+                sb.append(StringUtil.capitalize(p.getName()));
+                Method m = ci.getObjClass().getMethod(sb.toString(), foam.core.X.class);
                 cls = m.getReturnType();
                 //cleaning up StringBuilder by setting it to "find" for another property to use
                 sb.setLength(4);
@@ -164,7 +165,8 @@ foam.CLASS({
                 obj1 = (FObject) p.f(obj1);
                 cls = p.getValueClass();
               } else {
-                obj1 = (FObject)obj1.getClass().getMethod(StringUtil.capitalize(p.getName()), foam.core.X.class).invoke(obj1, x);
+                sb.append(StringUtil.capitalize(p.getName()));
+                obj1 = (FObject)obj1.getClass().getMethod(sb.toString(), foam.core.X.class).invoke(obj1, x);
                 sb.setLength(4);
                 if ( obj1 == null ) return new ColumnPropertyValue.Builder(x).setPropertyValue(null).setObjValue(null).build();
                 cls = obj1.getClass();
