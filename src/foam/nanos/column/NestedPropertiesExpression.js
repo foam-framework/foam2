@@ -92,11 +92,15 @@ foam.CLASS({
         if ( ! prop ) return null;
 
         var thisPropExpr; 
-        if ( foam.core.Reference.isInstance(prop) ) thisPropExpr = foam.mlang.Expressions.create().REF(prop);
-        else thisPropExpr = prop;
+        if ( foam.core.Reference.isInstance(prop) )
+          thisPropExpr = foam.mlang.Expressions.create().REF(prop);
+        else
+          thisPropExpr = prop;
 
-        if ( ! expr ) expr = thisPropExpr;
-        else foam.mlang.Expressions.create().DOT(expr, thisPropExpr);
+        if ( ! expr )
+          expr = thisPropExpr;
+        else
+          foam.mlang.Expressions.create().DOT(expr, thisPropExpr);
 
         if ( i === propName.length - 1 )
           return expr;
@@ -116,8 +120,10 @@ foam.CLASS({
           thisPropExpr = REF(prop);
         else
           thisPropExpr = prop;
-        if ( expr == null) expr = thisPropExpr;
-        else expr = DOT(expr, thisPropExpr);
+        if ( expr == null )
+          expr = thisPropExpr;
+        else
+          expr = DOT(expr, thisPropExpr);
 
         if ( i == propName.length - 1 ) {
           return expr;
@@ -126,9 +132,9 @@ foam.CLASS({
         try {
           StringBuilder sb = new StringBuilder("find");
           Class cls;
-          if ( prop instanceof foam.core.AbstractFObjectPropertyInfo ) {
+          if ( prop instanceof foam.core.AbstractFObjectPropertyInfo )
             cls = prop.getValueClass();
-          } else {
+          else {
             sb.setLength(4);
             sb.append(StringUtil.capitalize(prop.getName()));
             Method m = ci.getObjClass().getMethod(sb.toString(), foam.core.X.class);

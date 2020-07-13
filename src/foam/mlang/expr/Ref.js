@@ -31,7 +31,7 @@ foam.CLASS({
     {
       name: 'f',
       code: async function(o) {
-        return o[arg1.name + '$find'];
+        throw new Error('Ref is not supported');
       },
       javaCode: `
         PropertyInfo p1 = (PropertyInfo) getArg1();
