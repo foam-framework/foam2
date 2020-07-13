@@ -26,7 +26,8 @@ foam.CLASS({
     {
       name: 'nodePlacementPlan',
       class: 'FObjectProperty',
-      of: 'foam.u2.svg.graph.GridPlacementPlan',
+      of: 'FObject',
+      // of: 'foam.u2.svg.graph.GridPlacementPlan',
     },
     // {
     //   name: 'data',
@@ -35,7 +36,8 @@ foam.CLASS({
     // },
     {
       name: 'rootObject',
-      class: 'FObjectProperty'
+      class: 'FObjectProperty',
+      of: 'FObject',
     },
     {
       name: 'relationshipPropertyName',
