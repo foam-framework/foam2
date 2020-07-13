@@ -45,7 +45,7 @@
         cls.extras.push(foam.java.Code.create({
           data: `
             public static Pattern digitAppearenceRegex = Pattern.compile("(\\\\d){1}");
-            public static Pattern numbersRegex = Pattern.compile("\\\\d+(\\\\.\\\\d{1,2})?");
+            public static Pattern twoDecimalPointsNumberRegex = Pattern.compile("\\\\d+(\\\\.\\\\d{1,2})?");
             public static Pattern alphabeticalCharsRegex = Pattern.compile("[a-zA-Z]{1,}");
             public static String dateTimeFormat = "EEE MMM d yyyy HH/mm/ss zZ (zzzz)";
             public static String dateFormat  = "yyyy-MM-dd";
@@ -243,7 +243,7 @@
       return true;
     `
   },
-  {//maybe all of it to static will save memory
+  {
     name: 'pasreAndSetValue',
     type: 'Boolean',
     args: [
@@ -275,13 +275,15 @@
           case "long":
             if ( columnHeaderToPropertyMapping.getUnitProperty() != null ) {
               String unitValue = valueString;
-              Matcher numMatcher = numbersRegex.matcher(unitValue);
-              if ( ! numMatcher.find() ) {
+              Matcher numMatcher = twoDecimalPointsNumberRegex.matcher(unitValue);
+
+              if ( ! numMatcher.find() )
                 return false;
-              }
+
               String number = unitValue.substring(numMatcher.start(), numMatcher.end());
               prop.set(obj, Math.round( Double.parseDouble(number) * 100));//might not be the case for all of the unitValues
               Matcher alphabeticalCharsMatcher = alphabeticalCharsRegex.matcher(unitValue);
+
               if ( alphabeticalCharsMatcher.find() ) {
                 String unit = unitValue.substring(alphabeticalCharsMatcher.start(), alphabeticalCharsMatcher.end());
                 ((PropertyInfo)columnHeaderToPropertyMapping.getUnitProperty()).set(obj, unit);

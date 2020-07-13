@@ -47,9 +47,8 @@ foam.CLASS({
 
         String baseCurrency = ((Business)payer).getSuggestedUserTransactionInfo().getBaseCurrency();
 
-        if ( t.getSourceCurrency() == null ) {
+        if ( t.getSourceCurrency() == null )
           t.setSourceCurrency(baseCurrency);
-        }
 
         BankAccount payerBankAccount = BankAccount.findDefault(x, payer, t.getSourceCurrency());
         if ( payerBankAccount == null ) return false;

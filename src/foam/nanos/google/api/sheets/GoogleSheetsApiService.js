@@ -33,12 +33,12 @@ foam.CLASS({
       javaValue: `JacksonFactory.getDefaultInstance()`
     },
     {
-      name: 'SCOPES',
+      name: 'DRIVE_FILE',
       javaType: 'List<String>',
       javaValue: `Collections.singletonList(SheetsScopes.DRIVE_FILE)`
     },
     {
-      name: 'READ_SCOPES',
+      name: 'READ_AND_EDIT_ALL_SCOPES',
       javaType: 'List<String>',
       javaValue: `Collections.singletonList(SheetsScopes.DRIVE)`
     },
@@ -99,7 +99,7 @@ foam.CLASS({
     
           final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
           GoogleApiAuthService googleApiAuthService = (GoogleApiAuthService)getX().get("googleApiAuthService");
-          Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, SCOPES))
+          Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, DRIVE_FILE))
             .setApplicationName("nanopay")
             .build();
     
@@ -269,7 +269,7 @@ foam.CLASS({
       javaCode: `
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         GoogleApiAuthService googleApiAuthService = (GoogleApiAuthService)getX().get("googleApiAuthService");
-        Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, READ_SCOPES))
+        Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, READ_AND_EDIT_ALL_SCOPES))
           .setApplicationName("nanopay")
           .build();
         Sheets.Spreadsheets.Values.Get request = service.spreadsheets().values()
@@ -307,7 +307,7 @@ foam.CLASS({
       javaCode: `
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         GoogleApiAuthService googleApiAuthService = (GoogleApiAuthService)getX().get("googleApiAuthService");
-        Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, READ_SCOPES))
+        Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, READ_AND_EDIT_ALL_SCOPES))
           .setApplicationName("nanopay")
           .build();
 
