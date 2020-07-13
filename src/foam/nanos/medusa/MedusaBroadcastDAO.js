@@ -107,7 +107,7 @@ foam.CLASS({
       ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
       ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
 
-      MedusaEntry old = (MedusaEntry) getDelegate().find_(x, entry.getId());
+      // MedusaEntry old = (MedusaEntry) getDelegate().find_(x, entry.getId());
       entry = (MedusaEntry) getDelegate().put_(x, entry);
 
       if ( support.getStandAlone() ) {
@@ -130,10 +130,14 @@ foam.CLASS({
         // REVIEW: to avoid broadcast during reply, wait until ONLINE,
         // mediators may miss data between replayComplete and status change to ONLINE.
                   myConfig.getStatus() == Status.ONLINE &&
-                  ( entry.getPromoted() &&
-                    ( old == null ||
-                      ! old.getPromoted() ) ) ) {
+                  entry.getPromoted() ) {
+                  // REVIEW: can't test for old, freezing is off so old always equals new.
+                  // ( entry.getPromoted() &&
+                  //   ( old == null ||
+                  //     ! old.getPromoted() ) ) ) {
         submit(x, entry, DOP.PUT);
+      // } else if ( myConfig.getType() == MedusaType.MEDIATOR ) {
+      //   getLogger().debug("put", "did not broadcast", "status", myConfig.getStatus(), entry.getIndex(), "promoted", entry.getPromoted(), (old == null ? "null" : old.getPromoted()));
       }
       return entry;
       `

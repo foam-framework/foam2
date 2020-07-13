@@ -208,7 +208,6 @@ foam.CLASS({
                  getIndex() >= replaying.getReplayIndex() ) {
               getLogger().debug("promote", "replayComplete", "index");
               ((DAO) x.get("localMedusaEntryDAO")).cmd(new ReplayCompleteCmd());
-              // replayComplete(x);
             }
           }
         }

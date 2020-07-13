@@ -109,6 +109,7 @@ foam.CLASS({
       class: 'Int',
       visibility: 'RO',
       storageTransient: true,
+      clusterTransient: true,
       tableWidth: 150
     },
     {
@@ -119,6 +120,7 @@ foam.CLASS({
       factory: function() { return new []; },
       javaFactory: 'return new java.util.ArrayList();',
       storageTransient: true,
+      clusterTransient: true,
       tableWidth: 150,
       tableCellFormatter: function(value) {
         this.add(value && value.join());
@@ -129,12 +131,14 @@ foam.CLASS({
       class: 'Boolean',
       visibility: 'RO',
       storageTransient: true,
+      clusterTransient: true,
     },
     {
       name: 'promoted',
       class: 'Boolean',
       visibility: 'RO',
       storageTransient: true,
+      clusterTransient: true,
     },
     {
       documentation: 'Solely for information. Originating Mediator.',
