@@ -11,9 +11,7 @@ foam.CLASS({
   documentation: 'SUGAR : Service Unified GAteway Relay - Perform non-DAO operations against a web service',
 
   tableColumns: [
-    'id',
-    'serviceKey',
-    'method'
+    'id'
   ],
 
   requires: [
@@ -43,203 +41,24 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'serviceKey',
-      label: 'Service',
-      documentation: 'non DAOs list as service',
-      view: function(_, X) {
-        var E = foam.mlang.Expressions.create();
-        return {
-          class: 'foam.u2.view.RichChoiceView',
-          search: true,
-          sections: [
-            {
-              heading: 'Service',
-              dao: X.AuthenticatedNSpecDAO
-                .where(E.AND(
-                  E.EQ(foam.nanos.boot.NSpec.SERVE, true),
-                  E.NOT(E.ENDS_WITH(foam.nanos.boot.NSpec.ID, 'DAO'))
-                ))
-                .orderBy(foam.nanos.boot.NSpec.ID)
-            }
-          ]
-        };
-      },
-      postSet: function() {
-        var service = this.__context__[this.serviceKey];
-
-        if ( ! service ) return;
-
-        if ( ! service.cls_.getAxiomByName('delegate') ) {
-          this.interfaceName = '';
-          this.argumentInfo  = null;
-          this.currentMethod = '';
-
-          return;
-        }
-        var of = foam.lookup(service.cls_.getAxiomByName('delegate').of);
-
-        if ( ! of ) return;
-
-        this.interfaceName = of.id.toString();
-        var methods     = of.getOwnAxiomsByClass(foam.core.Method);
-        var methodNames = methods.map(function(m) { return m.name; }).sort();
-
-        if ( methodNames.length > 0 ) {
-            methods.find((item) => {
-              if ( item.name == methodNames[0] ) {
-                this.currentMethod = item.name;
-                this.argumentInfo  = item.args;
-              }
-            });
-        } else { // if the service doesn't have a filtered method, the following should be empty
-          this.argumentInfo = null;
-          this.currentMethod = '';
-        }
-
-        this.postData = '';
-      }
-    },
-    {
-      class: 'String',
-      name: 'method',
-      label: 'Method',
-      documentation: 'the methods list of the picked service key',
-      view: function(_, X) {
-        return X.data.slot(function(serviceKey) {
-          var service = this.__context__[serviceKey];
-
-          if ( ! service ) return;
-
-          if ( ! service.cls_.getAxiomByName('delegate') ) return;
-
-          var of = foam.lookup(service.cls_.getAxiomByName('delegate').of);
-
-          if ( ! of ) return;
-
-          var methods = of.getOwnAxiomsByClass(foam.core.Method);
-          var methodNames = methods.map(function(m) { return m.name; }).sort();
-
-          return foam.u2.view.ChoiceView.create({ choices: methodNames, data$: this.method$ });
-        });
-      },
-      postSet: function(old, nu) {
-        if ( old != nu ) {
-          var data = '';
-          var service = this.__context__[this.serviceKey];
-
-          if ( ! service ) return;
-
-          if ( ! service.cls_.getAxiomByName('delegate') ) return;
-
-          var of = foam.lookup(service.cls_.getAxiomByName('delegate').of);
-
-          if ( ! of ) return;
-
-          var methods = of.getOwnAxiomsByClass(foam.core.Method);
-
-          methods.find((item) => {
-            if ( item.name == this.method ) {
-              this.currentMethod = item.name;
-
-              if ( item.args.length > 0 )
-                this.argumentInfo = item.args;
-              else this.argumentInfo = '';
-            }
-          });
-       }
-
-       this.postData = '';
-      }
-    },
-    {
-      class: 'FObjectArray',
-      of: 'foam.nanos.dig.Argument',
-      name: 'argumentInfo',
-      documentation: 'Set the arguments Info of the method',
-      postSet: function() {
-        var self = this;
-
-        for ( var j = 0 ; j < this.argumentInfo.length ; j++ ) {
-          this.argumentInfo[j].sub(function(argInfo) {
-            self.flag = ! self.flag;
-          });
-
-          if ( this.argumentInfo[j].objectType ) {
-            this.argumentInfo[j].objectType.sub(function(ot) {
-               self.objFlag = ! self.objFlag;
-            });
-          }
-        }
-      }
-    },
-    {
-      class: 'String',
-      name: 'interfaceName',
-      documentation: 'service class name',
-      displayWidth: 60,
-      visibility: 'RO'
-    },
-    {
-      class: 'Boolean',
-      name: 'flag',
-      documentation: 'to give a change event for argumentInfo',
-      hidden: true
-    },
-    {
-      class: 'Boolean',
-      name: 'objFlag',
-      documentation: 'to give a change event for Object argumentInfo',
-      hidden: true
-    },
-    {
-      class: 'String',
-      name: 'currentMethod',
-      documentation: 'to set a current method for URL',
-      hidden: true
-    },
-    {
-      class: 'String',
-      name: 'postData',
-      value: '',
-      hidden: true
-    },
-    {
-      class: 'String',
-      name: 'postURL',
-      value: '',
-      hidden: true
-    },
-    {
-      class: 'URL',
-      // TODO: appears not to work if named 'url', find out why.
-      name: 'sugarURL',
-      label: 'URL',
-      hidden: true,
-      displayWidth: 120,
-      documentation: 'dynamic URL according to picking service, method, parameters against web agent',
-      view: 'foam.nanos.dig.LinkView',
-      setter: function() {}, // Prevent from ever getting set
-      expression: function(serviceKey, method, interfaceName, argumentInfo, flag, currentMethod, objFlag) {
-        var query = false;
-        var url   = '/service/sugar';
-
-        this.postData = this.data.toString();
-        return encodeURI(url);
-      }
-    },
-    {
-      class: 'String',
       name: 'data',
-      value: 'Add your data to send to the server.',
-      view: { class: 'foam.u2.tag.TextArea', rows: 5, cols: 137 },
+      value: `{
+  "service":"service-name",
+  "method":"method-name",
+  "interfaceName":"foam.nanos.interface-name",
+  "numberArg":8023,
+  "stringArg":"my-string"
+}`,
+      view: { class: 'foam.u2.tag.TextArea', rows: 16, cols: 137 },
       visibility: 'RW'
     },
     {
       class: 'String',
       name: 'result',
       value: 'No Request Sent Yet.',
-      view: { class: 'foam.u2.tag.TextArea', rows: 5, cols: 137 },
-      visibility: 'RO'
+      view: { class: 'foam.u2.tag.TextArea', rows: 20, cols: 137 },
+      createVisibility: 'RO',
+      updateVisibility: 'RO'
     }
   ],
 
@@ -248,29 +67,25 @@ foam.CLASS({
       name: 'postButton',
       label: 'Send POST Request',
       code: async function() {
-        if ( this.sugarURL !== '' ) {
-          var req = this.HTTPRequest.create({
-            url: window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + this.sugarURL + '?data=' + this.postData+ '&sessionId=' + localStorage.defaultSession,
-            method: 'POST',
-            contentType: 'url'
-          }).send();
+        var req = this.HTTPRequest.create({
+          url: window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + '/service/sugar?sessionId=' + localStorage.defaultSession,
+          method: 'POST',
+          payload: this.data
+        }).send();
 
-          var resp = await req.then(async function(resp) {
-            var temp = await resp.payload.then(function(result) {
-              return result;
-            });
-            return temp;
-          }, async function(error) {
-            var temp = await error.payload.then(function(result) {
-              return result;
-            });
-            return temp;
+        var resp = await req.then(async function(resp) {
+          var temp = await resp.payload.then(function(result) {
+            return result;
           });
+          return temp;
+        }, async function(error) {
+          var temp = await error.payload.then(function(result) {
+            return result;
+          });
+          return temp;
+        });
 
-          this.result = resp;
-        } else {
-          alert('Click on URL link.');
-        }
+        this.result = resp;
       }
     }
   ]
