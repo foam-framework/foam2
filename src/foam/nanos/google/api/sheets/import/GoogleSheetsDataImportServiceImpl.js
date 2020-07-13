@@ -81,9 +81,8 @@
           return columnNames;
         } catch ( Throwable t ) {
           Logger logger = (Logger) x.get("logger");
-          if ( logger == null ) {
+          if ( logger == null )
             logger = new StdoutLogger();
-          }
           logger.error(t);
           return null;
         }
@@ -112,7 +111,7 @@
           importConfig.setCellsRange(values.getRange().split("!")[1]);
 
           List<List<Object>> data = values.getValues();
-          List<FObject> parsedObjs = valueRangeValuesToFobjectsArray(x, importConfig, data);
+          List<FObject> parsedObjs = convertDataToFObjectList(x, importConfig, data);
 
           if ( parsedObjs == null ) {
             result.setResult(0);
@@ -135,9 +134,8 @@
           result.setSuccess(true);
         } catch ( Throwable t ) {
           Logger logger = (Logger) x.get("logger");
-          if ( logger == null ) {
+          if ( logger == null )
             logger = new StdoutLogger();
-          }
           logger.error(t);
           result.setSuccess(false);
         }
@@ -171,9 +169,8 @@
           recordsInserted++;
         } catch ( Throwable t ) {
           Logger logger = (Logger) x.get("logger");
-          if ( logger == null ) {
+          if ( logger == null )
             logger = new StdoutLogger();
-          }
           logger.error(t);
         }
       }
@@ -181,7 +178,7 @@
     `
   },
   {
-    name: 'valueRangeValuesToFobjectsArray',
+    name: 'convertDataToFObjectList',
     javaType: 'List<foam.core.FObject>',
     javaThrows: [
       'InstantiationException',
@@ -215,11 +212,15 @@
       for ( int i = 1 ; i < data.size() ; i++ ) {
         Object obj = importConfig.getImportClassInfo().newInstance();
         for ( int j = 0 ; j < Math.min(importConfig.getColumnHeaderPropertyMappings().length, data.get(i).size()) ; j++ ) {
-          if ( importConfig.getColumnHeaderPropertyMappings()[j].getProp() == null || importConfig.getColumnHeaderPropertyMappings()[j].getProp().getSheetsOutput() ) continue;
+          boolean isColumnHeaderMappedToProperty = importConfig.getColumnHeaderPropertyMappings()[j].getProp() == null ;
+          boolean isOutputProperty = importConfig.getColumnHeaderPropertyMappings()[j].getProp().getSheetsOutput();
+
+          if ( isColumnHeaderMappedToProperty || isOutputProperty )
+            continue;
+
           int columnIndex = columnHeaders.indexOf(importConfig.getColumnHeaderPropertyMappings()[j].getColumnHeader());
           Object val = data.get(i).get(columnIndex);
-          if ( ! pasreAndSetValue(x, obj, importConfig.getColumnHeaderPropertyMappings()[j], data.get(i).get(columnIndex)) )
-            continue;
+          pasreAndSetValue(x, obj, importConfig.getColumnHeaderPropertyMappings()[j], data.get(i).get(columnIndex));
         }
         postSetValues(x, obj);
         objs.add((FObject)obj);
@@ -282,7 +283,7 @@
                 return false;
 
               String number = unitValue.substring(numMatcher.start(), numMatcher.end());
-              prop.set(obj, Math.round( Double.parseDouble(number) * 100));//might not be the case for all of the unitValues
+              prop.set(obj, Math.round( Double.parseDouble(number) * 100));//may not be the case for all of the unitValues
               Matcher alphabeticalCharsMatcher = alphabeticalCharsRegex.matcher(unitValue);
 
               if ( alphabeticalCharsMatcher.find() ) {
@@ -298,13 +299,12 @@
             if ( prop instanceof AbstractEnumPropertyInfo )
               prop.set(obj, ((AbstractEnumPropertyInfo)prop).getValueClass().getMethod("forLabel", String.class).invoke(null, valueString));
             else if ( prop.getValueClass().getName().equals("java.util.Date") ) {
-              if ( valueString.indexOf("/") > 2 ) {
+              if ( valueString.indexOf("/") > 2 )
                 prop.set(obj, new SimpleDateFormat(dateTimeFormat, Locale.US).parse(valueString));
-              } else if ( valueString.indexOf("-") > -1 ) {
+              else if ( valueString.indexOf("-") > -1 )
                 prop.set(obj, new SimpleDateFormat(dateFormat).parse(valueString));
-              } else {
+              else
                 prop.set(obj, new java.util.Date(valueString));
-              }
             }
             else
               prop.set(obj, val);
@@ -312,9 +312,8 @@
         }
       } catch ( Throwable t ) {
         Logger logger = (Logger) x.get("logger");
-        if ( logger == null ) {
+        if ( logger == null )
           logger = new StdoutLogger();
-        }
         logger.error(t);
         return false;
       }
@@ -324,6 +323,7 @@
   {
     name: 'updateSheet',
     type: 'Boolean',
+    documentation: 'method to update "Google Sheets Output columns" eg id or status',
     args: [
       {
         name: 'x',
@@ -346,30 +346,31 @@
     javaCode: `
       GoogleSheetsApiService googleSheetsAPIEnabler = (GoogleSheetsApiService)x.get("googleSheetsDataExport");
       List<List<List<Object>>> values = new ArrayList<>();
-
-      //to store cells ranges for columns that must be updated
       List<String> cellsRange = new ArrayList<>();
 
-      //to calculate column headers row
+      //column headers row calculation
       String[] rangeLimits = importConfig.getCellsRange().split(":");
       Matcher m = digitAppearenceRegex.matcher(rangeLimits[0]);
 
-      if ( !m.find() ) return false;
+      if ( !m.find() )
+        return false;
       int indexOfFirstRowInRange = m.start();
       String startColumn = rangeLimits[0].substring(0, indexOfFirstRowInRange);
       String startRow = Integer.toString( Integer.parseInt(rangeLimits[0].substring(indexOfFirstRowInRange)) + 1 );
       m = digitAppearenceRegex.matcher(rangeLimits[1]);
 
-      if ( ! m.find() ) return false;
+      if ( ! m.find() )
+        return false;
       int indexOfEndRowInRange = m.start();
       String endColumn = rangeLimits[1].substring(0,indexOfEndRowInRange);
       String endRow = rangeLimits[1].substring(indexOfEndRowInRange);
       List<List<String>> base = GoogleSheetsParsingHelper.generateBase(endColumn.length());
 
       for ( ColumnHeaderToPropertyMapping c : importConfig.getColumnHeaderPropertyMappings() ) {
-        if ( c.getProp() == null ) continue;
+        if ( c.getProp() == null )
+          continue;
         if ( ((PropertyInfo)c.getProp()).getSheetsOutput() ) {
-          //to calculate cells ranges
+          //cells ranges calculation
           StringBuilder sb = new StringBuilder();
           int currColumnIndexRelativeToFirstColumn = columnHeaders.indexOf(c.getColumnHeader());
           String startColumnForCurrenctHeader = GoogleSheetsParsingHelper.findColumn(base, startColumn, currColumnIndexRelativeToFirstColumn);
@@ -389,9 +390,8 @@
           values.add(updatedValues);
         }
       }
-      if ( values.size() == 0 ) {
+      if ( values.size() == 0 )
         return true;
-      }
       return googleSheetsAPIEnabler.createAndExecuteBatchUpdateWithListOfValuesForCellsRange(x, importConfig.getGoogleSpreadsheetId(), values, cellsRange);
     `
   },
