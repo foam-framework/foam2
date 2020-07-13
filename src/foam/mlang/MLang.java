@@ -172,10 +172,9 @@ public class MLang
     return dot;
   }
 
-  public static Expr REF(foam.core.ClassInfo o1, Expr o2) {
+  public static Expr REF(Expr o1) {
     Ref ref = new Ref();
     ref.setArg1(o1);
-    ref.setArg2(o2);
     return ref;
   }
 

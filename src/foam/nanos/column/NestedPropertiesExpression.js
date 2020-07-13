@@ -92,7 +92,7 @@ foam.CLASS({
         if ( ! prop ) return null;
 
         var thisPropExpr; 
-        if ( foam.core.Reference.isInstance(prop) ) thisPropExpr = foam.mlang.Expressions.create().REF(of, prop);
+        if ( foam.core.Reference.isInstance(prop) ) thisPropExpr = foam.mlang.Expressions.create().REF(prop);
         else thisPropExpr = prop;
 
         if ( ! expr ) expr = thisPropExpr;
@@ -113,7 +113,7 @@ foam.CLASS({
 
         Expr thisPropExpr = null;
         if ( isPropAReference )
-          thisPropExpr = REF(of, prop);
+          thisPropExpr = REF(prop);
         else
           thisPropExpr = prop;
         if ( expr == null) expr = thisPropExpr;

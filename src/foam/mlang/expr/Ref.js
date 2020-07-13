@@ -23,14 +23,8 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Class',
-      javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
-      javaType: 'foam.core.ClassInfo',
-      name: 'arg1'
-    },
-    {
       class: 'foam.mlang.ExprProperty',
-      name: 'arg2'
+      name: 'arg1'
     }
   ],
 
@@ -38,13 +32,13 @@ foam.CLASS({
     {
       name: 'f',
       code: async function(o) {
-        return o[arg2.name + '$find'];
+        return o[arg1.name + '$find'];
       },
       javaCode: `
-        PropertyInfo p1 = (PropertyInfo) getArg2();
+        PropertyInfo p1 = (PropertyInfo) getArg1();
         FObject refObj = null;
         try {
-          refObj = (FObject)getArg1().getObjClass().getMethod("find" + StringUtil.capitalize(p1.getName()), foam.core.X.class).invoke(obj, ((FObject)obj).getX());
+          refObj = (FObject)obj.getClass().getMethod("find" + StringUtil.capitalize(p1.getName()), foam.core.X.class).invoke(obj, ((FObject)obj).getX());
         } catch ( Throwable t ) {
           Logger logger = (Logger) getX().get("logger");
           if ( logger == null ) {
