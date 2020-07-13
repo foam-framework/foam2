@@ -39,14 +39,12 @@ foam.CLASS({
 
         Transaction t = (Transaction)obj;
 
-        //re-use?
         User payer = ((Subject) x.get("subject")).getUser();
         if ( payer == null )
           return false;
         
         t.setPayerId(payer.getId());
 
-        //re-use?
         String baseCurrency = ((Business)payer).getSuggestedUserTransactionInfo().getBaseCurrency();
 
         if ( t.getSourceCurrency() == null ) {
@@ -68,7 +66,7 @@ foam.CLASS({
       `
     },
     {
-      name: 'getStringValueByProperty',
+      name: 'getStringValueForProperty',
       type: 'String',
       args: [
         {
@@ -87,7 +85,7 @@ foam.CLASS({
       javaCode: `
         if ( prop.getName().equals("Status") )
           return ((Transaction)obj).getState(x).toString();
-        return super.getStringValueByProperty(x, prop, obj);
+        return super.getStringValueForProperty(x, prop, obj);
       `
     }
   ]

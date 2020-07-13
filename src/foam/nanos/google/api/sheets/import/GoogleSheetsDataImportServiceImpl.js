@@ -47,6 +47,8 @@
             public static Pattern digitAppearenceRegex = Pattern.compile("(\\\\d){1}");
             public static Pattern numbersRegex = Pattern.compile("\\\\d+(\\\\.\\\\d{1,2})?");
             public static Pattern alphabeticalCharsRegex = Pattern.compile("[a-zA-Z]{1,}");
+            public static String dateTimeFormat = "EEE MMM d yyyy HH/mm/ss zZ (zzzz)";
+            public static String dateFormat  = "yyyy-MM-dd";
           `
         }));
       }
@@ -111,8 +113,7 @@
 
           List<List<Object>> data = values.getValues();
           List<FObject> parsedObjs = valueRangeValuesToFobjectsArray(x, importConfig, data);
-          //if there was a problem with adding records we still might want to update user's google sheet with ids or status
-          //so we might need extra logic for adding status that might be too much thought
+
           if ( parsedObjs == null ) {
             result.setResult(0);
             result.setSuccess(false);
@@ -295,9 +296,9 @@
               prop.set(obj, ((AbstractEnumPropertyInfo)prop).getValueClass().getMethod("forLabel", String.class).invoke(null, valueString));
             else if ( prop.getValueClass().getName().equals("java.util.Date") ) {
               if ( valueString.indexOf("/") > 2 ) {
-                prop.set(obj, new SimpleDateFormat("EEE MMM d yyyy HH/mm/ss zZ (zzzz)", Locale.US).parse(valueString));
+                prop.set(obj, new SimpleDateFormat(dateTimeFormat, Locale.US).parse(valueString));
               } else if ( valueString.indexOf("-") > -1 ) {
-                prop.set(obj, new SimpleDateFormat("yyyy-MM-dd").parse(valueString));
+                prop.set(obj, new SimpleDateFormat(dateFormat).parse(valueString));
               } else {
                 prop.set(obj, new java.util.Date(valueString));
               }
@@ -380,7 +381,7 @@
           List<List<Object>> updatedValues = new ArrayList<>();
           for ( int i = 0 ; i < objs.size() ; i ++ ) {
             int finalI = i;
-            updatedValues.add(new ArrayList<Object>() {{ add(getStringValueByProperty(x, (PropertyInfo)c.getProp(), (Object)objs.get(finalI))); }});
+            updatedValues.add(new ArrayList<Object>() {{ add(getStringValueForProperty(x, (PropertyInfo)c.getProp(), (Object)objs.get(finalI))); }});
           }
           values.add(updatedValues);
         }
@@ -392,7 +393,7 @@
     `
   },
   {
-    name: 'getStringValueByProperty',
+    name: 'getStringValueForProperty',
     type: 'String',
     args: [
       {

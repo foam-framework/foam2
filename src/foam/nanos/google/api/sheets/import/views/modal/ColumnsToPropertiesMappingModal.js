@@ -9,6 +9,7 @@
   name: 'ColumnsToPropertiesMappingModal',
   extends: 'net.nanopay.ui.wizardModal.WizardModalSubView',
   requires: [
+    'foam.log.LogLevel',
     'foam.nanos.google.api.sheets.ColumnHeaderToPropertyMapping',
     'foam.u2.dialog.NotificationMessage',
     'foam.u2.detail.SectionedDetailPropertyView'
@@ -27,6 +28,10 @@
     padding: 0;
   }
   `,
+  messages: [
+    { name: 'ERROR_MSG', message: 'Something went wrong! Please contact support'},
+    { name: 'SUCCESS_MSG', message: 'Number of records inserted: '}
+  ],
   methods: [
     function initE() {
       this.SUPER();
@@ -78,8 +83,8 @@
           var message = this.NotificationMessage.create();
           if ( r.success ) message.message = `Number of records inserted: ${r.result}`;
           else {
-            message.message = 'Something went wrong! Please contact support';
-            message.type = 'error';
+            message.message = this.ERROR_MSG;
+            message.type = this.LogLevel.ERROR;
           }
           this.ctrl.add(message);
         });

@@ -9,6 +9,7 @@
   name: 'GoogleSheetImportModal',
   extends: 'net.nanopay.ui.wizardModal.WizardModalSubView',
   requires: [
+    'foam.log.LogLevel',
     'foam.u2.dialog.NotificationMessage',
   ],
   imports: [
@@ -23,6 +24,9 @@
     bottom: 0;
   }
   `,
+  messages: [
+    { name: 'ERROR_MSG', message: 'Something went wrong! Please contact support'},
+  ],
   methods: [
     function initE() {
       this.SUPER();
@@ -68,7 +72,7 @@
             this.importConfig.columnHeaderPropertyMappings = arr;
             this.pushToId('columnsMapping');
           } else {
-            this.ctrl.add(this.NotificationMessage.create({ message: 'Something went wrong! Please contact support', type: 'error' }));
+            this.ctrl.add(this.NotificationMessage.create({ message: this.ERROR_MSG, type: this.LogLevel.ERROR }));
             X.closeDialog();
           }
         });
