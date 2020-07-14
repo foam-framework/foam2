@@ -131,6 +131,16 @@ foam.CLASS({
       The UserCapabilityJunction object will have its expiry configured to a DateTime based on the lower value of the two, expiry and duration`
     },
     {
+      name: 'gracePeriod',
+      class: 'Int',
+      value: 0,
+      documentation: `To be used in the case where expiry is duration based, represents the number of DAYS the user can keep permissions
+      granted by this capability after the duration runs out. 
+      If the gracePeriod is greater than 0, the UserCapabilityJunction will go 
+      into GRACE_PERIOD status with the property graceDaysLeft set to be equals to this property. Otherwise, the UserCapabilityJunction will
+      go into EXPIRED status.`
+    },
+    {
       name: 'of',
       class: 'Class',
       documentation: `Model used to store information required by this credential`
