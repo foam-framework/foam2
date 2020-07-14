@@ -36,6 +36,11 @@ foam.ENUM({
       label: 'available',
       documentation: `This status is used when there is no UCJ - thus capability available.`,
       background: '#604aff'
+    },
+    {
+      name: 'GRACE_PERIOD',
+      label: 'grace period',
+      documentation: `This status is used when a UCJ is expired, but the number of graceDaysLeft is greater than 0 `
     }
   ]
 });

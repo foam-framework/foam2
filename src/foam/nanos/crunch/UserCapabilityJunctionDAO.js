@@ -100,7 +100,7 @@ foam.CLASS({
       type: 'foam.core.FObject',
       documentation: `
         Set the status of the junction before put by checking if prerequisites are fulfilled, data required is validated,
-        and whether review is required and set.
+        and whether review is required.
       `,
       javaCode: `
         UserCapabilityJunction ucJunction = (UserCapabilityJunction) obj;
@@ -112,21 +112,19 @@ foam.CLASS({
         checkOwnership(x, ucJunction);
 
         // if the junction is being updated from GRANTED to something else, put the updated ucj,
-        // then try to reput the ucj as new ucj
+        // then try to reput the ucj as new ucj, unless the ucj is in grace period or has expired.
         if ( old != null && old.getStatus() == CapabilityJunctionStatus.GRANTED && ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED ) {
-          getDelegate().put_(x, ucJunction);
+          ucJunction = (UserCapabilityJunction) getDelegate().put_(x, ucJunction);
           old = null;
+          if ( ucJunction.getStatus() == CapabilityJunctionStatus.EXPIRED || ucJunction.getStatus() == CapabilityJunctionStatus.GRACE_PERIOD ) return ucJunction;
         }
 
         boolean requiresData = capability.getOf() != null;
         boolean requiresReview = capability.getReviewRequired();
 
-        boolean ucjExpiredButCapabilityNot = ucJunction.getStatus() == CapabilityJunctionStatus.EXPIRED && ! capability.isExpired();
-
         // Update current UCJ status
         if ( old == null
-          || ucJunction.getStatus() == CapabilityJunctionStatus.ACTION_REQUIRED
-          || ucjExpiredButCapabilityNot )
+          || ucJunction.getStatus() == CapabilityJunctionStatus.ACTION_REQUIRED )
         {
           CapabilityJunctionStatus chainedStatus = checkPrereqsChainedStatus(x, ucJunction);
           if ( ( ! requiresData || ( ucJunction.getData() != null && validateData(x, ucJunction) ) )
