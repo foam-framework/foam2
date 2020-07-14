@@ -213,9 +213,11 @@
         Object obj = importConfig.getImportClassInfo().newInstance();
         for ( int j = 0 ; j < Math.min(importConfig.getColumnHeaderPropertyMappings().length, data.get(i).size()) ; j++ ) {
           boolean isColumnHeaderMappedToProperty = importConfig.getColumnHeaderPropertyMappings()[j].getProp() == null ;
-          boolean isOutputProperty = importConfig.getColumnHeaderPropertyMappings()[j].getProp().getSheetsOutput();
+          if ( isColumnHeaderMappedToProperty )
+            continue;
 
-          if ( isColumnHeaderMappedToProperty || isOutputProperty )
+          boolean isOutputProperty = importConfig.getColumnHeaderPropertyMappings()[j].getProp().getSheetsOutput();
+          if ( isOutputProperty )
             continue;
 
           int columnIndex = columnHeaders.indexOf(importConfig.getColumnHeaderPropertyMappings()[j].getColumnHeader());
