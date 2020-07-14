@@ -293,7 +293,7 @@ foam.CLASS({
           style({ 'min-width': this.tableWidth_$ }).
           show(this.showHeader$).
           add(this.slot(function(columns_) {
-            var propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => c));
+            var propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => foam.core.Property.isInstance(c) ? c.name : c));
             view.props = view.returnProperties(view, propertyNamesToQuery);
             view.updateValues = ! view.updateValues;
 
@@ -588,8 +588,9 @@ foam.CLASS({
                       stringValue = view.outputter.returnStringValueForProperty(view.__context__, view.props[i], val[i]);
                     }
                     tableRowElement.start().addClass(view.myClass('td'))
-                    .add(stringValue)
-                    .style({flex: column && column.tableWidth ? `0 0 ${column.tableWidth}px` : view.props[i] && view.props[i].tableWidth  ? `0 0 ${view.props[i].tableWidth}px` : '1 0 0'}).end();
+                      .add(stringValue)
+                      .style({flex: column && column.tableWidth ? `0 0 ${column.tableWidth}px` : view.props[i] && view.props[i].tableWidth  ? `0 0 ${view.props[i].tableWidth}px` : '1 0 0'})
+                    .end();
                   }
                   tableRowElement
                     .start()
