@@ -96,7 +96,7 @@ foam.CLASS({
       name: 'selectedColumnNames',
       expression: function(columns, of) {
         var ls = JSON.parse(localStorage.getItem(of.id));
-        return ls ? ls : columns;
+        return ls ? ls : of.getAxiomByName('tableColumns').columns;
       }
     },
     {
