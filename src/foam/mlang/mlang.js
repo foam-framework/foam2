@@ -3223,7 +3223,7 @@ foam.CLASS({
   extends: 'foam.mlang.AbstractExpr',
   implements: [ 'foam.core.Serializable' ],
 
-  documentation: 'A Binary Predicate which applies arg2.f() to arg1.f().',
+  documentation: 'A Binary Expression which applies arg2.f() to arg1.f().',
 
   properties: [
     {
@@ -3243,9 +3243,9 @@ foam.CLASS({
         return this.arg2.f(this.arg1.f(o));
       },
       javaCode: `
-        Object e1 = getArg1().f(obj);
-        if ( e1 == null ) return e1;
-        return getArg2().f(e1);
+        Object receiver = getArg1().f(obj);
+        if ( receiver == null ) return null;
+        return getArg2().f(receiver);
       `
     },
 

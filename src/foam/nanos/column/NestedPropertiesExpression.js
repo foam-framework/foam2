@@ -91,16 +91,7 @@ foam.CLASS({
         var prop = of.getAxiomByName(propName[i]);
         if ( ! prop ) return null;
 
-        var thisPropExpr; 
-        if ( foam.core.Reference.isInstance(prop) )
-          thisPropExpr = foam.mlang.Expressions.create().REF(prop);
-        else
-          thisPropExpr = prop;
-
-        if ( ! expr )
-          expr = thisPropExpr;
-        else
-          foam.mlang.Expressions.create().DOT(expr, thisPropExpr);
+        expr = this.buildPropertyExpr(prop, expr);
 
         if ( i === propName.length - 1 )
           return expr;
@@ -111,28 +102,18 @@ foam.CLASS({
         ClassInfo ci = of;
         PropertyInfo prop = (PropertyInfo) ci.getAxiomByName(propName[i]);
 
-        if ( prop == null ) return null; 
+        if ( prop == null ) return null;
 
         Boolean isPropAReference = isPropertyAReference(ci, prop);
+        expr = buildPropertyExpr(prop, expr, isPropAReference);
 
-        Expr thisPropExpr = null;
-        if ( isPropAReference )
-          thisPropExpr = REF(prop);
-        else
-          thisPropExpr = prop;
-        if ( expr == null )
-          expr = thisPropExpr;
-        else
-          expr = DOT(expr, thisPropExpr);
-
-        if ( i == propName.length - 1 ) {
+        if ( i == propName.length - 1 )
           return expr;
-        }
         
         try {
           StringBuilder sb = new StringBuilder("find");
           Class cls;
-          if ( prop instanceof foam.core.AbstractFObjectPropertyInfo )
+          if ( ! isPropAReference )
             cls = prop.getValueClass();
           else {
             sb.setLength(4);
@@ -146,6 +127,45 @@ foam.CLASS({
         }
         
         return returnDotExprForNestedProperty(ci, propName, ++i, expr);
+      `
+    },
+    {
+      name: 'buildPropertyExpr',
+      javaType: 'foam.mlang.Expr',
+      args: [
+        {
+          name: 'prop',
+          javaType: 'foam.core.PropertyInfo',
+        },
+        {
+          name: 'expr',
+          javaType: 'foam.mlang.Expr'
+        },
+        {
+          name: 'isPropertyAReference',
+          type: 'Boolean'
+        }
+      ],
+      code: function(prop, expr) {
+        if ( foam.core.Reference.isInstance(prop) ) {
+          prop = foam.mlang.Expressions.create().REF(prop);
+        }
+      
+        return expr == null ? prop :
+          foam.mlang.Expressions.create().DOT(expr, prop);
+      },
+      javaCode: `
+        Expr thisPropExpr = null;
+        if ( isPropertyAReference )
+          thisPropExpr = REF(prop);
+        else
+          thisPropExpr = prop;
+        if ( expr == null )
+          expr = thisPropExpr;
+        else
+          expr = DOT(expr, thisPropExpr);
+
+        return expr;
       `
     },
     {

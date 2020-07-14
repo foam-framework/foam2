@@ -10,7 +10,7 @@ foam.CLASS({
   extends: 'foam.mlang.AbstractExpr',
   implements: [ 'foam.core.Serializable' ],
 
-  documentation: 'An Unary Predicate which returns reference property object',
+  documentation: 'An Unary Expression which returns reference property object',
 
   javaImports: [
     'foam.core.FObject',
