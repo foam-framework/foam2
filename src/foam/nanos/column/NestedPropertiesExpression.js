@@ -91,12 +91,12 @@ foam.CLASS({
         var prop = of.getAxiomByName(propName[i]);
         if ( ! prop ) return null;
 
-        expr = this.buildPropertyExpr(prop, expr);
+        var propExpr = this.buildPropertyExpr(prop, expr);
 
         if ( i === propName.length - 1 )
-          return expr;
+          return propExpr;
 
-        return this.returnDotExprForNestedProperty(prop.of, propName, ++i, expr);
+        return this.returnDotExprForNestedProperty(prop.of, propName, ++i, propExpr);
       },
       javaCode: `
         ClassInfo ci = of;
@@ -104,29 +104,48 @@ foam.CLASS({
 
         if ( prop == null ) return null;
 
-        Boolean isPropAReference = isPropertyAReference(ci, prop);
-        expr = buildPropertyExpr(prop, expr, isPropAReference);
+        Boolean isPropAReference = isPropertyAReference(prop);
+        expr = buildPropertyExpr(prop, expr);
 
         if ( i == propName.length - 1 )
           return expr;
         
+        ci = getPropertyValueClass(ci, prop);
+        if ( ci == null )
+          return null; 
+        
+        return returnDotExprForNestedProperty(ci, propName, ++i, expr);
+      `
+    },
+    {
+      name: 'getPropertyValueClass',
+      javaType: 'ClassInfo',
+      args: [
+        {
+          name: 'ci',
+          type: 'Object',
+          javaType: 'foam.core.ClassInfo'
+        },
+        {
+          name: 'prop',
+          javaType: 'foam.core.PropertyInfo',
+        }
+      ],
+      javaCode: `
         try {
-          StringBuilder sb = new StringBuilder("find");
+          Boolean isPropAReference = isPropertyAReference(prop);
           Class cls;
           if ( ! isPropAReference )
             cls = prop.getValueClass();
           else {
-            sb.setLength(4);
-            sb.append(StringUtil.capitalize(prop.getName()));
-            Method m = ci.getObjClass().getMethod(sb.toString(), foam.core.X.class);
+            Method m = ci.getObjClass().getMethod("find" + StringUtil.capitalize(prop.getName()), foam.core.X.class);
             cls = m.getReturnType();
           }
           ci = (ClassInfo) cls.getMethod("getOwnClassInfo").invoke(null);
         } catch( Throwable t ) {
           return null;
         }
-        
-        return returnDotExprForNestedProperty(ci, propName, ++i, expr);
+        return ci;
       `
     },
     {
@@ -140,10 +159,6 @@ foam.CLASS({
         {
           name: 'expr',
           javaType: 'foam.mlang.Expr'
-        },
-        {
-          name: 'isPropertyAReference',
-          type: 'Boolean'
         }
       ],
       code: function(prop, expr) {
@@ -151,12 +166,12 @@ foam.CLASS({
           prop = foam.mlang.Expressions.create().REF(prop);
         }
       
-        return expr == null ? prop :
+        return ! expr ? prop :
           foam.mlang.Expressions.create().DOT(expr, prop);
       },
       javaCode: `
         Expr thisPropExpr = null;
-        if ( isPropertyAReference )
+        if ( isPropertyAReference(prop) )
           thisPropExpr = REF(prop);
         else
           thisPropExpr = prop;
@@ -173,23 +188,17 @@ foam.CLASS({
       javaType: 'Boolean',
       args: [
         {
-          name: 'ci',
-          type: 'Object',
-          javaType: 'foam.core.ClassInfo'
-        },
-        {
           name: 'prop',
           javaType: 'foam.core.PropertyInfo',
           javaInfoType: 'foam.core.AbstractObjectPropertyInfo'
         },
       ],
       javaCode: `
-
         if ( prop instanceof foam.core.AbstractFObjectPropertyInfo )
           return false;
 
         try {
-          Method m = ci.getObjClass().getMethod("find" + StringUtil.capitalize(prop.getName()), foam.core.X.class);
+          Method m = prop.getClassInfo().getObjClass().getMethod("find" + StringUtil.capitalize(prop.getName()), foam.core.X.class);
           return true;
         } catch( Throwable t ) {}
         return false;
