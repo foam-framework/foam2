@@ -21,12 +21,12 @@
     'notify'
   ],
   css: `
-  ^footer {
-    width: 100%;
-    position: absolute;
-    bottom: 0;
-    padding: 0;
-  }
+    ^footer {
+      width: 100%;
+      position: absolute;
+      bottom: 0;
+      padding: 0;
+    }
   `,
   messages: [
     { name: 'ERROR_MSG', message: 'Something went wrong! Please contact support'},
