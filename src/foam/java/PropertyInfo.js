@@ -123,7 +123,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'sheetsOutput',
-      documentation: 'the sheetsOutput specifies either property shoud be written to Google Sheet on import. eg on Transaction import in case there is Status column transaction\'s status will be written there'
+      documentation: 'The sheetsOutput specifies if property shoud be written to Google Sheet on import. eg on Transaction import in case there is Status column transaction\'s status will be written there'
     },
     {
       name: 'methods',

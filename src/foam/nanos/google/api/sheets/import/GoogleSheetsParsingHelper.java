@@ -5,22 +5,13 @@ import java.util.List;
 
 public class GoogleSheetsParsingHelper {
   public static List<String> alphabet = java.util.Arrays.asList(new String[] {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"});
-  public static int findAndValidateIndexOfColumnInArrayOfValues (List<List<String>> base, int startColumnIndex, int endColumnIndex, String col) {
-    int colIndex = findColumnIndex(col, base);
-    return colIndex > endColumnIndex ?  -1 : colIndex < startColumnIndex ? -1 : colIndex;
-  }      
 
-  public static int findColumnIndex(String col, List<List<String>> base) {
-    int i = 0;
-    int preIndex = 0;
-    while ( i < col.length() - 1 ) {
-      preIndex = base.get(i).size();
-      i++;
-    }
-    int startIndex = preIndex + base.get(col.length() - 1).indexOf(col);
-    return startIndex;
-  }
-  
+  // this method generates all posible column names ( A, B, ... , AA, AB, ..)
+  // this column names are located in base depending on its length
+  // eg column names A-Z in generateBase(endColumnLength).get(0)
+  // AA-ZZ generateBase(endColumnLength).get(1)
+  // length of end column let us know how many "base rows" should be generated
+  // for endColumnLength = 2 we would generate A - ZZ column names
   public static List<List<String>> generateBase(int endColumnLength) {
 
     List<List<String>> base = new ArrayList<>();
@@ -42,7 +33,10 @@ public class GoogleSheetsParsingHelper {
     return base;
   }
 
-  public static String findColumn(List<List<String>> base, String startCol, int startColCurrColDiff) {
+  // this method is used to return Google Sheets Column "Header" for column which is startColCurrColDiff away from startCol Google Sheets Name
+  // eg base = A-Z, startCol = "A", startColCurrColDiff = 3
+  // result would be "D"
+  public static String findColumnNameStartingWithStartColumn(List<List<String>> base, String startCol, int startColCurrColDiff) {
     int startColIndex = base.get(startCol.length() - 1).indexOf(startCol);
     int currColumnIndex = startColIndex + startColCurrColDiff;
     if ( currColumnIndex > base.get(startCol.length() - 1).size() ) {

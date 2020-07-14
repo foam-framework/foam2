@@ -77,7 +77,8 @@ foam.CLASS({
       visibility: 'DISABLED',
       validationTextVisible: true,
       validateObj: function() {
-        if ( this.prop ) return;
+        if ( this.prop )
+          return;
         return 'Data for column with header  "' + this.columnHeader + '" cannot be imported. You can still import your data but this column data will be ignored';
       }
     },

@@ -82,7 +82,8 @@
 
         await X[this.importServiceName].importData(X, this.importConfig).then(r => {
           var message = this.NotificationMessage.create();
-          if ( r.success ) message.message = this.SUCCESS_MSG + r.result;
+          if ( r.success )
+            message.message = this.SUCCESS_MSG + r.result;
           else {
             message.message = this.ERROR_MSG;
             message.type = this.LogLevel.ERROR;

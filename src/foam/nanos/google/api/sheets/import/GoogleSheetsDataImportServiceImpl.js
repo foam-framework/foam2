@@ -268,10 +268,12 @@
     ],
     javaCode: `
       PropertyInfo prop  = (PropertyInfo)columnHeaderToPropertyMapping.getProp();
-      if ( prop == null ) return false;
+      if ( prop == null )
+        return false;
 
       String valueString = val.toString();
-      if ( valueString.length() == 0 ) return true;
+      if ( valueString.length() == 0 )
+        return true;
       try {
         switch (prop.getValueClass().getName()) {
           case "long":
@@ -352,7 +354,7 @@
       String[] rangeLimits = importConfig.getCellsRange().split(":");
       Matcher m = digitAppearenceRegex.matcher(rangeLimits[0]);
 
-      if ( !m.find() )
+      if ( ! m.find() )
         return false;
       int indexOfFirstRowInRange = m.start();
       String startColumn = rangeLimits[0].substring(0, indexOfFirstRowInRange);
@@ -373,7 +375,7 @@
           //cells ranges calculation
           StringBuilder sb = new StringBuilder();
           int currColumnIndexRelativeToFirstColumn = columnHeaders.indexOf(c.getColumnHeader());
-          String startColumnForCurrenctHeader = GoogleSheetsParsingHelper.findColumn(base, startColumn, currColumnIndexRelativeToFirstColumn);
+          String startColumnForCurrenctHeader = GoogleSheetsParsingHelper.findColumnNameStartingWithStartColumn(base, startColumn, currColumnIndexRelativeToFirstColumn);
           sb.append(startColumnForCurrenctHeader);
           sb.append(startRow);
           sb.append(":");
