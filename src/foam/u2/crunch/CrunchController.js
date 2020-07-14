@@ -177,6 +177,7 @@ foam.CLASS({
     },
 
     async function launchWizard(capability) {
+      if ( typeof capability == 'string' ) capability = await this.capabilityDAO.find(capability);
       var isAssociationCapability = this.AssociationCapability.isInstance(capability);
       var associatedEntity = isAssociationCapability ? this.subject.realUser : 
         capability.associatedEntity === 'user' ? this.subject.user : this.subject.realUser;
