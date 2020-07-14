@@ -76,10 +76,10 @@ foam.CLASS({
         if ( ! of ) return [];
         var cols;
         if ( ! editColumnsEnabled )
-          cols = of.getAxiomByName('tableColumns').columns || allColumns;
+          cols = columns || allColumns;
         else
           cols = selectedColumnNames;
-        return cols.filter( c => allColumns.includes(foam.String.isInstance(c) ? ( c.indexOf('.') > -1 ? c.split('.')[0] : c ) : columns.name )).map(c => foam.Array.isInstance(c) ? c : [c, null]);
+        return cols.filter( c => allColumns.includes(foam.String.isInstance(c) ? ( c.indexOf('.') > -1 ? c.split('.')[0] : c ) : c.name )).map(c => foam.Array.isInstance(c) ? c : [c, null]);
       },
     },
     {
@@ -98,7 +98,7 @@ foam.CLASS({
       name: 'selectedColumnNames',
       expression: function(columns, of) {
         var ls = JSON.parse(localStorage.getItem(of.id));
-        return ls ? ls : of.getAxiomByName('tableColumns').columns;
+        return ls ? ls : columns;
       }
     },
     {
@@ -108,7 +108,7 @@ foam.CLASS({
           return [];
         var tc = of.getAxiomByName('tableColumns');
         return tc ? tc.columns : allColumns;
-      },
+      }
     },
     {
       class: 'FObjectArray',
