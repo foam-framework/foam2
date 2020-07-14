@@ -29,6 +29,7 @@ foam.CLASS({
 
   methods: [
     function init() {
+      this.SUPER();
       this.onDetach(this.desiredModelId$.sub(this.updateChoices));
       this.onDetach(this.target$.sub(this.updateChoices));
       this.updateChoices();
@@ -48,7 +49,7 @@ foam.CLASS({
                 return arr;
               }
 
-              return arr.concat([[sr.strategy.id, sr.strategy.name]]);
+              return arr.concat([[sr.strategy, sr.strategy.name]]);
             }, [[null, 'Select...']])
             .filter(x => x);
         });

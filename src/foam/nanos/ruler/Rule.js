@@ -11,11 +11,13 @@
   documentation: 'Rule model represents rules(actions) that need to be applied in case passed object satisfies provided predicate.',
 
   implements: [
+    'foam.nanos.auth.Authorizable',
     'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.CreatedByAware',
     'foam.nanos.auth.LastModifiedAware',
     'foam.nanos.auth.LastModifiedByAware',
-    'foam.nanos.approval.ApprovableAware'
+    'foam.nanos.approval.ApprovableAware',
+    'foam.nanos.auth.ServiceProviderAware'
   ],
 
   imports: [
@@ -24,6 +26,8 @@
 
   javaImports: [
     'foam.core.DirectAgency',
+    'foam.nanos.auth.AuthorizationException',
+    'foam.nanos.auth.AuthService',
     'foam.nanos.logger.Logger',
     'java.util.Collection'
   ],
@@ -291,6 +295,13 @@
     {
       name: 'checkerPredicate',
       javaFactory: 'return foam.mlang.MLang.FALSE;'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.ServiceProvider',
+      name: 'spid',
+      value: foam.nanos.auth.ServiceProviderAware.GLOBAL_SPID,
+      documentation: 'Service Provider Id of the rule. Default to ServiceProviderAware.GLOBAL_SPID for rule applicable to all service providers.'
     }
   ],
 
@@ -313,11 +324,10 @@
         }
       ],
       javaCode: `
+        if ( ! getEnabled() ) return false;
+
         try {
-          return getEnabled()
-            && getPredicate().f(
-              x.put("NEW", obj).put("OLD", oldObj)
-            );
+          return getPredicate().f(x.put("NEW", obj).put("OLD", oldObj));
         } catch ( Throwable t ) {
           try {
             return getPredicate().f(obj);
@@ -408,7 +418,53 @@
     {
       name: 'toSummary',
       type: 'String',
-      code: () => { return this.name || this.id; }
+      code: function() {
+        return this.name || this.id;
+      }
+    },
+    {
+      name: 'authorizeOnCreate',
+      javaCode: `
+        var auth = (AuthService) x.get("auth");
+        if ( ! auth.check(x, "rule.create")
+          || ! auth.check(x, "spid.read." + getSpid())
+        ) {
+          throw new AuthorizationException("You do not have permission to create the rule.");
+        }
+      `
+    },
+    {
+      name: 'authorizeOnRead',
+      javaCode: `
+        var auth = (AuthService) x.get("auth");
+        if ( ! auth.check(x, "rule.read." + getId())
+          || ! auth.check(x, "spid.read." + getSpid())
+        ) {
+          throw new AuthorizationException("You do not have permission to read the rule.");
+        }
+      `
+    },
+    {
+      name: 'authorizeOnUpdate',
+      javaCode: `
+        var auth = (AuthService) x.get("auth");
+        if ( ! auth.check(x, "rule.update." + getId())
+          || ! auth.check(x, "spid.read." + getSpid())
+        ) {
+          throw new AuthorizationException("You do not have permission to update the rule.");
+        }
+      `
+    },
+    {
+      name: 'authorizeOnDelete',
+      javaCode: `
+        var auth = (AuthService) x.get("auth");
+        if ( ! auth.check(x, "rule.remove." + getId())
+          || ! auth.check(x, "spid.read." + getSpid())
+        ) {
+          throw new AuthorizationException("You do not have permission to delete the rule.");
+        }
+      `
     }
   ],
 
