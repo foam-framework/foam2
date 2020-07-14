@@ -571,7 +571,6 @@ foam.CLASS({
     },
     {
       class: 'FObjectArray',
-//      of: 'foam.dao.DAOInterceptor',
       of: 'foam.core.FObject',
       generateJava: false,
       name: 'decorators'
