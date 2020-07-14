@@ -75,8 +75,10 @@ foam.CLASS({
       expression: function(columns, of, editColumnsEnabled, selectedColumnNames, allColumns) {
         if ( ! of ) return [];
         var cols;
-        if ( ! editColumnsEnabled ) cols = of.getAxiomByName('tableColumns').columns || allColumns;
-        else cols = selectedColumnNames;
+        if ( ! editColumnsEnabled )
+          cols = of.getAxiomByName('tableColumns').columns || allColumns;
+        else
+          cols = selectedColumnNames;
         return cols.filter( c => allColumns.includes(foam.String.isInstance(c) ? ( c.indexOf('.') > -1 ? c.split('.')[0] : c ) : columns.name )).map(c => foam.Array.isInstance(c) ? c : [c, null]);
       },
     },
@@ -102,7 +104,8 @@ foam.CLASS({
     {
       name: 'columns',
       expression: function(of, allColumns, isColumnChanged) {
-        if ( ! of ) return [];
+        if ( ! of )
+          return [];
         var tc = of.getAxiomByName('tableColumns');
         return tc ? tc.columns : allColumns;
       },
