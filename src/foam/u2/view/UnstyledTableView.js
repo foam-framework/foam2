@@ -245,10 +245,6 @@ foam.CLASS({
     },
     {
       name: 'props',
-      expression: function(columns_) {
-        var propertyNamesToQuery = columns_.length === 0 ? columns_ : [ 'id' ].concat(columns_.map(([c, overrides]) => foam.core.Property.isInstance(c) ? c.name : c));
-        return this.returnProperties(this, propertyNamesToQuery);
-      }
     },
     {
       name: 'updateValues',
