@@ -203,7 +203,7 @@ FOAM_FILES([
   { name: "foam/dao/DAO" },
   { name: "foam/dao/daoUtils" },
   { name: "foam/dao/ArraySink" },
-  { name: "foam/dao/DAODecorator" },
+  { name: "foam/dao/DAOInterceptor" },
   { name: "foam/dao/AbstractDAO" },
   { name: "foam/dao/FilteredDAO" },
   { name: "foam/dao/DAOProperty" },
