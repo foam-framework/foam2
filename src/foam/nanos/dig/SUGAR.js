@@ -66,14 +66,12 @@ foam.CLASS({
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdBy',
-      storageOptional: true,
       section: 'supportDetails'
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdByAgent',
-      storageOptional: true,
       section: 'supportDetails'
     },
     {
@@ -84,7 +82,6 @@ foam.CLASS({
       updateVisibility: 'RO',
       section: 'administrative',
       includeInDigest: true,
-      storageOptional: true,
       section: 'supportDetails'
     },
     {

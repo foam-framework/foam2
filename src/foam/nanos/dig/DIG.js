@@ -67,14 +67,12 @@ foam.CLASS({
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdBy',
-      storageOptional: true,
       section: 'supportDetails'
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdByAgent',
-      storageOptional: true,
       section: 'supportDetails'
     },
     {
@@ -84,8 +82,7 @@ foam.CLASS({
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
       section: 'supportDetails',
-      includeInDigest: true,
-      storageOptional: true
+      includeInDigest: true
     },
     {
       class: 'DateTime',
