@@ -15,11 +15,9 @@
  * limitations under the License.
  */
 
-// TODO: the name of this is confusing because it overloads the term
-// "DAO Decorator". Rename to DAOFilter or EasyDAODecorator or something else.
 foam.INTERFACE({
   package: 'foam.dao',
-  name: 'DAODecorator',
+  name: 'DAOInterceptor',
 
   methods: [
     {
@@ -90,7 +88,7 @@ foam.INTERFACE({
 foam.CLASS({
   package: 'foam.dao',
   name: 'AbstractDAODecorator',
-  implements: ['foam.dao.DAODecorator'],
+  implements: ['foam.dao.DAOInterceptor'],
 
   methods: [
     function write(X, dao, obj, existing) {
@@ -110,7 +108,7 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'CompoundDAODecorator',
 
-  implements: ['foam.dao.DAODecorator'],
+  implements: ['foam.dao.DAOInterceptor'],
 
   properties: [
     {
@@ -152,7 +150,7 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.dao',
-  name: 'DecoratedDAO',
+  name: 'InterceptedDAO',
   extends: 'foam.dao.ProxyDAO',
 
   requires: [
@@ -163,7 +161,7 @@ foam.CLASS({
   properties: [
     {
 //      class: 'FObjectProperty',
-//      of: 'foam.dao.DAODecorator',
+//      of: 'foam.dao.DAOInterceptor',
       name: 'decorator'
     },
     {
