@@ -46,6 +46,10 @@ foam.CLASS({
       of: 'FObject',
     },
     {
+      name: 'nodeView',
+      class: 'foam.u2.ViewSpec'
+    },
+    {
       name: 'relationshipPropertyName',
       class: 'String'
     },
@@ -68,12 +72,13 @@ foam.CLASS({
       var self = this;
       var g = this.start('svg');
       this.renderBoxes(g, this.rootObject);
+      var shape = this.nodePlacementPlan.shape;
       g
         .attrs({
           'xmlns': 'http://www.w3.org/2000/svg',
           'viewBox': '0 0 ' +
-            ('' + (this.nodePlacementPlan.shape[0]*(size + gap) + gap)) + ' ' +
-            ('' + (this.nodePlacementPlan.shape[1]*(size + gap) + gap))
+            ('' + (shape[0]*(size + gap) + gap)) + ' ' +
+            ('' + (shape[1]*(size + gap) + gap))
         })
         .end()
     },
@@ -87,35 +92,12 @@ foam.CLASS({
           typeof coords, coords)
       }
 
-      var dims = {
-        x: '' + (coords[0]*(size + gap) + gap),
-        y: '' + (coords[1]*(size + gap) + gap),
-        width: '' + size, height: '' + size,
-      }
-
       g
-        .start('rect')
-          .attrs({
-            ...dims,
-            fill: '#fff',
-            stroke: 'black'
-          })
-        .end()
-        .start('foreignObject')
-          .attrs({
-            ...dims,
-          })
-          .start('p')
-            .attrs({
-              xmlns: 'http://www.w3.org/1999/xhtml',
-            })
-            .addClass(this.myClass('p'))
-            .add(obj.name)
-            .add('<br>')
-            .add(obj.id)
-          .end()
-        .end()
-
+        .tag(this.nodeView, {
+          data: obj,
+          position: coords.map(v => gap + v*(size + gap)),
+          size: Array(coords.length).fill(this.size)
+        })
         .callIf(parent, function () {
           var pcoords = self.nodePlacementPlan.getPlacement(parent);
           this
