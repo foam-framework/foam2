@@ -75,7 +75,7 @@ foam.CLASS({
       expression: function(columns, of, editColumnsEnabled, selectedColumnNames, allColumns) {
         if ( ! of ) return [];
         var cols;
-        if ( ! editColumnsEnabled ) cols = columns;
+        if ( ! editColumnsEnabled ) cols = of.getAxiomByName('tableColumns').columns || allColumns;
         else cols = selectedColumnNames;
         return cols.filter( c => allColumns.includes(foam.String.isInstance(c) ? ( c.indexOf('.') > -1 ? c.split('.')[0] : c ) : columns.name )).map(c => foam.Array.isInstance(c) ? c : [c, null]);
       },

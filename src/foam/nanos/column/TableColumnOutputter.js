@@ -17,7 +17,7 @@
       type: 'String',
       documentation: 'Method that converts value to string',
       code: async function(x, prop, val, unitPropName) {
-        if ( val ) {
+        if ( val == 0 || val ) {
           if ( foam.Array.isInstance(val) ) {
             var stringArr = [];
             for ( var i = 0 ; i < val.length ; i++ ) {
