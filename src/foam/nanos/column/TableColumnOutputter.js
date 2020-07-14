@@ -21,14 +21,14 @@
           if ( foam.Array.isInstance(val) ) {
             var stringArr = [];
             for ( var i = 0 ; i < val.length ; i++ ) {
-              stringArr.push(await this.valueToString(val[i]));
+              stringArr.push(await this.unitPropValueToString(val[i]));
             }
             return stringArr.join(' ');
           }
           if ( foam.core.UnitValue.isInstance(prop) ) {
             if ( unitPropName ) {
-              if ( prop.valueToString) {
-                return await prop.valueToString(x, val, unitPropName);
+              if ( prop.unitPropValueToString) {
+                return await prop.unitPropValueToString(x, val, unitPropName);
               }
               return unitPropName + ' ' + ( val / 100 ).toString();
             }
@@ -43,12 +43,12 @@
           if ( foam.core.Time.isInstance(prop) ) {
             return val.toString().substring(0, 8);
           }
-          return await this.valueToString(val);
+          return await this.unitPropValueToString(val);
         }
         return ''; 
       }
     },
-    async function valueToString(val) {
+    async function unitPropValueToString(val) {
       if ( val.toSummary ) {
         if ( val.toSummary() instanceof Promise )
           return await val.toSummary();
