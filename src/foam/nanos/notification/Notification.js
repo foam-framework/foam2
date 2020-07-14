@@ -197,14 +197,14 @@ foam.CLASS({
       name: 'authorizeOnCreate',
       javaCode: `
       AuthService auth = (AuthService) x.get("auth");
-      if ( ! checkOwnership(x) && ! auth.check(x, createPermission("create")) && ! getTransient() ) throw new AuthorizationException("You don't have permission to create this notification.");
+      if ( ! checkOwnership(x) && ! auth.check(x, createPermission("create")) ) throw new AuthorizationException("You don't have permission to create this notification.");
       `
     },
     {
       name: 'authorizeOnUpdate',
       javaCode: `
       AuthService auth = (AuthService) x.get("auth");
-      if ( ! checkOwnership(x) && ! auth.check(x, createPermission("update")) && ! getTransient() ) throw new AuthorizationException("You don't have permission to update notifications you do not own.");
+      if ( ! checkOwnership(x) && ! auth.check(x, createPermission("update")) ) throw new AuthorizationException("You don't have permission to update notifications you do not own.");
       `
     },
     {
