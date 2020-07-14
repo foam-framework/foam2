@@ -26,7 +26,9 @@ foam.CLASS({
     'foam.mlang.order.Desc',
     'foam.mlang.predicate.Predicate',
     'foam.mlang.sink.GroupBy',
+    'foam.nanos.auth.ServiceProviderAwareSupport',
     'foam.util.SafetyUtil',
+    'java.util.stream.Collectors',
     'java.util.List',
     'java.util.Map',
     'static foam.mlang.MLang.*'
@@ -168,11 +170,41 @@ for ( Object key : sink.getGroupKeys() ) {
     ((foam.nanos.logger.Logger) x.get("logger")).error("RuleGroup not found.", key);
   } else if ( rg.f(x, obj, oldObj) ) {
     List<Rule> group = ((ArraySink) sink.getGroups().get(key)).getArray();
-    if ( ! group.isEmpty() ) {
-      new RuleEngine(x, getX(), this).execute(group, obj, oldObj);
+    var rules = enforceSpid(x, obj, group);
+    if ( ! rules.isEmpty() ) {
+      new RuleEngine(x, getX(), this).execute(rules, obj, oldObj);
     }
   }
 }`
+    },
+    {
+      name: 'enforceSpid',
+      type: 'List<Rule>',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'obj', type: 'FObject' },
+        { name: 'rules', type: 'List<Rule>' }
+      ],
+      javaCode: `
+        return rules.stream()
+          .filter(rule -> rule.isGlobalSpid() || isSpidMatched(x, rule, obj))
+          .collect(Collectors.toList());
+      `
+    },
+    {
+      name: 'isSpidMatched',
+      type: 'boolean',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'rule', type: 'Rule' },
+        { name: 'obj', type: 'FObject' }
+      ],
+      documentation: 'Send a ServiceProviderAwareSupport action command to the DAO for spid matching test.',
+      javaCode: `
+        var result = getDelegate().cmd_(x.put("OBJ", obj),
+          new ServiceProviderAwareSupport(rule.getSpid()));
+        return result instanceof Boolean ? (boolean) result : true;
+      `
     },
     {
       name: 'updateRules',

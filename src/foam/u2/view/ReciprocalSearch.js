@@ -32,7 +32,6 @@ foam.CLASS({
       background-color: white;
       border-radius: 2px;
       min-width: 250px;
-      font-size: smaller;
     }
 
     ^ input {

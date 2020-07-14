@@ -29,8 +29,8 @@ foam.CLASS({
   ],
 
   css: `
-  ^ input {
-    width: 220px;
+  ^ input[type="search"] {
+    width: 210px;
   }
 
   ^ .side-nav-view {

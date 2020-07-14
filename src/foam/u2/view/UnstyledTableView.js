@@ -75,7 +75,7 @@ foam.CLASS({
       expression: function(columns, of, editColumnsEnabled, selectedColumnNames, allColumns) {
         if ( ! of ) return [];
         var cols;
-        if ( ! editColumnsEnabled ) cols = columns;
+        if ( ! editColumnsEnabled ) cols = of.getAxiomByName('tableColumns').columns || allColumns;
         else cols = selectedColumnNames;
         return cols.filter( c => allColumns.includes(foam.String.isInstance(c) ? ( c.indexOf('.') > -1 ? c.split('.')[0] : c ) : columns.name )).map(c => foam.Array.isInstance(c) ? c : [c, null]);
       },
@@ -213,7 +213,7 @@ foam.CLASS({
               for ( var i = 0 ; i < props.length ; i++ ) {
                 axiom = foam.String.isInstance(props[i])
                 ? cls.getAxiomByName(props[i])
-                :  foam.Array.isInstance(props[i]) ? 
+                :  foam.Array.isInstance(props[i]) ?
                 cls.getAxiomByName(props[i]) : props[i];
                 if ( ! axiom ) {
                   break;
@@ -221,16 +221,16 @@ foam.CLASS({
                 cls = axiom.of;
               }
             }
-          } else 
+          } else
             axiom = col[0];
-         
+
           return acc + (axiom.tableWidth || this.MIN_COLUMN_WIDTH_FALLBACK);
         }, this.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH) + 'px';
       }
     },
-    { 
+    {
       name: 'isColumnChanged',
-      class: 'Boolean', 
+      class: 'Boolean',
       value: false,
       documentation: 'If isColumnChanged is changed, columns_ will be updated'
     },
@@ -244,12 +244,12 @@ foam.CLASS({
       name: 'props',
       expression: function(columns_) {
         var propertyNamesToQuery = columns_.length === 0 ? columns_ : [ 'id' ].concat(columns_.map(([c, overrides]) => foam.core.Property.isInstance(c) ? c.name : c));
-        return this.returnProperties(this, propertyNamesToQuery); 
+        return this.returnProperties(this, propertyNamesToQuery);
       }
     },
-    { 
+    {
       name: 'updateValues',
-      class: 'Boolean', 
+      class: 'Boolean',
       value: false,
       documentation: 'If isColumnChanged is changed, columns_ will be updated'
     }
@@ -293,7 +293,7 @@ foam.CLASS({
             var propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => c));
             view.props = view.returnProperties(view, propertyNamesToQuery);
             view.updateValues = ! view.updateValues;
-            
+
             return this.E().
               addClass(view.myClass('tr')).
 
@@ -335,7 +335,7 @@ foam.CLASS({
               forEach(columns_, function([col, overrides]) {
                 var prop;
                 var isFirstLevelProperty = true;
-                if ( ! foam.core.Property.isInstance(col) ) {
+                if ( ! foam.core.FObject.isInstance(col) ) {
                   var propertyNames = col.split('.');
                   isFirstLevelProperty = propertyNames.length === 1;
                   prop = view.props.find(c => c.name === propertyNames[propertyNames.length - 1]);
@@ -393,7 +393,7 @@ foam.CLASS({
               });
             })).
         end().
-        callIf(view.editColumnsEnabled, function() {this.add(editColumnView);}).       
+        callIf(view.editColumnsEnabled, function() {this.add(editColumnView);}).
         add(this.rowsFrom(this.data$proxy));
     },
     {
@@ -416,14 +416,14 @@ foam.CLASS({
           var actions = Array.isArray(view.contextMenuActions)
             ? view.contextMenuActions.concat(modelActions)
             : modelActions;
-          
+
           //with this code error created  slot.get cause promise return
           //FIX ME
           return this.slot(function(order, updateValues) {
             var propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => ! foam.core.Property.isInstance(c) ? c : c.name));
             view.props = view.returnProperties(view, propertyNamesToQuery);
 
-            var unitValueProperties = view.props.filter( p => foam.core.UnitValue.isInstance(p) ); 
+            var unitValueProperties = view.props.filter( p => foam.core.UnitValue.isInstance(p) );
 
             var numberOfColumns = propertyNamesToQuery.length;
 
@@ -435,7 +435,7 @@ foam.CLASS({
             //to retrieve value of unitProp
             unitValueProperties.forEach(p => propertyNamesToQuery.push(p.unitPropName));
             var valPromises = view.returnRecords(proxy, propertyNamesToQuery);
-            
+
             var tbodyElement = this.
               E();
               tbodyElement.
@@ -475,7 +475,7 @@ foam.CLASS({
                         evt.target.nodeName === 'DROPDOWN-OVERLAY' ||
                         evt.target.classList.contains(view.myClass('vertDots'))
                       ) return;
-                      
+
                       if  ( !thisObjValue ) {
                         dao.find(val[0]).then(v => {
                           view.selection = v;
@@ -494,7 +494,7 @@ foam.CLASS({
                   })).
                   addClass(view.myClass('row')).
                   style({ 'min-width': view.tableWidth_$ }).
-  
+
                   // If the multi-select feature is enabled, then we render a
                   // Checkbox in the first cell of each row.
                   callIf(view.multiSelectEnabled, function() {
@@ -504,7 +504,7 @@ foam.CLASS({
                         .addClass(view.myClass('td'))
                         .tag(view.CheckBox, { data: view.idsOfObjectsTheUserHasInteractedWith_[val[0]] ? !!view.selectedObjects[val[0]] : view.allCheckBoxesEnabled_ }, slot)
                       .end();
-  
+
                     // Set up a listener so that when the user checks or unchecks
                     // a box, we update the `selectedObjects` property.
                     view.onDetach(slot.value$.dot('data').sub(function(_, __, ___, newValueSlot) {
@@ -514,7 +514,7 @@ foam.CLASS({
                       // of here. This way we prevent a propertyChange being fired
                       // for every single CheckBox's data changing.
                       if ( view.togglingCheckBoxes_ ) return;
-  
+
                       // Remember that the user has interacted with this checkbox
                       // directly. We need this because the ScrollTableView loads
                       // tbody's in and out while the user scrolls, so we need to
@@ -533,9 +533,9 @@ foam.CLASS({
                       // has interacted with, then we don't need to clutter up
                       // `selectedObjects`.
                       view.idsOfObjectsTheUserHasInteractedWith_[val[0]] = true;
-  
+
                       var checked = newValueSlot.get();
-  
+
                       if ( checked ) {
                         var modification = {};
                         if ( !thisObjValue ) {
@@ -554,7 +554,7 @@ foam.CLASS({
                         view.selectedObjects = temp;
                       }
                     }));
-  
+
                     // Store each CheckBox Element in a map so we have a reference
                     // to them so we can set the `data` property of them when the
                     // user checks the box to enable or disable all checkboxes.
@@ -586,7 +586,7 @@ foam.CLASS({
                     }
                     tableRowElement.start().addClass(view.myClass('td'))
                     .add(stringValue)
-                    .style({flex: column && column.tableWidth ? `0 0 ${column.tableWidth}px` : view.props[i] && view.props[i].tableWidth  ? `0 0 ${view.props[i].tableWidth}px` : '1 0 0'}).end();  
+                    .style({flex: column && column.tableWidth ? `0 0 ${column.tableWidth}px` : view.props[i] && view.props[i].tableWidth  ? `0 0 ${view.props[i].tableWidth}px` : '1 0 0'}).end();
                   }
                   tableRowElement
                     .start()
@@ -602,7 +602,7 @@ foam.CLASS({
                   tbodyElement.add(tableRowElement);
                 });
               });
-              
+
               return tbodyElement;
             });
         }
@@ -615,7 +615,7 @@ foam.CLASS({
         var columnConfig = obj.__context__.columnConfigToPropertyConverter;
         if ( ! columnConfig ) columnConfig = obj.ColumnConfigToPropertyConverter.create();
         return columnConfig.returnProperties(obj.of, propertyNamesToQuery);
-      }      
+      }
   ],
 
 });

@@ -136,12 +136,13 @@ foam.CLASS({
 
   css: `
     body {
+      background: /*%GREY5%*/ #f5f7fa;
+      color: #373a3c;
       font-family: 'Roboto', sans-serif;
       font-size: 14px;
       letter-spacing: 0.2px;
-      color: #373a3c;
-      background: /*%GREY5%*/ #f5f7fa;
       margin: 0;
+      overscroll-behavior: none;
     }
     .stack-wrapper {
       min-height: calc(80% - 60px);
