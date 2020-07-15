@@ -113,7 +113,8 @@ foam.CLASS({
   "stringArg":"my-string"
 }`,
       view: { class: 'foam.u2.tag.TextArea', rows: 16, cols: 137 },
-      visibility: 'RW'
+      visibility: 'RW',
+      section: 'details'
     },
     {
       class: 'String',
@@ -121,7 +122,8 @@ foam.CLASS({
       value: 'No Request Sent Yet.',
       view: { class: 'foam.u2.tag.TextArea', rows: 20, cols: 137 },
       createVisibility: 'RO',
-      updateVisibility: 'RO'
+      updateVisibility: 'RO',
+      section: 'details'
     }
   ],
 
