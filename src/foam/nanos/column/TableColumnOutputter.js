@@ -43,7 +43,7 @@
           if ( foam.core.Time.isInstance(prop) ) {
             return val.toString().substring(0, 8);
           }
-          return await this.unitPropValueToString(val);
+          return await val;
         }
         return ''; 
       }
