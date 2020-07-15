@@ -31,6 +31,13 @@ foam.CLASS({
     'java.util.Base64'
   ],
 
+  tableColumns: [
+      'id',
+      'filename',
+      'filesize',
+      'mimeType'
+    ],
+
   properties: [
     {
       class: 'String',
