@@ -136,6 +136,11 @@ foam.CLASS({
       javaFactory: 'return reset(getX());',
       hidden: true,
       transient: true
+    },
+    {
+      class: 'String',
+      name: 'homeDenomination',
+      visibility: 'RO'
     }
   ],
 

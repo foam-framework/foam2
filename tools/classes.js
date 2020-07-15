@@ -289,6 +289,9 @@ var classes = [
   'foam.nanos.session.Session',
   'foam.nanos.session.SessionService',
   'foam.nanos.session.SimpleSessionService',
+  'foam.nanos.session.services.ClientHomeDenominationSessionServiceImpl',
+  'foam.nanos.session.services.HomeDenominationSessionService',
+  'foam.nanos.session.services.HomeDenominationSessionServiceImpl',
   'foam.nanos.pool.AbstractFixedThreadPool',
   'foam.nanos.pool.ThreadPoolAgency',
   'foam.nanos.om.OMLogger',
@@ -679,7 +682,8 @@ var skeletons = [
   'foam.nanos.test.EchoService',
   'foam.strategy.StrategizerService',
   'foam.nanos.auth.UserQueryService',
-  'foam.nanos.export.GoogleSheetsExport'
+  'foam.nanos.export.GoogleSheetsExport',
+  'foam.nanos.session.services.HomeDenominationSessionService'
 ];
 
 var proxies = [

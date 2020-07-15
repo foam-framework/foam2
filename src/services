@@ -1103,3 +1103,23 @@ p({
     }
   """
 })
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "homeDenominationSessionService",
+  "lazy": false,
+  "serve": true,
+  "authenticate": true,
+  "boxClass": "foam.nanos.session.services.HomeDenominationSessionServiceSkeleton",
+  "serviceClass": "foam.nanos.session.services.HomeDenominationSessionServiceImpl",
+  "client":"""
+    {
+      "class": "foam.nanos.session.services.ClientHomeDenominationSessionServiceImpl",
+      "delegate":
+        {
+          "class": "foam.box.HTTPBox",
+          "url": "service/homeDenominationSessionService"
+        }
+    }
+  """
+})
