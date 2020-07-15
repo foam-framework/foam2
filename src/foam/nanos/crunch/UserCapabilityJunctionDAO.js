@@ -268,6 +268,11 @@ foam.CLASS({
           }
         }
         obj.setExpiry(junctionExpiry);
+
+        if ( capability.getGracePeriod() > 0 ) {
+          obj.setGraceDaysLeft(capability.getGracePeriod());
+        }
+
         return obj;
       `
     },
