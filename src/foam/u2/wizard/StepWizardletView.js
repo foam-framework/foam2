@@ -53,6 +53,21 @@ foam.CLASS({
       max-height: 95vh;
       height: 100%;
     }
+    ^fullscreen {
+      display: flex;
+      flex-direction: column;
+      background-color: white !important;
+      position: fixed !important;
+      top: 0;
+      left: 0;
+      height: 100vh !important;
+      width: 100vw;
+      max-height: 100vh !important;
+      z-index: 950;
+      margin: 0;
+      padding: 0;
+      overflow: scroll;
+    }
     ^status {
       background-color: %WHITE%;
       padding: 50px;
@@ -83,6 +98,9 @@ foam.CLASS({
       padding: 25px 50px;
       text-align: right;
     }
+    ^top-padding {
+      padding-top: 99px;
+    }
     ^ .foam-u2-stack-StackView {
       height: auto;
       margin-bottom: 30px;
@@ -103,6 +121,16 @@ foam.CLASS({
     {
       name: 'showDiscardOption',
       class: 'Boolean'
+    },
+    {
+      name: 'fullScreen',
+      class: 'Boolean',
+      value: false
+    },
+    {
+      name: 'hideX',
+      class: 'Boolean',
+      value: false
     }
   ],
 
@@ -113,6 +141,7 @@ foam.CLASS({
 
       this
         .addClass(this.myClass())
+        .enableClass(this.myClass('fullscreen'), this.fullScreen$)
         .start(this.Grid)
           .addClass(this.myClass('fix-grid'))
           .start(this.GUnit, { columns: 4 })
@@ -127,19 +156,23 @@ foam.CLASS({
           .end()
           .start(this.GUnit, { columns: 8 })
             .addClass(this.myClass('rightside'))
-            .start().addClass(this.myClass('top-buttons'))
-              .start(this.CircleIndicator, {
-                label: 'X',
-                borderThickness: 2,
-                borderColor: this.theme.grey2,
-                borderColorHover: this.theme.primary1,
-                clickable: true
-              })
-                .on('click', function () {
-                  self.showExitPrompt();
+            .add(this.slot(function(hideX) {
+              if ( hideX ) {
+                return this.E().addClass(this.myClass('top-padding'));
+              }
+              return this.E().addClass(this.myClass('top-buttons'))
+                .start(this.CircleIndicator, {
+                  label: 'X',
+                  borderThickness: 2,
+                  borderColor: this.theme.grey2,
+                  borderColorHover: this.theme.primary1,
+                  clickable: true
                 })
-              .end()
-            .end()
+                  .on('click', function () {
+                    self.showExitPrompt();
+                  })
+                .end();
+            }))
             .start()
               .addClass(this.myClass('entry'))
               .start()
