@@ -28,9 +28,6 @@ foam.CLASS({
       margin-left: 250px;
     }
 
-    .foam-comics-DAOControllerView {
-      margin: 96 auto;
-    }
   `,
 
   methods: [

@@ -40,7 +40,7 @@ foam.CLASS({
 
   css: `
     ^ {
-      width: 1024px;
+      width: 100%;
       margin: auto;
     }
     ^action-container {

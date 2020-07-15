@@ -37,10 +37,6 @@ foam.CLASS({
   ],
 
   css: `
-    ^ {
-      width: max-content;
-      margin: 24px auto 0 auto;
-    }
 
     ^top-row {
       align-items: center;
@@ -74,10 +70,6 @@ foam.CLASS({
     ^full-search-container {
       flex: 0 0 250px;
       padding-right: 18px;
-    }
-
-    ^ .foam-u2-view-TableView {
-      width: 1024px;
     }
   `,
 
@@ -174,7 +166,7 @@ foam.CLASS({
                 }))
               .end();
             })
-            .start()
+            .start().style({ 'width': '100%' })
               .start()
                 .addClass(this.myClass('separate'))
                 .callIf(this.data.searchMode === this.SearchMode.SIMPLE, function() {
