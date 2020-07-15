@@ -162,9 +162,9 @@ foam.CLASS({
         }
       ],
       code: function(prop, expr) {
-        if ( foam.core.Reference.isInstance(prop) ) {
+        if ( foam.core.Reference.isInstance(prop) )
           prop = foam.mlang.Expressions.create().REF(prop);
-        }
+        
       
         return ! expr ? prop :
           foam.mlang.Expressions.create().DOT(expr, prop);
