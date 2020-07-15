@@ -22,7 +22,6 @@ foam.CLASS({
     'foam.mlang.Expr',
     'foam.nanos.logger.Logger',
     'foam.util.StringUtil',
-    'java.lang.reflect.InvocationTargetException',
     'java.lang.reflect.Method',
     'static foam.mlang.MLang.*',
   ],
@@ -105,15 +104,14 @@ foam.CLASS({
 
         if ( prop == null ) return null;
 
-        Method m = getFinderMethod(prop);
-        expr = buildPropertyExpr(prop, expr);
+        Expr propExpr = buildPropertyExpr(prop, expr);
 
         if ( i == propName.length - 1 )
-          return expr;
+          return propExpr;
         
         try {
           ClassInfo ci = getPropertyClassInfo(prop);
-          return returnDotExprForNestedProperty(ci, propName, ++i, expr);
+          return returnDotExprForNestedProperty(ci, propName, ++i, propExpr);
         } catch ( Throwable t ) {
           return null;
         }
@@ -123,9 +121,7 @@ foam.CLASS({
       name: 'getPropertyClassInfo',
       javaType: 'ClassInfo',
       javaThrows: [
-        'NoSuchMethodException',
-        'IllegalAccessException',
-        'InvocationTargetException'
+        'java.lang.Exception'
       ],
       args: [
         {
@@ -159,7 +155,6 @@ foam.CLASS({
         if ( foam.core.Reference.isInstance(prop) )
           prop = foam.mlang.Expressions.create().REF(prop);
         
-      
         return ! expr ? prop :
           foam.mlang.Expressions.create().DOT(expr, prop);
       },
