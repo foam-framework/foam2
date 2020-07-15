@@ -99,7 +99,7 @@ foam.CLASS({
       // Query UCJ status
       var isAssociationCapability = this.AssociationCapability.isInstance(cap);
       var associatedEntity = isAssociationCapability ? this.subject.realUser : 
-        cap.associatedEntity === 'user' ? this.subject.user : this.subject.realUser;
+        cap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
       this.userCapabilityJunctionDAO.where(
         this.AND(
           this.OR(

@@ -111,7 +111,7 @@ foam.CLASS({
             .map(cap => {
                 var isAssociationCapability = this.AssociationCapability.isInstance(cap);
                 var associatedEntity = isAssociationCapability ? this.subject.realUser : 
-                  cap.associatedEntity === 'user' ? this.subject.user : this.subject.realUser;
+                  cap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
                 var wizardlet = this.CapabilityWizardlet.create({ capability: cap });
                 return this.updateUCJ(wizardlet, associatedEntity);
               })
@@ -180,7 +180,7 @@ foam.CLASS({
       if ( typeof capability == 'string' ) capability = await this.capabilityDAO.find(capability);
       var isAssociationCapability = this.AssociationCapability.isInstance(capability);
       var associatedEntity = isAssociationCapability ? this.subject.realUser : 
-        capability.associatedEntity === 'user' ? this.subject.user : this.subject.realUser;
+        capability.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
       var ucj = await this.userCapabilityJunctionDAO.find(
         this.AND(
           this.OR(
@@ -274,7 +274,7 @@ foam.CLASS({
     function save(wizardlet) {
       var isAssociationCapability = foam.nanos.crunch.AssociationCapability.isInstance(wizardlet.capability);
       var associatedEntity = isAssociationCapability ? this.subject.realUser : 
-      wizardlet.capability.associatedEntity === 'user' ? this.subject.user : this.subject.realUser;
+      wizardlet.capability.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
 
       return this.updateUCJ(wizardlet, associatedEntity).then(() => {
         var ucj = wizardlet.ucj;

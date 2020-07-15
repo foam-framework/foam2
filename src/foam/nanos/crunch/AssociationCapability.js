@@ -16,9 +16,9 @@ foam.CLASS({
   properties: [
     {
       name: 'associatedEntity',
-      factory: () => { return 'realUser'; },
+      factory: () => { return foam.nanos.crunch.AssociatedEntity.REAL_USER; },
       javaFactory: `
-        return "realUser";
+        return foam.nanos.crunch.AssociatedEntity.REAL_USER;
       `
     }
   ]
