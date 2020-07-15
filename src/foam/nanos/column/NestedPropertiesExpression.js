@@ -92,7 +92,7 @@ foam.CLASS({
         var prop = of.getAxiomByName(propName[i]);
         if ( ! prop ) return null;
 
-        var propExpr = this.buildPropertyExpr(prop, expr);
+        var propExpr = this.buildPropertyExpr(prop, expr, i === propName.length - 1);
 
         if ( i === propName.length - 1 )
           return propExpr;
@@ -104,7 +104,7 @@ foam.CLASS({
 
         if ( prop == null ) return null;
 
-        Expr propExpr = buildPropertyExpr(prop, expr);
+        Expr propExpr = buildPropertyExpr(prop, expr, i == propName.length - 1);
 
         if ( i == propName.length - 1 )
           return propExpr;
@@ -149,17 +149,21 @@ foam.CLASS({
         {
           name: 'expr',
           javaType: 'foam.mlang.Expr'
+        },
+        {
+          name: 'isLastPropName',
+          type: 'Boolean'
         }
       ],
-      code: function(prop, expr) {
-        if ( foam.core.Reference.isInstance(prop) )
+      code: function(prop, expr, isLastPropName) {          
+        if ( ! isLastPropName && foam.core.Reference.isInstance(prop) )
           prop = foam.mlang.Expressions.create().REF(prop);
         
         return ! expr ? prop :
           foam.mlang.Expressions.create().DOT(expr, prop);
       },
       javaCode: `
-        if ( isPropertyAReference((PropertyInfo)prop) )
+        if ( isPropertyAReference((PropertyInfo)prop, isLastPropName) )
           prop = REF(prop);
 
         return expr == null ? prop : DOT(expr, prop);
@@ -172,13 +176,17 @@ foam.CLASS({
         {
           name: 'prop',
           javaType: 'foam.core.PropertyInfo',
+        },
+        {
+          name: 'isLastPropName',
+          type: 'Boolean'
         }
       ],
       javaCode: `
         if ( prop instanceof foam.core.AbstractFObjectPropertyInfo )
           return false;
         
-        return getFinderMethod(prop) != null;
+        return ! isLastPropName && getFinderMethod(prop) != null;
       `
     },
     {
