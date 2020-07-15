@@ -61,7 +61,10 @@ foam.CLASS({
     {
       name: 'effectiveUser',
       class: 'Reference',
-      of: 'foam.nanos.auth.User'
+      of: 'foam.nanos.auth.User',
+      documentation: `
+        The entity the owner of this capability 'act as'
+      `
     }
   ]
 })
