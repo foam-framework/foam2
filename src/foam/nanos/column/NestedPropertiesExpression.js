@@ -154,7 +154,7 @@ foam.CLASS({
       args: [
         {
           name: 'prop',
-          javaType: 'foam.core.PropertyInfo',
+          javaType: 'foam.mlang.Expr',
         },
         {
           name: 'expr',
@@ -170,17 +170,10 @@ foam.CLASS({
           foam.mlang.Expressions.create().DOT(expr, prop);
       },
       javaCode: `
-        Expr thisPropExpr = null;
-        if ( isPropertyAReference(prop) )
-          thisPropExpr = REF(prop);
-        else
-          thisPropExpr = prop;
-        if ( expr == null )
-          expr = thisPropExpr;
-        else
-          expr = DOT(expr, thisPropExpr);
+        if ( isPropertyAReference((PropertyInfo)prop) )
+          prop = REF(prop);
 
-        return expr;
+        return expr == null ? prop : DOT(expr, prop);
       `
     },
     {
