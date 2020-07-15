@@ -8,11 +8,28 @@ foam.INTERFACE({
   package: 'foam.nanos.auth',
   name: 'ServiceProviderAware',
 
+  constants: {
+    GLOBAL_SPID: '*'
+  },
+
   properties: [
     {
       class: 'Reference',
       of: 'foam.nanos.auth.ServiceProvider',
       name: 'spid'
+    }
+  ],
+
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.methods.push(`
+          default boolean isGlobalSpid() {
+            return GLOBAL_SPID.equals(getSpid());
+          }
+        `);
+      }
     }
   ]
 });

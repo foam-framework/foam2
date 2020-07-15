@@ -135,6 +135,17 @@ ServiceProviderAware`,
       spidPredicate
     );
      `
+    },
+    {
+      name: 'cmd_',
+      documentation: 'Process ServiceProviderAwareSupport action which performs spid matching on "OBJ" in the context.',
+      javaCode: `
+        if ( obj instanceof ServiceProviderAwareSupport ) {
+          return ((ServiceProviderAwareSupport) obj).match(x, getPropertyInfos(), x.get("OBJ"));
+        }
+
+        return getDelegate().cmd_(x, obj);
+      `
     }
   ]
 });

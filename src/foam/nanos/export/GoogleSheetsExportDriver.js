@@ -63,7 +63,7 @@ foam.CLASS({
       var props = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(dao.of);
       props = columnConfig.filterExportedProps(dao.of, props);
 
-      var metadata = await self.outputter.getColumnMethadata(X, dao.of);
+      var metadata = await self.outputter.getColumnMethadata(X, dao.of, props);
 
       var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(dao.of, props);
       var sink = await dao.select(expr);

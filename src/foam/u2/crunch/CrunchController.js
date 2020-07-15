@@ -25,11 +25,12 @@ foam.CLASS({
 
   requires: [
     'foam.log.LogLevel',
+    'foam.nanos.crunch.AgentCapabilityJunction',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityCapabilityJunction',
     'foam.nanos.crunch.CapabilityJunctionStatus',
-    'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.crunch.ui.CapabilityWizardlet',
+    'foam.nanos.crunch.UserCapabilityJunction',
     'foam.u2.borders.MarginBorder',
     'foam.u2.crunch.CapabilityInterceptView',
     'foam.u2.detail.AbstractSectionedDetailView',
@@ -106,8 +107,11 @@ foam.CLASS({
           Promise.resolve(capabilities),
           Promise.all(capabilities
             .filter(cap => !! cap.of )
-            .map(cap =>
-              this.CapabilityWizardlet.create({ capability: cap }).updateUCJ())
+            .map(cap => {
+                var associatedEntity = cap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
+                var wizardlet = this.CapabilityWizardlet.create({ capability: cap });
+                return this.updateUCJ(wizardlet, associatedEntity);
+              })
             )
           ]).then((capAndSections) => {
             return {
@@ -169,12 +173,25 @@ foam.CLASS({
       });
     },
 
-    async function launchWizard(capabilityId) {
+    async function launchWizard(capability) {
+      if ( typeof capability == 'string' ) capability = await this.capabilityDAO.find(capability);
+      var associatedEntity = capability.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
       var ucj = await this.userCapabilityJunctionDAO.find(
         this.AND(
-          this.EQ(this.UserCapabilityJunction.SOURCE_ID, this.subject.user.id),
-          this.EQ(this.UserCapabilityJunction.TARGET_ID, capabilityId)
-        ));
+          this.OR(
+            this.AND(
+              this.NOT(this.INSTANCE_OF(this.AgentCapabilityJunction)),
+              this.EQ(this.UserCapabilityJunction.SOURCE_ID, associatedEntity.id)
+            ),
+            this.AND(
+              this.INSTANCE_OF(this.AgentCapabilityJunction),
+              this.EQ(this.UserCapabilityJunction.SOURCE_ID, associatedEntity.id),
+              this.EQ(this.AgentCapabilityJunction.EFFECTIVE_USER, this.subject.user.id)
+            )
+          ),
+          this.EQ(this.UserCapabilityJunction.TARGET_ID, capability.id)
+        )
+      );
       if ( ucj ) {
         var statusGranted = ucj.status === this.CapabilityJunctionStatus.GRANTED;
         var statusPending = ucj.status === this.CapabilityJunctionStatus.PENDING;
@@ -184,9 +201,9 @@ foam.CLASS({
           return;
         }
         var nothingTodo = ucj.status === this.CapabilityJunctionStatus.ACTION_REQUIRED;
-        return this.startWizardFlow(capabilityId, nothingTodo);
+        return this.startWizardFlow(capability.id, nothingTodo);
       }
-      return this.startWizardFlow(capabilityId, false);
+      return this.startWizardFlow(capability.id, false);
     },
 
     function maybeLaunchInterceptView(intercept) {
@@ -248,6 +265,50 @@ foam.CLASS({
             capabilityId: capabilityId
           })).end();
       }
+    },
+    function save(wizardlet) {
+      var isAssociation = wizardlet.capability.associatedEntity === foam.nanos.crunch.AssociatedEntity.ACTING_USER;
+      var associatedEntity = isAssociation ? this.subject.realUser : 
+      wizardlet.capability.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
+
+      return this.updateUCJ(wizardlet, associatedEntity).then(() => {
+        var ucj = wizardlet.ucj;
+        if ( ucj === null ) {
+          ucj = isAssociation ? 
+          this.AgentCapabilityJunction.create({
+              sourceId: associatedEntity.id,
+              targetId: wizardlet.capability.id,
+              effectiveUser: this.subject.user.id
+            })
+            : this.UserCapabilityJunction.create({
+              sourceId: associatedEntity.id,
+              targetId: wizardlet.capability.id
+            })
+        }
+        if ( wizardlet.of ) ucj.data = wizardlet.data;
+        return this.userCapabilityJunctionDAO.put(ucj);
+      });
+    }, 
+    async function updateUCJ(wizardlet, associatedEntity) {
+      return this.userCapabilityJunctionDAO.find(
+        this.AND(
+          this.OR(
+            this.AND(
+              this.NOT(this.INSTANCE_OF(this.AgentCapabilityJunction)),
+              this.EQ(this.UserCapabilityJunction.SOURCE_ID, associatedEntity.id)
+            ),
+            this.AND(
+              this.INSTANCE_OF(this.AgentCapabilityJunction),
+              this.EQ(this.UserCapabilityJunction.SOURCE_ID, associatedEntity.id),
+              this.EQ(this.AgentCapabilityJunction.EFFECTIVE_USER, this.subject.user.id)
+            )
+          ),
+          this.EQ(this.UserCapabilityJunction.TARGET_ID, wizardlet.capability.id)
+        )
+      ).then(ucj => {
+        wizardlet.ucj = ucj;
+        return wizardlet;
+      });
     }
   ]
 });

@@ -76,7 +76,7 @@ foam.CLASS({
         if ( ! of ) return [];
         var cols;
         if ( ! editColumnsEnabled )
-          cols = columns;
+          cols = of.getAxiomByName('tableColumns').columns || allColumns;
         else
           cols = selectedColumnNames;
         return cols.filter( c => allColumns.includes(foam.String.isInstance(c) ? ( c.indexOf('.') > -1 ? c.split('.')[0] : c ) : columns.name )).map(c => foam.Array.isInstance(c) ? c : [c, null]);
@@ -568,7 +568,7 @@ foam.CLASS({
                   });
                   for ( var  i = 1 ; i < numberOfColumns ; i++  ) {
                     var column = view.columns.find( c => !foam.String.isInstance(c) && c.name === view.props[i].name );
-                    if ( ( view.props[i].tableCellFormatter || ( column && column.tableCellFormatter ) ) && val[i] ) {
+                    if ( view.props[i].tableCellFormatter || ( column && column.tableCellFormatter ) ) {
                       var elmt = this.E().addClass(view.myClass('td')).style({flex: column && column.tableWidth ? `0 0 ${column.tableWidth}px` : view.props[i] && view.props[i].tableWidth  ? `0 0 ${view.props[i].tableWidth}px` : '1 0 0'});//, 'justify-content': 'center'
                       try {
                         if ( column && column.tableCellFormatter )
@@ -618,6 +618,5 @@ foam.CLASS({
         if ( ! columnConfig ) columnConfig = obj.ColumnConfigToPropertyConverter.create();
         return columnConfig.returnProperties(obj.of, propertyNamesToQuery);
       }
-  ],
-
+  ]
 });

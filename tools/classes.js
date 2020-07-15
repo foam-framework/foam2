@@ -613,6 +613,7 @@ var classes = [
   'foam.nanos.crunch.UserCapabilityJunction',
   'foam.nanos.crunch.AgentCapabilityJunction',
   'foam.nanos.crunch.CapabilityCapabilityJunction',
+  'foam.nanos.crunch.AssociatedEntity',
   //daos
   'foam.nanos.crunch.UserCapabilityJunctionDAO',
   //rules
@@ -674,6 +675,7 @@ var skeletons = [
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.email.POP3Email',
   'foam.nanos.notification.push.PushService',
+  'foam.nanos.notification.ResendNotificationServiceInterface',
   'foam.nanos.session.SessionService',
   'foam.nanos.test.EchoService',
   'foam.strategy.StrategizerService',
