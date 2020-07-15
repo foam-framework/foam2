@@ -48,6 +48,7 @@ foam.CLASS({
     {
       name: 'defaultAuthorizer',
       class: 'Object',
+      flags: ['java'],
       javaType: 'foam.nanos.auth.Authorizer',
       javaFactory: `
         return new foam.nanos.auth.StandardAuthorizer(getClass().getSimpleName().toLowerCase());

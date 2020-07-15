@@ -44,9 +44,7 @@ foam.CLASS({
       class: 'Int',
       documentation: `
       Number of days left that a user can use the Capability in this ucj after it goes into GRACE_PERIOD status.
-      `,
-      javaFactory: `
-        return ((Capability) findTargetId(getX())).getGracePeriod();
+      Set when the ucj is first granted.
       `
     }
   ]
@@ -61,7 +59,10 @@ foam.CLASS({
     {
       name: 'effectiveUser',
       class: 'Reference',
-      of: 'foam.nanos.auth.User'
+      of: 'foam.nanos.auth.User',
+      documentation: `
+        The entity the owner of this capability 'act as'
+      `
     }
   ]
 })

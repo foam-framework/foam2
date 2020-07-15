@@ -321,6 +321,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/CapabilityCategory" },
   { name: "foam/nanos/crunch/CapabilityJunctionStatus" },
   { name: "foam/nanos/crunch/UserCapabilityJunctionRefine" },
+  { name: "foam/nanos/crunch/AssociatedEntity" },
   //daos
   { name: "foam/nanos/crunch/UserCapabilityJunctionDAO" },
   //rules

@@ -12,15 +12,17 @@ foam.CLASS({
   implements: [ 'foam.mlang.Expressions' ],
 
   requires: [
-    'foam.u2.Element',
-    'foam.u2.crunch.Style',
-    'foam.nanos.crunch.UserCapabilityJunction',
+    'foam.nanos.crunch.AgentCapabilityJunction',
+    'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityJunctionStatus',
+    'foam.nanos.crunch.UserCapabilityJunction',
+    'foam.u2.crunch.Style',
+    'foam.u2.Element',
     'foam.u2.view.ReadOnlyEnumView'
   ],
 
   imports: [
-    'user',
+    'subject',
     'userCapabilityJunctionDAO'
   ],
 
@@ -52,10 +54,23 @@ foam.CLASS({
         .call(function () {
           var badgeWrapper = self.Element.create({ nodeName: 'SPAN' });
           this.add(badgeWrapper);
-          self.userCapabilityJunctionDAO.find(self.AND(
-            self.EQ(self.UserCapabilityJunction.SOURCE_ID, self.user.id),
-            self.EQ(self.UserCapabilityJunction.TARGET_ID, self.data.id),
-          )).then(ucj => {
+          var associatedEntity = self.data.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? self.subject.user : self.subject.realUser;
+          self.userCapabilityJunctionDAO.find(
+            self.AND(
+              self.OR(
+                self.AND(
+                  self.NOT(self.INSTANCE_OF(self.AgentCapabilityJunction)),
+                  self.EQ(self.UserCapabilityJunction.SOURCE_ID, associatedEntity.id)
+                ),
+                self.AND(
+                  self.INSTANCE_OF(self.AgentCapabilityJunction),
+                  self.EQ(self.UserCapabilityJunction.SOURCE_ID, associatedEntity.id),
+                  self.EQ(self.AgentCapabilityJunction.EFFECTIVE_USER, self.subject.user.id)
+                )
+              ),
+              self.EQ(self.UserCapabilityJunction.TARGET_ID, self.data.id)
+            )
+          ).then(ucj => {
             var statusEnum =  foam.nanos.crunch.CapabilityJunctionStatus.AVAILABLE;
             if ( ucj ) {
               statusEnum = ucj.status;

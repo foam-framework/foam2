@@ -207,6 +207,22 @@ foam.CLASS({
       name: 'reviewRequired',
       class: 'Boolean',
       permissionRequired: true
+    },
+    {
+      name: 'associatedEntity',
+      class: 'Enum',
+      of: 'foam.nanos.crunch.AssociatedEntity',
+      hidden: true,
+      permissionRequired: true,
+      documentation: `
+        Denotes which entity in the context subject the capability should be saved to when there are mutiple.
+      `,
+      factory: () => {
+        return foam.nanos.crunch.AssociatedEntity.USER;
+      },
+      javaFactory: `
+        return foam.nanos.crunch.AssociatedEntity.USER;
+      `
     }
   ],
 
