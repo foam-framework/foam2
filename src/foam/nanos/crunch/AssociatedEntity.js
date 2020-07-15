@@ -14,6 +14,12 @@ foam.ENUM({
       {
         name: 'REAL_USER',
         label: 'realUser'
+      },
+      {
+        name: 'ACTING_USER',
+        label: 'acting_user',
+        documentation: `Denotes the special case where the associatedEntity of a capability should be
+        some user acting as another user.`
       }
     ]
   });

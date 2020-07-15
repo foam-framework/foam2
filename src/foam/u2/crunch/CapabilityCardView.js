@@ -13,7 +13,6 @@ foam.CLASS({
 
   requires: [
     'foam.nanos.crunch.AgentCapabilityJunction',
-    'foam.nanos.crunch.AssociationCapability',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction',
@@ -55,9 +54,7 @@ foam.CLASS({
         .call(function () {
           var badgeWrapper = self.Element.create({ nodeName: 'SPAN' });
           this.add(badgeWrapper);
-          var isAssociationCapability = self.AssociationCapability.isInstance(self.data);
-          var associatedEntity = isAssociationCapability ? self.subject.realUser : 
-            self.data.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? self.subject.user : self.subject.realUser;
+          var associatedEntity = self.data.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? self.subject.user : self.subject.realUser;
           self.userCapabilityJunctionDAO.find(
             self.AND(
               self.OR(

@@ -26,7 +26,6 @@ foam.CLASS({
   requires: [
     'foam.log.LogLevel',
     'foam.nanos.crunch.AgentCapabilityJunction',
-    'foam.nanos.crunch.AssociationCapability',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityCapabilityJunction',
     'foam.nanos.crunch.CapabilityJunctionStatus',
@@ -109,9 +108,7 @@ foam.CLASS({
           Promise.all(capabilities
             .filter(cap => !! cap.of )
             .map(cap => {
-                var isAssociationCapability = this.AssociationCapability.isInstance(cap);
-                var associatedEntity = isAssociationCapability ? this.subject.realUser : 
-                  cap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
+                var associatedEntity = cap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
                 var wizardlet = this.CapabilityWizardlet.create({ capability: cap });
                 return this.updateUCJ(wizardlet, associatedEntity);
               })
@@ -178,9 +175,7 @@ foam.CLASS({
 
     async function launchWizard(capability) {
       if ( typeof capability == 'string' ) capability = await this.capabilityDAO.find(capability);
-      var isAssociationCapability = this.AssociationCapability.isInstance(capability);
-      var associatedEntity = isAssociationCapability ? this.subject.realUser : 
-        capability.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
+      var associatedEntity = capability.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
       var ucj = await this.userCapabilityJunctionDAO.find(
         this.AND(
           this.OR(
@@ -272,14 +267,14 @@ foam.CLASS({
       }
     },
     function save(wizardlet) {
-      var isAssociationCapability = foam.nanos.crunch.AssociationCapability.isInstance(wizardlet.capability);
-      var associatedEntity = isAssociationCapability ? this.subject.realUser : 
+      var isAssociation = wizardlet.capability.associatedEntity === foam.nanos.crunch.AssociatedEntity.ACTING_USER;
+      var associatedEntity = isAssociation ? this.subject.realUser : 
       wizardlet.capability.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
 
       return this.updateUCJ(wizardlet, associatedEntity).then(() => {
         var ucj = wizardlet.ucj;
         if ( ucj === null ) {
-          ucj = isAssociationCapability ? 
+          ucj = isAssociation ? 
           this.AgentCapabilityJunction.create({
               sourceId: associatedEntity.id,
               targetId: wizardlet.capability.id,

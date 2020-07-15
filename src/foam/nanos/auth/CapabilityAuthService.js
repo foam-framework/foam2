@@ -28,7 +28,6 @@ foam.CLASS({
     'foam.mlang.predicate.Predicate',
     'foam.nanos.auth.Subject',
     'foam.nanos.crunch.AgentCapabilityJunction',
-    'foam.nanos.crunch.AssociationCapability',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityRuntimeException',
     'foam.nanos.crunch.CapabilityJunctionStatus',

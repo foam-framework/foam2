@@ -316,7 +316,6 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/crunchtest/FakeTestObject" },
   // models
   { name: "foam/nanos/crunch/Capability" },
-  { name: "foam/nanos/crunch/AssociationCapability" },
   { name: "foam/nanos/crunch/CapabilityCategory" },
   { name: "foam/nanos/crunch/CapabilityJunctionStatus" },
   { name: "foam/nanos/crunch/UserCapabilityJunctionRefine" },

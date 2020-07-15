@@ -14,7 +14,6 @@ foam.CLASS({
   requires: [
     'foam.log.LogLevel',
     'foam.nanos.crunch.AgentCapabilityJunction',
-    'foam.nanos.crunch.AssociationCapability',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction',
@@ -97,9 +96,7 @@ foam.CLASS({
     },
     function checkStatus(cap) {
       // Query UCJ status
-      var isAssociationCapability = this.AssociationCapability.isInstance(cap);
-      var associatedEntity = isAssociationCapability ? this.subject.realUser : 
-        cap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
+      var associatedEntity = cap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
       this.userCapabilityJunctionDAO.where(
         this.AND(
           this.OR(
