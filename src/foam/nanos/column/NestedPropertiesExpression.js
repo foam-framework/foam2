@@ -14,6 +14,7 @@ foam.CLASS({
   documentation: 'Class for creating expression for a given nestedProperty ( e.g. address.countryId.name )',
 
   javaImports: [
+    'foam.core.AbstractFObjectPropertyInfo',
     'foam.core.ClassInfo',
     'foam.core.FObject',
     'foam.core.PropertyInfo',
@@ -21,6 +22,7 @@ foam.CLASS({
     'foam.mlang.Expr',
     'foam.nanos.logger.Logger',
     'foam.util.StringUtil',
+    'java.lang.reflect.InvocationTargetException',
     'java.lang.reflect.Method',
     'static foam.mlang.MLang.*',
   ],
@@ -99,57 +101,45 @@ foam.CLASS({
         return this.returnDotExprForNestedProperty(prop.of, propName, ++i, propExpr);
       },
       javaCode: `
-        ClassInfo ci = of;
-        PropertyInfo prop = (PropertyInfo) ci.getAxiomByName(propName[i]);
+        PropertyInfo prop = (PropertyInfo) of.getAxiomByName(propName[i]);
 
         if ( prop == null ) return null;
 
         Method m = getFinderMethod(prop);
-        expr = buildPropertyExpr(prop, expr, m);
+        expr = buildPropertyExpr(prop, expr);
 
         if ( i == propName.length - 1 )
           return expr;
         
-        ci = getPropertyClassInfo(ci, prop, m);
-        if ( ci == null )
-          return null; 
-        
-        return returnDotExprForNestedProperty(ci, propName, ++i, expr);
+        try {
+          ClassInfo ci = getPropertyClassInfo(prop);
+          return returnDotExprForNestedProperty(ci, propName, ++i, expr);
+        } catch ( Throwable t ) {
+          return null;
+        }
       `
     },
     {
       name: 'getPropertyClassInfo',
       javaType: 'ClassInfo',
+      javaThrows: [
+        'NoSuchMethodException',
+        'IllegalAccessException',
+        'InvocationTargetException'
+      ],
       args: [
-        {
-          name: 'ci',
-          type: 'Object',
-          javaType: 'foam.core.ClassInfo'
-        },
         {
           name: 'prop',
           javaType: 'foam.core.PropertyInfo',
-        },
-        {
-          name: 'findMethod',
-          javaType: 'Method'
         }
       ],
       javaCode: `
-        try {
-          Boolean isPropAReference = isPropertyAReference(prop, findMethod);
-          Class cls;
-          if ( ! isPropAReference )
-            cls = prop.getValueClass();
-          else {
-            Method m = findMethod;
-            cls = m.getReturnType();
-          }
-          ci = (ClassInfo) cls.getMethod("getOwnClassInfo").invoke(null);
-        } catch( Throwable t ) {
-          return null;
+        if ( prop instanceof AbstractFObjectPropertyInfo ) {
+          return ((AbstractFObjectPropertyInfo) prop).of();
         }
-        return ci;
+
+        var cls = getFinderMethod(prop).getReturnType();
+        return (ClassInfo) cls.getMethod("getOwnClassInfo").invoke(null);
       `
     },
     {
@@ -163,10 +153,6 @@ foam.CLASS({
         {
           name: 'expr',
           javaType: 'foam.mlang.Expr'
-        },
-        {
-          name: 'findMethod',
-          javaType: 'Method'
         }
       ],
       code: function(prop, expr) {
@@ -178,7 +164,7 @@ foam.CLASS({
           foam.mlang.Expressions.create().DOT(expr, prop);
       },
       javaCode: `
-        if ( isPropertyAReference((PropertyInfo)prop, findMethod) )
+        if ( isPropertyAReference((PropertyInfo)prop) )
           prop = REF(prop);
 
         return expr == null ? prop : DOT(expr, prop);
@@ -191,14 +177,13 @@ foam.CLASS({
         {
           name: 'prop',
           javaType: 'foam.core.PropertyInfo',
-        },
-        {
-          name: 'findMethod',
-          javaType: 'Method'
         }
       ],
       javaCode: `
-        return findMethod != null;
+        if ( prop instanceof foam.core.AbstractFObjectPropertyInfo )
+          return false;
+        
+        return getFinderMethod(prop) != null;
       `
     },
     {
@@ -211,13 +196,11 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        if ( prop instanceof foam.core.AbstractFObjectPropertyInfo )
-          return null;
         try {
-          Method m = prop.getClassInfo().getObjClass().getMethod("find" + StringUtil.capitalize(prop.getName()), foam.core.X.class);
-          return m;
-        } catch( Throwable t ) {}
-        return null; 
+          return prop.getClassInfo().getObjClass().getMethod("find" + StringUtil.capitalize(prop.getName()), foam.core.X.class);
+        } catch( Throwable t ) {
+          return null;
+        }
       `
     }
   ]
