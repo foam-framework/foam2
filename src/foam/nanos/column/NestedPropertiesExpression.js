@@ -104,13 +104,13 @@ foam.CLASS({
 
         if ( prop == null ) return null;
 
-        Boolean isPropAReference = isPropertyAReference(prop);
-        expr = buildPropertyExpr(prop, expr);
+        Method m = getFinderMethod(prop);
+        expr = buildPropertyExpr(prop, expr, m);
 
         if ( i == propName.length - 1 )
           return expr;
         
-        ci = getPropertyValueClass(ci, prop);
+        ci = getPropertyClassInfo(ci, prop, m);
         if ( ci == null )
           return null; 
         
@@ -118,7 +118,7 @@ foam.CLASS({
       `
     },
     {
-      name: 'getPropertyValueClass',
+      name: 'getPropertyClassInfo',
       javaType: 'ClassInfo',
       args: [
         {
@@ -129,16 +129,20 @@ foam.CLASS({
         {
           name: 'prop',
           javaType: 'foam.core.PropertyInfo',
+        },
+        {
+          name: 'findMethod',
+          javaType: 'Method'
         }
       ],
       javaCode: `
         try {
-          Boolean isPropAReference = isPropertyAReference(prop);
+          Boolean isPropAReference = isPropertyAReference(prop, findMethod);
           Class cls;
           if ( ! isPropAReference )
             cls = prop.getValueClass();
           else {
-            Method m = ci.getObjClass().getMethod("find" + StringUtil.capitalize(prop.getName()), foam.core.X.class);
+            Method m = findMethod;
             cls = m.getReturnType();
           }
           ci = (ClassInfo) cls.getMethod("getOwnClassInfo").invoke(null);
@@ -159,6 +163,10 @@ foam.CLASS({
         {
           name: 'expr',
           javaType: 'foam.mlang.Expr'
+        },
+        {
+          name: 'findMethod',
+          javaType: 'Method'
         }
       ],
       code: function(prop, expr) {
@@ -170,7 +178,7 @@ foam.CLASS({
           foam.mlang.Expressions.create().DOT(expr, prop);
       },
       javaCode: `
-        if ( isPropertyAReference((PropertyInfo)prop) )
+        if ( isPropertyAReference((PropertyInfo)prop, findMethod) )
           prop = REF(prop);
 
         return expr == null ? prop : DOT(expr, prop);
@@ -183,18 +191,33 @@ foam.CLASS({
         {
           name: 'prop',
           javaType: 'foam.core.PropertyInfo',
-          javaInfoType: 'foam.core.AbstractObjectPropertyInfo'
         },
+        {
+          name: 'findMethod',
+          javaType: 'Method'
+        }
+      ],
+      javaCode: `
+        return findMethod != null;
+      `
+    },
+    {
+      name: 'getFinderMethod',
+      javaType: 'Method',
+      args: [
+        {
+          name: 'prop',
+          javaType: 'foam.core.PropertyInfo',
+        }
       ],
       javaCode: `
         if ( prop instanceof foam.core.AbstractFObjectPropertyInfo )
-          return false;
-
+          return null;
         try {
           Method m = prop.getClassInfo().getObjClass().getMethod("find" + StringUtil.capitalize(prop.getName()), foam.core.X.class);
-          return true;
+          return m;
         } catch( Throwable t ) {}
-        return false;
+        return null; 
       `
     }
   ]

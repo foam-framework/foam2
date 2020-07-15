@@ -3223,7 +3223,14 @@ foam.CLASS({
   extends: 'foam.mlang.AbstractExpr',
   implements: [ 'foam.core.Serializable' ],
 
-  documentation: 'A Binary Expression which applies arg2.f() to arg1.f().',
+  documentation: `
+    A Binary Expression which evaluates arg1 and passes the result to arg2.
+    In other word, the output of arg1 is the receiver of arg2.
+    
+    For example, to get city from user address:
+    
+    DOT(User.ADDRESS, Address.CITY).f(user); // return user.address.city
+  `,
 
   properties: [
     {
