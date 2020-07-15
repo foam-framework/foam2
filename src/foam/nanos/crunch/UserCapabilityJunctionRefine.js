@@ -38,6 +38,16 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.nanos.crunch.CapabilityJunctionStatus',
       value: foam.nanos.crunch.CapabilityJunctionStatus.ACTION_REQUIRED
+    },
+    {
+      name: 'graceDaysLeft',
+      class: 'Int',
+      documentation: `
+      Number of days left that a user can use the Capability in this ucj after it goes into GRACE_PERIOD status.
+      `,
+      javaFactory: `
+        return ((Capability) findTargetId(getX())).getGracePeriod();
+      `
     }
   ]
 });

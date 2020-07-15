@@ -10,6 +10,13 @@ foam.CLASS({
 
   documentation: 'SUGAR : Service Unified GAteway Relay - Perform non-DAO operations against a web service',
 
+  implements: [
+    'foam.nanos.auth.CreatedAware',
+    'foam.nanos.auth.CreatedByAware',
+    'foam.nanos.auth.LastModifiedAware',
+    'foam.nanos.auth.LastModifiedByAware'
+  ],
+
   tableColumns: [
     'id'
   ],
@@ -33,11 +40,67 @@ foam.CLASS({
     }
   ],
 
+  sections: [
+    {
+      name: 'details'
+    },
+    {
+      name: 'supportDetails'
+    },
+    {
+      name: '_defaultSection',
+      permissionRequired: true
+    }
+  ],
+
   properties: [
     {
       class: 'String',
       name: 'id',
-      displayWidth: 40
+      displayWidth: 40,
+      section: 'details'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdBy',
+      section: 'supportDetails'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdByAgent',
+      section: 'supportDetails'
+    },
+    {
+      class: 'DateTime',
+      name: 'created',
+      documentation: 'The date and time of when the User was created in the system.',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      section: 'administrative',
+      includeInDigest: true,
+      section: 'supportDetails'
+    },
+    {
+      class: 'DateTime',
+      name: 'lastModified',
+      documentation: 'The date and time the User was last modified.',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      section: 'administrative',
+      storageOptional: true,
+      section: 'supportDetails'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'lastModifiedBy',
+      section: 'supportDetails',
+      readPermissionRequired: true,
+      writePermissionRequired: true,
+      storageOptional: true,
+      section: 'supportDetails'
     },
     {
       class: 'String',
