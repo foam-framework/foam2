@@ -134,7 +134,7 @@ foam.CLASS({
           return ((AbstractFObjectPropertyInfo) prop).of();
         }
 
-        var cls = getFinderMethod(prop).getReturnType();
+        Class cls = getFinderMethod(prop).getReturnType();
         return (ClassInfo) cls.getMethod("getOwnClassInfo").invoke(null);
       `
     },
