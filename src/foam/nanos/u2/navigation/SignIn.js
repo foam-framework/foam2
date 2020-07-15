@@ -125,7 +125,9 @@ foam.CLASS({
             (logedInUser) => {
               if ( ! logedInUser ) return;
 
-              X.homeDenominationSessionService.addHomeDenomination(X, localStorage.getItem('homeDenomination'));
+              try {
+                X.homeDenominationSessionService.addHomeDenomination(X, localStorage.getItem('homeDenomination'));
+              } catch(e) {}
 
               if ( this.token_ ) {
                 logedInUser.signUpToken = this.token_;
