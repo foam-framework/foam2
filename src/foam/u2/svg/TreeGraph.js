@@ -30,28 +30,19 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'graph',
+      class: 'FObjectProperty',
+      of: 'foam.graph.Graph'
+    },
+    {
       name: 'nodePlacementPlan',
       class: 'FObjectProperty',
       of: 'FObject',
       // of: 'foam.u2.svg.graph.GridPlacementPlan',
     },
-    // {
-    //   name: 'data',
-    //   // can't be FObjectArray because 'of' can't be specified
-    //   class: 'Array'
-    // },
-    {
-      name: 'rootObject',
-      class: 'FObjectProperty',
-      of: 'FObject',
-    },
     {
       name: 'nodeView',
       class: 'foam.u2.ViewSpec'
-    },
-    {
-      name: 'relationshipPropertyName',
-      class: 'String'
     },
 
     {
@@ -63,6 +54,11 @@ foam.CLASS({
       name: 'gap',
       class: 'Int',
       value: 20
+    },
+
+    {
+      name: 'alreadyRendered_',
+      class: 'Map'
     }
   ],
 
@@ -71,7 +67,10 @@ foam.CLASS({
       var size = this.size; var gap = this.gap;
       var self = this;
       var g = this.start('svg');
-      this.renderBoxes(g, this.rootObject);
+      this.graph.roots.forEach(node => {
+        console.log('rendering root', node);
+        this.renderBoxes(g, node);
+      })
       var shape = this.nodePlacementPlan.shape;
       g
         .attrs({
@@ -82,10 +81,13 @@ foam.CLASS({
         })
         .end()
     },
-    function renderBoxes(g, obj, parent) {
+    function renderBoxes(g, node, parent) {
+      if ( this.alreadyRendered_[node.id] ) return;
+      this.alreadyRendered_[node.id] = true;
+
       var self = this;
       var size = this.size; var gap = this.gap;
-      var coords = this.nodePlacementPlan.getPlacement(obj);
+      var coords = this.nodePlacementPlan.getPlacement(node);
       if ( coords == null ) return;
       if ( ! Array.isArray(coords) ) {
         console.warn('unexpected return time from placement',
@@ -94,7 +96,7 @@ foam.CLASS({
 
       g
         .tag(this.nodeView, {
-          data: obj,
+          data: node.data,
           position: coords.map(v => gap + v*(size + gap)),
           size: Array(coords.length).fill(this.size)
         })
@@ -122,10 +124,9 @@ foam.CLASS({
             })
         })
       
-      obj[this.relationshipPropertyName].dao
-        .select().then(r => r.array.forEach(o => {
-          this.renderBoxes(g, o, obj);
-        }));
+      this.graph.getDirectChildren(node.id).forEach(childNode => {
+        this.renderBoxes(g, childNode, node);
+      })
     }
   ]
 });
