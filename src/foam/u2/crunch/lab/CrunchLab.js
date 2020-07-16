@@ -111,7 +111,10 @@ foam.CLASS({
               )).select().then(r => {
                 r.array.forEach(ucj => {
                   console.log('replacing', ucj.targetId, ucj);
-                  graph.data[ucj.targetId].data = ucj;
+                  let capability = graph.data[ucj.targetId].data;
+                  graph.data[ucj.targetId].data = [
+                    capability, ucj
+                  ];
                 })
               })
             }
@@ -126,8 +129,8 @@ foam.CLASS({
                 nodePlacementPlan: placementPlan,
                 graph: graph,
                 size: 200,
-                // nodeView: 'foam.u2.crunch.lab.CapabilityGraphNodeView'
-                nodeView: 'foam.u2.svg.graph.ZoomedOutFObjectGraphNodeView'
+                nodeView: 'foam.u2.crunch.lab.CapabilityGraphNodeView'
+                // nodeView: 'foam.u2.svg.graph.ZoomedOutFObjectGraphNodeView'
               })
               ;
           })

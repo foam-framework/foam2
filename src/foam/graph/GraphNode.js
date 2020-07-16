@@ -30,8 +30,7 @@ foam.CLASS({
       class: 'StringArray'
     },
     {
-      name: 'data',
-      of: 'foam.core.FObject',
+      name: 'data'
     }
   ]
 });
