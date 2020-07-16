@@ -219,3 +219,88 @@ p({
   })
   """
 })
+
+p({
+  "class": "foam.nanos.script.Script",
+  "id": "extractMenuFromJournal",
+  "lastRun": 1593184732391,
+  "lastDuration": 18,
+  "server": false,
+  "code": """
+  x.menuDAO.select(function(m) {
+
+    let l = foam.i18n.Locale.create({
+      "id": m.id+'.label',
+      "locale": "fr",
+      "variant": "CA",
+      "locale_variant": "fr-CA",
+      "source": m.id+'.label',
+      "target": m.label +' fr'
+    });
+    x.LocaleDAO.put(l);
+
+    if ( m.handler && m.handler.title ){
+      let l2 = foam.i18n.Locale.create({
+        "id": m.id+'.handler.title',
+        "locale": "fr",
+        "variant": "CA",
+        "locale_variant": "fr-CA",
+        "source": m.id+'.handler.title',
+        "target": m.handler.title +' fr'
+      });
+      x.LocaleDAO.put(l2);
+    }
+
+    if ( m.handler && m.handler.subtitle ){
+      let l2 = foam.i18n.Locale.create({
+        "id": m.id+'.handler.subtitle',
+        "locale": "fr",
+        "variant": "CA",
+        "locale_variant": "fr-CA",
+        "source": m.id+'.handler.subtitle',
+        "target": m.handler.subtitle +' fr'
+      });
+      x.LocaleDAO.put(l2);
+    }
+
+    if ( m.handler && m.handler.config ) {
+      if ( m.handler.config.browseTitle ) {
+        let l2 = foam.i18n.Locale.create({
+          "id": m.id+'.handler.config.browseTitle',
+          "locale": "fr",
+          "variant": "CA",
+          "locale_variant": "fr-CA",
+          "source": m.id+'.handler.config.browseTitle',
+          "target": m.handler.config.browseTitle +' fr'
+        });
+        x.LocaleDAO.put(l2);
+      }
+      if ( m.handler.config.browseSubtitle ) {
+        let l2 = foam.i18n.Locale.create({
+          "id": m.id+'.handler.config.browseSubtitle',
+          "locale": "fr",
+          "variant": "CA",
+          "locale_variant": "fr-CA",
+          "source": m.id+'.handler.config.browseSubtitle',
+          "target": m.handler.config.browseSubtitle +' fr'
+        });
+        x.LocaleDAO.put(l2);
+      }
+      if ( m.handler.config.createTitle ) {
+        let l2 = foam.i18n.Locale.create({
+          "id": m.id+'.handler.config.createTitle',
+          "locale": "fr",
+          "variant": "CA",
+          "locale_variant": "fr-CA",
+          "source": m.id+'.handler.config.createTitle',
+          "target": m.handler.config.createTitle +' fr'
+        });
+        x.LocaleDAO.put(l2);
+      }
+    }
+  });
+""",
+  "output": "",
+  "notes": "",
+  "lastModifiedBy": 1348
+})
