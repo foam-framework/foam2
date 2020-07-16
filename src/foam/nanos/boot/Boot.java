@@ -23,7 +23,6 @@ import foam.nanos.pm.PM;
 import foam.nanos.script.Script;
 import foam.nanos.session.Session;
 import foam.util.SafetyUtil;
-
 import java.lang.Exception;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -43,6 +42,8 @@ public class Boot {
   }
 
   public Boot(String datadir) {
+    XLocator.set(root_);
+
     Logger logger = new ProxyLogger(new StdoutLogger());
     root_.put("logger", logger);
 
