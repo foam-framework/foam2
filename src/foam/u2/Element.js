@@ -658,6 +658,10 @@ foam.CLASS({
     'getElementById'
   ],
 
+  implements: [
+    'foam.mlang.Expressions',
+  ],
+
   topics: [
     'onload',
     'onunload'
@@ -1627,6 +1631,21 @@ foam.CLASS({
         } else if ( typeof c === 'function' ) {
           throw new Error('Unsupported');
         } else {
+          if ( typeof c === 'object' ) {
+            var self = this;
+            let d =  this.__subContext__.LocaleDAO;
+            this.add(this.PromiseSlot.create({
+              promise:
+                d.where(self.EQ(foam.i18n.Locale.ID, c.data.id+'.'+c.clsInfo)).select().then(function(a){
+                  let arr = a.array;
+                  if ( arr.length > 0 ) {
+                    let ea = arr[0];
+                    return ea.target;
+                  }
+                  return '';
+                })
+            }))
+          } else
           es.push(c);
         }
       }
