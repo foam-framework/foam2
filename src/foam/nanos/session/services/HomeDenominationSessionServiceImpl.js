@@ -24,7 +24,7 @@ foam.CLASS({
         if ( homeDenomination == null || homeDenomination.length() == 0 )
           homeDenomination = "USD";
         Session session = x.get(Session.class);
-        session.setHomeDenomination(homeDenomination);
+        session.setContext(session.getContext().put("homeDenomination", homeDenomination));
       `
     }
   ]

@@ -117,6 +117,19 @@
     },
     {
       name: 'format',
+      args: [
+        {
+          class: 'Long',
+          name: 'amount'
+        },
+      ],
+      type: 'String',
+      javaCode: `
+        return format(amount, false);
+      `
+    },
+    {
+      name: 'format',
       code: function(amount, hideId) {
         /**
          * Given a number, display it as a currency using the appropriate
@@ -168,7 +181,7 @@
       },
       args: [
         {
-          class: 'foam.core.UnitValue',
+          class: 'Long',
           name: 'amount'
         },
         {

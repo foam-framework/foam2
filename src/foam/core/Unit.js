@@ -30,5 +30,20 @@
       documentation: 'Defines the number of digits that come after the decimal point. ',
       required: true
     }
+  ],
+  methods: [
+    {
+      name: 'format',
+      args: [
+        {
+          class: 'Long',
+          name: 'amount'
+        },
+      ],
+      type: 'String',
+      javaCode: `
+        return "";
+      `
+    }
   ]
 });
