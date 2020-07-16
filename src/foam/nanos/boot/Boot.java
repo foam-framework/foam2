@@ -115,6 +115,7 @@ public class Boot {
 
     // Revert root_ to non ProxyX to avoid letting children add new bindings.
     root_ = ((ProxyX) root_).getX();
+    XLocator.set(root_);
 
     // Export the ServiceDAO
     ((ProxyDAO) root_.get("nSpecDAO")).setDelegate(
