@@ -24,6 +24,11 @@ public class ContextAgentRunnable
   }
 
   public void run() {
-    agent_.execute(x_);
+    XLocator.set(x_);
+    try {
+      agent_.execute(x_);
+    } finally {
+      XLocator.set(null);
+    }
   }
 }
