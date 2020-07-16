@@ -30,7 +30,7 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      code: async function(o) {
+      code: function(o) {
         throw new Error('Ref is not supported');
       },
       javaCode: `
