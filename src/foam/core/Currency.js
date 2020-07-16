@@ -27,7 +27,7 @@
     {
       buildJavaClass: function(cls) {
         cls.extras.push(`
-          public String format(Long amount) {
+          public String format(long amount) {
             return format(amount, false);
           }
         `);
@@ -114,19 +114,6 @@
       code: function(x) {
         return this.id + " - " + this.name;
       }
-    },
-    {
-      name: 'format',
-      args: [
-        {
-          class: 'Long',
-          name: 'amount'
-        },
-      ],
-      type: 'String',
-      javaCode: `
-        return format(amount, false);
-      `
     },
     {
       name: 'format',

@@ -36,7 +36,7 @@
       name: 'format',
       args: [
         {
-          class: 'Long',
+          class: 'foam.core.UnitValue',
           name: 'amount'
         },
       ],
