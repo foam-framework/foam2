@@ -332,21 +332,20 @@ foam.CLASS({
 
               // Render the table headers for the property columns.
               forEach(columns_, function([col, overrides]) {
-                var prop;
+                var prop = view.props[propertyNamesToQuery.indexOf(col)];
                 var isFirstLevelProperty = true;
-                if ( ! foam.core.FObject.isInstance(col) ) {
+                var column;
+                if ( foam.core.FObject.isInstance(col) || foam.core.Reference.isInstance(col) ) {
                   var propertyNames = col.split('.');
                   isFirstLevelProperty = propertyNames.length === 1;
-                  prop = view.props.find(c => c.name === propertyNames[propertyNames.length - 1]);
                 } else
-                  prop = view.props.find(c => c.name === col.name);
-                var column = view.columns.find( c => !foam.String.isInstance(c) && c.name === prop.name );
+                  column = view.columns.find( c => !foam.String.isInstance(c) && c.name === prop.name );
 
                 this.start().
                   addClass(view.myClass('th')).
                   addClass(view.myClass('th-' + prop.name)).
                   call(function() {
-                    if ( prop.tableWidth || ( column && column.tableWidth ) ) {
+                    if ( ( column && column.tableWidth ) || prop.tableWidth ) {
                       this.style({ flex: `0 0 ${column && column.tableWidth ? column.tableWidth : prop.tableWidth}px` });
                     } else {
                       this.style({ flex: '1 0 0' });
@@ -564,7 +563,9 @@ foam.CLASS({
                     });
                   });
                   for ( var  i = 1 ; i < numberOfColumns ; i++  ) {
-                    var column = view.columns.find( c => !foam.String.isInstance(c) && c.name === view.props[i].name );
+                    var column;
+                    if ( ! foam.core.Reference.isInstance(view.props[i]) && ! foam.core.FObjectProperty.isInstance(view.props[i]) )
+                      column = view.columns.find( c => !foam.String.isInstance(c) && c.name === view.props[i].name && ! propertyNamesToQuery[i].includes('.') );
                     if ( view.props[i].tableCellFormatter || ( column && column.tableCellFormatter ) ) {
                       var elmt = this.E().addClass(view.myClass('td')).style({flex: column && column.tableWidth ? `0 0 ${column.tableWidth}px` : view.props[i] && view.props[i].tableWidth  ? `0 0 ${view.props[i].tableWidth}px` : '1 0 0'});//, 'justify-content': 'center'
                       try {
