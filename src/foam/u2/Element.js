@@ -1632,7 +1632,7 @@ foam.CLASS({
           throw new Error('Unsupported');
         } else {
           //foam.locale = 'fr';
-          if ( typeof c === 'object' ) {
+          if ( typeof c === 'object' && c.data !== undefined && c.data.id !== undefined ) {
             var self = this;
             var expr = foam.mlang.Expressions.create();
             let d =  this.__subContext__.LocaleDAO;
