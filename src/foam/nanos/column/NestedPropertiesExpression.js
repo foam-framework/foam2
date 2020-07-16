@@ -92,10 +92,11 @@ foam.CLASS({
         var prop = of.getAxiomByName(propName[i]);
         if ( ! prop ) return null;
 
-        var propExpr = this.buildPropertyExpr(prop, expr, i === propName.length - 1);
-
         if ( i === propName.length - 1 )
-          return propExpr;
+          return ! expr ? prop :
+            foam.mlang.Expressions.create().DOT(expr, prop);
+
+        var propExpr = this.buildPropertyExpr(prop, expr);
 
         return this.returnDotExprForNestedProperty(prop.of, propName, ++i, propExpr);
       },
@@ -104,11 +105,11 @@ foam.CLASS({
 
         if ( prop == null ) return null;
 
-        Expr propExpr = buildPropertyExpr(prop, expr, i == propName.length - 1);
-
         if ( i == propName.length - 1 )
-          return propExpr;
+          return expr == null ? prop : DOT(expr, prop);
         
+        Expr propExpr = buildPropertyExpr(prop, expr);
+
         try {
           ClassInfo ci = getPropertyClassInfo(prop);
           return returnDotExprForNestedProperty(ci, propName, ++i, propExpr);
@@ -149,21 +150,17 @@ foam.CLASS({
         {
           name: 'expr',
           javaType: 'foam.mlang.Expr'
-        },
-        {
-          name: 'isLastPropName',
-          type: 'Boolean'
         }
       ],
-      code: function(prop, expr, isLastPropName) {          
-        if ( ! isLastPropName && foam.core.Reference.isInstance(prop) )
+      code: function(prop, expr) {          
+        if ( foam.core.Reference.isInstance(prop) )
           prop = foam.mlang.Expressions.create().REF(prop);
         
         return ! expr ? prop :
           foam.mlang.Expressions.create().DOT(expr, prop);
       },
       javaCode: `
-        if ( isPropertyAReference((PropertyInfo)prop, isLastPropName) )
+        if ( isPropertyAReference((PropertyInfo)prop) )
           prop = REF(prop);
 
         return expr == null ? prop : DOT(expr, prop);
@@ -176,17 +173,13 @@ foam.CLASS({
         {
           name: 'prop',
           javaType: 'foam.core.PropertyInfo',
-        },
-        {
-          name: 'isLastPropName',
-          type: 'Boolean'
         }
       ],
       javaCode: `
         if ( prop instanceof foam.core.AbstractFObjectPropertyInfo )
           return false;
         
-        return ! isLastPropName && getFinderMethod(prop) != null;
+        return getFinderMethod(prop) != null;
       `
     },
     {
