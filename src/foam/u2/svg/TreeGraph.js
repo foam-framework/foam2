@@ -82,9 +82,6 @@ foam.CLASS({
         .end()
     },
     function renderBoxes(g, node, parent) {
-      if ( this.alreadyRendered_[node.id] ) return;
-      this.alreadyRendered_[node.id] = true;
-
       var self = this;
       var size = this.size; var gap = this.gap;
       var coords = this.nodePlacementPlan.getPlacement(node);
@@ -95,10 +92,14 @@ foam.CLASS({
       }
 
       g
-        .tag(this.nodeView, {
-          data: node.data,
-          position: coords.map(v => gap + v*(size + gap)),
-          size: Array(coords.length).fill(this.size)
+        .callIf(! self.alreadyRendered_[node.id], function () {
+          self.alreadyRendered_[node.id] = true;
+          this
+            .tag(self.nodeView, {
+              data: node.data,
+              position: coords.map(v => gap + v*(size + gap)),
+              size: Array(coords.length).fill(self.size)
+            })
         })
         .callIf(parent, function () {
           var pcoords = self.nodePlacementPlan.getPlacement(parent);
@@ -123,7 +124,7 @@ foam.CLASS({
               size: 5
             })
         })
-      
+
       this.graph.getDirectChildren(node.id).forEach(childNode => {
         this.renderBoxes(g, childNode, node);
       })

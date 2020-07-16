@@ -26,9 +26,9 @@ foam.CLASS({
     }
 
     ^segment {
-      border-bottom: 1px solid rgba(0,0,0,0.9);
+      border-bottom: 1px solid rgba(0,0,0,0.4);
       background-color: rgba(255,255,255,0.7);
-      padding: 8px;
+      padding: 8px 0;
       text-align: center;
       margin-bottom: 8px;
       box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.2);
