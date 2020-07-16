@@ -1631,22 +1631,24 @@ foam.CLASS({
         } else if ( typeof c === 'function' ) {
           throw new Error('Unsupported');
         } else {
+          //foam.locale = 'fr';
           if ( typeof c === 'object' ) {
             var self = this;
+            var expr = foam.mlang.Expressions.create();
             let d =  this.__subContext__.LocaleDAO;
             this.add(this.PromiseSlot.create({
-              promise:
-                d.where(self.EQ(foam.i18n.Locale.ID, c.data.id+'.'+c.clsInfo)).select().then(function(a){
+              promise://TODO support more that one language (add language to the id)
+                d.where(expr.AND(expr.EQ(foam.i18n.Locale.LOCALE, foam.locale),expr.EQ(foam.i18n.Locale.ID, c.data.id+'.'+c.clsInfo))).select().then(function(a){
                   let arr = a.array;
                   if ( arr.length > 0 ) {
                     let ea = arr[0];
                     return ea.target;
                   }
-                  return '';
+                  return c.default || 'no value';
                 })
             }))
           } else
-          es.push(c);
+            es.push(c);
         }
       }
 
