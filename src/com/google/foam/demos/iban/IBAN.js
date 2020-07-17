@@ -24,7 +24,7 @@ foam.CLASS({
 
     function format(iban) {
       var l = iban.length;
-      for ( var i = l - l % 4 ; i > 0 ; i -= 4 ) iban = iban.substring(0, i) + ' ' + iban.substring(i, l*2);
+      for ( var i = l - l % 4 ; i > 0 ; i -= 4 ) iban = iban.substring(0, i) + ' ' + iban.substring(i);
       return iban;
     },
 
@@ -56,16 +56,16 @@ foam.CLASS({
       var num = this.toNumber(iban);
       var checksum = this.mod(num, 97);
       var desiredChecksum = 98 - checksum;
-      iban = iban.substring(0,2) + ('' + desiredChecksum).padStart(2, '0') + iban.substring(4, 200);
+      iban = iban.substring(0,2) + ('' + desiredChecksum).padStart(2, '0') + iban.substring(4);
       return iban;
     },
 
     function toNumber(iban) {
-      iban = iban.substring(4, 100) + iban.substring(0, 4);
+      iban = iban.substring(4) + iban.substring(0, 4);
       for ( var l = iban.length ; l >= 0 ; l-- ) {
         var c = iban.charAt(l);
         if ( c >= 'A' && c <= 'Z' ) {
-          iban = iban.substring(0, l) + (10 + ( c.charCodeAt(0) - 'A'.charCodeAt(0) )) + iban.substring(l+1, 100)
+          iban = iban.substring(0, l) + (10 + ( c.charCodeAt(0) - 'A'.charCodeAt(0) )) + iban.substring(l+1)
         }
       }
       return iban;
@@ -91,6 +91,16 @@ foam.CLASS({
         ret = (ret*10 + (num.charAt(i) - '0')) % a;
 
       return ret;
+    },
+
+    function next(iban) {
+      for ( var i = iban.length-1 ; i >= 2 ; i-- ) {
+        var c = iban.charAt(i);
+        if ( c < '9' ) {
+          return this.setChecksum(iban.substring(0, i) + (parseInt(iban.charAt(i)) + 1 + '') + iban.substring(i+1));
+        }
+        iban = iban.substring(0, i) + '0' + iban.substring(i+1);
+      }
     }
   ],
 
@@ -130,6 +140,12 @@ foam.CLASS({
       console.log(this.toNumber(this.trim('GB82 WEST 1234 5698 7654 32')));
       console.log('3214282912345698765432161182');
       console.log(this.setChecksum('GB99WEST12345698765432'));
+      console.log(this.next('GB99WEST12345698765432'));
+      var iban = 'GB99WEST12345698765432';
+      for ( var i = 0 ; i < 10 ; i++ ) {
+        iban = this.next(iban);
+        console.log(this.format(iban));
+      }
     }
   ]
 });
