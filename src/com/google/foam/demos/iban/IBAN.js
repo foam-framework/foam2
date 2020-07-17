@@ -3,9 +3,25 @@ foam.CLASS({
   name: 'IBAN',
 
   constants: {
-    COUNTRIES: {
-      GB: 'kkbbbbsssssscccccccc'
-    }
+    COUNTRIES: (function() {
+      var m = {};
+      [
+        'ALkk bbbs sssx cccc cccc cccc cccc',
+        'DEkk bbbb bbbb cccc cccc cc',
+        'ESkk bbbb gggg xxcc cccc cccc',
+        'FRkk bbbb bggg ggcc cccc cccc cxx',
+        'GBkk bbbb ssss sscc cccc cc',
+        'GRkk bbbs sssc cccc cccc cccc ccc',
+        'HUkk bbbs sssk cccc cccc cccc cccx',
+        'IEkk aaaa bbbb bbcc cccc cc',
+        'ITkk xaaa aabb bbbc cccc cccc ccc',
+        'NLkk bbbb cccc cccc cc',
+        'SEkk bbbc cccc cccc cccc cccc'
+      ].forEach(function (c) {
+        m[c.substring(0,2)] = c.substring(2).replace(/ /g, '');
+      });
+      return m;
+    })()
   },
 
   methods: [
