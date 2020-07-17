@@ -51,6 +51,15 @@ foam.CLASS({
       if ( checksum != 1 ) throw 'Invalid checksum ' + checksum;
     },
 
+    function setChecksum(iban) {
+      iban = iban.substring(0,2) + '00' + iban.substring(4, 200);
+      var num = this.toNumber(iban);
+      var checksum = this.mod(num, 97);
+      var desiredChecksum = 98 - checksum;
+      iban = iban.substring(0,2) + ('' + desiredChecksum).padStart(2, '0') + iban.substring(4, 200);
+      return iban;
+    },
+
     function toNumber(iban) {
       iban = iban.substring(4, 100) + iban.substring(0, 4);
       for ( var l = iban.length ; l >= 0 ; l-- ) {
@@ -120,6 +129,7 @@ foam.CLASS({
       console.log('GB82 WEST 1234 5698 7654 32');
       console.log(this.toNumber(this.trim('GB82 WEST 1234 5698 7654 32')));
       console.log('3214282912345698765432161182');
+      console.log(this.setChecksum('GB99WEST12345698765432'));
     }
   ]
 });
