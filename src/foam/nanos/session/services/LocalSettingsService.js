@@ -1,6 +1,6 @@
 foam.INTERFACE({
   package: 'foam.nanos.session.services',
-  name: 'HomeDenominationSessionService',
+  name: 'LocalSettingsService',
   methods: [
     {
       name: 'addHomeDenomination',

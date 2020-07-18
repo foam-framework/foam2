@@ -1,8 +1,8 @@
 foam.CLASS({
   package: 'foam.nanos.session.services',
-  name: 'HomeDenominationSessionServiceImpl',
+  name: 'LocalSettingsServiceImpl',
   implements: [
-    'foam.nanos.session.services.HomeDenominationSessionService'
+    'foam.nanos.session.services.LocalSettingsService'
   ],
   javaImports: [
     'foam.nanos.session.Session'
