@@ -91,7 +91,7 @@ foam.CLASS({
           .setApplicationName("nanopay")
           .build();
         FileList result = service.files().list()
-          .setQ("mimeType = 'application/vnd.google-apps.folder' and name = '" + folderName + "'")// and title='nanopay_export'
+          .setQ("mimeType = 'application/vnd.google-apps.folder' and name = '" + folderName + "'")
           .setSpaces("drive")
           .execute();
         File file;
