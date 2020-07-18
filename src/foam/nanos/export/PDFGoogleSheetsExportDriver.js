@@ -76,10 +76,6 @@ foam.CLASS({
         return '';
       var url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?exportFormat=pdf&format=pdf&scale=1`;
       return url;
-    },
-    async function tearDown(X, obj) {
-      var findMatch = obj.match(this.SPREADSHEET_ID_REGEX);
-      if ( findMatch ) X.googleSheetsDataExport.deleteSheet(X, findMatch[1]);
     }
   ],
   constants: {

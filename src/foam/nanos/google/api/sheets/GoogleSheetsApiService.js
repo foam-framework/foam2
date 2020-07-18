@@ -231,7 +231,6 @@ foam.CLASS({
       ],
       javaCode: `
         try {
-          Thread.sleep(120000);
           GoogleDriveService googleDriveService = (GoogleDriveService) getX().get("googleDriveService");
           googleDriveService.deleteFile(x, sheetId);
         } catch(Exception e) {

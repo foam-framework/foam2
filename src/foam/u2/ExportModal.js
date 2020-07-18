@@ -234,8 +234,6 @@ foam.CLASS({
         }).finally(() => {
           if ( this.exportAllColumns )
             this.filteredTableColumns = filteredColumnsCopy;
-          if ( this.exportDriver.tearDown )
-            this.exportDriver.tearDown(self.__context__, exportDataResult);
         });
       }
     },
