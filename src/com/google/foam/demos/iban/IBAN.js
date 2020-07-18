@@ -4,117 +4,112 @@ foam.CLASS({
 
   constants: {
     COUNTRIES: (function() {
-      var specs = [
-      [ "AD", 24, "F04F04A12",          "AD1200012030200359100100" ],
-      [ "AE", 23, "F03F16",             "AE070331234567890123456" ],
-      [ "AL", 28, "F08A16",             "AL47212110090000000235698741" ],
-      [ "AT", 20, "F05F11",             "AT611904300234573201" ],
-      [ "AZ", 28, "U04A20",             "AZ21NABZ00000000137010001944" ],
-      [ "BA", 20, "F03F03F08F02",       "BA391290079401028494" ],
-      [ "BE", 16, "F03F07F02",          "BE68539007547034" ],
-      [ "BG", 22, "U04F04F02A08",       "BG80BNBG96611020345678" ],
-      [ "BH", 22, "U04A14",             "BH67BMAG00001299123456" ],
-      [ "BR", 29, "F08F05F10U01A01",    "BR9700360305000010009795493P1" ],
-      [ "BY", 28, "A04F04A16",          "BY13NBRB3600900000002Z00AB00" ],
-      [ "CH", 21, "F05A12",             "CH9300762011623852957" ],
-      [ "CR", 22, "F04F14",             "CR72012300000171549015" ],
-      [ "CY", 28, "F03F05A16",          "CY17002001280000001200527600" ],
-      [ "CZ", 24, "F04F06F10",          "CZ6508000000192000145399" ],
-      [ "DE", 22, "F08F10",             "DE89370400440532013000" ],
-      [ "DK", 18, "F04F09F01",          "DK5000400440116243" ],
-      [ "DO", 28, "U04F20",             "DO28BAGR00000001212453611324" ],
-      [ "EE", 20, "F02F02F11F01",       "EE382200221020145685" ],
-      [ "EG", 29, "F04F04F17",          "EG800002000156789012345180002" ],
-      [ "ES", 24, "F04F04F01F01F10",    "ES9121000418450200051332" ],
-      [ "FI", 18, "F06F07F01",          "FI2112345600000785" ],
-      [ "FO", 18, "F04F09F01",          "FO6264600001631634" ],
-      [ "FR", 27, "F05F05A11F02",       "FR1420041010050500013M02606" ],
-      [ "GB", 22, "U04F06F08",          "GB29NWBK60161331926819" ],
-      [ "GE", 22, "U02F16",             "GE29NB0000000101904917" ],
-      [ "GI", 23, "U04A15",             "GI75NWBK000000007099453" ],
-      [ "GL", 18, "F04F09F01",          "GL8964710001000206" ],
-      [ "GR", 27, "F03F04A16",          "GR1601101250000000012300695" ],
-      [ "GT", 28, "A04A20",             "GT82TRAJ01020000001210029690" ],
-      [ "HR", 21, "F07F10",             "HR1210010051863000160" ],
-      [ "HU", 28, "F03F04F01F15F01",    "HU42117730161111101800000000" ],
-      [ "IE", 22, "U04F06F08",          "IE29AIBK93115212345678" ],
-      [ "IL", 23, "F03F03F13",          "IL620108000000099999999" ],
-      [ "IS", 26, "F04F02F06F10",       "IS140159260076545510730339" ],
-      [ "IT", 27, "U01F05F05A12",       "IT60X0542811101000000123456" ],
-      [ "IQ", 23, "U04F03A12",          "IQ98NBIQ850123456789012" ],
-      [ "JO", 30, "A04F22",             "JO15AAAA1234567890123456789012" ],
-      [ "KW", 30, "U04A22",             "KW81CBKU0000000000001234560101" ],
-      [ "KZ", 20, "F03A13",             "KZ86125KZT5004100100" ],
-      [ "LB", 28, "F04A20",             "LB62099900000001001901229114" ],
-      [ "LC", 32, "U04F24",             "LC07HEMM000100010012001200013015" ],
-      [ "LI", 21, "F05A12",             "LI21088100002324013AA" ],
-      [ "LT", 20, "F05F11",             "LT121000011101001000" ],
-      [ "LU", 20, "F03A13",             "LU280019400644750000" ],
-      [ "LV", 21, "U04A13",             "LV80BANK0000435195001" ],
-      [ "MC", 27, "F05F05A11F02",       "MC5811222000010123456789030" ],
-      [ "MD", 24, "U02A18",             "MD24AG000225100013104168" ],
-      [ "ME", 22, "F03F13F02",          "ME25505000012345678951" ],
-      [ "MK", 19, "F03A10F02",          "MK07250120000058984" ],
-      [ "MR", 27, "F05F05F11F02",       "MR1300020001010000123456753" ],
-      [ "MT", 31, "U04F05A18",          "MT84MALT011000012345MTLCAST001S" ],
-      [ "MU", 30, "U04F02F02F12F03U03", "MU17BOMM0101101030300200000MUR" ],
-      [ "NL", 18, "U04F10",             "NL91ABNA0417164300" ],
-      [ "NO", 15, "F04F06F01",          "NO9386011117947" ],
-      [ "PK", 24, "U04A16",             "PK36SCBL0000001123456702" ],
-      [ "PL", 28, "F08F16",             "PL61109010140000071219812874" ],
-      [ "PS", 29, "U04A21",             "PS92PALS000000000400123456702" ],
-      [ "PT", 25, "F04F04F11F02",       "PT50000201231234567890154" ],
-      [ "QA", 29, "U04A21",             "QA30AAAA123456789012345678901" ],
-      [ "RO", 24, "U04A16",             "RO49AAAA1B31007593840000" ],
-      [ "RS", 22, "F03F13F02",          "RS35260005601001611379" ],
-      [ "SA", 24, "F02A18",             "SA0380000000608010167519" ],
-      [ "SC", 31, "U04F04F16U03",       "SC18SSCB11010000000000001497USD" ],
-      [ "SE", 24, "F03F16F01",          "SE4550000000058398257466" ],
-      [ "SI", 19, "F05F08F02",          "SI56263300012039086" ],
-      [ "SK", 24, "F04F06F10",          "SK3112000000198742637541" ],
-      [ "SM", 27, "U01F05F05A12",       "SM86U0322509800000000270100" ],
-      [ "ST", 25, "F08F11F02",          "ST68000100010051845310112" ],
-      [ "SV", 28, "U04F20",             "SV62CENR00000000000000700025" ],
-      [ "TL", 23, "F03F14F02",          "TL380080012345678910157" ],
-      [ "TN", 24, "F02F03F13F02",       "TN5910006035183598478831" ],
-      [ "TR", 26, "F05F01A16",          "TR330006100519786457841326" ],
-      [ "UA", 29, "F25",                "UA511234567890123456789012345" ],
-      [ "VA", 22, "F18",                "VA59001123000012345678" ],
-      [ "VG", 24, "U04F16",             "VG96VPVG0000012345678901" ],
-      [ "XK", 20, "F04F10F02",          "XK051212012345678906" ],
-      // Unofficial IBAN users
-      [ "AO", 25, "F21",                "AO69123456789012345678901" ],
-      [ "BF", 27, "F23",                "BF2312345678901234567890123" ],
-      [ "BI", 16, "F12",                "BI41123456789012" ],
-      [ "BJ", 28, "F24",                "BJ39123456789012345678901234" ],
-      [ "CI", 28, "U02F22",             "CI70CI1234567890123456789012" ],
-      [ "CM", 27, "F23",                "CM9012345678901234567890123" ],
-      [ "CV", 25, "F21",                "CV30123456789012345678901" ],
-      [ "DZ", 24, "F20",                "DZ8612345678901234567890" ],
-      [ "IR", 26, "F22",                "IR861234568790123456789012" ],
-      [ "MG", 27, "F23",                "MG1812345678901234567890123" ],
-      [ "ML", 28, "U01F23",             "ML15A12345678901234567890123" ],
-      [ "MZ", 25, "F21",                "MZ25123456789012345678901" ],
-      [ "SN", 28, "U01F23",             "SN52A12345678901234567890123" ],
-      // French territories
-      [ "GF", 27, "F05F05A11F02",       "GF121234512345123456789AB13" ],
-      [ "GP", 27, "F05F05A11F02",       "GP791234512345123456789AB13" ],
-      [ "MQ", 27, "F05F05A11F02",       "MQ221234512345123456789AB13" ],
-      [ "RE", 27, "F05F05A11F02",       "RE131234512345123456789AB13" ],
-      [ "PF", 27, "F05F05A11F02",       "PF281234512345123456789AB13" ],
-      [ "TF", 27, "F05F05A11F02",       "TF891234512345123456789AB13" ],
-      [ "YT", 27, "F05F05A11F02",       "YT021234512345123456789AB13" ],
-      [ "NC", 27, "F05F05A11F02",       "NC551234512345123456789AB13" ],
-      [ "BL", 27, "F05F05A11F02",       "BL391234512345123456789AB13" ],
-      [ "MF", 27, "F05F05A11F02",       "MF551234512345123456789AB13" ],
-      [ "PM", 27, "F05F05A11F02",       "PM071234512345123456789AB13" ],
-      [ "WF", 27, "F05F05A11F02",       "WF621234512345123456789AB13" ]
-    ];
-
       var m = {};
-      /*
+
       [
-        'ALkk bbbs sssx cccc cccc cccc cccc',
+        ["ADFF FFFF FFFF AAAA AAAA AAAA ", "", "AD12 0001 2030 2003 5910 0100 "],
+        ["AEFF FFFF FFFF FFFF FFFF FFF", "", "AE07 0331 2345 6789 0123 456"],
+        ["ALFF FFFF FFFF AAAA AAAA AAAA AAAA ", "", "AL47 2121 1009 0000 0002 3569 8741 "],
+        ["ATFF FFFF FFFF FFFF FFFF ", "", "AT61 1904 3002 3457 3201 "],
+        ["AZFF UUUU AAAA AAAA AAAA AAAA AAAA ", "", "AZ21 NABZ 0000 0000 1370 1000 1944 "],
+        ["BAFF FFFF FFFF FFFF FFFF ", "", "BA39 1290 0794 0102 8494 "],
+        ["BEFF FFFF FFFF FFFF ", "", "BE68 5390 0754 7034 "],
+        ["BGFF UUUU FFFF FFAA AAAA AA", "", "BG80 BNBG 9661 1020 3456 78"],
+        ["BHFF UUUU AAAA AAAA AAAA AA", "", "BH67 BMAG 0000 1299 1234 56"],
+        ["BRFF FFFF FFFF FFFF FFFF FFFF FFFU A", "", "BR97 0036 0305 0000 1000 9795 493P 1"],
+        ["BYFF AAAA FFFF AAAA AAAA AAAA AAAA ", "", "BY13 NBRB 3600 9000 0000 2Z00 AB00 "],
+        ["CHFF FFFF FAAA AAAA AAAA A", "", "CH93 0076 2011 6238 5295 7"],
+        ["CRFF FFFF FFFF FFFF FFFF FF", "", "CR72 0123 0000 0171 5490 15"],
+        ["CYFF FFFF FFFF AAAA AAAA AAAA AAAA ", "", "CY17 0020 0128 0000 0012 0052 7600 "],
+        ["CZFF FFFF FFFF FFFF FFFF FFFF ", "", "CZ65 0800 0000 1920 0014 5399 "],
+        ["DEFF FFFF FFFF FFFF FFFF FF", "", "DE89 3704 0044 0532 0130 00"],
+        ["DKFF FFFF FFFF FFFF FF", "", "DK50 0040 0440 1162 43"],
+        ["DOFF UUUU FFFF FFFF FFFF FFFF FFFF ", "", "DO28 BAGR 0000 0001 2124 5361 1324 "],
+        ["EEFF FFFF FFFF FFFF FFFF ", "", "EE38 2200 2210 2014 5685 "],
+        ["EGFF FFFF FFFF FFFF FFFF FFFF FFFF F", "", "EG80 0002 0001 5678 9012 3451 8000 2"],
+        ["ESFF FFFF FFFF FFFF FFFF FFFF ", "", "ES91 2100 0418 4502 0005 1332 "],
+        ["FIFF FFFF FFFF FFFF FF", "", "FI21 1234 5600 0007 85"],
+        ["FOFF FFFF FFFF FFFF FF", "", "FO62 6460 0001 6316 34"],
+        ["FRFF FFFF FFFF FFAA AAAA AAAA AFF", "", "FR14 2004 1010 0505 0001 3M02 606"],
+        ["GBFF UUUU FFFF FFFF FFFF FF", "", "GB29 NWBK 6016 1331 9268 19"],
+        ["GEFF UUFF FFFF FFFF FFFF FF", "", "GE29 NB00 0000 0101 9049 17"],
+        ["GIFF UUUU AAAA AAAA AAAA AAA", "", "GI75 NWBK 0000 0000 7099 453"],
+        ["GLFF FFFF FFFF FFFF FF", "", "GL89 6471 0001 0002 06"],
+        ["GRFF FFFF FFFA AAAA AAAA AAAA AAA", "", "GR16 0110 1250 0000 0001 2300 695"],
+        ["GTFF AAAA AAAA AAAA AAAA AAAA AAAA ", "", "GT82 TRAJ 0102 0000 0012 1002 9690 "],
+        ["HRFF FFFF FFFF FFFF FFFF F", "", "HR12 1001 0051 8630 0016 0"],
+        ["HUFF FFFF FFFF FFFF FFFF FFFF FFFF ", "", "HU42 1177 3016 1111 1018 0000 0000 "],
+        ["IEFF UUUU FFFF FFFF FFFF FF", "", "IE29 AIBK 9311 5212 3456 78"],
+        ["ILFF FFFF FFFF FFFF FFFF FFF", "", "IL62 0108 0000 0009 9999 999"],
+        ["ISFF FFFF FFFF FFFF FFFF FFFF FF", "", "IS14 0159 2600 7654 5510 7303 39"],
+        ["ITFF UFFF FFFF FFFA AAAA AAAA AAA", "", "IT60 X054 2811 1010 0000 0123 456"],
+        ["IQFF UUUU FFFA AAAA AAAA AAA", "", "IQ98 NBIQ 8501 2345 6789 012"],
+        ["JOFF AAAA FFFF FFFF FFFF FFFF FFFF FF", "", "JO15 AAAA 1234 5678 9012 3456 7890 12"],
+        ["KWFF UUUU AAAA AAAA AAAA AAAA AAAA AA", "", "KW81 CBKU 0000 0000 0000 1234 5601 01"],
+        ["KZFF FFFA AAAA AAAA AAAA ", "", "KZ86 125K ZT50 0410 0100 "],
+        ["LBFF FFFF AAAA AAAA AAAA AAAA AAAA ", "", "LB62 0999 0000 0001 0019 0122 9114 "],
+        ["LCFF UUUU FFFF FFFF FFFF FFFF FFFF FFFF ", "", "LC07 HEMM 0001 0001 0012 0012 0001 3015 "],
+        ["LIFF FFFF FAAA AAAA AAAA A", "", "LI21 0881 0000 2324 013A A"],
+        ["LTFF FFFF FFFF FFFF FFFF ", "", "LT12 1000 0111 0100 1000 "],
+        ["LUFF FFFA AAAA AAAA AAAA ", "", "LU28 0019 4006 4475 0000 "],
+        ["LVFF UUUU AAAA AAAA AAAA A", "", "LV80 BANK 0000 4351 9500 1"],
+        ["MCFF FFFF FFFF FFAA AAAA AAAA AFF", "", "MC58 1122 2000 0101 2345 6789 030"],
+        ["MDFF UUAA AAAA AAAA AAAA AAAA ", "", "MD24 AG00 0225 1000 1310 4168 "],
+        ["MEFF FFFF FFFF FFFF FFFF FF", "", "ME25 5050 0001 2345 6789 51"],
+        ["MKFF FFFA AAAA AAAA AFF", "", "MK07 2501 2000 0058 984"],
+        ["MRFF FFFF FFFF FFFF FFFF FFFF FFF", "", "MR13 0002 0001 0100 0012 3456 753"],
+        ["MTFF UUUU FFFF FAAA AAAA AAAA AAAA AAA", "", "MT84 MALT 0110 0001 2345 MTLC AST0 01S"],
+        ["MUFF UUUU FFFF FFFF FFFF FFFF FFFU UU", "", "MU17 BOMM 0101 1010 3030 0200 000M UR"],
+        ["NLFF UUUU FFFF FFFF FF", "", "NL91 ABNA 0417 1643 00"],
+        ["NOFF FFFF FFFF FFF", "", "NO93 8601 1117 947"],
+        ["PKFF UUUU AAAA AAAA AAAA AAAA ", "", "PK36 SCBL 0000 0011 2345 6702 "],
+        ["PLFF FFFF FFFF FFFF FFFF FFFF FFFF ", "", "PL61 1090 1014 0000 0712 1981 2874 "],
+        ["PSFF UUUU AAAA AAAA AAAA AAAA AAAA A", "", "PS92 PALS 0000 0000 0400 1234 5670 2"],
+        ["PTFF FFFF FFFF FFFF FFFF FFFF F", "", "PT50 0002 0123 1234 5678 9015 4"],
+        ["QAFF UUUU AAAA AAAA AAAA AAAA AAAA A", "", "QA30 AAAA 1234 5678 9012 3456 7890 1"],
+        ["ROFF UUUU AAAA AAAA AAAA AAAA ", "", "RO49 AAAA 1B31 0075 9384 0000 "],
+        ["RSFF FFFF FFFF FFFF FFFF FF", "", "RS35 2600 0560 1001 6113 79"],
+        ["SAFF FFAA AAAA AAAA AAAA AAAA ", "", "SA03 8000 0000 6080 1016 7519 "],
+        ["SCFF UUUU FFFF FFFF FFFF FFFF FFFF UUU", "", "SC18 SSCB 1101 0000 0000 0000 1497 USD"],
+        ["SEFF FFFF FFFF FFFF FFFF FFFF ", "", "SE45 5000 0000 0583 9825 7466 "],
+        ["SIFF FFFF FFFF FFFF FFF", "", "SI56 2633 0001 2039 086"],
+        ["SKFF FFFF FFFF FFFF FFFF FFFF ", "", "SK31 1200 0000 1987 4263 7541 "],
+        ["SMFF UFFF FFFF FFFA AAAA AAAA AAA", "", "SM86 U032 2509 8000 0000 0270 100"],
+        ["STFF FFFF FFFF FFFF FFFF FFFF F", "", "ST68 0001 0001 0051 8453 1011 2"],
+        ["SVFF UUUU FFFF FFFF FFFF FFFF FFFF ", "", "SV62 CENR 0000 0000 0000 0070 0025 "],
+        ["TLFF FFFF FFFF FFFF FFFF FFF", "", "TL38 0080 0123 4567 8910 157"],
+        ["TNFF FFFF FFFF FFFF FFFF FFFF ", "", "TN59 1000 6035 1835 9847 8831 "],
+        ["TRFF FFFF FFAA AAAA AAAA AAAA AA", "", "TR33 0006 1005 1978 6457 8413 26"],
+        ["UAFF FFFF FFFF FFFF FFFF FFFF FFFF F", "", "UA51 1234 5678 9012 3456 7890 1234 5"],
+        ["VAFF FFFF FFFF FFFF FFFF FF", "", "VA59 0011 2300 0012 3456 78"],
+        ["VGFF UUUU FFFF FFFF FFFF FFFF ", "", "VG96 VPVG 0000 0123 4567 8901 "],
+        ["XKFF FFFF FFFF FFFF FFFF ", "", "XK05 1212 0123 4567 8906 "],
+        ["AOFF FFFF FFFF FFFF FFFF FFFF F", "", "AO69 1234 5678 9012 3456 7890 1"],
+        ["BFFF FFFF FFFF FFFF FFFF FFFF FFF", "", "BF23 1234 5678 9012 3456 7890 123"],
+        ["BIFF FFFF FFFF FFFF ", "", "BI41 1234 5678 9012 "],
+        ["BJFF FFFF FFFF FFFF FFFF FFFF FFFF ", "", "BJ39 1234 5678 9012 3456 7890 1234 "],
+        ["CIFF UUFF FFFF FFFF FFFF FFFF FFFF ", "", "CI70 CI12 3456 7890 1234 5678 9012 "],
+        ["CMFF FFFF FFFF FFFF FFFF FFFF FFF", "", "CM90 1234 5678 9012 3456 7890 123"],
+        ["CVFF FFFF FFFF FFFF FFFF FFFF F", "", "CV30 1234 5678 9012 3456 7890 1"],
+        ["DZFF FFFF FFFF FFFF FFFF FFFF ", "", "DZ86 1234 5678 9012 3456 7890 "],
+        ["IRFF FFFF FFFF FFFF FFFF FFFF FF", "", "IR86 1234 5687 9012 3456 7890 12"],
+        ["MGFF FFFF FFFF FFFF FFFF FFFF FFF", "", "MG18 1234 5678 9012 3456 7890 123"],
+        ["MLFF UFFF FFFF FFFF FFFF FFFF FFFF ", "", "ML15 A123 4567 8901 2345 6789 0123 "],
+        ["MZFF FFFF FFFF FFFF FFFF FFFF F", "", "MZ25 1234 5678 9012 3456 7890 1"],
+        ["SNFF UFFF FFFF FFFF FFFF FFFF FFFF ", "", "SN52 A123 4567 8901 2345 6789 0123 "],
+        ["GFFF FFFF FFFF FFAA AAAA AAAA AFF", "", "GF12 1234 5123 4512 3456 789A B13"],
+        ["GPFF FFFF FFFF FFAA AAAA AAAA AFF", "", "GP79 1234 5123 4512 3456 789A B13"],
+        ["MQFF FFFF FFFF FFAA AAAA AAAA AFF", "", "MQ22 1234 5123 4512 3456 789A B13"],
+        ["REFF FFFF FFFF FFAA AAAA AAAA AFF", "", "RE13 1234 5123 4512 3456 789A B13"],
+        ["PFFF FFFF FFFF FFAA AAAA AAAA AFF", "", "PF28 1234 5123 4512 3456 789A B13"],
+        ["TFFF FFFF FFFF FFAA AAAA AAAA AFF", "", "TF89 1234 5123 4512 3456 789A B13"],
+        ["YTFF FFFF FFFF FFAA AAAA AAAA AFF", "", "YT02 1234 5123 4512 3456 789A B13"],
+        ["NCFF FFFF FFFF FFAA AAAA AAAA AFF", "", "NC55 1234 5123 4512 3456 789A B13"],
+        ["BLFF FFFF FFFF FFAA AAAA AAAA AFF", "", "BL39 1234 5123 4512 3456 789A B13"],
+        ["MFFF FFFF FFFF FFAA AAAA AAAA AFF", "", "MF55 1234 5123 4512 3456 789A B13"],
+        ["PMFF FFFF FFFF FFAA AAAA AAAA AFF", "", "PM07 1234 5123 4512 3456 789A B13"],
+        ["WFFF FFFF FFFF FFAA AAAA AAAA AFF", "", "WF62 1234 5123 4512 3456 789A B13"]
+        /*
         'DEkk bbbb bbbb cccc cccc cc',
         'ESkk bbbb gggg xxcc cccc cccc',
         'FRkk bbbb bggg ggcc cccc cccc cxx',
@@ -125,25 +120,10 @@ foam.CLASS({
         'ITkk xaaa aabb bbbc cccc cccc ccc',
         'NLkk bbbb cccc cccc cc',
         'SEkk bbbc cccc cccc cccc cccc'
+        */
       ].forEach(function (c) {
-        m[c.substring(0,2)] = c.substring(2).replace(/ /g, '');
-      });
-      */
-      specs.forEach(function(spec) {
-        var countryCode = spec[0];
-        var format      = spec[2];
-        var longFormat  = 'FF';
-
-        var regex = format.match(/(.{3})/g).map(function(segment) {
-          // parse each structure block (1-char + 2-digits)
-          var pattern = segment.substring(0, 1);
-          var repeats = parseInt(segment.substring(1));
-
-          for ( var i = 0 ; i < repeats ; i++ ) longFormat += pattern;
-        });
-        m[countryCode] = longFormat;
-//        console.log(com.google.foam.demos.iban.IBAN.create().format(countryCode + longFormat));
-
+        var format = c[0]
+        m[format.substring(0,2)] = [format.substring(2).replace(/ /g, ''), c[1], c[2]];
       });
 
       return m;
@@ -174,13 +154,18 @@ foam.CLASS({
       return iban;
     },
 
+    function getFormatForCountry(cc) {
+      var cInfo = this.COUNTRIES[cc];
+      return cInfo && cInfo[0];
+    },
+
     function validate(iban) {
       iban = this.trim(iban);
 
       if ( iban.length < 2 ) throw 'IBAN too short';
 
       var cc = iban.substring(0, 2);
-      var format = this.COUNTRIES[cc];
+      var format = this.getFormatForCountry(cc);
 
       if ( ! format ) throw 'Unknown country code: ' + cc;
 
@@ -295,62 +280,3 @@ foam.CLASS({
     }
   ]
 });
-
-/*
-8n,16c ALkk bbbs sssx cccc cccc cccc cccc
-8n,12c ADkk bbbb ssss cccc cccc cccc
-16n BAkk bbbs sscc cccc ccxx
-23n,1a,1c BRkk bbbb bbbb ssss sccc cccc cccc c
-4a,14c BHkk bbbb cccc cccc cccc cc
-12n BEkk bbbc cccc ccxx
-17n HRkk bbbb bbbc cccc cccc c
-8n,16c CYkk bbbs ssss cccc cccc cccc cccc
-4a,6n,8c BGkk bbbb ssss ddcc cccc cc
-17n CRkk bbbc cccc cccc cccc c
-4a,20n DOkk bbbb cccc cccc cccc cccc cccc
-16n EEkk bbss cccc cccc cccx
-20n CZkk bbbb ssss sscc cccc cccc
-14n DKkk bbbb cccc cccc cc
-10n,11c,2n FRkk bbbb bggg ggcc cccc cccc cxx
-2c,16n GEkk bbcc cccc cccc cccc cc
-14n FOkk bbbb cccc cccc cx
-14n FIkk bbbb bbcc cccc cx
-7n,16c GRkk bbbs sssc cccc cccc cccc ccc
-14n GLkk bbbb cccc cccc cc
-18n DEkk bbbb bbbb cccc cccc cc
-4a,15c GIkk bbbb cccc cccc cccc ccc
-22n ISkk bbbb sscc cccc iiii iiii ii
-4c,14n IEkk aaaa bbbb bbcc cccc cc
-19n ILkk bbbn nncc cccc cccc ccc
-1a,10n,12c ITkk xaaa aabb bbbc cccc cccc ccc
-5n,12c LIkk bbbb bccc cccc cccc c
-16n LTkk bbbb bccc cccc cccc
-4a,13c LVkk bbbb cccc cccc cccc c
-4n,20c LBkk bbbb cccc cccc cccc cccc cccc
-4a,5n,18c MTkk bbbb ssss sccc cccc cccc cccc ccc
-23n MRkk bbbb bsss sscc cccc cccc cxx
-3n,13c LUkk bbbc cccc cccc cccc
-3n,10c,2n MKkk bbbc cccc cccc cxx
-2c,18n MDkk bbcc cccc cccc cccc cccc
-18n MEkk bbbc cccc cccc cccc xx
-4a,19n,3a MUkk bbbb bbss cccc cccc cccc cccc cc
-10n,11c,2n MCkk bbbb bsss sscc cccc cccc cxx
-4c,16n PKkk bbbb cccc cccc cccc cccc
-4c,21n PSkk bbbb xxxx xxxx xccc cccc cccc c
-4a,10n NLkk bbbb cccc cccc cc
-11n NOkk bbbb cccc ccx
-4a,16c ROkk bbbb cccc cccc cccc cccc
-1a,10n,12c SMkk xaaa aabb bbbc cccc cccc ccc
-24n PLkk bbbs sssx cccc cccc cccc cccc
-21n PTkk bbbb ssss cccc cccc cccx x
-20n SKkk bbbb ssss sscc cccc cccc
-15n SIkk bbss sccc cccc cxx
-2n,18c SAkk bbcc cccc cccc cccc cccc
-18n RSkk bbbc cccc cccc cccc xx
-20n ESkk bbbb gggg xxcc cccc cccc
-20n SEkk bbbc cccc cccc cccc cccc
-5n,17c TRkk bbbb bxcc cccc cccc cccc cc
-5n,12c CHkk bbbb bccc cccc cccc c
-4a,14n GBkk bbbb ssss sscc cccc cc
-3n,16n AEkk bbbc cccc cccc cccc ccc
-*/
