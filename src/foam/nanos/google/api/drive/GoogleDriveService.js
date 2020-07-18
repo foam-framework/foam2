@@ -8,15 +8,16 @@ foam.CLASS({
   package: 'foam.nanos.google.api.drive',
   name: 'GoogleDriveService',
   javaImports: [
-    'com.google.api.client.http.FileContent',
-    'com.google.api.services.drive.model.File',
-    'com.google.api.services.drive.model.FileList',
+
     'com.google.api.client.googleapis.javanet.GoogleNetHttpTransport',
+    'com.google.api.client.http.FileContent',
     'com.google.api.client.http.javanet.NetHttpTransport',
     'com.google.api.client.json.JsonFactory',
     'com.google.api.client.json.jackson2.JacksonFactory',
     'com.google.api.services.drive.Drive',
     'com.google.api.services.drive.DriveScopes',
+    'com.google.api.services.drive.model.File',
+    'com.google.api.services.drive.model.FileList',
 
     'foam.nanos.google.api.auth.GoogleApiAuthService',
 
@@ -25,7 +26,7 @@ foam.CLASS({
     'java.util.ArrayList',
     'java.util.Arrays',
     'java.util.Collections',
-    'java.util.List',
+    'java.util.List'
   ],
   constants: [
     {
