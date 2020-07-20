@@ -262,8 +262,8 @@ foam.CLASS({
     {
       name: 'goNext',
       label: 'next',
-      isEnabled: function (data$isLastWizardlet, data$currentWizardlet) {
-        return data$isLastWizardlet || data$currentWizardlet.validate();
+      isEnabled: function (data$isLastWizardlet, data$currentWizardlet, data$currentWizardlet$isValid) {
+        return data$currentWizardlet$isValid;
       },
       code: function(x) {
         this.data.next().then((isFinished) => {
