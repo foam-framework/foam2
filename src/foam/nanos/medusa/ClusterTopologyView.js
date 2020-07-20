@@ -159,10 +159,7 @@ foam.CLASS({
       var c = this.canvas.findFirstChildAt(x, y);
 
       if ( c && c !== this.canvas ) {
-        console.log('onClick', 'child', c, c.cls_ && c.cls_.id);
         c.handleClick && c.handleClick(evt, this);
-      } else {
-        console.log('onClick', 'child not found');
       }
     },
 

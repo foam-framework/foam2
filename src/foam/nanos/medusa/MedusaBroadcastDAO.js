@@ -62,13 +62,14 @@ foam.CLASS({
       ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
       ClusterConfig myConfig = support.getConfig(getX(), support.getConfigId());
 
-      Predicate zones = EQ(ClusterConfig.ZONE, myConfig.getZone() + 1);
+      long zone = myConfig.getZone() + 1;
       if ( myConfig.getType() == MedusaType.NODE ) {
-        zones = EQ(ClusterConfig.ZONE, myConfig.getZone());
+        zone = myConfig.getZone();
       }
+      getLogger().debug("predicate", myConfig.getType(), "zone", zone);
       return
           AND(
-            zones,
+            EQ(ClusterConfig.ZONE, zone),
             EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
             EQ(ClusterConfig.STATUS, Status.ONLINE),
             EQ(ClusterConfig.ENABLED, true),
@@ -102,12 +103,12 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
-      getLogger().debug("put", entry.getIndex());
+      // getLogger().debug("put", entry.getIndex());
 
       ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
       ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
 
-      // MedusaEntry old = (MedusaEntry) getDelegate().find_(x, entry.getId());
+      // MedusaEntry old = (MedusaEntry) getDelegate().find_(x, entry.getProperty("id"));
       entry = (MedusaEntry) getDelegate().put_(x, entry);
 
       if ( support.getStandAlone() ) {
@@ -170,7 +171,7 @@ foam.CLASS({
       javaCode: `
       PM pm = PM.create(x, this.getOwnClassInfo(), getServiceName()+":"+dop.getLabel());
       try {
-      getLogger().debug("submit", dop.getLabel(), obj.getClass().getSimpleName());
+      // getLogger().debug("submit", dop.getLabel(), obj.getClass().getSimpleName());
 
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
@@ -186,17 +187,17 @@ foam.CLASS({
              try {
               DAO dao = (DAO) getClients().get(config.getId());
               if ( dao == null ) {
-                dao = (DAO) x.get(getServiceName());
-                if ( dao != null ) {
-                  getLogger().debug("agency", "execute", "short circuit", getServiceName());
-                } else {
+                // dao = (DAO) x.get(getServiceName());
+                // if ( dao != null ) {
+                //   getLogger().debug("agency", "execute", "short circuit", getServiceName());
+                // } else {
                   dao = support.getClientDAO(x, getServiceName(), myConfig, config);
                   dao = new RetryClientSinkDAO.Builder(x)
                           .setDelegate(dao)
                           .setMaxRetryAttempts(support.getMaxRetryAttempts())
                           .setMaxRetryDelay(support.getMaxRetryDelay())
                           .build();
-                }
+                // }
               }
               getClients().put(config.getId(), dao);
 

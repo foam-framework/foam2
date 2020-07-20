@@ -38,7 +38,7 @@ foam.CLASS({
           this.getClass().getSimpleName()
         }, (Logger) getX().get("logger"));
       `
-    },
+    }
   ],
 
   methods: [
@@ -114,13 +114,13 @@ foam.CLASS({
               }
               replaying.getReplayNodes().put(details.getResponder(), details);
 
-            getLogger().debug(myConfig.getId(), "replaying", replaying.getReplaying(), "replayIndex", replaying.getReplayIndex(), "node quorum", support.getHasNodeQuorum());
+              getLogger().debug(myConfig.getId(), "replaying", replaying.getReplaying(), "index", replaying.getIndex(), "replayIndex", replaying.getReplayIndex(), "node quorum", support.getHasNodeQuorum());
 
-            if ( replaying.getReplayIndex() == 0 &&
-                 support.getHasNodeQuorum() ) {
-              // special intial case - no data.
-              ((DAO) x.get("localMedusaEntryDAO")).cmd(new ReplayCompleteCmd());
-            }
+              if ( replaying.getIndex() >= replaying.getReplayIndex() &&
+                   support.getHasNodeQuorum() ) {
+                // special intial case - no data, or baseline
+                ((DAO) x.get("localMedusaEntryDAO")).cmd(new ReplayCompleteCmd());
+              }
             }
 
             if ( details.getMaxIndex() > 0 ) {

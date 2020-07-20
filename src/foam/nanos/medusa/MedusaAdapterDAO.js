@@ -50,16 +50,6 @@ foam.CLASS({
       `
     },
     {
-      // TODO: clear on ClusterConfigDAO update.
-      name: 'config',
-      class: 'FObjectProperty',
-      of: 'foam.nanos.medusa.ClusterConfig',
-      javaFactory: `
-      ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
-      return support.getConfig(getX(), support.getConfigId());
-      `
-    },
-    {
       name: 'logger',
       class: 'FObjectProperty',
       of: 'foam.nanos.logger.Logger',
@@ -114,49 +104,95 @@ foam.CLASS({
       3. If not mediator, proxy to the next 'server', put result.`,
       name: 'put_',
       javaCode: `
-       // TODO/REVIEW: does Clusterable make sense?
       if ( obj instanceof Clusterable &&
            ! ((Clusterable) obj).getClusterable() ) {
         getLogger().debug("put", "not clusterable", obj.getProperty("id"));
         return getDelegate().put_(x, obj);
       }
 
-      if ( obj instanceof ClusterCommand ) {
-        // See ClusterServerDAO which searches the DAO stack for a
-        // Client. This DAO will return itself as the Client when isPrimary.
-        // ClusterServerDAO will then pass the cmd to the Client.
-        obj = ((ClusterCommand) obj).getData();
-      }
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      ClusterConfig config = support.getConfig(x, support.getConfigId());
 
       // Primary instance - put to MDAO (delegate)
-      if ( getConfig().getIsPrimary() ) {
-        getLogger().debug("put", "primary", obj.getClass().getSimpleName(), obj.getProperty("id"));
+      if ( config.getIsPrimary() ) {
+        // getLogger().debug("put", "primary", obj.getClass().getSimpleName(), obj.getProperty("id"));
+        ClusterCommand cmd = null;
+        if ( obj instanceof ClusterCommand ) {
+          // See ClusterServerDAO which searches the DAO stack for a
+          // Client. This DAO will return itself as the Client when isPrimary.
+          // ClusterServerDAO will then pass the cmd to the Client.
+          cmd = (ClusterCommand) obj;
+          obj = cmd.getData();
+        }
+
         FObject old = getDelegate().find_(x, obj.getProperty("id"));
         FObject nu = getDelegate().put_(x, obj);
-        return submit(x, nu, old, DOP.PUT);
+        String data = data(x, nu, old, DOP.PUT);
+        if ( SafetyUtil.isEmpty(data) ) {
+          getLogger().info("put", "primary", obj.getProperty("id"), "data", "no delta");
+        } else {
+          MedusaEntry entry = (MedusaEntry) submit(x, data, DOP.PUT);
+          if ( cmd != null ) {
+            getLogger().debug("put", "primary", obj.getProperty("id"), "setMedusaEntryId", entry.toSummary(), entry.getId().toString());
+            cmd.setMedusaEntryId(entry.getId());
+            cmd.setData(nu);
+          }
+        }
+        if ( cmd != null ) {
+          return cmd;
+        }
+        return nu;
       }
 
       // Not primary - pass on to next Mediator.
-      getLogger().debug("put", "client", obj.getProperty("id"));
-      FObject result = getClientDAO().put_(x, obj);
-      if ( getConfig().getType() == MedusaType.MEDIATOR ) {
+
+      FObject old = getDelegate().find_(x, obj.getProperty("id"));
+      if ( old != null ) {
+        String data = data(x, obj, old, DOP.PUT);
+        if ( SafetyUtil.isEmpty(data) ) {
+          getLogger().info("put", "client", obj.getProperty("id"), "data", "no delta");
+          return obj;
+        }
+      }
+
+      ClusterCommand cmd = new ClusterCommand(x, getNSpec().getName(), DOP.PUT, obj);
+      getLogger().debug("put", "client", "cmd", obj.getProperty("id"), "send");
+      cmd = (ClusterCommand) getClientDAO().cmd_(x, cmd);
+      getLogger().debug("put", "client", "cmd", obj.getProperty("id"), "receive", cmd.getMedusaEntryId());
+      if ( config.getType() == MedusaType.MEDIATOR ) {
+        MedusaEntryId id = cmd.getMedusaEntryId();
+        if ( id != null ) {
+          getMedusaEntryDAO().find_(x, id); // blocking
+        } else {
+          // TODO/REVIEW: ??
+          getLogger().warning("put", "client", "cmd", obj.getProperty("id"), "MedusaEntryId not found.");
+          return obj;
+        }
         FObject found = getDelegate().find_(x, obj.getProperty("id"));
         if ( found == null) {
           // FIXME: In Zone 1+, it would appear the client returns before the broadcast finishes.
-          getLogger().error("put", "client", "delegate.find", "NOT FOUND", obj.getProperty("id"));
-          return result;
+          getLogger().warning("put", "client", "cmd", obj.getProperty("id"), "Object not found", obj.getProperty("id"));
+          return obj;
+        } else {
+          getLogger().debug("put", "client", "cmd", obj.getProperty("id"), "Object found");
         }
         return found;
       }
+
       // Fall through when not Mediator and update local MDAO (delegate).
-      getLogger().debug("put", "client", "delegate.put", obj.getProperty("id"));
-      return getDelegate().put_(x, result);
+      FObject result = cmd.getData();
+      if ( result != null ) {
+        getLogger().debug("put", "delegate", result.getProperty("id"));
+        return getDelegate().put_(x, result);
+      }
+      getLogger().warning("put", obj.getProperty("id"), "result,null");
+      return result;
       `
     },
     {
       name: 'remove_',
       javaCode: `
-      // TODO/REVIEW: does Clusterable make sense?
+      // INCOMPLETE.
       if ( obj instanceof Clusterable &&
            ! ((Clusterable) obj).getClusterable() ) {
         return getDelegate().remove_(x, obj);
@@ -166,13 +202,15 @@ foam.CLASS({
         obj = ((ClusterCommand) obj).getData();
       }
 
-      if ( getConfig().getIsPrimary() ) {
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      ClusterConfig config = support.getConfig(x, support.getConfigId());
+      if ( config.getIsPrimary() ) {
         getDelegate().remove_(x, obj);
-        return submit(x, obj, null, DOP.REMOVE);
+        return submit(x, data(x, obj, null, DOP.REMOVE), DOP.REMOVE);
       }
 
       FObject result = getClientDAO().remove_(x, obj);
-      if ( getConfig().getType() == MedusaType.MEDIATOR ) {
+      if ( config.getType() == MedusaType.MEDIATOR ) {
         return result;
       }
       return getDelegate().remove_(x, result);
@@ -182,27 +220,36 @@ foam.CLASS({
       name: 'cmd_',
       javaCode: `
       getLogger().debug("cmd");
-       if ( foam.dao.MDAO.GET_MDAO_CMD.equals(obj) ) {
-        return getDelegate().cmd_(x, obj);
+      if ( foam.dao.MDAO.GET_MDAO_CMD.equals(obj) ) {
+        return this;
+        // return getDelegate().cmd_(x, obj);
       }
-      if ( getConfig().getIsPrimary() ) {
-        if ( ClusterServerDAO.GET_CLIENT_CMD.equals(obj) ) {
-          getLogger().debug("cmd", "GET_CLIENT_CMD", "this");
-          return this;
-        }
-        if ( obj instanceof ClusterCommand ) {
+      // if ( ClusterServerDAO.GET_CLIENT_CMD.equals(obj) ) {
+      //   return this;
+      //   // if ( getConfig().getIsPrimary() ) {
+      //   //   getLogger().debug("cmd", "GET_CLIENT_CMD", "this");
+      //   //   return this;
+      //   // } else {
+      //   //   return getClientDAO();
+      //   // }
+      // }
+      if ( obj instanceof ClusterCommand ) {
+        ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+        ClusterConfig config = support.getConfig(x, support.getConfigId());
+        if ( config.getIsPrimary() ) {
           ClusterCommand cmd = (ClusterCommand) obj;
-          getLogger().debug("cmd", "ClusterCommand");
+          getLogger().debug("cmd", "ClusterCommand", "primary");
 
           if ( DOP.PUT == cmd.getDop() ) {
-            cmd.setData(put_(x, cmd.getData()));
+            // cmd.setData(put_(x, cmd.getData()));
+            return put_(x, cmd);
           } else if ( DOP.REMOVE == cmd.getDop() ) {
-            cmd.setData(remove_(x, cmd.getData()));
+            // cmd.setData(remove_(x, cmd.getData()));
+            return remove_(x, cmd);
           } else {
             getLogger().warning("Unsupported operation", cmd.getDop().getLabel());
             throw new UnsupportedOperationException(cmd.getDop().getLabel());
           }
-          return cmd;
         }
       }
       getLogger().debug("cmd", "getClientDAO");
@@ -210,7 +257,7 @@ foam.CLASS({
       `
     },
     {
-      name: 'submit',
+      name: 'data',
       args: [
         {
           name: 'x',
@@ -229,15 +276,9 @@ foam.CLASS({
           type: 'foam.dao.DOP'
         }
       ],
-      type: 'FObject',
+      type: 'String',
       javaCode: `
-      getLogger().debug("submit", dop.getLabel(), obj.getClass().getName());
-
-      DaggerService dagger = (DaggerService) x.get("daggerService");
-      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      ClusterConfig config = support.getConfig(x, support.getConfigId());
-
-      PM pm = PM.create(x, this.getOwnClassInfo(), "formatter");
+      PM pm = PM.create(x, this.getOwnClassInfo(), "data");
       String data = null;
       try {
         FObjectFormatter formatter = formatter_.get();
@@ -247,34 +288,46 @@ foam.CLASS({
           formatter.output(obj);
         }
         data = formatter.builder().toString();
-        if ( SafetyUtil.isEmpty(data) ) {
-          getLogger().info("submit", obj.getClass().getSimpleName(), "data,empty");
-          return obj;
-        }
       } finally {
         pm.log(x);
       }
-
-      pm = PM.create(x, this.getOwnClassInfo(), dop.getLabel());
+      return data;
+      `
+    },
+    {
+      name: 'submit',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'data',
+          type: 'String'
+        },
+        {
+          name: 'dop',
+          type: 'foam.dao.DOP'
+        }
+      ],
+      type: 'FObject',
+      javaCode: `
+      PM pm = PM.create(x, this.getOwnClassInfo(), "submit");
       MedusaEntry entry = x.create(MedusaEntry.class);
       try {
+        DaggerService dagger = (DaggerService) x.get("daggerService");
         entry = dagger.link(x, entry);
-        entry.setMediator(config.getName());
+        // entry.setMediator(config.getName());
         entry.setNSpecName(getNSpec().getName());
         entry.setDop(dop);
         entry.setData(data);
 
-        getLogger().debug("submit", entry.getIndex(), obj.getClass().getSimpleName()); //, "stringify", entry.getData());
-
-        FObject result = getMedusaEntryDAO().put_(x, entry); // blocking
-        FObject nu = getDelegate().find_(x, obj.getProperty("id"));
-        if ( nu == null ) {
-          getLogger().error("submit", entry.getIndex(), "delegate", "find", obj.getProperty("id"), "not found");
-          throw new RuntimeException("Object not found.");
-        }
-        return nu;
+        getLogger().debug("submit", entry.toSummary());
+        entry = (MedusaEntry) getMedusaEntryDAO().put_(x, entry); // blocking
+        // entry = (MedusaEntry) getMedusaEntryDAO().find_(x, entry.getId());
+        return entry;
       } catch (Throwable t) {
-        getLogger().error("submit", entry.getIndex(), t.getMessage(), t);
+        getLogger().error("submit", entry.toSummary(), t.getMessage(), t);
         throw t;
       } finally {
         pm.log(x);

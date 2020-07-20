@@ -35,85 +35,17 @@ foam.CLASS({
     }
   ],
 
-  constants: [
-    {
-      name: 'GET_CLIENT_CMD',
-      value: 'GET_CLIENT_CMD',
-      type: 'String'
-    }
-  ],
-
   methods: [
-    {
-      name: 'getClientDAO',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'cmd',
-          type: 'foam.nanos.medusa.ClusterCommand'
-        }
-      ],
-      type: 'foam.dao.DAO',
-      javaCode: `
-      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      ClusterConfig config = support.getConfig(x, support.getConfigId());
-      DAO dao = (DAO) x.get(cmd.getServiceName());
-
-      if ( dao != null ) {
-        dao = (DAO) dao.cmd_(x, GET_CLIENT_CMD);
-        if ( dao != null ) {
-          if ( dao instanceof ClusterClientDAO ) {
-            ClusterClientDAO client = (ClusterClientDAO) dao;
-            if ( config.getId().equals(cmd.getHops()[cmd.getHops().length - 1]) ) {
-              // short circuiting - self to self.
-              getLogger().debug("short circuit");
-              return null;
-            }
-          }
-          return dao;
-        }
-      }
-      return null;
-      `
-    },
-    {
-      name: 'getMDAO',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'cmd',
-          type: 'foam.nanos.medusa.ClusterCommand'
-        }
-      ],
-      type: 'foam.dao.DAO',
-      javaCode: `
-      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      DAO dao = support.getMdao(x, cmd.getServiceName());
-      if ( dao == null ) {
-        getLogger().error("Service not found", cmd.getServiceName());
-        Throwable cause = new IllegalArgumentException("Service not found: "+cmd.getServiceName());
-        throw new ClusterException(cause.getMessage(), cause);
-      }
-      return dao;
-      `
-    },
     {
       name: 'put_',
       javaCode: `
       ClusterCommand cmd = (ClusterCommand) obj;
-      getLogger().debug("put_", "ClusterCommand", java.util.Arrays.toString(cmd.getHops()));
-
-      DAO dao = getClientDAO(x, cmd);
-      if ( dao != null ) {
-        return dao.put_(x, cmd);
+      DAO dao = (DAO) x.get(cmd.getServiceName());
+      if ( dao == null ) {
+        getLogger().error("DAO not found", cmd.getServiceName());
+        throw new ClusterException("DAO not found");
       }
-      dao = getMDAO(x, cmd);
+      getLogger().debug("put_", java.util.Arrays.toString(cmd.getHops()));
 
       FObject nu = cmd.getData();
       getLogger().debug("put_", "find_", nu.getClass().getSimpleName(), nu.getProperty("id"));
@@ -128,43 +60,26 @@ foam.CLASS({
       name: 'remove_',
       javaCode: `
       ClusterCommand cmd = (ClusterCommand) obj;
-      getLogger().debug("remove_", "ClusterCommand", java.util.Arrays.toString(cmd.getHops()));
-
-      DAO dao = getClientDAO(x, cmd);
-      if ( dao != null ) {
-        return dao.remove_(x, cmd);
+      DAO dao = (DAO) x.get(cmd.getServiceName());
+      if ( dao == null ) {
+        getLogger().error("DAO not found", cmd.getServiceName());
+        throw new ClusterException("DAO not found");
       }
-      dao = getMDAO(x, cmd);
+      getLogger().debug("remove_", java.util.Arrays.toString(cmd.getHops()));
       return dao.remove_(x, cmd.getData());
       `
     },
     {
       name: 'cmd_',
       javaCode: `
-      if ( ! (obj instanceof ClusterCommand) ) {
-        DAO delegate = getDelegate();
-        if ( delegate != null ) {
-          return delegate.cmd_(x, obj);
-        }
-        return obj;
-      }
-
       ClusterCommand cmd = (ClusterCommand) obj;
-      getLogger().debug("cmd_", "ClusterCommand", java.util.Arrays.toString(cmd.getHops()));
-      DAO dao = getClientDAO(x, cmd);
-      if ( dao != null ) {
-        return dao.cmd_(x, cmd);
+      DAO dao = (DAO) x.get(cmd.getServiceName());
+      if ( dao == null ) {
+        getLogger().error("DAO not found", cmd.getServiceName());
+        throw new ClusterException("DAO not found");
       }
-      dao = getMDAO(x, cmd);
-
-      if ( DOP.PUT == cmd.getDop() ) {
-        return dao.put_(x, cmd.getData());
-      } else if ( DOP.REMOVE == cmd.getDop() ) {
-        return dao.remove_(x, cmd.getData());
-      } else {
-        getLogger().warning("Unsupported operation", cmd.getDop().getLabel());
-        throw new ClusterException("Unsupported operation: "+cmd.getDop().getLabel(), new UnsupportedOperationException(cmd.getDop().getLabel()));
-      }
+      getLogger().debug("cmd_", java.util.Arrays.toString(cmd.getHops()));
+      return dao.cmd_(x, obj);
       `
     }
   ]

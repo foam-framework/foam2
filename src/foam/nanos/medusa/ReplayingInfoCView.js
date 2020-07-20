@@ -45,19 +45,20 @@ foam.CLASS({
         return this.Label.create({
           align: 'center',
           y: -25,
-          text$: this.complete$.map(function(i) {
-            if ( i > 0 && i < 1 ) {
-              let f = (i * 100).toFixed(2);
-              return f+'%';
+          text$: this.config$.map(function(c) {
+            if ( c.replayingInfo &&
+                 c.replayingInfo.replaying &&
+                 c.replayingInfo.replayIndex > 0 ) {
+              let complete = c.replayingInfo.percentComplete;
+              if ( complete && complete > 0 && complete < 1 ) {
+                let f = (complete * 100).toFixed(2);
+                return f+'%';
+              }
             }
             return '';
           })
         });
       }
-    },
-    {
-      name: 'eta',
-      class: 'String'
     },
     {
       name: 'etaLabel',
@@ -67,13 +68,16 @@ foam.CLASS({
         return this.Label.create({
           align: 'center',
           y: -15,
-          text$: this.eta$.map(function(i) { return i; })
+          text$: this.config$.map(function(c) {
+            if ( c.replayingInfo &&
+                 c.replayingInfo.replaying &&
+                 c.replayingInfo.replayIndex > 0 ) {
+              return c.replayingInfo.timeRemaining;
+            }
+            return c.replayingInfo && c.replayingInfo.tps > 0 && c.replayingInfo.tps;
+          })
         });
       }
-    },
-    {
-      name: 'index',
-      class: 'String'
     },
     {
       name: 'indexLabel',
@@ -83,13 +87,15 @@ foam.CLASS({
         return this.Label.create({
           align: 'center',
           y: +5,
-          text$: this.index$.map(function(i) { return i; })
+          text$: this.config$.map(function(c) {
+            if ( c.replayingInfo &&
+                 c.replayingInfo.index > 0 ) {
+              return c.replayingInfo.index;
+            }
+            return '';
+          })
         });
       }
-    },
-    {
-      name: 'replayIndex',
-      class: 'String'
     },
     {
       name: 'replayIndexLabel',
@@ -99,8 +105,15 @@ foam.CLASS({
         return this.Label.create({
           align: 'center',
           y: +15,
-          text$: this.replayIndex$.map(function(i) { return i; })
-        });
+          text$: this.config$.map(function(c) {
+            if ( c.replayingInfo &&
+                 c.replayingInfo.replaying &&
+                 c.replayingInfo.replayIndex > 0 ) {
+              return c.replayingInfo.replayIndex;
+            }
+            return '';
+          })
+       });
       }
     },
     {
@@ -114,10 +127,26 @@ foam.CLASS({
     async function initCView() {
       this.SUPER();
 
-      this.color = '';
       this.border = '';
       this.arcWidth = 1;
       this.alpha = 0.5;
+
+      this.start$ = this.config$.map(function(c) {
+        if ( c.replayingInfo &&
+             c.replayingInfo.replaying ) {
+          return (1 - c.replayingInfo.percentComplete ) * (2 * Math.PI);
+        }
+        return 0;
+      });
+
+      this.color = '';
+      this.color$ = this.config$.map(function(c) {
+        if ( c.replayingInfo &&
+             c.replayingInfo.replaying ) {
+          return 'cyan';
+        }
+        return '';
+      });
 
       this.add(this.completeLabel);
       this.add(this.etaLabel);
@@ -132,7 +161,7 @@ foam.CLASS({
         console.log('ReplayingInfoCView.refresh '+self.children.length);
         if ( self.config ) {
           self.config = await self.dao.find(self.config.id);
-          self.updateReplaying();
+//          self.updateReplaying();
           for ( var i = 0; i < self.children.length; i++ ) {
             let child = self.children[i];
             child.refresh && child.refresh(child);
@@ -141,28 +170,29 @@ foam.CLASS({
         }
       }
     },
-    {
-      name: 'updateReplaying',
-      code: function() {
-        if ( this.config.replayingInfo ) {
-          if ( this.config.replayingInfo.replaying &&
-               this.config.replayingInfo.replayIndex > 0 ) {
-            this.color = 'cyan';
-            this.start = (1 - this.config.replayingInfo.percentComplete ) * (2 * Math.PI);
-            this.complete = this.config.replayingInfo.percentComplete;
-            this.eta = this.config.replayingInfo.timeRemaining;
-            this.index = this.config.replayingInfo.index;
-            this.replayIndex = this.config.replayingInfo.replayIndex;
-          } else {
-            this.color = '';
-            this.complete = '';
-            this.eta == this.config.replayingInfo.tps;
-            this.index = this.config.replayingInfo.index;
-            this.replayIndex = '';
-          }
-        }
-      }
-    },
+    // {
+    //   name: 'updateReplaying',
+    //   code: function() {
+    //     if ( this.config.replayingInfo ) {
+    //       if ( this.config.replayingInfo.replaying &&
+    //            this.config.replayingInfo.replayIndex > 0 ) {
+    //         this.color = 'cyan';
+    //         // this.start = (1 - this.config.replayingInfo.percentComplete ) * (2 *
+    //                                                                          Math.PI);
+    //         // this.complete = this.config.replayingInfo.percentComplete;
+    //         // this.eta = this.config.replayingInfo.timeRemaining;
+    //         // this.index = this.config.replayingInfo.index;
+    //         // this.replayIndex = this.config.replayingInfo.replayIndex;
+    //       } else {
+    //         this.color = '';
+    //         // this.complete = '';
+    //         // this.eta == this.config.replayingInfo.tps;
+    //         // this.index = this.config.replayingInfo.index;
+    //         // this.replayIndex = '';
+    //       }
+    //     }
+    //   }
+    // },
     {
       name: 'handleClick',
       code: function(evt, element) {

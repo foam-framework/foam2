@@ -18,7 +18,8 @@ foam.CLASS({
   documentation: `Ledger entry.`,
 
   ids: [
-    'index'
+    'index',
+    'hash'
   ],
 
   tableColumns: [
@@ -115,15 +116,15 @@ foam.CLASS({
     {
       documentation: `Track Entries and Nodes - as we need consensus based on unique Entry.  If a node startup, stopped, started, the mediators would get the entry twice and if not distiguishing would assume two same hash copies, for example.`,
       name: 'consensusNodes',
-      class: 'List',
+      class: 'Map',
       visibility: 'RO',
-      factory: function() { return new []; },
-      javaFactory: 'return new java.util.ArrayList();',
+      factory: function() { return new {}; },
+      javaFactory: 'return new java.util.HashMap();',
       storageTransient: true,
       clusterTransient: true,
       tableWidth: 150,
       tableCellFormatter: function(value) {
-        this.add(value && value.join());
+        this.add(value && Object.values(value).join());
       }
     },
     {
@@ -190,10 +191,18 @@ foam.CLASS({
       name: 'toSummary',
       type: 'String',
       code: function() {
-        return this.index + ' ' + this.nSpecName;
+        return this.nSpecName + ':' + this.index;
       },
       javaCode: `
-        return getIndex() + " " + getNSpecName();
+        StringBuilder sb = new StringBuilder();
+        sb.append(getNSpecName());
+        sb.append(":");
+        sb.append(getIndex());
+        if ( ! foam.util.SafetyUtil.isEmpty(getHash()) ) {
+          sb.append(":");
+          sb.append(getHash().substring(0,7));
+        }
+        return sb.toString();
       `
     },
     {

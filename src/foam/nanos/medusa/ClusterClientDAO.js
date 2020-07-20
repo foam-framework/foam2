@@ -87,16 +87,18 @@ foam.CLASS({
       `
     },
     {
-      documentation: `If a ClusterServer is looking for MDAO return self so this Client will proxy to the next Server.`,
+      // documentation: `If a ClusterServer is looking for MDAO return self so this Client will proxy to the next Server.`,
       name: 'cmd_',
       javaCode: `
-      if ( ClusterServerDAO.GET_CLIENT_CMD.equals(obj) ) {
-        getLogger().debug("cmd", "GET_CLIENT_CMD");
-        return this;
-      }
+      // if ( ClusterServerDAO.GET_CLIENT_CMD.equals(obj) ) {
+      //   getLogger().debug("cmd", "GET_CLIENT_CMD");
+      //   return this;
+      // }
       if ( obj instanceof ClusterCommand ) {
+        getLogger().debug("cmd", "ClusterCommand");
         return submit(x, DOP.CMD, obj);
       }
+      getLogger().debug("cmd", "delegate", obj.getClass().getSimpleName(), obj.toString(), new Exception("stackTrace"));
       return getDelegate().cmd_(x, obj);
       `
     },
@@ -118,53 +120,44 @@ foam.CLASS({
       ],
       type: 'Object',
       javaCode: `
-       ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
+       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
 
      // REVIEW: set context to null after init so it's not marshalled across network. Periodically have contexts being marshalled
-      FObject fobj = null;
       ClusterCommand cmd = null;
       if ( obj instanceof ClusterCommand ) {
         cmd = (ClusterCommand) obj;
-        fobj = cmd;
-        cmd.addHop(x);
       } else {
-        fobj = (FObject) obj;
-        ((ContextAware) fobj).setX(null);
-        cmd = new ClusterCommand(x, getNSpec().getName(), dop, fobj);
+        ((ContextAware) obj).setX(null);
+        cmd = new ClusterCommand(x, getNSpec().getName(), dop, (FObject) obj);
       }
+      cmd.addHop(x);
       cmd.setX(null);
 
       int retryDelay = 10;
       while ( true ) {
         try {
-          ClusterConfig serverConfig = support.getNextServerConfig(getX());
-          DAO dao = support.getClientDAO(getX(), getServiceName(), getConfig(), serverConfig);
-          getLogger().debug("submit", "request", "dao", dao.getClass().getSimpleName(), dop.getLabel(), obj.getClass().getSimpleName(), fobj.getProperty("id"));
+          ClusterConfig serverConfig = support.getNextServerConfig(x);
+          DAO dao = support.getClientDAO(x, getServiceName(), getConfig(), serverConfig);
+          getLogger().debug("submit", "request", "dao", dao.getClass().getSimpleName(), dop.getLabel(), obj.getClass().getSimpleName());
 
-          FObject data = null;
           Object result = null;
-          if ( DOP.PUT == cmd.getDop() ) {
+          if ( DOP.PUT == dop ) {
             result = dao.put_(x, cmd);
-          } else if ( DOP.REMOVE == cmd.getDop() ) {
+          } else if ( DOP.REMOVE == dop ) {
             result = dao.remove_(x, cmd);
-          } else if ( DOP.CMD == cmd.getDop() ) {
+          } else if ( DOP.CMD == dop ) {
             result = dao.cmd_(x, cmd);
-            cmd = (ClusterCommand) dao.cmd_(x, cmd);
-            data = cmd.getData();
-          }
-          if ( result != null ) {
-            if ( result instanceof FObject ) {
-              data = (FObject) result;
-            } else if ( result instanceof ClusterCommand ) {
-              data = ((ClusterCommand) result).getData();
+            if ( result != null ) {
+              return result;
             }
-            getLogger().debug("submit", "response", "dao", dao.getClass().getSimpleName(), dop.getLabel(), data.getClass().getSimpleName(), data.getProperty("id"));
-          } else {
-            getLogger().debug("submit", "response", "dao", dao.getClass().getSimpleName(), dop.getLabel(), "null");
-
           }
+          if ( obj instanceof ClusterCommand ) {
+            getLogger().debug("submit", "response", "dao", dao.getClass().getSimpleName(), dop.getLabel(), (result != null ? result.getClass().getSimpleName() : "null"));
+            cmd.setData((FObject) result);
+            return cmd;
+          }
+          return result;
 
-          return data;
         } catch ( ClusterException e ) {
           getLogger().debug("submit", e.getClass().getSimpleName(), e.getMessage());
           throw e;

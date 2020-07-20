@@ -89,17 +89,17 @@ foam.CLASS({
               try {
                 DAO dao = (DAO) getClients().get(config.getId());
                 if ( dao == null ) {
-                  dao = (DAO) x.get(getServiceName());
-                  if ( dao != null ) {
-                    getLogger().debug("short circuit");
-                  } else {
+                  // dao = (DAO) x.get(getServiceName());
+                  // if ( dao != null ) {
+                  //   getLogger().debug("short circuit");
+                  // } else {
                     dao = support.getClientDAO(x, getServiceName(), myConfig, config);
                     dao = new RetryClientSinkDAO.Builder(x)
                             .setDelegate(dao)
                             .setMaxRetryAttempts(support.getMaxRetryAttempts())
                             .setMaxRetryDelay(support.getMaxRetryDelay())
                             .build();
-                  }
+                  // }
                   getClients().put(config.getId(), dao);
                 }
 

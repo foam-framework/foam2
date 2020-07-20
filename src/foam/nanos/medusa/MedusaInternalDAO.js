@@ -46,9 +46,10 @@ DAO stacks both end at x.get("internalMedusaEntryDAO").`,
     {
       name: 'put_',
       javaCode: `
-      MedusaEntry entry = (MedusaEntry) obj;
-      getLogger().debug("put", entry.getIndex(), "id", entry.getId(), "hash", entry.getHash());
-      return getDao().put_(x, entry);
+      // MedusaEntry entry = (MedusaEntry) obj;
+      // getLogger().debug("put", entry.getIndex(), "id", entry.toSummary(), "hash", entry.getHash());
+      // return getDao().put_(x, entry);
+      return getDao().put_(x, obj);
       `
     }
   ]

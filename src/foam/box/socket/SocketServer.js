@@ -86,7 +86,7 @@ foam.CLASS({
                     agency.submit(
                       x,
                       new SocketServerProcessor(getX(), client),
-                      "SocketServerProcessor-"+client.getRemoteSocketAddress()
+                      client.getRemoteSocketAddress().toString()
                     );
                   }
                 } catch ( IOException ioe ) {

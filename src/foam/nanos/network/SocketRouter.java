@@ -82,7 +82,10 @@ public class SocketRouter
     Object service = getX().get(serviceKey);
     NSpec spec = (NSpec) nSpecDAO_.find(serviceKey);
 
-    PM pm = new PM(this.getClass(), serviceKey);
+    foam.core.ClassInfoImpl clsInfo = new foam.core.ClassInfoImpl();
+    clsInfo.setObjClass(this.getClass());
+    clsInfo.setId(this.getClass().getSimpleName());
+    PM pm = PM.create(getX(), clsInfo, serviceKey);
 
     X requestContext = getX()
       .put("logger", new PrefixLogger(new Object[] {

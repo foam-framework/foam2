@@ -104,23 +104,23 @@ foam.CLASS({
         formatter.setX(getX());
         formatter.output(msg);
         String message = formatter.builder().toString();
-
-        int length = message.length();
-        int chunk = Math.max(0, Math.min(length, 200) - 1);
-        getLogger().debug("send", length, message.substring(0, chunk), "...", message.substring(length-chunk));
+        // getLogger().debug("message", message);
+        // int length = message.length();
+        // int chunk = Math.max(0, Math.min(length, 200) - 1);
+        // getLogger().debug("send", length, message.substring(0, chunk), "...", message.substring(length-chunk));
 
         byte[] messageBytes = message.getBytes(StandardCharsets.UTF_8);
-        //DataOutputStream out = (DataOutputStream) getX().get("socketOutputStream");
         synchronized( out ) {
           out.writeInt(messageBytes.length);
+          out.writeLong(System.currentTimeMillis());
           out.write(messageBytes);
-          // out.flush();
-          if ( flushId == flushId_.get() ) {
-            getLogger().debug("flush");
-            out.flush();
-          } else {
-            getLogger().debug("flush", "skip", flushId, flushId_.get());
-          }
+          // // out.flush();
+          // if ( flushId == flushId_.get() ) {
+          //   getLogger().debug("flush");
+          //   out.flush();
+          // } else {
+          //   getLogger().debug("flush", "skip", flushId, flushId_.get());
+          // }
         }
       } catch (Throwable t) {
         getLogger().error(t);

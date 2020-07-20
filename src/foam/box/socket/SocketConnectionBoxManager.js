@@ -20,7 +20,13 @@ foam.CLASS({
     'foam.core.X',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
-    'java.net.Socket'
+    'java.io.IOException',
+    'java.net.ConnectException',
+    'java.net.InetSocketAddress',
+    'java.net.Socket',
+    'java.net.SocketAddress',
+    'java.net.SocketException',
+    'java.net.SocketTimeoutException'
   ],
 
   properties: [
@@ -28,6 +34,12 @@ foam.CLASS({
       documentation: 'So not to block server shutdown, have sockets timeout. Catch and continue on SocketTimeoutException.',
       class: 'Int',
       name: 'soTimeout',
+      value: 60000
+    },
+    {
+      documentation: 'Time to wait on initial creation for connection to be established',
+      class: 'Int',
+      name: 'connectTimeout',
       value: 60000
     },
     {
@@ -72,7 +84,25 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      getBoxes().remove(makeKey(box.getHost(), box.getPort()));
+      if ( box != null ) {
+        getBoxes().remove(makeKey(box.getHost(), box.getPort()));
+
+        Socket socket = (Socket) box.getSocket();
+        if ( socket != null &&
+             socket.isConnected() ) {
+          try {
+            socket.getOutputStream().flush();
+          } catch (IOException e) {
+            // nop
+          }
+          try {
+            getLogger().debug("socket,close",socket.getRemoteSocketAddress());
+            socket.close();
+          } catch (IOException e) {
+            // nop
+          }
+        }
+      }
       `
     },
     {
@@ -116,16 +146,19 @@ foam.CLASS({
         }
 
         try {
-          Socket socket = new Socket(host, port);
+          Socket socket = new Socket();
           socket.setSoTimeout(getSoTimeout());
+          SocketAddress address = new InetSocketAddress(host, port);
+          socket.connect(address, getConnectTimeout());
           box = new SocketConnectionBox(x, socket, host, port);
-          Agency agency = (Agency) x.get("threadPool");
-          getLogger().debug("agency.submit", "SocketConnectionBox-"+makeKey(host, port));
-          agency.submit(x, (ContextAgent) box, "SocketConnectionBox-"+makeKey(host, port));
           add(box);
+          Agency agency = (Agency) x.get("threadPool");
+          agency.submit(x, (ContextAgent) box, socket.getRemoteSocketAddress().toString());
           return box;
-        } catch (java.net.ConnectException e) {
-          getLogger().debug(host, port, e.getMessage());
+        // } catch ( ConnectException | SocketException | SocketTimeoutException e ) {
+        } catch ( IOException e ) {
+          getLogger().error(host, port, e.getMessage());
+          remove(box);
           throw new RuntimeException(e);
         } catch ( Throwable t ) {
           remove(box);

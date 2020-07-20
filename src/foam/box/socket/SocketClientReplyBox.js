@@ -56,7 +56,11 @@ foam.CLASS({
         Box box = ((SocketConnectionBoxManager) x.get("socketConnectionBoxManager")).getReplyBox(x, socket.getRemoteSocketAddress().toString());
         box.send(msg);
       } else {
-        ((foam.nanos.logger.Logger) x.get("logger")).error(this.getClass().getSimpleName(), "send,Socket not found");
+        foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
+        if ( logger == null ) {
+          logger = new foam.nanos.logger.StdoutLogger();
+        }
+        logger.error(this.getClass().getSimpleName(), "send,Socket not found", "message abandoned", msg);
       }
       `
     }

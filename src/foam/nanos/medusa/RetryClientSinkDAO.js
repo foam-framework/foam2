@@ -124,14 +124,23 @@ foam.CLASS({
       int retryAttempt = 0;
       int retryDelay = 10;
 
-      getLogger().debug("submit", dop);
+      // getLogger().debug("submit", dop);
+
+      // TODO: Previously in RepayBatchSink. Need to decorate this sink.
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      if ( obj instanceof MedusaEntry ) {
+        MedusaEntry entry = (MedusaEntry) obj;
+        entry.setNode(support.getConfigId());
+      }
 
       while ( true ) {
         try {
           if ( DOP.PUT == dop ) {
-            return getDelegate().put_(getX(), (FObject)obj);
+            return getDelegate().put_(x, (FObject)obj);
+          } else if ( DOP.REMOVE == dop ) {
+            return getDelegate().remove_(x, (FObject)obj);
           } else if ( DOP.CMD == dop ) {
-            return getDelegate().cmd_(getX(), obj);
+            return getDelegate().cmd_(x, obj);
           } else {
             throw new UnsupportedOperationException("Unknown operation: "+dop);
           }
@@ -155,11 +164,12 @@ foam.CLASS({
             if ( retryDelay > getMaxRetryDelay() ) {
               retryDelay = 10;
             }
-            getLogger().debug("retry attempt", retryAttempt, "delay", retryDelay);
+            getLogger().info("retry attempt", retryAttempt, "delay", retryDelay);
             Thread.sleep(retryDelay);
           } catch(InterruptedException e) {
             Thread.currentThread().interrupt();
-            getLogger().debug("InterruptedException");
+            // getLogger().debug("InterruptedException");
+            break;
           }
         }
       }

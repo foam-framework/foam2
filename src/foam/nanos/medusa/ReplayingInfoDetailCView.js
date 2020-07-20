@@ -52,6 +52,15 @@ foam.CLASS({
       this.border = 'blue';
       this.color = 'white';
 
+//       var view = foam.graphics.ViewCView.create({
+// //        innerView: this.config.replayingInfo.toE(null, this)
+//         innerView: foam.u2.DetailView.create({
+//           data: this.config.replayingInfo
+//         })
+//       });
+//       this.add(view);
+//       return;
+
       var label = this.makeLabel();
       label.text = this.config.name;
       this.add(label);
@@ -129,7 +138,6 @@ foam.CLASS({
       name: 'handleClick',
       code: function(evt, element) {
         console.log('ReplayingInfoDetailCView.handleClick');
-        //this.parent.remove(this);
         element.canvas.remove(this);
       }
     }

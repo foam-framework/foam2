@@ -56,6 +56,11 @@ foam.CLASS({
     {
       name: 'exception',
       class: 'Object'
+    },
+    {
+      name: 'medusaEntryId',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.medusa.MedusaEntryId'
     }
   ],
 
@@ -69,7 +74,7 @@ foam.CLASS({
     setServiceName(serviceName);
     setDop(dop);
     setData(data);
-    addHop(x);
+    // addHop(x);
     java.util.Random r = ThreadLocalRandom.current();
     setId(new UUID(r.nextLong(), r.nextLong()).toString());
   }

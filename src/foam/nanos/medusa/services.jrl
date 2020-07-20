@@ -136,6 +136,7 @@ p({
   "client": "{\"of\":\"foam.nanos.medusa.ReplayingInfo\"}"
 })
 
+// Enabled in mm services
 // p({
 //   "class":"foam.nanos.boot.NSpec",
 //   "name":"clusterTopologyMonitor",
@@ -149,6 +150,7 @@ p({
   "serviceScript": """
     dao = new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.medusa.ClusterConfig.getOwnClassInfo())
+//      .setInnerDAO((foam.dao.DAO) x.get("localClusterConfigDAO"))
       .setCluster(false)
       .setRuler(false)
       .setAuthorize(false)

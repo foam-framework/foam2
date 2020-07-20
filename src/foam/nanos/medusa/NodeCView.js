@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.nanos.medusa',
   name: 'NodeCView',
-  extends: 'foam.physics.PhysicalCircle',
+  extends: 'foam.graphics.Circle',
 
   implements: [ 'foam.mlang.Expressions' ],
 
@@ -75,8 +75,29 @@ foam.CLASS({
     async function initCView() {
       this.SUPER();
 
-      this.arcWidth = 3;
       this.color = 'white';
+
+      this.border = 'green';
+      this.border$ = this.config$.map(function(c) {
+        if ( c.status == this.Status.OFFLINE ) {
+          if ( c.errorMessage ) {
+            return 'red';
+          } else {
+            return 'orange';
+          }
+        } else if ( c.status == this.Status.ONLINE ) {
+          return 'green';
+        }
+      }.bind(this));
+
+      this.arcWidth = 3;
+      this.arcWidth$ = this.config$.map(function(c) {
+        if ( c.type == this.MedusaType.MEDIATOR &&
+             c.isPrimary ) {
+          return 6;
+        }
+        return 3;
+      }.bind(this));
 
       var label = this.Label.create({
         text: this.config.name,
@@ -85,17 +106,14 @@ foam.CLASS({
       });
       this.add(label);
 
-      // if ( this.config.type == this.MedusaType.MEDIATOR ||
-      //      this.config.type == this.MedusaType.NERF ) {
+      if ( this.config.replayingInfo ) {
         var replay = this.ReplayingInfoCView.create({
           config: this.config,
           radius: this.radius - this.arcWidth
-          // radius$: this.radius$.map(function(r) {
-          //   return r - this.arcWidth;
-          // }),
         });
         this.add(replay);
-      // }
+      }
+
       this.refresh();
     },
     {
@@ -104,39 +122,11 @@ foam.CLASS({
         console.log('NodeCView.refresh '+self.children.length);
         if ( self.config ) {
           self.config = await self.dao.find(self.config.id);
-          self.updateStatus();
-          self.updatePrimary();
-          for ( var i = 0; i < self.children.length; i++ ) {
+         for ( var i = 0; i < self.children.length; i++ ) {
             let child = self.children[i];
             child.refresh && child.refresh(child);
           }
           self.invalidate();
-        }
-      }
-    },
-    {
-      name: 'updateStatus',
-      code: function() {
-        if ( this.config.status == this.Status.OFFLINE ) {
-          if ( this.config.errorMessage ) {
-            this.border = 'red';
-          } else {
-            this.border = 'orange';
-          }
-        } else if ( this.config.status == this.Status.ONLINE ) {
-          this.border = 'green';
-        }
-      }
-    },
-    {
-      name: 'updatePrimary',
-      code: function() {
-        if ( this.config.type == this.MedusaType.MEDIATOR ) {
-          if ( this.config.isPrimary ) {
-            this.arcWidth = 6;
-          } else {
-            this.arcWidth = 3;
-          }
         }
       }
     }

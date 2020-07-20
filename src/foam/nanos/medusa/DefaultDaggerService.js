@@ -134,7 +134,6 @@ foam.CLASS({
       entry.setIndex2(-1L);
       entry.setHash2("9232622261b1df4dff84067b2df22ecae387162742626326216bf9b4d0d29a3f");
       entry.setHash(hash(getX(), entry));
-      entry.setPromoted(true);
       entry = (MedusaEntry) dao.put_(getX(), entry);
       updateLinks(getX(), entry);
 
@@ -146,7 +145,6 @@ foam.CLASS({
       entry.setIndex2(-1L);
       entry.setHash2("50c1071e836bdd4f2d4b5907bb6090fae6891d6cacdb70dcd72770bfd43dc814");
       entry.setHash(hash(getX(), entry));
-      entry.setPromoted(true);
       entry = (MedusaEntry) dao.put_(getX(), entry);
       updateLinks(getX(), entry);
      `
@@ -169,7 +167,7 @@ foam.CLASS({
       name: 'hash',
       javaCode: `
       // TODO: also getProvider
-      PM pm = createPM(x, "hash");
+      PM pm = PM.create(x, DefaultDaggerService.getOwnClassInfo(), "hash");
       try {
 //      getLogger().debug("hash", entry.getIndex(), entry.getIndex1(), entry.getIndex2());
       getLogger().debug("hash", entry.getIndex(), "1", entry.getIndex1(), entry.getHash1());
@@ -203,7 +201,7 @@ foam.CLASS({
       documentation: 'Verify entry hash, and compare hashes of parent indexes.',
       name: 'verify',
       javaCode: `
-      PM pm = createPM(x, "verify");
+      PM pm = PM.create(x, DefaultDaggerService.getOwnClassInfo(), "verify");
       try {
         getLogger().debug("verify", entry.getIndex(), entry.getIndex1(), entry.getIndex2());
 
@@ -214,14 +212,14 @@ foam.CLASS({
         DAO dao = getDao();
         MedusaEntry parent1 = (MedusaEntry) dao.find(EQ(MedusaEntry.INDEX, entry.getIndex1()));
         if ( parent1 == null ) {
-          getLogger().error("verify", entry.getIndex(), "parent not found", entry.getIndex1(), "entry", entry.getId());
-          throw new DaggerException("Hash Verification Failed on: "+entry.getId());
+          getLogger().error("verify", entry.getIndex(), "parent not found", entry.getIndex1(), "entry", entry.toSummary());
+          throw new DaggerException("Hash Verification Failed on: "+entry.toSummary());
         }
         MedusaEntry parent2 = (MedusaEntry) dao.find(EQ(MedusaEntry.INDEX, entry.getIndex2()));
         if ( parent2 == null ) {
-          getLogger().error("verify", entry.getIndex(), "parent not found", entry.getIndex2(), "entry", entry.getId());
+          getLogger().error("verify", entry.getIndex(), "parent not found", entry.getIndex2(), "entry", entry.toSummary());
 // TODO: Add Index to exception.
-          throw new DaggerException("Hash Verification Failed on: "+entry.getId());
+          throw new DaggerException("Hash Verification Failed on: "+entry.toSummary());
         }
 
         try {
@@ -242,8 +240,8 @@ foam.CLASS({
             calculatedHash = byte2Hex(md.digest());
           }
           if ( ! calculatedHash.equals(entry.getHash()) ) {
-            getLogger().error("verify", entry.getIndex(), "hash", "fail", entry.getId());
-//            throw new DaggerException("Hash verification failed on: "+entry.Id());
+            getLogger().error("verify", entry.getIndex(), "hash", "fail", entry.toSummary());
+            throw new DaggerException("Hash verification failed on: "+entry.toSummary());
           }
         } catch ( java.security.NoSuchAlgorithmException e ) {
           getLogger().error(e);
@@ -303,23 +301,6 @@ foam.CLASS({
       javaCode: `
       setIndex(getIndex() + 1);
       return getIndex();
-      `
-    },
-    {
-      name: 'createPM',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'name',
-          type: 'String'
-        }
-      ],
-      javaType: 'PM',
-      javaCode: `
-      return PM.create(x, DefaultDaggerService.getOwnClassInfo(), name);
       `
     }
   ]

@@ -39,8 +39,6 @@ configuration for contacting the primary node.`,
     'foam.mlang.predicate.Predicate',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
-    'foam.nanos.om.OMBox',
-    'foam.nanos.pm.PMBox',
     'foam.net.Host',
     'foam.util.SafetyUtil',
     'java.net.HttpURLConnection',
@@ -684,11 +682,7 @@ configuration for contacting the primary node.`,
         client = new ClientDAO.Builder(x)
         .setDelegate(new SessionClientBox.Builder(x)
           .setSessionID(sendClusterConfig.getSessionId())
-          .setDelegate(new PMBox.Builder(x)
-            .setClassType(ClientDAO.getOwnClassInfo())
-            .setName(id)
-            .setDelegate(getTransportlayerBox(x, serviceName, sendClusterConfig, receiveClusterConfig, true))
-            .build())
+          .setDelegate(getTransportlayerBox(x, serviceName, sendClusterConfig, receiveClusterConfig, true))
           .build())
         .build();
       // }

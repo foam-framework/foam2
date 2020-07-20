@@ -63,7 +63,6 @@ foam.CLASS({
               public void execute(X x) {
                 try {
                   FObject o = (FObject) entry.getValue();
-        getLogger().debug("cmd", "BatchCmd", cmd.getHostname(), o.toString());
                   getDelegate().put_(x, (FObject) entry.getValue());
                 } catch ( Throwable t ) {
                   getLogger().error(t);

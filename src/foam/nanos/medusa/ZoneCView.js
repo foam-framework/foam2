@@ -95,7 +95,7 @@ foam.CLASS({
     },
     {
       name: 'refresh',
-      code: async function(self) {
+      code: async function(self = this) {
         console.log('ZoneCView.refresh '+self.children.length);
         if ( self.config ) {
           self.config = await self.dao.find(self.config.id);

@@ -73,13 +73,13 @@ foam.CLASS({
       try {
         DAO dao = support.getClientDAO(getX(), "clusterConfigDAO", myConfig, config);
         ClusterConfig remote = (ClusterConfig) dao.find(config.getId());
-        getLogger().debug(config.getId(), "remote", remote);
+        // getLogger().debug(config.getId(), "remote", remote);
         if ( remote != null ) {
           remote = (ClusterConfig) remote.fclone();
           config = (ClusterConfig) getDao().put_(getX(), remote);
         }
       } catch (Throwable t) {
-        getLogger().debug(config.getId(), t.getClass().getSimpleName(), t.getMessage());
+        getLogger().warning(config.getId(), t.getClass().getSimpleName(), t.getMessage());
         config = (ClusterConfig) config.fclone();
         Throwable cause = t.getCause();
         if ( cause != null &&
