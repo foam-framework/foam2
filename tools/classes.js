@@ -65,6 +65,7 @@ var classes = [
   'foam.mlang.ArrayConstant',
   'foam.mlang.expr.Dot',
   'foam.mlang.expr.PropertyExpr',
+  'foam.mlang.expr.Ref',
   'foam.mlang.expr.DateTypes',
   'foam.mlang.expr.DateGrouping',
   'foam.mlang.expr.DateGroupingExpr',
