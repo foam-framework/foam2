@@ -87,7 +87,7 @@ foam.CLASS({
       expression: function(of) {
         return ! of ? [] : [].concat(
           of.getAxiomsByClass(foam.core.Property)
-            .filter(p => p.tableCellFormatter && ! p.hidden && ! p.networkTransient )
+            .filter(p => ! p.hidden && ! p.networkTransient )
             .map(a => a.name),
           of.getAxiomsByClass(foam.core.Action)
             .map(a => a.name)
@@ -566,7 +566,7 @@ foam.CLASS({
                     var column;
                     if ( ! foam.core.Reference.isInstance(view.props[i]) && ! foam.core.FObjectProperty.isInstance(view.props[i]) )
                       column = view.columns.find( c => !foam.String.isInstance(c) && c.name === view.props[i].name && ! propertyNamesToQuery[i].includes('.') );
-                    if ( view.props[i].tableCellFormatter || ( column && column.tableCellFormatter ) ) {
+                    if ( ! view.props[i].unitPropValueToString || view.props[i].tableCellFormatter || ( column && column.tableCellFormatter ) ) {
                       var elmt = this.E().addClass(view.myClass('td')).style({flex: column && column.tableWidth ? `0 0 ${column.tableWidth}px` : view.props[i] && view.props[i].tableWidth  ? `0 0 ${view.props[i].tableWidth}px` : '1 0 0'});//, 'justify-content': 'center'
                       try {
                         if ( column && column.tableCellFormatter )
