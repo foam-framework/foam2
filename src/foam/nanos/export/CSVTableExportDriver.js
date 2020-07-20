@@ -36,14 +36,11 @@ foam.CLASS({
       });
     },
     async function exportDAO(X, dao) {
-      var columnConfig = X.columnConfigToPropertyConverter;
-
       var propNames = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(dao.of);
-      propNames = columnConfig.filterExportedProps(dao.of, propNames);
 
       var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(dao.of, propNames);
       return dao.select(expr).then( (values) => {
-        return this.outputter.returnTable(X, columnConfig.returnProperties(dao.of, propNames), values.array).then( values => {
+        return this.outputter.returnTable(X, dao.of, propNames, values.array).then( values => {
           var ouputter = foam.nanos.column.CSVTableOutputter.create();
           return ouputter.arrayToCSV(values);
         }); 

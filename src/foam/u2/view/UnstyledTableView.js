@@ -317,7 +317,7 @@ foam.CLASS({
 
                   if ( checked ) {
                     view.selectedObjects = {};
-                    view.data.select(function(obj) {//FIX ME
+                    view.data.select(function(obj) {
                       view.selectedObjects[obj.id] = obj;
                     });
                   } else {
@@ -355,7 +355,7 @@ foam.CLASS({
                       this.style({ flex: '1 0 0' });
                     }
                   }).
-                  call(column && column.tableHeaderFormatter ? column.tableHeaderFormatter : prop.tableHeaderFormatter, [column && column.tableHeaderFormatter ? column : prop]).
+                  add(view.__subContext__.columnConfigToPropertyConverter.returnColumnHeader(view.of, col)).
                   callIf(isFirstLevelProperty && prop.sortable, function() {
                     this.on('click', function(e) {
                       view.sortBy(prop);
