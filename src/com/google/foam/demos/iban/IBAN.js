@@ -277,6 +277,16 @@ foam.CLASS({
         iban = this.next(iban);
         console.log(this.format(iban));
       }
+
+      var a = [];
+//      iban = 'DE88503303002716409700';
+      iban = 'GB76BARC20060523908000';
+      for ( var i = 0 ; i <= 1000 ; i++ ) {
+        a.push(iban);
+        iban = this.next(iban);
+        console.log(this.format(iban));
+      }
+      console.log(JSON.stringify(a));
     }
   ]
 });
