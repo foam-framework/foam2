@@ -67,7 +67,7 @@ foam.CLASS({
             if ( ! axiom || axiom.networkTransient ) {
               continue;
             }
-            rootProperty = [ axiom.name, axiom.label ? axiom.label : axiom.name ];
+            rootProperty = [ axiom.name, axiom.tableHeader ? axiom.tableHeader() : axiom.label ];
           } else 
             rootProperty = data.selectedColumnNames[i];
 
@@ -107,7 +107,7 @@ foam.CLASS({
             axiom = axiom || data.of.getAxiomByName(notSelectedColumns[i]);
             if ( axiom.networkTransient )
               continue;
-            rootProperty = [ axiom.name, axiom.label ? axiom.label : axiom.name ];
+            rootProperty = [ axiom.name, axiom.tableHeader ? axiom.tableHeader() : axiom.label ];
           } else 
             rootProperty = notSelectedColumns[i];
           
@@ -120,8 +120,8 @@ foam.CLASS({
           }));
         }
         nonSelectedViewModels.sort((a, b) => { 
-          var aName = foam.Array.isInstance(a.rootProperty) ?  a.rootProperty[1] : a.rootProperty.label ? a.rootProperty.label : a.rootProperty.name;
-          var bName = foam.Array.isInstance(b.rootProperty) ? b.rootProperty[1] : b.rootProperty.label ? b.rootProperty.label : b.rootProperty.name;
+          var aName = foam.Array.isInstance(a.rootProperty) ?  a.rootProperty[1] : a.rootProperty.tableHeader ? a.rootProperty.label : a.rootProperty.tableHeader();
+          var bName = foam.Array.isInstance(b.rootProperty) ? b.rootProperty[1] : b.rootProperty.tableHeader ? b.rootProperty.label : b.rootProperty.tableHeader();
           return aName.toLowerCase().localeCompare(bName.toLowerCase());
         });
         arr = arr.concat(nonSelectedViewModels);
@@ -444,7 +444,7 @@ foam.CLASS({
             .end()
             .start('span')
               .style({'padding-left' : this.data.isPropertySelected$.map(function(s) { return s ? '4px' : '13px';})})
-              .add(foam.Array.isInstance(this.data.rootProperty) ? this.data.rootProperty[1] : this.data.rootProperty.label)
+              .add(foam.Array.isInstance(this.data.rootProperty) ? this.data.rootProperty[1] : this.data.rootProperty.tableHeader ? this.data.rootProperty.tableHeader() : this.data.rootProperty.tableHeader.label)
             .end()
             .start('span')
               .show(this.data.hasSubProperties)
@@ -586,7 +586,7 @@ foam.CLASS({
           return [];
         var r = this.of.getAxiomByName(foam.Array.isInstance(rootProperty) ? this.rootProperty[0] : rootProperty.name);
         if ( r && r.cls_ && ( foam.core.FObjectProperty.isInstance(r) || foam.core.Reference.isInstance(r) ) )
-          return r.of.getAxiomsByClass(foam.core.Property).map(p => [p.name, p.label ? p.label : p.name]);
+          return r.of.getAxiomsByClass(foam.core.Property).map(p => [p.name, p.tableHeader ? p.tableHeader() : p.tableHeader.label]);
         return [];
       }
     },

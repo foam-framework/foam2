@@ -60,7 +60,7 @@ foam.CLASS({
             cls.getAxiomByName(propNames[i][0]) : propNames[i];
             if ( ! property )
               return '';
-            columnHeader.push(property.label);
+            columnHeader.push(property.tableHeader());
             cls = property.of;
           }
         } else {
@@ -71,8 +71,8 @@ foam.CLASS({
               columnHeader.push('-');
             else {
               property = cls.getAxiomByName(propName.name);
-              if ( property && property.label )
-                columnHeader.push(propName.label);
+              if ( property )
+                columnHeader.push(propName.tableHeader());
               else
                 columnHeader.push('-');
             }
@@ -243,7 +243,21 @@ foam.CLASS({
       }
       return arr;
     },
-    
+    function returnPropertyLabel(propName) {
+      if ( propName.label )
+            columnHeader.push(propName.label);
+          else {
+            if ( ! propName.name )
+              columnHeader.push('-');
+            else {
+              property = cls.getAxiomByName(propName.name);
+              if ( property )
+                columnHeader.push(propName.tableHeader());
+              else
+                columnHeader.push('-');
+            }
+          }
+    }
   ]
 });
 
