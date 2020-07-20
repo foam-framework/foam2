@@ -34,6 +34,54 @@ foam.CLASS({
       }
     },
     {
+      name: 'returnColumnHeader',
+      type: 'String',
+      args: [
+        {
+          name: 'of',
+          type: 'ClassInfo'
+        },
+        {
+          name: 'propName',
+          class: 'String'
+        }
+      ],
+      code: function(of, propName) {
+        var cls = of;
+        var property;
+        var columnHeader = [];
+
+        if ( foam.String.isInstance(propName) ) {
+          var propNames = propName.split('.');
+          for ( var i = 0 ; i < propNames.length ; i++ ) {
+            property = foam.String.isInstance(propNames[i])
+            ? cls.getAxiomByName(propNames[i])
+            :  foam.Array.isInstance(propNames[i]) ? 
+            cls.getAxiomByName(propNames[i][0]) : propNames[i];
+            if ( ! property )
+              return '';
+            columnHeader.push(property.label);
+            cls = property.of;
+          }
+        } else {
+          if ( propName.label )
+            columnHeader.push(propName.label);
+          else {
+            if ( ! propName.name )
+              columnHeader.push('-');
+            else {
+              property = cls.getAxiomByName(propName.name);
+              if ( property && property.label )
+                columnHeader.push(propName.label);
+              else
+                columnHeader.push('-');
+            }
+          }
+        }
+        return columnHeader.join('/');
+      }
+    },
+    {
       name: 'returnProperty',
       documentation: 'returns last property for chain of properties e.g. city property for address.city',
       type: 'PropertyInfo',
