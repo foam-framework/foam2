@@ -132,6 +132,11 @@ foam.CLASS({
       name: 'hideX',
       class: 'Boolean',
       value: false
+    },
+    {
+      name: 'backDisabled',
+      class: 'Boolean',
+      value: false
     }
   ],
 
@@ -254,6 +259,9 @@ foam.CLASS({
       label: 'back',
       isEnabled: function (data$canGoBack) {
         return data$canGoBack;
+      },
+      isAvailable: function (backDisabled) {
+        return ! backDisabled;
       },
       code: function() {
         this.data.back();
