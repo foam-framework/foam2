@@ -242,21 +242,6 @@ foam.CLASS({
         arr.push(this.returnProperty(of, prop));
       }
       return arr;
-    },
-    function returnPropertyLabel(propName) {
-      if ( propName.label )
-            columnHeader.push(propName.label);
-          else {
-            if ( ! propName.name )
-              columnHeader.push('-');
-            else {
-              property = cls.getAxiomByName(propName.name);
-              if ( property )
-                columnHeader.push(propName.tableHeader());
-              else
-                columnHeader.push('-');
-            }
-          }
     }
   ]
 });
