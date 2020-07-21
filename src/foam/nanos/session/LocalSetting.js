@@ -1,13 +1,9 @@
 foam.CLASS({
-  package: 'foam.nanos.session.local_settings',
+  package: 'foam.nanos.session',
   name: 'LocalSetting',
   properties: [
     {
       name: 'id',
-      class: 'Long'
-    },
-    {
-      name: 'name',
       class: 'String'
     },
     {

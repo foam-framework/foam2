@@ -229,6 +229,9 @@ foam.CLASS({
         // used as the argument to this method.
         X rtn = reset(x);
 
+        DAO localSettingsDAO = new foam.dao.MDAO(foam.nanos.session.LocalSetting.getOwnClassInfo());
+        rtn = rtn.put("localSettingsDAO", localSettingsDAO);
+
         if ( getUserId() == 0 ) {
           HttpServletRequest req = x.get(HttpServletRequest.class);
           if ( req == null ) {
@@ -248,10 +251,6 @@ foam.CLASS({
           appConfig = appConfig.configure(x, null);
 
           rtn = rtn.put("appConfig", appConfig);
-
-          DAO localSettingsDAO = new foam.dao.MDAO(foam.nanos.session.local_settings.LocalSetting.getOwnClassInfo());
-          rtn.put("localSettingsDAO", localSettingsDAO);
-
           return rtn;
         }
 
@@ -274,7 +273,8 @@ foam.CLASS({
           .put("subject", subject)
           .put("logger", new PrefixLogger(prefix, (Logger) x.get("logger")))
           .put("twoFactorSuccess", getContext().get("twoFactorSuccess"))
-          .put(CachingAuthService.CACHE_KEY, getContext().get(CachingAuthService.CACHE_KEY));
+          .put(CachingAuthService.CACHE_KEY, getContext().get(CachingAuthService.CACHE_KEY))
+          .put("lala", "laksal");
 
         if ( user != null ) {
           rtn = rtn.put("spid", user.getSpid());
