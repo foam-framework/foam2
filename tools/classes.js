@@ -289,6 +289,7 @@ var classes = [
   'foam.nanos.session.Session',
   'foam.nanos.session.SessionService',
   'foam.nanos.session.SimpleSessionService',
+  'foam.nanos.session.local_settings.LocalSetting',
   'foam.nanos.session.services.ClientLocalSettingsServiceImpl',
   'foam.nanos.session.services.LocalSettingsService',
   'foam.nanos.session.services.LocalSettingsServiceImpl',

@@ -549,6 +549,8 @@ foam.CLASS({
       } else if ( this.theme ) {
         this.window.location.hash = this.theme.defaultMenu;
       }
+
+      this.__subContext__.localSettingsDAO.put(foam.nanos.session.local_settings.LocalSetting.create({name: 'homeDenomination', value: 'USD'}));
     },
 
     function menuListener(m) {

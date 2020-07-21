@@ -249,6 +249,9 @@ foam.CLASS({
 
           rtn = rtn.put("appConfig", appConfig);
 
+          DAO localSettingsDAO = new foam.dao.MDAO(foam.nanos.session.local_settings.LocalSetting.getOwnClassInfo());
+          rtn.put("localSettingsDAO", localSettingsDAO);
+
           return rtn;
         }
 
