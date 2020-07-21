@@ -125,10 +125,6 @@ foam.CLASS({
             (logedInUser) => {
               if ( ! logedInUser ) return;
 
-              try {
-                X.localSettingsService.addHomeDenomination(X, localStorage.getItem('homeDenomination'));
-              } catch(e) {}
-
               if ( this.token_ ) {
                 logedInUser.signUpToken = this.token_;
                 this.dao_.put(logedInUser)

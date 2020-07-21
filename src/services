@@ -1105,27 +1105,6 @@ p({
 })
 
 p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "localSettingsService",
-  "lazy": false,
-  "serve": true,
-  "authenticate": true,
-  "boxClass": "foam.nanos.session.services.LocalSettingsServiceSkeleton",
-  "serviceClass": "foam.nanos.session.services.LocalSettingsServiceImpl",
-  "client":"""
-    {
-      "class": "foam.nanos.session.services.ClientLocalSettingsServiceImpl",
-      "delegate":
-        {
-          "class": "foam.box.HTTPBox",
-          "url": "service/localSettingsService"
-        }
-    }
-  """
-})
-
-
-p({
   "class":"foam.nanos.boot.NSpec",
   "name":"localSettingDAO",
   "lazy":false,

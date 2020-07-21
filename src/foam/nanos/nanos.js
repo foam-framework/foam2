@@ -117,8 +117,6 @@ FOAM_FILES([
   { name: "foam/nanos/session/Session" },
   { name: "foam/nanos/session/SessionTimer" },
   { name: "foam/nanos/session/SessionService" },
-  { name: "foam/nanos/session/services/ClientLocalSettingsServiceImpl" },
-  { name: "foam/nanos/session/services/LocalSettingsService" },
   { name: "foam/nanos/menu/XRegistration" },
   { name: "foam/nanos/menu/AbstractMenu" },
   { name: "foam/nanos/menu/DAOMenu" },
