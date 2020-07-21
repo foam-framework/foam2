@@ -1123,3 +1123,25 @@ p({
     }
   """
 })
+
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"localSettingDAO",
+  "lazy":false,
+  "serve":true,
+  "authenticate": false,
+  "serviceScript":"""
+    import foam.dao.DAO;
+    dao = x.get("localLocalSettingDAO");
+
+    if(dao == null)
+      dao = new foam.dao.NullDAO(x, foam.nanos.session.LocalSetting.getOwnClassInfo());
+    return new foam.dao.EasyDAO.Builder(x)
+      .setInnerDAO(dao)
+      .setAuthorize(false)
+      .setOf(foam.nanos.session.LocalSetting.getOwnClassInfo())
+      .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.session.LocalSetting\", \"remoteListenerSupport\": false}"
+})
