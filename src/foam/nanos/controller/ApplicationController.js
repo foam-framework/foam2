@@ -399,32 +399,40 @@ foam.CLASS({
 
     async function fetchLanguage() {
       try {
-        let ctx = this.__subContext__;
-        let d = await  this.__subContext__.LocaleDAO;
-        d.select().then(e => {
-          console.log( e )
-          let arr = e.array;
-          arr.forEach(ea =>
-            {
-              let s = null;
-              try {
-                let i, obj;
-                do {
-                  i = ea.source.indexOf('.',++i);
-                  if (i != -1) {
-                    s = eval(ea.source.substring(0,i))
+        let l = localStorage.getItem('localeLanguage');
+        if ( l !== undefined ) foam.locale = l;
+        //TODO manage more complicated language. 'en-CA'
+        if ( foam.locale !== 'en' && foam.locale !== 'en-US' ) {
+          let ctx = this.__subContext__;
+          let d = await  this.__subContext__.LocaleDAO;
+          d.select().then(e => {
+            var expr = foam.mlang.Expressions.create();
+            d.where(expr.EQ(foam.i18n.Locale.LOCALE, foam.locale)).select().then(e => {
+              console.log( e )
+              let arr = e.array;
+              arr.forEach(ea =>
+                {
+                  let s = null;
+                  try {
+                    let i, obj;
+                    do {
+                      i = ea.source.indexOf('.',++i);
+                      if (i != -1) {
+                        s = eval(ea.source.substring(0,i))
+                      }
+                    } while (i > 0 && !!s);
                   }
-                } while (i > 0 && !!s);
-              }
-              catch(err) {
-                console.log(ea.source)
-                console.log(err)
-              }
-              if (!!s) {
-                s[ea.source.substring(ea.source.lastIndexOf('.')+1)] = ea.target;
-              }
+                  catch(err) {
+                    console.log(ea.source)
+                    console.log(err)
+                  }
+                  if (!!s) {
+                    s[ea.source.substring(ea.source.lastIndexOf('.')+1)] = ea.target;
+                  }
+                })
             })
-        })
+          })
+        }
       } catch (err) {//TODO
         this.notify(this.LANGUAGE_FETCH_ERR, 'error');
         console.error(err.message || this.LANGUAGE_FETCH_ERR);
