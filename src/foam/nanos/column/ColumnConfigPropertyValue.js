@@ -34,6 +34,54 @@ foam.CLASS({
       }
     },
     {
+      name: 'returnColumnHeader',
+      type: 'String',
+      args: [
+        {
+          name: 'of',
+          type: 'ClassInfo'
+        },
+        {
+          name: 'propName',
+          class: 'String'
+        }
+      ],
+      code: function(of, propName) {
+        var cls = of;
+        var property;
+        var columnHeader = [];
+
+        if ( foam.String.isInstance(propName) ) {
+          var propNames = propName.split('.');
+          for ( var i = 0 ; i < propNames.length ; i++ ) {
+            property = foam.String.isInstance(propNames[i])
+            ? cls.getAxiomByName(propNames[i])
+            :  foam.Array.isInstance(propNames[i]) ? 
+            cls.getAxiomByName(propNames[i][0]) : propNames[i];
+            if ( ! property )
+              return '';
+            columnHeader.push(property.tableHeader());
+            cls = property.of;
+          }
+        } else {
+          if ( propName.label )
+            columnHeader.push(propName.label);
+          else {
+            if ( ! propName.name )
+              columnHeader.push('-');
+            else {
+              property = cls.getAxiomByName(propName.name);
+              if ( property )
+                columnHeader.push(propName.tableHeader());
+              else
+                columnHeader.push('-');
+            }
+          }
+        }
+        return columnHeader.join('/');
+      }
+    },
+    {
       name: 'returnProperty',
       documentation: 'returns last property for chain of properties e.g. city property for address.city',
       type: 'PropertyInfo',
@@ -81,7 +129,8 @@ foam.CLASS({
               if ( p instanceof foam.core.AbstractFObjectPropertyInfo ) {
                 cls = p.getValueClass();
               } else {
-                Method m = ci.getObjClass().getMethod(StringUtil.capitalize(p.getName()), foam.core.X.class);
+                sb.append(StringUtil.capitalize(p.getName()));
+                Method m = ci.getObjClass().getMethod(sb.toString(), foam.core.X.class);
                 cls = m.getReturnType();
                 //cleaning up StringBuilder by setting it to "find" for another property to use
                 sb.setLength(4);
@@ -164,7 +213,8 @@ foam.CLASS({
                 obj1 = (FObject) p.f(obj1);
                 cls = p.getValueClass();
               } else {
-                obj1 = (FObject)obj1.getClass().getMethod(StringUtil.capitalize(p.getName()), foam.core.X.class).invoke(obj1, x);
+                sb.append(StringUtil.capitalize(p.getName()));
+                obj1 = (FObject)obj1.getClass().getMethod(sb.toString(), foam.core.X.class).invoke(obj1, x);
                 sb.setLength(4);
                 if ( obj1 == null ) return new ColumnPropertyValue.Builder(x).setPropertyValue(null).setObjValue(null).build();
                 cls = obj1.getClass();
@@ -194,8 +244,7 @@ foam.CLASS({
         arr.push(this.returnProperty(of, prop));
       }
       return arr;
-    },
-    
+    }
   ]
 });
 
