@@ -1112,12 +1112,8 @@ p({
   "authenticate": false,
   "serviceScript":"""
     import foam.dao.DAO;
-    dao = x.get("localLocalSettingDAO");
-
-    if(dao == null)
-      dao = new foam.dao.NullDAO(x, foam.nanos.session.LocalSetting.getOwnClassInfo());
     return new foam.dao.EasyDAO.Builder(x)
-      .setInnerDAO(dao)
+      .setDecorator(new foam.nanos.session.LocalSettingSessionDAO(x, new foam.dao.NullDAO(x, foam.nanos.session.LocalSetting.getOwnClassInfo())))
       .setAuthorize(false)
       .setOf(foam.nanos.session.LocalSetting.getOwnClassInfo())
       .build();

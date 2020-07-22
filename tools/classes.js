@@ -288,6 +288,7 @@ var classes = [
   'foam.nanos.http.HttpParameters',
   'foam.nanos.http.DefaultHttpParameters',
   'foam.nanos.session.LocalSetting',
+  'foam.nanos.session.LocalSettingSessionDAO',
   'foam.nanos.session.Session',
   'foam.nanos.session.SessionService',
   'foam.nanos.session.SimpleSessionService',
