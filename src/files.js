@@ -516,6 +516,7 @@ FOAM_FILES([
   { name: "foam/u2/view/ScrollTableView", flags: ['web'] },
   { name: "foam/u2/view/ScrollDAOView", flags: ['web'] },
   { name: "foam/u2/view/BlobView", flags: ['web'] },
+  { name: "foam/u2/view/CarouselView", flags: ['web'] },
   { name: "foam/u2/view/FileView", flags: ['web'] },
   { name: "foam/u2/view/ImageBlobView", flags: ['web'] },
   { name: "foam/u2/view/StringArrayView", flags: ['web'] },
