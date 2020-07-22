@@ -9,6 +9,7 @@ foam.CLASS({
   name: 'StepWizardletController',
 
   requires: [
+    'foam.core.ArraySlot',
     'foam.u2.detail.AbstractSectionedDetailView',
     'foam.u2.detail.VerticalDetailView',
     'foam.u2.stack.Stack',
@@ -66,11 +67,21 @@ foam.CLASS({
         Array format is similar to sections.
       `,
       expression: function(sections) {
-        return [...sections.keys()].map(w => sections[w].map(
+        var availableSlots = [...sections.keys()].map(w => sections[w].map(
           section => section.createIsAvailableFor(
             this.wizardlets[w].data$
           )
         ));
+        var flatSlots = availableSlots.reduce((lis, v) => [...lis, ...v]);
+        flatSlots.forEach(s => {
+          s.sub(() => {
+            s.get();
+            this.sectionAvailableSlots = this.sectionAvailableSlots;
+            let name = 'sectionAvailableSlots';
+            this.propertyChange.pub(name, this.slot(name));
+          });
+        })
+        return availableSlots;
       }
     },
     {

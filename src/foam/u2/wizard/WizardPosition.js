@@ -11,21 +11,11 @@ foam.CLASS({
   properties: [
     {
       name: 'wizardletIndex',
-      class: 'Int',
-      postSet: function() {
-        console.warn(
-          `WizardPosition should not be mutated; ` +
-          `create a new WizardPosition to guarentee slot updates`);
-      }
+      class: 'Int'
     },
     {
       name: 'sectionIndex',
-      class: 'Int',
-      postSet: function() {
-        console.warn(
-          `WizardPosition should not be mutated; ` +
-          `create a new WizardPosition to guarentee slot updates`);
-      }
+      class: 'Int'
     },
   ],
 });
