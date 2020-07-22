@@ -16,6 +16,6 @@ foam.CLASS({
     {
       name: 'sectionIndex',
       class: 'Int'
-    },
+    }
   ],
 });
