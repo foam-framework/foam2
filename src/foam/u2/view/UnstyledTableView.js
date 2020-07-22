@@ -421,7 +421,7 @@ foam.CLASS({
 
           //with this code error created  slot.get cause promise return
           //FIX ME
-          return this.slot(function(data, data$proxy, order, updateValues) {
+          return this.slot(function(data, order, updateValues) {
             var propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => ! foam.core.Property.isInstance(c) ? c : c.name));
             view.props = view.returnProperties(view, propertyNamesToQuery);
 
