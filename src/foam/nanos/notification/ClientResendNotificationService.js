@@ -8,11 +8,6 @@
 foam.CLASS({
   package: 'foam.nanos.notification',
   name: 'ClientResendNotificationService',
-
-  implements: [
-    'foam.nanos.notification.ResendNotificationServiceInterface'
-  ],
-
   properties: [
     {
       class: 'Stub',
