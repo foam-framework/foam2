@@ -319,7 +319,7 @@ foam.CLASS({
 
               // Render the table headers for the property columns.
               forEach(columns_, function([col, overrides]) {
-                var prop = view.props.find(p => p.fullPropertyName === view.returnPropertyNamesForColumn(view, col)).property;
+                var prop = view.props.find(p => p.fullPropertyName === view.checkIfArrayAndReturnPropertyNamesForColumn(view, col)).property;
                 var isFirstLevelProperty = col.indexOf('.') > -1;
 
                 var tableWidth = view.returnColumnPropertyForPropertyName(view, col, 'tableWidth');
@@ -601,12 +601,6 @@ foam.CLASS({
         }
         return result;
       },
-      function returnColumnFirstLevelName(context, col) {
-        return context.canColumnBeTreatedAsAnAxiom(context, col) ? col.name : context.returnColumnNameForNLevelName(context, col, 0);
-      },
-      function returnColumnLastLevelName(context, col) {
-        return context.canColumnBeTreatedAsAnAxiom(context, col) ? col.name : context.returnColumnNameForNLevelName(context, col, -1);
-      },
       function returnColumnNameForNLevelName(context, col, n) {
         var propNames = col.split('.');
         if ( n === -1 ) {
@@ -617,14 +611,23 @@ foam.CLASS({
         }
         return propNames[n];
       },
-      function returnPropertyNamesForColumn(context, col) {
-        return context.canColumnBeTreatedAsAnAxiom(context, col) ? col.name : col;
-      },
       function checkIfArrayAndReturnPropertyNamesForColumn(context, col) {
         return context.checkIfArrayAndExecute(context, col, context.returnPropertyNamesForColumn);
       },
+      function returnPropertyNamesForColumn(context, col) {
+        return context.canColumnBeTreatedAsAnAxiom(context, col) ? col.name : col;
+      },
+      function checkIfArrayAndReturnColumnLastLevelName(context, col) {
+        return context.checkIfArrayAndExecute(context, col, context.returnColumnLastLevelName);
+      },
+      function returnColumnLastLevelName(context, col) {
+        return context.canColumnBeTreatedAsAnAxiom(context, col) ? col.name : context.returnColumnNameForNLevelName(context, col, -1);
+      },
       function checkIfArrayAndReturnFirstLevelColumnName(context, col) {
         return context.checkIfArrayAndExecute(context, col, context.returnColumnFirstLevelName);
+      },
+      function returnColumnFirstLevelName(context, col) {
+        return context.canColumnBeTreatedAsAnAxiom(context, col) ? col.name : context.returnColumnNameForNLevelName(context, col, 0);
       },
       function checkIfArrayAndExecute(context, col, f) {
         return foam.Array.isInstance(col) ? f(context, col[0]) : f(context, col);
@@ -644,9 +647,6 @@ foam.CLASS({
       },
       function mapArrayColumnsToArrayOfColumnNames(context, cols) {
         return cols.map(c => context.checkIfArrayAndReturnPropertyNamesForColumn(context, c));
-      },
-      function returnPropertyForColumn(context, col) {
-        return context.props.find(p => p.fullPropertyName === context.returnPropertyNamesForColumn(context, col));
       },
       function returnColumnPropertyForPropertyName(context, col, property) {
         var colObj = foam.Array.isInstance(col) ? col[0] : col;
