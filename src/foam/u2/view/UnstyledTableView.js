@@ -104,10 +104,11 @@ foam.CLASS({
     {
       name: 'columns',
       expression: function(of, allColumns, isColumnChanged) {
-        if ( ! of ) return [];
+        if ( ! of )
+          return [];
         var tc = of.getAxiomByName('tableColumns');
         return tc ? tc.columns : allColumns;
-      },
+      }
     },
     {
       class: 'FObjectArray',
@@ -244,10 +245,6 @@ foam.CLASS({
     },
     {
       name: 'props',
-      expression: function(columns_) {
-        var propertyNamesToQuery = columns_.length === 0 ? columns_ : [ 'id' ].concat(columns_.map(([c, overrides]) => foam.core.Property.isInstance(c) ? c.name : c));
-        return this.returnProperties(this, propertyNamesToQuery);
-      }
     },
     {
       name: 'updateValues',
@@ -292,7 +289,7 @@ foam.CLASS({
           style({ 'min-width': this.tableWidth_$ }).
           show(this.showHeader$).
           add(this.slot(function(columns_) {
-            var propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => c));
+            var propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => foam.core.Property.isInstance(c) ? c.name : c));
             view.props = view.returnProperties(view, propertyNamesToQuery);
             view.updateValues = ! view.updateValues;
 
@@ -335,21 +332,20 @@ foam.CLASS({
 
               // Render the table headers for the property columns.
               forEach(columns_, function([col, overrides]) {
-                var prop;
+                var prop = view.props[propertyNamesToQuery.indexOf(col)];
                 var isFirstLevelProperty = true;
-                if ( ! foam.core.FObject.isInstance(col) ) {
+                var column;
+                if ( foam.core.FObject.isInstance(col) || foam.core.Reference.isInstance(col) ) {
                   var propertyNames = col.split('.');
                   isFirstLevelProperty = propertyNames.length === 1;
-                  prop = view.props.find(c => c.name === propertyNames[propertyNames.length - 1]);
                 } else
-                  prop = view.props.find(c => c.name === col.name);
-                var column = view.columns.find( c => !foam.String.isInstance(c) && c.name === prop.name );
+                  column = view.columns.find( c => !foam.String.isInstance(c) && c.name === prop.name );
 
                 this.start().
                   addClass(view.myClass('th')).
                   addClass(view.myClass('th-' + prop.name)).
                   call(function() {
-                    if ( prop.tableWidth || ( column && column.tableWidth ) ) {
+                    if ( ( column && column.tableWidth ) || prop.tableWidth ) {
                       this.style({ flex: `0 0 ${column && column.tableWidth ? column.tableWidth : prop.tableWidth}px` });
                     } else {
                       this.style({ flex: '1 0 0' });
@@ -567,7 +563,9 @@ foam.CLASS({
                     });
                   });
                   for ( var  i = 1 ; i < numberOfColumns ; i++  ) {
-                    var column = view.columns.find( c => !foam.String.isInstance(c) && c.name === view.props[i].name );
+                    var column;
+                    if ( ! foam.core.Reference.isInstance(view.props[i]) && ! foam.core.FObjectProperty.isInstance(view.props[i]) )
+                      column = view.columns.find( c => !foam.String.isInstance(c) && c.name === view.props[i].name && ! propertyNamesToQuery[i].includes('.') );
                     if ( view.props[i].tableCellFormatter || ( column && column.tableCellFormatter ) ) {
                       var elmt = this.E().addClass(view.myClass('td')).style({flex: column && column.tableWidth ? `0 0 ${column.tableWidth}px` : view.props[i] && view.props[i].tableWidth  ? `0 0 ${view.props[i].tableWidth}px` : '1 0 0'});//, 'justify-content': 'center'
                       try {
@@ -587,8 +585,9 @@ foam.CLASS({
                       stringValue = view.outputter.returnStringValueForProperty(view.__context__, view.props[i], val[i]);
                     }
                     tableRowElement.start().addClass(view.myClass('td'))
-                    .add(stringValue)
-                    .style({flex: column && column.tableWidth ? `0 0 ${column.tableWidth}px` : view.props[i] && view.props[i].tableWidth  ? `0 0 ${view.props[i].tableWidth}px` : '1 0 0'}).end();
+                      .add(stringValue)
+                      .style({flex: column && column.tableWidth ? `0 0 ${column.tableWidth}px` : view.props[i] && view.props[i].tableWidth  ? `0 0 ${view.props[i].tableWidth}px` : '1 0 0'})
+                    .end();
                   }
                   tableRowElement
                     .start()
