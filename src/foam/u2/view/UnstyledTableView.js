@@ -211,7 +211,7 @@ foam.CLASS({
           if ( this.canColumnBeTreatedAsAnAxiom(this, col[0]) && col[0].tableWidth ) {
             axiom = col[0];
           } else
-            axiom = props.find(p => p.fullPropertyName === this.returnColumnLastLevelName(this, col[0])).property;
+            axiom = props.find(p => p.fullPropertyName === this.checkIfArrayAndReturnPropertyNamesForColumn(this, col[0])).property;
 
           return acc + (axiom.tableWidth || this.MIN_COLUMN_WIDTH_FALLBACK);
         }, this.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH) + 'px';
@@ -549,18 +549,18 @@ foam.CLASS({
                       delete view.checkboxes_[val[0]];
                     });
                   });
-                  //change to view.columns_
+
+                  //change to view.columns_.length!!!!!!!!
                   for ( var  i = 1 ; i < numberOfColumns ; i++  ) {
                     var column;
-                    if ( ! foam.core.Reference.isInstance(view.props[i].property) && ! foam.core.FObjectProperty.isInstance(view.props[i].property) )
-                      column = view.columns.find( c => !foam.String.isInstance(c) && c.name === view.props[i].property.name && ! propertyNamesToQuery[i].includes('.') );
-                    if ( view.props[i].property.tableCellFormatter || ( column && column.tableCellFormatter ) ) {
-                      var elmt = this.E().addClass(view.myClass('td')).style({flex: column && column.tableWidth ? `0 0 ${column.tableWidth}px` : view.props[i].property && view.props[i].property.tableWidth  ? `0 0 ${view.props[i].property.tableWidth}px` : '1 0 0'});//, 'justify-content': 'center'
+                    
+                    var tableCellFormatter = view.returnColumnPropertyForPropertyName(view, view.props[i].fullPropertyName, tableCellFormatter);
+                    var tableWidth = view.returnColumnPropertyForPropertyName(view, view.props[i].fullPropertyName, tableWidth);
+                    if ( tableCellFormatter ) {
+                      var elmt = this.E().addClass(view.myClass('td')).style({flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0'});//, 'justify-content': 'center'
                       try {
-                        if ( column && column.tableCellFormatter )
-                          column.tableCellFormatter.format(elmt, val[i], null);
-                        else
-                          view.props[i].property.tableCellFormatter.format(elmt, val[i], null);
+                        if ( tableCellFormatter )
+                          tableCellFormatter.format(elmt, val[i], null);
                         tableRowElement.add(elmt);
                         continue;
                       } catch(e) {}
@@ -574,7 +574,7 @@ foam.CLASS({
                     }
                     tableRowElement.start().addClass(view.myClass('td'))
                       .add(stringValue)
-                      .style({flex: column && column.tableWidth ? `0 0 ${column.tableWidth}px` : view.props[i].property && view.props[i].property.tableWidth  ? `0 0 ${view.props[i].property.tableWidth}px` : '1 0 0'})
+                      .style({flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0'})
                     .end();
                   }
                   tableRowElement
@@ -629,7 +629,7 @@ foam.CLASS({
         return context.canColumnBeTreatedAsAnAxiom(col) ? col.name : col;
       },
       function checkIfArrayAndReturnPropertyNamesForColumn(context, col) {
-        return context.checkIfArrayAndExecute(context, col, context.canColumnBeTreatedAsAnAxiom);
+        return context.checkIfArrayAndExecute(context, col, context.returnPropertyNamesForColumn);
       },
       function checkIfArrayAndReturnFirstLevelColumnName(context, col) {
         return context.checkIfArrayAndExecute(context, col, context.returnColumnFirstLevelName);
@@ -641,7 +641,7 @@ foam.CLASS({
         return foam.core.Property.isInstance(col) || foam.Object.isInstance(col);
       },
       function returnPropertiesForColumns(context, columns_) {
-        var propertyNamesToQuery = columns_.length === 0 ? columns_ : [ 'id' ].concat(columns_.map(c => context.checkIfArrayAndReturnFirstLevelColumnName(context, c)));
+        var propertyNamesToQuery = columns_.length === 0 ? columns_ : [ 'id' ].concat(context.filterColumnsThatAllColumnsDoesNotIncludeForArrayOfColumns(context, columns_).map(c => context.checkIfArrayAndReturnPropertyNamesForColumn(context, c)));
         return context.returnProperties(context, propertyNamesToQuery);
       },
       function doesAllColumnsContainsColumnName(context, col) {
@@ -655,6 +655,23 @@ foam.CLASS({
       },
       function returnPropertyForColumn(context, col) {
         return context.props.find(p => p.fullPropertyName === context.returnPropertyNamesForColumn(context, col));
+      },
+      function returnColumnPropertyForPropertyName(context, col, property) {
+        if ( context.canColumnBeTreatedAsAnAxiom(context, col) ) {
+          if ( col[property] )
+            return col[property];
+        }
+        var tableColumn = context.returnTableColumnForColumnName(context, col);
+        return tableColumn ? tableColumn[property] : context.props.find(p => p.fullPropertyName === context.returnPropertyNamesForColumn(context, col) ).property[property];
+      },
+      function returnTableColumnForColumnName(context, col) {
+        if ( col.indexOf('.') > -1 ) {
+          return null;
+        }
+        if ( context.canColumnBeTreatedAsAnAxiom(context, col) ) {
+          return col;
+        }
+        return context.columns.find( c =>  context.returnPropertyNamesForColumn(context, c) === col);
       }
   ]
 });
