@@ -548,27 +548,27 @@ foam.CLASS({
                     var tableWidth = view.returnColumnPropertyForPropertyName(view, view.columns_[i], 'tableWidth');
 
                     var stringValue;
+                    var elmt = this.E().addClass(view.myClass('td')).style({flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0'});//, 'justify-content': 'center'
                     if ( foam.core.UnitValue.isInstance(prop) ) {
                       var indexOfUnitName = propertyNamesToQuery.indexOf(prop.unitPropName);
                       stringValue = view.outputter.returnStringValueForProperty(prop, value, val[indexOfUnitName]);
                     } else if ( tableCellFormatter ) {
-                      var elmt = this.E().addClass(view.myClass('td')).style({flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0'});//, 'justify-content': 'center'
                       try {
                         if ( tableCellFormatter )
                           tableCellFormatter.format(elmt, value, null);
-                        tableRowElement.add(elmt);
-                        continue;
-                      } catch(e) {}
+                      } catch(e) {
+                        stringValue = view.outputter.returnStringValueForProperty(view.__context__, prop, value);
+                      }
                     }  else {
                       stringValue = view.outputter.returnStringValueForProperty(view.__context__, prop, value);
                     }
                     if ( stringValue ) {
-                      tableRowElement.start().addClass(view.myClass('td'))
-                        .add(stringValue)
-                        .style({flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0'})
-                      .end();
+                      elmt.add(stringValue);
+                      stringValue = null;
                     }
+                    tableRowElement.add(elmt);
                   }
+
                   tableRowElement
                     .start()
                       .addClass(view.myClass('td')).
