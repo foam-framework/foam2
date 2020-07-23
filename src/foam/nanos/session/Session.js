@@ -248,6 +248,7 @@ foam.CLASS({
           appConfig = appConfig.configure(x, null);
 
           rtn = rtn.put("appConfig", appConfig);
+
           return rtn;
         }
 
@@ -280,7 +281,7 @@ foam.CLASS({
         // 'getCurrentGroup' depends on them being in the context.
         Group group = auth.getCurrentGroup(rtn);
 
-      if ( group != null ) {
+        if ( group != null ) {
           rtn = rtn
             .put("group", group)
             .put("appConfig", group.getAppConfig(rtn));
