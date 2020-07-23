@@ -172,6 +172,12 @@ public class MLang
     return dot;
   }
 
+  public static Expr REF(Expr o1) {
+    Ref ref = new Ref();
+    ref.setArg1(o1);
+    return ref;
+  }
+
   public static Predicate CLASS_OF(ClassInfo info) {
     return new IsClassOf(info);
   }

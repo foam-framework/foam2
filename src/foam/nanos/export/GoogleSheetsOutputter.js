@@ -77,17 +77,6 @@ foam.CLASS({
             propName: propName
           });
       }
-    },
-    {
-      name: 'outputTable',
-      code: async function(x, cls, arr, columnsMetadata) {
-        var columnConfig = x.columnConfigToPropertyConverter;
-        columnConfig = columnConfig || this.ColumnConfigToPropertyConverter.create();
-
-        var props = columnConfig.returnProperties(cls, columnsMetadata.map(m => m.propName));
-
-        return await this.returnTable(x, props, arr);
-      }
     }
   ]
 });

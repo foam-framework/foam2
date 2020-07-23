@@ -82,6 +82,11 @@ foam.CLASS({
           List<List<Object>> listOfValues = new ArrayList<>();
           Object[] metadataArr = (Object[])metadataObj;
           GoogleSheetsPropertyMetadata[] metadata = new GoogleSheetsPropertyMetadata[metadataArr.length];
+
+          GoogleDriveService googleDriveService = (GoogleDriveService) getX().get("googleDriveService");
+          String folderId = googleDriveService.createFolderIfNotExists(x, "Nanopay Export");
+          String fileName = extraConfig == null || SafetyUtil.isEmpty(extraConfig.getTitle()) ? ("NanopayExport" + new Date()) : extraConfig.getTitle();
+          String fileId = googleDriveService.createFile(x, folderId, fileName);
     
           for ( int i = 0 ; i < metadata.length ; i++ ) {
             metadata[i] = (GoogleSheetsPropertyMetadata)metadataArr[i];
@@ -97,11 +102,7 @@ foam.CLASS({
           Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, SCOPES))
             .setApplicationName("nanopay")
             .build();
-    
-          Spreadsheet st = new Spreadsheet().setProperties(
-            new SpreadsheetProperties().setTitle( extraConfig == null || SafetyUtil.isEmpty(extraConfig.getTitle()) ? ("NanopayExport" + new Date()) : extraConfig.getTitle()));
-  
-    
+        
           List<ValueRange> data = new ArrayList<>();
           data.add(new ValueRange()
             .setRange("A1")
@@ -110,12 +111,9 @@ foam.CLASS({
           BatchUpdateValuesRequest batchBody = new BatchUpdateValuesRequest()
             .setValueInputOption("USER_ENTERED")
             .setData(data);
-    
-          Spreadsheet response = service.spreadsheets().create(st)
-            .execute();
-    
+        
           BatchUpdateValuesResponse batchResult = service.spreadsheets().values()
-            .batchUpdate(response.getSpreadsheetId(), batchBody)
+            .batchUpdate(fileId, batchBody)
             .execute();
     
           Request fontSizeRequest = new Request().setRepeatCell(new RepeatCellRequest()
@@ -208,7 +206,7 @@ foam.CLASS({
           BatchUpdateSpreadsheetRequest r = new BatchUpdateSpreadsheetRequest().setRequests(requests);
     
           BatchUpdateSpreadsheetResponse updateResponse = service.spreadsheets()
-            .batchUpdate(response.getSpreadsheetId(), r)
+            .batchUpdate(fileId, r)
             .execute();
     
           return updateResponse.getSpreadsheetId();
@@ -233,7 +231,6 @@ foam.CLASS({
       ],
       javaCode: `
         try {
-          Thread.sleep(120000);
           GoogleDriveService googleDriveService = (GoogleDriveService) getX().get("googleDriveService");
           googleDriveService.deleteFile(x, sheetId);
         } catch(Exception e) {

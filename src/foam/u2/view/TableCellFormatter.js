@@ -51,6 +51,12 @@ foam.CLASS({
       }
     },
     {
+      name: 'tableHeader',
+      value: function() {
+        return this.label || foam.String.labelize(this.name);
+      }
+    },
+    {
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       factory: function() {
