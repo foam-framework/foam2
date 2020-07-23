@@ -24,6 +24,15 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'String',
+      name: 'id',
+      javaFactory: `
+        if ( getClassType() != null )
+          return getClassType().getId();
+        return null;
+      `
+    },
+    {
       class: 'Class',
       name: 'classType'
     },
@@ -43,6 +52,20 @@ foam.CLASS({
       name: 'endTime',
       class: 'DateTime'
     },
+    {
+      name: 'isError',
+      class: 'Boolean',
+      value: false
+    },
+    {
+      name: 'errorMessage',
+      class: 'String'
+    },
+    {
+      name: 'exception',
+      type: 'Object',
+      storageTransient: true
+    }
   ],
 
   methods: [
@@ -63,6 +86,7 @@ foam.CLASS({
       ],
       javaCode: `
     if ( x == null ) return;
+    if ( getIsError() ) return;
     setEndTime(new java.util.Date());
     PMLogger pmLogger = (PMLogger) x.get(DAOPMLogger.SERVICE_NAME);
     if ( pmLogger != null ) {
@@ -82,6 +106,21 @@ foam.CLASS({
       javaCode: `
     fm.foldForState(getClassType().getId()+":"+getName(), getStartTime(), getTime());
       `
+    },
+    {
+      name: 'error',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'exception', type: 'Object' },
+        { name: 'message', type: 'String...' }
+      ],
+      javaCode: `
+        String str = "";
+        for (String s: message){
+          str += s + ",";
+        }
+        setErrorMessage(str.substring(0, str.length() - 1));
+      `
     }
   ],
   axioms: [
@@ -90,25 +129,25 @@ foam.CLASS({
       buildJavaClass: function (cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-          public static PM create(X x, FObject fo, String name) {
+          public static PM create(X x, FObject fo, String... name) {
             PM pm = (PM) x.get("PM");
 
             if ( pm == null ) return new PM(fo, name);
 
             pm.setClassType(fo.getClassInfo());
-            pm.setName(name);
+            pm.setName(combine(name));
             pm.init_();
 
             return pm;
           }
 
-          public static PM create(X x, ClassInfo clsInfo, String name) {
+          public static PM create(X x, ClassInfo clsInfo, String... name) {
             PM pm = (PM) x.get("PM");
 
             if ( pm == null ) return new PM(clsInfo, name);
 
             pm.setClassType(clsInfo);
-            pm.setName(name);
+            pm.setName(combine(name));
             pm.init_();
 
             return pm;
@@ -128,14 +167,14 @@ foam.CLASS({
   }
   */
 
-  public PM(ClassInfo clsInfo, String name) {
-    setName(name);
+  public PM(ClassInfo clsInfo, String... name) {
+    setName(combine(name));
     setClassType(clsInfo);
     init_();
   }
 
-  public PM(Class cls, String name) {
-    setName(name);
+  public PM(Class cls, String... name) {
+    setName(combine(name));
     foam.core.ClassInfoImpl clsInfo = new foam.core.ClassInfoImpl();
     clsInfo.setObjClass(cls);
     clsInfo.setId(cls.getName());
@@ -143,8 +182,16 @@ foam.CLASS({
     init_();
   }
 
-  public PM(FObject fo, String name) {
+  public PM(FObject fo, String... name) {
     this(fo.getClassInfo(), name);
+  }
+
+  private static String combine(String... args) {
+    String str = "";
+    for ( String s: args) {
+      str += s + ":";
+    }
+    return str.substring(0, str.length() - 1);
   }
 
 `
