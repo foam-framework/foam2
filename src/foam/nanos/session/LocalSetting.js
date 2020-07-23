@@ -9,10 +9,6 @@ foam.CLASS({
     {
       name: 'value',
       class: 'String'
-    },
-    {
-      name: 'deviceId',
-      class: 'Long'
     }
   ]
 });
