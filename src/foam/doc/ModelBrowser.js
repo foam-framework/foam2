@@ -50,7 +50,7 @@ foam.CLASS({
               a.array.map(function(nspec) {
                 return self.parseClientModel(nspec)
               }).filter(function(cls) {
-                return cls && (allowedModels == undefined? true : !!allowedModels[cls.id]);
+                return cls && (allowedModels == undefined || ( Object.keys(allowedModels).length && Object.values(allowedModels).some( e => e == true) ) ? !!allowedModels[cls.id] : true );
               }).map(function(cls) {
                 return dao.put(cls.model_);
               })
@@ -101,7 +101,7 @@ foam.CLASS({
         .start().add(this.PRINT_PAGE).end()
         .select(this.modelDAO, function(model) {
           var cls = foam.lookup(model.id);
-          return this.E().
+          return self.E().
               start().style({ 'font-size': '20px', 'margin-top': '20px' }).
                 add('Model ' + model).
               end().
@@ -113,6 +113,11 @@ foam.CLASS({
 
     function parseClientModel(n) {
       var cls = JSON.parse(n.client);
+      if ( Object.keys(cls).length === 0 ){
+        console.log('this model', n.name, 'is not accessible in the client side or is a service')
+        //throw new Error('Unsupported');
+        return null;
+      }
       var clsName = cls.of ? cls.of : cls.class;
       return foam.lookup(clsName, true);
     }
