@@ -18,4 +18,13 @@ foam.CLASS({
       class: 'Int'
     }
   ],
+
+  methods: [
+    function compareTo(b) {
+      let a = this;
+      let wizardletDiff = a.wizardletIndex - b.wizardletIndex;
+      if ( wizardletDiff != 0 ) return wizardletDiff;
+      return a.sectionIndex - b.sectionIndex;
+    }
+  ]
 });

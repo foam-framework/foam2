@@ -13,13 +13,22 @@ foam.CLASS({
     'foam.u2.detail.AbstractSectionedDetailView',
     'foam.u2.detail.VerticalDetailView',
     'foam.u2.stack.Stack',
-    'foam.u2.wizard.WizardPosition'
+    'foam.u2.wizard.WizardPosition',
+    'foam.u2.wizard.StepWizardConfig'
   ],
 
   properties: [
     {
       class: 'String',
       name: 'title'
+    },
+    {
+      name: 'config',
+      class: 'FObjectProperty',
+      of: 'foam.u2.wizard.StepWizardConfig',
+      factory: function () {
+        return this.StepWizardConfig.create();
+      }
     },
     {
       name: 'wizardlets',
@@ -248,8 +257,14 @@ foam.CLASS({
       );
     },
     function canSkipTo(pos) {
-      // TODO: add override
-      return true;
+      let diff = pos.compareTo(this.wizardPosition);
+      return ( diff == 0
+        ? true
+        : ( diff > 0
+          ? this.canGoNext && this.config.allowSkipping
+          : this.canGoBack && this.config.allowBacktracking
+        )
+      );
     },
     function skipTo(pos) {
       // TODO: add ucj save logic
