@@ -87,7 +87,7 @@ foam.CLASS({
       expression: function(of) {
         return ! of ? [] : [].concat(
           of.getAxiomsByClass(foam.core.Property)
-            .filter(p => p.tableCellFormatter && ! p.hidden && ! p.networkTransient )
+            .filter(p => ! p.hidden && ! p.networkTransient )
             .map(a => a.name),
           of.getAxiomsByClass(foam.core.Action)
             .map(a => a.name)
@@ -322,7 +322,7 @@ foam.CLASS({
                 var prop = view.props.find(p => p.fullPropertyName === col).property;
                 var isFirstLevelProperty = col.indexOf('.') > -1;
 
-                var tableWidth = view.returnColumnPropertyForPropertyName(view, col, tableWidth);
+                var tableWidth = view.returnColumnPropertyForPropertyName(view, col, 'tableWidth');
 
                 this.start().
                   addClass(view.myClass('th')).
@@ -408,7 +408,7 @@ foam.CLASS({
             var proxy = view.ProxyDAO.create({ delegate: dao });
 
             //to retrieve value of unitProp
-            unitValueProperties.forEach(p => propertyNamesToQuery.push(p.unitPropName));
+            unitValueProperties.forEach(p => propertyNamesToQuery.push(p.property.unitPropName));
             var valPromises = view.returnRecords(proxy, propertyNamesToQuery);
 
             var tbodyElement = this.
@@ -542,9 +542,13 @@ foam.CLASS({
 
                   //change to view.columns_.length!!!!!!!!
                   for ( var  i = 1 ; i < numberOfColumns ; i++  ) {                    
-                    var tableCellFormatter = view.returnColumnPropertyForPropertyName(view, view.props[i].fullPropertyName, tableCellFormatter);
-                    var tableWidth = view.returnColumnPropertyForPropertyName(view, view.props[i].fullPropertyName, tableWidth);
-                    if ( tableCellFormatter ) {
+                    var tableCellFormatter = view.returnColumnPropertyForPropertyName(view, view.props[i].fullPropertyName, 'tableCellFormatter');
+                    var tableWidth = view.returnColumnPropertyForPropertyName(view, view.props[i].fullPropertyName, 'tableWidth');
+                    var stringValue;
+                    if ( foam.core.UnitValue.isInstance(view.props[i].property) ) {
+                      var indexOfUnitName = propertyNamesToQuery.indexOf(view.props[i].property.unitPropName);
+                      stringValue = view.outputter.returnStringValueForProperty(view.__context__, view.props[i].property, val[i], val[indexOfUnitName]);
+                    } else if ( tableCellFormatter ) {
                       var elmt = this.E().addClass(view.myClass('td')).style({flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0'});//, 'justify-content': 'center'
                       try {
                         if ( tableCellFormatter )
@@ -552,18 +556,15 @@ foam.CLASS({
                         tableRowElement.add(elmt);
                         continue;
                       } catch(e) {}
-                    }
-                    var stringValue;
-                    if ( foam.core.UnitValue.isInstance(view.props[i].property) ) {
-                      var indexOfUnitName = propertyNamesToQuery.indexOf(view.props[i].property.unitPropName);
-                      stringValue = view.outputter.returnStringValueForProperty(view.__context__, view.props[i].property, val[i], val[indexOfUnitName]);
-                    } else {
+                    }  else {
                       stringValue = view.outputter.returnStringValueForProperty(view.__context__, view.props[i].property, val[i]);
                     }
-                    tableRowElement.start().addClass(view.myClass('td'))
-                      .add(stringValue)
-                      .style({flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0'})
-                    .end();
+                    if ( stringValue ) {
+                      tableRowElement.start().addClass(view.myClass('td'))
+                        .add(stringValue)
+                        .style({flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0'})
+                      .end();
+                    }
                   }
                   tableRowElement
                     .start()
@@ -645,13 +646,14 @@ foam.CLASS({
         return context.props.find(p => p.fullPropertyName === context.returnPropertyNamesForColumn(context, col));
       },
       function returnColumnPropertyForPropertyName(context, col, property) {
-        //check for array!!!!!
-        if ( context.canColumnBeTreatedAsAnAxiom(context, col) ) {
-          if ( col[property] )
-            return col[property];
+        var colObj = foam.Array.isInstance(col) ? col[0] : col;
+
+        if ( context.canColumnBeTreatedAsAnAxiom(context, colObj) ) {
+          if ( colObj[property] )
+            return colObj[property];
         }
-        var tableColumn = context.returnTableColumnForColumnName(context, col);
-        return tableColumn ? tableColumn[property] : context.props.find(p => p.fullPropertyName === context.returnPropertyNamesForColumn(context, col) ).property[property];
+        var tableColumn = context.returnTableColumnForColumnName(context, colObj);
+        return tableColumn && tableColumn[property] ? tableColumn[property] : context.props.find(p => p.fullPropertyName === context.returnPropertyNamesForColumn(context, colObj) ).property[property];
       },
       function returnTableColumnForColumnName(context, col) {
         if ( col.indexOf('.') > -1 ) {
