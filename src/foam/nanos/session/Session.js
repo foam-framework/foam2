@@ -274,9 +274,6 @@ foam.CLASS({
 
         if ( user != null ) {
           rtn = rtn.put("spid", user.getSpid());
-
-        DAO localLocalSettingDAO = new foam.dao.MDAO(foam.nanos.session.LocalSetting.getOwnClassInfo());
-        rtn = rtn.put("localLocalSettingDAO", localLocalSettingDAO);
         }
 
         // We need to do this after the user and agent have been put since

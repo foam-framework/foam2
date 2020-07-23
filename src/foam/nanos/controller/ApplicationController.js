@@ -550,7 +550,7 @@ foam.CLASS({
         this.window.location.hash = this.theme.defaultMenu;
       }
 
-      this.__subContext__.localSettingDAO.put(foam.nanos.session.LocalSetting.create({id: 'homeDenomination', value: localStorage.getItem('homeDenomination')}));
+      this.__subContext__.localSettingDAO.put(foam.nanos.session.LocalSetting.create({id: 'homeDenomination', value: "CAD"}));
     },
 
     function menuListener(m) {

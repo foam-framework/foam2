@@ -25,8 +25,19 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-        foam.dao.DAO dao = (foam.dao.DAO)x.get("localLocalSettingDAO");
+        DAO dao = (DAO)x.get(Session.class).getContext().get("localLocalSettingDAO");
+        if ( dao == null )
+          return null;
         return dao.put(obj);
+      `
+    },
+    {
+      name: 'remove_',
+      javaCode: `
+        DAO dao = (DAO)x.get(Session.class).getContext().get("localLocalSettingDAO");
+        if ( dao == null )
+          return null;
+        return dao.remove_(x, obj);
       `
     }
   ]
