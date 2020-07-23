@@ -82,6 +82,11 @@ foam.CLASS({
         model in the 'of' property. The user can choose to create an instance
         of one of the models in this list.
       `
+    },
+    {
+      class: 'Object',
+      name: 'persistantData',
+      documentation: 'Allows passed in data to persist to selected class instances.'
     }
   ],
 
@@ -141,7 +146,7 @@ foam.CLASS({
 
       var classToData = function(c) {
         var m = c && this.__context__.lookup(c, true);
-        return m ? m.create(null, this) : null;
+        return m ? m.create(this.persistantData ? this.persistantData : null, this) : null;
       }.bind(this);
 
       this.data$.relateTo(
@@ -149,15 +154,20 @@ foam.CLASS({
         dataToClass,
         classToData
       );
-      if ( this.data ) { this.objectClass = dataToClass(this.data); }
-      if ( ! this.data && ! this.objectClass && this.choices.length ) this.objectClass = this.choices[0][0];
 
-      this.
-        tag(this.OBJECT_CLASS).
-        tag(foam.u2.detail.VerticalDetailView, {
-          data$: this.data$
+      if ( this.data )
+        this.objectClass = dataToClass(this.data);
+
+      if ( this.data && this.of && (this.data.cls_.id === this.of.id) )
+        this.objectClass = this.choices[0][0];
+
+      this
+        .tag(foam.u2.detail.VerticalDetailView, {
+          data: this,
+          sections: [{
+            properties: [this.OBJECT_CLASS, this.DATA]
+          }]
         });
-            
     },
 
     function choicesFallback(of) {
