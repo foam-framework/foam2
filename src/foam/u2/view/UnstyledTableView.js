@@ -76,10 +76,10 @@ foam.CLASS({
         if ( ! of ) return [];
         var cols;
         if ( ! editColumnsEnabled )
-          cols = of.getAxiomByName('tableColumns').columns || allColumns;
+          cols = columns || allColumns;
         else
           cols = selectedColumnNames;
-        return cols.filter( c => allColumns.includes(foam.String.isInstance(c) ? ( c.indexOf('.') > -1 ? c.split('.')[0] : c ) : columns.name )).map(c => foam.Array.isInstance(c) ? c : [c, null]);
+        return cols.filter( c => allColumns.includes(foam.String.isInstance(c) ? ( c.indexOf('.') > -1 ? c.split('.')[0] : c ) : c.name )).map(c => foam.Array.isInstance(c) ? c : [c, null]);
       },
     },
     {
@@ -332,10 +332,10 @@ foam.CLASS({
 
               // Render the table headers for the property columns.
               forEach(columns_, function([col, overrides]) {
-                var prop = view.props[propertyNamesToQuery.indexOf(col)];
+                var prop = view.props[propertyNamesToQuery.indexOf(!foam.core.Property.isInstance(col) ? col : col.name)];
                 var isFirstLevelProperty = true;
                 var column;
-                if ( foam.core.FObject.isInstance(col) || foam.core.Reference.isInstance(col) ) {
+                if ( !foam.core.Property.isInstance(col) && foam.core.FObject.isInstance(col) || foam.core.Reference.isInstance(col) ) {
                   var propertyNames = col.split('.');
                   isFirstLevelProperty = propertyNames.length === 1;
                 } else
