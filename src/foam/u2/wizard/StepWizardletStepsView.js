@@ -98,7 +98,7 @@ foam.CLASS({
             // Render section labels
             let sections = this.data.sections[w];
 
-            let afterCurrentSection = false;
+            // let afterCurrentSection = false;
             for ( let s = 0 ; s < sections.length ; s++ ) {
               let pos = this.WizardPosition.create({
                 wizardletIndex: w,
@@ -106,7 +106,6 @@ foam.CLASS({
               })
               let section = sections[s];
               let isCurrentSection = isCurrent && si === s;
-              let onClickSkips = afterCurrent || afterCurrentSection;
               let allowedToSkip = self.data.canSkipTo(pos);
               let slot = section.createIsAvailableFor(
                 wizardlet.data$
@@ -116,9 +115,8 @@ foam.CLASS({
                   e,
                   section, s+1,
                   isCurrentSection,
-                  ! isCurrentSection && ( ! onClickSkips || allowedToSkip )
+                  allowedToSkip
                 ).on('click', () => {
-                  let targetScreenIndex = self.data.sectionToScreenIndex(w, s);
                   if ( isCurrentSection ) return;
                   if ( allowedToSkip ) {
                     self.data.skipTo(pos);
@@ -127,7 +125,7 @@ foam.CLASS({
                 });
                 return e;
               })
-              if ( isCurrentSection ) afterCurrentSection = true;
+              // if ( isCurrentSection ) afterCurrentSection = true;
               elem.add(slot);
             }
 
