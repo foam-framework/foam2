@@ -79,7 +79,7 @@ foam.CLASS({
           cols = of.getAxiomByName('tableColumns').columns || allColumns;
         else
           cols = selectedColumnNames;
-        return cols.filter( c => allColumns.includes(foam.String.isInstance(c) ? ( c.indexOf('.') > -1 ? c.split('.')[0] : c ) : columns.name )).map(c => foam.Array.isInstance(c) ? c : [c, null]);
+        return this.filterColumnsThatAllColumnsDoesNotIncludeForArrayOfColumns(this, cols).map(c => foam.Array.isInstance(c) ? c : [c, null]);
       },
     },
     {
@@ -204,28 +204,14 @@ foam.CLASS({
       class: 'Int',
       name: 'tableWidth_',
       documentation: 'Width of the whole table. Used to get proper scrolling on narrow screens.',
-      expression: function(of, columns_) {
+      expression: function(of, columns_, props) {
         return columns_.reduce((acc, col) => {
-          var cls = of;
           var axiom;
 
-          if ( foam.String.isInstance(col[0]) ) {
-            axiom = this.columns.find(c => c.name ===  col[0]);
-            if ( ! axiom ) {
-              var props = col[0].split('.');
-              for ( var i = 0 ; i < props.length ; i++ ) {
-                axiom = foam.String.isInstance(props[i])
-                ? cls.getAxiomByName(props[i])
-                :  foam.Array.isInstance(props[i]) ?
-                cls.getAxiomByName(props[i]) : props[i];
-                if ( ! axiom ) {
-                  break;
-                }
-                cls = axiom.of;
-              }
-            }
-          } else
+          if ( this.canColumnBeTreatedAsAnAxiom(this, col[0]) && col[0].tableWidth ) {
             axiom = col[0];
+          } else
+            axiom = props.find(p => p.fullName === this.returnColumnLastLevelName(this, col[0]));
 
           return acc + (axiom.tableWidth || this.MIN_COLUMN_WIDTH_FALLBACK);
         }, this.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH) + 'px';
@@ -245,6 +231,9 @@ foam.CLASS({
     },
     {
       name: 'props',
+      expression: function(of, columns_) {
+        return this.returnProeprtiesForColumns(this, columns_);
+      }
     },
     {
       name: 'updateValues',
@@ -277,9 +266,8 @@ foam.CLASS({
       if ( this.filteredTableColumns$ ) {
         this.onDetach(this.filteredTableColumns$.follow(
           //to not export "custom" table columns
-          this.columns_$.map((cols) => cols.filter(([axiomOrColumnName, overrides]) => view.allColumns.includes(foam.String.isInstance(axiomOrColumnName) ? ( axiomOrColumnName.indexOf('.') > -1 ? axiomOrColumnName.split('.')[0] : axiomOrColumnName ) : axiomOrColumnName.name )).map(([axiomOrColumnName, overrides]) => {
-            return foam.String.isInstance(axiomOrColumnName) ? axiomOrColumnName : axiomOrColumnName.name;
-          }))));
+          this.columns_$.map((cols) => this.mapArrayColumnsToArrayOfColumnNames(this, this.filterColumnsThatAllColumnsDoesNotIncludeForArrayOfColumns(this, cols)))
+        ));
       }
       this.
         addClass(this.myClass()).
@@ -289,8 +277,7 @@ foam.CLASS({
           style({ 'min-width': this.tableWidth_$ }).
           show(this.showHeader$).
           add(this.slot(function(columns_) {
-            var propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => foam.core.Property.isInstance(c) ? c.name : c));
-            view.props = view.returnProperties(view, propertyNamesToQuery);
+            view.props = this.returnProeprtiesForColumns(view, columns_);
             view.updateValues = ! view.updateValues;
 
             return this.E().
@@ -418,12 +405,12 @@ foam.CLASS({
           //with this code error created  slot.get cause promise return
           //FIX ME
           return this.slot(function(data, order, updateValues) {
-            var propertyNamesToQuery = view.columns_.length === 0 ? view.columns_ : [ 'id' ].concat(view.columns_.map(([c, overrides]) => ! foam.core.Property.isInstance(c) ? c : c.name));
-            view.props = view.returnProperties(view, propertyNamesToQuery);
+            view.props = this.returnProeprtiesForColumns(view, view.columns_);
+            var propertyNamesToQuery = view.props.map(p => p.fullPropertyName);
 
             var unitValueProperties = view.props.filter( p => foam.core.UnitValue.isInstance(p) );
 
-            var numberOfColumns = propertyNamesToQuery.length;
+            var numberOfColumns = view.props.length;
 
             // Make sure the DAO set here responds to ordering when a user clicks
             // on a table column header to sort by that column.
@@ -562,6 +549,7 @@ foam.CLASS({
                       delete view.checkboxes_[val[0]];
                     });
                   });
+                  //change to view.columns_
                   for ( var  i = 1 ; i < numberOfColumns ; i++  ) {
                     var column;
                     if ( ! foam.core.Reference.isInstance(view.props[i]) && ! foam.core.FObjectProperty.isInstance(view.props[i]) )
@@ -615,7 +603,75 @@ foam.CLASS({
       function returnProperties(obj, propertyNamesToQuery) {
         var columnConfig = obj.__context__.columnConfigToPropertyConverter;
         if ( ! columnConfig ) columnConfig = obj.ColumnConfigToPropertyConverter.create();
+        var result = [];
+        for ( var propName of propertyNamesToQuery ) {
+          result.push(foam.u2.view.PropertyColumnMapping.create({ fullPropertyName: propName, property: columnConfig.returnProperty(obj.of, propName) }));
+        }
         return columnConfig.returnProperties(obj.of, propertyNamesToQuery);
+      },
+      function returnColumnFirstLevelName(context, col) {
+        return context.canColumnBeTreatedAsAnAxiom(col) ? col.name : context.returnColumnNameForNLevelName(context, col, 0);
+      },
+      function returnColumnLastLevelName(context, col) {
+        return context.canColumnBeTreatedAsAnAxiom(col) ? col.name : context.returnColumnNameForNLevelName(context, col, -1);
+      },
+      function returnColumnNameForNLevelName(context, col, n) {
+        var propNames = col.split('.');
+        if ( n === -1 ) {
+          if ( propNames.length === 0 )
+            n = 0;
+          else
+            n = propNames.length - 1;
+        }
+        return propNames[n];
+      },
+      function returnPropertyNamesForColumn(context, col) {
+        return context.canColumnBeTreatedAsAnAxiom(col) ? col.name : col;
+      },
+      function checkIfArrayAndReturnPropertyNamesForColumn(context, col) {
+        return context.checkIfArrayAndExecute(context, col, context.canColumnBeTreatedAsAnAxiom);
+      },
+      function checkIfArrayAndReturnFirstLevelColumnName(context, col) {
+        return context.checkIfArrayAndExecute(context, col, context.returnColumnFirstLevelName);
+      },
+      function checkIfArrayAndExecute(context, col, f) {
+        return foam.Array.isInstance(col) ? f(context, col[0]) : f(context, col);
+      },
+      function canColumnBeTreatedAsAnAxiom(context, col) {
+        return foam.core.Property.isInstance(col) || foam.Object.isInstance(col);
+      },
+      function returnProeprtiesForColumns(context, columns_) {
+        var propertyNamesToQuery = columns_.length === 0 ? columns_ : [ 'id' ].concat(columns_.map(c => context.checkIfArrayAndReturnFirstLevelColumnName(context, c)));
+        return context.returnProperties(context, propertyNamesToQuery);
+      },
+      function doesAllColumnsContainsColumnName(context, col) {
+        return context.allColumns.contains(context.checkIfArrayAndReturnFirstLevelColumnName(context, col));
+      },
+      function filterColumnsThatAllColumnsDoesNotIncludeForArrayOfColumns(context, columns) {
+        return columns.filter( c => context.allColumns.includes( context.checkIfArrayAndReturnFirstLevelColumnName(context, c) ));
+      },
+      function mapArrayColumnsToArrayOfColumnNames(context, cols) {
+        return cols.map(c => context.checkIfArrayAndReturnPropertyNamesForColumn(context, c));
+      },
+      function returnPropertyForColumn(context, col) {
+        return context.props.find(p => p.name === context.returnPropertyNamesForColumn(context, col));
       }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2.view',
+  name: 'PropertyColumnMapping',
+  properties: [
+    {
+      name: 'fullPropertyName',
+      class: 'String'
+    },
+    {
+      name: 'property',
+      class: 'FObjectProperty',
+      of: 'Property',
+    }
   ]
 });
