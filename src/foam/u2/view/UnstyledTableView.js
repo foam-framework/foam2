@@ -328,17 +328,13 @@ foam.CLASS({
                 } else
                   column = view.columns.find( c => !foam.String.isInstance(c) && c.name === prop.name );
 
+                var tableWidth = view.returnColumnPropertyForPropertyName(view, col, tableWidth);
+
                 this.start().
                   addClass(view.myClass('th')).
-                  addClass(view.myClass('th-' + prop.name)).
-                  call(function() {
-                    if ( ( column && column.tableWidth ) || prop.tableWidth ) {
-                      this.style({ flex: `0 0 ${column && column.tableWidth ? column.tableWidth : prop.tableWidth}px` });
-                    } else {
-                      this.style({ flex: '1 0 0' });
-                    }
-                  }).
-                  add(view.__subContext__.columnConfigToPropertyConverter.returnColumnHeader(view.of, col)).
+                  addClass(view.myClass('th-' + prop.name))
+                  .style({ flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0' })
+                  .add(view.__subContext__.columnConfigToPropertyConverter.returnColumnHeader(view.of, col)).
                   callIf(isFirstLevelProperty && prop.sortable, function() {
                     this.on('click', function(e) {
                       view.sortBy(prop);
@@ -551,9 +547,7 @@ foam.CLASS({
                   });
 
                   //change to view.columns_.length!!!!!!!!
-                  for ( var  i = 1 ; i < numberOfColumns ; i++  ) {
-                    var column;
-                    
+                  for ( var  i = 1 ; i < numberOfColumns ; i++  ) {                    
                     var tableCellFormatter = view.returnColumnPropertyForPropertyName(view, view.props[i].fullPropertyName, tableCellFormatter);
                     var tableWidth = view.returnColumnPropertyForPropertyName(view, view.props[i].fullPropertyName, tableWidth);
                     if ( tableCellFormatter ) {
@@ -657,6 +651,7 @@ foam.CLASS({
         return context.props.find(p => p.fullPropertyName === context.returnPropertyNamesForColumn(context, col));
       },
       function returnColumnPropertyForPropertyName(context, col, property) {
+        //check for array!!!!!
         if ( context.canColumnBeTreatedAsAnAxiom(context, col) ) {
           if ( col[property] )
             return col[property];
