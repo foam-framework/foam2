@@ -25,12 +25,7 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'id',
-      javaFactory: `
-        if ( getClassType() != null )
-          return getClassType().getId();
-        return null;
-      `
+      name: 'id'
     },
     {
       class: 'Class',
@@ -111,15 +106,18 @@ foam.CLASS({
       name: 'error',
       args: [
         { name: 'x', type: 'Context' },
-        { name: 'exception', type: 'Object' },
-        { name: 'message', type: 'String...' }
+        { name: 'message', type: 'Object...' }
       ],
       javaCode: `
         String str = "";
-        for (String s: message){
-          str += s + ",";
+        setIsError(true);
+        for (Object s: message){
+          if ( s instanceof java.lang.Exception ) {
+            str += s.toString() + ",";
+          }
         }
-        setErrorMessage(str.substring(0, str.length() - 1));
+        if ( str.length() > 0 )
+          setErrorMessage(str.substring(0, str.length() - 1));
       `
     }
   ],
@@ -135,6 +133,7 @@ foam.CLASS({
             if ( pm == null ) return new PM(fo, name);
 
             pm.setClassType(fo.getClassInfo());
+            pm.setId(fo.getClassInfo().getId());
             pm.setName(combine(name));
             pm.init_();
 
@@ -147,6 +146,7 @@ foam.CLASS({
             if ( pm == null ) return new PM(clsInfo, name);
 
             pm.setClassType(clsInfo);
+            pm.setId(clsInfo.getId());
             pm.setName(combine(name));
             pm.init_();
 
@@ -170,6 +170,7 @@ foam.CLASS({
   public PM(ClassInfo clsInfo, String... name) {
     setName(combine(name));
     setClassType(clsInfo);
+    setId(clsInfo.getId());
     init_();
   }
 
@@ -178,12 +179,26 @@ foam.CLASS({
     foam.core.ClassInfoImpl clsInfo = new foam.core.ClassInfoImpl();
     clsInfo.setObjClass(cls);
     clsInfo.setId(cls.getName());
+    setId(clsInfo.getId());
     setClassType(clsInfo);
     init_();
   }
 
   public PM(FObject fo, String... name) {
     this(fo.getClassInfo(), name);
+  }
+
+  public PM(Object... args) {
+    setId(args[0].toString());
+    String str = "";
+    for (Object obj: args){
+      if ( obj instanceof java.lang.Exception ) {
+        str += obj.toString() + ",";
+      }
+    }
+    if ( str.length() > 0 )
+      setErrorMessage(str.substring(0, str.length() - 1));
+    init_();
   }
 
   private static String combine(String... args) {
@@ -193,7 +208,6 @@ foam.CLASS({
     }
     return str.substring(0, str.length() - 1);
   }
-
 `
         }));
       }
