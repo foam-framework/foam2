@@ -84,7 +84,8 @@ foam.CLASS({
       gridColumns: 6,
       view: {
         class: 'foam.u2.TextField',
-        placeholder: 'Jane'
+        placeholder: 'Jane',
+        focused: true
       },
       required: true
     },
