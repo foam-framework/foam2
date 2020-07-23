@@ -6,10 +6,9 @@
 
 foam.CLASS({
   package: 'foam.nanos.crunch',
-  name: 'CascadeInvalidate',
+  name: 'ReputDependentUCJs',
 
-  documentation: `When a ucj falls out of GRANTED status, also invalidate any ucjs
-    that depend on the first one.
+  documentation: `When a ucj goes into a certain status, try to reput its dependents
   `,
 
   implements: [
@@ -35,7 +34,7 @@ foam.CLASS({
           @Override
           public void execute(X x) {
             UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
-            CapabilityJunctionStatus invalidatedStatus = ucj.getStatus();
+            CapabilityJunctionStatus ucjStatus = ucj.getStatus();
             
             DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
             DAO filteredUserCapabilityJunctionDAO = (DAO) userCapabilityJunctionDAO.where((EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId())));
@@ -46,6 +45,7 @@ foam.CLASS({
               @Override
               public boolean f(Object obj) {
                 UserCapabilityJunction ucjToCheck = (UserCapabilityJunction) obj;
+                if ( ucjToCheck.getStatus() == ucjStatus ) return false;
                 CapabilityCapabilityJunctionId id = new CapabilityCapabilityJunctionId.Builder(x)
                   .setSourceId(ucjToCheck.getTargetId())
                   .setTargetId(ucj.getTargetId())
@@ -60,17 +60,17 @@ foam.CLASS({
               }
             };
 
-            List<UserCapabilityJunction> ucjsToInvalidate = (List<UserCapabilityJunction>) ((ArraySink) filteredUserCapabilityJunctionDAO
+            List<UserCapabilityJunction> ucjsToReput = (List<UserCapabilityJunction>) ((ArraySink) filteredUserCapabilityJunctionDAO
               .where(predicate)
               .select(new ArraySink()))
               .getArray();
-              
-            for ( UserCapabilityJunction invalidatedUcj : ucjsToInvalidate ) {
-              invalidatedUcj.setStatus(invalidatedStatus);
-              userCapabilityJunctionDAO.put(invalidatedUcj);
+
+            for ( UserCapabilityJunction ucjToReput : ucjsToReput ) {
+              userCapabilityJunctionDAO.put(ucjToReput);
+
             }
           }
-        }, "Remove dependencies on prerequisite ucj removal");
+        }, "Reput the UCJs of dependent capabilities");
       `
     }
   ]

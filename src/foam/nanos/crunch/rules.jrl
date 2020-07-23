@@ -62,6 +62,6 @@ p({
       }
     ]
   },
-  "action":{"class":"foam.nanos.crunch.CascadeInvalidate"},
+  "action":{"class":"foam.nanos.crunch.ReputDependentUCJs"},
   "lifecycleState":1
 })
