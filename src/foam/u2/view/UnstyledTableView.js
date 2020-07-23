@@ -320,13 +320,7 @@ foam.CLASS({
               // Render the table headers for the property columns.
               forEach(columns_, function([col, overrides]) {
                 var prop = view.props.find(p => p.fullPropertyName === col).property;
-                var isFirstLevelProperty = true;
-                var column;
-                if ( foam.core.FObject.isInstance(col) || foam.core.Reference.isInstance(col) ) {
-                  var propertyNames = col.split('.');
-                  isFirstLevelProperty = propertyNames.length === 1;
-                } else
-                  column = view.columns.find( c => !foam.String.isInstance(c) && c.name === prop.name );
+                var isFirstLevelProperty = col.indexOf('.') > -1;
 
                 var tableWidth = view.returnColumnPropertyForPropertyName(view, col, tableWidth);
 
