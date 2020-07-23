@@ -2,6 +2,7 @@ foam.CLASS({
   package: 'foam.nanos.session',
   name: 'LocalSettingSessionDAO',
   extends: 'foam.dao.ProxyDAO',
+  documentation: 'LocalSettingSessionDAO is decorator for writting to localLocalSettingDAO, which is Session Context MDAO',
   javaImports: [
     'foam.core.X',
     'foam.dao.DAO'
