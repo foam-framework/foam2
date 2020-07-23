@@ -124,7 +124,6 @@ foam.CLASS({
           this.auth.login(X, this.identifier, this.password).then(
             (logedInUser) => {
               if ( ! logedInUser ) return;
-
               if ( this.token_ ) {
                 logedInUser.signUpToken = this.token_;
                 this.dao_.put(logedInUser)
