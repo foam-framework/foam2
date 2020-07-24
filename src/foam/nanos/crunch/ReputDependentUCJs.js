@@ -22,6 +22,7 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.mlang.predicate.AbstractPredicate',
     'foam.nanos.auth.User',
+    'foam.nanos.auth.Subject',
     'java.util.List',
     'static foam.mlang.MLang.*'
   ],
@@ -66,8 +67,7 @@ foam.CLASS({
               .getArray();
 
             for ( UserCapabilityJunction ucjToReput : ucjsToReput ) {
-              userCapabilityJunctionDAO.put(ucjToReput);
-
+              userCapabilityJunctionDAO.inX(x).put(ucjToReput);
             }
           }
         }, "Reput the UCJs of dependent capabilities");
