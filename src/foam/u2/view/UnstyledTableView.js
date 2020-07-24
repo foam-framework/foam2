@@ -329,7 +329,7 @@ foam.CLASS({
               // Render the table headers for the property columns.
               forEach(columns_, function([col, overrides]) {
                 var prop = view.props.find(p => p.fullPropertyName === view.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(view, col)).property;
-                var isFirstLevelProperty = col.indexOf('.') > -1;
+                var isFirstLevelProperty = view.columnHandler.canColumnBeTreatedAsAnAxiom(view, col) ? true : col.indexOf('.') > -1;
 
                 var tableWidth = view.returnColumnPropertyForPropertyName(view, col, 'tableWidth');
 
