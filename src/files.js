@@ -832,6 +832,7 @@ FOAM_FILES([
 
   //Column config
   { name: "foam/nanos/column/ColumnConfigPropertyValue" },
+  { name: "foam/nanos/column/CommonColumnHandler"},
   { name: "foam/nanos/column/CSVTableOutputter"},
   { name: "foam/nanos/column/NestedPropertiesExpression" },
   { name: "foam/nanos/column/TableColumnOutputter" }
