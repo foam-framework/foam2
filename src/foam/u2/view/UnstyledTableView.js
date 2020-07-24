@@ -557,10 +557,10 @@ foam.CLASS({
                     var tableWidth = view.returnColumnPropertyForPropertyName(view, view.columns_[i], 'tableWidth');
 
                     var stringValue;
-                    var elmt = this.E().addClass(view.myClass('td')).style({flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0'});//, 'justify-content': 'center'
+                    var elmt = this.E().addClass(view.myClass('td')).style({flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0'});
                     if ( foam.core.UnitValue.isInstance(prop) ) {
                       var indexOfUnitName = propertyNamesToQuery.indexOf(prop.unitPropName);
-                      stringValue = view.outputter.returnStringValueForProperty(prop, value, val[indexOfUnitName]);
+                      stringValue = view.outputter.returnStringValueForProperty(view.__context__, prop, value, val[indexOfUnitName]);
                     } else if ( tableCellFormatter ) {
                       try {
                         if ( tableCellFormatter )
