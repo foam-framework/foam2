@@ -27,7 +27,7 @@
           }
           if ( foam.core.UnitValue.isInstance(prop) ) {
             if ( unitPropName ) {
-              if ( prop.unitPropValueToString) {
+              if ( prop.unitPropValueToString ) {
                 return await prop.unitPropValueToString(x, val, unitPropName);
               }
               return unitPropName + ' ' + ( val / 100 ).toString();

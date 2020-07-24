@@ -77,7 +77,7 @@ foam.CLASS({
         if ( ! of ) return [];
         var cols;
         if ( ! editColumnsEnabled )
-          cols = of.getAxiomByName('tableColumns').columns || allColumns;
+          cols = columns || allColumns;
         else
           cols = selectedColumnNames;
         return this.filterColumnsThatAllColumnsDoesNotIncludeForArrayOfColumns(this, cols).map(c => foam.Array.isInstance(c) ? c : [c, null]);
@@ -631,11 +631,11 @@ foam.CLASS({
         return result;
       },
       function returnTableColumnForColumnName(context, col) {
-        if ( col.indexOf('.') > -1 ) {
-          return null;
-        }
         if ( context.columnHandler.canColumnBeTreatedAsAnAxiom(context, col) ) {
           return col;
+        }
+        if ( col.indexOf('.') > -1 ) {
+          return null;
         }
         return context.columns.find( c =>  context.columnHandler.returnPropertyNamesForColumn(context, c) === col);
       }

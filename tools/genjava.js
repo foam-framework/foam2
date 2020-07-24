@@ -3,8 +3,9 @@
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
+
 var path_ = require('path');
-var fs_ = require('fs');
+var fs_   = require('fs');
 
 process.on('unhandledRejection', function(e) {
   console.error("ERROR: Unhandled promise rejection ", e);
