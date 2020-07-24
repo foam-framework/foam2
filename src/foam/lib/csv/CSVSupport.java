@@ -55,6 +55,10 @@ public class CSVSupport
       Object[] values = null;
 
       while ( (line = reader.readLine()) != null ) {
+        line = line;
+        line = line.trim();
+        if ( line.length() == 0 ) continue;
+
         ps = new StringPStream();
         ps.setString(line);
         x = new ParserContextImpl();

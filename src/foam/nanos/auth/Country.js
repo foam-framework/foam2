@@ -37,6 +37,7 @@ foam.CLASS({
       documentation: `A list of known alternative country names.`,
     }
   ],
+
   methods: [
     {
       name: 'toString',

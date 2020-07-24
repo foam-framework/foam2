@@ -49,6 +49,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'errorString',
+      // TODO: make deprecated, makes i18n difficult
       documentation: `
         Provide feedback to the user via a String.
         When both errorString and errorMessage are specified, the errorMessage will be used.
@@ -59,7 +60,7 @@ foam.CLASS({
       // TODO: it isn't normal for JS functions to have a 'js' prefix
       name: 'jsErr',
       expression: function(errorString, errorMessage) {
-        return function(obj) { 
+        return function(obj) {
           if ( errorMessage && obj ) {
             if ( obj[errorMessage] ) return obj[errorMessage];
             console.warn('Error finding message', errorMessage, '. No such message on object.', obj);

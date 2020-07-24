@@ -21,13 +21,13 @@
           if ( foam.Array.isInstance(val) ) {
             var stringArr = [];
             for ( var i = 0 ; i < val.length ; i++ ) {
-              stringArr.push(await this.unitPropValueToString(val[i]));
+              stringArr.push(await this.valueToString(val[i]));
             }
             return stringArr.join(' ');
           }
           if ( foam.core.UnitValue.isInstance(prop) ) {
             if ( unitPropName ) {
-              if ( prop.unitPropValueToString) {
+              if ( prop.unitPropValueToString ) {
                 return await prop.unitPropValueToString(x, val, unitPropName);
               }
               return unitPropName + ' ' + ( val / 100 ).toString();
@@ -43,12 +43,12 @@
           if ( foam.core.Time.isInstance(prop) ) {
             return val.toString().substring(0, 8);
           }
-          return await this.unitPropValueToString(val);
+          return await this.valueToString(val);
         }
         return ''; 
       }
     },
-    async function unitPropValueToString(val) {
+    async function valueToString(val) {
       if ( val.toSummary ) {
         if ( val.toSummary() instanceof Promise )
           return await val.toSummary();
@@ -80,15 +80,19 @@
     },
     {
       name: 'objectToTable',
-      code: async function(x, of, props, obj) {
-        var values = await this.objToArrayOfStringValues(x, of, props, obj);
-        return this.returnTable(x, props, values);
+      code: async function(x, of, propNames, obj) {
+        var columnConfig = x.columnConfigToPropertyConverter;
+        var filteredPropNames = columnConfig.filterExportedProps(obj.cls_, propNames);
+        var values = await this.objToArrayOfStringValues(x, of, filteredPropNames, obj);
+        return this.returnTable(x, of, filteredPropNames, values);
       }
     },
     {
       name: 'returnTable',
-      code: async function(x, props, values) {
-        var table =  [ props.map( p => p.label ) ];
+      code: async function(x, of, propNames, values) {
+        var columnConfig = x.columnConfigToPropertyConverter;
+        var props = columnConfig.returnProperties(of, propNames);
+        var table =  [ this.getColumnHeaders(x, of, propNames) ];
         var values = await this.arrayOfValuesToArrayOfStrings(x, props, values);
         table = table.concat(values);
         return table;
@@ -105,6 +109,18 @@
             propNames.push(props[i].name);
         }
         return propNames;
+      }
+    },
+    {
+      name: 'getColumnHeaders',
+      type: 'String',
+      code: function(x, of, arrOfPropNames) {
+        var columnConfig = x.columnConfigToPropertyConverter;
+        var columnHeaders = [];
+        for ( var propName of  arrOfPropNames ) {
+          columnHeaders.push(columnConfig.returnColumnHeader(of, propName));
+        }
+        return columnHeaders;
       }
     }
   ]

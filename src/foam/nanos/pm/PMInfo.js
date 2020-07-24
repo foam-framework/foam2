@@ -49,7 +49,7 @@ foam.CLASS({
       label: 'Avg',
       getter: function() { return (this.totalTime / this.count).toFixed(2); },
       javaGetter: `return (long) (Math.round( ( (float)getTotalTime() / (float)getCount() ) * 100.0 ) / 100.0);`,
-      transient: true
+      storageTransient: true
     },
     {
       class: 'Duration',
