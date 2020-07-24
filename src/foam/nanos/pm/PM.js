@@ -58,7 +58,7 @@ foam.CLASS({
     },
     {
       name: 'exception',
-      type: 'Object',
+      class: 'Object',
       storageTransient: true
     }
   ],
@@ -106,14 +106,15 @@ foam.CLASS({
       name: 'error',
       args: [
         { name: 'x', type: 'Context' },
-        { name: 'message', type: 'Object...' }
+        { name: 'args', type: 'Object...' }
       ],
       javaCode: `
         String str = "";
         setIsError(true);
-        for (Object s: message){
-          if ( s instanceof java.lang.Exception ) {
-            str += s.toString() + ",";
+        for (Object obj: args) {
+          if ( obj instanceof java.lang.Exception ) {
+            setException(obj);
+            str += ((Exception) obj).getMessage() + ",";
           }
         }
         if ( str.length() > 0 )
@@ -191,13 +192,11 @@ foam.CLASS({
   public PM(Object... args) {
     setId(args[0].toString());
     String str = "";
-    for (Object obj: args){
-      if ( obj instanceof java.lang.Exception ) {
-        str += obj.toString() + ",";
-      }
+    for (Object obj: java.util.Arrays.copyOfRange(args, 1, args.length)){
+      str += obj.toString() + ":";
     }
     if ( str.length() > 0 )
-      setErrorMessage(str.substring(0, str.length() - 1));
+      setName(str.substring(0, str.length() - 1));
     init_();
   }
 
