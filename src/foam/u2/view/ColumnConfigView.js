@@ -65,7 +65,7 @@ foam.CLASS({
             if ( ! axiom || axiom.networkTransient ) {
               continue;
             }
-            rootProperty = [ axiom.name, axiom.tableHeader ? axiom.tableHeader() : axiom.label ];
+            rootProperty = [ axiom.name, this.columnHandler.returnAxiomHeader(axiom) ];
           } else 
             rootProperty = data.selectedColumnNames[i];
 
@@ -108,7 +108,7 @@ foam.CLASS({
             axiom = axiom || data.of.getAxiomByName(notSelectedColumns[i]);
             if ( axiom.networkTransient )
               continue;
-            rootProperty = [ axiom.name, axiom.tableHeader ? axiom.tableHeader() : axiom.label ];
+            rootProperty = [ axiom.name, this.columnHandler.returnAxiomHeader(axiom) ];
           }
           
           nonSelectedViewModels.push(foam.u2.view.SubColumnSelectConfig.create({ 
@@ -598,9 +598,9 @@ foam.CLASS({
       expression: function(rootProperty) {
         if ( ! this.of || ! this.of.getAxiomByName )
           return [];
-        var r = this.of.getAxiomByName(foam.Array.isInstance(rootProperty) ? this.rootProperty[0] : rootProperty.name);
+        var r = this.of.getAxiomByName(this.columnHandler.checkIfArrayAndReturnPropertyNameForRootProperty(this, rootProperty));
         if ( r && r.cls_ && ( foam.core.FObjectProperty.isInstance(r) || foam.core.Reference.isInstance(r) ) )
-          return r.of.getAxiomsByClass(foam.core.Property).map(p => [p.name, p.tableHeader ? p.tableHeader() : p.tableHeader.label]);
+          return r.of.getAxiomsByClass(foam.core.Property).map(p => [p.name, this.columnHandler.returnAxiomHeader(p)]);
         return [];
       }
     },
@@ -616,7 +616,7 @@ foam.CLASS({
         var selectedSubProperties = [];
         var otherSubProperties = [];
 
-        var thisRootPropName = foam.Array.isInstance(this.rootProperty) ? this.rootProperty[0] : this.rootProperty.name;
+        var thisRootPropName = this.columnHandler.checkIfArrayAndReturnPropertyNameForRootProperty(this, this.rootProperty);
         //find selectedColumn for the root property 
         var selectedColumn = this.selectedColumns.filter(c => {
           var thisSelectedColumn = foam.String.isInstance(c) ? c : c.name;
@@ -664,7 +664,7 @@ foam.CLASS({
       name: 'isPropertySelected',
       class: 'Boolean',
       expression: function() {
-        var thisPropName = foam.Array.isInstance(this.rootProperty) ? this.rootProperty[0] : this.rootProperty.name;
+        var thisPropName = this.columnHandler.checkIfArrayAndReturnPropertyNameForRootProperty(this, this.rootProperty);
         return typeof this.selectedColumns.find(s => {
           var propName = foam.String.isInstance(s) ? s.split('.') : s.name;
           return foam.Array.isInstance(propName) ? ( this.level < propName.length && propName[this.level] === thisPropName ) : thisPropName === propName;
