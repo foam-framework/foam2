@@ -19,6 +19,17 @@ foam.CLASS({
     'foam.util.StringUtil',
     'java.lang.reflect.Method'
   ],
+  properties: [
+    {
+      name: 'columnHandler',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.column.CommonColumnHandler',
+      flags: ['js'],
+      factory: function() {
+        return foam.nanos.column.CommonColumnHandler.create();
+      }
+    }
+  ],
   methods: [
     {
       name: 'filterExportedProps',
@@ -54,10 +65,7 @@ foam.CLASS({
         if ( foam.String.isInstance(propName) ) {
           var propNames = propName.split('.');
           for ( var i = 0 ; i < propNames.length ; i++ ) {
-            property = foam.String.isInstance(propNames[i])
-            ? cls.getAxiomByName(propNames[i])
-            :  foam.Array.isInstance(propNames[i]) ? 
-            cls.getAxiomByName(propNames[i][0]) : propNames[i];
+            property = cls.getAxiomByName(this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(this, propNames[i]));
             if ( ! property )
               return '';
             columnHeader.push(property.tableHeader());
