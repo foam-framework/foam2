@@ -11,6 +11,10 @@ foam.CLASS({
   documentation: `Model used for registering/creating an user.
   Hidden properties create the different functionalities for this view (Ex. coming in with a signUp token)`,
 
+  implements: [
+    'foam.mlang.Expressions'
+  ],
+
   imports: [
     'appConfig',
     'auth',
@@ -21,8 +25,6 @@ foam.CLASS({
 
   requires: [
     'foam.log.LogLevel',
-    'foam.nanos.auth.Address',
-    'foam.nanos.auth.Country',
     'foam.nanos.auth.User',
     'foam.u2.dialog.NotificationMessage'
   ],
@@ -32,7 +34,9 @@ foam.CLASS({
     { name: 'FOOTER_TXT', message: 'Already have an account?' },
     { name: 'FOOTER_LINK', message: 'Sign in' },
     { name: 'ERROR_MSG', message: 'There was a problem creating your account.' },
-    { name: 'VALIDATION_ERR_TEXT', message: 'Please enter username' }
+    { name: 'USERNAME_EMPTY_ERR', message: 'Please enter username' },
+    { name: 'USERNAME_SYNTAX_ERR', message: 'Please enter valid username' },
+    { name: 'USERNAME_AVAILABILITY_ERR', message: 'This username is taken. Please try another.' }
   ],
 
   properties: [
@@ -78,24 +82,33 @@ foam.CLASS({
       required: true
     },
     {
+      class: 'Boolean',
+      name: 'userNameAvailable',
+      documentation: `Binded property used to display failed username availability validation error`,
+      value: true,
+      hidden: true
+    },
+    {
       class: 'String',
       name: 'userName',
       label: 'Username',
-      view: {
-        class: 'foam.u2.TextField',
-        placeholder: 'example123'
+      placeholder: 'example123',
+      view: function(_, X) {
+        return {
+          class: 'foam.u2.view.UsernameView',
+          icon: 'images/checkmark-small-green.svg',
+          onKey: true,
+          userNameAvailable$: X.data.userNameAvailable$
+        };
       },
-      validationPredicates: [
-        {
-          args: ['userName'],
-          predicateFactory: function(e) {
-            return e.REG_EXP(
-              foam.nanos.u2.navigation.SignUp.USER_NAME,
-              /^[^\s\/]+$/);
-          },
-          errorMessage: 'VALIDATION_ERR_TEXT'
-        }
-      ],
+      validateObj: function(userName, userNameAvailable) {
+        // Empty Check
+        if ( userName.length === 0 ) return this.USERNAME_EMPTY_ERR;
+        // Syntax Check
+        if ( ! /^[^\s\/]+$/.test(userName) ) return this.USERNAME_SYNTAX_ERR;
+        // Availability Check
+        if ( ! userNameAvailable ) return this.USERNAME_AVAILABILITY_ERR;
+      },
       required: true
     },
     {
@@ -158,8 +171,6 @@ foam.CLASS({
         this.isLoading_ = true;
         this.dao_
           .put(this.User.create({
-            // organization needs to be overwritten by crunch when registering business
-            organization: this.userName,
             userName: this.userName,
             email: this.email,
             desiredPassword: this.desiredPassword,

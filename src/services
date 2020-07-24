@@ -1060,3 +1060,26 @@ p({
     }
   """
 })
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "usernameService",
+  "serve": true,
+  "authenticate": false,
+  "boxClass":"foam.nanos.auth.username.UsernameServiceInterfaceSkeleton",
+  "serviceClass": "foam.nanos.auth.username.UsernameService",
+  "client":
+    """
+      {
+        "class":"foam.nanos.auth.username.ClientUsernameService",
+        "delegate": {
+          "class":"foam.box.SessionClientBox",
+          "delegate": {
+            "class":"foam.box.HTTPBox",
+            "url":
+            "service/usernameService"
+          }
+        }
+      }
+    """
+})
