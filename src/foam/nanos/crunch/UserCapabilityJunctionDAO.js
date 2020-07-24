@@ -114,21 +114,24 @@ foam.CLASS({
         boolean requiresData = capability.getOf() != null;
         boolean requiresReview = capability.getReviewRequired();
 
+        boolean validData = ! requiresData || ( ucJunction.getData() != null && validateData(x, ucJunction) );
+        if ( ! validData ) {
+          // if the data is not valid, the ucj should always be in ACTION_REQUIRED, thus we can skip the next steps
+          ucJunction.setStatus(CapabilityJunctionStatus.ACTION_REQUIRED);
+          return getDelegate().put_(x, ucJunction);
+        }
+
         // Update current UCJ status
-        if ( old == null
-          || ucJunction.getStatus() == CapabilityJunctionStatus.ACTION_REQUIRED )
+        if ( old == null || ucJunction.getStatus() == CapabilityJunctionStatus.ACTION_REQUIRED )
         {
           CapabilityJunctionStatus chainedStatus = checkPrereqsChainedStatus(x, ucJunction);
-          if ( ( ! requiresData || ( ucJunction.getData() != null && validateData(x, ucJunction) ) )
-            && chainedStatus == CapabilityJunctionStatus.GRANTED )
-          {
-            // if review is required for this Capability, set the status to pending so that rules can be triggered
-            if ( requiresReview )
-              ucJunction.setStatus(CapabilityJunctionStatus.PENDING);
-            else
-              ucJunction.setStatus(CapabilityJunctionStatus.GRANTED);
-          } else {
-            ucJunction.setStatus(CapabilityJunctionStatus.ACTION_REQUIRED);
+          if ( requiresReview ) {
+            ucJunction.setStatus(chainedStatus == CapabilityJunctionStatus.ACTION_REQUIRED ?
+              CapabilityJunctionStatus.ACTION_REQUIRED :
+              CapabilityJunctionStatus.PENDING);
+          }
+          else {
+            ucJunction.setStatus(chainedStatus);
           }
         } 
 
@@ -340,22 +343,15 @@ foam.CLASS({
 
           if ( ucJunction != null && ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED ) continue;
           
-          // CONFIRM ucJunction status with re-put the ucj
-          ucJunction = ucJunction == null ? 
-            new UserCapabilityJunction.Builder(x)
-              .setSourceId(ucj.getSourceId())
-              .setTargetId(ccJunction.getTargetId())
-              .build() :
-            ucJunction;
-          try {
-            ucJunction = (UserCapabilityJunction) ((DAO) x.get("userCapabilityJunctionDAO")).put_(x, ucJunction);
-          } catch ( RuntimeException e ) {
+
+          if ( ucJunction == null ) {
             return CapabilityJunctionStatus.ACTION_REQUIRED;
           }
-
-          if ( ucJunction == null ) return CapabilityJunctionStatus.ACTION_REQUIRED;
           if ( ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED
-            && ucJunction.getStatus() != CapabilityJunctionStatus.PENDING ) return CapabilityJunctionStatus.ACTION_REQUIRED;
+            && ucJunction.getStatus() != CapabilityJunctionStatus.PENDING ) {
+
+              return CapabilityJunctionStatus.ACTION_REQUIRED;
+            }
           if ( ucJunction.getStatus() == CapabilityJunctionStatus.PENDING ) allGranted = false; 
         }
         return allGranted ? CapabilityJunctionStatus.GRANTED : CapabilityJunctionStatus.PENDING;
