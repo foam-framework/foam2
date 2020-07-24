@@ -20,17 +20,17 @@ foam.CLASS({
     'foam.nanos.column.TableColumnOutputter',
     'foam.u2.md.CheckBox',
     'foam.u2.md.OverlayDropdown',
-    'foam.u2.view.OverlayActionListView',
-    'foam.u2.view.EditColumnsView',
+    'foam.u2.tag.Image',
     'foam.u2.view.ColumnConfig',
     'foam.u2.view.ColumnVisibility',
-    'foam.u2.tag.Image',
+    'foam.u2.view.EditColumnsView',
+    'foam.u2.view.OverlayActionListView'
   ],
 
   exports: [
     'columns',
-    'selection',
-    'hoverSelection'
+    'hoverSelection',
+    'selection'
   ],
 
   imports: [
@@ -75,8 +75,10 @@ foam.CLASS({
       expression: function(columns, of, editColumnsEnabled, selectedColumnNames, allColumns) {
         if ( ! of ) return [];
         var cols;
-        if ( ! editColumnsEnabled ) cols = of.getAxiomByName('tableColumns').columns || allColumns;
-        else cols = selectedColumnNames;
+        if ( ! editColumnsEnabled )
+          cols = of.getAxiomByName('tableColumns').columns || allColumns;
+        else
+          cols = selectedColumnNames;
         return cols.filter( c => allColumns.includes(foam.String.isInstance(c) ? ( c.indexOf('.') > -1 ? c.split('.')[0] : c ) : columns.name )).map(c => foam.Array.isInstance(c) ? c : [c, null]);
       },
     },
@@ -96,7 +98,7 @@ foam.CLASS({
       name: 'selectedColumnNames',
       expression: function(columns, of) {
         var ls = JSON.parse(localStorage.getItem(of.id));
-        return ls ? ls : columns;
+        return ls || columns;
       }
     },
     {
@@ -616,6 +618,5 @@ foam.CLASS({
         if ( ! columnConfig ) columnConfig = obj.ColumnConfigToPropertyConverter.create();
         return columnConfig.returnProperties(obj.of, propertyNamesToQuery);
       }
-  ],
-
+  ]
 });
