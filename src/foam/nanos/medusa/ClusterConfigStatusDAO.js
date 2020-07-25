@@ -110,6 +110,7 @@ foam.CLASS({
             EQ(ClusterConfig.ENABLED, true),
             EQ(ClusterConfig.STATUS, Status.ONLINE),
             EQ(ClusterConfig.TYPE, MedusaType.NODE),
+            EQ(ClusterConfig.ACCESS_MODE, AccessMode.RW),
             EQ(ClusterConfig.ZONE, 0L),
             EQ(ClusterConfig.REGION, myConfig.getRegion()),
             EQ(ClusterConfig.REALM, myConfig.getRealm())

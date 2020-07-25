@@ -3,7 +3,6 @@
  * Copyright 2020 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-
 foam.CLASS({
   package: 'foam.box.socket',
   name: 'SocketConnectionBox',
@@ -150,7 +149,7 @@ foam.CLASS({
       Box replyBox = (Box) msg.getAttributes().get("replyBox");
       if ( replyBox != null ) {
         Long replyBoxId = replyBoxId_.incrementAndGet();
-        getReplyBoxes().put(replyBoxId, replyBox);
+        getReplyBoxes().put(replyBoxId, new BoxHolder(replyBox, PM.create(getX(), this.getOwnClassInfo(), getHost()+":"+getPort()+":roundtrip")));
         SocketClientReplyBox box = new SocketClientReplyBox(replyBoxId);
         if ( replyBox instanceof ReplyBox ) {
           ((ReplyBox)replyBox).setDelegate(box);
@@ -172,6 +171,7 @@ foam.CLASS({
           out_.writeInt(messageBytes.length);
           out_.write(messageBytes);
           out_.flush();
+          // REVIEW: this does not work.
           // if ( flushId == flushId_.get() ) {
           //   getLogger().debug("flush");
           //   out_.flush();
@@ -180,6 +180,7 @@ foam.CLASS({
           // }
         }
       } catch ( Exception e ) {
+        // TODO: perhaps report last exception on host port via manager.
         getLogger().error(e.getMessage(), "message", message, e);
         setValid(false);
         throw new RuntimeException(e);
@@ -225,6 +226,7 @@ foam.CLASS({
                 break;
               }
               if ( total > length ) {
+                // REVIEW: can this happen?
                 getLogger().error("read too much", length, total);
                 break;
               }
@@ -242,13 +244,11 @@ foam.CLASS({
               throw new RuntimeException("Failed to parse.");
             }
             Long replyBoxId = (Long) msg.getAttributes().get(REPLY_BOX_ID);
-            Box replyBox = (Box) getReplyBoxes().get(replyBoxId);
-            if ( replyBox != null ) {
-              if ( replyBox instanceof SocketClientReplyBox ) {
-                pm = PM.create(getX(), this.getOwnClassInfo(), getHost()+":"+getPort()+":roundtrip");
-                pm.setStartTime(((SocketClientReplyBox) replyBox).getCreated());
-                pm.log(x);
-              }
+            BoxHolder holder = (BoxHolder) getReplyBoxes().get(replyBoxId);
+            if ( holder != null ) {
+              Box replyBox = holder.getBox();
+              pm = holder.getPm();
+              pm.log(x);
               getReplyBoxes().remove(replyBoxId);
               replyBox.send(msg);
             } else {

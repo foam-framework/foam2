@@ -80,7 +80,7 @@ logger.warning(this.getClass().getSimpleName(), "send", e.getMessage());
   // TODO: should this be wrapped in new Thread() ?
   ((Runnable) getX().get("requestLogin")).run();
   getClientBox().send(getMsg());
-} else {
+} else if ( getDelegate() != null ) {
   getDelegate().send(msg);
 }`
     }
@@ -162,10 +162,8 @@ msg.attributes["replyBox"] = SessionReplyBox_create([
 ])
 try delegate.send(msg)
       `,
-      javaCode: `msg.getAttributes().put(SESSION_KEY, getSessionID());
-SessionReplyBox sessionReplyBox = new SessionReplyBox(getX(), msg,
-    this, (Box) msg.getAttributes().get("replyBox"));
-msg.getAttributes().put("replyBox", sessionReplyBox);
+      javaCode: `
+msg.getAttributes().put(SESSION_KEY, getSessionID());
 getDelegate().send(msg);`
     }
   ]

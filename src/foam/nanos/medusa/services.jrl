@@ -183,4 +183,11 @@ p({
   """
 })
 
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "daggerService",
+  "serve": false,
+  "service": {"class":"foam.nanos.medusa.DefaultDaggerService"}
+})
+
 // See deployment/mm and mn for type specific setup

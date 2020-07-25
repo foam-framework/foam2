@@ -74,7 +74,11 @@ public class NanoRouter
     Object   service    = getX().get(serviceKey);
     NSpec    spec       = (NSpec) nSpecDAO_.find(serviceKey);
     WebAgent agent     = getWebAgent(spec, service);
-    PM       pm         = new PM(this.getClass(), serviceKey);
+
+    foam.core.ClassInfoImpl clsInfo = new foam.core.ClassInfoImpl();
+    clsInfo.setObjClass(this.getClass());
+    clsInfo.setId(this.getClass().getSimpleName());
+    PM       pm         = PM.create(getX(), clsInfo, serviceKey);
 
     resp.setContentType("text/html");
 

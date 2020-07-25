@@ -29,6 +29,7 @@ foam.CLASS({
     'status',
     'type',
     'isPrimary',
+    'accessMode',
     'port',
     'pingLatency',
     'zone',
@@ -100,11 +101,11 @@ foam.CLASS({
       storageTransient: true
     },
     {
-      // TODO: not presently used. 
+      documentation: 'Mode of a node (read-only, read-write or write-only)',
       name: 'accessMode',
       class: 'Enum',
       of: 'foam.nanos.medusa.AccessMode',
-      documentation: 'Mode of a node (read-only, read-write or write-only)'
+      value: 'RW'
     },
     {
       name: 'port',
