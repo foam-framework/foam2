@@ -24,12 +24,6 @@ foam.INTERFACE({
       args: ['X', 'dao'],
       documentation: 'Exports data in a DAO',
       flags: ['js']
-    },
-    {
-      name: 'tearDown',
-      type: 'String',
-      args: ['X', 'obj'],
-      flags: ['js']
     }
   ]
 });

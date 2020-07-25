@@ -9,13 +9,13 @@ package foam.core;
 public class ContextAgentRunnable
   implements Runnable
 {
-  final protected X            x_;
-  final protected ContextAgent agent_;
-  final protected String description_;
+  final X            x_;
+  final ContextAgent agent_;
+  final String       description_;
 
   public ContextAgentRunnable(X x, ContextAgent agent, String description) {
-    x_     = x;
-    agent_ = agent;
+    x_           = x;
+    agent_       = agent;
     description_ = description;
   }
 
@@ -24,6 +24,11 @@ public class ContextAgentRunnable
   }
 
   public void run() {
-    agent_.execute(x_);
+    XLocator.set(x_);
+    try {
+      agent_.execute(x_);
+    } finally {
+      XLocator.set(null);
+    }
   }
 }

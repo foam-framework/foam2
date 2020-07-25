@@ -23,7 +23,6 @@ import foam.nanos.pm.PM;
 import foam.nanos.script.Script;
 import foam.nanos.session.Session;
 import foam.util.SafetyUtil;
-
 import java.lang.Exception;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -43,6 +42,8 @@ public class Boot {
   }
 
   public Boot(String datadir) {
+    XLocator.set(root_);
+
     Logger logger = new ProxyLogger(new StdoutLogger());
     root_ = root_.put("logger", logger);
 
@@ -114,6 +115,9 @@ public class Boot {
 
     // Revert root_ to non ProxyX to avoid letting children add new bindings.
     root_ = ((ProxyX) root_).getX();
+    XLocator.set(root_);
+
+    // Export the ServiceDAO
     ((ProxyDAO) root_.get("nSpecDAO")).setDelegate(
       new foam.nanos.auth.AuthorizationDAO(getX(), serviceDAO_, new foam.nanos.auth.GlobalReadAuthorizer("service")));
 

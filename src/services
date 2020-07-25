@@ -523,23 +523,26 @@ p({
   "class":"foam.nanos.boot.NSpec",
   "name":"digDAO",
   "serve":true,
-  "serviceScript":`
-    return new foam.dao.EasyDAO.Builder(x)
-      .setPm(true)
-      .setGuid(true)
-      .setOf(foam.nanos.dig.DIG.getOwnClassInfo())
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName(\"digs\")
-      .build();"
-  `,
-  "client":` {
-    "of":"foam.nanos.dig.DIG",
-    "decorators": [
-      {"class":"foam.nanos.fs.FileDAODecorator"},
-      {"class":"foam.nanos.fs.FileArrayDAODecorator"}
-    ]
-  }
-  `
+  "serviceScript":
+  """
+  return new foam.dao.EasyDAO.Builder(x)
+    .setPm(true)
+    .setGuid(true)
+    .setOf(foam.nanos.dig.DIG.getOwnClassInfo())
+    .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+    .setJournalName("digs")
+    .setServiceProviderAware(true)
+    .setServiceProviderAwarePropertyInfos(
+      foam.util.Arrays.asMap(new Object[]
+        {
+          foam.nanos.dig.DIG.class.getName(),
+          new foam.core.PropertyInfo[] { foam.nanos.dig.DIG.CREATED_BY }
+        }
+      )
+    )
+    .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.dig.DIG\",\"decorators\": [{\"class\":\"foam.nanos.fs.FileDAODecorator\"},{\"class\":\"foam.nanos.fs.FileArrayDAODecorator\"}]}"
 })
 
 p({"class":"foam.nanos.boot.NSpec", "name":"demoObjectDAO",                      "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"demoObjects\").setGuid(true).setOf(foam.nanos.demo.DemoObject.getOwnClassInfo()).build();", "client":"{\"of\":\"foam.nanos.demo.DemoObject\", \"remoteListenerSupport\": false}"})
@@ -742,6 +745,15 @@ p({
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("sugars")
       .setPm(true)
+      .setServiceProviderAware(true)
+      .setServiceProviderAwarePropertyInfos(
+        foam.util.Arrays.asMap(new Object[]
+          {
+            foam.nanos.dig.SUGAR.class.getName(),
+            new foam.core.PropertyInfo[] { foam.nanos.dig.SUGAR.CREATED_BY }
+          }
+        )
+      )
       .build();
   """,
   "client":"{\"of\":\"foam.nanos.dig.SUGAR\"}"
@@ -1091,4 +1103,21 @@ p({
       "of":"foam.nanos.google.api.auth.GoogleApiCredentials"
     }
   """
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"localSettingDAO",
+  "lazy":false,
+  "serve":true,
+  "authenticate": true,
+  "serviceScript":"""
+    import foam.dao.DAO;
+    return new foam.dao.EasyDAO.Builder(x)
+      .setDecorator(new foam.nanos.session.LocalSettingSessionDAO(x, new foam.dao.NullDAO(x, foam.nanos.session.LocalSetting.getOwnClassInfo())))
+      .setAuthorize(true)
+      .setOf(foam.nanos.session.LocalSetting.getOwnClassInfo())
+      .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.session.LocalSetting\", \"remoteListenerSupport\": false}"
 })

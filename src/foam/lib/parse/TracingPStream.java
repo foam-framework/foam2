@@ -12,7 +12,7 @@ import java.io.Writer;
 public class TracingPStream
     extends ProxyPStream
 {
-  protected final static PrintWriter OUT = new PrintWriter(System.out);
+  protected final static PrintWriter OUT = new PrintWriter(System.err);
   protected int pos;
   protected int depth;
   protected PrintWriter writer;
@@ -47,12 +47,14 @@ public class TracingPStream
 
     char char1 = ( this.valid() ) ? this.head() : ' ';
     writer.println(indentation + "Parsing '" + char1 + "' at position: " + pos + " using " + ps);
-
+    writer.flush();
     PStream result = ps.parse(this, x);
     if ( result == null ) {
       writer.println(indentation + "Parse error");
+      writer.flush();
     } else {
       writer.println(indentation + "Result = " + result.value());
+      writer.flush();
     }
     return result;
   }

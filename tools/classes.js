@@ -65,6 +65,7 @@ var classes = [
   'foam.mlang.ArrayConstant',
   'foam.mlang.expr.Dot',
   'foam.mlang.expr.PropertyExpr',
+  'foam.mlang.expr.Ref',
   'foam.mlang.expr.DateTypes',
   'foam.mlang.expr.DateGrouping',
   'foam.mlang.expr.DateGroupingExpr',
@@ -303,6 +304,8 @@ var classes = [
   'foam.nanos.auth.EnabledCheckAuthService',
   'foam.nanos.http.HttpParameters',
   'foam.nanos.http.DefaultHttpParameters',
+  'foam.nanos.session.LocalSetting',
+  'foam.nanos.session.LocalSettingSessionDAO',
   'foam.nanos.session.Session',
   'foam.nanos.session.SessionService',
   'foam.nanos.session.SimpleSessionService',
@@ -697,6 +700,7 @@ var classes = [
   'foam.nanos.crunch.UserCapabilityJunction',
   'foam.nanos.crunch.AgentCapabilityJunction',
   'foam.nanos.crunch.CapabilityCapabilityJunction',
+  'foam.nanos.crunch.AssociatedEntity',
   //daos
   'foam.nanos.crunch.UserCapabilityJunctionDAO',
   //rules
@@ -758,6 +762,7 @@ var skeletons = [
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.email.POP3Email',
   'foam.nanos.notification.push.PushService',
+  'foam.nanos.notification.ResendNotificationServiceInterface',
   'foam.nanos.session.SessionService',
   'foam.nanos.test.EchoService',
   'foam.strategy.StrategizerService',

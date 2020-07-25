@@ -27,7 +27,7 @@
     {
       buildJavaClass: function(cls) {
         cls.extras.push(`
-          public String format(Long amount) {
+          public String format(long amount) {
             return format(amount, false);
           }
         `);

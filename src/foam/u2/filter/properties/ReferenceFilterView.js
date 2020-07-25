@@ -145,7 +145,12 @@ foam.CLASS({
       name: 'idToStringDisplayMap',
       documentation: 'Map that contains the ids as keys and strings as values',
       expression: function(referenceObjectsArray, daoContents) {
-        if ( referenceObjectsArray.length === 0 || ! daoContents ) return {};
+        if ( ! daoContents ) return {};
+        if ( referenceObjectsArray.length === 0 ) {
+          var m = {};
+          daoContents.groupKeys.forEach(g => m[g] = g);
+          return m;
+        }
         var result = {};
         for ( i = 0; i < referenceObjectsArray.length; i++ ) {
           if ( daoContents.groupKeys.includes(referenceObjectsArray[i].id) ) {
@@ -249,10 +254,10 @@ foam.CLASS({
         console.error('Please specify a targetDAOKey on the reference.');
         return;
       }
-
       this.onDetach(this.daoContents$.sub(this.updateReferenceObjectsArray));
       this.onDetach(this.dao$.sub(this.daoUpdate));
       this.daoUpdate();
+
       this.addClass(this.myClass())
         .start().addClass(this.myClass('container-search'))
           .start({

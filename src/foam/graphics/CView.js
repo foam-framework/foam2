@@ -752,16 +752,16 @@ foam.CLASS({
     function intersects(c) {
       if ( c.RADIUS ) {
         return ! (
-            this.x + this.width  < c.x - c.radius ||
-            this.y + this.height < c.y - c.radius ||
-            c.x    + c.radius    < this.x         ||
-            c.y    + c.radius    < this.y );
+          this.x + this.width  < c.x - c.radius ||
+          this.y + this.height < c.y - c.radius ||
+          c.x    + c.radius    < this.x         ||
+          c.y    + c.radius    < this.y );
       }
       return ! (
-          this.x + this.width  < c.x ||
-          this.y + this.height < c.y ||
-          c.x    + c.width  < this.x ||
-          c.y    + c.height < this.y );
+        this.x + this.width  < c.x ||
+        this.y + this.height < c.y ||
+        c.x    + c.width  < this.x ||
+        c.y    + c.height < this.y );
     },
 
     function equals(b) { return this === b; }
