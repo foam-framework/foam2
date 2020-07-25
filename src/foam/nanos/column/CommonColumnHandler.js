@@ -3,6 +3,7 @@ foam.CLASS({
   name: 'CommonColumnHandler',
   methods: [
     function returnColumnNameForNLevelName(context, col, n) {
+      if ( ! col.split ) return null;
       var propNames = col.split('.');
       if ( n === -1 ) {
         if ( propNames.length === 0 )

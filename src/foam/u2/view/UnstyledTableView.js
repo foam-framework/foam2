@@ -211,10 +211,15 @@ foam.CLASS({
 
           if ( this.columnHandler.canColumnBeTreatedAsAnAxiom(this, col[0]) && col[0].tableWidth ) {
             axiom = col[0];
-          } else
-            axiom = props.find(p => p.fullPropertyName === this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(this, col[0])).property;
+          } else {
+            let found = props.find(p => p.fullPropertyName === this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(this, col[0]));
+            if ( found ) {
+              axiom = found.property;
 
-          return acc + (axiom.tableWidth || this.MIN_COLUMN_WIDTH_FALLBACK);
+              return acc + (axiom.tableWidth || this.MIN_COLUMN_WIDTH_FALLBACK);
+            }
+            return acc;
+          }
         }, this.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH) + 'px';
       }
     },
@@ -328,7 +333,11 @@ foam.CLASS({
 
               // Render the table headers for the property columns.
               forEach(columns_, function([col, overrides]) {
-                var prop = view.props.find(p => p.fullPropertyName === view.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(view, col)).property;
+                let found = view.props.find(p => p.fullPropertyName === view.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(view, col));
+                if ( ! found ) {
+                  return;
+                }
+                var prop = found.property;
                 var isFirstLevelProperty = view.columnHandler.canColumnBeTreatedAsAnAxiom(view, col) ? true : col.indexOf('.') === -1;
 
                 var tableWidth = view.returnColumnPropertyForPropertyName(view, col, 'tableWidth');
