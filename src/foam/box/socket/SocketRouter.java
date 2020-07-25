@@ -4,12 +4,13 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-package foam.nanos.network;
+package foam.box.socket;
 
 import foam.box.Box;
 import foam.box.Message;
 import foam.box.SessionServerBox;
 import foam.box.Skeleton;
+import foam.box.socket.SocketWebAgent;
 import foam.core.ContextAware;
 import foam.core.FObject;
 import foam.core.Detachable;
@@ -29,13 +30,8 @@ import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
 import foam.nanos.pm.PMWebAgent;
 import foam.nanos.NanoService;
-import foam.nanos.network.SocketWebAgent;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.InputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -93,17 +89,12 @@ public class SocketRouter
             spec.getName()
           }, (Logger) getX().get("logger")))
       .put(NSpec.class, spec);
-    //      .put("requestMessage", requestMsg);
-    // NOTE: Passing the requestMessage as a context paremeter through
-    // to the SessionServerBox is a potential memory leak.  On replay,
-    // for example, the entire medusaEntry data set is a requestMessage
     SocketWebAgent agent = (SocketWebAgent) getWebAgent(spec, service);
     if ( agent == null ) {
       throw new IOException("Service not found: "+serviceKey);
     }
     try {
       new SessionServerBox(requestContext, agent.getSkeletonBox(), agent.getAuthenticate()).send(msg);
-      // agent.execute(requestContext);
     } catch (Exception e) {
       logger_.error("Error serving", serviceKey, e);
       throw e;

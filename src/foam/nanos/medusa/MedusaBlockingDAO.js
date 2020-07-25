@@ -99,7 +99,7 @@ foam.CLASS({
           latch = new CountDownLatch(1);
           getLatches().put(id, latch);
         } else {
-          getLogger().warning("waitOn", id, "latch exists");
+          getLogger().debug("waitOn", id, "latch exists");
         }
       }
 
@@ -135,8 +135,10 @@ foam.CLASS({
       synchronized ( String.valueOf(id).intern() ) {
         latch = (CountDownLatch) getLatches().get(id);
         if ( latch == null ) {
-          // TODO/REVIEW - that these are removed/cleaned up.
-          getLogger().warning("notifyOn", id, "Latch not found", entry.toSummary());
+          ReplayingInfo info = (ReplayingInfo) x.get("replayingInfo");
+          if ( ! info.getReplaying() ) {
+            getLogger().debug("notifyOn", id, "Latch not found", entry.toSummary());
+          }
           return;
         }
         MedusaEntry e = (MedusaEntry) getEntries().get(id);

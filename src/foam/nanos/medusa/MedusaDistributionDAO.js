@@ -3,7 +3,7 @@
  * Copyright 2020 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-
+// TODO: no longer required.
 foam.CLASS({
   package: 'foam.nanos.medusa',
   name: 'MedusaDistributionDAO',

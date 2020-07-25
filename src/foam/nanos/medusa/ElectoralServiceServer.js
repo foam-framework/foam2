@@ -271,15 +271,7 @@ foam.CLASS({
         if ( ! support.getHasNodeQuorum() ) {
           getLogger().warning("callVote", getState().getLabel(), "waiting for node quorum", "voters/quorum", voters.size(), support.getMediatorQuorum(), support.getHasNodeQuorum());
 
-          Map<Integer, List> buckets = support.getNodeBuckets();
-          for ( int i = 0; i < buckets.size(); i++ ) {
-            List bucket = (List) buckets.get(i);
-            for ( int j = 0; j < bucket.size(); j++ ) {
-              String id = (String) bucket.get(j);
-              ClusterConfig node = support.getConfig(getX(), id);
-              getLogger().debug("buckets", buckets.size(), "bucket", i, id, node.getStatus());
-            }
-          }
+          support.outputBuckets(x);
         } else {
           // nothing to do.
           getLogger().warning("callVote", getState().getLabel(), "waiting for mediator quorum", "voters/quorum", voters.size(), support.getMediatorQuorum(), support.getHasNodeQuorum());

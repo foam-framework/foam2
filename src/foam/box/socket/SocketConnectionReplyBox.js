@@ -16,13 +16,14 @@ foam.CLASS({
     'foam.core.X',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
+    'java.io.BufferedOutputStream',
     'java.io.DataOutputStream',
     'java.io.IOException',
     'java.io.OutputStream',
     'java.net.Socket',
     'java.nio.ByteBuffer',
     'java.nio.charset.StandardCharsets',
-    'java.util.concurrent.atomic.AtomicLong',
+    'java.util.concurrent.atomic.AtomicLong'
   ],
 
   properties: [
@@ -58,6 +59,8 @@ foam.CLASS({
     setKey(key);
   }
 
+  private static AtomicLong flushId_ = new AtomicLong(0);
+
   protected static final ThreadLocal<foam.lib.formatter.FObjectFormatter> formatter_ = new ThreadLocal<foam.lib.formatter.FObjectFormatter>() {
     @Override
     protected foam.lib.formatter.JSONFObjectFormatter initialValue() {
@@ -74,8 +77,6 @@ foam.CLASS({
       return formatter;
     }
   };
-
-  private static AtomicLong flushId_ = new AtomicLong(0);
         `
         }));
       }
@@ -86,47 +87,33 @@ foam.CLASS({
     {
       name: 'send',
       javaCode: `
-      // TODO/REVIEW: request context with socket, in, out is in message
-      // but not box.
-      // test for correct context
-      DataOutputStream out = (DataOutputStream) getX().get("socketOutputStream");
-      if ( out == null ) {
-        out = (DataOutputStream) msg.getX().get("socketOutputStream");
-        if ( out != null ) {
-          getLogger().warning("Using msg context");
-          setX(msg.getX());
-        }
-      }
-
+      X x = msg.getX();
       Long flushId = flushId_.incrementAndGet();
+      DataOutputStream out = (DataOutputStream) x.get("socketOutputStream");
+
       try {
         foam.lib.formatter.FObjectFormatter formatter = formatter_.get();
-        formatter.setX(getX());
+        formatter.setX(x);
         formatter.output(msg);
         String message = formatter.builder().toString();
-        // getLogger().debug("message", message);
-        // int length = message.length();
-        // int chunk = Math.max(0, Math.min(length, 200) - 1);
-        // getLogger().debug("send", length, message.substring(0, chunk), "...", message.substring(length-chunk));
-
         byte[] messageBytes = message.getBytes(StandardCharsets.UTF_8);
         synchronized( out ) {
-          out.writeInt(messageBytes.length);
           out.writeLong(System.currentTimeMillis());
+          out.writeInt(messageBytes.length);
           out.write(messageBytes);
-          // // out.flush();
+          out.flush();
           // if ( flushId == flushId_.get() ) {
           //   getLogger().debug("flush");
           //   out.flush();
           // } else {
-          //   getLogger().debug("flush", "skip", flushId, flushId_.get());
+          //   getLogger().info("flush", "skip", flushId, flushId_.get());
           // }
         }
       } catch (Throwable t) {
         getLogger().error(t);
         throw new RuntimeException(t);
       } finally {
-        ((SocketConnectionBoxManager) getX().get("socketConnectionBoxManager")).removeReplyBox(this);
+        ((SocketConnectionBoxManager) x.get("socketConnectionBoxManager")).removeReplyBox(this);
       }
       `
     }

@@ -85,7 +85,8 @@ foam.CLASS({
       ],
       javaCode: `
       if ( box != null ) {
-        getBoxes().remove(makeKey(box.getHost(), box.getPort()));
+//        getBoxes().remove(makeKey(box.getHost(), box.getPort()));
+        getBoxes().remove(box.getKey());
 
         Socket socket = (Socket) box.getSocket();
         if ( socket != null &&
@@ -140,7 +141,8 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        SocketConnectionBox box = (SocketConnectionBox) getBoxes().get(makeKey(host, port));
+        String key = makeKey(host, port);
+        SocketConnectionBox box = (SocketConnectionBox) getBoxes().get(key);
         if ( box != null ) {
           return box;
         }
@@ -150,7 +152,7 @@ foam.CLASS({
           socket.setSoTimeout(getSoTimeout());
           SocketAddress address = new InetSocketAddress(host, port);
           socket.connect(address, getConnectTimeout());
-          box = new SocketConnectionBox(x, socket, host, port);
+          box = new SocketConnectionBox(x, key, socket, host, port);
           add(box);
           Agency agency = (Agency) x.get("threadPool");
           agency.submit(x, (ContextAgent) box, socket.getRemoteSocketAddress().toString());

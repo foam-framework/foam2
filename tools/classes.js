@@ -156,6 +156,8 @@ var classes = [
   'foam.dao.JournalType',
   'foam.dao.WriteOnlyJDAO',
   'foam.dao.WriteOnlyFileJournal',
+  'foam.dao.BaseNotificationClientDAO',
+  'foam.dao.NotificationClientDAO',
   'foam.dao.BaseClientDAO',
   'foam.dao.ClientDAO',
   'foam.dao.ClientSink',

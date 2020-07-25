@@ -140,8 +140,11 @@ foam.CLASS({
               replaying.setEndTime(new java.util.Date());
               Max max = (Max) dao.select(MAX(MedusaEntry.INDEX));
               replaying.setReplaying(false);
-              replaying.setIndex((Long)max.getValue());
-              replaying.setReplayIndex((Long)max.getValue());
+              if ( max != null &&
+                   max.getValue() != null ) {
+                replaying.setIndex((Long)max.getValue());
+                replaying.setReplayIndex((Long)max.getValue());
+              }
             }
 
             // TODO: deal with digest failures - and Node taking self OFFLINE.

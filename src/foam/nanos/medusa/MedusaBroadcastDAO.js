@@ -191,7 +191,7 @@ foam.CLASS({
                 // if ( dao != null ) {
                 //   getLogger().debug("agency", "execute", "short circuit", getServiceName());
                 // } else {
-                  dao = support.getClientDAO(x, getServiceName(), myConfig, config);
+                  dao = support.getBroadcastClientDAO(x, getServiceName(), myConfig, config);
                   dao = new RetryClientSinkDAO.Builder(x)
                           .setDelegate(dao)
                           .setMaxRetryAttempts(support.getMaxRetryAttempts())

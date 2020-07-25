@@ -4,7 +4,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-package foam.nanos.network;
+package foam.box.socket;
 
 import foam.core.X;
 import foam.core.FObject;

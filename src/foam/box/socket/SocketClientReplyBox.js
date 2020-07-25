@@ -19,6 +19,11 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'replyBoxId'
+    },
+    {
+      name: 'created',
+      class: 'DateTime',
+      javaFactory: 'return new java.util.Date();'
     }
   ],
 
@@ -30,6 +35,7 @@ foam.CLASS({
           data: `
   public SocketClientReplyBox(Long replyBoxId) {
     setReplyBoxId(replyBoxId);
+    setCreated(new java.util.Date());
   }
         `
         }));
@@ -41,18 +47,10 @@ foam.CLASS({
     {
       name: 'send',
       javaCode: `
-      X x = getX();
+      X x = msg.getX();
       Socket socket = (Socket) x.get("socket");
-      if ( socket == null ) {
-        x = msg.getX();
-        socket = (Socket) x.get("socket");
-        if ( socket != null ) {
-          ((foam.nanos.logger.Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "send,Using Msg context.");
-        }
-      }
-
-      msg.getAttributes().put(SocketConnectionBox.REPLY_BOX_ID, getReplyBoxId());
       if ( socket != null ) {
+        msg.getAttributes().put(SocketConnectionBox.REPLY_BOX_ID, getReplyBoxId());
         Box box = ((SocketConnectionBoxManager) x.get("socketConnectionBoxManager")).getReplyBox(x, socket.getRemoteSocketAddress().toString());
         box.send(msg);
       } else {

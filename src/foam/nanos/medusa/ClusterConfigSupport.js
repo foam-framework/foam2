@@ -32,6 +32,7 @@ configuration for contacting the primary node.`,
     'foam.dao.DAO',
     'foam.dao.EasyDAO',
     'foam.dao.MDAO',
+    'foam.dao.NotificationClientDAO',
     'foam.dao.ProxyDAO',
     'static foam.mlang.MLang.*',
     'static foam.mlang.MLang.COUNT',
@@ -238,12 +239,14 @@ configuration for contacting the primary node.`,
       Map buckets = getNodeBuckets();
       if ( buckets.size() < getNodeGroups() ) {
         getLogger().warning("hasNodeQuorum", "false", "insufficient buckets", buckets.size(), "threshold", getNodeGroups());
+        outputBuckets(getX());
         return false;
       }
       for ( int i = 0; i < buckets.size(); i++ ) {
         List bucket = (List) buckets.get(i);
         if ( bucket.size() < quorumCount ) {
           getLogger().warning("hasNodeQuorum", "false", "insufficient nodes in bucket", "buckets", bucket.size(), "threshold", quorumCount);
+          outputBuckets(getX());
           return false;
         }
         int count = 0;
@@ -255,6 +258,7 @@ configuration for contacting the primary node.`,
         }
         if ( count < quorumCount ) {
            getLogger().warning("hasNodeQuorum", "false", "insufficient ONLINE nodes in bucket", "bucket", i, "count", count, "threshold", quorumCount);
+          outputBuckets(getX());
           return false;
         }
       }
@@ -373,7 +377,7 @@ configuration for contacting the primary node.`,
         {
           name: 'receiveClusterConfig',
           type: 'foam.nanos.medusa.ClusterConfig'
-        },
+        }
       ],
       javaCode: `
         String address = receiveClusterConfig.getId();
@@ -691,6 +695,51 @@ configuration for contacting the primary node.`,
       `
     },
     {
+      name: 'getBroadcastClientDAO',
+      type: 'foam.dao.DAO',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'serviceName',
+          type: 'String',
+        },
+        {
+          name: 'sendClusterConfig',
+          type: 'ClusterConfig'
+        },
+        {
+          name: 'receiveClusterConfig',
+          type: 'ClusterConfig'
+        }
+      ],
+      javaCode: `
+      StringBuilder sb = new StringBuilder();
+      sb.append(sendClusterConfig.getName());
+      sb.append(":");
+      sb.append(serviceName);
+      sb.append(":");
+      sb.append(receiveClusterConfig.getName());
+      sb.append(":");
+      sb.append("broadcast");
+      String id = sb.toString();
+      DAO client = (DAO) getClients().get(id);
+      if ( client != null ) {
+        return client;
+      }
+      client = new NotificationClientDAO.Builder(x)
+        .setDelegate(new SessionClientBox.Builder(x)
+          .setSessionID(sendClusterConfig.getSessionId())
+          .setDelegate(getTransportlayerBox(x, serviceName, sendClusterConfig, receiveClusterConfig, true))
+          .build())
+        .build();
+      getClients().put(id, client);
+      return client;
+      `
+    },
+    {
       documentation: 'determine the next server to route request to.',
       name: 'getNextServerConfig',
       args: [
@@ -845,5 +894,25 @@ configuration for contacting the primary node.`,
       throw new IllegalArgumentException("MDAO not found: "+serviceName);
       `
     },
+    {
+      name: 'outputBuckets',
+      args: [
+        {
+          name: 'x',
+          type: 'X'
+        },
+      ],
+      javaCode: `
+      Map<Integer, List> buckets = getNodeBuckets();
+      for ( int i = 0; i < buckets.size(); i++ ) {
+        List bucket = (List) buckets.get(i);
+        for ( int j = 0; j < bucket.size(); j++ ) {
+          String id = (String) bucket.get(j);
+          ClusterConfig node = getConfig(x, id);
+          getLogger().info("buckets", buckets.size(), "bucket", i, id, node.getStatus());
+        }
+      }
+      `
+    }
   ]
 });

@@ -17,6 +17,7 @@ foam.CLASS({
     'foam.box.Box',
     'foam.box.Message',
     'foam.box.ReplyBox',
+    'foam.core.ContextAgent',
     'foam.core.FObject',
     'foam.core.X',
     'foam.lib.json.JSONParser',
@@ -24,6 +25,7 @@ foam.CLASS({
     'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
     'java.net.Socket',
+    'java.io.BufferedOutputStream',
     'java.io.DataInputStream',
     'java.io.DataOutputStream',
     'java.io.InputStream',
@@ -36,7 +38,7 @@ foam.CLASS({
     'java.util.Map',
     'java.util.HashMap',
     'java.util.Collections',
-    'java.util.concurrent.atomic.AtomicLong',
+    'java.util.concurrent.atomic.AtomicLong'
   ],
     
   constants: [
@@ -48,6 +50,11 @@ foam.CLASS({
   ],
 
   properties: [
+    {
+      documentation: 'managed by SocketConnectionBoxManager',
+      name: 'key',
+      class: 'String'
+    },
     {
       name: 'host',
       class: 'String'
@@ -75,12 +82,6 @@ foam.CLASS({
       visibility: 'HIDDEN',
     },
     {
-      name: 'pms',
-      class: 'Map',
-      javaFactory: `return new HashMap();`,
-      visibility: 'HIDDEN',
-    },
-    {
       name: 'logger',
       class: 'FObjectProperty',
       of: 'foam.nanos.logger.Logger',
@@ -101,22 +102,23 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-  public SocketConnectionBox(X x, Socket socket, String host, int port)
+  public SocketConnectionBox(X x, String key, Socket socket, String host, int port)
     throws IOException
   {
     setX(x);
+    setKey(key);
     setHost(host);
     setPort(port);
     setSocket(socket);
 
-    // NOTE: raw socket InputStream does not block on read.
-    out_ = new DataOutputStream(socket.getOutputStream());
+    out_ = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
     in_ = new DataInputStream(socket.getInputStream());
   }
 
   protected DataInputStream in_;
   protected DataOutputStream out_;
   private static AtomicLong replyBoxId_ = new AtomicLong(0);
+  private static AtomicLong flushId_ = new AtomicLong(0);
 
   protected static final ThreadLocal<foam.lib.formatter.FObjectFormatter> formatter_ = new ThreadLocal<foam.lib.formatter.FObjectFormatter>() {
     @Override
@@ -144,53 +146,41 @@ foam.CLASS({
     {
       name: 'send',
       javaCode: `
-      Long replyBoxId = replyBoxId_.incrementAndGet();
+      Long flushId = flushId_.incrementAndGet();
       Box replyBox = (Box) msg.getAttributes().get("replyBox");
-      getReplyBoxes().put(replyBoxId, replyBox);
-      getPms().put(replyBoxId, PM.create(getX(), this.getOwnClassInfo(), getHost()+":"+getPort()+":roundtrip"));
-      SocketClientReplyBox box = new SocketClientReplyBox(replyBoxId);
-      if ( replyBox instanceof ReplyBox ) {
-        ((ReplyBox)replyBox).setDelegate(box);
-        getLogger().debug("send", "replyBox.setDelegate");
-      } else {
-        replyBox = box;
+      if ( replyBox != null ) {
+        Long replyBoxId = replyBoxId_.incrementAndGet();
+        getReplyBoxes().put(replyBoxId, replyBox);
+        SocketClientReplyBox box = new SocketClientReplyBox(replyBoxId);
+        if ( replyBox instanceof ReplyBox ) {
+          ((ReplyBox)replyBox).setDelegate(box);
+          getLogger().debug("send", "replyBox.setDelegate");
+        } else {
+          replyBox = box;
+        }
+        msg.getAttributes().put("replyBox", replyBox);
       }
-      msg.getAttributes().put("replyBox", replyBox);
       String message = null;
       try {
         foam.lib.formatter.FObjectFormatter formatter = formatter_.get();
         formatter.setX(getX());
         formatter.output(msg);
         message = formatter.builder().toString();
-
-        // TODO: remove - debugging onlye
-        // getLogger().debug("send", "message", message);
-        // if ( message != null ) {
-        //   int length = message.length();
-        //   int chunk = Math.max(0, Math.min(length, 200) - 1);
-        //   getLogger().info("send", length, message.substring(0, chunk), "...", message.substring(length-chunk));
-        // }
-
         byte[] messageBytes = message.getBytes(StandardCharsets.UTF_8);
         synchronized (out_) {
-          out_.writeInt(messageBytes.length);
           out_.writeLong(System.currentTimeMillis());
+          out_.writeInt(messageBytes.length);
           out_.write(messageBytes);
-          // // out_.flush();
-          // if ( replyBoxId == replyBoxId_.get() ) {
+          out_.flush();
+          // if ( flushId == flushId_.get() ) {
           //   getLogger().debug("flush");
           //   out_.flush();
           // } else {
-          //   getLogger().debug("flush", "skip", replyBoxId, replyBoxId_.get());
+          //   getLogger().info("flush", "skip", flushId, flushId_.get());
           // }
         }
       } catch ( Exception e ) {
-        if ( message != null ) {
-          int length = message.length();
-          int chunk = Math.max(0, Math.min(length, 200) - 1);
-          getLogger().info("send", length, message.substring(0, chunk), "...", message.substring(length-chunk));
-        }
-        getLogger().error(e);
+        getLogger().error(e.getMessage(), "message", message, e);
         setValid(false);
         throw new RuntimeException(e);
       }
@@ -208,11 +198,12 @@ foam.CLASS({
       try {
         while ( getValid() ) {
           try {
-            int length = in_.readInt();
             long sent = in_.readLong();
             PM pm = PM.create(getX(), this.getOwnClassInfo(), getHost()+":"+getPort()+":network");
             pm.setStartTime(new java.util.Date(sent));
             pm.log(x);
+
+            int length = in_.readInt();
             byte[] bytes = new byte[length];
             StringBuilder data = new StringBuilder();
             int total = 0;
@@ -247,28 +238,35 @@ foam.CLASS({
             // getLogger().debug("receive", "message", message);
             Message msg = (Message) x.create(JSONParser.class).parseString(message);
             if ( msg == null ) {
-              int chunk = Math.max(0, Math.min(length, 100) - 1);
-              String start = new String(java.util.Arrays.copyOfRange(bytes, 0, chunk), StandardCharsets.UTF_8);
-              String end = new String(java.util.Arrays.copyOfRange(bytes, length-chunk, length-1), StandardCharsets.UTF_8);
-              getLogger().warning("Failed to parse", "message", getSocket() != null ? ((Socket) getSocket()).getRemoteSocketAddress() : "NA", length, start, "...", end);
+              getLogger().warning("Failed to parse", "message", message);
               throw new RuntimeException("Failed to parse.");
             }
             Long replyBoxId = (Long) msg.getAttributes().get(REPLY_BOX_ID);
             Box replyBox = (Box) getReplyBoxes().get(replyBoxId);
             if ( replyBox != null ) {
-              pm = (PM) getPms().get(replyBoxId);
-              if ( pm != null ) {
+              if ( replyBox instanceof SocketClientReplyBox ) {
+                pm = PM.create(getX(), this.getOwnClassInfo(), getHost()+":"+getPort()+":roundtrip");
+                pm.setStartTime(((SocketClientReplyBox) replyBox).getCreated());
                 pm.log(x);
-                getPms().remove(replyBoxId);
               }
               getReplyBoxes().remove(replyBoxId);
               replyBox.send(msg);
             } else {
-              getLogger().error("ReplyBox not found.");
+              getLogger().error("ReplyBox not found", replyBoxId);
               throw new RuntimeException("ReplyBox not found.");
             }
           } catch ( java.net.SocketTimeoutException e ) {
             // getLogger().debug("SocketTimeoutException");
+
+            // REVIEW: The flush logic in 'send' in buggy and stalling.  This
+            // will periodically flush the 'send' output stream.
+            synchronized ( out_ ) {
+              try {
+                out_.flush();
+              } catch ( IOException ioe ) {
+                // nop
+              }
+            }
             continue;
           } catch ( java.io.IOException e ) {
             getLogger().debug(e.getMessage());

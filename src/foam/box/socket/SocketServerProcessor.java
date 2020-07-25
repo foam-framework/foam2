@@ -8,17 +8,18 @@ package foam.box.socket;
 
 import foam.box.Box;
 import foam.box.Message;
+import foam.box.socket.SocketRouter;
 import foam.core.ContextAgent;
 import foam.core.ContextAware;
 import foam.core.X;
 import foam.lib.json.JSONParser;
 import foam.nanos.logger.PrefixLogger;
 import foam.nanos.logger.Logger;
-import foam.nanos.network.SocketRouter;
 import foam.nanos.pm.PM;
 
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.InputStream;
@@ -44,7 +45,8 @@ public class SocketServerProcessor
     setX(x);
     socket_ = socket;
     in_ = new DataInputStream(socket.getInputStream());
-    out_ = new DataOutputStream(socket.getOutputStream());
+    out_ = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+    // out_ = new DataOutputStream(socket.getOutputStream());
 
     logger_ = new PrefixLogger(new Object[] {
         this.getClass().getSimpleName(),
@@ -76,11 +78,12 @@ public class SocketServerProcessor
     try {
       while ( true ) {
         try {
-          int length = in_.readInt();
           long sent = in_.readLong();
           PM pm = PM.create(x, pmClass, pmName);
           pm.setStartTime(new java.util.Date(sent));
           pm.log(x);
+
+          int length = in_.readInt();
           byte[] bytes = new byte[length];
           StringBuilder data = new StringBuilder();
           int total = 0;
@@ -111,20 +114,10 @@ public class SocketServerProcessor
             logger_.error("null message from", socket_.getRemoteSocketAddress());
             throw new RuntimeException("Received empty message.");
           }
-          // logger_.debug("message", message);
           Message msg = (Message) x.create(JSONParser.class).parseString(message);
           if ( msg == null ) {
-            int chunk = Math.max(0, Math.min(length, 200) - 1);
-            String start = new String(java.util.Arrays.copyOfRange(bytes, 0, chunk), StandardCharsets.UTF_8);
-            String end = new String(java.util.Arrays.copyOfRange(bytes, length-chunk, length-1), StandardCharsets.UTF_8);
-            logger_.warning("Failed to parse", "message", socket_.getRemoteSocketAddress(), length, start, "...", end);
+            logger_.warning("Failed to parse", "message", message);
             throw new RuntimeException("Failed to parse.");
-          // } else {
-          //   // TODO: for debugging
-          //   int chunk = Math.max(0, Math.min(length, 200) - 1);
-          //   String start = new String(java.util.Arrays.copyOfRange(bytes, 0, chunk), StandardCharsets.UTF_8);
-          //   String end = new String(java.util.Arrays.copyOfRange(bytes, length-chunk, length-1), StandardCharsets.UTF_8);
-          //   logger_.debug("bytes", socket_.getRemoteSocketAddress(), length, start, "...", end);
           }
           socketRouter_.service(msg);
         } catch ( java.net.SocketTimeoutException e ) {

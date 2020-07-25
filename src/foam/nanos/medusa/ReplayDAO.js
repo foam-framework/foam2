@@ -79,7 +79,7 @@ foam.CLASS({
         ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
         ClusterConfig fromConfig = support.getConfig(x, cmd.getDetails().getResponder());
         ClusterConfig toConfig = support.getConfig(x, cmd.getDetails().getRequester());
-        DAO clientDAO = support.getClientDAO(x, cmd.getServiceName(), fromConfig, toConfig);
+        DAO clientDAO = support.getBroadcastClientDAO(x, cmd.getServiceName(), fromConfig, toConfig);
         // NOTE: toIndex not yet used.
         getDelegate().where(
           GTE(MedusaEntry.INDEX, cmd.getDetails().getMinIndex())
