@@ -137,9 +137,7 @@ foam.CLASS({
           });
         }
 
-        let current = wizardPosition;
-
-        for ( let p = decr(wizardPosition) ; p != null ; p = decr(current) ) {
+        for ( let p = decr(wizardPosition) ; p != null ; p = decr(p) ) {
           console.log('prev p', p);
           if ( sectionAvailableSlots[p.wizardletIndex][p.sectionIndex].get() ) {
             return p;
@@ -170,8 +168,6 @@ foam.CLASS({
             sectionIndex: subSi,
           });
         }
-
-        let current = wizardPosition;
 
         for ( let p = incr(wizardPosition) ; p != null ; p = incr(p) ) {
           console.log('next p', p);
