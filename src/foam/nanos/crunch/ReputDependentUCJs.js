@@ -23,6 +23,7 @@ foam.CLASS({
     'foam.mlang.predicate.AbstractPredicate',
     'foam.nanos.auth.User',
     'foam.nanos.auth.Subject',
+    'java.util.ArrayList',
     'java.util.List',
     'static foam.mlang.MLang.*'
   ],
@@ -42,29 +43,17 @@ foam.CLASS({
             DAO filteredPrerequisiteCapabilityJunctionDAO = (DAO) ((DAO) x.get("prerequisiteCapabilityJunctionDAO"))
               .where(EQ(CapabilityCapabilityJunction.TARGET_ID, ucj.getTargetId()));
             
-            AbstractPredicate predicate = new AbstractPredicate(x) {
-              @Override
-              public boolean f(Object obj) {
-                UserCapabilityJunction ucjToCheck = (UserCapabilityJunction) obj;
-                if ( ucjToCheck.getStatus() == ucjStatus ) return false;
-                CapabilityCapabilityJunctionId id = new CapabilityCapabilityJunctionId.Builder(x)
-                  .setSourceId(ucjToCheck.getTargetId())
-                  .setTargetId(ucj.getTargetId())
-                  .build();
-                CapabilityCapabilityJunction prereqJunction = null;
-                try {
-                  prereqJunction = (CapabilityCapabilityJunction) filteredPrerequisiteCapabilityJunctionDAO.find(id);
-                } catch (Exception e) {
-                  return false;
-                }
-                return prereqJunction != null;
-              }
-            };
-
-            List<UserCapabilityJunction> ucjsToReput = (List<UserCapabilityJunction>) ((ArraySink) filteredUserCapabilityJunctionDAO
-              .where(predicate)
+            List<CapabilityCapabilityJunction> ccjs = ((ArraySink) filteredPrerequisiteCapabilityJunctionDAO
               .select(new ArraySink()))
               .getArray();
+
+            List<UserCapabilityJunction> ucjsToReput = new ArrayList<UserCapabilityJunction>();
+
+            for ( CapabilityCapabilityJunction ccj : ccjs ) {
+              UserCapabilityJunction ucjToReput = (UserCapabilityJunction) filteredUserCapabilityJunctionDAO
+                .find(EQ(UserCapabilityJunction.TARGET_ID, ccj.getSourceId()));
+              if ( ucjToReput != null ) ucjsToReput.add(ucjToReput);
+            }
 
             for ( UserCapabilityJunction ucjToReput : ucjsToReput ) {
               userCapabilityJunctionDAO.inX(x).put(ucjToReput);

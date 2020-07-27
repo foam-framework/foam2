@@ -121,10 +121,10 @@ foam.CLASS({
           return getDelegate().put_(x, ucJunction);
         }
 
+        CapabilityJunctionStatus chainedStatus = checkPrereqsChainedStatus(x, ucJunction);
+
         // Update current UCJ status
-        if ( old == null || ucJunction.getStatus() == CapabilityJunctionStatus.ACTION_REQUIRED )
-        {
-          CapabilityJunctionStatus chainedStatus = checkPrereqsChainedStatus(x, ucJunction);
+        if ( old == null || ucJunction.getStatus() == CapabilityJunctionStatus.ACTION_REQUIRED ) {
           if ( requiresReview ) {
             ucJunction.setStatus(chainedStatus == CapabilityJunctionStatus.ACTION_REQUIRED ?
               CapabilityJunctionStatus.ACTION_REQUIRED :
@@ -135,8 +135,10 @@ foam.CLASS({
           }
         } 
 
-        if ( ucJunction.getStatus() == CapabilityJunctionStatus.PENDING ) {
-          if ( ! requiresReview ) ucJunction.setStatus(CapabilityJunctionStatus.GRANTED);
+        if ( ucJunction.getStatus() == CapabilityJunctionStatus.PENDING &&
+             ! requiresReview && 
+             chainedStatus == CapabilityJunctionStatus.GRANTED ) {
+            ucJunction.setStatus(CapabilityJunctionStatus.GRANTED);
         }
 
         if ( ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED ) {
