@@ -81,15 +81,34 @@ foam.CLASS({
             this.wizardlets[w].data$
           )
         ));
-        var flatSlots = availableSlots.reduce((lis, v) => [...lis, ...v]);
-        flatSlots.forEach(s => {
-          s.sub(() => {
-            s.get();
-            this.sectionAvailableSlots = this.sectionAvailableSlots;
-            let name = 'sectionAvailableSlots';
-            this.propertyChange.pub(name, this.slot(name));
-          });
-        })
+        availableSlots.forEach((sections, wizardletIndex) => {
+          sections.forEach((availableSlot, sectionIndex) => {
+            availableSlot.sub(() => {
+              var val = availableSlot.get();
+              this.sectionAvailableSlots = this.sectionAvailableSlots;
+              let name = 'sectionAvailableSlots';
+              this.propertyChange.pub(name, this.slot(name));
+
+              if ( val ) {
+                // If this is a previous position, move the wizard back
+                var maybeNewPos = this.WizardPosition.create({
+                  wizardletIndex: wizardletIndex,
+                  sectionIndex: sectionIndex,
+                });
+                if ( maybeNewPos.compareTo(this.wizardPosition) < 0 ) {
+                  this.wizardPosition = maybeNewPos;
+                }
+              }
+
+              // Invoke a wizard position update (even if position didn't change)
+              // to re-render steps
+              this.wizardPosition = this.WizardPosition.create({
+                wizardletIndex: this.wizardPosition.wizardletIndex,
+                sectionIndex: this.wizardPosition.sectionIndex
+              });
+            });
+          })
+        });
         return availableSlots;
       }
     },
