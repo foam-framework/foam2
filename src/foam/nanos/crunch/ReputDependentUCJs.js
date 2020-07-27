@@ -20,9 +20,6 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
-    'foam.mlang.predicate.AbstractPredicate',
-    'foam.nanos.auth.User',
-    'foam.nanos.auth.Subject',
     'java.util.ArrayList',
     'java.util.List',
     'static foam.mlang.MLang.*'
