@@ -34,8 +34,10 @@ foam.CLASS({
     { name: 'FOOTER_TXT', message: 'Already have an account?' },
     { name: 'FOOTER_LINK', message: 'Sign in' },
     { name: 'ERROR_MSG', message: 'There was a problem creating your account.' },
+    { name: 'EMAIL_EMPTY_ERR', message: 'Please enter email' },
+    { name: 'EMAIL_SYNTAX_ERR', message: 'Please enter valid email' },
+    { name: 'EMAIL_AVAILABILITY_ERR', message: 'This email is taken. Please try another.' },
     { name: 'USERNAME_EMPTY_ERR', message: 'Please enter username' },
-    { name: 'USERNAME_SYNTAX_ERR', message: 'Please enter valid username' },
     { name: 'USERNAME_AVAILABILITY_ERR', message: 'This username is taken. Please try another.' }
   ],
 
@@ -69,11 +71,34 @@ foam.CLASS({
       hidden: true
     },
     {
+      class: 'Boolean',
+      name: 'emailAvailable',
+      documentation: `Binded property used to display email not available error.`,
+      value: true,
+      hidden: true
+    },
+    {
       class: 'EMail',
       name: 'email',
-      view: {
-        class: 'foam.u2.TextField',
-        placeholder: 'example@example.com'
+      placeholder: 'example@example.com',
+      view: function(_, X) {
+        return {
+          class: 'foam.u2.view.UserPropertyAvailabilityView',
+          icon: 'images/checkmark-small-green.svg',
+          onKey: true,
+          isAvailable$: X.data.emailAvailable$,
+          targetProperty: foam.nanos.auth.User.EMAIL,
+          inputValidation: /\S+@\S+\.\S+/,
+          restrictedCharacters: /^[^\s]$/
+        };
+      },
+      validateObj: function(email, emailAvailable) {
+        // Empty Check
+        if ( email.length === 0 ) return this.EMAIL_EMPTY_ERR;
+        // Syntax Check
+        if ( ! /\S+@\S+\.\S+/.test(email) ) return this.EMAIL_SYNTAX_ERR;
+        // Availability Check
+        if ( ! emailAvailable ) return this.EMAIL_AVAILABILITY_ERR;
       },
       visibility: function(disableEmail_) {
         return disableEmail_ ?
@@ -83,8 +108,8 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'userNameAvailable',
-      documentation: `Binded property used to display failed username availability validation error`,
+      name: 'usernameAvailable',
+      documentation: `Binded property used to display username not available error.`,
       value: true,
       hidden: true
     },
@@ -95,19 +120,20 @@ foam.CLASS({
       placeholder: 'example123',
       view: function(_, X) {
         return {
-          class: 'foam.u2.view.UsernameView',
+          class: 'foam.u2.view.UserPropertyAvailabilityView',
           icon: 'images/checkmark-small-green.svg',
           onKey: true,
-          userNameAvailable$: X.data.userNameAvailable$
+          isAvailable$: X.data.usernameAvailable$,
+          targetProperty: foam.nanos.auth.User.USER_NAME,
+          inputValidation: /^[^\s\/]+$/,
+          restrictedCharacters: /^[^\s\/]$/
         };
       },
-      validateObj: function(userName, userNameAvailable) {
+      validateObj: function(userName, usernameAvailable) {
         // Empty Check
         if ( userName.length === 0 ) return this.USERNAME_EMPTY_ERR;
-        // Syntax Check
-        if ( ! /^[^\s\/]+$/.test(userName) ) return this.USERNAME_SYNTAX_ERR;
         // Availability Check
-        if ( ! userNameAvailable ) return this.USERNAME_AVAILABILITY_ERR;
+        if ( ! usernameAvailable ) return this.USERNAME_AVAILABILITY_ERR;
       },
       required: true
     },

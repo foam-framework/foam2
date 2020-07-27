@@ -5,17 +5,17 @@
  */
 
 foam.CLASS({
-  package: 'foam.nanos.auth.username',
-  name: 'ClientUsernameService',
+  package: 'foam.nanos.auth',
+  name: 'ClientUserPropertyAvailabilityService',
 
   implements: [
-    'foam.nanos.auth.username.UsernameServiceInterface'
+    'foam.nanos.auth.UserPropertyAvailabilityServiceInterface'
   ],
 
   properties: [
     {
       class: 'Stub',
-      of: 'foam.nanos.auth.username.UsernameServiceInterface',
+      of: 'foam.nanos.auth.UserPropertyAvailabilityServiceInterface',
       name: 'delegate'
     }
   ]

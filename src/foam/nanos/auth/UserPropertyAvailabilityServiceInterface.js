@@ -5,17 +5,13 @@
  */
 
 foam.INTERFACE({
-  package: 'foam.nanos.auth.username',
-  name: 'UsernameServiceInterface',
-
-  documentation: `
-    A service for username authorization operations.
-  `,
+  package: 'foam.nanos.auth',
+  name: 'UserPropertyAvailabilityServiceInterface',
 
   methods: [
     {
       name: 'checkAvailability',
-      documentation: `Checks whether the given username is already assigned to a user in the system.`,
+      documentation: `Checks whether a user that satisfies the predicate already exists.`,
       async: true,
       type: 'Boolean',
       args: [
@@ -24,8 +20,7 @@ foam.INTERFACE({
           type: 'Context'
         },
         {
-          name: 'username',
-          type: 'String'
+          name: 'predicate'
         }
       ]
     }

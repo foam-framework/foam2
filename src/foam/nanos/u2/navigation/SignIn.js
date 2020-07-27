@@ -43,8 +43,7 @@ foam.CLASS({
       class: 'String',
       name: 'identifier',
       required: true,
-      // TODO: rename label to 'Email or Username' when integrating
-      label: 'Email',
+      label: 'Email or Username',
       view: {
         class: 'foam.u2.TextField',
         focused: true

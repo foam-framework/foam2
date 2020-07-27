@@ -6,17 +6,18 @@
 
 foam.CLASS({
   package: 'foam.u2.view',
-  name: 'UsernameView',
+  name: 'UserPropertyAvailabilityView',
   extends: 'foam.u2.View',
 
-  documentation: 'A TextField view for checking username availability.',
+  documentation: 
+    'A TextField view that supports availability checks on specified User model property values (ie. Username/Email).',
 
   implements: [
     'foam.mlang.Expressions'
   ],
 
   imports: [
-    'usernameService'
+    'userPropertyAvailabilityService'
   ],
 
   requires: [
@@ -53,14 +54,29 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'userNameAvailable',
-      documentation: `Binded property used to display failed username availability validation error`
+      name: 'isAvailable',
+      documentation: `Binded property used for validation outside of view.`
     },
     {
       class: 'Boolean',
       name: 'showIcon',
       documentation: `Boolean toggle for displaying availability checkmark icon.`,
       value: false
+    },
+    {
+      class: 'FObjectProperty',
+      name: 'targetProperty',
+      documentation: `The property on the User model that the availability check will operate on.`,
+    },
+    {
+      type: 'Regex',
+      name: 'inputValidation',
+      documentation: `Optional regular expression used to prevent invalid inputs from making network calls.`
+    },
+    {
+      type: 'Regex',
+      name: 'restrictedCharacters',
+      documentation: `Optional regular expression used to prevent restricted characters from being typed.`
     }
   ],
 
@@ -84,9 +100,12 @@ foam.CLASS({
         })
           .addClass(this.myClass('input'))
           .attr('name', this.fromPropertyName + 'Input')
-          .on('blur', this.checkUsername )
-          .on('input', (e) => {
-            this.userNameAvailable = true;
+          .on('blur', this.checkAvailability )
+          .on('keypress', (e) => {
+            if ( this.restrictedCharacters && ! this.restrictedCharacters.test(e.key) ) {
+              e.preventDefault();
+            }
+            this.isAvailable = true;
             this.showIcon = false;
           })
         .end()
@@ -106,12 +125,22 @@ foam.CLASS({
   ],
 
   listeners: [
-    function checkUsername() {
-      this.usernameService.checkAvailability(this, this.data)
+    function checkAvailability() {
+      if ( this.inputValidation && ! this.inputValidation.test(this.data) ) {
+        this.showIcon = false;
+        return;
+      }
+
+      var pred = foam.mlang.predicate.Eq.create({
+        arg1: this.targetProperty,
+        arg2: this.data
+      });
+
+      this.userPropertyAvailabilityService.checkAvailability(this, pred)
         .then(( isAvailable ) => {
-          this.userNameAvailable = isAvailable;
+          this.isAvailable = isAvailable;
           this.showIcon = isAvailable;
-        })
+        });
     }
   ]
 })
