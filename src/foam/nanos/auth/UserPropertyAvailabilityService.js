@@ -36,7 +36,7 @@ foam.CLASS({
 
 				ArraySink select =
           (ArraySink) userDAO.inX(x).where((Predicate) predicate).select(new ArraySink());
-          
+
 				if ( select.getArray().size() != 0 ) {
 					return false;
 				}
