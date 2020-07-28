@@ -267,7 +267,7 @@ foam.CLASS({
     },
     {
       name: 'goPrev',
-      label: 'back',
+      label: 'Back',
       isEnabled: function (data$canGoBack) {
         return data$canGoBack;
       },
@@ -280,7 +280,7 @@ foam.CLASS({
     },
     {
       name: 'goNext',
-      label: 'next',
+      label: 'Next',
       isEnabled: function (data$canGoNext) {
         return data$canGoNext;
       },
