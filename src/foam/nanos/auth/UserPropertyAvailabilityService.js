@@ -32,14 +32,14 @@ foam.CLASS({
     {
       name: 'checkAvailability',
       javaCode: `
-      DAO userDAO = (DAO) getX().get("localUserDAO");
-      
-      ArraySink select = (ArraySink) userDAO.inX(x).where((Predicate) predicate).select(new ArraySink());
-      
-      if ( select.getArray().size() != 0 ) {
-        return false;
-      }
-      return true;
+        DAO userDAO = (DAO) getX().get("localUserDAO");
+        
+        ArraySink select = (ArraySink) userDAO.inX(x).where((Predicate) predicate).select(new ArraySink());
+        
+        if ( select.getArray().size() != 0 ) {
+          return false;
+        }
+        return true;
       `
     }  
   ]
