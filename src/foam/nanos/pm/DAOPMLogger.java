@@ -35,13 +35,13 @@ public class DAOPMLogger
     if (
       // TODO: maybe an exclusion list for names in this package instead
       //       of an inclusion list for names in outside packages
-      ! pm.getClassType().getId().equals("foam.dao.PMDAO") &&
-      ! pm.getClassType().getId().equals("foam.dao.PipelinePMDAO") &&
-      ! pm.getClassType().getId().equals("foam.nanos.auth.PMAuthService")
+      ! pm.getId().equals("foam.dao.PMDAO") &&
+      ! pm.getId().equals("foam.dao.PipelinePMDAO") &&
+      ! pm.getId().equals("foam.nanos.auth.PMAuthService")
     ) {
-      if ( pm.getClassType().getId().indexOf("PM") != -1 ) return;
+      if ( pm.getId().indexOf("PM") != -1 ) return;
       if ( pm.getName().indexOf("PM")              != -1 ) return;
-      if ( pm.getClassType().getId().indexOf("pm") != -1 ) return;
+      if ( pm.getId().indexOf("pm") != -1 ) return;
       if ( pm.getName().indexOf("pm")              != -1 ) return;
     }
 
@@ -52,7 +52,7 @@ public class DAOPMLogger
     // Regular PMInfo
     // TODO: could reuse the PMInfo by also using it as the lock object
     PMInfo pmi = new PMInfo();
-    pmi.setClsName(pm.getClassType().getId());
+    pmi.setClsName(pm.getId());
     pmi.setName(pm.getName());
     DAO pmd = (DAO) getX().get(PM_INFO_DAO_NAME);
 

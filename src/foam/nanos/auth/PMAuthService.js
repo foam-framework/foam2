@@ -63,7 +63,7 @@ foam.CLASS({
     PM pm = null;
     if ( getEnabled() ) {
       pm = (PM) x.get("PM");
-      pm.setClassType(this.getClassType());
+      pm.setId(this.getClassType().getId());
       pm.setName(op);
       pm.init_();
     }

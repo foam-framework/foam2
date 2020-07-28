@@ -20,16 +20,12 @@ foam.CLASS({
     'foam.core.X'
   ],
 
-  ids: [ 'classType', 'name', 'startTime' ],
+  ids: [ 'id', 'name', 'startTime' ],
 
   properties: [
     {
       class: 'String',
       name: 'id'
-    },
-    {
-      class: 'Class',
-      name: 'classType'
     },
     {
       class: 'String',
@@ -99,7 +95,7 @@ foam.CLASS({
     {
       name: 'doFolds',
       javaCode: `
-    fm.foldForState(getClassType().getId()+":"+getName(), getStartTime(), getTime());
+    fm.foldForState(getId()+":"+getName(), getStartTime(), getTime());
       `
     },
     {
@@ -128,86 +124,68 @@ foam.CLASS({
       buildJavaClass: function (cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-          public static PM create(X x, FObject fo, String... name) {
-            PM pm = (PM) x.get("PM");
+            public static PM create(X x, FObject fo, String... name) {
+              PM pm = (PM) x.get("PM");
 
-            if ( pm == null ) return new PM(fo, name);
+              if ( pm == null ) return new PM(fo, name);
 
-            pm.setClassType(fo.getClassInfo());
-            pm.setId(fo.getClassInfo().getId());
-            pm.setName(combine(name));
-            pm.init_();
+              pm.setId(fo.getClassInfo().getId());
+              pm.setName(combine(name));
+              pm.init_();
 
-            return pm;
-          }
+              return pm;
+            }
 
-          public static PM create(X x, ClassInfo clsInfo, String... name) {
-            PM pm = (PM) x.get("PM");
+            public static PM create(X x, ClassInfo clsInfo, String... name) {
+              PM pm = (PM) x.get("PM");
 
-            if ( pm == null ) return new PM(clsInfo, name);
+              if ( pm == null ) return new PM(clsInfo, name);
 
-            pm.setClassType(clsInfo);
-            pm.setId(clsInfo.getId());
-            pm.setName(combine(name));
-            pm.init_();
+              pm.setId(clsInfo.getId());
+              pm.setName(combine(name));
+              pm.init_();
 
-            return pm;
-          }
+              return pm;
+            }
 
-/*
-  public static PM create(X x, Class cls, String name) {
-    PM pm = (PM) x.get("PM");
+            public PM(ClassInfo clsInfo, String... name) {
+              setName(combine(name));
+              setId(clsInfo.getId());
+              init_();
+            }
 
-    if ( pm == null ) return new PM(cls, name);
+            public PM(Class cls, String... name) {
+              setName(combine(name));
+              foam.core.ClassInfoImpl clsInfo = new foam.core.ClassInfoImpl();
+              clsInfo.setObjClass(cls);
+              clsInfo.setId(cls.getName());
+              setId(clsInfo.getId());
+              init_();
+            }
 
-    pm.setClassType(cls);
-    pm.setName(name);
-    pm.init_();
+            public PM(FObject fo, String... name) {
+              this(fo.getClassInfo(), name);
+            }
 
-    return pm;
-  }
-  */
+            public PM(Object... args) {
+              setId(args[0].toString());
+              String str = "";
+              for (Object obj: java.util.Arrays.copyOfRange(args, 1, args.length)){
+                str += obj.toString() + ":";
+              }
+              if ( str.length() > 0 )
+                setName(str.substring(0, str.length() - 1));
+              init_();
+            }
 
-  public PM(ClassInfo clsInfo, String... name) {
-    setName(combine(name));
-    setClassType(clsInfo);
-    setId(clsInfo.getId());
-    init_();
-  }
-
-  public PM(Class cls, String... name) {
-    setName(combine(name));
-    foam.core.ClassInfoImpl clsInfo = new foam.core.ClassInfoImpl();
-    clsInfo.setObjClass(cls);
-    clsInfo.setId(cls.getName());
-    setId(clsInfo.getId());
-    setClassType(clsInfo);
-    init_();
-  }
-
-  public PM(FObject fo, String... name) {
-    this(fo.getClassInfo(), name);
-  }
-
-  public PM(Object... args) {
-    setId(args[0].toString());
-    String str = "";
-    for (Object obj: java.util.Arrays.copyOfRange(args, 1, args.length)){
-      str += obj.toString() + ":";
-    }
-    if ( str.length() > 0 )
-      setName(str.substring(0, str.length() - 1));
-    init_();
-  }
-
-  private static String combine(String... args) {
-    String str = "";
-    for ( String s: args) {
-      str += s + ":";
-    }
-    return str.substring(0, str.length() - 1);
-  }
-`
+            private static String combine(String... args) {
+              String str = "";
+              for ( String s: args) {
+                str += s + ":";
+              }
+              return str.substring(0, str.length() - 1);
+            }
+          `
         }));
       }
     }
