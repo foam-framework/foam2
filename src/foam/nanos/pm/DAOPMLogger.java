@@ -25,7 +25,7 @@ public class DAOPMLogger
   }
 
   protected Object getLock(PMInfo pmi) {
-    int hash = pmi.getClsName().hashCode() * 31 + pmi.getName().hashCode();
+    int hash = pmi.getId().hashCode() * 31 + pmi.getName().hashCode();
     return locks_[(int) Math.abs(hash % locks_.length)];
   }
 
@@ -52,7 +52,7 @@ public class DAOPMLogger
     // Regular PMInfo
     // TODO: could reuse the PMInfo by also using it as the lock object
     PMInfo pmi = new PMInfo();
-    pmi.setClsName(pm.getId());
+    pmi.setId(pm.getId());
     pmi.setName(pm.getName());
     DAO pmd = (DAO) getX().get(PM_INFO_DAO_NAME);
 
