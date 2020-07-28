@@ -73,7 +73,7 @@ foam.CLASS({
         return this.prerequisiteCapabilityJunctionDAO.where(this.AND(
           this.EQ(this.CapabilityCapabilityJunction.SOURCE_ID, sourceId),
           this.NOT(this.IN(this.CapabilityCapabilityJunction.TARGET_ID, seen))
-        )).select().then((result) => {
+        )).select().then(result => {
           var arry = result.array;
 
           if ( arry.length == 0 ) {
@@ -82,7 +82,7 @@ foam.CLASS({
           }
 
           return arry.reduce(
-            (p, pcj) => p.then(() => tcRecurse(pcj.targetId, seen.concat(arry.map((pcj) => pcj.targetId)))),
+            (p, pcj) => p.then(() => tcRecurse(pcj.targetId, seen.concat(arry.map(pcj => pcj.targetId)))),
             Promise.resolve()
           ).then(() => tcList.push(sourceId));
         });
@@ -101,19 +101,19 @@ foam.CLASS({
     },
 
     function getCapsAndWizardlets(capabilityId) {
-      return this.getCapabilities(capabilityId).then( (capabilities) => {
+      return this.getCapabilities(capabilityId).then(capabilities => {
         return Promise.all([
           Promise.resolve(capabilities),
           Promise.all(capabilities
-            .filter(cap => !! cap.of )
+            .filter(cap => cap && !! cap.of )
             .map(cap =>
               this.CapabilityWizardlet.create({ capability: cap }).updateUCJ())
             )
-          ]).then((capAndSections) => {
+          ]).then(capAndSections => {
             return {
               caps: capAndSections[0],
               wizCaps: capAndSections[1]
-                .filter((wizardSection) =>
+                .filter(wizardSection =>
                   wizardSection.ucj === null ||
                   (
                     wizardSection.ucj.status != this.CapabilityJunctionStatus.GRANTED &&
@@ -138,7 +138,7 @@ foam.CLASS({
         data: foam.u2.wizard.StepWizardletController.create({
           wizardlets: capabilitiesSections.wizCaps
         }),
-        onClose: (x) => {
+        onClose: x => {
           this.finalOnClose(x, capabilitiesSections.caps);
         }
       }));
@@ -146,17 +146,17 @@ foam.CLASS({
 
     async function startWizardFlow(capabilityId, toLaunchOrNot) {
       return this.getCapsAndWizardlets(capabilityId)
-        .then((capabilitiesSections) => {
+        .then(capabilitiesSections => {
           // generate and popUp summary view (CapabilityRequirmentView) before wizard
           return this.onStartShowPopRequirements(capabilityId, capabilitiesSections, toLaunchOrNot);
         });
     },
 
     function finalOnClose(x, capabilities) {
-      return new Promise((wizardResolve) => {
+      return new Promise(wizardResolve => {
         x.closeDialog();
         // Save no-data capabilities (i.e. not displayed in wizard)
-        Promise.all(capabilities.filter(cap => ! cap.of).map(
+        Promise.all(capabilities.filter(cap => cap && ! cap.of).map(
           cap => this.userCapabilityJunctionDAO.put(this.UserCapabilityJunction.create({
             sourceId: this.subject.user.id,
             targetId: cap.id
