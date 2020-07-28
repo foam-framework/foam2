@@ -20,6 +20,7 @@ foam.CLASS({
   requires: [
     'foam.core.Action',
     'foam.log.LogLevel',
+    'foam.u2.detail.SectionView',
     'foam.u2.dialog.Popup',
     'foam.u2.dialog.SimpleActionDialog',
     'foam.u2.stack.Stack',
@@ -143,18 +144,28 @@ foam.CLASS({
             .start()
               .addClass(this.myClass('entry'))
               .start()
-                .add(this.data.SUB_STACK)
+                .add(this.slot(function (data$currentWizardlet, data$currentSection) {
+                  var ctx = this.__subContext__.createSubContext();
+                  ctx.register(
+                    this.VerticalDetailView,
+                    'foam.u2.detail.SectionedDetailView'
+                  );
+                  return self.SectionView.create({
+                    section: data$currentSection,
+                    data$: data$currentWizardlet.data$,
+                  }, ctx)
+                }))
               .end()
             .end()
             .start()
               .addClass(this.myClass('bottom-buttons'))
-              .add(this.slot(function (data$isLastWizardlet) {
+              .add(this.slot(function (data$isLastScreen) {
                 return this.E()
                   .startContext({ data: self })
                   .addClass(self.myClass('buttons'))
                   .tag(this.GO_PREV, btn)
                   .tag(this.GO_NEXT,
-                    data$isLastWizardlet
+                    data$isLastScreen
                       ? { ...btn, label: this.ACTION_LABEL }
                       : btn
                   )
@@ -228,8 +239,8 @@ foam.CLASS({
     {
       name: 'goNext',
       label: 'next',
-      isEnabled: function (data$isLastWizardlet, data$currentWizardlet) {
-        return data$isLastWizardlet || data$currentWizardlet.validate();
+      isEnabled: function (data$canGoNext) {
+        return data$canGoNext;
       },
       code: function(x) {
         this.data.next().then((isFinished) => {
