@@ -66,35 +66,6 @@ foam.CLASS({
             ));
           });
         }))
-
-
-
-        // .add(this.slot(function(capabilities) {
-        //   return this.E().forEach(capabilities, async function(cap) {
-        //     // get wizardlets for the capability and all of its dependent capabilities
-        //     self.wizardlets = (await self.crunchController.getCapsAndWizardlets(cap)).wizCaps;
-
-        //     // add listeners on wizardlets
-        //     for ( let wizardlet of self.wizardlets ) {
-        //       self.addListeners(wizardlet.data);
-        //     }
-
-        //     // get all the sections associated with the wizardlets
-        //     self.wizardletSectionsList = self.crunchController.generateSections(self.wizardlets);
-            
-        //     this.add(self.slot(function(wizardletSectionsList) {
-        //       return this.E().forEach(wizardletSectionsList, function(sections, index) {
-        //         sections.map(section => (
-        //           this.tag(self.SectionView, {
-        //             section,
-        //             data: self.wizardlets[index].data,
-        //             showTitle: false
-        //           })
-        //         ));
-        //       });
-        //     }));
-        //   });
-        // }))
       .end();
     },
 
