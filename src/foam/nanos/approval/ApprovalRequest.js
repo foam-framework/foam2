@@ -57,7 +57,7 @@
     'description',
     'classification',
     'objId',
-    'approver',
+    'approver.legalName',
     'status',
     'memo'
   ],
