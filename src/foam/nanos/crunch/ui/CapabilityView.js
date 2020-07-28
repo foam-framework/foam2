@@ -20,23 +20,22 @@ foam.CLASS({
     },
     {
       name: 'wizardlets',
-      documentation: 'wizardlets for the capability'
+      documentation: 'wizardlets for the capability',
+      value: []
     },
     {
       name: 'wizardletSectionsList',
       documentation: `
         sections for wizardlets
         wizardletSectionsList[i] stores sections for wizardlets[i]
-      `
+      `,
+      value: []
     }
   ],
 
   methods: [
     async function initE() {
       const self = this;
-
-      this.wizardlets = [];
-      this.wizardletSectionsList = [];
 
       // get the wizardlets and sections for all of the capabilties
       for ( let cap of this.capabilities ) {
