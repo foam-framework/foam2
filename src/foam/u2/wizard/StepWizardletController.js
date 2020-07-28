@@ -218,9 +218,8 @@ foam.CLASS({
     {
       name: 'canGoNext',
       class: 'Boolean',
-      expression: function (currentWizardlet) {
-        // TODO: merge change of validation
-        return true;
+      expression: function (currentWizardlet$isValid) {
+        return currentWizardlet$isValid;
       }
     }
   ],
