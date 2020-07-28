@@ -23,7 +23,7 @@ foam.CLASS({
       expression: function (mustBeValid, of, data, data$errors_) {
         if ( ! mustBeValid ) return true;
         if ( ! this.of ) return true;
-        if ( ! this.data || this.data.errors_ ) return false;
+        if ( ( ! data ) || data$errors_ ) return false;
         return true;
       }
     }
