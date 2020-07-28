@@ -46,7 +46,7 @@ foam.CLASS({
     'foam.dao.CompoundDAODecorator',
     'foam.dao.ContextualizingDAO',
     'foam.dao.DeDupDAO',
-    'foam.dao.DecoratedDAO',
+    'foam.dao.InterceptedDAO',
     'foam.dao.GUIDDAO',
     'foam.dao.IDBDAO',
     {
@@ -571,7 +571,7 @@ foam.CLASS({
     },
     {
       class: 'FObjectArray',
-      of: 'foam.dao.DAODecorator',
+      of: 'foam.core.FObject',
       generateJava: false,
       name: 'decorators'
     },
@@ -865,9 +865,19 @@ model from which to test ServiceProvider ID (spid)`,
       }
 
       if ( this.decorators.length ) {
-        var decorated = this.DecoratedDAO.create({
+        decoratorsArray = [];
+        for ( let i = 0; i < this.decorators.length; i++ ) {
+          if ( foam.dao.ProxyDAO.isInstance(this.decorators[i]) ) {
+            d = this.decorators[i];
+            d.delegate = dao;
+            dao = d;
+          } else {
+            decoratorsArray.push(this.decorators[i]);
+          }
+        }
+        var decorated = this.InterceptedDAO.create({
           decorator: this.CompoundDAODecorator.create({
-            decorators: this.decorators
+            decorators: decoratorsArray
           }),
           delegate: dao
         });

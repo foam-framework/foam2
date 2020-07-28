@@ -649,6 +649,38 @@ foam.LIB({
         return map[val] || (map[val] = val.toString());
       };
     })(),
+    function applyFormat(string, formatString, placeholder, escapeChar) {
+      placeholder = placeholder || 'x';
+      escapeChar = escapeChar || '\\';
+      var newString = '';
+      var escaping = false;
+      var safe = true;
+      formatString.split('').forEach(chr => {
+        if ( escaping ) {
+          newString += chr;
+          escaping = false;
+          return;
+        }
+        if ( chr == escapeChar ) {
+          escaping = true;
+          return;
+        }
+        if ( chr == placeholder ) {
+          if ( string.length < 1 ) {
+            safe = false;
+            return;
+          }
+          newString += string[0];
+          string = string.slice(1);
+          return;
+        }
+        newString += chr;
+      })
+      safe = safe && string.length == 0;
+      if ( ! safe ) console.warn(
+        'performed foam.String.applyMask with unsafe inputs');
+      return newString;
+    }
   ]
 });
 

@@ -10,6 +10,13 @@ foam.CLASS({
 
   documentation: 'SUGAR : Service Unified GAteway Relay - Perform non-DAO operations against a web service',
 
+  implements: [
+    'foam.nanos.auth.CreatedAware',
+    'foam.nanos.auth.CreatedByAware',
+    'foam.nanos.auth.LastModifiedAware',
+    'foam.nanos.auth.LastModifiedByAware'
+  ],
+
   tableColumns: [
     'id',
     'serviceKey',
@@ -35,11 +42,67 @@ foam.CLASS({
     }
   ],
 
+  sections: [
+    {
+      name: 'details'
+    },
+    {
+      name: 'supportDetails'
+    },
+    {
+      name: '_defaultSection',
+      permissionRequired: true
+    }
+  ],
+
   properties: [
     {
       class: 'String',
       name: 'id',
-      displayWidth: 40
+      displayWidth: 40,
+      section: 'details'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdBy',
+      section: 'supportDetails'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdByAgent',
+      section: 'supportDetails'
+    },
+    {
+      class: 'DateTime',
+      name: 'created',
+      documentation: 'The date and time of when the User was created in the system.',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      section: 'administrative',
+      includeInDigest: true,
+      section: 'supportDetails'
+    },
+    {
+      class: 'DateTime',
+      name: 'lastModified',
+      documentation: 'The date and time the User was last modified.',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      section: 'administrative',
+      storageOptional: true,
+      section: 'supportDetails'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'lastModifiedBy',
+      section: 'supportDetails',
+      readPermissionRequired: true,
+      writePermissionRequired: true,
+      storageOptional: true,
+      section: 'supportDetails'
     },
     {
       class: 'String',
@@ -97,13 +160,15 @@ foam.CLASS({
         }
 
         this.postData = '';
-      }
+      },
+      section: 'details'
     },
     {
       class: 'String',
       name: 'method',
       label: 'Method',
       documentation: 'the methods list of the picked service key',
+      section: 'details',
       view: function(_, X) {
         return X.data.slot(function(serviceKey) {
           var service = this.__context__[serviceKey];
@@ -149,13 +214,15 @@ foam.CLASS({
        }
 
        this.postData = '';
-      }
+      },
+      section: 'details'
     },
     {
       class: 'FObjectArray',
       of: 'foam.nanos.dig.Argument',
       name: 'argumentInfo',
       documentation: 'Set the arguments Info of the method',
+      section: 'details',
       postSet: function() {
         var self = this;
 
@@ -170,14 +237,16 @@ foam.CLASS({
             });
           }
         }
-      }
+      },
+      section: 'details'
     },
     {
       class: 'String',
       name: 'interfaceName',
       documentation: 'service class name',
       displayWidth: 60,
-      visibility: 'RO'
+      visibility: 'RO',
+      section: 'details'
     },
     {
       class: 'Boolean',
@@ -232,14 +301,16 @@ foam.CLASS({
       name: 'data',
       value: 'Add your data to send to the server.',
       view: { class: 'foam.u2.tag.TextArea', rows: 5, cols: 137 },
-      visibility: 'RW'
+      visibility: 'RW',
+      section: 'details'
     },
     {
       class: 'String',
       name: 'result',
       value: 'No Request Sent Yet.',
       view: { class: 'foam.u2.tag.TextArea', rows: 5, cols: 137 },
-      visibility: 'RO'
+      visibility: 'RO',
+      section: 'details'
     }
   ],
 

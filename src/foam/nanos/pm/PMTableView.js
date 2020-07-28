@@ -21,6 +21,7 @@ foam.CLASS({
   constants: { CSS_CLASS: 'foam-u2-view-TableView' },
 
   css: `
+    .foam-comics-BrowserView-foam-nanos-pm-PMInfo .foam-u2-ActionView-clearAll { margin-bottom: 6px; }
     .foam-comics-BrowserView-foam-nanos-pm-PMInfo .foam-u2-ActionView-create { display: none; }
     .foam-comics-BrowserView-foam-nanos-pm-PMInfo .foam-u2-ActionView-edit   { display: none; }
   `,

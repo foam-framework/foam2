@@ -156,15 +156,17 @@
 
         X.userDAO.find(approver).then(user => {
           if ( data.status != foam.nanos.approval.ApprovalStatus.REQUESTED ) {
-            slot.set(user ? user.toSummary() : `User #${approver}`);	
+            slot.set(user ? user.toSummary() : `User #${approver}`);
+          } else if ( data.isTrackingRequest ) {
+            slot.set(data.TRACKING);
           } else if ( user ) {
             if ( X.user.id != user.id ) {
               slot.set(user.toSummary());
             } else {
-              slot.set(user.group);
+              slot.set(data.PENDING);
             }
           } else {
-            slot.set(data.REQUESTED);
+            slot.set(`User #${approver}`);
           }
         });
         
@@ -178,14 +180,16 @@
         this.__subSubContext__.userDAO.find(approver).then(user => {
           if ( data.status != foam.nanos.approval.ApprovalStatus.REQUESTED ) {
             self.add(user ? user.toSummary() : `User #${approver}`);
+          } else if ( data.isTrackingRequest ) {
+            self.add(data.TRACKING);
           } else if ( user ) {
             if ( self.__subSubContext__.user.id != user.id ) {
               self.add(user.toSummary());
             } else {
-              self.add(user.group);
+              self.add(data.PENDING);
             }
           } else {
-            self.add(data.REQUESTED);
+            self.add(`User #${approver}`);
           }
         });
       },
@@ -474,8 +478,12 @@
       message: 'You have successfully cancelled this request.'
     },
     {
-      name: 'REQUESTED',
+      name: 'PENDING',
       message: 'Pending'
+    },
+    {
+      name: 'TRACKING',
+      message: 'Tracking'
     }
   ],
 

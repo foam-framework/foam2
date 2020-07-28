@@ -35,39 +35,43 @@ foam.CLASS({
 
   methods: [
     async function exportFObject(X, obj) {
-        var self = this;
-        
-        var sheetId  = '';
-        var stringArray = [];
-        var props = X.filteredTableColumns ? X.filteredTableColumns : self.outputter.getAllPropertyNames(dao.of);
-        var metadata = self.outputter.getColumnMethadata(dao.of, props);
-        stringArray.push(metadata.map(m => m.columnLabel));
-        var values = await self.outputter.outputArray([ obj ], metadata);
-        stringArray = stringArray.concat(values);
+      var self = this;
+      
+      var sheetId  = '';
+      var stringArray = [];
+      var columnConfig = X.columnConfigToPropertyConverter;
 
-        sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata, this);
-        if ( ! sheetId || sheetId.length == 0)
-          return '';
-        var url = `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`;
-        return url;
+      var propNames = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(obj.cls);
+      propNames = columnConfig.filterExportedProps(X, obj.cls_, propNames);
+      
+      var metadata = await self.outputter.getColumnMethadata(X, obj.cls_, propNames);
+      stringArray = [ await this.outputter.objectToTable(X, obj.cls_, obj, propNames) ];
+
+      sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata, this);
+      if ( ! sheetId || sheetId.length === 0)
+        return '';
+      return `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`;
     },
     async function exportDAO(X, dao) {
       var self = this;
+
+      var columnConfig = X.columnConfigToPropertyConverter;
+
+      var propNames = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(dao.of);
+      propNames = columnConfig.filterExportedProps(dao.of, propNames);
+
+      var metadata = await self.outputter.getColumnMethadata(X, dao.of, propNames);
+
+      var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(dao.of, propNames);
+      var sink = await dao.select(expr);
       
-      var sink = await dao.select();
       var sheetId  = '';
-      var stringArray = [];
-      var props = X.filteredTableColumns ? X.filteredTableColumns : self.outputter.getAllPropertyNames(dao.of);
-      var metadata = self.outputter.getColumnMethadata(dao.of, props);
-      stringArray.push(metadata.map(m => m.columnLabel));
-      var values = await self.outputter.outputArray(sink.array, metadata);
-      stringArray = stringArray.concat(values);
+      var stringArray = await self.outputter.returnTable(X, dao.of, propNames, sink.array);
 
       sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata, this);
       if ( ! sheetId || sheetId.length == 0)
         return '';
-      var url = `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`;
-      return url;
+      return `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`;
     }
   ]
 });

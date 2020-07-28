@@ -71,4 +71,11 @@ public class StringUtil {
 
     return list.toArray(result);
   }
+
+  public static String capitalize(String s) {
+    if ( SafetyUtil.isEmpty(s) ) return s;
+    char[] chars = s.toCharArray();
+    chars[0] = Character.toUpperCase(chars[0]);
+    return new String(chars);
+  }
 }

@@ -3,8 +3,9 @@
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
+
 var path_ = require('path');
-var fs_ = require('fs');
+var fs_   = require('fs');
 
 process.on('unhandledRejection', function(e) {
   console.error("ERROR: Unhandled promise rejection ", e);
@@ -109,7 +110,7 @@ logger.debug('fileWhitelist', fileWhitelist);
   // compile properly.
   'foam.blob.BlobBlob',
   'foam.dao.CompoundDAODecorator',
-  'foam.dao.DAODecorator',
+  'foam.dao.DAOInterceptor',
   'foam.dao.FlowControl',
   'foam.dao.sync.SyncRecord',
   'foam.dao.sync.VersionedSyncRecord',
@@ -126,7 +127,7 @@ logger.debug('fileWhitelist', fileWhitelist);
   'foam.dao.TTLCachingDAO',
   'foam.dao.CachingDAO',
   'foam.dao.CompoundDAODecorator',
-  'foam.dao.DecoratedDAO',
+  'foam.dao.InterceptedDAO',
   'foam.dao.DeDupDAO',
   'foam.dao.IDBDAO',
   'foam.dao.LoggingDAO',
