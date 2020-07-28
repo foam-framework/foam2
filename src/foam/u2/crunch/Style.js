@@ -12,12 +12,9 @@ foam.CLASS({
   css: `
     ^ {
       padding: 8px;
-      width: 216px;
+      width: 245px;
       height: 211px;
       border: 1px solid rgba(255,255,255,0);
-
-      /* width is calculated width from ^cardpart plus 4 pixels */
-      width: calc(254px - (2*24px)/3);
 
       /* Card highlight transition */
       transition: background 200ms ease-in, border 200ms ease-in;
@@ -27,16 +24,10 @@ foam.CLASS({
 
     ^cardpart {
       display: inline-block;
-      /* width: 272px;
-      /* height: 153px;
-      /**/
-      width: calc(250px - (2*24px)/3);
-      height: 132px;
+      width: 245px;
+      height: 130px;
       margin-bottom: 15px;
-
-      /* Calculated 86% for this but 95% renders correctly */
-      background-size: 95%;
-
+      background-size: 103%;
       background-repeat: no-repeat;
       border-radius: 3px;
       box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
@@ -119,7 +110,7 @@ foam.CLASS({
     ^mode-card.state-hover ^card-description {
       position: relative;
       left: -15px;
-      width: calc(250px - (2*24px)/3 + 30px);
+      width: 245px;
     }
     ^mode-circle.state-hover ^card-description {
       width: auto;

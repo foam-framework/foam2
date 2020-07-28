@@ -28,13 +28,8 @@ foam.CLASS({
   ],
 
   imports: [
-    'auth',
     'ctrl',
-    'capabilityCategoryCapabilityJunctionDAO',
-    'capabilityCategoryDAO',
-    'capabilityDAO',
     'crunchController',
-    'registerElement'
   ],
 
   css: `
@@ -129,68 +124,98 @@ foam.CLASS({
     {
       class: 'Array',
       name: 'daoElementArray',
-      documentation: 'stores the styled element to display in carousel.',
-      expression: function(dao) {
-        if ( dao ) {
-          dao.select().then(result => {
-            this.totalNumCards = result.array.length;
-            for ( let i = 0; i < this.totalNumCards; i++ ) {
-              this.daoElementArray.push(generateElement(result.array[i]));
-            }
-          });
-        }
-      }
+      documentation: 'stores the styled element to display in carousel.'
     },
-    {
-      class: 'Function',
-      name: 'elementGeneration',
-      factory: function() {
-        return ele => this.Element.create().add(ele.id);
-      }
-    }
+    // {
+    //   class: 'Function',
+    //   name: 'elementGeneration',
+    //   factory: function elementGeneration(ele) {
+    //     return this.Element.create().add(ele.id);
+    //   }
+    // }
   ],
 
   methods: [
     function initE() {
       this.SUPER();
-
-      window.onresize = this.calcNumOfCardsToDisplay;
+      // window.onresize = this.calcNumOfCardsToDisplay;
       var self = this;
 
       self.addClass(this.myClass('container'))
-      .add(self.slot(function(dao) {
-        var spot = self.E();
-
         // Left Arrow
-        spot.start('span').start('img').addClass(this.myClass('left-arrow'))
-            .attr('src', '/images/carouselArrow.svg')
-            .on('click', function() {
-              self.coursalCounter--;
-            })
-          .end().end();
+      .start('span')
+        .start('img').addClass(this.myClass('left-arrow'))
+          .attr('src', '/images/carouselArrow.svg')
+          .on('click', function() {
+            self.coursalCounter--;
+          })
+        .end()
+      .end()
+      .add(self.slot(function(dao, coursalCounter) {
         // main section arrow
-        spot.add(self.slot(
-          function(coursalCounter, numCardsThatFit, daoElementArray, totalNumCards) {
-            self.removeAllChildren();
+          dao.select().then(result => {
+            self.totalNumCards = result.array.length;
+            self.daoElementArray = [];
             var ele = self.E().addClass(self.myClass('feature-column-grid'));
-            var spaces = numCardsThatFit <= totalNumCards && numCardsThatFit > 0 ? numCardsThatFit : totalNumCards;
-            for ( var k = 0; k < spaces; k++ ) {
-              let cc = coursalCounter % totalNumCards; // this stops any out of bounds indecies
-              let index = ( cc + totalNumCards + k ) % totalNumCards; // this ensures circle indecies
-              ele = ele.add(daoElementArray[index].call(self));
+
+            // for ( let i = 0; i < self.totalNumCards; i++ ) {
+            //   self.daoElementArray.push(() => self.elementGeneration(result.array[i]));
+            // }
+            for ( var k = 0; k < self.totalNumCards; k++ ) {
+              let cc = coursalCounter % self.totalNumCards; // this stops any out of bounds indecies
+              let index = ( cc + self.totalNumCards + k ) % self.totalNumCards; // this ensures circle indecies
+              // var bob = self.elementGeneration.call(self, result.array[k]);
+              // ele = ele.add(bob);
+              ele = ele.add(self.elementGeneration.call(self, result.array[index]));
+              // console.log(`daoElementArray[index]:${self.daoElementArray[index]}`);
             }
             return ele;
-          }
-        ));
-        // Right Arrow
-        spot.start('span').start('img').addClass(this.myClass('right-arrow'))
+          });
+          // self.removeAllChildren();
+          // var ele = self.E().addClass(self.myClass('feature-column-grid'));
+          // var spaces = numCardsThatFit <= totalNumCards && numCardsThatFit > 0 ? numCardsThatFit : totalNumCards;
+          // spaces = daoElementArray.length < spaces ? daoElementArray.length : spaces;
+          
+          // console.log(`spaces:${spaces}`);
+          
+          // for ( var k = 0; k < spaces; k++ ) {
+          //   let cc = coursalCounter % totalNumCards; // this stops any out of bounds indecies
+          //   let index = ( cc + totalNumCards + k ) % totalNumCards; // this ensures circle indecies
+          //   ele = ele.start().add(daoElementArray[index].call(self)).end();
+          //   console.log(`daoElementArray[index]:${daoElementArray[index]}`);
+          // }
+          // return ele;
+        }
+      ))
+      // Right Arrow
+      .start('span')
+        .start('img').addClass(this.myClass('right-arrow'))
           .attr('src', '/images/carouselArrow.svg')
           .on('click', function() {
             self.coursalCounter++;
           })
-        .end().end();
-        return spot;
-      }));
+        .end()
+      .end();
+    },
+    // function setUpElementDisplay() {
+    //   this.dao.select().then(result => {
+    //     this.totalNumCards = result.array.length;
+    //     this.daoElementArray = [];
+    //     for ( let i = 0; i < this.totalNumCards; i++ ) {
+    //       this.daoElementArray.push(() => this.elementGeneration(result.array[i]));
+    //     }
+    //   });
+    // },
+    function elementGeneration(daoEle) {
+      return this.Element.create().start()
+      .addClass(this.myClass('perFeature'))
+      .start(foam.u2.crunch.CapabilityFeatureView, { data: daoEle })
+        .addClass(this.myClass('featureSection'))
+      .end()
+      .on('click', () => {
+        this.ctrl.crunchController.launchWizard(daoEle.id);
+      })
+    .end();
     }
   ],
 
