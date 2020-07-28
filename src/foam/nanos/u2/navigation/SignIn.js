@@ -31,7 +31,7 @@ foam.CLASS({
     { name: 'FOOTER_LINK', message: 'Create an account' },
     { name: 'SUB_FOOTER_LINK', message: 'Forgot password?' },
     { name: 'ERROR_MSG', message: 'There was an issue with logging in.' },
-    { name: 'ERROR_MSG2', message: 'Please enter email' }
+    { name: 'ERROR_MSG2', message: 'Please enter email or username' }
   ],
 
   properties: [
@@ -148,7 +148,6 @@ foam.CLASS({
               }));
           });
         } else {
-          // TODO: change to 'Please enter email or username' when integrating
           this.ctrl.add(this.NotificationMessage.create({
             message: this.ERROR_MSG2,
             type: this.LogLevel.ERROR
