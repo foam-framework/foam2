@@ -23,8 +23,8 @@ foam.CLASS({
   methods: [
     {
       name: 'getPlacement',
-      code: function getPlacement(obj) {
-        return this.coords[obj.id] || null;
+      code: function getPlacement(id) {
+        return this.coords[id] || null;
       }
     },
     function addAssociation_(id, coords) {
