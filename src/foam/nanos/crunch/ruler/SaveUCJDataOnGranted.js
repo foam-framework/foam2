@@ -18,7 +18,10 @@ foam.CLASS({
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.crunch.Capability',
     'foam.core.FObject',
-    'foam.nanos.logger.Logger'
+    'foam.nanos.logger.Logger',
+    'foam.dao.DAO',
+    'static foam.mlang.MLang.*',
+    'foam.nanos.crunch.CapabilityJunctionStatus'
   ],
 
   methods: [
@@ -28,7 +31,15 @@ foam.CLASS({
         agency.submit(x, new ContextAgent() {
           @Override
           public void execute(X x) {
+            DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
+
             UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
+            UserCapabilityJunction old = (UserCapabilityJunction) userCapabilityJunctionDAO.find(AND(
+              EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId()),
+              EQ(UserCapabilityJunction.TARGET_ID, ucj.getTargetId())
+            ));
+
+            if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED || old.getStatus() == CapabilityJunctionStatus.GRANTED ) return;
 
             Capability capability = (Capability) ucj.findTargetId(x);
             if ( capability == null ) throw new RuntimeException("Data not saved to target object: Capability not found.");

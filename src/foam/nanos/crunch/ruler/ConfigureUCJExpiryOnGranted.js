@@ -31,16 +31,17 @@ foam.CLASS({
         agency.submit(x, new ContextAgent() {
           @Override
           public void execute(X x) {
-            UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
-
             DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
-            DAO capabilityDAO = (DAO) x.get("capabilityDAO");
 
+            UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
             UserCapabilityJunction old = (UserCapabilityJunction) userCapabilityJunctionDAO.find(AND(
               EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId()),
               EQ(UserCapabilityJunction.TARGET_ID, ucj.getTargetId())
             ));
-            Capability capability = (Capability) capabilityDAO.find(ucj.getTargetId());
+
+            if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED || old.getStatus() == CapabilityJunctionStatus.GRANTED ) return;
+
+            Capability capability = (Capability) ucj.findTargetId(x);
             if ( capability == null ) throw new RuntimeException("UCJ Expiry not configured: Capability not found");
 
             // Only update the expiry for non-active junctions, i.e., non-expired, non-pending, or granted junctions whose expiry is not yet set
