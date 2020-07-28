@@ -63,9 +63,9 @@ foam2_MAVEN_DEPS = \
 	org.eclipse.jetty:jetty-quickstart:9.4.8.v20171121 \
 	org.eclipse.jetty:jetty-rewrite:9.4.8.v20171121 \
 	org.eclipse.jetty:jetty-security:9.4.8.v20171121 \
-	org.eclipse.jetty:jetty-server:9.4.8.v20171121 \
-	org.eclipse.jetty:jetty-servlet:9.4.8.v20171121 \
-	org.eclipse.jetty:jetty-servlets:9.4.8.v20171121 \
+    org.eclipse.jetty:jetty-server:9.4.30.v20200611 \
+	org.eclipse.jetty:jetty-servlet:9.4.30.v20200611 \
+	org.eclipse.jetty:jetty-servlets:9.4.30.v20200611 \
 	org.eclipse.jetty:jetty-unixsocket:9.4.8.v20171121 \
 	org.eclipse.jetty:jetty-util:9.4.8.v20171121 \
 	org.eclipse.jetty:jetty-webapp:9.4.8.v20171121 \
