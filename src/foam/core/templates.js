@@ -227,8 +227,8 @@ foam.CLASS({
   methods: [
     function installInProto(proto) {
       proto[this.name] =
-          foam.templates.TemplateUtil.create().lazyCompile(
-              this.template, this.name, this.args || []);
+        foam.templates.TemplateUtil.create().lazyCompile(
+          this.template, this.name, this.args || []);
     }
   ]
 });

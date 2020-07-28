@@ -78,6 +78,22 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2.view',
+  name: 'TableHeaderActionRefinement',
+
+  refines: 'foam.core.Action',
+
+  properties: [
+    {
+      name: 'tableHeader',
+      value: function() {
+        return this.label || foam.String.labelize(this.name);
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.u2.view',
   name: 'ActionTableCellFormatterRefinement',
   refines: 'foam.core.Action',
 
