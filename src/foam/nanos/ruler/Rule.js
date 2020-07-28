@@ -35,12 +35,14 @@
   tableColumns: [
     'id',
     'name',
-    'ruleGroup',
+    'ruleGroup.id',
     'enabled',
     'priority',
     'daoKey',
-    'createdBy',
-    'lastModifiedBy'
+    'createdBy.firstName',
+    'createdBy.lastName',
+    'lastModifiedBy.firstName',
+    'lastModifiedBy.lastName'
   ],
 
   searchColumns: [

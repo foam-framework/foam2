@@ -25,7 +25,7 @@ foam.CLASS({
 
   tableColumns: [
     'id',
-    'daoKey',
+    'daoKey.name',
     'cmd',
     'format'
   ],
