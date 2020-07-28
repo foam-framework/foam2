@@ -18,8 +18,9 @@ foam.CLASS({
     foam.u2.view.ChoiceView.MAX_SIZE,
     foam.u2.view.ChoiceView.CHOICES,
     {
-      name: 'n',
-      class: 'Int'
+      name: 'maxSelections',
+      class: 'Int',
+      value: Number.MAX_SAFE_INTEGER
     },
     {
       name: 'booleanView',
@@ -66,7 +67,7 @@ foam.CLASS({
                 isOn = valueSlot.get();
                 console.log('choice', choice[0], isOn);
                 if ( isOn ) {
-                  if ( Object.keys(self.data).length >= self.n ) {
+                  if ( Object.keys(self.data).length >= self.maxSelections ) {
                     valueSlot.set(false);
                     return;
                   }
