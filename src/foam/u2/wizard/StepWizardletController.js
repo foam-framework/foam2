@@ -9,9 +9,12 @@ foam.CLASS({
   name: 'StepWizardletController',
 
   requires: [
+    'foam.core.ArraySlot',
     'foam.u2.detail.AbstractSectionedDetailView',
     'foam.u2.detail.VerticalDetailView',
-    'foam.u2.stack.Stack'
+    'foam.u2.stack.Stack',
+    'foam.u2.wizard.WizardPosition',
+    'foam.u2.wizard.StepWizardConfig'
   ],
 
   properties: [
@@ -20,20 +23,33 @@ foam.CLASS({
       name: 'title'
     },
     {
+      name: 'config',
+      class: 'FObjectProperty',
+      of: 'foam.u2.wizard.StepWizardConfig',
+      factory: function () {
+        return this.StepWizardConfig.create();
+      }
+    },
+    {
       name: 'wizardlets',
       class: 'FObjectArray',
       of: 'foam.u2.wizard.Wizardlet'
     },
     {
-      name: 'subStack',
+      name: 'wizardPosition',
+      documentation: `
+        Wizardlet position
+      `,
       class: 'FObjectProperty',
-      of: 'foam.u2.stack.Stack',
-      view: {
-        class: 'foam.u2.stack.StackView',
-        showActions: false
-      },
+      of: 'foam.u2.wizard.WizardPosition',
       factory: function () {
-        return this.Stack.create();
+        return this.WizardPosition.create({
+          wizardletIndex: 0,
+          sectionIndex: 0,
+        });
+      },
+      postSet: function(_, n) {
+        this.highestIndex = Math.max(this.highestIndex, n.wizardletIndex);
       }
     },
     {
@@ -60,25 +76,52 @@ foam.CLASS({
         Array format is similar to sections.
       `,
       expression: function(sections) {
-        return [...sections.keys()].map(w => sections[w].map(
+        var availableSlots = [...sections.keys()].map(w => sections[w].map(
           section => section.createIsAvailableFor(
             this.wizardlets[w].data$
           )
         ));
+        availableSlots.forEach((sections, wizardletIndex) => {
+          sections.forEach((availableSlot, sectionIndex) => {
+            availableSlot.sub(() => {
+              var val = availableSlot.get();
+              this.sectionAvailableSlots = this.sectionAvailableSlots;
+              let name = 'sectionAvailableSlots';
+              this.propertyChange.pub(name, this.slot(name));
+
+              if ( val ) {
+                // If this is a previous position, move the wizard back
+                var maybeNewPos = this.WizardPosition.create({
+                  wizardletIndex: wizardletIndex,
+                  sectionIndex: sectionIndex,
+                });
+                if ( maybeNewPos.compareTo(this.wizardPosition) < 0 ) {
+                  this.wizardPosition = maybeNewPos;
+                }
+              }
+
+              // Invoke a wizard position update (even if position didn't change)
+              // to re-render steps
+              this.wizardPosition = this.WizardPosition.create({
+                wizardletIndex: this.wizardPosition.wizardletIndex,
+                sectionIndex: this.wizardPosition.sectionIndex
+              });
+            });
+          })
+        });
+        return availableSlots;
       }
     },
     {
       name: 'currentWizardlet',
-      expression: function (subStack$pos) {
-        let sectionIndices = this.screenIndexToSection(subStack$pos);
-        // sectionIndices[0] is the index of the current wizardlet
-        return this.wizardlets[sectionIndices[0]];
+      expression: function (wizardlets, wizardPosition) {
+        return wizardlets[wizardPosition.wizardletIndex];
       }
     },
     {
-      name: 'isLastWizardlet',
-      expression: function (subStack$pos, numberOfScreens) {
-        return subStack$pos === numberOfScreens - 1;
+      name: 'currentSection',
+      expression: function (sections, wizardPosition) {
+        return sections[wizardPosition.wizardletIndex][wizardPosition.sectionIndex];
       }
     },
     {
@@ -92,11 +135,73 @@ foam.CLASS({
       name: 'stackContext'
     },
     {
-      name: 'numberOfScreens',
-      class: 'Int',
-      expression: function (sections) {
-        return sections.reduce(
-          (sum, wizardletSections) => sum + wizardletSections.length, 0);
+      name: 'previousScreen',
+      expression: function (sectionAvailableSlots, wizardPosition) {
+        var wi = wizardPosition.wizardletIndex;
+        var si = wizardPosition.sectionIndex;
+
+        var decr = (pos) => {
+          let subWi = pos.wizardletIndex;
+          let subSi = pos.sectionIndex;
+          if ( subSi == 0 ) {
+            if ( subWi == 0 ) return null;
+            subWi--;
+            subSi = sectionAvailableSlots[subWi].length - 1;
+          } else {
+            subSi--;
+          }
+          return this.WizardPosition.create({
+            wizardletIndex: subWi,
+            sectionIndex: subSi,
+          });
+        }
+
+        for ( let p = decr(wizardPosition) ; p != null ; p = decr(p) ) {
+          console.log('prev p', p);
+          if ( sectionAvailableSlots[p.wizardletIndex][p.sectionIndex].get() ) {
+            return p;
+          }
+        }
+
+        return null;
+      }
+    },
+    {
+      name: 'nextScreen',
+      expression: function (sectionAvailableSlots, wizardPosition) {
+        var wi = wizardPosition.wizardletIndex;
+        var si = wizardPosition.sectionIndex;
+
+        var incr = (pos) => {
+          let subWi = pos.wizardletIndex;
+          let subSi = pos.sectionIndex;
+          if ( subSi >= sectionAvailableSlots[subWi].length - 1 ) {
+            if ( subWi >= this.wizardlets.length - 1 ) return null;
+            subSi = 0;
+            subWi++;
+          } else {
+            subSi++;
+          }
+          return this.WizardPosition.create({
+            wizardletIndex: subWi,
+            sectionIndex: subSi,
+          });
+        }
+
+        for ( let p = incr(wizardPosition) ; p != null ; p = incr(p) ) {
+          console.log('next p', p);
+          if ( sectionAvailableSlots[p.wizardletIndex][p.sectionIndex].get() ) {
+            return p;
+          }
+        }
+
+        return null;
+      }
+    },
+    {
+      name: 'isLastScreen',
+      expression: function (nextScreen) {
+        return nextScreen == null;
       }
     },
     {
@@ -106,48 +211,22 @@ foam.CLASS({
         If the first screen has no available sections, then the back button
         should be disabled.
       `,
-      expression: function (subStack$pos) {
-        let previousScreenPos = subStack$pos - 1;
-        if ( previousScreenPos < 0 ) return false;
-
-        for ( let i = previousScreenPos ; i >= 0 ; i-- ) {
-          let indices = this.screenIndexToSection(i);
-          let wIndex = indices[0]; // Wizardlet index
-          let sIndex = indices[1]; // Section index
-
-          if ( this.sectionAvailableSlots[wIndex][sIndex].get() ) {
-            return true;
-          }
-        }
-        return false;
+      expression: function (previousScreen) {
+        return previousScreen != null;
+      }
+    },
+    {
+      name: 'canGoNext',
+      class: 'Boolean',
+      expression: function (currentWizardlet$isValid) {
+        return currentWizardlet$isValid;
       }
     }
   ],
 
   methods: [
     function init() {
-      this.stackContext = this.__subContext__.createSubContext();
-      this.stackContext.register(
-        this.VerticalDetailView,
-        'foam.u2.detail.SectionedDetailView'
-      );
-      this.subStack.push({
-        class: 'foam.u2.detail.SectionView',
-        // Note: assumes wizard has at least one wizardlet with at least one section.
-        section: this.sections[0][0],
-        data$: this.wizardlets[0].data$,
-      });
-
-      // If the first screen has no available sections, move next and repeat.
-      var skipEmptyWizardlets;
-      skipEmptyWizardlets = () => {
-        var currentWizardletIndex =
-          this.screenIndexToSection(this.subStack.pos)[0];
-        if ( this.countAvailableSections(currentWizardletIndex) < 1 ) {
-          return this.next().then(skipEmptyWizardlets);
-        }
-      };
-      skipEmptyWizardlets();
+      console.log('StepWizardletController', this);
     },
     function saveProgress() {
       var p = Promise.resolve();
@@ -163,53 +242,25 @@ foam.CLASS({
         current wizardlet is already the last one.
       `,
       code: function next() {
-        if ( this.subStack.pos >= this.numberOfScreens - 1 ) {
+        var nextScreen = this.nextScreen;
+
+        if ( nextScreen == null ) {
           return this.currentWizardlet.save().then(() => true);
         }
-        let previousScreenIndex = this.subStack.pos;
-        let screenIndex = this.subStack.pos + 1;
 
-        // Get wizardlet and section indices
-        let sectionIndices = this.screenIndexToSection(screenIndex);
-        let wizardletIndex = sectionIndices[0];
-        let sectionIndex = sectionIndices[1];
+        // number of unsaved wizardlets
+        let N = nextScreen.wizardletIndex - this.wizardPosition.wizardletIndex;
+        // starting index of unsaved wizardlets
+        let S = this.wizardPosition.wizardletIndex;
 
-        let p = Promise.resolve();
-        if ( this.screenIndexToSection(previousScreenIndex)[0] !== wizardletIndex ) {
-          p = this.currentWizardlet.save();
-        }
-        return p.then(() => {
-          // Get overall index of screen (this is related to subStack position)
-          let screenIndex = this.subStack.pos + 1;
-
-          // Get wizardlet and section indices
-          let sectionIndices = this.screenIndexToSection(screenIndex);
-          let wizardletIndex = sectionIndices[0];
-          let sectionIndex = sectionIndices[1];
-
-          // Section and wizardlet can be obtained with above indices
-          let section = this.sections[wizardletIndex][sectionIndex];
-          let wizardlet = this.wizardlets[wizardletIndex];
-
-          // Set the highestIndex, this way if the user hits back and then save
-          // it will still save all the wizardlets they visited.
-          this.highestIndex = wizardletIndex;
-          this.subStack.push({
-            class: 'foam.u2.detail.SectionView',
-            section: section,
-            data$: wizardlet.data$,
-          })
-
-          // Automatically push the next section if this one is
-          // unavailable.
-          let slot = this.sectionAvailableSlots[wizardletIndex][sectionIndex];
-          if ( ! slot.get() ) {
-            return this.next();
-          }
-
-          // Return false for "not finished"
-          return false;
-        });
+        // Save wizardlets
+        return [...Array(N).keys()].map(v => S + v)
+          .reduce(
+            (p, i) => p.then(() => this.wizardlets[i].save()),
+            Promise.resolve()
+          ).then(() => {
+            this.wizardPosition = nextScreen;
+          });
       },
     },
     function countAvailableSections(wizardletIndex) {
@@ -219,60 +270,25 @@ foam.CLASS({
         0
       );
     },
-    function canSkipTo(wizardletIndex) {
-      let currentWizardletIndex =
-        this.screenIndexToSection(this.subStack.pos)[0];
-      for ( let w = currentWizardletIndex ; w <= wizardletIndex ; w++ ) {
-        if ( ! this.wizardlets[w].validate() ) return false;
-      }
-      return true;
-    },
-    function skipTo(screenIndex) {
-      var skipToScreenRecur;
-      skipToScreenRecur = () => {
-        if ( this.subStack.pos !== screenIndex ) {
-          return this.next().then(skipToScreenRecur);
-        }
-      };
-      return skipToScreenRecur(); // call recursive function
-    },
-    function back() {
-      this.subStack.back();
-
-      // Call back again if this section is unavailable
-      let sectionIndices = this.screenIndexToSection(this.subStack.pos);
-      let wizardletIndex = sectionIndices[0];
-      let sectionIndex = sectionIndices[1];
-      let slot = this.sectionAvailableSlots[wizardletIndex][sectionIndex];
-      if ( ! slot.get() ) {
-        return this.back();
-      }
-    },
-    // Returns a tuple of two indices, 0: index corresponding to the wizardlet;
-    // and 1: index corresponding to the section under that wizardlet.
-    // This is used to locate the next section to display based on the stack
-    // position.
-    function screenIndexToSection(screenIndex) {
-      let i = 0;
-      for ( let w = 0 ; w < this.wizardlets.length ; w++ ) {
-        let nSections = this.sections[w].length;
-        if ( screenIndex >= i && i + nSections > screenIndex ) {
-          return [w, screenIndex - i]
-        }
-        i += nSections;
-      }
-      throw new Error(
-        `Tried to get wizard screen at index ${i} but it doesn't exist`
+    function canSkipTo(pos) {
+      let diff = pos.compareTo(this.wizardPosition);
+      return ( diff == 0
+        ? true
+        : ( diff > 0
+          ? this.canGoNext && this.config.allowSkipping
+          : this.canGoBack && this.config.allowBacktracking
+        )
       );
     },
-
-    function sectionToScreenIndex(wizardletIndex, sectionIndex) {
-      let screenIndex = 0;
-      for ( let w = 0 ; w < wizardletIndex ; w++ ) {
-        screenIndex += this.sections[w].length;
+    function skipTo(pos) {
+      // TODO: add ucj save logic
+      this.wizardPosition = pos;
+    },
+    function back() {
+      let previousScreen = this.previousScreen;
+      if ( previousScreen !== null ) {
+        this.wizardPosition = previousScreen;
       }
-      screenIndex += sectionIndex;
-      return screenIndex;
     }
   ]
 });
