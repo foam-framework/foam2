@@ -2,7 +2,7 @@ foam.CLASS({
   package: 'foam.nanos.crunch.ui',
   name: 'CapabilityView',
   extends: 'foam.u2.View',
-  documentation: 'All purpose capability view that takes in an array of capaiblity ids and display these capabilities',
+  documentation: 'All purpose capability view that takes in an array of capaiblity ids and displays these capabilities',
 
   imports: [
     'crunchController',
@@ -37,17 +37,17 @@ foam.CLASS({
     async function initE() {
       const self = this;
 
-      // get the wizardlets and sections for all of the capabilties
+      // gets the wizardlets and sections for all of the capabilties
       for ( let cap of this.capabilities ) {
         // wizardlets for current capability
         const curWizardlets = (await this.crunchController.getCapsAndWizardlets(cap)).wizCaps;
 
-         // add listener on curWizardlets
+         // adds listener on curWizardlets
          for ( let wizardlet of curWizardlets ) {
           this.addListeners(wizardlet.data);
         }
 
-        // get all the sections associated with curWizardlets
+        // gets all the sections associated with curWizardlets
         const curWizardletSectionsList = this.crunchController.generateSections(curWizardlets);
 
         this.wizardlets = this.wizardlets.concat(curWizardlets);
@@ -76,7 +76,7 @@ foam.CLASS({
 
       obj.sub(this.updateWizardlet);
 
-      // add listeners on inner fobjects
+      // adds listeners on inner fobjects
       for ( let value of Object.values(obj.instance_) ) {
         if ( this.isFObject(value) ) {
           this.addListeners(value);
