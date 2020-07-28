@@ -143,7 +143,7 @@ foam.CLASS({
       }
     },
     {
-      name: 'coursalCounter',
+      name: 'carouselCounter',
       class: 'Int',
       documentation: 'left and right scroll counter for featureCardArray index'
     },
@@ -214,14 +214,14 @@ foam.CLASS({
             spot.start('span').start('img').addClass(self.myClass('left-arrow'))
                 .attr('src', 'images/carouselArrow.svg')
                 .on('click', function() {
-                  self.coursalCounter--;
+                  self.carouselCounter--;
                 })
               .end().end();
             spot.add(self.slot(
-              function(coursalCounter, totalNumCards) {
+              function(carouselCounter, totalNumCards) {
                 var ele = self.E().addClass(self.myClass('feature-column-grid'));
                 for ( var k = 0 ; k < totalNumCards ; k++ ) {
-                  let cc = coursalCounter % totalNumCards; // this stops any out of bounds indecies
+                  let cc = carouselCounter % totalNumCards; // this stops any out of bounds indecies
                   let index = ( cc + totalNumCards + k ) % totalNumCards; // this ensures circle indecies
                   ele = ele.add(self.featureCardArray[index].call(self));
                 }
@@ -230,7 +230,7 @@ foam.CLASS({
             spot.start('span').start('img').addClass(self.myClass('right-arrow'))
               .attr('src', 'images/carouselArrow.svg')
               .on('click', function() {
-                self.coursalCounter++;
+                self.carouselCounter++;
               })
             .end().end();
           });
