@@ -17,7 +17,6 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.nanos.auth.*',
     'foam.nanos.logger.Logger',
-
     'java.util.Calendar',
     'java.util.Date',
     'java.util.List',
@@ -30,21 +29,6 @@ foam.CLASS({
   ],
 
   methods: [
-    {
-      name: 'getUser',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        }
-      ],
-      type: 'foam.nanos.auth.User',
-      javaCode: `
-        User user = ((Subject) x.get("subject")).getUser();
-        if ( user == null ) throw new AuthenticationException("user not found");
-        return user;
-      `
-    },
     {
       name: 'checkOwnership',
       args: [
@@ -59,11 +43,13 @@ foam.CLASS({
       ],
       documentation: `Check if current user has permission to add this junction`,
       javaCode: `
-        User user = getUser(x);
-        User agent = ((Subject) x.get("subject")).getRealUser();
+        Subject subject = (Subject) x.get("subject");
+        User user = subject.getUser();
+        User realUser = subject.getRealUser();
+
         AuthService auth = (AuthService) x.get("auth");
-        boolean isOwner = obj.getSourceId() == user.getId() || ( agent != null && obj.getSourceId() == agent.getId() );
-        if ( ! isOwner && ! auth.check(x, "ucj.addPermission") ) throw new AuthorizationException(ERROR_MSG + agent.getId()+":"+user.getId());
+        boolean isOwner = obj.getSourceId() == user.getId() || obj.getSourceId() == realUser.getId();
+        if ( ! isOwner && ! auth.check(x, "*") ) throw new AuthorizationException();
       `
     },
     {
@@ -77,12 +63,18 @@ foam.CLASS({
       type: 'foam.dao.DAO',
       documentation: `Return list of junctions the current user has read access to`,
       javaCode: `
-        User user = getUser(x);
-        AuthService auth = (AuthService) x.get("auth");
-        if ( auth.check(x, "service.*") ) return getDelegate();
-        return getDelegate().where(
-          EQ(UserCapabilityJunction.SOURCE_ID, user.getId())
-        );
+      Subject subject = (Subject) x.get("subject");
+      User user = (User) subject.getUser();
+      User realUser = (User) subject.getRealUser();
+      
+      AuthService auth = (AuthService) x.get("auth");
+      if ( auth.check(x, "*") ) return getDelegate();
+      return getDelegate().where(
+        OR(
+          EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
+          EQ(UserCapabilityJunction.SOURCE_ID, realUser.getId())
+        )
+      ); 
       `
     },
     {
@@ -100,7 +92,7 @@ foam.CLASS({
       type: 'foam.core.FObject',
       documentation: `
         Set the status of the junction before put by checking if prerequisites are fulfilled, data required is validated,
-        and whether review is required and set.
+        and whether review is required.
       `,
       javaCode: `
         UserCapabilityJunction ucJunction = (UserCapabilityJunction) obj;
@@ -112,21 +104,19 @@ foam.CLASS({
         checkOwnership(x, ucJunction);
 
         // if the junction is being updated from GRANTED to something else, put the updated ucj,
-        // then try to reput the ucj as new ucj
+        // then try to reput the ucj as new ucj, unless the ucj is in grace period or has expired.
         if ( old != null && old.getStatus() == CapabilityJunctionStatus.GRANTED && ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED ) {
-          getDelegate().put_(x, ucJunction);
+          ucJunction = (UserCapabilityJunction) getDelegate().put_(x, ucJunction);
           old = null;
+          if ( ucJunction.getStatus() == CapabilityJunctionStatus.EXPIRED || ucJunction.getStatus() == CapabilityJunctionStatus.GRACE_PERIOD ) return ucJunction;
         }
 
         boolean requiresData = capability.getOf() != null;
         boolean requiresReview = capability.getReviewRequired();
 
-        boolean ucjExpiredButCapabilityNot = ucJunction.getStatus() == CapabilityJunctionStatus.EXPIRED && ! capability.isExpired();
-
         // Update current UCJ status
         if ( old == null
-          || ucJunction.getStatus() == CapabilityJunctionStatus.ACTION_REQUIRED
-          || ucjExpiredButCapabilityNot )
+          || ucJunction.getStatus() == CapabilityJunctionStatus.ACTION_REQUIRED )
         {
           CapabilityJunctionStatus chainedStatus = checkPrereqsChainedStatus(x, ucJunction);
           if ( ( ! requiresData || ( ucJunction.getData() != null && validateData(x, ucJunction) ) )
@@ -278,6 +268,11 @@ foam.CLASS({
           }
         }
         obj.setExpiry(junctionExpiry);
+
+        if ( capability.getGracePeriod() > 0 ) {
+          obj.setGraceDaysLeft(capability.getGracePeriod());
+        }
+
         return obj;
       `
     },

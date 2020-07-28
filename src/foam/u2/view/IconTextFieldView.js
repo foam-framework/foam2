@@ -43,7 +43,17 @@ foam.CLASS({
     {
       class: 'String',
       name: 'fromPropertyName'
-    }
+    },
+    // Set 'focused_' instead of focused
+    // so that the inner TextField
+    // can get the focus instead of this wrapper.
+    {
+      name: 'focused',
+      setter: function(f) {
+        this.focused_ = f;
+      }
+    },
+    'focused_'
   ],
 
   methods: [
@@ -61,7 +71,8 @@ foam.CLASS({
           type: this.type,
           data$: this.data$,
           placeholder: this.placeholder,
-          onKey: this.onKey
+          onKey: this.onKey,
+          focused: this.focused_
         })
           .addClass(this.myClass('input'))
           .attr('name', this.fromPropertyName + 'Input')

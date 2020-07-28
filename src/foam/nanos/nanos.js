@@ -113,6 +113,7 @@ FOAM_FILES([
   { name: "foam/nanos/bench/Benchmark" },
   { name: "foam/nanos/boot/DAOConfigSummaryView", flags: ['web'] },
   { name: "foam/nanos/boot/DAONSpecMenu" },
+  { name: "foam/nanos/session/LocalSetting" },
   { name: "foam/nanos/session/Session" },
   { name: "foam/nanos/session/SessionTimer" },
   { name: "foam/nanos/session/SessionService" },
@@ -232,10 +233,12 @@ FOAM_FILES([
   { name: 'foam/nanos/demo/relationship/Professor' },
   { name: 'foam/nanos/demo/relationship/Student' },
   { name: 'foam/nanos/demo/relationship/Controller' },
+  { name: "foam/nanos/notification/ClientResendNotificationService"},
   { name: 'foam/nanos/notification/EmailSetting' },
   { name: 'foam/nanos/notification/Notifiable' },
   { name: 'foam/nanos/notification/Notification'},
   { name: 'foam/nanos/notification/MyNotificationDAO'},
+  { name: "foam/nanos/notification/ResendNotificationServiceInterface"},
   { name: 'foam/nanos/notification/notifications/ScriptRunNotification'},
   { name: 'foam/nanos/notification/NotificationView'},
   { name: 'foam/nanos/notification/NotificationExpansionDAO'},
@@ -319,6 +322,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/CapabilityCategory" },
   { name: "foam/nanos/crunch/CapabilityJunctionStatus" },
   { name: "foam/nanos/crunch/UserCapabilityJunctionRefine" },
+  { name: "foam/nanos/crunch/AssociatedEntity" },
   //daos
   { name: "foam/nanos/crunch/UserCapabilityJunctionDAO" },
   //rules
