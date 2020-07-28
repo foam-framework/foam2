@@ -14,11 +14,11 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.ContextAgent',
+    'foam.core.FObject',
     'foam.core.X',
-    'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityJunctionStatus',
-    'foam.core.FObject'
+    'foam.nanos.crunch.UserCapabilityJunction'
   ],
 
   methods: [

@@ -13,14 +13,8 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.FObject',
-    'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.nanos.auth.*',
-    'foam.nanos.logger.Logger',
-    'java.util.Calendar',
-    'java.util.Date',
-    'java.util.List',
-
     'static foam.mlang.MLang.*'
   ],
 

@@ -15,13 +15,11 @@ foam.CLASS({
   javaImports: [
     'foam.core.ContextAgent',
     'foam.core.X',
-    'foam.nanos.crunch.UserCapabilityJunction',
-    'foam.nanos.crunch.Capability',
-    'foam.core.FObject',
-    'foam.nanos.logger.Logger',
     'foam.dao.DAO',
-    'static foam.mlang.MLang.*',
-    'foam.nanos.crunch.CapabilityJunctionStatus'
+    'foam.nanos.crunch.Capability',
+    'foam.nanos.crunch.CapabilityJunctionStatus',
+    'foam.nanos.crunch.UserCapabilityJunction',
+    'static foam.mlang.MLang.*'
   ],
 
   methods: [

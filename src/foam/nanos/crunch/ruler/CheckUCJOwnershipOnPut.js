@@ -15,10 +15,10 @@ foam.CLASS({
   javaImports: [
     'foam.core.ContextAgent',
     'foam.core.X',
-    'foam.nanos.auth.AuthService',
-    'foam.nanos.auth.User',
-    'foam.nanos.auth.Subject',
     'foam.nanos.auth.AuthorizationException',
+    'foam.nanos.auth.AuthService',
+    'foam.nanos.auth.Subject',
+    'foam.nanos.auth.User',
     'foam.nanos.crunch.UserCapabilityJunction'
   ],
 

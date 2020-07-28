@@ -16,11 +16,11 @@ foam.CLASS({
     'foam.core.ContextAgent',
     'foam.core.X',
     'foam.dao.DAO',
-    'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityJunctionStatus',
-    'java.util.Date',
+    'foam.nanos.crunch.UserCapabilityJunction',
     'java.util.Calendar',
+    'java.util.Date',
     'static foam.mlang.MLang.*'
   ],
 
