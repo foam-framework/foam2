@@ -52,7 +52,7 @@ foam.CLASS({
     ^feature-column-grid {
       justify-content: space-between;
       display: inline-flex;
-      width: 96%;
+      width: 94%;
       overflow: hidden;
     }
 
@@ -72,7 +72,6 @@ foam.CLASS({
       transform: scaleX(-1);
       display: flex;
       padding-top: 70px;
-      margin-right: -1.3vw;
       /* HOVER OFF */
       -webkit-transition: padding 2s;
     }
@@ -104,6 +103,8 @@ foam.CLASS({
     ^container {
       display: inline-block;
       width: 100%;
+      height: fit-content;
+      overflow-y: visible;
     }
   `,
 
@@ -170,10 +171,7 @@ foam.CLASS({
         .addClass(self.myClass())
         .start(self.Tabs)
           .start(self.Tab, { label: this.TAB_ALL, selected: true })
-            .start().style({ 'height': 'fit-content', 'overflow-y': 'visible' })
-              .add(self.renderFeaturedT())
-            .end()
-            // .add(self.renderFeatured())
+              .add(self.renderFeatured())
             .add(self.accountAndAccountingCard())
           .end()
           // TODO: replace this .call with a .select once
@@ -190,45 +188,17 @@ foam.CLASS({
           })
         .end();
     },
-    function renderFeatured() {
-      var self = this;
-      return self.E()
-        // Featured Capabilities
-        .add(self.slot(function(featuredCapabilities) {
-          var spot = this.E('span');
-          featuredCapabilities.select().then(result => {
-            var arr = result.array;
-            var grid = self.E();
-            grid
-              .addClass(self.myClass('feature-column-grid'));
-            for ( let i = 0 ; i < arr.length ; i++ ) {
-              let cap = arr[i];
-              grid = grid
-                .start() // 'div', { columns: arr.length })
-                  // .addClass(self.myClass('perFeature'))
-                  .start(self.CapabilityFeatureView, { data: cap })
-                    // .addClass(self.myClass('featureSection'))
-                  .end()
-                  .on('click', () => {
-                    self.crunchController.launchWizard(cap);
-                  })
-                .end();
-            }
-            spot.add(grid);
-          });
-          return spot;
-        }));
-    },
 
-    function renderFeaturedT() { // Featured Capabilities in carousel view
+    function renderFeatured() { // Featured Capabilities in carousel view
       var self = this;
       var spot = self.E();
-      return this.E()
+      return this.E().start()// .style({ 'height': 'fit-content', 'overflow-y': 'visible' })
         .addClass(this.myClass('container'))
         .add(this.slot(function(featuredCapabilities) {
           featuredCapabilities.select().then(result => {
             var arr = result.array;
             self.totalNumCards = arr.length;
+            self.featureCardArray = [];
             for ( let i = 0 ; i < self.totalNumCards ; i++ ) { // build featured cards as elements
               self.featureCardArray.push(
                 () => self.Element.create().start()
@@ -242,30 +212,30 @@ foam.CLASS({
                 .end());
             }
             spot.start('span').start('img').addClass(self.myClass('left-arrow'))
-                .attr('src', '/images/carouselArrow.svg')
+                .attr('src', 'images/carouselArrow.svg')
                 .on('click', function() {
                   self.coursalCounter--;
                 })
               .end().end();
-            spot.add(self.slot(function(coursalCounter, featureCardArray, totalNumCards) {
-              // self.removeAllChildren();
-              var ele = self.E().addClass(self.myClass('feature-column-grid'));
-              for ( var k = 0 ; k < totalNumCards ; k++ ) {
-                let cc = coursalCounter % totalNumCards; // this stops any out of bounds indecies
-                let index = ( cc + totalNumCards + k ) % totalNumCards; // this ensures circle indecies
-                ele = ele.add(featureCardArray[index].call(self));
-              }
-              return ele;
-            }));
+            spot.add(self.slot(
+              function(coursalCounter, totalNumCards) {
+                var ele = self.E().addClass(self.myClass('feature-column-grid'));
+                for ( var k = 0 ; k < totalNumCards ; k++ ) {
+                  let cc = coursalCounter % totalNumCards; // this stops any out of bounds indecies
+                  let index = ( cc + totalNumCards + k ) % totalNumCards; // this ensures circle indecies
+                  ele = ele.add(self.featureCardArray[index].call(self));
+                }
+                return ele;
+              }));
             spot.start('span').start('img').addClass(self.myClass('right-arrow'))
-              .attr('src', '/images/carouselArrow.svg')
+              .attr('src', 'images/carouselArrow.svg')
               .on('click', function() {
                 self.coursalCounter++;
               })
             .end().end();
           });
           return spot;
-       }));
+       })).end();
     },
 
     function accountAndAccountingCard() {
