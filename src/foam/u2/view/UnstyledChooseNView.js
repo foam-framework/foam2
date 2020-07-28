@@ -35,11 +35,12 @@ foam.CLASS({
       factory: function () {
         return {};
       },
-      adapt: function (_, n) {
-        var set = n;
-        if ( Array.isArray(n) ) {
+      adapt: function (_, nu) {
+        var set = nu;
+        // Convert array input to a set (represented as an object of `true`)
+        if ( Array.isArray(nu) ) {
           set = {};
-          n.forEach(v => { set[n] = true; })
+          nu.forEach(k => { set[k] = true; })
         }
         return set;
       },
