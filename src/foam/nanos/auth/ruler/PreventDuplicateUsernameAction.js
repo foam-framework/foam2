@@ -25,7 +25,8 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'DUPLICATE_ERROR', message: 'User with same username already exists: ' }
+    { name: 'DUPLICATE_ERROR', message: 'User with same username already exists: ' },
+    { name: 'EMPTY_ERROR', message: 'Username required' }
   ],
 
   methods: [
@@ -40,7 +41,7 @@ foam.CLASS({
 
         User user = (User) obj;
         if ( SafetyUtil.isEmpty(user.getUserName()) ) {
-          return;
+          throw new RuntimeException(EMPTY_ERROR);
         }
 
         Count count = new Count();
