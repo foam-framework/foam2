@@ -28,7 +28,7 @@ foam.CLASS({
   tableColumns: [
     'created',
     'createdBy.id',
-    'createdByAgent.id',
+    'createdByAgent.legalName',
     'comment'
   ],
 

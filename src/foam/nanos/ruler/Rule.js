@@ -39,10 +39,8 @@
     'enabled',
     'priority',
     'daoKey',
-    'createdBy.firstName',
-    'createdBy.lastName',
-    'lastModifiedBy.firstName',
-    'lastModifiedBy.lastName'
+    'createdBy.legalName',
+    'lastModifiedBy.legalName'
   ],
 
   searchColumns: [
