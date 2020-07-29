@@ -37,11 +37,11 @@ foam.CLASS({
     },
     {
       name: 'width',
-      value: 700
+      value: 1000
     },
     {
       name: 'height',
-      value: 700
+      value: 1000
     },
     {
       name: 'color',

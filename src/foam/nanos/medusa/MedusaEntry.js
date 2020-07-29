@@ -118,7 +118,7 @@ foam.CLASS({
       name: 'consensusNodes',
       class: 'Map',
       visibility: 'RO',
-      factory: function() { return new {}; },
+      factory: function() { return {}; },
       javaFactory: 'return new java.util.HashMap();',
       storageTransient: true,
       clusterTransient: true,

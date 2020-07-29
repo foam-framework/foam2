@@ -28,6 +28,7 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.nanos.http.Ping',
     'foam.nanos.logger.Logger',
+    'foam.nanos.pm.PM',
     'foam.net.Host',
     'java.io.PrintWriter',
     'java.io.IOException'
@@ -133,42 +134,42 @@ foam.CLASS({
       ],
       type: 'foam.nanos.http.Ping',
       javaThrows: ['java.io.IOException'],
-      code: async function(x, hostname, port = 8080, timeout = 3000, useHttps = false) {
-        var address = await this.hostDAO && this.hostDAO.find(hostname);
-        if ( ! address ) {
-          address = hostname;
-        }
-        var url = useHttps ? 'https://' : 'http://' + hostname /*address*/ + ':' + port + '/service/' + this.serviceName;
+      // code: async function(x, hostname, port = 8080, timeout = 3000, useHttps = false) {
+      //   var address = await this.hostDAO && this.hostDAO.find(hostname);
+      //   if ( ! address ) {
+      //     address = hostname;
+      //   }
+      //   var url = useHttps ? 'https://' : 'http://' + hostname /*address*/ + ':' + port + '/service/' + this.serviceName;
 
-        var box = this.HTTPBox.create({
-          url: url,
-          connectionTimeout: timeout,
-          readTimeout: timeout
-        });
+      //   var box = this.HTTPBox.create({
+      //     url: url,
+      //     connectionTimeout: timeout,
+      //     readTimeout: timeout
+      //   });
 
-        var msg = this.Message.create({
-          object: this.Ping.create()
-        });
-        msg.attributes['replyBox', this.MessageReplyBox.create({}, x)];
-        msg.attributes['startTime', new Date().getTime()];
+      //   var msg = this.Message.create({
+      //     object: this.Ping.create({})
+      //   });
+      //   msg.attributes['replyBox', this.MessageReplyBox.create({}, x)];
+      //   msg.attributes['startTime', new Date().getTime()];
 
-        box.send(msg);
-        var ping = null;
-        var latency = 0;
-        var replyBox = msg.attributes['replyBox'];
-        if ( replyBox ) {
-          var response = replyBox.message;
-          var endTime = new Date().getTime();
-          latency = endTime - startTime;
-          console && console.log('response: '+response);
-          ping = response.object;
-        } else {
-          ping = this.Ping.create({
-            latency: latency
-          });
-        }
-        return ping;
-      },
+      //   box.send(msg);
+      //   var ping = null;
+      //   var latency = 0;
+      //   var replyBox = msg.attributes['replyBox'];
+      //   if ( replyBox ) {
+      //     var response = replyBox.message;
+      //     var endTime = new Date().getTime();
+      //     latency = endTime - startTime;
+      //     console && console.log('response: '+response);
+      //     ping = response.object;
+      //   } else {
+      //     ping = this.Ping.create({
+      //       latency: latency
+      //     });
+      //   }
+      //   return ping;
+      // },
       javaCode: `
     Logger logger = (Logger) x.get("logger");
 
@@ -185,11 +186,8 @@ foam.CLASS({
       .setConnectTimeout(timeout)
       .setReadTimeout(timeout)
       .build();
-
+    Ping ping = new Ping(x, hostname);
     try {
-      Ping ping = new Ping();
-      ping.setHostname(hostname);
-      ping.setStartTime(System.currentTimeMillis());
       Message msg = x.create(Message.class);
       msg.setObject(ping);
       msg.getAttributes().put("replyBox", new MessageReplyBox(x));
@@ -204,14 +202,6 @@ foam.CLASS({
         if ( obj instanceof Throwable ) {
           throw (Throwable) obj;
         }
-        // TODO: unserialize Ping if useful, perhaps future can contain hops like Trace. See execute above, no box processing, just returns new Message.
-        if ( obj instanceof Ping ) {
-          ping = (Ping) obj;
-        // } else {
-        //   throw new IOException("Invalid response type: " + obj.getClass().getName() + ", expected foam.nanos.http.Ping.");
-        //  ping.setLatency(latency);
-        }
-        ping.setEndTime(endTime);
         return ping;
       }
       throw new IOException("Invalid response type: null, expected foam.nanos.http.Ping.");
@@ -219,6 +209,8 @@ foam.CLASS({
       throw e;
     } catch (Throwable t) {
       throw new IOException(t.getMessage(), t);
+    } finally {
+      ping.getPm().log(x);
     }
       `
     }

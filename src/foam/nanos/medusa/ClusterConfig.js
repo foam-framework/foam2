@@ -31,7 +31,6 @@ foam.CLASS({
     'isPrimary',
     'accessMode',
     'port',
-    'pingLatency',
     'zone',
     'region',
     'regionStatus',
@@ -126,29 +125,6 @@ foam.CLASS({
       name: 'isPrimary',
       class: 'Boolean',
       value: false,
-      visibility: 'RO',
-      storageTransient: true
-    },
-    {
-      documentation: 'Ping delay greater than this value will trigger alarms.',
-      name: 'pingLatency',
-      class: 'Long',
-      units: 'ms',
-      visibility: 'RO',
-      storageTransient: true
-    },
-    {
-      documentation: 'Ping message on error',
-      name: 'pingInfo',
-      class: 'String',
-      visibility: 'RO',
-      storageTransient: true
-    },
-    {
-      documentation: 'Ping delay greater than this value will trigger alarms.',
-      name: 'maxPingLatency',
-      class: 'Long',
-      value: 500,
       visibility: 'RO',
       storageTransient: true
     },

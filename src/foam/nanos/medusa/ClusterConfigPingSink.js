@@ -75,28 +75,18 @@ foam.CLASS({
       ClusterConfig config = (ClusterConfig) obj;
       ClusterPingService pingService = (ClusterPingService) getX().get("mping");
       try {
-//        Long latency = pingService.ping(getX(), config.getId(), config.getPort(), getTimeout(), config.getUseHttps());
-        Ping ping = pingService.ping(getX(), config.getId(), config.getPort(), getTimeout(), config.getUseHttps());
-        Long latency = ping.getLatency();
+        pingService.ping(getX(), config.getId(), config.getPort(), getTimeout(), config.getUseHttps());
         config = (ClusterConfig) support.getConfig(getX(), config.getId()).fclone();
-        config.setPingLatency(latency);
         if ( config.getStatus() != Status.ONLINE) {
           config.setStatus(Status.ONLINE);
-          config.setPingInfo("");
           config = (ClusterConfig) getDao().put_(getX(), config).fclone();
         }
-        ClusterConfig.PING_INFO.clear(config);
-        if ( latency > config.getMaxPingLatency() ) {
-          // TODO: Alarm
-          getLogger().warning(config.getName(), config.getType().getLabel(), config.getStatus().getLabel(), "exceeded max ping latency", latency, " > ", config.getMaxPingLatency());
-        }
-      } catch (NullPointerException t) {
-        getLogger().error(t);
+      // } catch (NullPointerException t) {
+      //   getLogger().error(t);
       } catch (RuntimeException | java.io.IOException t) {
         getLogger().debug("ping", config.getId(), t.getClass().getSimpleName(), t.getMessage());
         if ( config.getStatus() != Status.OFFLINE ) {
           config = (ClusterConfig) config.fclone();
-          config.setPingInfo(t.getMessage());
           config.setStatus(Status.OFFLINE);
           config = (ClusterConfig) getDao().put_(getX(), config);
         // TODO: Alarm.
