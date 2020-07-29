@@ -74,6 +74,11 @@ foam.CLASS({
             var statusEnum =  foam.nanos.crunch.CapabilityJunctionStatus.AVAILABLE;
             if ( ucj ) {
               statusEnum = ucj.status;
+              
+              // Want approved to be displayed same as pending because this status denotes that
+              // the ucj has passed review, but its prerequites are still to be reviewed and in pending status
+              if ( statusEnum === foam.nanos.crunch.CapabilityJunctionStatus.APPROVED ) 
+                statusEnum = foam.nanos.crunch.CapabilityJunctionStatus.PENDING;
             }
             var badge = self.ReadOnlyEnumView.create({
                 data: statusEnum

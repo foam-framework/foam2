@@ -44,11 +44,9 @@ foam.ENUM({
     },
     {
       name: 'APPROVED',
-      label: 'pending',
+      label: 'approved',
       documentation: `Denoting a UCJ requiring review has been approved. It would need to go through the rules of the ucjDAO before 
-      being set to granted.
-      The label is the same as pending because a ucj in this status either becomes GRANTED right away 
-      before this status is saved to the dao, or it stays in APPROVED due to prerequisites in PENDING status.`,
+      being set to granted.`,
       background: '#bfae32'
     }
   ]
