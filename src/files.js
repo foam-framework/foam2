@@ -98,6 +98,7 @@ FOAM_FILES([
   { name: "foam/core/CompoundContextAgency" },
   { name: "foam/core/Validatable" },
   { name: "foam/core/AxiomCloner" },
+  { name: "foam/core/Agency"},
   { name: "foam/nanos/auth/Authorizable" },
   { name: "foam/i18n/TranslationFormatStringParser", flags: ['swift'] },
   { name: "foam/swift/SwiftLib", flags: ['swift'] },
@@ -740,6 +741,7 @@ FOAM_FILES([
   { name: "foam/dashboard/view/Line" },
   { name: "foam/dashboard/view/DAOTable" },
   { name: "foam/dashboard/view/Card" },
+  { name: "foam/dashboard/view/Dashboard"},
   { name: "foam/build/Library" },
   { name: "foam/build/EmbeddedModelDAO" },
 
@@ -840,5 +842,8 @@ FOAM_FILES([
   { name: "foam/nanos/column/CommonColumnHandler"},
   { name: "foam/nanos/column/CSVTableOutputter"},
   { name: "foam/nanos/column/NestedPropertiesExpression" },
-  { name: "foam/nanos/column/TableColumnOutputter" }
+  { name: "foam/nanos/column/TableColumnOutputter" },
+
+  { name: "foam/nanos/pool/AbstractFixedThreadPool" },
+  { name: "foam/nanos/pool/ThreadPoolAgency" }
 ]);
