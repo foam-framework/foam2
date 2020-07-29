@@ -487,6 +487,8 @@ FOAM_FILES([
   { name: "foam/u2/view/DraftDetailView", flags: ['web'] },
   { name: "foam/u2/view/FObjectArrayView", flags: ['web'] },
   { name: "foam/u2/view/ChoiceView", flags: ['web'] },
+  { name: "foam/u2/view/UnstyledChooseNView", flags: ['web'] },
+  { name: "foam/u2/view/ChooseNView", flags: ['web'] },
   { name: "foam/u2/view/ChoiceWithOtherView", flags: ['web'] },
   { name: "foam/u2/view/RichChoiceView", flags: ['web'] },
   { name: "foam/u2/view/OverlayActionListView", flags: ['web'] },
