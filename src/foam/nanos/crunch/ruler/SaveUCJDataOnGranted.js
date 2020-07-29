@@ -37,7 +37,9 @@ foam.CLASS({
               EQ(UserCapabilityJunction.TARGET_ID, ucj.getTargetId())
             ));
 
-            if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED || old.getStatus() == CapabilityJunctionStatus.GRANTED ) return;
+            if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED 
+              || ( old != null && old.getStatus() == CapabilityJunctionStatus.GRANTED ) ) 
+              return;
 
             Capability capability = (Capability) ucj.findTargetId(x);
             if ( capability == null ) throw new RuntimeException("Data not saved to target object: Capability not found.");
