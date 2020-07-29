@@ -49,6 +49,9 @@ foam.CLASS({
             // Update current UCJ status
 
             ucj.setStatus(chainedStatus);
+            if ( chainedStatus == CapabilityJunctionStatus.PENDING && reviewRequired && wasApproved ) {
+              ucj.setStatus(CapabilityJunctionStatus.APPROVED);
+            }
             if ( chainedStatus == CapabilityJunctionStatus.GRANTED && reviewRequired ) {
               ucj.setStatus(wasApproved ? CapabilityJunctionStatus.GRANTED : CapabilityJunctionStatus.PENDING);
             }

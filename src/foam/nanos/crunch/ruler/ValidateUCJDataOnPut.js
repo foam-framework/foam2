@@ -31,12 +31,10 @@ foam.CLASS({
             UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
             Capability capability = (Capability) ucj.findTargetId(x);
 
-            boolean wasApproved = ucj.getStatus() == CapabilityJunctionStatus.APPROVED;
-
             ucj.setStatus(CapabilityJunctionStatus.ACTION_REQUIRED);
 
             if ( capability.getOf() == null ) {
-              ucj.setStatus(wasApproved ? CapabilityJunctionStatus.APPROVED : CapabilityJunctionStatus.PENDING);
+              ucj.setStatus(CapabilityJunctionStatus.PENDING);
               return;
             }
 
@@ -47,7 +45,7 @@ foam.CLASS({
               } catch (IllegalStateException e) {
                 return;
               }
-              ucj.setStatus(wasApproved ? CapabilityJunctionStatus.APPROVED : CapabilityJunctionStatus.PENDING);
+              ucj.setStatus(CapabilityJunctionStatus.PENDING);
             }
           }
         }, "validate ucj data on put");
