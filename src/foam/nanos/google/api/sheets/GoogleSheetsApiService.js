@@ -55,7 +55,7 @@ foam.CLASS({
   ],
   methods: [
     {
-      name: 'createSheet',
+      name: 'createSheetAndPopulateWithData',
       javaType: 'String',
       args: [
         {
@@ -210,9 +210,9 @@ foam.CLASS({
             .execute();
     
           return updateResponse.getSpreadsheetId();
-        } catch (Exception e) {
+        } catch ( Throwable t ) {
           Logger l = (Logger) getX().get("logger");
-          l.error(e);
+          l.error(t);
           return "";
         }
       `
@@ -233,10 +233,48 @@ foam.CLASS({
         try {
           GoogleDriveService googleDriveService = (GoogleDriveService) getX().get("googleDriveService");
           googleDriveService.deleteFile(x, sheetId);
-        } catch(Exception e) {
+        } catch ( Throwable t ) {
           Logger l = (Logger) getX().get("logger");
-          l.error(e);
+          l.error(t);
         }
+      `
+    },
+    {
+      name: 'createSheetByCopyingTemplate',
+      javaType: 'String',
+      args: [
+        {
+          name: 'x',
+          type: 'Context',
+        },
+        {
+          name: 'obj',
+          javaType: 'Object'
+        },
+        {
+          name: 'metadataObj',
+          type: 'foam.nanos.export.GoogleSheetsPropertyMetadata[]',
+          javaType: 'Object'
+        },
+        {
+          name: 'extraConfig',
+          type: 'Object',
+          javaType: 'foam.nanos.export.GoogleSheetsServiceConfig'
+        }
+      ],
+      javaCode: `
+      try {
+        GoogleDriveService googleDriveService = (GoogleDriveService) getX().get("googleDriveService");
+        String folderId = googleDriveService.createFolderIfNotExists(x, "Nanopay Export");
+        String fileName = extraConfig == null || SafetyUtil.isEmpty(extraConfig.getTitle()) ? ("NanopayExport" + new Date()) : extraConfig.getTitle();
+        String fileId = googleDriveService.createAndCopyFromFile(x, folderId, fileName);
+        return fileId;
+      }catch ( Throwable t ) {
+        Logger l = (Logger) getX().get("logger");
+        l.error(t);
+        return "";
+      }
+        
       `
     }
   ]

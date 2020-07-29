@@ -148,6 +148,52 @@ foam.CLASS({
           .execute();
         return file.getId();
       `
+    },
+    {
+
+      name: 'createAndCopyFromFile',
+      type: 'String',
+      args: [
+        {
+          name: 'x',
+          type: 'Context',
+        },
+        {
+          name: 'folderId',
+          javaType: 'String'
+        },
+        {
+          name: 'title',
+          javaType: 'String'
+        }
+      ],
+      javaThrows: [
+        'java.io.IOException',
+        'java.security.GeneralSecurityException'
+      ],
+      javaCode: `
+        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+        GoogleApiAuthService googleApiAuthService = (GoogleApiAuthService)getX().get("googleApiAuthService");
+        Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY,  googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, SCOPES))
+          .setApplicationName("nanopay")
+          .build();
+        File fileMetadata = new File();
+        fileMetadata.setName(title);
+        if ( folderId != null ) {
+          fileMetadata.setParents(new ArrayList<String>() {{ add(folderId); }});
+        }
+        fileMetadata.setMimeType("application/vnd.google-apps.spreadsheet");
+
+        File file = service.files().create(fileMetadata)
+          .setFields("id")
+          .execute();
+
+        file = service.files().copy("1Hz6kGY4EycCzOtlRPfU75WvVgMUlt42SzK-W6-JpVtY", file)
+          .setFields("id")
+          .execute();
+
+        return file.getId();
+      `
     }
   ]
 });

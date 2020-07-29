@@ -9,7 +9,7 @@ foam.INTERFACE({
   name: 'GoogleSheetsExport',
   methods: [
     {
-      name: 'createSheet',
+      name: 'createSheetAndPopulateWithData',
       type: 'String',
       javaThrows: [ 'java.lang.Exception' ],
       async: true,

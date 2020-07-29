@@ -100,7 +100,8 @@ foam.CLASS({
 
   exports: [
     'dblclick',
-    'filteredTableColumns'
+    'filteredTableColumns',
+    'serviceName'
   ],
 
   properties: [

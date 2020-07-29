@@ -30,6 +30,12 @@ foam.CLASS({
     {
       class: 'String',
       name: 'title'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.nanos.export.report.Template',
+      name: 'template',
+      
     }
   ],
 
@@ -47,7 +53,7 @@ foam.CLASS({
       var metadata = await self.outputter.getColumnMethadata(X, obj.cls_, propNames);
       stringArray = [ await this.outputter.objectToTable(X, obj.cls_, obj, propNames) ];
 
-      sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata, this);
+      sheetId = await X.googleSheetsDataExport.createSheetAndPopulateWithData(X, stringArray, metadata, this);
       if ( ! sheetId || sheetId.length === 0)
         return '';
       return `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`;
@@ -68,7 +74,7 @@ foam.CLASS({
       var sheetId  = '';
       var stringArray = await self.outputter.returnTable(X, dao.of, propNames, sink.array);
 
-      sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata, this);
+      sheetId = await X.googleSheetsDataExport.createSheetAndPopulateWithData(X, stringArray, metadata, this);
       if ( ! sheetId || sheetId.length == 0)
         return '';
       return `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`;

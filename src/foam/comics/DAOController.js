@@ -32,6 +32,7 @@ foam.CLASS({
 
   exports: [
     'filteredTableColumns',
+    'serviceName'
   ],
 
   properties: [
