@@ -99,10 +99,9 @@ foam.CLASS({
             return CapabilityJunctionStatus.ACTION_REQUIRED;
           }
           if ( ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED
-            && ucJunction.getStatus() != CapabilityJunctionStatus.PENDING ) {
-
-              return CapabilityJunctionStatus.ACTION_REQUIRED;
-            }
+               && ucJunction.getStatus() != CapabilityJunctionStatus.PENDING ) {
+            return CapabilityJunctionStatus.ACTION_REQUIRED;
+          }
           if ( ucJunction.getStatus() == CapabilityJunctionStatus.PENDING ) allGranted = false; 
         }
         return allGranted ? CapabilityJunctionStatus.GRANTED : CapabilityJunctionStatus.PENDING;
