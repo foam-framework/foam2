@@ -260,6 +260,12 @@ foam.CLASS({
       view: { class: 'foam.nanos.dig.ResultView' },
       section: 'details',
       visibility: 'RO'
+    },
+    {
+      class: 'String',
+      name: 'Description',
+      section: 'details',
+      view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 144 }
     }
   ],
 
