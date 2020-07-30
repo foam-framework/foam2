@@ -52,6 +52,9 @@ foam.CLASS({
       name: 'supportDetails'
     },
     {
+      name: 'body'
+    },
+    {
       name: '_defaultSection',
       permissionRequired: true
     }
@@ -182,6 +185,7 @@ foam.CLASS({
     },
     {
       name: 'data',
+      section: 'body',
       visibility: function(cmd) {
         return (cmd == 'PUT') ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
       }
