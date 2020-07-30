@@ -620,6 +620,7 @@ var classes = [
   'foam.nanos.crunch.AgentCapabilityJunction',
   'foam.nanos.crunch.CapabilityCapabilityJunction',
   'foam.nanos.crunch.AssociatedEntity',
+  'foam.nanos.crunch.CapabilityAvailabilityDAO',
 
   //daos
   'foam.nanos.crunch.UserCapabilityJunctionDAO',

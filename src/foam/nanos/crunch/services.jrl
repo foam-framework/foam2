@@ -41,6 +41,7 @@ p({
   "serviceScript":"""
     return new foam.dao.EasyDAO.Builder(x)
       .setInnerDAO(x.get("localCapabilityDAO"))
+      .setDecorator(new foam.nanos.crunch.CapabilityAvailabilityDAO(x, new foam.dao.NullDAO(x, foam.nanos.crunch.Capability.getOwnClassInfo())))
       .setOf(foam.nanos.crunch.Capability.getOwnClassInfo())
       .build();
   """,
