@@ -49,10 +49,10 @@ foam.CLASS({
       name: 'details'
     },
     {
-      name: 'supportDetails'
+      name: 'body'
     },
     {
-      name: 'body'
+      name: 'supportDetails'
     },
     {
       name: '_defaultSection',
