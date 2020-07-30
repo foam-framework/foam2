@@ -78,6 +78,9 @@ foam.CLASS({
       padding-right: 18px;
     }
     
+    ^manual-width-adjust{
+      width: inherit;
+    }
   `,
 
   properties: [
@@ -174,7 +177,7 @@ foam.CLASS({
                 }))
               .end();
             })
-            .start().style({ 'width': 'inherit' })
+            .start().addClass(this.myClass('manual-width-adjust'))
               .start()
                 .addClass(this.myClass('separate'))
                 .callIf(this.data.searchMode === this.SearchMode.SIMPLE, function() {
