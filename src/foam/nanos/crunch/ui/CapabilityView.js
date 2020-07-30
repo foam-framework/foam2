@@ -52,10 +52,10 @@ foam.CLASS({
         const { caps: curCaps, wizCaps: curWizardlets } =
           await this.crunchController.getCapsAndWizardlets(capID);
 
-        // pre-populate wizardlets' data
+        // pre-populate curWizardlets' data
         this.populateData(curWizardlets);
 
-        // add listeners on wizardlets
+        // add listeners on curWizardlets
         curWizardlets.forEach(wizardlet => this.addListeners(wizardlet, wizardlet.data));
 
         // get all the sections associated with curWizardlets
@@ -89,8 +89,7 @@ foam.CLASS({
     // for the purpose of saving all user inputs releasing
     // calling views from the responsibility
     function addListeners(wizardlet, data) {
-      if ( ! this.isFObject(data) ) return;
-
+      // add listeners on wizardlet data
       data.sub(this.updateWizardlet.bind(this, wizardlet));
 
       // add listeners on obj in wizardlet.data
