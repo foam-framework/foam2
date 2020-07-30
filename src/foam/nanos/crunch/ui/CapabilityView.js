@@ -52,14 +52,11 @@ foam.CLASS({
         const { caps: curCaps, wizCaps: curWizardlets } =
           await this.crunchController.getCapsAndWizardlets(capID);
 
-        // pre-populate all the data for wizardlets
+        // pre-populate wizardlets' data
         this.populateData(curWizardlets);
 
         // add listeners on wizardlets
-        for ( let wizardlet of curWizardlets ) {
-          this.addListeners(wizardlet, wizardlet.data);
-        }
-
+        curWizardlets.forEach(wizardlet => this.addListeners(wizardlet, wizardlet.data));
 
         // get all the sections associated with curWizardlets
         const curWizardletSectionsList = this.crunchController.generateSections(curWizardlets);
@@ -88,23 +85,20 @@ foam.CLASS({
       .end();
     },
 
-    // add a listener to each wizardlet.data obj for the purpose of saving
-    // all user inputs releasing calling views from the responsibility
-    function addListeners(wizardlet, obj) {
-      if ( ! this.isFObject(obj) ) return;
+    // add a listener to wizardlet.data and each wizardlet.data obj
+    // for the purpose of saving all user inputs releasing
+    // calling views from the responsibility
+    function addListeners(wizardlet, data) {
+      if ( ! this.isFObject(data) ) return;
 
-      // bind wizardlet to the listener since
-      // we need to update the wizardlet that contains obj
-      obj.sub(this.updateWizardlet.bind(this, wizardlet));
+      data.sub(this.updateWizardlet.bind(this, wizardlet));
 
-      // add listeners on nested fobjects
-      for ( let value of Object.values(obj.instance_) ) {
-        if ( this.isFObject(value) ) {
-          value.sub(this.updateWizardlet.bind(this, wizardlet));
+      // add listeners on obj in wizardlet.data
+      for ( let obj of Object.values(data.instance_) ) {
+        if ( this.isFObject(obj) ) {
+          obj.sub(this.updateWizardlet.bind(this, wizardlet));
         }
       }
-
-      return;
     },
 
     function isFObject(obj) {
@@ -120,7 +114,7 @@ foam.CLASS({
         // exist in wizardlet data
         for ( let p of properties ) {
           if ( ! wizardlet.data[p.name] && p.of ) {
-            const pClassName = p.of.id;
+            let pClassName = p.of.id;
             wizardlet.data[p.name] = foam.lookup(pClassName).create({}, this);
           }
         }
