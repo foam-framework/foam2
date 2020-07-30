@@ -23,11 +23,6 @@ foam.CLASS({
   documentation: 'Top navigation bar for IFrame view. Use to load custom css',
 
   css: `
-    .login-wrapper {
-      padding-top: 60px;
-      margin-left: 250px;
-    }
-
     .foam-comics-DAOControllerView {
       margin: 96 auto;
     }
