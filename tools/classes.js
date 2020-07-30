@@ -414,9 +414,6 @@ var classes = [
   'foam.u2.ElementState',
   'foam.u2.DefaultValidator',
   'foam.u2.DisplayMode',
-  'foam.u2.ExprPropertyRefinement',
-  'foam.u2.filter.properties.IntegerFilterView',
-  'foam.u2.filter.properties.FloatFilterView',
   'foam.nanos.export.ClientGoogleSheetsExportService',
   'foam.nanos.export.ExportDriverRegistry',
   'foam.nanos.export.GoogleSheetsExport',
@@ -623,7 +620,7 @@ var classes = [
   'foam.nanos.crunch.AgentCapabilityJunction',
   'foam.nanos.crunch.CapabilityCapabilityJunction',
   'foam.nanos.crunch.AssociatedEntity',
-  'foam.nanos.dashboard.Demo',
+
   //daos
   'foam.nanos.crunch.UserCapabilityJunctionDAO',
   //rules
@@ -664,8 +661,7 @@ var classes = [
   'foam.nanos.approval.AuthenticatedApprovalDAOAuthorizer',
   'foam.nanos.approval.PopulateApprovalRequestsDAO',
 
-  'foam.core.NumberSet',
-  'foam.dashboard.view.Dashboard'
+  'foam.core.NumberSet'
 ];
 
 var abstractClasses = [
