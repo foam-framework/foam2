@@ -409,7 +409,7 @@ foam.CLASS({
 
           //with this code error created  slot.get cause promise return
           //FIX ME
-          return this.slot(function(data, order, updateValues) {
+          return this.slot(function(data, data$delegate, order, updateValues) {
             view.props = this.returnPropertiesForColumns(view, view.columns_);
             var propertyNamesToQuery = view.props.map(p => p.fullPropertyName);
 
