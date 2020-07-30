@@ -6,17 +6,25 @@ foam.CLASS({
 
   imports: [
     'crunchController',
-    'notify'
+    'notify',
+    'subject',
+    'userCapabilityJunctionDAO'
   ],
 
   requires: [
+    'foam.log.LogLevel',
+    'foam.nanos.crunch.UserCapabilityJunction',
     'foam.u2.detail.SectionView'
   ],
 
   properties: [
     {
       class: 'StringArray',
-      name: 'capabilities'
+      name: 'capabilityIDs'
+    },
+    {
+      name: 'capabilities',
+      value: []
     },
     {
       name: 'wizardlets',
@@ -30,29 +38,40 @@ foam.CLASS({
         wizardletSectionsList[i] stores sections for wizardlets[i]
       `,
       value: []
+    },
+    {
+      name: 'showTitle',
+      value: false
     }
   ],
 
   methods: [
-    async function initE() {
-      const self = this;
+    async function init() {
+      for ( let capID of this.capabilityIDs ) {
+        // get capabilities and wizardlets for capID
+        const { caps: curCaps, wizCaps: curWizardlets } =
+          await this.crunchController.getCapsAndWizardlets(capID);
 
-      // gets the wizardlets and sections for all of the capabilties
-      for ( let cap of this.capabilities ) {
-        // wizardlets for current capability
-        const curWizardlets = (await this.crunchController.getCapsAndWizardlets(cap)).wizCaps;
+        // pre-populate all the data for wizardlets
+        this.populateData(curWizardlets);
 
-         // adds listener on curWizardlets
-         for ( let wizardlet of curWizardlets ) {
-          this.addListeners(wizardlet.data);
+        // add listeners on wizardlets
+        for ( let wizardlet of curWizardlets ) {
+          this.addListeners(wizardlet, wizardlet.data);
         }
 
-        // gets all the sections associated with curWizardlets
+
+        // get all the sections associated with curWizardlets
         const curWizardletSectionsList = this.crunchController.generateSections(curWizardlets);
 
+        this.capabilities = this.capabilities.concat(curCaps);
         this.wizardlets = this.wizardlets.concat(curWizardlets);
         this.wizardletSectionsList = this.wizardletSectionsList.concat(curWizardletSectionsList);
       }
+    },
+
+    async function initE() {
+      const self = this;
 
       this.start().addClass(this.myClass())
         .add(self.slot(function(wizardletSectionsList) {
@@ -61,7 +80,7 @@ foam.CLASS({
               this.tag(self.SectionView, {
                 section,
                 data: self.wizardlets[index].data,
-                showTitle: false
+                showTitle: self.showTitle
               })
             ));
           });
@@ -69,42 +88,69 @@ foam.CLASS({
       .end();
     },
 
-    // adds a listener to each wizardlet.data obj for the purpose of saving
+    // add a listener to each wizardlet.data obj for the purpose of saving
     // all user inputs releasing calling views from the responsibility
-    function addListeners(obj) {
+    function addListeners(wizardlet, obj) {
       if ( ! this.isFObject(obj) ) return;
 
-      obj.sub(this.updateWizardlet);
+      // bind wizardlet to the listener since
+      // we need to update the wizardlet that contains obj
+      obj.sub(this.updateWizardlet.bind(this, wizardlet));
 
-      // adds listeners on inner fobjects
+      // add listeners on nested fobjects
       for ( let value of Object.values(obj.instance_) ) {
         if ( this.isFObject(value) ) {
-          this.addListeners(value);
+          value.sub(this.updateWizardlet.bind(this, wizardlet));
         }
       }
+
       return;
     },
 
     function isFObject(obj) {
-      if ( typeof obj === 'object' && obj.instance_ ) {
-        return true;
+      return typeof obj === 'object' && obj.instance_;
+    },
+
+    function populateData(wizardlets) {
+      for ( let wizardlet of wizardlets ) {
+        // get all the properties for this wizardlet
+        const properties = wizardlet.capability.of.getAxiomsByClass(foam.core.Property);
+
+        // add property to wizardlet data if the property is an object and does not
+        // exist in wizardlet data
+        for ( let p of properties ) {
+          if ( ! wizardlet.data[p.name] && p.of ) {
+            const pClassName = p.of.id;
+            wizardlet.data[p.name] = foam.lookup(pClassName).create({}, this);
+          }
+        }
       }
-    }
+    },
+
+    function saveNoDataCaps(capabilities) {
+      return new Promise(wizardResolve => {
+        // save no-data capabilities (i.e. not displayed in wizard)
+        Promise.all(capabilities.filter(cap => ! cap.of).map(
+          cap => this.userCapabilityJunctionDAO.put(this.UserCapabilityJunction.create({
+            sourceId: this.subject.user.id,
+            targetId: cap.id
+          }))
+        )).then(() => {
+          wizardResolve();
+        });
+      });
+    },
   ],
 
   listeners: [
     {
       name: 'updateWizardlet',
-      code: function() {
-        // TODO: can we only update the wizardlet that has new data instead of updating all the wizardlets?
-        // TODO: when/where do we call finalOnClose?
-        for ( let wizardlet of this.wizardlets ) {
-          try {
-            wizardlet.save();
-          } catch (err) {
-            this.notify(err.message, '', this.LogLevel.ERROR, true);
-          }
-        }
+      code: function(wizardlet) {
+        wizardlet.save().then(() => {
+          this.saveNoDataCaps(this.capabilities);
+        }).catch(err => {
+          this.notify(err.message, '', this.LogLevel.ERROR, true);
+        });
       }
     }
   ]
