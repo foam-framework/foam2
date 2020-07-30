@@ -41,7 +41,9 @@ foam.CLASS({
 
         User user = (User) obj;
         if ( SafetyUtil.isEmpty(user.getUserName()) ) {
-          throw new RuntimeException(EMPTY_ERROR);
+          return;
+          // TODO: REMOVE COMMENT ONCE READY TO MAKE USERNAME A REQUIREMENT
+          // throw new RuntimeException(EMPTY_ERROR);
         }
 
         Count count = new Count();
