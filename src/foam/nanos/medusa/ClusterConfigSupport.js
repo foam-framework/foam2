@@ -192,7 +192,7 @@ configuration for contacting the primary node.`,
       documentation: 'Additional node redundancy in each bucket.',
       name: 'nodeRedundancy',
       class: 'Int',
-      value: 0,
+      value: 1,
     },
     {
       name: 'nodeGroups',
