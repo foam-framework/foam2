@@ -8,6 +8,7 @@ foam.CLASS({
   package: 'org.chartjs',
   name: 'AbstractChartView',
   extends: 'foam.u2.View',
+  flags: ['web'],
   requires: [
     'foam.dao.FnSink',
     'org.chartjs.ChartCView'
