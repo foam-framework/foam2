@@ -7,6 +7,9 @@
 foam.CLASS({
   package: 'foam.nanos.export',
   name: 'GoogleSheetsExportDriver',
+  imports: [
+    'data'
+  ],
   implements: [ 
     'foam.nanos.export.ExportDriver',
     'foam.nanos.export.GoogleSheetsServiceConfig'
@@ -35,7 +38,18 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.nanos.export.report.Template',
       name: 'template',
-      
+      view: function(args, X) {
+        var expr = foam.mlang.Expressions.create();
+        if ( ! X.data || ! X.data.serviceName ) return [];
+        return {
+            class: 'foam.u2.view.ChoiceView',
+            placeholder: 'templates...',
+            dao: X.reportTamplateDAO.where(expr.EQ(foam.nanos.export.report.Template.DAO_KEY, X.data.serviceName.split('/')[1])),
+            objToChoice: function(a) {
+              return [a.id, a.name];
+          }
+        };
+      },
     }
   ],
 

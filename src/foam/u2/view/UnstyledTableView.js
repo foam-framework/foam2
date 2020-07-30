@@ -40,8 +40,7 @@ foam.CLASS({
     'editRecord?',
     'filteredTableColumns?',
     'selection? as importSelection',
-    'stack?',
-    'serviceName'
+    'stack?'
   ],
 
   constants: [
