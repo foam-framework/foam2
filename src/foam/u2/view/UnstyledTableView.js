@@ -22,8 +22,6 @@ foam.CLASS({
     'foam.u2.md.CheckBox',
     'foam.u2.md.OverlayDropdown',
     'foam.u2.tag.Image',
-    'foam.u2.view.ColumnConfig',
-    'foam.u2.view.ColumnVisibility',
     'foam.u2.view.EditColumnsView',
     'foam.u2.view.OverlayActionListView'
   ],
@@ -617,7 +615,7 @@ foam.CLASS({
       },
       function returnColumnPropertyForPropertyName(context, col, property) {
         var colObj = foam.Array.isInstance(col) ? col[0] : col;
-  
+
         if ( context.columnHandler.canColumnBeTreatedAsAnAxiom(context, colObj) ) {
           if ( colObj[property] )
             return colObj[property];

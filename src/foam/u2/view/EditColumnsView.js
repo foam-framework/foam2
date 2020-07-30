@@ -11,17 +11,16 @@ foam.CLASS({
   requires: [
     'foam.u2.DetailView',
     'foam.u2.view.ColumnConfigPropView',
-    'foam.u2.view.ColumnOptionsSelectConfig',
     'foam.u2.view.SubColumnSelectConfig'
   ],
   css: `
     ^drop-down-bg {
-      font-size:        12px; 
-      position:         fixed; 
-      width:            100%; 
-      height:           100%; 
-      top:              0; 
-      left:             0; 
+      font-size:        12px;
+      position:         fixed;
+      width:            100%;
+      height:           100%;
+      top:              0;
+      left:             0;
       z-index:          100;
       background:       rgba(0, 0, 0, 0.4);
     }
@@ -48,7 +47,7 @@ foam.CLASS({
   properties: [
     {
       name: 'selectColumnsExpanded',
-      class: 'Boolean' 
+      class: 'Boolean'
     },
     'parentId',
     'columnConfigPropView'
