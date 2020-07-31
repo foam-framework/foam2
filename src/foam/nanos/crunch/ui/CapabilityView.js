@@ -1,3 +1,10 @@
+
+/**
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.nanos.crunch.ui',
   name: 'CapabilityView',
@@ -100,7 +107,7 @@ foam.CLASS({
     // calling views from the responsibility
     function addListeners(wizardlet, obj, depth=0) {
       // Some obj (e.g., dao) have a long chain of nested objects
-      // which casues a stack overflow. Such objects don't need listeners
+      // which causes a stack overflow. Such objects don't need listeners
       // as they are dependent on other objects that are updated by user inputs
       // so we set depth to prevent a stack overflow while setting listeners on
       // all the necessary objects
