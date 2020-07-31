@@ -99,7 +99,7 @@ foam.CLASS({
     // for the purpose of saving all user inputs releasing
     // calling views from the responsibility
     function addListeners(wizardlet, obj, depth=0) {
-      // Some obj (e.g., dao ) have a long chain of nested objects within them
+      // Some obj (e.g., dao) have a long chain of nested objects within them
       // which casues a stack overflow. Such objects don't need listeners on them
       // as they are dependent on other objects that are updated by user inputs
       // so we set depth to prevent a stack overflow while setting listeners on
