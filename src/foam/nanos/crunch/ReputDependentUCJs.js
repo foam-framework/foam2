@@ -32,10 +32,16 @@ foam.CLASS({
         agency.submit(x, new ContextAgent() {
           @Override
           public void execute(X x) {
-            UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
-            CapabilityJunctionStatus ucjStatus = ucj.getStatus();
-            
             DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
+            UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
+            UserCapabilityJunction old = (UserCapabilityJunction) userCapabilityJunctionDAO.find(AND(
+              EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId()),
+              EQ(UserCapabilityJunction.TARGET_ID, ucj.getTargetId())
+            ));
+            CapabilityJunctionStatus status = ucj.getStatus();
+
+            boolean isInvalidate = ucj.getStatus() != CapabilityJunctionStatus.GRANTED || ucj.getStatus() != CapabilityJunctionStatus.GRACE_PERIOD;
+            
             DAO filteredUserCapabilityJunctionDAO = (DAO) userCapabilityJunctionDAO.where((EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId())));
             DAO filteredPrerequisiteCapabilityJunctionDAO = (DAO) ((DAO) x.get("prerequisiteCapabilityJunctionDAO"))
               .where(EQ(CapabilityCapabilityJunction.TARGET_ID, ucj.getTargetId()));
@@ -53,10 +59,47 @@ foam.CLASS({
             }
 
             for ( UserCapabilityJunction ucjToReput : ucjsToReput ) {
+              if ( isInvalidate ) ucjToReput.setStatus(cascadeInvalidateStatus(x, ucjToReput, status));
               userCapabilityJunctionDAO.inX(x).put(ucjToReput);
             }
           }
         }, "Reput the UCJs of dependent capabilities");
+      `
+    },
+    {
+      name: 'cascadeInvalidateStatus',
+      args: [
+        { name: 'x', javaType: 'foam.core.X' },
+        { name: 'ucj', javaType: 'foam.nanos.crunch.UserCapabilityJunction' },
+        { name: 'prereqStatus', javaType: 'foam.nanos.crunch.CapabilityJunctionStatus' }
+      ],
+      javaType: 'foam.nanos.crunch.CapabilityJunctionStatus',
+      javaCode: `
+        CapabilityJunctionStatus newStatus = ucj.getStatus();
+
+        Capability capability = (Capability) ucj.findTargetId(x);
+        boolean reviewRequired = capability.getReviewRequired();
+
+        switch ( (CapabilityJunctionStatus) prereqStatus ) {
+          case AVAILABLE : 
+            newStatus = CapabilityJunctionStatus.ACTION_REQUIRED;
+            break;
+          case ACTION_REQUIRED : 
+            newStatus = CapabilityJunctionStatus.ACTION_REQUIRED;
+            break;
+          case PENDING : 
+            newStatus = reviewRequired ? CapabilityJunctionStatus.APPROVED : CapabilityJunctionStatus.PENDING;
+            break;
+          case APPROVED : 
+            newStatus = reviewRequired ? CapabilityJunctionStatus.APPROVED : CapabilityJunctionStatus.PENDING;
+            break;
+          case EXPIRED :
+            newStatus = CapabilityJunctionStatus.ACTION_REQUIRED;
+            break;
+          default : // GRACE_PERIOD AND GRANTED
+        }
+        return newStatus;
+
       `
     }
   ]
