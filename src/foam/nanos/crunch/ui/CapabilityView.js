@@ -115,7 +115,6 @@ foam.CLASS({
           this.addListeners(wizardlet, innerObj, ++depth);
         }
       }
-      return;
     },
 
     function isFObject(obj) {
