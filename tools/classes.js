@@ -628,6 +628,7 @@ var classes = [
   'foam.nanos.crunch.IsUserCapabilityJunctionStatusUpdate',
   'foam.nanos.crunch.RemoveJunctionsOnUserRemoval',
   'foam.nanos.crunch.CascadeInvalidate',
+  'foam.nanos.crunch.CrunchService',
   //authservice
   'foam.nanos.auth.CapabilityAuthService',
   // userQueryService
@@ -688,7 +689,8 @@ var skeletons = [
   'foam.nanos.test.EchoService',
   'foam.strategy.StrategizerService',
   'foam.nanos.auth.UserQueryService',
-  'foam.nanos.export.GoogleSheetsExport'
+  'foam.nanos.export.GoogleSheetsExport',
+  'foam.nanos.crunch.CrunchService'
 ];
 
 var proxies = [

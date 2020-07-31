@@ -333,6 +333,8 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/IsUserCapabilityJunctionStatusUpdate" },
   { name: "foam/nanos/crunch/RemoveJunctionsOnUserRemoval" },
   { name: "foam/nanos/crunch/CascadeInvalidate" },
+  { name: "foam/nanos/crunch/CrunchService" },
+  { name: "foam/nanos/crunch/ClientCrunchService" },
 
   // approval
   { name: 'foam/nanos/approval/ApprovalRequest' },
