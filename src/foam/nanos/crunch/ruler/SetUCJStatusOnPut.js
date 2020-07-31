@@ -91,7 +91,10 @@ foam.CLASS({
             EQ(UserCapabilityJunction.TARGET_ID, (String) ccJunction.getTargetId())
           ));
 
-          if ( ucJunction != null && ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED ) continue;
+          if ( ucJunction != null && 
+               ( ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED || ucJunction.getStatus() == CapabilityJunctionStatus.GRACE_PERIOD ) 
+             ) 
+              continue;
           
 
           if ( ucJunction == null ) {
