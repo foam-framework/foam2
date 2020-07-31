@@ -9,7 +9,7 @@ foam.CLASS({
   package: 'foam.nanos.crunch.ui',
   name: 'CapabilityView',
   extends: 'foam.u2.View',
-  documentation: 'All purpose capability view that takes in an array of capaiblity ids and displays these capabilities',
+  documentation: 'All purpose capability view that takes in an array of capability ids and displays those capabilities',
 
   imports: [
     'crunchController',
