@@ -17,6 +17,16 @@ foam.CLASS({
     'foam.u2.detail.SectionView'
   ],
 
+  constants: [
+    {
+      name: 'MAX_DEPTH',
+      type: 'Integer',
+      value: 5,
+      documentation: 'max. depth addListeners can move down on recursion'
+    }
+
+  ],
+
   properties: [
     {
       class: 'StringArray',
@@ -52,11 +62,11 @@ foam.CLASS({
         const { caps: curCaps, wizCaps: curWizardlets } =
           await this.crunchController.getCapsAndWizardlets(capID);
 
-        // pre-populate curWizardlets' data
-        this.populateData(curWizardlets);
-
-        // add listeners on curWizardlets
-        curWizardlets.forEach(wizardlet => this.addListeners(wizardlet, wizardlet.data));
+        // pre-populate curWizardlets' data and add listeners to it
+        for ( let wizardlet of curWizardlets ) {
+          this.populateData(wizardlet);
+          this.addListeners(wizardlet, wizardlet.data);
+        }
 
         // get all the sections associated with curWizardlets
         const curWizardletSectionsList = this.crunchController.generateSections(curWizardlets);
@@ -88,34 +98,40 @@ foam.CLASS({
     // add a listener to wizardlet.data and each wizardlet.data obj
     // for the purpose of saving all user inputs releasing
     // calling views from the responsibility
-    function addListeners(wizardlet, data) {
-      // add listeners on wizardlet data
-      data.sub(this.updateWizardlet.bind(this, wizardlet));
+    function addListeners(wizardlet, obj, depth=0) {
+      // Some obj (e.g., dao ) have a long chain of nested objects within them
+      // which casues a stack overflow. Such objects don't need listeners on them
+      // as they are dependent on other objects that are updated by user inputs
+      // so we set depth to prevent a stack overflow while setting listeners on
+      // all the necessary objects
+      if ( ! this.isFObject(obj) || depth > this.MAX_DEPTH ) return;
 
-      // add listeners on obj in wizardlet.data
-      for ( let obj of Object.values(data.instance_) ) {
-        if ( this.isFObject(obj) ) {
-          obj.sub(this.updateWizardlet.bind(this, wizardlet));
+      // add listeners on wizardlet data
+      obj.sub(this.updateWizardlet.bind(this, wizardlet));
+
+      // add listeners on inner objects for obj
+      for ( let innerObj of Object.values(obj.instance_) ) {
+        if ( this.isFObject(innerObj) ) {
+          this.addListeners(wizardlet, innerObj, ++depth);
         }
       }
+      return;
     },
 
     function isFObject(obj) {
-      return typeof obj === 'object' && obj.instance_;
+      return typeof obj === 'object' && obj['instance_'] !== undefined;
     },
 
-    function populateData(wizardlets) {
-      for ( let wizardlet of wizardlets ) {
-        // get all the properties for this wizardlet
-        const properties = wizardlet.capability.of.getAxiomsByClass(foam.core.Property);
+    function populateData(wizardlet) {
+      // get all the properties for this wizardlet
+      const properties = wizardlet.capability.of.getAxiomsByClass(foam.core.Property);
 
-        // add property to wizardlet data if the property is an object and does not
-        // exist in wizardlet data
-        for ( let p of properties ) {
-          if ( ! wizardlet.data[p.name] && p.of ) {
-            let pClassName = p.of.id;
-            wizardlet.data[p.name] = foam.lookup(pClassName).create({}, this);
-          }
+      // add property to wizardlet data if the property is an object and does not
+      // exist in wizardlet data
+      for ( let p of properties ) {
+        if ( ! wizardlet.data[p.name] && p.of ) {
+          let pClassName = p.of.id;
+          wizardlet.data[p.name] = foam.lookup(pClassName).create({}, this);
         }
       }
     },
@@ -139,11 +155,12 @@ foam.CLASS({
     {
       name: 'updateWizardlet',
       code: function(wizardlet) {
-        wizardlet.save().then(() => {
+        try {
+          wizardlet.save();
           this.saveNoDataCaps(this.capabilities);
-        }).catch(err => {
+        } catch (err) {
           this.notify(err.message, '', this.LogLevel.ERROR, true);
-        });
+        };
       }
     }
   ]
