@@ -1,4 +1,3 @@
-
 /**
  * @license
  * Copyright 2020 The FOAM Authors. All Rights Reserved.
