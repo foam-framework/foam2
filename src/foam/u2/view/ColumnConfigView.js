@@ -43,7 +43,6 @@ foam.CLASS({
         tableColumns = tableColumns.filter( c => data.allColumns.includes(this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(this, c))).map(c => this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(this, c));
         //to keep record of columns that are selected
         var topLevelProps = [];
-        //to remove properties that are FObjectProperty or Reference and are not nested
         //or some kind of outputter might be used to convert property to number of nested properties eg 'address' to [ 'address.city', 'address.region', ... ]
         var columnThatShouldBeDeleted = [];
 
@@ -57,10 +56,6 @@ foam.CLASS({
               axiom = tableColumns.find(c => c.name === data.selectedColumnNames[i]);
               if ( ! axiom )
                 axiom = data.of.getAxiomByName(data.selectedColumnNames[i]);
-              if ( foam.core.FObjectProperty.isInstance(axiom) || foam.core.Reference.isInstance(axiom) ) {
-                columnThatShouldBeDeleted.push(data.selectedColumnNames[i]);
-                continue;
-              }
             }
             if ( ! axiom || axiom.networkTransient ) {
               continue;
