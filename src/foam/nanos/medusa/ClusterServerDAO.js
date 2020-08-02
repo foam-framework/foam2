@@ -73,12 +73,12 @@ foam.CLASS({
       name: 'cmd_',
       javaCode: `
       ClusterCommand cmd = (ClusterCommand) obj;
+      getLogger().debug("cmd_", java.util.Arrays.toString(cmd.getHops()));
       DAO dao = (DAO) x.get(cmd.getServiceName());
       if ( dao == null ) {
         getLogger().error("DAO not found", cmd.getServiceName());
         throw new ClusterException("DAO not found");
       }
-      getLogger().debug("cmd_", java.util.Arrays.toString(cmd.getHops()));
       return dao.cmd_(x, obj);
       `
     }

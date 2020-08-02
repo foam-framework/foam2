@@ -112,17 +112,18 @@ foam.CLASS({
 
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       ClusterConfig config = support.getConfig(x, support.getConfigId());
+      ClusterCommand cmd = null;
+      if ( obj instanceof ClusterCommand ) {
+        cmd = (ClusterCommand) obj;
+        obj = cmd.getData();
+      }
 
       // Primary instance - put to MDAO (delegate)
       if ( config.getIsPrimary() ) {
-        // getLogger().debug("put", "primary", obj.getClass().getSimpleName(), obj.getProperty("id"));
-        ClusterCommand cmd = null;
-        if ( obj instanceof ClusterCommand ) {
-          // See ClusterServerDAO which searches the DAO stack for a
-          // Client. This DAO will return itself as the Client when isPrimary.
-          // ClusterServerDAO will then pass the cmd to the Client.
-          cmd = (ClusterCommand) obj;
-          obj = cmd.getData();
+        if ( cmd != null ) {
+          getLogger().debug("put", "primary", "cmd", obj.getClass().getSimpleName());
+        } else {
+          getLogger().debug("put", "primary", "put", obj.getClass().getSimpleName());
         }
 
         FObject old = getDelegate().find_(x, obj.getProperty("id"));
@@ -155,7 +156,9 @@ foam.CLASS({
         }
       }
 
-      ClusterCommand cmd = new ClusterCommand(x, getNSpec().getName(), DOP.PUT, obj);
+      if ( cmd == null ) {
+        cmd = new ClusterCommand(x, getNSpec().getName(), DOP.PUT, obj);
+      }
       getLogger().debug("put", "client", "cmd", obj.getProperty("id"), "send");
       cmd = (ClusterCommand) getClientDAO().cmd_(x, cmd);
       getLogger().debug("put", "client", "cmd", obj.getProperty("id"), "receive", cmd.getMedusaEntryId());

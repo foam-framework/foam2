@@ -1,7 +1,7 @@
 p({
   "class":"foam.nanos.cron.Cron",
   "id":"omHourlyReduce",
-  "enabled":true,
+  "enabled":false,
   "clusterable":false,
   "schedule":{"class":"foam.nanos.cron.CronSchedule","minute":0,"hour":-1,"dayOfMonth":-1,"month":-1,"dayOfWeek":-1,"second":0}
 })
@@ -9,7 +9,7 @@ p({
 p({
   "class":"foam.nanos.cron.Cron",
   "id":"omDailyReduce",
-  "enabled":true,
+  "enabled":false,
   "clusterable":false,
   "schedule":{"class":"foam.nanos.cron.CronSchedule","minute":-1,"hour":0,"dayOfMonth":-1,"month":-1,"dayOfWeek":-1,"second":0}
 })
@@ -17,7 +17,7 @@ p({
 p({
   "class":"foam.nanos.cron.Cron",
   "id":"omReduceManager",
-  "enabled":true,
+  "enabled":false,
   "clusterable":false,
   "schedule":{"class":"foam.nanos.cron.CronSchedule","minute":-1,"hour":-1,"dayOfMonth":-1,"month":-1,"dayOfWeek":-1,"second":0}
 })
