@@ -278,11 +278,11 @@ foam.CLASS({
         }
         return;
       }
-      // if ( voters.size() < support.getMediatorQuorum() ) {
-      //     getLogger().debug("callVote", getState().getLabel(), "insuficient votes", "voters", voters.size());
+      if ( voters.size() < support.getMediatorQuorum() ) {
+        getLogger().debug("callVote", getState().getLabel(), "insuficient votes", "voters", voters.size());
       //     getLogger().warning("callVote", getState().getLabel(), "waiting for mediator quorum", "voters/quorum", voters.size(), support.getMediatorQuorum(), support.getHasNodeQuorum());
-      //     return;
-      // }
+        return;
+      }
       getLogger().debug("callVote", getState().getLabel(), "achieved mediator and node quorum", "voters/quorum", voters.size(), support.getMediatorQuorum());
  
       try {

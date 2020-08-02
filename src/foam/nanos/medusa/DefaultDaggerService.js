@@ -158,7 +158,7 @@ foam.CLASS({
       entry.setHash1(links.getLink1().getHash());
       entry.setIndex2(links.getLink2().getIndex());
       entry.setHash2(links.getLink2().getHash());
-      getLogger().debug("link", entry.getIndex(), entry.getIndex1(), entry.getHash1(), entry.getIndex2(), entry.getHash2());
+      // getLogger().debug("link", entry.getIndex(), entry.getIndex1(), entry.getHash1(), entry.getIndex2(), entry.getHash2());
 
       return entry;
       `
@@ -169,9 +169,9 @@ foam.CLASS({
       // TODO: also getProvider
       PM pm = PM.create(x, DefaultDaggerService.getOwnClassInfo(), "hash");
       try {
-//      getLogger().debug("hash", entry.getIndex(), entry.getIndex1(), entry.getIndex2());
-      getLogger().debug("hash", entry.getIndex(), "1", entry.getIndex1(), entry.getHash1());
-      getLogger().debug("hash", entry.getIndex(), "2", entry.getIndex2(), entry.getHash2());
+      // getLogger().debug("hash", entry.getIndex(), entry.getIndex1(), entry.getIndex2());
+      // getLogger().debug("hash", entry.getIndex(), "1", entry.getIndex1(), entry.getHash1());
+      // getLogger().debug("hash", entry.getIndex(), "2", entry.getIndex2(), entry.getHash2());
       if ( ! getHashingEnabled() ) {
         return byte2Hex(Long.toString(entry.getIndex()).getBytes(StandardCharsets.UTF_8));
       }
@@ -181,17 +181,15 @@ foam.CLASS({
       md.update(entry.getHash1().getBytes(StandardCharsets.UTF_8));
       md.update(Long.toString(entry.getIndex2()).getBytes(StandardCharsets.UTF_8));
       md.update(entry.getHash2().getBytes(StandardCharsets.UTF_8));
-//      getLogger().debug("hash", entry.getIndex(), "digest (without data)", byte2Hex(md.digest()));
+      // getLogger().debug("hash", entry.getIndex(), "digest (without data)", byte2Hex(md.digest()));
       if ( ! SafetyUtil.isEmpty(entry.getData()) ) {
-//        getLogger().debug("hash", entry.getIndex(), "digest (with data)", byte2Hex(entry.getData().hash(md)));
-        getLogger().debug("hash", entry.getIndex(), "data", entry.getData());
-//        getLogger().debug("hash", entry.getIndex(), "data", entry.getData().getClass().getSimpleName());
+        // getLogger().debug("hash", entry.getIndex(), "digest (with data)", byte2Hex(entry.getData().hash(md)));
+        // getLogger().debug("hash", entry.getIndex(), "data", entry.getData());
+        // getLogger().debug("hash", entry.getIndex(), "data", entry.getData().getClass().getSimpleName());
 //        return byte2Hex(entry.getData().hash(md));
         md.update(entry.getData().getBytes(StandardCharsets.UTF_8));
-        return byte2Hex(md.digest());
-      } else {
-        return byte2Hex(md.digest());
       }
+      return byte2Hex(md.digest());
       } finally {
         pm.log(x);
       }
@@ -203,7 +201,7 @@ foam.CLASS({
       javaCode: `
       PM pm = PM.create(x, DefaultDaggerService.getOwnClassInfo(), "verify");
       try {
-        getLogger().debug("verify", entry.getIndex(), entry.getIndex1(), entry.getIndex2());
+        // getLogger().debug("verify", entry.getIndex(), entry.getIndex1(), entry.getIndex2());
 
         if ( ! getHashingEnabled() ) {
           return;
@@ -228,11 +226,11 @@ foam.CLASS({
           md.update(parent1.getHash().getBytes(StandardCharsets.UTF_8));
           md.update(Long.toString(parent2.getIndex()).getBytes(StandardCharsets.UTF_8));
           md.update(parent2.getHash().getBytes(StandardCharsets.UTF_8));
-//          getLogger().debug("verify", entry.getIndex(), "digest (without data)", byte2Hex(md.digest()));
+          // getLogger().debug("verify", entry.getIndex(), "digest (without data)", byte2Hex(md.digest()));
           String calculatedHash = null;
           if ( entry.getData() != null ) {
-//            getLogger().debug("verify", entry.getIndex(), "digest (with data)", byte2Hex(entry.getData().hash(md)));
-//            getLogger().debug("verify", entry.getIndex(), "data", entry.getData().getClass().getSimpleName());
+           // getLogger().debug("verify", entry.getIndex(), "digest (with data)", byte2Hex(entry.getData().hash(md)));
+           // getLogger().debug("verify", entry.getIndex(), "data", entry.getData().getClass().getSimpleName());
             md.update(entry.getData().getBytes(StandardCharsets.UTF_8));
             // calculatedHash = byte2Hex(entry.getData().hash(md));
             calculatedHash = byte2Hex(md.digest());
@@ -275,7 +273,7 @@ foam.CLASS({
       synchronized: true,
       javaCode: `
       linksIndex_ ^= 1;
-      getLogger().debug("updateLinks", linksIndex_, link.getIndex(), link.getHash());
+      // getLogger().debug("updateLinks", linksIndex_, link.getIndex(), link.getHash());
       getLinks()[linksIndex_] = link;
       `
     },
