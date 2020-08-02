@@ -320,7 +320,7 @@ foam.CLASS({
           ByteArrayOutputStream baos  = new ByteArrayOutputStream();
           PrintStream           ps    = new PrintStream(baos);
           Interpreter           shell = createInterpreter(x);
-          PM                    pm    = new PM.Builder(x).setClassType(Script.getOwnClassInfo()).setName(getId()).build();
+          PM                    pm    = new PM.Builder(x).setId(Script.getOwnClassInfo().getId()).setName(getId()).build();
 
           // TODO: import common packages like foam.core.*, foam.dao.*, etc.
           try {

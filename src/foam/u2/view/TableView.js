@@ -14,6 +14,7 @@ foam.CLASS({
       background: white;
       display: flex;
       height: 48px;
+      justify-content: space-between;
     }
 
     ^tbody > ^tr {

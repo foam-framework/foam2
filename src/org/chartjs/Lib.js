@@ -7,7 +7,8 @@
 foam.CLASS({
   package: 'org.chartjs',
   name: 'Lib',
-  constants: [
+  flags: ['web'],
+   constants: [
     {
       name: 'CHART',
       factory: function() {

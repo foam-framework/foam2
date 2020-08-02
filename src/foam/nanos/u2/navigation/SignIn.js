@@ -31,7 +31,7 @@ foam.CLASS({
     { name: 'FOOTER_LINK', message: 'Create an account' },
     { name: 'SUB_FOOTER_LINK', message: 'Forgot password?' },
     { name: 'ERROR_MSG', message: 'There was an issue with logging in.' },
-    { name: 'ERROR_MSG2', message: 'Please enter email' }
+    { name: 'ERROR_MSG2', message: 'Please enter email or username' }
   ],
 
   properties: [
@@ -43,8 +43,7 @@ foam.CLASS({
       class: 'String',
       name: 'identifier',
       required: true,
-      // TODO: rename label to 'Email or Username' when integrating
-      label: 'Email',
+      label: 'Email or Username',
       view: {
         class: 'foam.u2.TextField',
         focused: true
@@ -149,7 +148,6 @@ foam.CLASS({
               }));
           });
         } else {
-          // TODO: change to 'Please enter email or username' when integrating
           this.ctrl.add(this.NotificationMessage.create({
             message: this.ERROR_MSG2,
             type: this.LogLevel.ERROR

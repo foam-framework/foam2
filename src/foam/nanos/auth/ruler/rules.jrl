@@ -1,1 +1,15 @@
 p({"class":"foam.nanos.ruler.Rule","id":"68afcf0c-c718-98f8-0841-75e97a3ad16d1","name":"passwordHistory Update Rule","priority":100,"ruleGroup":"PasswordHistory","documentation":"When user password changes, update the password history array with a timestamped entry.","daoKey":"localUserDAO","operation":1,"predicate":{"class":"foam.nanos.ruler.predicate.PropertyChangePredicate","propName":"password"},"action":{"class":"foam.nanos.auth.ruler.AddPasswordHistoryAction"},"lifecycleState":1})
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"8afcf0c-c718-98f8-0841-75e97a3ad16d186","name":"Prevent Duplicate Username Rule",
+  "priority": 100,
+  "enabled": true,
+  "ruleGroup": "auth",
+  "documentation": "Prevent Duplicate Username Rule",
+  "daoKey": "localUserDAO",
+  "operation": 0, 
+  "after": false,
+  "action":{ "class":"foam.nanos.auth.ruler.PreventDuplicateUsernameAction" },
+  "saveHistory": true,
+  "lifecycleState":1
+})
