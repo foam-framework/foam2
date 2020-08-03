@@ -79,11 +79,6 @@ foam.CLASS({
         getLogger().error("DAO not found", cmd.getServiceName());
         throw new ClusterException("DAO not found");
       }
-      DAO p = dao;
-      while ( p instanceof foam.dao.ProxyDAO ) {
-        getLogger().info("cmd", p.getClass().getSimpleName());
-        p = ((foam.dao.ProxyDAO)p).getDelegate();
-      }
       return dao.cmd_(x, obj);
       `
     }
