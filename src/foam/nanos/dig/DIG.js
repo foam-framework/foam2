@@ -49,9 +49,6 @@ foam.CLASS({
       name: 'details'
     },
     {
-      name: 'body'
-    },
-    {
       name: 'supportDetails'
     },
     {
@@ -185,7 +182,7 @@ foam.CLASS({
     },
     {
       name: 'data',
-      section: 'body',
+      section: 'details',
       visibility: function(cmd) {
         return (cmd == 'PUT') ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
       }
