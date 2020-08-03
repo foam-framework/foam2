@@ -188,6 +188,20 @@ foam.CLASS({
       `
     },
     {
+      name: 'fclone',
+      type: 'FObject',
+      javaCode: `
+      return this;
+      `
+    },
+    {
+      name: 'copyFrom',
+      type: 'FObject',
+      javaCode: `
+      return this;
+      `
+    },
+    {
       name: 'toSummary',
       type: 'String',
       code: function() {
