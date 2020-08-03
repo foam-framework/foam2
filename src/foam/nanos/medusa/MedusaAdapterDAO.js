@@ -112,20 +112,21 @@ foam.CLASS({
 
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       ClusterConfig config = support.getConfig(x, support.getConfigId());
+
       ClusterCommand cmd = null;
       if ( obj instanceof ClusterCommand ) {
         cmd = (ClusterCommand) obj;
         obj = cmd.getData();
+
+        if ( ! config.getIsPrimary() ) {
+          // Pass on to next Mediator.
+          return (ClusterCommand) getClientDAO().cmd_(x, cmd);
+        }
       }
 
-      // Primary instance - put to MDAO (delegate)
       if ( config.getIsPrimary() ) {
-        if ( cmd != null ) {
-          getLogger().debug("put", "primary", "cmd", obj.getClass().getSimpleName());
-        } else {
-          getLogger().debug("put", "primary", "put", obj.getClass().getSimpleName());
-        }
-
+        // Primary instance - put to MDAO (delegate)
+        getLogger().debug("put", "primary", obj.getClass().getSimpleName());
         FObject old = getDelegate().find_(x, obj.getProperty("id"));
         FObject nu = getDelegate().put_(x, obj);
         String data = data(x, nu, old, DOP.PUT);
@@ -145,23 +146,11 @@ foam.CLASS({
         return nu;
       }
 
-      // Not primary - pass on to next Mediator.
-
-      FObject old = getDelegate().find_(x, obj.getProperty("id"));
-      if ( old != null ) {
-        String data = data(x, obj, old, DOP.PUT);
-        if ( SafetyUtil.isEmpty(data) ) {
-          getLogger().info("put", "client", obj.getProperty("id"), "data", "no delta");
-          return obj;
-        }
-      }
-
-      if ( cmd == null ) {
-        cmd = new ClusterCommand(x, getNSpec().getName(), DOP.PUT, obj);
-      }
+      cmd = new ClusterCommand(x, getNSpec().getName(), DOP.PUT, obj);
       getLogger().debug("put", "client", "cmd", obj.getProperty("id"), "send");
       cmd = (ClusterCommand) getClientDAO().cmd_(x, cmd);
       getLogger().debug("put", "client", "cmd", obj.getProperty("id"), "receive", cmd.getMedusaEntryId());
+
       if ( config.getType() == MedusaType.MEDIATOR ) {
         MedusaEntryId id = cmd.getMedusaEntryId();
         if ( id != null ) {
