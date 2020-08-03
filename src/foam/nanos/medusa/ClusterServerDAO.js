@@ -40,12 +40,12 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       ClusterCommand cmd = (ClusterCommand) obj;
+      getLogger().debug("put_", java.util.Arrays.toString(cmd.getHops()));
       DAO dao = (DAO) x.get(cmd.getServiceName());
       if ( dao == null ) {
         getLogger().error("DAO not found", cmd.getServiceName());
         throw new ClusterException("DAO not found");
       }
-      getLogger().debug("put_", java.util.Arrays.toString(cmd.getHops()));
 
       FObject nu = cmd.getData();
       getLogger().debug("put_", "find_", nu.getClass().getSimpleName(), nu.getProperty("id"));
@@ -60,12 +60,12 @@ foam.CLASS({
       name: 'remove_',
       javaCode: `
       ClusterCommand cmd = (ClusterCommand) obj;
+      getLogger().debug("remove_", java.util.Arrays.toString(cmd.getHops()));
       DAO dao = (DAO) x.get(cmd.getServiceName());
       if ( dao == null ) {
         getLogger().error("DAO not found", cmd.getServiceName());
         throw new ClusterException("DAO not found");
       }
-      getLogger().debug("remove_", java.util.Arrays.toString(cmd.getHops()));
       return dao.remove_(x, cmd.getData());
       `
     },
@@ -78,6 +78,11 @@ foam.CLASS({
       if ( dao == null ) {
         getLogger().error("DAO not found", cmd.getServiceName());
         throw new ClusterException("DAO not found");
+      }
+      DAO p = dao;
+      while ( p instanceof foam.dao.ProxyDAO ) {
+        getLogger().info("cmd", p.getClass().getSimpleName());
+        p = ((foam.dao.ProxyDAO)p).getDelegate();
       }
       return dao.cmd_(x, obj);
       `
