@@ -704,15 +704,7 @@ foam.CLASS({
       this.expanded = false;
     },
     function returnSelectedProps() {
-      if ( ! this.hasSubProperties ) {
-        if ( this.level === 0 ) {
-          if ( foam.Array.isInstance(this.rootProperty) )
-            return [[this.rootProperty[0]]];
-          else
-            return [this.rootProperty];
-        } else 
-          return [this.rootProperty[0]];
-      } else {
+      if ( this.hasSubProperties ) {
         var arr = [];
         for ( var i = 0 ; i < this.subColumnSelectConfig.length ; i++ ) {
           if ( this.subColumnSelectConfig[i].isPropertySelected ) {
@@ -721,8 +713,16 @@ foam.CLASS({
             arr.push(childProps);
           }
         }
-        return arr;
+        if ( arr && arr.length > 0 )
+          return arr;
       }
+      if ( this.level === 0 ) {
+        if ( foam.Array.isInstance(this.rootProperty) )
+          return [[this.rootProperty[0]]];
+        else
+          return [this.rootProperty];
+      } else 
+        return [this.rootProperty[0]];
     },
     function updateOnSearch(query) {
       if ( ! this.hasSubProperties ) {
