@@ -314,7 +314,7 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'Description',
+      name: 'description',
       section: 'details',
       view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 144 }
     }
