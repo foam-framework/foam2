@@ -151,7 +151,18 @@ foam.CLASS({
       FObject result = cmd.getData();
       if ( result != null ) {
         getLogger().debug("put", "delegate", result.getProperty("id"));
-        return getDelegate().put_(x, result);
+        FObject nu = getDelegate().put_(x, result);
+        if ( nu == null ) {
+          getLogger().debug("put", "delegate", "returned null");
+        } else {
+          FObject f = getDelegate().find_(x, nu.getProperty("id"));
+          if ( f == null ) {
+            getLogger().debug("put", "delegate", "find null");
+            getLogger().debug("put", "delegate", "dao", getDelegate().getClass().getSimpleName());
+          }
+        }
+        return nu;
+//        return getDelegate().put_(x, result);
       }
       getLogger().warning("put", obj.getProperty("id"), "result,null");
       return result;
@@ -213,9 +224,9 @@ foam.CLASS({
         if ( config.getType() == MedusaType.MEDIATOR ) {
           MedusaEntryId id = cmd.getMedusaEntryId();
           if ( id != null ) {
-            getLogger().info("cmd", "ClusterCommand", "find", "block");
+            getLogger().debug("cmd", "ClusterCommand", "find", "block");
             getMedusaEntryDAO().find_(x, id); // blocking
-            getLogger().info("cmd", "ClusterCommand", "find", "unblock");
+            getLogger().debug("cmd", "ClusterCommand", "find", "unblock");
           } else {
             getLogger().debug("cmd", "ClusterCommand", "medusaEntry", "null");
           }

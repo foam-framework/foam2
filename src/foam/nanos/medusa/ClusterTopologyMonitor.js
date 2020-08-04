@@ -133,7 +133,9 @@ foam.CLASS({
           ));
         dao.select(new ClusterTopologySink(x, (DAO) x.get("localClusterTopologyDAO")));
       } finally {
-        setIsRunning(false);
+        synchronized ( this ) {
+          setIsRunning(false);
+        }
       }
         `
     }

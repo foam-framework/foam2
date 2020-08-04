@@ -197,7 +197,9 @@ foam.CLASS({
           ));
         dao.select(new ClusterConfigPingSink(x, dao, getPingTimeout()));
       } finally {
-        setIsRunning(false);
+        synchronized ( this ) {
+          setIsRunning(false);
+        }
       }
 
      // See ConsensusDAO for Mediators - they transition to ONLINE when replay complete.
