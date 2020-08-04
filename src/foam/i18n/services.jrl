@@ -21,7 +21,7 @@ p({
 
 p({
   "class":"foam.nanos.boot.NSpec",
-  "name":"LocaleDAO",
+  "name":"localeDAO",
   "description":"Locale DAO",
   "serve":true,
   "serviceScript":
