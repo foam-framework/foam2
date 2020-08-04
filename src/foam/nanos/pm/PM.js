@@ -16,16 +16,17 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.ClassInfo',
+    'foam.core.ContextAgent',
     'foam.core.FObject',
     'foam.core.X'
   ],
 
-  ids: [ 'id', 'name', 'startTime' ],
+  ids: [ 'key', 'name', 'startTime' ],
 
   properties: [
     {
       class: 'String',
-      name: 'id'
+      name: 'key'
     },
     {
       class: 'String',
@@ -95,7 +96,7 @@ foam.CLASS({
     {
       name: 'doFolds',
       javaCode: `
-    fm.foldForState(getId()+":"+getName(), getStartTime(), getTime());
+    fm.foldForState(getKey()+":"+getName(), getStartTime(), getTime());
       `
     },
     {
@@ -105,16 +106,16 @@ foam.CLASS({
         { name: 'args', type: 'Object...' }
       ],
       javaCode: `
-        String str = "";
         setIsError(true);
+        StringBuilder sb = new StringBuilder();
         for (Object obj: args) {
-          if ( obj instanceof java.lang.Exception ) {
+          if ( obj instanceof Exception ) {
             setException(obj);
-            str += ((Exception) obj).getMessage() + ",";
+            sb.append(((Exception) obj).getMessage()).append(",");
           }
         }
-        if ( str.length() > 0 )
-          setErrorMessage(str.substring(0, str.length() - 1));
+        if ( sb.length() > 0 )
+          setErrorMessage(sb.deleteCharAt(sb.length() - 1).toString());
       `
     }
   ],
@@ -129,7 +130,7 @@ foam.CLASS({
 
               if ( pm == null ) return new PM(fo, name);
 
-              pm.setId(fo.getClassInfo().getId());
+              pm.setKey(fo.getClassInfo().getId());
               pm.setName(combine(name));
               pm.init_();
 
@@ -141,7 +142,7 @@ foam.CLASS({
 
               if ( pm == null ) return new PM(clsInfo, name);
 
-              pm.setId(clsInfo.getId());
+              pm.setKey(clsInfo.getId());
               pm.setName(combine(name));
               pm.init_();
 
@@ -150,7 +151,7 @@ foam.CLASS({
 
             public PM(ClassInfo clsInfo, String... name) {
               setName(combine(name));
-              setId(clsInfo.getId());
+              setKey(clsInfo.getId());
               init_();
             }
 
@@ -159,7 +160,7 @@ foam.CLASS({
               foam.core.ClassInfoImpl clsInfo = new foam.core.ClassInfoImpl();
               clsInfo.setObjClass(cls);
               clsInfo.setId(cls.getName());
-              setId(clsInfo.getId());
+              setKey(clsInfo.getId());
               init_();
             }
 
@@ -168,22 +169,22 @@ foam.CLASS({
             }
 
             public PM(Object... args) {
-              setId(args[0].toString());
-              String str = "";
+              setKey(args[0].toString());
+              StringBuilder sb = new StringBuilder();
               for (Object obj: java.util.Arrays.copyOfRange(args, 1, args.length)){
-                str += obj.toString() + ":";
+                sb.append(obj.toString()).append(":");
               }
-              if ( str.length() > 0 )
-                setName(str.substring(0, str.length() - 1));
+              if ( sb.length() > 0 )
+                setName(sb.deleteCharAt(sb.length() - 1).toString());
               init_();
             }
 
             private static String combine(String... args) {
-              String str = "";
+              StringBuilder sb = new StringBuilder();
               for ( String s: args) {
-                str += s + ":";
+                sb.append(s).append(":");
               }
-              return str.substring(0, str.length() - 1);
+              return sb.deleteCharAt(sb.length() - 1).toString();
             }
           `
         }));

@@ -68,7 +68,7 @@ public class RuleEngine extends ContextAwareSupport {
         if ( stops_.get() ) break;
         if ( ! isRuleApplicable(rule, obj, oldObj)) continue;
         PM pm = (PM) x_.get("PM");
-        pm.setId(RulerDAO.getOwnClassInfo().getId());
+        pm.setKey(RulerDAO.getOwnClassInfo().getId());
         pm.setName(rule.getDaoKey() + ": " + rule.getId());
         pm.init_();
         applyRule(rule, obj, oldObj, agency);
@@ -106,7 +106,7 @@ public class RuleEngine extends ContextAwareSupport {
    */
   public void probe(List<Rule> rules, RulerProbe rulerProbe, FObject obj, FObject oldObj) {
       PM pm = (PM) x_.get("PM");
-      pm.setId(RulerProbe.getOwnClassInfo().getId());
+      pm.setKey(RulerProbe.getOwnClassInfo().getId());
       pm.setName("Probe:" + obj.getClassInfo());
       pm.init_();
     for (Rule rule : rules) {
