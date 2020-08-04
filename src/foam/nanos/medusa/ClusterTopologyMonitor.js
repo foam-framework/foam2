@@ -106,15 +106,14 @@ foam.CLASS({
       if ( ! getEnabled() ) {
         return;
       }
-      try {
-        synchronized ( this ) {
-          if ( getIsRunning() ) {
-            getLogger().debug("already running");
-            return;
-          }
-          setIsRunning(true);
+      synchronized ( this ) {
+        if ( getIsRunning() ) {
+          getLogger().debug("already running");
+          return;
         }
-  
+        setIsRunning(true);
+      }
+      try {
         ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
         ClusterConfig config = support.getConfig(x, support.getConfigId());
         // getLogger().debug("execute", config.getId(), config.getType().getLabel(), config.getStatus().getLabel());
@@ -124,7 +123,7 @@ foam.CLASS({
           ((Timer)getTimer()).purge();
           return;
         }
-    
+
         DAO dao = (DAO) x.get("localClusterConfigDAO");
         dao = dao.where(
           AND(
