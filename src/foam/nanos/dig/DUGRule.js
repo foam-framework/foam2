@@ -109,6 +109,7 @@ foam.CLASS({
       value: foam.nanos.http.Format.JSON,
       tableWidth: 100,
       section: 'dugInfo',
+      readVisibility: 'HIDDEN',
       view: {
         class: 'foam.u2.view.ChoiceView',
         choices: [

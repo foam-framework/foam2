@@ -12,7 +12,7 @@ foam.CLASS({
 
   tableColumns: [
     'id',
-    'theme'
+    'theme.name'
   ],
 
   properties: [

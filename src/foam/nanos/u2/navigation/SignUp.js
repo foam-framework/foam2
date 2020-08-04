@@ -11,6 +11,10 @@ foam.CLASS({
   documentation: `Model used for registering/creating an user.
   Hidden properties create the different functionalities for this view (Ex. coming in with a signUp token)`,
 
+  implements: [
+    'foam.mlang.Expressions'
+  ],
+
   imports: [
     'appConfig',
     'auth',
@@ -21,8 +25,6 @@ foam.CLASS({
 
   requires: [
     'foam.log.LogLevel',
-    'foam.nanos.auth.Address',
-    'foam.nanos.auth.Country',
     'foam.nanos.auth.User',
     'foam.u2.dialog.NotificationMessage'
   ],
@@ -32,9 +34,11 @@ foam.CLASS({
     { name: 'FOOTER_TXT', message: 'Already have an account?' },
     { name: 'FOOTER_LINK', message: 'Sign in' },
     { name: 'ERROR_MSG', message: 'There was a problem creating your account.' },
-    { name: 'SELECTION_TEXT', message: 'Select your country' },
-    { name: 'SELECTION', message: 'Please select...' },
-    { name: 'VALIDATION_ERR_TEXT', message: 'Please enter job title'}
+    { name: 'EMAIL_EMPTY_ERR', message: 'Please enter email' },
+    { name: 'EMAIL_SYNTAX_ERR', message: 'Please enter valid email' },
+    { name: 'EMAIL_AVAILABILITY_ERR', message: 'This email is taken. Please try another.' },
+    { name: 'USERNAME_EMPTY_ERR', message: 'Please enter username' },
+    { name: 'USERNAME_AVAILABILITY_ERR', message: 'This username is taken. Please try another.' }
   ],
 
   properties: [
@@ -68,141 +72,68 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'disableCompanyName_',
-      documentation: `Set this to true to disable the Company Name input field.`,
-      hidden: true
-    },
-    {
-      class: 'StringArray',
-      name: 'countryChoices_',
-      documentation: `Set this to the list of countries (Country.NAME) we want our signing up user to be able to select.`,
-      hidden: true
-    },
-    {
-      class: 'String',
-      name: 'firstName',
-      gridColumns: 6,
-      view: {
-        class: 'foam.u2.TextField',
-        placeholder: 'Jane',
-        focused: true
-      },
-      required: true
-    },
-    {
-      class: 'String',
-      name: 'lastName',
-      gridColumns: 6,
-      view: {
-        class: 'foam.u2.TextField',
-        placeholder: 'Doe'
-      },
-      required: true
-    },
-    {
-      class: 'String',
-      name: 'jobTitle',
-      view: function(args, X) {
-        return {
-          class: 'foam.u2.view.ChoiceWithOtherView',
-          otherKey: 'Other',
-          choiceView: {
-            class: 'foam.u2.view.ChoiceView',
-            placeholder: X.data.SELECTION,
-            dao: X.jobTitleDAO,
-            objToChoice: function(a) {
-              return [a.name, a.label];
-            }
-          }
-        };
-      },
-      validationPredicates: [
-        {
-          args: ['jobTitle'],
-          predicateFactory: function(e) {
-            return e.NEQ(foam.nanos.u2.navigation.SignUp.JOB_TITLE, '');
-          },
-          errorMessage: 'VALIDATION_ERR_TEXT'
-        }
-      ],
-      required: true
-    },
-    {
-      class: 'PhoneNumber',
-      name: 'phone',
-      required: true
-    },
-    {
-      class: 'String',
-      name: 'organization',
-      label: 'Company Name',
-      view: {
-        class: 'foam.u2.TextField',
-        placeholder: 'ABC Company'
-      },
-      visibility: function(disableCompanyName_) {
-        return disableCompanyName_ ? foam.u2.DisplayMode.DISABLED : foam.u2.DisplayMode.RW;
-      },
-      required: true
-    },
-    {
-      class: 'Reference',
-      targetDAOKey: 'countryDAO',
-      name: 'countryId',
-      label: 'Country',
-      of: 'foam.nanos.auth.Country',
-      documentation: 'Country address.',
-      view: function(_, X) {
-        var E = foam.mlang.Expressions.create();
-        choices = X.data.slot(function(countryChoices_) {
-          if ( ! countryChoices_ || countryChoices_.length == 0 ) return X.countryDAO;
-          return X.countryDAO.where(E.IN(X.data.Country.ID, countryChoices_));
-        });
-        return foam.u2.view.ChoiceView.create({
-          placeholder: X.data.SELECTION_TEXT,
-          objToChoice: function(a) {
-            return [a.id, a.name];
-          },
-          dao$: choices
-        }, X);
-      },
-      required: true,
-    },
-    {
-      class: 'String',
-      name: 'userName',
-      label: 'Username',
-      view: {
-        class: 'foam.u2.TextField',
-        placeholder: 'example123'
-      },
-      //TODO: uncomment when integrating
-      // validationPredicates: [
-      //   {
-      //     args: ['userName'],
-      //     predicateFactory: function(e) {
-      //       return e.REG_EXP(
-      //         foam.nanos.u2.navigation.SignUp.USER_NAME,
-      //         /^[^\s\/]+$/);
-      //     },
-      //     errorString: 'Please enter username'
-      //   }
-      // ],
-      //TODO: set to true when integrating
-      required: false,
-      //TODO: set to false when integrating
+      name: 'emailAvailable',
+      documentation: `Binded property used to display email not available error.`,
+      value: true,
       hidden: true
     },
     {
       class: 'EMail',
       name: 'email',
-      view: {
-        class: 'foam.u2.TextField',
-        placeholder: 'example@example.com'
+      placeholder: 'example@example.com',
+      view: function(_, X) {
+        return {
+          class: 'foam.u2.view.UserPropertyAvailabilityView',
+          icon: 'images/checkmark-small-green.svg',
+          onKey: true,
+          isAvailable$: X.data.emailAvailable$,
+          targetProperty: foam.nanos.auth.User.EMAIL,
+          inputValidation: /\S+@\S+\.\S+/,
+          restrictedCharacters: /^[^\s]$/
+        };
+      },
+      validateObj: function(email, emailAvailable) {
+        // Empty Check
+        if ( email.length === 0 ) return this.EMAIL_EMPTY_ERR;
+        // Syntax Check
+        if ( ! /\S+@\S+\.\S+/.test(email) ) return this.EMAIL_SYNTAX_ERR;
+        // Availability Check
+        if ( ! emailAvailable ) return this.EMAIL_AVAILABILITY_ERR;
       },
       visibility: function(disableEmail_) {
         return disableEmail_ ?
           foam.u2.DisplayMode.DISABLED : foam.u2.DisplayMode.RW;
+      },
+      required: true
+    },
+    {
+      class: 'Boolean',
+      name: 'usernameAvailable',
+      documentation: `Binded property used to display username not available error.`,
+      value: true,
+      hidden: true
+    },
+    {
+      class: 'String',
+      name: 'userName',
+      label: 'Username',
+      placeholder: 'example123',
+      view: function(_, X) {
+        return {
+          class: 'foam.u2.view.UserPropertyAvailabilityView',
+          icon: 'images/checkmark-small-green.svg',
+          onKey: true,
+          isAvailable$: X.data.usernameAvailable$,
+          targetProperty: foam.nanos.auth.User.USER_NAME,
+          inputValidation: /^[^\s\/]+$/,
+          restrictedCharacters: /^[^\s\/]$/
+        };
+      },
+      validateObj: function(userName, usernameAvailable) {
+        // Empty Check
+        if ( userName.length === 0 ) return this.USERNAME_EMPTY_ERR;
+        // Availability Check
+        if ( ! usernameAvailable ) return this.USERNAME_AVAILABILITY_ERR;
       },
       required: true
     },
@@ -266,17 +197,10 @@ foam.CLASS({
         this.isLoading_ = true;
         this.dao_
           .put(this.User.create({
-            firstName: this.firstName,
-            lastName: this.lastName,
-            organization: this.organization,
             userName: this.userName,
             email: this.email,
             desiredPassword: this.desiredPassword,
             signUpToken: this.token_,
-            address: this.Address.create({ countryId: this.countryId }),
-            welcomeEmailSent: true,
-            jobTitle: this.jobTitle,
-            phoneNumber: this.phone,
             group: this.group_
           }))
           .then((user) => {

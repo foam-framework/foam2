@@ -55,7 +55,7 @@ foam.CLASS({
       color: #7f8385;
       padding-left: 1.5vw;
       margin-top: -19px;
-      line-height: 2vh;
+      line-height: 1em;
       padding-bottom: 2vh;
     }
 

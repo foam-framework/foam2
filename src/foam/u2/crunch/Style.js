@@ -34,8 +34,8 @@ foam.CLASS({
       height: 132px;
       margin-bottom: 15px;
 
-      /* Calculated 86% for this but 95% renders correctly */
-      background-size: 95%;
+      /* Calculated 86% for this but 103% renders correctly */
+      background-size: 103%;
 
       background-repeat: no-repeat;
       border-radius: 3px;

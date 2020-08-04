@@ -16,19 +16,22 @@ foam.CLASS({
     {
       name: 'mustBeValid',
       class: 'Boolean'
+    },
+    {
+      name: 'isValid',
+      class: 'Boolean',
+      expression: function (mustBeValid, of, data, data$errors_) {
+        if ( ! mustBeValid ) return true;
+        if ( ! this.of ) return true;
+        if ( ( ! data ) || data$errors_ ) return false;
+        return true;
+      }
     }
   ],
 
   methods: [
     function validate() {
-      /* breaks everything; not sure why
-      var valid = this.SUPER();
-      if ( ! valid ) return false;
-      */
-      if ( ! this.mustBeValid ) return true;
-      if ( ! this.of ) return true;
-      if ( ! this.data || this.data.errors_ ) return false;
-      return true;
+      return this.isValid;
     }
   ]
 });

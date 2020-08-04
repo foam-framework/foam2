@@ -311,6 +311,12 @@ foam.CLASS({
       view: { class: 'foam.u2.tag.TextArea', rows: 5, cols: 137 },
       visibility: 'RO',
       section: 'details'
+    },
+    {
+      class: 'String',
+      name: 'description',
+      section: 'details',
+      view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 144 }
     }
   ],
 

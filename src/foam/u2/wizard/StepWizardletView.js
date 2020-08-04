@@ -20,6 +20,7 @@ foam.CLASS({
   requires: [
     'foam.core.Action',
     'foam.log.LogLevel',
+    'foam.u2.detail.SectionView',
     'foam.u2.dialog.Popup',
     'foam.u2.dialog.SimpleActionDialog',
     'foam.u2.stack.Stack',
@@ -53,10 +54,25 @@ foam.CLASS({
       max-height: 95vh;
       height: 100%;
     }
+    ^fullscreen {
+      display: flex;
+      flex-direction: column;
+      background-color: white !important;
+      position: fixed !important;
+      top: 0;
+      left: 0;
+      height: 100vh !important;
+      width: 100vw;
+      max-height: 100vh !important;
+      z-index: 950;
+      margin: 0;
+      padding: 0;
+    }
     ^status {
       background-color: %WHITE%;
       padding: 50px;
-      overflow-y: scroll;
+      overflow-y: auto;
+      max-height: 800px;
       display: flex;
       flex-direction: column;
     }
@@ -69,7 +85,8 @@ foam.CLASS({
     ^rightside ^entry {
       flex-grow: 1;
       -webkit-mask-image: -webkit-gradient(linear, left 15, left top, from(rgba(0,0,0,1)), to(rgba(0,0,0,0)));
-      overflow-y: scroll;
+      overflow-y: auto;
+      max-height: 600px;
       padding: 0 50px;
     }
     ^rightside ^top-buttons {
@@ -82,6 +99,9 @@ foam.CLASS({
       background-color: %GREY6%;
       padding: 25px 50px;
       text-align: right;
+    }
+    ^top-padding {
+      padding-top: 99px;
     }
     ^ .foam-u2-stack-StackView {
       height: auto;
@@ -103,6 +123,21 @@ foam.CLASS({
     {
       name: 'showDiscardOption',
       class: 'Boolean'
+    },
+    {
+      name: 'fullScreen',
+      class: 'Boolean',
+      value: false
+    },
+    {
+      name: 'hideX',
+      class: 'Boolean',
+      value: false
+    },
+    {
+      name: 'backDisabled',
+      class: 'Boolean',
+      value: false
     }
   ],
 
@@ -113,6 +148,7 @@ foam.CLASS({
 
       this
         .addClass(this.myClass())
+        .enableClass(this.myClass('fullscreen'), this.fullScreen$)
         .start(this.Grid)
           .addClass(this.myClass('fix-grid'))
           .start(this.GUnit, { columns: 4 })
@@ -127,34 +163,48 @@ foam.CLASS({
           .end()
           .start(this.GUnit, { columns: 8 })
             .addClass(this.myClass('rightside'))
-            .start().addClass(this.myClass('top-buttons'))
-              .start(this.CircleIndicator, {
-                label: 'X',
-                borderThickness: 2,
-                borderColor: this.theme.grey2,
-                borderColorHover: this.theme.primary1,
-                clickable: true
-              })
-                .on('click', function () {
-                  self.showExitPrompt();
+            .add(this.slot(function(hideX) {
+              if ( hideX ) {
+                return this.E().addClass(this.myClass('top-padding'));
+              }
+              return this.E().addClass(this.myClass('top-buttons'))
+                .start(this.CircleIndicator, {
+                  label: 'X',
+                  borderThickness: 2,
+                  borderColor: this.theme.grey2,
+                  borderColorHover: this.theme.primary1,
+                  clickable: true
                 })
-              .end()
-            .end()
+                  .on('click', function () {
+                    self.showExitPrompt();
+                  })
+                .end();
+            }))
             .start()
               .addClass(this.myClass('entry'))
               .start()
-                .add(this.data.SUB_STACK)
+                .add(this.slot(function (data$currentWizardlet, data$currentSection) {
+                  var ctx = this.__subContext__.createSubContext();
+                  ctx.register(
+                    this.VerticalDetailView,
+                    'foam.u2.detail.SectionedDetailView'
+                  );
+                  return self.SectionView.create({
+                    section: data$currentSection,
+                    data$: data$currentWizardlet.data$,
+                  }, ctx)
+                }))
               .end()
             .end()
             .start()
               .addClass(this.myClass('bottom-buttons'))
-              .add(this.slot(function (data$isLastWizardlet) {
+              .add(this.slot(function (data$isLastScreen) {
                 return this.E()
                   .startContext({ data: self })
                   .addClass(self.myClass('buttons'))
                   .tag(this.GO_PREV, btn)
                   .tag(this.GO_NEXT,
-                    data$isLastWizardlet
+                    data$isLastScreen
                       ? { ...btn, label: this.ACTION_LABEL }
                       : btn
                   )
@@ -217,9 +267,12 @@ foam.CLASS({
     },
     {
       name: 'goPrev',
-      label: 'back',
+      label: 'Back',
       isEnabled: function (data$canGoBack) {
         return data$canGoBack;
+      },
+      isAvailable: function (backDisabled) {
+        return ! backDisabled;
       },
       code: function() {
         this.data.back();
@@ -227,9 +280,9 @@ foam.CLASS({
     },
     {
       name: 'goNext',
-      label: 'next',
-      isEnabled: function (data$isLastWizardlet, data$currentWizardlet) {
-        return data$isLastWizardlet || data$currentWizardlet.validate();
+      label: 'Next',
+      isEnabled: function (data$canGoNext) {
+        return data$canGoNext;
       },
       code: function(x) {
         this.data.next().then((isFinished) => {
