@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -15,14 +15,6 @@ foam.CLASS({
     'foam.lib.formatter.JSONFObjectFormatter',
     'foam.util.concurrent.AbstractAssembly',
     'foam.util.SafetyUtil'
-  ],
-
-  properties: [
-    {
-      name: 'outputClassNames',
-      class: 'Boolean',
-      value: false
-    }
   ],
 
   methods: [
