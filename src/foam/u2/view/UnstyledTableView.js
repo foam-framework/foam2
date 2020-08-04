@@ -205,19 +205,7 @@ foam.CLASS({
       documentation: 'Width of the whole table. Used to get proper scrolling on narrow screens.',
       expression: function(props) {
         return this.columns_.reduce((acc, col) => {
-          var axiom;
-
-          if ( this.columnHandler.canColumnBeTreatedAsAnAxiom(this, col[0]) && col[0].tableWidth ) {
-            axiom = col[0];
-          } else {
-            let found = props.find(p => p.fullPropertyName === this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(this, col[0]));
-            if ( found ) {
-              axiom = found.property;
-
-              return acc + (axiom.tableWidth || this.MIN_COLUMN_WIDTH_FALLBACK);
-            }
-            return acc;
-          }
+          return acc + (this.returnColumnPropertyForPropertyName(this, col, 'tableWidth') || this.MIN_COLUMN_WIDTH_FALLBACK);
         }, this.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH) + 'px';
       }
     },
@@ -293,6 +281,7 @@ foam.CLASS({
 
             return this.E().
               addClass(view.myClass('tr')).
+              style({ 'min-width': this.tableWidth_$ }).
 
               // If multi-select is enabled, then we show a checkbox in the
               // header that allows you to select all or select none.
