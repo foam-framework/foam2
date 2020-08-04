@@ -5,6 +5,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'getGrantPath',
+      async: true,
       type: 'List',
       args: [
         {

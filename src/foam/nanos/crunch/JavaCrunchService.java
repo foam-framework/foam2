@@ -3,6 +3,7 @@ package foam.nanos.crunch;
 import foam.core.X;
 import foam.dao.ArraySink;
 import foam.dao.DAO;
+import foam.nanos.logger.Logger;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,6 +15,9 @@ import static foam.mlang.MLang.*;
 
 public class JavaCrunchService implements CrunchService {
   public List getGrantPath(X x, String rootId) {
+    Logger logger = (Logger) x.get("logger");
+    logger.info("Handling CrunchService grantPath request: " + rootId);
+
     DAO prerequisiteDAO = (DAO) x.get("prerequisiteCapabilityJunctionDAO");
     DAO capabilityDAO = (DAO) x.get("capabilityDAO");
     // TODO:
@@ -47,6 +51,7 @@ public class JavaCrunchService implements CrunchService {
           int newIndex = entry.getValue();
           if ( newIndex > previousIndex ) newIndex--;
         }
+        alreadyListed = newAlreadyListed;
       }
 
       // Add capability to grant path, and remember index in case it's replaced
