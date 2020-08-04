@@ -42,7 +42,8 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-  protected static final Object runLock_ = new Object();
+  protected static Timer timer_ = null;
+  protected static Boolean isRunning_ = false;
           `
         }));
       }
@@ -65,17 +66,17 @@ foam.CLASS({
       class: 'Int',
       value: 10000
     },
-    {
-      name: 'isRunning',
-      class: 'Boolean',
-      value: false,
-      visibility: 'HIDDEN'
-    },
-    {
-      name: 'timer',
-      class: 'Object',
-      visibility: 'HIDDEN'
-    },
+    // {
+    //   name: 'isRunning',
+    //   class: 'Boolean',
+    //   value: false,
+    //   visibility: 'HIDDEN'
+    // },
+    // {
+    //   name: 'timer',
+    //   class: 'Object',
+    //   visibility: 'HIDDEN'
+    // },
     {
       name: 'logger',
       class: 'FObjectProperty',
@@ -95,10 +96,14 @@ foam.CLASS({
       documentation: 'Start as a NanoService',
       name: 'start',
       javaCode: `
+      getLogger().info("start");
       ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
-      Timer timer = new Timer(this.getClass().getSimpleName(), true);
-      setTimer(timer);
-      timer.scheduleAtFixedRate(
+      if ( timer_ != null ) {
+        getLogger().warning("multiple instances", new Exception());
+        return;
+      }
+      timer_ = new Timer(this.getClass().getSimpleName(), true);
+      timer_.scheduleAtFixedRate(
         new AgencyTimerTask(getX(), support.getThreadPoolName(), this),
         getInitialTimerDelay(),
         getTimerInterval());
@@ -116,12 +121,12 @@ foam.CLASS({
       if ( ! getEnabled() ) {
         return;
       }
-      synchronized ( runLock_ ) {
-        if ( getIsRunning() ) {
+      synchronized ( timer_ ) {
+        if ( isRunning_ ) {
           getLogger().debug("already running");
           return;
         }
-        setIsRunning(true);
+        isRunning_ = true;
       }
       try {
         ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
@@ -129,8 +134,8 @@ foam.CLASS({
         // getLogger().debug("execute", config.getId(), config.getType().getLabel(), config.getStatus().getLabel());
         if ( support.getStandAlone() ) {
           // no need for ping timer in standalone mode.
-          ((Timer)getTimer()).cancel();
-          ((Timer)getTimer()).purge();
+          timer_.cancel();
+          timer_.purge();
           return;
         }
 
@@ -142,8 +147,8 @@ foam.CLASS({
           ));
         dao.select(new ClusterTopologySink(x, (DAO) x.get("localClusterTopologyDAO")));
       } finally {
-        synchronized ( runLock_ ) {
-          setIsRunning(false);
+        synchronized ( timer_ ) {
+          isRunning_ = false;
         }
       }
         `

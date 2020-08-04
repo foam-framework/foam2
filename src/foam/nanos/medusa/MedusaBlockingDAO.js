@@ -52,6 +52,7 @@ foam.CLASS({
       name: 'find_',
       javaCode: `
       if ( id instanceof MedusaEntryId ) {
+        latchOn(x, ((MedusaEntryId)id).getIndex());
         MedusaEntry entry = (MedusaEntry) waitOn(x, ((MedusaEntryId)id).getIndex());
         return (MedusaEntry) getDelegate().find_(x, entry.getId());
       }
@@ -62,6 +63,7 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
+      latchOn(x, entry.getIndex());
       entry = (MedusaEntry) getDelegate().put_(x, entry);
       return waitOn(x, entry.getIndex());
       `
@@ -78,6 +80,32 @@ foam.CLASS({
       `
     },
     {
+      documentation: 'create latch, for future wait',
+      name: 'latchOn',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'id',
+          type: 'Long'
+        }
+      ],
+      javaCode: `
+      // TODO: this is not unique.
+      synchronized ( String.valueOf(id).intern() ) {
+        CountDownLatch latch = (CountDownLatch) getLatches().get(id);
+        if ( latch == null ) {
+          latch = new CountDownLatch(1);
+          getLatches().put(id, latch);
+        } else {
+          getLogger().debug("latchOn", id, "latch exists");
+        }
+      }
+      `
+    },
+    {
       name: 'waitOn',
       args: [
         {
@@ -91,20 +119,13 @@ foam.CLASS({
       ],
       type: 'FObject',
       javaCode: `
-      CountDownLatch latch = null;
-      // TODO: this is not unique.
-      synchronized ( String.valueOf(id).intern() ) {
-        latch = (CountDownLatch) getLatches().get(id);
-        if ( latch == null ) {
-          latch = new CountDownLatch(1);
-          getLatches().put(id, latch);
-        } else {
-          getLogger().debug("waitOn", id, "latch exists");
-        }
-      }
-
       try {
         getLogger().debug("waitOn", id);
+        CountDownLatch latch = (CountDownLatch) getLatches().get(id);
+        if ( latch == null ) {
+          getLogger().debug("waitOn", id, "Latch not found");
+          return;
+        }
         latch.await();
         getLogger().debug("wakeOn", id);
         return (FObject) getEntries().get(id);
@@ -130,21 +151,18 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      CountDownLatch latch = null;
       Long id = entry.getIndex();
-      synchronized ( String.valueOf(id).intern() ) {
-        latch = (CountDownLatch) getLatches().get(id);
-        if ( latch == null ) {
-          ReplayingInfo info = (ReplayingInfo) x.get("replayingInfo");
-          if ( ! info.getReplaying() ) {
-            getLogger().debug("notifyOn", id, "Latch not found", entry.toSummary());
-          }
-          return;
+      CountDownLatch = (CountDownLatch) getLatches().get(id);
+      if ( latch == null ) {
+        ReplayingInfo info = (ReplayingInfo) x.get("replayingInfo");
+        if ( ! info.getReplaying() ) {
+          getLogger().debug("notifyOn", id, "Latch not found", entry.toSummary());
         }
-        MedusaEntry e = (MedusaEntry) getEntries().get(id);
-        if ( e == null ) {
-          getEntries().put(id, entry);
-        }
+        return;
+      }
+      MedusaEntry e = (MedusaEntry) getEntries().get(id);
+      if ( e == null ) {
+        getEntries().put(id, entry);
       }
       getLogger().debug("notifyOn", id);
       latch.countDown();
