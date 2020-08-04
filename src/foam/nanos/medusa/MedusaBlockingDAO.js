@@ -152,7 +152,7 @@ foam.CLASS({
       ],
       javaCode: `
       Long id = entry.getIndex();
-      CountDownLatch = (CountDownLatch) getLatches().get(id);
+      CountDownLatch latch = (CountDownLatch) getLatches().get(id);
       if ( latch == null ) {
         ReplayingInfo info = (ReplayingInfo) x.get("replayingInfo");
         if ( ! info.getReplaying() ) {
