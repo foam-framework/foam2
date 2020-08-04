@@ -43,7 +43,7 @@ foam.CLASS({
     {
       type: 'String',
       name: 'AVAILABILITY_PERMISSION',
-      value: 'capability.read.'
+      value: 'capability.availability.'
     }
   ],
 
