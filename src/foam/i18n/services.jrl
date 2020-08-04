@@ -1,6 +1,6 @@
 p({
   "class":"foam.nanos.boot.NSpec",
-  "name":"XLIFFTranslationDAO",
+  "name":"xliffTranslationDAO",
   "serve":true,
   "serviceScript":
   """
