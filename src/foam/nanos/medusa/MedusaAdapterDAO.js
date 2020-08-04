@@ -148,28 +148,6 @@ foam.CLASS({
       cmd = (ClusterCommand) getClientDAO().cmd_(x, cmd);
       getLogger().debug("put", "client", "cmd", obj.getProperty("id"), "receive", cmd.getMedusaEntryId());
 
-      // if ( config.getType() == MedusaType.MEDIATOR ) {
-      //   MedusaEntryId id = cmd.getMedusaEntryId();
-      //   if ( id != null ) {
-      //     getMedusaEntryDAO().find_(x, id); // blocking
-      //   } else {
-      //     // TODO/REVIEW: ??
-      //     getLogger().warning("put", "client", "cmd", obj.getProperty("id"), "MedusaEntryId not found.");
-      //     return obj;
-      //   }
-
-      //   FObject found = getDelegate().find_(x, obj.getProperty("id"));
-      //   if ( found == null) {
-      //     // FIXME: In Zone 1+, it would appear the client returns before the broadcast finishes.
-      //     getLogger().warning("put", "client", "cmd", obj.getProperty("id"), "Object not found", obj.getProperty("id"));
-      //     return obj;
-      //   } else {
-      //     getLogger().debug("put", "client", "cmd", obj.getProperty("id"), "Object found");
-      //   }
-      //   return found;
-      // }
-
-      // Fall through when not Mediator and update local MDAO (delegate).
       FObject result = cmd.getData();
       if ( result != null ) {
         getLogger().debug("put", "delegate", result.getProperty("id"));
@@ -235,8 +213,11 @@ foam.CLASS({
         if ( config.getType() == MedusaType.MEDIATOR ) {
           MedusaEntryId id = cmd.getMedusaEntryId();
           if ( id != null ) {
-            getLogger().debug("cmd", "ClusterCommand", "find", "block");
+            getLogger().info("cmd", "ClusterCommand", "find", "block");
             getMedusaEntryDAO().find_(x, id); // blocking
+            getLogger().info("cmd", "ClusterCommand", "find", "unblock");
+          } else {
+            getLogger().debug("cmd", "ClusterCommand", "medusaEntry", "null");
           }
         }
         getLogger().debug("cmd", "ClusterCommand", "return");
@@ -312,9 +293,10 @@ foam.CLASS({
         entry.setDop(dop);
         entry.setData(data);
 
-        getLogger().debug("submit", entry.toSummary());
+        getLogger().debug("submit", entry.toSummary(), "block");
         entry = (MedusaEntry) getMedusaEntryDAO().put_(x, entry); // blocking
         // entry = (MedusaEntry) getMedusaEntryDAO().find_(x, entry.getId());
+        getLogger().debug("submit", entry.toSummary(), "unblock");
         return entry;
       } catch (Throwable t) {
         getLogger().error("submit", entry.toSummary(), t.getMessage(), t);
