@@ -56,6 +56,12 @@ public class JavaCrunchService implements CrunchService {
 
       // Add capability to grant path, and remember index in case it's replaced
       Capability cap = (Capability) capabilityDAO.find(sourceId);
+
+      UserCapabilityJunction ucj = cap.getJunction(x);
+      if ( ucj != null && ucj.getStatus() == CapabilityJunctionStatus.GRANTED ) {
+        continue;
+      }
+
       alreadyListed.put(sourceId, grantPath.size());
       grantPath.add(cap);
 

@@ -17,7 +17,11 @@ foam.CLASS({
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.dao.Sink',
+    'foam.mlang.predicate.Predicate',
     'foam.mlang.sink.Count',
+    'foam.nanos.auth.Subject',
+    'foam.nanos.auth.User',
+    'foam.nanos.logger.Logger',
     'java.util.Date',
     'java.util.List',
     'static foam.mlang.MLang.*'
@@ -306,6 +310,73 @@ foam.CLASS({
       Date capabilityExpiry = getExpiry();
 
       return today.after(capabilityExpiry);
+      `
+    },
+    {
+      name: 'getJunction',
+      type: 'foam.nanos.crunch.UserCapabilityJunction',
+      documentation: `
+        answers the question "does the context have this capability granted?"
+      `,
+      args: [
+        { name: 'x', type: 'Context' }
+      ],
+      javaCode: `
+        User user = ((Subject) x.get("subject")).getUser();
+        User realUser = ((Subject) x.get("subject")).getRealUser();
+
+        Predicate acjPredicate = INSTANCE_OF(AgentCapabilityJunction.class);
+        Predicate targetPredicate = EQ(UserCapabilityJunction.TARGET_ID, getId());
+        try {
+          DAO capabilityDAO = ( x.get("localCapabilityDAO") == null ) ? (DAO) x.get("capabilityDAO") : (DAO) x.get("localCapabilityDAO");
+          DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
+          
+          {
+            // Check if a ucj implies the subject.user has this permission
+            Predicate userPredicate = AND(
+              NOT(INSTANCE_OF(AgentCapabilityJunction.class)),
+              EQ(UserCapabilityJunction.SOURCE_ID, user.getId())
+            );
+            UserCapabilityJunction ucj = (UserCapabilityJunction)
+              userCapabilityJunctionDAO.find(AND(userPredicate,targetPredicate));
+            if ( ucj != null ) {
+              return ucj;
+            }
+          }
+
+          // Check if a ucj implies the subject.realUser has this permission
+          if ( realUser != null ) {
+            Predicate userPredicate = AND(
+              NOT(INSTANCE_OF(AgentCapabilityJunction.class)),
+              EQ(UserCapabilityJunction.SOURCE_ID, realUser.getId())
+            );
+            UserCapabilityJunction ucj = (UserCapabilityJunction)
+              userCapabilityJunctionDAO.find(AND(userPredicate,targetPredicate));
+            if ( ucj != null ) {
+              return ucj;
+            }
+          }
+
+          // Check if a ucj implies the subject.realUser has this permission in relation to the user
+          if ( realUser != null ) {
+            Predicate userPredicate = AND(
+              INSTANCE_OF(AgentCapabilityJunction.class),
+              EQ(UserCapabilityJunction.SOURCE_ID, realUser.getId()),
+              EQ(AgentCapabilityJunction.EFFECTIVE_USER, user.getId())
+            );
+            UserCapabilityJunction ucj = (UserCapabilityJunction)
+              userCapabilityJunctionDAO.find(AND(userPredicate,targetPredicate));
+            if ( ucj != null ) {
+              return ucj;
+            }
+          }
+
+        } catch ( Exception e ) {
+          Logger logger = (Logger) x.get("logger");
+          logger.error("getJunction", getId());
+        }
+
+        return null;
       `
     }
   ]
