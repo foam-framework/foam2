@@ -6,7 +6,7 @@ p({
   """
     return new foam.dao.EasyDAO.Builder(x)
       .setAuthorize(false)
-      .setJournalName("XLIFFTranslations")
+      .setJournalName("xliffTranslations")
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setOf(foam.i18n.XLIFFTranslationValue.getOwnClassInfo())
       .build();
