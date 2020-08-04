@@ -58,10 +58,7 @@ foam.CLASS({
     }
 
     ^container {
-      display: inline-flex;
       padding: 0 32px;
-      width: 100vw;
-      max-width: -webkit-fill-available;
     }
 
     ^ .actions {
@@ -76,6 +73,9 @@ foam.CLASS({
     ^full-search-container {
       flex: 0 0 250px;
       padding-right: 18px;
+      width: 250px;
+      float: left;
+      padding-top: 23px;
     }
     
     ^manual-width-adjust{
