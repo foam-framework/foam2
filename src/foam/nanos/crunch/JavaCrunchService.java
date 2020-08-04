@@ -3,6 +3,9 @@ package foam.nanos.crunch;
 import foam.core.X;
 import foam.dao.ArraySink;
 import foam.dao.DAO;
+import foam.mlang.predicate.Predicate;
+import foam.nanos.auth.Subject;
+import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -20,8 +23,6 @@ public class JavaCrunchService implements CrunchService {
 
     DAO prerequisiteDAO = (DAO) x.get("prerequisiteCapabilityJunctionDAO");
     DAO capabilityDAO = (DAO) x.get("capabilityDAO");
-    // TODO:
-    // DAO junctionDAO
 
     // Lookup for indices of previously observed capabilities
     Map<String,Integer> alreadyListed = new HashMap<String,Integer>();
@@ -31,11 +32,17 @@ public class JavaCrunchService implements CrunchService {
     Queue<String> nextSources = new ArrayDeque<String>();
     nextSources.add(rootId);
 
+    // Doing this instead of "this" could prevent unexpected behaviour
+    // in the incident CrunchService's getJunction method is decorated
+    CrunchService crunchService = (CrunchService) x.get("crunchService");
+
     while ( nextSources.size() > 0 ) {
       String sourceId = nextSources.poll();
 
-      // TODO:
-      // UserCapabilityJunction ucj = (UserCapabilityJunction)
+      UserCapabilityJunction ucj = crunchService.getJunction(x, sourceId);
+      if ( ucj != null && ucj.getStatus() == CapabilityJunctionStatus.GRANTED ) {
+        continue;
+      }
 
       // Remove previously added prerequisite if one matches
       if ( alreadyListed.containsKey(sourceId) ) {
@@ -57,11 +64,6 @@ public class JavaCrunchService implements CrunchService {
       // Add capability to grant path, and remember index in case it's replaced
       Capability cap = (Capability) capabilityDAO.find(sourceId);
 
-      UserCapabilityJunction ucj = cap.getJunction(x);
-      if ( ucj != null && ucj.getStatus() == CapabilityJunctionStatus.GRANTED ) {
-        continue;
-      }
-
       alreadyListed.put(sourceId, grantPath.size());
       grantPath.add(cap);
 
@@ -78,5 +80,63 @@ public class JavaCrunchService implements CrunchService {
 
     Collections.reverse(grantPath);
     return grantPath;
+  }
+
+  public UserCapabilityJunction getJunction(X x, String capabilityId) {
+    User user = ((Subject) x.get("subject")).getUser();
+    User realUser = ((Subject) x.get("subject")).getRealUser();
+
+    Predicate acjPredicate = INSTANCE_OF(AgentCapabilityJunction.class);
+    Predicate targetPredicate = EQ(UserCapabilityJunction.TARGET_ID, capabilityId);
+    try {
+      DAO capabilityDAO = ( x.get("localCapabilityDAO") == null ) ? (DAO) x.get("capabilityDAO") : (DAO) x.get("localCapabilityDAO");
+      DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
+      
+      {
+        // Check if a ucj implies the subject.user has this permission
+        Predicate userPredicate = AND(
+          NOT(INSTANCE_OF(AgentCapabilityJunction.class)),
+          EQ(UserCapabilityJunction.SOURCE_ID, user.getId())
+        );
+        UserCapabilityJunction ucj = (UserCapabilityJunction)
+          userCapabilityJunctionDAO.find(AND(userPredicate,targetPredicate));
+        if ( ucj != null ) {
+          return ucj;
+        }
+      }
+
+      // Check if a ucj implies the subject.realUser has this permission
+      if ( realUser != null ) {
+        Predicate userPredicate = AND(
+          NOT(INSTANCE_OF(AgentCapabilityJunction.class)),
+          EQ(UserCapabilityJunction.SOURCE_ID, realUser.getId())
+        );
+        UserCapabilityJunction ucj = (UserCapabilityJunction)
+          userCapabilityJunctionDAO.find(AND(userPredicate,targetPredicate));
+        if ( ucj != null ) {
+          return ucj;
+        }
+      }
+
+      // Check if a ucj implies the subject.realUser has this permission in relation to the user
+      if ( realUser != null ) {
+        Predicate userPredicate = AND(
+          INSTANCE_OF(AgentCapabilityJunction.class),
+          EQ(UserCapabilityJunction.SOURCE_ID, realUser.getId()),
+          EQ(AgentCapabilityJunction.EFFECTIVE_USER, user.getId())
+        );
+        UserCapabilityJunction ucj = (UserCapabilityJunction)
+          userCapabilityJunctionDAO.find(AND(userPredicate,targetPredicate));
+        if ( ucj != null ) {
+          return ucj;
+        }
+      }
+
+    } catch ( Exception e ) {
+      Logger logger = (Logger) x.get("logger");
+      logger.error("getJunction", capabilityId, e);
+    }
+
+    return null;
   }
 }
