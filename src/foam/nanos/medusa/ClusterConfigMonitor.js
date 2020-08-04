@@ -10,10 +10,6 @@ foam.CLASS({
 
   documentation: 'NOTE: do not start with cronjob. This process starts the ClusterConfigPingSing which polls the Mediators and Nodes and will initiate Replay, and Elections.',
 
-  axioms: [
-    foam.pattern.Singleton.create()
-  ],
-
   implements: [
     'foam.core.ContextAgent',
     'foam.nanos.NanoService',
@@ -39,6 +35,20 @@ foam.CLASS({
     'java.util.ArrayList',
     'java.util.List',
     'java.util.Timer'
+  ],
+
+  axioms: [
+    foam.pattern.Singleton.create(),
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(foam.java.Code.create({
+          data: `
+  protected static final Object runLock_ = new Object();
+          `
+        }));
+      }
+    }
   ],
 
   properties: [
@@ -113,7 +123,7 @@ foam.CLASS({
       if ( ! getEnabled() ) {
         return;
       }
-      synchronized ( this ) {
+      synchronized ( runLock_ ) {
         if ( getIsRunning() ) {
           getLogger().debug("already running");
           return;
@@ -197,7 +207,7 @@ foam.CLASS({
           ));
         dao.select(new ClusterConfigPingSink(x, dao, getPingTimeout()));
       } finally {
-        synchronized ( this ) {
+        synchronized ( runLock_ ) {
           setIsRunning(false);
         }
       }
