@@ -11,6 +11,7 @@ foam.CLASS({
   flags: ['java'],
 
   javaImports: [
+    'foam.nanos.auth.AuthService',
     'foam.nanos.crunch.Capability',
     'foam.core.X',
     'foam.core.Detachable',
@@ -38,12 +39,21 @@ foam.CLASS({
     }
   ],
 
+  constants: [
+    {
+      type: 'String',
+      name: 'AVAILABILITY_PERMISSION',
+      value: 'capability.read.'
+    }
+  ],
+
   methods: [
     {
       name: 'find_',
       javaCode: `
+        AuthService auth = (AuthService) x.get("auth");
         Capability capability = (Capability) getDelegate().find_(x, id);
-        if ( capability == null || ! capability.getAvailabilityPredicate().f(x) ) {
+        if ( capability == null || ( ! capability.getAvailabilityPredicate().f(x) && ! auth.check(x, AVAILABILITY_PERMISSION + id) ) ) {
           return null;
         }
 
@@ -53,11 +63,12 @@ foam.CLASS({
     {
       name: 'select_',
       javaCode: `
+        AuthService auth = (AuthService) x.get("auth");
         Sink s = sink != null ? sink : new ArraySink();
         ProxySink proxy = new ProxySink(x, s) {
           public void put(Object o, Detachable d) {
             Capability capability = (Capability) o;
-            if ( capability.getAvailabilityPredicate().f(x) ) {
+            if ( capability.getAvailabilityPredicate().f(x) || auth.check(x, AVAILABILITY_PERMISSION + capability.getId()) ) {
               getDelegate().put(capability, d);
             }
           }
