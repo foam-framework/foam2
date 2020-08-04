@@ -28,14 +28,15 @@ foam.CLASS({
 
   requires: [
     'foam.u2.detail.AbstractSectionedDetailView',
-    'foam.u2.tag.CircleIndicator'
+    'foam.u2.tag.CircleIndicator',
+    'foam.u2.wizard.WizardPosition'
   ],
 
   methods: [
     function initE() {
       var self = this;
       this
-        .add(this.slot(function (data$wizardlets, data$subStack$pos) {
+        .add(this.slot(function (data$wizardlets, data$wizardPosition) {
           let elem = this.E();
 
           let afterCurrent = false;
@@ -92,17 +93,20 @@ foam.CLASS({
                 .end();
             
             // Get section index to highlight current section
-            let indices = this.data.screenIndexToSection(data$subStack$pos);
+            let si = data$wizardPosition.sectionIndex;
             
             // Render section labels
             let sections = this.data.sections[w];
 
-            let afterCurrentSection = false;
+            // let afterCurrentSection = false;
             for ( let s = 0 ; s < sections.length ; s++ ) {
+              let pos = this.WizardPosition.create({
+                wizardletIndex: w,
+                sectionIndex: s,
+              })
               let section = sections[s];
-              let isCurrentSection = isCurrent && indices[1] === s;
-              let onClickSkips = afterCurrent || afterCurrentSection;
-              let allowedToSkip = self.data.canSkipTo(w);
+              let isCurrentSection = isCurrent && si === s;
+              let allowedToSkip = self.data.canSkipTo(pos);
               let slot = section.createIsAvailableFor(
                 wizardlet.data$
               ).map(function (isAvailable) {
@@ -111,23 +115,17 @@ foam.CLASS({
                   e,
                   section, s+1,
                   isCurrentSection,
-                  ! isCurrentSection && ( ! onClickSkips || allowedToSkip )
+                  allowedToSkip
                 ).on('click', () => {
-                  let targetScreenIndex = self.data.sectionToScreenIndex(w, s);
                   if ( isCurrentSection ) return;
-                  if ( onClickSkips ) {
-                    if ( allowedToSkip ) {
-                      self.data.skipTo(targetScreenIndex);
-                    }
-                    return;
+                  if ( allowedToSkip ) {
+                    self.data.skipTo(pos);
                   }
-                  while ( self.data.subStack.pos !== targetScreenIndex ) {
-                    self.data.back();
-                  }
+                  return;
                 });
                 return e;
               })
-              if ( isCurrentSection ) afterCurrentSection = true;
+              // if ( isCurrentSection ) afterCurrentSection = true;
               elem.add(slot);
             }
 

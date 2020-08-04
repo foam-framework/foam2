@@ -16,7 +16,6 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.ClassInfo',
-    'foam.core.ContextAgent',
     'foam.core.FObject',
     'foam.core.X'
   ],

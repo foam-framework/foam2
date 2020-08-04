@@ -22,8 +22,6 @@ foam.CLASS({
     'foam.u2.md.CheckBox',
     'foam.u2.md.OverlayDropdown',
     'foam.u2.tag.Image',
-    'foam.u2.view.ColumnConfig',
-    'foam.u2.view.ColumnVisibility',
     'foam.u2.view.EditColumnsView',
     'foam.u2.view.OverlayActionListView'
   ],
@@ -207,14 +205,7 @@ foam.CLASS({
       documentation: 'Width of the whole table. Used to get proper scrolling on narrow screens.',
       expression: function(props) {
         return this.columns_.reduce((acc, col) => {
-          var axiom;
-
-          if ( this.columnHandler.canColumnBeTreatedAsAnAxiom(this, col[0]) && col[0].tableWidth ) {
-            axiom = col[0];
-          } else
-            axiom = props.find(p => p.fullPropertyName === this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(this, col[0])).property;
-
-          return acc + (axiom.tableWidth || this.MIN_COLUMN_WIDTH_FALLBACK);
+          return acc + (this.returnColumnPropertyForPropertyName(this, col, 'tableWidth') || this.MIN_COLUMN_WIDTH_FALLBACK);
         }, this.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH) + 'px';
       }
     },
@@ -283,7 +274,6 @@ foam.CLASS({
         addClass(this.myClass(this.of.id.replace(/\./g, '-'))).
         start().
           addClass(this.myClass('thead')).
-          style({ 'min-width': this.tableWidth_$ }).
           show(this.showHeader$).
           add(this.slot(function(columns_) {
             view.props = this.returnPropertiesForColumns(view, columns_);
@@ -291,6 +281,7 @@ foam.CLASS({
 
             return this.E().
               addClass(view.myClass('tr')).
+              style({ 'min-width': this.tableWidth_$ }).
 
               // If multi-select is enabled, then we show a checkbox in the
               // header that allows you to select all or select none.
@@ -328,7 +319,11 @@ foam.CLASS({
 
               // Render the table headers for the property columns.
               forEach(columns_, function([col, overrides]) {
-                var prop = view.props.find(p => p.fullPropertyName === view.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(view, col)).property;
+                let found = view.props.find(p => p.fullPropertyName === view.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(view, col));
+                if ( ! found ) {
+                  return;
+                }
+                var prop = found.property;
                 var isFirstLevelProperty = view.columnHandler.canColumnBeTreatedAsAnAxiom(view, col) ? true : col.indexOf('.') === -1;
 
                 var tableWidth = view.returnColumnPropertyForPropertyName(view, col, 'tableWidth');
@@ -403,7 +398,7 @@ foam.CLASS({
 
           //with this code error created  slot.get cause promise return
           //FIX ME
-          return this.slot(function(data, order, updateValues) {
+          return this.slot(function(data, data$delegate, order, updateValues) {
             view.props = this.returnPropertiesForColumns(view, view.columns_);
             var propertyNamesToQuery = view.props.map(p => p.fullPropertyName);
 
@@ -609,7 +604,7 @@ foam.CLASS({
       },
       function returnColumnPropertyForPropertyName(context, col, property) {
         var colObj = foam.Array.isInstance(col) ? col[0] : col;
-  
+
         if ( context.columnHandler.canColumnBeTreatedAsAnAxiom(context, colObj) ) {
           if ( colObj[property] )
             return colObj[property];

@@ -1120,3 +1120,26 @@ p({
   """,
   "client":"{\"of\":\"foam.nanos.session.LocalSetting\", \"remoteListenerSupport\": false}"
 })
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "userPropertyAvailabilityService",
+  "serve": true,
+  "authenticate": false,
+  "boxClass":"foam.nanos.auth.UserPropertyAvailabilityServiceInterfaceSkeleton",
+  "serviceClass": "foam.nanos.auth.UserPropertyAvailabilityService",
+  "client":
+    """
+      {
+        "class":"foam.nanos.auth.ClientUserPropertyAvailabilityService",
+        "delegate": {
+          "class":"foam.box.SessionClientBox",
+          "delegate": {
+            "class":"foam.box.HTTPBox",
+            "url":
+            "service/userPropertyAvailabilityService"
+          }
+        }
+      }
+    """
+})

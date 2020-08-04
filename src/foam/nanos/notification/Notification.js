@@ -27,7 +27,7 @@ foam.CLASS({
     'resendNotificationService'
   ],
 
-  tableColumns: ['id', 'body', 'notificationType', 'broadcasted', 'userId', 'groupId' ],
+  tableColumns: ['id', 'body', 'notificationType', 'broadcasted', 'userId.id', 'groupId.id' ],
 
   axioms: [
     {
