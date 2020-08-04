@@ -113,19 +113,16 @@ foam.CLASS({
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       ClusterConfig config = support.getConfig(x, support.getConfigId());
 
-      ClusterCommand cmd = null;
-      if ( obj instanceof ClusterCommand ) {
-        cmd = (ClusterCommand) obj;
-        obj = cmd.getData();
-
-        if ( ! config.getIsPrimary() ) {
-          // Pass on to next Mediator.
-          return (ClusterCommand) getClientDAO().cmd_(x, cmd);
-        }
-      }
 
       if ( config.getIsPrimary() ) {
         // Primary instance - put to MDAO (delegate)
+
+        ClusterCommand cmd = null;
+        if ( obj instanceof ClusterCommand ) {
+          cmd = (ClusterCommand) obj;
+          obj = cmd.getData();
+        }
+
         getLogger().debug("put", "primary", obj.getClass().getSimpleName());
         FObject old = getDelegate().find_(x, obj.getProperty("id"));
         FObject nu = getDelegate().put_(x, obj);
@@ -146,30 +143,31 @@ foam.CLASS({
         return nu;
       }
 
-      cmd = new ClusterCommand(x, getNSpec().getName(), DOP.PUT, obj);
+      ClusterCommand cmd = new ClusterCommand(x, getNSpec().getName(), DOP.PUT, obj);
       getLogger().debug("put", "client", "cmd", obj.getProperty("id"), "send");
       cmd = (ClusterCommand) getClientDAO().cmd_(x, cmd);
       getLogger().debug("put", "client", "cmd", obj.getProperty("id"), "receive", cmd.getMedusaEntryId());
 
-      if ( config.getType() == MedusaType.MEDIATOR ) {
-        MedusaEntryId id = cmd.getMedusaEntryId();
-        if ( id != null ) {
-          getMedusaEntryDAO().find_(x, id); // blocking
-        } else {
-          // TODO/REVIEW: ??
-          getLogger().warning("put", "client", "cmd", obj.getProperty("id"), "MedusaEntryId not found.");
-          return obj;
-        }
-        FObject found = getDelegate().find_(x, obj.getProperty("id"));
-        if ( found == null) {
-          // FIXME: In Zone 1+, it would appear the client returns before the broadcast finishes.
-          getLogger().warning("put", "client", "cmd", obj.getProperty("id"), "Object not found", obj.getProperty("id"));
-          return obj;
-        } else {
-          getLogger().debug("put", "client", "cmd", obj.getProperty("id"), "Object found");
-        }
-        return found;
-      }
+      // if ( config.getType() == MedusaType.MEDIATOR ) {
+      //   MedusaEntryId id = cmd.getMedusaEntryId();
+      //   if ( id != null ) {
+      //     getMedusaEntryDAO().find_(x, id); // blocking
+      //   } else {
+      //     // TODO/REVIEW: ??
+      //     getLogger().warning("put", "client", "cmd", obj.getProperty("id"), "MedusaEntryId not found.");
+      //     return obj;
+      //   }
+
+      //   FObject found = getDelegate().find_(x, obj.getProperty("id"));
+      //   if ( found == null) {
+      //     // FIXME: In Zone 1+, it would appear the client returns before the broadcast finishes.
+      //     getLogger().warning("put", "client", "cmd", obj.getProperty("id"), "Object not found", obj.getProperty("id"));
+      //     return obj;
+      //   } else {
+      //     getLogger().debug("put", "client", "cmd", obj.getProperty("id"), "Object found");
+      //   }
+      //   return found;
+      // }
 
       // Fall through when not Mediator and update local MDAO (delegate).
       FObject result = cmd.getData();
@@ -216,33 +214,33 @@ foam.CLASS({
         return this;
         // return getDelegate().cmd_(x, obj);
       }
-      // if ( ClusterServerDAO.GET_CLIENT_CMD.equals(obj) ) {
-      //   return this;
-      //   // if ( getConfig().getIsPrimary() ) {
-      //   //   getLogger().debug("cmd", "GET_CLIENT_CMD", "this");
-      //   //   return this;
-      //   // } else {
-      //   //   return getClientDAO();
-      //   // }
-      // }
       if ( obj instanceof ClusterCommand ) {
         ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
         ClusterConfig config = support.getConfig(x, support.getConfigId());
-        if ( config.getIsPrimary() ) {
-          ClusterCommand cmd = (ClusterCommand) obj;
-          getLogger().debug("cmd", "ClusterCommand", "primary");
+        ClusterCommand cmd = (ClusterCommand) obj;
 
+        if ( config.getIsPrimary() ) {
+          getLogger().debug("cmd", "ClusterCommand", "primary");
           if ( DOP.PUT == cmd.getDop() ) {
-            // cmd.setData(put_(x, cmd.getData()));
             return put_(x, cmd);
-          } else if ( DOP.REMOVE == cmd.getDop() ) {
-            // cmd.setData(remove_(x, cmd.getData()));
-            return remove_(x, cmd);
           } else {
             getLogger().warning("Unsupported operation", cmd.getDop().getLabel());
             throw new UnsupportedOperationException(cmd.getDop().getLabel());
           }
         }
+
+        getLogger().debug("cmd", "ClusterCommand", "non-primary");
+        cmd = (ClusterCommand) getClientDAO().cmd_(x, obj);
+
+        if ( config.getType() == MedusaType.MEDIATOR ) {
+          MedusaEntryId id = cmd.getMedusaEntryId();
+          if ( id != null ) {
+            getLogger().debug("cmd", "ClusterCommand", "find", "block");
+            getMedusaEntryDAO().find_(x, id); // blocking
+          }
+        }
+        getLogger().debug("cmd", "ClusterCommand", "return");
+        return cmd;
       }
       getLogger().debug("cmd", "getClientDAO");
       return getClientDAO().cmd_(x, obj);
