@@ -719,10 +719,9 @@ foam.CLASS({
       if ( this.level === 0 ) {
         if ( foam.Array.isInstance(this.rootProperty) )
           return [[this.rootProperty[0]]];
-        else
-          return [this.rootProperty];
-      } else 
-        return [this.rootProperty[0]];
+        return [this.rootProperty];
+      }
+      return [this.rootProperty[0]];
     },
     function updateOnSearch(query) {
       if ( ! this.hasSubProperties ) {
