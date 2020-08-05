@@ -126,7 +126,7 @@ foam.CLASS({
         Returns the list of prerequisiteCapabilityJunctions for the target capability of the ucj
       `, 
       javaCode: `
-        DAO prerequisiteCapabilityJunctionDAO = (DAO) (x.get("prerequisiteCapabilityJunctionDAO"));
+        DAO prerequisiteCapabilityJunctionDAO = (DAO) x.get("prerequisiteCapabilityJunctionDAO");
 
         // get a list of the prerequisite junctions where the current capability is the dependent
         List<CapabilityCapabilityJunction> ccJunctions = (List<CapabilityCapabilityJunction>) ((ArraySink) prerequisiteCapabilityJunctionDAO
