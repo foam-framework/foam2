@@ -36,7 +36,7 @@ foam.CLASS({
             if ( ucj.getStatus() == CapabilityJunctionStatus.ACTION_REQUIRED ) return;
           
 
-            // the following should be checked iff the result of previous rule ( validateUCJDataOnPut ) 
+            // the following should be checked if the result of previous rule ( validateUCJDataOnPut ) 
             // is not ACTION_REQUIRED. In the ACTION_REQUIRED case, the ucj should be put into the
             // dao without any additional checks
             Capability capability = (Capability) ucj.findTargetId(x);
@@ -72,7 +72,7 @@ foam.CLASS({
       ],
       type: 'CapabilityJunctionStatus',
       documentation: `
-        Check statuses of all preRequist capabilities - returning:
+        Check statuses of all prerequisite capabilities - returning:
         GRANTED: If all pre-reqs are in granted status
         PENDING: At least one pre-req is still in pending status
         ACTION_REQUIRED: If not any of the above
@@ -126,7 +126,7 @@ foam.CLASS({
         Returns the list of prerequisiteCapabilityJunctions for the target capability of the ucj
       `, 
       javaCode: `
-        DAO prerequisiteCapabilityJunctionDAO = (DAO) (x.get("prerequisiteCapabilityJunctionDAO"));
+        DAO prerequisiteCapabilityJunctionDAO = (DAO) x.get("prerequisiteCapabilityJunctionDAO");
 
         // get a list of the prerequisite junctions where the current capability is the dependent
         List<CapabilityCapabilityJunction> ccJunctions = (List<CapabilityCapabilityJunction>) ((ArraySink) prerequisiteCapabilityJunctionDAO
