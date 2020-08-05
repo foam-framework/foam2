@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'ReputDependentUCJs',
 
   documentation: `If ucj not granted or in grace_period, then the ucj is in a state where its dependents may need to be updated.
-  note: granted ucj's go through SaveUCJDataOnGranted and grace_period is really just an extension of granted.
+  note: granted ucjs go through SaveUCJDataOnGranted and grace_period is really just an extension of granted.
   `,
 
   implements: [
