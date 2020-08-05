@@ -35,7 +35,7 @@ foam.CLASS({
       return foam.Array.isInstance(col) ? col[n] : col;
     },
     function canColumnBeTreatedAsAnAxiom(context, col) {
-      return foam.core.Property.isInstance(col) || foam.Object.isInstance(col);
+      return foam.core.Property.isInstance(col) || foam.core.Action.isInstance(col) || foam.Object.isInstance(col);
     },
     function mapArrayColumnsToArrayOfColumnNames(context, cols) {
       return cols.map(c => context.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(context, c));
