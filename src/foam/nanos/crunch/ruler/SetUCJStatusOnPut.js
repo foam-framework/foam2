@@ -72,7 +72,7 @@ foam.CLASS({
       ],
       type: 'CapabilityJunctionStatus',
       documentation: `
-        Check statuses of all preRequist capabilities - returning:
+        Check statuses of all prerequisite capabilities - returning:
         GRANTED: If all pre-reqs are in granted status
         PENDING: At least one pre-req is still in pending status
         ACTION_REQUIRED: If not any of the above
