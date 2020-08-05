@@ -54,6 +54,12 @@ foam.CLASS({
     }
   ],
 
+  css: `
+    ^{
+      overflow-y: scroll;
+    }
+  `,
+
   properties: [
     {
       class: 'Class',
@@ -320,7 +326,7 @@ foam.CLASS({
               // Render the table headers for the property columns.
               forEach(columns_, function([col, overrides]) {
                 let found = view.props.find(p => p.fullPropertyName === view.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(view, col));
-                var prop = found ? found.property : view.of.getAxiomByName(view.columnHandler.returnPropertyNamesForColumn(view, col));
+                var prop = found ? found.property : view.of.getAxiomByName(view.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(view, col));
                 var isFirstLevelProperty = view.columnHandler.canColumnBeTreatedAsAnAxiom(view, col) ? true : col.indexOf('.') === -1;
 
                 if ( ! prop )
@@ -544,7 +550,7 @@ foam.CLASS({
 
                   for ( var  i = 0 ; i < view.columns_.length ; i++  ) {
                     var prop = view.props.find(p => p.fullPropertyName === view.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(view, view.columns_[i]));
-                    prop = prop ? prop.property : view.of.getAxiomByName(view.columnHandler.returnPropertyNamesForColumn(view, view.columns_[i]));
+                    prop = prop ? prop.property : view.of.getAxiomByName(view.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(view, view.columns_[i]));
 
                     if ( ! prop )
                       continue;
