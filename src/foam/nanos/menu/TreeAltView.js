@@ -24,10 +24,7 @@ foam.CLASS({
       this.views = [
         [
           { 
-            class: 'foam.u2.view.TableView',
-            css: {
-              'overflow-y': 'scroll'
-            }
+            class: 'foam.u2.view.TableView'
           },
          'Table'
         ],
