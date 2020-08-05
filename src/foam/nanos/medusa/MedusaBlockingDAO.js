@@ -52,6 +52,7 @@ foam.CLASS({
       name: 'find_',
       javaCode: `
       if ( id instanceof MedusaEntryId ) {
+        getLogger().debug("find", ((MedusaEntryId)id).getIndex());
         MedusaEntry entry = (MedusaEntry) waitOn(x, ((MedusaEntryId)id).getIndex());
         return (MedusaEntry) getDelegate().find_(x, entry.getId());
       }
@@ -62,6 +63,7 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
+      getLogger().debug("put", entry.getIndex());
       latchOn(x, entry.getIndex());
       entry = (MedusaEntry) getDelegate().put_(x, entry);
       return waitOn(x, entry.getIndex());
