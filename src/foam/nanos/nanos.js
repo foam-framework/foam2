@@ -181,6 +181,8 @@ FOAM_FILES([
   { name: "foam/nanos/medusa/MedusaDistributionDAO" },
   { name: "foam/nanos/medusa/MedusaHashingDAO" },
   { name: "foam/nanos/medusa/MedusaInternalDAO" },
+  { name: "foam/nanos/medusa/MedusaRegistry" },
+  { name: "foam/nanos/medusa/MedusaRegistryService" },
   { name: "foam/nanos/medusa/MedusaSigningDAO" },
   { name: "foam/nanos/medusa/MedusaTestingDAO" },
   { name: "foam/nanos/medusa/MedusaUniqueDAO" },

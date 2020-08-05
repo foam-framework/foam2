@@ -208,7 +208,8 @@ foam.CLASS({
         entry = (MedusaEntry) getDelegate().put_(x, entry);
 
         // Notify any blocked Primary puts
-        ((DAO) x.get("localMedusaEntryDAO")).cmd_(x, entry);
+        MedusaRegistry registry = (MedusaRegistry) x.get("medusaRegistry");
+        registry.notify(x, entry);
       } finally {
         pm.log(x);
       }

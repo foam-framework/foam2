@@ -224,9 +224,8 @@ foam.CLASS({
         if ( config.getType() == MedusaType.MEDIATOR ) {
           MedusaEntryId id = cmd.getMedusaEntryId();
           if ( id != null ) {
-            getLogger().debug("cmd", "ClusterCommand", "find", "block");
-            getMedusaEntryDAO().find_(x, id); // blocking
-            getLogger().debug("cmd", "ClusterCommand", "find", "unblock");
+            MedusaRegistry registry = (MedusaRegistry) x.get("medusaRegistry");
+            registry.wait(x, id.getIndex());
           } else {
             getLogger().debug("cmd", "ClusterCommand", "medusaEntry", "null");
           }
@@ -299,15 +298,14 @@ foam.CLASS({
       try {
         DaggerService dagger = (DaggerService) x.get("daggerService");
         entry = dagger.link(x, entry);
-        // entry.setMediator(config.getName());
         entry.setNSpecName(getNSpec().getName());
         entry.setDop(dop);
         entry.setData(data);
 
-        getLogger().debug("submit", entry.toSummary(), "block");
-        entry = (MedusaEntry) getMedusaEntryDAO().put_(x, entry); // blocking
-        // entry = (MedusaEntry) getMedusaEntryDAO().find_(x, entry.getId());
-        getLogger().debug("submit", entry.toSummary(), "unblock");
+        MedusaRegistry registry = (MedusaRegistry) x.get("medusaRegistry");
+        registry.register(x, entry.getIndex());
+        entry = (MedusaEntry) getMedusaEntryDAO().put_(x, entry);
+        registry.wait(x, entry.getIndex());
         return entry;
       } catch (Throwable t) {
         getLogger().error("submit", entry.toSummary(), t.getMessage(), t);
