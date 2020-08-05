@@ -8,7 +8,8 @@ foam.CLASS({
   package: 'foam.nanos.crunch',
   name: 'ReputDependentUCJs',
 
-  documentation: `When a ucj goes into a certain status, try to reput its dependents
+  documentation: `If ucj not granted or in grace_period, then ucj in a state where its dependents may need to be updated.
+  note: granted ucj's go through SaveUCJDataOnGranted and grace_period is really just an extension of granted.
   `,
 
   implements: [
