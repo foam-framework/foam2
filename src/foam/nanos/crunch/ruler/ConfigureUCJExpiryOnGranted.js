@@ -19,6 +19,7 @@ foam.CLASS({
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction',
+    'foam.nanos.logger.Logger',
     'java.util.Calendar',
     'java.util.Date',
     'static foam.mlang.MLang.*'
@@ -44,7 +45,11 @@ foam.CLASS({
               return;
               
             Capability capability = (Capability) ucj.findTargetId(x);
-            if ( capability == null ) throw new RuntimeException("UCJ Expiry not configured: Capability not found");
+            if ( capability == null ) {
+              Logger logger = (Logger) x.get("logger");
+              logger.debug("UCJ Expiry not configured: Capability not found for UCJ targetId : " + ucj.getSourceId());
+              return;
+            }
 
             // Only update the expiry for non-active junctions, i.e., non-expired, non-pending, or granted junctions whose expiry is not yet set
             if ( ( old != null && old.getStatus() == CapabilityJunctionStatus.GRANTED && old.getExpiry() != null ) 
