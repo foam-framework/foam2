@@ -38,8 +38,7 @@ foam.CLASS({
             boolean isOwner = ucj.getSourceId() == user.getId() || ucj.getSourceId() == realUser.getId();
             if ( isOwner ) return;
 
-            AuthService auth = (AuthService) x.get("auth");
-            boolean isAdmin = auth.check(x, "*");
+            boolean isAdmin = user.getId() == foam.nanos.auth.User.SYSTEM_USER_ID || user.getGroup().equals("admin") || user.getGroup().equals("system");
             if ( isAdmin ) return;
 
             throw new AuthorizationException("Cannot add UserCapabilityJunction. Not an admin or owner.");
