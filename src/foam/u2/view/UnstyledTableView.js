@@ -547,7 +547,7 @@ foam.CLASS({
                     prop = prop ? prop.property : view.of.getAxiomByName(view.columnHandler.returnPropertyNamesForColumn(view, view.columns_[i]));
 
                     if ( ! prop )
-                      return;
+                      continue;
 
                     var index = propertyNamesToQuery.indexOf(view.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(view, view.columns_[i]));
                     var value;
