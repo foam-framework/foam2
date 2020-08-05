@@ -145,6 +145,20 @@ foam.CLASS({
         }
       }
     },
+
+    function saveNoDataCaps(capabilities) {
+      return new Promise(wizardResolve => {
+        // save no-data capabilities (i.e. not displayed in wizard)
+        Promise.all(capabilities.filter(cap => ! cap.of).map(
+          cap => this.userCapabilityJunctionDAO.put(this.UserCapabilityJunction.create({
+            sourceId: this.subject.user.id,
+            targetId: cap.id
+          }))
+        )).then(() => {
+          wizardResolve();
+        });
+      });
+    },
   ],
 
   listeners: [
@@ -153,7 +167,7 @@ foam.CLASS({
       code: function(wizardlet) {
         try {
           wizardlet.save();
-          this.crunchController.finalOnClose(this.__subContext__, this.capabilities);
+          this.saveNoDataCaps(this.capabilities);
         } catch (err) {
           this.notify(err.message, '', this.LogLevel.ERROR, true);
         };
