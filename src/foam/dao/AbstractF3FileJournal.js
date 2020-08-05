@@ -99,7 +99,7 @@ foam.CLASS({
       class: 'Object',
       name: 'line',
       javaType: 'foam.util.concurrent.AssemblyLine',
-      javaFactory: 'return new foam.util.concurrent.SyncAssemblyLine();'
+      javaFactory: 'return new foam.util.concurrent.SyncAssemblyLine(getX());'
     },
     {
       class: 'Object',
@@ -148,7 +148,7 @@ try {
   }
   return (is == null) ? null : new BufferedReader(new InputStreamReader(is));
 } catch ( Throwable t ) {
-  getLogger().error("Failed to read from journal: " + getFilename(), t);
+  getLogger().error("Failed to initialize reader on journal", getFilename(), t);
   throw new RuntimeException(t);
 }
       `
@@ -166,7 +166,7 @@ try {
   }
   return (os == null) ? null : new BufferedWriter(new OutputStreamWriter(os));
 } catch ( Throwable t ) {
-  getLogger().error("Failed to read from journal: " + getFilename(), t);
+  getLogger().error("Failed to initialize writer on journal", getFilename(), t);
   throw new RuntimeException(t);
 }
       `

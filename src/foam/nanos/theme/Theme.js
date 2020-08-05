@@ -269,6 +269,31 @@ foam.CLASS({
     },
     {
       class: 'Color',
+      name: 'secondary1',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'secondary2',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'secondary3',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'secondary4',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'secondary5',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
       name: 'approval1',
       section: 'colours'
     },
