@@ -616,6 +616,8 @@ var classes = [
   // Crunch
   'foam.nanos.crunch.crunchtest.FakeTestObject',
   //models
+  "foam.u2.wizard.RefreshingStepWizardConfig",
+  "foam.u2.wizard.StepWizardConfig",
   'foam.nanos.crunch.Capability',
   'foam.nanos.crunch.CapabilityCategory',
   'foam.nanos.crunch.CapabilityCategoryCapabilityJunction',

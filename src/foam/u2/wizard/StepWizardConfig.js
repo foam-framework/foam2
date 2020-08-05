@@ -18,6 +18,11 @@ foam.CLASS({
       name: 'allowBacktracking',
       class: 'Boolean',
       value: true
+    },
+    {
+      name: 'onClose',
+      class: 'Function',
+      value: () => {}
     }
   ],
 })

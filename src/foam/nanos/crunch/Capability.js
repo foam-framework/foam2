@@ -226,6 +226,14 @@ foam.CLASS({
       javaFactory: `
         return foam.nanos.crunch.AssociatedEntity.USER;
       `
+    },
+    {
+      name: 'wizardConfig',
+      class: 'FObjectProperty',
+      of: 'foam.u2.wizard.StepWizardConfig',
+      documentation: `
+        Allow this capability to configure the wizard when it is the root capability.
+      `
     }
   ],
 

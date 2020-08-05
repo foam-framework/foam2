@@ -135,11 +135,15 @@ foam.CLASS({
         }).sections);
     },
 
-    function generateAndDisplayWizard(capabilitiesSections) {
+    function generateAndDisplayWizard(capability, capabilitiesSections) {
+      var maybeConfig = capability.wizardConfig
+        ? { config: capability.wizardConfig } : {};
+
       // called in CapabilityRequirementView
       return ctrl.add(this.Popup.create({ closeable: false }).tag({
         class: 'foam.u2.wizard.StepWizardletView',
         data: foam.u2.wizard.StepWizardletController.create({
+          ...maybeConfig,
           wizardlets: capabilitiesSections.wizCaps
         }),
         onClose: (x) => {
@@ -148,11 +152,11 @@ foam.CLASS({
       }));
     },
 
-    async function startWizardFlow(capabilityId, toLaunchOrNot) {
-      return this.getCapsAndWizardlets(capabilityId)
+    async function startWizardFlow(capability, toLaunchOrNot) {
+      return this.getCapsAndWizardlets(capability.id)
         .then((capabilitiesSections) => {
           // generate and popUp summary view (CapabilityRequirmentView) before wizard
-          return this.onStartShowPopRequirements(capabilityId, capabilitiesSections, toLaunchOrNot);
+          return this.onStartShowPopRequirements(capability, capabilitiesSections, toLaunchOrNot);
         });
     },
 
@@ -201,9 +205,9 @@ foam.CLASS({
           return;
         }
         var nothingTodo = ucj.status === this.CapabilityJunctionStatus.ACTION_REQUIRED;
-        return this.startWizardFlow(capability.id, nothingTodo);
+        return this.startWizardFlow(capability, nothingTodo);
       }
-      return this.startWizardFlow(capability.id, false);
+      return this.startWizardFlow(capability, false);
     },
 
     function maybeLaunchInterceptView(intercept) {
@@ -242,7 +246,7 @@ foam.CLASS({
       return intercept.promise;
     },
 
-    function onStartShowPopRequirements(capabilityId, capabilitiesSections, toLaunchOrNot) {
+    function onStartShowPopRequirements(capability, capabilitiesSections, toLaunchOrNot) {
       // toLaunchOrNot is true if ucj or capabilityId is in ActionRequired
       if ( toLaunchOrNot && capabilitiesSections.caps.length < 1 ) {
         // This is here because of a CertifyDataReviewed capability.
@@ -255,14 +259,14 @@ foam.CLASS({
         .map(eachSection => eachSection.help);
       if ( arrOfRequiredCapabilities.length < 1 ) {
         // if nothing to show don't open this dialog - push directly to wizard
-        this.generateAndDisplayWizard(capabilitiesSections);
+        this.generateAndDisplayWizard(capability, capabilitiesSections);
       } else {
         return this.ctrl.add(
           this.Popup.create({ closeable: false }, this.ctrl.__subContext__).tag({
             class: 'foam.u2.crunch.CapabilityRequirementView',
             arrayRequirement: arrOfRequiredCapabilities,
             functionData: capabilitiesSections,
-            capabilityId: capabilityId
+            capability: capability
           })).end();
       }
     },

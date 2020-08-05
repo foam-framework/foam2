@@ -99,8 +99,16 @@ foam.CLASS({
       name: 'functionData'
     },
     {
+      class: 'FObjectProperty',
+      of: 'foam.nanos.crunch.Capability',
+      name: 'capability'
+    },
+    {
       class: 'String',
-      name: 'capabilityId'
+      name: 'capabilityId',
+      expression: function (capability) {
+        return capability.id;
+      }
     }
   ],
 
@@ -161,7 +169,8 @@ foam.CLASS({
     {
       name: 'getStarted',
       code: function(x) {
-        x.crunchController.generateAndDisplayWizard(this.functionData);
+        console.log('uhh', this.capability)
+        x.crunchController.generateAndDisplayWizard(this.capability, this.functionData);
         x.closeDialog();
       }
     },
