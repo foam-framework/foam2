@@ -568,7 +568,9 @@ foam.CLASS({
             end().
             start('td').
               style({'vertical-align': 'top'}).
-              tag(this.ClassList, {title: 'Class List', showPackages: false, showSummary: true, data: Object.values(foam.USED).sort(this.MODEL_COMPARATOR)}).
+              callIf( this.MODEL_COMPARATOR, function() {
+                this.tag(this.ClassList, {title: 'Class List', showPackages: false, showSummary: true, data: Object.values(foam.USED).sort(this.MODEL_COMPARATOR)});
+              }).
             end().
             start('td').
               style({'vertical-align': 'top'}).
