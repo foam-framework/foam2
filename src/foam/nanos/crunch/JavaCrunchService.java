@@ -19,7 +19,6 @@ import static foam.mlang.MLang.*;
 public class JavaCrunchService implements CrunchService {
   public List getGrantPath(X x, String rootId) {
     Logger logger = (Logger) x.get("logger");
-    logger.info("Handling CrunchService grantPath request: " + rootId);
 
     DAO prerequisiteDAO = (DAO) x.get("prerequisiteCapabilityJunctionDAO");
     DAO capabilityDAO = (DAO) x.get("capabilityDAO");
@@ -89,13 +88,12 @@ public class JavaCrunchService implements CrunchService {
     Predicate acjPredicate = INSTANCE_OF(AgentCapabilityJunction.class);
     Predicate targetPredicate = EQ(UserCapabilityJunction.TARGET_ID, capabilityId);
     try {
-      DAO capabilityDAO = ( x.get("localCapabilityDAO") == null ) ? (DAO) x.get("capabilityDAO") : (DAO) x.get("localCapabilityDAO");
       DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
-      
-      {
+
+      if ( user != realUser ) {
         // Check if a ucj implies the subject.user has this permission
         Predicate userPredicate = AND(
-          NOT(INSTANCE_OF(AgentCapabilityJunction.class)),
+          NOT(acjPredicate),
           EQ(UserCapabilityJunction.SOURCE_ID, user.getId())
         );
         UserCapabilityJunction ucj = (UserCapabilityJunction)
@@ -106,9 +104,9 @@ public class JavaCrunchService implements CrunchService {
       }
 
       // Check if a ucj implies the subject.realUser has this permission
-      if ( realUser != null ) {
+      {
         Predicate userPredicate = AND(
-          NOT(INSTANCE_OF(AgentCapabilityJunction.class)),
+          NOT(acjPredicate),
           EQ(UserCapabilityJunction.SOURCE_ID, realUser.getId())
         );
         UserCapabilityJunction ucj = (UserCapabilityJunction)
@@ -119,9 +117,9 @@ public class JavaCrunchService implements CrunchService {
       }
 
       // Check if a ucj implies the subject.realUser has this permission in relation to the user
-      if ( realUser != null ) {
+      {
         Predicate userPredicate = AND(
-          INSTANCE_OF(AgentCapabilityJunction.class),
+          acjPredicate,
           EQ(UserCapabilityJunction.SOURCE_ID, realUser.getId()),
           EQ(AgentCapabilityJunction.EFFECTIVE_USER, user.getId())
         );
