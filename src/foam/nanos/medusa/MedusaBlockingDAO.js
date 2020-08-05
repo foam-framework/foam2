@@ -154,8 +154,10 @@ foam.CLASS({
         ReplayingInfo info = (ReplayingInfo) x.get("replayingInfo");
         if ( ! info.getReplaying() ) {
           getLogger().debug("notifyOn", id, "Latch not found", entry.toSummary());
+          latch = latchOn(x, id);
+        } else {
+          return;
         }
-        return;
       }
       MedusaEntry e = (MedusaEntry) getEntries().get(id);
       if ( e == null ) {
