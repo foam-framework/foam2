@@ -39,15 +39,20 @@ foam.CLASS({
       name: 'capabilityIDs'
     },
     {
+      class: 'FObjectArray',
+      of: 'foam.nanos.crunch.Capability',
       name: 'capabilities',
       value: []
     },
     {
+      class: 'FObjectArray',
+      of: 'foam.u2.wizard.BaseWizardlet',
       name: 'wizardlets',
       documentation: 'wizardlets for the capability',
       value: []
     },
     {
+      class: 'Array',
       name: 'wizardletSectionsList',
       documentation: `
         sections for wizardlets
@@ -140,20 +145,6 @@ foam.CLASS({
         }
       }
     },
-
-    function saveNoDataCaps(capabilities) {
-      return new Promise(wizardResolve => {
-        // save no-data capabilities (i.e. not displayed in wizard)
-        Promise.all(capabilities.filter(cap => ! cap.of).map(
-          cap => this.userCapabilityJunctionDAO.put(this.UserCapabilityJunction.create({
-            sourceId: this.subject.user.id,
-            targetId: cap.id
-          }))
-        )).then(() => {
-          wizardResolve();
-        });
-      });
-    },
   ],
 
   listeners: [
@@ -162,7 +153,7 @@ foam.CLASS({
       code: function(wizardlet) {
         try {
           wizardlet.save();
-          this.saveNoDataCaps(this.capabilities);
+          this.crunchController.finalOnClose(this.__subContext__, this.capabilities);
         } catch (err) {
           this.notify(err.message, '', this.LogLevel.ERROR, true);
         };
