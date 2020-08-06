@@ -920,9 +920,10 @@ p({
   "serviceScript":
   """
     return new foam.nanos.analytics.FoldManagerDAODecorator.Builder(x)
-      .setDelegate(new foam.dao.NullDAO.Builder(x)
-      .setOf(foam.nanos.pm.PM.getOwnClassInfo())
-      .build())
+      .setDelegate(
+        new foam.nanos.ruler.RulerDAO(x, new foam.dao.NullDAO.Builder(x)
+        .setOf(foam.nanos.pm.PM.getOwnClassInfo())
+        .build(), "pmDAO"))
       .setFm((foam.nanos.analytics.DAOFoldManager) x.get("pmFoldManager"))
       .build();
   """,
