@@ -24,11 +24,12 @@ public class ContextAgentRunnable
   }
 
   public void run() {
+    X oldX = ((ProxyX) XLocator.get()).getX();
     XLocator.set(x_);
     try {
       agent_.execute(x_);
     } finally {
-      XLocator.set(null);
+      XLocator.set(oldX);
     }
   }
 }
