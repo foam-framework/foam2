@@ -19,7 +19,11 @@ foam.CLASS({
     'foam.core.ClassInfo',
     'foam.core.ContextAgent',
     'foam.core.FObject',
-    'foam.core.X'
+    'foam.core.X',
+    'foam.dao.DAO',
+    'foam.nanos.alarming.Alarm',
+    'foam.nanos.alarming.AlarmConfig',
+    'static foam.mlang.MLang.EQ'
   ],
 
   ids: [ 'key', 'name', 'startTime' ],
@@ -125,18 +129,19 @@ foam.CLASS({
           agency.submit(x, new ContextAgent() {
             @Override
             public void execute(X x) {
-              if ( ! obj.getIsError() ) {
+              PM pm = (PM) obj;
+              if ( ! pm.getIsError() ) {
                 return;
               }
               DAO configDAO = (DAO) x.get("alarmConfigDAO");
-              PM pm = (PM) obj;
+
               AlarmConfig config = (AlarmConfig) configDAO.find(EQ(AlarmConfig.NAME, pm.getId()));
               if ( config == null || ! config.getEnabled() ) {
                 return;
               }
               DAO alarmDAO = (DAO) x.get("alarmDAO");
               Alarm alarm = (Alarm) alarmDAO.find(EQ(Alarm.NAME, config.getName()));
-              if ( ! alarm == null || alarm.getIsActive() ){
+              if ( ! (alarm == null) || alarm.getIsActive() ){
                 return;
               }
               alarm = new Alarm.Builder(x)
