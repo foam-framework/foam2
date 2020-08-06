@@ -37,7 +37,7 @@ foam.CLASS({
 
       var style = self.Style.create();
       style.addBinds(self);
-      
+
       self
         .addClass(style.myClass())
         .addClass(style.myClass('mode-circle'))
@@ -51,24 +51,21 @@ foam.CLASS({
           })
         .end()
         .start('span')
-        .call(function () {
+        .call(function() {
           var badgeWrapper = self.Element.create({ nodeName: 'SPAN' });
           this.add(badgeWrapper);
           var associatedEntity = self.data.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? self.subject.user : self.subject.realUser;
           self.userCapabilityJunctionDAO.find(
             self.AND(
+              self.EQ(self.UserCapabilityJunction.SOURCE_ID, associatedEntity.id),
+              self.EQ(self.UserCapabilityJunction.TARGET_ID, self.data.id),
               self.OR(
-                self.AND(
-                  self.NOT(self.INSTANCE_OF(self.AgentCapabilityJunction)),
-                  self.EQ(self.UserCapabilityJunction.SOURCE_ID, associatedEntity.id)
-                ),
+                self.NOT(self.INSTANCE_OF(self.AgentCapabilityJunction)),
                 self.AND(
                   self.INSTANCE_OF(self.AgentCapabilityJunction),
-                  self.EQ(self.UserCapabilityJunction.SOURCE_ID, associatedEntity.id),
                   self.EQ(self.AgentCapabilityJunction.EFFECTIVE_USER, self.subject.user.id)
                 )
-              ),
-              self.EQ(self.UserCapabilityJunction.TARGET_ID, self.data.id)
+              )
             )
           ).then(ucj => {
             var statusEnum =  foam.nanos.crunch.CapabilityJunctionStatus.AVAILABLE;

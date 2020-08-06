@@ -10,13 +10,13 @@ foam.ENUM({
     {
       name: 'PENDING',
       label: 'pending',
-      documentation: `This is for capabilities that are waiting approvals. UCJ has sent out an approval.`,
+      documentation: `This is for capabilities that are waiting verification. Capability access may take upto 24hrs.`,
       background: '#bfae32'
     },
     {
       name: 'GRANTED',
       label: 'granted',
-      documentation: `This is for capabilities that have passed all checks.`,
+      documentation: `This is for capabilities that have passed all checks. Capabilities in this status have their features unlocked.`,
       background: '#32bf5e'
     },
     {
@@ -29,7 +29,7 @@ foam.ENUM({
       name: 'ACTION_REQUIRED',
       label: 'action required',
       documentation: `A capability started and requiring user action, should have ucj in this state.`,
-      background: '#bf3232',
+      background: 'black',
       color: '#FFFFFF'
     },
     {

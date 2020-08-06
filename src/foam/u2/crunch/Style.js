@@ -164,7 +164,7 @@ foam.CLASS({
       font-stretch: normal;
       line-height: 24px;
       letter-spacing: normal;
-      text-align: right;
+      text-align: center;
       color: #ffffff;
     }
 

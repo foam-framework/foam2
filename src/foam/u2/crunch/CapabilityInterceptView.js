@@ -9,7 +9,9 @@ foam.CLASS({
   name: 'CapabilityInterceptView',
   extends: 'foam.u2.View',
 
-  implements: [ 'foam.mlang.Expressions' ],
+  implements: [
+    'foam.mlang.Expressions'
+  ],
 
   requires: [
     'foam.log.LogLevel',
@@ -35,26 +37,33 @@ foam.CLASS({
     {
       name: 'capabilityView',
       class: 'foam.u2.ViewSpec',
-      factory: function () {
+      factory: function() {
         return 'foam.u2.crunch.CapabilityCardView';
       }
     },
     {
       name: 'onClose',
       class: 'Function',
-      factory: () => (x) => {
-        x.closeDialog();
+      factory: function() {
+        return x => x.closeDialog();
       }
     }
   ],
 
   messages: [
-    { name: 'REJECTED_MSG', message: 'Your choice to bypass this was stored, please refresh page to revert cancel selection.' }
+    { name: 'REJECTED_MSG', message: 'Your choice to bypass this was stored, please refresh page to revert cancel selection.' },
+    { name: 'TITLE', message: 'Welcome to Capability unlock options' },
+    { name: 'SUBTITLE', message: 'You do not have access to undertake your previous selected action. Please select one of the following capabilities, to unlock full feature.' }
   ],
 
   css: `
+    ^{  
+      width: 47vw;
+      text-align: center;
+    }
     ^detail-container {
       overflow-y: scroll;
+      width: 40%;
     }
     ^ > *:not(:last-child) {
       margin-bottom: 24px !important;
@@ -63,7 +72,7 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.data.capabilityOptions.forEach((c) => {
+      this.data.capabilityOptions.forEach(c => {
         if ( this.capabilityCache.has(c) && this.capabilityCache.get(c) ) {
           this.aquire();
         }
@@ -72,31 +81,38 @@ foam.CLASS({
       var self = this;
       this
         .addClass(this.myClass())
-        .start(this.Rows)
-          .addClass(this.myClass('detail-container'))
-          .add(this.slot(function (data$capabilityOptions) {
-            return this.E().select(this.capabilityDAO.where(
-              self.IN(self.Capability.ID, data$capabilityOptions)
-            ), (cap) => {
-              return this.E().tag(self.capabilityView, {
-                data: cap
-              })
-                .on('click', () => {
-                  var p = self.crunchController.launchWizard(cap);
-                  p.then(() => {
-                    this.checkStatus(cap);
-                  })
+        .start('h1').add(this.TITLE).end()
+        .start('h3').add(this.SUBTITLE).end()
+        .start().style({ 'display': 'flex', 'justify-content': 'space-between' })
+          .start(this.Rows)
+            .addClass(this.myClass('detail-container'))
+            .add(this.slot(function(data$capabilityOptions) {
+              return this.E().select(this.capabilityDAO.where(
+                self.IN(self.Capability.ID, data$capabilityOptions)
+              ), cap => {
+                return this.E().tag(self.capabilityView, {
+                  data: cap
                 })
-            })
-          }))
+                  .on('click', () => {
+                    var p = self.crunchController.launchWizard(cap.id);
+                    p.then(() => {
+                      this.checkStatus(cap);
+                    });
+                  });
+              });
+            }))
+          .end()
+          .start().style({ 'width': '47%' }).tag(foam.u2.crunch.CapabilityJunctionStatusLegendView).end()
         .end()
         .startContext({ data: this })
           .tag(this.CANCEL, { buttonStyle: 'SECONDARY' })
         .endContext();
     },
+
     function checkStatus(cap) {
       // Query UCJ status
-      var associatedEntity = cap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
+      var associatedEntity = cap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ?
+        this.subject.user : this.subject.realUser;
       this.userCapabilityJunctionDAO.where(
         this.AND(
           this.OR(
@@ -131,18 +147,20 @@ foam.CLASS({
         }
       });
     },
+
     function aquire(x) {
       x = x || this.__subSubContext__;
       this.data.aquired = true;
-      this.data.capabilityOptions.forEach((c) => {
+      this.data.capabilityOptions.forEach(c => {
         this.capabilityCache.set(c, true);
       });
       this.onClose(x);
     },
+
     function reject(x) {
       x = x || this.__subSubContext__;
       this.data.cancelled = true;
-      this.data.capabilityOptions.forEach((c) => {
+      this.data.capabilityOptions.forEach(c => {
         this.capabilityCache.set(c, true);
       });
       this.notify(this.REJECTED_MSG, '', this.LogLevel.INFO, true);
@@ -157,6 +175,42 @@ foam.CLASS({
       code: function(x) {
         this.reject(x);
       }
+    }
+  ]
+});
+// todo scroll
+foam.CLASS({
+  package: 'foam.u2.crunch',
+  name: 'CapabilityJunctionStatusLegendView',
+  extends: 'foam.u2.View',
+
+  css: `
+  .badgePosition {
+
+  }
+  `,
+  methods: [
+    function initE() {
+      this.SUPER();
+      var style = foam.u2.crunch.Style.create();
+
+      this.start().style({ 'border-style': 'outset' })
+      .start('h3').add('Status Legend').end()
+      .add(foam.nanos.crunch.CapabilityJunctionStatus.VALUES.map(
+        statusEnum => {
+          return this.E().start().style({ 'display': 'inline-flex', 'padding': '12px' })
+            
+            .start().add(
+              foam.u2.view.ReadOnlyEnumView.create({
+                data: statusEnum
+              }).addClass(style.myClass('badge'))
+              .style({ 'background-color': statusEnum.background, 'margin-top': '12px', 'margin-right': '7px', 'width': '71px' })
+            ).end()
+            .start('span').style({ 'float': 'right', 'text-align': 'justify' }).add(statusEnum.documentation).end()
+          .end();
+        }
+      ))
+      .end();
     }
   ]
 });
