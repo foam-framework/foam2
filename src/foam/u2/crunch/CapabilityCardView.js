@@ -40,6 +40,10 @@ foam.CLASS({
     },
     {
       name: 'cjStatus',
+      documentation: `
+        Stores the status of the capability feature and is updated when the user
+        attempts to fill out or complete the CRUNCH forms.
+      `,
       factory: function() {
         return foam.nanos.crunch.CapabilityJunctionStatus.AVAILABLE;
       }
