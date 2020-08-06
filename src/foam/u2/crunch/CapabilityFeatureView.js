@@ -118,18 +118,15 @@ foam.CLASS({
       code: function() {
         this.userCapabilityJunctionDAO.find(
           this.AND(
+            this.EQ(this.UserCapabilityJunction.TARGET_ID, this.data.id),
+            this.EQ(this.UserCapabilityJunction.SOURCE_ID, this.associatedEntity.id),
             this.OR(
-              this.AND(
-                this.NOT(this.INSTANCE_OF(this.AgentCapabilityJunction)),
-                this.EQ(this.UserCapabilityJunction.SOURCE_ID, this.associatedEntity.id)
-              ),
+              this.NOT(this.INSTANCE_OF(this.AgentCapabilityJunction)),
               this.AND(
                 this.INSTANCE_OF(this.AgentCapabilityJunction),
-                this.EQ(this.UserCapabilityJunction.SOURCE_ID, this.associatedEntity.id),
                 this.EQ(this.AgentCapabilityJunction.EFFECTIVE_USER, this.subject.user.id)
               )
-            ),
-            this.EQ(this.UserCapabilityJunction.TARGET_ID, this.data.id)
+            )
           )
         ).then(ucj => {
           if ( ucj ) this.cjStatus = ucj.status;
