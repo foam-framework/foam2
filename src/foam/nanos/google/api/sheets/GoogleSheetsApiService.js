@@ -259,7 +259,7 @@ foam.CLASS({
         {
           name: 'extraConfig',
           type: 'Object',
-          javaType: 'foam.nanos.export.GoogleSheetsServiceConfig'
+          javaType: 'foam.nanos.export.GoogleSheetsExportDriver'
         }
       ],
       javaCode: `
@@ -267,9 +267,9 @@ foam.CLASS({
         GoogleDriveService googleDriveService = (GoogleDriveService) getX().get("googleDriveService");
         String folderId = googleDriveService.createFolderIfNotExists(x, "Nanopay Export");
         String fileName = extraConfig == null || SafetyUtil.isEmpty(extraConfig.getTitle()) ? ("NanopayExport" + new Date()) : extraConfig.getTitle();
-        String fileId = googleDriveService.createAndCopyFromFile(x, folderId, fileName);
+        String fileId = googleDriveService.createAndCopyFromFile(x, folderId, extraConfig.getTemplate().getId());
         return fileId;
-      }catch ( Throwable t ) {
+      } catch ( Throwable t ) {
         Logger l = (Logger) getX().get("logger");
         l.error(t);
         return "";

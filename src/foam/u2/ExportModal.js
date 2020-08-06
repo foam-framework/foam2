@@ -13,8 +13,10 @@ foam.CLASS({
 
   imports: [
     'exportDriverRegistryDAO',
-    'filteredTableColumns'
+    'filteredTableColumns',
+    'serviceName'
   ],
+
 
   requires: [
     'foam.u2.ModalHeader',
@@ -66,7 +68,14 @@ foam.CLASS({
       class: 'Boolean',
       name: 'isOpenAvailable'
     },
-    'exportDriver'
+    'exportDriver',
+    // {
+    //   name: 'serviceName',
+    //   class: 'String',
+    //   expression: function(data) {
+    //     return data.serviceName;
+    //   }
+    // }
   ],
 
   css: `
@@ -130,8 +139,8 @@ foam.CLASS({
         self.isConvertAvailable =  self.exportDriverReg.isConvertible;
         self.isDownloadAvailable = self.exportDriverReg.isDownloadable;
         self.isOpenAvailable = self.exportDriverReg.isOpenable;
+        self.exportDriver.serviceName = self.serviceName;
       });
-
 
       this
       .tag(this.ModalHeader.create({

@@ -7,9 +7,6 @@
 foam.CLASS({
   package: 'foam.nanos.export',
   name: 'GoogleSheetsExportDriver',
-  imports: [
-    'data'
-  ],
   implements: [ 
     'foam.nanos.export.ExportDriver',
     'foam.nanos.export.GoogleSheetsServiceConfig'
@@ -40,16 +37,20 @@ foam.CLASS({
       name: 'template',
       view: function(args, X) {
         var expr = foam.mlang.Expressions.create();
-        if ( ! X.data || ! X.data.serviceName ) return [];
+        if ( ! X.serviceName ) return [];
         return {
             class: 'foam.u2.view.ChoiceView',
             placeholder: 'templates...',
-            dao: X.reportTamplateDAO.where(expr.EQ(foam.nanos.export.report.Template.DAO_KEY, X.data.serviceName.split('/')[1])),
+            dao: X.reportTemplateDAO.where(expr.EQ(foam.nanos.export.report.Template.DAO_KEY, X.serviceName.split('/')[1])),
             objToChoice: function(a) {
-              return [a.id, a.name];
+              return [a.id, a.docTitle];
           }
         };
       },
+    },
+    {
+      name: 'serviceName',
+      class: 'String'
     }
   ],
 
@@ -88,7 +89,10 @@ foam.CLASS({
       var sheetId  = '';
       var stringArray = await self.outputter.returnTable(X, dao.of, propNames, sink.array);
 
-      sheetId = await X.googleSheetsDataExport.createSheetAndPopulateWithData(X, stringArray, metadata, this);
+      if ( this.template )
+        sheetId = await X.googleSheetsDataExport.createSheetByCopyingTemplate(X, stringArray, metadata, this);
+      else
+        sheetId = await X.googleSheetsDataExport.createSheetAndPopulateWithData(X, stringArray, metadata, this);
       if ( ! sheetId || sheetId.length == 0)
         return '';
       return `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`;

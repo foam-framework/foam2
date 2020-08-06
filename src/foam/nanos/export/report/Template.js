@@ -6,7 +6,7 @@ foam.CLASS({
       name: 'id',
       class: 'String',
       documetation: 'file id',
-      hidden: true
+      // hidden: true
     },
     {
       name: 'daoKey',
@@ -15,7 +15,7 @@ foam.CLASS({
     {
       name: 'docTitle',
       class: 'String',
-      hidden: true
+      // hidden: true
     }
   ]
 });

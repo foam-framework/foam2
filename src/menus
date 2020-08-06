@@ -273,3 +273,4 @@ p({
 })
 p({"class":"foam.nanos.menu.Menu","id":"reset","label":"Reset Password","handler":{"class":"foam.nanos.menu.ViewMenu"},"parent":"hidden"})
 p({"class":"foam.nanos.menu.Menu","id":"sign-in","label":"Sign in","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.u2.view.LoginView","mode_":"SignIn"}},"parent":"hidden"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.reportTemplates","label":"Report Templates","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"reportTemplateDAO"}},"parent":"admin"})

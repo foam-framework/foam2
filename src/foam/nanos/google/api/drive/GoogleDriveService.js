@@ -178,11 +178,11 @@ foam.CLASS({
           .setApplicationName("nanopay")
           .build();
         File fileMetadata = new File();
-        fileMetadata.setName(title);
+        fileMetadata.setName("title");
         if ( folderId != null ) {
           fileMetadata.setParents(new ArrayList<String>() {{ add(folderId); }});
         }
-        fileMetadata.setMimeType("application/vnd.google-apps.spreadsheet");
+        // fileMetadata.setMimeType("application/vnd.google-apps.spreadsheet");
 
         File file = service.files().create(fileMetadata)
           .setFields("id")
