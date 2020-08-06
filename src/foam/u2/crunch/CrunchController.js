@@ -15,6 +15,7 @@ foam.CLASS({
   ],
 
   imports: [
+    'auth',
     'capabilityDAO',
     'ctrl',
     'prerequisiteCapabilityJunctionDAO',
@@ -170,6 +171,17 @@ foam.CLASS({
         )).then(() => {
           wizardResolve();
         });
+        debugger;
+
+        if ( capabilities.length == 1 && capabilities[0].id === "554af38a-8225-87c8-dfdf-eeb15f71215e-demo1" ) {
+          this.auth.logout().then(function() {
+            if ( alert('Please log in again to start a session as a business') ) {}
+            else {
+              self.window.location.hash = '';
+              self.window.location.reload();
+            }
+          });
+        }
       });
     },
 

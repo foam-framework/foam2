@@ -20,13 +20,16 @@ foam.CLASS({
     'foam.mlang.sink.Count',
     'java.util.Date',
     'java.util.List',
+    'foam.nanos.auth.AuthorizationException',
+    'foam.nanos.auth.Authorizer',
     'static foam.mlang.MLang.*'
   ],
 
   implements: [
     'foam.mlang.Expressions',
     'foam.nanos.auth.LastModifiedAware',
-    'foam.nanos.auth.LastModifiedByAware'
+    'foam.nanos.auth.LastModifiedByAware',
+    'foam.nanos.auth.Authorizable'
   ],
 
   tableColumns: [
@@ -223,7 +226,25 @@ foam.CLASS({
       javaFactory: `
         return foam.nanos.crunch.AssociatedEntity.USER;
       `
-    }
+    },
+    {
+      name: 'visibilityCondition',
+      class: 'foam.mlang.predicate.PredicateProperty',
+      readVisibility: 'HIDDEN',
+      javaFactory: `
+      return foam.mlang.MLang.TRUE;
+      `
+    },
+    {
+      name: 'defaultAuthorizer',
+      class: 'Object',
+      flags: ['java'],
+      javaType: 'foam.nanos.auth.Authorizer',
+      javaFactory: `
+        return new foam.nanos.auth.StandardAuthorizer(getClass().getSimpleName().toLowerCase());
+      `,
+      readVisibility: 'HIDDEN'
+    },
   ],
 
 
@@ -306,6 +327,55 @@ foam.CLASS({
       Date capabilityExpiry = getExpiry();
 
       return today.after(capabilityExpiry);
+      `
+    },
+    {
+      name: 'authorizeOnCreate',
+      args: [
+        { name: 'x', type: 'Context' }
+      ],
+      javaThrows: ['AuthorizationException'],
+      javaCode: `
+        ( getDefaultAuthorizer()).authorizeOnCreate(x, this);
+      `
+    },
+    {
+      name: 'authorizeOnRead',
+      args: [
+        { name: 'x', type: 'Context' }
+      ],
+      javaThrows: ['AuthorizationException'],
+      javaCode: `
+        if ( getVisibilityCondition() == null ) {
+          return;
+        }
+        try {
+          if ( getVisibilityCondition().f(x) ) return;
+          throw new AuthorizationException();
+        } catch ( AuthorizationException e ) {
+          throw new AuthorizationException("You do not have permission to view this capability : " + getName());
+        }
+      `
+    },
+    {
+      name: 'authorizeOnUpdate',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'oldObj', type: 'foam.core.FObject' }
+      ],
+      javaThrows: ['AuthorizationException'],
+      javaCode: `
+        ( getDefaultAuthorizer()).authorizeOnUpdate(x, oldObj, this);
+      `
+    },
+    {
+      name: 'authorizeOnDelete',
+      args: [
+        { name: 'x', type: 'Context' }
+      ],
+      javaThrows: ['AuthorizationException'],
+      javaCode: `
+        ( getDefaultAuthorizer()).authorizeOnDelete(x, this);
       `
     }
   ]
