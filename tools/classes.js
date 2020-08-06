@@ -630,7 +630,13 @@ var classes = [
   'foam.nanos.crunch.SendNotificationOnTopLevelCapabilityStatusUpdate',
   'foam.nanos.crunch.IsUserCapabilityJunctionStatusUpdate',
   'foam.nanos.crunch.RemoveJunctionsOnUserRemoval',
-  'foam.nanos.crunch.CascadeInvalidate',
+  'foam.nanos.crunch.ReputDependentUCJs',
+  //ucjdao rules
+  'foam.nanos.crunch.ruler.CheckUCJOwnershipOnPut',
+  'foam.nanos.crunch.ruler.ValidateUCJDataOnPut',
+  'foam.nanos.crunch.ruler.SetUCJStatusOnPut',
+  'foam.nanos.crunch.ruler.ConfigureUCJExpiryOnGranted',
+  'foam.nanos.crunch.ruler.SaveUCJDataOnGranted',
   //authservice
   'foam.nanos.auth.CapabilityAuthService',
   // userQueryService
