@@ -223,18 +223,18 @@ foam.CLASS({
         return a;
       }
       prompt = this.Popup.create().tag(this.SimpleActionDialog, {
-        title: 'Confirm Wizard Cancellation',
-        body: 'You are closing this wizard. How do you wish to proceed?',
+        title: 'Confirm Wizard Dismissal',
+        body: 'You are about to dismiss the wizard. Are you sure?',
         actions: [
-          actionWrap(this.DISCARD),
-          actionWrap(this.SAVE_AND_CLOSE),
           this.Action.create({
             name: 'cancel',
-            label: 'Cancel',
+            label: 'No, I want to continue',
             code: () => {
               prompt.close();
             }
-          })
+          }),
+          actionWrap(this.SAVE_AND_CLOSE),
+          actionWrap(this.DISCARD)
         ]
       });
       ctrl.add(prompt);
@@ -244,7 +244,7 @@ foam.CLASS({
   actions: [
     {
       name: 'discard',
-      label: 'Discard Changes',
+      label: 'Dismiss',
       isAvailable: function () {
         return this.showDiscardOption;
       },
@@ -255,7 +255,7 @@ foam.CLASS({
     },
     {
       name: 'saveAndClose',
-      label: 'Save for Later',
+      label: 'Save & Dismiss',
       code: function(x) {
         this.data.saveProgress().then(() => {
           this.onClose(x);
