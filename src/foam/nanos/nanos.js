@@ -249,6 +249,7 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/NotificationCitationView'},
   { name: 'foam/nanos/notification/NotificationNotificationView'},
   { name: 'foam/nanos/notification/NotificationHostnameRuleAction'},
+  { name: 'foam/nanos/notification/SlackSetting' },
   { name: 'foam/nanos/notification/ToastNotificationDAO' },
   { name: 'foam/nanos/notification/ToastState' },
   { name: 'foam/nanos/notification/notifications/ScriptRunNotification'},
