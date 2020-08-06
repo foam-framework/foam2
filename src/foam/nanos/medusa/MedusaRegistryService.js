@@ -172,7 +172,7 @@ foam.CLASS({
       if ( latch == null ) {
         ReplayingInfo info = (ReplayingInfo) x.get("replayingInfo");
         if ( ! info.getReplaying() ) {
-          getLogger().warning("notify", id, "Latch not found", entry.toSummary());
+          getLogger().debug("notify", id, "Latch not found", entry.toSummary());
         }
         return;
       }

@@ -29,14 +29,11 @@ foam.CLASS({
         final Object               id  = obj.getProperty("id");
 
         getLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
-          FObject old;
-
           public Object[] requestLocks() {
             return new Object[] { id };
           }
 
           public void executeUnderLock() {
-            old = dao.find_(x, id);
             dao.put_(x, obj);
           }
         });
