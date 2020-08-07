@@ -256,6 +256,7 @@ foam.CLASS({
     {
       name: 'buildProjectionForPropertyNamesArray',
       type: 'Any',
+      javaType: 'foam.mlang.sink.Projection',
       args: [
         {
           name: 'of',

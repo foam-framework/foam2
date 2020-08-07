@@ -6,7 +6,6 @@ foam.CLASS({
       name: 'id',
       class: 'String',
       documetation: 'file id',
-      // hidden: true
     },
     {
       name: 'daoKey',
@@ -15,7 +14,11 @@ foam.CLASS({
     {
       name: 'docTitle',
       class: 'String',
-      // hidden: true
+    },
+    {
+      class: 'StringArray',
+      name: 'columnNames',
+      documentation: 'List of property names which required for template'
     }
   ]
 });

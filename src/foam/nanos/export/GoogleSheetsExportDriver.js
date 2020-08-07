@@ -90,7 +90,7 @@ foam.CLASS({
       var stringArray = await self.outputter.returnTable(X, dao.of, propNames, sink.array);
 
       if ( this.template )
-        sheetId = await X.googleSheetsDataExport.createSheetByCopyingTemplate(X, stringArray, metadata, this);
+        sheetId = await X.googleSheetsDataExport.createSheetByCopyingTemplate(X, stringArray, propNames, metadata, this);
       else
         sheetId = await X.googleSheetsDataExport.createSheetAndPopulateWithData(X, stringArray, metadata, this);
       if ( ! sheetId || sheetId.length == 0)
