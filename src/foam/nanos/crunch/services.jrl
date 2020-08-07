@@ -68,12 +68,16 @@ p({
   "class":"foam.nanos.boot.NSpec",
   "name":"userCapabilityJunctionDAO",
   "serve":true,
-  "serviceScript":"""
+  "serviceScript":"""    
+    decorator = new foam.nanos.audit.AuditDAO.Builder(x)
+      .setDelegate(new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.crunch.UserCapabilityJunction.getOwnClassInfo()).build())
+      .build();
     dao = new foam.dao.EasyDAO.Builder(x)
       .setAuthorize(false)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("userCapabilityJunctions")
       .setOf(foam.nanos.crunch.UserCapabilityJunction.getOwnClassInfo())
+      .setDecorator(decorator)
       .build();
     userCap =  new foam.nanos.crunch.UserCapabilityJunctionDAO.Builder(x).setDelegate(dao).build();
     ruler = new foam.nanos.ruler.RulerDAO(x, userCap, "userCapabilityJunctionDAO");
