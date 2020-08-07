@@ -89,10 +89,20 @@ foam.CLASS({
             newStatus = CapabilityJunctionStatus.ACTION_REQUIRED;
             break;
           case PENDING : 
-            newStatus = reviewRequired ? CapabilityJunctionStatus.APPROVED : CapabilityJunctionStatus.PENDING;
+            newStatus = reviewRequired && 
+              ( newStatus == CapabilityJunctionStatus.APPROVED || 
+                newStatus == CapabilityJunctionStatus.GRANTED || 
+                newStatus == CapabilityJunctionStatus.GRACE_PERIOD 
+              ) ? 
+                CapabilityJunctionStatus.APPROVED : CapabilityJunctionStatus.PENDING;
             break;
           case APPROVED : 
-            newStatus = reviewRequired ? CapabilityJunctionStatus.APPROVED : CapabilityJunctionStatus.PENDING;
+            newStatus = reviewRequired && 
+            ( newStatus == CapabilityJunctionStatus.APPROVED || 
+              newStatus == CapabilityJunctionStatus.GRANTED || 
+              newStatus == CapabilityJunctionStatus.GRACE_PERIOD 
+            ) ? 
+              CapabilityJunctionStatus.APPROVED : CapabilityJunctionStatus.PENDING;
             break;
           case EXPIRED :
             newStatus = CapabilityJunctionStatus.ACTION_REQUIRED;
