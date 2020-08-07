@@ -289,6 +289,9 @@ foam.CLASS({
       if ( previousScreen !== null ) {
         this.wizardPosition = previousScreen;
       }
+    },
+    function onClose(x) {
+      this.config.onClose(x);
     }
   ]
 });
