@@ -165,6 +165,10 @@ foam.CLASS({
         {
           name: 'title',
           javaType: 'String'
+        },
+        {
+          name: 'templateId',
+          javaType: 'String'
         }
       ],
       javaThrows: [
@@ -178,17 +182,12 @@ foam.CLASS({
           .setApplicationName("nanopay")
           .build();
         File fileMetadata = new File();
-        fileMetadata.setName("title");
+        fileMetadata.setName(title);
         if ( folderId != null ) {
           fileMetadata.setParents(new ArrayList<String>() {{ add(folderId); }});
         }
         // fileMetadata.setMimeType("application/vnd.google-apps.spreadsheet");
-
-        File file = service.files().create(fileMetadata)
-          .setFields("id")
-          .execute();
-
-        file = service.files().copy("1Hz6kGY4EycCzOtlRPfU75WvVgMUlt42SzK-W6-JpVtY", file)
+        File file = service.files().copy(templateId, fileMetadata)
           .setFields("id")
           .execute();
 
