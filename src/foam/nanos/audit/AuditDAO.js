@@ -63,9 +63,13 @@ foam.CLASS({
         Logger  logger   = (Logger) x.get("logger");
         FObject current  = this.find_(x, obj);
         Object  objectId = obj.getProperty("id");
-    
-        logger.info("CHANGE", objectId, user.getId(), formatMessage(current, obj));
-    
+
+        if ( current == null ) {
+          logger.info("CREATE", objectId, user.getId(), getOutputter().toString());
+        } else {
+          logger.info("CHANGE", objectId, user.getId(), formatMessage(current, obj));
+        }
+
         return super.put_(x, obj);
       `
     },

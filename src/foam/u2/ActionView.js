@@ -80,7 +80,7 @@ foam.CLASS({
      */
 
     ^primary {
-      border-color: #4a33f4;
+      border-color: /*%SECONDARY1%*/ #4a33f4;
       background-color: /*%PRIMARY3%*/ #406dea;
       color: white;
     }
@@ -145,7 +145,7 @@ foam.CLASS({
     }
 
     ^secondary:focus:not(:hover) {
-      border-color: #432de7;
+      border-color: /*%SECONDARY2%*/ #432de7;
       color: /*%PRIMARY2%*/ #144794;
     }
 
@@ -193,7 +193,7 @@ foam.CLASS({
     }
 
     ^tertiary:focus:not(:hover) {
-      border-color: #4a33f4;
+      border-color: /*%SECONDARY1%*/ #4a33f4;
     }
 
     ^tertiary:disabled {

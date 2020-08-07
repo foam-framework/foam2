@@ -10,16 +10,16 @@ foam.CLASS({
 
   documentation: 'Performance Measurement database entry.',
 
-  ids: [ 'id', 'name' ],
+  ids: [ 'key', 'name' ],
 
-  tableColumns: [ 'id', 'name', 'count', 'minTime', 'average', 'maxTime', 'totalTime' ],
+  tableColumns: [ 'key', 'name', 'count', 'minTime', 'average', 'maxTime', 'totalTime' ],
 
-  searchColumns: [ 'id', 'name' ],
+  searchColumns: [ 'key', 'name' ],
 
   properties: [
     {
       class: 'String',
-      name: 'id',
+      name: 'key',
       label: 'Class',
       tableWidth: 170,
       tableCellFormatter: function(cls) {

@@ -11,21 +11,27 @@ foam.CLASS({
   documentation: `A Performance Measure which captures the count and duration of some event.`,
 
   implements: [
-    'foam.nanos.analytics.Foldable'
+    'foam.nanos.analytics.Foldable',
+    'foam.nanos.ruler.RuleAction'
   ],
 
   javaImports: [
     'foam.core.ClassInfo',
+    'foam.core.ContextAgent',
     'foam.core.FObject',
-    'foam.core.X'
+    'foam.core.X',
+    'foam.dao.DAO',
+    'foam.nanos.alarming.Alarm',
+    'foam.nanos.alarming.AlarmConfig',
+    'static foam.mlang.MLang.EQ'
   ],
 
-  ids: [ 'id', 'name', 'startTime' ],
+  ids: [ 'key', 'name', 'startTime' ],
 
   properties: [
     {
       class: 'String',
-      name: 'id'
+      name: 'key'
     },
     {
       class: 'String',
@@ -95,7 +101,7 @@ foam.CLASS({
     {
       name: 'doFolds',
       javaCode: `
-    fm.foldForState(getId()+":"+getName(), getStartTime(), getTime());
+    fm.foldForState(getKey()+":"+getName(), getStartTime(), getTime());
       `
     },
     {
@@ -105,17 +111,47 @@ foam.CLASS({
         { name: 'args', type: 'Object...' }
       ],
       javaCode: `
-        String str = "";
         setIsError(true);
+        StringBuilder sb = new StringBuilder();
         for (Object obj: args) {
-          if ( obj instanceof java.lang.Exception ) {
+          if ( obj instanceof Exception ) {
             setException(obj);
-            str += ((Exception) obj).getMessage() + ",";
+            sb.append(((Exception) obj).getMessage()).append(",");
           }
         }
-        if ( str.length() > 0 )
-          setErrorMessage(str.substring(0, str.length() - 1));
+        if ( sb.length() > 0 )
+          setErrorMessage(sb.deleteCharAt(sb.length() - 1).toString());
       `
+    },
+    {
+      name: 'applyAction',
+      javaCode: `
+          agency.submit(x, new ContextAgent() {
+            @Override
+            public void execute(X x) {
+              PM pm = (PM) obj;
+              if ( ! pm.getIsError() ) {
+                return;
+              }
+              DAO configDAO = (DAO) x.get("alarmConfigDAO");
+
+              AlarmConfig config = (AlarmConfig) configDAO.find(EQ(AlarmConfig.NAME, pm.getId()));
+              if ( config == null || ! config.getEnabled() ) {
+                return;
+              }
+              DAO alarmDAO = (DAO) x.get("alarmDAO");
+              Alarm alarm = (Alarm) alarmDAO.find(EQ(Alarm.NAME, config.getName()));
+              if ( ! (alarm == null) || alarm.getIsActive() ){
+                return;
+              }
+              alarm = new Alarm.Builder(x)
+                .setName(config.getName())
+                .setIsActive(true)
+                .build();
+              alarmDAO.put(alarm);
+            }
+          }, "PM alarm");
+     `
     }
   ],
   axioms: [
@@ -129,7 +165,7 @@ foam.CLASS({
 
               if ( pm == null ) return new PM(fo, name);
 
-              pm.setId(fo.getClassInfo().getId());
+              pm.setKey(fo.getClassInfo().getId());
               pm.setName(combine(name));
               pm.init_();
 
@@ -141,7 +177,7 @@ foam.CLASS({
 
               if ( pm == null ) return new PM(clsInfo, name);
 
-              pm.setId(clsInfo.getId());
+              pm.setKey(clsInfo.getId());
               pm.setName(combine(name));
               pm.init_();
 
@@ -150,7 +186,7 @@ foam.CLASS({
 
             public PM(ClassInfo clsInfo, String... name) {
               setName(combine(name));
-              setId(clsInfo.getId());
+              setKey(clsInfo.getId());
               init_();
             }
 
@@ -159,7 +195,7 @@ foam.CLASS({
               foam.core.ClassInfoImpl clsInfo = new foam.core.ClassInfoImpl();
               clsInfo.setObjClass(cls);
               clsInfo.setId(cls.getName());
-              setId(clsInfo.getId());
+              setKey(clsInfo.getId());
               init_();
             }
 
@@ -168,22 +204,22 @@ foam.CLASS({
             }
 
             public PM(Object... args) {
-              setId(args[0].toString());
-              String str = "";
+              setKey(args[0].toString());
+              StringBuilder sb = new StringBuilder();
               for (Object obj: java.util.Arrays.copyOfRange(args, 1, args.length)){
-                str += obj.toString() + ":";
+                sb.append(obj.toString()).append(":");
               }
-              if ( str.length() > 0 )
-                setName(str.substring(0, str.length() - 1));
+              if ( sb.length() > 0 )
+                setName(sb.deleteCharAt(sb.length() - 1).toString());
               init_();
             }
 
             private static String combine(String... args) {
-              String str = "";
+              StringBuilder sb = new StringBuilder();
               for ( String s: args) {
-                str += s + ":";
+                sb.append(s).append(":");
               }
-              return str.substring(0, str.length() - 1);
+              return sb.deleteCharAt(sb.length() - 1).toString();
             }
           `
         }));
