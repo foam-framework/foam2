@@ -18,7 +18,7 @@ foam.CLASS({
     {
       name: 'threadsPerCore',
       class: 'Int',
-      value: 8
+      value: 250
     },
     {
       class: 'Int',
