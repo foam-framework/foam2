@@ -46,7 +46,11 @@ foam.CLASS({
         // effectively writing out logs twice. 
         if ( lm.getSeverity().getOrdinal() >= LogLevel.INFO.getOrdinal() ||
             getMode() != Mode.PRODUCTION ) {
-          System.out.println(lm.getCreated() + ","+lm.getThread()+","+lm.getSeverity()+","+lm.getMessage());
+          if ( lm.getSeverity() == LogLevel.ERROR ) {
+            System.err.println(lm.getCreated() + ","+lm.getThread()+","+lm.getSeverity()+","+lm.getMessage());
+          } else {
+            System.out.println(lm.getCreated() + ","+lm.getThread()+","+lm.getSeverity()+","+lm.getMessage());
+          }
         }
       }
       return lm;

@@ -155,7 +155,7 @@ foam.CLASS({
       if ( ! this.choices.length ) {
         this.onDetach(this.of$.sub(this.updateChoices));
         this.updateChoices();
-        await this.choicesLoaded;
+        this.choicesLoaded;
       }
 
       function dataToClass(d) {

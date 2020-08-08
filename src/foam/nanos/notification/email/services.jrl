@@ -26,10 +26,10 @@ p({
       .setCreatedAware(true)
       .setSeqNo(true)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName(\"emailMessages\")
+      .setJournalName("emailMessages")
       .setFixedSize(new foam.dao.FixedSizeDAO.Builder(x)
         .setComparator(foam.mlang.MLang.DESC(foam.nanos.notification.email.EmailMessage.CREATED))
-        .setSize(1000)
+        .setSize(10000)
         .build())
       .setIndex(new foam.core.PropertyInfo[] {foam.nanos.notification.email.EmailMessage.CREATED})
       .build();
