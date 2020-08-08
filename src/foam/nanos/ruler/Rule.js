@@ -427,7 +427,7 @@
       javaCode: `
         var auth = (AuthService) x.get("auth");
         if ( ! auth.check(x, "rule.create")
-          || ! auth.check(x, "spid.read." + getSpid())
+          && ! auth.check(x, "spid.update." + getSpid())
         ) {
           throw new AuthorizationException("You do not have permission to create the rule.");
         }
@@ -438,7 +438,7 @@
       javaCode: `
         var auth = (AuthService) x.get("auth");
         if ( ! auth.check(x, "rule.read." + getId())
-          || ! auth.check(x, "spid.read." + getSpid())
+          && ! auth.check(x, "spid.read." + getSpid())
         ) {
           throw new AuthorizationException("You do not have permission to read the rule.");
         }
@@ -449,7 +449,7 @@
       javaCode: `
         var auth = (AuthService) x.get("auth");
         if ( ! auth.check(x, "rule.update." + getId())
-          || ! auth.check(x, "spid.read." + getSpid())
+          && ! auth.check(x, "spid.update." + getSpid())
         ) {
           throw new AuthorizationException("You do not have permission to update the rule.");
         }
@@ -460,7 +460,7 @@
       javaCode: `
         var auth = (AuthService) x.get("auth");
         if ( ! auth.check(x, "rule.remove." + getId())
-          || ! auth.check(x, "spid.read." + getSpid())
+          && ! auth.check(x, "spid.update." + getSpid())
         ) {
           throw new AuthorizationException("You do not have permission to delete the rule.");
         }
