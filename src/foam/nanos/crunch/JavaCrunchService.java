@@ -56,6 +56,7 @@ public class JavaCrunchService implements CrunchService {
         for ( Map.Entry<String,Integer> entry : alreadyListed.entrySet() ) {
           int newIndex = entry.getValue();
           if ( newIndex > previousIndex ) newIndex--;
+          newAlreadyListed.put(entry.getKey(), newIndex);
         }
         alreadyListed = newAlreadyListed;
       }
