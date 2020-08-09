@@ -128,7 +128,7 @@ foam.CLASS({
         FObject nu = getDelegate().put_(x, obj);
         String data = data(x, nu, old, DOP.PUT);
         if ( SafetyUtil.isEmpty(data) ) {
-          getLogger().info("put", "primary", obj.getProperty("id"), "data", "no delta");
+          getLogger().debug("put", "primary", obj.getProperty("id"), "data", "no delta");
         } else {
           MedusaEntry entry = (MedusaEntry) submit(x, data, DOP.PUT);
           if ( cmd != null ) {
