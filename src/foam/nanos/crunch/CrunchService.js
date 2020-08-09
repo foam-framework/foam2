@@ -10,7 +10,7 @@ foam.INTERFACE({
     {
       name: 'getGrantPath',
       documentation: `
-        getGrantPath provides a an array of capability objects representing
+        getGrantPath provides an array of capability objects representing
         the list of capabilities required to grant the desired capability.
       `,
       async: true,
