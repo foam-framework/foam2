@@ -40,7 +40,6 @@ foam.CLASS({
         if ( ! X.serviceName ) return [];
         return {
             class: 'foam.u2.view.ChoiceView',
-            placeholder: 'templates...',
             dao: X.reportTemplateDAO.where(expr.EQ(foam.nanos.export.report.Template.DAO_KEY, X.serviceName.split('/')[1])),
             objToChoice: function(a) {
               return [a.id, a.docTitle];
@@ -78,7 +77,7 @@ foam.CLASS({
 
       var columnConfig = X.columnConfigToPropertyConverter;
 
-      var propNames = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(dao.of);
+      var propNames = this.template && this.template.columnNames && this.template.columnNames.length > 0 ? this.template.columnNames : X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(dao.of);
       propNames = columnConfig.filterExportedProps(dao.of, propNames);
 
       var metadata = await self.outputter.getColumnMethadata(X, dao.of, propNames);
@@ -90,7 +89,7 @@ foam.CLASS({
       var stringArray = await self.outputter.returnTable(X, dao.of, propNames, sink.array);
 
       if ( this.template )
-        sheetId = await X.googleSheetsDataExport.createSheetByCopyingTemplate(X, stringArray, propNames, metadata, this);
+        sheetId = await X.googleSheetsDataExport.createSheetByCopyingTemplate(X, stringArray, metadata, this);
       else
         sheetId = await X.googleSheetsDataExport.createSheetAndPopulateWithData(X, stringArray, metadata, this);
       if ( ! sheetId || sheetId.length == 0)
