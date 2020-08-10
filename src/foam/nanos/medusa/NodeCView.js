@@ -86,6 +86,12 @@ foam.CLASS({
             return 'orange';
           }
         } else if ( c.status == this.Status.ONLINE ) {
+          if ( c.type == this.MedusaType.NERF ) {
+            return 'blue';
+          }
+          if ( c.type == this.MedusaType.OTHER ) {
+            return 'purple';
+          }
           return 'green';
         }
       }.bind(this));
@@ -112,7 +118,7 @@ foam.CLASS({
           radius: this.radius - this.arcWidth
         });
         this.add(replay);
-      }
+      };
 
       this.refresh();
     },
