@@ -66,7 +66,7 @@ foam.CLASS({
       padding-bottom: 10px;
     }
 
-    ^left-arrow { 
+    ^left-arrow {
       width: 3%;
       float: left;
       transform: scaleX(-1);
@@ -76,7 +76,7 @@ foam.CLASS({
       -webkit-transition: padding 2s;
     }
 
-    ^right-arrow { 
+    ^right-arrow {
       width: 3%;
       float: right;
       display: flex;
@@ -169,23 +169,26 @@ foam.CLASS({
 
       self
         .addClass(self.myClass())
-        .start(self.Tabs)
-          .start(self.Tab, { label: this.TAB_ALL, selected: true })
-              .add(self.renderFeatured())
-            .add(self.accountAndAccountingCard())
-          .end()
-          // TODO: replace this .call with a .select once
-          //       duplication error is fixed
-          .call(function() {
-            self.visibleCategoryDAO.select().then(a => {
-              for ( let i = 0 ; i < a.array.length ; i++ ) {
-                let category = a.array[i];
-                let e = self.Tab.create({ label: category.name })
-                  .add(self.renderSection(category));
-                this.add(e);
-              }
-            });
-          })
+        .add(self.renderFeatured())
+        .add(self.accountAndAccountingCard())
+        // NOTE: TEMPORARILY REMOVED
+        // .start(self.Tabs)
+        //   .start(self.Tab, { label: this.TAB_ALL, selected: true })
+        //     .add(self.renderFeatured())
+        //     .add(self.accountAndAccountingCard())
+        //   .end()
+        //   // TODO: replace this .call with a .select once
+        //   //       duplication error is fixed
+        //   .call(function() {
+        //     self.visibleCategoryDAO.select().then(a => {
+        //       for ( let i = 0 ; i < a.array.length ; i++ ) {
+        //         let category = a.array[i];
+        //         let e = self.Tab.create({ label: category.name })
+        //           .add(self.renderSection(category));
+        //         this.add(e);
+        //       }
+        //     });
+        //   })
         .end();
     },
 

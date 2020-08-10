@@ -161,9 +161,11 @@ foam.CLASS({
     function initializeOverlay() {
       var self = this;
 
-      this.dao.find(this.objId).then(function(val) {
-        self.obj = val;
-      });
+      if( ! this.obj ) {
+        this.dao.find(this.objId).then(function(val) {
+          self.obj = val;
+        });
+      }
 
       this.overlay_.add(this.slot(function() {
         return this.E().forEach(this.data, function(action) {

@@ -24,7 +24,12 @@ foam.CLASS({
   ],
 
   import: [
-    'resendNotificationService'
+    'resendNotificationService',
+    'notify'
+  ],
+
+  requires: [
+    'foam.log.LogLevel'
   ],
 
   tableColumns: ['id', 'body', 'notificationType', 'broadcasted', 'userId.id', 'groupId.id' ],
@@ -181,6 +186,12 @@ foam.CLASS({
     }
   ],
 
+  messages: [
+    { name: 'SEND_SUCCESS', message: 'Notification successfully resent.' },
+    { name: 'SEND_FAILED', message: 'Notification could not be resent.' }
+  ],
+
+
   methods: [
     {
       name: 'checkOwnership',
@@ -239,9 +250,10 @@ foam.CLASS({
       availablePermissions:['notification.notify'],
       code: function(X) {
         try {
-         X.resendNotificationService.resend(X, this.userId, this);
+          X.resendNotificationService.resend(X, this.userId, this);
+          X.notify(this.SEND_SUCCESS, '', this.LogLevel.INFO, true);
         } catch(e) {
-          console.error('error',e)
+          X.notify(this.SEND_FAILED, '', this.LogLevel.ERROR, true);
         }
 
       }
