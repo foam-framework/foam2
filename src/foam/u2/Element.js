@@ -1631,11 +1631,10 @@ foam.CLASS({
         } else if ( typeof c === 'function' ) {
           throw new Error('Unsupported');
         } else {
-          //foam.locale = 'fr';
           if ( typeof c === 'object' && c.data !== undefined && c.data.id !== undefined ) {
             var self = this;
             var expr = foam.mlang.Expressions.create();
-            let d =  this.__subContext__.LocaleDAO;
+            let d =  this.__subContext__.localeDAO;
             this.add(this.PromiseSlot.create({
               promise://TODO support more that one language (add language to the id)
                 d.where(expr.AND(expr.EQ(foam.i18n.Locale.LOCALE, foam.locale),expr.EQ(foam.i18n.Locale.ID, c.data.id+'.'+c.clsInfo))).select().then(function(a){

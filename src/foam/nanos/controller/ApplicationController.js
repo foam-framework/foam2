@@ -404,7 +404,7 @@ foam.CLASS({
         //TODO manage more complicated language. 'en-CA'
         if ( foam.locale !== 'en' && foam.locale !== 'en-US' ) {
           let ctx = this.__subContext__;
-          let d = await  this.__subContext__.LocaleDAO;
+          let d = await  this.__subContext__.localeDAO;
           d.select().then(e => {
             var expr = foam.mlang.Expressions.create();
             d.where(
