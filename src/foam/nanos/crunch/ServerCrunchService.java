@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Queue;
 import static foam.mlang.MLang.*;
 
-public class JavaCrunchService implements CrunchService {
+public class ServerCrunchService implements CrunchService {
   public List getGrantPath(X x, String rootId) {
     Logger logger = (Logger) x.get("logger");
 
