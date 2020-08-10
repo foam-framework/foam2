@@ -47,7 +47,7 @@ public class AuthWebAgent
 
     if ( session == null ) {
       try {
-        XLocator.set(requestX);
+        XLocator.set(x);
         templateLogin(x);
       } finally {
         XLocator.set(null);
