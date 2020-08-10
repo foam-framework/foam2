@@ -177,6 +177,7 @@ FOAM_FILES([
   { name: "foam/nanos/export/CSVTableExportDriver"},
   { name: "foam/nanos/export/ExportDriverRegistry"},
   { name: "foam/nanos/export/ExportDriver" },
+  { name: "foam/nanos/export/GoogleSheetsBasedExportDriver" },
   { name: "foam/nanos/export/GoogleSheetsExport" },
   { name: "foam/nanos/export/GoogleSheetsExportDriver" },
   { name: "foam/nanos/export/GoogleSheetsOutputter" },
