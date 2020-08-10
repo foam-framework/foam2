@@ -407,7 +407,12 @@ foam.CLASS({
           let d = await  this.__subContext__.LocaleDAO;
           d.select().then(e => {
             var expr = foam.mlang.Expressions.create();
-            d.where(expr.EQ(foam.i18n.Locale.LOCALE, foam.locale)).select().then(e => {
+            d.where(
+              expr.OR(
+                expr.EQ(foam.i18n.Locale.LOCALE, foam.locale),
+                expr.EQ(foam.i18n.Locale.LOCALE, foam.locale.substring(0,foam.locale.indexOf('-')))
+              )
+            ).select().then(e => {
               console.log( e )
               let arr = e.array;
               arr.forEach(ea =>

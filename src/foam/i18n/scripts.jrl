@@ -241,3 +241,161 @@ p({
   "notes": "",
   "lastModifiedBy": 1348
 })
+p({
+  "class": "foam.nanos.script.Script",
+  "id": "ExtractStringAxiomPerPackage",
+  "description":"get all String axiom to translate them per package",
+  "code": """
+  let used = Object.values(foam.USED)
+  let objs = used.concat(Object.values(foam.UNUSED))
+
+  objs = used.filter(p => p.package == 'net.nanopay.sme.ui.dashboard')
+
+  objs.forEach(o => {
+    !!o.messages && o.messages.forEach(m => {console.log(objs+'mm')
+      let xl = foam.i18n.Locale.create({
+        "id": o.id+'.'+foam.String.constantize(m.name),
+        "locale": 'pt',
+        "variant": 'PT',
+        "locale_variant": 'pt-PT',
+        "source": o.id+'.'+foam.String.constantize(m.name),
+        "target": m.message+' pt',
+      })
+      x.LocaleDAO.put(xl);
+    })
+
+    !!o.properties && o.properties.forEach(p => {
+      if ( !!p.label && typeof p.label != "object" ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "locale": 'pt',
+          "variant": 'PT',
+          "locale_variant": 'pt-PT',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "target": p.label+' pt',
+        })
+        x.LocaleDAO.put(xl);
+      }
+
+      if ( !!!p.label && !!p.name && ( p.class != "foam.core.Enum" && p.class != "Enum") ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "locale": 'pt',
+          "variant": 'PT',
+          "locale_variant": 'pt-PT',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "target": p.name+' pt',
+        })
+        x.LocaleDAO.put(xl);
+      }
+      if ( !!p.value && typeof p.value !== 'function' && p.name !== 'slashReplacement' && p.name !== 'code' && typeof p.value !== 'object' && ( p.class != "foam.core.Enum" && p.class != "Enum")  ) { //not for object
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.value',
+          "locale": 'pt',
+          "variant": 'PT',
+          "locale_variant": 'pt-PT',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.value',
+          "target": p.value+' pt',
+        })
+        x.LocaleDAO.put(xl);
+      }
+      if ( !!p.documentation ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.documentation',
+          "locale": 'pt',
+          "variant": 'PT',
+          "locale_variant": 'pt-PT',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.documentation',
+          "target": p.documentation+' pt',
+        })
+        x.LocaleDAO.put(xl);
+      }
+      if ( !!p.placeholder ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.placeholder',
+          "locale": 'pt',
+          "variant": 'PT',
+          "locale_variant": 'pt-PT',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.placeholder',
+          "target": p.placeholder+' pt',
+        })
+        x.LocaleDAO.put(xl);
+      }
+
+      if ( !!p.view && !!p.view.placeholder  ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.view.placeholder',
+          "locale": 'pt',
+          "variant": 'PT',
+          "locale_variant": 'pt-PT',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.view.placeholder',
+          "target": p.view.placeholder+' pt',
+        })
+        x.LocaleDAO.put(xl);
+      }
+      if ( !!p.view && !!p.view.label ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.view.label',
+          "locale": 'pt',
+          "variant": 'PT',
+          "locale_variant": 'pt-PT',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.view.label',
+          "target": p.view.label+' pt',
+        })
+        x.LocaleDAO.put(xl);
+      }
+    })
+
+    !!o.sections && !!o.sections.forEach(m => {
+      if ( !!m.title ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.SECTION_'+foam.String.constantize(m.name)+'.title',
+          "locale": 'pt',
+          "variant": 'PT',
+          "locale_variant": 'pt-PT',
+          "source": o.id+'.SECTION_'+foam.String.constantize(m.name)+'.title',
+          "target": m.title+' pt',
+        })
+        x.LocaleDAO.put(xl);
+      }
+      if ( !!m.subTitle ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.SECTION_'+foam.String.constantize(m.name)+'.subTitle',
+          "locale": 'pt',
+          "variant": 'PT',
+          "locale_variant": 'pt-PT',
+          "source": o.id+'.SECTION_'+foam.String.constantize(m.name)+'.subTitle',
+          "target": m.subTitle+' pt',
+        })
+        x.LocaleDAO.put(xl);
+      }
+    })
+
+    !!o.actions && o.actions.forEach(p => {
+      if ( !!p.label ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "locale": 'pt',
+          "variant": 'PT',
+          "locale_variant": 'pt-PT',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "target": p.label+' pt',
+        })
+        x.LocaleDAO.put(xl);
+      }
+
+      if ( !!!p.label && !!p.name ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "locale": 'pt',
+          "variant": 'PT',
+          "locale_variant": 'pt-PT',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "target": p.name+' pt',
+        })
+        x.LocaleDAO.put(xl);
+      }
+    })
+  })
+  """
+})
