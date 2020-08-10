@@ -6,10 +6,9 @@ foam.INTERFACE({
       name: 'getTitle',
       type: 'String'
     },
-    // {
-    //   name: 'getTemplate',
-    //   type: 'Object',
-    //   javaType: 'foam.nanos.export.report.Template'
-    // }
+    {
+      name: 'getTemplate',
+      type: 'String',
+    }
   ]
 });

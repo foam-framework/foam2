@@ -56,7 +56,7 @@ foam.INTERFACE({
         {
           name: 'extraConfig',
           type: 'Object',
-          javaType: 'foam.nanos.export.GoogleSheetsExportDriver'
+          javaType: 'foam.nanos.export.GoogleSheetsServiceConfig'
         }
       ]
     },
