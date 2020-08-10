@@ -17,8 +17,7 @@ public class XLocator
   };
 
   public static X set(X x) {
-    if (x != null)
-      x__.get().setX(x);
+    x__.get().setX(x);
     return x;
   }
 
