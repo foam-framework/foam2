@@ -268,6 +268,11 @@ foam.CLASS({
       class: 'String',
       name: 'javaToCSVLabel',
       value: 'outputter.outputValue(getName());'
+    },
+    {
+      class: 'String',
+      name: 'javaUnitPropValueToString',
+      value: 'return "";'
     }
   ],
 
@@ -311,7 +316,8 @@ foam.CLASS({
         validateObj:             this.javaValidateObj,
         toCSV:                   this.javaToCSV,
         toCSVLabel:              this.javaToCSVLabel,
-        fromCSVLabelMapping:     this.javaFromCSVLabelMapping
+        fromCSVLabelMapping:     this.javaFromCSVLabelMapping,
+        unitPropValueToString:   this.javaUnitPropValueToString
       });
     },
 

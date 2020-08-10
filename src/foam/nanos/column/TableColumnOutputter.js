@@ -8,6 +8,9 @@
   package: 'foam.nanos.column',
   name: 'TableColumnOutputter',
 
+  javaImports: [
+    'java.util.ArrayList'
+  ], 
 
   documentation: 'Class for returning 2d-array ( ie table ) for array of values ',
 
@@ -122,6 +125,66 @@
         }
         return columnHeaders;
       }
+    },
+    {
+      name: 'returnTableForMethadata',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'methadata',
+          type: 'foam.nanos.export.GoogleSheetsPropertyMetadata[]'
+        },
+        {
+          name: 'arrOfObjectValues',
+          javaType: 'Object[][]'
+        }
+      ],
+      javaType: 'java.util.List<java.util.List<String>>',
+      javaCode: `
+        java.util.List<java.util.List<String>> result = new ArrayList<>();
+
+        java.util.List<String> columnHeaders = new ArrayList<>();
+
+        for ( int i = 0 ; i < methadata.length ; i++ ) {
+          columnHeaders.add(methadata[i].getPropLabel());
+        }
+
+        for ( int i = 0 ; i < arrOfObjectValues.length ; i++ ) {
+          for ( int j = 0 ; j < arrOfObjectValues[i].length ; j++ ) {
+
+          }
+        }
+
+        return null;
+      `
+    },
+    {
+      name: 'returnStringValueForMethadata',
+      type: 'String',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'methadata',
+          type: 'foam.nanos.export.GoogleSheetsPropertyMetadata'
+        },
+        {
+          name: 'arrOfObjectValues',
+          javaType: 'Object'
+        },
+        {
+          name: 'unitPropMetadata',
+          type: 'foam.nanos.export.GoogleSheetsPropertyMetadata'
+        }
+      ],
+      javaCode: `
+        return "";
+      `
     }
   ]
 });

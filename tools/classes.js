@@ -399,6 +399,7 @@ var classes = [
   'foam.nanos.column.ColumnConfigToPropertyConverter',
   'foam.nanos.column.ColumnPropertyValue',
   'foam.nanos.column.NestedPropertiesExpression',
+  'foam.nanos.column.TableColumnOutputter',
   'foam.nanos.cron.Cron',
   'foam.nanos.cron.TimeHMS',
   'foam.nanos.cron.Schedule',
