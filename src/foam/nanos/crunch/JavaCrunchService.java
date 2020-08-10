@@ -91,41 +91,30 @@ public class JavaCrunchService implements CrunchService {
     try {
       DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
 
-      if ( user != realUser ) {
-        // Check if a ucj implies the subject.user has this permission
-        Predicate userPredicate = AND(
+      Predicate associationPredicate = OR(
+        AND(
           NOT(acjPredicate),
-          EQ(UserCapabilityJunction.SOURCE_ID, user.getId())
-        );
-        UserCapabilityJunction ucj = (UserCapabilityJunction)
-          userCapabilityJunctionDAO.find(AND(userPredicate,targetPredicate));
-        if ( ucj != null ) {
-          return ucj;
-        }
-      }
-
-      // Check if a ucj implies the subject.realUser has this permission
-      {
-        Predicate userPredicate = AND(
-          NOT(acjPredicate),
-          EQ(UserCapabilityJunction.SOURCE_ID, realUser.getId())
-        );
-        UserCapabilityJunction ucj = (UserCapabilityJunction)
-          userCapabilityJunctionDAO.find(AND(userPredicate,targetPredicate));
-        if ( ucj != null ) {
-          return ucj;
-        }
-      }
+          ( user != realUser )
+            // Check if a ucj implies the subject.user has this permission
+            ? OR(
+                EQ(UserCapabilityJunction.SOURCE_ID, realUser.getId()),
+                EQ(UserCapabilityJunction.SOURCE_ID, user.getId())
+              )
+            // Check if a ucj implies the subject.realUser has this permission
+            : EQ(UserCapabilityJunction.SOURCE_ID, realUser.getId())
+        ),
+        AND(
+          acjPredicate,
+          // Check if a ucj implies the subject.realUser has this permission in relation to the user
+          EQ(UserCapabilityJunction.SOURCE_ID, realUser.getId()),
+          EQ(AgentCapabilityJunction.EFFECTIVE_USER, user.getId())
+        )
+      );
 
       // Check if a ucj implies the subject.realUser has this permission in relation to the user
       {
-        Predicate userPredicate = AND(
-          acjPredicate,
-          EQ(UserCapabilityJunction.SOURCE_ID, realUser.getId()),
-          EQ(AgentCapabilityJunction.EFFECTIVE_USER, user.getId())
-        );
         UserCapabilityJunction ucj = (UserCapabilityJunction)
-          userCapabilityJunctionDAO.find(AND(userPredicate,targetPredicate));
+          userCapabilityJunctionDAO.find(AND(associationPredicate,targetPredicate));
         if ( ucj != null ) {
           return ucj;
         }
