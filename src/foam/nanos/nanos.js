@@ -91,6 +91,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/User" },
   { name: "foam/nanos/auth/PriorPassword" },
   { name: "foam/nanos/auth/ruler/AddPasswordHistoryAction" },
+  { name: "foam/nanos/auth/ruler/PreventDuplicateUsernameAction" },
   { name: "foam/nanos/auth/test/PasswordPolicyTest" },
   { name: "foam/nanos/auth/LastModifiedByAware" },
   { name: "foam/nanos/auth/LastModifiedByAwareDAO" },
@@ -249,6 +250,7 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/NotificationCitationView'},
   { name: 'foam/nanos/notification/NotificationNotificationView'},
   { name: 'foam/nanos/notification/NotificationHostnameRuleAction'},
+  { name: 'foam/nanos/notification/SlackSetting' },
   { name: 'foam/nanos/notification/ToastNotificationDAO' },
   { name: 'foam/nanos/notification/ToastState' },
   { name: 'foam/nanos/notification/notifications/ScriptRunNotification'},
@@ -323,6 +325,8 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/CapabilityCategory" },
   { name: "foam/nanos/crunch/CapabilityJunctionStatus" },
   { name: "foam/nanos/crunch/UserCapabilityJunctionRefine" },
+  { name: "foam/nanos/crunch/CapabilityCapabilityJunctionRefine" },
+  { name: "foam/nanos/crunch/CapabilityCategoryCapabilityJunctionRefine" },
   { name: "foam/nanos/crunch/AssociatedEntity" },
   //daos
   { name: "foam/nanos/crunch/UserCapabilityJunctionDAO" },
@@ -331,6 +335,8 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/IsUserCapabilityJunctionStatusUpdate" },
   { name: "foam/nanos/crunch/RemoveJunctionsOnUserRemoval" },
   { name: "foam/nanos/crunch/CascadeInvalidate" },
+  //views
+  { name: "foam/nanos/crunch/ui/CapabilityView" },
 
   // approval
   { name: 'foam/nanos/approval/ApprovalRequest' },

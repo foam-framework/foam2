@@ -31,7 +31,8 @@ foam.CLASS({
     {
       name: 'f',
       code: function(o) {
-        throw new Error('Ref is not supported');
+        //throw new Error('Ref is not supported');
+        return null;
       },
       javaCode: `
         PropertyInfo p1 = (PropertyInfo) getArg1();

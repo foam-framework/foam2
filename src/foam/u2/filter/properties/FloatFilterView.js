@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.u2.filter.properties',
   name: 'FloatFilterView',
-  extends: 'foam.u2.filter.IntegerFilterView',
+  extends: 'foam.u2.filter.properties.IntegerFilterView',
 
   documentation: `
     A SearchView for properties of type Float and Double. Lets the

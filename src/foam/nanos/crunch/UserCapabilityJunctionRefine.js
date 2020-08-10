@@ -14,7 +14,44 @@ foam.CLASS({
     capability to user.
   `,
 
+  tableColumns: [
+    'sourceId',
+    'targetId',
+    'status',
+    'created',
+    'expiry',
+    'graceDaysLeft',
+    'data'
+  ],
+
   properties: [
+    {
+      name: 'id',
+      class: 'String',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      section: 'basicInfo'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'sourceId',
+      label: 'User'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.crunch.Capability',
+      name: 'targetId',
+      label: 'Capability',
+      tableCellFormatter: function(value, obj, axiom) {
+        this.__subSubContext__.capabilityDAO
+          .find(value)
+          .then((capability) => this.add(capability.name))
+          .catch((error) => {
+            this.add(value);
+          });
+      }
+    },
     {
       name: 'created',
       class: 'DateTime',

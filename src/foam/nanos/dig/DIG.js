@@ -182,6 +182,7 @@ foam.CLASS({
     },
     {
       name: 'data',
+      section: 'details',
       visibility: function(cmd) {
         return (cmd == 'PUT') ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
       }
@@ -256,6 +257,12 @@ foam.CLASS({
       view: { class: 'foam.nanos.dig.ResultView' },
       section: 'details',
       visibility: 'RO'
+    },
+    {
+      class: 'String',
+      name: 'Description',
+      section: 'details',
+      view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 144 }
     }
   ],
 

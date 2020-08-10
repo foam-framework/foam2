@@ -11,21 +11,27 @@ foam.CLASS({
   documentation: `A Performance Measure which captures the count and duration of some event.`,
 
   implements: [
-    'foam.nanos.analytics.Foldable'
+    'foam.nanos.analytics.Foldable',
+    'foam.nanos.ruler.RuleAction'
   ],
 
   javaImports: [
     'foam.core.ClassInfo',
+    'foam.core.ContextAgent',
     'foam.core.FObject',
-    'foam.core.X'
+    'foam.core.X',
+    'foam.dao.DAO',
+    'foam.nanos.alarming.Alarm',
+    'foam.nanos.alarming.AlarmConfig',
+    'static foam.mlang.MLang.EQ'
   ],
 
-  ids: [ 'classType', 'name', 'startTime' ],
+  ids: [ 'key', 'name', 'startTime' ],
 
   properties: [
     {
-      class: 'Class',
-      name: 'classType'
+      class: 'String',
+      name: 'key'
     },
     {
       class: 'String',
@@ -43,6 +49,20 @@ foam.CLASS({
       name: 'endTime',
       class: 'DateTime'
     },
+    {
+      name: 'isError',
+      class: 'Boolean',
+      value: false
+    },
+    {
+      name: 'errorMessage',
+      class: 'String'
+    },
+    {
+      name: 'exception',
+      class: 'Object',
+      storageTransient: true
+    }
   ],
 
   methods: [
@@ -63,6 +83,7 @@ foam.CLASS({
       ],
       javaCode: `
     if ( x == null ) return;
+    if ( getIsError() ) return;
     setEndTime(new java.util.Date());
     PMLogger pmLogger = (PMLogger) x.get(DAOPMLogger.SERVICE_NAME);
     if ( pmLogger != null ) {
@@ -80,8 +101,57 @@ foam.CLASS({
     {
       name: 'doFolds',
       javaCode: `
-    fm.foldForState(getClassType().getId()+":"+getName(), getStartTime(), getTime());
+    fm.foldForState(getKey()+":"+getName(), getStartTime(), getTime());
       `
+    },
+    {
+      name: 'error',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'args', type: 'Object...' }
+      ],
+      javaCode: `
+        setIsError(true);
+        StringBuilder sb = new StringBuilder();
+        for (Object obj: args) {
+          if ( obj instanceof Exception ) {
+            setException(obj);
+            sb.append(((Exception) obj).getMessage()).append(",");
+          }
+        }
+        if ( sb.length() > 0 )
+          setErrorMessage(sb.deleteCharAt(sb.length() - 1).toString());
+      `
+    },
+    {
+      name: 'applyAction',
+      javaCode: `
+          agency.submit(x, new ContextAgent() {
+            @Override
+            public void execute(X x) {
+              PM pm = (PM) obj;
+              if ( ! pm.getIsError() ) {
+                return;
+              }
+              DAO configDAO = (DAO) x.get("alarmConfigDAO");
+
+              AlarmConfig config = (AlarmConfig) configDAO.find(EQ(AlarmConfig.NAME, pm.getId()));
+              if ( config == null || ! config.getEnabled() ) {
+                return;
+              }
+              DAO alarmDAO = (DAO) x.get("alarmDAO");
+              Alarm alarm = (Alarm) alarmDAO.find(EQ(Alarm.NAME, config.getName()));
+              if ( ! (alarm == null) || alarm.getIsActive() ){
+                return;
+              }
+              alarm = new Alarm.Builder(x)
+                .setName(config.getName())
+                .setIsActive(true)
+                .build();
+              alarmDAO.put(alarm);
+            }
+          }, "PM alarm");
+     `
     }
   ],
   axioms: [
@@ -90,64 +160,68 @@ foam.CLASS({
       buildJavaClass: function (cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-          public static PM create(X x, FObject fo, String name) {
-            PM pm = (PM) x.get("PM");
+            public static PM create(X x, FObject fo, String... name) {
+              PM pm = (PM) x.get("PM");
 
-            if ( pm == null ) return new PM(fo, name);
+              if ( pm == null ) return new PM(fo, name);
 
-            pm.setClassType(fo.getClassInfo());
-            pm.setName(name);
-            pm.init_();
+              pm.setKey(fo.getClassInfo().getId());
+              pm.setName(combine(name));
+              pm.init_();
 
-            return pm;
-          }
+              return pm;
+            }
 
-          public static PM create(X x, ClassInfo clsInfo, String name) {
-            PM pm = (PM) x.get("PM");
+            public static PM create(X x, ClassInfo clsInfo, String... name) {
+              PM pm = (PM) x.get("PM");
 
-            if ( pm == null ) return new PM(clsInfo, name);
+              if ( pm == null ) return new PM(clsInfo, name);
 
-            pm.setClassType(clsInfo);
-            pm.setName(name);
-            pm.init_();
+              pm.setKey(clsInfo.getId());
+              pm.setName(combine(name));
+              pm.init_();
 
-            return pm;
-          }
+              return pm;
+            }
 
-/*
-  public static PM create(X x, Class cls, String name) {
-    PM pm = (PM) x.get("PM");
+            public PM(ClassInfo clsInfo, String... name) {
+              setName(combine(name));
+              setKey(clsInfo.getId());
+              init_();
+            }
 
-    if ( pm == null ) return new PM(cls, name);
+            public PM(Class cls, String... name) {
+              setName(combine(name));
+              foam.core.ClassInfoImpl clsInfo = new foam.core.ClassInfoImpl();
+              clsInfo.setObjClass(cls);
+              clsInfo.setId(cls.getName());
+              setKey(clsInfo.getId());
+              init_();
+            }
 
-    pm.setClassType(cls);
-    pm.setName(name);
-    pm.init_();
+            public PM(FObject fo, String... name) {
+              this(fo.getClassInfo(), name);
+            }
 
-    return pm;
-  }
-  */
+            public PM(Object... args) {
+              setKey(args[0].toString());
+              StringBuilder sb = new StringBuilder();
+              for (Object obj: java.util.Arrays.copyOfRange(args, 1, args.length)){
+                sb.append(obj.toString()).append(":");
+              }
+              if ( sb.length() > 0 )
+                setName(sb.deleteCharAt(sb.length() - 1).toString());
+              init_();
+            }
 
-  public PM(ClassInfo clsInfo, String name) {
-    setName(name);
-    setClassType(clsInfo);
-    init_();
-  }
-
-  public PM(Class cls, String name) {
-    setName(name);
-    foam.core.ClassInfoImpl clsInfo = new foam.core.ClassInfoImpl();
-    clsInfo.setObjClass(cls);
-    clsInfo.setId(cls.getName());
-    setClassType(clsInfo);
-    init_();
-  }
-
-  public PM(FObject fo, String name) {
-    this(fo.getClassInfo(), name);
-  }
-
-`
+            private static String combine(String... args) {
+              StringBuilder sb = new StringBuilder();
+              for ( String s: args) {
+                sb.append(s).append(":");
+              }
+              return sb.deleteCharAt(sb.length() - 1).toString();
+            }
+          `
         }));
       }
     }

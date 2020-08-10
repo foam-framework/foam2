@@ -80,6 +80,7 @@ FOAM_FILES([
   { name: "foam/lib/csv/PrefixedCSVOutputter" },
   { name: "foam/lib/csv/DynamicHeaderCSVParser" },
   { name: "foam/parse/StringPStream" },
+  { name: "foam/core/Validator" },
   { name: "foam/parse/ErrorReportingPStream" },
   { name: "foam/parse/TrapPStream" },
   { name: "foam/parse/InvalidPStream" },
@@ -98,6 +99,7 @@ FOAM_FILES([
   { name: "foam/core/CompoundContextAgency" },
   { name: "foam/core/Validatable" },
   { name: "foam/core/AxiomCloner" },
+  { name: "foam/core/Agency"},
   { name: "foam/nanos/auth/Authorizable" },
   { name: "foam/i18n/TranslationFormatStringParser", flags: ['swift'] },
   { name: "foam/swift/SwiftLib", flags: ['swift'] },
@@ -284,6 +286,9 @@ FOAM_FILES([
   { name: "foam/nanos/auth/ServiceProviderAwareSink" },
   { name: "foam/nanos/auth/test/ServiceProviderAwareTest" },
   { name: "foam/nanos/auth/test/ServiceProviderAuthorizerTest" },
+  { name: 'foam/nanos/auth/UserPropertyAvailabilityService' },
+  { name: 'foam/nanos/auth/UserPropertyAvailabilityServiceInterface' },
+  { name: 'foam/nanos/auth/ClientUserPropertyAvailabilityService' },
   { name: "foam/nanos/logger/Logger" },
   { name: "foam/nanos/logger/DAOLogger" },
   { name: "foam/nanos/logger/LoggingDAO" },
@@ -479,6 +484,7 @@ FOAM_FILES([
   { name: "foam/u2/view/TableCellFormatterReadView", flags: ['web'] },
   { name: "foam/u2/view/MultiBoxInputView", flags: ['web'] },
   { name: "foam/u2/FragmentedTextField", flags: ['web'] },
+  { name: "foam/u2/view/UserPropertyAvailabilityView", flags: ['web'] },
   { name: "foam/u2/view/FObjectView", flags: ['web'] },
   { name: "foam/u2/view/CollapseableDetailView", flags: ['web'] },
   { name: "foam/u2/view/ReadReferenceView", flags: ['web'] },
@@ -487,6 +493,8 @@ FOAM_FILES([
   { name: "foam/u2/view/DraftDetailView", flags: ['web'] },
   { name: "foam/u2/view/FObjectArrayView", flags: ['web'] },
   { name: "foam/u2/view/ChoiceView", flags: ['web'] },
+  { name: "foam/u2/view/UnstyledChooseNView", flags: ['web'] },
+  { name: "foam/u2/view/ChooseNView", flags: ['web'] },
   { name: "foam/u2/view/ChoiceWithOtherView", flags: ['web'] },
   { name: "foam/u2/view/RichChoiceView", flags: ['web'] },
   { name: "foam/u2/view/OverlayActionListView", flags: ['web'] },
@@ -740,6 +748,7 @@ FOAM_FILES([
   { name: "foam/dashboard/view/Line" },
   { name: "foam/dashboard/view/DAOTable" },
   { name: "foam/dashboard/view/Card" },
+  { name: "foam/dashboard/view/Dashboard"},
   { name: "foam/build/Library" },
   { name: "foam/build/EmbeddedModelDAO" },
 
@@ -840,5 +849,8 @@ FOAM_FILES([
   { name: "foam/nanos/column/CommonColumnHandler"},
   { name: "foam/nanos/column/CSVTableOutputter"},
   { name: "foam/nanos/column/NestedPropertiesExpression" },
-  { name: "foam/nanos/column/TableColumnOutputter" }
+  { name: "foam/nanos/column/TableColumnOutputter" },
+
+  { name: "foam/nanos/pool/AbstractFixedThreadPool" },
+  { name: "foam/nanos/pool/ThreadPoolAgency" }
 ]);

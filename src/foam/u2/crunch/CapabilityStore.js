@@ -17,13 +17,14 @@ foam.CLASS({
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityCategory',
     'foam.nanos.crunch.CapabilityCategoryCapabilityJunction',
-    'foam.u2.Tab',
-    'foam.u2.Tabs',
-    'foam.u2.UnstyledTabs',
     'foam.u2.crunch.CapabilityCardView',
     'foam.u2.crunch.CapabilityFeatureView',
+    'foam.u2.Element',
     'foam.u2.layout.Grid',
-    'foam.u2.layout.GUnit'
+    'foam.u2.layout.GUnit',
+    'foam.u2.Tab',
+    'foam.u2.Tabs',
+    'foam.u2.UnstyledTabs'
   ],
 
   imports: [
@@ -42,19 +43,71 @@ foam.CLASS({
 
   css: `
     ^ {
-      max-width: 1024px;
       margin: auto;
       padding: 12px 24px 24px 24px;
+      -webkit-box-sizing: border-box;
+      box-sizing: border-box;
     }
+
     ^feature-column-grid {
       justify-content: space-between;
+      display: inline-flex;
+      width: 94%;
+      overflow: hidden;
+    }
+
+    ^featureSection {
+      flex: 0;
+      height: auto;
+    }
+
+    ^perFeature {
       display: flex;
-      flex-direction: row;
+      padding-bottom: 10px;
+    }
+
+    ^left-arrow {
+      width: 3%;
+      float: left;
+      transform: scaleX(-1);
+      display: flex;
+      padding-top: 70px;
+      /* HOVER OFF */
+      -webkit-transition: padding 2s;
+    }
+
+    ^right-arrow {
+      width: 3%;
+      float: right;
+      display: flex;
+      padding-top: 70px;
+      margin-left: -20px;
+      z-index: 100111;
+      position: relative;
+      /* HOVER OFF */
+      -webkit-transition: padding 2s;
+    }
+
+    ^right-arrow:hover {
+      transform: scale(1.2);
+      /* HOVER ON */
+      -webkit-transition: border-radius 2s;
+    }
+
+    ^left-arrow:hover {
+      transform: scaleX(-1) scale(1.2);
+      /* HOVER ON */
+      -webkit-transition: border-radius 2s;
+    }
+
+    ^container {
+      display: inline-block;
+      width: 100%;
       height: fit-content;
-      align-items: stretch;
+      overflow-y: visible;
     }
   `,
-  
+
   properties: [
     {
       name: 'visibleCapabilityDAO',
@@ -62,7 +115,7 @@ foam.CLASS({
       documentation: `
         DAO with only visible capabilities.
       `,
-      factory: function () {
+      factory: function() {
         return this.capabilityDAO
           .where(this.EQ(this.Capability.VISIBLE, true));
       }
@@ -73,7 +126,7 @@ foam.CLASS({
       documentation: `
         DAO Property to find capabilities to feature.
       `,
-      factory: function () {
+      factory: function() {
         return this.visibleCapabilityDAO
           .where(this.IN('featured', this.Capability.KEYWORDS));
       }
@@ -84,10 +137,25 @@ foam.CLASS({
       documentation: `
         DAO Property to find categories that are visible.
       `,
-      expression: function (capabilityCategoryDAO) {
+      expression: function(capabilityCategoryDAO) {
         return capabilityCategoryDAO
           .where(this.EQ(this.CapabilityCategory.VISIBLE, true));
       }
+    },
+    {
+      name: 'carouselCounter',
+      class: 'Int',
+      documentation: 'left and right scroll counter for featureCardArray index'
+    },
+    {
+      name: 'totalNumCards',
+      class: 'Int',
+      documentation: 'should be equivalent to featureCardArray.length'
+    },
+    {
+      name: 'featureCardArray',
+      value: [],
+      documentation: 'stores the styling of each featureCapability'
     }
   ],
 
@@ -95,66 +163,88 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this.signingOfficerQuestion();
-      
+
       var self = this;
       window.cstore = self;
 
       self
         .addClass(self.myClass())
-        .start(self.Tabs)
-          .start(self.Tab, { label: this.TAB_ALL, selected: true })
-            .add(self.renderFeatured())
-          .end()
-          // TODO: replace this .call with a .select once
-          //       duplication error is fixed
-          .call(function() {
-            self.visibleCategoryDAO.select().then((a) => {
-              for ( let i = 0 ; i < a.array.length ; i++ ) {
-                let category = a.array[i];
-                let e = self.Tab.create({ label: category.name })
-                  .add(self.renderSection(category));
-                this.add(e);
-              }
-            });
-          })
+        .add(self.renderFeatured())
+        .add(self.accountAndAccountingCard())
+        // NOTE: TEMPORARILY REMOVED
+        // .start(self.Tabs)
+        //   .start(self.Tab, { label: this.TAB_ALL, selected: true })
+        //     .add(self.renderFeatured())
+        //     .add(self.accountAndAccountingCard())
+        //   .end()
+        //   // TODO: replace this .call with a .select once
+        //   //       duplication error is fixed
+        //   .call(function() {
+        //     self.visibleCategoryDAO.select().then(a => {
+        //       for ( let i = 0 ; i < a.array.length ; i++ ) {
+        //         let category = a.array[i];
+        //         let e = self.Tab.create({ label: category.name })
+        //           .add(self.renderSection(category));
+        //         this.add(e);
+        //       }
+        //     });
+        //   })
         .end();
     },
-    function renderFeatured() {
+
+    function renderFeatured() { // Featured Capabilities in carousel view
       var self = this;
-      return self.E()
-        // Featured Capabilities
-        .add(self.slot(function (featuredCapabilities) {
-          var spot = this.E('span');
-          featuredCapabilities.select().then((result) => {
-            let arr = result.array;
-            let grid = self.E();
-            grid
-              .addClass(self.myClass('feature-column-grid'));
-            for ( let i = 0 ; i < arr.length ; i++ ) {
-              let cap = arr[i];
-              grid = grid
-                .start('div', { columns: 3 })
-                  .style({
-                    flex: 0,
-                    display: 'flex',
-                    height: 'auto'
-                  })
-                  .start(self.CapabilityFeatureView, { data: cap })
-                    .style({
-                      flex: 0,
-                      height: 'auto'
-                    })
+      var spot = self.E();
+      return this.E().start()// .style({ 'height': 'fit-content', 'overflow-y': 'visible' })
+        .addClass(this.myClass('container'))
+        .add(this.slot(function(featuredCapabilities) {
+          featuredCapabilities.select().then(result => {
+            var arr = result.array;
+            self.totalNumCards = arr.length;
+            self.featureCardArray = [];
+            for ( let i = 0 ; i < self.totalNumCards ; i++ ) { // build featured cards as elements
+              self.featureCardArray.push(
+                () => self.Element.create().start()
+                  .addClass(self.myClass('perFeature'))
+                  .start(self.CapabilityFeatureView, { data: arr[i] })
+                    .addClass(self.myClass('featureSection'))
                   .end()
                   .on('click', () => {
-                    self.crunchController.launchWizard(cap);
+                    self.crunchController.launchWizard(arr[i].id);
                   })
-                .end();
+                .end());
             }
-            spot.add(grid);
+            spot.start('span').start('img').addClass(self.myClass('left-arrow'))
+                .attr('src', 'images/carouselArrow.svg')
+                .on('click', function() {
+                  self.carouselCounter--;
+                })
+              .end().end();
+            spot.add(self.slot(
+              function(carouselCounter, totalNumCards) {
+                var ele = self.E().addClass(self.myClass('feature-column-grid'));
+                for ( var k = 0 ; k < totalNumCards ; k++ ) {
+                  let cc = carouselCounter % totalNumCards; // this stops any out of bounds indecies
+                  let index = ( cc + totalNumCards + k ) % totalNumCards; // this ensures circle indecies
+                  ele = ele.add(self.featureCardArray[index].call(self));
+                }
+                return ele;
+              }));
+            spot.start('span').start('img').addClass(self.myClass('right-arrow'))
+              .attr('src', 'images/carouselArrow.svg')
+              .on('click', function() {
+                self.carouselCounter++;
+              })
+            .end().end();
           });
           return spot;
-        }))
-        // Capability Store Section Previews
+       })).end();
+    },
+
+    function accountAndAccountingCard() {
+      // Capability Store Section Previews
+      var self = this;
+      return self.E()
         .select(self.visibleCategoryDAO, function(category) {
           var sectionElement = this.E('span');
           var returnElement = this.E()
@@ -168,7 +258,7 @@ foam.CLASS({
           previewIdsPromise.then(capabilityIds => {
             self.visibleCapabilityDAO.where(
               self.IN(self.Capability.ID, capabilityIds)
-            ).select().then((result) => {
+            ).select().then(result => {
               let arr = result.array;
               let grid = self.Grid.create();
               for ( let i = 0 ; i < arr.length ; i++ ) {
@@ -187,20 +277,21 @@ foam.CLASS({
           return returnElement;
         });
     },
+
     function renderSection(category) {
       var self = this;
       var sectionElement = this.E();
 
       // Promise 'p' reports capability IDs that are in this category
-      var p = self.getCategoryDAO_(category.id).select(self.PROJECTION(self.CapabilityCategoryCapabilityJunction.TARGET_ID));
-      
+      var p = self.getCategoryDAO_(category.id).select(
+        self.PROJECTION(self.CapabilityCategoryCapabilityJunction.TARGET_ID));
 
       // When 'p' resolves, query all matching capabilities
       p.then(arraySink => {
         capabilityIds = arraySink.array;
         self.visibleCapabilityDAO.where(
           self.IN(self.Capability.ID, capabilityIds)
-        ).select().then((result) => {
+        ).select().then(result => {
           let arr = result.array;
           let grid = self.Grid.create();
           for ( let i = 0 ; i < arr.length ; i++ ) {
