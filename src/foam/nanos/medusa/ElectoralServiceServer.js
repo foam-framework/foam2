@@ -418,6 +418,10 @@ foam.CLASS({
         getLogger().debug("callReport", getState().getLabel(), "votes", getVotes(), "voters", voters.size());
 
         if ( voters.size() < support.getMediatorQuorum() ) {
+          getLogger().debug("callReport", getState().getLabel(), "insuficient voters", "votes", getVotes(), "voters", voters.size());
+          return;
+        }
+        if ( getVotes() < voters.size() ) {
           getLogger().debug("callReport", getState().getLabel(), "insuficient votes", "votes", getVotes(), "voters", voters.size());
           return;
         }
@@ -476,14 +480,8 @@ foam.CLASS({
         return;
       }
 
-      List voters = support.getVoters(getX());
-      if ( voters.size() < support.getMediatorQuorum() ) {
-        getLogger().debug("report", getState().getLabel(), "ignore", "no quorum");
-        return;
-      }
-
       support.setIsPrimary(support.getConfigId().equals(winner));
-
+      List voters = support.getVoters(getX());
       DAO dao = (DAO) getX().get("localClusterConfigDAO");
       for (int i = 0; i < voters.size(); i++) {
         ClusterConfig cfg = (ClusterConfig) ((ClusterConfig) voters.get(i)).fclone();
