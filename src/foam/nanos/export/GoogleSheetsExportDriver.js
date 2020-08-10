@@ -32,28 +32,22 @@ foam.CLASS({
       name: 'title'
     },
     {
-      class: 'FObjectProperty',
+      class: 'Reference',
       of: 'foam.nanos.export.report.Template',
       name: 'template',
+      targetDAOKey: 'reportTemplateDAO',
       view: function(args, X) {
         var expr = foam.mlang.Expressions.create();
         if ( ! X.serviceName ) return [];
-        var choices = X.reportTemplateDAO.where(expr.EQ(foam.nanos.export.report.Template.DAO_KEY, X.serviceName.split('/')[1]));
         
         return foam.u2.view.ChoiceView.create({
             placeholder: 'Please select template...',
-            dao: choices,
+            dao: X.reportTemplateDAO.where(expr.EQ(foam.nanos.export.report.Template.DAO_KEY, X.serviceName.split('/')[1])),
             objToChoice: function(a) {
               return [a.id, a.docTitle];
           }
         });
-      },
-      // factory: function() {
-      //   var expr = foam.mlang.Expressions.create();
-      //   if ( ! this.serviceName ) return [];
-
-      //   return this.__subContext__.reportTemplateDAO.find(expr.EQ(foam.nanos.export.report.Template.DAO_KEY, X.serviceName.split('/')[1]));
-      // }
+      }
     },
     {
       name: 'serviceName',

@@ -309,7 +309,7 @@ foam.CLASS({
         GoogleDriveService googleDriveService = (GoogleDriveService) getX().get("googleDriveService");
         String folderId = googleDriveService.createFolderIfNotExists(x, "Nanopay Export");
         String fileName = extraConfig == null || SafetyUtil.isEmpty(extraConfig.getTitle()) ? ("NanopayExport" + new Date()) : extraConfig.getTitle();
-        String fileId = googleDriveService.createAndCopyFromFile(x, folderId, fileName, extraConfig.getTemplate().getId());
+        String fileId = googleDriveService.createAndCopyFromFile(x, folderId, fileName, extraConfig.getTemplate());
         return populateWithDataSheetWithId(x, fileId, obj, metadataObj, extraConfig);
       } catch ( Throwable t ) {
         Logger l = (Logger) getX().get("logger");
