@@ -121,7 +121,7 @@ p({
   "serve": true,
   "authenticate": true,
   "boxClass": "foam.nanos.crunch.CrunchServiceSkeleton",
-  "serviceClass": "foam.nanos.crunch.JavaCrunchService",
+  "serviceClass": "foam.nanos.crunch.ServerCrunchService",
   "client":
     """
       {
