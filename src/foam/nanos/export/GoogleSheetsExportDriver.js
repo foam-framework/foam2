@@ -85,7 +85,7 @@ foam.CLASS({
       else {
         var expr1 = foam.mlang.Expressions.create();
         var template = await X.reportTemplateDAO.find(expr1.EQ(foam.nanos.export.report.Template.ID, this.template));
-        propNames = template && template.columnNames && template.columnNames.length > 0 ? this.template.columnNames : X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(dao.of);
+        propNames = template && template.columnNames && template.columnNames.length > 0 ? template.columnNames : X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(dao.of);
       }
        
       propNames = columnConfig.filterExportedProps(dao.of, propNames);
