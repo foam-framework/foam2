@@ -38,14 +38,22 @@ foam.CLASS({
       view: function(args, X) {
         var expr = foam.mlang.Expressions.create();
         if ( ! X.serviceName ) return [];
-        return {
-            class: 'foam.u2.view.ChoiceView',
-            dao: X.reportTemplateDAO.where(expr.EQ(foam.nanos.export.report.Template.DAO_KEY, X.serviceName.split('/')[1])),
+        var choices = X.reportTemplateDAO.where(expr.EQ(foam.nanos.export.report.Template.DAO_KEY, X.serviceName.split('/')[1]));
+        
+        return foam.u2.view.ChoiceView.create({
+            placeholder: 'Please select template...',
+            dao: choices,
             objToChoice: function(a) {
               return [a.id, a.docTitle];
           }
-        };
+        });
       },
+      // factory: function() {
+      //   var expr = foam.mlang.Expressions.create();
+      //   if ( ! this.serviceName ) return [];
+
+      //   return this.__subContext__.reportTemplateDAO.find(expr.EQ(foam.nanos.export.report.Template.DAO_KEY, X.serviceName.split('/')[1]));
+      // }
     },
     {
       name: 'serviceName',
@@ -82,6 +90,7 @@ foam.CLASS({
 
       var metadata = await self.outputter.getColumnMethadata(X, dao.of, propNames);
 
+      // to backend
       var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(dao.of, propNames);
       var sink = await dao.select(expr);
       
