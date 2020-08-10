@@ -117,12 +117,10 @@ public class ServerCrunchService implements CrunchService {
       );
 
       // Check if a ucj implies the subject.realUser has this permission in relation to the user
-      {
-        UserCapabilityJunction ucj = (UserCapabilityJunction)
-          userCapabilityJunctionDAO.find(AND(associationPredicate,targetPredicate));
-        if ( ucj != null ) {
-          return ucj;
-        }
+      UserCapabilityJunction ucj = (UserCapabilityJunction)
+        userCapabilityJunctionDAO.find(AND(associationPredicate,targetPredicate));
+      if ( ucj != null ) {
+        return ucj;
       }
 
     } catch ( Exception e ) {
