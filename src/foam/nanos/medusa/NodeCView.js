@@ -89,6 +89,9 @@ foam.CLASS({
           if ( c.type == this.MedusaType.NERF ) {
             return 'blue';
           }
+          if ( c.type == this.MedusaType.ARCHIVE ) {
+            return 'brown';
+          }
           if ( c.type == this.MedusaType.OTHER ) {
             return 'purple';
           }
