@@ -25,7 +25,12 @@ public class JavaCrunchService implements CrunchService {
 
     // Lookup for indices of previously observed capabilities
     Map<String,Integer> alreadyListed = new HashMap<String,Integer>();
-    // Return list (list is reversed at the end to put prerequisites first)
+
+    // List of capabilities required to grant the desired capability.
+    // Throughout the traversial algorithm this list starts with parents of
+    // prerequisites appearing earlier in the list. Before returning, this
+    // list is reversed so that the caller receives capabilities in order of
+    // expected completion (i.e. pre-order traversial)
     List grantPath = new ArrayList<>();
 
     Queue<String> nextSources = new ArrayDeque<String>();
@@ -36,20 +41,20 @@ public class JavaCrunchService implements CrunchService {
     CrunchService crunchService = (CrunchService) x.get("crunchService");
 
     while ( nextSources.size() > 0 ) {
-      String sourceId = nextSources.poll();
+      String sourceCapabilityId = nextSources.poll();
 
-      UserCapabilityJunction ucj = crunchService.getJunction(x, sourceId);
+      UserCapabilityJunction ucj = crunchService.getJunction(x, sourceCapabilityId);
       if ( ucj != null && ucj.getStatus() == CapabilityJunctionStatus.GRANTED ) {
         continue;
       }
 
       // Remove previously added prerequisite if one matches
-      if ( alreadyListed.containsKey(sourceId) ) {
-        int previousIndex = alreadyListed.get(sourceId);
+      if ( alreadyListed.containsKey(sourceCapabilityId) ) {
+        int previousIndex = alreadyListed.get(sourceCapabilityId);
         grantPath.remove(previousIndex);
 
         // Remove previously stored index of capability
-        alreadyListed.remove(sourceId);
+        alreadyListed.remove(sourceCapabilityId);
 
         // Shift remembered indexes, now that grantList has been shifted
         Map<String,Integer> newAlreadyListed = new HashMap<String,Integer>();
@@ -62,14 +67,14 @@ public class JavaCrunchService implements CrunchService {
       }
 
       // Add capability to grant path, and remember index in case it's replaced
-      Capability cap = (Capability) capabilityDAO.find(sourceId);
+      Capability cap = (Capability) capabilityDAO.find(sourceCapabilityId);
 
-      alreadyListed.put(sourceId, grantPath.size());
+      alreadyListed.put(sourceCapabilityId, grantPath.size());
       grantPath.add(cap);
 
       // Enqueue prerequisites for adding to grant path
       List prereqs = ( (ArraySink) prerequisiteDAO
-        .where(EQ(CapabilityCapabilityJunction.SOURCE_ID, sourceId))
+        .where(EQ(CapabilityCapabilityJunction.SOURCE_ID, sourceCapabilityId))
         .select(new ArraySink()) ).getArray();
       for ( Object prereqObj : prereqs ) {
         CapabilityCapabilityJunction prereq =
