@@ -10,8 +10,7 @@ foam.CLASS({
 
   implements: [
     'foam.core.ContextAgent',
-    'foam.nanos.medusa.ElectoralService',
-//    'foam.nanos.NanoService'
+    'foam.nanos.medusa.ElectoralService'
   ],
 
   javaImports: [
@@ -140,7 +139,7 @@ foam.CLASS({
         synchronized ( voteLock_ ) {
           setVotes(getVotes() + 1);
           if ( result > getCurrentSeq() ) {
-            getLogger().debug("recordResult", config.getName(), result, "leader");
+            getLogger().info("recordResult", config.getName(), result, "leader");
             setCurrentSeq(result);
             setWinner(config.getId());
           }
@@ -209,7 +208,7 @@ foam.CLASS({
       }
 
       // run a new campaigne
-      setElectionTime(System.nanoTime());
+      setElectionTime(System.currentTimeMillis());
       setState(ElectoralServiceState.ELECTION);
       getLogger().debug("dissolve", getState().getLabel(), "execute");
       ((Agency) x.get(support.getThreadPoolName())).submit(x, (ContextAgent)this, this.getClass().getSimpleName());
