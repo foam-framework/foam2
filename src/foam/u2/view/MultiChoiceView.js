@@ -30,10 +30,26 @@ foam.CLASS({
       name: 'choices',
       documentation: `
         An array of choices which are single choice is denoted as [value, label, isSelected, choiceMode], however the user can
-        just pass in [value, label] and 
+        just pass in [value, label] and the adapt function will turn it into the [value, label, isSelected, choiceMode] format
+        for processing purposes
       `,
       factory: function() {
-        return [["test1", "test1", false, this.mode], ["test2", "test2", false, this.mode], ["test3", "test3", false, this.mode]];
+        return [];
+      },
+      adapt: function(_, n) {
+        if ( ! Array.isArray(n) ) throw new Error("Please submit an array to choices in the MultiChoiceView");
+
+        if ( n.length > 0 ){
+          var valueLabelChoices = n.filter(choice => choice.length === 2)
+          var fullChoices = n.filter(choice => choice.length === 4)
+
+          if ( valueLabelChoices.length === n.length ) return n.map(choice => [ choice[0], choice[1], false, this.mode ])
+          if ( fullChoices.length === n.length  ) return n;
+
+          throw new Error("Items in choices array do not have consistent lengths")
+        }
+
+        return n;
       },
       postSet: function(_,n){
         var selectedChoices = n.filter(choice => choice[2] );
@@ -67,17 +83,19 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'showMinMaxHelper',
-      value: false
+      value: true
     },
     {
       class: 'Boolean',
       name: 'showValidNumberOfChoicesHelper',
-      value: false
+      value: true
     },
     {
       class: 'Int',
       name: 'minSelected',
-      value: 1
+      factory: function() {
+        return this.choices.length > 0 ? 1 : 0
+      }
     },
     {
       class: 'Int',
