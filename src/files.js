@@ -720,6 +720,7 @@ FOAM_FILES([
   { name: "foam/flow/Document" },
   { name: "foam/flow/MarkupEditor" },
   { name: "foam/flow/DocumentationFolderDAO" },
+  { name: "foam/flow/widgets/PropertyShortSummary" },
 
   { name: "org/chartjs/Lib" },
   { name: "org/chartjs/ChartCView" },
