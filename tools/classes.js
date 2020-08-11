@@ -203,6 +203,7 @@ var classes = [
   'foam.nanos.alarming.MonitoringReport',
   'foam.nanos.alarming.MonitorType',
   'foam.nanos.alarming.OMName',
+  'foam.nanos.alarming.AlarmConfigName',
   'foam.nanos.actioncommand.ActionCommand',
   'foam.nanos.NanoService',
   'foam.nanos.boot.NSpec',
