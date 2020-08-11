@@ -194,7 +194,8 @@ foam.CLASS({
       );
       if ( ucj ) {
         var statusGranted = ucj.status === this.CapabilityJunctionStatus.GRANTED;
-        var statusPending = ucj.status === this.CapabilityJunctionStatus.PENDING;
+        var statusPending = ucj.status === this.CapabilityJunctionStatus.PENDING 
+          || ucj.status === this.CapabilityJunctionStatus.APPROVED;
         if ( statusGranted || statusPending ) {
           var message = statusGranted ? this.CANNOT_OPEN_GRANTED : this.CANNOT_OPEN_PENDING;
           this.ctrl.notify(message, '', this.LogLevel.INFO, true);
