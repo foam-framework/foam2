@@ -537,7 +537,6 @@ foam.CLASS({
     function initE() {
       for ( var key in foam.UNUSED ) foam.lookup(key);
       this.SUPER();
-
       this.
         addClass(this.myClass()).
         tag(this.PATH, {displayWidth: 80}).
@@ -568,7 +567,7 @@ foam.CLASS({
             end().
             start('td').
               style({'vertical-align': 'top'}).
-              tag(this.ClassList, {title: 'Class List', showPackages: false, showSummary: true, data: Object.values(foam.USED).sort(this.MODEL_COMPARATOR)}).
+              tag(this.ClassList, {title: 'Class List', showPackages: false, showSummary: true, data: Object.values(foam.USED).filter((e) => {e != undefined }).sort(this.MODEL_COMPARATOR)}).
             end().
             start('td').
               style({'vertical-align': 'top'}).

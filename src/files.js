@@ -80,6 +80,7 @@ FOAM_FILES([
   { name: "foam/lib/csv/PrefixedCSVOutputter" },
   { name: "foam/lib/csv/DynamicHeaderCSVParser" },
   { name: "foam/parse/StringPStream" },
+  { name: "foam/core/Validator" },
   { name: "foam/parse/ErrorReportingPStream" },
   { name: "foam/parse/TrapPStream" },
   { name: "foam/parse/InvalidPStream" },

@@ -112,7 +112,10 @@ ServiceProviderAware`,
       if ( ServiceProviderAware.class.isAssignableFrom(getOf().getObjClass()) ) {
 
         PropertyInfo spidProperty = ((PropertyInfo) getOf().getAxiomByName("spid"));
-        spidPredicate = MLang.EQ(spidProperty, spid);
+        spidPredicate = MLang.OR(
+          MLang.EQ(spidProperty, spid),
+          new ServiceProviderAwarePredicate(x, null, getPropertyInfos())
+        );
 
         if ( predicate != null ) {
           spidPredicate = MLang.AND(

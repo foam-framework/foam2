@@ -250,6 +250,7 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/NotificationCitationView'},
   { name: 'foam/nanos/notification/NotificationNotificationView'},
   { name: 'foam/nanos/notification/NotificationHostnameRuleAction'},
+  { name: 'foam/nanos/notification/SlackSetting' },
   { name: 'foam/nanos/notification/ToastNotificationDAO' },
   { name: 'foam/nanos/notification/ToastState' },
   { name: 'foam/nanos/notification/notifications/ScriptRunNotification'},
@@ -334,6 +335,8 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/IsUserCapabilityJunctionStatusUpdate" },
   { name: "foam/nanos/crunch/RemoveJunctionsOnUserRemoval" },
   { name: "foam/nanos/crunch/CascadeInvalidate" },
+  //views
+  { name: "foam/nanos/crunch/ui/CapabilityView" },
 
   // approval
   { name: 'foam/nanos/approval/ApprovalRequest' },

@@ -135,7 +135,7 @@ foam.CLASS({
               }
               DAO configDAO = (DAO) x.get("alarmConfigDAO");
 
-              AlarmConfig config = (AlarmConfig) configDAO.find(EQ(AlarmConfig.NAME, pm.getKey()));
+              AlarmConfig config = (AlarmConfig) configDAO.find(EQ(AlarmConfig.NAME, pm.getId()));
               if ( config == null || ! config.getEnabled() ) {
                 return;
               }

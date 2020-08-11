@@ -52,6 +52,8 @@ public class ExpireUserCapabilityJunctionsCron implements ContextAgent {
         int graceDays = activeJunction.getGraceDaysLeft();
         activeJunction.setStatus(graceDays > 0 ? CapabilityJunctionStatus.GRACE_PERIOD : CapabilityJunctionStatus.EXPIRED);
       }
+      if ( activeJunction.getStatus() == CapabilityJunctionStatus.EXPIRED ) activeJunction.clearData();
+      
       logger.debug("Moved UserCapabilityJunction : " + activeJunction.getId() + " into status :" + activeJunction.getStatus());
       userCapabilityJunctionDAO.put(activeJunction);
     }
