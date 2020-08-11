@@ -14,7 +14,7 @@ foam.CLASS({
   ],
   methods: [
     {
-      name: 'getColumnMethadata',
+      name: 'getColumnMetadata',
       type: 'foam.nanos.export.GoogleSheetsPropertyMetadata[]',
       code: async function(x, cls, propNames) {
         var metadata = [];
@@ -33,7 +33,7 @@ foam.CLASS({
           if ( props[i].cls_.id === "foam.core.Action" )
             continue;
           
-          metadata.push(this.returnMetadataForProperty(props[i], propNames[i]));
+          metadata.push(this.returnMetadataForProperty(x, cls, props[i], propNames[i]));
         }
         return metadata;
       }
@@ -52,13 +52,15 @@ foam.CLASS({
     },
     {
       name: 'returnMetadataForProperty',
-      code: function(prop, propName) {
+      code: function(x, of, prop, propName) {
           //to constants?
           var cellType = 'STRING';
           var pattern = '';
+          var unitProp;
           if ( foam.core.UnitValue.isInstance(prop) ) {
             cellType = 'CURRENCY';
             pattern = '\"$\"#0.00\" CAD\"';
+            unitProp = of.getAxiomByName(prop.unitPropName);
           } else if ( foam.core.Date.isInstance(prop) ) {
             cellType = 'DATE';
             pattern = 'yyyy-mm-dd';
@@ -70,11 +72,13 @@ foam.CLASS({
 
           return this.GoogleSheetsPropertyMetadata.create({
             columnName: prop.name,
-            columnLabel: prop.label,
+            columnLabel: this.getColumnHeaders(x, of, propName.split('.')),
             columnWidth: prop.tableWidth ? prop.tableWidth : 0,
             cellType: cellType,
             pattern: pattern,
-            propName: propName
+            propName: propName,
+            prop: prop,
+            unitProp: unitProp
           });
       }
     }

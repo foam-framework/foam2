@@ -18,6 +18,8 @@ foam.CLASS({
     'com.google.api.services.sheets.v4.Sheets',
     'com.google.api.services.sheets.v4.SheetsScopes',
     'com.google.api.services.sheets.v4.model.*',
+    'foam.dao.DAO',
+    'foam.mlang.sink.Projection',
     'foam.nanos.export.GoogleSheetsPropertyMetadata',
     'foam.nanos.google.api.auth.GoogleApiAuthService',
     'foam.nanos.google.api.drive.GoogleDriveService',
@@ -316,7 +318,37 @@ foam.CLASS({
         l.error(t);
         return "";
       }
+      `
+    },
+    {
+      name: 'retrieveTemplateData',
+      args: [
+        {
+          name: 'x',
+          type: 'Context',
+        },
+        {
+          name: 'of',
+          class: 'Class',
+          javaType: 'foam.core.ClassInfo'
+        },
+        {
+          name: 'daoName',
+          class: 'String'
+        },
+        {
+          name: 'propertiesName',
+          class: 'StringArray'
+        }
+      ],
+      javaCode: `
+        DAO dao = (DAO)x.get(daoName);
+        if ( dao == null )
+          return;
         
+        Projection p = ( new foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder() ).buildProjectionForPropertyNamesArray(of, propertiesName);
+        dao.select(p);
+        java.util.List values = p.getArray();
       `
     }
   ]

@@ -127,14 +127,14 @@
       }
     },
     {
-      name: 'returnTableForMethadata',
+      name: 'returnTableForMetadata',
       args: [
         {
           name: 'x',
           type: 'Context'
         },
         {
-          name: 'methadata',
+          name: 'metadata',
           type: 'foam.nanos.export.GoogleSheetsPropertyMetadata[]'
         },
         {
@@ -145,24 +145,27 @@
       javaType: 'java.util.List<java.util.List<String>>',
       javaCode: `
         java.util.List<java.util.List<String>> result = new ArrayList<>();
-
+      
         java.util.List<String> columnHeaders = new ArrayList<>();
 
-        for ( int i = 0 ; i < methadata.length ; i++ ) {
-          columnHeaders.add(methadata[i].getPropLabel());
+        for ( int i = 0 ; i < metadata.length ; i++ ) {
+          columnHeaders.add(metadata[i].getColumnLabel());
         }
+        result.add(columnHeaders);
 
         for ( int i = 0 ; i < arrOfObjectValues.length ; i++ ) {
+          java.util.List<String> row = new ArrayList<>();
           for ( int j = 0 ; j < arrOfObjectValues[i].length ; j++ ) {
-
+            row.add(returnStringValueForMetadata(x, metadata[j], arrOfObjectValues[j], null));
           }
+          result.add(row);
         }
 
-        return null;
+        return result;
       `
     },
     {
-      name: 'returnStringValueForMethadata',
+      name: 'returnStringValueForMetadata',
       type: 'String',
       args: [
         {
@@ -170,20 +173,34 @@
           type: 'Context'
         },
         {
-          name: 'methadata',
+          name: 'metadata',
           type: 'foam.nanos.export.GoogleSheetsPropertyMetadata'
         },
         {
-          name: 'arrOfObjectValues',
+          name: 'obj',
           javaType: 'Object'
         },
         {
-          name: 'unitPropMetadata',
-          type: 'foam.nanos.export.GoogleSheetsPropertyMetadata'
+          name: 'unitPropValue',
+          type: 'String'
         }
       ],
       javaCode: `
+      if ( obj == null )
         return "";
+
+      switch(metadata.getCellType()) {
+        case "CURRENCY":
+          return metadata.getProp().unitPropValueToString(x, obj, unitPropValue);
+        case "DATE":
+          return obj.toString().substring(0, 10);
+        case "DATETIME":
+          return obj.toString().substring(0, 24);
+        case "TIME":
+          return obj.toString().substring(0, 8);
+        default:
+          return ((foam.core.FObject)obj).toSummary();
+      }
       `
     }
   ]

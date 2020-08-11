@@ -60,7 +60,7 @@ foam.CLASS({
       var propNames = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(obj.cls);
       propNames = columnConfig.filterExportedProps(X, obj.cls_, propNames);
       
-      var metadata = await self.outputter.getColumnMethadata(X, obj.cls_, propNames);
+      var metadata = await self.outputter.getColumnMetadata(X, obj.cls_, propNames);
       stringArray = [ await this.outputter.objectToTable(X, obj.cls_, obj, propNames) ];
 
       sheetId = await X.googleSheetsDataExport.createSheetAndPopulateWithData(X, stringArray, metadata, this);
@@ -79,12 +79,13 @@ foam.CLASS({
       else {
         var expr1 = foam.mlang.Expressions.create();
         var template = await X.reportTemplateDAO.find(expr1.EQ(foam.nanos.export.report.Template.ID, this.template));
+        //check that for columns for template which are unit value added unitName columns to columns
         propNames = template && template.columnNames && template.columnNames.length > 0 ? template.columnNames : X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(dao.of);
       }
        
       propNames = columnConfig.filterExportedProps(dao.of, propNames);
 
-      var metadata = await self.outputter.getColumnMethadata(X, dao.of, propNames);
+      var metadata = await self.outputter.getColumnMetadata(X, dao.of, propNames);
 
       // to backend
       var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(dao.of, propNames);
