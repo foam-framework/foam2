@@ -537,7 +537,6 @@ foam.CLASS({
     function initE() {
       for ( var key in foam.UNUSED ) foam.lookup(key);
       this.SUPER();
-console.log(Object.values(foam.USED));
       this.
         addClass(this.myClass()).
         tag(this.PATH, {displayWidth: 80}).
