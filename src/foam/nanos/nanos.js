@@ -38,6 +38,7 @@ FOAM_FILES([
   { name: 'foam/nanos/alarming/MonitorType' },
   { name: 'foam/nanos/alarming/AlarmAndMonitoring' },
   { name: 'foam/nanos/alarming/OMName' },
+  { name: 'foam/nanos/alarming/AlarmConfigName' },
   { name: 'foam/nanos/alarming/AlarmingUniqueNameDAO' },
   { name: "foam/nanos/auth/DayOfWeek" },
   { name: "foam/nanos/auth/Hours" },
