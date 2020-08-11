@@ -56,9 +56,9 @@ foam.CLASS({
         if ( SafetyUtil.isEmpty(formatter.builder().toString().trim()) ) {
           return obj;
         }
-     }
-     return getDelegate().put_(x, obj);
-     `
+      }
+      return getDelegate().put_(x, obj);
+      `
     }
   ]
 });
