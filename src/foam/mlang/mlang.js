@@ -2933,7 +2933,7 @@ foam.CLASS({
       name: 'compare',
       code: function(o1, o2) {
         // an equals of arg1.compare is falsy, which will then hit arg2
-        return this.head.compare(o1, o2) || this.tail.compare(o1, o2);
+        return this.head == undefined ? -1 : this.head.compare(o1, o2) || this.tail.compare(o1, o2);
       },
       javaCode: `
         int ret = getHead().compare(o1, o2);
