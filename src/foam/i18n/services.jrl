@@ -1,0 +1,42 @@
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"xliffTranslationDAO",
+  "serve":true,
+  "serviceScript":
+  """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setAuthorize(false)
+      .setJournalName("xliffTranslations")
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setOf(foam.i18n.XLIFFTranslationValue.getOwnClassInfo())
+      .build();
+  """,
+  "client":
+  """
+    {
+      "of":"foam.i18n.XLIFFTranslationValue"
+    }
+  """
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"localeDAO",
+  "description":"Locale DAO",
+  "serve":true,
+  "serviceScript":
+  """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setAuthorize(false)
+      .setJournalName("locales")
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setOf(foam.i18n.Locale.getOwnClassInfo())
+      .build();
+  """,
+  "client":
+  """
+    {
+      "of":"foam.i18n.Locale"
+    }
+  """
+})

@@ -11,13 +11,19 @@ foam.CLASS({
   documentation: `A Performance Measure which captures the count and duration of some event.`,
 
   implements: [
-    'foam.nanos.analytics.Foldable'
+    'foam.nanos.analytics.Foldable',
+    'foam.nanos.ruler.RuleAction'
   ],
 
   javaImports: [
     'foam.core.ClassInfo',
+    'foam.core.ContextAgent',
     'foam.core.FObject',
-    'foam.core.X'
+    'foam.core.X',
+    'foam.dao.DAO',
+    'foam.nanos.alarming.Alarm',
+    'foam.nanos.alarming.AlarmConfig',
+    'static foam.mlang.MLang.EQ'
   ],
 
   ids: [ 'key', 'name', 'startTime' ],
@@ -116,6 +122,36 @@ foam.CLASS({
         if ( sb.length() > 0 )
           setErrorMessage(sb.deleteCharAt(sb.length() - 1).toString());
       `
+    },
+    {
+      name: 'applyAction',
+      javaCode: `
+          agency.submit(x, new ContextAgent() {
+            @Override
+            public void execute(X x) {
+              PM pm = (PM) obj;
+              if ( ! pm.getIsError() ) {
+                return;
+              }
+              DAO configDAO = (DAO) x.get("alarmConfigDAO");
+
+              AlarmConfig config = (AlarmConfig) configDAO.find(EQ(AlarmConfig.NAME, pm.getId()));
+              if ( config == null || ! config.getEnabled() ) {
+                return;
+              }
+              DAO alarmDAO = (DAO) x.get("alarmDAO");
+              Alarm alarm = (Alarm) alarmDAO.find(EQ(Alarm.NAME, config.getName()));
+              if ( ! (alarm == null) || alarm.getIsActive() ){
+                return;
+              }
+              alarm = new Alarm.Builder(x)
+                .setName(config.getName())
+                .setIsActive(true)
+                .build();
+              alarmDAO.put(alarm);
+            }
+          }, "PM alarm");
+     `
     }
   ],
   axioms: [

@@ -14,11 +14,26 @@ foam.CLASS({
       margin-bottom: 15px;
     }
     ^item > .circle {
+      display: inline-block;
       margin-right: 15px;
+      vertical-align: middle;
     }
     ^sub-item {
       padding-left: calc(24px + 15px + 4px);
-      padding-top: 15px;
+      padding-top: 8px;
+      font-style: italic;
+    }
+    ^sub-item:hover {
+      cursor: pointer;
+      font-weight: bold;
+    }
+    ^sub-item:first-child {
+      padding-top: 16px;
+    }
+    ^title {
+      display: inline-block;
+      margin: 0;
+      vertical-align: middle;
     }
   `,
 
@@ -84,21 +99,21 @@ foam.CLASS({
                 .end()
 
                 // Render title
-                .start('span')
+                .start('p').addClass(self.myClass('title'))
                   .add(wizardlet.title)
                   .style({
                     'font-weight': isCurrent ? 'bold' : 'normal',
-                    'color': isCurrent ? this.theme.primary1 : 'inherit'
+                    'color': isCurrent || ! afterCurrent ? this.theme.primary1 : this.theme.grey2
                   })
                 .end();
-            
+
             // Get section index to highlight current section
+            let wi = data$wizardPosition.wizardletIndex;
             let si = data$wizardPosition.sectionIndex;
-            
+
             // Render section labels
             let sections = this.data.sections[w];
 
-            // let afterCurrentSection = false;
             for ( let s = 0 ; s < sections.length ; s++ ) {
               let pos = this.WizardPosition.create({
                 wizardletIndex: w,
@@ -106,15 +121,17 @@ foam.CLASS({
               })
               let section = sections[s];
               let isCurrentSection = isCurrent && si === s;
+              let isBeforeCurrentSection = w < wi || isCurrent && s < si;
+
               let allowedToSkip = self.data.canSkipTo(pos);
               let slot = section.createIsAvailableFor(
                 wizardlet.data$
               ).map(function (isAvailable) {
-                let e = self.E('span');
-                if ( isAvailable ) e = self.renderSectionLabel(
-                  e,
+                return isAvailable ? self.renderSectionLabel(
+                  self.E().addClass(self.myClass('sub-item')),
                   section, s+1,
                   isCurrentSection,
+                  isBeforeCurrentSection,
                   allowedToSkip
                 ).on('click', () => {
                   if ( isCurrentSection ) return;
@@ -122,10 +139,8 @@ foam.CLASS({
                     self.data.skipTo(pos);
                   }
                   return;
-                });
-                return e;
+                }) : self.E('span');
               })
-              // if ( isCurrentSection ) afterCurrentSection = true;
               elem.add(slot);
             }
 
@@ -138,17 +153,16 @@ foam.CLASS({
           return elem;
         }))
     },
-    function renderSectionLabel(elem, section, index, isCurrent, isClickable) {
+    function renderSectionLabel(elem, section, index, isCurrent, isBeforeCurrentSection, isClickable) {
       let title = section.title;
       if ( ! title || ! title.trim() ) title = "Part " + index;
       return elem
         .start()
-          .addClass(this.myClass('sub-item'))
           .style({
-            'color': isCurrent
+            'color': isCurrent || isBeforeCurrentSection
               ? this.theme.primary1
               : isClickable
-                ? 'inherit'
+                ? this.theme.grey2
                 : this.theme.grey3,
             'font-weight': isCurrent ? 'bold' : 'inherit'
           })

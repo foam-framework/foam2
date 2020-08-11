@@ -249,6 +249,7 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/NotificationCitationView'},
   { name: 'foam/nanos/notification/NotificationNotificationView'},
   { name: 'foam/nanos/notification/NotificationHostnameRuleAction'},
+  { name: 'foam/nanos/notification/SlackSetting' },
   { name: 'foam/nanos/notification/ToastNotificationDAO' },
   { name: 'foam/nanos/notification/ToastState' },
   { name: 'foam/nanos/notification/notifications/ScriptRunNotification'},
@@ -332,7 +333,13 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/SendNotificationOnTopLevelCapabilityStatusUpdate" },
   { name: "foam/nanos/crunch/IsUserCapabilityJunctionStatusUpdate" },
   { name: "foam/nanos/crunch/RemoveJunctionsOnUserRemoval" },
-  { name: "foam/nanos/crunch/CascadeInvalidate" },
+  { name: "foam/nanos/crunch/ReputDependentUCJs" },
+  //ucjDAO rules
+  { name: "foam/nanos/crunch/ruler/CheckUCJOwnershipOnPut" },
+  { name: "foam/nanos/crunch/ruler/ValidateUCJDataOnPut" },
+  { name: "foam/nanos/crunch/ruler/SetUCJStatusOnPut" },
+  { name: "foam/nanos/crunch/ruler/ConfigureUCJExpiryOnGranted" },
+  { name: "foam/nanos/crunch/ruler/SaveUCJDataOnGranted" },
   //views
   { name: "foam/nanos/crunch/ui/CapabilityView" },
 
