@@ -102,8 +102,8 @@ foam.CLASS({
     if (x.get("notificationDAO") != null) ((DAO) x.get("notificationDAO")).put_(x, notif) ;
   }
   catch (Throwable t) {
-    Logger logger = (Logger) x.get("logger");
-    logger.error(t);
+    System.err.println(t.getMessage());
+    t.printStackTrace();
   }
   currentlyLogging.set(false);
   `

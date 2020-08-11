@@ -399,6 +399,8 @@ foam.CLASS({
       function(o, n, prop) {
         var type = foam.lookup(prop.type);
 
+        if ( n && typeof n === 'function' ) n = n();
+
         if ( n && n.cls_ === type ) return n;
 
         var valueType = foam.typeOf(n), ret;

@@ -112,7 +112,10 @@ ServiceProviderAware`,
       if ( ServiceProviderAware.class.isAssignableFrom(getOf().getObjClass()) ) {
 
         PropertyInfo spidProperty = ((PropertyInfo) getOf().getAxiomByName("spid"));
-        spidPredicate = MLang.EQ(spidProperty, spid);
+        spidPredicate = MLang.OR(
+          MLang.EQ(spidProperty, spid),
+          new ServiceProviderAwarePredicate(x, null, getPropertyInfos())
+        );
 
         if ( predicate != null ) {
           spidPredicate = MLang.AND(
@@ -135,6 +138,17 @@ ServiceProviderAware`,
       spidPredicate
     );
      `
+    },
+    {
+      name: 'cmd_',
+      documentation: 'Process ServiceProviderAwareSupport action which performs spid matching on "OBJ" in the context.',
+      javaCode: `
+        if ( obj instanceof ServiceProviderAwareSupport ) {
+          return ((ServiceProviderAwareSupport) obj).match(x, getPropertyInfos(), x.get("OBJ"));
+        }
+
+        return getDelegate().cmd_(x, obj);
+      `
     }
   ]
 });

@@ -105,6 +105,11 @@ foam.CLASS({
       'approval3',
       'approval4',
       'approval5',
+      'secondary1',
+      'secondary2',
+      'secondary3',
+      'secondary4',
+      'secondary5',
       'warning1',
       'warning2',
       'warning3',
@@ -137,12 +142,13 @@ foam.CLASS({
 
   css: `
     body {
+      background: /*%GREY5%*/ #f5f7fa;
+      color: #373a3c;
       font-family: 'Roboto', sans-serif;
       font-size: 14px;
       letter-spacing: 0.2px;
-      color: #373a3c;
-      background: /*%GREY5%*/ #f5f7fa;
       margin: 0;
+      overscroll-behavior: none;
     }
     .stack-wrapper {
       min-height: calc(80% - 60px);
@@ -598,6 +604,8 @@ foam.CLASS({
       } else if ( this.theme ) {
         this.window.location.hash = this.theme.defaultMenu;
       }
+
+      this.__subContext__.localSettingDAO.put(foam.nanos.session.LocalSetting.create({id: 'homeDenomination', value: localStorage.getItem("homeDenomination")}));
     },
 
     function menuListener(m) {

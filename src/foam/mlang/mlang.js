@@ -3223,16 +3223,14 @@ foam.CLASS({
   extends: 'foam.mlang.AbstractExpr',
   implements: [ 'foam.core.Serializable' ],
 
-  documentation: 'A Binary Predicate which applies arg2.f() to arg1.f().',
-
-  javaImports: [
-    'foam.core.AbstractFObjectPropertyInfo',
-    'foam.core.FObject',
-    'foam.core.PropertyInfo',
-    'foam.nanos.logger.Logger',
-    'foam.nanos.logger.StdoutLogger',
-    'foam.util.StringUtil'
-  ],
+  documentation: `
+    A Binary Expression which evaluates arg1 and passes the result to arg2.
+    In other word, the output of arg1 is the receiver of arg2.
+    
+    For example, to get city from user address:
+    
+    DOT(User.ADDRESS, Address.CITY).f(user); // return user.address.city
+  `,
 
   properties: [
     {
@@ -3249,35 +3247,12 @@ foam.CLASS({
     {
       name: 'f',
       code: function(o) {
-        if ( foam.core.Reference.isInstance(this.arg1) ) {
-          return o[property.name + '$find'].then(val => this.arg2.f(val));
-        }
         return this.arg2.f(this.arg1.f(o));
       },
       javaCode: `
-        StringBuilder sb = new StringBuilder("find");
-        PropertyInfo p1 = (PropertyInfo) getArg1();
-        FObject obj1;
-        if ( p1 instanceof AbstractFObjectPropertyInfo ) {
-          Object val = getArg1().f(obj);
-          return val == null ? null : getArg2().f(val);
-        }
-        try {
-          obj1 = (FObject)obj.getClass().getMethod(StringUtil.capitalize(p1.getName()), foam.core.X.class).invoke(obj, ((FObject)obj).getX());
-        } catch ( Throwable t ) {
-          return null;
-        }
-        if ( obj1 == null ) return null;
-        try {
-          return getArg2().f(obj1);
-        } catch ( Throwable t ) {
-          Logger logger = (Logger) getX().get("logger");
-          if ( logger == null ) {
-            logger = new StdoutLogger();
-          }
-          logger.error(t);
-          return null;
-        }
+        Object receiver = getArg1().f(obj);
+        if ( receiver == null ) return null;
+        return getArg2().f(receiver);
       `
     },
 
@@ -3301,12 +3276,17 @@ foam.CLASS({
   documentation: `A binary predicate that evaluates arg1 as a predicate with
     arg2 as its argument.`,
 
+  javaImports: [
+    'static foam.core.ContextAware.maybeContextualize'
+  ],
+
   methods: [
     {
       name: 'f',
       javaCode: `
         Object predicate = getArg1().f(obj);
         if ( predicate instanceof Predicate ) {
+          maybeContextualize(getX(), predicate);
           return ((Predicate) predicate).f(getArg2().f(obj));
         }
         return false;
@@ -3318,6 +3298,11 @@ foam.CLASS({
         }
         return false;
       }
+    },
+    {
+      name: 'deepClone',
+      type: 'FObject',
+      javaCode: 'return this;'
     }
   ]
 });
@@ -3426,6 +3411,7 @@ foam.CLASS({
     'foam.mlang.expr.Add',
     'foam.mlang.expr.Divide',
     'foam.mlang.expr.Dot',
+    'foam.mlang.expr.Ref',
     'foam.mlang.expr.MaxFunc',
     'foam.mlang.expr.MinFunc',
     'foam.mlang.expr.Multiply',
@@ -3519,6 +3505,7 @@ foam.CLASS({
     function ENDS_WITH(a, b) { return this._binary_("EndsWith", a, b); },
     function FUNC(fn) { return this.Func.create({ fn: fn }); },
     function DOT(a, b) { return this._binary_("Dot", a, b); },
+    function REF(a) { return this._unary_("Ref", a); },
     function DOT_F(a, b) { return this._binary_("DotF", a, b); },
     function ADD() { return this._nary_("Add", arguments); },
     function SUB() { return this._nary_("Subtract", arguments); },

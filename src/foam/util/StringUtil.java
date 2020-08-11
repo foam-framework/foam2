@@ -76,6 +76,6 @@ public class StringUtil {
     if ( SafetyUtil.isEmpty(s) ) return s;
     char[] chars = s.toCharArray();
     chars[0] = Character.toUpperCase(chars[0]);
-    return chars.toString();
+    return new String(chars);
   }
 }

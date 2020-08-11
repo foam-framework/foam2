@@ -71,7 +71,7 @@ public class JSONFObjectFormatter
   };
 
   protected boolean quoteKeys_               = false;
-  protected boolean outputShortNames_        = true;
+  protected boolean outputShortNames_        = false;
   protected boolean outputDefaultValues_     = false;
   protected boolean multiLineOutput_         = false;
   protected boolean outputClassNames_        = true;
@@ -297,6 +297,10 @@ public class JSONFObjectFormatter
     return true;
   }
 
+  public List getDelta(FObject oldFObject, FObject newFObject) {
+    return delta_ == null ? super.getDelta(oldFObject, newFObject) : delta_;
+  }
+
   public void outputDelta(FObject oldFObject, FObject newFObject) {
     outputDelta(oldFObject, newFObject, null);
   }
@@ -456,7 +460,7 @@ public class JSONFObjectFormatter
   }
 
   public JSONFObjectFormatter setOutputShortNames(boolean outputShortNames) {
-    outputShortNames_ = outputShortNames;
+   // outputShortNames_ = outputShortNames;
     return this;
   }
 

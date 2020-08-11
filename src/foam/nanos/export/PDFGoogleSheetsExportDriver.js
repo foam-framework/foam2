@@ -41,43 +41,41 @@ foam.CLASS({
         var stringArray = [];
         var columnConfig = X.columnConfigToPropertyConverter;
 
-        var props = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(obj.cls);
-        props = columnConfig.filterExportedProps(obj.cls_, props);
+        var propNames = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(obj.cls);
+        propNames = columnConfig.filterExportedProps(obj.cls_, propNames);
         
-        var metadata = await self.outputter.getColumnMethadata(X, obj.cls_, props);
-        stringArray.push(metadata.map(m => m.columnLabel));
-        var values = [ await this.outputter.objToArrayOfStringValues(X, obj.cls_, [ obj ], metadata.map(p => p.propName)) ];
-        stringArray = stringArray.concat(values);
+        var metadata = await self.outputter.getColumnMethadata(X, obj.cls_, propNames);
+        stringArray = [ await this.outputter.objectToTable(X, obj.cls_, obj, propNames) ];
 
         sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata, this);
         if ( ! sheetId || sheetId.length == 0)
           return '';
         var url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?exportFormat=pdf&format=pdf&scale=3`;
-        X.googleSheetsDataExport.deleteSheet(X, sheetId);
         return url;
     },
     async function exportDAO(X, dao) {
       var self = this;
       var columnConfig = X.columnConfigToPropertyConverter;
 
-      var props = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(dao.of);
-      props = columnConfig.filterExportedProps(dao.of, props);
+      var propNames = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(dao.of);
+      propNames = columnConfig.filterExportedProps(dao.of, propNames);
 
-      var metadata = await self.outputter.getColumnMethadata(X, dao.of, props);
+      var metadata = await self.outputter.getColumnMethadata(X, dao.of, propNames);
 
-      var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(dao.of, props);
+      var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(dao.of, propNames);
       var sink = await dao.select(expr);
       
       var sheetId  = '';
-      var stringArray = await self.outputter.outputTable(X, dao.of, sink.array, metadata);
-
+      var stringArray = await self.outputter.returnTable(X, dao.of, propNames, sink.array);
 
       sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata, this);
       if ( ! sheetId || sheetId.length == 0)
         return '';
-      var url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?exportFormat=pdf&format=pdf&scale=3`;
-      X.googleSheetsDataExport.deleteSheet(X, sheetId);
+      var url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?exportFormat=pdf&format=pdf&scale=1`;
       return url;
     }
-  ]
+  ],
+  constants: {
+    SPREADSHEET_ID_REGEX: '/spreadsheets/d/([a-zA-Z0-9-_]+)',
+  }
 });

@@ -31,37 +31,84 @@ p({
 p({
   "class":"foam.nanos.ruler.Rule",
   "id":"68afcf0c-c718-98f8-0841-75e9-crunch2",
-  "name":"Invalidate Dependencies If Prerequisite Invalidated",
-  "priority":1000,
+  "name":"Invalidate Dependents If Prerequisite Invalidated",
+  "priority":1,
   "ruleGroup":"crunch",
-  "documentation":"When a ucj falls out of GRANTED status, also invalidate any ucjs that depend on the first one.",
+  "documentation":"When a ucj falls out of GRANTED (or GRACE_PERIOD) status, also invalidate any ucjs that depend on the first one.",
   "daoKey":"userCapabilityJunctionDAO",
   "operation":1,
-  "after":false,
-  "saveHistory":false,
+  "after":true,
+  "saveHistory":true,
   "enabled":true,
   "predicate":{
-    "class":"foam.mlang.predicate.And",
+    "class":"foam.mlang.predicate.Or",
     "args":[
       {
-        "class":"foam.nanos.ruler.predicate.PropertyEQValue",
-        "propName":"status",
-        "propValue":{
-          "class":"foam.nanos.crunch.CapabilityJunctionStatus",
-          "ordinal":1
-        },
-        "isNew":false
+        "class":"foam.mlang.predicate.And",
+        "args":[
+          {
+            "class":"foam.mlang.predicate.Or",
+            "args":[
+              {
+                "class":"foam.nanos.ruler.predicate.PropertyEQValue",
+                "propName":"status",
+                "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1},
+                "isNew":false
+              },
+              {
+                "class":"foam.nanos.ruler.predicate.PropertyEQValue",
+                "propName":"status",
+                "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":5},
+                "isNew":false
+              }
+            ]
+          },
+          {
+            "class":"foam.mlang.predicate.And",
+            "args":[
+              {
+                "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
+                "propName":"status",
+                "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1}
+              },
+              {
+                "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
+                "propName":"status",
+                "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":5}
+              }
+            ]
+          }
+        ]
       },
-      {
-        "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
-        "propName":"status",
-        "propValue":{
-          "class":"foam.nanos.crunch.CapabilityJunctionStatus",
-          "ordinal":1
-        }
+      { 
+        "class":"foam.mlang.predicate.And",
+        "args":[
+          {
+            "class":"foam.mlang.predicate.Or",
+            "args":[
+              {
+                "class":"foam.nanos.ruler.predicate.PropertyEQValue",
+                "propName":"status",
+                "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":0},
+                "isNew":false
+              },
+              {
+                "class":"foam.nanos.ruler.predicate.PropertyEQValue",
+                "propName":"status",
+                "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":6},
+                "isNew":false
+              }
+            ]
+          },
+          {
+            "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
+            "propName":"status",
+            "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":3}
+          },
+        ]
       }
     ]
   },
-  "action":{"class":"foam.nanos.crunch.CascadeInvalidate"},
+  "action":{"class":"foam.nanos.crunch.ReputDependentUCJs"},
   "lifecycleState":1
 })

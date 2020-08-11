@@ -15,6 +15,16 @@ p({
   "parent":"admin"
 })
 p({"class":"foam.nanos.menu.Menu","id":"admin.cron","label":"Cron Jobs","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"cronDAO"}},"parent":"admin"})
+p({
+  "class": "foam.nanos.menu.Menu",
+  "id": "admin.crunchlab",
+  "label": "CRUNCH Lab",
+  "handler": {
+    "class": "foam.nanos.menu.ViewMenu",
+    "view": {"class":"foam.u2.crunch.CrunchLab"}
+  },
+  "parent":"admin"
+})
 p({"class":"foam.nanos.boot.DAONSpecMenu","id":"admin.data","label":"Data Management","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.boot.DAOConfigSummaryView"}},"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"admin.emailmessages","label":"Email Messages","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"emailMessageDAO"}},"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"admin.emailtemplates","label":"Email Templates","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"emailTemplateDAO"}},"parent":"admin"})
