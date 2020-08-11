@@ -386,6 +386,7 @@ var classes = [
   'foam.nanos.notification.EmailSetting',
   'foam.nanos.notification.NotificationSetting',
   'foam.nanos.notification.NotificationHostnameRuleAction',
+  'foam.nanos.notification.SlackSetting',
   'foam.nanos.notification.ToastNotificationDAO',
   'foam.nanos.notification.ToastState',
   'foam.nanos.notification.ResendNotificationServiceInterface',
@@ -623,6 +624,7 @@ var classes = [
   'foam.nanos.crunch.AgentCapabilityJunction',
   'foam.nanos.crunch.CapabilityCapabilityJunction',
   'foam.nanos.crunch.AssociatedEntity',
+  'foam.nanos.crunch.CapabilityAvailabilityDAO',
 
   //daos
   'foam.nanos.crunch.UserCapabilityJunctionDAO',
