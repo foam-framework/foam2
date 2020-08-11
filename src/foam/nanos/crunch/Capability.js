@@ -18,6 +18,9 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.dao.Sink',
     'foam.mlang.sink.Count',
+    'foam.nanos.auth.Subject',
+    'foam.nanos.auth.User',
+    'foam.nanos.logger.Logger',
     'java.util.Date',
     'java.util.List',
     'static foam.mlang.MLang.*'
@@ -317,7 +320,7 @@ foam.CLASS({
 
       return today.after(capabilityExpiry);
       `
-    }
+    },
   ]
 });
 
