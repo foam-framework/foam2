@@ -24,6 +24,7 @@ public abstract class AbstractFObjectFormatter
   protected PropertyPredicate propertyPredicate_;
   protected PropertyPredicate optionalPredicate_ = new StorageOptionalPropertyPredicate();
   protected Map<String, List<PropertyInfo>> propertyMap_ = new HashMap<>();
+  protected List<PropertyInfo> delta_;
 
   public AbstractFObjectFormatter(X x) {
     setX(x);
@@ -41,7 +42,10 @@ public abstract class AbstractFObjectFormatter
 
   public StringBuilder builder() { return b_; }
 
-  public void reset() { builder().setLength(0); }
+  public void reset() { 
+    delta_ = null;
+    builder().setLength(0); 
+  }
 
   public String stringify(FObject obj) {
     reset();
@@ -84,23 +88,23 @@ public abstract class AbstractFObjectFormatter
     int       size           = axioms.size();
     int       optional       = 0;
 
-    List<PropertyInfo> delta = new ArrayList<>();
+    delta_ = new ArrayList<PropertyInfo>();
 
     for ( int i = 0 ; i < size ; i++ ) {
       PropertyInfo prop = (PropertyInfo) axioms.get(i);
 
       if ( prop.compare(oldFObject, newFObject) != 0 ) {
-        delta.add(prop);
+        delta_.add(prop);
         if ( optionalPredicate_.propertyPredicateCheck(getX(), of, prop) ) {
           optional += 1;
         }
       }
     }
     if ( optional > 0 &&
-         delta.size() == optional ) {
-      delta = new ArrayList<>();
+         delta_.size() == optional ) {
+      delta_ = new ArrayList<>();
     }
-    return delta;
+    return delta_;
   }
 
   public void setPropertyPredicate(PropertyPredicate p) {
