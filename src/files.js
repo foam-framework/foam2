@@ -852,6 +852,10 @@ FOAM_FILES([
   { name: "foam/nanos/column/NestedPropertiesExpression" },
   { name: "foam/nanos/column/TableColumnOutputter" },
 
+  // Translation Support
+  { name: 'foam/i18n/XLIFFTranslationValue' },
+  { name: 'foam/i18n/Locale' },
+
   { name: "foam/nanos/pool/AbstractFixedThreadPool" },
   { name: "foam/nanos/pool/ThreadPoolAgency" }
 ]);

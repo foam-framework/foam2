@@ -634,6 +634,13 @@ var classes = [
   'foam.nanos.crunch.RemoveJunctionsOnUserRemoval',
   'foam.nanos.crunch.CascadeInvalidate',
   'foam.nanos.crunch.CrunchService',
+  'foam.nanos.crunch.ReputDependentUCJs',
+  //ucjdao rules
+  'foam.nanos.crunch.ruler.CheckUCJOwnershipOnPut',
+  'foam.nanos.crunch.ruler.ValidateUCJDataOnPut',
+  'foam.nanos.crunch.ruler.SetUCJStatusOnPut',
+  'foam.nanos.crunch.ruler.ConfigureUCJExpiryOnGranted',
+  'foam.nanos.crunch.ruler.SaveUCJDataOnGranted',
   //authservice
   'foam.nanos.auth.CapabilityAuthService',
   // userQueryService
@@ -667,7 +674,11 @@ var classes = [
   'foam.nanos.approval.AuthenticatedApprovalDAOAuthorizer',
   'foam.nanos.approval.PopulateApprovalRequestsDAO',
 
-  'foam.core.NumberSet'
+  'foam.core.NumberSet',
+
+  // Translation Support
+  'foam.i18n.XLIFFTranslationValue',
+  'foam.i18n.Locale'
 ];
 
 var abstractClasses = [
