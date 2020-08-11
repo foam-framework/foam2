@@ -14,7 +14,24 @@ foam.CLASS({
     capability to user.
   `,
 
+  tableColumns: [
+    'sourceId',
+    'targetId',
+    'status',
+    'created',
+    'expiry',
+    'graceDaysLeft',
+    'data'
+  ],
+
   properties: [
+    {
+      name: 'id',
+      class: 'String',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      section: 'basicInfo'
+    },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',

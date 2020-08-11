@@ -80,6 +80,7 @@ FOAM_FILES([
   { name: "foam/lib/csv/PrefixedCSVOutputter" },
   { name: "foam/lib/csv/DynamicHeaderCSVParser" },
   { name: "foam/parse/StringPStream" },
+  { name: "foam/core/Validator" },
   { name: "foam/parse/ErrorReportingPStream" },
   { name: "foam/parse/TrapPStream" },
   { name: "foam/parse/InvalidPStream" },
@@ -719,6 +720,7 @@ FOAM_FILES([
   { name: "foam/flow/Document" },
   { name: "foam/flow/MarkupEditor" },
   { name: "foam/flow/DocumentationFolderDAO" },
+  { name: "foam/flow/widgets/PropertyShortSummary" },
 
   { name: "org/chartjs/Lib" },
   { name: "org/chartjs/ChartCView" },

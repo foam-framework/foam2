@@ -205,6 +205,14 @@ foam.CLASS({
             delegate = new foam.dao.ValidatingDAO(getX(), delegate, foam.core.ValidatableValidator.instance());
         }
 
+        if ( getServiceProviderAware() ) {
+          foam.nanos.auth.ServiceProviderAwareDAO dao = new foam.nanos.auth.ServiceProviderAwareDAO.Builder(getX()).setDelegate(delegate).build();
+          if ( getServiceProviderAwarePropertyInfos() != null ) {
+            dao.setPropertyInfos(getServiceProviderAwarePropertyInfos());
+          }
+          delegate = dao;
+        }
+
         if ( getLifecycleAware() ) {
           delegate = new foam.nanos.auth.LifecycleAwareDAO.Builder(getX())
             .setDelegate(delegate)
@@ -250,14 +258,6 @@ foam.CLASS({
             .setDelegate(delegate)
             .setAuthorizer(getAuthorizer())
             .build();
-        }
-
-        if ( getServiceProviderAware() ) {
-          foam.nanos.auth.ServiceProviderAwareDAO dao = new foam.nanos.auth.ServiceProviderAwareDAO.Builder(getX()).setDelegate(delegate).build();
-          if ( getServiceProviderAwarePropertyInfos() != null ) {
-            dao.setPropertyInfos(getServiceProviderAwarePropertyInfos());
-          }
-          delegate = dao;
         }
 
         if ( getNSpec() != null && getNSpec().getServe() && ! getAuthorize() && ! getReadOnly() )

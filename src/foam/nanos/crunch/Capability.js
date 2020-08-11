@@ -173,10 +173,20 @@ foam.CLASS({
     {
       class: 'foam.mlang.predicate.PredicateProperty',
       name: 'interceptIf',
+      networkTransient: true,
       javaFactory: `
       return foam.mlang.MLang.TRUE;
       `,
       documentation: 'condition under which the permissions that may be intercepted by this capability will be intercepted.'
+    },
+    {
+      class: 'foam.mlang.predicate.PredicateProperty',
+      name: 'availabilityPredicate',
+      networkTransient: true,
+      javaFactory: `
+      return foam.mlang.MLang.TRUE;
+      `,
+      documentation: 'Predicate used to omit or include capabilities from capabilityDAO'
     },
     {
       name: 'lastModified',
