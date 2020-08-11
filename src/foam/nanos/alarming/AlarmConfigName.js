@@ -1,3 +1,7 @@
+/**
+ * @license
+ * Copyright 2020 nanopay Inc. All Rights Reserved.
+ */
 foam.CLASS({
   package: 'foam.nanos.alarming',
   name: 'AlarmConfigName',
