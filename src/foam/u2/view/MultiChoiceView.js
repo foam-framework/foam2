@@ -1,18 +1,7 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
@@ -20,36 +9,70 @@ foam.CLASS({
   name: 'MultiChoiceView',
   extends: 'foam.u2.View',
 
-  requires:  [
-    'foam.core.ArraySlot',
-  ],
-
   documentation: `
     Wraps a tag that represents multiple choices. 
 
-    The choices are [value, label, isSelected ] triplets. this.choice is the current
-    pair, this.data the current value. this.text is the current label,
-    this.label is the label for the whole view (eg. "Medal Color", not
-    "Gold", false).
+    The choices are in [value, label, isSelected, choiceMode ] quartets.
+
+    However the client can simply pass in [value, label] and it will adapt to a [value, label, isSelected, choiceMode ] format
+
+    Adds flexibility incase the client wants to have preselected options for the user or a choice disabled from the start
+
+    Calling the method, this.outputSelectedChoicesInValueLabelFormat() will return an array containing the selected choices in [ value, label ] format only if the minSelected, maxSelected criteria is respected
+
     For now choices can only be provided as an array (this.choices)
 
-    this.booleanView is a ViewSpec for each choice. It defaults to
-    foam.u2.CheckBox
+    this.booleanView is a ViewSpec for each choice. It defaults to foam.u2.CheckBox
   `,
 
   properties: [
     {
       name: 'choices',
       documentation: `
-        An array of choices which are single choice is denoted as [value, label, isSelected]
+        An array of choices which are single choice is denoted as [value, label, isSelected, choiceMode], however the user can
+        just pass in [value, label] and 
       `,
       factory: function() {
-        return [["test1", "test1", false], ["test2", "test2", false], ["test3", "test3", true]];
+        return [["test1", "test1", false, this.mode], ["test2", "test2", false, this.mode], ["test3", "test3", false, this.mode]];
       },
-      postSet: function(o,n){
-        console.log("hit");
-        console.log(n);
+      postSet: function(_,n){
+        var selectedChoices = n.filter(choice => choice[2] );
+
+        if ( selectedChoices.length >= this.minSelected && selectedChoices.length <= this.maxSelected ){
+          this.isValidNumberOfChoices = true;
+        } else {
+          this.isValidNumberOfChoices = false;
+        }
+
+        if ( selectedChoices.length < this.maxSelected ) {
+          n.forEach((choice) => {
+            if ( ! choice[2] ){
+              choice[3] = this.mode
+            }
+          })
+        } else {
+          n.forEach((choice) => {
+            if ( ! choice[2] ){
+              choice[3] = foam.u2.DisplayMode.DISABLED
+            }
+          })
+        }
       },
+    },
+    {
+      class: 'Boolean',
+      name: 'isValidNumberOfChoices',
+      value: this.minSelected === 0 ? true : false
+    },
+    {
+      class: 'Boolean',
+      name: 'showMinMaxHelper',
+      value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'showValidNumberOfChoicesHelper',
+      value: false
     },
     {
       class: 'Int',
@@ -59,8 +82,8 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'maxSelected',
-      expression: function (choices) {
-        return choices.length;
+      factory: function () {
+        return this.choices.length;
       }
     },
     {
@@ -76,25 +99,62 @@ foam.CLASS({
       var arraySlotForChoices = foam.core.ArraySlot.create({
         slots: []
       });
-
       this
-        .add(
-          this.choices.map(function (choice) {
-            var simpSlot1 = foam.core.SimpleSlot.create({ value: choice[2] });
-            var simpSlot2 = foam.core.SimpleSlot.create({ value: choice[1] });
+        .start()
+          .add(self.slot(function(showMinMaxHelper, minSelected, maxSelected) {
+            return self.E().callIf(showMinMaxHelper, function() {
+              this
+              .start(foam.u2.layout.Rows)
+                .start()
+                  .add(`Min number of choices: ${minSelected}`)
+                .end()
+                .start()
+                  .add(`Max number of choices: ${maxSelected}`)
+                .end()
+              .end()
+            })
+          }))
+        .end()
+        .start()
+          .add(
+            this.choices.map(function (choice) {
+              var simpSlot0 = foam.core.SimpleSlot.create({ value: choice[0] });
+              var simpSlot1 = foam.core.SimpleSlot.create({ value: choice[1] });
+              var simpSlot2 = foam.core.SimpleSlot.create({ value: choice[2] });
+              var simpSlot3 = foam.core.SimpleSlot.create({ value: choice[3] });
 
-            arraySlotForChoices.slots.push(simpSlot1);
-            arraySlotForChoices.slots.push(simpSlot2);
+              var arraySlotForChoice = foam.core.ArraySlot.create({
+                slots: [ simpSlot0, simpSlot1, simpSlot2, simpSlot3 ]
+              })
 
-            return self.E()
-              .tag(self.booleanView, {
-                data$: simpSlot1,
-                label$: simpSlot2
-              });
-          })
-        )
+              arraySlotForChoices.slots.push(arraySlotForChoice);
 
-      this.choices$.follow(arraySlotForChoices);
+              return self.E()
+                .tag(self.booleanView, {
+                  data$: simpSlot2,
+                  label$: simpSlot1,
+                  mode$: simpSlot3
+                });
+            })
+          )
+        .end()
+        .start()
+          .add(
+            self.slot(function(showValidNumberOfChoicesHelper ,isValidNumberOfChoices) {
+              return self.E().callIf(! isValidNumberOfChoices && showValidNumberOfChoicesHelper, function() {
+                this
+                  .add("Please select a valid number of choices")
+              })
+            })
+          )
+        .end()
+
+      this.choices$ = arraySlotForChoices;
+    },
+
+    function outputSelectedChoicesInValueLabelFormat() {
+      if ( this.isValidNumberOfChoices ) console.warn("Please select a valid number of choices");
+      else return this.choices.map(choice => [choice[0], choice[1]]);
     }
   ]
 });
