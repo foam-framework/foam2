@@ -170,10 +170,24 @@ foam.CLASS({
         .end()
         .start()
           .add(
-            self.slot(function(showValidNumberOfChoicesHelper ,isValidNumberOfChoices) {
-              return self.E().callIf(! isValidNumberOfChoices && showValidNumberOfChoicesHelper, function() {
+            self.slot(function(showValidNumberOfChoicesHelper ,isValidNumberOfChoices, choices) {
+              return self.E()
+              .callIf(! isValidNumberOfChoices && showValidNumberOfChoicesHelper, function() {
                 this
                   .add("Please select a valid number of choices")
+              })
+              .callIf(isValidNumberOfChoices && showValidNumberOfChoicesHelper, function() {
+                this
+                  .start()
+                    .add("Here are your valid selected choices using the outputSelectedChoicesInValueLabelFormat() function:")
+                  .end()
+                  .start()
+                    .add(
+                      self.outputSelectedChoicesInValueLabelFormat().map(function(choice){
+                        return self.E().add(`[${choice[0]},${choice[1]}]`)
+                      })
+                    )
+                  .end()
               })
             })
           )
@@ -183,8 +197,14 @@ foam.CLASS({
     },
 
     function outputSelectedChoicesInValueLabelFormat() {
-      if ( this.isValidNumberOfChoices ) console.warn("Please select a valid number of choices");
-      else return this.choices.map(choice => [choice[0], choice[1]]);
+      if ( ! this.isValidNumberOfChoices ) {
+        console.warn("Please select a valid number of choices");
+        return [];
+      }
+
+      var filteredChoices = this.choices.filter(choice => choice[2]);
+
+      return filteredChoices.map(choice => [choice[0], choice[1]]);
     }
   ]
 });
