@@ -510,6 +510,7 @@ foam.CLASS({
     },
     {
       name: 'partialEval',
+      code: function() { return this },
       javaCode: 'return foam.mlang.MLang.TRUE;'
     }
   ]
@@ -540,6 +541,7 @@ foam.CLASS({
     },
     {
       name: 'partialEval',
+      code: function() { return this },
       javaCode: 'return foam.mlang.MLang.FALSE;'
     }
   ]
