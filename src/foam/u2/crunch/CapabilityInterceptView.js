@@ -35,13 +35,6 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'capabilityView',
-      class: 'foam.u2.ViewSpec',
-      factory: function() {
-        return 'foam.u2.crunch.CapabilityCardView';
-      }
-    },
-    {
       name: 'onClose',
       class: 'Function',
       factory: function() {
@@ -118,7 +111,7 @@ foam.CLASS({
               return this.E().select(this.capabilityDAO.where(
                 self.IN(self.Capability.ID, data$capabilityOptions)
               ), cap => {
-                return this.E().tag(self.capabilityView, {
+                return this.E().tag(self.CapabilityCardView, {
                   data: cap
                 })
                   .on('click', () => {

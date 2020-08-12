@@ -18,6 +18,9 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.dao.Sink',
     'foam.mlang.sink.Count',
+    'foam.nanos.auth.Subject',
+    'foam.nanos.auth.User',
+    'foam.nanos.logger.Logger',
     'java.util.Date',
     'java.util.List',
     'static foam.mlang.MLang.*'
@@ -170,10 +173,20 @@ foam.CLASS({
     {
       class: 'foam.mlang.predicate.PredicateProperty',
       name: 'interceptIf',
+      networkTransient: true,
       javaFactory: `
       return foam.mlang.MLang.TRUE;
       `,
       documentation: 'condition under which the permissions that may be intercepted by this capability will be intercepted.'
+    },
+    {
+      class: 'foam.mlang.predicate.PredicateProperty',
+      name: 'availabilityPredicate',
+      networkTransient: true,
+      javaFactory: `
+      return foam.mlang.MLang.TRUE;
+      `,
+      documentation: 'Predicate used to omit or include capabilities from capabilityDAO'
     },
     {
       name: 'lastModified',
@@ -307,7 +320,7 @@ foam.CLASS({
 
       return today.after(capabilityExpiry);
       `
-    }
+    },
   ]
 });
 

@@ -42,6 +42,13 @@ foam.ENUM({
       name: 'GRACE_PERIOD',
       label: 'grace period',
       documentation: `This status is used when a UCJ is expired, but the number of graceDaysLeft is greater than 0 `
+    },
+    {
+      name: 'APPROVED',
+      label: 'approved',
+      documentation: `Denoting a UCJ requiring review has been approved. It would need to go through the rules of the ucjDAO before 
+      being set to granted.`,
+      background: '#bfae32'
     }
   ]
 });

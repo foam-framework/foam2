@@ -80,6 +80,7 @@ FOAM_FILES([
   { name: "foam/lib/csv/PrefixedCSVOutputter" },
   { name: "foam/lib/csv/DynamicHeaderCSVParser" },
   { name: "foam/parse/StringPStream" },
+  { name: "foam/core/Validator" },
   { name: "foam/parse/ErrorReportingPStream" },
   { name: "foam/parse/TrapPStream" },
   { name: "foam/parse/InvalidPStream" },
@@ -720,6 +721,7 @@ FOAM_FILES([
   { name: "foam/flow/Document" },
   { name: "foam/flow/MarkupEditor" },
   { name: "foam/flow/DocumentationFolderDAO" },
+  { name: "foam/flow/widgets/PropertyShortSummary" },
 
   { name: "org/chartjs/Lib" },
   { name: "org/chartjs/ChartCView" },
@@ -850,6 +852,10 @@ FOAM_FILES([
   { name: "foam/nanos/column/CSVTableOutputter"},
   { name: "foam/nanos/column/NestedPropertiesExpression" },
   { name: "foam/nanos/column/TableColumnOutputter" },
+
+  // Translation Support
+  { name: 'foam/i18n/XLIFFTranslationValue' },
+  { name: 'foam/i18n/Locale' },
 
   { name: "foam/nanos/pool/AbstractFixedThreadPool" },
   { name: "foam/nanos/pool/ThreadPoolAgency" }

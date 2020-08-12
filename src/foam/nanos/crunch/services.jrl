@@ -41,6 +41,7 @@ p({
   "serviceScript":"""
     return new foam.dao.EasyDAO.Builder(x)
       .setInnerDAO(x.get("localCapabilityDAO"))
+      .setDecorator(new foam.nanos.crunch.CapabilityAvailabilityDAO(x, new foam.dao.NullDAO(x, foam.nanos.crunch.Capability.getOwnClassInfo())))
       .setOf(foam.nanos.crunch.Capability.getOwnClassInfo())
       .build();
   """,
@@ -68,12 +69,15 @@ p({
   "class":"foam.nanos.boot.NSpec",
   "name":"userCapabilityJunctionDAO",
   "serve":true,
-  "serviceScript":"""
+  "serviceScript":"""    
+    decorator = new foam.dao.history.HistoryDAO(x, "userCapabilityJunctionHistoryDAO", new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.crunch.UserCapabilityJunction.getOwnClassInfo()).build());
     dao = new foam.dao.EasyDAO.Builder(x)
       .setAuthorize(false)
+      .setGuid(true)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("userCapabilityJunctions")
       .setOf(foam.nanos.crunch.UserCapabilityJunction.getOwnClassInfo())
+      .setDecorator(decorator)
       .build();
     userCap =  new foam.nanos.crunch.UserCapabilityJunctionDAO.Builder(x).setDelegate(dao).build();
     ruler = new foam.nanos.ruler.RulerDAO(x, userCap, "userCapabilityJunctionDAO");
@@ -111,4 +115,51 @@ p({
       .build();
   """,
   "client":"{\"of\":\"foam.nanos.crunch.CapabilityCapabilityJunction\", \"remoteListenerSupport\": false}"
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "crunchService",
+  "serve": true,
+  "authenticate": true,
+  "boxClass": "foam.nanos.crunch.CrunchServiceSkeleton",
+  "serviceClass": "foam.nanos.crunch.ServerCrunchService",
+  "client":
+    """
+      {
+        "class": "foam.nanos.crunch.ClientCrunchService",
+        "delegate": {
+          "class": "foam.box.SessionClientBox",
+          "delegate": {
+            "class": "foam.box.HTTPBox",
+            "url": "service/crunchService"
+          }
+        }
+      }
+    """
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "userCapabilityJunctionHistoryDAO",
+  "description": "DAO containing any modifications made to userCapabilityJunctions",
+  "serve": true,
+  "lazy": false,
+  "authNotes": "Protected by service-level access control. This service requires the 'service.userCapabilityJunctionHistoryDAO' permission to access.",
+  "serviceScript":
+  """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setAuthorize(false)
+      .setSeqNo(true)
+      .setSeqPropertyName("seqNo")
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("userCapabilityJunctionHistory")
+      .setOf(foam.dao.history.HistoryRecord.getOwnClassInfo())
+      .build()
+      .orderBy(foam.mlang.MLang.DESC(foam.dao.history.HistoryRecord.TIMESTAMP));
+  """,
+  "client":
+  """
+    { "of": "foam.dao.history.HistoryRecord" }
+  """
 })
