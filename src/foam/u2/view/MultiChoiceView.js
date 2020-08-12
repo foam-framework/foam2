@@ -4,6 +4,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+ // TODO: DAO Support make it do an IN QUERY where value is the ID
+
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'MultiChoiceView',
@@ -41,7 +43,7 @@ foam.CLASS({
         for processing purposes
       `,
       factory: function() {
-        return [["test1","test1"],["test2","test2"],["test3","test3"]];
+        return [];
       },
       adapt: function(_, n) {
         if ( ! Array.isArray(n) ) throw new Error("Please submit an array to choices in the MultiChoiceView");
