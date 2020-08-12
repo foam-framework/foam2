@@ -25,6 +25,13 @@ foam.CLASS({
     this.booleanView is a ViewSpec for each choice. It defaults to foam.u2.CheckBox
   `,
 
+  css: `
+    ^boolean-wrapper{
+      width: 100%;
+      height: 100%;
+    }
+  `,
+
   properties: [
     {
       name: 'choices',
@@ -34,7 +41,7 @@ foam.CLASS({
         for processing purposes
       `,
       factory: function() {
-        return [];
+        return [["test1","test1"],["test2","test2"],["test3","test3"]];
       },
       adapt: function(_, n) {
         if ( ! Array.isArray(n) ) throw new Error("Please submit an array to choices in the MultiChoiceView");
@@ -101,7 +108,7 @@ foam.CLASS({
       class: 'Int',
       name: 'maxSelected',
       factory: function () {
-        return this.choices.length;
+        return 2;
       }
     },
     {
@@ -109,6 +116,11 @@ foam.CLASS({
       name: 'booleanView',
       value: { class: 'foam.u2.CheckBox' }
     },
+    {
+      class: 'Boolean',
+      name: 'isVertical',
+      value: true
+    }
   ],
 
   methods: [
@@ -133,9 +145,9 @@ foam.CLASS({
             })
           }))
         .end()
-        .start()
+        .start(self.isVertical ? foam.u2.layout.Rows : foam.u2.layout.Cols)
           .add(
-            this.choices.map(function (choice) {
+            self.choices.map(function (choice) {
               var simpSlot0 = foam.core.SimpleSlot.create({ value: choice[0] });
               var simpSlot1 = foam.core.SimpleSlot.create({ value: choice[1] });
               var simpSlot2 = foam.core.SimpleSlot.create({ value: choice[2] });
@@ -147,12 +159,12 @@ foam.CLASS({
 
               arraySlotForChoices.slots.push(arraySlotForChoice);
 
-              return self.E()
+              return self.E().addClass(self.myClass("boolean-wrapper"))
                 .tag(self.booleanView, {
-                  data$: simpSlot2,
-                  label$: simpSlot1,
-                  mode$: simpSlot3
-                });
+                    data$: simpSlot2,
+                    label$: simpSlot1,
+                    mode$: simpSlot3
+                  })
             })
           )
         .end()
