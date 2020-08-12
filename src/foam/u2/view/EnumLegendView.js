@@ -11,6 +11,7 @@ foam.CLASS({
   ^eachValue {
     display: inline-flex;
     padding: 12px;
+    text-align: justify;
   }
   ^badge {
     float: right;
@@ -34,15 +35,15 @@ foam.CLASS({
     color: #ffffff;
   }
 
-  ^text-css {
-    float: right;
-    text-align: justify;
-  }
   `,
   properties: [
     {
       class: 'Class',
       name: 'of'
+    },
+    {
+      class: 'Array',
+      name: 'enumValueToHide'
     }
   ],
   methods: [
@@ -51,18 +52,21 @@ foam.CLASS({
 
       this.start().addClass(this.myClass('container'))
       .start('h3').add('Status Legend').end()
-      .add(this.of.VALUES.map(
-        statusEnum => {
-          return this.E().start().addClass(this.myClass('eachValue'))
-            .start().add(
-              foam.u2.view.ReadOnlyEnumView.create({
-                data: statusEnum
-              }).addClass(this.myClass('badge'))
-              .style({ 'background-color': statusEnum.background })
-            ).end()
-            .start('span').addClass(this.myClass('txt-css')).add(statusEnum.documentation).end()
-          .end();
-        }
+      .add(this.of.VALUES
+        .filter(
+          statusEnum => ! this.enumValueToHide.includes(statusEnum.name))
+        .map(
+          statusEnum => {
+            return this.E().start().addClass(this.myClass('eachValue'))
+              .start().add(
+                foam.u2.view.ReadOnlyEnumView.create({
+                  data: statusEnum
+                }).addClass(this.myClass('badge'))
+                .style({ 'background-color': statusEnum.background })
+              ).end()
+              .start().add(statusEnum.documentation).end()
+            .end();
+          }
       ))
       .end();
     }

@@ -69,6 +69,9 @@ foam.CLASS({
       overflow: scroll;
       height: 53vh;
     }
+    ^legendSize {
+      width: 47%;
+    }
     ^ .foam-u2-layout-Rows {
       display: initial;
       border-style: solid;
@@ -123,7 +126,7 @@ foam.CLASS({
               }).addClass(this.myClass('capList-css'));
             }))
           .end()
-          .start().style({ 'width': '47%' }).tag(foam.u2.view.EnumLegendView, { of: foam.nanos.crunch.CapabilityJunctionStatus }).end()
+          .start().addClass(this.myClass('legendSize')).tag(foam.u2.view.EnumLegendView, { of: foam.nanos.crunch.CapabilityJunctionStatus, enumValueToHide: ['APPROVED'] }).end()
         .end()
         .startContext({ data: this })
           .tag(this.CANCEL, { buttonStyle: 'SECONDARY' })
