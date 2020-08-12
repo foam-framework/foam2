@@ -718,9 +718,12 @@ FOAM_FILES([
   { name: "foam/core/FObjectTest" },
 
   { name: "foam/flow/Document" },
+  { name: "foam/flow/DocumentMenu" },
   { name: "foam/flow/MarkupEditor" },
   { name: "foam/flow/DocumentationFolderDAO" },
   { name: "foam/flow/widgets/PropertyShortSummary" },
+  { name: "foam/flow/widgets/EnumSummary" },
+  { name: "foam/flow/widgets/DocumentationIncomplete" },
 
   { name: "org/chartjs/Lib" },
   { name: "org/chartjs/ChartCView" },
