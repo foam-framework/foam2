@@ -87,14 +87,14 @@ foam.CLASS({
     ^content {
       display: inline-block;
       vertical-align: middle;
-      font-family: IBMPlexSans;
+      font-family: /*%FONT1%*/s;
       font-size: 16px;
       font-weight: 600;
       color: #19402e;
       letter-spacing: normal;
     }
     ^description {
-      font-family: IBMPlexSans;
+      font-family: /*%FONT1%*/;
       font-size: 14px;
       font-weight: normal;
       line-height: 1.43;

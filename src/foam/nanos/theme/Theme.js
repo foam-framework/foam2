@@ -243,6 +243,11 @@ foam.CLASS({
       section: 'sectionCss'
     },
     {
+      class: 'String',
+      name: 'font1',
+      section: 'sectionCss'
+    },
+    {
       class: 'Color',
       name: 'primary1',
       section: 'colours'

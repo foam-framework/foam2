@@ -48,7 +48,7 @@ foam.CLASS({
     ^ .title {
       width: 208px;
       height: 40px;
-      font-family: IBMPlexSans;
+      font-family: /*%FONT1%*/;
       font-size: 35px;
       font-weight: 600;
       font-stretch: normal;
