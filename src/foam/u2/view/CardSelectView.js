@@ -42,7 +42,7 @@ foam.CLASS({
       factory: function(){
         return String(this.value);
       }
-    },
+    }
   ],
 
   methods: [

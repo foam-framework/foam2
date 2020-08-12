@@ -82,7 +82,7 @@ foam.CLASS({
             }
           })
         }
-      },
+      }
     },
     {
       class: 'Boolean',
