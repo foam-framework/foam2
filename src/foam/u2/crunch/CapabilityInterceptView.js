@@ -53,20 +53,46 @@ foam.CLASS({
   messages: [
     { name: 'REJECTED_MSG', message: 'Your choice to bypass this was stored, please refresh page to revert cancel selection.' },
     { name: 'TITLE', message: 'Welcome to Capability unlock options' },
-    { name: 'SUBTITLE', message: 'You do not have access to undertake your previous selected action. Please select one of the following capabilities, to unlock full feature.' }
+    { name: 'CAP_TITLE', message: 'Capabilities Available' },
+    { name: 'SUBTITLE_1', message: 'You do not have access to undertake your previous selected action.' },
+    { name: 'SUBTITLE_2', message: 'Please select one of the following capabilities, to unlock full feature.' }
   ],
 
   css: `
     ^{  
-      width: 47vw;
+      width: 55vw;
       text-align: center;
     }
     ^detail-container {
       overflow-y: scroll;
-      width: 40%;
+      width: 45%;
     }
-    ^ > *:not(:last-child) {
-      margin-bottom: 24px !important;
+    ^mainSection {
+      display: flex;
+      justify-content: space-between;
+      padding: 24px;
+    }
+    ^capList-css {
+      overflow: scroll;
+      height: 53vh;
+    }
+    ^ .foam-u2-layout-Rows {
+      display: initial;
+      border-style: solid;
+      border-width: thin;
+    }
+    h1 {
+      margin-bottom: 5px;
+    }
+    h3 {
+      text-decoration: underline;
+    }
+    h4 {
+      margin-block-start: 0;
+      margin: 0;
+      padding: 0;
+      margin-block-end: 0;
+      margin-bottom: 0;
     }
   `,
 
@@ -82,10 +108,12 @@ foam.CLASS({
       this
         .addClass(this.myClass())
         .start('h1').add(this.TITLE).end()
-        .start('h3').add(this.SUBTITLE).end()
-        .start().style({ 'display': 'flex', 'justify-content': 'space-between' })
+        .start('h4').add(this.SUBTITLE_1).end()
+        .start('h4').add(this.SUBTITLE_2).end()
+        .start().addClass(this.myClass('mainSection'))
           .start(this.Rows)
             .addClass(this.myClass('detail-container'))
+            .start('h3').add(this.CAP_TITLE).end()
             .add(this.slot(function(data$capabilityOptions) {
               return this.E().select(this.capabilityDAO.where(
                 self.IN(self.Capability.ID, data$capabilityOptions)
@@ -99,10 +127,10 @@ foam.CLASS({
                       this.checkStatus(cap);
                     });
                   });
-              });
+              }).addClass(this.myClass('capList-css'));
             }))
           .end()
-          .start().style({ 'width': '47%' }).tag(foam.u2.crunch.CapabilityJunctionStatusLegendView).end()
+          .start().style({ 'width': '47%' }).tag(foam.u2.view.EnumLegendView, { of: foam.nanos.crunch.CapabilityJunctionStatus }).end()
         .end()
         .startContext({ data: this })
           .tag(this.CANCEL, { buttonStyle: 'SECONDARY' })
@@ -171,46 +199,10 @@ foam.CLASS({
   actions: [
     {
       name: 'cancel',
-      label: 'Not interested in adding this functionality',
+      label: 'Not interested - Close',
       code: function(x) {
         this.reject(x);
       }
-    }
-  ]
-});
-// todo scroll
-foam.CLASS({
-  package: 'foam.u2.crunch',
-  name: 'CapabilityJunctionStatusLegendView',
-  extends: 'foam.u2.View',
-
-  css: `
-  .badgePosition {
-
-  }
-  `,
-  methods: [
-    function initE() {
-      this.SUPER();
-      var style = foam.u2.crunch.Style.create();
-
-      this.start().style({ 'border-style': 'outset' })
-      .start('h3').add('Status Legend').end()
-      .add(foam.nanos.crunch.CapabilityJunctionStatus.VALUES.map(
-        statusEnum => {
-          return this.E().start().style({ 'display': 'inline-flex', 'padding': '12px' })
-            
-            .start().add(
-              foam.u2.view.ReadOnlyEnumView.create({
-                data: statusEnum
-              }).addClass(style.myClass('badge'))
-              .style({ 'background-color': statusEnum.background, 'margin-top': '12px', 'margin-right': '7px', 'width': '71px' })
-            ).end()
-            .start('span').style({ 'float': 'right', 'text-align': 'justify' }).add(statusEnum.documentation).end()
-          .end();
-        }
-      ))
-      .end();
     }
   ]
 });
