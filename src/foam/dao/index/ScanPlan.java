@@ -56,7 +56,7 @@ public class ScanPlan
         order_   = null;
       } else {
         sortRequired = true;
-        cost *= Math.log(cost) / Math.log(2);
+        cost = (long) (Math.log(cost) / Math.log(2));
       }
     }
 
