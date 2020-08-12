@@ -26,7 +26,8 @@ foam.CLASS({
       border-color: /*%PRIMARY1%*/ #202341 !important;
     }
     ^disabled {
-      background-color: #f4f7fa !important;
+      background-color: /*%GREY5%*/ #f5f7fa !important;
+      color: /*%GREY2%*/ #9ba1a6;
     }
   `,
 
