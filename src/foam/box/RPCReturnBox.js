@@ -36,7 +36,10 @@ foam.CLASS({
       factory: function() {
         return new Promise(function(resolve, reject) {
           this.resolve_ = resolve;
-          this.reject_ = reject;
+          this.reject_ = function(obj) {
+            if ( obj.id === 'foam.nanos.crunch.CapabilityRuntimeException' ) return;
+            reject(obj);
+          };
         }.bind(this));
       },
       swiftType: 'Future<Any?>',
