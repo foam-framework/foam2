@@ -46,7 +46,7 @@ foam.INTERFACE({
         },
         {
           name: 'obj',
-          javaType: 'Object'
+          type: 'Object'
         },
         {
           name: 'metadataObj',
@@ -55,8 +55,7 @@ foam.INTERFACE({
         },
         {
           name: 'extraConfig',
-          type: 'Object',
-          javaType: 'foam.nanos.export.GoogleSheetsServiceConfig'
+          type: 'foam.nanos.export.GoogleSheetsServiceConfig'
         }
       ]
     },

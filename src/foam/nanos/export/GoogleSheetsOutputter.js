@@ -54,7 +54,7 @@ foam.CLASS({
       name: 'returnMetadataForProperty',
       code: function(x, of, prop, propName) {
           //to constants?
-          var cellType = 'STRING';
+          var cellType = '';
           var pattern = '';
           var unitProp;
           if ( foam.core.UnitValue.isInstance(prop) ) {
@@ -68,6 +68,8 @@ foam.CLASS({
             cellType = 'DATE_TIME';
           } else if ( foam.core.Time.isInstance(prop) ) {
             cellType = 'TIME';
+          } else if( foam.core.Int.isInstance(prop) || foam.core.Float.isInstance(prop) || foam.core.Long.isInstance(prop) || foam.core.Double.isInstance(prop) || foam.core.String.isInstance(prop) || foam.core.Boolean.isInstance(prop) || foam.core.String.isInstance(prop) ){
+            cellType = 'PRIMITIVE';
           }
 
           return this.GoogleSheetsPropertyMetadata.create({

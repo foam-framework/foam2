@@ -20,6 +20,7 @@ foam.CLASS({
     'com.google.api.services.sheets.v4.model.*',
     'foam.dao.DAO',
     'foam.mlang.sink.Projection',
+    'foam.nanos.column.TableColumnOutputter',
     'foam.nanos.export.GoogleSheetsPropertyMetadata',
     'foam.nanos.google.api.auth.GoogleApiAuthService',
     'foam.nanos.google.api.drive.GoogleDriveService',
@@ -60,7 +61,7 @@ foam.CLASS({
   ],
   methods: [
     {
-      name: 'populateWithDataSheetWithId',
+      name: 'populateWithDataSheetWithObj',
       javaType: 'String',
       javaThrows: [
         'IOException',
@@ -80,9 +81,8 @@ foam.CLASS({
           javaType: 'Object'
         },
         {
-          name: 'metadataObj',
+          name: 'metadata',
           type: 'foam.nanos.export.GoogleSheetsPropertyMetadata[]',
-          javaType: 'Object'
         },
         {
           name: 'extraConfig',
@@ -92,18 +92,46 @@ foam.CLASS({
       ],
       javaCode: `
         List<List<Object>> listOfValues = new ArrayList<>();
-        Object[] metadataArr = (Object[])metadataObj;
-        GoogleSheetsPropertyMetadata[] metadata = new GoogleSheetsPropertyMetadata[metadataArr.length];
-  
-        for ( int i = 0 ; i < metadata.length ; i++ ) {
-          metadata[i] = (GoogleSheetsPropertyMetadata)metadataArr[i];
-        }
-  
+        
         Object[] arr = (Object[]) obj;
         for ( Object v : arr ) {
           listOfValues.add(Arrays.asList((Object[])v));
         }
-  
+        
+        return populateWithDataSheetWithId(x, fileId, listOfValues, metadata, extraConfig);
+      `
+    },
+    {
+      name: 'populateWithDataSheetWithId',
+      javaType: 'String',
+      javaThrows: [
+        'IOException',
+        'GeneralSecurityException'
+      ],
+      args: [
+        {
+          name: 'x',
+          type: 'Context',
+        },
+        {
+          name: 'fileId',
+          type: 'String'
+        },
+        {
+          name: 'listOfValues',
+          javaType: 'List<List<Object>>'
+        },
+        {
+          name: 'metadata',
+          type: 'foam.nanos.export.GoogleSheetsPropertyMetadata[]',
+        },
+        {
+          name: 'extraConfig',
+          type: 'Object',
+          javaType: 'foam.nanos.export.GoogleSheetsServiceConfig'
+        }
+      ],
+      javaCode: `
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         GoogleApiAuthService googleApiAuthService = (GoogleApiAuthService)getX().get("googleApiAuthService");
         Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, SCOPES))
@@ -221,7 +249,9 @@ foam.CLASS({
     },
     {
       name: 'createSheetAndPopulateWithData',
-      javaType: 'String',
+      type: 'String',
+      javaThrows: [ 'java.lang.Exception' ],
+      async: true,
       args: [
         {
           name: 'x',
@@ -229,7 +259,7 @@ foam.CLASS({
         },
         {
           name: 'obj',
-          javaType: 'Object'
+          type: 'Object'
         },
         {
           name: 'metadataObj',
@@ -238,8 +268,7 @@ foam.CLASS({
         },
         {
           name: 'extraConfig',
-          type: 'Object',
-          javaType: 'foam.nanos.export.GoogleSheetsServiceConfig'
+          type: 'foam.nanos.export.GoogleSheetsServiceConfig'
         }
       ],
       javaCode: `
@@ -247,13 +276,17 @@ foam.CLASS({
           List<List<Object>> listOfValues = new ArrayList<>();
           Object[] metadataArr = (Object[])metadataObj;
           GoogleSheetsPropertyMetadata[] metadata = new GoogleSheetsPropertyMetadata[metadataArr.length];
+    
+          for ( int i = 0 ; i < metadata.length ; i++ ) {
+            metadata[i] = (GoogleSheetsPropertyMetadata)metadataArr[i];
+          }
 
           GoogleDriveService googleDriveService = (GoogleDriveService) getX().get("googleDriveService");
           String folderId = googleDriveService.createFolderIfNotExists(x, "Nanopay Export");
           String fileName = extraConfig == null || SafetyUtil.isEmpty(extraConfig.getTitle()) ? ("NanopayExport" + new Date()) : extraConfig.getTitle();
           String fileId = googleDriveService.createFile(x, folderId, fileName);
     
-          return populateWithDataSheetWithId(x, fileId, obj, metadataObj, extraConfig);
+          return populateWithDataSheetWithObj(x, fileId, obj, metadata, extraConfig);
         } catch ( Throwable t ) {
           Logger l = (Logger) getX().get("logger");
           l.error(t);
@@ -286,6 +319,8 @@ foam.CLASS({
     {
       name: 'createSheetByCopyingTemplate',
       javaType: 'String',
+      javaThrows: [ 'java.lang.Exception' ],
+      async: true,
       args: [
         {
           name: 'x',
@@ -293,7 +328,7 @@ foam.CLASS({
         },
         {
           name: 'obj',
-          javaType: 'Object'
+          type: 'Object'//clean me up
         },
         {
           name: 'metadataObj',
@@ -302,17 +337,24 @@ foam.CLASS({
         },
         {
           name: 'extraConfig',
-          type: 'Object',
-          javaType: 'foam.nanos.export.GoogleSheetsServiceConfig'
+          type: 'foam.nanos.export.GoogleSheetsServiceConfig'
         }
       ],
       javaCode: `
       try {
+        Object[] metadataArr = (Object[])metadataObj;
+        GoogleSheetsPropertyMetadata[] metadata = new GoogleSheetsPropertyMetadata[metadataArr.length];
+  
+        for ( int i = 0 ; i < metadata.length ; i++ ) {
+          metadata[i] = (GoogleSheetsPropertyMetadata)metadataArr[i];
+        }
+        java.util.List<java.util.List<String>> data = retrieveTemplateData(x, extraConfig.getExportClsInfo(), extraConfig.getServiceName(), metadata);
+
         GoogleDriveService googleDriveService = (GoogleDriveService) getX().get("googleDriveService");
         String folderId = googleDriveService.createFolderIfNotExists(x, "Nanopay Export");
         String fileName = extraConfig == null || SafetyUtil.isEmpty(extraConfig.getTitle()) ? ("NanopayExport" + new Date()) : extraConfig.getTitle();
         String fileId = googleDriveService.createAndCopyFromFile(x, folderId, fileName, extraConfig.getTemplate());
-        return populateWithDataSheetWithId(x, fileId, obj, metadataObj, extraConfig);
+        return populateWithDataSheetWithId(x, fileId, data, metadata, extraConfig);
       } catch ( Throwable t ) {
         Logger l = (Logger) getX().get("logger");
         l.error(t);
@@ -322,6 +364,7 @@ foam.CLASS({
     },
     {
       name: 'retrieveTemplateData',
+      javaType: 'java.util.List<java.util.List<String>>',
       args: [
         {
           name: 'x',
@@ -337,18 +380,24 @@ foam.CLASS({
           class: 'String'
         },
         {
-          name: 'propertiesName',
-          class: 'StringArray'
+          name: 'metadata',
+          type: 'foam.nanos.export.GoogleSheetsPropertyMetadata[]',
         }
       ],
       javaCode: `
         DAO dao = (DAO)x.get(daoName);
         if ( dao == null )
-          return;
-        
+          return null;
+        String[] propertiesName = new String[metadata.length];
+        for ( int i = 0 ; i < metadata.length ; i++ ) {
+          propertiesName[i] = metadata[i].getPropName();
+        }
         Projection p = ( new foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder() ).buildProjectionForPropertyNamesArray(of, propertiesName);
         dao.select(p);
         java.util.List values = p.getArray();
+
+        TableColumnOutputter outputter = new TableColumnOutputter();
+        return outputter.returnTableForMetadata(x, metadata, values);
       `
     }
   ]

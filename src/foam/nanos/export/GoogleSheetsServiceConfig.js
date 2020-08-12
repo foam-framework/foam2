@@ -9,6 +9,15 @@ foam.INTERFACE({
     {
       name: 'getTemplate',
       type: 'String',
+    },
+    {
+      name: 'getServiceName',
+      type: 'String',
+    },
+    {
+      name: 'getExportClsInfo',
+      type: 'Class',
+      javaType: 'foam.core.ClassInfo'
     }
   ]
 });

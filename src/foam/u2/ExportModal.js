@@ -139,7 +139,8 @@ foam.CLASS({
         self.isConvertAvailable =  self.exportDriverReg.isConvertible;
         self.isDownloadAvailable = self.exportDriverReg.isDownloadable;
         self.isOpenAvailable = self.exportDriverReg.isOpenable;
-        self.exportDriver.serviceName = self.serviceName;
+        if ( self.exportDriver.serviceName === '' )
+          self.exportDriver.serviceName = self.serviceName;
       });
 
       this

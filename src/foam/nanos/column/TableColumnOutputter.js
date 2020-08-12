@@ -139,7 +139,7 @@
         },
         {
           name: 'arrOfObjectValues',
-          javaType: 'Object[][]'
+          javaType: 'java.util.List<Object[]>'
         }
       ],
       javaType: 'java.util.List<java.util.List<String>>',
@@ -153,10 +153,10 @@
         }
         result.add(columnHeaders);
 
-        for ( int i = 0 ; i < arrOfObjectValues.length ; i++ ) {
+        for ( int i = 0 ; i < arrOfObjectValues.size() ; i++ ) {
           java.util.List<String> row = new ArrayList<>();
-          for ( int j = 0 ; j < arrOfObjectValues[i].length ; j++ ) {
-            row.add(returnStringValueForMetadata(x, metadata[j], arrOfObjectValues[j], null));
+          for ( int j = 0 ; j < arrOfObjectValues.get(i).length ; j++ ) {
+            row.add(returnStringValueForMetadata(x, metadata[j], arrOfObjectValues.get(i)[j], null));
           }
           result.add(row);
         }
@@ -190,6 +190,8 @@
         return "";
 
       switch(metadata.getCellType()) {
+        case "PRIMITIVE":
+          return obj.toString();
         case "CURRENCY":
           return metadata.getProp().unitPropValueToString(x, obj, unitPropValue);
         case "DATE":

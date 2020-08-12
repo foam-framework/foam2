@@ -45,7 +45,14 @@ foam.CLASS({
     },
     {
       name: 'serviceName',
-      class: 'String'
+      class: 'String',
+      value: 'businessDAO'
+    },
+    {
+      name: 'exportClsInfo',
+      class: 'Class',
+      javaType: 'foam.core.ClassInfo',
+      hidden: true
     }
   ],
 
@@ -69,7 +76,9 @@ foam.CLASS({
       return sheetId;
     },
     async function exportDAOAndReturnSheetId(X, dao) {
+      this.serviceName = X.serviceName.split('/')[1];
       var self = this;
+      this.exportClsInfo = dao.of;
 
       var columnConfig = X.columnConfigToPropertyConverter;
 

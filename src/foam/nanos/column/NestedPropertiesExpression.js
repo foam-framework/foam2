@@ -250,7 +250,13 @@ foam.CLASS({
             exprs.add(expr);
           }
         }
-        return (Expr[]) exprs.toArray();
+
+        Expr[] exprsArr = new Expr[exprs.size()];
+
+        for ( int i = 0 ; i < exprs.size() ; i++ ) {
+          exprsArr[i] = exprs.get(i);
+        }
+        return exprsArr;
       `
     },
     {
