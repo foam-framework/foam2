@@ -508,6 +508,10 @@ foam.CLASS({
       swiftCode: 'return true',
       javaCode: 'return true;'
     },
+    {
+      name: 'partialEval',
+      javaCode: 'return foam.mlang.MLang.TRUE;'
+    }
   ]
 });
 
@@ -533,6 +537,10 @@ foam.CLASS({
       type: 'String',
       javaCode: 'return " 1 <> 1 ";',
       code: function() { return "1 <> 1"; }
+    },
+    {
+      name: 'partialEval',
+      javaCode: 'return foam.mlang.MLang.FALSE;'
     }
   ]
 });
@@ -3226,9 +3234,9 @@ foam.CLASS({
   documentation: `
     A Binary Expression which evaluates arg1 and passes the result to arg2.
     In other word, the output of arg1 is the receiver of arg2.
-    
+
     For example, to get city from user address:
-    
+
     DOT(User.ADDRESS, Address.CITY).f(user); // return user.address.city
   `,
 
