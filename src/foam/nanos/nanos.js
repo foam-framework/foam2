@@ -38,6 +38,7 @@ FOAM_FILES([
   { name: 'foam/nanos/alarming/MonitorType' },
   { name: 'foam/nanos/alarming/AlarmAndMonitoring' },
   { name: 'foam/nanos/alarming/OMName' },
+  { name: 'foam/nanos/alarming/AlarmConfigName' },
   { name: 'foam/nanos/alarming/AlarmingUniqueNameDAO' },
   { name: "foam/nanos/auth/DayOfWeek" },
   { name: "foam/nanos/auth/Hours" },
@@ -400,7 +401,15 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/SendNotificationOnTopLevelCapabilityStatusUpdate" },
   { name: "foam/nanos/crunch/IsUserCapabilityJunctionStatusUpdate" },
   { name: "foam/nanos/crunch/RemoveJunctionsOnUserRemoval" },
-  { name: "foam/nanos/crunch/CascadeInvalidate" },
+  { name: "foam/nanos/crunch/CrunchService" },
+  { name: "foam/nanos/crunch/ClientCrunchService" },
+  { name: "foam/nanos/crunch/ReputDependentUCJs" },
+  //ucjDAO rules
+  { name: "foam/nanos/crunch/ruler/CheckUCJOwnershipOnPut" },
+  { name: "foam/nanos/crunch/ruler/ValidateUCJDataOnPut" },
+  { name: "foam/nanos/crunch/ruler/SetUCJStatusOnPut" },
+  { name: "foam/nanos/crunch/ruler/ConfigureUCJExpiryOnGranted" },
+  { name: "foam/nanos/crunch/ruler/SaveUCJDataOnGranted" },
   //views
   { name: "foam/nanos/crunch/ui/CapabilityView" },
 

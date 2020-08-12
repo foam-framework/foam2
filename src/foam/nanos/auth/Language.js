@@ -21,5 +21,11 @@
        class: "String",
        name: "name"
      },
+     {
+       class: 'String',
+       name: 'flagImage',
+       documentation: `The flag image used in relation to currencies from countries currently
+         supported by the platform.`,
+     },
    ]
  });

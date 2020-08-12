@@ -7,10 +7,8 @@
 package foam.nanos.http;
 
 import foam.core.X;
+import foam.core.XLocator;
 import foam.dao.DAO;
-import static foam.mlang.MLang.AND;
-import static foam.mlang.MLang.EQ;
-
 import foam.nanos.app.AppConfig;
 import foam.nanos.auth.*;
 import foam.nanos.boot.Boot;
@@ -24,6 +22,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.bouncycastle.util.encoders.Base64;
+import static foam.mlang.MLang.AND;
+import static foam.mlang.MLang.EQ;
 
 /**
  * A WebAgent decorator that adds session and authentication support.
@@ -46,7 +46,12 @@ public class AuthWebAgent
     Session     session = authenticate(x);
 
     if ( session == null ) {
-      templateLogin(x);
+      try {
+        XLocator.set(x);
+        templateLogin(x);
+      } finally {
+        XLocator.set(null);
+      }
       return;
     }
 
@@ -64,7 +69,12 @@ public class AuthWebAgent
       .put(HttpServletResponse.class, x.get(HttpServletResponse.class))
       .put(PrintWriter.class,         x.get(PrintWriter.class));
 
-    super.execute(requestX);
+    try {
+      XLocator.set(requestX);
+      super.execute(requestX);
+    } finally {
+      XLocator.set(null);
+    }
   }
 
   /** If provided, use user and password parameters to login and create session and cookie. **/

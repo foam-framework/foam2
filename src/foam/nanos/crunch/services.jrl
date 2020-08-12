@@ -41,6 +41,7 @@ p({
   "serviceScript":"""
     return new foam.dao.EasyDAO.Builder(x)
       .setInnerDAO(x.get("localCapabilityDAO"))
+      .setDecorator(new foam.nanos.crunch.CapabilityAvailabilityDAO(x, new foam.dao.NullDAO(x, foam.nanos.crunch.Capability.getOwnClassInfo())))
       .setOf(foam.nanos.crunch.Capability.getOwnClassInfo())
       .build();
   """,
@@ -118,6 +119,28 @@ p({
 
 p({
   "class": "foam.nanos.boot.NSpec",
+  "name": "crunchService",
+  "serve": true,
+  "authenticate": true,
+  "boxClass": "foam.nanos.crunch.CrunchServiceSkeleton",
+  "serviceClass": "foam.nanos.crunch.ServerCrunchService",
+  "client":
+    """
+      {
+        "class": "foam.nanos.crunch.ClientCrunchService",
+        "delegate": {
+          "class": "foam.box.SessionClientBox",
+          "delegate": {
+            "class": "foam.box.HTTPBox",
+            "url": "service/crunchService"
+          }
+        }
+      }
+    """
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
   "name": "userCapabilityJunctionHistoryDAO",
   "description": "DAO containing any modifications made to userCapabilityJunctions",
   "serve": true,
@@ -140,4 +163,3 @@ p({
     { "of": "foam.dao.history.HistoryRecord" }
   """
 })
-

@@ -1,0 +1,141 @@
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-0",
+  "name":"Check Ownership On UCJ Put",
+  "priority":1000,
+  "ruleGroup":"ucjDAO",
+  "daoKey":"userCapabilityJunctionDAO",
+  "operation":3,
+  "after":false,
+  "enabled":true,
+  "saveHistory":true,
+  "action":{"class":"foam.nanos.crunch.ruler.CheckUCJOwnershipOnPut"},
+  "lifecycleState":1
+})
+
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-1",
+  "name":"Validate UCJ Data On Put",
+  "priority":900,
+  "ruleGroup":"ucjDAO",
+  "daoKey":"userCapabilityJunctionDAO",
+  "operation":3,
+  "after":false,
+  "enabled":true,
+  "saveHistory":true,
+  "action":{"class":"foam.nanos.crunch.ruler.ValidateUCJDataOnPut"},
+  "lifecycleState":1,
+  "predicate":{
+    "class":"foam.nanos.ruler.predicate.PropertyEQValue",
+    "propName":"status",
+    "propValue":{
+      "class":"foam.nanos.crunch.CapabilityJunctionStatus",
+      "ordinal":3
+    }
+  }
+})
+
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-2",
+  "name":"Set UCJ Status On Put",
+  "priority":800,
+  "ruleGroup":"ucjDAO",
+  "daoKey":"userCapabilityJunctionDAO",
+  "operation":3,
+  "after":false,
+  "enabled":true,
+  "saveHistory":true,
+  "action":{"class":"foam.nanos.crunch.ruler.SetUCJStatusOnPut"},
+  "lifecycleState":1,
+  "predicate":{
+    "class":"foam.mlang.predicate.Or",
+    "args":[
+      {
+        "class":"foam.nanos.ruler.predicate.PropertyEQValue",
+        "propName":"status",
+        "propValue":{
+          "class":"foam.nanos.crunch.CapabilityJunctionStatus",
+          "ordinal":3
+        }
+      },
+      {
+        "class":"foam.nanos.ruler.predicate.PropertyEQValue",
+        "propName":"status",
+        "propValue":{
+          "class":"foam.nanos.crunch.CapabilityJunctionStatus",
+          "ordinal":0
+        }
+      },
+      {
+        "class":"foam.nanos.ruler.predicate.PropertyEQValue",
+        "propName":"status",
+        "propValue":{
+          "class":"foam.nanos.crunch.CapabilityJunctionStatus",
+          "ordinal":6
+        }
+      }
+    ]
+  }
+})
+
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-3-c",
+  "name":"Configure UCJ Expiry On Granted",
+  "priority":700,
+  "ruleGroup":"ucjDAO",
+  "daoKey":"userCapabilityJunctionDAO",
+  "operation":0,
+  "after":false,
+  "enabled":true,
+  "saveHistory":true,
+  "action":{"class":"foam.nanos.crunch.ruler.ConfigureUCJExpiryOnGranted"},
+  "lifecycleState":1
+})
+
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-3-u",
+  "name":"Configure UCJ Expiry On Granted",
+  "priority":700,
+  "ruleGroup":"ucjDAO",
+  "daoKey":"userCapabilityJunctionDAO",
+  "operation":1,
+  "after":false,
+  "enabled":true,
+  "saveHistory":true,
+  "action":{"class":"foam.nanos.crunch.ruler.ConfigureUCJExpiryOnGranted"},
+  "lifecycleState":1
+})
+
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-4-c",
+  "name":"Save UCJ Data On Granted",
+  "priority":600,
+  "ruleGroup":"ucjDAO",
+  "daoKey":"userCapabilityJunctionDAO",
+  "operation":0,
+  "after":false,
+  "enabled":true,
+  "saveHistory":true,
+  "action":{"class":"foam.nanos.crunch.ruler.SaveUCJDataOnGranted"},
+  "lifecycleState":1
+})
+
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-4-u",
+  "name":"Save UCJ Data On Granted",
+  "priority":600,
+  "ruleGroup":"ucjDAO",
+  "daoKey":"userCapabilityJunctionDAO",
+  "operation":1,
+  "after":false,
+  "enabled":true,
+  "saveHistory":true,
+  "action":{"class":"foam.nanos.crunch.ruler.SaveUCJDataOnGranted"},
+  "lifecycleState":1
+})

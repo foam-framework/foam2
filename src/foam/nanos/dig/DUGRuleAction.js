@@ -33,8 +33,8 @@ foam.CLASS({
     {
       class: 'foam.core.Enum',
       of: 'foam.nanos.http.Format',
-      name: 'format',
-    },
+      name: 'format'
+    }
   ],
 
   methods: [

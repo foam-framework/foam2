@@ -14,7 +14,7 @@ foam.CLASS({
   tableColumns: [
     'timestamp',
     'objectId',
-    'user.id',
+    'user',
     'updates'
   ],
 
