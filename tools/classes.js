@@ -633,7 +633,6 @@ var classes = [
   'foam.nanos.crunch.SendNotificationOnTopLevelCapabilityStatusUpdate',
   'foam.nanos.crunch.IsUserCapabilityJunctionStatusUpdate',
   'foam.nanos.crunch.RemoveJunctionsOnUserRemoval',
-  'foam.nanos.crunch.CascadeInvalidate',
   'foam.nanos.crunch.CrunchService',
   'foam.nanos.crunch.ReputDependentUCJs',
   //ucjdao rules
