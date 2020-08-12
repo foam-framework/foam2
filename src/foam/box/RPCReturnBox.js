@@ -74,7 +74,7 @@ foam.CLASS({
             this.requestCapability(msg.object.data).then(function() {
               self.clientBox.send(self.msg);
             });
-            this.resolve_(msg.object.data);
+            this.reject_(msg.object.data);
             return;
           } 
           this.reject_(msg.object.data);
