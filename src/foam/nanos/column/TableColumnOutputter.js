@@ -142,11 +142,11 @@
           javaType: 'java.util.List<Object[]>'
         }
       ],
-      javaType: 'java.util.List<java.util.List<String>>',
+      javaType: 'java.util.List<java.util.List<Object>>',
       javaCode: `
-        java.util.List<java.util.List<String>> result = new ArrayList<>();
+        java.util.List<java.util.List<Object>> result = new ArrayList<>();
       
-        java.util.List<String> columnHeaders = new ArrayList<>();
+        java.util.List<Object> columnHeaders = new ArrayList<>();
 
         for ( int i = 0 ; i < metadata.length ; i++ ) {
           columnHeaders.add(metadata[i].getColumnLabel());
@@ -154,7 +154,7 @@
         result.add(columnHeaders);
 
         for ( int i = 0 ; i < arrOfObjectValues.size() ; i++ ) {
-          java.util.List<String> row = new ArrayList<>();
+          java.util.List<Object> row = new ArrayList<>();
           for ( int j = 0 ; j < arrOfObjectValues.get(i).length ; j++ ) {
             row.add(returnStringValueForMetadata(x, metadata[j], arrOfObjectValues.get(i)[j], null));
           }
@@ -166,7 +166,7 @@
     },
     {
       name: 'returnStringValueForMetadata',
-      type: 'String',
+      type: 'Object',
       args: [
         {
           name: 'x',
@@ -190,10 +190,10 @@
         return "";
 
       switch(metadata.getCellType()) {
+        case "STRING":
         case "PRIMITIVE":
-          return obj.toString();
-        case "CURRENCY":
-          return metadata.getProp().unitPropValueToString(x, obj, unitPropValue);
+        case "CURRENCY"://make sure commas added in GS pattern
+          return obj;
         case "DATE":
           return obj.toString().substring(0, 10);
         case "DATETIME":

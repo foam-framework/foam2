@@ -348,7 +348,7 @@ foam.CLASS({
         for ( int i = 0 ; i < metadata.length ; i++ ) {
           metadata[i] = (GoogleSheetsPropertyMetadata)metadataArr[i];
         }
-        java.util.List<java.util.List<String>> data = retrieveTemplateData(x, extraConfig.getExportClsInfo(), extraConfig.getServiceName(), metadata);
+        java.util.List<java.util.List<Object>> data = retrieveTemplateData(x, extraConfig.getExportClsInfo(), extraConfig.getServiceName(), metadata);
 
         GoogleDriveService googleDriveService = (GoogleDriveService) getX().get("googleDriveService");
         String folderId = googleDriveService.createFolderIfNotExists(x, "Nanopay Export");
@@ -364,7 +364,7 @@ foam.CLASS({
     },
     {
       name: 'retrieveTemplateData',
-      javaType: 'java.util.List<java.util.List<String>>',
+      javaType: 'java.util.List<java.util.List<Object>>',
       args: [
         {
           name: 'x',

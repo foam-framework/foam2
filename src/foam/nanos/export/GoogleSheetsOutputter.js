@@ -53,6 +53,7 @@ foam.CLASS({
     {
       name: 'returnMetadataForProperty',
       code: function(x, of, prop, propName) {
+        var columnConfig = x.columnConfigToPropertyConverter;
           //to constants?
           var cellType = '';
           var pattern = '';
@@ -68,13 +69,15 @@ foam.CLASS({
             cellType = 'DATE_TIME';
           } else if ( foam.core.Time.isInstance(prop) ) {
             cellType = 'TIME';
-          } else if( foam.core.Int.isInstance(prop) || foam.core.Float.isInstance(prop) || foam.core.Long.isInstance(prop) || foam.core.Double.isInstance(prop) || foam.core.String.isInstance(prop) || foam.core.Boolean.isInstance(prop) || foam.core.String.isInstance(prop) ){
+          } else if ( foam.core.String.isInstance(prop) ) {
+            cellType = 'STRING';
+          } else if ( foam.core.Int.isInstance(prop) || foam.core.Float.isInstance(prop) || foam.core.Long.isInstance(prop) || foam.core.Double.isInstance(prop) || foam.core.String.isInstance(prop) || foam.core.Boolean.isInstance(prop) ) {
             cellType = 'PRIMITIVE';
           }
 
           return this.GoogleSheetsPropertyMetadata.create({
             columnName: prop.name,
-            columnLabel: this.getColumnHeaders(x, of, propName.split('.')),
+            columnLabel: columnConfig.returnColumnHeader(of, propName),
             columnWidth: prop.tableWidth ? prop.tableWidth : 0,
             cellType: cellType,
             pattern: pattern,
