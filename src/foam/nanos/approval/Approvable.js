@@ -91,6 +91,7 @@ foam.CLASS({
   methods: [
     {
       name: 'toSummary',
+      type: 'String',
       code: function() {
         var modelString = this.daoKey;
 
@@ -100,7 +101,7 @@ foam.CLASS({
         return `(${modelString}:${this.objId}) UPDATE`;
       },
       javaCode: `
-        if ( foam.util.SafetyUtil.isEmpty(getDaoKey()) || foam.util.SafetyUtil.isEmpty(getObjId()) )
+        if ( foam.util.SafetyUtil.isEmpty(getDaoKey()) || getObjId() == null )
           return "";
         String modelString = getDaoKey().replace("local", "").replace("DAO", "");
         return "(" + modelString + ":" + getObjId() + ") UPDATE";

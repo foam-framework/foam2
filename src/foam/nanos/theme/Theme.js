@@ -527,6 +527,7 @@ foam.CLASS({
   methods: [
     {
       name: 'toSummary',
+      type: 'String',
       code: function() {
         return this.name + ' ' + this.description;
       },

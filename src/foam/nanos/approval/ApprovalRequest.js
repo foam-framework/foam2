@@ -515,6 +515,7 @@
     },
     {
       name: 'toSummary',
+      type: 'String',
       code: function() {
         return `(${this.classification}) ${this.operation}`;
       },
