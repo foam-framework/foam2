@@ -114,7 +114,7 @@ p({
 p({
   "class":"foam.nanos.ruler.Rule",
   "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-3-c",
-  "name":"Configure UCJ Expiry On Granted",
+  "name":"Configure UCJ Expiry On Granted - Create",
   "priority":700,
   "ruleGroup":"ucjDAO",
   "daoKey":"userCapabilityJunctionDAO",
@@ -129,7 +129,7 @@ p({
 p({
   "class":"foam.nanos.ruler.Rule",
   "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-3-u",
-  "name":"Configure UCJ Expiry On Granted",
+  "name":"Configure UCJ Expiry On Granted - Update",
   "priority":700,
   "ruleGroup":"ucjDAO",
   "daoKey":"userCapabilityJunctionDAO",
@@ -138,13 +138,27 @@ p({
   "enabled":true,
   "saveHistory":true,
   "action":{"class":"foam.nanos.crunch.ruler.ConfigureUCJExpiryOnGranted"},
+  "predicate":{
+    "class":"foam.mlang.predicate.Or", 
+    "args":[
+      {
+        "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
+        "propName":"status",
+        "propValue":{
+          "class":"foam.nanos.crunch.CapabilityJunctionStatus",
+          "ordinal":1
+        },
+        "isNew":false
+      },
+      { "class":"foam.nanos.crunch.ruler.IsDataUpdate" }
+    ]
+  },
   "lifecycleState":1
 })
-
 p({
   "class":"foam.nanos.ruler.Rule",
   "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-4-c",
-  "name":"Save UCJ Data On Granted",
+  "name":"Save UCJ Data On Granted - Create",
   "priority":600,
   "ruleGroup":"ucjDAO",
   "daoKey":"userCapabilityJunctionDAO",
@@ -159,7 +173,7 @@ p({
 p({
   "class":"foam.nanos.ruler.Rule",
   "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-4-u",
-  "name":"Save UCJ Data On Granted",
+  "name":"Save UCJ Data On Granted - Update",
   "priority":600,
   "ruleGroup":"ucjDAO",
   "daoKey":"userCapabilityJunctionDAO",
@@ -168,5 +182,20 @@ p({
   "enabled":true,
   "saveHistory":true,
   "action":{"class":"foam.nanos.crunch.ruler.SaveUCJDataOnGranted"},
+  "predicate":{
+    "class":"foam.mlang.predicate.Or", 
+    "args":[
+      {
+        "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
+        "propName":"status",
+        "propValue":{
+          "class":"foam.nanos.crunch.CapabilityJunctionStatus",
+          "ordinal":1
+        },
+        "isNew":false
+      },
+      { "class":"foam.nanos.crunch.ruler.IsDataUpdate" }
+    ]
+  },
   "lifecycleState":1
 })
