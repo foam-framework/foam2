@@ -30,8 +30,8 @@ foam.CLASS({
     {
       name: 'flatCapabilityId',
       class: 'Reference',
-      of: 'foam.nanos.crunch.Capability',
-      targetDAOKey: 'capabilityDAO',
+      of: 'foam.nanos.crunch.connection.FlatCapability',
+      targetDAOKey: 'flatCapabilityDAO',
       documentation: `
         ID of the FlatCapability being submitted.
       `
@@ -39,6 +39,7 @@ foam.CLASS({
     {
       name: 'data',
       class: 'FObjectArray',
+      of: 'foam.core.FObject',
       documentation: `
         Data objects corresponding to 'classes' of the FlatCapability.
         A RuntimeException is thrown if the array length doesn't match or

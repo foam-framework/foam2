@@ -11,9 +11,24 @@ foam.CLASS({
   flags: ['java'],
 
   javaImports: [
-    'foam.nanos.crunch.Capability',
+    
     'foam.core.X',
     'foam.dao.DAO'
+  ],
+
+  javaImports: [
+    'foam.dao.*',
+    'foam.core.FObject',
+    'foam.core.X',
+    'foam.dao.DAO',
+    'foam.dao.Sink',
+    'foam.dao.ArraySink',
+    'foam.mlang.predicate.Predicate',
+    'foam.mlang.order.Comparator',
+    'foam.nanos.auth.User',
+    'foam.util.SafetyUtil',
+    'foam.nanos.crunch.Capability',
+    'foam.nanos.crunch.connection.FlatCapability'
   ],
 
   documentation: `
@@ -25,7 +40,25 @@ foam.CLASS({
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(`
-          public ConnectedCapabilityDAO(X x, DAO delegate) {
+        protected class DecoratedSink extends foam.dao.ProxySink
+          {
+            public DecoratedSink(X x, Sink delegate)
+            {
+              super(x, delegate);
+              if (delegate == null)
+                delegate = new ArraySink();
+            }
+
+            @Override
+            public void put(Object obj, foam.core.Detachable sub)
+            {
+              if (obj instanceof FlatCapability) {
+                getDelegate().put(obj, sub);
+              }
+            }
+          }
+
+          public FlatCapabilityDAO(X x, DAO delegate) {
             setX(x);
             setDelegate(delegate);
           } 
@@ -35,6 +68,24 @@ foam.CLASS({
   ],
 
   methods: [
+    {
+      name: 'find_',
+      javaCode: `
+        FObject obj = getDelegate().find_(x, id);
+        if( obj != null && obj instanceof FlatCapability ) {
+          return obj;
+        }
+        return null;
+      `
+    },
+    {
+      name: 'select_',
+      javaCode: `
+        Sink decoratedSink = new DecoratedSink(x, sink);
+        getDelegate().select_(x, decoratedSink, skip, limit, order, predicate);
+        return sink;
+      `
+    },
     {
       name: 'put_',
       javaCode: `
