@@ -292,7 +292,8 @@ foam.CLASS({
       class: 'Boolean',
       name: 'sortable',
       value: true
-    }
+    },
+    'unitPropValueToString'
   ],
 
   methods: [

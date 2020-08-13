@@ -120,7 +120,6 @@ foam.CLASS({
     'toCSV',
     'toCSVLabel',
     'fromCSVLabelMapping',
-    'unitPropValueToString',
     {
       name: 'methods',
       factory: function() {

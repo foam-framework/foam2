@@ -256,10 +256,6 @@ public abstract class AbstractPropertyInfo
     outputter.outputValue(getName());
   }
 
-  public String unitPropValueToString(X x, Object val, String unitPropName) {
-    return "";
-  }
-
   public void fromCSVLabelMapping(java.util.Map<String, foam.lib.csv.FromCSVSetter> map) {
     
     foam.core.PropertyInfo prop = this;
