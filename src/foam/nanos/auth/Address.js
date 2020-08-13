@@ -307,7 +307,7 @@ foam.CLASS({
       javaCode: `
       StringBuilder sb = new StringBuilder();
       if ( this.getStructured() ) {
-        if ( this.getSuite() != null ) {
+        if ( this.getSuite() != null && ! this.getSuite().equals("") ) {
           sb.append(this.getSuite());
           sb.append("-");
         }
