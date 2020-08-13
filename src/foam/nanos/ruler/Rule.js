@@ -420,7 +420,10 @@
       type: 'String',
       code: function() {
         return this.name || this.id;
-      }
+      },
+      javaCode: `
+        return foam.util.SafetyUtil.isEmpty(getName()) ? getName() : getId();
+      `
     },
     {
       name: 'authorizeOnCreate',

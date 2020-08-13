@@ -242,7 +242,10 @@ foam.CLASS({
       name: 'toSummary',
       code: function() {
         return this.name;
-      }
+      },
+      javaCode: `
+        return getName();
+      `
     },
     {
       name: 'implies',

@@ -113,7 +113,12 @@
       `,
       code: function(x) {
         return this.id + " - " + this.name;
-      }
+      },
+      javaCode: `
+        if ( foam.util.SafetyUtil.isEmpty(getId()) || foam.util.SafetyUtil.isEmpty(getName()) )
+          return "";
+        return getId() + " - " + getName();
+      `
     },
     {
       name: 'format',

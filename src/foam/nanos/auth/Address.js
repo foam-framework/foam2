@@ -272,18 +272,18 @@ foam.CLASS({
         return rtn === ', , , , ' ? '' : rtn;
       },
       javaCode: `
-      StringBuilder sb = new StringBuilder();
-      sb.append(getShortAddress());
-      sb.append(", ");
-      sb.append(this.getCity());
-      sb.append(", ");
-      sb.append(this.getRegionId());
-      sb.append(", ");
-      sb.append(this.getCountryId());
-      sb.append(", ");
-      sb.append(this.getPostalCode());
-      String rtn = sb.toString();
-      return rtn.equals(", , , , ") ? "" : rtn;
+        StringBuilder sb = new StringBuilder();
+        sb.append(getShortAddress());
+        sb.append(", ");
+        sb.append(this.getCity());
+        sb.append(", ");
+        sb.append(this.getRegionId());
+        sb.append(", ");
+        sb.append(this.getCountryId());
+        sb.append(", ");
+        sb.append(this.getPostalCode());
+        String rtn = sb.toString();
+        return rtn.equals(", , , , ") ? "" : rtn;
       `
     },
     {
