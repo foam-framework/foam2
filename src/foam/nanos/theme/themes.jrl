@@ -6,6 +6,7 @@ p({
   "description":"The default FOAM theme.",
   "defaultMenu":"admin.nspec",
   "logo":"images/foam_red.png",
+  "font1":"Arial",
   "primaryColor":"#1e1f21",
   "secondaryColor":"#406dea",
   "secondaryHoverColor":"#2d59d2",

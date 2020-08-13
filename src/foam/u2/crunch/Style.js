@@ -47,7 +47,7 @@ foam.CLASS({
 
     ^card-title {
       min-height: 20px;
-      font-family: IBMPlexSans;
+      font-family: /*%FONT1%*/;
       font-size: 16px;
       font-weight: 600;
       font-style: normal;
@@ -59,7 +59,7 @@ foam.CLASS({
 
     ^card-subtitle {
       height: 14px;
-      font-family: IBMPlexSans;
+      font-family: /*%FONT1%*/;
       font-size: 11px;
       font-weight: normal;
       font-style: italic;
@@ -72,7 +72,7 @@ foam.CLASS({
     ^card-description {
       margin-top: 9px;
       height: 20px;
-      font-family: IBMPlexSans Helvetica;
+      font-family: /*%FONT1%*/ Helvetica;
       font-size: 14px;
       font-weight: normal;
       font-style: normal;
@@ -157,7 +157,7 @@ foam.CLASS({
       padding: 0 8px;
       background-color: #b5b5b5;
 
-      font-family: IBMPlexSans;
+      font-family: /*%FONT1%*/;
       font-size: 11px;
       font-weight: 500;
       font-style: normal;

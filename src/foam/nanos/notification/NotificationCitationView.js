@@ -18,13 +18,13 @@ foam.CLASS({
       line-height: 17px;
     }
     ^ .created {
-      font-family: IBMPlexSans;
+      font-family: /*%FONT1%*/;
       font-size: 11px;
       color: #5e6061;
       margin-left: 16px;
     }
     ^ .description {
-      font-family: IBMPlexSans;
+      font-family: /*%FONT1%*/;
       font-size: 14px;
       color: #1e1f21;
       margin-left: 32px;
