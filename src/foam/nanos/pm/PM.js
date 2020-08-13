@@ -21,9 +21,9 @@ foam.CLASS({
     'foam.core.FObject',
     'foam.core.X',
     'foam.dao.DAO',
+    'static foam.mlang.MLang.EQ',
     'foam.nanos.alarming.Alarm',
-    'foam.nanos.alarming.AlarmConfig',
-    'static foam.mlang.MLang.EQ'
+    'foam.nanos.alarming.AlarmConfig'
   ],
 
   ids: [ 'key', 'name', 'startTime' ],
@@ -88,6 +88,19 @@ foam.CLASS({
     PMLogger pmLogger = (PMLogger) x.get(DAOPMLogger.SERVICE_NAME);
     if ( pmLogger != null ) {
       pmLogger.log(this);
+    } else {
+      foam.nanos.app.AppConfig app = (foam.nanos.app.AppConfig) x.get("appConfig");
+      if ( app != null &&
+           app.getMode() != foam.nanos.app.Mode.PRODUCTION ) {
+        Exception e = new Exception("PMLogger not found");
+        foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
+        if ( logger != null ) {
+          logger.error(e.getMessage(), this.toString(), e);
+        } else {
+          System.err.println(e.getMessage());
+          e.printStackTrace();
+        }
+      }
     }
       `
     },
@@ -112,16 +125,38 @@ foam.CLASS({
       ],
       javaCode: `
         setIsError(true);
+        setEndTime(new java.util.Date());
         StringBuilder sb = new StringBuilder();
         for (Object obj: args) {
           if ( obj instanceof Exception ) {
             setException(obj);
-            sb.append(((Exception) obj).getMessage()).append(",");
+            sb.append(((Exception) obj).getMessage());
+          } else {
+            sb.append(obj.toString());
+          }
+          sb.append(",");
+        }
+        if ( sb.length() > 0 ) {
+          setErrorMessage(sb.deleteCharAt(sb.length() - 1).toString());
+        }
+        PMLogger pmLogger = (PMLogger) x.get(DAOPMLogger.SERVICE_NAME);
+        if ( pmLogger != null ) {
+          pmLogger.log(this);
+        } else {
+          foam.nanos.app.AppConfig app = (foam.nanos.app.AppConfig) x.get("appConfig");
+          if ( app != null &&
+               app.getMode() != foam.nanos.app.Mode.PRODUCTION ) {
+            Exception e = new Exception("PMLogger not found");
+            foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
+            if ( logger != null ) {
+              logger.error(e.getMessage(), this.toString(), e);
+            } else {
+              System.err.println(e.getMessage());
+              e.printStackTrace();
+            }
           }
         }
-        if ( sb.length() > 0 )
-          setErrorMessage(sb.deleteCharAt(sb.length() - 1).toString());
-      `
+        `
     },
     {
       name: 'applyAction',
@@ -184,6 +219,18 @@ foam.CLASS({
               return pm;
             }
 
+            public static PM create(X x, String key, String... args) {
+              PM pm = (PM) x.get("PM");
+
+              if ( pm == null ) return new PM(key, args);
+
+              pm.setKey(key);
+              pm.setName(combine(args));
+              pm.init_();
+
+              return pm;
+            }
+
             public PM(ClassInfo clsInfo, String... name) {
               setName(combine(name));
               setKey(clsInfo.getId());
@@ -203,21 +250,44 @@ foam.CLASS({
               this(fo.getClassInfo(), name);
             }
 
-            public PM(Object... args) {
-              setKey(args[0].toString());
-              StringBuilder sb = new StringBuilder();
-              for (Object obj: java.util.Arrays.copyOfRange(args, 1, args.length)){
-                sb.append(obj.toString()).append(":");
+            public PM(String... args) {
+              if ( args.length > 0 ) {
+                setKey(args[0]);
               }
-              if ( sb.length() > 0 )
-                setName(sb.deleteCharAt(sb.length() - 1).toString());
+              if ( args.length > 1 ) {
+                setName(combine(java.util.Arrays.copyOfRange(args, 1, args.length)));
+              }
+              init_();
+            }
+
+            public PM(Object... args) {
+              if ( args.length > 0 ) {
+                setKey(args[0].toString());
+              }
+              if ( args.length > 1 ) {
+                setName(combine(java.util.Arrays.copyOfRange(args, 1, args.length)));
+              }
               init_();
             }
 
             private static String combine(String... args) {
+              if ( args == null ) {
+                return "";
+              }
               StringBuilder sb = new StringBuilder();
               for ( String s: args) {
                 sb.append(s).append(":");
+              }
+              return sb.deleteCharAt(sb.length() - 1).toString();
+            }
+
+            private static String combine(Object... args) {
+              if ( args == null ) {
+                return "";
+              }
+              StringBuilder sb = new StringBuilder();
+              for ( Object o: args) {
+                sb.append(o.toString()).append(":");
               }
               return sb.deleteCharAt(sb.length() - 1).toString();
             }
