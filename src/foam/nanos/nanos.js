@@ -328,8 +328,12 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/CapabilityCapabilityJunctionRefine" },
   { name: "foam/nanos/crunch/CapabilityCategoryCapabilityJunctionRefine" },
   { name: "foam/nanos/crunch/AssociatedEntity" },
+  { name: "foam/nanos/crunch/connection/ConnectedCapability" },
+  { name: "foam/nanos/crunch/connection/FlatCapability" },
   //daos
   { name: "foam/nanos/crunch/UserCapabilityJunctionDAO" },
+  { name: "foam/nanos/crunch/connection/ConnectedCapabilityDAO" },
+  { name: "foam/nanos/crunch/connection/FlatCapabilityDAO" },
   //rules
   { name: "foam/nanos/crunch/SendNotificationOnTopLevelCapabilityStatusUpdate" },
   { name: "foam/nanos/crunch/IsUserCapabilityJunctionStatusUpdate" },
