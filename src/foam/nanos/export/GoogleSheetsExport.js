@@ -41,10 +41,6 @@ foam.INTERFACE({
           type: 'Context',
         },
         {
-          name: 'obj',
-          type: 'Object'
-        },
-        {
           name: 'metadataObj',
           type: 'foam.nanos.export.GoogleSheetsPropertyMetadata[]',
           javaType: 'Object'

@@ -69,12 +69,12 @@ foam.CLASS({
             cellType = 'DATE_TIME';
           } else if ( foam.core.Time.isInstance(prop) ) {
             cellType = 'TIME';
-          } else if ( foam.core.String.isInstance(prop) ) {
-            cellType = 'STRING';
+          }  else if ( foam.core.Enum.isInstance(prop) || foam.core.AbstractEnum.isInstance(prop) ) {
+            cellType = "ENUM";
           } else if ( foam.core.Int.isInstance(prop) || foam.core.Float.isInstance(prop) || foam.core.Long.isInstance(prop) || foam.core.Double.isInstance(prop) || foam.core.String.isInstance(prop) || foam.core.Boolean.isInstance(prop) ) {
             cellType = 'PRIMITIVE';
-          } else if ( foam.core.Enum.isInstance(prop) || foam.core.AbstractEnum.isInstance(prop) ) {
-            cellType = "ENUM";
+          } else if ( foam.core.String.isInstance(prop) ) {
+            cellType = 'STRING';
           }
 
           return this.GoogleSheetsPropertyMetadata.create({

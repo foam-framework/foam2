@@ -155,7 +155,7 @@
 
         for ( int i = 0 ; i < arrOfObjectValues.size() ; i++ ) {
           java.util.List<Object> row = new ArrayList<>();
-          for ( int j = 0 ; j < arrOfObjectValues.get(i).length ; j++ ) {
+          for ( int j = 0 ; j < metadata.length ; j++ ) {
             row.add(returnStringValueForMetadata(x, metadata[j], arrOfObjectValues.get(i)[j], null));
           }
           result.add(row);
@@ -192,6 +192,7 @@
       switch(metadata.getCellType()) {
         case "STRING":
         case "PRIMITIVE":
+          return obj;
         case "CURRENCY"://make sure commas added in GS pattern
           return new Long(obj.toString()) / 100.0 ;
         case "DATE":

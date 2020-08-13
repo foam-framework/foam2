@@ -44,7 +44,7 @@
     },
     {
       name: 'unitPropName',
-      type: 'String'
+      class: 'String'
     }
   ]
 });
