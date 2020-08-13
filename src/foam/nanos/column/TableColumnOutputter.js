@@ -191,7 +191,8 @@
 
       switch(metadata.getCellType()) {
         case "STRING":
-        case "PRIMITIVE":
+        case "NUMBER":
+        case "BOOLEAN":
           return obj;
         case "CURRENCY"://make sure commas added in GS pattern
           return new Long(obj.toString()) / 100.0 ;
