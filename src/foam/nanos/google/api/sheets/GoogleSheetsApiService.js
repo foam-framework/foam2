@@ -182,11 +182,16 @@ foam.CLASS({
         }};
   
         requests.add(new Request().setAutoResizeDimensions(new AutoResizeDimensionsRequest().setDimensions(new DimensionRange().setSheetId(0).setDimension("COLUMNS").setEndIndex(metadata.length))));
-  //refactor me!!!
         for ( int i = 0 ; i < metadata.length ; i++ ) {
           if ( metadata[i].getColumnWidth() > 0 )
-            requests.add(new Request().setUpdateDimensionProperties(new UpdateDimensionPropertiesRequest().setRange(new DimensionRange().setSheetId(0).setDimension("COLUMNS").setStartIndex(i).setEndIndex(i+1)).setProperties(new DimensionProperties().setPixelSize(metadata[i].getColumnWidth())).setFields("pixelSize")));
-          if ( metadata[i].getCellType().equals("") ||metadata[i].getCellType().equals("STRING") || metadata[i].getCellType().equals("ENUM") )//|| metadata[i].getCellType().equals("PRIMITIVE")
+            requests.add(new Request().setUpdateDimensionProperties(new UpdateDimensionPropertiesRequest()
+            .setRange(new DimensionRange().setSheetId(0)
+            .setDimension("COLUMNS")
+            .setStartIndex(i).setEndIndex(i+1))
+            .setProperties(new DimensionProperties().setPixelSize(metadata[i].getColumnWidth()))
+            .setFields("pixelSize")));
+
+          if ( metadata[i].getCellType().equals("") ||metadata[i].getCellType().equals("STRING") || metadata[i].getCellType().equals("ENUM") || metadata[i].getCellType().equals("BOOLEAN") )
             continue;
   
           if ( metadata[i].getCellType().equals("DATE_TIME") ) {
