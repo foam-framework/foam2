@@ -176,7 +176,7 @@ foam.CLASS({
                     this.EQ(this.AgentCapabilityJunction.EFFECTIVE_USER, this.subject.user.id)
                   )
                 ),
-                this.EQ(this.UserCapabilityJunction.TARGET_ID, capability.id))
+                this.EQ(this.UserCapabilityJunction.TARGET_ID, cap.id))
             ).then((ucj) => {
               if ( ucj == null ) {
                 ucj = this.UserCapabilityJunction.create({
