@@ -2348,18 +2348,19 @@ foam.CLASS({
           const props = obj.cls_.getAxiomsByClass(foam.core.Property);
           for ( let i = 0; i < props.length; i++ ) {
             const prop = props[i];
-            if ( this.FObjectProperty.isInstance(prop) )
+            if ( this.FObjectProperty.isInstance(prop) ) {
               if ( this.checkNestedFObject(prop.f(obj)) ) return true;
-            else if ( this.Enum.isInstance(prop) )
+            } else if ( this.Enum.isInstance(prop) ) {
               s = prop.f(obj).label.toLowerCase();
-            else if ( this.Long.isInstance(prop) )
+            } else if ( this.Long.isInstance(prop) ) {
               s = prop.f(obj).toString().toLowerCase();
-            else if ( this.Date.isInstance(prop) )
+            } else if ( this.Date.isInstance(prop) ) {
               s = prop.f(obj).toISOString().toLowerCase();
-            else if ( ! this.String.isInstance(prop) )
-              continue
-            else
+            } else if ( ! this.String.isInstance(prop) ) {
+              continue;
+            } else {
               s = prop.f(obj).toLowerCase();
+            }
           }
 
           if ( s.toLowerCase().includes(arg) ) return true;
