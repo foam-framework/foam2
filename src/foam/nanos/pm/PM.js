@@ -88,19 +88,6 @@ foam.CLASS({
     PMLogger pmLogger = (PMLogger) x.get(DAOPMLogger.SERVICE_NAME);
     if ( pmLogger != null ) {
       pmLogger.log(this);
-    } else {
-      foam.nanos.app.AppConfig app = (foam.nanos.app.AppConfig) x.get("appConfig");
-      if ( app != null &&
-           app.getMode() != foam.nanos.app.Mode.PRODUCTION ) {
-        Exception e = new Exception("PMLogger not found");
-        foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
-        if ( logger != null ) {
-          logger.error(e.getMessage(), this.toString(), e);
-        } else {
-          System.err.println(e.getMessage());
-          e.printStackTrace();
-        }
-      }
     }
       `
     },
@@ -132,7 +119,7 @@ foam.CLASS({
             setException(obj);
             sb.append(((Exception) obj).getMessage());
           } else {
-            sb.append(obj.toString());
+            sb.append(obj);
           }
           sb.append(",");
         }
@@ -142,19 +129,6 @@ foam.CLASS({
         PMLogger pmLogger = (PMLogger) x.get(DAOPMLogger.SERVICE_NAME);
         if ( pmLogger != null ) {
           pmLogger.log(this);
-        } else {
-          foam.nanos.app.AppConfig app = (foam.nanos.app.AppConfig) x.get("appConfig");
-          if ( app != null &&
-               app.getMode() != foam.nanos.app.Mode.PRODUCTION ) {
-            Exception e = new Exception("PMLogger not found");
-            foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
-            if ( logger != null ) {
-              logger.error(e.getMessage(), this.toString(), e);
-            } else {
-              System.err.println(e.getMessage());
-              e.printStackTrace();
-            }
-          }
         }
         `
     },
@@ -287,7 +261,7 @@ foam.CLASS({
               }
               StringBuilder sb = new StringBuilder();
               for ( Object o: args) {
-                sb.append(o.toString()).append(":");
+                sb.append(o).append(":");
               }
               return sb.deleteCharAt(sb.length() - 1).toString();
             }
