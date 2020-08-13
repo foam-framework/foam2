@@ -43,9 +43,8 @@
       javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
     },
     {
-      name: 'unitProp',
-      javaType: 'foam.core.PropertyInfo',
-      javaInfoType: 'foam.core.AbstractObjectPropertyInfo', 
+      name: 'unitPropName',
+      type: 'String'
     }
   ]
 });

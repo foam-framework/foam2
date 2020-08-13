@@ -61,7 +61,7 @@ foam.CLASS({
           if ( foam.core.UnitValue.isInstance(prop) ) {
             cellType = 'CURRENCY';
             pattern = '\"$\"#0.00\" CAD\"';
-            unitProp = of.getAxiomByName(prop.unitPropName);
+            unitProp = of.getAxiomByName(prop.unitPropName).name;
           } else if ( foam.core.Date.isInstance(prop) ) {
             cellType = 'DATE';
             pattern = 'yyyy-mm-dd';
@@ -85,7 +85,7 @@ foam.CLASS({
             pattern: pattern,
             propName: propName,
             prop: prop,
-            unitProp: unitProp
+            unitPropName: unitProp
           });
       }
     }

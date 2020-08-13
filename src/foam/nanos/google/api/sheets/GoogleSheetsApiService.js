@@ -258,10 +258,6 @@ foam.CLASS({
           type: 'Context',
         },
         {
-          name: 'obj',
-          type: 'Object'
-        },
-        {
           name: 'metadataObj',
           type: 'foam.nanos.export.GoogleSheetsPropertyMetadata[]',
           javaType: 'Object'
@@ -273,7 +269,6 @@ foam.CLASS({
       ],
       javaCode: `
         try {
-          List<List<Object>> listOfValues = new ArrayList<>();
           Object[] metadataArr = (Object[])metadataObj;
           GoogleSheetsPropertyMetadata[] metadata = new GoogleSheetsPropertyMetadata[metadataArr.length];
     
@@ -390,14 +385,29 @@ foam.CLASS({
         DAO dao = (DAO)x.get(daoName);
         if ( dao == null )
           return null;
-        String[] propertiesName = new String[metadata.length];
+        List<String> propertyNames = new ArrayList<String>();
+        List<Integer> indexesOfUnitValuePropertyInPropertyNamesList = new ArrayList<Integer>();
+        List<Integer> indexesOfUnitPropertyInPropertyNamesList = new ArrayList<Integer>();
         for ( int i = 0 ; i < metadata.length ; i++ ) {
-          propertiesName[i] = metadata[i].getPropName();
+          propertyNames.add(metadata[i].getPropName());
+          if ( metadata[i].getType().equals("CURRENCY") ) {
+            propertyNames.add(metadata[i].getUnitPropName());
+            indexesOfUnitValuePropertyName.add(propertyNames.size() - 2);
+            indexesOfUnitNamePropertyName.add(propertyNames.size() - 1);
+          }
         }
-        Projection p = ( new foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder() ).buildProjectionForPropertyNamesArray(of, propertiesName);
+        String[] propNamesArr = new String[]; 
+        for ( int i = 0 ; i < propertyNames.size() ; i++ ) {
+          propNamesArr[i] = propertyNames.get(i);
+        }
+        Projection p = ( new foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder() ).buildProjectionForPropertyNamesArray(of, propNamesArr);
         dao.select(p);
         java.util.List values = p.getArray();
-
+        //set specific values here
+        for ( int i = 0 ; i < indexesOfUnitValuePropertyName.size() ; i++ ) {
+          metadata[indexesOfUnitValuePropertyName.get(i)].getPerValuePatternSpecificValues().add();
+        }
+        
         TableColumnOutputter outputter = new TableColumnOutputter();
         return outputter.returnTableForMetadata(x, metadata, values);
       `

@@ -61,16 +61,14 @@ foam.CLASS({
       var self = this;
       
       var sheetId  = '';
-      var stringArray = [];
       var columnConfig = X.columnConfigToPropertyConverter;
 
       var propNames = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(obj.cls);
       propNames = columnConfig.filterExportedProps(X, obj.cls_, propNames);
       
       var metadata = await self.outputter.getColumnMetadata(X, obj.cls_, propNames);
-      stringArray = [ await this.outputter.objectToTable(X, obj.cls_, obj, propNames) ];
 
-      sheetId = await X.googleSheetsDataExport.createSheetAndPopulateWithData(X, stringArray, metadata, this);
+      sheetId = await X.googleSheetsDataExport.createSheetAndPopulateWithData(X, metadata, this);
       if ( ! sheetId || sheetId.length === 0)
         return '';
       return sheetId;
@@ -96,17 +94,12 @@ foam.CLASS({
 
       var metadata = await self.outputter.getColumnMetadata(X, dao.of, propNames);
 
-      // to backend
-      var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(dao.of, propNames);
-      var sink = await dao.select(expr);
-      
       var sheetId  = '';
-      var stringArray = await self.outputter.returnTable(X, dao.of, propNames, sink.array);
 
       if ( this.template )
-        sheetId = await X.googleSheetsDataExport.createSheetByCopyingTemplate(X, stringArray, metadata, this);
+        sheetId = await X.googleSheetsDataExport.createSheetByCopyingTemplate(X, metadata, this);
       else
-        sheetId = await X.googleSheetsDataExport.createSheetAndPopulateWithData(X, stringArray, metadata, this);
+        sheetId = await X.googleSheetsDataExport.createSheetAndPopulateWithData(X, metadata, this);
       if ( ! sheetId || sheetId.length == 0)
         return '';
       return sheetId;
