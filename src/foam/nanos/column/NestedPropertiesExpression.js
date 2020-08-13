@@ -62,7 +62,7 @@ foam.CLASS({
         if ( e == null )
           return null;
         FObject copy = ((FObject)obj).shallowClone();
-        copy.setX(getX());
+        copy.setX(foam.core.XLocator.get());
         return e.f(copy);
       `
     },
@@ -245,7 +245,7 @@ foam.CLASS({
       javaCode: `
         ArrayList<foam.mlang.Expr> exprs = new ArrayList();
         for ( int i = 0 ; i < propNames.length ; i++ ) {
-          Expr expr = new NestedPropertiesExpression.Builder(getX()).setObjClass(objClass).setNestedProperty( propNames[i]).build();
+          Expr expr = new NestedPropertiesExpression.Builder(foam.core.XLocator.get()).setObjClass(objClass).setNestedProperty( propNames[i]).build();
           if ( expr != null ) {
             exprs.add(expr);
           }
@@ -279,7 +279,7 @@ foam.CLASS({
       },
       javaCode: `
         Expr[] exprs = returnArrayOfExprForArrayOfProperties(of, propNames);
-        return new Projection.Builder(getX()).setExprs(exprs).build();
+        return new Projection.Builder(foam.core.XLocator.get()).setExprs(exprs).build();
       `
     }
   ]
