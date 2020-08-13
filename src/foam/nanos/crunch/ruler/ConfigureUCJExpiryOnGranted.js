@@ -50,11 +50,6 @@ foam.CLASS({
               return;
             }
 
-            // Only update the expiry for non-active junctions, i.e., non-expired, non-pending, or granted junctions whose expiry is not yet set
-            if ( ( old != null && old.getStatus() == CapabilityJunctionStatus.GRANTED && old.getExpiry() != null ) 
-              || ucj.getStatus() != CapabilityJunctionStatus.GRANTED )
-              return;
-    
             Date junctionExpiry = capability.getExpiry();
     
             if ( capability.getDuration() > 0 ) {
