@@ -1,0 +1,401 @@
+p({
+  "class": "foam.nanos.script.Script",
+  "id": "ExtractStringAxiom",
+  "description": "get all String axiom to translate them",
+  "server": false,
+  "code": """
+  let used = Object.values(foam.USED)
+  let objs = used.concat(Object.values(foam.UNUSED))
+
+
+  objs.forEach(o => {
+    !!o.messages && o.messages.forEach(m => {
+      let xl = foam.i18n.Locale.create({
+        "id": o.id+'.'+foam.String.constantize(m.name),
+        "locale": 'fr',
+        "variant": 'CA',
+        "locale_variant": 'fr-CA',
+        "source": o.id+'.'+foam.String.constantize(m.name),
+        "target": m.message+' fr',
+      })
+      x.LocaleDAO.put(xl);
+    })
+
+    !!o.properties && o.properties.forEach(p => {
+      if ( !!p.label && typeof p.label != "object" ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "locale": 'fr',
+          "variant": 'CA',
+          "locale_variant": 'fr-CA',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "target": p.label+' fr',
+        })
+        x.LocaleDAO.put(xl);
+      }
+
+      if ( !!!p.label && !!p.name && ( p.class != "foam.core.Enum" && p.class != "Enum") ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "locale": 'fr',
+          "variant": 'CA',
+          "locale_variant": 'fr-CA',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "target": p.name+' fr',
+        })
+        x.LocaleDAO.put(xl);
+      }
+      if ( !!p.value && typeof p.value !== 'function' && p.name !== 'slashReplacement' && p.name !== 'code' && typeof p.value !== 'object' && ( p.class != "foam.core.Enum" && p.class != "Enum")  ) { //not for object
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.value',
+          "locale": 'fr',
+          "variant": 'CA',
+          "locale_variant": 'fr-CA',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.value',
+          "target": p.value+' fr',
+        })
+        x.LocaleDAO.put(xl);
+      }
+      if ( !!p.documentation ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.documentation',
+          "locale": 'fr',
+          "variant": 'CA',
+          "locale_variant": 'fr-CA',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.documentation',
+          "target": p.documentation+' fr',
+        })
+        x.LocaleDAO.put(xl);
+      }
+      if ( !!p.placeholder ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.placeholder',
+          "locale": 'fr',
+          "variant": 'CA',
+          "locale_variant": 'fr-CA',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.placeholder',
+          "target": p.placeholder+' fr',
+        })
+        x.LocaleDAO.put(xl);
+      }
+
+      if ( !!p.view && !!p.view.placeholder  ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.view.placeholder',
+          "locale": 'fr',
+          "variant": 'CA',
+          "locale_variant": 'fr-CA',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.view.placeholder',
+          "target": p.view.placeholder+' fr',
+        })
+        x.LocaleDAO.put(xl);
+      }
+      if ( !!p.view && !!p.view.label ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.view.label',
+          "locale": 'fr',
+          "variant": 'CA',
+          "locale_variant": 'fr-CA',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.view.label',
+          "target": p.view.label+' fr',
+        })
+        x.LocaleDAO.put(xl);
+      }
+    })
+
+    !!o.sections && !!o.sections.forEach(m => {
+      if ( !!m.title ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.SECTION_'+foam.String.constantize(m.name)+'.title',
+          "locale": 'fr',
+          "variant": 'CA',
+          "locale_variant": 'fr-CA',
+          "source": o.id+'.SECTION_'+foam.String.constantize(m.name)+'.title',
+          "target": m.title+' fr',
+        })
+        x.LocaleDAO.put(xl);
+      }
+      if ( !!m.subTitle ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.SECTION_'+foam.String.constantize(m.name)+'.subTitle',
+          "locale": 'fr',
+          "variant": 'CA',
+          "locale_variant": 'fr-CA',
+          "source": o.id+'.SECTION_'+foam.String.constantize(m.name)+'.subTitle',
+          "target": m.subTitle+' fr',
+        })
+        x.LocaleDAO.put(xl);
+      }
+    })
+
+    !!o.actions && o.actions.forEach(p => {
+      if ( !!p.label ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "locale": 'fr',
+          "variant": 'CA',
+          "locale_variant": 'fr-CA',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "target": p.label+' fr',
+        })
+        x.LocaleDAO.put(xl);
+      }
+
+      if ( !!!p.label && !!p.name ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "locale": 'fr',
+          "variant": 'CA',
+          "locale_variant": 'fr-CA',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "target": p.name+' fr',
+        })
+        x.LocaleDAO.put(xl);
+      }
+    })
+  })
+  """
+})
+
+p({
+  "class": "foam.nanos.script.Script",
+  "id": "extractMenuFromJournal",
+  "lastRun": 1593184732391,
+  "lastDuration": 18,
+  "server": false,
+  "code": """
+  x.menuDAO.select(function(m) {
+
+    let l = foam.i18n.Locale.create({
+      "id": m.id+'.label',
+      "locale": "fr",
+      "variant": "CA",
+      "locale_variant": "fr-CA",
+      "source": m.id+'.label',
+      "target": m.label +' fr'
+    });
+    x.LocaleDAO.put(l);
+
+    if ( m.handler && m.handler.title ){
+      let l2 = foam.i18n.Locale.create({
+        "id": m.id+'.handler.title',
+        "locale": "fr",
+        "variant": "CA",
+        "locale_variant": "fr-CA",
+        "source": m.id+'.handler.title',
+        "target": m.handler.title +' fr'
+      });
+      x.LocaleDAO.put(l2);
+    }
+
+    if ( m.handler && m.handler.subtitle ){
+      let l2 = foam.i18n.Locale.create({
+        "id": m.id+'.handler.subtitle',
+        "locale": "fr",
+        "variant": "CA",
+        "locale_variant": "fr-CA",
+        "source": m.id+'.handler.subtitle',
+        "target": m.handler.subtitle +' fr'
+      });
+      x.LocaleDAO.put(l2);
+    }
+
+    if ( m.handler && m.handler.config ) {
+      if ( m.handler.config.browseTitle ) {
+        let l2 = foam.i18n.Locale.create({
+          "id": m.id+'.handler.config.browseTitle',
+          "locale": "fr",
+          "variant": "CA",
+          "locale_variant": "fr-CA",
+          "source": m.id+'.handler.config.browseTitle',
+          "target": m.handler.config.browseTitle +' fr'
+        });
+        x.LocaleDAO.put(l2);
+      }
+      if ( m.handler.config.browseSubtitle ) {
+        let l2 = foam.i18n.Locale.create({
+          "id": m.id+'.handler.config.browseSubtitle',
+          "locale": "fr",
+          "variant": "CA",
+          "locale_variant": "fr-CA",
+          "source": m.id+'.handler.config.browseSubtitle',
+          "target": m.handler.config.browseSubtitle +' fr'
+        });
+        x.LocaleDAO.put(l2);
+      }
+      if ( m.handler.config.createTitle ) {
+        let l2 = foam.i18n.Locale.create({
+          "id": m.id+'.handler.config.createTitle',
+          "locale": "fr",
+          "variant": "CA",
+          "locale_variant": "fr-CA",
+          "source": m.id+'.handler.config.createTitle',
+          "target": m.handler.config.createTitle +' fr'
+        });
+        x.LocaleDAO.put(l2);
+      }
+    }
+  });
+""",
+  "output": "",
+  "notes": "",
+  "lastModifiedBy": 1348
+})
+p({
+  "class": "foam.nanos.script.Script",
+  "id": "ExtractStringAxiomPerPackage",
+  "description":"get all String axiom to translate them per package",
+  "code": """
+  let used = Object.values(foam.USED)
+  let objs = used.concat(Object.values(foam.UNUSED))
+
+  objs = used.filter(p => p.package == 'net.nanopay.sme.ui.dashboard')
+
+  objs.forEach(o => {
+    !!o.messages && o.messages.forEach(m => {console.log(objs+'mm')
+      let xl = foam.i18n.Locale.create({
+        "id": o.id+'.'+foam.String.constantize(m.name),
+        "locale": 'pt',
+        "variant": 'PT',
+        "locale_variant": 'pt-PT',
+        "source": o.id+'.'+foam.String.constantize(m.name),
+        "target": m.message+' pt',
+      })
+      x.LocaleDAO.put(xl);
+    })
+
+    !!o.properties && o.properties.forEach(p => {
+      if ( !!p.label && typeof p.label != "object" ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "locale": 'pt',
+          "variant": 'PT',
+          "locale_variant": 'pt-PT',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "target": p.label+' pt',
+        })
+        x.LocaleDAO.put(xl);
+      }
+
+      if ( !!!p.label && !!p.name && ( p.class != "foam.core.Enum" && p.class != "Enum") ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "locale": 'pt',
+          "variant": 'PT',
+          "locale_variant": 'pt-PT',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "target": p.name+' pt',
+        })
+        x.LocaleDAO.put(xl);
+      }
+      if ( !!p.value && typeof p.value !== 'function' && p.name !== 'slashReplacement' && p.name !== 'code' && typeof p.value !== 'object' && ( p.class != "foam.core.Enum" && p.class != "Enum")  ) { //not for object
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.value',
+          "locale": 'pt',
+          "variant": 'PT',
+          "locale_variant": 'pt-PT',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.value',
+          "target": p.value+' pt',
+        })
+        x.LocaleDAO.put(xl);
+      }
+      if ( !!p.documentation ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.documentation',
+          "locale": 'pt',
+          "variant": 'PT',
+          "locale_variant": 'pt-PT',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.documentation',
+          "target": p.documentation+' pt',
+        })
+        x.LocaleDAO.put(xl);
+      }
+      if ( !!p.placeholder ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.placeholder',
+          "locale": 'pt',
+          "variant": 'PT',
+          "locale_variant": 'pt-PT',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.placeholder',
+          "target": p.placeholder+' pt',
+        })
+        x.LocaleDAO.put(xl);
+      }
+
+      if ( !!p.view && !!p.view.placeholder  ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.view.placeholder',
+          "locale": 'pt',
+          "variant": 'PT',
+          "locale_variant": 'pt-PT',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.view.placeholder',
+          "target": p.view.placeholder+' pt',
+        })
+        x.LocaleDAO.put(xl);
+      }
+      if ( !!p.view && !!p.view.label ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.view.label',
+          "locale": 'pt',
+          "variant": 'PT',
+          "locale_variant": 'pt-PT',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.view.label',
+          "target": p.view.label+' pt',
+        })
+        x.LocaleDAO.put(xl);
+      }
+    })
+
+    !!o.sections && !!o.sections.forEach(m => {
+      if ( !!m.title ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.SECTION_'+foam.String.constantize(m.name)+'.title',
+          "locale": 'pt',
+          "variant": 'PT',
+          "locale_variant": 'pt-PT',
+          "source": o.id+'.SECTION_'+foam.String.constantize(m.name)+'.title',
+          "target": m.title+' pt',
+        })
+        x.LocaleDAO.put(xl);
+      }
+      if ( !!m.subTitle ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.SECTION_'+foam.String.constantize(m.name)+'.subTitle',
+          "locale": 'pt',
+          "variant": 'PT',
+          "locale_variant": 'pt-PT',
+          "source": o.id+'.SECTION_'+foam.String.constantize(m.name)+'.subTitle',
+          "target": m.subTitle+' pt',
+        })
+        x.LocaleDAO.put(xl);
+      }
+    })
+
+    !!o.actions && o.actions.forEach(p => {
+      if ( !!p.label ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "locale": 'pt',
+          "variant": 'PT',
+          "locale_variant": 'pt-PT',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "target": p.label+' pt',
+        })
+        x.LocaleDAO.put(xl);
+      }
+
+      if ( !!!p.label && !!p.name ) {
+        let xl = foam.i18n.Locale.create({
+          "id": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "locale": 'pt',
+          "variant": 'PT',
+          "locale_variant": 'pt-PT',
+          "source": o.id+'.'+foam.String.constantize(p.name)+'.label',
+          "target": p.name+' pt',
+        })
+        x.LocaleDAO.put(xl);
+      }
+    })
+  })
+  """
+})

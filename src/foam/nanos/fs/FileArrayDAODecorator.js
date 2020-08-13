@@ -40,7 +40,6 @@ foam.CLASS({
             f.dataString = await this.encode(f.data.blob);
             delete f.instance_.data;
           }
-          a = await self.fileDAO.put(f);
           return self.fileDAO.put(f);
         }))
       });

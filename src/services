@@ -771,6 +771,7 @@ p({
   "serviceScript": """
     dao = new foam.dao.EasyDAO.Builder(x)
       .setEnableInterfaceDecorators(false)
+      .setServiceProviderAware(true)
       .setOf(foam.nanos.ruler.Rule.getOwnClassInfo())
       .setInnerDAO(x.get("localRuleDAO"))
       .build();
@@ -805,6 +806,8 @@ p({
       .build();
 
     dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.ruler.Rule.NAME });
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.ruler.Rule.DAO_KEY });
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.ruler.Rule.ENABLED });
 
     return dao;
   """,
@@ -920,9 +923,10 @@ p({
   "serviceScript":
   """
     return new foam.nanos.analytics.FoldManagerDAODecorator.Builder(x)
-      .setDelegate(new foam.dao.NullDAO.Builder(x)
-      .setOf(foam.nanos.pm.PM.getOwnClassInfo())
-      .build())
+      .setDelegate(
+        new foam.nanos.ruler.RulerDAO(x, new foam.dao.NullDAO.Builder(x)
+        .setOf(foam.nanos.pm.PM.getOwnClassInfo())
+        .build(), "pmDAO"))
       .setFm((foam.nanos.analytics.DAOFoldManager) x.get("pmFoldManager"))
       .build();
   """,

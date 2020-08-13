@@ -33,17 +33,17 @@ foam.CLASS({
           return;
 
         // Get the message to send
-        String slackMessage = notif.getSlackMessage();
+        String slackMessage = notification.getSlackMessage();
         if ( foam.util.SafetyUtil.isEmpty(slackMessage) ) {
-          slackMessage = notif.getBody();
+          slackMessage = notification.getBody();
         }
 
         // Post to the slack webhook
-        HttpPost httpPost = new HttpPost(slackWebhook);
+        HttpPost httpPost = new HttpPost(notification.getSlackWebhook());
         httpPost.addHeader("Content-type", "application/json");
         
         // Add the slack message to the post
-        StringEntity params = new StringEntity("{\"text\" : \"" + slackMessage + "\"}", "UTF-8");
+        StringEntity params = new StringEntity("{\\"text\\" : \\"" + slackMessage + "\\"}", "UTF-8");
         params.setContentType("application/json");
         httpPost.setEntity(params);
         

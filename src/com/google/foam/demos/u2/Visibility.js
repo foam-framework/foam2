@@ -160,7 +160,7 @@ foam.CLASS({
 
   css: `
     body {
-      font-family: 'IBM Plex Sans', Helvetica, sans-serif;
+      font-family: /*%FONT1%*/, Helvetica, sans-serif;
       line-height: 1.5;
     }
 
