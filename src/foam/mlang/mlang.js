@@ -784,15 +784,24 @@ foam.CLASS({
     function toSummary() {
       return this.toString();
     },
-    function toString() {
-      var s = foam.String.constantize(this.cls_.name) + '(';
-      for ( var i = 0 ; i < this.args.length ; i++ ) {
-        var a = this.args[i];
-        s += a.toString();
-        if ( i < this.args.length - 1 ) s += ', ';
-      }
-      return s + ')';
+    {
+      name: 'toString',
+      code: function() {
+        return foam.String.constantize(this.cls_.name) + '(' +
+          this.args.map(a => a.toString()) + ')';
+      },
+      javaCode: `
+        StringBuilder sb = new StringBuilder();
+        sb.append(getClass().getSimpleName()).append('(');
+        for ( int i = 0; i < getArgs().length; i++ ) {
+          if ( i > 0 ) sb.append(", ");
+          sb.append(getArgs()[i].toString());
+        }
+        sb.append(')');
+        return sb.toString();
+      `
     },
+
     function reduce_(args, shortCircuit, methodName) {
       for ( var i = 0; i < args.length - 1; i++ ) {
         for ( var j = i + 1; j < args.length; j++ ) {
@@ -1708,7 +1717,11 @@ foam.CLASS({
         x && (x).toString();
     },
 
-    function toString() { return this.toString_(this.value); },
+    {
+      name: 'toString',
+      code: function() { return this.toString_(this.value); },
+      javaCode: 'return getValue().toString();'
+    },
 
     // TODO(adamvy): Re-enable when we can parse this in java more correctly.
     function xxoutputJSON(os) {
@@ -2414,6 +2427,11 @@ return false;`
 
         return false;
       }
+    },
+    {
+      name: 'toString',
+      code: function() { return 'Keyword(' + this.arg1.toString() + ')'; },
+      javaCode: 'return "Keyword(" + getArg1().toString() + ")";'
     }
   ]
 });
