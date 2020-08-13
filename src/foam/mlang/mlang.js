@@ -2330,7 +2330,7 @@ foam.CLASS({
         return this.fInner_(obj, true);
       },
       javaCode: `
-if ( ! ( getArg1().f(obj) instanceof String ) ) return false;
+if ( ! ( getArg1().f(obj) instanceof String ) || obj == null ) return false;
 
 String arg1 = ((String) getArg1().f(obj)).toUpperCase();
 List props = ((foam.core.FObject) obj).getClassInfo().getAxiomsByClass(PropertyInfo.class);
