@@ -2326,7 +2326,7 @@ foam.CLASS({
   properties: [
     {
       class: 'Boolean',
-      name: '_checkingNestedFObject',
+      name: 'checkingNestedFObject_',
       value: false,
       transient: true,
       visibility: 'HIDDEN',
@@ -2422,15 +2422,15 @@ return false;`
         { name: 'obj', type: 'Any' }
       ],
       code: function(obj) {
-        if ( obj === undefined || obj === null || this._checkingNestedFObject ) {
+        if ( obj === undefined || obj === null || this.checkingNestedFObject_ ) {
           return false;
         }
-        this._checkingNestedFObject = true;
+        this.checkingNestedFObject_ = true;
         return this.f(obj);
       },
       javaCode: `
-        if ( obj == null || get_checkingNestedFObject() ) return false;
-        set_checkingNestedFObject(true);
+        if ( obj == null || getCheckingNestedFObject_() ) return false;
+        setCheckingNestedFObject_(true);
         return this.f(obj);
       `
     },
