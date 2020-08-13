@@ -186,7 +186,7 @@ foam.CLASS({
         for ( int i = 0 ; i < metadata.length ; i++ ) {
           if ( metadata[i].getColumnWidth() > 0 )
             requests.add(new Request().setUpdateDimensionProperties(new UpdateDimensionPropertiesRequest().setRange(new DimensionRange().setSheetId(0).setDimension("COLUMNS").setStartIndex(i).setEndIndex(i+1)).setProperties(new DimensionProperties().setPixelSize(metadata[i].getColumnWidth())).setFields("pixelSize")));
-          if ( metadata[i].getCellType().equals("STRING") )
+          if ( metadata[i].getCellType().equals("STRING") || metadata[i].getCellType().equals("ENUM") )
             continue;
   
           if ( metadata[i].getCellType().equals("DATE_TIME") ) {
@@ -281,12 +281,14 @@ foam.CLASS({
             metadata[i] = (GoogleSheetsPropertyMetadata)metadataArr[i];
           }
 
+          java.util.List<java.util.List<Object>> data = retrieveTemplateData(x, extraConfig.getExportClsInfo(), extraConfig.getServiceName(), metadata);
+
           GoogleDriveService googleDriveService = (GoogleDriveService) getX().get("googleDriveService");
           String folderId = googleDriveService.createFolderIfNotExists(x, "Nanopay Export");
           String fileName = extraConfig == null || SafetyUtil.isEmpty(extraConfig.getTitle()) ? ("NanopayExport" + new Date()) : extraConfig.getTitle();
           String fileId = googleDriveService.createFile(x, folderId, fileName);
     
-          return populateWithDataSheetWithObj(x, fileId, obj, metadata, extraConfig);
+          return populateWithDataSheetWithId(x, fileId, data, metadata, extraConfig);
         } catch ( Throwable t ) {
           Logger l = (Logger) getX().get("logger");
           l.error(t);

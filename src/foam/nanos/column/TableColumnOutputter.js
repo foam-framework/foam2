@@ -200,6 +200,8 @@
           return obj.toString().substring(0, 24);
         case "TIME":
           return obj.toString().substring(0, 8);
+        case "ENUM":
+          return obj.toString();
         default:
           return ((foam.core.FObject)obj).toSummary();
       }
