@@ -46,7 +46,7 @@ foam.CLASS({
     {
       name: 'serviceName',
       class: 'String',
-      value: 'businessDAO'
+      hidden: true
     },
     {
       name: 'exportClsInfo',

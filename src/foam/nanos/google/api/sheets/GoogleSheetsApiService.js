@@ -186,7 +186,7 @@ foam.CLASS({
         for ( int i = 0 ; i < metadata.length ; i++ ) {
           if ( metadata[i].getColumnWidth() > 0 )
             requests.add(new Request().setUpdateDimensionProperties(new UpdateDimensionPropertiesRequest().setRange(new DimensionRange().setSheetId(0).setDimension("COLUMNS").setStartIndex(i).setEndIndex(i+1)).setProperties(new DimensionProperties().setPixelSize(metadata[i].getColumnWidth())).setFields("pixelSize")));
-          if ( metadata[i].getCellType().equals("STRING") || metadata[i].getCellType().equals("ENUM") )
+          if ( metadata[i].getCellType().equals("STRING") || metadata[i].getCellType().equals("ENUM") || metadata[i].getCellType().equals("PRIMITIVE") )
             continue;
   
           if ( metadata[i].getCellType().equals("DATE_TIME") ) {

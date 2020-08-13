@@ -186,14 +186,14 @@
         }
       ],
       javaCode: `
-      if ( obj == null )
+      if ( obj == null || obj == "" )
         return "";
 
       switch(metadata.getCellType()) {
         case "STRING":
         case "PRIMITIVE":
         case "CURRENCY"://make sure commas added in GS pattern
-          return obj;
+          return new Long(obj.toString()) / 100.0 ;
         case "DATE":
           return obj.toString().substring(0, 10);
         case "DATETIME":
