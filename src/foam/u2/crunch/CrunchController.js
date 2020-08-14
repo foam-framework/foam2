@@ -124,12 +124,32 @@ foam.CLASS({
         x.closeDialog();
         // Save no-data capabilities (i.e. not displayed in wizard)
         Promise.all(capabilities.filter(cap => ! cap.of).map(
-          cap => this.userCapabilityJunctionDAO.put(this.UserCapabilityJunction.create({
-            sourceId: this.subject.user.id,
-            targetId: cap.id
-          })).then(() => {
-            console.log('SAVED (no-data cap)', cap.id);
-          })
+          cap => {
+            var associatedEntity = cap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
+            this.userCapabilityJunctionDAO.find(
+              this.AND(
+                this.OR(
+                  this.AND(
+                    this.NOT(this.INSTANCE_OF(this.AgentCapabilityJunction)),
+                    this.EQ(this.UserCapabilityJunction.SOURCE_ID, associatedEntity.id)
+                  ),
+                  this.AND(
+                    this.INSTANCE_OF(this.AgentCapabilityJunction),
+                    this.EQ(this.UserCapabilityJunction.SOURCE_ID, associatedEntity.id),
+                    this.EQ(this.AgentCapabilityJunction.EFFECTIVE_USER, this.subject.user.id)
+                  )
+                ),
+                this.EQ(this.UserCapabilityJunction.TARGET_ID, cap.id))
+            ).then((ucj) => {
+              if ( ucj == null ) {
+                ucj = this.UserCapabilityJunction.create({
+                  sourceId: associatedEntity.id,
+                  targetId: cap.id
+                });
+              }
+              this.userCapabilityJunctionDAO.put(ucj).then(() => console.log('SAVED (no-data cap)', cap.id));
+            });
+          }
         )).then(() => {
           wizardResolve();
         });
