@@ -206,7 +206,7 @@ public class MDAO
         }
         unindexed_.add(getOf().getId());
         if ( logger != null ) {
-          logger.warning("Unindexed search on MDAO", getOf().getId(), simplePredicate.toString());
+          logger.warning("Unindexed search on MDAO", getOf().getId(), simplePredicate.toString(), plan.toString());
         }
       }
     }
