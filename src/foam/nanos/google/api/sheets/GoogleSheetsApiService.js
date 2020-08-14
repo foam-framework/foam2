@@ -191,7 +191,7 @@ foam.CLASS({
             .setProperties(new DimensionProperties().setPixelSize(metadata[i].getColumnWidth()))
             .setFields("pixelSize")));
 
-          if ( metadata[i].getCellType().equals("") ||metadata[i].getCellType().equals("STRING") || metadata[i].getCellType().equals("ENUM") || metadata[i].getCellType().equals("BOOLEAN") )
+          if ( metadata[i].getCellType().equals("") || metadata[i].getCellType().equals("STRING") || metadata[i].getCellType().equals("ENUM") || metadata[i].getCellType().equals("BOOLEAN") )
             continue;
   
           if ( metadata[i].getCellType().equals("DATE_TIME") ) {
@@ -404,7 +404,7 @@ foam.CLASS({
         Projection p = ( new foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder() ).buildProjectionForPropertyNamesArray(of, propNamesArr);
         dao.select(p);
         java.util.List<Object[]> values = p.getArray();
-        //set specific values here
+ 
         for ( int i = 0 ; i < indexesOfUnitValuePropertyName.size() ; i++ ) {
           int indexOfMetadataPropertyName = indexesOfUnitValuePropertyName.get(i);
           int indexForMetadataPropertyUnitPropertyName = indexesOfUnitPropertyName.get(i);
