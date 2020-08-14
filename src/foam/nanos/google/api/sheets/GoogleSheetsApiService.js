@@ -193,54 +193,28 @@ foam.CLASS({
 
           if ( metadata[i].getCellType().equals("") || metadata[i].getCellType().equals("STRING") || metadata[i].getCellType().equals("ENUM") || metadata[i].getCellType().equals("BOOLEAN") )
             continue;
-  
-          if ( metadata[i].getCellType().equals("DATE_TIME") ) {
+
+          if ( metadata[i].getCellType().equals("CURRENCY") ) {
             for ( int j = 0 ; j < metadata[i].getPerValuePatternSpecificValues().length ; j++ ) {
+              if ( metadata[i].getPerValuePatternSpecificValues()[j] == null || metadata[i].getPerValuePatternSpecificValues()[j].equals("") || metadata[i].getPerValuePatternSpecificValues()[j].equals(DEFAULT_CURRENCY) )
+                continue;
               requests.add(new Request().setRepeatCell(
                 new RepeatCellRequest()
-                  .setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(metadata[i].getCellType()).setPattern("ddd mmm d yyyy hh/mm/ss\\" " + metadata[i].getPerValuePatternSpecificValues()[j] + "\\""))))
+                  .setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(metadata[i].getCellType()).setPattern("\\"$\\"#0.00\\" " + metadata[i].getPerValuePatternSpecificValues()[j] + "\\""))))
                   .setRange(new GridRange().setStartColumnIndex(i).setEndColumnIndex(i+1).setStartRowIndex(j+1).setEndRowIndex(j+2))
                   .setFields(NUMBER_FORMAT)
               ));
-            }
-          } else if ( metadata[i].getCellType().equals("TIME") ) {
-            for ( int j = 0 ; j < metadata[i].getPerValuePatternSpecificValues().length ; j++ ) {
-              requests.add(new Request().setRepeatCell(
-                new RepeatCellRequest()
-                  .setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(metadata[i].getCellType()).setPattern("hh/mm/ss\\" " + metadata[i].getPerValuePatternSpecificValues()[j] + "\\""))))
-                  .setRange(new GridRange().setStartColumnIndex(i).setEndColumnIndex(i+1).setStartRowIndex(j+1).setEndRowIndex(j+2))
-                  .setFields(NUMBER_FORMAT)
-              ));
-            }
-          } else {
-            if ( metadata[i].getPattern().isEmpty() )
-              requests.add(new Request().setRepeatCell(
-                new RepeatCellRequest()
-                  .setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(metadata[i].getCellType()))))
-                  .setRange(new GridRange().setStartRowIndex(COLUMN_TITLES_ROW_INDEX).setStartColumnIndex(i).setEndColumnIndex(i+1))
-                  .setFields(NUMBER_FORMAT)
-              ));
-            else
-              requests.add(new Request().setRepeatCell(
-                new RepeatCellRequest()
-                  .setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(metadata[i].getCellType()).setPattern(metadata[i].getPattern()))))
-                  .setRange(new GridRange().setStartRowIndex(COLUMN_TITLES_ROW_INDEX).setStartColumnIndex(i).setEndColumnIndex(i+1))
-                  .setFields(NUMBER_FORMAT)
-              ));
-  
-            if ( metadata[i].getCellType().equals("CURRENCY") ) {
-              for ( int j = 0 ; j < metadata[i].getPerValuePatternSpecificValues().length ; j++ ) {
-                if ( metadata[i].getPerValuePatternSpecificValues()[j] == null || metadata[i].getPerValuePatternSpecificValues()[j].equals("") || metadata[i].getPerValuePatternSpecificValues()[j].equals(DEFAULT_CURRENCY) )
-                  continue;
-                requests.add(new Request().setRepeatCell(
-                  new RepeatCellRequest()
-                    .setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(metadata[i].getCellType()).setPattern("\\"$\\"#0.00\\" " + metadata[i].getPerValuePatternSpecificValues()[j] + "\\""))))
-                    .setRange(new GridRange().setStartColumnIndex(i).setEndColumnIndex(i+1).setStartRowIndex(j+1).setEndRowIndex(j+2))
-                    .setFields(NUMBER_FORMAT)
-                ));
-              }
             }
           }
+
+          RepeatCellRequest req = new RepeatCellRequest().setRange(new GridRange().setStartRowIndex(COLUMN_TITLES_ROW_INDEX).setStartColumnIndex(i).setEndColumnIndex(i+1))
+            .setFields(NUMBER_FORMAT);
+  
+          if ( metadata[i].getPattern().isEmpty() )
+            req.setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(metadata[i].getCellType()))));
+          else
+            req.setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(metadata[i].getCellType()).setPattern(metadata[i].getPattern()))));
+          requests.add(new Request().setRepeatCell(req));
         }
   
         BatchUpdateSpreadsheetRequest r = new BatchUpdateSpreadsheetRequest().setRequests(requests);

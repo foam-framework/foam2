@@ -67,8 +67,10 @@ foam.CLASS({
             pattern = 'yyyy-mm-dd';
           } else if ( foam.core.DateTime.isInstance(prop) ) {
             cellType = 'DATE_TIME';
+            pattern = 'ddd mmm d yyyy hh/mm/ss';
           } else if ( foam.core.Time.isInstance(prop) ) {
             cellType = 'TIME';
+            pattern = 'hh/mm/ss';
           }  else if ( foam.core.Enum.isInstance(prop) || foam.core.AbstractEnum.isInstance(prop) ) {
             cellType = "ENUM";
           } else if ( foam.core.Int.isInstance(prop) || foam.core.Float.isInstance(prop) || foam.core.Long.isInstance(prop) || foam.core.Double.isInstance(prop) || foam.core.Boolean.isInstance(prop) ) {
