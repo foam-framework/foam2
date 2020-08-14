@@ -224,6 +224,10 @@ foam.CLASS({
       type: 'foam.mlang.Expr[]',
       args: [
         {
+          name: 'x',
+          type: 'Context'
+        },
+        {
           name: 'objClass',
           class: 'Object',
           javaType: 'foam.core.ClassInfo'
@@ -245,7 +249,7 @@ foam.CLASS({
       javaCode: `
         ArrayList<foam.mlang.Expr> exprs = new ArrayList();
         for ( int i = 0 ; i < propNames.length ; i++ ) {
-          Expr expr = new NestedPropertiesExpression.Builder(foam.core.XLocator.get()).setObjClass(objClass).setNestedProperty( propNames[i]).build();
+          Expr expr = new NestedPropertiesExpression.Builder(x).setObjClass(objClass).setNestedProperty( propNames[i]).build();
           if ( expr != null ) {
             exprs.add(expr);
           }
@@ -265,6 +269,10 @@ foam.CLASS({
       javaType: 'foam.mlang.sink.Projection',
       args: [
         {
+          name: 'x',
+          type: 'Context'
+        },
+        {
           name: 'of',
           class: 'Class',
           javaType: 'foam.core.ClassInfo'
@@ -278,8 +286,8 @@ foam.CLASS({
         return foam.mlang.sink.Projection.create({ exprs: this.returnArrayOfExprForArrayOfProperties(of, propNames) });
       },
       javaCode: `
-        Expr[] exprs = returnArrayOfExprForArrayOfProperties(of, propNames);
-        return new Projection.Builder(foam.core.XLocator.get()).setExprs(exprs).build();
+        Expr[] exprs = returnArrayOfExprForArrayOfProperties(x, of, propNames);
+        return new Projection.Builder(x).setExprs(exprs).build();
       `
     }
   ]
