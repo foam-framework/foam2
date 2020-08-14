@@ -4,12 +4,12 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
- // TODO: DAO Support make it do an IN QUERY where value is the ID
-
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'MultiChoiceView',
   extends: 'foam.u2.View',
+
+  implements: [ 'foam.mlang.Expressions' ],
 
   documentation: `
     Wraps a tag that represents multiple choices. 
@@ -25,13 +25,6 @@ foam.CLASS({
     For now choices can only be provided as an array (this.choices)
 
     this.booleanView is a ViewSpec for each choice. It defaults to foam.u2.CheckBox
-  `,
-
-  css: `
-    ^boolean-wrapper{
-      width: 100%;
-      height: 100%;
-    }
   `,
 
   properties: [
@@ -85,6 +78,10 @@ foam.CLASS({
       }
     },
     {
+      class: 'foam.dao.DAOProperty',
+      name: 'dao'
+    },
+    {
       class: 'Boolean',
       name: 'isValidNumberOfChoices',
       value: this.minSelected === 0 ? true : false
@@ -116,21 +113,37 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpecWithJava',
       name: 'booleanView',
-      value: { class: 'foam.u2.CheckBox' }
+      value: { class: 'foam.u2.view.CardSelectView' }
     },
     {
       class: 'Boolean',
       name: 'isVertical',
-      value: true
+      value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'isDaoFetched',
+      value: false
+    },
+    {
+      class: 'Int',
+      name: 'numberOfColumns',
+      value: 3
+    },
+    {
+      name: 'objToChoice',
+      value: function(obj) {
+        return [ obj.id, obj.toSummary() ];
+      }
     }
   ],
 
   methods: [
     function initE() {
       var self = this;
-      var arraySlotForChoices = foam.core.ArraySlot.create({
-        slots: []
-      });
+
+      this.onDAOUpdate();
+
       this
         .start()
           .add(self.slot(function(showMinMaxHelper, minSelected, maxSelected) {
@@ -147,26 +160,36 @@ foam.CLASS({
             })
           }))
         .end()
-        .start(self.isVertical ? foam.u2.layout.Rows : foam.u2.layout.Cols)
+        .start(self.isVertical ? foam.u2.layout.Rows : foam.u2.layout.Cols).style({'flex-wrap': 'wrap;'})
           .add(
-            self.choices.map(function (choice) {
-              var simpSlot0 = foam.core.SimpleSlot.create({ value: choice[0] });
-              var simpSlot1 = foam.core.SimpleSlot.create({ value: choice[1] });
-              var simpSlot2 = foam.core.SimpleSlot.create({ value: choice[2] });
-              var simpSlot3 = foam.core.SimpleSlot.create({ value: choice[3] });
+            self.isDaoFetched$.map(isDaoFetched => {
 
-              var arraySlotForChoice = foam.core.ArraySlot.create({
-                slots: [ simpSlot0, simpSlot1, simpSlot2, simpSlot3 ]
+              var arraySlotForChoices = foam.core.ArraySlot.create({
+                slots: []
+              });        
+
+              var toRender = self.choices.map(function (choice) {
+                var simpSlot0 = foam.core.SimpleSlot.create({ value: choice[0] });
+                var simpSlot1 = foam.core.SimpleSlot.create({ value: choice[1] });
+                var simpSlot2 = foam.core.SimpleSlot.create({ value: choice[2] });
+                var simpSlot3 = foam.core.SimpleSlot.create({ value: choice[3] });
+  
+                var arraySlotForChoice = foam.core.ArraySlot.create({
+                  slots: [ simpSlot0, simpSlot1, simpSlot2, simpSlot3 ]
+                })
+  
+                arraySlotForChoices.slots.push(arraySlotForChoice);
+  
+                return self.E().style({ 'height': '100%;', 'width':`${100 / self.numberOfColumns}%` })
+                  .tag(self.booleanView, {
+                      data$: simpSlot2,
+                      label$: simpSlot1,
+                      mode$: simpSlot3
+                    })
               })
 
-              arraySlotForChoices.slots.push(arraySlotForChoice);
-
-              return self.E().addClass(self.myClass("boolean-wrapper"))
-                .tag(self.booleanView, {
-                    data$: simpSlot2,
-                    label$: simpSlot1,
-                    mode$: simpSlot3
-                  })
+              this.choices$ = arraySlotForChoices;
+              return toRender;
             })
           )
         .end()
@@ -195,7 +218,6 @@ foam.CLASS({
           )
         .end()
 
-      this.choices$ = arraySlotForChoices;
     },
 
     function outputSelectedChoicesInValueLabelFormat() {
@@ -207,6 +229,60 @@ foam.CLASS({
       var filteredChoices = this.choices.filter(choice => choice[2]);
 
       return filteredChoices.map(choice => [choice[0], choice[1]]);
+    },
+
+    function outputSelectedChoicesInDAO() {
+      var of = this.dao.of
+
+      var filteredChoices = this.choices.filter(choice => choice[2]);
+
+      return this.dao.where(this.EQ(of.ID, this.IN(filteredChoices.map(choice => choice))));
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'onDAOUpdate',
+      isFramed: true,
+      code: function() {
+        if ( ! this.dao || ! foam.dao.DAO.isInstance(this.dao) ) return;
+
+        var of = this.dao.of
+        if ( of._CHOICE_TEXT_ ) {
+          this.dao.select(this.PROJECTION(of.ID, of._CHOICE_TEXT_)).then((s) => {
+            this.choices = s.array;
+            this.isDaoFetched = true
+          });
+          return;
+        } else {
+          console.warn('Inefficient ChoiceView. Consider creating transient _choiceText_ property on ' + of.id + ' DAO, prop: ' + this.prop_);
+
+          /* Ex.:
+          {
+            class: 'String',
+            name: '_choiceText_',
+            transient: true,
+            javaGetter: 'return getName();',
+            getter: function() { return this.name; }
+          }
+          */
+        }
+        var p = this.mode === foam.u2.DisplayMode.RW ?
+          this.dao.select().then(s => s.array) :
+          this.dao.find(this.data).then(o => o ? [o] : []);
+
+        p.then(a => {
+          var choices = a.map(this.objToChoice);
+          var choiceLabels = a.map(o => { return this.objToChoice(o)[1]});
+          Promise.all(choiceLabels).then(resolvedChoiceLabels => {
+            for ( let i = 0; i < choices.length; i++ ) {
+              choices[i][1] = resolvedChoiceLabels[i];
+            }
+            this.choices = choices;
+            this.isDaoFetched = true
+          });
+        });
+      }
     }
   ]
 });
