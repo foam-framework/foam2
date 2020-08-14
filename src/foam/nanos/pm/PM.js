@@ -175,7 +175,7 @@ foam.CLASS({
               if ( pm == null ) return new PM(fo, name);
 
               pm.setKey(fo.getClassInfo().getId());
-              pm.setName(combine(name));
+              pm.setName(combine((Object[]) name));
               pm.init_();
 
               return pm;
@@ -187,7 +187,7 @@ foam.CLASS({
               if ( pm == null ) return new PM(clsInfo, name);
 
               pm.setKey(clsInfo.getId());
-              pm.setName(combine(name));
+              pm.setName(combine((Object[]) name));
               pm.init_();
 
               return pm;
@@ -199,20 +199,20 @@ foam.CLASS({
               if ( pm == null ) return new PM(key, args);
 
               pm.setKey(key);
-              pm.setName(combine(args));
+              pm.setName(combine((Object[]) args));
               pm.init_();
 
               return pm;
             }
 
             public PM(ClassInfo clsInfo, String... name) {
-              setName(combine(name));
+              setName(combine((Object[]) name));
               setKey(clsInfo.getId());
               init_();
             }
 
             public PM(Class cls, String... name) {
-              setName(combine(name));
+              setName(combine((Object[]) name));
               foam.core.ClassInfoImpl clsInfo = new foam.core.ClassInfoImpl();
               clsInfo.setObjClass(cls);
               clsInfo.setId(cls.getName());
@@ -229,7 +229,7 @@ foam.CLASS({
                 setKey(args[0]);
               }
               if ( args.length > 1 ) {
-                setName(combine(java.util.Arrays.copyOfRange(args, 1, args.length)));
+                setName(combine((Object[]) java.util.Arrays.copyOfRange(args, 1, args.length)));
               }
               init_();
             }
@@ -239,20 +239,9 @@ foam.CLASS({
                 setKey(args[0].toString());
               }
               if ( args.length > 1 ) {
-                setName(combine(java.util.Arrays.copyOfRange(args, 1, args.length)));
+                setName(combine((Object[]) java.util.Arrays.copyOfRange(args, 1, args.length)));
               }
               init_();
-            }
-
-            private static String combine(String... args) {
-              if ( args == null ) {
-                return "";
-              }
-              StringBuilder sb = new StringBuilder();
-              for ( String s: args) {
-                sb.append(s).append(":");
-              }
-              return sb.deleteCharAt(sb.length() - 1).toString();
             }
 
             private static String combine(Object... args) {
