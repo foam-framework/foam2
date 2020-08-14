@@ -73,7 +73,7 @@ foam.CLASS({
             pattern = 'hh/mm/ss';
           }  else if ( foam.core.Enum.isInstance(prop) || foam.core.AbstractEnum.isInstance(prop) ) {
             cellType = "ENUM";
-          } else if ( foam.core.Int.isInstance(prop) || foam.core.Float.isInstance(prop) || foam.core.Long.isInstance(prop) || foam.core.Double.isInstance(prop) || foam.core.Boolean.isInstance(prop) ) {
+          } else if ( foam.core.Int.isInstance(prop) || foam.core.Float.isInstance(prop) || foam.core.Long.isInstance(prop) || foam.core.Double.isInstance(prop) ) {
             cellType = 'NUMBER';
           }  else if ( foam.core.Boolean.isInstance(prop) ) {
             cellType = 'BOOLEAN';
