@@ -12,17 +12,24 @@ foam.CLASS({
   implements: [ 'foam.mlang.Expressions' ],
 
   documentation: `
-    Wraps a tag that represents multiple choices. 
+    Wraps a tag that represents multiple choices.
 
     The choices are in [value, label, isSelected, choiceMode ] quartets.
 
     However the client can simply pass in [value, label] and it will adapt to a [value, label, isSelected, choiceMode ] format
 
-    Adds flexibility incase the client wants to have preselected options for the user or a choice disabled from the start
+    Or the client can instead pass in a DAO to the MultiChoiceView.dao and the choices list will
+    be automatically generated
 
-    Calling the method, this.outputSelectedChoicesInValueLabelFormat() will return an array containing the selected choices in [ value, label ] format only if the minSelected, maxSelected criteria is respected
+    Calling the following methods: 
+    
+    1. MultiChoiceView.outputSelectedChoicesInValueLabelFormat() - will return an array containing the 
+    selected choices in [ value, label ] format only if the minSelected, maxSelected criteria is respected
+    2. MultiChoiceView.outputSelectedChoicesInValueLabelFormat() - will return a predicated dao containing thee 
+    selected choices in only if the minSelected, maxSelected criteria is respected
 
-    For now choices can only be provided as an array (this.choices)
+    MultiChoiceView.data will be automatically set to a predicated dao based on the choices selected only if
+    the minSelected, maxSelected criteria is respected, it will be foam.dao.NullDAO othrewise
 
     this.booleanView is a ViewSpec for each choice. It defaults to foam.u2.CheckBox
   `,
@@ -75,11 +82,19 @@ foam.CLASS({
             }
           })
         }
+
+        if (this.isValidNumberOfChoices ){
+          this.data = this.outputSelectedChoicesInDAO()
+        }
       }
     },
     {
       class: 'foam.dao.DAOProperty',
-      name: 'dao'
+      name: 'dao',
+      documentation: `
+        If the user just wants to pass in a dao, it will be processed to populate the
+        choices array instead of manually inputing the choices
+      `
     },
     {
       class: 'Boolean',
@@ -232,11 +247,16 @@ foam.CLASS({
     },
 
     function outputSelectedChoicesInDAO() {
+      if ( ! this.isValidNumberOfChoices ) {
+        console.warn("Please select a valid number of choices");
+        return foam.dao.NullDAO;
+      }
+
       var of = this.dao.of
 
       var filteredChoices = this.choices.filter(choice => choice[2]);
 
-      return this.dao.where(this.EQ(of.ID, this.IN(filteredChoices.map(choice => choice))));
+      return this.dao.where(this.IN(of.ID, filteredChoices.map(choice => choice[0])));
     }
   ],
 
