@@ -68,14 +68,7 @@ foam.CLASS({
       class: 'Boolean',
       name: 'isOpenAvailable'
     },
-    'exportDriver',
-    // {
-    //   name: 'serviceName',
-    //   class: 'String',
-    //   expression: function(data) {
-    //     return data.serviceName;
-    //   }
-    // }
+    'exportDriver'
   ],
 
   css: `

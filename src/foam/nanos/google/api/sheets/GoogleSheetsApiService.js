@@ -146,7 +146,7 @@ foam.CLASS({
         BatchUpdateValuesRequest batchBody = new BatchUpdateValuesRequest()
           .setValueInputOption("USER_ENTERED")
           .setData(data);
-      //
+
         BatchUpdateValuesResponse batchResult = service.spreadsheets().values()
           .batchUpdate(fileId, batchBody)
           .execute();

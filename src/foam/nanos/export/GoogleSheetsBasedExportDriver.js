@@ -38,7 +38,7 @@ foam.CLASS({
             placeholder: 'Please select template...',
             dao: X.reportTemplateDAO.where(expr.EQ(foam.nanos.export.report.Template.DAO_KEY, X.serviceName.split('/')[1])),
             objToChoice: function(a) {
-              return [a.id, a.docTitle];
+              return [a.id, a.name];
           }
         });
       }
@@ -86,7 +86,6 @@ foam.CLASS({
       else {
         var expr1 = foam.mlang.Expressions.create();
         var template = await X.reportTemplateDAO.find(expr1.EQ(foam.nanos.export.report.Template.ID, this.template));
-        //check that for columns for template which are unit value added unitName columns to columns
         propNames = template && template.columnNames && template.columnNames.length > 0 ? template.columnNames : X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(dao.of);
       }
        

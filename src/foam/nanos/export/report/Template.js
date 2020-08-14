@@ -12,7 +12,7 @@ foam.CLASS({
       class: 'String'
     },
     {
-      name: 'docTitle',
+      name: 'name',
       class: 'String',
     },
     {

@@ -186,7 +186,7 @@ foam.CLASS({
         if ( folderId != null ) {
           fileMetadata.setParents(new ArrayList<String>() {{ add(folderId); }});
         }
-        // fileMetadata.setMimeType("application/vnd.google-apps.spreadsheet");
+
         File file = service.files().copy(templateId, fileMetadata)
           .setFields("id")
           .execute();
