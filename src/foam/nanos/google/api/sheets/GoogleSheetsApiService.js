@@ -194,6 +194,15 @@ foam.CLASS({
           if ( metadata[i].getCellType().equals("") || metadata[i].getCellType().equals("STRING") || metadata[i].getCellType().equals("ENUM") || metadata[i].getCellType().equals("BOOLEAN") )
             continue;
 
+          RepeatCellRequest req = new RepeatCellRequest().setRange(new GridRange().setStartRowIndex(COLUMN_TITLES_ROW_INDEX).setStartColumnIndex(i).setEndColumnIndex(i+1))
+            .setFields(NUMBER_FORMAT);
+  
+          if ( metadata[i].getPattern().isEmpty() )
+            req.setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(metadata[i].getCellType()))));
+          else
+            req.setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(metadata[i].getCellType()).setPattern(metadata[i].getPattern()))));
+          requests.add(new Request().setRepeatCell(req));
+
           if ( metadata[i].getCellType().equals("CURRENCY") ) {
             for ( int j = 0 ; j < metadata[i].getPerValuePatternSpecificValues().length ; j++ ) {
               if ( metadata[i].getPerValuePatternSpecificValues()[j] == null || metadata[i].getPerValuePatternSpecificValues()[j].equals("") || metadata[i].getPerValuePatternSpecificValues()[j].equals(DEFAULT_CURRENCY) )
@@ -206,15 +215,6 @@ foam.CLASS({
               ));
             }
           }
-
-          RepeatCellRequest req = new RepeatCellRequest().setRange(new GridRange().setStartRowIndex(COLUMN_TITLES_ROW_INDEX).setStartColumnIndex(i).setEndColumnIndex(i+1))
-            .setFields(NUMBER_FORMAT);
-  
-          if ( metadata[i].getPattern().isEmpty() )
-            req.setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(metadata[i].getCellType()))));
-          else
-            req.setCell(new CellData().setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType(metadata[i].getCellType()).setPattern(metadata[i].getPattern()))));
-          requests.add(new Request().setRepeatCell(req));
         }
   
         BatchUpdateSpreadsheetRequest r = new BatchUpdateSpreadsheetRequest().setRequests(requests);
