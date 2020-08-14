@@ -23,7 +23,7 @@ foam.CLASS({
     }
 
     ^selected {
-      border-color: /*%PRIMARY1%*/ #202341 !important;
+      border-color: /*%PRIMARY3%*/ #406dea !important;
     }
     ^disabled {
       background-color: /*%GREY5%*/ #f5f7fa !important;
