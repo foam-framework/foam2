@@ -4,8 +4,8 @@ p({
   "description":"Daily check to remove expired UserCapabilityJunctions",
   "schedule":{
     "class":"foam.nanos.cron.CronSchedule",
-    "minute":0,
-    "hour":0,
+    "minute":-1,
+    "hour":-1,
     "dayOfMonth":-1,
     "month":-1,
     "dayOfWeek":-1,
@@ -25,8 +25,8 @@ p({
   "description":"Daily job to reduce the grace period on a ucj",
   "schedule": {
     "class": "foam.nanos.cron.CronSchedule",
-    "minute": 0,
-    "hour": 0,
+    "minute": -1,
+    "hour": -1,
     "dayOfMonth": -1,
     "month": -1,
     "dayOfWeek": -1,
