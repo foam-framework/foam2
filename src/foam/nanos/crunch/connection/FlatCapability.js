@@ -53,8 +53,7 @@ foam.CLASS({
     },
     {
       name: 'capabilities',
-      class: 'List',
-      javaType: 'java.util.ArrayList<String>',
+      class: 'StringArray',
       documentation: `
         Capability IDs of prerequisites. This is a parallel array
         to 'classes'.

@@ -28,7 +28,10 @@ foam.CLASS({
     'foam.nanos.auth.User',
     'foam.util.SafetyUtil',
     'foam.nanos.crunch.Capability',
-    'foam.nanos.crunch.connection.FlatCapability'
+    'foam.nanos.crunch.CrunchService',
+    'foam.nanos.crunch.connection.FlatCapability',
+    'java.util.ArrayList',
+    'java.util.List'
   ],
 
   documentation: `
@@ -90,6 +93,26 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
         // TODO: add logic to retrieve capabilities in order of precendence
+        CrunchService crunchService = (CrunchService) x.get("crunchService");
+        if ( obj == null || ! (obj instanceof FlatCapability) ) {
+          throw new RuntimeException("Attempted to put a non-flat capability in FlatCapabilityDAO");
+        }
+        FlatCapability flatCap = (FlatCapability) obj;
+        List grantPath = crunchService.getGrantPath(x, flatCap.getTargetCapabilityId());
+
+        List<String> classes = new ArrayList<>();
+        List<String> capabilities = new ArrayList<>();
+        for ( Object item : grantPath ) {
+          // TODO: Verify that MinMaxCapability lists can be ignored here
+          if ( item instanceof Capability ) {
+            Capability cap = (Capability) item;
+            classes.add(cap.getOf().getId());
+            capabilities.add(cap.getId());
+          }
+        }
+
+        flatCap.setClasses(classes.toArray(new String[classes.size()]));
+        flatCap.setCapabilities(capabilities.toArray(new String[classes.size()]));
 
         return getDelegate().put_(x, obj);
       `

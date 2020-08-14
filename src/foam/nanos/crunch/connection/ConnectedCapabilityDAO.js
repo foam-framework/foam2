@@ -12,8 +12,12 @@ foam.CLASS({
 
   javaImports: [
     'foam.nanos.crunch.Capability',
+    'foam.nanos.crunch.CrunchService',
+    'foam.core.ClassInfo',
+    'foam.core.FObject',
     'foam.core.X',
-    'foam.dao.DAO'
+    'foam.dao.DAO',
+    'java.util.List'
   ],
 
   documentation: `
@@ -39,6 +43,36 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
         // TODO: add logic to disprese FObjectArray to lower level capabilities
+        DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+        ConnectedCapability sentCap = (ConnectedCapability) obj;
+        FlatCapability flatCap = (FlatCapability)
+          capabilityDAO.find(sentCap.getFlatCapabilityId());
+
+        String[] classes = flatCap.getClasses();
+        String[] capabilities = flatCap.getCapabilities();
+
+        Object[] flatData = sentCap.getData();
+
+        // First pass: validate types provided
+        for ( int i = 0 ; i < classes.length ; i++ ) {
+          FObject dataObj = (FObject) flatData[i];
+          ClassInfo clsInfo = dataObj.getClassInfo();
+          if ( clsInfo.getId() != classes[i] ) {
+            throw new RuntimeException(String.format(
+              "Recieved incorrect type at index %d: "
+              + "found '%s', but expected '%s'."
+            ));
+          }
+        }
+
+        CrunchService crunchService = (CrunchService) x.get("crunchService");
+
+        // Second pass: store UCJs
+        for ( int i = 0 ; i < classes.length ; i++ ) {
+          FObject dataObj = (FObject) flatData[i];
+          String targetId = capabilities[i];
+          crunchService.updateJunction(x, targetId, dataObj);
+        }
 
         return getDelegate().put_(x, obj);
       `

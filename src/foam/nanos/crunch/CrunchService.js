@@ -50,6 +50,23 @@ foam.INTERFACE({
           type: 'String'
         }
       ],
+    },
+    {
+      name: 'updateJunction',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'capabilityId',
+          type: 'String'
+        },
+        {
+          name: 'data',
+          type: 'foam.core.FObject'
+        }
+      ],
     }
   ],
 });
