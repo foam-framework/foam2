@@ -16,6 +16,7 @@ foam.CLASS({
 
   imports: [
     'capabilityDAO',
+    'crunchService',
     'ctrl',
     'prerequisiteCapabilityJunctionDAO',
     'stack',
@@ -63,46 +64,8 @@ foam.CLASS({
   ],
 
   methods: [
-    function getTC(capabilityId) {
-      var tcList = [];
-      var tcRecurse = () => {};
-      // Pre-Order Traversial of Capability Dependancies.
-      // Using Pre-Order here will cause the wizard to display
-      // dependancies in a logical order.
-      tcRecurse = (sourceId, seen) => {
-        if ( ! seen ) seen = [];
-        return this.prerequisiteCapabilityJunctionDAO.where(this.AND(
-          this.EQ(this.CapabilityCapabilityJunction.SOURCE_ID, sourceId),
-          this.NOT(this.IN(this.CapabilityCapabilityJunction.TARGET_ID, seen))
-        )).select().then((result) => {
-          var arry = result.array;
-
-          if ( arry.length == 0 ) {
-            tcList.push(sourceId);
-            return;
-          }
-
-          return arry.reduce(
-            (p, pcj) => p.then(() => tcRecurse(pcj.targetId, seen.concat(arry.map((pcj) => pcj.targetId)))),
-            Promise.resolve()
-          ).then(() => tcList.push(sourceId));
-        });
-      };
-
-      return tcRecurse(capabilityId, []).then(() => [...new Set(tcList)]);
-    },
-
-    function getCapabilities(capabilityId) {
-      return Promise.resolve(
-        this.getTC(capabilityId).then(
-          tcList => Promise.all(tcList.map(
-            capId => this.capabilityDAO.find(capId))
-          )
-        ));
-    },
-
     function getCapsAndWizardlets(capabilityId) {
-      return this.getCapabilities(capabilityId).then( (capabilities) => {
+      return this.crunchService.getGrantPath(this.__subContext__, capabilityId).then((capabilities) => {
         return Promise.all([
           Promise.resolve(capabilities),
           Promise.all(capabilities
