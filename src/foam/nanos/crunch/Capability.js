@@ -236,6 +236,26 @@ foam.CLASS({
       javaFactory: `
         return foam.nanos.crunch.AssociatedEntity.USER;
       `
+    },
+    {
+      class: 'Object',
+      name: 'wizardlet',
+      documentation: `
+        Defines the wizardlet used when displaying capability on related wizards.
+      `,
+      factory: function() {
+        return foam.nanos.crunch.ui.CapabilityWizardlet.create({}, this);
+      }
+    },
+    {
+      class: 'Object',
+      name: 'wizardletConfig',
+      documentation: `
+        Configuration placed on top level capabilities which define various configuration options supported by client capability wizards.
+      `,
+      factory: function() {
+        return foam.u2.wizard.StepWizardConfig.create({}, this);
+      }
     }
   ],
 
