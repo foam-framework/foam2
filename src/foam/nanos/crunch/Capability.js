@@ -241,7 +241,7 @@ foam.CLASS({
       class: 'Object',
       name: 'wizardlet',
       documentation: `
-        Defines the wizardlet used when displaying capability on related wizards.
+        Defines a wizardlet used when displaying this capability on related client crunch wizards.
       `,
       factory: function() {
         return foam.nanos.crunch.ui.CapabilityWizardlet.create({}, this);
@@ -251,7 +251,7 @@ foam.CLASS({
       class: 'Object',
       name: 'wizardletConfig',
       documentation: `
-        Configuration placed on top level capabilities which define various configuration options supported by client capability wizards.
+        Configuration placed on top level capabilities defining various configuration options supported by client capability wizards.
       `,
       factory: function() {
         return foam.u2.wizard.StepWizardConfig.create({}, this);
