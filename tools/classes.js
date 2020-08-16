@@ -307,6 +307,7 @@ var classes = [
   'foam.nanos.script.Language',
   'foam.nanos.auth.Language',
   'foam.nanos.auth.Region',
+  'foam.nanos.auth.TimeZone',
   'foam.nanos.logger.LogMessage',
   'foam.nanos.logger.LogMessageDAO',
   'foam.nanos.logger.LogLevelFilterLogger',
