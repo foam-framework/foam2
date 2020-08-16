@@ -54,6 +54,24 @@ foam.CLASS({
 
         return Date.from(time.toInstant());
       `
+    },
+    {
+      name: 'toString',
+      type: 'String',
+      code: function() {
+        return 'TimeZone(hour:' + this.hour +
+                        ', minute:' + this.minute +
+                        ', second:' + this.second +
+                        ', country:' + this.country +
+                        ', timezone:' + this.timezone + ')';
+      },
+      javaCode: `
+        return "TimeZone(hour:" + getHour() +
+                        ", minute:" + getMinute() +
+                        ", second:" + getSecond() +
+                        ", country:" + getCountry() +
+                        ", timezone:" + getTimezone() + ")";
+      `
     }
   ]
 });
