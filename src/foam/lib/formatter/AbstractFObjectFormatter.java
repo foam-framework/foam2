@@ -42,9 +42,15 @@ public abstract class AbstractFObjectFormatter
 
   public StringBuilder builder() { return b_; }
 
-  public void reset() { 
+  // single point of access to b_ to simplify subclassing.
+  public StringBuilder append(Object o) {
+    b_.append(o);
+    return b_;
+  }
+
+  public void reset() {
     delta_ = null;
-    builder().setLength(0); 
+    builder().setLength(0);
   }
 
   public String stringify(FObject obj) {
