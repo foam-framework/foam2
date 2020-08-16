@@ -321,6 +321,57 @@ foam.CLASS({
       return today.after(capabilityExpiry);
       `
     },
+    {
+      name: 'getPrereqsChainedStatus',
+      type: 'CapabilityJunctionStatus',
+      args: [
+        { name: 'x', type: 'Context' }
+      ],
+      documentation: `
+        Check statuses of all prerequisite capabilities - returning:
+        GRANTED: If all pre-reqs are in granted status
+        PENDING: At least one pre-req is still in pending status
+        ACTION_REQUIRED: If not any of the above
+      `,
+      javaCode: `
+        // CrunchService used to get capability junctions
+        CrunchService crunchService = (CrunchService) x.get("crunchService");
+
+        boolean allGranted = true;
+        DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
+        DAO myPrerequisitesDAO = ((DAO)
+          x.get("prerequisiteCapabilityJunctionDAO"))
+            .where(
+              EQ(CapabilityCapabilityJunction.SOURCE_ID, getId()));
+
+        List<CapabilityCapabilityJunction> ccJunctions =
+          ((ArraySink) myPrerequisitesDAO.select(new ArraySink()))
+          .getArray();
+
+        for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
+          Capability cap = (Capability) ccJunction.findSourceId(x);
+          if ( ! cap.getEnabled() ) continue;
+          UserCapabilityJunction ucJunction =
+            crunchService.getJunction(x, ccJunction.getTargetId());
+
+          if ( ucJunction != null && 
+               ( ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED || ucJunction.getStatus() == CapabilityJunctionStatus.GRACE_PERIOD ) 
+             ) 
+              continue;
+          
+
+          if ( ucJunction == null ) {
+            return CapabilityJunctionStatus.ACTION_REQUIRED;
+          }
+          if ( ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED
+               && ucJunction.getStatus() != CapabilityJunctionStatus.PENDING ) {
+            return CapabilityJunctionStatus.ACTION_REQUIRED;
+          }
+          if ( ucJunction.getStatus() == CapabilityJunctionStatus.PENDING ) allGranted = false; 
+        }
+        return allGranted ? CapabilityJunctionStatus.GRANTED : CapabilityJunctionStatus.PENDING;
+      `,
+    }
   ]
 });
 

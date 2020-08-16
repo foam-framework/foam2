@@ -58,6 +58,11 @@ public class ServerCrunchService implements CrunchService {
       Capability cap = (Capability) capabilityDAO.find(sourceCapabilityId);
 
       alreadyListed.add(sourceCapabilityId);
+
+      // if ( cap instanceof MinMaxCapability && ! rootId.equals(sourceCapabilityId) ) {
+      //   grantPath.add(this.getGrantPath(x, sourceCapabilityId));
+      //   continue;
+      // }
       grantPath.add(cap);
 
       // Enqueue prerequisites for adding to grant path
