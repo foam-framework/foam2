@@ -79,6 +79,7 @@ var classes = [
   'foam.mlang.PredicatedExpr',
   'foam.mlang.ContextObject',
   'foam.mlang.CurrentTime',
+  'foam.mlang.expr.TimeOfDay',
   'foam.mlang.predicate.RegExp',
   'foam.mlang.predicate.OlderThan',
   'foam.mlang.predicate.isAuthorizedToRead',
