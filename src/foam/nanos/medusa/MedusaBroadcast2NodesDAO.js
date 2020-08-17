@@ -70,10 +70,12 @@ foam.CLASS({
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
       getLogger().debug("put", entry.getIndex());
+      ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
+      ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
+
       PM pm = PM.create(x, this.getOwnClassInfo(), "put");
       try {
-        ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
-        ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
+
         entry.setNode(support.getConfigId());
 
         int groups = support.getNodeGroups();

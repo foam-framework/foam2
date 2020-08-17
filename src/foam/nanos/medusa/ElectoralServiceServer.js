@@ -289,6 +289,11 @@ foam.CLASS({
 
         // record own vote
         recordResult(x, generateVote(x), config);
+        if ( voters.size() == 1 &&
+             voters.size() == support.getMediatorQuorum() ) {
+          callReport(x);
+          return;
+        }
 
         Agency agency = (Agency) x.get("threadPool");
 

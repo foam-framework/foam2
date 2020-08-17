@@ -78,7 +78,7 @@ foam.CLASS({
   methods: [
     {
       name: 'put_',
-      code:     function put_(x, obj) {
+      code: function put_(x, obj) {
         return this.SUPER(null, obj);
       },
       javaCode: 'return super.put_(null, obj);',
@@ -94,7 +94,7 @@ foam.CLASS({
     },
     {
       name: 'find_',
-      code:     function find_(x, key) {
+      code: function find_(x, key) {
         return this.SUPER(null, key);
       },
       javaCode: 'return super.find_(null, id);',
@@ -163,7 +163,7 @@ return sink
     },
     {
       name: 'cmd_',
-      code:     function cmd_(x, obj) {
+      code: function cmd_(x, obj) {
         return this.SUPER(null, obj);
       },
       javaCode: 'return super.cmd_(null, obj);',

@@ -87,13 +87,8 @@ foam.CLASS({
       `
     },
     {
-      // documentation: `If a ClusterServer is looking for MDAO return self so this Client will proxy to the next Server.`,
       name: 'cmd_',
       javaCode: `
-      // if ( ClusterServerDAO.GET_CLIENT_CMD.equals(obj) ) {
-      //   getLogger().debug("cmd", "GET_CLIENT_CMD");
-      //   return this;
-      // }
       if ( obj instanceof ClusterCommand ) {
         getLogger().debug("cmd", "ClusterCommand");
         return submit(x, DOP.CMD, obj);

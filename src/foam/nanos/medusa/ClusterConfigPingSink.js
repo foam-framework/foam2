@@ -81,8 +81,14 @@ foam.CLASS({
           config.setStatus(Status.ONLINE);
           config = (ClusterConfig) getDao().put_(getX(), config).fclone();
         }
-      // } catch (NullPointerException t) {
-      //   getLogger().error(t);
+      } catch (NullPointerException t) {
+        getLogger().error(t);
+        if ( config.getStatus() != Status.OFFLINE ) {
+          config = (ClusterConfig) config.fclone();
+          config.setStatus(Status.OFFLINE);
+          config = (ClusterConfig) getDao().put_(getX(), config);
+        // TODO: Alarm.
+        }
       } catch (RuntimeException | java.io.IOException t) {
         getLogger().debug("ping", config.getId(), t.getClass().getSimpleName(), t.getMessage());
         if ( config.getStatus() != Status.OFFLINE ) {

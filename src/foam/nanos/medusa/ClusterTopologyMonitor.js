@@ -131,13 +131,6 @@ foam.CLASS({
       try {
         ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
         ClusterConfig config = support.getConfig(x, support.getConfigId());
-        // getLogger().debug("execute", config.getId(), config.getType().getLabel(), config.getStatus().getLabel());
-        if ( support.getStandAlone() ) {
-          // no need for ping timer in standalone mode.
-          timer_.cancel();
-          timer_.purge();
-          return;
-        }
 
         DAO dao = (DAO) x.get("localClusterConfigDAO");
         dao = dao.where(

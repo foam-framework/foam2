@@ -70,7 +70,7 @@ foam.CLASS({
       value: true
     },
     {
-      name: 'hashingAlgorithm',
+      name: 'algorithm',
       class: 'String',
       value: 'SHA-256'
     },
@@ -134,6 +134,7 @@ foam.CLASS({
       entry.setIndex2(-1L);
       entry.setHash2("9232622261b1df4dff84067b2df22ecae387162742626326216bf9b4d0d29a3f");
       entry.setHash(hash(getX(), entry));
+      entry.setAlgorithm(getAlgorithm());
       entry = (MedusaEntry) dao.put_(getX(), entry);
       updateLinks(getX(), entry);
 
@@ -145,6 +146,7 @@ foam.CLASS({
       entry.setIndex2(-1L);
       entry.setHash2("50c1071e836bdd4f2d4b5907bb6090fae6891d6cacdb70dcd72770bfd43dc814");
       entry.setHash(hash(getX(), entry));
+      entry.setAlgorithm(getAlgorithm());
       entry = (MedusaEntry) dao.put_(getX(), entry);
       updateLinks(getX(), entry);
      `
@@ -166,30 +168,21 @@ foam.CLASS({
     {
       name: 'hash',
       javaCode: `
-      // TODO: also getProvider
       PM pm = PM.create(x, DefaultDaggerService.getOwnClassInfo(), "hash");
       try {
-      // getLogger().debug("hash", entry.getIndex(), entry.getIndex1(), entry.getIndex2());
-      // getLogger().debug("hash", entry.getIndex(), "1", entry.getIndex1(), entry.getHash1());
-      // getLogger().debug("hash", entry.getIndex(), "2", entry.getIndex2(), entry.getHash2());
-      if ( ! getHashingEnabled() ) {
-        return byte2Hex(Long.toString(entry.getIndex()).getBytes(StandardCharsets.UTF_8));
-      }
+        if ( ! getHashingEnabled() ) {
+          return byte2Hex(Long.toString(entry.getIndex()).getBytes(StandardCharsets.UTF_8));
+        }
 
-      MessageDigest md = MessageDigest.getInstance(getHashingAlgorithm());
-      md.update(Long.toString(entry.getIndex1()).getBytes(StandardCharsets.UTF_8));
-      md.update(entry.getHash1().getBytes(StandardCharsets.UTF_8));
-      md.update(Long.toString(entry.getIndex2()).getBytes(StandardCharsets.UTF_8));
-      md.update(entry.getHash2().getBytes(StandardCharsets.UTF_8));
-      // getLogger().debug("hash", entry.getIndex(), "digest (without data)", byte2Hex(md.digest()));
-      if ( ! SafetyUtil.isEmpty(entry.getData()) ) {
-        // getLogger().debug("hash", entry.getIndex(), "digest (with data)", byte2Hex(entry.getData().hash(md)));
-        // getLogger().debug("hash", entry.getIndex(), "data", entry.getData());
-        // getLogger().debug("hash", entry.getIndex(), "data", entry.getData().getClass().getSimpleName());
-//        return byte2Hex(entry.getData().hash(md));
-        md.update(entry.getData().getBytes(StandardCharsets.UTF_8));
-      }
-      return byte2Hex(md.digest());
+        MessageDigest md = MessageDigest.getInstance(getAlgorithm());
+        md.update(Long.toString(entry.getIndex1()).getBytes(StandardCharsets.UTF_8));
+        md.update(entry.getHash1().getBytes(StandardCharsets.UTF_8));
+        md.update(Long.toString(entry.getIndex2()).getBytes(StandardCharsets.UTF_8));
+        md.update(entry.getHash2().getBytes(StandardCharsets.UTF_8));
+        if ( ! SafetyUtil.isEmpty(entry.getData()) ) {
+          md.update(entry.getData().getBytes(StandardCharsets.UTF_8));
+        }
+        return byte2Hex(md.digest());
       } finally {
         pm.log(x);
       }
@@ -221,7 +214,7 @@ foam.CLASS({
         }
 
         try {
-          MessageDigest md = MessageDigest.getInstance(getHashingAlgorithm());
+          MessageDigest md = MessageDigest.getInstance(entry.getAlgorithm());
           md.update(Long.toString(parent1.getIndex()).getBytes(StandardCharsets.UTF_8));
           md.update(parent1.getHash().getBytes(StandardCharsets.UTF_8));
           md.update(Long.toString(parent2.getIndex()).getBytes(StandardCharsets.UTF_8));

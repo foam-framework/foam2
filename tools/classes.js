@@ -194,6 +194,8 @@ var classes = [
   'foam.dao.PipelinePMDAO',
   'foam.dao.PMDAO',
   'foam.nanos.pm.PMInfo',
+  'foam.nanos.pm.PMLogger',
+  'foam.nanos.pm.NullPMLogger',
   'foam.dao.PutOnlyDAO',
   'foam.dao.ORBRequest',
   'foam.dao.ORBitalDAO',
@@ -385,7 +387,6 @@ var classes = [
   'foam.nanos.medusa.MedusaEntryAgent',
   'foam.nanos.medusa.MedusaEntryAgencyDAO',
   'foam.nanos.medusa.MedusaAdapterDAO',
-  'foam.nanos.medusa.MedusaBlockingDAO',
   'foam.nanos.medusa.MedusaBroadcastDAO',
   'foam.nanos.medusa.MedusaBroadcast2NodesDAO',
   'foam.nanos.medusa.MedusaConsensusDAO',
@@ -393,6 +394,7 @@ var classes = [
   'foam.nanos.medusa.MedusaInternalDAO',
   'foam.nanos.medusa.MedusaRegistry',
   'foam.nanos.medusa.MedusaRegistryService',
+  'foam.nanos.medusa.MedusaNOPRegistryService',
   'foam.nanos.medusa.MedusaSigningDAO',
   'foam.nanos.medusa.MedusaTestingDAO',
   'foam.nanos.medusa.MedusaUniqueDAO',
@@ -521,6 +523,7 @@ var classes = [
   'foam.lib.parse.Parser',
   'foam.lib.parse.PStream',
   'foam.lib.parse.BlobPStream',
+  'foam.lib.json.JSONParser',
   'foam.lib.json.OutputJSON',
   'foam.lib.json.OutputterMode',
   'foam.lib.json.UnknownFObject',
@@ -759,7 +762,7 @@ var classes = [
 
   // Translation Support
   'foam.i18n.XLIFFTranslationValue',
-  'foam.i18n.Locale'
+  'foam.i18n.Locale',
 ];
 
 var abstractClasses = [

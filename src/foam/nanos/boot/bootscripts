@@ -26,3 +26,4 @@ p({
   print(appConfig);
   """
 })
+p({"class": "foam.nanos.script.TestRunnerScript", "id":"testRunnerScript"})

@@ -41,7 +41,7 @@ foam.CLASS({
       name: 'replaying',
       class: 'Boolean',
       value: true,
-      visibility: 'RO',
+      visibility: 'RO'
     },
     {
       name: 'startTime',

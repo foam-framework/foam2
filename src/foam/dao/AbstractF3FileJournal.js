@@ -15,6 +15,7 @@ foam.CLASS({
     'foam.core.FObject',
     'foam.core.PropertyInfo',
     'foam.core.ProxyX',
+    'foam.core.X',
     'foam.lib.formatter.FObjectFormatter',
     'foam.lib.formatter.JSONFObjectFormatter',
     'foam.lib.json.ExprParser',
@@ -62,6 +63,12 @@ foam.CLASS({
             }
           };
 
+          protected JSONFObjectFormatter getFormatter(X x) {
+            JSONFObjectFormatter f = formatter.get();
+            f.setX(x);
+            return f;
+          }
+
           protected static ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
             @Override
             protected StringBuilder initialValue() {
@@ -84,11 +91,17 @@ foam.CLASS({
               return new JSONParser();
             }
             @Override
-            public JSONParser get() {
-              JSONParser parser = super.get();
+            public foam.lib.json.JSONParser get() {
+              foam.lib.json.JSONParser parser = super.get();
               return parser;
             }
           };
+
+          protected foam.lib.json.JSONParser getParser(X x) {
+            foam.lib.json.JSONParser p = jsonParser.get();
+            p.setX(x);
+            return p;
+          }
         `);
       }
     }
@@ -189,7 +202,7 @@ try {
       javaCode: `
         final Object               id  = obj.getProperty("id");
         final ClassInfo            of  = dao.getOf();
-        final JSONFObjectFormatter fmt = formatter.get();
+        final JSONFObjectFormatter fmt = getFormatter(x);
 
         getLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
           FObject old;

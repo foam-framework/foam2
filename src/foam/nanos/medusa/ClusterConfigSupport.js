@@ -186,13 +186,21 @@ configuration for contacting the primary node.`,
       documentation: 'Enable and Online nodes in each bucket to achieve quorum',
       name: 'nodeQuorum',
       class: 'Int',
-      value: 2
+      value: 2,
+      javaSetter: `
+      // getLogger().info("setNodeQuorum", val);
+      nodeQuorum_ = val;
+      `,
+      javaGetter: `
+      // getLogger().info("getNodeQuorum", nodeQuorum_);
+      return nodeQuorum_;
+      `
     },
     {
       documentation: 'Additional node redundancy in each bucket.',
       name: 'nodeRedundancy',
       class: 'Int',
-      value: 1,
+      value: 1
     },
     {
       name: 'nodeGroups',
@@ -201,7 +209,7 @@ configuration for contacting the primary node.`,
         return this.nodeCount / (nodeQuorum + nodeRedundancy);
       },
       javaFactory: `
-      return getNodeCount() / (getNodeQuorum() + getNodeRedundancy());
+      return Math.max(1, getNodeCount() / (getNodeQuorum() + getNodeRedundancy()));
       `
     },
     {
@@ -270,15 +278,8 @@ configuration for contacting the primary node.`,
       documentation: 'A single instance is using the medusa journal. No other clustering features are used.',
       name: 'standAlone',
       class: 'Boolean',
-      visibility: 'RO',
-      javaFactory: `
-      if ( getMediatorCount() == 1 ) {
-        ClusterConfig config = getConfig(getX(), getConfigId());
-        return config.getType() == MedusaType.MEDIATOR &&
-               config.getZone() == 0L;
-      }
-      return false;
-      `
+      value: false,
+      visibility: 'RO'
     },
     {
       name: 'logger',
@@ -304,6 +305,8 @@ configuration for contacting the primary node.`,
       ClusterConfig myConfig = (ClusterConfig) dao.find(getConfigId()).fclone();
       myConfig.setReplayingInfo(replaying);
       dao.put(myConfig);
+
+      getLogger().info("start", "nodeQuorum", getNodeQuorum());
       `
     },
     {
@@ -768,8 +771,8 @@ configuration for contacting the primary node.`,
         return getPrimary(x);
       } catch ( RuntimeException t ) {
         // if in standalone mode, just route to self if only one mediator enabled.
-        getLogger().debug("getNextServerConfig", t.getMessage(), getMediatorCount());
-        if ( getMediatorCount() == 1 ) {
+        if ( getStandAlone() ) {
+          getLogger().debug("getNextServerConfig", t.getMessage(), "fallback to StandAlone");
           return config;
         }
         throw t;

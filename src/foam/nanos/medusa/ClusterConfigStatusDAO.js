@@ -45,11 +45,13 @@ foam.CLASS({
       javaCode: `
       ClusterConfig nu = (ClusterConfig) obj;
       getLogger().debug("put", nu.getName());
-      ClusterConfig old = (ClusterConfig) find_(x, nu.getId());
-
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      Boolean hadQuorum = support.hasQuorum(x);
+      if ( support.getStandAlone() ) {
+        return getDelegate().put_(x, nu);
+      }
 
+      ClusterConfig old = (ClusterConfig) find_(x, nu.getId());
+      Boolean hadQuorum = support.hasQuorum(x);
       nu = (ClusterConfig) getDelegate().put_(x, nu);
 
       if ( old != null &&

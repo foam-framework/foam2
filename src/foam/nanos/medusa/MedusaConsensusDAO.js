@@ -114,13 +114,6 @@ foam.CLASS({
       ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
       getLogger().debug("put", getIndex(), replaying.getReplayIndex(), entry.toSummary(), entry.getNode());
 
-      // ClusterConfigSupport s = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      // if ( s.getConfigId().equals(entry.getNode()) ) {
-      //   RuntimeException e = new RuntimeException("MedusaConsensusDAO called from self: "+s.getConfigId());
-      //   getLogger().error(e);
-      //   throw e;
-      // }
-
       try {
         MedusaEntry existing = (MedusaEntry) getDelegate().find_(x, id);
         if ( existing != null &&
@@ -262,31 +255,37 @@ foam.CLASS({
           // getLogger().debug("promoter", next, "find");
           List<MedusaEntry> list = ((ArraySink) getDelegate()
             .where(
-              EQ(MedusaEntry.INDEX, next)
-              // AND(
-              //   EQ(MedusaEntry.INDEX, next),
-              //   GTE(MedusaEntry.CONSENSUS_COUNT, support.getNodeQuorum())
-              // )
+              AND(
+                EQ(MedusaEntry.INDEX, next),
+                GTE(MedusaEntry.CONSENSUS_COUNT, support.getNodeQuorum())
+              )
             )
             .select(new ArraySink())).getArray();
-          for ( MedusaEntry e : list ) {
-            if ( e.getConsensusCount() >= support.getNodeQuorum() ) {
-              if ( entry == null ) {
-                entry = e;
-              } else {
-                // TODO/REVIEW: halt system
-                getLogger().error("promoter", next, "multiple found with consensus", e.toSummary(), e.getConsensusCount(), support.getNodeQuorum());
-              }
-            } else {
-              getLogger().warning("promoter", next, "no consensus", e.toSummary(), e.getConsensusCount(), support.getNodeQuorum());
-            }
-          }
-          if ( entry == null ) {
-            // getLogger().debug("promoter", next, "not found");
-            break;
-          } else {
-            // getLogger().debug("promoter", next, "found", "promoting");
+          if ( list.size() ==  1 ) {
+            entry = list.get(0);
             promote(x, entry);
+          } else if ( list.size() > 1 ) {
+            entry = list.get(0);
+            getLogger().error("promoter", next, "multiple found with consensus", entry.toSummary(), entry.getConsensusCount(), support.getNodeQuorum());
+            // TODO: Halt System.
+          }
+
+          // TODO: for troubleshooting, remove later
+          {
+            if ( entry != null ) {
+              break;
+            }
+            list = ((ArraySink) getDelegate()
+              .where(
+                EQ(MedusaEntry.INDEX, next)
+              )
+              .select(new ArraySink())).getArray();
+            for ( MedusaEntry e : list ) {
+              if ( e.getConsensusCount() < support.getNodeQuorum() ) {
+                getLogger().warning("promoter", next, "no consensus", e.toSummary(), e.getConsensusCount(), support.getNodeQuorum());
+              }
+            }
+            break;
           }
         }
       } catch ( Throwable e ) {

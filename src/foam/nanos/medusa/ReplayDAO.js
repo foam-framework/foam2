@@ -79,7 +79,11 @@ foam.CLASS({
         ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
         ClusterConfig fromConfig = support.getConfig(x, cmd.getDetails().getResponder());
         ClusterConfig toConfig = support.getConfig(x, cmd.getDetails().getRequester());
-        DAO clientDAO = support.getBroadcastClientDAO(x, cmd.getServiceName(), fromConfig, toConfig);
+        // dao is local when running StandAlone
+        DAO clientDAO = (DAO) x.get("medusaMediatorDAO");
+        if ( clientDAO == null ) {
+          clientDAO = support.getBroadcastClientDAO(x, cmd.getServiceName(), fromConfig, toConfig);
+        }
         // NOTE: toIndex not yet used.
         getDelegate().where(
           GTE(MedusaEntry.INDEX, cmd.getDetails().getMinIndex())

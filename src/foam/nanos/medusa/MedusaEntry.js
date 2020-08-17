@@ -23,7 +23,6 @@ foam.CLASS({
   ],
 
   tableColumns: [
-//    'id',
     'nSpecName',
     'index',
     'index1',
@@ -35,12 +34,6 @@ foam.CLASS({
   ],
 
   properties: [
-    // {
-    //   class: 'String',
-    //   name: 'id',
-    //   visibility: 'RO',
-    //   includeInDigest: false
-    // },
     {
       class: 'String',
       name: 'nSpecName',
@@ -142,6 +135,12 @@ foam.CLASS({
       clusterTransient: true,
     },
     {
+      name: 'algorithm',
+      class: 'String',
+      value: 'SHA-256',
+      visibility: 'RO'
+    },
+    {
       documentation: 'Solely for information. Originating Mediator.',
       name: 'mediator',
       class: 'String',
@@ -189,13 +188,6 @@ foam.CLASS({
     },
     {
       name: 'fclone',
-      type: 'FObject',
-      javaCode: `
-      return this;
-      `
-    },
-    {
-      name: 'copyFrom',
       type: 'FObject',
       javaCode: `
       return this;

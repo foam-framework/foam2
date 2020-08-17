@@ -111,9 +111,9 @@ foam.CLASS({
       // MedusaEntry old = (MedusaEntry) getDelegate().find_(x, entry.getProperty("id"));
       entry = (MedusaEntry) getDelegate().put_(x, entry);
 
-      if ( support.getStandAlone() ) {
-        return ((DAO) x.get(getServiceName())).put(entry);
-      }
+      // if ( support.getStandAlone() ) {
+      //   return ((DAO) x.get(getServiceName())).put(entry);
+      // }
 
       entry.setNode(support.getConfigId());
 
