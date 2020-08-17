@@ -67,6 +67,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/Permission" },
   { name: "foam/nanos/auth/Country" },
   { name: "foam/nanos/auth/Region" },
+  { name: "foam/nanos/auth/TimeZone" },
   { name: 'foam/nanos/auth/ResendVerificationEmail', flags: ['web'] },
   { name: "foam/nanos/auth/Phone" },
   { name: "foam/nanos/auth/HtmlDoc" },
@@ -328,8 +329,12 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/CapabilityCapabilityJunctionRefine" },
   { name: "foam/nanos/crunch/CapabilityCategoryCapabilityJunctionRefine" },
   { name: "foam/nanos/crunch/AssociatedEntity" },
+  { name: "foam/nanos/crunch/connection/ConnectedCapability" },
+  { name: "foam/nanos/crunch/connection/FlatCapability" },
   //daos
   { name: "foam/nanos/crunch/UserCapabilityJunctionDAO" },
+  { name: "foam/nanos/crunch/connection/ConnectedCapabilityDAO" },
+  { name: "foam/nanos/crunch/connection/FlatCapabilityDAO" },
   //rules
   { name: "foam/nanos/crunch/SendNotificationOnTopLevelCapabilityStatusUpdate" },
   { name: "foam/nanos/crunch/IsUserCapabilityJunctionStatusUpdate" },

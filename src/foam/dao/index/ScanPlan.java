@@ -77,4 +77,12 @@ public class ScanPlan
     // Use the stale_, skip_, limit_, order_, predicate_... which we have already pre-processed.
     ((TreeNode) state).select((TreeNode) state_, sink, skip_, limit_, order_, predicate_, tail_, reverse_);
   }
+
+  @Override
+  public String toString() {
+    var sortRequired = order_ != null;
+    var size = state_ == null ? 0
+                : state_ instanceof TreeNode ? ((TreeNode) state_).size : 1;
+    return "scan(size:" + size + ", cost:" + cost() + ", sortRequired:" + sortRequired + ")";
+  }
 }

@@ -129,6 +129,9 @@ foam.CLASS({
         PMLogger pmLogger = (PMLogger) x.get(DAOPMLogger.SERVICE_NAME);
         if ( pmLogger != null ) {
           pmLogger.log(this);
+        } else {
+          System.err.println("PMLogger not found.");
+          new Exception("PMLogger not found").printStackTrace();
         }
         `
     },
@@ -144,17 +147,22 @@ foam.CLASS({
               }
               DAO configDAO = (DAO) x.get("alarmConfigDAO");
 
-              AlarmConfig config = (AlarmConfig) configDAO.find(EQ(AlarmConfig.NAME, pm.getId()));
-              if ( config == null || ! config.getEnabled() ) {
-                return;
+              AlarmConfig config = (AlarmConfig) configDAO.find(EQ(AlarmConfig.NAME, pm.getKey()));
+              String name = pm.getKey();
+              if ( config != null ) {
+                if ( ! config.getEnabled() ) {
+                  return;
+                }
+                name = config.getName();
               }
               DAO alarmDAO = (DAO) x.get("alarmDAO");
-              Alarm alarm = (Alarm) alarmDAO.find(EQ(Alarm.NAME, config.getName()));
-              if ( ! (alarm == null) || alarm.getIsActive() ){
+              Alarm alarm = (Alarm) alarmDAO.find(EQ(Alarm.NAME, name));
+              if ( alarm != null &&
+                   alarm.getIsActive() ) {
                 return;
               }
               alarm = new Alarm.Builder(x)
-                .setName(config.getName())
+                .setName(name)
                 .setIsActive(true)
                 .build();
               alarmDAO.put(alarm);

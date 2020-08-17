@@ -163,3 +163,33 @@ p({
     { "of": "foam.dao.history.HistoryRecord" }
   """
 })
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"connectedCapabilityDAO",
+  "lazy":true,
+  "serve":true,
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setDecorator(new foam.nanos.crunch.connection.ConnectedCapabilityDAO(x, new foam.dao.NullDAO(x, foam.nanos.crunch.connection.ConnectedCapability.getOwnClassInfo())))
+      .setInnerDAO(new foam.dao.MDAO(foam.nanos.crunch.connection.ConnectedCapability.getOwnClassInfo()))
+      .setOf(foam.nanos.crunch.connection.ConnectedCapability.getOwnClassInfo())
+      .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.crunch.connection.ConnectedCapability\"}"
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"flatCapabilityDAO",
+  "lazy":true,
+  "serve":true,
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setDecorator(new foam.nanos.crunch.connection.FlatCapabilityDAO(x, new foam.dao.NullDAO(x, foam.nanos.crunch.connection.ConnectedCapability.getOwnClassInfo())))
+      .setInnerDAO(x.get("capabilityDAO"))
+      .setOf(foam.nanos.crunch.connection.FlatCapability.getOwnClassInfo())
+      .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.crunch.connection.FlatCapability\"}"
+})

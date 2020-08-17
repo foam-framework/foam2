@@ -344,6 +344,23 @@ foam.CLASS({
   sections: [{ name: 'capabilities' }]
 });
 
+foam.CLASS({
+  package: 'foam.nanos.crunch',
+  name: 'CRUNCHThemeRefinement',
+  refines: 'foam.nanos.theme.Theme',
+
+  properties: [
+    {
+      name: 'admissionCapability',
+      class: 'String',
+      // TODO: Why doesn't a Reference property work here?
+      // class: 'Reference',
+      of: 'foam.nanos.crunch.Capability',
+      documentation: 'Specifies the top-level capability that must be granted before we admit a user to the system.'
+    },
+  ],
+});
+
 foam.RELATIONSHIP({
   sourceModel: 'foam.nanos.crunch.Capability',
   targetModel: 'foam.nanos.crunch.Capability',
