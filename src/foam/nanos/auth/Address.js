@@ -253,6 +253,12 @@ foam.CLASS({
       documentation: 'The longitude of the postal address location.',
       hidden: true
     },
+    {
+      class: 'Enum',
+      name: 'propertyType',
+      of: 'foam.nanos.auth.PropertyType',
+      documentation: 'Defines property type of address.'
+    }
   ],
 
   methods: [
