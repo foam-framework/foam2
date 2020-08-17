@@ -56,7 +56,7 @@ foam.CLASS({
               Date today = new Date();
               Calendar calendar = Calendar.getInstance();
               calendar.setTime(today);
-              calendar.add(Calendar.DATE, capability.getDuration());
+              calendar.add(Calendar.MINUTE, capability.getDuration());
     
               if ( junctionExpiry == null ) {
                 junctionExpiry = calendar.getTime();
