@@ -29,7 +29,7 @@ foam.CLASS({
 
   css: `
     ^group-title {
-      font-family: 'IBM Plex Sans';
+      font-family: /*%FONT1%*/;
       font-size: 35px;
       font-weight: 600;
       color: #1e1f21;

@@ -153,13 +153,8 @@ foam.CLASS({
     {
       name: 'authorizeOnUpdate',
       javaCode: `
-        User user = ((Subject) x.get("subject")).getUser();
-        if ( user != null && user.getId() == getOwner() ) return;
-
-        AuthService auth = (AuthService) x.get("auth");
-        if ( ! auth.check(x, "file.update." + getId()) ) {
-          throw new AuthorizationException();
-        }
+        // KeyValueDAO will return the same object if it is update operation
+        // No changes will be made
       `
     },
     {
