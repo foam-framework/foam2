@@ -67,6 +67,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/Permission" },
   { name: "foam/nanos/auth/Country" },
   { name: "foam/nanos/auth/Region" },
+  { name: "foam/nanos/auth/TimeZone" },
   { name: 'foam/nanos/auth/ResendVerificationEmail', flags: ['web'] },
   { name: "foam/nanos/auth/Phone" },
   { name: "foam/nanos/auth/HtmlDoc" },
