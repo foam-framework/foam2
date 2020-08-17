@@ -16,9 +16,7 @@ import foam.nanos.logger.Logger;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import static foam.mlang.MLang.*;
 
@@ -30,7 +28,7 @@ public class ServerCrunchService implements CrunchService {
     DAO capabilityDAO = (DAO) x.get("capabilityDAO");
 
     // Lookup for indices of previously observed capabilities
-    Map<String,Integer> alreadyListed = new HashMap<String,Integer>();
+    List<String> alreadyListed = new ArrayList<String>();
 
     // List of capabilities required to grant the desired capability.
     // Throughout the traversial algorithm this list starts with parents of
@@ -54,37 +52,23 @@ public class ServerCrunchService implements CrunchService {
         continue;
       }
 
-      // Remove previously added prerequisite if one matches
-      if ( alreadyListed.containsKey(sourceCapabilityId) ) {
-        int previousIndex = alreadyListed.get(sourceCapabilityId);
-        grantPath.remove(previousIndex);
-
-        // Remove previously stored index of capability
-        alreadyListed.remove(sourceCapabilityId);
-
-        // Shift remembered indexes, now that grantList has been shifted
-        Map<String,Integer> newAlreadyListed = new HashMap<String,Integer>();
-        for ( Map.Entry<String,Integer> entry : alreadyListed.entrySet() ) {
-          int newIndex = entry.getValue();
-          if ( newIndex > previousIndex ) newIndex--;
-          newAlreadyListed.put(entry.getKey(), newIndex);
-        }
-        alreadyListed = newAlreadyListed;
-      }
+      if ( alreadyListed.contains(sourceCapabilityId) ) continue;
 
       // Add capability to grant path, and remember index in case it's replaced
       Capability cap = (Capability) capabilityDAO.find(sourceCapabilityId);
 
-      alreadyListed.put(sourceCapabilityId, grantPath.size());
+      alreadyListed.add(sourceCapabilityId);
       grantPath.add(cap);
 
       // Enqueue prerequisites for adding to grant path
       List prereqs = ( (ArraySink) prerequisiteDAO
-        .where(EQ(CapabilityCapabilityJunction.SOURCE_ID, sourceCapabilityId))
+        .where(AND(
+          EQ(CapabilityCapabilityJunction.SOURCE_ID, sourceCapabilityId),
+          NOT(IN(CapabilityCapabilityJunction.TARGET_ID, alreadyListed))
+        ))
         .select(new ArraySink()) ).getArray();
-      for ( Object prereqObj : prereqs ) {
-        CapabilityCapabilityJunction prereq =
-          (CapabilityCapabilityJunction) prereqObj;
+      for ( int i = prereqs.size() - 1; i >= 0; i-- ) {
+        CapabilityCapabilityJunction prereq = (CapabilityCapabilityJunction) prereqs.get(i);
         nextSources.add(prereq.getTargetId());
       }
     }

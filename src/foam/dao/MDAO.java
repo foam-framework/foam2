@@ -7,6 +7,7 @@ package foam.dao;
 
 import foam.core.*;
 import foam.dao.index.*;
+import foam.mlang.MLang;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Or;
 import foam.mlang.predicate.Predicate;
@@ -197,7 +198,7 @@ public class MDAO
       plan = index_.planSelect(state, sink, skip, limit, order, simplePredicate);
     }
 
-    if ( state != null && predicate != null && plan.cost() > 10 && plan.cost() >= index_.size(state) ) {
+    if ( state != null && simplePredicate != null && simplePredicate != MLang.TRUE && plan.cost() > 10 && plan.cost() >= index_.size(state) ) {
       pm = new PM(this.getClass(), "MDAO:UnindexedSelect:" + getOf().getId());
       if ( ! unindexed_.contains(getOf().getId())) {
         if ( ! predicate.equals(simplePredicate) && logger != null ) {
@@ -205,7 +206,7 @@ public class MDAO
         }
         unindexed_.add(getOf().getId());
         if ( logger != null ) {
-          logger.warning("Unindexed search on MDAO", getOf().getId(), simplePredicate.toString());
+          logger.warning("Unindexed search on MDAO", getOf().getId(), simplePredicate.toString(), plan.toString());
         }
       }
     }

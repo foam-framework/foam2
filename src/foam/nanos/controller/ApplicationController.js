@@ -419,7 +419,6 @@ foam.CLASS({
                 expr.EQ(foam.i18n.Locale.LOCALE, foam.locale.substring(0,foam.locale.indexOf('-')))
               )
             ).select().then(e => {
-              console.log( e )
               let arr = e.array;
               arr.forEach(ea =>
                 {

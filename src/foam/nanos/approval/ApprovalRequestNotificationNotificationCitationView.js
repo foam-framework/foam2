@@ -127,20 +127,20 @@ foam.CLASS({
       width: 100%;
     }
     ^ .userSummary {
-      font-family: IBMPlexSans;
+      font-family: /*%FONT1%*/;
       font-size: 14px;
       font-weight: 600;
       color: #1e1f21;
       margin-left: 16px;
     }
     ^ .created {
-      font-family: IBMPlexSans;
+      font-family: /*%FONT1%*/;
       font-size: 11px;
       color: #5e6061;
       margin-left: 16px;
     }
     ^ .classification {
-      font-family: IBMPlexSans;
+      font-family: /*%FONT1%*/;
       padding-left: 8px;
       padding-right: 8px;
       min-width: 84px;
@@ -156,14 +156,14 @@ foam.CLASS({
       display: inline-block;
     }
     ^ .description {
-      font-family: IBMPlexSans;
+      font-family: /*%FONT1%*/;
       font-size: 14px;
       color: #1e1f21;
       margin-left: 32px;
       display: inline-block;
     }
     ^ .status {
-      font-family: IBMPlexSans;
+      font-family: /*%FONT1%*/;
       width: 94px;
       height: 20px;
       line-height: 20px;
