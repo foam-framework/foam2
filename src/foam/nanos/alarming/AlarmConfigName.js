@@ -5,7 +5,6 @@
 foam.CLASS({
   package: 'foam.nanos.alarming',
   name: 'AlarmConfigName',
-  extends: 'foam.dao.ProxySink',
 
   implements: [
     'foam.nanos.auth.EnabledAware'
@@ -27,13 +26,24 @@ foam.CLASS({
   methods: [
     {
       name: 'put',
+      args: [
+        {
+          name: 'configName',
+          type: 'String'
+        }
+      ],
       javaCode: `
-        getDelegate().put(obj, sub);
-
-        String name = (String) obj;
-        DAO alarmConfigDAO = (DAO) getX().get("AlarmConfigDAO");
-        AlarmConfig config = (AlarmConfig) alarmConfigDAO.find(EQ(AlarmConfig.NAME, name));
-        if ( config == null || ! config.getEnabled() ) {
+        DAO alarmConfigDAO = (DAO) getX().get("alarmConfigDAO");
+        AlarmConfig config = (AlarmConfig) alarmConfigDAO.find(EQ(AlarmConfig.NAME, configName));
+        if ( config == null ) {
+          AlarmConfig alarmConfig = new AlarmConfig.Builder(getX())
+            .setName(configName)
+            .setSendEmail(false)
+            .build();
+            alarmConfigDAO.put(alarmConfig);
+            return;
+        }
+        if ( ! config.getEnabled() ) {
           return;
         }
         DAO alarmDAO = (DAO) getX().get("alarmDAO");
@@ -48,21 +58,6 @@ foam.CLASS({
           .build();
         alarmDAO.put(alarm);
       `
-    }
-  ],
-
-  axioms: [
-    {
-      buildJavaClass: function(cls) {
-        cls.extras.push(`
-          protected foam.dao.DAO dao_;
-
-          public AlarmConfigName(foam.core.X x, foam.dao.Sink delegate, foam.dao.DAO dao) {
-            super(x, delegate);
-            dao_ = dao;
-          }
-        `);
-      }
     }
   ]
 })
