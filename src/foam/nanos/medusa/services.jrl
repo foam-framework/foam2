@@ -1,13 +1,5 @@
 p({
   "class": "foam.nanos.boot.NSpec",
-  "name": "mping",
-  "lazy": false,
-  "authenticate": false,
-  "serviceClass": "foam.nanos.medusa.ClusterPingService"
-})
-
-p({
-  "class": "foam.nanos.boot.NSpec",
   "name": "medusaThreadPool",
   "serviceScript": `
     return new foam.nanos.pool.ThreadPoolAgency.Builder(x)
@@ -69,7 +61,12 @@ p({
   "class": "foam.nanos.boot.NSpec",
   "name": "clusterConfigSupport",
   "serve": true,
-  "service": {"class":"foam.nanos.medusa.ClusterConfigSupport"}
+  "serviceScript":
+  """
+    return new foam.nanos.medusa.ClusterConfigSupport.Builder(x)
+      .build();
+  """,
+  "client": "{\"of\":\"foam.nanos.medusa.ClusterConfigSupport\"}"
 })
 
 p({
