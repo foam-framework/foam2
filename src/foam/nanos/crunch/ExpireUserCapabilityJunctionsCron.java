@@ -30,7 +30,6 @@ public class ExpireUserCapabilityJunctionsCron implements ContextAgent {
     userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
     Date today = new Date();
 
-System.out.println("EXPIRE_USERCAPABILITYJUNCTION_CRON :: " + today);
     List<UserCapabilityJunction> activeJunctions = ((ArraySink) userCapabilityJunctionDAO
       .where(OR(
         AND(
@@ -47,8 +46,6 @@ System.out.println("EXPIRE_USERCAPABILITYJUNCTION_CRON :: " + today);
       .getArray();
 
     for ( UserCapabilityJunction activeJunction : activeJunctions ) {
-
-          System.out.println("ucj = " + activeJunction);
       if ( activeJunction.getStatus() == CapabilityJunctionStatus.GRACE_PERIOD) {
         activeJunction.setStatus(CapabilityJunctionStatus.EXPIRED);
       } else {
