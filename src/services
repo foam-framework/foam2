@@ -1171,7 +1171,7 @@ p({
 
 p({
   "class":"foam.nanos.boot.NSpec",
-  "name":"supportFileTypeDAO",
+  "name":"fileTypeDAO",
   "serve":true,
   "serviceScript":
   """
@@ -1180,7 +1180,7 @@ p({
       .setPipelinePm(true)
       .setGuid(true)
       .setOf(foam.nanos.fs.FileType.getOwnClassInfo())
-      .setJournalName("supportFileType")
+      .setJournalName("fileTypes")
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .build()
   """,

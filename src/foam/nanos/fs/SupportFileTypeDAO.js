@@ -1,18 +1,7 @@
 /**
- * NANOPAY CONFIDENTIAL
- *
- * [2020] nanopay Corporation
- * All Rights Reserved.
- *
- * NOTICE:  All information contained herein is, and remains
- * the property of nanopay Corporation.
- * The intellectual and technical concepts contained
- * herein are proprietary to nanopay Corporation
- * and may be covered by Canadian and Foreign Patents, patents
- * in process, and are protected by trade secret or copyright law.
- * Dissemination of this information or reproduction of this material
- * is strictly forbidden unless prior written permission is obtained
- * from nanopay Corporation.
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
@@ -22,6 +11,7 @@ foam.CLASS({
   documentation: ` A fileDAO decorator use to store the file type`,
 
   javaImports: [
+    'foam.comics.v2.userfeedback.UserFeedbackException',
     'foam.core.X',
     'foam.dao.*',
     'foam.nanos.fs.File',
@@ -44,6 +34,10 @@ foam.CLASS({
     }
   ],
 
+  messages: [
+    { name: 'FILE_TYPE_NOT_SUPPORT', message: 'Such file type are not supported' },
+  ],
+
   methods: [
     {
       name: 'put_',
@@ -53,17 +47,19 @@ foam.CLASS({
       }
 
       File file = (File) obj;
-      DAO supportFileTypeDAO = (DAO) x.get("supportFileTypeDAO");
-      FileType fileType = (FileType) supportFileTypeDAO.find(
+      DAO fileTypeDAO = (DAO) x.get("fileTypeDAO");
+      FileType fileType = (FileType) fileTypeDAO.find(
         EQ(FileType.MIME, file.getMimeType())
       );
 
-      // if fileType not store in supportFileTypeDAO, create new one and store it
+      // if fileType not store in fileTypeDAO, create new one and store it
       if ( fileType == null ) {
-        fileType = new FileType.Builder(x)
-          .setMime(file.getMimeType())
-          .build();
-          supportFileTypeDAO.put(fileType);
+        throw new UserFeedbackException.Builder(x)
+        .setUserFeedback(new UserFeedback.Builder(x)
+          .setStatus(UserFeedbackStatus.ERROR)
+          .setMessage(FILE_TYPE_NOT_SUPPORT)
+          .build()
+        ).build();
       }
       return file;
       `
