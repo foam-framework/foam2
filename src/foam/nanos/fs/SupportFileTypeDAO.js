@@ -37,7 +37,7 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'FILE_TYPE_NOT_SUPPORT', message: 'Such file type are not supported' },
+    { name: 'FILE_TYPE_NOT_SUPPORT', message: 'File type not supported.' },
   ],
 
   methods: [
