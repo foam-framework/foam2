@@ -18,7 +18,7 @@ foam.CLASS({
 
   tableColumns: [
     'id',
-    'flatCapabilityId'
+    'flatCapability'
   ],
 
   properties: [
@@ -28,7 +28,7 @@ foam.CLASS({
       documentation: 'ID of the ConnectedCapability'
     },
     {
-      name: 'flatCapabilityId',
+      name: 'flatCapability',
       class: 'Reference',
       of: 'foam.nanos.crunch.connection.FlatCapability',
       targetDAOKey: 'flatCapabilityDAO',
