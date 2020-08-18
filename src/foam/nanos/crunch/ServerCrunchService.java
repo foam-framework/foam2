@@ -60,10 +60,10 @@ public class ServerCrunchService implements CrunchService {
 
       alreadyListed.add(sourceCapabilityId);
 
-      // if ( cap instanceof MinMaxCapability && ! rootId.equals(sourceCapabilityId) ) {
-      //   grantPath.add(this.getGrantPath(x, sourceCapabilityId));
-      //   continue;
-      // }
+      if ( cap instanceof MinMaxCapability && ! rootId.equals(sourceCapabilityId) ) {
+        grantPath.add(this.getGrantPath(x, sourceCapabilityId));
+        continue;
+      }
       grantPath.add(cap);
 
       // Enqueue prerequisites for adding to grant path
