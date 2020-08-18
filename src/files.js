@@ -703,6 +703,7 @@ FOAM_FILES([
   { name: "foam/lib/StorageOptionalPropertyPredicate" },
   { name: "foam/lib/StoragePropertyPredicate" },
   { name: "foam/lib/AndPropertyPredicate" },
+  { name: "foam/lib/json/JSONParser" },
   { name: "foam/lib/json/OutputterMode" },
   { name: "foam/lib/json/ClassReferenceParserTest" },
   { name: "foam/lib/json/PropertyReferenceParserTest" },
