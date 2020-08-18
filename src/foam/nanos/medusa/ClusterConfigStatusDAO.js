@@ -64,6 +64,7 @@ foam.CLASS({
         }
 
         if ( nu.getType() == MedusaType.MEDIATOR ) {
+          broadcastMediators(x);
           ElectoralService electoralService = (ElectoralService) x.get("electoralService");
           if ( electoralService != null ) {
             ClusterConfig config = support.getConfig(x, support.getConfigId());
@@ -85,7 +86,6 @@ foam.CLASS({
           }
         } else if ( nu.getType() == MedusaType.NODE ) {
           bucketNodes(x);
-          broadcast2Mediators(x);
         }
       }
       return nu;
@@ -136,7 +136,7 @@ foam.CLASS({
     {
       documentation: 'Update list of mediators to broadcast to.',
       synchronized: true,
-      name: 'broadcast2Mediators',
+      name: 'broadcastMediators',
       args: [
         {
           name: 'x',
@@ -144,7 +144,7 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      getLogger().debug("broadcast2Mediators");
+      getLogger().debug("broadcastMediators");
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
 
