@@ -160,7 +160,7 @@ foam.CLASS({
       background-color: #b5b5b5;
 
       font-family: /*%FONT1%*/;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 500;
       font-style: normal;
       font-stretch: normal;
