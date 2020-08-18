@@ -82,7 +82,7 @@ foam.CLASS({
         DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
         DAO capabilityDAO = (DAO) x.get("capabilityDAO");
         Capability cap = (Capability) capabilityDAO.find(ucj.getTargetId());
-        return cap.getPrereqsChainedStatus(x);
+        return cap.getPrereqsChainedStatus(x, ucj);
       `
     },
     {

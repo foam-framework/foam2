@@ -325,7 +325,8 @@ foam.CLASS({
       name: 'getPrereqsChainedStatus',
       type: 'CapabilityJunctionStatus',
       args: [
-        { name: 'x', type: 'Context' }
+        { name: 'x', type: 'Context' },
+        { name: 'ucj', type: 'UserCapabilityJunction' }
       ],
       documentation: `
         Check statuses of all prerequisite capabilities - returning:
@@ -347,12 +348,22 @@ foam.CLASS({
         List<CapabilityCapabilityJunction> ccJunctions =
           ((ArraySink) myPrerequisitesDAO.select(new ArraySink()))
           .getArray();
+        
+
+        DAO userDAO = (DAO) x.get("userDAO");
+
+        Subject subject = new Subject(x);
+        subject.setUser((User) userDAO.find(ucj.getSourceId()));
+        if ( ucj instanceof AgentCapabilityJunction ) {
+          AgentCapabilityJunction acj = (AgentCapabilityJunction) ucj;
+          subject.setUser((User) userDAO.find(acj.getEffectiveUser())); // "user"
+        }
 
         for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
           Capability cap = (Capability) ccJunction.findSourceId(x);
           if ( ! cap.getEnabled() ) continue;
           UserCapabilityJunction ucJunction =
-            crunchService.getJunction(x, ccJunction.getTargetId());
+            crunchService.getJunctionForSubject(x, ccJunction.getTargetId(), subject);
 
           if ( ucJunction != null && 
                ( ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED || ucJunction.getStatus() == CapabilityJunctionStatus.GRACE_PERIOD ) 
