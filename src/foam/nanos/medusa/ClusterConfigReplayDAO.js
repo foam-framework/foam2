@@ -85,7 +85,7 @@ foam.CLASS({
               .build();
           }
           // NOTE: using internalMedusaDAO else we'll block on ReplayingDAO.
-          DAO dao = (DAO) getX().get("internalMedusaDAO");
+          DAO dao = (DAO) x.get("internalMedusaDAO");
           dao = dao.where(EQ(MedusaEntry.PROMOTED, false));
           Min min = (Min) dao.select(MIN(MedusaEntry.INDEX));
 

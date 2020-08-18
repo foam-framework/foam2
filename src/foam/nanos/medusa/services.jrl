@@ -29,12 +29,22 @@ p({
       .build())
       .build();
     dao.addPropertyIndex(new foam.core.PropertyInfo[] {
-      foam.nanos.medusa.ClusterConfig.ENABLED,
-      foam.nanos.medusa.ClusterConfig.REALM,
-      foam.nanos.medusa.ClusterConfig.REGION,
-      foam.nanos.medusa.ClusterConfig.STATUS,
-      foam.nanos.medusa.ClusterConfig.TYPE,
-      foam.nanos.medusa.ClusterConfig.ZONE,
+      foam.nanos.medusa.ClusterConfig.ENABLED
+    });
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] {
+      foam.nanos.medusa.ClusterConfig.REALM
+    });
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] {
+      foam.nanos.medusa.ClusterConfig.REGION
+    });
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] {
+      foam.nanos.medusa.ClusterConfig.STATUS
+    });
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] {
+      foam.nanos.medusa.ClusterConfig.TYPE
+    });
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] {
+      foam.nanos.medusa.ClusterConfig.ZONE
     });
     return dao;
    """

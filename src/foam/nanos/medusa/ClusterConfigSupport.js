@@ -183,18 +183,10 @@ configuration for contacting the primary node.`,
       `
     },
     {
-      documentation: 'Enable and Online nodes in each bucket to achieve quorum',
+      documentation: 'Enabled and Online nodes in each bucket to achieve quorum',
       name: 'nodeQuorum',
       class: 'Int',
-      value: 2,
-      javaSetter: `
-      // getLogger().info("setNodeQuorum", val);
-      nodeQuorum_ = val;
-      `,
-      javaGetter: `
-      // getLogger().info("getNodeQuorum", nodeQuorum_);
-      return nodeQuorum_;
-      `
+      value: 2
     },
     {
       documentation: 'Additional node redundancy in each bucket.',
