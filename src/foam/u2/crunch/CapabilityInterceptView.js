@@ -27,10 +27,8 @@ foam.CLASS({
     'capabilityCache',
     'capabilityDAO',
     'crunchController',
-    'notify',
-    'stack',
-    'subject',
-    'userCapabilityJunctionDAO'
+    'crunchService',
+    'notify'
   ],
 
   properties: [
@@ -115,13 +113,10 @@ foam.CLASS({
                 self.IN(self.Capability.ID, data$capabilityOptions)
               ), cap => {
                 return this.E().tag(self.CapabilityCardView, {
-                  data: cap
-                })
+                    data: cap
+                  })
                   .on('click', () => {
-                    var p = self.crunchController.launchWizard(cap.id);
-                    p.then(() => {
-                      this.checkStatus(cap);
-                    });
+                    self.crunchController.launchWizard(cap.id);
                   });
               }).addClass(this.myClass('capList-css'));
             }))
@@ -133,44 +128,26 @@ foam.CLASS({
         .endContext();
     },
 
-    function checkStatus(cap) {
-      // Query UCJ status
-      var associatedEntity = cap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ?
-        this.subject.user : this.subject.realUser;
-      this.userCapabilityJunctionDAO.where(
-        this.AND(
-          this.OR(
-            this.AND(
-              this.NOT(this.INSTANCE_OF(this.AgentCapabilityJunction)),
-              this.EQ(this.UserCapabilityJunction.SOURCE_ID, associatedEntity.id)
-            ),
-            this.AND(
-              this.INSTANCE_OF(this.AgentCapabilityJunction),
-              this.EQ(this.UserCapabilityJunction.SOURCE_ID, associatedEntity.id),
-              this.EQ(this.AgentCapabilityJunction.EFFECTIVE_USER, this.subject.user.id)
-            )
-          ),
-          this.EQ(this.UserCapabilityJunction.TARGET_ID, cap.id)
-        )
-      ).limit(1).select(this.PROJECTION(
-        this.UserCapabilityJunction.STATUS
-      )).then(results => {
-        if ( results.array.length < 1 ) {
-          this.reject();
-          return;
-        }
-        var entry = results.array[0]; // limit 1
-        var status = entry[0]; // first field (status)
-        switch ( status ) {
-          case this.CapabilityJunctionStatus.GRANTED:
-            this.aquire();
-            break;
-          default:
-            this.reject();
-            break;
-        }
-      });
-    },
+    // TODO - add feature to capture wizard close for a capability:
+
+    // First attempt:
+    //   call checkStatus() on  promise resolve of launchWizard
+    //   code:
+    //     var p = self.crunchController.launchWizard(cap.id);
+    //     p.then(() => self.checkStatus(cap));
+    // Second attempt:
+    //   add property to crunchController that changes on close,
+    //   and add a listener checkStatus(cap) that listens to property change of crunchController
+
+    // neither above works but don't want to delete this. Could be a nice feature.
+
+    // function checkStatus(cap) {
+    //   // Query UCJ status
+    //   this.crunchService.getJunction(ctrl.__subContext__, cap.id).then(ucj => {
+    //     if ( ucj && ucj.status === this.CapabilityJunctionStatus.GRANTED ) this.aquire();
+    //     else this.reject();
+    //   });
+    // },
 
     function aquire(x) {
       x = x || this.__subSubContext__;
@@ -195,7 +172,7 @@ foam.CLASS({
   actions: [
     {
       name: 'cancel',
-      label: 'Not interested - Close',
+      label: 'Close',
       code: function(x) {
         this.reject(x);
       }

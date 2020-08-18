@@ -3,6 +3,10 @@ foam.CLASS({
   name: 'EnumLegendView',
   extends: 'foam.u2.View',
 
+  requires: [
+    'foam.u2.crunch.Style'
+  ],
+
   css: `
   ^container {
     border-style: solid;
@@ -13,28 +17,6 @@ foam.CLASS({
     padding: 12px;
     text-align: justify;
   }
-  ^badge {
-    float: right;
-    height: 24px;
-    border-radius: 12px;
-    margin-top: 12px;
-    margin-right: 7px;
-    width: 71px;
-
-    padding: 0 8px;
-    background-color: #b5b5b5;
-
-    font-family: IBMPlexSans;
-    font-size: 11px;
-    font-weight: 500;
-    font-style: normal;
-    font-stretch: normal;
-    line-height: 24px;
-    letter-spacing: normal;
-    text-align: center;
-    color: #ffffff;
-  }
-
   `,
   properties: [
     {
@@ -50,6 +32,9 @@ foam.CLASS({
     function initE() {
       this.SUPER();
 
+      var style = this.Style.create();
+      style.addBinds(this);
+
       this.start().addClass(this.myClass('container'))
       .start('h3').add('Status Legend').end()
       .add(this.of.VALUES
@@ -61,7 +46,7 @@ foam.CLASS({
               .start().add(
                 foam.u2.view.ReadOnlyEnumView.create({
                   data: statusEnum
-                }).addClass(this.myClass('badge'))
+                }).addClass(style.myClass('badge'))
                 .style({ 'background-color': statusEnum.background })
               ).end()
               .start().add(statusEnum.documentation).end()

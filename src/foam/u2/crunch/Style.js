@@ -150,9 +150,11 @@ foam.CLASS({
 
     ^badge {
       float: right;
-      width: auto;
       height: 24px;
       border-radius: 12px;
+      margin-top: 12px;
+      margin-right: 7px;
+      width: 71px;
 
       padding: 0 8px;
       background-color: #b5b5b5;
