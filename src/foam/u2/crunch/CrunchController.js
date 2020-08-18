@@ -71,6 +71,11 @@ foam.CLASS({
           Promise.all(capabilities
             .filter(cap => !! cap.of )
             .map(cap => {
+                /* TODO:
+                  If cap is list && last cap is instance of MinMaxCapability
+                  - create wizardlets for capabilities from 0 to n-1 with isAvailable set to false
+                  - instanciate MinMaxCapabilityWizardlet, slotted to above wizardlets
+                */
                 var associatedEntity = cap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
                 var wizardlet = this.CapabilityWizardlet.create({ capability: cap });
                 return this.updateUCJ(wizardlet, associatedEntity);
