@@ -157,7 +157,10 @@ foam.CLASS({
         }
 
         for ( let p = decr(wizardPosition) ; p != null ; p = decr(p) ) {
-          console.log('prev p', p);
+          if ( ! this.wizardlets[p.wizardletIndex].isAvailable ) {
+            continue;
+          }
+
           if ( sectionAvailableSlots[p.wizardletIndex][p.sectionIndex].get() ) {
             return p;
           }
@@ -189,7 +192,12 @@ foam.CLASS({
         }
 
         for ( let p = incr(wizardPosition) ; p != null ; p = incr(p) ) {
-          console.log('next p', p);
+          // Skip unavailable wizardlets
+          if ( ! this.wizardlets[p.wizardletIndex].isAvailable ) {
+            continue;
+          }
+
+          // Land on an available section
           if ( sectionAvailableSlots[p.wizardletIndex][p.sectionIndex].get() ) {
             return p;
           }
@@ -221,12 +229,21 @@ foam.CLASS({
       expression: function (currentWizardlet$isValid) {
         return currentWizardlet$isValid;
       }
+    },
+    {
+      name: 'availabilityInvalidate',
+      class: 'Int'
     }
   ],
 
   methods: [
     function init() {
       console.log('StepWizardletController', this);
+      return this.wizardlets.forEach(wizardlet => {
+        wizardlet.isAvailable$.sub(() => {
+          this.availabilityInvalidate++;
+        })
+      })
     },
     function saveProgress() {
       var p = Promise.resolve();
