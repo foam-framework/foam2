@@ -64,7 +64,7 @@ foam.CLASS({
         }
 
         if ( nu.getType() == MedusaType.MEDIATOR ) {
-          broadcastMediators(x);
+
           ElectoralService electoralService = (ElectoralService) x.get("electoralService");
           if ( electoralService != null ) {
             ClusterConfig config = support.getConfig(x, support.getConfigId());
@@ -133,41 +133,5 @@ foam.CLASS({
       support.outputBuckets(x);
       `
     },
-    {
-      documentation: 'Update list of mediators to broadcast to.',
-      synchronized: true,
-      name: 'broadcastMediators',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        }
-      ],
-      javaCode: `
-      getLogger().debug("broadcastMediators");
-      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
-
-      long zone = myConfig.getZone() + 1;
-      if ( myConfig.getType() == MedusaType.NODE ) {
-        zone = myConfig.getZone();
-      }
-      List<ClusterConfig> arr = (ArrayList) ((ArraySink) ((DAO) x.get("localClusterConfigDAO"))
-        .where(
-          AND(
-            EQ(ClusterConfig.ZONE, zone),
-            EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
-            EQ(ClusterConfig.STATUS, Status.ONLINE),
-            EQ(ClusterConfig.ENABLED, true),
-            EQ(ClusterConfig.REGION, myConfig.getRegion()),
-            EQ(ClusterConfig.REALM, myConfig.getRealm())
-          )
-        )
-        .select(new ArraySink())).getArray();
-      ClusterConfig[] configs = new ClusterConfig[arr.size()];
-      arr.toArray(configs);
-      support.setBroadcastMediators(configs);
-      `
-    }
   ]
 });

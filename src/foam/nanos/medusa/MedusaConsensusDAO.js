@@ -236,7 +236,7 @@ foam.CLASS({
       try {
         synchronized ( promoteLock_ ) {
           if ( getPromoterRunning() ) {
-            // getLogger().debug("promoter already running");
+            getLogger().debug("promoter already running");
             return;
           }
           setPromoterRunning(true);
@@ -268,13 +268,8 @@ foam.CLASS({
             entry = list.get(0);
             getLogger().error("promoter", next, "multiple found with consensus", entry.toSummary(), entry.getConsensusCount(), support.getNodeQuorum());
             // TODO: Halt System.
-          }
-
-          // TODO: for troubleshooting, remove later
-          {
-            if ( entry != null ) {
-              break;
-            }
+          } else {
+            // TODO: for troubleshooting, remove later
             list = ((ArraySink) getDelegate()
               .where(
                 EQ(MedusaEntry.INDEX, next)
@@ -292,7 +287,7 @@ foam.CLASS({
         getLogger().error("promoter", "execute", e.getMessage(), e);
         // TODO: Alarm
       } finally {
-        // getLogger().warning("promoter", "execute", "exit");
+        // getLogger().debug("promoter", "execute", "exit");
         synchronized ( promoteLock_ ) {
           setPromoterRunning(false);
         }

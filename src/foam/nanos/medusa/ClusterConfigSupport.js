@@ -271,6 +271,29 @@ configuration for contacting the primary node.`,
       name: 'broadcastMediators',
       class: 'FObjectArray',
       of: 'foam.nanos.medusa.ClusterConfig',
+      javaFactory: `
+      ClusterConfig myConfig = getConfig(getX(), getConfigId());
+      long zone = myConfig.getZone() + 1;
+      if ( myConfig.getType() == MedusaType.NODE ) {
+        zone = myConfig.getZone();
+      }
+      getLogger().debug("broadcastMediators", "zone", zone);
+      List<ClusterConfig> arr = (ArrayList) ((ArraySink) ((DAO) getX().get("localClusterConfigDAO"))
+        .where(
+          AND(
+            EQ(ClusterConfig.ZONE, zone),
+            EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
+            EQ(ClusterConfig.STATUS, Status.ONLINE),
+            EQ(ClusterConfig.ENABLED, true),
+            EQ(ClusterConfig.REGION, myConfig.getRegion()),
+            EQ(ClusterConfig.REALM, myConfig.getRealm())
+          )
+        )
+        .select(new ArraySink())).getArray();
+      ClusterConfig[] configs = new ClusterConfig[arr.size()];
+      arr.toArray(configs);
+      return configs;
+      `
     },
     {
       documentation: 'A single instance is using the medusa journal. No other clustering features are used.',

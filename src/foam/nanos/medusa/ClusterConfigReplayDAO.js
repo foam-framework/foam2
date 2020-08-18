@@ -56,8 +56,8 @@ foam.CLASS({
            nu.getStatus() == Status.ONLINE ) {
 
         ClusterConfig config = nu;
-        ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
-        ClusterConfig myConfig = support.getConfig(getX(), support.getConfigId());
+        ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+        ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
         // If a Node comming online, begin replay from it.
         if ( support.getStandAlone() ||
             ( ( myConfig.getType() == MedusaType.MEDIATOR ||
@@ -77,8 +77,8 @@ foam.CLASS({
             if ( config.getType() == MedusaType.MEDIATOR ) {
               serviceName = "medusaEntryDAO";
             }
-            clientDAO = support.getClientDAO(getX(), serviceName, myConfig, config);
-            clientDAO = new RetryClientSinkDAO.Builder(getX())
+            clientDAO = support.getClientDAO(x, serviceName, myConfig, config);
+            clientDAO = new RetryClientSinkDAO.Builder(x)
               .setName(serviceName)
               .setDelegate(clientDAO)
               .setMaxRetryAttempts(support.getMaxRetryAttempts())
@@ -98,7 +98,7 @@ foam.CLASS({
             details.setMinIndex((Long) min.getValue());
           }
           getLogger().debug(myConfig.getId(), "ReplayDetailsCmd to", config.getId());
-          details = (ReplayDetailsCmd) clientDAO.cmd_(getX(), details);
+          details = (ReplayDetailsCmd) clientDAO.cmd_(x, details);
           getLogger().debug(myConfig.getId(), "ReplayDetailsCmd from", config.getId(), details);
 
           synchronized ( this ) {
@@ -107,8 +107,8 @@ foam.CLASS({
               replaying.setStartTime(new java.util.Date());
             }
             DaggerService dagger = (DaggerService) x.get("daggerService");
-            if ( details.getMaxIndex() > dagger.getGlobalIndex(getX())) {
-              dagger.setGlobalIndex(getX(), details.getMaxIndex());
+            if ( details.getMaxIndex() > dagger.getGlobalIndex(x)) {
+              dagger.setGlobalIndex(x, details.getMaxIndex());
             }
 
             if ( details.getMaxIndex() > replaying.getReplayIndex() ) {
@@ -131,7 +131,7 @@ foam.CLASS({
             cmd.setServiceName("medusaMediatorDAO"); // TODO: configuration
 
             getLogger().debug(myConfig.getId(), "ReplayCmd to", config.getId());
-            cmd = (ReplayCmd) clientDAO.cmd_(getX(), cmd);
+            cmd = (ReplayCmd) clientDAO.cmd_(x, cmd);
             getLogger().debug(myConfig.getId(), "ReplayCmd from", config.getId(), cmd);
           }
         } else {
