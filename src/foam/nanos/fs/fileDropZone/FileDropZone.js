@@ -141,7 +141,7 @@ foam.CLASS({
       if ( Object.keys(this.supportedFormats).length == 0 ) {
         let s = await this.fileTypeDAO.select()
         s.array.forEach(type => {
-          this.supportedFormats[type.mime] = type.fileName
+          this.supportedFormats[type.toSummary()] = type.abbreviation
         })
       }
 

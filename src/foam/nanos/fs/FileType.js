@@ -11,17 +11,26 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Long',
+      class: 'String',
       name: 'id',
-      visibility: 'RO'
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
     },
     {
       class: 'String',
-      name: 'fileName',
+      name: 'type',
     },
     {
       class: 'String',
-      name: 'mime',
+      name: 'subType',
+    },
+    {
+      class: 'String',
+      name: 'abbreviation',
     }
+  ],
+
+  methods: [
+    function toSummary() { return this.type + '/' + this.subType; }
   ]
 });

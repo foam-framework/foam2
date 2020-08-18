@@ -54,7 +54,6 @@ foam.CLASS({
         EQ(FileType.MIME, file.getMimeType())
       );
 
-      // if fileType not store in fileTypeDAO, create new one and store it
       if ( fileType == null ) {
         throw new UserFeedbackException.Builder(x)
         .setUserFeedback(new UserFeedback.Builder(x)

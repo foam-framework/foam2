@@ -1168,22 +1168,3 @@ p({
   """,
   "client": "{\"of\":\"foam.nanos.auth.TimeZone\"}"
 })
-
-p({
-  "class":"foam.nanos.boot.NSpec",
-  "name":"fileTypeDAO",
-  "serve":true,
-  "serviceScript":
-  """
-    return new foam.dao.EasyDAO.Builder(x)
-      .setPm(true)
-      .setPipelinePm(true)
-      .setSeqNo(true)
-      .setAuthorize(false)
-      .setOf(foam.nanos.fs.FileType.getOwnClassInfo())
-      .setJournalName("fileTypes")
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .build()
-  """,
-  "client": "{\"of\":\"foam.nanos.fs.FileType\"}"
-})
