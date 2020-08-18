@@ -1147,3 +1147,24 @@ p({
       }
     """
 })
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "timezoneDAO",
+  "description": "A DAO which contains information about timezones in countries.",
+  "serve": true,
+  "serviceScript": """
+    dao = new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("timezoneDAO"))
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("timezones")
+      .setOf(foam.nanos.auth.TimeZone.getOwnClassInfo())
+      .build();
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.auth.TimeZone.DISPLAY_NAME });
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.auth.TimeZone.COUNTRY_ID });
+
+    return dao;
+  """,
+  "client": "{\"of\":\"foam.nanos.auth.TimeZone\"}"
+})

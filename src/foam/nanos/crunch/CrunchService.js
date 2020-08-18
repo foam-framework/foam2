@@ -73,6 +73,23 @@ foam.INTERFACE({
           type: 'foam.nanos.auth.Subject'
         }
       ],
+    },
+    {
+      name: 'updateJunction',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'capabilityId',
+          type: 'String'
+        },
+        {
+          name: 'data',
+          type: 'foam.core.FObject'
+        }
+      ],
     }
   ],
 });

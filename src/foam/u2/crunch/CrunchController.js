@@ -77,7 +77,7 @@ foam.CLASS({
                   - instanciate MinMaxCapabilityWizardlet, slotted to above wizardlets
                 */
                 var associatedEntity = cap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
-                var wizardlet = this.CapabilityWizardlet.create({ capability: cap });
+                var wizardlet = cap.wizardlet.cls_.create({ capability: cap, ...cap.wizardlet.instance_ }, this);
                 return this.updateUCJ(wizardlet, associatedEntity);
               })
             )
@@ -105,10 +105,13 @@ foam.CLASS({
 
     function generateAndDisplayWizard(capabilitiesSections) {
       // called in CapabilityRequirementView
+      let topCap = capabilitiesSections.caps[capabilitiesSections.caps.length - 1];
+      let config = topCap.wizardletConfig.cls_.create({ ...topCap.wizardletConfig.instance_ }, this);
       return ctrl.add(this.Popup.create({ closeable: false }).tag({
         class: 'foam.u2.wizard.StepWizardletView',
         data: foam.u2.wizard.StepWizardletController.create({
-          wizardlets: capabilitiesSections.wizCaps
+          wizardlets: capabilitiesSections.wizCaps,
+          config: config
         }),
         onClose: (x) => {
           this.finalOnClose(x, capabilitiesSections.caps);

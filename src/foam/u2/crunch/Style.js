@@ -150,21 +150,23 @@ foam.CLASS({
 
     ^badge {
       float: right;
-      width: auto;
       height: 24px;
       border-radius: 12px;
+      margin-top: 12px;
+      margin-right: 7px;
+      width: 71px;
 
       padding: 0 8px;
       background-color: #b5b5b5;
 
       font-family: /*%FONT1%*/;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 500;
       font-style: normal;
       font-stretch: normal;
       line-height: 24px;
       letter-spacing: normal;
-      text-align: right;
+      text-align: center;
       color: #ffffff;
     }
 
