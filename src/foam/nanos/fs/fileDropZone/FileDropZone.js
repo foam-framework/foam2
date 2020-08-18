@@ -20,7 +20,8 @@ foam.CLASS({
 
   imports: [
     'ctrl',
-    'user'
+    'user',
+    'fileTypeDAO'
   ],
 
   exports: [
@@ -133,9 +134,16 @@ foam.CLASS({
   ],
 
   methods: [
-    function initE() {
+    async function initE() {
       this.SUPER();
       var self = this;
+
+      if ( Object.keys(this.supportedFormats).length === 0 ) {
+        let s = await this.fileTypeDAO.select()
+        s.array.forEach(type => {
+          this.supportedFormats[type.mime] = type.fileName
+        })
+      }
 
       this
         .addClass(this.myClass())
@@ -318,6 +326,6 @@ foam.CLASS({
       this.addFiles(files);
       // Remove all temporary files in the element.target.files
       this.document.querySelector('.' + this.myClass('input')).value = null;
-    },
+    }
   ]
 });

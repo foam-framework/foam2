@@ -17,6 +17,10 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'fileName',
+    },
+    {
+      class: 'String',
       name: 'mime',
     }
   ]
