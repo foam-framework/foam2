@@ -79,6 +79,7 @@ var classes = [
   'foam.mlang.PredicatedExpr',
   'foam.mlang.ContextObject',
   'foam.mlang.CurrentTime',
+  'foam.mlang.expr.TimeOfDay',
   'foam.mlang.predicate.RegExp',
   'foam.mlang.predicate.OlderThan',
   'foam.mlang.predicate.isAuthorizedToRead',
@@ -307,6 +308,7 @@ var classes = [
   'foam.nanos.script.Language',
   'foam.nanos.auth.Language',
   'foam.nanos.auth.Region',
+  'foam.nanos.auth.TimeZone',
   'foam.nanos.logger.LogMessage',
   'foam.nanos.logger.LogMessageDAO',
   'foam.nanos.logger.LogLevelFilterLogger',
@@ -525,6 +527,7 @@ var classes = [
   'foam.nanos.dig.exception.AuthorizationException',
   'foam.flow.Document',
   'foam.flow.DocumentationFolderDAO',
+  'foam.flow.DocumentMenu',
 
   'foam.nanos.ruler.RuleGroup',
   'foam.nanos.ruler.Rule',
@@ -628,6 +631,11 @@ var classes = [
   'foam.nanos.crunch.AssociatedEntity',
   'foam.nanos.crunch.CapabilityAvailabilityDAO',
 
+  'foam.nanos.crunch.connection.ConnectedCapability',
+  'foam.nanos.crunch.connection.ConnectedCapabilityDAO',
+  'foam.nanos.crunch.connection.FlatCapability',
+  'foam.nanos.crunch.connection.FlatCapabilityDAO',
+  
   //daos
   'foam.nanos.crunch.UserCapabilityJunctionDAO',
   //rules
@@ -636,6 +644,7 @@ var classes = [
   'foam.nanos.crunch.RemoveJunctionsOnUserRemoval',
   'foam.nanos.crunch.CrunchService',
   'foam.nanos.crunch.ReputDependentUCJs',
+
   //ucjdao rules
   'foam.nanos.crunch.ruler.CheckUCJOwnershipOnPut',
   'foam.nanos.crunch.ruler.ValidateUCJDataOnPut',

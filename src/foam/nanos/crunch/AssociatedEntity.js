@@ -9,11 +9,17 @@ foam.ENUM({
     values: [
       {
         name: 'USER',
-        label: 'user'
+        label: 'user',
+        documentation: `
+          Associate capability junction with effective user
+        `
       },
       {
         name: 'REAL_USER',
-        label: 'realUser'
+        label: 'realUser',
+        documentation: `
+          Associate capability junction with logged-in user
+        `
       },
       {
         name: 'ACTING_USER',

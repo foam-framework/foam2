@@ -225,9 +225,6 @@ foam.CLASS({
   ],
 
   methods: [
-    function init() {
-      console.log('StepWizardletController', this);
-    },
     function saveProgress() {
       var p = Promise.resolve();
       return this.wizardlets.slice(0, this.highestIndex).reduce(

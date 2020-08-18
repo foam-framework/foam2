@@ -48,7 +48,11 @@ public class FallbackStorage implements Storage {
   public Set<String> getAvailableFiles(String name, String glob) {
     Set<String> paths = storage_.getAvailableFiles(name, glob);
     if ( paths == null ) return fallback_.getAvailableFiles(name, glob);
-    paths.addAll(fallback_.getAvailableFiles(name, glob));
+    try {
+      paths.addAll(fallback_.getAvailableFiles(name, glob));
+    } catch ( RuntimeException e ) {
+      // Fallback is allowed to fail in this case
+    }
     return paths;
   }
 }
