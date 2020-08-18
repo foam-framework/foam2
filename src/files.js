@@ -857,5 +857,9 @@ FOAM_FILES([
   { name: 'foam/i18n/Locale' },
 
   { name: "foam/nanos/pool/AbstractFixedThreadPool" },
-  { name: "foam/nanos/pool/ThreadPoolAgency" }
+  { name: "foam/nanos/pool/ThreadPoolAgency" },
+
+  // fs
+  { name: 'foam/nanos/fs/fileDropZone/FileDropZone', flags: ['web'] },
+  { name: 'foam/nanos/fs/fileDropZone/FileCard', flags: ['web'] }
 ]);
