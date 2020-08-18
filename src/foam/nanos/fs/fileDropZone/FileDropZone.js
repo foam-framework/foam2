@@ -138,7 +138,7 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
-      if ( Object.keys(this.supportedFormats).length === 0 ) {
+      if ( Object.keys(this.supportedFormats).length == 0 ) {
         let s = await this.fileTypeDAO.select()
         s.array.forEach(type => {
           this.supportedFormats[type.mime] = type.fileName

@@ -11,7 +11,9 @@ foam.CLASS({
   documentation: ` A fileDAO decorator use to store the file type`,
 
   javaImports: [
+    'foam.comics.v2.userfeedback.UserFeedback',
     'foam.comics.v2.userfeedback.UserFeedbackException',
+    'foam.comics.v2.userfeedback.UserFeedbackStatus',
     'foam.core.X',
     'foam.dao.*',
     'foam.nanos.fs.File',
