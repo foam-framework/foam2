@@ -171,6 +171,7 @@ p({
   "serve":true,
   "serviceScript":"""
     return new foam.dao.EasyDAO.Builder(x)
+      .setGuid(true)
       .setDecorator(new foam.nanos.crunch.connection.ConnectedCapabilityDAO(x, new foam.dao.NullDAO(x, foam.nanos.crunch.connection.ConnectedCapability.getOwnClassInfo())))
       .setInnerDAO(new foam.dao.MDAO(foam.nanos.crunch.connection.ConnectedCapability.getOwnClassInfo()))
       .setOf(foam.nanos.crunch.connection.ConnectedCapability.getOwnClassInfo())
