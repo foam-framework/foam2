@@ -42,7 +42,6 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-        // TODO: add logic to disprese FObjectArray to lower level capabilities
         DAO capabilityDAO = (DAO) x.get("capabilityDAO");
         ConnectedCapability sentCap = (ConnectedCapability) obj;
         FlatCapability flatCap = (FlatCapability)

@@ -92,7 +92,6 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-        // TODO: add logic to retrieve capabilities in order of precendence
         CrunchService crunchService = (CrunchService) x.get("crunchService");
         if ( obj == null || ! (obj instanceof FlatCapability) ) {
           throw new RuntimeException("Attempted to put a non-flat capability in FlatCapabilityDAO");
