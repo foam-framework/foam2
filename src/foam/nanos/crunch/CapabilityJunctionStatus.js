@@ -22,7 +22,7 @@ foam.ENUM({
     {
       name: 'EXPIRED',
       label: 'expired',
-      documentation: `A capability can expire due to a number of factors. The data that was previously collected will be rest and will require to be re-completed to gain access.`,
+      documentation: `A capability can expire due to a number of factors. The data that was previously collected will be removed or reset and must be re-added or re-approved to gain access.`,
       background: '#bf3232'
     },
     {
