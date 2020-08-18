@@ -45,7 +45,7 @@ foam.CLASS({
         DAO capabilityDAO = (DAO) x.get("capabilityDAO");
         ConnectedCapability sentCap = (ConnectedCapability) obj;
         FlatCapability flatCap = (FlatCapability)
-          capabilityDAO.find(sentCap.getFlatCapabilityId());
+          capabilityDAO.find(sentCap.getFlatCapability());
 
         String[] classes = flatCap.getClasses();
         String[] capabilities = flatCap.getCapabilities();
