@@ -28,6 +28,16 @@ p({
       .build())
       .build())
       .build();
+
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] {
+      foam.nanos.medusa.ClusterConfig.ENABLED,
+      foam.nanos.medusa.ClusterConfig.REALM,
+      foam.nanos.medusa.ClusterConfig.REGION,
+      foam.nanos.medusa.ClusterConfig.STATUS,
+      foam.nanos.medusa.ClusterConfig.TYPE,
+      foam.nanos.medusa.ClusterConfig.ZONE
+    });
+
     dao.addPropertyIndex(new foam.core.PropertyInfo[] {
       foam.nanos.medusa.ClusterConfig.ENABLED
     });

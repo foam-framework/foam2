@@ -79,6 +79,7 @@ foam.CLASS({
             }
             clientDAO = support.getClientDAO(getX(), serviceName, myConfig, config);
             clientDAO = new RetryClientSinkDAO.Builder(getX())
+              .setName(serviceName)
               .setDelegate(clientDAO)
               .setMaxRetryAttempts(support.getMaxRetryAttempts())
               .setMaxRetryDelay(support.getMaxRetryDelay())

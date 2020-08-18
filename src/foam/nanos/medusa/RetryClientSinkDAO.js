@@ -18,7 +18,8 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.dao.DOP',
     'foam.nanos.logger.PrefixLogger',
-    'foam.nanos.logger.Logger'
+    'foam.nanos.logger.Logger',
+    'foam.nanos.pm.PM'
   ],
 
   properties: [
@@ -50,7 +51,8 @@ foam.CLASS({
       visibility: 'HIDDEN',
       javaFactory: `
         return new PrefixLogger(new Object[] {
-          this.getClass().getSimpleName()
+          this.getClass().getSimpleName(),
+          this.getName()
         }, (Logger) getX().get("logger"));
       `
     }
@@ -133,6 +135,8 @@ foam.CLASS({
         entry.setNode(support.getConfigId());
       }
 
+      PM pm = PM.create(x, getClass().getSimpleName()+":"+getName(), dop);
+      try {
       while ( true ) {
         try {
           if ( DOP.PUT == dop ) {
@@ -154,6 +158,7 @@ foam.CLASS({
 
             // TODO: Alarm
             //throw new RuntimeException("Rejected, retry limit reached.", t);
+            pm.error(x, "Retry limit reached.");
             break;
           }
           retryAttempt += 1;
@@ -172,6 +177,9 @@ foam.CLASS({
             break;
           }
         }
+      }
+      } finally {
+        pm.log(x);
       }
       return obj;
       `

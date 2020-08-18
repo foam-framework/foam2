@@ -267,6 +267,12 @@ configuration for contacting the primary node.`,
       `
     },
     {
+      documentation: 'Mediators to broadcast to. See ClusterConfigStatusDAO',
+      name: 'broadcastMediators',
+      class: 'FObjectArray',
+      of: 'foam.nanos.medusa.ClusterConfig',
+    },
+    {
       documentation: 'A single instance is using the medusa journal. No other clustering features are used.',
       name: 'standAlone',
       class: 'Boolean',

@@ -73,9 +73,6 @@ foam.CLASS({
       ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
       ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
 
-      PM pm = PM.create(x, this.getOwnClassInfo(), "put");
-      try {
-
         entry.setNode(support.getConfigId());
 
         int groups = support.getNodeGroups();
@@ -91,17 +88,12 @@ foam.CLASS({
               try {
                 DAO dao = (DAO) getClients().get(config.getId());
                 if ( dao == null ) {
-                  // dao = (DAO) x.get(getServiceName());
-                  // if ( dao != null ) {
-                  //   getLogger().debug("short circuit");
-                  // } else {
-                    dao = support.getBroadcastClientDAO(x, getServiceName(), myConfig, config);
-                    dao = new RetryClientSinkDAO.Builder(x)
+                  dao = support.getBroadcastClientDAO(x, getServiceName(), myConfig, config);
+                  dao = new RetryClientSinkDAO.Builder(x)
                             .setDelegate(dao)
                             .setMaxRetryAttempts(support.getMaxRetryAttempts())
                             .setMaxRetryDelay(support.getMaxRetryDelay())
                             .build();
-                  // }
                   getClients().put(config.getId(), dao);
                 }
 
@@ -114,9 +106,6 @@ foam.CLASS({
           }, this.getClass().getSimpleName());
         }
         return obj;
-      } finally {
-        pm.log(x);
-      }
       `
     }
   ]

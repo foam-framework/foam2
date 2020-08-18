@@ -85,6 +85,7 @@ foam.CLASS({
           }
         } else if ( nu.getType() == MedusaType.NODE ) {
           bucketNodes(x);
+          broadcast2Mediators(x);
         }
       }
       return nu;
@@ -92,8 +93,8 @@ foam.CLASS({
     },
     {
       documentation: 'Assign nodes to buckets.',
+      synchronized: true,
       name: 'bucketNodes',
-      //synchronized: true,
       args: [
         {
           name: 'x',
@@ -101,7 +102,6 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      getLogger().debug("bucketNodes");
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
 
@@ -128,9 +128,45 @@ foam.CLASS({
           buckets.put(index, bucket);
         }
         bucket.add(node.getId());
-        getLogger().debug("bucketNodes", "bucket", index, "node", node.getId());
       }
       support.setNodeBuckets(buckets);
+      support.outputBuckets(x);
+      `
+    },
+    {
+      documentation: 'Update list of mediators to broadcast to.',
+      synchronized: true,
+      name: 'broadcast2Mediators',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      javaCode: `
+      getLogger().debug("broadcast2Mediators");
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
+
+      long zone = myConfig.getZone() + 1;
+      if ( myConfig.getType() == MedusaType.NODE ) {
+        zone = myConfig.getZone();
+      }
+      List<ClusterConfig> arr = (ArrayList) ((ArraySink) ((DAO) x.get("localClusterConfigDAO"))
+        .where(
+          AND(
+            EQ(ClusterConfig.ZONE, zone),
+            EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
+            EQ(ClusterConfig.STATUS, Status.ONLINE),
+            EQ(ClusterConfig.ENABLED, true),
+            EQ(ClusterConfig.REGION, myConfig.getRegion()),
+            EQ(ClusterConfig.REALM, myConfig.getRealm())
+          )
+        )
+        .select(new ArraySink())).getArray();
+      ClusterConfig[] configs = new ClusterConfig[arr.size()];
+      arr.toArray(configs);
+      support.setBroadcastMediators(configs);
       `
     }
   ]
