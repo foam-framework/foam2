@@ -42,10 +42,8 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-        DAO capabilityDAO = (DAO) x.get("capabilityDAO");
         ConnectedCapability sentCap = (ConnectedCapability) obj;
-        FlatCapability flatCap = (FlatCapability)
-          capabilityDAO.find(sentCap.getFlatCapability());
+        FlatCapability flatCap = sentCap.findFlatCapability(x);
 
         String[] classes = flatCap.getClasses();
         String[] capabilities = flatCap.getCapabilities();
