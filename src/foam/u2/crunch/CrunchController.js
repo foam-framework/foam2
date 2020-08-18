@@ -35,6 +35,8 @@ foam.CLASS({
     'foam.u2.borders.MarginBorder',
     'foam.u2.crunch.CapabilityInterceptView',
     'foam.u2.detail.AbstractSectionedDetailView',
+    'foam.nanos.crunch.MinMaxCapability',
+    'foam.nanos.crunch.ui.MinMaxCapabilityWizardlet',
     'foam.u2.dialog.Popup'
   ],
 
@@ -70,29 +72,61 @@ foam.CLASS({
           Promise.resolve(capabilities),
           Promise.all(capabilities
             .filter(cap => !! cap.of )
-            .map(cap => {
-                /* TODO:
-                  If cap is list && last cap is instance of MinMaxCapability
-                  - create wizardlets for capabilities from 0 to n-1 with isAvailable set to false
-                  - instanciate MinMaxCapabilityWizardlet, slotted to above wizardlets
-                */
-                var associatedEntity = cap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
-                var wizardlet = cap.wizardlet.cls_.create({ capability: cap, ...cap.wizardlet.instance_ }, this);
-                return this.updateUCJ(wizardlet, associatedEntity);
-              })
-            )
-          ]).then((capAndSections) => {
-            return {
-              caps: capAndSections[0],
-              wizCaps: capAndSections[1]
-                .filter((wizardSection) =>
-                  wizardSection.ucj === null ||
-                  (
-                    wizardSection.ucj.status != this.CapabilityJunctionStatus.GRANTED &&
-                    wizardSection.ucj.status != this.CapabilityJunctionStatus.PENDING
-                  ))
-            };
-          });
+            .reduce((updateUCJPromiseList, cap) => {
+              var associatedEntity, wizardlet;
+                
+              if ( Array.isArray(cap) && ( cap[cap.length - 1] instanceof foam.nanos.crunch.MinMaxCapability ) ){
+                var minMaxCap = cap[cap.length - 1];
+
+                var choiceWizardlets = cap.slice(0, cap.length - 1).map(
+                  capability => {
+                    wizardlet = capability.wizardlet.cls_.create(
+                    { 
+                      capability: capability, 
+                      isAvailable: false,
+                      ...capability.wizardlet.instance_ 
+                    }, this)
+
+                    associatedEntity = capability.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
+
+                    updateUCJPromiseList.push(this.updateUCJ(wizardlet, associatedEntity))
+                    
+                    return wizardlet;
+                  }
+                )
+                                                  
+                var minMaxWizardlet = this.MinMaxCapabilityWizardlet.create({
+                  capability: minMaxCap,
+                  ...minMaxCapa.wizardlet.instance_,
+                  choiceWizardlets: choiceWizardlets
+                })
+
+                associatedEntity = minMaxCap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
+                
+                updateUCJPromiseList.push(this.updateUCJ(minMaxWizardlet, associatedEntity));
+
+              } else {
+                associatedEntity = cap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
+                wizardlet = cap.wizardlet.cls_.create({ capability: cap, ...cap.wizardlet.instance_ }, this);
+
+                updateUCJPromiseList.push(this.updateUCJ(wizardlet, associatedEntity));
+              }
+
+              return updateUCJPromiseList
+            }, [])
+          )
+        ]).then((capAndSections) => {
+          return {
+            caps: capAndSections[0],
+            wizCaps: capAndSections[1]
+              .filter((wizardSection) =>
+                wizardSection.ucj === null ||
+                (
+                  wizardSection.ucj.status != this.CapabilityJunctionStatus.GRANTED &&
+                  wizardSection.ucj.status != this.CapabilityJunctionStatus.PENDING
+                ))
+          };
+        });
       });
     },
 
