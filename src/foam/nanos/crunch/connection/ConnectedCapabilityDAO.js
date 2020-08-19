@@ -53,7 +53,7 @@ foam.CLASS({
 
         // First pass: validate types provided
         int index = 0;
-        for ( var data : flatData ) {
+        for ( Object data : flatData ) {
           // Skip capability where 'of' property is empty
           while ( index < classes.length && SafetyUtil.isEmpty(classes[index]) ) {
             index++;
