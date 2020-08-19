@@ -480,6 +480,7 @@ FOAM_FILES([
   { name: "foam/u2/svg/graph/ZoomedOutFObjectGraphNodeView", flags: ['web'] },
   { name: "foam/u2/svg/TreeGraph", flags: ['web'] },
   { name: "foam/u2/svg/TestView", flags: ['web'] },
+  { name: "foam/u2/view/EnumLegendView", flags: ['web'] },
   { name: "foam/u2/view/LoginView", flags: ['web'] },
   { name: "foam/u2/view/ValueView", flags: ['web'] },
   { name: "foam/u2/view/PreView", flags: ['web'] },
@@ -703,6 +704,7 @@ FOAM_FILES([
   { name: "foam/lib/StorageOptionalPropertyPredicate" },
   { name: "foam/lib/StoragePropertyPredicate" },
   { name: "foam/lib/AndPropertyPredicate" },
+  { name: "foam/lib/json/JSONParser" },
   { name: "foam/lib/json/OutputterMode" },
   { name: "foam/lib/json/ClassReferenceParserTest" },
   { name: "foam/lib/json/PropertyReferenceParserTest" },
@@ -722,9 +724,12 @@ FOAM_FILES([
   { name: "foam/core/FObjectTest" },
 
   { name: "foam/flow/Document" },
+  { name: "foam/flow/DocumentMenu" },
   { name: "foam/flow/MarkupEditor" },
   { name: "foam/flow/DocumentationFolderDAO" },
   { name: "foam/flow/widgets/PropertyShortSummary" },
+  { name: "foam/flow/widgets/EnumSummary" },
+  { name: "foam/flow/widgets/DocumentationIncomplete" },
 
   { name: "org/chartjs/Lib" },
   { name: "org/chartjs/ChartCView" },
@@ -861,5 +866,9 @@ FOAM_FILES([
   { name: 'foam/i18n/Locale' },
 
   { name: "foam/nanos/pool/AbstractFixedThreadPool" },
-  { name: "foam/nanos/pool/ThreadPoolAgency" }
+  { name: "foam/nanos/pool/ThreadPoolAgency" },
+
+  // fs
+  { name: 'foam/nanos/fs/fileDropZone/FileDropZone', flags: ['web'] },
+  { name: 'foam/nanos/fs/fileDropZone/FileCard', flags: ['web'] }
 ]);

@@ -246,6 +246,7 @@ var classes = [
   'foam.nanos.auth.ruler.PreventDuplicateUsernameAction',
   'foam.nanos.auth.test.PasswordPolicyTest',
   'foam.nanos.auth.Country',
+  'foam.nanos.auth.PropertyType',
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.PMAuthService',
   'foam.nanos.auth.UserUserJunction',
@@ -443,6 +444,7 @@ var classes = [
   'foam.lib.parse.Parser',
   'foam.lib.parse.PStream',
   'foam.lib.parse.BlobPStream',
+  'foam.lib.json.JSONParser',
   'foam.lib.json.OutputJSON',
   'foam.lib.json.OutputterMode',
   'foam.lib.json.UnknownFObject',
@@ -476,7 +478,8 @@ var classes = [
   'foam.nanos.demo.relationship.CourseType',
   'foam.nanos.demo.relationship.StudentCourseJunction',
   'foam.nanos.fs.File',
-
+  'foam.nanos.fs.FileType',
+  'foam.nanos.fs.SupportFileTypeDAO',
   'foam.crypto.hash.Hasher',
   'foam.crypto.hash.HashableTest',
 
@@ -526,6 +529,7 @@ var classes = [
   'foam.nanos.dig.exception.AuthorizationException',
   'foam.flow.Document',
   'foam.flow.DocumentationFolderDAO',
+  'foam.flow.DocumentMenu',
 
   'foam.nanos.ruler.RuleGroup',
   'foam.nanos.ruler.Rule',
@@ -642,6 +646,7 @@ var classes = [
   'foam.nanos.crunch.RemoveJunctionsOnUserRemoval',
   'foam.nanos.crunch.CrunchService',
   'foam.nanos.crunch.ReputDependentUCJs',
+
   //ucjdao rules
   'foam.nanos.crunch.ruler.CheckUCJOwnershipOnPut',
   'foam.nanos.crunch.ruler.ValidateUCJDataOnPut',

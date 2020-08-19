@@ -186,7 +186,9 @@ foam.CLASS({
               var toRender = self.choices.map(function (choice) {
                 var simpSlot0 = foam.core.SimpleSlot.create({ value: choice[0] });
                 var simpSlot1 = foam.core.SimpleSlot.create({ value: choice[1] });
-                var simpSlot2 = foam.core.SimpleSlot.create({ value: choice[2] });
+                var simpSlot2 = foam.core.Slot.isInstance(choice[2])
+                  ? choice[2]
+                  : foam.core.SimpleSlot.create({ value: choice[2] });
                 var simpSlot3 = foam.core.SimpleSlot.create({ value: choice[3] });
   
                 var arraySlotForChoice = foam.core.ArraySlot.create({
