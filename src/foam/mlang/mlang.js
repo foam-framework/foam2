@@ -2343,10 +2343,11 @@ foam.CLASS({
 
         arg = arg.toLowerCase();
 
-        try {
-          var s = '';
-          const props = obj.cls_.getAxiomsByClass(foam.core.Property);
-          for ( let i = 0; i < props.length; i++ ) {
+        
+        var s = '';
+        const props = obj.cls_.getAxiomsByClass(foam.core.Property);
+        for ( let i = 0; i < props.length; i++ ) {
+          try {
             const prop = props[i];
             if ( this.FObjectProperty.isInstance(prop) ) {
               if ( this.checkNestedFObject(prop.f(obj)) ) return true;
@@ -2361,10 +2362,9 @@ foam.CLASS({
             } else {
               s = prop.f(obj).toLowerCase();
             }
-          }
-
+          } catch (err) {}
           if ( s.toLowerCase().includes(arg) ) return true;
-        } catch (err) {}
+        }
 
         return false;
       },
