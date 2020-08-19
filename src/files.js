@@ -276,6 +276,7 @@ FOAM_FILES([
 
   { name: 'foam/nanos/approval/AuthenticatedApprovalDAOAuthorizer' },
 
+  { name: 'foam/nanos/alarming/AddAlarmNameDAO' },
   { name: "foam/nanos/approval/ApprovalRequestNotificationNotificationCitationView", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/SignUp" },
   { name: "foam/nanos/u2/navigation/SignIn" },
