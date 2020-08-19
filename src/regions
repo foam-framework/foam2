@@ -9,7 +9,7 @@ p({"class":"foam.nanos.auth.Region", "code":"UA", "name":"Upper Austria", "count
 p({"class":"foam.nanos.auth.Region", "code":"VI", "name":"Vienna", "countryId":"AT"})
 p({"class":"foam.nanos.auth.Region", "code":"VO", "name":"Voralberg", "countryId":"AT"})
 
-// Belgium (divided into 3 regions which are made up of provinces)
+// Belgium
 // 1. Flemish Region
 p({"class":"foam.nanos.auth.Region", "code":"AN", "name":"Antwerp", "countryId":"BE"})
 p({"class":"foam.nanos.auth.Region", "code":"EF", "name":"East Flanders", "countryId":"BE"})
@@ -284,6 +284,62 @@ p({"class":"foam.nanos.auth.Region", "code":"CO", "name":"Connacht", "countryId"
 p({"class":"foam.nanos.auth.Region", "code":"LE", "name":"Leinster", "countryId":"IE"})
 p({"class":"foam.nanos.auth.Region", "code":"MU", "name":"Munster", "countryId":"IE"})
 p({"class":"foam.nanos.auth.Region", "code":"UL", "name":"Ulster", "countryId":"IE"})
+
+// Italy
+p({"class":"foam.nanos.auth.Region", "code":"AB", "name":"Abruzzo", "countryId":"IT"})
+p({"class":"foam.nanos.auth.Region", "code":"BA", "name":"Basilicata", "countryId":"IT"})
+p({"class":"foam.nanos.auth.Region", "code":"CA", "name":"Calabria", "countryId":"IT"})
+p({"class":"foam.nanos.auth.Region", "code":"CP", "name":"Campania", "countryId":"IT"})
+p({"class":"foam.nanos.auth.Region", "code":"ER", "name":"Emilia-Romagna", "countryId":"IT"})
+p({"class":"foam.nanos.auth.Region", "code":"FG", "name":"Friuli-Venezia Giulia", "countryId":"IT"})
+p({"class":"foam.nanos.auth.Region", "code":"LZ", "name":"Lazio", "countryId":"IT"})
+p({"class":"foam.nanos.auth.Region", "code":"LI", "name":"Liguria", "countryId":"IT"})
+p({"class":"foam.nanos.auth.Region", "code":"LO", "name":"Lombardia", "countryId":"IT"})
+p({"class":"foam.nanos.auth.Region", "code":"MA", "name":"Marche", "countryId":"IT"})
+p({"class":"foam.nanos.auth.Region", "code":"MO", "name":"Molise", "countryId":"IT"})
+p({"class":"foam.nanos.auth.Region", "code":"PI", "name":"Piemonte", "countryId":"IT"})
+p({"class":"foam.nanos.auth.Region", "code":"AP", "name":"Apulia", "countryId":"IT"})
+p({"class":"foam.nanos.auth.Region", "code":"SA", "name":"Sardinia", "countryId":"IT"})
+p({"class":"foam.nanos.auth.Region", "code":"SI", "name":"Sicily", "countryId":"IT"})
+p({"class":"foam.nanos.auth.Region", "code":"TU", "name":"Tuscany", "countryId":"IT"})
+p({"class":"foam.nanos.auth.Region", "code":"TT", "name":"Trentino-South Tyrol", "countryId":"IT"})
+p({"class":"foam.nanos.auth.Region", "code":"UM", "name":"Umbria", "countryId":"IT"})
+p({"class":"foam.nanos.auth.Region", "code":"AO", "name":"Aosta Valley", "countryId":"IT"})
+p({"class":"foam.nanos.auth.Region", "code":"VE", "name":"Veneto", "countryId":"IT"})
+
+// Latvia
+p({"class":"foam.nanos.auth.Region", "code":"KU", "name":"Kurzeme", "countryId":"LV"})
+p({"class":"foam.nanos.auth.Region", "code":"LA", "name":"Latgale", "countryId":"LV"})
+p({"class":"foam.nanos.auth.Region", "code":"VI", "name":"Vidzeme", "countryId":"LV"})
+p({"class":"foam.nanos.auth.Region", "code":"ZE", "name":"Zemgale", "countryId":"LV"})
+
+// Lithuania
+p({"class":"foam.nanos.auth.Region", "code":"AU", "name":"Aukštaitija", "countryId":"LT"})
+p({"class":"foam.nanos.auth.Region", "code":"DZ", "name":"Dzūkija", "countryId":"LT"})
+p({"class":"foam.nanos.auth.Region", "code":"LM", "name":"the Lithuania Minor", "countryId":"LT"})
+p({"class":"foam.nanos.auth.Region", "code":"SA", "name":"Samogitia", "countryId":"LT"})
+p({"class":"foam.nanos.auth.Region", "code":"SU", "name":"Sudovia", "countryId":"LT"})
+
+// Luxembourg
+p({"class":"foam.nanos.auth.Region", "code":"CA", "name":"Capellen", "countryId":"LU"})
+p({"class":"foam.nanos.auth.Region", "code":"CL", "name":"Clervaux", "countryId":"LU"})
+p({"class":"foam.nanos.auth.Region", "code":"DI", "name":"Diekirch", "countryId":"LU"})
+p({"class":"foam.nanos.auth.Region", "code":"EC", "name":"Echternach", "countryId":"LU"})
+p({"class":"foam.nanos.auth.Region", "code":"EA", "name":"Esch-sur-Alzette", "countryId":"LU"})
+p({"class":"foam.nanos.auth.Region", "code":"GR", "name":"Grevenmacher", "countryId":"LU"})
+p({"class":"foam.nanos.auth.Region", "code":"LU", "name":"Luxembourg", "countryId":"LU"})
+p({"class":"foam.nanos.auth.Region", "code":"ME", "name":"Mersch", "countryId":"LU"})
+p({"class":"foam.nanos.auth.Region", "code":"RA", "name":"Redange-sur-Attert", "countryId":"LU"})
+p({"class":"foam.nanos.auth.Region", "code":"RE", "name":"Remich", "countryId":"LU"})
+p({"class":"foam.nanos.auth.Region", "code":"VI", "name":"Vianden", "countryId":"LU"})
+p({"class":"foam.nanos.auth.Region", "code":"WI", "name":"Wiltz", "countryId":"LU"})
+
+// Malta
+p({"class":"foam.nanos.auth.Region", "code":"CT", "name":"Central Region", "countryId":"MT"})
+p({"class":"foam.nanos.auth.Region", "code":"GO", "name":"Gozo Region", "countryId":"MT"})
+p({"class":"foam.nanos.auth.Region", "code":"NO", "name":"Northern Region", "countryId":"MT"})
+p({"class":"foam.nanos.auth.Region", "code":"SE", "name":"South Eastern Region", "countryId":"MT"})
+p({"class":"foam.nanos.auth.Region", "code":"SO", "name":"Southern Region", "countryId":"MT"})
 
 // USA
 p({"class":"foam.nanos.auth.Region", "code":"AL", "name": "Alabama", "countryId":"US"})
