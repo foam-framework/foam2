@@ -69,6 +69,8 @@ public class AuthWebAgent
       .put(HttpServletResponse.class, x.get(HttpServletResponse.class))
       .put(PrintWriter.class,         x.get(PrintWriter.class));
 
+    requestX = requestX.put("appConfig", ((AppConfig) requestX.get("appConfig")).configure(requestX, null));
+
     try {
       XLocator.set(requestX);
       super.execute(requestX);
