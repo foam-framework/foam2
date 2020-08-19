@@ -42,7 +42,7 @@ foam.ENUM({
       name: 'GRACE_PERIOD',
       label: 'grace period',
       documentation: `This status is used when a UCJ is expired, but the number of graceDaysLeft is greater than 0 `,
-      background: '#ff9c42'
+      background: '#ffb470'
     },
     {
       name: 'APPROVED',

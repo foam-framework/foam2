@@ -25,7 +25,7 @@ public class DecrementGraceDaysLeftCron implements ContextAgent {
   @Override
   public void execute(X x) {
     logger = (Logger) x.get("logger");
-    userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
+    userCapabilityJunctionDAO = (DAO) x.get("bareUserCapabilityJunctionDAO");
 
     List<UserCapabilityJunction> junctions = ((ArraySink) userCapabilityJunctionDAO
       .where(AND(

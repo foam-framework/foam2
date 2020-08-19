@@ -32,10 +32,23 @@ p({
       {
         "class":"foam.nanos.ruler.predicate.PropertyEQValue",
         "propName":"status",
-        "propValue":{
-          "class":"foam.nanos.crunch.CapabilityJunctionStatus",
-          "ordinal":3
-        }
+        "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":3}
+      },
+      {
+        "class":"foam.mlang.predicate.And",
+        "args":[
+          {
+            "class":"foam.nanos.ruler.predicate.PropertyEQValue",
+            "propName":"status",
+            "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":5},
+            "isNew":false
+          },
+          {
+            "class":"foam.nanos.ruler.predicate.PropertyEQValue",
+            "propName":"status",
+            "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":5}
+          }
+        ]
       },
       {
         "class":"foam.mlang.predicate.And",
@@ -44,17 +57,14 @@ p({
             "class":"foam.mlang.predicate.Not",
             "arg1":{
               "class":"foam.nanos.ruler.predicate.PropertyChangePredicate",
-              "propName":"status",
-            },
+              "propName":"status"
+            }
           },
           { "class":"foam.nanos.crunch.ruler.IsDataUpdate" },
           {
             "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
             "propName":"status",
-            "propValue":{
-              "class":"foam.nanos.crunch.CapabilityJunctionStatus",
-              "ordinal":1
-            }
+            "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1}
           }
         ]
       }
@@ -101,6 +111,22 @@ p({
           "class":"foam.nanos.crunch.CapabilityJunctionStatus",
           "ordinal":6
         }
+      },
+      {
+        "class":"foam.mlang.predicate.And",
+        "args":[
+          {
+            "class":"foam.nanos.ruler.predicate.PropertyEQValue",
+            "propName":"status",
+            "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":5},
+            "isNew":false
+          },
+          {
+            "class":"foam.nanos.ruler.predicate.PropertyEQValue",
+            "propName":"status",
+            "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":5}
+          }
+        ]
       },
       {
         "class":"foam.mlang.predicate.And",
