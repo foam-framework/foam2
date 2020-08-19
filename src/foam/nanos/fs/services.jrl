@@ -14,3 +14,37 @@ p({
   """,
   "client": "{\"of\":\"foam.nanos.fs.FileType\"}"
 })
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"fileDAO",
+  "serve":true,
+  "serviceScript":
+  """
+    dao = new foam.dao.KeyValueDAO.Builder(x)
+      .setDelegate(new foam.dao.NullDAO(x, foam.nanos.fs.File.getOwnClassInfo()))
+      .build();
+    dao = new foam.nanos.fs.SupportFileTypeDAO(x, dao);
+    return new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setGuid(true)
+      .setDecorator(dao)
+      .setOf(foam.nanos.fs.File.getOwnClassInfo())
+      .setJournalName("files")
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .build()
+  """,
+  "client":
+  """
+    {
+      "of":"foam.nanos.fs.File",
+      "cache":false,
+      "decorators":
+      [
+        {
+          "class":"foam.blob.BlobServiceDecorator"
+        }
+      ]
+    }
+  """
+})
