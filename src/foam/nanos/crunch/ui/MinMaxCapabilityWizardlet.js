@@ -5,6 +5,12 @@ foam.CLASS({
 
   properties: [
     {
+      // TODO: remove value this is just here for testing
+      name:  'of',
+      class: 'Class',
+      value: 'foam.nanos.cron.TimeHMS'
+    },
+    {
       class: 'FObjectArray',
       of: 'foam.u2.wizard.Wizardlet',
       name: 'choiceWizardlets',

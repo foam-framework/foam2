@@ -36,7 +36,6 @@ foam.CLASS({
     'foam.u2.crunch.CapabilityInterceptView',
     'foam.u2.detail.AbstractSectionedDetailView',
     'foam.nanos.crunch.MinMaxCapability',
-    'foam.nanos.crunch.ui.MinMaxCapabilityWizardlet',
     'foam.u2.dialog.Popup'
   ],
 
@@ -71,11 +70,10 @@ foam.CLASS({
         return Promise.all([
           Promise.resolve(capabilities),
           Promise.all(capabilities
-            .filter(cap => !! cap.of )
             .reduce((updateUCJPromiseList, cap) => {
               var associatedEntity, wizardlet;
                 
-              if ( Array.isArray(cap) && ( cap[cap.length - 1] instanceof foam.nanos.crunch.MinMaxCapability ) ){
+              if ( Array.isArray(cap) && ( foam.nanos.crunch.MinMaxCapability.isInstance(cap[cap.length - 1]) ) ){
                 var minMaxCap = cap[cap.length - 1];
 
                 var choiceWizardlets = cap.slice(0, cap.length - 1).map(
@@ -95,9 +93,9 @@ foam.CLASS({
                   }
                 )
                                                   
-                var minMaxWizardlet = this.MinMaxCapabilityWizardlet.create({
+                var minMaxWizardlet = foam.nanos.crunch.ui.MinMaxCapabilityWizardlet.create({
                   capability: minMaxCap,
-                  ...minMaxCapa.wizardlet.instance_,
+                  ...minMaxCap.wizardlet.instance_,
                   choiceWizardlets: choiceWizardlets
                 })
 
@@ -105,7 +103,7 @@ foam.CLASS({
                 
                 updateUCJPromiseList.push(this.updateUCJ(minMaxWizardlet, associatedEntity));
 
-              } else {
+              } else if ( cap.of ) {
                 associatedEntity = cap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
                 wizardlet = cap.wizardlet.cls_.create({ capability: cap, ...cap.wizardlet.instance_ }, this);
 
