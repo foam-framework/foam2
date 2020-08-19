@@ -94,12 +94,11 @@ public class TreeIndex
           ((And) predicate).getArgs()[i] = new True();
         }
       }
+      // use partialEval to simplify predicate themselves.
+      predicate = predicate.partialEval();
     }
 
-    // Use partialEval to simplify and nullify the predicate itself
-    predicate = predicate.partialEval();
     if ( predicate instanceof True ) predicate = null;
-
     return new Object[]{state, predicate};
   }
 
