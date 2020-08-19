@@ -55,14 +55,6 @@ p({
               "class":"foam.nanos.crunch.CapabilityJunctionStatus",
               "ordinal":1
             }
-          },
-          {
-            "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
-            "propName":"status",
-            "propValue":{
-              "class":"foam.nanos.crunch.CapabilityJunctionStatus",
-              "ordinal":6
-            }
           }
         ]
       }
@@ -120,21 +112,13 @@ p({
               "propName":"status",
             },
           },
-          {"class":"foam.nanos.crunch.ruler.IsDataUpdate"},
+          { "class":"foam.nanos.crunch.ruler.IsDataUpdate" },
           {
             "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
             "propName":"status",
             "propValue":{
               "class":"foam.nanos.crunch.CapabilityJunctionStatus",
               "ordinal":1
-            }
-          },
-          {
-            "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
-            "propName":"status",
-            "propValue":{
-              "class":"foam.nanos.crunch.CapabilityJunctionStatus",
-              "ordinal":6
             }
           }
         ]
