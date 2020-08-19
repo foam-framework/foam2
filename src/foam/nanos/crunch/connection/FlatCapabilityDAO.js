@@ -105,7 +105,7 @@ foam.CLASS({
           // TODO: Verify that MinMaxCapability lists can be ignored here
           if ( item instanceof Capability ) {
             Capability cap = (Capability) item;
-            classes.add(cap.getOf().getId());
+            classes.add(( cap.getOf() != null ) ? cap.getOf().getId() : "");
             capabilities.add(cap.getId());
           }
         }
