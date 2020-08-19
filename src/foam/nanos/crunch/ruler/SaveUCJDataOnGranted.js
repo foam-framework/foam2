@@ -37,7 +37,8 @@ foam.CLASS({
               EQ(UserCapabilityJunction.TARGET_ID, ucj.getTargetId())
             ));
 
-            if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED ) 
+            if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED 
+              || ( old != null && old.getStatus() == CapabilityJunctionStatus.GRANTED ) ) 
               return;
 
             Capability capability = (Capability) ucj.findTargetId(x);
