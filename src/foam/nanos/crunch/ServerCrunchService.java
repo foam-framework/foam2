@@ -6,6 +6,7 @@
 
 package foam.nanos.crunch;
 
+import foam.core.FObject;
 import foam.core.X;
 import foam.dao.ArraySink;
 import foam.dao.DAO;
@@ -119,5 +120,41 @@ public class ServerCrunchService implements CrunchService {
     }
 
     return null;
+  }
+  public void updateJunction(X x, String capabilityId, FObject data) {
+    Subject subject = (Subject) x.get("subject");
+    UserCapabilityJunction ucj = this.getJunction(x, capabilityId);
+    if ( ucj == null ) {
+      // Need Capability to associate UCJ correctly
+      DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+      Capability cap = (Capability) capabilityDAO.find(capabilityId);
+      if ( cap == null ) {
+        throw new RuntimeException(String.format(
+          "Capability with id '%s' not found", capabilityId
+        ));
+      }
+      AssociatedEntity associatedEntity = cap.getAssociatedEntity();
+      boolean isAssociation = associatedEntity == AssociatedEntity.ACTING_USER;
+      User associatedUser = associatedEntity == AssociatedEntity.USER
+        ? subject.getUser()
+        : subject.getRealUser()
+        ;
+      ucj = isAssociation
+        ? new AgentCapabilityJunction.Builder(x)
+          .setSourceId(associatedUser.getId())
+          .setTargetId(capabilityId)
+          .setEffectiveUser(subject.getUser().getId())
+          .build()
+        : new UserCapabilityJunction.Builder(x)
+          .setSourceId(associatedUser.getId())
+          .setTargetId(capabilityId)
+          .build()
+        ;
+    }
+    if ( data != null ) {
+      ucj.setData(data);
+    }
+    DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
+    userCapabilityJunctionDAO.put(ucj);
   }
 }

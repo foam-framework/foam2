@@ -488,6 +488,7 @@ FOAM_FILES([
   { name: "foam/u2/svg/graph/ZoomedOutFObjectGraphNodeView", flags: ['web'] },
   { name: "foam/u2/svg/TreeGraph", flags: ['web'] },
   { name: "foam/u2/svg/TestView", flags: ['web'] },
+  { name: "foam/u2/view/EnumLegendView", flags: ['web'] },
   { name: "foam/u2/view/LoginView", flags: ['web'] },
   { name: "foam/u2/view/ValueView", flags: ['web'] },
   { name: "foam/u2/view/PreView", flags: ['web'] },
@@ -873,5 +874,9 @@ FOAM_FILES([
   { name: 'foam/i18n/Locale' },
 
   { name: "foam/nanos/pool/AbstractFixedThreadPool" },
-  { name: "foam/nanos/pool/ThreadPoolAgency" }
+  { name: "foam/nanos/pool/ThreadPoolAgency" },
+
+  // fs
+  { name: 'foam/nanos/fs/fileDropZone/FileDropZone', flags: ['web'] },
+  { name: 'foam/nanos/fs/fileDropZone/FileCard', flags: ['web'] }
 ]);
