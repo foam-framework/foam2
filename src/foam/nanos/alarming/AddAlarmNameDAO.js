@@ -14,7 +14,14 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-        String s = "";
+        DAO alarmConfigDAO = (DAO) x.get("alarmConfigDAO");
+        AlarmConfig config = (AlarmConfig) alarmConfigDAO.find(EQ(AlarmConfig.NAME, obj.getName()));
+        if ( config == null ) {
+          AlarmConfig alarmConfig = new AlarmConfig.Builder(getX())
+           .setName(configName)
+           .build();
+          alarmConfigDAO.put(alarmConfig);
+        }
         return super.put_(x, obj);
       `
     }
