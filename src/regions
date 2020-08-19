@@ -10,19 +10,16 @@ p({"class":"foam.nanos.auth.Region", "code":"VI", "name":"Vienna", "countryId":"
 p({"class":"foam.nanos.auth.Region", "code":"VO", "name":"Voralberg", "countryId":"AT"})
 
 // Belgium
-// 1. Flemish Region
 p({"class":"foam.nanos.auth.Region", "code":"AN", "name":"Antwerp", "countryId":"BE"})
 p({"class":"foam.nanos.auth.Region", "code":"EF", "name":"East Flanders", "countryId":"BE"})
 p({"class":"foam.nanos.auth.Region", "code":"FB", "name":"Flemish Brabant", "countryId":"BE"})
 p({"class":"foam.nanos.auth.Region", "code":"LI", "name":"Limburg", "countryId":"BE"})
 p({"class":"foam.nanos.auth.Region", "code":"WF", "name":"West Flanders", "countryId":"BE"})
-// 2. Walloon Region
 p({"class":"foam.nanos.auth.Region", "code":"HA", "name":"Hainaut", "countryId":"BE"})
 p({"class":"foam.nanos.auth.Region", "code":"LG", "name":"Liège", "countryId":"BE"})
 p({"class":"foam.nanos.auth.Region", "code":"LU", "name":"Luxembourg", "countryId":"BE"})
 p({"class":"foam.nanos.auth.Region", "code":"NA", "name":"Namur", "countryId":"BE"})
 p({"class":"foam.nanos.auth.Region", "code":"WB", "name":"Walloon Brabant", "countryId":"BE"})
-// 3. Brussels Captial Region
 p({"class":"foam.nanos.auth.Region", "code":"BC", "name":"Brussels Capital Region", "countryId":"BE"})
 
 // Brazil
@@ -152,7 +149,6 @@ p({"class":"foam.nanos.auth.Region", "code":"SF", "name":"Southwest Finland", "c
 p({"class":"foam.nanos.auth.Region", "code":"AL", "name":"Åland", "countryId":"FI"})
 
 // France
-// 1. Mainland Region
 p({"class":"foam.nanos.auth.Region", "code":"AR", "name":"Auvergne-Rhône-Alps", "countryId":"FR"})
 p({"class":"foam.nanos.auth.Region", "code":"BF", "name":"Burgundy-Free County", "countryId":"FR"})
 p({"class":"foam.nanos.auth.Region", "code":"BR", "name":"Brittany", "countryId":"FR"})
@@ -166,7 +162,6 @@ p({"class":"foam.nanos.auth.Region", "code":"NA", "name":"New Aquitaine", "count
 p({"class":"foam.nanos.auth.Region", "code":"OC", "name":"Occitanie", "countryId":"FR"})
 p({"class":"foam.nanos.auth.Region", "code":"LC", "name":"Loire Countries", "countryId":"FR"})
 p({"class":"foam.nanos.auth.Region", "code":"PC", "name":"Provence-Alps-Azure Coast", "countryId":"FR"})
-// Overseas Region
 p({"class":"foam.nanos.auth.Region", "code":"GU", "name":"Guadeloupe", "countryId":"FR"})
 p({"class":"foam.nanos.auth.Region", "code":"FG", "name":"French Guiana", "countryId":"FR"})
 p({"class":"foam.nanos.auth.Region", "code":"RE", "name":"Réunion", "countryId":"FR"})
