@@ -53,7 +53,7 @@ foam.CLASS({
       String mimeType = file.getMimeType();
       String subType = mimeType.substring(mimeType.indexOf("/") + 1);
       FileType fileType = (FileType) fileTypeDAO.find(
-        EQ(FileType.SUBTYPE, subType)
+        EQ(FileType.SUB_TYPE, subType)
       );
 
       if ( fileType == null ) {
