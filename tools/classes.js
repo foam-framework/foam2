@@ -192,6 +192,7 @@ var classes = [
   'foam.mlang.sink.Sum',
   'foam.mlang.sink.Average',
   'foam.mlang.sink.Map',
+  'foam.nanos.alarming.AddAlarmNameDAO',
   'foam.nanos.alarming.Alarm',
   'foam.nanos.alarming.AlarmConfig',
   'foam.nanos.alarming.AlarmConfigOMNameDAO',

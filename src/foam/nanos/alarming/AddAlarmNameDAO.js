@@ -15,6 +15,7 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
         String s = "";
+        return super.put_(x, obj);
       `
     }
   ]
