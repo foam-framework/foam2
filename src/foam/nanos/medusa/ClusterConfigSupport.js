@@ -691,34 +691,16 @@ configuration for contacting the primary node.`,
         }
       ],
       javaCode: `
-      StringBuilder sb = new StringBuilder();
-      sb.append(sendClusterConfig.getName());
-      sb.append(":");
-      sb.append(serviceName);
-      sb.append(":");
-      sb.append(receiveClusterConfig.getName());
-      String id = sb.toString();
-      DAO client = (DAO) getClients().get(id);
-      if ( client != null ) {
-        return client;
-      }
-      // if ( sendClusterConfig.getId().equals(receiveClusterConfig.getId()) ) {
-      //   // short circuit
-      //   getLogger().debug("getClientDAO", "short circuit", sendClusterConfig.getId(), receiveClusterConfig.getId());
-      //   client = new ClusterServerDAO(x);
-      // } else {
-        client = new ClientDAO.Builder(x)
+      return new ClientDAO.Builder(x)
         .setDelegate(new SessionClientBox.Builder(x)
           .setSessionID(sendClusterConfig.getSessionId())
           .setDelegate(getTransportlayerBox(x, serviceName, sendClusterConfig, receiveClusterConfig, true))
           .build())
         .build();
-      // }
-      getClients().put(id, client);
-      return client;
       `
     },
     {
+      documentation: 'Notification client is send and forget, does not register a reply box.',
       name: 'getBroadcastClientDAO',
       type: 'foam.dao.DAO',
       args: [
@@ -740,27 +722,12 @@ configuration for contacting the primary node.`,
         }
       ],
       javaCode: `
-      StringBuilder sb = new StringBuilder();
-      sb.append(sendClusterConfig.getName());
-      sb.append(":");
-      sb.append(serviceName);
-      sb.append(":");
-      sb.append(receiveClusterConfig.getName());
-      sb.append(":");
-      sb.append("broadcast");
-      String id = sb.toString();
-      DAO client = (DAO) getClients().get(id);
-      if ( client != null ) {
-        return client;
-      }
-      client = new NotificationClientDAO.Builder(x)
+      return new NotificationClientDAO.Builder(x)
         .setDelegate(new SessionClientBox.Builder(x)
           .setSessionID(sendClusterConfig.getSessionId())
           .setDelegate(getTransportlayerBox(x, serviceName, sendClusterConfig, receiveClusterConfig, true))
           .build())
         .build();
-      getClients().put(id, client);
-      return client;
       `
     },
     {

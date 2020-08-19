@@ -21,7 +21,6 @@ foam.CLASS({
     'foam.dao.DOP',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
-    'foam.nanos.pm.PM',
     'java.util.ArrayList',
     'java.util.HashMap',
     'java.util.List',
@@ -80,7 +79,9 @@ foam.CLASS({
       ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
 
       entry = (MedusaEntry) getDelegate().put_(x, entry);
-      entry.setNode(support.getConfigId());
+      if ( entry.isFrozen() ) {
+        return entry;
+      }
 
       if ( myConfig.getType() == MedusaType.NODE ) {
         ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
@@ -102,7 +103,13 @@ foam.CLASS({
                   // ( entry.getPromoted() &&
                   //   ( old == null ||
                   //     ! old.getPromoted() ) ) ) {
-        submit(x, entry, DOP.PUT);
+        entry = (MedusaEntry) submit(x, entry, DOP.PUT);
+
+        // REVIEW: broadcasted, can now copy and delete data put to save space
+        entry = (MedusaEntry) entry.shallowClone();
+        entry.setData(null);
+        // entry.__frozen__ = true;
+        entry = (MedusaEntry) getDelegate().put_(x, entry);
       }
       return entry;
       `
@@ -136,7 +143,7 @@ foam.CLASS({
       try {
       // getLogger().debug("submit", dop.getLabel(), obj.getClass().getSimpleName());
 
-      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      final ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
       Agency agency = (Agency) x.get("threadPool");
       for ( ClusterConfig config : support.getBroadcastMediators() ) {
@@ -154,11 +161,12 @@ foam.CLASS({
                           .setMaxRetryAttempts(support.getMaxRetryAttempts())
                           .setMaxRetryDelay(support.getMaxRetryDelay())
                           .build();
+                getClients().put(config.getId(), dao);
               }
-              getClients().put(config.getId(), dao);
 
               if ( DOP.PUT == dop ) {
                 MedusaEntry entry = (MedusaEntry) obj;
+                entry.setNode(support.getConfigId());
                 getLogger().debug("agency", "execute", config.getId(), dop.getLabel(), entry.getIndex());
                 dao.put_(x, entry);
               } else if ( DOP.CMD == dop ) {

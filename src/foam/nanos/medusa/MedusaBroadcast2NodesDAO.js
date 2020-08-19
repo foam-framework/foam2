@@ -19,13 +19,8 @@ foam.CLASS({
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.dao.DOP',
-    'static foam.mlang.MLang.AND',
-    'static foam.mlang.MLang.EQ',
-    'static foam.mlang.MLang.OR',
-    'foam.mlang.predicate.Predicate',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
-    'foam.nanos.pm.PM',
     'java.util.ArrayList',
     'java.util.HashMap',
     'java.util.List',
@@ -70,42 +65,41 @@ foam.CLASS({
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
       getLogger().debug("put", entry.getIndex());
-      ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
+      final ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
 
-        entry.setNode(support.getConfigId());
+      int groups = support.getNodeGroups();
+      Map buckets = support.getNodeBuckets();
+      int index = (int) (entry.getIndex() % groups);
+      List bucket = (List) buckets.get(index);
+      Agency agency = (Agency) x.get("threadPool");
 
-        int groups = support.getNodeGroups();
-        Map buckets = support.getNodeBuckets();
-        int index = (int) (entry.getIndex() % groups);
-        List bucket = (List) buckets.get(index);
-        Agency agency = (Agency) x.get("threadPool");
-
-        for ( int i = 0; i < bucket.size(); i++ ) {
-          ClusterConfig config = support.getConfig(x, (String) bucket.get(i));
-          agency.submit(x, new ContextAgent() {
-            public void execute(X x) {
-              try {
-                DAO dao = (DAO) getClients().get(config.getId());
-                if ( dao == null ) {
-                  dao = support.getBroadcastClientDAO(x, getServiceName(), myConfig, config);
-                  dao = new RetryClientSinkDAO.Builder(x)
-                            .setDelegate(dao)
-                            .setMaxRetryAttempts(support.getMaxRetryAttempts())
-                            .setMaxRetryDelay(support.getMaxRetryDelay())
-                            .build();
-                  getClients().put(config.getId(), dao);
-                }
-
-                getLogger().debug("put_", "job", entry.getIndex(), config.getName(), "data", (entry.getData() != null) ? entry.getData().getClass().getSimpleName():"null");
-                dao.put_(x, entry);
-              } catch ( Throwable t ) {
-                getLogger().error(t);
+      for ( int i = 0; i < bucket.size(); i++ ) {
+        ClusterConfig config = support.getConfig(x, (String) bucket.get(i));
+        agency.submit(x, new ContextAgent() {
+          public void execute(X x) {
+            try {
+              DAO dao = (DAO) getClients().get(config.getId());
+              if ( dao == null ) {
+                dao = support.getBroadcastClientDAO(x, getServiceName(), myConfig, config);
+                dao = new RetryClientSinkDAO.Builder(x)
+                          .setDelegate(dao)
+                          .setMaxRetryAttempts(support.getMaxRetryAttempts())
+                          .setMaxRetryDelay(support.getMaxRetryDelay())
+                          .build();
+                getClients().put(config.getId(), dao);
               }
+
+              getLogger().debug("put_", "job", entry.getIndex(), config.getName(), "data", (entry.getData() != null) ? entry.getData().getClass().getSimpleName():"null");
+              entry.setNode(support.getConfigId());
+              dao.put_(x, entry);
+            } catch ( Throwable t ) {
+              getLogger().error(t);
             }
-          }, this.getClass().getSimpleName());
-        }
-        return obj;
+          }
+        }, this.getClass().getSimpleName());
+      }
+      return obj;
       `
     }
   ]
