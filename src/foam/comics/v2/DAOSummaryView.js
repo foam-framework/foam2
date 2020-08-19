@@ -234,7 +234,7 @@ foam.CLASS({
                   .start(self.Cols).style({ 'align-items': 'center' })
                     .start()
                       .add(data.toSummary())
-                      .addClass(this.myClass('account-name'))
+                      .addClass(self.myClass('account-name'))
                       .addClass('truncate-ellipsis')
                     .end()
                     .startContext({ data }).add(self.primary).endContext()
@@ -242,7 +242,7 @@ foam.CLASS({
                 .end()
 
                 .start(self.Cols)
-                  .start(self.Cols).addClass(this.myClass('actions-header'))
+                  .start(self.Cols).addClass(self.myClass('actions-header'))
                     .startContext({ data: self })
                       .tag(self.EDIT, {
                         buttonStyle: foam.u2.ButtonStyle.TERTIARY,
@@ -259,9 +259,8 @@ foam.CLASS({
                     .endContext()
                   .end()
                 .end()
-
                 .start(config$viewBorder)
-                  .start(viewView, { data }).addClass(this.myClass('view-container')).end()
+                  .start(viewView, { data }).addClass(self.myClass('view-container')).end()
                 .end()
               .end();
           }));
