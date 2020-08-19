@@ -36,7 +36,10 @@ foam.CLASS({
       });
     },
     async function exportDAO(X, dao) {
+      var columnConfig = X.columnConfigToPropertyConverter;
+
       var propNames = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(dao.of);
+      propNames = columnConfig.filterExportedProps(dao.of, propNames);
 
       var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(dao.of, propNames);
       return dao.select(expr).then( (values) => {

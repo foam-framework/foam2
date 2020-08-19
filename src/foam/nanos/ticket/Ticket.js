@@ -42,7 +42,7 @@ foam.CLASS({
     'type',
     // REVIEW: view fails to display when owner in tableColumn, the 2nd entry in allColumns is undefined.
     // 'owner',
-    'createdBy',
+    'createdBy.legalName',
     'lastModified',
     'status',
     'title'

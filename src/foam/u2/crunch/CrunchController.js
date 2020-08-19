@@ -16,6 +16,7 @@ foam.CLASS({
 
   imports: [
     'capabilityDAO',
+    'crunchService',
     'ctrl',
     'prerequisiteCapabilityJunctionDAO',
     'stack',
@@ -63,53 +64,15 @@ foam.CLASS({
   ],
 
   methods: [
-    function getTC(capabilityId) {
-      var tcList = [];
-      var tcRecurse = () => {};
-      // Pre-Order Traversial of Capability Dependancies.
-      // Using Pre-Order here will cause the wizard to display
-      // dependancies in a logical order.
-      tcRecurse = (sourceId, seen) => {
-        if ( ! seen ) seen = [];
-        return this.prerequisiteCapabilityJunctionDAO.where(this.AND(
-          this.EQ(this.CapabilityCapabilityJunction.SOURCE_ID, sourceId),
-          this.NOT(this.IN(this.CapabilityCapabilityJunction.TARGET_ID, seen))
-        )).select().then((result) => {
-          var arry = result.array;
-
-          if ( arry.length == 0 ) {
-            tcList.push(sourceId);
-            return;
-          }
-
-          return arry.reduce(
-            (p, pcj) => p.then(() => tcRecurse(pcj.targetId, seen.concat(arry.map((pcj) => pcj.targetId)))),
-            Promise.resolve()
-          ).then(() => tcList.push(sourceId));
-        });
-      };
-
-      return tcRecurse(capabilityId, []).then(() => [...new Set(tcList)]);
-    },
-
-    function getCapabilities(capabilityId) {
-      return Promise.resolve(
-        this.getTC(capabilityId).then(
-          tcList => Promise.all(tcList.map(
-            capId => this.capabilityDAO.find(capId))
-          )
-        ));
-    },
-
     function getCapsAndWizardlets(capabilityId) {
-      return this.getCapabilities(capabilityId).then( (capabilities) => {
+      return this.crunchService.getGrantPath(this.__subContext__, capabilityId).then((capabilities) => {
         return Promise.all([
           Promise.resolve(capabilities),
           Promise.all(capabilities
             .filter(cap => !! cap.of )
             .map(cap => {
                 var associatedEntity = cap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
-                var wizardlet = this.CapabilityWizardlet.create({ capability: cap });
+                var wizardlet = cap.wizardlet.cls_.create({ capability: cap, ...cap.wizardlet.instance_ }, this);
                 return this.updateUCJ(wizardlet, associatedEntity);
               })
             )
@@ -137,10 +100,13 @@ foam.CLASS({
 
     function generateAndDisplayWizard(capabilitiesSections) {
       // called in CapabilityRequirementView
+      let topCap = capabilitiesSections.caps[capabilitiesSections.caps.length - 1];
+      let config = topCap.wizardletConfig.cls_.create({ ...topCap.wizardletConfig.instance_ }, this);
       return ctrl.add(this.Popup.create({ closeable: false }).tag({
         class: 'foam.u2.wizard.StepWizardletView',
         data: foam.u2.wizard.StepWizardletController.create({
-          wizardlets: capabilitiesSections.wizCaps
+          wizardlets: capabilitiesSections.wizCaps,
+          config: config
         }),
         onClose: (x) => {
           this.finalOnClose(x, capabilitiesSections.caps);
@@ -161,12 +127,32 @@ foam.CLASS({
         x.closeDialog();
         // Save no-data capabilities (i.e. not displayed in wizard)
         Promise.all(capabilities.filter(cap => ! cap.of).map(
-          cap => this.userCapabilityJunctionDAO.put(this.UserCapabilityJunction.create({
-            sourceId: this.subject.user.id,
-            targetId: cap.id
-          })).then(() => {
-            console.log('SAVED (no-data cap)', cap.id);
-          })
+          cap => {
+            var associatedEntity = cap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
+            this.userCapabilityJunctionDAO.find(
+              this.AND(
+                this.OR(
+                  this.AND(
+                    this.NOT(this.INSTANCE_OF(this.AgentCapabilityJunction)),
+                    this.EQ(this.UserCapabilityJunction.SOURCE_ID, associatedEntity.id)
+                  ),
+                  this.AND(
+                    this.INSTANCE_OF(this.AgentCapabilityJunction),
+                    this.EQ(this.UserCapabilityJunction.SOURCE_ID, associatedEntity.id),
+                    this.EQ(this.AgentCapabilityJunction.EFFECTIVE_USER, this.subject.user.id)
+                  )
+                ),
+                this.EQ(this.UserCapabilityJunction.TARGET_ID, cap.id))
+            ).then((ucj) => {
+              if ( ucj == null ) {
+                ucj = this.UserCapabilityJunction.create({
+                  sourceId: associatedEntity.id,
+                  targetId: cap.id
+                });
+              }
+              this.userCapabilityJunctionDAO.put(ucj).then(() => console.log('SAVED (no-data cap)', cap.id));
+            });
+          }
         )).then(() => {
           wizardResolve();
         });
@@ -194,7 +180,8 @@ foam.CLASS({
       );
       if ( ucj ) {
         var statusGranted = ucj.status === this.CapabilityJunctionStatus.GRANTED;
-        var statusPending = ucj.status === this.CapabilityJunctionStatus.PENDING;
+        var statusPending = ucj.status === this.CapabilityJunctionStatus.PENDING 
+          || ucj.status === this.CapabilityJunctionStatus.APPROVED;
         if ( statusGranted || statusPending ) {
           var message = statusGranted ? this.CANNOT_OPEN_GRANTED : this.CANNOT_OPEN_PENDING;
           this.ctrl.notify(message, '', this.LogLevel.INFO, true);

@@ -15,7 +15,20 @@ p({
   "saveHistory": false,
   "lifecycleState":1
 })
-p({"class":"foam.nanos.ruler.Rule","id":"68afcf0c-c718-98f8-0841-75e97a3ad16d63","name":"Alarm Alerting","priority":80,"ruleGroup":"am","documentation":"Alert if an alarm goes from off to on","daoKey":"alarmDAO","operation":3,"after":false,"action":{"class":"foam.nanos.alarming.Alarming"},"enabled":true,"saveHistory":false})
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"68afcf0c-c718-98f8-0841-75e97a3ad16d63",
+  "name":"Alarm Alerting",
+  "priority":80,
+  "ruleGroup":"am",
+  "documentation":"Alert if an alarm goes from off to on",
+  "daoKey":"alarmDAO",
+  "operation":3,
+  "after":false,
+  "action":{"class":"foam.nanos.alarming.Alarming"},
+  "enabled":true,
+  "saveHistory":false
+})
 p({
   "class":"foam.nanos.ruler.Rule",
   "id":"01-68afcf0c-c718-98f8-0841-75e97a3ad16d63",
@@ -26,6 +39,21 @@ p({
   "operation":0,
   "after":false,
   "action":{"class":"foam.nanos.alarming.AlarmHostnameRuleAction"},
+  "enabled":true,
+  "saveHistory":false,
+  "lifecycleState":1
+})
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"68afcf0c-c718-98f8-0841-asfdsfsdf",
+  "name":"PM alarm",
+  "priority":"100",
+  "ruleGroup":"am",
+  "documentation":"Check if there is an error in pm to create alarm",
+  "daoKey":"pmDAO",
+  "operation":0,
+  "after":false,
+  "action":{"class":"foam.nanos.pm.PM"},
   "enabled":true,
   "saveHistory":false,
   "lifecycleState":1

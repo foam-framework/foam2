@@ -105,6 +105,11 @@ foam.CLASS({
       'approval3',
       'approval4',
       'approval5',
+      'secondary1',
+      'secondary2',
+      'secondary3',
+      'secondary4',
+      'secondary5',
       'warning1',
       'warning2',
       'warning3',
@@ -131,7 +136,8 @@ foam.CLASS({
   messages: [
     { name: 'GROUP_FETCH_ERR', message: 'Error fetching group' },
     { name: 'GROUP_NULL_ERR', message: 'Group was null' },
-    { name: 'LOOK_AND_FEEL_NOT_FOUND', message: 'Could not fetch look and feel object.' }
+    { name: 'LOOK_AND_FEEL_NOT_FOUND', message: 'Could not fetch look and feel object.' },
+    { name: 'LANGUAGE_FETCH_ERR', message: 'Error fetching language' },
   ],
 
   css: `
@@ -344,6 +350,7 @@ foam.CLASS({
         // the line above before executing this one.
         await self.fetchGroup();
         await self.fetchTheme();
+        await self.fetchLanguage();
         self.onUserAgentAndGroupLoaded();
       });
     },
@@ -395,6 +402,53 @@ foam.CLASS({
           });
       });
     },
+
+    async function fetchLanguage() {
+      try {
+        let l = localStorage.getItem('localeLanguage');
+        if ( l !== undefined ) foam.locale = l;
+        //TODO manage more complicated language. 'en-CA'
+        if ( foam.locale !== 'en' && foam.locale !== 'en-US' ) {
+          let ctx = this.__subContext__;
+          let d = await  this.__subContext__.localeDAO;
+          d.select().then(e => {
+            var expr = foam.mlang.Expressions.create();
+            d.where(
+              expr.OR(
+                expr.EQ(foam.i18n.Locale.LOCALE, foam.locale),
+                expr.EQ(foam.i18n.Locale.LOCALE, foam.locale.substring(0,foam.locale.indexOf('-')))
+              )
+            ).select().then(e => {
+              let arr = e.array;
+              arr.forEach(ea =>
+                {
+                  let s = null;
+                  try {
+                    let i, obj;
+                    do {
+                      i = ea.source.indexOf('.',++i);
+                      if (i != -1) {
+                        s = eval(ea.source.substring(0,i))
+                      }
+                    } while (i > 0 && !!s);
+                  }
+                  catch(err) {
+                    console.log(ea.source)
+                    console.log(err)
+                  }
+                  if (!!s) {
+                    s[ea.source.substring(ea.source.lastIndexOf('.')+1)] = ea.target;
+                  }
+                })
+            })
+          })
+        }
+      } catch (err) {//TODO
+        this.notify(this.LANGUAGE_FETCH_ERR, 'error');
+        console.error(err.message || this.LANGUAGE_FETCH_ERR);
+      }
+    },
+
 
     async function fetchGroup() {
       try {

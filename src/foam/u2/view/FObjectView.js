@@ -87,6 +87,29 @@ foam.CLASS({
       class: 'Object',
       name: 'persistantData',
       documentation: 'Allows passed in data to persist to selected class instances.'
+    },
+    {
+      name: 'predicate',
+      documentation: `
+        Predicate to pass into strategizer query request. Used to define results from strategizer query.
+        Example use of strategizer predicate on FObjectView from property view:
+
+        name: 'exampleProp',
+        view: function(_, X) {
+          let predicate = expr.AND(
+              expr.EQ(foam.strategy.StrategyReference.DESIRED_MODEL_ID, 'foam.nanos.auth.User'),
+              expr.IN(
+                foam.strategy.StrategyReference.STRATEGY,
+                [foam.lookup('foam.nanos.auth.SomeUserClass'), foam.lookup('foam.nanos.auth.AnotherUserClass') ]
+              )
+          );
+          return foam.u2.view.FObjectView.create({
+            data: X.data.exampleProp,
+            of: foam.nanos.auth.User,
+            predicate: predicate
+          }, X);
+        }
+      `
     }
   ],
 
@@ -102,7 +125,7 @@ foam.CLASS({
       // populate the list of choices using models related to 'of' via the
       // implements and extends relations.
       if ( this.strategizer != null ) {
-        this.strategizer.query(null, this.of.id).then((strategyReferences) => {
+        this.strategizer.query(null, this.of.id, null, this.predicate).then((strategyReferences) => {
           if ( ! Array.isArray(strategyReferences) || strategyReferences.length === 0 ) {
             this.choices = [[this.of.id, this.of.model_.label]];
             this.choicesLoaded.resolve();

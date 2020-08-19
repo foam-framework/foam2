@@ -552,39 +552,6 @@ p({
 })
 
 p({"class":"foam.nanos.boot.NSpec", "name":"demoObjectDAO",                      "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"demoObjects\").setGuid(true).setOf(foam.nanos.demo.DemoObject.getOwnClassInfo()).build();", "client":"{\"of\":\"foam.nanos.demo.DemoObject\", \"remoteListenerSupport\": false}"})
-p({
-  "class":"foam.nanos.boot.NSpec",
-  "name":"fileDAO",
-  "serve":true,
-  "serviceScript":
-  """
-    dao = new foam.dao.KeyValueDAO.Builder(x)
-      .setDelegate(new foam.dao.NullDAO(x, foam.nanos.fs.File.getOwnClassInfo()))
-      .build();
-
-    return new foam.dao.EasyDAO.Builder(x)
-      .setPm(true)
-      .setGuid(true)
-      .setDecorator(dao)
-      .setOf(foam.nanos.fs.File.getOwnClassInfo())
-      .setJournalName("files")
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .build()
-  """,
-  "client":
-  """
-    {
-      "of":"foam.nanos.fs.File",
-      "cache":false,
-      "decorators":
-      [
-        {
-          "class":"foam.blob.BlobServiceDecorator"
-        }
-      ]
-    }
-  """
-})
 
 p({
   "class":"foam.nanos.boot.NSpec",
@@ -771,6 +738,7 @@ p({
   "serviceScript": """
     dao = new foam.dao.EasyDAO.Builder(x)
       .setEnableInterfaceDecorators(false)
+      .setServiceProviderAware(true)
       .setOf(foam.nanos.ruler.Rule.getOwnClassInfo())
       .setInnerDAO(x.get("localRuleDAO"))
       .build();
@@ -805,6 +773,8 @@ p({
       .build();
 
     dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.ruler.Rule.NAME });
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.ruler.Rule.DAO_KEY });
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.ruler.Rule.ENABLED });
 
     return dao;
   """,
@@ -920,9 +890,10 @@ p({
   "serviceScript":
   """
     return new foam.nanos.analytics.FoldManagerDAODecorator.Builder(x)
-      .setDelegate(new foam.dao.NullDAO.Builder(x)
-      .setOf(foam.nanos.pm.PM.getOwnClassInfo())
-      .build())
+      .setDelegate(
+        new foam.nanos.ruler.RulerDAO(x, new foam.dao.NullDAO.Builder(x)
+        .setOf(foam.nanos.pm.PM.getOwnClassInfo())
+        .build(), "pmDAO"))
       .setFm((foam.nanos.analytics.DAOFoldManager) x.get("pmFoldManager"))
       .build();
   """,
@@ -1109,14 +1080,58 @@ p({
   "name":"localSettingDAO",
   "lazy":false,
   "serve":true,
-  "authenticate": false,
+  "authenticate": true,
   "serviceScript":"""
     import foam.dao.DAO;
     return new foam.dao.EasyDAO.Builder(x)
       .setDecorator(new foam.nanos.session.LocalSettingSessionDAO(x, new foam.dao.NullDAO(x, foam.nanos.session.LocalSetting.getOwnClassInfo())))
-      .setAuthorize(false)
+      .setAuthorize(true)
       .setOf(foam.nanos.session.LocalSetting.getOwnClassInfo())
       .build();
   """,
   "client":"{\"of\":\"foam.nanos.session.LocalSetting\", \"remoteListenerSupport\": false}"
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "userPropertyAvailabilityService",
+  "serve": true,
+  "authenticate": false,
+  "boxClass":"foam.nanos.auth.UserPropertyAvailabilityServiceInterfaceSkeleton",
+  "serviceClass": "foam.nanos.auth.UserPropertyAvailabilityService",
+  "client":
+    """
+      {
+        "class":"foam.nanos.auth.ClientUserPropertyAvailabilityService",
+        "delegate": {
+          "class":"foam.box.SessionClientBox",
+          "delegate": {
+            "class":"foam.box.HTTPBox",
+            "url":
+            "service/userPropertyAvailabilityService"
+          }
+        }
+      }
+    """
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "timezoneDAO",
+  "description": "A DAO which contains information about timezones in countries.",
+  "serve": true,
+  "serviceScript": """
+    dao = new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("timezoneDAO"))
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("timezones")
+      .setOf(foam.nanos.auth.TimeZone.getOwnClassInfo())
+      .build();
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.auth.TimeZone.DISPLAY_NAME });
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.auth.TimeZone.COUNTRY_ID });
+
+    return dao;
+  """,
+  "client": "{\"of\":\"foam.nanos.auth.TimeZone\"}"
 })

@@ -30,7 +30,7 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'order',
-      value: Number.MAX_VALUE
+      value: Number.MAX_SAFE_INTEGER
     },
     {
       class: 'Boolean',
@@ -43,6 +43,16 @@ foam.CLASS({
       class: 'Function',
       name: 'isAvailable',
       value: function() { return true; }
+    },
+    {
+      class: 'String',
+      name: 'section',
+      getter: function() { return this.section_ ; },
+      setter: function(m) { this.section_ = m; }
+    },
+    {
+      class: 'Simple',
+      name: 'section_'
     }
   ],
 
@@ -91,6 +101,10 @@ foam.CLASS({
       return foam.core.ArraySlot.create({slots: availabilitySlots}).map(arr => {
         return arr.every(b => b);
       });
+    },
+
+    function installInClass(cls) {
+      cls['SECTION_'+foam.String.constantize(this.name)] = this;
     }
   ]
 });
