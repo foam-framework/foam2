@@ -26,8 +26,8 @@ foam.CLASS({
       class: 'Boolean',
       name: 'structured',
       value: true,
-      documentation: `Determines whether the address is shown in the following structure: 
-        Street Number, Street Name, Suite Number. For an unstructured address field, 
+      documentation: `Determines whether the address is shown in the following structure:
+        Street Number, Street Name, Suite Number. For an unstructured address field,
         use address1 and/or address2.
       `,
       hidden: true
@@ -155,9 +155,7 @@ foam.CLASS({
           predicateFactory: function(e) {
             return e.OR(
               e.EQ(foam.nanos.auth.Address.STRUCTURED, false),
-              e.GTE(foam.mlang.StringLength.create({
-                arg1: foam.nanos.auth.Address.STREET_NUMBER
-              }), 1)
+              e.REG_EXP(foam.nanos.auth.Address.STREET_NUMBER, /^[0-9]{1,16}$/)
             );
           },
           errorString: 'Invalid street number.'
