@@ -27,7 +27,7 @@ foam.CLASS({
     {
       name: 'targetObject',
       class: 'FObjectProperty',
-      of: 'foam.nanos.crunch.Capable'
+      of: 'foam.nanos.crunch.lite.Capable'
     },
 
     // Properties for WizardSection interface
@@ -43,11 +43,7 @@ foam.CLASS({
       factory: function () {
         if ( ! this.of ) return null;
 
-        var ret = this.of.create({}, this);
-        if ( this.ucj === null ) return ret;
-      
-        ret = Object.assign(ret, this.ucj.data);
-        return ret;
+        return this.of.create({}, this);
       }
     },
     {
@@ -61,8 +57,8 @@ foam.CLASS({
   methods: [
     {
       name: 'save',
+      // TODO: implement capable save for client
       code: function() {
-        return this.crunchController.save(this);
       }
     }
   ]
