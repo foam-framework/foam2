@@ -88,13 +88,13 @@ public class ServerCrunchService implements CrunchService {
 
   // Return capability path for multiple prerequisites without duplicates.
   public List getMultipleCapabilityPath(
-    X x, String[] capabilities, boolean filterGrantedUCJ
+    X x, String[] capabilityIds, boolean filterGrantedUCJ
   ) {
     Set alreadyListed = new HashSet<String>();
 
     List multiplePath = new ArrayList();
 
-    for ( String capId : capabilities ) {
+    for ( String capId : capabilityIds ) {
       List crunchyPath = getCapabilityPath(x, capId, filterGrantedUCJ);
       for ( Object obj : crunchyPath ) {
         Capability cap = null;

@@ -36,18 +36,18 @@ foam.INTERFACE({
           visibility: 'default',
           args: [
             { name: 'x', type: 'X' },
-            { name: 'capabilities', type: 'String[]' }
+            { name: 'capabilityIds', type: 'String[]' }
           ],
           body: `
             List<CapablePayload> payloads = new ArrayList<>();
 
             CrunchService crunchService = (CrunchService) x.get("crunchService");
             List crunchPath = crunchService.getMultipleCapabilityPath(
-              x, capabilities, false);
+              x, capabilityIds, false);
 
             for ( Object obj : crunchPath ) {
               if ( ! (obj instanceof Capability) ) {
-                // Lists correspond to capabilities with their own prerequisite
+                // Lists correspond to capabilityIds with their own prerequisite
                 // logic, such as MinMaxCapability. Clients will need to be
                 // made aware of these capabilities separately.
                 if ( obj instanceof List ) {
@@ -98,7 +98,7 @@ foam.INTERFACE({
           javaThrows: [ 'IllegalStateException' ],
           args: [
             { name: 'x', type: 'X' },
-            { name: 'capabilities', type: 'String[]' }
+            { name: 'capabilityIds', type: 'String[]' }
           ],
           body: `
             // Marshal payloads into a hashmap
@@ -109,7 +109,7 @@ foam.INTERFACE({
 
             CrunchService crunchService = (CrunchService) x.get("crunchService");
             List crunchPath = crunchService.getMultipleCapabilityPath(
-              x, capabilities, false);
+              x, capabilityIds, false);
 
             for ( Object obj : crunchPath ) {
               if ( ! (obj instanceof Capability) ) {

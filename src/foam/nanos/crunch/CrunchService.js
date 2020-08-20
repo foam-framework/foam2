@@ -69,7 +69,7 @@ foam.INTERFACE({
           type: 'Context'
         },
         {
-          name: 'capabilities',
+          name: 'capabilityIds',
           type: 'String[]'
         },
         {
