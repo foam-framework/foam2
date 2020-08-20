@@ -73,6 +73,29 @@ foam.CLASS({
         LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(credentialsConfig.getPort()).build();
         return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
       `
+    },
+    {
+      name: 'addHttpTimeout',
+      javaType: [
+        'com.google.api.client.http.HttpRequestInitializer'
+      ],
+      args: [
+        {
+          final: true,
+          name: 'requestInitializer',
+          javaType: 'com.google.api.client.http.HttpRequestInitializer'
+        }
+      ],
+      javaCode: `
+      return new com.google.api.client.http.HttpRequestInitializer() {
+        @Override
+        public void initialize(com.google.api.client.http.HttpRequest httpRequest) throws IOException {
+          requestInitializer.initialize(httpRequest);
+          httpRequest.setConnectTimeout(60000);
+          httpRequest.setReadTimeout(3 * 60000);
+        }
+      };
+      `
     }
   ]
 });
