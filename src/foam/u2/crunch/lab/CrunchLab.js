@@ -17,6 +17,9 @@ foam.CLASS({
     ^ svg {
       height: calc(100% - 40px); /* temp */
     }
+    ^ .foam-u2-view-RichChoiceView-selection-view {
+      width: 30vw;
+    }
   `,
 
   imports: [
@@ -42,12 +45,36 @@ foam.CLASS({
     {
       name: 'rootCapability',
       class: 'Reference',
-      of: 'foam.nanos.crunch.Capability'
+      of: 'foam.nanos.crunch.Capability',
+      view: function(_, X) {
+        return {
+          class: 'foam.u2.view.RichChoiceView',
+          search: true,
+          sections: [
+            {
+              heading: 'Services',
+              dao: X.capabilityDAO
+            }
+          ]
+        };
+      }
     },
     {
       name: 'crunchUser',
       class: 'Reference',
-      of: 'foam.nanos.auth.User'
+      of: 'foam.nanos.auth.User',
+      view: function(_, X) {
+        return {
+          class: 'foam.u2.view.RichChoiceView',
+          search: true,
+          sections: [
+            {
+              heading: 'Services',
+              dao: X.userDAO
+            }
+          ]
+        };
+      },
     },
     {
       name: 'relation',
