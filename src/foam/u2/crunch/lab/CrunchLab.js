@@ -52,7 +52,7 @@ foam.CLASS({
           search: true,
           sections: [
             {
-              heading: 'Services',
+              heading: 'Capabilities',
               dao: X.capabilityDAO
             }
           ]
@@ -69,7 +69,7 @@ foam.CLASS({
           search: true,
           sections: [
             {
-              heading: 'Services',
+              heading: 'Users',
               dao: X.userDAO
             }
           ]
