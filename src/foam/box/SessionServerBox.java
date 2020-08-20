@@ -100,6 +100,7 @@ public class SessionServerBox
 
       // Make context available to thread-local XLocator
       XLocator.set(effectiveContext);
+      session.setContext(effectiveContext);
 
       session.touch();
 
