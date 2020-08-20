@@ -91,6 +91,7 @@ foam.CLASS({
 
     if ( config.getEnabled() &&
          config.getStatus() == Status.ONLINE ) {
+      // TODO: send back recieved Ping.
       msg.setObject(new Ping());
     } else {
       Throwable t = new java.net.ConnectException("Connection refused: "+Status.OFFLINE.getLabel());
@@ -188,6 +189,7 @@ foam.CLASS({
       .build();
     Ping ping = new Ping(x, hostname);
     try {
+      // TODO: need a PingReplyBox
       Message msg = x.create(Message.class);
       msg.setObject(ping);
       msg.getAttributes().put("replyBox", new MessageReplyBox(x));

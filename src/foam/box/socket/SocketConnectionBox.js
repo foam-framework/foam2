@@ -145,6 +145,7 @@ foam.CLASS({
     {
       name: 'send',
       javaCode: `
+      PM pm = PM.create(getX(), this.getClass().getSimpleName(), getHost()+":"+getPort()+":send");
       Long flushId = flushId_.incrementAndGet();
       Box replyBox = (Box) msg.getAttributes().get("replyBox");
       if ( replyBox != null ) {
@@ -180,10 +181,13 @@ foam.CLASS({
           // }
         }
       } catch ( Exception e ) {
+        pm.error(getX(), e);
         // TODO: perhaps report last exception on host port via manager.
         getLogger().error(e.getMessage(), "message", message, e);
         setValid(false);
         throw new RuntimeException(e);
+      } finally {
+        pm.log(getX());
       }
       `
     },
@@ -200,7 +204,7 @@ foam.CLASS({
         while ( getValid() ) {
           try {
             long sent = in_.readLong();
-            PM pm = PM.create(getX(), this.getOwnClassInfo(), getHost()+":"+getPort()+":network");
+            PM pm = PM.create(getX(), this.getClass().getSimpleName(), getHost()+":"+getPort()+":network");
             pm.setStartTime(new java.util.Date(sent));
             pm.log(x);
 
@@ -258,15 +262,15 @@ foam.CLASS({
           } catch ( java.net.SocketTimeoutException e ) {
             // getLogger().debug("SocketTimeoutException");
 
-            // REVIEW: The flush logic in 'send' in buggy and stalling.  This
-            // will periodically flush the 'send' output stream.
-            synchronized ( out_ ) {
-              try {
-                out_.flush();
-              } catch ( IOException ioe ) {
-                // nop
-              }
-            }
+            // // REVIEW: The flush logic in 'send' in buggy and stalling.  This
+            // // will periodically flush the 'send' output stream.
+            // synchronized ( out_ ) {
+            //   try {
+            //     out_.flush();
+            //   } catch ( IOException ioe ) {
+            //     // nop
+            //   }
+            // }
             continue;
           } catch ( java.io.IOException e ) {
             getLogger().debug(e.getMessage());

@@ -59,7 +59,6 @@ foam.CLASS({
           data: `
   public Ping(foam.core.X x, String hostname) {
     setHostname(hostname);
-    // setPm(foam.nanos.pm.PM.create(x, this.getOwnClassInfo(), hostname));
     setPm(new foam.nanos.pm.PM(this.getOwnClassInfo(), hostname));
   }
          `

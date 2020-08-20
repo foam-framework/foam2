@@ -78,10 +78,7 @@ public class SocketRouter
     Object service = getX().get(serviceKey);
     NSpec spec = (NSpec) nSpecDAO_.find(serviceKey);
 
-    foam.core.ClassInfoImpl clsInfo = new foam.core.ClassInfoImpl();
-    clsInfo.setObjClass(this.getClass());
-    clsInfo.setId(this.getClass().getSimpleName());
-    PM pm = PM.create(getX(), clsInfo, serviceKey);
+    PM pm = PM.create(getX(), this.getClass().getSimpleName(), serviceKey);
 
     X requestContext = getX()
       .put("logger", new PrefixLogger(new Object[] {
@@ -96,6 +93,7 @@ public class SocketRouter
     try {
       new SessionServerBox(requestContext, agent.getSkeletonBox(), agent.getAuthenticate()).send(msg);
     } catch (Exception e) {
+      if ( ! serviceKey.equals("static") ) pm.error(getX(), e);
       logger_.error("Error serving", serviceKey, e);
       throw e;
     } finally {

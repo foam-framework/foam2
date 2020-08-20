@@ -46,8 +46,6 @@ public class SocketServerProcessor
     socket_ = socket;
     in_ = new DataInputStream(socket.getInputStream());
     out_ = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
-    // out_ = new DataOutputStream(socket.getOutputStream());
-
     logger_ = new PrefixLogger(new Object[] {
         this.getClass().getSimpleName(),
         socket.getRemoteSocketAddress()
@@ -72,16 +70,18 @@ public class SocketServerProcessor
   }
 
   public void execute(X x) {
-    // NOTE: using SocketServer as PMs only take FObject classInfo
-    foam.core.ClassInfo pmClass = SocketServer.getOwnClassInfo();
-    String pmName = String.valueOf(socket_.getRemoteSocketAddress())+":network";
+    String pmKey = "SocketServerProcessor";
+    String pmName = String.valueOf(socket_.getRemoteSocketAddress());;
     try {
       while ( true ) {
+        PM pm = null;
         try {
           long sent = in_.readLong();
-          PM pm = PM.create(x, pmClass, pmName);
-          pm.setStartTime(new java.util.Date(sent));
-          pm.log(x);
+          PM p = PM.create(x, pmKey, pmName+":network");
+          p.setStartTime(new java.util.Date(sent));
+          p.log(x);
+
+          pm = PM.create(x, pmKey, pmName+":execute");
 
           int length = in_.readInt();
           byte[] bytes = new byte[length];
@@ -119,6 +119,7 @@ public class SocketServerProcessor
             logger_.warning("Failed to parse", "message", message);
             throw new RuntimeException("Failed to parse.");
           }
+          pm.log(x);
           socketRouter_.service(msg);
         } catch ( java.net.SocketTimeoutException e ) {
           continue;
@@ -129,6 +130,7 @@ public class SocketServerProcessor
           // TODO: Alarm
           // TODO: write error to output stream
           // REVIEW: remove this catch when understand all exceptions
+          if ( pm != null ) pm.error(x, t);
           logger_.error(t);
           break;
         }
