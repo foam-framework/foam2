@@ -145,7 +145,9 @@ foam.CLASS({
 
       ClusterCommand cmd = new ClusterCommand(x, getNSpec().getName(), DOP.PUT, obj);
       getLogger().debug("put", "client", "cmd", obj.getProperty("id"), "send");
+      PM pm = PM.create(x, this.getClass().getSimpleName(), "cmd");
       cmd = (ClusterCommand) getClientDAO().cmd_(x, cmd);
+      pm.log(x);
       getLogger().debug("put", "client", "cmd", obj.getProperty("id"), "receive", cmd.getMedusaEntryId());
 
       FObject result = cmd.getData();
