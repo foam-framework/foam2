@@ -347,6 +347,7 @@ foam.CLASS({
   css: `
     ^ {
       padding-top: 10px;
+      overflow-y: scroll;
     }
   `,
 
