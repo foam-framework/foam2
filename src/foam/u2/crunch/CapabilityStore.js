@@ -82,7 +82,7 @@ foam.CLASS({
       display: flex;
       padding-top: 70px;
       margin-left: -20px;
-      z-index: 100111;
+      z-index: 10000;
       position: relative;
       /* HOVER OFF */
       -webkit-transition: padding 2s;
