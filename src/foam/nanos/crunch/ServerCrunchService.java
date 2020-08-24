@@ -191,4 +191,32 @@ public class ServerCrunchService implements CrunchService {
     DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
     userCapabilityJunctionDAO.put(ucj);
   }
+  public void require(X x, String[] capabilityOptions) {
+    if ( capabilityOptions.length < 1 ) {
+      Logger logger = (Logger) x.get("logger");
+      logger.warning("crunchService.require() performed with empty list");
+      return;
+    }
+    boolean satisfied = false;
+    for ( String capId : capabilityOptions ) {
+      UserCapabilityJunction ucj = this.getJunction(x, capId);
+      if ( ucj != null && (
+        // TODO: use getStatus().getBroadStatus() when available
+        ucj.getStatus() == CapabilityJunctionStatus.GRANTED
+        || ucj.getStatus() == CapabilityJunctionStatus.GRACE_PERIOD
+      ) ) {
+        satisfied = true;
+        break;
+      }
+    }
+    if ( ! satisfied ) {
+      CapabilityRuntimeException ex = new CapabilityRuntimeException(
+        "Missing a required capability."
+      );
+      for ( String capId : capabilityOptions ) {
+        ex.addCapabilityId(capId);
+      }
+      throw ex;
+    }
+  }
 }

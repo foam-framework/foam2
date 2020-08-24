@@ -113,6 +113,19 @@ foam.INTERFACE({
           type: 'foam.core.FObject'
         }
       ],
+    },
+    {
+      name: 'require',
+      args: [
+        {
+          name: 'x',
+          type: 'Context',
+        },
+        {
+          name: 'capabilityId',
+          type: 'String[]'
+        },
+      ]
     }
   ],
 });
