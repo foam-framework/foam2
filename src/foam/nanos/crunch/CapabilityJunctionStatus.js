@@ -6,49 +6,65 @@
 foam.ENUM({
   package: 'foam.nanos.crunch',
   name: 'CapabilityJunctionStatus',
+
+  properties: [
+    {
+      name: 'basicStatus',
+      class: 'Enum',
+      of: 'foam.nanos.crunch.BasicCapabilityJunctionStatus'
+    }
+  ],
+
   values: [
     {
       name: 'PENDING',
       label: 'pending',
       documentation: `This is for capabilities that are waiting verification. Capability access may take upto 24hrs.`,
-      background: '#bfae32'
+      background: '#bfae32',
+      broadStatus: 'PENDING'
     },
     {
       name: 'GRANTED',
       label: 'granted',
       documentation: `This is for capabilities that have passed all checks. Capabilities in this status have their features unlocked.`,
-      background: '#32bf5e'
+      background: '#32bf5e',
+      broadStatus: 'GRANTED'
     },
     {
       name: 'EXPIRED',
       label: 'expired',
       documentation: `A capability can expire due to a number of factors. The data that was previously collected will be removed or reset and must be re-added or re-approved to gain access.`,
-      background: '#bf3232'
+      background: '#bf3232',
+      broadStatus: 'EXPIRED'
     },
     {
       name: 'ACTION_REQUIRED',
       label: 'action required',
       documentation: `A capability started and requires further action to complete.`,
-      background: '#cf6f0a'
+      background: '#cf6f0a',
+      broadStatus: 'AVAILABLE'
     },
     {
       name: 'AVAILABLE',
       label: 'available',
       documentation: `This status is used when a capability has had no previous actions and is accessible if you so choose.`,
-      background: '#604aff'
+      background: '#604aff',
+      broadStatus: 'AVAILABLE'
     },
     {
       name: 'GRACE_PERIOD',
       label: 'grace period',
       documentation: `This status is used when a capability is expired, but for your benefit we allow a certian set of days to continue accessing the features that are unlocked by this capability.`,
-      background: 'grey'
+      background: 'grey',
+      broadStatus: 'GRANTED'
     },
     {
       name: 'APPROVED',
       label: 'approved',
       documentation: `- not seen by users - Denoting a UCJ requiring review has been approved. It would need to go through the rules of the ucjDAO before 
       being set to granted.`,
-      background: '#bfae32'
+      background: '#bfae32',
+      broadStatus: 'PENDING'
     }
   ]
 });
