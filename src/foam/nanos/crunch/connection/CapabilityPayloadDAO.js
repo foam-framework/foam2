@@ -31,7 +31,14 @@ foam.CLASS({
   ],
 
   documentation: `
-    CapabilityPayload details the data objects needed and grant path for a specific capability
+    CapabilityPayloadDAO is not able to store anything. 
+    
+    For find and select, it defaults to looking up the respective
+    query on the localCapabilityDAO, and instead returns CapabilityPayload objects based on those queries.
+
+    For put, it expects a CapabilityPayload back and then updates UCJs based on fetching the grant path based on 
+    the CapabilityPayload.id and then cross referencing the grant path with CapabilityPayload.capabilityDataObjects
+    to fetch the filled out data.
   `,
 
   axioms: [
@@ -140,7 +147,6 @@ foam.CLASS({
           capabilityPayloads.add(capabilityPayload);
         }
 
-        // TODO: need to convert capabilityPayloads to an ArraySink
         ArraySink capabilityPayloadsToArraySink = new ArraySink.Builder(x)
           .setArray(new ArrayList(capabilityPayloads))
           .build();
@@ -159,35 +165,7 @@ foam.CLASS({
 
         Map<String,FObject> capabilityDataObjects = (HashMap<String,FObject>) receivingCapPayload.getCapabilityDataObjects();
 
-        // TODO: Don't think this block is needed anymore
-        // // First pass: validate types provided
-        // int index = 0;
-        // for ( Object data : capabilityDataObjects ) {
-        //   // Skip capability where 'of' property is empty
-        //   while ( index < capabilityDataObjects.length && capabilityDataObjects[index] != null ) {
-        //     index++;
-        //   }
-
-        //   if ( index >= capabilityDataObjects.length ) {
-        //     throw new RuntimeException("Unexpected data provided: " + data);
-        //   }
-
-        //   FObject dataObj = (FObject) data;
-        //   ClassInfo clsInfo = dataObj.getClassInfo();
-        //   if ( !SafetyUtil.equals(clsInfo.getId(), capabilityDataObjects[index]) ) {
-        //     throw new RuntimeException(String.format(
-        //       "Recieved incorrect type at index %d: "
-        //       + "found '%s', but expected '%s'.", 
-        //       index, clsInfo.getId(), capabilityDataObjects[index]
-        //     ));
-        //   }
-
-        //   // increment the index
-        //   index++;
-        // }
-
-        // Second pass: store UCJs
-
+        // storing the ucjs by looking up the capabilities required from the grantPath and then referencing them in capabilityDataObjects
         for ( Object item : grantPath ){
           if ( item instanceof Capability ) {
             Capability cap = (Capability) item;

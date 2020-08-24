@@ -10,7 +10,7 @@ foam.CLASS({
   documentation: `
     TODO: Update
     CapabilityPayload is created with an id for a specific requested capability and its
-    associated capabilities mapped to required data pbjects in the capability 
+    associated capabilities mapped to required data objects in the specified in its grant path 
   `,
 
   javaImports: [
