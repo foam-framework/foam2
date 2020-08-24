@@ -84,7 +84,6 @@ foam.CLASS({
           GTE(MedusaEntry.INDEX, cmd.getDetails().getMinIndex())
         )
         .orderBy(MedusaEntry.INDEX)
-        // .select(new ReplayBatchSink(x, clientDAO, cmd.getDetails()));
         .select(new RetryClientSinkDAO(x, clientDAO));
         return cmd;
       }

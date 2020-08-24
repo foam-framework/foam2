@@ -109,16 +109,16 @@ foam.CLASS({
     {
       documentation: `Record which nodes contributed to consensus of a particular hash. Until consensus is reached, list is the hash with most nodes.`,
       name: 'consensusNodes',
-      class: 'Array',
+      class: 'StringArray',
       visibility: 'RO',
       factory: function() { return []; },
       javaFactory: 'return new String[0];',
       storageTransient: true,
       clusterTransient: true,
       tableWidth: 150,
-      // tableCellFormatter: function(value) {
-      //   this.add(value && Object.values(value).join());
-      // }
+      tableCellFormatter: function(value) {
+        this.add(value && value.join());
+      }
     },
     {
       documentation: `Track Entries and Nodes - as we need consensus based on unique Entry.  If a node startup, stopped, started, the mediators would get the entry twice and if not distiguishing would assume two same hash copies, for example.`,

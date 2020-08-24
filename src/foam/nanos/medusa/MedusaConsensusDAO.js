@@ -119,7 +119,7 @@ foam.CLASS({
         MedusaEntry existing = (MedusaEntry) getDelegate().find_(x, id);
         if ( existing != null &&
              existing.getPromoted() ) {
-         getLogger().debug("put", getIndex(), entry.toSummary(), entry.getNode(), "discarding");
+         // getLogger().debug("put", getIndex(), entry.toSummary(), entry.getNode(), "discarding");
          return existing;
         }
 
@@ -127,7 +127,7 @@ foam.CLASS({
           existing = (MedusaEntry) getDelegate().find_(x, id);
           if ( existing != null ) {
             if ( existing.getPromoted() ) {
-              getLogger().debug("put", getIndex(), entry.toSummary(), entry.getNode(), "discarding", "in-lock");
+              // getLogger().debug("put", getIndex(), entry.toSummary(), entry.getNode(), "discarding", "in-lock");
               return entry;
             }
           } else {
@@ -137,8 +137,8 @@ foam.CLASS({
           // NOTE: all this business with the nested Maps to avoid
           // a mulitipart id (index,hash) on MedusaEntry, as presently
           // it is a huge performance impact.
-          Map<Object, Map> hashes = existing.getConsensusHashes();
-          Map nodes = hashes.get(entry.getNode());
+          Map<String, Map> hashes = existing.getConsensusHashes();
+          Map<String, Object> nodes = hashes.get(entry.getHash());
           if ( nodes == null ) {
             nodes = new HashMap<String, Object>();
             hashes.put(entry.getHash(), nodes);
@@ -147,16 +147,22 @@ foam.CLASS({
             // getLogger().debug("put", "nodes", "put", entry.toSummary(), entry.getNode());
             nodes.put(entry.getNode(), entry);
           }
-          hashes.put(entry.getHash(), nodes);
-          existing.setConsensusHashes(hashes);
-          existing = (MedusaEntry) getDelegate().put_(x, existing);
           ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
           if ( nodes.size() >= support.getNodeQuorum() &&
                entry.getIndex() == getIndex() + 1 ) {
             entry.setConsensusCount(nodes.size());
-            entry.setConsensusNodes(nodes.entrySet().toArray());
+            entry.setConsensusNodes(nodes.keySet().toArray(new String[0]));
             MedusaEntry.CONSENSUS_HASHES.clear(entry);
             promote(x, entry);
+          } else {
+            hashes.put(entry.getHash(), nodes);
+            existing.setConsensusHashes(hashes);
+            if ( nodes.size() > existing.getConsensusCount() ) {
+              existing.setConsensusCount(nodes.size());
+              existing.setConsensusNodes(nodes.keySet().toArray(new String[0]));
+            }
+            existing = (MedusaEntry) getDelegate().put_(x, existing);
+            // getLogger().debug("put", getIndex(), entry.toSummary(), "existing", Arrays.toString(existing.getConsensusNodes()));
           }
           return entry;
         }
@@ -182,7 +188,7 @@ foam.CLASS({
       javaCode: `
       PM pm = PM.create(x, this.getOwnClassInfo(), "promote");
       ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
-//      getLogger().debug("promote", entry.getIndex(), getIndex(), replaying.getReplayIndex(), replaying.getReplaying());
+      // getLogger().debug("promote", entry.getIndex(), getIndex(), replaying.getReplayIndex(), replaying.getReplaying());
       try {
 
         DaggerService dagger = (DaggerService) x.get("daggerService");
@@ -261,26 +267,25 @@ foam.CLASS({
           MedusaEntry next = (MedusaEntry) getDelegate().find_(x, nextIndex);
           if ( next != null ) {
             Map<Object, Map> hashes = next.getConsensusHashes();
-            for ( Map nodes : hashes.values() ) {
+            for ( Map<String, MedusaEntry> nodes : hashes.values() ) {
               if ( nodes.size() >= support.getNodeQuorum() ) {
                 if ( entry == null ) {
-                  entry = next;
+                  for ( MedusaEntry e : nodes.values() ) {
+                    entry = e;
+                    break;
+                  }
                   entry.setConsensusCount(nodes.size());
-                  entry.setConsensusNodes(nodes.entrySet().toArray());
+                  entry.setConsensusNodes(nodes.keySet().toArray(new String[0]));
                   MedusaEntry.CONSENSUS_HASHES.clear(entry);
                   promote(x, entry);
                 } else {
                   getLogger().error("promoter", next, "multiple found with consensus", next.toSummary(), next.getConsensusCount(), support.getNodeQuorum());
                   // TODO: Halt system
                 }
-              } else if ( nodes.size() > next.getConsensusCount() ) {
-                next.setConsensusCount(nodes.size());
-                next.setConsensusNodes(nodes.entrySet().toArray());
               }
             }
             if ( entry == null ) {
               getLogger().warning("promoter", next, "no consensus", next.toSummary(), next.getConsensusCount(), support.getNodeQuorum());
-
             }
           }
           if ( entry == null ) {

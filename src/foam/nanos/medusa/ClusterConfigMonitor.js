@@ -73,17 +73,6 @@ foam.CLASS({
       class: 'Int',
       value: 3000
     },
-    // {
-    //   name: 'isRunning',
-    //   class: 'Boolean',
-    //   value: false,
-    //   visibility: 'HIDDEN'
-    // },
-    // {
-    //   name: 'timer',
-    //   class: 'Object',
-    //   visibility: 'HIDDEN'
-    // },
     {
       name: 'logger',
       class: 'FObjectProperty',

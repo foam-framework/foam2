@@ -80,6 +80,7 @@ foam.CLASS({
         if ( config.getStatus() != Status.ONLINE) {
           config.setStatus(Status.ONLINE);
           config = (ClusterConfig) getDao().put_(getX(), config).fclone();
+          // TOOD: clear Alarm
         }
       } catch (NullPointerException t) {
         getLogger().error(t);

@@ -133,7 +133,7 @@ foam.CLASS({
         try {
           ClusterConfig serverConfig = support.getNextServerConfig(x);
           DAO dao = support.getClientDAO(x, getServiceName(), getConfig(), serverConfig);
-          getLogger().debug("submit", "request", "to", serverConfig.getId(), "dao", dao.getClass().getSimpleName(), dop.getLabel(), obj.getClass().getSimpleName());
+          // getLogger().debug("submit", "request", "to", serverConfig.getId(), "dao", dao.getClass().getSimpleName(), dop.getLabel(), obj.getClass().getSimpleName());
 
           Object result = null;
           if ( DOP.PUT == dop ) {
@@ -143,12 +143,12 @@ foam.CLASS({
           } else if ( DOP.CMD == dop ) {
             result = dao.cmd_(x, cmd);
             if ( result != null ) {
-              getLogger().debug("submit", "response", "from", serverConfig.getId(), "dao", dao.getClass().getSimpleName(), dop.getLabel(), result.getClass().getSimpleName());
+              // getLogger().debug("submit", "response", "from", serverConfig.getId(), "dao", dao.getClass().getSimpleName(), dop.getLabel(), result.getClass().getSimpleName());
               return result;
             }
           }
           if ( obj instanceof ClusterCommand ) {
-            getLogger().debug("submit", "response", "from", serverConfig.getId(), "dao", dao.getClass().getSimpleName(), dop.getLabel(), (result != null ? result.getClass().getSimpleName() : "null"));
+            // getLogger().debug("submit", "response", "from", serverConfig.getId(), "dao", dao.getClass().getSimpleName(), dop.getLabel(), (result != null ? result.getClass().getSimpleName() : "null"));
             cmd.setData((FObject) result);
             return cmd;
           }

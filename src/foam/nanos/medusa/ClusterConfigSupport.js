@@ -84,7 +84,8 @@ configuration for contacting the primary node.`,
     {
       name: 'isPrimary',
       class: 'Boolean',
-      value: true, //false,
+      value: false,
+      // value: true,
       visibility: 'RO'
     },
     {
@@ -186,13 +187,15 @@ configuration for contacting the primary node.`,
       documentation: 'Enabled and Online nodes in each bucket to achieve quorum',
       name: 'nodeQuorum',
       class: 'Int',
-      value: 1 //2
+      value: 2
+      // value: 1
     },
     {
       documentation: 'Additional node redundancy in each bucket.',
       name: 'nodeRedundancy',
       class: 'Int',
-      value: 0 //1
+      value: 1
+      // value: 0
     },
     {
       name: 'nodeGroups',

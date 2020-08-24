@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'ClusterConfigStatusDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  documentation: `Monitor the ClusterConfig status and call election when quorum changes`,
+  documentation: `Monitor the ClusterConfig status and on mediator quorum change, call election, and on node quorum change, re-bucket nodes.`,
 
   javaImports: [
     'foam.dao.ArraySink',

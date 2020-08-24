@@ -27,9 +27,6 @@ foam.CLASS({
       name: 'name',
       class: 'String',
       javaFactory: `
-      // if ( getDelegate() != null && getDelegate.getOf() != null) {
-      //   return getDelegate().getOf().getId();
-      // }
       return this.getClass().getSimpleName();
       `
     },

@@ -117,8 +117,8 @@ foam.CLASS({
         entry = (MedusaEntry) submit(x, entry, DOP.PUT);
 
         // REVIEW: broadcasted, can now copy and delete data put to save space
-        entry = (MedusaEntry) entry.shallowClone();
-        entry.setData(null);
+        // entry = (MedusaEntry) entry.shallowClone();
+        // entry.setData(null);
         // entry.__frozen__ = true;
         entry = (MedusaEntry) getDelegate().put_(x, entry);
       }
