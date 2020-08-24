@@ -99,7 +99,7 @@ p({
     builder = new BenchmarkRunner.Builder(x)
       .setInvocationCount(1000)
       .setThreadCount(2)
-      .setRunPerThread(false)
+      .setRunPerThread(true)
       .setBenchmark(b);
     runner = builder.build();
     runner.execute(x);
