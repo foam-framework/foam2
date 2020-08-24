@@ -201,12 +201,12 @@ foam.CLASS({
               return pm;
             }
 
-            public static PM create(X x, String key, String... args) {
+            public static PM create(X x, Object key, Object... args) {
               PM pm = (PM) x.get("PM");
 
               if ( pm == null ) return new PM(key, args);
 
-              pm.setKey(key);
+              pm.setKey(key.toString());
               pm.setName(combine((Object[]) args));
               pm.init_();
 
