@@ -51,7 +51,7 @@ public class Boot {
       datadir = System.getProperty("JOURNAL_HOME");
     }
 
-    root_ = root_.put(foam.nanos.fs.Storage.class,
+    root_.put(foam.nanos.fs.Storage.class,
         new foam.nanos.fs.FileSystemStorage(datadir));
 
     // Used for all the services that will be required when Booting
@@ -69,7 +69,7 @@ public class Boot {
       NSpecFactory factory = new NSpecFactory((ProxyX) root_, sp);
       factories_.put(sp.getName(), factory);
       logger.info("Registering:", sp.getName());
-      root_ = root_.putFactory(sp.getName(), factory);
+      root_.putFactory(sp.getName(), factory);
     }
 
     serviceDAO_.listen(new AbstractSink() {
