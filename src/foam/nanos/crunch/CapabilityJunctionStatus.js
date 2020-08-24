@@ -29,7 +29,7 @@ foam.ENUM({
       name: 'ACTION_REQUIRED',
       label: 'action required',
       documentation: `A capability started and requires further action to complete.`,
-      background: 'pink'
+      background: '#cf6f0a'
     },
     {
       name: 'AVAILABLE',
