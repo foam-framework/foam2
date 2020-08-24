@@ -84,7 +84,7 @@ configuration for contacting the primary node.`,
     {
       name: 'isPrimary',
       class: 'Boolean',
-      value: false,
+      value: true, //false,
       visibility: 'RO'
     },
     {
@@ -186,13 +186,13 @@ configuration for contacting the primary node.`,
       documentation: 'Enabled and Online nodes in each bucket to achieve quorum',
       name: 'nodeQuorum',
       class: 'Int',
-      value: 2
+      value: 1 //2
     },
     {
       documentation: 'Additional node redundancy in each bucket.',
       name: 'nodeRedundancy',
       class: 'Int',
-      value: 1
+      value: 0 //1
     },
     {
       name: 'nodeGroups',
@@ -299,6 +299,7 @@ configuration for contacting the primary node.`,
       documentation: 'A single instance is using the medusa journal. No other clustering features are used.',
       name: 'standAlone',
       class: 'Boolean',
+//      value: true,
       value: false,
       visibility: 'RO'
     },
@@ -326,8 +327,6 @@ configuration for contacting the primary node.`,
       ClusterConfig myConfig = (ClusterConfig) dao.find(getConfigId()).fclone();
       myConfig.setReplayingInfo(replaying);
       dao.put(myConfig);
-
-      getLogger().info("start", "nodeQuorum", getNodeQuorum());
       `
     },
     {

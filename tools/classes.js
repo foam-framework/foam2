@@ -414,6 +414,12 @@ var classes = [
   'foam.nanos.medusa.RetryClientSinkDAO',
   'foam.nanos.medusa.Status',
   'foam.nanos.medusa.MedusaMessage',
+  'foam.nanos.medusa.benchmark.ClusterPingBenchmark',
+  'foam.nanos.medusa.benchmark.DaggerLinkBenchmark',
+  'foam.nanos.medusa.benchmark.DaggerVerifyBenchmark',
+  'foam.nanos.medusa.benchmark.MedusaBenchmark',
+  'foam.nanos.benchmark.UUIDBenchmark',
+
   'foam.box.BackoffBox',
 
   'foam.comics.v2.EnabledActionsAuth',

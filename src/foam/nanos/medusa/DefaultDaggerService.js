@@ -160,7 +160,7 @@ foam.CLASS({
       entry.setHash1(links.getLink1().getHash());
       entry.setIndex2(links.getLink2().getIndex());
       entry.setHash2(links.getLink2().getHash());
-      // getLogger().debug("link", entry.getIndex(), entry.getIndex1(), entry.getHash1(), entry.getIndex2(), entry.getHash2());
+      getLogger().debug("link", entry.getIndex(), entry.getIndex1(), entry.getHash1(), entry.getIndex2(), entry.getHash2());
 
       return entry;
       `

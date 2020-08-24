@@ -18,8 +18,7 @@ foam.CLASS({
   documentation: `Ledger entry.`,
 
   ids: [
-    'index',
-    'hash'
+    'index'
   ],
 
   tableColumns: [
@@ -99,6 +98,7 @@ foam.CLASS({
       visibility: 'RO'
     },
     {
+      documentation: `Count of nodes contributing to a particular hash.  Until consensus is reached, count of the hash with the most nodes.`,
       name: 'consensusCount',
       class: 'Int',
       visibility: 'RO',
@@ -107,18 +107,27 @@ foam.CLASS({
       tableWidth: 150
     },
     {
-      documentation: `Track Entries and Nodes - as we need consensus based on unique Entry.  If a node startup, stopped, started, the mediators would get the entry twice and if not distiguishing would assume two same hash copies, for example.`,
+      documentation: `Record which nodes contributed to consensus of a particular hash. Until consensus is reached, list is the hash with most nodes.`,
       name: 'consensusNodes',
-      class: 'Map',
+      class: 'Array',
       visibility: 'RO',
-      factory: function() { return {}; },
-      javaFactory: 'return new java.util.HashMap();',
+      factory: function() { return []; },
+      javaFactory: 'return new String[0];',
       storageTransient: true,
       clusterTransient: true,
       tableWidth: 150,
-      tableCellFormatter: function(value) {
-        this.add(value && Object.values(value).join());
-      }
+      // tableCellFormatter: function(value) {
+      //   this.add(value && Object.values(value).join());
+      // }
+    },
+    {
+      documentation: `Track Entries and Nodes - as we need consensus based on unique Entry.  If a node startup, stopped, started, the mediators would get the entry twice and if not distiguishing would assume two same hash copies, for example.`,
+      name: 'consensusHashes',
+      class: 'Map',
+      visibility: 'HIDDEN',
+      factory: function() { return {}; },
+      javaFactory: 'return new java.util.HashMap();',
+      transient: true,
     },
     {
       name: 'verified',

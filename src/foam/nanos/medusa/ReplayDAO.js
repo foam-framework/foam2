@@ -59,11 +59,9 @@ foam.CLASS({
           .build();
 
         getDelegate()
-//          .where(GTE(MedusaEntry.INDEX, details.getMinIndex()))
           .select(seq);
 
-        if ( count != null &&
-             ((Long) count.getValue()) > 0 ) {
+        if ( ((Long) count.getValue()) > 0 ) {
           details.setMinIndex((Long)min.getValue());
           details.setMaxIndex((Long)max.getValue());
           details.setCount((Long) count.getValue());
@@ -79,13 +77,8 @@ foam.CLASS({
         ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
         ClusterConfig fromConfig = support.getConfig(x, cmd.getDetails().getResponder());
         ClusterConfig toConfig = support.getConfig(x, cmd.getDetails().getRequester());
-        DAO clientDAO = null;
-        if ( support.getStandAlone() ) {
-          clientDAO = (DAO) x.get("medusaMediatorDAO");
-        }
-        if ( clientDAO == null ) {
-          clientDAO = support.getBroadcastClientDAO(x, cmd.getServiceName(), fromConfig, toConfig);
-        }
+        DAO clientDAO = support.getBroadcastClientDAO(x, cmd.getServiceName(), fromConfig, toConfig);
+
         // NOTE: toIndex not yet used.
         getDelegate().where(
           GTE(MedusaEntry.INDEX, cmd.getDetails().getMinIndex())

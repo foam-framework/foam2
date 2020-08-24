@@ -40,15 +40,10 @@ foam.CLASS({
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
       getLogger().debug("put", entry.getIndex());
-      Count count = (Count) getDelegate().where(
-        EQ(MedusaEntry.INDEX, entry.getIndex())
-      ).select(COUNT());
-      if ( count.getValue() > 0 ) {
+      if ( getDelegate().find_(x, entry.getId()) != null ) {
         getLogger().error("put", "duplicate index", entry);
         throw new DaggerException("Duplicate index: "+entry.getIndex());
       }
-      // ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      // entry.setNode(support.getConfigId());
       return getDelegate().put_(x, entry);
       `
     }

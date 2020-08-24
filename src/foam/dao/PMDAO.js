@@ -30,52 +30,63 @@ foam.CLASS({
       value: true
     },
     {
+      name: 'name',
+      class: 'String',
+      javaFactory: `
+      foam.nanos.boot.NSpec nspec = getNSpec();
+      if ( nspec != null ) {
+        return nspec.getName();
+      }
+      return "NA";
+      `
+    },
+    {
       name: 'nSpec',
       class: 'FObjectProperty',
       type: 'foam.nanos.boot.NSpec'
     },
     {
-      name: 'classType',
-      class: 'Class',
-      javaFactory: `
+     name: 'classType',
+     class: 'Class',
+     javaFactory: `
         return PMDAO.getOwnClassInfo();
       `,
-      hidden: true
-    },
+     hidden: true
+     },
     {
       name: 'putName',
       class: 'String',
-      javaFactory: 'return getNSpec().getName() + ":put";',
+      javaFactory: 'return getName() + ":put";',
       visibility: 'RO'
     },
     {
       name: 'findName',
       class: 'String',
-      javaFactory: 'return getNSpec().getName() + ":find";',
+      javaFactory: 'return getName() + ":find";',
       visibility: 'RO'
     },
     {
       name: 'selectName',
       class: 'String',
-      javaFactory: 'return getNSpec().getName() + ":select";',
+      javaFactory: 'return getName() + ":select";',
       visibility: 'RO'
     },
     {
       name: 'removeName',
       class: 'String',
-      javaFactory: 'return getNSpec().getName() + ":remove";',
+      javaFactory: 'return getName() + ":remove";',
       visibility: 'RO'
     },
     {
       name: 'removeAllName',
       class: 'String',
-      javaFactory: 'return getNSpec().getName() + ":removeAll";',
+      javaFactory: 'return getName() + ":removeAll";',
       visibility: 'RO'
     },
     {
       name: 'cmdName',
       class: 'String',
-      javaFactory: 'return getNSpec().getName() + ":cmd";',
+      javaFactory: 'return getName() + ":cmd";',
       visibility: 'RO'
     }
   ],

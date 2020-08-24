@@ -104,6 +104,7 @@ foam.CLASS({
       name: 'start',
       javaCode: `
       getLogger().info("start");
+      getLogger().info("start", "pingTimeout", getPingTimeout());
       ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
       if ( timer_ != null ) {
         getLogger().warning("multiple instances", new Exception());
@@ -128,8 +129,9 @@ foam.CLASS({
       if ( ! getEnabled() ) {
         return;
       }
+      getLogger().info("execute");
       synchronized ( timer_ ) {
-        if ( isRunning_ ) {
+       if ( isRunning_ ) {
           getLogger().debug("already running");
           return;
         }
@@ -198,6 +200,7 @@ foam.CLASS({
           // no need for ping timer in standalone mode.
           timer_.cancel();
           timer_.purge();
+          getLogger().debug("timer", "cancel");
           return;
         }
 
@@ -215,6 +218,7 @@ foam.CLASS({
         synchronized ( timer_ ) {
           isRunning_ = false;
         }
+        getLogger().debug("execute", "exit");
       }
 
      // See ConsensusDAO for Mediators - they transition to ONLINE when replay complete.

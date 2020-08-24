@@ -104,6 +104,7 @@ foam.CLASS({
       3. If not mediator, proxy to the next 'server', put result.`,
       name: 'put_',
       javaCode: `
+      getLogger().debug("put");
       if ( obj instanceof Clusterable &&
            ! ((Clusterable) obj).getClusterable() ) {
         getLogger().debug("put", "not clusterable", obj.getProperty("id"));
@@ -133,7 +134,7 @@ foam.CLASS({
           MedusaEntry entry = (MedusaEntry) submit(x, data, DOP.PUT);
           if ( cmd != null ) {
             getLogger().debug("put", "primary", obj.getProperty("id"), "setMedusaEntryId", entry.toSummary(), entry.getId().toString());
-            cmd.setMedusaEntryId(entry.getId());
+            cmd.setMedusaEntryId((Long) entry.getId());
             cmd.setData(nu);
           }
         }
@@ -224,10 +225,10 @@ foam.CLASS({
         cmd = (ClusterCommand) getClientDAO().cmd_(x, obj);
 
         if ( config.getType() == MedusaType.MEDIATOR ) {
-          MedusaEntryId id = cmd.getMedusaEntryId();
+          Long id = cmd.getMedusaEntryId();
           if ( id != null ) {
             MedusaRegistry registry = (MedusaRegistry) x.get("medusaRegistry");
-            registry.wait(x, id.getIndex());
+            registry.wait(x, id);
           } else {
             getLogger().debug("cmd", "ClusterCommand", "medusaEntry", "null");
           }
@@ -295,7 +296,8 @@ foam.CLASS({
       ],
       type: 'FObject',
       javaCode: `
-      PM pm = PM.create(x, this.getOwnClassInfo(), "submit");
+      // PM pm = PM.create(x, this.getOwnClassInfo(), "submit");
+      PM pm = new PM(this.getOwnClassInfo(), "submit");
       MedusaEntry entry = x.create(MedusaEntry.class);
       try {
         DaggerService dagger = (DaggerService) x.get("daggerService");
@@ -304,10 +306,12 @@ foam.CLASS({
         entry.setDop(dop);
         entry.setData(data);
 
+        getLogger().debug("submit", entry.getId());
+
         MedusaRegistry registry = (MedusaRegistry) x.get("medusaRegistry");
-        registry.register(x, entry.getIndex());
+        registry.register(x, (Long) entry.getId());
         entry = (MedusaEntry) getMedusaEntryDAO().put_(x, entry);
-        registry.wait(x, entry.getIndex());
+        registry.wait(x, (Long) entry.getId());
         return entry;
       } catch (Throwable t) {
         getLogger().error("submit", entry.toSummary(), t.getMessage(), t);

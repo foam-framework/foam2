@@ -59,8 +59,7 @@ foam.CLASS({
     },
     {
       name: 'medusaEntryId',
-      class: 'FObjectProperty',
-      of: 'foam.nanos.medusa.MedusaEntryId'
+      class: 'Long'
     }
   ],
 

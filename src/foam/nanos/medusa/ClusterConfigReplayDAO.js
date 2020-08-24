@@ -13,6 +13,7 @@ foam.CLASS({
 
   javaImports: [
     'foam.dao.DAO',
+    'foam.dao.Sink',
     'static foam.mlang.MLang.AND',
     'static foam.mlang.MLang.EQ',
     'static foam.mlang.MLang.GTE',
@@ -20,8 +21,10 @@ foam.CLASS({
     'static foam.mlang.MLang.MAX',
     'static foam.mlang.MLang.MIN',
     'static foam.mlang.MLang.OR',
+    'foam.mlang.sink.Count',
     'foam.mlang.sink.Max',
     'foam.mlang.sink.Min',
+    'foam.mlang.sink.Sequence',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger'
   ],
@@ -57,10 +60,47 @@ foam.CLASS({
 
         ClusterConfig config = nu;
         ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+        getLogger().info("support,standalone", support.getStandAlone());
         ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
+
         // If a Node comming online, begin replay from it.
-        if ( support.getStandAlone() ||
-            ( ( myConfig.getType() == MedusaType.MEDIATOR ||
+        if ( support.getStandAlone() &&
+             nu.getType() == MedusaType.NODE ) {
+          // see ClusterConfigMonitor
+          getLogger().debug("standalone");
+          ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
+          replaying.setStartTime(new java.util.Date());
+
+          DAO dao = (DAO) x.get("medusaNodeDAO");
+          Min min = (Min) MIN(MedusaEntry.INDEX);
+          Max max = (Max) MAX(MedusaEntry.INDEX);
+          Count count = new Count();
+          Sequence seq = new Sequence.Builder(x)
+            .setArgs(new Sink[] {count, min, max})
+            .build();
+          dao.select(seq);
+          getLogger().debug("put", "standalone", "count", count.getValue(), "max", max.getValue());
+          if ( ((Long) count.getValue()) > 0 ) {
+            replaying.setReplayIndex((Long) max.getValue());
+
+            DaggerService dagger = (DaggerService) x.get("daggerService");
+            if ( ((Long) max.getValue()) > dagger.getGlobalIndex(x)) {
+              dagger.setGlobalIndex(x, ((Long) max.getValue()));
+            }
+
+            // select from internal and put to consensus - medusaMediatorDAO
+            Sink sink = new RetryClientSinkDAO.Builder(x)
+              .setName("medusaNodeDAO")
+              .setDelegate((DAO) x.get("medusaMediatorDAO"))
+              .setMaxRetryAttempts(0)
+              .setMaxRetryDelay(0)
+              .build();
+            dao.select(sink);
+          } else {
+            replaying.setReplaying(false);
+            replaying.setEndTime(new java.util.Date());
+          }
+        } else if ( ( myConfig.getType() == MedusaType.MEDIATOR ||
                myConfig.getType() == MedusaType.NERF ) &&
                ( ( myConfig.getZone() == 0L &&
                    config.getType() == MedusaType.NODE &&
@@ -68,23 +108,20 @@ foam.CLASS({
                  ( config.getType() == MedusaType.MEDIATOR &&
                    config.getZone() == myConfig.getZone() - 1L ) ) &&
                config.getRegion() == myConfig.getRegion() &&
-               config.getRealm() == myConfig.getRealm() ) ) {
+               config.getRealm() == myConfig.getRealm() ) {
 
-          // in standalone configuration, node is local
-          DAO clientDAO = (DAO) x.get("medusaNodeDAO");
-          if ( clientDAO == null ) {
-            String serviceName = "medusaNodeDAO";
-            if ( config.getType() == MedusaType.MEDIATOR ) {
-              serviceName = "medusaEntryDAO";
-            }
-            clientDAO = support.getClientDAO(x, serviceName, myConfig, config);
-            clientDAO = new RetryClientSinkDAO.Builder(x)
-              .setName(serviceName)
-              .setDelegate(clientDAO)
-              .setMaxRetryAttempts(support.getMaxRetryAttempts())
-              .setMaxRetryDelay(support.getMaxRetryDelay())
-              .build();
+          String serviceName = "medusaNodeDAO";
+          if ( config.getType() == MedusaType.MEDIATOR ) {
+            serviceName = "medusaEntryDAO";
           }
+          DAO clientDAO = support.getClientDAO(x, serviceName, myConfig, config);
+          clientDAO = new RetryClientSinkDAO.Builder(x)
+            .setName(serviceName)
+            .setDelegate(clientDAO)
+            .setMaxRetryAttempts(support.getMaxRetryAttempts())
+            .setMaxRetryDelay(support.getMaxRetryDelay())
+            .build();
+
           // NOTE: using internalMedusaDAO else we'll block on ReplayingDAO.
           DAO dao = (DAO) x.get("internalMedusaDAO");
           dao = dao.where(EQ(MedusaEntry.PROMOTED, false));

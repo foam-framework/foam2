@@ -113,8 +113,11 @@ foam.CLASS({
       javaCode: `
     getLogger().debug("start");
     ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
-
-    ((Agency) getX().get(support.getThreadPoolName())).submit(getX(), this, "election");
+    if ( support.getStandAlone() ) {
+      setState(ElectoralServiceState.IN_SESSION);
+    } else {
+      ((Agency) getX().get(support.getThreadPoolName())).submit(getX(), this, "election");
+    }
      `
     },
     {
@@ -183,13 +186,6 @@ foam.CLASS({
       javaCode: `
       getLogger().debug("dissolve", getState().getLabel());
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      if ( support.getStandAlone() ) {
-        setState(ElectoralServiceState.IN_SESSION);
-        setElectionTime(0L);
-        setCurrentSeq(0L);
-        getLogger().debug("dissolve", getState().getLabel(), "standalone");
-        return;
-      }
 
       if ( ! support.hasQuorum(x) ) {
         setState(ElectoralServiceState.ADJOURNED);

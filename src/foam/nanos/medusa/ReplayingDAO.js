@@ -96,7 +96,7 @@ foam.CLASS({
           ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
           replaying.setReplaying(false);
           replaying.setEndTime(new java.util.Date());
-          getLogger().info("replayComplete", "duration", (replaying.getEndTime().getTime() - replaying.getStartTime().getTime())/ 1000, "s");
+          getLogger().info("replayComplete", replaying.getReplayIndex(), "duration", (replaying.getEndTime().getTime() - replaying.getStartTime().getTime())/ 1000, "s");
           ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
 
           DAO dao = (DAO) x.get("localClusterConfigDAO");

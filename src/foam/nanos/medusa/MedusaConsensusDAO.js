@@ -37,6 +37,7 @@ foam.CLASS({
     'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
     'foam.util.SafetyUtil',
+    'java.util.Arrays',
     'java.util.ArrayList',
     'java.util.concurrent.atomic.AtomicInteger',
     'java.util.HashMap',
@@ -108,7 +109,7 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-      PM pm = PM.create(x, this.getOwnClassInfo(), "put");
+      PM pm = PM.create(x, this.getClass().getSimpleName(), "put");
       MedusaEntry entry = (MedusaEntry) obj;
       Object id = entry.getProperty("id");
       ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
@@ -133,22 +134,28 @@ foam.CLASS({
             existing = entry;
           }
 
-          Map<Object, List> map = existing.getConsensusNodes();
-          List nodes = map.get(id.toString());
+          // NOTE: all this business with the nested Maps to avoid
+          // a mulitipart id (index,hash) on MedusaEntry, as presently
+          // it is a huge performance impact.
+          Map<Object, Map> hashes = existing.getConsensusHashes();
+          Map nodes = hashes.get(entry.getNode());
           if ( nodes == null ) {
-            nodes = new ArrayList();
+            nodes = new HashMap<String, Object>();
+            hashes.put(entry.getHash(), nodes);
           }
-          if ( ! nodes.contains(entry.getNode()) ) {
-            // getLogger().debug("put", "nodes", "add", entry.toSummary(), entry.getNode());
-            nodes.add(entry.getNode());
+          if ( nodes.get(entry.getNode()) == null ) {
+            // getLogger().debug("put", "nodes", "put", entry.toSummary(), entry.getNode());
+            nodes.put(entry.getNode(), entry);
           }
-          map.put(id.toString(), nodes);
-          existing.setConsensusNodes(map);
-          existing.setConsensusCount(nodes.size());
-          entry = (MedusaEntry) getDelegate().put_(x, existing);
+          hashes.put(entry.getHash(), nodes);
+          existing.setConsensusHashes(hashes);
+          existing = (MedusaEntry) getDelegate().put_(x, existing);
           ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-          if ( entry.getConsensusCount() >= support.getNodeQuorum() &&
+          if ( nodes.size() >= support.getNodeQuorum() &&
                entry.getIndex() == getIndex() + 1 ) {
+            entry.setConsensusCount(nodes.size());
+            entry.setConsensusNodes(nodes.entrySet().toArray());
+            MedusaEntry.CONSENSUS_HASHES.clear(entry);
             promote(x, entry);
           }
           return entry;
@@ -175,7 +182,7 @@ foam.CLASS({
       javaCode: `
       PM pm = PM.create(x, this.getOwnClassInfo(), "promote");
       ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
-      getLogger().debug("promote", entry.getIndex(), getIndex(), replaying.getReplayIndex(), replaying.getReplaying());
+//      getLogger().debug("promote", entry.getIndex(), getIndex(), replaying.getReplayIndex(), replaying.getReplaying());
       try {
 
         DaggerService dagger = (DaggerService) x.get("daggerService");
@@ -232,7 +239,6 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      // getLogger().debug("promoter", "execute");
       try {
         synchronized ( promoteLock_ ) {
           if ( getPromoterRunning() ) {
@@ -251,54 +257,35 @@ foam.CLASS({
             ((DAO) x.get("localMedusaEntryDAO")).cmd(new ReplayCompleteCmd());
           }
 
-          Long next = getIndex() + 1;
-          // getLogger().debug("promoter", next, "find");
-          List<MedusaEntry> list = ((ArraySink) getDelegate()
-            .where(
-              // REVIEW: the GTE is causing an Unindexed search.
-              // AND(
-                EQ(MedusaEntry.INDEX, next) //,
-              //   GTE(MedusaEntry.CONSENSUS_COUNT, support.getNodeQuorum())
-              // )
-            )
-            .select(new ArraySink())).getArray();
-          for ( MedusaEntry e : list ) {
-            if ( e.getConsensusCount() >= support.getNodeQuorum() ) {
-              if ( entry == null ) {
-                entry = e;
-                promote(x, entry);
-              } else {
-                getLogger().error("promoter", next, "multiple found with consensus", e.toSummary(), e.getConsensusCount(), support.getNodeQuorum());
-                // TODO: Halt system
+          Long nextIndex = getIndex() + 1;
+          MedusaEntry next = (MedusaEntry) getDelegate().find_(x, nextIndex);
+          if ( next != null ) {
+            Map<Object, Map> hashes = next.getConsensusHashes();
+            for ( Map nodes : hashes.values() ) {
+              if ( nodes.size() >= support.getNodeQuorum() ) {
+                if ( entry == null ) {
+                  entry = next;
+                  entry.setConsensusCount(nodes.size());
+                  entry.setConsensusNodes(nodes.entrySet().toArray());
+                  MedusaEntry.CONSENSUS_HASHES.clear(entry);
+                  promote(x, entry);
+                } else {
+                  getLogger().error("promoter", next, "multiple found with consensus", next.toSummary(), next.getConsensusCount(), support.getNodeQuorum());
+                  // TODO: Halt system
+                }
+              } else if ( nodes.size() > next.getConsensusCount() ) {
+                next.setConsensusCount(nodes.size());
+                next.setConsensusNodes(nodes.entrySet().toArray());
               }
-            } else { //if ( e.getConsensusCount() < support.getNodeQuorum() ) {
-              getLogger().warning("promoter", next, "no consensus", e.toSummary(), e.getConsensusCount(), support.getNodeQuorum());
+            }
+            if ( entry == null ) {
+              getLogger().warning("promoter", next, "no consensus", next.toSummary(), next.getConsensusCount(), support.getNodeQuorum());
+
             }
           }
           if ( entry == null ) {
             break;
           }
-          // if ( list.size() ==  1 ) {
-          //   entry = list.get(0);
-          //   promote(x, entry);
-          // } else if ( list.size() > 1 ) {
-          //   entry = list.get(0);
-          //   getLogger().error("promoter", next, "multiple found with consensus", entry.toSummary(), entry.getConsensusCount(), support.getNodeQuorum());
-          //   // TODO: Halt System.
-          // } else {
-          // // TODO: for troubleshooting, remove later
-          //   list = ((ArraySink) getDelegate()
-          //     .where(
-          //       EQ(MedusaEntry.INDEX, next)
-          //     )
-          //     .select(new ArraySink())).getArray();
-          //   for ( MedusaEntry e : list ) {
-          //     if ( e.getConsensusCount() < support.getNodeQuorum() ) {
-          //       getLogger().warning("promoter", next, "no consensus", e.toSummary(), e.getConsensusCount(), support.getNodeQuorum());
-          //     }
-          //   }
-          //   break;
-          // }
         }
       } catch ( Throwable e ) {
         getLogger().error("promoter", "execute", e.getMessage(), e);

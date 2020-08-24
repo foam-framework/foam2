@@ -19,6 +19,9 @@ foam.CLASS({
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.dao.DOP',
+    'static foam.mlang.MLang.COUNT',
+    'static foam.mlang.MLang.EQ',
+    'foam.mlang.sink.Count',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'java.util.ArrayList',
@@ -73,10 +76,18 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
-      // getLogger().debug("put", entry.getIndex());
+      getLogger().debug("put", entry.getIndex());
 
       ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
       ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
+
+      if ( support.getStandAlone() ) {
+        if ( getDelegate().find_(x, entry.getId()) == null ) {
+          entry = (MedusaEntry) getDelegate().put_(x, entry);
+          return ((DAO) x.get(getServiceName())).put_(x, entry);
+        }
+        return entry;
+      }
 
       entry = (MedusaEntry) getDelegate().put_(x, entry);
       if ( entry.isFrozen() ) {

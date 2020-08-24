@@ -11,14 +11,15 @@ foam.CLASS({
 
   documentation: `Manage access to internal MedusaEntry DAO.
 Presently we have data loss when both the local and non-local MedusaEntry
-DAO stacks both end at x.get("internalMedusaEntryDAO").`,
-  
+DAO stacks both end at x.get("internalMedusaEntryDAO").
+Update: it appears there are multiple DAOs in the context.`,
+
   javaImports: [
     'foam.dao.DAO',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
   ],
-  
+
   properties: [
     {
       name: 'dao',
@@ -41,14 +42,26 @@ DAO stacks both end at x.get("internalMedusaEntryDAO").`,
       `
     },
   ],
-  
+
   methods: [
+    {
+      name: 'find_',
+      javaCode: `
+      // getLogger().debug("find");
+      return getDao().find_(x, id);
+      `
+    },
+    {
+      name: 'select_',
+      javaCode: `
+      // getLogger().debug("select");
+      return getDao().select_(x, sink, skip, limit, order, predicate);
+      `
+    },
     {
       name: 'put_',
       javaCode: `
-      // MedusaEntry entry = (MedusaEntry) obj;
-      // getLogger().debug("put", entry.getIndex(), "id", entry.toSummary(), "hash", entry.getHash());
-      // return getDao().put_(x, entry);
+      // getLogger().debug("put");
       return getDao().put_(x, obj);
       `
     }
