@@ -172,12 +172,11 @@ p({
   "serviceScript":"""
     return new foam.dao.EasyDAO.Builder(x)
       .setAuthorize(false)
-      .setGuid(true)
+      .setPermissioned(false)
+      .setNullify(true)
       .setDecorator(new foam.nanos.crunch.connection.CapabilityPayloadDAO(x, new foam.dao.NullDAO(x, foam.nanos.crunch.connection.CapabilityPayload.getOwnClassInfo())))
-      .setInnerDAO(new foam.dao.MDAO(foam.nanos.crunch.connection.CapabilityPayload.getOwnClassInfo()))
       .setOf(foam.nanos.crunch.connection.CapabilityPayload.getOwnClassInfo())
       .build();
   """,
   "client":"{\"of\":\"foam.nanos.crunch.connection.CapabilityPayload\"}"
 })
-

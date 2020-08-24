@@ -25,7 +25,9 @@ foam.CLASS({
     'foam.nanos.crunch.CrunchService',
     'foam.nanos.crunch.connection.CapabilityPayload',
     'java.util.ArrayList',
-    'java.util.List'
+    'java.util.List',
+    'java.util.Map',
+    'java.util.HashMap'
   ],
 
   documentation: `
@@ -50,54 +52,112 @@ foam.CLASS({
     {
       name: 'find_',
       javaCode: `
-        if ( id instanceof CapabilityPayload ) return super.find_(x, ((CapabilityPayload) id).getId());
+        if ( id instanceof CapabilityPayload ) return null;
 
         DAO localCapabilityDAO = (DAO) x.get("localCapabilityDAO");
 
         String idToString = (String) id;
+        
+        if ( localCapabilityDAO.find(idToString) == null ){
+          // throw new RuntimeException("Requested Capability id cannot be found");
+          return null;
+        }
 
-        // TODO: IN deployment we won't even be storing CapabilityPayload
-        if ( localCapabilityDAO.find(idToString) != null ){
-          CrunchService crunchService = (CrunchService) x.get("crunchService");
+        CrunchService crunchService = (CrunchService) x.get("crunchService");
 
-          List grantPath = crunchService.getGrantPath(x, idToString);
-          List<Object> capabilityDataObjects = new ArrayList<>();
-          List<String> capabilities = new ArrayList<>();
+        List grantPath = crunchService.getGrantPath(x, idToString);
+        Map<String,FObject> capabilityDataObjects = new HashMap<>();
+
+        for ( Object item : grantPath ) {
+          // TODO: Verify that MinMaxCapability lists can be ignored here
+          if ( item instanceof Capability ) {
+            Capability cap = (Capability) item;
+            FObject capDataObject = null;
+            if ( cap.getOf() != null ){
+              try {
+                capDataObject = (FObject) cap.getOf().newInstance();
+              } catch (Exception e){
+                throw new RuntimeException(e);
+              }
+            }
+            capabilityDataObjects.put(cap.getName(), capDataObject);
+          }
+        }
+
+        CapabilityPayload capabilityPayload = new CapabilityPayload.Builder(x)
+          .setCapabilityDataObjects(new HashMap<String,FObject>(capabilityDataObjects))
+          .setId(idToString).build();
+        
+        return capabilityPayload;
+      `
+    },
+    {
+      name: 'select_',
+      javaCode: `
+
+        // grabbing actual capabilities based on the capabilities given in select
+        DAO localCapabilityDAO = (DAO) x.get("localCapabilityDAO");
+        List<Capability> rootCapabilities = ((ArraySink) localCapabilityDAO.select_(
+          x,
+          new ArraySink(),
+          skip,
+          limit,
+          order,
+          predicate
+        )).getArray();
+
+        CrunchService crunchService = (CrunchService) x.get("crunchService");
+
+        // if separate capability ids submitted in select which aree part of different subtrees
+        List<CapabilityPayload> capabilityPayloads = new ArrayList<>();
+      
+        // iterate through each capability from the select and calculate separate grant path
+        for ( Capability rootCapability : rootCapabilities ){
+          List grantPath = crunchService.getGrantPath(x, rootCapability.getId());
+          Map<String,FObject> capabilityDataObjects = new HashMap<>();
+
+          // Adding separate capabilityDataObject map
           for ( Object item : grantPath ) {
-            // TODO: Verify that MinMaxCapability lists can be ignored here
             if ( item instanceof Capability ) {
               Capability cap = (Capability) item;
+              FObject capDataObject = null;
               if ( cap.getOf() != null ){
-                FObject newOfInstance;
                 try {
-                  newOfInstance = (FObject) cap.getOf().newInstance();
+                  capDataObject = (FObject) cap.getOf().newInstance();
                 } catch (Exception e){
                   throw new RuntimeException(e);
                 }
-                capabilityDataObjects.add(newOfInstance);
               }
-              capabilities.add(cap.getId());
+              capabilityDataObjects.put(cap.getName(), capDataObject);
             }
           }
 
           CapabilityPayload capabilityPayload = new CapabilityPayload.Builder(x)
-            .setCapabilityDataObjects(capabilityDataObjects.toArray(new Object[capabilityDataObjects.size()]))
-            .setCapabilities(capabilities.toArray(new String[capabilities.size()]))
-            .setTargetCapabilityId(idToString).build();
-          
-          return capabilityPayload;
+            .setCapabilityDataObjects(new HashMap<String,FObject>(capabilityDataObjects))
+            .setId(rootCapability.getId())
+            .build();
+
+          capabilityPayloads.add(capabilityPayload);
         }
 
-        return super.find_(x, id);
+        // TODO: need to convert capabilityPayloads to an ArraySink
+        ArraySink capabilityPayloadsToArraySink = new ArraySink.Builder(x)
+          .setArray(new ArrayList(capabilityPayloads))
+          .build();
+        
+        return capabilityPayloadsToArraySink;
       `
     },
     {
       name: 'put_',
       javaCode: `
-        CapabilityPayload sentCapPayload = (CapabilityPayload) obj;
+        CapabilityPayload receivingCapPayload = (CapabilityPayload) obj;
 
-        Object[] capabilityDataObjects = sentCapPayload.getCapabilityDataObjects();
-        String[] capabilities = sentCapPayload.getCapabilities();
+        CrunchService crunchService = (CrunchService) x.get("crunchService");
+
+        List grantPath = crunchService.getGrantPath(x, receivingCapPayload.getId());
+
+        Map<String,FObject> capabilityDataObjects = (HashMap<String,FObject>) receivingCapPayload.getCapabilityDataObjects();
 
         // TODO: Don't think this block is needed anymore
         // // First pass: validate types provided
@@ -126,21 +186,26 @@ foam.CLASS({
         //   index++;
         // }
 
-        CrunchService crunchService = (CrunchService) x.get("crunchService");
-
         // Second pass: store UCJs
-        int capabilitiesIndex = 0;
-        for ( int i = 0 ; i < capabilities.length ; i++ ) {
-          FObject dataObj = null;
-          if ( capabilitiesIndex < capabilityDataObjects.length && capabilityDataObjects[i] != null ) {
-            dataObj = (FObject) capabilityDataObjects[capabilitiesIndex++];
+
+        for ( Object item : grantPath ){
+          if ( item instanceof Capability ) {
+            Capability cap = (Capability) item;
+
+            if ( ! capabilityDataObjects.containsKey(cap.getName()) ){
+              throw new RuntimeException(
+                "Required capability does not exist in capabilityDataObject: " + cap.getName()
+              );
+            }
+
+            FObject dataObj = capabilityDataObjects.get(cap.getName());
+            String targetId = cap.getId();
+
+            crunchService.updateJunction(x, targetId, dataObj);
           }
-          String targetId = capabilities[i];
-          crunchService.updateJunction(x, targetId, dataObj);
         }
 
-        // TODO: Saving just for testing
-        return getDelegate().put_(x, obj);
+        return obj;
       `
     }
   ],
