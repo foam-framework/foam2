@@ -9,8 +9,6 @@ package foam.core;
 import java.util.Collections;
 import java.util.Map;
 
-// TODO: make this a functional tree rather than a linked list. (for performance)
-
 abstract class AbstractX
   implements X, Appendable
 {
