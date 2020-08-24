@@ -176,7 +176,14 @@ foam.CLASS({
               );
             }
 
-            FObject dataObj = capabilityDataObjects.get(cap.getName());
+            // Making sure to cast the of to the object before it gets casted to an fobject
+            FObject dataObj;
+            if ( cap.getOf() != null ){
+              dataObj = (FObject) cap.getOf().getObjClass().cast(capabilityDataObjects.get(cap.getName()));
+            } else {
+              dataObj = (FObject) capabilityDataObjects.get(cap.getName());
+            }
+
             String targetId = cap.getId();
 
             crunchService.updateJunction(x, targetId, dataObj);

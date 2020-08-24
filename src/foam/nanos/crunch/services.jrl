@@ -175,8 +175,8 @@ p({
       .setPermissioned(false)
       .setNullify(true)
       .setDecorator(new foam.nanos.crunch.connection.CapabilityPayloadDAO(x, new foam.dao.NullDAO(x, foam.nanos.crunch.connection.CapabilityPayload.getOwnClassInfo())))
-      .setOf(foam.nanos.crunch.connection.CapabilityPayload.getOwnClassInfo())
+      .setOf(foam.nanos.crunch.Capability.getOwnClassInfo())
       .build();
   """,
-  "client":"{\"of\":\"foam.nanos.crunch.connection.CapabilityPayload\"}"
+  "client":"{\"of\":\"foam.nanos.crunch.Capability\"}"
 })
