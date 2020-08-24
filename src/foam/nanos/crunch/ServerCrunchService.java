@@ -194,7 +194,7 @@ public class ServerCrunchService implements CrunchService {
   public void maybeIntercept(X x, String[] capabilityOptions) {
     if ( capabilityOptions.length < 1 ) {
       Logger logger = (Logger) x.get("logger");
-      logger.warning("crunchService.require() performed with empty list");
+      logger.warning("crunchService.maybeIntercept() performed with empty list");
       return;
     }
 
