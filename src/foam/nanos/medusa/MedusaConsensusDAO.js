@@ -60,22 +60,19 @@ foam.CLASS({
     }
   ],
 
-  constants: [
-    {
-      documentation: 'starting at 2 as indexes 1 and 2 are used to prime the system.',
-      name: 'INDEX_OFFSET',
-      type: 'Long',
-      value: 2
-    }
-  ],
-
   properties: [
     {
       name: 'index',
       class: 'Long',
-      factory: function() { return this.INDEX_OFFSET; },
-      javaFactory: 'return INDEX_OFFSET;',
+      factory: function() { return this.initialIndexOffset; },
+      javaFactory: 'return getInitialIndexOffset();',
       visibility: 'RO',
+    },
+    {
+      documentation: 'Starting at 2 as indexes 1 and 2 are used to prime the system.',
+      name: 'initialIndexOffset',
+      class: 'Long',
+      value: 2
     },
     {
       name: 'timerInterval',
@@ -119,7 +116,7 @@ foam.CLASS({
         MedusaEntry existing = (MedusaEntry) getDelegate().find_(x, id);
         if ( existing != null &&
              existing.getPromoted() ) {
-         // getLogger().debug("put", getIndex(), entry.toSummary(), entry.getNode(), "discarding");
+         getLogger().debug("put", getIndex(), entry.toSummary(), entry.getNode(), "discarding");
          return existing;
         }
 
@@ -127,7 +124,7 @@ foam.CLASS({
           existing = (MedusaEntry) getDelegate().find_(x, id);
           if ( existing != null ) {
             if ( existing.getPromoted() ) {
-              // getLogger().debug("put", getIndex(), entry.toSummary(), entry.getNode(), "discarding", "in-lock");
+              getLogger().debug("put", getIndex(), entry.toSummary(), entry.getNode(), "discarding", "in-lock");
               return entry;
             }
           } else {
