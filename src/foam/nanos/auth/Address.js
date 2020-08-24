@@ -21,6 +21,10 @@ foam.CLASS({
     'foam.nanos.auth.Region'
   ],
 
+  messages: [
+    { name: 'INVALID_POSTAL_CODE_ERR_MSG', message: 'Invalid postal code' }
+  ],
+
   properties: [
     {
       class: 'Boolean',
@@ -210,7 +214,7 @@ foam.CLASS({
                 /^[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z][ -]?\d[ABCEGHJ-NPRSTV-Z]\d$/i)
             );
           },
-          errorString: 'Invalid postal code'
+          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
         },
         {
           args: ['postalCode', 'countryId'],
@@ -219,11 +223,168 @@ foam.CLASS({
               e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'US'),
               e.REG_EXP(
                 foam.nanos.auth.Address.POSTAL_CODE,
-                /^^\d{5}(?:[-\s]\d{4})?$/i)
+                /^\d{5}(?:[-\s]\d{4})?$/i)
             );
           },
-          errorString: 'Invalid zip code'
+          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
         },
+        // Austria
+        {
+          args: ['postalCode', 'countryId'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'AT'),
+              e.REG_EXP(
+                foam.nanos.auth.Address.POSTAL_CODE,
+                /^\d{4}$/
+              )
+            );
+          },
+          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+        },
+        // Belgium
+        {
+          args: ['postalCode', 'countryId'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'BE'),
+              e.REG_EXP(
+                foam.nanos.auth.Address.POSTAL_CODE,
+                /^(?:(?:[1-9])(?:\d{3}))$/
+              )
+            );
+          },
+          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+        },
+        // Brazil
+        {
+          args: ['postalCode', 'countryId'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'BR'),
+              e.REG_EXP(
+                foam.nanos.auth.Address.POSTAL_CODE,
+                /^\d{5}-?\d{3}$/
+              )
+            );
+          },
+          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+        },
+        // China
+        // Note: The postal services in Macau or Hong Kong Special Administrative Regions remain separate from
+        // Mainland China, with no postal code system currently used
+        {
+          args: ['postalCode', 'countryId'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'CN'),
+              e.REG_EXP(
+                foam.nanos.auth.Address.POSTAL_CODE,
+                /^\d{6}$/
+              )
+            );
+          },
+          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+        },
+        // Cyprus
+        {
+          args: ['postalCode', 'countryId'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'CY'),
+              e.REG_EXP(
+                foam.nanos.auth.Address.POSTAL_CODE,
+                /^\d{4}$/
+              )
+            );
+          },
+          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+        },
+        // Estonia
+        {
+          args: ['postalCode', 'countryId'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'EE'),
+              e.REG_EXP(
+                foam.nanos.auth.Address.POSTAL_CODE,
+                /^\d{5}$/
+              )
+            );
+          },
+          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+        },
+        // Finland
+        {
+          args: ['postalCode', 'countryId'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'FI'),
+              e.REG_EXP(
+                foam.nanos.auth.Address.POSTAL_CODE,
+                /^\d{5}$/
+              )
+            );
+          },
+          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+        },
+        // France
+        {
+          args: ['postalCode', 'countryId'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'FR'),
+              e.REG_EXP(
+                foam.nanos.auth.Address.POSTAL_CODE,
+                /^(?:[0-8]\d|9[0-8])\d{3}$/
+              )
+            );
+          },
+          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+        },
+        // Germany
+        {
+          args: ['postalCode', 'countryId'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'DE'),
+              e.REG_EXP(
+                foam.nanos.auth.Address.POSTAL_CODE,
+                /^\d{5}$/
+              )
+            );
+          },
+          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+        },
+        // Great Britain
+        {
+          args: ['postalCode', 'countryId'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'GB'),
+              e.REG_EXP(
+                foam.nanos.auth.Address.POSTAL_CODE,
+                /^(?:GIR 0AA|(?:(?:(?:A[BL]|B[ABDHLNRSTX]?|C[ABFHMORTVW]|D[ADEGHLNTY]|E[HNX]?|F[KY]|G[LUY]?|H[ADGPRSUX]|I[GMPV]|JE|K[ATWY]|L[ADELNSU]?|M[EKL]?|N[EGNPRW]?|O[LX]|P[AEHLOR]|R[GHM]|S[AEGK-PRSTY]?|T[ADFNQRSW]|UB|W[ADFNRSV]|YO|ZE)[1-9]?\d|(?:(?:E|N|NW|SE|SW|W)1|EC[1-4]|WC[12])[A-HJKMNPR-Y]|(?:SW|W)(?:[2-9]|[1-9]\d)|EC[1-9]\d)\d[ABD-HJLNP-UW-Z]{2}))$/i
+              )
+            );
+          },
+          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+        },
+        // Greece
+        {
+          args: ['postalCode', 'countryId'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'GR'),
+              e.REG_EXP(
+                foam.nanos.auth.Address.POSTAL_CODE,
+                /^\d{3}\s{0,1}\d{2}$/
+              )
+            );
+          },
+          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+        },
+        // India
         {
           args: ['postalCode', 'countryId'],
           predicateFactory: function(e) {
@@ -231,15 +392,157 @@ foam.CLASS({
               e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'IN'),
               e.REG_EXP(
                 foam.nanos.auth.Address.POSTAL_CODE,
-                /^^\d{6}(?:[-\s]\d{4})?$/i)
+                /^\d{6}(?:[-\s]\d{4})?$/i
+              )
             );
           },
-          errorString: 'Invalid zip code'
+          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+        },
+        // Italy
+        {
+          args: ['postalCode', 'countryId'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'IT'),
+              e.REG_EXP(
+                foam.nanos.auth.Address.POSTAL_CODE,
+                /^\d{5}$/
+              )
+            );
+          },
+          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+        },
+        // Latvia
+        {
+          args: ['postalCode', 'countryId'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'LV'),
+              e.REG_EXP(
+                foam.nanos.auth.Address.POSTAL_CODE,
+                /^(LV-)?\d{4}$/i
+              )
+            );
+          },
+          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+        },
+        // Lithuania
+        {
+          args: ['postalCode', 'countryId'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'LT'),
+              e.REG_EXP(
+                foam.nanos.auth.Address.POSTAL_CODE,
+                /^(LT-)?\d{5}$/i
+              )
+            );
+          },
+          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+        },
+        // Luxembourg
+        {
+          args: ['postalCode', 'countryId'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'LU'),
+              e.REG_EXP(
+                foam.nanos.auth.Address.POSTAL_CODE,
+                /^\d{4}$/
+              )
+            );
+          },
+          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+        },
+        // Malta
+        {
+          args: ['postalCode', 'countryId'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'MT'),
+              e.REG_EXP(
+                foam.nanos.auth.Address.POSTAL_CODE,
+                /^[A-Z]{3}\s?\d{4}$/i
+              )
+            );
+          },
+          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+        },
+        // the Netherlands
+        {
+          args: ['postalCode', 'countryId'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'NL'),
+              e.REG_EXP(
+                foam.nanos.auth.Address.POSTAL_CODE,
+                /^(?:NL-)?(?:[1-9]\d{3} ?(?:[A-EGHJ-NPRTVWXZ][A-EGHJ-NPRSTVWXZ]|S[BCEGHJ-NPRTVWXZ]))$/i
+              )
+            );
+          },
+          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+        },
+        // Portugal
+        {
+          args: ['postalCode', 'countryId'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'PT'),
+              e.REG_EXP(
+                foam.nanos.auth.Address.POSTAL_CODE,
+                /^\d{4}$/
+              )
+            );
+          },
+          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+        },
+        // Slovakia
+        {
+          args: ['postalCode', 'countryId'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'SK'),
+              e.REG_EXP(
+                foam.nanos.auth.Address.POSTAL_CODE,
+                /^(SK-)?\d{3}\s?\d{2}$/i
+              )
+            );
+          },
+          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+        },
+        // Slovenia
+        {
+          args: ['postalCode', 'countryId'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'SI'),
+              e.REG_EXP(
+                foam.nanos.auth.Address.POSTAL_CODE,
+                /^(SI-)?\d{4}$/i
+              )
+            );
+          },
+          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+        },
+        // Spain
+        {
+          args: ['postalCode', 'countryId'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'ES'),
+              e.REG_EXP(
+                foam.nanos.auth.Address.POSTAL_CODE,
+                /^(?:0[1-9]|[1-4]\d|5[0-2])\d{3}$/
+              )
+            );
+          },
+          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
         }
       ],
-      javaSetter:
-        `postalCode_ = val.toUpperCase();
-        postalCodeIsSet_ = true;`
+      javaSetter: `
+        postalCode_ = val.toUpperCase();
+        postalCodeIsSet_ = true;
+      `
     },
     {
       class: 'Double',
