@@ -406,7 +406,7 @@ foam.CLASS({
               e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'LV'),
               e.REG_EXP(
                 foam.nanos.auth.Address.POSTAL_CODE,
-                /^LV[- ]?\d{4}$/i
+                /^(LV-)?\d{4}$/i
               )
             );
           },
@@ -420,7 +420,7 @@ foam.CLASS({
               e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'LT'),
               e.REG_EXP(
                 foam.nanos.auth.Address.POSTAL_CODE,
-                /^LT[- ]?\d{5}$/i
+                /^(LT-)?\d{5}$/i
               )
             );
           },
@@ -490,7 +490,7 @@ foam.CLASS({
               e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'SK'),
               e.REG_EXP(
                 foam.nanos.auth.Address.POSTAL_CODE,
-                /^\d{5}\s\(\d{3}\s\d{2}\)$/
+                /^(SK-)?\d{3}\s?\d{2}$/i
               )
             );
           },
@@ -504,7 +504,7 @@ foam.CLASS({
               e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'SL'),
               e.REG_EXP(
                 foam.nanos.auth.Address.POSTAL_CODE,
-                /^(SI[- ]?)?\d{4}$/i
+                /^(SI-)?\d{4}$/i
               )
             );
           },
