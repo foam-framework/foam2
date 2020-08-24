@@ -10,6 +10,7 @@ import foam.core.*;
 import foam.dao.ProxyDAO;
 import foam.nanos.*;
 import foam.nanos.logger.Logger;
+import foam.nanos.logger.StdoutLogger;
 import foam.nanos.pm.PM;
 import foam.util.SafetyUtil;
 
@@ -33,15 +34,13 @@ public class NSpecFactory
     if ( ! "logger".equals(spec_.getName()) ) {
       logger = (Logger) x.get("logger");
     }
+    if ( logger == null ) {
+      logger = new StdoutLogger();
+    }
 
     // Avoid infinite recursions when creating services
     if ( creatingThread_ == Thread.currentThread() ) {
-      if ( logger != null ) {
-        logger.warning("Recursive Service Factory", spec_.getName());
-      } else {
-        System.err.println("Recursive Service Factory: " + spec_.getName());
-      }
-
+      logger.warning("Recursive Service Factory", spec_.getName());
       return ns_;
     }
     creatingThread_ = Thread.currentThread();
@@ -49,11 +48,7 @@ public class NSpecFactory
     PM     pm     = new PM(this.getClass(), spec_.getName());
 
     try {
-      if ( logger != null ) {
-        logger.info("Creating Service", spec_.getName());
-      } else {
-        System.out.println("Creating Service: " + spec_.getName());
-      }
+      logger.info("Creating Service", spec_.getName());
       ns_ = spec_.createService(x_.getX().put(NSpec.class, spec_));
       Object ns = ns_;
       while ( ns != null ) {
@@ -69,11 +64,7 @@ public class NSpecFactory
           }
         }
         if ( ns instanceof NanoService )  {
-          if ( logger != null ) {
-            logger.info("Starting Service", spec_.getName());
-          } else {
-            System.out.println("Starting Service: " + spec_.getName());
-          }
+          logger.info("Starting Service", spec_.getName());
           ((NanoService) ns).start();
         }
         if ( ns instanceof ProxyDAO ) {
@@ -82,18 +73,9 @@ public class NSpecFactory
           ns = null;
         }
       }
-      if ( logger != null ) {
-        logger.info("Created Service", spec_.getName(), ns_ != null ? ns_.getClass().getSimpleName() : "null");
-      } else {
-        System.out.println("Created Service: " + spec_.getName());
-      }
+      logger.info("Created Service", spec_.getName(), ns_ != null ? ns_.getClass().getSimpleName() : "null");
     } catch (Throwable t) {
-      if ( logger != null ) {
-        logger.error("Error Creating Service", spec_.getName(), t);
-      } else {
-        System.err.println("Error Creating Service: " + spec_.getName());
-        t.printStackTrace();
-      }
+      logger.error("Error Creating Service", spec_.getName(), t);
     } finally {
       pm.log(x_.getX());
       creatingThread_ = null;
