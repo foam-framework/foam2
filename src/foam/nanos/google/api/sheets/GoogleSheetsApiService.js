@@ -99,7 +99,7 @@ foam.CLASS({
     
           final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
           GoogleApiAuthService googleApiAuthService = (GoogleApiAuthService)getX().get("googleApiAuthService");
-          Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, SCOPES))
+          Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleApiAuthService.addHttpTimeout(googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, SCOPES)))
             .setApplicationName("nanopay")
             .build();
         

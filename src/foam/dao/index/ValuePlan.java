@@ -29,4 +29,9 @@ public class ValuePlan implements FindPlan, SelectPlan {
     if ( limit <= 0 ) return;
    sink.put(state, MDAO.DetachSelect.instance());
   }
+
+  @Override
+  public String toString() {
+    return "value(cost:" + cost() + ")";
+  }
 }

@@ -79,6 +79,7 @@ var classes = [
   'foam.mlang.PredicatedExpr',
   'foam.mlang.ContextObject',
   'foam.mlang.CurrentTime',
+  'foam.mlang.expr.TimeOfDay',
   'foam.mlang.predicate.RegExp',
   'foam.mlang.predicate.OlderThan',
   'foam.mlang.predicate.isAuthorizedToRead',
@@ -245,6 +246,7 @@ var classes = [
   'foam.nanos.auth.ruler.PreventDuplicateUsernameAction',
   'foam.nanos.auth.test.PasswordPolicyTest',
   'foam.nanos.auth.Country',
+  'foam.nanos.auth.PropertyType',
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.PMAuthService',
   'foam.nanos.auth.UserUserJunction',
@@ -307,6 +309,7 @@ var classes = [
   'foam.nanos.script.Language',
   'foam.nanos.auth.Language',
   'foam.nanos.auth.Region',
+  'foam.nanos.auth.TimeZone',
   'foam.nanos.logger.LogMessage',
   'foam.nanos.logger.LogMessageDAO',
   'foam.nanos.logger.LogLevelFilterLogger',
@@ -441,6 +444,7 @@ var classes = [
   'foam.lib.parse.Parser',
   'foam.lib.parse.PStream',
   'foam.lib.parse.BlobPStream',
+  'foam.lib.json.JSONParser',
   'foam.lib.json.OutputJSON',
   'foam.lib.json.OutputterMode',
   'foam.lib.json.UnknownFObject',
@@ -474,7 +478,8 @@ var classes = [
   'foam.nanos.demo.relationship.CourseType',
   'foam.nanos.demo.relationship.StudentCourseJunction',
   'foam.nanos.fs.File',
-
+  'foam.nanos.fs.FileType',
+  'foam.nanos.fs.SupportFileTypeDAO',
   'foam.crypto.hash.Hasher',
   'foam.crypto.hash.HashableTest',
 
@@ -524,6 +529,7 @@ var classes = [
   'foam.nanos.dig.exception.AuthorizationException',
   'foam.flow.Document',
   'foam.flow.DocumentationFolderDAO',
+  'foam.flow.DocumentMenu',
 
   'foam.nanos.ruler.RuleGroup',
   'foam.nanos.ruler.Rule',
@@ -618,6 +624,8 @@ var classes = [
   'foam.nanos.crunch.crunchtest.FakeTestObject',
   //models
   'foam.nanos.crunch.Capability',
+  'foam.nanos.crunch.lite.Capable',
+  'foam.nanos.crunch.lite.CapablePayload',
   'foam.nanos.crunch.CapabilityCategory',
   'foam.nanos.crunch.CapabilityCategoryCapabilityJunction',
   'foam.nanos.crunch.CapabilityJunctionStatus',
@@ -627,6 +635,11 @@ var classes = [
   'foam.nanos.crunch.AssociatedEntity',
   'foam.nanos.crunch.CapabilityAvailabilityDAO',
 
+  'foam.nanos.crunch.connection.ConnectedCapability',
+  'foam.nanos.crunch.connection.ConnectedCapabilityDAO',
+  'foam.nanos.crunch.connection.FlatCapability',
+  'foam.nanos.crunch.connection.FlatCapabilityDAO',
+  
   //daos
   'foam.nanos.crunch.UserCapabilityJunctionDAO',
   //rules
@@ -635,6 +648,7 @@ var classes = [
   'foam.nanos.crunch.RemoveJunctionsOnUserRemoval',
   'foam.nanos.crunch.CrunchService',
   'foam.nanos.crunch.ReputDependentUCJs',
+
   //ucjdao rules
   'foam.nanos.crunch.ruler.CheckUCJOwnershipOnPut',
   'foam.nanos.crunch.ruler.ValidateUCJDataOnPut',

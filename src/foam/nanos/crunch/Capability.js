@@ -236,6 +236,26 @@ foam.CLASS({
       javaFactory: `
         return foam.nanos.crunch.AssociatedEntity.USER;
       `
+    },
+    {
+      class: 'Object',
+      name: 'wizardlet',
+      documentation: `
+        Defines a wizardlet used when displaying this capability on related client crunch wizards.
+      `,
+      factory: function() {
+        return foam.nanos.crunch.ui.CapabilityWizardlet.create({}, this);
+      }
+    },
+    {
+      class: 'Object',
+      name: 'wizardletConfig',
+      documentation: `
+        Configuration placed on top level capabilities defining various configuration options supported by client capability wizards.
+      `,
+      factory: function() {
+        return foam.u2.wizard.StepWizardConfig.create({}, this);
+      }
     }
   ],
 
@@ -342,6 +362,23 @@ foam.CLASS({
   name: 'CRUNCHUserRefinement',
   refines: 'foam.nanos.auth.User',
   sections: [{ name: 'capabilities' }]
+});
+
+foam.CLASS({
+  package: 'foam.nanos.crunch',
+  name: 'CRUNCHThemeRefinement',
+  refines: 'foam.nanos.theme.Theme',
+
+  properties: [
+    {
+      name: 'admissionCapability',
+      class: 'String',
+      // TODO: Why doesn't a Reference property work here?
+      // class: 'Reference',
+      of: 'foam.nanos.crunch.Capability',
+      documentation: 'Specifies the top-level capability that must be granted before we admit a user to the system.'
+    },
+  ],
 });
 
 foam.RELATIONSHIP({

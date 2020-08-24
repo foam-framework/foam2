@@ -24,10 +24,11 @@ p({
   "name":"localeDAO",
   "description":"Locale DAO",
   "serve":true,
+  "authenticate":false,
   "serviceScript":
   """
     return new foam.dao.EasyDAO.Builder(x)
-      .setAuthorize(false)
+      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("localeDAO"))
       .setJournalName("locales")
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setOf(foam.i18n.Locale.getOwnClassInfo())

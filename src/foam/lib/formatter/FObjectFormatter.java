@@ -26,6 +26,8 @@ public interface FObjectFormatter
 
   public void reset();
 
+  public StringBuilder append(Object o);
+
   public String stringify(FObject obj);
 
   public String stringifyDelta(FObject oldFObject, FObject newFObject);
