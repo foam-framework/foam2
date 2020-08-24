@@ -105,6 +105,7 @@ public class JSONFObjectFormatter
   }
 
   public void escapeAppend(String s) {
+    if ( s == null ) return;
     StringBuilder sb = new StringBuilder();
     foam.lib.json.Util.escape(s, sb);
     append(sb.toString());
@@ -229,7 +230,9 @@ public class JSONFObjectFormatter
   }
 
   public void output(Object value) {
-    if ( value instanceof OutputJSON ) {
+    if ( value == null ) {
+      append("null");
+    } else if ( value instanceof OutputJSON ) {
       ((OutputJSON) value).formatJSON(this);
     } else if ( value instanceof String ) {
       output((String) value);
@@ -259,7 +262,8 @@ public class JSONFObjectFormatter
       output((Map) value);
     } else if ( value instanceof List ) {
       output((List) value);
-    } else /*if ( value == null )*/ {
+    } else {
+      System.err.println(this.getClass().getSimpleName()+".output, Unexpected value type: "+value.getClass().getName());
       append("null");
     }
   }
@@ -282,7 +286,11 @@ public class JSONFObjectFormatter
   }
 
   public void output(Date date) {
-    output(date.getTime());
+    if ( date != null ) {
+      output(date.getTime());
+    } else {
+      append("null");
+    }
   }
 
   protected Boolean maybeOutputProperty(FObject fo, PropertyInfo prop, boolean includeComma) {
