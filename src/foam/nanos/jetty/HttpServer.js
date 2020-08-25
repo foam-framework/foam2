@@ -66,6 +66,10 @@ foam.CLASS({
       name: 'forwardedForProxyWhitelist',
     },
     {
+      class: 'StringArray',
+      name: 'hostDomains',
+    },
+    {
       class: 'FObjectArray',
       of: 'foam.nanos.servlet.ServletMapping',
       name: 'servletMappings',
