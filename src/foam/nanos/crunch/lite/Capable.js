@@ -58,7 +58,7 @@ foam.INTERFACE({
                   for ( int i = 0 ; i < list.size() - 1 ; i++ ) {
                     Capability prereqCap = (Capability) list.get(i);
                     list.add(new CapablePayload.Builder(x)
-                      .setCapabilityId(prereqCap.getId())
+                      .setCapability(prereqCap)
                       .build());
                   }
 
@@ -67,7 +67,7 @@ foam.INTERFACE({
                            support for MinMaxCapability
                   Capability cap = (Capability) list.get(list.size() - 1);
                   payloads.add(new CapablePayload.Builder(x)
-                    .setCapabilityId(cap.getId())
+                    .setCapability(cap)
                     .setPrerequisites(prereqs.toArray(
                       new CapablePayload[list.size()]))
                     .build());
@@ -80,7 +80,7 @@ foam.INTERFACE({
               }
               Capability cap = (Capability) obj;
               payloads.add(new CapablePayload.Builder(x)
-                .setCapabilityId(cap.getId())
+                .setCapability(cap)
                 .build());
             }
             
@@ -104,7 +104,8 @@ foam.INTERFACE({
             // Marshal payloads into a hashmap
             Map<String, FObject> payloads = new HashMap<String, FObject>();
             for ( CapablePayload payload : getCapabilityPayloads() ) {
-              payloads.put(payload.getCapabilityId(), (FObject) payload.getData());
+              payloads.put(payload.getCapability().getId(),
+                (FObject) payload.getData());
             }
 
             CrunchService crunchService = (CrunchService) x.get("crunchService");
@@ -145,6 +146,19 @@ foam.INTERFACE({
     },
     {
       name: 'setCapabilityPayloads',
+      args: [
+        {
+          name: 'payloads',
+          type: 'CapablePayload[]'
+        }
+      ]
+    },
+    {
+      name: 'getUserCapabilityRequirements',
+      type: 'CapablePayload[]'
+    },
+    {
+      name: 'setUserCapabilityRequirements',
       args: [
         {
           name: 'payloads',

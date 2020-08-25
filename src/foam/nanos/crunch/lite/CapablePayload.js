@@ -23,8 +23,9 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'capabilityId',
-      class: 'String'
+      name: 'capability',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.crunch.Capability'
     },
     {
       name: 'data',
