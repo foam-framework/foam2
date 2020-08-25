@@ -51,8 +51,7 @@ foam.CLASS({
           month: 1,
           day: 2
         };
-        var zonetime = new Intl.DateTimeFormat(undefined, {
-          hour12: false,
+        var zonetime = new Intl.DateTimeFormat('default', {
           timeZone: this.timezone,
           year: "numeric",
           month: "2-digit",
