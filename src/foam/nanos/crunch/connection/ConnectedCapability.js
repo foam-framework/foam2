@@ -38,8 +38,7 @@ foam.CLASS({
     },
     {
       name: 'data',
-      class: 'FObjectArray',
-      of: 'foam.core.FObject',
+      class: 'Array',
       documentation: `
         Data objects corresponding to 'classes' of the FlatCapability.
         A RuntimeException is thrown if the array length doesn't match or
