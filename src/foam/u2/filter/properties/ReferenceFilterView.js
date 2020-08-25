@@ -155,11 +155,12 @@ foam.CLASS({
         for ( i = 0; i < daoContents.groupKeys.length; i++ ) {
           var refObj = referenceObjectsArray.find(r => r.id == daoContents.groupKeys[i] );
           if ( refObj ) {
+            var objectId = refObj.id;
             var summary = refObj.toSummary();
             if ( summary ) {
-              result[refObj.id] = summary;
+              result[objectId] = summary;
             } else {
-              result[refObj.id] = `ID: ${objectId}`;
+              result[objectId] = `ID: ${objectId}`;
             }
           } else {
             result[0] = '';
