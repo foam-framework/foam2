@@ -35,6 +35,9 @@ foam.INTERFACE({
   methods: [
     {
       name: 'save'
+    },
+    {
+      name: 'createView'
     }
   ]
 });
