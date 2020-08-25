@@ -33,6 +33,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'MergedResetSink',
@@ -62,6 +63,7 @@ try {
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.dao',
