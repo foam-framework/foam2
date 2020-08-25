@@ -12,6 +12,7 @@ foam.CLASS({
   documentation: 'Attempt to contact Nodes and Mediators, record ping time and mark them ONLINE or OFFLINE.',
 
   javaImports: [
+    'foam.core.FObject',
     'foam.dao.DAO',
     'foam.nanos.http.Ping',
     'foam.nanos.http.PingService',
@@ -72,28 +73,23 @@ foam.CLASS({
       javaCode: `
       ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
       ClusterConfig myConfig = support.getConfig(getX(), support.getConfigId());
-      ClusterConfig config = (ClusterConfig) obj;
+      ClusterConfig config = (ClusterConfig) ((FObject)obj).fclone();
       ClusterPingService pingService = (ClusterPingService) getX().get("mping");
       try {
-        pingService.ping(getX(), config.getId(), config.getPort(), getTimeout(), config.getUseHttps());
-        config = (ClusterConfig) support.getConfig(getX(), config.getId()).fclone();
-        if ( config.getStatus() != Status.ONLINE) {
-          config.setStatus(Status.ONLINE);
-          config = (ClusterConfig) getDao().put_(getX(), config).fclone();
-          // TOOD: clear Alarm
+        Status status = pingService.ping(getX(), config.getId(), config.getPort(), getTimeout(), config.getUseHttps());
+        // getLogger().debug("config.status", config.getStatus(), "status", status);
+        if ( status == null ) {
+          status = Status.OFFLINE;
         }
-      } catch (NullPointerException t) {
-        getLogger().error(t);
-        if ( config.getStatus() != Status.OFFLINE ) {
-          config = (ClusterConfig) config.fclone();
-          config.setStatus(Status.OFFLINE);
+        // TODO: Alarm if ONLINE -> OFFLINE
+        // TODO: clear Alarm if OFFLINE -> ONLINE
+        if ( status != config.getStatus() ) {
+          config.setStatus(status);
           config = (ClusterConfig) getDao().put_(getX(), config);
-        // TODO: Alarm.
         }
-      } catch (RuntimeException | java.io.IOException t) {
-        getLogger().debug("ping", config.getId(), t.getClass().getSimpleName(), t.getMessage());
+      } catch (java.io.IOException | RuntimeException t) {
+        getLogger().debug(config.getId(), t.getClass().getSimpleName(), t.getMessage());
         if ( config.getStatus() != Status.OFFLINE ) {
-          config = (ClusterConfig) config.fclone();
           config.setStatus(Status.OFFLINE);
           config = (ClusterConfig) getDao().put_(getX(), config);
         // TODO: Alarm.
@@ -102,9 +98,10 @@ foam.CLASS({
       `
     },
     {
-      // avoid null pointer on ProxySink.eof()
       name: 'eof',
-      javaCode: `//nop`
+      javaCode: `
+      //nop
+      `
     }
   ]
 });

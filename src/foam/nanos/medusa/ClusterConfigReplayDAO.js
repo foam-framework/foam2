@@ -60,7 +60,6 @@ foam.CLASS({
 
         ClusterConfig config = nu;
         ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-        getLogger().info("support,standalone", support.getStandAlone());
         ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
 
         // If a Node comming online, begin replay from it.
@@ -134,9 +133,9 @@ foam.CLASS({
                min.getValue() != null ) {
             details.setMinIndex((Long) min.getValue());
           }
-          getLogger().debug(myConfig.getId(), "ReplayDetailsCmd to", config.getId());
+          getLogger().info("ReplayDetailsCmd", "from", myConfig.getId(), "to", config.getId(), "request");
           details = (ReplayDetailsCmd) clientDAO.cmd_(x, details);
-          getLogger().debug(myConfig.getId(), "ReplayDetailsCmd from", config.getId(), details);
+          getLogger().info("ReplayDetailsCmd", "from", myConfig.getId(), "to", config.getId(), "response", details);
 
           synchronized ( this ) {
             ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
@@ -167,9 +166,9 @@ foam.CLASS({
             cmd.setDetails(details);
             cmd.setServiceName("medusaMediatorDAO"); // TODO: configuration
 
-            getLogger().debug(myConfig.getId(), "ReplayCmd to", config.getId());
+            getLogger().info("ReplayCmd", "from", myConfig.getId(), "to", config.getId(), "request", cmd.getDetails());
             cmd = (ReplayCmd) clientDAO.cmd_(x, cmd);
-            getLogger().debug(myConfig.getId(), "ReplayCmd from", config.getId(), cmd);
+            getLogger().info("ReplayCmd", "from", myConfig.getId(), "to", config.getId(), "response");
           }
         } else {
           getLogger().debug("no match");

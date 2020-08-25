@@ -27,7 +27,9 @@ foam.CLASS({
     'foam.core.*',
     'foam.dao.DAO',
     'foam.nanos.http.Ping',
+    'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
+    'foam.nanos.logger.StdoutLogger',
     'foam.nanos.pm.PM',
     'foam.net.Host',
     'java.io.PrintWriter',
@@ -39,7 +41,24 @@ foam.CLASS({
       name: 'serviceName',
       class: 'String',
       value: 'mping'
-    }
+    },
+    {
+      name: 'logger',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.logger.Logger',
+      visibility: 'HIDDEN',
+      transient: true,
+      javaFactory: `
+        Logger logger = (Logger) getX().get("logger");
+        if ( logger == null ) {
+          logger = new StdoutLogger();
+        }
+        return new PrefixLogger(new Object[] {
+          this.getClass().getSimpleName()
+        }, logger);
+
+      `
+    },
   ],
 
   axioms: [
@@ -48,7 +67,7 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-  public Ping ping(X x, String hostname, int port)
+  public Status ping(X x, String hostname, int port)
     throws java.io.IOException {
     return ping(x, hostname, port, 3000, false);
   }
@@ -89,10 +108,11 @@ foam.CLASS({
     ClusterConfig config = support.getConfig(x, support.getConfigId());
     Message msg = new Message();
 
+    // getLogger().info(config.getStatus());
     if ( config.getEnabled() &&
          config.getStatus() == Status.ONLINE ) {
       // TODO: send back recieved Ping.
-      msg.setObject(new Ping());
+      msg.setObject(config.getStatus());
     } else {
       Throwable t = new java.net.ConnectException("Connection refused: "+Status.OFFLINE.getLabel());
       RemoteException wrapper = new RemoteException();
@@ -133,7 +153,8 @@ foam.CLASS({
           type: 'Boolean'
         }
       ],
-      type: 'foam.nanos.http.Ping',
+//      type: 'foam.nanos.http.Ping',
+      type: 'foam.nanos.medusa.Status',
       javaThrows: ['java.io.IOException'],
       // code: async function(x, hostname, port = 8080, timeout = 3000, useHttps = false) {
       //   var address = await this.hostDAO && this.hostDAO.find(hostname);
@@ -172,8 +193,6 @@ foam.CLASS({
       //   return ping;
       // },
       javaCode: `
-    Logger logger = (Logger) x.get("logger");
-
     String address = hostname;
     Host host = (Host) ((DAO) x.get("hostDAO")).find(hostname);
     if ( host != null ) {
@@ -195,18 +214,28 @@ foam.CLASS({
       msg.getAttributes().put("replyBox", new MessageReplyBox(x));
 
       box.send(msg);
-      long endTime = System.currentTimeMillis();
-      MessageReplyBox reply = (MessageReplyBox) msg.getAttributes().get("replyBox");
 
+      MessageReplyBox reply = (MessageReplyBox) msg.getAttributes().get("replyBox");
       Message response = reply.getMessage();
       Object obj = response.getObject();
       if ( obj != null ) {
         if ( obj instanceof Throwable ) {
           throw (Throwable) obj;
         }
-        return ping;
+        if ( obj instanceof Status ) {
+          Status status = (Status) obj;
+          // getLogger().info(hostname, status);
+          if ( status != Status.ONLINE ) {
+            getLogger().warning(hostname, "responded in state", status.getLabel());
+            throw new IOException("Invalid response state: "+status.getLabel());
+          }
+          return status;
+        } else {
+          throw new IOException("Invalid response: "+obj.getClass().getSimpleName()+", expected foam.nanos.medusa.Status");
+        }
+        //return ping;
       }
-      throw new IOException("Invalid response type: null, expected foam.nanos.http.Ping.");
+      throw new IOException("Invalid response: null");
     } catch (IOException e) {
       throw e;
     } catch (Throwable t) {

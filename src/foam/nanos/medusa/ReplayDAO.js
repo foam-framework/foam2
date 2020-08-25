@@ -49,7 +49,6 @@ foam.CLASS({
       javaCode: `
       if ( obj instanceof ReplayDetailsCmd ) {
         ReplayDetailsCmd details = (ReplayDetailsCmd) obj;
-        getLogger().debug("cmd", "request", details);
 
         Min min = (Min) MIN(MedusaEntry.INDEX);
         Max max = (Max) MAX(MedusaEntry.INDEX);
@@ -66,13 +65,13 @@ foam.CLASS({
           details.setMaxIndex((Long)max.getValue());
           details.setCount((Long) count.getValue());
         }
-        getLogger().debug("cmd", "response", details);
+        getLogger().info("ReplayDetailsCmd", "requester", details.getRequester(), "min", details.getMinIndex(), "count", details.getCount());
         return details;
       }
 
       if ( obj instanceof ReplayCmd ) {
         ReplayCmd cmd = (ReplayCmd) obj;
-        getLogger().debug("cmd", cmd);
+        getLogger().info("ReplayCmd", "requester", cmd.getDetails().getRequester(), "min", cmd.getDetails().getMinIndex());
 
         ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
         ClusterConfig fromConfig = support.getConfig(x, cmd.getDetails().getResponder());
