@@ -49,32 +49,26 @@ foam.CLASS({
         var typeToIdx = {
           year: 0,
           month: 1,
-          day: 2,
-          hour: 3,
-          minute: 4,
-          second: 5
+          day: 2
         };
-        var zonetime = new Intl.DateTimeFormat("en-US", {
+        var zonetime = new Intl.DateTimeFormat(undefined, {
           hour12: false,
           timeZone: this.timezone,
           year: "numeric",
           month: "2-digit",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit"
+          day: "2-digit"
         });
         var formatted = zonetime.formatToParts(new Date());
-        var p = [];
+        var p = {};
         for ( var i = 0 ; i < formatted.length ; i++ ) {
           var { type, value } = formatted[i];
           var offset = typeToIdx[type];
 
           if ( ! (offset === undefined) ) {
-            p[offset] = parseInt(value, 10);
+            p[type] = parseInt(value, 10);
           }
         }
-        var d = new Date(p[0], p[1], p[2], this.hour, this.minute, thie.second);
+        var d = new Date(p.year, p.month, p.day, this.hour, this.minute, thie.second);
         return d;
       },
       javaCode: `
