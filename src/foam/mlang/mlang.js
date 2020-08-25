@@ -2343,7 +2343,7 @@ foam.CLASS({
 
         arg = arg.toLowerCase();
 
-        
+
         var s = '';
         const props = obj.cls_.getAxiomsByClass(foam.core.Property);
         for ( let i = 0; i < props.length; i++ ) {
@@ -2758,7 +2758,10 @@ foam.CLASS({
     {
       class: 'List',
       name: 'projection',
-      factory: function() { return []; },
+      factory: function() {
+        // TODO:
+        return [];
+      },
       javaFactory: `return new java.util.ArrayList();`
     },
     {
@@ -2813,7 +2816,7 @@ foam.CLASS({
 
         a[0] = ((FObject) obj).getClassInfo();
         for ( int i = 0 ; i < getExprs().length ; i++ )
-          a[i] = getExprs()[i+1].f(obj);
+          a[i+1] = getExprs()[i].f(obj);
 
         getArray().add(a);
       `
