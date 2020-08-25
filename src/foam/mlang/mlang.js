@@ -2284,13 +2284,15 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.PropertyInfo',
+    'foam.mlang.ReferenceExpressionHelper',
     'java.lang.reflect.Method',
     'java.text.DateFormat',
     'java.text.SimpleDateFormat',
     'java.util.Date',
     'java.util.Iterator',
     'java.util.List',
-    'java.util.TimeZone'
+    'java.util.TimeZone',
+    'static foam.mlang.MLang.*'
   ],
 
   documentation: 'Unary Predicate for generic keyword search (searching all String properties for argument substring).',
@@ -2380,7 +2382,9 @@ while ( i.hasNext() ) {
 
   try {
     String s = "";
-    if ( prop instanceof foam.core.AbstractFObjectPropertyInfo ) {
+    if ( ReferenceExpressionHelper.isPropertyAReference((PropertyInfo)prop) ) {
+      if ( checkNestedFObject(REF(prop).f(obj)) ) return true;
+    } else if ( prop instanceof foam.core.AbstractFObjectPropertyInfo ) {
       if ( checkNestedFObject(prop.f(obj)) ) return true;
     } else if ( prop instanceof foam.core.AbstractEnumPropertyInfo ) {
       Object value = prop.f(obj);
