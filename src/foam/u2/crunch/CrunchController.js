@@ -76,6 +76,8 @@ foam.CLASS({
               if ( Array.isArray(cap) && ( foam.nanos.crunch.MinMaxCapability.isInstance(cap[cap.length - 1]) ) ){
                 var minMaxCap = cap[cap.length - 1];
 
+                minMaxArray = [];
+
                 var choiceWizardlets = cap.slice(0, cap.length - 1).map(
                   capability => {
                     wizardlet = capability.wizardlet.cls_.create(
@@ -87,7 +89,7 @@ foam.CLASS({
 
                     associatedEntity = capability.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
 
-                    updateUCJPromiseList.push(this.updateUCJ(wizardlet, associatedEntity))
+                    minMaxArray.push(this.updateUCJ(wizardlet, associatedEntity))
                     
                     return wizardlet;
                   }
@@ -101,7 +103,9 @@ foam.CLASS({
 
                 associatedEntity = minMaxCap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
                 
-                updateUCJPromiseList.push(this.updateUCJ(minMaxWizardlet, associatedEntity));
+                minMaxArray.unshift(this.updateUCJ(minMaxWizardlet, associatedEntity));
+                updateUCJPromiseList = updateUCJPromiseList.concat(minMaxArray);
+                
 
               } else if ( cap.of ) {
                 associatedEntity = cap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;

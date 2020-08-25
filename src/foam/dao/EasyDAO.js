@@ -941,7 +941,7 @@ model from which to test ServiceProvider ID (spid)`,
       name: 'addPropertyIndex',
       type: 'foam.dao.EasyDAO',
       args: [ { javaType: 'foam.core.PropertyInfo...', name: 'props' } ],
-      code:     function addPropertyIndex() {
+      code: function addPropertyIndex() {
         this.mdao && this.mdao.addPropertyIndex.apply(this.mdao, arguments);
         return this;
       },

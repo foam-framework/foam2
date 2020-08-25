@@ -37,7 +37,12 @@ foam.INTERFACE({
       name: 'save'
     },
     {
-      name: 'createView'
+      name: 'createView',
+      args: [
+        {
+          name: 'data'
+        }
+      ]
     }
   ]
 });

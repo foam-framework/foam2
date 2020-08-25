@@ -5,7 +5,7 @@
  */
 foam.CLASS({
   package: 'foam.nanos.crunch.ui',
-  name: 'CapabilityWizardlet',
+  name: 'CapableObjectWizardlet',
   extends: 'foam.u2.wizard.BaseWizardlet',
 
   imports: [
@@ -25,33 +25,31 @@ foam.CLASS({
       name: 'capability'
     },
     {
-      name: 'ucj'
+      name: 'targetObject',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.crunch.lite.Capable'
     },
 
     // Properties for WizardSection interface
     {
       name: 'of',
       class: 'Class',
-      expression: function(capability) {
-        return capability && capability.of;
+      expression: function (capability) {
+        return capability.of;
       }
     },
     {
       name: 'data',
-      factory: function() {
+      factory: function () {
         if ( ! this.of ) return null;
 
-        var ret = this.of.create({ capability: this.capability }, this);
-        if ( this.ucj === null ) return ret;
-      
-        ret = Object.assign(ret, this.ucj.data);
-        return ret;
+        return this.of.create({}, this);
       }
     },
     {
       name: 'title',
       expression: function(capability) {
-        return capability && capability.name;
+        return capability.name;
       }
     }
   ],
@@ -59,9 +57,10 @@ foam.CLASS({
   methods: [
     {
       name: 'save',
+      // TODO: implement capable save for client
       code: function() {
-        return this.crunchController && this.crunchController.save(this);
       }
     }
   ]
 });
+

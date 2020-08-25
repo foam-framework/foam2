@@ -3,13 +3,12 @@ foam.CLASS({
   name: 'MinMaxCapabilityWizardlet',
   extends: 'foam.nanos.crunch.ui.CapabilityWizardlet',
 
+  requires: [
+    'foam.u2.view.MultiChoiceView',
+    'foam.u2.view.CardSelectView'
+  ],
+
   properties: [
-    {
-      // TODO: remove value this is just here for testing
-      name:  'of',
-      class: 'Class',
-      value: 'foam.nanos.cron.TimeHMS'
-    },
     {
       class: 'FObjectArray',
       of: 'foam.u2.wizard.Wizardlet',
@@ -27,10 +26,14 @@ foam.CLASS({
   ],
 
   methods: [
-    function createView() {
+    function createView(data) {
       // TODO: Implement create view method based on the choices property and the MultiChoiceView with choiceView as CardSelectView
       // TODO: Wire up wizard to see if createView returns null then render default SDV otherwise render the method output
-      return null;
+
+      return this.MultiChoiceView.create({
+        choices$: this.choices$,
+        booleanView: this.CardSelectView
+      });
     }
   ]
 });

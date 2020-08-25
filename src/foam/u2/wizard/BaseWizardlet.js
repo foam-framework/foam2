@@ -33,7 +33,7 @@ foam.CLASS({
     function validate() {
       return this.isValid;
     },
-    function createView() {
+    function createView(data) {
       return null;
     }
   ]
