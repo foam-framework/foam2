@@ -63,11 +63,11 @@ foam.CLASS({
     },
     {
       class: 'StringArray',
-      name: 'forwardedForProxyWhitelist',
+      name: 'forwardedForProxyWhitelist'
     },
     {
       class: 'StringArray',
-      name: 'hostDomains',
+      name: 'hostDomains'
     },
     {
       class: 'FObjectArray',

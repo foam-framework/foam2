@@ -15,7 +15,10 @@ foam.CLASS({
   properties: [
     {
       class: 'Map',
-      name: 'customHostMapping'
+      name: 'customHostMapping',
+      documentation: `
+        Custom host mapping that will directly serve the index file for the specified virtual host.
+      `
     },
     {
       class: 'Boolean',
@@ -59,6 +62,7 @@ foam.CLASS({
     {
       name: 'getTagString',
       type: 'String',
+      documentation: `Utility method that returns an html tag string.`,
       args: [ 
         { name: 'tag', javaType: 'String'},
         { name: 'keywords', javaType: 'java.util.ArrayList<String>'},
@@ -88,6 +92,9 @@ foam.CLASS({
     {
       name: 'populateHead',
       type: 'Void',
+      documentation: `
+        Generates the index file's head content based on theme and prints it to the response writer.
+      `,
       args: [ 
         { name: 'theme', javaType: 'foam.nanos.theme.Theme'},
         { name: 'out', javaType: 'java.io.PrintWriter'} 
@@ -153,7 +160,7 @@ foam.CLASS({
                     'java.io.IOException' ],
       javaCode: `
         String vhost = request.getServerName();
-
+        
         if ( getCustomHostMapping().containsKey(vhost) ) {
           request.getRequestDispatcher((String) getCustomHostMapping().get(vhost)).forward(request, response);
           return;
