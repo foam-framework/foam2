@@ -2758,10 +2758,7 @@ foam.CLASS({
     {
       class: 'List',
       name: 'projection',
-      factory: function() {
-        // TODO:
-        return [];
-      },
+      factory: function() { return []; },
       javaFactory: `return new java.util.ArrayList();`
     },
     {
@@ -2770,7 +2767,7 @@ foam.CLASS({
       transient: true,
       factory: function() {
         return this.projection.map(p => {
-          var o = p[0].create();
+          var o = foam.lookup(p[0]).create();
           for ( var i = 0 ; i < this.exprs.length ; i++ ) {
             this.exprs[i].set(o, p[i+1]);
           }
@@ -2789,7 +2786,7 @@ foam.CLASS({
 
             for ( int j = 0 ; j < es.length ; j++ ) {
               PropertyInfo e = (PropertyInfo) es[j];
-              e.set(o, o);
+              e.set(o, arr[i]);
             }
 
             a.set(i, o);
@@ -2808,7 +2805,7 @@ foam.CLASS({
         var a = [o.cls_];
         for ( var i = 0 ; i < this.exprs.length ; i++ )
           a[i+1] = this.exprs[i].f(o);
-        this.array.push(a);
+        this.projection.push(a);
       },
 // TODO:      swiftCode: 'array.append(obj)',
       javaCode: `
@@ -2818,7 +2815,7 @@ foam.CLASS({
         for ( int i = 0 ; i < getExprs().length ; i++ )
           a[i+1] = getExprs()[i].f(obj);
 
-        getArray().add(a);
+        getProjection().add(a);
       `
     },
     {
