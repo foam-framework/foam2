@@ -17,12 +17,18 @@ import foam.nanos.logger.Logger;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Queue;
 import static foam.mlang.MLang.*;
 
 public class ServerCrunchService implements CrunchService {
   public List getGrantPath(X x, String rootId) {
+    return getCapabilityPath(x, rootId, true);
+  }
+
+  public List getCapabilityPath(X x, String rootId, boolean filterGrantedUCJ) {
     Logger logger = (Logger) x.get("logger");
 
     DAO prerequisiteDAO = (DAO) x.get("prerequisiteCapabilityJunctionDAO");
@@ -48,9 +54,11 @@ public class ServerCrunchService implements CrunchService {
     while ( nextSources.size() > 0 ) {
       String sourceCapabilityId = nextSources.poll();
 
-      UserCapabilityJunction ucj = crunchService.getJunction(x, sourceCapabilityId);
-      if ( ucj != null && ucj.getStatus() == CapabilityJunctionStatus.GRANTED ) {
-        continue;
+      if ( ! filterGrantedUCJ ) {
+        UserCapabilityJunction ucj = crunchService.getJunction(x, sourceCapabilityId);
+        if ( ucj != null && ucj.getStatus() == CapabilityJunctionStatus.GRANTED ) {
+          continue;
+        }
       }
 
       if ( alreadyListed.contains(sourceCapabilityId) ) continue;
@@ -81,6 +89,32 @@ public class ServerCrunchService implements CrunchService {
 
     Collections.reverse(grantPath);
     return grantPath;
+  }
+
+  // Return capability path for multiple prerequisites without duplicates.
+  public List getMultipleCapabilityPath(
+    X x, String[] capabilityIds, boolean filterGrantedUCJ
+  ) {
+    Set alreadyListed = new HashSet<String>();
+
+    List multiplePath = new ArrayList();
+
+    for ( String capId : capabilityIds ) {
+      List crunchyPath = getCapabilityPath(x, capId, filterGrantedUCJ);
+      for ( Object obj : crunchyPath ) {
+        Capability cap = null;
+        if ( obj instanceof List ) {
+          List list = (List) obj;
+          cap = (Capability) list.get(list.size() - 1);
+        } else {
+          cap = (Capability) obj;
+        }
+        if ( alreadyListed.contains(cap.getId()) ) continue;
+        multiplePath.add(obj);
+      }
+    }
+
+    return multiplePath;
   }
 
   public UserCapabilityJunction getJunction(X x, String capabilityId) {

@@ -246,6 +246,14 @@ foam.CLASS({
       factory: function() {
         return foam.nanos.column.CommonColumnHandler.create();
       }
+    },
+    {
+      name: 'columnConfigToPropertyConverter',
+      factory: function() {
+        if ( ! this.__context__.columnConfigToPropertyConverter )
+          return foam.nanos.column.ColumnConfigToPropertyConverter.create();
+        return this.__context__.columnConfigToPropertyConverter;
+      }
     }
   ],
 
@@ -338,7 +346,7 @@ foam.CLASS({
                   addClass(view.myClass('th')).
                   addClass(view.myClass('th-' + prop.name))
                   .style({ flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0' })
-                  .add(view.__subContext__.columnConfigToPropertyConverter.returnColumnHeader(view.of, col)).
+                  .add(view.columnConfigToPropertyConverter.returnColumnHeader(view.of, col)).
                   callIf(isFirstLevelProperty && prop.sortable, function() {
                     this.on('click', function(e) {
                       view.sortBy(prop);
@@ -417,7 +425,7 @@ foam.CLASS({
 
             //to retrieve value of unitProp
             unitValueProperties.forEach(p => propertyNamesToQuery.push(p.property.unitPropName));
-            var valPromises = view.returnRecords(proxy, propertyNamesToQuery);
+            var valPromises = view.returnRecords(view.of, proxy, propertyNamesToQuery);
 
             var tbodyElement = this.
               E();
@@ -432,7 +440,7 @@ foam.CLASS({
                   addClass(view.myClass('tr')).
                   on('mouseover', function() {
                     if ( !thisObjValue ) {
-                      dao.find(val[0]).then(v => {
+                      dao.inX(ctrl.__subContext__).find(val[0]).then(v => {
                       thisObjValue = v;
                       view.hoverSelection = thisObjValue;
                     });
@@ -442,7 +450,7 @@ foam.CLASS({
                   callIf(view.dblclick && ! view.disableUserSelection, function() {
                     tableRowElement.on('dblclick', function() {
                       if ( !thisObjValue ) {
-                        dao.find(val[0]).then(function(v) {
+                        dao.inX(ctrl.__subContext__).find(val[0]).then(function(v) {
                           thisObjValue = v;
                           view.dblclick && view.dblclick(thisObjValue);
                         });
@@ -460,7 +468,7 @@ foam.CLASS({
                       ) return;
 
                       if  ( !thisObjValue ) {
-                        dao.find(val[0]).then(v => {
+                        dao.inX(ctrl.__subContext__).find(val[0]).then(v => {
                           view.selection = v;
                           if ( view.importSelection$ ) view.importSelection = v;
                           if ( view.editRecord$ ) view.editRecord(v);
@@ -608,8 +616,8 @@ foam.CLASS({
             });
         }
       },
-      function returnRecords(dao, propertyNamesToQuery) {
-        var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(dao.of, propertyNamesToQuery);
+      function returnRecords(of, dao, propertyNamesToQuery) {
+        var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(of, propertyNamesToQuery);
         return dao.select(expr);
       },
       function doesAllColumnsContainsColumnName(context, col) {
@@ -636,7 +644,7 @@ foam.CLASS({
         return context.returnProperties(context, propertyNamesToQuery);
       },
       function returnProperties(obj, propertyNamesToQuery) {
-        var columnConfig = obj.__context__.columnConfigToPropertyConverter;
+        var columnConfig = obj.columnConfigToPropertyConverter;
         if ( ! columnConfig ) columnConfig = obj.ColumnConfigToPropertyConverter.create();
         var result = [];
         for ( var propName of propertyNamesToQuery ) {
