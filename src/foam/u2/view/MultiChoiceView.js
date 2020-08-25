@@ -83,7 +83,7 @@ foam.CLASS({
           })
         }
 
-        if (this.isValidNumberOfChoices ){
+        if (this.isValidNumberOfChoices && this.dao ){
           this.data = this.outputSelectedChoicesInDAO()
         }
       }

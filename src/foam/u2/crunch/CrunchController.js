@@ -101,7 +101,7 @@ foam.CLASS({
 
                 associatedEntity = minMaxCap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
                 
-                updateUCJPromiseList.push(this.updateUCJ(minMaxWizardlet, associatedEntity));
+                updateUCJPromiseList.unshift(this.updateUCJ(minMaxWizardlet, associatedEntity));
 
               } else if ( cap.of ) {
                 associatedEntity = cap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
