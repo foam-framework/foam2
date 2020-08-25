@@ -830,12 +830,15 @@ p({
   "name":"localGroupPermissionJunctionDAO",
   "description":"The junction DAO for the many-to-many relationship between groups and permissions",
   "serviceScript":"""
-    return new foam.dao.EasyDAO.Builder(x)
+    dao = new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.auth.GroupPermissionJunction.getOwnClassInfo())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("groupPermissionJunctions")
       .setPm(true)
       .build();
+
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.auth.GroupPermissionJunction.SOURCE_ID });
+    return dao;
   """
 })
 p({
