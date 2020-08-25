@@ -20,10 +20,11 @@ foam.CLASS({
     'foam.core.PropertyInfo',
     'foam.core.X',
     'foam.mlang.Expr',
+    'foam.mlang.ReferenceExpressionHelper',
     'foam.nanos.logger.Logger',
     'foam.util.StringUtil',
     'java.lang.reflect.Method',
-    'static foam.mlang.MLang.*',
+    'static foam.mlang.MLang.*'
   ],
   properties: [
     {
@@ -107,7 +108,7 @@ foam.CLASS({
 
         if ( i == propName.length - 1 )
           return expr == null ? prop : DOT(expr, prop);
-        
+
         Expr propExpr = buildPropertyExpr(prop, expr);
 
         try {
@@ -135,7 +136,7 @@ foam.CLASS({
           return ((AbstractFObjectPropertyInfo) prop).of();
         }
 
-        Class cls = getFinderMethod(prop).getReturnType();
+        Class cls = ReferenceExpressionHelper.getFinderMethod(prop).getReturnType();
         return (ClassInfo) cls.getMethod("getOwnClassInfo").invoke(null);
       `
     },
@@ -152,51 +153,18 @@ foam.CLASS({
           javaType: 'foam.mlang.Expr'
         }
       ],
-      code: function(prop, expr) {          
+      code: function(prop, expr) {
         if ( foam.core.Reference.isInstance(prop) )
           prop = foam.mlang.Expressions.create().REF(prop);
-        
+
         return ! expr ? prop :
           foam.mlang.Expressions.create().DOT(expr, prop);
       },
       javaCode: `
-        if ( isPropertyAReference((PropertyInfo)prop) )
+        if ( ReferenceExpressionHelper.isPropertyAReference((PropertyInfo)prop) )
           prop = REF(prop);
 
         return expr == null ? prop : DOT(expr, prop);
-      `
-    },
-    {
-      name: 'isPropertyAReference',
-      javaType: 'Boolean',
-      args: [
-        {
-          name: 'prop',
-          javaType: 'foam.core.PropertyInfo',
-        }
-      ],
-      javaCode: `
-        if ( prop instanceof foam.core.AbstractFObjectPropertyInfo )
-          return false;
-        
-        return getFinderMethod(prop) != null;
-      `
-    },
-    {
-      name: 'getFinderMethod',
-      javaType: 'Method',
-      args: [
-        {
-          name: 'prop',
-          javaType: 'foam.core.PropertyInfo',
-        }
-      ],
-      javaCode: `
-        try {
-          return prop.getClassInfo().getObjClass().getMethod("find" + StringUtil.capitalize(prop.getName()), foam.core.X.class);
-        } catch( Throwable t ) {
-          return null;
-        }
       `
     }
   ]
