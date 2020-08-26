@@ -189,8 +189,9 @@ public class ServerCrunchService implements CrunchService {
       ucj.setData(data);
     }
     DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
-    userCapabilityJunctionDAO.put(ucj);
+    userCapabilityJunctionDAO.inX(x).put(ucj);
   }
+
   public void maybeIntercept(X x, String[] capabilityOptions) {
     if ( capabilityOptions.length < 1 ) {
       Logger logger = (Logger) x.get("logger");
