@@ -172,15 +172,21 @@ foam.CLASS({
         dataToClass,
         classToData
       );
+
       if ( this.data ) { this.objectClass = dataToClass(this.data); }
       if ( ! this.data && ! this.objectClass && this.choices.length ) this.objectClass = this.choices[0][0];
 
       this.
-        tag(this.OBJECT_CLASS).
+        start(this.OBJECT_CLASS).
+          // If we were using a DetailView, this would be done for us, but since
+          // we aren't, we need to connect the 'visibility' property ourself.
+          show(this.OBJECT_CLASS.createVisibilityFor(foam.core.SimpleSlot.create({value: this}), this.controllerMode$).map(function(m) {
+            return m != foam.u2.DisplayMode.HIDDEN;
+          })).
+        end().
         tag(foam.u2.detail.VerticalDetailView, {
           data$: this.data$
         });
-            
     },
 
     function choicesFallback(of) {

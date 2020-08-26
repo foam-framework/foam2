@@ -2679,69 +2679,6 @@ foam.CLASS({
   implements: [ 'foam.core.Serializable' ],
 
   javaImports: [
-    'foam.mlang.Expr',
-    'java.util.StringJoiner'
-  ],
-
-  properties: [
-    {
-      class: 'Array',
-      type: 'foam.mlang.Expr[]',
-      name: 'exprs'
-    },
-    {
-      class: 'List',
-      name: 'array',
-      factory: function() { return []; },
-      javaFactory: `return new java.util.ArrayList();`
-    }
-  ],
-
-  methods: [
-    {
-      name: 'put',
-      code: function put(o, sub) {
-        var a = [];
-        for ( var i = 0 ; i < this.exprs.length ; i++ )
-          a[i] = this.exprs[i].f(o);
-        this.array.push(a);
-      },
-// TODO:      swiftCode: 'array.append(obj)',
-      javaCode: `
-        Object[] a = new Object[getExprs().length];
-
-        for ( int i = 0 ; i < getExprs().length ; i++ )
-          a[i] = getExprs()[i].f(obj);
-
-        getArray().add(a);
-      `
-    },
-    {
-      name: 'toString',
-      code: function() {
-        return this.cls_.name + '(' + this.exprs.join(',') + ')';
-      },
-      javaCode: `
-        StringJoiner joiner = new StringJoiner(", ", getClassInfo().getId() + "(", ")");
-
-        for ( Expr expr : getExprs() ) {
-          joiner.add(expr.toString());
-        }
-
-        return joiner.toString();
-      `
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.mlang.sink',
-  name: 'Projection2',
-  extends: 'foam.dao.AbstractSink',
-  implements: [ 'foam.core.Serializable' ],
-
-  javaImports: [
     'foam.core.ClassInfo',
     'foam.core.FObject',
     'foam.core.PropertyInfo',
@@ -2753,26 +2690,36 @@ foam.CLASS({
     {
       class: 'Array',
       type: 'foam.mlang.Expr[]',
-      name: 'exprs'
+      name: 'exprs',
+      documentation: 'The expressions to be evaluated and returned in the projection. Typically are Properties.',
     },
     {
       class: 'List',
-      name: 'projection',
-      factory: function() {
-        // TODO:
-        return [];
-      },
+      name: 'projectionWithClass',
+      documentation: 'The projection but with the class in position 0 with all other values offset by 1.',
+      factory: function() { return []; },
       javaFactory: `return new java.util.ArrayList();`
+    },
+    {
+      class: 'List',
+      documentation: 'The projection with the class removed and all values in the same position as in "exprs".',
+      name: 'projection',
+      transient: true,
+      getter: function() { return this.projectionWithClass.map(p => p.slice(1)); }
     },
     {
       class: 'List',
       name: 'array',
       transient: true,
+      documentation: 'An array of full objects created from the projection. Only properties included in exprs/the-projection will be set.',
       factory: function() {
-        return this.projection.map(p => {
-          var o = p[0].create();
+        return this.projectionWithClass.map(p => {
+          var o = foam.lookup(p[0]).create();
           for ( var i = 0 ; i < this.exprs.length ; i++ ) {
-            this.exprs[i].set(o, p[i+1]);
+            try {
+              this.exprs[i].set(o, p[i+1]);
+            } catch (x) {
+            }
           }
           return o;
         });
@@ -2780,7 +2727,7 @@ foam.CLASS({
       javaFactory: `
         var a  = new java.util.ArrayList();
         var es = getExprs();
-        var p  = getProjection();
+        var p  = getProjectionWithClass();
         for ( int i = 0 ; i < p.size() ; i++ ) {
           try {
             Object[]  arr = (Object[]) p.get(i);
@@ -2789,12 +2736,11 @@ foam.CLASS({
 
             for ( int j = 0 ; j < es.length ; j++ ) {
               PropertyInfo e = (PropertyInfo) es[j];
-              e.set(o, o);
+              e.set(o, arr[i]);
             }
 
             a.set(i, o);
-          } catch (Throwable t) {
-          }
+          } catch (Throwable t) {}
         }
         return a;
       `
@@ -2808,7 +2754,7 @@ foam.CLASS({
         var a = [o.cls_];
         for ( var i = 0 ; i < this.exprs.length ; i++ )
           a[i+1] = this.exprs[i].f(o);
-        this.array.push(a);
+        this.projectionWithClass.push(a);
       },
 // TODO:      swiftCode: 'array.append(obj)',
       javaCode: `
@@ -2818,7 +2764,7 @@ foam.CLASS({
         for ( int i = 0 ; i < getExprs().length ; i++ )
           a[i+1] = getExprs()[i].f(obj);
 
-        getArray().add(a);
+        getProjectionWithClass().add(a);
       `
     },
     {
@@ -3588,7 +3534,6 @@ foam.CLASS({
     'foam.mlang.sink.Max',
     'foam.mlang.sink.Min',
     'foam.mlang.sink.Projection',
-    'foam.mlang.sink.Projection2',
     'foam.mlang.sink.Plot',
     'foam.mlang.sink.Sequence',
     'foam.mlang.sink.Sum',
@@ -3670,13 +3615,6 @@ foam.CLASS({
     function SEQ() { return this._nary_("Sequence", arguments); },
     function PROJECTION(exprs) {
       return this.Projection.create({
-        exprs: foam.Array.isInstance(exprs) ?
-          exprs :
-          foam.Array.clone(arguments)
-        });
-    },
-    function PROJECTION2(exprs) {
-      return this.Projection2.create({
         exprs: foam.Array.isInstance(exprs) ?
           exprs :
           foam.Array.clone(arguments)

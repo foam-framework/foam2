@@ -19,6 +19,7 @@ foam.CLASS({
 
   requires: [
     'foam.log.LogLevel',
+    'foam.nanos.crunch.AgentCapabilityJunction',
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.u2.detail.SectionView'
   ],
@@ -150,10 +151,23 @@ foam.CLASS({
       return new Promise(wizardResolve => {
         // save no-data capabilities (i.e. not displayed in wizard)
         Promise.all(capabilities.filter(cap => ! cap.of).map(
-          cap => this.userCapabilityJunctionDAO.put(this.UserCapabilityJunction.create({
-            sourceId: this.subject.user.id,
-            targetId: cap.id
-          }))
+          cap => {
+            var isAssociation = cap.associatedEntity === foam.nanos.crunch.AssociatedEntity.ACTING_USER;
+            var sourceEntity = isAssociation || cap.associatedEntity == foam.nanos.crunch.AssociatedEntity.REAL_USER ? 
+              this.subject.realUser.id : 
+              this.subject.user.id;
+            var ucj = isAssociation ? 
+              this.AgentCapabilityJunction.create({
+                sourceId: sourceEntity,
+                targetId: cap.id,
+                effectiveUser: this.subject.user.id
+              }) :
+              this.UserCapabilityJunction.create({
+                sourceId: sourceEntity,
+                targetId: cap.id
+              });
+            this.userCapabilityJunctionDAO.put(ucj);
+          }
         )).then(() => {
           wizardResolve();
         });

@@ -21,11 +21,11 @@ foam.CLASS({
     Or the client can instead pass in a DAO to the MultiChoiceView.dao and the choices list will
     be automatically generated
 
-    Calling the following methods: 
-    
-    1. MultiChoiceView.outputSelectedChoicesInValueLabelFormat() - will return an array containing the 
+    Calling the following methods:
+
+    1. MultiChoiceView.outputSelectedChoicesInValueLabelFormat() - will return an array containing the
     selected choices in [ value, label ] format only if the minSelected, maxSelected criteria is respected
-    2. MultiChoiceView.outputSelectedChoicesInValueLabelFormat() - will return a predicated dao containing thee 
+    2. MultiChoiceView.outputSelectedChoicesInValueLabelFormat() - will return a predicated dao containing thee
     selected choices in only if the minSelected, maxSelected criteria is respected
 
     MultiChoiceView.data will be automatically set to a predicated dao based on the choices selected only if
@@ -181,7 +181,7 @@ foam.CLASS({
 
               var arraySlotForChoices = foam.core.ArraySlot.create({
                 slots: []
-              });        
+              });
 
               var toRender = self.choices.map(function (choice) {
                 var simpSlot0 = foam.core.SimpleSlot.create({ value: choice[0] });
@@ -190,13 +190,13 @@ foam.CLASS({
                   ? choice[2]
                   : foam.core.SimpleSlot.create({ value: choice[2] });
                 var simpSlot3 = foam.core.SimpleSlot.create({ value: choice[3] });
-  
+
                 var arraySlotForChoice = foam.core.ArraySlot.create({
                   slots: [ simpSlot0, simpSlot1, simpSlot2, simpSlot3 ]
                 })
-  
+
                 arraySlotForChoices.slots.push(arraySlotForChoice);
-  
+
                 return self.E().style({ 'height': '100%;', 'width':`${100 / self.numberOfColumns}%` })
                   .tag(self.booleanView, {
                       data$: simpSlot2,
@@ -272,7 +272,7 @@ foam.CLASS({
         var of = this.dao.of
         if ( of._CHOICE_TEXT_ ) {
           this.dao.select(this.PROJECTION(of.ID, of._CHOICE_TEXT_)).then((s) => {
-            this.choices = s.array;
+            this.choices      = s.projection;
             this.isDaoFetched = true
           });
           return;

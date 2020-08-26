@@ -14,6 +14,10 @@ foam.CLASS({
       class: 'FObjectArray',
       // javaType: 'java.util.List<foam.nanos.crunch.crunchlite.CapablePayload>',
       of: 'foam.nanos.crunch.lite.CapablePayload'
+    },
+    {
+      name: 'userCapabilityRequirements',
+      class: 'StringArray',
     }
   ],
 });
