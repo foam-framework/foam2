@@ -288,7 +288,7 @@ foam.CLASS({
 
       // When 'p' resolves, query all matching capabilities
       p.then(arraySink => {
-        capabilityIds = arraySink.array;
+        capabilityIds = arraySink.projection;
         self.visibleCapabilityDAO.where(
           self.IN(self.Capability.ID, capabilityIds)
         ).select().then(result => {
