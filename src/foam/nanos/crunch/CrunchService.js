@@ -113,6 +113,24 @@ foam.INTERFACE({
           type: 'foam.core.FObject'
         }
       ],
+    },
+    {
+      name: 'maybeIntercept',
+      documentation: `
+        Invoke a capability intercept if no capabilities from the list of
+        options are granted. The intercept will have the specified
+        capabilities options for the user.
+      `,
+      args: [
+        {
+          name: 'x',
+          type: 'Context',
+        },
+        {
+          name: 'capabilityId',
+          type: 'String[]'
+        },
+      ]
     }
   ],
 });
