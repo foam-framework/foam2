@@ -17,6 +17,9 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
+    'foam.nanos.auth.Subject',
+    'foam.nanos.auth.User',
+    'foam.nanos.crunch.AgentCapabilityJunction',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityCapabilityJunction',
     'foam.nanos.crunch.CapabilityJunctionStatus',
@@ -34,7 +37,6 @@ foam.CLASS({
           public void execute(X x) {
             UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
             if ( ucj.getStatus() == CapabilityJunctionStatus.ACTION_REQUIRED ) return;
-          
 
             // the following should be checked if the result of previous rule ( validateUCJDataOnPut ) 
             // is not ACTION_REQUIRED. In the ACTION_REQUIRED case, the ucj should be put into the
@@ -88,7 +90,12 @@ foam.CLASS({
           if ( ! cap.getEnabled() ) continue;
           UserCapabilityJunction ucJunction = (UserCapabilityJunction) userCapabilityJunctionDAO.find(AND(
             EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId()),
-            EQ(UserCapabilityJunction.TARGET_ID, (String) ccJunction.getTargetId())
+            EQ(UserCapabilityJunction.TARGET_ID, (String) ccJunction.getTargetId()),
+            // if we were to check this based on subject user its important that ucjs are put in the context of their owner
+            OR(
+              NOT(INSTANCE_OF(foam.nanos.crunch.AgentCapabilityJunction.class)),
+              EQ(AgentCapabilityJunction.EFFECTIVE_USER, ((User) ((Subject) x.get("subject")).getUser()).getId())
+            )
           ));
 
           if ( ucJunction != null && 
