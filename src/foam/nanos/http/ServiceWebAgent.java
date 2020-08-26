@@ -25,7 +25,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.net.URL;
-import java.util.Arrays;
 
 @SuppressWarnings("serial")
 public class ServiceWebAgent

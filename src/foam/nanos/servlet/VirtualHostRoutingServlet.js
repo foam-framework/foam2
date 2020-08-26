@@ -35,9 +35,7 @@ foam.CLASS({
     {
       class: 'Map',
       name: 'customHostMapping',
-      documentation: `
-        Custom host mapping that will directly serve the index file for the specified virtual host.
-      `
+      documentation: `Custom host mapping that will directly serve the index file for the specified virtual host.`
     },
     {
       class: 'Boolean',
@@ -124,9 +122,7 @@ foam.CLASS({
     {
       name: 'populateHead',
       type: 'Void',
-      documentation: `
-        Generates the index file's head content based on theme and prints it to the response writer.
-      `,
+      documentation: `Generates the index file's head content based on theme and prints it to the response writer.`,
       args: [ 
         { name: 'theme', javaType: 'Theme'},
         { name: 'out', javaType: 'PrintWriter'} 
@@ -157,6 +153,7 @@ foam.CLASS({
         String headTag = this.getTagString((String) tagConfig.get("tag"), keywords, (HashMap) tagConfig.get("attributes"), hasClosingTag, isSingleClosingTag);
         out.println(headTag);
       }
+      
       if ( this.getIsResourceStorage() ) {
         out.println("<script language=\\"javascript\\" src=\\"/foam-bin-@VERSION@.js\\"></script>");
         out.println("<script async defer language=\\"javascript\\" src=\\"/html2canvas.min.js\\"></script>");
