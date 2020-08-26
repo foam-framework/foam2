@@ -102,16 +102,21 @@ foam.CLASS({
       // called in CapabilityRequirementView
       let topCap = capabilitiesSections.caps[capabilitiesSections.caps.length - 1];
       let config = topCap.wizardletConfig.cls_.create({ ...topCap.wizardletConfig.instance_ }, this);
-      return ctrl.add(this.Popup.create({ closeable: false }).tag({
-        class: 'foam.u2.wizard.StepWizardletView',
-        data: foam.u2.wizard.StepWizardletController.create({
-          wizardlets: capabilitiesSections.wizCaps,
-          config: config
-        }),
-        onClose: (x) => {
-          this.finalOnClose(x, capabilitiesSections.caps);
-        }
-      }));
+      return new Promise((resolve, _) => {
+        ctrl.add(this.Popup.create({ closeable: false }).tag({
+          class: 'foam.u2.wizard.StepWizardletView',
+          data: foam.u2.wizard.StepWizardletController.create({
+            wizardlets: capabilitiesSections.wizCaps,
+            config: config
+          }),
+          onClose: (x) => {
+            x.closeDialog();
+            resolve();
+          }
+        }));
+      }).then(() => {
+        return this.finalOnClose(capabilitiesSections.caps);
+      });
     },
 
     async function startWizardFlow(capabilityId, toLaunchOrNot) {
@@ -122,9 +127,8 @@ foam.CLASS({
         });
     },
 
-    function finalOnClose(x, capabilities) {
+    function finalOnClose(capabilities) {
       return new Promise((wizardResolve) => {
-        x.closeDialog();
         // Save no-data capabilities (i.e. not displayed in wizard)
         Promise.all(capabilities.filter(cap => ! cap.of).map(
           cap => {
@@ -242,15 +246,25 @@ foam.CLASS({
         .map(eachSection => eachSection.help);
       if ( arrOfRequiredCapabilities.length < 1 ) {
         // if nothing to show don't open this dialog - push directly to wizard
-        this.generateAndDisplayWizard(capabilitiesSections);
+        return this.generateAndDisplayWizard(capabilitiesSections);
       } else {
-        return this.ctrl.add(
-          this.Popup.create({ closeable: false }, this.ctrl.__subContext__).tag({
-            class: 'foam.u2.crunch.CapabilityRequirementView',
-            arrayRequirement: arrOfRequiredCapabilities,
-            functionData: capabilitiesSections,
-            capabilityId: capabilityId
-          })).end();
+        return new Promise((resolve, _) => {
+          this.ctrl.add(
+            this.Popup.create({ closeable: false }, this.ctrl.__subContext__).tag({
+              class: 'foam.u2.crunch.CapabilityRequirementView',
+              arrayRequirement: arrOfRequiredCapabilities,
+              functionData: capabilitiesSections,
+              capabilityId: capabilityId,
+              onClose: (x, isContinueAction) => {
+                resolve(isContinueAction);
+              }
+            })
+          ).end();
+        }).then(isContinueAction => {
+          if (isContinueAction) {
+            return this.generateAndDisplayWizard(capabilitiesSections);
+          }
+        })
       }
     },
     function save(wizardlet) {
