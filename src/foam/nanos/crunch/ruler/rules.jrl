@@ -15,58 +15,61 @@ p({
 
 p({
   "class":"foam.nanos.ruler.Rule",
-  "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-1",
-  "name":"Validate UCJ Data On Put",
+  "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-1-create",
+  "name":"Validate UCJ Data On Create",
   "priority":900,
   "ruleGroup":"ucjDAO",
   "daoKey":"userCapabilityJunctionDAO",
-  "operation":3,
+  "operation":0,
+  "after":false,
+  "enabled":true,
+  "saveHistory":true,
+  "action":{"class":"foam.nanos.crunch.ruler.ValidateUCJDataOnPut"},
+  "lifecycleState":1,
+})
+
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-1-update",
+  "name":"Validate UCJ Data On Update",
+  "priority":900,
+  "ruleGroup":"ucjDAO",
+  "daoKey":"userCapabilityJunctionDAO",
+  "operation":1,
   "after":false,
   "enabled":true,
   "saveHistory":true,
   "action":{"class":"foam.nanos.crunch.ruler.ValidateUCJDataOnPut"},
   "lifecycleState":1,
   "predicate":{
-    "class":"foam.mlang.predicate.Or",
+    "class":"foam.mlang.predicate.And",
     "args":[
       {
-        "class":"foam.nanos.ruler.predicate.PropertyEQValue",
+        "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
         "propName":"status",
-        "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":3}
+        "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":0}
       },
       {
-        "class":"foam.mlang.predicate.And",
-        "args":[
-          {
-            "class":"foam.nanos.ruler.predicate.PropertyEQValue",
-            "propName":"status",
-            "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":5},
-            "isNew":false
-          },
-          {
-            "class":"foam.nanos.ruler.predicate.PropertyEQValue",
-            "propName":"status",
-            "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":5}
-          }
-        ]
+        "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
+        "propName":"status",
+        "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1}
       },
       {
-        "class":"foam.mlang.predicate.And",
-        "args":[
-          {
-            "class":"foam.mlang.predicate.Not",
-            "arg1":{
-              "class":"foam.nanos.ruler.predicate.PropertyChangePredicate",
-              "propName":"status"
-            }
-          },
-          { "class":"foam.nanos.crunch.ruler.IsDataUpdate" },
-          {
-            "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
-            "propName":"status",
-            "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1}
-          }
-        ]
+        "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
+        "propName":"status",
+        "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":6}
+      },
+      {
+        "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
+        "propName":"status",
+        "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1},
+        "isNew":false
+      },
+      {
+        "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
+        "propName":"status",
+        "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":6},
+        "isNew":false
       },
       {
         "class":"foam.mlang.predicate.Not",
@@ -74,40 +77,33 @@ p({
           "class":"foam.mlang.predicate.And",
           "args":[
             {
-              "class":"foam.nanos.ruler.predicate.PropertyEQValue",
+              "class":"foam.nanos.ruler.predicate.PropertyChangePredicate",
               "propName":"status",
-              "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1},
-              "isNew":false
             },
             {
-              "class":"foam.nanos.ruler.predicate.PropertyEQValue",
-              "propName":"status",
-              "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":7}
+              "class":"foam.mlang.predicate.Or",
+              "args":[
+                {
+                  "class":"foam.nanos.ruler.predicate.PropertyEQValue",
+                  "propName":"status",
+                  "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":7}
+                },
+                {
+                  "class":"foam.nanos.ruler.predicate.PropertyEQValue",
+                  "propName":"status",
+                  "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":5}
+                },
+                {
+                  "class":"foam.nanos.ruler.predicate.PropertyEQValue",
+                  "propName":"status",
+                  "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":2}
+                }
+              ]
             }
           ]
         }
-      },
-      {
-        "class":"foam.mlang.predicate.Or",
-        "args":[
-          {
-            "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
-            "propName":"status",
-            "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":0}
-          },
-          {
-            "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
-            "propName":"status",
-            "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1}
-          },
-          {
-            "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
-            "propName":"status",
-            "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":6}
-          }
-        ]
+        
       }
-
     ]
   }
 })
