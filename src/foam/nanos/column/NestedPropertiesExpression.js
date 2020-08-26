@@ -37,8 +37,8 @@ foam.CLASS({
     }
   ],
   methods: [
-    function set() {
-      // TODO: implement
+    function set(o, val) {
+      o.cls_.getAxiomByName(this.nestedProperty).set(o, val);
     },
     {
       name: 'toString',
