@@ -18,6 +18,7 @@ foam.CLASS({
       class: 'Reference',
       of: 'foam.nanos.crunch.Capability',
       name: 'sourceId',
+      targetDAOKey: 'localCapabilityDAO',
       tableCellFormatter: function(value, obj, axiom) {
         this.__subSubContext__.capabilityDAO
           .find(value)
@@ -31,6 +32,7 @@ foam.CLASS({
       class: 'Reference',
       of: 'foam.nanos.crunch.Capability',
       name: 'targetId',
+      targetDAOKey: 'localCapabilityDAO',
       tableCellFormatter: function(value, obj, axiom) {
         this.__subSubContext__.capabilityDAO
           .find(value)

@@ -50,6 +50,7 @@ foam.CLASS({
       class: 'Reference',
       of: 'foam.nanos.crunch.Capability',
       name: 'targetId',
+      targetDAOKey: 'localCapabilityDAO',
       label: 'Capability',
       tableCellFormatter: function(value, obj, axiom) {
         this.__subSubContext__.capabilityDAO
