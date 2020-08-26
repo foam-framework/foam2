@@ -426,6 +426,7 @@ foam.CLASS({
             //to retrieve value of unitProp
             unitValueProperties.forEach(p => propertyNamesToQuery.push(p.property.unitPropName));
             var valPromises = view.returnRecords(view.of, proxy, propertyNamesToQuery);
+            var nastedPropertyNamesAndItsIndexes = view.buildArrayOfNestedPropertyNamesAndCorrespondingIndexesInArray(propertyNamesToQuery);
 
             var tbodyElement = this.
               E();
@@ -433,9 +434,12 @@ foam.CLASS({
               addClass(view.myClass('tbody'));
               valPromises.then(function(values) {
 
-                tbodyElement.forEach(values.array, function(obj) {
+                for ( var i = 0 ; i < values.projection.length ; i++ ) {
+                  var obj = values.array[i];
+                  var nestedPropertyValues = view.filterOutValuesForNotNestedProperties(values.projection[i], nastedPropertyNamesAndItsIndexes[1]);
+                  var nestedPropertiesObjsMap = view.groupObjectsThatAreRelatedToNestedProperties(view.of, nastedPropertyNamesAndItsIndexes[0], nestedPropertyValues);
                   var thisObjValue;
-                  var tableRowElement = this.E();
+                  var tableRowElement = tbodyElement.E();
                   tableRowElement.
                   addClass(view.myClass('tr')).
                   on('mouseover', function() {
@@ -555,51 +559,28 @@ foam.CLASS({
                       delete view.checkboxes_[obj.id];
                     });
                   });
+                  
+                  for ( var  j = 0 ; j < view.columns_.length ; j++  ) {
+                    var objForCurrentProperty = obj;
+                    var propName = view.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(view, view.columns_[j]);
+                    var prop = view.props.find(p => p.fullPropertyName === propName);
+                    //check if current column is a nested property
+                    //if so get object for it
+                    if ( prop && prop.fullPropertyName.includes('.') ) {
+                      objForCurrentProperty = nestedPropertiesObjsMap[view.getNestedPropertyNameExcludingLastProperty(prop.fullPropertyName)];
+                    }
 
-                  for ( var  i = 0 ; i < view.columns_.length ; i++  ) {
-                    var prop = view.props.find(p => p.fullPropertyName === view.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(view, view.columns_[i]));
-                    prop = prop ? prop.property : view.of.getAxiomByName(view.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(view, view.columns_[i]));
-
-                    if ( ! prop )
-                      continue;
-
-                    var index = propertyNamesToQuery.indexOf(view.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(view, view.columns_[i]));
-                    var value;
-                    // if ( index !== -1 ) value = val[index];
-
-                    var tableCellFormatter = view.returnColumnPropertyForPropertyName(view, view.columns_[i], 'tableCellFormatter');
-                    var tableWidth = view.returnColumnPropertyForPropertyName(view, view.columns_[i], 'tableWidth');
+                    prop = prop ? prop.property : view.of.getAxiomByName(propName);
+                    var tableWidth = view.returnColumnPropertyForPropertyName(view, view.columns_[j], 'tableWidth');
 
                     // var stringValue;
-                    var column = typeof view.columns_[i] === 'string' || ! view.columns_[i].tableCellFormatter ? prop : view.columns_[i];
+                    var column = typeof view.columns_[j] === 'string' || ! view.columns_[j].tableCellFormatter ? prop : view.columns_[j];
                     // if ( overrides ) column = column.clone().copyFrom(overrides);
 
-                    var elmt = this.E().addClass(view.myClass('td')).style({flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0'}).
+                    var elmt = tableRowElement.E().addClass(view.myClass('td')).style({flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0'}).
                     callOn(column.tableCellFormatter, 'format', [
-                      column.f ? column.f(obj) : null, obj, column
+                      column.f ? column.f(objForCurrentProperty) : null, objForCurrentProperty, column
                     ]);
-
-                    // if (foam.core.Action.isInstance(prop)) {
-                    //   elmt.add('');// will be fixed on Projection update
-                    // } else {
-                    //   if ( foam.core.UnitValue.isInstance(prop) ) {
-                    //     var indexOfUnitName = propertyNamesToQuery.indexOf(prop.unitPropName);
-                    //     stringValue = view.outputter.returnStringValueForProperty(view.__context__, prop, value, val[indexOfUnitName]);
-                    //   } else if ( tableCellFormatter ) {
-                    //     try {
-                    //       if ( tableCellFormatter )
-                    //         tableCellFormatter.format(elmt, value, null);
-                    //     } catch(e) {
-                    //       stringValue = view.outputter.returnStringValueForProperty(view.__context__, prop, value);
-                    //     }
-                    //   }  else {
-                    //     stringValue = view.outputter.returnStringValueForProperty(view.__context__, prop, value);
-                    //   }
-                    //   if ( stringValue ) {
-                    //     elmt.add(stringValue);
-                    //     stringValue = null;
-                    //   }
-                    // }
                     tableRowElement.add(elmt);
                   }
 
@@ -615,7 +596,7 @@ foam.CLASS({
                       }).
                     end();
                   tbodyElement.add(tableRowElement);
-                });
+                }
               });
 
               return tbodyElement;
@@ -666,6 +647,51 @@ foam.CLASS({
           return null;
         }
         return context.columns.find( c =>  context.columnHandler.returnPropertyNamesForColumn(context, c) === col);
+      },
+      function getClassForNestedPropertyObject(cls, propNames) {
+        var of_ = cls;
+        for ( var i = 0 ; i < propNames.length - 1 ; i++ ) {
+          of_ = of_.getAxiomByName(propNames[i]).of;
+        }
+        return of_;
+      },
+      function groupObjectsThatAreRelatedToNestedProperties(of, arrayOfNestedPropertiesName, arrayOfValues) {
+        var map = {};
+        for ( var i = 0 ; i < arrayOfNestedPropertiesName.length ; i++ ) {
+          var key = this.getNestedPropertyNameExcludingLastProperty(arrayOfNestedPropertiesName[i]);
+          var objsClass = this.getClassForNestedPropertyObject(of, arrayOfNestedPropertiesName[i].split('.'));
+          if( ! map[key] ) {
+            map[key] = objsClass.create();
+          }
+          objsClass.getAxiomByName(this.getNameOfLastPropertyForNestedProperty(arrayOfNestedPropertiesName[i])).set(map[key], arrayOfValues[i]);
+        }
+        return map;
+      },
+      function getNestedPropertyNameExcludingLastProperty(nestedPropertyName) {
+        var lastIndex = nestedPropertyName.lastIndexOf('.');
+        return nestedPropertyName.substr(0, lastIndex);//lastIndex == length here
+      },
+      function getNameOfLastPropertyForNestedProperty(nestedPropertyName) {
+        var lastIndex = nestedPropertyName.lastIndexOf('.');
+        return nestedPropertyName.substr(lastIndex + 1);
+      },
+      function buildArrayOfNestedPropertyNamesAndCorrespondingIndexesInArray(propNames) {
+        var nestedPropertyNames = [];
+        var indexOfValuesForCorrespondingPropertyNames = [];
+        for ( var i = 0 ; i < propNames.length ; i++ ) {
+          if ( ! propNames[i].includes('.') ) continue;
+          nestedPropertyNames.push(propNames[i]);
+          indexOfValuesForCorrespondingPropertyNames.push(i);
+        }
+        var result = [nestedPropertyNames, indexOfValuesForCorrespondingPropertyNames];
+        return result;
+      },
+      function filterOutValuesForNotNestedProperties(valuesArray, indexes) {
+        var filteredArr = [];
+        for ( var i = 0 ; i < indexes.length; i++ ) {
+          filteredArr.push(valuesArray[indexes[i]]);
+        }
+        return filteredArr;
       }
   ]
 });
