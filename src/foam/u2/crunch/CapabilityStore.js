@@ -50,7 +50,6 @@ foam.CLASS({
     }
 
     ^feature-column-grid {
-      justify-content: space-between;
       display: inline-flex;
       width: 94%;
       overflow: hidden;
@@ -245,7 +244,7 @@ foam.CLASS({
       // Capability Store Section Previews
       var self = this;
       return self.E()
-        .select(self.visibleCategoryDAO, function(category) {
+        .select(self.visibleCategoryDAO$proxy, function(category) {
           var sectionElement = this.E('span');
           var returnElement = this.E()
             .start('h3')
