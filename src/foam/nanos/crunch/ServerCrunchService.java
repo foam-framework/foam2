@@ -189,6 +189,6 @@ public class ServerCrunchService implements CrunchService {
       ucj.setData(data);
     }
     DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
-    userCapabilityJunctionDAO.put(ucj);
+    userCapabilityJunctionDAO.inX(x).put(ucj);
   }
 }
