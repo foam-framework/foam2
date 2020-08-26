@@ -710,6 +710,8 @@ var classes = [
   'foam.nanos.crunch.crunchtest.FakeTestObject',
   //models
   'foam.nanos.crunch.Capability',
+  'foam.nanos.crunch.lite.Capable',
+  'foam.nanos.crunch.lite.CapablePayload',
   'foam.nanos.crunch.CapabilityCategory',
   'foam.nanos.crunch.CapabilityCategoryCapabilityJunction',
   'foam.nanos.crunch.CapabilityJunctionStatus',
@@ -718,13 +720,10 @@ var classes = [
   'foam.nanos.crunch.CapabilityCapabilityJunction',
   'foam.nanos.crunch.AssociatedEntity',
   'foam.nanos.crunch.CapabilityAvailabilityDAO',
-
-  'foam.nanos.crunch.connection.ConnectedCapability',
-  'foam.nanos.crunch.connection.ConnectedCapabilityDAO',
-  'foam.nanos.crunch.connection.FlatCapability',
-  'foam.nanos.crunch.connection.FlatCapabilityDAO',
+  'foam.nanos.crunch.connection.CapabilityPayload',
 
   //daos
+  'foam.nanos.crunch.connection.CapabilityPayloadDAO',
   'foam.nanos.crunch.UserCapabilityJunctionDAO',
   //rules
   'foam.nanos.crunch.SendNotificationOnTopLevelCapabilityStatusUpdate',

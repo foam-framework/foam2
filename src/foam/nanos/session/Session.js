@@ -69,7 +69,7 @@ foam.CLASS({
         }.bind(this));
       },
       required: true,
-      updateVisibility: 'RO',
+      updateVisibility: 'RO'
     },
     {
       class: 'Long',
@@ -82,7 +82,7 @@ foam.CLASS({
           this.add(' ', user.toSummary());
         }.bind(this));
       },
-      visibility: 'RO',
+      visibility: 'RO'
     },
     {
       class: 'DateTime',
@@ -341,7 +341,7 @@ foam.CLASS({
       javaCode: `
         User user = (User) ((DAO) x.get("localUserDAO")).find(userId);
 
-       if ( user == null
+        if ( user == null
          || (user instanceof LifecycleAware && ((LifecycleAware)user).getLifecycleState() != LifecycleState.ACTIVE)
        ) {
           ((Logger) x.get("logger")).warning("Session", "User not found.", userId, user);
