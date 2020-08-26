@@ -85,7 +85,7 @@ foam.INTERFACE({
             }
             
             // Re-FObjectArray
-            setCapabilityPayloads(payloads.toArray(
+            setCapablePayloads(payloads.toArray(
               new CapablePayload[payloads.size()]
             ));
           `
@@ -103,7 +103,7 @@ foam.INTERFACE({
           body: `
             // Marshal payloads into a hashmap
             Map<String, FObject> payloads = new HashMap<String, FObject>();
-            for ( CapablePayload payload : getCapabilityPayloads() ) {
+            for ( CapablePayload payload : getCapablePayloads() ) {
               payloads.put(payload.getCapability().getId(),
                 (FObject) payload.getData());
             }
@@ -141,11 +141,13 @@ foam.INTERFACE({
 
   methods: [
     {
-      name: 'getCapabilityPayloads',
-      type: 'CapablePayload[]'
+      name: 'getCapablePayloads',
+      type: 'CapablePayload[]',
+      flags: ['java'],
     },
     {
-      name: 'setCapabilityPayloads',
+      name: 'setCapablePayloads',
+      flags: ['java'],
       args: [
         {
           name: 'payloads',
@@ -155,16 +157,18 @@ foam.INTERFACE({
     },
     {
       name: 'getUserCapabilityRequirements',
-      type: 'CapablePayload[]'
+      flags: ['java'],
+      type: 'String[]'
     },
     {
       name: 'setUserCapabilityRequirements',
+      flags: ['java'],
       args: [
         {
           name: 'payloads',
-          type: 'CapablePayload[]'
+          type: 'String[]'
         }
       ]
-    }
+    },
   ],
 });
