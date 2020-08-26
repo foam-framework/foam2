@@ -1,5 +1,5 @@
 p({"class":"foam.nanos.auth.Permission","id":"service.notificationSettingDAO","description":"Permission to access notificationSettingDAO"})
 p({"class":"foam.nanos.auth.Permission","id":"notificationsetting.create","description":"Permission to create notificationsetting."})
-p({"class":"foam.nanos.auth.Permission","id":"notificationsetting.delete.*","description":"Permission to delete any notificationsetting."})
+p({"class":"foam.nanos.auth.Permission","id":"notificationsetting.remove.*","description":"Permission to delete any notificationsetting."})
 p({"class":"foam.nanos.auth.Permission","id":"notificationsetting.read.*","description":"Permission to read any notificationsetting."})
 p({"class":"foam.nanos.auth.Permission","id":"notificationsetting.update.*","description":"Permission to update any notificationsettings."})
