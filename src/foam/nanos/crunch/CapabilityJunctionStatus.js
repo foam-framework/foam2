@@ -50,6 +50,12 @@ foam.ENUM({
       documentation: `Denoting a UCJ requiring review has been approved. It would need to go through the rules of the ucjDAO before 
       being set to granted.`,
       background: '#bfae32'
+    },
+    {
+      name: 'RENEWABLE',
+      label: 'renewable',
+      documentation: `- not seen by users - Denoting a UCJ is less than 30 days away from its expiry and can be renewed by the user.`,
+      background: '#32bf5e'
     }
   ]
 });

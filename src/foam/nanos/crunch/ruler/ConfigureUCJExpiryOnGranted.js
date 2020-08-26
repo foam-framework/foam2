@@ -14,10 +14,12 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.ContextAgent',
+    'foam.core.FObject',
     'foam.core.X',
     'foam.dao.DAO',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityJunctionStatus',
+    'foam.nanos.crunch.RenewableData',
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.logger.Logger',
     'java.util.Calendar',
@@ -66,6 +68,12 @@ foam.CLASS({
               }
             }
             ucj.setExpiry(junctionExpiry);
+            FObject data = ucj.getData();
+            if ( junctionExpiry != null && ( data instanceof RenewableData ) ) {
+              ((RenewableData) data).setRenewable(false);
+              ((RenewableData) data).setReviewed(false);
+              ucj.setData(data);
+            } 
     
             if ( capability.getGracePeriod() > 0 ) {
               ucj.setGraceDaysLeft(capability.getGracePeriod());

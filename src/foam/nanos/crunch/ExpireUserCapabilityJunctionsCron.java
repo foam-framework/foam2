@@ -37,7 +37,10 @@ public class ExpireUserCapabilityJunctionsCron implements ContextAgent {
           LTE(UserCapabilityJunction.GRACE_DAYS_LEFT, 0)
         ),
         AND(
-          EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED),
+          OR(
+            EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED),
+            EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.RENEWABLE)
+          ),
           NEQ(UserCapabilityJunction.EXPIRY, null),
           LT(UserCapabilityJunction.EXPIRY, today)
         )

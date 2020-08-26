@@ -41,7 +41,10 @@ foam.CLASS({
             ));
             CapabilityJunctionStatus status = ucj.getStatus();
 
-            boolean isInvalidate = ucj.getStatus() != CapabilityJunctionStatus.GRANTED || ucj.getStatus() != CapabilityJunctionStatus.GRACE_PERIOD;
+            boolean isInvalidate = ucj.getStatus() != CapabilityJunctionStatus.GRANTED || 
+              ( ucj.getStatus() == CapabilityJunctionStatus.APPROVED && (
+                 old.getStatus() != CapabilityJunctionStatus.APPROVED ||
+                 old.getStatus() != CapabilityJunctionStatus.GRANTED ) );
             
             DAO filteredUserCapabilityJunctionDAO = (DAO) userCapabilityJunctionDAO.where((EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId())));
             DAO filteredPrerequisiteCapabilityJunctionDAO = (DAO) ((DAO) x.get("prerequisiteCapabilityJunctionDAO"))
@@ -104,10 +107,16 @@ foam.CLASS({
             ) ? 
               CapabilityJunctionStatus.APPROVED : CapabilityJunctionStatus.PENDING;
             break;
+          case GRACE_PERIOD :
+            newStatus = CapabilityJunctionStatus.GRACE_PERIOD;
+            break;
+          case RENEWABLE : 
+            newStatus = CapabilityJunctionStatus.RENEWABLE;
+            break;
           case EXPIRED :
             newStatus = CapabilityJunctionStatus.ACTION_REQUIRED;
             break;
-          default : // GRACE_PERIOD AND GRANTED
+          default : // GRANTED
         }
         return newStatus;
 

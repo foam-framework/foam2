@@ -32,9 +32,8 @@ foam.CLASS({
         agency.submit(x, new ContextAgent() {
           @Override
           public void execute(X x) {
-            UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
-            if ( ucj.getStatus() == CapabilityJunctionStatus.ACTION_REQUIRED ) return;
-          
+            UserCapabilityJunction ucj = (UserCapabilityJunction) obj;         
+            if ( ucj.getStatus() != CapabilityJunctionStatus.PENDING && ucj.getStatus() != CapabilityJunctionStatus.APPROVED ) return;
 
             // the following should be checked if the result of previous rule ( validateUCJDataOnPut ) 
             // is not ACTION_REQUIRED. In the ACTION_REQUIRED case, the ucj should be put into the
@@ -86,19 +85,23 @@ foam.CLASS({
         for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
           cap = (Capability) ccJunction.findSourceId(x);
           if ( ! cap.getEnabled() ) continue;
+          // todo this needs to take acj into consideration
           UserCapabilityJunction ucJunction = (UserCapabilityJunction) userCapabilityJunctionDAO.find(AND(
             EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId()),
             EQ(UserCapabilityJunction.TARGET_ID, (String) ccJunction.getTargetId())
           ));
 
-          if ( ucJunction != null && 
-               ( ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED || ucJunction.getStatus() == CapabilityJunctionStatus.GRACE_PERIOD ) 
-             ) 
-              continue;
+          if ( ucJunction != null && ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED ) 
+            continue;
           
 
           if ( ucJunction == null ) {
             return CapabilityJunctionStatus.ACTION_REQUIRED;
+          }
+          if ( ucJunction.getStatus() == CapabilityJunctionStatus.GRACE_PERIOD 
+               || ucJunction.getStatus() == CapabilityJunctionStatus.RENEWABLE 
+               || ucJunction.getStatus() == CapabilityJunctionStatus.EXPIRED ) {
+            return ucJunction.getStatus();
           }
           if ( ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED
                && ucJunction.getStatus() != CapabilityJunctionStatus.PENDING ) {
