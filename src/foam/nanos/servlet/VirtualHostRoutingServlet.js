@@ -12,6 +12,25 @@ foam.CLASS({
     'foam.nanos.servlet.Servlet'
   ],
 
+  javaImports: [
+    'foam.core.X',
+    'foam.dao.DAO',
+    'foam.nanos.jetty.HttpServer',
+    'foam.nanos.theme.Theme',
+    'foam.nanos.theme.ThemeDomain',
+    'java.io.IOException',
+    'java.io.PrintWriter',
+    'java.lang.StringBuilder',
+    'javax.servlet.ServletConfig',
+    'javax.servlet.ServletException',
+    'javax.servlet.ServletRequest',
+    'javax.servlet.ServletResponse',
+    'java.util.ArrayList',
+    'java.util.HashMap',
+    'java.util.Iterator',
+    'java.util.Map.Entry'
+  ],
+
   properties: [
     {
       class: 'Map',
@@ -23,11 +42,13 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'liveScriptBundlerDisabled',
+      documentation: `If set to true, generate index file with live script bundler disabled.`,
       value: false
     },
     {
       class: 'Boolean',
-      name: 'isProduction',
+      name: 'isResourceStorage',
+      documentation: `If set to true, generate index file from jar file resources.`,
       value: false
     },
     {
@@ -37,7 +58,7 @@ foam.CLASS({
     {
       class: 'Object',
       transient: true,
-      javaType: 'javax.servlet.ServletConfig',
+      javaType: 'ServletConfig',
       name: 'servletConfig'
     }
   ],
@@ -55,7 +76,7 @@ foam.CLASS({
     {
       name: 'init',
       type: 'Void',
-      args: [ { name: 'config', javaType: 'javax.servlet.ServletConfig' } ],
+      args: [ { name: 'config', javaType: 'ServletConfig' } ],
       javaCode: 'setServletConfig(config);',
       code: function() { }
     },
@@ -65,28 +86,39 @@ foam.CLASS({
       documentation: `Utility method that returns an html tag string.`,
       args: [ 
         { name: 'tag', javaType: 'String'},
-        { name: 'keywords', javaType: 'java.util.ArrayList<String>'},
-        { name: 'attributes', javaType: 'java.util.HashMap'},
+        { name: 'keywords', javaType: 'ArrayList<String>'},
+        { name: 'attributes', javaType: 'HashMap'},
         { name: 'hasClosingTag', javaType: 'Boolean'},
         { name: 'isSingleClosingTag', javaType: 'Boolean'}
       ],
       javaCode: `
-        String tagString = "<" + tag + " ";
+        StringBuilder sb = new StringBuilder("<");
+        sb.append(tag);
+        sb.append(" ");
         for ( String keyword : keywords ) {
-          tagString += keyword + " ";
+          sb.append(keyword);
+          sb.append(" ");
         }
-        java.util.Iterator i = attributes.entrySet().iterator();
+        Iterator i = attributes.entrySet().iterator();
         while ( i.hasNext() ) {
-          java.util.Map.Entry attribute = (java.util.Map.Entry) i.next();
-          tagString += attribute.getKey() + "=\\"" + attribute.getValue() + "\\" ";
+          Entry attribute = (Entry) i.next();
+          sb.append(attribute.getKey());
+          sb.append("=\\"");
+          sb.append(attribute.getValue());
+          sb.append("\\" ");
           i.remove();
         }
         if ( isSingleClosingTag ) {
-          return tagString += "/>";
+          sb.append("/>");
+          return sb.toString();
         }
-        tagString += ">";
-        tagString += hasClosingTag ? "</" + tag + ">" : "";
-        return tagString;
+        sb.append(">");
+        if ( hasClosingTag ) {
+          sb.append("</");
+          sb.append(tag);
+          sb.append(">");
+        }
+        return sb.toString();
       `
     },
     {
@@ -96,32 +128,36 @@ foam.CLASS({
         Generates the index file's head content based on theme and prints it to the response writer.
       `,
       args: [ 
-        { name: 'theme', javaType: 'foam.nanos.theme.Theme'},
-        { name: 'out', javaType: 'java.io.PrintWriter'} 
+        { name: 'theme', javaType: 'Theme'},
+        { name: 'out', javaType: 'PrintWriter'} 
       ],
       javaCode: `
+      ArrayList<HashMap> headConfig = (ArrayList<HashMap>) theme.getHeadConfig();
+
       out.println("<meta charset=\\"utf-8\\"/>");
       out.println("<title>" + theme.getAppName() + "</title>");
-      java.util.ArrayList<java.util.HashMap> headConfig = (java.util.ArrayList<java.util.HashMap>) theme.getHeadConfig();
-
       for ( int i = 0; i < headConfig.size(); i++ ) {
-        java.util.HashMap tagConfig = (java.util.HashMap) headConfig.get(i);
-        java.util.ArrayList<String> keywords = new java.util.ArrayList<String>();
+        HashMap tagConfig = (HashMap) headConfig.get(i);
+
+        ArrayList<String> keywords  = new ArrayList<String>();
         if ( tagConfig.containsKey("keywords") ) {
-          keywords = (java.util.ArrayList<String>) tagConfig.get("keywords");
+          keywords = (ArrayList<String>) tagConfig.get("keywords");
         }
+
         Boolean hasClosingTag = false;
         if ( tagConfig.containsKey("hasClosingTag") ) {
           hasClosingTag = (Boolean) tagConfig.get("hasClosingTag");
         }
+
         Boolean isSingleClosingTag = false;
         if ( tagConfig.containsKey("isSingleClosingTag") ) {
           isSingleClosingTag = (Boolean) tagConfig.get("isSingleClosingTag");
         }
-        String headTag = this.getTagString((String)tagConfig.get("tag"), keywords, (java.util.HashMap)tagConfig.get("attributes"), hasClosingTag, isSingleClosingTag);
+
+        String headTag = this.getTagString((String) tagConfig.get("tag"), keywords, (HashMap) tagConfig.get("attributes"), hasClosingTag, isSingleClosingTag);
         out.println(headTag);
       }
-      if ( this.getIsProduction() ) {
+      if ( this.getIsResourceStorage() ) {
         out.println("<script language=\\"javascript\\" src=\\"/foam-bin-@VERSION@.js\\"></script>");
         out.println("<script async defer language=\\"javascript\\" src=\\"/html2canvas.min.js\\"></script>");
         out.println("<script async defer language=\\"javascript\\" src=\\"/jspdf.min.js\\"></script>");
@@ -154,10 +190,9 @@ foam.CLASS({
     {
       name: 'service',
       type: 'Void',
-      args: [ { name: 'request', javaType: 'javax.servlet.ServletRequest' },
-              { name: 'response', javaType: 'javax.servlet.ServletResponse' } ],
-      javaThrows: [ 'javax.servlet.ServletException',
-                    'java.io.IOException' ],
+      args: [ { name: 'request', javaType: 'ServletRequest' },
+              { name: 'response', javaType: 'ServletResponse' } ],
+      javaThrows: [ 'ServletException', 'IOException' ],
       javaCode: `
         String vhost = request.getServerName();
         
@@ -166,19 +201,24 @@ foam.CLASS({
           return;
         }
 
-        foam.core.X x = (foam.core.X) this.getServletConfig().getServletContext().getAttribute("X");
-        foam.dao.DAO themeDomainDAO = (foam.dao.DAO) x.get("themeDomainDAO");
-        foam.dao.DAO themeDAO = (foam.dao.DAO) x.get("themeDAO");
+        HttpServer server         = (HttpServer) this.getServletConfig().getServletContext().getAttribute("httpServer");
+        X          x              = (X)          this.getServletConfig().getServletContext().getAttribute("X");
+        DAO        themeDomainDAO = (DAO)        x.get("themeDomainDAO");
+        DAO        themeDAO       = (DAO)        x.get("themeDAO");
 
-        foam.nanos.theme.ThemeDomain themeDomain = (foam.nanos.theme.ThemeDomain) themeDomainDAO.find(vhost);
+        if ( ! server.containsHostDomain(vhost) ) {
+          vhost = getDefaultHost();
+        }
+
+        ThemeDomain themeDomain = (ThemeDomain) themeDomainDAO.find(vhost);
         if ( themeDomain == null ) {
-          themeDomain = (foam.nanos.theme.ThemeDomain) themeDomainDAO.find(getDefaultHost());
+          themeDomain = (ThemeDomain) themeDomainDAO.find(getDefaultHost());
         }
         if ( themeDomain == null ) {
           throw new RuntimeException("No theme domain found for default host " + getDefaultHost());
         }
 
-        foam.nanos.theme.Theme theme = (foam.nanos.theme.Theme) themeDAO.find(themeDomain.getTheme());
+        Theme theme = (Theme) themeDAO.find(themeDomain.getTheme());
         if ( theme == null ) {
           throw new RuntimeException("No theme found for theme domain " + themeDomain.getId());
         }
@@ -186,7 +226,7 @@ foam.CLASS({
         response.setContentType("text/html; charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
 
-        java.io.PrintWriter out = response.getWriter();
+        PrintWriter out = response.getWriter();
         out.println("<!DOCTYPE>");
 
         out.println("<html lang=\\"en\\">");
