@@ -331,6 +331,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/lite/CapableObjectData" },
   { name: "foam/nanos/crunch/lite/Capable" },
   { name: "foam/nanos/crunch/CapabilityCategory" },
+  { name: "foam/nanos/crunch/BasicCapabilityJunctionStatus" },
   { name: "foam/nanos/crunch/CapabilityJunctionStatus" },
   { name: "foam/nanos/crunch/UserCapabilityJunctionRefine" },
   { name: "foam/nanos/crunch/CapabilityCapabilityJunctionRefine" },

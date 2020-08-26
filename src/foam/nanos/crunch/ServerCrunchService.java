@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Queue;
 import static foam.mlang.MLang.*;
+import static foam.nanos.crunch.CapabilityJunctionStatus.*;
 
 public class ServerCrunchService implements CrunchService {
   public List getGrantPath(X x, String rootId) {
@@ -56,7 +57,7 @@ public class ServerCrunchService implements CrunchService {
 
       if ( ! filterGrantedUCJ ) {
         UserCapabilityJunction ucj = crunchService.getJunction(x, sourceCapabilityId);
-        if ( ucj != null && ucj.getStatus() == CapabilityJunctionStatus.GRANTED ) {
+        if ( ucj != null && ucj.isBasically(GRANTED) ) {
           continue;
         }
       }

@@ -170,6 +170,32 @@ foam.CLASS({
 
         return objectToSave;
       `
+    },
+    {
+      name: 'isBasically',
+      type: 'boolean',
+      args: [
+        {
+          name: 'status',
+          type: 'CapabilityJunctionStatus'
+        }
+      ],
+      javaCode: `
+        return getStatus().getBasicStatus() == status.getBasicStatus();
+      `,
+    },
+    {
+      name: 'isReally',
+      type: 'boolean',
+      args: [
+        {
+          name: 'status',
+          type: 'CapabilityJunctionStatus'
+        }
+      ],
+      javaCode: `
+        return getStatus() == status;
+      `,
     }
   ]
 });
