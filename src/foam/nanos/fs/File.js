@@ -161,7 +161,7 @@ foam.CLASS({
       name: 'authorizeOnDelete',
       javaCode: `
         AuthService auth = (AuthService) x.get("auth");
-        if ( ! auth.check(x, "file.delete." + getId()) ) {
+        if ( ! auth.check(x, "file.remove." + getId()) ) {
           throw new AuthorizationException();
         }
       `

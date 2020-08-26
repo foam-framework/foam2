@@ -95,6 +95,10 @@ foam.CLASS({
       name: 'arrayRequirement'
     },
     {
+      class: 'Function',
+      name: 'onClose'
+    },
+    {
       class: 'Object',
       name: 'functionData'
     },
@@ -152,8 +156,10 @@ foam.CLASS({
           ))
       .end()
       .start().addClass('actionPosition')
-        .startContext({ data: this }).start(this.GET_STARTED).end().endContext()
-        .start(this.CANCEL, { buttonStyle: 'SECONDARY' }).end()
+        .startContext({ data: this })
+          .start(this.GET_STARTED).end()
+          .start(this.CANCEL, { buttonStyle: 'SECONDARY' }).end()
+        .endContext()
       .end();
     }
   ],
@@ -161,14 +167,15 @@ foam.CLASS({
     {
       name: 'getStarted',
       code: function(x) {
-        x.crunchController.generateAndDisplayWizard(this.functionData);
         x.closeDialog();
+        this.onClose(x, true);
       }
     },
     {
       name: 'cancel',
       code: function(x) {
         x.closeDialog();
+        this.onClose(x, false);
       }
     }
   ]
