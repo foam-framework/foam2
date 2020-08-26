@@ -433,15 +433,15 @@ foam.CLASS({
               addClass(view.myClass('tbody'));
               valPromises.then(function(values) {
 
-                tbodyElement.forEach(values.projection, function(val) {
+                tbodyElement.forEach(values.array, function(obj) {
                   var thisObjValue;
                   var tableRowElement = this.E();
                   tableRowElement.
                   addClass(view.myClass('tr')).
                   on('mouseover', function() {
                     if ( !thisObjValue ) {
-                      dao.inX(ctrl.__subContext__).find(val[0]).then(v => {
-                      thisObjValue = v;
+                      dao.inX(ctrl.__subContext__).find(obj.id).then(v => {
+                      thisObjValue = v;//as we here do not have whole info about object we need 
                       view.hoverSelection = thisObjValue;
                     });
                     } else
@@ -450,7 +450,7 @@ foam.CLASS({
                   callIf(view.dblclick && ! view.disableUserSelection, function() {
                     tableRowElement.on('dblclick', function() {
                       if ( !thisObjValue ) {
-                        dao.inX(ctrl.__subContext__).find(val[0]).then(function(v) {
+                        dao.inX(ctrl.__subContext__).find(obj.id).then(function(v) {
                           thisObjValue = v;
                           view.dblclick && view.dblclick(thisObjValue);
                         });
@@ -468,7 +468,7 @@ foam.CLASS({
                       ) return;
 
                       if  ( !thisObjValue ) {
-                        dao.inX(ctrl.__subContext__).find(val[0]).then(v => {
+                        dao.inX(ctrl.__subContext__).find(obj.id).then(v => {
                           view.selection = v;
                           if ( view.importSelection$ ) view.importSelection = v;
                           if ( view.editRecord$ ) view.editRecord(v);
@@ -480,7 +480,7 @@ foam.CLASS({
                     });
                   }).
                   addClass(view.slot(function(selection) {
-                    return selection && foam.util.equals(val[0], selection.id) ?
+                    return selection && foam.util.equals(obj.id, selection.id) ?
                         view.myClass('selected') : '';
                   })).
                   addClass(view.myClass('row')).
@@ -493,7 +493,7 @@ foam.CLASS({
                     tableRowElement
                       .start()
                         .addClass(view.myClass('td'))
-                        .tag(view.CheckBox, { data: view.idsOfObjectsTheUserHasInteractedWith_[val[0]] ? !!view.selectedObjects[val[0]] : view.allCheckBoxesEnabled_ }, slot)
+                        .tag(view.CheckBox, { data: view.idsOfObjectsTheUserHasInteractedWith_[obj.id] ? !!view.selectedObjects[obj.id] : view.allCheckBoxesEnabled_ }, slot)
                       .end();
 
                     // Set up a listener so that when the user checks or unchecks
@@ -523,25 +523,25 @@ foam.CLASS({
                       // use a separate set to remember which checkboxes the user
                       // has interacted with, then we don't need to clutter up
                       // `selectedObjects`.
-                      view.idsOfObjectsTheUserHasInteractedWith_[val[0]] = true;
+                      view.idsOfObjectsTheUserHasInteractedWith_[obj.id] = true;
 
                       var checked = newValueSlot.get();
 
                       if ( checked ) {
                         var modification = {};
                         if ( !thisObjValue ) {
-                          dao.find(val[0]).then(v => {
-                            modification[val[0]] = v;
+                          dao.find(obj.id).then(v => {
+                            modification[obj.id] = v;
                             view.selectedObjects = Object.assign({}, view.selectedObjects, modification);
                           });
                         } else {
-                          modification[val[0]] = thisObjValue;
+                          modification[obj.id] = thisObjValue;
                           view.selectedObjects = Object.assign({}, view.selectedObjects, modification);
                         }
 
                       } else {
                         var temp = Object.assign({}, view.selectedObjects);
-                        delete temp[val[0]];
+                        delete temp[obj.id];
                         view.selectedObjects = temp;
                       }
                     }));
@@ -550,9 +550,9 @@ foam.CLASS({
                     // to them so we can set the `data` property of them when the
                     // user checks the box to enable or disable all checkboxes.
                     var checkbox = slot.get();
-                    view.checkboxes_[val[0]] = checkbox;
+                    view.checkboxes_[obj.id] = checkbox;
                     checkbox.onDetach(function() {
-                      delete view.checkboxes_[val[0]];
+                      delete view.checkboxes_[obj.id];
                     });
                   });
 
@@ -565,35 +565,41 @@ foam.CLASS({
 
                     var index = propertyNamesToQuery.indexOf(view.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(view, view.columns_[i]));
                     var value;
-                    if ( index !== -1 ) value = val[index];
+                    // if ( index !== -1 ) value = val[index];
 
                     var tableCellFormatter = view.returnColumnPropertyForPropertyName(view, view.columns_[i], 'tableCellFormatter');
                     var tableWidth = view.returnColumnPropertyForPropertyName(view, view.columns_[i], 'tableWidth');
 
-                    var stringValue;
-                    var elmt = this.E().addClass(view.myClass('td')).style({flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0'});
+                    // var stringValue;
+                    var column = typeof view.columns_[i] === 'string' || ! view.columns_[i].tableCellFormatter ? prop : view.columns_[i];
+                    // if ( overrides ) column = column.clone().copyFrom(overrides);
 
-                    if (foam.core.Action.isInstance(prop)) {
-                      elmt.add('');// will be fixed on Projection update
-                    } else {
-                      if ( foam.core.UnitValue.isInstance(prop) ) {
-                        var indexOfUnitName = propertyNamesToQuery.indexOf(prop.unitPropName);
-                        stringValue = view.outputter.returnStringValueForProperty(view.__context__, prop, value, val[indexOfUnitName]);
-                      } else if ( tableCellFormatter ) {
-                        try {
-                          if ( tableCellFormatter )
-                            tableCellFormatter.format(elmt, value, null);
-                        } catch(e) {
-                          stringValue = view.outputter.returnStringValueForProperty(view.__context__, prop, value);
-                        }
-                      }  else {
-                        stringValue = view.outputter.returnStringValueForProperty(view.__context__, prop, value);
-                      }
-                      if ( stringValue ) {
-                        elmt.add(stringValue);
-                        stringValue = null;
-                      }
-                    }
+                    var elmt = this.E().addClass(view.myClass('td')).style({flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0'}).
+                    callOn(column.tableCellFormatter, 'format', [
+                      column.f ? column.f(obj) : null, obj, column
+                    ]);
+
+                    // if (foam.core.Action.isInstance(prop)) {
+                    //   elmt.add('');// will be fixed on Projection update
+                    // } else {
+                    //   if ( foam.core.UnitValue.isInstance(prop) ) {
+                    //     var indexOfUnitName = propertyNamesToQuery.indexOf(prop.unitPropName);
+                    //     stringValue = view.outputter.returnStringValueForProperty(view.__context__, prop, value, val[indexOfUnitName]);
+                    //   } else if ( tableCellFormatter ) {
+                    //     try {
+                    //       if ( tableCellFormatter )
+                    //         tableCellFormatter.format(elmt, value, null);
+                    //     } catch(e) {
+                    //       stringValue = view.outputter.returnStringValueForProperty(view.__context__, prop, value);
+                    //     }
+                    //   }  else {
+                    //     stringValue = view.outputter.returnStringValueForProperty(view.__context__, prop, value);
+                    //   }
+                    //   if ( stringValue ) {
+                    //     elmt.add(stringValue);
+                    //     stringValue = null;
+                    //   }
+                    // }
                     tableRowElement.add(elmt);
                   }
 
@@ -604,7 +610,7 @@ foam.CLASS({
                       style({ flex: `0 0 ${view.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH}px` }).
                       tag(view.OverlayActionListView, {
                         data: actions,
-                        objId: val[0],
+                        objId: obj.id,//check if info about obj will suffice here not to retriev it in OverlayActionListView
                         dao: dao
                       }).
                     end();
