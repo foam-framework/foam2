@@ -128,12 +128,17 @@ foam.CLASS({
         { name: 'out', javaType: 'PrintWriter'} 
       ],
       javaCode: `
-      ArrayList<HashMap> headConfig = (ArrayList<HashMap>) theme.getHeadConfig();
+      ArrayList<HashMap> headConfig          = (ArrayList<HashMap>) theme.getHeadConfig();
+      Boolean            disableDefaultFonts = false;
 
       out.println("<meta charset=\\"utf-8\\"/>");
       out.println("<title>" + theme.getAppName() + "</title>");
       for ( int i = 0; i < headConfig.size(); i++ ) {
         HashMap tagConfig = (HashMap) headConfig.get(i);
+
+        if ( tagConfig.containsKey("isFont") ) {
+          disableDefaultFonts = (Boolean) tagConfig.get("isFont");
+        }
 
         ArrayList<String> keywords  = new ArrayList<String>();
         if ( tagConfig.containsKey("keywords") ) {
@@ -179,9 +184,11 @@ foam.CLASS({
         out.println("<script language=\\"javascript\\" src=\\"../../../../node_modules/jspdf/dist/jspdf.min.js\\"></script>");
         out.println("<script async defer language=\\"javascript\\" src=\\"../../../../node_modules/jspdf-autotable/dist/jspdf.plugin.autotable.min.js\\"></script>");
       }
-      out.println("<link href=\\"https://fonts.googleapis.com/css?family=Roboto:100,300,400,500\\" rel=\\"stylesheet\\">");
-      out.println("<link href=\\"https://fonts.googleapis.com/css?family=Lato:400,400i,700,700i,900,900i\\" rel=\\"stylesheet\\">");
-      out.println("<link href=\\"https://fonts.googleapis.com/css?family=IBM+Plex+Sans&display=swap\\" rel=\\"stylesheet\\">");
+      if ( ! disableDefaultFonts ) {
+        out.println("<link href=\\"https://fonts.googleapis.com/css?family=Roboto:100,300,400,500\\" rel=\\"stylesheet\\">");
+        out.println("<link href=\\"https://fonts.googleapis.com/css?family=Lato:400,400i,700,700i,900,900i\\" rel=\\"stylesheet\\">");
+        out.println("<link href=\\"https://fonts.googleapis.com/css?family=IBM+Plex+Sans&display=swap\\" rel=\\"stylesheet\\">");
+      }
       `
     },
     {

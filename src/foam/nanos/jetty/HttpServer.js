@@ -310,8 +310,7 @@ foam.CLASS({
         { name: 'domain', javaType: 'String' }
       ],
       javaCode: `
-        int a = Arrays.binarySearch(getHostDomains(), domain);
-        return a >= 0;
+        return Arrays.binarySearch(getHostDomains(), domain) >= 0;
       `
     }
   ]
