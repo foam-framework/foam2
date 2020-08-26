@@ -84,7 +84,7 @@ foam.CLASS({
     {
       name: 'INTRO_TEXT',
       message: `Before you get started,
-      here is a list of helpful items to have on hand that will assit you
+      here is a list of helpful items to have on hand that will assist you
       in answering the questions in the following step`
     }
   ],
