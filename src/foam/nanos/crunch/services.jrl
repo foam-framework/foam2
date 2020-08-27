@@ -45,7 +45,12 @@ p({
       .setOf(foam.nanos.crunch.Capability.getOwnClassInfo())
       .build();
   """,
-  "client":"{\"of\":\"foam.nanos.crunch.Capability\"}"
+  "client":"""
+    {
+      "of":"foam.nanos.crunch.Capability",
+      "cache": false
+    }
+  """
 })
 
 p({
@@ -83,7 +88,13 @@ p({
     ruler = new foam.nanos.ruler.RulerDAO(x, userCap, "userCapabilityJunctionDAO");
     return ruler;
   """,
-  "client":"{\"of\":\"foam.nanos.crunch.UserCapabilityJunction\", \"remoteListenerSupport\": false}"
+  "client":
+  """
+    {
+      "of":"foam.nanos.crunch.UserCapabilityJunction",
+      "remoteListenerSupport": false
+    }
+  """
 })
 
 p({

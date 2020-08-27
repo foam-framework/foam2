@@ -515,6 +515,17 @@ foam.CLASS({
     },
     {
       class: 'FObjectProperty',
+      name: 'fObjectViewWithOneChoice',
+      label: 'FObjectView With One Choice',
+      view: {
+        class: 'foam.u2.view.FObjectView',
+        choices: [
+          [ 'foam.util.Timer', 'Timer' ]
+        ]
+      }
+    },
+    {
+      class: 'FObjectProperty',
       name: 'fObjectViewWithChoicesValueSet',
       label: 'FObjectView With Choices (Value Set)',
       value: foam.util.Timer.create(),

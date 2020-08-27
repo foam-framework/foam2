@@ -84,11 +84,6 @@ foam.CLASS({
       `
     },
     {
-      class: 'Object',
-      name: 'persistantData',
-      documentation: 'Allows passed in data to persist to selected class instances.'
-    },
-    {
       name: 'predicate',
       documentation: `
         Predicate to pass into strategizer query request. Used to define results from strategizer query.
@@ -169,7 +164,7 @@ foam.CLASS({
 
       var classToData = function(c) {
         var m = c && this.__context__.lookup(c, true);
-        return m ? m.create(this.persistantData ? this.persistantData : null, this) : null;
+        return m.create(this.data, this);
       }.bind(this);
 
       this.data$.relateTo(
@@ -178,18 +173,19 @@ foam.CLASS({
         classToData
       );
 
-      if ( this.data )
-        this.objectClass = dataToClass(this.data);
+      if ( this.data ) { this.objectClass = dataToClass(this.data); }
+      if ( ! this.data && ! this.objectClass && this.choices.length ) this.objectClass = this.choices[0][0];
 
-      if ( this.data && this.of && (this.data.cls_.id === this.of.id) )
-        this.objectClass = this.choices[0][0];
-
-      this
-        .tag(foam.u2.detail.VerticalDetailView, {
-          data: this,
-          sections: [{
-            properties: [this.OBJECT_CLASS, this.DATA]
-          }]
+      this.
+        start(this.OBJECT_CLASS).
+          // If we were using a DetailView, this would be done for us, but since
+          // we aren't, we need to connect the 'visibility' property ourself.
+          show(this.OBJECT_CLASS.createVisibilityFor(foam.core.SimpleSlot.create({value: this}), this.controllerMode$).map(function(m) {
+            return m != foam.u2.DisplayMode.HIDDEN;
+          })).
+        end().
+        tag(foam.u2.detail.VerticalDetailView, {
+          data$: this.data$
         });
     },
 
