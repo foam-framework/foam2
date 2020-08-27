@@ -33,12 +33,13 @@ foam.CLASS({
             DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
 
             UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
+            Long effectiveUser = ( ucj instanceof AgentCapabilityJunction ) ? ((AgentCapabilityJunction) ucj).getEffectiveUser() : null;
             UserCapabilityJunction old = (UserCapabilityJunction) userCapabilityJunctionDAO.find(AND(
               EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId()),
               EQ(UserCapabilityJunction.TARGET_ID, ucj.getTargetId()),
               OR(
                 NOT(INSTANCE_OF(foam.nanos.crunch.AgentCapabilityJunction.class)),
-                EQ(AgentCapabilityJunction.EFFECTIVE_USER, ((AgentCapabilityJunction) ucj).getEffectiveUser())
+                EQ(AgentCapabilityJunction.EFFECTIVE_USER, effectiveUser)
               )
             ));
 

@@ -16,6 +16,7 @@ foam.CLASS({
 
   imports: [
     'capabilityDAO',
+    'capabilityCategoryDAO',
     'crunchService',
     'ctrl',
     'prerequisiteCapabilityJunctionDAO',
@@ -222,10 +223,9 @@ foam.CLASS({
       // Register intercept for later occurances of the check above
       this.activeIntercepts.push(intercept);
       // Pop up the popup
-      var self = this;
-      self.ctrl.add(self.Popup.create({ closeable: false })
-        .start(self.MarginBorder)
-          .tag(self.CapabilityInterceptView, {
+      this.ctrl.add(this.Popup.create({ closeable: false })
+        .start(this.MarginBorder)
+          .tag(this.CapabilityInterceptView, {
             data: intercept
           })
         .end()
@@ -310,6 +310,14 @@ foam.CLASS({
         wizardlet.ucj = ucj;
         return wizardlet;
       });
+    },
+    function purgeCachedCapabilityDAOs() {
+      this.capabilityDAO.cmd_(this, foam.dao.CachingDAO.PURGE);
+      this.capabilityDAO.cmd_(this, foam.dao.AbstractDAO.RESET_CMD);
+      this.capabilityCategoryDAO.cmd_(this, foam.dao.CachingDAO.PURGE);
+      this.capabilityCategoryDAO.cmd_(this, foam.dao.AbstractDAO.RESET_CMD);
+      this.userCapabilityJunctionDAO.cmd_(this, foam.dao.CachingDAO.PURGE);
+      this.userCapabilityJunctionDAO.cmd_(this, foam.dao.AbstractDAO.RESET_CMD);
     }
   ]
 });

@@ -38,13 +38,13 @@ foam.CLASS({
             CapabilityJunctionStatus status = ucj.getStatus();
 
             boolean isInvalidate = ucj.getStatus() != CapabilityJunctionStatus.GRANTED || ucj.getStatus() != CapabilityJunctionStatus.GRACE_PERIOD;
-            
+            Long effectiveUser = ( ucj instanceof AgentCapabilityJunction ) ? ((AgentCapabilityJunction) ucj).getEffectiveUser() : null;
             DAO filteredUserCapabilityJunctionDAO = (DAO) userCapabilityJunctionDAO
               .where(AND(
                 EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId()),
                 OR(
                   NOT(INSTANCE_OF(foam.nanos.crunch.AgentCapabilityJunction.class)),
-                  EQ(AgentCapabilityJunction.EFFECTIVE_USER, ((AgentCapabilityJunction) ucj).getEffectiveUser())
+                  EQ(AgentCapabilityJunction.EFFECTIVE_USER, effectiveUser)
                 )
               ));
             DAO filteredPrerequisiteCapabilityJunctionDAO = (DAO) ((DAO) x.get("prerequisiteCapabilityJunctionDAO"))
