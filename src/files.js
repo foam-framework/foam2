@@ -830,6 +830,7 @@ FOAM_FILES([
   { name: "foam/u2/wizard/ScrollWizardletView" },
   { name: "foam/u2/wizard/DAOWizardlet" },
   { name: "foam/nanos/crunch/ui/CapabilityWizardlet" },
+  { name: "foam/nanos/crunch/ui/CapableObjectWizardlet" },
 
   { name: "foam/graphics/ZoomMapView" },
   { name: "foam/core/CoreTypesValidationTest" },
