@@ -100,7 +100,7 @@ foam.CLASS({
           } else {
             ucJunction = (UserCapabilityJunction) userCapabilityJunctionDAO.find(AND(
               EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId()),
-              EQ(UserCapabilityJunction.TARGET_ID, (String) ccJunction.getTargetId()),
+              EQ(UserCapabilityJunction.TARGET_ID, (String) ccJunction.getTargetId())
             ));
           }
 
