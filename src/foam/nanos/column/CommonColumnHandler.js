@@ -77,9 +77,9 @@ foam.CLASS({
       }
       return of_;
     },
-    function returnPropNamesToQuery(view) {
-      var propertyNamesToQuery = view.props.filter(p => foam.core.Property.isInstance(p.property)).map(p => p.fullPropertyName);
-      view.props.forEach(p => {
+    function returnPropNamesToQuery(props) {
+      var propertyNamesToQuery = props.filter(p => foam.core.Property.isInstance(p.property)).map(p => p.fullPropertyName);
+      props.forEach(p => {
         var propPrefix = ! p.fullPropertyName.includes('.') ? '' : this.getNestedPropertyNameExcludingLastProperty(p.fullPropertyName) + '.';
         if ( foam.core.UnitValue.isInstance(p.property) )
           propertyNamesToQuery.push(propPrefix + p.property.unitPropName);

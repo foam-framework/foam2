@@ -420,7 +420,7 @@ foam.CLASS({
 
             view.props = this.returnPropertiesForColumns(view, view.columns_);
 
-            var propertyNamesToQuery = view.columnHandler.returnPropNamesToQuery(view);
+            var propertyNamesToQuery = view.columnHandler.returnPropNamesToQuery(view.props);
             var valPromises = view.returnRecords(view.of, proxy, propertyNamesToQuery);
             var nastedPropertyNamesAndItsIndexes = view.columnHandler.buildArrayOfNestedPropertyNamesAndCorrespondingIndexesInArray(propertyNamesToQuery);
 
