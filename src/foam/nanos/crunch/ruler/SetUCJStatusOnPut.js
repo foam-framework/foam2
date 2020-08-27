@@ -88,15 +88,21 @@ foam.CLASS({
         for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
           cap = (Capability) ccJunction.findSourceId(x);
           if ( ! cap.getEnabled() ) continue;
-          UserCapabilityJunction ucJunction = (UserCapabilityJunction) userCapabilityJunctionDAO.find(AND(
-            EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId()),
-            EQ(UserCapabilityJunction.TARGET_ID, (String) ccJunction.getTargetId()),
-            // if we were to check this based on subject user its important that ucjs are put in the context of their owner
-            OR(
-              NOT(INSTANCE_OF(foam.nanos.crunch.AgentCapabilityJunction.class)),
+          UserCapabilityJunction ucJunction = null;
+          if ( cap.getAssociatedEntity() == foam.nanos.crunch.AssociatedEntity.ACTING_USER ) {
+            ucJunction = (UserCapabilityJunction) userCapabilityJunctionDAO.find(AND(
+              // if we were to check this based on subject user its important that ucjs are put in the context of their owner
+              INSTANCE_OF(foam.nanos.crunch.AgentCapabilityJunction.class),
+              EQ(UserCapabilityJunction.SOURCE_ID, ((User) ((Subject) x.get("subject")).getRealUser()).getId()),
+              EQ(UserCapabilityJunction.TARGET_ID, (String) ccJunction.getTargetId()),
               EQ(AgentCapabilityJunction.EFFECTIVE_USER, ((User) ((Subject) x.get("subject")).getUser()).getId())
-            )
-          ));
+            ));
+          } else {
+            ucJunction = (UserCapabilityJunction) userCapabilityJunctionDAO.find(AND(
+              EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId()),
+              EQ(UserCapabilityJunction.TARGET_ID, (String) ccJunction.getTargetId()),
+            ));
+          }
 
           if ( ucJunction != null && 
                ( ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED || ucJunction.getStatus() == CapabilityJunctionStatus.GRACE_PERIOD ) 
