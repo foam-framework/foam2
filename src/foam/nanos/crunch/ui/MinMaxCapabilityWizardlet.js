@@ -5,7 +5,8 @@ foam.CLASS({
 
   requires: [
     'foam.u2.view.MultiChoiceView',
-    'foam.u2.view.CardSelectView'
+    'foam.u2.view.CardSelectView',
+    'foam.nanos.crunch.CapabilityJunctionStatus'
   ],
 
   properties: [
@@ -18,21 +19,57 @@ foam.CLASS({
       }
     },
     {
+      name: 'mustBeValid',
+      class: 'Boolean',
+      value: true
+    },
+    {
+      name: 'min',
+      class: 'Int',
+      factory: function(){
+        if ( foam.nanos.crunch.MinMaxCapability.isInstance(this.capability) ){
+          return this.capability.min;
+        }
+      }
+    },
+    {
+      name: 'max',
+      class: 'Int',
+      factory: function(){
+        if ( foam.nanos.crunch.MinMaxCapability.isInstance(this.capability) ){
+          return this.capability.max;
+        }
+      }
+    },
+    {
       name: 'choices',
       expression: function(choiceWizardlets){
-        return choiceWizardlets.map(wizardlet => [wizardlet.title, wizardlet.title, wizardlet.isAvailable$, foam.u2.DisplayMode.RW])
+        return choiceWizardlets.map(wizardlet => {
+          var isFinal = wizardlet.ucj !== null &&
+          (
+            wizardlet.ucj.status != this.CapabilityJunctionStatus.GRANTED ||
+            wizardlet.ucj.status != this.CapabilityJunctionStatus.PENDING
+          )
+
+          return [wizardlet.title, wizardlet.title, isFinal ? true : wizardlet.isAvailable$, isFinal ?  foam.u2.DisplayMode.DISABLED : foam.u2.DisplayMode.RW, isFinal]
+        })
       }
+    },
+    {
+      class: 'Boolean',
+      name: 'isValid',
+      value: false
     }
   ],
 
   methods: [
-    function createView(data) {
-      // TODO: Implement create view method based on the choices property and the MultiChoiceView with choiceView as CardSelectView
-      // TODO: Wire up wizard to see if createView returns null then render default SDV otherwise render the method output
-
+    function createView(data) {    
       return this.MultiChoiceView.create({
         choices$: this.choices$,
-        booleanView: this.CardSelectView
+        booleanView: this.CardSelectView,
+        isValidNumberOfChoices$: this.isValid$,
+        minSelected$: this.min$,
+        maxSelected$: this.max$
       });
     }
   ]

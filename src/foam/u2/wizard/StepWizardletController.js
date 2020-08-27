@@ -67,6 +67,27 @@ foam.CLASS({
       }
     },
     {
+      name: 'wizardletAvailableSlots',
+      documentation: `
+        Used to gather all the slots across all the Wizardlets so that nextScreen can change
+        depending on the availablity of all the wizardlets
+
+        Array format is similar to sections.
+      `,
+      expression: function(wizardlets) {
+        var availableSlots = wizardlets.map(wizardlet =>  wizardlet.isAvailable$)
+        availableSlots.forEach(availableSlot => {
+            availableSlot.sub(() => {
+              this.wizardPosition = this.WizardPosition.create({
+                wizardletIndex: this.wizardPosition.wizardletIndex,
+                sectionIndex: this.wizardPosition.sectionIndex
+              });
+            });
+          });
+        return availableSlots;
+      }
+    },
+    {
       name: 'sectionAvailableSlots',
       documentation: `
         Sometimes the slot returned by createIsAvailableFor doesn't
@@ -168,7 +189,7 @@ foam.CLASS({
     },
     {
       name: 'nextScreen',
-      expression: function(sectionAvailableSlots, wizardPosition) {
+      expression: function(sectionAvailableSlots, wizardPosition, wizardletAvailableSlots) {
         var incr = pos => {
           let subWi = pos.wizardletIndex;
           let subSi = pos.sectionIndex;

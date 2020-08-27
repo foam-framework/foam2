@@ -1,6 +1,51 @@
 p({"class":"foam.nanos.script.Script","id":"279885d4-28ad-4af8-b1d9-69e6105970e1","description":"test","server":true,"scheduled":false,"code":"return \"hello World\"","output":"","notes":""})
 p({"class":"foam.nanos.script.Script","id":"279885d4-28ad-4af8-b1d9-69e6105970e1","description":"test","lastRun":"2017-09-29T16:23:47.978Z","server":true,"scheduled":false,"code":"return \"hello World\"","output":"","notes":""})
-p({"class":"foam.nanos.script.Script","id":"createPermissions","description":"Create missing Permissions","server":false,"code":"x.groupDAO.select(function(g) {\nfor ( var i = 0 ; i < g.permissions.length ; i++ ) {\nx.permissionDAO.put(g.permissions[i]);\n}\nperm = g.id + '.*';\np = foam.nanos.auth.Permission.create({id: perm});\nx.permissionDAO.put(p);\n});\n\nx.serviceProviderDAO.select(function(s) {\nperm = 'spid.read.' + s.id;\np = foam.nanos.auth.Permission.create({id: perm});\nx.permissionDAO.put(p);\nperm = 'spid.update.' + s.id;\np = foam.nanos.auth.Permission.create({id: perm});\nx.permissionDAO.put(p);\nperm = 'spid.delete.' + s.id;\np = foam.nanos.auth.Permission.create({id: perm});\nx.permissionDAO.put(p);\n});\n\nx.menuDAO.select(function(m) {\nperm = 'menu.read.' + m.id;\np = foam.nanos.auth.Permission.create({id: perm});\nx.permissionDAO.put(p);\nperm = 'menu.read.' + m.id;\np = foam.nanos.auth.Permission.create({id: perm});\nx.permissionDAO.put(p);\n});\n\nx.nSpecDAO.select(function(s) {\nperm = 'service.run.' + s.id;\np = foam.nanos.auth.Permission.create({id: perm});\nx.permissionDAO.put(p);\nperm = 'service.read.' + s.id;\np = foam.nanos.auth.Permission.create({id: perm});\nx.permissionDAO.put(p);\n});\n\n"})
+p({
+  "class":"foam.nanos.script.Script",
+  "id":"createPermissions",
+  "description":"Create missing Permissions",
+  "server":false,
+  "code":"""
+    x.groupDAO.select(function (g) {
+      for (var i = 0; i < g.permissions.length; i++) {
+        x.permissionDAO.put(g.permissions[i]);
+      }
+      perm = g.id + '.*';
+      p = foam.nanos.auth.Permission.create({ id: perm });
+      x.permissionDAO.put(p);
+    });
+
+    x.serviceProviderDAO.select(function (s) {
+      perm = 'spid.read.' + s.id;
+      p = foam.nanos.auth.Permission.create({ id: perm });
+      x.permissionDAO.put(p);
+      perm = 'spid.update.' + s.id;
+      p = foam.nanos.auth.Permission.create({ id: perm });
+      x.permissionDAO.put(p);
+      perm = 'spid.remove.' + s.id;
+      p = foam.nanos.auth.Permission.create({ id: perm });
+      x.permissionDAO.put(p);
+    });
+
+    x.menuDAO.select(function (m) {
+      perm = 'menu.read.' + m.id;
+      p = foam.nanos.auth.Permission.create({ id: perm });
+      x.permissionDAO.put(p);
+      perm = 'menu.read.' + m.id;
+      p = foam.nanos.auth.Permission.create({ id: perm });
+      x.permissionDAO.put(p);
+    });
+
+    x.nSpecDAO.select(function (s) {
+      perm = 'service.run.' + s.id;
+      p = foam.nanos.auth.Permission.create({ id: perm });
+      x.permissionDAO.put(p);
+      perm = 'service.read.' + s.id;
+      p = foam.nanos.auth.Permission.create({ id: perm });
+      x.permissionDAO.put(p);
+    });
+  """
+})
 
 p({
   "class":"foam.nanos.script.Script",

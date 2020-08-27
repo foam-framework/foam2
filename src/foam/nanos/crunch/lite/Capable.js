@@ -58,7 +58,7 @@ foam.INTERFACE({
                   for ( int i = 0 ; i < list.size() - 1 ; i++ ) {
                     Capability prereqCap = (Capability) list.get(i);
                     list.add(new CapablePayload.Builder(x)
-                      .setCapabilityId(prereqCap.getId())
+                      .setCapability(prereqCap)
                       .build());
                   }
 
@@ -67,7 +67,7 @@ foam.INTERFACE({
                            support for MinMaxCapability
                   Capability cap = (Capability) list.get(list.size() - 1);
                   payloads.add(new CapablePayload.Builder(x)
-                    .setCapabilityId(cap.getId())
+                    .setCapability(cap)
                     .setPrerequisites(prereqs.toArray(
                       new CapablePayload[list.size()]))
                     .build());
@@ -80,12 +80,12 @@ foam.INTERFACE({
               }
               Capability cap = (Capability) obj;
               payloads.add(new CapablePayload.Builder(x)
-                .setCapabilityId(cap.getId())
+                .setCapability(cap)
                 .build());
             }
             
             // Re-FObjectArray
-            setCapabilityPayloads(payloads.toArray(
+            setCapablePayloads(payloads.toArray(
               new CapablePayload[payloads.size()]
             ));
           `
@@ -103,8 +103,9 @@ foam.INTERFACE({
           body: `
             // Marshal payloads into a hashmap
             Map<String, FObject> payloads = new HashMap<String, FObject>();
-            for ( CapablePayload payload : getCapabilityPayloads() ) {
-              payloads.put(payload.getCapabilityId(), (FObject) payload.getData());
+            for ( CapablePayload payload : getCapablePayloads() ) {
+              payloads.put(payload.getCapability().getId(),
+                (FObject) payload.getData());
             }
 
             CrunchService crunchService = (CrunchService) x.get("crunchService");
@@ -140,17 +141,34 @@ foam.INTERFACE({
 
   methods: [
     {
-      name: 'getCapabilityPayloads',
-      type: 'CapablePayload[]'
+      name: 'getCapablePayloads',
+      type: 'CapablePayload[]',
+      flags: ['java'],
     },
     {
-      name: 'setCapabilityPayloads',
+      name: 'setCapablePayloads',
+      flags: ['java'],
       args: [
         {
           name: 'payloads',
           type: 'CapablePayload[]'
         }
       ]
-    }
+    },
+    {
+      name: 'getUserCapabilityRequirements',
+      flags: ['java'],
+      type: 'String[]'
+    },
+    {
+      name: 'setUserCapabilityRequirements',
+      flags: ['java'],
+      args: [
+        {
+          name: 'payloads',
+          type: 'String[]'
+        }
+      ]
+    },
   ],
 });

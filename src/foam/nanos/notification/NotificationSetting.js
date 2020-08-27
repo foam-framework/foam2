@@ -119,7 +119,7 @@ foam.CLASS({
       name: 'authorizeOnDelete',
       javaCode: `
       AuthService auth = (AuthService) x.get("auth");
-      if ( ! checkOwnership(x) && ! auth.check(x, createPermission("delete")) ) throw new AuthorizationException(LACKS_DELETE_PERMISSION);
+      if ( ! checkOwnership(x) && ! auth.check(x, createPermission("remove")) ) throw new AuthorizationException(LACKS_DELETE_PERMISSION);
       `
     },
     {
