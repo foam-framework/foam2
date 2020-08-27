@@ -183,7 +183,13 @@ foam.CLASS({
             .start()
               .addClass(this.myClass('entry'))
               .start()
-                .add(this.slot(function (data$currentWizardlet, data$currentSection) {
+                .add(this.slot(function (data, data$currentWizardlet, data$currentSection) {
+                  var createView = data$currentWizardlet.createView(data);
+        
+                  if ( createView !== null && foam.u2.View.isInstance(createView) ) {
+                    return createView;
+                  }
+
                   var ctx = this.__subContext__.createSubContext();
                   ctx.register(
                     this.VerticalDetailView,
