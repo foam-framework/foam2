@@ -68,6 +68,7 @@ foam.CLASS({
               numberGranted++;
               break;
             case PENDING:
+            case APPROVED:
               numberPending++;
               break;
           }
