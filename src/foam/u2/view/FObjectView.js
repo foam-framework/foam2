@@ -34,10 +34,10 @@ foam.CLASS({
       class: 'String',
       name: 'objectClass',
       label: '',
-      visibility: function(allowCustom, choices) {
-        return allowCustom || choices.length > 1 ?
-          foam.u2.DisplayMode.RW :
-          foam.u2.DisplayMode.HIDDEN;
+      visibility: function(allowCustom, classIsFinal, choices, data) {
+        if ( ! allowCustom && choices.length <= 1  ) return foam.u2.DisplayMode.HIDDEN;
+        if ( classIsFinal && this.dataWasProvided_ ) return foam.u2.DisplayMode.HIDDEN;
+        return foam.u2.DisplayMode.RW;
       },
       view: function(args, X) {
         return {
@@ -53,9 +53,7 @@ foam.CLASS({
       // We need to override the default view, otherwise we end up with a
       // circular definition where FObjectView has an FObjectProperty which gets
       // rendered as an FObjectView, which leads to infinite recursion.
-      preSet: function(o, n) {
-        return n || o;
-      },
+      preSet: function(o, n) { return n || o; },
       view: 'foam.u2.detail.SectionedDetailView'
     },
     {
@@ -73,6 +71,21 @@ foam.CLASS({
       expression: function(choices) {
         return choices.length == 0;
       }
+    },
+    {
+      class: 'Function',
+      name: 'copyOldData',
+      value: function(o) { return o; }
+    },
+    {
+      class: 'Boolean',
+      name: 'classIsFinal',
+      documentation: 'If true, objectClass cannot be changed if data is provided.'
+    },
+    {
+      class: 'Boolean',
+      name: 'dataWasProvided_',
+      documentation: 'Set to true if data was initially provided. Used to implement classIsFinal.'
     },
     {
       class: 'Array',
@@ -152,20 +165,25 @@ foam.CLASS({
     async function initE() {
       this.SUPER();
 
-      if ( ! this.choices.length ) {
-        this.onDetach(this.of$.sub(this.updateChoices));
-        this.updateChoices();
-        this.choicesLoaded;
-      }
-
       function dataToClass(d) {
         return d ? d.cls_.id : '';
       }
 
       var classToData = function(c) {
         var m = c && this.__context__.lookup(c, true);
-        return m ? m.create(null, this) : null;
+        return m.create(this.data ? this.copyOldData(this.data) : null, this);
       }.bind(this);
+
+      this.dataWasProvided_ = !! this.data;
+
+      if ( ! this.data && this.objectClass )
+        this.data = classToData(this.objectClass);
+
+      if ( ! this.choices.length ) {
+        this.onDetach(this.of$.sub(this.updateChoices));
+        this.updateChoices();
+        await this.choicesLoaded;
+      }
 
       this.data$.relateTo(
         this.objectClass$,
