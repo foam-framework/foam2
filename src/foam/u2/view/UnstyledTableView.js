@@ -413,18 +413,14 @@ foam.CLASS({
           //with this code error created  slot.get cause promise return
           //FIX ME
           return this.slot(function(data, data$delegate, order, updateValues) {
-            view.props = this.returnPropertiesForColumns(view, view.columns_);
-            var propertyNamesToQuery = view.props.filter(p => foam.core.Property.isInstance(p.property)).map(p => p.fullPropertyName);
-
-            var unitValueProperties = view.props.filter( p => foam.core.UnitValue.isInstance(p.property) );
-
             // Make sure the DAO set here responds to ordering when a user clicks
             // on a table column header to sort by that column.
             if ( this.order ) dao = dao.orderBy(this.order);
             var proxy = view.ProxyDAO.create({ delegate: dao });
 
-            //to retrieve value of unitProp
-            unitValueProperties.forEach(p => propertyNamesToQuery.push(p.property.unitPropName));
+            view.props = this.returnPropertiesForColumns(view, view.columns_);
+
+            var propertyNamesToQuery = view.returnPropNamesToQuery(view);
             var valPromises = view.returnRecords(view.of, proxy, propertyNamesToQuery);
             var nastedPropertyNamesAndItsIndexes = view.buildArrayOfNestedPropertyNamesAndCorrespondingIndexesInArray(propertyNamesToQuery);
 
@@ -668,6 +664,7 @@ foam.CLASS({
         return map;
       },
       function getNestedPropertyNameExcludingLastProperty(nestedPropertyName) {
+        //this method asssumes that the propName is nestedPropertyName
         var lastIndex = nestedPropertyName.lastIndexOf('.');
         return nestedPropertyName.substr(0, lastIndex);//lastIndex == length here
       },
@@ -692,6 +689,18 @@ foam.CLASS({
           filteredArr.push(valuesArray[indexes[i]]);
         }
         return filteredArr;
+      },
+      function returnPropNamesToQuery(view) {
+        var propertyNamesToQuery = view.props.filter(p => foam.core.Property.isInstance(p.property)).map(p => p.fullPropertyName);
+        view.props.forEach(p => {
+          var propPrefix = ! p.fullPropertyName.includes('.') ? '' : view.getNestedPropertyNameExcludingLastProperty(p.fullPropertyName) + '.';
+          if ( foam.core.UnitValue.isInstance(p.property) )
+            propertyNamesToQuery.push(propPrefix + p.property.unitPropName);
+          for (var i = 0 ; i < p.property.dependsOnPropertiesWithNames.length ; i++ ) {
+            propertyNamesToQuery.push(propPrefix + p.property.dependsOnPropertiesWithNames[i]);
+          }
+        });
+        return propertyNamesToQuery;
       }
   ]
 });

@@ -293,7 +293,11 @@ foam.CLASS({
       name: 'sortable',
       value: true
     },
-    'unitPropValueToString'
+    'unitPropValueToString',
+    {
+      name: 'dependsOnPropertiesWithNames',
+      value: []
+    }
   ],
 
   methods: [
