@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.nanos.crunch',
   name: 'MinMaxCapability',
@@ -14,12 +20,12 @@ foam.CLASS({
     {
       name: 'min',
       class: 'Int',
-      value: 1,
+      value: 1
     },
     {
       name: 'max',
       class: 'Int',
-      value: 0,
+      value: 0
     }
   ],
 
@@ -74,7 +80,7 @@ foam.CLASS({
           return CapabilityJunctionStatus.PENDING;
         }
         return CapabilityJunctionStatus.ACTION_REQUIRED;
-      `,
+      `
     }
   ]
 });
