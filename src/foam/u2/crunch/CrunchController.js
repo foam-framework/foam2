@@ -153,13 +153,16 @@ foam.CLASS({
             wizardlets: capabilitiesSections.wizCaps,
             config: config
           }),
-          onClose: (x) => {
+          onClose: (x, userWantsToContinue) => {
             x.closeDialog();
-            resolve();
+            resolve(userWantsToContinue);
           }
         }));
-      }).then(() => {
-        return this.finalOnClose(capabilitiesSections.caps);
+      }).then((userWantsToContinue) => {
+        return this.finalOnClose(
+          capabilitiesSections.caps,
+          userWantsToContinue
+        );
       });
     },
 
@@ -363,6 +366,60 @@ foam.CLASS({
       this.capabilityCategoryDAO.cmd_(this, foam.dao.AbstractDAO.RESET_CMD);
       this.userCapabilityJunctionDAO.cmd_(this, foam.dao.CachingDAO.PURGE);
       this.userCapabilityJunctionDAO.cmd_(this, foam.dao.AbstractDAO.RESET_CMD);
+    },
+
+    // CRUNCH Lite Methods
+    function launchCapableWizard(capable) {
+      var p = Promise.resolve(true);
+      if ( capable.userCapabilityRequirements ) {
+        p = capable.userCapabilityRequirements.reduce(
+          (p, capabilityId) => p.then(userWantsToContinue => {
+            console.log('should be a cap id', capabilityId);
+            if ( ! userWantsToContinue ) return false;
+            return this.launchWizard(capabilityId);
+          }),
+          p
+        );
+      }
+      var capableWizard = this.createCapableWizard(capable);
+      p.then(userWantsToContinue => {
+        ctrl.add(this.Popup.create().tag(capableWizard));
+      });
+    },
+
+    function createCapableWizard(capable) {
+      var wizardlets = [];
+      for ( let i = 0 ; i < capable.capablePayloads.length ; i++ ) {
+        let capablePayload = capable.capablePayloads[i];
+        let wizardletClass = capablePayload.capability.wizardlet.cls_;
+
+        // Override the default wizardlet class with one that does not
+        //   save to userCapabilityJunction
+        if ( wizardletClass.id == 'foam.nanos.crunch.ui.CapabilityWizardlet' ) {
+          wizardletClass = foam.nanos.crunch.ui.CapableObjectWizardlet;
+        }
+        let wizardlet = wizardletClass.create({
+          capability: capablePayload.capability,
+          targetPayload: capablePayload
+        }, capable);
+        if ( capablePayload.data ) {
+          wizardlet.data = capablePayload.data;
+        }
+
+        wizardlets.push(wizardlet);
+      }
+
+      console.log(wizardlets);
+
+      return {
+        class: 'foam.u2.wizard.StepWizardletView',
+        data: foam.u2.wizard.StepWizardletController.create({
+          wizardlets: wizardlets
+        }),
+        onClose: (x) => {
+          x.closeDialog();
+        }
+      };
     }
   ]
 });

@@ -256,7 +256,7 @@ foam.CLASS({
       },
       confirmationRequired: true,
       code: function(x) {
-        this.onClose(x);
+        this.onClose(x, false);
       }
     },
     {
@@ -264,7 +264,7 @@ foam.CLASS({
       label: 'Save & Dismiss',
       code: function(x) {
         this.data.saveProgress().then(() => {
-          this.onClose(x);
+          this.onClose(x, false);
         }).catch(e => {
           console.error(e);
           x.ctrl.notify(this.ERROR_MSG_DRAFT, '', this.LogLevel.ERROR, true);
@@ -293,7 +293,7 @@ foam.CLASS({
       code: function(x) {
         this.data.next().then((isFinished) => {
           if ( isFinished ) {
-            this.onClose(x);
+            this.onClose(x, true);
           }
         }).catch(e => {
           console.error(e);

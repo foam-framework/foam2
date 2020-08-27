@@ -25,9 +25,9 @@ foam.CLASS({
       name: 'capability'
     },
     {
-      name: 'targetObject',
+      name: 'targetPayload',
       class: 'FObjectProperty',
-      of: 'foam.nanos.crunch.lite.Capable'
+      of: 'foam.nanos.crunch.lite.CapablePayload'
     },
 
     // Properties for WizardSection interface
@@ -57,8 +57,8 @@ foam.CLASS({
   methods: [
     {
       name: 'save',
-      // TODO: implement capable save for client
       code: function() {
+        //
       }
     }
   ]
