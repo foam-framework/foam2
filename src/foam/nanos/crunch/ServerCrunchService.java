@@ -6,6 +6,7 @@
 
 package foam.nanos.crunch;
 
+import foam.core.FObject;
 import foam.core.X;
 import foam.dao.ArraySink;
 import foam.dao.DAO;
@@ -16,21 +17,25 @@ import foam.nanos.logger.Logger;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.Queue;
 import static foam.mlang.MLang.*;
 
 public class ServerCrunchService implements CrunchService {
   public List getGrantPath(X x, String rootId) {
+    return getCapabilityPath(x, rootId, true);
+  }
+
+  public List getCapabilityPath(X x, String rootId, boolean filterGrantedUCJ) {
     Logger logger = (Logger) x.get("logger");
 
     DAO prerequisiteDAO = (DAO) x.get("prerequisiteCapabilityJunctionDAO");
     DAO capabilityDAO = (DAO) x.get("capabilityDAO");
 
     // Lookup for indices of previously observed capabilities
-    Map<String,Integer> alreadyListed = new HashMap<String,Integer>();
+    List<String> alreadyListed = new ArrayList<String>();
 
     // List of capabilities required to grant the desired capability.
     // Throughout the traversial algorithm this list starts with parents of
@@ -49,48 +54,62 @@ public class ServerCrunchService implements CrunchService {
     while ( nextSources.size() > 0 ) {
       String sourceCapabilityId = nextSources.poll();
 
-      UserCapabilityJunction ucj = crunchService.getJunction(x, sourceCapabilityId);
-      if ( ucj != null && ucj.getStatus() == CapabilityJunctionStatus.GRANTED ) {
-        continue;
-      }
-
-      // Remove previously added prerequisite if one matches
-      if ( alreadyListed.containsKey(sourceCapabilityId) ) {
-        int previousIndex = alreadyListed.get(sourceCapabilityId);
-        grantPath.remove(previousIndex);
-
-        // Remove previously stored index of capability
-        alreadyListed.remove(sourceCapabilityId);
-
-        // Shift remembered indexes, now that grantList has been shifted
-        Map<String,Integer> newAlreadyListed = new HashMap<String,Integer>();
-        for ( Map.Entry<String,Integer> entry : alreadyListed.entrySet() ) {
-          int newIndex = entry.getValue();
-          if ( newIndex > previousIndex ) newIndex--;
-          newAlreadyListed.put(entry.getKey(), newIndex);
+      if ( ! filterGrantedUCJ ) {
+        UserCapabilityJunction ucj = crunchService.getJunction(x, sourceCapabilityId);
+        if ( ucj != null && ucj.getStatus() == CapabilityJunctionStatus.GRANTED ) {
+          continue;
         }
-        alreadyListed = newAlreadyListed;
       }
+
+      if ( alreadyListed.contains(sourceCapabilityId) ) continue;
 
       // Add capability to grant path, and remember index in case it's replaced
       Capability cap = (Capability) capabilityDAO.find(sourceCapabilityId);
 
-      alreadyListed.put(sourceCapabilityId, grantPath.size());
+      alreadyListed.add(sourceCapabilityId);
       grantPath.add(cap);
 
       // Enqueue prerequisites for adding to grant path
       List prereqs = ( (ArraySink) prerequisiteDAO
-        .where(EQ(CapabilityCapabilityJunction.SOURCE_ID, sourceCapabilityId))
+        .where(AND(
+          EQ(CapabilityCapabilityJunction.SOURCE_ID, sourceCapabilityId),
+          NOT(IN(CapabilityCapabilityJunction.TARGET_ID, alreadyListed))
+        ))
         .select(new ArraySink()) ).getArray();
-      for ( Object prereqObj : prereqs ) {
-        CapabilityCapabilityJunction prereq =
-          (CapabilityCapabilityJunction) prereqObj;
+      for ( int i = prereqs.size() - 1; i >= 0; i-- ) {
+        CapabilityCapabilityJunction prereq = (CapabilityCapabilityJunction) prereqs.get(i);
         nextSources.add(prereq.getTargetId());
       }
     }
 
     Collections.reverse(grantPath);
     return grantPath;
+  }
+
+  // Return capability path for multiple prerequisites without duplicates.
+  public List getMultipleCapabilityPath(
+    X x, String[] capabilityIds, boolean filterGrantedUCJ
+  ) {
+    Set alreadyListed = new HashSet<String>();
+
+    List multiplePath = new ArrayList();
+
+    for ( String capId : capabilityIds ) {
+      List crunchyPath = getCapabilityPath(x, capId, filterGrantedUCJ);
+      for ( Object obj : crunchyPath ) {
+        Capability cap = null;
+        if ( obj instanceof List ) {
+          List list = (List) obj;
+          cap = (Capability) list.get(list.size() - 1);
+        } else {
+          cap = (Capability) obj;
+        }
+        if ( alreadyListed.contains(cap.getId()) ) continue;
+        multiplePath.add(obj);
+      }
+    }
+
+    return multiplePath;
   }
 
   public UserCapabilityJunction getJunction(X x, String capabilityId) {
@@ -135,5 +154,74 @@ public class ServerCrunchService implements CrunchService {
     }
 
     return null;
+  }
+  public void updateJunction(X x, String capabilityId, FObject data) {
+    Subject subject = (Subject) x.get("subject");
+    UserCapabilityJunction ucj = this.getJunction(x, capabilityId);
+    if ( ucj == null ) {
+      // Need Capability to associate UCJ correctly
+      DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+      Capability cap = (Capability) capabilityDAO.find(capabilityId);
+      if ( cap == null ) {
+        throw new RuntimeException(String.format(
+          "Capability with id '%s' not found", capabilityId
+        ));
+      }
+      AssociatedEntity associatedEntity = cap.getAssociatedEntity();
+      boolean isAssociation = associatedEntity == AssociatedEntity.ACTING_USER;
+      User associatedUser = associatedEntity == AssociatedEntity.USER
+        ? subject.getUser()
+        : subject.getRealUser()
+        ;
+      ucj = isAssociation
+        ? new AgentCapabilityJunction.Builder(x)
+          .setSourceId(associatedUser.getId())
+          .setTargetId(capabilityId)
+          .setEffectiveUser(subject.getUser().getId())
+          .build()
+        : new UserCapabilityJunction.Builder(x)
+          .setSourceId(associatedUser.getId())
+          .setTargetId(capabilityId)
+          .build()
+        ;
+    }
+    if ( data != null ) {
+      ucj.setData(data);
+    }
+    DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
+    userCapabilityJunctionDAO.inX(x).put(ucj);
+  }
+
+  public void maybeIntercept(X x, String[] capabilityOptions) {
+    if ( capabilityOptions.length < 1 ) {
+      Logger logger = (Logger) x.get("logger");
+      logger.warning("crunchService.maybeIntercept() performed with empty list");
+      return;
+    }
+
+    // Check that at least one capability option is satisfied
+    boolean satisfied = false;
+    for ( String capId : capabilityOptions ) {
+      UserCapabilityJunction ucj = this.getJunction(x, capId);
+      if ( ucj != null && (
+        // TODO: use getStatus().getBroadStatus() when available
+        ucj.getStatus() == CapabilityJunctionStatus.GRANTED
+        || ucj.getStatus() == CapabilityJunctionStatus.GRACE_PERIOD
+      ) ) {
+        satisfied = true;
+        break;
+      }
+    }
+
+    // Throw a capability intercept if none were satisfied
+    if ( ! satisfied ) {
+      CapabilityRuntimeException ex = new CapabilityRuntimeException(
+        "Missing a required capability."
+      );
+      for ( String capId : capabilityOptions ) {
+        ex.addCapabilityId(capId);
+      }
+      throw ex;
+    }
   }
 }

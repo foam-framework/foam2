@@ -16,6 +16,8 @@ foam.CLASS({
 
   imports: [
     'capabilityDAO',
+    'capabilityCategoryDAO',
+    'crunchService',
     'ctrl',
     'prerequisiteCapabilityJunctionDAO',
     'stack',
@@ -63,53 +65,15 @@ foam.CLASS({
   ],
 
   methods: [
-    function getTC(capabilityId) {
-      var tcList = [];
-      var tcRecurse = () => {};
-      // Pre-Order Traversial of Capability Dependancies.
-      // Using Pre-Order here will cause the wizard to display
-      // dependancies in a logical order.
-      tcRecurse = (sourceId, seen) => {
-        if ( ! seen ) seen = [];
-        return this.prerequisiteCapabilityJunctionDAO.where(this.AND(
-          this.EQ(this.CapabilityCapabilityJunction.SOURCE_ID, sourceId),
-          this.NOT(this.IN(this.CapabilityCapabilityJunction.TARGET_ID, seen))
-        )).select().then((result) => {
-          var arry = result.array;
-
-          if ( arry.length == 0 ) {
-            tcList.push(sourceId);
-            return;
-          }
-
-          return arry.reduce(
-            (p, pcj) => p.then(() => tcRecurse(pcj.targetId, seen.concat(arry.map((pcj) => pcj.targetId)))),
-            Promise.resolve()
-          ).then(() => tcList.push(sourceId));
-        });
-      };
-
-      return tcRecurse(capabilityId, []).then(() => [...new Set(tcList)]);
-    },
-
-    function getCapabilities(capabilityId) {
-      return Promise.resolve(
-        this.getTC(capabilityId).then(
-          tcList => Promise.all(tcList.map(
-            capId => this.capabilityDAO.find(capId))
-          )
-        ));
-    },
-
     function getCapsAndWizardlets(capabilityId) {
-      return this.getCapabilities(capabilityId).then( (capabilities) => {
+      return this.crunchService.getGrantPath(this.__subContext__, capabilityId).then((capabilities) => {
         return Promise.all([
           Promise.resolve(capabilities),
           Promise.all(capabilities
             .filter(cap => !! cap.of )
             .map(cap => {
                 var associatedEntity = cap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
-                var wizardlet = this.CapabilityWizardlet.create({ capability: cap });
+                var wizardlet = cap.wizardlet.cls_.create({ capability: cap, ...cap.wizardlet.instance_ }, this);
                 return this.updateUCJ(wizardlet, associatedEntity);
               })
             )
@@ -138,15 +102,23 @@ foam.CLASS({
 
     function generateAndDisplayWizard(capabilitiesSections) {
       // called in CapabilityRequirementView
-      return ctrl.add(this.Popup.create({ closeable: false }).tag({
-        class: 'foam.u2.wizard.StepWizardletView',
-        data: foam.u2.wizard.StepWizardletController.create({
-          wizardlets: capabilitiesSections.wizCaps
-        }),
-        onClose: (x) => {
-          this.finalOnClose(x, capabilitiesSections.caps);
-        }
-      }));
+      let topCap = capabilitiesSections.caps[capabilitiesSections.caps.length - 1];
+      let config = topCap.wizardletConfig.cls_.create({ ...topCap.wizardletConfig.instance_ }, this);
+      return new Promise((resolve, _) => {
+        ctrl.add(this.Popup.create({ closeable: false }).tag({
+          class: 'foam.u2.wizard.StepWizardletView',
+          data: foam.u2.wizard.StepWizardletController.create({
+            wizardlets: capabilitiesSections.wizCaps,
+            config: config
+          }),
+          onClose: (x) => {
+            x.closeDialog();
+            resolve();
+          }
+        }));
+      }).then(() => {
+        return this.finalOnClose(capabilitiesSections.caps);
+      });
     },
 
     async function startWizardFlow(capabilityId, toLaunchOrNot) {
@@ -157,9 +129,8 @@ foam.CLASS({
         });
     },
 
-    function finalOnClose(x, capabilities) {
+    function finalOnClose(capabilities) {
       return new Promise((wizardResolve) => {
-        x.closeDialog();
         // Save no-data capabilities (i.e. not displayed in wizard)
         Promise.all(capabilities.filter(cap => ! cap.of).map(
           cap => {
@@ -253,10 +224,9 @@ foam.CLASS({
       // Register intercept for later occurances of the check above
       this.activeIntercepts.push(intercept);
       // Pop up the popup
-      var self = this;
-      self.ctrl.add(self.Popup.create({ closeable: false })
-        .start(self.MarginBorder)
-          .tag(self.CapabilityInterceptView, {
+      this.ctrl.add(this.Popup.create({ closeable: false })
+        .start(this.MarginBorder)
+          .tag(this.CapabilityInterceptView, {
             data: intercept
           })
         .end()
@@ -277,15 +247,25 @@ foam.CLASS({
         .map(eachSection => eachSection.help);
       if ( arrOfRequiredCapabilities.length < 1 ) {
         // if nothing to show don't open this dialog - push directly to wizard
-        this.generateAndDisplayWizard(capabilitiesSections);
+        return this.generateAndDisplayWizard(capabilitiesSections);
       } else {
-        return this.ctrl.add(
-          this.Popup.create({ closeable: false }, this.ctrl.__subContext__).tag({
-            class: 'foam.u2.crunch.CapabilityRequirementView',
-            arrayRequirement: arrOfRequiredCapabilities,
-            functionData: capabilitiesSections,
-            capabilityId: capabilityId
-          })).end();
+        return new Promise((resolve, _) => {
+          this.ctrl.add(
+            this.Popup.create({ closeable: false }, this.ctrl.__subContext__).tag({
+              class: 'foam.u2.crunch.CapabilityRequirementView',
+              arrayRequirement: arrOfRequiredCapabilities,
+              functionData: capabilitiesSections,
+              capabilityId: capabilityId,
+              onClose: (x, isContinueAction) => {
+                resolve(isContinueAction);
+              }
+            })
+          ).end();
+        }).then(isContinueAction => {
+          if (isContinueAction) {
+            return this.generateAndDisplayWizard(capabilitiesSections);
+          }
+        })
       }
     },
     function save(wizardlet) {
@@ -331,6 +311,14 @@ foam.CLASS({
         wizardlet.ucj = ucj;
         return wizardlet;
       });
+    },
+    function purgeCachedCapabilityDAOs() {
+      this.capabilityDAO.cmd_(this, foam.dao.CachingDAO.PURGE);
+      this.capabilityDAO.cmd_(this, foam.dao.AbstractDAO.RESET_CMD);
+      this.capabilityCategoryDAO.cmd_(this, foam.dao.CachingDAO.PURGE);
+      this.capabilityCategoryDAO.cmd_(this, foam.dao.AbstractDAO.RESET_CMD);
+      this.userCapabilityJunctionDAO.cmd_(this, foam.dao.CachingDAO.PURGE);
+      this.userCapabilityJunctionDAO.cmd_(this, foam.dao.AbstractDAO.RESET_CMD);
     }
   ]
 });

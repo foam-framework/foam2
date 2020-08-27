@@ -50,7 +50,6 @@ foam.CLASS({
     }
 
     ^feature-column-grid {
-      justify-content: space-between;
       display: inline-flex;
       width: 94%;
       overflow: hidden;
@@ -82,7 +81,7 @@ foam.CLASS({
       display: flex;
       padding-top: 70px;
       margin-left: -20px;
-      z-index: 100111;
+      z-index: 10000;
       position: relative;
       /* HOVER OFF */
       -webkit-transition: padding 2s;
@@ -245,7 +244,7 @@ foam.CLASS({
       // Capability Store Section Previews
       var self = this;
       return self.E()
-        .select(self.visibleCategoryDAO, function(category) {
+        .select(self.visibleCategoryDAO$proxy, function(category) {
           var sectionElement = this.E('span');
           var returnElement = this.E()
             .start('h3')
@@ -288,7 +287,7 @@ foam.CLASS({
 
       // When 'p' resolves, query all matching capabilities
       p.then(arraySink => {
-        capabilityIds = arraySink.array;
+        capabilityIds = arraySink.projection;
         self.visibleCapabilityDAO.where(
           self.IN(self.Capability.ID, capabilityIds)
         ).select().then(result => {

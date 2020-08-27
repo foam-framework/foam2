@@ -26,7 +26,7 @@ foam.CLASS({
       name: 'config',
       class: 'FObjectProperty',
       of: 'foam.u2.wizard.StepWizardConfig',
-      factory: function () {
+      factory: function() {
         return this.StepWizardConfig.create();
       }
     },
@@ -42,7 +42,7 @@ foam.CLASS({
       `,
       class: 'FObjectProperty',
       of: 'foam.u2.wizard.WizardPosition',
-      factory: function () {
+      factory: function() {
         return this.WizardPosition.create({
           wizardletIndex: 0,
           sectionIndex: 0,
@@ -107,20 +107,20 @@ foam.CLASS({
                 sectionIndex: this.wizardPosition.sectionIndex
               });
             });
-          })
+          });
         });
         return availableSlots;
       }
     },
     {
       name: 'currentWizardlet',
-      expression: function (wizardlets, wizardPosition) {
+      expression: function(wizardlets, wizardPosition) {
         return wizardlets[wizardPosition.wizardletIndex];
       }
     },
     {
       name: 'currentSection',
-      expression: function (sections, wizardPosition) {
+      expression: function(sections, wizardPosition) {
         return sections[wizardPosition.wizardletIndex][wizardPosition.sectionIndex];
       }
     },
@@ -136,11 +136,8 @@ foam.CLASS({
     },
     {
       name: 'previousScreen',
-      expression: function (sectionAvailableSlots, wizardPosition) {
-        var wi = wizardPosition.wizardletIndex;
-        var si = wizardPosition.sectionIndex;
-
-        var decr = (pos) => {
+      expression: function(sectionAvailableSlots, wizardPosition) {
+        var decr = pos => {
           let subWi = pos.wizardletIndex;
           let subSi = pos.sectionIndex;
           if ( subSi == 0 ) {
@@ -154,10 +151,9 @@ foam.CLASS({
             wizardletIndex: subWi,
             sectionIndex: subSi,
           });
-        }
+        };
 
         for ( let p = decr(wizardPosition) ; p != null ; p = decr(p) ) {
-          console.log('prev p', p);
           if ( sectionAvailableSlots[p.wizardletIndex][p.sectionIndex].get() ) {
             return p;
           }
@@ -168,11 +164,8 @@ foam.CLASS({
     },
     {
       name: 'nextScreen',
-      expression: function (sectionAvailableSlots, wizardPosition) {
-        var wi = wizardPosition.wizardletIndex;
-        var si = wizardPosition.sectionIndex;
-
-        var incr = (pos) => {
+      expression: function(sectionAvailableSlots, wizardPosition) {
+        var incr = pos => {
           let subWi = pos.wizardletIndex;
           let subSi = pos.sectionIndex;
           if ( subSi >= sectionAvailableSlots[subWi].length - 1 ) {
@@ -186,10 +179,9 @@ foam.CLASS({
             wizardletIndex: subWi,
             sectionIndex: subSi,
           });
-        }
+        };
 
         for ( let p = incr(wizardPosition) ; p != null ; p = incr(p) ) {
-          console.log('next p', p);
           if ( sectionAvailableSlots[p.wizardletIndex][p.sectionIndex].get() ) {
             return p;
           }
@@ -200,7 +192,7 @@ foam.CLASS({
     },
     {
       name: 'isLastScreen',
-      expression: function (nextScreen) {
+      expression: function(nextScreen) {
         return nextScreen == null;
       }
     },
@@ -211,23 +203,20 @@ foam.CLASS({
         If the first screen has no available sections, then the back button
         should be disabled.
       `,
-      expression: function (previousScreen) {
+      expression: function(previousScreen) {
         return previousScreen != null;
       }
     },
     {
       name: 'canGoNext',
       class: 'Boolean',
-      expression: function (currentWizardlet$isValid) {
+      expression: function(currentWizardlet$isValid) {
         return currentWizardlet$isValid;
       }
     }
   ],
 
   methods: [
-    function init() {
-      console.log('StepWizardletController', this);
-    },
     function saveProgress() {
       var p = Promise.resolve();
       return this.wizardlets.slice(0, this.highestIndex).reduce(

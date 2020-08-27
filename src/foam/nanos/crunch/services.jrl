@@ -45,7 +45,12 @@ p({
       .setOf(foam.nanos.crunch.Capability.getOwnClassInfo())
       .build();
   """,
-  "client":"{\"of\":\"foam.nanos.crunch.Capability\"}"
+  "client":"""
+    {
+      "of":"foam.nanos.crunch.Capability",
+      "cache": false
+    }
+  """
 })
 
 p({
@@ -97,7 +102,13 @@ p({
       .build();
     return dao;
   """,
-  "client":"{\"of\":\"foam.nanos.crunch.UserCapabilityJunction\", \"remoteListenerSupport\": false}"
+  "client":
+  """
+    {
+      "of":"foam.nanos.crunch.UserCapabilityJunction",
+      "remoteListenerSupport": false
+    }
+  """
 })
 
 p({
@@ -176,4 +187,21 @@ p({
   """
     { "of": "foam.dao.history.HistoryRecord" }
   """
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"capabilityPayloadDAO",
+  "lazy":true,
+  "serve":true,
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setAuthorize(false)
+      .setPermissioned(false)
+      .setNullify(true)
+      .setDecorator(new foam.nanos.crunch.connection.CapabilityPayloadDAO(x, new foam.dao.NullDAO(x, foam.nanos.crunch.connection.CapabilityPayload.getOwnClassInfo())))
+      .setOf(foam.nanos.crunch.Capability.getOwnClassInfo())
+      .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.crunch.Capability\"}"
 })

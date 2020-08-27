@@ -32,16 +32,19 @@ foam.CLASS({
     {
       name: 'of',
       class: 'Class',
-      expression: function (capability) {
-        return capability.of;
+      expression: function(capability) {
+        return capability && capability.of;
       }
     },
     {
       name: 'data',
-      factory: function () {
+      factory: function() {
         if ( ! this.of ) return null;
 
-        var ret = this.of.create({}, this);
+        var ret = this.of.getAxiomByName('capability') ?
+          this.of.create({ capability: this.capability }, this) :
+          this.of.create({}, this);
+
         if ( this.ucj === null ) return ret;
       
         ret = Object.assign(ret, this.ucj.data);
@@ -51,7 +54,7 @@ foam.CLASS({
     {
       name: 'title',
       expression: function(capability) {
-        return capability.name;
+        return capability && capability.name;
       }
     }
   ],
@@ -60,7 +63,7 @@ foam.CLASS({
     {
       name: 'save',
       code: function() {
-        return this.crunchController.save(this);
+        return this.crunchController && this.crunchController.save(this);
       }
     }
   ]

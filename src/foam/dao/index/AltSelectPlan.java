@@ -30,4 +30,9 @@ public class AltSelectPlan
   public long cost() {
     return bestPlan_.cost();
   }
+
+  @Override
+  public String toString() {
+    return bestPlan_.toString();
+  }
 }

@@ -2154,7 +2154,7 @@ foam.SCRIPT({
   package: 'foam.u2',
   name: 'U2ContextScript',
   requires: [
-    'foam.u2.U2Context',
+    'foam.u2.U2Context'
   ],
   flags: ['web'],
   code: function() {
