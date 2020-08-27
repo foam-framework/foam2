@@ -51,7 +51,11 @@ foam.CLASS({
     },
     {
       name: 'hops',
-      class: 'Array'
+      class: 'FObjectArray',
+      of: 'foam.nanos.medusa.ClusterCommandHop',
+      tableCellFormatter: function(value) {
+        this.add(value && value.map(function(hop) { return hop.hostname; }).join());
+      }
     },
     {
       name: 'exception',
@@ -90,20 +94,53 @@ foam.CLASS({
         {
           name: 'x',
           type: 'Context'
+        },
+        {
+          name: 'op',
+          type: 'String'
+        },
+        {
+          name: 'hostname',
+          type: 'String'
+        }
+      ],
+      type: 'foam.nanos.medusa.ClusterCommand',
+      javaCode: `
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      if ( foam.util.SafetyUtil.isEmpty(hostname) ) {
+        hostname = support.getConfigId();
+      }
+      if ( getHops() == null ) {
+        setHops(new ClusterCommandHop[] { new ClusterCommandHop(hostname, op) });
+      } else {
+        ClusterCommandHop[] hops = new ClusterCommandHop[getHops().length + 1];
+        System.arraycopy(getHops(), 0, hops, 0, getHops().length);
+        hops[hops.length - 1] = new ClusterCommandHop(hostname, op);
+        setHops(hops);
+      }
+      return this;
+      `
+    },
+    {
+      name: 'logHops',
+      args: [
+        {
+          name: 'x',
+          type: 'X'
         }
       ],
       javaCode: `
-      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      if ( getHops() == null ) {
-        setHops(new String[] { support.getConfigId() });
-      } else {
-        String[] hops = new String[getHops().length + 1];
-        System.arraycopy(getHops(), 0, hops, 0, getHops().length);
-        hops[hops.length - 1] = support.getConfigId();
-        setHops(hops);
+      Logger logger = (Logger) x.get("logger");
+      ClusterCommandHop[] hops = (ClusterCommandHop[]) getHops();
+      long timestamp = hops[0].getTimestamp();
+      long starttime = timestamp;
+      logger.debug("ClusterCommandHop", "hostname", "op", "time");
+      for ( ClusterCommandHop hop : hops ) {
+        logger.debug("ClusterCommandHop", hop.getHostname(), hop.getOp(), timestamp-hop.getTimestamp());
+        timestamp = hop.getTimestamp();
       }
+      logger.debug("ClusterCommandHop", "total", hops.length, timestamp-starttime);
       `
     }
   ]
-
 });

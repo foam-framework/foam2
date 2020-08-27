@@ -146,11 +146,12 @@ foam.CLASS({
 
       ClusterCommand cmd = new ClusterCommand(x, getNSpec().getName(), DOP.PUT, obj);
       getLogger().debug("put", "client", "cmd", obj.getProperty("id"), "send");
-      PM pm = PM.create(x, this.getClass().getSimpleName(), "cmd");
+      // PM pm = PM.create(x, this.getClass().getSimpleName(), "cmd");
+      PM pm = new PM(this.getClass().getSimpleName(), "cmd");
       cmd = (ClusterCommand) getClientDAO().cmd_(x, cmd);
       pm.log(x);
       getLogger().debug("put", "client", "cmd", obj.getProperty("id"), "receive", cmd.getMedusaEntryId());
-
+      cmd.logHops(x);
       FObject result = cmd.getData();
       if ( result != null ) {
         getLogger().debug("put", "delegate", result.getProperty("id"));
@@ -165,7 +166,6 @@ foam.CLASS({
           }
         }
         return nu;
-//        return getDelegate().put_(x, result);
       }
       getLogger().warning("put", obj.getProperty("id"), "result,null");
       return result;
@@ -262,7 +262,7 @@ foam.CLASS({
       ],
       type: 'String',
       javaCode: `
-      PM pm = PM.create(x, this.getOwnClassInfo(), "data");
+      PM pm = PM.create(x, this.getClass().getSimpleName(), "data");
       String data = null;
       try {
         FObjectFormatter formatter = formatter_.get();
@@ -296,8 +296,8 @@ foam.CLASS({
       ],
       type: 'FObject',
       javaCode: `
-      // PM pm = PM.create(x, this.getOwnClassInfo(), "submit");
-      PM pm = new PM(this.getOwnClassInfo(), "submit");
+      // PM pm = PM.create(x, this.getClass().getSimpleName(), "submit");
+      PM pm = new PM(this.getClass().getSimpleName(), "submit");
       MedusaEntry entry = x.create(MedusaEntry.class);
       try {
         DaggerService dagger = (DaggerService) x.get("daggerService");
@@ -314,6 +314,7 @@ foam.CLASS({
         registry.wait(x, (Long) entry.getId());
         return entry;
       } catch (Throwable t) {
+        pm.error(x, entry.toSummary(), t);
         getLogger().error("submit", entry.toSummary(), t.getMessage(), t);
         throw t;
       } finally {

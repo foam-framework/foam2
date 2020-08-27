@@ -120,7 +120,7 @@ foam.CLASS({
         // entry = (MedusaEntry) entry.shallowClone();
         // entry.setData(null);
         // entry.__frozen__ = true;
-        entry = (MedusaEntry) getDelegate().put_(x, entry);
+        // entry = (MedusaEntry) getDelegate().put_(x, entry);
       }
       return entry;
       `
@@ -151,11 +151,11 @@ foam.CLASS({
       ],
       type: 'Object',
       javaCode: `
-      try {
+    try {
       // getLogger().debug("submit", dop.getLabel(), obj.getClass().getSimpleName());
 
       final ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
+      final ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
       Agency agency = (Agency) x.get("threadPool");
       for ( ClusterConfig config : support.getBroadcastMediators() ) {
         getLogger().debug("submit", "job", config.getId(), dop.getLabel(), "assembly");
@@ -177,6 +177,13 @@ foam.CLASS({
 
               if ( DOP.PUT == dop ) {
                 MedusaEntry entry = (MedusaEntry) obj;
+                // REVIEW: mediator moosehead in zone 1 - which is slower, halts consensus when it
+                // receives a entry from a 'node' rather than a zone 0 mediator.  Happens repeated
+                // when benchmarking. cloning before setting node, but also note, that moosehead only
+                // receives one entry - it gets no others from other nodes or mediators.
+                if ( myConfig.getType() == MedusaType.MEDIATOR ) {
+                  entry = (MedusaEntry) entry.shallowClone();
+                }
                 entry.setNode(support.getConfigId());
                 getLogger().debug("agency", "execute", config.getId(), dop.getLabel(), entry.getIndex());
                 dao.put_(x, entry);
@@ -191,10 +198,10 @@ foam.CLASS({
         }, this.getClass().getSimpleName());
       }
       return obj;
-      } catch (Throwable t) {
-        getLogger().error(t.getMessage(), t);
-        throw t;
-      }
+    } catch (Throwable t) {
+      getLogger().error(t.getMessage(), t);
+      throw t;
+    }
       `
     }
    ]

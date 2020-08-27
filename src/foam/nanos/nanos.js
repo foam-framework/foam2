@@ -150,6 +150,7 @@ FOAM_FILES([
   { name: 'foam/nanos/medusa/Clusterable' },
   { name: 'foam/nanos/medusa/ClusterClientDAO' },
   { name: 'foam/nanos/medusa/ClusterCommand' },
+  { name: 'foam/nanos/medusa/ClusterCommandHop' },
   { name: 'foam/nanos/medusa/ClusterConfig' },
   { name: 'foam/nanos/medusa/ClusterConfigMonitor' },
   { name: 'foam/nanos/medusa/ClusterConfigPingSink' },

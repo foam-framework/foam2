@@ -93,7 +93,6 @@ foam.CLASS({
       name: 'start',
       javaCode: `
       getLogger().info("start");
-      getLogger().info("start", "pingTimeout", getPingTimeout());
       ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
       if ( timer_ != null ) {
         getLogger().warning("multiple instances", new Exception());
@@ -118,7 +117,7 @@ foam.CLASS({
       if ( ! getEnabled() ) {
         return;
       }
-      getLogger().info("execute");
+      getLogger().debug("execute");
       synchronized ( timer_ ) {
        if ( isRunning_ ) {
           getLogger().debug("already running");

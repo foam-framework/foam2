@@ -183,7 +183,7 @@ foam.CLASS({
       ],
       type: 'foam.nanos.medusa.MedusaEntry',
       javaCode: `
-      PM pm = PM.create(x, this.getOwnClassInfo(), "promote");
+      PM pm = PM.create(x, this.getClass().getSimpleName(), "promote");
       ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
       // getLogger().debug("promote", entry.getIndex(), getIndex(), replaying.getReplayIndex(), replaying.getReplaying());
       try {
@@ -315,7 +315,7 @@ foam.CLASS({
       ],
       type: 'foam.nanos.medusa.MedusaEntry',
       javaCode: `
-      PM pm = PM.create(x, this.getOwnClassInfo(), "mdao");
+      PM pm = PM.create(x, this.getClass().getSimpleName(), "mdao");
       // getLogger().debug("mdao", entry.getIndex());
 
       try {
@@ -361,6 +361,7 @@ foam.CLASS({
 
         return entry;
       } catch (Throwable t) {
+        pm.error(x, t);
         getLogger().error(t);
         throw t;
         // TODO: Alarm
