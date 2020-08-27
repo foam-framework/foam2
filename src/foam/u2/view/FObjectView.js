@@ -155,7 +155,7 @@ foam.CLASS({
       if ( ! this.choices.length ) {
         this.onDetach(this.of$.sub(this.updateChoices));
         this.updateChoices();
-        this.choicesLoaded;
+        await this.choicesLoaded;
       }
 
       function dataToClass(d) {
@@ -164,7 +164,7 @@ foam.CLASS({
 
       var classToData = function(c) {
         var m = c && this.__context__.lookup(c, true);
-        return m ? m.create(null, this) : null;
+        return m.create(this.data, this);
       }.bind(this);
 
       this.data$.relateTo(
