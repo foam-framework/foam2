@@ -433,7 +433,7 @@ foam.CLASS({
               addClass(view.myClass('tbody'));
               valPromises.then(function(values) {
 
-                tbodyElement.forEach(values.array, function(val) {
+                tbodyElement.forEach(values.projection, function(val) {
                   var thisObjValue;
                   var tableRowElement = this.E();
                   tableRowElement.

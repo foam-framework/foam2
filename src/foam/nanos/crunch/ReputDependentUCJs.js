@@ -35,15 +35,18 @@ foam.CLASS({
           public void execute(X x) {
             DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
             UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
-            UserCapabilityJunction old = (UserCapabilityJunction) userCapabilityJunctionDAO.find(AND(
-              EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId()),
-              EQ(UserCapabilityJunction.TARGET_ID, ucj.getTargetId())
-            ));
             CapabilityJunctionStatus status = ucj.getStatus();
 
             boolean isInvalidate = ucj.getStatus() != CapabilityJunctionStatus.GRANTED || ucj.getStatus() != CapabilityJunctionStatus.GRACE_PERIOD;
-            
-            DAO filteredUserCapabilityJunctionDAO = (DAO) userCapabilityJunctionDAO.where((EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId())));
+            Long effectiveUser = ( ucj instanceof AgentCapabilityJunction ) ? ((AgentCapabilityJunction) ucj).getEffectiveUser() : null;
+            DAO filteredUserCapabilityJunctionDAO = (DAO) userCapabilityJunctionDAO
+              .where(AND(
+                EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId()),
+                OR(
+                  NOT(INSTANCE_OF(foam.nanos.crunch.AgentCapabilityJunction.class)),
+                  EQ(AgentCapabilityJunction.EFFECTIVE_USER, effectiveUser)
+                )
+              ));
             DAO filteredPrerequisiteCapabilityJunctionDAO = (DAO) ((DAO) x.get("prerequisiteCapabilityJunctionDAO"))
               .where(EQ(CapabilityCapabilityJunction.TARGET_ID, ucj.getTargetId()));
             

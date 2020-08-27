@@ -84,7 +84,7 @@ foam.CLASS({
     {
       name: 'INTRO_TEXT',
       message: `Before you get started,
-      here is a list of helpful items to have on hand that will assit you
+      here is a list of helpful items to have on hand that will assist you
       in answering the questions in the following step`
     }
   ],
@@ -93,6 +93,10 @@ foam.CLASS({
     {
       class: 'StringArray',
       name: 'arrayRequirement'
+    },
+    {
+      class: 'Function',
+      name: 'onClose'
     },
     {
       class: 'Object',
@@ -152,8 +156,10 @@ foam.CLASS({
           ))
       .end()
       .start().addClass('actionPosition')
-        .startContext({ data: this }).start(this.GET_STARTED).end().endContext()
-        .start(this.CANCEL, { buttonStyle: 'SECONDARY' }).end()
+        .startContext({ data: this })
+          .start(this.GET_STARTED).end()
+          .start(this.CANCEL, { buttonStyle: 'SECONDARY' }).end()
+        .endContext()
       .end();
     }
   ],
@@ -161,14 +167,15 @@ foam.CLASS({
     {
       name: 'getStarted',
       code: function(x) {
-        x.crunchController.generateAndDisplayWizard(this.functionData);
         x.closeDialog();
+        this.onClose(x, true);
       }
     },
     {
       name: 'cancel',
       code: function(x) {
         x.closeDialog();
+        this.onClose(x, false);
       }
     }
   ]
