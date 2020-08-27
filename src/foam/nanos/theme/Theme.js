@@ -158,7 +158,7 @@ foam.CLASS({
       section: 'navigation'
     },
     {
-      class: 'List',
+      class: 'Map',
       name: 'headConfig'
     },
     {
