@@ -211,7 +211,7 @@ foam.CLASS({
       documentation: 'Width of the whole table. Used to get proper scrolling on narrow screens.',
       expression: function(props) {
         return this.columns_.reduce((acc, col) => {
-          return acc + (this.returnColumnPropertyForPropertyName(this, col, 'tableWidth') || this.MIN_COLUMN_WIDTH_FALLBACK);
+          return acc + (this.columnHandler.returnColumnPropertyForPropertyName(this.props, this.of, col, this.allColumns, 'tableWidth') || this.MIN_COLUMN_WIDTH_FALLBACK);
         }, this.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH) + 'px';
       }
     },
@@ -280,7 +280,7 @@ foam.CLASS({
       if ( this.filteredTableColumns$ ) {
         this.onDetach(this.filteredTableColumns$.follow(
           //to not export "custom" table columns
-          this.columns_$.map((cols) => this.columnHandler.mapArrayColumnsToArrayOfColumnNames(this, this.filterColumnsThatAllColumnsDoesNotIncludeForArrayOfColumns(this, cols)))
+          this.columns_$.map((cols) => this.columnHandler.mapArrayColumnsToArrayOfColumnNames(this.filterColumnsThatAllColumnsDoesNotIncludeForArrayOfColumns(this, cols)))
         ));
       }
       this.
@@ -333,14 +333,14 @@ foam.CLASS({
 
               // Render the table headers for the property columns.
               forEach(columns_, function([col, overrides]) {
-                let found = view.props.find(p => p.fullPropertyName === view.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(view, col));
-                var prop = found ? found.property : view.of.getAxiomByName(view.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(view, col));
-                var isFirstLevelProperty = view.columnHandler.canColumnBeTreatedAsAnAxiom(view, col) ? true : col.indexOf('.') === -1;
+                let found = view.props.find(p => p.fullPropertyName === view.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(col));
+                var prop = found ? found.property : view.of.getAxiomByName(view.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(col));
+                var isFirstLevelProperty = view.columnHandler.canColumnBeTreatedAsAnAxiom(col) ? true : col.indexOf('.') === -1;
 
                 if ( ! prop )
                   return;
 
-                var tableWidth = view.returnColumnPropertyForPropertyName(view, col, 'tableWidth');
+                var tableWidth = view.columnHandler.returnColumnPropertyForPropertyName(view.props, view.of, col, view.allColumns, 'tableWidth');
 
                 this.start().
                   addClass(view.myClass('th')).
@@ -420,9 +420,9 @@ foam.CLASS({
 
             view.props = this.returnPropertiesForColumns(view, view.columns_);
 
-            var propertyNamesToQuery = view.returnPropNamesToQuery(view);
+            var propertyNamesToQuery = view.columnHandler.returnPropNamesToQuery(view);
             var valPromises = view.returnRecords(view.of, proxy, propertyNamesToQuery);
-            var nastedPropertyNamesAndItsIndexes = view.buildArrayOfNestedPropertyNamesAndCorrespondingIndexesInArray(propertyNamesToQuery);
+            var nastedPropertyNamesAndItsIndexes = view.columnHandler.buildArrayOfNestedPropertyNamesAndCorrespondingIndexesInArray(propertyNamesToQuery);
 
             var tbodyElement = this.
               E();
@@ -432,8 +432,8 @@ foam.CLASS({
 
                 for ( var i = 0 ; i < values.projection.length ; i++ ) {
                   var obj = values.array[i];
-                  var nestedPropertyValues = view.filterOutValuesForNotNestedProperties(values.projection[i], nastedPropertyNamesAndItsIndexes[1]);
-                  var nestedPropertiesObjsMap = view.groupObjectsThatAreRelatedToNestedProperties(view.of, nastedPropertyNamesAndItsIndexes[0], nestedPropertyValues);
+                  var nestedPropertyValues = view.columnHandler.filterOutValuesForNotNestedProperties(values.projection[i], nastedPropertyNamesAndItsIndexes[1]);
+                  var nestedPropertiesObjsMap = view.columnHandler.groupObjectsThatAreRelatedToNestedProperties(view.of, nastedPropertyNamesAndItsIndexes[0], nestedPropertyValues);
                   var thisObjValue;
                   var tableRowElement = tbodyElement.E();
                   tableRowElement.
@@ -558,16 +558,16 @@ foam.CLASS({
                   
                   for ( var  j = 0 ; j < view.columns_.length ; j++  ) {
                     var objForCurrentProperty = obj;
-                    var propName = view.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(view, view.columns_[j]);
+                    var propName = view.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(view.columns_[j]);
                     var prop = view.props.find(p => p.fullPropertyName === propName);
                     //check if current column is a nested property
                     //if so get object for it
                     if ( prop && prop.fullPropertyName.includes('.') ) {
-                      objForCurrentProperty = nestedPropertiesObjsMap[view.getNestedPropertyNameExcludingLastProperty(prop.fullPropertyName)];
+                      objForCurrentProperty = nestedPropertiesObjsMap[view.columnHandler.getNestedPropertyNameExcludingLastProperty(prop.fullPropertyName)];
                     }
 
                     prop = prop ? prop.property : view.of.getAxiomByName(propName);
-                    var tableWidth = view.returnColumnPropertyForPropertyName(view, view.columns_[j], 'tableWidth');
+                    var tableWidth = view.columnHandler.returnColumnPropertyForPropertyName(view.props, view.of, view.columns_[j], view.allColumns, 'tableWidth');
 
                     // var stringValue;
                     var column = typeof view.columns_[j] === 'string' || ! view.columns_[j].tableCellFormatter ? prop : view.columns_[j];
@@ -604,104 +604,15 @@ foam.CLASS({
         return dao.select(expr);
       },
       function doesAllColumnsContainsColumnName(obj, col) {
-        return obj.allColumns.contains(obj.columnHandler.checkIfArrayAndReturnFirstLevelColumnName(obj, col));
+        return obj.allColumns.contains(obj.columnHandler.checkIfArrayAndReturnFirstLevelColumnName(col));
       },
       function filterColumnsThatAllColumnsDoesNotIncludeForArrayOfColumns(obj, columns) {
-        return columns.filter( c => obj.allColumns.includes( obj.columnHandler.checkIfArrayAndReturnFirstLevelColumnName(obj, c) ));
-      },
-      function returnTableColumnForColumnName(obj, col) {
-        if ( obj.columnHandler.canColumnBeTreatedAsAnAxiom(obj, col) ) {
-          return col;
-        }
-        if ( col.indexOf('.') > -1 ) {
-          return null;
-        }
-        return obj.columns.find( c =>  obj.columnHandler.returnPropertyNamesForColumn(obj, c) === col);
-      },
-      function getClassForNestedPropertyObject(cls, propNames) {
-        var of_ = cls;
-        for ( var i = 0 ; i < propNames.length - 1 ; i++ ) {
-          of_ = of_.getAxiomByName(propNames[i]).of;
-        }
-        return of_;
-      },
-      function groupObjectsThatAreRelatedToNestedProperties(of, arrayOfNestedPropertiesName, arrayOfValues) {
-        var map = {};
-        for ( var i = 0 ; i < arrayOfNestedPropertiesName.length ; i++ ) {
-          var key = this.getNestedPropertyNameExcludingLastProperty(arrayOfNestedPropertiesName[i]);
-          var objsClass = this.getClassForNestedPropertyObject(of, arrayOfNestedPropertiesName[i].split('.'));
-          if( ! map[key] ) {
-            map[key] = objsClass.create();
-          }
-          objsClass.getAxiomByName(this.getNameOfLastPropertyForNestedProperty(arrayOfNestedPropertiesName[i])).set(map[key], arrayOfValues[i]);
-        }
-        return map;
-      },
-      function getNestedPropertyNameExcludingLastProperty(nestedPropertyName) {
-        //this method asssumes that the propName is nestedPropertyName
-        var lastIndex = nestedPropertyName.lastIndexOf('.');
-        return nestedPropertyName.substr(0, lastIndex);//lastIndex == length here
-      },
-      function getNameOfLastPropertyForNestedProperty(nestedPropertyName) {
-        var lastIndex = nestedPropertyName.lastIndexOf('.');
-        return nestedPropertyName.substr(lastIndex + 1);
-      },
-      function buildArrayOfNestedPropertyNamesAndCorrespondingIndexesInArray(propNames) {
-        var nestedPropertyNames = [];
-        var indexOfValuesForCorrespondingPropertyNames = [];
-        for ( var i = 0 ; i < propNames.length ; i++ ) {
-          if ( ! propNames[i].includes('.') ) continue;
-          nestedPropertyNames.push(propNames[i]);
-          indexOfValuesForCorrespondingPropertyNames.push(i);
-        }
-        var result = [nestedPropertyNames, indexOfValuesForCorrespondingPropertyNames];
-        return result;
-      },
-      function filterOutValuesForNotNestedProperties(valuesArray, indexes) {
-        var filteredArr = [];
-        for ( var i = 0 ; i < indexes.length; i++ ) {
-          filteredArr.push(valuesArray[indexes[i]]);
-        }
-        return filteredArr;
-      },
-      function returnPropNamesToQuery(view) {
-        var propertyNamesToQuery = view.props.filter(p => foam.core.Property.isInstance(p.property)).map(p => p.fullPropertyName);
-        view.props.forEach(p => {
-          var propPrefix = ! p.fullPropertyName.includes('.') ? '' : view.getNestedPropertyNameExcludingLastProperty(p.fullPropertyName) + '.';
-          if ( foam.core.UnitValue.isInstance(p.property) )
-            propertyNamesToQuery.push(propPrefix + p.property.unitPropName);
-          for (var i = 0 ; i < p.property.dependsOnPropertiesWithNames.length ; i++ ) {
-            propertyNamesToQuery.push(propPrefix + p.property.dependsOnPropertiesWithNames[i]);
-          }
-        });
-        return propertyNamesToQuery;
-      },
-      function returnColumnPropertyForPropertyName(obj, col, property) {
-        var colObj = foam.Array.isInstance(col) ? col[0] : col;
-
-        if ( obj.columnHandler.canColumnBeTreatedAsAnAxiom(obj, colObj) ) {
-          if ( colObj[property] )
-            return colObj[property];
-        }
-        var tableColumn = obj.returnTableColumnForColumnName(obj, colObj);
-        if ( tableColumn && tableColumn[property] )
-          return tableColumn[property];
-        var prop = obj.props.find(p => p.fullPropertyName === obj.columnHandler.returnPropertyNamesForColumn(obj, colObj) );
-        return  prop ? prop.property[property] : obj.of.getAxiomByName(obj.columnHandler.returnPropertyNamesForColumn(obj, colObj))[property];
+        return columns.filter( c => obj.allColumns.includes( obj.columnHandler.checkIfArrayAndReturnFirstLevelColumnName(c) ));
       },
       function returnPropertiesForColumns(obj, columns_) {
-        var propertyNamesToQuery = columns_.length === 0 ? columns_ : [ 'id' ].concat(obj.filterColumnsThatAllColumnsDoesNotIncludeForArrayOfColumns(obj, columns_).filter(c => ! foam.core.Action.isInstance(obj.of.getAxiomByName(obj.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(obj, c)))).map(c => obj.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(obj, c)));
-        return obj.returnProperties(obj, propertyNamesToQuery);
-      },
-      function returnProperties(obj, propertyNamesToQuery) {
-        var columnConfig = obj.columnConfigToPropertyConverter;
-        if ( ! columnConfig ) columnConfig = obj.ColumnConfigToPropertyConverter.create();
-        var result = [];
-        for ( var propName of propertyNamesToQuery ) {
-          result.push(foam.u2.view.PropertyColumnMapping.create({ fullPropertyName: propName, property: columnConfig.returnProperty(obj.of, propName) }));
-        }
-        return result;
-      },
+        var propertyNamesToQuery = columns_.length === 0 ? columns_ : [ 'id' ].concat(obj.filterColumnsThatAllColumnsDoesNotIncludeForArrayOfColumns(obj, columns_).filter(c => ! foam.core.Action.isInstance(obj.of.getAxiomByName(obj.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c)))).map(c => obj.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c)));
+        return obj.columnConfigToPropertyConverter.returnPropertyColumnMappings(obj.of, propertyNamesToQuery);
+      }
   ]
 });
 

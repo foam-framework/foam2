@@ -65,7 +65,7 @@ foam.CLASS({
         if ( foam.String.isInstance(propName) ) {
           var propNames = propName.split('.');
           for ( var i = 0 ; i < propNames.length ; i++ ) {
-            axiom = cls.getAxiomByName(this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(this, propNames[i]));
+            axiom = cls.getAxiomByName(this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(propNames[i]));
             if ( ! axiom )
               return '';
             columnHeader.push(axiom.tableHeader ? axiom.tableHeader() : axiom.label || foam.String.labelize(axiom.name) );
@@ -253,8 +253,15 @@ foam.CLASS({
       }
       return arr;
     },
+    function returnPropertyColumnMappings(of, propertyNamesToQuery) {
+      var result = [];
+      for ( var propName of propertyNamesToQuery ) {
+        result.push(foam.u2.view.PropertyColumnMapping.create({ fullPropertyName: propName, property: this.returnProperty(of, propName) }));
+      }
+      return result;
+    },
     function objToArrayOfStrings(obj, prop) {
-      
+
     }
   ]
 });
