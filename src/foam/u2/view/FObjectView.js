@@ -160,14 +160,6 @@ foam.CLASS({
     async function initE() {
       this.SUPER();
 
-      this.dataWasProvided_ = !! this.data;
-
-      if ( ! this.choices.length ) {
-        this.onDetach(this.of$.sub(this.updateChoices));
-        this.updateChoices();
-        await this.choicesLoaded;
-      }
-
       function dataToClass(d) {
         return d ? d.cls_.id : '';
       }
@@ -176,6 +168,17 @@ foam.CLASS({
         var m = c && this.__context__.lookup(c, true);
         return m.create(this.data, this);
       }.bind(this);
+
+      this.dataWasProvided_ = !! this.data;
+
+      if ( ! this.data && this.objectClass )
+        this.data = classToData(this.objectClass);
+
+      if ( ! this.choices.length ) {
+        this.onDetach(this.of$.sub(this.updateChoices));
+        this.updateChoices();
+        await this.choicesLoaded;
+      }
 
       this.data$.relateTo(
         this.objectClass$,
