@@ -252,6 +252,9 @@ foam.CLASS({
         arr.push(this.returnProperty(of, prop));
       }
       return arr;
+    },
+    function objToArrayOfStrings(obj, prop) {
+      
     }
   ]
 });

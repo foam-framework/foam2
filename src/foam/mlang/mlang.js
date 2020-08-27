@@ -2735,7 +2735,7 @@ foam.CLASS({
             Object    o   = ci.newInstance();
 
             for ( int j = 0 ; j < es.length ; j++ ) {
-              PropertyInfo e = (PropertyInfo) es[j];
+              PropertyInfo e = (PropertyInfo) es[j];//probably not all the expressions can be casted to PropInfo eg NestedPropExpr // should we change it here?
               e.set(o, arr[i]);
             }
 
