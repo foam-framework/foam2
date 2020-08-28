@@ -58,7 +58,7 @@ foam.CLASS({
     }
 
     ^container {
-      padding: 0 32px;
+      padding: 0 0px;
     }
 
     ^ .actions {
