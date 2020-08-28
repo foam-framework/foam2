@@ -169,6 +169,6 @@ foam.INTERFACE({
           type: 'String[]'
         }
       ]
-    },
+    }
   ],
 });
