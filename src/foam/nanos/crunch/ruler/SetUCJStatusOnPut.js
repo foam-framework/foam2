@@ -78,37 +78,10 @@ foam.CLASS({
       `,
       javaCode: `
         boolean allGranted = true;
-        Capability cap;
         DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
-        List<CapabilityCapabilityJunction> ccJunctions = ( List<CapabilityCapabilityJunction> ) getPrereqs(x, ucj);
-
-        for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
-          cap = (Capability) ccJunction.findSourceId(x);
-          if ( ! cap.getEnabled() ) continue;
-          // todo this needs to take acj into consideration
-          UserCapabilityJunction ucJunction = (UserCapabilityJunction) userCapabilityJunctionDAO.find(AND(
-            EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId()),
-            EQ(UserCapabilityJunction.TARGET_ID, (String) ccJunction.getTargetId())
-          ));
-
-          if ( ucJunction != null && ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED ) 
-            continue;
-          
-
-          if ( ucJunction == null ) {
-            return CapabilityJunctionStatus.ACTION_REQUIRED;
-          }
-          if ( ucJunction.getIsRenewable() ) { 
-            // this should be equivalent to checking if its either expired, in grace period, or in renewable period
-            return ucJunction.getStatus();
-          }
-          if ( ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED
-               && ucJunction.getStatus() != CapabilityJunctionStatus.PENDING ) {
-            return CapabilityJunctionStatus.ACTION_REQUIRED;
-          }
-          if ( ucJunction.getStatus() == CapabilityJunctionStatus.PENDING ) allGranted = false; 
-        }
-        return allGranted ? CapabilityJunctionStatus.GRANTED : CapabilityJunctionStatus.PENDING;
+        DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+        Capability cap = (Capability) capabilityDAO.find(ucj.getTargetId());
+        return cap.getPrereqsChainedStatus(x, ucj);
       `
     },
     {

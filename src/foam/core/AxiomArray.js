@@ -60,8 +60,8 @@ foam.CLASS({
             prop.of);
         for ( var i = 0 ; i < v.length ; i++ ) {
           foam.assert(of.isInstance(v[i]),
-              'Element', i, 'of', prop.name, 'is not an instance of',
-              prop.of);
+              'Element', i, 'of', prop.name, 'is not an instance of', prop.of,
+              'at', this.package + '.' + this.name, '[', v[i].name, ']');
         }
       }
     },

@@ -19,6 +19,7 @@ var classes = [
   'foam.core.CoreTypesValidationTest',
   'foam.core.CoreTypesValidationTestModel',
   'foam.core.Validator',
+  'foam.core.CompoundException',
   'foam.glang.EndOfTimeSpan',
   'foam.glang.EndOfDay',
   'foam.glang.EndOfWeek',
@@ -625,6 +626,7 @@ var classes = [
   //models
   'foam.nanos.crunch.Renewable',
   'foam.nanos.crunch.Capability',
+  'foam.nanos.crunch.MinMaxCapability',
   'foam.nanos.crunch.lite.Capable',
   'foam.nanos.crunch.lite.CapablePayload',
   'foam.nanos.crunch.CapabilityCategory',

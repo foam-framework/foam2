@@ -36,6 +36,7 @@ foam.CLASS({
     'foam.u2.borders.MarginBorder',
     'foam.u2.crunch.CapabilityInterceptView',
     'foam.u2.detail.AbstractSectionedDetailView',
+    'foam.nanos.crunch.MinMaxCapability',
     'foam.u2.dialog.Popup'
   ],
 
@@ -70,26 +71,68 @@ foam.CLASS({
         return Promise.all([
           Promise.resolve(capabilities),
           Promise.all(capabilities
-            .filter(cap => !! cap.of )
-            .map(cap => {
-                var associatedEntity = cap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
-                var wizardlet = cap.wizardlet.cls_.create({ capability: cap, ...cap.wizardlet.instance_ }, this);
-                return this.updateUCJ(wizardlet, associatedEntity);
+            .reduce((updateUCJPromiseList, cap) => {
+              var associatedEntity, wizardlet;
+                
+              if ( Array.isArray(cap) && ( foam.nanos.crunch.MinMaxCapability.isInstance(cap[cap.length - 1]) ) ){
+                var minMaxCap = cap[cap.length - 1];
+
+                minMaxArray = [];
+
+                var choiceWizardlets = cap.slice(0, cap.length - 1).map(
+                  capability => {
+                    wizardlet = capability.wizardlet.cls_.create(
+                    { 
+                      capability: capability, 
+                      isAvailable: false,
+                      ...capability.wizardlet.instance_ 
+                    }, this)
+
+                    associatedEntity = capability.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
+
+                    minMaxArray.push(this.updateUCJ(wizardlet, associatedEntity))
+
+                    // TODO:  also instantiate updateUCJ for the choice prereqs and push to promise array
+                    // TODO: slot the prereqs isAvaialble to wizardlet.isAvailable$
+                    return wizardlet;
+                  }
+                )
+                var minMaxWizardlet = foam.nanos.crunch.ui.MinMaxCapabilityWizardlet.create({
+                  capability: minMaxCap,
+                  ...minMaxCap.wizardlet.instance_,
+                  choiceWizardlets: choiceWizardlets
+                })
+
+                associatedEntity = minMaxCap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
+                
+                minMaxArray.unshift(this.updateUCJ(minMaxWizardlet, associatedEntity));
+                updateUCJPromiseList = updateUCJPromiseList.concat(minMaxArray);
+                
+
+              } else if ( cap.of ) {
+                associatedEntity = cap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
+                wizardlet = cap.wizardlet.cls_.create({ capability: cap, ...cap.wizardlet.instance_ }, this);
+
+                updateUCJPromiseList.push(this.updateUCJ(wizardlet, associatedEntity));
+              }
+
+              return updateUCJPromiseList
+            }, [])
+          )
+        ]).then((capAndSections) => {
+          return {
+            caps: capAndSections[0],
+            wizCaps: capAndSections[1]
+              .filter((wizardSection) => {
+                return wizardSection.ucj === null ||
+                (
+                  wizardSection.ucj.status != this.CapabilityJunctionStatus.GRANTED &&
+                  wizardSection.ucj.status != this.CapabilityJunctionStatus.PENDING &&
+                  wizardSection.ucj.status != this.CapabilityJunctionStatus.APPROVED
+                )
               })
-            )
-          ]).then((capAndSections) => {
-            return {
-              caps: capAndSections[0],
-              wizCaps: capAndSections[1]
-                .filter((wizardSection) =>
-                  wizardSection.ucj === null ||
-                  (
-                    wizardSection.ucj.status != this.CapabilityJunctionStatus.GRANTED &&
-                    wizardSection.ucj.status != this.CapabilityJunctionStatus.PENDING &&
-                    wizardSection.ucj.status != this.CapabilityJunctionStatus.APPROVED
-                  ))
-            };
-          });
+          };
+        });
       });
     },
 
@@ -111,13 +154,16 @@ foam.CLASS({
             wizardlets: capabilitiesSections.wizCaps,
             config: config
           }),
-          onClose: (x) => {
+          onClose: (x, userWantsToContinue) => {
             x.closeDialog();
-            resolve();
+            resolve(userWantsToContinue);
           }
         }));
-      }).then(() => {
-        return this.finalOnClose(capabilitiesSections.caps);
+      }).then((userWantsToContinue) => {
+        return this.finalOnClose(
+          capabilitiesSections.caps,
+          userWantsToContinue
+        );
       });
     },
 
@@ -150,6 +196,7 @@ foam.CLASS({
                 ),
                 this.EQ(this.UserCapabilityJunction.TARGET_ID, cap.id))
             ).then((ucj) => {
+              // TODO: should be calling save
               if ( ucj == null ) {
                 ucj = this.UserCapabilityJunction.create({
                   sourceId: associatedEntity.id,
@@ -269,6 +316,7 @@ foam.CLASS({
       }
     },
     function save(wizardlet) {
+      // TODO: ignore saving when wizardlet.isAvailable === false
       var isAssociation = wizardlet.capability.associatedEntity === foam.nanos.crunch.AssociatedEntity.ACTING_USER;
       var associatedEntity = isAssociation ? this.subject.realUser : 
       wizardlet.capability.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
@@ -319,6 +367,60 @@ foam.CLASS({
       this.capabilityCategoryDAO.cmd_(this, foam.dao.AbstractDAO.RESET_CMD);
       this.userCapabilityJunctionDAO.cmd_(this, foam.dao.CachingDAO.PURGE);
       this.userCapabilityJunctionDAO.cmd_(this, foam.dao.AbstractDAO.RESET_CMD);
+    },
+
+    // CRUNCH Lite Methods
+    function launchCapableWizard(capable) {
+      var p = Promise.resolve(true);
+      if ( capable.userCapabilityRequirements ) {
+        p = capable.userCapabilityRequirements.reduce(
+          (p, capabilityId) => p.then(userWantsToContinue => {
+            console.log('should be a cap id', capabilityId);
+            if ( ! userWantsToContinue ) return false;
+            return this.launchWizard(capabilityId);
+          }),
+          p
+        );
+      }
+      var capableWizard = this.createCapableWizard(capable);
+      p.then(userWantsToContinue => {
+        ctrl.add(this.Popup.create().tag(capableWizard));
+      });
+    },
+
+    function createCapableWizard(capable) {
+      var wizardlets = [];
+      for ( let i = 0 ; i < capable.capablePayloads.length ; i++ ) {
+        let capablePayload = capable.capablePayloads[i];
+        let wizardletClass = capablePayload.capability.wizardlet.cls_;
+
+        // Override the default wizardlet class with one that does not
+        //   save to userCapabilityJunction
+        if ( wizardletClass.id == 'foam.nanos.crunch.ui.CapabilityWizardlet' ) {
+          wizardletClass = foam.nanos.crunch.ui.CapableObjectWizardlet;
+        }
+        let wizardlet = wizardletClass.create({
+          capability: capablePayload.capability,
+          targetPayload: capablePayload
+        }, capable);
+        if ( capablePayload.data ) {
+          wizardlet.data = capablePayload.data;
+        }
+
+        wizardlets.push(wizardlet);
+      }
+
+      console.log(wizardlets);
+
+      return {
+        class: 'foam.u2.wizard.StepWizardletView',
+        data: foam.u2.wizard.StepWizardletController.create({
+          wizardlets: wizardlets
+        }),
+        onClose: (x) => {
+          x.closeDialog();
+        }
+      };
     }
   ]
 });

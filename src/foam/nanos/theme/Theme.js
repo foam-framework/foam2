@@ -158,6 +158,10 @@ foam.CLASS({
       section: 'navigation'
     },
     {
+      class: 'Map',
+      name: 'headConfig'
+    },
+    {
       class: 'Image',
       name: 'logo',
       documentation: 'The logo to display in the application.',

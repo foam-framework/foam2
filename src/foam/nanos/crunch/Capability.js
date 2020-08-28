@@ -341,6 +341,68 @@ foam.CLASS({
       return today.after(capabilityExpiry);
       `
     },
+    {
+      name: 'getPrereqsChainedStatus',
+      type: 'CapabilityJunctionStatus',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'ucj', type: 'UserCapabilityJunction' }
+      ],
+      documentation: `
+        Check statuses of all prerequisite capabilities - returning:
+        GRANTED: If all pre-reqs are in granted status
+        PENDING: At least one pre-req is still in pending status
+        ACTION_REQUIRED: If not any of the above
+      `,
+      javaCode: `
+        // CrunchService used to get capability junctions
+        CrunchService crunchService = (CrunchService) x.get("crunchService");
+
+        boolean allGranted = true;
+        DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
+        DAO myPrerequisitesDAO = ((DAO)
+          x.get("prerequisiteCapabilityJunctionDAO"))
+            .where(
+              EQ(CapabilityCapabilityJunction.SOURCE_ID, getId()));
+
+        List<CapabilityCapabilityJunction> ccJunctions =
+          ((ArraySink) myPrerequisitesDAO.select(new ArraySink()))
+          .getArray();
+        
+
+        DAO userDAO = (DAO) x.get("userDAO");
+
+        Subject subject = new Subject(x);
+        subject.setUser((User) userDAO.find(ucj.getSourceId()));
+        if ( ucj instanceof AgentCapabilityJunction ) {
+          AgentCapabilityJunction acj = (AgentCapabilityJunction) ucj;
+          subject.setUser((User) userDAO.find(acj.getEffectiveUser())); // "user"
+        }
+
+        for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
+          Capability cap = (Capability) ccJunction.findSourceId(x);
+          if ( ! cap.getEnabled() ) continue;
+          UserCapabilityJunction ucJunction =
+            crunchService.getJunctionForSubject(x, ccJunction.getTargetId(), subject);
+
+          if ( ucJunction != null && 
+               ( ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED || ucJunction.getStatus() == CapabilityJunctionStatus.GRACE_PERIOD ) 
+             ) 
+              continue;
+          
+
+          if ( ucJunction == null ) {
+            return CapabilityJunctionStatus.ACTION_REQUIRED;
+          }
+          if ( ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED
+               && ucJunction.getStatus() != CapabilityJunctionStatus.PENDING ) {
+            return CapabilityJunctionStatus.ACTION_REQUIRED;
+          }
+          if ( ucJunction.getStatus() == CapabilityJunctionStatus.PENDING ) allGranted = false; 
+        }
+        return allGranted ? CapabilityJunctionStatus.GRANTED : CapabilityJunctionStatus.PENDING;
+      `,
+    }
   ]
 });
 

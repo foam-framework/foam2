@@ -18,7 +18,8 @@ foam.CLASS({
     'foam.core.X',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityJunctionStatus',
-    'foam.nanos.crunch.UserCapabilityJunction'
+    'foam.nanos.crunch.UserCapabilityJunction',
+    'foam.nanos.logger.Logger'
   ],
 
   methods: [
@@ -52,6 +53,8 @@ foam.CLASS({
                 data.validate(x);
                 ucj.setStatus(CapabilityJunctionStatus.PENDING);
               } catch (IllegalStateException e) {
+                Logger logger = (Logger) x.get("logger");
+                logger.error("ERROR IN UCJ DATA VALIDATION : ", e);
                 return;
               }
             }
