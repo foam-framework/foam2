@@ -53,7 +53,7 @@ foam.CLASS({
             name: 'getMessage',
             type: 'String',
             javaType: `
-            var str = sb_.get();
+            var str = getSb().get();
             var size = getExceptions().size();
         
             for ( int i = 0; i < size; i++ ) {
