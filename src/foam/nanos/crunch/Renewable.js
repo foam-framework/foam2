@@ -111,7 +111,7 @@ foam.CLASS({
       javaCode: `
         if ( getIsExpired() ) dependent.setIsExpired(true);
         if ( getIsInRenewablePeriod() ) dependent.setIsInRenewablePeriod(true);
-        if ( getIsInGracePeriod() ) dependent.getIsInGracePeriod(true);
+        if ( getIsInGracePeriod() ) dependent.setIsInGracePeriod(true);
         if ( getIsRenewable() ) dependent.setIsRenewable(true);
 
         return dependent;

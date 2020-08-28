@@ -392,7 +392,7 @@ foam.CLASS({
           }
           if ( ucJunction.getIsRenewable() ) { 
             // TODO this should be equivalent to checking if its either expired, in grace period, or in renewable period
-            cap = ucJunction.updateDependentRenewalStatus(cap);
+            ucj = ucJunction.updateDependentRenewalStatus(ucj);
             return ucJunction.getStatus();
           }
           if ( ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED

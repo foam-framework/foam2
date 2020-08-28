@@ -27,7 +27,7 @@ foam.CLASS({
         UserCapabilityJunction ucj = (UserCapabilityJunction) x.get("NEW");
 
         if ( old == null ) return true;
-        if ( ucj.getRenewableStatusChanged(old) ) return true;
+        if ( ucj.getRenewalStatusChanged(old) ) return true;
         if ( old.getStatus() != ucj.getStatus() ) return true;
 
         return false;
