@@ -3,6 +3,7 @@
  * Copyright 2020 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
+
 foam.CLASS({
   package: 'foam.u2.crunch',
   name: 'CrunchController',
@@ -33,6 +34,15 @@ foam.CLASS({
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.ui.CapabilityWizardlet',
     'foam.nanos.crunch.UserCapabilityJunction',
+    'foam.u2.crunch.wizardflow.CapabilityAdaptAgent',
+    'foam.u2.crunch.wizardflow.CheckPendingAgent',
+    'foam.u2.crunch.wizardflow.LoadCapabilitiesAgent',
+    'foam.u2.crunch.wizardflow.CreateWizardletsAgent',
+    'foam.u2.crunch.wizardflow.RequirementsPreviewAgent',
+    'foam.u2.crunch.wizardflow.StepWizardAgent',
+    'foam.u2.crunch.wizardflow.PutFinalJunctionsAgent',
+    'foam.u2.crunch.wizardflow.TestAgent',
+    'foam.util.async.Sequence',
     'foam.u2.borders.MarginBorder',
     'foam.u2.crunch.CapabilityInterceptView',
     'foam.u2.detail.AbstractSectionedDetailView',
@@ -66,6 +76,20 @@ foam.CLASS({
   ],
 
   methods: [
+    function createWizardSequence(capabilityOrId) {
+      return this.Sequence.create(null, this.__subContext__.createSubContext({
+        rootCapability: capabilityOrId
+      }))
+        .add(this.CapabilityAdaptAgent)
+        .add(this.LoadCapabilitiesAgent)
+        .add(this.CheckPendingAgent)
+        .add(this.CreateWizardletsAgent)
+        .add(this.RequirementsPreviewAgent)
+        .add(this.StepWizardAgent)
+        .add(this.PutFinalJunctionsAgent)
+        .add(this.TestAgent)
+        ;
+    },
     function getCapsAndWizardlets(capabilityId) {
       return this.crunchService.getGrantPath(this.__subContext__, capabilityId).then((capabilities) => {
         return Promise.all([
