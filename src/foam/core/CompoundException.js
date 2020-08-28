@@ -54,10 +54,10 @@ foam.CLASS({
             type: 'String',
             javaType: `
             var str = sb_.get();
-            var size = exceptions_.size();
+            var size = getExceptions().size();
         
             for ( int i = 0; i < size; i++ ) {
-              Throwable t = (Throwable) exceptions_.get(i);
+              Throwable t = (Throwable) getExceptions().get(i);
               var counter = i + 1;
         
               str.append('[').append(counter).append('/').append(size).append("] ")
