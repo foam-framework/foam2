@@ -183,7 +183,13 @@ foam.CLASS({
             .start()
               .addClass(this.myClass('entry'))
               .start()
-                .add(this.slot(function (data$currentWizardlet, data$currentSection) {
+                .add(this.slot(function (data, data$currentWizardlet, data$currentSection) {
+                  var createView = data$currentWizardlet.createView(data);
+        
+                  if ( createView !== null && foam.u2.View.isInstance(createView) ) {
+                    return createView;
+                  }
+
                   var ctx = this.__subContext__.createSubContext();
                   ctx.register(
                     this.VerticalDetailView,
@@ -250,7 +256,7 @@ foam.CLASS({
       },
       confirmationRequired: true,
       code: function(x) {
-        this.onClose(x);
+        this.onClose(x, false);
       }
     },
     {
@@ -258,7 +264,7 @@ foam.CLASS({
       label: 'Save & Dismiss',
       code: function(x) {
         this.data.saveProgress().then(() => {
-          this.onClose(x);
+          this.onClose(x, false);
         }).catch(e => {
           console.error(e);
           x.ctrl.notify(this.ERROR_MSG_DRAFT, '', this.LogLevel.ERROR, true);
@@ -287,7 +293,7 @@ foam.CLASS({
       code: function(x) {
         this.data.next().then((isFinished) => {
           if ( isFinished ) {
-            this.onClose(x);
+            this.onClose(x, true);
           }
         }).catch(e => {
           console.error(e);
