@@ -439,17 +439,18 @@ foam.CLASS({
                   tableRowElement.
                   addClass(view.myClass('tr')).
                   on('mouseover', function() {
-                    if ( !thisObjValue ) {
+                    if ( ! thisObjValue ) {
                       dao.inX(ctrl.__subContext__).find(val[0]).then(v => {
-                      thisObjValue = v;
+                        thisObjValue = v;
+                        view.hoverSelection = thisObjValue;
+                      });
+                    } else {
                       view.hoverSelection = thisObjValue;
-                    });
-                    } else
-                      view.hoverSelection = thisObjValue;
+                    }
                   }).
                   callIf(view.dblclick && ! view.disableUserSelection, function() {
                     tableRowElement.on('dblclick', function() {
-                      if ( !thisObjValue ) {
+                      if ( ! thisObjValue ) {
                         dao.inX(ctrl.__subContext__).find(val[0]).then(function(v) {
                           thisObjValue = v;
                           view.dblclick && view.dblclick(thisObjValue);
@@ -467,7 +468,7 @@ foam.CLASS({
                         evt.target.classList.contains(view.myClass('vertDots'))
                       ) return;
 
-                      if  ( !thisObjValue ) {
+                      if  ( ! thisObjValue ) {
                         dao.inX(ctrl.__subContext__).find(val[0]).then(v => {
                           view.selection = v;
                           if ( view.importSelection$ ) view.importSelection = v;
