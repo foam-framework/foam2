@@ -15,6 +15,7 @@ foam.CLASS({
   javaImports: [
     'foam.core.X',
     'foam.dao.DAO',
+    'foam.nanos.app.AppConfig',
     'foam.nanos.jetty.HttpServer',
     'foam.nanos.logger.Logger',
     'foam.nanos.theme.Theme',
@@ -80,15 +81,17 @@ foam.CLASS({
       type: 'Void',
       documentation: `Generates the index file's head content based on theme and prints it to the response writer.`,
       args: [ 
+        { name: 'x', javaType: 'X'},
         { name: 'theme', javaType: 'Theme'},
-        { name: 'out', javaType: 'PrintWriter'},
-        { name: 'logger', javaType: 'Logger'}
+        { name: 'logger', javaType: 'Logger'},
+        { name: 'out', javaType: 'PrintWriter'}
       ],
       javaCode: `
-      HashMap headConfig = (HashMap) theme.getHeadConfig();
-      Boolean customFavIconFailed = false;
-      Boolean customScriptsFailed = false;
-      Boolean customFontsFailed = false;
+      HashMap    headConfig          = (HashMap)   theme.getHeadConfig();
+      AppConfig  appConfig           = (AppConfig) x.get("appConfig");
+      Boolean    customFavIconFailed = false;
+      Boolean    customScriptsFailed = false;
+      Boolean    customFontsFailed   = false;
 
       out.println("<meta charset=\\"utf-8\\"/>");
       out.print("<title>");
@@ -137,7 +140,9 @@ foam.CLASS({
       if ( headConfig == null || ! headConfig.containsKey("customScripts") || customScriptsFailed ) {
         // jar file deployment
         if ( this.getIsResourceStorage() ) {
-          out.println("<script language=\\"javascript\\" src=\\"/foam-bin-@VERSION@.js\\"></script>");
+          out.print("<script language=\\"javascript\\" src=\\"/foam-bin-");
+          out.print(appConfig.getVersion());
+          out.println(".js\\"></script>");
           out.println("<script async defer language=\\"javascript\\" src=\\"/html2canvas.min.js\\"></script>");
           out.println("<script async defer language=\\"javascript\\" src=\\"/jspdf.min.js\\"></script>");
           out.println("<script language=\\"javascript\\" src=\\"/jspdf.plugin.autotable.min.js\\"></script>");
@@ -205,6 +210,7 @@ foam.CLASS({
         DAO        themeDAO       = (DAO)        x.get("themeDAO");
         Logger     logger         = (Logger)     x.get("logger");
 
+
         if ( ! server.containsHostDomain(vhost) ) {
           vhost = getDefaultHost();
         }
@@ -212,9 +218,10 @@ foam.CLASS({
         ThemeDomain themeDomain = (ThemeDomain) themeDomainDAO.find(vhost);
         if ( themeDomain == null ) {
           themeDomain = (ThemeDomain) themeDomainDAO.find(getDefaultHost());
-        }
-        if ( themeDomain == null ) {
-          throw new RuntimeException("No theme domain found for default host " + getDefaultHost());
+          if ( themeDomain == null ) {
+            themeDomain = (ThemeDomain) themeDomainDAO.find("localhost");
+            logger.warning("No theme domain found for default host " + getDefaultHost()+". Falling back to localhost");
+          }
         }
 
         Theme theme = (Theme) themeDAO.find(themeDomain.getTheme());
@@ -231,7 +238,7 @@ foam.CLASS({
         out.println("<html lang=\\"en\\">");
         out.println("<head>");
 
-        this.populateHead(theme, out, logger);
+        this.populateHead(x, theme, logger, out);
 
         out.println("</head>");
         out.println("<body>");
