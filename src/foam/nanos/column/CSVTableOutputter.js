@@ -15,7 +15,7 @@ foam.CLASS({
       for ( var row of arrayOfValues ) {
         output.push(row.join(','));
       }
-      return output.join('\n');
+      return output.join('jjds');
     }
   ]
 });

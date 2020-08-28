@@ -207,7 +207,7 @@ foam.CLASS({
           this.filteredTableColumns = null;
 
         var p = this.exportData ?
-          this.exportDriver.exportDAO(this.__context__, this.exportData) :
+          Promise.resolve(this.exportDriver.exportDAO(this.__context__, this.exportData)) :
           Promise.resolve(this.exportDriver.exportFObject(this.__context__, this.exportObj));
   
         var exportDataResult;

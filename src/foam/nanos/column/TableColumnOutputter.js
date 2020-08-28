@@ -63,12 +63,14 @@
         for ( var value of values ) {
           var stringArrayForValue = [];
           for ( var i = 0 ; i < lengthOfPrimaryPropsRequested ; i++ ) {
-            if ( ! foam.core.UnitValue.isInstance(props[i]) ) {
-              stringArrayForValue.push(await this.returnStringValueForProperty(x, props[i], value[i]));
-              continue;
+            if ( foam.core.UnitValue.isInstance(props[i]) ) {
+              var indexOfUnitProp = props.findIndex(p => p.name === props[i].unitPropName);
+              if ( indexOfUnitProp !== -1 ) {
+                stringArrayForValue.push(await this.returnStringValueForProperty(x, props[i], value[i], value[indexOfUnitProp]));
+                continue;
+              }
             }
-            var indexOfUnitProp = props.findIndex(p => p.name === props[i].unitPropName);
-            stringArrayForValue.push(await this.returnStringValueForProperty(x, props[i], value[i], value[indexOfUnitProp]));
+            stringArrayForValue.push(await this.returnStringValueForProperty(x, props[i], value[i]));
           }
           stringValues.push(stringArrayForValue);
         }

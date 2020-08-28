@@ -439,19 +439,13 @@ foam.CLASS({
                   tableRowElement.
                   addClass(view.myClass('tr')).
                   on('mouseover', function() {
-                    if ( !thisObjValue ) {
-                      dao.inX(ctrl.__subContext__).find(obj.id).then(v => {
-                      thisObjValue = v;//as we here do not have whole info about object we need 
-                      view.hoverSelection = thisObjValue;
-                    });
-                    } else
-                      view.hoverSelection = thisObjValue;
+                    view.hoverSelection = obj;
                   }).
                   callIf(view.dblclick && ! view.disableUserSelection, function() {
                     tableRowElement.on('dblclick', function() {
                       if ( !thisObjValue ) {
                         dao.inX(ctrl.__subContext__).find(obj.id).then(function(v) {
-                          thisObjValue = v;
+                          thisObjValue = v;//as we here do not have whole object we need 
                           view.dblclick && view.dblclick(thisObjValue);
                         });
                       } else
@@ -587,7 +581,7 @@ foam.CLASS({
                       style({ flex: `0 0 ${view.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH}px` }).
                       tag(view.OverlayActionListView, {
                         data: actions,
-                        objId: obj.id,//check if info about obj will suffice here not to retriev it in OverlayActionListView
+                        obj: obj,
                         dao: dao
                       }).
                     end();
