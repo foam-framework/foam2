@@ -43,11 +43,11 @@ foam.CLASS({
         {
             name: 'add',
             args: [{ name: 't', javaType: 'Throwable' }],
-            javaCode: 'exceptions_.add(t);'
+            javaCode: 'getExceptions().add(t);'
         },
         {
             name: 'maybeThrow',
-            javaCode: 'if ( exceptions_.size() != 0 ) throw this;'
+            javaCode: 'if ( getExceptions().size() != 0 ) throw this;'
         },
         {
             name: 'getMessage',
