@@ -51,7 +51,11 @@ foam.CLASS({
     function initE() {
       var self = this;
       this
-        .add(this.slot(function (data$wizardlets, data$wizardPosition) {
+        .add(this.slot(function (
+          data$wizardlets,
+          data$wizardPosition,
+          data$availabilityInvalidate
+        ) {
           let elem = this.E();
 
           let afterCurrent = false;
@@ -63,7 +67,11 @@ foam.CLASS({
             let wizardlet = this.data.wizardlets[w];
             let isCurrent = wizardlet === this.data.currentWizardlet;
 
-            if ( this.data.countAvailableSections(w) < 1 ) {
+            if (
+              this.data.countAvailableSections(w) < 1
+              || ! wizardlet.isAvailable
+            ) {
+              console.log('skip');
               wSkipped++;
               continue;
             }
