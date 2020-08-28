@@ -50,9 +50,15 @@ p({
         "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":0}
       },
       {
-        "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
-        "propName":"status",
-        "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1}
+        "class":"foam.mlang.predicate.Or",
+        "args":[
+          {
+            "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
+            "propName":"status",
+            "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1}
+          },
+          { "class":"foam.nanos.ruler.predicate.PropertyEQValue","propName":"isRenewable","propValue":true }
+        ]
       },
       {
         "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
@@ -60,10 +66,16 @@ p({
         "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":6}
       },
       {
-        "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
-        "propName":"status",
-        "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1},
-        "isNew":false
+        "class":"foam.mlang.predicate.Or",
+        "args":[
+          {
+            "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
+            "propName":"status",
+            "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1},
+            "isNew":false
+          },
+          { "class":"foam.nanos.ruler.predicate.PropertyEQValue","propName":"isRenewable","propValue":true,"isNew":false }
+        ]
       },
       {
         "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
@@ -76,28 +88,13 @@ p({
         "arg1":{
           "class":"foam.mlang.predicate.And",
           "args":[
-            {
-              "class":"foam.nanos.ruler.predicate.PropertyChangePredicate",
-              "propName":"status",
-            },
+            { "class":"foam.nanos.crunch.isUserCapabilityJunctionStatusUpdate" },
             {
               "class":"foam.mlang.predicate.Or",
               "args":[
-                {
-                  "class":"foam.nanos.ruler.predicate.PropertyEQValue",
-                  "propName":"status",
-                  "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":7}
-                },
-                {
-                  "class":"foam.nanos.ruler.predicate.PropertyEQValue",
-                  "propName":"status",
-                  "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":5}
-                },
-                {
-                  "class":"foam.nanos.ruler.predicate.PropertyEQValue",
-                  "propName":"status",
-                  "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":2}
-                }
+                { "class":"foam.nanos.ruler.predicate.PropertyEQValue","propName":"isInRenewalPeriod","propValue":true },
+                { "class":"foam.nanos.ruler.predicate.PropertyEQValue","propName":"isInGracePeriod","propValue":true },
+                { "class":"foam.nanos.ruler.predicate.PropertyEQValue", "propName":"isExpired", "propValue":true }
               ]
             }
           ]
@@ -122,9 +119,15 @@ p({
   "action":{"class":"foam.nanos.crunch.ruler.SetUCJStatusOnPut"},
   "lifecycleState":1,
   "predicate":{
-    "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
-    "propName":"status",
-    "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1}
+    "class":"foam.mlang.predicate.Or",
+    "args":[
+      {
+        "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
+        "propName":"status",
+        "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1}
+      },
+      { "class":"foam.nanos.ruler.predicate.PropertyEQValue","propName":"isRenewable","propValue":true }
+    ]
   }
 })
 
@@ -159,13 +162,16 @@ p({
     "class":"foam.mlang.predicate.Or", 
     "args":[
       {
-        "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
-        "propName":"status",
-        "propValue":{
-          "class":"foam.nanos.crunch.CapabilityJunctionStatus",
-          "ordinal":1
-        },
-        "isNew":false
+        "class":"foam.mlang.predicate.Or",
+        "args":[
+          {
+            "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
+            "propName":"status",
+            "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1},
+            "isNew":false
+          },
+          { "class":"foam.nanos.ruler.predicate.PropertyEQValue","propName":"isRenewable","propValue":true,"isNew":false }
+        ]
       },
       { "class":"foam.nanos.crunch.ruler.IsDataUpdate" }
     ]
@@ -203,13 +209,16 @@ p({
     "class":"foam.mlang.predicate.Or", 
     "args":[
       {
-        "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
-        "propName":"status",
-        "propValue":{
-          "class":"foam.nanos.crunch.CapabilityJunctionStatus",
-          "ordinal":1
-        },
-        "isNew":false
+        "class":"foam.mlang.predicate.Or",
+        "args":[
+          {
+            "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
+            "propName":"status",
+            "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1},
+            "isNew":false
+          },
+          { "class":"foam.nanos.ruler.predicate.PropertyEQValue","propName":"isRenewable","propValue":true,"isNew":false }
+        ]
       },
       { "class":"foam.nanos.crunch.ruler.IsDataUpdate" }
     ]

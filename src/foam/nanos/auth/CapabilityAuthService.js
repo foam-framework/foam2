@@ -174,7 +174,7 @@ foam.CLASS({
             public boolean f(Object obj) {
               UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
               Capability c = (Capability) capabilityDAO.find(ucj.getTargetId());
-              if ( ( ucj.getStatus() == CapabilityJunctionStatus.GRANTED || ucj.getStatus() == CapabilityJunctionStatus.GRACE_PERIOD ) &&
+              if ( ( ucj.getStatus() == CapabilityJunctionStatus.GRANTED ) &&
                    c != null && ! c.isDeprecated(x) && c.implies(x, permission) ) {
                 return true;
               }

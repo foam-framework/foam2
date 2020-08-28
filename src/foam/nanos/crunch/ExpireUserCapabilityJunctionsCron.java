@@ -33,13 +33,12 @@ public class ExpireUserCapabilityJunctionsCron implements ContextAgent {
     List<UserCapabilityJunction> activeJunctions = ((ArraySink) userCapabilityJunctionDAO
       .where(OR(
         AND(
-          EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRACE_PERIOD),
-          LTE(UserCapabilityJunction.GRACE_DAYS_LEFT, 0)
+          EQ(UserCapabilityJunction.IS_IN_GRACE_PERIOD, true),
+          LTE(UserCapabilityJunction.GRACE_PERIOD, 0)
         ),
         AND(
           OR(
-            EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED),
-            EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.RENEWABLE)
+            EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
           ),
           NEQ(UserCapabilityJunction.EXPIRY, null),
           LT(UserCapabilityJunction.EXPIRY, today)
@@ -49,11 +48,11 @@ public class ExpireUserCapabilityJunctionsCron implements ContextAgent {
       .getArray();
 
     for ( UserCapabilityJunction activeJunction : activeJunctions ) {
-      if ( activeJunction.getStatus() == CapabilityJunctionStatus.GRACE_PERIOD) {
+      if ( activeJunction.getIsInGracePeriod() || activeJunction.getGracePeriod() <= 0 ) {
         activeJunction.setStatus(CapabilityJunctionStatus.EXPIRED);
+        activeJunction.setIsExpired(true);
       } else {
-        int graceDays = activeJunction.getGraceDaysLeft();
-        activeJunction.setStatus(graceDays > 0 ? CapabilityJunctionStatus.GRACE_PERIOD : CapabilityJunctionStatus.EXPIRED);
+        activeJunction.setIsInGracePeriod(true);
       }
       if ( activeJunction.getStatus() == CapabilityJunctionStatus.EXPIRED ) activeJunction.clearData();
       

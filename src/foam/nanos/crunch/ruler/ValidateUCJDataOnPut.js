@@ -37,9 +37,7 @@ foam.CLASS({
 
             Capability capability = (Capability) ucj.findTargetId(x);
 
-            boolean isRenewable = ucj.getStatus() == CapabilityJunctionStatus.RENEWABLE 
-              || ucj.getStatus() == CapabilityJunctionStatus.GRACE_PERIOD
-              || ucj.getStatus() == CapabilityJunctionStatus.EXPIRED;
+            boolean isRenewable = ucj.getIsRenewable(); // ucj either expired, in grace period, or in renewal period
 
             if ( ! isRenewable ) ucj.setStatus(CapabilityJunctionStatus.ACTION_REQUIRED);
 

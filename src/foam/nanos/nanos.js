@@ -326,6 +326,7 @@ FOAM_FILES([
   // foam/nanos/crunch
   { name: "foam/nanos/crunch/crunchtest/FakeTestObject" },
   // models
+  { name: "foam/nanos/crunch/Renewable" },
   { name: "foam/nanos/crunch/Capability" },
   { name: "foam/nanos/crunch/lite/CapablePayload" },
   { name: "foam/nanos/crunch/lite/CapableObjectData" },

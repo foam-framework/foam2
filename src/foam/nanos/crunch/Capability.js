@@ -139,8 +139,8 @@ foam.CLASS({
       value: 0,
       documentation: `To be used in the case where expiry is duration based, represents the number of DAYS the user can keep permissions
       granted by this capability after the duration runs out.
-      If the gracePeriod is greater than 0, the UserCapabilityJunction will go
-      into GRACE_PERIOD status with the property graceDaysLeft set to be equals to this property. Otherwise, the UserCapabilityJunction will
+      If the gracePeriod is greater than 0, the UserCapabilityJunction will set isInGracePeriod property to true 
+      and set gracePeriod property to be equals to this. Otherwise, the UserCapabilityJunction will
       go into EXPIRED status.`
     },
     {
@@ -346,6 +346,7 @@ foam.CLASS({
 
 foam.RELATIONSHIP({
   package: 'foam.nanos.crunch',
+  extends:'foam.nanos.crunch.Renewable',
   sourceModel: 'foam.nanos.auth.User',
   targetModel: 'foam.nanos.crunch.Capability',
   cardinality: '*:*',

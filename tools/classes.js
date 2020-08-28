@@ -623,6 +623,7 @@ var classes = [
   // Crunch
   'foam.nanos.crunch.crunchtest.FakeTestObject',
   //models
+  'foam.nanos.crunch.Renewable',
   'foam.nanos.crunch.Capability',
   'foam.nanos.crunch.lite.Capable',
   'foam.nanos.crunch.lite.CapablePayload',

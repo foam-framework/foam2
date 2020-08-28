@@ -98,9 +98,8 @@ foam.CLASS({
           if ( ucJunction == null ) {
             return CapabilityJunctionStatus.ACTION_REQUIRED;
           }
-          if ( ucJunction.getStatus() == CapabilityJunctionStatus.GRACE_PERIOD 
-               || ucJunction.getStatus() == CapabilityJunctionStatus.RENEWABLE 
-               || ucJunction.getStatus() == CapabilityJunctionStatus.EXPIRED ) {
+          if ( ucJunction.getIsRenewable() ) { 
+            // this should be equivalent to checking if its either expired, in grace period, or in renewable period
             return ucJunction.getStatus();
           }
           if ( ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED

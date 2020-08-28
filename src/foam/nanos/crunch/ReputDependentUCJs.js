@@ -35,7 +35,10 @@ foam.CLASS({
           public void execute(X x) {
             DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
             UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
-            CapabilityJunctionStatus status = ucj.getStatus();
+            UserCapabilityJunction old = (UserCapabilityJunction) userCapabilityJunctionDAO.find(AND(
+              EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId()),
+              EQ(UserCapabilityJunction.TARGET_ID, ucj.getTargetId())
+            ));
 
             boolean isInvalidate = ucj.getStatus() != CapabilityJunctionStatus.GRANTED || 
               ( ucj.getStatus() == CapabilityJunctionStatus.APPROVED && (
@@ -67,7 +70,7 @@ foam.CLASS({
             }
 
             for ( UserCapabilityJunction ucjToReput : ucjsToReput ) {
-              if ( isInvalidate ) ucjToReput.setStatus(cascadeInvalidateStatus(x, ucjToReput, status));
+              if ( isInvalidate ) ucjToReput.setStatus(cascadeInvalidateStatus(x, ucjToReput, ucj));
               userCapabilityJunctionDAO.inX(x).put(ucjToReput);
             }
           }
@@ -79,7 +82,7 @@ foam.CLASS({
       args: [
         { name: 'x', javaType: 'foam.core.X' },
         { name: 'ucj', javaType: 'foam.nanos.crunch.UserCapabilityJunction' },
-        { name: 'prereqStatus', javaType: 'foam.nanos.crunch.CapabilityJunctionStatus' }
+        { name: 'prereq', javaType: 'foam.nanos.crunch.UserCapabilityJunction' }
       ],
       javaType: 'foam.nanos.crunch.CapabilityJunctionStatus',
       javaCode: `
@@ -87,6 +90,7 @@ foam.CLASS({
 
         Capability capability = (Capability) ucj.findTargetId(x);
         boolean reviewRequired = capability.getReviewRequired();
+        CapabilityJunctionStatus prereqStatus = prereq.getStatus();
 
         switch ( (CapabilityJunctionStatus) prereqStatus ) {
           case AVAILABLE : 
@@ -98,29 +102,23 @@ foam.CLASS({
           case PENDING : 
             newStatus = reviewRequired && 
               ( newStatus == CapabilityJunctionStatus.APPROVED || 
-                newStatus == CapabilityJunctionStatus.GRANTED || 
-                newStatus == CapabilityJunctionStatus.GRACE_PERIOD 
+                newStatus == CapabilityJunctionStatus.GRANTED
               ) ? 
                 CapabilityJunctionStatus.APPROVED : CapabilityJunctionStatus.PENDING;
             break;
           case APPROVED : 
             newStatus = reviewRequired && 
             ( newStatus == CapabilityJunctionStatus.APPROVED || 
-              newStatus == CapabilityJunctionStatus.GRANTED || 
-              newStatus == CapabilityJunctionStatus.GRACE_PERIOD 
+              newStatus == CapabilityJunctionStatus.GRANTED
             ) ? 
               CapabilityJunctionStatus.APPROVED : CapabilityJunctionStatus.PENDING;
-            break;
-          case GRACE_PERIOD :
-            newStatus = CapabilityJunctionStatus.GRACE_PERIOD;
-            break;
-          case RENEWABLE : 
-            newStatus = CapabilityJunctionStatus.RENEWABLE;
             break;
           case EXPIRED :
             newStatus = CapabilityJunctionStatus.ACTION_REQUIRED;
             break;
           default : // GRANTED
+            if ( prereq.getIsInGracePeriod() ) ucj.setIsInGracePeriod(true);
+            if ( prereq.getIsRenewable() ) ucj.setIsRenewable(true);
         }
         return newStatus;
 

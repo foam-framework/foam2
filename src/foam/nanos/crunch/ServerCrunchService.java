@@ -203,11 +203,7 @@ public class ServerCrunchService implements CrunchService {
     boolean satisfied = false;
     for ( String capId : capabilityOptions ) {
       UserCapabilityJunction ucj = this.getJunction(x, capId);
-      if ( ucj != null && (
-        // TODO: use getStatus().getBroadStatus() when available
-        ucj.getStatus() == CapabilityJunctionStatus.GRANTED
-        || ucj.getStatus() == CapabilityJunctionStatus.GRACE_PERIOD
-      ) ) {
+      if ( ucj != null && ucj.getStatus() == CapabilityJunctionStatus.GRANTED ) {
         satisfied = true;
         break;
       }

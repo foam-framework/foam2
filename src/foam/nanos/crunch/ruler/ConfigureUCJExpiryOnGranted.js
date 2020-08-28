@@ -82,7 +82,7 @@ foam.CLASS({
             } 
     
             if ( capability.getGracePeriod() > 0 ) {
-              ucj.setGraceDaysLeft(capability.getGracePeriod());
+              ucj.setGracePeriod(capability.getGracePeriod());
             }
           }
         }, "");

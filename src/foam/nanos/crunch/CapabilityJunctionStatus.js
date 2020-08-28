@@ -38,23 +38,12 @@ foam.ENUM({
       background: '#604aff'
     },
     {
-      name: 'GRACE_PERIOD',
-      label: 'grace period',
-      documentation: `This status is used when a capability is expired, but for your benefit we allow a certian set of days to continue accessing the features that are unlocked by this capability.`,
-      background: 'grey'
-    },
-    {
       name: 'APPROVED',
       label: 'approved',
       documentation: `- not seen by users - Denoting a UCJ requiring review has been approved. It would need to go through the rules of the ucjDAO before 
       being set to granted.`,
-      background: '#bfae32'
+      background: '#bfae32',
+      ordinal: 6
     },
-    {
-      name: 'RENEWABLE',
-      label: 'renewable',
-      documentation: `- not seen by users - Denoting a UCJ is less than 30 days away from its expiry and can be renewed by the user.`,
-      background: '#32bf5e'
-    }
   ]
 });
