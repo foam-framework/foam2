@@ -18,8 +18,8 @@ foam.CLASS({
   methods: [
     // If Property expressions ever unwrap promises this method can be blank.
     function execute() {
-      console.log('caps', this.capabilities);
-      console.log('wizs', this.wizardlets);
+      // console.log('caps', this.capabilities);
+      // console.log('wizs', this.wizardlets);
       return Promise.resolve();
     }
   ]
