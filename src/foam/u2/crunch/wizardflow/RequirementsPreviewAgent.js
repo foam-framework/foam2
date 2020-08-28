@@ -49,7 +49,7 @@ foam.CLASS({
         }).then(isContinueAction => {
           if ( ! isContinueAction ) {
             this.endSequence();
-            return;
+            return Promise.resolve();
           }
         })
       }

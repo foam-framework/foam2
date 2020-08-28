@@ -30,11 +30,9 @@ foam.CLASS({
 
   methods: [
     async function execute() {
-      console.log('umm...', this.unadaptedRootCapability);
       if ( typeof this.unadaptedRootCapability == 'string' ) {
         this.rootCapability =
           await this.capabilityDAO.find(this.unadaptedRootCapability);
-        console.log(this.rootCapability)
         return;
       }
       this.rootCapability = this.unadaptedRootCapability;
