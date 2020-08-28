@@ -114,7 +114,7 @@ foam.CLASS({
     },
 
     function save(wizardlet) {
-      // TODO: ignore saving when wizardlet.isAvailable === false
+      if ( ! wizardlet.isAvailable ) return Promise.resolve(); 
       var isAssociation = wizardlet.capability.associatedEntity === foam.nanos.crunch.AssociatedEntity.ACTING_USER;
       var associatedEntity = isAssociation ? this.subject.realUser : 
       wizardlet.capability.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;

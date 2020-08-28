@@ -42,7 +42,8 @@ foam.CLASS({
       return Promise.all(this.capabilities
         .reduce((updateUCJPromiseList, cap) => {
           var associatedEntity, wizardlet;
-            
+          // TODO: transform this into a recursive function
+          // TODO: Account for choices with prereqs not instance of minMax but array exists
           if ( Array.isArray(cap) && ( foam.nanos.crunch.MinMaxCapability.isInstance(cap[cap.length - 1]) ) ){
             var minMaxCap = cap[cap.length - 1];
 
@@ -55,7 +56,7 @@ foam.CLASS({
                   capability: capability, 
                   isAvailable: false,
                   ...capability.wizardlet.instance_ 
-                }, this)
+                }, this.__subContext__)
 
                 associatedEntity = capability.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
 
@@ -70,7 +71,7 @@ foam.CLASS({
               capability: minMaxCap,
               ...minMaxCap.wizardlet.instance_,
               choiceWizardlets: choiceWizardlets
-            })
+            }, this.__subContext__)
 
             associatedEntity = minMaxCap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
             
@@ -78,9 +79,9 @@ foam.CLASS({
             updateUCJPromiseList = updateUCJPromiseList.concat(minMaxArray);
             
 
-          } else if ( cap.of ) {
+          } else if ( cap ) {
             associatedEntity = cap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
-            wizardlet = cap.wizardlet.cls_.create({ capability: cap, ...cap.wizardlet.instance_ }, this);
+            wizardlet = cap.wizardlet.cls_.create({ capability: cap, ...cap.wizardlet.instance_ }, this.__subContext__);
 
             updateUCJPromiseList.push(this.updateUCJ(wizardlet, associatedEntity));
           }

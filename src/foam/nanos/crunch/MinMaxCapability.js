@@ -74,6 +74,10 @@ foam.CLASS({
           }
         }
 
+        // TODO: Need to test if this works
+        System.out.println("numberGranted");
+        System.out.println(numberGranted);
+
         if ( numberGranted >= getMin() ) {
           return CapabilityJunctionStatus.GRANTED;
         }
