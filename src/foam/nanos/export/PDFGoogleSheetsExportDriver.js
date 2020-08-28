@@ -7,11 +7,7 @@
 foam.CLASS({
   package: 'foam.nanos.export',
   name: 'PDFGoogleSheetsExportDriver',
-
-  implements: [ 
-    'foam.nanos.export.ExportDriver',
-    'foam.nanos.export.GoogleSheetsServiceConfig'
-  ],
+  extends: 'foam.nanos.export.GoogleSheetsBasedExportDriver',
 
   documentation: `
     Driver retrieves data, transforms it and makes calls to googleSheetsDataExport.
@@ -20,59 +16,18 @@ foam.CLASS({
     Driver makes a link for downloading pdf, returns it to user and sends request to delete the sheet.
   `,
 
-  properties: [
-    {
-      name: 'outputter',
-      factory: function() {
-        return foam.nanos.export.GoogleSheetsOutputter.create();
-      },
-      hidden: true
-    },
-    {
-      class: 'String',
-      name: 'title'
-    }
-  ],
   methods: [
     async function exportFObject(X, obj) {
-        var self = this;
-        
-        var sheetId  = '';
-        var stringArray = [];
-        var columnConfig = X.columnConfigToPropertyConverter;
-
-        var propNames = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(obj.cls);
-        propNames = columnConfig.filterExportedProps(obj.cls_, propNames);
-        
-        var metadata = await self.outputter.getColumnMethadata(X, obj.cls_, propNames);
-        stringArray = [ await this.outputter.objectToTable(X, obj.cls_, obj, propNames) ];
-
-        sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata, this);
-        if ( ! sheetId || sheetId.length == 0)
-          return '';
-        var url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?exportFormat=pdf&format=pdf&scale=3`;
-        return url;
+      var sheetId = await this.exportFObjectAndReturnSheetId(X, obj);
+      if ( ! sheetId || sheetId.length === 0)
+        return '';
+      return  `https://docs.google.com/spreadsheets/d/${sheetId}/export?exportFormat=pdf&format=pdf&scale=3`;
     },
     async function exportDAO(X, dao) {
-      var self = this;
-      var columnConfig = X.columnConfigToPropertyConverter;
-
-      var propNames = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(dao.of);
-      propNames = columnConfig.filterExportedProps(dao.of, propNames);
-
-      var metadata = await self.outputter.getColumnMethadata(X, dao.of, propNames);
-
-      var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(dao.of, propNames);
-      var sink = await dao.select(expr);
-      
-      var sheetId  = '';
-      var stringArray = await self.outputter.returnTable(X, dao.of, propNames, sink.array);
-
-      sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata, this);
-      if ( ! sheetId || sheetId.length == 0)
+      var sheetId = await this.exportDAOAndReturnSheetId(X, dao);
+      if ( ! sheetId || sheetId.length === 0)
         return '';
-      var url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?exportFormat=pdf&format=pdf&scale=1`;
-      return url;
+      return `https://docs.google.com/spreadsheets/d/${sheetId}/export?exportFormat=pdf&format=pdf&scale=1`;
     }
   ],
   constants: {

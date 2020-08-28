@@ -41,12 +41,12 @@ foam.CLASS({
     {
       name: 'outputStringForProperties',
       type: 'StringArray',
-      code: async function(x, cls, obj, columnMetadata) {
+      code: async function(x, cls, obj, columnMetadata, lengthOfPrimaryPropsRequested) {
         var values = [];
         var columnConfig = x.columnConfigToPropertyConverter;
 
         var props = columnConfig.returnProperties(cls, columnMetadata.map(m => m.propName));
-        values.push(await this.arrayOfValuesToArrayOfStrings(x, obj, props));
+        values.push(await this.arrayOfValuesToArrayOfStrings(x, obj, props, lengthOfPrimaryPropsRequested));
         return values;
       }
     },
