@@ -16,10 +16,12 @@ foam.CLASS({
   `,
 
   javaImports: [
+    'foam.core.CompoundException',
     'foam.core.Detachable',
     'foam.core.FObject',
     'foam.core.ReadOnlyDAOContext',
     'foam.core.X',
+    'foam.core.XLocator',
     'foam.dao.AbstractSink',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
@@ -121,6 +123,7 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `FObject oldObj = getDelegate().find_(x, obj);
+if ( x.get(CompoundException.class) == null ) x = x.put(CompoundException.class, new CompoundException());
 Map rulesList = getRulesList();
 if ( oldObj == null ) {
   applyRules(x, obj, oldObj, (GroupBy) rulesList.get(getCreateBefore()));
@@ -133,6 +136,7 @@ if ( oldObj == null ) {
 } else {
   applyRules(x, ret, oldObj, (GroupBy) rulesList.get(getUpdateAfter()));
 }
+x = XLocator.set(x);
 return ret;`
     },
     {
