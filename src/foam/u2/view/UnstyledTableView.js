@@ -33,7 +33,6 @@ foam.CLASS({
   ],
 
   imports: [
-    'ctrl',
     'dblclick?',
     'editRecord?',
     'filteredTableColumns?',
@@ -440,7 +439,7 @@ foam.CLASS({
                   addClass(view.myClass('tr')).
                   on('mouseover', function() {
                     if ( ! thisObjValue ) {
-                      dao.inX(ctrl.__subContext__).find(val[0]).then(v => {
+                      dao.find(val[0]).then(v => {
                         thisObjValue = v;
                         view.hoverSelection = thisObjValue;
                       });
@@ -451,7 +450,7 @@ foam.CLASS({
                   callIf(view.dblclick && ! view.disableUserSelection, function() {
                     tableRowElement.on('dblclick', function() {
                       if ( ! thisObjValue ) {
-                        dao.inX(ctrl.__subContext__).find(val[0]).then(function(v) {
+                        dao.find(val[0]).then(function(v) {
                           thisObjValue = v;
                           view.dblclick && view.dblclick(thisObjValue);
                         });
@@ -469,7 +468,7 @@ foam.CLASS({
                       ) return;
 
                       if  ( ! thisObjValue ) {
-                        dao.inX(ctrl.__subContext__).find(val[0]).then(v => {
+                        dao.find(val[0]).then(v => {
                           view.selection = v;
                           if ( view.importSelection$ ) view.importSelection = v;
                           if ( view.editRecord$ ) view.editRecord(v);
