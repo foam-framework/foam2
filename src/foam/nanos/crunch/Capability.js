@@ -382,17 +382,18 @@ foam.CLASS({
         for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
           Capability cap = (Capability) ccJunction.findSourceId(x);
           if ( ! cap.getEnabled() ) continue;
-          UserCapabilityJunction ucJunction =
-            crunchService.getJunctionForSubject(x, ccJunction.getTargetId(), subject);
+          UserCapabilityJunction ucJunction = crunchService.getJunctionForSubject(x, ccJunction.getTargetId(), subject);
 
-          if ( ucJunction != null && 
-               ( ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED || ucJunction.getStatus() == CapabilityJunctionStatus.GRACE_PERIOD ) 
-             ) 
-              continue;
-          
+          if ( ucJunction != null && ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED ) 
+            continue;
 
           if ( ucJunction == null ) {
             return CapabilityJunctionStatus.ACTION_REQUIRED;
+          }
+          if ( ucJunction.getIsRenewable() ) { 
+            // TODO this should be equivalent to checking if its either expired, in grace period, or in renewable period
+            cap = ucJunction.updateDependentRenewalStatus(cap);
+            return ucJunction.getStatus();
           }
           if ( ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED
                && ucJunction.getStatus() != CapabilityJunctionStatus.PENDING ) {
