@@ -115,7 +115,8 @@ foam.CLASS({
                     data: cap
                   })
                   .on('click', () => {
-                    self.crunchController.launchWizard(cap.id);
+                    self.crunchController
+                      .createWizardSequence(cap.id).execute();
                   });
               }).addClass(this.myClass('capList-css'));
             }))
