@@ -210,7 +210,6 @@ foam.CLASS({
         DAO        themeDAO       = (DAO)        x.get("themeDAO");
         Logger     logger         = (Logger)     x.get("logger");
 
-
         if ( ! server.containsHostDomain(vhost) ) {
           vhost = getDefaultHost();
         }
