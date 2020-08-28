@@ -88,7 +88,7 @@ p({
         "arg1":{
           "class":"foam.mlang.predicate.And",
           "args":[
-            { "class":"foam.nanos.crunch.isUserCapabilityJunctionStatusUpdate" },
+            { "class":"foam.nanos.crunch.IsUserCapabilityJunctionStatusUpdate" },
             {
               "class":"foam.mlang.predicate.Or",
               "args":[
