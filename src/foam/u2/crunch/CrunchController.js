@@ -74,7 +74,7 @@ foam.CLASS({
         .add(this.RequirementsPreviewAgent)
         .add(this.StepWizardAgent)
         .add(this.PutFinalJunctionsAgent)
-        // .add(this.TestAget)
+        // .add(this.TestAgent)
         ;
     },
 
