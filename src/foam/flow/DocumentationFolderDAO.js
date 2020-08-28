@@ -13,6 +13,7 @@ foam.CLASS({
   javaImports: [
     'foam.nanos.fs.Storage',
     'java.nio.charset.StandardCharsets',
+    'java.util.HashSet',
     'java.util.Set',
     'java.io.OutputStream'
   ],
@@ -49,7 +50,14 @@ sink = prepareSink(sink);
 foam.dao.Sink         decorated = decorateSink_(sink, skip, limit, order, predicate);
 foam.dao.Subscription sub       = new foam.dao.Subscription();
 
-Set<String> paths = storage.getAvailableFiles("", "*.flow");
+Set<String> paths = null;
+try {
+  paths = storage.getAvailableFiles("", "*.flow");
+} catch (Throwable t) {
+  foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
+  logger.warning(t.getMessage());
+  paths = new HashSet<String>();
+}
 
 for ( String path : paths ) {
   if ( sub.getDetached() ) break;

@@ -43,6 +43,9 @@ foam.CLASS({
   methods: [
     function validate() {
       return this.isValid;
+    },
+    function createView(data) {
+      return null;
     }
   ]
 });

@@ -73,6 +73,11 @@ foam.CLASS({
       }
     },
     {
+      class: 'Function',
+      name: 'copyOldData',
+      value: function(o) { return o; }
+    },
+    {
       class: 'Boolean',
       name: 'classIsFinal',
       documentation: 'If true, objectClass cannot be changed if data is provided.'
@@ -166,7 +171,7 @@ foam.CLASS({
 
       var classToData = function(c) {
         var m = c && this.__context__.lookup(c, true);
-        return m.create(this.data, this);
+        return m.create(this.data ? this.copyOldData(this.data) : null, this);
       }.bind(this);
 
       this.dataWasProvided_ = !! this.data;

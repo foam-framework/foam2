@@ -98,6 +98,29 @@ foam.INTERFACE({
       ],
     },
     {
+      name: 'getJunctionForSubject',
+      documentation: `
+        getJunction provides the correct UserCapabilityJunction based on the
+        subject provided.
+      `,
+      async: true,
+      type: 'UserCapabilityJunction',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'capabilityId',
+          type: 'String'
+        },
+        {
+          name: 'subject',
+          type: 'foam.nanos.auth.Subject'
+        }
+      ],
+    },
+    {
       name: 'updateJunction',
       args: [
         {
