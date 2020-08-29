@@ -3916,6 +3916,11 @@ foam.CLASS({
 
   documentation: 'Formula base-class',
 
+  javaImports: [
+    'java.util.ArrayList',
+    'java.util.List'
+  ],
+
   properties: [
     {
       class: 'foam.mlang.ExprArrayProperty',
@@ -3969,6 +3974,25 @@ foam.CLASS({
         { name: 'accumulator', type: 'Double' },
         { name: 'currentValue', type: 'Double' }
       ]
+    },
+    {
+      name: 'partialEval',
+      type: 'foam.mlang.Expr',
+      javaCode: `
+        List<Double> list = new ArrayList<>();
+        for ( var arg : getArgs() ) {
+          arg = arg.partialEval();
+          if ( arg instanceof Constant ) {
+            var value = ((Number) arg.f(this)).doubleValue();
+            list.add(value);
+          }
+        }
+
+        if ( list.size() == getArgs().length ) {
+          return new Constant(list.stream().reduce(this::reduce).get());
+        }
+        return this;
+      `
     },
     {
       name: 'toString',
