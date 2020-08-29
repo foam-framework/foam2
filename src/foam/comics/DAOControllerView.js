@@ -58,7 +58,7 @@ foam.CLASS({
     }
 
     ^container {
-      padding: 0 32px;
+      padding: 0 0px;
     }
 
     ^ .actions {
@@ -77,8 +77,8 @@ foam.CLASS({
       float: left;
       padding-top: 23px;
     }
-    
-    ^manual-width-adjust{
+
+    ^manual-width-adjust {
       width: inherit;
     }
   `,
