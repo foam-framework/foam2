@@ -10,19 +10,19 @@ foam.CLASS({
 
   documentation: `Record a hop through Medusa cluster.`,
 
+  javaImports: [
+    'foam.nanos.pm.PM'
+  ],
+  
   properties: [
     {
       name: 'hostname',
       class: 'String'
     },
     {
-      name: 'op',
-      class: 'String',
-      value: 'sendTo'
-    },
-    {
-      name: 'timestamp',
-      class: 'Long'
+      name: 'pm',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.pm.PM'
     }
   ],
 
@@ -32,16 +32,9 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-  public ClusterCommandHop(String hostname) {
-    setHostname(hostname);
-    setOp("sendTo");
-    setTimestamp(System.currentTimeMillis());
-  }
-
   public ClusterCommandHop(String hostname, String op) {
     setHostname(hostname);
-    setOp(op);
-    setTimestamp(System.currentTimeMillis());
+    setPm(new PM(this.getClass().getSimpleName(), hostname, op));
   }
           `
         }));
@@ -54,7 +47,7 @@ foam.CLASS({
       name: 'toString',
       type: 'String',
       javaCode: `
-      return this.getHostname()+":"+this.getOp();
+      return this.getHostname();
       `
     }
   ]

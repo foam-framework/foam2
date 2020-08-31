@@ -230,6 +230,9 @@ foam.CLASS({
             throw new IOException("Invalid response state: "+status.getLabel());
           }
           return status;
+        } else if ( obj instanceof RPCErrorMessage ) {
+          RemoteException wrapper = (RemoteException) ((RPCErrorMessage) obj).getData();
+          throw new IOException("RemoteException "+wrapper.getId()+" "+wrapper.getMessage());
         } else {
           throw new IOException("Invalid response: "+obj.getClass().getSimpleName()+", expected foam.nanos.medusa.Status");
         }
@@ -237,8 +240,10 @@ foam.CLASS({
       }
       throw new IOException("Invalid response: null");
     } catch (IOException e) {
+      ping.getPm().error(x, e);
       throw e;
     } catch (Throwable t) {
+      ping.getPm().error(x, t);
       throw new IOException(t.getMessage(), t);
     } finally {
       ping.getPm().log(x);

@@ -41,7 +41,7 @@ foam.CLASS({
       javaCode: `
       ClusterCommand cmd = (ClusterCommand) obj;
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      cmd = cmd.addHop(x, "receivedAt", support.getConfigId());
+      cmd = cmd.addHop(x, "received");
       getLogger().debug("put_", "hops", java.util.Arrays.toString(cmd.getHops()));
       DAO dao = (DAO) x.get(cmd.getServiceName());
       if ( dao == null ) {
@@ -63,7 +63,7 @@ foam.CLASS({
       javaCode: `
       ClusterCommand cmd = (ClusterCommand) obj;
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      cmd = cmd.addHop(x, "receivedAt", support.getConfigId());
+      cmd = cmd.addHop(x, "received");
       getLogger().debug("remove_", "hops", java.util.Arrays.toString(cmd.getHops()));
       DAO dao = (DAO) x.get(cmd.getServiceName());
       if ( dao == null ) {
@@ -78,7 +78,7 @@ foam.CLASS({
       javaCode: `
       ClusterCommand cmd = (ClusterCommand) obj;
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      cmd = cmd.addHop(x, "receivedAt", support.getConfigId());
+      cmd = cmd.addHop(x, "received");
       getLogger().debug("cmd_", "hops", java.util.Arrays.toString(cmd.getHops()));
       DAO dao = (DAO) x.get(cmd.getServiceName());
       if ( dao == null ) {
@@ -88,7 +88,7 @@ foam.CLASS({
       Object result = dao.cmd_(x, obj);
       if ( result instanceof ClusterCommand ) {
         cmd = (ClusterCommand) result;
-        cmd.addHop(x, "replyFrom", support.getConfigId());
+        cmd.addHop(x, "reply");
       }
       return result;
       `

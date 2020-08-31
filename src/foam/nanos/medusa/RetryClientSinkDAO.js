@@ -205,7 +205,9 @@ foam.CLASS({
     },
     {
       name: 'eof',
-      javaCode: `//nop`
+      javaCode: `
+      getLogger().debug("eof");
+      `
     },
     {
       name: 'reset',

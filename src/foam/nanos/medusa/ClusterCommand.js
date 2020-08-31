@@ -21,6 +21,7 @@ foam.CLASS({
     'foam.nanos.auth.User',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
+    'foam.nanos.pm.PM',
     'foam.nanos.session.Session',
     'java.util.concurrent.ThreadLocalRandom',
     'java.util.Random',
@@ -98,24 +99,25 @@ foam.CLASS({
         {
           name: 'op',
           type: 'String'
-        },
-        {
-          name: 'hostname',
-          type: 'String'
         }
       ],
       type: 'foam.nanos.medusa.ClusterCommand',
       javaCode: `
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      if ( foam.util.SafetyUtil.isEmpty(hostname) ) {
-        hostname = support.getConfigId();
-      }
-      if ( getHops() == null ) {
-        setHops(new ClusterCommandHop[] { new ClusterCommandHop(hostname, op) });
+      ClusterCommandHop[] existing = getHops();
+      if ( existing == null ||
+           existing.length == 0 ) {
+        setHops(new ClusterCommandHop[] { new ClusterCommandHop(support.getConfigId(), op) });
       } else {
-        ClusterCommandHop[] hops = new ClusterCommandHop[getHops().length + 1];
-        System.arraycopy(getHops(), 0, hops, 0, getHops().length);
-        hops[hops.length - 1] = new ClusterCommandHop(hostname, op);
+        // set destination on previous hop
+        ClusterCommandHop hop = existing[existing.length -1];
+        PM pm = hop.getPm();
+        pm.setEndTime(new java.util.Date());
+        pm.setName(PM.combine(pm.getName(), support.getConfigId()));
+        // start next hop
+        ClusterCommandHop[] hops = new ClusterCommandHop[existing.length + 1];
+        System.arraycopy(existing, 0, hops, 0, existing.length);
+        hops[hops.length - 1] = new ClusterCommandHop(support.getConfigId(), op);
         setHops(hops);
       }
       return this;
@@ -130,16 +132,13 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      Logger logger = (Logger) x.get("logger");
       ClusterCommandHop[] hops = (ClusterCommandHop[]) getHops();
-      long timestamp = hops[0].getTimestamp();
-      long starttime = timestamp;
-      logger.debug("ClusterCommandHop", "hostname", "op", "time");
+      Logger logger = (Logger) x.get("logger");
+      logger.debug("hops", hops.length);
       for ( ClusterCommandHop hop : hops ) {
-        logger.debug("ClusterCommandHop", hop.getHostname(), hop.getOp(), timestamp-hop.getTimestamp());
-        timestamp = hop.getTimestamp();
+        PM pm = hop.getPm();
+        pm.log(x);
       }
-      logger.debug("ClusterCommandHop", "total", hops.length, timestamp-starttime);
       `
     }
   ]
