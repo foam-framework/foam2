@@ -61,7 +61,10 @@ foam.CLASS({
           ClassInfo ci = (ClassInfo)cls.getField("classInfo_").get(o);
           PropertyInfo pi = (PropertyInfo)ci.getAxiomByName(getNestedProperty());
           pi.set(o, value);
-        } catch ( Throwable t ) {}
+        } catch ( Throwable t ) {
+          Logger logger = (Logger) getX().get("logger");
+          logger.error(t);
+        }
       `
     },
     {
@@ -141,6 +144,8 @@ foam.CLASS({
           ClassInfo ci = getPropertyClassInfo(prop);
           return returnDotExprForNestedProperty(ci, propName, ++i, propExpr);
         } catch ( Throwable t ) {
+          Logger logger = (Logger) getX().get("logger");
+          logger.error(t);
           return null;
         }
       `
@@ -222,6 +227,8 @@ foam.CLASS({
         try {
           return prop.getClassInfo().getObjClass().getMethod("find" + StringUtil.capitalize(prop.getName()), foam.core.X.class);
         } catch( Throwable t ) {
+          Logger logger = (Logger) getX().get("logger");
+          logger.error(t);
           return null;
         }
       `
