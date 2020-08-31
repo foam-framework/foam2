@@ -249,7 +249,7 @@ foam.CLASS({
           var sectionElement = this.E('span');
           var returnElement = this.E()
             .start('h3')
-              .add(category.name)
+              .add({ data : category, clsInfo : category.cls_.NAME.name, default : category.name })
             .end()
             .add(sectionElement);
           var previewIdsPromise = self.getCategoryDAO_(category.id).limit(6)
