@@ -54,7 +54,7 @@ foam.CLASS({
           notification.setNotificationType("Capability Status Update");
           notification.setCreated(new Date());
           notification.setBody(sb.toString());
-          notificationDAO.put(notification);
+          user.doNotify(x, notification);
         }
       }, "Send Notification On Top Level Capability Status Update");
       `
