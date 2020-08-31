@@ -91,8 +91,7 @@ foam.CLASS({
         this.wizardlets = wizardlets.filter(wizardlet => {
           return wizardlet.ucj === null ||
           (
-            // wizardlet.ucj.status != this.CapabilityJunctionStatus.GRANTED &&
-            // ! wizardlet.ucj.isRenewable && 
+            wizardlet.ucj.status != this.CapabilityJunctionStatus.GRANTED &&
             wizardlet.ucj.status != this.CapabilityJunctionStatus.PENDING
           )
         });

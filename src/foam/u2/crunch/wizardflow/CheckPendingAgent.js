@@ -60,8 +60,7 @@ foam.CLASS({
       
       var toLaunchOrNot = false;
       if ( ucj ) {
-        var statusGranted = false;
-        // ucj.status === this.CapabilityJunctionStatus.GRANTED && ! ucj.isRenewable;
+        var statusGranted = ucj.status === this.CapabilityJunctionStatus.GRANTED;
         var statusPending = ucj.status === this.CapabilityJunctionStatus.PENDING 
           || ucj.status === this.CapabilityJunctionStatus.APPROVED;
         if ( statusGranted || statusPending ) {
