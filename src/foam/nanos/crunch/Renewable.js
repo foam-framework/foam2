@@ -86,21 +86,6 @@ foam.CLASS({
       `
     },
     {
-      name: 'updateDependentRenewalStatus',
-      args: [
-        { name: 'dependent', javaType: 'foam.nanos.crunch.UserCapabilityJunction' }
-      ],
-      javaType: 'foam.nanos.crunch.UserCapabilityJunction',
-      javaCode: `
-        if ( getIsExpired() ) dependent.setIsExpired(true);
-        if ( getIsInRenewablePeriod() ) dependent.setIsInRenewablePeriod(true);
-        if ( getIsInGracePeriod() ) dependent.setIsInGracePeriod(true);
-        if ( getIsRenewable() ) dependent.setIsRenewable(true);
-
-        return dependent;
-      `
-    },
-    {
       name: 'resetRenewalStatus',
       javaCode: `
         clearIsInRenewablePeriod();

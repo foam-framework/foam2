@@ -384,10 +384,6 @@ foam.CLASS({
           if ( ! cap.getEnabled() ) continue;
           UserCapabilityJunction ucJunction = crunchService.getJunctionForSubject(x, ccJunction.getTargetId(), subject);
 
-          if ( ucJunction.getIsRenewable() ) { 
-            ucj = ucJunction.updateDependentRenewalStatus(ucj);
-          }
-
           if ( ucJunction != null && ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED ) 
             continue;
 
