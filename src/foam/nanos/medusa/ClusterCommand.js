@@ -133,8 +133,6 @@ foam.CLASS({
       ],
       javaCode: `
       ClusterCommandHop[] hops = (ClusterCommandHop[]) getHops();
-      Logger logger = (Logger) x.get("logger");
-      logger.debug("hops", hops.length);
       for ( ClusterCommandHop hop : hops ) {
         PM pm = hop.getPm();
         pm.log(x);
