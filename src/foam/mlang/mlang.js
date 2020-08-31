@@ -2751,7 +2751,7 @@ foam.CLASS({
     {
       name: 'put',
       code: function put(o, sub) {
-        var a = [o.cls_];
+        var a = [o.cls_.id];
         for ( var i = 0 ; i < this.exprs.length ; i++ )
           a[i+1] = this.exprs[i].f(o);
         this.projectionWithClass.push(a);
