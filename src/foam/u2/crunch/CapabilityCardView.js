@@ -76,7 +76,7 @@ foam.CLASS({
             'float': 'left'
           })
         .end()
-        .add(this.slot(function(cjStatus) {//{ data: cjStatus }
+        .add(this.slot(function(cjStatus) {
           return this.E().start(self.ReadOnlyEnumView, { data : cjStatus, clsInfo : cjStatus.cls_.LABEL.name, default : cjStatus.label })
             .addClass(style.myClass('badge'))
             .style({ 'background-color': cjStatus.background })
