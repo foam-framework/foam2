@@ -11,7 +11,7 @@ foam.CLASS({
   sections: [
     {
       name: 'ucjExpirySection',
-      isAvailable: function(renewable) { return renewable; }
+      isAvailable: function(isRenewable) { return isRenewable; }
     }
   ],
 
@@ -34,9 +34,6 @@ foam.CLASS({
       section: 'ucjExpirySection',
       javaGetter: `
         return getIsExpired() || getIsInRenewablePeriod() || getIsInGracePeriod();
-      `,
-      javaSetter: `
-        throw new RuntimeException("Error setting property isRenewable: This property should be managed by system");
       `
     },
     {
