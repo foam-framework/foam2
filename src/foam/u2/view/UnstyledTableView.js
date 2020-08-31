@@ -33,7 +33,6 @@ foam.CLASS({
   ],
 
   imports: [
-    'ctrl',
     'dblclick?',
     'editRecord?',
     'filteredTableColumns?',
@@ -443,7 +442,7 @@ foam.CLASS({
                   }).
                   callIf(view.dblclick && ! view.disableUserSelection, function() {
                     tableRowElement.on('dblclick', function() {
-                      if ( !thisObjValue ) {
+                      if ( ! thisObjValue ) {
                         dao.inX(ctrl.__subContext__).find(obj.id).then(function(v) {
                           thisObjValue = v;//as we here do not have whole object we need 
                           view.dblclick && view.dblclick(thisObjValue);

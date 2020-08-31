@@ -67,6 +67,11 @@ public class ServerCrunchService implements CrunchService {
       Capability cap = (Capability) capabilityDAO.find(sourceCapabilityId);
 
       alreadyListed.add(sourceCapabilityId);
+
+      if ( cap instanceof MinMaxCapability && ! rootId.equals(sourceCapabilityId) ) {
+        grantPath.add(this.getGrantPath(x, sourceCapabilityId));
+        continue;
+      }
       grantPath.add(cap);
 
       // Enqueue prerequisites for adding to grant path
@@ -113,8 +118,15 @@ public class ServerCrunchService implements CrunchService {
   }
 
   public UserCapabilityJunction getJunction(X x, String capabilityId) {
-    User user = ((Subject) x.get("subject")).getUser();
-    User realUser = ((Subject) x.get("subject")).getRealUser();
+    Subject subject = (Subject) x.get("subject");
+    return this.getJunctionForSubject(x, capabilityId, subject);
+  }
+
+  public UserCapabilityJunction getJunctionForSubject(
+    X x, String capabilityId,  Subject subject
+  ) {
+    User user = subject.getUser();
+    User realUser = subject.getRealUser();
 
     Predicate acjPredicate = INSTANCE_OF(AgentCapabilityJunction.class);
     Predicate targetPredicate = EQ(UserCapabilityJunction.TARGET_ID, capabilityId);
@@ -189,8 +201,9 @@ public class ServerCrunchService implements CrunchService {
       ucj.setData(data);
     }
     DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
-    userCapabilityJunctionDAO.put(ucj);
+    userCapabilityJunctionDAO.inX(x).put(ucj);
   }
+
   public void maybeIntercept(X x, String[] capabilityOptions) {
     if ( capabilityOptions.length < 1 ) {
       Logger logger = (Logger) x.get("logger");

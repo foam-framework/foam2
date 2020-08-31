@@ -50,7 +50,6 @@ foam.CLASS({
     }
 
     ^feature-column-grid {
-      justify-content: space-between;
       display: inline-flex;
       width: 94%;
       overflow: hidden;
@@ -210,7 +209,8 @@ foam.CLASS({
                     .addClass(self.myClass('featureSection'))
                   .end()
                   .on('click', () => {
-                    self.crunchController.launchWizard(arr[i].id);
+                    self.crunchController
+                      .createWizardSequence(arr[i].id).execute();
                   })
                 .end());
             }
@@ -245,7 +245,7 @@ foam.CLASS({
       // Capability Store Section Previews
       var self = this;
       return self.E()
-        .select(self.visibleCategoryDAO, function(category) {
+        .select(self.visibleCategoryDAO$proxy, function(category) {
           var sectionElement = this.E('span');
           var returnElement = this.E()
             .start('h3')
@@ -267,7 +267,8 @@ foam.CLASS({
                   .start(self.GUnit, { columns: 4 })
                     .tag(self.CapabilityCardView, { data: cap })
                     .on('click', () => {
-                      self.crunchController.launchWizard(cap);
+                      self.crunchController
+                        .createWizardSequence(cap).execute();
                     })
                   .end();
               }
@@ -300,7 +301,8 @@ foam.CLASS({
               .start(self.GUnit, { columns: 4 })
                 .tag(self.CapabilityCardView, { data: cap })
                 .on('click', () => {
-                  self.crunchController.launchWizard(cap);
+                  self.crunchController
+                    .createWizardSequence(cap).execute();
                 })
               .end();
           }

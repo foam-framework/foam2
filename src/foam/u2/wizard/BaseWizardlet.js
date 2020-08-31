@@ -18,12 +18,23 @@ foam.CLASS({
       class: 'Boolean'
     },
     {
+      name: 'currentSection',
+      transient: true
+    },
+    {
       name: 'isValid',
       class: 'Boolean',
-      expression: function (mustBeValid, of, data, data$errors_) {
+      expression: function (mustBeValid, of, data, currentSection, data$errors_) {
+        let sectionErrors = [];
+        if ( currentSection && data$errors_ ) {
+          sectionErrors = data$errors_.filter(error =>
+            currentSection.properties.includes(error[0])
+          );
+        }
+
         if ( ! mustBeValid ) return true;
         if ( ! this.of ) return true;
-        if ( ( ! data ) || data$errors_ ) return false;
+        if ( ( ! data ) || currentSection ? sectionErrors.length > 0 : data$errors_) return false;
         return true;
       }
     }
@@ -32,6 +43,9 @@ foam.CLASS({
   methods: [
     function validate() {
       return this.isValid;
+    },
+    function createView(data) {
+      return null;
     }
   ]
 });
