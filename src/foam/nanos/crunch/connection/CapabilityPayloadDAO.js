@@ -20,14 +20,19 @@ foam.CLASS({
     'foam.mlang.predicate.Predicate',
     'foam.mlang.order.Comparator',
     'foam.nanos.auth.User',
+    'foam.nanos.crunch.UserCapabilityJunction',
     'foam.util.SafetyUtil',
+    'foam.nanos.auth.Subject',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CrunchService',
     'foam.nanos.crunch.connection.CapabilityPayload',
     'java.util.ArrayList',
     'java.util.List',
     'java.util.Map',
-    'java.util.HashMap'
+    'java.util.HashMap',
+    'static foam.mlang.MLang.AND',
+    'static foam.mlang.MLang.OR',
+    'static foam.mlang.MLang.EQ'
   ],
 
   documentation: `
@@ -50,6 +55,52 @@ foam.CLASS({
             setX(x);
             setDelegate(delegate);
           } 
+
+          private Map<String, FObject> walkGrantPath(List grantPath, X x) {
+            DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
+            var capabilityDAO = (DAO) x.get("capabilityDAO");
+            var user = ((Subject)x.get("subject")).getUser();
+            var businessId = user.getId();
+            var userId = user.getCreatedBy();
+
+            var ucjs = ((ArraySink) userCapabilityJunctionDAO.where(
+              OR(
+                EQ(UserCapabilityJunction.SOURCE_ID, userId),
+                EQ(UserCapabilityJunction.SOURCE_ID, businessId)
+              )
+            ).select(new ArraySink())).getArray();
+
+            var capabilities = new ArrayList<Capability>();
+            for ( var ucj : ucjs ) {
+              var capability = (Capability) capabilityDAO.find(((UserCapabilityJunction)ucj).getTargetId());
+              if ( capability != null )
+                capabilities.add(capability);
+            }
+      
+            Map<String,FObject> capabilityDataObjects = new HashMap<>();
+      
+            for ( Object item : grantPath ) {
+              // TODO: Verify that MinMaxCapability lists can be ignored here
+              if ( item instanceof Capability ) {
+                Capability cap = (Capability) item;
+                FObject capDataObject = null;
+                if ( cap.getOf() != null ){
+                  try {
+                    for ( var capability : capabilities ) {
+                      if ( capability.getName() == cap.getName())
+                        capDataObject = capability;
+                    }
+                    if ( capDataObject == null )
+                      capDataObject = (FObject) cap.getOf().newInstance();
+                  } catch (Exception e){
+                    throw new RuntimeException(e);
+                  }
+                }
+                capabilityDataObjects.put(cap.getName(), capDataObject);
+              }
+            }
+            return capabilityDataObjects;
+          }
         `);
       }
     }
@@ -71,25 +122,7 @@ foam.CLASS({
         }
 
         CrunchService crunchService = (CrunchService) x.get("crunchService");
-
-        List grantPath = crunchService.getGrantPath(x, idToString);
-        Map<String,FObject> capabilityDataObjects = new HashMap<>();
-
-        for ( Object item : grantPath ) {
-          // TODO: Verify that MinMaxCapability lists can be ignored here
-          if ( item instanceof Capability ) {
-            Capability cap = (Capability) item;
-            FObject capDataObject = null;
-            if ( cap.getOf() != null ){
-              try {
-                capDataObject = (FObject) cap.getOf().newInstance();
-              } catch (Exception e){
-                throw new RuntimeException(e);
-              }
-            }
-            capabilityDataObjects.put(cap.getName(), capDataObject);
-          }
-        }
+        Map<String,FObject> capabilityDataObjects = walkGrantPath(crunchService.getGrantPath(x, idToString), x);
 
         CapabilityPayload capabilityPayload = new CapabilityPayload.Builder(x)
           .setCapabilityDataObjects(new HashMap<String,FObject>(capabilityDataObjects))
@@ -120,24 +153,7 @@ foam.CLASS({
       
         // iterate through each capability from the select and calculate separate grant path
         for ( Capability rootCapability : rootCapabilities ){
-          List grantPath = crunchService.getGrantPath(x, rootCapability.getId());
-          Map<String,FObject> capabilityDataObjects = new HashMap<>();
-
-          // Adding separate capabilityDataObject map
-          for ( Object item : grantPath ) {
-            if ( item instanceof Capability ) {
-              Capability cap = (Capability) item;
-              FObject capDataObject = null;
-              if ( cap.getOf() != null ){
-                try {
-                  capDataObject = (FObject) cap.getOf().newInstance();
-                } catch (Exception e){
-                  throw new RuntimeException(e);
-                }
-              }
-              capabilityDataObjects.put(cap.getName(), capDataObject);
-            }
-          }
+          var capabilityDataObjects = walkGrantPath(crunchService.getGrantPath(x, rootCapability.getId()), x);
 
           CapabilityPayload capabilityPayload = new CapabilityPayload.Builder(x)
             .setCapabilityDataObjects(new HashMap<String,FObject>(capabilityDataObjects))
