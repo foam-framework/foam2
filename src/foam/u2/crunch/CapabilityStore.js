@@ -209,7 +209,8 @@ foam.CLASS({
                     .addClass(self.myClass('featureSection'))
                   .end()
                   .on('click', () => {
-                    self.crunchController.launchWizard(arr[i].id);
+                    self.crunchController
+                      .createWizardSequence(arr[i].id).execute();
                   })
                 .end());
             }
@@ -266,7 +267,8 @@ foam.CLASS({
                   .start(self.GUnit, { columns: 4 })
                     .tag(self.CapabilityCardView, { data: cap })
                     .on('click', () => {
-                      self.crunchController.launchWizard(cap);
+                      self.crunchController
+                        .createWizardSequence(cap).execute();
                     })
                   .end();
               }
@@ -299,7 +301,8 @@ foam.CLASS({
               .start(self.GUnit, { columns: 4 })
                 .tag(self.CapabilityCardView, { data: cap })
                 .on('click', () => {
-                  self.crunchController.launchWizard(cap);
+                  self.crunchController
+                    .createWizardSequence(cap).execute();
                 })
               .end();
           }
