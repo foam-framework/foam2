@@ -39,20 +39,34 @@ foam.CLASS({
   methods: [
     function set(o, val) {
       if ( this.nestedProperty.includes('.') ) return; 
-      // var prop = o.cls_.getAxiomByName(this.nestedProperty.contains('.') ? this.nestedProperty.split('.')[0] : this.nestedProperty);
-      // if ( foam.core.Reference.isInstance(prop) ) return;
-      // if ( foam.core.FObjectProperty.isInstance(prop) ) {
-      //   var propNames = this.nestedProperty.split('.');
-      //   var obj = prop.get(o);
-      //   var of = prop.of;
-      //   for ( var i = 0 ; i < propNames.length; i++ ) {
-      //     if ( ! obj ) {
-      //       obj = prop.of.create();
-      //what to do when there is a reference for fobjectProperty object. would we like to set it as far as we can????
-      //     }
-      //   }
-      // }
       o.cls_.getAxiomByName(this.nestedProperty).set(o, val);
+    },
+    {
+      name: 'set',
+      args: [
+        {
+          name: 'o',
+          type: 'Object'
+        },
+        {
+          name: 'value',
+          type: 'Object'
+        }
+      ],
+      code: function(o, val) {
+        if ( this.nestedProperty.includes('.') ) return; 
+        o.cls_.getAxiomByName(this.nestedProperty).set(o, val);
+      },
+      javaCode: `
+        if ( getNestedProperty().contains(".") )
+          return;
+        Class cls = o.getClass();
+        try {
+          ClassInfo ci = (ClassInfo)cls.getField("classInfo_").get(o);
+          PropertyInfo pi = (PropertyInfo)ci.getAxiomByName(getNestedProperty());
+          pi.set(o, value);
+        } catch ( Throwable t ) {}
+      `
     },
     {
       name: 'toString',
