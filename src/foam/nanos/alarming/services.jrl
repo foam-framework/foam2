@@ -72,9 +72,3 @@ p({
     `
   ,"client":"{\"of\":\"foam.nanos.alarming.OMName\"}"
 })
-
-p({
-  "class":"foam.nanos.boot.NSpec",
-  "name":"alarmConfigName",
-  "service":{"class":"foam.nanos.alarming.AlarmConfigName"}
-})
