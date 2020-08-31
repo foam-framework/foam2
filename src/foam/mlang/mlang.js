@@ -3989,7 +3989,10 @@ foam.CLASS({
         }
 
         if ( list.size() == getArgs().length ) {
-          return new Constant(list.stream().reduce(this::reduce).get());
+          var result = list.stream().reduce(this::reduce).get();
+          if ( Double.isFinite(result) ) {
+            return new Constant(result);
+          }
         }
         return this;
       `
