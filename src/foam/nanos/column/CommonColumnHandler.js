@@ -61,15 +61,6 @@ foam.CLASS({
     function returnAxiomHeader(axiom) {
       return axiom.tableHeader  ? axiom.tableHeader() : axiom.label;
     },
-    function returnTableColumnForColumnName(col, allColumns) {
-      if ( this.canColumnBeTreatedAsAnAxiom(col) ) {
-        return col;
-      }
-      if ( col.indexOf('.') > -1 ) {
-        return null;
-      }
-      return allColumns.find( c =>  this.returnPropertyNamesForColumn(c) === col);
-    },
     function getClassForNestedPropertyObject(cls, propNames) {
       var of_ = cls;
       for ( var i = 0 ; i < propNames.length - 1 ; i++ ) {
@@ -124,7 +115,8 @@ foam.CLASS({
       var nestedPropertyNames = [];
       var indexOfValuesForCorrespondingPropertyNames = [];
       for ( var i = 0 ; i < propNames.length ; i++ ) {
-        if ( ! propNames[i].includes('.') ) continue;
+        if ( ! propNames[i].includes('.') )
+          continue;
         nestedPropertyNames.push(propNames[i]);
         indexOfValuesForCorrespondingPropertyNames.push(i);
       }
