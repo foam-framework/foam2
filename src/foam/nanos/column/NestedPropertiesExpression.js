@@ -37,10 +37,6 @@ foam.CLASS({
     }
   ],
   methods: [
-    function set(o, val) {
-      if ( this.nestedProperty.includes('.') ) return; 
-      o.cls_.getAxiomByName(this.nestedProperty).set(o, val);
-    },
     {
       name: 'set',
       args: [

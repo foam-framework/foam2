@@ -90,15 +90,12 @@ foam.CLASS({
       return propertyNamesToQuery;
     },
     function returnColumnPropertyForPropertyName(props, of, col, allColumns, property) {
-      var colObj = foam.Array.isInstance(col) ? col[0] : col;
+      var colObj = foam.Array.isInstance(col) ? col[1] && col[1][property] ? col[1] : col[0] : col ;
 
-      if ( this.canColumnBeTreatedAsAnAxiom(colObj) ) {
+      if ( colObj && this.canColumnBeTreatedAsAnAxiom(colObj) ) {
         if ( colObj[property] )
           return colObj[property];
       }
-      var tableColumn = this.returnTableColumnForColumnName(col, allColumns);
-      if ( tableColumn && tableColumn[property] )
-        return tableColumn[property];
       var prop = props.find(p => p.fullPropertyName ===this.returnPropertyNamesForColumn(colObj) );
       return  prop ? prop.property[property] : of.getAxiomByName(this.returnPropertyNamesForColumn(colObj))[property];
     },

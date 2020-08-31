@@ -333,14 +333,14 @@ foam.CLASS({
 
               // Render the table headers for the property columns.
               forEach(columns_, function([col, overrides]) {
-                let found = view.props.find(p => p.fullPropertyName === view.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(col));
+                var found = view.props.find(p => p.fullPropertyName === view.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(col));
                 var prop = found ? found.property : view.of.getAxiomByName(view.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(col));
                 var isFirstLevelProperty = view.columnHandler.canColumnBeTreatedAsAnAxiom(col) ? true : col.indexOf('.') === -1;
 
                 if ( ! prop )
                   return;
 
-                var tableWidth = view.columnHandler.returnColumnPropertyForPropertyName(view.props, view.of, col, view.allColumns, 'tableWidth');
+                var tableWidth = view.columnHandler.returnColumnPropertyForPropertyName(view.props, view.of, [ col, overrides], view.allColumns, 'tableWidth');
 
                 this.start().
                   addClass(view.myClass('th')).
@@ -560,17 +560,12 @@ foam.CLASS({
                       objForCurrentProperty = nestedPropertiesObjsMap[view.columnHandler.getNestedPropertyNameExcludingLastProperty(prop.fullPropertyName)];
                     }
 
-                    prop = prop && prop.property ? prop.property : view.of.getAxiomByName(propName);
+                    prop = objForCurrentProperty ? objForCurrentProperty.cls_.getAxiomByName(view.columnHandler.getNameOfLastPropertyForNestedProperty(propName)) : prop && prop.property ? prop.property : view.of.getAxiomByName(propName);
                     var tableWidth = view.columnHandler.returnColumnPropertyForPropertyName(view.props, view.of, view.columns_[j], view.allColumns, 'tableWidth');
 
-                    prop = objForCurrentProperty ? objForCurrentProperty.cls_.getAxiomByName(propName) : prop;
-                    // var stringValue;
-                    var column = typeof view.columns_[j] === 'string' || ! view.columns_[j].tableCellFormatter ? prop : view.columns_[j];
-                    // if ( overrides ) column = column.clone().copyFrom(overrides);
-
                     var elmt = tableRowElement.E().addClass(view.myClass('td')).style({flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0'}).
-                    callOn(column.tableCellFormatter, 'format', [
-                      column.f ? column.f(objForCurrentProperty) : null, objForCurrentProperty, column
+                    callOn(prop.tableCellFormatter, 'format', [
+                      prop.f ? prop.f(objForCurrentProperty) : null, objForCurrentProperty, prop
                     ]);
                     tableRowElement.add(elmt);
                   }
