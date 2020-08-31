@@ -84,7 +84,9 @@ foam.CLASS({
       javaCode: `
     if ( x == null ) return;
     if ( getIsError() ) return;
-    setEndTime(new java.util.Date());
+    if ( getEndTime() == null ) {
+      setEndTime(new java.util.Date());
+    }
     PMLogger pmLogger = (PMLogger) x.get(DAOPMLogger.SERVICE_NAME);
     if ( pmLogger != null ) {
       pmLogger.log(this);
