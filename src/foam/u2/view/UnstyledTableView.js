@@ -431,7 +431,7 @@ foam.CLASS({
               valPromises.then(function(values) {
 
                 for ( var i = 0 ; i < values.projection.length ; i++ ) {
-                  var obj = values.array[i];
+                  const obj = values.array[i];
                   var nestedPropertyValues = view.columnHandler.filterOutValuesForNotNestedProperties(values.projection[i], nastedPropertyNamesAndItsIndexes[1]);
                   var nestedPropertiesObjsMap = view.columnHandler.groupObjectsThatAreRelatedToNestedProperties(view.of, nastedPropertyNamesAndItsIndexes[0], nestedPropertyValues);
                   var thisObjValue;
