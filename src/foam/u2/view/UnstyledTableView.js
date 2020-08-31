@@ -560,9 +560,10 @@ foam.CLASS({
                       objForCurrentProperty = nestedPropertiesObjsMap[view.columnHandler.getNestedPropertyNameExcludingLastProperty(prop.fullPropertyName)];
                     }
 
-                    prop = prop ? prop.property : view.of.getAxiomByName(propName);
+                    prop = prop && prop.property ? prop.property : view.of.getAxiomByName(propName);
                     var tableWidth = view.columnHandler.returnColumnPropertyForPropertyName(view.props, view.of, view.columns_[j], view.allColumns, 'tableWidth');
 
+                    prop = objForCurrentProperty ? objForCurrentProperty.cls_.getAxiomByName(propName) : prop;
                     // var stringValue;
                     var column = typeof view.columns_[j] === 'string' || ! view.columns_[j].tableCellFormatter ? prop : view.columns_[j];
                     // if ( overrides ) column = column.clone().copyFrom(overrides);
