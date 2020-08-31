@@ -210,7 +210,7 @@ foam.CLASS({
       documentation: 'Width of the whole table. Used to get proper scrolling on narrow screens.',
       expression: function(props) {
         return this.columns_.reduce((acc, col) => {
-          return acc + (this.columnHandler.returnColumnPropertyForPropertyName(this.props, this.of, col, this.allColumns, 'tableWidth') || this.MIN_COLUMN_WIDTH_FALLBACK);
+          return acc + (this.columnHandler.returnPropertyForColumn(this.props, this.of, col, 'tableWidth') || this.MIN_COLUMN_WIDTH_FALLBACK);
         }, this.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH) + 'px';
       }
     },
@@ -339,7 +339,7 @@ foam.CLASS({
                 if ( ! prop )
                   return;
 
-                var tableWidth = view.columnHandler.returnColumnPropertyForPropertyName(view.props, view.of, [ col, overrides], view.allColumns, 'tableWidth');
+                var tableWidth = view.columnHandler.returnPropertyForColumn(view.props, view.of, [ col, overrides], 'tableWidth');
 
                 this.start().
                   addClass(view.myClass('th')).
@@ -560,7 +560,7 @@ foam.CLASS({
                     }
 
                     prop = objForCurrentProperty ? objForCurrentProperty.cls_.getAxiomByName(view.columnHandler.getNameOfLastPropertyForNestedProperty(propName)) : prop && prop.property ? prop.property : view.of.getAxiomByName(propName);
-                    var tableWidth = view.columnHandler.returnColumnPropertyForPropertyName(view.props, view.of, view.columns_[j], view.allColumns, 'tableWidth');
+                    var tableWidth = view.columnHandler.returnPropertyForColumn(view.props, view.of, view.columns_[j], 'tableWidth');
 
                     var elmt = tableRowElement.E().addClass(view.myClass('td')).style({flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0'}).
                     callOn(prop.tableCellFormatter, 'format', [

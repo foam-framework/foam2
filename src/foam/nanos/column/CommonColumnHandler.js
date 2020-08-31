@@ -80,7 +80,7 @@ foam.CLASS({
       });
       return propertyNamesToQuery;
     },
-    function returnColumnPropertyForPropertyName(props, of, col, allColumns, property) {
+    function returnPropertyForColumn(props, of, col, property) {
       var colObj = foam.Array.isInstance(col) ? col[1] && col[1][property] ? col[1] : col[0] : col ;
 
       if ( colObj && this.canColumnBeTreatedAsAnAxiom(colObj) ) {
