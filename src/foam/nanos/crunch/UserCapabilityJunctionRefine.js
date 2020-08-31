@@ -32,6 +32,10 @@ foam.CLASS({
     'data'
   ],
 
+  sections: [
+    { name: 'ucjExpirySection' }
+  ],
+
   properties: [
     {
       name: 'id',
@@ -72,7 +76,14 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.nanos.crunch.CapabilityJunctionStatus',
       value: foam.nanos.crunch.CapabilityJunctionStatus.ACTION_REQUIRED
-    }
+    },
+    // renewable
+    { name: 'isExpired', section: 'ucjExpirySection' },
+    { name: 'isRenewable', section: 'ucjExpirySection' },
+    { name: 'isInRenewablePeriod', section: 'ucjExpirySection' },
+    { name: 'isInGracePeriod', section: 'ucjExpirySection' },
+    { name: 'expiry', section: 'ucjExpirySection' },
+    { name: 'gracePeriod', section: 'ucjExpirySection' }
   ],
 
   methods: [

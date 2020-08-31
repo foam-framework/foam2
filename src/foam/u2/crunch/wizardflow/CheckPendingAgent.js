@@ -16,6 +16,7 @@ foam.CLASS({
   imports: [
     'capabilityDAO',
     'capabilities',
+    'ctrl',
     'endSequence',
     'rootCapability',
     'subject',
@@ -23,6 +24,7 @@ foam.CLASS({
   ],
 
   requires: [
+    'foam.log.LogLevel',
     'foam.nanos.crunch.AgentCapabilityJunction',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction'
@@ -58,7 +60,8 @@ foam.CLASS({
       
       var toLaunchOrNot = false;
       if ( ucj ) {
-        var statusGranted = ucj.status === this.CapabilityJunctionStatus.GRANTED;
+        var statusGranted = false;
+        // ucj.status === this.CapabilityJunctionStatus.GRANTED && ! ucj.isRenewable;
         var statusPending = ucj.status === this.CapabilityJunctionStatus.PENDING 
           || ucj.status === this.CapabilityJunctionStatus.APPROVED;
         if ( statusGranted || statusPending ) {

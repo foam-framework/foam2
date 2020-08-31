@@ -8,18 +8,10 @@ foam.CLASS({
   package: 'foam.nanos.crunch',
   name: 'Renewable',
 
-  sections: [
-    {
-      name: 'ucjExpirySection',
-      isAvailable: function(isRenewable) { return isRenewable; }
-    }
-  ],
-
   properties: [
     {
       name: 'isExpired',
       class: 'Boolean',
-      section: 'ucjExpirySection',
       javaSetter: `
         isExpired_ = val;
         isExpiredIsSet_ = true;
@@ -31,7 +23,7 @@ foam.CLASS({
     {
       name: 'isRenewable',
       class: 'Boolean',
-      section: 'ucjExpirySection',
+      getter: () => { return this.isExpired || this.isInRenewablePeriod || this.isInGracePeriod; },
       javaGetter: `
         return getIsExpired() || getIsInRenewablePeriod() || getIsInGracePeriod();
       `
@@ -39,35 +31,30 @@ foam.CLASS({
     {
       name: 'isInRenewablePeriod',
       class: 'Boolean',
-      section: 'ucjExpirySection',
       javaSetter: `
         isInRenewablePeriod_ = val;
         isInRenewablePeriodIsSet_ = true;
         if ( isInRenewablePeriod_ ) {
           isExpired_ = false;
           isInGracePeriod_ = false;
-          isRenewable_ = true;
         }
       `
     },
     {
       name: 'isInGracePeriod',
       class: 'Boolean',
-      section: 'ucjExpirySection',
       javaSetter: `
         isInGracePeriod_ = val;
         isInGracePeriodIsSet_ = true;
         if ( isInGracePeriod_ ) {
           isExpired_ = false;
           isInRenewablePeriod_ = false;
-          isRenewable_ = true;
         }
       `
     },
     {
       name: 'expiry',
       class: 'DateTime',
-      section: 'ucjExpirySection',
       documentation: `
         The date of expiry for this ucj. After this date, the ucj will stay GRANTED
         for a gracePeriod, or go into EXPIRED status, if no gracePeriod is set.
@@ -76,7 +63,6 @@ foam.CLASS({
     {
       name: 'gracePeriod',
       class: 'Int',
-      section: 'ucjExpirySection',
       documentation: `
         Number of days left that a user can use the Capability in this ucj after it has expired
       `
@@ -112,6 +98,15 @@ foam.CLASS({
         if ( getIsRenewable() ) dependent.setIsRenewable(true);
 
         return dependent;
+      `
+    },
+    {
+      name: 'resetRenewalStatus',
+      javaCode: `
+        clearIsInRenewablePeriod();
+        clearIsInGracePeriod();
+        clearIsExpired();
+        clearIsRenewable();
       `
     }
   ]

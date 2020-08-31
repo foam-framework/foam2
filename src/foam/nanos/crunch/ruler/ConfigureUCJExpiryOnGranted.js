@@ -48,8 +48,8 @@ foam.CLASS({
               )
             ));
 
-            if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED 
-              || ( old != null && old.getStatus() == CapabilityJunctionStatus.GRANTED ) ) 
+            if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED || ucj.getIsRenewable() 
+              || ( old != null && ! old.getIsRenewable() && old.getStatus() == CapabilityJunctionStatus.GRANTED ) ) 
               return;
               
             Capability capability = (Capability) ucj.findTargetId(x);
@@ -60,6 +60,8 @@ foam.CLASS({
             }
 
             Date junctionExpiry = capability.getExpiry();
+
+            ucj.resetRenewalStatus();
     
             if ( capability.getDuration() > 0 ) {
               Date today = new Date();
