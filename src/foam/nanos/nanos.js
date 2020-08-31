@@ -28,6 +28,7 @@ FOAM_FILES([
   { name: "foam/nanos/notification/email/SMTPConfig" },
   { name: "foam/nanos/app/ClientAppConfigService" },
   { name: "foam/nanos/controller/ApplicationController" },
+  { name: "foam/nanos/mobile/controller/MobileController" },
   { name: "foam/nanos/app/Mode" },
   { name: 'foam/nanos/alarming/Alarm' },
   { name: 'foam/nanos/alarming/Alarming' },

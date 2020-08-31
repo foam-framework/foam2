@@ -9,10 +9,11 @@ foam.CLASS({
   name: 'AbstractMenu',
   abstract: true,
 
-  imports: [ 'menuListener?', 'pushMenu' ],
+  imports: [ 'menuListener?', 'pushMenu', 'isMenuOpen' ],
 
   methods: [
     function launch(X, menu) {
+    this.isMenuOpen = false;
       X.stack.push(
         function() {
           // Set the menuId and call the menuListener so that the
