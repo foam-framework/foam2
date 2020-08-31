@@ -386,8 +386,8 @@ foam.CLASS({
 
           if ( ucJunction.getIsRenewable() ) { 
             ucj = ucJunction.updateDependentRenewalStatus(ucj);
-            return ucJunction.getStatus();
           }
+
           if ( ucJunction != null && ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED ) 
             continue;
 

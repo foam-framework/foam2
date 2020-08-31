@@ -32,7 +32,10 @@ foam.CLASS({
         agency.submit(x, new ContextAgent() {
           @Override
           public void execute(X x) {
-            UserCapabilityJunction ucj = (UserCapabilityJunction) obj;         
+            UserCapabilityJunction ucj = (UserCapabilityJunction) obj; 
+
+            CapabilityJunctionStatus chainedStatus = checkPrereqsChainedStatus(x, ucj);
+            
             if ( ucj.getStatus() != CapabilityJunctionStatus.PENDING && ucj.getStatus() != CapabilityJunctionStatus.APPROVED ) return;
 
             // the following should be checked if the result of previous rule ( validateUCJDataOnPut ) 
@@ -42,8 +45,6 @@ foam.CLASS({
 
             boolean reviewRequired = capability.getReviewRequired();
             boolean wasApproved = ucj.getStatus() == CapabilityJunctionStatus.APPROVED;
-
-            CapabilityJunctionStatus chainedStatus = checkPrereqsChainedStatus(x, ucj);
 
             // Update current UCJ status
 
