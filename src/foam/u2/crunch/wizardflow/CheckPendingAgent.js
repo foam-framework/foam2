@@ -62,7 +62,7 @@ foam.CLASS({
       var shouldReopen = false;
       if ( ucj ) {
         var statusPending = ucj.status === this.CapabilityJunctionStatus.PENDING;
-        var shouldReopen = await this.crunchService.maybeReopen(this.ctrl.__subContext__, wizardlet.capability.id);
+        var shouldReopen = await this.crunchService.maybeReopen(this.ctrl.__subContext__, ucj.targetId);
         if ( ! shouldReopen ) {
           var message = statusPending ? this.CANNOT_OPEN_PENDING : this.CANNOT_OPEN_GRANTED;
           this.ctrl.notify(message, '', this.LogLevel.INFO, true);
