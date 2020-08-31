@@ -154,6 +154,26 @@ foam.INTERFACE({
           type: 'String[]'
         },
       ]
+    },
+    {
+      name: 'maybeReopen',
+      documentation: `
+        Checks if a capability can be reopened from the appstore by checking if its :
+          - non-PENDING
+          - non-GRANTED or renewable
+      `,
+      async: true,
+      type: 'Boolean',
+      args: [
+        {
+          name: 'x',
+          type: 'Context',
+        },
+        {
+          name: 'capabilityId',
+          type: 'String'
+        }
+      ]
     }
   ],
 });
