@@ -39,55 +39,13 @@ foam.INTERFACE({
             { name: 'capabilityIds', type: 'String[]' }
           ],
           body: `
-            List<CapablePayload> payloads = new ArrayList<>();
-
             CrunchService crunchService = (CrunchService) x.get("crunchService");
-            List crunchPath = crunchService.getMultipleCapabilityPath(
-              x, capabilityIds, false);
 
-            for ( Object obj : crunchPath ) {
-              if ( ! (obj instanceof Capability) ) {
-                // Lists correspond to capabilityIds with their own prerequisite
-                // logic, such as MinMaxCapability. Clients will need to be
-                // made aware of these capabilities separately.
-                if ( obj instanceof List ) {
-                  List list = (List) obj;
-
-                  // Add payload object prerequisites
-                  List prereqs = new ArrayList();
-                  for ( int i = 0 ; i < list.size() - 1 ; i++ ) {
-                    Capability prereqCap = (Capability) list.get(i);
-                    list.add(new CapablePayload.Builder(x)
-                      .setCapability(prereqCap)
-                      .build());
-                  }
-
-                  // Add payload object
-                  /* TODO: Figure out why this is an error when adding
-                           support for MinMaxCapability
-                  Capability cap = (Capability) list.get(list.size() - 1);
-                  payloads.add(new CapablePayload.Builder(x)
-                    .setCapability(cap)
-                    .setPrerequisites(prereqs.toArray(
-                      new CapablePayload[list.size()]))
-                    .build());
-                  */
-                  continue;
-                }
-
-                throw new RuntimeException(
-                  "Expected capability or list");
-              }
-              Capability cap = (Capability) obj;
-              payloads.add(new CapablePayload.Builder(x)
-                .setCapability(cap)
-                .build());
-            }
-            
-            // Re-FObjectArray
-            setCapablePayloads(payloads.toArray(
-              new CapablePayload[payloads.size()]
-            ));
+            setCapablePayloads(
+              crunchService.getCapableObjectPayloads(
+                x, capabilityIds
+              )
+            );
           `
         }));
         cls.methods.push(foam.java.Method.create({

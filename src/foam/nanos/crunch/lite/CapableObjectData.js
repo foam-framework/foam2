@@ -20,4 +20,23 @@ foam.CLASS({
       class: 'StringArray',
     }
   ],
+
+  methods: [
+    {
+      // TODO: investigate why this default implementation doesn't
+      //   work when put in the Capable interface itself; this
+      //   behaviour works with mlang.Expressions so it's odd that
+      //   it doesn't work for this case.
+      name: 'setRequirements',
+      flags: ['web'],
+      code: function(capabilityIds) {
+        var crunchService = this.__subContext__['crunchService'];
+        return crunchService.getCapableObjectPayloads(
+          null, capabilityIds
+        ).then(result => {
+          this.capablePayloads = result;
+        })
+      }
+    }
+  ]
 });
