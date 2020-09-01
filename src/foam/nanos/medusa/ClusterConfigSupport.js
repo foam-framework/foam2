@@ -40,6 +40,7 @@ configuration for contacting the primary node.`,
     'foam.mlang.predicate.Predicate',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
+    'foam.nanos.pm.PM',
     'foam.net.Host',
     'foam.util.SafetyUtil',
     'java.net.HttpURLConnection',
@@ -302,6 +303,97 @@ configuration for contacting the primary node.`,
       `
     },
     {
+      documentation: 'Any active region in realm.',
+      name: 'nextZone',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.medusa.ClusterConfig',
+      javaFactory: `
+      ClusterConfig config = getConfig(getX(), getConfigId());
+      long zone = config.getZone();
+      while ( zone > 0 ) {
+        zone -= 1;
+        DAO clusterConfigDAO = (DAO) getX().get("clusterConfigDAO");
+        List<ClusterConfig> configs = ((ArraySink) clusterConfigDAO
+          .where(
+            AND(
+              EQ(ClusterConfig.REGION_STATUS, RegionStatus.ACTIVE),
+              EQ(ClusterConfig.REALM, config.getRealm()),
+              EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
+              EQ(ClusterConfig.ZONE, zone),
+              EQ(ClusterConfig.STATUS, Status.ONLINE),
+              EQ(ClusterConfig.ENABLED, true)
+            ))
+          .orderBy(foam.mlang.MLang.DESC(ClusterConfig.IS_PRIMARY))
+          .select(new ArraySink())).getArray();
+        if ( configs.size() > 0 ) {
+          return configs.get(0);
+        }
+      }
+      throw new RuntimeException("Next Zone not found.");
+      `
+    },
+    {
+      documentation: 'determine the next server to route request to.',
+      name: 'nextServer',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.medusa.ClusterConfig',
+      javaFactory: `
+      ClusterConfig config = getConfig(getX(), getConfigId());
+
+      // standby region -> active region
+      if ( config.getRegionStatus() != RegionStatus.ACTIVE ) {
+        return getActiveRegion();
+      }
+
+      // active region, zone # -> zone # -1 (primary if known)
+      if ( config.getZone() > 0 ) {
+        return getNextZone();
+      }
+
+      // route to primary
+      try {
+        return getPrimary(getX());
+      } catch ( RuntimeException t ) {
+        // if in standalone mode, just route to self if only one mediator enabled.
+        if ( getStandAlone() ) {
+          getLogger().debug("nextServer", t.getMessage(), "fallback to StandAlone");
+          return config;
+        }
+        throw t;
+      }
+      `
+    },
+    {
+      documentation: 'Any active region in realm.',
+      name: 'activeRegion',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.medusa.ClusterConfig',
+      javaFactory: `
+      ClusterConfig config = getConfig(getX(), getConfigId());
+      DAO clusterConfigDAO = (DAO) getX().get("clusterConfigDAO");
+      List<ClusterConfig> configs = ((ArraySink) clusterConfigDAO
+        .where(
+          AND(
+            EQ(ClusterConfig.REGION_STATUS, RegionStatus.ACTIVE),
+            EQ(ClusterConfig.REALM, config.getRealm()),
+            EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
+            EQ(ClusterConfig.STATUS, Status.ONLINE),
+            EQ(ClusterConfig.ENABLED, true)
+          ))
+        // send to outermost zone.
+        .orderBy(foam.mlang.MLang.DESC(ClusterConfig.ZONE))
+//        .orderBy(ClusterConfig.IS_PRIMARY)
+        .select(new ArraySink())).getArray();
+      if ( configs.size() > 0 ) {
+        // TODO: random or round-robin.
+        // Ordered by IS_PRIMARY if any are.
+        return configs.get(0);
+      } else {
+        throw new RuntimeException("Active Region not found.");
+      }
+      `
+    },
+    {
       documentation: 'A single instance is using the medusa journal. No other clustering features are used.',
       name: 'standAlone',
       class: 'Boolean',
@@ -361,7 +453,8 @@ configuration for contacting the primary node.`,
         },
       ],
       javaCode: `
-       try {
+      PM pm = PM.create(x, this.getClass().getSimpleName(), "buildURL");
+      try {
          // TODO: protocol - http will do for now as we are behind the load balancers.
         String address = config.getId();
         DAO hostDAO = (DAO) x.get("hostDAO");
@@ -384,6 +477,8 @@ configuration for contacting the primary node.`,
       } catch (java.net.MalformedURLException | java.net.URISyntaxException e) {
         getLogger().error(e);
         throw new RuntimeException(e);
+      } finally {
+        pm.log(x);
       }
       `
     },
@@ -409,6 +504,8 @@ configuration for contacting the primary node.`,
         }
       ],
       javaCode: `
+      PM pm = PM.create(x, this.getClass().getSimpleName(), "getSocketClientBox");
+      try {
         String address = receiveClusterConfig.getId();
         DAO hostDAO = (DAO) x.get("hostDAO");
         Host host = (Host) hostDAO.find(address);
@@ -422,44 +519,9 @@ configuration for contacting the primary node.`,
         clientBox.setPort(receiveClusterConfig.getPort() + SocketServer.PORT_OFFSET);
         clientBox.setServiceName(serviceName);
         return clientBox;
-      `
-    },
-    {
-      name: 'getTransportlayerBox',
-      type: 'Box',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'serviceName',
-          type: 'String'
-        },
-        {
-          name: 'sendClusterConfig',
-          type: 'ClusterConfig'
-        },
-        {
-          name: 'receiveClusterConfig',
-          type: 'ClusterConfig'
-        },
-        {
-          name: 'useTCP',
-          type: 'Boolean',
-          value: true
-        }
-      ],
-      javaCode: `
-        if ( useTCP == true ) {
-          return getSocketClientBox(x, serviceName, sendClusterConfig, receiveClusterConfig);
-        } else {
-          return new ClusterHTTPBox.Builder(x)
-                  .setAuthorizationType(foam.box.HTTPAuthorizationType.BEARER)
-                  .setSessionID(sendClusterConfig.getSessionId())
-                  .setUrl(buildURL(x, serviceName, null, null, receiveClusterConfig))
-                  .build();
-        }
+      } finally {
+        pm.log(x);
+      }
       `
     },
     {
@@ -489,6 +551,8 @@ configuration for contacting the primary node.`,
       ],
       type: 'foam.nanos.medusa.ClusterConfig',
       javaCode: `
+      PM pm = PM.create(x, this.getClass().getSimpleName(), "getPrimaryDAO");
+      try {
       ClusterConfig primaryConfig = null;
       DAO clusterConfigDAO = (DAO) x.get("clusterConfigDAO");
       List<ClusterConfig> configs = ((ArraySink) clusterConfigDAO
@@ -511,6 +575,9 @@ configuration for contacting the primary node.`,
       } else {
         throw new RuntimeException("Primary not found.");
       }
+      } finally {
+        pm.log(x);
+      }
       `
     },
     {
@@ -527,90 +594,18 @@ configuration for contacting the primary node.`,
       ],
       type: 'foam.nanos.medusa.ClusterConfig',
       javaCode: `
+      PM pm = PM.create(x, this.getClass().getSimpleName(), "getConfig");
+      try {
       ClusterConfig config = (ClusterConfig) ((DAO) x.get("localClusterConfigDAO")).find(id);
       if ( config != null ) {
         return (ClusterConfig) config.fclone();
       }
       getLogger().error("ClusterConfig not found:", id);
       throw new RuntimeException("ClusterConfig not found: "+id);
+      } finally {
+        pm.log(x);
+      }
      `
-    },
-    {
-      documentation: 'Any active region in realm.',
-      name: 'getActiveRegionConfig',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'config',
-          type: 'foam.nanos.medusa.ClusterConfig'
-        }
-      ],
-      type: 'foam.nanos.medusa.ClusterConfig',
-      javaCode: `
-      DAO clusterConfigDAO = (DAO) x.get("clusterConfigDAO");
-      List<ClusterConfig> configs = ((ArraySink) clusterConfigDAO
-        .where(
-          AND(
-            EQ(ClusterConfig.REGION_STATUS, RegionStatus.ACTIVE),
-            EQ(ClusterConfig.REALM, config.getRealm()),
-            EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
-//            EQ(ClusterConfig.ZONE, 0L),
-            EQ(ClusterConfig.STATUS, Status.ONLINE),
-            EQ(ClusterConfig.ENABLED, true)
-          ))
-        // send to outermost zone.
-        .orderBy(foam.mlang.MLang.DESC(ClusterConfig.ZONE))
-//        .orderBy(ClusterConfig.IS_PRIMARY)
-        .select(new ArraySink())).getArray();
-      if ( configs.size() > 0 ) {
-        // TODO: random or round-robin.
-        // Ordered by IS_PRIMARY if any are.
-        return configs.get(configs.size() -1);
-      } else {
-        throw new RuntimeException("Active Region not found.");
-      }
-      `
-    },
-    {
-      documentation: 'Any active region in realm.',
-      name: 'getNextZoneConfig',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'config',
-          type: 'foam.nanos.medusa.ClusterConfig'
-        }
-      ],
-      type: 'foam.nanos.medusa.ClusterConfig',
-      javaCode: `
-      long zone = config.getZone();
-      while ( zone > 0 ) {
-        zone -= 1;
-        DAO clusterConfigDAO = (DAO) x.get("clusterConfigDAO");
-        List<ClusterConfig> configs = ((ArraySink) clusterConfigDAO
-          .where(
-            AND(
-              EQ(ClusterConfig.REGION_STATUS, RegionStatus.ACTIVE),
-              EQ(ClusterConfig.REALM, config.getRealm()),
-              EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
-              EQ(ClusterConfig.ZONE, zone),
-              EQ(ClusterConfig.STATUS, Status.ONLINE),
-              EQ(ClusterConfig.ENABLED, true)
-            ))
-          .orderBy(foam.mlang.MLang.DESC(ClusterConfig.IS_PRIMARY))
-          .select(new ArraySink())).getArray();
-        if ( configs.size() > 0 ) {
-          return configs.get(configs.size() -1);
-        }
-      }
-      throw new RuntimeException("Next Zone not found.");
-      `
     },
     {
       name: 'getVoters',
@@ -622,6 +617,8 @@ configuration for contacting the primary node.`,
       ],
       javaType: `java.util.List`,
       javaCode: `
+      PM pm = PM.create(x, this.getClass().getSimpleName(), "getVoters");
+      try {
       ClusterConfig config = getConfig(x, getConfigId());
       List arr = (ArrayList) ((ArraySink) ((DAO) x.get("localClusterConfigDAO"))
         .where(
@@ -636,7 +633,10 @@ configuration for contacting the primary node.`,
         )
         .select(new ArraySink())).getArray();
       return arr;
-      `
+      } finally {
+        pm.log(x);
+      }
+     `
     },
     {
       name: 'canVote',
@@ -696,12 +696,17 @@ configuration for contacting the primary node.`,
         }
       ],
       javaCode: `
+      PM pm = PM.create(x, this.getClass().getSimpleName(), "getClientDAO");
+      try {
       return new ClientDAO.Builder(x)
         .setDelegate(new SessionClientBox.Builder(x)
           .setSessionID(sendClusterConfig.getSessionId())
-          .setDelegate(getTransportlayerBox(x, serviceName, sendClusterConfig, receiveClusterConfig, true))
+          .setDelegate(getSocketClientBox(x, serviceName, sendClusterConfig, receiveClusterConfig))
           .build())
         .build();
+      } finally {
+        pm.log(x);
+      }
       `
     },
     {
@@ -727,48 +732,16 @@ configuration for contacting the primary node.`,
         }
       ],
       javaCode: `
+      PM pm = PM.create(x, this.getClass().getSimpleName(), "getBroadcastClientDAO");
+      try {
       return new NotificationClientDAO.Builder(x)
         .setDelegate(new SessionClientBox.Builder(x)
           .setSessionID(sendClusterConfig.getSessionId())
-          .setDelegate(getTransportlayerBox(x, serviceName, sendClusterConfig, receiveClusterConfig, true))
+          .setDelegate(getSocketClientBox(x, serviceName, sendClusterConfig, receiveClusterConfig))
           .build())
         .build();
-      `
-    },
-    {
-      documentation: 'determine the next server to route request to.',
-      name: 'getNextServerConfig',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        }
-      ],
-      type: 'ClusterConfig',
-      javaCode: `
-      DAO dao = (DAO) x.get("localClusterConfigDAO");
-      ClusterConfig config = (ClusterConfig) dao.find(getConfigId());
-
-      // standby region -> active region
-      if ( config.getRegionStatus() != RegionStatus.ACTIVE ) {
-        return getActiveRegionConfig(x, config);
-      }
-
-      // active region, zone # -> zone # -1 (primary if known)
-      if ( config.getZone() > 0 ) {
-        return getNextZoneConfig(x, config);
-      }
-
-      // route to primary
-      try {
-        return getPrimary(x);
-      } catch ( RuntimeException t ) {
-        // if in standalone mode, just route to self if only one mediator enabled.
-        if ( getStandAlone() ) {
-          getLogger().debug("getNextServerConfig", t.getMessage(), "fallback to StandAlone");
-          return config;
-        }
-        throw t;
+      } finally {
+        pm.log(x);
       }
       `
     },
@@ -784,6 +757,7 @@ configuration for contacting the primary node.`,
         },
       ],
       javaCode: `
+      PM pm = PM.create(x, this.getClass().getSimpleName(), "cronEnabled");
       try {
         ClusterConfig config = getConfig(x, getConfigId());
         if ( config == null ) {
@@ -809,6 +783,8 @@ configuration for contacting the primary node.`,
         }
       } catch (Throwable t) {
         // ignore, thrown when no config found.
+      } finally {
+        pm.log(x);
       }
       return true;
      `
@@ -840,6 +816,8 @@ configuration for contacting the primary node.`,
         getLogger().debug("mdao", "cache", serviceName);
         return dao;
       }
+      PM pm = PM.create(x, this.getClass().getSimpleName(), "getMdao");
+      try {
       if ( obj != null &&
            ! ( obj instanceof DAO ) ) {
         getLogger().error("getMdao" ,serviceName, "not instance of dao", obj.getClass().getSimpleName());
@@ -888,6 +866,9 @@ configuration for contacting the primary node.`,
         getLogger().error("mdao", serviceName, key, t.getMessage(), t);
       }
       throw new IllegalArgumentException("MDAO not found: "+serviceName);
+      } finally {
+        pm.log(x);
+      }
       `
     },
     {

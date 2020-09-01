@@ -36,12 +36,28 @@ foam.CLASS({
   ],
 
   methods: [
+    // {
+    //   name: 'find_',
+    //   javaCode: `
+    //   ClusterCommand cmd = (ClusterCommand) id;
+    //   ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+    //   cmd = cmd.addHop(x, DOP.FIND, "received");
+    //   getLogger().debug("find_", "hops", java.util.Arrays.toString(cmd.getHops()));
+    //   DAO dao = (DAO) x.get(cmd.getServiceName());
+    //   if ( dao == null ) {
+    //     getLogger().error("DAO not found", cmd.getServiceName());
+    //     throw new ClusterException("DAO not found");
+    //   }
+    //   getLogger().debug("find_", cmd.getData());
+    //   return dao.find_(x, cmd.getData());
+    //   `
+    // },
     {
       name: 'put_',
       javaCode: `
       ClusterCommand cmd = (ClusterCommand) obj;
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      cmd = cmd.addHop(x, "received");
+      cmd = cmd.addHop(x, DOP.PUT, "received");
       getLogger().debug("put_", "hops", java.util.Arrays.toString(cmd.getHops()));
       DAO dao = (DAO) x.get(cmd.getServiceName());
       if ( dao == null ) {
@@ -50,7 +66,7 @@ foam.CLASS({
       }
 
       FObject nu = cmd.getData();
-      getLogger().debug("put_", "find_", nu.getClass().getSimpleName(), nu.getProperty("id"));
+      // getLogger().debug("put_", "find_", nu.getClass().getSimpleName(), nu.getProperty("id"));
       FObject old = dao.find_(x, nu.getProperty("id"));
       if (  old != null ) {
          nu = old.fclone().copyFrom(nu);
@@ -63,8 +79,8 @@ foam.CLASS({
       javaCode: `
       ClusterCommand cmd = (ClusterCommand) obj;
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      cmd = cmd.addHop(x, "received");
-      getLogger().debug("remove_", "hops", java.util.Arrays.toString(cmd.getHops()));
+      cmd = cmd.addHop(x, DOP.REMOVE, "received");
+      // getLogger().debug("remove_", "hops", java.util.Arrays.toString(cmd.getHops()));
       DAO dao = (DAO) x.get(cmd.getServiceName());
       if ( dao == null ) {
         getLogger().error("DAO not found", cmd.getServiceName());
@@ -78,8 +94,8 @@ foam.CLASS({
       javaCode: `
       ClusterCommand cmd = (ClusterCommand) obj;
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      cmd = cmd.addHop(x, "received");
-      getLogger().debug("cmd_", "hops", java.util.Arrays.toString(cmd.getHops()));
+      cmd = cmd.addHop(x, DOP.CMD, "received");
+      // getLogger().debug("cmd_", "hops", java.util.Arrays.toString(cmd.getHops()));
       DAO dao = (DAO) x.get(cmd.getServiceName());
       if ( dao == null ) {
         getLogger().error("DAO not found", cmd.getServiceName());
@@ -88,7 +104,7 @@ foam.CLASS({
       Object result = dao.cmd_(x, obj);
       if ( result instanceof ClusterCommand ) {
         cmd = (ClusterCommand) result;
-        cmd.addHop(x, "reply");
+        cmd.addHop(x, DOP.CMD, "reply");
       }
       return result;
       `

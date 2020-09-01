@@ -36,12 +36,22 @@ foam.CLASS({
     {
       name: 'serviceName',
       class: 'String',
+      javaFactory: `
+      if ( getNSpec() != null ) {
+        return getNSpec().getName();
+      }
+      return serviceName_;
+      `
+    },
+    {
+      name: 'clusterServiceName',
+      class: 'String',
       value: 'cluster'
     },
     {
       name: 'maxRetryAttempts',
       class: 'Int',
-      documentation: 'Set to -1 to infinitely retry.',
+      documentation: 'Set to -1 to infinitely retry, 0 to not retry',
       value: 20
     },
     {
@@ -67,12 +77,26 @@ foam.CLASS({
       javaFactory: `
         return new PrefixLogger(new Object[] {
           this.getClass().getSimpleName(),
-          getNSpec().getName()
+          getServiceName()
         }, (Logger) getX().get("logger"));
       `
     }
   ],
 
+  axioms: [
+    {
+      buildJavaClass: function(cls) {
+        cls.extras.push(`
+  public ClusterClientDAO(foam.core.X x, String serviceName, ClusterConfig config) {
+    setX(x);
+    setServiceName(serviceName);
+    setConfig(config);
+    setMaxRetryAttempts(0);
+  }
+        `);
+      }
+    }
+  ],
   methods: [
     {
       name: 'put_',
@@ -91,7 +115,7 @@ foam.CLASS({
       javaCode: `
       if ( obj instanceof ClusterCommand ) {
         getLogger().debug("cmd", "ClusterCommand");
-        return submit(x, DOP.CMD, obj);
+        return submit(x, DOP.CMD, (FObject) obj);
       }
       getLogger().debug("cmd", "delegate", obj.getClass().getSimpleName(), obj.toString(), new Exception("stackTrace"));
       return getDelegate().cmd_(x, obj);
@@ -110,7 +134,7 @@ foam.CLASS({
         },
         {
           name: 'obj',
-          type: 'Object'
+          type: 'FObject'
         }
       ],
       type: 'Object',
@@ -122,19 +146,20 @@ foam.CLASS({
       if ( obj instanceof ClusterCommand ) {
         cmd = (ClusterCommand) obj;
       } else {
-        ((ContextAware) obj).setX(null);
-        cmd = new ClusterCommand(x, getNSpec().getName(), dop, (FObject) obj);
+        if ( obj instanceof ContextAware ) {
+          ((ContextAware) obj).setX(null);
+        }
+        cmd = new ClusterCommand(x, getServiceName(), dop, obj);
       }
-      ClusterConfig serverConfig = support.getNextServerConfig(x);
-      cmd.addHop(x, "send");
+      cmd.addHop(x, dop, "send");
       cmd.setX(null);
 
       int retryDelay = 10;
       while ( true ) {
         try {
-          serverConfig = support.getNextServerConfig(x);
-          DAO dao = support.getClientDAO(x, getServiceName(), getConfig(), serverConfig);
-          // getLogger().debug("submit", "request", "to", serverConfig.getId(), "dao", dao.getClass().getSimpleName(), dop.getLabel(), obj.getClass().getSimpleName());
+          ClusterConfig serverConfig = support.getNextServer();
+          DAO dao = support.getClientDAO(x, getClusterServiceName(), getConfig(), serverConfig);
+          getLogger().debug("submit", "request", "to", serverConfig.getId(), "dao", dao.getClass().getSimpleName(), dop.getLabel(), obj.getClass().getSimpleName());
 
           Object result = null;
           if ( DOP.PUT == dop ) {
@@ -151,7 +176,7 @@ foam.CLASS({
           if ( obj instanceof ClusterCommand ) {
             // getLogger().debug("submit", "response", "from", serverConfig.getId(), "dao", dao.getClass().getSimpleName(), dop.getLabel(), (result != null ? result.getClass().getSimpleName() : "null"));
             cmd.setData((FObject) result);
-            cmd.addHop(x, "reply");
+            cmd.addHop(x, dop, "reply");
             return cmd;
           }
           return result;

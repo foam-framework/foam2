@@ -14,8 +14,6 @@ foam.CLASS({
   javaImports: [
     'foam.core.FObject',
     'foam.dao.DAO',
-    'foam.nanos.http.Ping',
-    'foam.nanos.http.PingService',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger'
   ],
@@ -24,10 +22,9 @@ foam.CLASS({
     {
       buildJavaClass: function(cls) {
         cls.extras.push(`
-          public ClusterConfigPingSink(foam.core.X x, foam.dao.DAO dao, int timeout) {
+          public ClusterConfigPingSink(foam.core.X x, foam.dao.DAO dao) {
             setX(x);
             setDao(dao);
-            setTimeout(timeout);
           }
         `);
       }
@@ -35,11 +32,6 @@ foam.CLASS({
   ],
 
   properties: [
-    {
-      name: 'timeout',
-      class: 'Int',
-      value: 3000,
-    },
     {
       name: 'dao',
       class: 'foam.dao.DAOProperty'
@@ -74,20 +66,13 @@ foam.CLASS({
       ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
       ClusterConfig myConfig = support.getConfig(getX(), support.getConfigId());
       ClusterConfig config = (ClusterConfig) ((FObject)obj).fclone();
-      ClusterPingService pingService = (ClusterPingService) getX().get("mping");
+      DAO client = support.getClientDAO(getX(), "clusterConfigDAO", myConfig, config);
       try {
-        Status status = pingService.ping(getX(), config.getId(), config.getPort(), getTimeout(), config.getUseHttps());
-        // getLogger().debug("config.status", config.getStatus(), "status", status);
-        if ( status == null ) {
-          status = Status.OFFLINE;
+        ClusterConfig cfg = (ClusterConfig) client.find_(getX(), config.getId());
+        if ( cfg != null ) {
+          getDao().put_(getX(), cfg);
         }
-        // TODO: Alarm if ONLINE -> OFFLINE
-        // TODO: clear Alarm if OFFLINE -> ONLINE
-        if ( status != config.getStatus() ) {
-          config.setStatus(status);
-          config = (ClusterConfig) getDao().put_(getX(), config);
-        }
-      } catch (java.io.IOException | RuntimeException t) {
+      } catch ( RuntimeException t ) {
         getLogger().debug(config.getId(), t.getClass().getSimpleName(), t.getMessage());
         if ( config.getStatus() != Status.OFFLINE ) {
           config.setStatus(Status.OFFLINE);

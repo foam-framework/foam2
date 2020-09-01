@@ -61,17 +61,12 @@ foam.CLASS({
     {
       name: 'timerInterval',
       class: 'Long',
-      value: 3000
+      value: 5000
     },
     {
       name: 'initialTimerDelay',
       class: 'Int',
       value: 5000
-    },
-    {
-      name: 'pingTimeout',
-      class: 'Int',
-      value: 3000
     },
     {
       name: 'logger',
@@ -185,14 +180,14 @@ foam.CLASS({
             node.setStatus(Status.ONLINE);
             dao.put_(x, node);
           }
-          // no need for ping timer in standalone mode.
+          // no need for timer in standalone mode.
           timer_.cancel();
           timer_.purge();
           getLogger().debug("timer", "cancel");
           return;
         }
 
-        // TODO: Non-Mediators don't need to ping anything, just useful for reporting and network graph - the ping time could be reduced - see mn/services.jrl
+        // TODO: Non-Mediators just useful for reporting and network graph - the ping time could be reduced - see mn/services.jrl
 
         DAO dao = (DAO) x.get("localClusterConfigDAO");
         dao = dao.where(
@@ -201,7 +196,7 @@ foam.CLASS({
             NOT(EQ(ClusterConfig.ID, support.getConfigId())),
             EQ(ClusterConfig.REALM, config.getRealm())
           ));
-        dao.select(new ClusterConfigPingSink(x, dao, getPingTimeout()));
+        dao.select(new ClusterConfigPingSink(x, dao));
       } finally {
         synchronized ( timer_ ) {
           isRunning_ = false;

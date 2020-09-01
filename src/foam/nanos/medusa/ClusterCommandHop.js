@@ -11,6 +11,7 @@ foam.CLASS({
   documentation: `Record a hop through Medusa cluster.`,
 
   javaImports: [
+    'foam.dao.DOP',
     'foam.nanos.pm.PM'
   ],
   
@@ -32,9 +33,9 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-  public ClusterCommandHop(String hostname, String op) {
+  public ClusterCommandHop(String hostname, DOP dop, String op) {
     setHostname(hostname);
-    setPm(new PM(this.getClass().getSimpleName(), hostname, op));
+    setPm(new PM(this.getClass().getSimpleName(), hostname, dop.getLabel(), op));
   }
           `
         }));

@@ -78,7 +78,6 @@ foam.CLASS({
     setServiceName(serviceName);
     setDop(dop);
     setData(data);
-    // addHop(x);
     java.util.Random r = ThreadLocalRandom.current();
     setId(new UUID(r.nextLong(), r.nextLong()).toString());
   }
@@ -97,6 +96,10 @@ foam.CLASS({
           type: 'Context'
         },
         {
+          name: 'dop',
+          type: 'foam.dao.DOP'
+        },
+        {
           name: 'op',
           type: 'String'
         }
@@ -107,7 +110,7 @@ foam.CLASS({
       ClusterCommandHop[] existing = getHops();
       if ( existing == null ||
            existing.length == 0 ) {
-        setHops(new ClusterCommandHop[] { new ClusterCommandHop(support.getConfigId(), op) });
+        setHops(new ClusterCommandHop[] { new ClusterCommandHop(support.getConfigId(), dop, op) });
       } else {
         // set destination on previous hop
         ClusterCommandHop hop = existing[existing.length -1];
@@ -117,7 +120,7 @@ foam.CLASS({
         // start next hop
         ClusterCommandHop[] hops = new ClusterCommandHop[existing.length + 1];
         System.arraycopy(existing, 0, hops, 0, existing.length);
-        hops[hops.length - 1] = new ClusterCommandHop(support.getConfigId(), op);
+        hops[hops.length - 1] = new ClusterCommandHop(support.getConfigId(), dop, op);
         setHops(hops);
       }
       return this;
