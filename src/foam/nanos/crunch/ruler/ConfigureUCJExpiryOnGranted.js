@@ -14,11 +14,13 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.ContextAgent',
+    'foam.core.FObject',
     'foam.core.X',
     'foam.dao.DAO',
     'foam.nanos.crunch.AgentCapabilityJunction',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityJunctionStatus',
+    'foam.nanos.crunch.RenewableData',
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.logger.Logger',
     'java.util.Calendar',
@@ -46,8 +48,8 @@ foam.CLASS({
               )
             ));
 
-            if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED 
-              || ( old != null && old.getStatus() == CapabilityJunctionStatus.GRANTED ) ) 
+            if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED || ucj.getIsRenewable() 
+              || ( old != null && ! old.getIsRenewable() && old.getStatus() == CapabilityJunctionStatus.GRANTED ) ) 
               return;
               
             Capability capability = (Capability) ucj.findTargetId(x);
@@ -57,12 +59,9 @@ foam.CLASS({
               return;
             }
 
-            // Only update the expiry for non-active junctions, i.e., non-expired, non-pending, or granted junctions whose expiry is not yet set
-            if ( ( old != null && old.getStatus() == CapabilityJunctionStatus.GRANTED && old.getExpiry() != null ) 
-              || ucj.getStatus() != CapabilityJunctionStatus.GRANTED )
-              return;
-    
             Date junctionExpiry = capability.getExpiry();
+
+            ucj.resetRenewalStatus();
     
             if ( capability.getDuration() > 0 ) {
               Date today = new Date();
@@ -77,9 +76,15 @@ foam.CLASS({
               }
             }
             ucj.setExpiry(junctionExpiry);
+            FObject data = ucj.getData();
+            if ( junctionExpiry != null && ( data instanceof RenewableData ) ) {
+              ((RenewableData) data).setRenewable(false);
+              ((RenewableData) data).setReviewed(false);
+              ucj.setData(data);
+            } 
     
             if ( capability.getGracePeriod() > 0 ) {
-              ucj.setGraceDaysLeft(capability.getGracePeriod());
+              ucj.setGracePeriod(capability.getGracePeriod());
             }
           }
         }, "");

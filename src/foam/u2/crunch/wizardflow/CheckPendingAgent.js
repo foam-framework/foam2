@@ -16,6 +16,8 @@ foam.CLASS({
   imports: [
     'capabilityDAO',
     'capabilities',
+    'crunchService',
+    'ctrl',
     'endSequence',
     'rootCapability',
     'subject',
@@ -23,6 +25,7 @@ foam.CLASS({
   ],
 
   requires: [
+    'foam.log.LogLevel',
     'foam.nanos.crunch.AgentCapabilityJunction',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction'
@@ -56,20 +59,18 @@ foam.CLASS({
         )
       );
       
-      var toLaunchOrNot = false;
+      var shouldReopen = false;
       if ( ucj ) {
-        var statusGranted = ucj.status === this.CapabilityJunctionStatus.GRANTED;
-        var statusPending = ucj.status === this.CapabilityJunctionStatus.PENDING 
-          || ucj.status === this.CapabilityJunctionStatus.APPROVED;
-        if ( statusGranted || statusPending ) {
-          var message = statusGranted ? this.CANNOT_OPEN_GRANTED : this.CANNOT_OPEN_PENDING;
+        var statusPending = ucj.status === this.CapabilityJunctionStatus.PENDING;
+        var shouldReopen = await this.crunchService.maybeReopen(this.ctrl.__subContext__, ucj.targetId);
+        if ( ! shouldReopen ) {
+          var message = statusPending ? this.CANNOT_OPEN_PENDING : this.CANNOT_OPEN_GRANTED;
           this.ctrl.notify(message, '', this.LogLevel.INFO, true);
           this.endSequence();
           return;
         }
-        toLaunchOrNot = ucj.status === this.CapabilityJunctionStatus.ACTION_REQUIRED;
       }
-      if ( toLaunchOrNot && this.capabilities.length < 1 ) {
+      if ( shouldReopen && this.capabilities.length < 1 ) {
         // This is here because of a CertifyDataReviewed capability.
         this.ctrl.notify(this.CANNOT_OPEN_ACTION_PENDING);
         this.endSequence();
