@@ -28,7 +28,7 @@ foam.CLASS({
         AlarmConfig config = (AlarmConfig) alarmConfigDAO.find(EQ(AlarmConfig.NAME, alarm.getName()));
         try {
           if ( config == null ) {
-            AlarmConfig alarmConfig = new AlarmConfig.Builder(getX())
+            AlarmConfig alarmConfig = new AlarmConfig.Builder(x)
               .setName(alarm.getName())
               .build();
             alarmConfigDAO.put(alarmConfig);
