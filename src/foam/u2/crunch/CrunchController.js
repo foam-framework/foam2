@@ -38,6 +38,7 @@ foam.CLASS({
     'foam.u2.crunch.wizardflow.StepWizardAgent',
     'foam.u2.crunch.wizardflow.PutFinalJunctionsAgent',
     'foam.u2.crunch.wizardflow.TestAgent',
+    'foam.u2.crunch.wizardflow.LoadTopConfig',
     'foam.util.async.Sequence',
     'foam.u2.borders.MarginBorder',
     'foam.u2.crunch.CapabilityInterceptView'
@@ -72,6 +73,7 @@ foam.CLASS({
         .add(this.CheckPendingAgent)
         .add(this.CreateWizardletsAgent)
         .add(this.RequirementsPreviewAgent)
+        .add(this.LoadTopConfig)
         .add(this.StepWizardAgent)
         .add(this.PutFinalJunctionsAgent)
         // .add(this.TestAgent)

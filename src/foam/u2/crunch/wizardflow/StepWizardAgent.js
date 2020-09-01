@@ -15,7 +15,8 @@ foam.CLASS({
 
   imports: [
     'capabilities',
-    'wizardlets'
+    'wizardlets',
+    'wizardConfig'
   ],
 
   requires: [
@@ -25,14 +26,12 @@ foam.CLASS({
 
   methods: [
     function execute() {
-      let topCap = this.capabilities.slice(-1)[0];
-      let config = topCap.wizardletConfig.cls_.create({ ...topCap.wizardletConfig.instance_ }, this);
       return new Promise((resolve, _) => {
         ctrl.add(this.Popup.create({ closeable: false }).tag({
           class: 'foam.u2.wizard.StepWizardletView',
           data: this.StepWizardletController.create({
             wizardlets: this.wizardlets,
-            config: config
+            config: this.wizardConfig
           }),
           onClose: (x) => {
             x.closeDialog();
