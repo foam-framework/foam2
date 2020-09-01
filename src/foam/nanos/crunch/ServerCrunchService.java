@@ -54,7 +54,7 @@ public class ServerCrunchService implements CrunchService {
     while ( nextSources.size() > 0 ) {
       String sourceCapabilityId = nextSources.poll();
 
-      if ( ! filterGrantedUCJ ) {
+      if ( filterGrantedUCJ ) {
         UserCapabilityJunction ucj = crunchService.getJunction(x, sourceCapabilityId);
         if ( ucj != null && ucj.getStatus() == CapabilityJunctionStatus.GRANTED ) {
           continue;
