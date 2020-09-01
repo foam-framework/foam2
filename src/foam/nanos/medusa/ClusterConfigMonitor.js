@@ -189,7 +189,11 @@ foam.CLASS({
 
         // TODO: Non-Mediators just useful for reporting and network graph - the ping time could be reduced - see mn/services.jrl
 
-        DAO dao = (DAO) x.get("localClusterConfigDAO");
+        // update ReplayingInfo for self.
+        DAO dao = (DAO) x.get("clusterConfigDAO");
+        dao.find_(x, config.getId());
+
+        dao = (DAO) x.get("localClusterConfigDAO");
         dao = dao.where(
           AND(
             EQ(ClusterConfig.ENABLED, true),

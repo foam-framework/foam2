@@ -316,17 +316,18 @@ configuration for contacting the primary node.`,
         List<ClusterConfig> configs = ((ArraySink) clusterConfigDAO
           .where(
             AND(
-              EQ(ClusterConfig.REGION_STATUS, RegionStatus.ACTIVE),
+              EQ(ClusterConfig.ENABLED, true),
               EQ(ClusterConfig.REALM, config.getRealm()),
-              EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
-              EQ(ClusterConfig.ZONE, zone),
+              EQ(ClusterConfig.REGION_STATUS, RegionStatus.ACTIVE),
               EQ(ClusterConfig.STATUS, Status.ONLINE),
-              EQ(ClusterConfig.ENABLED, true)
+              EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
+              EQ(ClusterConfig.ZONE, zone)
             ))
           .orderBy(foam.mlang.MLang.DESC(ClusterConfig.IS_PRIMARY))
           .select(new ArraySink())).getArray();
         if ( configs.size() > 0 ) {
           return configs.get(0);
+          // return configs.get(configs.size() -1);
         }
       }
       throw new RuntimeException("Next Zone not found.");
