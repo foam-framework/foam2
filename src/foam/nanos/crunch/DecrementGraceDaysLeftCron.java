@@ -25,18 +25,18 @@ public class DecrementGraceDaysLeftCron implements ContextAgent {
   @Override
   public void execute(X x) {
     logger = (Logger) x.get("logger");
-    userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
+    userCapabilityJunctionDAO = (DAO) x.get("bareUserCapabilityJunctionDAO");
 
     List<UserCapabilityJunction> junctions = ((ArraySink) userCapabilityJunctionDAO
       .where(AND(
-        EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRACE_PERIOD),
-        GT(UserCapabilityJunction.GRACE_DAYS_LEFT, 0)
+        EQ(UserCapabilityJunction.IS_IN_GRACE_PERIOD, true),
+        GT(UserCapabilityJunction.GRACE_PERIOD, 0)
       ))
       .select(new ArraySink()))
       .getArray();
 
     for ( UserCapabilityJunction ucj : junctions ) {
-      ucj.setGraceDaysLeft(ucj.getGraceDaysLeft() - 1);
+      ucj.setGracePeriod(ucj.getGracePeriod() - 1);
       logger.debug("Decrementing grace days left for UserCapabilityJunction : " + ucj.getId());
       userCapabilityJunctionDAO.put(ucj);
     }

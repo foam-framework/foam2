@@ -19,12 +19,12 @@ foam.CLASS({
     'userCapabilityJunctionDAO'
   ],
   exports: [
-    'wizardlets'
+    'unfilteredWizardlets'
   ],
 
   properties: [
     {
-      name: 'wizardlets',
+      name: 'unfilteredWizardlets',
       class: 'FObjectArray',
       of: 'foam.u2.wizard.Wizardlet'
     }
@@ -88,13 +88,7 @@ foam.CLASS({
           return updateUCJPromiseList
         }, [])
       ).then(wizardlets => {
-        this.wizardlets = wizardlets.filter(wizardlet => {
-          return wizardlet.ucj === null ||
-          (
-            wizardlet.ucj.status != this.CapabilityJunctionStatus.GRANTED &&
-            wizardlet.ucj.status != this.CapabilityJunctionStatus.PENDING
-          )
-        });
+        this.unfilteredWizardlets = wizardlets;
       });
     },
     async function updateUCJ(wizardlet, associatedEntity) {

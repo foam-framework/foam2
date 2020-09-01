@@ -30,9 +30,17 @@ foam.CLASS({
           @Override
           public void execute(X x) {
             UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
+
+            boolean isRenewable = ucj.getIsRenewable(); // ucj either expired, in grace period, or in renewal period
+            
+            if ( ( ucj.getStatus() == CapabilityJunctionStatus.GRANTED && ! isRenewable ) || 
+              ucj.getStatus() == CapabilityJunctionStatus.PENDING || 
+              ucj.getStatus() == CapabilityJunctionStatus.APPROVED ) 
+              return;
+
             Capability capability = (Capability) ucj.findTargetId(x);
 
-            ucj.setStatus(CapabilityJunctionStatus.ACTION_REQUIRED);
+            if ( ! isRenewable ) ucj.setStatus(CapabilityJunctionStatus.ACTION_REQUIRED);
 
             if ( capability.getOf() == null ) {
               ucj.setStatus(CapabilityJunctionStatus.PENDING);
@@ -43,12 +51,13 @@ foam.CLASS({
             if ( data != null ) {
               try {
                 data.validate(x);
+                ucj.setStatus(CapabilityJunctionStatus.PENDING);
+                ucj.resetRenewalStatus();
               } catch (IllegalStateException e) {
                 Logger logger = (Logger) x.get("logger");
                 logger.error("ERROR IN UCJ DATA VALIDATION : ", e);
                 return;
               }
-              ucj.setStatus(CapabilityJunctionStatus.PENDING);
             }
           }
         }, "validate ucj data on put");

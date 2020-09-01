@@ -216,11 +216,7 @@ public class ServerCrunchService implements CrunchService {
     boolean satisfied = false;
     for ( String capId : capabilityOptions ) {
       UserCapabilityJunction ucj = this.getJunction(x, capId);
-      if ( ucj != null && (
-        // TODO: use getStatus().getBroadStatus() when available
-        ucj.getStatus() == CapabilityJunctionStatus.GRANTED
-        || ucj.getStatus() == CapabilityJunctionStatus.GRACE_PERIOD
-      ) ) {
+      if ( ucj != null && ucj.getStatus() == CapabilityJunctionStatus.GRANTED ) {
         satisfied = true;
         break;
       }
@@ -236,6 +232,38 @@ public class ServerCrunchService implements CrunchService {
       }
       throw ex;
     }
+  }
+
+  public boolean maybeReopen(X x, String capabilityId) {
+    DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+    DAO prerequisitesDAO = ((DAO) x.get("prerequisiteCapabilityJunctionDAO")).where(EQ(CapabilityCapabilityJunction.SOURCE_ID, capabilityId));
+    CrunchService crunchService = (CrunchService) x.get("crunchService");
+
+    Capability capability = (Capability) capabilityDAO.find(capabilityId);
+    UserCapabilityJunction ucj = crunchService.getJunction(x, capabilityId);
+
+    List<CapabilityCapabilityJunction> ccJunctions = ((ArraySink) prerequisitesDAO.select(new ArraySink())).getArray();
+    
+    boolean shouldReopenTopLevel = shouldReopenUserCapabilityJunction(ucj);
+
+    if ( ccJunctions.size() == 0 || shouldReopenTopLevel ) return shouldReopenTopLevel;
+
+    for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
+      Capability cap = (Capability) ccJunction.findTargetId(x);
+      if ( ! cap.getEnabled() ) continue;
+      UserCapabilityJunction ucJunction = crunchService.getJunction(x, ccJunction.getTargetId());
+      if ( shouldReopenUserCapabilityJunction(ucJunction) ) return true;
+    }
+    return false;
+  }
+
+  public boolean shouldReopenUserCapabilityJunction(UserCapabilityJunction ucj) {
+    if ( ucj == null ) return true;
+    else if ( ucj.getStatus() == CapabilityJunctionStatus.GRANTED && ucj.getIsRenewable() ) return true;
+    else if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED && 
+              ucj.getStatus() != CapabilityJunctionStatus.PENDING && 
+              ucj.getStatus() != CapabilityJunctionStatus.APPROVED ) return true;
+    return false;
   }
 
   public CapablePayload[] getCapableObjectPayloads(X x, String[] capabilityIds) {

@@ -26,10 +26,14 @@ foam.CLASS({
     'sourceId',
     'targetId',
     'status',
-    'created',
+    // 'created', todo, use createaware instead
     'expiry',
-    'graceDaysLeft',
+    'gracePeriod',
     'data'
+  ],
+
+  sections: [
+    { name: 'ucjExpirySection' }
   ],
 
   properties: [
@@ -61,17 +65,6 @@ foam.CLASS({
       }
     },
     {
-      name: 'created',
-      class: 'DateTime',
-      factory: function() {
-        return new Date();
-      }
-    },
-    {
-      name: 'expiry',
-      class: 'DateTime'
-    },
-    {
       name: 'data',
       class: 'foam.core.FObjectProperty',
       of: 'foam.core.FObject',
@@ -84,14 +77,13 @@ foam.CLASS({
       of: 'foam.nanos.crunch.CapabilityJunctionStatus',
       value: foam.nanos.crunch.CapabilityJunctionStatus.ACTION_REQUIRED
     },
-    {
-      name: 'graceDaysLeft',
-      class: 'Int',
-      documentation: `
-      Number of days left that a user can use the Capability in this ucj after it goes into GRACE_PERIOD status.
-      Set when the ucj is first granted.
-      `
-    }
+    // renewable
+    { name: 'isExpired', section: 'ucjExpirySection' },
+    { name: 'isRenewable', section: 'ucjExpirySection' },
+    { name: 'isInRenewablePeriod', section: 'ucjExpirySection' },
+    { name: 'isInGracePeriod', section: 'ucjExpirySection' },
+    { name: 'expiry', section: 'ucjExpirySection' },
+    { name: 'gracePeriod', section: 'ucjExpirySection' }
   ],
 
   methods: [
