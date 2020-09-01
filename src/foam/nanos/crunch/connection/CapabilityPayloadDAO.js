@@ -85,8 +85,8 @@ foam.CLASS({
                 FObject capDataObject = null;
                 if ( cap.getOf() != null ){
                   try {
-                    var capDataObject = capabilityDataMap.get(cap.getName());
-                    if ( capabilityData == null )
+                    capDataObject = capabilityDataMap.get(cap.getName());
+                    if ( capDataObject == null )
                       capDataObject = (FObject) cap.getOf().newInstance();
                   } catch (Exception e){
                     throw new RuntimeException(e);
