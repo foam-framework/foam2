@@ -38,14 +38,6 @@ foam.CLASS({
       value: {
         class: 'foam.u2.wizard.StepWizardletView',
       }
-    },
-    {
-      name: 'overrideTopCapabilityConfig',
-      documentation: `
-        Set this to true and this StepWizardAgent's config will override
-        any wizard configuration specified by the root capability being
-        granted.
-      `
     }
   ],
 
