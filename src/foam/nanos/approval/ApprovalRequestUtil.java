@@ -78,6 +78,6 @@ public class ApprovalRequestUtil {
       return tester.getState();
     }
     ApprovalStatus state = tester.getState();
-    return state == null ? ApprovalStatus.REQUESTED : ApprovalStatus.APPROVED;
+    return state == null ? ApprovalStatus.REQUESTED : state;
   }
 }
