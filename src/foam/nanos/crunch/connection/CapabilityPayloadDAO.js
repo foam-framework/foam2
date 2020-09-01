@@ -86,7 +86,7 @@ foam.CLASS({
                 if ( cap.getOf() != null ){
                   try {
                     for ( var capability : capabilities ) {
-                      if ( capability.getName() == cap.getName())
+                      if ( capability.getName() == cap.getName() )
                         capDataObject = capability;
                     }
                     if ( capDataObject == null )
@@ -98,6 +98,7 @@ foam.CLASS({
                 capabilityDataObjects.put(cap.getName(), capDataObject);
               }
             }
+
             return capabilityDataObjects;
           }
         `);
