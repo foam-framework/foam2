@@ -59,8 +59,7 @@ public class ApprovalTester {
    * @return approval status of the test
    */
   public ApprovalStatus test(ApprovalRequest request) {
-    if ( request.getStatus() == ApprovalStatus.REQUESTED
-      || incrRejected(request) >= request.getRequiredRejectedPoints()
+    if ( incrRejected(request) >= request.getRequiredRejectedPoints()
     ) {
       state_ = request.getStatus();
     } else {
